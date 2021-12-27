@@ -1,0 +1,19 @@
+Changes
+CONTRIBUTING.md
+examples/everything.pl
+lib/Devel/Agent/AwareRole.pm
+lib/Devel/Agent/EveryThing.pm
+lib/Devel/Agent.pm
+lib/Devel/Agent/Proxy.pm
+LICENSE.md
+Makefile.PL
+MANIFEST
+README.md
+t/Devel-Agent-AwareRole.t
+t/Devel-Agent-Proxy.t
+t/Devel-Agent.t
+t/TestMe2.pm
+t/TestMe3.pm
+t/TestMe.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

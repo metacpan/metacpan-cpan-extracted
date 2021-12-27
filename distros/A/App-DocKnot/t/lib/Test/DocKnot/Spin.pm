@@ -50,7 +50,7 @@ sub is_spin_output {
         Last [ ] modified [ ] and \s+ (<a[^>]+>spun</a>) [ ] [%]DATE[%]
     }{Last $1\n    %DATE% from thread modified %DATE%}gxms;
     $results =~ s{
-        %DATE% [ ] from [ ] POD [ ] modified [ ] %DATE%
+        %DATE% [ ] from [ ] (Markdown|POD) [ ] modified [ ] %DATE%
     }{%DATE% from thread modified %DATE%}gxms;
     $results =~ s{
         (<guid [ ] isPermaLink="false">) \d+ (</guid>)

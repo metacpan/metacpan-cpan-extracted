@@ -18,20 +18,20 @@
   #include "spvm_descriptor.h"
 %}
 
-%token <opval> CLASS HAS METHOD OUR ENUM MY USE REQUIRE ALLOW
+%token <opval> CLASS HAS METHOD OUR ENUM MY USE AS REQUIRE ALLOW CURRENT_CLASS
 %token <opval> DESCRIPTOR
 %token <opval> IF UNLESS ELSIF ELSE FOR WHILE LAST NEXT SWITCH CASE DEFAULT BREAK EVAL
 %token <opval> NAME VAR_NAME CONSTANT EXCEPTION_VAR
 %token <opval> UNDEF VOID BYTE SHORT INT LONG FLOAT DOUBLE STRING OBJECT TRUE FALSE
 %token <opval> DOT3 FATCAMMA RW RO WO INIT NEW
-%token <opval> RETURN WEAKEN DIE WARN PRINT CURRENT_CLASS UNWEAKEN '[' '{' '('
+%token <opval> RETURN WEAKEN DIE WARN PRINT CURRENT_CLASS_NAME UNWEAKEN '[' '{' '('
 
 %type <opval> grammar
 %type <opval> opt_classes classes class class_block
 %type <opval> opt_declarations declarations declaration
 %type <opval> enumeration enumeration_block opt_enumeration_values enumeration_values enumeration_value
 %type <opval> method anon_method opt_args args arg has use require our
-%type <opval> opt_descriptors descriptors method_names opt_method_names
+%type <opval> opt_descriptors descriptors
 %type <opval> opt_statements statements statement if_statement else_statement 
 %type <opval> for_statement while_statement switch_statement case_statement default_statement
 %type <opval> block eval_block init_block switch_block if_require_statement
@@ -49,12 +49,12 @@
 %left <opval> LOGICAL_OR
 %left <opval> LOGICAL_AND
 %left <opval> BIT_OR BIT_XOR
-%left <opval> '&'
+%left <opval> BIT_AND
 %nonassoc <opval> NUMEQ NUMNE STREQ STRNE
 %nonassoc <opval> NUMGT NUMGE NUMLT NUMLE STRGT STRGE STRLT STRLE ISA NUMERIC_CMP STRING_CMP
 %left <opval> SHIFT
 %left <opval> '+' '-' '.'
-%left <opval> MULTIPLY DIVIDE REMAINDER
+%left <opval> '*' DIVIDE REMAINDER
 %right <opval> LOGICAL_NOT BIT_NOT '@' CREATE_REF DEREF PLUS MINUS CONVERT SCALAR STRING_LENGTH ISWEAK REFCNT REFOP DUMP
 %nonassoc <opval> INC DEC
 %left <opval> ARROW
@@ -190,7 +190,7 @@ use
     {
       $$ = SPVM_OP_build_use(compiler, $1, $2, NULL, 0);
     }
-  | USE basic_type '(' opt_method_names ')' ';'
+  | USE basic_type AS basic_type';'
     {
       $$ = SPVM_OP_build_use(compiler, $1, $2, $4, 0);
     }
@@ -200,6 +200,11 @@ require
     {
       SPVM_OP* op_use = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_USE, compiler->cur_file, compiler->cur_line);
       $$ = SPVM_OP_build_use(compiler, op_use, $2, NULL, 1);
+    }
+  | REQUIRE basic_type AS basic_type';'
+    {
+      SPVM_OP* op_use = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_USE, compiler->cur_file, compiler->cur_line);
+      $$ = SPVM_OP_build_use(compiler, op_use, $2, $4, 1);
     }
 
 allow
@@ -695,7 +700,7 @@ expression
         $$ = $2;
       }
     }
-  | CURRENT_CLASS
+  | CURRENT_CLASS_NAME
   | isweak_field
   | comparison_op
   | isa
@@ -807,9 +812,10 @@ binary_op
       SPVM_OP* op = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_SUBTRACT, $2->file, $2->line);
       $$ = SPVM_OP_build_binary_op(compiler, op, $1, $3);
     }
-  | expression MULTIPLY expression
+  | expression '*' expression
     {
-      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
+      SPVM_OP* op = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_MULTIPLY, $2->file, $2->line);
+      $$ = SPVM_OP_build_binary_op(compiler, op, $1, $3);
     }
   | expression DIVIDE expression
     {
@@ -823,10 +829,9 @@ binary_op
     {
       $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
     }
-  | expression '&' expression
+  | expression BIT_AND expression
     {
-      SPVM_OP* op = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_BIT_AND, $2->file, $2->line);
-      $$ = SPVM_OP_build_binary_op(compiler, op, $1, $3);
+      $$ = SPVM_OP_build_binary_op(compiler, $2, $1, $3);
     }
   | expression BIT_OR expression
     {
@@ -1011,9 +1016,14 @@ array_access
     }
 
 call_spvm_method
-  : NAME '(' opt_expressions  ')'
+  : CURRENT_CLASS ARROW NAME '(' opt_expressions  ')'
     {
-      $$ = SPVM_OP_build_call_method(compiler, NULL, $1, $3);
+      $$ = SPVM_OP_build_call_method(compiler, $1, $3, $5);
+    }
+  | CURRENT_CLASS ARROW NAME
+    {
+      SPVM_OP* op_expressions = SPVM_OP_new_op_list(compiler, $1->file, $2->line);
+      $$ = SPVM_OP_build_call_method(compiler, $1, $3, op_expressions);
     }
   | basic_type ARROW method_name '(' opt_expressions  ')'
     {
@@ -1171,7 +1181,7 @@ basic_type
     }
 
 ref_type
-  : basic_type '&'
+  : basic_type '*'
     {
       $$ = SPVM_OP_build_ref_type(compiler, $1);
     }
@@ -1208,40 +1218,5 @@ field_name
 
 method_name
   : NAME
-
-opt_method_names
-  : /* Empty */
-    {
-      $$ = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
-    }
-  | method_names
-    {
-      if ($1->id == SPVM_OP_C_ID_LIST) {
-        $$ = $1;
-      }
-      else {
-        SPVM_OP* op_list = SPVM_OP_new_op_list(compiler, $1->file, $1->line);
-        SPVM_OP_insert_child(compiler, op_list, op_list->last, $1);
-        $$ = op_list;
-      }
-    }
-
-method_names
-  : method_names ',' method_name
-    {
-      SPVM_OP* op_list;
-      if ($1->id == SPVM_OP_C_ID_LIST) {
-        op_list = $1;
-      }
-      else {
-        op_list = SPVM_OP_new_op_list(compiler, $1->file, $1->line);
-        SPVM_OP_insert_child(compiler, op_list, op_list->last, $1);
-      }
-      SPVM_OP_insert_child(compiler, op_list, op_list->last, $3);
-      
-      $$ = op_list;
-    }
-  | method_names ','
-  | method_name
 
 %%

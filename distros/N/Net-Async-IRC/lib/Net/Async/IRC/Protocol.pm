@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2021 -- leonerd@leonerd.org.uk
 
-package Net::Async::IRC::Protocol;
+package Net::Async::IRC::Protocol 0.12;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.11';
 
 use base qw( IO::Async::Stream Protocol::IRC );
 
@@ -113,7 +111,7 @@ incoming messages.
 
 =head2 new
 
-   $irc = Net::Async::IRC::Protocol->new( %args )
+   $irc = Net::Async::IRC::Protocol->new( %args );
 
 Returns a new instance of a C<Net::Async::IRC::Protocol> object. This object
 represents a IRC connection to a peer.
@@ -235,7 +233,7 @@ sub incoming_message
 
 =head2 is_connected
 
-   $connect = $irc->is_connected
+   $connect = $irc->is_connected;
 
 Returns true if a connection to the peer is established. Note that even
 after a successful connection, the connection may not yet logged in to. See
@@ -252,7 +250,7 @@ sub is_connected
 
 =head2 is_loggedin
 
-   $loggedin = $irc->is_loggedin
+   $loggedin = $irc->is_loggedin;
 
 Returns true if the full login sequence has been performed on the connection
 and it is ready to use.
@@ -291,7 +289,7 @@ sub on_read
 
 =head2 nick
 
-   $nick = $irc->nick
+   $nick = $irc->nick;
 
 Returns the current nick in use by the connection.
 
@@ -312,7 +310,7 @@ sub nick
 
 =head2 nick_folded
 
-   $nick_folded = $irc->nick_folded
+   $nick_folded = $irc->nick_folded;
 
 Returns the current nick in use by the connection, folded by C<casefold_name>
 for convenience.
@@ -347,25 +345,25 @@ A message with a command of C<COMMAND> will try handlers in following places:
 
 A CODE ref in a parameter called C<on_message_COMMAND>
 
- $on_message_COMMAND->( $irc, $message, \%hints )
+   $on_message_COMMAND->( $irc, $message, \%hints )
 
 =item 2.
 
 A method called C<on_message_COMMAND>
 
- $irc->on_message_COMMAND( $message, \%hints )
+   $irc->on_message_COMMAND( $message, \%hints )
 
 =item 3.
 
 A CODE ref in a parameter called C<on_message>
 
- $on_message->( $irc, 'COMMAND', $message, \%hints )
+   $on_message->( $irc, 'COMMAND', $message, \%hints )
 
 =item 4.
 
 A method called C<on_message>
 
- $irc->on_message( 'COMMAND', $message, \%hints )
+   $irc->on_message( 'COMMAND', $message, \%hints )
 
 =back
 

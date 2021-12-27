@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Base role for JSON Schema vocabulary classes
 
-our $VERSION = '0.531';
+our $VERSION = '0.533';
 
 use 5.020;
 use Moo::Role;
@@ -103,7 +103,7 @@ JSON::Schema::Modern::Vocabulary - Base role for JSON Schema vocabulary classes
 
 =head1 VERSION
 
-version 0.531
+version 0.533
 
 =head1 SYNOPSIS
 
@@ -165,6 +165,13 @@ Evaluates a subschema. Callers are expected to establish a new C<$state> scope.
 =head2 eval_subschema_at_uri
 
 Resolves a URI to a subschema, then evaluates that subschema (essentially the `$ref` keyword).
+
+=head1 SUPPORT
+
+=for stopwords OpenAPI
+
+You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI Slack
+server|https://open-api.slack.com>, which are also great resources for finding help.
 
 =head1 SUPPORT
 

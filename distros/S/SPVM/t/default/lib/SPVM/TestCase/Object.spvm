@@ -3,7 +3,7 @@ class TestCase::Object {
   use TestCase::Simple;
   
   use TestCase::Destructor;
-  use Fn (INT8_MIN, INT8_MAX, INT16_MIN, INT16_MAX, INT32_MIN, INT32_MAX, INT64_MIN, INT64_MAX, FLT_MIN, FLT_MAX, DBL_MIN, DBL_MAX);
+  use Fn;
   
   has INT32_MAX : int;
   has next : int;
@@ -60,7 +60,7 @@ class TestCase::Object {
 
   static method destructor : int () {
     my $minimal = TestCase::Minimal->new();
-    destructor_call($minimal);
+    TestCase::Object->destructor_call($minimal);
     
     if ($minimal->{x} == 3) {
       return 1;
@@ -90,20 +90,20 @@ class TestCase::Object {
   static method object_field_set_and_get : int () {
     my $test_case =TestCase->new;
     
-    $test_case->{x_byte} = INT8_MAX();
-    $test_case->{x_short} = INT16_MAX();
-    $test_case->{x_int} = INT32_MAX();
-    $test_case->{x_long} = INT64_MAX();
+    $test_case->{x_byte} = Fn->INT8_MAX();
+    $test_case->{x_short} = Fn->INT16_MAX();
+    $test_case->{x_int} = Fn->INT32_MAX();
+    $test_case->{x_long} = Fn->INT64_MAX();
     $test_case->{x_float} = TestCase->FLOAT_PRECICE();
     $test_case->{x_double} = TestCase->DOUBLE_PRECICE();
     my $minimal = TestCase::Minimal->new();
     $minimal->{x} = 3;
     $test_case->{minimal} = $minimal;
     
-    if ((int)$test_case->{x_byte} == (int)INT8_MAX()) {
-      if ((int)$test_case->{x_short} == (int)INT16_MAX()) {
-        if ($test_case->{x_int} == INT32_MAX()) {
-          if ($test_case->{x_long} == INT64_MAX()) {
+    if ((int)$test_case->{x_byte} == (int)Fn->INT8_MAX()) {
+      if ((int)$test_case->{x_short} == (int)Fn->INT16_MAX()) {
+        if ($test_case->{x_int} == Fn->INT32_MAX()) {
+          if ($test_case->{x_long} == Fn->INT64_MAX()) {
             if ($test_case->{x_float} == TestCase->FLOAT_PRECICE()) {
               if ($test_case->{x_double} == TestCase->DOUBLE_PRECICE()) {
                 if ($test_case->{minimal}->{x} == 3) {
@@ -122,30 +122,30 @@ class TestCase::Object {
   static method object_field_set_and_get_again : int () {
     my $test_case =TestCase->new;
     
-    $test_case->{x_byte} = INT8_MAX();
-    $test_case->{x_short} = INT16_MAX();
-    $test_case->{x_int} = INT32_MAX();
-    $test_case->{x_long} = INT64_MAX();
-    $test_case->{x_float} = FLOAT_PRECICE();
-    $test_case->{x_double} = DOUBLE_PRECICE();
+    $test_case->{x_byte} = Fn->INT8_MAX();
+    $test_case->{x_short} = Fn->INT16_MAX();
+    $test_case->{x_int} = Fn->INT32_MAX();
+    $test_case->{x_long} = Fn->INT64_MAX();
+    $test_case->{x_float} = TestCase::Object->FLOAT_PRECICE();
+    $test_case->{x_double} = TestCase::Object->DOUBLE_PRECICE();
     my $minimal = TestCase::Minimal->new();
     $minimal->{x} = 3;
     $test_case->{minimal} = $minimal;
 
-    $test_case->{x_byte} = INT8_MAX();
-    $test_case->{x_short} = INT16_MAX();
-    $test_case->{x_int} = INT32_MAX();
-    $test_case->{x_long} = INT64_MAX();
-    $test_case->{x_float} = FLOAT_PRECICE();
-    $test_case->{x_double} = DOUBLE_PRECICE();
+    $test_case->{x_byte} = Fn->INT8_MAX();
+    $test_case->{x_short} = Fn->INT16_MAX();
+    $test_case->{x_int} = Fn->INT32_MAX();
+    $test_case->{x_long} = Fn->INT64_MAX();
+    $test_case->{x_float} = TestCase::Object->FLOAT_PRECICE();
+    $test_case->{x_double} = TestCase::Object->DOUBLE_PRECICE();
     $test_case->{minimal} = $minimal;
 
-    if ((int)$test_case->{x_byte} == (int)INT8_MAX()) {
-      if ((int)$test_case->{x_short} == (int)INT16_MAX()) {
-        if ($test_case->{x_int} == INT32_MAX()) {
-          if ($test_case->{x_long} == INT64_MAX()) {
-            if ($test_case->{x_float} == FLOAT_PRECICE()) {
-              if ($test_case->{x_double} == DOUBLE_PRECICE()) {
+    if ((int)$test_case->{x_byte} == (int)Fn->INT8_MAX()) {
+      if ((int)$test_case->{x_short} == (int)Fn->INT16_MAX()) {
+        if ($test_case->{x_int} == Fn->INT32_MAX()) {
+          if ($test_case->{x_long} == Fn->INT64_MAX()) {
+            if ($test_case->{x_float} == TestCase::Object->FLOAT_PRECICE()) {
+              if ($test_case->{x_double} == TestCase::Object->DOUBLE_PRECICE()) {
                 if ($test_case->{minimal}->{x} == 3) {
                   return 1;
                 }

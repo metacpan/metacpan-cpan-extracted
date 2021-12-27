@@ -109,8 +109,6 @@ if ($@ && $@ =~ m/\QConnection refused\E/i) {
     exit;
 }
 
-$ua->close_all();
-
 ok( $ua->add("/page/01.html"), "Adding the first request");
 ok( $ua->add("/page/02.html"), "Adding the second request");
 ok(!$ua->add("/page/03.html"), "Adding the third request");

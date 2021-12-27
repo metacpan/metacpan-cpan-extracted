@@ -93,6 +93,12 @@ allow = unless
 # Perl 5.20).  See https://github.com/Perl-Critic/Perl-Critic/issues/578.
 [-References::ProhibitDoubleSigils]
 
+# Five arguments to a method has seemed reasonable at least once: a pair of
+# input file data and path, a pair of output file descriptor and path, and
+# a dict of additional arguments.
+[Subroutines::ProhibitManyArgs]
+skip_object = 1
+
 # I generally don't want to require Readonly as a prerequisite for all my Perl
 # modules.
 [-ValuesAndExpressions::ProhibitConstantPragma]

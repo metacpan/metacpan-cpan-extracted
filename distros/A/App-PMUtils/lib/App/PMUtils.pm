@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-12-01'; # DATE
+our $DATE = '2021-12-03'; # DATE
 our $DIST = 'App-PMUtils'; # DIST
-our $VERSION = '0.737'; # VERSION
+our $VERSION = '0.738'; # VERSION
 
 our %SPEC;
 
@@ -267,6 +267,37 @@ sub pmabstract {
     }
 }
 
+$SPEC{update_this_mod} = {
+    v => 1.1,
+    summary => 'Update "this" Perl module',
+    description => <<'_',
+
+Will use <pm:App::ThisDist>'s `this_mod()` to find out what the current Perl
+module is, then run "cpanm -n" against the module. It's a convenient shortcut
+for:
+
+    % this-mod | cpanm -n
+
+_
+    args => {
+        # XXX cpanm options
+    },
+    deps => {
+        prog => 'cpanm',
+    },
+};
+sub update_this_mod {
+    require App::ThisDist;
+    require IPC::System::Options;
+
+    my %args = @_;
+
+    my $mod = App::ThisDist::this_mod();
+    return [412, "Can't determine the current module"] unless defined $mod;
+    IPC::System::Options::system({log=>1, die=>1}, "cpanm", "-n", $mod);
+    [200];
+}
+
 1;
 # ABSTRACT: Command-line utilities related to Perl modules
 
@@ -282,7 +313,7 @@ App::PMUtils - Command-line utilities related to Perl modules
 
 =head1 VERSION
 
-This document describes version 0.737 of App::PMUtils (from Perl distribution App-PMUtils), released on 2021-12-01.
+This document describes version 0.738 of App::PMUtils (from Perl distribution App-PMUtils), released on 2021-12-03.
 
 =head1 SYNOPSIS
 
@@ -290,6 +321,8 @@ This distribution provides the following command-line utilities related to Perl
 modules:
 
 =over
+
+=item * L<cpanm-this-mod>
 
 =item * L<module-dir>
 
@@ -348,6 +381,8 @@ modules:
 =item * L<pwd2mod>
 
 =item * L<rel2mod>
+
+=item * L<update-this-mod>
 
 =back
 
@@ -569,6 +604,37 @@ Arguments ('*' denotes required arguments):
 
 
 =back
+
+Return value:  (any)
+
+
+
+=head2 update_this_mod
+
+Usage:
+
+ update_this_mod() -> [$status_code, $reason, $payload, \%result_meta]
+
+Update "this" Perl module.
+
+Will use L<App::ThisDist>'s C<this_mod()> to find out what the current Perl
+module is, then run "cpanm -n" against the module. It's a convenient shortcut
+for:
+
+ % this-mod | cpanm -n
+
+This function is not exported.
+
+No arguments.
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 

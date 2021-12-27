@@ -24,12 +24,12 @@ local $ENV{TZ} = 'America/Los_Angeles';
 tzset();
 
 # Parse the file.
-my $path     = File::Spec->catfile('t', 'data', 'spin', 'input', '.versions');
+my $path = File::Spec->catfile('t', 'data', 'spin', 'input', '.versions');
 my $versions = App::DocKnot::Spin::Versions->new($path);
 isa_ok($versions, 'App::DocKnot::Spin::Versions');
 
 # Check the resulting information.
-is($versions->version('docknot'),      '4.01',       'docknot version');
+is($versions->version('docknot'), '4.01', 'docknot version');
 is($versions->release_date('docknot'), '2021-02-27', 'docknot release date');
 is(
     $versions->latest_release('software/docknot/index.th'), 1614460092,
@@ -37,17 +37,17 @@ is(
 );
 
 # Unknown products or files.
-is($versions->version('unknown'),         undef, 'unknown version');
-is($versions->release_date('unknown'),    undef, 'unknown release date');
-is($versions->latest_release('index.th'), 0,     'unknown file index.th');
+is($versions->version('unknown'), undef, 'unknown version');
+is($versions->release_date('unknown'), undef, 'unknown release date');
+is($versions->latest_release('index.th'), 0, 'unknown file index.th');
 
 # Check continuation handling and a line without dependencies.
 my $inputdir = File::Spec->catfile('t', 'data', 'spin', 'versions');
-$path     = File::Spec->catfile($inputdir, 'continuation');
+$path = File::Spec->catfile($inputdir, 'continuation');
 $versions = App::DocKnot::Spin::Versions->new($path);
-is($versions->version('docknot'),       '4.01',       'docknot version');
-is($versions->release_date('docknot'),  '2021-02-27', 'docknot release date');
-is($versions->version('other-package'), '1.00',       'other-package version');
+is($versions->version('docknot'), '4.01', 'docknot version');
+is($versions->release_date('docknot'), '2021-02-27', 'docknot release date');
+is($versions->version('other-package'), '1.00', 'other-package version');
 is(
     $versions->release_date('other-package'), '2021-09-07',
     'other-package release date',

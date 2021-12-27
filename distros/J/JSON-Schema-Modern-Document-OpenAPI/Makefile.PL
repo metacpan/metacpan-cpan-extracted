@@ -87,7 +87,7 @@ my %WriteMakefileArgs = (
     "Encode" => "2.89",
     "Feature::Compat::Try" => 0,
     "File::ShareDir" => 0,
-    "JSON::Schema::Modern" => "0.531",
+    "JSON::Schema::Modern" => "0.532",
     "JSON::Schema::Modern::Document" => 0,
     "JSON::Schema::Modern::Utilities" => "0.531",
     "JSON::Schema::Modern::Vocabulary" => 0,
@@ -124,7 +124,7 @@ my %WriteMakefileArgs = (
     "open" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.012",
+  "VERSION" => "0.013",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -138,7 +138,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "HTTP::Request::Common" => 0,
   "HTTP::Response" => 0,
-  "JSON::Schema::Modern" => "0.531",
+  "JSON::Schema::Modern" => "0.532",
   "JSON::Schema::Modern::Document" => 0,
   "JSON::Schema::Modern::Utilities" => "0.531",
   "JSON::Schema::Modern::Vocabulary" => 0,

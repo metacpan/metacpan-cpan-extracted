@@ -83,7 +83,7 @@
       },
       "App::sdif" : {
          "file" : "lib/App/sdif.pm",
-         "version" : "v4.20.2"
+         "version" : "v4.21.0"
       },
       "App::sdif::Divert" : {
          "file" : "lib/App/sdif/Divert.pm"
@@ -102,6 +102,9 @@
       },
       "App::sdif::default" : {
          "file" : "lib/App/sdif/default.pm"
+      },
+      "App::watchdiff" : {
+         "file" : "lib/App/watchdiff.pm"
       }
    },
    "release_status" : "stable",
@@ -115,7 +118,7 @@
          "web" : "https://github.com/kaz-utashiro/sdif-tools"
       }
    },
-   "version" : "4.20.2",
+   "version" : "4.21.0",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>",

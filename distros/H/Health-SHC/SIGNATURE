@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 091cbfcddcb4960ab7b29a6df0827965c8429e2dbb6c43a9e4b862202d7b2cd7 Changes
+SHA256 6447a5ff2bcbe67499d32698da377c48e1e8da901151cc55e0109f68fbaad140 LICENSE
+SHA256 e3288b92e1a9db66eaab17dcc62758af7168cb51ec108f530ca057f7e4c173ef MANIFEST
+SHA256 f00c679f33e247b7023a26f71b6bdbdc0db998ce0cb714e462f584f336c21309 META.yml
+SHA256 c32bda4b30d2c3b7c50964e2cdbf21872a042aa8d9c5821aef5c663124d58bae Makefile.PL
+SHA256 e558db4740cf915b4ac302a1f707c8a514fd57214cca61ba665a04052e65d654 cpanfile
+SHA256 63882f763bf1f0d3098de3c8511fd231af7f2a59fd7dda0c4acc238e20a9c87e dist.ini
+SHA256 3edfec8d5450deb6834391a3caca353925cd6658531c8b275ccbdc9e5bcc71b0 lib/Health/SHC.pm
+SHA256 db2a23c82e2762e79c9fc29ef44dd30271389d2b9b9b4abd209c511b96193da2 lib/Health/SHC/Extract.pm
+SHA256 829165b071cf4563d76786c9906a550236b0c88cd774afe673a6f578ae56a27f lib/Health/SHC/Validate.pm
+SHA256 6a4ecfbe84ef7e6e30971c26bf67a0103f2cddbf49029a47db088ce5045276b1 share/keys.json
+SHA256 5e163d27f1c9a2aec28c6ace3fbc2f86a07c09f95008217a12c9e7aabec10afd t/001-extract-from-pdf.t
+SHA256 889a0e4eb16cb8b5736c0bb58160591eb5644e52bdf5e30b1115605553c62323 t/002-extract-from-png.t
+SHA256 db1e3792f93550cd47d1e386762d7d484efef0d1542738e4f8029f55bc1f7368 t/003-validate-from-shc.t
+SHA256 d58e5c4f2e2d61f37b23600a075825ae1c125754dd16408f827f415d4b35912a t/author-critic.t
+SHA256 be73ea212761642da1fb438ee6ae029acfc29fd8555e990dccf8f6b4f463d3d2 t/author-pod-spell.t
+SHA256 a4d74b9834d1edbe8193768834cd63bab9d6d4210f98bd8c4b3c46dfb5b27580 t/testdata/sample-qr-code-keys.json
+SHA256 fc6f6316436923d15a8a5696b9ab448512b179643ed45f912765affabad48527 t/testdata/sample-qr-code.pdf
+SHA256 37aae5733c45e92443854d7a2b051beead9a3006aa51897a47009819c8c0385c t/testdata/sample-qr-code.png
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEEMguXHBCUSzAt6mNu1fh7LgYGpfkFAmHIjqUACgkQ1fh7LgYG
+pfl3Sw/+K1BOHWn5DQaGShMn/QmnTz9QHjv6SMRaGxbmeIadmZ5174rLpq/ryoVX
+sy/MyuDgMw8wjf6+OBlSGWynV8FMIWIvXgn8cAZ3PoBOg7swbHqAnPO/8GWCDtPH
+/y9qFK0eR41ci0EbImcnePzY+OwW/8briHSsangykKtQEBorpwdqWM5rR61iYf7N
+DBFWgRP2HBv6VMxLwxnMIsTeF/2+VDpRWa3W43WdY8yD/KByEs12HN/NWy9yE/Nc
+4iIH8O6YogaYsc/onhBbtEynl+B+5oEZtTIDKdIfymrRyYm7FMjDoQaQJlc7b2tp
+ybPB33ZbmN+wym9KSt6h//Rdu8+TrK6XUi8h20lL6Va0p4X7oKNJKzZZHpra8Y8E
++66D62LJERm8vVudntN6wmvkwwomLRmV05HnYyOO8ne3SRkKnGposBlJvDBJn6/N
+Lxy1nLv0uDloC1+Pv7o0YSQHljgQdKvqSQlzvCq+hAUWgWWhlalRnIGBdA7qx7XK
+7C63PCd5BNyUsd3Xy9VyAgTx3EGOUbQp3Rg2MvjtWhAnPkp3ZfqNMc/apoXsuNfl
+xERV1yZZRg/VaQkk2jiZRjVUTyR/YM0Rd8a3LPLQj8ZQ3AYCCJIvptOh3AwJqoP+
+nXFW20Cd1N3eVEebQFtnkqr67HMDPjtN2EJ6PD2DcK3IqF88TRE=
+=6z3C
+-----END PGP SIGNATURE-----

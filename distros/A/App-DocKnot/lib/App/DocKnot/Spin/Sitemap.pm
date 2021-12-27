@@ -12,7 +12,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Spin::Sitemap 5.00;
+package App::DocKnot::Spin::Sitemap 6.00;
 
 use 5.024;
 use autodie;
@@ -141,7 +141,7 @@ sub _escape {
 sub _relative {
     my ($origin, $dest) = @_;
     my @origin = split(qr{ / }xms, $origin, -1);
-    my @dest   = split(qr{ / }xms, $dest,   -1);
+    my @dest = split(qr{ / }xms, $dest, -1);
 
     # Remove the common prefix.
     while (@origin && @dest && $origin[0] eq $dest[0]) {
@@ -207,11 +207,13 @@ sub new {
     # links maps partial URLs to a list of other partial URLs (previous, next,
     # and then the full upwards hierarchy to the top of the site) used for
     # interpage links.
+    #<<<
     my $self = {
         links    => {},
         pagedesc => {},
         sitemap  => [],
     };
+    #>>>
     bless($self, $class);
 
     # Parse the file into the newly-created object.
@@ -292,7 +294,7 @@ sub navbar {
 
     # Construct the bread crumbs for the page hierarchy.
     my @breadcrumbs = ("  <td>\n");
-    my $first       = 1;
+    my $first = 1;
     for my $parent (reverse(@parents)) {
         my ($url, $desc) = $parent->@*;
         my $prefix = q{ } x 4;
@@ -312,7 +314,6 @@ sub navbar {
         @breadcrumbs,
         $next_link,
         "</tr></table>\n",
-        "\n",
     );
 }
 
@@ -335,7 +336,7 @@ sub sitemap {
 
         # Open or close <ul> elements as needed by the indentation.
         if ($indent > $indents[-1]) {
-            push(@output,  (q{ } x $indent) . "<ul>\n");
+            push(@output, (q{ } x $indent) . "<ul>\n");
             push(@indents, $indent);
         } else {
             while ($indent < $indents[-1]) {

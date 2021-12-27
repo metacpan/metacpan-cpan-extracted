@@ -34,7 +34,7 @@
    "provides" : {
       "Pod::Thread" : {
          "file" : "lib/Pod/Thread.pm",
-         "version" : "3.00"
+         "version" : "3.01"
       }
    },
    "release_status" : "stable",
@@ -52,6 +52,6 @@
          "web" : "https://github.com/rra/pod-thread"
       }
    },
-   "version" : "3.00",
+   "version" : "3.01",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

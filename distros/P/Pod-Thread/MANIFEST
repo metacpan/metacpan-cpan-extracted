@@ -29,6 +29,7 @@ t/data/snippets/item-nested
 t/data/snippets/item-with-z
 t/data/snippets/item-zero
 t/data/snippets/navbar-contents
+t/data/snippets/navbar-no-headers
 t/data/snippets/navbar-underscore
 t/data/snippets/pod-errors
 t/data/snippets/README.md
@@ -42,6 +43,7 @@ t/docs/synopsis.t
 t/lib/Test/RRA.pm
 t/lib/Test/RRA/Config.pm
 t/lib/Test/Snippets.pm
+t/output/options.t
 t/output/snippets.t
 t/style/coverage.t
 t/style/critic.t

@@ -12,6 +12,7 @@ requires 'IPC::System::Simple';
 requires 'JSON::MaybeXS';
 requires 'Kwalify';
 requires 'List::SomeUtils', '0.07';
+requires 'Path::Tiny';
 requires 'Perl6::Slurp';
 requires 'Pod::Thread', '3.00';
 requires 'Template';

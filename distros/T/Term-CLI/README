@@ -1,7 +1,7 @@
 Term::CLI is Copyright (C) 2018-2021, Steven Bakker (SBAKKER).
 
 The Term::CLI collection of modules implement a convenient interactive
-CLI parser based on Term::ReadLine(::Gnu), providing completion and
+CLI parser based on Term::ReadLine, providing completion and
 validation.
 
 For more information, see the Term::CLI::Tutorial and Term::CLI::Intro

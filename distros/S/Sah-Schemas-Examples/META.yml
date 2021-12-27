@@ -22,7 +22,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Examples
   homepage: https://metacpan.org/release/Sah-Schemas-Examples
   repository: git://github.com/perlancar/perl-Sah-Schemas-Examples.git
-version: '0.007'
+version: '0.009'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -34,7 +34,7 @@ x_Dist_Zilla:
           Module::Metadata: '1.000037'
           version: '0.006'
       name: Sah::Schemas
-      version: '0.026'
+      version: '0.027'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
       name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'

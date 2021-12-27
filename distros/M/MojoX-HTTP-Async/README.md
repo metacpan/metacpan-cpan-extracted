@@ -57,7 +57,7 @@
 
     In comparison with "HTTP::Async", this library doesn't make a new connection on each request.
 
-    And in comparison with "Mojo::AsyncAwait", it's it's more intuitive how
+    And in comparison with "Mojo::AsyncAwait", it's more intuitive how
     to use it, and there is no any Singleton restrictions.
 
     The instance of this class can work only with one domain and scheme: either HTTP or HTTPS.

@@ -9,7 +9,7 @@
 
 package Test::RRA::Config;
 
-use 5.008;
+use 5.010;
 use base qw(Exporter);
 use strict;
 use warnings;
@@ -32,7 +32,7 @@ BEGIN {
     # This version should match the corresponding rra-c-util release, but with
     # two digits for the minor version, including a leading zero if necessary,
     # so that it will sort properly.
-    $VERSION = '9.01';
+    $VERSION = '10.01';
 }
 
 # If C_TAP_BUILD or C_TAP_SOURCE are set in the environment, look for
@@ -58,7 +58,7 @@ our $COVERAGE_LEVEL = 100;
 our @COVERAGE_SKIP_TESTS;
 our @CRITIC_IGNORE;
 our $LIBRARY_PATH;
-our $MINIMUM_VERSION = '5.008';
+our $MINIMUM_VERSION = '5.010';
 our %MINIMUM_VERSION;
 our @MODULE_VERSION_IGNORE;
 our @POD_COVERAGE_EXCLUDE;
@@ -135,7 +135,7 @@ that Perl scripts can pass a syntax check.
 =item $MINIMUM_VERSION
 
 Default minimum version requirement for included Perl scripts.  If not given,
-defaults to 5.008.
+defaults to 5.010.
 
 =item %MINIMUM_VERSION
 

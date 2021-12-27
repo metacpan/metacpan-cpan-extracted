@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI::Argument::Filename  0.052003 {
+package Term::CLI::Argument::Filename  0.053006 {
 
 use 5.014;
 use strict;
@@ -29,24 +29,51 @@ use namespace::clean 0.25;
 
 extends 'Term::CLI::Argument';
 
+use File::Glob 'bsd_glob';
+
+use namespace::clean;
+
 sub complete {
     my $self = shift;
     my $partial = shift;
 
     my $func_ref = $self->term->Attribs->{filename_completion_function}
-        or return;
+        or return $self->_glob_complete($partial);
 
-    my $state = 0;
-    my @list;
-    while (my $f = $func_ref->($partial, $state)) {
-        push @list, $f;
-        $state = 1;
+    if ($func_ref) {
+        my $state = 0;
+        my @list;
+        while (my $f = $func_ref->($partial, $state)) {
+            push @list, $f;
+            $state = 1;
+        }
+        return @list;
+    }
+}
+
+sub _glob_complete {
+    my ($self, $partial) = @_;
+    my @list = bsd_glob("$partial*");
+
+    return @list if @list <= 1;
+
+    # If there is more than one possible completion,
+    # add filetype suffixes.
+    foreach (@list) {
+        if (-l $_) {
+            $_ .= '@';
+        } elsif (-d _) {
+            $_ .= '/';
+        } elsif (-x _) {
+            $_ .= '*';
+        } elsif (-S _ || -p _) {
+            $_ .= '=';
+        }
     }
     return @list;
 }
 
 }
-
 1;
 
 __END__
@@ -59,7 +86,7 @@ Term::CLI::Argument::Filename - class for file name arguments in Term::CLI
 
 =head1 VERSION
 
-version 0.052003
+version 0.053006
 
 =head1 SYNOPSIS
 
@@ -98,7 +125,14 @@ See L<Term::CLI::Argument>(3p). Additionally:
 
 =item B<complete> ( I<PARTIAL> )
 
-Use L<Term::ReadLine::Gnu>'s file name completion function.
+If present, use the C<filename_completion_function> function listed
+in L<Term::ReadLine>'s C<Attribs>, otherwise use L<bsd_glob from
+File::Glob|File::Glob/bsd_glob>.
+
+Not every C<Term::ReadLine> implementation implements its own
+filename completion function. The ones that do will ave the
+C<Attrib-E<gt>{filename_completion_function}> attribute set.
+L<Term::ReadLine::Gnu> does this, while L<Term::ReadLine::Perl> doesn't.
 
 =back
 
@@ -106,6 +140,7 @@ Use L<Term::ReadLine::Gnu>'s file name completion function.
 
 L<Term::CLI::Argument>(3p),
 L<Term::ReadLine::Gnu>(3p),
+L<File::Glob>(3p),
 L<Term::CLI>(3p).
 
 =head1 AUTHOR

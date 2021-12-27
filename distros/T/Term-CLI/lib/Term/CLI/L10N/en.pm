@@ -15,13 +15,13 @@
 #
 #=============================================================================
 
-package Term::CLI::L10N::en  0.052003 {
+package Term::CLI::L10N::en  0.053006 {
 
 use 5.014;
 use strict;
 use warnings;
 
-use parent 0.228 qw( Term::CLI::L10N );
+use parent 0.225 qw( Term::CLI::L10N );
 
 our %Lexicon = (
     _AUTO => 1,
@@ -41,7 +41,7 @@ Term::CLI::L10N::en - English localizations for Term::CLI
 
 =head1 VERSION
 
-version 0.052003
+version 0.053006
 
 =head1 SYNOPSIS
 

@@ -17,13 +17,22 @@ use Cwd qw(getcwd realpath);
 use File::Copy::Recursive qw(dircopy);
 use File::Spec ();
 use File::Temp ();
+use POSIX qw(LC_ALL setlocale);
 use Test::RRA qw(is_file_contents);
 use Test::DocKnot::Spin qw(is_spin_output is_spin_output_tree);
 
 use Test::More;
 
-# Load the module.
-BEGIN { use_ok('App::DocKnot::Command') }
+# Load the modules.
+BEGIN {
+    use_ok('App::DocKnot::Command');
+    use_ok('App::DocKnot::Util', qw(print_fh));
+}
+
+# Force the C locale because some of the output intentionally uses localized
+# month names and we have to force those to English for comparison of test
+# results.
+setlocale(LC_ALL, 'C');
 
 # Create the command-line parser.
 my $docknot = App::DocKnot::Command->new();
@@ -33,10 +42,10 @@ isa_ok($docknot, 'App::DocKnot::Command');
 my $tempdir = File::Temp->newdir();
 
 # Spin a single file.
-my $datadir  = File::Spec->catfile('t',      'data',   'spin');
-my $input    = File::Spec->catfile($datadir, 'input',  'index.th');
+my $datadir = File::Spec->catfile('t', 'data', 'spin');
+my $input = File::Spec->catfile($datadir, 'input', 'index.th');
 my $expected = File::Spec->catfile($datadir, 'output', 'index.html');
-my $output   = File::Spec->catfile($tempdir->dirname, 'index.html');
+my $output = File::Spec->catfile($tempdir->dirname, 'index.html');
 $docknot->run('spin-thread', '-s', '/~eagle/styles', $input, $output);
 is_spin_output($output, $expected, 'spin-thread (output specified)');
 
@@ -50,20 +59,21 @@ close($output_fh);
 is_spin_output($output, $expected, 'spin-thread (standard output)');
 
 # Copy the input tree to a new temporary directory since .rss files generate
-# additional thread files.  Replace the rpod pointer since it points to a
+# additional thread files.  Replace the .spin pointer since it points to a
 # relative path in the source tree.
 my $indir = File::Temp->newdir();
 $input = File::Spec->catfile($datadir, 'input');
 dircopy($input, $indir->dirname)
   or die "Cannot copy $input to $indir: $!\n";
-my $rpod_source = File::Spec->catfile(getcwd(), 'lib', 'App', 'DocKnot.pm');
-my $rpod_path   = File::Spec->catfile(
+my $pod_source = File::Spec->catfile(getcwd(), 'lib', 'App', 'DocKnot.pm');
+my $pointer_path = File::Spec->catfile(
     $indir->dirname, 'software', 'docknot', 'api',
-    'app-docknot.rpod',
+    'app-docknot.spin',
 );
-chmod(0644, $rpod_path);
-open(my $fh, '>', $rpod_path);
-print {$fh} "$rpod_source\n" or die "Cannot write to $rpod_path: $!\n";
+chmod(0644, $pointer_path);
+open(my $fh, '>', $pointer_path);
+print_fh($fh, $pointer_path, "format: pod\n");
+print_fh($fh, $pointer_path, "path: $pod_source\n");
 close($fh);
 
 # Spin a tree of files.
@@ -89,4 +99,4 @@ like(
 );
 
 # Report the end of testing.
-done_testing($count + 5);
+done_testing($count + 6);

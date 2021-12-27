@@ -19,6 +19,8 @@ already taken place:
    use strict;
    use warnings;
 
+   use Future::AsyncAwait;
+
    use IO::Async::Loop;
    use Net::Async::IRC;
 
@@ -38,23 +40,23 @@ file, commandline arguments, etc...
 
 Finally we can connect to the IRC server and send the message:
 
-   $irc->login(
+   await $irc->login(
       host => $SERVER,
       nick => $NICK,
-   )->then( sub {
-      $irc->do_PRIVMSG(
-         target => $TARGET,
-         text   => "Hello, World"
-      );
-   })->get;
+   );
+
+   await $irc->do_PRIVMSG(
+      target => $TARGET,
+      text   => "Hello, World"
+   );
 
 The program calls L<Net::Async::IRC/login>, which connects the client to the
 given IRC server and logs in as the given nick. This method returns a
 L<Future> instance to represent its eventual completion, giving us an easy way
 to sequence further code after it. After login is complete, the next task is
 simply to send the message. This is done with the C<PRIVMSG> IRC command as
-wrapped by L<Net::Async::IRC/do_PRIVMSG>. This takes taking the message target
-name and text string.
+wrapped by L<Net::Async::IRC/do_PRIVMSG>. This takes the message target name
+and text string.
 
 The trailing call to L<Future/get> makes the script stop here waiting for this
 chain of futures to actually complete. Without this, the returned future would
@@ -66,7 +68,7 @@ will cause the C<get> call to throw an exception instead.
 
 Once this is sent, the script terminates, closing its connection to the server.
 
-=head2 RECEIVING MESSAGES
+=head2 Receiving Messages
 
 As a second example, lets now consider also how we handle messages that arrive
 from IRC.
@@ -81,15 +83,15 @@ from IRC.
       }
    );
 
-   $irc->login(
+   await $irc->login(
       host => $SERVER,
       nick => $NICK,
-   )->then( sub {   
-      $irc->do_PRIVMSG(
-         target => $TARGET,
-         text   => "Hello, what's your name?"
-      );
-   })->get;
+   );
+
+   await $irc->do_PRIVMSG(
+      target => $TARGET,
+      text   => "Hello, what's your name?"
+   );
    
    $loop->run;
 
@@ -97,6 +99,21 @@ Here we have used the C<configure> method to attach an event handler to the
 C<on_message_PRIVMSG> event. This handler code ignores any messages except
 from the user we are interested in, and simply prints the contents of those we
 are interested in to the terminal.
+
+Like all IRC message handlers, this one is passed both the plain IRC message
+itself (in I<$message> as an instance of L<Protocol::IRC::Message>), and the
+hints hash (in I<$hints> as a plain hash reference). While the code could
+operate on the message instance itself, this requries knowing that, in this
+case, the text field happens to be at C<< $message->arg(1) >>. An easier and
+more powerful way to work on incoming messages is to use fields of the hint
+hash. In this case, the text comes in a field named simply C<text>. In this
+case for C<PRIVMSG> there aren't too many other fields of interest, but for
+some message types, especially server numeric replies, the hints hash will
+contain lots of additional detail parsed out of the raw message, so it's
+always worth looking there first. It's entirely reasonable for a program
+never to actually inspect the C<$message> object itself; it is passed only
+for completeness, or in case the hints parsing has failed to recognise some
+server-extended detail about it and such raw access is required.
 
 Having established this event handler, we can then log in and send a message
 to the target user, similar to the first example. Instead of stopping the
@@ -132,10 +149,10 @@ Furthermore, as the case folded version of the target name won't change after
 startup, we could store that initially to save re-calculating it at every
 event:
 
-   $irc->login(
+   await $irc->login(
       host => $SERVER,
       nick => $NICK,
-   )->get;
+   );
 
    my $target_folded = $irc->casefold_name( $TARGET );
 
@@ -177,6 +194,10 @@ C<CTCP ACTION>:
 This second handlers is invoked on receipt of a C<PRIVMSG> containing a
 C<CTCP ACTION>. The first is only invoked on receipt of a plain C<PRIVMSG>
 that doesn't contain a C<CTCP> subcommand.
+
+=head1 TODO
+
+Encodings
 
 =head1 AUTHOR
 

@@ -41,7 +41,93 @@ my %BACKEND_OF = (
    );
 lock_hash(%BACKEND_OF);
 
-1;
+sub _getInstance {
+	# TL#getSessionやTripletail::Filterによって呼ばれるクラスメソッド。
+	my $class = shift;
+	my $group = shift;
+
+	defined $group or $group = 'Session';
+
+	if($_instance{$group}) {
+		$_instance{$group};
+	} else {
+		die "TL#getSession: the session group [$group] has not been specified at the call of \$TL->startCgi() like ".
+			"-Session => '(group)'.".
+			" (セッショングループ $group は使用できません。startCgi の -Session で指定する必要があります)\n";
+	}
+}
+
+sub _getInstanceGroups {
+	# Tripletail::Filterなどによって呼ばれるクラスメソッド。
+	my $class = shift;
+
+	return keys %_instance;
+}
+
+sub __find_backend {
+    my $group = defined $_[0] ? $_[0] : 'Session';
+
+    my $dbgroup = $TL->INI->get($group => 'dbgroup');
+    # Nasty special case here: if the INI dbgroup has been declared as
+    # a MongoDB group in startCgi/trapError, the corresponding backend
+    # is TL::Session::MongoDB.
+    require Tripletail::MongoDB;
+    if (Tripletail::MongoDB->_lookupInstance($dbgroup)) {
+        return 'Tripletail::Session::MongoDB';
+    }
+    else {
+        my $DB      = $TL->getDB($dbgroup);
+        my $type    = $DB->getType;
+        my $backend = exists $BACKEND_OF{$type}
+                           ? $BACKEND_OF{$type}
+                             : die __PACKAGE__."#_init: the type of DB [$dbgroup] is [$type], which is not supported".
+                               " (DB [$dbgroup] の [$type] は対応していないDBです)\n";
+        return $backend;
+    }
+}
+
+use fields qw(
+    group mode timeout_period updateinterval_period setvaluewithrenew
+    sid data checkval checkvalssl updatetime
+   );
+sub __new {
+	my Tripletail::Session $this = shift;
+	my $group = shift;
+
+	if (!ref $this) {
+		$this = fields::new($this);
+	}
+
+	$this->{group} = defined $group ? $group : 'Session';
+
+	$this->{mode} = $TL->INI->get($this->{group} => 'mode', 'double');
+
+	my $timeout = $TL->INI->get($this->{group} => 'timeout','30min');
+	$this->{timeout_period} = $TL->parsePeriod($timeout);
+
+	my $updateinterval = $TL->INI->get($this->{group} => 'updateinterval','10min');
+	$this->{updateinterval_period} = $TL->parsePeriod($updateinterval);
+
+	$this->{setvaluewithrenew} = $TL->INI->get($this->{group} => 'setvaluewithrenew', 1);
+
+	$this->__reset;
+
+	# モードチェック
+	if($this->{mode} eq 'https') {
+		if(!$this->isHttps) {
+			die __PACKAGE__."#__new: the session mode 'https' is not available because we are not in the https connection.".
+				" (httpsモードの場合はhttps接続中でのみセッションを利用できます)\n";
+		}
+	} elsif($this->{mode} eq 'http') {
+		# 常に利用可能
+	} elsif($this->{mode} eq 'double') {
+		# 常に利用可能
+	} else {
+		die __PACKAGE__."#__new: invalid mode: [$this->{mode}] (不正なモードが指定されました)\n";
+	}
+
+	return $this;
+}
 
 sub isHttps {
 	$ENV{HTTPS} and $ENV{HTTPS} eq 'on';
@@ -72,8 +158,7 @@ sub discard {
 
         if ($TL->INI->get($this->{group} => 'logging', '0')) {
             $TL->log(__PACKAGE__,
-                     "Removed the session ID [$this->{sid}] on the DB".
-                       " [$this->{dbgroup}][$this->{sessiontable}].");
+                     "Removed the session ID [$this->{sid}]");
         }
 	}
 	$this->__reset;
@@ -140,49 +225,30 @@ sub _createSid {
 
     if ($TL->INI->get($this->{group} => 'logging', '0')) {
         $TL->log(__PACKAGE__,
-                 "created new session sid [$this->{sid}] on the DB".
-                   " [$this->{dbgroup}][$this->{sessiontable}].");
+                 "created new session sid [$this->{sid}].");
     }
 }
 
 sub _insertSid {
-    my $this        = shift;
+    my Tripletail::Session $this = shift;
     my $checkval    = shift;
     my $checkvalssl = shift;
     my $data        = shift;
 
-    my $DB   = $TL->getDB($this->{dbgroup});
-    my $type = $DB->getType;
-
-    die __PACKAGE__."#__createSid: the type of DB [$this->{dbgroup}] is [$type], which is not supported.".
-      " (DB [$this->{dbgroup}] の [$type] は対応していないDBです)\n";
+    die "internal error: override the method";
 }
 
 sub _deleteSid {
-    my $this = shift;
+    my Tripletail::Session $this = shift;
     my $sid  = shift;
 
-    my $DB   = $TL->getDB($this->{dbgroup});
-    my $type = $DB->getType;
-
-    $DB->execute(
-        \$this->{dbset},
-        sprintf(
-            q{DELETE FROM %s WHERE sid = ?},
-            $DB->symquote($this->{sessiontable}, $this->{dbset})),
-        $sid);
-
-    return $this;
+    die "internal error: override the method";
 }
 
 sub _createSessionTable {
-    my $this = shift;
+    my Tripletail::Session $this = shift;
 
-    my $DB   = $TL->getDB($this->{dbgroup});
-    my $type = $DB->getType;
-
-    die __PACKAGE__."#__prepareSessionTable: the type of DB [$this->{dbgroup}] is [$type], which is not supported by the Tripletail::Session.".
-      " (DB [$this->{dbgroup}] の [$type] は対応していないDBです)\n";
+    die "internal error: override the method";
 }
 
 sub _init {
@@ -209,70 +275,21 @@ sub _init {
 		},
 	);
 	foreach my $group (@$groups) {
+		my $backend = __find_backend($group);
 
-        my $dbgroup = $TL->INI->get((defined $group ? $group : 'Session') => dbgroup => undef);
-        my $DB      = $TL->getDB($dbgroup);
-        my $type    = $DB->getType;
-        my $backend = exists $BACKEND_OF{$type}
-                           ? $BACKEND_OF{$type}
-                             : die __PACKAGE__."#_init: the type of DB [$dbgroup] is [$type], which is not supported".
-                               " (DB [$dbgroup] の [$type] は対応していないDBです)\n";
+		local $SIG{__DIE__} = 'DEFAULT';
+		eval qq{
+			require $backend;
+		};
+		if ($@) {
+			die $@;
+		}
 
-        eval qq{
-            use $backend;
-        };
-        if ($@) {
-            local $SIG{__DIE__} = $@;
-            die $@;
-        }
-
-        $_instance{$group} = $backend->__new($group);
+		$_instance{$group} = $backend->__new($group);
+		$_instance{$group}->_createSessionTable;
 	}
 
 	undef;
-}
-
-sub __new {
-	my $class = shift;
-	my $group = shift;
-	my $this = bless {} => $class;
-
-	$this->{group} = defined $group ? $group : 'Session';
-
-	$this->{mode} = $TL->INI->get($this->{group} => 'mode', 'double');
-
-	my $timeout = $TL->INI->get($this->{group} => 'timeout','30min');
-	$this->{timeout_period} = $TL->parsePeriod($timeout);
-
-	my $updateinterval = $TL->INI->get($this->{group} => 'updateinterval','10min');
-	$this->{updateinterval_period} = $TL->parsePeriod($updateinterval);
-
-	$this->{setvaluewithrenew} = $TL->INI->get($this->{group} => 'setvaluewithrenew', 1);
-
-	$this->__reset;
-
-	# モードチェック
-	if($this->{mode} eq 'https') {
-		if(!$this->isHttps) {
-			die __PACKAGE__."#__new: the session mode 'https' is not available because we are not in the https connection.".
-				" (httpsモードの場合はhttps接続中でのみセッションを利用できます)\n";
-		}
-	} elsif($this->{mode} eq 'http') {
-		# 常に利用可能
-	} elsif($this->{mode} eq 'double') {
-		# 常に利用可能
-	} else {
-		die __PACKAGE__."#__new: invalid mode: [$this->{mode}] (不正なモードが指定されました)\n";
-	}
-
-	$this->{dbgroup     } = $TL->INI->get($this->{group} => 'dbgroup');
-	$this->{dbset       } = $TL->INI->get($this->{group} => 'dbset'  );
-	$this->{readdbset   } = $TL->INI->get($this->{group} => readdbset    => $this->{dbset}              );
-	$this->{sessiontable} = $TL->INI->get($this->{group} => sessiontable => 'tl_session_'.$this->{group});
-
-    $this->_createSessionTable;
-
-	$this;
 }
 
 sub __reset {
@@ -283,30 +300,6 @@ sub __reset {
 	$this->{checkval} = undef;
 	$this->{checkvalssl} = undef;
 	$this->{updatetime} = undef; # 新規セッションを作成した場合はundefのまま
-}
-
-
-sub _getInstance {
-	# TL#getSessionやTripletail::Filterによって呼ばれるクラスメソッド。
-	my $class = shift;
-	my $group = shift;
-
-	defined $group or $group = 'Session';
-
-	if($_instance{$group}) {
-		$_instance{$group};
-	} else {
-		die "TL#getSession: the session group [$group] has not been specified at the call of \$TL->startCgi() like ".
-			"-Session => '(group)'.".
-			" (セッショングループ $group は使用できません。startCgi の -Session で指定する必要があります)\n";
-	}
-}
-
-sub _getInstanceGroups {
-	# Tripletail::Filterなどによって呼ばれるクラスメソッド。
-	my $class = shift;
-
-	return keys %_instance;
 }
 
 sub _getRawCookie {
@@ -469,29 +462,19 @@ sub _getSessionDataFromForm {
 }
 
 sub _loadSession {
-    # セッションの存在確認をし，問題がなければデータをセットする．
-    my $this     = shift;
+    my Tripletail::Session $this = shift;
     my $sid      = shift;
     my $checkval = shift;
-    my %opts     = @_;
+    my %opts     = @_; # (secure => bool)
 
-    my $DB = $TL->getDB($this->{dbgroup});
-    my $type = $DB->getType;
-
-    die __PACKAGE__."#_loadSession: the type of DB [$this->{dbgroup}] is [$type], which is not supported by Tripletail::Session.".
-      " (DB [$this->{dbgroup}] の [$type] は対応していないDBです)\n";
+    die "internal error: override the method";
 }
 
 sub _updateSession {
-    my $this = shift;
+    my Tripletail::Session $this = shift;
 
-    my $DB = $TL->getDB($this->{dbgroup});
-    my $type = $DB->getType;
-
-    die __PACKAGE__."#_updateSession, the type of DB [$this->{dbgroup}] is [$type], which is not supported by Tripletail::Session.".
-      " (DB [$this->{dbgroup}] の [$type] は対応していないDBです)\n";
+    die "internal error: override the method";
 }
-
 
 # -----------------------------------------------------------------------------
 # ($key, $val, $err) = $sess->_createSessionCheck($issecure).
@@ -528,6 +511,8 @@ sub _createSessionCheck
 
 	($key, $value, undef);
 }
+
+1;
 
 __END__
 
@@ -659,13 +644,16 @@ Tripletail::Session オブジェクトを取得。
 
   $sid = $session->get
 
-ユニークなセッションキーを取得する。
+ユニークなセッションキーを取得する。セッションが存在しなければ、新規に発行する。
 
-セッションキーは64bit整数値の負の数を除いた範囲となる。
+バックエンドが RDBMS の場合には、セッションキーは 64bit 整数値の負の数を除いた範囲となる。
+Perlでは通常 32bit 整数値までしか扱えないため、セッションキーを数値として扱ってはならない。
 
-Perlでは通常32bit整数値までしか扱えないため、セッションキーを数値として扱ってはならない。
+バックエンドが MongoDB の場合には、セッションキーは
+C<ObjectId> (L<https://docs.mongodb.com/manual/reference/method/ObjectId/>)
+の 16 進表現となる。次のように L<MongoDB::OID> のコンストラクタに渡す事で OID オブジェクトを作る事ができる:
 
-セッションが存在しなければ、新規に発行する。
+  my $sid = MongoDB::OID->new($session->get);
 
 セッションの発行は常に行え、double モード時の非SSL側からの get メソッド呼び出しでもセッションは設定される。
 ただし、SSL側からアクセスした際にセッションが無効になるため、その時にセッションIDは再作成される。
@@ -698,7 +686,13 @@ Perlでは通常32bit整数値までしか扱えないため、セッション�
 
 セッションに値を設定する。
 
-設定できる値は '64bit符号無し整数' のみ（※PostgreSQL利用時は64bit整数値のみ）。
+バックエンドが RDBMS の場合には、設定できる値は 64bit
+符号無し整数のみである（※PostgreSQL利用時は64bit整数値のみ）。
+
+バックエンドが MongoDB の場合には、設定できる値は C<ObjectId>
+(L<https://docs.mongodb.com/manual/reference/method/ObjectId/>) の 16
+進表現のみである。
+
 その他のデータを管理したい場合は、セッションキーを用いて別途実装する必要がある。
 
 doubleモードの場合は、SSL起動時の場合に限り、両方のセッションに書き込まれる。
@@ -750,6 +744,11 @@ DELETE結果の件数が0件になるまで、ループして処理して下さ�
 
 セッションテーブルがInnoDB形式の場合も、トランザクションが大きくなりすぎないよう、
 LIMIT句を利用することを推奨します。
+
+=head3 MongoDB の場合
+
+MongoDB の場合には、各セッションデータの最終更新日時はドキュメントの C<u> フィールドに
+C<date> 型で格納されます。
 
 =head3 TripletaiL 0.29 以前のセッションテーブルの注意
 
@@ -851,7 +850,21 @@ setValueした際に自動的にrenewを行うか否か。
 
 使用するDBのグループ名。
 L<ini|Tripletail::Ini> で設定したグループ名を渡す。
-L<Tripletail#startCgi|Tripletail/"startCgi"> で有効化しなければならない。
+L<Tripletail#startCgi|Tripletail/"startCgi"> で有効化しなければならない:
+
+  # RDBMS をバックエンドにする場合の例
+  $TL->startCgi(
+      -DB      => 'DB',
+      -Session => 'Session',
+      -main    => \&main,
+  );
+
+  # MongoDB をバックエンドにする場合の例
+  $TL->startCgi(
+      -MongoDB => 'MongoDB',
+      -Session => 'Session',
+      -main    => \&main,
+  );
 
 =item dbset
 
@@ -860,6 +873,8 @@ L<Tripletail#startCgi|Tripletail/"startCgi"> で有効化しなければなら�
 使用する書き込み用DBセット名。
 L<Tripletail#startCgi|Tripletail/"startCgi"> で有効化しなければならない。
 L<ini|Tripletail::Ini> で設定したグループ名を渡す。
+
+この項目は RDBMS をバックエンドにする場合にのみ使用される。
 
 =item readdbset
 
@@ -871,12 +886,25 @@ L<ini|Tripletail::Ini> で設定したグループ名を渡す。
 
 省略された場合は dbset と同じものが使用される。
 
+この項目は RDBMS をバックエンドにする場合にのみ使用される。
+
 =item sessiontable
 
   sessiontable = tl_session
 
 セッションで使用するテーブル名。
 デフォルトは tl_session_グループ名 が使用される。
+
+この項目は RDBMS をバックエンドにする場合にのみ使用される。MongoDB
+の場合には L</"session_ns"> を設定しなければならない。
+
+=item session_ns
+
+  session_ns = tl.session
+
+MongoDB をバックエンドにする際にセッションで使用する名前空間。
+C<DB名.コレクション名> の形式で指定する。
+この項目は MongoDB を用いる場合には省略不可能である。
 
 =item mysqlsessiontabletype
 

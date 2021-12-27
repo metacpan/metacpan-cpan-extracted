@@ -3,6 +3,8 @@
 # Perl REST API to Process Presentation in Cloud
 This repository contains Aspose.Slides Cloud SDK for Perl source code. This SDK allows you to [process & manipulate PPT, PPTX, ODP, OTP](https://products.aspose.cloud/slides/perl) using Aspose.slides Cloud REST APIs in your Perl applications.
 
+You may want to check out Aspose free [[PowerPoint to Word Converter]](https://products.aspose.app/slides/conversion/ppt-to-word) because it is a live implementation of one of the most popular conversion processes.
+
 ## Presentation Processing Features
 
 - Fetch presentation images in any of the supported file formats.
@@ -21,8 +23,21 @@ This repository contains Aspose.Slides Cloud SDK for Perl source code. This SDK 
 
 **Fixed Layout:** PDF, PDF/A, XPS
 **Images:** JPEG, PNG, BMP, TIFF, SVG
-**Web:** HTML
+**Web:** HTML/HTML5
 **Other:** SWF (export whole presentations)
+
+## Enhancements in Version 21.12
+* New **ThreeDFormat**, **Camera**, **LightRig** and **ShapeBevel** classes allow to get and set 3D effects for shapes. New **ThreeDFormat** property of **ShapeBase** class allows to access those objects.
+* The declaration of **GetAnimation** and  **GetSpecialSlideAnimation** methods is changed. New **paragraphIndex** parameter allows to get effects for a specific paragraph. New **ParagraphIndex** property of **Effect** class allows to set effects for a specific paragraph.
+* You can now use **Html5** value for **format** parameter in conversion methods and export presentations to HTML5 format.
+* New **Width** and **Height** parameters were added to **ExportOptions** class. You can now set custom size when convertion your documents.
+
+## Enhancements in Version 21.9
+* New **options** parameter for **Convert**, **ConvertAndSave**, **DownloadSlideOnline**, **SaveSlideOnline**, **DownloadShapeOnline** and **SaveShapeOnline** methods that allows to specify options when converting presentations from request body.
+* New methods to manage shapes and animation for special slide types: master, layout and notes slides. The new methods are **GetSpecialSlideShapes**, **GetSpecialSlideSubshapes, **GetSpecialSlideShape**, **GetSpecialSlideSubshape**, **GetSpecialSlideParagraphs**, **GetSpecialSlideSubshapeParagraphs**, **GetSpecialSlideParagraph**, **GetSpecialSlideSubshapeParagraph**, **GetSpecialSlidePortions**, **GetSpecialSlideSubshapePortions**, **GetSpecialSlidePortion**, **GetSpecialSlideSubshapePortion**, **CreateSpecialSlideShape**, **CreateSpecialSlideSubshape**, **CreateSpecialSlideParagraph**, **CreateSpecialSlideSubshapeParagraph**, **CreateSpecialSlidePortion**, **CreateSpecialSlideSubshapePortion**, **UpdateSpecialSlideShape**, **UpdateSpecialSlideSubshape**, **UpdateSpecialSlideParagraph**, **UpdateSpecialSlideSubshapeParagraph**, **UpdateSpecialSlidePortion**, **UpdateSpecialSlideSubshapePortion**, **DeleteSpecialSlideShapes**, **DeleteSpecialSlideSubshapes**, **DeleteSpecialSlideShape**, **DeleteSpecialSlideSubshape**, **DeleteSpecialSlideParagraphs**, **DeleteSpecialSlideSubshapeParagraphs**, **DeleteSpecialSlideParagraph**, **DeleteSpecialSlideSubshapeParagraph**, **DeleteSpecialSlidePortions**, **DeleteSpecialSlideSubshapePortions**, **DeleteSpecialSlidePortion**, **DeleteSpecialSlideSubshapePortion**, **DownloadSpecialSlideShape**, **DownloadSpecialSlideSubshape**, **SaveSpecialSlideShape**, **SaveSpecialSlideSubshape**, **AlignSpecialSlideShapes**, **GetSpecialSlideAnimation**, **SetSpecialSlideAnimation**, **CreateSpecialSlideAnimationInteractiveSequence**, **CreateSpecialSlideAnimationEffect**, **CreateSpecialSlideAnimationInteractiveSequenceEffect**, **UpdateSpecialSlideAnimationEffect**, **UpdateSpecialSlideAnimationInteractiveSequenceEffect**, **DeleteSpecialSlideAnimation**, **DeleteSpecialSlideAnimationMainSequence**, **DeleteSpecialSlideAnimationInteractiveSequences**, **DeleteSpecialSlideAnimationInteractiveSequence**, **DeleteSpecialSlideAnimationEffect**, **DeleteSpecialSlideAnimationInteractiveSequenceEffect**.
+
+## Enhancements in Version 21.8
+* New **slides** parameter for **Convert**, **ConvertAndSave**, **DownloadPresentation** and **SavePresentation** methods that allows to convert a specified set of slides in the presentation.
 
 ## Enhancements in Version 21.6
 * New **CreateComment**, **CreateCommentOnline**, **DeleteComments**, **DeleteCommentsOnline**, **DeleteSlideComments** and **DeleteSlideCommentsOnline** methods to add or delete comments in presentations.
@@ -63,7 +78,7 @@ To use Aspose Slides Cloud SDK for Perl you need to register an account with [As
 ### Installation
 
 ```sh
-cpan ASPOSE/AsposeSlidesCloud-SlidesApi-21.09.tar.gz
+cpan ASPOSE/AsposeSlidesCloud-SlidesApi-21.12.tar.gz
 ```
 
 ### Sample usage
@@ -81,7 +96,7 @@ The example code below converts a PowerPoint document to PDF format using aspose
 	my $api = AsposeSlidesCloud::SlidesApi->new(config => $config);
 	my $file = read_file("MyPresentation.pptx", { binmode => ':raw' });
 	my %params = ('format' => 'pdf', 'document' => $file);
-	my $result = $api->post_slides_convert(%params);
+	my $result = $api->convert(%params);
 	my $pdf = "MyPresentation.pdf";
 	open my $fh, '>>', $pdf;
 	binmode $fh;

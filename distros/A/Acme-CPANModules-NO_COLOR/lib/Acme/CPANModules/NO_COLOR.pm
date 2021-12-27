@@ -1,9 +1,11 @@
 package Acme::CPANModules::NO_COLOR;
 
+use strict;
+
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-21'; # DATE
+our $DATE = '2021-12-03'; # DATE
 our $DIST = 'Acme-CPANModules-NO_COLOR'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $LIST = {
     summary => "Modules/scripts that follow the NO_COLOR convention",
@@ -32,6 +34,7 @@ _
         {module=>'Debug::Print'},
         {module=>'Git::Deploy', script=>'git-deploy'},
         {module=>'Indent::Form'},
+        {module=>'JSON::Color'},
         {module=>'Log::Any::Adapter::Screen'},
         {module=>'Log::ger::Output::Screen'},
         {module=>'Parse::Netstat::Colorizer', script=>'cnetstat'},
@@ -70,7 +73,7 @@ Acme::CPANModules::NO_COLOR - Modules/scripts that follow the NO_COLOR conventio
 
 =head1 VERSION
 
-This document describes version 0.008 of Acme::CPANModules::NO_COLOR (from Perl distribution Acme-CPANModules-NO_COLOR), released on 2021-07-21.
+This document describes version 0.009 of Acme::CPANModules::NO_COLOR (from Perl distribution Acme-CPANModules-NO_COLOR), released on 2021-12-03.
 
 =head1 DESCRIPTION
 
@@ -154,6 +157,10 @@ Script: L<git-deploy>
 =item * L<Indent::Form>
 
 Author: L<SKIM|https://metacpan.org/author/SKIM>
+
+=item * L<JSON::Color> - Encode to colored JSON
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 =item * L<Log::Any::Adapter::Screen> - Send logs to screen, with colors and some other features
 
@@ -261,6 +268,8 @@ or directly:
 This Acme::CPANModules module also helps L<lcpan> produce a more meaningful
 result for C<lcpan related-mods> command when it comes to finding related
 modules for the modules listed in this Acme::CPANModules module.
+See L<App::lcpan::Cmd::related_mods> for more details on how "related modules"
+are found.
 
 =head1 HOMEPAGE
 
@@ -269,14 +278,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Acme-CPANM
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModules-NO_COLOR>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-NO_COLOR>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -288,11 +289,36 @@ L<cpanmodules> - CLI tool to let you browse/view the lists
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2018 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-NO_COLOR>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

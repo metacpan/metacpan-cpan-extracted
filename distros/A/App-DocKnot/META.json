@@ -33,6 +33,7 @@
             "JSON::MaybeXS" : "0",
             "Kwalify" : "0",
             "List::SomeUtils" : "0.07",
+            "Path::Tiny" : "0",
             "Perl6::Slurp" : "0",
             "Pod::Thread" : "3.00",
             "Template" : "0",
@@ -50,47 +51,55 @@
    "provides" : {
       "App::DocKnot" : {
          "file" : "lib/App/DocKnot.pm",
-         "version" : "5.00"
+         "version" : "6.00"
       },
       "App::DocKnot::Command" : {
          "file" : "lib/App/DocKnot/Command.pm",
-         "version" : "5.00"
+         "version" : "6.00"
       },
       "App::DocKnot::Config" : {
          "file" : "lib/App/DocKnot/Config.pm",
-         "version" : "5.00"
+         "version" : "6.00"
       },
       "App::DocKnot::Dist" : {
          "file" : "lib/App/DocKnot/Dist.pm",
-         "version" : "5.00"
+         "version" : "6.00"
       },
       "App::DocKnot::Generate" : {
          "file" : "lib/App/DocKnot/Generate.pm",
-         "version" : "5.00"
+         "version" : "6.00"
       },
       "App::DocKnot::Spin" : {
          "file" : "lib/App/DocKnot/Spin.pm",
-         "version" : "5.00"
+         "version" : "6.00"
+      },
+      "App::DocKnot::Spin::Pointer" : {
+         "file" : "lib/App/DocKnot/Spin/Pointer.pm",
+         "version" : "6.00"
       },
       "App::DocKnot::Spin::RSS" : {
          "file" : "lib/App/DocKnot/Spin/RSS.pm",
-         "version" : "5.00"
+         "version" : "6.00"
       },
       "App::DocKnot::Spin::Sitemap" : {
          "file" : "lib/App/DocKnot/Spin/Sitemap.pm",
-         "version" : "5.00"
+         "version" : "6.00"
       },
       "App::DocKnot::Spin::Thread" : {
          "file" : "lib/App/DocKnot/Spin/Thread.pm",
-         "version" : "5.00"
+         "version" : "6.00"
       },
       "App::DocKnot::Spin::Versions" : {
          "file" : "lib/App/DocKnot/Spin/Versions.pm",
-         "version" : "5.00"
+         "version" : "6.00"
       },
       "App::DocKnot::Update" : {
          "file" : "lib/App/DocKnot/Update.pm",
-         "version" : "5.00"
+         "version" : "6.00"
+      },
+      "App::DocKnot::Util" : {
+         "file" : "lib/App/DocKnot/Util.pm",
+         "version" : "6.00"
       }
    },
    "release_status" : "stable",
@@ -108,6 +117,6 @@
          "web" : "https://github.com/rra/docknot"
       }
    },
-   "version" : "5.00",
+   "version" : "6.00",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

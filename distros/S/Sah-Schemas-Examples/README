@@ -2,7 +2,7 @@ NAME
     Sah::Schemas::Examples - Various example Sah schemas
 
 VERSION
-    This document describes version 0.007 of Sah::Schemas::Examples (from
+    This document describes version 0.009 of Sah::Schemas::Examples (from
     Perl distribution Sah-Schemas-Examples), released on 2021-07-30.
 
 SAH SCHEMAS
@@ -20,6 +20,9 @@ SAH SCHEMAS
 
         A sample schema.
 
+        This is just a simple schema based on "str" with no additional
+        restriction clauses.
+
     *   example::has_merge
 
         Even integer.
@@ -35,6 +38,9 @@ SAH SCHEMAS
 
         Recursive schema.
 
+        This schema will cause the resolver Data::Sah::Resolve to bail
+        because it recurses to itself.
+
     *   example::recurse2a
 
         Recursive schema.
@@ -42,6 +48,9 @@ SAH SCHEMAS
     *   example::recurse2b
 
         Recursive schema.
+
+        This schema will cause the resolver Data::Sah::Resolve to bail
+        because it eventually recurses to itself.
 
     *   hash_of_int
 

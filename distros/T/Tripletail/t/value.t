@@ -218,12 +218,7 @@ dies_ok {
     $v->set('2000/01/01')->isDateString('foo bar');
 } 'isDateString [2000/01/01] [foo bar]';
 
-SKIP:
 {
-  if( $Tripletail::VERSION le '0.43' )
-  {
-    skip "isChar is not supported this version", 17;
-  }
   ok($v->can("isChar"), "isChar is supported");
 
   throws_ok {

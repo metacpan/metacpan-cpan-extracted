@@ -984,6 +984,66 @@ YAML
     { valid => true },
     'decoded content matches the schema',
   );
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => 'openapi.yaml',
+    openapi_schema => do {
+      YAML::PP->new( boolean => 'JSON::PP' )->load_string(<<YAML);
+$openapi_preamble
+paths:
+  /foo/{foo_id}/bar/{bar_id}:
+    post:
+      requestBody:
+        required: true
+        content:
+          '*/*':
+            schema:
+              minLength: 10
+YAML
+    },
+  );
+  $request = POST 'http://example.com/some/path', 'Content-Type' => 'unsupported/unsupported', Content => '!!!';
+  cmp_deeply(
+    ($result = $openapi->validate_request($request,
+      { path_template => $path_template, path_captures => {} }))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/body',
+          keywordLocation => jsonp('/paths', '/foo/{foo_id}/bar/{bar_id}', qw(post requestBody content */* schema minLength)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths', '/foo/{foo_id}/bar/{bar_id}', qw(post requestBody content */* schema minLength)))->to_string,
+          error => 'length is less than 10',
+        },
+      ],
+    },
+    'unknown content type can still be evaluated if */* is an acceptable media-type',
+  );
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => 'openapi.yaml',
+    openapi_schema => do {
+      YAML::PP->new( boolean => 'JSON::PP' )->load_string(<<YAML);
+$openapi_preamble
+paths:
+  /foo/{foo_id}/bar/{bar_id}:
+    post:
+      requestBody:
+        required: true
+        content:
+          text/plain: {}
+YAML
+    },
+  );
+  $request = POST 'http://example.com/some/path', 'Content-Type' => 'text/plain', Content => '!!!';
+  cmp_deeply(
+    ($result = $openapi->validate_request($request,
+      { path_template => $path_template, path_captures => {} }))->TO_JSON,
+    { valid => true },
+    'empty media-type object is not an error',
+  );
 };
 
 subtest 'document errors' => sub {

@@ -1,10 +1,10 @@
 class TestCase::Lib::Short {
-  use Fn (INT8_MIN, INT8_MAX, INT16_MIN, INT16_MAX, INT32_MIN, INT32_MAX, INT64_MIN, INT64_MAX, FLT_MIN, FLT_MAX, DBL_MIN, DBL_MAX);
+  use Fn;
   static method basic : int () {
-    my $oval = Short->new(INT16_MIN());
+    my $oval = Short->new(Fn->INT16_MIN());
     my $value1 = $oval->value;
     
-    unless ($value1 == INT16_MIN()) {
+    unless ($value1 == Fn->INT16_MIN()) {
       return 0;
     }
     

@@ -1,5 +1,13 @@
 Revision history for Perl extension RxPerl-AnyEvent
 
+v6.8.1 2021-12-26T11:20:13Z
+
+    - added dependency to 'parent' module for perl v5.10
+
+v6.8.0 2021-12-26T07:49:45Z
+
+    - switched license back to the license of Perl
+
 v6.7.0 2021-12-16T08:19:16Z
 
     - added community code of conduct

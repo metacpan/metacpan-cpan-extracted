@@ -8,6 +8,7 @@ use Test::Fatal;
 use Errno qw/ENOENT ENOTDIR/;
 
 use FindBin;
+use File::Spec::Functions 'catfile';
 use File::Temp;
 use lib "$FindBin::Bin/lib";
 use TestUtils;
@@ -17,9 +18,13 @@ subtest enotdir => sub {
 
 	my ($tfh, $tpath) = File::Temp::tempfile( CLEANUP => 1 );
 
-	my $err = exception { -e "$tpath/notthere" };
+	my $path = catfile($tpath, 'notthere');
+	my $err = exception { -e $path };
 
-	like($err, error_for("-e '$tpath/notthere'", ENOTDIR));
+	SKIP: {
+		skip 'Windows is special', 1 if $^O eq 'MSWin32';
+		like($err, error_for("-e '\Q$path\E'", ENOTDIR));
+	}
 };
 
 subtest no_error => sub {

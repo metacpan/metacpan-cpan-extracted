@@ -8,7 +8,7 @@ configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
 generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
-license: gpl
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -26,17 +26,18 @@ no_index:
 provides:
   RxPerl::Mojo:
     file: lib/RxPerl/Mojo.pm
-    version: v6.7.0
+    version: v6.8.1
 requires:
   Mojo::IOLoop: '0'
   RxPerl: v6.6.1
   Sub::Util: '1.41'
+  parent: '0'
   perl: '5.010'
 resources:
   bugtracker: https://gitlab.com/karjala/rxperl-mojo-for-perl/issues
   homepage: https://gitlab.com/karjala/rxperl-mojo-for-perl
   repository: git://gitlab.com/karjala/rxperl-mojo-for-perl.git
-version: v6.7.0
+version: v6.8.1
 x_authority: cpan:KARJALA
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

@@ -39,7 +39,7 @@ my $tempdir = File::Temp->newdir();
 # generate/self.t test, but via the command-line parser.  Do this in a
 # separate block so that $tempfile goes out of scope and will be cleaned up.
 {
-    my $tempfile    = File::Temp->new(DIR => $tempdir);
+    my $tempfile = File::Temp->new(DIR => $tempdir);
     my $output_path = $tempfile->filename;
     $docknot->run('generate', 'readme', $output_path);
     my $output = slurp($output_path);
@@ -48,7 +48,7 @@ my $tempdir = File::Temp->newdir();
 
 # Do the same thing again, but using arguments from @ARGV.
 {
-    my $tempfile    = File::Temp->new(DIR => $tempdir);
+    my $tempfile = File::Temp->new(DIR => $tempdir);
     my $output_path = $tempfile->filename;
     local @ARGV = ('generate', 'readme-md', "$output_path");
     $docknot->run();
@@ -57,9 +57,9 @@ my $tempdir = File::Temp->newdir();
 }
 
 # Save the paths to various files in the source directory.
-my $readme_path    = File::Spec->catfile(getcwd(), 'README');
+my $readme_path = File::Spec->catfile(getcwd(), 'README');
 my $readme_md_path = File::Spec->catfile(getcwd(), 'README.md');
-my $metadata_path  = File::Spec->catfile(getcwd(), 'docs', 'docknot.yaml');
+my $metadata_path = File::Spec->catfile(getcwd(), 'docs', 'docknot.yaml');
 
 # Generate all of the files using generate-all in a new temporary directory.
 my $tmpdir = File::Temp->newdir();

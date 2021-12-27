@@ -2,8 +2,8 @@ NAME
     Params::Sah - Validate method/function parameters using Sah schemas
 
 VERSION
-    This document describes version 0.072 of Params::Sah (from Perl
-    distribution Params-Sah), released on 2020-05-10.
+    This document describes version 0.073 of Params::Sah (from Perl
+    distribution Params-Sah), released on 2021-08-04.
 
 SYNOPSIS
      use Params::Sah qw(gen_validator);
@@ -134,8 +134,10 @@ FUNCTIONS
      gen_validator('schema1', 'schema2', ...);
      gen_validator({option=>'val', ...}, 'schema1', 'schema2', ...);
 
-    Will return a coderef which is the validator code. The code accepts an
-    arrayref (usually "\@_").
+    Will return a coderef which is the validator code. The validator code
+    accepts an arrayref (usually "\@_"). The validator code will by default
+    croak on invalid parameters, but this behavior can be customized using
+    the "on_invalid" option.
 
     Known options:
 
@@ -303,14 +305,20 @@ BUGS
 SEE ALSO
     Sah, Data::Sah
 
-    Alternative modules: Params::ValidationCompiler (a compiled version of
-    Params::Validate), Type::Params (from Type::Tiny).
+    Alternative non-Sah modules: Params::ValidationCompiler (a compiled
+    version of Params::Validate), Type::Params (from Type::Tiny).
+
+    Alternative Sah modules: you can add Rinci metadata to your function,
+    then use Perinci::Sub::Wrapper or Perinci::CmdLine to enforce
+    validation. These can do more then schema checking e.g. interargument
+    relationship checking, external dependency checking, etc.
 
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2016, 2015 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2016, 2015 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

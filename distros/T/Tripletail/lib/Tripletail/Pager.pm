@@ -262,7 +262,7 @@ sub _paging {
     # 全部で何件あるか調べる
     if ($this->{dbtype} eq 'mysql') {
         unless (defined($this->{maxrows})) {
-            my $sth   = $DB->execute(q{SELECT FOUND_ROWS() as ROWS});
+            my $sth   = $DB->execute(q{SELECT FOUND_ROWS()});
             my $count = $sth->fetchArray;
             $sth->finish;
 

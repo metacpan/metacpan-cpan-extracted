@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -6,11 +7,15 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Net::Async::IRC',
    requires => {
+      'Future::AsyncAwait' => '0.47', # toplevel await
       'IO::Async::Loop' => '0.54', # ->connect Future
       'IO::Async::Stream' => '0.59', # Protocol deprecation
-      'Protocol::IRC::Client' => '0.12',
+      'List::Util' => '1.33',
+      'MIME::Base64' => 0,
+      'Protocol::IRC::Client' => '0.13',
       'Time::HiRes' => 0,
-      'perl' => '5.010', # //, mro c3
+
+      'perl' => '5.014',
    },
    test_requires => {
       'IO::Async::OS' => 0,
@@ -18,9 +23,10 @@ my $build = Module::Build->new(
       'Test::Fatal' => 0,
       'Test::More' => '0.88', # done_testing
    },
-   auto_configure_requires => 0, # Don't add M::B to configure_requires
+   configure_requires => {
+      'Module::Build' => '0.4004', # test_requires
+   },
    license => 'perl',
-   create_makefile_pl => 'traditional',
    create_license => 1,
    create_readme  => 1,
 );

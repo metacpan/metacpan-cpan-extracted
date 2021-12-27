@@ -6,7 +6,7 @@ use Test::More;
 use Data::Dumper;
 use Capture::Tiny 'capture';
 use Test::HTTP::LocalServer;
-use URL::Encode 'url_decode';
+use URI::Escape 'uri_unescape';
 use File::Temp 'tempfile';
 use Storable 'dclone';
 use LWP::UserAgent;
@@ -233,8 +233,8 @@ sub request_logs_identical_ok( $test, $name, $r, $res ) {
         SKIP: {
             skip "We can't check the request body", 1;
         };
-    } elsif( url_decode($r->uri->path_query) ne $res->{path} ) {
-        is url_decode($r->uri->path_query), $res->{path}, $name ;
+    } elsif( uri_unescape($r->uri->path_query) ne $res->{path} ) {
+        is uri_unescape($r->uri->path_query), $res->{path}, $name ;
         diag join " ", @{ $test->{cmd} };
         SKIP: {
             skip "We can't check the request body", 1;

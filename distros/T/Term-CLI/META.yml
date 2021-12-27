@@ -3,11 +3,12 @@ abstract: 'CLI interpreter based on Term::ReadLine'
 author:
   - 'Steven Bakker <sbakker@cpan.org>'
 build_requires:
-  File::Temp: '0.2304'
+  File::Temp: '0.22'
   Pod::Coverage::TrustPod: '0'
   Test::Class: '0'
   Test::Compile: v1.2.0
   Test::Exception: '0.35'
+  Test::MockModule: '0.171'
   Test::More: '1.001002'
   Test::Output: '1.03'
   Test::Pod: '0'
@@ -18,7 +19,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.023, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,83 +28,84 @@ name: Term-CLI
 provides:
   Term::CLI:
     file: lib/Term/CLI.pm
-    version: '0.052003'
+    version: '0.053006'
   Term::CLI::Argument:
     file: lib/Term/CLI/Argument.pm
-    version: '0.052003'
+    version: '0.053006'
   Term::CLI::Argument::Bool:
     file: lib/Term/CLI/Argument/Bool.pm
-    version: '0.052003'
+    version: '0.053006'
   Term::CLI::Argument::Enum:
     file: lib/Term/CLI/Argument/Enum.pm
-    version: '0.052003'
+    version: '0.053006'
   Term::CLI::Argument::Filename:
     file: lib/Term/CLI/Argument/Filename.pm
-    version: '0.052003'
+    version: '0.053006'
   Term::CLI::Argument::Number:
     file: lib/Term/CLI/Argument/Number.pm
-    version: '0.052003'
+    version: '0.053006'
   Term::CLI::Argument::Number::Float:
     file: lib/Term/CLI/Argument/Number/Float.pm
-    version: '0.052003'
+    version: '0.053006'
   Term::CLI::Argument::Number::Int:
     file: lib/Term/CLI/Argument/Number/Int.pm
-    version: '0.052003'
+    version: '0.053006'
   Term::CLI::Argument::String:
     file: lib/Term/CLI/Argument/String.pm
-    version: '0.052003'
+    version: '0.053006'
   Term::CLI::Base:
     file: lib/Term/CLI/Base.pm
-    version: '0.052003'
+    version: '0.053006'
   Term::CLI::Command:
     file: lib/Term/CLI/Command.pm
-    version: '0.052003'
+    version: '0.053006'
   Term::CLI::Command::Help:
     file: lib/Term/CLI/Command/Help.pm
-    version: '0.052003'
+    version: '0.053006'
   Term::CLI::Element:
     file: lib/Term/CLI/Element.pm
-    version: '0.052003'
+    version: '0.053006'
   Term::CLI::L10N:
     file: lib/Term/CLI/L10N.pm
-    version: '0.052003'
+    version: '0.053006'
   Term::CLI::L10N::en:
     file: lib/Term/CLI/L10N/en.pm
-    version: '0.052003'
+    version: '0.053006'
   Term::CLI::L10N::nl:
     file: lib/Term/CLI/L10N/nl.pm
-    version: '0.052003'
+    version: '0.053006'
   Term::CLI::ReadLine:
     file: lib/Term/CLI/ReadLine.pm
-    version: '0.052003'
+    version: '0.053006'
   Term::CLI::Role::ArgumentSet:
     file: lib/Term/CLI/Role/ArgumentSet.pm
-    version: '0.052003'
+    version: '0.053006'
   Term::CLI::Role::CommandSet:
     file: lib/Term/CLI/Role/CommandSet.pm
-    version: '0.052003'
+    version: '0.053006'
   Term::CLI::Role::HelpText:
     file: lib/Term/CLI/Role/HelpText.pm
-    version: '0.052003'
+    version: '0.053006'
 requires:
-  Carp: '0'
-  Exporter: '5.71'
+  Exporter: '5.64'
+  File::Glob: '0'
   File::Which: '1.09'
   FindBin: '1.50'
-  Getopt::Long: '2.42'
-  List::Util: '1.38'
-  Locale::Maketext: '1.25'
+  Getopt::Long: '2.38'
+  List::Util: '1.23'
+  Locale::Maketext: '1.19'
   Locale::Maketext::Lexicon::Gettext: '1.00'
   Moo: '1.000001'
   Moo::Role: '0'
-  Pod::Text::Termcap: '2.08'
-  Scalar::Util: '1.38'
-  Term::ReadLine: '1.14'
+  Pod::Text::Termcap: '2.06'
+  Scalar::Util: '1.23'
+  Term::ReadKey: '2.34'
+  Term::ReadLine: '1.07'
   Term::ReadLine::Gnu: '1.24'
-  Text::ParseWords: '3.29'
+  Text::ParseWords: '3.27'
   Types::Standard: '1.000005'
   namespace::clean: '0.25'
-  parent: '0.228'
+  parent: '0.225'
   perl: 5.014_001
   strict: '1.00'
   subs: '1.00'
@@ -112,7 +114,7 @@ resources:
   bugtracker: https://github.com/sbakker/perl-Term-CLI/issues
   homepage: https://github.com/sbakker/perl-Term-CLI
   repository: https://github.com/sbakker/perl-Term-CLI.git
-version: '0.052003'
-x_generated_by_perl: v5.32.1
+version: '0.053006'
+x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

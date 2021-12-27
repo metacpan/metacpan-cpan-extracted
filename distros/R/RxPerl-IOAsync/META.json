@@ -6,7 +6,7 @@
    "dynamic_config" : 0,
    "generated_by" : "Minilla/v3.1.12",
    "license" : [
-      "gpl_1"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -45,6 +45,7 @@
             "IO::Async" : "0",
             "RxPerl" : "v6.7.0",
             "Sub::Util" : "1.41",
+            "parent" : "0",
             "perl" : "5.010"
          }
       },
@@ -58,7 +59,7 @@
    "provides" : {
       "RxPerl::IOAsync" : {
          "file" : "lib/RxPerl/IOAsync.pm",
-         "version" : "v6.8.0"
+         "version" : "v6.9.1"
       }
    },
    "release_status" : "stable",
@@ -72,7 +73,7 @@
          "web" : "https://gitlab.com/karjala/rxperl-ioasync-for-perl"
       }
    },
-   "version" : "v6.8.0",
+   "version" : "v6.9.1",
    "x_authority" : "cpan:KARJALA",
    "x_serialization_backend" : "JSON::PP version 4.06",
    "x_static_install" : 1

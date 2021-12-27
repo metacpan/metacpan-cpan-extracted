@@ -11,6 +11,8 @@ navbar 1
 =head1 S<WHITE SPACE>
 
 [output]
+\heading[][]
+
 \class(navbar)[
   \link[#S1][Head \bold[BOLD \italic[ITALIC \code[CODE]]]]
   | \link[#S2][White Space]

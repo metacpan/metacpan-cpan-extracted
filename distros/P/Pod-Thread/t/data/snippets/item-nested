@@ -47,6 +47,8 @@ Blah blah blah blah blah blah
 =back
 
 [output]
+\heading[][]
+
 \desc[\italic(file)[inn.conf]]
 [\bullet
 [Blah blah blah blah blah blah blah

@@ -16,6 +16,7 @@ my @files = (
     't/document-schemas.t',
     't/document-toplevel.t',
     't/oas-invalid-schemas/discriminator.json',
+    't/oas-invalid-schemas/formats.json',
     't/oas-vocabulary.t',
     't/openapi-constructor.t',
     't/operationIds.t',

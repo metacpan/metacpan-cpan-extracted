@@ -59,7 +59,7 @@ sub getMemorySize {
             }
 		}
 
-		if($uname =~ m/^Linux 2\./) {
+		if($uname =~ m/^Linux [2-4]\./) {
 			$this->{getmemfunc} = \&__getMemLinux2;
 		} else {
 			$TL->log(__PACKAGE__, "We can't get memory usage on [$uname] currently...");
@@ -200,7 +200,7 @@ Tripletail::MemorySentinel オブジェクトを取得。
 
   my $usage = $TL->getMemorySize;
 
-現在のメモリ使用量を取得する。
+現在のメモリ使用量を KiB 単位で取得する。
 
 =item C<< setPermissibleSize >>
 

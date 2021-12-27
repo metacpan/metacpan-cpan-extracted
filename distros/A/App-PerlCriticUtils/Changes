@@ -1,3 +1,11 @@
+0.006   2021-12-01  Released-By: PERLANCAR; Urgency: medium
+
+	- [cli pcplist] Allow filtering with keyword, e.g. 'pcplist
+	  strict'.
+
+	- Add utility: pcpgrep.
+
+
 0.005   2021-08-28  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

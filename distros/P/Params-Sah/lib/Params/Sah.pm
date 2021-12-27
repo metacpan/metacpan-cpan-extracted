@@ -1,9 +1,9 @@
 package Params::Sah;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-10'; # DATE
+our $DATE = '2021-08-04'; # DATE
 our $DIST = 'Params-Sah'; # DIST
-our $VERSION = '0.072'; # VERSION
+our $VERSION = '0.073'; # VERSION
 
 use 5.010001;
 use strict;
@@ -216,7 +216,7 @@ Params::Sah - Validate method/function parameters using Sah schemas
 
 =head1 VERSION
 
-This document describes version 0.072 of Params::Sah (from Perl distribution Params-Sah), released on 2020-05-10.
+This document describes version 0.073 of Params::Sah (from Perl distribution Params-Sah), released on 2021-08-04.
 
 =head1 SYNOPSIS
 
@@ -358,8 +358,10 @@ schema will validate the function's first argument, and so on. Example:
  gen_validator('schema1', 'schema2', ...);
  gen_validator({option=>'val', ...}, 'schema1', 'schema2', ...);
 
-Will return a coderef which is the validator code. The code accepts an arrayref
-(usually C<< \@_ >>).
+Will return a coderef which is the validator code. The validator code accepts an
+arrayref (usually C<< \@_ >>). The validator code will by default croak on
+invalid parameters, but this behavior can be customized using the C<on_invalid>
+option.
 
 Known options:
 
@@ -535,8 +537,13 @@ feature.
 
 L<Sah>, L<Data::Sah>
 
-Alternative modules: L<Params::ValidationCompiler> (a compiled version of
-L<Params::Validate>), L<Type::Params> (from L<Type::Tiny>).
+Alternative non-Sah modules: L<Params::ValidationCompiler> (a compiled version
+of L<Params::Validate>), L<Type::Params> (from L<Type::Tiny>).
+
+Alternative Sah modules: you can add L<Rinci|Rinci::function> metadata to your
+function, then use L<Perinci::Sub::Wrapper> or L<Perinci::CmdLine> to enforce
+validation. These can do more then schema checking e.g. interargument
+relationship checking, external dependency checking, etc.
 
 =head1 AUTHOR
 
@@ -544,7 +551,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

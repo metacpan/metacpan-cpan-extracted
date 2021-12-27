@@ -18,6 +18,7 @@ sub category { shift->{category} }
 sub builder { shift->{builder} }
 sub force { shift->{force} }
 sub quiet { shift->{quiet} }
+sub debug { shift->{debug} }
 
 sub new {
   my $class = shift;
@@ -25,7 +26,7 @@ sub new {
   my $self = {@_};
   
   if ($ENV{SPVM_CC_DEBUG}) {
-    $self->{quiet} = 0;
+    $self->{debug} = 1;
   }
   
   if ($ENV{SPVM_CC_FORCE}) {
@@ -215,9 +216,9 @@ sub compile {
   # Quiet output
   my $quiet = $config->quiet;
 
-  # If quiet field exists, overwrite it
-  if (defined $self->quiet) {
-    $quiet = $self->quiet;
+  # Debug mode
+  if ($self->debug) {
+    $quiet = 0;
   }
   
   # SPVM Method source file
@@ -237,14 +238,14 @@ sub compile {
   my $dependency = $self->parse_native_source_dependencies($native_include_dir, $native_src_dir, $src_ext);
 
   # Native source files
-  my @native_src_files = sort keys %$dependency;
+  my $native_src_files = [map { "$native_src_dir/$_" } @{$config->sources} ];
   
   my $cbuilder = ExtUtils::CBuilder->new(quiet => $quiet);
   
   # Compile source files
   my $object_files = [];
   my $is_native_src;
-  for my $src_file ($spvm_method_src_file, @native_src_files) {
+  for my $src_file ($spvm_method_src_file, @$native_src_files) {
     my $object_file;
     # Native object file name
     if ($is_native_src) {
@@ -311,11 +312,10 @@ sub compile {
       mkpath dirname $object_file;
 
       my $cc_cmd = $self->create_compile_command($config, $object_file, $src_file, \@runtime_include_dirs);
-      eval {
-        # Execute compile command
-        $cbuilder->do_system(@$cc_cmd)
-          or confess "Can't compile $src_file: @$cc_cmd";
-      };
+
+      # Execute compile command
+      $cbuilder->do_system(@$cc_cmd)
+        or confess "Can't compile $src_file: @$cc_cmd";
     }
     push @$object_files, $object_file;
     
@@ -363,7 +363,7 @@ sub link {
   else {
     confess "SPVM_BUILD_DIR environment variable must be set for link";
   }
-  
+
   # Object directory
   my $object_dir = $opt->{object_dir};
   unless (defined $object_dir && -d $object_dir) {
@@ -422,25 +422,6 @@ EOS
   # Runtime library directories
   my @runtime_lib_dirs;
   
-  # Add resouce lib directories
-  my $resources = $config->resources;
-  for my $resource (@$resources) {
-    eval "require $resource";
-    if ($@) {
-      confess "Can't load $resource";
-    }
-    my $module_name = $resource;
-    $module_name =~ s|::|/|g;
-    $module_name .= '.pm';
-    
-    my $module_path = $INC{$module_name};
-    
-    my $lib_dir = $module_path;
-    $lib_dir =~ s/\.pm$//;
-    $lib_dir .= '.native/lib';
-    push @runtime_lib_dirs, $lib_dir;
-  }
-  
   # Library directory
   my $native_lib_dir = "$native_dir/lib";
   if (-d $native_lib_dir) {
@@ -451,8 +432,8 @@ EOS
   my $quiet = $config->quiet;
 
   # If quiet field exists, overwrite it
-  if (defined $self->quiet) {
-    $quiet = $self->quiet;
+  if ($self->debug) {
+    $quiet = 0;
   }
   
   # dl_func_list
@@ -473,7 +454,12 @@ EOS
       push @$dl_func_list, $anon_method_cfunc_name;
     }
   }
-  
+
+  my $exported_funcs = $config->exported_funcs;
+  for my $exported_func (@$exported_funcs) {
+    push @$dl_func_list, $exported_func;
+  }
+
   # This is bad hack to suppress boot strap function error.
   unless (@$dl_func_list) {
     push @$dl_func_list, '';
@@ -490,7 +476,30 @@ EOS
   # Optimize
   my $ld_optimize = $config->ld_optimize;
   $ldflags_str .= " $ld_optimize";
-  
+
+  # Add resouce lib directories
+  my $resources = $config->resources;
+  for my $resource (@$resources) {
+    eval "require $resource";
+    if ($@) {
+      confess "Can't load $resource";
+    }
+    my $module_name = $resource;
+    $module_name =~ s|::|/|g;
+    $module_name .= '.pm';
+    
+    my $module_path = $INC{$module_name};
+    
+    my $static_lib_file = $module_path;
+    $static_lib_file =~ s/\.pm$/\.a/;
+    if (-f $static_lib_file) {
+      push @$object_files, $static_lib_file;
+    }
+    else {
+      confess "Can't find resource static library file \"$static_lib_file\"";
+    }
+  }
+
   # Libraries
   # Libraries is linked using absolute path because the linked libraries must be known at runtime.
   my $lib_dirs = [@runtime_lib_dirs, @{$config->lib_dirs}];
@@ -549,7 +558,14 @@ EOS
     ld => $ld,
     lddlflags => $ldflags_str,
     shrpenv => '',
+    perllibs => '',
+    libpth => '',
   };
+
+  # Setting for Windows MinGW
+  if ($^O eq 'MSWin32') {
+    $cbuilder_config->{libpth} = "$Config{bin}";
+  }
   
   # ExtUtils::CBuilder object
   my $cbuilder = ExtUtils::CBuilder->new(quiet => $quiet, config => $cbuilder_config);
@@ -557,18 +573,50 @@ EOS
   # Move temporary shared library file to blib directory
   mkpath dirname $shared_lib_file;
 
-  # Link and create shared library
-  eval {
-    $cbuilder->link(
-      lib_file => $shared_lib_file,
-      objects => $object_files,
-      module_name => $class_name,
-      dl_func_list => $dl_func_list,
-    );
-  };
-  if (my $error = $@) {
-    confess $error;
+  # Create shared library
+  my (undef, @tmp_files) = $cbuilder->link(
+    lib_file => $shared_lib_file,
+    objects => $object_files,
+    module_name => $class_name,
+    dl_func_list => $dl_func_list,
+  );
+
+  if ($self->debug) {
+    if ($^O eq 'MSWin32') {
+      my $def_file;
+      my $lds_file;
+      for my $tmp_file (@tmp_files) {
+        # Remove double quote
+        $tmp_file =~ s/^"//;
+        $tmp_file =~ s/"$//;
+
+        if ($tmp_file =~ /\.def$/) {
+          $def_file = $tmp_file;
+          $lds_file = $def_file;
+          $lds_file =~ s/\.def$/.lds/;
+          last;
+        }
+      }
+      if (defined $def_file && -f $def_file) {
+        my $def_content = SPVM::Builder::Util::slurp_binary($def_file);
+        warn "[$def_file]\n$def_content\n";
+      }
+      if (defined $lds_file && -f $lds_file) {
+        my $lds_content = SPVM::Builder::Util::slurp_binary($lds_file);
+        warn "[$lds_file]\n$lds_content\n";
+      }
+    }
   }
+
+  # Create static library
+  my $ar_rel_file = SPVM::Builder::Util::convert_class_name_to_category_rel_file($class_name, $category, 'a');
+  my $ar_file = "$lib_dir/$ar_rel_file";
+  if (-f $ar_file) {
+    unlink $ar_file
+      or confess "Can't delete file \"$ar_file\":$!";
+  }
+  my @ar_cmd = ('ar', 'rc', $ar_file, @$object_files);
+  $cbuilder->do_system(@ar_cmd);
   
   return $shared_lib_file;
 }

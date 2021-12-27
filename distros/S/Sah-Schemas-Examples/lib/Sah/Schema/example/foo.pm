@@ -3,10 +3,16 @@ package Sah::Schema::example::foo;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-07-30'; # DATE
 our $DIST = 'Sah-Schemas-Examples'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $schema = [str => {
     summary => 'A sample schema',
+    description => <<'_',
+
+This is just a simple schema based on `str` with no additional restriction
+clauses.
+
+_
 }];
 
 1;
@@ -24,7 +30,7 @@ Sah::Schema::example::foo - A sample schema
 
 =head1 VERSION
 
-This document describes version 0.007 of Sah::Schema::example::foo (from Perl distribution Sah-Schemas-Examples), released on 2021-07-30.
+This document describes version 0.009 of Sah::Schema::example::foo (from Perl distribution Sah-Schemas-Examples), released on 2021-07-30.
 
 =head1 SYNOPSIS
 
@@ -88,6 +94,11 @@ L<Perinci::CmdLine> to create a CLI:
  % ./myapp.pl --version
 
  % ./myapp.pl --arg1 ...
+
+=head1 DESCRIPTION
+
+This is just a simple schema based on C<str> with no additional restriction
+clauses.
 
 =head1 HOMEPAGE
 

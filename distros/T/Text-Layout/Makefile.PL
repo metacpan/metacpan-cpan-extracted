@@ -5,7 +5,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my $master = 'lib/Text/Layout/Version.pm';
-my $version = "0.025";
+my $version = "0.027";
 $master =~ s;/Version;;;
 
 WriteMakefile(

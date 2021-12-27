@@ -1,0 +1,8 @@
+Revision history for Tickit-App-Plugin-EscapePrefix
+
+0.02    2021-12-24
+        [CHANGES]
+         * Does not need to use Module::Build::Using::PkgConfig
+
+0.01    2020-01-27 22:12
+        First version, released on an unsuspecting world.

@@ -10,7 +10,7 @@ use Carp;
 
 
 
-our $VERSION = "0.025";
+our $VERSION = "0.027";
 
 =head1 NAME
 
@@ -47,6 +47,9 @@ Example, using PDF::API2 integration:
 
     # Create a markup instance.
     my $layout = Text::Layout->new($pdf);
+
+    # This example uses PDF corefonts only.
+    Text::Layout::FontConfig->register_corefonts;
 
     $layout->set_font_description(Text::Layout::FontConfig->from_string("times 40"));
     $layout->set_markup( q{The <i><span foreground="red">quick</span> <span size="20"><b>brown</b></span></i> fox} );
@@ -88,27 +91,34 @@ PDF::API2 uses the coordinate system as defined in the PDF
 specification. It starts off bottom left. For western text the
 direction is increasing I<x> and B<de>creasing I<y>.
 
+=head1 Pango Conformance Mode
+
+Text::Layout can operate in one of two modes: I<convenience mode>
+(enabled by default), and I<Pango conformance mode>. The desired mode
+can be selected by calling the method set_pango_scaling().
+
 =head2 Pango coordinates
 
 Pango uses two device coordinates units: Pango units and device units.
-Pango units are 1000 (C<PANGO_SCALE>) times the device units.
+Pango units are 1024 (C<PANGO_SCALE>) times the device units.
 
 Several methods have two variants, e.g. get_size() and
 get_pixel_size(). The pixel-variant uses device units while the other
 variant uses Pango units.
 
-This module assumes no scaling. If you insist on multiplying all
-values by PANGO_SCALE use the set_pango_scale() method to say so and
-we'll divide everything back again internally.
+In I<convenience mode>, this module assumes no scaling. All units are
+PDF device units (1/72 inch).
 
 =head2 Pango device units
 
-Pango device units are 96dpi while PDF uses 72dpi. This module ignores
-this and uses PDF units everywhere, except for font sizes. Since we
-want e.g. a C<Times 20> font to be of equal size in the two systems,
-it will set the PDF font size to 15.
+Device units are used for font rendering. Pango device units are 96dpi
+while PDF uses 72dpi.
 
-I<DBD: Is this really a good idea?>
+In I<convenience mode> this is ignored. E.g. a C<Times 20> font 
+will be of equal size in the two systems,
+
+In I<Pango conformance mode> you would need to specify a font size of
+C<15360> to get a 20pt font.
 
 =head1 SUPPORTED MARKUP
 
@@ -246,7 +256,7 @@ underline=single
 =cut
 
 use constant {
-    PANGO_SCALE		=> 1000,
+    PANGO_SCALE		=> 1024,
     PANGO_DEVICE_UNITS	=>   96,
     PDF_DEVICE_UNITS	=>   72,
 };
@@ -295,6 +305,7 @@ sub new {
 	    _content => [],
 	    _px2pu   => \&px2pu,
 	    _pu2px   => \&pu2px,
+	    _pango_scale => 0,
 	  } => $pkg;
 }
 
@@ -387,6 +398,7 @@ sub set_text {
 	  color => $self->{_currentcolor},
 	  base  => 0,
 	} ];
+    delete( $self->{_bbcache} );
 }
 
 =over
@@ -460,7 +472,7 @@ my %magstep =
 
 sub set_markup {
     my ( $self, $string ) = @_;
-
+    confess("set_markup with UNDEF") unless defined $string;
     my @stack;
     my @content;
     my $fcur = $self->{_currentfont};
@@ -517,7 +529,9 @@ sub set_markup {
 
 		# <span face="Sans">
 		elsif ( $k =~ /^(face|font_family)$/ ) {
-		    $fcur = Text::Layout::FontConfig->find_font($v);
+		    $fcur = Text::Layout::FontConfig->find_font( $v,
+								 $fcur->{style},
+								 $fcur->{weight});
 		}
 
 		# <span size=20>
@@ -526,7 +540,10 @@ sub set_markup {
 			#ok
 		    }
 		    elsif ( $v =~ /\d+(?:\.\d+)?$/ ) {
-			$fsiz = 0 + $v;
+			$fsiz = $self->{_pu2px}->($v);
+			if ( $self->{_pango_scale} ) {
+			    $fsiz *= PANGO_DEVICE_UNITS / PDF_DEVICE_UNITS;
+			}
 		    }
 		    else {
 			carp("Invalid size: $v\n");
@@ -723,19 +740,19 @@ sub set_markup {
 	# Text.
 	else {
 	    push( @content,
-		  { text       => $a,
-		    font       => $fcur,
-		    size       => $fsiz,
-		    color      => $fcol,
-		    underline  => $undl,
-		    ulcol      => $uncl,
-		    overline   => $ovrl,
-		    ovrcol     => $ovcl,
-		    strike     => $strk,
-		    strcol     => $stcl,
-		    base       => $base,
-		    href       => $href,
-		  } );
+		  { text		     => $a,
+		    font		     => $fcur,
+		    size		     => $fsiz,
+		    color		     => $fcol,
+		    underline		     => $undl,
+		    underline_color	     => $uncl,
+		    overline		     => $ovrl,
+		    overline_color	     => $ovcl,
+		    strikethrough	     => $strk,
+		    strikethrough_color	     => $stcl,
+		    base		     => $base,
+		    href		     => $href,
+		  } ) if defined $a && $a ne '';
 	}
     }
 
@@ -748,6 +765,7 @@ sub set_markup {
 
     # Store content.
     $self->{_content} = \@content;
+    delete( $self->{_bbcache} );
 }
 
 =over
@@ -799,9 +817,17 @@ sub set_font_description {
       unless UNIVERSAL::isa( $description, $o );
 
     $self->{_currentfont}  = $description;
-    $self->{_currentsize}  = $description->{size}
-      if $description->{size};
+    if ( $description->{size} ) {
+	if ( $self->{_pango_scale} ) {
+	    $self->{_currentsize} = $self->{_pu2px}->($description->{size})
+	      * PANGO_DEVICE_UNITS / PDF_DEVICE_UNITS;
+	}
+	else {
+	    $self->{_currentsize} = $self->{_pu2px}->($description->{size});
+	}
+    }
     $self->{_currentcolor} = $description->{color} || "black";
+    delete( $self->{_bbcache} );
 }
 
 =over
@@ -840,6 +866,7 @@ Implementation note: Only alignment is implemented.
 sub set_width {
     my ( $self, $width ) = @_;
     $self->{_width} = $self->{_pu2px}->($width);
+    delete( $self->{_bbcache} );
 }
 
 =over
@@ -873,6 +900,7 @@ Implementation note: Height restrictions are not yet implemented.
 sub set_height {
     my ( $self, $height ) = @_;
     $self->{_height} = $self->{_pu2px}->($height);
+    delete( $self->{_bbcache} );
 }
 
 =over
@@ -1056,6 +1084,7 @@ Not yet implemented.
 sub set_spacing {
     my ( $self, $spacing ) = @_;
     $self->{_currentspacing} = $self->{_pu2px}->($spacing);
+    delete( $self->{_bbcache} );
 }
 
 =over
@@ -1098,6 +1127,7 @@ Not yet implemented.
 sub set_line_spacing {
     my ( $self, $factor ) = @_;
     $self->{_currentlinespacing} = $factor;
+    delete( $self->{_bbcache} );
 }
 
 =over
@@ -1189,6 +1219,7 @@ sub set_alignment {
     else {
 	croak("Invalid alignment: $align");
     }
+    delete( $self->{_bbcache} );
 }
 
 =over
@@ -1320,19 +1351,20 @@ Computes the logical and ink extents of the layout.
 
 Logical extents are usually what you want for positioning things.
 
-Return value is an array (in list context) or an array ref (in scalar
-context) containing two hash refs with 4 values: C<x>, C<y>, C<width>,
-and C<height>. The first reflects the ink extents, the second the
-logical extents.
+Return value in scalar context is a hash ref with 4 values:
+ C<x>, C<y>, C<width>, and C<height>
+describing the logical extents of the layout.
+In list context an array of two hashrefs is returned.
+The first reflects the ink extents, the second the logical extents.
 
-C<x> will reflect the offset when text is centered or right aligned.
-It will be zero for left aligned text. For right aligned text, it will
-be the width of the layout.
+In the extents, C<x> will reflect the offset when text is centered or
+right aligned. It will be zero for left aligned text. For right
+aligned text, it will be the width of the layout.
 
 C<y> will reflect the offset when text is centered vertically or
 bottom aligned. It will be zero for top aligned text.
 
-Implementation note: Since the PDF::API support layer cannot calculate ink,
+Implementation note: If the PDF::API support layer cannot calculate ink,
 this function returns two identical extents.
 
 =back
@@ -1341,10 +1373,17 @@ this function returns two identical extents.
 
 sub get_extents {
     my ( $self ) = @_;
+    my $need_ink = wantarray;
 
-    my @bb = @{$self->get_bbox};
-    my $res = { x => $bb[0], y => 0, width => $bb[2], height => $bb[3]-$bb[1] };
-    return wantarray ? ( $res, $res ) : [ $res, $res ];
+    my @bb = @{ $self->get_bbox($need_ink) };
+    my $res = { x     => $bb[0], y      => 0,
+		width => $bb[2], height => $bb[3]-$bb[1] };
+    my $ink = $res;
+    if ( @bb > 4 ) {
+	$ink = { x     => $bb[4], y      => $bb[5],
+		 width => $bb[6], height => $bb[7]-$bb[5] };
+    }
+    return $need_ink ? ( $ink, $res ) : $res;
 }
 
 =over
@@ -1360,9 +1399,17 @@ Same as get_extents, but using device units.
 sub get_pixel_extents {
     my ( $self ) = @_;
 
-    my @bb = @{$self->get_pixel_bbox};
-    my $res = { x => $bb[0], y => 0, width => $bb[2], height => $bb[3]-$bb[1] };
-    return wantarray ? ( $res, $res ) : [ $res, $res ];
+    my $need_ink = wantarray;
+
+    my @bb = @{ $self->get_pixel_bbox($need_ink) };
+    my $res = { x     => $bb[0], y      => 0,
+		width => $bb[2], height => $bb[3]-$bb[1] };
+    my $ink = $res;
+    if ( @bb > 4 ) {
+	$ink = { x     => $bb[4], y      => $bb[5],
+		 width => $bb[6], height => $bb[7]-$bb[5] };
+    }
+    return $need_ink ? ( $ink, $res ) : $res;
 }
 
 =over
@@ -1383,7 +1430,7 @@ returned.
 
 sub get_size {
     my ( $self ) = @_;
-    my $e = ($self->get_extents)[1];
+    my $e = $self->get_extents;
     wantarray
       ? return ( $e->{width}, $e->{height} )
       : return { width => $e->{width}, height => $e->{height} };
@@ -1401,7 +1448,7 @@ Same as get_size().
 
 sub get_pixel_size {
     my ( $self ) = @_;
-    my $e = ($self->get_pixel_extents)[1];
+    my $e = $self->get_pixel_extents;
     wantarray
       ? return ( $e->{width}, $e->{height} )
       : return { width => $e->{width}, height => $e->{height} };
@@ -1493,6 +1540,7 @@ Sets the size for the current font.
 sub set_font_size {
     my ( $self, $size ) = @_;
     $self->{_currentsize} = $size;
+    delete( $self->{_bbcache} );
 }
 
 =over
@@ -1500,8 +1548,6 @@ sub set_font_size {
 =item get_font_size
 
 Returns the size of the current font.
-
-NOTE: This is not a Pango API method.
 
 =back
 
@@ -1546,19 +1592,33 @@ bb[3] = ascend is a positive value
 
 NOTE: Some fonts do not include accents on capital letters in the ascend.
 
+If an argument is supplied and true, get_bbox() will attempt to
+calculate the ink extents as well, and add these as another set of 4
+elements,
+
+In list context returns the array of values, in scalar context an
+array ref.
+
 =back
 
 =cut
 
 sub get_pixel_bbox {
-    my ( $self ) = @_;
-    my $res = $self->bbox;
+    my ( $self, $all ) = @_;
+    my $res;
+    if ( $self->{_bbcache}
+	 && @{ $self->{_bbcache} } == ($all ? 8 : 4) ) {
+	$res = $self->{_bbcache};
+    }
+    else {
+	$res = $self->{_bbcache} = $self->bbox($all);
+    }
     wantarray ? @$res : $res;
 }
 
 sub get_bbox {
-    my ( $self ) = @_;
-    my @res = map { $self->{_px2pu}->($_) } ( $self->get_pixel_bbox );
+    my ( $self, $all ) = @_;
+    my @res = map { $self->{_px2pu}->($_) } ( $self->get_pixel_bbox($all) );
     wantarray ? @res : \@res;
 }
 
@@ -1584,39 +1644,37 @@ sub show {
 
 =over
 
-=item set_pango_scale( $scale )
+=item set_pango_mode( $enable )
 
-Sets the pango scaling to $scale, which should be 1000.
+Enable/disable Pango conformance mode.
+See L<Pango Conformance Mode>.
 
-Set to 1 to cancel scaling, causing all methods to use pixel units
-instead of Pango units. Set to 0 to get the default behaviour.
+Returns the internal Pango scaling factor if enabled.
 
 =back
 
 =cut
 
-sub set_pango_scale {
-    my ( $self, $scale ) = @_;
-    $scale //= PANGO_SCALE;
-    if ( $scale == 0 ) {
-	$self->{_px2pu} = \&px2pu;
-	$self->{_pu2px} = \&pu2px;
+sub set_pango_mode {
+    my ( $self, $enable ) = @_;
+    if ( $enable ) {
+	$self->{_px2pu} = sub { $_[0] * PANGO_SCALE };
+	$self->{_pu2px} = sub { $_[0] / PANGO_SCALE };
+	return $self->{_pango_scale} = PANGO_SCALE;
     }
-    elsif ( $scale == 1 ) {
-	$self->{_px2pu} = sub { $_[0] };
-	$self->{_pu2px} = sub { $_[0] };
-    }
-    else {
-	carp("Pango scale should be set to @{[PANGO_SCALE]} for Pango conformance")
-	  unless $scale == PANGO_SCALE;
-	$self->{_px2pu} = sub { $_[0] * $scale };
-	$self->{_pu2px} = sub { $_[0] / $scale };
-    }
+
+    $self->{_px2pu} = \&px2pu;
+    $self->{_pu2px} = \&pu2px;
+    delete( $self->{_bbcache} );
+    return $self->{_pango_scale} = 0;
 }
+
+# Legacy.
+*set_pango_scale = \&set_pango_mode;
 
 sub get_pango_scale {
     my ( $self ) = @_;
-    $self->{_px2pu}->(1);
+    $self->{_pango_scale} ? PANGO_SCALE : 1;
 }
 
 sub nyi {

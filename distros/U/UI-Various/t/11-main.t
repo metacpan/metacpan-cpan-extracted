@@ -29,7 +29,7 @@ use UI::Various({use => [], include => 'Main'});
 use UI::Various::toplevel;
 
 use constant T_PATH => map { s|/[^/]+$||; $_ } abs_path($0);
-do T_PATH . '/functions/run_in_fork.pl';
+do(T_PATH . '/functions/run_in_fork.pl');
 
 #########################################################################
 

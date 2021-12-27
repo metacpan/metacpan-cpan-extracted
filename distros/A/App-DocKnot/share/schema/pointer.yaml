@@ -1,0 +1,28 @@
+# Kwalify schema for spin pointers to external files.
+#
+# Copyright 2021 Russ Allbery <rra@cpan.org>
+#
+# SPDX-License-Identifier: MIT
+
+type: map
+mapping:
+  format:
+    type: text
+    required: true
+    enum:
+      - markdown
+      - pod
+  path:
+    type: text
+    required: true
+  options:
+    type: map
+    mapping:
+      contents:
+        type: bool
+      navbar:
+        type: bool
+  style:
+    type: text
+  title:
+    type: text

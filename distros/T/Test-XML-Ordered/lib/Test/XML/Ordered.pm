@@ -1,5 +1,5 @@
 package Test::XML::Ordered;
-$Test::XML::Ordered::VERSION = '0.2.1';
+$Test::XML::Ordered::VERSION = '0.2.2';
 use strict;
 use warnings;
 
@@ -228,8 +228,7 @@ NODE_LOOP:
                     return [
                         sort {
                                    ( $a->{ns} cmp $b->{ns} )
-                                or
-                                ( $a->{localName} cmp $b->{localName} )
+                                or ( $a->{localName} cmp $b->{localName} )
                         } @list
                     ];
                 };
@@ -455,13 +454,13 @@ fashion.
 
 =head1 VERSION
 
-version 0.2.1
+version 0.2.2
 
 =head1 SYNOPSIS
 
     use Test::More tests => 1;
 
-    use Test::XML::Ordered;
+    use Test::XML::Ordered qw(is_xml_ordered);
 
     # TEST:$c++;
     is_xml_ordered(
@@ -492,6 +491,8 @@ Other advantages of Test::XML::Ordered are:
 =back
 
 =head1 EXPORTS
+
+The following function is exported upon request:
 
 =head2 is_xml_ordered($got_params, $expected_params, $args, $message)
 

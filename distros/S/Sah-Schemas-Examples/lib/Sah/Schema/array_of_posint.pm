@@ -3,7 +3,7 @@ package Sah::Schema::array_of_posint;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-07-30'; # DATE
 our $DIST = 'Sah-Schemas-Examples'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $schema = [array => {
     summary => 'Array of positive integers',
@@ -25,7 +25,7 @@ Sah::Schema::array_of_posint - Array of positive integers
 
 =head1 VERSION
 
-This document describes version 0.007 of Sah::Schema::array_of_posint (from Perl distribution Sah-Schemas-Examples), released on 2021-07-30.
+This document describes version 0.009 of Sah::Schema::array_of_posint (from Perl distribution Sah-Schemas-Examples), released on 2021-07-30.
 
 =head1 SYNOPSIS
 
@@ -109,6 +109,11 @@ feature.
 =head1 SEE ALSO
 
 L<Sah::Schema::posints> - alias
+
+L<Sah::Schema::posint>
+
+L<Sah::Schemas::Collection> distribution contains the schemas aos (array of
+strings), aoms (array of maybe strings), hos (hash of strings), etc.
 
 =head1 AUTHOR
 

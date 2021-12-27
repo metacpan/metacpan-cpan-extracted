@@ -36,7 +36,7 @@ require_ok('App::DocKnot::Spin::Thread');
 
 # Spin the errors file with output captured.
 my $input = File::Spec->catfile('t', 'data', 'spin', 'errors', 'errors.th');
-my $spin  = App::DocKnot::Spin::Thread->new();
+my $spin = App::DocKnot::Spin::Thread->new();
 my ($stdout, $stderr) = capture {
     $spin->spin_thread_file($input);
 };

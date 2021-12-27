@@ -1,4 +1,7 @@
-use Modern::Perl;
+#!/usr/bin/env perl
+
+use 5.014_001;
+use warnings;
 use Text::ParseWords qw( shellwords );
 use Term::ReadLine;
 

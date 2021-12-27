@@ -1,22 +1,25 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2008-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2008-2021 -- leonerd@leonerd.org.uk
 
-package Net::Async::IRC;
+package Net::Async::IRC 0.12;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.11';
 
 # We need to use C3 MRO to make the ->isupport etc.. methods work properly
 use mro 'c3';
 use base qw( Net::Async::IRC::Protocol Protocol::IRC::Client );
 
+use Future::AsyncAwait;
+
 use Carp;
 
+use List::Util 1.33 qw( any );
 use Socket qw( SOCK_STREAM );
+
+use MIME::Base64 qw( encode_base64 decode_base64 );
 
 use constant HAVE_MSWIN32 => ( $^O eq "MSWin32" );
 
@@ -26,29 +29,31 @@ C<Net::Async::IRC> - use IRC with C<IO::Async>
 
 =head1 SYNOPSIS
 
- use IO::Async::Loop;
- use Net::Async::IRC;
+   use Future::AsyncAwait;
 
- my $loop = IO::Async::Loop->new;
+   use IO::Async::Loop;
+   use Net::Async::IRC;
 
- my $irc = Net::Async::IRC->new(
-    on_message_text => sub {
-       my ( $self, $message, $hints ) = @_;
+   my $loop = IO::Async::Loop->new;
 
-       print "$hints->{prefix_name} says: $hints->{text}\n";
-    },
- );
+   my $irc = Net::Async::IRC->new(
+      on_message_text => sub {
+         my ( $self, $message, $hints ) = @_;
 
- $loop->add( $irc );
+         print "$hints->{prefix_name} says: $hints->{text}\n";
+      },
+   );
 
- $irc->login(
-    nick => "MyName",
-    host => "irc.example.org",
- )->get;
+   $loop->add( $irc );
 
- $irc->do_PRIVMSG( target => "YourName", text => "Hello world!" );
+   await $irc->login(
+      nick => "MyName",
+      host => "irc.example.org",
+   );
 
- $loop->run;
+   await $irc->do_PRIVMSG( target => "YourName", text => "Hello world!" );
+
+   $loop->run;
 
 =head1 DESCRIPTION
 
@@ -97,6 +102,7 @@ sub _init
    $self->{user} = $ENV{LOGNAME} ||
       ( HAVE_MSWIN32 ? Win32::LoginName() : getpwuid($>) );
 
+   our $VERSION;
    $self->{realname} = "Net::Async::IRC client $VERSION";
 }
 
@@ -129,6 +135,9 @@ next login.
 Attempts to negotiate IRC v3.1 CAP at connect time. The array gives the names
 of capabilities which will be requested, if the server supports them.
 
+If the C<sasl> capability is requested and supported by the server, the
+C<login> method will use that.
+
 =back
 
 =cut
@@ -151,14 +160,14 @@ sub configure
 
 =head1 METHODS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented in an C<await> expression return L<Future>
+instances.
 
 =cut
 
 =head2 connect
 
-   $irc = $irc->connect( %args )->get
+   $irc = await $irc->connect( %args );
 
 Connects to the IRC server. This method does not perform the complete IRC
 login sequence; for that see instead the C<login> method. The returned
@@ -179,7 +188,7 @@ Optional. Port number or service name of the IRC server. Defaults to 6667.
 Any other arguments are passed into the underlying C<IO::Async::Loop>
 C<connect> method.
 
-   $irc->connect( %args )
+   $irc->connect( %args );
 
 The following additional arguments are used to provide continuations when not
 returning a Future.
@@ -191,14 +200,14 @@ returning a Future.
 Continuation to invoke once the connection has been established. Usually used
 by the C<login> method to perform the actual login sequence.
 
- $on_connected->( $irc )
+   $on_connected->( $irc )
 
 =item on_error => CODE
 
 Continuation to invoke in the case of an error preventing the connection from
 taking place.
 
- $on_error->( $errormsg )
+   $on_error->( $errormsg )
 
 =back
 
@@ -246,7 +255,7 @@ sub connect
 
 =head2 login
 
-   $irc = $irc->login( %args )->get
+   $irc = await $irc->login( %args );
 
 Logs in to the IRC network, connecting first using the C<connect> method if
 required. Takes the following named arguments:
@@ -272,7 +281,7 @@ Any other arguments that are passed, are forwarded to the C<connect> method if
 it is required; i.e. if C<login> is invoked when not yet connected to the
 server.
 
-   $irc->login( %args )
+   $irc->login( %args );
 
 The following additional arguments are used to provide continuations when not
 returning a Future.
@@ -283,13 +292,27 @@ returning a Future.
 
 A continuation to invoke once login is successful.
 
- $on_login->( $irc )
+   $on_login->( $irc )
 
 =back
+
+If the C<sasl> capability was requested and is supported by the server, this
+will be used instead of the simple C<USER/PASS> command combination.
+
+At the current version, only the C<PLAIN> SASL mechanism is supported.
 
 =cut
 
 sub login
+{
+   my $self = shift;
+   my %args = @_;
+
+   return $self->{login_f} //= $self->_login( %args )
+      ->on_fail( sub { undef $self->{login_f} } );
+}
+
+async sub _login
 {
    my $self = shift;
    my %args = @_;
@@ -307,25 +330,56 @@ sub login
    !defined $on_login or ref $on_login eq "CODE" or 
       croak "Expected 'on_login' to be a CODE reference";
 
-   return $self->{login_f} ||= $self->connect( %args )->then( sub {
-      $self->send_message( "CAP", undef, "LS" ) if $self->{use_caps};
+   await $self->connect( %args );
 
+   undef $self->{defer_cap_end_f};
+   undef $self->{on_cap_finished_f};
+
+   $self->send_message( "CAP", undef, "LS" ) if $self->{use_caps};
+
+   $self->send_message( "NICK", undef, $nick );
+
+   my $use_sasl;
+
+   if( $self->{use_caps} and any { $_ eq "sasl" } @{ $self->{use_caps} } ) {
+      await ( $self->{on_cap_finished_f} //= $self->loop->new_future );
+
+      $use_sasl = $self->cap_supported( "sasl" );
+   }
+
+   if( $use_sasl ) {
+      push @{ $self->{defer_cap_end_f} }, my $f = $self->loop->new_future;
+      undef $self->{on_sasl_complete_f};
+
+      $self->send_message( "USER", undef, $user, "0", "*", $realname );
+
+      # TODO: configurable mechanisms
+      $self->send_message( "AUTHENTICATE", undef, "PLAIN" );
+      await ( $self->{on_authenticate_f} //= $self->loop->new_future );
+
+      my $payload = encode_base64( join( "\0", $nick, $nick, $pass ), "" );
+      $self->send_message( "AUTHENTICATE", undef, $payload );
+
+      await ( $self->{on_sasl_complete_f} //= $self->loop->new_future );
+
+      $f->done;
+   }
+   else {
       $self->send_message( "PASS", undef, $pass ) if defined $pass;
       $self->send_message( "USER", undef, $user, "0", "*", $realname );
-      $self->send_message( "NICK", undef, $nick );
+   }
 
-      my $f = $self->loop->new_future;
+   my $f = $self->loop->new_future;
 
-      push @{ $self->{on_login_f} }, $f;
-      $f->on_done( $on_login ) if $on_login;
+   push @{ $self->{on_login_f} }, $f;
+   $f->on_done( $on_login ) if $on_login;
 
-      return $f;
-   })->on_fail( sub { undef $self->{login_f} } );
+   return await $f;
 }
 
 =head2 change_nick
 
-   $irc->change_nick( $newnick )
+   $irc->change_nick( $newnick );
 
 Requests to change the nick. If unconnected, the change happens immediately
 to the stored defaults. If logged in, sends a C<NICK> command to the server,
@@ -371,6 +425,7 @@ sub on_message_cap_LS
    }
    else {
       $self->send_message( "CAP", undef, "END" );
+      ( $self->{on_cap_finished_f} //= $self->loop->new_future )->done;
    }
 
    return 1;
@@ -388,13 +443,20 @@ sub _on_message_cap_reply
    # Are any outstanding
    !defined and return 1 for values %{ $self->{caps_enabled} };
 
-   $self->send_message( "CAP", undef, "END" );
+   ( $self->{on_cap_finished_f} //= $self->loop->new_future )->done;
+
+   $self->adopt_future(
+      Future->needs_all( @{ $self->{defer_cap_end_f} } )->then(
+         sub { $self->send_message( "CAP", undef, "END" ); }
+      )
+   );
+
    return 1;
 }
 
 =head2 caps_supported
 
-   $caps = $irc->caps_supported
+   $caps = $irc->caps_supported;
 
 Returns a HASH whose keys give the capabilities listed by the server as
 supported in its C<CAP LS> response. If the server ignored the C<CAP>
@@ -410,7 +472,7 @@ sub caps_supported
 
 =head2 cap_supported
 
-   $supported = $irc->cap_supported( $cap )
+   $supported = $irc->cap_supported( $cap );
 
 Returns a boolean indicating if the server supports the named capability.
 
@@ -425,7 +487,7 @@ sub cap_supported
 
 =head2 caps_enabled
 
-   $caps = $irc->caps_enabled
+   $caps = $irc->caps_enabled;
 
 Returns a HASH whose keys give the capabilities successfully enabled by the
 server as part of the C<CAP REQ> login sequence. If the server ignored the
@@ -441,7 +503,7 @@ sub caps_enabled
 
 =head2 cap_enabled
 
-   $enabled = $irc->cap_enabled( $cap )
+   $enabled = $irc->cap_enabled( $cap );
 
 Returns a boolean indicating if the client successfully enabled the named
 capability.
@@ -489,6 +551,50 @@ sub on_message_RPL_WELCOME
    return 0;
 }
 
+sub on_message_AUTHENTICATE
+{
+   my $self = shift;
+   my ( $message ) = @_;
+
+   my $data = $message->arg( 0 );
+
+   if( $data eq "+" ) {
+      # Done
+      my $data = $self->{authenticate_buffer} // "";
+      my $f    = $self->{on_authenticate_f};
+
+      undef @{$self}{qw( authenticate_buffer on_authenticate_f )};
+
+      $f->done( $self, $data ) if $f;
+      return 1;
+   }
+
+   $self->{authenticate_buffer} .= decode_base64( $data );
+
+   return 1;
+}
+
+sub on_message_RPL_SASLSUCCESS
+{
+   my $self = shift;
+   my ( $message, $hints ) = @_;
+
+   ( $self->{on_sasl_complete_f} //= Future->new )->done( $message, $hints );
+
+   return 0;
+}
+
+sub on_message_ERR_SASLFAIL
+{
+   my $self = shift;
+   my ( $message, $hints ) = @_;
+
+   # It's still complete even though it failed
+   ( $self->{on_sasl_complete_f} //= Future->new )->done( $message, $hints );
+
+   return 0;
+}
+
 =head1 MESSAGE-WRAPPING METHODS
 
 The following methods are all inherited from L<Protocol::IRC::Client> but are
@@ -503,9 +609,9 @@ In particular, each method returns a L<Future> instance.
 
 =head2 do_NOTICE
 
-   $irc->do_PRIVMSG( target => $target, text => $text )->get
+   await $irc->do_PRIVMSG( target => $target, text => $text );
 
-   $irc->do_NOTICE( target => $target, text => $text )->get
+   await $irc->do_NOTICE( target => $target, text => $text );
 
 Sends a C<PRIVMSG> or C<NOITICE> command.
 

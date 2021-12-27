@@ -615,6 +615,45 @@ YAML
     },
     'an undesired response body is detectable',
   );
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => 'openapi.yaml',
+    openapi_schema => do {
+      YAML::PP->new( boolean => 'JSON::PP' )->load_string(<<YAML);
+$openapi_preamble
+paths:
+  /foo/{foo_id}:
+    post:
+      responses:
+        default:
+          description: no content permitted
+          content:
+            '*/*':
+              schema:
+                maxLength: 0
+YAML
+    },
+  );
+  $response = HTTP::Response->new(POST => 'http://example.com/foo/123',
+    [ 'Content-Length' => 1, 'Content-Type' => 'unknown/unknown' ], '!!!');
+  $response->request(POST 'http://example.com/some/path');
+  cmp_deeply(
+    ($result = $openapi->validate_response($response,
+      { path_template => '/foo/{foo_id}', path_captures => {} }))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/response/body',
+          keywordLocation => jsonp('/paths', '/foo/{foo_id}', qw(post responses default content */* schema maxLength)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths', '/foo/{foo_id}', qw(post responses default content */* schema maxLength)))->to_string,
+          error => 'length is greater than 0',
+        },
+      ],
+    },
+    'demonstrate recipe for guaranteeing that there is no response body',
+  );
 };
 
 done_testing;

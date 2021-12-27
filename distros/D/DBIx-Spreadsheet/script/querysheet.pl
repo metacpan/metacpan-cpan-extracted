@@ -4,7 +4,7 @@ use Getopt::Long;
 use DBIx::Spreadsheet;
 use DBIx::RunSQL;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 # use File::Notify::Simple;
 GetOptions();

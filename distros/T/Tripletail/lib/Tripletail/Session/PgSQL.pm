@@ -2,7 +2,7 @@ package Tripletail::Session::PgSQL;
 use strict;
 use warnings;
 use Tripletail;
-our @ISA = qw(Tripletail::Session);
+use base 'Tripletail::Session::DB';
 
 sub _insertSid {
     my $this        = shift;

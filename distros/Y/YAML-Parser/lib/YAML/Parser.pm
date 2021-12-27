@@ -5,7 +5,7 @@
 use v5.12;
 package YAML::Parser;
 
-our $VERSION = '0.0.3';
+our $VERSION = '0.0.4';
 
 use XXX;
 
@@ -82,6 +82,7 @@ package PerlYamlReferenceParserPrelude;
 
 use boolean;
 use Carp;
+use Encode;
 use Exporter 'import';
 use JSON::PP;
 use Time::HiRes qw< gettimeofday tv_interval >;
@@ -195,7 +196,7 @@ sub func {
 
 export 'file_read';
 sub file_read {
-  do { local $/; <> };
+  decode_utf8(do { local $/; <> });
 }
 
 export 'debug';
@@ -3026,7 +3027,7 @@ rule '163', c_indentation_indicator => sub {
   my ($self, $n) = @_;
   debug_rule("c_indentation_indicator",$n) if DEBUG;
   $self->any(
-    $self->if($self->func('ns_dec_digit'), $self->set('m', $self->ord($self->func('match')))),
+    $self->if($self->rng("\x{31}", "\x{39}"), $self->set('m', $self->ord($self->func('match')))),
     $self->if($self->func('empty'), $self->set('m', [ $self->func('auto_detect'), $n ]))
   );
 };
@@ -3995,6 +3996,7 @@ use v5.12;
 
 package PerlYamlReferenceParserParser;
 
+use Encode;
 use PerlYamlReferenceParserPrelude;
 use PerlYamlReferenceParserGrammar;
 
@@ -4026,6 +4028,9 @@ sub new {
 
 sub parse {
   my ($self, $input) = @_;
+
+  $input = decode_utf8($input)
+    unless Encode::is_utf8($input);
   $self->{input} = $input;
 
   $self->{end} = length $self->{input};
@@ -4933,12 +4938,13 @@ sub got__c_single_quoted {
 sub got__c_double_quoted {
   my ($self, $o) = @_;
   my $text = substr($o->{text}, 1, -1);
-  $text =~ s/(?:[\ \t]*\r?\n[\ \t]*)/\n/g;
+  $text =~ s/(?:(?<!\\)[\ \t]*\r?\n[\ \t]*)/\n/g;
   $text =~ s/\\\n[\ \t]*//g;
   $text =~ s/(\n)(\n*)/length($2) ? $2 : ' '/ge;
   $text =~ s/\\(["\/])/$1/g;
   $text =~ s/\\ / /g;
   $text =~ s/\\b/\b/g;
+  $text =~ s/\\\t/\t/g;
   $text =~ s/\\t/\t/g;
   $text =~ s/\\n/\n/g;
   $text =~ s/\\r/\r/g;
@@ -5137,7 +5143,6 @@ sub output {
       $value =~ s/\t/\\t/g;
       $value =~ s/\n/\\n/g;
       $value =~ s/\r/\\r/g;
-      $value =~ s/\x20\z/<SPC>/;
       push @event, "$style$value";
     }
     join(' ', @event) . "\n";

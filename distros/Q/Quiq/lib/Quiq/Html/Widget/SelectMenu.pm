@@ -99,7 +99,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.196';
+our $VERSION = '1.197';
 
 use Quiq::Html::Widget::TextField;
 use Quiq::JavaScript;
@@ -147,6 +147,19 @@ sub new {
 
     # Werte Konstruktoraufruf
     $self->set(@_);
+
+
+    my $optionPairs = $self->{'optionPairs'};
+    if (@$optionPairs) {
+        my (@options,@texts);
+        for (my $i = 0; $i < @$optionPairs; $i += 2) {
+            push @options,$optionPairs->[$i];
+            push @texts,$optionPairs->[$i+1];
+        }
+        $self->{'options'} = \@options;
+        $self->{'texts'} = \@texts;
+    }
+
 
     # Existenz des Werts prüfen. Wenn nicht existent,
     # setzen wir den ersten Wert.
@@ -211,24 +224,10 @@ sub html {
         );
     }
     else {
-        my (@options,@texts);
-        if (@$optionPairs) {
-            for (my $i = 0; $i < @$optionPairs; $i += 2) {
-                push @options,$optionPairs->[$i];
-                push @texts,$optionPairs->[$i+1];
-            }
-        }
-        else {
-            for (my $i = 0; $i < @$options; $i++) {
-                push @options,$options->[$i];
-                push @texts,$texts->[$i] // $options->[$i];
-            }
-        }
-
         my $str;
-        for (my $i = 0; $i < @options; $i++) {
-            my $option = $options[$i];
-            my $text = $texts[$i];
+        for (my $i = 0; $i < @$options; $i++) {
+            my $option = $options->[$i];
+            my $text = $texts->[$i];
             my $style = $styles->[$i];
 
             $str .= $h->tag('option',
@@ -265,7 +264,7 @@ sub html {
 
 =head1 VERSION
 
-1.196
+1.197
 
 =head1 AUTHOR
 

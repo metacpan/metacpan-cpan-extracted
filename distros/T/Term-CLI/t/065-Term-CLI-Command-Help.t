@@ -21,7 +21,7 @@ sub Main {
 
 package Term_CLI_Command_Help_test {
 
-use parent 0.228 qw( Test::Class );
+use parent 0.225 qw( Test::Class );
 
 use Test::More 1.001002;
 use Test::Output 1.03;

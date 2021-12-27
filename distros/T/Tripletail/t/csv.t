@@ -17,8 +17,8 @@ else {
 
 my $csv;
 lives_ok {
-    $csv = $TL->getCsv();
-} 'getCsv';
+    $csv = $TL->newCsv();
+} 'newCsv';
 
 my $p;
 ok($p = $csv->parseCsv(\*DATA), 'parseCsv (fh)');

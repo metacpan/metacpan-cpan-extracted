@@ -15,7 +15,7 @@ my $inputfile = catfile( $RealBin, 'data', 'cp1252.txt' );
 
 my $s = read_text( $inputfile, 'cp1252' );
 
-my ( $outfh, $outputfile ) = tempfile();
+my $outfh = tempfile();
 binmode $outfh, ':encoding(utf8)';
 
 print $outfh "Snowman! \x{2603}\n";

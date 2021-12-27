@@ -4,8 +4,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-use 5.008;
-use strict;
+use 5.024;
+use autodie;
 use warnings;
 
 use Getopt::Long qw(GetOptions);
@@ -47,8 +47,8 @@ B<pod2thread> [B<-chn>] [B<-s> I<style>] [B<-t> I<title>]
 
 =head1 DESCRIPTION
 
-B<pod2thread> is a front-end for Pod::Thread and its subclasses.  It uses
-that module to generate thread source from POD source.
+B<pod2thread> is a front-end for L<Pod::Thread>.  It uses that module to
+generate thread source from POD source.
 
 I<input> is the file to read for POD source (the POD can be embedded in
 code).  If I<input> isn't given, it defaults to STDIN.  I<output>, if given,
@@ -131,13 +131,11 @@ SOFTWARE.
 
 =head1 SEE ALSO
 
-L<Pod::Simple>, L<Pod::Thread>, L<spin(1)>
+L<Pod::Simple>, L<Pod::Thread>
 
 This program is part of the Pod-Thread distribution.  The current version of
 Pod-Thread is available from CPAN, or directly from its web site at
 L<https://www.eyrie.org/~eagle/software/pod-thread/>.
-
-B<spin> is available from L<https://www.eyrie.org/~eagle/software/web/>.
 
 =cut
 

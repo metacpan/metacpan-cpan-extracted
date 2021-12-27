@@ -18,7 +18,22 @@ doc/Tripletail/CharConv.html
 doc/Tripletail/Cookie.html
 doc/Tripletail/CSV.html
 doc/Tripletail/DateTime.html
+doc/Tripletail/DateTime/Calendar/Gregorian.html
+doc/Tripletail/DateTime/Calendar/MonthDay.html
+doc/Tripletail/DateTime/Calendar/OrdinalDate.html
+doc/Tripletail/DateTime/Calendar/WeekDate.html
+doc/Tripletail/DateTime/Clock/POSIX.html
+doc/Tripletail/DateTime/Clock/UTC.html
+doc/Tripletail/DateTime/Format/Apache.html
+doc/Tripletail/DateTime/Format/DateCmd.html
+doc/Tripletail/DateTime/Format/Generic.html
+doc/Tripletail/DateTime/Format/RFC733.html
+doc/Tripletail/DateTime/Format/RFC822.html
+doc/Tripletail/DateTime/Format/W3CDTF.html
+doc/Tripletail/DateTime/JPEra.html
 doc/Tripletail/DateTime/JPHoliday.html
+doc/Tripletail/DateTime/LocalTime.html
+doc/Tripletail/DateTime/Math.html
 doc/Tripletail/DB.html
 doc/Tripletail/DB/Backend/Interbase.html
 doc/Tripletail/DB/Backend/MSSQL.html
@@ -46,6 +61,9 @@ doc/Tripletail/Form.html
 doc/Tripletail/HtmlFilter.html
 doc/Tripletail/HtmlMail.html
 doc/Tripletail/Ini.html
+doc/Tripletail/Ini/Group.html
+doc/Tripletail/Ini/Group/Annotation.html
+doc/Tripletail/Ini/Group/Variant.html
 doc/Tripletail/InputFilter.html
 doc/Tripletail/InputFilter/HTML.html
 doc/Tripletail/InputFilter/MobileHTML.html
@@ -54,6 +72,7 @@ doc/Tripletail/InputFilter/SEO.html
 doc/Tripletail/Mail.html
 doc/Tripletail/MemCached.html
 doc/Tripletail/MemorySentinel.html
+doc/Tripletail/MongoDB.html
 doc/Tripletail/Pager.html
 doc/Tripletail/RawCookie.html
 doc/Tripletail/Sendmail.html
@@ -65,6 +84,8 @@ doc/Tripletail/Serializer.html
 doc/Tripletail/Serializer/Compat.html
 doc/Tripletail/Serializer/Legacy.html
 doc/Tripletail/Session.html
+doc/Tripletail/Session/DB.html
+doc/Tripletail/Session/MongoDB.html
 doc/Tripletail/Session/MySQL.html
 doc/Tripletail/Session/PgSQL.html
 doc/Tripletail/Session/SQLite.html
@@ -84,7 +105,22 @@ lib/Tripletail/CharConv.pm
 lib/Tripletail/Cookie.pm
 lib/Tripletail/CSV.pm
 lib/Tripletail/DateTime.pm
+lib/Tripletail/DateTime/Calendar/Gregorian.pm
+lib/Tripletail/DateTime/Calendar/MonthDay.pm
+lib/Tripletail/DateTime/Calendar/OrdinalDate.pm
+lib/Tripletail/DateTime/Calendar/WeekDate.pm
+lib/Tripletail/DateTime/Clock/POSIX.pm
+lib/Tripletail/DateTime/Clock/UTC.pm
+lib/Tripletail/DateTime/Format/Apache.pm
+lib/Tripletail/DateTime/Format/DateCmd.pm
+lib/Tripletail/DateTime/Format/Generic.pm
+lib/Tripletail/DateTime/Format/RFC733.pm
+lib/Tripletail/DateTime/Format/RFC822.pm
+lib/Tripletail/DateTime/Format/W3CDTF.pm
+lib/Tripletail/DateTime/JPEra.pm
 lib/Tripletail/DateTime/JPHoliday.pm
+lib/Tripletail/DateTime/LocalTime.pm
+lib/Tripletail/DateTime/Math.pm
 lib/Tripletail/DB.pm
 lib/Tripletail/DB/Backend/Interbase.pm
 lib/Tripletail/DB/Backend/MSSQL.pm
@@ -111,6 +147,9 @@ lib/Tripletail/Filter/TEXT.pm
 lib/Tripletail/Form.pm
 lib/Tripletail/HtmlMail.pm
 lib/Tripletail/Ini.pm
+lib/Tripletail/Ini/Group.pm
+lib/Tripletail/Ini/Group/Annotation.pm
+lib/Tripletail/Ini/Group/Variant.pm
 lib/Tripletail/InputFilter.pm
 lib/Tripletail/InputFilter/HTML.pm
 lib/Tripletail/InputFilter/MobileHTML.pm
@@ -119,6 +158,7 @@ lib/Tripletail/InputFilter/SEO.pm
 lib/Tripletail/Mail.pm
 lib/Tripletail/MemCached.pm
 lib/Tripletail/MemorySentinel.pm
+lib/Tripletail/MongoDB.pm
 lib/Tripletail/Pager.pm
 lib/Tripletail/RawCookie.pm
 lib/Tripletail/Sendmail.pm
@@ -130,6 +170,8 @@ lib/Tripletail/Serializer.pm
 lib/Tripletail/Serializer/Compat.pm
 lib/Tripletail/Serializer/Legacy.pm
 lib/Tripletail/Session.pm
+lib/Tripletail/Session/DB.pm
+lib/Tripletail/Session/MongoDB.pm
 lib/Tripletail/Session/MySQL.pm
 lib/Tripletail/Session/PgSQL.pm
 lib/Tripletail/Session/SQLite.pm
@@ -143,7 +185,6 @@ lib/Tripletail/Value.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-META.yml
 README
 sample/basic/csvdownload.cgi
 sample/basic/csvdownload.ini
@@ -175,15 +216,16 @@ sample/session/login.ini
 sample/session/logindouble.cgi
 sample/session/logindouble.html
 sample/session/logindouble.ini
-SIGNATURE
 t/0.prereq.t
 t/00.load.t
+t/alternative-import.t
 t/charconv.t
 t/cookie-modern.t
 t/cookie.t
 t/csv.t
 t/csv2.t
 t/datetime.t
+t/db-mongodb.t
 t/db-mssql.t
 t/db-mysql-readdefaultfile.t
 t/db-mysql.t
@@ -199,9 +241,13 @@ t/filter_null.pm
 t/form.t
 t/htmlfilter.t
 t/ini.t
+t/log.t
 t/mail.t
 t/make_ini.pm
+t/manifest.t
 t/memcache.t
+t/memory-sentinel.t
+t/old-encode-pm.t
 t/pager-pgsql.t
 t/pager.t
 t/pod-coverage.t
@@ -215,6 +261,7 @@ t/server_filter.t
 t/server_memcache.t
 t/server_session.t
 t/server_session_innodb.t
+t/server_session_mongodb.t
 t/server_session_pgsql.t
 t/server_session_sqlite.t
 t/tagcheck.t
@@ -243,4 +290,5 @@ t/v044_setform_multival.t
 t/validator.t
 t/validator_correct.t
 t/value.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

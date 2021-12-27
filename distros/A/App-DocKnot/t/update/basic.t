@@ -39,11 +39,11 @@ my $tempdir = File::Temp->newdir();
 for my $test (@tests) {
     my $metadata_path = File::Spec->catfile($dataroot, $test, 'old');
     my $expected_path = File::Spec->catfile($dataroot, $test, 'docknot.yaml');
-    my $output_path   = File::Spec->catfile($tempdir,  "$test.yaml");
-    my $docknot       = App::DocKnot::Update->new(
+    my $output_path = File::Spec->catfile($tempdir, "$test.yaml");
+    my $docknot = App::DocKnot::Update->new(
         {
             metadata => $metadata_path,
-            output   => $output_path,
+            output => $output_path,
         },
     );
     isa_ok($docknot, 'App::DocKnot::Update', "for $test");

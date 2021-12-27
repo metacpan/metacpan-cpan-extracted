@@ -43,6 +43,7 @@ Davis
 Domini
 Doug
 Duration
+Dyck
 EEEE
 EEEEE
 Etheridge
@@ -191,6 +192,7 @@ rjbs
 rkhill
 sexagesimal
 subclasses
+tidyable
 uu
 viviparous
 vvvv

@@ -104,6 +104,7 @@ for your own purposes.
 Perl 5.24 or later and Module::Build are required to build this module.
 The following additional Perl modules are required to use it:
 
+\bullet(packed)[Date::Language (part of TimeDate)]
 \bullet(packed)[Date::Parse (part of TimeDate)]
 \bullet(packed)[File::BaseDir]
 \bullet(packed)[File::ShareDir]
@@ -116,6 +117,7 @@ The following additional Perl modules are required to use it:
 \bullet(packed)[JSON::MaybeXS]
 \bullet(packed)[Kwalify]
 \bullet(packed)[List::SomeUtils 0.07 or later]
+\bullet(packed)[Path::Tiny]
 \bullet(packed)[Perl6::Slurp]
 \bullet(packed)[Pod::Thread 3.00 or later]
 \bullet(packed)[Template (part of Template Toolkit)]
@@ -179,11 +181,13 @@ development source].
     \doc[api/app-docknot-dist.html][App::DocKnot::Dist]
     \doc[api/app-docknot-generate.html][App::DocKnot::Generate]
     \doc[api/app-docknot-spin.html][App::DocKnot::Spin]
+    \doc[api/app-docknot-spin-pointer.html][App::DocKnot::Spin::Pointer]
     \doc[api/app-docknot-spin-rss.html][App::DocKnot::Spin::RSS]
     \doc[api/app-docknot-spin-sitemap.html][App::DocKnot::Spin::Sitemap]
     \doc[api/app-docknot-spin-thread.html][App::DocKnot::Spin::Thread]
     \doc[api/app-docknot-spin-versions.html][App::DocKnot::Spin::Versions]
     \doc[api/app-docknot-update.html][App::DocKnot::Update]
+    \doc[api/app-docknot-util.html][App::DocKnot::Util]
 ]
 
 \h2(after)[License]

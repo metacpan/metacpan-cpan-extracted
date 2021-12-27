@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -46,8 +46,9 @@ my $serverstream = "";
 
 wait_for_stream { $serverstream =~ m/$CRLF.*$CRLF/ } $S2 => $serverstream;
 
-is( $serverstream, "USER defaultuser 0 * :Default Real name$CRLF" . 
-                   "NICK AlreadyUsedNick$CRLF", 'Server stream after attempt to login with nick already in use' );
+is( $serverstream, "NICK AlreadyUsedNick$CRLF" .
+                   "USER defaultuser 0 * :Default Real name$CRLF",
+                   'Server stream after attempt to login with nick already in use' );
 
 $S2->syswrite( ":irc.example.com 433 * AlreadyUsedNick :Nickname is already in use$CRLF" );
 

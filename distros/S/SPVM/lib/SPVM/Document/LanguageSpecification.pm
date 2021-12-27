@@ -414,13 +414,13 @@ cmp length isa ref
 The following is Syntax Parsing Definition in SPVM, using the syntax in yacc/bison. 
 
 <pre>
-%token <opval> CLASS HAS METHOD OUR ENUM MY USE REQUIRE ALLOW
+%token <opval> CLASS HAS METHOD OUR ENUM MY USE AS REQUIRE ALLOW CURRENT_CLASS
 %token <opval> DESCRIPTOR
 %token <opval> IF UNLESS ELSIF ELSE FOR WHILE LAST NEXT SWITCH CASE DEFAULT BREAK EVAL
 %token <opval> NAME VAR_NAME CONSTANT EXCEPTION_VAR
 %token <opval> UNDEF VOID BYTE SHORT INT LONG FLOAT DOUBLE STRING OBJECT TRUE FALSE
 %token <opval> DOT3 FATCAMMA RW RO WO INIT NEW
-%token <opval> RETURN WEAKEN DIE WARN CURRENT_CLASS UNWEAKEN '[' '{' '('
+%token <opval> RETURN WEAKEN DIE WARN CURRENT_CLASS_NAME UNWEAKEN '[' '{' '('
 
 %type <opval> grammar
 %type <opval> opt_classes classes class class_block
@@ -445,13 +445,13 @@ The following is Syntax Parsing Definition in SPVM, using the syntax in yacc/bis
 %left <opval> LOGICAL_OR
 %left <opval> LOGICAL_AND
 %left <opval> BIT_OR BIT_XOR
-%left <opval> '&'
+%left <opval> BIT_AND
 %nonassoc <opval> NUMEQ NUMNE STREQ STRNE
 %nonassoc <opval> NUMGT NUMGE NUMLT NUMLE STRGT STRGE STRLT STRLE ISA NUMERIC_CMP STRING_CMP
 %left <opval> SHIFT
 %left <opval> '+' '-' '.'
-%left <opval> MULTIPLY DIVIDE REMAINDER
-%right <opval> LOGICAL_NOT BIT_NOT '@' REF DEREF PLUS MINUS CONVERT SCALAR STRING_LENGTH ISWEAK REFCNT REFOP DUMP
+%left <opval> '*' DIVIDE REMAINDER
+%right <opval> LOGICAL_NOT BIT_NOT '@' CREATE_REF DEREF PLUS MINUS CONVERT SCALAR STRING_LENGTH ISWEAK REFCNT REFOP DUMP
 %nonassoc <opval> INC DEC
 %left <opval> ARROW
 
@@ -499,10 +499,11 @@ begin_block
 
 use
   : USE basic_type ';'
-  | USE basic_type '(' opt_method_names ')' ';'
+  | USE basic_type AS basic_type';'
 
 require
   : REQUIRE basic_type
+  | REQUIRE basic_type AS basic_type';'
 
 allow
   : ALLOW basic_type ';'
@@ -672,7 +673,7 @@ expression
   | inc
   | dec
   | '(' expressions ')'
-  | CURRENT_CLASS
+  | CURRENT_CLASS_NAME
   | isweak_field
   | comparison_op
   | isa
@@ -706,11 +707,11 @@ dec
 binary_op
   : expression '+' expression
   | expression '-' expression
-  | expression MULTIPLY expression
+  | expression '*' expression
   | expression DIVIDE expression
   | expression REMAINDER expression
   | expression BIT_XOR expression
-  | expression '&' expression
+  | expression BIT_AND expression
   | expression BIT_OR expression
   | expression SHIFT expression
   | expression '.' expression
@@ -763,7 +764,8 @@ array_access
   | field_access '[' expression ']'
 
 call_method
-  : NAME '(' opt_expressions  ')'
+  : CURRENT_CLASS ARROW NAME '(' opt_expressions  ')'
+  | CURRENT_CLASS ARROW NAME
   | basic_type ARROW method_name '(' opt_expressions  ')'
   | basic_type ARROW method_name
   | expression ARROW method_name '(' opt_expressions ')'
@@ -817,7 +819,7 @@ basic_type
   | STRING
 
 ref_type
-  : basic_type '&'
+  : basic_type '*'
 
 array_type
   : basic_type '[' ']'
@@ -874,6 +876,9 @@ The following is a correspondence table between tokens in yacc/bison and keyword
   </tr>
   <tr>
     <td>USE</td><td>use</td>
+  </tr>
+  <tr>
+    <td>AS</td><td>as</td>
   </tr>
   <tr>
     <td>REQUIRE</td><td>require</td>
@@ -1005,7 +1010,10 @@ The following is a correspondence table between tokens in yacc/bison and keyword
     <td>PRINT</td><td>print</td>
   </tr>
   <tr>
-    <td>CURRENT_CLASS</td><td>__CLASS__</td>
+    <td>CURRENT_CLASS</td><td>cur</td>
+  </tr>
+  <tr>
+    <td>CURRENT_CLASS_NAME</td><td>__CLASS__</td>
   </tr>
   <tr>
     <td>UNWEAKEN</td><td>unweaken</td>
@@ -1023,10 +1031,13 @@ The following is a correspondence table between tokens in yacc/bison and keyword
     <td>LOGICAL_AND</td><td>&&</td>
   </tr>
   <tr>
+    <td>BIT_AND</td><td>&</td>
+  </tr>
+  <tr>
     <td>BIT_OR</td><td>|</td>
   </tr>
   <tr>
-    <td>BIT_XOR</td><td>&</td>
+    <td>BIT_XOR</td><td>^</td>
   </tr>
   <tr>
     <td>NUMEQ</td><td>==</td>
@@ -1075,9 +1086,6 @@ The following is a correspondence table between tokens in yacc/bison and keyword
   </tr>
   <tr>
     <td>SHIFT</td><td>&lt;&lt;  &gt;&gt;  &gt;&gt;&gt;</td>
-  </tr>
-  <tr>
-    <td>MULTIPLY</td><td>*</td>
   </tr>
   <tr>
     <td>DIVIDE</td><td>/</td>
@@ -1446,6 +1454,21 @@ class Foo {
 }
 </pre>
 
+<h3 id="language-module-use-class-alias">Class Alias</h3>
+
+Define class aliases using <b>as</b> syntax with <b>use</b>
+
+<pre>
+use Foo::Bar as FB;
+</pre>
+
+FB is used as Foo::Bar alias in class method calls.
+
+<pre>
+# This means Foo::Bar->sum(1, 2);
+FB->sum(1, 2);
+</pre>
+
 <h3 id="language-module-auto-loaded-module">Automatically Loaded Module</h3>
 
 The followings are Automatically Loaded Modules. They can be used without <a href="#language-module-use">use</a>.
@@ -1499,16 +1522,6 @@ else {
   warn "Warning: Can't load Foo";
 }
 </pre>
-
-<h3 id="language-module-function-import">Function Import</h3>
-
-The Method which is defined as Class Method is imported as Function using <a href="#language-module-use">use Statement</a>.
-
-<pre>
-use Foo(method1, method2);
-</pre>
-
-This function is called by <a href="language-expression-callsub-function-call">Function Call</a>
 
 <h2 id="language-class-var">Class Variable</h2>
 <ul>
@@ -1859,7 +1872,7 @@ Minimal Argument Count is 0. Max Argument Count is 255.
 
 Type of Argument must be <a href="#language-type-numeric">Numeric Type</a>, <a href="#language-type-object">Object Type</a>, or <a href="#language-type-reference">Reference Type</a>, otherwise Compile Error occurs.
 
-The defined Method can be called. See <a href="#language-expression-callsub">Method Call</a> about calling Method, .
+The defined Method can be called. See <a href="#language-expression-callmethod">Method Call</a> about calling Method, .
 
 <a href="#language-scope-block-statement-sub">Method Block</a> can have zero or more Statements.
 
@@ -1981,7 +1994,7 @@ method METHOD_NAME : TYPE  (ARGUMENT2 : TYPE2, ARGUMENT3 : TYPE3, ARGUMENTN : TY
 
 <a href="#language-type-self">self Type</a> must be first argument.
 
-Method can be called from the object created by <a href="#language-expression-new">new</a>. See <a href="#language-expression-callsub">Method Call</a> for Method Call.
+Method can be called from the object created by <a href="#language-expression-new">new</a>. See <a href="#language-expression-callmethod">Method Call</a> for Method Call.
 
 $self is called Invocant.
 
@@ -2262,7 +2275,7 @@ Lexical variable name must be follow the rule of <a href="#language-token-identi
 my $var : int;
 my $var : Point;
 my $var : Complex_2d;
-my $var : int&;
+my $var : int*;
 </pre>
 
 Local Variable is initialized by <a href="#language-local-var-initial-value">Local Variable Initial Value</a>.
@@ -3285,17 +3298,17 @@ Reference is data that indicates the location of <a href="#language-local-var">L
 
 You can get Reference of Local Variable using <a href="#language-operator-ref">Reference Operator</a>.
 
-<a href="#language-type-ref">Reference Type</a> is represented by <a href="#language-type-numeric">Numeric Type</a> "&" or <a href="#language-type-multi-numeric ">Multi Numeric Type</a> followed by "&".
-Reference types are represented by appending an & after <a href="#language-type-numeric">Numeric Type</a> or <a href="#language-type-multi-numeric ">Multi Numeric Type</a>.
+<a href="#language-type-ref">Reference Type</a> is represented by <a href="#language-type-numeric">Numeric Type</a> "*" or <a href="#language-type-multi-numeric ">Multi Numeric Type</a> followed by "*".
+Reference types are represented by appending an * after <a href="#language-type-numeric">Numeric Type</a> or <a href="#language-type-multi-numeric ">Multi Numeric Type</a>.
 
 <pre>
 # Numeric Type Reference
 my $num : int;
-my $num_ref : int& = \$num;
+my $num_ref : int* = \$num;
 
 # Multi Numeric Type Reference
 my $point : Point_3d;
-my $point_ref : Point_3d& = \$point;
+my $point_ref : Point_3d* = \$point;
 </pre>
 
 Target of Reference Operator is Variable of <a href="#language-type-numeric">Numeric Type</a> or <a href="#language-type-multi-numeric">Multi Numeric Type</a>. <a href="#language-type-object">Object Type</a> Variable or <a href="#language-literal">Literal</a> can't be target of Reference Operator.
@@ -3304,7 +3317,7 @@ Target of Reference Operator is Variable of <a href="#language-type-numeric">Num
 
 <pre>
 # Method Definition
-static method sum : void ($out_ref : int&, $in1 : int, $in2 : int) {
+static method sum : void ($out_ref : int*, $in1 : int, $in2 : int) {
   $$out_ref = $in1 + $in2;
 }
 
@@ -3368,10 +3381,10 @@ $point_ref->{x} = 1;
   <li><a href="#language-expression-new">Create Object</a></li>
   <li><a href="#language-expression-new-array">Create Array</a></li>
   <li><a href="#language-expression-array-init">Array Initialization</a></li>
-  <li><a href="#language-expression-callsub">Method Call</a></li>
-  <li><a href="#language-expression-callsub-class-method-call">Class Method Call</a></li>
-  <li><a href="#language-expression-callsub-method-call">Method Call</a></li>
-  <li><a href="#language-expression-callsub-function-call">Function Call</a></li>
+  <li><a href="#language-expression-callmethod">Method Call</a></li>
+  <li><a href="#language-expression-callmethod-class-method-call">Class Method Call</a></li>
+  <li><a href="#language-expression-callmethod-method-call">Method Call</a></li>
+  <li><a href="#language-expression-callmethod-current-class">Function Call</a></li>
   <li><a href="#language-expression-current-class">Get Current Class Name</a></li>
   <li><a href="#language-expression-current-file">Get Current File Name</a></li>
   <li><a href="#language-expression-current-line">Get Current Line Number</a></li>
@@ -3885,7 +3898,7 @@ my $key_values = {};
 my $key_values = {foo => 1, bar => "Hello"};
 </pre>
 
-<h3 id="language-expression-callsub">Method Call</h3>
+<h3 id="language-expression-callmethod">Method Call</h3>
 
 Methods defined by <a href="#language-method-definition">Method Definition</a> can be called from program. There are three types of method calls. <b>Class Method Call</b> and <b>Instance Method Call</b>.
 
@@ -3905,33 +3918,28 @@ If the number of arguments does not match the number of arguments defined in the
 my $ret = Foo->bar(1, 2, 3);
 </pre>
 
-<h3 id="language-expression-callsub-function-call">Function Call</h3>
+<h3 id="language-expression-callmethod-current-class">Current Class</h3>
 
-Method which is defined as Class Method is imported as Function using <a href="#language-module-use">use Statement</a>.
+<b>cur</b> keyword expresses the current class. You can call method using <b>cur</b> keyword instead of the class name.
 
-<pre>
-use Foo(MethodName);
-</pre>
-
-<pre>
-MethodName(ARGS1, ARGS2, ARGS3, ..., ARGSn);
-</pre>
-
-Function Call is <a href="#language-expression">Expression</a>.
-
-<b>Function Call Example</b>
+<b>Current Class Example</b>
 
 <pre>
 class Foo {
-  use Fn (copy_string);
   
   static method test : void () {
-    my $ret = copy_string("hello");
+    # This means Foo->sum(1, 2)
+    my $ret = cur->sum(1, 2);
   }
+
+  static method sum : int ($num1 : int, $num2 : int) {
+    return $num1 + $num2;
+  }
+  
 }
 </pre>
 
-<h3 id="language-expression-callsub-method">Instance Method Call</h3>
+<h3 id="language-expression-callmethod-method">Instance Method Call</h3>
 <p>
   Instance Method Call is a method to call Method which is <a href="#language-method-method">Method</a>. In <a href="#language-method-definition">Method Definition</a>, the first argument is <a href="#language-type-self">self Type</a> If the argument of> is specified, it becomes Method.
 </p>
@@ -3996,11 +4004,11 @@ $VARIABLE
 </pre>
 <pre>
 my $num : int;
-my $num_ref : int& = \$num;
+my $num_ref : int* = \$num;
 my $num_deref : int = $$num_ref;
 
 my $z : Complex_2d;
-my $z_ref : Complex_2d& = \$z;
+my $z_ref : Complex_2d* = \$z;
 my $z_deref : Complex_2d = $$z_ref;
 </pre>
 
@@ -4025,11 +4033,11 @@ $VARIABLE = Expression
 </pre>
 <pre>
 my $num : int;
-my $num_ref : int& = \$num;
+my $num_ref : int* = \$num;
 $$num_ref = 1;
 
 my $z : Complex_2d;
-my $z_ref : Complex_2d& = \$z;
+my $z_ref : Complex_2d* = \$z;
 
 my $z2 : Complex_2d;
 
@@ -5200,7 +5208,7 @@ $x >>>= 1;
 
 <h3 id="language-operator-ref">Reference Operator</h3>
 <p>
-  The Reference Operator is an Operator that retrieves the address of a variable for <a href="#language-type-numeric">Numeric Type</a> or <a href="#language-type-multi-numeric">Multi Numeric Type</a>. Designed to achieve c address Operator "&".
+  The Reference Operator is an Operator that retrieves the address of a variable for <a href="#language-type-numeric">Numeric Type</a> or <a href="#language-type-multi-numeric">Multi Numeric Type</a>. Designed to achieve c address Operator "*".
 </p>
 <pre>
 \VARIABLE
@@ -5216,10 +5224,10 @@ $x >>>= 1;
 </pre>
 <pre>
 my $num : int;
-my $num_ref : int& = \$num;
+my $num_ref : int* = \$num;
 
 my $z : Complex_2d;
-my $z_ref : Complex_2d& = \$z;
+my $z_ref : Complex_2d* = \$z;
 </pre>
 <p>
   For a detailed description of Reference, see <a href="#language-ref">Reference</a>.
@@ -6938,14 +6946,14 @@ class Point_3i : mulnum_t {
 
 <h3 id="language-type-ref">Reference Type</h3>
 <p>
-  Reference Type is a Type that can store the address of a variable. Add "&" after <a href="#language-type-numeric">Numeric Type</a> or <a href="#language-type-multi-numeric">Multi Numeric Type</a> You can define it.
+  Reference Type is a Type that can store the address of a variable. Add "*" after <a href="#language-type-numeric">Numeric Type</a> or <a href="#language-type-multi-numeric">Multi Numeric Type</a> You can define it.
 </p>
 <pre>
 my $num : int;
-my $num_ref : int& = \$num;
+my $num_ref : int* = \$num;
 
 my $point : Point_3i;
-my $point_ref : Point_3i& = \$point;
+my $point_ref : Point_3i* = \$point;
 </pre>
 <p>
   Only the address of the Local Variable acquired by <a href="#language-operator-ref">Reference Operator</a> can be assigned to the value of Reference Type.
@@ -7739,7 +7747,7 @@ my $comparator = method : int ($x1 : object, $x2 : object) {
 </pre>
 
 <p>
-  You can call Method because the object created by Create Callback Object is a normal object. For the call to Create Callback Object, see <a href="#language-expression-callsub">Method Call</a>.
+  You can call Method because the object created by Create Callback Object is a normal object. For the call to Create Callback Object, see <a href="#language-expression-callmethod">Method Call</a>.
 <p>
 
 <h3 id="language-method-capture">Capture</h3>

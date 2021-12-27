@@ -3,10 +3,16 @@ package Sah::Schema::example::recurse1;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-07-30'; # DATE
 our $DIST = 'Sah-Schemas-Examples'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $schema = ["example::recurse1" => {
     summary => 'Recursive schema',
+    description => <<'_',
+
+This schema will cause the resolver <pm:Data::Sah::Resolve> to bail because it
+recurses to itself.
+
+_
 }];
 
 1;
@@ -24,7 +30,7 @@ Sah::Schema::example::recurse1
 
 =head1 VERSION
 
-This document describes version 0.007 of Sah::Schema::example::recurse1 (from Perl distribution Sah-Schemas-Examples), released on 2021-07-30.
+This document describes version 0.009 of Sah::Schema::example::recurse1 (from Perl distribution Sah-Schemas-Examples), released on 2021-07-30.
 
 =head1 SYNOPSIS
 
@@ -88,6 +94,11 @@ L<Perinci::CmdLine> to create a CLI:
  % ./myapp.pl --version
 
  % ./myapp.pl --arg1 ...
+
+=head1 DESCRIPTION
+
+This schema will cause the resolver L<Data::Sah::Resolve> to bail because it
+recurses to itself.
 
 =head1 HOMEPAGE
 

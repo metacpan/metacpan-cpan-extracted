@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-28'; # DATE
+our $DATE = '2021-12-01'; # DATE
 our $DIST = 'App-PerlCriticUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/PerlCriticUtils/pcplist",
@@ -38,13 +38,13 @@ pcplist - List installed Perl::Critic policy modules
 
 =head1 VERSION
 
-This document describes version 0.005 of pcplist (from Perl distribution App-PerlCriticUtils), released on 2021-08-28.
+This document describes version 0.006 of pcplist (from Perl distribution App-PerlCriticUtils), released on 2021-12-01.
 
 =head1 SYNOPSIS
 
 Usage:
 
-% B<pcplist> [B<--detail>|B<-l>|B<--no-detail>|B<--nodetail>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]]
+% B<pcplist> [B<--detail>|B<-l>|B<--no-detail>|B<--nodetail>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] -- [I<query>] ...
 
 =head1 OPTIONS
 
@@ -55,6 +55,18 @@ C<*> marks required options.
 =over
 
 =item B<--detail>, B<-l>
+
+=item B<--query-json>=I<s>
+
+See C<--query>.
+
+Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--query>=I<s@>
+
+Can also be specified as the 1st command-line argument and onwards.
+
+Can be specified multiple times.
 
 =back
 
@@ -458,6 +470,16 @@ List installed policies (show details):
  | Variables::RequireLocalizedPunctuationVars                               | Magic variables should be assigned as "local".                                                             |
  | Variables::RequireNegativeIndices                                        | Negative array index should be used.                                                                       |
  +--------------------------------------------------------------------------+------------------------------------------------------------------------------------------------------------+
+
+What's that policy that prohibits returning undef explicitly?:
+
+ % pcplist undef
+ Subroutines::ProhibitExplicitReturnUndef
+
+What's that policy that requires using strict?:
+
+ % pcplist req strict
+ TestingAndDebugging::RequireUseStrict
 
 =head1 HOMEPAGE
 

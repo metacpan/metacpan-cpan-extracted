@@ -2,12 +2,14 @@
 
 =head1 NAME
 
-Math::Ryu - perl interface to the ryu C library.
+Math::Ryu - perl interface to Ryu (float-to-string conversion).
 
 =head1 DEPENDENCIES
 
-   This module includes the Ryu C library, which is available from github:
-   $ git clone https://github.com/ulfjack/ryu.git /home/me/ryu_source
+   This module uses the Ryu C implementation,  which is included with
+   this module's source. It is therefore unnecessary to download that
+   Ryu code - but, should you wish to grab it, it's available at:
+   https://github.com/ulfjack/ryu/tree/master/ryu
 
 =head1 DESCRIPTION
 
@@ -30,7 +32,16 @@ Math::Ryu - perl interface to the ryu C library.
    $str = d2s(sqrt 2);
    print $str;           # 1.4142135623730951E0
 
+   # Also do the reverse of s2d()
+   my $d = s2d('1E-1');
+   printf "%.17g\n", $d; # 0.10000000000000001
+
+
 =head1 FUNCTIONS
+
+   $nv = s2d($str);
+    Converts the string ($str) to a vloating point value ($nv)
+    and return $nv.
 
    $str = d2s($nv);
     $nv holds a floating point numeric value.
@@ -51,7 +62,6 @@ Math::Ryu - perl interface to the ryu C library.
    $str = d2exp($nv, $digits);
     $str is a $digits-decimal floating point representation of $nv.
     For example, d2exp(1 / 10000, 6) returns '1.000000e-04'.
-
 
    $str = d2s_buffered($nv);                       # Not very useful
     Returns the same as d2s($nv).
@@ -80,9 +90,22 @@ Math::Ryu - perl interface to the ryu C library.
 
 =head1 LICENSE
 
-    This program is free software; you may redistribute it and/or
-    modify it under the same terms as Perl itself.
-    Copyright 2021 Sisyphus
+    This perl module is free software; you may redistribute it
+    and/or modify it under the same terms as Perl itself.
+    However, the ".c" and ".h" files that ship with this distro
+    are Copyright 2018 Ulf Adams, and can only be used under the
+    the terms of version 2.0 the Apache License, or of version 1.0
+    of the Boost Software License.
+    A copy of the Apache License (Apache_License.txt) is included
+    with this distro.
+
+    The Apache License can also be found at:
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    The Boost Software License can be found at:
+    https://www.boost.org/LICENSE_1_0.txt
+
+    This perl module is Copyright 2021 Sisyphus
 
 =head1 AUTHOR
 

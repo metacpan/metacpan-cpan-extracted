@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.530-10-g3555f8b5
+package JSON::Schema::Modern; # git description: v0.532-7-ga7669dcf
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.531';
+our $VERSION = '0.533';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -19,6 +19,7 @@ use JSON::MaybeXS;
 use Carp qw(croak carp);
 use List::Util 1.55 qw(pairs first uniqint pairmap uniq);
 use Ref::Util 0.100 qw(is_ref is_plain_hashref);
+use Scalar::Util 'refaddr';
 use Mojo::URL;
 use Safe::Isa;
 use Path::Tiny;
@@ -39,6 +40,7 @@ our @CARP_NOT = qw(
   JSON::Schema::Modern::Document
   JSON::Schema::Modern::Vocabulary
   JSON::Schema::Modern::Vocabulary::Applicator
+  OpenAPI::Modern
 );
 
 use constant SPECIFICATION_VERSION_DEFAULT => 'draft2020-12';
@@ -114,7 +116,7 @@ has _format_validations => (
   default => sub { {} },
 );
 
-before add_format_validation => sub ($self, $name, $sub) { $format_type->({ $name => $sub }) };
+before add_format_validation => sub ($self, @kvs) { $format_type->({ @$_ }) foreach pairs @kvs };
 
 around BUILDARGS => sub ($orig, $class, @args) {
   my $args = $class->$orig(@args);
@@ -141,6 +143,7 @@ sub add_schema {
     return $schema_info->{document};
   }
 
+  # document BUILD will trigger $self->traverse($schema)
   my $document = $_[0]->$_isa('JSON::Schema::Modern::Document') ? shift
     : JSON::Schema::Modern::Document->new(
       schema => shift,
@@ -156,7 +159,7 @@ sub add_schema {
       errors => [ $document->errors ],
     )) if $document->has_errors;
 
-  if (not grep $_->{document} == $document, $self->_canonical_resources) {
+  if (not grep refaddr($_->{document}) == refaddr($document), $self->_canonical_resources) {
     my $schema_content = $document->_serialized_schema
       // $document->_serialized_schema($self->_json_decoder->encode($document->schema));
 
@@ -415,6 +418,8 @@ sub _traverse_subschema ($self, $schema, $state) {
 
   return E($state, 'invalid schema type: %s', $schema_type) if $schema_type ne 'object';
 
+  return 1 if not keys %$schema;
+
   my $valid = 1;
   # we must check the array length on every iteration because some keywords can change it!
   for (my $idx = 0; $idx <= $state->{vocabularies}->$#*; ++$idx) {
@@ -482,6 +487,8 @@ sub _eval_subschema ($self, $data, $schema, $state) {
 
   # this should never happen, due to checks in traverse
   abort($state, 'invalid schema type: %s', $schema_type) if $schema_type ne 'object';
+
+  return 1 if not keys %$schema;
 
   my $valid = 1;
   my %unknown_keywords = map +($_ => undef), keys %$schema;
@@ -582,7 +589,7 @@ around _add_resources => sub {
         next if $existing->{path} eq $value->{path}
           and $existing->{canonical_uri} eq $value->{canonical_uri}
           and $existing->{specification_version} eq $value->{specification_version}
-          and $existing->{document} == $value->{document};
+          and refaddr($existing->{document}) == refaddr($value->{document});
         croak 'uri "'.$key.'" conflicts with an existing schema resource';
       }
     }
@@ -835,11 +842,14 @@ has _media_type => (
   },
   lazy => 1,
   default => sub ($self) {
+    my $_json_media_type = sub ($content_ref) {
+      \ JSON::MaybeXS->new(allow_nonref => 1, utf8 => 0)->decode($content_ref->$*);
+    };
     +{
       # note: utf-8 decoding is NOT done, as we can't be sure that's the correct charset!
-      'application/json' => sub ($content_ref) {
-        \ JSON::MaybeXS->new(allow_nonref => 1, utf8 => 0)->decode($content_ref->$*);
-      },
+      'application/json' => $_json_media_type,
+      'application/schema+json' => $_json_media_type,
+      'application/schema-instance+json' => $_json_media_type,
       map +($_ => sub ($content_ref) { $content_ref }),
         qw(text/plain application/octet-stream),
     };
@@ -912,7 +922,7 @@ JSON::Schema::Modern - Validate data against a schema
 
 =head1 VERSION
 
-version 0.531
+version 0.533
 
 =head1 SYNOPSIS
 
@@ -1209,6 +1219,18 @@ C<application/json>
 
 =item *
 
+C<application/schema+json>
+
+=item *
+
+C<application/schema-instance+json>
+
+=item *
+
+C<application/octet-stream>
+
+=item *
+
 C<text/plain>
 
 =back
@@ -1432,6 +1454,10 @@ SOURCES.>
 
 =item *
 
+L<json-schema-eval>
+
+=item *
+
 L<https://json-schema.org>
 
 =item *
@@ -1467,6 +1493,13 @@ L<https://json-schema.org/draft-07/json-schema-release-notes.html>
 L<Understanding JSON Schema|https://json-schema.org/understanding-json-schema>: tutorial-focused documentation
 
 =back
+
+=head1 SUPPORT
+
+=for stopwords OpenAPI
+
+You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI Slack
+server|https://open-api.slack.com>, which are also great resources for finding help.
 
 =head1 SUPPORT
 

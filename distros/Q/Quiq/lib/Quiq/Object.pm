@@ -22,7 +22,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.196';
+our $VERSION = '1.197';
 
 use Scalar::Util ();
 use Hash::Util ();
@@ -516,6 +516,41 @@ sub classFile {
 
 # -----------------------------------------------------------------------------
 
+=head3 methodName() - Liefere Namen der ausgeführten Methode
+
+=head4 Synopsis
+
+  $name = $this->methodName;
+
+=head4 Returns
+
+=over 4
+
+=item $name
+
+(String) Methodenname
+
+=back
+
+=head4 Description
+
+Ermittele den Namen der ausgeführten Methode und liefere diesen zurück.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub methodName {
+    my $this = shift;
+
+    my $name = (caller(1))[3];
+    $name =~ s/.*:://; # Klassennamen entfernen
+
+    return $name;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 this() - Liefere Klassenname und Objektreferenz
 
 =head4 Synopsis
@@ -523,16 +558,55 @@ sub classFile {
   ($class,$self,$isClassMethod) = Quiq::Object->this($this);
   $class = Quiq::Object->this($this);
 
+=head4 Arguments
+
+=over 4
+
+=item $this
+
+Der erste Parameter der Methode
+
+=back
+
+=head4 Returns
+
+=over 4
+
+=item $class
+
+(String) Klassenname
+
+=item $self
+
+(Referenz) Objektreferenz.
+
+=item $isClassMethod
+
+(Boolean) Zeigt an, ob die Methode als Klassenmethode gerufen wurde.
+
+=back
+
 =head4 Description
 
-Liefere Klassenname und Objektreferenz zu Parameter $this und zeige
-auf dem dritten Rückgabewert an, ob die Methode als Klassen- oder
-Objektmethode gerufen wurde.
+Liefere Klassenname und/oder die Objektreferenz zu Parameter $this
+und zeige auf dem dritten Rückgabewert an, ob die Methode als
+Klassen- oder Objektmethode gerufen wurde.
 
-Ist $this ein Klassenname (eine Zeichenkette) liefere den Namen selbst
-und als Objektreferenz undef und als dritten Rückgabewert 1. Ist
-$this eine Objektreferenz, liefere den Klassennamen zur Objektreferenz
-sowie die Objektreferenz selbst und als dritten Rückgabewert 0.
+Ist $this ein Klassenname (eine Zeichenkette) liefere den Namen
+selbst, als Objektreferenz C<undef> und als dritten Rückgabewert
+
+=over 4
+
+=item 1.
+
+Ist $this eine Objektreferenz, liefere den Klassennamen zur
+
+=back
+
+Objektreferenz, die Objektreferenz selbst und als dritten
+Rückgabewert 0.
+
+Im Skalarkontext liefere nur den Klassennamen.
 
 =head4 Example
 
@@ -598,7 +672,7 @@ sub this {
 
 =head1 VERSION
 
-1.196
+1.197
 
 =head1 AUTHOR
 

@@ -173,7 +173,7 @@ const char* const* SPVM_OP_C_ID_NAMES(void) {
     "INIT",
     "REQUIRE",
     "IF_REQUIRE",
-    "CURRENT_CLASS",
+    "CURRENT_CLASS_NAME",
     "FREE_TMP",
     "REFCNT",
     "ALLOW",
@@ -184,6 +184,8 @@ const char* const* SPVM_OP_C_ID_NAMES(void) {
     "DUMP",
     "TRUE",
     "FALSE",
+    "CURRENT_CLASS",
+    "AS",
   };
   
   return id_names;
@@ -1750,7 +1752,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
           category_descriptors_count++;
           break;
         case SPVM_DESCRIPTOR_C_ID_MULNUM_T:
-          class->category = SPVM_CLASS_C_CATEGORY_VALUE;
+          class->category = SPVM_CLASS_C_CATEGORY_MULNUM;
           category_descriptors_count++;
           break;
         case SPVM_DESCRIPTOR_C_ID_PRIVATE:
@@ -1783,22 +1785,23 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
     while ((op_decl = SPVM_OP_sibling(compiler, op_decl))) {
       // use declarations
       if (op_decl->id == SPVM_OP_C_ID_USE) {
-        SPVM_LIST_push(class->op_uses, op_decl);
+        SPVM_OP* op_use = op_decl;
+        SPVM_LIST_push(class->op_uses, op_use);
         
-        SPVM_LIST* method_names = op_decl->uv.use->method_names;
-        
-        if (method_names) {
-          for (int32_t i = 0; i < method_names->length; i++) {
-            const char* method_name = SPVM_LIST_fetch(method_names, i);
-            
-            const char* found_method_name = SPVM_HASH_fetch(class->method_symtable, method_name, strlen(method_name));
-            if (found_method_name) {
-              SPVM_COMPILER_error(compiler, "Redeclaration of sub in use statement \"%s\" at %s line %d\n", method_name, op_decl->file, op_decl->line);
-            }
-            // Unknown sub
-            else {
-              SPVM_HASH_insert(class->method_symtable, method_name, strlen(method_name), (void*)method_name);
-            }
+        // Class alias
+        SPVM_OP* op_type_alias = op_use->uv.use->op_type_alias;
+        if (op_type_alias) {
+          SPVM_OP* op_type = op_use->uv.use->op_type;
+          const char* use_class_name = op_type->uv.type->basic_type->name;
+          
+          const char* class_alias_name = op_type_alias->uv.type->basic_type->name;
+          
+          const char* use_class_name_exists = SPVM_HASH_fetch(class->class_alias_symtable, class_alias_name, strlen(class_alias_name));
+          if (use_class_name_exists) {
+            SPVM_COMPILER_error(compiler, "Class alias name \"%s\" is already used at %s line %d\n", class_alias_name, op_decl->file, op_decl->line);
+          }
+          else {
+            SPVM_HASH_insert(class->class_alias_symtable, class_alias_name, strlen(class_alias_name), (void*)use_class_name);
           }
         }
       }
@@ -2215,22 +2218,23 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
   return op_class;
 }
 
-SPVM_OP* SPVM_OP_build_use(SPVM_COMPILER* compiler, SPVM_OP* op_use, SPVM_OP* op_type, SPVM_OP* op_method_names, int32_t is_require) {
+SPVM_OP* SPVM_OP_build_use(SPVM_COMPILER* compiler, SPVM_OP* op_use, SPVM_OP* op_type, SPVM_OP* op_type_alias, int32_t is_require) {
   
   SPVM_USE* use = SPVM_USE_new(compiler);
   op_use->uv.use = use;
   use->op_type = op_type;
   use->is_require = is_require;
-
-  // Check method_names
-  if (op_method_names) {
-    SPVM_LIST* method_names = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
-    SPVM_OP* op_method_name = op_method_names->first;
-    while ((op_method_name = SPVM_OP_sibling(compiler, op_method_name))) {
-      const char* method_name = op_method_name->uv.name;
-      SPVM_LIST_push(method_names, (void*)method_name);
+  
+  if (op_type_alias) {
+    const char* class_alias_name = op_type_alias->uv.type->basic_type->name;
+    op_type_alias->uv.type->is_class_alias = 1;
+    
+    // Class name must start with upper case, otherwise compiler error occur.
+    // (Invalid example) Foo::bar
+    if (islower(class_alias_name[0])) {
+      SPVM_COMPILER_error(compiler, "Class alias name \"%s\" must start with upper case at %s line %d\n", class_alias_name, op_type_alias->file, op_type_alias->line);
     }
-    use->method_names = method_names;
+    use->op_type_alias = op_type_alias;
   }
 
   SPVM_LIST_push(compiler->op_use_stack, op_use);
@@ -2739,22 +2743,25 @@ SPVM_OP* SPVM_OP_build_call_method(SPVM_COMPILER* compiler, SPVM_OP* op_invocant
     SPVM_COMPILER_error(compiler, "method name can't conatin :: at %s line %d\n", op_name_method->file, op_name_method->line);
   }
   
+  // Class method call
+  if (op_invocant->id == SPVM_OP_C_ID_TYPE || op_invocant->id == SPVM_OP_C_ID_CURRENT_CLASS) {
+    call_method->is_class_method_call = 1;
+    call_method->op_invocant = op_invocant;
+    call_method->op_name = op_name_method;
+    if (op_invocant->id == SPVM_OP_C_ID_TYPE) {
+      op_invocant->uv.type->is_maybe_class_alias = 1;
+    }
+  }
   // Instance method call
-  if (op_invocant && op_invocant->id != SPVM_OP_C_ID_TYPE) {
-   call_method->op_invocant = op_invocant;
-   call_method->op_name = op_name_method;
+  else {
+    call_method->op_invocant = op_invocant;
+    call_method->op_name = op_name_method;
     
     if (op_invocant->id == SPVM_OP_C_ID_VAR) {
       op_invocant->uv.var->call_method =call_method;
     }
     
     SPVM_OP_insert_child(compiler, op_list_terms, op_list_terms->first, op_invocant);
-  }
-  // Class method call
-  else {
-   call_method->is_class_method_call = 1;
-   call_method->op_invocant = op_invocant;
-   call_method->op_name = op_name_method;
   }
   
   // term is passed to method

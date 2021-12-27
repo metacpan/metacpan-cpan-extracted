@@ -21,7 +21,7 @@ sub Main {
 
 package Term_CLI_Argument_Enum_test {
 
-use parent 0.228 qw( Test::Class );
+use parent 0.225 qw( Test::Class );
 
 use Test::More 1.001002;
 use Test::Exception 0.35;
@@ -30,7 +30,9 @@ use Term::CLI::Argument::Enum;
 use Term::CLI::L10N;
 
 my $ARG_NAME= 'test_enum';
-my @ENUM_VALUES = qw( one two three );
+my @ONE_WORDS = qw( one oneself onetime );
+my @T_WORDS = qw( two three );
+my @ENUM_VALUES = (@ONE_WORDS, @T_WORDS);
 
 # Untaint the PATH.
 $::ENV{PATH} = '/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin';
@@ -65,7 +67,7 @@ sub check_attributes: Test(2) {
     is( $arg->type, 'Enum', "type attribute is Enum" );
 }
 
-sub check_complete: Test(3) {
+sub check_complete: Test(4) {
     my $self = shift;
     my $arg = $self->{arg};
 
@@ -73,9 +75,13 @@ sub check_complete: Test(3) {
     is_deeply( [$arg->complete('')], \@expected,
         "complete returns (@ENUM_VALUES) for ''");
 
-    @expected = sort qw( two three );
+    @expected = sort @T_WORDS;
     is_deeply( [$arg->complete('t')], \@expected,
         "complete returns (@expected) for 't'");
+
+    @expected = sort @ONE_WORDS;
+    is_deeply( [$arg->complete('one')], \@expected,
+        "complete returns (@expected) for 'one'");
 
     @expected = ();
     is_deeply( [$arg->complete('X')], \@expected,
@@ -109,7 +115,7 @@ sub check_validate: Test(10) {
 
     $arg->set_error('SOMETHING');
 
-    my $test_value = $ENUM_VALUES[1];
+    my $test_value = $ONE_WORDS[1];
     ok( $arg->validate($test_value), "'$test_value' validates");
 
     is ( $arg->error, '',

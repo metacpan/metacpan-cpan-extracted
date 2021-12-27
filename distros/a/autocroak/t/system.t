@@ -14,6 +14,7 @@ use lib "t/lib";
 use TestUtils;
 
 my $perl = file_name_is_absolute($^X) ? $^X : $Config{perlpath};
+my $unixish = $^O ne 'MSWin32';
 
 subtest return0 => sub {
 	use autocroak;
@@ -24,7 +25,7 @@ subtest return0 => sub {
 subtest return1 => sub {
 	use autocroak;
 	my $ex = exception { system $perl, qw/-e exit(1)/ };
-	my $error = $^O ne 'MSWin32' ? qr/unexpectedly returned exit value 1/ : qr/returned \d+/;
+	my $error = $unixish ? qr/unexpectedly returned exit value 1/ : qr/returned \d+/;
 	like($ex, qr/^Could not call system ".+": $error/);
 };
 
@@ -39,7 +40,8 @@ subtest nonexistent => sub {
 	use autocroak;
 	no warnings 'exec';
 	my $ex = exception { system '/usr/bin/nonexistent', '1' };
-	like($ex, error_for(qr/call system ".+"/, ENOENT));
+	my $error = $unixish ? error_for(qr/call system ".+"/, ENOENT) : qr/Could not call system.*returned 256/;
+	like($ex, $error);
 };
 
 done_testing;

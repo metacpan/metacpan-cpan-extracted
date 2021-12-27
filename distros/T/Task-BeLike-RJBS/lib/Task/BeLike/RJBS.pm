@@ -1,6 +1,6 @@
 use 5.20.0;
 use warnings;
-package Task::BeLike::RJBS 20210619.000;
+package Task::BeLike::RJBS 20211226.000;
 # ABSTRACT: be more like RJBS -- use the modules he likes!
 
 
@@ -18,7 +18,7 @@ Task::BeLike::RJBS - be more like RJBS -- use the modules he likes!
 
 =head1 VERSION
 
-version 20210619.000
+version 20211226.000
 
 =head1 TASK CONTENTS
 
@@ -76,6 +76,8 @@ Version 1.1002 required because: it has --auto-cleanup
 Version 0.12 required because: it won't install old dists
 
 =head3 L<CPAN::Mini> 0.563
+
+=head3 L<Module::CPANfile>
 
 =head3 L<Module::Which>
 

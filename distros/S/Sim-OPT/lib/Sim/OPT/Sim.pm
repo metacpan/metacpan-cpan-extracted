@@ -1,5 +1,5 @@
 package Sim::OPT::Sim;
-# Copyright (C) 2008-2020 by Gian Luca Brunetti and Politecnico di Milano.
+# Copyright (C) 2008-2021 by Gian Luca Brunetti and Politecnico di Milano.
 # This is the module Sim::OPT::Sim of Sim::OPT, a program for detailed metadesign managing parametric explorations through the ESP-r building performance simulation platform and performing optimization by block coordinate descent.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
@@ -38,7 +38,7 @@ use warnings::unused;
 
 our @EXPORT = qw( sim ); # our @EXPORT = qw( );
 
-$VERSION = '0.075'; # our $VERSION = '';
+$VERSION = '0.077'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Sim is the module used by Sim::OPT to launch simulations once the models have been built.';
 
 #########################################################################################
@@ -72,6 +72,7 @@ sub sim
   my %simtitles = %main::simtitles;
   my %retrievedata = %main::retrievedata;
   my @keepcolumns = @main::keepcolumns;
+  my @weighttransforms = @main::weighttransforms;
   my @weights = @main::weights;
   my @weightsaim = @main::weightsaim;
   my @varthemes_report = @main::varthemes_report;
@@ -157,7 +158,6 @@ sub sim
 
   my %notecases;
 
-  my ( $resfile, $flfile );
   my @container;
   foreach my $instance (@instances)
   {
@@ -183,7 +183,6 @@ sub sim
 
     my $skip = $dowhat{$countvar}{skip}; #########################################
     my ( $resfile, $flfile );
-    #eval($getfly);
 
     my $varnumber = $countvar;
     my $stepsvar = $varnums{$countvar};
@@ -193,11 +192,14 @@ sub sim
     my $countdir = 0;
 
     my $numberof_simtools = scalar ( keys %{ $dowhat{simtools} } );
-    my $simelt = $to{crypto};
-
+    my $simelt = $to{crypto}; say $tee "SIMELT: $simelt";
+    my $shortsimelt = $simelt;
+    $shortsimelt =~ s/$mypath\///;
+    my ( $shortresfile, $shortflfile );
 
     if ( $dowhat{simulate} eq "y")
     {
+
       my $counttool = 1;
       while ( $counttool <= $numberof_simtools )
       {
@@ -208,9 +210,15 @@ sub sim
 
           if ( $tooltype eq "esp-r" )
           {
-            my $launchline = "cd $simelt/cfg/ \n bps -file $fileconfig -mode script";
-
-
+            my $launchline;
+            if ( ( -e "../tmp/*.res" ) or ( -e "../tmp/*.fl" ) or ( -e "../tmp/*.mfr" ) )
+            {
+              $launchline = "rm ../tmp/*.res \n rm ../tmp/*.fl \n rm ../tmp/*.mfr \n cd $simelt/cfg/ \n bps -file $fileconfig -mode script";
+            }
+            else
+            {
+              $launchline = "cd $simelt/cfg/ \n bps -file $fileconfig -mode script";
+            }
 
             my $countsim = 0;
             foreach my $simtitle_ref ( @{ $simtitles{$counttool} } )
@@ -223,8 +231,12 @@ sub sim
 
               if ( ( $simelt ne "") and ( $date_to_sim ne "" ) )
               {
-                $resfile = "$simelt-$date_to_sim-$tooltype.res";
-                $flfile = "$simelt-$date_to_sim-$tooltype.fl";
+                my $fileconfigroot = $fileconfig;
+                $fileconfigroot =~ s/\.cfg//;
+                $resfile = "$simelt/tmp/$fileconfigroot.res";
+                $flfile = "$simelt/tmp/$fileconfigroot.mfr";
+                $shortresfile = "$fileconfigroot.res";
+                $shortflfile = "$fileconfigroot.mfr";
               }
 
               open( SIMLIST, ">$simlist") or die( "$!" );
@@ -259,12 +271,13 @@ sub sim
 "$launchline<<XXX
 
 c
-$resfile
-$flfile
+$shortresfile
+$shortflfile
 $begin
 $end
 $before
 $step
+y
 s
 $simnetwork
 Results for $simelt-$dates_to_sim
@@ -275,18 +288,17 @@ y
 -
 -
 -
--
--
 XXX
   ";
+
+                    print $tee "
+        #Simulating case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.\
+        $printthis
+        \n";
                     if ($exeonfiles eq "y")
                     {
                       print `$printthis`;
                     }
-                    print TOFILE "
-        #Simulating case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.\
-        $printthis
-        \n";
                     print OUTFILE "TWO, $resfile\n";
                   }
                   else #  if ( $simnetwork eq "n" )
@@ -296,18 +308,17 @@ XXX
 "$launchline<<XXX
 
 c
-$resfile
+$shortresfile
 $begin
 $end
 $before
 $step
+y
 s
 $simnetwork
-Results for $simelt-$date_to_sim
+Results for $simelt-$dates_to_sim
 y
 y
--
--
 -
 -
 -
@@ -315,13 +326,14 @@ y
 -
 XXX
 ";
+
+                    print $tee "
+$printthis
+";
                     if ($exeonfiles eq "y")
                     {
                       print `$printthis`;
                     }
-                    print TOFILE "
-$printthis
-";
                   }
                 }
               }
@@ -485,8 +497,8 @@ $printthis
                       #`rm -f $templaunch`;
                     }
 
-                    print TOFILE "cp -f $epnewpath $templaunch\n";
-                    print TOFILE "runenergyplus $templaunch $epwfile\n";
+                    print $tee "cp -f $epnewpath $templaunch\n";
+                    print $tee "runenergyplus $templaunch $epwfile\n";
 
                     say "#Simulating case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep for tool $tooltype. Instance $countinstance: using $epnewpath (actually $templaunch) to obtain $resfile. " ;
                   }
@@ -504,7 +516,7 @@ $printthis
 
 
     if ( $dowhat{newretrieve} eq "y" )
-    {
+    { say $tee "DOING 1";
       my @resultretrieve = Sim::OPT::Report::newretrieve(
       {
         instance => $instance, dirfiles => \%dirfiles,
@@ -517,7 +529,7 @@ $printthis
     }
 
     if ( ( $dowhat{newreport} eq "y" ) and ( $precious  eq "" ) )
-    {
+    { say $tee "DOING 2";
       my @resultreport = Sim::OPT::Report::newreport(
       {
         instance => $instance, dirfiles => \%dirfiles,
@@ -529,8 +541,9 @@ $printthis
       $dirfiles{mergestruct} = $resultreport[3];
       $dirfiles{mergecases} = $resultreport[4];
     }
+
     if ( ( $dowhat{newreport} eq "y" ) and ( $precious  ne "" ) )
-    {
+    { say $tee "DOING 3";
       $winningvalue = Sim::OPT::Report::newreport(
       {
         instance => $instance, dirfiles => \%dirfiles,
@@ -553,6 +566,7 @@ $printthis
     return( $winningvalue );
   }
 
+  say $tee "LEAVING SIMULATION MODULE";
   close TOFILE;
   close OUTFILE;
 
@@ -593,7 +607,7 @@ Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2015 by Gian Luca Brunetti and Politecnico di Milano. This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+Copyright (C) 2008-2021 by Gian Luca Brunetti and Politecnico di Milano. This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
 
 =cut

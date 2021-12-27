@@ -177,6 +177,10 @@ sub expand_keichou ($) {
 	elsif ($year == 1993) {
 		entry $year,  6,  9, '皇太子徳仁親王の結婚の儀';
 	}
+	elsif ($year == 2019) {
+		entry $year,  5,  1, '天皇の即位';
+		entry $year, 10, 22, '即位礼正殿の儀';
+	}
 }
 
 sub expand_happy_monday ($) {
@@ -194,7 +198,14 @@ sub expand_happy_monday ($) {
 		$d;
 	};
 
-	if($year >= 2000) {
+	if($year >= 2020) {
+		my $yeartemp = $year - 1;
+		entry $nth_monday->(
+			$TL->newDateTime("$yeartemp-12-31") => 2) => '成人の日';
+
+		entry $nth_monday->(
+			$TL->newDateTime("$year-09-30") => 2) => 'スポーツの日' if($year != 2020 && $year != 2021);
+	} elsif($year >= 2000) {
 		my $yeartemp = $year - 1;
 		entry $nth_monday->(
 			$TL->newDateTime("$yeartemp-12-31") => 2) => '成人の日';
@@ -208,7 +219,7 @@ sub expand_happy_monday ($) {
 
 	if($year >= 2003) {
 		entry $nth_monday->(
-			$TL->newDateTime("$year-06-30") => 3) => '海の日';
+			$TL->newDateTime("$year-06-30") => 3) => '海の日' if($year != 2020 && $year != 2021);
 
 		entry $nth_monday->(
 			$TL->newDateTime("$year-08-31") => 3) => '敬老の日';
@@ -249,29 +260,52 @@ sub expand_year ($) {
 
 	# 皇室慶弔行事に伴う休日
 	expand_keichou $year;
+	
+	# 東京オリンピック
+	if($year == 2020) {
+		entry $year, 7, 23, '海の日';
+		entry $year, 7, 24, 'スポーツの日';
+		entry $year, 8, 10, '山の日';
+	}
+	# 振替東京オリンピック
+	if($year == 2021) {
+		entry $year, 7, 22, '海の日';
+		entry $year, 7, 23, 'スポーツの日';
+		entry $year, 8, 8, '山の日';
+	}
 
 	# 毎年変化しない祝日
 	entry $year,  1,  1, '元旦';
 	
 	if($year >= 1967) {
-		entry $year,  2, 11, '建国記念日';
+		entry $year,  2, 11, '建国記念の日';
 	}
 	if ($year >= 2007) {
 		entry $year,  4, 29, '昭和の日';
 		entry $year,  5,  4, 'みどりの日';
 	} elsif($year >= 1989) {
 		entry $year,  4, 29, 'みどりの日';
-	} else {
-		# 昭和天皇
-		entry $year,  4, 29, '天皇誕生日';
 	}
 	entry $year,  5,  3, '憲法記念日';
 	entry $year,  5,  5, 'こどもの日';
+
+	if($year >= 2016) {
+		entry $year, 8, 11, '山の日' if($year != 2020 && $year != 2021);
+	}
+
 	entry $year, 11,  3, '文化の日';
 	entry $year, 11, 23, '勤労感謝の日';
-	# 今上天皇
-	if($year >= 1989) {
+	if($year >= 2020) {
+		# 今上天皇
+		entry $year, 2, 23, '天皇誕生日';
+	} elsif($year >= 2019) {
+		#この年は無し
+	} elsif($year >= 1989) {
+		#平成天皇
 		entry $year, 12, 23, '天皇誕生日';
+	} else {
+		# 昭和天皇
+		entry $year,  4, 29, '天皇誕生日';
 	}
 
 
@@ -328,6 +362,9 @@ our %HOLIDAY = (
 __END__
 
 =encoding utf-8
+
+=for stopwords
+	ja
 
 =head1 NAME
 

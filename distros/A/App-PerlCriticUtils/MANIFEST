@@ -10,6 +10,7 @@ dist.ini
 lib/App/PerlCriticUtils.pm
 script/pcpcat
 script/pcpdoc
+script/pcpgrep
 script/pcpless
 script/pcplist
 script/pcpman

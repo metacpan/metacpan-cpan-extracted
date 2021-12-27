@@ -10,6 +10,7 @@ dist.ini
 lib/App/ModuleUtils.pm
 lib/App/PMUtils.pm
 lib/App/pmgrep.pm
+script/cpanm-this-mod
 script/module-dir
 script/pmabstract
 script/pmbin
@@ -39,6 +40,7 @@ script/podlist
 script/podpath
 script/pwd2mod
 script/rel2mod
+script/update-this-mod
 share/cdpm.bash
 t/00-compile.t
 t/author-critic.t

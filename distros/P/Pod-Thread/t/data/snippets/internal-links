@@ -18,6 +18,8 @@ disappear and links to L<Other::Module/FOO> should get the default text.
 =cut
 
 [output]
+\heading[][]
+
 \h2(#S1)[FOO]
 
 Some foo stuff with \link[#S2][BAR] forward reference.

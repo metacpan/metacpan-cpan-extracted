@@ -21,12 +21,12 @@ sub Main {
 
 package Term_CLI_History_test {
 
-use parent 0.228 qw( Test::Class );
+use parent 0.225 qw( Test::Class );
 
 use Test::More 1.001002;
 use FindBin 1.50;
 use Term::CLI;
-use File::Temp 0.2304 qw( tempfile );
+use File::Temp 0.22 qw( tempfile );
 
 # Untaint the PATH.
 $::ENV{PATH} = '/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin';
@@ -61,7 +61,7 @@ sub check_history : Test(12) {
 
     $fh->seek(0,0);
     $fh->autoflush(1);
-    my $history = "command 1\ncommand 2\ncommand 3\n";
+    my $history = "   \ncommand 1\ncommand 2\ncommand 3\n";
     say $fh $history;
 
     ok($cli->read_history($filename), 'read_history from new file works')

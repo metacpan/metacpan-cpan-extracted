@@ -3,7 +3,7 @@ package Sah::Schema::example::has_merge;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-07-30'; # DATE
 our $DIST = 'Sah-Schemas-Examples'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $schema = [posint => {
     summary => 'Even integer',
@@ -35,7 +35,7 @@ Sah::Schema::example::has_merge - Even integer
 
 =head1 VERSION
 
-This document describes version 0.007 of Sah::Schema::example::has_merge (from Perl distribution Sah-Schemas-Examples), released on 2021-07-30.
+This document describes version 0.009 of Sah::Schema::example::has_merge (from Perl distribution Sah-Schemas-Examples), released on 2021-07-30.
 
 =head1 SYNOPSIS
 

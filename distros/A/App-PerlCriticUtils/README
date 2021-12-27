@@ -2,8 +2,8 @@ NAME
     App::PerlCriticUtils - Command-line utilities related to Perl::Critic
 
 VERSION
-    This document describes version 0.005 of App::PerlCriticUtils (from Perl
-    distribution App-PerlCriticUtils), released on 2021-08-28.
+    This document describes version 0.006 of App::PerlCriticUtils (from Perl
+    distribution App-PerlCriticUtils), released on 2021-12-01.
 
 SYNOPSIS
     This distribution provides the following command-line utilities related
@@ -12,6 +12,8 @@ SYNOPSIS
     *   pcpcat
 
     *   pcpdoc
+
+    *   pcpgrep
 
     *   pcpless
 
@@ -73,6 +75,95 @@ FUNCTIONS
     Arguments ('*' denotes required arguments):
 
     *   policy* => *perl::modname*
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  pcpgrep
+    Usage:
+
+     pcpgrep(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Grep from list of installed Perl::Critic policy module names (abstracts,
+    ...).
+
+    Examples:
+
+    *   What's that policy that prohibits returning undef explicitly?:
+
+         pcpgrep(query => ["undef"]);
+
+        Result:
+
+         [
+           200,
+           "OK",
+           [
+             {
+               name => "BuiltinFunctions::ProhibitSleepViaSelect",
+               abstract => "Use L<Time::HiRes|Time::HiRes> instead of something like C<select(undef, undef, undef, .05)>.",
+             },
+             {
+               name => "InputOutput::ProhibitJoinedReadline",
+               abstract => "Use C<local \$/ = undef> or L<Path::Tiny|Path::Tiny> instead of joined readline.",
+             },
+             {
+               name => "Subroutines::ProhibitExplicitReturnUndef",
+               abstract => "Return failure with bare C<return> instead of C<return undef>.",
+             },
+           ],
+           { "table.fields" => ["name", "abstract"] },
+         ]
+
+    *   What's that policy that requires using strict?:
+
+         pcpgrep(query => ["req", "strict"]);
+
+        Result:
+
+         [
+           200,
+           "OK",
+           [
+             {
+               name => "TestingAndDebugging::RequireUseStrict",
+               abstract => "Always C<use strict>.",
+             },
+           ],
+           { "table.fields" => ["name", "abstract"] },
+         ]
+
+    I can never remember the names of the policies, hence this utility. It's
+    a convenience shortcut for:
+
+     % pcplist | grep SOMETHING
+     % pcplist -l | grep SOMETHING
+
+    Note that pcplist also can filter:
+
+     % pcplist undef
+     % pcplist req strict
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   ignore_case => *bool* (default: 1)
+
+        Defaults to true for convenience.
+
+    *   query* => *array[str]*
 
     Returns an enveloped result (an array).
 
@@ -888,11 +979,25 @@ FUNCTIONS
            { "table.fields" => ["name", "abstract"] },
          ]
 
+    *   What's that policy that prohibits returning undef explicitly?:
+
+         pcplist(query => ["undef"]); # -> [200, "OK", ["Subroutines::ProhibitExplicitReturnUndef"], {}]
+
+    *   What's that policy that requires using strict?:
+
+         pcplist(query => ["req", "strict"]);
+
+        Result:
+
+         [200, "OK", ["TestingAndDebugging::RequireUseStrict"], {}]
+
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
 
     *   detail => *bool*
+
+    *   query => *array[str]*
 
     Returns an enveloped result (an array).
 

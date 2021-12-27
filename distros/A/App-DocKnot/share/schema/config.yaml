@@ -8,5 +8,7 @@ type: map
 mapping:
   distdir:
     type: text
+  pandoc:
+    type: text
   pgp_key:
     type: text

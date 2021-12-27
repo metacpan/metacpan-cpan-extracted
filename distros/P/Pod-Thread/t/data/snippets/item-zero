@@ -13,6 +13,8 @@ Some 0 item.
 =back
 
 [output]
+\heading[][]
+
 \h2(#S1)[ITEM 0]
 
 \desc[0]

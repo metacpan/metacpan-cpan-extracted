@@ -188,7 +188,8 @@ static OP* croak_SYSTEM(pTHX) {
 		dITEMS;
 
 		SV* arguments = newSVpvs("");
-		for (int i = 0; i < items; ++i) {
+		int i;
+		for (i = 0; i < items; ++i) {
 			SV* element = ST(i);
 			if (i)
 				sv_catpvs(arguments, " ");

@@ -6,7 +6,7 @@ use warnings;
 use Perl::Critic::Utils qw(:severities :classification :ppi);
 use parent 'Perl::Critic::Policy::Subroutines::ProhibitAmpersandSigils';
 
-our $VERSION = 'v1.0.1';
+our $VERSION = 'v1.0.2';
 
 sub default_severity { $SEVERITY_HIGH }
 sub default_themes { 'community' }

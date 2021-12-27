@@ -1,9 +1,9 @@
 package Sah::SchemaR::example::foo;
 
 our $DATE = '2021-07-30'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
-our $rschema = do{my$var={base=>"str",clsets_after_base=>[{summary=>"A sample schema"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
+our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\nThis is just a simple schema based on `str` with no additional restriction\nclauses.\n\n",summary=>"A sample schema"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
 # ABSTRACT: A sample schema
@@ -20,7 +20,7 @@ Sah::SchemaR::example::foo - A sample schema
 
 =head1 VERSION
 
-This document describes version 0.007 of Sah::SchemaR::example::foo (from Perl distribution Sah-Schemas-Examples), released on 2021-07-30.
+This document describes version 0.009 of Sah::SchemaR::example::foo (from Perl distribution Sah-Schemas-Examples), released on 2021-07-30.
 
 =head1 DESCRIPTION
 

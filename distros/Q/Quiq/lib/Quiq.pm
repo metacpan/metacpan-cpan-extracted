@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.196';
+our $VERSION = '1.197';
 
 =encoding utf8
 
@@ -241,6 +241,10 @@ L<Quiq::ExampleCode> - Führe Beispielcode aus
 =item *
 
 L<Quiq::Excel::Writer> - Erzeuge Datei im Excel 2007+ XLSX Format
+
+=item *
+
+L<Quiq::ExportFile> - Manipuliere Exportdatei
 
 =item *
 
@@ -914,7 +918,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.196
+1.197
 
 =head1 AUTHOR
 

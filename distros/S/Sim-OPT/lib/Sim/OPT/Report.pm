@@ -1,5 +1,5 @@
 package Sim::OPT::Report;
-# Copyright (C) 2008-2019 by Gian Luca Brunetti and Politecnico di Milano.
+# Copyright (C) 2008-2021 by Gian Luca Brunetti and Politecnico di Milano.
 # This is the module Sim::OPT::Retrieve of Sim::OPT, a program for detailed metadesign managing parametric explorations through the ESP-r building performance simulation platform and performing optimization by block coordinate descent.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
@@ -37,7 +37,7 @@ use warnings::unused;
 
 our @EXPORT = qw( newretrieve newreport get_files );
 
-$VERSION = '0.081';
+$VERSION = '0.091';
 $ABSTRACT = 'Sim::OPT::Report is the module used by Sim::OPT to retrieve simulation results.';
 
 #########################################################################################
@@ -72,11 +72,12 @@ sub newretrieve
   $tee = new IO::Tee(\*STDOUT, ">>$tofile"); # GLOBAL
 
 
-  say $tee "\n#Now in Sim::OPT::Report_newretrieve.\n";
+  say $tee "\n#Now in Sim::OPT::Report::newretrieve\n";
 
   my %simtitles = %main::simtitles;
   my %retrievedata = %main::retrievedata;
   my @keepcolumns = @main::keepcolumns;
+  my @weighttransforms = @main::weighttransforms;
   my @weights = @main::weights;
   my @weightsaim = @main::weightsaim;
   my @varthemes_report = @main::varthemes_report;
@@ -151,13 +152,12 @@ sub newretrieve
   my $countstep = $d{countstep};
 
   my %to = %{ $d{to} };
-  my $thisto = $to{to};
+  my $thisto = $to{to}; say $tee "\$thisto: $thisto";
   #my %inst = %{ $d{inst} };
-  my $cleanto = $inst{$thisto};
-
+  my $cleanto = $inst{$thisto}; say $tee "\$cleanto: $cleanto";
 
   my $from = $d{from};
-  my $toitem = $d{toitem};
+  my $toitem = $d{toitem}; say $tee "TOITEM: $toitem";
 
   my $c = $d{c};
 
@@ -166,6 +166,12 @@ sub newretrieve
   my ( @repdata, @retrdata );
 
   my $numberof_simtools = scalar ( keys %{ $dowhat{simtools} } );
+
+  my $shortresfile = $resfile;
+  $shortresfile =~ s/$thisto\/tmp\///; say $tee "IN RETRIEVE: \$shortresfile: $shortresfile, \$resfile: $resfile, \$to: $to, \$toitem: $toitem, \$thisto: $thisto, \$cleanto: $cleanto";
+
+  my $shortflfile = $flfile;
+  $shortflfile =~ s/$thisto\/tmp\///; say $tee "IN RETRIEVE: \$shortflfile: $shortflfile, \$flfile: $flfile";
 
   my $counttool = 1;
   while ( $counttool <= $numberof_simtools )
@@ -177,10 +183,11 @@ sub newretrieve
 
       sub retrieve_temperatures_results
       {
-        my ( $result, $resfile, $retrdata_ref, $reporttitle, $themereport, $counttheme, $countreport, $retfile ) = @_;
+        my ( $result, $resfile, $shortresfile, $thisto, $retrdata_ref, $reporttitle, $themereport, $counttheme, $countreport, $retfile ) = @_;
 
         my $printthis =
-"res -file $resfile -mode script<<YYY
+"cd $thisto/cfg
+res -file ../tmp/$shortresfile -mode script<<YYY
 
 3
 $retrdata[0]
@@ -197,7 +204,6 @@ e
 b
 f
 >
-a
 $retfile
 !
 -
@@ -224,14 +230,15 @@ $printthis";
 
       sub retrieve_comfort_results
       {
-        my ( $result, $resfile, $retrdata_ref, $reporttitle, $stripcheck, $themereport, $counttheme, $countreport, $retfile ) = @_;
+        my ( $result, $resfile, $shortresfile, $thisto, $retrdata_ref, $reporttitle, $stripcheck, $themereport, $counttheme, $countreport, $retfile ) = @_;
 
         my @retrdata = @$retrdata_ref;
 
         unless (-e "$retfile")
         {
           my $printthis =
-"res -file $resfile -mode script<<ZZZ
+"cd $thisto/cfg
+res -file ../tmp/$shortresfile -mode script<<ZZZ
 
 3
 $retrdata[0]
@@ -247,7 +254,6 @@ b
 
 a
 >
-a
 $retfile
 !
 -
@@ -274,7 +280,7 @@ $printthis";
 
     sub retrieve_stats_results
     {
-      my ( $result, $resfile, $retrdata_ref, $reporttitle, $themereport, $counttheme, $countreport, $retfile, $semaphorego1, $semaphorego2, $semaphorestop1, $semaphorestop2, $textpattern, $afterlines ) = @_;
+      my ( $result, $shortresfile, $shortresfile, $thisto, $retrdata_ref, $reporttitle, $themereport, $counttheme, $countreport, $retfile, $semaphorego1, $semaphorego2, $semaphorestop1, $semaphorestop2, $textpattern, $afterlines ) = @_;
 
       my @retrdata = @$retrdata_ref;
       my $printthis;
@@ -284,7 +290,8 @@ $printthis";
         unless (-e "$retfile")
         {
           $printthis =
-"res -file $resfile -mode script<<TTT
+"cd $thisto/cfg
+res -file ../tmp/$shortresfile -mode script<<TTT
 
 3
 $retrdata[0]
@@ -292,10 +299,11 @@ $retrdata[1]
 $retrdata[2]
 d
 >
-a
 $retfile
 $retfile
 l
+a
+-
 a
 -
 -
@@ -311,7 +319,8 @@ TTT
         unless (-e "$retfile")
         {
           $printthis =
-"res -file $resfile -mode script<<TTT
+"cd $thisto/cfg
+res -file ../tmp/$shortresfile -mode script<<TTT
 
 3
 $retrdata[0]
@@ -319,7 +328,6 @@ $retrdata[1]
 $retrdata[2]
 d
 >
-a
 $retfile
 $retfile
 m
@@ -351,7 +359,7 @@ $printthis
 
     sub retrieve_adhoc
     {
-      my ( $result, $resfile, $retrdata_ref, $reporttitle, $themereport, $counttheme, $countreport, $retfile, $semaphorego1, $semaphorego2, $semaphorestop1, $semaphorestop2, $textpattern, $afterlines ) = @_;
+      my ( $result, $resfile, $shortresfile, $thisto, $retrdata_ref, $reporttitle, $themereport, $counttheme, $countreport, $retfile, $semaphorego1, $semaphorego2, $semaphorestop1, $semaphorestop2, $textpattern, $afterlines ) = @_;
 
       my @retrdata = @$retrdata_ref;
       #my $insert = eval { $adhoclines }; say $tee "\$insert: $insert";
@@ -361,7 +369,8 @@ $printthis
         if ( $themereport eq "radent" )
         {
           $printthis =
-"res -file $resfile -mode script<<TTT
+"cd $thisto/cfg
+res -file ../tmp/$shortresfile -mode script<<TTT
 
 3
 $retrdata[0]
@@ -372,7 +381,6 @@ g
 d
 a
 >
-a
 $retfile
 $retfile
 
@@ -400,8 +408,8 @@ $printthis
         }
         elsif ( $themereport eq "radabs" )
         {
-          $printthis =
-"res -file $resfile -mode script<<TTT
+"cd $thisto/cfg
+res -file ../tmp/$shortresfile -mode script<<TTT
 
 3
 $retrdata[0]
@@ -412,7 +420,6 @@ g
 d
 c
 >
-a
 $retfile
 $retfile
 
@@ -443,7 +450,8 @@ $printthis
         elsif ( $themereport eq "airtemp" )
         {
           $printthis =
-"res -file $resfile -mode script<<TTT
+"cd $thisto/cfg
+res -file ../tmp/$shortresfile -mode script<<TTT
 
 3
 $retrdata[0]
@@ -454,7 +462,6 @@ g
 b
 e
 >
-a
 $retfile
 $retfile
 
@@ -483,7 +490,8 @@ $printthis
         elsif ( $themereport eq "radtemp" )
         {
           $printthis =
-"res -file $resfile -mode script<<TTT
+"cd $thisto/cfg
+res -file ../tmp/$shortresfile -mode script<<TTT
 
 3
 $retrdata[0]
@@ -494,7 +502,6 @@ g
 b
 e
 >
-a
 $retfile
 $retfile
 
@@ -523,7 +530,7 @@ $printthis
         elsif ( $themereport eq "restemp" )
         {
           $printthis =
-"res -file $resfile -mode script<<TTT
+"res -file ../tmp/$shortresfile -mode script<<TTT
 
 3
 $retrdata[0]
@@ -534,7 +541,6 @@ g
 b
 e
 >
-a
 $retfile
 $retfile
 
@@ -567,7 +573,6 @@ $printthis
       {
         if ( $tooltype eq "esp-r" )
         {
-
           my $retfile = $datarep{retfile};
           my $reporttitle = $datarep{reporttitle};
           my $themereport = $datarep{themereport};
@@ -602,24 +607,12 @@ $printthis
                 $targetprov =~ s/$mypath\///;
                 my $result = "$mypath/" . "$targetprov";
 
-                #if ( fileno (RETLIST) )
-                #if (not (-e $retlist ) )
-                #{
-                #  if ( $countblock == 0 )
-                #  {
-                    open( RETLIST, ">>$retlist"); # or die;
-                #  }
-                #  else
-                #  {
-                #    open( RETLIST, ">>$retlist"); # or die;
-                #  }
-                #}
+                open( RETLIST, ">>$retlist"); # or die;
 
                 open( RETBLOCK, ">>$retblock"); # or die;
 
                 my $reportdata_ref = $reportdata_ref_ref->[$countreport];
-                @repdata = @$reportdata_ref;
-
+                @repdata = @$reportdata_ref; say $tee "HERE REPDATA: " . dump( @repdata );
 
 
                 my $countitem = 0;
@@ -676,26 +669,27 @@ $printthis
 
                     if ( $themereport eq "temps" )
                     {
-                       retrieve_temperatures_results( $result, $resfile, \@retrdata, $reporttitle, $themereport, $counttheme, $countreport, $retfile );
+
+                       retrieve_temperatures_results( $result, $resfile, $shortresfile, $thisto, \@retrdata, $reporttitle, $themereport, $counttheme, $countreport, $retfile );
                     }
                     elsif ( $themereport eq "comfort"  )
                            #}
            					{
-                      retrieve_comfort_results( $result, $resfile, \@retrdata, $reporttitle, $themereport, $counttheme, $countreport, $retfile );
+                      retrieve_comfort_results( $result, $resfile, $shortresfile, $thisto, \@retrdata, $reporttitle, $themereport, $counttheme, $countreport, $retfile );
                     }
                     elsif ( ( ( $themereport eq "loads" ) or ( $themereport eq "tempsstats"  ) ) )
                     {
-                      say $tee "IN NEWRETRIEVE \$result $result, \$resfile $resfile, \@retrdata @retrdata, \$reporttitle $reporttitle,
+                      say $tee "IN NEWRETRIEVE \$result $result, \$resfile $resfile, $shortresfile. \@retrdata @retrdata, \$reporttitle $reporttitle,
                       \$themereport $themereport, \$counttheme $counttheme,
-                            \$countreport $countreport, \$retfile $retfile, \$semaphorego1 $semaphorego1, \$semaphorego2 $semaphorego2,
+                            \$countrep$shortresfile, ort $countreport, \$retfile $retfile, \$semaphorego1 $semaphorego1, \$semaphorego2 $semaphorego2,
                             \$semaphorestop1 $semaphorestop1, \$semaphorestop2 $semaphorestop2, \$textpattern $textpattern, \$afterlines $afterlines";
-                      retrieve_stats_results( $result, $resfile, \@retrdata, $reporttitle, $themereport, $counttheme,
+                      retrieve_stats_results( $result, $resfile, $shortresfile, $thisto, \@retrdata, $reporttitle, $themereport, $counttheme,
                             $countreport, $retfile, $semaphorego1, $semaphorego2, $semaphorestop1, $semaphorestop2, $textpattern, $afterlines );
                     }
                     elsif ( ( $themereport eq "radent" ) or ( $themereport eq "radabs" ) or ( $themereport eq "airtemp" ) or ( $themereport eq "radtemp" ) or ( $themereport eq "restemp" ) )
                     {
 
-                      retrieve_adhoc( $result, $resfile, \@retrdata, $reporttitle, $themereport, $counttheme,
+                      retrieve_adhoc( $result, $resfile, $shortresfile, $thisto, \@retrdata, $reporttitle, $themereport, $counttheme,
                             $countreport, $retfile, $semaphorego1, $semaphorego2, $semaphorestop1, $semaphorestop2, $textpattern, $afterlines );
                     }
                   }
@@ -843,6 +837,7 @@ sub newreport # This function retrieves the results of interest from the texts f
   my %simtitles = %main::simtitles;
   my %retrievedata = %main::retrievedata;
   my @keepcolumns = @main::keepcolumns;
+  my @weighttransforms = @main::weighttransforms;
   my @weights = @main::weights;
   my @weightsaim = @main::weightsaim;
   my @varthemes_report = @main::varthemes_report;
@@ -871,7 +866,7 @@ sub newreport # This function retrieves the results of interest from the texts f
 
   $tee = new IO::Tee(\*STDOUT, ">>$tofile"); # GLOBAL
 
-  say $tee "\nNow in Sim::OPT::Report::newreport.\n";
+  say $tee "\nNow in Sim::OPT::Report::newreport\n";
 
   my %dt = %{ $_[0] };
   my %d = %{ $dt{instance} };
@@ -1003,7 +998,7 @@ sub newreport # This function retrieves the results of interest from the texts f
         foreach $ret_ref ( ( @{ $notecases[ $countcase ][ $countblock ][ $counttool ][ $countinstance ] } ) )
         {
           %retitem = %$ret_ref;
-          my $retfile = $retitem{retfile};
+          my $retfile = $retitem{retfile}; #say $tee "IN REPORT 1 \$retfile $retfile";
           my $reporttitle = $retitem{reporttitle};
           my $themereport = $retitem{themereport};
           my $semaphorego = $retitem{semaphorego};
@@ -1027,7 +1022,7 @@ sub newreport # This function retrieves the results of interest from the texts f
 
           if ( -e $retfile )
           { say $tee "#Inspecting results for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", instance " . ($countinstance + 1) . ", file $retfile, to report $themereport." ;
-
+            #say $tee "IN REPORT 2 \$retfile $retfile";
             open( RETFILE, "$retfile" ) or die( "$!" );
             my @lines = <RETFILE>;
             close RETFILE;
@@ -1040,20 +1035,17 @@ sub newreport # This function retrieves the results of interest from the texts f
 
             foreach my $line ( @lines )
             {
-              $line =~ s/^\s//;
-              $line =~ s/^\s//;
-              $line =~ s/^\s//;
-              $line =~ s/://;
-              #$line =~ s/(\s+)/\s/;
-              $line =~ s/(\s+)/,/;
-              my @elts = split( ",", $line );
+              chomp $line;
+              $line =~ s/^(\s+)//;
+              $line =~ s/:\s/:/g;
+              $line =~ s/(\s+)/ /g;
+              my @elts = split( " ", $line );
               my $elt = $elts[$column];
 
               if ( ( not ( defined( $semaphorego ) ) ) or ( $semaphorego eq "" ) or ( $line =~ m/$semaphorego/ ) )
               {
                 $semaphore = "on";
               }
-
 
               if ( ( not ( defined( $semaphorego1 ) ) ) or ( $semaphorego1 eq "" ) or ( $line =~ m/$semaphorego1/ ) )
               {
@@ -1085,18 +1077,18 @@ sub newreport # This function retrieves the results of interest from the texts f
 
               if ( ( not ( defined ( $afterlines ) ) ) or ( $afterlines eq "" ) )
               {
-                if ( ( $textpattern ne "" ) and ( $line =~ m/$textpattern/ ) and ( $semaphore1 eq "on" ) and ( $semaphore2 eq "on" ) )
+                if ( ( $textpattern ne "" ) and ( $line =~ m/^$textpattern/ ) and ( $semaphore1 eq "on" ) and ( $semaphore2 eq "on" ) )
                 {
                   #chomp( $line )
                   if ( $foundhit == 0 )
                   {
                     unless ( $reportstrategy eq "new" )
                     {
-                      push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, "$themereport,$reporttitle,$line" );
+                      push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, "$line" );
                     }
                     else
                     { #say $tee "NEWSTRATEGY";
-                      push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, "$themereport,$reporttitle,$elt" );
+                      push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, "$elt" );
                     }
                   }
                   else
@@ -1115,7 +1107,7 @@ sub newreport # This function retrieves the results of interest from the texts f
               }
               else
               {
-                if ( ( $textpattern ne "" ) and ( $line =~ m/$textpattern/ ) and ( $semaphore1 eq "on" ) and ( $semaphore2 eq "on" ) )
+                if ( ( $textpattern ne "" ) and ( $line =~ m/^$textpattern/ ) and ( $semaphore1 eq "on" ) and ( $semaphore2 eq "on" ) )
                 {
                   $signalhit++;
                 }
@@ -1129,11 +1121,11 @@ sub newreport # This function retrieves the results of interest from the texts f
                     {
                       unless ( $reportstrategy eq "new" )
                       {
-                        push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, "$themereport,$reporttitle,$line" );
+                        push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, "$line" );
                       }
                       else
                       {
-                        push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, "$themereport,$reporttitle,$elt" );
+                        push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, "$elt" );
                       }
                       $countli++;
                     }
@@ -1168,11 +1160,11 @@ sub newreport # This function retrieves the results of interest from the texts f
                           {
                             unless ( $reportstrategy eq "new" )
                             {
-                              push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, "$themereport,$reporttitle,$line" );
+                              push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, "$line" );
                             }
                             else
                             {
-                              push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, "$themereport,$reporttitle,$elt" );
+                              push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, "$elt" );
                             }
                           }
                           else
@@ -1362,7 +1354,7 @@ Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2018 by Gian Luca Brunetti and Politecnico di Milano. This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+Copyright (C) 2008-2021 by Gian Luca Brunetti and Politecnico di Milano. This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
 
 =cut

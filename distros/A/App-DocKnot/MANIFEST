@@ -12,11 +12,13 @@ lib/App/DocKnot/Config.pm
 lib/App/DocKnot/Dist.pm
 lib/App/DocKnot/Generate.pm
 lib/App/DocKnot/Spin.pm
+lib/App/DocKnot/Spin/Pointer.pm
 lib/App/DocKnot/Spin/RSS.pm
 lib/App/DocKnot/Spin/Sitemap.pm
 lib/App/DocKnot/Spin/Thread.pm
 lib/App/DocKnot/Spin/Versions.pm
 lib/App/DocKnot/Update.pm
+lib/App/DocKnot/Util.pm
 LICENSE
 MANIFEST			This list of files
 MANIFEST.SKIP
@@ -26,6 +28,8 @@ share/licenses.yaml
 share/schema/config.yaml
 share/schema/docknot.yaml
 share/schema/licenses.yaml
+share/schema/pointer.yaml
+share/templates/html.tmpl
 share/templates/readme-md.tmpl
 share/templates/readme.tmpl
 share/templates/thread.tmpl
@@ -98,7 +102,7 @@ t/data/spin/input/names.png
 t/data/spin/input/random.th
 t/data/spin/input/reviews/books/.macros
 t/data/spin/input/reviews/books/0-385-49362-2.th
-t/data/spin/input/software/docknot/api/app-docknot.rpod
+t/data/spin/input/software/docknot/api/app-docknot.spin
 t/data/spin/input/software/docknot/index.th
 t/data/spin/input/software/index.th
 t/data/spin/input/usefor/drafts/draft-ietf-usefor-message-id-01.txt
@@ -106,6 +110,12 @@ t/data/spin/input/usefor/drafts/draft-ietf-usefor-posted-mailed-01.txt
 t/data/spin/input/usefor/drafts/draft-ietf-usefor-useage-01.txt
 t/data/spin/input/usefor/drafts/draft-lindsey-usefor-signed-01.txt
 t/data/spin/input/usefor/index.th
+t/data/spin/markdown/input/.sitemap
+t/data/spin/markdown/input/other.spin
+t/data/spin/markdown/input/test.spin
+t/data/spin/markdown/output/other.html
+t/data/spin/markdown/output/test.html
+t/data/spin/markdown/test.md
 t/data/spin/output/changes.html
 t/data/spin/output/changes.rss
 t/data/spin/output/index.html
@@ -227,6 +237,7 @@ t/lib/Test/RRA/ModuleVersion.pm
 t/metadata/licenses.t
 t/spin/errors.t
 t/spin/file.t
+t/spin/markdown.t
 t/spin/sitemap.t
 t/spin/thread.t
 t/spin/tree.t

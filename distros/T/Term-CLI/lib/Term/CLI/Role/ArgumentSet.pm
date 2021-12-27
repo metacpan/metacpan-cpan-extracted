@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI::Role::ArgumentSet  0.052003 {
+package Term::CLI::Role::ArgumentSet  0.053006 {
 
 use 5.014;
 use strict;
@@ -98,7 +98,7 @@ Term::CLI::Role::ArgumentSet - Role for (sub-)commands in Term::CLI
 
 =head1 VERSION
 
-version 0.052003
+version 0.053006
 
 =head1 SYNOPSIS
 

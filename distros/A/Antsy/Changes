@@ -1,5 +1,12 @@
 # Changes for Antsy
 
+0.903 2021-12-24T16:17:51Z
+	* The previous release had a problem with the Changes file
+
+0.902 2021-12-24T16:06:36Z
+	* ki3v sent a correction for the ordering of the clear_* numbers. Github #1
+	* Added iTerm2 sequences https://iterm2.com/documentation-escape-codes.html
+
 0.901 2021-02-25T20:33:25Z
 	* First release.
 

@@ -1,5 +1,9 @@
 Revision history for Task-BeLike-RJBS
 
+20211226.000 2021-12-26 10:02:21-05:00 America/New_York
+            - add Module::CPANfile -- I keep forgetting how to get
+              cpanfile-dump, which I always want
+
 20210619.000 2021-06-19 08:54:23-04:00 America/New_York
             - update list based on things I keep installing
             - bump lowest version to v5.20.0, which it effectively was

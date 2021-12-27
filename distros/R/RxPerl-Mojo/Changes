@@ -1,5 +1,13 @@
 Revision history for Perl extension RxPerl-Mojo
 
+v6.8.1 2021-12-26T11:17:23Z
+
+    - added dependency to 'parent' module for perl v5.10
+
+v6.8.0 2021-12-26T07:48:15Z
+
+    - switched license back to the license of Perl
+
 v6.7.0 2021-12-16T08:25:06Z
 
     - added community code of conduct

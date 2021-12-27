@@ -49,6 +49,7 @@ do { my $x = {
                                       'LWP::Protocol::https' => '0',
                                       'List::AllUtils' => '0',
                                       'Log::Dispatchouli' => '2.000',
+                                      'Module::CPANfile' => '0',
                                       'Module::Which' => '0',
                                       'Moose' => '1.19',
                                       'MooseX::StrictConstructor' => '0',

@@ -62,7 +62,7 @@ sub __new {
                 die sprintf(
                       qq{%s: %s/format is set to `%s' which do not support }.
                       qq{encryption. Use `modern' instead, or just omit it.\n},
-                      $TL->INI->_filename, $this->{group}, $format);
+                      $TL->INI->getFilePath, $this->{group}, $format);
             }
         }
         else {
@@ -76,7 +76,7 @@ sub __new {
                 die sprintf(
                       qq{%s: %s/format is set to `%s' which is unknown to the }.
                       qq{current version of Tripletail.\n},
-                      $TL->INI->_filename, $this->{group}, $format);
+                      $TL->INI->getFilePath, $this->{group}, $format);
             }
         }
     };

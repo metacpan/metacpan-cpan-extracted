@@ -1,4 +1,4 @@
-use v5.28;
+use v5.32;
 
 package Antsy;
 use strict;
@@ -46,7 +46,7 @@ my $github    = 'https://github.com/briandfoy/antsy';
 my $main_file = catfile( 'lib', split /::/, "$module.pm" );
 
 my %WriteMakefile = (
-	'MIN_PERL_VERSION' => '5.026',
+	'MIN_PERL_VERSION' => '5.032',
 
 	'NAME'          => $module,
 	'ABSTRACT_FROM' => $main_file,

@@ -32,7 +32,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "perl" : "5.026"
+            "perl" : "5.032"
          }
       },
       "test" : {
@@ -53,6 +53,6 @@
          "web" : "https://github.com/briandfoy/antsy"
       }
    },
-   "version" : "0.901",
+   "version" : "0.903",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

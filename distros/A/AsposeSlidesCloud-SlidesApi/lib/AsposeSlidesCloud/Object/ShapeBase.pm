@@ -42,6 +42,7 @@ use AsposeSlidesCloud::Object::FillFormat;
 use AsposeSlidesCloud::Object::LineFormat;
 use AsposeSlidesCloud::Object::ResourceBase;
 use AsposeSlidesCloud::Object::ResourceUri;
+use AsposeSlidesCloud::Object::ThreeDFormat;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -266,6 +267,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'three_d_format' => {
+    	datatype => 'ThreeDFormat',
+    	base_name => 'ThreeDFormat',
+    	description => 'Gets or sets the 3D format',
+    	format => '',
+    	read_only => '',
+    		},
     'line_format' => {
     	datatype => 'LineFormat',
     	base_name => 'LineFormat',
@@ -297,6 +305,7 @@ __PACKAGE__->swagger_types( {
     'shapes' => 'ResourceUri',
     'fill_format' => 'FillFormat',
     'effect_format' => 'EffectFormat',
+    'three_d_format' => 'ThreeDFormat',
     'line_format' => 'LineFormat',
     'type' => 'string'
 } );
@@ -316,6 +325,7 @@ __PACKAGE__->attribute_map( {
     'shapes' => 'Shapes',
     'fill_format' => 'FillFormat',
     'effect_format' => 'EffectFormat',
+    'three_d_format' => 'ThreeDFormat',
     'line_format' => 'LineFormat',
     'type' => 'Type'
 } );

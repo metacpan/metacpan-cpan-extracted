@@ -9,6 +9,7 @@ t/00_load.t
 t/10_basic.t
 t/20_shaper.t
 t/30_kern.t
+t/31_extents.t
 t/Lohit-Devanagari.ttf
 t/NimbusRoman-Regular.otf
 lib/HarfBuzz/Shaper.pm

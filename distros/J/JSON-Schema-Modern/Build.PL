@@ -89,7 +89,7 @@ EOW
         "Karen Etheridge <ether\@cpan.org>"
       ],
       "dist_name" => "JSON-Schema-Modern",
-      "dist_version" => "0.531",
+      "dist_version" => "0.533",
       "license" => "perl",
       "module_name" => "JSON::Schema::Modern",
       "recursive_test_files" => 1,
@@ -99,6 +99,7 @@ EOW
         "Exporter" => 0,
         "Feature::Compat::Try" => 0,
         "File::ShareDir" => 0,
+        "Getopt::Long::Descriptive" => 0,
         "JSON::MaybeXS" => "1.004001",
         "JSON::PP" => 0,
         "List::Util" => "1.55",
@@ -122,12 +123,16 @@ EOW
         "experimental" => 0,
         "if" => 0,
         "namespace::clean" => 0,
+        "open" => 0,
         "overload" => 0,
         "perl" => "v5.20.0",
         "strict" => 0,
         "strictures" => 2,
         "warnings" => 0
       },
+      "script_files" => [
+        "script/json-schema-eval"
+      ],
       "share_dir" => {
         "dist" => "share"
       },
@@ -144,7 +149,6 @@ EOW
         "Test::More" => "0.96",
         "Test::Warnings" => 0,
         "lib" => 0,
-        "open" => 0,
         "perl" => "v5.20.0",
         "utf8" => 0
       }
@@ -164,7 +168,6 @@ EOW
       "Test::More" => "0.96",
       "Test::Warnings" => 0,
       "lib" => 0,
-      "open" => 0,
       "perl" => "v5.20.0",
       "utf8" => 0
     );

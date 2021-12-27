@@ -1,4 +1,4 @@
-                             Pod::Thread 3.00
+                             Pod::Thread 3.01
          (Format POD source into thread, an HTML macro language)
                 Maintained by Russ Allbery <rra@cpan.org>
 
@@ -9,26 +9,22 @@
 BLURB
 
   Pod::Thread translates POD source into thread, a macro language
-  processed by spin.  It supports optionally adding a table of contents
+  processed by DocKnot.  It supports optionally adding a table of contents
   and a navigation bar to the genenerated file.  This package also
-  includes the pod2thread driver script, invoked automatically by spin for
-  POD files and pointers to POD files.
+  includes the pod2thread driver script for easy command-line access to
+  the converter.
 
 DESCRIPTION
 
   This package contains a module to translate POD into thread, an HTML
-  macro language.  As such, it's not very useful without spin [1], a
-  separate program to convert thread into HTML.  I wrote this module for
-  my personal needs and it may not be (and in fact probably isn't)
-  suitable for more general use as yet.
+  macro language.  As such, it is primarily intended to support DocKnot
+  [1], the static site generator that converts thread into HTML.
+  Pod::Thread provides the POD formatting for DocKnot.
 
-  [1] https://www.eyrie.org/~eagle/software/web/
+  [1] https://www.eyrie.org/~eagle/software/docknot/
 
-  The eventual intention is to incorporate spin into DocKnot [2], at which
-  point this module will provide the POD support for DocKnot as a static
-  site generator.  I have no estimate for when that work will be done.
-
-  [2] https://www.eyrie.org/~eagle/software/docknot/
+  DocKnot and this module were written for my personal needs and may not
+  be suitable for more general use.
 
   The conversion done by this module is mostly straightforward.  The only
   notable parts are the optional generation of a table of contents or a
@@ -37,7 +33,7 @@ DESCRIPTION
 REQUIREMENTS
 
   Perl 5.24 or later.  As mentioned above, it's also not particularly
-  useful without spin.
+  useful without DocKnot.
 
 BUILDING AND INSTALLATION
 

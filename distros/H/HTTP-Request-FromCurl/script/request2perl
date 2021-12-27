@@ -10,7 +10,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 
 my $has_tidy;
 BEGIN { eval { require Perl::Tidy; $has_tidy = 1; } }

@@ -35,8 +35,8 @@ my $data_ref = $config->config();
 ok($data_ref->{build}{install}, 'build/install defaults to true');
 
 # Check that the license data is expanded correctly.
-my $licenses_path    = module_file('App::DocKnot', 'licenses.yaml');
-my $licenses_ref     = YAML::XS::LoadFile($licenses_path);
+my $licenses_path = module_file('App::DocKnot', 'licenses.yaml');
+my $licenses_ref = YAML::XS::LoadFile($licenses_path);
 my $perl_license_ref = $licenses_ref->{Perl};
 is($data_ref->{license}{summary}, $perl_license_ref->{summary}, 'summary');
-is($data_ref->{license}{text},    $perl_license_ref->{text},    'text');
+is($data_ref->{license}{text}, $perl_license_ref->{text}, 'text');

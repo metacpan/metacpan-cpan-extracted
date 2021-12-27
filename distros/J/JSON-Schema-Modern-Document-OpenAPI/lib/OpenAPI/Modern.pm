@@ -5,7 +5,7 @@ package OpenAPI::Modern;
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -187,16 +187,16 @@ sub validate_response ($self, $response, $options) {
 
     $state->{schema_path} = jsonp('/paths', $path_template, $method);
 
-    my $response_property = first { exists $operation->{responses}{$_} }
+    my $response_name = first { exists $operation->{responses}{$_} }
       $response->code, substr(sprintf('%03s', $response->code), 0, -2).'XX', 'default';
 
-    if (not $response_property) {
+    if (not $response_name) {
       ()= E({ %$state, keyword => 'responses' }, 'no response object found for code %s', $response->code);
       return $self->_result($state);
     }
 
-    my $response_obj = $operation->{responses}{$response_property};
-    $state->{schema_path} = jsonp($state->{schema_path}, 'responses', $response_property);
+    my $response_obj = $operation->{responses}{$response_name};
+    $state->{schema_path} = jsonp($state->{schema_path}, 'responses', $response_name);
     while (my $ref = $response_obj->{'$ref'}) {
       $response_obj = $self->_resolve_ref($ref, $state);
     }
@@ -369,12 +369,11 @@ sub _validate_body_content ($self, $state, $content_obj, $message) {
       'missing header: Content-Type')
     if not length $content_type;
 
-  # we don't support */* here because what is the point? if you want to test string length,
-  # check the Content-Length header.
   my $media_type = (first { $content_type eq fc } keys $content_obj->%*)
-    // (first { m{([^/]+)/\*$} && fc($content_type) =~ m{^\F$1/[^/]+$} } keys $content_obj->%*);
+    // (first { m{([^/]+)/\*$} && fc($content_type) =~ m{^\F\Q$1\E/[^/]+$} } keys $content_obj->%*);
+  $media_type = '*/*' if not defined $media_type and exists $content_obj->{'*/*'};
   return E({ %$state, keyword => 'content' }, 'incorrect Content-Type "%s"', $content_type)
-    if not $media_type;
+    if not defined $media_type;
 
   if (exists $content_obj->{$media_type}{encoding}) {
     my $state = { %$state, schema_path => jsonp($state->{schema_path}, 'content', $media_type) };
@@ -410,9 +409,10 @@ sub _validate_body_content ($self, $state, $content_obj, $message) {
 
   # use the original Content-Type, NOT the possibly wildcard media type from the document
   my $media_type_decoder = $self->get_media_type($content_type);  # case-insensitive, wildcard lookup
+  $media_type_decoder = sub ($content_ref) { $content_ref } if $media_type eq '*/*';
   if (not $media_type_decoder) {
     # don't fail if the schema would pass on any input
-    return if is_plain_hashref($schema) ? !keys %$schema : $schema;
+    return if not defined $schema or is_plain_hashref($schema) ? !keys %$schema : $schema;
 
     abort({ %$state, keyword => 'content', _schema_path_suffix => $media_type },
       'EXCEPTION: unsupported Content-Type "%s": add support with $openapi->add_media_type(...)', $content_type)
@@ -425,6 +425,8 @@ sub _validate_body_content ($self, $state, $content_obj, $message) {
     return E({ %$state, keyword => 'content', _schema_path_suffix => $media_type },
       'could not decode content as %s: %s', $media_type, $e =~ s/^(.*)\n/$1/r);
   }
+
+  return 1 if not defined $schema;
 
   $state = { %$state, schema_path => jsonp($state->{schema_path}, 'content', $media_type, 'schema') };
   $self->_evaluate_subschema($decoded_content_ref->$*, $schema, $state);
@@ -501,7 +503,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI docume
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 

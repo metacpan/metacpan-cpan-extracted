@@ -10,7 +10,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Generate 5.00;
+package App::DocKnot::Generate 6.00;
 
 use 5.024;
 use autodie;
@@ -25,7 +25,7 @@ use Text::Wrap qw(wrap);
 
 # Default output files for specific templates.
 my %DEFAULT_OUTPUT = (
-    'readme'    => 'README',
+    'readme' => 'README',
     'readme-md' => 'README.md',
 );
 
@@ -77,11 +77,11 @@ sub _code_for_copyright {
         my $notice;
         for my $copyright ($copyrights_ref->@*) {
             my $holder = $copyright->{holder};
-            my $years  = $copyright->{years};
+            my $years = $copyright->{years};
 
             # Build the initial notice with the word copyright and the years.
             my $text = 'Copyright ' . $copyright->{years};
-            local $Text::Wrap::columns  = $self->{width} + 1;
+            local $Text::Wrap::columns = $self->{width} + 1;
             local $Text::Wrap::unexpand = 0;
             $text = wrap($prefix, $prefix . q{ } x 4, $text);
 
@@ -174,11 +174,12 @@ sub _code_for_to_text {
         # numeric references, and accumulate the mapping of numbers to URLs in
         # %urls.  Then, add to the end of the paragraph the references and
         # URLs.
-        my $ref        = 1;
+        my $ref = 1;
         my @paragraphs = split(m{ \n\n }xms, $text);
         for my $para (@paragraphs) {
             my %urls;
-            while ($para =~ s{ \[([^\]]+)\] [(] (\S+) [)] }{$1 [$ref]}xms) {
+            my $regex = qr{ \[([^\]]+)\] [(] (\S+) [)] }xms;
+            while ($para =~ s{$regex}{$1 [$ref]}xms) {
                 $urls{$ref} = $2;
                 $ref++;
             }
@@ -375,9 +376,9 @@ sub _wrap_paragraph {
     $para =~ s{ \n(\S) }{ $1}xmsg;
 
     # Force locally correct configuration of Text::Wrap.
-    local $Text::Wrap::break    = qr{\s+}xms;
-    local $Text::Wrap::columns  = $self->{width} + 1;
-    local $Text::Wrap::huge     = 'overflow';
+    local $Text::Wrap::break = qr{\s+}xms;
+    local $Text::Wrap::columns = $self->{width} + 1;
+    local $Text::Wrap::huge = 'overflow';
     local $Text::Wrap::unexpand = 0;
 
     # Do the wrapping.  This modifies @paragraphs in place.
@@ -447,7 +448,7 @@ sub new {
     # Create and return the object.
     my $self = {
         config => $config,
-        width  => $args_ref->{width} // 74,
+        width => $args_ref->{width} // 74,
     };
     bless($self, $class);
     return $self;
@@ -472,10 +473,10 @@ sub generate {
     my %vars = %{$data_ref};
 
     # Add code references for our defined helper functions.
-    $vars{center}    = $self->_code_for_center;
+    $vars{center} = $self->_code_for_center;
     $vars{copyright} = $self->_code_for_copyright($data_ref->{copyrights});
-    $vars{indent}    = $self->_code_for_indent;
-    $vars{to_text}   = $self->_code_for_to_text;
+    $vars{indent} = $self->_code_for_indent;
+    $vars{to_text} = $self->_code_for_to_text;
     $vars{to_thread} = $self->_code_for_to_thread;
 
     # Ensure we were given a valid template.

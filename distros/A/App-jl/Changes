@@ -1,77 +1,12 @@
-Revision history for Perl extension App::jl
+## App::jl commit log
 
-0.16    Mon Aug 26 06:05:44 JST 2019
-        - Improve label handling
+https://github.com/bayashi/App-jl/commits/main
 
-0.15    Sun Aug  4 13:43:58 JST 2019
-        - Fixed minor typo in the pod. (Thanks, Mohammad S Anwar)
-        - Ignore too large number for unix timestamp
+## Tags
 
-0.14    Sun Jul  7 06:01:30 JST 2019
-        - Remove `depth` option
-        - Add `X` option
-        - Add test for aliases of CLI option parser
-        - Fix bug: Not call recursively if value would be number
+https://github.com/bayashi/App-jl/tags
 
-0.13    Mon Jul  1 15:03:15 JST 2019
-        - Add `sweep` option
-        - Support multiple grep/ignore options
-        - Not affect such an UserAgent value
-        - Skip a line just consists of [\t\s\r\n]
-        - Fix .travis.yml
-        - Improve POD/README
-        - Tiny refactors
+## Last Release
 
-0.12    Sun Jun 23 14:42:37 JST 2019
-        - Add `grep` and `ignore` options
-        - Add `stderr` option
-        - Add `xxxxx` option to convert unix timestamp forcely
-        - Add `unbuffered` option
-        - Refactor
-
-0.11    Sat Jun 22 01:06:15 JST 2019
-        - Add head line for YAML output
-
-0.10    Sat Jun 15 22:52:15 JST 2019
-        - Support YAML for output
-        - improve doc
-        - refactor
-
-0.09    Sat Jun 15 00:47:35 JST 2019
-        - Convert unixtime if 'timestamp-key' is set without 'xxxx' option
-        - Add 'gmtime' option to treat unixtime for GMT
-        - Trim trailing chars
-        - Improve doc
-        - Tiny refactor
-
-0.08    Tue Jun 11 14:02:20 JST 2019
-        - Add `xxxx` option
-        - Sort invoking order
-        - Improve some logics
-
-0.07    Sun Jun  9 14:10:13 JST 2019
-        - Add `xx` and `xxx` option
-        - Add `timestamp-key` option to specify unix timestamp value by hash key
-
-0.06    Sun May 12 05:01:42 JST 2019
-        - Sort keys for output
-        - Refactor
-        - Improve test
-
-0.05    Fri May 10 16:27:02 JST 2019
-        - Add `x` option
-        - Improve documents
-        - Fix dependency
-
-0.04    Sun May  5 13:26:26 JST 2019
-        - Improve test coverage
-
-0.03    Sun May  5 13:13:13 JST 2019
-        - Improve test coverage
-
-0.02    Sun May  5 12:40:09 JST 2019
-        - Fix test
-        - Fix docs
-
-0.01    Sun May  5 02:09:15 JST 2019
-        - original version
+0.20   Sun Dec 26 00:34:51 UTC 2021
+    - https://github.com/bayashi/App-jl/compare/0.19...0.20

@@ -85,6 +85,9 @@ my %WriteMakefileArgs = (
     "Module::Build::Tiny" => "0.034"
   },
   "DISTNAME" => "JSON-Schema-Modern",
+  "EXE_FILES" => [
+    "script/json-schema-eval"
+  ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.020000",
   "NAME" => "JSON::Schema::Modern",
@@ -95,6 +98,7 @@ my %WriteMakefileArgs = (
     "Exporter" => 0,
     "Feature::Compat::Try" => 0,
     "File::ShareDir" => 0,
+    "Getopt::Long::Descriptive" => 0,
     "JSON::MaybeXS" => "1.004001",
     "JSON::PP" => 0,
     "List::Util" => "1.55",
@@ -118,6 +122,7 @@ my %WriteMakefileArgs = (
     "experimental" => 0,
     "if" => 0,
     "namespace::clean" => 0,
+    "open" => 0,
     "overload" => 0,
     "strict" => 0,
     "strictures" => 2,
@@ -136,10 +141,9 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.96",
     "Test::Warnings" => 0,
     "lib" => 0,
-    "open" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.531",
+  "VERSION" => "0.533",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -153,6 +157,7 @@ my %FallbackPrereqs = (
   "Feature::Compat::Try" => 0,
   "File::ShareDir" => 0,
   "File::Spec" => 0,
+  "Getopt::Long::Descriptive" => 0,
   "JSON::MaybeXS" => "1.004001",
   "JSON::PP" => 0,
   "List::Util" => "1.55",

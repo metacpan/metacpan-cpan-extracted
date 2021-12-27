@@ -1,7 +1,7 @@
 #! /usr/bin/perl 
 
 use Date::Holidays::AU qw( is_holiday holidays );
-use Test::More(tests => 157 );
+use Test::More(tests => 159 );
 use strict;
 use warnings;
 
@@ -149,6 +149,7 @@ ok(is_holiday(2019, 9, 30, 'WA'), "WA Queens Birthday 2019");
 ok(is_holiday(2020, 9, 28, 'WA'), "WA Queens Birthday 2020");
 ok(is_holiday(2021, 9, 27, 'WA'), "WA Queens Birthday 2021");
 ok(is_holiday(2022, 9, 26, 'WA'), "WA Queens Birthday 2022");
+ok(is_holiday(2023, 9, 25, 'WA'), "WA Queens Birthday 2023");
 my ($year) = (localtime(time))[5] + 1900 + 1;
 eval { is_holiday($year, 1, 1, 'WA'); };
 ok($@ eq '', "WA Queens Birthday next year ($year)");
@@ -190,5 +191,6 @@ ok(is_holiday(2018, 9, 28, 'VIC'), "Grand Final Eve 2018");
 ok(is_holiday(2019, 9, 27, 'VIC'), "Grand Final Eve 2019");
 ok(is_holiday(2020, 10, 23, 'VIC'), "Grand Final Eve / Thank you 2020");
 ok(is_holiday(2021, 9, 24, 'VIC'), "Grand Final Eve 2021");
+ok(is_holiday(2022, 9, 23, 'VIC'), "Grand Final Eve 2022");
 eval { is_holiday($year + 2, 1, 1, 'VIC'); };
 ok($@ =~ /^Don't know how to calculate Grand Final Eve Day/, "Attempting to calculate Grand Final Eve too far in the future throws exception");

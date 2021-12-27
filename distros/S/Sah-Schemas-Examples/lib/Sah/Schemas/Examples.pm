@@ -1,7 +1,7 @@
 package Sah::Schemas::Examples;
 
 our $DATE = '2021-07-30'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 1;
 # ABSTRACT: Various example Sah schemas
@@ -18,7 +18,7 @@ Sah::Schemas::Examples - Various example Sah schemas
 
 =head1 VERSION
 
-This document describes version 0.007 of Sah::Schemas::Examples (from Perl distribution Sah-Schemas-Examples), released on 2021-07-30.
+This document describes version 0.009 of Sah::Schemas::Examples (from Perl distribution Sah-Schemas-Examples), released on 2021-07-30.
 
 =head1 SAH SCHEMAS
 
@@ -38,6 +38,10 @@ Array of positive integers.
 
 A sample schema.
 
+This is just a simple schema based on C<str> with no additional restriction
+clauses.
+
+
 =item * L<example::has_merge|Sah::Schema::example::has_merge>
 
 Even integer.
@@ -53,6 +57,10 @@ schema would become "positive even integer."
 
 Recursive schema.
 
+This schema will cause the resolver L<Data::Sah::Resolve> to bail because it
+recurses to itself.
+
+
 =item * L<example::recurse2a|Sah::Schema::example::recurse2a>
 
 Recursive schema.
@@ -60,6 +68,10 @@ Recursive schema.
 =item * L<example::recurse2b|Sah::Schema::example::recurse2b>
 
 Recursive schema.
+
+This schema will cause the resolver L<Data::Sah::Resolve> to bail because it
+eventually recurses to itself.
+
 
 =item * L<hash_of_int|Sah::Schema::hash_of_int>
 

@@ -21,9 +21,9 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = 0.052003;
+our $VERSION = 0.053006;
 
-use parent 0.228 qw( Term::CLI::L10N );
+use parent 0.225 qw( Term::CLI::L10N );
 
 use Locale::Maketext::Lexicon::Gettext 1.00;
 
@@ -301,7 +301,7 @@ Term::CLI::L10N::nl - Dutch localizations for Term::CLI
 
 =head1 VERSION
 
-version 0.052003
+version 0.053006
 
 =head1 SYNOPSIS
 

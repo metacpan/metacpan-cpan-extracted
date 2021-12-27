@@ -5,14 +5,14 @@ This is Perl module B<App::jl>.
 
 =begin html
 
-<a href="https://github.com/bayashi/App-jl/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic-GREEN.png"></a> <a href="http://travis-ci.org/bayashi/App-jl"><img src="https://secure.travis-ci.org/bayashi/App-jl.png?_t=1566766313"/></a> <a href="https://coveralls.io/r/bayashi/App-jl"><img src="https://coveralls.io/repos/bayashi/App-jl/badge.png?_t=1566766313&branch=master"/></a>
+<a href="https://github.com/bayashi/App-jl/blob/main/lib/App/jl.pm"><img src="https://img.shields.io/badge/Version-0.20-green?style=flat"></a> <a href="https://github.com/bayashi/App-jl/blob/main/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic-GREEN.png"></a> <a href="http://travis-ci.org/bayashi/App-jl"><img src="https://secure.travis-ci.org/bayashi/App-jl.png?_t=1640484266"/></a> <a href="https://coveralls.io/r/bayashi/App-jl"><img src="https://coveralls.io/repos/bayashi/App-jl/badge.png?_t=1640484266&branch=main"/></a>
 
 =end html
 
 
 =head1 SYNOPSIS
 
-The B<jl> command allows you to show JSON log nicely. Especially, recursively decoded JSON in JSON string
+The B<jl> command allows you to show the "JSON in JSON" log nicely. Recursively decode JSON in JSON string like below
 
     $ echo '{"foo":"{\"bar\":\"{\\\"baz\\\":123}\"}"}' | jl
     {
@@ -47,7 +47,7 @@ A complecated log can be converted to nice JSON structure to treat a tool like C
        "service" : "Foo-Service"
     }
 
-Make JSON logs more readable.
+Make JSON in JSON logs more readable.
 
 
 =head1 INSTALLATION

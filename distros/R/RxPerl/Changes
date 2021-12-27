@@ -1,5 +1,16 @@
 Revision history for Perl extension RxPerl
 
+v6.12.0 2021-12-26T11:03:24Z
+
+    - added op_ignore_elements
+    - added dependency to 'parent' module for perl v5.10
+
+v6.11.0 2021-12-26T07:15:10Z
+
+    - switched license back to the license of Perl
+    - you can use $_ in map and filter's callbacks
+    - added op_combine_latest_with
+
 v6.10.1 2021-12-16T08:14:39Z
 
     - changed wording in POD (code of conduct)

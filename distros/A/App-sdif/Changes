@@ -1,5 +1,13 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.21.0 2021-12-24T02:25:28Z
+
+    cdif:
+    - Apply VISIBLE effect only for intended chars by --visible.
+
+    watchdiff:
+    - Modularized to lib/watchdiff.pm.
+
 4.20.2 2021-09-29T02:53:59Z
 
     - Fix-up missing short option of watchdiff.

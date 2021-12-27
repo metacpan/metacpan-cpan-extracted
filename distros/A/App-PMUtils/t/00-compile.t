@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 32 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 34 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/ModuleUtils.pm',
@@ -15,6 +15,7 @@ my @module_files = (
 );
 
 my @scripts = (
+    'script/cpanm-this-mod',
     'script/module-dir',
     'script/pmabstract',
     'script/pmbin',
@@ -43,7 +44,8 @@ my @scripts = (
     'script/podlist',
     'script/podpath',
     'script/pwd2mod',
-    'script/rel2mod'
+    'script/rel2mod',
+    'script/update-this-mod'
 );
 
 # no fake home requested

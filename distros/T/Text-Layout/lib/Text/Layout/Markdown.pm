@@ -7,6 +7,8 @@ use Carp;
 
 package Text::Layout::Markdown;
 
+use parent 'Text::Layout';
+
 #### API
 sub new {
     my ( $pkg, @data ) = @_;

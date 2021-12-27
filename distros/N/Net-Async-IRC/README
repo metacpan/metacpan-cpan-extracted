@@ -4,29 +4,31 @@ NAME
 
 SYNOPSIS
 
-     use IO::Async::Loop;
-     use Net::Async::IRC;
+       use Future::AsyncAwait;
     
-     my $loop = IO::Async::Loop->new;
+       use IO::Async::Loop;
+       use Net::Async::IRC;
     
-     my $irc = Net::Async::IRC->new(
-        on_message_text => sub {
-           my ( $self, $message, $hints ) = @_;
+       my $loop = IO::Async::Loop->new;
     
-           print "$hints->{prefix_name} says: $hints->{text}\n";
-        },
-     );
+       my $irc = Net::Async::IRC->new(
+          on_message_text => sub {
+             my ( $self, $message, $hints ) = @_;
     
-     $loop->add( $irc );
+             print "$hints->{prefix_name} says: $hints->{text}\n";
+          },
+       );
     
-     $irc->login(
-        nick => "MyName",
-        host => "irc.example.org",
-     )->get;
+       $loop->add( $irc );
     
-     $irc->do_PRIVMSG( target => "YourName", text => "Hello world!" );
+       await $irc->login(
+          nick => "MyName",
+          host => "irc.example.org",
+       );
     
-     $loop->run;
+       await $irc->do_PRIVMSG( target => "YourName", text => "Hello world!" );
+    
+       $loop->run;
 
 DESCRIPTION
 
@@ -71,14 +73,17 @@ PARAMETERS
       the names of capabilities which will be requested, if the server
       supports them.
 
+      If the sasl capability is requested and supported by the server, the
+      login method will use that.
+
 METHODS
 
-    The following methods documented with a trailing call to ->get return
-    Future instances.
+    The following methods documented in an await expression return Future
+    instances.
 
  connect
 
-       $irc = $irc->connect( %args )->get
+       $irc = await $irc->connect( %args );
 
     Connects to the IRC server. This method does not perform the complete
     IRC login sequence; for that see instead the login method. The returned
@@ -96,7 +101,7 @@ METHODS
     Any other arguments are passed into the underlying IO::Async::Loop
     connect method.
 
-       $irc->connect( %args )
+       $irc->connect( %args );
 
     The following additional arguments are used to provide continuations
     when not returning a Future.
@@ -107,18 +112,18 @@ METHODS
       Usually used by the login method to perform the actual login
       sequence.
 
-       $on_connected->( $irc )
+         $on_connected->( $irc )
 
     on_error => CODE
 
       Continuation to invoke in the case of an error preventing the
       connection from taking place.
 
-       $on_error->( $errormsg )
+         $on_error->( $errormsg )
 
  login
 
-       $irc = $irc->login( %args )->get
+       $irc = await $irc->login( %args );
 
     Logs in to the IRC network, connecting first using the connect method
     if required. Takes the following named arguments:
@@ -140,7 +145,7 @@ METHODS
     method if it is required; i.e. if login is invoked when not yet
     connected to the server.
 
-       $irc->login( %args )
+       $irc->login( %args );
 
     The following additional arguments are used to provide continuations
     when not returning a Future.
@@ -149,11 +154,16 @@ METHODS
 
       A continuation to invoke once login is successful.
 
-       $on_login->( $irc )
+         $on_login->( $irc )
+
+    If the sasl capability was requested and is supported by the server,
+    this will be used instead of the simple USER/PASS command combination.
+
+    At the current version, only the PLAIN SASL mechanism is supported.
 
  change_nick
 
-       $irc->change_nick( $newnick )
+       $irc->change_nick( $newnick );
 
     Requests to change the nick. If unconnected, the change happens
     immediately to the stored defaults. If logged in, sends a NICK command
@@ -165,7 +175,7 @@ IRC v3.1 CAPABILITIES
 
  caps_supported
 
-       $caps = $irc->caps_supported
+       $caps = $irc->caps_supported;
 
     Returns a HASH whose keys give the capabilities listed by the server as
     supported in its CAP LS response. If the server ignored the CAP
@@ -173,14 +183,14 @@ IRC v3.1 CAPABILITIES
 
  cap_supported
 
-       $supported = $irc->cap_supported( $cap )
+       $supported = $irc->cap_supported( $cap );
 
     Returns a boolean indicating if the server supports the named
     capability.
 
  caps_enabled
 
-       $caps = $irc->caps_enabled
+       $caps = $irc->caps_enabled;
 
     Returns a HASH whose keys give the capabilities successfully enabled by
     the server as part of the CAP REQ login sequence. If the server ignored
@@ -188,7 +198,7 @@ IRC v3.1 CAPABILITIES
 
  cap_enabled
 
-       $enabled = $irc->cap_enabled( $cap )
+       $enabled = $irc->cap_enabled( $cap );
 
     Returns a boolean indicating if the client successfully enabled the
     named capability.
@@ -205,9 +215,9 @@ MESSAGE-WRAPPING METHODS
 
  do_NOTICE
 
-       $irc->do_PRIVMSG( target => $target, text => $text )->get
+       await $irc->do_PRIVMSG( target => $target, text => $text );
     
-       $irc->do_NOTICE( target => $target, text => $text )->get
+       await $irc->do_NOTICE( target => $target, text => $text );
 
     Sends a PRIVMSG or NOITICE command.
 

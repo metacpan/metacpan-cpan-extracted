@@ -28,20 +28,49 @@ eval { require DBD::mysql; 1; };
 $@ and plan skip_all => "no DBD::mysql";
 
 eval {
+    local($SIG{__DIE__}) = sub{ die $@ };
     $TL->trapError(
-	-DB   => 'DB',
-	-main => sub {},
+        -DB   => 'DB',
+        -main => sub {},
        );
 };
 if ($@) {
-	plan skip_all => "Failed to connect to local MySQL: $@";
+    plan skip_all => "Failed to connect to local MySQL: $@";
 }
 
-plan tests => 66+24+15;
+plan tests => 4;
 
-&test_mysql; #66.
-&test_tx_transaction; #24.
-&test_old_transaction;  #15.
+subtest 'mysql' => sub {
+    plan tests => 66;
+    test_mysql();
+};
+
+subtest 'tx_transaction' => sub {
+    plan tests => 24;
+    test_tx_transaction();
+};
+
+subtest 'old_transaction' => sub {
+    plan tests => 15;
+    test_old_transaction();
+};
+
+subtest 'db_error_in_tx' => sub {
+    plan tests => 1;
+
+    $TL->trapError(
+        -DB   => 'DB',
+        -main => sub {
+            my $DB = $TL->getDB();
+
+            throws_ok {
+                $DB->tx(
+                    sub {
+                        $DB->execute(q{SELECT @&^(*&$(*@&)(*&@*&^});
+                    });
+            } qr/\bDBD::mysql::st execute failed\b/, 'dying in middle of $DB->tx()';
+        });
+};
 
 sub test_mysql
 {
@@ -359,18 +388,20 @@ sub test_tx_transaction
 				});
 				$s = $DB->selectAllHash("SELECT * FROM test_colors");
 				is(@$s, 4, '[tx_tran] explicit commit');
-				
+
 				eval{ $DB->tx(sub{
 					$DB->execute("DELETE FROM test_colors WHERE sval = ?", 'cyan');
 					$s = $DB->selectAllHash("SELECT * FROM test_colors");
 					is(@$s, 3, '[tx_tran] die implicits rollback, 3 records in tx');
+
+					local $SIG{__DIE__} = 'DEFAULT';
 					die "test\n";
 				}) };
 				is($@, "test\n", "[tx_tran] die in tx");
 				$s = $DB->selectAllHash("SELECT * FROM test_colors");
 				is(@$s, 4, '[tx_tran] die implicits rollback, 4 records after tx');
 			}
-			
+
 			# close-wait.
 			my $pkg = "Tripletail::DB";
 			my $msg = "you can't do anything related to DB after doing rollback or commit in tx";
@@ -381,10 +412,10 @@ sub test_tx_transaction
 			)){
 				throws_ok {
 					$DB->tx(sub{ $DB->commit(); $DB->$meth("SELECT 1"); })
-				} qr/^$pkg#$meth: $msg\b/, "[tx_tran] execute on commit close-wait tx";
+				} qr/\b$pkg#$meth: $msg\b/, "[tx_tran] execute on commit close-wait tx";
 				throws_ok {
 					$DB->tx(sub{ $DB->rollback(); $DB->$meth("SELECT 1"); })
-				} qr/^$pkg#$meth: $msg\b/, "[tx_tran] $meth on rollback close-wait tx";
+				} qr/\b$pkg#$meth: $msg\b/, "[tx_tran] $meth on rollback close-wait tx";
 			}
 		},
 	);

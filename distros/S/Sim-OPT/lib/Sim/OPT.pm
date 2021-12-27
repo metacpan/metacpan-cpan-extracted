@@ -2,7 +2,7 @@ package Sim::OPT;
 # Copyright (C) 2008-2021 by Gian Luca Brunetti and Politecnico di Milano.
 # This is Sim::OPT, a program managing building performance simulation programs for performing optimization by overlapping block coordinate descent.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
-$VERSION = '0.477';
+$VERSION = '0.507';
 use v5.14;
 # use v5.20;
 use Exporter;
@@ -58,7 +58,7 @@ $simnetwork @themereports %simtitles %reporttitles %retrievedata
 @sweeps @miditers @varnumbers @caseseed @chanceseed @chancedata $dimchance $tee @pars_tocheck retrieve
 report newretrieve newreport washn
 $target %dowhat readsweeps $max_processes $computype $calcprocedure %specularratios @totalcases @winneritems
-toil genstar solvestar integratebox filterbox__ clean %dowhat
+toil genstar solvestar integratebox filterbox__ clean %dowhat @weighttransforms
 );
 
 $ABSTRACT = 'Sim::OPT is an optimization and parametric exploration program oriented to problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. It allows a free mix of sequential and parallel block coordinate searches.';
@@ -2216,6 +2216,7 @@ sub exe
 			$dirfiles{repstruct} = $repstruct_ref;
 			$dirfiles{mergestruct} = $mergestruct_ref;
 			$dirfiles{mergecases} = $mergecases_ref;
+			say $tee "#Performed simulations, reporting and retrieving for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
 		}
 	}
 
@@ -2223,6 +2224,7 @@ sub exe
 	{
 		say $tee "#Calling descent for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ".";
 		Sim::OPT::Descend::descend(	{ instances => \@instances, dirfiles => \%dirfiles, vehicles => \%vehicles, inst => \%inst } );
+		say $tee "#Performed descent for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ".";
 	}
 
 	if ( $dowhat{substitutenames} eq "y" )
@@ -2360,7 +2362,7 @@ sub opt
 		$dowhat{hypercubefraction} = 1;
 	}
 
-	$tee = new IO::Tee(\*STDOUT, ">>$tofile"); # GLOBAL ZZZ
+	$tee = new IO::Tee(\*STDOUT, ">>$tofile"); # GLOBAL
 
 	say $tee "\nNow in Sim::OPT. \n";
 	$dowhat{file} = $file;
@@ -2729,7 +2731,7 @@ Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2019 by Gian Luca Brunetti and Politecnico di Milano. This is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+Copyright (C) 2008-2021 by Gian Luca Brunetti and Politecnico di Milano. This is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
 
 =cut

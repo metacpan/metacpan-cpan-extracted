@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-12-01'; # DATE
+our $DATE = '2021-12-03'; # DATE
 our $DIST = 'App-PMUtils'; # DIST
-our $VERSION = '0.737'; # VERSION
+our $VERSION = '0.738'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/pmgrep/pmgrep",
@@ -42,7 +42,7 @@ pmgrep - Print lines from installed Perl module sources matching a pattern
 
 =head1 VERSION
 
-This document describes version 0.737 of pmgrep (from Perl distribution App-PMUtils), released on 2021-12-01.
+This document describes version 0.738 of pmgrep (from Perl distribution App-PMUtils), released on 2021-12-03.
 
 =head1 SYNOPSIS
 

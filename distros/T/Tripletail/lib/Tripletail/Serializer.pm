@@ -13,7 +13,12 @@ use Compress::Zlib qw(
 use Crypt::CBC ();
 use Crypt::Rijndael ();
 use Data::Dumper ();
-use Encode qw(decode_utf8 encode_utf8);
+BEGIN {
+    # Workaround for Encode < 2.26. See t/old-encode-pm.t
+    local $SIG{__DIE__} = 'DEFAULT';
+    require Encode;
+    Encode->import(qw(decode_utf8 encode_utf8));
+}
 use POSIX qw(ceil);
 use Scalar::Util qw(blessed);
 use constant {

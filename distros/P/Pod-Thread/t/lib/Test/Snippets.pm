@@ -52,7 +52,7 @@ sub _stderr_save {
     }
     my $path = File::Spec->catfile($tmpdir, "out$$.err");
     open($OLD_STDERR, '>&', \*STDERR);
-    open(STDERR,      '>',  $path);
+    open(STDERR, '>', $path);
     $SAVED_STDERR = $path;
     return;
 }
@@ -181,7 +181,7 @@ sub test_snippet {
     $parser->output_string(\$got);
     eval { $parser->parse_string_document($data_ref->{input}) };
     my $exception = $@;
-    my $stderr    = _stderr_restore();
+    my $stderr = _stderr_restore();
 
     # Strip any trailing blank lines.
     $got =~ s{ \n\s+ \z }{\n}xms;

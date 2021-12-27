@@ -1,8 +1,9 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 # See https://robots.thoughtbot.com/tab-completion-in-gnu-readline
 
-use Modern::Perl;
+use 5.014_001;
+use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 use Data::Dumper;

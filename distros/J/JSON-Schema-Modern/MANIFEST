@@ -25,6 +25,7 @@ lib/JSON/Schema/Modern/Vocabulary/FormatAssertion.pm
 lib/JSON/Schema/Modern/Vocabulary/MetaData.pm
 lib/JSON/Schema/Modern/Vocabulary/Unevaluated.pm
 lib/JSON/Schema/Modern/Vocabulary/Validation.pm
+script/json-schema-eval
 share/draft2019-09/meta/applicator.json
 share/draft2019-09/meta/content.json
 share/draft2019-09/meta/core.json
@@ -59,6 +60,7 @@ t/additional-tests-draft2019-09/format-ipv4.json
 t/additional-tests-draft2019-09/format-relative-json-pointer.json
 t/additional-tests-draft2019-09/format-time.json
 t/additional-tests-draft2019-09/id.json
+t/additional-tests-draft2019-09/integers.json
 t/additional-tests-draft2019-09/keyword-independence.json
 t/additional-tests-draft2019-09/loose-types-const-enum.json
 t/additional-tests-draft2019-09/recursive-dynamic.json
@@ -80,6 +82,7 @@ t/additional-tests-draft2020-12/format-ipv4.json
 t/additional-tests-draft2020-12/format-relative-json-pointer.json
 t/additional-tests-draft2020-12/format-time.json
 t/additional-tests-draft2020-12/id.json
+t/additional-tests-draft2020-12/integers.json
 t/additional-tests-draft2020-12/keyword-independence.json
 t/additional-tests-draft2020-12/loose-types-const-enum.json
 t/additional-tests-draft2020-12/recursive-dynamic.json
@@ -99,6 +102,7 @@ t/additional-tests-draft7/format-ipv4.json
 t/additional-tests-draft7/format-relative-json-pointer.json
 t/additional-tests-draft7/format-time.json
 t/additional-tests-draft7/id.json
+t/additional-tests-draft7/integers.json
 t/additional-tests-draft7/keyword-independence.json
 t/additional-tests-draft7/loose-types-const-enum.json
 t/additional-tests-draft7/not-an-anchor.json

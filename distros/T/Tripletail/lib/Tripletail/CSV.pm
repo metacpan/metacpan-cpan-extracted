@@ -6,20 +6,10 @@ use strict;
 use warnings;
 use IO::Handle ();
 use IO::Scalar ();
+use version 0.77;
 
-my $_INSTANCE;
 
 1;
-
-sub _getInstance {
-	my $class = shift;
-
-	if (!$_INSTANCE) {
-		$_INSTANCE = $class->_new(@_);
-	}
-
-	$_INSTANCE;
-}
 
 sub _new {
 	my $class = shift;
@@ -33,9 +23,20 @@ sub _new {
 		die __PACKAGE__."#new: Text::CSV_XS is unavailable. (Text::CSV_XSが使用できません)\n";
 	}
 
-	$this->{csv} = Text::CSV_XS->new({
-		binary => 1,
-	});
+	my $opts = do {
+		if (Text::CSV_XS->VERSION >= version->parse('1.02')) {
+			{
+				binary => 1,
+				decode_utf8 => 0,
+			};
+		} else {
+			{
+				binary => 1,
+			};
+		}
+	};
+
+	$this->{csv} = Text::CSV_XS->new($opts);
 
 	$this;
 }
@@ -138,9 +139,9 @@ CSV のパースと生成を行う為のクラス。
 
 =over 4
 
-=item C<< $TL->getCsv >>
+=item C<< $TL->newCsv >>
 
-  my $csv = $TL->getCsv;
+  my $csv = $TL->newCsv;
 
 L<Tripletail::CSV> オブジェクトを取得する。
 

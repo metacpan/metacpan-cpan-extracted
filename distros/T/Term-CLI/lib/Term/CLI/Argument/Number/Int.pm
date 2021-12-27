@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI::Argument::Number::Int  0.052003 {
+package Term::CLI::Argument::Number::Int  0.053006 {
 
 use 5.014;
 use strict;
@@ -52,7 +52,7 @@ Term::CLI::Argument::Number::Int - class for integer arguments in Term::CLI
 
 =head1 VERSION
 
-version 0.052003
+version 0.053006
 
 =head1 SYNOPSIS
 

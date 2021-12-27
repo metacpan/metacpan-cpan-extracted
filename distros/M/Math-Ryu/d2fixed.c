@@ -363,8 +363,9 @@ static inline int copy_special_str_printf(char* const result, const bool sign, c
 int d2fixed_buffered_n(double d, uint32_t precision, char* result) {
   const uint64_t bits = double_to_bits(d);
 #ifdef RYU_DEBUG
+  int32_t bit;
   printf("IN=");
-  for (int32_t bit = 63; bit >= 0; --bit) {
+  for (bit = 63; bit >= 0; --bit) {
     printf("%d", (int) ((bits >> bit) & 1));
   }
   printf("\n");
@@ -573,8 +574,9 @@ char* d2fixed(double d, uint32_t precision) {
 int d2exp_buffered_n(double d, uint32_t precision, char* result) {
   const uint64_t bits = double_to_bits(d);
 #ifdef RYU_DEBUG
+  int32_t bit;
   printf("IN=");
-  for (int32_t bit = 63; bit >= 0; --bit) {
+  for (bit = 63; bit >= 0; --bit) {
     printf("%d", (int) ((bits >> bit) & 1));
   }
   printf("\n");

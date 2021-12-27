@@ -11,7 +11,7 @@ our $MAX_ARRAY_DEPTH = 1000;
 
 has context => (is=>'ro', required=>1);
 has _namespace => (is=>'rw', required=>0, isa=>'ArrayRef', predicate=>'has_namespace', init_arg=>'namespace');
-has _flatten_array_value => (is=>'ro', required=>1, init_arg=>'flatten_array_value');
+has _flatten_array_value => (is=>'rw', required=>1, init_arg=>'flatten_array_value');
 has _current => (is=>'rw', required=>0, init_arg=>undef);
 has _required => (is=>'rw', required=>0, init_arg=>undef);
 has _src => (is=>'ro', required=>1, init_arg=>'src');
@@ -107,6 +107,9 @@ sub _parse {
 
 sub _parse_formlike {
   my ($self, $context, $ns, $rules) = @_;
+
+  use Devel::Dwarn;
+  
   my $current = +{};
   while(@{$rules}) {
     my $rule = shift @{$rules};
@@ -130,10 +133,26 @@ sub _parse_formlike {
       foreach my $index(sort _sorted CORE::keys %indexes) {
         my $cloned_rules = dclone($rules); # each iteration in the loop needs its own copy of the rules;
         $cloned_rules = [''] unless @$cloned_rules; # to handle the bare array case
+        my $old = $self->_flatten_array_value;
+        $self->_flatten_array_value(0) if $index eq '';
         my $value = $self->_parse_formlike( $context, [@$ns, "${local_ns}[$index]"], $cloned_rules);
-        ## I don't think these are missing params, just a row with invalid fields
-        next if( (ref($value)||'') eq 'HASH') && !%$value;
-        push @{$current->{$local_ns}}, $value;
+        if(($index eq '') && $old) {
+          $self->_flatten_array_value($old);
+          if( (ref($value)||'') eq 'ARRAY') {
+            push @{$current->{$local_ns}}, $_ for @$value;
+          } elsif((ref($value)||'') eq 'HASH') {            
+            if(ref $value->{$indexes{$index}}) {
+              my @values = map { +{ $indexes{$index} => $_ }  } @{ $value->{$indexes{$index}} };
+              push @{$current->{$local_ns}}, @values;
+            } else {
+              push @{$current->{$local_ns}}, $value;
+            }
+          }
+        } else {
+          ## I don't think these are missing params, just a row with invalid fields
+          next if( (ref($value)||'') eq 'HASH') && !%$value;
+          push @{$current->{$local_ns}}, $value;
+        }
       }
     } else {
       if((ref($rules->[0])||'') eq 'ARRAY') {
@@ -151,7 +170,7 @@ sub _parse_formlike {
           my $key = join('.', @$ns, $rule);
           unless(defined $context->{$key}) {
             $self->_required ? Catalyst::Exception::MissingParameter->throw(param=>$key)  : next;
-          }
+          } 
           $current->{$rule} = $self->_normalize_array_value($context->{$key});
         }
       }

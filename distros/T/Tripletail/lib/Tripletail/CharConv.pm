@@ -4,7 +4,11 @@
 package Tripletail::CharConv;
 use strict;
 use warnings;
-use Encode;
+BEGIN {
+    # Workaround for Encode < 2.26. See t/old-encode-pm.t
+    local $SIG{__DIE__} = 'DEFAULT';
+    require Encode;
+}
 use Encode::Alias;
 use Unicode::Japanese ();
 

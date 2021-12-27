@@ -44,7 +44,7 @@ calc_newctl checkfile constrain_controls read_controls read_control_constraints 
 apply_flowcontrol_changes constrain_obstructions read_obstructions read_obs_constraints apply_obs_constraints
 vary_net read_net apply_node_changes readobsfile obs_modify
 decreasearray deg2rad_ rad2deg_ purifyarray replace_nth rotate2dabs rotate2d rotate3d fixlength purifydata
-gatherseparators supercleanarray modish $max_processes
+gatherseparators supercleanarray modish $max_processes @weighttransforms
 ); # our @EXPORT = qw( );
 
 $VERSION = '0.117'; # our $VERSION = '';
@@ -71,12 +71,13 @@ sub morph
 	my $outfile = $main::outfile;
 	my $tofile = $main::tofile;
 	my $simnetwork = $main::simnetwork;
-  my $max_processes = $main::max_processes;
+        my $max_processes = $main::max_processes;
 
 	my %simtitles = %main::simtitles;
 	my %retrievedata = %main::retrievedata;
 	my @keepcolumns = @main::keepcolumns;
 	my @weights = @main::weights;
+        my @weighttransforms = @main::weighttransforms;
 	my @weightsaim = @main::weightsaim;
 	my @varthemes_report = @main::varthemes_report;
 	my @varthemes_variations = @main::varthemes_variations;
@@ -247,6 +248,70 @@ sub morph
 		"0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nr" => 96, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\ns" => 97, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nt" => 98, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nu" => 99,
 		"0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nv" => 100, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nw" => 101, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nx" => 102, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\ny" => 103,
 		"0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nz" => 104 );
+	}
+	elsif ( $dowhat{menus} eq "long" )
+	{
+		%numvertmenu = ( 1 => "a", 2 => "b", 3 => "c", 4 => "d", 5 => "e", 6 => "f", 7 => "g",
+		8 => "h", 9 => "i", 10 => "j", 11 => "k", 12 => "l",
+		13 => "m", 14 => "n", 15 => "o", 16 => "p", 17 => "q", 18 => "r", 19 => "s",
+		20 => "t", 		21 => "u", 22 => "v", 23 => "w", 24 => "x", 25 => "0\ny",
+		26 => "0\nz", 27 => "0\na", 28 => "0\nb", 29 => "0\nc", 30 => "0\nd", 31 => "0\ne",
+		32 => "0\nf", 33 => "0\ng", 34 => "0\nh", 35 => "0\ni", 36 => "0\nj",
+		37 => "0\nk", 38 => "0\nl", 39 => "0\nm", 40 => "0\nn", 41 => "0\no",
+		42 => "0\np", 43 => "0\nq", 44 => "0\nr", 45 => "0\ns", 46 => "0\nt",
+		47 => "0\nu", 48 => "0\n0\nc\nv", 49 => "0\n0\nc\nw", 50 => "0\n0\nc\nx",
+		51 => "0\n0\nc\ny", 52 => "0\n0\nc\nz",
+		53 => "0\n0\nc\na", 54 => "0\n0\nc\nb", 55 => "0\n0\nc\nc", 56 => "0\n0\nc\nd",
+		57 => "0\n0\nc\ne", 58 => "0\n0\nc\nf",
+		59 => "0\n0\nc\ng", 60 => "0\n0\ncnh", 61 => "0\n0\nc\ni",
+		62 => "0\n0\nc\nj", 63 => "0\n0\nc\nk", 64 => "0\n0\nc\nl",
+		65 => "0\n0\nc\nm", 66 => "0\n0\nc\nn",
+		67 => "0\n0\nc\no", 68 => "0\n0\nc\np", 69 => "0\n0\nc\nq",
+		70 => "0\n0\nc\nr", 71 => "0\n0\nc\ns",
+		72 => "0\n0\nc\nt", 73 => "0\n0\nc\nu", 74 => "0\n0\nc\nv",
+		75 => "0\n0\nc\nw", 76 => "0\n0\nc\nx",
+		77 => "0\n0\nc\ny", 78 => "0\n0\nc\nz", 79 => "0\n0\nc\na",
+		80 => "0\n0\nc\nb", 81 => "0\n0\nc\nc", 82 => "0\n0\nc\nd",
+		83 => "0\n0\nc\ne", 84 => "0\n0\nc\nf", 85 => "0\n0\nc\n0\nc\ng",
+		86 => "0\n0\nc\n0\nc\nh", 87 => "0\n0\nc\n0\nc\ni", 88 => "0\n0\nc\n0\nc\nj",
+		89 => "0\n0\nc\n0\nc\nk", 90 => "0\n0\nc\n0\nc\nl", 91 => "0\n0\nc\n0\nc\nm",
+		92 => "0\n0\nc\n0\nc\nn", 93 => "0\n0\nc\n0\nc\no",
+		94 => "0\n0\nc\n0\nc\np", 95 => "0\n0\nc\n0\nc\nq",
+		96 => "0\n0\nc\n0\nc\nr", 97 => "0\n0\nc\n0\nc\ns",
+		98 => "0\n0\nc\n0\nc\nt", 99 => "0\n0\nc\n0\nc\nu",
+		100 => "0\n0\nc\n0\nc\nv", 101 => "0\n0\nc\n0\nc\nw",
+		102 => "0\n0\nc\n0\nc\nx", 103 => "0\n0\nc\n0\nc\ny", );
+
+		%vertnummenu = ( "a" => 1, "b" => 2, "c" => 3, "d" => 4, "e" => 5, "f" => 6, "g" => 7,
+		"h" => 8, "i" => 9, "j" => 10, "k" => 11, "l" => 12,
+		"m" => 13, "n" => 14, "o" => 15, "p" => 16, "q" => 17, "r" => 18, "s" => 19,
+		"t" => 20, "u" => 21, "v" => 22, "w" => 23, "x" => 24, "0\ny" => 25,
+		"0\nz" => 26, "0\na" => 27, "0\nb" => 28, "0\nc" => 29, "0\nd" => 30, "0\ne" => 31,
+		"0\nf" => 32, "0\ng" => 33, "0\nh" => 34, "0\ni" => 35, "0\nj" => 36,
+		"0\nk" => 37, "0\nl" => 38, "0\nm" => 39, "0\nn" => 40, "0\no" => 41,
+		"0\np" => 42, "0\nq" => 43, "0\nr" => 44, "0\ns" => 45, "0\nt" => 46,
+		"0\nu" => 47, "0\n0\nc\nv" => 48, "0\n0\nc\nw" => 49, "0\n0\nc\nx" => 50,
+		"0\n0\nc\ny" => 51, "0\n0\nc\nz" => 52,
+		"0\n0\nc\na" => 53, "0\n0\nc\nb" => 54, "0\n0\nc\nc" => 55, "0\n0\nc\nd" => 56,
+		"0\n0\nc\ne" => 57, "0\n0\nc\nf" => 58,
+		"0\n0\nc\ng" => 59, "0\n0\ncnh" => 60, "0\n0\nc\ni" => 61,
+		"0\n0\nc\nj" => 62, "0\n0\nc\nk" => 63, "0\n0\nc\nl" => 64,
+		"0\n0\nc\nm" => 65, "0\n0\nc\nn" => 66,
+		"0\n0\nc\no" => 67, "0\n0\nc\np" => 68, "0\n0\nc\nq" => 69,
+		"0\n0\nc\nr" => 70, "0\n0\nc\ns" => 71,
+		"0\n0\nc\nt" => 72, "0\n0\nc\nu" => 73, "0\n0\nc\nv" => 74,
+		"0\n0\nc\nw" => 75, "0\n0\nc\nx" => 76,
+		"0\n0\nc\ny" => 77, "0\n0\nc\nz" => 78, "0\n0\nc\na" => 79,
+		"0\n0\nc\nb" => 80, "0\n0\nc\nc" => 81, "0\n0\nc\nd" => 82,
+		"0\n0\nc\ne" => 83, "0\n0\nc\nf" => 84, "0\n0\nc\n0\nc\ng" => 85,
+		"0\n0\nc\n0\nc\nh" => 86, "0\n0\nc\n0\nc\ni" => 87, "0\n0\nc\n0\nc\nj" => 88,
+		"0\n0\nc\n0\nc\nk" => 89, "0\n0\nc\n0\nc\nl" => 90, "0\n0\nc\n0\nc\nm" => 91,
+		"0\n0\nc\n0\nc\nn" => 92, "0\n0\nc\n0\nc\no" => 93,
+		"0\n0\nc\n0\nc\np" => 94, "0\n0\nc\n0\nc\nq" => 95,
+		"0\n0\nc\n0\nc\nr" => 96, "0\n0\nc\n0\nc\ns" => 97,
+		"0\n0\nc\n0\nc\nt" => 98, "0\n0\nc\n0\nc\nu" => 99,
+		"0\n0\nc\n0\nc\nv" => 100, "0\n0\nc\n0\nc\nw" => 101,
+		"0\n0\nc\n0\nc\nx" => 102, "0\n0\nc\n0\nc\ny" => 103, );
 	};
 
 	my @menus = ( \%numvertmenu, \%vertnummenu );
@@ -1827,9 +1892,6 @@ $x_new $y_new $z_new
 -
 y
 c
--
--
--
 -
 -
 -

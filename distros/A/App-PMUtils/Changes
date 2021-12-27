@@ -1,3 +1,8 @@
+0.738   2021-12-03  Released-By: PERLANCAR; Urgency: medium
+
+	- Add utility: update-this-mod (cpanm-this-mod).
+
+
 0.737   2021-12-01  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Set default perl module argument to 'this module' (see

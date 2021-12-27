@@ -3,7 +3,7 @@ package Sah::Schema::example::recurse2a;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-07-30'; # DATE
 our $DIST = 'Sah-Schemas-Examples'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $schema = ["example::recurse2b" => {
     summary => 'Recursive schema',
@@ -24,7 +24,7 @@ Sah::Schema::example::recurse2a
 
 =head1 VERSION
 
-This document describes version 0.007 of Sah::Schema::example::recurse2a (from Perl distribution Sah-Schemas-Examples), released on 2021-07-30.
+This document describes version 0.009 of Sah::Schema::example::recurse2a (from Perl distribution Sah-Schemas-Examples), released on 2021-07-30.
 
 =head1 SYNOPSIS
 

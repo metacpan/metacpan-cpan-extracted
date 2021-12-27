@@ -74,7 +74,7 @@ sub render {
     my @bb = $self->get_pixel_bbox;
     my $bl = $bb[3];
     if ( $self->{_width} && $self->{_alignment} ) {
-	my $w = $bb[2] - $bb[0];
+	my $w = $bb[2];
 	if ( $w < $self->{_width} ) {
 	    if ( $self->{_alignment} eq "right" ) {
 		$x += $self->{_width} - $w;
@@ -124,8 +124,8 @@ sub render {
 			$fragment->{font}->{weight},
 			$fragment->{size} || $self->{_currentsize},
 			$fragment->{color},
-			$fragment->{underline}||'""', $fragment->{ulcolor}||'""',
-			$fragment->{strike}||'""', $fragment->{strcol}||'""',
+			$fragment->{underline}||'""', $fragment->{underline_color}||'""',
+			$fragment->{strikethrough}||'""', $fragment->{strikethrough_color}||'""',
 		       ),
 		  ) if 0;
 	    my $t = $fragment->{text};
@@ -140,8 +140,6 @@ sub render {
 
 	next unless $x > $x0;
 
-	my $gfx = $text->{' apipage'}->gfx;
-	$gfx->save;
 	my $dw = 1000;
 	my $xh = $font->xheight;
 
@@ -152,7 +150,7 @@ sub render {
 		       || $font->underlineposition ) * $sz/$dw;
 	    my $h = ( $f->{underline_thickness}
 		      || $font->underlinethickness ) * $sz/$dw;
-	    my $col = $fragment->{ulcolor} // $fragment->{color};
+	    my $col = $fragment->{underline_color} // $fragment->{color};
 	    if ( $fragment->{underline} eq 'double' ) {
 		push( @strikes, [ $d-0.125*$h, $h * 0.75, $col ],
 		                [ $d+1.125*$h, $h * 0.75, $col ] );
@@ -162,7 +160,7 @@ sub render {
 	    }
 	}
 
-	if ( $fragment->{strike} ) {
+	if ( $fragment->{strikethrough} ) {
 	    my $sz = $fragment->{size} || $self->{_currentsize};
 	    my $d = -( $f->{strikeline_position}
 		       ? $f->{strikeline_position}
@@ -170,7 +168,7 @@ sub render {
 	    my $h = ( $f->{strikeline_thickness}
 		      || $f->{underline_thickness}
 		      || $font->underlinethickness ) * $sz/$dw;
-	    my $col = $fragment->{ulcolor} // $fragment->{color};
+	    my $col = $fragment->{strikethrough_color} // $fragment->{color};
 	    push( @strikes, [ $d+$h/2, $h, $col ] );
 	}
 
@@ -182,7 +180,7 @@ sub render {
 	    my $d = -( $f->{overline_position}
 		       ? $f->{overline_position} * $sz/$dw
 		       : $xh*$sz/$dw + 2*$h );
-	    my $col = $fragment->{ovrcol} // $fragment->{color};
+	    my $col = $fragment->{overline_color} // $fragment->{color};
 	    if ( $fragment->{overline} eq 'double' ) {
 		push( @strikes, [ $d-0.125*$h, $h * 0.75, $col ],
 		                [ $d+1.125*$h, $h * 0.75, $col ] );
@@ -192,9 +190,18 @@ sub render {
 	    }
 	}
 	for ( @strikes ) {
-	    _line( $gfx, $x0, $y0-$fragment->{base}-$bl-$_->[0],
-		   $x-$x0, 0, $_->[2], $_->[1] );
+
+	    # Mostly copied from PDF::API2::Content::_text_underline.
+	    $text->add_post(PDF::API2::Content::_save());
+
+	    $text->add_post($text->_strokecolor($_->[2]));
+	    $text->add_post(PDF::API2::Content::_linewidth($_->[1]));
+	    $text->add_post(PDF::API2::Content::_move($x0, $y0-$fragment->{base}-$bl-$_->[0]));
+	    $text->add_post(PDF::API2::Content::_line($x, $y0-$fragment->{base}-$bl-$_->[0]));
+	    $text->add_post(PDF::API2::Content::_stroke());
+	    $text->add_post(PDF::API2::Content::_restore());
 	}
+
 	if ( $fragment->{href} ) {
 	    my $sz = $fragment->{size} || $self->{_currentsize};
 	    my $ann = $text->{' apipage'}->annotation;
@@ -204,9 +211,7 @@ sub render {
 		     		  $x, $y0 - $sz ]
 		     );
 	}
-	$gfx->restore;
     }
-    # $text->restore;		# doesn't do anything
 }
 
 #### API
@@ -267,22 +272,26 @@ sub bbox {
 	}
     }
 
-    [ $x, $d, $x+$w, $a ];
+    [ $x, $d, $w, $a ];
 }
 
 #### API
 sub load_font {
-    my ( $self, $font ) = @_;
+    my ( $self, $font, $fd ) = @_;
 
     if ( $fc->{$font} ) {
 	# warn("Loaded font $font (cached)\n");
 	return $fc->{$font};
     }
-
     my $ff;
     if ( $font =~ /\.[ot]tf$/ ) {
 	eval {
-	    $ff = $self->{_context}->ttfont( $font, -dokern => 1 );
+	    $ff = $self->{_context}->ttfont( $font,
+					     -dokern => 1,
+					     $fd->{nosubset}
+					     ? ( -nosubset => 1 )
+					     : (),
+					   );
 	};
     }
     else {
@@ -343,7 +352,7 @@ sub showbb {
 
     # Bounding box, top-left coordinates.
     my %e = %{($self->get_pixel_extents)[1]};
-    # printf( "EXT: %.2f %.2f %.2f %.2f\n", @e{qw( x y width height )} );
+    printf( "EXT: %.2f %.2f %.2f %.2f\n", @e{qw( x y width height )} );
 
     # NOTE: Some fonts include natural spacing in the bounding box.
     # NOTE: Some fonts exclude accents on capitals from the bounding box.
@@ -363,7 +372,7 @@ sub showbb {
     $gfx->linewidth( 0.25 );
     $gfx->strokecolor($col);
     $e{height} = -$e{height};		# PDF coordinates
-    $gfx->rectxy( $e{x}, $e{y}, $e{width}, $e{height} );;
+    $gfx->rectxy( $e{x}, $e{y}, $e{x} + $e{width}, $e{height} );;
     $gfx->stroke;
     $gfx->restore;
 }

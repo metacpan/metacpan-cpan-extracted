@@ -1,0 +1,45 @@
+---
+abstract: 'Easy Command-line MIDI'
+author:
+  - 'Gene Boggs <gene@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: idi
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  idi:
+    file: lib/idi.pm
+    version: '0.0102'
+requires:
+  Exporter: '0'
+  MIDI::Simple: '0'
+  Moo: '0'
+  Music::Tempo: '0'
+  namespace::clean: '0'
+  strict: '0'
+  strictures: '2'
+  warnings: '0'
+resources:
+  homepage: https://github.com/ology/idi
+  repository: https://github.com/ology/idi.git
+version: '0.0102'
+x_generated_by_perl: v5.32.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0

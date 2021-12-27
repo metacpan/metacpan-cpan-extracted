@@ -1,0 +1,48 @@
+---
+abstract: 'Classes for working with I<Treekin> output.'
+author:
+  - 'Felix Kuehnl <xfelix@bioinf.uni-leipzig.de>'
+build_requires:
+  Digest::CRC: '0'
+  File::Slurp: '0'
+  File::Spec::Functions: '0'
+  Scalar::Util: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::NoWarnings: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bio-RNA-Treekin
+provides:
+  Bio::RNA::Treekin:
+    file: lib/Bio/RNA/Treekin.pm
+    version: '0.01'
+  Bio::RNA::Treekin::MultiRecord:
+    file: lib/Bio/RNA/Treekin/MultiRecord.pm
+    version: '0.01'
+  Bio::RNA::Treekin::PopulationDataRecord:
+    file: lib/Bio/RNA/Treekin/PopulationDataRecord.pm
+    version: '0.01'
+  Bio::RNA::Treekin::Record:
+    file: lib/Bio/RNA/Treekin/Record.pm
+    version: '0.01'
+  IO::File::RecordStream:
+    file: lib/IO/File/RecordStream.pm
+    version: '0.01'
+requires:
+  IO::Lines: '2.111'
+  IPC::System::Simple: '1.25'
+  List::Util: '1.5'
+  Moose: '2.2011'
+  MooseX::StrictConstructor: '0.21'
+  Scalar::Util: '1.5'
+  autodie: '2.29'
+  namespace::autoclean: '0.28'
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

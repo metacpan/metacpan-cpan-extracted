@@ -4,23 +4,31 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.422",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-Async-IRC",
    "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
       "runtime" : {
          "requires" : {
+            "Future::AsyncAwait" : "0.47",
             "IO::Async::Loop" : "0.54",
             "IO::Async::Stream" : "0.59",
-            "Protocol::IRC::Client" : "0.12",
+            "List::Util" : "1.33",
+            "MIME::Base64" : "0",
+            "Protocol::IRC::Client" : "0.13",
             "Time::HiRes" : "0",
-            "perl" : "5.010"
+            "perl" : "5.014"
          }
       },
       "test" : {
@@ -35,11 +43,11 @@
    "provides" : {
       "Net::Async::IRC" : {
          "file" : "lib/Net/Async/IRC.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       },
       "Net::Async::IRC::Protocol" : {
          "file" : "lib/Net/Async/IRC/Protocol.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
@@ -48,6 +56,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.11",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.12",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

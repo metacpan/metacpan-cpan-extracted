@@ -3,6 +3,10 @@ use strict;
 use warnings;
 use Test::More;
 
+# NOTE: We will hopefully remove the next line in the future.
+plan skip_all =>
+  'Skipping dependency test as Test::Dependencies is way too buggy to use.';
+
 # Test::Dependencies is a bit idiotic when it comes to locating
 # metadata files.
 my @CLEANUP;

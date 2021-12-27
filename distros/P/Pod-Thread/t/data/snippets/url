@@ -9,6 +9,8 @@ URL with L<anchor text|http://example.com/>.
 URL without anchor text: L<http://example.com/>.
 
 [output]
+\heading[][]
+
 \h2(#S1)[URLs]
 
 URL with \link[http://example.com/][anchor text].

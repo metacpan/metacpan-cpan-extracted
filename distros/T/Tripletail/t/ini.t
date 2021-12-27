@@ -3,35 +3,35 @@ use strict;
 use warnings;
 use Test::Exception;
 use Test::More tests =>
-  60
+  63
   +13 # get_reloc.
 ;
 use t::make_ini {
-    ini => {
-        TL => {
+    ini => [
+        TL => [
             trap    => 'none',
             Samhain => 1,
             Imbolc  => 2,
-            Beltain => 3,
-        },
-        'TL:special' => {
-            Beltain => 300,
-            Lugnasa => 400,
-        },
-        'TL:special@remote:Testuser@server:Debughost' => {
+            Beltain => 3
+           ],
+        'TL:special@server:Debughost@remote:Testuser' => [
             Beltain => 500,
-            Lugnasa => 600,
-        },
-        HOST => {
+            Lugnasa => 600
+           ],
+        'TL:special' => [
+            Beltain => 300,
+            Lugnasa => 400
+           ],
+        HOST => [
             Debughost => '192.168.0.0/24',
-            Testuser  => '192.168.1.1',
-        },
-        RelocTest => {
+            Testuser  => '192.168.1.1'
+           ],
+        RelocTest => [
             a => '...',
             b => '.../',
-            c => '....',
-        },
-    },
+            c => '....'
+           ]
+       ]
 };
 use Tripletail $t::make_ini::INI_FILE, 'special';
 
@@ -80,6 +80,19 @@ is_deeply(
 	toHash($ini->getKeys('TL',1)),
 	toHash(qw[trap Samhain Imbolc Beltain]), 'getKeys');
 
+do {
+    local $ENV{SERVER_ADDR} = '192.168.0.1';
+    local $ENV{REMOTE_ADDR} = '192.168.1.1';
+
+    is $ini->get(TL => 'Beltain'), 500, 'get/specialized/server+remote';
+};
+
+do {
+    local $ENV{SERVER_ADDR} = '127.0.0.1';
+    local $ENV{REMOTE_ADDR} = '192.168.1.1';
+
+    is $ini->get(TL => 'Beltain'), 300, 'get/specialized/server+remote';
+};
 
 dies_ok {$ini->set} 'set undef';
 dies_ok {$ini->set(\123)} 'set ref';
@@ -94,10 +107,46 @@ dies_ok {$ini->set('  ' => aaa => 222)} 'set space';
 dies_ok {$ini->set(Foo => '  ' => 222)} 'set space';
 dies_ok {$ini->set(Foo => aaa => '  ')} 'set space';
 ok($ini->set(Foo => aaa => 111), 'set');
-dies_ok {$ini->write("/$$/$$/$$/file$$.dummy")} 'write cant open file die';
+dies_ok {$ini->write("$$/$$/$$/file$$.dummy")} 'write cant open file die';
 ok($ini->write($t::make_ini::INI_FILE), 'write');
 
-is($ini->_filename, $t::make_ini::INI_FILE , '_filename');
+do {
+    local $/ = undef;
+    open my $fh, '<', $t::make_ini::INI_FILE;
+
+    my $got    = <$fh>;
+    my $wanted = <<'EOF';
+[TL]
+trap = none
+Samhain = 1
+Imbolc = 2
+Beltain = 3
+
+[TL:special@server:Debughost@remote:Testuser]
+Beltain = 500
+Lugnasa = 600
+
+[TL:special]
+Beltain = 300
+Lugnasa = 400
+
+[HOST]
+Debughost = 192.168.0.0/24
+Testuser = 192.168.1.1
+
+[RelocTest]
+a = ...
+b = .../
+c = ....
+
+[Foo]
+aaa = 111
+EOF
+
+    is $got, $wanted, 'write';
+};
+
+is($ini->getFilePath, $t::make_ini::INI_FILE , 'getFilePath');
 
 do {
     open my $fh, '>', "tmp2$$.ini";
@@ -151,6 +200,7 @@ dies_ok {$ini->deleteGroup} 'const object undef';
   is($ini2->get      (RelocTest2 => 'a'), '...', 'RelocTest2.a is "..."');
   is($ini2->get_reloc(RelocTest2 => 'a'), '...', '  - not relocated (no filename)');
 
-  $ini2->{filename} = "../nofile.ini";
+  # EXTREMELY UNSAFE. NEVER DO THIS IN YOUR CODE.
+  $ini2->{file_path} = "../nofile.ini";
   is($ini2->get_reloc(RelocTest2 => 'a'), '..', '  - relocated to updir');
 }

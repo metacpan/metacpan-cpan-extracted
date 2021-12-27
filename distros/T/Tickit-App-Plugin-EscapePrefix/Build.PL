@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 
-use Module::Build::Using::PkgConfig;
+use Module::Build;
 
-my $build = Module::Build::Using::PkgConfig->new(
+my $build = Module::Build->new(
    module_name => 'Tickit::App::Plugin::EscapePrefix',
    requires => {
       'Tickit' => '0.64',

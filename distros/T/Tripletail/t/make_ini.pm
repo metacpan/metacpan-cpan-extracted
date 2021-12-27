@@ -65,29 +65,58 @@ END
 # write_ini(%ini);
 # write ini on $t::make_ini::INI_FILE;
 # -----------------------------------------------------------------------------
-sub write_ini
-{
-	my $hash = shift;
-	
-	#print STDERR "write [$INI_FILE]\n";
-	open my $fh, '>', $INI_FILE or die "could not create file [$INI_FILE]: $!";
-	my @keys = sort keys %$hash;
-	@keys = ((grep{/^TL$/}@keys),(grep{!/^TL$/}@keys));
-	my $cont = 0;
-	foreach my $group (@keys)
-	{
-		$cont and print $fh "\n";
-		print $fh "[$group]\n";
-		foreach my $key (sort keys %{$hash->{$group}})
-		{
-			my $val = $hash->{$group}{$key};
-			ref($val) eq 'ARRAY' and $val = join(',',@$val);
-			print $fh "$key = $val\n";
-		}
-		$cont = 1;
-	}
-	close $fh;
-	push(@cleanup, $INI_FILE);
+sub write_ini {
+    my $groups = shift;
+
+    if (ref($groups) eq 'HASH') {
+        $groups = [
+            map {
+                $_ => $groups->{$_};
+              }
+              keys %$groups
+           ];
+    }
+
+    open my $fh, '>', $INI_FILE
+      or
+        die "could not create file [$INI_FILE]: $!";
+
+    my $is_first = 1;
+    for (my $i = 0; $i < @$groups; $i += 2) {
+        my $group = $groups->[$i  ];
+        my $pairs = $groups->[$i+1];
+
+        if (ref($pairs) eq 'HASH') {
+            $pairs = [
+                map {
+                    $_ => $pairs->{$_}
+                  }
+                  keys %$pairs
+               ];
+        }
+
+        if ($is_first) {
+            $is_first = undef;
+        }
+        else {
+            print {$fh} "\n";
+        }
+
+        print {$fh} "[$group]\n";
+        for (my $j = 0; $j < @$pairs; $j += 2) {
+            my $key   = $pairs->[$j  ];
+            my $value = $pairs->[$j+1];
+
+            if (ref($value) eq 'ARRAY') {
+                $value = join(',', @$value);
+            }
+
+            printf {$fh} "%s = %s\n", $key, $value;
+        }
+    }
+
+    push @cleanup, $INI_FILE;
+    return;
 }
 
 # -----------------------------------------------------------------------------

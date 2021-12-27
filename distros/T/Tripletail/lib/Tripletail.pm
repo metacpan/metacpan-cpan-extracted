@@ -14,12 +14,11 @@ use POSIX qw(:errno_h);
 use Scalar::Util qw(blessed);
 use Cwd ();
 
-our $VERSION = '0.50';
+our $VERSION = '0.65';
 our $XS_VERSION = $VERSION;
 $VERSION = CORE::eval $VERSION;
 
 our $TL = Tripletail->__new;
-our @specialization;
 our $LOG_SERIAL = 0;
 our $LASTERROR;
 our %_FILE_CACHE;
@@ -51,11 +50,6 @@ if ($ENV{TL_COVER_TEST_MODE}) {
     }
 }
 
-*errorTrap = \&_errorTrap_is_deprecated;
-sub _errorTrap_is_deprecated {
-    die "\$TL->errorTrap(..) is deprecated, use \$TL->trapEror(..)"
-}
-
 if ($ENV{MOD_PERL}) {
     CORE::eval {
         require Apache2::RequestRec;
@@ -79,19 +73,28 @@ sub import {
     my $class  = shift;
     my $caller = (caller(0))[0];
 
+    my $symbol = do {
+        if (@_ && $_[0] =~ m/\A\$(.+)\z/) {
+            shift;
+            $1;
+        }
+        else {
+            'TL';
+        }
+    };
     no strict qw(refs);
-    *{"${caller}::TL"} = *{"Tripletail::TL"};
+    *{"${caller}::${symbol}"} = *{"Tripletail::TL"};
 
     if (defined $TL->{INI}) {
-        if (exists $_[0]) {
+        if (@_) {
             die "use Tripletail: ini file has been already loaded." .
               " (iniファイルを指定した use Tripletail は一度しか行えません)\n";
         }
     }
     else {
         my $ini_file = do {
-            if (exists $_[0]) {
-                $_[0];
+            if (@_) {
+                shift;
             }
             else {
                 if (_is_in_pod_coverage() || _is_in_b_perlreq()) {
@@ -112,8 +115,8 @@ sub import {
         }
         $TL->{INI}->const;
 
-        if (defined($_[0])) {
-            @specialization = @_;
+        if (@_) {
+            Tripletail::Ini->__setEnabledTags(@_);
         }
 
         $TL->{trap} = $TL->{INI}->get(TL => trap => 'die');
@@ -131,8 +134,10 @@ sub import {
     }
     # preload some modules.
     # (workaround for "BEGIN not safe after errors--compilation aborted", perldiag)
-    require Tripletail::Error;
+    require Tripletail::CharConv;
     require Tripletail::Debug;
+    require Tripletail::Error;
+    require Tripletail::Template;
 }
 
 sub __die_handler_for_startup
@@ -290,8 +295,10 @@ sub fork {
         }
 
         require Tripletail::DB;
-
         Tripletail::DB::_reconnectSilentlyAll();
+
+        require Tripletail::MongoDB;
+        Tripletail::MongoDB::_reconnectSilentlyAll();
     }
     else {
         # parent
@@ -541,6 +548,17 @@ sub startCgi {
 			}
 		}
 
+		if (defined(my $groups = $param->{-MongoDB})) {
+			require Tripletail::MongoDB;
+
+			if (!ref $groups) {
+				Tripletail::MongoDB->_connect([$groups]);
+			}
+			else {
+				Tripletail::MongoDB->_connect($groups);
+			}
+		}
+
 		if(!defined($param->{'-main'})) {
 			die __PACKAGE__."#startCgi: -main handler is not defined. (-main引数が指定されていません)\n";
 		}
@@ -584,7 +602,6 @@ sub startCgi {
 			}
 
 			my $exit_requested;
-			my $handling_request;
 			local $SIG{USR1} = sub {
                 if ($this->INI->get(TL => 'fcgilog' => 0)) {
                     $this->log("SIGUSR1 received");
@@ -809,7 +826,22 @@ sub _fcgi_restart
 	my $this = shift;
 	@_ and $this->{fcgi_restart} = shift;
 	$this->{fcgi_restart};
-} 
+}
+
+=begin comment
+
+=head4 C<< errorTrap >>
+
+I<Deprecated>. This is an alias for L</"trapError">.
+
+=end comment
+
+=cut
+
+*errorTrap = \&_errorTrap_is_deprecated;
+sub _errorTrap_is_deprecated {
+    die "\$TL->errorTrap(..) is deprecated, use \$TL->trapEror(..)"
+}
 
 sub trapError {
 	my $this = shift;
@@ -834,6 +866,17 @@ sub trapError {
 				Tripletail::DB->_connect([$group]);
 			} elsif(ref($group) eq 'ARRAY') {
 				Tripletail::DB->_connect($group);
+			}
+		}
+
+		if (defined(my $groups = $param->{-MongoDB})) {
+			require Tripletail::MongoDB;
+
+			if (!ref $groups) {
+				Tripletail::MongoDB->_connect([$groups]);
+			}
+			else {
+				Tripletail::MongoDB->_connect($groups);
 			}
 		}
 
@@ -941,6 +984,9 @@ sub dispatch {
 
 sub log {
 	my $this = shift;
+
+	local($!);
+
     my $group;
     my $message;
 
@@ -1640,6 +1686,22 @@ sub newDB {
 	Tripletail::DB->_new(@_);
 }
 
+sub getMongoDB {
+    my $this = shift;
+
+    require Tripletail::MongoDB;
+
+    return Tripletail::MongoDB->_getInstance(@_);
+}
+
+sub newMongoDB {
+    my $this = shift;
+
+    require Tripletail::MongoDB;
+
+    return Tripletail::MongoDB::_new(@_);
+}
+
 sub getDebug {
 	my $this = shift;
 
@@ -1648,12 +1710,20 @@ sub getDebug {
 	Tripletail::Debug->_getInstance(@_);
 }
 
+sub newCsv {
+	my $this = shift;
+
+	require Tripletail::CSV;
+
+	Tripletail::CSV->_new(@_);
+}
+
 sub getCsv {
 	my $this = shift;
 
 	require Tripletail::CSV;
 
-	Tripletail::CSV->_getInstance(@_);
+	Tripletail::CSV->_new(@_);
 }
 
 sub newForm {
@@ -1686,8 +1756,6 @@ sub newIni {
 	my $this = shift;
 
 	require Tripletail::Ini;
-
-	*Tripletail::Ini::TL = *Tripletail::TL;
 
 	Tripletail::Ini->_new(@_);
 }
@@ -1987,11 +2055,17 @@ sub readTextFile {
 	my $cache = $this->_fetchFileCache($fpath);
 	if( !defined($cache->{text}) )
 	{
-		$cache->{text} = $this->charconv(
-			$this->readFile($fpath),
-			$coding,
-			'UTF-8',
-		);
+		my $text = $this->readFile($fpath);
+		eval {
+			local $SIG{__DIE__} = 'DEFAULT';
+			$cache->{text} = $this->charconv($text, $coding, 'UTF-8');
+		};
+		if ($@) {
+			# This can happen while dying for a syntax error in CGI
+			# scripts. Original errors are far more important than
+			# totally needless "BEGIN not safe after errors".
+			$cache->{text} = $text; # Give up converting it.
+		}
 		if( $cache->{cache_size} )
 		{
 			$cache->{cache_size} += 25 + length($cache->{text});
@@ -2463,8 +2537,8 @@ sub __executeCgi {
 		CORE::eval {
 			$mainfunc->();
 		};
-		if($@) {
-			$this->__dispError($@);
+		if(my $err = $@) {
+			$this->__dispError($err);
 		} else {
 			$this->__flushContentFilter;
 		}
@@ -2718,7 +2792,7 @@ L<Ini|Tripletail::Ini> ファイルの位置を指定しようとした場合は
 
 特化指定は複数行うことができ、その場合は最初の方に書いたものほど優先的に使用される。 
 
-=head2 特化指定
+=head3 特化指定
 
 特化指定の具体的例を示す
 
@@ -2776,6 +2850,23 @@ L<Ini|Tripletail::Ini> ファイルの位置を指定しようとした場合は
   logdir = /home/tl/logs
 
 
+=head3 C<$TL> とは別の名前でインポートする
+
+以下のようにする事で C<$TL> とは別の名前でインポートする事ができる。この例では
+C<$TL> ではなく C<$TL2> がインポートされ、C<$TL> の代わりに使う事ができる:
+
+  use Tripletail qw($TL2 /home/www/ini/tl.ini);
+
+  $TL2->startCgi(...);
+
+二度目以降の C<use> でも同様に変数名の指定が可能:
+
+  use Tripletail qw($TL2);
+
+複数個のパッケージから L<Tripletail> を用いる場合に、必ずしも全てのパッケージでこの変数名を揃える必要は無い。
+例えばあるパッケージで C<$TL> を用い、別のパッケージでは C<$TL2> を用いたとしても問題は起こらない。
+
+
 =head2 携帯向け設定
 
 以下のように、L<Tripletail::InputFilter::MobileHTML> 入力フィルタと
@@ -2783,18 +2874,18 @@ L<Tripletail::Filter::MobileHTML> 出力フィルタを利用することで、
 携帯絵文字を含めて扱うことができる。
 
   use Tripletail qw(tl.ini);
-  
+
   # startCgi前に入力フィルタを設定する
   $TL->setInputFilter('Tripletail::InputFilter::MobileHTML');
   $TL->startCgi(
       -main => \&main,
   );
-  
+
   sub main {
       # mainの最初で出力フィルタを設定する
       $TL->setContentFilter('Tripletail::Filter::MobileHTML');
       my $t = $TL->newTemplate('index.html');
-      
+
       $t->flush;
   }
 
@@ -3007,15 +3098,17 @@ FastCGI の場合は最後の1回だけ呼ばれる。
 =head4 C<< startCgi >>
 
   $TL->startCgi(
-    -main        => \&Main,    # メイン関数
-    -DB          => 'DB',      # DBを使う場合，iniのグループ名を指定
-    -Session => 'Session',     # Sessionを使う場合、iniのグループ名を指定
+    -main    => \&Main,    # メイン関数
+    -DB      => 'DB',      # Tripletail::DB を使う場合，ini のグループ名を指定
+    -MongoDB => 'MongoDB', # Tripletail::MongoDB を使う場合，ini のグループ名を指定
+    -Session => 'Session', # Tripletail::Session を使う場合、ini のグループ名を指定
   );
 
 CGI を実行する為の環境を整えた上で、 L</"Main 関数"> を実行する。
 L</"Main 関数"> がdie した場合は、エラー表示 HTML が出力される。
 
 C<DB> は、次のように配列へのリファレンスを渡す事で、複数指定可能。
+C<MongoDB> も同様。
 
   $TL->startCgi(
     -main => \&Main,
@@ -3025,8 +3118,8 @@ C<DB> は、次のように配列へのリファレンスを渡す事で、複�
 C<Session> は、次のように配列へのリファレンスを渡す事で、複数指定可能。
 
   $TL->startCgi(
-    -main        => \&Main,
-    -DB          => 'DB',
+    -main    => \&Main,
+    -DB      => 'DB',
     -Session => ['Session1', 'Session2'],
   );
 
@@ -3229,6 +3322,18 @@ L<Tripletail::DB> オブジェクトを取得。
 
 L<Tripletail::DB> オブジェクトを作成。
 
+=head4 C<< getMongoDB >>
+
+  $DB = $TL->getMongoDB($group)
+
+L<Tripletail::MongoDB> オブジェクトを取得。
+
+=head4 C<< newMongoDB >>
+
+  $DB = $TL->newMongoDB($group)
+
+L<Tripletail::MongoDB> オブジェクトを作成。
+
 =head4 C<< newForm >>
 
 L<Tripletail::Form> オブジェクトを作成。
@@ -3257,9 +3362,14 @@ L<Tripletail::DateTime> オブジェクトを作成。
 
 L<Tripletail::Pager> オブジェクトを作成。
 
+=head4 C<< newCsv >>
+
+L<Tripletail::CSV> オブジェクトを取得。
+
 =head4 C<< getCsv >>
 
 L<Tripletail::CSV> オブジェクトを取得。
+互換用なので、newCsv の利用を推奨。
 
 =head4 C<< newTagCheck >>
 
@@ -3324,14 +3434,15 @@ C<< use Tripletail qw(filename.ini); >> で読み込まれた L<Tripletail::Ini>
 =head4 C<< trapError >>
 
   $TL->trapError(
-    -main => \&Main, # メイン関数
-    -DB   => 'DB',   # DBを使う場合，iniのグループ名を指定
+    -main    => \&Main,    # メイン関数
+    -DB      => 'DB',      # Tripletail::DB を使う場合，ini のグループ名を指定
+    -MongoDB => 'MongoDB', # Tripletail::MongoDB を使う場合，ini のグループ名を指定
   );
 
 環境を整え、 L</"Main 関数"> を実行する。
 L</"Main 関数"> がdie した場合は、エラー内容が標準エラーへ出力される。
 
-L</"startCgi"> と同様に、C<DB> には配列へのリファレンスを渡す事も出来る。
+L</"startCgi"> と同様に、C<DB> や C<MongoDB> には配列へのリファレンスを渡す事も出来る。
 
 =head4 C<< fork >>
 

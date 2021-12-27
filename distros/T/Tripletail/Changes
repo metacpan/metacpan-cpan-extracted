@@ -7,9 +7,136 @@
 
 Revision history for Tripletail
 
+* RELEASED 0.65
+CLOSED: [2021-10-19 Tue 12:18]
+** TL::Pager
+MariaDB 10.2.4 以降で動作しない問題を解消した。
+
+* RELEASED 0.64
+CLOSED: [2021-09-17 Fri 11:58]
+- TL::DateTime
+  - 2021年の追加の祝日変更に対応した。
+- $TL->newCsv() を追加.
+
+* RELEASED 0.63
+CLOSED: [2020-10-05 Mon 11:51]
+** TL::MemorySentinel
+メモリ使用量の検出機能を Linux 3.x, および 4.x に対応。
+
+* RELEASED 0.62
+CLOSED: [2020-09-15 Tue 15:20]
+** TL::DB::Backend::MySQL
+MySQL への接続に失敗した際に正しい例外が発生しない不具合を修正した。
+
+* RELEASED 0.61
+CLOSED: [2020-06-18 Thu 15:18]
+- Fix build on recent versions of Perl.
+- TL::DateTime
+  - 2019年と2020年の追加の祝日変更に対応した。
+  - 建国記念日を建国記念の日に修正。
+
+* RELEASED 0.60
+CLOSED: [2018-09-13 Thu 14:28]
+- TL#startCgi
+  - main 関数が blessed された例外を送出した場合に Debug 画面に例外の
+    内容が表示されない場合がある不具合を修正した。
+- TL::DateTime
+  - Apache, date command, RFC 733, RFC 822, W3C DTF の各形式において、
+    24時以降の時が与えられた場合にも解釈時にエラーとせずに不正な値のま
+    ま受理するという不具合を修正した。
+  - 2019年と2020年の祝日変更に対応した。
+
+* RELEASED 0.59
+CLOSED: [2017-06-05 月 18:24]
+- TL
+  - Perl 5.10.1 以降において文法エラーが存在した場合にスタックトレース
+    を表示できなくなる不具合を修正した。
+- TL::MongoDB
+  - 新規追加。
+- TL::Session
+  - MongoDB をバックエンドにする事ができるようになった。
+
+* RELEASED 0.58
+CLOSED: [2017-02-16 Fri 18:04]
+- TL::DateTime
+  - YYYYMMDDhhmmdd 形式の文字列を誤った解釈をすることがある問題を修正
+
+* RELEASED 0.57
+CLOSED: [2016-10-06 Thu 15:17]
+- TL::DateTime
+  - 山の日の算出方法が誤っており、別の日となっていた不具合を修正した。
+  - 不定形式の日付と時刻の解釈について、時が 23 を越えている場合にも誤っ
+    て受け容れてしまう不具合を修正した。
+  - 不定形式の時刻について、秒が存在しない場合にも受け容れるようにした。
+    この場合は秒が 0 であったものと解釈する。
+
+* RELEASED 0.56
+CLOSED: [2016-07-08 Fri 20:25]
+** TL
+- use Tripletail qw($TL2 ...); のようにする事で、$TL とは別の名前でグロー
+  バル変数をインポートする事が可能になった。
+** TL::DateTime
+- 0.53 以降で spanMinute, spanHour, spanDay はタイムゾーンの一致してい
+  ない二つの日時の間での計算が出来ないようになっていたが、それは誤りで
+  あったので修正した。
+- 0.53 以降で現在のタイムゾーンを求める処理に不具合があり、求めようとし
+  た時刻に依存して誤った結果が得られる場合があったが、これを修正した。
+
+* RELEASED 0.55
+CLOSED: [2016-03-07 Mon 14:57]
+** TL::CSV
+- Text::CSV_XS.pm のバージョンが 1.02 以降の場合に誤動作する場合のある
+  不具合を修正した。
+
+* RELEASED 0.54
+CLOSED: [2016-02-17 Wed 15:33]
+** TL::Ini
+- 特化指定に関する不具合を修正。或る ini ファイル中にグループ [Foo] と
+  [Foo:bar] が存在している場合、もし特化指定 "bar" が為されたならば
+  [Foo] よりも [Foo:bar] の設定値の方を優先しなければならない。しかし
+  Tripletail-0.51 で入った不具合によりグループの優先順位は ini ファイル
+  内での出現順のみによって決定されていた為、もし ini ファイル内で
+  [Foo] の方が [Foo:bar] よりも先に現れていたならば誤って [Foo] の方が
+  優先されてしまっていた。
+- RELEASED 0.53のChangesに記載されるべき修正が漏れていたので追記する。
+
+* RELEASED 0.53
+CLOSED: [2015-11-11 Wed 12:02]
+** TL::DateTime
+- 山の日に対応.
+- 内部計算の誤差のために 5 月 31 日等の有り得ない日付が得られる場合があっ
+  た為、実装の全体を見直して誤差が一切出ないようにした。唯一
+  setJulianDay および getJulianDay のみが誤差の生じる可能性を持つが、こ
+  れらについては浮動小数点数に関する演算が避けられない為である。
+- RFC 850 で規定される日付の形式は実際には RFC 733 のものであるが、本モ
+  ジュールでは RFC 733 形式の日付のうち正しく解析できないものがあったの
+  を修正した。
+- DBD::Pg >= 3.4.0 を用いた場合に TL::DB#findTables が temporary table
+  を検索できない不具合を修正した。
+- Encode.pm のバージョンが 2.26 より前の場合に誤動作する場合のある不具
+  合を修正した。
+** TL
+  - TL#logが$!を破壊することがある問題を修正した。
+
+* RELEASED 0.52
+CLOSED: [2015-05-13 Wed 17:19]
+** TL::DB
+- TL::DB#tx の内部で DBI のエラーが発生した場合にエラー内容の取得に失敗
+  する不具合を修正。
+
+* RELEASED 0.51_01
+CLOSED: [2013-10-02 Wed 21:45]
+- ExtUtils::MakeMaker のバージョンによっては Makefile.PL に失敗する現象を修正.
+
+* RELEASED 0.51
+CLOSED: [2013-06-06 Thu 00:00]
+- TL::Ini
+  - Ini#getFilePath メソッドを追加．
+  - ほぼ全ての操作を高速化．
+
 * RELEASED 0.50
 CLOSED: [2013-03-26 Tue 16:19]
-- [[重要な更新]]
+- *重要な更新*
   - MobileHTML フィルタでのセッション不具合の修正
   - TL::Ini, デフォルト値もini内定義値もなかった場合は例外を発生させるように変更(互換用パラメータ [Ini]treat_absent_values_as_undef)
 - TL

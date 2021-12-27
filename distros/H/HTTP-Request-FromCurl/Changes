@@ -1,3 +1,9 @@
+0.37 2021-12-24
+    * Eliminate (test) prerequisite URL::Encode
+      The functionality is already present in the (runtime) prerequisite
+      URI::Escape, so we use that.
+      Spotted by David Cantrell
+
 0.36 2021-12-16
     * curl: Make Host: header generation not append the port number if the
       port number is the default port number for the protocol

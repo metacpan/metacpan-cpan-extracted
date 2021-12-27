@@ -4,663 +4,503 @@
 package Tripletail::DateTime;
 use strict;
 use warnings;
+use Scalar::Util qw(blessed);
 use Tripletail;
-use Tripletail::DateTime::JPHoliday;
+use Tripletail::DateTime::Calendar::Gregorian qw(toGregorian fromGregorian fromGregorianRollOver addGregorianMonthsClip addGregorianYearsClip);
+use Tripletail::DateTime::Calendar::MonthDay qw(monthLength);
+use Tripletail::DateTime::Calendar::OrdinalDate qw(toOrdinalDate isGregorianLeapYear);
+use Tripletail::DateTime::Calendar::WeekDate qw(toWeekDate);
+use Tripletail::DateTime::Clock::POSIX qw(posixDayLength posixSecondsToUTCTime utcTimeToPOSIXSeconds);
+use Tripletail::DateTime::Clock::UTC qw(getCurrentTime);
+use Tripletail::DateTime::Format::Apache qw(parseApacheDateTime);
+use Tripletail::DateTime::Format::DateCmd qw(parseDateCmdDateTime);
+use Tripletail::DateTime::Format::Generic qw($RE_GENERIC_TIMEZONE parseGenericDateTime parseGenericTimeZone renderGenericTimeZone);
+use Tripletail::DateTime::Format::RFC733 qw(parseRFC733DateTime renderRFC733DateTime);
+use Tripletail::DateTime::Format::RFC822 qw($RE_RFC822_TIMEZONE parseRFC822DateTime renderRFC822DateTime parseRFC822TimeZone renderRFC822TimeZone);
+use Tripletail::DateTime::Format::W3CDTF qw($RE_W3CDTF_TIMEZONE parseW3CDTF parseW3CDTFTimeZone renderW3CDTF renderW3CDTFTimeZone);
+use Tripletail::DateTime::JPEra qw(parseJPEra renderJPEra);
+use Tripletail::DateTime::JPHoliday ();
+use Tripletail::DateTime::LocalTime qw(getCurrentTimeZone timeToTimeOfDay timeOfDayToTime utcToLocalTime localTimeToUTC);
+use Tripletail::DateTime::Math qw(quot widenYearOf2Digits);
 
-our @WDAY_NAME = qw(Sun Mon Tue Wed Thu Fri Sat);
+our @WDAY_NAME       = qw(Sun    Mon    Tue     Wed       Thu      Fri    Sat     );
+our @WDAY_NAME_LONG  = qw(Sunday Monday Tuesday Wednesday Thursday Friday Saturday);
 
-our @WDAY_NAME_LONG = qw(Sunday Monday Tuesday Wednesday Thursday Friday Saturday);
+our @J_WDAY_NAME     = qw(日 月 火 水 木 金 土);
 
-our @J_WDAY_NAME = qw(日 月 火 水 木 金 土);
+our @MONTH_NAME      = qw(Jan     Feb      Mar   Apr   May Jun  Jul  Aug    Sep       Oct     Nov      Dec     );
+our @MONTH_NAME_LONG = qw(January February March April May June July August September October November December);
 
-our @MONTH_NAME = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+our @J_MONTH_NAME    = qw(睦月 如月 弥生 卯月 皐月 水無月 文月 葉月 長月 神無月 霜月 師走);
 
-our @J_MONTH_NAME = qw(睦月 如月 弥生 卯月 皐月 水無月 文月 葉月 長月 神無月 霜月 師走);
+our @ANIMAL_NAME     = qw(子 丑 寅 卯 辰 巳 午 未 申 酉 戌 亥);
 
-our @ANIMAL_NAME = ('子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥');
-
-our @MONTH_NAME_LONG = qw(January February March April May June July
-                      August September October November December);
-
-our %HOLIDAY = (
-		'01-01' => '元旦',
-		'02-11' => '建国記念日',
-		'04-29' => 'みどりの日',
-		'05-03' => '憲法記念日',
-		'05-05' => 'こどもの日',
-		'11-03' => '文化の日',
-		'11-23' => '勤労感謝の日',
-		'12-23' => '天皇誕生日'
-	);
-
-our @JP_YEARS = (
-		 [1868,  9,  8, '明治'], # 開始西暦, 開始月, 開始日, 年号
-		 [1912,  7, 30, '大正'],
-		 [1926, 12, 25, '昭和'],
-		 [1989,  1,  8, '平成'],
-		);
-
-our %TZ_TABLE = (
-		"gmt"       =>   0,          # Greenwich Mean
-		"ut"        =>   0, # Universal (Coordinated)
-		"utc"       =>   0,
-		"wet"       =>   0, # Western European
-		"wat"       =>  -1*3600, # West Africa
-		"at"        =>  -2*3600, # Azores
-		"ast"       =>  -4*3600, # Atlantic Standard
-		"est"       =>  -5*3600, # Eastern Standard
-		"cst"       =>  -6*3600, # Central Standard
-		"mst"       =>  -7*3600, # Mountain Standard
-		"pst"       =>  -8*3600, # Pacific Standard
-		"yst"       =>  -9*3600, # Yukon Standard
-		"hst"       => -10*3600, # Hawaii Standard
-		"cat"       => -10*3600, # Central Alaska
-		"ahst"      => -10*3600, # Alaska-Hawaii Standard
-		"nt"        => -11*3600, # Nome
-		"idlw"      => -12*3600, # International Date Line West
-		"cet"       =>  +1*3600, # Central European
-		"met"       =>  +1*3600, # Middle European
-		"mewt"      =>  +1*3600, # Middle European Winter
-		"swt"       =>  +1*3600, # Swedish Winter
-		"fwt"       =>  +1*3600, # French Winter
-		"eet"       =>  +2*3600, # Eastern Europe, USSR Zone 1
-		"bt"        =>  +3*3600, # Baghdad, USSR Zone 2
-		"zp4"       =>  +4*3600, # USSR Zone 3
-		"zp5"       =>  +5*3600, # USSR Zone 4
-		"ist"       =>  +5*3600+1800, # Indian Standard
-		"zp6"       =>  +6*3600, # USSR Zone 5
-		"wast"      =>  +7*3600, # West Australian Standard
-		"cct"       =>  +8*3600, # China Coast, USSR Zone 7
-		"jst"       =>  +9*3600, # Japan Standard, USSR Zone 8
-		"east"      => +10*3600, # Eastern Australian Standard
-		"gst"       => +10*3600, # Guam Standard, USSR Zone 9
-		"nzt"       => +12*3600, # New Zealand
-		"nzst"      => +12*3600, # New Zealand Standard
-		"idle"      => +12*3600, # International Date Line East
-	);
-our %TZ_TABLE_OFF = reverse(%TZ_TABLE);
-
-our %TZ_TABLE_DST = (
-		 "adt"  =>   -3*3600, # Atlantic Daylight
-		 "edt"  =>   -4*3600, # Eastern Daylight
-		 "cdt"  =>   -5*3600, # Central Daylight
-		 "mdt"  =>   -6*3600, # Mountain Daylight
-		 "pdt"  =>   -7*3600, # Pacific Daylight
-		 "ydt"  =>   -8*3600, # Yukon Daylight
-		 "hdt"  =>   -9*3600, # Hawaii Daylight
-		 "bst"  =>   +1*3600, # British Summer
-		 "mest" =>   +2*3600, # Middle European Summer
-		 "sst"  =>   +2*3600, # Swedish Summer
-		 "fst"  =>   +2*3600, # French Summer
-		 "wadt" =>   +8*3600, # West Australian Daylight
-		 "eadt" =>  +11*3600, # Eastern Australian Daylight
-		 "nzdt" =>  +13*3600, # New Zealand Daylight
-		);
-our %TZ_TABLE_DST_OFF = reverse(%TZ_TABLE_DST);
-
-our %RFC822_TZ_TABLE = (
-		Y   => 12*3600,
-		N   =>  1*3600,
-		GMT =>       0,
-		UT  =>       0,
-		Z   =>       0,
-		A   => -1*3600,
-		EDT => -4*3600,
-		EST => -5*3600,
-		CST => -6*3600,
-		MST => -7*3600,
-		PST => -8*3600,
-		M   =>-12*3600,
-	);
-our %RFC822_TZ_TABLE_OFF = reverse %RFC822_TZ_TABLE;
-
-sub __a2h (@) {
-	my $i = 0;
-	map { $_ => ++$i } @_;
+sub __a2h {
+    my $i = 0;
+    return map { $_ => ++$i } @_;
 }
 
-sub __a2r (@) {
-	local($_);
-	$_ = join '|', @_;
-	qr/$_/;
+sub __a2r {
+    my $re = join('|', map { quotemeta } @_);
+    return qr/$re/;
 }
-
-sub __a2r_i (@) {
-	local($_);
-	$_ = join '|', @_;
-	qr/$_/i;
-}
-
-my %MONTH_HASH = __a2h @MONTH_NAME;
-my %MONTH_LONG_HASH = __a2h @MONTH_NAME_LONG;
-my %J_MONTH_HASH = __a2h @J_MONTH_NAME;
-my %WDAY_HASH = __a2h @WDAY_NAME;
-my %WDAT_LONG_HASH = __a2h @WDAY_NAME_LONG;
-
-my $re_2year = qr/\d{2}/;
-my $re_4year = qr/\d{4}/;
-my $re_2month = qr/0[1-9]|1[0-2]/;
-my $re_2day = qr/0[1-9]|[12][0-9]|3[01]/;
-my $re_2hms = qr/[0-5][0-9]/;
-my $re_anydelim = qr/[ !@#$%^&*\-_+=|\\~`:;"',.\?\/]/;
-
-my $re_1month = qr/0?[1-9]|1[0-2]/;
-my $re_1day = qr/0?[1-9]|[12][0-9]|3[01]/;
-my $re_1hms = qr/0?[0-9]|[1-5][0-9]/;
-
-my $re_hms = qr/($re_2hms):($re_2hms):($re_2hms)/;
-
-my $re_generic_ymd = qr/($re_4year)$re_anydelim?($re_2month)$re_anydelim?($re_2day)/;
-my $re_generic_hms = qr/($re_2hms)$re_anydelim?($re_2hms)$re_anydelim?($re_2hms)/;
-my $re_generic_ymdhms = qr/$re_generic_ymd\s*$re_generic_hms/;
-
-my $re_fuzzy_generic_ymd = qr/($re_4year)$re_anydelim($re_1month)$re_anydelim($re_1day)/;
-my $re_fuzzy_generic_hms = qr/($re_1hms)$re_anydelim($re_1hms)$re_anydelim($re_1hms)/;
-my $re_fuzzy_generic_ymdhms = qr/$re_fuzzy_generic_ymd\s*$re_fuzzy_generic_hms/;
-
-my $re_wdy = __a2r @WDAY_NAME;
-my $re_wdy_long = __a2r @WDAY_NAME_LONG;
-my $re_month = __a2r @MONTH_NAME;
-my $re_month_long = __a2r @MONTH_NAME_LONG;
-my $re_j_wday = __a2r @J_WDAY_NAME;
-my $re_j_month = __a2r @J_MONTH_NAME;
-my $re_tz_name = __a2r_i(keys(%TZ_TABLE), keys(%TZ_TABLE_DST));
-my $re_jp_year_name = __a2r(map {$_->[3]} @JP_YEARS);
-my $re_animal_name = __a2r @ANIMAL_NAME;
-
-my $re_w3c_tz = qr/Z|[+\-]\d{2}:\d{2}/;
-my $re_hex_byte = qr/(?:[0-9a-f]){2}/;
-
-my $re_rfc822_tz = do {
-	my $r = __a2r keys(%RFC822_TZ_TABLE);
-	$r .= '|' . qr/[+\-]\d{4}/;
-	$r;
-};
-
-my $re_ampm = qr/[ap]\.?m\.?/i;
-my $re_j_ampm = qr/午前|午後/;
-
-my $re_date_cmd = qr/$re_wdy ($re_month) ($re_2day) $re_hms (\S+) ($re_4year)/;
-my $re_apache_access = qr!($re_2day)/($re_month)/($re_4year):$re_hms (\S+)!;
-my $re_apache_error = qr/$re_wdy ($re_month) ($re_2day) $re_hms ($re_4year)/;
-my $re_apache_index = qr/($re_2day)-($re_month)-($re_4year) $re_hms/;
-my $re_rfc_822 = qr/$re_wdy, ($re_2day) ($re_month) (\d{2}|\d{4}) $re_hms ($re_rfc822_tz)/;
-# TODO: ↑「($re_month)」の前後の空白等は、rfc822では確かに空白だが、
-#         rfc2822ではFWSになっているので、その辺を直すべきかもしれない
-#         (しかし下手にいじると問題になるかも)
-my $re_rfc_850 = qr/$re_wdy, ($re_2day)-($re_month)-(\d{2}|\d{4}) $re_hms ($re_rfc822_tz)/;
 
 1;
 
+use fields qw(localDay localDayTime timeZone);
+
 sub _new {
-	my $pkg = shift;
-	my $this = bless {} => $pkg;
+    my Tripletail::DateTime $this = shift;
 
-	$this->{jd} = undef; # ユリウス日 (小数)
-	$this->{tz} = undef; # UTCとの時差 (整数、秒)
+    if (!ref $this) {
+        $this = fields::new($this);
+    }
 
-	$this->{greg_cache} = undef;
+    $this->{localDay    } = undef; # Modified Julian Day (integer)
+    $this->{localDayTime} = undef; # Number of seconds from midnight (integer)
+    $this->{timeZone    } = undef; # Number of minutes offset from UTC (integer)
 
-	$this->set(@_);
-	$this;
+    $this->set(@_);
+    return $this;
 }
 
 sub clone {
-	my $this = shift;
+    my Tripletail::DateTime $this = shift;
 
-	bless { %$this } => ref($this);
+    return __PACKAGE__->_new($this);
 }
 
+my @PARSERS = (
+    \&parseGenericDateTime,
+    \&parseDateCmdDateTime,
+    \&parseApacheDateTime,
+    \&parseRFC733DateTime,
+    \&parseRFC822DateTime,
+    \&parseW3CDTF
+   );
 sub set {
-	my $this = shift;
-	my $val = shift;
+    my Tripletail::DateTime $this = shift;
+    my                      $val  = shift;
 
-	if(ref($val))
-	{
-		if( !Tripletail::_isa($val, ref($this)) ) {
-			die __PACKAGE__."#set: arg[1] is a reference. (第1引数がリファレンスです)\n";
-		}
-		$val = $val->toStr();
-	}
+    if (!defined $val) {
+        # Set it to the current date and time.
+        my $tz          = getCurrentTimeZone();
+        my ($day, @tod) = utcToLocalTime($tz, getCurrentTime());
 
-	if(!$val) {
-		# 現在の時刻に設定
-		$this->setTimeZone;
-		$this->setEpoch(time);
-		return $this;
-	}
+        $this->{localDay    } = $day;
+        $this->{localDayTime} = timeOfDayToTime(@tod);
+        $this->{timeZone    } = $tz;
+    }
+    elsif (ref $val) {
+        if (UNIVERSAL::isa($val, __PACKAGE__)) {
+            %$this = %$val;
+        }
+        else {
+            die __PACKAGE__."#set: arg[1] is a reference. (第1引数がリファレンスです)\n";
+        }
+    }
+    else {
+        foreach my $parser (@PARSERS) {
+            if (my ($localDay, $localDayTime, $timeZone) = $parser->($val)) {
+                $this->{localDay    } = $localDay;
+                $this->{localDayTime} = $localDayTime;
+                $this->{timeZone    } = $timeZone;
+                return $this;
+            }
+        }
 
-	if(!$this->{tz}) {
-		$this->setTimeZone;
-	}
-
-	my $greg = {
-		month => 1,
-		day => 1,
-		hour => 0,
-		min  => 0,
-		sec  => 0,
-		tz   => $this->{tz},
-	};
-
-	if($val =~ m/^$re_generic_ymdhms$/o or $val =~ m/^$re_fuzzy_generic_ymdhms$/) {
-		$greg->{year} = $1;
-		$greg->{mon} = $2;
-		$greg->{day} = $3;
-		$greg->{hour} = $4;
-		$greg->{min} = $5;
-		$greg->{sec} = $6;
-	} elsif($val =~ m/^$re_generic_ymd$/o or $val =~ m/^$re_fuzzy_generic_ymd$/) {
-		$greg->{year} = $1;
-		$greg->{mon} = $2;
-		$greg->{day} = $3;
-	} elsif($val =~ m/^$re_date_cmd$/o) {
-		$greg->{mon} = $MONTH_HASH{$1};
-		$greg->{day} = $2;
-		$greg->{hour} = $3;
-		$greg->{min} = $4;
-		$greg->{sec} = $5;
-		$greg->{tz} = $this->__getTZByName($6);
-		$greg->{year} = $7;
-
-		defined $greg->{tz} or die __PACKAGE__."#set: unknown timezone: $6 (不正なタイムゾーンです)\n";
-	} elsif($val =~ m/^$re_apache_access$/o) {
-		$greg->{day} = $1;
-		$greg->{mon} = $MONTH_HASH{$2};
-		$greg->{year} = $3;
-		$greg->{hour} = $4;
-		$greg->{min} = $5;
-		$greg->{sec} = $6;
-		$greg->{tz} = $this->__parseRFC822TimeZone($7);
-	} elsif($val =~ m/^$re_apache_error$/o) {
-		$greg->{mon} = $MONTH_HASH{$1};
-		$greg->{day} = $2;
-		$greg->{hour} = $3;
-		$greg->{min} = $4;
-		$greg->{sec} = $5;
-		$greg->{year} = $6;
-	} elsif($val =~ m/^$re_apache_index$/o) {
-		$greg->{day} = $1;
-		$greg->{mon} = $MONTH_HASH{$2};
-		$greg->{year} = $3;
-		$greg->{hour} = $4;
-		$greg->{min} = $5;
-		$greg->{sec} = $6;
-	} elsif($val =~ m/^$re_rfc_822$/o || $val =~ m/^$re_rfc_850$/o) {
-		$greg->{day} = $1;
-		$greg->{mon} = $MONTH_HASH{$2};
-		$greg->{year} = $this->__widenYearOf2Cols($3);
-		$greg->{hour} = $4;
-		$greg->{min} = $5;
-		$greg->{sec} = $6;
-		$greg->{tz} = $this->__parseRFC822TimeZone($7);
-	} elsif($val =~ m/^($re_4year)$/o
-	|| $val =~ m/^($re_4year)-($re_2month)$/o
-	|| $val =~ m/^($re_4year)-($re_2month)-($re_2day)$/o
-	|| $val =~ m/^($re_4year)-($re_2month)-($re_2day)T($re_2hms):($re_2hms)($re_w3c_tz)$/o
-	|| $val =~ m/^($re_4year)-($re_2month)-($re_2day)T($re_2hms):($re_2hms):($re_2hms)($re_w3c_tz)$/o
-	|| $val =~ m/^($re_4year)-($re_2month)-($re_2day)T($re_2hms):($re_2hms):($re_2hms)\.\d+($re_w3c_tz)$/o) {
-		$greg->{year} = $1;
-		$greg->{mon} = $2 || 1;
-		$greg->{day} = $3 || 1;
-		$greg->{hour} = $4 || 0;
-		$greg->{min} = $5 || 0;
-		if($6) {
-			if($7) {
-				$greg->{sec} = $6 || 0;
-				$greg->{tz} = $this->__parseW3CTimeZone($7);
-			} else {
-				$greg->{tz} = $this->__parseW3CTimeZone($6);
-			}
-		}
-	} else {
-		die __PACKAGE__."#set: failed to parse the date: $val (不正な日付形式です)\n";
-	}
-
-	$this->setJulianDay($this->__getJulian($greg));
-	$this;
+        die __PACKAGE__."#set: failed to parse the date: $val (不正な日付形式です)\n";
+    }
 }
 
 sub setEpoch {
-	my $this = shift;
-	my $epoch = shift;
+    my Tripletail::DateTime $this  = shift;
+    my                      $epoch = shift;
 
-	if(!defined($epoch)) {
-		die __PACKAGE__."#setEpoch: arg[1] is not defined. (第1引数が指定されていません)\n";
-	} elsif(ref($epoch)) {
-		die __PACKAGE__."#setEpoch: arg[1] is a reference. (第1引数がリファレンスです)\n";
-	} elsif($epoch !~ m/^-?\d+$/) {
-		die __PACKAGE__."#setEpoch: arg[1] is not a number. (第1引数が数字ではありません)\n";
-	}
+    if (!defined $epoch) {
+        die __PACKAGE__."#setEpoch: arg[1] is not defined. (第1引数が指定されていません)\n";
+    }
+    elsif (ref $epoch) {
+        die __PACKAGE__."#setEpoch: arg[1] is a reference. (第1引数がリファレンスです)\n";
+    }
+    elsif ($epoch !~ m/^-?\d+$/) {
+        die __PACKAGE__."#setEpoch: arg[1] is not a number. (第1引数が数字ではありません)\n";
+    }
 
-	$this->setJulianDay($this->__getJulianOfEpoch + $epoch / 86400);
-	$this;
+    my ($utctDay , $utctDayTime) = posixSecondsToUTCTime($epoch);
+    my ($localDay, @localTOD   ) = utcToLocalTime($this->{timeZone}, $utctDay, $utctDayTime);
+
+    $this->{localDay    } = $localDay;
+    $this->{localDayTime} = timeOfDayToTime(@localTOD);
+
+    return $this;
 }
 
 sub setJulianDay {
-	my $this = shift;
-	my $jd = shift;
+    no integer;
+    my Tripletail::DateTime $this = shift;
+    my                      $jd   = shift;
 
-	if(!defined($jd)) {
-		die __PACKAGE__."#setJulianDay: arg[1] is not defined. (第1引数が指定されていません)\n";
-	} elsif(ref($jd)) {
-		die __PACKAGE__."#setJulianDay: arg[1] is a reference. (第1引数がリファレンスです)\n";
-	} elsif($jd !~ m/^-?[\d\.]+$/) {
-		die __PACKAGE__."#setJulianDay: arg[1] is not a number. (第1引数が数字ではありません)\n";
-	}
+    if (!defined $jd) {
+        die __PACKAGE__."#setJulianDay: arg[1] is not defined. (第1引数が指定されていません)\n";
+    }
+    elsif (ref $jd) {
+        die __PACKAGE__."#setJulianDay: arg[1] is a reference. (第1引数がリファレンスです)\n";
+    }
+    elsif ($jd !~ m/^-?[\d\.]+$/) {
+        die __PACKAGE__."#setJulianDay: arg[1] is not a number. (第1引数が数字ではありません)\n";
+    }
 
-	$this->{jd} = $jd;
-	$this->{greg_cache} = undef;
-	$this;
+    return $this->setEpoch(int(($jd - 2440587.5) * posixDayLength()));
 }
 
 sub setYear {
-	my $this = shift;
-	my $year = shift;
+    my Tripletail::DateTime $this = shift;
+    my $year                      = shift;
 
-	if(!defined($year)) {
-		die __PACKAGE__."#setYear: arg[1] is not defined. (第1引数が指定されていません)\n";
-	} elsif(ref($year)) {
-		die __PACKAGE__."#setYear: arg[1] is a reference. (第1引数がリファレンスです)\n";
-	} elsif($year !~ m/^-?\d+$/) {
-		die __PACKAGE__."#setYear: arg[1] is not a number. (第1引数が数字ではありません)\n";
-	}
+    if (!defined $year) {
+        die __PACKAGE__."#setYear: arg[1] is not defined. (第1引数が指定されていません)\n";
+    }
+    elsif (ref $year) {
+        die __PACKAGE__."#setYear: arg[1] is a reference. (第1引数がリファレンスです)\n";
+    }
+    elsif ($year !~ m/^-?\d+$/) {
+        die __PACKAGE__."#setYear: arg[1] is not a number. (第1引数が数字ではありません)\n";
+    }
 
-	my $greg = $this->__getGregorian();
-	$greg->{year} = $year;
-	$this->setJulianDay($this->__getJulian($greg));
+    my (undef, $month, $day) = toGregorian($this->{localDay});
+    $this->{localDay} = fromGregorian($year, $month, $day);
+
+    return $this;
 }
 
 sub setMonth {
-	my $this = shift;
-	my $mon = shift;
+    my Tripletail::DateTime $this  = shift;
+    my                      $month = shift;
 
-	if(!defined($mon)) {
-		die __PACKAGE__."#setMonth: arg[1] is not defined. (第1引数が指定されていません)\n";
-	} elsif(ref($mon)) {
-		die __PACKAGE__."#setMonth: arg[1] is a reference. (第1引数がリファレンスです)\n";
-	} elsif($mon !~ m/^-?\d+$/) {
-		die __PACKAGE__."#setMonth: arg[1] is not a number. (第1引数が数字ではありません)\n";
-	} elsif($mon == 0) {
-		die __PACKAGE__."#setMonth: arg[1] == 0. (月が0です)\n";
-	} elsif($mon >= 13) {
-		die __PACKAGE__."#setMonth: arg[1] >= 13. (月が13以上です)\n";
-	} elsif($mon <= -13) {
-		die __PACKAGE__."#setMonth: arg[1] <= -13. (月が-13以下です)\n";
-	}
+    if (!defined $month) {
+        die __PACKAGE__."#setMonth: arg[1] is not defined. (第1引数が指定されていません)\n";
+    }
+    elsif (ref($month)) {
+        die __PACKAGE__."#setMonth: arg[1] is a reference. (第1引数がリファレンスです)\n";
+    }
+    elsif ($month !~ m/^-?\d+$/) {
+        die __PACKAGE__."#setMonth: arg[1] is not a number. (第1引数が数字ではありません)\n";
+    }
+    elsif ($month == 0) {
+        die __PACKAGE__."#setMonth: arg[1] == 0. (月が0です)\n";
+    }
+    elsif ($month >= 13) {
+        die __PACKAGE__."#setMonth: arg[1] >= 13. (月が13以上です)\n";
+    }
+    elsif ($month <= -13) {
+        die __PACKAGE__."#setMonth: arg[1] <= -13. (月が-13以下です)\n";
+    }
 
-	if($mon < 0) {
-		$mon += 13;
-	}
+    if ($month < 0) {
+        $month += 13;
+    }
 
-	my $greg = $this->__getGregorian();
-	$this->setJulianDay($this->addMonth($mon - $greg->{mon})->getJulianDay);
+    my ($year, undef, $day) = toGregorian($this->{localDay});
+    $this->{localDay} = fromGregorian($year, $month, $day);
+
+    return $this;
 }
 
 sub setDay {
-	my $this = shift;
-	my $day = shift;
+    my Tripletail::DateTime $this = shift;
+    my                      $day  = shift;
 
-	if(!defined($day)) {
-		die __PACKAGE__."#setDay: arg[1] is not defined. (第1引数が指定されていません)\n";
-	} elsif(ref($day)) {
-		die __PACKAGE__."#setDay: arg[1] is a reference. (第1引数がリファレンスです)\n";
-	} elsif($day !~ m/^-?\d+$/) {
-		die __PACKAGE__."#setDay: arg[1] is not a number. (第1引数が数字ではありません)\n";
-	} elsif($day == 0) {
-		die __PACKAGE__."#setDay: arg[1] == 0. (日が0です)\n";
-	}
+    if (!defined($day)) {
+        die __PACKAGE__."#setDay: arg[1] is not defined. (第1引数が指定されていません)\n";
+    }
+    elsif (ref($day)) {
+        die __PACKAGE__."#setDay: arg[1] is a reference. (第1引数がリファレンスです)\n";
+    }
+    elsif ($day !~ m/^-?\d+$/) {
+        die __PACKAGE__."#setDay: arg[1] is not a number. (第1引数が数字ではありません)\n";
+    }
+    elsif ($day == 0) {
+        die __PACKAGE__."#setDay: arg[1] == 0. (日が0です)\n";
+    }
 
-	my $greg = $this->__getGregorian();
+    my ($year, $month, undef) = toGregorian($this->{localDay});
+    my $length                = monthLength(scalar isGregorianLeapYear($year), $month);
 
-	my $last = $this->__lastDayOfMonth;
-	if($day > $last) {
-		die sprintf(__PACKAGE__."#setDay: %04d-%02d-%02d does not exist. (%04d-%02d-%02dの日付は存在しません\n",
-			$greg->{year}, $greg->{mon}, $day,
-			$greg->{year}, $greg->{mon}, $day);
-	} elsif($day < -1 * $last) {
-		die sprintf(__PACKAGE__."#setDay: %04d-%02d-%02d does not exist. (%04d-%02d-%02dの日付は存在しません)\n",
-			$greg->{year}, $greg->{mon}, $day + $last + 1,
-			$greg->{year}, $greg->{mon}, $day + $last + 1);
-	}
+    if ($day > $length) {
+        die sprintf(
+            __PACKAGE__."#setDay: %04d-%02d-%02d does not exist. (%04d-%02d-%02dの日付は存在しません\n",
+            $year, $month, $day,
+            $year, $month, $day);
+    }
+    elsif ($day < -1 * $length) {
+        die sprintf(
+            __PACKAGE__."#setDay: %04d-%02d-%02d does not exist. (%04d-%02d-%02dの日付は存在しません)\n",
+            $year, $month, $day + $length + 1,
+            $year, $month, $day + $length + 1);
+    }
 
-	if($day < 0) {
-		$day += $last + 1;
-	}
+    if ($day < 0) {
+        $day += $length + 1;
+    }
 
-	$this->setJulianDay($this->addDay($day - $greg->{day})->getJulianDay);
+    $this->{localDay} = fromGregorian($year, $month, $day);
+
+    return $this;
 }
 
 sub setHour {
-	my $this = shift;
-	my $hour = shift;
+    my Tripletail::DateTime $this = shift;
+    my                      $hour = shift;
 
-	if(!defined($hour)) {
-		die __PACKAGE__."#setHour: arg[1] is not defined. (第1引数が指定されていません)\n";
-	} elsif(ref($hour)) {
-		die __PACKAGE__."#setHour: arg[1] is a reference. (第1引数がリファレンスです)\n";
-	} elsif($hour !~ m/^-?\d+$/) {
-		die __PACKAGE__."#setHour: arg[1] is not a number. (第1引数が数字ではありません)\n";
-	} elsif($hour >= 24) {
-		die __PACKAGE__."#setHour: arg[1] >= 24. (第1引数が24以上です)\n";
-	} elsif($hour <= -24) {
-		die __PACKAGE__."#setHour: arg[1] <= -24. (第1引数が-24以下です)\n";
-	}
+    if (!defined $hour) {
+        die __PACKAGE__."#setHour: arg[1] is not defined. (第1引数が指定されていません)\n";
+    }
+    elsif (ref $hour) {
+        die __PACKAGE__."#setHour: arg[1] is a reference. (第1引数がリファレンスです)\n";
+    }
+    elsif ($hour !~ m/^-?\d+$/) {
+        die __PACKAGE__."#setHour: arg[1] is not a number. (第1引数が数字ではありません)\n";
+    }
+    elsif ($hour >= 24) {
+        die __PACKAGE__."#setHour: arg[1] >= 24. (第1引数が24以上です)\n";
+    }
+    elsif ($hour <= -24) {
+        die __PACKAGE__."#setHour: arg[1] <= -24. (第1引数が-24以下です)\n";
+    }
 
-	if($hour < 0) {
-		$hour += 24;
-	}
+    if ($hour < 0) {
+        $hour += 24;
+    }
 
-	my $greg = $this->__getGregorian();
-	$this->setJulianDay($this->addHour($hour - $greg->{hour})->getJulianDay);
+    my (undef, $minute, $second) = timeToTimeOfDay($this->{localDayTime});
+    $this->{localDayTime} = timeOfDayToTime($hour, $minute, $second);
+
+    return $this;
 }
 
 sub setMinute {
-	my $this = shift;
-	my $min = shift;
+    my Tripletail::DateTime $this   = shift;
+    my                      $minute = shift;
 
-	if(!defined($min)) {
-		die __PACKAGE__."#setMinute: arg[1] is not defined. (第1引数が指定されていません)\n";
-	} elsif(ref($min)) {
-		die __PACKAGE__."#setMinute: arg[1] is a reference. (第1引数がリファレンスです)\n";
-	} elsif($min !~ m/^-?\d+$/) {
-		die __PACKAGE__."#setMinute: arg[1] is not a number. (第1引数が数字ではありません)\n";
-	} elsif($min >= 60) {
-		die __PACKAGE__."#setHour: arg[1] >= 60. (第1引数が60以上です)\n";
-	} elsif($min <= -60) {
-		die __PACKAGE__."#setHour: arg[1] <= -60. (第1引数が-60以下です)\n";
-	}
+    if (!defined $minute) {
+        die __PACKAGE__."#setMinute: arg[1] is not defined. (第1引数が指定されていません)\n";
+    }
+    elsif (ref $minute) {
+        die __PACKAGE__."#setMinute: arg[1] is a reference. (第1引数がリファレンスです)\n";
+    }
+    elsif ($minute !~ m/^-?\d+$/) {
+        die __PACKAGE__."#setMinute: arg[1] is not a number. (第1引数が数字ではありません)\n";
+    }
+    elsif ($minute >= 60) {
+        die __PACKAGE__."#setHour: arg[1] >= 60. (第1引数が60以上です)\n";
+    }
+    elsif ($minute <= -60) {
+        die __PACKAGE__."#setHour: arg[1] <= -60. (第1引数が-60以下です)\n";
+    }
 
-	if($min < 0) {
-		$min += 60;
-	}
+    if ($minute < 0) {
+        $minute += 60;
+    }
 
-	my $greg = $this->__getGregorian();
-	$this->setJulianDay($this->addMinute($min - $greg->{min})->getJulianDay);
+    my ($hour, undef, $second) = timeToTimeOfDay($this->{localDayTime});
+    $this->{localDayTime} = timeOfDayToTime($hour, $minute, $second);
+
+    return $this;
 }
 
 sub setSecond {
-	my $this = shift;
-	my $sec = shift;
+    my Tripletail::DateTime $this   = shift;
+    my                      $second = shift;
 
-	if(!defined($sec)) {
-		die __PACKAGE__."#setSecond: arg[1] is not defined. (第1引数が指定されていません)\n";
-	} elsif(ref($sec)) {
-		die __PACKAGE__."#setSecond: arg[1] is a reference. (第1引数がリファレンスです)\n";
-	} elsif($sec !~ m/^-?\d+$/) {
-		die __PACKAGE__."#setSecond: arg[1] is not a number. (第1引数が数字ではありません)\n";
-	} elsif($sec >= 60) {
-		die __PACKAGE__."#setSecond: arg[1] >= 60. (第1引数が60以上です)\n";
-	} elsif($sec <= -60) {
-		die __PACKAGE__."#setSecond: arg[1] <= -60. (第1引数が-60以下です)\n";
-	}
+    if (!defined $second) {
+        die __PACKAGE__."#setSecond: arg[1] is not defined. (第1引数が指定されていません)\n";
+    }
+    elsif (ref $second) {
+        die __PACKAGE__."#setSecond: arg[1] is a reference. (第1引数がリファレンスです)\n";
+    }
+    elsif ($second !~ m/^-?\d+$/) {
+        die __PACKAGE__."#setSecond: arg[1] is not a number. (第1引数が数字ではありません)\n";
+    }
+    elsif ($second >= 60) {
+        die __PACKAGE__."#setSecond: arg[1] >= 60. (第1引数が60以上です)\n";
+    }
+    elsif ($second <= -60) {
+        die __PACKAGE__."#setSecond: arg[1] <= -60. (第1引数が-60以下です)\n";
+    }
 
-	if($sec < 0) {
-		$sec += 60;
-	}
+    if ($second < 0) {
+        $second += 60;
+    }
 
-	my $greg = $this->__getGregorian();
-	$this->setJulianDay($this->addSecond($sec - $greg->{sec})->getJulianDay);
+    my ($hour, $minute, undef) = timeToTimeOfDay($this->{localDayTime});
+    $this->{localDayTime} = timeOfDayToTime($hour, $minute, $second);
+
+    return $this;
 }
 
 sub setTimeZone {
-	my $this = shift;
-	my $tz = shift;
+    my Tripletail::DateTime $this = shift;
+    my                      $str  = shift;
 
-	local($_);
+    my $tz = do {
+        if (!defined $str) {
+            getCurrentTimeZone();
+        }
+        elsif (ref $str) {
+            die __PACKAGE__."#setTimeZone: arg[1] is a reference. (第1引数がリファレンスです)\n";
+        }
+        elsif ($str =~ m/^([+\-])(\d{2})(?::)?(\d{2})$/) {
+            ($1 eq '-' ? -1 : 1) * ($2 * 60 + $3);
+        }
+        elsif ($str =~ m/^-?\d+$/) {
+            $str * 60;
+        }
+        elsif (defined(my $tz = parseGenericTimeZone($str))) {
+            $tz;
+        }
+        else {
+            die __PACKAGE__."#setTimeZone: unrecognized time-zone: $str (認識できないタイムゾーンです)\n";
+        }
+    };
 
-	if(ref($tz)) {
-		die __PACKAGE__."#setTimeZone: arg[1] is a reference. (第1引数がリファレンスです)\n";
-	}
+    my @localTOD0                = timeToTimeOfDay($this->{localDayTime});
+    my ($utctDay , $utctDayTime) = localTimeToUTC($this->{timeZone}, $this->{localDay}, @localTOD0);
+    my ($localDay, @localTOD   ) = utcToLocalTime($tz, $utctDay, $utctDayTime);
 
-	if(!defined($tz)) {
-		# localtimeとgmtimeの差から計算
-		my @local = localtime(0);
-		my @gmt = gmtime(0);
+    $this->{localDay    } = $localDay;
+    $this->{localDayTime} = timeOfDayToTime(@localTOD);
+    $this->{timeZone    } = $tz;
 
-		$this->{tz} =
-			($local[0] - $gmt[0]) +
-			($local[1] - $gmt[1]) * 60 +
-			($local[2] - $gmt[2]) * 3600;
-	} elsif(defined($_ = $this->__getTZByName($tz))) {
-		$this->{tz} = $_;
-	} elsif($tz =~ m/^([+\-])(\d{2})(?::)?(\d{2})$/) {
-		$this->{tz} = ($1 eq '-' ? -1 : 1) * ($2 * 3600 + $3 * 60);
-	} elsif($tz =~ m/^-?\d+$/) {
-		$this->{tz} = $tz * 3600;
-	} else {
-		die __PACKAGE__."#setTimeZone: unrecognized TimeZone: $tz (認識できないタイムゾーンです)\n";
-	}
-
-	$this->{greg_cache} = undef;
-	$this;
+    return $this;
 }
 
 sub getEpoch {
-	my $this = shift;
+    my Tripletail::DateTime $this = shift;
 
-	my $jep = $this->__getJulianOfEpoch;
-	
-	my $epoch = ($this->{jd} - $jep) * 86400;
-	int($epoch + ($epoch >= 0 ? 0.5 : -0.5));
+    my @localTOD                = timeToTimeOfDay($this->{localDayTime});
+    my ($utctDay, $utctDayTime) = localTimeToUTC($this->{timeZone}, $this->{localDay}, @localTOD);
+
+    return utcTimeToPOSIXSeconds($utctDay, $utctDayTime);
 }
 
 sub getJulianDay {
-	my $this = shift;
+    no integer;
+    my Tripletail::DateTime $this = shift;
 
-	$this->{jd};
+    return ($this->getEpoch / posixDayLength()) + 2440587.5;
 }
 
 sub getYear {
-	my $this = shift;
-	$this->__getGregorian()->{year};
+    my Tripletail::DateTime $this = shift;
+    return (toGregorian($this->{localDay}))[0];
 }
 
 sub getMonth {
-	my $this = shift;
-	$this->__getGregorian()->{mon};
+    my Tripletail::DateTime $this = shift;
+    return (toGregorian($this->{localDay}))[1];
 }
 
 sub getDay {
-	my $this = shift;
-	$this->__getGregorian()->{day};
+    my Tripletail::DateTime $this = shift;
+    return (toGregorian($this->{localDay}))[2];
 }
 
 sub getHour {
-	my $this = shift;
-	$this->__getGregorian()->{hour};
+    my Tripletail::DateTime $this = shift;
+    return (timeToTimeOfDay($this->{localDayTime}))[0];
 }
 
 sub getMinute {
-	my $this = shift;
-	$this->__getGregorian()->{min};
+    my Tripletail::DateTime $this = shift;
+    return (timeToTimeOfDay($this->{localDayTime}))[1];
 }
 
 sub getSecond {
-	my $this = shift;
-	$this->__getGregorian()->{sec};
+    my Tripletail::DateTime $this = shift;
+    return (timeToTimeOfDay($this->{localDayTime}))[2];
 }
 
 sub getWday {
-	my $this = shift;
-	$this->__getGregorian()->{wday};
+    my Tripletail::DateTime $this = shift;
+    return (toWeekDate($this->{localDay}))[2] % 7;
 }
 
 sub getTimeZone {
-	my $this = shift;
+    my Tripletail::DateTime $this = shift;
 
-	$this->{tz} / 3600;
+    return quot($this->{timeZone}, 60);
 }
 
 sub getAnimal {
-	my $this = shift;
-	($this->getYear - 4) % 12;
+    my Tripletail::DateTime $this = shift;
+
+    return ($this->getYear - 4) % 12;
 }
 
 sub getAllHolidays {
-	my $this = shift;
+    my Tripletail::DateTime $this = shift;
 
-	my $table = $Tripletail::DateTime::JPHoliday::HOLIDAY{sprintf '%04d', $this->getYear};
-	$table ? { %$table } : {};		
+    my $table = $Tripletail::DateTime::JPHoliday::HOLIDAY{sprintf '%04d', $this->getYear};
+    return $table ? { %$table } : {};
 }
 
 sub isHoliday {
-	my $this = shift;
-	my $type = shift;
-	
-	$type = 0 if(!defined($type));
+    my Tripletail::DateTime $this = shift;
+    my                      $type = shift || 0;
 
-	if($type == 1) {
-		return 1 if($this->getWday == 0 || defined($this->getHolidayName));
-	} elsif($type == 2) {
-		return 1 if(defined($this->getHolidayName));
-	} else {
-		return 1 if($this->getWday == 0 || $this->getWday == 6 || defined($this->getHolidayName));
-	}
+    if ($type == 1) {
+        if ($this->getWday == 0 or defined $this->getHolidayName) {
+            return 1;
+        }
+    }
+    elsif ($type == 2) {
+        if (defined $this->getHolidayName) {
+            return 1;
+        }
+    }
+    else {
+        my $wday = $this->getWday;
+        if ($wday == 0 or $wday == 6 or defined $this->getHolidayName) {
+            return 1;
+        }
+    }
 
-	undef;
+    return undef;
 }
 
 sub isLeapYear {
-	my $this = shift;
-	my $greg = $this->__getGregorian();
+    my Tripletail::DateTime $this = shift;
 
-	(($greg->{year} % 4 == 0
-		&& $greg->{year} % 100 != 0
-		|| $greg->{year} % 400 == 0 ) ? 1 : undef);
+    my ($year, undef) = toOrdinalDate($this->{localDay});
+    return isGregorianLeapYear($year) ? 1 : undef;
 }
 
 sub getHolidayName {
-	my $this = shift;
+    my Tripletail::DateTime $this = shift;
 
-	local($_);
+    my $holidays = $this->getAllHolidays;
+    my $key      = sprintf '%02d-%02d', $this->getMonth, $this->getDay;
 
-	my $holidays = $this->getAllHolidays;
-	my $key = sprintf '%02d-%02d', $this->getMonth, $this->getDay;
-
-	if($_ = $holidays->{$key}) {
-		$_;
-	} else {
-		undef;
-	}
+    if (defined(my $name = $holidays->{$key})) {
+        return $name;
+    }
+    else {
+        return undef;
+    }
 }
 
 sub getCalendar {
-	my $this = shift;
-	my $year = $this->getYear;
-	my $mon = $this->getMonth;
+    my Tripletail::DateTime $this = shift;
 
-	my $dt = $this->clone;
-	my @calendar;
-	foreach my $d (1 .. $dt->__lastDayOfMonth) {
-		$dt->setDay($d);
-		push @calendar, $dt->clone;
-	}
-	\@calendar;
+    my ($year, $month, undef) = toGregorian($this->{localDay});
+    my $length                = monthLength(scalar isGregorianLeapYear($year), $month);
+
+    return [ map { $this->clone->setDay($_) } (1 .. $length) ];
 }
 
 sub getCalendarMatrix {
-	my $this = shift;
+	my Tripletail::DateTime $this = shift;
 
 	my $opt = {
 		type => 'normal',
@@ -677,7 +517,7 @@ sub getCalendarMatrix {
 	}->{lc($opt->{begin})};
 	if( !defined($begin) )
 	{
-		die __PACKAGE__."#getCalendarMatrix: opt[begin] is invalid: $_ (beginが指定が不正です)\n";
+		die __PACKAGE__."#getCalendarMatrix: opt[begin] is invalid: $opt->{begin} (beginの指定が不正です)\n";
 	}
 
 	if($opt->{type} ne 'normal' && $opt->{type} ne 'fixed') {
@@ -685,13 +525,13 @@ sub getCalendarMatrix {
 	}
 
 	my $this_month_1st = $this->clone->setDay(1);
-	
+
 	my $start_day;
 	{
 		my $daysback = ($this_month_1st->getWday()+7 - $begin)%7;
 		$start_day = $this_month_1st->clone()->addDay(-$daysback);
 	}
-	
+
 	my $weeks;
 	if( $opt->{type} eq 'fixed' )
 	{
@@ -715,525 +555,394 @@ sub getCalendarMatrix {
 		push(@$matrix, \@week);
 	}
 
-	$matrix;
+	return $matrix;
 }
 
 sub minusSecond {
-	my $this = shift;
-	if( @_==0 )
-	{
-		die __PACKAGE__."#minusSecond: arg[1] is not defined. (第1引数が指定されていません)\n";
-	}
-	my ($dt_base, $dt_sub) = $this->_prepare_biop(@_);
+    my Tripletail::DateTime $this = shift;
 
-	my $span = ($dt_base->{jd} - $dt_sub->{jd});
-	my $day = int($span);
-	my $f = $span - $day;
-	my $hour = int($f * 24);
-	my $min = int(($f * 24 - $hour) * 60);
-	my $sec = ($f * 24 * 60 - $hour * 60 - $min) * 60;
-	$sec = int($sec + ($sec >= 0 ? 0.5 : -0.5));
+    my ($lhs, $rhs) = $this->__prepare_biop(@_);
 
-	$sec + $min * 60 + $hour * 3600 + $day * 86400;
+    return $lhs->getEpoch() - $rhs->getEpoch();
 }
 
+# These two operations are in fact the same.
 sub spanSecond {
-	my $this = shift;
-	if( @_==0 )
-	{
-		die __PACKAGE__."#minusSecond: arg[1] is not defined. (第1引数が指定されていません)\n";
-	}
-	$this->minusSecond(@_);
+    my Tripletail::DateTime $this = shift;
+
+    my ($lhs, $rhs) = $this->__prepare_biop(@_);
+
+    return $lhs->getEpoch() - $rhs->getEpoch();
 }
 
 sub minusMinute {
-	my $this = shift;
-	if( @_==0 )
-	{
-		die __PACKAGE__."#minusMinute: arg[1] is not defined. (第1引数が指定されていません)\n";
-	}
-	my ($dt_base, $dt_sub) = $this->_prepare_biop(@_);
-	
-	$dt_base->setSecond(0);
-	$dt_sub->setSecond(0);
-	
-	my $span = ($dt_base->{jd} - $dt_sub->{jd});
-	my $day = int($span);
-	my $f = $span - $day;
-	my $hour = int($f * 24);
-	my $min = int(($f * 24 - $hour) * 60);
-	my $sec = ($f * 24 * 60 - $hour * 60 - $min) * 60;
-	$sec = int($sec + ($sec >= 0 ? 0.5 : -0.5));
+    my Tripletail::DateTime $this = shift;
 
-	if($sec >= 60) {
-		$min++;
-	} elsif($sec <= -60) {
-		$min-- ;
-	}
+    my ($lhs, $rhs) = $this->__prepare_biop({-sameTimeZone => 1}, @_);
+    foreach my $dt ($lhs, $rhs) {
+        my ($hour, $minute, undef) = timeToTimeOfDay($dt->{localDayTime});
+        $dt->{localDayTime} = timeOfDayToTime($hour, $minute, 0);
+    }
 
-	$min + $hour * 60 + $day * 1440;
+    my $delta = $lhs->getEpoch() - $rhs->getEpoch();
+    return quot($delta, 60);
 }
 
 sub spanMinute {
-	my $this = shift;
-	if( @_==0 )
-	{
-		die __PACKAGE__."#spanMinute: arg[1] is not defined. (第1引数が指定されていません)\n";
-	}
-	my ($dt_base, $dt_sub) = $this->_prepare_biop(@_);
+    my Tripletail::DateTime $this = shift;
 
-	my $span = ($dt_base->{jd} - $dt_sub->{jd});
-	my $day = int($span);
-	my $f = $span - $day;
-	my $hour = int($f * 24);
-	my $min = int(($f * 24 - $hour) * 60);
-	my $sec = ($f * 24 * 60 - $hour * 60 - $min) * 60;
-	$sec = int($sec + ($sec >= 0 ? 0.5 : -0.5));
+    my ($lhs, $rhs) = $this->__prepare_biop(@_);
+    my $delta       = $lhs->getEpoch() - $rhs->getEpoch();
 
-	if($sec >= 60) {
-		$min++;
-	} elsif($sec <= -60) {
-		$min-- ;
-	}
-
-	$min + $hour * 60 + $day * 1440;
+    return quot($delta, 60);
 }
 
 sub minusHour {
-	my $this = shift;
-	if( @_==0 )
-	{
-		die __PACKAGE__."#minusHour: arg[1] is not defined. (第1引数が指定されていません)\n";
-	}
-	my ($dt_base, $dt_sub) = $this->_prepare_biop(@_);
+    my Tripletail::DateTime $this = shift;
 
-	$dt_base->setSecond(0);
-	$dt_base->setMinute(0);
-	$dt_sub->setSecond(0);
-	$dt_sub->setMinute(0);
+    my ($lhs, $rhs) = $this->__prepare_biop({-sameTimeZone => 1}, @_);
+    foreach my $dt ($lhs, $rhs) {
+        my ($hour, undef, undef) = timeToTimeOfDay($dt->{localDayTime});
+        $dt->{localDayTime} = timeOfDayToTime($hour, 0, 0);
+    }
 
-	my $span = ($dt_base->{jd} - $dt_sub->{jd});
-	my $day = int($span);
-	my $f = $span - $day;
-	my $hour = int($f * 24);
-	my $min = int(($f * 24 - $hour) * 60);
-	my $sec = ($f * 24 * 60 - $hour * 60 - $min) * 60;
-	$sec = int($sec + ($sec >= 0 ? 0.5 : -0.5));
-
-	if($sec >= 60) {
-		$min++;
-	} elsif($sec <= -60) {
-		$min-- ;
-	}
-	if($min >= 60) {
-		$hour++;
-	} elsif($min <= -60) {
-		$hour-- ;
-	}
-
-	$hour + $day * 24;
+    my $delta = $lhs->getEpoch() - $rhs->getEpoch();
+    return quot($delta, 60 * 60);
 }
 
 sub spanHour {
-	my $this = shift;
-	if( @_==0 )
-	{
-		die __PACKAGE__."#spanHour: arg[1] is not defined. (第1引数が指定されていません)\n";
-	}
-	my ($dt_base, $dt_sub) = $this->_prepare_biop(@_);
+    my Tripletail::DateTime $this = shift;
 
-	my $span = ($dt_base->{jd} - $dt_sub->{jd});
-	my $day = int($span);
-	my $f = $span - $day;
-	my $hour = int($f * 24);
-	my $min = int(($f * 24 - $hour) * 60);
-	my $sec = ($f * 24 * 60 - $hour * 60 - $min) * 60;
-	$sec = int($sec + ($sec >= 0 ? 0.5 : -0.5));
+    my ($lhs, $rhs) = $this->__prepare_biop(@_);
+    my $delta       = $lhs->getEpoch() - $rhs->getEpoch();
 
-	if($sec >= 60) {
-		$min++;
-	} elsif($sec <= -60) {
-		$min-- ;
-	}
-	if($min >= 60) {
-		$hour++;
-	} elsif($min <= -60) {
-		$hour-- ;
-	}
-
-	$hour + $day * 24;
+    return quot($delta, 60 * 60);
 }
 
 sub spanDay {
-	my $this = shift;
-	if( @_==0 )
-	{
-		die __PACKAGE__."#spanDay: arg[1] is not defined. (第1引数が指定されていません)\n";
-	}
-	my ($dt_base, $dt_sub) = $this->_prepare_biop(@_);
+    my Tripletail::DateTime $this = shift;
 
-	my $span = ($dt_base->{jd} - $dt_sub->{jd});
-	my $day = int($span);
-	my $f = $span - $day;
-	my $hour = int($f * 24);
-	my $min = int(($f * 24 - $hour) * 60);
-	my $sec = ($f * 24 * 60 - $hour * 60 - $min) * 60;
-	$sec = int($sec + ($sec >= 0 ? 0.5 : -0.5));
+    my ($lhs, $rhs) = $this->__prepare_biop(@_);
+    my $delta       = $lhs->getEpoch() - $rhs->getEpoch();
 
-	if($sec >= 60) {
-		$min++;
-	} elsif($sec <= -60) {
-		$min-- ;
-	}
-	if($min >= 60) {
-		$hour++;
-	} elsif($min <= -60) {
-		$hour-- ;
-	}
-	if($hour >= 24) {
-		$day++;
-	} elsif($hour <= -24) {
-		$day-- ;
-	}
-
-	$day;
-}
-
-sub _prepare_biop
-{
-	my $this = shift;
-	my @values;
-	if( @_==0 )
-	{
-		return;
-	}elsif( @_==1 )
-	{
-		# $val1->method($val2);
-		@values = ($this,$_[0]);
-	}else
-	{
-		# $x->method($val1, $val2);
-		@values = ($_[0],$_[1]);
-	}
-	foreach my $val (@values)
-	{
-		if( ref($val) && Tripletail::_isa($val, ref($this)) )
-		{
-			$val = $val->clone();
-		}else
-		{
-			$val = $this->clone()->set($val);
-		}
-	}
-	@values;
+    return quot($delta, 60 * 60 * 24);
 }
 
 sub minusDay {
-	my $this = shift;
-	
-	if( @_==0 )
-	{
-		die __PACKAGE__."#minusDay: arg[1] is not defined. (第1引数が指定されていません)\n";
-	}
-	my ($dt_base, $dt_sub) = $this->_prepare_biop(@_);
-	
-	$dt_base->setSecond(0);
-	$dt_base->setMinute(0);
-	$dt_base->setHour(0);
-	$dt_sub->setSecond(0);
-	$dt_sub->setMinute(0);
-	$dt_sub->setHour(0);
+    my Tripletail::DateTime $this = shift;
 
-	my $span = ($dt_base->{jd} - $dt_sub->{jd});
-	my $day = int($span);
-	my $f = $span - $day;
-	my $hour = int($f * 24);
-	my $min = int(($f * 24 - $hour) * 60);
-	my $sec = ($f * 24 * 60 - $hour * 60 - $min) * 60;
-	$sec = int($sec + ($sec >= 0 ? 0.5 : -0.5));
+    my ($lhs, $rhs) = $this->__prepare_biop({-sameTimeZone => 1}, @_);
 
-	if($sec >= 60) {
-		$min++;
-	} elsif($sec <= -60) {
-		$min-- ;
-	}
-	if($min >= 60) {
-		$hour++;
-	} elsif($min <= -60) {
-		$hour-- ;
-	}
-	if($hour >= 24) {
-		$day++;
-	} elsif($hour <= -24) {
-		$day-- ;
-	}
-
-	$day;
+    return $lhs->{localDay} - $rhs->{localDay};
 }
 
 sub spanMonth {
-	my $this = shift;
-	if( @_==0 )
-	{
-		die __PACKAGE__."#spanMonth: arg[1] is not defined. (第1引数が指定されていません)\n";
-	}
-	my ($dt_base, $dt_sub) = $this->_prepare_biop(@_);
+    my Tripletail::DateTime $this = shift;
 
-	my $reverse;
-	if($dt_base->{jd} < $dt_sub->{jd}){
-		$reverse = 1;
-		($dt_base, $dt_sub) = ($dt_sub, $dt_base);
-	}
+    my ($lhs, $rhs) = $this->__prepare_biop({-sameTimeZone => 1}, @_);
+    my $sign        = ($lhs->{localDay} < $rhs->{localDay} or
+                         ($lhs->{localDay} == $rhs->{localDay} and $lhs->{localDayTime} < $rhs->{localDayTime}))
+                      ? -1
+                      :  1;
+    if ($sign < 0) {
+        ($lhs, $rhs) = ($rhs, $lhs);
+    }
 
-	my $greg1 = $dt_base->__getGregorian();
-	my $greg2 = $dt_sub->__getGregorian();
+    my ($lYear, $lMonth, $lDay) = toGregorian($lhs->{localDay});
+    my ($rYear, $rMonth, $rDay) = toGregorian($rhs->{localDay});
 
-	my $spanmon = ($greg1->{year} - $greg2->{year}) * 12 + ($greg1->{mon} - $greg2->{mon});
+    my $delta = ($lYear - $rYear) * 12 + ($lMonth - $rMonth);
+    if ($lDay < $rDay or
+          ($lDay == $rDay and $lhs->{localDayTime} < $rhs->{localDayTime})) {
 
-	if(sprintf('%02d%02d%02d%02d',$greg1->{day},$greg1->{hour},$greg1->{min},$greg1->{sec})
-	   < sprintf('%02d%02d%02d%02d',$greg2->{day},$greg2->{hour},$greg2->{min},$greg2->{sec})) {
-		 $spanmon--;
-	}
-	
-	$spanmon = 0 - $spanmon if(defined($reverse));
-	
-	$spanmon;
+        $delta--;
+    }
+
+    return $delta * $sign;
 }
 
 sub minusMonth {
-	my $this = shift;
-	if( @_==0 )
-	{
-		die __PACKAGE__."#minusMonth: arg[1] is not defined. (第1引数が指定されていません)\n";
-	}
-	my ($dt_base, $dt_sub) = $this->_prepare_biop(@_);
+    my Tripletail::DateTime $this = shift;
 
-	my $greg1 = $dt_base->__getGregorian();
-	my $greg2 = $dt_sub->__getGregorian();
+    my ($lhs  , $rhs          ) = $this->__prepare_biop({-sameTimeZone => 1}, @_);
+    my ($lYear, $lMonth, undef) = toGregorian($lhs->{localDay});
+    my ($rYear, $rMonth, undef) = toGregorian($rhs->{localDay});
 
-	($greg1->{year} - $greg2->{year}) * 12 + ($greg1->{mon} - $greg2->{mon});
+    return ($lYear - $rYear) * 12 + $lMonth - $rMonth;
 }
 
 sub spanYear {
-	my $this = shift;
-	if( @_==0 )
-	{
-		die __PACKAGE__."#spanYear: arg[1] is not defined. (第1引数が指定されていません)\n";
-	}
-	my ($dt_base, $dt_sub) = $this->_prepare_biop(@_);
+    my Tripletail::DateTime $this = shift;
 
-	my $reverse;
-	if($dt_base->{jd} < $dt_sub->{jd}){
-		$reverse = 1;
-		($dt_base,$dt_sub) = ($dt_sub,$dt_base);
-	}
+    my ($lhs, $rhs) = $this->__prepare_biop({-sameTimeZone => 1}, @_);
+    my $sign        = ($lhs->{localDay} < $rhs->{localDay} or
+                         ($lhs->{localDay} == $rhs->{localDay} and $lhs->{localDayTime} < $rhs->{localDayTime}))
+                      ? -1
+                      :  1;
+    if ($sign < 0) {
+        ($lhs, $rhs) = ($rhs, $lhs);
+    }
 
-	my $greg1 = $dt_base->__getGregorian();
-	my $greg2 = $dt_sub->__getGregorian();
+    my ($lYear, $lMonth, $lDay) = toGregorian($lhs->{localDay});
+    my ($rYear, $rMonth, $rDay) = toGregorian($rhs->{localDay});
 
-	my $spanyear = $greg1->{year} - $greg2->{year};
+    my $delta = $lYear - $rYear;
+    if ($lMonth < $rMonth or
+          ($lMonth == $rMonth and $lDay < $rDay) or
+            ($lMonth == $rMonth and $lDay == $rDay and $lhs->{localDayTime} < $rhs->{localDayTime})) {
 
-	if(sprintf('%02d%02d%02d%02d%02d',$greg1->{mon},$greg1->{day},$greg1->{hour},$greg1->{min},$greg1->{sec})
-	  < sprintf('%02d%02d%02d%02d%02d',$greg2->{mon},$greg2->{day},$greg2->{hour},$greg2->{min},$greg2->{sec})) {
-		 $spanyear--;
-	}
-	
-	$spanyear = 0 - $spanyear if(defined($reverse));
-	
-	$spanyear;
+        $delta--;
+    }
+
+    return $delta * $sign;
 }
 
 sub minusYear {
-	my $this = shift;
-	if( @_==0 )
-	{
-		die __PACKAGE__."#minusYear: arg[1] is not defined. (第1引数が指定されていません)\n";
-	}
-	my ($dt_base, $dt_sub) = $this->_prepare_biop(@_);
+    my Tripletail::DateTime $this = shift;
 
-	my $greg1 = $dt_base->__getGregorian();
-	my $greg2 = $dt_sub->__getGregorian();
+    my ($lhs  , $rhs        ) = $this->__prepare_biop({-sameTimeZone => 1}, @_);
+    my ($lYear, undef, undef) = toGregorian($lhs->{localDay});
+    my ($rYear, undef, undef) = toGregorian($rhs->{localDay});
 
-	($greg1->{year} - $greg2->{year});
+    return $lYear - $rYear;
+}
+
+sub __prepare_biop {
+    my Tripletail::DateTime $this = shift;
+    my %opts = !blessed $_[0] && UNIVERSAL::isa($_[0], 'HASH') ? %{+shift} : ();
+
+    my $findCaller = sub {
+        for (my $i = 1; ; $i++) {
+            my (undef, undef, undef, $subname) = caller($i);
+            if ($subname !~ m/^__/) {
+                return $subname;
+            }
+        }
+        return '(unknown)';
+    };
+
+    my @values = do {
+        if (@_ == 0) {
+            die sprintf(
+                "%s#%s: arg[1] is not defined. (第1引数が指定されていません)\n",
+                __PACKAGE__, $findCaller->());
+        }
+        elsif (@_ == 1) {
+            # $val1->method($val2);
+            ($this, $_[0]);
+        }
+        else {
+            # $x->method($val1, $val2);
+            ($_[0], $_[1]);
+        }
+    };
+
+    my @objects = map {
+        if (UNIVERSAL::isa($_, __PACKAGE__)) {
+            $_->clone();
+        }
+        else {
+            __PACKAGE__->_new($_);
+        }
+      } @values;
+
+    if ($opts{-sameTimeZone} and
+          $objects[0]->{timeZone} != $objects[1]->{timeZone}) {
+
+        die sprintf(
+            "%s#%s: This operation is not defined for two dates in different time-zones. ".
+              "(タイムゾーンの異なる二つの日付においては、この演算は定義されません)\n",
+            __PACKAGE__, $findCaller->());
+    }
+    else {
+        return @objects;
+    }
 }
 
 sub addSecond {
-	my $this = shift;
-	my $sec = shift;
+    my Tripletail::DateTime $this  = shift;
+    my                      $delta = shift;
 
-	if(!defined($sec)) {
-		die __PACKAGE__."#addSecond: arg[1] is not defined. (第1引数が指定されていません)\n";
-	} elsif(ref($sec)) {
-		die __PACKAGE__."#addSecond: arg[1] is a reference. (第1引数がリファレンスです)\n";
-	} elsif($sec !~ m/^-?\d+$/) {
-		die __PACKAGE__."#addSecond: arg[1] is not a number. (第1引数が数字ではありません)\n";
-	}
+    if (!defined $delta) {
+        die __PACKAGE__."#addSecond: arg[1] is not defined. (第1引数が指定されていません)\n";
+    }
+    elsif (ref $delta) {
+        die __PACKAGE__."#addSecond: arg[1] is a reference. (第1引数がリファレンスです)\n";
+    }
+    elsif ($delta !~ m/^-?\d+$/) {
+        die __PACKAGE__."#addSecond: arg[1] is not a number. (第1引数が数字ではありません)\n";
+    }
 
-	$this->setJulianDay($this->{jd} + $sec / 86400);
+    $this->setEpoch($this->getEpoch + $delta);
+
+    return $this;
 }
 
 sub addMinute {
-	my $this = shift;
-	my $min = shift;
+    my Tripletail::DateTime $this  = shift;
+    my                      $delta = shift;
 
-	if(!defined($min)) {
-		die __PACKAGE__."#addMinute: arg[1] is not defined. (第1引数が指定されていません)\n";
-	} elsif(ref($min)) {
-		die __PACKAGE__."#addMinute: arg[1] is a reference. (第1引数がリファレンスです)\n";
-	} elsif($min !~ m/^-?\d+$/) {
-		die __PACKAGE__."#addMinute: arg[1] is not a number. (第1引数が数字ではありません)\n";
-	}
+    if (!defined $delta) {
+        die __PACKAGE__."#addMinute: arg[1] is not defined. (第1引数が指定されていません)\n";
+    }
+    elsif (ref $delta) {
+        die __PACKAGE__."#addMinute: arg[1] is a reference. (第1引数がリファレンスです)\n";
+    }
+    elsif ($delta !~ m/^-?\d+$/) {
+        die __PACKAGE__."#addMinute: arg[1] is not a number. (第1引数が数字ではありません)\n";
+    }
 
-	$this->setJulianDay($this->{jd} + $min / 1440);
+    $this->setEpoch($this->getEpoch + $delta * 60);
+
+    return $this;
 }
 
 sub addHour {
-	my $this = shift;
-	my $hour = shift;
+    my Tripletail::DateTime $this  = shift;
+    my                      $delta = shift;
 
-	if(!defined($hour)) {
-		die __PACKAGE__."#addHour: arg[1] is not defined. (第1引数が指定されていません)\n";
-	} elsif(ref($hour)) {
-		die __PACKAGE__."#addHour: arg[1] is a reference. (第1引数がリファレンスです)\n";
-	} elsif($hour !~ m/^-?\d+$/) {
-		die __PACKAGE__."#addHour: arg[1] is not a number. (第1引数が数字ではありません)\n";
-	}
+    if (!defined $delta) {
+        die __PACKAGE__."#addHour: arg[1] is not defined. (第1引数が指定されていません)\n";
+    }
+    elsif (ref $delta) {
+        die __PACKAGE__."#addHour: arg[1] is a reference. (第1引数がリファレンスです)\n";
+    }
+    elsif ($delta !~ m/^-?\d+$/) {
+        die __PACKAGE__."#addHour: arg[1] is not a number. (第1引数が数字ではありません)\n";
+    }
 
-	$this->setJulianDay($this->{jd} + $hour / 24);
+    $this->setEpoch($this->getEpoch + $delta * 60 * 60);
+
+    return $this;
 }
 
 sub addDay {
-	my $this = shift;
-	my $day = shift;
+    my Tripletail::DateTime $this = shift;
+    my                      $days = shift;
 
-	if(!defined($day)) {
-		die __PACKAGE__."#addDay: arg[1] is not defined. (第1引数が指定されていません)\n";
-	} elsif(ref($day)) {
-		die __PACKAGE__."#addDay: arg[1] is a reference. (第1引数がリファレンスです)\n";
-	} elsif($day !~ m/^-?\d+$/) {
-		die __PACKAGE__."#addDay: arg[1] is not a number. (第1引数が数字ではありません)\n";
-	}
+    if (!defined $days) {
+        die __PACKAGE__."#addDay: arg[1] is not defined. (第1引数が指定されていません)\n";
+    }
+    elsif (ref $days) {
+        die __PACKAGE__."#addDay: arg[1] is a reference. (第1引数がリファレンスです)\n";
+    }
+    elsif ($days !~ m/^-?\d+$/) {
+        die __PACKAGE__."#addDay: arg[1] is not a number. (第1引数が数字ではありません)\n";
+    }
 
-	$this->setJulianDay($this->{jd} + $day);
+    $this->{localDay} += $days;
+
+    return $this;
 }
 
 sub addMonth {
-	my $this = shift;
-	my $mon = shift;
-	my $greg = { %{$this->__getGregorian()} };
+    my Tripletail::DateTime $this   = shift;
+    my                      $months = shift;
 
-	if(!defined($mon)) {
-		die __PACKAGE__."#addMonth: arg[1] is not defined. (第1引数が指定されていません)\n";
-	} elsif(ref($mon)) {
-		die __PACKAGE__."#addMonth: arg[1] is a reference. (第1引数がリファレンスです)\n";
-	} elsif($mon !~ m/^-?\d+$/) {
-		die __PACKAGE__."#addMonth: arg[1] is not a number. (第1引数が数字ではありません)\n";
-	}
+    if (!defined $months) {
+        die __PACKAGE__."#addMonth: arg[1] is not defined. (第1引数が指定されていません)\n";
+    }
+    elsif (ref $months) {
+        die __PACKAGE__."#addMonth: arg[1] is a reference. (第1引数がリファレンスです)\n";
+    }
+    elsif ($months !~ m/^-?\d+$/) {
+        die __PACKAGE__."#addMonth: arg[1] is not a number. (第1引数が数字ではありません)\n";
+    }
 
-	$greg->{mon} += $mon;
-	if($greg->{mon} < 1) {
-		while($greg->{mon} < 1) {
-			$greg->{year}--;
-			$greg->{mon} += 12;
-		}
-	} elsif($greg->{mon} > 12) {
-		$greg->{year} += int($greg->{mon} / 12);
-		$greg->{mon} = ($greg->{mon} % 12 == 0 ? 12 : $greg->{mon} % 12);
-	}
-	my $tmp = $this->clone->setJulianDay($this->__getJulian({%$greg, day => 1}));
-	my $last = $tmp->__lastDayOfMonth;
-	if ($greg->{day} > $last) {
-	$greg->{day} = $last;
-	}
-	$this->setJulianDay($this->__getJulian($greg));
+    $this->{localDay} = addGregorianMonthsClip($months, $this->{localDay});
+
+    return $this;
 }
 
 sub addYear {
-	my $this = shift;
-	my $year = shift;
-	my $greg = { %{$this->__getGregorian()} };
+    my Tripletail::DateTime $this  = shift;
+    my                      $years = shift;
 
-	if(!defined($year)) {
-		die __PACKAGE__."#addYear: arg[1] is not defined. (第1引数が指定されていません)\n";
-	} elsif(ref($year)) {
-		die __PACKAGE__."#addYear: arg[1] is a reference. (第1引数がリファレンスです)\n";
-	} elsif($year !~ m/^-?\d+$/) {
-		die __PACKAGE__."#addYear: arg[1] is not a number. (第1引数が数字ではありません)\n";
-	}
+    if (!defined $years) {
+        die __PACKAGE__."#addYear: arg[1] is not defined. (第1引数が指定されていません)\n";
+    }
+    elsif (ref $years) {
+        die __PACKAGE__."#addYear: arg[1] is a reference. (第1引数がリファレンスです)\n";
+    }
+    elsif ($years !~ m/^-?\d+$/) {
+        die __PACKAGE__."#addYear: arg[1] is not a number. (第1引数が数字ではありません)\n";
+    }
 
-	$greg->{year} += $year;
+    $this->{localDay} = addGregorianYearsClip($years, $this->{localDay});
 
-	my $tmp = $this->clone->setJulianDay($this->__getJulian({%$greg, day => 1}));
-	my $last = $tmp->__lastDayOfMonth;
-	if($greg->{day} > $last) {
-		$greg->{day} = $last;
-	}
-	$this->setJulianDay($this->__getJulian($greg));
+    return $this;
 }
 
 sub nextDay {
-	my $this = shift;
-	$this->addDay(1);
+    return shift->addDay(1);
 }
 
 sub prevDay {
-	my $this = shift;
-	$this->addDay(-1);
+    return shift->addDay(-1);
 }
 
 sub firstDay {
-	my $this = shift;
-	$this->setDay(1);
+    return shift->setDay(1);
 }
 
 sub lastDay {
-	my $this = shift;
-	$this->setDay(-1);
+    return shift->setDay(-1);
 }
 
 sub addBusinessDay {
-	my $this = shift;
-	my $day = shift;
-	my $type = shift;
+    my Tripletail::DateTime $this = shift;
+    my                      $day  = shift;
+    my                      $type = shift;
 
-	if(!defined($day)) {
-		die __PACKAGE__."#addBusinessDay: arg[1] is not defined. (第1引数が指定されていません)\n";
-	} elsif(ref($day)) {
-		die __PACKAGE__."#addBusinessDay: arg[1] is a reference. (第1引数がリファレンスです)\n";
-	} elsif($day !~ m/^-?\d+$/) {
-		die __PACKAGE__."#addBusinessDay: arg[1] is not a number. (第1引数が数字ではありません)\n";
-	}
+    if (!defined $day) {
+        die __PACKAGE__."#addBusinessDay: arg[1] is not defined. (第1引数が指定されていません)\n";
+    }
+    elsif (ref $day) {
+        die __PACKAGE__."#addBusinessDay: arg[1] is a reference. (第1引数がリファレンスです)\n";
+    }
+    elsif ($day !~ m/^-?\d+$/) {
+        die __PACKAGE__."#addBusinessDay: arg[1] is not a number. (第1引数が数字ではありません)\n";
+    }
 
-	$this->addDay($day);
-	while($this->isHoliday($type)) {
-		$this->nextDay;
-	}
+    $this->addDay($day);
+    while ($this->isHoliday($type)) {
+        $this->nextDay;
+    }
 
-	$this;
+    return $this;
 }
 
-sub toStr {
-	my $this = shift;
-	my $format = shift || 'mysql';
+my %RENDERER_OF = (
+    rfc822 => \&renderRFC822DateTime,
+    rfc850 => \&renderRFC733DateTime,
+    w3c    => \&renderW3CDTF,
+    mysql  => sub {
+        my ($day , $dayTime, $tz  ) = @_;
+        my ($y   , $m      , $d   ) = toGregorian($day);
+        my ($hour, $min    , $sec ) = timeToTimeOfDay($dayTime);
 
-	if($format eq 'mysql') {
-		$this->strFormat('%Y-%m-%d %H:%M:%S');
-	} elsif($format eq 'rfc822') {
-		$this->strFormat('%a, %d %b %Y %H:%M:%S %z');
-	} elsif($format eq 'rfc850') {
-		$this->strFormat('%a, %d-%b-%Y %H:%M:%S %z');
-	} elsif($format eq 'w3c') {
-		$this->strFormat('%Y-%m-%dT%H:%M:%S%_z');
-	} else {
-		die __PACKAGE__."#toStr: unsupported format type: $format (サポートしていないフォーマットが指定されました)\n";
-	}
+        return sprintf(
+            '%04d-%02d-%02d %02d:%02d:%02d',
+            $y, $m, $d, $hour, $min, $sec);
+    }
+   );
+sub toStr {
+    my Tripletail::DateTime $this = shift;
+    my                      $format = shift || 'mysql';
+
+    if (defined(my $renderer = $RENDERER_OF{$format})) {
+        return $renderer->($this->{localDay}, $this->{localDayTime}, $this->{timeZone});
+    }
+    else {
+        die __PACKAGE__."#toStr: unsupported format: $format (サポートしていないフォーマットが指定されました)\n";
+    }
 }
 
 sub strFormat {
-	my $this = shift;
-	my $format = shift;
-
-	local($_);
+	# THINKME: There are just too many opportunities for optimization in
+	# this single method.
+	my Tripletail::DateTime $this   = shift;
+	my                      $format = shift;
 
 	$format =~ s/%%/\0PERCENT\0/g;
 
@@ -1255,7 +964,7 @@ sub strFormat {
 
 	$format =~ s/%y/substr sprintf('%04d', $this->getYear), 2, 2/eg;
 	$format =~ s/%Y/sprintf '%04d', $this->getYear/eg;
-	$format =~ s/%_Y/$this->__getJPYear/eg;
+	$format =~ s/%_Y/renderJPEra($this->{localDay})/eg;
 
 	$format =~ s/%H/sprintf '%02d', $this->getHour/eg;
 	$format =~ s/%_H/$this->getHour/eg;
@@ -1277,9 +986,9 @@ sub strFormat {
 
 	$format =~ s/%E/$ANIMAL_NAME[$this->getAnimal]/eg;
 
-	$format =~ s/%z/$this->__getRFC822TimeZone($this->{tz})/eg;
-	$format =~ s/%_z/$this->__getW3CTimeZone($this->{tz})/eg;
-	$format =~ s/%Z/$_ = $this->__getTZNameBySec($this->{tz}); defined($_) ? uc : ''/eg;
+	$format =~ s/%z/renderRFC822TimeZone($this->{timeZone})/eg;
+	$format =~ s/%_z/renderW3CDTFTimeZone($this->{timeZone})/eg;
+	$format =~ s/%Z/my $name = renderGenericTimeZone($this->{timeZone}); defined($name) ? uc $name : ''/eg;
 
 	$format =~ s/%T/sprintf '%02d:%02d:%02d', $this->getHour, $this->getMinute, $this->getSecond/eg;
 
@@ -1287,8 +996,35 @@ sub strFormat {
 	$format;
 }
 
+my %MONTH_HASH      = __a2h(@MONTH_NAME);
+my %MONTH_LONG_HASH = __a2h(@MONTH_NAME_LONG);
+my %J_MONTH_HASH    = __a2h(@J_MONTH_NAME);
+
+my $re_2year  = qr/\d{2}/;
+my $re_4year  = qr/\d{4}/;
+my $re_2month = qr/0[1-9]|1[0-2]/;
+my $re_2day   = qr/0[1-9]|[12][0-9]|3[01]/;
+my $re_2hms   = qr/[0-5][0-9]/;
+
+my $re_1month = qr/0?[1-9]|1[0-2]/;
+my $re_1day   = qr/0?[1-9]|[12][0-9]|3[01]/;
+my $re_1hms   = qr/0?[0-9]|[1-5][0-9]/;
+
+my $re_hms    = qr/($re_2hms):($re_2hms):($re_2hms)/;
+
+my $re_wdy          = __a2r(@WDAY_NAME);
+my $re_wdy_long     = __a2r(@WDAY_NAME_LONG);
+my $re_month        = __a2r(@MONTH_NAME);
+my $re_month_long   = __a2r(@MONTH_NAME_LONG);
+my $re_j_wday       = __a2r(@J_WDAY_NAME);
+my $re_j_month      = __a2r(@J_MONTH_NAME);
+my $re_animal_name  = __a2r(@ANIMAL_NAME);
+
+my $re_ampm   = qr/[ap]\.?m\.?/i;
+my $re_j_ampm = qr/午前|午後/;
+
 sub parseFormat {
-	my $this = shift;
+	my Tripletail::DateTime $this = shift;
 	my $format = shift;
 	my $str = shift;
 
@@ -1342,7 +1078,7 @@ sub parseFormat {
 		} elsif($f =~ s/^%y//) {
 			$regex .= "($re_2year)";
 			push @parse, ['y' => sub {
-				$this->__widenYearOf2Cols($_[0]);
+				widenYearOf2Digits($_[0]);
 			}];
 		} elsif($f =~ s/^%Y//) {
 			$regex .= "($re_4year)";
@@ -1350,7 +1086,7 @@ sub parseFormat {
 		} elsif($f =~ s/^%_Y//) {
 			$regex .= qr/(\D+(?:\d+|元)年)/;
 			push @parse, [_Y => sub {
-				$this->__parseJPYear($_[0]);
+				parseJPEra($_[0]);
 			}];
 		} elsif($f =~ s/^%H//) {
 			$regex .= "($re_2hms)";
@@ -1389,19 +1125,37 @@ sub parseFormat {
 		} elsif($f =~ s/^%E//) {
 			$regex .= $re_animal_name;
 		} elsif($f =~ s/^%z//) {
-			$regex .= "($re_rfc822_tz)";
+			$regex .= "($RE_RFC822_TIMEZONE)";
 			push @parse, [z => sub {
-				$this->__parseRFC822TimeZone($_[0]);
+				my $tz = parseRFC822TimeZone($_[0]);
+				if (defined $tz) {
+					return $tz;
+				}
+				else {
+					die __PACKAGE__."#parseFormat: failed to parse RFC 822 time-zone: $str (RFC 822タイムゾーンの解析に失敗しました)\n";
+				}
 			}];
 		} elsif($f =~ s/^%_z//) {
-			$regex .= "($re_w3c_tz)";
+			$regex .= "($RE_W3CDTF_TIMEZONE)";
 			push @parse, [_z => sub {
-				$this->__parseW3CTimeZone($_[0]);
+				my $tz = parseW3CDTFTimeZone($_[0]);
+				if (defined $tz) {
+					return $tz;
+				}
+				else {
+					die __PACKAGE__."#parseFormat: failed to parse W3CDTF time-zone: $str (W3CDTFタイムゾーンの解析に失敗しました)\n";
+				}
 			}];
 		} elsif($f =~ s/^%Z//) {
-			$regex .= "($re_tz_name)";
+			$regex .= "($RE_GENERIC_TIMEZONE)";
 			push @parse, [Z => sub {
-				$this->__getTZByName($_[0]);
+				my $tz = parseGenericTimeZone($_[0]);
+				if (defined $tz) {
+					return $tz;
+				}
+				else {
+					die __PACKAGE__."#parseFormat: failed to parse generic time-zone: $str (一般的タイムゾーンの解析に失敗しました)\n";
+				}
 			}];
 		} elsif($f =~ s/^%T//) {
 			$regex .= "($re_2hms:$re_2hms:$re_2hms)";
@@ -1430,7 +1184,7 @@ sub parseFormat {
 		tz   => [qw(z _z Z)],
 
 		'12hour' => [qw(I _I)],
-		ampm   => [qw(P _P)],
+		ampm     => [qw(P _P)],
 	);
 	my %rev_group = do {
 		my %ret;
@@ -1489,301 +1243,43 @@ sub parseFormat {
 		die __PACKAGE__."#parseFormat: internal error: generated regex must be invalid. (内部エラー:生成された正規表現が不正です)\n";
 	}
 
-	my $greg = {
+	my %greg = (
+		year => undef,
 		mon  => 1,
 		day  => 1,
 		hour => 0,
 		min  => 0,
 		sec  => 0,
-		tz   => $this->{tz},
+		tz   => $this->{timeZone},
 
 		'12hour' => undef,
-		ampm   => undef, # AM => 0, PM => 1
-	};
+		ampm     => undef, # AM => 0, PM => 1
+	);
 	for(my $i = 0; $i < @parse; $i++) {
 		my $ent = $parse[$i];
 		my $matched = $matched[$i];
 
 		if($ent->[0] eq 'T') {
-			@$greg{qw(hour min sec)} = $ent->[1]->($matched);
+			@greg{qw(hour min sec)} = $ent->[1]->($matched);
 		} else {
 			my $group = $rev_group{$ent->[0]};
 			if($ent->[1]) {
-				$greg->{$group} = $ent->[1]->($matched);
+				$greg{$group} = $ent->[1]->($matched);
 			} else {
-				$greg->{$group} = $matched;
+				$greg{$group} = $matched;
 			}
 		}
 	}
 
-	if(defined($greg->{'12hour'}) && defined($greg->{ampm})) {
-		$greg->{hour} = $greg->{ampm} * 12 + $greg->{'12hour'};
+	if(defined($greg{'12hour'}) && defined($greg{ampm})) {
+		$greg{hour} = $greg{ampm} * 12 + $greg{'12hour'};
 	}
 
-	$this->setJulianDay($this->__getJulian($greg));
-	$this->{tz} = $greg->{tz};
-}
+	$this->{localDay    } = fromGregorianRollOver($greg{year}, $greg{mon}, $greg{day});
+	$this->{localDayTime} = timeOfDayToTime      ($greg{hour}, $greg{min}, $greg{sec});
+	$this->{timeZone    } = $greg{tz};
 
-sub __getRFC822TimeZone {
-	my $this = shift;
-	my $tz = shift;
-
-	local($_);
-
-	if($_ = $RFC822_TZ_TABLE_OFF{$tz}) {
-		$_;
-	} else {
-		sprintf('%s%02d%02d',
-			$tz < 0 ? '-' : '+',
-			int($tz / 3600),
-			int(($tz - int($tz / 3600) * 3600) / 60)
-		);
-	}
-}
-
-sub __parseRFC822TimeZone {
-	my $this = shift;
-	my $str = shift;
-
-	local($_);
-
-	if(defined($_ = $RFC822_TZ_TABLE{$str})) {
-		$_;
-	} elsif($str =~ m/^([+\-])(\d{2})(\d{2})$/) {
-		($1 eq '-' ? -1 : 1) * ($2 * 3600 + $3 * 60);
-	} else {
-		die __PACKAGE__.": failed to parse RFC822 TimeZone: $str (RFC822タイムゾーンの解析に失敗しました)\n";
-	}
-}
-
-sub __parseW3CTimeZone {
-	my $this = shift;
-	my $str = shift;
-
-	if($str eq 'Z') {
-		0;
-	} elsif($str =~ m/^([+\-])(\d{2}):(\d{2})$/) {
-		($1 eq '-' ? -1 : 1) * ($2 * 3600 + $3 * 60);
-	} else {
-		die __PACKAGE__.": failed to parse W3C TimeZone: $str (W3Cタイムゾーンの解析に失敗しました)\n";
-	}
-}
-
-sub __getW3CTimeZone {
-	my $this = shift;
-	my $tz = shift;
-
-	local($_);
-
-	$_ = $tz;
-	if($_ == 0) {
-		'Z';
-	} else {
-		sprintf('%s%02d:%02d',
-			$tz < 0 ? '-' : '+',
-			int($_ / 3600),
-			int(($_ - int($_ / 3600) * 3600) / 60)
-		);
-	}
-}
-
-sub __getTZByName {
-	my $this = shift;
-	my $name = lc shift;
-
-	local($_);
-
-	if(defined($_ = $TZ_TABLE{$name})) {
-		$_;
-	} elsif(defined($_ = $TZ_TABLE_DST{$name})) {
-		$_;
-	} else {
-		undef;
-	}
-}
-
-sub __getTZNameBySec {
-	my $this = shift;
-	my $sec = shift;
-
-	local($_);
-
-	if($_ = $TZ_TABLE_OFF{$sec}) {
-		$_;
-	} elsif($_ = $TZ_TABLE_DST_OFF{$sec}) {
-		$_;
-	} else {
-		undef;
-	}
-}
-
-sub __widenYearOf2Cols {
-	my $this = shift;
-	my $year = shift;
-
-	if($year < 100) {
-		($year < 50 ? 2000 : 1900) + $year;
-	} else {
-		$year;
-	}
-}
-
-sub __getJPYear {
-	my $this = shift;
-
-	my @sorted = sort {
-		$b->[0] <=> $a->[0]
-		} @JP_YEARS;
-
-	foreach my $ent (@sorted) {
-		my $d = $this->clone->set(sprintf '%04d-%02d-%02d', @$ent[0 .. 2]);
-
-		if($this->spanDay($d) >= 0) {
-			return sprintf('%s%s年',
-				$ent->[3],
-				$this->getYear == $d->getYear ?
-				'元' : $this->getYear - $d->getYear + 1
-			);
-		}
-	}
-}
-
-sub __parseJPYear {
-	my $this = shift;
-	my $str = shift;
-
-	if($str =~ m/^($re_jp_year_name)(\d+|元)年$/) {
-		foreach my $ent (@JP_YEARS) {
-			if($ent->[3] eq $1) {
-				if($2 eq '元') {
-					return $ent->[0];
-				} else {
-					return $ent->[0] + $2 - 1;
-				}
-			}
-		}
-	}
-
-	die __PACKAGE__.": failed to parse japanese year: $str (和暦の解析に失敗しました)\n";
-}
-
-sub __lastDayOfMonth {
-	my $this = shift;
-	my $want_obj = shift;
-
-	my $make_obj = sub {
-		my $greg = $this->__getGregorian();
-		$greg->{day} = shift;
-		
-		$this->clone->setJulianDay(
-			$this->__getJulian($greg));
-	};
-
-	if($this->isLeapYear && $this->getMonth == 2) {
-		return $want_obj ? $make_obj->(29) : 29;
-	}
-
-	my @last_days = (31,28,31,30,31,30,31,31,30,31,30,31);
-	my $d = $last_days[$this->getMonth - 1];
-	$want_obj ? $make_obj->($d) : $d;
-}
-
-sub __getJulianOfEpoch {
-	my $this = shift;
-
-	my ($sec, $min, $hour, $day, $mon, $year) = gmtime(0);
-	$year += 1900;
-	$mon++;
-
-	$this->__getJulian({
-		year => $year,
-		mon  => $mon,
-		day  => $day,
-		hour => $hour,
-		min  => $min,
-		sec  => $sec,
-		tz   => 0,
-	});
-}
-
-sub __getJulian {
-	my $this = shift;
-	my $greg = shift;
-
-	if($greg->{mon} < 3) {
-		$greg->{year}--;
-		$greg->{mon} += 12;
-	}
-
-	my $jd = int($greg->{year} * 365.25) - int($greg->{year} / 100) + int($greg->{year} / 400);
-	$jd += int(30.59 * ($greg->{mon} - 2));
-	$jd += $greg->{day};
-	$jd += $greg->{hour} / 24;
-	$jd += $greg->{min} / 1440;
-	$jd += $greg->{sec} / 86400;
-	$jd += 1721088.5;
-	$jd -= $greg->{tz} / 86400;
-	$jd;
-}
-
-sub __getGregorian {
-	my $this = shift;
-	my $tz = shift || $this->{tz};
-
-	local($_);
-
-	if($_ = $this->{greg_cache}) {
-		return $_;
-	}
-
-	my $greg = $this->{greg_cache} = {};
-
-	my $jd = $this->{jd} + 0.5 + $tz / 86400;
-	$greg->{wday} = int($jd + 1) % 7;
-
-	my $z = int($jd);
-	my $f = $jd - $z;
-	my $aa= int(($z - 1867216.25) / 36524.25);
-	my $a = int($z + 1 + $aa - int($aa / 4));
-	my $b = $a + 1524;
-	my $c = int(($b - 122.1) / 365.25);
-	my $k = int(365.25 * $c);
-	my $e = int(($b - $k) / 30.6001);
-
-	$greg->{day} = int($b - $k - int(30.6001 * $e));
-#	$greg->{day} = int($greg->{day} + ($greg->{day} >= 0 ? 0.5 : -0.5));
-
-	if($e < 13.5) {
-		$greg->{mon} = $e - 1;
-	} else {
-		$greg->{mon} = $e - 13;
-	}
-
-	if($greg->{mon} > 2.5) {
-		$greg->{year} = $c - 4716;
-	} else {
-		$greg->{year} = $c - 4715;
-	}
-
-	$greg->{hour} = $f * 24;
-	$greg->{hour} = int($greg->{hour});
-	$greg->{min} = ($f * 24 - $greg->{hour}) * 60;
-	$greg->{min} = int($greg->{min});
-	$greg->{sec} = ($f * 24 * 60 - $greg->{hour} * 60 - $greg->{min}) * 60;
-	$greg->{sec} = int($greg->{sec} + ($greg->{sec} >= 0 ? 0.5 : -0.5));
-
-	# 計算誤差を補正
-	if($greg->{sec} == 60) {
-		$greg->{sec} = 0;
-		$greg->{min}++;
-	}
-	if($greg->{min} == 60) {
-		$greg->{min} = 0;
-		$greg->{hour}++;
-	}
-
-	$greg->{tz} = $tz;
-	$greg;
+	return $this;
 }
 
 __END__
@@ -1837,6 +1333,7 @@ Tripletail::DateTime オブジェクトを生成。
 =item B<< 一般 >>
 
  YYYY-MM-DD
+ YYYY-MM-DD HH:MM
  YYYY-MM-DD HH:MM:SS
 
 ハイフンやコロンは別の記号であっても良く、何も無くても良い。
@@ -1850,6 +1347,7 @@ Tripletail::DateTime オブジェクトを生成。
 また、記号がある場合は次のように月、日、時、分、秒は一桁であっても良い。
 
  YYYY-M-D
+ YYYY/M/D H:M
  YYYY/M/D H:M:S
 
 =item B<< date コマンド >>
@@ -1886,6 +1384,8 @@ Tripletail::DateTime オブジェクトを生成。
 
  Wdy, DD-Mon-YYYY HH:MM:SS TIMEZONE
  (Fri, 17-Feb-2006 11:24:41 +0900)
+
+RFC 850 で規定される形式は、実際には RFC 733 のものである。
 
 =item B<< W3C Date and Time >>
 
@@ -2134,10 +1634,10 @@ minusは、指定された単位部分の差を計算する。
 minusDayであれば、時・分・秒の部分を無視し、
 年月日のみで差を計算し、その差が何日分かを返す。
 
-例：minsMonthの場合（2006年1月1日と2005年12月31日の場合、1が返る）
+例：minusMonthの場合（2006年1月1日と2005年12月31日の場合、1が返る）
 
 引数が DateTime オブジェク
-トだった場合はそのオブジェクトと比較し、それ以外の場合は引数をそのまま 
+トだった場合はそのオブジェクトと比較し、それ以外の場合は引数をそのまま
 $TL->newDateTime に渡して生成したオブジェクトと比較する。
 
 返される値は ($dt) - ($dt2) もしくは、($dt1) - ($dt2)であり、引数が過去ならば結果は負になる。

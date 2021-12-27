@@ -131,6 +131,11 @@ sub align_shapes {
       croak("Missing the required parameter 'alignment_type' when calling align_shapes");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'alignment_type'}$/i, ( 'AlignLeft', 'AlignRight', 'AlignCenter', 'AlignTop', 'AlignMiddle', 'AlignBottom', 'DistributeHorizontally', 'DistributeVertically' ))) {
+      croak("Invalid value for 'alignment_type': " . $args{'alignment_type'});
+    }
+
     # parse inputs
     my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/align/{alignmentType}';
 
@@ -293,9 +298,19 @@ sub align_special_slide_shapes {
       croak("Missing the required parameter 'slide_type' when calling align_special_slide_shapes");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
+    }
+
     # verify the required parameter 'alignment_type' is set
     unless (exists $args{'alignment_type'} && $args{'alignment_type'}) {
       croak("Missing the required parameter 'alignment_type' when calling align_special_slide_shapes");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'alignment_type'}$/i, ( 'AlignLeft', 'AlignRight', 'AlignCenter', 'AlignTop', 'AlignMiddle', 'AlignBottom', 'DistributeHorizontally', 'DistributeVertically' ))) {
+      croak("Invalid value for 'alignment_type': " . $args{'alignment_type'});
     }
 
     # parse inputs
@@ -450,6 +465,11 @@ sub convert {
       croak("Missing the required parameter 'format' when calling convert");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp' ))) {
+      croak("Invalid value for 'format': " . $args{'format'});
+    }
+
     # parse inputs
     my $_resource_path = '/slides/convert/{format}';
 
@@ -588,6 +608,11 @@ sub convert_and_save {
     # verify the required parameter 'format' is set
     unless (exists $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling convert_and_save");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp' ))) {
+      croak("Invalid value for 'format': " . $args{'format'});
     }
 
     # verify the required parameter 'out_path' is set
@@ -3217,8 +3242,8 @@ sub create_portion {
 # Create a presentation.
 # 
 # @param string $name Document name. (required)
-# @param File $data Document input data. (optional)
-# @param string $input_password The password for input document. (optional)
+# @param File $data Source presentation binary data. (optional)
+# @param string $input_password The password for source presentation. (optional)
 # @param string $password The document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -3231,12 +3256,12 @@ sub create_portion {
     },
     'data' => {
         data_type => 'File',
-        description => 'Document input data.',
+        description => 'Source presentation binary data.',
         required => '0',
     },
     'input_password' => {
         data_type => 'string',
-        description => 'The password for input document.',
+        description => 'The password for source presentation.',
         required => '0',
     },
     'password' => {
@@ -3335,9 +3360,9 @@ sub create_presentation {
 # Create a presentation from an existing source.
 # 
 # @param string $name Document name. (required)
-# @param string $source_path Template file path. (optional)
-# @param string $source_password Template file password. (optional)
-# @param string $source_storage Template storage name. (optional)
+# @param string $source_path Source file path. (optional)
+# @param string $source_password Source file password. (optional)
+# @param string $source_storage Source storage name. (optional)
 # @param string $password The document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -3350,17 +3375,17 @@ sub create_presentation {
     },
     'source_path' => {
         data_type => 'string',
-        description => 'Template file path.',
+        description => 'Source file path.',
         required => '0',
     },
     'source_password' => {
         data_type => 'string',
-        description => 'Template file password.',
+        description => 'Source file password.',
         required => '0',
     },
     'source_storage' => {
         data_type => 'string',
-        description => 'Template storage name.',
+        description => 'Source storage name.',
         required => '0',
     },
     'password' => {
@@ -4093,6 +4118,11 @@ sub create_special_slide_animation_effect {
       croak("Missing the required parameter 'slide_type' when calling create_special_slide_animation_effect");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
+    }
+
     # verify the required parameter 'effect' is set
     unless (exists $args{'effect'} && $args{'effect'}) {
       croak("Missing the required parameter 'effect' when calling create_special_slide_animation_effect");
@@ -4241,6 +4271,11 @@ sub create_special_slide_animation_interactive_sequence {
     # verify the required parameter 'slide_type' is set
     unless (exists $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling create_special_slide_animation_interactive_sequence");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
     }
 
     # verify the required parameter 'sequence' is set
@@ -4397,6 +4432,11 @@ sub create_special_slide_animation_interactive_sequence_effect {
     # verify the required parameter 'slide_type' is set
     unless (exists $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling create_special_slide_animation_interactive_sequence_effect");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
     }
 
     # verify the required parameter 'sequence_index' is set
@@ -4571,6 +4611,11 @@ sub create_special_slide_paragraph {
     # verify the required parameter 'slide_type' is set
     unless (exists $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling create_special_slide_paragraph");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
     }
 
     # verify the required parameter 'shape_index' is set
@@ -4756,6 +4801,11 @@ sub create_special_slide_portion {
     # verify the required parameter 'slide_type' is set
     unless (exists $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling create_special_slide_portion");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
     }
 
     # verify the required parameter 'shape_index' is set
@@ -4949,6 +4999,11 @@ sub create_special_slide_shape {
       croak("Missing the required parameter 'slide_type' when calling create_special_slide_shape");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
+    }
+
     # parse inputs
     my $_resource_path = '/slides/{name}/slides/{slideIndex}/{slideType}/shapes';
 
@@ -5120,6 +5175,11 @@ sub create_special_slide_subshape {
     # verify the required parameter 'slide_type' is set
     unless (exists $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling create_special_slide_subshape");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
     }
 
     # verify the required parameter 'path' is set
@@ -5305,6 +5365,11 @@ sub create_special_slide_subshape_paragraph {
     # verify the required parameter 'slide_type' is set
     unless (exists $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling create_special_slide_subshape_paragraph");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
     }
 
     # verify the required parameter 'path' is set
@@ -5508,6 +5573,11 @@ sub create_special_slide_subshape_portion {
     # verify the required parameter 'slide_type' is set
     unless (exists $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling create_special_slide_subshape_portion");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
     }
 
     # verify the required parameter 'path' is set
@@ -10322,6 +10392,11 @@ sub delete_special_slide_animation {
       croak("Missing the required parameter 'slide_type' when calling delete_special_slide_animation");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
+    }
+
     # parse inputs
     my $_resource_path = '/slides/{name}/slides/{slideIndex}/{slideType}/animation';
 
@@ -10460,6 +10535,11 @@ sub delete_special_slide_animation_effect {
     # verify the required parameter 'slide_type' is set
     unless (exists $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling delete_special_slide_animation_effect");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
     }
 
     # verify the required parameter 'effect_index' is set
@@ -10612,6 +10692,11 @@ sub delete_special_slide_animation_interactive_sequence {
     # verify the required parameter 'slide_type' is set
     unless (exists $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling delete_special_slide_animation_interactive_sequence");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
     }
 
     # verify the required parameter 'sequence_index' is set
@@ -10772,6 +10857,11 @@ sub delete_special_slide_animation_interactive_sequence_effect {
       croak("Missing the required parameter 'slide_type' when calling delete_special_slide_animation_interactive_sequence_effect");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
+    }
+
     # verify the required parameter 'sequence_index' is set
     unless (exists $args{'sequence_index'}) {
       croak("Missing the required parameter 'sequence_index' when calling delete_special_slide_animation_interactive_sequence_effect");
@@ -10930,6 +11020,11 @@ sub delete_special_slide_animation_interactive_sequences {
       croak("Missing the required parameter 'slide_type' when calling delete_special_slide_animation_interactive_sequences");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
+    }
+
     # parse inputs
     my $_resource_path = '/slides/{name}/slides/{slideIndex}/{slideType}/animation/interactiveSequences';
 
@@ -11062,6 +11157,11 @@ sub delete_special_slide_animation_main_sequence {
     # verify the required parameter 'slide_type' is set
     unless (exists $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling delete_special_slide_animation_main_sequence");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
     }
 
     # parse inputs
@@ -11208,6 +11308,11 @@ sub delete_special_slide_paragraph {
     # verify the required parameter 'slide_type' is set
     unless (exists $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling delete_special_slide_paragraph");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
     }
 
     # verify the required parameter 'shape_index' is set
@@ -11380,6 +11485,11 @@ sub delete_special_slide_paragraphs {
       croak("Missing the required parameter 'slide_type' when calling delete_special_slide_paragraphs");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
+    }
+
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling delete_special_slide_paragraphs");
@@ -11547,6 +11657,11 @@ sub delete_special_slide_portion {
     # verify the required parameter 'slide_type' is set
     unless (exists $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling delete_special_slide_portion");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
     }
 
     # verify the required parameter 'shape_index' is set
@@ -11737,6 +11852,11 @@ sub delete_special_slide_portions {
       croak("Missing the required parameter 'slide_type' when calling delete_special_slide_portions");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
+    }
+
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling delete_special_slide_portions");
@@ -11906,6 +12026,11 @@ sub delete_special_slide_shape {
       croak("Missing the required parameter 'slide_type' when calling delete_special_slide_shape");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
+    }
+
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling delete_special_slide_shape");
@@ -12058,6 +12183,11 @@ sub delete_special_slide_shapes {
       croak("Missing the required parameter 'slide_type' when calling delete_special_slide_shapes");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
+    }
+
     # parse inputs
     my $_resource_path = '/slides/{name}/slides/{slideIndex}/{slideType}/shapes';
 
@@ -12207,6 +12337,11 @@ sub delete_special_slide_subshape {
     # verify the required parameter 'slide_type' is set
     unless (exists $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling delete_special_slide_subshape");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
     }
 
     # verify the required parameter 'path' is set
@@ -12383,6 +12518,11 @@ sub delete_special_slide_subshape_paragraph {
     # verify the required parameter 'slide_type' is set
     unless (exists $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling delete_special_slide_subshape_paragraph");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
     }
 
     # verify the required parameter 'path' is set
@@ -12573,6 +12713,11 @@ sub delete_special_slide_subshape_paragraphs {
       croak("Missing the required parameter 'slide_type' when calling delete_special_slide_subshape_paragraphs");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
+    }
+
     # verify the required parameter 'path' is set
     unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling delete_special_slide_subshape_paragraphs");
@@ -12758,6 +12903,11 @@ sub delete_special_slide_subshape_portion {
     # verify the required parameter 'slide_type' is set
     unless (exists $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling delete_special_slide_subshape_portion");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
     }
 
     # verify the required parameter 'path' is set
@@ -12966,6 +13116,11 @@ sub delete_special_slide_subshape_portions {
       croak("Missing the required parameter 'slide_type' when calling delete_special_slide_subshape_portions");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
+    }
+
     # verify the required parameter 'path' is set
     unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling delete_special_slide_subshape_portions");
@@ -13151,6 +13306,11 @@ sub delete_special_slide_subshapes {
     # verify the required parameter 'slide_type' is set
     unless (exists $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling delete_special_slide_subshapes");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
     }
 
     # verify the required parameter 'path' is set
@@ -14578,6 +14738,11 @@ sub download_image {
       croak("Missing the required parameter 'format' when calling download_image");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff' ))) {
+      croak("Invalid value for 'format': " . $args{'format'});
+    }
+
     # parse inputs
     my $_resource_path = '/slides/{name}/images/{index}/{format}';
 
@@ -14906,6 +15071,11 @@ sub download_image_online {
       croak("Missing the required parameter 'format' when calling download_image_online");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff' ))) {
+      croak("Invalid value for 'format': " . $args{'format'});
+    }
+
     # parse inputs
     my $_resource_path = '/slides/images/{index}/{format}';
 
@@ -15013,6 +15183,11 @@ sub download_images {
     # verify the required parameter 'format' is set
     unless (exists $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling download_images");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff' ))) {
+      croak("Invalid value for 'format': " . $args{'format'});
     }
 
     # parse inputs
@@ -15289,6 +15464,11 @@ sub download_images_online {
       croak("Missing the required parameter 'format' when calling download_images_online");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff' ))) {
+      croak("Invalid value for 'format': " . $args{'format'});
+    }
+
     # parse inputs
     my $_resource_path = '/slides/images/download/{format}';
 
@@ -15418,6 +15598,11 @@ sub download_notes_slide {
     # verify the required parameter 'format' is set
     unless (exists $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling download_notes_slide");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff' ))) {
+      croak("Invalid value for 'format': " . $args{'format'});
     }
 
     # parse inputs
@@ -15575,6 +15760,11 @@ sub download_notes_slide_online {
       croak("Missing the required parameter 'format' when calling download_notes_slide_online");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff' ))) {
+      croak("Invalid value for 'format': " . $args{'format'});
+    }
+
     # parse inputs
     my $_resource_path = '/slides/slides/{slideIndex}/notesSlide/{format}';
 
@@ -15715,6 +15905,11 @@ sub download_presentation {
     # verify the required parameter 'format' is set
     unless (exists $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling download_presentation");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp' ))) {
+      croak("Invalid value for 'format': " . $args{'format'});
     }
 
     # parse inputs
@@ -15898,6 +16093,16 @@ sub download_shape {
     # verify the required parameter 'format' is set
     unless (exists $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling download_shape");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Svg' ))) {
+      croak("Invalid value for 'format': " . $args{'format'});
+    }
+
+    # verify enum value
+    if (exists $args{'bounds'} && $args{'bounds'} && !grep(/^$args{'bounds'}$/i, ( 'Slide', 'Shape', 'Appearance' ))) {
+      croak("Invalid value for 'bounds': " . $args{'bounds'});
     }
 
     # parse inputs
@@ -16101,6 +16306,16 @@ sub download_shape_online {
       croak("Missing the required parameter 'format' when calling download_shape_online");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Svg' ))) {
+      croak("Invalid value for 'format': " . $args{'format'});
+    }
+
+    # verify enum value
+    if (exists $args{'bounds'} && $args{'bounds'} && !grep(/^$args{'bounds'}$/i, ( 'Slide', 'Shape', 'Appearance' ))) {
+      croak("Invalid value for 'bounds': " . $args{'bounds'});
+    }
+
     # parse inputs
     my $_resource_path = '/slides/slides/{slideIndex}/shapes/{shapeIndex}/{format}';
 
@@ -16282,6 +16497,11 @@ sub download_slide {
       croak("Missing the required parameter 'format' when calling download_slide");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp' ))) {
+      croak("Invalid value for 'format': " . $args{'format'});
+    }
+
     # parse inputs
     my $_resource_path = '/slides/{name}/slides/{slideIndex}/{format}';
 
@@ -16452,6 +16672,11 @@ sub download_slide_online {
     # verify the required parameter 'format' is set
     unless (exists $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling download_slide_online");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp' ))) {
+      croak("Invalid value for 'format': " . $args{'format'});
     }
 
     # parse inputs
@@ -16641,6 +16866,11 @@ sub download_special_slide_shape {
       croak("Missing the required parameter 'slide_type' when calling download_special_slide_shape");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
+    }
+
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling download_special_slide_shape");
@@ -16649,6 +16879,16 @@ sub download_special_slide_shape {
     # verify the required parameter 'format' is set
     unless (exists $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling download_special_slide_shape");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Svg' ))) {
+      croak("Invalid value for 'format': " . $args{'format'});
+    }
+
+    # verify enum value
+    if (exists $args{'bounds'} && $args{'bounds'} && !grep(/^$args{'bounds'}$/i, ( 'Slide', 'Shape', 'Appearance' ))) {
+      croak("Invalid value for 'bounds': " . $args{'bounds'});
     }
 
     # parse inputs
@@ -16872,6 +17112,11 @@ sub download_special_slide_subshape {
       croak("Missing the required parameter 'slide_type' when calling download_special_slide_subshape");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
+    }
+
     # verify the required parameter 'path' is set
     unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling download_special_slide_subshape");
@@ -16885,6 +17130,16 @@ sub download_special_slide_subshape {
     # verify the required parameter 'format' is set
     unless (exists $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling download_special_slide_subshape");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Svg' ))) {
+      croak("Invalid value for 'format': " . $args{'format'});
+    }
+
+    # verify enum value
+    if (exists $args{'bounds'} && $args{'bounds'} && !grep(/^$args{'bounds'}$/i, ( 'Slide', 'Shape', 'Appearance' ))) {
+      croak("Invalid value for 'bounds': " . $args{'bounds'});
     }
 
     # parse inputs
@@ -17119,6 +17374,16 @@ sub download_subshape {
       croak("Missing the required parameter 'format' when calling download_subshape");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Svg' ))) {
+      croak("Invalid value for 'format': " . $args{'format'});
+    }
+
+    # verify enum value
+    if (exists $args{'bounds'} && $args{'bounds'} && !grep(/^$args{'bounds'}$/i, ( 'Slide', 'Shape', 'Appearance' ))) {
+      croak("Invalid value for 'bounds': " . $args{'bounds'});
+    }
+
     # parse inputs
     my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{path}/{shapeIndex}/{format}';
 
@@ -17230,6 +17495,7 @@ sub download_subshape {
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
 # @param int $shape_index Shape index. If specified, only effects related to that shape are returned. (optional)
+# @param int $paragraph_index Paragraph index. (optional)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -17248,6 +17514,11 @@ sub download_subshape {
     'shape_index' => {
         data_type => 'int',
         description => 'Shape index. If specified, only effects related to that shape are returned.',
+        required => '0',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
         required => '0',
     },
     'password' => {
@@ -17305,6 +17576,11 @@ sub get_animation {
     # query params
     if (exists $args{'shape_index'} && defined $args{'shape_index'}) {
         $query_params->{'shapeIndex'} = $self->{api_client}->to_query_value($args{'shape_index'});
+    }
+
+    # query params
+    if (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
+        $query_params->{'paragraphIndex'} = $self->{api_client}->to_query_value($args{'paragraph_index'});
     }
 
     # query params
@@ -21439,6 +21715,7 @@ sub get_slides {
 # @param int $slide_index Parent slide index. (required)
 # @param string $slide_type Slide type (master, layout or notes). (required)
 # @param int $shape_index Shape index. If specified, only effects related to that shape are returned. (optional)
+# @param int $paragraph_index Paragraph index. If specified, only effects related to that paragraph are returned. (optional)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -21462,6 +21739,11 @@ sub get_slides {
     'shape_index' => {
         data_type => 'int',
         description => 'Shape index. If specified, only effects related to that shape are returned.',
+        required => '0',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index. If specified, only effects related to that paragraph are returned.',
         required => '0',
     },
     'password' => {
@@ -21506,6 +21788,11 @@ sub get_special_slide_animation {
       croak("Missing the required parameter 'slide_type' when calling get_special_slide_animation");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
+    }
+
     # parse inputs
     my $_resource_path = '/slides/{name}/slides/{slideIndex}/{slideType}/animation';
 
@@ -21524,6 +21811,11 @@ sub get_special_slide_animation {
     # query params
     if (exists $args{'shape_index'} && defined $args{'shape_index'}) {
         $query_params->{'shapeIndex'} = $self->{api_client}->to_query_value($args{'shape_index'});
+    }
+
+    # query params
+    if (exists $args{'paragraph_index'} && defined $args{'paragraph_index'}) {
+        $query_params->{'paragraphIndex'} = $self->{api_client}->to_query_value($args{'paragraph_index'});
     }
 
     # query params
@@ -21655,6 +21947,11 @@ sub get_special_slide_paragraph {
     # verify the required parameter 'slide_type' is set
     unless (exists $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling get_special_slide_paragraph");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
     }
 
     # verify the required parameter 'shape_index' is set
@@ -21821,6 +22118,11 @@ sub get_special_slide_paragraphs {
       croak("Missing the required parameter 'slide_type' when calling get_special_slide_paragraphs");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
+    }
+
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling get_special_slide_paragraphs");
@@ -21983,6 +22285,11 @@ sub get_special_slide_portion {
     # verify the required parameter 'slide_type' is set
     unless (exists $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling get_special_slide_portion");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
     }
 
     # verify the required parameter 'shape_index' is set
@@ -22167,6 +22474,11 @@ sub get_special_slide_portions {
       croak("Missing the required parameter 'slide_type' when calling get_special_slide_portions");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
+    }
+
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling get_special_slide_portions");
@@ -22331,6 +22643,11 @@ sub get_special_slide_shape {
       croak("Missing the required parameter 'slide_type' when calling get_special_slide_shape");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
+    }
+
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling get_special_slide_shape");
@@ -22477,6 +22794,11 @@ sub get_special_slide_shapes {
       croak("Missing the required parameter 'slide_type' when calling get_special_slide_shapes");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
+    }
+
     # parse inputs
     my $_resource_path = '/slides/{name}/slides/{slideIndex}/{slideType}/shapes';
 
@@ -22621,6 +22943,11 @@ sub get_special_slide_subshape {
     # verify the required parameter 'slide_type' is set
     unless (exists $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling get_special_slide_subshape");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
     }
 
     # verify the required parameter 'path' is set
@@ -22797,6 +23124,11 @@ sub get_special_slide_subshape_paragraph {
     # verify the required parameter 'slide_type' is set
     unless (exists $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling get_special_slide_subshape_paragraph");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
     }
 
     # verify the required parameter 'path' is set
@@ -22981,6 +23313,11 @@ sub get_special_slide_subshape_paragraphs {
       croak("Missing the required parameter 'slide_type' when calling get_special_slide_subshape_paragraphs");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
+    }
+
     # verify the required parameter 'path' is set
     unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling get_special_slide_subshape_paragraphs");
@@ -23161,6 +23498,11 @@ sub get_special_slide_subshape_portion {
     # verify the required parameter 'slide_type' is set
     unless (exists $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling get_special_slide_subshape_portion");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
     }
 
     # verify the required parameter 'path' is set
@@ -23363,6 +23705,11 @@ sub get_special_slide_subshape_portions {
       croak("Missing the required parameter 'slide_type' when calling get_special_slide_subshape_portions");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
+    }
+
     # verify the required parameter 'path' is set
     unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling get_special_slide_subshape_portions");
@@ -23537,6 +23884,11 @@ sub get_special_slide_subshapes {
     # verify the required parameter 'slide_type' is set
     unless (exists $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling get_special_slide_subshapes");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
     }
 
     # verify the required parameter 'path' is set
@@ -26999,6 +27351,11 @@ sub save_presentation {
       croak("Missing the required parameter 'format' when calling save_presentation");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'format'}$/i, ( 'Pdf', 'Xps', 'Tiff', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Pot', 'Potx', 'Potm', 'Html', 'Html5', 'Swf', 'Svg', 'Jpeg', 'Png', 'Gif', 'Bmp', 'Fodp' ))) {
+      croak("Invalid value for 'format': " . $args{'format'});
+    }
+
     # verify the required parameter 'out_path' is set
     unless (exists $args{'out_path'} && $args{'out_path'}) {
       croak("Missing the required parameter 'out_path' when calling save_presentation");
@@ -27194,9 +27551,19 @@ sub save_shape {
       croak("Missing the required parameter 'format' when calling save_shape");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Svg' ))) {
+      croak("Invalid value for 'format': " . $args{'format'});
+    }
+
     # verify the required parameter 'out_path' is set
     unless (exists $args{'out_path'} && $args{'out_path'}) {
       croak("Missing the required parameter 'out_path' when calling save_shape");
+    }
+
+    # verify enum value
+    if (exists $args{'bounds'} && $args{'bounds'} && !grep(/^$args{'bounds'}$/i, ( 'Slide', 'Shape', 'Appearance' ))) {
+      croak("Invalid value for 'bounds': " . $args{'bounds'});
     }
 
     # parse inputs
@@ -27407,9 +27774,19 @@ sub save_shape_online {
       croak("Missing the required parameter 'format' when calling save_shape_online");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Svg' ))) {
+      croak("Invalid value for 'format': " . $args{'format'});
+    }
+
     # verify the required parameter 'out_path' is set
     unless (exists $args{'out_path'} && $args{'out_path'}) {
       croak("Missing the required parameter 'out_path' when calling save_shape_online");
+    }
+
+    # verify enum value
+    if (exists $args{'bounds'} && $args{'bounds'} && !grep(/^$args{'bounds'}$/i, ( 'Slide', 'Shape', 'Appearance' ))) {
+      croak("Invalid value for 'bounds': " . $args{'bounds'});
     }
 
     # parse inputs
@@ -27600,6 +27977,11 @@ sub save_slide {
       croak("Missing the required parameter 'format' when calling save_slide");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp' ))) {
+      croak("Invalid value for 'format': " . $args{'format'});
+    }
+
     # verify the required parameter 'out_path' is set
     unless (exists $args{'out_path'} && $args{'out_path'}) {
       croak("Missing the required parameter 'out_path' when calling save_slide");
@@ -27782,6 +28164,11 @@ sub save_slide_online {
     # verify the required parameter 'format' is set
     unless (exists $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling save_slide_online");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp' ))) {
+      croak("Invalid value for 'format': " . $args{'format'});
     }
 
     # verify the required parameter 'out_path' is set
@@ -27983,6 +28370,11 @@ sub save_special_slide_shape {
       croak("Missing the required parameter 'slide_type' when calling save_special_slide_shape");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
+    }
+
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling save_special_slide_shape");
@@ -27993,9 +28385,19 @@ sub save_special_slide_shape {
       croak("Missing the required parameter 'format' when calling save_special_slide_shape");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Svg' ))) {
+      croak("Invalid value for 'format': " . $args{'format'});
+    }
+
     # verify the required parameter 'out_path' is set
     unless (exists $args{'out_path'} && $args{'out_path'}) {
       croak("Missing the required parameter 'out_path' when calling save_special_slide_shape");
+    }
+
+    # verify enum value
+    if (exists $args{'bounds'} && $args{'bounds'} && !grep(/^$args{'bounds'}$/i, ( 'Slide', 'Shape', 'Appearance' ))) {
+      croak("Invalid value for 'bounds': " . $args{'bounds'});
     }
 
     # parse inputs
@@ -28226,6 +28628,11 @@ sub save_special_slide_subshape {
       croak("Missing the required parameter 'slide_type' when calling save_special_slide_subshape");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
+    }
+
     # verify the required parameter 'path' is set
     unless (exists $args{'path'} && $args{'path'}) {
       croak("Missing the required parameter 'path' when calling save_special_slide_subshape");
@@ -28241,9 +28648,19 @@ sub save_special_slide_subshape {
       croak("Missing the required parameter 'format' when calling save_special_slide_subshape");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Svg' ))) {
+      croak("Invalid value for 'format': " . $args{'format'});
+    }
+
     # verify the required parameter 'out_path' is set
     unless (exists $args{'out_path'} && $args{'out_path'}) {
       croak("Missing the required parameter 'out_path' when calling save_special_slide_subshape");
+    }
+
+    # verify enum value
+    if (exists $args{'bounds'} && $args{'bounds'} && !grep(/^$args{'bounds'}$/i, ( 'Slide', 'Shape', 'Appearance' ))) {
+      croak("Invalid value for 'bounds': " . $args{'bounds'});
     }
 
     # parse inputs
@@ -28485,9 +28902,19 @@ sub save_subshape {
       croak("Missing the required parameter 'format' when calling save_subshape");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Svg' ))) {
+      croak("Invalid value for 'format': " . $args{'format'});
+    }
+
     # verify the required parameter 'out_path' is set
     unless (exists $args{'out_path'} && $args{'out_path'}) {
       croak("Missing the required parameter 'out_path' when calling save_subshape");
+    }
+
+    # verify enum value
+    if (exists $args{'bounds'} && $args{'bounds'} && !grep(/^$args{'bounds'}$/i, ( 'Slide', 'Shape', 'Appearance' ))) {
+      croak("Invalid value for 'bounds': " . $args{'bounds'});
     }
 
     # parse inputs
@@ -30120,6 +30547,11 @@ sub set_special_slide_animation {
       croak("Missing the required parameter 'slide_type' when calling set_special_slide_animation");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
+    }
+
     # verify the required parameter 'animation' is set
     unless (exists $args{'animation'} && $args{'animation'}) {
       croak("Missing the required parameter 'animation' when calling set_special_slide_animation");
@@ -30404,6 +30836,11 @@ sub split {
       croak("Missing the required parameter 'name' when calling split");
     }
 
+    # verify enum value
+    if (exists $args{'format'} && $args{'format'} && !grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp' ))) {
+      croak("Invalid value for 'format': " . $args{'format'});
+    }
+
     # parse inputs
     my $_resource_path = '/slides/{name}/split';
 
@@ -30583,6 +31020,11 @@ sub split_and_save_online {
       croak("Missing the required parameter 'format' when calling split_and_save_online");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp' ))) {
+      croak("Invalid value for 'format': " . $args{'format'});
+    }
+
     # parse inputs
     my $_resource_path = '/slides/split/{format}';
 
@@ -30742,6 +31184,11 @@ sub split_online {
     # verify the required parameter 'format' is set
     unless (exists $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling split_online");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'format'}$/i, ( 'Jpeg', 'Png', 'Gif', 'Bmp', 'Tiff', 'Html', 'Pdf', 'Xps', 'Pptx', 'Odp', 'Otp', 'Ppt', 'Pps', 'Ppsx', 'Pptm', 'Ppsm', 'Potx', 'Pot', 'Potm', 'Svg', 'Fodp' ))) {
+      croak("Invalid value for 'format': " . $args{'format'});
     }
 
     # parse inputs
@@ -32836,6 +33283,11 @@ sub update_special_slide_animation_effect {
       croak("Missing the required parameter 'slide_type' when calling update_special_slide_animation_effect");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
+    }
+
     # verify the required parameter 'effect_index' is set
     unless (exists $args{'effect_index'}) {
       croak("Missing the required parameter 'effect_index' when calling update_special_slide_animation_effect");
@@ -33008,6 +33460,11 @@ sub update_special_slide_animation_interactive_sequence_effect {
     # verify the required parameter 'slide_type' is set
     unless (exists $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling update_special_slide_animation_interactive_sequence_effect");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
     }
 
     # verify the required parameter 'sequence_index' is set
@@ -33194,6 +33651,11 @@ sub update_special_slide_paragraph {
     # verify the required parameter 'slide_type' is set
     unless (exists $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling update_special_slide_paragraph");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
     }
 
     # verify the required parameter 'shape_index' is set
@@ -33388,6 +33850,11 @@ sub update_special_slide_portion {
       croak("Missing the required parameter 'slide_type' when calling update_special_slide_portion");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
+    }
+
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling update_special_slide_portion");
@@ -33580,6 +34047,11 @@ sub update_special_slide_shape {
       croak("Missing the required parameter 'slide_type' when calling update_special_slide_shape");
     }
 
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
+    }
+
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling update_special_slide_shape");
@@ -33752,6 +34224,11 @@ sub update_special_slide_subshape {
     # verify the required parameter 'slide_type' is set
     unless (exists $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling update_special_slide_subshape");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
     }
 
     # verify the required parameter 'path' is set
@@ -33944,6 +34421,11 @@ sub update_special_slide_subshape_paragraph {
     # verify the required parameter 'slide_type' is set
     unless (exists $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling update_special_slide_subshape_paragraph");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
     }
 
     # verify the required parameter 'path' is set
@@ -34154,6 +34636,11 @@ sub update_special_slide_subshape_portion {
     # verify the required parameter 'slide_type' is set
     unless (exists $args{'slide_type'} && $args{'slide_type'}) {
       croak("Missing the required parameter 'slide_type' when calling update_special_slide_subshape_portion");
+    }
+
+    # verify enum value
+    if (!grep(/^$args{'slide_type'}$/i, ( 'MasterSlide', 'LayoutSlide', 'NotesSlide' ))) {
+      croak("Invalid value for 'slide_type': " . $args{'slide_type'});
     }
 
     # verify the required parameter 'path' is set

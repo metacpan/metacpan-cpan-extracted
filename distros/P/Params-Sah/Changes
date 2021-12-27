@@ -1,3 +1,13 @@
+0.073   2021-08-04  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention alternative modules Perinci::Sub::Wrapper,
+	  Perinci::CmdLine.
+
+	- [doc] Add description for the generated validator code.
+
+
 0.072   2020-05-10  Released-By: PERLANCAR; Urgency: medium
 
 	- Support Data::Sah::Tiny as backend.

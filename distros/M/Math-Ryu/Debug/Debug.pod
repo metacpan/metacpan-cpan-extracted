@@ -1,0 +1,48 @@
+=pod
+
+=head1 NAME
+
+Math::Ryu::Debug - perl interface to Ryu (with added Debugging outputs).
+
+=head1 FUNCTIONS
+
+    As for the functions (of the same names) provided by Math::Ryu.
+    Unlike the Math::Ryu functions, the Math::Ryu::Debug counterparts
+    also output some intermediate results that could be useful for
+    tracking and/or debugging.
+    That's the only difference.
+    See the Math::Ryu documentation for details re the functionality.
+
+    NOTE:
+      It's advisable to avoid importing these functions simultaneously
+      into both the Math::Ryu and Math::Ryu::Debug namespaces. Doing
+      so will probably lead only to confusion.
+      If warnings are enabled, you will receive a warning for any and
+      all functions that are imported into both namespaces.
+
+
+
+=head1 LICENSE
+
+    This perl module is free software; you may redistribute it
+    and/or modify it under the same terms as Perl itself.
+    However, the ".c" and ".h" files that ship with this distro
+    are Copyright 2018 Ulf Adams, and can only be used under the
+    the terms of version 2.0 the Apache License, or of version 1.0
+    of the Boost Software License.
+    A copy of the Apache License (Apache_License.txt) is included
+    with this distro.
+
+    The Apache License can also be found at:
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    The Boost Software License can be found at:
+    https://www.boost.org/LICENSE_1_0.txt
+
+    This perl module is Copyright 2021 Sisyphus
+
+=head1 AUTHOR
+
+    Sisyphus <sisyphus at(@) cpan dot (.) org>
+
+=cut

@@ -5,10 +5,32 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
-    NAME             => 'Date::Holidays::AU',
-    VERSION_FROM     => 'lib/Date/Holidays/AU.pm',
-    MIN_PERL_VERSION => '5.006',
-    BUILD_REQUIRES   => {
+    NAME          => 'Date::Holidays::AU',
+    AUTHOR        => 'David Dick <ddick@cpan.org>',
+    VERSION_FROM  => 'lib/Date/Holidays/AU.pm',
+    ABSTRACT_FROM => 'lib/Date/Holidays/AU.pm',  # retrieve abstract from module
+    ( $ExtUtils::MakeMaker::VERSION >= 6.3002
+        ? ( 'LICENSE' => 'perl' )
+        : () ),
+    (
+        $ExtUtils::MakeMaker::VERSION >= 6.48
+        ? ( 'MIN_PERL_VERSION' => '5.006' )
+        : ()
+    ),
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources   => {
+            repository => {
+                url  => 'https://github.com/david-dick/date-holidays-au.git',
+                web  => 'https://github.com/david-dick/date-holidays-au',
+                type => 'git',
+            },
+            bugtracker => {
+                web => 'https://github.com/david-dick/date-holidays-au/issues',
+            },
+        },
+    },
+    BUILD_REQUIRES => {
         'Test::More' => 0,
     },
     PREREQ_PM => {
@@ -16,35 +38,6 @@ WriteMakefile(
         'Date::Easter' => 0,
         'Carp'         => 0,
     },
-    (
-        $] >= 5.005
-        ?    ## Add these new keywords supported since 5.005
-          (
-            ABSTRACT_FROM =>
-              'lib/Date/Holidays/AU.pm',    # retrieve abstract from module
-            META_MERGE => {
-                resources => {
-                    license    => 'http://dev.perl.org/licenses/',
-                    repository => {
-                        type => 'git',
-                        url  =>
-                          'https://github.com/david-dick/date-holidays-au.git',
-                        web => 'https://github.com/david-dick/date-holidays-au',
-                    },
-                    bugtracker => {
-                        web =>
-'https://github.com/david-dick/date-holidays-au/issues',
-                    }
-                }
-            },
-            AUTHOR => 'David Dick <ddick@cpan.org>'
-          )
-        : ()
-    ),
-    (
-        $ExtUtils::MakeMaker::VERSION ge '6.30_00'
-        ?    # shamelessly copied this from Template Toolkit
-          ( LICENSE => 'perl' )
-        : ()
-    ),
+    dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    clean => { FILES    => 'Date-Holidays-AU-*' },
 );

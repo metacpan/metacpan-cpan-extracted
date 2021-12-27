@@ -6,7 +6,7 @@
    "dynamic_config" : 0,
    "generated_by" : "Minilla/v3.1.12",
    "license" : [
-      "gpl_1"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -45,6 +45,7 @@
             "AnyEvent" : "0",
             "RxPerl" : "v6.6.1",
             "Sub::Util" : "1.41",
+            "parent" : "0",
             "perl" : "5.010"
          }
       },
@@ -57,7 +58,7 @@
    "provides" : {
       "RxPerl::AnyEvent" : {
          "file" : "lib/RxPerl/AnyEvent.pm",
-         "version" : "v6.7.0"
+         "version" : "v6.8.1"
       }
    },
    "release_status" : "stable",
@@ -71,7 +72,7 @@
          "web" : "https://gitlab.com/karjala/rxperl-anyevent-for-perl"
       }
    },
-   "version" : "v6.7.0",
+   "version" : "v6.8.1",
    "x_authority" : "cpan:KARJALA",
    "x_serialization_backend" : "JSON::PP version 4.06",
    "x_static_install" : 1

@@ -306,16 +306,8 @@ use Getopt::EX::LabeledParam;
 Getopt::EX::LabeledParam
     ->new(HASH => \%opt_visible)
     ->load_params (@opt_visible);
-my $visible_chars = join "", do {
-    map  {
-	my $v = $visible{$_} // die "Unknown charname: \"$_\"\n";
-	$v->[0];
-    }
-    grep {
-	$opt_visible{$_};
-    }
-    keys %opt_visible;
-};
+my @visible_names = grep $opt_visible{$_}, keys %opt_visible;
+my $visible_chars = join "", map $visible{$_}->[0], @visible_names;
 my($visible_chars_re, @converter) = do {
     if ($visible_chars eq '') {
 	(undef);
@@ -336,12 +328,14 @@ my($visible_chars_re, @converter) = do {
     }
 };
 my $effector = do {
-    if ($visible_chars and my $color = $colormap{'VISIBLE'}) {
+    if (@visible_names and my $color = $colormap{'VISIBLE'}) {
 	my $s = ansi_code($color);
 	my $e = ansi_code($color =~ s/(?=.)/~/gr);
-	my $chars = join '', map { $_->[-1] =~ s/\s+//gr } values %visible;
-	my $chars_re = qr/[\Q$chars\E]/;
-	sub { s/($chars_re+)/${s}${1}${e}/g };
+	my $symbols = join('',
+			   map  { $visible{$_}->[-1] =~ s/\s+//gr }
+			   @visible_names);
+	my $symbols_re = qr/[\Q$symbols\E]/;
+	sub { s/($symbols_re+)/${s}${1}${e}/g };
     } else {
 	undef;
     }
@@ -725,11 +719,11 @@ sub context {
     maketmp($T2, @nwlist);
 
     my $diff = sprintf "$sub_diff @sub_diffopts %s %s", $T1->path, $T2->path;
-    open(CDIF, "$diff |") || die "diff: $!\n";
-    binmode CDIF, ":encoding(utf8)";
+    open my $cdif, "$diff |" or die "diff: $!\n";
+    binmode $cdif, ":encoding(utf8)";
     my @command;
     my %c = (a => 0, d => 0, c => 0);
-    while (<CDIF>) {
+    while (<$cdif>) {
 	warn $_ if $opt_d{d};
 
 	## Quick hack to read `git diff` unified output
@@ -746,7 +740,7 @@ sub context {
 	    $c{$1}++;
 	}
     }
-    close CDIF;
+    close $cdif;
 
     if ($opt_d{d}) {
 	printf(STDERR "old=%d new=%d command=%d\n",
@@ -929,7 +923,7 @@ cdif - word context diff
 
 =head1 VERSION
 
-Version 4.20.2
+Version 4.21.0
 
 =head1 SYNOPSIS
 

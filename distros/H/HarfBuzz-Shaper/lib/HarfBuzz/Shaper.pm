@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 use Encode;
 
-our $VERSION = '0.024';
+our $VERSION = '0.025';
 
 require XSLoader;
 XSLoader::load('HarfBuzz::Shaper', $VERSION);
@@ -114,7 +114,7 @@ and script. With I<full>, also clears the font cache.
 sub reset {
     my ( $self, $full ) = @_;
 
-    for ( qw ( font size text language direction script ) ) {
+    for ( qw ( font size text language direction script shaped ) ) {
 	delete $self->{$_};
     }
     if ( $full ) {
@@ -146,6 +146,7 @@ font filename are very fast.
 sub set_font {
     my ( $self, $fontfile, $size ) = @_;
 
+    delete $self->{shaped};
     unless ( defined $fontfile or defined $size ) {
 	delete $self->{font};
 	delete $self->{size};
@@ -182,6 +183,7 @@ remove the setting.
 sub set_size {
     my ( $self, $size ) = @_;
 
+    delete $self->{shaped};
     unless ( defined $size ) {
 	delete $self->{size};
 	return $self;
@@ -206,6 +208,7 @@ remove the setting.
 sub set_text {
     my ( $self, @text ) = @_;
 
+    delete $self->{shaped};
     unless ( @_ > 1 and defined $text[0] ) {
 	delete $self->{text};
 	return $self;
@@ -245,6 +248,7 @@ set of persistent features.
 
 sub add_features {
     my ( $self, @features ) = @_;
+    delete $self->{shaped};
     foreach my $feature ( @features ) {
 	push( @{ $self->{features} },
 	      hb_feature_from_string($feature)
@@ -265,6 +269,7 @@ remove the setting.
 sub set_language {
     my ( $self, $lang ) = @_;
 
+    delete $self->{shaped};
     unless ( defined $lang ) {
 	delete $self->{language};
 	return $self;
@@ -306,6 +311,7 @@ remove the setting.
 sub set_script {
     my ( $self, $script ) = @_;
 
+    delete $self->{shaped};
     unless ( defined $script ) {
 	delete $self->{script};
 	return $self;
@@ -347,6 +353,7 @@ remove the setting.
 sub set_direction {
     my ( $self, $dir ) = @_;
 
+    delete $self->{shaped};
     unless ( defined $dir ) {
 	delete $self->{direction};
 	return $self;
@@ -441,7 +448,45 @@ sub shaper {
     my $info = hb_shaper( $self->{font}, $self->{buffer}, $features );
 
     foreach my $i ( @$info ) {
-	$i->{$_} *= $self->{size} / $scale for qw( ax ay dx dy );
+	$i->{$_} *= $self->{size} / $scale
+	  for qw( ax ay dx dy );
+    }
+
+    $self->{shaped} = 1;
+    return $info;
+}
+
+=head2 $info = $hb->get_extents
+
+Get the extents of the (shaped) buffer.
+
+Upon completion an array of hashes is returned with one element for
+each glyph.
+
+The hash contains the following items:
+
+    x_bearing; Distance from the x-origin to the left extremum of the glyph.
+    y_bearing; Distance from the top extremum of the glyph to the y-origin.
+    width;     Distance from the left extremum of the glyph to the right extremum.
+    height;    Distance from the top extremum of the glyph to the bottom extremum.
+    g:         glyph index in font (CId)
+
+Note that the number of glyphs does not necessarily match the number
+of input characters!
+
+=cut
+
+sub get_extents {
+    my ( $self ) = @_;
+
+    croak("HarfBuzz get_extents() without shaped buffer")
+      unless $self->{shaped};
+
+    my $scale = $self->{size} / 1000;
+    my $info = hb_buffer_get_extents( $self->{font}, $self->{buffer} );
+
+    foreach my $i ( @$info ) {
+	$i->{$_} *= $scale for qw( x_bearing y_bearing width height );
     }
 
     return $info;

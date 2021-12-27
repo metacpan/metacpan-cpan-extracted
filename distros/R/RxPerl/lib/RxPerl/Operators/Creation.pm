@@ -21,7 +21,7 @@ our @EXPORT_OK = qw/
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.10.1";
+our $VERSION = "v6.12.0";
 
 sub rx_observable;
 

@@ -1,8 +1,16 @@
                      Revision history for Pod::Thread
 
+3.01 - 2021-12-26
+
+ - Fix Perl warning when navbar is requested but there are no headings.
+ - Always output \heading even if no title was seen.
+ - Treat an undef title option the same as if no title was specified.
+ - Remove documentation of the id option to the constructor.
+ - Replace references to spin in the documentation with DocKnot.
+
 3.00 - 2021-09-11
 
- - Remove support for parsing CVS $Id strings and emitting \id commands.
+ - Remove support for parsing CVS $Id$ strings and emitting \id commands.
  - Stop wrapping output text.
  - Fix internal section links.
  - Fix conversion of nested =over blocks.

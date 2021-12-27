@@ -1,6 +1,6 @@
 package SPVM::Math;
 
-our $VERSION = '0.02';
+our $VERSION = '0.05';
 
 1;
 
@@ -905,13 +905,13 @@ fpclassify macro defined in C language math.h for float type. This method receiv
 
 =head2 frexp
 
-  static method frexp : double ($x : double, $exp : int&)
+  static method frexp : double ($x : double, $exp : int*)
 
 frexp function defined in C language math.h.
 
 =head2 frexpf
 
-  static method frexpf : float ($x : float, $exp : int&)
+  static method frexpf : float ($x : float, $exp : int*)
 
 frexpf function defined in C language math.h.
 
@@ -1175,13 +1175,13 @@ llroundf function defined in C language math.h. Note that call llroundf instead 
 
 =head2 modf
 
-  static method modf : double ($x : double, $intpart : double&)
+  static method modf : double ($x : double, $intpart : double*)
 
 modf function defined in C language math.h.
 
 =head2 modff
 
-  static method modff : float ($x : float, $intpart : float&)
+  static method modff : float ($x : float, $intpart : float*)
 
 modff function defined in C language math.h.
 
@@ -1281,13 +1281,13 @@ remainderf function defined in C language math.h.
 
 =head2 remquo
 
-  static method remquo : double ($x1 : double, $x2 : double, $quo : int&)
+  static method remquo : double ($x1 : double, $x2 : double, $quo : int*)
 
 remquo function defined in C language math.h.
 
 =head2 remquof
 
-  static method remquof : float ($x1 : float, $x2 : float, $quo : int&)
+  static method remquof : float ($x1 : float, $x2 : float, $quo : int*)
 
 remquof function defined in C language math.h.
 

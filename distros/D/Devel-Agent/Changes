@@ -1,0 +1,8 @@
+0.0001
+  -- Inital Checkin
+0.001
+  -- Good enough to release, but needs a lot more work unit tessts and documentation
+0.002
+  -- Pod fixups
+0.003
+  -- removed blib/* from manifest

@@ -10,3 +10,7 @@
 #else
 #  define MORTALIZED_PV(x) sv_2mortal(newSVpv(x,0))
 #endif
+
+#ifndef Newxz
+#  define Newxz(v,n,t) Newz(0,v,n,t)
+#endif

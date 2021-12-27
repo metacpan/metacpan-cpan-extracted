@@ -380,7 +380,7 @@ sub test_04_mobile {
     like $html, qr{<form action="index.cgi" name="form-1"></form>},
       'the form with EXT="1" is not rewritten';
 
-    like $html, qr{<form action="index.cgi" name="form-2">(.*?)<input type="hidden" name="SIDSession" value="[^"]+"></form>},
+    like $html, qr{<form action="index.cgi" name="form-2">(.*?)<input type="hidden" name="SIDSession" value="[^"]+">(.*?)</form>},
       'the form without EXT="1" is rewritten';
 
     # リンクから SID を取り出す

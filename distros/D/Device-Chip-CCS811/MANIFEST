@@ -1,0 +1,16 @@
+Build.PL
+Changes
+examples/ccs811.pl
+lib/Device/Chip/CCS811.pm
+MANIFEST			This list of files
+t/00use.t
+t/01id.t
+t/02status.t
+t/03config.t
+t/10data.t
+t/70sensors.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

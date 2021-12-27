@@ -11,12 +11,23 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#include "ryu_headers/ryu.h"
 #include "math_ryu_include.h"
+#include "ryu_headers/ryu.h"
+#include "ryu_headers/ryu_parse.h"
+#include "ryu_headers/common.h"
 
+/* s2d */
+
+NV M_RYU_s2d(char * buffer) {
+  NV nv;
+  s2d(buffer, &nv);
+  return nv;
+}
+
+/* End s2d */
 /* d2s */
 
-void RYU_d2s_buffered_n(pTHX_ SV * nv) {
+void M_RYU_d2s_buffered_n(pTHX_ SV * nv) {
   dXSARGS;
   int n;
   char * result;
@@ -31,7 +42,7 @@ void RYU_d2s_buffered_n(pTHX_ SV * nv) {
   XSRETURN(2);
 }
 
-SV * RYU_d2s_buffered(pTHX_ SV * nv) {
+SV * M_RYU_d2s_buffered(pTHX_ SV * nv) {
   char * result;
   SV * outsv;
 
@@ -44,14 +55,14 @@ SV * RYU_d2s_buffered(pTHX_ SV * nv) {
   return outsv;
   }
 
-SV * RYU_d2s(pTHX_ SV * nv) {
+SV * M_RYU_d2s(pTHX_ SV * nv) {
   return newSVpv(d2s(SvNV(nv)), 0);
 }
 
 /* End d2s */
 /* d2fixed */
 
-void RYU_d2fixed_buffered_n(pTHX_ SV * nv, SV * prec) {
+void M_RYU_d2fixed_buffered_n(pTHX_ SV * nv, SV * prec) {
   dXSARGS;
   int n;
   char * result;
@@ -66,7 +77,7 @@ void RYU_d2fixed_buffered_n(pTHX_ SV * nv, SV * prec) {
   XSRETURN(2);
 }
 
-SV * RYU_d2fixed_buffered(pTHX_ SV * nv, SV * prec) {
+SV * M_RYU_d2fixed_buffered(pTHX_ SV * nv, SV * prec) {
   char * result;
   SV * outsv;
 
@@ -79,14 +90,14 @@ SV * RYU_d2fixed_buffered(pTHX_ SV * nv, SV * prec) {
   return outsv;
 }
 
-SV * RYU_d2fixed(pTHX_ SV * nv, SV * prec) {
+SV * M_RYU_d2fixed(pTHX_ SV * nv, SV * prec) {
   return newSVpv(d2fixed(SvNV(nv), SvUV(prec)), 0);
 }
 
 /*End d2fixed */
 /* d2exp */
 
-void RYU_d2exp_buffered_n(pTHX_ SV * nv, SV * exponent) {
+void M_RYU_d2exp_buffered_n(pTHX_ SV * nv, SV * exponent) {
   dXSARGS;
   int n;
   char * result;
@@ -101,7 +112,7 @@ void RYU_d2exp_buffered_n(pTHX_ SV * nv, SV * exponent) {
   XSRETURN(2);
 }
 
-SV * RYU_d2exp_buffered(pTHX_ SV * nv, SV * exponent) {
+SV * M_RYU_d2exp_buffered(pTHX_ SV * nv, SV * exponent) {
   char * result;
   SV * outsv;
 
@@ -114,7 +125,7 @@ SV * RYU_d2exp_buffered(pTHX_ SV * nv, SV * exponent) {
   return outsv;
 }
 
-SV * RYU_d2exp(pTHX_ SV * nv, SV * exponent) {
+SV * M_RYU_d2exp(pTHX_ SV * nv, SV * exponent) {
   return newSVpv(d2exp(SvNV(nv), SvUV(exponent)), 0);
 }
 
@@ -125,19 +136,23 @@ int _sis_perl_version(void) {
 /* End d2exp */
 
 
-MODULE = Math::Ryu  PACKAGE = Math::Ryu  PREFIX = RYU_
+MODULE = Math::Ryu  PACKAGE = Math::Ryu  PREFIX = M_RYU_
 
 PROTOTYPES: DISABLE
 
 
+NV
+M_RYU_s2d (buffer)
+	char *	buffer
+
 void
-RYU_d2s_buffered_n (nv)
+M_RYU_d2s_buffered_n (nv)
 	SV *	nv
         PREINIT:
         I32* temp;
         PPCODE:
         temp = PL_markstack_ptr++;
-        RYU_d2s_buffered_n(aTHX_ nv);
+        M_RYU_d2s_buffered_n(aTHX_ nv);
         if (PL_markstack_ptr != temp) {
           /* truly void, because dXSARGS not invoked */
           PL_markstack_ptr = temp;
@@ -147,28 +162,28 @@ RYU_d2s_buffered_n (nv)
         return; /* assume stack size is correct */
 
 SV *
-RYU_d2s_buffered (nv)
+M_RYU_d2s_buffered (nv)
 	SV *	nv
 CODE:
-  RETVAL = RYU_d2s_buffered (aTHX_ nv);
+  RETVAL = M_RYU_d2s_buffered (aTHX_ nv);
 OUTPUT:  RETVAL
 
 SV *
-RYU_d2s (nv)
+M_RYU_d2s (nv)
 	SV *	nv
 CODE:
-  RETVAL = RYU_d2s (aTHX_ nv);
+  RETVAL = M_RYU_d2s (aTHX_ nv);
 OUTPUT:  RETVAL
 
 void
-RYU_d2fixed_buffered_n (nv, prec)
+M_RYU_d2fixed_buffered_n (nv, prec)
 	SV *	nv
 	SV *	prec
         PREINIT:
         I32* temp;
         PPCODE:
         temp = PL_markstack_ptr++;
-        RYU_d2fixed_buffered_n(aTHX_ nv, prec);
+        M_RYU_d2fixed_buffered_n(aTHX_ nv, prec);
         if (PL_markstack_ptr != temp) {
           /* truly void, because dXSARGS not invoked */
           PL_markstack_ptr = temp;
@@ -178,30 +193,30 @@ RYU_d2fixed_buffered_n (nv, prec)
         return; /* assume stack size is correct */
 
 SV *
-RYU_d2fixed_buffered (nv, prec)
+M_RYU_d2fixed_buffered (nv, prec)
 	SV *	nv
 	SV *	prec
 CODE:
-  RETVAL = RYU_d2fixed_buffered (aTHX_ nv, prec);
+  RETVAL = M_RYU_d2fixed_buffered (aTHX_ nv, prec);
 OUTPUT:  RETVAL
 
 SV *
-RYU_d2fixed (nv, prec)
+M_RYU_d2fixed (nv, prec)
 	SV *	nv
 	SV *	prec
 CODE:
-  RETVAL = RYU_d2fixed (aTHX_ nv, prec);
+  RETVAL = M_RYU_d2fixed (aTHX_ nv, prec);
 OUTPUT:  RETVAL
 
 void
-RYU_d2exp_buffered_n (nv, exponent)
+M_RYU_d2exp_buffered_n (nv, exponent)
 	SV *	nv
 	SV *	exponent
         PREINIT:
         I32* temp;
         PPCODE:
         temp = PL_markstack_ptr++;
-        RYU_d2exp_buffered_n(aTHX_ nv, exponent);
+        M_RYU_d2exp_buffered_n(aTHX_ nv, exponent);
         if (PL_markstack_ptr != temp) {
           /* truly void, because dXSARGS not invoked */
           PL_markstack_ptr = temp;
@@ -211,19 +226,19 @@ RYU_d2exp_buffered_n (nv, exponent)
         return; /* assume stack size is correct */
 
 SV *
-RYU_d2exp_buffered (nv, exponent)
+M_RYU_d2exp_buffered (nv, exponent)
 	SV *	nv
 	SV *	exponent
 CODE:
-  RETVAL = RYU_d2exp_buffered (aTHX_ nv, exponent);
+  RETVAL = M_RYU_d2exp_buffered (aTHX_ nv, exponent);
 OUTPUT:  RETVAL
 
 SV *
-RYU_d2exp (nv, exponent)
+M_RYU_d2exp (nv, exponent)
 	SV *	nv
 	SV *	exponent
 CODE:
-  RETVAL = RYU_d2exp (aTHX_ nv, exponent);
+  RETVAL = M_RYU_d2exp (aTHX_ nv, exponent);
 OUTPUT:  RETVAL
 
 int

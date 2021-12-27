@@ -1,5 +1,8 @@
 Changes
+examples/fg_bg_colors.pl
+examples/fireworks.pl
 examples/placeholder.pl
+examples/query.pl
 INSTALL.SKIP
 lib/Antsy.pm
 LICENSE

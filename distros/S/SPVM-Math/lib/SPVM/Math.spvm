@@ -198,8 +198,8 @@ class Math : precompile {
   native static method FP_ZERO : int ();
   native static method fpclassify : int ($x : double);
   native static method fpclassifyf : int ($x : float);
-  native static method frexp : double ($x : double, $exp : int&);
-  native static method frexpf : float ($x : float, $exp : int&);
+  native static method frexp : double ($x : double, $exp : int*);
+  native static method frexpf : float ($x : float, $exp : int*);
   native static method HUGE_VAL : double ();
   native static method HUGE_VALF : float ();
   native static method hypot : double ($x : double, $y : double);
@@ -252,8 +252,8 @@ class Math : precompile {
   native static method logf : float ($x : float);
   native static method lround : long ($x : double);
   native static method lroundf : long ($x : float);
-  native static method modf : double ($x : double, $intpart : double&);
-  native static method modff : float ($x : float, $intpart : float&);
+  native static method modf : double ($x : double, $intpart : double*);
+  native static method modff : float ($x : float, $intpart : float*);
   native static method nan : double ($str : string);
   native static method NAN : double ();
   native static method NANF : float ();
@@ -269,8 +269,8 @@ class Math : precompile {
   native static method powf : float ($x : float, $y : float);
   native static method remainder : double ($x1 : double, $x2 : double);
   native static method remainderf : float ($x1 : float, $x2 : float);
-  native static method remquo : double ($x1 : double, $x2 : double, $quo : int&);
-  native static method remquof : float ($x1 : float, $x2 : float, $quo : int&);
+  native static method remquo : double ($x1 : double, $x2 : double, $quo : int*);
+  native static method remquof : float ($x1 : float, $x2 : float, $quo : int*);
   native static method round : double ($x : double);
   native static method roundf : float ($x : float);
   native static method scalbln : double ($x : double, $exp : long);

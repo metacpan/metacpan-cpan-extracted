@@ -1,3 +1,150 @@
+0.053006 -- 2021-12-27
+
+    [Compatibility]
+
+    - Fix versions of used modules for Perl 5.14.1
+        If we claim to to be compatible with Perl 5.14, then we should
+        make sure that the minimum required version of modules included
+        in the default distribution match up with what we require.
+
+        Files modified:
+            lib/**/*.pm
+            t/**/*.t
+
+    - Use `bsd_glob` instead of `:bsd_glob`
+        `File::Glob` in Perl 5.14 didn't have the `:bsd_glob` tag yet.
+        Since we only need the `bsd_glob()` function, just import the
+        function.
+
+        Files modified:
+            lib/Term/CLI/Argument/Filename.pm
+
+    [Bug Fixes]
+
+    - Make sure Term::ReadKey uses a "TTY" filehandle
+        In cases of automatic builds, STDIN and STDOUT may be
+        redirected. Term::ReadLine can handle that, Term::ReadKey
+        cannot, so we need to be explicit.
+
+        Files modified:
+            lib/Term/CLI/ReadLine.pm
+
+    - Minor POD fixes.
+
+0.053005 -- 2021-12-23
+
+    - Validate keyboard signal names before using them.
+
+        Files modified:
+            lib/Term/CLI/ReadLine.pm
+
+    - Add back the dependency on Term::ReadLine::Gnu
+        Tests will break on MSWIN if the ::Perl backend is chosen.
+
+        Files modified:
+            dist.ini
+
+0.053004 -- 2021-12-23
+
+    [Bug Fixes]
+
+    - Don't use `state` hash; not supported on older Perls
+      Use `state $xx = { ... }` instead.
+
+        Files modified:
+            lib/Term/CLI/ReadLine.pm
+
+0.053003 -- 2021-12-23
+
+    [Packaging]
+
+    - Remove author tests from MANIFEST.SKIP
+
+0.053002 -- 2021-12-23
+
+    [Packaging]
+
+    - Fix MANIFEST.
+
+0.053001 -- 2021-12-22
+
+    [Features]
+
+    - Now indepenent of Term::ReadLine implementation
+        I.e. compatible with Term::ReadLine::Perl and Term::ReadLine::Stub
+        as well (though Term::ReadLine::Gnu is still the best supported).
+
+    - Improved signal handling:
+        - Add `ignore_keyboard_signal`.
+        - Ignore QUIT control sequence (makes ::Gnu behave like ::Perl).
+
+    - Allow Term::CLI::Argument::Enum values to be provided dynamically
+        Term::CLI::Argument::Enum's value_list attribute may be a coderef,
+        which should return an array reference of valid values.
+        (Pull request #13 from djerius/dynamic-enum.)
+
+    - Add "cleanup" attribute.
+
+    [Tutorial]
+
+    - Formatting fixes.
+    - Add SIGNAL HANDLING section.
+    - Add HISTORY HANDLING section.
+    - Add tutorial/example_17_suspend.pl
+    - Use `local($SIG{...})` in `sleep` command.
+
+    [Refactoring]
+
+    - Move most history logic to Term::CLI::ReadLine
+        Term::CLI::ReadLine is much more of a compatibility layer
+        between Term::CLI and Term::ReadLine now, providing compatibility
+        code to compensate for missing functionality in the underlying
+        Term::ReadLine implementation.
+
+    [Bug Fixes]
+
+    - Fix Enum validation - closes #10
+        Enum validation finds potential matches to an argument by performing
+        prefix comparison against the list of valid values. This works fine
+        as long as the valid values are not prefixes of each other; if they
+        are, then the shorter strings will never be considered valid input.
+        
+    - GNU ReadLine - exclude prompt ornaments for leading/trailing whitespace.
+        The Term::ReadLine::GNU implementation will just slap the prompt
+        between the ornament-start/ornament-end sequences, but this looks
+        ugly if there are leading/trailing spaces and the ornament is set
+        to e.g. underline or standout. This is now brought in line with how
+        the Term::ReadLine::Perl implementation handles it, by inserting
+        relevant escape sequences where necessary.
+
+    [Packaging]
+
+    - Various build fixes.
+    - Remove prereq on Term::ReadLine::Gnu.
+
+0.052005 -- 2021-05-27
+
+    - Increase coverage of Term::CLI.
+
+        Files modified:
+            lib/Term/CLI.pm
+            t/055-Term-CLI.t
+
+    - Remove reference to Modern::Perl
+
+        Files modified:
+            lib/Term/CLI/Tutorial.pod
+
+    - Clean up `use` statements and `#!` in examples and tutorials.
+
+        Files modified:
+            examples/*
+            tutorial/*
+
+0.052004 -- 2021-05-27
+
+    - Ignore; tagged without changelog, see 0.052005 instead.
+
 0.052003 -- 2021-05-26
 
     - Packaging fixes

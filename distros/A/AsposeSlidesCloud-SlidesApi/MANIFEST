@@ -16,6 +16,7 @@ lib/AsposeSlidesCloud/Object/BlurEffect.pm
 lib/AsposeSlidesCloud/Object/BoxAndWhiskerSeries.pm
 lib/AsposeSlidesCloud/Object/BubbleChartDataPoint.pm
 lib/AsposeSlidesCloud/Object/BubbleSeries.pm
+lib/AsposeSlidesCloud/Object/Camera.pm
 lib/AsposeSlidesCloud/Object/Chart.pm
 lib/AsposeSlidesCloud/Object/ChartCategory.pm
 lib/AsposeSlidesCloud/Object/ChartTitle.pm
@@ -53,6 +54,7 @@ lib/AsposeSlidesCloud/Object/GradientFillStop.pm
 lib/AsposeSlidesCloud/Object/GraphicalObject.pm
 lib/AsposeSlidesCloud/Object/GroupShape.pm
 lib/AsposeSlidesCloud/Object/HeaderFooter.pm
+lib/AsposeSlidesCloud/Object/Html5ExportOptions.pm
 lib/AsposeSlidesCloud/Object/HtmlExportOptions.pm
 lib/AsposeSlidesCloud/Object/Image.pm
 lib/AsposeSlidesCloud/Object/ImageExportFormat.pm
@@ -66,6 +68,7 @@ lib/AsposeSlidesCloud/Object/IShapeExportOptions.pm
 lib/AsposeSlidesCloud/Object/LayoutSlide.pm
 lib/AsposeSlidesCloud/Object/LayoutSlides.pm
 lib/AsposeSlidesCloud/Object/Legend.pm
+lib/AsposeSlidesCloud/Object/LightRig.pm
 lib/AsposeSlidesCloud/Object/LineFormat.pm
 lib/AsposeSlidesCloud/Object/MasterSlide.pm
 lib/AsposeSlidesCloud/Object/MasterSlides.pm
@@ -123,6 +126,7 @@ lib/AsposeSlidesCloud/Object/Series.pm
 lib/AsposeSlidesCloud/Object/SeriesMarker.pm
 lib/AsposeSlidesCloud/Object/Shape.pm
 lib/AsposeSlidesCloud/Object/ShapeBase.pm
+lib/AsposeSlidesCloud/Object/ShapeBevel.pm
 lib/AsposeSlidesCloud/Object/ShapeExportFormat.pm
 lib/AsposeSlidesCloud/Object/ShapeImageExportOptions.pm
 lib/AsposeSlidesCloud/Object/Shapes.pm
@@ -156,6 +160,7 @@ lib/AsposeSlidesCloud/Object/Task.pm
 lib/AsposeSlidesCloud/Object/TextItem.pm
 lib/AsposeSlidesCloud/Object/TextItems.pm
 lib/AsposeSlidesCloud/Object/Theme.pm
+lib/AsposeSlidesCloud/Object/ThreeDFormat.pm
 lib/AsposeSlidesCloud/Object/TiffExportOptions.pm
 lib/AsposeSlidesCloud/Object/UpdateBackground.pm
 lib/AsposeSlidesCloud/Object/UpdateShape.pm

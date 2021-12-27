@@ -1,18 +1,20 @@
 NAME
     Module::FeaturesUtil::Check - Check feature set specification and
-    feature declaration
+    feature declaration (following Module::Features specification)
 
 VERSION
-    This document describes version 0.005 of Module::FeaturesUtil::Check
+    This document describes version 0.006 of Module::FeaturesUtil::Check
     (from Perl distribution Module-FeaturesUtil-Check), released on
-    2021-03-26.
+    2021-07-31.
 
 DESCRIPTION
+    See "GLOSSARY" in Module::Features for terminology.
+
 FUNCTIONS
   check_feature_set_spec
     Usage:
 
-     check_feature_set_spec($feature_set_spec) -> [status, msg, payload, meta]
+     check_feature_set_spec($feature_set_spec) -> [$status_code, $reason, $payload, \%result_meta]
 
     Check feature set specification.
 
@@ -24,19 +26,22 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   check_features_decl
     Usage:
 
-     check_features_decl($features_decl) -> [status, msg, payload, meta]
+     check_features_decl($features_decl) -> [$status_code, $reason, $payload, \%result_meta]
 
     Check features declaration.
 
@@ -48,12 +53,15 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
@@ -67,7 +75,8 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-Module-FeaturesUtil-Check/issues>
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Module-FeaturesUtil-C
+    heck>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.

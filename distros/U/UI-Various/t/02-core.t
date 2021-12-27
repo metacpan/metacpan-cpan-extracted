@@ -28,7 +28,7 @@ BEGIN { delete $ENV{DISPLAY}; delete $ENV{UI}; }
 use UI::Various({log => 'WARNING'}); # testing the alias here
 
 use constant T_PATH => map { s|/[^/]+$||; $_ } abs_path($0);
-do T_PATH . '/functions/sub_perl.pl';
+do(T_PATH . '/functions/sub_perl.pl');
 
 #########################################################################
 # identical parts of messages:
@@ -129,9 +129,9 @@ warnings_like
     [ { carped => qr/^message 'zz_not_existing' missing in 'en'$re_msg_tail/ },
       qr|^zz_not_existing at .*/UI/Various/core.pm line \d{3}\.$|],
     'missing message creates error and is reported as key';
-warning_is
+warning_like
 {   UI::Various::core::error('invalid_selection');   }
-    "invalid selection\n",
+    qr/^invalid selection$/,
     'error message with new-line does not use carp';
 
 warning_like
@@ -241,7 +241,7 @@ $_ = _sub_perl(	<<'CODE');
 CODE
 is($?, 0x900, 'RC 9 (no signal or core-dump) in sub-perl "closed STDERR"');
 like($_,
-     qr{\n\*{5} can't duplicate STDERR: Bad file (descriptor|number) \*{5}\n}n,
+     qr{\n\*{5} can't duplicate STDERR: Bad file (?:descriptor|number) \*{5}\n},
    'closed STDERR causes error');
 
 #####################################

@@ -1,3 +1,47 @@
+1.197 2021-12-26
+================
+
+[Quiq::Html::Widget::CheckBox]
+* Attribut "options" erweitert, so dass die Checkbox einen Wert sendet, auch
+  wenn sie nicht aktiviert ist
+
+[Quiq::Html::Widget::SelectMenu]
+* Attribut "optionPairs" hinzugefügt, so dass Wert und Texte paarweise
+  angegeben werden können
+
+[Quiq::Html::Widget::TextArea]
+* Attribute "autoCols" und "autoRows" hinzugefügt
+
+[Quiq::Html::Component]
+* Doku bearbeitet
+
+[Quiq::Html::HorizontalMenu]
+* Attribut "class" hinzugefügt
+
+[Quiq::Sdoc::Producer]
+* Möglichkeit zur Angabe von Eingenschaften zum Code-Abschnitt hinzugefügt
+* link(): Methode hinzugefügt
+* linkDefs(): Methode hinzugefügt
+
+[Quiq::ExportFile]
+* Klasse hinzugefügt
+
+[Quiq::FileHandle]
+* Doku ergänzt
+
+[Quiq::JavaScript]
+* Konstruktor hinzugefügt
+
+[Quiq::Object]
+* methodName(): Methode hinzugefügt
+* Doku ergänzt
+
+[Quiq::SQLite]
+* recreateDatabase(): detailliertere Meldungen ergänzt
+
+[Quiq::Sendmail]
+* Header "replyTo" hinzugefügt
+
 1.196 2021-11-30
 ================
 * Codeaufbau geändert

@@ -11,6 +11,8 @@ There is no back here.
 =cut
 
 [output]
+\heading[][]
+
 \bullet
 [There is no back here.
 ]

@@ -1,7 +1,7 @@
 package Sah::SchemaR::hash_of_posint;
 
 our $DATE = '2021-07-30'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $rschema = do{my$var={base=>"hash",clsets_after_base=>[{of=>["posint",{req=>1}],summary=>"Hash of positive integers"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["hash"],type=>"hash",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -20,7 +20,7 @@ Sah::SchemaR::hash_of_posint - Hash of positive integers
 
 =head1 VERSION
 
-This document describes version 0.007 of Sah::SchemaR::hash_of_posint (from Perl distribution Sah-Schemas-Examples), released on 2021-07-30.
+This document describes version 0.009 of Sah::SchemaR::hash_of_posint (from Perl distribution Sah-Schemas-Examples), released on 2021-07-30.
 
 =head1 DESCRIPTION
 

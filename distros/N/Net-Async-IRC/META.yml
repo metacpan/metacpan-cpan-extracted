@@ -7,8 +7,10 @@ build_requires:
   IO::Async::Test: '0.14'
   Test::Fatal: '0'
   Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,17 +19,20 @@ name: Net-Async-IRC
 provides:
   Net::Async::IRC:
     file: lib/Net/Async/IRC.pm
-    version: '0.11'
+    version: '0.12'
   Net::Async::IRC::Protocol:
     file: lib/Net/Async/IRC/Protocol.pm
-    version: '0.11'
+    version: '0.12'
 requires:
+  Future::AsyncAwait: '0.47'
   IO::Async::Loop: '0.54'
   IO::Async::Stream: '0.59'
-  Protocol::IRC::Client: '0.12'
+  List::Util: '1.33'
+  MIME::Base64: '0'
+  Protocol::IRC::Client: '0.13'
   Time::HiRes: '0'
-  perl: '5.010'
+  perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.11'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

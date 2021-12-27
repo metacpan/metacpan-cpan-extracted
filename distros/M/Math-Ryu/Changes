@@ -1,6 +1,11 @@
+0.03
+     - Expand coverage to include environments that don't provide __uint128_t
+     - Add Math::Ryu::Debug.
+     - Add s2d().
+     - Ensure that Newxz() is defined.
 
 0.02
      - Fix big in t/mpfr_checks.t (No allowance was being made for the possibility
        that atonv() or nvtoa() might not be available.
 
-0.01 - First release
+0.01 - First release.

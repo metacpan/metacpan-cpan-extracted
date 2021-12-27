@@ -49,7 +49,8 @@ sub connect {
             # 保持してしまうとその後のエラーメッセージがでなくなり,
             # リファレンスではundefに消されてしまうので
             # ここでエラー情報を作成.
-            $Tripletail::Error::LAST_DB_ERROR = lazy { $this->_errinfo($_[0]) } 'init';
+            my $e = $this->_errinfo($_[0]);
+            $Tripletail::Error::LAST_DB_ERROR = lazy { $e } 'init';
         }
         return wantarray ? @ret : $ret[0];
     };

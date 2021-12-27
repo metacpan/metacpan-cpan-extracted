@@ -34,6 +34,16 @@ for (-324 .. -290, -200 .. -180, -50 .. 50, 200 .. 250) {
       $s2 = d2s($nv / 10);
     }
 
+    cmp_ok(s2d($s1), '==', s2d($s2),
+           "s2d() handles formats provided by both nvtoa() and d2s()");
+
+    cmp_ok(Math::MPFR::atonv($s1), '==', Math::MPFR::atonv($s2),
+           "atonv() handles formats provided by both nvtoa() and d2s()");
+
+    # nvtoa() and d2s() can provide different formatting of the
+    # same value. We now standardize the forms they take so that
+    # valid comparison checks can be made
+
     # They both might not signify a positive exponent with an
     # explicit '+' symbol. If so, ignore the discrepancy.
     $s1 =~ s/e\+/e/i;

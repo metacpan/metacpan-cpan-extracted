@@ -9,18 +9,20 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Spin::Thread 5.00;
+package App::DocKnot::Spin::Thread 6.00;
 
 use 5.024;
 use autodie;
 use warnings;
 
 use App::DocKnot;
+use App::DocKnot::Util qw(print_fh);
 use Cwd qw(getcwd realpath);
 use File::Basename qw(fileparse);
-use File::Spec      ();
+use File::Spec ();
 use Git::Repository ();
 use Image::Size qw(html_imgsize);
+use Path::Tiny qw(path);
 use Perl6::Slurp qw(slurp);
 use POSIX qw(strftime);
 use Text::Balanced qw(extract_bracketed);
@@ -34,6 +36,7 @@ my $URL = 'https://www.eyrie.org/~eagle/software/web/';
 # 1. Number of arguments or -1 to consume as many arguments as it can find.
 # 2. Name of the method to call with the arguments and (if wanted) format.
 # 3. Whether to look for a format in parens before the arguments.
+#<<<
 my %COMMANDS = (
     # name       args  method             want_format
     block     => [1,  '_cmd_block',       1],
@@ -80,6 +83,7 @@ my %COMMANDS = (
     q{==}     => [3,  '_define_macro',    0],
     q{\\}     => [0,  '_literal',         0],
 );
+#>>>
 
 ##############################################################################
 # Input and output
@@ -102,22 +106,6 @@ sub _read_file {
 
     # Return the contents.
     return $text;
-}
-
-# print with error checking and an explicit file handle.  autodie
-# unfortunately can't help us because print can't be prototyped and hence
-# can't be overridden.
-#
-# $fh   - Output file handle
-# $file - File name for error reporting
-# @args - Remaining arguments to print
-#
-# Returns: undef
-#  Throws: Text exception on output failure
-sub _print_fh {
-    my ($fh, $file, @args) = @_;
-    print {$fh} @args or croak("cannot write to $file: $!");
-    return;
 }
 
 # Sends something to the output file with special handling of whitespace for
@@ -159,7 +147,7 @@ sub _output {
     }
 
     # Send the results to the output file.
-    _print_fh($self->{out_fh}, $self->{out_path}, $output);
+    print_fh($self->{out_fh}, $self->{out_path}, $output);
     return;
 }
 
@@ -255,7 +243,7 @@ sub _paragraph {
 # Returns: Output to write to start the structure
 sub _border_start {
     my ($self, $border, $start, $end) = @_;
-    my $state  = $self->{state}[-1];
+    my $state = $self->{state}[-1];
     my $output = q{};
 
     # If we're at the top-level block structure or inside a structure other
@@ -450,7 +438,7 @@ sub _expand {
         my ($blocktag, $output) = $self->$handler($format, @args);
         return ($output, $blocktag, $rest);
     } else {
-        my ($rest,     @args)   = $self->_extract($text, $args);
+        my ($rest, @args) = $self->_extract($text, $args);
         my ($blocktag, $output) = $self->$handler(@args);
         return ($output, $blocktag, $rest);
     }
@@ -577,7 +565,7 @@ sub _parse_context {
             if ($blocktag) {
                 if ($block && $paragraph ne q{}) {
                     $output .= $border . $self->_paragraph($paragraph);
-                    $border    = q{};
+                    $border = q{};
                     $paragraph = q{};
                 } else {
                     $output .= $space;
@@ -648,25 +636,29 @@ sub _parse {
 # since thread may contain relative paths to files that the spinning process
 # needs to access.
 #
-# $thread   - Thread to spin
-# $in_path  - Input file path if any, used for error reporting
-# $out_fh   - Output file handle to which to write the HTML
-# $out_path - Optional output file path for error reporting and page links
+# $thread     - Thread to spin
+# $in_path    - Input file path if any, used for error reporting
+# $out_fh     - Output file handle to which to write the HTML
+# $out_path   - Optional output file path for error reporting and page links
+# $input_type - Optional one-word description of input type
 sub _parse_document {
-    my ($self, $thread, $in_path, $out_fh, $out_path) = @_;
+    my ($self, $thread, $in_path, $out_fh, $out_path, $input_type) = @_;
 
     # Parse the thread into paragraphs and reverse them to form a stack.
     my @input = reverse($self->_split_paragraphs($thread));
 
     # Initialize object state for a new document.
-    $self->{input}    = [[\@input, $in_path, 1]];
-    $self->{macro}    = {};
-    $self->{out_fh}   = $out_fh;
-    $self->{out_path} = $out_path // q{-};
-    $self->{rss}      = [];
-    $self->{space}    = q{};
-    $self->{state}    = ['BLOCK'];
-    $self->{variable} = {};
+    #<<<
+    $self->{input}      = [[\@input, $in_path, 1]];
+    $self->{input_type} = $input_type // 'thread';
+    $self->{macro}      = {};
+    $self->{out_fh}     = $out_fh;
+    $self->{out_path}   = $out_path // q{-};
+    $self->{rss}        = [];
+    $self->{space}      = q{};
+    $self->{state}      = ['BLOCK'];
+    $self->{variable}   = {};
+    #>>>
 
     # Parse the thread file a paragraph at a time.  _split_paragraphs takes
     # care of ensuring that each paragraph contains the complete value of a
@@ -688,7 +680,7 @@ sub _parse_document {
     }
 
     # Close open tags and print any deferred whitespace.
-    _print_fh($out_fh, $out_path, $self->_block_end(), $self->{space});
+    print_fh($out_fh, $out_path, $self->_block_end(), $self->{space});
     return;
 }
 
@@ -735,13 +727,13 @@ sub _split_paragraphs {
 
     # Pull paragraphs off the text one by one.
     while ($text ne q{} && $text =~ s{ \A ( .*? (?: \n\n+ | \s*\z ) )}{}xms) {
-        my $para        = $1;
-        my $open_count  = ($para =~ tr{\[}{});
+        my $para = $1;
+        my $open_count = ($para =~ tr{\[}{});
         my $close_count = ($para =~ tr{\]}{});
         while ($text ne q{} && $open_count > $close_count) {
             if ($text =~ s{ \A ( .*? (?: \n\n+ | \s*\z ) )}{}xms) {
                 my $extra = $1;
-                $open_count  += ($extra =~ tr{\[}{});
+                $open_count += ($extra =~ tr{\[}{});
                 $close_count += ($extra =~ tr{\]}{});
                 $para .= $extra;
             } else {
@@ -784,7 +776,7 @@ sub _block {
 
     # Close the tag.  The tag may have contained attributes, which aren't
     # allowed in the closing tag.
-    $tag    =~ s{ [ ] .* }{}xms;
+    $tag =~ s{ [ ] .* }{}xms;
     $output =~ s{ \s* \z }{</$tag>}xms;
     if ($format ne 'packed') {
         $output .= "\n";
@@ -930,6 +922,7 @@ sub _literal { return (0, q{\\}) }
 ##############################################################################
 
 # Basic inline commands.
+#<<<
 sub _cmd_break  { return (0, '<br />') }
 sub _cmd_bold   { my ($self, @a) = @_; return $self->_inline('b',      @a) }
 sub _cmd_cite   { my ($self, @a) = @_; return $self->_inline('cite',   @a) }
@@ -942,6 +935,7 @@ sub _cmd_strong { my ($self, @a) = @_; return $self->_inline('strong', @a) }
 sub _cmd_sub    { my ($self, @a) = @_; return $self->_inline('sub',    @a) }
 sub _cmd_sup    { my ($self, @a) = @_; return $self->_inline('sup',    @a) }
 sub _cmd_under  { my ($self, @a) = @_; return $self->_inline('u',      @a) }
+#>>>
 
 # The headings.
 sub _cmd_h1 { my ($self, @a) = @_; return $self->_heading(1, @a); }
@@ -990,8 +984,8 @@ sub _cmd_desc {
     my ($self, $format, $heading, $text) = @_;
     $heading = $self->_parse($heading);
     my $format_attr = $self->_format_attr($format);
-    my $border      = $self->_border_start('desc', "<dl>\n", "</dl>\n\n");
-    my $initial     = $border . "<dt$format_attr>" . $heading . "</dt>\n";
+    my $border = $self->_border_start('desc', "<dl>\n", "</dl>\n\n");
+    my $initial = $border . "<dt$format_attr>" . $heading . "</dt>\n";
     return $self->_block('dd', $initial, $format, $text);
 }
 
@@ -1099,7 +1093,7 @@ sub _cmd_heading {
 sub _cmd_image {
     my ($self, $format, $image, $text) = @_;
     $image = $self->_parse($image);
-    $text  = $self->_parse($text);
+    $text = $self->_parse($text);
 
     # Determine the size attributes of the image if possible.
     my $size = -e $image ? q{ } . lc(html_imgsize($image)) : q{};
@@ -1117,7 +1111,7 @@ sub _cmd_include {
     $file = realpath($self->_parse($file));
 
     # Read the thread, split it on paragraphs, and reverse it to make a stack.
-    my $thread     = $self->_read_file($file);
+    my $thread = $self->_read_file($file);
     my @paragraphs = reverse($self->_split_paragraphs($thread));
 
     # Add it to the file stack.
@@ -1134,7 +1128,7 @@ sub _cmd_include {
 # $text   - Anchor text
 sub _cmd_link {
     my ($self, $format, $url, $text) = @_;
-    $url  = $self->_parse($url);
+    $url = $self->_parse($url);
     $text = $self->_parse($text);
     my $format_attr = $self->_format_attr($format);
     return (0, qq{<a href="$url"$format_attr>$text</a>});
@@ -1164,7 +1158,7 @@ sub _cmd_pre {
 sub _cmd_quote {
     my ($self, $format, $quote, $author, $cite) = @_;
     $author = $self->_parse($author);
-    $cite   = $self->_parse($cite);
+    $cite = $self->_parse($cite);
     my $output = $self->_border_end() . q{<blockquote class="quote">};
 
     # Parse the contents of the quote in a new block context.
@@ -1238,7 +1232,7 @@ sub _cmd_release {
 # directly; the RSS feed information is used later in _cmd_heading.
 sub _cmd_rss {
     my ($self, $url, $title) = @_;
-    $url   = $self->_parse($url);
+    $url = $self->_parse($url);
     $title = $self->_parse($title);
     push($self->{rss}->@*, [$url, $title]);
     return (1, q{});
@@ -1251,9 +1245,9 @@ sub _cmd_signature {
     my $source = $self->{input}[-1][1];
     my $output = $self->_border_end();
 
-    # If we're spinning from standard input, don't add any of the standard
-    # footer, just close the HTML tags.
-    if ($self->{input}[-1][1] eq q{-}) {
+    # If we're spinning from standard input to standard output, don't add any
+    # of the standard footer, just close the HTML tags.
+    if ($source eq q{-} && $self->{out_path} eq q{-}) {
         $output .= "</body>\n</html>\n";
         return (1, $output);
     }
@@ -1262,27 +1256,33 @@ sub _cmd_signature {
     if ($self->{sitemap} && $self->{output}) {
         my $page = $self->{out_path};
         $page =~ s{ \A \Q$self->{output}\E }{}xms;
-        $output .= join(q{}, $self->{sitemap}->navbar($page));
+        $output .= join(q{}, $self->{sitemap}->navbar($page)) . "\n";
     }
 
     # Figure out the modification dates.  Use the Git repository if available.
-    my $now      = strftime('%Y-%m-%d', gmtime());
-    my $modified = strftime('%Y-%m-%d', gmtime((stat($source))[9]));
+    my $now = strftime('%Y-%m-%d', gmtime());
+    my $modified = $now;
+    if ($source ne q{-}) {
+        $modified = strftime('%Y-%m-%d', gmtime((stat($source))[9]));
+    }
     if ($self->{repository} && $self->{source}) {
-        my $repository = $self->{repository};
-        $modified = $repository->run('log', '-1', '--format=%ct', $source);
-        if ($modified) {
-            $modified = strftime('%Y-%m-%d', gmtime($modified));
+        if (path($self->{source})->subsumes(path($source))) {
+            my $repository = $self->{repository};
+            $modified = $repository->run('log', '-1', '--format=%ct', $source);
+            if ($modified) {
+                $modified = strftime('%Y-%m-%d', gmtime($modified));
+            }
         }
     }
 
     # Determine which template to use and substitute in the appropriate times.
-    $output .= "<address>\n" . q{ } x 4;
+    $output .= "<address>\n";
     my $link = qq{<a href="$URL">spun</a>};
     if ($modified eq $now) {
-        $output .= "Last modified and\n    $link $modified\n";
+        $output .= "    Last modified and\n    $link $modified\n";
     } else {
-        $output .= "Last $link\n    $now from thread modified $modified\n";
+        $output .= "    Last $link\n";
+        $output .= "    $now from $self->{input_type} modified $modified\n";
     }
 
     # Close out the document.
@@ -1306,7 +1306,7 @@ sub _cmd_size {
 
     # Format the size using SI units.
     my @suffixes = qw(K M G T);
-    my $suffix   = q{};
+    my $suffix = q{};
     while ($size > 1024 && @suffixes) {
         $size /= 1024;
         $suffix = shift(@suffixes);
@@ -1410,6 +1410,7 @@ sub new {
     }
 
     # Create and return the object.
+    #<<<
     my $self = {
         output     => $args_ref->{output},
         repository => $repository,
@@ -1418,6 +1419,7 @@ sub new {
         style_url  => $style_url,
         versions   => $args_ref->{versions},
     };
+    #>>>
     bless($self, $class);
     return $self;
 }
@@ -1453,12 +1455,12 @@ sub spin_thread_file {
     # ensure that relative file references resolve properly.
     if (defined($input)) {
         my $path = realpath($input) or die "cannot canonicalize $input: $!\n";
-        $input  = $path;
+        $input = $path;
         $thread = slurp($input);
         my (undef, $input_dir) = fileparse($input);
         chdir($input_dir);
     } else {
-        $input  = q{-};
+        $input = q{-};
         $thread = slurp(\*STDIN);
     }
 
@@ -1482,6 +1484,39 @@ sub spin_thread_file {
     return;
 }
 
+# Convert thread to HTML and write it to the given output file.  This is used
+# when the thread isn't part of the input tree but instead is intermediate
+# output from some other conversion process.
+#
+# $thread     - Thread to spin
+# $input      - Original input file (for modification timestamps)
+# $input_type - One-word description of input type for the page footer
+# $output     - Output file
+#
+# Returns: Resulting HTML
+sub spin_thread_output {
+    my ($self, $thread, $input, $input_type, $output) = @_;
+
+    # Open the output file.
+    my $out_fh;
+    if (defined($output)) {
+        my $path = realpath($output)
+          or die "cannot canonicalize $output: $!\n";
+        $output = $path;
+        open($out_fh, '>', $output);
+    } else {
+        $output = q{-};
+        open($out_fh, '>&', 'STDOUT');
+    }
+
+    # Do the work.
+    $self->_parse_document($thread, $input, $out_fh, $output, $input_type);
+
+    # Clean up and restore the working directory.
+    close($out_fh);
+    return;
+}
+
 ##############################################################################
 # Module return value and documentation
 ##############################################################################
@@ -1501,8 +1536,9 @@ App::DocKnot::Spin::Thread - Generate HTML from the macro language thread
 
     use App::DocKnot::Spin::Thread;
 
+    my $input  = 'some thread';
     my $thread = App::DocKnot::Spin::Thread->new();
-    $thread->spin_file('/path/to/file.th', '/path/to/file.html');
+    my $output = $thread->spin_thread($input);
 
     use App::DocKnot::Spin::Sitemap;
     use App::DocKnot::Spin::Versions;
@@ -1515,12 +1551,15 @@ App::DocKnot::Spin::Thread - Generate HTML from the macro language thread
         sitemap  => $sitemap,
         versions => $versions,
     });
-    $thread->spin_file('/input/file.th', '/output/file.th');
+    $thread->spin_thread_file('/input/file.th', '/output/file.html');
+    $thread->spin_thread_output(
+        $input, '/path/to/file.pod', 'POD', '/output/file.html'
+    );
 
 =head1 REQUIREMENTS
 
-Perl 5.24 or later and the modules Git::Repository and Image::Size, both of
-which are available from CPAN.
+Perl 5.24 or later and the modules Git::Repository, Image::Size,
+List::SomeUtils, and Path::Tiny, all of which are available from CPAN.
 
 =head1 DESCRIPTION
 
@@ -1600,6 +1639,16 @@ will be used.
 If OUTPUT is omitted, App::DocKnot::Spin::Thread will not be able to obtain
 sitemap information even if a sitemap was provided and therefore will not add
 inter-page links.
+
+=item spin_thread_output(THREAD, INPUT, TYPE[, OUTPUT])
+
+Convert the given thread to HTML, writing the result to OUTPUT.  If OUTPUT is
+not given, write the results to standard output.  This is like spin_thread()
+but does use sitemap information and adds inter-page links.  It should be used
+when the thread input is the result of an intermediate conversion step of a
+known input file.  INPUT should be the full path to the original source file,
+used for modification time information.  TYPE should be set to a one-word
+description of the format of the input file and is used for the page footer.
 
 =back
 

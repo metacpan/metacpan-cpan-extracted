@@ -1,6 +1,11 @@
 Revision history for Perl extension UI-Various
 
-0.06 2021-12-21T07:23:15Z
+0.07 2021-12-26T15:37:35Z
+
+0.07 2021-12-26T15:36:41Z
+
+    - fixed "do" bug in tests with older Perl versions
+    - removed regexp modifier /n not supported by older Perl versions
 
 0.06 2021-12-21T07:22:00Z
 

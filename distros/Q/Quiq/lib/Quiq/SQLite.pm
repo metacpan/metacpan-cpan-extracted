@@ -21,11 +21,12 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.196';
+our $VERSION = '1.197';
 
 use Quiq::Database::Connection;
 use Quiq::Path;
 use Quiq::Terminal;
+use POSIX ();
 
 # -----------------------------------------------------------------------------
 
@@ -280,18 +281,37 @@ sub recreateDatabase {
         }
     }
     else {
+        say "Creating exportdir $exportDir ...";
         $p->mkdir($exportDir,-recursive=>1);
     }
 
     if ($export) {
+        if ($interactive) {
+            say "Exporting table data to $exportDir ...";
+        }
         $class->exportData($dbFile,$exportDir);
-        $p->copyToDir($dbFile,$exportDir,-preserve=>1);
+
+        my $saveDir = '~/tmp';
+        $p->mkdir($saveDir,-recursive=>1);
+        my (undef,undef,$basename,$ext) = $p->split($dbFile);
+        my $now = POSIX::strftime('%Y%m%d-%H%M%S',localtime);
+        my $destFile = sprintf '%s/%s-%s.%s',$saveDir,$basename,$now,$ext;
+        if ($interactive) {
+            say "Saving database $dbFile to $destFile ...";
+        }
+        $p->copy($dbFile,$destFile,-preserve=>1);
     }
 
     # Erzeuge Datenbank neu und importiere Tabellendaten
 
-    eval {
+    my $status = eval {
+        if ($interactive) {
+            say "Truncating database $dbFile ...";
+        }
         $p->truncate($dbFile);
+        if ($interactive) {
+            say "Creating tables etc. ...";
+        }
         $sub->($dbFile);
         my $answ = Quiq::Terminal->askUser(
             "Ready to import data from $exportDir?",
@@ -299,10 +319,13 @@ sub recreateDatabase {
             -default => 'y',
             -automatic => !$interactive,
         );
-        if ($answ eq 'a') {
-            return;
+        if ($answ eq 'y') {
+            if ($interactive) {
+                say "Importing table data from $exportDir ...";
+            }
+            $class->importData($dbFile,$exportDir);
         }
-        $class->importData($dbFile,$exportDir);
+        return $answ;
     };
     if ($@) {
         $class->throw(
@@ -312,9 +335,14 @@ sub recreateDatabase {
              Error => $@,
         );
     }
+    if ($status eq 'y') {
+        # Wenn alles geklappt hat, löschen wir das Exportverzeichnis
 
-    # Wenn alles geklappt hat, löschen wir das Exportverzeichnis
-    $p->delete($exportDir);
+        if ($interactive) {
+            say "Deleting $exportDir ...";
+        }
+        $p->delete($exportDir);
+    }
 
     return;
 }
@@ -323,7 +351,7 @@ sub recreateDatabase {
 
 =head1 VERSION
 
-1.196
+1.197
 
 =head1 AUTHOR
 

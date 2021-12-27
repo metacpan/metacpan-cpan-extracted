@@ -1,4 +1,6 @@
 Changes
+examples/complex/complex.pl
+examples/complex/lib/SPVM/MyComplex.spvm
 lib/SPVM/Math.c
 lib/SPVM/Math.config
 lib/SPVM/Math.pm

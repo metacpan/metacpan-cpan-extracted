@@ -9,15 +9,24 @@ use Test::Fatal;
 use Socket;
 use File::Temp;
 use Errno 'EBADF';
+use IO::Socket::INET;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
 use TestUtils;
 
+sub socket_pair {
+	my $listen = IO::Socket::INET->new(Listen => 10) or die $!;
+	my $connecting = IO::Socket::INET->new(PeerAddr => $listen->sockhost, PeerPort => $listen->sockport) or die $!;
+	return ($connecting, $listen->accept);
+}
+
 subtest ebadf => sub {
 	use autocroak;
 
-	socket my $s, Socket::AF_INET, Socket::SOCK_STREAM, 0;
+	plan skip_all => 'Windows is special' if $^O eq 'MSWin32'; # XXX we need a better test here
+
+	my ($s, $r) = socket_pair;
 	my $fd = fileno $s;
 
 	vec( my $rin, $fd, 1) = 1;
@@ -36,8 +45,9 @@ subtest ebadf => sub {
 subtest success => sub {
 	use autocroak;
 
-	my $fh = File::Temp::tempfile();
-	my $fd = fileno $fh;
+	my ($read, $write) = socket_pair;
+	syswrite $write, "0";
+	my $fd = fileno $read;
 
 	is(exception { 
 		vec( my $rin, $fd, 1) = 1;

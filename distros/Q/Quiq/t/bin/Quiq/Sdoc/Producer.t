@@ -92,6 +92,29 @@ sub test_format : Test(1) {
 
 # -----------------------------------------------------------------------------
 
+sub test_linkDefs : Test(1) {
+    my $self = shift;
+
+    my $gen = Quiq::Sdoc::Producer->new;
+    
+    my $str = $gen->link('fseitz.de',
+        url => 'http://fseitz.de',
+    );
+    $self->is($str,'L{fseitz.de}');
+
+    # $self->is($str,Quiq::Unindent->string(q~
+    #     %Format:
+    #     @@HTML@@
+    #     <p>Hallo</p>
+    #     @@LaTeX@@
+    #     Hallo
+    #     .
+    # 
+    # ~));
+}
+
+# -----------------------------------------------------------------------------
+
 sub test_paragraph : Test(2) {
     my $self = shift;
 

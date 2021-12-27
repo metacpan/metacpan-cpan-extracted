@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -35,8 +35,9 @@ my ( $S1, $S2 ) = IO::Async::OS->socketpair() or die "Cannot create socket pair 
    wait_for_stream { $serverstream =~ m/(?:.*$CRLF){3}/ } $S2 => $serverstream;
 
    is( $serverstream, "CAP LS$CRLF" .
-                      "USER me 0 * :My real name$CRLF" .
-                      "NICK MyNick$CRLF", 'Server stream negotiates CAP' );
+                      "NICK MyNick$CRLF" .
+                      "USER me 0 * :My real name$CRLF",
+                      'Server stream negotiates CAP' );
    $serverstream = "";
 
    $S2->syswrite( ':irc.example.com CAP * LS :multi-prefix sasl' . $CRLF );

@@ -82,7 +82,7 @@ sub _new {
 	if(defined($0)) {
 		$this->watch($0);
 	}
-	my $filename = $TL->INI->_filename;
+	my $filename = $TL->INI->getFilePath;
 	if(defined($filename)) {
 		$this->watch($filename);
 	}

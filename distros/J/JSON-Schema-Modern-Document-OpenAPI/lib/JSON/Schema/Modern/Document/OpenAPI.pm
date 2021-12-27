@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern::Document::OpenAPI; # git description: v0.011-5-g914500a
+package JSON::Schema::Modern::Document::OpenAPI; # git description: v0.012-5-gb6173d5
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -173,6 +173,15 @@ sub _add_vocab_and_default_schemas ($self) {
   my $js = $self->evaluator;
   $js->add_vocabulary('JSON::Schema::Modern::Vocabulary::OpenAPI');
 
+  # note: proper support for int64 requires bigint support in JSM
+  $js->add_format_validation(
+    int32 => +{ type => 'integer', sub => sub ($x) { $x >= -2**31 && $x < 2**31 } },
+    int64 => +{ type => 'integer', sub => sub ($x) { $x >= -2**63 && $x < 2**63 } },
+    float => +{ type => 'number', sub => sub ($) { 1 } },
+    double => +{ type => 'number', sub => sub ($) { 1 } },
+    password => +{ type => 'string', sub => sub ($) { 1 } },
+  );
+
   foreach my $pairs (pairs DEFAULT_SCHEMAS->%*) {
     my ($filename, $uri) = @$pairs;
     my $document = $js->add_schema($uri,
@@ -212,7 +221,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 

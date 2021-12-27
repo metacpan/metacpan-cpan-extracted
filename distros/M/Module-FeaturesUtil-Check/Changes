@@ -1,3 +1,10 @@
+0.006   2021-07-31  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Tweak Abstract and Description.
+
+
 0.005   2021-03-26  Released-By: PERLANCAR; Urgency: medium
 
 	- Degrade the severity of check to warning: feature name must be

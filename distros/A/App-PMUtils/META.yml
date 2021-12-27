@@ -20,16 +20,17 @@ name: App-PMUtils
 provides:
   App::ModuleUtils:
     file: lib/App/ModuleUtils.pm
-    version: '0.737'
+    version: '0.738'
   App::PMUtils:
     file: lib/App/PMUtils.pm
-    version: '0.737'
+    version: '0.738'
   App::pmgrep:
     file: lib/App/pmgrep.pm
-    version: '0.737'
+    version: '0.738'
 recommends:
   Perl::MinimumVersion::Fast: '0'
 requires:
+  App::ThisDist: '0.012'
   AppBase::Grep: '0.009'
   Browser::Open: '0'
   Complete::Module: '0.262'
@@ -67,6 +68,7 @@ requires:
   PERLANCAR::Module::List: '0.004004'
   Perinci::CmdLine::Any: '0.152'
   Perinci::CmdLine::Lite: '1.905'
+  Perinci::Sub::DepChecker: '0'
   Perinci::Sub::Util: '0.470'
   Perl::MinimumVersion: '0'
   Perl::Stripper: '0'
@@ -84,7 +86,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-PMUtils
   homepage: https://metacpan.org/release/App-PMUtils
   repository: git://github.com/perlancar/perl-App-PMUtils.git
-version: '0.737'
+version: '0.738'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -99,6 +101,10 @@ x_Dist_Zilla:
       version: '0.14'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript cpanm-this-mod'
+      version: '0.423'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript pmunlink'
       version: '0.423'
     -
@@ -108,6 +114,10 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript pmgrep'
+      version: '0.423'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript update-this-mod'
       version: '0.423'
     -
       class: Dist::Zilla::Plugin::InsertExecsList

@@ -1,5 +1,9 @@
 # This file documents the revision history for Perl extension Catalyst-TraitFor-Request-StructuredParameters.
 
+0.007 - 2021-12-24
+  - fixes / improvements to support for final empty array.   Now you can have
+    more than one non specified array indexes in limited but useful situations.
+
 0.006 - 2021-10-19
   - ome new helper methods on getting processed parameters.
   - New option to control how long an array can be (Sets default of 1000 items).

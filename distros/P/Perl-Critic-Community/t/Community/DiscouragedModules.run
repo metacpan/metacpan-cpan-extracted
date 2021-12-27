@@ -12,6 +12,7 @@ use Exception::Class;
 use File::Slurp::Tiny;
 use Future;
 use Future::AsyncAwait;
+use GeoIP2::Database::Reader;
 use IO::Async::Loop;
 use IO::Socket::IP;
 use JSON::MaybeXS;
@@ -42,7 +43,7 @@ use XML::TreeBuilder;
 use XML::Twig;
 
 ## name BadModules
-## failures 15
+## failures 16
 ## cut
 
 use Any::Moose;
@@ -55,6 +56,7 @@ use File::Slurp;
 use FindBin;
 use HTML::Template;
 use IO::Socket::INET6;
+use IP::World;
 use JSON::Any;
 use JSON::XS;
 use Net::IRC;

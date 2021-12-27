@@ -10,7 +10,7 @@ use Carp;
 
 
 
-our $VERSION = "0.025";
+our $VERSION = "0.027";
 
 use Text::Layout::FontDescriptor;
 
@@ -367,7 +367,7 @@ sub find_font {
 		return;
 	    }
 
-	    for ( qw( shaping interline
+	    for ( qw( shaping interline nosubset
 		      underline_thickness underline_position
 		      strikeline_thickness strikeline_position
 		      overline_thickness overline_position

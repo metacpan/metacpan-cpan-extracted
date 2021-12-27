@@ -172,6 +172,20 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'height' => {
+    	datatype => 'int',
+    	base_name => 'Height',
+    	description => 'Gets or sets the height of slides in the output format, e.g. image size, pdf page size etc.',
+    	format => '',
+    	read_only => '',
+    		},
+    'width' => {
+    	datatype => 'int',
+    	base_name => 'Width',
+    	description => 'Gets or sets the height of slides in the output format, e.g. image size, pdf page size etc.',
+    	format => '',
+    	read_only => '',
+    		},
     'format' => {
     	datatype => 'string',
     	base_name => 'Format',
@@ -190,12 +204,16 @@ __PACKAGE__->method_documentation({
 
 __PACKAGE__->swagger_types( {
     'default_regular_font' => 'string',
+    'height' => 'int',
+    'width' => 'int',
     'format' => 'string',
     'conformance' => 'string'
 } );
 
 __PACKAGE__->attribute_map( {
     'default_regular_font' => 'DefaultRegularFont',
+    'height' => 'Height',
+    'width' => 'Width',
     'format' => 'Format',
     'conformance' => 'Conformance'
 } );

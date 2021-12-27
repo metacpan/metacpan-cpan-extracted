@@ -1,5 +1,12 @@
 Revision history for JSON-Schema-Modern-Document-OpenAPI
 
+0.013     2021-12-22 19:23:30Z
+          - support */* as a media-type in a content specification, to
+            indicate valiation checks that can be performed on any content
+            type (e.g. length)
+          - add support for OAS-specific formats: int32, int64, float, double,
+            password
+
 0.012     2021-12-17 06:39:38Z
           - properly handle a missing Content-Length header alongside a
             non-zero-length body payload

@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4229",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -16,8 +16,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.4004",
-            "Module::Build::Using::PkgConfig" : "0"
+            "Module::Build" : "0.4004"
          }
       },
       "runtime" : {
@@ -36,7 +35,7 @@
    "provides" : {
       "Tickit::App::Plugin::EscapePrefix" : {
          "file" : "lib/Tickit/App/Plugin/EscapePrefix.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -45,6 +44,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

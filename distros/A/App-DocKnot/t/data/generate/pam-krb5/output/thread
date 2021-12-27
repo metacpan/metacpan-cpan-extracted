@@ -48,11 +48,14 @@
 
     \h2[Security Advisories]
 
+    \link[security/2020-03-30.html]
+        [2020-03-30]: pam-krb5 4.8 and earlier \break
     \link[security/2009-02-11.html]
-        [2009-02-11]: pam-krb5 3.12 and earlier\break
+        [2009-02-11]: pam-krb5 3.12 and earlier \break
 
     \h2[Development]
 
+    \link[todo.html][To-do list] \break
     \link[https://github.com/rra/pam-krb5]
          [GitHub] \break
     \link[https://github.com/rra/pam-krb5/issues]
@@ -110,20 +113,22 @@ not been tested with earlier versions.
 
 For PKINIT support, Heimdal 0.8rc1 or later or MIT Kerberos 1.6.3 or later
 are required.  Earlier MIT Kerberos 1.6 releases have a bug in their
-handling of PKINIT options.
+handling of PKINIT options.  MIT Kerberos 1.12 or later is required to use
+the use_pkinit PAM option.
 
 For FAST (Flexible Authentication Secure Tunneling) support, MIT Kerberos
 1.7 or higher is required.  For anonymous FAST support, anonymous
 authentication (generally anonymous PKINIT) support is required in both
 the Kerberos libraries and in the local KDC.
 
-This module should work on Linux and Solaris (and build with gcc, clang,
-or the Sun C compiler), but has been far more heavily tested on Linux.
-There is beta-quality support for the AIX NAS Kerberos implementation.
-Other PAM implementations will probably require some porting, although
-untested build system support is present for FreeBSD, Mac OS X, and HP-UX.
-I personally can only test on Linux and rely on others to report problems
-on other operating systems.
+This module should work on Linux and build with gcc or clang.  It may
+still work on Solaris and build with the Sun C compiler, but I have only
+tested it on Linux recently.  There is beta-quality support for the AIX
+NAS Kerberos implementation that has not been tested in years.  Other PAM
+implementations will probably require some porting, although untested
+build system support is present for FreeBSD, Mac OS X, and HP-UX.  I
+personally can only test on Linux and rely on others to report problems on
+other operating systems.
 
 Old versions of OpenSSH are known to call \code[pam_authenticate] followed
 by \code[pam_setcred(PAM_REINITIALIZE_CRED)] without first calling
@@ -158,7 +163,7 @@ The distribution:
 
 An \link[https://archives.eyrie.org/software/ARCHIVE/pam-krb5/] [archive
 of older releases] is also available.  \class(alert)[Versions older than
-3.13 have known security vulnerabilities and should not be used.]
+4.9 have known security vulnerabilities and should not be used.]
 
 Debian packages are available from Debian in Debian 4.0 (etch) and later
 releases as libpam-krb5 and libpam-heimdal.  The former packages are built
@@ -188,11 +193,14 @@ User documentation:
 
 Security advisories:
 
+\doc[security/2020-03-30.html]
+    [2020-03-30: 4.8 and earlier]
 \doc[security/2009-02-11.html]
     [2009-02-11: 3.12 and earlier]
 
 Developer documentation:
 
+\doc[todo.html][To-do list]
 \doc[https://github.com/rra/pam-krb5]
     [GitHub]
 \doc[https://github.com/rra/pam-krb5/issues]
@@ -207,7 +215,7 @@ license:
 
 \block[
 
-    Copyright 2005-2010, 2014-2015, 2017
+    Copyright 2005-2010, 2014-2015, 2017, 2020-2021
         Russ Allbery <eagle@eyrie.org>
 
     Copyright 2009-2011

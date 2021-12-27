@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-28'; # DATE
+our $DATE = '2021-12-01'; # DATE
 our $DIST = 'App-PerlCriticUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 our %SPEC;
 
@@ -52,6 +52,11 @@ $SPEC{pcplist} = {
     summary => 'List installed Perl::Critic policy modules',
     args => {
         %argopt_detail,
+        query => {
+            schema => ['array*', of=>'str*'],
+            pos => 0,
+            slurpy => 1,
+        },
     },
     examples => [
         {
@@ -64,31 +69,124 @@ $SPEC{pcplist} = {
             argv => ['-l'],
             test => 0,
         },
+        {
+            summary => "What's that policy that prohibits returning undef explicitly?",
+            argv => ["undef"],
+            test => 0,
+        },
+        {
+            summary => "What's that policy that requires using strict?",
+            argv => ["req", "strict"],
+            test => 0,
+        },
     ],
 };
 sub pcplist {
     require PERLANCAR::Module::List;
 
     my %args = @_;
+    my $query = $args{query} // [];
 
     my $mods = PERLANCAR::Module::List::list_modules(
         'Perl::Critic::Policy::', {list_modules=>1, recurse=>1});
     my @rows;
     my $resmeta = {};
+  MOD:
     for my $mod (sort keys %$mods) {
         (my $name = $mod) =~ s/^Perl::Critic::Policy:://;
+        my $str;
+        my $row;
         if ($args{detail}) {
             require Module::Abstract;
-            push @rows, {
+            $row = {
                 name => $name,
                 abstract => Module::Abstract::module_abstract($mod),
             };
+            $str = lc join(" ", $row->{name}, $row->{abstract});
         } else {
-            push @rows, $name;
+            $row = $name;
+            $str = lc $name;
         }
+
+        if (@$query) {
+            for my $q (@$query) {
+                next MOD unless index($str, $q) >= 0;
+            }
+        }
+
+        push @rows, $row;
     }
     $resmeta->{'table.fields'} = [qw/name abstract/] if $args{detail};
     [200, "OK", \@rows, $resmeta];
+}
+
+$SPEC{pcpgrep} = {
+    v => 1.1,
+    summary => 'Grep from list of installed Perl::Critic policy module names (abstracts, ...)',
+    description => <<'_',
+
+I can never remember the names of the policies, hence this utility. It's a
+convenience shortcut for:
+
+    % pcplist | grep SOMETHING
+    % pcplist -l | grep SOMETHING
+
+Note that pcplist also can filter:
+
+    % pcplist undef
+    % pcplist req strict
+_
+    args => {
+        query => {
+            schema => ['array*', of=>'str*'],
+            req => 1,
+            pos => 0,
+            slurpy => 1,
+        },
+        ignore_case => {
+            summary => 'Defaults to true for convenience',
+            schema => 'bool*',
+            default => 1,
+        },
+    },
+    examples => [
+        {
+            summary => "What's that policy that prohibits returning undef explicitly?",
+            argv => ["undef"],
+            test => 0,
+        },
+        {
+            summary => "What's that policy that requires using strict?",
+            argv => ["req", "strict"],
+            test => 0,
+        },
+    ],
+};
+sub pcpgrep {
+    require PERLANCAR::Module::List;
+
+    my %args = @_;
+    my $query = $args{query} or return [400, "Please specify query"];
+    my $ignore_case = $args{ignore_case} // 1;
+
+    my $listres = pcplist(detail=>1);
+    my $grepres = [$listres->[0], $listres->[1], [], $listres->[3]];
+
+    for my $row (@{ $listres->[2] }) {
+        my $str = join(" ", $row->{name}, $row->{abstract});
+        my $match = 1;
+        for my $q (@$query) {
+            if ($ignore_case) {
+                do { $match = 0; last } unless index(lc($str), lc($q)) >= 0;
+            } else {
+                do { $match = 0; last } unless index($str, $q) >= 0;
+            }
+        }
+        next unless $match;
+        push @{$grepres->[2]}, $row;
+    }
+
+    $grepres;
 }
 
 $SPEC{pcppath} = {
@@ -277,7 +375,7 @@ App::PerlCriticUtils - Command-line utilities related to Perl::Critic
 
 =head1 VERSION
 
-This document describes version 0.005 of App::PerlCriticUtils (from Perl distribution App-PerlCriticUtils), released on 2021-08-28.
+This document describes version 0.006 of App::PerlCriticUtils (from Perl distribution App-PerlCriticUtils), released on 2021-12-01.
 
 =head1 SYNOPSIS
 
@@ -289,6 +387,8 @@ Perl::Critic:
 =item * L<pcpcat>
 
 =item * L<pcpdoc>
+
+=item * L<pcpgrep>
 
 =item * L<pcpless>
 
@@ -370,6 +470,103 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<policy>* => I<perl::modname>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 pcpgrep
+
+Usage:
+
+ pcpgrep(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Grep from list of installed Perl::Critic policy module names (abstracts, ...).
+
+Examples:
+
+=over
+
+=item * What's that policy that prohibits returning undef explicitly?:
+
+ pcpgrep(query => ["undef"]);
+
+Result:
+
+ [
+   200,
+   "OK",
+   [
+     {
+       name => "BuiltinFunctions::ProhibitSleepViaSelect",
+       abstract => "Use L<Time::HiRes|Time::HiRes> instead of something like C<select(undef, undef, undef, .05)>.",
+     },
+     {
+       name => "InputOutput::ProhibitJoinedReadline",
+       abstract => "Use C<local \$/ = undef> or L<Path::Tiny|Path::Tiny> instead of joined readline.",
+     },
+     {
+       name => "Subroutines::ProhibitExplicitReturnUndef",
+       abstract => "Return failure with bare C<return> instead of C<return undef>.",
+     },
+   ],
+   { "table.fields" => ["name", "abstract"] },
+ ]
+
+=item * What's that policy that requires using strict?:
+
+ pcpgrep(query => ["req", "strict"]);
+
+Result:
+
+ [
+   200,
+   "OK",
+   [
+     {
+       name => "TestingAndDebugging::RequireUseStrict",
+       abstract => "Always C<use strict>.",
+     },
+   ],
+   { "table.fields" => ["name", "abstract"] },
+ ]
+
+=back
+
+I can never remember the names of the policies, hence this utility. It's a
+convenience shortcut for:
+
+ % pcplist | grep SOMETHING
+ % pcplist -l | grep SOMETHING
+
+Note that pcplist also can filter:
+
+ % pcplist undef
+ % pcplist req strict
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<ignore_case> => I<bool> (default: 1)
+
+Defaults to true for convenience.
+
+=item * B<query>* => I<array[str]>
 
 
 =back
@@ -1199,6 +1396,18 @@ Result:
    { "table.fields" => ["name", "abstract"] },
  ]
 
+=item * What's that policy that prohibits returning undef explicitly?:
+
+ pcplist(query => ["undef"]); # -> [200, "OK", ["Subroutines::ProhibitExplicitReturnUndef"], {}]
+
+=item * What's that policy that requires using strict?:
+
+ pcplist(query => ["req", "strict"]);
+
+Result:
+
+ [200, "OK", ["TestingAndDebugging::RequireUseStrict"], {}]
+
 =back
 
 This function is not exported.
@@ -1208,6 +1417,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<detail> => I<bool>
+
+=item * B<query> => I<array[str]>
 
 
 =back

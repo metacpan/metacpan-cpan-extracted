@@ -6,7 +6,7 @@ use warnings;
 use Perl::Critic::Utils qw(:severities :classification :ppi);
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = 'v1.0.1';
+our $VERSION = 'v1.0.2';
 
 use constant DESC => '<>/<<>>/readline/readdir/each result not explicitly assigned in while condition';
 use constant EXPL => 'When used alone in a while condition, the <>/<<>> operator, readline, readdir, and each functions assign their result to $_, but do not localize it. Assign the result to an explicit lexical variable instead (my $line = <...>, my $dir = readdir ...)';

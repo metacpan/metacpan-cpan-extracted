@@ -31,4 +31,6 @@ Validation
 Vocabulary
 ether
 irc
+json
 lib
+script

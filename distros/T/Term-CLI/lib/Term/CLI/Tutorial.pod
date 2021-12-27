@@ -22,7 +22,7 @@ Term::CLI::Tutorial - tips, tricks, and examples for Term::CLI
 
 =head1 VERSION
 
-version 0.052003
+version 0.053006
 
 =head1 SYNOPSIS
 
@@ -36,6 +36,16 @@ and more.
 
 For an introduction in the object class structure, see
 L<Term::CLI::Intro>(3p).
+
+=head2 Note on Term::ReadLine
+
+Although L<Term::CLI> has been created to work with L<Term::ReadLine> in
+general, it works best when L<Term::ReadLine::Gnu>(3p) is present;
+failing that, L<Term::ReadLine::Perl>(3p) will also suffice, although there
+are some subtle differences (especially in signal handling).
+If neither is present on your system, L<Term::ReadLine> will load a "stub"
+interface (C<Term::ReadLine::Stub>), which supports neither command line
+editing nor completion.
 
 =head1 INTRODUCTION
 
@@ -148,6 +158,7 @@ The basic design of an interactive interface follows the well-established REPL
 L<Term::CLI> provides a framework to make this happen:
 
     use 5.014_001;
+    use warnings;
     use Term::CLI;
 
     my $term = Term::CLI->new(
@@ -287,10 +298,15 @@ So, now that we have the basic mechanism out of the way, let's
 add our first command, the highly useful C<exit>.
 
 =head2 The C<exit> command (optional argument)
+X<exit_command>
 
 From L<THE BSSH CONCEPT|/THE BSSH CONCEPT> section above:
 
-S<    >B<exit> [ I<code> ]
+=over
+
+B<exit> [ I<code> ]
+
+=back
 
 This illustrates the use of a single, optional argument. Here's the code:
 
@@ -299,7 +315,7 @@ This illustrates the use of a single, optional argument. Here's the code:
         callback => sub {
             my ($cmd, %args) = @_;
             return %args if $args{status} < 0;
-            execute_exit($cmd->name, @{$args{arguments}});
+            execute_exit($cmd, @{$args{arguments}});
             return %args;
         },
         arguments => [
@@ -341,7 +357,7 @@ The callback function is called when the command is executed.
     callback => sub {
         my ($cmd, %args) = @_;
         return %args if $args{status} < 0;
-        execute_exit($cmd->name, @{$args{arguments}});
+        execute_exit($cmd, @{$args{arguments}});
         return %args;
     },
 
@@ -350,7 +366,7 @@ In this case, we also have to define C<execute_exit>:
     sub execute_exit {
         my ($cmd, $excode) = @_;
         $excode //= 0;
-        say "-- $cmd: $excode";
+        say "-- exit: $excode";
         exit $excode;
     }
 
@@ -497,7 +513,7 @@ and C<description> attributes in the C<exit> command definition:
         callback => sub {
             my ($cmd, %args) = @_;
             return %args if $args{status} < 0;
-            execute_exit($cmd->name, @{$args{arguments}});
+            execute_exit($cmd, @{$args{arguments}});
             return %args;
         },
         arguments => [
@@ -572,7 +588,11 @@ The C<sleep> command demonstrates a numerical argument
 Next up, the C<echo> command.
 From L<THE BSSH CONCEPT|/THE BSSH CONCEPT> section above:
 
-S<    >B<echo> [ I<arg> ... ]
+=over
+
+B<echo> [ I<arg> ... ]
+
+=back
 
 That is, the C<echo> command takes zero or more arbitrary
 string arguments.
@@ -613,7 +633,11 @@ same prefix (C<e>), so let's see what happens with the abbreviations:
 
 From L<THE BSSH CONCEPT|/THE BSSH CONCEPT> section above:
 
-S<    >B<make> {B<love>|B<money>} {B<now|later|never|forever>}
+=over
+
+B<make> {B<love>|B<money>} {B<now|later|never|forever>}
+
+=back
 
 Arguments with fixed set of values can be specified with
 L<Term::CLI::Argument::Enum> objects:
@@ -668,7 +692,11 @@ fail because C<n> is ambiguous:
 The C<ls> command takes zero or more file name arguments.
 From L<THE BSSH CONCEPT|/THE BSSH CONCEPT> section above:
 
-S<    >B<ls> [ I<path> ... ]
+=over
+
+B<ls> [ I<path> ... ]
+
+=back
 
 The code for this:
 
@@ -723,7 +751,11 @@ about the arguments it gets, juost so long as they are not empty:
 
 From L<THE BSSH CONCEPT|/THE BSSH CONCEPT> section above:
 
-S<    >B<cp> I<src-path> ... I<dst-path>
+=over
+
+B<cp> I<src-path> ... I<dst-path>
+
+=back
 
 Ideally, we would like to specify this as:
 
@@ -814,7 +846,11 @@ be passed as regular arguments.
 
 From L<THE BSSH CONCEPT|/THE BSSH CONCEPT> section above:
 
-S<    >B<sleep> I<seconds>
+=over
+
+S<sleep> I<seconds>
+
+=back
 
 This is an almost trivial implementation:
 
@@ -838,16 +874,13 @@ This is an almost trivial implementation:
 
             say "-- sleep: $time";
 
-            my %oldsig = %::SIG; # Save signals;
-
             # Make sure we can interrupt the sleep() call.
-            $::SIG{INT} = $::SIG{QUIT} = sub {
-                say STDERR "(interrupted by $_[0])";
+            my $slept = do {
+                local($::SIG{INT}) = local($::SIG{QUIT}) = sub {
+                    say STDERR "(interrupted by $_[0])";
+                };
+                sleep($time);
             };
-
-            my $slept = sleep($time);
-
-            %::SIG = %oldsig; # Restore signal handlers.
 
             say "-- woke up after $slept sec", $slept == 1 ? '' : 's';
             return %args;
@@ -885,7 +918,11 @@ See it in action:
 You may have noticed that so far, we've only added commands with arguments.
 But what if we want to implement something like:
 
-S<    >B<show> { B<load>|B<clock>|B<terminal> }
+=over
+
+B<show> { B<load>|B<clock>|B<terminal> }
+
+=back
 
 Well, as it turns out, L<Term::CLI::Command|Term::CLI::Command>(3p) can handle
 that as well: instead of specifying C<arguments> in the constructor, you can
@@ -969,9 +1006,13 @@ Adding this to our ever-growing C<bssh> code, we get:
 
 The specification says:
 
-S<    >B<set> B<verbose> I<bool>
+=over
 
-S<    >B<set> B<delimiters> I<string>
+B<set> B<verbose> I<bool>
+
+B<set> B<delimiters> I<string>
+
+=back
 
 Code:
 
@@ -1075,7 +1116,11 @@ sub-commands (the C<interface> command), or to create syntactic sugar
 
 The specification says:
 
-S<    >B<do> {B<something>|B<nothing>} B<while> {B<working>|B<sleeping>}
+=over
+
+B<do> {B<something>|B<nothing>} B<while> {B<working>|B<sleeping>}
+
+=back
 
 Code:
 
@@ -1115,7 +1160,11 @@ Code:
 
 The specification says:
 
-S<    >B<interface> I<iface> {B<up>|B<down>}
+=over
+
+B<interface> I<iface> {B<up>|B<down>}
+
+=back
 
 The I<iface> argument is used by both sub-commands.
 
@@ -1403,20 +1452,107 @@ specify it explicitly in its options:
         ...
     ),
 
+=head1 SIGNAL HANDLING
+
+As you may have noticed, we disable the interrupt (I<INT>) signal
+in the beginning of the program. This is because we want I<Ctrl-C>
+to abort the input line, but not exit the program.
+
+There are other signals that can be entered via the command line,
+namely C<QUIT> and C<TSTP> (suspend).
+
+Normally, I<Ctrl-\> will generate a C<QUIT> signal (3) to the
+application. You usually don't want this during keyboard input
+(having an accidental I<Ctrl-\> kill your session can be annoying),
+so L<Term::CLI> will disable this for you already.
+
+However, if you run any of the previous examples and enter 
+I<Ctrl-Z>, you'll notice that the program suspends and you are
+dropped back into the shell you started from.
+
+What if you don't want to suspend on I<Ctrl-Z>, but add a C<suspend>
+command instead?
+
+=head2 The C<suspend> command
+
+The F<tutorial/example_17_suspend.pl> file adds the following code:
+
+    $SIG{INT} = $SIG{TSTP} = 'IGNORE';
+
+    ...
+
+    push @commands, Term::CLI::Command->new(
+        name => 'suspend',
+        summary => 'suspend the program',
+        description => "Suspend the program by sending a C<TSTP>\n"
+                    .  "signal and return control to the shell.",
+        callback => sub {
+            my ($cmd, %args) = @_;
+            local($SIG{TSTP}) = 'DEFAULT';
+            kill 'TSTP', $$;
+            return %args;
+        }
+    );
+
+Now do this:
+
+=over
+
+=item 1.
+
+perl tutorial/example_16_options.pl
+    
+=item 2.
+
+Enter I<Ctrl-Z>; this should suspend the program.
+
+=item 3. 
+
+Type C<fg> + I<ENTER> to continue again.
+
+=back
+
+Compare that to the version with C<suspend>:
+
+=over
+
+=item 1.
+
+perl tutorial/example_17_suspend.pl
+    
+=item 2.
+
+Enter I<Ctrl-Z>; nothing should happen (unless you have
+C<Term::ReadLine::Perl> loaded).
+
+=item 3.
+
+Enter the C<suspend> command. This should suspend the program.
+
+=item 4.
+
+Type C<fg> + I<ENTER> to continue again.
+
+=back
+
+For more details on the dirty secrets of signal handling, see the
+L<SIGNAL HANDLING section|Term::CLI::ReadLine/SIGNAL HANDLING>
+in L<Term::CLI::ReadLine>(3p).
+
 =head1 DEALING WITH HISTORY
 
 By default, the L<Term::CLI> objects do not try to read or write
 to history files, so you will have to tell the application to do
 so explicitly. Fortunately, that's not hard:
 
-    $cli->read_history();
+    $term->read_history();
 
-    while (defined (my $l = $cli->readline)) {
+    while (defined (my $l = $term->readline)) {
         ...
     }
 
-    $cli->write_history()
-        or warn "cannot write history: ".$cli->error."\n";
+    $term->write_history()
+        or warn "cannot write history: ".$term->error."\n";
 
 (Note that we don't raise a warning if we cannot read the history
 file: you don't want to get a warning if you run the application
@@ -1430,6 +1566,196 @@ See the L<History Control|Term::CLI/History Control>
 section in the L<Term::CLI> documentation for more information
 on how to change the defaults.
 
+=head2 Ensuring history is saved on exit
+
+The above code will not save the command history if you call C<exit> from
+a callback function. The previously created C<exit> command
+(L<see above|/exit_command>) calls the C<execute_exit> callback, which calls
+C<exit()>. As a result, the line with C<$term-E<gt>write_history()> is never
+reached.
+
+There are several approaches to fix this, the most recommended is to use the
+L<Term::CLI's cleanup|Term::CLI/cleanup> attribute:
+
+    my $term = Term::CLI->new(
+        ...,
+        cleanup => sub {
+            my ($term) = @_;
+            $term->write_history() or 
+                or warn "cannot write history: ".$term->error."\n";
+        }
+    );
+
+    while ( defined(my $line = $term->readline) ) {
+        $term->execute($line);
+    }
+    exit 0;
+
+This ensures that the command history will be saved before the C<$term> object
+is destroyed.
+
+For completeness' sake, here are a number of alternative options, YMMV:
+
+=over
+
+=item 1.
+
+Add a global flag that is checked within the loop:
+
+    $::global_exit = undef;
+
+    sub execute_exit {
+        my ($cmd, $excode) = @_;
+        $excode //= 0;
+        say "-- exit: $excode";
+        $::global_exit = $excode;
+    }
+
+    ...
+
+    while (defined (my $line = $term->readline)) {
+        $term->execute($line);
+        last if defined $::global_exit;
+    }
+    $term->write_history()
+        or warn "cannot write history: ".$term->error."\n";
+
+    exit($::global_exit // 0);
+
+This has the disadvantage of creating a global variable. :-(
+
+=item 2.
+
+Return an exit flag through C<execute>:
+
+    push @commands, Term::CLI::Command->new(
+        name => 'exit',
+        callback => sub {
+            my ($cmd, %args) = @_;
+            return %args if $args{status} < 0;
+            my $excode = execute_exit($cmd, @{$args{arguments}});
+            return (%args, exit => $excode);
+        },
+        arguments => [
+            Term::CLI::Argument::Number::Int->new(  # Integer
+                name => 'excode',
+                min => 0,             # non-negative
+                min_occur => 0,       # occurrence is optional
+            ),
+        ],
+    );
+
+    sub execute_exit {
+        my ($cmd, $excode) = @_;
+        $excode //= 0;
+        say "-- exit: $excode";
+        return $excode;
+    }
+
+    ...
+
+    my %ret;
+    while (defined (my $line = $term->readline)) {
+        %ret = $term->execute($line);
+        last if defined $ret{exit};
+    }
+    $term->write_history()
+        or warn "cannot write history: ".$term->error."\n";
+
+    exit($ret{exit} // 0);
+
+This is better, since it doesn't rely on global variables, but it still
+depends on "magic" data to trigger delayed actions.
+
+=item 3.
+
+Write history in the callback:
+
+    sub execute_exit {
+        my ($cmd, $excode) = @_;
+        my $term = $cmd->root_node;
+        $term->write_history()
+            or warn "cannot write history: ".$term->error."\n";
+        $excode //= 0;
+        say "-- exit: $excode";
+        exit $excode;
+    }
+
+    ...
+
+    while (defined (my $line = $term->readline)) {
+        $term->execute($line);
+    }
+
+    execute_exit($term, 0);
+
+This is preferable to the previous two, since it doesn't require global flags
+or magic values. It also allows us to call C<execute_exit> at the end of the
+loop.
+
+Still, this is not perfect, as you have to remember to call C<execute_exit>
+instead of C<exit> in other places of your program as well. Some of these
+places may not have access to a valid L<Term::CLI> or L<Term::CLI::CommandSet>
+object, so this adds further complications.
+
+=item 4.
+
+Use an C<END> or C<defer> block.
+
+This will ensure that the history writing will occur before the program exits.
+
+Using an C<END> block:
+
+    my $term = Term::CLI->new( ... );
+
+    ...
+
+    END {
+        if (defined $term) {
+            $term->write_history()
+                or warn "cannot write history: ".$term->error."\n";
+        }
+    }
+
+Note that this still requires you to make the C<$term> variable visible in the
+package scope (i.e. it cannot be a lexical variable in a function).
+
+It's also possible to use the C<defer> keyword (see
+L<Syntax::Keyword::Defer>):
+
+    my $term = Term::CLI->new( ... );
+
+    defer {
+        $term->write_history() or 
+            or warn "cannot write history: ".$term->error."\n";
+    }
+
+    ...
+
+While tempting, this means you have to be careful to place the C<defer> in the
+correct scope:
+
+    sub initialise_term {
+        my $term = Term::CLI->new( ... );
+        defer {
+            $term->write_history() or 
+                or warn "cannot write history: ".$term->error."\n";
+        }
+        return $term;
+    }
+
+    my $term = initialise_term();
+
+    while ( defined(my $line = $term->readline) ) {
+        $term->execute($line);
+    }
+    exit 0;
+
+The above will not have the desired effect of writing the history to file upon
+exit.
+
+=back
+
 =head1 COMPARISON WITH OTHER IMPLEMENTATIONS
 
 Here are some examples of how you might go about it without
@@ -1442,7 +1768,8 @@ The "naive" implementation uses no fancy modules, just a loop
 reading from F<STDIN> and some explicit C<if> statements matching
 the commands:
 
-    use Modern::Perl;
+    use 5.014_001;
+    use warnings;
     use Text::ParseWords qw( shellwords );
     use Term::ReadLine;
 
@@ -1504,7 +1831,8 @@ This performs the basic actions, but does not offer anything else.
 
 Replacing the REPL above by a L<Term::ReadLine>(3p) construction, we get:
 
-    use Modern::Perl;
+    use 5.014_001;
+    use warnings;
     use Text::ParseWords qw( shellwords );
     use Term::ReadLine;
 
@@ -1592,7 +1920,7 @@ and command history.
 The full-blown L<Term::CLI> implementation with all of the
 features of F<tutorial/readline_cli.pl>, adding all the goodness.
 
-=item F<tutorial/example_01.pl> ... F<tutorial/example_16.pl>
+=item F<tutorial/example_*.pl>
 
 The tutorial code.
 

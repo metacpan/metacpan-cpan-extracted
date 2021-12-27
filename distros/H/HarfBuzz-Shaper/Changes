@@ -1,5 +1,9 @@
 Revision history for HarfBuzz::Shaper.
 
+0.025 2021-12-24
+
+    - Add get_extents method.
+
 0.024 2021-04-12
 
     - Fix build problem of the fallback library on MacOS Catalina.

@@ -8,175 +8,13 @@
 ## Original version on Feb 15 2014
 ##
 
-use v5.14;
+use strict;
 use warnings;
 
-use open ":std" => ":encoding(utf8)";
-use Fcntl;
-use Pod::Usage;
-use Data::Dumper;
+use  App::watchdiff;
+exit App::watchdiff->new->run(splice @ARGV);
 
-use List::Util qw(pairmap);
-
-use App::sdif;
-my $version = $App::sdif::VERSION;
-
-use Getopt::EX::Hashed 'has'; {
-
-    Getopt::EX::Hashed->configure(DEFAULT => [ is => 'ro' ]);
-
-    has help     => ' h      ' ;
-    has version  => ' v      ' ;
-    has debug    => ' d      ' ;
-    has unit     => '    =s  ' , default => '';
-    has diff     => '    =s  ' ;
-    has exec     => ' e  =s@ ' , default => [];
-    has refresh  => ' r  :1  ' , default => 1;
-    has interval => ' i  =i  ' , default => 2;
-    has count    => ' c  =i  ' , default => 1000;
-    has clear    => '    !   ' , default => 1;
-    has silent   => ' s  !   ' , default => 0;
-    has mark     => ' M  !   ' , default => 0;
-    has old      => ' O  !   ' , default => 0;
-    has date     => ' D  !   ' , default => 1;
-    has newline  => ' N  !   ' , default => 1;
-    has colormap => ' cm =s@ ' , default => [];
-    has plain    => ' p      ' ,
-	action   => sub {
-	    $_->{date} = $_->{newline} = 0;
-	};
-
-    has '+help' => action => sub {
-	pod2usage
-	    -verbose  => 99,
-	    -sections => [ qw(SYNOPSIS VERSION) ];
-    };
-
-    has '+version' => action  => sub {
-	print "Version: $version\n";
-	exit;
-    };
-
-} no Getopt::EX::Hashed;
-
-use Getopt::EX::Long;
-Getopt::Long::Configure(qw(bundling require_order));
-my $opt = Getopt::EX::Hashed->new or die;
-$opt->getopt or usage({status => 1});
-
-my %colormap = qw(
-    APPEND	K/544
-    DELETE	K/544
-    OCHANGE	K/445
-    NCHANGE	K/445
-    OTEXT	K/455E
-    NTEXT	K/554E
-    );
-
-use Getopt::EX::Colormap;
-my $cm = Getopt::EX::Colormap
-    ->new(HASH => \%colormap)
-    ->load_params(@{$opt->colormap});
-
-my @default_diff = (
-    qw(cdif --no-command --no-unknown -U100),
-    map { ('--cm', "$_=$colormap{$_}") } sort keys %colormap
-    );
-
-if (@ARGV) {
-    push @{$opt->exec}, [ @ARGV ];
-} else {
-    @{$opt->exec} or pod2usage();
-}
-
-sub flush {
-    use IO::Handle;
-    state $stdout = IO::Handle->new->fdopen(fileno(STDOUT), "w") or die;
-    $stdout->printflush(@_);
-}
-
-use App::cdif::Command;
-my $old = App::cdif::Command->new(@{$opt->exec});
-my $new = App::cdif::Command->new(@{$opt->exec});
-
-my @diffcmd = do {
-    if ($opt->diff) {
-	use Text::ParseWords;
-	shellwords $opt->diff;
-    } else {
-	( @default_diff,
-	  map  { $_->[1] }
-	  grep { $_->[0] }
-	  [ $opt->unit   => "--unit=$opt->unit" ],
-	  [ ! $opt->mark => '--no-mark' ],
-	  [ ! $opt->old  => '--no-old' ],
-	);
-    }
-};
-
-use Getopt::EX::Colormap qw(ansi_code);
-my %termcap = pairmap { $a => ansi_code($b) } qw(
-    home	{CUP}
-    clear	{CUP}{ED2}
-    el		{EL}
-    ed		{ED}
-    );
-
-sub run {
-    use IO::File;
-    my $pid = (my $fh = IO::File->new)->open('-|') // die "open: $@\n";
-    if ($pid == 0) {
-	open STDERR, ">&STDOUT" or die "dup: $!";
-	close STDIN;
-	exec @_ or warn "$_[0]: $!\n";
-	exit 3;
-    }
-    binmode $fh, ':encoding(utf8)';
-    my $result = do { local $/; <$fh> };
-    for my $child (wait) {
-	$child != $pid and die "child = $child, pid = $pid";
-    }
-    ($? >> 8) == 3 ? undef : $result;
-}
-
-print $termcap{clear} if $opt->refresh;
-my $count = 0;
-my $refresh_count = 0;
-while (1) {
-    $old->rewind;
-    $new->update;
-    my $data = run(@diffcmd, $old->path, $new->path) // die "diff: $!\n";
-    if ($data eq '') {
-	if ($opt->silent) {
-	    flush $new->date, "\r";
-	    next;
-	}
-	$data = $new->data;
-	$data =~ s/^/ /mg if $opt->mark;
-    }
-    $data .= "\n" if $opt->newline;
-    if ($opt->refresh) {
-	$data =~ s/^/$termcap{el}/mg;
-	if ($refresh_count++ % $opt->refresh == 0) {
-	    print $termcap{clear};
-	}
-    }
-    print $new->date, "\n\n" if $opt->date;
-    print $data;
-    if ($opt->refresh and $opt->clear) {
-	flush $termcap{ed};
-    }
-} continue {
-    last if ++$count == $opt->count;
-    ($old, $new) = ($new, $old);
-    sleep $opt->interval;
-}
-
-flush $termcap{el} if $opt->refresh;
-
-exit;
-
-######################################################################
+__END__
 
 =pod
 
@@ -204,7 +42,7 @@ Options:
 
 =head1 VERSION
 
-Version 4.20.2
+Version 4.21.0
 
 =head1 EXAMPLES
 

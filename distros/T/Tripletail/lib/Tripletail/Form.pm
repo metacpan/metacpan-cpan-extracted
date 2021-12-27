@@ -438,32 +438,36 @@ sub delete {
 }
 
 sub getFile {
-	my $this         = shift;
-	my $key          = shift;
+    my $this         = shift;
+    my $key          = shift;
     my $charset_from = shift;
     my $charset_to   = shift;
 
-	if (ref $key) {
-		die __PACKAGE__."#getFile: arg[1] is a reference. (第1引数がリファレンスです)\n";
-	}
+    if (ref $key) {
+        die __PACKAGE__."#getFile: arg[1] is a reference. (第1引数がリファレンスです)\n";
+    }
 
-    if (defined $charset_from) {
-        $charset_to ||= 'UTF-8';
+    if (defined(my $fh_in = $this->{filehandle}{$key})) {
+        if (defined $charset_from) {
+            $charset_to ||= 'UTF-8';
 
-        my $fh_in  = $this->{filehandle}{$key};
-        my $fh_out = IO::File->new_tmpfile;
+            my $fh_out = IO::File->new_tmpfile;
 
-        seek $fh_in, 0, 0;
-        local $/ = "\n";
-        while (defined(my $line = <$fh_in>)) {
-            print {$fh_out} $TL->charconv($line, $charset_from, $charset_to);
+            seek $fh_in, 0, 0;
+            local $/ = "\n";
+            while (defined(my $line = <$fh_in>)) {
+                print {$fh_out} $TL->charconv($line, $charset_from, $charset_to);
+            }
+
+            seek $fh_out, 0, 0;
+            return $fh_out;
         }
-
-        seek $fh_out, 0, 0;
-        return $fh_out;
+        else {
+            return $fh_in;
+        }
     }
     else {
-        return $this->{filehandle}{$key};
+        return undef;
     }
 }
 
@@ -982,6 +986,10 @@ undef を返す。
 を行う。第三引数が指定されている場合は、それを変換先の文字コードと見做す。第三引
 数が省略された場合は UTF-8 が指定されたものと見做す。
 
+このメソッドは、アップロードキーが存在しつつも実際のファイルが存在しな
+かった場合、つまり Web ブラウザ上でファイルを選択せずにフォームを送信し
+たような場合には、undef ではなく空のファイルハンドルを返す。
+
 =item setFile
 
   $form->setFile($key, $iohandle);
@@ -1002,8 +1010,12 @@ undef を返す。
 る。ファイルアップロードではなかった場合や、キーが存在しない場合は
 undef を返す。
 
+アップロードキーが存在しつつも実際のファイルが存在しなかった場合、つまり
+Web ブラウザ上でファイルを選択せずにフォームを送信したような場合には、
+undef ではなく空のファイルハンドルを返す。
+
 ファイル名はベース名部分のみを返す(0.45以降)。
-(以前の動作に関しては L<Tripletail/compat_form_getfilename_returns_fullpath> 
+(以前の動作に関しては L<Tripletail/compat_form_getfilename_returns_fullpath>
 を参照。)
 
 =item getFullFileName

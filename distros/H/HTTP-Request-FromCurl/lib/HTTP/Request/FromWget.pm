@@ -4,7 +4,6 @@ use warnings;
 use HTTP::Request;
 use HTTP::Request::Common;
 use URI;
-use URI::Escape;
 use Getopt::Long;
 use File::Spec::Unix;
 use HTTP::Request::CurlParameters;
@@ -16,7 +15,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 
 =head1 NAME
 

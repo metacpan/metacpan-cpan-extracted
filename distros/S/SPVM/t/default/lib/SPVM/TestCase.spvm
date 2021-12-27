@@ -1,7 +1,7 @@
 class TestCase {
   use TestCase::Minimal;
   use TestCase::Simple;
-  use Fn (INT8_MIN, INT8_MAX, INT16_MIN, INT16_MAX, INT32_MIN, INT32_MAX, INT64_MIN, INT64_MAX, FLT_MIN, FLT_MAX, DBL_MIN, DBL_MAX);
+  use Fn;
 
   our $CLASS_VAR_INT : int;
   our $CLASS_VAR_LONG : long;
@@ -89,10 +89,10 @@ class TestCase {
   
   static method class_var : int () {
     if ($TestCase::CLASS_VAR_INT == 0) {
-      $TestCase::CLASS_VAR_INT = INT32_MAX();
-      if ($TestCase::CLASS_VAR_INT == INT32_MAX()) {
-        $TestCase::CLASS_VAR_LONG = INT64_MAX();
-        if ($TestCase::CLASS_VAR_LONG == INT64_MAX()) {
+      $TestCase::CLASS_VAR_INT = Fn->INT32_MAX();
+      if ($TestCase::CLASS_VAR_INT == Fn->INT32_MAX()) {
+        $TestCase::CLASS_VAR_LONG = Fn->INT64_MAX();
+        if ($TestCase::CLASS_VAR_LONG == Fn->INT64_MAX()) {
           $TestCase::CLASS_VAR_MINIMAL = TestCase::Minimal->new();
           
           $TestCase::CLASS_VAR_MINIMAL->set_x(4);

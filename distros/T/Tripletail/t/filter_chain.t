@@ -17,7 +17,15 @@ use File::Spec;
 our $TL;
 
 check_fork();
-plan tests => 5;
+eval {
+    require Text::CSV_XS;
+};
+if ($@) {
+    plan skip_all => 'Text::CSV_XS is required for these tests';
+}
+else {
+    plan tests => 5;
+}
 &setup;
 &test_001;
 

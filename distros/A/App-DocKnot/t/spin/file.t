@@ -26,10 +26,10 @@ require_ok('App::DocKnot::Spin::Thread');
 
 # Spin a single file.
 my $tempfile = File::Temp->new();
-my $datadir  = File::Spec->catfile('t',       'data', 'spin');
-my $inputdir = File::Spec->catfile($datadir,  'input');
-my $input    = File::Spec->catfile($inputdir, 'index.th');
-my $expected = File::Spec->catfile($datadir,  'output', 'index.html');
+my $datadir = File::Spec->catfile('t', 'data', 'spin');
+my $inputdir = File::Spec->catfile($datadir, 'input');
+my $input = File::Spec->catfile($inputdir, 'index.th');
+my $expected = File::Spec->catfile($datadir, 'output', 'index.html');
 my $spin
   = App::DocKnot::Spin::Thread->new({ 'style-url' => '/~eagle/styles/' });
 $spin->spin_thread_file($input, $tempfile->filename);

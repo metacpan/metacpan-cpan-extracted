@@ -15,7 +15,7 @@ our @EXPORT_OK = (
 );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.10.1";
+our $VERSION = "v6.12.0";
 
 1;
 __END__
@@ -381,6 +381,22 @@ L<https://rxjs.dev/api/operators/catchError>
         op_catch_error(sub ($err, $caught) { rx_of($err, $err, $err) }),
     )->subscribe($observer);
 
+=item op_combine_latest_with
+
+L<https://rxjs.dev/api/operators/combineLatestWith>
+
+Similar to rx_combine_latest, but as a pipeable operator.
+
+    # [0, 0, -5], [0, 1, -5], [10, 1, -5], [10, 2, -5], [10, 3, -5], [20, 3, -5], ...
+    rx_interval(1)->pipe(
+        op_map(sub { $_ * 10 }),
+        op_combine_latest_with(
+            rx_interval(0.7),
+            rx_of(-5),
+        ),
+        op_take(10),
+    )->subscribe($observer);
+
 =item op_concat_map
 
 L<https://rxjs.dev/api/operators/concatMap>
@@ -473,9 +489,16 @@ L<https://rxjs.dev/api/operators/exhaustMap>
 
 L<https://rxjs.dev/api/operators/filter>
 
+You can use C<$_> instead of C<$_[0]> inside this operator's callback.
+
     # 0, 2, 4, 6, ... (every 1.4 seconds)
     rx_interval(0.7)->pipe(
         op_filter(sub {$_[0] % 2 == 0}),
+    )->subscribe($observer);
+
+    # 0, 2, 4, 6, ... (every 1.4 seconds)
+    rx_interval(0.7)->pipe(
+        op_filter(sub {$_ % 2 == 0}),
     )->subscribe($observer);
 
     # 10, 36, 50, complete
@@ -519,13 +542,38 @@ L<https://rxjs.dev/api/operators/first>
         op_first(),
     )->subscribe($observer);
 
+=item op_ignore_elements
+
+L<https://rxjs.dev/api/operators/ignoreElements>
+
+    # (pause 3 seconds) complete
+    rx_interval(1)->pipe(
+        op_take(3),
+        op_ignore_elements(),
+    )->subscribe($observer);
+
+    # (pause 3 seconds) error: foo
+    rx_concat(
+        rx_interval(1)->pipe(op_take(3)),
+        rx_throw_error('foo'),
+    )->pipe(
+        op_ignore_elements(),
+    )->subscribe($observer);
+
 =item op_map
 
 L<https://rxjs.dev/api/operators/map>
 
+You can use C<$_> instead of C<$_[0]> inside this operator's callback.
+
     # 10, 11, 12, 13, ...
     rx_interval(1)->pipe(
         op_map(sub {$_[0] + 10}),
+    )->subscribe($observer);
+
+    # 10, 11, 12, 13, ...
+    rx_interval(1)->pipe(
+        op_map(sub {$_ + 10}),
     )->subscribe($observer);
 
     # 10-0, 20-1, 30-2, complete
@@ -928,18 +976,8 @@ The Community Code of Conduct can be found L<here|RxPerl::CodeOfConduct>.
 
 Copyright (C) 2020 Karelcom OÜ.
 
-This is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see L<https://www.gnu.org/licenses/>.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =head1 AUTHOR
 

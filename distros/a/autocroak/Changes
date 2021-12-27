@@ -1,5 +1,12 @@
 Revision history for autocroak
 
+0.004     2021-12-26 14:47:04+01:00 Europe/Amsterdam
+          - Fix more test failures on Windows
+
+0.003     2021-12-25 11:41:14+01:00 Europe/Amsterdam
+          - Fix C89 compilation issues
+          - Fix test failures on Windows
+
 0.002     2021-10-29 14:43:43+02:00 Europe/Amsterdam
           - Fix locale handling on perls before 5.26
           - Allow systems without WIFEXIT (e.g. Windows)

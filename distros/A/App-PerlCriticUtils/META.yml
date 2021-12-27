@@ -19,7 +19,7 @@ name: App-PerlCriticUtils
 provides:
   App::PerlCriticUtils:
     file: lib/App/PerlCriticUtils.pm
-    version: '0.005'
+    version: '0.006'
 requires:
   Complete::Module: '0.262'
   Data::Sah::Compiler::perl::TH::array: '0.910'
@@ -40,7 +40,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-PerlCriticUtils
   homepage: https://metacpan.org/release/App-PerlCriticUtils
   repository: git://github.com/perlancar/perl-App-PerlCriticUtils.git
-version: '0.005'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -52,6 +52,10 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript pcpdoc'
+      version: '0.423'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript pcpgrep'
       version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
@@ -148,7 +152,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.605'
+      version: '0.606'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'

@@ -37,9 +37,10 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.196';
+our $VERSION = '1.197';
 
 use Quiq::Unindent;
+use Quiq::Hash;
 
 # -----------------------------------------------------------------------------
 
@@ -77,6 +78,7 @@ sub new {
 
     my $self = $class->SUPER::new(
         indentation => 4,
+        linkA => [],
     );
     $self->set(@_);
 
@@ -91,7 +93,21 @@ sub new {
 
 =head4 Synopsis
 
-  $str = $gen->code($text);
+  $str = $gen->code($text,@keyVal);
+
+=head4 Arguments
+
+=over 4
+
+=item $text
+
+Text des Code-Abschnitts.
+
+=item @keyVal
+
+Eigenschaften des Code-Abschnitts.
+
+=back
 
 =head4 Description
 
@@ -113,14 +129,25 @@ erzeugt
 # -----------------------------------------------------------------------------
 
 sub code {
-    my ($self,$text) = @_;
-
+    my ($self,$text) = splice@_,0,2;
+    # @_: @keyVal
+    
     $text = Quiq::Unindent->trim($text);
     if ($text eq '') {
-        return $text;
+        return '';
     }
 
     my $ind = ' ' x $self->indentation;
+
+    if (@_) {
+        my $str = "%Code:\n";
+        while (@_) {
+            $str .= sprintf qq|%s%s="%s"\n|,$ind,shift,shift;
+        }
+        $str .= "$text\n.\n\n";
+        return $str;
+    }
+
     $text =~ s/^/$ind/mg;
 
     return "$text\n\n";
@@ -226,6 +253,69 @@ sub format {
         $str .= sprintf "\@\@%s\@\@\n%s",$format,$code;
     }
     $str .= ".\n\n";
+
+    return $str;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 link() - Link
+
+=head4 Synopsis
+
+  $str = $gen->link($name,
+      url => $url,
+      ...
+  );
+
+=head4 Description
+
+Erzeuge ein Link-Segment. Intern wird die Link-Defínition gespeichert,
+die später mit allen anderen Link-Definitionen per $gen->linkDefs()
+abgerufen werden kann.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub link {
+    my ($self,$name) = splice @_,0,2;
+    # @_: @keyVal
+
+    my $linkA = $self->linkA;
+    push @$linkA,Quiq::Hash->new({@_},
+        name => $name,
+        url => undef,
+    );
+
+    return "L{$name}";
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 linkDefs() - Link-Definitionen
+
+=head4 Synopsis
+
+  $str = $gen->linkDefs;
+
+=head4 Description
+
+Generiere Link-Definitionen zu den Link-Segmenten des Dokuments
+und liefere diese zurück. Die Methode wird typischerweise am Ende
+des Dokuments gerufen.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub linkDefs {
+    my $self = shift;
+
+    my $str = '';
+    for my $l (@{$self->linkA}) {
+        $str .= qq~%Link:\n  name="$l->{'name'}"\n  url="$l->{'url'}"\n\n~
+    }
 
     return $str;
 }
@@ -506,7 +596,7 @@ sub eof {
 
 =head1 VERSION
 
-1.196
+1.197
 
 =head1 AUTHOR
 

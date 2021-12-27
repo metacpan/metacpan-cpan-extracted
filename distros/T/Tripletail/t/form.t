@@ -200,10 +200,11 @@ is($f1->get('aaa'), undef , 'remove check');
   is($form->getFileName('file'), "c.dat", "getFileName returns basename (unix)");
   is($form->getFullFileName('file'), "a/b/c.dat", "getFullFileName returns fullpath (unix)");
   {
-  local($TL->{INI}{ini}{TL}{compat_form_getfilename_returns_fullpath}) = 1;
-  local($TL->{INI}{order}{group}[0]) = 'TL';
-  local($TL->{INI}{order}{key}{TL}[0]) = 'compat_form_getfilename_returns_fullpath';
-  is($form->getFileName('file'), "a/b/c.dat", "getFileName+compat returns fullpath (unix)");
+    # EXTREMELY UNSAFE. NEVER DO THIS IN YOUR CODE.
+    local $TL->{INI} = $TL->newIni();
+    $TL->INI->set(TL => compat_form_getfilename_returns_fullpath => 1);
+
+    is($form->getFileName('file'), "a/b/c.dat", "getFileName+compat returns fullpath (unix)");
   }
 
   $form->setFileName('file', "a:\\b\\c.dat");
@@ -211,9 +212,10 @@ is($f1->get('aaa'), undef , 'remove check');
   is($form->getFileName('file'), "c.dat", "getFileName returns basename (win)");
   is($form->getFullFileName('file'), "a:\\b\\c.dat", "getFullFileName returns fullpath (win)");
   {
-  local($TL->{INI}{ini}{TL}{compat_form_getfilename_returns_fullpath}) = 1;
-  local($TL->{INI}{order}{group}[0]) = 'TL';
-  local($TL->{INI}{order}{key}{TL}[0]) = 'compat_form_getfilename_returns_fullpath';
-  is($form->getFileName('file'), "a:\\b\\c.dat", "getFileName+compat returns fullpath (win)");
+    # EXTREMELY UNSAFE. NEVER DO THIS IN YOUR CODE.
+    local $TL->{INI} = $TL->newIni();
+    $TL->INI->set(TL => compat_form_getfilename_returns_fullpath => 1);
+
+    is($form->getFileName('file'), "a:\\b\\c.dat", "getFileName+compat returns fullpath (win)");
   }
 }

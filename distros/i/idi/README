@@ -1,0 +1,71 @@
+NAME
+    idi - Easy Command-line MIDI
+
+SYNOPSIS
+      perl -Midi -E'x(qw(c1 f o5)); n(qw(qn Cs)); n("F"); n("Ds"); n(qw(hn Gs_d1)); w()'
+
+      timidity idi.mid
+
+      # Compare with:
+      perl -MMIDI::Simple -E'new_score; noop qw(c1 f o5); n qw(qn Cs); n "F"; n "Ds"; n qw(hn Gs_d1); write_score shift()' idi.mid
+
+DESCRIPTION
+    Easy Command-line MIDI
+
+FUNCTIONS
+  b
+    BPM
+
+  c
+    Channel
+
+    Default: 0
+
+  d
+    Duration
+
+    Default: <96>
+
+  n
+    Add note
+
+  o
+    Octave
+
+    Default: 5
+
+  p
+    Patch
+
+    Default: 0 (piano)
+
+  r
+    Add rest
+
+  t
+    Time signature
+
+    Default: "none"
+
+  v
+    Volume
+
+    Default: 64
+
+  w
+    Write score. Supply a string argument for different name.
+
+    Default filename: "idi.mid"
+
+  x
+    No-op (with "MIDI::Simple::noop")
+
+AUTHOR
+    Gene Boggs <gene@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2021 by Gene Boggs.
+
+    This is free software, licensed under: The Artistic License 2.0 (GPL
+    Compatible)
+

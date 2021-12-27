@@ -1,0 +1,41 @@
+Catalyst::Plugin::CachedUriForAction
+
+This provides a (mostly) drop-in replacement version of "uri_for_action".
+
+The stock Catalyst "uri_for_action" method is a thin wrapper around
+"uri_for". Every time you pass "uri_for" an action to create a
+parametrized URL for it, it introspects the dispatcher. This is
+expensive, and on views that generate a lot of URLs, it can add up to a
+substantial cost. Doing this introspection repeatedly can only possibly
+be useful if the set of controllers and actions in the application can
+change at runtime. Even then it is still wasted time on any view that
+generates many URLs for the same action.
+
+This plugin scans the dispatch table once during startup and pregenerates
+templates for all possible output URLs. The only work then left in
+"uri_for_action" is the string manipulation to assemble a URL from its
+template.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by Aristotle Pagaltzis.
+
+This is free software; you can redistribute it and/or modify it under the
+same terms as the Perl 5 programming language system itself.

@@ -10,7 +10,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Command 5.00;
+package App::DocKnot::Command 6.00;
 
 use 5.024;
 use autodie;
@@ -60,47 +60,47 @@ use Pod::Usage qw(pod2usage);
 #     are not set, an error will be thrown.
 our %COMMANDS = (
     dist => {
-        method  => 'make_distribution',
-        module  => 'App::DocKnot::Dist',
+        method => 'make_distribution',
+        module => 'App::DocKnot::Dist',
         options => ['distdir|d=s', 'metadata|m=s', 'pgp-key|p=s'],
         maximum => 0,
     },
     generate => {
-        method  => 'generate_output',
-        module  => 'App::DocKnot::Generate',
+        method => 'generate_output',
+        module => 'App::DocKnot::Generate',
         options => ['metadata|m=s', 'width|w=i'],
         maximum => 2,
         minimum => 1,
     },
     'generate-all' => {
-        method  => 'generate_all',
-        module  => 'App::DocKnot::Generate',
+        method => 'generate_all',
+        module => 'App::DocKnot::Generate',
         options => ['metadata|m=s', 'width|w=i'],
         maximum => 0,
     },
     spin => {
-        method  => 'spin',
-        module  => 'App::DocKnot::Spin',
+        method => 'spin',
+        module => 'App::DocKnot::Spin',
         options => ['delete|d', 'exclude|e=s@', 'style-url|s=s'],
         minimum => 2,
         maximum => 2,
     },
     'spin-rss' => {
-        method  => 'generate',
-        module  => 'App::DocKnot::Spin::RSS',
+        method => 'generate',
+        module => 'App::DocKnot::Spin::RSS',
         options => ['base|b=s'],
         minimum => 1,
         maximum => 1,
     },
     'spin-thread' => {
-        method  => 'spin_thread_file',
-        module  => 'App::DocKnot::Spin::Thread',
+        method => 'spin_thread_file',
+        module => 'App::DocKnot::Spin::Thread',
         options => ['style-url|s=s'],
         maximum => 2,
     },
     update => {
-        method  => 'update',
-        module  => 'App::DocKnot::Update',
+        method => 'update',
+        module => 'App::DocKnot::Update',
         options => ['metadata|m=s', 'output|o=s'],
         maximum => 0,
     },
@@ -293,12 +293,12 @@ App::DocKnot::Command - Run DocKnot commands
 
 =head1 REQUIREMENTS
 
-Perl 5.24 or later and the modules Date::Parse (part of TimeDate),
-File::BaseDir, File::ShareDir, Git::Repository, Image::Size, IO::Compress::Xz
-(part of IO-Compress-Lzma), IO::Uncompress::Gunzip (part of IO-Compress),
-IPC::Run, IPC::System::Simple, JSON::MaybeXS, Kwalify, List::SomeUtils,
-Perl6::Slurp, Template (part of Template Toolkit), and YAML::XS, all of which
-are available from CPAN.
+Perl 5.24 or later and the modules Date::Language, Date::Parse (both part of
+TimeDate), File::BaseDir, File::ShareDir, Git::Repository, Image::Size,
+IO::Compress::Xz (part of IO-Compress-Lzma), IO::Uncompress::Gunzip (part of
+IO-Compress), IPC::Run, IPC::System::Simple, JSON::MaybeXS, Kwalify,
+List::SomeUtils, Path::Tiny, Perl6::Slurp, Template (part of Template
+Toolkit), and YAML::XS, all of which are available from CPAN.
 
 =head1 DESCRIPTION
 

@@ -33,7 +33,7 @@ require_ok 'UI::Various::core';
 $ENV{DISPLAY}  or  $ENV{DISPLAY} = ':0';
 
 use constant T_PATH => map { s|/[^/]+$||; $_ } abs_path($0);
-do T_PATH . '/functions/sub_perl.pl';
+do(T_PATH . '/functions/sub_perl.pl');
 
 #########################################################################
 # identical parts of messages:

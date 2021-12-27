@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 $SIG{__WARN__} = \&Carp::confess; use Carp;
 WriteMakefile(
-    NAME => 'Tripletail-ext',
+    NAME => 'Tripletail::ext',
    );
 
 # -----------------------------------------------------------------------------

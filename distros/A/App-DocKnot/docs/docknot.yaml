@@ -15,7 +15,7 @@ format: v1
 
 name: DocKnot
 maintainer: Russ Allbery <rra@cpan.org>
-version: '5.00'
+version: '6.00'
 synopsis: Static web site and documentation generator
 
 license:
@@ -67,6 +67,8 @@ docs:
       title: App::DocKnot::Generate
     - name: api/app-docknot-spin
       title: App::DocKnot::Spin
+    - name: api/app-docknot-spin-pointer
+      title: App::DocKnot::Spin::Pointer
     - name: api/app-docknot-spin-rss
       title: App::DocKnot::Spin::RSS
     - name: api/app-docknot-spin-sitemap
@@ -77,6 +79,8 @@ docs:
       title: App::DocKnot::Spin::Versions
     - name: api/app-docknot-update
       title: App::DocKnot::Update
+    - name: api/app-docknot-util
+      title: App::DocKnot::Util
   developer:
     - name: todo
       title: To-do list
@@ -124,6 +128,7 @@ requirements: |
   Perl 5.24 or later and Module::Build are required to build this module.
   The following additional Perl modules are required to use it:
 
+  * Date::Language (part of TimeDate)
   * Date::Parse (part of TimeDate)
   * File::BaseDir
   * File::ShareDir
@@ -136,6 +141,7 @@ requirements: |
   * JSON::MaybeXS
   * Kwalify
   * List::SomeUtils 0.07 or later
+  * Path::Tiny
   * Perl6::Slurp
   * Pod::Thread 3.00 or later
   * Template (part of Template Toolkit)

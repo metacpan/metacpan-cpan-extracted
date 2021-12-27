@@ -52,8 +52,8 @@ HTML-Seite (<head>, <body>, <style>, <script>, $(function()
 (Attribut resources) können zu einer Liste ohne Dubletten konsolidiert
 werden. Dies ist allerdings Aufgabe des Nutzers bzw. der Klasse
 Quiq::Html::Component::Bundle. Ein Objekt der Klasse
-speichert die einzelnen Bestandteile nur, die Methoden
-manipulieren sie nicht. Einzig die Methode L<fragment|"fragment() - Generiere HTML">() führt
+speichert die einzelnen Bestandteile lediglich, die Methoden
+manipulieren diese nicht. Einzig die Methode L<fragment|"fragment() - Generiere HTML">() führt
 eine Verarbeitung durch, indem sie zusammenfassenden HTML-Code über
 allen Komponenten generiert.
 
@@ -68,7 +68,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.196';
+our $VERSION = '1.197';
 
 use Quiq::Css;
 use Quiq::JavaScript;
@@ -407,7 +407,7 @@ sub putValue {
 
 =head1 VERSION
 
-1.196
+1.197
 
 =head1 AUTHOR
 

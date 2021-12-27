@@ -2,6 +2,7 @@ requires 'perl', '5.010';
 
 requires 'Hash::Ordered', '0.006';
 requires 'Sub::Util', '1.41';
+requires 'parent';
 
 on 'test' => sub {
     requires 'Test2::V0';

@@ -10,7 +10,7 @@ use bytes ();
 use lib 'lib/', 't/lib';
 
 use Test::More ('import' => [qw/ done_testing is ok use_ok like /]);
-use Test::Utils qw/ get_listen_socket start_server notify_parent IS_NOT_WIN /;
+use Test::Utils qw/ get_listen_socket start_server notify_parent IS_NOT_WIN_AND_NOT_MACOS /;
 
 use Time::HiRes qw/ sleep /;
 use Mojo::Message::Request ();
@@ -95,7 +95,7 @@ my $ua = MojoX::HTTP::Async->new(
     'connect_timeout' => $connect_timeout,
     'request_timeout' => $request_timeout,
     'ssl' => 0,
-    &IS_NOT_WIN() ? (
+    &IS_NOT_WIN_AND_NOT_MACOS() ? (
         'sol_socket' => {'so_keepalive' => 1},
         'sol_tcp' => {
             'tcp_keepidle' => 15,

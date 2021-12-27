@@ -1,5 +1,13 @@
 Revision history for Perl extension RxPerl-IOAsync
 
+v6.9.1 2021-12-26T11:18:34Z
+
+    - added dependency to 'parent' module for perl v5.10
+
+v6.9.0 2021-12-26T07:49:08Z
+
+    - switched license back to the license of Perl
+
 v6.8.0 2021-12-16T08:22:54Z
 
     - added community code of conduct

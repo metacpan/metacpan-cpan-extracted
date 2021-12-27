@@ -1,0 +1,17 @@
+[name]
+navbar with no headings
+
+[options]
+navbar 1
+
+[input]
+=pod
+
+This is some text without any headings.
+
+[output]
+\heading[][]
+
+This is some text without any headings.
+
+\signature

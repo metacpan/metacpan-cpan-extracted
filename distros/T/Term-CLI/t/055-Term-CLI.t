@@ -21,10 +21,13 @@ sub Main {
 
 package Term_CLI_test {
 
-use parent 0.228 qw( Test::Class );
+use parent 0.225 qw( Test::Class );
 
 use Test::More 1.001002;
 use Test::Exception 0.35;
+use Test::Output 1.02;
+use Test::MockModule 0.171 qw( strict );
+
 use FindBin 1.50;
 use Term::CLI;
 use Term::CLI::ReadLine;
@@ -210,12 +213,16 @@ sub startup : Test(startup => 5) {
 
     my $cli = Term::CLI->new(
         prompt => 'test> ',
-        callback => undef,
         commands => [],
+        skip => qr/^\s*(?:#.*)?$/,
     );
     isa_ok( $cli, 'Term::CLI', 'Term::CLI->new' );
     ok(!$cli->has_commands, 'empty commands array -> has_commands == false');
+
     $cli->add_command(@commands);
+
+    $self->{dfl_callback} = $cli->callback;
+    $cli->callback(undef);
 
     # Try out the "add_" methods.
     my $test_2_4 = Term::CLI::Command->new(
@@ -301,6 +308,8 @@ sub check__is_escaped: Test(6) {
 
     my $bs = '\\';
     my $line = 'foo bar';
+
+    #ok(!$cli->term->Attribs->{char_is_quoted_p}->($line, index($line, ' ')),
     ok(!$cli->_is_escaped($line, index($line, ' ')),
         qq{_is_escaped on '$line' returns false});
 
@@ -325,8 +334,44 @@ sub check__is_escaped: Test(6) {
         qq{_is_escaped on '$line' returns false});
 }
 
+sub check_readline: Test(3) {
+    my $self = shift;
+    my $cli;
 
-sub check_complete_line: Test(11) {
+    my ($line, $text, $start, @got, @expected);
+
+    # Mock out Term::ReadLine's "readline".
+
+    my @test_lines = ( '# comment - should be skipped', '', 'show version');
+    my ($expected, $got, @lines);
+
+    my $rl_mock = Test::MockModule->new('Term::ReadLine');
+    $rl_mock->redefine('readline' => sub { return shift @lines });
+
+    @lines = @test_lines;
+    $expected = $lines[0];
+    my $skip = qr/^\s*(?:#.*)?$/;
+
+    $cli = Term::CLI->new();
+    $got = $cli->readline(prompt => 'test> ');
+    is($got, $expected, qq{default does not skip comments and empty lines})
+            or diag("Term::CLI::readline returned: '$got'");
+
+    $expected = $lines[$#lines];
+    $got = $cli->readline(prompt => 'test> ', skip => $skip );
+    is($got, $expected, qq{readline with skip argument skips comments and empty lines})
+            or diag("Term::CLI::readline returned: '$got'");
+
+    $cli = Term::CLI->new(skip => qr/^\s*(?:#.*)?$/);
+    @lines = @test_lines;
+    $expected = $lines[$#lines];
+
+    $got = $cli->readline();
+    is($got, $expected, qq{Term::CLI with skip set skips comments and empty lines})
+            or diag("Term::CLI::readline returned: '$got'");
+}
+
+sub check_complete_line: Test(12) {
     my $self = shift;
     my $cli = $self->{cli};
 
@@ -335,6 +380,7 @@ sub check_complete_line: Test(11) {
     $line = '';
     $text = '';
     $start = length($line);
+    #@got = $cli->term->Attribs->{completion_function}->($text, $line.$text, $start);
     @got = $cli->complete_line($text, $line.$text, $start);
     @expected = $cli->command_names();
 
@@ -359,6 +405,23 @@ sub check_complete_line: Test(11) {
     is_deeply(\@got, \@expected,
             "'show' commands are (@expected)")
     or diag("complete_line('$text','$line$text',$start) returned: (", join(", ", map {"'$_'"} @got), ")");
+
+    {
+        # Try quoted strings for completion... We need to make sure that
+        # Term::CLI's `_rl_completion_quote_character` returns a quote char,
+        # so temporarily mock it.
+        my $quote_char = '"';
+        my $rl_mock = Test::MockModule->new('Term::CLI');
+        $rl_mock->redefine('_rl_completion_quote_character' => $quote_char);
+
+        $line = "show $quote_char";
+        $text = 'd';
+        $start = length($line);
+        @got = $cli->complete_line($text, $line.$text, $start);
+        @expected = qw( date debug );
+        is_deeply(\@got, \@expected, qq{'$line$text' completions are (@expected)})
+            or diag("complete_line('$text','$line$text',$start) returned: (", join(", ", map {"'$_'"} @got), ")");
+    }
 
     $line = 'file --verbose cp ';
     $text = '--i';
@@ -434,7 +497,7 @@ sub check_complete_line: Test(11) {
     or diag("complete_line('$text','$line$text',$start) returned: (", join(", ", map {"'$_'"} @got), ")");
 }
 
-sub check_execute: Test(47) {
+sub check_execute: Test(49) {
     my $self = shift;
     my $cli = $self->{cli};
 
@@ -448,18 +511,31 @@ sub check_execute: Test(47) {
     like($result{error}, qr/missing command/, 'error message missing command');
 
   # ------
-    $line = 'file --verbose cp aap noot';
-    %result = $cli->execute($line);
-    is($result{status}, 0, 'successful command execution');
+    
+    $cli->callback($self->{dfl_callback});
+        $line = 'file --verbose cp aap noot';
+        combined_is(
+            sub { %result = $cli->execute($line) },
+            '',
+            'Successful command prints nothing'
+        );
+        is($result{status}, 0, 'successful command execution');
+    $cli->callback(undef);
 
     $line .= "\t";
     %result = $cli->execute($line);
     is($result{status}, 0, 'successful command execution with trailing whitespace');
 
-    $line = 'file --wtf cp aap noot';
-    %result = $cli->execute($line);
-    is($result{status}, -1, 'failed command execution: bad option');
-    like($result{error}, qr/Unknown option: wtf/, 'error message bad option');
+    $cli->callback($self->{dfl_callback});
+        $line = 'file --wtf cp aap noot';
+        stderr_like(
+            sub { %result = $cli->execute($line) },
+            qr/Unknown option: wtf/,
+            'default callback prints error to STDERR',
+        );
+        is($result{status}, -1, 'failed command execution: bad option');
+        like($result{error}, qr/Unknown option: wtf/, 'error message bad option');
+    $cli->callback(undef);
 
     $line = 'file --verbose cp aap noot mies';
     %result = $cli->execute($line);

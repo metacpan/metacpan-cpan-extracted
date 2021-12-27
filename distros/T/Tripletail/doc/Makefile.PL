@@ -3,19 +3,16 @@ use warnings;
 use File::Find;
 use File::Path;
 use File::Spec;
+use Config qw(%Config);
 
 $| = 1;
 
 print "checking for mlpod2html... ";
 my $mlpod2html = do{
-	my $devnull = File::Spec->devnull();
-	my $mlpod2html = `which mlpod2html 2>$devnull`;
-	$mlpod2html and chomp $mlpod2html;
-	$mlpod2html &&= -x $mlpod2html && $mlpod2html;
-	$mlpod2html;
+	my $mlpod2html = File::Spec->catfile($Config{binexp}, 'mlpod2html');
+	-x $mlpod2html ? $mlpod2html : undef;
 };
 if ($mlpod2html) {
-	chomp $mlpod2html;
 	print "$mlpod2html\n";
 }
 else {
@@ -78,7 +75,7 @@ else {
 	print $fh "\t\@echo Note: html doc will not be generated for lack of mlpod2html.\n"
 }
 print $fh "\n";
-print $fh "test: \n";
+print $fh "test test_dynamic test_static: \n";
 print $fh "\n";
 print $fh "clean: \n";
 print $fh "\trm -f Makefile\n";
@@ -92,5 +89,5 @@ print $fh "touch:\n";
 print $fh "\ttouch -t 01010000 \`find -name '*.html'\`\n";
 print $fh "rebuild: touch all\n";
 print $fh "\n";
-print $fh ".PHONY: all doc test clean\n";
+print $fh ".PHONY: all doc test test_dynamic test_static clean\n";
 close $fh;

@@ -1,5 +1,39 @@
                        Revision history for DocKnot
 
+6.00 - 2021-12-25
+
+ - Add a new *.spin input file for docknot spin that points to an external
+   file with instructions for how to convert it to HTML.  Via this
+   mechanism, support formatting Markdown files as HTML via docknot spin.
+   This support requires the pandoc program be installed.  The path to
+   pandoc may be specified in the DocKnot global configuration file.
+
+ - Support *.spin pointers in addition to *.rpod pointers for external POD
+   files.  The command-line flags used in *.rpod pointers are replaced by
+   the title and options key of the *.spin file.  *.rpod files are
+   deprecated and support will be removed in a future version of DocKnot.
+
+ - Add spin_thread_output method to App::DocKnot::Spin::Thread, intended
+   to convert thread to HTML as part of a conversion pipeline of a
+   non-thread input file, while still using sitemap information and
+   generating the page footer.  DocKnot now depends on Path::Tiny.
+
+ - Support creating distributions from branches named main rather than
+   master.  The first of main or master that's found in the repository
+   will be used.
+
+ - Move some utility functions into a new App::DocKnot::Util module.  This
+   is primarily intended for internal use by other App::DocKnot modules.
+
+ - Fix unintended localization of dates in RSS output, which are supposed
+   to be RFC 2822 dates and therefore always use English month and day of
+   week names.  Thanks to Slaven Rezić for testing.
+
+ - Add load_yaml_file method to App::DocKnot, which loads a YAML file with
+   schema checking.
+
+ - Fix small whitespace problems in thread output.
+
 5.00 - 2021-09-12
 
  - Merge spin and spin-rss into this package, making it a full, if highly

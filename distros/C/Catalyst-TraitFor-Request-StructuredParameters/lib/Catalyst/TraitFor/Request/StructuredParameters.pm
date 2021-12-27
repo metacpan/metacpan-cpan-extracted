@@ -350,7 +350,7 @@ that don't set an 'off' value (like checkboxes).
 Please note this only applies to L</structured_body> / L</structured_query>
 
 Since the index values used to sort arrays are not preserved (they indicate order but are not used to
-set the index since that could open your code to potential hackers) we permit a final 'empty' index:
+set the index since that could open your code to potential hackers) we permit final 'empty' indexes:
 
     'person.credit_cards[0].number' => '245345345345345',
     'person.credit_cards[0].exp' => '2024-01-01',
@@ -359,7 +359,40 @@ set the index since that could open your code to potential hackers) we permit a 
     'person.credit_cards[].number' => '444444433333',
     'person.credit_cards[].exp' => '4024-01-01',
 
-This 'empty' index will always be considered the final element when sorting
+This 'empty' index will always be considered the final element when sorting.  You may have more than
+one final empty index as well when its either the last rule or the rule only contains a single index
+
+    'person.notes[]' => 'This is a note',
+    'person.notes[]' => 'This is another note',
+    'person.person_roles[1].role_id' => '1',
+    'person.person_roles[2].role_id' => '2',
+    'person.person_roles[].role_id' => '3',
+    'person.person_roles[].role_id' => '4',
+
+Would produce:
+
+    +{
+      person => {
+        notes => [
+          'This is a note',
+          'This is another note',
+        ],
+        person_roles => [
+          {
+            role_id => 1,
+          },
+          {
+            role_id => 2,
+          },
+          {
+            role_id => 3,
+          },
+          {
+            role_id => 4,
+          },
+        ],
+      },
+    };
 
 =head1 EXCEPTIONS
 

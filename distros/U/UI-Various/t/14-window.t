@@ -28,7 +28,7 @@ BEGIN { delete $ENV{DISPLAY}; delete $ENV{UI}; }
 use UI::Various({use => [], include => [qw(Main Text Button Window)]});
 
 use constant T_PATH => map { s|/[^/]+$||; $_ } abs_path($0);
-do T_PATH . '/functions/call_with_stdin.pl';
+do(T_PATH . '/functions/call_with_stdin.pl');
 
 #########################################################################
 # minimal dummy classes needed for unit tests:

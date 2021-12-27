@@ -1,16 +1,16 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 # See https://robots.thoughtbot.com/tab-completion-in-gnu-readline
 
-use Modern::Perl;
+use 5.014_001;
+use warnings;
+use FindBin;
 use lib qw( ../lib );
 use File::Basename qw( fileparse );
 use Data::Dumper;
 use Text::ParseWords qw( shellwords );
 use Term::ReadLine;
 use Term::ReadLine::Gnu;
-
-use FindBin;
 
 my $prog = $FindBin::Script;
 my $term = Term::ReadLine->new("readline_completion_demo");

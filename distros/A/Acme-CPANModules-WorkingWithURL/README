@@ -1,0 +1,113 @@
+NAME
+    Acme::CPANModules::WorkingWithURL - Working with URL
+
+VERSION
+    This document describes version 0.001 of
+    Acme::CPANModules::WorkingWithURL (from Perl distribution
+    Acme-CPANModules-WorkingWithURL), released on 2021-07-02.
+
+DESCRIPTION
+    Parsing
+
+    URI, the venerable module.
+
+    URI::Info extracts things from URL.
+
+    For specific CPAN-related URLs, there are CPAN::Info::FromURL,
+    CPAN::Release::FromURL, CPAN::Author::FromURL, CPAN::Dist::FromURL,
+    CPAN::Module::FromURL.
+
+    HTML::LinkExtor extracts links from HTML document.
+
+    Matching with regex
+
+    Regexp::Common::URI, Regexp::Pattern::URI
+
+    ** CLIs
+
+    App::grep::url (contains CLI grep-url) greps URLs in lines of text.
+
+ACME::MODULES ENTRIES
+    *   URI
+
+    *   URI::Info
+
+    *   CPAN::Info::FromURL
+
+    *   CPAN::Release::FromURL
+
+    *   CPAN::Author::FromURL
+
+    *   CPAN::Dist::FromURL
+
+    *   CPAN::Module::FromURL
+
+    *   HTML::LinkExtor
+
+    *   Regexp::Common::URI
+
+    *   Regexp::Pattern::URI
+
+    *   App::grep::url
+
+FAQ
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n WorkingWithURL
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
+
+        % cpanmodules ls-entries WorkingWithURL | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=WorkingWithURL -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    or directly:
+
+        % perl -MAcme::CPANModules::WorkingWithURL -E'say $_->{module} for @{ $Acme::CPANModules::WorkingWithURL::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-WorkingWithURL>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-WorkingWithURL>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Work
+    ingWithURL>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -70,7 +70,7 @@ TripletaiL では、拡張プレースホルダ "C<??>" を利用することで
 
 特に、HTTP領域では、通信内容を第三者に閲覧される可能性があるため、セッションハイジャックの可能性が残ります。
 
-サイトを設計する際は、重要な機能は全て HTTPS領域に配置し、L< セッションのmode | Tripletail::Session/mode > を C<double> または C<https> モードにする必要があります。
+サイトを設計する際は、重要な機能は全て HTTPS領域に配置し、L<< セッションのmode | Tripletail::Session/mode >> を C<double> または C<https> モードにする必要があります。
 C<http> モードはセッションハイジャックに対して安全ではないので、重要な情報を取り扱う場合は利用しないで下さい。
 
 TripletaiL のセッションは、C<double> モードであれば、HTTP領域、HTTPS領域にまたがってセッションを利用しても、

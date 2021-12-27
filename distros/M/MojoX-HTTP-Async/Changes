@@ -1,6 +1,12 @@
 Changes
 =======
 
+0.14 2021 Dec 27
+    - fixing t/insecure.t for Darwin platform
+
+0.13 2021 Dec 22
+    - fixing t/secure.t on some platforms
+
 0.12 2021 Dec 15
     - minor fixes in POD
     - improve test coverage

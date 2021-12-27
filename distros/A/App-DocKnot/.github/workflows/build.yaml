@@ -36,6 +36,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - name: Install pandoc
+        run: apt-get -y --no-install-recommends install pandoc
       - uses: perl-actions/install-with-cpm@v1.4
         with:
           cpanfile: "cpanfile"

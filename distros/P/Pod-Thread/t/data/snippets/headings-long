@@ -19,6 +19,8 @@ L</Heading of excessive length continued on multiple lines (POD is
 required to handle this)>
 
 [output]
+\heading[][]
+
 \class(navbar)[
   \link[#S1][Heading Of
 Excessive Length Continued On

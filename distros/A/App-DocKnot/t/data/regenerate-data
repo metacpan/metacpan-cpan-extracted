@@ -51,9 +51,9 @@ for my $package (@packages) {
 # The test of spinning a tree of files uses a reference to App::DocKnot's own
 # POD documentation.  Regenerate the expected output in case the POD has
 # changed.
-my $source    = File::Spec->catdir('lib', 'App', 'DocKnot.pm');
+my $source = File::Spec->catdir('lib', 'App', 'DocKnot.pm');
 my $podthread = Pod::Thread->new(navbar => 1);
-my $spin      = App::DocKnot::Spin::Thread->new();
+my $spin = App::DocKnot::Spin::Thread->new();
 my $thread;
 $podthread->output_string(\$thread);
 $podthread->parse_file($source);
@@ -67,8 +67,8 @@ my $links = <<'EOD';
   <link rel="up" href="../" title="DocKnot" />
   <link rel="top" href="../../../" />
 EOD
-my $comment = '<!-- Spun by DocKnot %VERSION% on %DATE% -->';
-my $navbar  = <<'EOD';
+my $comment = '<!-- Spun from DocKnot.pm by DocKnot %VERSION% on %DATE% -->';
+my $navbar = <<'EOD';
 <table class="navbar"><tr>
   <td class="navleft"></td>
   <td>
@@ -78,7 +78,6 @@ my $navbar  = <<'EOD';
   </td>
   <td class="navright"><a href="app-docknot-command.html">App::DocKnot::Command</a>&nbsp;&gt;</td>
 </tr></table>
-
 EOD
 my $address = <<'EOD';
 <address>
@@ -89,11 +88,11 @@ EOD
 $html =~ s{ (</head>) }{$links$1}xms;
 $html =~ s{ <!-- [ ] Spun .*? [ ] --> }{$comment}xms;
 $html =~ s{ (<body> \n) }{$1$navbar}xms;
-$html =~ s{ (</body>) }{$navbar$address$1}xms;
+$html =~ s{ (</body>) }{$navbar\n$address$1}xms;
 
 # Replace the expected data file.
 my $output = File::Spec->catdir(
-    't',   'data', 'spin', 'output', 'software', 'docknot',
+    't', 'data', 'spin', 'output', 'software', 'docknot',
     'api', 'app-docknot.html',
 );
 open(my $fh, '>', $output);

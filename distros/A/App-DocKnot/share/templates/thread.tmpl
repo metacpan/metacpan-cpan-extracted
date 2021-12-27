@@ -47,8 +47,8 @@
     \h2[Security Advisories]
 [% FOREACH advisory IN advisories %]
     \link[security/[% advisory.date %].html]
-        [[% advisory.date %]]: [% name %] [% advisory.versions %]\break
-[% END %][% END %]
+        [[% advisory.date %]]: [% name %] [% advisory.versions %] \break[% END %]
+[% END %]
     \h2[Development]
 [% FOREACH doc IN docs.developer %]
     \link[[% doc.name %].html][[% doc.title %]] \break[% END %][% IF vcs.github %]
@@ -189,11 +189,11 @@ User documentation:
 Security advisories:
 [% FOREACH advisory IN advisories %]
 \doc[security/[% advisory.date %].html]
-    [[% advisory.date %]: [% advisory.versions %]]
-[% END %][% END %]
+    [[% advisory.date %]: [% advisory.versions %]][% END %]
+[% END %]
 Developer documentation:
 [% FOREACH doc IN docs.developer %]
-    \doc[[% doc.name %].html][[% doc.title %]][% END %][% IF vcs.github %]
+\doc[[% doc.name %].html][[% doc.title %]][% END %][% IF vcs.github %]
 \doc[https://github.com/[% vcs.github %]]
     [GitHub][% END %][% IF support.github %]
 \doc[https://github.com/[% support.github %]/issues]

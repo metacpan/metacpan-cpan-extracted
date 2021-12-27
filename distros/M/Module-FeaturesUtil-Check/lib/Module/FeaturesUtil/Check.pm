@@ -1,9 +1,9 @@
 package Module::FeaturesUtil::Check;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-03-26'; # DATE
+our $DATE = '2021-07-31'; # DATE
 our $DIST = 'Module-FeaturesUtil-Check'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -144,7 +144,7 @@ sub check_features_decl {
 }
 
 1;
-# ABSTRACT: Check feature set specification and feature declaration
+# ABSTRACT: Check feature set specification and feature declaration (following Module::Features specification)
 
 __END__
 
@@ -154,13 +154,15 @@ __END__
 
 =head1 NAME
 
-Module::FeaturesUtil::Check - Check feature set specification and feature declaration
+Module::FeaturesUtil::Check - Check feature set specification and feature declaration (following Module::Features specification)
 
 =head1 VERSION
 
-This document describes version 0.005 of Module::FeaturesUtil::Check (from Perl distribution Module-FeaturesUtil-Check), released on 2021-03-26.
+This document describes version 0.006 of Module::FeaturesUtil::Check (from Perl distribution Module-FeaturesUtil-Check), released on 2021-07-31.
 
 =head1 DESCRIPTION
+
+See L<Module::Features/"GLOSSARY"> for terminology.
 
 =head1 FUNCTIONS
 
@@ -169,7 +171,7 @@ This document describes version 0.005 of Module::FeaturesUtil::Check (from Perl 
 
 Usage:
 
- check_feature_set_spec($feature_set_spec) -> [status, msg, payload, meta]
+ check_feature_set_spec($feature_set_spec) -> [$status_code, $reason, $payload, \%result_meta]
 
 Check feature set specification.
 
@@ -186,12 +188,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -201,7 +203,7 @@ Return value:  (any)
 
 Usage:
 
- check_features_decl($features_decl) -> [status, msg, payload, meta]
+ check_features_decl($features_decl) -> [$status_code, $reason, $payload, \%result_meta]
 
 Check features declaration.
 
@@ -218,12 +220,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -237,7 +239,7 @@ Source repository is at L<https://github.com/perlancar/perl-Module-FeaturesUtil-
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Module-FeaturesUtil-Check/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Module-FeaturesUtil-Check>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

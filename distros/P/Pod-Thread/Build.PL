@@ -13,6 +13,7 @@ use warnings;
 use Module::Build;
 
 # Basic package configuration.
+#<<<
 my $build = Module::Build->new(
     module_name          => 'Pod::Thread',
     dist_author          => 'Russ Allbery <rra@cpan.org>',
@@ -43,6 +44,7 @@ my $build = Module::Build->new(
         perl          => '5.024',
     },
 );
+#>>>
 
 # Generate the build script.
 $build->create_build_script;

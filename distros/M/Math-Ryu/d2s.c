@@ -27,8 +27,9 @@
 //     size by about 10x (only one case, and only double) at the cost of some
 //     performance. Currently requires MSVC intrinsics.
 
-/* The location of the header files, relative to this file, has been changed by
- * Sisyphus */
+/* Sisyphus has applied some superficial changes to this file because perl has *
+ * not always honored "C99 mode". The location of the header files, relative   *
+ * to the location of this file, has also changed                              */
 
 #include "ryu_headers/ryu.h"
 
@@ -459,8 +460,9 @@ int d2s_buffered_n(double f, char* result) {
   const uint64_t bits = double_to_bits(f);
 
 #ifdef RYU_DEBUG
+  int32_t bit;
   printf("IN=");
-  for (int32_t bit = 63; bit >= 0; --bit) {
+  for (bit = 63; bit >= 0; --bit) {
     printf("%d", (int) ((bits >> bit) & 1));
   }
   printf("\n");

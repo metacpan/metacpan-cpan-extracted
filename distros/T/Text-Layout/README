@@ -1,6 +1,9 @@
 Text::Layout
 ============
 
+WARNING: Some parts of the API may change in the near future. If you
+(want to) use this module for serious work please contact me.
+
 Text::Layout provides methods for Pango style text formatting. Where
 possible the methods have identical names and (near) identical
 behaviour as their Pango counterparts.
@@ -32,6 +35,9 @@ Example:
 
     # Create a markup instance, passing the PDF context.
     my $layout = Text::Layout->new($pdf);
+
+    # This example uses PDF corefonts only.
+    Text::Layout::FontConfig->register_corefonts;
 
     $layout->set_font_description(Text::Layout::FontConfig->from_string("times 40"));
     $layout->set_markup( q{The <i><span foreground="red">quick</span> <span size="20"><b>brown</b></span></i> fox} );

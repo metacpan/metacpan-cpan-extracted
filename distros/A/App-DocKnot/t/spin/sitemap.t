@@ -21,12 +21,12 @@ require_ok('App::DocKnot::Spin::Sitemap');
 
 # Parse a complex .sitemap file.
 my $datadir = File::Spec->catfile('t', 'data', 'spin', 'sitemap');
-my $path    = File::Spec->catfile($datadir, 'complex');
+my $path = File::Spec->catfile($datadir, 'complex');
 my $sitemap = App::DocKnot::Spin::Sitemap->new($path);
 isa_ok($sitemap, 'App::DocKnot::Spin::Sitemap');
 
 # Check the generated sitemap.
-my $output   = join(q{}, $sitemap->sitemap());
+my $output = join(q{}, $sitemap->sitemap());
 my $expected = File::Spec->catfile($datadir, 'complex.html');
 is_file_contents($output, $expected, 'sitemap output');
 
@@ -46,7 +46,7 @@ my @expected = (
     qq{  <link rel="top" href="../" />\n},
 );
 is_deeply(\@links, \@expected, 'links output');
-@navbar   = $sitemap->navbar('/faqs/soundness-inn.html');
+@navbar = $sitemap->navbar('/faqs/soundness-inn.html');
 @expected = (
     qq{<table class="navbar"><tr>\n},
     qq{  <td class="navleft"></td>\n},
@@ -57,12 +57,11 @@ is_deeply(\@links, \@expected, 'links output');
     q{  <td class="navright"><a href="soundness-cnews.html">}
       . qq{Soundness for C News</a>&nbsp;&gt;</td>\n},
     qq{</tr></table>\n},
-    qq{\n},
 );
 is_deeply(\@navbar, \@expected, 'navbar output');
 
 # Check links for a page with long adjacent titles to test the wrapping.
-@links    = $sitemap->links('/notes/cvs/basic-usage.html');
+@links = $sitemap->links('/notes/cvs/basic-usage.html');
 @expected = (
     qq{  <link rel="previous" href="why.html"\n},
     qq{        title="Why put a set of files into CVS?" />\n},

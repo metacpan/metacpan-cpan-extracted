@@ -1,0 +1,19 @@
+Changes
+Makefile.PL
+boilerplate.pl
+lib/Catalyst/Plugin/CachedUriForAction.pm
+t/lib/TestApp.pm
+t/lib/TestApp/Controller/Action/Chained.pm
+t/lib/TestApp/Controller/Action/Chained/ArgsOrder.pm
+t/lib/TestApp/Controller/Action/Index.pm
+t/lib/TestApp/Controller/Action/Path.pm
+t/lib/TestApp/Controller/Action/TestRelative.pm
+t/lib/TestApp/Controller/Root.pm
+t/unit_core_uri_for.t
+t/unit_core_uri_for_action.t
+t/unit_core_uri_for_multibytechar.t
+MANIFEST
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+LICENSE
+README

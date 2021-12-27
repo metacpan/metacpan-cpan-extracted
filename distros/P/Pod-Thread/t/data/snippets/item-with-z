@@ -17,6 +17,8 @@ Second item.
 =back
 
 [output]
+\heading[][]
+
 \h2(#S1)[Non-numeric =item]
 
 \desc[1]

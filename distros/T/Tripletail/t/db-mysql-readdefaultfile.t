@@ -92,9 +92,9 @@ if( $mysql_version < 5.001 )
 # -----------------------------------------------------------------------------
 # test spec.
 # -----------------------------------------------------------------------------
-plan tests => 3+9;
+plan tests => 2+9;
 
-&test_connect; #3.
+&test_connect; #2.
 &test_utf8_kanji;  #9.
 
 # -----------------------------------------------------------------------------
@@ -141,15 +141,6 @@ sub test_connect
 			-main => sub{},
 		);
 	} '[setup] connect failed (no my.cnf file)';
-
-	createTestConfigFile('.this.is.invalid.host!', 'utf8');
-
-	dies_ok {
-		$TL->trapError(
-			-DB   => 'DB',
-			-main => sub{},
-		);
-	} '[setup] connect failed (invalid host name)';
 
 	createTestConfigFile($ENV{MYSQL_HOST} || 'localhost', 'utf8');
 

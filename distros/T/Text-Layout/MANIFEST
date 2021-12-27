@@ -6,10 +6,13 @@ lib/Text/Layout/FontDescriptor.pm
 lib/Text/Layout/Markdown.pm
 lib/Text/Layout/Pango.pm
 lib/Text/Layout/PDFAPI2.pm
+lib/Text/Layout/Testing.pm
 Makefile.PL
 MANIFEST
 README
 t/00-load.t
+t/10-markup.t
+t/11-markup.t
 t/100-pdfapi.t
 t/102-pdfapi.t
 t/150-pdfbuilder.t

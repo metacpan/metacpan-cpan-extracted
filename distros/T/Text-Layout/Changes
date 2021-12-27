@@ -1,5 +1,25 @@
 Revision history for Text::Layout
 
+0.027	2021-12-23
+
+	Pango compatibility (POSSIBLY INCOMPATIBLE):
+	get_{pixel_}extents now returns the layout extents in scalar
+	context. In this case, ink extents are not calculated.
+	Improve performance (15%) by cacheing bbox.
+
+0.026	2021-12-22
+
+	Add tests for markup parsing.
+	Update example in README.
+	Add 'nosubset' property for fonts.
+	POSSIBLY INCOMPATIBLE: Fix issue #10. The difference will only
+	be noticable when you query the width for centered/right
+	aligned texts.
+	UNLIKELY INCOMPATIBLE: method set_pango_scale does now enable/disable.
+	The scaling is fixed to PANGO_SCALE (1024).
+	Fixed some issues with pango scaling.
+	Fix regression that sometimes tripled the resultant PDF.
+
 0.025	2021-10-22
 
 	Add font config properties underline_thickness,

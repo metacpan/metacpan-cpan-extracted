@@ -34,6 +34,16 @@ use t::make_ini {
 			DBSET_test => [qw(DBCONN_test)]
 		},
 		DBCONN_test => \%DBINFO,
+		DB_fail => {
+			type       => 'mysql',
+			defaultset => 'DBSET_fail',
+			DBSET_fail => [qw(DBCONN_fail)]
+		},
+		DBCONN_fail => do {
+			my %tmp = %DBINFO;
+			$tmp{dbname} = sprintf('xxx%sxxx', $tmp{dbname});
+			\%tmp
+		}
 	},
 };
 use Tripletail $t::make_ini::INI_FILE;
@@ -61,7 +71,7 @@ if ($@) {
 # -----------------------------------------------------------------------------
 # test spec.
 # -----------------------------------------------------------------------------
-plan tests => 1+3+25+25+15+5;
+plan tests => 1+3+25+25+15+5+1;
 
 &test_setup; #1.
 &test_getdb; #3.
@@ -69,6 +79,7 @@ plan tests => 1+3+25+25+15+5;
 &test_tx_transaction; #25.
 &test_old_transaction;  #15.
 &test_locks;  #5.
+&test_errors; #1
 
 # -----------------------------------------------------------------------------
 # test setup.
@@ -380,3 +391,14 @@ sub test_locks
 	);
 }
 
+# -----------------------------------------------------------------------------
+# test errors.
+# -----------------------------------------------------------------------------
+sub test_errors {
+    throws_ok {
+        $TL->trapError(
+            -DB   => 'DB_fail',
+            -main => sub {}
+           );
+    } qr/Access denied|Unknown database/, 'LAST_DB_ERROR will be properly populated';
+}

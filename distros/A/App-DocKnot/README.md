@@ -56,6 +56,7 @@ for your own purposes.
 Perl 5.24 or later and Module::Build are required to build this module.
 The following additional Perl modules are required to use it:
 
+* Date::Language (part of TimeDate)
 * Date::Parse (part of TimeDate)
 * File::BaseDir
 * File::ShareDir
@@ -68,6 +69,7 @@ The following additional Perl modules are required to use it:
 * JSON::MaybeXS
 * Kwalify
 * List::SomeUtils 0.07 or later
+* Path::Tiny
 * Perl6::Slurp
 * Pod::Thread 3.00 or later
 * Template (part of Template Toolkit)

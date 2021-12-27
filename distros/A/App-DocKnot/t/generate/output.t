@@ -34,11 +34,11 @@ my $docknot = App::DocKnot::Generate->new({ metadata => $metadata_path });
 isa_ok($docknot, 'App::DocKnot::Generate');
 
 # Save the paths to the real README and README.md files.
-my $readme_path    = File::Spec->catfile(getcwd(), 'README');
+my $readme_path = File::Spec->catfile(getcwd(), 'README');
 my $readme_md_path = File::Spec->catfile(getcwd(), 'README.md');
 
 # Write the README output for the DocKnot package to a temporary file.
-my $tmp     = File::Temp->new();
+my $tmp = File::Temp->new();
 my $tmpname = $tmp->filename;
 $docknot->generate_output('readme', $tmpname);
 my $output = slurp($tmpname);

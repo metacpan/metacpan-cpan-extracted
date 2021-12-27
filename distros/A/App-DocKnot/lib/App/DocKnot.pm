@@ -11,7 +11,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot 5.00;
+package App::DocKnot 6.00;
 
 use 5.024;
 use autodie;
@@ -20,6 +20,8 @@ use warnings;
 use File::BaseDir qw(config_files);
 use File::ShareDir qw(module_file);
 use File::Spec;
+use Kwalify qw(validate);
+use YAML::XS ();
 
 ##############################################################################
 # Helper methods
@@ -53,6 +55,36 @@ sub appdata_path {
     return $path;
 }
 
+# Load a YAML file with schema checking.
+#
+# $path   - Path to the YAML file to load
+# $schema - Name of the schema file against which to check it
+#
+# Returns: Contents of the file as a hash
+#  Throws: YAML::XS exception on invalid file
+#          Text exception on schema mismatch
+sub load_yaml_file {
+    my ($self, $path, $schema) = @_;
+
+    # Tell YAML::XS to use real booleans.  Otherwise, Kwalify is unhappy with
+    # data elements set to false.
+    local $YAML::XS::Boolean = 'JSON::PP';
+
+    # Load the metadata and check it against the schema.
+    my $data_ref = YAML::XS::LoadFile($path);
+    my $schema_path = $self->appdata_path('schema', $schema . '.yaml');
+    my $schema_ref = YAML::XS::LoadFile($schema_path);
+    eval { validate($schema_ref, $data_ref) };
+    if ($@) {
+        my $errors = $@;
+        chomp($errors);
+        die "schema validation for $path failed:\n$errors\n";
+    }
+
+    # Return the verified contents.
+    return $data_ref;
+}
+
 ##############################################################################
 # Module return value and documentation
 ##############################################################################
@@ -62,7 +94,7 @@ __END__
 
 =for stopwords
 Allbery DocKnot docknot MERCHANTABILITY NONINFRINGEMENT sublicense
-submodules
+submodules Kwalify
 
 =head1 NAME
 
@@ -70,8 +102,8 @@ App::DocKnot - Documentation and software release management
 
 =head1 REQUIREMENTS
 
-Perl 5.24 or later and the modules File::BaseDir and File::ShareDir, both of
-which are available from CPAN.
+Perl 5.24 or later and the modules File::BaseDir, File::ShareDir, Kwalify, and
+YAML::XS, all of which are available from CPAN.
 
 =head1 DESCRIPTION
 
@@ -95,6 +127,13 @@ These data files are installed with App::DocKnot, but each file can be
 overridden by the user via files in F<$HOME/.config/docknot> or
 F</etc/xdg/docknot> (or whatever $XDG_CONFIG_HOME and $XDG_CONFIG_DIRS are set
 to).  Raises a text exception if the desired file could not be located.
+
+=item load_yaml_file(PATH, SCHEMA)
+
+Load a YAML file with schema checking.  PATH is the path to the file.
+SCHEMA is the name of the schema, which will be loaded from the F<schema>
+directory using appdata_path().  See the description of that method for the
+paths that are searched.
 
 =back
 

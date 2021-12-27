@@ -5,6 +5,8 @@ status](https://github.com/rra/pod-thread/workflows/build/badge.svg)](https://gi
 [![CPAN
 version](https://img.shields.io/cpan/v/Pod-Thread)](https://metacpan.org/release/Pod-Thread)
 [![License](https://img.shields.io/cpan/l/Pod-Thread)](https://github.com/rra/pod-thread/blob/master/LICENSE)
+[![Debian
+package](https://img.shields.io/debian/v/libpod-thread-perl/unstable)](https://tracker.debian.org/pkg/libpod-thread-perl)
 
 Copyright 2002, 2008-2009, 2013, 2021 Russ Allbery <rra@cpan.org>.  This
 software is distributed under a BSD-style license.  Please see the section
@@ -13,24 +15,20 @@ software is distributed under a BSD-style license.  Please see the section
 ## Blurb
 
 Pod::Thread translates POD source into thread, a macro language processed
-by spin.  It supports optionally adding a table of contents and a
+by DocKnot.  It supports optionally adding a table of contents and a
 navigation bar to the genenerated file.  This package also includes the
-pod2thread driver script, invoked automatically by spin for POD files and
-pointers to POD files.
+pod2thread driver script for easy command-line access to the converter.
 
 ## Description
 
 This package contains a module to translate POD into thread, an HTML macro
-language.  As such, it's not very useful without
-[spin](https://www.eyrie.org/~eagle/software/web/), a separate program to
-convert thread into HTML.  I wrote this module for my personal needs and
-it may not be (and in fact probably isn't) suitable for more general use
-as yet.
+language.  As such, it is primarily intended to support
+[DocKnot](https://www.eyrie.org/~eagle/software/docknot/), the static site
+generator that converts thread into HTML.  Pod::Thread provides the POD
+formatting for DocKnot.
 
-The eventual intention is to incorporate spin into
-[DocKnot](https://www.eyrie.org/~eagle/software/docknot/), at which point
-this module will provide the POD support for DocKnot as a static site
-generator.  I have no estimate for when that work will be done.
+DocKnot and this module were written for my personal needs and may not be
+suitable for more general use.
 
 The conversion done by this module is mostly straightforward.  The only
 notable parts are the optional generation of a table of contents or a
@@ -39,7 +37,7 @@ navigation bar at the top of the generated file.
 ## Requirements
 
 Perl 5.24 or later.  As mentioned above, it's also not particularly useful
-without spin.
+without DocKnot.
 
 ## Building and Installation
 

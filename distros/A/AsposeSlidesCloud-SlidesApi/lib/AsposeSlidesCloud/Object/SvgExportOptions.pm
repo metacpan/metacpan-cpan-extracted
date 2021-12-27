@@ -172,10 +172,24 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'height' => {
+    	datatype => 'int',
+    	base_name => 'Height',
+    	description => 'Gets or sets the height of slides in the output format, e.g. image size, pdf page size etc.',
+    	format => '',
+    	read_only => '',
+    		},
+    'width' => {
+    	datatype => 'int',
+    	base_name => 'Width',
+    	description => 'Gets or sets the height of slides in the output format, e.g. image size, pdf page size etc.',
+    	format => '',
+    	read_only => '',
+    		},
     'format' => {
     	datatype => 'string',
     	base_name => 'Format',
-    	description => 'Export format.',
+    	description => '         Export format.          ',
     	format => '',
     	read_only => '',
     		},
@@ -246,6 +260,8 @@ __PACKAGE__->method_documentation({
 
 __PACKAGE__->swagger_types( {
     'default_regular_font' => 'string',
+    'height' => 'int',
+    'width' => 'int',
     'format' => 'string',
     'vectorize_text' => 'boolean',
     'metafile_rasterization_dpi' => 'int',
@@ -260,6 +276,8 @@ __PACKAGE__->swagger_types( {
 
 __PACKAGE__->attribute_map( {
     'default_regular_font' => 'DefaultRegularFont',
+    'height' => 'Height',
+    'width' => 'Width',
     'format' => 'Format',
     'vectorize_text' => 'VectorizeText',
     'metafile_rasterization_dpi' => 'MetafileRasterizationDpi',

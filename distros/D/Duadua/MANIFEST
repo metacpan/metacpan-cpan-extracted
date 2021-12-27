@@ -30,6 +30,7 @@ lib/Duadua/Parser/Bot/HatenaBot.pm
 lib/Duadua/Parser/Bot/Huawei.pm
 lib/Duadua/Parser/Bot/Inoreader.pm
 lib/Duadua/Parser/Bot/LetsEncrypt.pm
+lib/Duadua/Parser/Bot/Log4Shell.pm
 lib/Duadua/Parser/Bot/MailRUBot.pm
 lib/Duadua/Parser/Bot/Msnbot.pm
 lib/Duadua/Parser/Bot/Netcraft.pm
@@ -101,6 +102,7 @@ t/testset/bot/hatena_bot.yaml
 t/testset/bot/huawei.yaml
 t/testset/bot/inoreader.yaml
 t/testset/bot/letsencrypt.yaml
+t/testset/bot/log4shell.yaml
 t/testset/bot/mail_ru_bot.yaml
 t/testset/bot/msnbot.yaml
 t/testset/bot/netcraft.yaml

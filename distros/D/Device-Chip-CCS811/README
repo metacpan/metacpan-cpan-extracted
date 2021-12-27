@@ -1,0 +1,99 @@
+NAME
+
+    Device::Chip::CCS811 - chip driver for CCS811
+
+SYNOPSIS
+
+       use Device::Chip::CCS811;
+       use Future::AsyncAwait;
+    
+       my $chip = Device::Chip::CCS811->new;
+       await $chip->mount( Device::Chip::Adapter::...->new );
+    
+       await $chip->init;
+    
+       await $chip->change_config( DRIVE_MODE => 1 );
+    
+       sleep 60; # wait for chip to warm up
+    
+       my ( $eCO2, $eTVOC ) = await $chip->read_alg_result_data;
+    
+       printf "eCO2=%dppm\n", $eCO2;
+       printf "eTVOC=%dppb\n", $eTVOC;
+
+DESCRIPTION
+
+    This Device::Chip subclass provides specific communication to a
+    ScioSense CCS811 Digital Gas Sensor attached to a computer via an I²C
+    adapter.
+
+    The reader is presumed to be familiar with the general operation of
+    this chip; the documentation here will not attempt to explain or define
+    chip-specific concepts or features, only the use of this module to
+    access them.
+
+METHODS
+
+    The following methods documented in an await expression return Future
+    instances.
+
+ read_status
+
+       $status = await $chip->read_status;
+
+    Reads the STATUS register and returns a hash reference containing the
+    following fields:
+
+       FWMODE     => "boot" | "app"
+       APP_ERASE  => 0 | 1
+       APP_VERIFY => 0 | 1
+       APP_VALID  => 0 | 1
+       DATA_READY => 0 | 1
+       ERROR      => 0 | 1
+
+ read_config
+
+       $config = await $chip->read_config;
+
+    Reads the MEAS_MODE configuration register and reeturns a hash
+    reference containing the following fields:
+
+       DRIVE_MODE  => 0 | 1 | 2 | 3 | 4
+       INT_DATARDY => 0 | 1
+       INT_THRESH  => 0 | 1
+
+ change_config
+
+       await $chip->change_config( %changes );
+
+    Writes updates to the MEAS_MODE configuration register.
+
+ read_alg_result_data
+
+       $data = await $chip->read_alg_result_data;
+
+    Reads the ALG_RESULT_DATA register and returns a hash reference
+    containing the following fields, in addition to the STATUS fields.
+
+       eCO2     => INT (in units of ppm)
+       eTVOC    => INT (in unts of ppb)
+       ERROR_ID => INT
+
+ read_id
+
+       $id = await $chip->read_id;
+
+    Reads the HW_ID register and returns an integer. This should be the
+    value 0x81 for the CCS811 chip.
+
+ init
+
+       await $chip->init;
+
+    Performs the chip startup actions; namely, starting the application if
+    the chip is still in bootloader mode.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

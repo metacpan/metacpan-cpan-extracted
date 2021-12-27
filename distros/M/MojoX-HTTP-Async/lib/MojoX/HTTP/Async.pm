@@ -60,7 +60,7 @@ This library allows to make multiple HTTP/HTTPS request to the particular host i
 
 In comparison with C<HTTP::Async>, this library doesn't make a new connection on each request.
 
-And in comparison with C<Mojo::AsyncAwait>, it's it's more intuitive how to use it, and there is no any Singleton restrictions.
+And in comparison with C<Mojo::AsyncAwait>, it's more intuitive how to use it, and there is no any Singleton restrictions.
 
 The instance of this class can work only with one domain and scheme: either HTTP or HTTPS.
 
@@ -88,7 +88,7 @@ use URI ();
 use Scalar::Util qw/ blessed /;
 use Errno qw / :POSIX /;
 
-our $VERSION = 0.12;
+our $VERSION = 0.14;
 
 use constant {
     IS_WIN     => ($^O eq 'MSWin32') ? 1 : 0,

@@ -23,16 +23,16 @@ use Test::More tests => 2;
 require_ok('App::DocKnot::Spin::Thread');
 
 # Test data file paths.
-my $datadir  = File::Spec->catfile('t',       'data', 'spin');
-my $inputdir = File::Spec->catfile($datadir,  'input');
-my $input    = File::Spec->catfile($inputdir, 'index.th');
-my $expected = File::Spec->catfile($datadir,  'output', 'index.html');
+my $datadir = File::Spec->catfile('t', 'data', 'spin');
+my $inputdir = File::Spec->catfile($datadir, 'input');
+my $input = File::Spec->catfile($inputdir, 'index.th');
+my $expected = File::Spec->catfile($datadir, 'output', 'index.html');
 
 # The expected output is a bit different since we won't add timestamp
 # information or the filename to the comment, so we have to generate our
 # expected output file.
 my $tempfile = File::Temp->new();
-my $output   = slurp($expected);
+my $output = slurp($expected);
 $output =~ s{ from [ ] index[.]th [ ] }{}xms;
 $output =~ s{ <address> .* </address> \n }{}xms;
 print {$tempfile} $output or die "Cannot write to $tempfile: $!\n";
@@ -43,7 +43,7 @@ $tempfile->flush();
 my $spin
   = App::DocKnot::Spin::Thread->new({ 'style-url' => '/~eagle/styles/' });
 my $thread = slurp($input);
-my $cwd    = getcwd();
+my $cwd = getcwd();
 chdir($inputdir);
 my $html = $spin->spin_thread($thread);
 chdir($cwd);

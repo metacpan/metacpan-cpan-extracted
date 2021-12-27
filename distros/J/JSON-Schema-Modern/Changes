@@ -1,5 +1,13 @@
 Revision history for JSON-Schema-Modern
 
+0.533     2021-12-23 19:45:11Z
+          - fix exit statuses in json-schema-eval
+
+0.532     2021-12-22 19:14:06Z
+          - add media_type decoders for application/schema+json,
+            application/schema-instance+json
+          - add 'json-schema-eval' executable, for ad-hoc evaluation
+
 0.531     2021-12-06 05:39:53Z
           - add method to add format implementations after construction
           - treat media_type names case-insensitively, as per RFC6838,

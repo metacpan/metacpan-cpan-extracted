@@ -71,6 +71,20 @@ BEGIN {
     $c->res->body($dumped);
   }
 
+  sub select :Local {
+    my ($self, $c) = @_;
+    my %clean = $c->structured_body(['person'], +{ 'person_roles' => [ 'role_id' ] } )->to_hash;
+    my $dumped = Dumper(\%clean);
+    $c->res->body($dumped);
+  }
+
+  sub select2 :Local {
+    my ($self, $c) = @_;
+    my %clean = $c->structured_body(['person'], +{ 'person_roles' => [ 'role' => ['id'] ] } )->to_hash;
+    my $dumped = Dumper(\%clean);
+    $c->res->body($dumped);
+  }
+
   sub end :Action {
     my ($self, $c) = @_;
     if($c->has_errors) {
@@ -138,8 +152,11 @@ use Catalyst::Test 'MyApp';
     'person.credit_cards[2].note[0]' => '1',
     'person.credit_cards[2].note[1]' => '2',
     'person.credit_cards[2].note[2]' => '3',
+    'person.credit_cards[2].note[]' => '4',
+    'person.credit_cards[2].note[]' => '5',
     'person.credit_cards[].number' => '444444433333',
     'person.credit_cards[].exp' => '4024-01-01',
+
   ];
 
   ok my $res = request POST '/root/body', $body_parameters;
@@ -186,6 +203,8 @@ use Catalyst::Test 'MyApp';
           1,
           2,
           3,
+          4,
+          5,
         ],
         number => "88888888888",
       },
@@ -287,6 +306,73 @@ use Catalyst::Test 'MyApp';
     ],
     name => [2, "John"],
   };
+}
 
+{
+  ok my $body_parameters = [
+    'person.person_roles[1].role_id' => '1',
+    'person.person_roles[2].role_id' => '2',
+    'person.person_roles[].role_id' => '3',
+    'person.person_roles[].role_id' => '4',
+  ];
+
+  ok my $res = request POST '/root/select', $body_parameters;
+  ok my $data = eval $res->content;
+  is_deeply $data, +{
+    person_roles => [
+      {
+        role_id => 1,
+      },
+      {
+        role_id => 2,
+      },
+      {
+        role_id => 3,
+      },
+      {
+        role_id => 4,
+      },
+    ],
+  };
+}
+
+{
+  ok my $body_parameters = [
+    'person.person_roles[1].role.id' => '1',
+    'person.person_roles[2].role.id' => '2',
+    'person.person_roles[].role.id' => '3',
+    'person.person_roles[].role.id' => '4',
+  ];
+
+  ok my $res = request POST '/root/select2', $body_parameters;
+  ok my $data = eval $res->content;
+
+SKIP: {
+    skip "multi empty array doesn't work yet (patches welcomed)", 1;
+    is_deeply $data, +{
+      person_roles => [
+        {
+          role => {
+            id => 1,
+          },
+        },
+        {
+          role => {
+            id => 2,
+          },
+        },
+        {
+          role => {
+            id => 3,
+          },
+        },
+        {
+          role => {
+            id => 4,
+          },
+        },
+      ],
+    };
+  };
 }
 done_testing;

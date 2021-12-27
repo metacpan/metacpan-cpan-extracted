@@ -57,7 +57,7 @@
          "web" : "https://github.com/perlancar/perl-Sah-Schemas-Examples"
       }
    },
-   "version" : "0.007",
+   "version" : "0.009",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -72,7 +72,7 @@
                }
             },
             "name" : "Sah::Schemas",
-            "version" : "0.026"
+            "version" : "0.027"
          },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease",

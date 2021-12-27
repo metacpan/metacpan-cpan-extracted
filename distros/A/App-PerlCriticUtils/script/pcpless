@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-28'; # DATE
+our $DATE = '2021-12-01'; # DATE
 our $DIST = 'App-PerlCriticUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/PerlCriticUtils/pcpless",
@@ -38,7 +38,7 @@ pcpless - Show Perl::Critic policy module source code with `less`
 
 =head1 VERSION
 
-This document describes version 0.005 of pcpless (from Perl distribution App-PerlCriticUtils), released on 2021-08-28.
+This document describes version 0.006 of pcpless (from Perl distribution App-PerlCriticUtils), released on 2021-12-01.
 
 =head1 SYNOPSIS
 

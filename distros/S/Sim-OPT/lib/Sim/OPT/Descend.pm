@@ -1,5 +1,5 @@
 package Sim::OPT::Descend;
-# Copyright (C) 2008-2019 by Gian Luca Brunetti and Politecnico di Milano.
+# Copyright (C) 2008-2021 by Gian Luca Brunetti and Politecnico di Milano.
 # This is the module Sim::OPT::Descend of Sim::OPT, a program for detailed metadesign managing parametric explorations through the ESP-r building performance simulation platform and performing optimization by block coordinate descent.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
@@ -38,50 +38,64 @@ no warnings;
 #@EXPORT   = qw(); # our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw( descend prepareblank ); # our @EXPORT = qw( );
 
-$VERSION = '0.147'; # our $VERSION = '';
+$VERSION = '0.153'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Descent is an module collaborating with the Sim::OPT module for performing block coordinate descent.';
 
 #########################################################################################
 # HERE FOLLOWS THE CONTENT OF "Descend.pm" - Sim::OPT::Descend
 ##############################################################################
 
+sub odd
+{
+    my $number = shift;
+    return !even ($number);
+}
+
+sub even
+{
+    my $number = abs shift;
+    return 1 if $number == 0;
+    return odd ($number - 1);
+}
+
 sub descend
 {
-  $configfile = $main::configfile;
-  %vals = %main::vals;
+  my $configfile = $main::configfile;
+  my %vals = %main::vals;
 
-  $mypath = $main::mypath;
-  $exeonfiles = $main::exeonfiles;
-  $generatechance = $main::generatechance;
-  $file = $main::file;
-  $preventsim = $main::preventsim;
-  $fileconfig = $main::fileconfig;
-  $outfile = $main::outfile;
-  $tofile = $main::tofile;
-  $report = $main::report;
-  $simnetwork = $main::simnetwork;
+  my $mypath = $main::mypath;
+  my $exeonfiles = $main::exeonfiles;
+  my $generatechance = $main::generatechance;
+  my $file = $main::file;
+  my $preventsim = $main::preventsim;
+  my $fileconfig = $main::fileconfig;
+  my $outfile = $main::outfile;
+  my $tofile = $main::tofile;
+  my $report = $main::report;
+  my $simnetwork = $main::simnetwork;
 
   $tee = new IO::Tee(\*STDOUT, ">>$tofile"); # GLOBAL
   say $tee "\n#Now in Sim::OPT::Descend.\n";
 
-  %simtitles = %main::simtitles;
-  %retrievedata = %main::retrievedata;
-  @keepcolumns = @main::keepcolumns;
-  @weights = @main::weights;
-  @weightsaim = @main::weightsaim;
-  @varthemes_report = @main::varthemes_report;
-  @varthemes_variations = @vmain::arthemes_variations;
-  @varthemes_steps = @main::varthemes_steps;
-  @rankdata = @main::rankdata; # CUT
-  @rankcolumn = @main::rankcolumn;
-  %reportdata = %main::reportdata;
-  @report_loadsortemps = @main::report_loadsortemps;
-  @files_to_filter = @main::files_to_filter;
-  @filter_reports = @main::filter_reports;
-  @base_columns = @main::base_columns;
-  @maketabledata = @main::maketabledata;
-  @filter_columns = @main::filter_columns;
-  %vals = %main::vals;
+  my %simtitles = %main::simtitles;
+  my %retrievedata = %main::retrievedata;
+  my @keepcolumns = @main::keepcolumns;
+  my @weights = @main::weights;
+  my @weighttransforms = @main::weighttransforms;
+  my @weightsaim = @main::weightsaim;
+  my @varthemes_report = @main::varthemes_report;
+  my @varthemes_variations = @vmain::arthemes_variations;
+  my @varthemes_steps = @main::varthemes_steps;
+  my @rankdata = @main::rankdata; # CUT
+  my @rankcolumn = @main::rankcolumn;
+  my %reportdata = %main::reportdata;
+  my @report_loadsortemps = @main::report_loadsortemps;
+  my @files_to_filter = @main::files_to_filter;
+  my @filter_reports = @main::filter_reports;
+  my @base_columns = @main::base_columns;
+  my @maketabledata = @main::maketabledata;
+  my @filter_columns = @main::filter_columns;
+  my %vals = %main::vals;
 
   my %dt = %{ $_[0] };
 
@@ -258,13 +272,6 @@ sub descend
   #  sourcesweeps => \@sourcesweeps, instn => $instn, inst => \%inst, vehicles => \%vehicles } );
   #}
 
-  sub plus1
-  {
-    my ( $val ) = @_;
-    my $val = ( $val + 1 );
-    return ( $val );
-  }
-
   say $tee " \$repfile " . dump($repfile);
   if ( not( -e $repfile ) ){ die "There isn't \$repfile: $repfile"; };
 
@@ -286,15 +293,15 @@ sub descend
   my $varnumber = $countvar;
   my $stepsvar = $varnums{$countvar};
 
-  say $tee "Descending into case " . ( plus1($countcase) ) . ", block " . ( plus1($countblock) ) . ".";
+  say $tee "Descending into case " . ( $countcase + 1 ) . ", block " . ( $countcase + 1 ) . ".";
 
   my @columns_to_report = @{ $reporttempsdata[1] };
   my $number_of_columns_to_report = scalar(@columns_to_report);
   my $number_of_dates_to_mix = scalar(@simtitles);
   my @dates                    = @simtitles;
 
-  my $cleanmixed = "$repfile-clean.csv";
-  my $throwclean = $cleanmixed;
+
+  my $throwclean = $repfile;
   $throwclean =~ s/\.csv//;
   my $selectmixed = "$throwclean-select.csv";
 
@@ -302,71 +309,68 @@ sub descend
 
   sub cleanselect
   {   # IT CLEANS THE MIXED FILE AND SELECTS SOME COLUMNS, THEN COPIES THEM IN ANOTHER FILE
-    my ( $repfile, $cleanmixed, $selectmixed ) = @_;
-    say $tee "Cleaning results for case " . ( plus1( $countcase ) ) . ", block " . ( plus1( $countblock ) ) . ".";
+    my ( $repfile, $selectmixed ) = @_;
+    say $tee "Cleaning results for case " . ( $countcase + 1 ) . ", block " . ( $countcase + 1 ) . ".";
     open( MIXFILE, $repfile ) or die( "$!" );
     my @lines = <MIXFILE>;
-    close MIXFILE;
-
-    open( CLEANMIXED, ">$cleanmixed" ) or die( "$!" );
-
-    foreach my $line ( @lines )
-    {
-      #chomp $line;
-      $line =~ s/\n/°/g;
-      $line =~ s/\s+/,/g;
-      $line =~ s/°/\n/g;
-      if ( ( $line ne "" ) and ( $line ne " " ) and ( $line ne "\n" ) )
-      {
-        print CLEANMIXED "$line";
-      }
-    }
-    close CLEANMIXED;
-
-    # IT SELECTS SOME COLUMNS AND COPIES THEM IN ANOTHER FILE
-    open( CLEANMIXED, $cleanmixed ) or die( "$!" );
-    my @lines = <CLEANMIXED>;
-    close CLEANMIXED;
+    close MIXFILE; say $tee "\@lines: " . dump( @lines );
 
     open( SELECTEDMIXED, ">$selectmixed" ) or die( "$!" );
     foreach my $line (@lines)
     {
       if ( ( $line ne "" ) and ( $line ne " " ) and ( $line ne "\n" ) )
       {
-        #chomp $line;
-        my @elts = split(/\s+|,/, $line);
-        $elts[0] =~ /^(.*)_-(.*)/;
-        my $touse = $1;
-        $touse =~ s/$mypath\///;
-        print SELECTEDMIXED "$touse,";
-        my $countout = 0;
-        foreach my $elmref (@keepcolumns)
-        {
-          my @cols = @$elmref;
-          my $countin = 0;
-          foreach my $elm (@cols)
-          {
-            if ( Sim::OPT::odd($countin) )
-            {
-              print SELECTEDMIXED "$elts[$elm]";
-            }
-            else
-            {
-              print SELECTEDMIXED "$elm";
-            }
+        chomp $line;
+        $line =~ s/\n/°/g;
+        $line =~ s/\s+/,/g;
+        $line =~ s/°/\n/g;
+        $line =~ s/,,/,/g;
+        my @elts = split(/,/, $line); say $tee "ELTS: " . dump( @elts );
+        my $touse = $elts[0];
 
-            if ( ( $countout < $#keepcolumns  ) or ( $countin < $#cols) )
-            {
-              print  SELECTEDMIXED ",";
-            }
-            else
-            {
-              print  SELECTEDMIXED "\n";
-            }
-            $countin++;
+        my ( @elements, @names, @obtaineds, @newnames ); say $tee "\@keepcolumns: " . dump( @keepcolumns );
+        foreach my $elm_ref (@keepcolumns)
+        {
+          my @cols = @{ $elm_ref };
+          my $name = $cols[0];
+          my $number = $cols[1];
+          push ( @elements, $elts[$number] ); say $tee "\PUSH \$elts[\$number]: " . dump( $elts[$number] );
+          say $tee "\$elts: $elts, \$number: $number";
+          push ( @names, $name );
+        } say $tee "ELEMENTS: ". dump( @elements ); say $tee "NAMES: ". dump( @names );
+
+        if ( not ( scalar( @weighttransforms ) == 0 ) )
+        {
+          my $coun = 0;
+          foreach my $elt_ref ( @weighttransforms )
+          {
+            my @els = @{ $elt_ref };
+            my $newname = $els[0];
+            my $transform = $els[1];
+            my $obtained = eval ( $transform ); say $tee "HERE \$transform: $transform, \$obtained: $obtained";
+            push ( @obtaineds, $obtained );
+            push ( @newnames, $newname );
+            $coun++;
           }
-          $countout++;
+          @names = @newnames;
         }
+        else
+        {
+          @obtaineds = @elements;
+        }
+        say $tee "ELEMENTS: ". dump( @elements ); say $tee "\@obtaineds: ". dump( @obtaineds );
+        say $tee "NAMES: ". dump( @names ); say $tee "NEWNAMES: ". dump( @newnames );
+
+        print SELECTEDMIXED "$touse,";
+
+        my $coun = 0; say $tee "PRINTNG OBTAINEDS: " . dump ( @obtaineds ) ;
+        foreach my $elt ( @obtaineds )
+        {
+          print SELECTEDMIXED "$names[$coun],";
+          print SELECTEDMIXED "$elt,";
+          $coun++;
+        }
+        print SELECTEDMIXED "\n";
       }
     }
     close SELECTEDMIXED;
@@ -374,7 +378,7 @@ sub descend
 
   if ( $precomputed eq "" )
   {
-    cleanselect( $repfile, $cleanmixed, $selectmixed );
+    cleanselect( $repfile, $selectmixed );
   }
 
 
@@ -384,64 +388,62 @@ sub descend
   sub weight
   {
     my ( $selectmixed, $weight ) = @_;
-    say $tee "Scaling results for case " . ( plus1( $countcase ) ). ", block " . ( plus1( $countblock ) ) . ".";
+    say $tee "Scaling results for case " . ( $countcase + 1 ). ", block " . ( $countcase + 1 ) . ".";
     open( SELECTEDMIXED, $selectmixed ) or die( "$!" );
     my @lines = <SELECTEDMIXED>;
     close SELECTEDMIXED;
+
     my $counterline = 0;
     open( WEIGHT, ">$weight" ) or die( "$!" );
 
-    my @containerone;
-    my @containernames;
+    my ( @containerone, @containernames, @containertitles, @containertwo, @containerthree, @maxes, @mins );
     foreach my $line (@lines)
     {
-      #chomp $line;
       $line =~ s/^[\n]//;
+      chomp $line;
       my @elts = split( /\s+|,/, $line );
-      my $touse = shift(@elts);
-      my $countcol = 0;
+      my $touse = shift( @elts ); # IT CHOPS AWAY THE FIRST ELEMENT DESTRUCTIVELY
       my $countel = 0;
-      foreach my $elt (@elts)
+      my $countcol = 0;
+      my $countcn = 0;
+      foreach my $elt ( @elts )
       {
-        if ( Sim::OPT::odd($countel) )
+        if ( odd( $countel ) )
         {
-          push ( @{$containerone[$countcol]}, $elt);
+          push ( @{ $containerone[ $countcol ] }, $elt );
           $countcol++;
         }
-        push (@containernames, $touse);
+        else
+        {
+          push ( @{ $containernames[$countcn] }, $elt );
+          $countcn++;
+        }
         $countel++;
       }
+      push ( @containertitles, $touse );
     }
 
-    my @containertwo;
-    my @containerthree;
+
     $countcolm = 0;
-    my @optimals;
     foreach my $colref ( @containerone )
     {
       my @column = @{ $colref }; # DEREFERENCE
 
-      if ( $weights[$countcolm] < 0 ) # TURNS EVERYTHING POSITIVE
+      if ( max( @column ) != 0) # FILLS THE UNTRACTABLE VALUES
       {
-        foreach my $el (@column)
-        {
-          $el = ($el * -1);
-        }
-      }
-
-      if ( max(@column) != 0) # FILLS THE UNTRACTABLE VALUES
-      {
-        push (@maxes, max(@column));
+        push ( @maxes, max( @column ) );
       }
       else
       {
-        push (@maxes, "NOTHING1");
+        push ( @maxes, "NOTHING1" );
       }
 
-      foreach my $el (@column)
+      push ( @mins, min( @column ) );
+
+      foreach my $el ( @column )
       {
         my $eltrans;
-        if ( $maxes[$countcolm] != 0 )
+        if ( $maxes[ $countcolm ] != 0 )
         {
           print TOFILE "\$weights[\$countcolm]: $weights[$countcolm]\n";
           $eltrans = ( $el / $maxes[$countcolm] ) ;
@@ -450,60 +452,79 @@ sub descend
         {
           $eltrans = "NOTHING2" ;
         }
-        push ( @{$containertwo[$countcolm]}, $eltrans) ; print TOFILE "ELTRANS: $eltrans\n";
+        push ( @{ $containertwo[$countcolm] }, $eltrans) ; print TOFILE "ELTRANS: $eltrans\n";
       }
       $countcolm++;
     }
+    say $tee "HERE \@containerone: " . dump( @containerone ); say $tee "\@containertwo: " . dump( @containertwo );
+    say $tee "\@maxes: " . dump( @maxes ); say $tee "\@mins: " . dump( @mins );
+    say $tee "\@containernames: " . dump( @containernames );
 
-    my $countline = 0;
-    foreach my $line (@lines)
+    my $countrow = 0;
+    foreach ( @lines )
     {
-      #chomp $line;
-      $line =~ s/^[\n]//;
-      my @elts = split(/\s+|,/, $line);
-      my $countcolm = 0;
-      foreach $eltref (@containertwo)
+      my ( @c1row, @c2row );
+
+      foreach my $c1_ref ( @containerone )
       {
-        my @col =  @{$eltref};
-        my $max = max(@col);
-        my $min = min(@col);
-        my $floordistance = ($max - $min);
-        my $el = $col[$countline];
-        my $rescaledel;
-        if ( $floordistance != 0 )
-        {
-          $rescaledel = ( ( $el - $min ) / $floordistance ) ;
-        }
-        else
-        {
-          $rescaledel = 1;
-        }
-        if ( $weightsaim[$countcolm] < 0)
-        {
-          $rescaledel = ( 1 - $rescaledel);
-        }
-        push (@elts, $rescaledel);
-        $countcolm++;
+        my @c1col = @{ $c1_ref };
+        push( @c1row, $c1col[ $countrow ] );
       }
 
-      $countline++;
-
-      my $counter = 0;
-      foreach my $el (@elts)
+      foreach my $cnames_ref ( @containernames )
       {
-        print WEIGHT "$el";
-        if ($counter < $#elts)
-        {
-          print WEIGHT ",";
-        }
-        else
-        {
-          print WEIGHT "\n";
-        }
-        $containerthree[$counterline][$counter] = $el;
-        $counter++;
+        my @cnamescol = @{ $cnames_ref };
+        push( @cnamesrow, $cnamescol[$countrow] );
       }
-      $counterline++;
+
+      foreach my $c2_ref ( @containertwo )
+      {
+        my @c2col = @{ $c2_ref };
+        push( @c2row, $c2col[$countrow] );
+      }
+
+
+      my ( $numberels, $scalar_keepcolumns );
+      if ( not ( scalar( @weighttransforms ) == 0 ) )
+      {
+        $numberels = scalar( @weighttransforms );
+        $scalar_keepcolumns = scalar( @weighttransforms );
+      }
+      else
+      {
+        $numberels = scalar( @keepcolumns );
+        $scalar_keepcolumns = scalar( @keepcolumns );
+      }
+
+
+      my $wsum = 0; # WEIGHTED SUM
+      my $counterin = 0;
+      foreach my $elt ( @c2row )
+      {
+        my $newelt = ( $elt * abs( $weights[$counterin] ) );
+        $wsum = ( $wsum + $newelt ) ;
+        $counterin++;
+      }
+
+      say $tee "HERE \@cnamesrow: " . dump( @cnamesrow ); say $tee "\@c1row: " . dump( @c1row ); say $tee "\@c2row: " . dump( @c2row );
+
+      print WEIGHT "$containertitles[ $countrow ],";
+
+      $countel = 0;
+      foreach my $el ( @c1row )
+      {
+        print WEIGHT "$cnamesrow[$countel],";
+        print WEIGHT "$el,";
+      }
+
+      foreach my $el ( @c2row )
+      {
+        print WEIGHT "$el,";
+      }
+
+      print WEIGHT "$wsum\n";
+
+      $countrow++;
     }
     close WEIGHT;
   }
@@ -513,69 +534,16 @@ sub descend
     weight( $selectmixed, $weight ); #
   }
 
-  my $weighttwo = "$throw-weighttwo.csv"; # THIS WILL HOST PARTIALLY SCALED VALUES, MADE POSITIVE AND WITH A CELING OF 1
+  my $weighttwo = $weight;
 
-  sub weighttwo
+
+  if ( $precomputed ne "" )
   {
-    my ( $weight, $weighttwo ) = @_;
-    say $tee "Weighting results for case " . ( plus1( $countcase ) ) . ", block " . ( plus1( $countblock ) ) .".";
-    open( WEIGHT, $weight );
-    my @lines = <WEIGHT>;
-    close WEIGHT;
-    open( WEIGHTTWO, ">$weighttwo" );
-    if ( not( -e $weighttwo) ){ die; };
-    my $counterline;
-    foreach my $line (@lines)
-    {
-      $line =~ s/^[\n]//;
-      my @elts = split(/\s+|,/, $line);
-      my $counterelt = 0;
-      my $counterin = 0;
-      my $sum = 0;
-      my $avg;
-      my $numberels = scalar(@keepcolumns);
-      foreach my $elt (@elts)
-      {
-        my $newelt;
-        if ($counterelt > ( $#elts - $numberels ))
-        {
-          $newelt = ( $elt * abs($weights[$counterin]) );
-          $sum = ( $sum + $newelt ) ;
-          $counterin++;
-        }
-        $counterelt++;
-      }
-      $avg = ($sum / scalar(@keepcolumns) );
-      push ( @elts, $avg);
-
-      my $counter = 0;
-      foreach my $elt (@elts)
-      {
-        print WEIGHTTWO "$elt";
-        if ($counter < $#elts)
-        {
-          print WEIGHTTWO ",";
-        }
-        else
-        {
-          print WEIGHTTWO "\n";
-        }
-        $counter++;
-      }
-      $counterline++;
-    }
+    $weighttwo = $repfile; ############### TAKE CARE!
   }
 
-  if ( $precomputed eq "" )
-  {
-    weighttwo( $weight, $weighttwo );
-  }
-  else #NEW. TAKE CARE!
-  {
-    $weighttwo = $repfile;############### TAKE CARE!
-  }
 
-  if ( not( -e $weighttwo) ){ die; };
+  if ( not( -e $weighttwo ) ){ die; };
 
 
   if ( not( ( $repfile ) and ( -e $repfile ) ) )
@@ -583,12 +551,10 @@ sub descend
     die( "$!" );
   }
 
-
-
   sub sortmixed
   {
     my ( $weighttwo, $sortmixed, $searchname, $entryfile, $exitfile, $orderedfile, $outstarmode, $instn, $inst_r, $dirfiles_r, $vehicles_r, $countcase, $countblock ) = @_;
-    say $tee "Processing results for case " . ( plus1( $countcase ) ) . ", block " . ( plus1( $countblock ) ) . ".";
+    say $tee "Processing results for case " . ( $countcase + 1 ) . ", block " . ( $countcase + 1 ) . ".";
     my %inst = %{ $inst_r }; #say $tee "IN SORTMIXED \%inst" . dump( \%inst );
     my %dirfiles = %{ $dirfiles_r };
     my %vehicles = %{ $vehicles_r };
@@ -599,7 +565,7 @@ sub descend
       my @lines = <WEIGHTTWO>;
       close WEIGHTTWO;
 
-      if ( $dirfiles{popsupercycle} eq "yes" )###DDD
+      if ( $dirfiles{popsupercycle} eq "yes" )
       {
         my $openblock = pop( @{ $vehicles{nesting}{$dirfiles{nestclock}} } );
         while ( $openblock <= $countblock )
@@ -1128,7 +1094,7 @@ sub descend
         {
           if ( $val ==  $winnerval )
           {
-            say MESSAGE "Attention. At case " . ( plus1( $countcase ) ) . ", block " . ( plus1( $countblock ) ) . "There is a tie between optimal cases. Besides case $winnerline, producing a compound objective function of $winnerval, there is the case $case producing the same objective function value. Case $winnerline has been used for the search procedures which follow.\n";
+            say MESSAGE "Attention. At case " . ( $countcase + 1 ) . ", block " . ( $countcase + 1 ) . "There is a tie between optimal cases. Besides case $winnerline, producing a compound objective function of $winnerval, there is the case $case producing the same objective function value. Case $winnerline has been used for the search procedures which follow.\n";
           }
         }
       }
@@ -1274,7 +1240,7 @@ sub descend
         my @morphcases = grep -d, <$mypath/$file_*>;
         unless ( $direction eq "star" )
         {
-          say $tee "#Optimal option for case " . ( plus1( $countcase ) ) . ": $newtarget.";
+          say $tee "#Optimal option for case " . ( $countcase + 1 ) . ": $newtarget.";
         }
 
         @totalcases = uniq( @totalcases );
@@ -1284,7 +1250,7 @@ sub descend
         open( RESPONSE , ">>$mypath/response.txt" );
         unless ( $direction eq "star" )
         {
-          say RESPONSE "#Optimal option for case " . ( plus1( $countcase ) ) . ": $newtarget.";
+          say RESPONSE "#Optimal option for case " . ( $countcase + 1 ) . ": $newtarget.";
         }
 
         if ( $starstring eq "" )
@@ -1667,7 +1633,7 @@ Gian Luca Brunetti, E<lt>gianluca.brunetti@polimi.itE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2017 by Gian Luca Brunetti and Politecnico di Milano. This is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
+Copyright (C) 2008-2021 by Gian Luca Brunetti and Politecnico di Milano. This is free software. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
 
 =cut

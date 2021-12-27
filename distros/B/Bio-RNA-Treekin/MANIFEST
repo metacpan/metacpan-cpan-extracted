@@ -1,0 +1,25 @@
+Build.PL
+Changes
+lib/Bio/RNA/Treekin.pm
+lib/Bio/RNA/Treekin/MultiRecord.pm
+lib/Bio/RNA/Treekin/PopulationDataRecord.pm
+lib/Bio/RNA/Treekin/Record.pm
+lib/IO/File/RecordStream.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-load.t
+t/10-parse.t
+t/11-attributes.t
+t/20-stringify.t
+t/data/treekin_multi_small.28.bar
+t/data/treekin_multi_small.29.bar
+t/data/treekin_multi_small.30.bar
+t/data/treekin_multi_small.kin
+t/data/treekin_single_small.bar
+t/data/treekin_single_small.kin
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t

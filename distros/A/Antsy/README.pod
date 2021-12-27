@@ -18,7 +18,8 @@
 
 =head1 The Antsy module
 
-This is the I<README> for the L<Antsy> Perl module.
+This is the I<README> for the L<Antsy> Perl module that provides a
+more natural language interface to ANSI terminal sequences.
 
 You're probably looking at this because you don't know where else to
 find what you're looking for. Read this once and you might never have

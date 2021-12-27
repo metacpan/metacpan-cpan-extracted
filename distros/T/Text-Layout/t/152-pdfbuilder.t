@@ -9,7 +9,7 @@ if ( eval { require PDF::Builder } ) {
 	plan skip_all => "PDF::Builder incompatible version";
     }
     else {
-	plan tests => 27;
+	plan tests => 31;
     }
 }
 else {
@@ -48,53 +48,64 @@ $layout->set_markup("The quick brows fox");
 
 # Get baseline. Since we're working top-left this is a negative value.
 my $v = $layout->get_baseline;
-ok( $v > -13.67 && $v < -13.65, "baseline $v" );
+fuzz( $v, -13.66, "baseline $v" );
 $v = $layout->get_iter->get_baseline;
-ok( $v > -13.67 && $v < -13.65, "baseline $v" );
+fuzz( $v, -13.66, "baseline $v" );
 
 # Get width/height.
 my @a = $layout->get_pixel_size;
-ok( $a[0] > 166.07 && $a[0] < 166.09, "pixel_size width $a[0]"  );
-ok( $a[1] >  17.99 && $a[1] <  18.01, "pixel_size height $a[1]" );
+fuzz( $a[0], 166.08, "pixel_size width $a[0]"  );
+fuzz( $a[1], 18.00, "pixel_size height $a[1]" );
 my $a = $layout->get_pixel_size;
-ok( $a->{width}  > 166.07 && $a->{width}  < 166.09, "pixel_size width $a->{width}" );
-ok( $a->{height} >  17.99 && $a->{height} <  18.01, "pixel_size height $a->{height}" );
+fuzz( $a->{width}, 166.08, "pixel_size width $a->{width}" );
+fuzz( $a->{height}, 18.00, "pixel_size height $a->{height}" );
 
 # get_size should return the same, since we're not using Pango units.
 @a = $layout->get_size;
-ok( $a[0] > 166.07 && $a[0] < 166.09, "size width $a[0]" );
-ok( $a[1] >  17.99 && $a[1] <  18.01, "size height $a[1]" );
+fuzz( $a[0], 166.08, "size width" );
+fuzz( $a[1], 18.00, "size height" );
 $a = $layout->get_size;
-ok( $a->{width}  > 166.07 && $a->{width}  < 166.09, "size width $a->{width}" );
-ok( $a->{height} >  17.99 && $a->{height} <  18.01, "size height $a->{height}" );
+fuzz( $a->{width}, 166.08, "size width" );
+fuzz( $a->{height}, 18.00, "size height" );
 
 # Get extents
 my @ink = qw( ink layout );
+my @fields = qw( x y width height );
+
+my $res = { x => 0.00, y => 0.00, width => 166.08, height => 18.00 };
+
+# This case cannot calculate ink.
+my $ink = $res;
+my $inkres = [ $res, $ink ];
+
+# Scalar call should yield layout values.
+$a = $layout->get_pixel_extents;
+for my $f ( @fields ) {
+    fuzz( $a->{$f}, $res->{$f},
+	  "pixel_extents @{[$ink[1]]} $f @{[$a->{$f}]}" );
+}
+
+# List call should yield [ res ink ].
 @a = $layout->get_pixel_extents;
 for ( 0, 1 ) {
     my $a = $a[$_];
-    ok( $a->{x} > -0.01 && $a->{x} < 0.01,
-	"pixel_extents @{[$ink[$_]]} x @{[$a->{x}]}" );
-    ok( $a->{y} > -0.01 && $a->{y} < 0.01,
-	"pixel_extents @{[$ink[$_]]} y @{[$a->{y}]}" );
-    ok( $a->{width}  > 166.07 && $a->{width}  < 166.09,
-	"pixel_extents @{[$ink[$_]]} width @{[$a->{width}]}" );
-    ok( $a->{height} >  17.99 && $a->{height} <  18.01,
-	"pixel_extents @{[$ink[$_]]} height @{[$a->{height}]}" );
+    for my $f ( @fields ) {
+	fuzz( $a->{$f}, $inkres->[$_]{$f},
+	      "pixel_extents[$_] @{[$ink[$_]]} $f @{[$a->{$f}]}" );
+    }
 }
+
 # Same, using Pango units (but we do not).
 @a = $layout->get_extents;
 for ( 0, 1 ) {
     my $a = $a[$_];
-    ok( $a->{x} > -0.01 && $a->{x} < 0.01,
-	"extents @{[$ink[$_]]} x @{[$a->{x}]}" );
-    ok( $a->{y} > -0.01 && $a->{y} < 0.01,
-	"extents @{[$ink[$_]]} y @{[$a->{y}]}" );
-    ok( $a->{width}  > 166.07 && $a->{width}  < 166.09,
-	"extents @{[$ink[$_]]} width @{[$a->{width}]}" );
-    ok( $a->{height} >  17.99 && $a->{height} <  18.01,
-	"extents @{[$ink[$_]]} height @{[$a->{height}]}" );
+    for my $f ( @fields ) {
+	fuzz( $a->{$f}, $inkres->[$_]{$f},
+	      "extents[$_] @{[$ink[$_]]} $f @{[$a->{$f}]}" );
+    }
 }
 
 # Big bang?
 $layout->show( 100, 500, $text );
+
+sub fuzz { ok( $_[0] < $_[1]+0.01 && $_[0] > $_[1]-0.01, $_[2] ) }

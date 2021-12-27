@@ -1,5 +1,12 @@
 Revision history for Net-Async-IRC
 
+0.12    2021-12-27
+        [CHANGES]
+         * Implement SASL authentication using PLAIN mechanism
+         * General distribution updates to Build.PL and POD docs style
+         * Regenerated testing SSL certs
+         * Use Future::AsyncAwait for much async code style neatening
+
 0.11    2017/03/04 11:14:11
         [CHANGES]
          * Protocol::IRC is now moved to its own distribution

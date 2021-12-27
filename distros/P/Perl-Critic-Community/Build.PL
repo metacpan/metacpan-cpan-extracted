@@ -84,7 +84,7 @@ EOW
         "Dan Book <dbook\@cpan.org>"
       ],
       "dist_name" => "Perl-Critic-Community",
-      "dist_version" => "v1.0.1",
+      "dist_version" => "v1.0.2",
       "license" => "artistic_2",
       "module_name" => "Perl::Critic::Community",
       "recursive_test_files" => 1,

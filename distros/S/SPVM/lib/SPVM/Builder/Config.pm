@@ -3,8 +3,20 @@ package SPVM::Builder::Config;
 use strict;
 use warnings;
 use Config;
+use Carp 'confess';
 
 # Fields
+sub exported_funcs {
+  my $self = shift;
+  if (@_) {
+    $self->{exported_funcs} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{exported_funcs};
+  }
+}
+
 sub ext {
   my $self = shift;
   if (@_) {
@@ -126,6 +138,17 @@ sub libs {
   }
 }
 
+sub sources {
+  my $self = shift;
+  if (@_) {
+    $self->{sources} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{sources};
+  }
+}
+
 sub resources {
   my $self = shift;
   if (@_) {
@@ -174,6 +197,11 @@ sub new {
   # cc
   unless (defined $self->{cc}) {
     $self->cc($Config{cc});
+  }
+
+  # exported_funcs
+  unless (defined $self->{exported_funcs}) {
+    $self->exported_funcs([]);
   }
 
   # include_dirs
@@ -226,6 +254,11 @@ sub new {
   unless (defined $self->{resources}) {
     $self->resources([]);
   }
+
+  # sources
+  unless (defined $self->{sources}) {
+    $self->sources([]);
+  }
   
   # libs
   unless (defined $self->{libs}) {
@@ -240,7 +273,7 @@ sub new {
     
     # Dynamic link options
     if ($^O eq 'MSWin32') {
-      push @default_ldflags, '-mdll', '-s' , "-L$Config{bin}";
+      push @default_ldflags, '-mdll', '-s';
     }
     else {
       push @default_ldflags, '-shared';
@@ -349,6 +382,18 @@ sub add_libs {
   push @{$self->{libs}}, @libs;
 }
 
+sub add_exported_funcs {
+  my ($self, @exported_funcs) = @_;
+  
+  push @{$self->{exported_funcs}}, @exported_funcs;
+}
+
+sub add_sources {
+  my ($self, @sources) = @_;
+  
+  push @{$self->{sources}}, @sources;
+}
+
 sub add_resources {
   my ($self, @resources) = @_;
   
@@ -423,6 +468,33 @@ sub search_include_dirs_from_config_incpth {
   return \@include_dirs;
 }
 
+sub get_include_dir {
+  my ($self, $file) = @_;
+  
+  my $include_dir = $file;
+  $include_dir =~ s|\.config$|.native/include|;
+  
+  return $include_dir;
+}
+
+sub get_src_dir {
+  my ($self, $file) = @_;
+  
+  my $src_dir = $file;
+  $src_dir =~ s|\.config$|.native/src|;
+  
+  return $src_dir;
+}
+
+sub get_lib_dir {
+  my ($self, $file) = @_;
+  
+  my $lib_dir = $file;
+  $lib_dir =~ s|\.config$|.native/lib|;
+  
+  return $lib_dir;
+}
+
 1;
 
 =head1 NAME
@@ -491,6 +563,17 @@ B<Examples:>
   $config->optimize('-O2');
   $config->optimize('-g3 -O0');
 
+=head2 sources
+
+  my $sources = $config->sources;
+  $config->sources($sources);
+
+Get and get source files. These sourceraries are linked by the compiler.
+
+B<Examples:>
+
+  $config->sources(['foo.c', 'bar.c']);
+
 =head2 ld
 
   my $ld = $config->ld;
@@ -517,12 +600,19 @@ Not Windows
 
 At runtime, the "lib" directory of the native module is added before C<include_dirs>.
 
+=head2 exported_funcs
+
+  my $exported_funcs = $config->exported_funcs;
+  $config->exported_funcs($exported_funcs);
+
+Get and set the exported functions. This has means on Windows.
+
 =head2 libs
 
   my $libs = $config->libs;
   $config->libs($libs);
 
-Get and get libraries. These libraries are linked by the linker.
+Get and set libraries. These libraries are linked by the linker.
 
 If a dynamic link library is found from L<"lib_dirs">, this is linked. Otherwise if a static link library is found from L<"lib_dirs">, this is linked.
 
@@ -667,6 +757,18 @@ Add values after the last element of C<include_dirs> field.
 
 Add values after the last element of  C<lib_dirs> field.
 
+=head2 add_sources
+
+  $config->add_sources(@sources);
+
+Add the values after the last element of C<sources> field.
+
+=head2 add_exported_funcs
+
+  $config->add_exported_funcs(@exported_funcs);
+
+Add values after the last element of  C<exported_funcs> field.
+
 =head2 add_libs
 
   $config->add_libs(@libs);
@@ -734,3 +836,21 @@ Get the library searching directories parsing C<libpth> of L<Config>.
   my $include_dirs = $config->search_include_dirs_from_config_incpth;
 
 Get the header searching directories parsing C<incpth> of L<Config>.
+
+=head2 sub get_include_dir
+
+  my $include_dir = $config->get_include_dir(__FILE__);
+
+Get the header include directory from the config file name.
+
+=head2 get_src_dir
+
+  my $src_dir = $config->get_src_dir(__FILE__);
+
+Get the source directory from the config file name.
+
+=head2 get_lib_dir
+
+  my $lib_dir = $config->get_lib_dir(__FILE__);
+
+Get the library directory from the config file name.

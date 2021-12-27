@@ -18,13 +18,13 @@
 #
 #=============================================================================
 
-package Term::CLI  0.052003 {
+package Term::CLI  0.053006 {
 
 use 5.014;
 use strict;
 use warnings;
 
-use Text::ParseWords 3.29 qw( parse_line );
+use Text::ParseWords 3.27 qw( parse_line );
 use Term::CLI::ReadLine;
 use FindBin 1.50;
 
@@ -65,6 +65,12 @@ has '+name' => (
     default => sub { $FindBin::Script }
 );
 
+has cleanup => (
+    is        => 'rw',
+    isa       => Maybe[CodeRef],
+    predicate => 1
+);
+
 has prompt => (
     is => 'rw',
     isa => Str,
@@ -101,6 +107,11 @@ sub BUILD {
     my ($self, $args) = @_;
 
     my $term = Term::CLI::ReadLine->new($self->name)->term;
+
+    if (my $sig_list = $args->{ignore_keyboard_signals}) {
+        $term->ignore_keyboard_signals(@$sig_list);
+    }
+
     $term->Attribs->{completion_function} = sub { $self->complete_line(@_) };
     $term->Attribs->{char_is_quoted_p} = sub { $self->_is_escaped(@_) };
 
@@ -118,15 +129,28 @@ sub BUILD {
         $self->history_file("$::ENV{HOME}/.${hist_file}_history");
     }
 
-    # Set ReadLine history size...
-    $self->term->StifleHistory($self->history_lines);
+    # Ensure that the history_lines trigger is called.
+    # If history_lines is given as a parameter, the trigger
+    # *is* called, but it happens *before* the `$term` is
+    # initialised; and if no history_lines is given, the
+    # trigger is not called for the default.
+    $self->history_lines($self->history_lines);
+}
+
+sub DEMOLISH {
+    my ($self) = @_;
+    if ($self->has_cleanup) {
+        $self->cleanup->($self);
+    }
 }
 
 sub _trigger_history_lines {
     my ($self, $arg) = @_;
 
-    # the ReadLine object may not have been initialised yet...
-    $self->term->StifleHistory($arg) if $self->term;
+    # Terminal may not be initialiased yet...
+    return if !$self->term;
+
+    $self->term->StifleHistory($arg);
 }
 
 # %args = $self->_default_callback(%args);
@@ -176,8 +200,8 @@ sub _default_split {
 # character. Check if it is perhaps escaped.
 #
 sub _is_escaped {
-    my ($self,$line, $index) = @_;
-    return 0 if $index <= 0;
+    my ($self, $line, $index) = @_;
+    return 0 if !$index or $index < 0;
     return 0 if substr($line, $index-1, 1) ne '\\';
     return !$self->_is_escaped($line, $index-1);
 }
@@ -215,14 +239,21 @@ sub _split_line {
 }
 
 
+# Dumb wrapper around "Attrib" that allows mocking the
+# `completion_quote_character` state.
+sub _rl_completion_quote_character {
+    my ($self) = @_;
+    my $c = $self->term->Attribs->{completion_quote_character} // '';
+    return $c =~ s/\000//gr;
+}
+
 # See POD X<complete_line>
 sub complete_line {
     my ($self, $text, $line, $start) = @_;
 
     $self->_set_completion_attribs;
 
-    my $quote_char
-        = $self->term->Attribs->{completion_quote_character} =~ s/\000//gr;
+    my $quote_char = $self->_rl_completion_quote_character;
 
     my @words;
 
@@ -261,114 +292,6 @@ sub complete_line {
 }
 
 
-# %old_sig = CLI->_set_signal_handlers();
-#
-# Set signal handlers to ensure proper terminal/CLI handling in the
-# face of various signals (^C ^\ ^Z).
-#
-sub _set_signal_handlers {
-    my $self = shift;
-
-    my %old_sig = %SIG;
-
-    # $last_signal is set by the signal handlers and is used
-    # in the term's "Attrib{signal_event_hook}" to determine
-    # what action to take.
-    my $last_signal = 'NONE';
-
-    # The generic signal handler will attempt to re-throw the signal, after
-    # putting the terminal in the correct state. Any previously set signal
-    # handlers should then be triggered.
-    my $generic_handler = sub {
-        my $signal = shift;
-
-        $last_signal = $signal;
-
-        if (defined $old_sig{$signal} && $old_sig{$signal} ne 'DEFAULT') {
-            $SIG{$signal} = $old_sig{$signal};
-        }
-        else {
-            $SIG{$signal} = 'DEFAULT';
-        }
-
-        $self->term->Attribs->{catch_signals} = 0;
-
-        $self->term->free_line_state();
-        $self->term->cleanup_after_signal();
-        kill $signal, $$;
-        $self->term->Attribs->{catch_signals} = 1;
-        return 1;
-    };
-
-    # The WINCH signal handler.
-    # Tell ReadLine to resize the terminal.
-    my $winch_handler = sub {
-        $self->term->resize_terminal;
-        $last_signal = $_[0];
-        $old_sig{$_[0]}->(@_) if ref $old_sig{$_[0]};
-        return 1;
-    };
-
-    # The CONT signal handler.
-    # In case we get suspended, make sure we redraw the CLI on wake-up.
-    my $cont_handler = sub {
-        $last_signal = $_[0];
-
-        $self->term->free_line_state();
-        $self->term->cleanup_after_signal();
-
-        $old_sig{$_[0]}->(@_) if ref $old_sig{$_[0]};
-
-        $self->term->Attribs->{line_buffer} = '';
-        $self->term->reset_after_signal();
-        $self->term->forced_update_display();
-        return 1;
-    };
-
-    # Install signal handler(s).
-    my $install_handlers = sub {
-        $self->term->Attribs->{catch_signals} = 1;
-
-        $SIG{WINCH} = $winch_handler;
-        $SIG{CONT} = $cont_handler;
-        $SIG{HUP}
-            = $SIG{INT}
-            = $SIG{QUIT}
-            = $SIG{ALRM}
-            #= $SIG{STOP}
-            = $SIG{TERM}
-            = $SIG{TTIN}
-            = $SIG{TTOU}
-            = $SIG{TSTP}
-                = $generic_handler;
-
-    };
-
-    $install_handlers->();
-
-    # Post-signal hook, called by ReadLine.
-    #
-    # Abort the current input line, except when the
-    # WINCH signal was received.
-    #
-    $self->term->Attribs->{signal_event_hook} = sub {
-        return 1 if $last_signal eq 'WINCH'; # Nothing on WINCH.
-
-        # Move to a new line and clear input buffer.
-        $self->term->crlf();
-        $self->term->Attribs->{line_buffer} = '';
-        $self->term->forced_update_display();
-
-        $install_handlers->(); # Re-install handlers, if necessary.
-        $self->term->reset_after_signal();
-        return 1;
-    };
-
-    return %old_sig;
-}
-
-
-# See POD X<readline>
 sub readline {
     my ($self, %args) = @_;
 
@@ -376,15 +299,12 @@ sub readline {
     my $skip   = exists $args{skip} ? $args{skip} : $self->skip;
 
     $self->_set_completion_attribs;
-    my %old_sig = $self->_set_signal_handlers;
 
     my $input;
     while (defined ($input = $self->term->readline($prompt))) {
         next if defined $skip && $input =~ $skip;
         last;
     }
-
-    %SIG = %old_sig; # Restore signal handlers.
     return $input;
 }
 
@@ -394,14 +314,11 @@ sub read_history {
 
     my $hist_file = @_ ? shift @_ : $self->history_file;
 
-    if ($self->term->ReadHistory($hist_file)) {
-        $self->history_file($hist_file);
-        $self->set_error('');
-        return 1;
-    }
-    else {
-        return $self->set_error("$hist_file: $!");
-    }
+    $self->term->ReadHistory($hist_file)
+        or return $self->set_error("$hist_file: $!");
+    $self->history_file($hist_file);
+    $self->set_error('');
+    return 1;
 }
 
 
@@ -410,14 +327,11 @@ sub write_history {
 
     my $hist_file = @_ ? shift @_ : $self->history_file;
 
-    if ($self->term->WriteHistory($hist_file)) {
-        $self->history_file($hist_file);
-        $self->set_error('');
-        return 1;
-    }
-    else {
-        return $self->set_error("$hist_file: $!");
-    }
+    $self->term->WriteHistory($hist_file)
+        or return $self->set_error("$hist_file: $!");
+    $self->history_file($hist_file);
+    $self->set_error('');
+    return 1;
 }
 
 
@@ -470,7 +384,7 @@ Term::CLI - CLI interpreter based on Term::ReadLine
 
 =head1 VERSION
 
-version 0.052003
+version 0.053006
 
 =head1 SYNOPSIS
 
@@ -482,6 +396,11 @@ version 0.052003
  my $cli = Term::CLI->new(
     name => 'myapp',
     prompt => 'myapp> ',
+    cleanup => sub {
+        my ($cli) = @_;
+        $cli->write_history;
+            or warn "cannot write history: ".$cli->error."\n";
+    },
     callback => sub {
         my ($self, %args) = @_;
         print Data::Dumper->Dump([\%args], ['args']);
@@ -520,7 +439,9 @@ version 0.052003
 =head1 DESCRIPTION
 
 Implement an easy-to-use command line interpreter based on
-L<Term::ReadLine>(3p) and L<Term::ReadLine::Gnu>(3p).
+L<Term::ReadLine>(3p). Although primarily aimed at use with
+the L<Term::ReadLine::Gnu>(3p) implementation, it also supports
+L<Term::ReadLine::Perl>(3p).
 
 First-time users may want to read L<Term::CLI::Tutorial>(3p)
 and L<Term::CLI::Intro>(3p) first, and peruse the example
@@ -555,11 +476,27 @@ Valid attributes:
 Reference to a subroutine that should be called when the command
 is executed, or C<undef>.
 
+=item B<cleanup> =E<gt> I<CodeRef>
+
+Reference to a subroutine that should be called when the object
+is destroyed (i.e. in L<Moo> terminology, when C<DEMOLISH> is called).
+
 =item B<commands> =E<gt> I<ArrayRef>
 
 Reference to an array containing L<Term::CLI::Command> object
 instances that describe the commands that C<Term::CLI> recognises,
 or C<undef>.
+
+=item B<ignore_keyboard_signals> =E<gt> I<ArrayRef>
+
+Specify a list of signals for which the keyboard generation should be
+turned off during a C<readline> operation.
+
+The list of signals should be a combination of C<INT>, C<QUIT>, or
+C<TSTP>. See also
+L<ignore_keyboard_signals|Term::CLI::ReadLine/ignore_keyboard_signals>
+in L<Term::CLI::ReadLine>(3p). If this is not specified, C<QUIT>
+keyboard generation is turned off by default.
 
 =item B<name> =E<gt> I<Str>
 
@@ -587,7 +524,7 @@ Specify the file to read/write input history to/from.
 The default is I<name> + C<_history> in the user's
 I<HOME> directory.
 
-=item B<history_lines> =E<gt> I<Str>
+=item B<history_lines> =E<gt> I<Int>
 
 Maximum number of lines to keep in the input history.
 Default is 1000.
@@ -612,6 +549,12 @@ X<has_callback>
 See
 L<has_callback in Term::CLI::Role::CommandSet|Term::CLI::Role::CommandSet/has_callback>.
 
+=item B<callback> ( [ I<CodeRef> ] )
+X<callback>
+
+See
+L<callback in Term::CLI::Role::CommandSet|Term::CLI::Role::CommandSet/callback>.
+
 =item B<has_commands>
 X<has_commands>
 
@@ -626,17 +569,33 @@ L<commands in Term::CLI::Role::CommandSet|Term::CLI::Role::CommandSet/commands>.
 
 I<ArrayRef> with C<Term::CLI::Command> object instances.
 
-=item B<callback> ( [ I<CodeRef> ] )
-X<callback>
-
-See
-L<callback in Term::CLI::Role::CommandSet|Term::CLI::Role::CommandSet/callback>.
-
 =back
 
 =head2 Others
 
 =over
+
+=item B<has_cleanup>
+X<has_cleanup>
+
+Predicate function that returns whether or not the C<cleanup> attribute has been set.
+
+=item B<cleanup> ( [ I<CodeRef> ] )
+
+Gets or sets a reference to a subroutine that should be called when the object
+is destroyed (i.e. in L<Moo> terminology, when C<DEMOLISH> is called).
+
+The code is called with one parameter: the object to be destroyed. One typical
+use of C<cleanup> is to ensure that the history gets saved upon exit:
+
+  my $cli = Term::CLI->new(
+    ...
+    cleanup => sub {
+      my ($cli) = @_;
+      $cli->write_history
+        or warn "cannot write history: ".$cli->error."\n";
+    }
+  );
 
 =item B<find_command> ( I<Str> )
 X<find_command>
@@ -661,7 +620,7 @@ L<find_matches in Term::CLI::Role::CommandSet|Term::CLI::Role::CommandSet/find_m
 =item B<name>
 X<name>
 
-The application name. 
+The application name.
 See
 L<name in Term::CLI::Base|Term::CLI::Base/name>.
 
@@ -843,6 +802,9 @@ L<callback|Term::CLI::Role::CommandSet/callback> function
 is executed (see
 L<callback in Term::CLI::Role::Command|Term::CLI::Role::CommandSet/callback>).
 
+The C<execute> function returns the results of the last called callback
+function.
+
 =over
 
 =item *
@@ -901,44 +863,32 @@ be fed back up the parse tree (and eventually to the caller).
 
 =head1 SIGNAL HANDLING
 
-The C<Term::CLI> object sets its own signal handlers in the L<readline|/readline>
-function.
+The C<Term::CLI> object (through L<Term::CLI::ReadLine>) will make sure that
+signals are handled "correctly". This especially means that if a signal is
+not ignored, the terminal is left in a "sane" state before any signal
+handler is called or the program exits.
 
-The signal handlers will ensure the terminal is in a sane state.
-
-
-The following signal handlers discard the current input line, restore
-any previous signal handler, and re-throw the signal:
-C<HUP>, C<INT>, C<QUIT>, C<ALRM>, C<TERM>, C<TTIN>, C<TTOU>, C<TSTP>.
-
-The C<CONT> and C<WINCH> signals are treated slightly different: they don't
-re-throw the signal, but rather just call any previous signal handler. The
-C<WINCH> signal handler will not discard the input line.
-
-It also makes sure that after a keyboard suspend (C<TSTP>) and
-subsequent continue (C<CONT>), the command prompt is redrawn:
-
-    bash$ perl tutorial/term_cli.pl
-    > foo
-    > ^Z
-    [1]+  Stopped                 perl tutorial/term_cli.pl
-    bash$ fg
-    perl tutorial/term_cli.pl
-    > _
+See also
+L<SIGNAL HANDLING in Term::CLI::ReadLine|Term::CLI::ReadLine/SIGNAL HANDLING>.
 
 =head1 SEE ALSO
 
 L<FindBin>(3p),
+L<Moo>(3p),
 L<Getopt::Long>(3p),
-L<Term::CLI>(3p),
 L<Term::CLI::Argument>(3p),
+L<Term::CLI::Base>(3p),
 L<Term::CLI::Command>(3p),
 L<Term::CLI::Intro>(3p),
+L<Term::CLI::ReadLine>(3p),
 L<Term::CLI::Role::CommandSet>(3p),
 L<Term::CLI::Tutorial>(3p),
+L<Term::ReadLine::Gnu>(3p),
+L<Term::ReadLine::Perl>(3p),
+L<Term::ReadLine>(3p),
 L<Text::ParseWords>(3p),
 L<Types::Standard>(3p).
-
+ 
 Inspiration for the custom completion came from:
 L<https://robots.thoughtbot.com/tab-completion-in-gnu-readline>.
 This is an excellent tutorial into the completion mechanics

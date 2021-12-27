@@ -354,6 +354,7 @@ sub request
 		$text;
 	};
 	my $db_spec = $dumper->(-DB => $opts->{db});
+	my $mongodb_spec = $dumper->(-MongoDB => $opts->{mongodb});
 	my $sess_spec = $dumper->(-Session => $opts->{session});
 	
 	# サーバ側ではそれを-mainで実行して Data::Dumper で固めて返す. 
@@ -363,6 +364,7 @@ sub request
 		use Data::Dumper;
 		$TL->startCgi(
 			<&DB>
+			<&MONGODB>
 			<&SESSION>
 			-main    => sub{
 				my $ret = _main();
@@ -382,6 +384,7 @@ sub request
 	my $script = $tmpl;
 	$script =~ s/<&CODE>/$code_str/;
 	$script =~ s/<&DB>/$db_spec/;
+	$script =~ s/<&MONGODB>/$mongodb_spec/;
 	$script =~ s/<&SESSION>/$sess_spec/;
 	#print STDERR $script;
 	

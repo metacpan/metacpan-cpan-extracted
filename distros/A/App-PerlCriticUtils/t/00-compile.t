@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/PerlCriticUtils.pm'
@@ -15,6 +15,7 @@ my @module_files = (
 my @scripts = (
     'script/pcpcat',
     'script/pcpdoc',
+    'script/pcpgrep',
     'script/pcpless',
     'script/pcplist',
     'script/pcpman',

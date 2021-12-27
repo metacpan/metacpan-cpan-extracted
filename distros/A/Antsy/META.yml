@@ -20,10 +20,10 @@ no_index:
     - inc
 requires:
   Carp: '0'
-  perl: '5.026'
+  perl: '5.032'
 resources:
   bugtracker: https://github.com/briandfoy/antsy/issues
   homepage: https://github.com/briandfoy/antsy
   repository: https://github.com/briandfoy/antsy.git
-version: '0.901'
+version: '0.903'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

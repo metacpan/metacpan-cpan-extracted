@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Result;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains the result of a JSON Schema evaluation
 
-our $VERSION = '0.531';
+our $VERSION = '0.533';
 
 use 5.020;
 use Moo;
@@ -21,6 +21,7 @@ use JSON::Schema::Modern::Annotation;
 use JSON::Schema::Modern::Error;
 use JSON::PP ();
 use List::Util 1.50 'head';
+use Scalar::Util 'refaddr';
 use Safe::Isa;
 use namespace::clean;
 
@@ -146,7 +147,7 @@ sub count { $_[0]->valid ? $_[0]->annotation_count : $_[0]->error_count }
 sub combine ($self, $other, $swap) {
   die 'wrong type for & operation' if not $other->$_isa(__PACKAGE__);
 
-  return $self if $other == $self;
+  return $self if refaddr($other) == refaddr($self);
 
   return ref($self)->new(
     valid => $self->valid && $other->valid,
@@ -192,7 +193,7 @@ JSON::Schema::Modern::Result - Contains the result of a JSON Schema evaluation
 
 =head1 VERSION
 
-version 0.531
+version 0.533
 
 =head1 SYNOPSIS
 
@@ -302,6 +303,13 @@ is false.
 
 When provided with another result object, returns a new object with the combination of all results.
 See C<&> at L</OVERLOADS>.
+
+=head1 SUPPORT
+
+=for stopwords OpenAPI
+
+You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI Slack
+server|https://open-api.slack.com>, which are also great resources for finding help.
 
 =head1 SUPPORT
 

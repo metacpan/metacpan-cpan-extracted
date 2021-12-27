@@ -24,8 +24,8 @@ BEGIN { use_ok('App::DocKnot') }
 
 # Check the schema of the licenses.yaml file.
 my $licenses_path = module_file('App::DocKnot', 'licenses.yaml');
-my $licenses_ref  = YAML::XS::LoadFile($licenses_path);
-my $schema_path   = module_file('App::DocKnot', 'schema/licenses.yaml');
-my $schema_ref    = YAML::XS::LoadFile($schema_path);
+my $licenses_ref = YAML::XS::LoadFile($licenses_path);
+my $schema_path = module_file('App::DocKnot', 'schema/licenses.yaml');
+my $schema_ref = YAML::XS::LoadFile($schema_path);
 eval { validate($schema_ref, $licenses_ref) };
 is($@, q{}, 'licenses.yaml fails schema validation');

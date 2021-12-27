@@ -1,0 +1,90 @@
+NAME
+    WordList::Special::Stdin - Wordlist from STDIN
+
+VERSION
+    This document describes version 0.002 of WordList::Special::Stdin (from
+    Perl distribution WordList-Special-Stdin), released on 2021-12-01.
+
+SYNOPSIS
+    From Perl:
+
+     use WordList::Special::Stdin;
+
+     my $wl = WordList::Special::Stdin->new();
+     $wl->each_word(sub { ... });
+
+    From the command-line:
+
+     % some-prog-that-produces-words | wordlist -w Special::Stdin
+
+    Typical use-case is to filter some words, either some wordlist or other
+    programs:
+
+     % wordlist ... | wordlist -w Special::Stdin --len 5 '/foo/'
+
+DESCRIPTION
+    This is a special wordlist to get list of words from standard input.
+
+WORDLIST PARAMETERS
+    This is a parameterized wordlist module. When loading in Perl, you can
+    specify the parameters to the constructor, for example:
+
+     use WordList::Special::Stdin;
+     my $wl = WordList::Special::Stdin->(bar => 2, foo => 1);
+
+    When loading on the command-line, you can specify parameters using the
+    "WORDLISTNAME=ARGNAME1,ARGVAL1,ARGNAME2,ARGVAL2" syntax, like in perl's
+    "-M" option, for example:
+
+     % wordlist -w Special::Stdin=foo,1,bar,2 ...
+
+    Known parameters:
+
+  cache
+    Whether to cache the words the first time until EOF, then reuse them
+    later.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/WordList-Special-Stdin>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-WordList-Special-Stdin>.
+
+SEE ALSO
+    WordList
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=WordList-Special-Stdi
+    n>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

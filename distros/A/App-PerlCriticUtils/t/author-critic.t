@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/PerlCriticUtils.pm','script/pcpcat','script/pcpdoc','script/pcpless','script/pcplist','script/pcpman','script/pcppath'];
+my $filenames = ['lib/App/PerlCriticUtils.pm','script/pcpcat','script/pcpdoc','script/pcpgrep','script/pcpless','script/pcplist','script/pcpman','script/pcppath'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

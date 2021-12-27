@@ -119,5 +119,5 @@ $metadata_path
 $docknot
   = App::DocKnot::Dist->new({ distdir => q{.}, metadata => $metadata_path });
 @expected = (['make', 'dist']);
-@seen     = $docknot->commands();
+@seen = $docknot->commands();
 is_deeply(\@seen, \@expected, 'make');

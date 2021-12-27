@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One JSON Schema document
 
-our $VERSION = '0.531';
+our $VERSION = '0.533';
 
 use 5.020;
 use Moo;
@@ -168,6 +168,9 @@ sub BUILD ($self, $args) {
 }
 
 sub traverse ($self, $evaluator) {
+  die 'wrong class - use JSON::Schema::Modern::Document::OpenAPI instead'
+    if is_plain_hashref($self->schema) and exists $self->schema->{openapi};
+
   my $state = $evaluator->traverse($self->schema,
     {
       initial_schema_uri => $self->canonical_uri->clone,
@@ -209,7 +212,7 @@ JSON::Schema::Modern::Document - One JSON Schema document
 
 =head1 VERSION
 
-version 0.531
+version 0.533
 
 =head1 SYNOPSIS
 
@@ -323,6 +326,13 @@ L<JSON::Schema::Modern>
 L<Mojo::JSON::Pointer>
 
 =back
+
+=head1 SUPPORT
+
+=for stopwords OpenAPI
+
+You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI Slack
+server|https://open-api.slack.com>, which are also great resources for finding help.
 
 =head1 SUPPORT
 

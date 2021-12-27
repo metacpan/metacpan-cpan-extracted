@@ -1,0 +1,4 @@
+/: Test Root
+  /foo.html: Some document
+  /other.html: Other test Markdown
+  /test.html: Test Markdown

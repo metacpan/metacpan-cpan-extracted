@@ -10,7 +10,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Dist 5.00;
+package App::DocKnot::Dist 6.00;
 
 use 5.024;
 use autodie;
@@ -23,12 +23,13 @@ use Cwd qw(getcwd);
 use File::Copy qw(move);
 use File::Find qw(find);
 use File::Path qw(remove_tree);
-use IO::Compress::Xz       ();
+use Git::Repository ();
+use IO::Compress::Xz ();
 use IO::Uncompress::Gunzip ();
 use IPC::Run qw(run);
 use IPC::System::Simple qw(systemx);
 use List::SomeUtils qw(lastval);
-use List::Util qw(any);
+use List::Util qw(any first);
 
 # Base commands to run for various types of distributions.  Additional
 # variations may be added depending on additional configuration parameters.
@@ -138,7 +139,7 @@ sub _expected_dist_files {
 #  Throws: Text exception if no gzip tarball was found
 sub _find_gzip_tarball {
     my ($self, $path, $prefix) = @_;
-    my @files     = $self->_find_matching_tarballs($path, $prefix);
+    my @files = $self->_find_matching_tarballs($path, $prefix);
     my $gzip_file = lastval { m{ [.]tar [.]gz \z }xms } @files;
     if (!defined($gzip_file)) {
         die "cannot find gzip tarball for $prefix in $path\n";
@@ -174,14 +175,14 @@ sub _generate_compression_formats {
     my @files = $self->_find_matching_tarballs($path, $prefix);
     if (!any { m{ [.]tar [.]xz \z }xms } @files) {
         my $gzip_file = lastval { m{ [.]tar [.]gz \z }xms } @files;
-        my $xz_file   = $gzip_file;
+        my $xz_file = $gzip_file;
         $xz_file =~ s{ [.]gz \z }{.xz}xms;
         my $gzip_path = File::Spec->catfile($path, $gzip_file);
-        my $xz_path   = File::Spec->catfile($path, $xz_file);
+        my $xz_path = File::Spec->catfile($path, $xz_file);
 
         # Open the input and output files.
         my $gzip_fh = IO::Uncompress::Gunzip->new($gzip_path);
-        my $xz_fh   = IO::Compress::Xz->new($xz_path);
+        my $xz_fh = IO::Compress::Xz->new($xz_path);
 
         # Read from the gzip file and write to the xz-compressed file.
         my $buffer;
@@ -247,7 +248,7 @@ sub _sign_tarballs {
     for my $file (@files) {
         my $tarball_path = File::Spec->catdir($path, $file);
         systemx(
-            $self->{gpg},     '--detach-sign', '--armor', '-u',
+            $self->{gpg}, '--detach-sign', '--armor', '-u',
             $self->{pgp_key}, $tarball_path,
         );
     }
@@ -292,6 +293,7 @@ sub new {
     }
 
     # Create and return the object.
+    #<<<
     my $self = {
         config  => $config_reader->config(),
         distdir => $distdir,
@@ -299,6 +301,7 @@ sub new {
         perl    => $args_ref->{perl},
         pgp_key => $args_ref->{pgp_key} // $global_config_ref->{pgp_key},
     };
+    #>>>
     bless($self, $class);
     return $self;
 }
@@ -317,7 +320,7 @@ sub check_dist {
     my ($self, $source, $tarball) = @_;
     my @expected = $self->_expected_dist_files(getcwd());
     my %expected = map { $_ => 1 } @expected;
-    my $archive  = Archive::Tar->new($tarball);
+    my $archive = Archive::Tar->new($tarball);
     for my $file ($archive->list_files()) {
         $file =~ s{ \A [^/]* / }{}xms;
         delete $expected{$file};
@@ -332,8 +335,8 @@ sub check_dist {
 # Returns: List of commands, each of which is a list of strings representing
 #          a command and its arguments
 sub commands {
-    my ($self)   = @_;
-    my $type     = $self->{config}{build}{type};
+    my ($self) = @_;
+    my $type = $self->{config}{build}{type};
     my @commands = map { [@$_] } $COMMANDS{$type}->@*;
 
     # Special-case: If a specific path to Perl was configured, use that path
@@ -390,13 +393,19 @@ sub make_distribution {
     }
 
     # Export the Git repository into a new directory.
-    my @git = (
-        'git',              'archive',
-        "--remote=$source", "--prefix=${prefix}/",
-        'master',
+    my $repo = Git::Repository->new(work_tree => $source);
+    my @branches = $repo->run(
+        'for-each-ref' => '--format=%(refname:short)', 'refs/heads/',
     );
-    my @tar = qw(tar xf -);
-    run(\@git, q{|}, \@tar) or die "@git | @tar failed with status $?\n";
+    my $head = first { $_ eq 'main' || $_ eq 'master' } @branches;
+    my $archive = $repo->command(archive => "--prefix=${prefix}/", $head);
+    run([qw(tar xf -)], '<', $archive->stdout)
+      or die "git archive | tar xf - failed with status $?\n";
+    $archive->close();
+
+    if ($archive->exit != 0) {
+        die 'git archive failed with status ' . $archive->exit . "\n";
+    }
 
     # Change to that directory and run the configured commands.
     chdir($prefix);
@@ -461,9 +470,9 @@ App::DocKnot::Dist - Prepare a distribution tarball
 =head1 REQUIREMENTS
 
 Git, Perl 5.24 or later, and the modules File::BaseDir, File::ShareDir,
-IO::Compress::Xz (part of IO-Compress-Lzma), IO::Uncompress::Gunzip (part of
-IO-Compress), IPC::Run, IPC::System::Simple, Kwalify, List::SomeUtils, and
-YAML::XS, all of which are available from CPAN.
+Git::Repository, IO::Compress::Xz (part of IO-Compress-Lzma),
+IO::Uncompress::Gunzip (part of IO-Compress), IPC::Run, IPC::System::Simple,
+Kwalify, List::SomeUtils, and YAML::XS, all of which are available from CPAN.
 
 The tools to build whatever type of software distribution is being prepared
 are also required, since the distribution is built and tested as part of
@@ -557,6 +566,8 @@ an implementation detail of make_distribution().
 =item make_distribution()
 
 Generate distribution tarballs in the C<destdir> directory provided to new().
+The distribution will be generated from the first branch found named either
+C<main> or C<master>.
 
 If C<destdir> already contains a subdirectory whose name matches the
 C<tarname> of the distribution, it will be forcibly removed.  In order to

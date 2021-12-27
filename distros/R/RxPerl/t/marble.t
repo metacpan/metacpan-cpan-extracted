@@ -52,6 +52,25 @@ subtest 'rx_combine_latest' => sub {
     obs_is($o, $e, 'combine_latest provided observables');
 };
 
+subtest 'op_combine_latest_with' => sub {
+    my $o1 = cold('----a----b----c----|');
+    my $o2 = cold('--d--e--f--g--|');
+    my $e  =     ['----uv--wx-y--z----|', {
+        u => 'ad', v => 'ae', w => 'af',
+        x => 'bf', y => 'bg', z => 'cg',
+    }];
+
+    my $o = $o1->pipe(
+        op_combine_latest_with($o2),
+        op_map(sub {
+            my ($x, $y) = @{ $_[0] };
+            return "$x$y";
+        }),
+    );
+
+    obs_is($o, $e, 'combine_latest provided observables');
+};
+
 subtest 'rx_concat' => sub {
     my $o1 = cold('1-1---1-|');
     my $o2 = cold('22|');
@@ -180,11 +199,19 @@ subtest 'op_map' => sub {
         op_map(sub {$_[1] + 2}),
     );
     obs_is $o, ['23456'], 'map with index';
+
+    $o = cold('12345')->pipe(
+        op_map(sub {$_[1] + $_}),
+    );
+    obs_is $o, ['13579'], 'map with index and $_';
 };
 
 subtest 'op_filter' => sub {
     my $o = rx_interval(1)->pipe( op_filter(sub {$_[0] % 2 == 1}), op_take(3) );
     obs_is $o, ['--a-b-c', {a => 1, b => 3, c => 5}], 'filter with three/six values';
+
+    $o = rx_interval(1)->pipe( op_filter(sub {$_ % 2 == 1}), op_take(3) );
+    obs_is $o, ['--a-b-c', {a => 1, b => 3, c => 5}], 'filter with three/six values and $_';
 
     $o = cold('1234567890')->pipe(
         op_filter(sub {$_[1] % 3 == 1}),
@@ -360,6 +387,16 @@ subtest 'rx_partition' => sub {
 
     obs_is $o1, ['-2-4-6-8-0'], 'index o1';
     obs_is $o2, ['1-3-5-7-9-'], 'index o2';
+};
+
+subtest 'op_ignore_elements' => sub {
+    my $source = cold('0123');
+    my $o = $source->pipe(op_ignore_elements());
+    obs_is $o, ['----'], 'completes correctly';
+
+    $source = cold('0123#');
+    $o = $source->pipe(op_ignore_elements());
+    obs_is $o, ['----#'], 'emits error correctly';
 };
 
 done_testing();

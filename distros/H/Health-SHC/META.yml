@@ -1,0 +1,31 @@
+---
+abstract: 'Extract and verify Smart Haelth Card information'
+author:
+  - 'Timothy Legge <timlegge@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.022, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Health-SHC
+requires:
+  Barcode::ZBar: '0'
+  Crypt::JWT: '0'
+  File::ShareDir: '0'
+  File::Temp: '0'
+  Image::Magick: '0'
+  JSON::Parse: '0'
+  PostScript::Convert: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/timlegge/perl-Health-SHC/issues
+  repository: git://github.com/timlegge/perl-Health-SHC.git
+version: '0.002'
+x_generated_by_perl: v5.32.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -15,6 +15,7 @@ use Test::File::ShareDir -share => { -dist => { 'JSON-Schema-Modern-Document-Ope
 use File::ShareDir 'dist_dir';
 use Path::Tiny;
 use JSON::Schema::Modern;
+use JSON::Schema::Modern::Document::OpenAPI;
 
 my $accepter = Test::JSON::Schema::Acceptance->new(
   include_optional => 1,
@@ -30,14 +31,24 @@ my $js = JSON::Schema::Modern->new(
   validate_formats => 1,
 );
 
-$js->add_vocabulary('JSON::Schema::Modern::Vocabulary::OpenAPI');
-
-$js->add_schema(
-  'https://spec.openapis.org/oas/3.1/dialect/base',
-  $js->_json_decoder->decode(path(dist_dir('JSON-Schema-Modern-Document-OpenAPI'), 'oas/dialect/base.schema.json')->slurp_raw),
+# construct a minimal document in order to get the vocabulary and formats added
+my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+  evaluator => $js,
+  schema => {
+    openapi => '3.1.0',
+    info => {
+      title => 'my title',
+      version => '1.2.3',
+    },
+    paths => {},
+  },
 );
 
 $accepter->acceptance(
+  $ENV{NO_TODO} ? () : ( todo_tests => [
+    # requires bigint/bignum support in JSON::Schema::Modern
+    { file => 'formats.json', group_description => 'int64 format', test_description => [ 'too small', 'upper boundary', 'too large' ] }
+  ] ),
   validate_data => sub ($schema, $instance_data) {
     my $result = $js->evaluate($instance_data, $schema);
 

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 use utf8;
 
@@ -40,6 +40,10 @@ SKIP: foreach my $SSL ( 0, 1 ) {
          () ),
    )->get;
 
+   # Some OSes don't like connect()ing to 0.0.0.0
+   ( my $listenhost = $listener->read_handle->sockhost ) =~ s/^0\.0\.0\.0$/127.0.0.1/;
+   my $listenport = $listener->read_handle->sockport;
+
    my $irc = Net::Async::IRC->new(
       user => "defaultuser",
       realname => "Default Real name",
@@ -55,8 +59,8 @@ SKIP: foreach my $SSL ( 0, 1 ) {
    $irc->connect(
       addr => {
          family => "inet",
-         ip     => $listener->read_handle->sockhost,
-         port   => $listener->read_handle->sockport,
+         ip     => $listenhost,
+         port   => $listenport,
       },
       ( $SSL ?
          ( extensions => [ 'SSL' ],

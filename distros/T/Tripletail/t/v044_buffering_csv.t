@@ -2,10 +2,17 @@
 
 use strict;
 use warnings;
+use Test::More;
+eval {
+    require Text::CSV_XS;
+};
+if ($@) {
+    plan skip_all => 'Text::CSV_XS is required for these tests';
+}
+else {
+    plan tests => 4;
+}
 
-use Test::More tests =>
-  + 4
-;
 use lib '.';
 require t::make_ini;
 

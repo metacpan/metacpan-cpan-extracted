@@ -11,6 +11,8 @@ Random headings
 =head4 Fourth Heading
 
 [output]
+\heading[][]
+
 \h2(#S1)[First Heading]
 
 \h3[Second Heading]

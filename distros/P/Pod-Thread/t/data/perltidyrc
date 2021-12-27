@@ -18,11 +18,12 @@
 # SPDX-License-Identifier: FSFAP
 
 -bbao           # put line breaks before any operator
--boc            # do not re-break lists, since perltidy is awful at this
 -nbbc           # don't force blank lines before comments (bad for else blocks)
+-boc            # do not re-break lists, since perltidy is awful at this
 -ce             # cuddle braces around else
 -l=79           # usually use 78, but don't want 79-long lines reformatted
 -pt=2           # don't add extra whitespace around parentheses
 -sbt=2          # ...or square brackets
 -sfs            # no space before semicolon in for (not that I use this form)
+-nvc            # disable vertical alignment of = and similar symbols
 -xci            # improve indentation of nested structures

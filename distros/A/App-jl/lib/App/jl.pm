@@ -6,7 +6,7 @@ use Sub::Data::Recursive;
 use B;
 use Getopt::Long qw/GetOptionsFromArray/;
 
-our $VERSION = '0.16';
+our $VERSION = '0.20';
 
 my $MAX_RECURSIVE_CALL = 255;
 
@@ -437,7 +437,7 @@ __END__
 
 =head1 NAME
 
-App::jl - Show JSON Log Nicely
+App::jl - Show the "JSON in JSON" Log Nicely
 
 
 =head1 SYNOPSIS
@@ -452,6 +452,17 @@ See L<jl> for CLI to view logs.
 =head1 DESCRIPTION
 
 App::jl is recursive JSON in JSON decoder. It makes JSON log nice.
+
+For example,
+
+    $ echo '{"foo":"{\"bar\":\"{\\\"baz\\\":123}\"}"}' | jl
+    {
+       "foo" : {
+          "bar" : {
+             "baz" : 123
+          }
+       }
+    }
 
 
 =head1 METHODS
@@ -473,7 +484,7 @@ The main routine
 
 =begin html
 
-<a href="https://github.com/bayashi/App-jl/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic-GREEN.png"></a> <a href="http://travis-ci.org/bayashi/App-jl"><img src="https://secure.travis-ci.org/bayashi/App-jl.png?_t=1566766313"/></a> <a href="https://coveralls.io/r/bayashi/App-jl"><img src="https://coveralls.io/repos/bayashi/App-jl/badge.png?_t=1566766313&branch=master"/></a>
+<a href="https://github.com/bayashi/App-jl/blob/main/lib/App/jl.pm"><img src="https://img.shields.io/badge/Version-0.20-green?style=flat"></a> <a href="https://github.com/bayashi/App-jl/blob/main/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic-GREEN.png"></a> <a href="http://travis-ci.org/bayashi/App-jl"><img src="https://secure.travis-ci.org/bayashi/App-jl.png?_t=1640484266"/></a> <a href="https://coveralls.io/r/bayashi/App-jl"><img src="https://coveralls.io/repos/bayashi/App-jl/badge.png?_t=1640484266&branch=main"/></a>
 
 =end html
 

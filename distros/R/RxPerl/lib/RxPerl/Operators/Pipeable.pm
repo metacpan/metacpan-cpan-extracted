@@ -2,7 +2,7 @@ package RxPerl::Operators::Pipeable;
 use strict;
 use warnings;
 
-use RxPerl::Operators::Creation qw/ rx_observable rx_subject rx_concat rx_of rx_interval /;
+use RxPerl::Operators::Creation qw/ rx_observable rx_subject rx_concat rx_of rx_interval rx_combine_latest /;
 use RxPerl::ConnectableObservable;
 use RxPerl::Utils qw/ get_timer_subs /;
 use RxPerl::Subscription;
@@ -12,15 +12,15 @@ use Scalar::Util 'reftype', 'refaddr', 'blessed', 'weaken';
 
 use Exporter 'import';
 our @EXPORT_OK = qw/
-    op_audit_time op_buffer_count op_catch_error op_concat_map op_debounce_time op_delay op_distinct_until_changed
-    op_distinct_until_key_changed op_end_with op_exhaust_map op_filter op_finalize op_first op_map op_map_to
-    op_merge_map op_multicast op_pairwise op_pluck op_ref_count op_repeat op_retry op_sample_time op_scan
-    op_share op_skip op_skip_until op_start_with op_switch_map op_take op_take_until op_take_while op_tap
-    op_throttle_time op_with_latest_from
+    op_audit_time op_buffer_count op_catch_error op_combine_latest_with op_concat_map op_debounce_time op_delay
+    op_distinct_until_changed op_distinct_until_key_changed op_end_with op_exhaust_map op_filter op_finalize op_first
+    op_ignore_elements op_map op_map_to op_merge_map op_multicast op_pairwise op_pluck op_ref_count op_repeat op_retry
+    op_sample_time op_scan op_share op_skip op_skip_until op_start_with op_switch_map op_take op_take_until
+    op_take_while op_tap op_throttle_time op_with_latest_from
 /;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.10.1";
+our $VERSION = "v6.12.0";
 
 sub op_audit_time {
     my ($duration) = @_;
@@ -157,6 +157,16 @@ sub op_catch_error {
             return;
         });
     };
+}
+
+sub op_combine_latest_with {
+    my (@other_observables) = @_;
+
+    return sub {
+        my $source = shift;
+
+        return rx_combine_latest([$source, @other_observables]);
+    }
 }
 
 sub _op_concat_map_helper {
@@ -458,7 +468,10 @@ sub op_filter {
             my $idx = 0;
             $own_subscriber->{next} &&= sub {
                 my ($value) = @_;
-                my $passes = eval { $filtering_sub->($value, $idx++) };
+                my $passes = eval {
+                    local $_ = $value;
+                    $filtering_sub->($value, $idx++);
+                };
                 if (my $error = $@) {
                     $subscriber->{error}->($error);
                 } else {
@@ -506,6 +519,23 @@ sub op_first {
     };
 }
 
+sub op_ignore_elements {
+    return sub {
+        my ($source) = @_;
+
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            my %own_subscriber = %$subscriber;
+            delete $own_subscriber{next};
+
+            $source->subscribe(\%own_subscriber);
+
+            return;
+        });
+    }
+}
+
 sub op_map {
     my ($mapping_sub) = @_;
 
@@ -519,7 +549,10 @@ sub op_map {
             my $idx = 0;
             $own_subscriber->{next} &&= sub {
                 my ($value) = @_;
-                my $result = eval { $mapping_sub->($value, $idx++) };
+                my $result = eval {
+                    local $_ = $value;
+                    $mapping_sub->($value, $idx++);
+                };
                 if (my $error = $@) {
                     $subscriber->{error}->($error) if defined $subscriber->{error};
                 } else {

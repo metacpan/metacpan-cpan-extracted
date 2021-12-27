@@ -1,3 +1,7 @@
+0.04 2021-12-23
+    * Bump DBD::SQLite prerequisite to 1.44, since earlier versions don't have
+      virtual tables
+
 0.03 2021-12-15
     * Require Spreadsheet::ParseXLSX 0.24+ for testing
       to address the last 4 failures on CPAN testers

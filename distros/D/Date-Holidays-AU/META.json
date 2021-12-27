@@ -41,10 +41,15 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ]
+      "bugtracker" : {
+         "web" : "https://github.com/david-dick/date-holidays-au/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/david-dick/date-holidays-au.git",
+         "web" : "https://github.com/david-dick/date-holidays-au"
+      }
    },
-   "version" : "0.27",
+   "version" : "0.28",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

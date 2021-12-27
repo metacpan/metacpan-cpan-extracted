@@ -227,3 +227,31 @@ CODE:
   RETVAL = newRV_inc((SV *)results);
 OUTPUT:
   RETVAL
+
+SV *
+hb_buffer_get_extents( hb_font_t *font, hb_buffer_t *buf )
+INIT:
+  int n;
+  int i;
+  AV* results;
+  results = (AV *)sv_2mortal((SV *)newAV());
+CODE:
+  n = hb_buffer_get_length(buf);
+  hb_glyph_info_t *info = hb_buffer_get_glyph_infos(buf, NULL);
+  for ( i = 0; i < n; i++ ) {
+    HV * rh;
+    hb_codepoint_t gid   = info[i].codepoint;
+    rh = (HV *)sv_2mortal((SV *)newHV());
+    hb_glyph_extents_t e;
+    hb_font_get_glyph_extents(font, gid, &e);
+    hv_store(rh, "g",         1, newSViv(gid),         0);
+    hv_store(rh, "x_bearing", 9, newSViv(e.x_bearing), 0);
+    hv_store(rh, "y_bearing", 9, newSViv(e.y_bearing), 0);
+    hv_store(rh, "width",     5, newSViv(e.width),     0);
+    hv_store(rh, "height",    6, newSViv(e.height),    0);
+    av_push(results, newRV_inc((SV *)rh));
+  }
+
+  RETVAL = newRV_inc((SV *)results);
+OUTPUT:
+  RETVAL

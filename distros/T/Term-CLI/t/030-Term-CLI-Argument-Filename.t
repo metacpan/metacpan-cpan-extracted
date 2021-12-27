@@ -21,14 +21,14 @@ sub Main {
 
 package Term_CLI_Argument_Filename_test {
 
-use parent 0.228 qw( Test::Class );
+use parent 0.225 qw( Test::Class );
 
 use Test::More 1.001002;
 use Test::Exception 0.35;
 use FindBin 1.50;
 use Term::CLI::ReadLine;
 use Term::CLI::Argument::Filename;
-use File::Temp 0.2304 qw( tempdir );
+use File::Temp 0.22 qw( tempdir );
 
 my $ARG_NAME  = 'test_filename';
 my $PROG_NAME = 'test_filename';

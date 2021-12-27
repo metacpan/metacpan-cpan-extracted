@@ -2,7 +2,7 @@ package Acme::Resume;
 
 # ABSTRACT: Write a human-readable resume in Perl
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.0107';
+our $VERSION = '0.0108';
 
 use strict;
 use warnings;
@@ -54,7 +54,7 @@ Acme::Resume - Write a human-readable resume in Perl
 
 =head1 VERSION
 
-Version 0.0107, released 2021-11-30.
+Version 0.0108, released 2021-12-22.
 
 =head1 SYNOPSIS
 

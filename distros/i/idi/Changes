@@ -1,0 +1,10 @@
+Revision history for idi
+
+0.0102    2021-12-26 15:51:24 PST
+    - Fix exports.
+
+0.0101    2021-12-26 15:37:19 PST
+    - Fix documentation.
+
+0.0100    2021-12-26 15:28:14 PST
+    - Mint with Dist::Zilla.

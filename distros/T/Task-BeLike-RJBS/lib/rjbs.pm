@@ -1,4 +1,4 @@
-package rjbs 20210619.000;
+package rjbs 20211226.000;
 # ABSTRACT: all the junk that rjbs likes in his one-offs
 
 use 5.20.0;
@@ -30,7 +30,7 @@ rjbs - all the junk that rjbs likes in his one-offs
 
 =head1 VERSION
 
-version 20210619.000
+version 20211226.000
 
 =head1 OVERVIEW
 

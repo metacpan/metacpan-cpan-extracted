@@ -56,6 +56,7 @@ lib/Quiq/Eog.pm
 lib/Quiq/Epoch.pm
 lib/Quiq/ExampleCode.pm
 lib/Quiq/Excel/Writer.pm
+lib/Quiq/ExportFile.pm
 lib/Quiq/FFmpeg.pm
 lib/Quiq/File/Audio.pm
 lib/Quiq/File/Image.pm
@@ -281,6 +282,7 @@ t/bin/Quiq/Eog.t
 t/bin/Quiq/Epoch.t
 t/bin/Quiq/ExampleCode.t
 t/bin/Quiq/Excel/Writer.t
+t/bin/Quiq/ExportFile.t
 t/bin/Quiq/FFmpeg.t
 t/bin/Quiq/File/Audio.t
 t/bin/Quiq/File/Image.t

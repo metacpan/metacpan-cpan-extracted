@@ -31,7 +31,7 @@ $layout->set_font_description($font);
 #$font->set_shaping;
 $font->{underline_thickness} = 45;
 $font->{underline_position} = -100;
-$layout->set_markup( qq{<u>the <s>quick</s> <span underline="double">brown</span> fox _ jumps</u>} );
+$layout->set_markup( qq{<u>the <s>quick</s> <span underline="double" underline_color="red">brown</span> fox _ jumps</u>} );
 
 
 $layout->render( 50, 650, $text );

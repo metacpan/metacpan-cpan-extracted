@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-PMUtils",
   "EXE_FILES" => [
+    "script/cpanm-this-mod",
     "script/module-dir",
     "script/pmabstract",
     "script/pmbin",
@@ -49,12 +50,14 @@ my %WriteMakefileArgs = (
     "script/podlist",
     "script/podpath",
     "script/pwd2mod",
-    "script/rel2mod"
+    "script/rel2mod",
+    "script/update-this-mod"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::PMUtils",
   "PREREQ_PM" => {
+    "App::ThisDist" => "0.012",
     "AppBase::Grep" => "0.009",
     "Browser::Open" => 0,
     "Complete::Module" => "0.262",
@@ -92,6 +95,7 @@ my %WriteMakefileArgs = (
     "PERLANCAR::Module::List" => "0.004004",
     "Perinci::CmdLine::Any" => "0.152",
     "Perinci::CmdLine::Lite" => "1.905",
+    "Perinci::Sub::DepChecker" => 0,
     "Perinci::Sub::Util" => "0.470",
     "Perl::MinimumVersion" => 0,
     "Perl::Stripper" => 0,
@@ -111,7 +115,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.737",
+  "VERSION" => "0.738",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -119,6 +123,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "App::ThisDist" => "0.012",
   "AppBase::Grep" => "0.009",
   "Browser::Open" => 0,
   "Complete::Module" => "0.262",
@@ -158,6 +163,7 @@ my %FallbackPrereqs = (
   "PERLANCAR::Module::List" => "0.004004",
   "Perinci::CmdLine::Any" => "0.152",
   "Perinci::CmdLine::Lite" => "1.905",
+  "Perinci::Sub::DepChecker" => 0,
   "Perinci::Sub::Util" => "0.470",
   "Perl::MinimumVersion" => 0,
   "Perl::Stripper" => 0,

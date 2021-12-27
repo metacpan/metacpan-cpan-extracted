@@ -13,11 +13,15 @@ use Net::EmptyPort qw/ empty_port /;
 use FindBin qw/ $Bin /;
 
 use constant {
+    # IS_LINUX => ($^O eq 'linux') ? 1 : 0,
+    # IS_DARWIN => ($^O eq 'darwin') 1 ? : 0,
+    # IS_WIN => ($^O eq 'MSWin32') ? 1 : 0,
     IS_NOT_WIN => ($^O ne 'MSWin32') ? 1 : 0,
+    IS_NOT_WIN_AND_NOT_MACOS => ($^O ne 'MSWin32' && $^O ne 'darwin') ? 1 : 0,
 };
 
 our @EXPORT      = ();
-our @EXPORT_OK   = qw/ get_free_port get_listen_socket start_server notify_parent IS_NOT_WIN /;
+our @EXPORT_OK   = qw/ get_free_port get_listen_socket start_server notify_parent IS_NOT_WIN IS_NOT_WIN_AND_NOT_MACOS /;
 our %EXPORT_TAGS = ();
 
 our $PPID;

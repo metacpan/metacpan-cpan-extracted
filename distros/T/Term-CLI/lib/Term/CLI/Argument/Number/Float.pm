@@ -18,13 +18,13 @@
 #
 #=============================================================================
 
-package Term::CLI::Argument::Number::Float  0.052003 {
+package Term::CLI::Argument::Number::Float  0.053006 {
 
 use 5.014;
 use strict;
 use warnings;
 
-use Scalar::Util 1.38 qw( looks_like_number );
+use Scalar::Util 1.23 qw( looks_like_number );
 
 use Moo 1.000001;
 use namespace::clean 0.25;
@@ -52,7 +52,7 @@ Term::CLI::Argument::Number::Float - class for floating point arguments in Term:
 
 =head1 VERSION
 
-version 0.052003
+version 0.053006
 
 =head1 SYNOPSIS
 

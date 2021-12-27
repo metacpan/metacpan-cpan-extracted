@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -27,6 +27,10 @@ $listener->listen(
    addr => { family => "inet" },
 )->get;
 
+# Some OSes don't like connect()ing to 0.0.0.0
+( my $listenhost = $listener->read_handle->sockhost ) =~ s/^0\.0\.0\.0$/127.0.0.1/;
+my $listenport = $listener->read_handle->sockport;
+
 my @errors;
 
 my $irc = Net::Async::IRC->new(
@@ -50,8 +54,8 @@ ok( !$irc->is_connected, 'not $irc->is_connected' );
 $irc->connect(
    addr => {
       family => "inet",
-      ip     => $listener->read_handle->sockhost,
-      port   => $listener->read_handle->sockport,
+      ip     => $listenhost,
+      port   => $listenport,
    },
 )->get;
 
@@ -84,8 +88,8 @@ $read_f = $client->read_until( qr/$CRLF.*$CRLF/ );
 wait_for { $read_f->is_ready };
 
 is( scalar $read_f->get,
-   "USER defaultuser 0 * :Default Real name$CRLF" .
-      "NICK MyNick$CRLF",
+   "NICK MyNick$CRLF" .
+   "USER defaultuser 0 * :Default Real name$CRLF",
    'Server stream after login' );
 
 $client->write( ":irc.example.com 001 MyNick :Welcome to IRC MyNick!defaultuser\@your.host.here$CRLF" );

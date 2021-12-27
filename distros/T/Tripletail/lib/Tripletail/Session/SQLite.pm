@@ -2,7 +2,7 @@ package Tripletail::Session::SQLite;
 use strict;
 use warnings;
 use Tripletail;
-our @ISA = qw(Tripletail::Session);
+use base 'Tripletail::Session::DB';
 
 sub _insertSid {
     my $this        = shift;
@@ -24,63 +24,27 @@ sub _insertSid {
     return $DB->getLastInsertId(\$this->{dbset});
 }
 
-sub _deleteSid {
-    my $this = shift;
-    my $sid  = shift;
-
-    my $DB   = $TL->getDB($this->{dbgroup});
-    my $type = $DB->getType;
-
-    $DB->execute(
-        \$this->{dbset},
-        sprintf(
-            q{UPDATE %s
-                 SET checkval    = 'x',
-                     checkvalssl = 'x',
-                     data        = NULL,
-                     updatetime  = CURRENT_TIME
-               WHERE sid = ?},
-            $DB->symquote($this->{sessiontable}, $this->{dbset})),
-        $sid);
-
-    return $this;
-}
-
 sub _createSessionTable {
     my $this = shift;
 
-    my $DB = $TL->getDB($this->{dbgroup});
-
-    $TL->eval(
-        sub {
-            $DB->execute(
-                \$this->{readdbset},
-                sprintf(
-                    q{SELECT * FROM %s LIMIT 0},
-                    $DB->symquote($this->{sessiontable}, $this->{readdbset})));
-        });
-    if ($@) {
-        # sqlite3: 9223372036854775807. (64bit/signed)
-        my $table = $DB->symquote($this->{sessiontable}         , $this->{dbset});
-        my $index = $DB->symquote($this->{sessiontable} . '_idx', $this->{dbset});
-        $DB->execute(
-            \$this->{dbset},
-            sprintf(
-                q{CREATE TABLE %s (
-                      sid         INTEGER NOT NULL,
-                      checkval    BLOB    NOT NULL,
-                      checkvalssl BLOB    NOT NULL,
-                      data        BLOB,
-                      updatetime  TIMESTAMP NOT NULL,
-
-                      PRIMARY KEY (sid)
-                  )}, $table));
-        $DB->execute(
-            \$this->{dbset},
-            sprintf(
-                q{CREATE INDEX %s ON %s (updatetime)},
-                $index, $table));
-    }
+    my $DB    = $TL->getDB($this->{dbgroup});
+    my $table = $DB->symquote($this->{sessiontable}         , $this->{dbset});
+    my $index = $DB->symquote($this->{sessiontable} . '_idx', $this->{dbset});
+    $DB->execute(
+        \$this->{dbset},
+        sprintf(
+            q{CREATE TABLE IF NOT EXISTS %s (
+                  sid         INTEGER PRIMARY KEY AUTOINCREMENT,
+                  checkval    BLOB    NOT NULL,
+                  checkvalssl BLOB    NOT NULL,
+                  data        BLOB,
+                  updatetime  TIMESTAMP NOT NULL
+              )}, $table));
+    $DB->execute(
+        \$this->{dbset},
+        sprintf(
+            q{CREATE INDEX IF NOT EXISTS %s ON %s (updatetime)},
+            $index, $table));
 
     return $this;
 }

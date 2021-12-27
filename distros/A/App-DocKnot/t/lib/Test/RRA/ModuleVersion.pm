@@ -29,7 +29,7 @@ BEGIN {
     # This version should match the corresponding rra-c-util release, but with
     # two digits for the minor version, including a leading zero if necessary,
     # so that it will sort properly.
-    $VERSION = '9.01';
+    $VERSION = '10.01';
 }
 
 # A regular expression matching the version string for a module using the
@@ -135,7 +135,7 @@ sub _update_module_version {
     }
 
     # Scan for the version and replace it.
-    open(my $in,  q{<}, $file) or die "$0: cannot open $file: $!\n";
+    open(my $in, q{<}, $file) or die "$0: cannot open $file: $!\n";
     open(my $out, q{>}, "$file.new")
       or die "$0: cannot create $file.new: $!\n";
   SCAN:
@@ -151,8 +151,8 @@ sub _update_module_version {
 
     # Copy the rest of the input file to the output file.
     print {$out} <$in> or die "$0: cannot write to $file.new: $!\n";
-    close($out)        or die "$0: cannot flush $file.new: $!\n";
-    close($in)         or die "$0: error reading from $file: $!\n";
+    close($out) or die "$0: cannot flush $file.new: $!\n";
+    close($in) or die "$0: error reading from $file: $!\n";
 
     # All done.  Rename the new file over top of the old file.
     rename("$file.new", $file)

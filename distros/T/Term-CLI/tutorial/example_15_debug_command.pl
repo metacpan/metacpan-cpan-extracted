@@ -2,9 +2,11 @@
 
 use 5.014;
 use warnings;
+
 use FindBin;
 use lib ("$FindBin::Bin/../lib");
 use Data::Dumper;
+
 use Term::CLI;
 
 $SIG{INT} = 'IGNORE';
@@ -25,7 +27,7 @@ push @commands, Term::CLI::Command->new(
     callback => sub {
         my ($cmd, %args) = @_;
         return %args if $args{status} < 0;
-        execute_exit($cmd->name, @{$args{arguments}});
+        execute_exit($cmd, @{$args{arguments}});
         return %args;
     },
     arguments => [
@@ -42,7 +44,7 @@ push @commands, Term::CLI::Command->new(
 sub execute_exit {
     my ($cmd, $excode) = @_;
     $excode //= 0;
-    say "-- $cmd: $excode";
+    say "-- exit: $excode";
     exit $excode;
 }
 
@@ -155,16 +157,13 @@ push @commands, Term::CLI::Command->new(
 
         say "-- sleep: $time";
 
-        my %oldsig = %::SIG; # Save signals;
-
         # Make sure we can interrupt the sleep() call.
-        $::SIG{INT} = $::SIG{QUIT} = sub {
-            say STDERR "(interrupted by $_[0])";
+        my $slept = do {
+            local($::SIG{INT}) = local($::SIG{QUIT}) = sub {
+                say STDERR "(interrupted by $_[0])";
+            };
+            sleep($time);
         };
-
-        my $slept = sleep($time);
-
-        %::SIG = %oldsig; # Restore signal handlers.
 
         say "-- woke up after $slept sec", $slept == 1 ? '' : 's';
         return %args;
@@ -350,4 +349,4 @@ while ( defined(my $line = $term->readline) ) {
     $term->execute($line);
 }
 print "\n";
-execute_exit('exit', 0);
+execute_exit($term, 0);

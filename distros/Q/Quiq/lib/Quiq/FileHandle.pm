@@ -26,6 +26,13 @@ Datei lesen:
   }
   $fh->close;
 
+Programm darf nur einmal laufen:
+
+  my $fh = eval{Quiq::FileHandle->new('<',$file,-lock=>'EXNB')};
+  if ($@) {
+      exit 5;
+  }
+
 Zähler-Datei mit Locking:
 
   my $fh = Quiq::FileHandle->new('+>>',$file,-lock=>'EX');
@@ -56,7 +63,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.196';
+our $VERSION = '1.197';
 
 use Quiq::Path;
 use Quiq::Option;
@@ -953,7 +960,7 @@ sub slurpFromStdin {
 
 =head1 VERSION
 
-1.196
+1.197
 
 =head1 AUTHOR
 

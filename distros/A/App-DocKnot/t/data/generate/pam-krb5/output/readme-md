@@ -1,14 +1,17 @@
 # pam-krb5
 
+[![Build
+status](https://github.com/rra/pam-krb5/workflows/build/badge.svg)](https://github.com/rra/pam-krb5/actions)
 [![Debian
 package](https://img.shields.io/debian/v/libpam-krb5/unstable)](https://tracker.debian.org/pkg/libpam-krb5)
 
-Copyright 2005-2010, 2014-2015, 2017 Russ Allbery <eagle@eyrie.org>.
-Copyright 2009-2011 The Board of Trustees of the Leland Stanford Junior
-University.  Copyright 2005 Andres Salomon <dilinger@debian.org>.
-Copyright 1999-2000 Frank Cusack <fcusack@fcusack.com>.  This software is
-distributed under a BSD-style license.  Please see the section
-[License](#license) below for more information.
+Copyright 2005-2010, 2014-2015, 2017, 2020-2021 Russ Allbery
+<eagle@eyrie.org>.  Copyright 2009-2011 The Board of Trustees of the
+Leland Stanford Junior University.  Copyright 2005 Andres Salomon
+<dilinger@debian.org>.  Copyright 1999-2000 Frank Cusack
+<fcusack@fcusack.com>.  This software is distributed under a BSD-style
+license.  Please see the section [License](#license) below for more
+information.
 
 ## Blurb
 
@@ -55,20 +58,22 @@ not been tested with earlier versions.
 
 For PKINIT support, Heimdal 0.8rc1 or later or MIT Kerberos 1.6.3 or later
 are required.  Earlier MIT Kerberos 1.6 releases have a bug in their
-handling of PKINIT options.
+handling of PKINIT options.  MIT Kerberos 1.12 or later is required to use
+the use_pkinit PAM option.
 
 For FAST (Flexible Authentication Secure Tunneling) support, MIT Kerberos
 1.7 or higher is required.  For anonymous FAST support, anonymous
 authentication (generally anonymous PKINIT) support is required in both
 the Kerberos libraries and in the local KDC.
 
-This module should work on Linux and Solaris (and build with gcc, clang,
-or the Sun C compiler), but has been far more heavily tested on Linux.
-There is beta-quality support for the AIX NAS Kerberos implementation.
-Other PAM implementations will probably require some porting, although
-untested build system support is present for FreeBSD, Mac OS X, and HP-UX.
-I personally can only test on Linux and rely on others to report problems
-on other operating systems.
+This module should work on Linux and build with gcc or clang.  It may
+still work on Solaris and build with the Sun C compiler, but I have only
+tested it on Linux recently.  There is beta-quality support for the AIX
+NAS Kerberos implementation that has not been tested in years.  Other PAM
+implementations will probably require some porting, although untested
+build system support is present for FreeBSD, Mac OS X, and HP-UX.  I
+personally can only test on Linux and rely on others to report problems on
+other operating systems.
 
 Old versions of OpenSSH are known to call `pam_authenticate` followed by
 `pam_setcred(PAM_REINITIALIZE_CRED)` without first calling
@@ -108,14 +113,14 @@ probably have to be done as root.  Building outside of the source
 directory is also supported, if you wish, by creating an empty directory
 and then running configure with the correct relative path.
 
-The module will be installed in `/usr/local/lib/security` by default,
-except on 64-bit versions of Linux which will use
-`/usr/local/lib64/security` to match the default PAM configuration.  You
-can change the installation locations with the `--prefix`, `--mandir`, and
-`--libdir` options to configure.  The module will always be installed in a
-subdirectory named `security` under the specified libdir.  On Linux, use
-`--prefix=/usr` to install the man page into `/usr/share/man` and the PAM
-module in `/lib/security` or `/lib64/security`.
+The module will be installed in `/usr/local/lib/security` by default, but
+expect to have to override this using `--libdir`.  The correct
+installation path for PAM modules varies considerably between systems.
+The module will always be installed in a subdirectory named `security`
+under the specified value of `--libdir`.  On Red Hat Linux, for example,
+`--libdir=/usr/lib64` is appropriate to install the module into the system
+PAM directory.  On Debian's amd64 architecture,
+`--libdir=/usr/lib/x86_64-linux-gnu` would be correct.
 
 Normally, configure will use `krb5-config` to determine the flags to use
 to compile with your Kerberos libraries.  To specify a particular
@@ -207,6 +212,22 @@ Several `module/expired` tests are expected to fail with Heimdal 1.5 due
 to a bug in Heimdal with reauthenticating immediately after a
 library-mediated password change of an expired password.  This is fixed in
 later releases of Heimdal.
+
+To run the full test suite, Perl 5.10 or later is required.  The following
+additional Perl modules will be used if present:
+
+* Test::Pod
+* Test::Spelling
+
+All are available on CPAN.  Those tests will be skipped if the modules are
+not available.
+
+To enable tests that don't detect functionality problems but are used to
+sanity-check the release, set the environment variable `RELEASE_TESTING`
+to a true value.  To enable tests that may be sensitive to the local
+environment or that produce a lot of false positives without uncovering
+many problems, set the environment variable `AUTHOR_TESTING` to a true
+value.
 
 ## Configuring
 
@@ -586,7 +607,7 @@ requests are gratefully reviewed and normally accepted.
 The pam-krb5 package as a whole is covered by the following copyright
 statement and license:
 
-> Copyright 2005-2010, 2014-2015, 2017
+> Copyright 2005-2010, 2014-2015, 2017, 2020-2021
 >     Russ Allbery <eagle@eyrie.org>
 >
 > Copyright 2009-2011

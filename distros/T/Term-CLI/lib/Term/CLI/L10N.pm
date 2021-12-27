@@ -16,13 +16,13 @@
 #
 #=============================================================================
 
-package Term::CLI::L10N  0.052003 {
+package Term::CLI::L10N  0.053006 {
 
 use 5.014;
 use strict;
 use warnings;
 
-use parent 0.228 qw( Locale::Maketext Exporter );
+use parent 0.225 qw( Locale::Maketext Exporter );
 
 BEGIN {
     our @EXPORT_OK   = qw( __ loc );
@@ -73,7 +73,7 @@ Term::CLI::L10N - localizations for Term::CLI
 
 =head1 VERSION
 
-version 0.052003
+version 0.053006
 
 =head1 SYNOPSIS
 

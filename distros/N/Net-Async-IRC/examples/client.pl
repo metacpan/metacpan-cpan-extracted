@@ -1,18 +1,21 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
+
+use Future::AsyncAwait 0.47; # toplevel await
 
 use Data::Dump 'pp';
 use Getopt::Long;
 
-use Future::Utils qw( repeat );
 use IO::Async::Loop;
 use Net::Async::IRC;
 
 GetOptions(
    'server|s=s' => \my $SERVER,
    'nick|n=s'   => \my $NICK,
+   'pass=s'     => \my $PASS,
+   'sasl'       => \my $USE_SASL,
    'port|p=i'   => \my $PORT,
    'SSL|S'      => \my $SSL,
 ) or exit 1;
@@ -31,39 +34,42 @@ my $irc = Net::Async::IRC->new(
 
       return 1;
    },
+   use_caps => [
+      ( $USE_SASL ? "sasl" : () ),
+   ],
 );
 $loop->add( $irc );
 
 $PORT //= ( $SSL ? 6697 : 6667 );
 
-$irc->connect(
+await $irc->connect(
    host    => $SERVER,
    service => $PORT,
    ( $SSL ?
       ( extensions => ['SSL'],
         SSL_verify_mode => 0 ) :
       () ),
-)->get;
+);
 
 print "Connected...\n";
 
-$irc->login(
+await $irc->login(
    nick => $NICK,
-)->get;
+   pass => $PASS,
+);
 
 print "Now logged in...\n";
 
 my $stdin = IO::Async::Stream->new_for_stdin( on_read => sub {} );
 $loop->add( $stdin );
 
-my $eof;
-( repeat {
-   $stdin->read_until( "\n" )->on_done( sub {
-      ( my $line, $eof ) = @_;
-      return if $eof;
+while(1) {
+   my ( $line, $eof ) = await $stdin->read_until( "\n" );
+   last if $eof;
 
-      chomp $line;
-      my $message = Protocol::IRC::Message->new_from_line( $line );
-      $irc->send_message( $message );
-   });
-} while => sub { !$_[0]->failure and !$eof } )->get;
+   chomp $line;
+   next if !length $line;
+
+   my $message = Protocol::IRC::Message->new_from_line( $line );
+   $irc->send_message( $message );
+}

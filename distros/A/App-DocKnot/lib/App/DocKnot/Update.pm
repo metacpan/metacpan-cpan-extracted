@@ -9,7 +9,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Update 5.00;
+package App::DocKnot::Update 6.00;
 
 use 5.024;
 use autodie;
@@ -136,8 +136,8 @@ sub _config_from_json {
     eval { $data_ref->{license}{notices} = $self->_load_metadata('notices') };
 
     # Load the standard sections.
-    $data_ref->{blurb}        = $self->_load_metadata('blurb');
-    $data_ref->{description}  = $self->_load_metadata('description');
+    $data_ref->{blurb} = $self->_load_metadata('blurb');
+    $data_ref->{description} = $self->_load_metadata('description');
     $data_ref->{requirements} = $self->_load_metadata('requirements');
 
     # Load optional information if it exists.
@@ -182,7 +182,7 @@ sub new {
     # Create and return the object.
     my $self = {
         metadata => $metadata,
-        output   => $args_ref->{output} // 'docs/docknot.yaml',
+        output => $args_ref->{output} // 'docs/docknot.yaml',
     };
     bless($self, $class);
     return $self;
@@ -265,7 +265,7 @@ sub update {
 
     # Check the schema of the resulting file.
     my $schema_path = $self->appdata_path('schema/docknot.yaml');
-    my $schema_ref  = YAML::XS::LoadFile($schema_path);
+    my $schema_ref = YAML::XS::LoadFile($schema_path);
     eval { validate($schema_ref, $data_ref) };
     if ($@) {
         my $errors = $@;

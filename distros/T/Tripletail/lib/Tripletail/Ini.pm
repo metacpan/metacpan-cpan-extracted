@@ -5,470 +5,640 @@ package Tripletail::Ini;
 use strict;
 use warnings;
 use File::Basename qw(dirname);
+use Fcntl qw(LOCK_EX LOCK_SH);
+use Tripletail::Ini::Group;
 
 # NOTE: Importing Tripletail here leads to a circular dependency so we
-# have to break it by letting Tripletail#newIni to fill this
-# package-global variable $TL.
-our $TL;
+# have to break it.
+my $TL = $Tripletail::TL;
+
+my $re_annotated_group
+  = qr{
+          ([^:@]+)             # base name
+          (?:
+              :
+              ([^:@]+?)         # variant tag
+          )?
+          (?:
+              \@server:([^:@]+?) # local-host constraint
+          )?
+          (?:
+              \@remote:([^:@]+?) # remote-host constraint
+          )?
+  }x;
+
+my $re_group_start
+  = qr{
+          \[ ($re_annotated_group) \]
+  }x;
+
+my $re_key_value_pair
+  = qr{
+          (.+?)             # key
+          \s* = \s*
+          (.*?)             # value
+  }x;
 
 1;
 
+sub __setEnabledTags {
+    my $pkg = shift;
+
+    Tripletail::Ini::Group::Annotation->setEnabledTags(@_);
+
+    return;
+}
+
+sub _parseAnnotatedGroup {
+    my $pkg = shift;
+    my $str = shift;
+
+    if ($str =~ m/^$re_annotated_group$/o) {
+        my ($base, $tag, $local, $remote) = ($1, $2, $3, $4);
+        my $anno = Tripletail::Ini::Group::Annotation->new($2, $3, $4);
+
+        return ($base, $anno);
+    }
+    else {
+        return;
+    }
+}
+
+use fields qw(group_for groups is_const file_path);
 sub _new {
-	my $pkg = shift;
-	my $this = {};
-	bless $this, $pkg;
+    my Tripletail::Ini $this = shift;
 
-	$this->{filename} = undef;
-	$this->{ini} = {};
-	$this->{order} = {};
+    if (!ref $this) {
+        $this = fields::new($this);
+    }
 
-	if (scalar(@_)) {
-		$this->read(@_);
-	}
+    $this->{group_for} = {};    # {basename => Group}
+    $this->{groups   } = [];    # [Group]
+    $this->{is_const } = undef;
+    $this->{file_path} = undef;
 
-	$this;
+    if (scalar @_) {
+        $this->read(@_);
+    }
+
+    return $this;
 }
 
 sub const {
-	my $this = shift;
-	$this->{const} = 1;
-	$this;
+    my Tripletail::Ini $this = shift;
+
+    $this->{is_const} = 1;
+
+    return $this;
+}
+
+sub getFilePath {
+    my Tripletail::Ini $this = shift;
+
+    if (defined $this->{file_path}) {
+        return $this->{file_path};
+    }
+    else {
+        return;
+    }
 }
 
 sub read {
-	my $this = shift;
-	my $filename = shift;
+    my Tripletail::Ini $this = shift;
+    my $fpath                = shift;
 
-	%{$this->{ini}} = ();
-	%{$this->{order}} = ();
-	
-	my $fh = $TL->_gensym;
-	if(!open($fh, "$filename")) {
-		die __PACKAGE__."#read: failed to open a file to read. [$filename] ($!) (ファイルを読めません)\n";
-	}
+    if (!defined $fpath) {
+        die __PACKAGE__."#read: arg[1] is not defined. (第1引数が指定されていません)\n";
+    }
+    if ($this->{is_const}) {
+        die __PACKAGE__."#read: This object is marked as a constant. ".
+          "(このIniオブジェクトの内容は変更できません)\n";
+    }
 
-	binmode($fh);
-	flock($fh, 1);
-	seek($fh, 0, 0);
-	my $group = '';
-	while(<$fh>) {
-		next if(m/^#/);
-		s/^\s+//;
-		s/\s+$//;
-		next if(m/^$/);
-		if(m/^\[(.+)\]$/) {
-			$group = $1;
-		} else {
-			my ($key, $value) = split(/\s*=\s*/, $_, 2);
-			if(defined($group) && defined($key) && defined ($value)) {
-				if(!exists($this->{ini}{$group})) {
-					push(@{$this->{order}{group}},$group);
-				}
-				if(!exists($this->{ini}{$group}{$key})) {
-					$this->{ini}{$group}{$key} = $value;
-					push(@{$this->{order}{key}{$group}},$key);
-				}
-			} else {
-				die __PACKAGE__."#read: syntax error in the ini. line [$.] (INIファイルの形式が不正です)\n";
-			}
-		}
-	}
-	close($fh);
+    $this->_clear();
 
-	$this->{filename} = $filename;
-	$this;
+    open my $fh, '<', $fpath
+      or
+        die __PACKAGE__."#read: failed to open the file to read. [$fpath] ".
+          "($!) (ファイルを読めません)\n";
+
+    flock $fh, LOCK_SH
+      or
+        die __PACKAGE__."#read: failed to acquire a shared lock on file. ".
+          "[$fpath] ($!) (ファイルの共有ロックに失敗しました)\n";
+
+    binmode $fh
+      or
+        die __PACKAGE__."#read: failed to change the mode of file handle. ".
+          "[$fpath] ($!) (ファイルのバイナリモード変更に失敗しました)\n";
+
+    my Tripletail::Ini::Group::Variant $variant;
+    while (defined(my $line = <$fh>)) {
+        next if $line =~ m/^#/;
+        $line =~ s/^\s+//;
+        $line =~ s/\s+$//;
+        next if !length $line;
+
+        if ($line =~ m/^$re_group_start$/o and
+              my ($base, $anno) = __PACKAGE__->_parseAnnotatedGroup($1)) {
+
+            my $group = $this->_touchGroup($base);
+            $variant  = $group->touchVariant($anno);
+        }
+        elsif ($line =~ m/^$re_key_value_pair$/o and defined $variant) {
+            $variant->set($1 => $2);
+        }
+        else {
+            die __PACKAGE__."#read: syntax error at line ${.}. [$line] ".
+              "(INIファイルの形式が不正です)\n";
+        }
+    }
+
+    $this->{file_path} = $fpath;
+    return $this;
 }
 
 sub write {
-	my $this = shift;
-	my $filename = shift;
+    my Tripletail::Ini $this = shift;
+    my $fpath                = shift;
 
-	my $fh = $TL->_gensym;
-	if(!open($fh, ">$filename")) {
-		die __PACKAGE__."#write: failed to open a file to write. [$filename] ($!) (ファイルに書けません)\n";
-	}
+    if (!defined $fpath) {
+        die __PACKAGE__."#write: arg[1] is not defined. (第1引数が指定されていません)\n";
+    }
 
-	binmode($fh);
-	flock($fh, 2);
-	seek($fh, 0, 0);
-	foreach my $group (@{$this->{order}{group}}) {
-		print $fh "[$group]\n";
-		foreach my $key (@{$this->{order}{key}{$group}}) {
-			print $fh "$key = " . $this->{ini}{$group}{$key} . "\n";
-		}
-		print $fh "\n";
-	}
-	close($fh);
+    open my $fh, '>', $fpath
+      or
+        die __PACKAGE__."#write: failed to open the file to write. ".
+          "[$fpath] ($!) (ファイルに書けません)\n";
 
-	$this;
+    flock $fh, LOCK_EX
+      or
+        die __PACKAGE__."#write: failed to acquire an exclusive lock on file. ".
+          "[$fpath] ($!) (ファイルの排他的ロックに失敗しました)\n";
+
+    binmode $fh
+      or
+        die __PACKAGE__."#write: failed to change the mode of file handle. ".
+          "[$fpath] ($!) (ファイルのバイナリモード変更に失敗しました)\n";
+
+    my $is_first = 1;
+    foreach my Tripletail::Ini::Group $group (@{ $this->{groups} }) {
+        if ($is_first) {
+            $is_first = undef;
+        }
+        else {
+            print {$fh} "\n";
+        }
+
+        print {$fh} $group->toStr;
+    }
+
+    return $this;
+}
+
+sub _clear {
+    my Tripletail::Ini $this = shift;
+
+    %{ $this->{group_for} } = ();
+    @{ $this->{groups   } } = ();
+    $this->{file_path}      = undef;
+
+    return $this;
+}
+
+sub _touchGroup {
+    my Tripletail::Ini $this = shift;
+    my $base                 = shift;
+
+    if (exists $this->{group_for}{$base}) {
+        return $this->{group_for}{$base};
+    }
+    else {
+        my $group = Tripletail::Ini::Group->new($base);
+
+        $this->{group_for}{$base} = $group;
+        push @{ $this->{groups} }, $group;
+
+        return $group;
+    }
 }
 
 sub existsGroup {
-	my $this = shift;
-	my $group = shift;
-	my $raw = shift;
+    my Tripletail::Ini $this = shift;
+    my $name                 = shift;
+    my $raw                  = shift;
 
-	if(!defined($group)) {
-		die __PACKAGE__."#existsGroup: arg[1] is not defined. (第1引数が指定されていません)\n";
-	} elsif(ref($group)) {
-		die __PACKAGE__."#existsGroup: arg[1] is a reference. [$group] (第1引数がリファレンスです)\n";
-	}
+    if (!defined $name) {
+        die __PACKAGE__."#existsGroup: arg[1] is not defined. ".
+          "(第1引数が指定されていません)\n";
+    }
+    elsif (ref $name) {
+        die __PACKAGE__."#existsGroup: arg[1] is a reference. [$name] ".
+          "(第1引数がリファレンスです)\n";
+    }
 
-	$group = ($this->_getrawgroupname($group))[0] if(!$raw);
+    if ($raw) {
+        if (my ($base, $anno) = __PACKAGE__->_parseAnnotatedGroup($name)) {
+            if (exists $this->{group_for}{$base}) {
+                if ($this->{group_for}{$base}->hasVariant($anno)) {
+                    return 1;
+                }
+            }
+        }
+    }
+    elsif (exists $this->{group_for}{$name}) {
+        my $hosts = $this->{group_for}{HOST};
 
-	return 0 if(!defined($group));
+        if ($this->{group_for}{$name}->filterVariants($hosts)) {
+            return 1;
+        }
+    }
 
-	if(exists($this->{ini}{$group})) {
-		return 1;
-	} else {
-		return 0;
-	}
+    return;
 }
 
 sub existsKey {
-	my $this = shift;
-	my $group = shift;
-	my $key = shift;
-	my $raw = shift;
+    my Tripletail::Ini $this = shift;
+    my $name                 = shift;
+    my $key                  = shift;
+    my $raw                  = shift;
 
-	if(!defined($group)) {
-		die __PACKAGE__."#existsKey: arg[1] is not defined. (第1引数が指定されていません)\n";
-	} elsif(ref($group)) {
-		die __PACKAGE__."#existsKey: arg[1] is a reference. [$group] (第1引数がリファレンスです)\n";
-	}
-	if(!defined($key)) {
-		die __PACKAGE__."#existsKey: arg[2] is not defined. (第2引数が指定されていません)\n";
-	} elsif(ref($key)) {
-		die __PACKAGE__."#existsKey: arg[2] is a reference. [$key] (第2引数がリファレンスです)\n";
-	}
+    if (!defined $name) {
+        die __PACKAGE__."#existsKey: arg[1] is not defined. (第1引数が指定されていません)\n";
+    }
+    elsif (ref $name) {
+        die __PACKAGE__."#existsKey: arg[1] is a reference. [$name] ".
+          "(第1引数がリファレンスです)\n";
+    }
+    if (!defined $key) {
+        die __PACKAGE__."#existsKey: arg[2] is not defined. (第2引数が指定されていません)\n";
+    }
+    elsif (ref $key) {
+        die __PACKAGE__."#existsKey: arg[2] is a reference. [$key] ".
+          "(第2引数がリファレンスです)\n";
+    }
 
-	my @group;
-	if($raw) {
-		push(@group,$group);
-	} else {
-		@group = $this->_getrawgroupname($group);
-	}
+    if ($raw) {
+        if (my ($base, $anno) = __PACKAGE__->_parseAnnotatedGroup($name)) {
+            if (exists $this->{group_for}{$base}) {
+                my $variant = $this->{group_for}{$base}->getVariant($anno);
 
-	foreach my $groupname (@group) {
-		if(exists($this->{ini}{$groupname}{$key})) {
-			return 1;
-		}
-	}
+                if (defined $variant and $variant->exists($key)) {
+                    return 1;
+                }
+            }
+        }
+    }
+    elsif (exists $this->{group_for}{$name}) {
+        my $hosts    = $this->{group_for}{HOST};
+        my @variants = $this->{group_for}{$name}->filterVariants($hosts);
 
-	undef;
+        foreach my $variant (@variants) {
+            if ($variant->exists($key)) {
+                return 1;
+            }
+        }
+    }
+
+    return;
 }
 
 sub getGroups {
-	my $this = shift;
-	my $raw = shift;
-	
-	my @groups;
-	
-	if($raw) {
-		foreach my $group (@{$this->{order}{group}}) {
-			push(@groups,$group);
-		}
-	} else {
-		foreach my $group (@{$this->{order}{group}}) {
-			$group =~ /^([^:]+)/;
-			foreach my $groupname ($this->_getrawgroupname($1)) {
-				$groupname =~ /^([^:]+)/;
-				push(@groups,$1);
-			}
-		}
-	}
+    my Tripletail::Ini $this = shift;
+    my $raw                  = shift;
 
-	@groups;
+    my $hosts = $this->{group_for}{HOST};
+    my @names;
+    foreach my $group (@{ $this->{groups} }) {
+        if ($raw) {
+            foreach my $variant ($group->variants) {
+                push @names, $group->basename . $variant->annotation;
+            }
+        }
+        elsif ($group->filterVariants($hosts)) {
+            push @names, $group->basename;
+        }
+    }
+
+    return @names;
 }
 
 sub getKeys {
-	my $this = shift;
-	my $group = shift;
-	my $raw = shift;
+    my Tripletail::Ini $this = shift;
+    my $name                 = shift;
+    my $raw                  = shift;
 
-	if(!defined($group)) {
-		die __PACKAGE__."#getKeys: arg[1] is not defined. (第1引数が指定されていません)\n";
-	} elsif(ref($group)) {
-		die __PACKAGE__."#getKeys: arg[1] is a reference. [$group] (第1引数がリファレンスです)\n";
-	}
+    if (!defined $name) {
+        die __PACKAGE__."#getKeys: arg[1] is not defined. (第1引数が指定されていません)\n";
+    }
+    elsif (ref $name) {
+        die __PACKAGE__."#getKeys: arg[1] is a reference. [$name] ".
+          "(第1引数がリファレンスです)\n";
+    }
 
-	my @group;
-	if($raw) {
-		push(@group,$group);
-	} else {
-		@group = $this->_getrawgroupname($group);
-	}
+    if ($raw) {
+        if (my ($base, $anno) = __PACKAGE__->_parseAnnotatedGroup($name)) {
+            if (exists $this->{group_for}{$base}) {
+                my $variant = $this->{group_for}{$base}->getVariant($anno);
 
-	my @result;
-	my %occurence;
-	foreach my $groupname (@group) {
-		foreach my $key (@{$this->{order}{key}{$groupname}}) {
-			if(!$occurence{$key}) {
-				push(@result,$key);
-				$occurence{$key} = 1;
-			}
-		}
-	}
+                if (defined $variant) {
+                    return $variant->keys;
+                }
+            }
+        }
+    }
+    elsif (exists $this->{group_for}{$name}) {
+        my $hosts    = $this->{group_for}{HOST};
+        my @variants = $this->{group_for}{$name}->filterVariants($hosts);
 
-	@result;
+        my @keys;
+        my %seen;
+        foreach my $variant (@variants) {
+            foreach my $key ($variant->keys) {
+                if (!exists $seen{$key}) {
+                    push @keys, $key;
+                    $seen{$key} = 1;
+                }
+            }
+        }
+        return @keys;
+    }
+
+    return;
 }
 
 sub get {
-	my $this    = shift;
-	my $group   = shift;
-	my $key     = shift;
+    my Tripletail::Ini $this = shift;
+    my $name                 = shift;
+    my $key                  = shift;
+    my $default_ref          = @_ ? \shift : undef;
+    my $raw                  = shift;
 
-	if(!defined($group)) {
-		die __PACKAGE__."#get: arg[1] is not defined. (第1引数が指定されていません)\n";
-	} elsif(ref($group)) {
-		die __PACKAGE__."#get: arg[1] is a reference. [$group] (第1引数がリファレンスです)\n";
-	}
-	if(!defined($key)) {
-		die __PACKAGE__."#get: arg[2] is not defined. (第2引数が指定されていません)\n";
-	} elsif(ref($key)) {
-		die __PACKAGE__."#get: arg[2] is a reference. [$key] (第2引数がリファレンスです)\n";
-	}
-
-    my $default_ref = do {
-        if (@_) {
-            \(shift);
-        }
-        else {
-            undef;
-        }
-    };
-
-    my @group = do {
-        if (@_) {
-            my $raw = shift;
-            if ($raw) {
-                $group;
-            }
-            else {
-                $this->_getrawgroupname($group);
-            }
-        }
-        else {
-            $this->_getrawgroupname($group);
-        }
-    };
-
-	my $result;
-	foreach my $groupname (@group) {
-		if(exists($this->{ini}{$groupname}) && exists($this->{ini}{$groupname}{$key})) {
-			$result = $this->{ini}{$groupname}{$key};
-			last;
-		}
-	}
-
-    if (defined $result) {
-        return $result;
+    if (!defined $name) {
+        die __PACKAGE__."#get: arg[1] is not defined. (第1引数が指定されていません)\n";
     }
-    elsif (defined $default_ref) {
+    elsif (ref $name) {
+        die __PACKAGE__."#get: arg[1] is a reference. [$name] ".
+          "(第1引数がリファレンスです)\n";
+    }
+    if (!defined $key) {
+        die __PACKAGE__."#get: arg[2] is not defined. (第2引数が指定されていません)\n";
+    }
+    elsif (ref $key) {
+        die __PACKAGE__."#get: arg[2] is a reference. [$key] (第2引数がリファレンスです)\n";
+    }
+
+    my @variants;
+    if ($raw) {
+        if (my ($base, $anno) = __PACKAGE__->_parseAnnotatedGroup($name)) {
+            my $variant = $this->{group_for}{$base}->getVariant($anno);
+
+            if (defined $variant) {
+                @variants = ($variant);
+            }
+        }
+    }
+    elsif (exists $this->{group_for}{$name}) {
+        my $hosts = $this->{group_for}{HOST};
+        @variants = $this->{group_for}{$name}->filterVariants($hosts);
+    }
+
+    foreach my $variant (@variants) {
+        if (defined(my $value = $variant->get($key))) {
+            return $value;
+        }
+    }
+
+    if (defined $default_ref) {
         return $$default_ref;
     }
     else {
-        my $undef_if_absent = $TL->INI->get(Ini => treat_absent_values_as_undef => 'false');
+        my $undef_if_absent
+          = $TL->INI->get(Ini => treat_absent_values_as_undef => 'false');
+
         if ($undef_if_absent eq 'true') {
             return;
         }
         else {
-            die __PACKAGE__."#get: Either group [$group] or key [$key] is absent but no default values are provided (file=".(defined($this->{filename})?$this->{filename}:"-").")".
-              " (グループ [$group] もしくはキー [$key] が存在しない上に、デフォルト値も与えられていませんでした。)";
+            die sprintf(
+                    "%s#get: Either group [%s] or key [%s] is ".
+                      "absent but no default value is given (file: %s) ".
+                        "(グループ [%s] もしくはキー [%s] が存在しない上に、デフォルト値も与えられていませんでした。)\n",
+                    __PACKAGE__, $name, $key,
+                    defined $this->{file_path} ? $this->{file_path} : '-',
+                    $name, $key
+                   );
         }
     }
 }
 
-sub get_reloc
-{
-  my $this = shift;
-  my $value = $this->get(@_);
-  if( $value && $this->{filename} )
-  {
-    $value =~ s{^\.{3}(?=$|/)}{dirname($this->{filename})}e;
-  }
-  $value;
+sub get_reloc {
+    my Tripletail::Ini $this = shift;
+    my $value                = $this->get(@_);
+
+    if (defined $value) {
+        if (defined $this->{file_path}) {
+            $value =~ s{^\.{3}(?=$|/)}{
+                dirname $this->{file_path}
+            }e;
+        }
+        return $value;
+    }
+    else {
+        return;
+    }
 }
 
 sub set {
-	my $this = shift;
-	my $group = shift;
-	my $key = shift;
-	my $value = shift;
-	my $raw = shift;
+    my Tripletail::Ini $this = shift;
+    my $name                 = shift;
+    my $key                  = shift;
+    my $value                = shift;
+    my $raw                  = shift;
 
-	if(exists($this->{const})) {
-		die __PACKAGE__."#set: This instance is a const object. (このIniオブジェクトの内容は変更できません)\n";
-	}
+    if ($this->{is_const}) {
+        die __PACKAGE__."#set: This object is marked as a constant. ".
+          "(このIniオブジェクトの内容は変更できません)\n";
+    }
 
-	if(!defined($group)) {
-		die __PACKAGE__."#set: arg[1] is not defined. (第1引数が指定されていません)\n";
-	} elsif(ref($group)) {
-		die __PACKAGE__."#set: arg[1] is a reference. [$group] (第1引数がリファレンスです)\n";
-	}
-	if(!defined($key)) {
-		die __PACKAGE__."#set: arg[2] is not defined. (第2引数が指定されていません)\n";
-	} elsif(ref($key)) {
-		die __PACKAGE__."#set: arg[2] is a reference. [$key] (第2引数がリファレンスです)\n";
-	}
-	if(!defined($value)) {
-		die __PACKAGE__."#set: arg[3] is not defined. (第3引数が指定されていません)\n";
-	} elsif(ref($value)) {
-		die __PACKAGE__."#set: arg[2] is a reference. [$value] (第2引数がリファレンスです)\n";
-	}
-	if($group =~ m/[\x00-\x1f]/) {
-		die __PACKAGE__."#set: arg[1]: contains a control code. (第1引数にコントロールコードが含まれています)\n";
-	}
-	if($key =~ m/[\x00-\x1f]/) {
-		die __PACKAGE__."#set: arg[2]: contains a control code. (第2引数にコントロールコードが含まれています)\n";
-	}
-	if($value =~ m/[\x00-\x1f]/) {
-		die __PACKAGE__."#set: arg[3]: contains a control code. (第3引数にコントロールコードが含まれています)\n";
-	}
-	if($group =~ m/^\s+/ or $group =~ m/\s+$/) {
-		die __PACKAGE__."#set: arg[1]: the argument is not allowed to have preceding or trailing spaces. (第1引数の前後にスペースが含まれています)\n";
-	}
-	if($key =~ m/^\s+/ or $key =~ m/\s+$/) {
-		die __PACKAGE__."#set: arg[2]: the argument is not allowed to have preceding or trailing spaces. (第2引数の前後にスペースが含まれています)\n";
-	}
-	if($value =~ m/^\s+/ or $value =~ m/\s+$/) {
-		die __PACKAGE__."#set: arg[3]: the argument is not allowed to have preceding or trailing spaces. (第3引数の前後にスペースが含まれています)\n";
-	}
+    if (!defined $name) {
+        die __PACKAGE__."#set: arg[1] is not defined. (第1引数が指定されていません)\n";
+    }
+    elsif (ref $name) {
+        die __PACKAGE__."#set: arg[1] is a reference. [$name] ".
+          "(第1引数がリファレンスです)\n";
+    }
+    elsif ($name =~ m/[\x00-\x1f]/) {
+        die __PACKAGE__."#set: arg[1]: contains a control code. ".
+          "(第1引数にコントロールコードが含まれています)\n";
+    }
+    elsif ($name =~ m/^\s+/ or $name =~ m/\s+$/) {
+        die __PACKAGE__."#set: arg[1]: the argument is not allowed to ".
+          "have preceding or trailing spaces. (第1引数の前後にスペースが含まれています)\n";
+    }
 
-	if(!$raw) {
-		my @group = $this->_getrawgroupname($group);
-		$group = $group[0] if(defined($group[0]) && $group[0] ne '');
-	}
+    if (!defined $key) {
+        die __PACKAGE__."#set: arg[2] is not defined. (第2引数が指定されていません)\n";
+    }
+    elsif (ref $key) {
+        die __PACKAGE__."#set: arg[2] is a reference. [$key] (第2引数がリファレンスです)\n";
+    }
+    elsif ($key =~ m/[\x00-\x1f]/) {
+        die __PACKAGE__."#set: arg[2]: contains a control code. ".
+          "(第2引数にコントロールコードが含まれています)\n";
+    }
+    elsif ($key =~ m/^\s+/ or $key =~ m/\s+$/) {
+        die __PACKAGE__."#set: arg[2]: the argument is not allowed to have ".
+          "preceding or trailing spaces. (第2引数の前後にスペースが含まれています)\n";
+    }
 
-	if(!exists($this->{ini}{$group})) {
-		push(@{$this->{order}{group}},$group);
-	}
-	if(!exists($this->{ini}{$group}{$key})) {
-		push(@{$this->{order}{key}{$group}},$key);
-	}
-	$this->{ini}{$group}{$key} = $value;
+    if (!defined $value) {
+        die __PACKAGE__."#set: arg[3] is not defined. (第3引数が指定されていません)\n";
+    }
+    elsif (ref $value) {
+        die __PACKAGE__."#set: arg[2] is a reference. [$value] ".
+          "(第2引数がリファレンスです)\n";
+    }
+    elsif ($value =~ m/[\x00-\x1f]/) {
+        die __PACKAGE__."#set: arg[3]: contains a control code. ".
+          "(第3引数にコントロールコードが含まれています)\n";
+    }
+    elsif ($value =~ m/^\s+/ or $value =~ m/\s+$/) {
+        die __PACKAGE__."#set: arg[3]: the argument is not allowed to have ".
+          "preceding or trailing spaces. (第3引数の前後にスペースが含まれています)\n";
+    }
 
-	$this;
+    my Tripletail::Ini::Group::Variant $variant = do {
+        if ($raw) {
+            if (my ($base, $anno) = __PACKAGE__->_parseAnnotatedGroup($name)) {
+                my $group = $this->_touchGroup($base);
+
+                $group->touchVariant($anno);
+            }
+            else {
+                die __PACKAGE__."#set: arg[1]: malformed name. [$name] ".
+                  "(第2引数の形式が不正です)\n";
+            }
+        }
+        else {
+            my $group = $this->_touchGroup($name);
+
+            $group->touchVariant(
+                Tripletail::Ini::Group::Annotation->new());
+        }
+    };
+
+    $variant->set($key => $value);
+    return $this;
 }
 
 sub delete {
-	my $this = shift;
-	my $group = shift;
-	my $key = shift;
-	my $raw = shift;
+    my Tripletail::Ini $this = shift;
+    my $name                 = shift;
+    my $key                  = shift;
+    my $raw                  = shift;
 
-	if(exists($this->{const})) {
-		die __PACKAGE__."#delete, This instance is const object.\n";
-	}
+    if ($this->{is_const}) {
+        die __PACKAGE__."#delete: This object is marked as a constant. ".
+          "(このIniオブジェクトの内容は変更できません)\n";
+    }
 
-	if(!defined($group)) {
-		die __PACKAGE__."#delete: arg[1] is not defined. (第1引数が指定されていません)\n";
-	} elsif(ref($group)) {
-		die __PACKAGE__."#delete: arg[1] is a reference. [$group] (第1引数がリファレンスです)\n";
-	}
-	if(!defined($key)) {
-		die __PACKAGE__."#delete: arg[2] is not defined. (第2引数が指定されていません)\n";
-	} elsif(ref($key)) {
-		die __PACKAGE__."#delete: arg[2] is a reference. [$key] (第2引数がリファレンスです)\n";
-	}
+    if (!defined $name) {
+        die __PACKAGE__."#delete: arg[1] is not defined. (第1引数が指定されていません)\n";
+    }
+    elsif (ref $name) {
+        die __PACKAGE__."#delete: arg[1] is a reference. [$name] ".
+          "(第1引数がリファレンスです)\n";
+    }
+    if (!defined $key) {
+        die __PACKAGE__."#delete: arg[2] is not defined. (第2引数が指定されていません)\n";
+    }
+    elsif (ref $key) {
+        die __PACKAGE__."#delete: arg[2] is a reference. [$key] ".
+          "(第2引数がリファレンスです)\n";
+    }
 
-	my @group;
-	if($raw) {
-		push(@group,$group);
-	} else {
-		@group = $this->_getrawgroupname($group);
-	}
+    my @variants;
+    if ($raw) {
+        if (my ($base, $anno) = __PACKAGE__->_parseAnnotatedGroup($name)) {
+            if (exists $this->{group_for}{$base}) {
+                my $variant = $this->{group_for}{$base}->getVariant($anno);
 
-	foreach my $groupname (@group) {
-		delete $this->{ini}{$groupname}{$key};
-	}
+                if (defined $variant) {
+                    @variants = ($variant);
+                }
+            }
+        }
+    }
+    elsif (exists $this->{group_for}{$name}) {
+        my $hosts = $this->{group_for}{HOST};
+        @variants = $this->{group_for}{$name}->filterVariants($hosts);
+    }
 
+    foreach my $variant (@variants) {
+        $variant->delete($key);
+    }
 
-	$this;
+    return $this;
 }
 
 sub deleteGroup {
-	my $this = shift;
-	my $group = shift;
-	my $raw = shift;
+    my Tripletail::Ini $this = shift;
+    my $name                 = shift;
+    my $raw                  = shift;
 
-	if(exists($this->{const})) {
-		die __PACKAGE__."#delete, This instance is a const object.\n";
-	}
+    if ($this->{is_const}) {
+        die __PACKAGE__."#deleteGroup: This object is marked as a constant. ".
+          "(このIniオブジェクトの内容は変更できません)\n";
+    }
 
-	if(!defined($group)) {
-		die __PACKAGE__."#delete: arg[1] is not defined. (第1引数が指定されていません)\n";
-	} elsif(ref($group)) {
-		die __PACKAGE__."#delete: arg[1] is a reference. [$group] (第1引数がリファレンスです)\n";
-	}
+    if (!defined $name) {
+        die __PACKAGE__."#deleteGroup: arg[1] is not defined. ".
+          "(第1引数が指定されていません)\n";
+    }
+    elsif (ref $name) {
+        die __PACKAGE__."#deleteGroup: arg[1] is a reference. [$name] ".
+          "(第1引数がリファレンスです)\n";
+    }
 
-	my @group;
-	if($raw) {
-		push(@group,$group);
-	} else {
-		@group = $this->_getrawgroupname($group);
-	}
+    my %variants; # {basename => annotation}
+    if ($raw) {
+        if (my ($base, $anno) = __PACKAGE__->_parseAnnotatedGroup($name)) {
+            if (exists $this->{group_for}{$base}) {
+                my $variant = $this->{group_for}{$base}->getVariant($anno);
 
-	foreach my $groupname (@group) {
-		delete $this->{ini}{$groupname};
-	}
+                if (defined $variant) {
+                    $variants{$base} = [$variant->annotation];
+                }
+            }
+        }
+    }
+    elsif (exists $this->{group_for}{$name}) {
+        my $hosts = $this->{group_for}{HOST};
 
-	$this;
-}
+        $variants{$name} = [
+            map {
+                $_->annotation;
+              }
+              $this->{group_for}{$name}->filterVariants($hosts)
+           ];
+    }
 
-sub _filename {
-	my $this = shift;
-	$this->{filename};
-}
+    while (my ($base, $annotations_ref) = each %variants) {
+        $this->{group_for}{$base}->deleteVariants(@$annotations_ref);
 
-#特化指定やIPアドレス指定に適合しているグループを全て返す
-sub _getrawgroupname {
-	my $this = shift;
-	my $group = shift;
-	
-	my @group;
-	foreach my $spec (@Tripletail::specialization, '') {
-		my $groupname = (length $spec ? "$group:$spec" : $group);
-		foreach my $rawgroup ($this->getGroups(1)) {
-			next if(!defined($rawgroup));
-			if($rawgroup =~ m/^([^\@]+)/) {
-				next if($groupname ne $1);
-				my $matchflag = 1;
-				if($rawgroup =~ m/\@server:([^\@:]+)/){
-					$matchflag = 0;
-					my $servermask = $this->get('HOST' => $1,undef,1);
-					if(defined($servermask)) {
-						my $server = $ENV{SERVER_ADDR};
-						if(!defined($server)){
-							# ipaddress of host.
-							$server = $TL->_readcmd("hostname -i 2>&1");
-							$server = $server && $server =~ /^\s*([0-9.]+)\s*$/ ? $1 : undef;
-						}
-						if(defined($server)) {
-							if($TL->newValue->set($server)->isIpAddress($servermask)) {
-								$matchflag = 1;
-							}
-						}
-					}
-				}
-				if($matchflag == 1 && $rawgroup =~ m/\@remote:([^\@:]+)/){
-					$matchflag = 0;
-					my $remotemask = $this->get('HOST' => $1,undef,1);
-					if(defined($remotemask)) {
-						if(my $remote = $ENV{REMOTE_ADDR}) {
-							if($TL->newValue->set($remote)->isIpAddress($remotemask)) {
-								$matchflag = 1;
-							}
-						}
-					}
-				}
-				if($matchflag == 1) {
-					push(@group,$rawgroup);
-				}
-			}
-		}
-	}
-	@group;
+        if (!scalar $this->{group_for}{$base}->variants) {
+            delete $this->{group_for}{$base};
+
+            @{ $this->{groups} }
+              = grep {
+                    $_->basename ne $base
+                  }
+                  @{ $this->{groups} };
+        }
+    }
+
+    return $this;
 }
 
 
@@ -499,13 +669,13 @@ Tripletail::Ini - 設定ファイルを読み書きする
   [TL@server:Debughost]
   logdir = /home/tl/logs
   errormail = tl@example.org
-  [TL:regist@server:Debughost]
-  logdir = /home/tl/logs/regist
+  [TL:register@server:Debughost]
+  logdir = /home/tl/logs/register
+  [TL:register]
+  logdir = /home/tl/logs/register
   [TL]
   logdir = /home/tl/logs
   errormail = tl@example.org
-  [TL:regist]
-  logdir = /home/tl/logs/regist
   [Debug@remote:Testuser]
   enable_debug=1
   [Group]
@@ -555,20 +725,27 @@ Tripletail::Ini - 設定ファイルを読み書きする
 =item C<< $TL->newIni >>
 
   $TL->newIni
-  $TL->newIni($filename)
+  $TL->newIni($file_path)
 
 Tripletail::Ini オブジェクトを作成。
 設定ファイルを指定してあればreadメソッドで読み込む。
 
 =item C<< read >>
 
-  $ini->read($filename)
+  $ini->read($file_path)
 
 指定した設定ファイルを読み込む。
 
+=item C<< getFilePath >>
+
+  $fpath = $ini->getFilePath;
+
+ファイルから設定を読み込んでいた場合、そのファイルパスを返す。
+そうでなければ C<undef> を返す。
+
 =item C<< write >>
 
-  $ini->write($filename)
+  $ini->write($file_path)
 
 指定した設定ファイルに書き込む。
 自動的に読み込まれる$INIに関しては書き込みは出来ない。

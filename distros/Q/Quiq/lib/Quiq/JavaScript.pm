@@ -21,7 +21,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.196';
+our $VERSION = '1.197';
 
 use Quiq::Template;
 use Quiq::Path;
@@ -33,11 +33,41 @@ use Scalar::Util ();
 
 =head2 Klassenmethoden
 
+=head2 Konstruktor
+
+=head3 new() - Instantiiere Objekt
+
+=head4 Synopsis
+
+  $p = $class->new;
+
+=head4 Returns
+
+JavaScript-Objekt
+
+=head4 Description
+
+Instantiiere ein Objekt der Klasse und liefere eine Referenz auf
+dieses Objekt zurück. Da die Klasse ausschließlich Klassenmethoden
+enthält, hat das Objekt ausschließlich die Funktion, eine abkürzende
+Aufrufschreibweise zu ermöglichen.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub new {
+    my $class = shift;
+    return bless \(my $dummy),$class;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 code() - Erstelle JavaScript-Code in Perl
 
 =head4 Synopsis
 
-  $js = $class->code(@keyVal,$text);
+  $js = $this->code(@keyVal,$text);
 
 =head4 Arguments
 
@@ -71,7 +101,7 @@ jQuery-Aufrufe mit Dollar-Zeichen ($) enthält oder die Zeilen
 
 =head4 Example
 
-  $js = Quiq::JavaScript->code(q°
+  $js = $this->code(q°
       var __NAME__ = (function() {
           return {
               x: __VALUE__,
@@ -94,7 +124,7 @@ liefert
 # -----------------------------------------------------------------------------
 
 sub code {
-    my $self = shift;
+    my $this = shift;
     my $text = shift;
     # @_: @keyVal
 
@@ -110,7 +140,7 @@ sub code {
 
 =head4 Synopsis
 
-  $line = $class->line($code);
+  $line = $this->line($code);
 
 =head4 Arguments
 
@@ -183,11 +213,11 @@ wie JavaScipt es auch erlaubt, weggelassen werden.
 # -----------------------------------------------------------------------------
 
 sub line {
-    my ($self,$code) = @_;
+    my ($this,$code) = @_;
 
     my $line;
     if (defined $code) {
-        open my $fh,'<',\$code or $self->throw;
+        open my $fh,'<',\$code or $this->throw;
         while (<$fh>) {
             s|\s*//.*||; # Kommentar entfernen
             s/^\s+//;
@@ -352,7 +382,7 @@ sub script {
 
 =head1 VERSION
 
-1.196
+1.197
 
 =head1 AUTHOR
 

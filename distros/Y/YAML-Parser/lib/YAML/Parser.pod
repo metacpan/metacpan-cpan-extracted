@@ -12,7 +12,7 @@ YAML::Parser - Generated Reference Parser for YAML 1.2
 
 =head1 VERSION
 
-This document describes L<YAML::Parser> version B<0.0.3>.
+This document describes L<YAML::Parser> version B<0.0.4>.
 
 =head1 SYNOPSIS
 
@@ -53,7 +53,7 @@ Ingy döt Net <ingy@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2020. Ingy döt Net.
+Copyright 2020-2021. Ingy döt Net.
 
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

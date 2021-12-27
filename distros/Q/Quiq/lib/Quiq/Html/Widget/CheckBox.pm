@@ -42,9 +42,11 @@ Name, unter dem die Checkbox kommuniziert wird.
 
 OnClick-Handler.
 
-=item option => $value (Default: undef)
+=item option => $value -or- [$checkedValue,$uncheckedValue] (Default: undef)
 
-Wert, der gesendet wird, wenn die CheckBox aktiviert ist.
+Wert, der gesendet wird, wenn die CheckBox aktiviert ist. Ist der Wert
+eine Arrayreferenz, wird der erste Wert des Arrays gesendet, wenn
+die Checkbox aktiviert ist, andernfalls der zweite Wert.
 
 =item style => $style (Default: undef)
 
@@ -76,8 +78,9 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.196';
+our $VERSION = '1.197';
 
+use Quiq::Html::Widget::Hidden;
 use Quiq::JavaScript;
 
 # -----------------------------------------------------------------------------
@@ -158,23 +161,54 @@ sub html {
         return '';
     }
 
-    my $html .= $h->tag('input',
-        -nl => 0,
-        type => 'checkbox',
-        id => $id,
-        name => $name,
-        class => $class,
-        style => $style,
-        disabled => $disabled,
-        value => $option,
-        checked => defined($value) && $value eq $option? 1: 0,
-        title => $title,
-        onclick => Quiq::JavaScript->line($onClick),
-    );
+    my $html;
+
+    if (ref $option) { # option => [$checkedValue,$uncheckedValue]
+        $html .= Quiq::Html::Widget::Hidden->html($h,
+            name => $name,
+            value => defined($value) && $value eq $option->[0]?
+                $option->[0]: $option->[1],
+            disabled => $disabled,
+        );
+        chomp $html;
+
+        my $js = 'this.previousElementSibling.value = this.checked?'.
+            " '$option->[0]': '$option->[1]'";
+        if (my $onClick = Quiq::JavaScript->line($onClick)) {
+           $js .= "; $onClick";
+        }
+
+        $html .= $h->tag('input',
+            -nl => 0,
+            type => 'checkbox',
+            id => $id,
+            class => $class,
+            style => $style,
+            disabled => $disabled,
+            checked => defined($value) && $value eq $option->[0]? 1: 0,
+            title => $title,
+            onclick => $js,
+        );
+    }
+    else {
+        $html .= $h->tag('input',
+            -nl => 0,
+            type => 'checkbox',
+            id => $id,
+            name => $name,
+            class => $class,
+            style => $style,
+            disabled => $disabled,
+            value => $option,
+            checked => defined($value) && $value eq $option? 1: 0,
+            title => $title,
+            onclick => Quiq::JavaScript->line($onClick),
+        );
+    }
+
     if ($label ne '') {
         $html .= $label;
     }
-    # $html .= "\n";
 
     return $html;
 }
@@ -183,7 +217,7 @@ sub html {
 
 =head1 VERSION
 
-1.196
+1.197
 
 =head1 AUTHOR
 

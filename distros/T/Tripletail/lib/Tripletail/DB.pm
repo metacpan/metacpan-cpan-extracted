@@ -109,8 +109,14 @@ sub tx {
         $this->_closewait_broken();
     }
 
-    local $Tripletail::Error::LAST_DB_ERROR
-      = lazy { $this->getDbh($setname)->_errinfo };
+    local $Tripletail::Error::LAST_DB_ERROR = lazy {
+        # NOTE: TL::DB#getDbh returns a DBI::db not TL::DB::Dbh. The
+        # class having #_errinfo is the latter. So don't ever change
+        # again the following lines to
+        # "$this->getDbh($setname)->_errinfo".
+        my $set = $this->_getDbSetName($setname);
+        $this->{dbh}{$set}->_errinfo;
+    };
 
     my @ret;
     while (1) {
@@ -741,7 +747,7 @@ sub findTables {
                $this,
                $dbh,
                $dbh->getDbh->table_info(
-                   undef, $args->{schema}, $args->{table}, 'TABLE'));
+                   undef, $args->{schema}, $args->{table}, undef));
 }
 
 sub getTableColumns {
@@ -1101,7 +1107,7 @@ sub _new {
                 use $backend;
             };
             if ($@) {
-                local $SIG{__DIE__} = $@;
+                local $SIG{__DIE__} = 'DEFAULT';
                 die $@;
             }
 

@@ -22,6 +22,8 @@ Verbatim blocks
 =back
 
 [output]
+\heading[][]
+
 \pre
 [    Some verbatim text]
 
