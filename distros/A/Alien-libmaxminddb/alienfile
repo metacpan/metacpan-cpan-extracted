@@ -1,0 +1,37 @@
+use alienfile;
+use Path::Tiny qw(path);
+
+plugin 'PkgConfig' => 'libmaxminddb';
+
+share {
+  start_url 'https://github.com/maxmind/libmaxminddb/releases';
+  plugin 'Download' => (
+    filter => qr/^libmaxminddb-[0-9\.]+\.tar\.gz$/,
+    version => qr/^libmaxminddb-([0-9\.]+)\.tar\.gz$/,
+  );
+  plugin 'Extract' => 'tar.gz';
+  plugin 'Build::Autoconf';
+  patch \&patch_pkgconfig;
+  build [
+    '%{configure} --disable-binaries --disable-tests --disable-shared',
+    '%{make}',
+    '%{make} install',
+  ];
+};
+
+sub patch_pkgconfig {
+  my $build = shift;
+
+  my $extract = $build->install_prop->{extract};
+  my $pc = path($extract, 'src', 'libmaxminddb.pc.in');
+
+  if ($^O eq 'MSWin32') {
+    eval {
+      $pc->edit(sub {
+        s{-lmaxminddb\b}{-lmaxminddb -lws2_32}g;
+      });
+    };
+  }
+
+  return;
+}

@@ -28,35 +28,48 @@ provides:
     file: lib/App/optex/tc.pm
   App::optex::textconv:
     file: lib/App/optex/textconv.pm
-    version: '0.13'
+    version: '0.1401'
   App::optex::textconv::Converter:
     file: lib/App/optex/textconv/Converter.pm
   App::optex::textconv::default:
     file: lib/App/optex/textconv/default.pm
   App::optex::textconv::msdoc:
     file: lib/App/optex/textconv/msdoc.pm
-    version: '0.13'
+    version: '0.1401'
+  App::optex::textconv::ooxml:
+    file: lib/App/optex/textconv/ooxml.pm
+    version: '0.1401'
+  App::optex::textconv::ooxml::regex:
+    file: lib/App/optex/textconv/ooxml/regex.pm
+    version: '0.1401'
+  App::optex::textconv::ooxml::xslt:
+    file: lib/App/optex/textconv/ooxml/xslt.pm
+    version: '0.1401'
   App::optex::textconv::pandoc:
     file: lib/App/optex/textconv/pandoc.pm
-    version: '0.13'
+    version: '0.1401'
   App::optex::textconv::pdf:
     file: lib/App/optex/textconv/pdf.pm
-    version: '0.13'
+    version: '0.1401'
   App::optex::textconv::tika:
     file: lib/App/optex/textconv/tika.pm
-    version: '0.13'
+    version: '0.1401'
+recommends:
+  XML::LibXML: '0'
+  XML::LibXSLT: '0'
 requires:
-  App::optex: v0.3.0
+  App::optex: v0.5.2
   App::optex::Tmpfile: '0'
   Archive::Zip: '1.37'
   Encode: '0'
   List::Util: '1.45'
+  Text::Extract::Word: '0'
   perl: v5.14.0
 resources:
   bugtracker: https://github.com/kaz-utashiro/optex-textconv/issues
   homepage: https://github.com/kaz-utashiro/optex-textconv
   repository: git://github.com/kaz-utashiro/optex-textconv.git
-version: '0.13'
+version: '0.1401'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

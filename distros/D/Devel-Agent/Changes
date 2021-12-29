@@ -1,8 +1,28 @@
 0.0001
   -- Inital Checkin
 0.001
-  -- Good enough to release, but needs a lot more work unit tessts and documentation
+  -- Good enough to release, but needs a lot more work unit tests and documentation
 0.002
   -- Pod fixups
 0.003
   -- removed blib/* from manifest
+0.004
+  -- Flushed out the "agent aware" interface
+  -- Expanded pod
+  -- unit test skip count is now correct
+0.005
+  -- Pod cleanups
+0.006
+  -- Renamed Devel::Trace::EveryThing to Devel::Agent::EveryThing
+  -- more pod cleanups
+  -- updated Devel::Agent SYNOPSIS
+0.007
+  -- Removed errand print statement
+  -- Internals now use $self->{...} in place of $self->method to reduce overhead
+  -- Modules now pull thier version from Devel::Agent
+  -- Added Plack::Middleware::Devel::Agent::Plack
+  -- Created a basic stder frame dumper module
+  -- Added min version of perl to the Makefile.PL
+  -- Added addtional unit test requirements
+  -- Added new required packages
+  -- added hard LICENSE file for metacpan

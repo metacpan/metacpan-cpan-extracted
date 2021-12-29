@@ -1,10 +1,12 @@
 package App::optex::textconv;
 
-our $VERSION = '0.13';
+our $VERSION = '0.1401';
 
 use v5.14;
 use warnings;
 use Encode;
+
+use App::optex v0.5.2;
 
 =encoding utf-8
 
@@ -14,7 +16,7 @@ textconv - optex module to replace document file by its text contents
 
 =head1 VERSION
 
-Version 0.13
+Version 0.1401
 
 =head1 SYNOPSIS
 
@@ -76,7 +78,7 @@ See L<App::optex::textconv::pandoc>.
 
 =item tika
 
-Use L<Pache Tika|https://tika.apache.org/> command to translate
+Use L<Apache Tika|https://tika.apache.org/> command to translate
 Microsoft office document in XML and non-XML format.
 See L<App::optex::textconv::tika>.
 

@@ -1,0 +1,172 @@
+# no code
+## no critic: TestingAndDebugging::RequireUseStrict
+package Perinci::CmdLine::Manual::Explanation::ArgumentValidation; # just to make podweaver happy
+
+# AUTHORITY
+# DATE
+our $DIST = 'Perinci-CmdLine'; # DIST
+# VERSION
+
+1;
+# ABSTRACT: Argument validation
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Perinci::CmdLine::Manual::Explanation::ArgumentValidation - Argument validation
+
+=head1 VERSION
+
+This document describes version 1.913.0 of Perinci::CmdLine::Manual::Explanation::ArgumentValidation (from Perl distribution Perinci-CmdLine), released on 2021-12-03.
+
+=head1 DESCRIPTION
+
+Argument validation is performed before passing the arguments to the function.
+It includes: making sure required arguments (arguments with C<req> property set
+to true) are specified, the values of specified arguments conforms to the
+argument schema (C<schema> property, described in L<Sah> format), and argument
+relation rules (in C<args_rels> property in the C<args> function metadata
+property) are followed.
+
+Arguments will be checked against their schemas for all arguments that are
+specified by the user I<or> have a default value/rules in their schema, e.g.:
+
+ # argument specification
+
+ # this argument has a default clause in its schema
+ foo => {
+     schema => ['str*', default=>'on'],
+     ...
+ }
+
+ # this argument has a default-value rule clause in its schema
+ mod => {
+     schema => ['perl::modname*', 'x.perl.default_value_rules'=>['Perl::this_mod']],
+     ...
+ }
+
+=head1 FAQ
+
+=head2 How to find out if an argument is set explicitly by the user or is getting a default value from the schema/argument specification?
+
+Use the special argument C<-set_ARGNAME>.
+
+=head2 How to get the original value on an argument sent by user before the argument is being coerced/filtered/given default value by the schema?
+
+Use the special argument C<-orig_ARGNAME>.
+
+=head2 How to get the default value of an argument from the schema/argument specifcation?
+
+Use the special argument C<-default_ARGNAME>.
+
+=head2 What's the difference between setting a default in the argument specification vs in the schema?
+
+There are two ways to set a default value. The first one is via the C<default>
+property in argument specification:
+
+ # in the function metadata property...
+ args => {
+     foo => {
+         schema => 'str*',
+         default => 'on',
+     },
+     ...
+ }
+
+This means, if user does not specify the argument:
+
+ # via CLI
+ % progname
+
+ # via wrapped function call
+ funcname()
+
+then the function will get a C<foo> key in its C<%args> automatically. As well
+as C<-set_foo> set to false, C<-default_foo> set to C<on>. We know (from
+C<-set_foo>) that C<foo> gets its value from the default and not from the user
+explicitly setting it.
+
+Another way is by setting default value in the schema's C<default> clause or
+C<x.perl.default_value_rules> property (the latter allows dynamic default
+values):
+
+ # in the function metadata property...
+ args => {
+     bar => {
+         schema => ['str*', default=>'on'],
+         ...
+     },
+     baz => {
+         schema => ['perl::modname*', 'x.perl.default_value_rules'=>['Perl::this_mod']],
+         ...
+     },
+     ...
+ }
+
+This means that if the argument value is set to undefined value (C<undef>), it
+will get set the default from schema during argument validation:
+
+ # via CLI
+ % progname --baz-json 'null'
+
+ # via wrapped function call
+ funcname(baz=>undef)
+
+Function will receive C<bar> key in its C<%args> set to C<on>, C<baz> set to
+e.g. C<"Some::Module"> instead of C<undef>. C<%args> will also contain
+C<-set_bar> (false), C<-set_baz> (true), C<-orig_baz> (C<undef>) as well as
+C<-default_bar> (C<on>) and C<-default_baz> (C<Some::Module>).
+
+You can know from C<-set_bar> that the argument is set by default value and not
+explicitly by user.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Perinci-CmdLine>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Perinci-CmdLine>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

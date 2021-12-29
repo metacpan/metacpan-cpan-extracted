@@ -2,52 +2,63 @@
    "abstract" : "A fully event-driven networkable IRC server daemon module.",
    "author" : [
       "Chris Williams <chris@bingosnet.co.uk>",
-      "Hinrik \u00c3\u0096rn Sigur\u00c3\u00b0sson <hinrik.sig@gmail.com>"
+      "Hinrik \u00d6rn Sigur\u00f0sson <hinrik.sig@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.110930",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "POE-Component-Server-IRC",
    "no_index" : {
       "directory" : [
+         "examples",
          "t",
-         "xt",
-         "examples"
+         "xt"
       ]
    },
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.30"
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
          }
       },
       "runtime" : {
          "recommends" : {
-            "POE::Component::SSLify" : 0,
-            "POE::Filter::Zlib::Stream" : 0
+            "POE::Component::SSLify" : "0",
+            "POE::Filter::Zlib::Stream" : "0"
          },
          "requires" : {
+            "Crypt::Eksblowfish::Bcrypt" : "0.009",
             "Crypt::PasswdMD5" : "1.3",
             "IRC::Utils" : "0.10",
-            "List::Util" : 0,
-            "Net::Netmask" : "1.9012",
+            "List::Util" : "0",
+            "Net::CIDR" : "0.18",
+            "Net::IP::Minimal" : "0",
+            "Net::Netmask" : "1.9104",
             "POE" : "0.9999",
             "POE::Component::Client::DNS" : "1.00",
             "POE::Component::Client::Ident" : "1.00",
             "POE::Component::Syndicator" : "0.04",
-            "POE::Filter::IRCD" : "2.2"
+            "POE::Filter::IRCD" : "2.2",
+            "POE::Filter::ThruPut" : "1.00",
+            "Socket" : "2.013"
          }
       },
       "test" : {
          "requires" : {
             "POE::Component::IRC" : "6.68",
-            "Test::More" : "0.47"
+            "Test::More" : "0.47",
+            "Test::POE::Client::TCP" : "1.22"
          }
       }
    },
@@ -57,7 +68,7 @@
          "mailto" : "bug-POE-Component-Server-IRC@rt.cpan.org",
          "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=POE-Component-Server-IRC"
       },
-      "homepage" : "http://search.cpan.org/dist/POE-Component-Server-IRC/",
+      "homepage" : "http://metacpan.org/release/POE-Component-Server-IRC",
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
@@ -67,7 +78,10 @@
          "web" : "http://github.com/bingos/poe-component-server-irc"
       }
    },
-   "version" : "1.54",
-   "x_authority" : "cpan:HINRIK"
+   "version" : "1.62",
+   "x_authority" : "cpan:BINGOS",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

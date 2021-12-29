@@ -1,5 +1,5 @@
 This archive contains the distribution autocroak,
-version 0.004:
+version 0.005:
 
   Replace functions with ones that succeed or die with lexical scope
 

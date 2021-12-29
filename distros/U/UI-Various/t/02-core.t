@@ -12,7 +12,7 @@
 
 #########################################################################
 
-use v5.14.0;
+use v5.14;
 use strictures;
 no indirect 'fatal';
 no multidimensional;
@@ -231,7 +231,10 @@ CODE
 is($?, 0, 'RC 0 in sub-perl "postponing/dropping STDERR"');
 is($_, '', 'postponing/dropping STDERR printed correct output');
 
-$_ = _sub_perl(	<<'CODE');
+SKIP:
+{
+    skip 'closing STDERR not working in Perl <= 5.22', 2 if $^V lt 'v5.24';
+    $_ = _sub_perl(	<<'CODE');
 		use UI::Various({log => "WARN"});
 		close STDERR;
 		defined fileno(STDERR)  and
@@ -239,10 +242,11 @@ $_ = _sub_perl(	<<'CODE');
 		$_ = UI::Various::stderr(2);
 		print "We should not get here! ($_, ", fileno(STDERR), ")\n";
 CODE
-is($?, 0x900, 'RC 9 (no signal or core-dump) in sub-perl "closed STDERR"');
-like($_,
-     qr{\n\*{5} can't duplicate STDERR: Bad file (?:descriptor|number) \*{5}\n},
-   'closed STDERR causes error');
+    is($?, 0x900, 'RC 9 (no signal or core-dump) in sub-perl "closed STDERR"');
+    like($_,
+	 qr{\n\*{5} can't duplicate STDERR: Bad file (descriptor|number) \*+\n},
+	 'closed STDERR causes error');
+}
 
 #####################################
 # constructor and accessor tests:

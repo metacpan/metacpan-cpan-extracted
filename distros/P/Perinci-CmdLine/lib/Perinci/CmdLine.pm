@@ -3,9 +3,9 @@
 package Perinci::CmdLine;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-03'; # DATE
+our $DATE = '2021-12-03'; # DATE
 our $DIST = 'Perinci-CmdLine'; # DIST
-our $VERSION = '1.909.1'; # VERSION
+our $VERSION = '1.913.0'; # VERSION
 
 sub new {
     die "This module is currently empty, for now please use Perinci::CmdLine::{Lite,Classic,Any} instead. There is also Perinci::CmdLine::Inline.";
@@ -27,7 +27,7 @@ Perinci::CmdLine - Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.909.1 of Perinci::CmdLine (from Perl distribution Perinci-CmdLine), released on 2021-10-03.
+This document describes version 1.913.0 of Perinci::CmdLine (from Perl distribution Perinci-CmdLine), released on 2021-12-03.
 
 =head1 DESCRIPTION
 

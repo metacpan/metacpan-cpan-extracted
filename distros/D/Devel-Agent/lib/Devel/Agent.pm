@@ -2,15 +2,15 @@ package Devel::Agent;
 
 =head1 NAME
 
-Devel::Agent
+Devel::Agent - Agent like debugger interface
 
 =head1 SYNOPSIS
 
-  perl -d:Agent
+  perl -d:Agent -MDevel::Agent::EveryThing myscript.pl
 
 =head1 DESCRIPTION
 
-For years people in the perl commnity have been asking for a way to do performance monitoring and tracing of runtime production code. This module attempts to fill this role by implementing a stripped down debugger that is intended to provides an agent or agent like interface for perl 5.34.0+ that is simlilar in nature to the agent interface in other langagues Such as python or java.  
+For years people in the perl commnity have been asking for a way to do performance monitoring and tracing of runtime production code. This module attempts to fill this role by implementing a stripped down debugger that is intended to provide an agent or agent like interface for perl 5.34.0+ that is simlilar in nature to the agent interface in other langagues Such as python or java.  
 
 This is accomplished by running the script or code in debug mode, "perl -d:Agent"  and then turning the debugger on only as needed to record traching and performance metrics.  That said this module just provides an agent interface, it does not act on code directly until something turns it on.
 
@@ -19,7 +19,7 @@ This is accomplished by running the script or code in debug mode, "perl -d:Agent
 use strict;
 use warnings;
 use 5.34.0;
-our $VERSION=.003;
+our $VERSION=.007;
 
 our %VER_FIX;
 BEGIN {
@@ -86,11 +86,8 @@ BEGIN {
   foreach my $opt (@DB_DISABLE) {
     $^P=$^P & ($^P ^ $opt);
   }
-
-  # may or may not be compiled with -Dxx option
-  eval { $^D =0};
+  
 }
-
 
 =head1 Agent interface
 
@@ -121,7 +118,6 @@ Inside you script you can issue the following
   # to dump a very human readable full trace
   print Dumper($db->trace);
 
-
 But altering you code is far from ideal.
 
 Another option is to load the agent and a module that pre-configures it for use such as  the L<Devel::Trace::EveryThing> module, wich provides a stack trace to STDERR in real time as frames begin and exit.
@@ -129,6 +125,59 @@ Another option is to load the agent and a module that pre-configures it for use 
 Example using: Devel::Trace::EveryThing
 
   perl -Ilib -d:Agent -MDevel::Agent::EveryThing examples/everything.pl
+
+=head1 Classes that are Agent Aware
+
+Any class that implements the $instance->___db_stack_filter($agent,$frame,$args,$raw_caller) can filter its own current frame prior to execution, or even prevent the frame from being traced at all.
+
+The ___db_stack_filter method is expected to return true, if the call returns false, then the frame should not be traced. Since the frame passed in before it's runtime execution, the duration value will not be set. 
+
+A basic implementation that exposes only the top level calls is defined in L<Devel::Agent::AwareRole>.  Loading this role into your class will hide all calls made by your class, but not calls made directly to it, this includes child classes that make calls to other classes.
+
+Example:
+
+  package My::Class::That::IS::Mostly::Hidden;
+
+  use Role::Tiny::With; # you can also use Moo Moose or other role implementations
+  with 'Devel::Agent::AwareRole';
+
+  1;
+
+If you want to force a class to not show its internals.. say a class like LWP::UserAgent.
+
+  use LWP::UserAgent;
+  reuqire Devel::Agent::AwareRole;
+
+  # now only the top level calls to LWP::UserAgent will show up
+  *LWP::UserAgent::___db_stack_filter=\&Devel::Agent::AwareRole::___db_stack_filter;
+
+Or if you need to disable filtering on a class that has filtering then you can do the opposite
+  
+  *LWP::UserAgent::___db_stack_filter=sub { 1}
+
+To be fully ignored
+
+  *LWP::UserAgent::___db_stack_filter=sub { 0}
+
+=head1 Frame information
+
+The following hash represents what is provided as a representation of a frame
+
+  {
+    caller_class=>'main',         # class that called this class
+    calls=>[],                    # child frames, empty unless $self->save_to_stack is true
+    class_method=>'main::test_a', # the resolved class::method
+    depth=>1,                     # stack depth, 1 is considered the root
+    duration=>undef|Float,        # how long the frame took to execute, only defined when the frame has executed
+    end_id=>undef|Int,            # frame final execution order where in the stack it ended 
+    line=>2,                      # line number the frame was called from
+    no_frame=>0|1,                # when true, this frame would have been filtered but was included for completeness
+    order_id=>1,                  # inital frame execution order, where in the stack it started
+    owner_id=>0,                  # which order_id frame triggered the execution of this frame
+    raw_method=>'main::test_a',   # un-resolved method name
+    source=>'test.pl',            # the source file
+    t0=>[0,0],                    # Frame Start timestamp in: epoch, microseconds
+  }
 
 =head1 DB Constructor options
 
@@ -140,17 +189,15 @@ This section documents the %args the be passed to the new DB(%args) or DB->new(%
 package 
   DB;
 
-# ADD THIS TO THE SYNOPSIS!!!
-# PERL5OPT='-d:Agent'
-
 #use Modern::Perl;
 use strict;
 use warnings;
+require Scalar::Util;
 
 # as easy as Moo makes things.. its not welcome in a debugger ;(
 use Time::HiRes qw(gettimeofday tv_interval);
 use B qw(svref_2object);
-#use Data::Dumper;
+use Data::Dumper;
 
 our $AGENT;
 my $IN_METHOD=0;
@@ -224,7 +271,6 @@ sub DEFAULT_DEPTH () { 4 }
 our @EXCLUDE_DEFAULTS=(
   __PACKAGE__,
   qw(
-    DB
     Data::Dumper
     Time::HiRes
     Method::Generate::Accessor
@@ -236,6 +282,7 @@ our @EXCLUDE_DEFAULTS=(
     strict
     warnings
     Sub::Defer
+    B
   )
 );
 
@@ -478,12 +525,27 @@ The code was not orginally develpoed without threading in mind, if you wish to t
 has tid=>(
   is=>'rw',
   clearer=>1,
-  lazy=>1,
   default=>sub {
     my $tid=1;
-    eval { $tid=threads->tid };
+    eval { 
+     if(my $cb=threads->can('tid')) {
+       $tid=threads->$cb();
+     }
+    };
     return $tid;
   },
+);
+
+=item * agent_aware=>Bool
+
+This enables or disables the use of $self->_agent_aware(...) method.  See: $self->_agent_aware.  Default is true.
+
+=cut
+
+has agent_aware=>(
+  is=>'ro',
+  default=>1,
+  #isa=>Bool,
 );
 
 =item * existing_trace=>Maybe[InstanceOf['DB']]
@@ -502,7 +564,7 @@ has existing_trace=>(
 
 =item * process_result=>CodeRef
 
-This callback can be used to evaluate/modify the results of a callback. 
+This callback can be used to evaluate/modify the results of a traced method in this callback.
 
 Example callback
 
@@ -531,7 +593,6 @@ has process_result=>(
   is=>'ro',
   #isa=>CodeRef,
   default=>sub { sub {} },
-  lazy=>1,
 );
 
 =item * filter_on_args=>CodeRef
@@ -549,13 +610,14 @@ Default always returns true
     return 1; 
   }
 
+This is more or less a global frame filter, see: Classes that are Agent Aware
+
 =cut
 
 has filter_on_args=>(
   is=>'ro',
   #isa=>CodeRef,
   default=>sub { sub {1} },
-  lazy=>1,
 );
 
 
@@ -609,12 +671,12 @@ sub _filter {
   my ($self,$caller,$args)=@_;
   
   return 0 unless defined($caller->[0]);
-  foreach my $re (@{$self->ignore_calling_class_re}) {
+  foreach my $re ($self->{ignore_calling_class_re}->@*) {
     if($caller->[0]=~ $re) {
       return 0;
     }
   }
-  return 0 if exists $self->excludes->{$caller->[0]};
+  return 0 if exists $self->{excludes}->{$caller->[0]};
   my $caller_class=$caller->[3];
   return 0 unless defined $caller_class;
 
@@ -622,7 +684,7 @@ sub _filter {
 
   $self->resolve_class($class,$method,$caller,$args);
 
-  return 0 if exists $self->excludes->{$class};
+  return 0 if exists $self->{excludes}->{$class};
   return 1;
 }
 
@@ -636,7 +698,7 @@ sub resolve_class {
   my ($self,$class,$method,$caller,$args)=@_;
   return unless $#{$args}!=-1 && defined($args->[0]);
 
-  if($self->resolve_constructor && exists $self->constructor_methods->{$method} ) {
+  if($self->{resolve_constructor} && exists $self->{constructor_methods}->{$method} ) {
     my $new_class=$args->[0];
     if($new_class->DOES($class)) {
       $caller->[3]=$class.'::'.$method;
@@ -660,19 +722,16 @@ Sets the following frame option:
 sub close_depth {
   my ($self,$depth)=@_;
 
-  # work around for the $self->stop_trace;
-  return unless defined $self->depths->[$depth];
-
-  my $last=pop $self->depths->@*;
+  my $last=pop $self->{depths}->@*;
   my $t0=$last->{t0};
   my $d=tv_interval($t0);
-  #$d=0 if index($d,'e')!=-1; # how is this slower than a regex? wow!!!
-  $d=0 if $d=~ /e/s;
+  $d=0 if index($d,'e')!=-1; # how is this slower than a regex? wow!!!
+  #$d=0 if $d=~ /e/s;
   $last->{duration}=$d;
   $last->{end_id}=$self->next_order_id,
   my $tmp=$internals;
   $internals=1;
-  $self->on_frame_end->($self,$last);
+  $self->{on_frame_end}->($self,$last);
   $internals=$tmp;
 }
 
@@ -684,7 +743,7 @@ Returns the next order_id.
 
 sub next_order_id {
   my ($self)=@_;
-  return $self->order_id(1+$self->order_id);
+  return $self->{order_id}=1+$self->{order_id};
 }
 
 =head2 $self->close_to($depth,$frame|undef)
@@ -696,13 +755,13 @@ Closes down the stack trace to $depth, performs addtional actions if $frame is d
 sub close_to {
   my ($self,$to,$last)=@_;
 
-  if($to<=$self->max_depth) {
+  if($to<=$self->{max_depth}) {
     # reset our max depth to -1;
-    $self->max_depth(-1);
+    $self->{max_depth}=-1;
   }
 
   my $target;
-  my $size=$self->depths->$#*;
+  my $size=$self->{depths}->$#*;
   for(my $depth=$size;$depth>0;--$depth) {
     if($depth==$to) {
       $self->close_depth($depth);
@@ -720,7 +779,7 @@ sub close_to {
   } elsif(defined($last)) {
     $self->save_to($last);
   }
-  $self->last_depth($to);
+  $self->{last_depth}=$to;
 }
 
 =head2 $self->filter($caller,$args)
@@ -738,15 +797,49 @@ sub filter{
   my $last=$self->caller_to_ref($caller,undef,$DB::sub,0);
   return $self->restore_trace unless defined($last);
 
-  unless($self->filter_on_args->($self,$last,$args,$raw_caller)){
+  unless($self->{filter_on_args}->($self,$last,$args,$raw_caller)){
     $self->restore_trace;
     return;
   }
 
+  if($self->{agent_aware}) {
+    unless($self->_agent_aware($last,$args,$raw_caller)) {
+      $self->restore_trace;
+      return;
+    }
+  }
+
   $self->push_to_stack($last);
-  my $level=$self->level;
-  push $level->[$level->$#*]->@*,$self->last_depth;
+  my $level=$self->{level};
+  push $level->[$level->$#*]->@*,$self->{last_depth};
   $self->restore_trace;
+}
+
+=head2 $self->_agent_aware($frame,$args,$raw_caller)
+
+This method is called before a frame is traced if $self->agent_aware is set to true( the default ).  The objective of this method is see of the first argument being passed to this method is a blessed instance of that class.  When the first argument passed to the class is a blessed object that DOES this class then a call to $args->[0]->___db_stack_filter($agent,$frame,$args,$raw_caller) is made.  This allows classes to modify or inspect the frame that will be used in the reace.  If the call to $args->[0]->___db_stack_filter($agent,$frame,$args,$raw_caller)  returns false, the frame is skipped durring the trace period.
+
+Note note Note:
+
+The call to $args->[0]->___db_stack_filter($agent,$frame,$args,$raw_caller) is never wrapped in a eval and should never do anything heavy or it will impact the metrics provided by the debugger.
+
+=cut
+
+sub _agent_aware {
+  my ($self,$frame,$args,$raw_caller)=@_;
+  
+  return 1 unless $args->$#*>-1 && defined($args->[0]);
+  my $class=&Scalar::Util::blessed($args->[0]);
+  return 1 unless $class;
+  my $cb=$class->can('___db_stack_filter');
+  return 1 unless $cb;
+
+  if($frame->{class_method}=~ /^(.*)::/s) {
+    return 1 unless $args->[0]->DOES($1);
+    return $args->[0]->$cb(@_);
+  }
+
+  return 1;
 }
 
 =head2 Self->save_to($frame)
@@ -759,16 +852,16 @@ sub save_to {
   my ($self,$last)=@_;
   
   my $depth=$last->{depth};
-  $self->depths->[$depth]=$last;
+  $self->{depths}->[$depth]=$last;
 
-  $self->last_depth($depth);
+  $self->{last_depth}=$depth;
   # stop here unless someone wants the frames saved in memory
   return unless $self->save_to_stack;
   if($depth==1) {
-    push $self->trace->@*,$self->depths->[$depth]=$last;
+    push $self->trace->@*,$self->{depths}->[$depth]=$last;
   } else {
     my $root=$depth -1;
-    push $self->depths->[$root]->{calls}->@*,$self->depths->[$depth]=$last;
+    push $self->{depths}->[$root]->{calls}->@*,$self->{depths}->[$depth]=$last;
   }
 }
 
@@ -782,7 +875,7 @@ sub push_to_stack {
   my ($self,$last)=@_;
 
   my $depth=$last->{depth};
-  my $last_depth=$self->last_depth;
+  my $last_depth=$self->{last_depth};
   if($last_depth==0) {
     $self->save_to($last);
   } elsif($depth<= $last_depth) {
@@ -802,12 +895,12 @@ sub get_depth {
   my ($self)=@_;
   my $start = DEFAULT_DEPTH;
   # skip un-needed depth checking
-  $start +=$self->depths->$#* if $self->depths->$#* >0;
+  $start +=$self->{depths}->$#* if $self->{depths}->$#* >0;
   my $depth=$start - DEFAULT_DEPTH;
 
   my $caller=[caller($start)];
   my $no_frame=[];
-  my $max=$self->max_depth;
+  my $max=$self->{max_depth};
   while($caller->$#*!=-1) {
     if($max!=-1) {
       my $pos=$depth +1;
@@ -817,7 +910,7 @@ sub get_depth {
     }
 
     if($start !=DEFAULT_DEPTH) {
-      unless(defined $self->depths->[$depth]) {
+      unless(defined $self->{depths}->[$depth]) {
         push $caller->@*,$depth;
         push $no_frame->@*,$caller;
       }
@@ -863,8 +956,8 @@ sub caller_to_ref {
 
   my $root=$depth -1;
   my $owner_id=0;
-  if($root!=0 && defined $self->depths->[$root]) {
-    $owner_id=$self->depths->[$root]->{order_id};
+  if($root!=0 && defined $self->{depths}->[$root]) {
+    $owner_id=$self->{depths}->[$root]->{order_id};
   }
   
   my $ref={ 
@@ -895,14 +988,21 @@ Rsets the internals of the object for starting a new stack trace.
 
 sub reset {
   my ($self)=@_;
-  $self->clear_trace;
-  $self->clear_last_depth;
-  $self->clear_depths;
-  $self->clear_order_id;
-  $self->clear_level;
-  $self->clear_tid;
-  $self->clear_max_depth;
-  $self->clear_existing_trace;
+  foreach my $key (
+  qw(
+  trace
+  last_depth
+  depths
+  order_id
+  level
+  tid
+  max_depth
+  existing_trace
+  )) {
+    my $method="clear_$key";
+    $self->$method();
+    $self->$key();
+  }
 }
 
 =head2 $self->start_trace
@@ -921,6 +1021,7 @@ sub start_trace {
   $self->trace_id($self->trace_id +1);
   $AGENT=$self;
 }
+
 
 =head2 $self->stop_trace
 
@@ -970,16 +1071,16 @@ This method is called by the sub method.  It is used to send notice that a frame
 sub close_sub {
   my ($self,$res)=@_;
   $self->pause_trace;
-  my $level=pop $self->level->@*;
+  my $level=pop $self->{level}->@*;
 
   if($level->$#*==0) {
     $self->restore_trace;
     return;
   }
   my $depth=$level->[1];
-  my $last=$self->depths->[$depth];
-  $self->process_result->($self,$res,$last);
+  my $last=$self->{depths}->[$depth];
   $self->close_to($depth);
+  $self->{process_result}->($self,$res,$last);
   $self->restore_trace;
 }
 
@@ -1002,7 +1103,7 @@ sub grab_missing {
   return $missing if($depth==$frame->{depth});
 
   for(;$depth<$frame->{depth};++$depth) {
-    push $missing->@*,$self->depths->[$depth];
+    push $missing->@*,$self->{depths}->[$depth];
   }
   return $missing;
 }
@@ -1064,7 +1165,7 @@ sub sub {
   
   if(ref($DB::sub)) {
     my $name=svref_2object($DB::sub)->GV->NAME;
-    if(defined($name) && exists $AGENT->ignore_blocks->{$name}) {
+    if(defined($name) && exists $AGENT->{ignore_blocks}->{$name}) {
       my $agent=$AGENT;
       $IN_METHOD=0;
       $AGENT=undef;
@@ -1081,22 +1182,22 @@ sub sub {
       }
     }
   }
-  push $AGENT->level->@*,[$DB::sub];
+  push $AGENT->{level}->@*,[$DB::sub];
 
   $IN_METHOD=1;
   
   no strict 'refs';
   if ($DB::sub eq 'DESTROY' or substr($DB::sub, -9) eq '::DESTROY' or not defined wantarray) {
     $DB::ret=&$DB::sub;
-    $AGENT->close_sub(-1);
+    $AGENT->close_sub(-1) if defined $AGENT;
     $DB::ret = undef;
   } elsif (wantarray) {
     @DB::ret = &$DB::sub;
-    $AGENT->close_sub(1);
+    $AGENT->close_sub(1) if defined $AGENT;
     @DB::ret;
   } else {
     $DB::ret = &$DB::sub;
-    $AGENT->close_sub(0);
+    $AGENT->close_sub(0) if defined $AGENT;
     $DB::ret;
   }
 }
@@ -1112,12 +1213,11 @@ __END__
 
 =head1 Compile time notes
 
-For perl 5.34.0
+For perl 5.34.0+
 
 When loading this moduel All features of the debugger are disabled aside from: ( 0x01, 0x02, and 0x20 ) which are requried to force the execution of DB::DB. Please see the perldoc perlvar and the $PERLDB section.
 
   Which means:    $^P==35
-  Also as a note: $^D==0
 
 =head1 RUNTIME
 
@@ -1126,13 +1226,27 @@ At runtime, this modue tries to exectue $Devel::Agent::AGENT->filter($caller,$ar
   $caller: is the caller information
   $args:   contains an array reference that represents the arguments passed to a given method
 
-=head1 Silly stuff
+=head1 TODO
 
-Please forgive the typos, this was written on holiday in my spare time.
+  1. Add Dancer2 trace implementation/example
 
 =head1 AUTHOR
 
 Michael Shipper L<AKALINUX@CPAN.ORG>
+
+=head1 Silly stuff
+
+Please forgive the typos, this was written on holiday in my spare time.
+
+=head1 LICENSE
+
+This code is released under the terms of the perl5 licence itself.  Please see LICENSE.md for more details.
+
+=head1 See Also
+
+Lots of these internals are based on the following:
+
+L<DB>,L<Devel::Trace>,L<perldebguts>
 
 =cut
 

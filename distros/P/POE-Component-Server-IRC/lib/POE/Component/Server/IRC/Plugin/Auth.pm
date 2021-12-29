@@ -1,11 +1,6 @@
 package POE::Component::Server::IRC::Plugin::Auth;
-BEGIN {
-  $POE::Component::Server::IRC::Plugin::Auth::AUTHORITY = 'cpan:HINRIK';
-}
-{
-  $POE::Component::Server::IRC::Plugin::Auth::VERSION = '1.54';
-}
-
+our $AUTHORITY = 'cpan:BINGOS';
+$POE::Component::Server::IRC::Plugin::Auth::VERSION = '1.62';
 use strict;
 use warnings;
 use Carp 'croak';
@@ -13,6 +8,7 @@ use POE;
 use POE::Component::Client::Ident::Agent;
 use POE::Component::Client::DNS;
 use POE::Component::Server::IRC::Plugin 'PCSI_EAT_NONE';
+use Net::IP::Minimal qw[ip_is_ipv6];
 
 sub new {
     my ($package, %args) = @_;
@@ -62,6 +58,7 @@ sub _start {
 
 sub IRCD_connection {
     my ($self, $ircd) = splice @_, 0, 2;
+    my $server = $ircd->server_name();
     pop @_;
     my ($conn_id, $peeraddr, $peerport, $sockaddr, $sockport, $needs_auth)
         = map { $$_ } @_;
@@ -72,20 +69,23 @@ sub IRCD_connection {
     $self->{conns}{$conn_id} = {
         hostname => '',
         ident    => '',
+        done     => 0,
     };
 
     $ircd->send_output(
         {
+            prefix  => $server,
             command => 'NOTICE',
-            params  => ['AUTH', '*** Checking Ident'],
+            params  => ['*', '*** Checking Ident'],
         },
         $conn_id,
     );
 
     $ircd->send_output(
         {
+            prefix  => $server,
             command => 'NOTICE',
-            params  => ['AUTH', '*** Checking Hostname'],
+            params  => ['*', '*** Checking Hostname'],
         },
         $conn_id,
     );
@@ -93,8 +93,9 @@ sub IRCD_connection {
     if ($peeraddr =~ /^127\./) {
         $ircd->send_output(
             {
+                prefix  => $server,
                 command => 'NOTICE',
-                params  => ['AUTH', '*** Found your hostname']
+                params  => ['*', '*** Found your hostname']
             },
             $conn_id,
         );
@@ -143,8 +144,9 @@ sub resolve_ident {
         SockAddr    => $sockaddr,
         SockPort    => $sockport,
         BuggyIdentd => 1,
-        TimeOut     => 10,
+        TimeOut     => ( $self->{ircd}{config}{ident_timeout} || 10 ),
         Reference   => $conn_id,
+        IdentPort   => ( $self->{identport} || '' ),
     );
     return;
 }
@@ -152,6 +154,7 @@ sub resolve_ident {
 sub got_hostname {
     my ($kernel, $self, $response) = @_[KERNEL, OBJECT, ARG0];
     my $conn_id = $response->{context}{conn_id};
+    my $peer_ip = $response->{context}{peeraddr};
     my $ircd    = $self->{ircd};
 
     if (!$ircd->connection_exists($conn_id)) {
@@ -162,18 +165,17 @@ sub got_hostname {
     my $fail = sub {
         $ircd->send_output(
             {
+                prefix  => $self->{ircd}->server_name(),
                 command => 'NOTICE',
                 params  => [
-                    'AUTH',
+                    '*',
                     "*** Couldn\'t look up your hostname",
                 ],
             },
             $conn_id,
         );
 
-        if ($self->{conns}{$conn_id}{done} == 2) {
-            $self->_auth_done($conn_id);
-        }
+        $self->_auth_done($conn_id);
     };
 
     return $fail->() if !defined $response->{response};
@@ -189,7 +191,7 @@ sub got_hostname {
             event   => 'got_ip',
             host    => $answer->rdatastr(),
             context => $context,
-            type    => 'A',
+            type    => ( ip_is_ipv6( $peer_ip ) ? 'AAAA' : 'A' ),
         );
         if (defined $query) {
             $kernel->call($self->{session_id}, 'got_ip', $query);
@@ -203,6 +205,7 @@ sub got_ip {
     my ($kernel, $self, $response) = @_[KERNEL, OBJECT, ARG0];
     my $conn_id = $response->{context}{conn_id};
     my $ircd    = $self->{ircd};
+    my $server  = $ircd->server_name();
 
     if (!$ircd->connection_exists($conn_id)) {
         delete $self->{conns}{$conn_id};
@@ -212,9 +215,10 @@ sub got_ip {
     my $fail = sub {
         $ircd->send_output(
             {
+                prefix  => $server,
                 command => 'NOTICE',
                 params  => [
-                    'AUTH',
+                    '*',
                     "*** Couldn't look up your hostname",
                 ],
             },
@@ -233,8 +237,9 @@ sub got_ip {
         if ($answer->rdatastr() eq $peeraddr) {
             $ircd->send_output(
                 {
+                    prefix  => $server,
                     command => 'NOTICE',
-                    params  => ['AUTH', '*** Found your hostname'],
+                    params  => ['*', '*** Found your hostname'],
                 },
                 $conn_id,
             );
@@ -246,9 +251,10 @@ sub got_ip {
 
     $ircd->send_output(
         {
+            prefix  => $server,
             command => 'NOTICE',
             params  => [
-                'AUTH',
+                '*',
                 '*** Your forward and reverse DNS do not match',
             ],
         },
@@ -288,8 +294,9 @@ sub got_ident_error {
 
     $ircd->send_output(
         {
+            prefix  => $ircd->server_name(),
             command => 'NOTICE',
-            params  => ['AUTH', "*** No Ident response"],
+            params  => ['*', "*** No Ident response"],
         },
         $conn_id,
     );
@@ -312,8 +319,9 @@ sub got_ident {
     $ident = $other if uc $opsys ne 'OTHER';
     $ircd->send_output(
         {
+            prefix  => $ircd->server_name(),
             command => 'NOTICE',
-            params  => ['AUTH', "*** Got Ident response"],
+            params  => ['*', "*** Got Ident response"],
         },
         $conn_id,
     );

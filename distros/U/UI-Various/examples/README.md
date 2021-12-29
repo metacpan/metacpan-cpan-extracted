@@ -1,6 +1,6 @@
 # NAME
 
-*.pl - example scripts for `[UI::Various](https://metacpan.org/pod/UI%3A%3AVarious)`
+*.pl - example scripts for [UI::Various](https://metacpan.org/pod/UI%3A%3AVarious)
 
 # SYNOPSIS
 
@@ -12,8 +12,8 @@
 
 # ABSTRACT
 
-These are the example scripts for `[UI::Various](https://metacpan.org/pod/UI%3A%3AVarious)`, e. g. several "Hello
-World!" variants.
+These are the example scripts for [UI::Various](https://metacpan.org/pod/UI%3A%3AVarious),
+e. g. several "Hello World!" variants.
 
 # DESCRIPTION
 

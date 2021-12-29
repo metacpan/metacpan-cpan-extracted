@@ -9,6 +9,7 @@ my $pocosi = POE::Component::Server::IRC->spawn(
     auth         => 0,
     antiflood    => 0,
     plugin_debug => 1,
+    config       => { sid => '5IV', },
 );
 my $pocoirc = POE::Component::IRC->spawn(flood => 1);
 
@@ -117,12 +118,12 @@ sub irc_322 {
     my ($heap, $sender, $text, $parsed) = @_[HEAP, SENDER, ARG1, ARG2];
 
     if ($heap->{set_topic}) {
-        is($parsed->[2], 'Fubar', 'Topic is okay from LIST');
+        is($parsed->[2], '[+nt] Fubar', 'Topic is okay from LIST');
         $heap->{set_topic} = 0;
         $poe_kernel->post($sender, 'topic', $parsed->[0], '');
     }
     else {
-        is($parsed->[2], '', "No topic set");
+        is($parsed->[2], '[+nt]', "No topic set");
         $poe_kernel->post( $sender, 'quit');
     }
 }

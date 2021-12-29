@@ -3,9 +3,9 @@ NAME
     Bencher::Scenario::* distribution
 
 VERSION
-    This document describes version 0.248 of
+    This document describes version 0.250 of
     Pod::Weaver::Plugin::Bencher::Scenario (from Perl distribution
-    Pod-Weaver-Plugin-Bencher-Scenario), released on 2021-07-23.
+    Pod-Weaver-Plugin-Bencher-Scenario), released on 2021-07-31.
 
 SYNOPSIS
     In your weaver.ini:
@@ -32,7 +32,7 @@ DESCRIPTION
     *   Add a Benchmark Participants section containing list of participants
         from the scenario
 
-    *   Add a Sample Benchmark Results containing result from a bencher run
+    *   Add a Benchmark Sample Results containing result from a bencher run
 
         Both normal benchmark and a separate module startup benchmark (if
         eligible) are run and shown.
@@ -44,7 +44,7 @@ DESCRIPTION
         "lib/Acme/CPANModules_ScenarioR/*" module files that contain sample
         benchmark result data
 
-        These module files contain the raw data, while the Sample Benchmark
+        These module files contain the raw data, while the Benchmark Sample
         Results POD section of the scenario module contains the formatted
         result. The raw data might be useful later. For example I'm thinking
         of adding a utility later, perhaps in the form of an lcpan

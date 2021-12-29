@@ -81,6 +81,13 @@ returns.  However, it is possible to have a list of multiple windows and
 switch between them: One is active and the others are inactive, waiting to
 be activated again.  See examples/TODO
 
+# KNOWN BUGS
+
+Setting an attribute of any object to `undef` will not work with Perl
+versions prior to 5.20 (see [perl5200delta](https://metacpan.org/pod/perl5200delta), bugs #7508 and #109726).  The
+only possible (and dirty!) workaround is setting the member of the internal
+hash directly.
+
 # METHODS
 
 ## **import** - import and initialisation of UI::Various package

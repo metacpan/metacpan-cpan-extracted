@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 use parent qw(Exporter);
 
@@ -304,7 +304,7 @@ CPANPLUS::Dist::Debora::Util - Utility functions
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

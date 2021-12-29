@@ -1,6 +1,6 @@
 # Paranoid::Data::AVLTree -- AVL-Balanced Tree Class
 #
-# $Id: lib/Paranoid/Data/AVLTree.pm, 2.08 2020/12/31 12:10:06 acorliss Exp $
+# $Id: lib/Paranoid/Data/AVLTree.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
 #
 # This software is free software.  Similar to Perl, you can redistribute it
 # and/or modify it under the terms of either:
@@ -42,7 +42,7 @@ use Paranoid::Debug qw(:all);
 use Paranoid::Data::AVLTree::AVLNode;
 use Carp;
 
-($VERSION) = ( q$Revision: 2.08 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.09 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 use constant AVLROOT => 0;
 use constant AVLKEYS => 1;
@@ -909,7 +909,7 @@ Paranoid::Data::AVLTree - AVL-Balanced Tree Class
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Data/AVLTree.pm, 2.08 2020/12/31 12:10:06 acorliss Exp $
+$Id: lib/Paranoid/Data/AVLTree.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
 
 =head1 SYNOPSIS
 

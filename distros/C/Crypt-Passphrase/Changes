@@ -1,5 +1,8 @@
 Revision history for Crypt-Passphrase
 
+0.004     2021-12-29 02:25:52+01:00 Europe/Amsterdam
+          - Use Crypt::URandom for randomness
+
 0.003     2021-03-11 20:50:59+01:00 Europe/Amsterdam
           - Fix password encoding to utf8
 

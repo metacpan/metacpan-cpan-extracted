@@ -1,12 +1,12 @@
 # Paranoid::IO -- Paranoid IO support
 #
-# $Id: lib/Paranoid/IO.pm, 2.08 2020/12/31 12:10:06 acorliss Exp $
+# $Id: lib/Paranoid/IO.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
 #
 # This software is free software.  Similar to Perl, you can redistribute it
 # and/or modify it under the terms of either:
 #
 #   a)     the GNU General Public License
-#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the 
+#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the
 #          Free Software Foundation <http://www.fsf.org/>; either version 1
 #          <https://www.gnu.org/licenses/gpl-1.0.html>, or any later version
 #          <https://www.gnu.org/licenses/license-list.html#GNUGPL>, or
@@ -18,8 +18,8 @@
 # However, "Paranoid" may be used fairly to describe this unmodified
 # software, in good faith, but not as a trademark.
 #
-# (c) 2005 - 2020, Arthur Corliss (corliss@digitalmages.com)
-# (tm) 2008 - 2020, Paranoid Inc. (www.paranoid.com)
+# (c) 2005 - 2021, Arthur Corliss (corliss@digitalmages.com)
+# (tm) 2008 - 2021, Paranoid Inc. (www.paranoid.com)
 #
 #####################################################################
 
@@ -44,17 +44,19 @@ use Paranoid::Debug qw(:all);
 use Paranoid::Input;
 use IO::Handle;
 
-($VERSION) = ( q$Revision: 2.08 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.09 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 @EXPORT = qw(pclose pcloseAll popen preopen ptell pseek pflock pread
-    pnlread pwrite pappend ptruncate);
-@EXPORT_OK = ( @EXPORT, qw(PIOBLKSIZE PIOMAXFSIZE) );
+    pnlread pwrite pnlwrite pappend pnlappend ptruncate pnltruncate);
+@EXPORT_OK = ( @EXPORT, qw(PIOBLKSIZE PIOMAXFSIZE PIOLOCKSTACK) );
 %EXPORT_TAGS = ( all => [@EXPORT_OK] );
 
 use constant PDEFPERM   => 0666;
 use constant PDEFMODE   => O_CREAT | O_RDWR;
 use constant PDEFBLKSZ  => 4096;
 use constant PDEFFILESZ => 65536;
+use constant PFLMASK    => LOCK_SH | LOCK_EX | LOCK_UN;
+use constant PIGNMFLAGS => O_TRUNC | O_CREAT | O_EXCL;
 
 #####################################################################
 #
@@ -84,6 +86,18 @@ use constant PDEFFILESZ => 65536;
         # Usage:    PIOBLKSIZE
 
         $mfsz;
+    }
+
+    my %lstack;
+    my $lsflag = 0;
+
+    sub PIOLOCKSTACK : lvalue {
+
+        # Purpose:  Enables/disables the flock lock stack
+        # Returns:  $lsflag
+        # Usage:    PIOLOCKSTACK
+
+        $lsflag;
     }
 
     # %files:  {name} => {
@@ -154,7 +168,10 @@ use constant PDEFFILESZ => 65536;
             }
 
             # Clean up internal data structures
-            delete $files{$filename} if defined $filename;
+            if ( defined $filename ) {
+                delete $files{$filename};
+                delete $lstack{$filename};
+            }
 
             Paranoid::ERROR =
                 pdebug( 'error closing file handle: %s', PDLEVEL1, $! )
@@ -291,8 +308,8 @@ use constant PDEFFILESZ => 65536;
             $tmp{fh} = $fh = undef;
             if ( pclose($filename) ) {
 
-                # Remove O_TRUNC
-                $tmp{mode} ^= O_TRUNC if $tmp{mode} & O_TRUNC;
+                # Reopen should ignore O_TRUNC, O_CREAT, and O_EXCL on reopens
+                $tmp{mode} &= ~PIGNMFLAGS if $tmp{mode} & PIGNMFLAGS;
 
                 # Open the file and move the cursor back where it was
                 $rv = _open( @tmp{qw(real mode perms)} );
@@ -306,6 +323,9 @@ use constant PDEFFILESZ => 65536;
                     # Move the record over to the original file name
                     $files{$filename} = { %{ $files{ $tmp{real} } } };
                     delete $files{ $tmp{real} } if $filename ne $tmp{real};
+
+                    # Delete any existing lock stack
+                    delete $lstack{$filename};
                 }
             }
         }
@@ -413,15 +433,15 @@ use constant PDEFFILESZ => 65536;
         return $rv;
     }
 
-    sub pflock {
+    sub _pflock {
 
         # Purpose:  Performs file-locking operations on the passed filename
         # Returns:  Boolean
-        # Usage:    $rv = pflock($filename, LOCK_EX);
+        # Usage:    $rv = _pflock($filename, LOCK_EX);
 
         my $filename = shift;
         my $lock     = shift;
-        my ( $rv, $fh );
+        my ( $rv, $fh, $rl );
         local $!;
 
         pdebug( 'entering w/(%s)(%s)', PDLEVEL2, $filename, $lock );
@@ -440,16 +460,211 @@ use constant PDEFFILESZ => 65536;
             if ( defined $fh ) {
 
                 # Apply the lock
+                $rl = $lock & PFLMASK;
                 $rv = flock $fh, $lock;
 
                 # Record change to internal state if we're tracking this file
-                $files{$filename}{ltype} = $lock
-                    if defined $filename
-                        and exists $files{$filename};
+                if ($rv) {
+                    if ( defined $filename and exists $files{$filename} ) {
+                        $files{$filename}{ltype} = $rl;
+                    } else {
+                        pdebug(
+                            'flock succeeded on file opened outside of the'
+                                . ' Paranoid::IO framework (%s)',
+                            PDLEVEL1, $filename
+                            );
+                    }
+                } else {
+                    pdebug(
+                        ( ( $lock & LOCK_NB ) ? 'non-blocking' : '' )
+                        . 'flock attempt failed on %s',
+                        PDLEVEL1, $filename
+                        );
+                }
+            }
+        }
 
-                Paranoid::ERROR =
-                    pdebug( 'error attempting to pflock: %s', PDLEVEL1, $! )
-                    unless $rv;
+        pOut();
+        pdebug( 'leaving w/rv: %s', PDLEVEL2, $rv );
+
+        return $rv;
+    }
+
+    sub _plsflock {
+
+        my $filename = shift;
+        my $lock     = shift;
+        my ( $fh, $stack, $rl, $ll, $lsl, $rv );
+
+        pdebug( 'entering w/(%s)(%s)', PDLEVEL2, $filename, $lock );
+        pIn();
+
+        # Var Key:
+        #   lock:   lock passed to function (can include LOCK_NB)
+        #   rl:     real lock (stripping LOCK_NB)
+        #   ll:     last lock (as performed by last _pflock()
+        #   lsl:    last lock recorded in the lock stack
+
+        # Translate glob to filename for lock stack tracking purposes
+        $fh = $filename;
+        $filename = _pfFhind($filename) if ref $filename eq 'GLOB';
+
+        # Get the current lock state
+        $ll = $files{$filename}{ltype}
+            if defined $filename and exists $files{$filename};
+        if ( defined $ll ) {
+
+            # Get the real lock level for comparison
+            $rl = $lock & PFLMASK;
+
+            # File has been opened, at least, with popen, and has a locktype
+            # entry
+            $lstack{$filename} = [] unless exists $lstack{$filename};
+            $stack = $lstack{$filename};
+            $lsl   = $$stack[-1];
+
+            #warn "lock: $lock\nrl: $rl\nll: $ll\nlsl: $lsl\n";
+            pdebug(
+                'something has gone awry during lock tracking.'
+                    . 'll: %s lsl: %s',
+                PDLEVEL1, $ll, $lsl
+                )
+                if defined $lsl
+                    and $lsl != $ll;
+
+            # Adjust as necessary
+            if ( $rl == LOCK_UN ) {
+
+                # Remove a lock from the stack
+                pop @$stack;
+
+                if ( scalar @$stack ) {
+
+                    # Still have locks in the stack that must not be degraded
+                    $rv = 1;
+                    if ( $ll != $$stack[-1] ) {
+
+                        # Apply the new level
+                        $rv = _pflock( $filename, $$stack[-1] );
+                    }
+
+                } else {
+
+                    # No locks in the stack to preserve, so go ahead and
+                    # release the lock
+                    $rv = _pflock( $filename, LOCK_UN );
+
+                }
+
+            } elsif ( $rl == LOCK_SH ) {
+
+                # Upgrade lock to preserve previous exclusive lock on the
+                # stack, if necessary
+                if ( defined $lsl and $lsl == LOCK_EX ) {
+                    $lock = ( LOCK_EX | ( $lock & LOCK_NB ) );
+                    $rl = LOCK_EX;
+                }
+
+                $rv = $ll == $rl ? 1 : _pflock( $filename, $lock );
+                push @$stack, $rl if $rv;
+
+            } elsif ( $rl == LOCK_EX ) {
+                push @$stack, $rl;
+                $rv = $ll == $rl ? 1 : _pflock( $filename, $lock );
+            } else {
+                pdebug( 'unknown lock type: %x', PDLEVEL2, $lock );
+            }
+
+            # Report some diagnostics
+            if ( scalar @$stack ) {
+                pdebug( 'lock stack depth: %s', PDLEVEL4, scalar @$stack );
+                if ( $ll == $$stack[-1] ) {
+                    pdebug( 'preserved lock at %s', PDLEVEL4, $ll );
+                } else {
+                    pdebug( 'switched lock from %s to %s',
+                        PDLEVEL4, $ll, $$stack[-1] );
+                }
+            } else {
+                pdebug( 'no locks remaining', PDLEVEL4 );
+            }
+
+            # Delete empty stacks to avoid memory leaks
+            delete $lstack{$filename} unless scalar @$stack;
+
+        } else {
+            if ( defined $fh and !defined $filename ) {
+                $rv = _pflock( $fh, $lock );
+            } else {
+                pdebug( 'file %s is unknown to Paranoid::IO so far',
+                    PDLEVEL2, $filename );
+            }
+        }
+
+        pOut();
+        pdebug( 'leaving w/rv: %s', PDLEVEL2, $rv );
+
+        return $rv;
+    }
+
+    sub pflock {
+
+        # Purpose:  Performs file-locking operations on the passed filename
+        # Returns:  Boolean
+        # Usage:    $rv = pflock($filename, LOCK_EX);
+
+        my $filename = shift;
+        my $lock     = shift;
+        my ( $rv, $fh );
+
+        pdebug( 'entering w/(%s)(%s)', PDLEVEL2, $filename );
+        pIn();
+
+        # NOTE:  retrieving the file handle might seem silly, but if a process
+        # is forked, and the first thing they do on a file is apply an flock,
+        # the first I/O operation will close and reopen the file to avoid
+        # confusion with the parent process and, therefore, losing the lock.
+        #
+        # End sum, this is a necessary evil in order to preserve locks a
+        # before any effective I/O is done in the child.
+        if ( defined $filename ) {
+            $fh = popen($filename);
+            $rv =
+                  PIOLOCKSTACK()
+                ? _plsflock( $filename, $lock )
+                : _pflock( $filename, $lock );
+        }
+
+        pOut();
+        pdebug( 'leaving w/rv: %s', PDLEVEL2, $rv );
+
+        return $rv;
+    }
+
+    sub plockstat {
+
+        # Purpose:  Returns the the status of the last lock applied via
+        #           pflock()
+        # Returns:  LOCK_*
+        # Usage:    $lock = plockstat($filename);
+
+        my $filename = shift;
+        my $rv;
+
+        pdebug( 'entering w/(%s)(%s)', PDLEVEL2, $filename );
+        pIn();
+
+        if ( defined $filename ) {
+
+            # Get the missing variable
+            $filename = _pfFhind($filename) if ref $filename eq 'GLOB';
+            if ( defined $filename and exists $files{$filename} ) {
+                $rv = $files{$filename}{ltype};
+            } else {
+                pdebug(
+                    'attempted to retrieve lock status for file not opened'
+                        . ' with the Paranoid::IO framework (%s)',
+                    PDLEVEL1, $filename
+                    );
             }
         }
 
@@ -510,6 +725,7 @@ sub pseek {
 
         $fh = popen( $filename, O_RDWR );
         if ( defined $fh ) {
+            $whence = SEEK_SET unless defined $whence;
             $rv = sysseek $fh, $setpos, $whence;
             Paranoid::ERROR =
                 pdebug( 'error attempting to pseek: %s', PDLEVEL1, $! )
@@ -530,26 +746,29 @@ sub pwrite {
     # Usage:    $bytes = pwrite($filename, $text);
     # Usage:    $bytes = pwrite($filename, $text, $length);
     # Usage:    $bytes = pwrite($filename, $text, $length, $offset);
+    # Usage:    $bytes = pwrite($filename, $text, $length, $offset, $nolock);
 
     my $filename = shift;
     my $out      = shift;
     my $wlen     = shift;
     my $offset   = shift;
+    my $nolock   = shift;
+    my $bytes    = defined $out ? length $out : 0;
     my ( $fh, $rv );
 
-    pdebug( 'entering w/(%s)(%s)(%s)(%s)',
-        PDLEVEL2, $filename, $out, $wlen, $offset );
+    pdebug( 'entering w/(%s)(%s bytes)(%s)(%s)(%s)',
+        PDLEVEL2, $filename, $bytes, $wlen, $offset, $nolock );
     pIn();
 
     if ( defined $filename and defined $out and length $out ) {
 
         # Opportunistically open a file handle if needed,
         # otherwise, just retrieve the existing file handle
-        $fh = popen( $filename, O_WRONLY | O_CREAT | O_TRUNC );
+        $fh = popen( $filename, O_WRONLY | O_CREAT );
 
         # Smoke 'em if you got'em...
         if ( defined $fh ) {
-            if ( pflock( $filename, LOCK_EX ) ) {
+            if ( $nolock or pflock( $filename, LOCK_EX ) ) {
                 $wlen   = length $out unless defined $wlen;
                 $offset = 0           unless defined $offset;
                 $rv = syswrite $fh, $out, $wlen, $offset;
@@ -560,7 +779,7 @@ sub pwrite {
                         pdebug( 'failed to write to file handle: %s',
                         PDLEVEL1, $! );
                 }
-                pflock( $filename, LOCK_UN );
+                pflock( $filename, LOCK_UN ) unless $nolock;
             }
         }
     }
@@ -571,7 +790,22 @@ sub pwrite {
     return $rv;
 }
 
-sub pappend ($$;$$) {
+sub pnlwrite {
+
+    # Purpose:  Wrapper for pwrite w/o internal flocking
+    # Returns:  RV of pwrite
+    # Usage:    $bytes = pnlwrite($filename, $text, $length);
+    # Usage:    $bytes = pnlwrite($filename, $text, $length, $offset);
+
+    my $filename = shift;
+    my $out      = shift;
+    my $wlen     = shift;
+    my $offset   = shift;
+
+    return pwrite( $filename, $out, $wlen, $offset, 1 );
+}
+
+sub pappend {
 
     # Purpose:  Appends the data to the end of the file,
     #           but does not move the file cursor
@@ -584,22 +818,23 @@ sub pappend ($$;$$) {
     my $out      = shift;
     my $wlen     = shift;
     my $offset   = shift;
+    my $nolock   = shift;
     my ( $fh, $pos, $rv );
 
-    pdebug( 'entering w/(%s)(%s)(%s)(%s)',
-        PDLEVEL2, $filename, $out, $wlen, $offset );
+    pdebug( 'entering w/(%s)(%s)(%s)(%s)(%s)',
+        PDLEVEL2, $filename, $out, $wlen, $offset, $nolock );
     pIn();
 
     if ( defined $filename and defined $out and length $out ) {
 
-        # Opportunistically opena file handle in append mode
+        # Opportunistically open a file handle in append mode
         $fh = popen( $filename, O_WRONLY | O_CREAT | O_APPEND );
 
         # Smoke 'em if you got'em...
         if ( defined $fh ) {
 
             # Lock the file
-            if ( pflock( $filename, LOCK_EX ) ) {
+            if ( $nolock or pflock( $filename, LOCK_EX ) ) {
 
                 # Save the current position
                 $pos = sysseek $fh, 0, SEEK_CUR;
@@ -624,7 +859,7 @@ sub pappend ($$;$$) {
                 sysseek $fh, $pos, SEEK_SET;
 
                 # Unlock the file handle
-                pflock( $filename, LOCK_UN );
+                pflock( $filename, LOCK_UN ) unless $nolock;
             }
         }
     }
@@ -633,6 +868,21 @@ sub pappend ($$;$$) {
     pdebug( 'leaving w/rv: %s', PDLEVEL2, $rv );
 
     return $rv;
+}
+
+sub pnlappend {
+
+    # Purpose:  Wrapper for pappend w/o internal flocking
+    # Returns:  RV of pappend
+    # Usage:    $bytes = pnlappend($filename, $text, $length);
+    # Usage:    $bytes = pnlappend($filename, $text, $length, $offset);
+
+    my $filename = shift;
+    my $out      = shift;
+    my $wlen     = shift;
+    my $offset   = shift;
+
+    return pappend( $filename, $out, $wlen, $offset, 1 );
 }
 
 sub pread ($\$;@) {
@@ -685,7 +935,7 @@ sub pread ($\$;@) {
 
 sub pnlread ($\$;@) {
 
-    # Purpose:  Wrapper for pread
+    # Purpose:  Wrapper for pread w/o internal flocking
     # Returns:  RV of pread
     # Usage:    $bytes = pnlread($filename, $text, $length);
     # Usage:    $bytes = pnlread($filename, $text, $length, $offset);
@@ -707,6 +957,7 @@ sub ptruncate {
 
     my $filename = shift;
     my $pos      = shift;
+    my $nolock   = shift;
     my ( $rv, $fh, $cpos );
 
     pdebug( 'entering w/(%s)(%s)', PDLEVEL2, $filename, $pos );
@@ -718,7 +969,7 @@ sub ptruncate {
 
         # Smoke 'em if you got'em...
         if ( defined $fh ) {
-            if ( pflock( $filename, LOCK_EX ) ) {
+            if ( $nolock or pflock( $filename, LOCK_EX ) ) {
                 $cpos = sysseek $fh, 0, SEEK_CUR;
                 $rv = truncate $fh, $pos;
                 if ($rv) {
@@ -727,7 +978,7 @@ sub ptruncate {
                     Paranoid::ERROR =
                         pdebug( 'failed to truncate file: %s', PDLEVEL1, $! );
                 }
-                pflock( $filename, LOCK_UN );
+                pflock( $filename, LOCK_UN ) unless $nolock;
             }
         }
     }
@@ -754,7 +1005,7 @@ Paranoid::IO - Paranoid IO support
 
 =head1 VERSION
 
-$Id: lib/Paranoid/IO.pm, 2.08 2020/12/31 12:10:06 acorliss Exp $
+$Id: lib/Paranoid/IO.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -774,13 +1025,18 @@ $Id: lib/Paranoid/IO.pm, 2.08 2020/12/31 12:10:06 acorliss Exp $
   # Adjust max file size for file scans
   PIOMAXFSIZE = 65536;
 
+  # Enable flock lock stack
+  PIOLOCKSTACK = 1;
+
   # Explicit open
   $fh = popen($filename, O_RDWR | O_CREAT | O_TRUNC, 0600);
   $rv = pseek($filename, 0, SEEK_END);
+  $rv = pflock($filename, LOCK_EX);
   if ($rv > 0) {
     pseek($filename, 0, SEEK_SET) && ptruncate($filename);
   }
   $rv = pwrite($fileanme, $text) && pclose($filename);
+  $rv = plockstat($filename);
 
   $rv = pclose($filename);
 
@@ -826,6 +1082,8 @@ The features provided by this module are:
 O_APPEND
 
 =item * Intelligent file tracking
+
+=item * Optional flock lock stack for transactional I/O patterns
 
 =back
 
@@ -875,6 +1133,11 @@ append operations use locking internally, alleviating the need for the
 developer to do so explicitly.  Locks are applied and removed as quickly as
 possible to facilitate concurrent access.
 
+If you're managing flocks directly, however, all of the read/write functions
+in this module not only support an option boolean argument to disable internal
+flocking, but also have I<pnl*> wrapper functions that set that argument for
+you.
+
 =head2 O_APPEND access patterns
 
 I<pappend> allows you to mimic B<O_APPEND> access patterns even for files that
@@ -896,18 +1159,132 @@ This could be, however, a double-edged sword if your program intends to open
 identically named files in multiple locations.  If that is your intent you
 would be cautioned to avoid using relative paths with I<popen>.
 
+=head2 Optional flock lock stack for transactional I/O patterns
+
+Complex I/O patterns on file I/O can sometimes extensive nested function calls
+that each manipulate flocks independently.  Those nested calls can come into
+conflict when one call degrades a needed lock applied by a previous call.
+
+For instance, a pattern where a new block needs to be allocated to an opened
+file, but an index of blocks must be maintained within the same file.  One
+might have a function which retrieves the list of block addresses from the
+index, and that function rationally applies a shared flock before reading, and
+removes it afterwards.  One might try to get an exclusive lock on the file,
+then retrieve the index using the existing function. That function, however,
+would end up replacing your exclusive lock with the shared lock, potentially
+making it impossible to reacquire that exclusive lock depending on other
+processes and their I/O.
+
+The lock stack attempts to solve those kinds of problems by maintaining a
+stack of flocks, and making sure that no new locks degrade the previous locks.
+In previous example, it would notice that the stack was opened with an
+exclusive lock, and when the index retrieval function attempts to apply the
+shared lock, it would simply upgrade that lock to preserve the exclusive lock.
+Since a stack tracks each call to L<pflock()>, once that function attempts to
+release the shared lock, the lock stack would simply pop off it's upgraded
+call from the stack, and make sure the preceding lock stays in place.
+
+Another way to describe this in psuedo code:
+
+    # Enable the lock stack
+    PIOLOCKSTACK = 1;
+
+    sub readIdx {
+        pflock($file, LOCK_SH);
+        # ... read data
+        pflock($file, LOCK_UN);
+        # ... return data
+    }
+
+    sub writeIdx {
+        pflock($file, LOCK_EX);
+        # ... write data
+        pflock($file, LOCK_UN);
+    }
+
+    sub writeData {
+        pflock($file, LOCK_EX);
+        # ... write data
+        pflock($file, LOCK_UN);
+    }
+
+    sub writeTx {
+        pflock($file, LOCK_EX);
+        readIdx();
+        writeData();
+        writeIdx();
+        pflock($file, LOCK_UN);
+    }
+
+    # Execute the transaction
+    writeTx();
+
+Without the lock stack, executing the transaction function would cause the
+following to happen:
+
+    writeTx:
+        # apply LOCK_EX
+        # readIdx:
+            # apply LOCK_SH
+            # read data
+            # release all locks w/LOCK_UN
+        # writeData:
+            # apply LOCK_EX
+            # ERROR: any write decisions at this point based on the previous
+            # ERROR: index read may cause file corruption because the index
+            # ERROR: may have changed while this process was waiting to 
+            # ERROR: reacquire the exclusive lock!
+
+With the lock stack in place, however, it goes like this:
+
+    writeTx:
+        # apply LOCK_EX
+            # lock stack: (LOCK_EX)
+        # readIdx:
+            # asks for LOCK_SH, but maintains LOCK_EX
+                # lock stack: (LOCK_EX, LOCK_EX)
+            # read data
+            # deletes its lock from the stack, but preserves the previous lock
+                # lock stack: (LOCK_EX)
+        # writeData:
+            # asks for LOCK_EX
+                # lock stack: (LOCK_EX, LOCK_EX)
+            # writes data
+            # deletes its lock from the stack, but preserves the previous lock
+                # lock stack: (LOCK_EX)
+        # writeIdx:
+            # asks for LOCK_EX
+                # lock stack: (LOCK_EX, LOCK_EX)
+            # writes data
+            # deletes its lock from the stack, but preserves the previous lock
+                # lock stack: (LOCK_EX)
+        # release lock
+            # lock stack: ()
+
+At no point was the advisory lock lost, and hence, transactional integrity
+was preserved for all compliant processes.
+
+The lock stack is off by default to allow the developer complete control over
+locking and I/O patterns, but it's there to make functions easier to write
+without having to worry about any locks applied outside of their code scope.
+
+One downside of the lock stack is that affects all I/O performed via the
+L<Paranoid::IO> framework, it is not locallized to specific file handles.  For
+that reason, one must be confident that flocks are applied as atomically as
+possible throughout the code space leveraging it.
+
 =head1 IMPORT LISTS
 
 This module exports the following symbols by default:
 
-    pclose pcloseAll popen preopen ptell pseek pflock pread
-    pnlread pwrite pappend ptruncate
+    pclose pcloseAll popen preopen ptell pseek pflock 
+    plockstat pread pnlread pwrite pappend ptruncate
 
 The following specialized import lists also exist:
 
     List        Members
-    --------------------------------------------------------
-    all         @defaults PIOBLKSIZE PIOMAXFSIZE   
+    ---------------------------------------------------------
+    all         @defaults PIOBLKSIZE PIOMAXFSIZE PIOLOCKSTACK
 
 =head1 SUBROUTINES/METHODS
 
@@ -932,6 +1309,14 @@ provided for use in dependent modules that may want to impose file size
 limits, such as L<Paranoid::IO::Line> and others.
 
 The default is 65536.
+
+=head2 PIOLOCKSTACK
+
+    PIOLOCKSTACK = 1
+
+This lvalue function is not exported by default.  It is used to enable the 
+flock lock stack functionality in order to support transactional I/O patterns.
+It is disabled by default.
 
 =head2 popen
 
@@ -1024,6 +1409,12 @@ should be one of the B<LOCK_*> constants as exported by L<Fcntl>.
 B<NOTE:> This function essentially acts like a pass-through to the native
 L<flock> function for any file handle not opened via this module's functions.
 
+=head2 plockstat
+
+    $lock = plockstat($filename);
+
+This returns the last flock applied via L<pflock>.
+
 =head2 pread
 
     $bytes = pread($filename, $text, $length);
@@ -1042,50 +1433,95 @@ defaults to B<PIOBLKSIZE>.
     $bytes = pnlread($fh, $text, $length);
     $bytes = pnlread($fh, $text, $length, $offset);
 
-File locks are inherent on all reads and writes.  There are plenty of
-legitimate scenarios where a read needs to be done ignoring any file locks.
-It is for those situations that this function exists.  It acts identically in
-every way to I<pread> with the lone exception that it does not perform file
-locking.
+This is a wrapper function for B<pread> that calls it with inherent file
+locking disabled.  It is assumed that the dev is either managing flocks
+directly, or they're not needed for this application.
 
 =head2 pwrite
 
     $bytes = pwrite($filename, $text);
     $bytes = pwrite($filename, $text, $length);
     $bytes = pwrite($filename, $text, $length, $offset);
+    $bytes = pwrite($filename, $text, $length, $nolock);
     $bytes = pwrite($fh, $text);
     $bytes = pwrite($fj, $text, $length);
     $bytes = pwrite($fh, $text, $length, $offset);
+    $bytes = pwrite($fh, $text, $length, $offset, $nolock);
 
 This returns the number of bytes written, or undef for any critical failures.
 If this is called prior to an explicit I<popen> it uses a default mode of
 B<O_WRONLY | O_CREAT | O_TRUNC>.
+
+The optional boolean fifth argument (I<nolock>) will bypass automatic flocks
+since it assumes you're managing the lock directly.
+
+=head2 pnlwrite
+
+    $bytes = pnlwrite($filename, $text);
+    $bytes = pnlwrite($filename, $text, $length);
+    $bytes = pnlwrite($filename, $text, $length, $offset);
+    $bytes = pnlwrite($fh, $text);
+    $bytes = pnlwrite($fj, $text, $length);
+    $bytes = pnlwrite($fh, $text, $length, $offset);
+
+This is a wrapper function for B<pwrite> that calls it with inherent file
+locking disabled.  It is assumed that the dev is either managing flocks
+directly, or they're not needed for this application.
 
 =head2 pappend
 
     $bytes = pappend($filename, $text);
     $bytes = pappend($filename, $text, $length);
     $bytes = pappend($filename, $text, $length, $offset);
+    $bytes = pappend($filename, $text, $length, $offset, $nolock);
     $bytes = pappend($fh, $text);
     $bytes = pappend($fh, $text, $length);
-    $bytes = pappend($fh, $text, $length, $offset);
+    $bytes = pappend($fh, $text, $length, $offset, $nolock);
 
 This behaves identically to I<pwrite> with the sole exception that this
 preserves the file position after explicitly seeking and writing to the end of
 the file.  The default mode here, however, would be B<O_WRONLY | O_CREAT |
 O_APPEND> for those files not explicitly opened.
 
+The optional boolean fifth argument (I<nolock>) will bypass automatic flocks
+since it assumes you're managing the lock directly.
+
+=head2 pnlappend
+
+    $bytes = pnlappend($filename, $text);
+    $bytes = pnlappend($filename, $text, $length);
+    $bytes = pnlappend($filename, $text, $length, $offset);
+    $bytes = pnlappend($fh, $text);
+    $bytes = pnlappend($fj, $text, $length);
+    $bytes = pnlappend($fh, $text, $length, $offset);
+
+This is a wrapper function for B<pappend> that calls it with inherent file
+locking disabled.  It is assumed that the dev is either managing flocks
+directly, or they're not needed for this application.
+
 =head2 ptruncate
 
     $rv = ptruncate($filename);
-    $rv = ptruncate($filename, $pos);
+    $rv = ptruncate($filename, $pos, $nolock);
     $rv = ptruncate($fh);
-    $rv = ptruncate($fh, $pos);
+    $rv = ptruncate($fh, $pos, $nolock);
 
 This returns the result of the internal L<truncate> call.  If called without
 an explicit I<popen> it will open the named file with the default mode of
 B<O_RDWR | O_CREAT>.  Omitting the position to truncate from will result in
 the file being truncated at the beginning of the file.
+
+The optional boolean third argument (I<nolock>) will bypass automatic flocks
+since it assumes you're managing the lock directly.
+
+=head2 pnltruncate
+
+    $rv = pnltruncate($filename);
+    $rv = pnltruncate($fh);
+
+This is a wrapper function for B<pnltruncate> that calls it with inherent file
+locking disabled.  It is assumed that the dev is either managing flocks
+directly, or they're not needed for this application.
 
 =head1 DEPENDENCIES
 
@@ -1147,6 +1583,6 @@ subject to the following additional term:  No trademark rights to
 However, "Paranoid" may be used fairly to describe this unmodified
 software, in good faith, but not as a trademark.
 
-(c) 2005 - 2020, Arthur Corliss (corliss@digitalmages.com)
-(tm) 2008 - 2020, Paranoid Inc. (www.paranoid.com)
+(c) 2005 - 2021, Arthur Corliss (corliss@digitalmages.com)
+(tm) 2008 - 2021, Paranoid Inc. (www.paranoid.com)
 

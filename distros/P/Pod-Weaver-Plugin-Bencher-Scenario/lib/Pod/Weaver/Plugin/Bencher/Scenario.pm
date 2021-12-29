@@ -1,9 +1,9 @@
 package Pod::Weaver::Plugin::Bencher::Scenario;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-23'; # DATE
+our $DATE = '2021-07-31'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-Bencher-Scenario'; # DIST
-our $VERSION = '0.248'; # VERSION
+our $VERSION = '0.250'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -105,6 +105,7 @@ sub _gen_chart {
                     $table_num, $output_file]);
     }
 
+    push @$pod, "The above result presented as chart:\n\n";
     push @$pod, "#IMAGE: $build_file|$output_file\n\n";
 
     # this is very very dirty. we mark that we have created some chart files in
@@ -223,7 +224,7 @@ sub _process_bencher_scenario_or_acme_cpanmodules_module {
 
     my @modules = Bencher::Backend::_get_participant_modules($scenario);
 
-    # add Sample Benchmark Results section
+    # add Benchmark Sample Results section
     my @bench_res;
     my $table_num = 0;
     {
@@ -247,14 +248,9 @@ sub _process_bencher_scenario_or_acme_cpanmodules_module {
                     $self->log_fatal(["Invalid sample_bench[$i] specification: invalid args: %s - %s", $cres->[0], $cres->[1]])
                         unless $cres->[0] == 200;
                     my $cmd = "C<< bencher ".($is_cpanmodules ? "--cpanmodules-module $cpanmodules_name" : "-m $scenario_name")." ".join(" ", map {shell_quote($_)} @{$cres->[2]})." >>";
-                    if ($res->{title}) {
-                        $res->{title} .= " ($cmd)";
-                    } else {
-                        $res->{title} = "Benchmark with $cmd";
-                    }
+                    $res->{cmdline} = $cmd;
                 } elsif ($res->{file}) {
                     $res->{result} = decode_json(read_text($res->{file}));
-                    $res->{title} //= "(no title)";
                 } else {
                     $self->log_fatal(["Invalid sample_bench[$i] specification: no args/file specified"]);
                 }
@@ -263,7 +259,11 @@ sub _process_bencher_scenario_or_acme_cpanmodules_module {
             }
         } else {
             $sample_benches = [
-                {title=>"Benchmark with default options (C<< bencher ".($is_cpanmodules ? "--cpanmodules-module $cpanmodules_name" : "-m $scenario_name")." >>)", args=>{}},
+                {
+                    cmdline => "bencher ".($is_cpanmodules ? "--cpanmodules-module $cpanmodules_name" : "-m $scenario_name"),
+                    cmdline_comment => 'default options',
+                    args=>{},
+                },
             ];
         }
 
@@ -280,7 +280,7 @@ sub _process_bencher_scenario_or_acme_cpanmodules_module {
                 if ($i > 0) {
                     my $run_on = __render_run_on($bench_res);
                     if ($run_on ne $first_run_on) {
-                        $bench->{title} .= " ($run_on)";
+                        $bench->{cmdline_comment} = $run_on;
                     }
                 }
             } else {
@@ -303,15 +303,17 @@ sub _process_bencher_scenario_or_acme_cpanmodules_module {
                     $bench_res, [split /\s*[,;]\s*|\s+/, $self->result_split_fields]);
                 for my $k (0..$#{$split_bench_res}) {
                     my $split_item = $split_bench_res->[$k];
-                    if ($k == 0) { push @pod, "$bench->{title}:\n\n" }
+                    if ($k == 0) { push @pod, "Benchmark command".($bench->{cmdline_comment} ? " ($bench->{cmdline_comment})" : "").":\n\n % $bench->{cmdline}\n\n" }
                     my $fres = Bencher::Backend::format_result($split_item->[1]);
                     $fres =~ s/^/ /gm;
                     $table_num++;
+                    my $split_note = @$split_bench_res > 1 ? " (split, part ".($k+1)." of ".(@$split_bench_res+0).")" : "";
+                    push @pod, "Result formatted as table$split_note:\n\n";
                     push @pod, " #table$table_num#\n", " ", dmp($split_item->[0]), "\n$fres\n";
                     {
                         $fres = Bencher::Backend::format_result($split_item->[1], undef, {render_as_benchmark_pm=>1});
                         $fres =~ s/^/ /gm;
-                        push @pod, "Formatted as L<Benchmark.pm|Benchmark> result:\n\n$fres\n";
+                        push @pod, "The above result formatted in L<Benchmark.pm|Benchmark> style:\n\n$fres\n";
                     }
                     push @pod, __html_result($bench_res, $table_num) if $self->gen_html_tables;
                     $self->_gen_chart($tempdir, $input, \@pod, $split_item->[1], $table_num);
@@ -322,11 +324,13 @@ sub _process_bencher_scenario_or_acme_cpanmodules_module {
                 my $fres = Bencher::Backend::format_result($bench_res);
                 $fres =~ s/^/ /gm;
                 $table_num++;
-                push @pod, "$bench->{title}:\n\n #table$table_num#\n$fres\n\n";
+                push @pod, "Benchmark command".($bench->{cmdline_comment} ? " ($bench->{cmdline_comment})" : "").":\n\n % $bench->{cmdline}\n\n";
+                push @pod, "Result formatted as table:\n\n";
+                push @pod, " #table$table_num#\n$fres\n\n";
                 {
                     $fres = Bencher::Backend::format_result($bench_res, undef, {render_as_benchmark_pm=>1});
                     $fres =~ s/^/ /gm;
-                    push @pod, "Formatted as L<Benchmark.pm|Benchmark> result:\n\n$fres\n";
+                    push @pod, "The above result formatted in L<Benchmark.pm|Benchmark> style:\n\n$fres\n";
                 }
                 push @pod, __html_result($bench_res, $table_num) if $self->gen_html_tables;
                 $self->_gen_chart($tempdir, $input, \@pod, $bench_res, $table_num);
@@ -345,11 +349,13 @@ sub _process_bencher_scenario_or_acme_cpanmodules_module {
             $fres = Bencher::Backend::format_result($bench_res2);
             $fres =~ s/^/ /gm;
             $table_num++;
-            push @pod, "Benchmark module startup overhead (C<< bencher ".($is_cpanmodules ? "--cpanmodules-module $cpanmodules_name" : "-m $scenario_name")." --module-startup >>):\n\n #table$table_num#\n", $fres, "\n\n";
+            push @pod, "Benchmark module startup overhead (C<< bencher ".($is_cpanmodules ? "--cpanmodules-module $cpanmodules_name" : "-m $scenario_name")." --module-startup >>):\n\n";
+            push @pod, "Result formatted as table:\n\n";
+            push @pod, " #table$table_num#\n", $fres, "\n\n";
             {
                 $fres = Bencher::Backend::format_result($bench_res2, undef, {render_as_benchmark_pm=>1});
                 $fres =~ s/^/ /gm;
-                push @pod, "Formatted as L<Benchmark.pm|Benchmark> result:\n\n$fres\n";
+                push @pod, "The above result formatted in L<Benchmark.pm|Benchmark> style:\n\n$fres\n";
             }
             push @pod, __html_result($bench_res2, $table_num) if $self->gen_html_tables;
             $self->_gen_chart($tempdir, $input, \@pod, $bench_res2, $table_num);
@@ -360,7 +366,7 @@ sub _process_bencher_scenario_or_acme_cpanmodules_module {
         }
 
         $self->add_text_to_section(
-            $document, join("", @pod), 'SAMPLE BENCHMARK RESULTS',
+            $document, join("", @pod), 'BENCHMARK SAMPLE RESULTS',
             {
                 after_section => ['BENCHMARKED MODULES', 'SYNOPSIS'],
                 before_section => 'DESCRIPTION',
@@ -402,7 +408,7 @@ sub _process_bencher_scenario_or_acme_cpanmodules_module {
             $document, join("", @pod), 'BENCHMARKED MODULES',
             {
                 after_section => 'SYNOPSIS',
-                before_section => ['SAMPLE BENCHMARK RESULTS', 'DESCRIPTION'],
+                before_section => ['BENCHMARK SAMPLE RESULTS', 'DESCRIPTION'],
             });
     }
 
@@ -462,7 +468,7 @@ sub _process_bencher_scenario_or_acme_cpanmodules_module {
             $document, join("", @pod), 'BENCHMARK PARTICIPANTS',
             {
                 after_section => ['BENCHMARKED MODULES'],
-                before_section => ['SAMPLE BENCHMARK RESULTS'],
+                before_section => ['BENCHMARK SAMPLE RESULTS'],
             });
     }
 
@@ -670,7 +676,7 @@ Pod::Weaver::Plugin::Bencher::Scenario - Plugin to use when building Bencher::Sc
 
 =head1 VERSION
 
-This document describes version 0.248 of Pod::Weaver::Plugin::Bencher::Scenario (from Perl distribution Pod-Weaver-Plugin-Bencher-Scenario), released on 2021-07-23.
+This document describes version 0.250 of Pod::Weaver::Plugin::Bencher::Scenario (from Perl distribution Pod-Weaver-Plugin-Bencher-Scenario), released on 2021-07-31.
 
 =head1 SYNOPSIS
 
@@ -697,7 +703,7 @@ Only for C<lib/Bencher/Scenario/*> module files.
 
 =item * Add a Benchmark Participants section containing list of participants from the scenario
 
-=item * Add a Sample Benchmark Results containing result from a bencher run
+=item * Add a Benchmark Sample Results containing result from a bencher run
 
 Both normal benchmark and a separate module startup benchmark (if eligible) are
 run and shown.
@@ -706,7 +712,7 @@ run and shown.
 
 =item * Create C<lib/Bencher/ScenarioR/*> or C<lib/Acme/CPANModules_ScenarioR/*> module files that contain sample benchmark result data
 
-These module files contain the raw data, while the Sample Benchmark Results POD
+These module files contain the raw data, while the Benchmark Sample Results POD
 section of the scenario module contains the formatted result. The raw data might
 be useful later. For example I'm thinking of adding a utility later, perhaps in
 the form of an L<lcpan> subcommand, that can guess whether a module is

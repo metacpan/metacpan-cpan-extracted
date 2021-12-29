@@ -1,5 +1,5 @@
 package Sim::OPT::Morph;
-# Copyright (C) 2008-2020 by Gian Luca Brunetti and Politecnico di Milano.
+# Copyright (C) 2008-2021 by Gian Luca Brunetti and Politecnico di Milano.
 # This is the module Sim::OPT::Morph of Sim::OPT.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
@@ -47,20 +47,22 @@ decreasearray deg2rad_ rad2deg_ purifyarray replace_nth rotate2dabs rotate2d rot
 gatherseparators supercleanarray modish $max_processes @weighttransforms
 ); # our @EXPORT = qw( );
 
-$VERSION = '0.117'; # our $VERSION = '';
+$VERSION = '0.121'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Morph is a morphing program for performing parametric variations on model for simulation programs.';
 
 ################################################# MORPH
 
 sub morph
 {
-	my ( $configfile, $instances_r, $dirfiles_r, $dowhat_r, $vehicles_r, $inst_r ) = @_;
+	my ( $configfile, $instances_r, $dirfiles_r, $dowhat_r, $vehicles_r, $inst_r, $precedents_r ) = @_;
 
 	my @instances = @{ $instances_r };
+
 	my %dirfiles = %{ $dirfiles_r };
 	my %dowhat = %{ $dowhat_r };
 	my %vehicles = %{ $vehicles_r };
 	my %inst = %{ $inst_r };
+	my @precedents = @{ $precedents_r };
 
 	my $mypath = $main::mypath;
 	my $exeonfiles = $main::exeonfiles;
@@ -326,35 +328,34 @@ sub morph
 		my $instance_after = $instances[ $countinstance + 1];
 		my %d_after = %{ $instance_after };
 
-		my $countcase = $d{countcase};
-		my $countblock = $d{countblock};
-		my %datastruc = %{ $d{datastruc} }; ######
-		my @rescontainer = @{ $d{rescontainer} }; ######
-		my @miditers = @{ $d{miditers} };
-		my @winneritems = @{ $d{winneritems} };
-		my $countvar = $d{countvar};
+		my $countcase = $d{countcase}; say $tee "HEEERE IN MORPH \$countcase: " . dump( $countcase );
+		my $countblock = $d{countblock}; say $tee "HEEERE IN MORPH \$countblock: " . dump( $countblock );
+		my %datastruc = %{ $d{datastruc} }; say $tee "HEEERE IN MORPH \%datastruc: " . dump( \%datastruc );
+		my @rescontainer = @{ $d{rescontainer} }; say $tee "HEEERE IN MORPH \@rescontainer: " . dump( @rescontainer );
+		my @miditers = @{ $d{miditers} }; say $tee "HEEERE IN MORPH \@miditers: " . dump( @miditers );
+		my @winneritems = @{ $d{winneritems} }; say $tee "HEEERE IN MORPH \@winneritems: " . dump( @winneritems );
+		my $countvar = $d{countvar}; say $tee "HEEERE IN MORPH \$countvar: " . dump( $countvar );
 		my @countvars;
 		push( @countvars, $countvar );
 		my $countvar_after = $d_after{countvar};
-		my $countstep = $d{countstep};
-		my $countinstance = ( $d{instn} );
+		my $countstep = $d{countstep}; say $tee "HEEERE IN MORPH \$countstep: " . dump( $countstep );
+		my $countinstance = ( $d{instn} ); say $tee "HEEERE IN MORPH \$countinstance: " . dump( $countinstance );
 
-		my @uplift = @{ $d{uplift} };
-		my @backvalues = @{ $d{backvalues} };
-		my @sweeps = @{ $d{sweeps} };
-		my @sourcesweeps = @{ $d{sourcesweeps} };
-		my @blockelts = @{ $d{blockelts} };
-		my @blocks = @{ $d{blocks} };
+		my @uplift = @{ $d{uplift} }; say $tee "HEEERE IN MORPH \@uplift: " . dump( @uplift );
+		my @backvalues = @{ $d{backvalues} }; say $tee "HEEERE IN MORPH \@backvalues: " . dump( @backvalues );
+		my @sweeps = @{ $d{sweeps} }; say $tee "HEEERE IN MORPH \@sweeps: " . dump( @sweeps );
+		my @sourcesweeps = @{ $d{sourcesweeps} }; say $tee "HEEERE IN MORPH \@sourcesweeps: " . dump( @sourcesweeps );
+		my @blockelts = @{ $d{blockelts} }; say $tee "HEEERE IN MORPH \@blockelts: " . dump( @blockelts );
+		my @blocks = @{ $d{blocks} }; say $tee "HEEERE IN MORPH \@blocks: " . dump( @blocks );
 
-		my $origin = $d{origin};
-		my %to = %{ $d{to} };
-		#my %inst = %{ $d{inst} };
+		my $origin = $d{origin}; say $tee "HEEERE IN MORPH \$origin: " . dump( $origin );
+		my %to = %{ $d{to} }; say $tee "HEEERE IN MORPH \%to: " . dump( \%to );
 
-		my $from = $d{from};
-		my $toitem = $d{toitem};
+		my $from = $d{from}; say $tee "HEEERE IN MORPH \$from: " . dump( $from );
+		my $toitem = $d{toitem}; say $tee "HEEERE IN MORPH \$toitem: " . dump( $toitem );
 
-		my %varnums = %{ $d{varnums} };
-		my %mids = %{ $d{mids} };
+		my %varnums = %{ $d{varnums} }; say $tee "HEEERE IN MORPH \%varnums: " . dump( \%varnums );
+		my %mids = %{ $d{mids} }; say $tee "HEEERE IN MORPH \%mids: " . dump( \%mids );
 		my $rootname = Sim::OPT::getrootname( \@rootnames, $countcase );
 
 		my $varnumber = $countvar;
@@ -453,8 +454,7 @@ sub morph
 				my $sequencer = $$general_variables[1];
 				my $dffile = "df-$file.txt";
 
-
-
+				say $tee "HEERE 0 COUNTBLOCK: $countblock, \$countstep: $countstep, \$origin: $origin, \$target: $target, \$to{cleanto}: $to{cleanto}, \$to{thisto}: $to{thisto},  ";
 				if ( ( ( $countblock == 0 ) and ( $countstep == 1 ) ) or ( ( $dirfiles{randompick} eq "yes" ) or ( $dirfiles{ga} eq "yes" ) ) )
 				#if ( $countblock == 0 )
 				{
@@ -466,12 +466,15 @@ sub morph
 							unless ($exeonfiles eq "n")
 							{
 								$target = $inst{$dirfiles{starter}};
+								say $tee "HEERE 1 COUNTBLOCK: $countblock, \$countstep: $countstep, \$origin: $origin, \$target: $target, \$to{cleanto}: $to{cleanto}, \$to{thisto}: $to{thisto},  ";
 								if ( ( $dirfiles{randompick} eq "yes" ) or ( $dirfiles{ga} eq "yes" ) )
 								{
 									$target = "$mypath/$file" . "_" . $instance->{is};
 								}
 								`cp -R $mypath/$file $target`;
 								say $tee "LEVEL 0: cp -R $mypath/$file $target\n";
+
+								my $cleartarget = $to{to};
 								say $tee "THAT IS TO SAY, LEVEL 0: cp -R $mypath/$file $cleartarget\n";
 							}
 						}
@@ -486,13 +489,12 @@ sub morph
 
 					#	if ( ( not ( $to ~~ @morphcases ) ) or ( $dowhat{actonmodels} eq "y" ) )
 					if ( not ( $to{cleanto} ~~ @morphcases ) )
-					{
+					{ say $tee "HEERE 2 COUNTBLOCK: $countblock, \$countstep: $countstep, \$origin: $origin, \$orig: $orig, \$target: $target, \$to{cleanto}: $to{cleanto}, \$to{thisto}: $to{thisto},  ";
 
 						push ( @morphcases, $to{cleanto} );
 						print MORPHLIST "$to{cleanto}\n";
 
-						if ( ( not (-e $to{crypto} ) ) or ( not ( $to{cleanto} ~~ @morphcases) )
-							or ( $dowhat{overwrite_models} eq "y" ) )
+						if ( ( not (-e $to{crypto} ) ) or ( $dowhat{overwrite_models} eq "y" ) )
 						{
 							unless ($exeonfiles eq "n")
 							{
@@ -512,9 +514,20 @@ sub morph
 								}
 								else
 								{
-									$orig = $inst{$origin};
-									`cp -R $orig $target\n`;
-									print $tee "LEVEL 1: cp -R $orig $target\n\n";
+									if ( $inst{$origin} ne "" )
+									{
+										$orig = $inst{$origin};
+									}
+									else
+									{
+										$orig = "$mypath/$file" . "_" . "$origin";
+										#$inst{$origin} = $orig;
+										#$inst{$orig} = $origin;
+									}
+
+									`cp -R $orig $target`;
+									say $tee "HEERE 3 COUNTBLOCK: $countblock, \$countstep: $countstep, \$orig: $orig, \$target: $target, \$to{cleanto}: $to{cleanto}, \$to{thisto}: $to{thisto},  ";
+									print $tee "LEVEL 1: cp -R $orig $target \n\n";
 								}
 
 								my $cleartarget = $to{to};
@@ -559,7 +572,7 @@ sub morph
 
 								my $launchline = "cd $to/cfg/ \n prj -file $fileconfig -mode script"; say $tee "SO, LAUNCHLINE! " . dump( $launchline );
 
-								if ( ( $stepsvar > 0 ) and ( not ( eval ( $skip ) ) ) )
+								if ( ( $stepsvar > 1 ) and ( not ( eval ( $skip ) ) ) )
 								{
 
 									##########################################

@@ -94,12 +94,12 @@ sub newretrieve
 
   my %dt = %{ $_[0] };
   my %d = %{ $dt{instance} };
-  my %dirfiles = %{ $dt{dirfiles} };
-  my $resfile = $dt{resfile};
-  my $flfile = $dt{flfile};
-  my %vehicles = %{ $dt{vehicles} };
-  my $precious = $dt{precious};
-  my %inst = %{ $dt{inst} };
+  my %dirfiles = %{ $dt{dirfiles} }; say $tee "HEEERE IN OPT SUB CALLBLOCK \%dirfiles: " . dump( \%dirfiles );
+  my $resfile = $dt{resfile}; say $tee "HEEERE IN OPT SUB CALLBLOCK \$resfile: " . dump( $resfile );
+  my $flfile = $dt{flfile}; say $tee "HEEERE IN OPT SUB CALLBLOCK \$flfile: " . dump( $flfile );
+  my %vehicles = %{ $dt{vehicles} }; say $tee "HEEERE IN OPT SUB CALLBLOCK \%vehicles: " . dump( \%vehicles );
+  my $precious = $dt{precious}; say $tee "HEEERE IN OPT SUB CALLBLOCK \$precious: " . dump( $precious );
+  my %inst = %{ $dt{inst} }; say $tee "HEEERE IN OPT SUB CALLBLOCK \%inst: " . dump( \%inst );
 
   my @simcases = @{ $dirfiles{simcases} }; ######
   my @simstruct = @{ $dirfiles{simstruct} }; ######
@@ -125,38 +125,38 @@ sub newretrieve
   my $descendlist = $dirfiles{descendlist};
   my $descendblock = $dirfiles{descendblock};
 
-  my $countinstance = $d{instn};
+  my $countinstance = $d{instn}; say $tee "HEEERE IN REPORT \$countinstance: " . dump( $countinstance );
 
-  my $countcase = $d{countcase};
-  my $countblock = $d{countblock};
-  my %datastruc = %{ $d{datastruc} }; ######
+  my $countcase = $d{countcase}; say $tee "HEEERE IN REPORT \$countcase: " . dump( $countcase );
+  my $countblock = $d{countblock}; say $tee "HEEERE IN REPORT \$countblock: " . dump( $countblock );
+  my %datastruc = %{ $d{datastruc} }; say $tee "HEEERE IN REPORT \%datastruc: " . dump( \%datastruc );
   my @varnumbers = @{ $d{varnumbers} };
-  @varnumbers = Sim::OPT::washn( @varnumbers );
+  @varnumbers = Sim::OPT::washn( @varnumbers ); say $tee "HEEERE IN REPORT \@varnumbers: " . dump( @varnumbers );
   my @miditers = @{ $d{miditers} };
-  @miditers = Sim::OPT::washn( @miditers );
-  my @sweeps = @{ $d{sweeps} };
+  @miditers = Sim::OPT::washn( @miditers ); say $tee "HEEERE IN REPORT \@miditers: " . dump( @miditers );
+  my @sweeps = @{ $d{sweeps} }; say $tee "HEEERE IN REPORT \@sweeps: " . dump( @sweeps );
 
   my %dowhat = %{ $d{dowhat} };
 
-  my $direction = ${$dowhat{direction}}[$countcase][$countblock]; #NEW
-  my $precomputed = $dowhat{precomputed}; #NEW
-  my @takecolumns = @{ $dowhat{takecolumns} }; #NEW
+  my $direction = ${$dowhat{direction}}[$countcase][$countblock]; say $tee "HEEERE IN REPORT \$direction: " . dump( $direction );
+  my $precomputed = $dowhat{precomputed}; say $tee "HEEERE IN REPORT \$precomputed: " . dump( $precomputed );
+  my @takecolumns = @{ $dowhat{takecolumns} }; say $tee "HEEERE IN REPORT \@takecolumns: " . dump( @takecolumns );
 
   my $skipfile = $vals{skipfile};
 	my $skipsim = $vals{skipsim};
 	my $skipreport = $vals{skipreport};
   my %notecases;
 
-  my @winneritems = @{ $d{winneritems} };
-  my $countvar = $d{countvar};
-  my $countstep = $d{countstep};
+  my @winneritems = @{ $d{winneritems} }; say $tee "HEEERE IN REPORT \@winneritems: " . dump( @winneritems );
+  my $countvar = $d{countvar}; say $tee "HEEERE IN REPORT \$countvar: " . dump( $countvar );
+  my $countstep = $d{countstep}; say $tee "HEEERE IN REPORT \$countstep: " . dump( $countstep );
 
-  my %to = %{ $d{to} };
+  my %to = %{ $d{to} }; say $tee "HEEERE IN REPORT \%to: " . dump( %to );
   my $thisto = $to{to}; say $tee "\$thisto: $thisto";
-  #my %inst = %{ $d{inst} };
+
   my $cleanto = $inst{$thisto}; say $tee "\$cleanto: $cleanto";
 
-  my $from = $d{from};
+  my $from = $d{from}; say $tee "HEEERE IN REPORT \$from: " . dump( $from );
   my $toitem = $d{toitem}; say $tee "TOITEM: $toitem";
 
   my $c = $d{c};
@@ -172,6 +172,8 @@ sub newretrieve
 
   my $shortflfile = $flfile;
   $shortflfile =~ s/$thisto\/tmp\///; say $tee "IN RETRIEVE: \$shortflfile: $shortflfile, \$flfile: $flfile";
+
+  say $tee "RELAUNCHED IN RETRIEVE WITH INST " . dump( %inst );
 
   my $counttool = 1;
   while ( $counttool <= $numberof_simtools )
@@ -926,7 +928,7 @@ sub newreport # This function retrieves the results of interest from the texts f
 
   my %to = %{ $d{to} };
   my $thisto = $to{to};
-  #my %inst = %{ $d{inst} };
+
   my $cleanto = $inst{$thisto};
   my $is = $d{is};
 
@@ -950,6 +952,7 @@ sub newreport # This function retrieves the results of interest from the texts f
   my $direction = ${$dowhat{direction}}[$countcase][$countblock]; #NEW
   my $precomputed = $dowhat{precomputed};
   my @takecolumns = @{ $dowhat{takecolumns} }; #NEW
+  say $tee "HEEERE IN REPORT \@_: " . dump( @_ );
 
   my ( @repfilemem, @linecontent, @convey );
   $" = " ";
@@ -982,6 +985,8 @@ sub newreport # This function retrieves the results of interest from the texts f
     push ( @{ $repstruct[$countcase][$countblock] }, $repfile );
   }
   my $signalnewinstance = 1;
+
+  say $tee "RELAUNCHED IN REPORT WITH INST " . dump( %inst );
 
 
   if ( $precomputed eq "" ) #NEW, TAKE CARE.###########################

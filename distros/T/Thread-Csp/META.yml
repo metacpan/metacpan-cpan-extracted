@@ -1,0 +1,39 @@
+---
+abstract: 'Communicating sequential processes threading for Perl'
+author:
+  - 'Leon Timmermans <leont@cpan.org>'
+build_requires:
+  Module::Build: '0.28'
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Thread-Csp
+provides:
+  Thread::Csp:
+    file: lib/Thread/Csp.pm
+    version: '0.001'
+  Thread::Csp::Channel:
+    file: lib/Thread/Csp/Channel.pm
+    version: '0.001'
+  Thread::Csp::Promise:
+    file: lib/Thread/Csp/Promise.pm
+    version: '0.001'
+requires:
+  XSLoader: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Leont/threads-csp/issues
+  repository: git://github.com/Leont/threads-csp.git
+version: '0.001'
+x_generated_by_perl: v5.32.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

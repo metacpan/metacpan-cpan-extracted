@@ -1,0 +1,57 @@
+---
+abstract: 'Find or download and install libmaxminddb'
+author:
+  - 'Andreas Vögele <voegelas@cpan.org>'
+build_requires:
+  Alien::Build: '0.32'
+  Alien::Build::MM: '0.32'
+  ExtUtils::MakeMaker: '6.52'
+  Path::Tiny: '0.077'
+  Sort::Versions: '0'
+  Test::Alien: '0'
+  Test::More: '0'
+configure_requires:
+  Alien::Build: '1.19'
+  Alien::Build::MM: '0.32'
+  ExtUtils::MakeMaker: '6.52'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-libmaxminddb
+provides:
+  Alien::libmaxminddb:
+    file: lib/Alien/libmaxminddb.pm
+    version: '1.000'
+requires:
+  Alien::Base: '0'
+  parent: '0'
+  perl: '5.016'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://gitlab.com/voegelas/alien-libmaxminddb/-/issues
+  homepage: https://gitlab.com/voegelas/alien-libmaxminddb
+  repository: https://gitlab.com/voegelas/alien-libmaxminddb.git
+version: '1.000'
+x_alienfile:
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
+  requires:
+    share:
+      Archive::Tar: '0'
+      Config: '0'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      IO::Zlib: '0'
+      Mojo::DOM: '0'
+      Mojolicious: '7.00'
+      Net::SSLeay: '1.49'
+      Sort::Versions: '0'
+      URI: '0'
+      URI::Escape: '0'
+    system: {}
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

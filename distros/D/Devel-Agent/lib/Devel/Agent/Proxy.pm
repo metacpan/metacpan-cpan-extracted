@@ -2,7 +2,7 @@ package Devel::Agent::Proxy;
 
 =head1 NAME
 
-Devel::Agent::Proxy
+Devel::Agent::Proxy - instance proxy layer
 
 =head1 SYNOPSIS
 
@@ -26,7 +26,8 @@ This class was created to act as an agent aware wrapper for classes that interna
 use strict;
 use warnings;
 require Carp;
-our $VERSION=0.0001;
+require Devel::Agent;
+our $VERSION=$Devel::Agent::VERSION;
 
 # COMMENT THIS OUT AFTER TESTING!!
 #use Data::Dumper;

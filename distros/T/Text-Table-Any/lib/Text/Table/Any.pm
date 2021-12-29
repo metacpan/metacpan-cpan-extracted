@@ -1,15 +1,16 @@
+## no critic: TestingAndDebugging::RequireUseStrict
 package Text::Table::Any;
-
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-26'; # DATE
-our $DIST = 'Text-Table-Any'; # DIST
-our $VERSION = '0.104'; # VERSION
 
 #IFUNBUILT
 # # use 5.010001;
 # # use strict;
 # # use warnings;
 #END IFUNBUILT
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-12-09'; # DATE
+our $DIST = 'Text-Table-Any'; # DIST
+our $VERSION = '0.105'; # VERSION
 
 our @BACKENDS = qw(
                       Term::TablePrint
@@ -147,6 +148,7 @@ sub table {
         return Text::Table::HTML::DataTables::table(
             rows => $rows,
             header_row => $header_row,
+            (title => $params{title}) x !!defined($params{title}),
         );
     } elsif ($backend eq 'Text::Table::Paragraph') {
         require Text::Table::Paragraph;
@@ -269,7 +271,7 @@ Text::Table::Any - Generate text table using one of several backends
 
 =head1 VERSION
 
-This document describes version 0.104 of Text::Table::Any (from Perl distribution Text-Table-Any), released on 2021-04-26.
+This document describes version 0.105 of Text::Table::Any (from Perl distribution Text-Table-Any), released on 2021-12-09.
 
 =head1 SYNOPSIS
 
@@ -384,18 +386,19 @@ Usage:
 
  table(%params) => str
 
-Known arguments:
+Except for the C<backend> parameter, the parameters will mostly be passed to the
+backend, sometimes slightly modified if necessary to achieve the desired effect.
+If a parameter is not supported by a backend, then it will not be passed to the
+backend.
+
+Known parameters:
 
 =over
 
-=item * rows (aoaos)
+=item * backend
 
-Required. Takes an array reference which should contain one or more rows of
-data, where each row is an array reference.
-
-=item * backend (str, default C<Text::Table::Sprintf>)
-
-Optional. Pick a backend module. Supported backends:
+Optional. Str, default C<Text::Table::Sprintf>. Pick a backend module. Supported
+backends:
 
 =over
 
@@ -453,16 +456,30 @@ Optional. Pick a backend module. Supported backends:
 
 =back
 
-=item * header_row (bool, default 0)
+=item * rows
 
-Optional. If given a true value, the first row in the data will be interpreted
-as a header row, and separated visually from the rest of the table (e.g. with a
-ruled line). But some backends won't display differently.
+Required. Aoaos (array of array-of-scalars). Each element in the array is a row
+of data, where each row is an array reference.
+
+=item * header_row
+
+Optional. Bool, default is false. If given a true value, the first row in the
+data will be interpreted as a header row, and separated visually from the rest
+of the table (e.g. with a ruled line). But some backends won't display
+differently.
 
 =item * separate_rows
 
-Boolean. Optional. Default false. If set to true, will draw a separator line
+Boolean. Optional. Default is false. If set to true, will draw a separator line
 after each data row.
+
+Not all backends support this.
+
+=item * title
+
+Optional. Str. Title of the table.
+
+Currently the only backend supporting this is C<Text::Table::HTML::DataTables>.
 
 =back
 
@@ -479,14 +496,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Text-Table
 
 Source repository is at L<https://github.com/perlancar/perl-Text-Table-Any>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Text-Table-Any/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Acme::CPANModules::TextTable>
@@ -495,11 +504,36 @@ L<Acme::CPANModules::TextTable>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Table-Any>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

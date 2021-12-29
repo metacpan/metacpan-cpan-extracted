@@ -1,19 +1,16 @@
 package POE::Component::Server::IRC::Backend;
-BEGIN {
-  $POE::Component::Server::IRC::Backend::AUTHORITY = 'cpan:HINRIK';
-}
-{
-  $POE::Component::Server::IRC::Backend::VERSION = '1.54';
-}
-
+our $AUTHORITY = 'cpan:BINGOS';
+$POE::Component::Server::IRC::Backend::VERSION = '1.62';
 use strict;
 use warnings;
-use Carp qw(croak);
+use Carp qw(carp croak);
 use List::Util qw(first);
 use POE qw(Wheel::SocketFactory Wheel::ReadWrite Filter::Stackable
-           Filter::Line Filter::IRCD);
+           Filter::Line Filter::IRCD Filter::ThruPut);
 use Net::Netmask;
-use Socket qw(unpack_sockaddr_in inet_ntoa);
+use Net::CIDR ();
+use Net::IP::Minimal qw[ip_is_ipv6];
+use Socket qw(getnameinfo NI_NUMERICHOST NI_NUMERICSERV AF_INET6);
 use base qw(POE::Component::Syndicator);
 
 use constant {
@@ -35,6 +32,7 @@ use constant {
         _event_dispatcher
         _sock_failed
         _sock_up
+        _sock_ssl
     )],
 };
 
@@ -61,13 +59,18 @@ sub create {
         eval {
             require POE::Component::SSLify;
             POE::Component::SSLify->import(
-                qw(SSLify_Options Server_SSLify Client_SSLify)
+                qw(SSLify_GetCTX SSLify_Options Server_SSLify Client_SSLify SSLify_ContextCreate)
             );
         };
         chomp $@;
         croak("Can't use ssl: $@") if $@;
 
-        eval { SSLify_Options(@{ $args{sslify_options} }); };
+        eval {
+          SSLify_Options(@{ $args{sslify_options} });
+          my $ctx = SSLify_GetCTX();
+          require Net::SSLeay;
+          Net::SSLeay::CTX_set_verify( $ctx, 0x01, sub { return 1; } );
+        };
         chomp $@;
         croak("Can't use ssl: $@") if $@;
         $self->{got_ssl} = 1;
@@ -98,7 +101,9 @@ sub create {
         require POE::Component::Server::IRC::Plugin::Auth;
         $self->plugin_add(
             'Auth_'.$self->session_id(),
-            POE::Component::Server::IRC::Plugin::Auth->new(),
+            POE::Component::Server::IRC::Plugin::Auth->new(
+                identport => $args{identport},
+            ),
         );
     }
 
@@ -190,34 +195,44 @@ sub _accept_failed {
 }
 
 sub _accept_connection {
-    my ($kernel, $self, $socket, $peeraddr, $peerport, $listener_id)
-        = @_[KERNEL, OBJECT, ARG0..ARG3];
+    my ($kernel, $self, $socket, $listener_id)
+        = @_[KERNEL, OBJECT, ARG0, ARG3];
 
-    my $sockaddr = inet_ntoa((unpack_sockaddr_in(getsockname $socket))[1]);
-    my $sockport = (unpack_sockaddr_in(getsockname $socket))[0];
-    $peeraddr    = inet_ntoa($peeraddr);
+    my (undef,$peeraddr,$peerport) = getnameinfo( CORE::getpeername( $socket ), NI_NUMERICHOST | NI_NUMERICSERV );
+    my (undef,$sockaddr,$sockport) = getnameinfo( CORE::getsockname( $socket ), NI_NUMERICHOST | NI_NUMERICSERV );
+
+    s!^::ffff:!! for ( $sockaddr, $peeraddr );
+
     my $listener = $self->{listeners}{$listener_id};
 
+    my $secured = 0;
+    my $context = { };
+
     if ($self->{got_ssl} && $listener->{usessl}) {
+        my $cb = $_[SESSION]->callback('_sock_ssl',$context);
         eval {
-            $socket = POE::Component::SSLify::Server_SSLify($socket);
+            $socket = POE::Component::SSLify::Server_SSLify($socket,undef,$cb);
+            $secured = 1;
         };
         chomp $@;
         die "Failed to SSLify server socket: $@" if $@;
     }
 
-    return if $self->denied($peeraddr);
+    my $stats_filter = POE::Filter::ThruPut->new();
 
     my $wheel = POE::Wheel::ReadWrite->new(
         Handle       => $socket,
-        Filter       => $self->{filter},
         InputEvent   => '_conn_input',
         ErrorEvent   => '_conn_error',
         FlushedEvent => '_conn_flushed',
+        Filter       => POE::Filter::Stackable->new(
+            Filters => [$stats_filter, $self->{filter}],
+        ),
     );
 
     if ($wheel) {
         my $wheel_id = $wheel->ID();
+        $context->{wheel_id} = $wheel_id;
         my $ref = {
             wheel     => $wheel,
             peeraddr  => $peeraddr,
@@ -225,9 +240,12 @@ sub _accept_connection {
             flooded   => 0,
             sockaddr  => $sockaddr,
             sockport  => $sockport,
-            idle      => time(),
+            idle      => $listener->{idle},
             antiflood => $listener->{antiflood},
-            compress  => 0
+            compress  => 0,
+            secured   => $secured,
+            stats     => $stats_filter,
+            _sent     => 0,
         };
 
         my $needs_auth = $listener->{auth} && $self->{auth} ? 1 : 0;
@@ -239,6 +257,8 @@ sub _accept_connection {
             $sockaddr,
             $sockport,
             $needs_auth,
+            $secured,
+            $stats_filter,
         );
 
         $ref->{alarm} = $kernel->delay_set(
@@ -247,8 +267,50 @@ sub _accept_connection {
             $wheel_id,
         );
         $self->{wheels}{$wheel_id} = $ref;
+
+        if ( my $reason = $self->denied( $peeraddr ) ) {
+          $ref->{disconnecting} = $reason;
+          my $out = { command => 'ERROR', params => [ $reason ] };
+          $self->send_output( $out, $wheel_id );
+        }
     }
     return;
+}
+
+sub _sock_ssl {
+    my ($kernel,$self,$first,$second) = @_[KERNEL,OBJECT,ARG0,ARG1];
+    my ($cont) = @$first;
+    return if !$cont->{wheel_id};
+    my $wheel_id = delete $cont->{wheel_id};
+    return if !$self->{wheels}{$wheel_id};
+    my ($sock,$stat,$err) = @$second;
+    return if !$stat;
+    my $sslinf = _get_ssl_info($sock);
+    my $ref = $self->{wheels}{$wheel_id};
+    $ref->{sslinf} = $sslinf if $sslinf;
+    return;
+}
+
+sub _get_ssl_info {
+    my $sock = shift || return;
+    my $sslinf = eval {
+       require Net::SSLeay;
+       my $ssl = POE::Component::SSLify::SSLify_GetSSL($sock);
+       my $cipher = Net::SSLeay::get_cipher($ssl);
+       my $bits = Net::SSLeay::get_cipher_bits($ssl);
+       my $version = Net::SSLeay::version($ssl);
+       my $ver =
+        $version == 0x0304 ? 'TLSv1_3' :
+        $version == 0x0303 ? 'TLSv1_2' :
+        $version == 0x0302 ? 'TLSv1_1' :
+        $version == 0x0301 ? 'TLSv1'   :
+        $version == 0x0300 ? 'SSLv3'   :
+        $version == 0x0002 ? 'SSLv2'   :
+        $version == 0xfeff ? 'DTLS1'   :
+        undef;
+        return "$ver-$cipher-$bits";
+    };
+    return $sslinf;
 }
 
 sub add_listener {
@@ -280,6 +342,7 @@ sub _add_listener {
         SuccessEvent => '_accept_connection',
         FailureEvent => '_accept_failed',
         Reuse        => 'on',
+        ( ip_is_ipv6( $bindaddr ) ? ( SocketDomain => AF_INET6 ) : () ),
         ($args{listenqueue} ? (ListenQueue => $args{listenqueue}) : ()),
     );
 
@@ -292,7 +355,8 @@ sub _add_listener {
     $self->{listeners}{$id}{antiflood} = $antiflood;
     $self->{listeners}{$id}{usessl}    = $usessl;
 
-    my ($port, $addr) = unpack_sockaddr_in($listener->getsockname);
+    my (undef,$addr,$port) = getnameinfo( $listener->getsockname, NI_NUMERICHOST | NI_NUMERICSERV );
+    $addr =~ s!^::ffff:!!;
     if ($port) {
         $self->{listeners}{$id}{port} = $port;
         $self->send_event(
@@ -300,6 +364,7 @@ sub _add_listener {
             $port,
             $id,
             $bindaddr,
+            $usessl,
         );
     }
     return;
@@ -374,6 +439,8 @@ sub _add_connector {
 
     return if !$remoteaddress || !$remoteport;
 
+    $args{idle} = $args{idle} || 180;
+
     my $wheel = POE::Wheel::SocketFactory->new(
         SocketProtocol => 'tcp',
         RemoteAddress  => $remoteaddress,
@@ -381,6 +448,7 @@ sub _add_connector {
         SuccessEvent   => '_sock_up',
         FailureEvent   => '_sock_failed',
         ($args{bindaddress} ? (BindAddress => $args{bindaddress}) : ()),
+        (ip_is_ipv6($remoteaddress) ? (SocketDomain => AF_INET6) : () ),
     );
 
     if ($wheel) {
@@ -401,18 +469,25 @@ sub _sock_failed {
 }
 
 sub _sock_up {
-    my ($kernel, $self, $socket, $peeraddr, $peerport, $connector_id)
-        = @_[KERNEL, OBJECT, ARG0..ARG3];
-    $peeraddr = inet_ntoa($peeraddr);
+    my ($kernel, $self, $socket, $connector_id)
+        = @_[KERNEL, OBJECT, ARG0, ARG3];
+
+    my (undef,$peeraddr,$peerport) = getnameinfo( CORE::getpeername( $socket ), NI_NUMERICHOST | NI_NUMERICSERV );
+    my (undef,$sockaddr,$sockport) = getnameinfo( CORE::getsockname( $socket ), NI_NUMERICHOST | NI_NUMERICSERV );
+
+    s!^::ffff:!! for ( $sockaddr, $peeraddr );
 
     my $cntr = delete $self->{connectors}{$connector_id};
     if ($self->{got_ssl} && $cntr->{usessl}) {
         eval {
-            $socket = POE::Component::SSLify::Client_SSLify($socket);
+            my $ctx = SSLify_ContextCreate( @{ $self->{sslify_options} } );
+            $socket = POE::Component::SSLify::Client_SSLify($socket,undef,undef,$ctx);
         };
         chomp $@;
         die "Failed to SSLify client socket: $@" if $@;
     }
+
+    my $stats_filter = POE::Filter::ThruPut->new();
 
     my $wheel = POE::Wheel::ReadWrite->new(
         Handle       => $socket,
@@ -420,23 +495,23 @@ sub _sock_up {
         ErrorEvent   => '_conn_error',
         FlushedEvent => '_conn_flushed',
         Filter       => POE::Filter::Stackable->new(
-            Filters => [$self->{filter}],
+            Filters => [$stats_filter, $self->{filter}],
         ),
     );
 
     return if !$wheel;
     my $wheel_id = $wheel->ID();
-    my $sockaddr = inet_ntoa((unpack_sockaddr_in(getsockname $socket))[1]);
-    my $sockport = (unpack_sockaddr_in(getsockname $socket))[0];
     my $ref = {
         wheel     => $wheel,
         peeraddr  => $peeraddr,
         peerport  => $peerport,
         sockaddr  => $sockaddr,
         sockport  => $sockport,
-        idle      => time(),
+        idle      => $cntr->{idle},
         antiflood => 0,
         compress  => 0,
+        stats     => $stats_filter,
+        _sent     => 0,
     };
 
     $self->{wheels}{$wheel_id} = $ref;
@@ -447,7 +522,8 @@ sub _sock_up {
         $peerport,
         $sockaddr,
         $sockport,
-        $cntr->{name}
+        $cntr->{name},
+        $stats_filter,
     );
     return;
 }
@@ -510,7 +586,7 @@ sub _conn_alarm {
         $conn->{idle},
     );
     $conn->{alarm} = $kernel->delay_set(
-        '_conn_alar',
+        '_conn_alarm',
         $conn->{idle},
         $wheel_id,
     );
@@ -521,6 +597,13 @@ sub _conn_alarm {
 sub _conn_flushed {
     my ($kernel, $self, $wheel_id) = @_[KERNEL, OBJECT, ARG0];
     return if !$self->connection_exists($wheel_id);
+
+    {
+      my $sent  = $self->{wheels}{$wheel_id}{stats}->send();
+      my $tally = $sent - $self->{wheels}{$wheel_id}{_sent};
+      $self->{wheels}{$wheel_id}{_sent} = $sent;
+      $self->{_globalstats}{sent} += $tally;
+    }
 
     if ($self->{wheels}{$wheel_id}{disconnecting}) {
         $self->_disconnected(
@@ -545,6 +628,14 @@ sub _conn_input {
     my ($kernel, $self, $input, $wheel_id) = @_[KERNEL, OBJECT, ARG0, ARG1];
     my $conn = $self->{wheels}{$wheel_id};
 
+    # We aren't interested if they are disconnecting
+    return if $conn->{disconnecting};
+
+    {
+        require bytes;
+        $self->{_globalstats}{recv} += bytes::length($input->{raw_line}) + 2;
+    }
+
     if ($self->{raw_events}) {
         $self->send_event(
             "$self->{prefix}raw_input",
@@ -552,6 +643,7 @@ sub _conn_input {
             $input->{raw_line},
         );
     }
+    $conn->{msgs}{recv}++;
     $conn->{seen} = time();
     $kernel->delay_adjust($conn->{alarm}, $conn->{idle});
 
@@ -594,6 +686,7 @@ sub send_output {
                 $out =~ s/\015\012$//;
                 $self->send_event("$self->{prefix}raw_output", $id, $out);
             }
+            $self->{wheels}{$id}{msgs}{sent}++;
             $self->{wheels}{$id}{wheel}->put($output);
         }
     }
@@ -683,7 +776,7 @@ sub _disconnected {
     $self->send_event(
         "$self->{prefix}disconnected",
         $wheel_id,
-        $errstr || 'Client Quit',
+        $errstr || 'Remote host closed the connection',
     );
 
     if ( $^O =~ /(cygwin|MSWin)/ ) {
@@ -708,6 +801,46 @@ sub connection_exists {
     return 1;
 }
 
+sub connection_secured {
+    my ($self, $wheel_id) = @_;
+    return if !$wheel_id || !defined $self->{wheels}{$wheel_id};
+    return if !$self->{wheels}{$wheel_id}{secured};
+    my $sslinfo = $self->{wheels}{$wheel_id}{sslinfo};
+    if (!$sslinfo) {
+       my $sock = $self->{wheels}{$wheel_id}{wheel}->get_input_handle();
+       $sslinfo = _get_ssl_info($sock);
+       $self->{wheels}{$wheel_id}{sslinfo} = $sslinfo
+          if $sslinfo;
+    }
+    return $sslinfo;
+}
+
+sub connection_certfp {
+    my ($self, $wheel_id) = @_;
+    return if !$wheel_id || !defined $self->{wheels}{$wheel_id};
+    return if !$self->{wheels}{$wheel_id}{secured};
+    my $sock = $self->{wheels}{$wheel_id}{wheel}->get_input_handle();
+    my $fp = eval {
+       my $ssl = POE::Component::SSLify::SSLify_GetSSL($sock);
+       my $x509 = Net::SSLeay::get_peer_certificate($ssl);
+       return Net::SSLeay::X509_get_fingerprint($x509,'sha256');
+    };
+    $fp =~ s!:!!g if $fp;
+    return $fp;
+}
+
+sub connection_stats {
+    my ($self, $wheel_id) = @_;
+    return if !$wheel_id || !defined $self->{wheels}{$wheel_id};
+    return $self->{wheels}{$wheel_id}{stats}->stats();
+}
+
+sub connection_msgs {
+    my ($self, $wheel_id) = @_;
+    return if !$wheel_id || !defined $self->{wheels}{$wheel_id};
+    return [ map { $self->{wheels}{$wheel_id}{msgs}{$_} } qw[sent recv] ];
+}
+
 sub _conn_flooded {
     my $self = shift;
     my $conn_id = shift || return;
@@ -719,7 +852,15 @@ sub add_denial {
     my $self = shift;
     my $netmask = shift || return;
     my $reason = shift || 'Denied';
-    return if !$netmask->isa('Net::Netmask');
+
+    if ( ! eval { $netmask->isa('Net::Netmask') } ) {
+      $netmask = Net::CIDR::cidrvalidate( $netmask );
+    }
+
+    if ( !$netmask ) {
+      carp("Failed to validate netmask");
+      return;
+    }
 
     $self->{denials}{$netmask} = {
         blk    => $netmask,
@@ -731,7 +872,6 @@ sub add_denial {
 sub del_denial {
     my $self = shift;
     my $netmask = shift || return;
-    return if !$netmask->isa('Net::Netmask');
     return if !$self->{denials}{$netmask};
     delete $self->{denials}{$netmask};
     return 1;
@@ -740,7 +880,15 @@ sub del_denial {
 sub add_exemption {
     my $self = shift;
     my $netmask = shift || return;
-    return if !$netmask->isa('Net::Netmask');
+
+    if ( !$netmask->isa('Net::Netmask') ) {
+      $netmask = Net::CIDR::cidrvalidate( $netmask );
+    }
+
+    if ( !$netmask ) {
+      carp("Failed to validate netmask");
+      return;
+    }
 
     if (!$self->{exemptions}{$netmask}) {
         $self->{exemptions}{$netmask} = $netmask;
@@ -751,7 +899,6 @@ sub add_exemption {
 sub del_exemption {
     my $self = shift;
     my $netmask = shift || return;
-    return if !$netmask->isa('Net::Netmask');
     return if !$self->{exemptions}{$netmask};
     delete $self->{exemptions}{$netmask};
     return 1;
@@ -763,7 +910,10 @@ sub denied {
     return if $self->exempted($ipaddr);
 
     for my $mask (keys %{ $self->{denials} }) {
-        if ($self->{denials}{$mask}{blk}->match($ipaddr)) {
+        if ( eval { $self->{denials}{$mask}{blk}->isa('Net::Netmask') } && $self->{denials}{$mask}{blk}->match($ipaddr)) {
+            return $self->{denials}{$mask}{reason};
+        }
+        elsif ( Net::CIDR::cidrlookup( $ipaddr, $self->{denials}{$mask}{blk} ) ) {
             return $self->{denials}{$mask}{reason};
         }
     }
@@ -775,7 +925,8 @@ sub exempted {
     my $self = shift;
     my $ipaddr = shift || return;
     for my $mask (keys %{ $self->{exemptions} }) {
-        return 1 if $self->{exemptions}{$mask}->match($ipaddr);
+        return 1 if $self->{exemptions}{$mask}->isa('Net::Netmask') && $self->{exemptions}{$mask}->match($ipaddr);
+        return 1 if Net::CIDR::cidrlookup( $ipaddr, $self->{exemptions}{$mask} );
     }
     return;
 }
@@ -845,6 +996,10 @@ Default is false.
 
 =item * B<'raw_events'>, whether to send L<raw|/ircd_raw_input> events.
 False by default. Can be enabled later with L<C<raw_events>|/raw_events>;
+
+=item * B<'sslify_options'>, an array reference of items that are passed
+to L<POE::Component::SSLify> C<SSLify_Options>. Used to supply x509 certificate
+and key;
 
 =back
 
@@ -988,13 +1143,13 @@ port. Returns undef on error.
 =head3 C<add_denial>
 
 Takes one mandatory argument and one optional. The first mandatory
-argument is a L<Net::Netmask|Net::Netmask> object that will be used to
+argument is an address or CIDR as understood by L<Net::CIDR>::cidrvalidate that will be used to
 check connecting IP addresses against. The second optional argument is a
 reason string for the denial.
 
 =head3 C<del_denial>
 
-Takes one mandatory argument, a L<Net::Netmask|Net::Netmask> object to
+Takes one mandatory argument, an address or CIDR as understood by L<Net::CIDR>::cidrvalidate to
 remove from the current denial list.
 
 =head3 C<denied>
@@ -1004,12 +1159,12 @@ whether that IP is denied or not.
 
 =head3 C<add_exemption>
 
-Takes one mandatory argument, a L<Net::Netmask|Net::Netmask> object that
+Takes one mandatory argument, an address or CIDR as understood by L<Net::CIDR>::cidrvalidate that
 will be checked against connecting IP addresses for exemption from denials.
 
 =head3 C<del_exemption>
 
-Takes one mandatory argument, a L<Net::Netmask|Net::Netmask> object to
+Takes one mandatory argument, an address or CIDR as understood by L<Net::CIDR>::cidrvalidate to
 remove from the current exemption list.
 
 =head3 C<exempted>
@@ -1216,6 +1371,12 @@ Opens a TCP connection to specified address and port.
 
 =item * B<'bindaddress'>, a local address to bind from (optional);
 
+=item * B<'idle'>, the time, in seconds, after which a connection will be
+considered idle. Defaults is 180;
+
+=item * B<'usessl'>, whether the connection should use SSL. Default is
+false;
+
 =back
 
 =head2 C<send_output>
@@ -1287,6 +1448,8 @@ I<Inherited from L<POE::Component::Syndicator|POE::Component::Syndicator/syndica
 
 =item * C<ARG5>: a boolean indicating whether the client needs to be authed
 
+=item * C<ARG6>: a boolean indicating whether the client is securely connected
+
 =back
 
 =back
@@ -1329,6 +1492,8 @@ hostname and ident;
 =item * C<ARG1>, the listener id;
 
 =item * C<ARG2>, the listening address;
+
+=item * C<ARG3>, whether SSL is in use;
 
 =back
 

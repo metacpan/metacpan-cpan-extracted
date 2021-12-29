@@ -9,9 +9,10 @@ my $pocosi = POE::Component::Server::IRC->spawn(
     auth         => 0,
     antiflood    => 0,
     plugin_debug => 1,
+    config => { sid => '666' },
 );
 my @pocoirc;
-push @pocoirc, POE::Component::IRC->spawn(alias => $_, flood => 1) for qw(one two);
+push @pocoirc, POE::Component::IRC->spawn(alias => $_, flood => 1, nodns => 1) for qw(one two);
 
 if ($pocosi && @pocoirc) {
     isa_ok( $pocosi, "POE::Component::Server::IRC" );

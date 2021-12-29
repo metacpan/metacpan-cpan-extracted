@@ -1,0 +1,19 @@
+
+    print qq(
+\a### IMPORTANT! ######################################################
+
+This release of POE::Component::Server::IRC has dropped support
+for the TS5 server to server protocol.
+
+This means that it will *not* be able to link to both older
+versions of ircd-hybrid and versions of POE::Component::Server::IRC
+older than version 1.55
+
+Have a nice day!
+
+#####################################################################
+
+    ) . $/;
+
+    sleep 5;
+

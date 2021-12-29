@@ -1,6 +1,6 @@
 # Paranoid::Filesystem -- Filesystem support for paranoid programs
 #
-# $Id: lib/Paranoid/Filesystem.pm, 2.08 2020/12/31 12:10:06 acorliss Exp $
+# $Id: lib/Paranoid/Filesystem.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
 #
 # This software is free software.  Similar to Perl, you can redistribute it
 # and/or modify it under the terms of either:
@@ -47,7 +47,7 @@ use Paranoid::Input;
 use Paranoid::IO;
 use Paranoid::Glob;
 
-($VERSION) = ( q$Revision: 2.08 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.09 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 @EXPORT = qw(
     preadDir     psubdirs    pfiles
@@ -1083,7 +1083,7 @@ Paranoid::Filesystem - Filesystem Functions
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Filesystem.pm, 2.08 2020/12/31 12:10:06 acorliss Exp $
+$Id: lib/Paranoid/Filesystem.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
 
 =head1 SYNOPSIS
 

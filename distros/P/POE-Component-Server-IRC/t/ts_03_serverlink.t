@@ -7,13 +7,13 @@ my $listener = POE::Component::Server::IRC->spawn(
     auth         => 0,
     antiflood    => 0,
     plugin_debug => 1,
-    config       => { servername => 'listen.server.irc' },
+    config       => { servername => 'listen.server.irc', sid => '1FU', },
 );
 my $connector = POE::Component::Server::IRC->spawn(
     auth         => 0,
     antiflood    => 0,
     plugin_debug => 1,
-    config       => { servername => 'connect.server.irc' },
+    config       => { servername => 'connect.server.irc', sid => '2FU', },
 );
 
 if ($listener && $connector) {

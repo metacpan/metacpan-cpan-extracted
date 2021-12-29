@@ -1,7 +1,6 @@
 Changes
 lib/Graphite/Simple.pm
 LICENSE
-Makefile
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
@@ -12,3 +11,4 @@ README.md
 Simple.xs
 t/Graphite-Simple.t
 typemap
+xt/release/kwalitee.t

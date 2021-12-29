@@ -22,6 +22,9 @@ requires:
   Data::Dumper: '0'
   Modern::Perl: '0'
   Moo: '0'
+  Plack::Middleware: '0'
+  Plack::Util: '0'
   Role::Tiny: '0'
-version: 0.003
+  perl: '5.034000'
+version: 0.007
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

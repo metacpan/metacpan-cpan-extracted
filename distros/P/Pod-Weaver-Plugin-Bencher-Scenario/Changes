@@ -1,3 +1,16 @@
+0.250   2021-07-31  Released-By: PERLANCAR; Urgency: medium
+
+	- More tweaks to generated text.
+
+
+0.249   2021-07-31  Released-By: PERLANCAR; Urgency: medium
+
+	- Tweak POD section name: Sample Benchmark Results -> Benchmark
+	  Sample Results to be uniform with the other Benchmark* sections.
+
+	- Tweak generated text.
+
+
 0.248   2021-07-23  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Also show the benchmark result as Benchmark.pm-formatted

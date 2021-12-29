@@ -1,6 +1,6 @@
 # Paranoid::Glob -- Paranoid Glob objects
 #
-# $Id: lib/Paranoid/Glob.pm, 2.08 2020/12/31 12:10:06 acorliss Exp $
+# $Id: lib/Paranoid/Glob.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
 #
 # This software is free software.  Similar to Perl, you can redistribute it
 # and/or modify it under the terms of either:
@@ -44,7 +44,7 @@ use File::Glob qw(bsd_glob);
 use Paranoid;
 use Paranoid::Debug qw(:all);
 
-($VERSION) = ( q$Revision: 2.08 $ =~ /(\d+(?:\.\d+)+)/s );
+($VERSION) = ( q$Revision: 2.09 $ =~ /(\d+(?:\.\d+)+)/s );
 
 #####################################################################
 #
@@ -521,7 +521,7 @@ Paranoid::Glob - Paranoid Glob objects
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Glob.pm, 2.08 2020/12/31 12:10:06 acorliss Exp $
+$Id: lib/Paranoid/Glob.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
 
 =head1 SYNOPSIS
 

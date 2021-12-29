@@ -9,7 +9,11 @@ SYNOPSIS
 
       $graphite->connect();
 
+      $graphite->reconnect();
+
       $graphite->disconnect();
+
+      $graphite->is_connected();
 
       my $bulk = $graphite->get_bulk_metrics();
 
@@ -63,9 +67,23 @@ DESCRIPTION
         Graphite server via native "send_bulk" method. In this case you can
         use "send_bulk_delegate" method to do this work by other code.
 
+    path
+
+        Sets the path to the Unix socket file.
+        Either "path" or "host"/"port" can be used.
+
+    use_stream_sock
+
+        By default value is false.
+
+        If true, then enables SOCK_STREAM for Unix Socks.
+        Otherwise SOCK_DGRAM (UDP) will be used.
+
     host
         Sets the hostname or IPv4 address of Graphite server. This option is
         mandatory if "enabled" is true.
+
+        In this case SOCK_DGRAM (UDP) will be used.
 
     port
         Sets the port number of Graphite server. This option is mandatory if
@@ -111,11 +129,21 @@ DESCRIPTION
         Otherwise internal hashes will be used.
 
   $self->connect()
-    Establishes the connection to Graphite server if "enabled" was set as
-    true.
+    Establishes the connection to Graphite server if "enabled" was set as true.
+    Returns 1 in case of success, otherwise returns 0.
+
+  $self->reconnect()
+
+    Reestablishes the connection to Graphite server.
+    Returns 1 in case of success, otherwise returns 0.
 
   $self->disconnect()
     Closes the connection.
+
+  $self->is_connected()
+
+    Returns 1 or 0.
+    It returns 0 only in cases if "connected" isn't invoked or Unix Sock connection is broken.
 
   $self->send_bulk_delegate()
     Calculates the result metrics and passes them to specified method in

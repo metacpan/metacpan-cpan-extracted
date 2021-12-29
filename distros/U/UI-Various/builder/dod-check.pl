@@ -29,6 +29,8 @@ The script checks the following Definition of Done:
 
 =item C<L<update-language.pl> --check> must produce an empty report.
 
+=item All sources may only use Perl features of the version required.
+
 =item All tests must run without any error.
 
 =item All tests must have real plans (no C<done_testing>).
@@ -59,7 +61,7 @@ C<UI::Various>'s root directory.
 # load packages: #
 ##################
 
-use v5.12;
+use v5.22;
 use strictures;
 no indirect 'fatal';
 no multidimensional;
@@ -105,7 +107,7 @@ sub check_unit_tests();
 ###############
 
 my $tests;
-BEGIN  {  $tests = 14;  }
+BEGIN  {  $tests = 18;  }
 use Test::More tests => $tests;
 
 my $test_default = 0 == @ARGV ? 1 : 0;
@@ -168,6 +170,29 @@ skip_or_run('check EN messages', 'fix EN language source 1st',
 			      './builder/update-language.pl --check',
 			      0);
 	    });
+
+my %re_vers = (builder => '(v5\.14\.0 +\| v5\.6\.0|v5\.22\.0 +\| v5\.21\.8)',
+	       examples => '(v5\.14\.0 +\| v5\.6\.0|~ +\| ~)',
+	       lib => '(v5\.14\.0 +\| v5\.[68]\.0)',
+	       t => '(v5\.14\.0 +\| v5\.6\.0|~ +\| (~|v5\.8\.0))');
+foreach my $dir (sort keys %re_vers)
+{
+    skip_or_run('check Perl versions in ' . $dir,
+		'fix unsupported syntax / features in ' . $dir,
+		sub {
+		    run_and_check
+			('check Perl version in ' . $dir, 'perlver ' . $dir, 0,
+			 '^$+',
+			 '^\s+-{50,}\s+$',
+			 '^.* file +\| explicit +\| syntax +\| external.*',
+			 '^\s+\|\s+-{50,}\s+\|$',
+			 '^\s+\|\s+.* +\| ' . $re_vers{$dir} . ' +\| +n/a +\|$+',
+			 '^\s+\|\s+-{50,}\s+\|$',
+			 '^\s+\|\s+Minimum [a-z ]+: v5\.\d+\.\d+\s+\|$+',
+			 '^\s+-{50,}\s+$',
+			 '^\s*$');
+		});
+}
 
 skip_or_run('tests', 'repair tests 1st',
 	    sub {

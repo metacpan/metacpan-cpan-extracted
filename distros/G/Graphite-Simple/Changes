@@ -1,5 +1,17 @@
 Revision history for Perl extension Graphite::Simple
 
+0.11  2021 Jan 29
+    - adding the "is_connected" method
+    - adding ability to use SOCK_STREAM for Unix Socks
+
+0.10  2021 Jan 28
+    - adding the "reconnect" method
+    - fix possible memory leaks issue made in v0.09
+
+0.09  2021 Jan 28
+    - adding support of local (Unix) sockets (SOCK_DGRAM)
+    - some XS refactoring
+
 0.08  2021 Nov 28
     - fixes in META files
 

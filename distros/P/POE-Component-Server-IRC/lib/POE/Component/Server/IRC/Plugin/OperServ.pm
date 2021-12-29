@@ -1,11 +1,6 @@
 package POE::Component::Server::IRC::Plugin::OperServ;
-BEGIN {
-  $POE::Component::Server::IRC::Plugin::OperServ::AUTHORITY = 'cpan:HINRIK';
-}
-{
-  $POE::Component::Server::IRC::Plugin::OperServ::VERSION = '1.54';
-}
-
+our $AUTHORITY = 'cpan:BINGOS';
+$POE::Component::Server::IRC::Plugin::OperServ::VERSION = '1.62';
 use strict;
 use warnings;
 use POE::Component::Server::IRC::Plugin qw(:ALL);

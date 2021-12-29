@@ -1,0 +1,10 @@
+Revision history for Mail::Exim::Blacklist::Geolocation
+
+1.001  2021-12-29 01:40:01 CET
+
+  - Skip the IPv6 tests on Windows
+
+1.000  2021-12-28 09:15:46 CET
+
+  - First version
+

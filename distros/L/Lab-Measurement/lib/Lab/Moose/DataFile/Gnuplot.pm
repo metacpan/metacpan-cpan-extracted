@@ -1,9 +1,8 @@
 package Lab::Moose::DataFile::Gnuplot;
-$Lab::Moose::DataFile::Gnuplot::VERSION = '3.801';
+$Lab::Moose::DataFile::Gnuplot::VERSION = '3.802';
 #ABSTRACT: Text based data file ('Gnuplot style')
 
 use v5.20;
-
 
 use Moose;
 use MooseX::Params::Validate;
@@ -343,7 +342,6 @@ sub _add_pm3d_plot {
         ylabel  => $y_column,
         title   => $self->path(),
         grid    => 1,
-        clut    => 'sepia',
 
         #        border => '4095 front linetype -1 linewidth 1.000');
     );
@@ -628,7 +626,7 @@ Lab::Moose::DataFile::Gnuplot - Text based data file ('Gnuplot style')
 
 =head1 VERSION
 
-version 3.801
+version 3.802
 
 =head1 SYNOPSIS
 
@@ -871,6 +869,7 @@ This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
             2017       Andreas K. Huettel, Simon Reinhardt
             2018-2019  Simon Reinhardt
             2020       Andreas K. Huettel
+            2021       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

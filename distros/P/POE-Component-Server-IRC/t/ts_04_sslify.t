@@ -19,17 +19,20 @@ if (!$GOT_SSL) {
     plan skip_all => "POE::Component::SSLify not available";
 }
 
-plan tests => 15;
+plan tests => 17;
 
 my $pocosi = POE::Component::Server::IRC->spawn(
     auth           => 0,
     antiflood      => 0,
     plugin_debug   => 1,
-    sslify_options => ['ircd.key', 'ircd.crt'],
+    sslify_options => ['certs/ircd.key', 'certs/ircd.crt'],
+    config         => { sid => '2FA', },
 );
 my $pocoirc = POE::Component::IRC->spawn(
     flood   => 1,
     UseSSL  => 1,
+    SSLCert => 'certs/irc.crt',
+    SSLKey  => 'certs/irc.key',
 );
 
 POE::Session->create(
@@ -119,5 +122,9 @@ sub _default {
     elsif ($event eq 'irc_error') {
         pass($event);
         $_[HEAP]->{ircd}->del_listener(port => $_[HEAP]->{port});
+    }
+    elsif($event eq 'irc_snotice') {
+        pass($event);
+        diag($_[ARG1]->[0]);
     }
 }

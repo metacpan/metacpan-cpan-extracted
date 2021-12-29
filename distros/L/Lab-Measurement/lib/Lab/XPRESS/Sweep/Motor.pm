@@ -1,6 +1,6 @@
 package Lab::XPRESS::Sweep::Motor;
 #ABSTRACT: Stepper motor sweep
-$Lab::XPRESS::Sweep::Motor::VERSION = '3.801';
+$Lab::XPRESS::Sweep::Motor::VERSION = '3.802';
 use v5.20;
 
 use Lab::XPRESS::Sweep;
@@ -128,7 +128,7 @@ Lab::XPRESS::Sweep::Motor - Stepper motor sweep
 
 =head1 VERSION
 
-version 3.801
+version 3.802
 
 =head1 SYNOPSIS
 

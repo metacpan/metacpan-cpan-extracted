@@ -14,9 +14,14 @@ require TestMe;
 #$SIG{__DIE__}=\&confess;
 our $pkg='Devel::Agent';
 use Sub::Defer qw(undefer_all);
+require Plack::Middleware::Devel::Agent::Plack;
+use Devel::Agent::Util;
+use HTTP::Request::Common;
+use Plack::Test;
 use AnyEvent;
 use File::Spec;
 use File::Temp qw(tempdir);
+undefer_all();
 
 our $dir=tempdir;
 
@@ -27,7 +32,7 @@ our $dir=tempdir;
 our $SET;
 our $TESTS=0;
 SKIP: {
-  skip 'PERL5OPT="-d:Agent" is not set',326 unless $^P==35;
+  skip 'PERL5OPT="-d:Agent" is not set',303 unless $^P==35;
 
   my $self=DB->new( 
     save_to_stack=>1,
@@ -362,7 +367,7 @@ SKIP: {
       },
       on_frame_end=>sub {
         my ($self,$frame,$depth)=@_;
-        ok(1,'should not end up in our trace');
+        ok(1,'this unit test should not end up in our trace');
         #diag Dumper($frame);
         #$last_id=$frame->{end_id};
         #$frames->{$frame->{order_id}}=$frame;
@@ -437,15 +442,6 @@ SKIP: {
       ignore_calling_class_re=>[qr/^Test2::/s,qr/^Test::/],
       ignore_begin_method=>1,
       save_to_stack=>1,
-      filter_on_args=>sub {
-        my ($self,$frame,$args,$raw_caller)=@_;
-        if($args->$#*!=-1 && defined($args->[0]) && blessed($args->[0])) {
-          if(my $cb=$args->[0]->can('___db_stack_filter')) {
-            return $args->[0]->$cb(@_);
-          }
-        }
-        return 1;
-      },
     );
 
     $self->start_trace;
@@ -455,7 +451,6 @@ SKIP: {
 
     $self->stop_trace;
     diag Dumper($self->trace);
-    exit;
     check_stack($self->trace,[
       gm('TestMe3::new',1),
       gm('TestMe3::test_a',1),
@@ -463,11 +458,11 @@ SKIP: {
 
   }
 
-  if(0){
+  if(1){
     $TESTS=0;
     $SET='BLOCK 11 AnyEvent testing';
     $self=DB->new(
-      ignore_calling_class_re=>[qr/^Test2::/s,qr/^Test::/],
+      ignore_calling_class_re=>[qr/^Test2::/s,qr/^Test::/,],
       ignore_begin_method=>1,
       save_to_stack=>1,
       filter_on_args=>sub {
@@ -483,10 +478,10 @@ SKIP: {
 
 
     my $path=File::Spec->catfile($dir,'test');
-    my $fh=IO::File->new('>',$path);
+    my $fh=IO::File->new($path,'>');
 
     my $str='';
-    for(1 .. 100) {
+    for(1 .. 3) {
       my $line="$_\n";
       $str .=$line;
       $fh->print($line);
@@ -495,20 +490,102 @@ SKIP: {
 
     $fh->close;
 
-    #$fh=IO::File->new('<',
     $self->start_trace;
 
     my $cv=AnyEvent->condvar;
 
-    $cv->send('test');
+    my $check='';
+    my $watcher;
+    {
+    $fh=IO::File->new($path,'<');
+    $watcher=AnyEvent->io(
+      fh=>$fh,
+      poll=>'r',
+      cb=>sub {
+        my $line=$fh->getline;
+        if(defined($line)) {
+          $check .=$line;
+
+        } else {
+          $fh->close;
+          undef $watcher;
+          undef $fh;
+          $cv->send('test');
+        }
+      }
+    );
     $cv->recv;
+    }
 
     $self->stop_trace;
-    #diag Dumper($self->trace);
-    check_stack($self->trace,[
-      gm('TestMe3::new',1),
-      gm('TestMe3::test_a',1),
-    ]);
+    diag Dumper($self->trace);
+    cmp_ok($str,'eq',$check,'make sure our calls to anyevent work');
+  }
+  {
+    $SET='Pack Testing';
+    $TESTS=0;
+    my $check;
+    sub test_app { \&test_responder }
+
+    sub test_responder {
+      my $responder = shift;
+      my $writer = $responder->([ 200, [ 'Content-Type', 'text/plain' ]]);
+      $check='';
+      for(my $id=0;$id<2;++$id) {
+        write_chunk($writer,$id);
+        write_chunk($writer,$id);
+      }
+      $writer->close;
+    }
+    sub write_chunk {
+      my ($writer,$id)=@_;
+      my $line="Line: $id\n";
+      $check .=$line;
+      $writer->write($line);
+    }
+    my $test = Plack::Test->create(\&test_app);
+    my $get=GET '/';
+    my $res=$test->request($get);
+    cmp_ok($res->code,'==',200,'establish a base line that our hello world streaming app is working');
+    cmp_ok($res->content,'eq',$check,'ensure that our content is not corrupted');
+
+    
+    $DB::AGENT=undef;
+    {
+    no warnings;
+    # force a trace every reqest
+    $Plack::Middleware::Devel::Agent::Plack::TRACE_EVERY=1;
+    $Plack::Middleware::Devel::Agent::Plack::AGENT_OPTIONS{save_to_stack}=0;
+    $Plack::Middleware::Devel::Agent::Plack::AGENT_OPTIONS{on_frame_end}=sub {
+      my ($agent,$frame)=@_;
+      my $str='';
+      my $fh;
+      open($fh,'>',\$str);
+
+      flush_row($agent,$frame,$fh);
+      $fh->close;
+      diag $str;
+    };
+    $Plack::Middleware::Devel::Agent::Plack::AGENT_OPTIONS{ignore_calling_class_re}=[qr/^Test2::/s,qr/^Test::/,];
+    $Plack::Middleware::Devel::Agent::Plack::AGENT_OPTIONS{excludes}->{'Plack::Test::MockHTTP'}=1;
+    
+    $Plack::Middleware::Devel::Agent::Plack::AFTER_TRACE=sub {
+      my ($db,$id,$res,$env)=@_;
+      diag Dumper($res);
+      $self=$db;
+    };
+    }
+
+    my $org=$check;
+    $test = Plack::Test->create(Plack::Middleware::Devel::Agent::Plack->wrap(\&test_app));
+    $get=GET '/';
+    $res=$test->request($get);
+    $DB::AGENT->stop_trace if defined $DB::AGENT;
+    cmp_ok($res->code,'==',200,'should get a code 200');#or die $res->status_line;
+    diag $res->content;
+    diag Dumper(\%Plack::Middleware::Devel::Agent::Plack::AGENT_OPTIONS);
+    diag Dumper(\%Plack::Middleware::Devel::Agent::Plack::SELF_EXCLUDES);
+
 
   }
 }

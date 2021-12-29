@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Lakeshore340;
-$Lab::Moose::Instrument::Lakeshore340::VERSION = '3.801';
+$Lab::Moose::Instrument::Lakeshore340::VERSION = '3.802';
 #ABSTRACT: Lakeshore Model 340 Temperature Controller
 
 use v5.20;
@@ -39,8 +39,9 @@ sub BUILD {
     $self->cls();
 }
 
-my %channel_arg = ( channel => { isa => enum( [qw/A B C D/] ), optional => 1 } );
-my %loop_arg    = ( loop    => { isa => enum( [qw/1 2/] ), optional => 1 } );
+my %channel_arg
+    = ( channel => { isa => enum( [qw/A B C D/] ), optional => 1 } );
+my %loop_arg = ( loop => { isa => enum( [qw/1 2/] ), optional => 1 } );
 
 
 sub get_T {
@@ -270,6 +271,51 @@ sub get_zone {
 }
 
 
+sub set_analog_out {
+    my ( $self, %args ) = validated_getter(
+        \@_,
+        output         => { isa => enum( [ 1, 2 ] ) },
+        bipolar_enable => { isa => enum( [ 0, 1 ] ) },
+        mode           => { isa => enum( [ 0, 1, 2, 3 ] ) },
+        input => { isa => enum( [qw/A B C D/] ), default => '' },
+        source => { isa => enum( [ 1, 2, 3, 4 ] ), default => '' },
+        high_value   => { isa => 'Num', default => '' },
+        low_value    => { isa => 'Num', default => '' },
+        manual_value => { isa => 'Num', default => '' },
+    );
+
+    my (
+        $output,    $bipolar_enable, $mode, $input, $source, $high_value,
+        $low_value, $manual_value
+        )
+        = delete @args{
+        qw/output bipolar_enable mode input source high_value low_value manual_value/
+        };
+
+    $self->write(
+        command =>
+            "ANALOG $output, $bipolar_enable, $mode, $input, $source, $high_value, $low_value, $manual_value",
+        %args
+    );
+
+}
+
+sub get_analog_out {
+    my ( $self, %args ) = validated_getter(
+        \@_,
+        output => { isa => enum( [ 1, 2 ] ) },
+    );
+
+    my $output = delete $args{'output'};
+    my $result = $self->query( command => "ANALOG? $output", %args );
+    my %analog_out;
+    @analog_out{
+        qw/output bipolar_enable mode input source high_value low_value manual_value/
+    } = split /,/, $result;
+    return %analog_out;
+}
+
+
 __PACKAGE__->meta()->make_immutable();
 
 1;
@@ -286,7 +332,7 @@ Lab::Moose::Instrument::Lakeshore340 - Lakeshore Model 340 Temperature Controlle
 
 =head1 VERSION
 
-version 3.801
+version 3.802
 
 =head1 SYNOPSIS
 
@@ -393,6 +439,17 @@ Valid entries: 1 = local, 2 = remote, 3 = remote with local lockout.
  );
 
  my %zone = $lakeshore->get_zone(loop => 1, zone => 1);
+
+=head2 set_analog_out/get_analog_out
+
+ $lakeshore->set_analog_out
+     output => 1,
+     bipolar_enable => 1, # default: 0
+     mode => 2, # 0 = off, 1 = input, 2 = manual, 3 = loop. Loop is only valid for output 2
+     manual_value => -30, # -30 percent output (-3V)
+ );
+
+ my %analog_out = $lakeshore->get_analog_out();
 
 =head2 Consumed Roles
 

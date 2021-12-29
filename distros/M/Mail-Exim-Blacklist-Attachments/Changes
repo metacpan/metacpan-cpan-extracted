@@ -1,5 +1,9 @@
 Revision history for Mail::Exim::Blacklist::Attachments
 
+1.008  2021-12-28 17:22:21 CET
+
+  - The cpanfile is created by Dist::Zilla
+
 1.007  2021-12-18 08:19:21 CET
 
   - Add an accept verb to the example configuration

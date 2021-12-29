@@ -133,14 +133,14 @@ __PACKAGE__->method_documentation({
     	read_only => '',
     		},
     'max_value' => {
-    	datatype => 'object',
+    	datatype => 'int',
     	base_name => 'MaxValue',
     	description => '',
     	format => '',
     	read_only => '',
     		},
     'value' => {
-    	datatype => 'object',
+    	datatype => 'int',
     	base_name => 'Value',
     	description => '',
     	format => '',
@@ -150,8 +150,8 @@ __PACKAGE__->method_documentation({
 
 __PACKAGE__->swagger_types( {
     'dynamic_filter_type' => 'string',
-    'max_value' => 'object',
-    'value' => 'object'
+    'max_value' => 'int',
+    'value' => 'int'
 } );
 
 __PACKAGE__->attribute_map( {

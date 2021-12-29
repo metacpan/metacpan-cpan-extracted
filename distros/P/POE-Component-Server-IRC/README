@@ -1,48 +1,50 @@
 NAME
+
     POE::Component::Server::IRC - A fully event-driven networkable IRC
     server daemon module.
 
 SYNOPSIS
+
      # A fairly simple example:
      use strict;
      use warnings;
      use POE qw(Component::Server::IRC);
-
+    
      my %config = (
          servername => 'simple.poco.server.irc', 
          nicklen    => 15,
          network    => 'SimpleNET'
      );
-
+    
      my $pocosi = POE::Component::Server::IRC->spawn( config => \%config );
-
+    
      POE::Session->create(
          package_states => [
              'main' => [qw(_start _default)],
          ],
          heap => { ircd => $pocosi },
      );
-
+    
      $poe_kernel->run();
-
+    
      sub _start {
          my ($kernel, $heap) = @_[KERNEL, HEAP];
-
+    
          $heap->{ircd}->yield('register', 'all');
-
+    
          # Anyone connecting from the loopback gets spoofed hostname
          $heap->{ircd}->add_auth(
              mask     => '*@localhost',
              spoof    => 'm33p.com',
              no_tilde => 1,
          );
-
+    
          # We have to add an auth as we have specified one above.
          $heap->{ircd}->add_auth(mask => '*@*');
-
+    
          # Start a listener on the 'standard' IRC port.
          $heap->{ircd}->add_listener(port => 6667);
-
+    
          # Add an operator who can connect from localhost
          $heap->{ircd}->add_operator(
              {
@@ -51,10 +53,10 @@ SYNOPSIS
              }
          );
      }
-
+    
      sub _default {
          my ($event, $args) = @_[ARG0 .. $#_];
-
+    
          print "$event: ";
          for my $arg (@$args) {
              if (ref($arg) eq 'ARRAY') {
@@ -67,21 +69,22 @@ SYNOPSIS
                  print "'$arg' ";
              }
          }
-
+    
          print "\n";
       }
 
 DESCRIPTION
+
     POE::Component::Server::IRC is a POE component which implements an IRC
     server (also referred to as an IRC daemon or IRCd). It should be
-    compliant with the pertient IRC RFCs and is based on reverse engineering
-    Hybrid IRCd behaviour with regards to interactions with IRC clients and
-    other IRC servers.
+    compliant with the pertient IRC RFCs and is based on reverse
+    engineering Hybrid IRCd behaviour with regards to interactions with IRC
+    clients and other IRC servers.
 
     Yes, that's right. POE::Component::Server::IRC is capable of linking to
-    foreign IRC networks. It supports the TS5 server to server protocol and
-    has been tested with linking to Hybrid-7 based networks. It should in
-    theory work with any TS5-based IRC network.
+    foreign IRC networks. It supports the TS6 server to server protocol and
+    has been tested with linking to Hybrid-8 based networks. It should in
+    theory work with any TS6-based IRC network.
 
     POE::Component::Server::IRC also has a services API, which enables one
     to extend the IRCd to create IRC Services. This is fully event-driven
@@ -92,317 +95,481 @@ DESCRIPTION
     should read its documentation too.
 
 CONSTRUCTOR
-  "spawn"
-    Returns a new instance of the component. Takes the following parameters:
 
-    *   'config', a hashref of configuration options, see the "configure"
-        method for details.
+ spawn
+
+    Returns a new instance of the component. Takes the following
+    parameters:
+
+      * 'config', a hashref of configuration options, see the configure
+      method for details.
 
     Any other parameters will be passed along to
-    POE::Component::Server::IRC::Backend's "create" method.
+    POE::Component::Server::IRC::Backend's create method.
 
     If the component is spawned from within another session then that
     session will automagically be registered with the component to receive
-    events and be sent an "ircd_registered" event.
+    events and be sent an ircd_registered event.
 
 METHODS
-  Information
-   "server_name"
+
+ Information
+
+  server_name
+
     No arguments, returns the name of the ircd.
 
-   "server_version"
+  server_version
+
     No arguments, returns the software version of the ircd.
 
-   "server_created"
+  server_created
+
     No arguments, returns a string signifying when the ircd was created.
 
-   "server_config"
+  server_config
+
     Takes one argument, the server configuration value to query.
 
-  Configuration
+ Configuration
+
     These methods provide mechanisms for configuring and controlling the
     IRCd component.
 
-   "configure"
+  configure
+
     Configures your new shiny IRCd.
 
     Takes a number of parameters:
 
-    *   'servername', a name to bless your shiny new IRCd with, defaults to
-        'poco.server.irc';
+      * 'servername', a name to bless your shiny new IRCd with, defaults to
+      'poco.server.irc';
 
-    *   'serverdesc', a description for your IRCd, defaults to 'Poco? POCO?
-        POCO!';
+      * 'serverdesc', a description for your IRCd, defaults to 'Poco? POCO?
+      POCO!';
 
-    *   'network', the name of the IRC network you will be creating,
-        defaults to 'poconet';
+      * 'network', the name of the IRC network you will be creating,
+      defaults to 'poconet';
 
-    *   'nicklen', the max length of nicknames to support, defaults to 9.
-        Note: the nicklen must be the same on all servers on your IRC
-        network;
+      * 'nicklen', the max length of nicknames to support, defaults to 9.
+      Note: the nicklen must be the same on all servers on your IRC
+      network;
 
-    *   'maxtargets', max number of targets a user can send PRIVMSG/NOTICE's
-        to, defaults to 4;
+      * 'maxtargets', max number of targets a user can send
+      PRIVMSG/NOTICE's to, defaults to 4;
 
-    *   'maxchannels', max number of channels users may join, defaults to
-        15;
+      * 'maxchannels', max number of channels users may join, defaults to
+      15;
 
-    *   'version', change the server version that is reported;
+      * 'version', change the server version that is reported;
 
-    *   'admin', an arrayref consisting of the 3 lines that will be returned
-        by ADMIN;
+      * 'admin', an arrayref consisting of the 3 lines that will be
+      returned by ADMIN;
 
-    *   'info', an arrayref consisting of lines to be returned by INFO;
+      * 'info', an arrayref consisting of lines to be returned by INFO;
 
-    *   'ophacks', set to true to enable oper hacks. Default is false;
+      * 'ophacks', set to true to enable oper hacks. Default is false;
 
-    *   'whoisactually', setting this to a false value means that only opers
-        can see 338. Defaults to true;
+      * 'whoisactually', setting this to a false value means that only
+      opers can see 338. Defaults to true;
 
-   "add_auth"
+      * 'sid', servers unique ID. This is three characters long and must be
+      in the form [0-9][A-Z0-9][A-Z0-9]. Specifying this enables TS6.
+
+  add_auth
+
     By default the IRCd allows any user to connect to the server without a
     password. Configuring auths enables you to control who can connect and
     set passwords required to connect.
 
     Takes the following parameters:
 
-    *   'mask', a user@host or user@ipaddress mask to match against,
-        mandatory;
+      * 'mask', a user@host or user@ipaddress mask to match against,
+      mandatory;
 
-    *   'password', if specified, any client matching the mask must provide
-        this to connect;
+      * 'password', if specified, any client matching the mask must provide
+      this to connect;
 
-    *   'spoof', if specified, any client matching the mask will have their
-        hostname changed to this;
+      * 'spoof', if specified, any client matching the mask will have their
+      hostname changed to this;
 
-    *   'no_tilde', if specified, the '~' prefix is removed from their
-        username;
+      * 'no_tilde', if specified, the '~' prefix is removed from their
+      username;
+
+      * 'exceed_limit', if specified, any client matching the mask will not
+      have their connection limited, if the server is full;
+
+      * 'kline_exempt', if true, any client matching the mask will be
+      exempt from KLINEs and RKLINEs;
+
+      * 'resv_exempt', if true, any client matching the mask will be exempt
+      from RESVs;
+
+      * 'can_flood', if true, any client matching the mask will be exempt
+      from flood protection;
+
+      * 'need_ident', if true, any client matching the mask will be
+      required to have a valid response to Ident queries;
 
     Auth masks are processed in order of addition.
 
-    If auth masks have been defined, then a connecting user *must* match one
-    of the masks in order to be authorised to connect. This is a feature >;)
+    If auth masks have been defined, then a connecting user *must* match
+    one of the masks in order to be authorised to connect. This is a
+    feature >;)
 
-   "del_auth"
+  del_auth
+
     Takes a single argument, the mask to remove.
 
-   "add_operator"
+  add_operator
+
     This adds an O line to the IRCd. Takes a number of parameters:
 
-    *   'username', the username of the IRC oper, mandatory;
+      * 'username', the username of the IRC oper, mandatory;
 
-    *   'password', the password, mandatory;
+      * 'password', the password, mandatory;
 
-    *   'ipmask', either a scalar ipmask or an arrayref of Net::Netmask
-        objects;
+      * 'ipmask', either a scalar ipmask or an arrayref of addresses or
+      CIDRs as understood by Net::CIDR::cidrvalidate;
 
-    A scalar ipmask can contain '*' to match any number of characters or '?'
-    to match one character. If no 'ipmask' is provided, operators are only
-    allowed to OPER from the loopback interface.
+      * 'ssl_required', set to true to require that the oper is connected
+      securely using SSL/TLS;
 
-    'password' can be either plain-text, "crypt"'d or unix/apache md5. See
-    the "mkpasswd" function in POE::Component::Server::IRC::Common for how
-    to generate passwords.
+      * 'certfp', specify the fingerprint of the oper's client certificate
+      to verify;
 
-   "del_operator"
+    A scalar ipmask can contain '*' to match any number of characters or
+    '?' to match one character. If no 'ipmask' is provided, operators are
+    only allowed to OPER from the loopback interface.
+
+    'password' can be either plain-text, crypt'd or unix/apache md5. See
+    the mkpasswd function in POE::Component::Server::IRC::Common for how to
+    generate passwords.
+
+    'ssl_required' and 'certfp' obviously both require that the server
+    supports SSL/TLS connections. 'certfp' is the SHA256 digest fingerprint
+    of the client certificate. This can be obtained from the PEM formated
+    cert using one of the following methods:
+
+      OpenSSL/LibreSSL:
+        openssl x509 -sha256 -noout -fingerprint -in cert.pem | sed -e 's/^.*=//;s/://g'
+    
+      GnuTLS:
+        certtool -i < cert.pem | egrep -A 1 'SHA256 fingerprint'
+
+  del_operator
+
     Takes a single argument, the username to remove.
 
-   "add_peer"
+  add_peer
+
     Adds peer servers that we will allow to connect to us and who we will
     connect to. Takes the following parameters:
 
-    *   'name', the name of the server. This is the IRC name, not hostname,
-        mandatory;
+      * 'name', the name of the server. This is the IRC name, not hostname,
+      mandatory;
 
-    *   'pass', the password they must supply to us, mandatory;
+      * 'pass', the password they must supply to us, mandatory;
 
-    *   'rpass', the password we need to supply to them, mandatory;
+      * 'rpass', the password we need to supply to them, mandatory;
 
-    *   'type', the type of server, 'c' for a connecting server, 'r' for one
-        that we will connect to;
+      * 'type', the type of server, 'c' for a connecting server, 'r' for
+      one that we will connect to;
 
-    *   'raddress', the remote address to connect to, implies 'type' eq 'r';
+      * 'raddress', the remote address to connect to, implies 'type' eq
+      'r';
 
-    *   'rport', the remote port to connect to, default is 6667;
+      * 'rport', the remote port to connect to, default is 6667;
 
-    *   'ipmask', either a scalar ipmask or an arrayref of Net::Netmask
-        objects;
+      * 'ipmask', either a scalar ipmask or an arrayref of addresses or
+      CIDRs as understood by Net::CIDR::cidrvalidate;
 
-    *   'auto', if set to true value will automatically connect to remote
-        server if type is 'r';
+      * 'auto', if set to true value will automatically connect to remote
+      server if type is 'r';
 
-    *   'zip', set to a true value to enable ziplink support. This must be
-        done on both ends of the connection. Requires
-        POE::Filter::Zlib::Stream;
+      * 'zip', set to a true value to enable ziplink support. This must be
+      done on both ends of the connection. Requires
+      POE::Filter::Zlib::Stream;
 
-   "del_peer"
+      * 'service', set to a true value to enable the peer to be accepted as
+      a services peer.
+
+      * 'ssl', set to a true value to enable SSL/TLS support. This must be
+      done on both ends of the connection. Requires POE::Component::SSLify.
+
+      * 'certfp', specify the fingerprint of the peer's client certificate
+      to verify;
+
+    'certfp' is the SHA256 digest fingerprint of the client certificate.
+    This can be obtained from the PEM formated cert using one of the
+    following methods:
+
+      OpenSSL/LibreSSL:
+        openssl x509 -sha256 -noout -fingerprint -in cert.pem | sed -e 's/^.*=//;s/://g'
+    
+      GnuTLS:
+        certtool -i < cert.pem | egrep -A 1 'SHA256 fingerprint'
+
+  del_peer
+
     Takes a single argument, the peer to remove. This does not disconnect
     the said peer if it is currently connected.
 
-  State queries
+  add_service
+
+    Adds a service peer. A service peer is a peer that is accepted to send
+    service commands SVS*. Takes a single argument the service peer to add.
+    This does not have to be a directly connected peer as defined with
+    add_peer.
+
+  del_service
+
+    Takes a single argument, the service peer to remove. This does not
+    disconnect the said service peer, but it will deny the peer access to
+    service commands.
+
+  add_pseudo
+
+    Adds a pseudo command, also known as a service alias. The command is
+    transformed by the server into a PRIVMSG and sent to the given target.
+
+    Takes several arguments:
+
+      * 'cmd', (mandatory) command/alias to be added.
+
+      * 'name', (mandatory) the service name, eg. NickServ, this is used in
+      error messages reported to users.
+
+      * 'target', (mandatory) the target for the command in nick!user@host
+      format.
+
+      * 'prepend', (optional) text that will prepended to the user's
+      message.
+
+  del_pseudo
+
+    Removes a previously defined pseudo command/alias.
+
+ State queries
+
     The following methods allow you to query state information regarding
     nicknames, channels, and peers.
 
-   "state_nicks"
+  state_nicks
+
     Takes no arguments, returns a list of all nicknames in the state.
 
-   "state_chans"
+  state_chans
+
     Takes no arguments, returns a list of all channels in the state.
 
-   "state_peers"
+  state_peers
+
     Takes no arguments, returns a list of all irc servers in the state.
 
-   "state_nick_exists"
+  state_nick_exists
+
     Takes one argument, a nickname, returns true or false dependent on
     whether the given nickname exists or not.
 
-   "state_chan_exists"
+  state_chan_exists
+
     Takes one argument, a channel name, returns true or false dependent on
     whether the given channel exists or not.
 
-   "state_peer_exists"
+  state_peer_exists
+
     Takes one argument, a peer server name, returns true or false dependent
     on whether the given peer exists or not.
 
-   "state_user_full"
+  state_user_full
+
     Takes one argument, a nickname, returns that users full nick!user@host
     if they exist, undef if they don't.
 
-   "state_user_nick"
+    If a second argument is provided and the nickname provided is an oper,
+    then the returned value will be nick!user@host{opuser}
+
+  state_user_nick
+
     Takes one argument, a nickname, returns the proper nickname for that
     user. Returns undef if the nick doesn't exist.
 
-   "state_user_umode"
+  state_user_umode
+
     Takes one argument, a nickname, returns that users mode setting.
 
-   "state_user_is_operator"
+  state_user_is_operator
+
     Takes one argument, a nickname, returns true or false dependent on
     whether the given nickname is an IRC operator or not.
 
-   "state_user_chans"
+  state_user_chans
+
     Takes one argument, a nickname, returns a list of channels that that
     nick is a member of.
 
-   "state_user_server"
-    Takes one argument, a nickname, returns the name of the peer server that
-    that user is connected from.
+  state_user_server
 
-   "state_chan_list"
+    Takes one argument, a nickname, returns the name of the peer server
+    that that user is connected from.
+
+  state_chan_list
+
     Takes one argument, a channel name, returns a list of the member nicks
     on that channel.
 
-   "state_chan_list_prefixed"
+  state_chan_list_prefixed
+
     Takes one argument, a channel name, returns a list of the member nicks
     on that channel, nicknames will be prefixed with @%+ if they are +o +h
     or +v, respectively.
 
-   "state_chan_topic"
-    Takes one argument, a channel name, returns undef if no topic is set on
-    that channel, or an arrayref consisting of the topic, who set it and the
-    time they set it.
+  state_chan_topic
 
-   "state_chan_mode_set"
+    Takes one argument, a channel name, returns undef if no topic is set on
+    that channel, or an arrayref consisting of the topic, who set it and
+    the time they set it.
+
+  state_chan_mode_set
+
     Takes two arguments, a channel name and a channel mode character.
     Returns true if that channel mode is set, false otherwise.
 
-   "state_is_chan_member"
+  state_is_chan_member
+
     Takes two arguments, a nick and a channel name. Returns true if that
     nick is on channel, false otherwise.
 
-   "state_user_chan_mode"
+  state_user_chan_mode
+
     Takes two arguments, a nick and a channel name. Returns that nicks
     status (+ohv or '') on that channel.
 
-   "state_is_chan_op"
+  state_is_chan_op
+
     Takes two arguments, a nick and a channel name. Returns true if that
     nick is an channel operator, false otherwise.
 
-   "state_is_chan_hop"
+  state_is_chan_hop
+
     Takes two arguments, a nick and a channel name. Returns true if that
     nick is an channel half-operator, false otherwise.
 
-   "state_has_chan_voice"
+  state_has_chan_voice
+
     Takes two arguments, a nick and a channel name. Returns true if that
     nick has channel voice, false otherwise.
 
-  Server actions
-   "daemon_server_kill"
+ Server actions
+
+  daemon_server_kill
+
     Takes two arguments, a nickname and a comment (which is optional);
     Issues a SERVER KILL of the given nick;
 
-   "daemon_server_mode"
+  daemon_server_mode
+
     First argument is a channel name, remaining arguments are channel modes
     and their parameters to apply.
 
-   "daemon_server_kick"
+  daemon_server_join
+
+    Takes two arguments that are mandatory: a nickname of a user and a
+    channel name. The user will join the channel.
+
+  daemon_server_kick
+
     Takes two arguments that are mandatory and an optional one: channel
     name, nickname of the user to kick and a pithy comment.
 
-   "daemon_server_remove"
+  daemon_server_remove
+
     Takes two arguments that are mandatory and an optional one: channel
     name, nickname of the user to remove and a pithy comment.
 
-   "daemon_server_wallops"
+  daemon_server_wallops
+
     Takes one argument, the message text to send.
 
+  daemon_server_realops
+
+    Sends server notices.
+
+    Takes one mandatory argument, the message text to send.
+
+    Second argument is the notice type, this can be Notice, locops or
+    Globops. Defaults to Notice.
+
+    Third argument is a umode flag. The notice will be sent to OPERs who
+    have this umode set. Default is none and the notice will be sent to all
+    OPERs.
+
 INPUT EVENTS
+
     These are POE events that can be sent to the component.
 
-  "add_spoofed_nick"
+ add_spoofed_nick
+
     Takes a single argument a hashref which should have the following keys:
 
-    *   'nick', the nickname to add, mandatory;
+      * 'nick', the nickname to add, mandatory;
 
-    *   'user', the ident you want the nick to have, defaults to the same as
-        the nick;
+      * 'user', the ident you want the nick to have, defaults to the same
+      as the nick;
 
-    *   'hostname', the hostname, defaults to the server name;
+      * 'hostname', the hostname, defaults to the server name;
 
-    *   'umode', specify whether this is to be an IRCop etc, defaults to
-        'i';
+      * 'umode', specify whether this is to be an IRCop etc, defaults to
+      'i';
 
-    *   'ts', unixtime, default is time(), best not to meddle;
+      * 'ts', unixtime, default is time(), best not to meddle;
 
     Note: spoofed nicks are currently only really functional for use as IRC
     services.
 
-  "del_spoofed_nick"
+ del_spoofed_nick
+
     Takes a single mandatory argument, the spoofed nickname to remove.
     Optionally, you may specify a quit message for the spoofed nick.
 
-  Spoofed nick commands
+ Spoofed nick commands
+
     The following input events are for the benefit of spoofed nicks. All
     require a nickname of a spoofed nick as the first argument.
 
-   "daemon_cmd_join"
+  daemon_cmd_join
+
     Takes two arguments, a spoofed nick and a channel name to join.
 
-   "daemon_cmd_part"
+  daemon_cmd_part
+
     Takes two arguments, a spoofed nick and a channel name to part from.
 
-   "daemon_cmd_mode"
+  daemon_cmd_mode
+
     Takes at least three arguments, a spoofed nick, a channel and a channel
     mode to apply. Additional arguments are parameters for the channel
     modes.
 
-   "daemon_cmd_kick"
+  daemon_cmd_kick
+
     Takes at least three arguments, a spoofed nick, a channel name and the
     nickname of a user to kick from that channel. You may supply a fourth
     argument which will be the kick comment.
 
-   "daemon_cmd_topic"
+  daemon_cmd_topic
+
     Takes three arguments, a spoofed nick, a channel name and the topic to
     set on that channel. If the third argument is an empty string then the
     channel topic will be unset.
 
-   "daemon_cmd_nick"
+  daemon_cmd_nick
+
     Takes two arguments, a spoofed nick and a new nickname to change to.
 
-   "daemon_cmd_gline"
-    Takes three arguments, a spoofed nick, a user@host mask to gline and a
-    reason for the gline.
+  daemon_cmd_kline
 
-   "daemon_cmd_kline"
     Takes a number of arguments depending on where the KLINE is to be
     applied and for how long:
 
@@ -437,7 +604,8 @@ INPUT EVENTS
          $reason,
      );
 
-   "daemon_cmd_unkline"
+  daemon_cmd_unkline
+
     Removes a KLINE as indicated by the user@host mask supplied.
 
     To remove a KLINE:
@@ -458,7 +626,8 @@ INPUT EVENTS
          '*',
      );
 
-   "daemon_cmd_rkline"
+  daemon_cmd_rkline
+
     Used to set a regex based KLINE. The regex given must be based on a
     user@host mask.
 
@@ -481,372 +650,495 @@ INPUT EVENTS
          $reason,
      );
 
-    To set a temporary 10 minute RKLINE on all servers:
+  daemon_cmd_unrkline
+
+    Removes an RKLINE as indicated by the user@host mask supplied.
+
+    To remove a RKLINE:
 
      $ircd->yield(
-         'daemon_cmd_kline',
+         'daemon_cmd_unrkline',
          $spoofed_nick,
-         10,
-         '^.*$@^(yahoo|google|microsoft)\.com$',
-         'on',
-         '*',
-         $reason,
+         $user_host_mask,
      );
 
-   "daemon_cmd_sjoin"
+  daemon_cmd_sjoin
+
     Takes two arguments a spoofed nickname and an existing channel name.
     This command will then manipulate the channel timestamp to clear all
     modes on that channel, including existing channel operators, reset the
     channel mode to '+nt', the spoofed nick will then join the channel and
     gain channel ops.
 
-   "daemon_cmd_privmsg"
+  daemon_cmd_privmsg
+
     Takes three arguments, a spoofed nickname, a target (which can be a
     nickname or a channel name) and whatever text you wish to send.
 
-   "daemon_cmd_notice"
+  daemon_cmd_notice
+
     Takes three arguments, a spoofed nickname, a target (which can be a
     nickname or a channel name) and whatever text you wish to send.
 
-   "daemon_cmd_locops"
+  daemon_cmd_locops
+
     Takes two arguments, a spoofed nickname and the text message to send to
     local operators.
 
-   "daemon_cmd_wallops"
+  daemon_cmd_wallops
+
     Takes two arguments, a spoofed nickname and the text message to send to
     all operators.
 
-   "daemon_cmd_operwall"
+  daemon_cmd_globops
+
     Takes two arguments, a spoofed nickname and the text message to send to
     all operators.
 
 OUTPUT EVENTS
-  "ircd_daemon_error"
+
+ ircd_daemon_error
+
     Emitted: when we fail to register with a peer;
+
     Target: all plugins and registered sessions;
+
     Args:
 
-        *   "ARG0", the connection id;
+	* ARG0, the connection id;
 
-        *   "ARG1", the server name;
+	* ARG1, the server name;
 
-        *   "ARG2", the reason;
+	* ARG2, the reason;
 
-  "ircd_daemon_server"
+ ircd_daemon_server
+
     Emitted: when a server is introduced onto the network;
+
     Target: all plugins and registered sessions;
+
     Args:
 
-        *   "ARG0", the server name;
+	* ARG0, the server name;
 
-        *   "ARG1", the name of the server that is introducing them;
+	* ARG1, the name of the server that is introducing them;
 
-        *   "ARG2", the hop count;
+	* ARG2, the hop count;
 
-        *   "ARG3", the server description;
+	* ARG3, the server description;
 
-  "ircd_daemon_squit"
+ ircd_daemon_squit
+
     Emitted: when a server quits the network;
+
     Target: all plugins and registered sessions;
+
     Args:
 
-        *   "ARG0", the server name;
+	* ARG0, the server name;
 
-  "ircd_daemon_nick"
+ ircd_daemon_nick
+
     Emitted: when a user is introduced onto the network or changes their
     nickname
+
     Target: all plugins and registered sessions;
+
     Args (new user):
 
-        *   "ARG0", the nickname;
+	* ARG0, the nickname;
 
-        *   "ARG1", the hop count;
+	* ARG1, the hop count;
 
-        *   "ARG2", the time stamp (TS);
+	* ARG2, the time stamp (TS);
 
-        *   "ARG3", the user mode;
+	* ARG3, the user mode;
 
-        *   "ARG4", the ident;
+	* ARG4, the ident;
 
-        *   "ARG5", the hostname;
+	* ARG5, the hostname;
 
-        *   "ARG6", the server name;
+	* ARG6, the server name;
 
-        *   "ARG7", the real name;
+	* ARG7, the real name;
 
     Args (nick change):
 
-        *   "ARG0", the full nick!user@host;
+	* ARG0, the full nick!user@host;
 
-        *   "ARG1", the new nickname;
+	* ARG1, the new nickname;
 
-  "ircd_daemon_umode"
+ ircd_daemon_umode
+
     Emitted: when a user changes their user mode;
+
     Target: all plugins and registered sessions;
+
     Args:
 
-        *   "ARG0", the full nick!user@host;
+	* ARG0, the full nick!user@host;
 
-        *   "ARG1", the user mode change;
+	* ARG1, the user mode change;
 
-  "ircd_daemon_quit"
+ ircd_daemon_quit
+
     Emitted: when a user quits or the server they are on squits;
+
     Target: all plugins and registered sessions;
+
     Args:
 
-        *   "ARG0", the full nick!user@host;
+	* ARG0, the full nick!user@host;
 
-        *   "ARG1", the quit message;
+	* ARG1, the quit message;
 
-  "ircd_daemon_join"
+ ircd_daemon_join
+
     Emitted: when a user joins a channel
+
     Target: all plugins and registered sessions;
+
     Args:
 
-        *   "ARG0", the full nick!user@host;
+	* ARG0, the full nick!user@host;
 
-        *   "ARG1", the channel name;
+	* ARG1, the channel name;
 
-  "ircd_daemon_part"
+ ircd_daemon_part
+
     Emitted: when a user parts a channel;
+
     Target: all plugins and registered sessions;
+
     Args:
 
-        *   "ARG0", the full nick!user@host;
+	* ARG0, the full nick!user@host;
 
-        *   "ARG1", the channel name;
+	* ARG1, the channel name;
 
-        *   "ARG2", the part message;
+	* ARG2, the part message;
 
-  "ircd_daemon_kick"
+ ircd_daemon_kick
+
     Emitted: when a user is kicked from a channel;
+
     Target: all plugins and registered sessions;
+
     Args:
 
-        *   "ARG0", the full nick!user@host of the kicker;
+	* ARG0, the full nick!user@host of the kicker;
 
-        *   "ARG1", the channel name;
+	* ARG1, the channel name;
 
-        *   "ARG2", the nick of the kicked user;
+	* ARG2, the nick of the kicked user;
 
-        *   "ARG3", the kick message;
+	* ARG3, the kick message;
 
-  "ircd_daemon_mode"
+ ircd_daemon_mode
+
     Emitted: when a channel mode is changed;
+
     Target: all plugins and registered sessions;
+
     Args:
 
-        *   "ARG0", the full nick!user@host or server name;
+	* ARG0, the full nick!user@host or server name;
 
-        *   "ARG1", the channel name;
+	* ARG1, the channel name;
 
-        *   "ARG2..$#_", the modes and their arguments;
+	* ARG2..$#_, the modes and their arguments;
 
-  "ircd_daemon_topic"
+ ircd_daemon_topic
+
     Emitted: when a channel topic is changed
+
     Target: all plugins and registered sessions;
+
     Args:
 
-        *   "ARG0", the full nick!user@host of the changer;
+	* ARG0, the full nick!user@host of the changer;
 
-        *   "ARG1", the channel name;
+	* ARG1, the channel name;
 
-        *   "ARG2", the new topic;
+	* ARG2, the new topic;
 
-  "ircd_daemon_public"
+ ircd_daemon_public
+
     Emitted: when a channel message is sent (a spoofed nick must be in the
     channel)
+
     Target: all plugins and registered sessions;
+
     Args:
 
-        *   "ARG0", the full nick!user@host of the sender;
+	* ARG0, the full nick!user@host of the sender;
 
-        *   "ARG1", the channel name;
+	* ARG1, the channel name;
 
-        *   "ARG2", the message;
+	* ARG2, the message;
 
-  "ircd_daemon_privmsg"
+ ircd_daemon_privmsg
+
     Emitted: when someone sends a private message to a spoofed nick
+
     Target: all plugins and registered sessions;
+
     Args:
 
-        *   "ARG0", the full nick!user@host of the sender;
+	* ARG0, the full nick!user@host of the sender;
 
-        *   "ARG1", the spoofed nick targeted;
+	* ARG1, the spoofed nick targeted;
 
-        *   "ARG2", the message;
+	* ARG2, the message;
 
-  "ircd_daemon_notice"
+ ircd_daemon_notice
+
     Emitted: when someone sends a notice to a spoofed nick or channel
+
     Target: all plugins and registered sessions;
+
     Args:
 
-        *   "ARG0", the full nick!user@host of the sender;
+	* ARG0, the full nick!user@host of the sender;
 
-        *   "ARG1", the spoofed nick targeted or channel spoofed nick is in;
+	* ARG1, the spoofed nick targeted or channel spoofed nick is in;
 
-        *   "ARG2", the message;
+	* ARG2, the message;
 
-  "ircd_daemon_invite"
+ ircd_daemon_snotice
+
+    Emitted: when the server issues a notice for various reasons
+
+    Target: all plugins and registered sessions;
+
+    Args:
+
+	* ARG0, the message;
+
+ ircd_daemon_invite
+
     Emitted: when someone invites a spoofed nick to a channel;
+
     Target: all plugins and registered sessions;
+
     Args:
 
-        *   "ARG0", the full nick!user@host of the inviter;
+	* ARG0, the full nick!user@host of the inviter;
 
-        *   "ARG1", the spoofed nick being invited;
+	* ARG1, the spoofed nick being invited;
 
-        *   "ARG2", the channel being invited to;
+	* ARG2, the channel being invited to;
 
-  "ircd_daemon_rehash"
+ ircd_daemon_rehash
+
     Emitted: when an oper issues a REHASH command;
+
     Target: all plugins and registered sessions;
+
     Args:
 
-        *   "ARG0", the full nick!user@host of the oper;
+	* ARG0, the full nick!user@host of the oper;
 
-  "ircd_daemon_die"
+ ircd_daemon_die
+
     Emitted: when an oper issues a DIE command;
+
     Target: all plugins and registered sessions;
+
     Args:
 
-        *   "ARG0", the full nick!user@host of the oper;
+	* ARG0, the full nick!user@host of the oper;
 
     Note: the component will shutdown, this is a feature;
 
-  "ircd_daemon_gline"
-    Emitted: when an oper issues a GLINE command;
+ ircd_daemon_dline
+
+    Emitted: when an oper issues a DLINE command;
+
     Target: all plugins and registered sessions;
+
     Args:
 
-        *   "ARG0", the full nick!user@host;
+	* ARG0, the full nick!user@host;
 
-        *   "ARG1", the user mask;
+	* ARG1, the duration;
 
-        *   "ARG2", the host mask;
+	* ARG2, the network mask;
 
-        *   "ARG3", the reason;
+	* ARG3, the reason;
 
-  "ircd_daemon_kline"
+ ircd_daemon_kline
+
     Emitted: when an oper issues a KLINE command;
+
     Target: all plugins and registered sessions;
+
     Args:
 
-        *   "ARG0", the full nick!user@host;
+	* ARG0, the full nick!user@host;
 
-        *   "ARG1", the target for the KLINE;
+	* ARG1, the target for the KLINE;
 
-        *   "ARG2", the duration in seconds;
+	* ARG2, the duration in seconds;
 
-        *   "ARG3", the user mask;
+	* ARG3, the user mask;
 
-        *   "ARG4", the host mask;
+	* ARG4, the host mask;
 
-        *   "ARG5", the reason;
+	* ARG5, the reason;
 
-  "ircd_daemon_rkline"
+ ircd_daemon_rkline
+
     Emitted: when an oper issues an RKLINE command;
+
     Target: all plugins and registered sessions;
+
     Args:
 
-        *   "ARG0", the full nick!user@host;
+	* ARG0, the full nick!user@host;
 
-        *   "ARG1", the target for the RKLINE;
+	* ARG1, the target for the RKLINE;
 
-        *   "ARG2", the duration in seconds;
+	* ARG2, the duration in seconds;
 
-        *   "ARG3", the user mask;
+	* ARG3, the user mask;
 
-        *   "ARG4", the host mask;
+	* ARG4, the host mask;
 
-        *   "ARG5", the reason;
+	* ARG5, the reason;
 
-  "ircd_daemon_unkline"
+ ircd_daemon_unkline
+
     Emitted: when an oper issues an UNKLINE command;
+
     Target: all plugins and registered sessions;
+
     Args:
 
-        *   "ARG0", the full nick!user@host;
+	* ARG0, the full nick!user@host;
 
-        *   "ARG1", the target for the UNKLINE;
+	* ARG1, the target for the UNKLINE;
 
-        *   "ARG2", the user mask;
+	* ARG2, the user mask;
 
-        *   "ARG3", the host mask;
+	* ARG3, the host mask;
 
-  "ircd_daemon_locops"
+ ircd_daemon_expired
+
+    Emitted: when a temporary D-Line, X-Line, K-Line or RK-Line expires
+
+    Target: all plugins and registered sessions;
+
+    Args:
+
+	* ARG0, What expired, can be d-line, x-line, k-line or rk-line;
+
+	* ARG1, the mask (D-Line and X-Line) or user@host (K-Line and
+	RK-Line);
+
+ ircd_daemon_encap
+
+    Emitted: when the server receives an ENCAP message;
+
+    Target: all plugins and registered sessions;
+
+    Args:
+
+	* ARG0, the server name or full nick!user@host;
+
+	* ARG1, peermask of targets for the ENCAP;
+
+	* ARG2, the sub command being propagated;
+
+	* Subsequent ARGs are dependent on the sub command;
+
+ ircd_daemon_locops
+
     Emitted: when an oper issues a LOCOPS command;
+
     Target: all plugins and registered sessions;
+
     Args:
 
-        *   "ARG0", the full nick!user@host;
+	* ARG0, the full nick!user@host;
 
-        *   "ARG1", the locops message;
+	* ARG1, the locops message;
 
-  "ircd_daemon_operwall"
-    Emitted: when an oper issues a WALLOPS or OPERWALL command;
+ ircd_daemon_globops
+
+    Emitted: when an oper or server issues a GLOBOPS;
+
     Target: all plugins and registered sessions;
+
     Args:
 
-        *   "ARG0", the full nick!user@host;
+	* ARG0, the full nick!user@host or server name;
 
-        *   "ARG1", the wallops or operwall message;
+	* ARG1, the globops message;
 
-  "ircd_daemon_wallops"
+ ircd_daemon_wallops
+
     Emitted: when a server issues a WALLOPS;
+
     Target: all plugins and registered sessions;
+
     Args:
 
-        *   "ARG0", the server name;
+	* ARG0, the server name;
 
-        *   "ARG1", the wallops message;
+	* ARG1, the wallops message;
 
 BUGS
+
     A few have turned up in the past and they are sure to again. Please use
-    <http://rt.cpan.org/> to report any. Alternatively, email the current
+    http://rt.cpan.org/ to report any. Alternatively, email the current
     maintainer.
 
 DEVELOPMENT
-    You can find the latest source on github:
-    <http://github.com/bingos/poe-component-server-irc>
 
-    The project's developers usually hang out in the "#poe" IRC channel on
+    You can find the latest source on github:
+    http://github.com/bingos/poe-component-server-irc
+
+    The project's developers usually hang out in the #poe IRC channel on
     irc.perl.org. Do drop us a line.
 
 MAINTAINER
+
     Hinrik Örn Sigurðsson <hinrik.sig@gmail.com>
 
 AUTHOR
+
     Chris 'BinGOs' Williams
 
 LICENSE
-    Copyright "(c)" Chris Williams
+
+    Copyright (c) Chris Williams
 
     This module may be used, modified, and distributed under the same terms
     as Perl itself. Please see the license that came with your Perl
     distribution for details.
 
 KUDOS
+
     Rocco Caputo for creating POE.
 
     Buu for pestering me when I started to procrastinate =]
 
 SEE ALSO
-    POE <http://poe.perl.org/>
+
+    POE http://poe.perl.org/
 
     POE::Component::Server::IRC::Backend
 
-    Net::Netmask
+    Net::CIDR
 
-    Hybrid IRCD <http://ircd-hybrid.com/>
+    Hybrid IRCD http://ircd-hybrid.com/
 
-    TSOra <http://www.idolnet.org/docs/README.TSora>
+    RFC 2810 http://www.faqs.org/rfcs/rfc2810.html
 
-    RFC 2810 <http://www.faqs.org/rfcs/rfc2810.html>
+    RFC 2811 http://www.faqs.org/rfcs/rfc2811.html
 
-    RFC 2811 <http://www.faqs.org/rfcs/rfc2811.html>
+    RFC 2812 http://www.faqs.org/rfcs/rfc2812.html
 
-    RFC 2812 <http://www.faqs.org/rfcs/rfc2812.html>
-
-    RFC 2813 <http://www.faqs.org/rfcs/rfc2813.html>
+    RFC 2813 http://www.faqs.org/rfcs/rfc2813.html
 

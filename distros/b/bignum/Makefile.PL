@@ -29,6 +29,7 @@ my %WriteMakefileArgs =
                             'Math::BigInt'        => 1.999825,
                             'Math::BigRat'        => 0.2618,
                             #'Math::BigInt::Lite'  => 0.03,      # optional
+                            'Carp'                => 1.22,
                            },
 
    # A hash of modules that are needed to test the module but not run or build

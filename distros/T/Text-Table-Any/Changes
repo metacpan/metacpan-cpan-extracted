@@ -1,3 +1,10 @@
+0.105   2021-12-09  Released-By: PERLANCAR; Urgency: medium
+
+	- Pass 'title' parameter to Text::Table::HTML::DataTables.
+
+	- Reformat docs.
+
+
 0.104   2021-04-26  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

@@ -1,5 +1,23 @@
 CHANGELOG
 
+v2.09 (2021/12/28)
+==================
+--Added new export options for Paranoid::IO
+--Added new flock stack mechanism to support transactional I/O patterns
+--Improved open flag filtering on reopens
+--pflock now performs and popen in order to make sure an flock is 
+  properly applied to reopened file handles in children
+--Improved pdebug logging for items geting passed arbitrary content
+  (logging bytes in content, rather that spilling complete content into the
+  logs)
+--Added non-flocking variants of I/O functions
+--Added I/O tests w/pflock stack enabled to ensure consistent behaviour
+--Added Paranoid::IO::FileMultiplexer class, which allows for multiple 
+  data stream I/O within a single file, but using normal discrete file
+  I/O semantics
+--Fixed Paranoid::Filesystem test to account for NetBSD's noatime
+  implementation (utime calls for atime fail entirely)
+
 v2.08 (2020/12/31)
 ==================
 --Updated licensing information to reflect Paranoid trademark impact

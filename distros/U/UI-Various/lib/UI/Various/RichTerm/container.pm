@@ -54,13 +54,13 @@ be used to determine if a container's child will get a prefix or not.
 
 #########################################################################
 
-use v5.14.0;
+use v5.14;
 use strictures;
 no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 use UI::Various::core;
 use UI::Various::RichTerm::base;

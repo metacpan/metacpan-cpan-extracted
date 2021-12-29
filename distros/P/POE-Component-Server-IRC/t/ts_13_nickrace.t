@@ -19,6 +19,7 @@ my $ircd = POE::Component::Server::IRC->spawn(
     Auth         => 0,
     AntiFlood    => 0,
     plugin_debug => 1,
+    config       => { sid => '8UR', },
 );
 
 POE::Session->create(

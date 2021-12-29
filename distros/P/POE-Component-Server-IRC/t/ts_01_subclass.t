@@ -13,6 +13,7 @@ my $pocosi = PoCoServerIRCSubd->spawn(
     auth         => 0,
     antiflood    => 0,
     plugin_debug => 1,
+    config => { sid => '666' },
 );
 my $pocoirc = POE::Component::IRC->spawn(flood => 1);
 

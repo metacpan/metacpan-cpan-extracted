@@ -8,6 +8,7 @@ my $pocosi = POE::Component::Server::IRC->spawn(
     auth         => 0,
     antiflood    => 0,
     plugin_debug => 1,
+    config       => { sid => '999', },
 );
 
 POE::Session->create(

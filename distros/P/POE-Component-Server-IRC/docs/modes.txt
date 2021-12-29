@@ -1,0 +1,72 @@
+Oper only:
+==========
++a - admin        - Admin status. Can for example see IP addresses in "STATS c"
++b - bots         - See bot and drone flooding notices
++c - cconn        - Client connection/quit notices
++d - debug        - See debugging notices
++e - external     - See remote server connection and split notices
++f - full         - See auth {} block full notices
++F - farconnect   - See remote client connection/quit notices
++H - hidden       - Hides IRC operator status to other users
++j - rej          - See rejected client notices
++k - skill        - See server generated KILL messages
++l - locops       - See LOCOPS messages
++n - nchange      - See client nick changes
++s - servnotice   - See general server notices
++u - unauth       - See unauthorized client notices
++y - spy          - See ADMIN, LINKS, MOTD, STATS, TRACE notices
+
+Servers/Services:
+=================
++S - ssl          - Client is connected via SSL/TLS
++W - webirc       - User is connected using a webirc gateway
++r - registered   - User has been registered and identified for its nick.
++o - oper         - IRC operator status
+
+*:
+==
++D - deaf         - Don't receive channel messages
++G - softcallerid - Server Side Ignore for users not on your channels
++g - callerid     - Server Side Ignore (see modeg.txt)
++i - invisible    - Not shown in NAMES or WHO unless you share a channel
++p - hidechans    - Hides channel list in WHOIS
++q - hideidle     - Hides idle and signon time in WHOIS
++R - regonly      - Only registered clients may message you
++w - wallop       - See server generated WALLOPS
+
+Channel Modes:
+==============
+
++b - ban          - Channel ban on nick!user@host
++c - noctrls      - Prevent users from sending messages containing control codes to the channel
++C - noctcps      - Prevent users from sending CTCPs to the channel
++e - exempt       - Exemption from bans
++h - halfop       - Half-Op status
++I - invex        - Invite exceptions, nick!user@host does not need to be explicitly INVITE'd
+                    into the channel before being able JOIN
++i - invite       - Invite only
++k - key          - Key/password for the channel
++l - limit        - Limit the number of users in a channel
++m - moderated    - Users without +v/h/o cannot send text to the channel
++L - extlimit     - Channel can make use of the extended ban list limit. Can be set only by irc-operators,
+                    servers and services.
++M - modreg       - Unregistered/unidentified clients cannot send text to the channel
++N - nonickchange - This will prevent any user who isn't opped or half-opped (+o/+h) from changing their
+                    nick while in the channel.
++n - noexternal   - Users must be in the channel to send text to it
++o - chanop       - Full operator status
++O - operonly     - This mode will prevent anyone who hasn't obtained irc-operator status from joining the
+                    channel. Can be set only by irc-operators, servers and services.
++p - private      - Private is obsolete, this now restricts KNOCK, and can be set at the same time as +s.
++r - registered   - Channel has been registered. Can be set only by servers and services.
++R - regonly      - Only registered clients may join a channel with that mode set
++s - secret       - The channel does not show up on NAMES or LIST or in the
+                    WHOIS channel list unless you are a member of the channel
++S - sslonly      - This mode will prevent anyone who isn't securely connected via SSL/TLS from joining
+                    the channel.
++t - topic        - Only chanops and halfops can change the topic
++u - hidebmasks   - Hides +b/+e/+I mode changes and lists to everyone except channel ops, and
+                    half-ops (+o/+h)
++T - nonotice     - Users without +v/h/o cannot send NOTICEs to the channel
++v - voice        - Can speak in a moderated channel, and is exempt from flood restrictions
+

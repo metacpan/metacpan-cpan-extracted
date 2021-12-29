@@ -1,5 +1,6 @@
 BUGS
 CHANGES
+gentest/backend.sh
 gentest/scope-nested-const.sh
 gentest/scope-nested-hex-oct.sh
 lib/bigint.pm
@@ -16,6 +17,12 @@ README
 README.md
 t/00sig.t
 t/01load.t
+t/backend-gmp-bigint.t
+t/backend-gmp-bignum.t
+t/backend-gmp-bigrat.t
+t/backend-pari-bigint.t
+t/backend-pari-bignum.t
+t/backend-pari-bigrat.t
 t/bigexp.t
 t/bigint.t
 t/bignum.t

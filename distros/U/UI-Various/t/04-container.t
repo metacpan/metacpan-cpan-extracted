@@ -12,7 +12,7 @@
 
 #########################################################################
 
-use v5.14.0;
+use v5.14;
 use strictures;
 no indirect 'fatal';
 no multidimensional;
@@ -117,7 +117,10 @@ is($_, undef, 'removing non-existent element correctly returned undef');
 is($b2->children(), 3, 'Box 2 for iteration 2/3 has 3 children');
 $_ = $b2->child();
 is($_, $l1, 'iteration 2.1 through Box 2 finds Leaf 1');
-$_ = $b2->child(undef);
+if ($^V lt 'v5.20')		# workaround for Perl bugs #7508 / #109726
+{   $_ = $b2->child('');   }
+else
+{   $_ = $b2->child(undef);   }
 is($_, undef, 'aborting iteration 2 through Box 2 returns undef');
 $_ = $b2->child();
 is($_, $l1, 'iteration 3.1 through Box 2 finds Leaf 1');
@@ -127,7 +130,7 @@ $_ = $b2->child();
 is($_, $l3, 'iteration 3.3 through Box 2 finds Leaf 3');
 $_ = $b2->child();
 is($_, undef, 'iteration 3.4 through Box 2 finds end');
-$_ = $b2->child(undef);
+$_ = $b2->child('');
 is($_, undef, 'aborting after iteration 3 through Box 2 returns undef');
 
 # remove in the middle:

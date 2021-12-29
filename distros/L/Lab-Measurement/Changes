@@ -4,6 +4,11 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.802 2021-12-28
+  * Lakeshore 340: Add commands to set/get and configure analog outputs
+  * Backends: Update LinuxGPIB install instructions
+  * Fix for #59: Gnuplot pm3d palette gets overridden
+
 3.801 2021-12-10
   * Fix syntax for Perl 2.26 and earlier
   * Lakeshore340: Support 4 thermometers (A B C D)

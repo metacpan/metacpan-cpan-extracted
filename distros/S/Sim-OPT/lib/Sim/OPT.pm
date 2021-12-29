@@ -2,7 +2,7 @@ package Sim::OPT;
 # Copyright (C) 2008-2021 by Gian Luca Brunetti and Politecnico di Milano.
 # This is Sim::OPT, a program managing building performance simulation programs for performing optimization by overlapping block coordinate descent.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
-$VERSION = '0.507';
+$VERSION = '0.543';
 use v5.14;
 # use v5.20;
 use Exporter;
@@ -574,12 +574,14 @@ sub getitersnum
 sub clean
 {
   my ( $line, $mypath, $file ) = @_;
-	$line =~ s/^$mypath// ;
-	$line =~ s/^\/// ;
-	$line =~ s/^$file// ;
-	$line =~ s/^_// ;
-  $line =~ /_(\D+)$/ ;
-  $line =~ s/_$1$// ;
+	$line =~ s/$mypath// ;
+	$line =~ s/$file// ;
+	$line =~ s/^(\/+)//g ;
+	$line =~ s/^$file//g ;
+	$line =~ s/^_//g ;
+  $line =~ s/(\D+)$//g ;
+	$line =~ s/(\D+)$//g ;
+	#$line = "$mypath/$file" . "_" . "$line";
   #$line =~ s/^-// ;
   return( $line );
 }
@@ -651,11 +653,12 @@ sub getrootname
 
 sub extractcase #  UPDATES THE FILE NAME ON THE BASIS OF A %carrier
 {
-	my ( $dowhat_ref, $transfile, $carrier_r, $file, $blockelts_r, $mypath, $instn ) = @_;
+	my ( $inst_r, $dowhat_ref, $transfile, $carrier_r, $file, $blockelts_r, $mypath, $instn ) = @_;
 	my %carrier = %{ $carrier_r };
 	my @blockelts = @{ $blockelts_r };
 	my $num = scalar( @blockelts );
 	my %dowhat = %{ $dowhat_ref };
+	my %inst = %{ $inst_r };
 	my %provhash;
 	$transfile =~ s/^mypath\///;
 	$transfile =~ s/^$file//;
@@ -880,7 +883,9 @@ sub integratebox
 	my $file = $_[2];
 	my @blockelts = @{ $_[3] };
 	my $mypath = $_[4];
-	my %dowhat = %{ $_[5] };
+	my %inst = %{ $_[5] };
+	my %dowhat  = %{ $_[6] };
+	my $instn = $_[7];
 	my @newbox;
 	if ( ref( $arrelts[0] ) )
 	{
@@ -888,10 +893,10 @@ sub integratebox
 		{
 			my @elts = @{ $eltref };
 			my $target = $elts[0];
-			my %righttarg = %{ extractcase( \%dowhat, $target, \%carrier, $file, \@blockelts, $mypath ) };
+			my %righttarg = %{ extractcase( \%inst, \%dowhat, $target, \%carrier, $file, \@blockelts, $mypath ) };
 			my $righttarget = $righttarg{cleanto};
 			my $origin = $elts[3];
-			my %rightorig = %{ extractcase( \%dowhat, $origin, \%carrier, $file, \@blockelts, $mypath ) };
+			my %rightorig = %{ extractcase( \%inst, \%dowhat, $origin, \%carrier, $file, \@blockelts, $mypath ) };
 			my $rightorigin = $rightorig{cleanto};
 			push ( @newbox, [ $righttarget, $elts[1], $elts[2], $rightorigin, $elts[4] ] );
 		}
@@ -1370,10 +1375,10 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 	my %datastruc = %{ $d{datastruc} };
 	my %dowhat = %{ $d{dowhat} };
 	my @varnumbers = @{ $d{varnumbers} };
-	my $instn = $d{instn};
 	my %inst = %{ $d{inst} };
 	my %vehicles = %{ $d{vehicles} };
 	@varnumbers = Sim::OPT::washn( @varnumbers );
+
 
 	if ( $countcase > $#sweeps )# NUMBER OF CASES OF THE CURRENT PROBLEM
   {
@@ -1592,8 +1597,8 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 			$sourceblockelts[0] =~ /^(\d+)ç/ ;
 			$dirfiles{slicenum} = $1;
 		}
-		say "SLICENUM! " . dump( $dirfiles{slicenum} );
-		say "\$countcase $countcase \$countblock $countblock";
+		#say "SLICENUM! " . dump( $dirfiles{slicenum} );
+		#say "\$countcase $countcase \$countblock $countblock";
 		$dirfiles{pushsupercycle} = "yes";
 		$dirfiles{nestclock} = $dirfiles{nestclock} + 1;
 		push( @{ $vehicles{nesting}{$dirfiles{nestclock}} }, $countblock );
@@ -1603,7 +1608,7 @@ sub callblock # IT CALLS THE SEARCH ON BLOCKS.
 	{
 		$sourceblockelts[0] =~ /^(\d+)(>|<|£|§|°|§|ù)(\d+)é/ ;
 		$dirfiles{revealnum} = $3;
-		say "REVEALNUM! " . dump( $dirfiles{revealnum} );
+		#say "REVEALNUM! " . dump( $dirfiles{revealnum} );
 		$dirfiles{popsupercycle} = "yes";
 	}
 	else
@@ -1707,8 +1712,6 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 	my (@basket, @box);
 	push (@basket, [ $rootitem ] );
 
-
-
 	sub toil
 	{
 		my ( $blockelts_r, $varnums_r, $basket_r, $c, $mypath, $file ) = @_;
@@ -1756,7 +1759,6 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 		return( \@box );
 	}
 
-
 	my ( @bux, @buux );
 	if ( ( $dirfiles{starsign} eq "yes" ) or
 			( ( $dirfiles{random} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) ) or
@@ -1764,8 +1766,6 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 			( ( $dirfiles{factorial} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) ) or
 			( ( $dirfiles{facecentered} eq "yes" ) and ( $dowhat{metamodel} eq "yes" ) ) )
 	{
-
-
 		if ( $dirfiles{starsign} eq "yes" )
 		{
 			my $c = 0;
@@ -1792,7 +1792,6 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 			@fills = @{ Sim::OPT::Descend::prepareblank( \%varnums, $tmpblankfile, \@blockelts, \@bag, $file, \%carrier ) };
 			@fulls = uniq( map { $_->[0] } @fills );
 		}
-
 
 		if ( $dirfiles{random} eq "yes" )
 		{
@@ -1955,7 +1954,7 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 		foreach my $midsurrs_r ( @miditers )
 		{
 			my %midsurrs = %{ $midsurrs_r };
-	 		@bag = uniq( @{ integratebox( \@bux, \%midsurrs, $file, \@blockelts, $mypath, \%inst, \%dowhat ) } );
+	 		@bag = uniq( @{ integratebox( \@bux, \%midsurrs, $file, \@blockelts, $mypath, \%inst, \%dowhat, $instn ) } );
 			push( @finalbox, @bag );
 		}
 		my @finalbox = cleanduplicates( \@finalbox, \%dowhat );
@@ -1963,11 +1962,10 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 	else
 	{
 		my @bark = @{ flattenbox( \@bux ) };
-		@finalbox = uniq( @{ integratebox( \@bark, \%carrier, $file, \@blockelts, $mypath, \%inst, \%dowhat ) } );
+		@finalbox = uniq( @{ integratebox( \@bark, \%carrier, $file, \@blockelts, $mypath, \%inst, \%dowhat, $instn ) } );
 	}
 
 	@finalbox = sort { $a->[0] <=> $b->[0] } @finalbox;
-
 
 	setlaunch( {
 		countcase => $countcase, countblock => $countblock,
@@ -2009,8 +2007,8 @@ sub setlaunch # IT SETS THE DATA FOR THE SEARCH ON THE ACTIVE BLOCK.
 	my %mids = %{ $d{mids} };
 	my %carrier = %{ $d{carrier} };
 
-	my ( @instances );
-	my %starters = %{ extractcase( \%dowhat, "", \%carrier, $file, \@blockelts, $mypath, "" ) };
+	my ( @instances, @precedents );
+	my %starters = %{ extractcase( \%inst, \%dowhat, "", \%carrier, $file, \@blockelts, $mypath, "" ) };
 
 	$dirfiles{starter} = $starters{cleanto};
 
@@ -2022,38 +2020,62 @@ sub setlaunch # IT SETS THE DATA FOR THE SEARCH ON THE ACTIVE BLOCK.
 		my $countvar = $$elt[1];
 		my $countstep = $$elt[2];
 		my $oldpars = $$elt[3];
-		my %to = %{ extractcase( \%dowhat, $newpars, \%carrier, $file, \@blockelts, $mypath, $instn ) };
+		my %to = %{ extractcase( \%inst, \%dowhat, $newpars, \%carrier, $file, \@blockelts, $mypath, $instn ) };
 
-		unless( ( $to{cleanto} ~~ @{ $dirfiles{dones} } ) and ( $dirfiles{precomputed} eq "" ) )
 		{
-			push( @{ $dirfiles{dones} }, $to{cleanto} );
 			$inst{$to{cleanto}} = $to{crypto};
 			$inst{$to{crypto}} = $to{cleanto};
-			$inst{$to{to}} = $to{cleanto};
+			$inst{$to{cleancrypto}} = $to{to};
+			$inst{$to{to}} = $to{cleancrypto};
 
-			my %orig = %{ extractcase( \%dowhat, $oldpars, \%carrier, $file, \@blockelts, $mypath ) };
+			my %orig = %{ extractcase( \%inst, \%dowhat, $oldpars, \%carrier, $file, \@blockelts, $mypath ) }; say $tee "HEEEERE obtained \$instn: $instn, countinstance: $count, from: $from, \$to: $to, \$toitem: $toitem, \%orig: " . dump( \%orig ) . ", \%carrier: " . dump( \%carrier );
 			my $origin = $orig{cleanto};
+			my $fullor = $orig{to};
+			my $fullto = $to{to};
 			my $c = $$elt[4];
-			unless ( ( $dirfiles{ga} eq "yes" ) and ( $to{cleanto} ne $from ) )
+			unless ( $dirfiles{ga} eq "yes" )
 			{
-				push( @instances,
+				unless ( $to{cleanto} ~~ @{ $dirfiles{dones} } )
 				{
-					countcase => $countcase, countblock => $countblock,
-					miditers => \@miditers,  winneritems => \@winneritems, c => $c, toitem => $toitem, from => $from,
-					to => \%to, countvar => $countvar, countstep => $countstep,
-					sweeps => \@sweeps, dowhat => \%dowhat,
-					sourcesweeps => \@sourcesweeps, datastruc => \%datastruc,
-					varnumbers => \@varnumbers, blocks => \@blocks,
-					blockelts => \@blockelts, mids => \%mids, varnums => \%varnums,
-					countinstance => $count, carrier => \%carrier, origin => $origin,
-					instn => $instn, is => $to{cleanto}, vehicles => \%vehicles
-				} );
+
+
+					push( @{ $dirfiles{dones} }, $to{cleanto} );
+					push( @instances,
+					{
+						countcase => $countcase, countblock => $countblock,
+						miditers => \@miditers,  winneritems => \@winneritems, c => $c, toitem => $toitem, from => $from,
+						to => \%to, countvar => $countvar, countstep => $countstep,
+						sweeps => \@sweeps, dowhat => \%dowhat,
+						sourcesweeps => \@sourcesweeps, datastruc => \%datastruc,
+						varnumbers => \@varnumbers, blocks => \@blocks,
+						blockelts => \@blockelts, mids => \%mids, varnums => \%varnums,
+						countinstance => $count, carrier => \%carrier, origin => $origin,
+						instn => $instn, is => $to{cleanto}, vehicles => \%vehicles,
+						fullor => $fullor, fullto => $fullto
+					} );
+			  }
+        else
+				{
+					push( @precedents,
+					{
+						countcase => $countcase, countblock => $countblock,
+						miditers => \@miditers,  winneritems => \@winneritems, c => $c, toitem => $toitem, from => $from,
+						to => \%to, countvar => $countvar, countstep => $countstep,
+						sweeps => \@sweeps, dowhat => \%dowhat,
+						sourcesweeps => \@sourcesweeps, datastruc => \%datastruc,
+						varnumbers => \@varnumbers, blocks => \@blocks,
+						blockelts => \@blockelts, mids => \%mids, varnums => \%varnums,
+						countinstance => $count, carrier => \%carrier, origin => $origin,
+						instn => $instn, is => $to{cleanto}, vehicles => \%vehicles,
+						fullor => $fullor, fullto => $fullto
+					} );
+				}
 			}
 			$instn++;
 		}
 		$count++;
 	}
-	exe( { instances => \@instances, dirfiles => \%dirfiles, inst => \%inst } );
+	exe( { instances => \@instances, dirfiles => \%dirfiles, inst => \%inst, precedents => \@precedents, } );
 }
 
 sub exe
@@ -2062,6 +2084,7 @@ sub exe
 	my @instances = @{ $dat{instances} };
 	my %dirfiles = %{ $dat{dirfiles} };
 	my %inst = %{ $dat{inst} };
+	my @precedents = @{ $dat{precedents} };
 
 	my %d = %{ $instances[0] };
 	my $countcase = $d{countcase};
@@ -2108,6 +2131,8 @@ sub exe
 	{
 		push( @{ $vehicles{cumulateall} }, @instances );
 	}
+
+
 
 	if ( $dirfiles{ga} eq "yes" )
 	{
@@ -2156,6 +2181,7 @@ sub exe
 		#say "REDS1: " . dump( @reds );
 		@reds = @reds[0..($dirfiles{randompicknum}-1)];
 		#say "REDS2: " . dump( @reds );
+
 		foreach my $instance ( @instances )
 		{ #say "INSTANCE IS: $instance->{is}";
 			if ( $instance->{is} ~~ @reds )
@@ -2165,7 +2191,7 @@ sub exe
 				if ( $dowhat{morph} eq "y" )
 				{
 					say $tee "#Calling morphing operations for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
-					my @result = Sim::OPT::Morph::morph( $configfile, \@instancees, \%dirfiles, \%dowhat, \%vehicles, \%inst );
+					my @result = Sim::OPT::Morph::morph( $configfile, \@instancees, \%dirfiles, \%dowhat, \%vehicles, \%inst, \@precedents );
 				}
 
 				if ( ( $dowhat{simulate} eq "y" ) or ( $dowhat{newreport} eq "y" ) )
@@ -2174,7 +2200,7 @@ sub exe
 					say $tee "#Calling simulations, reporting and retrieving for instance $instance{is} in case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
 					my ( $simcases_ref, $simstruct_ref, $repcases_ref, $repstruct_ref,
 				    $mergestruct_ref, $mergecases_ref, $c ) = Sim::OPT::Sim::sim(
-							{ instances => \@instancees, dirfiles => \%dirfiles, vehicles => \%vehicles, inst => \%inst } );
+							{ instances => \@instancees, dirfiles => \%dirfiles, vehicles => \%vehicles, inst => \%inst, precedents => \@precedents } );
 							$dirfiles{simcases} = $simcases_ref;
 							$dirfiles{simstruct} = $simstruct_ref;
 							$dirfiles{repcases} = $repcases_ref;
@@ -2198,7 +2224,7 @@ sub exe
 		if ( $dowhat{morph} eq "y" )
 		{
 			say $tee "#Calling morphing operations for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
-			my @result = Sim::OPT::Morph::morph( $configfile, \@instances, \%dirfiles, \%dowhat, \%vehicles, \%inst );
+			my @result = Sim::OPT::Morph::morph( $configfile, \@instances, \%dirfiles, \%dowhat, \%vehicles, \%inst, \@precedents );
 			$dirfiles{morphcases} = $result[0];
 			$dirfiles{morphstruct} = $result[1];
 		}
@@ -2209,7 +2235,7 @@ sub exe
 			say $tee "#Calling simulations, reporting and retrieving for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
 			my ( $simcases_ref, $simstruct_ref, $repcases_ref, $repstruct_ref,
 		    $mergestruct_ref, $mergecases_ref, $c ) = Sim::OPT::Sim::sim(
-					{ instances => \@instances, dirfiles => \%dirfiles, vehicles => \%vehicles, inst => \%inst } );
+					{ instances => \@instances, dirfiles => \%dirfiles, vehicles => \%vehicles, inst => \%inst, precedents => \@precedents } );
 			$dirfiles{simcases} = $simcases_ref;
 			$dirfiles{simstruct} = $simstruct_ref;
 			$dirfiles{repcases} = $repcases_ref;
@@ -2223,7 +2249,8 @@ sub exe
 	if ( $dowhat{descend} eq "y" )
 	{
 		say $tee "#Calling descent for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ".";
-		Sim::OPT::Descend::descend(	{ instances => \@instances, dirfiles => \%dirfiles, vehicles => \%vehicles, inst => \%inst } );
+		Sim::OPT::Descend::descend(	{ instances => \@instances, dirfiles => \%dirfiles, vehicles => \%vehicles, inst => \%inst,
+	     precedents => \@precedents } );
 		say $tee "#Performed descent for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ".";
 	}
 
@@ -2545,7 +2572,7 @@ sub opt
 		}
 		$datastruc{pinwinneritem} = [ @arr ];
 
-		my ( @gencetres, @genextremes, @genpoints, $genextremes_ref, $gencentres_ref );
+		my ( @gencentres, @genextremes, @genpoints, $genextremes_ref, $gencentres_ref );
 
 		if ( $dowhat{outstarmode} eq "yes" )
 		{

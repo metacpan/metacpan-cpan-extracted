@@ -51,7 +51,7 @@ the directory with the language sources.
 # load packages: #
 ##################
 
-use v5.12;
+use v5.22;
 use strictures;
 no indirect 'fatal';
 no multidimensional;

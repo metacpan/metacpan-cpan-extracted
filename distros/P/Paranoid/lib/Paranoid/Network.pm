@@ -1,6 +1,6 @@
 # Paranoid::Network -- Network functions for paranoid programs
 #
-# $Id: lib/Paranoid/Network.pm, 2.08 2020/12/31 12:10:06 acorliss Exp $
+# $Id: lib/Paranoid/Network.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
 #
 # This software is free software.  Similar to Perl, you can redistribute it
 # and/or modify it under the terms of either:
@@ -43,7 +43,7 @@ use Paranoid::Network::Socket;
 use Paranoid::Network::IPv4 qw(:all);
 use Paranoid::Network::IPv6 qw(:all);
 
-($VERSION) = ( q$Revision: 2.08 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.09 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 @EXPORT      = qw(ipInNetworks hostInDomains extractIPs netIntersect);
 @EXPORT_OK   = ( @EXPORT, qw(NETMATCH HOSTNAME_REGEX) );
@@ -281,7 +281,7 @@ Paranoid::Network - Network functions for paranoid programs
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Network.pm, 2.08 2020/12/31 12:10:06 acorliss Exp $
+$Id: lib/Paranoid/Network.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
 
 =head1 SYNOPSIS
 

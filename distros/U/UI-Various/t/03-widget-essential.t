@@ -13,7 +13,7 @@
 
 #########################################################################
 
-use v5.14.0;
+use v5.14;
 use strictures;
 no indirect 'fatal';
 no multidimensional;
@@ -96,7 +96,14 @@ warning_like
     'parent cycles are detected correctly in top';
 is($_, undef, 'parent cycles return undefined top');
 
-$b1->parent(undef);
+if ($^V lt 'v5.20')		# workaround for Perl bugs #7508 / #109726
+{
+    warn("WARNING: Perl version ", $^V,
+	 " (prior to 5.20) can't handle 'undef' parameters correctly\n");
+    $b1->{parent} = undef;
+}
+else
+{   $b1->parent(undef);   }
 is($b1->parent(), undef, 'Box 1 again has no parent');
 $_ = $l2->top();
 is($_, $b1, 'test Leaf 2 again has correct top Box 1');

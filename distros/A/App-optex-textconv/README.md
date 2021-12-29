@@ -5,7 +5,7 @@ textconv - optex module to replace document file by its text contents
 
 # VERSION
 
-Version 0.13
+Version 0.1401
 
 # SYNOPSIS
 
@@ -65,7 +65,7 @@ Next command simply produces the same result.
 
 - tika
 
-    Use [Pache Tika](https://tika.apache.org/) command to translate
+    Use [Apache Tika](https://tika.apache.org/) command to translate
     Microsoft office document in XML and non-XML format.
     See [App::optex::textconv::tika](https://metacpan.org/pod/App::optex::textconv::tika).
 

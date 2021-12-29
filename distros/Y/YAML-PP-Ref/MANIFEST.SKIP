@@ -1,0 +1,8 @@
+^dev
+^test-suite/.git
+^cover_db
+^local
+^nytprof
+^nytprof.out
+^pod2htmd.tmp
+^gh-pages

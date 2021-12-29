@@ -37,6 +37,7 @@ use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
 
+use AsposeCellsCloud::Object::Range;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -139,16 +140,34 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'formula' => {
+    	datatype => 'string',
+    	base_name => 'Formula',
+    	description => 'Gets and sets the formula of the list column.',
+    	format => '',
+    	read_only => '',
+    		},
+    'range' => {
+    	datatype => 'Range',
+    	base_name => 'Range',
+    	description => 'Gets and sets the formula of the list column.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
     'totals_calculation' => 'string',
-    'name' => 'string'
+    'name' => 'string',
+    'formula' => 'string',
+    'range' => 'Range'
 } );
 
 __PACKAGE__->attribute_map( {
     'totals_calculation' => 'TotalsCalculation',
-    'name' => 'Name'
+    'name' => 'Name',
+    'formula' => 'Formula',
+    'range' => 'Range'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

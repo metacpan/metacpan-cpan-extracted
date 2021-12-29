@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 use parent qw(CPANPLUS::Dist::Debora::Package);
 
@@ -364,7 +364,9 @@ else {
     $OUT .= "AutoReq:   1\n";
 }
 
+$OUT .= "%if 0%{?fedora} > 0 || 0%{?rhel} > 0 || 0%{?suse_version} > 0\n";
 $OUT .= 'Requires:  perl(:MODULE_COMPAT_' . $escape->($perl_version) . ")\n";
+$OUT .= "%endif\n";
 for my $dependency (@{$package->dependencies}) {
     if ($dependency->{is_module}) {
         $OUT .= 'Requires:  perl(' . $escape->($dependency->{module_name}) . ')';
@@ -533,7 +535,7 @@ CPANPLUS::Dist::Debora::Package::RPM - Create binary RPM packages
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

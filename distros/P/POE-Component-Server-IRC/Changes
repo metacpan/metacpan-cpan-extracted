@@ -1,5 +1,81 @@
 Revision history for POE-Component-Server-IRC
 
+1.62  Tue Dec 28 18:56:15 GMT 2021
+    - Add TLSv1_3 definition
+
+1.61  Wed Mar 24 21:38:15 GMT 2021
+    - Defanged debug for bmask test
+
+1.60  Tue Aug 25 21:30:09 BST 2020
+    - Fixed crypt() issues with OpenBSD
+
+1.59  Thu Aug 20 16:58:31 BST 2020
+    - Fix a bug in peer TMODE handling
+
+1.58  Tue Nov 26 20:51:37 GMT 2019
+    - Pod fixes
+    - capability tests tweaked to avoid race
+      conditions
+    - Added SSL test where client doesn't provide
+      a certificate
+    - BMASK slight refactor so it doesn't announce
+      masks that are already applied
+
+1.57  Thu Aug 29 11:45:24 BST 2019
+    - Account for race conditions in two tests
+
+1.56  Thu Aug 29 10:47:56 BST 2019
+    - Fix sprintf warnings
+    - Fix test failures due to OS differences
+    - Resolve issues with perl v5.10.1 (possibly others)
+
+
+1.55  Thu Aug 22 10:54:19 BST 2019
+    - Added Net::CIDR support for netmasks
+    - Full IPv6 support for all connections/listeners
+    - Only supports TS6 protocol for server connections
+      - major internal refactoring to accomodate this
+    - Added TBURST for bursting channel topics
+    - Added AWAY burst for users' away messages
+    - Removed GLINE and added DLINE/UNDLINE, XLINE/UNXLINE
+    - RKLINE is now local only and not propagated
+    - Added UNRKLINE for removing RKLINEs
+    - Added IRCv3.x capability negotiations CAP cmd
+      - added 'away-notify', 'invite-notify' 'multi-prefix'
+      - added 'userhost-in-names', 'chghost', 'account-notify'
+      - added 'extended-join'
+    - Added bcrypt passwd support for OPER passwords
+    - Added bcrypt passwd support for auth passwords
+    - Fixed problem with pmkpasswd utility
+    - Updated the included x509 cert and key
+    - OPERWALL has been removed, replaced with GLOBOPS
+    - Refined LOCOPS for consistency with GLOBOPS
+    - Implemented WHOWAS command
+    - Added RESV/UNRESV for reserving nicknames/channels
+    - Added ENCAP peer command
+    - Implemented SVSJOIN, SVSHOST, SVSNICK, SVSTAG, SVSPART,
+      SVSMODE and SVSKILL services commands
+    - Added methods for defining services hosts
+    - Implemented KNOCK command with throttling
+    - Added account and nick registration support
+    - LIST command now supports SAFELIST and ELIST filters
+    - Implemented TRACE and ETRACE commands
+    - Implemented pseudo commands/service aliases
+    - NOTICEs sent for server operations with delivery to
+      OPERs based on umodes. New snotice event.
+    - Major overhaul of TLS/SSL. Server and oper certificate
+      fingerprint authentication added.
+    - Added channel modes +C, +O, +M, +N, +R, +S, +T +u and +L
+    - Implemented WATCH command
+    - Implemented CLOSE command
+    - Added daemon_server_join() for forcing channel joins
+    - Added daemon_server_realops() for sending server notices
+    - Added antispam features for exit messages and nick changes
+    - Added SET command for adjusting tunable settings
+    - Added HELP command
+    - Added +X umode See *LINE expiration notices (oper only)
+    - Start of hidden servers support (not feature complete)
+
 1.54  Fri Nov 25 15:36:51 UTC 2011
     - Resolve problem with remote (versus localhost) clients
     - Fix shutdown on Win32

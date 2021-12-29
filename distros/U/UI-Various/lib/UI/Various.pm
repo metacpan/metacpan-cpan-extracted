@@ -89,11 +89,18 @@ returns.  However, it is possible to have a list of multiple windows and
 switch between them: One is active and the others are inactive, waiting to
 be activated again.  See examples/TODO
 
+=head1 KNOWN BUGS
+
+Setting an attribute of any object to C<undef> will not work with Perl
+versions prior to 5.20 (see L<perl5200delta>, bugs #7508 and #109726).  The
+only possible (and dirty!) workaround is setting the member of the internal
+hash directly.
+
 =cut
 
 #########################################################################
 
-use v5.14.0;
+use v5.14;
 use strictures;
 no indirect 'fatal';
 no multidimensional;
@@ -101,7 +108,7 @@ use warnings 'once';
 
 use Carp;			# may only be used in import!
 
-our $VERSION = "0.07";
+our $VERSION = "0.09";
 
 BEGIN  {  require UI::Various::core;  }
 

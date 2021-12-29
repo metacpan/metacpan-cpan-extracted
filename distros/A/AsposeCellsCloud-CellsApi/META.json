@@ -62,7 +62,7 @@
       },
       "AsposeCellsCloud::CellsApi" : {
          "file" : "lib/AsposeCellsCloud/CellsApi.pm",
-         "version" : "21.11"
+         "version" : "21.12"
       },
       "AsposeCellsCloud::LiteCellsApi" : {
          "file" : "lib/AsposeCellsCloud/LiteCellsApi.pm"
@@ -699,6 +699,9 @@
       },
       "AsposeCellsCloud::Object::SvgSaveOptions" : {
          "file" : "lib/AsposeCellsCloud/Object/SvgSaveOptions.pm"
+      },      
+      "AsposeCellsCloud::Object::TableTotalRequest" : {
+         "file" : "lib/AsposeCellsCloud/Object/TableTotalRequest.pm"
       },
       "AsposeCellsCloud::Object::TaskData" : {
          "file" : "lib/AsposeCellsCloud/Object/TaskData.pm"
@@ -834,6 +837,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "21.11",
+   "version" : "21.12",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

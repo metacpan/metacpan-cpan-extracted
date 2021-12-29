@@ -46,6 +46,7 @@ use utf8;
 use strict;
 use warnings;
 
+use File::Temp qw/ tempfile tempdir /;
 use Test::LeakTrace qw/ no_leaks_ok /;
 use Test::Deep qw/ cmp_deeply num /;
 use Test::More ('import' => [qw/ done_testing like is use_ok /]);
@@ -53,6 +54,8 @@ use Test::More ('import' => [qw/ done_testing like is use_ok /]);
 BEGIN { use_ok('Graphite::Simple') };
 
 Graphite::Simple->import(qw/ :all /);
+
+my ($fh, $tmp_file_sock) = tempfile('DIR' => tempdir('CLEANUP' => 1), 'UNLINK' => 1);
 
 my %expected_bulk_metrics = (
     'wrong.avg.my.new.key' => 2,
@@ -329,7 +332,42 @@ no_leaks_ok {
     $g->append_bulk({"my.key1" => 1, "my.key2" => 11, "" => 5, "avg.key" => 3, "key.block.me.please" => 1});
     my $s = $g->connect();
     $r = $g->send_bulk();
+
+    $g->is_connected();
+    $g->reconnect();
     $g->disconnect();
+    $g->clear_bulk();
+};
+
+no_leaks_ok {
+    my $g = Graphite::Simple->new({
+        'path' => $tmp_file_sock,
+        'use_stream_sock' => 0,
+        'project' => 'test',
+        'enabled' => 1,
+    });
+
+    eval { my $s = $g->connect(); }; # connection refused
+
+    $g->incr_bulk("avg.my.new.key", 2);
+    $g->disconnect();
+    $g->is_connected();
+    $g->clear_bulk();
+};
+
+no_leaks_ok {
+    my $g = Graphite::Simple->new({
+        'path' => $tmp_file_sock,
+        'use_stream_sock' => 1,
+        'project' => 'test',
+        'enabled' => 1,
+    });
+
+    eval { my $s = $g->connect(); }; # connection refused
+
+    $g->incr_bulk("avg.my.new.key", 2);
+    $g->disconnect();
+    $g->is_connected();
     $g->clear_bulk();
 };
 

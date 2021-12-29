@@ -1,34 +1,16 @@
 package Crypt::Passphrase::Encoder;
-$Crypt::Passphrase::Encoder::VERSION = '0.003';
+$Crypt::Passphrase::Encoder::VERSION = '0.004';
 use strict;
 use warnings;
 
 use parent 'Crypt::Passphrase::Validator';
 
 use Carp 'croak';
-
-my $csprng = ($^O eq 'MSWin32') ?
-	do {
-	require Win32::API;
-	my $genrand = Win32::API->new('advapi32', 'INT SystemFunction036(PVOID RandomBuffer, ULONG RandomBufferLength)') or croak "Could not import SystemFunction036: $^E";
-	sub {
-		my $count = shift;
-		$genrand->Call(my $buffer, $count) or croak "Could not read from csprng: $^E";
-		return $buffer;
-	}
-} :
-do {
-	open my $urandom, '<:raw', '/dev/urandom' or croak 'Couldn\'t open /dev/urandom';
-	sub {
-		my $count = shift;
-		read $urandom, my $buffer, $count or croak "Couldn't read from csprng: $!";
-		return $buffer;
-	}
-};
+use Crypt::URandom;
 
 sub random_bytes {
 	my ($self, $count) = @_;
-	return $csprng->($count);
+	return Crypt::URandom::urandom($count);
 }
 
 sub crypt_subtypes {
@@ -57,7 +39,7 @@ Crypt::Passphrase::Encoder - Base class for Crypt::Passphrase encoders
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 

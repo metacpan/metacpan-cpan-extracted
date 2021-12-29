@@ -3,6 +3,7 @@ Changes
 LICENSE
 META.json
 README.md
+builder/README.md
 builder/confess-uncoverable.lst
 builder/dod-check.pl
 builder/dod-check.sh

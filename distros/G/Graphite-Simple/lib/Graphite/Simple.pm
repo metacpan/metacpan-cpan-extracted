@@ -9,7 +9,7 @@ our %EXPORT_TAGS = ( 'all' => [ ] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
-our $VERSION = '0.08';
+our $VERSION = '0.11';
 
 our %avg_counters;
 our %bulk;
@@ -34,7 +34,11 @@ Graphite::Simple - Perl XS package provides methods to collect metrics and send 
 
   $graphite->connect();
 
+  $graphite->reconnect();
+
   $graphite->disconnect();
+
+  $graphite->is_connected();
 
   my $bulk = $graphite->get_bulk_metrics();
 
@@ -93,10 +97,24 @@ If value is 0, then it will be still possible to collect mertrics in internal or
 But you won't allowed to send them to Graphite server via native C<send_bulk> method.
 In this case you can use C<send_bulk_delegate> method to do this work by other code.
 
+=item path
+
+Sets the path to the Unix socket file.
+Either C<path> or C<host>/C<port> can be used.
+
+=item use_stream_sock
+
+By default value is false.
+
+If true, then enables SOCK_STREAM for Unix Socks.
+Otherwise SOCK_DGRAM (UDP) will be used.
+
 =item host
 
 Sets the hostname or IPv4 address of Graphite server.
 This option is mandatory if C<enabled> is true.
+
+In this case SOCK_DGRAM (UDP) will be used.
 
 =item port
 
@@ -150,10 +168,21 @@ Otherwise internal hashes will be used.
 =head2 $self->connect()
 
 Establishes the connection to Graphite server if C<enabled> was set as true.
+Returns 1 in case of success, otherwise returns 0.
+
+=head2 $self->reconnect()
+
+Reestablishes the connection to Graphite server.
+Returns 1 in case of success, otherwise returns 0.
 
 =head2 $self->disconnect()
 
 Closes the connection.
+
+=head2 $self->is_connected()
+
+Returns 1 or 0.
+It returns 0 only in cases if C<connected> isn't invoked or Unix Sock connection is broken.
 
 =head2 $self->send_bulk_delegate()
 

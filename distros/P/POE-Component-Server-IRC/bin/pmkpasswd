@@ -8,9 +8,11 @@ use POE::Component::Server::IRC::Common qw(mkpasswd);
 my $version;
 my $md5;
 my $apache;
+my $bcrypt;
 my $password;
 
-GetOptions( 'version', \$version, 'md5', \$md5, 'apache', \$apache, 'password', \$password );
+GetOptions( 'version', \$version, 'md5', \$md5, 'apache', \$apache,
+            'bcrypt', \$bcrypt, 'password=s', \$password );
 
 if ( $version ) {
   no strict 'vars';
@@ -22,16 +24,17 @@ if ( $version ) {
 die "No --password option specified\n" unless $password;
 
 $md5 = 0 if $md5 and $apache;
+$apache = $md5 = 0 if $bcrypt;
 
-my $crypt = mkpasswd( $password, md5 => $md5, apache => $apache );
-print $crypt, "\n" if $crypt;
+my $crypt = mkpasswd( $password, md5 => $md5, apache => $apache, bcrypt => $bcrypt );
+print "$crypt\n" if $crypt;
 exit 0;
 
 __END__
 
 =head1 NAME
 
-pmkpasswd - Generate crypted passwords 
+pmkpasswd - Generate crypted passwords
 
 =head1 SYNOPSIS
 
@@ -39,7 +42,7 @@ pmkpasswd - Generate crypted passwords
 
 =head1 DESCRIPTION
 
-pmkpasswd is a little utility to generate crypted passwords for use with 
+pmkpasswd is a little utility to generate crypted passwords for use with
 L<POE::Component::Server::IRC> C<oper> blocks. It is basically a wrapper
 for the C<mkpasswd> function provided by L<POE::Component::Server::IRC::Common>.
 
@@ -55,7 +58,7 @@ The password is outputted on STDOUT.
 
 Prints the version number on STDOUT and exits.
 
-=item --password 
+=item --password
 
 Mandatory switch, the plain-text password you wish to be crypted.
 
@@ -63,9 +66,13 @@ Mandatory switch, the plain-text password you wish to be crypted.
 
 Instead of using C<crypt>, produce a MD5 crypted password.
 
-=item --apache 
+=item --apache
 
 Instead of using C<crypt>, produce an Apache MD5 crypted password.
+
+=item --bcrypt
+
+Instead of using C<crypt>, produce a Bcrypt crypted password.
 
 =back
 
@@ -80,3 +87,7 @@ L<POE::Component::Server::IRC>
 L<POE::Component::Server::IRC::Common>
 
 L<Crypt::PasswdMD5>
+
+L<Crypt::Eksblowfish::Bcrypt>
+
+=cut

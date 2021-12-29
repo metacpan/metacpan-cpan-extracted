@@ -28,7 +28,7 @@ by the other modules of L<UI::Various>.
 
 #########################################################################
 
-use v5.14.0;
+use v5.14;
 use strictures;
 no indirect 'fatal';
 no multidimensional;
@@ -37,7 +37,7 @@ use warnings 'once';
 use Carp;
 use Storable ();
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 use UI::Various::language::en;
 

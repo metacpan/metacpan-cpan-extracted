@@ -1,4 +1,6 @@
 #!install_default
+^Makefile$
+^Makefile.old$
 ^MYMETA\.yml$
 ^MYMETA\.json$
 ^\.git
@@ -8,4 +10,7 @@
 ^blib
 \.bak$
 \.old$
-
+\.bs$
+\.o$
+Simple.c$
+^pm_to_blib$

@@ -10,6 +10,7 @@ my $pocosi = POE::Component::Server::IRC->spawn(
     auth         => 0,
     antiflood    => 0,
     plugin_debug => 1,
+    config       => { sid => '4GO', },
 );
 
 $pocosi->plugin_add(

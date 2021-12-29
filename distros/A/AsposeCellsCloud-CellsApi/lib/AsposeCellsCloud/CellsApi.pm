@@ -8797,6 +8797,298 @@ sub cells_list_objects_get_worksheet_list_objects {
 }
 
 #
+# cells_list_objects_post_worksheet_list_column
+#
+# 
+# 
+# @param string $name  (required)
+# @param string $sheet_name  (required)
+# @param int $list_object_index  (required)
+# @param int $column_index  (required)
+# @param ListColumn $list_column  (optional)
+# @param string $folder  (optional)
+# @param string $storage_name storage name. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'sheet_name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'list_object_index' => {
+        data_type => 'int',
+        description => '',
+        required => '1',
+    },
+    'column_index' => {
+        data_type => 'int',
+        description => '',
+        required => '1',
+    },
+    'list_column' => {
+        data_type => 'ListColumn',
+        description => '',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    'storage_name' => {
+        data_type => 'string',
+        description => 'storage name.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'cells_list_objects_post_worksheet_list_column' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+        };
+}
+# @return CellsCloudResponse
+#
+sub cells_list_objects_post_worksheet_list_column {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling cells_list_objects_post_worksheet_list_column");
+    }
+
+    # verify the required parameter 'sheet_name' is set
+    unless (exists $args{'sheet_name'}) {
+      croak("Missing the required parameter 'sheet_name' when calling cells_list_objects_post_worksheet_list_column");
+    }
+
+    # verify the required parameter 'list_object_index' is set
+    unless (exists $args{'list_object_index'}) {
+      croak("Missing the required parameter 'list_object_index' when calling cells_list_objects_post_worksheet_list_column");
+    }
+
+    # verify the required parameter 'column_index' is set
+    unless (exists $args{'column_index'}) {
+      croak("Missing the required parameter 'column_index' when calling cells_list_objects_post_worksheet_list_column");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/listobjects/{listObjectIndex}/listcolumns/{columnIndex}';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'sheet_name'}) {
+        my $_base_variable = "{" . "sheetName" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'sheet_name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'list_object_index'}) {
+        my $_base_variable = "{" . "listObjectIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'list_object_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'column_index'}) {
+        my $_base_variable = "{" . "columnIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'column_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # body params
+    if ( exists $args{'list_column'}) {
+        $_body_data = $args{'list_column'};
+    }
+
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# cells_list_objects_post_worksheet_list_columns_total
+#
+# 
+# 
+# @param string $name  (required)
+# @param string $sheet_name  (required)
+# @param int $list_object_index  (required)
+# @param ARRAY[TableTotalRequest] $table_total_requests  (optional)
+# @param string $folder  (optional)
+# @param string $storage_name storage name. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'sheet_name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'list_object_index' => {
+        data_type => 'int',
+        description => '',
+        required => '1',
+    },
+    'table_total_requests' => {
+        data_type => 'ARRAY[TableTotalRequest]',
+        description => '',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    'storage_name' => {
+        data_type => 'string',
+        description => 'storage name.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'cells_list_objects_post_worksheet_list_columns_total' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'CellsCloudResponse',
+        };
+}
+# @return CellsCloudResponse
+#
+sub cells_list_objects_post_worksheet_list_columns_total {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling cells_list_objects_post_worksheet_list_columns_total");
+    }
+
+    # verify the required parameter 'sheet_name' is set
+    unless (exists $args{'sheet_name'}) {
+      croak("Missing the required parameter 'sheet_name' when calling cells_list_objects_post_worksheet_list_columns_total");
+    }
+
+    # verify the required parameter 'list_object_index' is set
+    unless (exists $args{'list_object_index'}) {
+      croak("Missing the required parameter 'list_object_index' when calling cells_list_objects_post_worksheet_list_columns_total");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/listobjects/{listObjectIndex}/listcolumns/total';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'sheet_name'}) {
+        my $_base_variable = "{" . "sheetName" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'sheet_name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'list_object_index'}) {
+        my $_base_variable = "{" . "listObjectIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'list_object_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # body params
+    if ( exists $args{'table_total_requests'}) {
+        $_body_data = $args{'table_total_requests'};
+    }
+
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
 # cells_list_objects_post_worksheet_list_object
 #
 # Update  list object 
@@ -23499,6 +23791,130 @@ sub cells_shapes_get_worksheet_shapes {
 }
 
 #
+# cells_shapes_post_worksheet_group_shape
+#
+# Update a shape in worksheet
+# 
+# @param string $name document name. (required)
+# @param string $sheet_name worksheet name. (required)
+# @param ARRAY[int] $list_shape group shape indexs in worksheet shapes. (required)
+# @param string $folder Document&#39;s folder. (optional)
+# @param string $storage_name storage name. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'document name.',
+        required => '1',
+    },
+    'sheet_name' => {
+        data_type => 'string',
+        description => 'worksheet name.',
+        required => '1',
+    },
+    'list_shape' => {
+        data_type => 'ARRAY[int]',
+        description => 'group shape indexs in worksheet shapes.',
+        required => '1',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document&#39;s folder.',
+        required => '0',
+    },
+    'storage_name' => {
+        data_type => 'string',
+        description => 'storage name.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'cells_shapes_post_worksheet_group_shape' } = { 
+    	summary => 'Update a shape in worksheet',
+        params => $params,
+        returns => 'CellsCloudResponse',
+        };
+}
+# @return CellsCloudResponse
+#
+sub cells_shapes_post_worksheet_group_shape {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling cells_shapes_post_worksheet_group_shape");
+    }
+
+    # verify the required parameter 'sheet_name' is set
+    unless (exists $args{'sheet_name'}) {
+      croak("Missing the required parameter 'sheet_name' when calling cells_shapes_post_worksheet_group_shape");
+    }
+
+    # verify the required parameter 'list_shape' is set
+    unless (exists $args{'list_shape'}) {
+      croak("Missing the required parameter 'list_shape' when calling cells_shapes_post_worksheet_group_shape");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/shapes/group';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'sheet_name'}) {
+        my $_base_variable = "{" . "sheetName" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'sheet_name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # body params
+    if ( exists $args{'list_shape'}) {
+        $_body_data = $args{'list_shape'};
+    }
+
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
 # cells_shapes_post_worksheet_shape
 #
 # Update a shape in worksheet
@@ -23621,6 +24037,132 @@ sub cells_shapes_post_worksheet_shape {
         $_body_data = $args{'dto'};
     }
 
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# cells_shapes_post_worksheet_ungroup_shape
+#
+# Update a shape in worksheet
+# 
+# @param string $name document name. (required)
+# @param string $sheet_name worksheet name. (required)
+# @param int $shapeindex shape index in worksheet shapes. (required)
+# @param string $folder Document&#39;s folder. (optional)
+# @param string $storage_name storage name. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'document name.',
+        required => '1',
+    },
+    'sheet_name' => {
+        data_type => 'string',
+        description => 'worksheet name.',
+        required => '1',
+    },
+    'shapeindex' => {
+        data_type => 'int',
+        description => 'shape index in worksheet shapes.',
+        required => '1',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document&#39;s folder.',
+        required => '0',
+    },
+    'storage_name' => {
+        data_type => 'string',
+        description => 'storage name.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'cells_shapes_post_worksheet_ungroup_shape' } = { 
+    	summary => 'Update a shape in worksheet',
+        params => $params,
+        returns => 'CellsCloudResponse',
+        };
+}
+# @return CellsCloudResponse
+#
+sub cells_shapes_post_worksheet_ungroup_shape {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling cells_shapes_post_worksheet_ungroup_shape");
+    }
+
+    # verify the required parameter 'sheet_name' is set
+    unless (exists $args{'sheet_name'}) {
+      croak("Missing the required parameter 'sheet_name' when calling cells_shapes_post_worksheet_ungroup_shape");
+    }
+
+    # verify the required parameter 'shapeindex' is set
+    unless (exists $args{'shapeindex'}) {
+      croak("Missing the required parameter 'shapeindex' when calling cells_shapes_post_worksheet_ungroup_shape");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/shapes/{shapeindex}/ungroup';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'sheet_name'}) {
+        my $_base_variable = "{" . "sheetName" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'sheet_name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shapeindex'}) {
+        my $_base_variable = "{" . "shapeindex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shapeindex'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
     # authentication setting, if any
     my $auth_settings = [qw()];
 
@@ -27459,6 +28001,7 @@ sub cells_workbook_post_workbooks_text_search {
 # @param string $format The format to convert. (optional)
 # @param string $password The workbook password. (optional)
 # @param string $out_path Path to save result (optional)
+# @param string $storage_name storage name. (optional)
 {
     my $params = {
     'workbook' => {
@@ -27479,6 +28022,11 @@ sub cells_workbook_post_workbooks_text_search {
     'out_path' => {
         data_type => 'string',
         description => 'Path to save result',
+        required => '0',
+    },
+    'storage_name' => {
+        data_type => 'string',
+        description => 'storage name.',
         required => '0',
     },
     };
@@ -27526,6 +28074,11 @@ sub cells_workbook_put_convert_workbook {
     # query params
     if ( exists $args{'out_path'}) {
         $query_params->{'outPath'} = $self->{api_client}->to_query_value($args{'out_path'});
+    }
+
+    # query params
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
     $self->{api_client}->check_access_token();

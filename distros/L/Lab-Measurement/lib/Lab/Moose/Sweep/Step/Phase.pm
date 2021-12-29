@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Step::Phase;
-$Lab::Moose::Sweep::Step::Phase::VERSION = '3.801';
+$Lab::Moose::Sweep::Step::Phase::VERSION = '3.802';
 #ABSTRACT: Phase sweep.
 
 use v5.20;
@@ -44,7 +44,7 @@ Lab::Moose::Sweep::Step::Phase - Phase sweep.
 
 =head1 VERSION
 
-version 3.801
+version 3.802
 
 =head1 Description
 

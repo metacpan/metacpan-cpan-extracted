@@ -36,11 +36,14 @@
             "Data::Dumper" : "0",
             "Modern::Perl" : "0",
             "Moo" : "0",
-            "Role::Tiny" : "0"
+            "Plack::Middleware" : "0",
+            "Plack::Util" : "0",
+            "Role::Tiny" : "0",
+            "perl" : "5.034000"
          }
       }
    },
    "release_status" : "stable",
-   "version" : 0.003,
+   "version" : 0.007,
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

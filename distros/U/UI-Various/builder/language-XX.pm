@@ -26,7 +26,7 @@ See L<UI::Various::language::en> for more details.
 
 #########################################################################
 
-use v5.8;
+use v5.14;
 use strictures;
 no indirect 'fatal';
 no multidimensional;

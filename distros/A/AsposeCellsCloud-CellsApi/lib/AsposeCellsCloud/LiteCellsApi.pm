@@ -1449,4 +1449,99 @@ sub post_replace {
     my $_response_object = $self->{api_client}->deserialize('FilesResult', $response);
     return $_response_object;
 }
+
+#
+# post_reverse
+#
+# 
+# 
+# @param File $file File to upload (required)
+# @param string $rotateType  (required)
+# @param string $format  (required)
+{
+    my $params = {
+    'file' => {
+        data_type => 'hash',
+        description => 'File to upload',
+        required => '1',
+    },
+    'rotate_type' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_reverse' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'FilesResult',
+        };
+}
+# @return FilesResult
+#
+sub post_reverse {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'file' is set
+    unless (exists $args{'file'}) {
+      croak("Missing the required parameter 'file' when calling post_replace");
+    }
+
+    # verify the required parameter 'rotateType' is set
+    unless (exists $args{'rotate_type'}) {
+      croak("Missing the required parameter 'rotateType' when calling post_replace");
+    }
+    unless (exists $args{'format'}) {
+      croak("Missing the required parameter 'format' when calling post_replace");
+    }
+    # parse inputs
+    my $_resource_path = '/cells/reverse';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if ( exists $args{'rotate_type'}) {
+        $query_params->{'rotateType'} = $self->{api_client}->to_query_value($args{'rotate_type'});
+    }
+    if ( exists $args{'format'}) {
+        $query_params->{'format'} = $self->{api_client}->to_query_value($args{'format'});
+    }
+    if ( exists $args{'file'} ) {   
+        my $map_file =$args{'file'};
+        while ( my ($filename,$value) = each( %$map_file ) ) {
+             $form_params->{$filename} = [$value ,$filename,'application/octet-stream'];
+        }
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+    
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('FilesResult', $response);
+    return $_response_object;
+}
+
 1;

@@ -19,12 +19,12 @@ name: Perinci-CmdLine
 provides:
   Perinci::CmdLine:
     file: lib/Perinci/CmdLine.pm
-    version: v1.909.1
+    version: v1.913.0
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine
   homepage: https://metacpan.org/release/Perinci-CmdLine
   repository: git://github.com/perlancar/perl-Perinci-CmdLine.git
-version: 1.909.1
+version: 1.913.0
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -108,7 +108,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.605'
+      version: '0.606'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'

@@ -14,7 +14,7 @@ Lab::Measurement::Tutorial - Lab::Measurement tutorial
 
 =head1 VERSION
 
-version 3.801
+version 3.802
 
 =head1 How to read the documentation
 
@@ -720,6 +720,7 @@ L<PDL::Graphics::Gnuplot> separates between plot options and curve options.
          ylabel  => 'y (V)',
          cblabel => 'current (A)', # label for color box
          format  => {x => "'%.2e'", y => "'%.2e'"},
+         clut    => 'sepia',
          grid    => 0, # disable grid
      },
      curve_options => {
@@ -1068,7 +1069,7 @@ This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
             2017       Andreas K. Huettel
             2018       Andreas K. Huettel, Simon Reinhardt
             2019-2020  Simon Reinhardt
-            2021       Fabian Weinelt
+            2021       Fabian Weinelt, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPIBlock;
-$Lab::Moose::Instrument::SCPIBlock::VERSION = '3.801';
+$Lab::Moose::Instrument::SCPIBlock::VERSION = '3.802';
 #ABSTRACT: Role for handling SCPI/IEEE 488.2 block data
 
 use v5.20;
@@ -111,7 +111,7 @@ Lab::Moose::Instrument::SCPIBlock - Role for handling SCPI/IEEE 488.2 block data
 
 =head1 VERSION
 
-version 3.801
+version 3.802
 
 =head1 DESCRIPTION
 

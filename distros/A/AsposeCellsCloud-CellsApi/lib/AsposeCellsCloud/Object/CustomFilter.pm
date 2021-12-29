@@ -133,7 +133,7 @@ __PACKAGE__->method_documentation({
     	read_only => '',
     		},
     'criteria' => {
-    	datatype => 'object',
+    	datatype => 'string',
     	base_name => 'Criteria',
     	description => '',
     	format => '',
@@ -143,7 +143,7 @@ __PACKAGE__->method_documentation({
 
 __PACKAGE__->swagger_types( {
     'filter_operator_type' => 'string',
-    'criteria' => 'object'
+    'criteria' => 'string'
 } );
 
 __PACKAGE__->attribute_map( {

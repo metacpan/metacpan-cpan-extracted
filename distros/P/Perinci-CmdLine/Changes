@@ -1,3 +1,8 @@
+1.913.0  2021-12-03  Released-By: PERLANCAR
+
+         - Add POD: Perinci::CmdLine::Manual::Explanation::ArgumentValidation.
+
+
 1.909.1  2021-10-03  Released-By: PERLANCAR; Urgency: low
 
 	 - [pod Perinci::CmdLine::Manual::HowTo::Debugging] Mention logging

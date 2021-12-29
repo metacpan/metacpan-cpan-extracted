@@ -9,6 +9,7 @@ my $ircd = POE::Component::Server::IRC->spawn(
     Auth         => 0,
     AntiFlood    => 0,
     plugin_debug => 1,
+    config       => { sid => '9AR', },
 );
 
 my $irc = POE::Component::IRC->spawn(Flood => 1);

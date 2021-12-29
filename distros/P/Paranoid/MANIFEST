@@ -14,6 +14,11 @@ lib/Paranoid/Debug.pm
 lib/Paranoid/Filesystem.pm
 lib/Paranoid/Glob.pm
 lib/Paranoid/IO.pm
+lib/Paranoid/IO/FileMultiplexer.pm
+lib/Paranoid/IO/FileMultiplexer/Block.pm
+lib/Paranoid/IO/FileMultiplexer/Block/BATHeader.pm
+lib/Paranoid/IO/FileMultiplexer/Block/FileHeader.pm
+lib/Paranoid/IO/FileMultiplexer/Block/StreamHeader.pm
 lib/Paranoid/IO/Line.pm
 lib/Paranoid/IO/Lockfile.pm
 lib/Paranoid/Input.pm
@@ -28,13 +33,16 @@ lib/Paranoid/Network/Socket.pm
 lib/Paranoid/Process.pm
 t/01_init_core.t
 t/02_pdebug.t
+t/03_io-lockstack.t
 t/03_io.t
 t/04_input.t
 t/05_data.t
 t/06_module.t
 t/07_glob.t
+t/10_io_line-lockstack.t
 t/10_io_line.t
 t/11_args.t
+t/12_lockfile-lockstack.t
 t/12_lockfile.t
 t/20_filesystem_pmkdir.t
 t/21_filesystem_preadDir.t
@@ -45,6 +53,7 @@ t/25_filesystem_pchmod.t
 t/26_filesystem_pchown.t
 t/30_log.t
 t/31_log_buffer.t
+t/32_log_file-lockstat.t
 t/32_log_file.t
 t/33_log_pdebug.t
 t/40_socket.t
@@ -53,6 +62,7 @@ t/42_ipv6.t
 t/43_network.t
 t/50_process.t
 t/60_avltree.t
+t/70_piofm.t
 t/98_pod_coverage.t
 t/99_pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

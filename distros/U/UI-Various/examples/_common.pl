@@ -7,7 +7,7 @@
 # allowing the example scripts to focus only on the code needed.  In
 # addition it defines the default code restrictions (C<strictures> etc.).
 
-use v5.14.0;
+use v5.14;
 use strictures;
 no indirect 'fatal';
 no multidimensional;

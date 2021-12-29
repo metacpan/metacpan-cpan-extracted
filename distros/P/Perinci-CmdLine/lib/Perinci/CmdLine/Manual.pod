@@ -1,6 +1,10 @@
+# no code
+## no critic: TestingAndDebugging::RequireUseStrict
 package Perinci::CmdLine::Manual; # just to make podweaver happy
 
+# AUTHORITY
 # DATE
+our $DIST = 'Perinci-CmdLine'; # DIST
 # VERSION
 
 1;
@@ -18,7 +22,7 @@ Perinci::CmdLine::Manual - Perinci::CmdLine manual
 
 =head1 VERSION
 
-This document describes version 1.909.1 of Perinci::CmdLine::Manual (from Perl distribution Perinci-CmdLine), released on 2021-10-03.
+This document describes version 1.913.0 of Perinci::CmdLine::Manual (from Perl distribution Perinci-CmdLine), released on 2021-12-03.
 
 =head1 DESCRIPTION
 
@@ -28,7 +32,7 @@ command-line options and arguments to the function. It accesses functions via
 L<Riap> protocol (using the L<Perinci::Access> Riap client library) so you can
 use remote functions transparently. Features:
 
-=over 4
+=over
 
 =item * Command-line options parsing
 

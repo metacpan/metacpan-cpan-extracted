@@ -1,15 +1,16 @@
 #!/usr/bin/perl -T
 
-use Test::More tests => 53;
+use Test::More tests => 52;
 use Paranoid;
 use Paranoid::Debug;
-use Paranoid::IO;
+use Paranoid::IO qw(:all);
 use Fcntl qw(:DEFAULT :seek :flock :mode);
 
 use strict;
 use warnings;
 
 psecureEnv();
+#PIOLOCKSTACK = 1;
 
 my $f    = 't/test_io.txt';
 my $rlen = length "0000\n";
@@ -22,7 +23,6 @@ unlink $f if -f $f;
 ok( pclose($f), 'unopened 1' );
 ok( !ptell($f), 'unopened 2' );
 ok( !pseek( $f, 0, SEEK_END ), 'unopened 3' );
-ok( !pflock( $f, LOCK_EX ), 'unopened 4' );
 
 # Check file mode
 ok( $fh = popen( $f, O_CREAT | O_RDWR ), 'file mode 1' );

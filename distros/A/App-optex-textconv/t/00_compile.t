@@ -10,7 +10,16 @@ use_ok $_ for qw(
     App::optex::textconv::pandoc
     App::optex::textconv::pdf
     App::optex::textconv::tika
+    App::optex::textconv::ooxml
+    App::optex::textconv::ooxml::regex
 );
+
+TODO: {
+    local $TODO = 'May not be installed';
+    use_ok $_ for qw(
+	App::optex::textconv::ooxml::xslt
+    );
+}
 
 done_testing;
 

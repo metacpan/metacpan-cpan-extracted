@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 use parent qw(Software::License);
 
@@ -138,7 +138,7 @@ CPANPLUS::Dist::Debora::License - Read license files
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

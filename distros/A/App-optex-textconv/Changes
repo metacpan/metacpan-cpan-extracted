@@ -1,5 +1,14 @@
 Revision history for Perl extension App-optex-textconv
 
+0.1401 2021-12-28T08:56:12Z
+
+    - Fix reverse check bug.
+
+0.14 2021-12-28T07:40:31Z
+
+    - Introduce ooxml::xslt module to use XML::LibXML, XML::LibXSLT module.
+    - Make msdoc module to handle .doc file using Text::Extract::Word.
+
 0.13 2021-12-15T09:27:25Z
 
     - Use Exporter module to implement -Mtc module.

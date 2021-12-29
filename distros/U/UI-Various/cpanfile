@@ -9,3 +9,9 @@ on 'test' => sub {
     requires 'Test::Output' => 1.01;
     requires 'Test::Warn'   => 0.23;
 };
+
+on 'develop' => sub {
+    requires 'perl' => 5.22.0;
+    requires 'Curses::UI' => '0.9603';
+    requires 'Tk' => '804.030';
+};

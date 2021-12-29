@@ -18,13 +18,15 @@ my %WriteMakefileArgs = (
   "NAME" => "Mail::Exim::Blacklist::Attachments",
   "PREREQ_PM" => {
     "Exporter" => 0,
-    "IO::Uncompress::Unzip" => 0
+    "IO::Uncompress::Unzip" => 0,
+    "utf8" => 0,
+    "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "IO::Compress::Zip" => 0,
-    "Test::More" => "0.96"
+    "Test::More" => 0
   },
-  "VERSION" => "1.007",
+  "VERSION" => "1.008",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,7 +37,9 @@ my %FallbackPrereqs = (
   "Exporter" => 0,
   "IO::Compress::Zip" => 0,
   "IO::Uncompress::Unzip" => 0,
-  "Test::More" => "0.96"
+  "Test::More" => 0,
+  "utf8" => 0,
+  "warnings" => 0
 );
 
 

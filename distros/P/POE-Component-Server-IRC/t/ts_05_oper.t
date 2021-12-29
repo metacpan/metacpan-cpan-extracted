@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 15;
+use Test::More tests => 18;
 use POE::Component::Server::IRC;
 use POE::Component::IRC;
 use POE;
@@ -8,6 +8,7 @@ my $pocosi = POE::Component::Server::IRC->spawn(
     auth         => 0,
     antiflood    => 0,
     plugin_debug => 1,
+    config       => { sid => '1HB', },
 );
 my $pocoirc = POE::Component::IRC->spawn(flood => 1);
 
@@ -21,6 +22,7 @@ POE::Session->create(
             ircd_daemon_rehash
             ircd_daemon_die
             ircd_listener_add
+            ircd_daemon_snotice
         )],
     ],
     heap => {
@@ -40,7 +42,7 @@ sub _start {
     $heap->{ircd}->add_operator(
         {
             username => 'moo',
-            password => 'fishdont'
+            password => '$2a$06$Z.NhM/6/Upqfn2WcECk0Y./rpDmNLD2nUeETfKUPWSGNoNtQq9BVO',
         }
     );
     $kernel->delay('_shutdown', 20);
@@ -81,6 +83,10 @@ sub ircd_daemon_rehash {
 sub ircd_daemon_die {
     pass($_[STATE]);
     $poe_kernel->yield('_shutdown');
+}
+
+sub ircd_daemon_snotice {
+    pass($_[STATE]);
 }
 
 sub _default {

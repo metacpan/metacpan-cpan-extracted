@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = 1.007;
+our $VERSION = 1.008;
 
 use Exporter qw(import);
 use IO::Uncompress::Unzip;
@@ -281,7 +281,7 @@ Mail::Exim::Blacklist::Attachments - Blacklist email attachments
 
 =head1 VERSION
 
-version 1.007
+version 1.008
 
 =head1 SYNOPSIS
 

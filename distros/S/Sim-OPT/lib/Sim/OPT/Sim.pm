@@ -93,6 +93,7 @@ sub sim
   my %vehicles = %{ $dat{vehicles} };
   my $precious = $dat{precious};
   my %inst = %{ $dat{inst} };
+  my @precedents = @{ $dat{precedents} };
   my $winningvalue;
 
 	if ( $tofile eq "" )
@@ -155,30 +156,39 @@ sub sim
   my $skipfile = $vals{skipfile};
 	my $skipsim = $vals{skipsim};
 	my $skipreport = $vals{skipreport};
-
   my %notecases;
 
-  my @container;
-  foreach my $instance (@instances)
+  my @trieds; #say $tee "HEARE IN SIM \@precedents: " . dump( \@precedents );
+  foreach $prec_r ( @precedents )
   {
-    my %dt = %{$instance};
-    my @winneritems = @{ $dt{winneritems} };
-    my $countvar = $dt{countvar};
-    my $countstep = $dt{countstep};
-    my $c = $dt{c};
+    my %prec = %{ $prec_r };
+    my %to = %{ $prec{to} };
+    push ( @trieds, $to{cleanto} );
+  } #say $tee "HEARE IN SIM \@trieds: " . dump( \@trieds );
 
-		my %to = %{ $dt{to} };
-		#my %inst = %{ $dt{inst} };
-    my $instn = $dt{instn};
+  my @allinstances = @instances ;
+  push( @allinstances, @precedents );
 
-		my $from = $dt{from};
-		my $toitem = $dt{toitem};
+  my @container;
+  foreach my $instance (@allinstances)
+  {
+    my %dt = %{$instance}; say $tee "HEEERE IN SIM \%dt: " . dump( \%dt );
+    my @winneritems = @{ $dt{winneritems} }; say $tee "HEEERE IN SIM \@winneritems: " . dump( @winneritems );
+    my $countvar = $dt{countvar}; say $tee "HEEERE IN SIM \$countvar: " . dump( $countvar );
+    my $countstep = $dt{countstep}; say $tee "HEEERE IN SIM \$countstep: " . dump( $countstep );
+    my $c = $dt{c}; say $tee "HEEERE IN SIM \$c: " . dump( $c );
 
-    my @blockelts =$dt{blockelts};
-    my @blocks = $dt{blocks};
-    my %varnums = $dt{varnums};
-    my %mids = $dt{mids};
-    my $countinstance = $dt{instn};
+		my %to = %{ $dt{to} }; say $tee "HEEERE IN SIM \%to: " . dump( \%to );
+    my $instn = $dt{instn}; say $tee "HEEERE IN SIM \$instn: " . dump( $instn );
+
+		my $from = $dt{from}; say $tee "HEEERE IN SIM \$from: " . dump( $from );
+		my $toitem = $dt{toitem}; say $tee "HEEERE IN SIM \$toitem: " . dump( $toitem );
+
+    my @blockelts =$dt{blockelts}; say $tee "HEEERE IN SIM \@blockelts: " . dump( @blockelts );
+    my @blocks = $dt{blocks}; say $tee "HEEERE IN SIM \@blocks: " . dump( @blocks );
+    my %varnums = $dt{varnums}; say $tee "HEEERE IN SIM \%varnums: " . dump( \%varnums );
+    my %mids = $dt{mids}; say $tee "HEEERE IN SIM \%mids: " . dump( \%mids );
+    my $countinstance = $dt{instn}; say $tee "HEEERE IN SIM \$countinstance: " . dump( $countinstance );
 
 
     my $skip = $dowhat{$countvar}{skip}; #########################################
@@ -197,7 +207,7 @@ sub sim
     $shortsimelt =~ s/$mypath\///;
     my ( $shortresfile, $shortflfile );
 
-    if ( $dowhat{simulate} eq "y")
+    if ( ( $dowhat{simulate} eq "y") and ( not ( $to{cleanto} ~~ ( @trieds ) ) ) )
     {
 
       my $counttool = 1;

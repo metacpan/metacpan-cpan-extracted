@@ -1,0 +1,15 @@
+POE::Component::Server::IRC is a POE component which implements an IRC
+server (also referred to as an IRC daemon or IRCd). It should be compliant
+with the pertient IRC RFCs and is based on reverse engineering Hybrid IRCd
+behaviour with regards to interactions with IRC clients and other IRC
+servers.
+
+Yes, that's right. POE::Component::Server::IRC is capable of linking to
+foreign IRC networks. It supports the TS6 server to server protocol and
+has been tested with linking to Hybrid-8 based networks. It should in
+theory work with any TS6-based IRC network.
+
+POE::Component::Server::IRC also has a services API, which enables one to
+extend the IRCd to create IRC Services. This is fully event-driven (of
+course =]). There is also a Plugin system, similar to that sported by
+POE::Component::IRC.

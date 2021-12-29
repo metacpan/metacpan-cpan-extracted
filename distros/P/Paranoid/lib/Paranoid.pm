@@ -1,6 +1,6 @@
 # Paranoid -- Paranoia support for safer programs
 #
-# $Id: lib/Paranoid.pm, 2.08 2020/12/31 12:10:06 acorliss Exp $
+# $Id: lib/Paranoid.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
 #
 # (c) 2005 - 2020, Arthur Corliss (corliss@digitalmages.com)
 # (tm) 2008 - 2020, Paranoid Inc. (www.paranoid.com)
@@ -40,7 +40,7 @@ use warnings;
 use vars qw($VERSION @EXPORT @EXPORT_OK %EXPORT_TAGS);
 use base qw(Exporter);
 
-($VERSION) = ( q$Revision: 2.08 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.09 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 @EXPORT      = qw(psecureEnv);
 @EXPORT_OK   = ( @EXPORT, qw(PTRUE_ZERO) );
@@ -116,7 +116,7 @@ Paranoid - Paranoia support for safer programs
 
 =head1 VERSION
 
-$Id: lib/Paranoid.pm, 2.08 2020/12/31 12:10:06 acorliss Exp $
+$Id: lib/Paranoid.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
 
 =head1 SYNOPSIS
 

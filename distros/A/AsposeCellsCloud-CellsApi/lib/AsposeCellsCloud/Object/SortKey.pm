@@ -126,7 +126,7 @@ __PACKAGE__->class_documentation({description => '',
 
 __PACKAGE__->method_documentation({
     'custom_list' => {
-    	datatype => 'string',
+    	datatype => 'ARRAY[string]',
     	base_name => 'CustomList',
     	description => '',
     	format => '',
@@ -146,18 +146,45 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'order' => {
+    	datatype => 'string',
+    	base_name => 'Order',
+    	description => '',
+    	format => '',
+    	read_only => '',
+    		},
+    'type' => {
+    	datatype => 'string',
+    	base_name => 'Type',
+    	description => '',
+    	format => '',
+    	read_only => '',
+    		},
+    'index' => {
+    	datatype => 'int',
+    	base_name => 'Index',
+    	description => '',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
-    'custom_list' => 'string',
+    'custom_list' => 'ARRAY[string]',
     'sort_order' => 'string',
-    'key' => 'int'
+    'key' => 'int',
+    'order' => 'string',
+    'type' => 'string',
+    'index' => 'int'
 } );
 
 __PACKAGE__->attribute_map( {
     'custom_list' => 'CustomList',
     'sort_order' => 'SortOrder',
-    'key' => 'Key'
+    'key' => 'Key',
+    'order' => 'Order',
+    'type' => 'Type',
+    'index' => 'Index'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

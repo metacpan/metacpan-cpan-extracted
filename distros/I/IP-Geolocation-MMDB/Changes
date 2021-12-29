@@ -1,0 +1,10 @@
+Revision history for IP::Geolocation::MMDB
+
+0.002  2021-12-29 01:16:55 CET
+
+  - Skip the IPv6 tests on Windows
+
+0.001  2021-12-27 08:03:18 CET
+
+  - First version
+

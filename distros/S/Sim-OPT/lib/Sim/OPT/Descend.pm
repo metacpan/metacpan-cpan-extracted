@@ -99,12 +99,13 @@ sub descend
 
   my %dt = %{ $_[0] };
 
-  my @instances = @{ $dt{instances} };
-  my %dirfiles = %{ $dt{dirfiles} };
-  my %vehicles = %{ $dt{vehicles} };
-  my %winhash = %{ $dt{winhash} };
+  my @instances = @{ $dt{instances} }; say $tee "HEEERE IN DESCEND \@instances: " . dump( @instances );
+  my %dirfiles = %{ $dt{dirfiles} }; say $tee "HEEERE IN DESCEND \%dirfiles: " . dump( \%dirfiles );
+  my %vehicles = %{ $dt{vehicles} }; say $tee "HEEERE IN DESCEND \%vehicles: " . dump( \%vehicles );
+  my %winhash = %{ $dt{winhash} }; say $tee "HEEERE IN DESCEND \%winhash: " . dump( \%winhash );
   #my $winning = $winhash{winning};
-  my %inst = %{ $dt{inst} };
+  my %inst = %{ $dt{inst} }; say $tee "HEEERE IN DESCEND \%inst: " . dump( \%inst );
+  my @precedents = @{ $dt{precedents} }; say $tee "HEEERE IN DESCEND \@precedents: " . dump( @precedents );
 
   my @simcases = @{ $dirfiles{simcases} };
   my @simstruct = @{ $dirfiles{simstruct} };
@@ -132,22 +133,22 @@ sub descend
 
   my $exitname = $dirfiles{exitname};
 
-  say $tee "IN ENTRY DESCEND3  \$dirfiles{starsign} " . dump( $dirfiles{starsign} );
+  #say $tee "IN ENTRY DESCEND3  \$dirfiles{starsign} " . dump( $dirfiles{starsign} );
 
   my %d = %{ $instances[0] };
-  my $countcase = $d{countcase};
-  my $countblock = $d{countblock};
-  my %datastruc = %{ $d{datastruc} }; ######
+  my $countcase = $d{countcase}; say $tee "HEEERE IN DESCEND \$countcase: " . dump( $countcase );
+  my $countblock = $d{countblock}; say $tee "HEEERE IN DESCEND \$countblock: " . dump( $countblock );
+  my %datastruc = %{ $d{datastruc} }; say $tee "HEEERE IN DESCEND \%datastruc: " . dump( \%datastruc );
   my @varnumbers = @{ $d{varnumbers} };
-  @varnumbers = Sim::OPT::washn( @varnumbers );
+  @varnumbers = Sim::OPT::washn( @varnumbers ); say $tee "HEEERE IN DESCEND \@varnumbers: " . dump( @varnumbers );
   my @miditers = @{ $d{miditers} };
-  @miditers = Sim::OPT::washn( @miditers );
-  my @sweeps = @{ $d{sweeps} };
-  my @sourcesweeps = @{ $d{sourcesweeps} };
-  my @rootnames = @{ $d{rootnames} }; ######
-  my @winneritems = @{ $d{winneritems} };
-  my $instn = $d{instn};
-  #my %inst = %{ $d{inst} };
+  @miditers = Sim::OPT::washn( @miditers ); say $tee "HEEERE IN DESCEND \@miditers: " . dump( @miditers );
+  my @sweeps = @{ $d{sweeps} }; say $tee "HEEERE IN DESCEND \@sweeps: " . dump( @sweeps );
+  my @sourcesweeps = @{ $d{sourcesweeps} }; say $tee "HEEERE IN DESCEND \@sourcesweeps: " . dump( @sourcesweeps );
+  my @rootnames = @{ $d{rootnames} }; say $tee "HEEERE IN DESCEND \@rootnames: " . dump( @rootnames );
+  my @winneritems = @{ $d{winneritems} }; say $tee "HEEERE IN DESCEND \@winneritems: " . dump( @winneritems );
+  my $instn = $d{instn}; say $tee "HEEERE IN DESCEND \$instn: " . dump( $instn );
+
   my %dowhat = %{ $d{dowhat} }; ######
 
   my $skipfile = $vals{skipfile};
@@ -167,6 +168,10 @@ sub descend
   my %mids = %{ $d{mids} };
   my %carrier = %{ $d{carrier} };
   my $outstarmode = $dowhat{outstarmode};
+
+  say $tee "HEEERE \$toitem $toitem \$from $from \$rootname $rootname ";
+
+  say $tee "RELAUNCHED IN DESCEND WITH INST " . dump( %inst );
 
   my ( $direction, $starorder );
   if ( $outstarmode eq "yes" )
@@ -225,7 +230,7 @@ sub descend
   my $tottot = $dirfiles{tottot};
   my $ordtot = $dirfiles{ordtot};
 
-  my $confinterlinear = "$mypath/" . $dowhat{confinterlinear} ; say $tee "IN DESCEND5 \$confinterlinear: " . dump( $confinterlinear );
+  my $confinterlinear = "$mypath/" . $dowhat{confinterlinear} ;
 
   my $repfile = $dirfiles{repfile};
   if ( not( $repfile ) ){ die; }
@@ -381,6 +386,8 @@ sub descend
     cleanselect( $repfile, $selectmixed );
   }
 
+  say $tee "IN DESCEND AFTER CLEANSELECT; INST " . dump( %inst );
+
 
   my $throw = $selectmixed;
   $throw =~ s/\.csv//;
@@ -533,6 +540,8 @@ sub descend
   {
     weight( $selectmixed, $weight ); #
   }
+
+  say $tee "IN DESCEND AFTER WEIGHT; INST " . dump( %inst );
 
   my $weighttwo = $weight;
 
@@ -732,8 +741,10 @@ sub descend
   close SORTMIXED;
   if ( not( -e $weighttwo) ){ die; };
   if ( not( $sortmixed) ){ die; };
-  sortmixed( $weighttwo, $sortmixed, $searchname, $entryfile, $exitfile, $orderedfile, $outstarmode, $instn, \%inst, \%dirfiles, \%vehicles, $countcase, $countblock );
+  sortmixed( $weighttwo, $sortmixed, $searchname, $entryfile, $exitfile, $orderedfile, $outstarmode,
+  $instn, \%inst, \%dirfiles, \%vehicles, $countcase, $countblock );
 
+  say $tee "IN DESCEND AFTER SORTMIXED; INST " . dump( %inst );
 
   sub metamodel
 	{
@@ -1013,7 +1024,9 @@ sub descend
 
   sub takeoptima
   {
-    my ( $sortmixed, $carrier_r, $blockelts_r, $searchname, $orderedfile, $direction, $starorder, $mids_r, $blocks_r, $totres, $objectivecolumn, $ordres, $starpositions_r, $countstring, $starnumber, $ordtot, $file, $ordmeta, $orderedfile, $dirfiles_r, $countcase, $countblock, $varnums_r, $vehicles_r ) = @_;
+    my ( $sortmixed, $carrier_r, $blockelts_r, $searchname, $orderedfile, $direction, $starorder, $mids_r,
+    $blocks_r, $totres, $objectivecolumn, $ordres, $starpositions_r, $countstring, $starnumber, $ordtot,
+    $file, $ordmeta, $orderedfile, $dirfiles_r, $countcase, $countblock, $varnums_r, $vehicles_r, $inst_r ) = @_;
     my %carrier = %{ $carrier_r };
     my @blockelts = @{ $blockelts_r };
     my @blocks = @{ $blocks_r };
@@ -1022,6 +1035,8 @@ sub descend
     my %varnums = %{ $varnums_r };
     my %vehicles = %{ $vehicles_r };
     my $slicenum = $dirfiles->{slicenum};
+    my %inst = %{ $inst_r };
+    say $tee "HEEERE 3 CARRIER: " . dump( \%carrier );
 
     close SORTMIXED;
     my @lines;
@@ -1075,7 +1090,9 @@ sub descend
     my @winnerelms = split( /,/, $winnerentry );
     my $winneritem = $winnerelms[0];
 
-    $winneritem =~ Sim::OPT::clean( $winneritem, $mypath, $file );
+    say $tee "HEEERE WINNERITEM BEFORE CLEANING: $winneritem.";
+    $winneritem = Sim::OPT::clean( $winneritem, $mypath, $file );
+    say $tee "HEEERE WINNERITEM AFTER CLEANING: $winneritem.";
     push ( @{ $datastruc{$closingelt} }, $winneritem );
 
     my $message;
@@ -1575,7 +1592,7 @@ sub descend
         sourcesweeps => \@sourcesweeps, instn => $instn, inst => \%inst, vehicles => \%vehicles } );
       } ### END OF THE PART ABOUT STAR CONFIGURATIONS
       else
-      {
+      { say $tee "RELAUNCHING WITH INST " . dump( %inst );
         $winneritem = Sim::OPT::clean( $winneritem, $mypath, $file );
 
         push ( @{ $winneritems[$countcase][$countblock+1] }, $winneritem );
@@ -1591,9 +1608,11 @@ sub descend
     }
   } # END SUB takeoptima
 
-
-
-  takeoptima( $sortmixed, \%carrier, \@blockelts, $searchname, $orderedfile, $direction, $starorder, \%mids, \@blocks, $totres, $objectivecolumn, $ordres, \@starpositions, $countstring, $starnumber, $ordtot, $file, $ordmeta, $orderedfile, \%dirfiles, $countcase, $countblock, \%varnums, \%vehicles ); #say $tee "TAKEOPTIMA \$sortmixed : " . dump( $sortmixed );
+  say $tee "IN DESCEND BEFORE TAKEOPTIMA; INST " . dump( %inst );
+  say $tee "HEEERE 2 CARRIER: " . dump( \%carrier );
+  takeoptima( $sortmixed, \%carrier, \@blockelts, $searchname, $orderedfile, $direction, $starorder,
+  \%mids, \@blocks, $totres, $objectivecolumn, $ordres, \@starpositions, $countstring, $starnumber,
+  $ordtot, $file, $ordmeta, $orderedfile, \%dirfiles, $countcase, $countblock, \%varnums, \%vehicles, \%inst ); #say $tee "TAKEOPTIMA \$sortmixed : " . dump( $sortmixed );
   close OUTFILE;
   close TOFILE;
 }    # END SUB descend

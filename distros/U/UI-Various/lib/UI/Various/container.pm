@@ -34,13 +34,13 @@ C<UI::Various::container>):
 
 #########################################################################
 
-use v5.14.0;
+use v5.14;
 use strictures;
 no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 use UI::Various::core;
 use UI::Various::widget;
@@ -205,7 +205,9 @@ sub remove($@)
 	{
 	    next unless $children->[$_] == $child;
 	    $removed = splice @{$children}, $_, 1;
-	    $child->parent(undef);
+	    # instead of: $child->parent(undef);
+	    # we need direct assignment for Perl < 5.20 here:
+	    $child->{parent} = undef;
 	    defined $self->{_index}  and  $_ < $self->{_index}  and
 		$self->{_index}--;
 	    next CHILD;
@@ -272,7 +274,9 @@ When called with a (positive or negative) numeric index this method returns
 the container's element at that index.  When called without parameter this
 method iterates over all elements until the end, when it returns C<undef>
 and automatically resets the iterator.  Calling the method with an explicit
-C<undef> resets the iterator before it reaches the end.
+C<undef> resets the iterator before it reaches the end.  An empty string
+instead of C<undef> is also possible to allow avoiding Perl bugs #7508 and
+#109726 in Perl versions prior to 5.20.
 
 Note that removing takes care of keeping the index valid, so it's perfectly
 possible to use a loop to remove some or all children of a container.
@@ -299,7 +303,7 @@ sub child($;$)
 
     local $_ = undef;
     # called with index:
-    if (defined $index)
+    if (defined $index  and  $index ne '')
     {
 	if ($index !~ m/^-?\d+$/)
 	{

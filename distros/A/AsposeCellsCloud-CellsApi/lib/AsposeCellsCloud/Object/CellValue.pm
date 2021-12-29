@@ -161,6 +161,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'formula' => {
+    	datatype => 'string',
+    	base_name => 'formula',
+    	description => '',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -168,7 +175,8 @@ __PACKAGE__->swagger_types( {
     'column_index' => 'int',
     'style' => 'Style',
     'type' => 'string',
-    'value' => 'string'
+    'value' => 'string',
+    'formula' => 'string'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -176,7 +184,8 @@ __PACKAGE__->attribute_map( {
     'column_index' => 'columnIndex',
     'style' => 'style',
     'type' => 'type',
-    'value' => 'value'
+    'value' => 'value',
+    'formula' => 'formula'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

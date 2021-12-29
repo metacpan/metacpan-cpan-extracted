@@ -20,7 +20,7 @@ Perinci::CmdLine::Manual::HowTo::Debugging - How-to guides related to debugging
 
 =head1 VERSION
 
-This document describes version 1.909.1 of Perinci::CmdLine::Manual::HowTo::Debugging (from Perl distribution Perinci-CmdLine), released on 2021-10-03.
+This document describes version 1.913.0 of Perinci::CmdLine::Manual::HowTo::Debugging (from Perl distribution Perinci-CmdLine), released on 2021-12-03.
 
 =head1 DESCRIPTION
 

@@ -1,6 +1,6 @@
 # Paranoid::Network::IPv6 -- IPv6-specific network functions
 #
-# $Id: lib/Paranoid/Network/IPv6.pm, 2.08 2020/12/31 12:10:06 acorliss Exp $
+# $Id: lib/Paranoid/Network/IPv6.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
 #
 # This software is free software.  Similar to Perl, you can redistribute it
 # and/or modify it under the terms of either:
@@ -46,7 +46,7 @@ my @constants = qw(MAXIPV6CIDR IPV6REGEX IPV6CIDRRGX IPV6BASE IPV6BRDCST
     IPV6MASK);
 my @ipv6sort = qw(ipv6StrSort ipv6PackedSort ipv6NumSort);
 
-($VERSION) = ( q$Revision: 2.08 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.09 $ =~ /(\d+(?:\.\d+)+)/sm );
 @EXPORT      = @base;
 @EXPORT_OK   = ( @base, @constants, @ipv6sort );
 %EXPORT_TAGS = (
@@ -374,7 +374,7 @@ Paranoid::Network::IPv6 - IPv6-related functions
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Network/IPv6.pm, 2.08 2020/12/31 12:10:06 acorliss Exp $
+$Id: lib/Paranoid/Network/IPv6.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
 
 =head1 SYNOPSIS
 

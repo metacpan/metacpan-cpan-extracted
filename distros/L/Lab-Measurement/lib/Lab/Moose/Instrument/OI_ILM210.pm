@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::OI_ILM210;
-$Lab::Moose::Instrument::OI_ILM210::VERSION = '3.801';
+$Lab::Moose::Instrument::OI_ILM210::VERSION = '3.802';
 #ABSTRACT: Oxford Instruments ILM Intelligent Helium Level Meter
 
 use v5.20;
@@ -58,7 +58,7 @@ Lab::Moose::Instrument::OI_ILM210 - Oxford Instruments ILM Intelligent Helium Le
 
 =head1 VERSION
 
-version 3.801
+version 3.802
 
 =head1 DESCRIPTION
 

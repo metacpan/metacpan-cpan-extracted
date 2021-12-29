@@ -1,6 +1,6 @@
 # Paranoid::Debug -- Debug support for paranoid programs
 #
-# $Id: lib/Paranoid/Debug.pm, 2.08 2020/12/31 12:10:06 acorliss Exp $
+# $Id: lib/Paranoid/Debug.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
 #
 # This software is free software.  Similar to Perl, you can redistribute it
 # and/or modify it under the terms of either:
@@ -37,7 +37,7 @@ use vars qw($VERSION @EXPORT @EXPORT_OK %EXPORT_TAGS);
 use base qw(Exporter);
 use Paranoid;
 
-($VERSION) = ( q$Revision: 2.08 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.09 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 @EXPORT = qw(PDEBUG pdebug pIn pOut
     PDEBUG1 PDEBUG2 PDEBUG3 PDEBUG4 PDEBUG5 PDEBUG6 PDEBUG7 PDEBUG8);
@@ -237,7 +237,7 @@ Paranoid::Debug - Trace message support for paranoid programs
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Debug.pm, 2.08 2020/12/31 12:10:06 acorliss Exp $
+$Id: lib/Paranoid/Debug.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 # Paranoid::Log -- Log support for paranoid programs
 #
-# $Id: lib/Paranoid/Log.pm, 2.08 2020/12/31 12:10:06 acorliss Exp $
+# $Id: lib/Paranoid/Log.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
 #
 # This software is free software.  Similar to Perl, you can redistribute it
 # and/or modify it under the terms of either:
@@ -41,7 +41,7 @@ use Paranoid::Debug qw(:all);
 use Paranoid::Module;
 use Paranoid::Input;
 
-($VERSION) = ( q$Revision: 2.08 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.09 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 @EXPORT = qw(
     PL_DEBUG     PL_INFO      PL_NOTICE    PL_WARN
@@ -264,7 +264,7 @@ our @_levels = (
         # Make sure the module can be loaded if the log level was valid
         $rv = _loadModule($mech) if $rv;
 
-        # Make sure the log entry is uniqe
+        # Make sure the log entry is unique
         if ($rv) {
             if ( exists $loggers{$name} ) {
                 Paranoid::ERROR = pdebug( 'a logger for %s already exists',
@@ -491,7 +491,7 @@ Paranoid::Log - Log Functions
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Log.pm, 2.08 2020/12/31 12:10:06 acorliss Exp $
+$Id: lib/Paranoid/Log.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
 
 =head1 SYNOPSIS
 

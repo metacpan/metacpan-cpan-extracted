@@ -457,6 +457,7 @@ lib/AsposeCellsCloud/Object/StorageFile.pm
 lib/AsposeCellsCloud/Object/Style.pm
 lib/AsposeCellsCloud/Object/StyleResponse.pm
 lib/AsposeCellsCloud/Object/SvgSaveOptions.pm
+lib/AsposeCellsCloud/Object/TableTotalRequest.pm
 lib/AsposeCellsCloud/Object/TaskData.pm
 lib/AsposeCellsCloud/Object/TaskDescription.pm
 lib/AsposeCellsCloud/Object/TaskParameter.pm

@@ -1,6 +1,6 @@
 # Paranoid::Data -- Misc. Data Manipulation Functions
 #
-# $Id: lib/Paranoid/Data.pm, 2.08 2020/12/31 12:10:06 acorliss Exp $
+# $Id: lib/Paranoid/Data.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
 #
 # This software is free software.  Similar to Perl, you can redistribute it
 # and/or modify it under the terms of either:
@@ -41,7 +41,7 @@ use Paranoid;
 use Paranoid::Debug qw(:all);
 use Carp;
 
-($VERSION) = ( q$Revision: 2.08 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.09 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 @EXPORT      = qw(deepCopy deepCmp);
 @EXPORT_OK   = @EXPORT;
@@ -327,7 +327,7 @@ Paranoid::Data - Misc. Data Manipulation Functions
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Data.pm, 2.08 2020/12/31 12:10:06 acorliss Exp $
+$Id: lib/Paranoid/Data.pm, 2.09 2021/12/28 15:46:49 acorliss Exp $
 
 =head1 SYNOPSIS
 
