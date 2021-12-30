@@ -2,7 +2,7 @@
 
 A Perl module for the [Exim](https://www.exim.org/) mailer that maps IP
 addresses to two-letter country codes such as "DE", "FR" and "US".
-SpamAssassin can use these country codes to filter junk e-mail.
+SpamAssassin can use these country codes to filter junk email.
 
     acl_check_rcpt:
 

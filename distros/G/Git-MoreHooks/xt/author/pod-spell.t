@@ -19,6 +19,7 @@ CheckCommitBase
 CheckIndent
 Gerrit
 Git
+GitRepoAdmin
 GitWeb
 Github
 Gravatar

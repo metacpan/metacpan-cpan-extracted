@@ -1,5 +1,8 @@
 Revision history for perl distribution Mojolicious-Plugin-Syslog
 
+0.06 2021-12-30T08:22:05+0900
+ - Add support for trace log level in Mojolicious 9.20
+
 0.05 2021-12-18T11:46:57+0900
  - Changed undocumented "v2" access log format and documented it
 

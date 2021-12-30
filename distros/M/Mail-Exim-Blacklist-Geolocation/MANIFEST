@@ -14,5 +14,5 @@ lib/Mail/Exim/Blacklist/Geolocation.pm
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/basic.t
-t/data/Test-GeoLite2-Country.mmdb
+t/data/Test-GeoLite2-City.mmdb
 t/release-kwalitee.t

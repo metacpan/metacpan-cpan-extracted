@@ -13,7 +13,7 @@ use Config;
 use Alien::libmaxminddb;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Map IP addresses to country codes",
+  "ABSTRACT" => "Read MaxMind DB files",
   "AUTHOR" => "Andreas V\x{f6}gele <voegelas\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "Alien::libmaxminddb" => 0,
@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
     "File::Spec::Functions" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }

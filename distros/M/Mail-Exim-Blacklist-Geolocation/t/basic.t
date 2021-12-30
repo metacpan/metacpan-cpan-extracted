@@ -10,7 +10,7 @@ use Test::More tests => 3;
 
 BEGIN {
   use File::Spec::Functions qw(catfile);
-  $ENV{GEOIP_COUNTRY} = catfile(qw(t data Test-GeoLite2-Country.mmdb));
+  $ENV{GEOIP_COUNTRY} = catfile(qw(t data Test-GeoLite2-City.mmdb));
   use_ok 'Mail::Exim::Blacklist::Geolocation', qw(country_code);
 }
 

@@ -10,6 +10,7 @@ requires "MIME::Base64" => "0";
 requires "OPM::Validate" => "1.10";
 requires "Path::Class" => "0";
 requires "Sys::Hostname" => "0";
+requires "Text::Gitignore" => "0.04";
 requires "XML::LibXML" => "0";
 requires "XML::LibXML::PrettyPrint" => "0";
 requires "perl" => "5.010";

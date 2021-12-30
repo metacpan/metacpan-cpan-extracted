@@ -11,7 +11,7 @@ use IO::Socket::INET;
 use Errno qw( EINPROGRESS EWOULDBLOCK );
 
 my $Package = __PACKAGE__;
-our $VERSION = '2.09';
+our $VERSION = '2.10';
 our %EXPORT_TAGS = (
 		use	=> [qw(useTelnet useSsh useSerial useIPv6)],
 		prompt	=> [qw(promptClear promptHide promptCredential)],
@@ -62,9 +62,9 @@ my %Default = ( # Hash of default object settings which can be modified on a per
 	poll_obj_complete	=> 'all',		# Default mode for poll() method
 	poll_obj_error		=> 'ignore',		# Default error mode for poll() method
 	report_query_status	=> 0,			# Default setting of report_query_status for class object
-	prompt		=> '.*[\?\$%#>]\s?$',		# Default prompt used in login() and cmd() methods
+	prompt		=> '.*[\?\$%#>](?:\e\[00?m)?\s?$',	# Default prompt used in login() and cmd() methods
 	username_prompt	=> '(?i:user(?: ?name)?|login)[: ]+$',	# Default username prompt used in login() method
-	password_prompt	=> '(?i)password[: ]+$',	# Default password prompt used in login() method
+	password_prompt	=> '(?i)(?<!new )password[: ]+$',	# Default password prompt used in login() method
 	terminal_type	=> 'vt100',			# Default terminal type (for SSH)
 	window_size	=> [],				# Default terminal window size [width, height]
 	debug		=> 0,				# Default debug level; 0 = disabled
@@ -1164,7 +1164,7 @@ sub poll { # Poll objects for completion
 					return $obj->error("$pkgsub: No polling method was ever called for object array element $i");
 				}
 				my $objStartTime = time;
-				my $objTimeCredit = $objStartTime - (defined $objLastPollTime->[$i] ? $objLastPollTime->[$i] : $pollStartTime);
+				my $objTimeCredit = $objStartTime - (defined $objLastPollTime->[$i] ? $objLastPollTime->[$i] : $pollStartTime) - $pollTimer;
 				my $ok = _call_poll_method($obj, $objTimeCredit, defined $args{errmode} ? $errmode : undef);
 				if ($ok) {
 					$completed++;
@@ -1200,7 +1200,7 @@ sub poll { # Poll objects for completion
 					return $obj->error("$pkgsub: No polling method was ever called for object hash key $key");
 				}
 				my $objStartTime = time;
-				my $objTimeCredit = $objStartTime - (defined $objLastPollTime->{$key} ? $objLastPollTime->{$key} : $pollStartTime);
+				my $objTimeCredit = $objStartTime - (defined $objLastPollTime->{$key} ? $objLastPollTime->{$key} : $pollStartTime) - $pollTimer;
 				my $ok = _call_poll_method($obj, $objTimeCredit, defined $args{errmode} ? $errmode : undef);
 				if ($ok) {
 					$completed++;
@@ -2929,7 +2929,7 @@ sub _call_poll_method { # Call object's poll method and optionally alter and the
 			$errmodecache = $self->{POLL}{errmode};
 			$self->{POLL}{errmode} = $errmode;
 		}
-		if ($timeCredit && defined $self->{POLL}{endtime}) { # We are going to increase the object's timeout by a credit amount
+		if ($timeCredit > 0 && defined $self->{POLL}{endtime}) { # We are going to increase the object's timeout by a credit amount
 			$self->{POLL}{endtime} = $self->{POLL}{endtime} + $timeCredit;
 			$self->debugMsg(1," - Timeout Credit of : ", \$timeCredit, " seconds\n");
 		}
@@ -3698,11 +3698,11 @@ In the first form only a success/failure value is returned in scalar context, wh
 For this method to succeed the username & password prompts from the remote host must match the default prompts defined for the object or the overrides specified via the optional "username_prompt" & "password_prompt" arguments. By default these regular expressions are set to:
 
 	'(?i:user(?: ?name)?|login)[: ]+$'
-	'(?i)password[: ]+$'
+	'(?i)(?<!new )password[: ]+$'
 
 Following a successful authentication, if a valid CLI prompt is received, the method will return a true (1) value. The expected CLI prompt is either the globally set prompt - see prompt() - or the local override specified with the optional "prompt" argument. By default, the following prompt is expected:
 
-	'.*[\?\$%#>]\s?$'
+	'.*[\?\$%#>](?:\e\[00?m)?\s?$'
 
 On timeout or failure or if the remote host prompts for the username a second time (the method assumes that the credentials provided were invalid) then the error mode action is performed. See errmode().
 If username/password are not provided but are required and prompt_credentials is true, the method will automatically prompt the user for them interactively; otherwise the error mode action is performed.
@@ -4326,7 +4326,7 @@ These can be retrieved via the username, password and passphrase methods. If you
 This method sets the CLI prompt match pattern for this object. In the first form the current pattern match string is returned. In the second form a new pattern match string is set and the previous setting returned.
 The default prompt match pattern used is:
 
-	'.*[\?\$%#>]\s?$'
+	'.*[\?\$%#>](?:\e\[00?m)?\s?$'
 
 The object CLI prompt match pattern is only used by the login() and cmd() methods.
 
@@ -4352,7 +4352,7 @@ The default prompt match pattern used is:
 This method sets the login() password prompt match pattern for this object. In the first form the current pattern match string is returned. In the second form a new pattern match string is set and the previous setting returned.
 The default prompt match pattern used is:
 
-	'(?i)password[: ]*$'
+	'(?i)(?<!new )password[: ]+$'
 
 
 =item B<terminal_type()> - set the terminal type for the connection
@@ -5118,7 +5118,7 @@ A lot of the methods and functionality of this class, as well as some code, is d
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2020 Ludovico Stevens.
+Copyright 2021 Ludovico Stevens.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

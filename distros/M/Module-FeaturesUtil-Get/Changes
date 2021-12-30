@@ -1,3 +1,10 @@
+0.005   2021-07-31  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Tweak Abstract and Description.
+
+
 0.004   2021-02-26  Released-By: PERLANCAR; Urgency: medium
 
 	- Add argument fatal_on_load_failure in get_feature_set_spec(),

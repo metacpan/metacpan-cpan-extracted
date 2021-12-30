@@ -25,4 +25,10 @@ WriteMakefile(
 	dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean		=> { FILES => 'Control-CLI-Extreme-*' },
 	MIN_PERL_VERSION => '5.6.0',
+	META_MERGE => {
+		'meta-spec' => { version => 2 },
+		bugtracker => {
+			web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Control-CLI-Extreme'
+		},
+	},
 );

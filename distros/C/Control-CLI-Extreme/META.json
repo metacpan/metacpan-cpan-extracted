@@ -35,15 +35,18 @@
    "provides" : {
       "Control::CLI::Extreme" : {
          "file" : "lib/Control/CLI/Extreme.pm",
-         "version" : "1.05"
+         "version" : "1.06"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Control-CLI-Extreme"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "1.05",
+   "version" : "1.06",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

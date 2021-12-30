@@ -1,14 +1,21 @@
 #!perl
-
-use 5.010;
+## no critic (Variables::ProhibitPunctuationVars)
 use strict;
 use warnings;
-use Test::Most;
+use Test2::V0;
 use Git::Hooks::Test ':all';
 use Path::Tiny;
-use Test::Requires::Git;
 
 my ( $repo, $clone, $T );
+
+# Eliminate the effects of system wide and global configuration.
+# https://metacpan.org/dist/Git-Repository/view/lib/Git/Repository/Tutorial.pod#Ignore-the-system-and-global-configuration-files
+my %git_test_env = (
+    LC_ALL              => 'C',
+    GIT_CONFIG_NOSYSTEM => 1,
+    XDG_CONFIG_HOME     => undef,
+    HOME                => undef,
+);
 
 my $mailmap = <<'MAILMAP_END';
 <cto@company.xx>                                <cto@coompany.xx>
@@ -38,7 +45,7 @@ sub modify_file {
     my $wcpath   = path( $repo->work_tree() );
     my $filename = $wcpath->child(@path);
 
-    unless ( -e $filename ) {
+    unless ( -e $filename ) {    ## no critic (ControlStructures::ProhibitUnlessBlocks)
         pop @path;
         my $dirname = $wcpath->child(@path);
         $dirname->mkpath;
@@ -74,19 +81,21 @@ sub modify_file {
 }
 
 sub check_can_commit {
-    my ( $testname, $file, $action, $data ) = @_;
+    my ( $testname, $file, $action, $data, $env ) = @_;
+    my $all_env = { %git_test_env, %{$env} };
     modify_file( $testname, $file, $action, $data );
-    test_ok( $testname, $repo, 'commit', '-m', $testname );
+    test_ok( $testname, $repo, 'commit', '-m', $testname, { env => $all_env } );
     return 1;
 }
 
-sub check_cannot_commit {
-    my ( $testname, $regex, $file, $action, $data ) = @_;
+sub check_cannot_commit {    ## no critic (Subroutines::ProhibitManyArgs)
+    my ( $testname, $regex, $file, $action, $data, $env ) = @_;
+    my $all_env  = { %git_test_env, %{$env} };
     my $filename = modify_file( $testname, $file, $action, $data );
     my $exit =
       $regex
-      ? test_nok_match( $testname, $regex, $repo, 'commit', '-m', $testname )
-      : test_nok( $testname, $repo, 'commit', '-m', $testname );
+      ? test_nok_match( $testname, $regex, $repo, 'commit', '-m', $testname, { env => $all_env } )
+      : test_nok( $testname, $repo, 'commit', '-m', $testname, { env => $all_env } );
     $repo->run(qw/reset --hard/);
     return $exit;
 }
@@ -94,30 +103,34 @@ sub check_cannot_commit {
 setup_repos();
 
 # Normal config
-$repo->run(qw/config user.name My Self/);
-$repo->run(qw/config user.email myself@example.com/);
+$repo->run( qw/config user.name My Self/,             { env => {%git_test_env} } );
+$repo->run( qw/config user.email myself@example.com/, { env => {%git_test_env} } );
 
 # Overriding variables (because you never know...)
-$ENV{'GIT_AUTHOR_NAME'}     = 'My Self';
-$ENV{'GIT_AUTHOR_EMAIL'}    = 'myself@example.com';
-$ENV{'GIT_COMMITTER_NAME'}  = 'My Self';
-$ENV{'GIT_COMMITTER_EMAIL'} = 'myself@example.com';
+my %env = (
+    GIT_AUTHOR_NAME     => 'My Self',
+    GIT_AUTHOR_EMAIL    => 'myself@example.com',
+    GIT_COMMITTER_NAME  => 'My Self',
+    GIT_COMMITTER_EMAIL => 'myself@example.com',
+);
 
-check_can_commit( 'commit sans configuration', 'file.txt' );
+check_can_commit( 'commit sans configuration', 'file.txt', undef, undef, \%env );
 
-check_can_commit( 'commit .mailmap', '.mailmap', 'truncate', $mailmap );
+check_can_commit( 'commit .mailmap', '.mailmap', 'truncate', $mailmap, \%env );
 
-$repo->run(qw/config githooks.plugin Git::MoreHooks::CheckCommitAuthorFromMailmap/);
+$repo->run( qw/config githooks.plugin Git::MoreHooks::CheckCommitAuthorFromMailmap/, { env => {%git_test_env} } );
 
-check_cannot_commit( 'fail commit file', undef, 'file.txt' );
+check_cannot_commit( 'fail commit file', undef, 'file.txt', undef, undef, \%env );
 
-$repo->run(qw/config user.name MeIMyself/);
-$repo->run(qw/config user.email me.myself@comp.xx/);
-$ENV{'GIT_AUTHOR_NAME'}     = 'MeIMyself';
-$ENV{'GIT_AUTHOR_EMAIL'}    = 'me.myself@comp.xx';
-$ENV{'GIT_COMMITTER_NAME'}  = 'MeIMyself';
-$ENV{'GIT_COMMITTER_EMAIL'} = 'me.myself@comp.xx';
+$repo->run( qw/config user.name MeIMyself/,          { env => {%git_test_env} } );
+$repo->run( qw/config user.email me.myself@comp.xx/, { env => {%git_test_env} } );
+%env = (
+    GIT_AUTHOR_NAME     => 'MeIMyself',
+    GIT_AUTHOR_EMAIL    => 'me.myself@comp.xx',
+    GIT_COMMITTER_NAME  => 'MeIMyself',
+    GIT_COMMITTER_EMAIL => 'me.myself@comp.xx',
+);
 
-check_can_commit( 'commit file', 'file.txt' );
+check_can_commit( 'commit file', 'file.txt', undef, undef, \%env );
 
 done_testing();

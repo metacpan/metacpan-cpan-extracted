@@ -23,4 +23,10 @@ for my $mod (@mods) {
     my $str = defined($ver) ? $ver : 'undef';
     diag(sprintf("%12s %s\n", $str, $mod));
 }
+
+diag("");
+diag(sprintf("%12s %s\n", 'Version', 'Library'));
+diag(sprintf("%12s %s\n", '-------', '-------'));
+my $GMP_version = Math::BigInt::GMP::gmp_version();
+diag(sprintf("%12s %s\n", $GMP_version || '-', 'GMP'));
 diag("");

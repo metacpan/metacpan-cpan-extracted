@@ -1,5 +1,59 @@
 [
     {
+        "description": "type checks",
+        "schema": {
+            "$comment": "on some architectures, some of these values may decode to strings",
+            "type": "integer"
+        },
+        "tests": [
+            {
+                "description": "beyond int64 lower boundary",
+                "data": -9223372036854775809,
+                "valid": true
+            },
+            {
+                "description": "int64 lower boundary",
+                "data": -9223372036854775808,
+                "valid": true
+            },
+            {
+                "description": "beyond int32 lower boundary",
+                "data": -2147483649,
+                "valid": true
+            },
+            {
+                "description": "int32 lower boundary",
+                "data": -2147483648,
+                "valid": true
+            },
+            {
+                "description": "zero",
+                "data": 0,
+                "valid": true
+            },
+            {
+                "description": "int32 upper boundary",
+                "data": 2147483647,
+                "valid": true
+            },
+            {
+                "description": "beyond int32 upper boundary",
+                "data": 2147483648,
+                "valid": true
+            },
+            {
+                "description": "int64 upper boundary",
+                "data": 9223372036854775807,
+                "valid": true
+            },
+            {
+                "description": "beyond int64 upper boundary",
+                "data": 9223372036854775808,
+                "valid": true
+            }
+        ]
+    },
+    {
         "description": "int32 format",
         "schema": {
             "$schema": "https://spec.openapis.org/oas/3.1/dialect/base",
@@ -12,7 +66,7 @@
                 "valid": true
             },
             {
-                "description": "too small",
+                "description": "beyond lower boundary",
                 "data": -2147483649,
                 "valid": false
             },
@@ -32,7 +86,7 @@
                 "valid": true
             },
             {
-                "description": "too large",
+                "description": "beyond upper boundary",
                 "data": 2147483648,
                 "valid": false
             }
@@ -51,7 +105,7 @@
                 "valid": true
             },
             {
-                "description": "too small",
+                "description": "beyond lower boundary",
                 "data": -9223372036854775809,
                 "valid": false
             },
@@ -71,7 +125,7 @@
                 "valid": true
             },
             {
-                "description": "too large",
+                "description": "beyond upper boundary",
                 "data": 9223372036854775808,
                 "valid": false
             }
@@ -90,7 +144,7 @@
                 "valid": true
             },
             {
-                "description": "very small",
+                "description": "beyond int32 lower boundary",
                 "data": -2147483649,
                 "valid": true
             },
@@ -105,12 +159,17 @@
                 "valid": true
             },
             {
+                "description": "π",
+                "data": 3.14159265358979,
+                "valid": true
+            },
+            {
                 "description": "int32 upper boundary",
                 "data": 2147483647,
                 "valid": true
             },
             {
-                "description": "very large",
+                "description": "beyond int32 upper boundary",
                 "data": 2147483648,
                 "valid": true
             }
@@ -129,7 +188,7 @@
                 "valid": true
             },
             {
-                "description": "very small",
+                "description": "beyond int32 lower boundary",
                 "data": -2147483649,
                 "valid": true
             },
@@ -144,12 +203,17 @@
                 "valid": true
             },
             {
+                "description": "π",
+                "data": 3.14159265358979,
+                "valid": true
+            },
+            {
                 "description": "int32 upper boundary",
                 "data": 2147483647,
                 "valid": true
             },
             {
-                "description": "very large",
+                "description": "beyond int32 upper boundary",
                 "data": 2147483648,
                 "valid": true
             }

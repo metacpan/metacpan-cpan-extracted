@@ -4,33 +4,45 @@ use warnings;
 # ABSTRACT: Use 'unknown' values instead of undef ones
 
 package Unknown::Values;
-$Unknown::Values::VERSION = '0.006';
+$Unknown::Values::VERSION = '0.100';
 use 5.01000;
 use Unknown::Values::Instance;
 use Unknown::Values::Instance::Fatal;
+use Unknown::Values::Instance::Object;
+use Carp ();
 
 use Scalar::Util 'blessed';
 
 sub import {
-    my $class  = shift;
-    my $caller = caller;
-    
+    my $class         = shift;
+    my $caller        = caller;
     my $unknown_class = 'Unknown::Values::Instance';
-    if ( @_ && 'fatal' eq $_[0] ) {
-        $unknown_class = 'Unknown::Values::Instance::Fatal';
+    if (@_) {
+        if ( ':FATAL' eq $_[0] ) {
+            $unknown_class = 'Unknown::Values::Instance::Fatal';
+        }
+        elsif ( ':OBJECT' eq $_[0] ) {
+            $unknown_class = 'Unknown::Values::Instance::Object';
+        }
+        else {
+            Carp::croak("I don't know how to create an Unknown::Values object of type '$_[0]'");
+        }
     }
     my $unknown        = $unknown_class->new;
     my $unknown_sub    = "${caller}::unknown";
     my $is_unknown_sub = "${caller}::is_unknown";
     no strict 'refs';
-    *$unknown_sub = sub () {$unknown};
+    *$unknown_sub    = sub {$unknown};
     *$is_unknown_sub = \&is_unknown;
 }
 
 sub is_unknown(_) {
     defined $_[0]
       && blessed( $_[0] )
-      && $_[0]->isa("Unknown::Values::Instance");
+      && (
+        # Unknown::Values::Instance::Object overrides isa()
+        ( 'Unknown::Values::Instance::Object' eq ref $_[0] ) || $_[0]->isa("Unknown::Values::Instance")
+      );
 }
 
 1;
@@ -47,7 +59,7 @@ Unknown::Values - Use 'unknown' values instead of undef ones
 
 =head1 VERSION
 
-version 0.006
+version 0.100
 
 =head1 SYNOPSIS
 
@@ -69,13 +81,24 @@ version 0.006
 
 Or:
 
-    use Unknown::Values 'fatal';
+    use Unknown::Values ':FATAL';
     my $value = unknown;
 
     if ( 3 < $value ) { ... } # fatal error
 
     if ( is_unknown $value ) { # not a fatal error
         ...
+    }
+
+Or:
+
+    # see documentation Unknown::Values::Instance::Object
+    use Unknown::Values ':OBJECT';    # NULL Object pattern
+
+    my $employee = unknown;
+
+    if ( $employee->salary < $threshold ) {
+        # we will never get to here
     }
 
 =head1 DESCRIPTION
@@ -155,6 +178,15 @@ In other words, you're probably getting garbage.
 A safer replacement for C<undef>. Conceptually, C<unknown> behaves very
 similarly to SQL's C<NULL>.
 
+Note that comparisons will return false, but stringification is always a fatal
+This ensures that you cannot accidentally use unknown values as hash keys or
+array indices:
+
+    my $unknown = Person->fetch($id);
+    print $unknown;             # fatal
+    $cache{$unknown}   = $id;   # fatal
+    $ordered[$unknown] = $id;   # fatal
+
 =head2 C<is_unknown>
 
     if ( is_unknown $value ) { ... }
@@ -190,8 +222,21 @@ Defaults to C<$_>:
         }
     }
 
-If you have specified C<< use Unknown::Values 'fatal' >>, this is the I<only>
+If you have specified C<< use Unknown::Values ':FATAL' >>, this is the I<only>
 safe use for C<unknown> values. Any other use is fatal.
+
+=head1 NULL Objects
+
+If you're a fan of the NULL object pattern, you can do this:
+
+    use Unknown::Values ':OBJECT';
+
+    my $unknown = unknown;
+    if ( $unknown->foo->bar->baz > $limit ) {
+        # we will never get here
+    }
+
+See L<Unknown::Values::Instance::Object> for more information.
 
 =head1 SORTING
 
@@ -466,7 +511,7 @@ Curtis "Ovid" Poe <ovid@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Curtis "Ovid" Poe.
+This software is copyright (c) 2021 by Curtis "Ovid" Poe.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

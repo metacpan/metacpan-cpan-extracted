@@ -2,8 +2,10 @@
 Changes
 LICENSE
 MANIFEST
+META.json
 META.yml
 Makefile.PL
+README
 SIGNATURE
 cpanfile
 dist.ini
@@ -19,3 +21,4 @@ t/author-pod-spell.t
 t/testdata/sample-qr-code-keys.json
 t/testdata/sample-qr-code.pdf
 t/testdata/sample-qr-code.png
+t/testdata/sample-qr-code.svg

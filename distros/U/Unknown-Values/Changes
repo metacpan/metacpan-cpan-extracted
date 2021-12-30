@@ -1,5 +1,12 @@
 Revision history for Perl extension Unknown::Values.
 
+0.100   December 29, 2021
+        - Breaking change: stringification of unknown values is now fatal
+          This is to case fatal errors if you try to use an unknown value as a
+          hash key or an array index.
+        - Added support for the NULL object pattern (use Unknown::Values ':OBJECT')
+        - Fatal unknown values are now loaded via (use Unknown::Values ':FATAL')
+
 0.006   December 13, 2021
         - Test::Difference's eq_or_diff seems to have caused some grief with this module
           (internally trying to dereference my data). is_deeply doesn't cause the

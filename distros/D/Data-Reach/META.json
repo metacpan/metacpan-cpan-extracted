@@ -24,7 +24,7 @@
             "Carp" : "0",
             "Scalar::Util" : "0",
             "overload" : "0",
-            "perl" : "5.01"
+            "perl" : "5.014"
          }
       },
       "test" : {
@@ -38,7 +38,7 @@
    "provides" : {
       "Data::Reach" : {
          "file" : "lib/Data/Reach.pm",
-         "version" : "2.00"
+         "version" : "2.01"
       }
    },
    "release_status" : "stable",
@@ -50,6 +50,6 @@
          "url" : "https://github.com/damil/Data-Reach"
       }
    },
-   "version" : "2.00",
+   "version" : "2.01",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

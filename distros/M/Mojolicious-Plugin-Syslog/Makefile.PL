@@ -16,7 +16,7 @@ my %WriteMakefileArgs = (
 }
 ,
   PREREQ_PM      => {
-  'Mojolicious' => '8.00',
+  'Mojolicious' => '9.20',
   'Sys::Syslog' => '0.35'
 }
 ,

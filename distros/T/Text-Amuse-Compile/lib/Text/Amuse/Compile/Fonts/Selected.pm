@@ -116,12 +116,21 @@ STANDARD
 \usepackage{bookmark}
 HYPERREF
     }
+    # main language
+    my $orig_lang = $args{lang} || 'english';
+
+    if ($orig_lang eq 'chinese') {
+        push @out, "\\usepackage[chinese, provide=*]{babel}";
+        push @out, "\\usepackage[heading=true]{ctex}";
+        # foreach my $slot (qw/main mono sans/) {
+        #     # original lang
+        #     push @out, "\\setCJK${slot}font{" . $self->$slot->name . "}";
+        # }
+        return join("\n", @out);
+    }
 
     push @out, "\\usepackage{fontspec}";
     push @out, "\\usepackage{polyglossia}";
-
-    # main language
-    my $orig_lang = $args{lang} || 'english';
 
     my %aliases = (
                    # pre texlive-2020

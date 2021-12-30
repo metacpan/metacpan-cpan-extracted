@@ -41,7 +41,7 @@ is_deeply($curry->(1), [ $foo, 1 ], 'Curried weak object call');
 
 my $curry2 = $foo->curry::weak::_('foo');
 
-is_deeply($curry->(1), [ $foo, 1 ], 'Curried weak string method call');
+is_deeply($curry2->(1), [ $foo, 1 ], 'Curried weak string method call');
 
 weaken($weak_foo = $foo);
 

@@ -5,7 +5,7 @@ package OpenAPI::Modern;
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -247,8 +247,7 @@ sub _find_path ($self, $state, $request, $options) {
     $path_template = $options->{path_template};
 
     my $path_item = $self->openapi_document->schema->{paths}{$path_template};
-    abort({ %$state, keyword => 'paths', _schema_path_suffix => $path_template },
-      'missing path-item "%s"', $path_template) if not $path_item;
+    abort({ %$state, keyword => 'paths' }, 'missing path-item "%s"', $path_template) if not $path_item;
 
     my $method = lc $request->method;
     abort({ %$state, schema_path => jsonp('/paths', $path_template), keyword => $method },
@@ -503,7 +502,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI docume
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 

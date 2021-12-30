@@ -10,10 +10,11 @@ use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use Test::More 0.96;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
-use Test::JSON::Schema::Acceptance;
+use Test::JSON::Schema::Acceptance 1.014;
 use Test::File::ShareDir -share => { -dist => { 'JSON-Schema-Modern-Document-OpenAPI' => 'share' } };
 use File::ShareDir 'dist_dir';
 use Path::Tiny;
+use Config;
 use JSON::Schema::Modern;
 use JSON::Schema::Modern::Document::OpenAPI;
 
@@ -23,7 +24,7 @@ my $accepter = Test::JSON::Schema::Acceptance->new(
   test_schemas => -d '.git' || $ENV{AUTHOR_TESTING},
   specification => 'draft2020-12',
   include_optional => 0,
-  test_dir => 't/oas-invalid-schemas',
+  test_dir => 't/oas-vocabulary',
 );
 
 my $js = JSON::Schema::Modern->new(
@@ -45,10 +46,6 @@ my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
 );
 
 $accepter->acceptance(
-  $ENV{NO_TODO} ? () : ( todo_tests => [
-    # requires bigint/bignum support in JSON::Schema::Modern
-    { file => 'formats.json', group_description => 'int64 format', test_description => [ 'too small', 'upper boundary', 'too large' ] }
-  ] ),
   validate_data => sub ($schema, $instance_data) {
     my $result = $js->evaluate($instance_data, $schema);
 
@@ -65,5 +62,8 @@ $accepter->acceptance(
   },
   @ARGV ? (tests => { file => \@ARGV }) : (),
 );
+
+path('t/results/oas-vocabulary.txt')->spew_utf8($accepter->results_text)
+  if -d '.git' or $ENV{AUTHOR_TESTING} or $ENV{RELEASE_TESTING};
 
 done_testing;

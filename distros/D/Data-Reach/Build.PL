@@ -18,7 +18,7 @@ my $builder = Module::Build->new(
         'Object::MultiType'=> 0,
     },
     requires => {
-        perl                => 5.010,
+        perl                => 5.014,
         'overload'          => 0,
         'Carp'              => 0,
         'Scalar::Util'      => 0,

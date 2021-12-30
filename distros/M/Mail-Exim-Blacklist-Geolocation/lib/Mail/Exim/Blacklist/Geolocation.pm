@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = 1.001;
+our $VERSION = 1.002;
 
 use Exporter qw(import);
 use IP::Geolocation::MMDB;
@@ -50,7 +50,7 @@ Mail::Exim::Blacklist::Geolocation - Map IP addresses to country codes
 
 =head1 VERSION
 
-version 1.001
+version 1.002
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ version 1.001
 
 A Perl module for the Exim mailer that maps IP addresses to two-letter country
 codes such as "DE", "FR" and "US".  SpamAssassin can use these country codes
-to filter junk e-mail.
+to filter junk email.
 
 =head1 SUBROUTINES/METHODS
 
@@ -106,12 +106,12 @@ the message header.
     accept
 
 Add a rule to your SpamAssassin configuration that increases the spam score if
-the message is sent from a country that is not whitelisted.
+the message is sent from a country that you usually don't get email from.
 
   bayes_ignore_header X-Sender-Host-Country
 
   header UNCOMMON_COUNTRY X-Sender-Host-Country !~ /^(?:DE|FR|US)/ [if-unset: US]
-  describe UNCOMMON_COUNTRY Message is sent from non-whitelisted country
+  describe UNCOMMON_COUNTRY Message is sent from uncommon country
   tflags UNCOMMON_COUNTRY noautolearn
   score UNCOMMON_COUNTRY 0.1
 
@@ -124,7 +124,7 @@ and North America is:
 Combine your new rule with other rules.
 
   meta SUSPICIOUS_BULKMAIL UNCOMMON_COUNTRY && (DCC_CHECK || RAZOR2_CHECK)
-  describe SUSPICIOUS_BULKMAIL Fuzzy checksum and from non-whitelisted country
+  describe SUSPICIOUS_BULKMAIL Bulk email from uncommon country
   tflags SUSPICIOUS_BULKMAIL net
   score SUSPICIOUS_BULKMAIL 1.5
 

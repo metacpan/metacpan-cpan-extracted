@@ -18,14 +18,14 @@ name: Data-Reach
 provides:
   Data::Reach:
     file: lib/Data/Reach.pm
-    version: '2.00'
+    version: '2.01'
 requires:
   Carp: '0'
   Scalar::Util: '0'
   overload: '0'
-  perl: '5.01'
+  perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/damil/Data-Reach
-version: '2.00'
+version: '2.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

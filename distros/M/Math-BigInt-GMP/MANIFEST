@@ -29,6 +29,7 @@ t/mbimbf.inc
 t/mbimbf.t
 t/storable.t
 t/threads.t
+t/version.t
 TODO
 typemap
 xt/author/lib-arithmetic-binary-_add.dat

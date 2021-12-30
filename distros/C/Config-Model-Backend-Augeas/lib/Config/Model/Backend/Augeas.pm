@@ -33,7 +33,7 @@ my $has_augeas = 1;
 eval { require Config::Augeas; };
 $has_augeas = 0 if $@;
 
-our $VERSION = '0.125';
+our $VERSION = '0.126';
 
 my $logger = get_logger('Backend::Augeas');
 
@@ -47,18 +47,14 @@ Config::Model::Backend::Augeas - Read and write config data through Augeas
   {
    config_class_name => 'OpenSsh::Sshd',
 
-   # try Augeas and fall-back with custom method
-   read_config  => [ { backend => 'augeas' , 
-                       file => '/etc/ssh/sshd_config',
-                       # declare "seq" Augeas elements 
-                       sequential_lens => [/AcceptEnv AllowGroups [etc]/],
-                     },
-                     { backend => 'custom' , # dir hardcoded in custom class
-                       class => 'Config::Model::Sshd' 
-                     }
-                   ],
-   # write_config will be written using read_config specifications
+   read_config  => {
+      backend => 'augeas' ,
+      file => '/etc/ssh/sshd_config',
+      # declare "seq" Augeas elements
+      sequential_lens => [/AcceptEnv AllowGroups [etc]/],
+   },
 
+   # config is written back using read_config specifications
 
    element => ...
   }
@@ -67,7 +63,7 @@ Config::Model::Backend::Augeas - Read and write config data through Augeas
 
 This class provides a way to load or store configuration data through
 L<Config::Augeas>. This way, the structure and comments of the
-original configuration file will preserved.
+original configuration file are preserved.
 
 To use Augeas as a backend, you must specify the following
 C<read_config> parameters:
@@ -97,14 +93,13 @@ for details.
 
 For instance:
 
-   read_config  => [ { backend => 'augeas' , 
-                       save   => 'backup',
-                       file => '/etc/ssh/sshd_config',
-                       # declare "seq" Augeas elements 
-                       sequential_lens => [/AcceptEnv AllowGroups/],
-                     },
-                   ],
-
+   read_config  => {
+       backend => 'augeas' ,
+       save   => 'backup',
+       file => '/etc/ssh/sshd_config',
+       # declare "seq" Augeas elements
+       sequential_lens => [/AcceptEnv AllowGroups/],
+    },
 
 =head2 Sequential lens
 
@@ -151,8 +146,9 @@ Augeas will have this tree:
  /files/etc/ssh/sshd_config/AcceptEnv[2]/4
  /files/etc/ssh/sshd_config/AcceptEnv[2]/5
 
-Note that the first index between squarekeeps track of how are grouped
-the C<AcceptEnv> data, but the I<real> list index is after the slash.
+Note that the first index between square brackets keeps track of how
+the C<AcceptEnv> items are grouped, but the I<real> list index is
+after the slash.
 
 Augeas does not require new elements to create C<AcceptEnv[3]>. A new
 element can be added as :
@@ -251,11 +247,11 @@ sub read {
     # the model. I.e if the file "root" matches a list element (like
     # for /etc/hosts), get this element name from "set_in" parameter
     my $set_in = $args{set_in} || '';
-    map {
-        s!$mainpath!!;
-        $_ = "/$set_in/$_" if $set_in;
-        s!/+!/!g;
-    } @cm_path;
+    foreach my $path (@cm_path) {
+        $path =~ s!$mainpath!!;
+        $path = "/$set_in/$path" if $set_in;
+        $path  =~ s!/+!/!g;
+    }
 
     # Create a hash of sequential lenses
     my %is_seq_lens = map { ( $_ => 1 ); } @{ $args{sequential_lens} || [] };
@@ -501,7 +497,9 @@ sub list_element_cb {
         # fail. But Augeas does return foo/1 if only one element is
         # present in the tree :-/
         my $replace = $element_name . '[1]';
-        map { s/$element_name(?!\[)/$replace/ } @matches;
+        foreach (@matches) {
+            s/$element_name(?!\[)/$replace/;
+        }
     }
 
     my $logger = get_logger("Data::Write");
@@ -585,7 +583,9 @@ sub hash_element_cb {
     # the tree :-/
     if ($is_seq) {
         my $replace = $element_name . '[1]';
-        map { s/$element_name(?!\[)/$replace/ } @matches;
+        foreach (@matches) {
+            s/$element_name(?!\[)/$replace/;
+        }
     }
 
     my $logger = get_logger('Data::Write');
@@ -666,7 +666,9 @@ sub node_content_cb {
 
         # cleanup indexes are we don't handle them now with element
         # (later in lists and hashes)
-        map { s/\[\d+\]+$//; } @matches;
+        foreach (@matches) {
+            s/\[\d+\]+$//;
+        }
         $logger->debug( "copy_in_augeas: Node path $p matches:\n\t" . join( "\n\t", @matches ), );
 
         # store elements found in Augeas and their corresponding path

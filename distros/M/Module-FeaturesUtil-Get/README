@@ -1,9 +1,10 @@
 NAME
-    Module::FeaturesUtil::Get - Get a feature
+    Module::FeaturesUtil::Get - Get a feature from a module (following
+    Module::Features specification)
 
 VERSION
-    This document describes version 0.004 of Module::FeaturesUtil::Get (from
-    Perl distribution Module-FeaturesUtil-Get), released on 2021-02-26.
+    This document describes version 0.005 of Module::FeaturesUtil::Get (from
+    Perl distribution Module-FeaturesUtil-Get), released on 2021-07-31.
 
 SYNOPSIS
      use Module::FeaturesUtil::Get qw(
@@ -28,6 +29,8 @@ SYNOPSIS
      }
 
 DESCRIPTION
+    See "GLOSSARY" in Module::Features for terminology.
+
 FUNCTIONS
   get_feature_set_spec
     Usage:
@@ -94,7 +97,8 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-Module-FeaturesUtil-Get/issues>
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Module-FeaturesUtil-G
+    et>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.

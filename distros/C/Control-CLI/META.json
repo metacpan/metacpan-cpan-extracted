@@ -39,15 +39,18 @@
    "provides" : {
       "Control::CLI" : {
          "file" : "lib/Control/CLI.pm",
-         "version" : "2.09"
+         "version" : "2.10"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Control-CLI"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "2.09",
+   "version" : "2.10",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

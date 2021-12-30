@@ -24,7 +24,7 @@ struct promise {
 };
 
 Promise* promise_alloc(UV refcount) {
-	Promise* result = PerlMemShared_calloc(1, sizeof(Promise));
+	Promise* result = calloc(1, sizeof(Promise));
 	MUTEX_INIT(&result->mutex);
 	COND_INIT(&result->condvar);
 	refcount_init(&result->refcount, refcount);
@@ -106,7 +106,7 @@ void promise_refcount_dec(Promise* promise) {
 		COND_DESTROY(&promise->condvar);
 		MUTEX_DESTROY(&promise->mutex);
 		refcount_destroy(&promise->refcount);
-		PerlMemShared_free(promise);
+		free(promise);
 	}
 }
 

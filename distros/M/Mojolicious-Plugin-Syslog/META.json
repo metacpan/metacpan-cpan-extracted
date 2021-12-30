@@ -30,7 +30,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojolicious" : "8.00",
+            "Mojolicious" : "9.20",
             "Sys::Syslog" : "0.35"
          }
       },
@@ -52,7 +52,7 @@
          "web" : "https://github.com/jhthorsen/mojolicious-plugin-syslog"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_contributors" : [
       "Jan Henning Thorsen"
    ],

@@ -40,6 +40,7 @@
             "OPM::Validate" : "1.10",
             "Path::Class" : "0",
             "Sys::Hostname" : "0",
+            "Text::Gitignore" : "0.04",
             "XML::LibXML" : "0",
             "XML::LibXML::PrettyPrint" : "0",
             "perl" : "5.010"
@@ -59,35 +60,35 @@
    "provides" : {
       "OPM::Maker" : {
          "file" : "lib/OPM/Maker.pm",
-         "version" : "1.10"
+         "version" : "1.11"
       },
       "OPM::Maker::Command::build" : {
          "file" : "lib/OPM/Maker/Command/build.pm",
-         "version" : "1.10"
+         "version" : "1.11"
       },
       "OPM::Maker::Command::dbtest" : {
          "file" : "lib/OPM/Maker/Command/dbtest.pm",
-         "version" : "1.10"
+         "version" : "1.11"
       },
       "OPM::Maker::Command::dependencies" : {
          "file" : "lib/OPM/Maker/Command/dependencies.pm",
-         "version" : "1.10"
+         "version" : "1.11"
       },
       "OPM::Maker::Command::filetest" : {
          "file" : "lib/OPM/Maker/Command/filetest.pm",
-         "version" : "1.10"
+         "version" : "1.11"
       },
       "OPM::Maker::Command::index" : {
          "file" : "lib/OPM/Maker/Command/index.pm",
-         "version" : "1.10"
+         "version" : "1.11"
       },
       "OPM::Maker::Command::sopmtest" : {
          "file" : "lib/OPM/Maker/Command/sopmtest.pm",
-         "version" : "1.10"
+         "version" : "1.11"
       },
       "OPM::Maker::Utils" : {
          "file" : "lib/OPM/Maker/Utils.pm",
-         "version" : "1.10"
+         "version" : "1.11"
       }
    },
    "release_status" : "stable",
@@ -102,7 +103,7 @@
          "web" : "https://github.com/reneeb/OPM-Maker"
       }
    },
-   "version" : "1.10",
+   "version" : "1.11",
    "x_contributors" : [
       "Cyrill Novgorodcev <cynovg@pause.org>",
       "Michiel Beijen <michiel.beijen@gmail.com>",

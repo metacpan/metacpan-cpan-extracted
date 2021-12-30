@@ -1,23 +1,23 @@
 # Mail::Exim::Blacklist::Attachments
 
 A Perl module for the [Exim](https://www.exim.org/) mailer that checks email
-attachments for blacklisted filenames.  Common executable, macro-enabled and
-archive file formats are blacklisted.
+attachments for blocked filenames.  Common executable, macro-enabled and
+archive file formats are rejected.
 
     acl_check_mime:
 
       warn
         condition = ${if and{{def:mime_filename} \
          {!match{${lc:$mime_filename}}{\N\.((json|xml)\.gz|zip)$\N}} \
-         {eq{${perl{check_filename}{$mime_filename}}}{blacklisted}}}}
-        set acl_m_blacklisted = yes
+         {eq{${perl{check_filename}{$mime_filename}}}{blocked}}}}
+        set acl_m_blocked = yes
 
       warn
         condition = ${if match{${lc:$mime_filename}}{\N\. *(jar|zip)$\N}}
         decode = default
         condition = ${if eq{${perl{check_zip}{$mime_decoded_filename}}} \
-                           {blacklisted}}
-        set acl_m_blacklisted = yes
+                           {blocked}}
+        set acl_m_blocked = yes
 
       accept
 

@@ -75,3 +75,8 @@ Revision history for Control-CLI-Extreme
 	* Detection of attributes 'is_slx_r' was giving uninitialized value errors on SLX versions 20 and above
 	  as the "r" is now omitted from the version going forward. Attribute 'is_slx_r' will still be set as
 	  SLX versions beyond 20 are implied to be SLX-R code stream
+
+1.06	2021-12-30
+	* Was not correctly detecting the SLX9740
+	* Changed the generic prompt regex to accomodate some Linux distributions where the prompt is coloured
+	  using ANSI escape sequences

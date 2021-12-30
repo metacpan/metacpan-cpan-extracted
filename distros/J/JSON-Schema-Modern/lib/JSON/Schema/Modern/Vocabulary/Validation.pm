@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Validation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Validation vocabulary
 
-our $VERSION = '0.535';
+our $VERSION = '0.536';
 
 use 5.020;
 use Moo;
@@ -16,7 +16,8 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use List::Util 'any';
 use Ref::Util 0.100 'is_plain_arrayref';
-use JSON::Schema::Modern::Utilities qw(is_type is_equal is_elements_unique E assert_keyword_type assert_pattern jsonp);
+use if "$]" >= 5.022, POSIX => 'isinf';
+use JSON::Schema::Modern::Utilities qw(is_type is_equal is_elements_unique E assert_keyword_type assert_pattern jsonp sprintf_num);
 use namespace::clean;
 
 with 'JSON::Schema::Modern::Vocabulary';
@@ -82,7 +83,6 @@ sub _eval_keyword_enum ($self, $data, $schema, $state) {
   my @s; my $idx = 0;
   my %s = ( scalarref_booleans => $state->{scalarref_booleans} );
   return 1 if any { is_equal($data, $_, $s[$idx++] = {%s}) } $schema->{enum}->@*;
-
   return E($state, 'value does not match'
     .(!(grep $_->{path}, @s) ? ''
       : ' (differences start '.join(', ', map 'from item #'.$_.' at "'.$s[$_]->{path}.'"', 0..$#s).')'));
@@ -106,9 +106,19 @@ sub _traverse_keyword_multipleOf ($self, $schema, $state) {
 sub _eval_keyword_multipleOf ($self, $data, $schema, $state) {
   return 1 if not is_type('number', $data);
 
-  my $quotient = $data / $schema->{multipleOf};
-  return 1 if int($quotient) == $quotient and $quotient !~ /^-?Inf$/i;
-  return E($state, 'value is not a multiple of %g', $schema->{multipleOf});
+  if (ref($data) =~ /^Math::Big(?:Int|Float)$/) {
+    my ($quotient, $remainder) = $data->copy->bdiv($schema->{multipleOf});
+    return E($state, 'overflow while calculating quotient') if $quotient->is_inf;
+    return 1 if $remainder == 0;
+  }
+  else {
+    my $quotient = $data / $schema->{multipleOf};
+    return E($state, 'overflow while calculating quotient')
+      if "$]" >= 5.022 ? isinf($quotient) : $quotient =~ /^-?Inf$/i;
+    return 1 if int($quotient) == $quotient;
+  }
+
+  return E($state, 'value is not a multiple of %s', sprintf_num($schema->{multipleOf}));
 }
 
 sub _traverse_keyword_maximum { goto \&_assert_number }
@@ -116,7 +126,7 @@ sub _traverse_keyword_maximum { goto \&_assert_number }
 sub _eval_keyword_maximum ($self, $data, $schema, $state) {
   return 1 if not is_type('number', $data);
   return 1 if $data <= $schema->{maximum};
-  return E($state, 'value is larger than %g', $schema->{maximum});
+  return E($state, 'value is larger than %s', sprintf_num($schema->{maximum}));
 }
 
 sub _traverse_keyword_exclusiveMaximum { goto \&_assert_number }
@@ -124,7 +134,7 @@ sub _traverse_keyword_exclusiveMaximum { goto \&_assert_number }
 sub _eval_keyword_exclusiveMaximum ($self, $data, $schema, $state) {
   return 1 if not is_type('number', $data);
   return 1 if $data < $schema->{exclusiveMaximum};
-  return E($state, 'value is equal to or larger than %g', $schema->{exclusiveMaximum});
+  return E($state, 'value is equal to or larger than %s', sprintf_num($schema->{exclusiveMaximum}));
 }
 
 sub _traverse_keyword_minimum { goto \&_assert_number }
@@ -132,7 +142,7 @@ sub _traverse_keyword_minimum { goto \&_assert_number }
 sub _eval_keyword_minimum ($self, $data, $schema, $state) {
   return 1 if not is_type('number', $data);
   return 1 if $data >= $schema->{minimum};
-  return E($state, 'value is smaller than %g', $schema->{minimum});
+  return E($state, 'value is smaller than %s', sprintf_num($schema->{minimum}));
 }
 
 sub _traverse_keyword_exclusiveMinimum { goto \&_assert_number }
@@ -140,7 +150,7 @@ sub _traverse_keyword_exclusiveMinimum { goto \&_assert_number }
 sub _eval_keyword_exclusiveMinimum ($self, $data, $schema, $state) {
   return 1 if not is_type('number', $data);
   return 1 if $data > $schema->{exclusiveMinimum};
-  return E($state, 'value is equal to or smaller than %g', $schema->{exclusiveMinimum});
+  return E($state, 'value is equal to or smaller than %s', sprintf_num($schema->{exclusiveMinimum}));
 }
 
 sub _traverse_keyword_maxLength { goto \&_assert_non_negative_integer }
@@ -322,7 +332,7 @@ JSON::Schema::Modern::Vocabulary::Validation - Implementation of the JSON Schema
 
 =head1 VERSION
 
-version 0.535
+version 0.536
 
 =head1 DESCRIPTION
 

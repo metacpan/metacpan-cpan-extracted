@@ -5,7 +5,7 @@ use warnings;
 
 package Health::SHC::Validate;
 
-our $VERSION = '0.002';
+our $VERSION = '0.004';
 
 #use IO::Uncompress::RawInflate qw/ rawinflate /;
 #use MIME::Base64 qw/ decode_base64url /;
@@ -42,6 +42,21 @@ Smart Health Card data.
 =item * L<JSON::Parse>
 
 =back
+
+=cut
+
+=head1 COPYRIGHT
+
+The following copyright notice applies to all the files provided in
+this distribution, including binary files, unless explicitly noted
+otherwise.
+
+Copyright 2021 Timothy Legge <timlegge@cpan.org>
+
+=head1 LICENCE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 

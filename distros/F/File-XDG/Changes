@@ -1,5 +1,25 @@
 Revision history for File-XDG
 
+0.11      2021-12-30 05:42:19 -0700
+  - Production release identical to 0.10_01
+
+0.10_01   2021-12-28 10:36:10 -0700
+  - Added option strict (gh#19)
+  - Added exe_dir method (gh#15, gh#18)
+  - Added runtime_home method (gh#15, gh#20, gh#22)
+  - Added state_home method (gh#15, gh#21)
+
+0.09_01   2021-12-27 12:58:16 -0700
+  - Added option path_class (gh#16, gh#17)
+  - Added option api (gh#17)
+  - New experimental API (api => 1)
+    - lookup_config_file and lookup_data_file will use the name passed
+      to the constructor, rather than passed to the method (gh#14, gh#17)
+    - Methods that return a path will return a Path::Tiny object instead
+      of a Path::Class object by default (gh#16, gh#17)
+    - Experimental API will issue a warning, until it becomes stable
+      (on the release of 1.00) (gh#17)
+
 0.08      2021-10-14 10:59:35 -0600
   - Fix typo which caused confusing diagnostic when an invalid
     key is passed into the constructor (gh#12, gh#13)

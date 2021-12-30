@@ -1,3 +1,7 @@
+1.17 2021-12-30T13:21:45Z
+
+    - schwartzmon: 'Not an ARRAY reference' in DBSet::add for at least v5.16.3 GH#12 (@trwww++)
+
 1.16 2021-07-16T07:49:43Z
 
     - Add ability to disable job randomization GH#9 (@jamadam++)

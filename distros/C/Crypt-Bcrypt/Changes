@@ -1,4 +1,8 @@
 Revision history for Crypt-Bcrypt
 
+0.002     2021-12-29 23:05:29+01:00 Europe/Amsterdam
+          - Convert to MakeMaker
+          - Include optimized version for x86
+
 0.001     2021-12-29 01:10:27+01:00 Europe/Amsterdam
           Initial release to an unsuspecting world

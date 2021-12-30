@@ -14,7 +14,7 @@ dist.ini
 lib/IP/Geolocation/MMDB.pm
 t/author-pod-coverage.t
 t/author-pod-syntax.t
-t/data/Test-GeoLite2-Country.mmdb
+t/data/Test-GeoLite2-City.mmdb
 t/mmdb.t
 t/release-kwalitee.t
 typemap

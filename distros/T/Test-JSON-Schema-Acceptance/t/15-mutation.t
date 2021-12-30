@@ -8,6 +8,7 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use Test2::API 'intercept';
 use Test::More 0.88;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
+use Scalar::Util 'dualvar';
 use Test::Deep;
 use Test::JSON::Schema::Acceptance;
 
@@ -18,13 +19,29 @@ foreach my $test (
     my ($thing) = shift;
     $thing->{(keys %$thing)[0]}{$key++} = 'this should not be here';
   } ],
-  [ 'string->integer type mutation' => sub {
+  [ 'string->integer type mutation, explicit numification' => sub {
     my ($thing) = shift;
     $thing->{foo}{string} += 0;
   } ],
-  [ 'integer->string type mutation' => sub {
+  [ 'integer->string type mutation, explicit stringification' => sub {
     my ($thing) = shift;
     $thing->{foo}{int} .= '';
+  } ],
+  [ 'string->integer type mutation, used as a number' => sub {
+    my ($thing) = shift;
+    my $str = sprintf('%d', $thing->{foo}{string});
+  } ],
+  [ 'integer->string type mutation, used as a string' => sub {
+    my ($thing) = shift;
+    my $str = sprintf('%s', $thing->{foo}{int});
+  } ],
+  [ 'string->dualvar' => sub {
+    my ($thing) = shift;
+    $thing->{foo}{string} = dualvar(1, 'one');
+  } ],
+  [ 'integer->dualvar' => sub {
+    my ($thing) = shift;
+    $thing->{foo}{int} = dualvar(1, 'one');
   } ],
   [ 'blessed hash replacement' => sub {
     my ($thing) = shift;
@@ -36,6 +53,10 @@ foreach my $test (
     tie(%hash, 'Tie::StdHash');
     @hash{keys %{$thing->{foo}}} = values %{$thing->{foo}};
     $thing->{foo} = \%hash;
+  } ],
+  [ 'bignum' => sub {
+    my ($thing) = shift;
+    $thing->{foo}{bigint} += 1;
   } ],
 )
 {

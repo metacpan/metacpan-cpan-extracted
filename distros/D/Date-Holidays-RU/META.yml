@@ -26,5 +26,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/nalobin/Date-Holidays-RU.git
-version: 1.2021.1
+version: 1.2022.1
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = 0.002;
+our $VERSION = 0.003;
 
 require XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -45,22 +45,23 @@ __END__
 
 =head1 NAME
 
-IP::Geolocation::MMDB - Map IP addresses to country codes
+IP::Geolocation::MMDB - Read MaxMind DB files
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
   use IP::Geolocation::MMDB;
   my $db = IP::Geolocation::MMDB->new(file => 'GeoIP2-Country.mmdb');
+  my $lookup_result = $db->record_for_address('1.2.3.4');
   my $country_code = $db->getcc('2620:fe::9');
 
 =head1 DESCRIPTION
 
-A Perl module that maps IP addresses to two-letter country codes such as "DE",
-"FR" and "US".
+A Perl module that reads MaxMind DB files and maps IP addresses to two-letter
+country codes such as "DE", "FR" and "US".
 
 =head1 SUBROUTINES/METHODS
 

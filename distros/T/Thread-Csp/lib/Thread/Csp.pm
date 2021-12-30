@@ -1,5 +1,5 @@
 package Thread::Csp;
-$Thread::Csp::VERSION = '0.001';
+$Thread::Csp::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -24,14 +24,14 @@ Thread::Csp - Communicating sequential processes threading for Perl
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 
  # in script.pl
  use Thread::Csp;
- my $input = Thread::Csp::channel->new;
- my $output = Thread::Csp::channel->new;
+ my $input = Thread::Csp::Channel->new;
+ my $output = Thread::Csp::Channel->new;
  Thread::Csp->spawn('Module', 'Module::function', $input, $output);
 
  while (<>) {
@@ -53,15 +53,15 @@ version 0.001
 
 =head1 DESCRIPTION
 
-This module implements share-nothing threads for perl. One crucial difference with C<threads.pm> threads is that the original thread will not be cloned except for the arguments that you pass on thread creation. Channels are used for inter-thread communication one or more channels will nearly always be such creation arguments).
+This module implements share-nothing threads for perl. One crucial difference with C<threads.pm> threads is that the original thread will not be cloned except for the arguments that you pass on thread creation. L<Thread::Csp::Channel|Thread::Csp::Channel>s (also using cloning to get values across) are used for inter-thread communication; one or more channels will nearly always be such creation arguments.
 
-Please note that B<this module is a research project>. In no way is API stability guaranteed. It is released for evaluation purposes only, not for production usage.
+Please note that B<at this stage this module is a research project>. In no way is API stability guaranteed. It is released for evaluation purposes only, not for production usage.
 
 =head1 METHODS
 
 =head2 spawn($module, $sub, @args)
 
-Spawn a new thread. It will load $module and then run C<$sub> (fully-qualified function name) with C<@args> as arguments. It returns a Thread::Csp::Promise that will finish when the thread is finished.
+Spawn a new thread. It will load $module and then run C<$sub> (fully-qualified function name) with C<@args> as arguments. It returns a L<Thread::Csp::Promise|Thread::Csp::Promise> that will finish when the thread is finished.
 
 =head1 AUTHOR
 

@@ -55,6 +55,10 @@ my $build = Module::Build->new(
 			'IO::Interactive'	=> 0,
 		},
 		configure_requires => { 'Module::Build' => 0.36 },
+		meta_merge => {
+			resources => {
+				bugtracker => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Control-CLI'
+			}
+		},
 	);
 $build->create_build_script;
-

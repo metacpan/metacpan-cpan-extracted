@@ -6,12 +6,16 @@ META.yml
 Makefile.PL
 README
 dist.ini
+errors.err
 lib/Unknown/Values.pm
 lib/Unknown/Values/Instance.pm
 lib/Unknown/Values/Instance/Fatal.pm
+lib/Unknown/Values/Instance/Object.pm
 rebuild
 t/basic.t
 t/bits.t
 t/fatal.t
+t/lib/UnknownUtils.pm
 t/logic.t
 t/math.t
+t/objects.t

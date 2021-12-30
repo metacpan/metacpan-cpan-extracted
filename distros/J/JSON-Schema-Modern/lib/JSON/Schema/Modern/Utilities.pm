@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.535';
+our $VERSION = '0.536';
 
 use 5.020;
 use strictures 2;
@@ -45,6 +45,7 @@ our @EXPORT_OK = qw(
   assert_uri_reference
   assert_uri
   annotate_self
+  sprintf_num
   true
   false
 );
@@ -67,20 +68,21 @@ sub is_type ($type, $value) {
   }
 
   if ($type eq 'string' or $type eq 'number' or $type eq 'integer') {
-    return 0 if not defined $value or is_ref($value);
+    return 0 if not defined $value;
     my $flags = B::svref_2object(\$value)->FLAGS;
 
     if ($type eq 'string') {
-      return $flags & B::SVf_POK && !($flags & (B::SVf_IOK | B::SVf_NOK));
+      return !is_ref($value) && $flags & B::SVf_POK && !($flags & (B::SVf_IOK | B::SVf_NOK));
     }
 
-    # FIXME: Storable twiddles the PV flag when isUV. https://github.com/Perl/perl5/issues/19296
     if ($type eq 'number') {
-      return (!($flags & B::SVf_POK) || $flags & B::SVf_IVisUV) && ($flags & (B::SVf_IOK | B::SVf_NOK));
+      return ref($value) =~ /^Math::Big(?:Int|Float)$/
+        || !($flags & B::SVf_POK) && ($flags & (B::SVf_IOK | B::SVf_NOK))
     }
 
     if ($type eq 'integer') {
-      return (!($flags & B::SVf_POK) || $flags & B::SVf_IVisUV) && ($flags & (B::SVf_IOK | B::SVf_NOK))
+      return (ref($value) =~ /^Math::Big(?:Int|Float)$/
+          || !($flags & B::SVf_POK) && ($flags & (B::SVf_IOK | B::SVf_NOK)))
         && int($value) == $value;
     }
   }
@@ -100,14 +102,15 @@ sub get_type ($value) {
   return 'array' if is_plain_arrayref($value);
   return 'boolean' if is_bool($value);
 
-  return (blessed($value) ? '' : 'reference to ').ref($value) if is_ref($value);
+  return ref($value) =~ /^Math::Big(?:Int|Float)$/ ? 'number' : (blessed($value) ? '' : 'reference to ').ref($value)
+    if is_ref($value);
 
   my $flags = B::svref_2object(\$value)->FLAGS;
   return 'string' if $flags & B::SVf_POK && !($flags & (B::SVf_IOK | B::SVf_NOK));
-  return 'number' if (!($flags & B::SVf_POK) || $flags & B::SVf_IVisUV) && ($flags & (B::SVf_IOK | B::SVf_NOK));
+  return 'number' if !($flags & B::SVf_POK) && ($flags & (B::SVf_IOK | B::SVf_NOK));
 
   croak sprintf('ambiguous type for %s',
-    JSON::MaybeXS->new(allow_nonref => 1, canonical => 1, utf8 => 0)->encode($value));
+    JSON::MaybeXS->new(allow_nonref => 1, canonical => 1, utf8 => 0, allow_bignum => 1, allow_blessed => 1)->encode($value));
 }
 
 # compares two arbitrary data payloads for equality, as per
@@ -339,6 +342,11 @@ sub annotate_self ($state, $schema) {
     : $schema->{$state->{keyword}});
 }
 
+sub sprintf_num ($value) {
+  # use original value as stored in the NV, without losing precision
+  ref($value) =~ /^Math::Big(?:Int|Float)$/ ? $value->bstr : sprintf('%s', $value);
+}
+
 1;
 
 __END__
@@ -353,7 +361,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.535
+version 0.536
 
 =head1 SYNOPSIS
 
@@ -365,7 +373,7 @@ This class contains internal utilities to be used by L<JSON::Schema::Modern>.
 
 =for Pod::Coverage is_type get_type is_equal is_elements_unique jsonp unjsonp local_annotations
 canonical_uri E A abort assert_keyword_exists assert_keyword_type assert_pattern assert_uri_reference assert_uri
-annotate_self is_uri_reference
+annotate_self is_uri_reference sprintf_num
 
 =head1 SUPPORT
 

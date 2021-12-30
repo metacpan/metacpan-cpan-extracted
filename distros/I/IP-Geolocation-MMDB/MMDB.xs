@@ -2,9 +2,6 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
 #include <maxminddb.h>
 
 typedef struct IP__Geolocation__MMDB {
@@ -30,14 +27,14 @@ decode_entry_data_list(MMDB_entry_data_list_s *entry_data_list, SV **sv, int *mm
          size--) {
       if (MMDB_DATA_TYPE_UTF8_STRING != entry_data_list->entry_data.type) {
         *mmdb_error = MMDB_INVALID_DATA_ERROR;
-         return NULL;
+        return NULL;
       }
       const char *key = entry_data_list->entry_data.utf8_string;
       uint32_t key_size = entry_data_list->entry_data.data_size;
       entry_data_list = entry_data_list->next;
       if (NULL == entry_data_list) {
         *mmdb_error = MMDB_INVALID_DATA_ERROR;
-         return NULL;
+        return NULL;
       }
       SV *val = &PL_sv_undef;
       entry_data_list = decode_entry_data_list(entry_data_list, &val, mmdb_error);
@@ -174,8 +171,7 @@ record_for_address(self, ip_address)
   CODE:
     result = MMDB_lookup_string(self->mmdb, ip_address, &gai_error, &mmdb_error);
     if (0 != gai_error) {
-      error = gai_strerror(gai_error);
-      croak("Couldn't parse IP address \"%s\": %s", ip_address, error);
+      croak("Couldn't parse IP address \"%s\"", ip_address);
     }
     if (MMDB_SUCCESS != mmdb_error) {
       error = MMDB_strerror(mmdb_error);

@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern::Document::OpenAPI; # git description: v0.012-5-gb6173d5
+package JSON::Schema::Modern::Document::OpenAPI; # git description: v0.013-6-gbd6a34c
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -173,10 +173,9 @@ sub _add_vocab_and_default_schemas ($self) {
   my $js = $self->evaluator;
   $js->add_vocabulary('JSON::Schema::Modern::Vocabulary::OpenAPI');
 
-  # note: proper support for int64 requires bigint support in JSM
   $js->add_format_validation(
-    int32 => +{ type => 'integer', sub => sub ($x) { $x >= -2**31 && $x < 2**31 } },
-    int64 => +{ type => 'integer', sub => sub ($x) { $x >= -2**63 && $x < 2**63 } },
+    int32 => +{ type => 'integer', sub => sub ($x) { $x = Math::BigInt->new($x); my $bound = Math::BigInt->new(2) ** 31; $x >= -$bound && $x < $bound } },
+    int64 => +{ type => 'integer', sub => sub ($x) { $x = Math::BigInt->new($x); my $bound = Math::BigInt->new(2) ** 63; $x >= -$bound && $x < $bound } },
     float => +{ type => 'number', sub => sub ($) { 1 } },
     double => +{ type => 'number', sub => sub ($) { 1 } },
     password => +{ type => 'string', sub => sub ($) { 1 } },
@@ -221,7 +220,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 

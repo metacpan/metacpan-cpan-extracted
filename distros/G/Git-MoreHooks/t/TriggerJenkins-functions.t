@@ -1,8 +1,7 @@
 #!perl -T
-use 5.006;
 use strict;
 use warnings;
-use Test::Most;
+use Test2::V0;
 
 use Git::MoreHooks::TriggerJenkins;
 

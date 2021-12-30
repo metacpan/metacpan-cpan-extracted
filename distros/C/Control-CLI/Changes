@@ -157,3 +157,13 @@ Revision history for Control-CLI
 	  match a Query Device Status escape sequence, and this could result in some escape sequences being withheld
 	  from read() attepts if they appeared at the end of host output. Now the caching is only performed if an
 	  escape sequence is found to be an exact partial match of the Query Device Status escape sequence (\e[5n) 
+
+2.10	2021-12-30
+	* The poll() method mechanism added in version 2.06 used to re-credit timeout time to polled objects was
+	  flawed and would result in object methods virtually never timing out. Now the poll timer itself is
+	  subtracted from the calculated time credit so the time credit will only apply if some objects hog time
+	  (e.g. SSH authentication which is blocking) when polled in excess of the poll timer
+	* Changed the default prompt regex from  '.*[\?\$%#>]\s?$'  to  '.*[\?\$%#>](?:\e\[00?m)?\s?$' to accomodate
+	  some Linux distributions where the prompt is coloured using ANSI escape sequences
+	* Changed the default password prompt from '(?i)password[: ]+$' to '(?i)(?<!new )password[: ]+$' so that it
+	  does not match on prompts asking user to enter a NEW password

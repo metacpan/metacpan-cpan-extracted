@@ -3,6 +3,11 @@ use strict;
 use warnings;
 use Path::Tiny;
 
+# ATTENTION DISTRO REPACKAGERS: do NOT use fresh copies of these files
+# from their source; it is important to include the original versions
+# of the files as they were packaged with this cpan distribution, or
+# surprising behaviour may occur.
+
 chomp(my $dirty = `git status --untracked --porcelain share`);
 !length($dirty) and die 'Cannot proceed: share/ is not dirty. Run "git submodule update --remote"';
 

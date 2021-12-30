@@ -1,5 +1,5 @@
 package OPM::Maker::Utils;
-$OPM::Maker::Utils::VERSION = '1.10';
+$OPM::Maker::Utils::VERSION = '1.11';
 # ABSTRACT: Utility functions for OPM::Maker
 
 use strict;
@@ -7,7 +7,12 @@ use warnings;
 
 use Exporter 'import';
 
-our @EXPORT_OK = qw(reformat_size);
+use File::Find::Rule;
+
+our @EXPORT_OK = qw(
+    reformat_size
+    check_args_sopm
+);
 
 sub reformat_size {
     my ($size) = @_;
@@ -28,6 +33,30 @@ sub reformat_size {
     return $+{count} * $factor;
 }
 
+sub check_args_sopm {
+    my ($args, $opm) = @_;
+
+    return if $args and 'ARRAY' ne ref $args;
+
+    my $sopm = $args->[0];
+
+    my @suffixes = $opm ? ('*.opm', '*.sopm') : ('*.sopm');
+
+    if ( !$sopm ) {
+        ($sopm) = map {
+            $_ =~ s{\A\.[/\\]}{};
+            $_;
+        } File::Find::Rule->file->name(@suffixes)->maxdepth(1)->in('.');
+    }
+
+    $sopm //= '';
+
+    my $re = $opm ? 's?opm' : 'sopm';
+    return if $sopm !~ m{\.$re\z} or !-f $sopm;
+
+    return $sopm;
+}
+
 1;
 
 __END__
@@ -42,7 +71,7 @@ OPM::Maker::Utils - Utility functions for OPM::Maker
 
 =head1 VERSION
 
-version 1.10
+version 1.11
 
 =head1 FUNCTIONS
 
@@ -54,6 +83,12 @@ reformat size
   15k   -> 15360        ( 15 * 1024 )
   15m   -> 15728640     ( 15 * 1024 * 1024 )
   15g   -> 16106127360  ( 15 * 1024 * 1024 * 1024)
+
+=head2 check_args_sopm
+
+Checks the given arguments for the .sopm file. If it
+isn't in the arguemnts, OPM::Maker tries to find one
+in the current directory.
 
 =head1 AUTHOR
 

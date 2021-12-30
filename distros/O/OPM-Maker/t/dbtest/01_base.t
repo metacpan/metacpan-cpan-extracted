@@ -15,6 +15,11 @@ my $dir  = File::Spec->rel2abs( dirname __FILE__ );
 my $sopm = File::Spec->catfile( $dir, '..', 'valid', 'TestSMTP', 'TestSMTP.sopm' );
 my $opm  = File::Spec->catfile( $dir, '..', 'valid', 'TestSMTP', 'TestSMTP-0.0.1.opm' );
 
-OPM::Maker::Command::dbtest::execute( undef, {}, [ $sopm ] );
+my $error;
+eval {
+    OPM::Maker::Command::dbtest::execute( undef, {}, [ $sopm ] );
+} or $error = $@;
+
+ok $error;
 
 done_testing();

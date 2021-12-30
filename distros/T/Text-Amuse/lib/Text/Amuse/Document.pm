@@ -253,6 +253,9 @@ sub _language_mapping {
             tr => 'turkish',
             uk => 'ukrainian',
             vi => 'vietnamese',
+            zh => 'chinese',
+            # ja => 'japanese',
+            # ko => 'korean',
            };
 }
 

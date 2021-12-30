@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.016;
+use 5.020;
 
 use ExtUtils::MakeMaker;
 
@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Test-JSON-Schema-Acceptance",
   "LICENSE" => "mit",
-  "MIN_PERL_VERSION" => "5.016",
+  "MIN_PERL_VERSION" => "5.020",
   "NAME" => "Test::JSON::Schema::Acceptance",
   "PREREQ_PM" => {
     "Feature::Compat::Try" => 0,
@@ -31,13 +31,14 @@ my %WriteMakefileArgs = (
     "Moo" => 0,
     "MooX::TypeTiny" => "0.002002",
     "Path::Tiny" => "0.069",
-    "Storable" => "3.00",
+    "Ref::Util" => 0,
     "Test2::API" => 0,
     "Test2::Todo" => 0,
     "Test2::Tools::Compare" => 0,
     "Types::Common::Numeric" => 0,
     "Types::Standard" => "1.010002",
     "constant" => 0,
+    "experimental" => 0,
     "if" => 0,
     "namespace::clean" => 0,
     "strict" => 0,
@@ -48,6 +49,7 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "JSON::PP" => 0,
+    "Scalar::Util" => 0,
     "Test2::Suite" => "0.000131",
     "Test::Deep" => 0,
     "Test::Fatal" => 0,
@@ -60,7 +62,7 @@ my %WriteMakefileArgs = (
     "open" => 0,
     "utf8" => 0
   },
-  "VERSION" => "1.013",
+  "VERSION" => "1.014",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -78,7 +80,8 @@ my %FallbackPrereqs = (
   "Moo" => 0,
   "MooX::TypeTiny" => "0.002002",
   "Path::Tiny" => "0.069",
-  "Storable" => "3.00",
+  "Ref::Util" => 0,
+  "Scalar::Util" => 0,
   "Test2::API" => 0,
   "Test2::Suite" => "0.000131",
   "Test2::Todo" => 0,
@@ -92,6 +95,7 @@ my %FallbackPrereqs = (
   "Types::Common::Numeric" => 0,
   "Types::Standard" => "1.010002",
   "constant" => 0,
+  "experimental" => 0,
   "feature" => 0,
   "if" => 0,
   "lib" => 0,

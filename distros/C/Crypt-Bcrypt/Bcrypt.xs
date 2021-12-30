@@ -3,7 +3,7 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#include "../../src/crypt_blowfish.h"
+#include "crypt_blowfish.h"
 
 #define BCRYPT_HASHSIZE 64
 
@@ -33,6 +33,8 @@ static int timing_safe_strcmp(const char *str1, const char *str2) {
 }
 
 MODULE = Crypt::Bcrypt              PACKAGE = Crypt::Bcrypt
+
+PROTOTYPES: DISABLE
 
 SV*
 _bcrypt_hashpw(const char* password, const char* settings)

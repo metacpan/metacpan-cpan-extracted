@@ -23,12 +23,13 @@ t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/document-schemas.t
 t/document-toplevel.t
-t/oas-invalid-schemas/discriminator.json
-t/oas-invalid-schemas/formats.json
 t/oas-vocabulary.t
+t/oas-vocabulary/discriminator.json
+t/oas-vocabulary/formats.json
 t/openapi-constructor.t
 t/operationIds.t
 t/parameters.t
+t/results/oas-vocabulary.txt
 t/validate_request.t
 t/validate_response.t
 update-schemas

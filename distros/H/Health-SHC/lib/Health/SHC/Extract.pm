@@ -7,7 +7,7 @@ use PostScript::Convert;
 
 package Health::SHC::Extract;
 
-our $VERSION = '0.002';
+our $VERSION = '0.004';
 
 =head1 NAME
 
@@ -19,7 +19,7 @@ Health::SHC::Extract - Extract Smart Health Card QR codes from PDFs or png files
 
     my $shc = Health::SHC::Extract->new();
 
-    my @qrcodes = $shc->extract_qr_from_pdf('t/sample-qr-code.png');
+    my @qrcodes = $shc->extract_qr_from_pdf('t/sample-qr-code.pdf');
 
     my @qrcodes = $shc->extract_qr_from_png('t/sample-qr-code.png');
 
@@ -46,6 +46,21 @@ extract_qr_from_png.
 =item * L<Barcode::ZBar>
 
 =back
+
+=cut
+
+=head1 COPYRIGHT
+
+The following copyright notice applies to all the files provided in
+this distribution, including binary files, unless explicitly noted
+otherwise.
+
+Copyright 2021 Timothy Legge <timlegge@cpan.org>
+
+=head1 LICENCE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 

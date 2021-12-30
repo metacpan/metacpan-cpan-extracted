@@ -1,5 +1,8 @@
 # -*- cperl -*-
 
+use warnings;
+use strict;
+
 # test augeas backend 
 
 # workaround Augeas locale bug
@@ -19,9 +22,6 @@ use version 0.77 ;
 
 use lib 't/lib';
 use LoadTest;
-
-use warnings;
-use strict;
 
 eval { require Config::Augeas ;} ;
 if ( $@ ) {
@@ -149,12 +149,10 @@ SKIP: {
     #my @aug_content = $ssh_augeas_obj->match("/files/etc/ssh/sshd_config/*") ;
     #print join("\n",@aug_content) ;
 
-    my $assign = $Config::Model::VERSION >= 2.052 ? ':=' : ':' ;
-
-    $expect = qq(AcceptEnv${assign}LC_PAPER,LC_NAME,LC_ADDRESS,LC_TELEPHONE,LC_MEASUREMENT,LC_IDENTIFICATION,LC_ALL
-AllowUsers${assign}foo,"bar\@192.168.0.*"
+    $expect = qq(AcceptEnv:=LC_PAPER,LC_NAME,LC_ADDRESS,LC_TELEPHONE,LC_MEASUREMENT,LC_IDENTIFICATION,LC_ALL
+AllowUsers:=foo,"bar\@192.168.0.*"
 HostbasedAuthentication=no
-HostKey${assign}/etc/ssh/ssh_host_key,/etc/ssh/ssh_host_rsa_key,/etc/ssh/ssh_host_dsa_key
+HostKey:=/etc/ssh/ssh_host_key,/etc/ssh/ssh_host_rsa_key,/etc/ssh/ssh_host_dsa_key
 Subsystem:rftp=/usr/lib/openssh/rftp-server
 Subsystem:sftp=/usr/lib/openssh/sftp-server
 Subsystem:tftp=/usr/lib/openssh/tftp-server
@@ -223,6 +221,13 @@ Ciphers=arcfour256,aes192-cbc,aes192-ctr,aes256-cbc,aes256-ctr -
     splice @mod, 32,2, @lines ;
     pop @mod ;
 
+    my $sarko = "Match User sarko Group pres.*\n";
+    if (version->parse($aug_version) ge version->parse('1.13.0')) {
+        # tweak quotes added by augeas since version 1.13.0
+        $mod[32] =~ s/(white.house.\*)/"$1"/;
+        $sarko =~ s/(sarko|pres.\*)/"$1"/g;
+    }
+
     is_deeply([$sshd_config->lines],\@mod,"check content of $sshd_config after Match~1") ;
 
     $sshd_root->load("Match:2 Condition User=sarko Group=pres.* -
@@ -231,9 +236,9 @@ Ciphers=arcfour256,aes192-cbc,aes192-ctr,aes256-cbc,aes256-ctr -
     $i_sshd->write_back ;
 
 
-    push @mod,"Match User sarko Group pres.*\n","Banner /etc/bienvenue2.txt\n";
+    push @mod, $sarko, "Banner /etc/bienvenue2.txt\n";
 
-    my @got = map {s/^[\t ]+//; $_; } $sshd_config->lines;
+    my @got = map {my $t=$_; $t =~ s/^[\t ]+//; $t; } $sshd_config->lines;
     eq_or_diff(\@got,\@mod,"check content of $sshd_config after Match:2 ...") ;
 
     $sshd_root->load("Match:2 Condition User=sarko Group=pres.* -
@@ -245,7 +250,7 @@ Ciphers=arcfour256,aes192-cbc,aes192-ctr,aes256-cbc,aes256-ctr -
     print "mod--\n",map { $i++ . ': '. $_} @mod,"---\n" if $trace ;
     splice @mod,37,0,"AllowTcpForwarding yes\n";
 
-    @got = map {s/^[\t ]+//; $_; } $sshd_config->lines;
+    @got = map {my $t=$_; $t =~ s/^[\t ]+//; $t; } $sshd_config->lines;
     eq_or_diff( \@got,\@mod,"check content of $sshd_config after Match:2 AllowTcpForwarding=yes") ;
 
 } # end SKIP section

@@ -1,29 +1,30 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v1.012-5-g5a236b9
+package Test::JSON::Schema::Acceptance; # git description: v1.013-11-gc922512
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators like JSON::Schema
 
-our $VERSION = '1.013';
+our $VERSION = '1.014';
 
-use 5.016;
+use 5.020;
+use Moo;
+use strictures 2;
+use experimental qw(signatures postderef);
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
-use strictures 2;
 use Test2::API ();
 use Test2::Todo;
 use Test2::Tools::Compare ();
 use JSON::MaybeXS 1.004001;
-use Storable 3.00 ();
 use File::ShareDir 'dist_dir';
-use Moo;
 use Feature::Compat::Try;
 use MooX::TypeTiny 0.002002;
 use Types::Standard 1.010002 qw(Str InstanceOf ArrayRef HashRef Dict Any HasMethods Bool Optional);
 use Types::Common::Numeric 'PositiveOrZeroInt';
 use Path::Tiny 0.069;
 use List::Util 1.33 qw(any max sum0);
+use Ref::Util qw(is_plain_arrayref is_plain_hashref is_ref);
 use namespace::clean;
 
 has specification => (
@@ -36,6 +37,7 @@ has specification => (
 
 # specification version => metaschema URI
 use constant METASCHEMA => {
+  'draft-next'    => 'https://json-schema.org/draft/next/schema',
   'draft2020-12'  => 'https://json-schema.org/draft/2020-12/schema',
   'draft2019-09'  => 'https://json-schema.org/draft/2019-09/schema',
   'draft7'        => 'http://json-schema.org/draft-07/schema#',
@@ -103,15 +105,13 @@ has results_text => (
   builder => '_build_results_text',
 );
 
-around BUILDARGS => sub {
-  my ($orig, $class, @args) = @_;
+around BUILDARGS => sub ($orig, $class, @args) {
   my %args = @args % 2 ? ( specification => 'draft'.$args[0] ) : @args;
   $args{specification} = 'draft2020-12' if ($args{specification} // '') eq 'latest';
   $class->$orig(\%args);
 };
 
-sub BUILD {
-  my $self = shift;
+sub BUILD ($self, @) {
   -d $self->test_dir or die 'test_dir does not exist: '.$self->test_dir;
 }
 
@@ -133,8 +133,7 @@ sub acceptance {
     my $base = 'http://localhost:1234'; # TODO? make this customizable
     $ctx->note('adding resources from '.$self->additional_resources.' with the base URI "'.$base.'"...');
     $self->additional_resources->visit(
-      sub {
-        my ($path) = @_;
+      sub ($path, @) {
         return if not $path->is_file or $path !~ /\.json$/;
         my $data = $self->_json_decoder->decode($path->slurp_raw);
         my $file = $path->relative($self->additional_resources);
@@ -157,27 +156,27 @@ sub acceptance {
     next if $options->{tests} and $options->{tests}{file}
       and not grep $_ eq $one_file->{file},
         (ref $options->{tests}{file} eq 'ARRAY'
-          ? @{$options->{tests}{file}} : $options->{tests}{file});
+          ? $options->{tests}{file}->@* : $options->{tests}{file});
 
     $ctx->note('');
 
-    foreach my $test_group (@{$one_file->{json}}) {
+    foreach my $test_group ($one_file->{json}->@*) {
       next if $options->{tests} and $options->{tests}{group_description}
         and not grep $_ eq $test_group->{description},
           (ref $options->{tests}{group_description} eq 'ARRAY'
-            ? @{$options->{tests}{group_description}} : $options->{tests}{group_description});
+            ? $options->{tests}{group_description}->@* : $options->{tests}{group_description});
 
       my $todo;
       $todo = Test2::Todo->new(reason => 'Test marked TODO via "todo_tests"')
         if $options->{todo_tests}
           and any {
             my $o = $_;
-            (not $o->{file} or grep $_ eq $one_file->{file}, (ref $o->{file} eq 'ARRAY' ? @{$o->{file}} : $o->{file}))
+            (not $o->{file} or grep $_ eq $one_file->{file}, (ref $o->{file} eq 'ARRAY' ? $o->{file}->@* : $o->{file}))
               and
-            (not $o->{group_description} or grep $_ eq $test_group->{description}, (ref $o->{group_description} eq 'ARRAY' ? @{$o->{group_description}} : $o->{group_description}))
+            (not $o->{group_description} or grep $_ eq $test_group->{description}, (ref $o->{group_description} eq 'ARRAY' ? $o->{group_description}->@* : $o->{group_description}))
               and not $o->{test_description}
           }
-          @{$options->{todo_tests}};
+          $options->{todo_tests}->@*;
 
       my $schema_fails;
       if ($self->test_schemas) {
@@ -196,29 +195,29 @@ sub acceptance {
         }
       }
 
-      foreach my $test (@{$test_group->{tests}}) {
+      foreach my $test ($test_group->{tests}->@*) {
         next if $options->{tests} and $options->{tests}{test_description}
           and not grep $_ eq $test->{description},
             (ref $options->{tests}{test_description} eq 'ARRAY'
-              ? @{$options->{tests}{test_description}} : $options->{tests}{test_description});
+              ? $options->{tests}{test_description}->@* : $options->{tests}{test_description});
 
         my $todo;
         $todo = Test2::Todo->new(reason => 'Test marked TODO via deprecated "skip_tests"')
           if ref $options->{skip_tests} eq 'ARRAY'
             and grep +(($test_group->{description}.' - '.$test->{description}) =~ /$_/),
-              @{$options->{skip_tests}};
+              $options->{skip_tests}->@*;
 
         $todo = Test2::Todo->new(reason => 'Test marked TODO via "todo_tests"')
           if $options->{todo_tests}
             and any {
               my $o = $_;
-              (not $o->{file} or grep $_ eq $one_file->{file}, (ref $o->{file} eq 'ARRAY' ? @{$o->{file}} : $o->{file}))
+              (not $o->{file} or grep $_ eq $one_file->{file}, (ref $o->{file} eq 'ARRAY' ? $o->{file}->@* : $o->{file}))
                 and
-              (not $o->{group_description} or grep $_ eq $test_group->{description}, (ref $o->{group_description} eq 'ARRAY' ? @{$o->{group_description}} : $o->{group_description}))
+              (not $o->{group_description} or grep $_ eq $test_group->{description}, (ref $o->{group_description} eq 'ARRAY' ? $o->{group_description}->@* : $o->{group_description}))
                 and
-              (not $o->{test_description} or grep $_ eq $test->{description}, (ref $o->{test_description} eq 'ARRAY' ? @{$o->{test_description}} : $o->{test_description}))
+              (not $o->{test_description} or grep $_ eq $test->{description}, (ref $o->{test_description} eq 'ARRAY' ? $o->{test_description}->@* : $o->{test_description}))
             }
-            @{$options->{todo_tests}};
+            $options->{todo_tests}->@*;
 
         my $result = $self->_run_test($one_file, $test_group, $test, $options);
         $result = 0 if $schema_fails;
@@ -250,9 +249,7 @@ sub acceptance {
   $ctx->release;
 }
 
-sub _run_test {
-  my ($self, $one_file, $test_group, $test, $options) = @_;
-
+sub _run_test ($self, $one_file, $test_group, $test, $options) {
   my $test_name = $one_file->{file}.': "'.$test_group->{description}.'" - "'.$test->{description}.'"';
 
   my $pass; # ignores TODO status
@@ -261,24 +258,16 @@ sub _run_test {
     sub {
       my ($result, $schema_before, $data_before, $schema_after, $data_after);
       try {
-        {
-          local $Storable::flags = Storable::BLESS_OK | Storable::TIE_OK;
-          local $Storable::canonical = 1;
-          ($schema_before, $data_before) = map Storable::freeze(\$_),
-            $test_group->{schema}, $test->{data};
-        }
+        ($schema_before, $data_before) = map $self->_json_decoder->encode($_),
+          $test_group->{schema}, $test->{data};
 
         $result = $options->{validate_data}
           ? $options->{validate_data}->($test_group->{schema}, $test->{data})
             # we use the decoder here so we don't prettify the string
           : $options->{validate_json_string}->($test_group->{schema}, $self->_json_decoder->encode($test->{data}));
 
-        {
-          local $Storable::flags = Storable::BLESS_OK | Storable::TIE_OK;
-          local $Storable::canonical = 1;
-          ($schema_after, $data_after) = map Storable::freeze(\$_),
-            $test_group->{schema}, $test->{data};
-        }
+        ($schema_after, $data_after) = map $self->_json_decoder->encode($_),
+          $test_group->{schema}, $test->{data};
 
         my $ctx = Test2::API::context;
 
@@ -294,10 +283,32 @@ sub _run_test {
           $pass = 1;
         }
 
-        $pass &&= Test2::Tools::Compare::is($data_after, $data_before, 'evaluator did not mutate data')
-          if $data_before ne $data_after;
-        $pass &&= Test2::Tools::Compare::is($schema_after, $schema_before, 'evaluator did not mutate schema')
-          if $schema_before ne $schema_after;
+        my @mutated_data_paths = $self->_mutation_check($test->{data});
+        my @mutated_schema_paths = $self->_mutation_check($test_group->{schema});
+
+        if ($data_before ne $data_after or @mutated_data_paths) {
+          if ($data_before ne $data_after) {
+            Test2::Tools::Compare::is($data_after, $data_before, 'evaluator did not mutate data');
+          }
+          else {
+            $ctx->fail('evaluator did not mutate data');
+          }
+
+          $ctx->note('mutated data at location'.(@mutated_data_paths > 1 ? 's' : '').': '.join(', ', @mutated_data_paths)) if @mutated_data_paths;
+          $pass = 0;
+        }
+
+        if ($schema_before ne $schema_after or @mutated_schema_paths) {
+          if ($schema_before ne $schema_after) {
+            Test2::Tools::Compare::is($schema_after, $schema_before, 'evaluator did not mutate schema');
+          }
+          else {
+            $ctx->fail('evaluator did not mutate schema');
+          }
+
+          $ctx->note('mutated schema at location'.(@mutated_schema_paths > 1 ? 's' : '').': '.join(', ', @mutated_schema_paths)) if @mutated_schema_paths;
+          $pass = 0;
+        }
 
         $ctx->release;
       }
@@ -314,11 +325,42 @@ sub _run_test {
   return $pass;
 }
 
+sub _mutation_check ($self, $data) {
+  my @error_paths;
+
+  # [ path => data ]
+  my @nodes = ([ '', $data ]);
+  while (my $node = shift @nodes) {
+    if (not defined $node->[1]) {
+      next;
+    }
+    if (is_plain_arrayref($node->[1])) {
+      push @nodes, map [ $node->[0].'/'.$_, $node->[1][$_] ], 0 .. $node->[1]->$#*;
+      push @error_paths, $node->[0] if tied($node->[1]->@*);
+    }
+    elsif (is_plain_hashref($node->[1])) {
+      push @nodes, map [ $node->[0].'/'.(s/~/~0/gr =~ s!/!~1!gr), $node->[1]{$_} ], keys $node->[1]->%*;
+      push @error_paths, $node->[0] if tied($node->[1]->%*);
+    }
+    elsif (is_ref($node->[1])) {
+      next; # boolean or bignum
+    }
+    else {
+      my $flags = B::svref_2object(\$node->[1])->FLAGS;
+      push @error_paths, $node->[0]
+        if not ($flags & B::SVf_POK xor $flags & (B::SVf_IOK | B::SVf_NOK));
+    }
+  }
+
+  return @error_paths;
+}
+
+# used for internal serialization also
 has _json_decoder => (
   is => 'ro',
   isa => HasMethods[qw(encode decode)],
   lazy => 1,
-  default => sub { JSON::MaybeXS->new(allow_nonref => 1, utf8 => 1) },
+  default => sub { JSON::MaybeXS->new(allow_nonref => 1, utf8 => 1, allow_bignum => 1, allow_blessed => 1) },
 );
 
 # used for pretty-printing diagnostics
@@ -356,14 +398,13 @@ has _test_data => (
          ]],
 );
 
-sub _build__test_data {
-  my $self = shift;
+sub _build__test_data ($self) {
   my @test_groups;
 
   $self->test_dir->visit(
     sub {
       my ($path) = @_;
-      return if any { $self->test_dir->child($_)->subsumes($path) } @{ $self->skip_dir };
+      return if any { $self->test_dir->child($_)->subsumes($path) } $self->skip_dir->@*;
       return if not $path->is_file;
       return if $path !~ /\.json$/;
       my $data = $self->_json_decoder->decode($path->slurp_raw);
@@ -387,11 +428,12 @@ sub _build__test_data {
   ];
 }
 
-sub _build_results_text {
-  my $self = shift;
-
+sub _build_results_text ($self) {
   my @lines;
   push @lines, 'Results using '.ref($self).' '.$self->VERSION;
+
+  my $test_dir = $self->test_dir;
+  my $orig_dir = $self->_build_test_dir;
 
   my $submodule_status = path(dist_dir('Test-JSON-Schema-Acceptance'), 'submodule_status');
   if ($submodule_status->exists and $submodule_status->parent->subsumes($self->test_dir)) {
@@ -399,11 +441,12 @@ sub _build_results_text {
     push @lines, 'with commit '.$commit;
     push @lines, 'from '.$url.':';
   }
+  elsif ($test_dir eq $orig_dir and not -d '.git') {
+    die 'submodule_status file is missing - packaging error? cannot continue';
+  }
 
   push @lines, 'specification version: '.($self->specification//'unknown');
 
-  my $test_dir = $self->test_dir;
-  my $orig_dir = $self->_build_test_dir;
   if ($test_dir ne $orig_dir) {
     if ($orig_dir->subsumes($test_dir)) {
       $test_dir = '<base test directory>/'.substr($test_dir, length($orig_dir)+1);
@@ -414,19 +457,19 @@ sub _build_results_text {
     push @lines, 'using custom test directory: '.$test_dir;
   }
   push @lines, 'optional tests included: '.($self->include_optional ? 'yes' : 'no');
-  push @lines, map 'skipping directory: '.$_, @{ $self->skip_dir };
+  push @lines, map 'skipping directory: '.$_, $self->skip_dir->@*;
 
   push @lines, '';
-  my $length = max(40, map length $_->{file}, @{$self->results});
+  my $length = max(40, map length $_->{file}, $self->results->@*);
 
   push @lines, sprintf('%-'.$length.'s  pass  todo-fail  fail', 'filename');
   push @lines, '-'x($length + 23);
-  push @lines, map sprintf('%-'.$length.'s % 5d       % 4d  % 4d', @{$_}{qw(file pass todo_fail fail)}),
-    @{$self->results};
+  push @lines, map sprintf('%-'.$length.'s % 5d       % 4d  % 4d', $_->@{qw(file pass todo_fail fail)}),
+    $self->results->@*;
 
-  my $total = +{ map { my $type = $_; $type => sum0(map $_->{$type}, @{$self->results}) } qw(pass todo_fail fail) };
+  my $total = +{ map { my $type = $_; $type => sum0(map $_->{$type}, $self->results->@*) } qw(pass todo_fail fail) };
   push @lines, '-'x($length + 23);
-  push @lines, sprintf('%-'.$length.'s % 5d      % 5d % 5d', 'TOTAL', @{$total}{qw(pass todo_fail fail)});
+  push @lines, sprintf('%-'.$length.'s % 5d      % 5d % 5d', 'TOTAL', $total->@{qw(pass todo_fail fail)});
 
   return join("\n", @lines, '');
 }
@@ -447,7 +490,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 1.013
+version 1.014
 
 =head1 SYNOPSIS
 
@@ -467,8 +510,7 @@ In the JSON::Schema module, a test could look like the following:
   my $accepter = Test::JSON::Schema::Acceptance->new(specification => 'draft3');
 
   $accepter->acceptance(
-    validate_data => sub {
-      my ($schema, $input_data) = @_;
+    validate_data => sub ($schema, $input_data) {
       return JSON::Schema->new($schema)->validate($input_data);
     },
     todo_tests => [ { file => 'dependencies.json' } ],
@@ -553,7 +595,7 @@ C<latest> (alias for C<draft2020-12>)
 
 =item *
 
-C<draft-future>
+C<draft-next>
 
 =back
 
@@ -771,6 +813,9 @@ This software is Copyright (c) 2015 by Ben Hutton.
 This is free software, licensed under:
 
   The MIT (X11) License
+
+This distribution includes data from the L<https://json-schema.org> test suite, which carries its own
+licence (see F<share/LICENSE>).
 
 =for Pod::Coverage BUILDARGS BUILD
 

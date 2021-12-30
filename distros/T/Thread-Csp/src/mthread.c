@@ -70,7 +70,7 @@ static void* run_thread(void* arg) {
 	mthread* thread = (mthread*)arg;
 	Promise* input = thread->input;
 	Promise* output = thread->output;
-	PerlMemShared_free(thread);
+	free(thread);
 
 	PerlInterpreter* my_perl = perl_alloc();
 	perl_construct(my_perl);
@@ -140,7 +140,7 @@ Promise* S_thread_spawn(pTHX_ AV* to_run) {
 	av_unshift(to_run, 1);
 	av_store(to_run, 0, (SV*)clone_INC());
 
-	mthread* mthread = PerlMemShared_calloc(1, sizeof(mthread));
+	mthread* mthread = calloc(1, sizeof(mthread));
 	Promise* input = promise_alloc(2);
 	mthread->input = input;
 	Promise* output = promise_alloc(2);

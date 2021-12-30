@@ -3,11 +3,11 @@ abstract: unknown
 author:
   - 'Peter John Acklam <pjacklam@gmail.com>'
 build_requires:
-  Test::More: '0.82'
+  Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '6.58'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,10 +18,11 @@ no_index:
     - t
     - inc
 requires:
+  Carp: '1.22'
   Math::BigInt: '1.999819'
   XSLoader: '0.02'
   perl: '5.008'
 resources:
   repository: https://github.com/pjacklam/p5-Math-BigInt-GMP.git
-version: '1.6009'
+version: '1.6010'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

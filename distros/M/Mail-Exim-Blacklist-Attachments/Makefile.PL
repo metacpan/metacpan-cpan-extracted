@@ -7,7 +7,7 @@ use 5.016;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Blacklist email attachments",
+  "ABSTRACT" => "Reject email attachments",
   "AUTHOR" => "Andreas V\x{f6}gele <voegelas\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "IO::Compress::Zip" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.008",
+  "VERSION" => "2.000",
   "test" => {
     "TESTS" => "t/*.t"
   }

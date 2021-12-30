@@ -22,7 +22,6 @@
             "Test::Differences" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0",
-            "Test::Warn" : "0.11",
             "version" : "0.77"
          }
       },
@@ -43,7 +42,7 @@
    "provides" : {
       "Config::Model::Backend::Augeas" : {
          "file" : "lib/Config/Model/Backend/Augeas.pm",
-         "version" : "0.125"
+         "version" : "0.126"
       }
    },
    "release_status" : "stable",
@@ -52,6 +51,6 @@
          "http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt"
       ]
    },
-   "version" : "0.125",
+   "version" : "0.126",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -25,17 +25,15 @@ zip(\q{} => \$bad_zip, Name => 'test.exe');
 
 my $garbage = 'garbage';
 
-is check_filename('test.docm'), 'blacklisted',
-  'Macro-enabled Word file is blacklisted';
-isnt check_filename('test.docx'), 'blacklisted', 'Plain Word file is accepted';
-is check_filename('test.exe'), 'blacklisted', 'Executable file is blacklisted';
-is check_filename('TEST.EXE'), 'blacklisted', 'Uppercase filenames are handled';
+is check_filename('test.docm'), 'blocked', 'Macro-enabled Word file is blocked';
+isnt check_filename('test.docx'), 'blocked', 'Plain Word file is accepted';
+is check_filename('test.exe'),    'blocked', 'Executable file is blocked';
+is check_filename('TEST.EXE'),    'blocked', 'Uppercase filenames are handled';
 
-is check_filename('test.001'), 'blacklisted', 'Split archive is blacklisted';
-is check_filename('test.r15'), 'blacklisted', 'Split archive is blacklisted';
+is check_filename('test.001'), 'blocked', 'Split archive is blocked';
+is check_filename('test.r15'), 'blocked', 'Split archive is blocked';
 
-is check_zip(\$good_zip), 'ok', 'Zip archive is accepted';
-is check_zip(\$macro_zip), 'blacklisted',
-  'Zip archive contains macro-enabled file';
-is check_zip(\$bad_zip), 'blacklisted', 'Zip archive contains executable file';
-is check_zip(\$garbage), 'blacklisted', 'Garbage is blacklisted';
+is check_zip(\$good_zip),  'ok',      'Zip archive is accepted';
+is check_zip(\$macro_zip), 'blocked', 'Zip archive contains macro-enabled file';
+is check_zip(\$bad_zip),   'blocked', 'Zip archive contains executable file';
+is check_zip(\$garbage),   'blocked', 'Garbage is blocked';

@@ -1,11 +1,12 @@
 package Data::Reach;
+use 5.014;
 use strict;
 use warnings;
 use Carp         qw/carp croak/;
 use Scalar::Util qw/blessed reftype/;
 use overload;
 
-our $VERSION    = '2.00';
+our $VERSION    = '2.01';
 
 
 #======================================================================

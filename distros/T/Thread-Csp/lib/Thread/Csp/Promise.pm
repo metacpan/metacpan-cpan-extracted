@@ -1,5 +1,5 @@
 package Thread::Csp::Promise;
-$Thread::Csp::Promise::VERSION = '0.001';
+$Thread::Csp::Promise::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -23,7 +23,12 @@ Thread::Csp::Promise - Promises for thread return values.
 
 =head1 VERSION
 
-version 0.001
+version 0.003
+
+=head1 SYNOPSIS
+
+ my $promise = Thread::Csp->spawn('Module', 'Module::function', $input, $output);
+ $promise->get;
 
 =head1 DESCRIPTION
 

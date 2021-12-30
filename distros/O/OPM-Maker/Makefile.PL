@@ -29,6 +29,7 @@ my %WriteMakefileArgs = (
     "OPM::Validate" => "1.10",
     "Path::Class" => 0,
     "Sys::Hostname" => 0,
+    "Text::Gitignore" => "0.04",
     "XML::LibXML" => 0,
     "XML::LibXML::PrettyPrint" => 0
   },
@@ -40,9 +41,9 @@ my %WriteMakefileArgs = (
     "Test::LongString" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.10",
+  "VERSION" => "1.11",
   "test" => {
-    "TESTS" => "t/*.t t/build/*.t t/dbtest/*.t t/dependencies/*.t t/filetest/*.t t/index/*.t t/sopmtest/*.t"
+    "TESTS" => "t/*.t t/build/*.t t/build_find_sopm/*.t t/dbtest/*.t t/dependencies/*.t t/dependencies_find_sopm/*.t t/filetest/*.t t/filetest_find_sopm/*.t t/filetest_ignore/*.t t/index/*.t t/sopmtest/*.t t/sopmtest_find_sopm/*.t"
   }
 );
 
@@ -63,6 +64,7 @@ my %FallbackPrereqs = (
   "Sys::Hostname" => 0,
   "Test::LongString" => 0,
   "Test::More" => 0,
+  "Text::Gitignore" => "0.04",
   "XML::LibXML" => 0,
   "XML::LibXML::PrettyPrint" => 0
 );

@@ -4,14 +4,15 @@ author:
   - "'Mikko Koivunalho <mikko.koivunalho@iki.fi>'"
 build_requires:
   Git::Hooks::Test: '0'
-  Test::Most: '0'
-  Test::Requires::Git: '0'
-  perl: '5.010'
+  Git::Repository: '0'
+  Log::Any::Adapter: '0'
+  Test2::V0: '0'
+  perl: '5.010000'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.010000'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.023, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 keywords:
   - git
   - git-hooks
@@ -23,22 +24,29 @@ name: Git-MoreHooks
 provides:
   Git::MoreHooks:
     file: lib/Git/MoreHooks.pm
-    version: '0.010'
+    version: '0.011'
   Git::MoreHooks::CheckCommitAuthorFromMailmap:
     file: lib/Git/MoreHooks/CheckCommitAuthorFromMailmap.pm
-    version: '0.010'
+    version: '0.011'
   Git::MoreHooks::CheckCommitBase:
     file: lib/Git/MoreHooks/CheckCommitBase.pm
-    version: '0.010'
+    version: '0.011'
   Git::MoreHooks::CheckIndent:
     file: lib/Git/MoreHooks/CheckIndent.pm
-    version: '0.010'
+    version: '0.011'
+  Git::MoreHooks::GitRepoAdmin:
+    file: lib/Git/MoreHooks/GitRepoAdmin.pm
+    version: '0.011'
   Git::MoreHooks::TriggerJenkins:
     file: lib/Git/MoreHooks/TriggerJenkins.pm
-    version: '0.010'
+    version: '0.011'
 requires:
   Carp: '0'
   Const::Fast: '0'
+  Cwd: '0'
+  English: '0'
+  File::Spec: '0'
+  File::Temp: '0'
   Git::Hooks: '0'
   Git::Mailmap: '0'
   Jenkins::API: '0'
@@ -46,7 +54,7 @@ requires:
   Params::Validate: '0'
   Path::Tiny: '0'
   Template: '0'
-  perl: '5.010'
+  perl: '5.010000'
   strict: '0'
   utf8: '0'
   warnings: '0'
@@ -54,9 +62,9 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Git-MoreHooks
   homepage: https://metacpan.org/release/Git-MoreHooks
   repository: https://github.com/mikkoi/git-morehooks.git
-version: '0.010'
+version: '0.011'
 x_contributors:
   - 'Gustavo L. de M. Chaves <gnustavo@cpan.org>'
-x_generated_by_perl: v5.20.2
+x_generated_by_perl: v5.28.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

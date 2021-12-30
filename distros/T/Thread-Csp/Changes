@@ -1,4 +1,11 @@
 Revision history for Thread-Csp
 
+0.003     2021-12-30 10:34:27+01:00 Europe/Amsterdam
+          - Use stdc malloc instead of PerlMemShared
+          - Define CX_LEAVE_SCOPE when not available
+
+0.002     2021-12-29 16:19:49+01:00 Europe/Amsterdam
+          - Various documentation fixes
+
 0.001     2021-12-29 15:20:44+01:00 Europe/Amsterdam
           Initial release to an unsuspecting world

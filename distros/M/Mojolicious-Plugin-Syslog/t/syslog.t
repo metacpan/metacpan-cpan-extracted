@@ -23,12 +23,13 @@ my $n_only_syslog = n_message_subscribers();
 is $n_only_syslog, 1, 'only syslog subscribed';
 
 my @log;
-app->log->level('debug');
+app->log->level('trace');
 app->log->on(message => sub { shift; push @log, [@_] });
-app->log->$_("dummy test $_") for qw(debug info warn error fatal);
+app->log->$_("dummy test $_") for qw(trace debug info warn error fatal);
 is_deeply(
   \@log,
   [
+    [trace => 'dummy test trace'],
     [debug => 'dummy test debug'],
     [info  => 'dummy test info'],
     [warn  => 'dummy test warn'],

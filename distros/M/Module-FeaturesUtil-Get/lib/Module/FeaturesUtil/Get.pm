@@ -1,9 +1,9 @@
 package Module::FeaturesUtil::Get;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-26'; # DATE
+our $DATE = '2021-07-31'; # DATE
 our $DIST = 'Module-FeaturesUtil-Get'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use strict 'subs', 'vars';
 use warnings;
@@ -97,7 +97,7 @@ sub module_declares_feature {
 }
 
 1;
-# ABSTRACT: Get a feature
+# ABSTRACT: Get a feature from a module (following Module::Features specification)
 
 __END__
 
@@ -107,11 +107,11 @@ __END__
 
 =head1 NAME
 
-Module::FeaturesUtil::Get - Get a feature
+Module::FeaturesUtil::Get - Get a feature from a module (following Module::Features specification)
 
 =head1 VERSION
 
-This document describes version 0.004 of Module::FeaturesUtil::Get (from Perl distribution Module-FeaturesUtil-Get), released on 2021-02-26.
+This document describes version 0.005 of Module::FeaturesUtil::Get (from Perl distribution Module-FeaturesUtil-Get), released on 2021-07-31.
 
 =head1 SYNOPSIS
 
@@ -137,6 +137,8 @@ This document describes version 0.004 of Module::FeaturesUtil::Get (from Perl di
  }
 
 =head1 DESCRIPTION
+
+See L<Module::Features/"GLOSSARY"> for terminology.
 
 =head1 FUNCTIONS
 
@@ -208,7 +210,7 @@ Source repository is at L<https://github.com/perlancar/perl-Module-FeaturesUtil-
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Module-FeaturesUtil-Get/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Module-FeaturesUtil-Get>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

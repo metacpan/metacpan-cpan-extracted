@@ -1,5 +1,19 @@
 Revision history for Health-SHC
 
+0.004 -- Wed Dec 29 12:42:08 AST 2021
+
+  - 11d47cd Increment Version
+  - d502856 Just some packaging improvements
+  - 15300ab v0.003
+
+0.003 -- Wed Dec 29 11:21:55 AST 2021
+
+  - 4ecfa09 (HEAD -> main) Prepare new version
+  - f83e0c8 Update to use samples from spec.smarthealth.cards
+  - 212654a Increase required version of JSON::Parse
+  - 8af926d Minor Documentation typo fixes
+  - 1004544 v0.002
+
 0.002 -- Sun Dec 26 11:47:48 AST 2021
 
   - 62e1a5f Add Git Ignore File

@@ -988,3 +988,14 @@ _root(Class,x,y)
     GMP_GET_ARGS_0_1;   /* (TEMP, TEMP_1) = (x,y)  */
     mpz_root(*TEMP, *TEMP, mpz_get_ui(*TEMP_1));
     PUSHs( x );
+
+##############################################################################
+# gmp_version()
+
+SV*
+gmp_version()
+    CODE:
+        RETVAL = newSVpv(gmp_version, 0);
+
+    OUTPUT:
+        RETVAL

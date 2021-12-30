@@ -71,8 +71,8 @@ YAML
       errors => [
         {
           instanceLocation => '/response',
-          keywordLocation => jsonp('/paths', '/foo/{foo_id}/bar/{bar_id}'),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths', '/foo/{foo_id}/bar/{bar_id}'))->to_string,
+          keywordLocation => '/paths',
+          absoluteKeywordLocation => $doc_uri->clone->fragment('/paths')->to_string,
           error => 'missing path-item "/foo/{foo_id}/bar/{bar_id}"',
         },
       ],

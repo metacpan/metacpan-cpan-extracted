@@ -1,4 +1,4 @@
-Results using Test::JSON::Schema::Acceptance 1.013
+Results using Test::JSON::Schema::Acceptance 1.014
 specification version: draft7
 using custom test directory: t/additional-tests-draft7
 optional tests included: no
@@ -14,7 +14,7 @@ format-ipv4.json                             4          0     0
 format-relative-json-pointer.json            7          0     0
 format-time.json                            13          0     0
 id.json                                      9          0     0
-integers.json                               27          2     0
+integers.json                               29          0     0
 keyword-independence.json                  636          0     0
 loose-types-const-enum.json                  8          0     0
 not-an-anchor.json                           2          0     0
@@ -25,4 +25,4 @@ short-circuit.json                          16          0     0
 unknownKeyword.json                          8          0     0
 vocabulary.json                              3          0     0
 ---------------------------------------------------------------
-TOTAL                                      766          2     0
+TOTAL                                      768          0     0

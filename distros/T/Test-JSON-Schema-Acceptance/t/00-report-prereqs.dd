@@ -3,12 +3,12 @@ do { my $x = {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0',
                                         'File::ShareDir::Install' => '0.06',
-                                        'perl' => '5.016'
+                                        'perl' => '5.020'
                                       }
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.161',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.162',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
@@ -45,16 +45,17 @@ do { my $x = {
                                       'Moo' => '0',
                                       'MooX::TypeTiny' => '0.002002',
                                       'Path::Tiny' => '0.069',
-                                      'Storable' => '3.00',
+                                      'Ref::Util' => '0',
                                       'Test2::API' => '0',
                                       'Test2::Todo' => '0',
                                       'Test2::Tools::Compare' => '0',
                                       'Types::Common::Numeric' => '0',
                                       'Types::Standard' => '1.010002',
                                       'constant' => '0',
+                                      'experimental' => '0',
                                       'if' => '0',
                                       'namespace::clean' => '0',
-                                      'perl' => '5.016',
+                                      'perl' => '5.020',
                                       'strict' => '0',
                                       'strictures' => '2',
                                       'warnings' => '0'
@@ -72,6 +73,7 @@ do { my $x = {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'JSON::PP' => '0',
+                                   'Scalar::Util' => '0',
                                    'Test2::Suite' => '0.000131',
                                    'Test::Deep' => '0',
                                    'Test::Fatal' => '0',
@@ -82,7 +84,7 @@ do { my $x = {
                                    'feature' => '0',
                                    'lib' => '0',
                                    'open' => '0',
-                                   'perl' => '5.016',
+                                   'perl' => '5.020',
                                    'utf8' => '0'
                                  }
                  },

@@ -1,5 +1,13 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+1.014     2021-12-30 05:08:33Z
+        - "draft-future" is now known as "draft-next"
+        - minimum perl version raised to 5.020
+        - now deserializes large numbers in test data to Math::BigInt,
+          Math::BigFloat objects
+        - updated test suite:
+          https://github.com/json-schema-org/JSON-Schema-Test-Suite/compare/329efe59c65ea9f49af9c5c07dd6f5d22cb67ef4...26f74befcd2286cce0b74c9ae17ecdd560245924
+
 1.013     2021-10-22 22:00:15Z
         - reflect schema validation failure (against the metaschema) in the
           results tally

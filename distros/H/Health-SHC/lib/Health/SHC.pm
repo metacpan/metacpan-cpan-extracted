@@ -2,9 +2,9 @@ use strict;
 use warnings;
 package Health::SHC;
 
-# ABSTRACT: Extract and verify Smart Haelth Card information
+# ABSTRACT: Extract and verify Smart Health Card information
 
-our $VERSION = '0.002';
+our $VERSION = '0.004';
 
 =head1 NAME
 
@@ -46,6 +46,21 @@ Health::SHC - Verify Smart Health Card Signature and Extract data.
 This perl module can extract a Smart Health Card's data from PDFs or image file.
 The extracted shc:/ Smart Health Card URI is decoded and the signature checked.
 The module provide several methods to retrieve the data in a more usable format.
+
+=cut
+
+=head1 COPYRIGHT
+
+The following copyright notice applies to all the files provided in
+this distribution, including binary files, unless explicitly noted
+otherwise.
+
+Copyright 2021 Timothy Legge <timlegge@cpan.org>
+
+=head1 LICENCE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 

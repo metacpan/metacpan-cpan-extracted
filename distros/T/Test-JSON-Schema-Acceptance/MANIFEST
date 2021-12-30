@@ -498,6 +498,7 @@ t/tests/subset/baz.json
 t/tests/subset/foo.json
 t/tests/unicode/unicode.json
 update-share
+weaver.ini
 xt/author/00-compile.t
 xt/author/clean-namespaces.t
 xt/author/distmeta.t

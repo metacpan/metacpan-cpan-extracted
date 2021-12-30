@@ -1,5 +1,8 @@
 Revision history for Data-Reach
 
+2.01    30.12.2021
+        requires perl 5.014 (because of '+' in function protototypes)
+
 2.00    27.12.2021
         additional functions : map_paths() and each_path()
 

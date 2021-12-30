@@ -1,0 +1,70 @@
+NAME
+    Health::SHC - Verify Smart Health Card Signature and Extract data.
+
+SYNOPSIS
+        use Health::SHC;
+        my $sh = Health::SHC->new();
+        my @patients = $sh->get_patients($data);
+
+        foreach (@patients) {
+            print "Patient: ", $_->{given}, " ", $_->{middle}, " ", $_->{family}, "\n";
+        }
+
+        my @immunizations = $sh->get_immunizations($data);
+
+        print "Vacination Provider", "\t", "Date", "\n";
+        foreach (@immunizations) {
+            print $_->{provider}, "\t", $_->{date}, "\n";
+        }
+
+        my @vaccines = $sh->get_vaccines($data);
+
+        print "Manufacturer\tLot Number\tCode\tCode System\n";
+        foreach (@vaccines) {
+            print $_->{manufacturer}, "\t\t", $_->{lotNumber}, "\t\t";
+            my $codes = $_->{codes};
+            foreach my $tmp (@$codes) {
+                print   $tmp->{code}, "\t",
+                        $tmp->{system}, "\t";
+            }
+            print "\n";
+        }
+
+DESCRIPTION
+    This perl module can extract a Smart Health Card's data from PDFs or
+    image file. The extracted shc:/ Smart Health Card URI is decoded and the
+    signature checked. The module provide several methods to retrieve the
+    data in a more usable format.
+
+COPYRIGHT
+    The following copyright notice applies to all the files provided in this
+    distribution, including binary files, unless explicitly noted otherwise.
+
+    Copyright 2021 Timothy Legge <timlegge@cpan.org>
+
+LICENCE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+  METHODS
+   new(...)
+    Constructor; see OPTIONS above.
+
+   get_patients($data)
+    Arguments: $data: string Smart Health Card data without the "shc:/"
+    prefix
+
+    Returns: hash containing the Patient information
+
+   get_immunizations($data)
+    Arguments: $data: string Smart Health Card data without the "shc:/"
+    prefix
+
+    Returns: hash containing the Immunization data
+
+   get_vaccines($data)
+    Arguments: $data: string Smart Health Card data without the "shc:/"
+    prefix
+
+    Returns: hash containing the Vaccine data
+

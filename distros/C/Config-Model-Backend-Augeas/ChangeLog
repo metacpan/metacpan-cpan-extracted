@@ -1,3 +1,10 @@
+2021-12-29  Dominique Dumont  <domi.dumont@free.fr> v0.126
+
+    * fix doc related to backend configuration
+    * fix grammar errors in doc
+    * fix tests broken by Augeas 1.13.0
+    * rm dependency on Test::Warn
+
 2018-02-26  Dominique Dumont  <domi.dumont@free.fr> v0.125
 
   * fix wiki url

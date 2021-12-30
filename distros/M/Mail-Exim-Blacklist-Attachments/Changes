@@ -1,5 +1,9 @@
 Revision history for Mail::Exim::Blacklist::Attachments
 
+2.000  2021-12-30 03:31:10 CET
+
+  - The check functions now return "ok" or "blocked"
+
 1.008  2021-12-28 17:22:21 CET
 
   - The cpanfile is created by Dist::Zilla
@@ -18,7 +22,7 @@ Revision history for Mail::Exim::Blacklist::Attachments
 
 1.004  2021-11-19 11:57:12 CET
 
-  - Macro-enabled documents are simply blacklisted.
+  - Macro-enabled documents are rejected.
   - Handle split archives such as "002" and "r15".
 
 1.003  2021-10-30 11:52:13 CEST

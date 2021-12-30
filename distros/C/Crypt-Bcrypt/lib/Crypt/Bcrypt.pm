@@ -1,5 +1,5 @@
 package Crypt::Bcrypt;
-$Crypt::Bcrypt::VERSION = '0.001';
+$Crypt::Bcrypt::VERSION = '0.002';
 use strict;
 use warnings;
 
@@ -37,7 +37,7 @@ Crypt::Bcrypt - A modern bcrypt implementation
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

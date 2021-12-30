@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use Sys::Syslog qw(:standard :macros);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 my %PRIORITY = (
   debug => LOG_DEBUG,
@@ -83,7 +83,7 @@ sub _add_syslog {
 
 sub _syslog {
   my ($log, $level, @msg) = @_;
-  syslog $PRIORITY{$level}, '%s', join ' ', @msg;
+  syslog $PRIORITY{$level}, '%s', join ' ', @msg if $PRIORITY{$level};
 }
 
 1;

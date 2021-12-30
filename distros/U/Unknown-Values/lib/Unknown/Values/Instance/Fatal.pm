@@ -4,7 +4,7 @@ use warnings;
 # ABSTRACT: Internal fatal value object for the "Unknown::Values" distribution
 
 package Unknown::Values::Instance::Fatal;
-$Unknown::Values::Instance::Fatal::VERSION = '0.006';
+$Unknown::Values::Instance::Fatal::VERSION = '0.100';
 use Carp 'confess';
 use base 'Unknown::Values::Instance';
 
@@ -39,7 +39,7 @@ Unknown::Values::Instance::Fatal - Internal fatal value object for the "Unknown:
 
 =head1 VERSION
 
-version 0.006
+version 0.100
 
 =head1 AUTHOR
 
@@ -47,7 +47,7 @@ Curtis "Ovid" Poe <ovid@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Curtis "Ovid" Poe.
+This software is copyright (c) 2021 by Curtis "Ovid" Poe.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

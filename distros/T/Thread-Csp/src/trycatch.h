@@ -1,3 +1,7 @@
+#ifndef CX_LEAVE_SCOPE
+#define CX_LEAVE_SCOPE(cx) LEAVE_SCOPE(cx->cx_u.cx_blk.blku_old_savestack_ix)
+#endif
+
 #define TRY \
 	PERL_CONTEXT *cONtExT = cx_pushblock(CXt_EVAL|CXp_TRYBLOCK, G_VOID, PL_stack_sp, PL_savestack_ix);\
 	SAVEPPTR(PL_op);\

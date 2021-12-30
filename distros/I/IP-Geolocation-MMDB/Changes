@@ -1,5 +1,10 @@
 Revision history for IP::Geolocation::MMDB
 
+0.003  2021-12-30 10:04:58 CET
+
+  - Don't call gai_strerror(), which may return UTF-16 on Windows
+  - Add more tests
+
 0.002  2021-12-29 01:16:55 CET
 
   - Skip the IPv6 tests on Windows

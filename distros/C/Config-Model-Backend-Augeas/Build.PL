@@ -46,7 +46,6 @@ my $build = Module::Build->new
        'Test::More'        => 0,
        'Test::Exception'   => 0,
        'Test::Differences' => 0,
-       'Test::Warn'        => '0.11', # tests fail with 0.08
        'version'           => '0.77'
    },
 

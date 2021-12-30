@@ -26,6 +26,7 @@
             "Dist::Zilla::Plugin::Author::Plicease::Thanks" : "0",
             "Dist::Zilla::Plugin::Author::Plicease::Upload" : "0",
             "Dist::Zilla::Plugin::Prereqs" : "0",
+            "Dist::Zilla::Plugin::PruneFiles" : "0",
             "Dist::Zilla::Plugin::RemovePrereqs" : "0",
             "Dist::Zilla::PluginBundle::Author::Plicease" : "2.66",
             "Perl::Critic::Policy::BuiltinFunctions::ProhibitBooleanGrep" : "0",
@@ -82,7 +83,6 @@
             "Software::License::Perl_5" : "0"
          },
          "requires" : {
-            "File::Spec" : "0",
             "FindBin" : "0",
             "Perl::Critic" : "0",
             "Test2::Require::Module" : "0.000121",
@@ -95,7 +95,6 @@
             "Test::NoTabs" : "0",
             "Test::Pod" : "0",
             "Test::Pod::Coverage" : "0",
-            "Test::Pod::Spelling::CommonMistakes" : "0",
             "Test::Spelling" : "0",
             "Test::Strict" : "0",
             "YAML" : "0"
@@ -104,7 +103,8 @@
       "runtime" : {
          "requires" : {
             "File::Path" : "2.07",
-            "Path::Class" : "0.26",
+            "Path::Tiny" : "0",
+            "Ref::Util" : "0",
             "perl" : "5.006"
          }
       },
@@ -112,6 +112,7 @@
          "requires" : {
             "File::Path" : "2.07",
             "File::Temp" : "0",
+            "Path::Class" : "0.26",
             "Test::More" : "0.98",
             "perl" : "5.006"
          }
@@ -129,13 +130,13 @@
          "web" : "https://github.com/uperl/File-XDG"
       }
    },
-   "version" : "0.08",
+   "version" : "0.11",
    "x_contributors" : [
       "S\u00edle Ekaterin Aman",
       "Graham Ollis <plicease@cpan.org>"
    ],
-   "x_generated_by_perl" : "v5.35.4",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_generated_by_perl" : "v5.35.6",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }

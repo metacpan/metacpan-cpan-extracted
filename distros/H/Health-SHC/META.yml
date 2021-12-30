@@ -1,8 +1,9 @@
 ---
-abstract: 'Extract and verify Smart Haelth Card information'
+abstract: 'Extract and verify Smart Health Card information'
 author:
   - 'Timothy Legge <timlegge@cpan.org>'
-build_requires: {}
+build_requires:
+  Test::Exception: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
@@ -13,19 +14,29 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Health-SHC
+provides:
+  Health::SHC:
+    file: lib/Health/SHC.pm
+    version: '0.004'
+  Health::SHC::Extract:
+    file: lib/Health/SHC/Extract.pm
+    version: '0.004'
+  Health::SHC::Validate:
+    file: lib/Health/SHC/Validate.pm
+    version: '0.004'
 requires:
   Barcode::ZBar: '0'
   Crypt::JWT: '0'
   File::ShareDir: '0'
   File::Temp: '0'
   Image::Magick: '0'
-  JSON::Parse: '0'
+  JSON::Parse: '0.59'
   PostScript::Convert: '0'
   perl: '5.008'
 resources:
   bugtracker: https://github.com/timlegge/perl-Health-SHC/issues
   repository: git://github.com/timlegge/perl-Health-SHC.git
-version: '0.002'
+version: '0.004'
 x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

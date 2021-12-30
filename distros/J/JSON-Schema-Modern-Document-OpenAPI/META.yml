@@ -10,7 +10,7 @@ build_requires:
   Test::Deep: '0'
   Test::Fatal: '0'
   Test::File::ShareDir: '0'
-  Test::JSON::Schema::Acceptance: '0'
+  Test::JSON::Schema::Acceptance: '1.014'
   Test::Memory::Cycle: '0'
   Test::More: '0.96'
   URI: '0'
@@ -46,19 +46,19 @@ no_index:
 provides:
   JSON::Schema::Modern::Document::OpenAPI:
     file: lib/JSON/Schema/Modern/Document/OpenAPI.pm
-    version: '0.013'
+    version: '0.014'
   JSON::Schema::Modern::Vocabulary::OpenAPI:
     file: lib/JSON/Schema/Modern/Vocabulary/OpenAPI.pm
-    version: '0.013'
+    version: '0.014'
   OpenAPI::Modern:
     file: lib/OpenAPI/Modern.pm
-    version: '0.013'
+    version: '0.014'
 requires:
   Carp: '0'
   Encode: '2.89'
   Feature::Compat::Try: '0'
   File::ShareDir: '0'
-  JSON::Schema::Modern: '0.532'
+  JSON::Schema::Modern: '0.536'
   JSON::Schema::Modern::Document: '0'
   JSON::Schema::Modern::Utilities: '0.531'
   JSON::Schema::Modern::Vocabulary: '0'
@@ -83,7 +83,7 @@ resources:
   bugtracker: https://github.com/karenetheridge/JSON-Schema-Modern-Document-OpenAPI/issues
   homepage: https://github.com/karenetheridge/JSON-Schema-Modern-Document-OpenAPI
   repository: https://github.com/karenetheridge/JSON-Schema-Modern-Document-OpenAPI.git
-version: '0.013'
+version: '0.014'
 x_Dist_Zilla:
   perl:
     version: '5.035007'
@@ -773,7 +773,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.013
+          tag: v0.014
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:

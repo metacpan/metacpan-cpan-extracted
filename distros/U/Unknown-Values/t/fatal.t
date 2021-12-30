@@ -2,7 +2,7 @@
 use Test::Most;
 
 use lib 'lib';
-use Unknown::Values 'fatal';
+use Unknown::Values ':FATAL';
 
 throws_ok { 1 == unknown }
 qr/Comparison operations not allowed with 'fatal unknown' objects/,

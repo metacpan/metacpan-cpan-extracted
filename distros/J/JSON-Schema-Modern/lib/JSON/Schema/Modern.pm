@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.534-4-gc98193c9
+package JSON::Schema::Modern; # git description: v0.535-5-g4a79749c
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.535';
+our $VERSION = '0.536';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -823,11 +823,12 @@ sub _fetch_from_uri ($self, $uri) {
   }
 }
 
+# used for internal encoding as well (when caching serialized schemas)
 has _json_decoder => (
   is => 'ro',
   isa => HasMethods[qw(encode decode)],
   lazy => 1,
-  default => sub { JSON::MaybeXS->new(allow_nonref => 1, canonical => 1, utf8 => 1) },
+  default => sub { JSON::MaybeXS->new(allow_nonref => 1, canonical => 1, utf8 => 1, allow_bignum => 1, allow_blessed => 1) },
 );
 
 # since media types are case-insensitive, all type names must be foldcased on insertion.
@@ -922,7 +923,7 @@ JSON::Schema::Modern - Validate data against a schema
 
 =head1 VERSION
 
-version 0.535
+version 0.536
 
 =head1 SYNOPSIS
 
@@ -1442,11 +1443,12 @@ additional output formats beyond C<flag>, C<basic>, and C<terse> (L<https://json
 =head1 SECURITY CONSIDERATIONS
 
 The C<pattern> and C<patternProperties> keywords evaluate regular expressions from the schema,
-and the C<regex> format validator evaluates regular expressions from the data.
+the C<regex> format validator evaluates regular expressions from the data, and some keywords
+in the Validation vocabulary perform floating point operations on potentially-very large numbers.
 No effort is taken (at this time) to sanitize the regular expressions for embedded code or
-potentially pathological constructs that may pose a security risk, either via denial of service
-or by allowing exposure to the internals of your application. B<DO NOT USE SCHEMAS FROM UNTRUSTED
-SOURCES.>
+detect potentially pathological constructs that may pose a security risk, either via denial of
+service or by allowing exposure to the internals of your application. B<DO NOT USE SCHEMAS FROM
+UNTRUSTED SOURCES.>
 
 =head1 SEE ALSO
 

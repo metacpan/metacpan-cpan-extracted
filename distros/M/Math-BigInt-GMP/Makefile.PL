@@ -37,6 +37,7 @@ WriteMakefile
 
    'PREREQ_PM'          => {
                             'Math::BigInt'        => 1.999819,
+                            'Carp'                => 1.22,
                             'XSLoader'            => 0.02,
                            },
 
@@ -44,7 +45,7 @@ WriteMakefile
    # it.
 
    'TEST_REQUIRES'      => {
-                            'Test::More'          => 0.82,
+                            'Test::More'          => 0.88,
                            },
 
    'LICENSE'            => 'perl_5',

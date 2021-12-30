@@ -42,7 +42,7 @@ my $invalid_xml = File::Spec->catfile( $dir, 'invalid.sopm' );
 }
 
 {
-    my $error = 'does not exist';
+    my $error = 'No file given';
 
     my $exec_output = capture_stdout {
         OPM::Maker::Command::sopmtest::execute( undef, {}, [ '/tmp/does/not/exist_yet.sopm' ] );

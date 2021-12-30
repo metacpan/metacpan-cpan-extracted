@@ -1,3 +1,9 @@
+1.6010 2021-12-29
+
+ * Add static gmp_version() function (code provided by FGasper on GitHub).
+
+ * Make t/01load.t display the output from gmp_version().
+
 1.6009 2021-09-28
 
  * Sync test files with Math-BigInt.

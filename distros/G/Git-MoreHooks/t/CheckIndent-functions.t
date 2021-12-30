@@ -1,10 +1,8 @@
 #!perl -T
-## no critic (Subroutines::ProtectPrivateSubs)
-
-use 5.010;
+## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
 use strict;
 use warnings;
-use Test::Most;
+use Test2::V0;
 
 use Git::MoreHooks::CheckIndent;
 
@@ -21,7 +19,7 @@ FILE_END
         'file_as_string' => $file,
         'indent_char'    => q{ },
     );
-    is_deeply( \%results, { 3 => "\tTab indented line." }, 'Found error with tab.' );
+    is( \%results, { 3 => "\tTab indented line." }, 'Found error with tab.' );
 
 }
 
@@ -38,7 +36,7 @@ FILE_END
         'indent_char'    => qq{\t},
         'indent_size'    => 2,
     );
-    is_deeply( [ sort keys %results ], [ 1, 4 ], 'Found error with spaces.' );
+    is( [ sort keys %results ], [ 1, 4 ], 'Found error with spaces.' );
 
 }
 

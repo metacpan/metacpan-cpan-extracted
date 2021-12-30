@@ -7,7 +7,7 @@ use Carp;
 use Control::CLI qw( :all );
 
 my $Package = __PACKAGE__;
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 our @ISA = qw(Control::CLI);
 our %EXPORT_TAGS = (
 		use	=> [qw(useTelnet useSsh useSerial useIPv6)],
@@ -168,6 +168,7 @@ my %Attribute = (
 );
 
 my @InitPromptOrder = ("$Prm{pers}_cli", "$Prm{pers}_nncli", $Prm{xos}, 'generic');
+my $GenericPromptRegex = '[\?\$%#>](?:\e\[00?m)?\s?$';
 my %InitPrompt = ( # Initial prompt pattern expected at login
 	# Capturing brackets: $1 = switchName, $2 = login_cpu_slot, $3 = configContext;
 	$Prm{bstk}		=>	'\x0d?([^\n\x0d\x0a]{1,50}?)()(?:\((.+?)\))?(?:<.+>)?[>#]$',
@@ -182,7 +183,7 @@ my %InitPrompt = ( # Initial prompt pattern expected at login
 	$Prm{s200}		=>	'\(([^\n\x0d\x0a\)]+)\) ()(?:\((.+?)\))?[>#]$',
 	$Prm{wing}		=>	'([^\n\x0d\x0a\)]+?)()(?:\((.+?)\))?\*?[>#]$',
 	$Prm{slx}		=>	'([^\n\x0d\x0a\)]+)()(?:\((.+?)\))?# $',
-	$Prm{generic}		=>	'[^\n\x0d\x0a]*[\?\$%#>]\s?$',
+	$Prm{generic}		=>	'[^\n\x0d\x0a]*' . $GenericPromptRegex,
 );
 
 my %Prompt = ( # Prompt pattern templates; SWITCHNAME gets replaced with actual switch prompt during login
@@ -198,7 +199,7 @@ my %Prompt = ( # Prompt pattern templates; SWITCHNAME gets replaced with actual 
 	$Prm{s200}		=>	'\(SWITCHNAME\) (?:\((.+?)\))?[>#]$',
 	$Prm{wing}		=>	'SWITCHNAME(?:\((.+?)\))?\*?[>#]$',
 	$Prm{slx}		=>	'SWITCHNAME(?:\((.+?)\))?# $',
-	$Prm{generic}		=>	'[^\n\x0d\x0a]*[\?\$%#>]\s?$',
+	$Prm{generic}		=>	'[^\n\x0d\x0a]*' . $GenericPromptRegex,
 );
 
 my @PromptConfigContext = ( # Used to extract config_context in _setLastPromptAndConfigContext(); these patterns need to condense the above 
@@ -2899,8 +2900,8 @@ sub poll_attribute { # Method to handle attribute for poll methods (used for bot
 		($attrib->{attribute} eq 'model' || $attrib->{attribute} eq 'switch_type' || $attrib->{attribute} eq 'baudrate') && do {
 			my ($ok, $outref) = $self->_attribExecuteCmd($pkgsub, $attrib, [($self->config_context ? 'do ':'') . 'show chassis | include "Chassis Name:|switchType:"']);
 			return $self->poll_return($ok) unless $ok; # Come out if error or if not done yet in non-blocking mode
-			$$outref =~ /Chassis Name:(?:\t|\e\[\d\w)(?:BR|EN)-(.+)/g && $self->_setModelAttrib($1); # On serial port SLX uses \e[3C instead of tab char
-			$self->_setAttrib('baudrate', $self->{$Package}{ATTRIB}{'model'} =~ /9030/ ? 115200 : undef);
+			$$outref =~ /Chassis Name:(?:\t|\e\[\d\w)(?:(?:BR|EN)-)?(.+)/g && $self->_setModelAttrib($1); # On serial port SLX uses \e[3C instead of tab char
+			$self->_setAttrib('baudrate', defined $self->{$Package}{ATTRIB}{'model'} && $self->{$Package}{ATTRIB}{'model'} =~ /9030/ ? 115200 : undef);
 			$$outref =~ /switchType: (\d+)/g && $self->_setAttrib('switch_type', $1);
 			$self->{POLL}{output_result} = $self->{$Package}{ATTRIB}{$attrib->{attribute}};
 			return $self->poll_return(1);
@@ -3778,8 +3779,8 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 		return $ok unless $ok;
 		$discDevice->{stage}++; # Move to next stage on next cycle
 		# .. and we lock it down to the minimum length required
-		$self->last_prompt =~ /(.*)([\?\$%#>]\s?)$/;
-		$self->prompt(join('', ".{", length($1), ",}\\$2\$"));
+		$self->last_prompt =~ /(.*)($GenericPromptRegex)/;
+		$self->prompt(join('', ".{", length($1), ",}\Q$2\E\$"));
 	}
 
 	# Prefer commands unique to platform, and with small output (not more paged)
@@ -3813,11 +3814,11 @@ sub discoverDevice { # Issues CLI commands to host, to determine what family typ
 		my ($ok, $outref) = $self->poll_cmd($pkgsub, ($self->config_context ? 'do ':'') . 'show chassis | include "Chassis Name:|switchType:"');
 		return $ok unless $ok;
 		$discDevice->{stage}++; # Move to next stage on next cycle
-		if ($$outref =~ /^Chassis Name:(?:\t|\e\[\d\w)(?:BR|EN)-(.+)/m) { # On serial port SLX uses \e[3C instead of tab char
+		if ($$outref =~ /^Chassis Name:(?:\t|\e\[\d\w)(?:(?:BR|EN)-)?(.+)/m) { # On serial port SLX uses \e[3C instead of tab char
 			my $model = $1;
 			$self->_setFamilyTypeAttrib($Prm{slx}, is_nncli => 1, is_slx => 1);
 			$self->_setModelAttrib($model);
-			$self->_setAttrib('baudrate', $self->{$Package}{ATTRIB}{'model'} =~ /9030/ ? 115200 : undef);
+			$self->_setAttrib('baudrate', defined $self->{$Package}{ATTRIB}{'model'} && $self->{$Package}{ATTRIB}{'model'} =~ /9030/ ? 115200 : undef);
 			$self->_setAttrib('switch_type', $1) if	$$outref =~ /switchType: (\d+)/g;
 			$self->{LASTPROMPT} =~ /$InitPrompt{$Prm{slx}}/;
 			$self->_setDevicePrompts($Prm{slx}, $1);
@@ -6751,7 +6752,7 @@ L<http://search.cpan.org/dist/Control-CLI-Extreme/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2020 Ludovico Stevens.
+Copyright 2021 Ludovico Stevens.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

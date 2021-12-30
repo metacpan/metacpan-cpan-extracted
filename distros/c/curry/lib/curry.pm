@@ -1,6 +1,6 @@
 package curry;
 
-our $VERSION = '2.000000';
+our $VERSION = '2.000001';
 $VERSION = eval $VERSION;
 
 our $curry = sub {
@@ -34,7 +34,7 @@ $curry::weak = sub {
   }
 };
 
-sub curry::_ { &$curry::weak }
+sub curry::weak::_ { &$curry::weak }
 
 sub AUTOLOAD {
   my $invocant = shift;

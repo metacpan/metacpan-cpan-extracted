@@ -249,7 +249,7 @@ package DBSet;
 sub new {
     my ( $this, $args ) = @_;
     my $class = ref($this) || $this;
-    return bless {}, $class;
+    return bless [], $class;
 }
 
 sub add {

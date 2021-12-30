@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = 1.008;
+our $VERSION = 2.000;
 
 use Exporter qw(import);
 use IO::Uncompress::Unzip;
@@ -207,7 +207,7 @@ our %ARCHIVES = (
   zip      => 'Zip Archive',
 );
 
-our %BLACKLIST = (%MACRO_ENABLED, %BLOCKED_BY_OUTLOOK, %ARCHIVES);
+our %BLOCKLIST = (%MACRO_ENABLED, %BLOCKED_BY_OUTLOOK, %ARCHIVES);
 
 sub check_filename {
   my $filename = shift;
@@ -217,13 +217,13 @@ sub check_filename {
     $extension = lc $1;
   }
 
-  if (exists $BLACKLIST{$extension}) {
-    return 'blacklisted';
+  if (exists $BLOCKLIST{$extension}) {
+    return 'blocked';
   }
 
-  # Blacklist split archives like "001" and "r01".
+  # Reject split archives like "001" and "r01".
   if ($extension =~ m{\A[r\d]\d{2,}\z}) {
-    return 'blacklisted';
+    return 'blocked';
   }
 
   return 'ok';
@@ -245,7 +245,7 @@ sub _get_filename {
 sub check_zip {
   my $input = shift;
 
-  my $result = 'blacklisted';
+  my $result = 'blocked';
 
   my $zip = eval { IO::Uncompress::Unzip->new($input) };
   if (defined $zip) {
@@ -257,7 +257,7 @@ sub check_zip {
         $result = check_filename($filename);
       }
       else {
-        $result = 'blacklisted';
+        $result = 'blocked';
       }
       if ($result ne 'ok') {
         last STREAM;
@@ -277,11 +277,11 @@ __END__
 
 =head1 NAME
 
-Mail::Exim::Blacklist::Attachments - Blacklist email attachments
+Mail::Exim::Blacklist::Attachments - Reject email attachments
 
 =head1 VERSION
 
-version 1.008
+version 2.000
 
 =head1 SYNOPSIS
 
@@ -290,26 +290,26 @@ version 1.008
     warn
       condition = ${if and{{def:mime_filename} \
         {!match{${lc:$mime_filename}}{\N\.((json|xml)\.gz|zip)$\N}} \
-        {eq{${perl{check_filename}{$mime_filename}}}{blacklisted}}}}
-      set acl_m_blacklisted = yes
+        {eq{${perl{check_filename}{$mime_filename}}}{blocked}}}}
+      set acl_m_blocked = yes
 
     warn
       condition = ${if match{${lc:$mime_filename}}{\N\. *(jar|zip)$\N}}
       decode = default
       condition = ${if eq{${perl{check_zip}{$mime_decoded_filename}}} \
-                         {blacklisted}}
-      set acl_m_blacklisted = yes
+                         {blocked}}
+      set acl_m_blocked = yes
 
     accept
 
 =head1 DESCRIPTION
 
 A Perl module for the Exim mailer that checks email attachments for
-blacklisted filenames.  Common executable, macro-enabled and archive file
-formats are blacklisted.
+blocked filenames.  Common executable, macro-enabled and archive file
+formats are rejected.
 
-The list of blacklisted filename extensions is built from information
-published by Microsoft and Wikipedia.
+The list of blocked filename extensions is built from information published by
+Microsoft and Wikipedia.
 
 =head1 SUBROUTINES/METHODS
 
@@ -317,15 +317,15 @@ published by Microsoft and Wikipedia.
 
   my $result = check_filename($filename);
 
-Checks if a filename has got a blacklisted extension.  Returns "ok" or
-"blacklisted".
+Checks if a filename has got a blocked extension.  Returns "ok" or
+"blocked".
 
 =head2 check_zip
 
   my $result = check_zip($input);
 
-Checks a Zip archive for files with blacklisted filename extensions.  Returns
-"ok" or "blacklisted".
+Checks a Zip archive for files with blocked filename extensions.  Returns "ok"
+or "blocked".
 
 =head1 DIAGNOSTICS
 
@@ -346,8 +346,8 @@ section.
   acl_smtp_mime     = acl_check_mime
   acl_not_smtp_mime = acl_check_mime
 
-Check for blacklisted filename extensions in the configuration file's ACL
-section, headed by C<begin acl>.
+Check for blocked filename extensions in the configuration file's ACL section,
+headed by C<begin acl>.
 
   acl_check_mime:
 
@@ -356,20 +356,20 @@ section, headed by C<begin acl>.
     warn
       condition = ${if and{{def:mime_filename} \
         {!match{${lc:$mime_filename}}{\N\.((json|xml)\.gz|zip)$\N}} \
-        {eq{${perl{check_filename}{$mime_filename}}}{blacklisted}}}}
-      set acl_m_blacklisted = yes
+        {eq{${perl{check_filename}{$mime_filename}}}{blocked}}}}
+      set acl_m_blocked = yes
 
     warn
       condition = ${if match{${lc:$mime_filename}}{\N\. *(jar|zip)$\N}}
       decode = default
       condition = ${if eq{${perl{check_zip}{$mime_decoded_filename}}} \
-                         {blacklisted}}
-      set acl_m_blacklisted = yes
+                         {blocked}}
+      set acl_m_blocked = yes
 
     accept
 
-Add statements that reject spam messages with blacklisted attachments to your
-DATA ACL.
+Add statements that reject spam messages with blocked attachments to your DATA
+ACL.
 
   acl_check_data:
 
@@ -377,16 +377,16 @@ DATA ACL.
       spam = nobody:true
       condition = ${if >={$spam_score_int}{50}}
 
-    deny message = Blacklisted attachment detected
+    deny message = Blocked attachment detected
       spam = nobody:true
       condition = ${if and{{>{$spam_score_int}{0}} \
-                           {bool{$acl_m_blacklisted}}}}
+                           {bool{$acl_m_blocked}}}}
 
     warn spam = nobody
       add_header = X-Spam-Flag: YES
 
-    warn condition = ${if bool{$acl_m_blacklisted}}
-      add_header = X-Warning: Blacklisted attachment detected
+    warn condition = ${if bool{$acl_m_blocked}}
+      add_header = X-Warning: Blocked attachment detected
 
 =head1 DEPENDENCIES
 

@@ -1,10 +1,11 @@
 # IP::Geolocation::MMDB
 
-A Perl module that maps IP addresses to two-letter country codes such as "DE",
-"FR" and "US".
+A Perl module that reads MaxMind DB files and maps IP addresses to two-letter
+country codes such as "DE", "FR" and "US".
 
     use IP::Geolocation::MMDB;
     my $db = IP::Geolocation::MMDB->new(file => 'GeoIP2-Country.mmdb');
+    my $lookup_result = $db->record_for_address('1.2.3.4');
     my $country_code = $db->getcc('2620:fe::9');
 
 ## DEPENDENCIES

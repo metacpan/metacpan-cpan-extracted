@@ -11,10 +11,13 @@ my @files = (
     'lib/Git/MoreHooks/CheckCommitAuthorFromMailmap.pm',
     'lib/Git/MoreHooks/CheckCommitBase.pm',
     'lib/Git/MoreHooks/CheckIndent.pm',
+    'lib/Git/MoreHooks/GitRepoAdmin.pm',
     'lib/Git/MoreHooks/TriggerJenkins.pm',
     't/CheckCommitAuthorFromMailmap-hooks.t',
     't/CheckCommitAuthorFromMailmap-load.t',
     't/CheckIndent-functions.t',
+    't/GitRepoAdmin-functions.t',
+    't/GitRepoAdmin-load.t',
     't/TriggerJenkins-functions.t'
 );
 

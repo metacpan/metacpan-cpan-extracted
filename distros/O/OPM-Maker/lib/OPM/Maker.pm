@@ -1,5 +1,5 @@
 package OPM::Maker;
-$OPM::Maker::VERSION = '1.10';
+$OPM::Maker::VERSION = '1.11';
 use strict;
 use warnings;
 
@@ -22,11 +22,11 @@ OPM::Maker - Module/App to build and test OPM packages for Znuny, OTOBO, ((OTRS)
 
 =head1 VERSION
 
-version 1.10
+version 1.11
 
 =head1 DESCRIPTION
 
-If you do customizing for ticketing systems like L<Znuny|https://znuny.org>, L<OTOBO|https://otobo.de> or ((OTRS)) Community Edition, you need to be able to check your package: Are all files of the package included in the file list in the sopm file? Is the sopm file valid? And you need to create the OPM file. There is otrs.PackageManager.pl included in OTRS installations, but sometimes you might not have an OTRS installation on the machine where you want to build the package (e.g. when you build the package in a L<Jenkins|http://jenkins-ci.org> job).
+If you do customizing for ticketing systems like L<Znuny|https://znuny.org>, L<OTOBO|https://otobo.de> or ((OTRS)) Community Edition, you need to be able to check your package: Are all files of the package included in the file list in the sopm file? Is the sopm file valid? And you need to create the OPM file. There is xxxx.Console.pl (where xxxx is either I<otobo> or I<otrs>) included in stanrdard installations, but sometimes you might not have a ticket system installed on the machine where you want to build the package (e.g. when you build the package in a CI/CD job).
 
 C<OPM::Maker> provides C<opmbuild> that is a small tool for several tasks. At the moment it supports:
 

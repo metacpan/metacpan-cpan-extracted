@@ -4,7 +4,7 @@ use warnings;
 # ABSTRACT: Internal value object for the "Unknown::Values" distribution
 
 package Unknown::Values::Instance;
-$Unknown::Values::Instance::VERSION = '0.006';
+$Unknown::Values::Instance::VERSION = '0.100';
 use Carp 'confess';
 
 use 5.01000;
@@ -28,16 +28,20 @@ BEGIN {
 }
 
 use overload @to_overload, '""' => 'to_string';
+my $CORE_UNKNOWN = __PACKAGE__->new;
 
-sub to_string { '[unknown]' }
+sub to_string {
+    confess("Attempt to coerce unknown value to a string");
+}
 
 sub new {
-    my $class = shift;
-    state $unknown = bless {} => $class;
+    my $class   = shift;
+    my $unknown = bless {} => $class;
     return $unknown;
 }
 
-sub bool { __PACKAGE__->new }
+# this helps to prevent some infinite loops
+sub bool {$CORE_UNKNOWN}
 
 sub compare {
 
@@ -47,7 +51,7 @@ sub compare {
 
 sub sort {
     if    ( $_[2] )                                { return -1 }
-    elsif ( Unknown::Values::is_unknown( $_[1] ) ) { return 0 }   # unnecessary?
+    elsif ( Unknown::Values::is_unknown( $_[1] ) ) { return 0 } # unnecessary?
     else                                           { return 1 }
 }
 
@@ -94,7 +98,7 @@ Unknown::Values::Instance - Internal value object for the "Unknown::Values" dist
 
 =head1 VERSION
 
-version 0.006
+version 0.100
 
 =head1 DESCRIPTION
 
@@ -125,7 +129,7 @@ Curtis "Ovid" Poe <ovid@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Curtis "Ovid" Poe.
+This software is copyright (c) 2021 by Curtis "Ovid" Poe.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

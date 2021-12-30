@@ -1,6 +1,11 @@
 Changes file for OPM::Maker
 ===========================
 
+1.11 2021-12-29 15:03:00
+
+  + try to find a .sopm file if no file path was given (build, dependencies, sopmtest, ...)
+  + added support for ignore files (filetest command, needs Text::Gitignore)
+
 1.10 2021-10-01 17:11:00
 
   + added support for huge files (see #7)
