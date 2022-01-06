@@ -1,5 +1,47 @@
 Revision history for SPVM
 
+0.9109  2021-01-06
+        [CHANGES]
+        * SPVM is compiled as GNU99 instead of C99
+          SPVM source codes is pure C99, but  is not pure C99.
+          Some platforms can't compile SPVM.xs that contains perl.h as C99.
+
+0.9108  2021-01-06
+        [CHANGES]
+        * SPVM::get_exception return SPVM::BlessedObject::String
+        * SPVM::set_exception can receive a SPVM::BlessedObject::String object
+        * SPVM::new_byte_array_from_string encode the string using utf8::encode instead of Encode::encode('UTF-8', ...)
+        * Don't use hex floating point literal and %a specifier of sprintf
+          because it seems that some compilers don't support this C99 syntax.
+0.9107  2021-01-05
+        [CHANGES]
+        * Native API new_env call INIT blocks.
+        * Add SPVM::Builder::Exe again. This is revert of 0.9019.
+
+        [BUGS]
+        * Fix string buffer memory allocate edge case bug.
+
+0.9106  2021-01-04
+        [BUGS]
+        * Fix the memory blocks count in runtime environment.
+
+0.9105  2021-01-03
+        [CHANGES]
+        * SPVM::get_memory_blocks_count and native api's get_memory_blocks_count return
+          the count of memory blocks created by the runtime environment. This is revert of 0.9103
+
+0.9104  2021-01-02
+        [CHANGES]
+        * SPVM gcc option is simplified. 
+
+0.9103  2021-01-01
+        [CHANGES]
+        * Fix the bug that old string buffers of the compiler isn't freed when new memory is allocated.
+        * SPVM::get_memory_blocks_count and native api's get_memory_blocks_count return
+          all count of memory blocks created by the SPVM compiler and runtime.
+        [BUG FIX]
+        * Fix memory leaks of the compiler
+        * Fix memory leaks of class variables
 0.9102  2021-12-24
         [CHANGES]
         * Upgrads ppport.h to fix Perl 5.8.7 compilation errors.
@@ -92,6 +134,7 @@ Revision history for SPVM
         
         [BUG FIX]
         * add push_lib_dirs of SPVM::Builder::Config. This is documented but doesn't exist.
+
 0.9018  2021-12-11
         [CHANGES]
         * Depends on ExtUtils::CBuilder for Perl 5.8

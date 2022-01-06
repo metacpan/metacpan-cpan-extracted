@@ -12,7 +12,6 @@ use Scalar::Util qw(tainted);
 use CPANPLUS::Backend;
 use CPANPLUS::Config;
 
-use open ':std', ':encoding(utf8)';
 use Test::More;
 
 if (!$ENV{RELEASE_TESTING}) {

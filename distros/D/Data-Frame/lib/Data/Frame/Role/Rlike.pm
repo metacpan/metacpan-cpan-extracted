@@ -1,13 +1,12 @@
 package Data::Frame::Role::Rlike;
-$Data::Frame::Role::Rlike::VERSION = '0.003';
+$Data::Frame::Role::Rlike::VERSION = '0.006002';
 
-use strict;
-use warnings;
-use Moo::Role;
+use Data::Frame::Role;
+
 use List::AllUtils;
 
-sub head {
-	my ($self, $n) = @_;
+
+method head($n=6) {
 	my ($start, $stop);
 	if( $n < 0 ) {
 		$start = 0;
@@ -19,11 +18,10 @@ sub head {
 	# clip to [ 0, number_of_rows-1 ]
 	$start = List::AllUtils::max( 0, $start );
 	$stop  = List::AllUtils::min( $self->number_of_rows-1, $stop );
-	$self->select_rows( $start..$stop );
+	return $self->select_rows( $start..$stop );
 }
 
-sub tail {
-	my ($self, $n) = @_;
+method tail($n=6) {
 	my ($start, $stop);
 	if( $n < 0 ) {
 		$start = -$n;
@@ -35,7 +33,7 @@ sub tail {
 	# clip to [ 0, number_of_rows-1 ]
 	$start = List::AllUtils::max( 0, $start );
 	$stop  = List::AllUtils::min( $self->number_of_rows-1, $stop );
-	$self->select_rows( $start..$stop );
+	return $self->select_rows( $start..$stop );
 }
 
 sub subset($&) {
@@ -60,7 +58,7 @@ Data::Frame::Role::Rlike
 
 =head1 VERSION
 
-version 0.003
+version 0.006002
 
 =head1 SYNOPSIS
 
@@ -70,7 +68,7 @@ Data::Frame::Role::Rlike - role to provide R-like methods for Data::Frame
 
 =head2 head
 
-    head( Int $n )
+    head( Int $n=6 )
 
 If $n ≥ 0, returns a new C<Data::Frame> with the first $n rows of the
 C<Data::Frame>.
@@ -82,7 +80,7 @@ See also: R's L<head|https://stat.ethz.ch/R-manual/R-devel/library/utils/html/he
 
 =head2 tail
 
-    tail( Int $n )
+    tail( Int $n=6 )
 
 If $n ≥ 0, returns a new C<Data::Frame> with the last $n rows of the
 C<Data::Frame>.
@@ -121,13 +119,23 @@ a C<Data::Frame::Column::Helper> for the Data::Frame C<$df>.
 
 See also: R's L<subset|https://stat.ethz.ch/R-manual/R-devel/library/base/html/subset.html> function
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Zakariyya Mughal <zmughal@cpan.org>
 
+=item *
+
+Stephan Loyd <sloyd@cpan.org>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Zakariyya Mughal.
+This software is copyright (c) 2014, 2019-2022 by Zakariyya Mughal, Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

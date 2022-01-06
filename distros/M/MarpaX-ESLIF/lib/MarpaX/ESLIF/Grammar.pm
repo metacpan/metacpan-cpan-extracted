@@ -8,7 +8,7 @@ use parent qw/MarpaX::ESLIF::Base/;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '5.0.7'; # VERSION
+our $VERSION = '6.0.10'; # VERSION
 
 #
 # Base required class methods
@@ -45,7 +45,7 @@ MarpaX::ESLIF::Grammar - MarpaX::ESLIF's grammar
 
 =head1 VERSION
 
-version 5.0.7
+version 6.0.10
 
 =head1 SYNOPSIS
 
@@ -85,8 +85,8 @@ version 5.0.7
   whitespaces ::= WHITESPACES
   comment ::= /(?:(?:(?:\/\/)(?:[^\n]*)(?:\n|\z))|(?:(?:\/\*)(?:(?:[^\*]+|\*(?!\/))*)(?:\*\/)))/u
 
-  :lexeme ::= NUMBER pause => before event => ^NUMBER
-  :lexeme ::= NUMBER pause => after  event => NUMBER$
+  :symbol ::= NUMBER pause => before event => ^NUMBER
+  :symbol ::= NUMBER pause => after  event => NUMBER$
 
   :desc      ~ 'Calculator Tokens'
   NUMBER     ~ /[\d]+/   name => 'NUMBER Lexeme'

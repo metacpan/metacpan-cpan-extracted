@@ -2,7 +2,7 @@ package Test2::Harness::Log::CoverageAggregator::ByTest;
 use strict;
 use warnings;
 
-our $VERSION = '1.000093';
+our $VERSION = '1.000094';
 
 use Scalar::Util qw/blessed/;
 use Test2::Harness::Util qw/mod2file/;
@@ -139,7 +139,7 @@ sub get_coverage_tests {
     my @out;
     my $ok = eval {
         require(mod2file($manager));
-        my $specs = $manager->test_parameters($test, \%froms);
+        my $specs = $manager->test_parameters($test, \%froms, $changes, $coverage_data);
 
         $specs = { run => $specs } unless ref $specs;
 

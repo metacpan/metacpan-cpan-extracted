@@ -63,6 +63,6 @@
       },
       "x_IRC" : "ircs://irc.libera.chat:6697/#perl-openapi"
    },
-   "version" : "5.04",
+   "version" : "5.05",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

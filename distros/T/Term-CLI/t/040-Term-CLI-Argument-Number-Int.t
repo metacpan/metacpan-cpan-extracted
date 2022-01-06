@@ -17,6 +17,7 @@ sub Main {
             : 0
     );
     Term_CLI_Argument_Number_Int_test->runtests();
+    return;
 }
 
 package Term_CLI_Argument_Number_Int_test {
@@ -48,6 +49,7 @@ sub startup : Test(startup => 1) {
             'Term::CLI::Argument::Number::Int->new' );
 
     $self->{arg} = $arg;
+    return;
 }
 
 sub check_constructor: Test(1) {
@@ -57,6 +59,7 @@ sub check_constructor: Test(1) {
         { Term::CLI::Argument::Number::Int->new() }
         qr/Missing required arguments: name/,
         'error on missing name';
+    return;
 }
 
 sub check_attributes: Test(2) {
@@ -64,6 +67,7 @@ sub check_attributes: Test(2) {
     my $arg = $self->{arg};
     is( $arg->name, $ARG_NAME, "name attribute is $ARG_NAME" );
     is( $arg->type, 'Number::Int', "type attribute is Number::Int" );
+    return;
 }
 
 sub check_validate: Test(29) {
@@ -219,6 +223,7 @@ sub check_validate: Test(29) {
     is( $arg->error, 'too large', 'error is set correctly on too large number' );
 
     $arg->inclusive(1);
+    return;
 }
 
 }

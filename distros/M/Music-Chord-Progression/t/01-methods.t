@@ -23,9 +23,13 @@ is_deeply $got->[-1], $expect, 'generate';
 $obj = new_ok 'Music::Chord::Progression';
 $expect = ['C4','E4','G4'];
 $got = $obj->generate;
-is scalar @$got, 8, 'generate';
+is scalar @$got, $obj->max, 'generate';
 is_deeply $got->[0], $expect, 'generate';
 is_deeply $got->[-1], $expect, 'generate';
+is_deeply $got, $obj->chords, 'generate';
+
+is @{ $obj->phrase }, $obj->max, 'phrase length';
+is @{ $obj->chords }, $obj->max, 'chords length';
 
 # Test setting a scale note
 $obj = new_ok 'Music::Chord::Progression' => [

@@ -11,6 +11,7 @@
 #include "spvm_hash.h"
 
 #include "spvm_compiler.h"
+#include "spvm_allocator.h"
 #include "spvm_op.h"
 
 #include "spvm_opcode_array.h"
@@ -261,10 +262,17 @@ SPVM_ENV* SPVM_API_create_env(SPVM_COMPILER* compiler) {
     SPVM_API_get_bool_object_value,
   };
   
-  SPVM_ENV* env = calloc(sizeof(env_init), 1);
+  SPVM_ENV* env = SPVM_ALLOCATOR_new_block_runtime_noenv(compiler, sizeof(env_init));
   if (env == NULL) {
     return NULL;
   }
+  
+  {
+    int32_t memory_blocks_count = (int32_t)(intptr_t)env->memory_blocks_count;
+    memory_blocks_count++;
+    env->memory_blocks_count = (void*)(intptr_t)memory_blocks_count;
+  }
+  
   memcpy(env, env_init, sizeof(env_init));
 
   // Mortal stack
@@ -293,6 +301,8 @@ SPVM_ENV* SPVM_API_create_env(SPVM_COMPILER* compiler) {
   
   // Object header byte size
   env->object_header_byte_size = (void*)(intptr_t)object_header_byte_size;
+
+  SPVM_API_call_init_blocks(env);
   
   return env;
 }
@@ -308,10 +318,12 @@ SPVM_OBJECT* SPVM_API_dump(SPVM_ENV* env, SPVM_OBJECT* object) {
 }
 
 SPVM_OBJECT* SPVM_API_dump_raw(SPVM_ENV* env, SPVM_OBJECT* object) {
+
+  SPVM_COMPILER* compiler = (SPVM_COMPILER*)env->compiler;
   
   int32_t depth = 0;
-  SPVM_STRING_BUFFER* string_buffer = SPVM_STRING_BUFFER_new(255);
-  SPVM_HASH* address_symtable = SPVM_HASH_new(255);
+  SPVM_STRING_BUFFER* string_buffer = SPVM_STRING_BUFFER_new(compiler, 255, SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_RUN_TIME, env);
+  SPVM_HASH* address_symtable = SPVM_HASH_new(compiler, 255, SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_RUN_TIME, env);
   
   SPVM_API_dump_recursive(env, object, &depth, string_buffer, address_symtable);
   
@@ -1110,8 +1122,25 @@ SPVM_ENV* SPVM_API_new_env(SPVM_ENV* env) {
 }
 
 void SPVM_API_free_env(SPVM_ENV* env) {
+
+  // Runtime
+  SPVM_COMPILER* compiler = env->compiler;
+
   // Free exception
   SPVM_API_set_exception(env, NULL);
+  
+  // Free objects of class variables
+  SPVM_LIST* class_vars = compiler->class_vars;
+  for (int32_t i = 0; i < class_vars->length; i++) {
+    SPVM_CLASS_VAR* class_var = (SPVM_CLASS_VAR*)SPVM_LIST_fetch(class_vars, i);
+    SPVM_TYPE* class_var_type = class_var->type;
+    if (SPVM_TYPE_is_object_type(compiler, class_var_type->basic_type->id, class_var_type->dimension, 0)) {
+      SPVM_OBJECT* object = *(void**)&((SPVM_VALUE*)env->class_vars_heap)[class_var->id];
+      if (object) {
+        SPVM_API_dec_ref_count(env, object);
+      }
+    }
+  }
 
   // Free class variables heap
   SPVM_API_free_memory_block(env, env->class_vars_heap);
@@ -1119,7 +1148,13 @@ void SPVM_API_free_env(SPVM_ENV* env) {
   // Free mortal stack
   SPVM_API_free_memory_block(env, env->native_mortal_stack);
 
-  free(env);
+  SPVM_ALLOCATOR_free_block_runtime_noenv(compiler, env);
+
+  {
+    int32_t memory_blocks_count = (int32_t)(intptr_t)env->memory_blocks_count;
+    memory_blocks_count--;
+    env->memory_blocks_count = (void*)(intptr_t)memory_blocks_count;
+  }
 }
 
 void SPVM_API_call_init_blocks(SPVM_ENV* env) {
@@ -6635,6 +6670,9 @@ void SPVM_API_set_field_object(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field
 }
 
 void* SPVM_API_alloc_memory_block_zero(SPVM_ENV* env, int64_t byte_size) {
+
+  // Runtime
+  SPVM_COMPILER* compiler = env->compiler;
   
   assert(byte_size > 0);
 
@@ -6642,35 +6680,25 @@ void* SPVM_API_alloc_memory_block_zero(SPVM_ENV* env, int64_t byte_size) {
     return NULL;
   }
   
-  void* block = calloc(1, (size_t)byte_size);
-  
-  if (block) {
-    int32_t memory_blocks_count = (int32_t)(intptr_t)env->memory_blocks_count;
-    memory_blocks_count++;
-    env->memory_blocks_count = (void*)(intptr_t)memory_blocks_count;
+  void* block = SPVM_ALLOCATOR_new_block_runtime(compiler, (size_t)byte_size, env);
   
 #ifdef SPVM_DEBUG_ALLOC_MEMORY_COUNT
   fprintf(stderr, "[ALLOC_MEMORY %p %d]\n", block, (int32_t)(intptr_t)env->memory_blocks_count);
 #endif
-  }
-  else {
-    
-  }
 
   return block;
 }
 
 void SPVM_API_free_memory_block(SPVM_ENV* env, void* block) {
 
+  // Runtime
+  SPVM_COMPILER* compiler = env->compiler;
+
   if (block) {
-    int32_t memory_blocks_count = (int32_t)(intptr_t)env->memory_blocks_count;
-    memory_blocks_count--;
-    env->memory_blocks_count = (void*)(intptr_t)memory_blocks_count;
-    
 #ifdef SPVM_DEBUG_ALLOC_MEMORY_COUNT
     fprintf(stderr, "[FREE_MEMORY %p %d]\n", block, (int32_t)(intptr_t)env->memory_blocks_count);
 #endif
-    free(block);
+    SPVM_ALLOCATOR_free_block_runtime(compiler, block, env);
   }
 }
 

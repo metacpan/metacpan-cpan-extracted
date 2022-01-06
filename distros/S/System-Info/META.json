@@ -1,118 +1,118 @@
 {
-   "license" : [
-      "perl_5"
-   ],
-   "provides" : {
-      "System::Info::AIX" : {
-         "version" : "0.050",
-         "file" : "lib/System/Info/AIX.pm"
-      },
-      "System::Info::Irix" : {
-         "file" : "lib/System/Info/Irix.pm",
-         "version" : "0.050"
-      },
-      "System::Info::Cygwin" : {
-         "version" : "0.050",
-         "file" : "lib/System/Info/Cygwin.pm"
-      },
-      "System::Info::Windows" : {
-         "file" : "lib/System/Info/Windows.pm",
-         "version" : "0.051"
-      },
-      "System::Info::Haiku" : {
-         "file" : "lib/System/Info/Haiku.pm",
-         "version" : "0.050"
-      },
-      "System::Info::Linux" : {
-         "version" : "0.052",
-         "file" : "lib/System/Info/Linux.pm"
-      },
-      "System::Info::Solaris" : {
-         "file" : "lib/System/Info/Solaris.pm",
-         "version" : "0.050"
-      },
-      "System::Info::BSD" : {
-         "version" : "0.051",
-         "file" : "lib/System/Info/BSD.pm"
-      },
-      "System::Info::Base" : {
-         "version" : "0.050",
-         "file" : "lib/System/Info/Base.pm"
-      },
-      "System::Info::Darwin" : {
-         "version" : "0.055",
-         "file" : "lib/System/Info/Darwin.pm"
-      },
-      "System::Info::VMS" : {
-         "version" : "0.050",
-         "file" : "lib/System/Info/VMS.pm"
-      },
-      "System::Info::Generic" : {
-         "version" : "0.050",
-         "file" : "lib/System/Info/Generic.pm"
-      },
-      "System::Info" : {
-         "file" : "lib/System/Info.pm",
-         "version" : "0.061"
-      },
-      "System::Info::HPUX" : {
-         "version" : "0.051",
-         "file" : "lib/System/Info/HPUX.pm"
-      }
-   },
-   "release_status" : "stable",
-   "name" : "System-Info",
-   "meta-spec" : {
-      "version" : 2,
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
-   },
-   "prereqs" : {
-      "runtime" : {
-         "requires" : {
-            "perl" : "5.008003",
-            "POSIX" : "0"
-         }
-      },
-      "test" : {
-         "requires" : {
-            "Test::More" : "0.88",
-            "Test::Warnings" : "0"
-         },
-         "recommends" : {
-            "Test::More" : "1.302186"
-         }
-      },
-      "build" : {
-         "requires" : {
-            "perl" : "5.008"
-         }
-      },
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      }
-   },
+   "generated_by" : "Author",
    "author" : [
       "H.Merijn Brand <h.m.brand@xs4all.nl>",
       "Abe Timmerman <abeltje@cpan.org>"
-   ],
-   "resources" : {
-      "repository" : {
-         "web" : "https://github.com/Tux/System-Info",
-         "type" : "git",
-         "url" : "https://github.com/Tux/System-Info"
-      },
-      "license" : [
-         "http://dev.perl.org/licenses/"
       ],
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+            }
+         },
+      "runtime" : {
+         "requires" : {
+            "POSIX" : "0",
+            "perl" : "5.008003"
+            }
+         },
+      "build" : {
+         "requires" : {
+            "perl" : "5.008"
+            }
+         },
+      "test" : {
+         "requires" : {
+            "Test::Warnings" : "0",
+            "Test::More" : "0.88"
+            },
+         "recommends" : {
+            "Test::More" : "1.302188"
+            }
+         }
+      },
+   "abstract" : "Basic information about the system",
+   "name" : "System-Info",
+   "license" : [
+      "perl_5"
+      ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+      },
+   "provides" : {
+      "System::Info::Windows" : {
+         "file" : "lib/System/Info/Windows.pm",
+         "version" : "0.051"
+         },
+      "System::Info::HPUX" : {
+         "version" : "0.051",
+         "file" : "lib/System/Info/HPUX.pm"
+         },
+      "System::Info::AIX" : {
+         "version" : "0.050",
+         "file" : "lib/System/Info/AIX.pm"
+         },
+      "System::Info::VMS" : {
+         "version" : "0.050",
+         "file" : "lib/System/Info/VMS.pm"
+         },
+      "System::Info::Darwin" : {
+         "version" : "0.055",
+         "file" : "lib/System/Info/Darwin.pm"
+         },
+      "System::Info::BSD" : {
+         "file" : "lib/System/Info/BSD.pm",
+         "version" : "0.051"
+         },
+      "System::Info::Generic" : {
+         "version" : "0.050",
+         "file" : "lib/System/Info/Generic.pm"
+         },
+      "System::Info::Solaris" : {
+         "version" : "0.050",
+         "file" : "lib/System/Info/Solaris.pm"
+         },
+      "System::Info" : {
+         "version" : "0.062",
+         "file" : "lib/System/Info.pm"
+         },
+      "System::Info::Linux" : {
+         "file" : "lib/System/Info/Linux.pm",
+         "version" : "0.052"
+         },
+      "System::Info::Irix" : {
+         "version" : "0.050",
+         "file" : "lib/System/Info/Irix.pm"
+         },
+      "System::Info::Cygwin" : {
+         "version" : "0.050",
+         "file" : "lib/System/Info/Cygwin.pm"
+         },
+      "System::Info::Haiku" : {
+         "file" : "lib/System/Info/Haiku.pm",
+         "version" : "0.050"
+         },
+      "System::Info::Base" : {
+         "version" : "0.050",
+         "file" : "lib/System/Info/Base.pm"
+         }
+      },
+   "resources" : {
+      "x_IRC" : "irc://irc.perl.org/#perl-qa",
+      "repository" : {
+         "url" : "https://github.com/Tux/System-Info",
+         "web" : "https://github.com/Tux/System-Info",
+         "type" : "git"
+         },
       "bugtracker" : {
          "web" : "https://github.com/Tux/System-Info/issues"
+         },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+         ]
       },
-      "x_IRC" : "irc://irc.perl.org/#perl-qa"
-   },
-   "dynamic_config" : 1,
-   "version" : "0.061",
-   "generated_by" : "Author",
-   "abstract" : "Basic information about the system"
-}
+   "version" : "0.062",
+   "release_status" : "stable",
+   "dynamic_config" : 1
+   }

@@ -1,22 +1,21 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::Opt::NonLinear;
 
-@EXPORT_OK  = qw( PDL::PP tensoropt PDL::PP lbfgs PDL::PP lbfgsb PDL::PP spg PDL::PP lmqn PDL::PP lmqnbc PDL::PP cgfam PDL::PP hooke PDL::PP gencan PDL::PP sgencan PDL::PP dhc PDL::PP de_opt PDL::PP asa_opt  rosen rosen_grad rosen_hess optimize );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(tensoropt lbfgs lbfgsb spg lmqn lmqnbc cgfam hooke gencan sgencan dhc de_opt asa_opt rosen rosen_grad rosen_hess optimize );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
-   $PDL::Opt::NonLinear::VERSION = 0.05;
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our $VERSION = '0.07';
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Opt::NonLinear $VERSION;
+
 
 
 
@@ -27,6 +26,7 @@ use PDL::Ops;
 use PDL::NiceSlice;
 use PDL::LinearAlgebra qw/diag tritosym/;
 
+=encoding utf8
 
 =head1 NAME
 
@@ -57,14 +57,14 @@ PDL::Opt::NonLinear -- Non Linear optimization routines
 
 This module provides routine that solves optimization problem:
 
-   	minimize     f(x)
+	minimize     f(x)
 	   x
 
 Some routines can handle bounds, so:
 
-   	minimize     f(x)
+	minimize     f(x)
 	   x
-   	subject to   low <= x <= up
+	subject to   low <= x <= up
 
 =cut
 
@@ -77,10 +77,7 @@ Some routines can handle bounds, so:
 
 =head1 FUNCTIONS
 
-
-
 =cut
-
 
 
 
@@ -116,7 +113,7 @@ parameters:
 	hx(n,n) --> hessian
 	x(n)    --> initial guess (input) and final point
 	method  --> if value is 0 then use only newton step at
- 		    each iteration, if value is 1 then try both
+		    each iteration, if value is 1 then try both
 		    tensor and newton steps at each iteration
 	maxit   <-- iteration limit and final number of iterations
 	digits  --> number of good digits in optimization function fcn
@@ -165,7 +162,7 @@ parameters:
 		my ($hx, $x) = @_;
 		$hx .= rosen_hess($x);
 	}
-	tensoropt($fx, $gx, $hx, $x, 
+	tensoropt($fx, $gx, $hx, $x,
 		1,$maxit,15,1,2,1,
 		ones(5),0.5,$xtol,$gtol,2,6,
 		\&min_func, \&grad_func, \&hess_func);
@@ -175,8 +172,8 @@ parameters:
 
 =for bad
 
-tensoropt ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+tensoropt ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -203,7 +200,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for ref
 
 This subroutine solves the unconstrained minimization problem
- 
+
 		min f(x),    x= (x1,x2,...,xn),
 
 using the limited memory bfgs method. The routine is especially
@@ -220,51 +217,51 @@ mathematical programming b 45 (1989) 503-528.
 
 The steplength is determined at each iteration by means of the
 line search routine mcvsrch, which is a slight modification of
-the routine csrch written by Moré and Thuente.
- 
- 
+the routine csrch written by MorÃ© and Thuente.
+
+
       where
- 
+
      m       The number of corrections used in the bfgs update. it
              is not altered by the routine. values of m less than 3 are
              not recommended; large values of m will result in excessive
              computing time. 3<= m <=7 is recommended. restriction: m > 0.
- 
+
      x       On initial entry, it must be set by the user to the values
-             of the initial estimate of the solution vector. 
-	     On exit with info=0, it contains the values of the variables 
+             of the initial estimate of the solution vector.
+	     On exit with info=0, it contains the values of the variables
 	     at the best point found (usually a solution).
- 
+
      f       is a double precision variable. before initial entry and on
              a re-entry with info=1, it must be set by the user to
              contain the value of the function f at the point x.
- 
+
      g       is a double precision array of length n. before initial
              entry and on a re-entry with info=1, it must be set by
              the user to contain the components of the gradient g at
              the point x.
- 
+
      diagco  is a logical variable that must be set to 1 if the
              user  wishes to provide the diagonal matrix hk0 at each
              iteration. Otherwise it should be set to 0, in which
              case  lbfgs will use a default value described below.
- 
+
      diag    is a double precision array of length n. if diagco=.true.,
              then on initial entry or on re-entry with info=2, diag
-             it must be set by the user to contain the values of the 
+             it must be set by the user to contain the values of the
              diagonal matrix hk0.  Restriction: all elements of diag
              must be positive.
 
      print   is an integer array of length two which must be set by the
              user.
- 
+
              print(1) specifies the frequency of the output:
                 print(1) < 0 : no output is generated,
                 print(1) = 0 : output only at first and last iteration,
                 print(1) > 0 : output every print(1) iterations.
- 
+
              print(2) specifies the type of output generated:
-                print(2) = 0 : iteration count, number of function 
+                print(2) = 0 : iteration count, number of function
                                 evaluations, function value, norm of the
                                 gradient, and steplength,
                 print(2) = 1 : same as print(2)=0, plus vector of
@@ -273,13 +270,13 @@ the routine csrch written by Moré and Thuente.
                 print(2) = 2 : same as print(2)=1, plus vector of
                                 variables,
                 print(2) = 3 : same as print(2)=2, plus gradient vector.
- 
+
      maxit   On entry maximum number of iteration.
 	     On exit, the number of iteration.
 
      maxfc   On entry maximum number of function evaluation.
 	     On exit, the number of function evaluation.
- 
+
      eps     is a positive double precision variable that must be set by
              the user, and determines the accuracy with which the solution
              is to be found. the subroutine terminates when
@@ -287,31 +284,31 @@ the routine csrch written by Moré and Thuente.
                          ||g|| < eps max(1,||x||),
 
              where ||.|| denotes the euclidean norm.
- 
+
      xtol    is a  positive double precision variable that must be set by
              the user to an estimate of the machine precision (e.g.
              10**(-16) on a sun station 3/60). The line search routine will
              terminate if the relative width of the interval of uncertainty
              is less than xtol.
 
-     gtol    is a double precision variable which controls the accuracy of 
-     	     the line search routine mcsrch. If the function and gradient 
-             evaluations are inexpensive with respect to the cost of the 
-	     iteration (which is sometimes the case when solving very large 
-	     problems) it may be advantageous to set gtol to a small value. 
-	     A typical small value is 0.1. It's set to 0.9 if gtol < 1.d-04.  
+     gtol    is a double precision variable which controls the accuracy of
+	     the line search routine mcsrch. If the function and gradient
+             evaluations are inexpensive with respect to the cost of the
+	     iteration (which is sometimes the case when solving very large
+	     problems) it may be advantageous to set gtol to a small value.
+	     A typical small value is 0.1. It's set to 0.9 if gtol < 1.d-04.
 	     restriction: gtol should be greater than 1.d-04.
- 
+
      info    is an integer variable that must be set to 0 on initial entry
-             to the subroutine. A return with info < 0 or info > 2 indicates 
-	     an error.  
+             to the subroutine. A return with info < 0 or info > 2 indicates
+	     an error.
              The following values of info, detecting an error,
              are possible:
- 
+
               info=-1  the i-th diagonal element of the diagonal inverse
                         hessian approximation, given in diag, is not
                         positive.
-           
+
               info=-2  improper input parameters for lbfgs (n or m are
                         not positive).
 
@@ -326,7 +323,7 @@ the routine csrch written by Moré and Thuente.
 
                        info = 5  the step is too large.
 
-                       info = 6  rounding errors prevent further progress. 
+                       info = 6  rounding errors prevent further progress.
                                  there may not be a step which satisfies
                                  the sufficient decrease and curvature
                                  conditions. tolerances may be too small.
@@ -335,7 +332,7 @@ the routine csrch written by Moré and Thuente.
                                  uncertainty is at most xtol.
 
                        info = 8  improper input parameters.
- 
+
 	fg_func:
 		stop = fg_func PDL(fx), PDL(gx), PDL(x)
 
@@ -370,8 +367,8 @@ the routine csrch written by Moré and Thuente.
 
 =for bad
 
-lbfgs ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+lbfgs ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -406,7 +403,7 @@ This routine solves the optimization problem
 It uses the limited memory BFGS method.
 (The direct method will be used in the subspace minimization.)
 
-     x 
+     x
 	is a double precision array of dimension n.
 	On entry x is an approximation to the solution.
 	On exit x is the current approximation.
@@ -424,11 +421,11 @@ It uses the limited memory BFGS method.
      tbound(n)
 	On entry nbd represents the type of bounds imposed on the
 	variables, and must be specified as follows:
- 	nbd(i)=0 if x(i) is unbounded,
+	nbd(i)=0 if x(i) is unbounded,
                 1 if x(i) has only a lower bound,
                 2 if x(i) has both lower and upper bounds, and
                 3 if x(i) has only an upper bound.
- 	On exit nbd is unchanged.
+	On exit nbd is unchanged.
 
      fx
 	On first entry f is unspecified.
@@ -439,8 +436,8 @@ It uses the limited memory BFGS method.
 	On final exit g is the value of the gradient at x.
 
      maxit
-     	On entry maximum number of iteration.
-     	On exit, the number of iteration
+	On entry maximum number of iteration.
+	On exit, the number of iteration
 
      factr
 	On entry factr >= 0 is specified by the user.  The iteration
@@ -459,15 +456,15 @@ It uses the limited memory BFGS method.
 
 	max{|proj g_i | i = 1, ..., n} <= pgtol
 
-	where pg_i is the ith component of the projected gradient.   
+	where pg_i is the ith component of the projected gradient.
 
      gtol
 	Controls the accuracy of the line search routine mcsrch.
-	If the function and gradient evaluations are inexpensive with 
-	respect to the cost of the iteration (which is sometimes the case 
-	when solving very large problems) it may be advantageous to set 
-	gtol to a small value. A typical small value is 0.1. 
-	It's set to 0.9 if gtol < 1.d-04. 
+	If the function and gradient evaluations are inexpensive with
+	respect to the cost of the iteration (which is sometimes the case
+	when solving very large problems) it may be advantageous to set
+	gtol to a small value. A typical small value is 0.1.
+	It's set to 0.9 if gtol < 1.d-04.
 	Restriction: gtol should be greater than 1.d-04.
 
      print
@@ -481,8 +478,8 @@ It uses the limited memory BFGS method.
          When print[1] > 0, the file iterate.dat will be created to
                         summarize the iteration.
      info
-     	On entry 0,
-     	On exit, contain error code:
+	On entry 0,
+	On exit, contain error code:
 	  0 : no error
 	  -1: the routine has terminated abnormally
               without being able to satisfy the termination conditions,
@@ -493,16 +490,16 @@ It uses the limited memory BFGS method.
      iv(44)
 	On exit, at end of an iteration, the following information is
 	available:
-         iv(21) = the total number of intervals explored in the 
+         iv(21) = the total number of intervals explored in the
                          search of Cauchy points;
-         iv(25) = the total number of skipped BFGS updates before 
+         iv(25) = the total number of skipped BFGS updates before
                          the current iteration;
          iv(29) = the number of current iteration;
          iv(30) = the total number of BFGS updates prior the current
                          iteration;
          iv(32) = the number of intervals explored in the search of
                          Cauchy point in the current iteration;
-         iv(33) = the total number of function and gradient 
+         iv(33) = the total number of function and gradient
                          evaluations;
          iv(35) = the number of function value or gradient
                                   evaluations in the current iteration;
@@ -539,7 +536,7 @@ It uses the limited memory BFGS method.
          v(6) = the accumulated time spent on searching for Cauchy points;
          v(7) = the accumulated time spent on subspace minimization;
          v(8) = the accumulated time spent on line search;
-         v(10) = the slope of the line search function at 
+         v(10) = the slope of the line search function at
 		 the current point of line search;
          v(11) = the maximum relative step length imposed in line search;
          v(12) = the infinity norm of the projected gradient;
@@ -562,7 +559,7 @@ It uses the limited memory BFGS method.
 
 	# Global Optimization
 	# Try to solve (with threading)
-	# The SIAM 100-Digit Challenge problem 4 
+	# The SIAM 100-Digit Challenge problem 4
 	# see http://www-m8.ma.tum.de/m3/bornemann/challengebook/
 	# result: -3.30686864747523728007611377089851565716648236
 	use PDL::Opt::NonLinear;
@@ -571,13 +568,13 @@ It uses the limited memory BFGS method.
 	$x = (random(2,500)-0.5)*2;
 	$gx = zeroes(2,500);
 	$fx = zeroes(500);
-        
+
 	$bounds =  zeroes(2,2);
 	$bounds(,0).= -1;
 	$bounds(,1).= 1;
 
 	$tbounds = zeroes(2);
-	$tbounds .= 2;  
+	$tbounds .= 2;
 
 	$gtol = pdl(0.9);
 	$pgtol = pdl(1e-4);
@@ -597,17 +594,17 @@ It uses the limited memory BFGS method.
 	sub fg_func{
 		my ($f, $g, $x) = @_;
 	
-		$f.= exp(sin(50*$x(0)))+sin(60*exp($x(1)))+ 
+		$f.= exp(sin(50*$x(0)))+sin(60*exp($x(1)))+
 			sin(70*sin($x(0)))+sin(sin(80*$x(1)))-
-                	sin(10*($x(0)+$x(1)))+($x(0)**2+$x(1)**2)/4;
+	sin(10*($x(0)+$x(1)))+($x(0)**2+$x(1)**2)/4;
 
 		$g(0) .= 50*cos(50*$x(0))* exp(sin(50*$x(0)))+
-        	        70*cos(70*sin($x(0)))*cos($x(0))-
-                	10*cos(10*$x(0)+10*$x(1))+1/2*$x(0);
-            
-		$g(1) .= 60*cos(60*exp($x(1)))* exp($x(1))+ 
-        	        80*cos(sin(80*$x(1)))* cos(80*$x(1))-
-                	10*cos(10*$x(0)+10*$x(1))+1/2*$x(1);
+	        70*cos(70*sin($x(0)))*cos($x(0))-
+	10*cos(10*$x(0)+10*$x(1))+1/2*$x(0);
+
+		$g(1) .= 60*cos(60*exp($x(1)))* exp($x(1))+
+	        80*cos(sin(80*$x(1)))* cos(80*$x(1))-
+	10*cos(10*$x(0)+10*$x(1))+1/2*$x(1);
 
 		return 0;
 	}
@@ -649,8 +646,8 @@ It uses the limited memory BFGS method.
 
 =for bad
 
-lbfgsb ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+lbfgsb ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -683,17 +680,17 @@ This routine solves the optimization problem
 
 where x is a vector of n real variables. The method used
 is a  Spectral Projected Gradient
-(Version 2: "continuous projected gradient direction") 
+(Version 2: "continuous projected gradient direction")
 to find the local minimizers of a given function with convex
 constraints, described in E. G. Birgin, J. M. Martinez, and M. Raydan,
-"Nonmonotone spectral projected gradient methods on convex sets", SIAM 
-Journal on Optimization 10, pp. 1196-1211, 2000. and  
-E. G. Birgin, J. M. Martinez, and M. Raydan, "SPG: software 
-for convex-constrained optimization", ACM Transactions on 
+"Nonmonotone spectral projected gradient methods on convex sets", SIAM
+Journal on Optimization 10, pp. 1196-1211, 2000. and
+E. G. Birgin, J. M. Martinez, and M. Raydan, "SPG: software
+for convex-constrained optimization", ACM Transactions on
 Mathematical Software, 2001 (to appear).
 
-The user must supply the external subroutines evalf, evalg 
-and proj to evaluate the objective function and its gradient 
+The user must supply the external subroutines evalf, evalg
+and proj to evaluate the objective function and its gradient
 and to project an arbitrary point onto the feasible region.
 
 This version 17 JAN 2000 by E.G.Birgin, J.M.Martinez and M.Raydan.
@@ -704,7 +701,7 @@ Final revision 03 JUL 2001 by E.G.Birgin, J.M.Martinez and M.Raydan.
 
      x(n)  initial guess,
 
-     m     number of previous function values to be considered 
+     m     number of previous function values to be considered
            in the nonmonotone line search,
 
      eps1  stopping criterion: ||projected grad||_inf < eps,
@@ -801,8 +798,8 @@ Final revision 03 JUL 2001 by E.G.Birgin, J.M.Martinez and M.Raydan.
 
 =for bad
 
-spg ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+spg ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -845,12 +842,12 @@ especially useful when the number of variables (n) is large.
 	subroutine parameters:
 
 	fx      On input, a rough estimate of the value of the
-         	objective function at the solution; on output, the value
-	        of the objective function at the solution        
+	objective function at the solution; on output, the value
+	        of the objective function at the solution
 
 	gx(n)   on output, the final value of the gradient
 
-	x(n)    on input, an initial estimate of the solution; 
+	x(n)    on input, an initial estimate of the solution;
 		on output, the computed solution.
 
 	maxit   maximum number of inner iterations
@@ -876,7 +873,7 @@ especially useful when the number of variables (n) is large.
 	info     ( 0 => normal return)
 	         ( 1 => more than maxit iterations)
 	         ( 2 => more than maxfun evaluations)
-        	 ( 3 => line search failed to find
+	 ( 3 => line search failed to find
 	         (          lower point (may not be serious)
 	         (-1 => error in input parameters)
 
@@ -914,8 +911,8 @@ especially useful when the number of variables (n) is large.
 
 =for bad
 
-lmqn ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+lmqn ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -960,18 +957,18 @@ especially useful when the number of variables (n) is large.
 	subroutine parameters:
 
 	fx      On input, a rough estimate of the value of the
-         	objective function at the solution; on output, the value
-	        of the objective function at the solution        
+	objective function at the solution; on output, the value
+	        of the objective function at the solution
 
 	gx(n)   on output, the final value of the gradient
 
-	x(n)    on input, an initial estimate of the solution; 
+	x(n)    on input, an initial estimate of the solution;
 		on output, the computed solution.
 
 	bound(n,2)
 		The lower and upper bounds on the variables.  if
-           	there are no bounds on a particular variable, set
-           	the bounds to -1.d38 and 1.d38, respectively.
+	there are no bounds on a particular variable, set
+	the bounds to -1.d38 and 1.d38, respectively.
 
 	maxit   maximum number of inner iterations
 
@@ -994,7 +991,7 @@ especially useful when the number of variables (n) is large.
 	info     ( 0 => normal return)
 	         ( 1 => more than maxit iterations)
 	         ( 2 => more than maxfun evaluations)
-        	 ( 3 => line search failed to find
+	 ( 3 => line search failed to find
 	         (          lower point (may not be serious)
 	         (-1 => error in input parameters)
 
@@ -1035,8 +1032,8 @@ especially useful when the number of variables (n) is large.
 
 =for bad
 
-lmqnbc ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+lmqnbc ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1063,32 +1060,32 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for ref
 
 This subroutine solves the unconstrained minimization problem
- 
+
 		min f(x),    x= (x1,x2,...,xn),
 
 using conjugate gradient methods, as described in the paper:
-gilbert, j.c. and nocedal, j. (1992). "global convergence properties 
+gilbert, j.c. and nocedal, j. (1992). "global convergence properties
 of conjugate gradient methods", siam journal on optimization, vol. 2,
-pp. 21-42. 
- 
- 
+pp. 21-42.
+
+
       where
- 
+
      fx      is a double precision variable. before initial entry and on
              a re-entry with info=1, it must be set by the user to
              contain the value of the function f at the point x.
- 
+
      gx      is a double precision array of length n. before initial
              entry and on a re-entry with info=1, it must be set by
              the user to contain the components of the gradient g at
              the point x.
      x       on initial entry, it must be set by the user to the values
-             of the initial estimate of the solution vector. 
-	     on exit with info=0, it contains the values of the variables 
+             of the initial estimate of the solution vector.
+	     on exit with info=0, it contains the values of the variables
 	     at the best point found (usually a solution).
- 
+
      maxit   maximum number of iterations.
-     
+
      eps     is a positive double precision variable that must be set by
              the user, and determines the accuracy with which the solution
              is to be found. the subroutine terminates when
@@ -1096,19 +1093,19 @@ pp. 21-42.
                          ||g|| < eps max(1,||x||),
 
              where ||.|| denotes the euclidean norm.
- 
+
      xtol    is a  positive double precision variable that must be set by
              the user to an estimate of the machine precision (e.g.
              10**(-16) on a sun station 3/60). the line search routine will
              terminate if the relative width of the interval of uncertainty
              is less than xtol.
 
-     gtol    is a double precision variable which controls the accuracy of 
-     	     the line search routine mcsrch. if the function and gradient 
-             evaluations are inexpensive with respect to the cost of the 
-	     iteration (which is sometimes the case when solving very large 
-	     problems) it may be advantageous to set gtol to a small value. 
-	     A typical small value is 0.1. It's set to 0.9 if gtol < 1.d-04.  
+     gtol    is a double precision variable which controls the accuracy of
+	     the line search routine mcsrch. if the function and gradient
+             evaluations are inexpensive with respect to the cost of the
+	     iteration (which is sometimes the case when solving very large
+	     problems) it may be advantageous to set gtol to a small value.
+	     A typical small value is 0.1. It's set to 0.9 if gtol < 1.d-04.
 	     restriction: gtol should be greater than 1.d-04.
 
      print   frequency and type of printing
@@ -1121,22 +1118,22 @@ pp. 21-42.
               iprint(2) = 0 : no additional information printed
 		iprint(2) = 1 : initial x and gradient vectors printed
 		iprint(2) = 2 : x vector printed every iteration
-		iprint(2) = 3 : x vector and gradient vector printed 
-				every iteration 
+		iprint(2) = 3 : x vector and gradient vector printed
+				every iteration
     info     controls termination of code, and return to main
                program to evaluate function and gradient
                info = -3 : improper input parameters
                info = -2 : descent was not obtained
                info = -1 : line search failure
-               info =  0 : initial entry or 
-                            successful termination without error   
+               info =  0 : initial entry or
+                            successful termination without error
                info = 1 : user canceled optimization (maximum iteration)
                info = 2 : user canceled optimization
 
-     method =  1 : fletcher-reeves 
+     method =  1 : fletcher-reeves
                2 : polak-ribiere
                3 : positive polak-ribiere ( beta=max{beta,0} )
- 
+
      scalar fg_func: computes the value(fx) and gradient(gx)  of the function at x.
 		param fx, gx, x
 		return value
@@ -1168,8 +1165,8 @@ pp. 21-42.
 
 =for bad
 
-cgfam ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+cgfam ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1196,10 +1193,10 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for ref
 
 Find a point X where the nonlinear function f(X) has a local
-minimum.  X is an n-vector and f(X) is a scalar.  In mathematical 
-notation  
+minimum.  X is an n-vector and f(X) is a scalar.  In mathematical
+notation
 
-	f: R^n -> R^1.  
+	f: R^n -> R^1.
 
 The objective function f()
 is not required to be continuous.  Nor does f() need to be
@@ -1215,71 +1212,71 @@ Jeeves.
 
 rho controls convergence :
 
-The algorithm works by taking "steps" from one estimate of 
-a minimum, to another (hopefully better) estimate.  Taking   
-big steps gets to the minimum more quickly, at the risk of   
-"stepping right over" an excellent point.  The stepsize is   
-controlled by a user supplied parameter called rho.  At each 
-iteration, the stepsize is multiplied by rho  (0 < rho < 1), 
-so the stepsize is successively reduced.			   
-Small values of rho correspond to big stepsize changes,    
-which make the algorithm run more quickly.  However, there   
-is a chance (especially with highly nonlinear functions)	   
-that these big changes will accidentally overlook a	   
-promising search vector, leading to nonconvergence.	   
-Large values of rho correspond to small stepsize changes,  
-which force the algorithm to carefully examine nearby points 
-instead of optimistically forging ahead.	This improves the  
-probability of convergence.				   
-The stepsize is reduced until it is equal to (or smaller   
-than) tol.  So the number of iterations performed by	   
-Hooke-Jeeves is determined by rho and tol:		   
+The algorithm works by taking "steps" from one estimate of
+a minimum, to another (hopefully better) estimate.  Taking
+big steps gets to the minimum more quickly, at the risk of
+"stepping right over" an excellent point.  The stepsize is
+controlled by a user supplied parameter called rho.  At each
+iteration, the stepsize is multiplied by rho  (0 < rho < 1),
+so the stepsize is successively reduced.			
+Small values of rho correspond to big stepsize changes,
+which make the algorithm run more quickly.  However, there
+is a chance (especially with highly nonlinear functions)	
+that these big changes will accidentally overlook a	
+promising search vector, leading to nonconvergence.	
+Large values of rho correspond to small stepsize changes,
+which force the algorithm to carefully examine nearby points
+instead of optimistically forging ahead.	This improves the
+probability of convergence.				
+The stepsize is reduced until it is equal to (or smaller
+than) tol.  So the number of iterations performed by	
+Hooke-Jeeves is determined by rho and tol:		
 
-    rho**(number_of_iterations) = tol		   
+    rho**(number_of_iterations) = tol		
 
-In general it is a good idea to set rho to an aggressively 
-small value like 0.5 (hoping for fast convergence).  Then,   
-if the user suspects that the reported minimum is incorrect  
-(or perhaps not accurate enough), the program can be run	   
-again with a larger value of rho such as 0.85, using the	   
-result of the first minimization as the starting guess to    
-begin the second minimization.				   
+In general it is a good idea to set rho to an aggressively
+small value like 0.5 (hoping for fast convergence).  Then,
+if the user suspects that the reported minimum is incorrect
+(or perhaps not accurate enough), the program can be run	
+again with a larger value of rho such as 0.85, using the	
+result of the first minimization as the starting guess to
+begin the second minimization.				
 
 
 
 
      x:		   On entry this is the user-supplied guess at the minimum.
-     		   On exit this is the location of  the local minimum,
-     		   calculated by the program    
+		   On exit this is the location of  the local minimum,
+		   calculated by the program
 
-     maxit	   On entry, a rarely used, halting    
-		   criterion.  If the algorithm uses >= maxit    
+     maxit	   On entry, a rarely used, halting
+		   criterion.  If the algorithm uses >= maxit
 		   iterations, halt.
 		   On exit number of iteration.
 
-     rho	   This is a user-supplied convergence 
-		   parameter (more detail above), which should be  
-		   set to a value between 0.0 and 1.0.	Larger	   
-		   values of rho give greater probability of	   
-		   convergence on highly nonlinear functions, at a 
-		   cost of more function evaluations.  Smaller	   
-		   values of rho reduces the number of evaluations 
-		   (and the program running time), but increases   
-		   the risk of nonconvergence.	See below.	   
+     rho	   This is a user-supplied convergence
+		   parameter (more detail above), which should be
+		   set to a value between 0.0 and 1.0.	Larger	
+		   values of rho give greater probability of	
+		   convergence on highly nonlinear functions, at a
+		   cost of more function evaluations.  Smaller	
+		   values of rho reduces the number of evaluations
+		   (and the program running time), but increases
+		   the risk of nonconvergence.	See below.	
 
-     tol	   This is the criterion for halting   
-		   the search for a minimum.  When the algorithm   
-		   begins to make less and less progress on each   
-		   iteration, it checks the halting criterion: if  
-		   the stepsize is below tol, terminate the    
-		   iteration and return the current best estimate  
-		   of the minimum.  Larger values of tol (such 
-		   as 1.0e-4) give quicker running time, but a	   
-		   less accurate estimate of the minimum.  Smaller 
-		   values of tol (such as 1.0e-7) give longer  
-		   running time, but a more accurate estimate of   
-		   the minimum. 				   
-   
+     tol	   This is the criterion for halting
+		   the search for a minimum.  When the algorithm
+		   begins to make less and less progress on each
+		   iteration, it checks the halting criterion: if
+		   the stepsize is below tol, terminate the
+		   iteration and return the current best estimate
+		   of the minimum.  Larger values of tol (such
+		   as 1.0e-4) give quicker running time, but a	
+		   less accurate estimate of the minimum.  Smaller
+		   values of tol (such as 1.0e-7) give longer
+		   running time, but a more accurate estimate of
+		   the minimum.				
+
      func	   objective function to be minimized.
 		   scalar double fun ($x(n))
 
@@ -1300,8 +1297,8 @@ begin the second minimization.
 
 =for bad
 
-hooke ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+hooke ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -1833,11 +1830,11 @@ evalhd could be:
 	}
 	gencan($fx, $gx, $x, $bounds, -1e308, 200, 1000,
 	1, 0, 0, 0, 5, 10, 5, 1, -1, 5,
-	0, 1e-10, 1e-10, 1e-8, 0.1, 1e-8, 1e-8, 
+	0, 1e-10, 1e-10, 1e-8, 0.1, 1e-8, 1e-8,
 	-1, 0.9, 0.1,
 	1e+40, 1e-40, 1e-6, 0.0001, 0.5, 0.1,0.9,
 	2, 2, 1e-10, 1e-99, 1e-30, 1e-99, 1e+308,
-	($gpeucn2=null), ($gpsupn=null), ($iter=null), ($fcnt=null), 
+	($gpeucn2=null), ($gpsupn=null), ($iter=null), ($fcnt=null),
 	($gcnt=null), ($cgcnt=null), ($spgiter=null), ($spgfcnt=null),
 	($tniter=null), ($tnfcnt=null), ($tnstpcnt=null), ($tnintcnt=null), ($tnexgcnt=null), ($tnexbcnt=null),
 	($tnintfe=null), ($tnexgfe=null), ($tnexbfe=null),	
@@ -1847,8 +1844,8 @@ evalhd could be:
 
 =for bad
 
-gencan ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+gencan ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2270,7 +2267,7 @@ evalhd could be:
 	}
 	sgencan($fx, $gx, $x, $bounds, $maxit, $maxfc,
 	1, 0, 0, 0, 5, 10, 5, 1, -1, 5,
-	0, 1e-8, 1e-10, 1e-5, 0.1, 1e-5, 1e-5, 
+	0, 1e-8, 1e-10, 1e-5, 0.1, 1e-5, 1e-5,
 	-1, 0.9, 0.1,
 	$print,$info,\&f_func,\&g_func, \&h_func);
 
@@ -2278,8 +2275,8 @@ evalhd could be:
 
 =for bad
 
-sgencan ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+sgencan ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2306,8 +2303,8 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for ref
 
 Find a point X where the function dhc_func(X) has a global
-minimum.  X is an n-vector and f(X) is a scalar.  In mathematical 
-notation  
+minimum.  X is an n-vector and f(X) is a scalar.  In mathematical
+notation
 
 	f: R^n -> R^1.
 
@@ -2318,11 +2315,11 @@ A.I. Technical Report No. 1569 (1994).
 
 
       where
- 
-     fx:           On exit it contains the value of the function f at 
+
+     fx:           On exit it contains the value of the function f at
 		   the point x.
      x:		   On exit this is the location of the global minimum,
-     		   calculated by the program.
+		   calculated by the program.
      xrandom:	   This is a user-supplied initial starting locations.
 		   On exit there are locations of the minimums
 		   calculated by the program.
@@ -2331,8 +2328,8 @@ A.I. Technical Report No. 1569 (1994).
      print:	   if true print some information at each iteration
 		   (each minimum).
      dhc_func:	   Objective function to be minimized.
-		   If you need boundary conditions, put them in the 
-		   objective function such that the optimizer gets 
+		   If you need boundary conditions, put them in the
+		   objective function such that the optimizer gets
 		   bad values for points out of bounds.
 		   scalar double dhc_func($x())
 
@@ -2350,13 +2347,13 @@ A.I. Technical Report No. 1569 (1994).
 	print "Minimum found ($fx) at $ret";
 
 	# Try to solve
-	# The SIAM 100-Digit Challenge problem 4 
+	# The SIAM 100-Digit Challenge problem 4
 	# see http://www-m8.ma.tum.de/m3/bornemann/challengebook/
 	# result: -3.30686864747523728007611377089851565716648236
 	$randomx = (random(2,100)-0.5)*2;
 	sub test{
 		my $x = shift;
-		my $f = exp(sin(50*$x(0)))+sin(60*exp($x(1)))+ 
+		my $f = exp(sin(50*$x(0)))+sin(60*exp($x(1)))+
 		sin(70*sin($x(0)))+sin(sin(80*$x(1)))-
                 sin(10*($x(0)+$x(1)))+($x(0)**2+$x(1)**2)/4;
 		$f->sclr;
@@ -2369,8 +2366,8 @@ A.I. Technical Report No. 1569 (1994).
 
 =for bad
 
-dhc ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+dhc ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2398,8 +2395,8 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 =for ref
 
 Find a point X where the function de_func(X) has a global
-minimum.  X is an n-vector and f(X) is a scalar. In mathematical 
-notation  
+minimum.  X is an n-vector and f(X) is a scalar. In mathematical
+notation
 
 	f: R^n -> R^1.
 
@@ -2439,11 +2436,11 @@ Strategy:
 
 
       where
- 
-     fx:           On exit it contains the value of the function f at 
+
+     fx:           On exit it contains the value of the function f at
 		   the point x.
      x:		   On exit this is the location of the global minimum,
-     		   calculated by the program.
+		   calculated by the program.
      cvar:	   On exit it contains the value variance of the function f.
      strategy:	   Choice of strategy.
      seed:	   Random seed.
@@ -2456,18 +2453,18 @@ Strategy:
      print:	   if > 1 print some information at each 'print' generation
 		   (minimum = 1).
      de_func:	   Objective function to be minimized.
-		   If you need boundary conditions, put them in the 
-		   objective function such that the optimizer gets 
+		   If you need boundary conditions, put them in the
+		   objective function such that the optimizer gets
 		   bad values for points out of bounds.
 		   scalar double de_func($x())
 
 =for example
 
 	# Try to solve
-	# The SIAM 100-Digit Challenge problem 4 
+	# The SIAM 100-Digit Challenge problem 4
 	# see http://www-m8.ma.tum.de/m3/bornemann/challengebook/
 	# result: -3.30686864747523728007611377089851565716648236
-	use PDL::Opt::NonLinear;   
+	use PDL::Opt::NonLinear;
 
 	$x = zeroes(2);
 	$strategy = pdl(long,7);
@@ -2485,13 +2482,13 @@ Strategy:
                 my ($x0, $y1);
 		$x0 = PDL::Core::sclr_c($x(0));
 		$y1 = PDL::Core::sclr_c($x(1));
-		my $f = exp(sin(50*$x0))+sin(60*exp($y1))+ 
+		my $f = exp(sin(50*$x0))+sin(60*exp($y1))+
                 sin(70*sin($x0))+sin(sin(80*$y1))-
                 sin(10*($x0+$y1))+($x0**2+$y1**2)/4;
                 $f;
 	}
-	($fx,$cvar)=de_opt($x, $genmax, $seed, $strategy, $np, 
-		$f, $cr, $inibound_l, $inibound_h, 
+	($fx,$cvar)=de_opt($x, $genmax, $seed, $strategy, $np,
+		$f, $cr, $inibound_l, $inibound_h,
 		$print, \&test);
 
 	print "Minimum found ($fx) at $x with variance $cvar\n";
@@ -2499,8 +2496,8 @@ Strategy:
 
 =for bad
 
-de_opt ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+de_opt ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2542,7 +2539,7 @@ It uses the Adaptive Simulated Annealing (ASA) method.
 
      where
 
-     x 
+     x
 	is a double precision array of dimension n.
 	On entry x is an approximation to the solution.
 	On exit x is the current approximation.
@@ -2617,11 +2614,11 @@ It uses the Adaptive Simulated Annealing (ASA) method.
 	On exit, it is the value of the tangents (gradient) at x.
 
      curvature
-     	On exit, it is the value of the curvature (hessian) at x.
+	On exit, it is the value of the curvature (hessian) at x.
 
      info
-     	On entry 0,
-     	On exit, contain error code:
+	On entry 0,
+	On exit, contain error code:
 		NORMAL_EXIT		    => 0
 		P_TEMP_TOO_SMALL	    => 1
 		C_TEMP_TOO_SMALL	    => 2
@@ -2638,7 +2635,7 @@ It uses the Adaptive Simulated Annealing (ASA) method.
 =for example
 
 	# Try to solve
-	# The SIAM 100-Digit Challenge problem 4 
+	# The SIAM 100-Digit Challenge problem 4
 	# see http://www-m8.ma.tum.de/m3/bornemann/challengebook/
 	# result: -3.30686864747523728007611377089851565716648236
 	use PDL::Opt::NonLinear;
@@ -2647,7 +2644,7 @@ It uses the Adaptive Simulated Annealing (ASA) method.
                 my ($x0, $y1);
                 $x0 = PDL::Core::sclr_c($x(0));
                 $y1 = PDL::Core::sclr_c($x(1));
-                my $f = exp(sin(50*$x0))+sin(60*exp($y1))+ 
+                my $f = exp(sin(50*$x0))+sin(60*exp($y1))+
                 sin(70*sin($x0))+sin(sin(80*$y1))-
                 sin(10*($x0+$y1))+($x0**2+$y1**2)/4;
                 $f;
@@ -2687,8 +2684,8 @@ It uses the Adaptive Simulated Annealing (ASA) method.
 
 =for bad
 
-asa_opt ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+asa_opt ignores the bad-value flag of the input ndarrays.
+It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 
 =cut
@@ -2702,7 +2699,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
-;
+
 
 
 sub rosen{
@@ -2720,10 +2717,10 @@ sub optimize{
 
 	#TODO error, print
 
-	if (substr($function,0,5) eq 'lbfgs' || 
+	if (substr($function,0,5) eq 'lbfgs' ||
 		substr($function,0,4) eq 'lmqn' ||
 		 $function eq 'cgfam'){
-		barf "optimize: no evaluation function\n" 
+		barf "optimize: no evaluation function\n"
 			if ( (!defined $opt{fg_func}) && (!defined $opt{f_func}) && (!defined $opt{g_func}));
 		if (!defined $opt{fg_func}){
 			barf "optimize: no gradient evaluation function\n" unless defined $opt{g_func};
@@ -2831,7 +2828,7 @@ sub optimize{
 			$opt{cgmaxit} = pdl(long, 50) unless defined $opt{cgmaxit};
 			$opt{fg_func}($ret{fx}, $ret{gx}, $x);
 			$opt{fg_func}($ret{fx}, $ret{gx}, $x);
-			defined $opt{bound} ? 
+			defined $opt{bound} ?
 			lmqnbc($ret{fx}, $ret{gx}, $x, $opt{bound}, $ret{iter}, $ret{fcnt}, $opt{cgmaxit}, $opt{eps}, $opt{accrcy}, $opt{eta}, $opt{stepmx}, $opt{'print'}, $ret{info}, $opt{fg_func}):
 			lmqn($ret{fx}, $ret{gx}, $x, $ret{iter}, $ret{fcnt}, $opt{cgmaxit}, $opt{eps}, $opt{accrcy}, $opt{eta}, $opt{stepmx}, $opt{'print'}, $ret{info}, $opt{fg_func});
 			if ($opt{'print'}){
@@ -2924,7 +2921,7 @@ sub optimize{
 		$opt{fscale} =  pdl(1) unless defined $opt{fscale};
 		$opt{typx} =  ones($x->dim(0)) unless defined $opt{typx};
 
-		tensoropt($ret{fx}, $ret{gx}, $hx, $x, 
+		tensoropt($ret{fx}, $ret{gx}, $hx, $x,
 			$opt{'method'},$ret{iter},$opt{digits},$opt{gtype},$opt{htype},$opt{fscale},
 			$opt{typx},$opt{stempx},$opt{xtol},$opt{gtol},$opt{'print'},$opt{ipr},
 			$opt{f_func}, $opt{g_func}, $opt{h_func});
@@ -3012,7 +3009,7 @@ sub optimize{
 		$ret{gnorm1} = null;$ret{gnorm2} = null;
 		$ret{iter} = null; $ret{fcnt}= null;$ret{spgfcnt}=null;
 		$ret{gcnt} = null; $ret{cgcnt} = null; $ret{spgiter} = null;
-		$ret{tniter} = null; $ret{tnfcnt} = null; $ret{tnstpcnt} = null; 
+		$ret{tniter} = null; $ret{tnfcnt} = null; $ret{tnstpcnt} = null;
 		$ret{tnintcnt}= null; $ret{tnexgcnt} = null; $ret{tnexbcnt} = null;
 		$ret{tnintfe}= null; $ret{tnexgfe}= null; $ret{tnexbfe}=null;
 
@@ -3025,11 +3022,11 @@ sub optimize{
 
 		gencan($ret{fx}, $ret{gx}, $x, $opt{bound}, $opt{fmin}, $opt{maxit}, $opt{maxfc},
 		$opt{nearlyq}, $opt{gtype}, $opt{htvtype}, $opt{trtype}, $opt{fmaxit}, $opt{gmaxit}, $opt{interpmaxit}, $opt{cgstop}, $opt{cgmaxit}, $opt{qmpmaxit},
-		$opt{ftol}, $opt{gtol2}, $opt{gtol1}, $opt{cggtol}, $opt{cgintol}, $opt{cgfitol}, $opt{qmptol}, 
+		$opt{ftol}, $opt{gtol2}, $opt{gtol1}, $opt{cggtol}, $opt{cgintol}, $opt{cgfitol}, $opt{qmptol},
 		$opt{delta}, $opt{eta}, $opt{delmin},
 		$opt{lammax}, $opt{lammin}, $opt{theta}, $opt{gamma}, $opt{beta}, $opt{sigma1},$opt{sigma2},
 		$opt{nint}, $opt{'next'}, $opt{sterel}, $opt{steabs}, $opt{epsrel}, $opt{epsabs}, $opt{infty},
-		$ret{gnorm2}, $ret{gnorm1}, $ret{iter}, $ret{fcnt}, 
+		$ret{gnorm2}, $ret{gnorm1}, $ret{iter}, $ret{fcnt},
 		$ret{gcnt}, $ret{cgcnt}, $ret{spgiter}, $ret{spgfcnt},
 		$ret{tniter}, $ret{tnfcnt}, $ret{tnstpcnt}, $ret{tnintcnt}, $ret{tnexgcnt}, $ret{tnexbcnt},
 		$ret{tnintfe}, $ret{tnexgfe}, $ret{tnexbfe},
@@ -3305,8 +3302,8 @@ sub rosen_grad{
 	$grad = $a->zeroes;
 	$grad(1:-2) .= 200 *( $am - $am_m1->power(2,0)) - 400*($am_p1 - $am->power(2,0))*$am - 2*(1-$am);
 	$grad(0) .= -400 * $a(0) * ($a(1) - $a(0)->power(2,0)) - 2*(1-$a(0));
-    	$grad(-1) .= 200 * ( $a(-1) - $a(-2)->power(2,0) );
-    	return $grad;
+	$grad(-1) .= 200 * ( $a(-1) - $a(-2)->power(2,0) );
+	return $grad;
 }
 
 sub rosen_hess{
@@ -3321,12 +3318,11 @@ sub rosen_hess{
         $diag(1:-2) .= 202 + 1200 * $a(1:-2)->power(2,0) - 400 * $a(2:);
         $hess->diagonal(0,1) += $diag;
 	$squared  ? return $hess->tritosym : return  $hess;
-        
 }
 
 =head1 COPYRIGHT
 
-Copyright (C) Grégory Vanuxem 2005-2018.
+Copyright (C) GrÃ©gory Vanuxem 2005-2018.
 All rights reserved. This program is free software; you can
 redistribute it and/or modify it under the same terms as Perl itself.
 
@@ -3339,5 +3335,3 @@ redistribute it and/or modify it under the same terms as Perl itself.
 # Exit with OK status
 
 1;
-
-		   

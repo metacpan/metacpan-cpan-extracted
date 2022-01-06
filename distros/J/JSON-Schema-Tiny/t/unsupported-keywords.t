@@ -1,6 +1,7 @@
 use strict;
 use warnings;
-use 5.016;
+use 5.020;
+use experimental qw(signatures postderef);
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
@@ -50,7 +51,7 @@ my @warnings = (
 );
 
 foreach my $index (0 .. $#warnings) {
-  my ($spec_version, $removed_keywords) = @{$warnings[$index]};
+  my ($spec_version, $removed_keywords) = $warnings[$index]->@*;
 
   note "\n", $spec_version;
   my $js = JSON::Schema::Tiny->new(specification_version => $spec_version);
@@ -63,7 +64,7 @@ foreach my $index (0 .. $#warnings) {
   }
 
   next if $index == $#warnings;
-  my ($next_spec_version, $removed_next_keywords) = @{$warnings[$index+1]};
+  my ($next_spec_version, $removed_next_keywords) = $warnings[$index+1]->@*;
   foreach my $keyword (@$removed_next_keywords) {
     next if grep $keyword eq $_, @$removed_keywords;
     cmp_deeply(

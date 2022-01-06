@@ -1,10 +1,10 @@
 {
    "abstract" : "Non linear optimization routines for PDL",
    "author" : [
-      "Gregory Vanuxem <gvanuxem.perl@gmail.com>"
+      "Grégory Vanuxem <gvanuxem.perl@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -22,24 +22,40 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "PDL" : "0",
-            "PDL::LinearAlgebra" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
             "ExtUtils::F77" : "0",
-            "PDL" : "0"
+            "PDL" : "2.063"
          }
       },
       "runtime" : {
          "requires" : {
-            "PDL" : "0",
+            "PDL" : "2.063",
             "PDL::LinearAlgebra" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/PDLPorters/PDL-Opt-NonLinear/issues"
+      },
+      "homepage" : "http://pdl.perl.org/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/PDLPorters/PDL-Opt-NonLinear.git",
+         "web" : "https://github.com/PDLPorters/PDL-Opt-NonLinear"
+      }
+   },
+   "version" : "0.07",
+   "x_IRC" : "irc://irc.perl.org/#pdl",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-12-01'; # DATE
+our $DATE = '2021-12-09'; # DATE
 our $DIST = 'Text-Table-HTML-DataTables'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 sub _encode {
     state $load = do { require HTML::Entities };
@@ -21,6 +21,7 @@ sub _escape_uri {
 
 sub table {
     require File::ShareDir;
+    require HTML::Entities;
     require JSON::PP;
 
     my %params = @_;
@@ -38,6 +39,7 @@ sub table {
     push @table, "<html>\n";
     push @table, "<head>\n";
 
+    push @table, qq(<title>).HTML::Entities::encode_entities($params{title}).qq(</title>\n) if defined $params{title};
     push @table, qq(<link rel="stylesheet" type="text/css" href="file://)._escape_uri("$dist_dir/datatables-1.10.22/datatables.css").qq(">\n);
     push @table, qq(<script src="file://)._escape_uri("$dist_dir/jquery-2.2.4/jquery-2.2.4.min.js").qq("></script>\n);
     push @table, qq(<script src="file://)._escape_uri("$dist_dir/datatables-1.10.22/datatables.js").qq("></script>\n);
@@ -58,6 +60,7 @@ sub table {
 
     push @table, "<body>\n";
     push @table, "<table>\n";
+    push @table, qq(<caption>).HTML::Entities::encode_entities($params{title}).qq(</caption>\n) if defined $params{title};
 
     # then the data
     my $i = -1;
@@ -126,7 +129,7 @@ Text::Table::HTML::DataTables - Generate HTML table with jQuery and DataTables p
 
 =head1 VERSION
 
-This document describes version 0.008 of Text::Table::HTML::DataTables (from Perl distribution Text-Table-HTML-DataTables), released on 2021-12-01.
+This document describes version 0.009 of Text::Table::HTML::DataTables (from Perl distribution Text-Table-HTML-DataTables), released on 2021-12-09.
 
 =head1 SYNOPSIS
 
@@ -188,7 +191,7 @@ The example shown in the SYNOPSIS generates HTML code like the following:
 
 =head2 OPTIONS
 
-The C<table> function understands these arguments, which are passed as a hash.
+The C<table> function understands these parameters, which are passed as a hash:
 
 =over
 
@@ -196,6 +199,12 @@ The C<table> function understands these arguments, which are passed as a hash.
 
 Takes an array reference which should contain one or more rows of data, where
 each row is an array reference.
+
+=item * title
+
+Optional. Str. If set, will output a HTML C<< <title> >> element in the HTML
+head as well as table C<< <caption> >> element in the HTML body containing the
+given title. The title will be HTML-encoded.
 
 =back
 

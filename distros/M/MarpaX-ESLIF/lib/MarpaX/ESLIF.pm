@@ -62,7 +62,7 @@ BEGIN {
 # Bootstrap
 #
 BEGIN {
-    our $VERSION = '5.0.7'; # VERSION
+    our $VERSION = '6.0.10'; # VERSION
 
     require XSLoader;
     # Modules that we depent on bootstrap
@@ -112,7 +112,7 @@ MarpaX::ESLIF - ESLIF is Extended ScanLess InterFace
 
 =head1 VERSION
 
-version 5.0.7
+version 6.0.10
 
 =head1 SYNOPSIS
 
@@ -227,11 +227,25 @@ L<MarpaX::ESLIF::Introduction>, L<PCRE2|http://www.pcre.org/>, L<MarpaX::ESLIF::
 
 Jean-Damien Durand <jeandamiendurand@free.fr>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Jean-Damien Durand
+=for stopwords Jean-Damien Durand Jeffrey Kegler
+
+=over 4
+
+=item *
 
 Jean-Damien Durand <Jean-Damien.Durand@newaccess.ch>
+
+=item *
+
+Jeffrey Kegler <jeffreykegler@jeffreykegler.com>
+
+=item *
+
+Jeffrey Kegler <jeffreykegler@protonmail.com>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

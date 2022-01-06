@@ -1,6 +1,15 @@
 Revision history for Perl extension UI-Various
 
-0.09 2021-12-29T09:14:50Z
+0.11 2022-01-06T08:22:57Z
+
+0.11 2022-01-06T08:22:16Z
+
+    - added output of package versions to t/00-compile.t
+
+0.10 2022-01-03T08:35:30Z
+
+    - missed workaround for parameters set to undef in Perl <5.20
+    - added missing dependency
 
 0.09 2021-12-29T09:14:27Z
 

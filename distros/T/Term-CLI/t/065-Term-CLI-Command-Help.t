@@ -17,16 +17,20 @@ sub Main {
             : 0
     );
     Term_CLI_Command_Help_test->runtests();
+    return;
 }
 
 package Term_CLI_Command_Help_test {
 
 use parent 0.225 qw( Test::Class );
 
+use charnames qw(:full :short);
+
 use Test::More 1.001002;
 use Test::Output 1.03;
 use Test::Exception 0.35;
 use FindBin 1.50;
+use Capture::Tiny 0.48 qw( capture );
 use Term::CLI;
 use Term::CLI::L10N;
 
@@ -81,6 +85,7 @@ sub startup : Test(startup => 1) {
 
     $self->{cli} = $cli;
     $self->{commands} = [@commands];
+    return;
 }
 
 
@@ -106,20 +111,43 @@ sub check_pager : Test(3) {
     %args = $cli->execute('help');
     is($args{status}, 1<<8, 'pager exit status propagates to status')
         or diag("got status=$args{status}; error='$args{error}'");
+    return;
 }
 
-
-sub check_help : Test(14) {
-    my $self = shift;
+sub check_help_formatted : Test(2) {
+    my ($self) = @_;
     my $cli = $self->{cli};
 
     $cli->find_command('help')->pager( [] );
 
-    stdout_like(
-        sub { $cli->execute('help') },
+    # We cannot use "stdout_like" for formatted help text, because
+    # bold/italic text can be rendered with termcap escape sequences
+    # or by overstriking, so we need to massage the output first. 
+
+    my $stdout;
+
+    ($stdout) = capture { $cli->execute('help') };
+    $stdout =~ s/ . \N{BACKSPACE} (.) /$1/gxms;
+    like($stdout,
         qr/Commands:.*cp.*help.*mv/sm,
         'help returns command summary'
     );
+
+    ($stdout) = capture { $cli->execute('help cp') };
+    $stdout =~ s/ . \N{BACKSPACE} (.) /$1/gxms;
+    like($stdout,
+        qr/Usage:.*cp.*--force.*src.*dst/xsm,
+        '"help cp" returns command help'
+    );
+
+    return;
+}
+
+sub check_help_pod : Test(6) {
+    my ($self) = @_;
+    my $cli = $self->{cli};
+
+    $cli->find_command('help')->pager( [] );
 
     stdout_like(
         sub { $cli->execute('help --pod') },
@@ -127,11 +155,6 @@ sub check_help : Test(14) {
         'help --pod returns POD command summary'
     );
 
-    stdout_like(
-        sub { $cli->execute('help cp') },
-        qr/Usage:.*cp.*--force.*src.*dst/sm,
-        '"help cp" returns command help'
-    );
     stdout_like(
         sub { $cli->execute('help --pod cp') },
         qr/=head\d Usage:.*B<cp>.*B<--force>.*I<src>.*I<dst>/sm,
@@ -182,8 +205,15 @@ sub check_help : Test(14) {
         }smx,
         '"help --pod --all" returns POD command help'
     );
-    my $x=q{
-        };
+
+    return;
+}
+
+sub check_help_error : Test(6) {
+    my ($self) = @_;
+    my $cli = $self->{cli};
+
+    $cli->find_command('help')->pager( [] );
 
     my %args = $cli->execute('help xp');
     ok($args{status} < 0, '"help xp" results in an error');
@@ -197,6 +227,7 @@ sub check_help : Test(14) {
     ok($args{status} < 0, '"help --bad foo" results in an error');
     like($args{error}, qr/Unknown option: bad/, 'error is set correctly');
 
+    return;
 }
 
 sub check_complete : Test(7) {
@@ -268,6 +299,7 @@ sub check_complete : Test(7) {
             "'$line$text' completions are (@expected)")
     or diag("complete_line('$text','$line$text',$start) returned: (", join(", ", map {"'$_'"} @got), ")");
 
+    return;
 }
 
 }

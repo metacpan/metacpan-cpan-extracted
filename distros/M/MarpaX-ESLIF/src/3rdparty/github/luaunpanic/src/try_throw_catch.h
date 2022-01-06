@@ -31,7 +31,7 @@
  */
 
 #undef _TRY_THROW_SETJMP
-/* If we abort it is really really bad luck... */
+/* If we abort here it is really really bad luck... */
 #define _TRY_THROW_SETJMP(LW, envp) jmp_buf localenv; do {              \
   if ((LW) == NULL) {                                                   \
     envp = &localenv;                                                   \

@@ -4,7 +4,7 @@ package Chart::GGPlot::Backend::Plotly::Geom::Text;
 
 use Chart::GGPlot::Class;
 
-our $VERSION = '0.0016'; # VERSION
+our $VERSION = '0.002000'; # VERSION
 
 extends qw(Chart::GGPlot::Backend::Plotly::Geom::Path);
 
@@ -110,7 +110,7 @@ Chart::GGPlot::Backend::Plotly::Geom::Text - Chart::GGPlot's Plotly implementati
 
 =head1 VERSION
 
-version 0.0016
+version 0.002000
 
 =head1 SEE ALSO
 

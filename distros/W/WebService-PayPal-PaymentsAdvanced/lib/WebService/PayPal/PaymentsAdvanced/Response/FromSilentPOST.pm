@@ -4,18 +4,17 @@ use Moo;
 
 use namespace::autoclean;
 
-our $VERSION = '0.000027';
+our $VERSION = '0.000028';
 
 use Const::Fast qw( const );
 use List::AllUtils qw( any );
-use MooX::HandlesVia;
 use MooX::StrictConstructor;
 use Net::Works::Address ();
 use Net::Works::Network ();
 use Types::Common::String qw( NonEmptyStr );
 use Types::Standard qw( ArrayRef Bool );
 use Type::Utils qw( class_type );
-use WebService::PayPal::PaymentsAdvanced::Error::IPVerification;
+use WebService::PayPal::PaymentsAdvanced::Error::IPVerification ();
 
 extends 'WebService::PayPal::PaymentsAdvanced::Response';
 
@@ -37,8 +36,8 @@ sub BUILD {
 
 {
     my $Address
-        = class_type( { class => 'Net::Works::Address' } )
-        ->plus_coercions( NonEmptyStr,
+        = class_type( { class => 'Net::Works::Address' } )->plus_coercions(
+        NonEmptyStr,
         sub { Net::Works::Address->new_from_string( string => $_ ) },
         );
 
@@ -90,7 +89,7 @@ WebService::PayPal::PaymentsAdvanced::Response::FromSilentPOST - Response object
 
 =head1 VERSION
 
-version 0.000027
+version 0.000028
 
 =head1 DESCRIPTION
 
@@ -138,7 +137,7 @@ Olaf Alders <olaf@wundercounter.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by MaxMind, Inc.
+This software is copyright (c) 2022 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

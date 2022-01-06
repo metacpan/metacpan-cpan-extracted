@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Create network transition chord progressions
 
-our $VERSION = '0.0503';
+our $VERSION = '0.0602';
 
 use Carp qw(croak);
 use Data::Dumper::Compact qw(ddc);
@@ -39,7 +39,7 @@ has net => (
 
 has chord_map => (
     is      => 'ro',
-    isa     => sub { croak "$_[0] is not a arrayref" unless ref $_[0] eq 'ARRAY' },
+    isa     => sub { croak "$_[0] is not an arrayref" unless ref $_[0] eq 'ARRAY' },
     default => sub { ['', 'm', 'm', '', '', 'm', 'dim'] },
 );
 
@@ -130,6 +130,19 @@ sub _build_graph {
 }
 
 
+has phrase => (
+    is        => 'rw',
+    init_args => undef,
+);
+
+
+has chords => (
+    is        => 'rw',
+    init_args => undef,
+);
+
+
+
 has verbose => (
     is      => 'ro',
     isa     => sub { croak "$_[0] is not a valid boolean" unless $_[0] =~ /^[01]$/ },
@@ -170,7 +183,8 @@ sub generate {
     print 'Chord map: ', ddc(\@chord_map) if $self->verbose;
 
     my @phrase = map { $self->_tt_sub(\@chord_map, $_) } @progression;
-    print 'Phrase: ', ddc(\@phrase) if $self->verbose;
+    $self->phrase(\@phrase);
+    print 'Phrase: ', ddc($self->phrase) if $self->verbose;
 
     # Add octaves to the chords
     my $mcn = Music::Chord::Note->new;
@@ -197,7 +211,8 @@ sub generate {
         }
     }
 
-    print 'Chords: ', ddc(\@chords) if $self->verbose;
+    $self->chords(\@chords);
+    print 'Chords: ', ddc($self->chords) if $self->verbose;
 
     return \@chords;
 }
@@ -318,7 +333,7 @@ Music::Chord::Progression - Create network transition chord progressions
 
 =head1 VERSION
 
-version 0.0503
+version 0.0602
 
 =head1 SYNOPSIS
 
@@ -360,35 +375,30 @@ Default:
     6 => [qw( 1 2 4 5 )],
     7 => [] }
 
-Alternative example:
+A chromatic example:
 
-  { 1 => [qw( 1 2 3 4 5 6 )],
-    2 => [qw( 3 5 )],
-    3 => [qw( 2 4 6 )],
-    4 => [qw( 1 2 3 5 )],
-    5 => [qw( 1 )],
-    6 => [qw( 2 4 )],
-    7 => [] }
+  { 1  => [1 .. 12],
+    2  => [1 .. 11],
+    3  => [1 .. 10],
+    4  => [1 .. 9],
+    5  => [1 .. 8],
+    6  => [1 .. 7],
+    7  => [1 .. 6],
+    8  => [1 .. 5],
+    9  => [1 .. 4],
+    10 => [1 .. 3],
+    11 => [1 .. 2],
+    12 => [1],
+  }
 
 The keys must start with C<1> and be contiguous to the end.
 
-Ending on C<12> represents all the notes of the chromatic scale, for
-instance.  Ending on C<7> can represent the diatonic notes, given the
-B<scale_name>.
+Ending on C<12> keys all the notes of the chromatic scale.  Ending on
+C<7> represents diatonic notes, given the B<scale_name>.
 
 If you do not wish a scale note to be chosen, include it among the
-keys, but do not refer to it and do not give it any neighbors.
-
-For example, the chord for the 5th degree of the scale will not be
-chosen here:
-
-  { 1 => [qw( 1 2 3 4 6 7)],
-    2 => [qw( 3 )],
-    3 => [qw( 2 4 6 )],
-    4 => [qw( 1 2 3 )],
-    5 => [],
-    6 => [qw( 2 4 )],
-    7 => [qw( 1 4 )] }
+keys, but do not refer to it and do not give it any neighbors.  Thus,
+in the first example, the 7th degree of the scale will never be chosen.
 
 =head2 chord_map
 
@@ -488,7 +498,16 @@ Default: C<0>
 
 The network transition L<Graph> object.  This is a computed attribute.
 
-Default: C<Graph::Directed>
+Default: C<Graph::Directed-E<gt>new>
+
+=head2 phrase
+
+The generated phrase of named chords.  This is a computed attribute.
+
+=head2 chords
+
+The generated phrase of individual note chords.  This is a computed
+attribute.
 
 =head2 verbose
 
@@ -519,13 +538,14 @@ Create a new C<Music::Chord::Progression> object.
 
   $chords = $prog->generate;
 
-Generate a fresh chord progression.
+Generate a fresh chord progression and set the B<phrase> and B<chords>
+attributes.
 
 =head2 substitution
 
   $substitute = $prog->substitution($chord_name);
 
-Perform a jazz substitution on the given the B<chord_name>.
+Perform a jazz substitution on the given the named chord.
 
 =head1 SEE ALSO
 
@@ -549,7 +569,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gene Boggs.
+This software is copyright (c) 2022 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

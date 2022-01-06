@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.1805';
+our $VERSION = '0.1900';
 
 use Math::Bezier;
 use MIDI::Simple ();
@@ -173,7 +173,7 @@ sub metronome34 {
 sub metronome44 {
     my $self = shift;
     my $bars = shift || $self->bars;
-    my $flag = shift || 0;
+    my $flag = shift // 0;
 
     my $i = 0;
 
@@ -202,6 +202,23 @@ sub metronome44 {
 
             $i++;
         }
+    }
+}
+
+
+sub metronome44swing {
+    my $self = shift;
+    my $bars = shift || $self->bars;
+
+    for my $n ( 1 .. $bars ) {
+        $self->note( $self->quarter,          $self->ride1, $self->kick );
+        $self->note( $self->triplet_eighth,   $self->ride1 );
+        $self->rest( $self->triplet_eighth );
+        $self->note( $self->triplet_eighth,   $self->ride1, $self->kick );
+        $self->note( $self->quarter,          $self->ride1, $self->snare );
+        $self->note( $self->triplet_eighth,   $self->ride1, $self->kick );
+        $self->rest( $self->triplet_eighth );
+        $self->note( $self->triplet_eighth,   $self->ride1 );
     }
 }
 
@@ -387,7 +404,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.1805
+version 0.1900
 
 =head1 SYNOPSIS
 
@@ -604,13 +621,18 @@ Add a steady 3/4 beat to the score.
   $d->metronome44;
   $d->metronome44($bars);
   $d->metronome44($bars, $flag);
-  $d->metronome44(16, 1);
-  $d->metronome44(0, 1); # Use the ->bars attribute
 
 Add a steady 4/4 beat to the score.
 
 If a B<flag> is provided the beat is modified to include alternating
 eighth-note kicks.
+
+=head2 metronome44swing
+
+  $d->metronome44swing;
+  $d->metronome44swing($bars);
+
+Add a steady 4/4 swing beat to the score.
 
 =head2 metronome54
 
@@ -734,7 +756,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Gene Boggs.
+This software is copyright (c) 2022 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

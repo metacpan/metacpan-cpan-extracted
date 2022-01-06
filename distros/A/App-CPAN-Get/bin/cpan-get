@@ -5,7 +5,7 @@ use warnings;
 
 use App::CPAN::Get;
 
-our $VERSION = 0.03;
+our $VERSION = 0.05;
 
 # Run.
 exit App::CPAN::Get->new->run;
@@ -89,6 +89,12 @@ easily interact with CPAN from the command line
 
 C<cpan -g Some::Module>
 
+=item L<cpanp>
+
+The CPANPLUS launcher
+
+C<cpanp d --fetchdir=. Some::Module>
+
 =item L<cpanspec>
 
 Generate a spec file for a CPAN module
@@ -119,12 +125,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021 Michal Josef Špaček
+© 2021-2022 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.05
 
 =cut

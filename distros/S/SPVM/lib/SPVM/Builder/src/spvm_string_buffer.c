@@ -5,20 +5,51 @@
 #include <inttypes.h>
 
 #include "spvm_string_buffer.h"
-#include "spvm_util_allocator.h"
+#include "spvm_compiler.h"
+#include "spvm_allocator.h"
+#include "spvm_native.h"
 
-SPVM_STRING_BUFFER* SPVM_STRING_BUFFER_new(int32_t capacity) {
-  
+SPVM_STRING_BUFFER* SPVM_STRING_BUFFER_new(SPVM_COMPILER* compiler, int32_t capacity, int32_t memory_block_type, SPVM_ENV* env) {
   
   if (capacity == 0) {
     capacity = 16;
   }
   
-  SPVM_STRING_BUFFER* string_buffer = (SPVM_STRING_BUFFER*) SPVM_UTIL_ALLOCATOR_safe_malloc_zero(sizeof(SPVM_STRING_BUFFER));
+  SPVM_STRING_BUFFER* string_buffer;
+  if (memory_block_type == SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_COMPILE_TIME_TEMPORARY) {
+    string_buffer = (SPVM_STRING_BUFFER*)SPVM_ALLOCATOR_new_block_compile_tmp(compiler, sizeof(SPVM_STRING_BUFFER));
+  }
+  else if (memory_block_type == SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_COMPILE_TIME_ETERNAL) {
+    string_buffer = (SPVM_STRING_BUFFER*)SPVM_ALLOCATOR_new_block_compile_eternal(compiler, sizeof(SPVM_STRING_BUFFER));
+  }
+  else if (memory_block_type == SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_RUN_TIME) {
+    string_buffer = (SPVM_STRING_BUFFER*)SPVM_ALLOCATOR_new_block_runtime(compiler, sizeof(SPVM_STRING_BUFFER), env);
+  }
+  else {
+    assert(0);
+  }
   
   string_buffer->capacity = capacity;
-  string_buffer->buffer = (char*)SPVM_UTIL_ALLOCATOR_safe_malloc_zero(capacity);
+  string_buffer->buffer;
+  if (memory_block_type == SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_COMPILE_TIME_TEMPORARY) {
+    string_buffer->buffer = (char*)SPVM_ALLOCATOR_new_block_compile_tmp(compiler, capacity);
+  }
+  else if (memory_block_type == SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_COMPILE_TIME_ETERNAL) {
+    string_buffer->buffer = (char*)SPVM_ALLOCATOR_new_block_compile_eternal(compiler, capacity);
+  }
+  else if (memory_block_type == SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_RUN_TIME) {
+    string_buffer->buffer = (char*)SPVM_ALLOCATOR_new_block_runtime(compiler, capacity, env);
+  }
+  else {
+    assert(0);
+  }
+
+  string_buffer->compiler = compiler;
   
+  string_buffer->memory_block_type = memory_block_type;
+  
+  string_buffer->env = env;
+
   return string_buffer;
 }
 
@@ -28,12 +59,41 @@ char* SPVM_STRING_BUFFER_get_buffer(SPVM_STRING_BUFFER* string_buffer) {
 }
 
 void SPVM_STRING_BUFFER_maybe_extend(SPVM_STRING_BUFFER* string_buffer, int32_t new_length) {
-  
+
+  SPVM_COMPILER* compiler = string_buffer->compiler;
+
   // Extend
-  while (new_length > string_buffer->capacity) {
+  while (new_length >= string_buffer->capacity) {
     int32_t new_capacity = string_buffer->capacity * 2;
-    char* new_buffer = SPVM_UTIL_ALLOCATOR_safe_malloc_zero(new_capacity);
+    char* new_buffer;
+    if (string_buffer->memory_block_type == SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_COMPILE_TIME_TEMPORARY) {
+      new_buffer = (char*)SPVM_ALLOCATOR_new_block_compile_tmp(compiler, new_capacity);
+    }
+    else if (string_buffer->memory_block_type == SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_COMPILE_TIME_ETERNAL) {
+      new_buffer = (char*)SPVM_ALLOCATOR_new_block_compile_eternal(compiler, new_capacity);
+    }
+    else if (string_buffer->memory_block_type == SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_RUN_TIME) {
+      new_buffer = (char*)SPVM_ALLOCATOR_new_block_runtime(compiler, new_capacity, string_buffer->env);
+    }
+    else {
+      assert(0);
+    }
+
     memcpy(new_buffer, string_buffer->buffer, string_buffer->length);
+
+    if (string_buffer->memory_block_type == SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_COMPILE_TIME_TEMPORARY) {
+      SPVM_ALLOCATOR_free_block_compile_tmp(compiler, string_buffer->buffer);
+    }
+    else if (string_buffer->memory_block_type == SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_COMPILE_TIME_ETERNAL) {
+      // Nothing
+    }
+    else if (string_buffer->memory_block_type == SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_RUN_TIME) {
+      SPVM_ALLOCATOR_free_block_runtime(compiler, string_buffer->buffer, string_buffer->env);
+    }
+    else {
+      assert(0);
+    }
+
     string_buffer->buffer = new_buffer;
     string_buffer->capacity = new_capacity;
   }
@@ -260,45 +320,22 @@ int32_t SPVM_STRING_BUFFER_add_long(SPVM_STRING_BUFFER* string_buffer, int64_t v
   return id;
 }
 
-int32_t SPVM_STRING_BUFFER_add_float(SPVM_STRING_BUFFER* string_buffer, float value) {
-
-  int32_t id = string_buffer->length;
-  
-  int32_t max_length = 100;
-  
-  int32_t new_max_length = string_buffer->length + max_length;
-  
-  // Extend
-  SPVM_STRING_BUFFER_maybe_extend(string_buffer, new_max_length);
-  
-  int32_t write_length = sprintf(string_buffer->buffer + string_buffer->length, "%a", value);
-  
-  string_buffer->length += write_length;
-  
-  return id;
-}
-
-int32_t SPVM_STRING_BUFFER_add_double(SPVM_STRING_BUFFER* string_buffer, double value) {
-
-  int32_t id = string_buffer->length;
-  
-  int32_t max_length = 100;
-  
-  int32_t new_max_length = string_buffer->length + max_length;
-  
-  // Extend
-  SPVM_STRING_BUFFER_maybe_extend(string_buffer, new_max_length);
-
-  int32_t write_length = sprintf(string_buffer->buffer + string_buffer->length, "%a", value);
-  
-  string_buffer->length += write_length;
-
-  return id;
-}
-
 void SPVM_STRING_BUFFER_free(SPVM_STRING_BUFFER* string_buffer) {
+
+  SPVM_COMPILER* compiler = string_buffer->compiler;
   
-  free(string_buffer->buffer);
-  
-  free(string_buffer);
+  if (string_buffer->memory_block_type == SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_COMPILE_TIME_TEMPORARY) {
+    SPVM_ALLOCATOR_free_block_compile_tmp(compiler, string_buffer->buffer);
+    SPVM_ALLOCATOR_free_block_compile_tmp(compiler, string_buffer);
+  }
+  else if (string_buffer->memory_block_type == SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_COMPILE_TIME_ETERNAL) {
+    // Nothing
+  }
+  else if (string_buffer->memory_block_type == SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_RUN_TIME) {
+    SPVM_ALLOCATOR_free_block_runtime(compiler, string_buffer->buffer, string_buffer->env);
+    SPVM_ALLOCATOR_free_block_runtime(compiler, string_buffer, string_buffer->env);
+  }
+  else {
+    assert(0);
+  }
 }

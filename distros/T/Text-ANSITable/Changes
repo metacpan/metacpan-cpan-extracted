@@ -1,3 +1,10 @@
+0.607   2021-08-27  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Declare features from Module::Features::PerlTrove.
+
+
 0.606   2021-08-27  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.
@@ -16,7 +23,7 @@
 
 0.604   2021-08-09  Released-By: PERLANCAR; Urgency: low
 
-	- Declare Module::Feature features.
+	- Declare features from Module::Features::TextTable.
 
 
 0.603   2021-08-08  Released-By: PERLANCAR; Urgency: medium

@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.002
+    Version 0.3.0
 
 SYNOPSIS
 
@@ -53,6 +53,27 @@ BEST PRACTICES
             $ENV{DBICDH_DEBUG} = 1;
         }
 
+Configuration
+
+    We are showing examples for YAML configuration files, but you can also
+    use any other format supported by Config::Any.
+
+ Values
+
+    schema_class
+
+    connection
+
+    databases
+
+ Files
+
+    dh-cli.yaml
+
+    ~/.dh-cli.yaml
+
+    /etc/dh-cli.yaml
+
 ATTRIBUTES
 
  schema
@@ -93,6 +114,18 @@ ATTRIBUTES
 
     Array reference with commandline parameters.
 
+ config
+
+    Configuration object DBIx::Class::DeploymentHandler::CLI::ConfigReader.
+    Created automatically.
+
+ config_files
+
+    Candidates for configuration files to be used instead of the default
+    ones.
+
+    Type: array reference.
+
  run
 
     Determines method to be run.
@@ -117,6 +150,14 @@ ATTRIBUTES
  custom_upgrade_directory
 
     Returns custom upgrade directory if possible.
+
+ run_custom
+
+    Runs a custom upgrade script.
+
+ install_custom
+
+    Installs a custom upgrade script.
 
  prepare_version_storage
 
@@ -144,7 +185,7 @@ ACKNOWLEDGEMENTS
 
 LICENSE AND COPYRIGHT
 
-    Copyright 2016-2017 Stefan Hornburg (Racke).
+    Copyright 2016-2022 Stefan Hornburg (Racke).
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of the the Artistic License (2.0). You may obtain a

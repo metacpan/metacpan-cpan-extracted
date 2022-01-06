@@ -13,7 +13,6 @@ use Test::More 0.96;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::Fatal;
 use Scalar::Util qw(isdual dualvar);
-use Config;
 use JSON::Schema::Modern::Utilities qw(is_type get_type);
 use Math::BigInt;
 use Math::BigFloat;
@@ -48,11 +47,7 @@ foreach my $type (sort keys %inflated_data) {
       ok(is_type($type, $value), json_sprintf(('is_type("'.$type.'", %s) is true'), $value_copy ));
       ok(is_type('number', $value), json_sprintf(('is_type("number", %s) is true'), $value_copy ))
         if $type eq 'integer';
-
-      {
-        my $type = $type eq 'integer' ? 'number' : $type;
-        is(get_type($value), $type, json_sprintf(('get_type(%s) = '.$type), $value_copy));
-      }
+      is(get_type($value), $type, json_sprintf(('get_type(%s) = '.$type), $value_copy));
 
       foreach my $other_type (sort keys %inflated_data) {
         next if $other_type eq $type;
@@ -73,16 +68,11 @@ foreach my $type (sort keys %json_data) {
   subtest 'JSON-encoded data, type: '.$type => sub {
     foreach my $value ($json_data{$type}->@*) {
       $value = $decoder->decode($value);
-      local $TODO = 'bignums are not handled yet'  if $Config{ivsize} < 8 and ($value < -2**32 or $value > 2**32-1);
       my $value_copy = $value;
       ok(is_type($type, $value), json_sprintf(('is_type("'.$type.'", %s) is true'), $value_copy ));
       ok(is_type('number', $value), json_sprintf(('is_type("number", %s) is true'), $value_copy ))
         if $type eq 'integer';
-
-      {
-        my $type = $type eq 'integer' ? 'number' : $type;
-        is(get_type($value), $type, json_sprintf(('get_type(%s) = '.$type), $value_copy));
-      }
+      is(get_type($value), $type, json_sprintf(('get_type(%s) = '.$type), $value_copy));
 
       foreach my $other_type (sort keys %json_data) {
         next if $other_type eq $type;

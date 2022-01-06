@@ -17,6 +17,7 @@ sub Main {
             : 0
     );
     Term_CLI_Role_HelpText_test->runtests();
+    return;
 }
 
 package Term_CLI_Role_HelpText_test {
@@ -221,6 +222,7 @@ sub check_usage : Test(no_plan) {
     is($txt, $expected,
         'usage text for command with both argument and sub-command is correct'
     );
+    return;
 }
 
 }

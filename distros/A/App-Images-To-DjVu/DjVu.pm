@@ -9,7 +9,7 @@ use File::Basename;
 use Getopt::Std;
 use Perl6::Slurp qw(slurp);
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 # Constructor.
 sub new {
@@ -42,7 +42,7 @@ sub run {
 		print STDERR "Usage: $0 [-e encoder] [-h] [-o out_file] [-q] ".
 			"[--version] images_list_file\n";
 		print STDERR "\t-e encoder\t\tEncoder (default value is 'c44').\n";
-		print STDERR "\t-h\t\t\tHelp.\n";
+		print STDERR "\t-h\t\t\tPrint help.\n";
 		print STDERR "\t-o out_file\t\tOutput file (default value is ".
 			"'output.djvu').\n";
 		print STDERR "\t-q\t\t\tQuiet mode.\n";
@@ -151,7 +151,7 @@ Returns 1 for error, 0 for success.
  # Output like:
  # Usage: ./ex1.pl [-e encoder] [-h] [-o out_file] [-q] [--version] images_list_file
  #         -e encoder              Encoder (default value is 'c44').
- #         -h                      Help.
+ #         -h                      Print help.
  #         -o out_file             Output file (default value is 'output.djvu').
  #         -q                      Quiet mode.
  #         --version               Print version.
@@ -177,12 +177,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021 Michal Josef Špaček
+© 2021-2022 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

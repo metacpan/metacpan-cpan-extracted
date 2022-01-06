@@ -4,20 +4,19 @@ use Moo;
 
 use namespace::autoclean;
 
-our $VERSION = '0.000027';
+our $VERSION = '0.000028';
 
 use feature qw( state );
 
 extends 'WebService::PayPal::PaymentsAdvanced::Response';
 
 use HTTP::Status qw( is_server_error );
-use Type::Params qw( compile );
 use Types::Standard qw( Bool CodeRef Enum InstanceOf Int );
 use Types::URI qw( Uri );
 use URI::QueryParam;
-use Web::Scraper;
-use WebService::PayPal::PaymentsAdvanced::Error::HTTP;
-use WebService::PayPal::PaymentsAdvanced::Error::HostedForm;
+use Web::Scraper qw( process scraper );
+use WebService::PayPal::PaymentsAdvanced::Error::HostedForm ();
+use WebService::PayPal::PaymentsAdvanced::Error::HTTP       ();
 
 has hosted_form_mode => (
     is        => 'ro',
@@ -166,7 +165,7 @@ WebService::PayPal::PaymentsAdvanced::Response::SecureToken - Response class for
 
 =head1 VERSION
 
-version 0.000027
+version 0.000028
 
 =head1 SYNOPSIS
 
@@ -254,7 +253,7 @@ Olaf Alders <olaf@wundercounter.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by MaxMind, Inc.
+This software is copyright (c) 2022 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

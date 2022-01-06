@@ -1,7 +1,8 @@
 # vim: set ft=perl ts=8 sts=2 sw=2 tw=100 et :
 use strict;
 use warnings;
-use 5.016;
+use 5.020;
+use experimental qw(signatures postderef);
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
@@ -33,7 +34,7 @@ my @warnings = warnings {
         { file => 'keyword-independence.json', group_description => [
           grep /unevaluated/,
           map $_->{description},
-          @{ decode_json(path('t/additional-tests-'.$version.'/keyword-independence.json')->slurp_raw) }
+          decode_json(path('t/additional-tests-'.$version.'/keyword-independence.json')->slurp_raw)->@*,
         ] },
       ] ),
     },

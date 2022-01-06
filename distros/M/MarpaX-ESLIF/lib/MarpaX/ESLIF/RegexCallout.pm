@@ -7,7 +7,7 @@ package MarpaX::ESLIF::RegexCallout;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '5.0.7'; # VERSION
+our $VERSION = '6.0.10'; # VERSION
 
 
 use constant PCRE2_ERROR_NOMATCH => -1;
@@ -247,6 +247,12 @@ sub getCurrentPosition { return shift->{current_position} }
 sub getNextItem { return shift->{next_item} }
 
 
+sub getGrammarLevel { return shift->{grammar_level} }
+
+
+sub getSymbolId { return shift->{symbol_id} }
+
+
 1;
 
 __END__
@@ -261,7 +267,7 @@ MarpaX::ESLIF::RegexCallout - ESLIF Regex Callout
 
 =head1 VERSION
 
-version 5.0.7
+version 6.0.10
 
 =head1 SYNOPSIS
 
@@ -499,11 +505,11 @@ Returns callout string or undef
 
 =head2 $self->getSubject
 
-Returns current subject
+Returns current subject. Always undef unless ESLIF is compiled in trace mode.
 
 =head2 $self->getPattern
 
-Returns pattern
+Returns pattern. Always undef unless ESLIF is compiled in trace mode.
 
 =head2 $self->getCaptureTop
 
@@ -532,6 +538,14 @@ Returns the current subject offset
 =head2 $self->getNextItem
 
 Returns the next item in the pattern
+
+=head2 $self->getGrammarLevel
+
+Returns the current grammar level
+
+=head2 $self->getSymbolId
+
+Returns the current symbol id
 
 =head1 SEE ALSO
 

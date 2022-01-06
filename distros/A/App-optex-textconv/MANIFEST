@@ -8,6 +8,7 @@ lib/App/optex/tc.pm
 lib/App/optex/textconv.pm
 lib/App/optex/textconv/Converter.pm
 lib/App/optex/textconv/default.pm
+lib/App/optex/textconv/doc.pm
 lib/App/optex/textconv/msdoc.pm
 lib/App/optex/textconv/ooxml.pm
 lib/App/optex/textconv/ooxml/regex.pm
@@ -15,7 +16,18 @@ lib/App/optex/textconv/ooxml/xslt.pm
 lib/App/optex/textconv/pandoc.pm
 lib/App/optex/textconv/pdf.pm
 lib/App/optex/textconv/tika.pm
+lib/App/optex/textconv/xls.pm
 minil.toml
 t/00_compile.t
+t/01_run.t
+t/Util.pm
+t/sample.doc
+t/sample.docx
+t/sample.pdf
+t/sample.pptx
+t/sample.xls
+t/sample.xlsx
+t/runner/README.md
+t/runner/Runner.pm
 META.yml
 MANIFEST

@@ -1,3 +1,13 @@
+0.07 2022-01-06T11:03:23+01:00
+ - Fix test requirements.
+ - Fix 04-run.t test to run from different places.
+
+0.06 2022-01-05T12:18:03+01:00
+ - Add test for help.
+ - Fix minimal version of Perl.
+ - Improve help in tool.
+ - Update copyright years.
+
 0.05 2021-01-26T11:13:40+01:00
  - Change bugtracker.
  - Update copyright years.

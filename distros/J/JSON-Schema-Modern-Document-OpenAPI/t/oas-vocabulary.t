@@ -26,6 +26,7 @@ my $accepter = Test::JSON::Schema::Acceptance->new(
   include_optional => 0,
   test_dir => 't/oas-vocabulary',
 );
+$accepter->_json_decoder->allow_bignum; # TODO: switch to public accessor with TJSA 1.015
 
 my $js = JSON::Schema::Modern->new(
   specification_version => 'draft2020-12',

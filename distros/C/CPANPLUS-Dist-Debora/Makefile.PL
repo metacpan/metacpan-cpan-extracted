@@ -56,10 +56,9 @@ my %WriteMakefileArgs = (
     "Test::MockObject" => 0,
     "Test::MockObject::Extends" => 0,
     "Test::More" => 0,
-    "lib" => 0,
-    "open" => 0
+    "lib" => 0
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -101,7 +100,6 @@ my %FallbackPrereqs = (
   "Text::Template" => "1.22",
   "Text::Wrap" => 0,
   "lib" => 0,
-  "open" => 0,
   "parent" => 0,
   "utf8" => 0,
   "version" => "0.77",

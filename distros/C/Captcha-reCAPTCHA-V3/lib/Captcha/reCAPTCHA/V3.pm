@@ -2,79 +2,98 @@ package Captcha::reCAPTCHA::V3;
 use 5.008001;
 use strict;
 use warnings;
+
+our $VERSION = "0.03";
+
 use Carp;
-
-use HTTP::Tiny;
 use JSON qw(decode_json);
-
-our $VERSION = "0.01";
+use LWP::UserAgent;
+my $ua = LWP::UserAgent->new();
 
 sub new {
     my $class = shift;
-    my $self = bless {}, $class;
-    my %attr = @_;
+    my $self  = bless {}, $class;
+    my %attr  = @_;
 
-    # Initialize the user agent object
-    $self->{'ua'} = HTTP::Tiny->new(
-        agent => __PACKAGE__ . '/' . $VERSION . ' (Perl)'
-    );
-    $self->{'sitekey'} = $attr{'sitekey'} || croak "missing param 'sitekey'";
-    $self->{'secret'} = $attr{'secret'} || croak "missing param 'secret'";
-    $self->{'widget_api'} = 'https://www.google.com/recaptcha/api.js?render='. $attr{'sitekey'};
+    # Initialize the values for API
+    $self->{'secret'}     = $attr{'secret'}     || croak "missing param 'secret'";
+    $self->{'sitekey'}    = $attr{'sitekey'}    || croak "missing param 'sitekey'";
+    $self->{'query_name'} = $attr{'query_name'} || 'g-recaptcha-response';
+
+    $self->{'widget_api'} = 'https://www.google.com/recaptcha/api.js?render=' . $attr{'sitekey'};
     $self->{'verify_api'} = 'https://www.google.com/recaptcha/api/siteverify';
-
     return $self;
+
+    #my $res = $ua->get( $self->{'widget_api'} );
+    #croak "something wrong to post by " . $ua->agent(), "\n" unless $res->is_success();
+    #return $self if $res->decoded_content()
+    #    =~ m|^\Q/* PLEASE DO NOT COPY AND PASTE THIS CODE. */(function(){|;
+    # )| this line is required to fix syntax highlights :)
+
 }
 
+# verifiers =======================================================================
 sub verify {
-    my $self = shift;
+    my $self     = shift;
     my $response = shift;
     croak "Extra arguments have been set." if @_;
- 
-    my $params = {
-        secret    => $self->{'secret'},
-        response  => $response || croak "missing response token",
-    };
- 
-    my $res = $self->{'ua'}->post_form( $self->{'verify_api'}, $params );
 
-    if($res->{'success'}) {
-        return decode_json($res->{'content'});
-    }else{
-        croak "something wrong to post by HTTP::Tiny";
-    }
+    my $params = {
+        secret   => $self->{'secret'},
+        response => $response || croak "missing response token",
+    };
+
+    my $res = $ua->post( $self->{'verify_api'}, $params );
+    return decode_json $res->decoded_content() if $res->is_success();
+
+    croak "something wrong to POST by " . $ua->agent(), "\n";
 }
 
-sub script4head {
-    my $self = shift;
-    my %attr = @_;
+sub deny_by_score {
+    my $self     = shift;
+    my %attr     = @_;
+    my $response = $attr{'response'} || croak "missing response token";
+    my $score    = $attr{'score'}    || 0.5;
+    croak "invalid score was set: $score" if $score < 0 or 1 < $score;
+
+    my $content = $self->verify($response);
+    if ( $content->{'success'} and $content->{'score'} == 1 || $content->{'score'} < $score ) {
+        unshift @{ $content->{'error-codes'} }, 'too-low-score';
+        $content->{'success'} = 0;
+    }
+    return $content;
+}
+
+sub verify_or_die {
+    my $self    = shift;
+    my $content = $self->deny_by_score(@_);
+    return $content if $content->{'success'};
+    die 'fail to verify reCAPTCHA: ', $content->{'error-codes'}[0], "\n";
+}
+
+# extra routines =======================================================================
+sub scripts {
+    my $self   = shift;
+    my %attr   = @_;
+    my $id     = $attr{'id'} or croak "missing the id for Form tag";
     my $action = $attr{'action'} || 'homepage';
-    my $id =  $self->get_element_id();
     return <<"EOL";
-    <script src="//code.jquery.com/jquery-latest.js"></script>
-    <script src="$self->{'widget_api'}"></script>
-    <script>
+<script src="$self->{'widget_api'}" defer></script>
+<script defer>
+let f = document.getElementById("$id");
+f.onsubmit = function(event){
     grecaptcha.ready(function() {
-        grecaptcha.execute('$self->{'sitekey'}', {action: '$action'}).then(function(token) {
-            \$("#$id").val(token);
-//            console.log(token);
+        grecaptcha.execute('$self->{'sitekey'}', { action: '$action' }).then(function(token) {
+            //console.log(token);
+            f.insertAdjacentHTML('beforeend', '<input type="hidden" name="$self->{'query_name'}" value="' + token + '">');
+            f.submit();
         });
     });
-    </script>
+    event.preventDefault();
+    return false;
+}
+</script>
 EOL
-}
-
-sub input4form {
-    my $self = shift;
-    my %attr = @_;
-    my $name = $attr{'name'} || 'reCAPTCHA_Token';
-    my $id =  $self->get_element_id();
-    return qq|<input type="hidden" name="$name" id="$id" />|;
-}
-
-sub get_element_id {
-    my $self = shift;
-    return 'recaptcha_' . substr( $self->{'sitekey'}, 0, 10 );
 }
 
 1;
@@ -95,49 +114,107 @@ Captcha::reCAPTCHA::V3 provides you to integrate Google reCAPTCHA v3 for your we
      secret  => '__YOUR_SECRET__',
      sitekey => '__YOUR_SITEKEY__',
  );
-
+ 
  ...
  
- my $content = $rc->verify($param{'reCAPTCHA_Token'});
- if( $content->{'success'} ){
-    # code for succeeding
- }else{
-    # code for failing
+ my $content = $rc->verify($param{'g-recaptcha-response'});
+ unless ( $content->{'success'} ) {
+    # code for failing like below
+    die 'fail to verify reCAPTCHA: ', @{ $content->{'error-codes'} }, "\n";
  }
-
+ 
 =head1 DESCRIPTION
 
-Captcha::reCAPTCHA::V3 is inspired from L<Captcha::reCAPTCHA::V2|https://metacpan.org/pod/Captcha::reCAPTCHA::V2>
+Captcha::reCAPTCHA::V3 is inspired from L<Captcha::reCAPTCHA::V2>
 
 This one is especially for Google reCAPTCHA v3, not for v2 because APIs are so defferent.
 
 =head2 Basic Usage
 
-=head3 new()
+=head3 new( secret => I<secret>, sitekey => I<sitekey> [ query_name => I<query_name> ] )
 
 Requires secret and sitekey when constructing.
-You have to get them before running from L<here|https://www.google.com/recaptcha/intro/v3.html>
+You have to get them before running from L<here|https://www.google.com/recaptcha/intro/v3.html>.
 
-=head3 verify()
+ my $rc = Captcha::reCAPTCHA::V3->new(
+    secret  => '__YOUR_SECRET__',
+    sitekey => '__YOUR_SITEKEY__',
+    query_name => '__YOUR_QUERY_NAME__', # Optinal
+ );
+
+According to the official document, query_name defaults to 'g-recaptcha-response'
+so if you changed it another, you have to set I<query_name> as same.
+
+=head3 verify( I<response> )
 
 Requires just only response key being got from Google reCAPTCHA API.
-B<DO NOT> add remote address. there is no function for remote address in reCAPTCHA v3
 
-=head2 Additional method for lazy persons(not supported)
+B<DO NOT> add remote address. there is no function for remote address within reCAPTCHA v3.
 
-=head3 script4head()
+ my $content = $rc->verify($param{'g-recaptcha-response'});
 
-You can insert this in your E<lt>headE<gt> tag
+The default I<query_name> is 'g-recaptcha-response' and it is stocked in constructor.
 
-=head3 input4form
+so you don't have to change it if you wrote like this:
 
-You can insert this in your E<lt>formE<gt> tag
+ my $content = $rc->verify($param{ $rc->{'query_name'} });
+
+The response contains JSON so it returns decoded value from JSON.
+
+ unless ( $content->{'success'} ) {
+    # code for failing like below
+    die 'fail to verify reCAPTCHA: ', @{ $content->{'error-codes'} }, "\n";
+ }
+
+=head3 deny_by_score( response => I<response>, [ score => I<expected> ] )
+
+reCAPTCHA v3 responses have score whether the request was by bot.
+
+So this method provides evaluation by scores that 0.0~1.0(defaults to 0.5)
+
+If the score was lower than what you expected, the verifying is fail
+with inserting 'too-low-score' into top of the error-codes.
+
+C<verify()> requires just only one argument because of compatibility for version 0.01. 
+
+In this method, the response pair SHOULD be set as a hash argument(score pair is optional).
+
+=head2 Additional method for lazy(not sudgested)
+
+=head3 verify_or_die( response => I<response>, [ score => I<score> ] )
+
+This method is a wrapper of C<deny_by_score()>, the differense is dying imidiately when fail to verify.
+
+=head3 scripts( id => I<ID>, [ action => I<action> ] )
+
+You can insert this somewhere in your E<lt>bodyE<gt> tag.
+
+In ordinal HTMLs, you can set this like below:
+
+ print <<"EOL", scripts( id => 'MailForm' );
+ <form action="./" method="POST" id="MailForm">
+    <input type="hidden" name="name" value="value">
+    <button type="submit">send</button>
+ </form>
+ EOL
+
+Then you might write less javascript lines.
+
+=head1 NOTES
+
+To test this module strictly,
+there is a necessary to run javascript in test environment.
+
+I have not prepared it yet.
+
+So any L<PRs|https://github.com/worthmine/Captcha-reCAPTCHA-V3/pulls>
+and L<Issues|https://github.com/worthmine/Captcha-reCAPTCHA-V3/issues> are welcome.
 
 =head1 SEE ALSO
 
 =over
 
-=item L<Captcha::reCAPTCHA::V2|https://metacpan.org/pod/Captcha::reCAPTCHA::V2>
+=item L<Captcha::reCAPTCHA::V2>
 
 =item L<Google reCAPTCHA v3|https://www.google.com/recaptcha/intro/v3.html>
 
@@ -157,4 +234,3 @@ it under the same terms as Perl itself.
 worthmine E<lt>worthmine@gmail.comE<gt>
 
 =cut
-

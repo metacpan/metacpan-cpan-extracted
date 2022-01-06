@@ -3,9 +3,9 @@ NAME
     DataTables plugin
 
 VERSION
-    This document describes version 0.008 of Text::Table::HTML::DataTables
+    This document describes version 0.009 of Text::Table::HTML::DataTables
     (from Perl distribution Text-Table-HTML-DataTables), released on
-    2021-12-01.
+    2021-12-09.
 
 SYNOPSIS
      use Text::Table::HTML::DataTables;
@@ -59,13 +59,19 @@ DESCRIPTION
 FUNCTIONS
   table(%params) => str
   OPTIONS
-    The "table" function understands these arguments, which are passed as a
-    hash.
+    The "table" function understands these parameters, which are passed as a
+    hash:
 
     *   rows (aoaos)
 
         Takes an array reference which should contain one or more rows of
         data, where each row is an array reference.
+
+    *   title
+
+        Optional. Str. If set, will output a HTML "<title>" element in the
+        HTML head as well as table "<caption>" element in the HTML body
+        containing the given title. The title will be HTML-encoded.
 
 HOMEPAGE
     Please visit the project's homepage at

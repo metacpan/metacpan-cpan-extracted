@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<otobo_package version="1.1">
+    <Name>TestSMTP</Name>
+    <Version>0.0.1</Version>
+    <Vendor>Renee Baecker, Perl-Services.de</Vendor>
+    <URL>http://perl-services.de/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <Description Lang="en">A module that restricts email addresses.</Description>
+    <Description Lang="de">Ein Modul, das den Emailversand auf Testsystemen einschränkt.</Description>
+    <PackageRequired Version="1.0">TestPackage</PackageRequired>
+    <ModuleRequired Version="0.35">SMS::Send</ModuleRequired>
+    <Framework>3.0.x</Framework>
+    <Filelist>
+        <File Permission="644" Location="Kernel/Config/Files/TestSMTP.xml" Encode="Base64">PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiID8+CjxvdHJzX2NvbmZpZyB2ZXJz
+aW9uPSIxLjAiIGluaXQ9IkFwcGxpY2F0aW9uIj4KICAgIDxDVlM+JElkOiBUZXN0U01UUC54bWws
+diAxLjEgMjAxMS8wMi8xMiAyMjo1NzoyMiByZWIgRXhwICQ8L0NWUz4KICAgIDxDb25maWdJdGVt
+IE5hbWU9IlRlc3RTTVRQOjpSZWFsUmVjaXBpZW50cyIgUmVxdWlyZWQ9IjAiIFZhbGlkPSIxIj4K
+</File>
+        <File Permission="644" Location="Kernel/System/Email.pm" Encode="Base64">IyAtLQojIEtlcm5lbC9TeXN0ZW0vRW1haWwucG0gLSB0aGUgZ2xvYmFsIGVtYWlsIHNlbmQgbW9k
+ICBteSAoICRTZWxmLCAlUGFyYW0gKSA9IEBfOwoKICAgIG15ICRGUUROID0gJFNlbGYtPntDb25m
+aWdPYmplY3R9LT5HZXQoJ0ZRRE4nKTsKICAgIHJldHVybiAnTWVzc2FnZS1JRDogPCcgLiB0aW1l
+KCkgLiAnLicgLiByYW5kKDk5OTk5OSkgLiAnQCcgLiAkRlFETiAuICc+JzsKfQoKMTsKCj1lbmQg
+SW50ZXJuYWw6Cgo9YmFjawoKPWhlYWQxIFRFUk1TIEFORCBDT05ESVRJT05TCgpUaGlzIHNvZnR3
+YXJlIGlzIHBhcnQgb2YgdGhlIE9UUlMgcHJvamVjdCAoTDxodHRwOi8vb3Rycy5vcmcvPikuCgpU
+aGlzIHNvZnR3YXJlIGNvbWVzIHdpdGggQUJTT0xVVEVMWSBOTyBXQVJSQU5UWS4gRm9yIGRldGFp
+bHMsIHNlZQp0aGUgZW5jbG9zZWQgZmlsZSBDT1BZSU5HIGZvciBsaWNlbnNlIGluZm9ybWF0aW9u
+IChBR1BMKS4gSWYgeW91CmRpZCBub3QgcmVjZWl2ZSB0aGlzIGZpbGUsIHNlZSBMPGh0dHA6Ly93
+d3cuZ251Lm9yZy9saWNlbnNlcy9hZ3BsLnR4dD4uCgo9Y3V0Cgo9aGVhZDEgVkVSU0lPTgoKJFJl
+dmlzaW9uOiAxLjcwICQgJERhdGU6IDIwMTAvMDYvMTcgMjE6Mzk6NDAgJAoKPWN1dAo=
+</File>
+    </Filelist>
+<BuildDate>2019-01-03 09:28:02</BuildDate><BuildHost>reneeb-ThinkPad-E560</BuildHost></otobo_package>

@@ -18,15 +18,14 @@
 #
 #=============================================================================
 
-package Term::CLI::Argument  0.053006 {
+package Term::CLI::Argument 0.054002;
 
 use 5.014;
-use strict;
 use warnings;
 
 use Moo 1.000001;
 
-use Term::CLI::L10N;
+use Term::CLI::L10N qw( loc );
 
 use Types::Standard 1.000005 qw( Int );
 
@@ -34,50 +33,52 @@ use namespace::clean 0.25;
 
 extends 'Term::CLI::Element';
 
-has min_occur => ( is => 'rw', isa => Int, default => sub{1});
-has max_occur => ( is => 'rw', isa => Int, default => sub{1});
+has min_occur => ( is => 'rw', isa => Int, default => sub {1} );
+has max_occur => ( is => 'rw', isa => Int, default => sub {1} );
 
 sub BUILD {
-    my ($self, $args) = @_;
+    my ( $self, $args ) = @_;
+
     # Allow "occur" as a shortcut for min/max setting.
-    if (defined $args->{occur}) {
-        $self->min_occur($args->{occur});
-        $self->max_occur($args->{occur});
+    if ( defined $args->{occur} ) {
+        $self->min_occur( $args->{occur} );
+        $self->max_occur( $args->{occur} );
     }
+    return;
 }
 
 sub occur {
-    my $self = shift @_;
-    if (@_) {
-        my $min = shift @_;
-        my $max = @_ ? shift @_ : $min;
+    my ( $self, @args ) = @_;
+    if (@args) {
+        my $min = shift @args;
+        my $max = @args ? shift @args : $min;
         $self->min_occur($min);
         $self->max_occur($max);
     }
-    return ($self->min_occur, $self->max_occur);
+    return ( $self->min_occur, $self->max_occur );
 }
 
 sub type {
-    my $self = shift;
+    my ($self) = @_;
     my $class = ref $self;
-    if ($class eq 'Term::CLI::Argument') {
+    if ( $class eq 'Term::CLI::Argument' ) {
         return 'GENERIC';
     }
-    return $class =~ s/^Term::CLI::Argument:://r;
+    return $class =~ s/\A Term::CLI::Argument:://rxms;
 }
 
-before validate => sub { $_[0]->set_error('') };
+before validate => sub {
+    my ($self) = @_;
+    $self->clear_error;
+};
 
 sub validate {
-    my ($self, $value) = @_;
+    my ( $self, $value ) = @_;
 
-    $self->set_error('');
-    if (!defined $value or $value eq '') {
-        return $self->set_error(loc('value cannot be empty'));
+    if ( not defined $value or $value eq q{} ) {
+        return $self->set_error( loc('value cannot be empty') );
     }
     return $value;
-}
-
 }
 
 1;
@@ -92,7 +93,7 @@ Term::CLI::Argument - generic parent class for arguments in Term::CLI
 
 =head1 VERSION
 
-version 0.053006
+version 0.054002
 
 =head1 SYNOPSIS
 
@@ -181,7 +182,7 @@ Get or set the C<max_occur> attribute.
 =item B<occur> ( [ I<INT> [, I<INT> ] ] )
 
 When called with no arguments, returns two-element list containing the
-L<min_occur|/min_occur> and L<max_occur|/max_occur> values, resp.
+L<min_occur|/min_occur> and L<max_occur|/max_occur> values, respectively.
 
 When called with one argument, it will set both the C<min_occur> and
 C<max_occur> attributes to the given value.

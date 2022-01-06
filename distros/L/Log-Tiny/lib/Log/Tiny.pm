@@ -9,11 +9,11 @@ Log::Tiny - Log data with as little code as possible
 
 =head1 VERSION
 
-Version 1.0
+Version 1.1
 
 =cut
 
-$VERSION = '1.0';
+$VERSION = '1.1';
 $errstr = '';
 
 %formats = (
@@ -81,6 +81,7 @@ sub new {
     my $format = shift || '[%t] %f:%p (%c) %m%n';
     open (my $logfh, '>>' . $logfile ) || 
         return _error( "Could not open $logfile: $!" );
+    $logfh->autoflush(1);
     my $self = bless { 
         format => $format,
         methods_only => [],
@@ -197,13 +198,7 @@ sub AUTOLOAD {
         $self->{format}, 
         $self->_mk_args( $method, $_ ),
     ) foreach @_;
-    my $ret;
-    {
-        my $autoflush = $|++;
-        $ret = print {$self->{logfh}} $tmp;
-        $| = $autoflush;
-    }
-    return $ret;
+    return print {$self->{logfh}} $tmp;
 }
 
 sub _mk_args {
@@ -293,7 +288,7 @@ Log::Log4perl, of which this module's formatting concept is largely based upon.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2007-2015 Jordan M. Adler, all rights reserved.
+Copyright 2007-2022 Jordan M. Adler, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

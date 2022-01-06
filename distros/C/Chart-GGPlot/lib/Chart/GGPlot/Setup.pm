@@ -5,14 +5,14 @@ package Chart::GGPlot::Setup;
 use 5.016;
 use warnings;
 
-our $VERSION = '0.0016'; # VERSION
+our $VERSION = '0.002000'; # VERSION
 
 use utf8;
 use feature ':5.16';
 
 use Import::Into;
 
-use Alt::Data::Frame::ButMore 0.0058;
+use Data::Frame 0.006002;
 use Data::Frame::Autobox ();
 
 use Carp;
@@ -23,7 +23,7 @@ use Log::Any::Adapter;
 use Safe::Isa 1.000010 ();
 use PerlX::Maybe ();
 
-use Syntax::Keyword::Try ();
+use Feature::Compat::Try ();
 use Module::Load;
 use Moose 2.1400;
 use Moose::Role               ();
@@ -90,7 +90,7 @@ sub _import_tag {
         Log::Any->import::into( $target, '$log' );
         Safe::Isa->import::into($target);
         PerlX::Maybe->import::into($target);
-        Syntax::Keyword::Try->import::into($target);
+        Feature::Compat::Try->import::into($target);
         boolean->import::into($target);
 
         Data::Frame::Autobox->import::into($target);
@@ -160,7 +160,7 @@ Chart::GGPlot::Setup - Import stuffs into Chart::GGPlot classes
 
 =head1 VERSION
 
-version 0.0016
+version 0.002000
 
 =head1 SYNOPSIS
 

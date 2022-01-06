@@ -6,7 +6,7 @@ use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 use MooseX::Singleton;
 
-our $VERSION = '0.0016'; # VERSION
+our $VERSION = '0.002000'; # VERSION
 
 use List::AllUtils qw(reduce);
 use PDL::Primitive qw(which);
@@ -155,7 +155,7 @@ Chart::GGPlot::Geom::Path - Class for path geom
 
 =head1 VERSION
 
-version 0.0016
+version 0.002000
 
 =head1 SEE ALSO
 

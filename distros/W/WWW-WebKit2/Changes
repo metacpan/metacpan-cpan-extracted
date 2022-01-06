@@ -56,3 +56,6 @@ Change to how page loading is checked in fire events.
 0.131 Tue Nov 30 14:11:00 CET 2021
 - wait_for_condition: reduce check overhead
 - correct previous changedate
+
+0.132 Wed Jan 05 10:00:00 CET 2022
+- Points DBUS address to null so xvfb does not hang after tests are complete

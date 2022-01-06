@@ -16,7 +16,40 @@ sub isWithDisableThreshold { 0 }
 sub isWithExhaustion       { 0 }
 sub isWithNewline          { 1 }
 sub isWithTrack            { 1 }
-sub event_action           { my ($self) = shift; $log->infof('Events: %s', \@_); 1 }
+sub if_action {
+    my ($self) = shift;
+
+    $log->debugf('if_action: %s', \@_);
+    $log->debugf('if_action: first 2 character are "%s"', $self->getRecognizer->input(0, 2));
+
+    return 1
+}
+sub event_action {
+    my ($self) = shift;
+
+    $log->debugf('event_action: %s', \@_);
+    $log->debugf('event_action: first 2 character are "%s"', $self->getRecognizer->input(0, 2));
+
+    return 1
+}
+sub regex_action {
+    my ($self) = shift;
+
+    $log->debugf('regex_action: %s', \@_);
+    $log->debugf('regex_action: first 2 character are "%s"', $self->getRecognizer->input(0, 2));
+
+    return 0
+}
+sub generator_action {
+    my ($self) = shift;
+
+    $log->debugf('generator_action: %s', \@_);
+    $log->debugf('generator_action: first 2 character are "%s"', $self->getRecognizer->input(0, 2));
+
+    return 'test ::= "XXX"'
+}
+sub setRecognizer          { my ($self, $recognizer) = @_; $log->debugf('setRecognizer: %s', $recognizer); $self->{recognizer} = $recognizer; }
+sub getRecognizer          { my ($self) = shift; $self->{recognizer} }
 
 package MyValueInterface;
 use strict;
@@ -66,17 +99,19 @@ Log::Any::Adapter->set('Log4perl');
 BEGIN { require_ok('MarpaX::ESLIF') };
 
 my $base_dsl = q{
-:default ::= action => ::shift event-action => event_action
+:default ::= action => ::shift event-action => event_action regex-action => regex_action discard-is-fallback => 1
 :start       ::= XXXXXX # Replaced on-the-fly by json or object
 :discard ::= perl_comment event => perl_comment$
 perl_comment ::= /(?:(?:#)(?:[^\\n]*)(?:\\n|\\z))/u
+:symbol   ::= LCURLY if-action => if_action pause => after event => LCURLY$
 
 json         ::= object
                | array
+               | . => generator_action->(1, 'x')
 object       ::= (- LCURLY -) members (- RCURLY -)
                | OBJECT_FROM_INNER_GRAMMAR action => ::concat
 members      ::= pair*                       action => do_members separator => ',' hide-separator => 1
-pair         ::= string (- ':' -) value      action => ::row
+pair         ::= string (- /:(?C0)/ -) value      action => ::row
 event value$ = completed <value>
 event ^value = predicted <value>
 value        ::= string
@@ -86,8 +121,8 @@ value        ::= string
                | 'true'                         action => ::true
                | 'false'                        action => ::false
                | 'null'                         action => ::undef
-array        ::= (- '[' -)          (- ']' -)   action => ::row
-               | (- '[' -) elements (- ']' -)   action => ::row
+array        ::= (- /\[(?C1)/ -)          (- /\](?C2)/ -)   action => ::row
+               | (- /\[(?C1)/ -) elements (- /\](?C2)/ -)   action => ::row
 elements     ::= value+                         action => ::row separator => ',' hide-separator => 1
 number         ~ int
                | int frac
@@ -105,16 +140,16 @@ e              ~ 'e'
                | 'E+'
                | 'E-'
 string       ::= lstring
-:lexeme ::= lstring pause => after event => lstring$
+:symbol ::= lstring pause => after event => lstring$
 lstring        ~ quote in_string quote
 quote          ~ '"'
 in_string      ~ in_string_char*
 in_string_char  ~ [^"] | '\\\\' '"'
 :discard       ::= whitespace
 whitespace     ~ [\s]+
-:lexeme ::= LCURLY pause => before event => ^LCURLY
+:symbol ::= LCURLY pause => before event => ^LCURLY
 LCURLY         ~ '{'
-:lexeme ::= RCURLY pause => before event => ^RCURLY
+:symbol ::= RCURLY pause => before event => ^RCURLY
 RCURLY         ~ '}'
 OBJECT_FROM_INNER_GRAMMAR ~ [^\s\S]
 };
@@ -244,14 +279,16 @@ sub doparse {
     my $ok = $marpaESLIFRecognizer->scan(1); # Initial events
     while ($ok && $marpaESLIFRecognizer->isCanContinue()) {
         my $events = $marpaESLIFRecognizer->events();
+        my $progress = $marpaESLIFRecognizer->progress(-1, -1);
+        $log->debugf('Progress: %s', $progress);
         for (my $k = 0; $k < scalar(@{$events}); $k++) {
             my $event = $events->[$k];
             next unless defined($event);
             $log->debugf('Event %s', $event->{event});
             if ($event->{event} eq 'lstring$') {
-                my $pauses = $marpaESLIFRecognizer->lexemeLastPause('lstring');
+                my $pauses = $marpaESLIFRecognizer->nameLastPause('lstring');
                 my ($line, $column) = $marpaESLIFRecognizer->location();
-                $log->infof("Got lstring: %s; length=%ld, current position is {line, column} = {%ld, %ld}", $pauses, length($pauses), $line, $column);
+                $log->debugf("Got lstring: %s; length=%ld, current position is {line, column} = {%ld, %ld}", $pauses, length($pauses), $line, $column);
             }
             elsif ($event->{event} eq '^LCURLY') {
                 my $marpaESLIFRecognizerObject;
@@ -263,20 +300,26 @@ sub doparse {
                 }
                 # Set exhausted flag since this grammar is very likely to exit when data remains
                 $marpaESLIFRecognizerObject->set_exhausted_flag(1);
-                # Force read of the LCURLY lexeme
-                $log->info("LCURLY lexeme read");
-                $marpaESLIFRecognizerObject->lexemeRead('LCURLY', '{', 1); # In UTF-8 '{' is one byte
+                # Force read of the LCURLY symbol
+                $log->debug("LCURLY symbol read");
+                #
+                # With alternativeRead
+                #
+                $marpaESLIFRecognizerObject->alternativeRead('LCURLY', '{', 1); # In UTF-8 '{' is one byte
                 my $value = doparse($marpaESLIFRecognizerObject, undef, $recursionLevel + 1);
                 # Inject object's value
-                $log->infof("Injecting value from sub grammar: %s", $value);
-                $log->info("OBJECT_FROM_INNER_GRAMMAR lexeme read");
+                $log->debugf("Injecting value from sub grammar: %s", $value);
+                $log->debug("OBJECT_FROM_INNER_GRAMMAR symbol read");
+                #
+                # With deprecated method lexemeRead
+                #
                 $marpaESLIFRecognizer->lexemeRead('OBJECT_FROM_INNER_GRAMMAR', $value, 0); # Stream moved synchroneously
                 $marpaESLIFRecognizerObject->unshare();
             }
             elsif ($event->{event} eq '^RCURLY') {
-                # Force read of the RCURLY lexeme
-                $log->info("RCURLY lexeme read");
-                $marpaESLIFRecognizer->lexemeRead('RCURLY', '}', 1); # In UTF-8 '}' is one byte
+                # Force read of the RCURLY symbol
+                $log->debug("RCURLY symbol read");
+                $marpaESLIFRecognizer->alternativeRead('RCURLY', '}', 1); # In UTF-8 '}' is one byte
                 goto valuation;
             } elsif ($event->{event} eq '^value' || $event->{event} eq 'value$') {
                 # No op
@@ -288,9 +331,47 @@ sub doparse {
         #
         # Check if there is something else to read
         #
+
+        for (my $offset = -3; $offset < 3; $offset++) {
+            my $bytes = $marpaESLIFRecognizer->input($offset);
+            $log->debugf("input(%d) returns: %s", $offset, $bytes);
+            #
+            # When offset is 0, it is also the default value
+            #
+            if ($offset == 0) {
+                my $verif = $marpaESLIFRecognizer->input();
+                $log->debugf("input()  returns: %s", $verif);
+                if ((! defined($bytes)) && defined($verif)) {
+                    BAIL_OUT("input($offset) output is not defined but input() output is defined");
+                } elsif (defined($bytes) && (! defined($verif))) {
+                    BAIL_OUT("input($offset) output is defined but input() output is not defined");
+                } elsif (defined($bytes) && ($bytes ne $verif)) {
+                    BAIL_OUT("input($offset) != input()");
+                }
+            }
+            for (my $length = -3; $length < 3; $length++) {
+                $bytes = $marpaESLIFRecognizer->input($offset, $length);
+                $log->debugf("input(%d, %d) returns: %s", $offset, $length, $bytes);
+                #
+                # When length is 0, it is also the default value
+                #
+                if ($length == 0) {
+                    my $verif = $marpaESLIFRecognizer->input($offset);
+                    $log->debugf("input(%d) returns: %s", $offset, $verif);
+                    if ((! defined($bytes)) && defined($verif)) {
+                        BAIL_OUT("input($offset, 0) output is not defined but input($offset) output is defined");
+                    } elsif (defined($bytes) && (! defined($verif))) {
+                        BAIL_OUT("input($offset, 0) output is defined but input($offset) output is not defined");
+                    } elsif (defined($bytes) && ($bytes ne $verif)) {
+                        BAIL_OUT("input($offset, 0) != input($offset)");
+                    }
+                }
+            }
+        }
+
+        my $firstByte = $marpaESLIFRecognizer->input(0, 1);
         my $eof = $marpaESLIFRecognizer->isEof;
-        my $bytes = $marpaESLIFRecognizer->input;
-        if ((! defined($bytes)) && $eof) {
+        if ((! defined($firstByte)) && $eof) {
             goto valuation;
         }
         #
@@ -311,7 +392,7 @@ sub doparse {
             die "Ambiguous grammar";
         }
         $rc = $valueInterface->getResult();
-        $log->infof("[%d] Value: %s", $recursionLevel, $rc);
+        $log->debugf("[%d] Value: %s", $recursionLevel, $rc);
     }
     goto done;
 
@@ -324,7 +405,7 @@ sub doparse {
         # Get last discarded data
         #
         my $discardLast = $marpaESLIFRecognizer->discardLast;
-        $log->infof("[%d] Last discarded data: %s", $recursionLevel, $discardLast);
+        $log->debugf("[%d] Last discarded data: %s", $recursionLevel, $discardLast);
     }
     return $rc;
 }

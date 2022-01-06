@@ -1,60 +1,62 @@
-Changes on 2015-09-18 for repository at:
-  Fetch URL: git@github.com:abeltje/Test-DBIC-SQLite.git
-  Push  URL: git@github.com:abeltje/Test-DBIC-SQLite.git
+Changes on 2022-01-06 for repository at:
+  Fetch URL: git@github.com:abeltje/Test-DBIC-SQLite
+  Push  URL: git@github.com:abeltje/Test-DBIC-SQLite
 
 Enjoy!
 
-________________________________________________________________________________
-[b1a3494] by abeltje on Tue, 15 Sep 2015 06:26:48 +0200
+1.00 2022-01-06T10:00:10+01:00 (46b7f18 => Abe Timmerman)
+ - (Abe Timmerman, 3 seconds ago) Autocommit for distribution
+   Test::DBIC::SQLite 1.00 (minor)
 
-     Improve kwalitee-score
+0.99_03 2021-12-24T20:54:31+01:00 (9357b1e => Abe Timmerman)
+ - (Abe Timmerman, 13 days ago) Autocommit for distribution
+   Test::DBIC::SQLite 0.99_03 (test)
 
-        * Add MIN_PERL_VERSION and AUTHOR to WriteMakefile(()
-        * Add LICENSE section to the documentation
+0.99_02 2021-12-24T16:40:52+01:00 (b8ee75b => Abe Timmerman)
+ - (Abe Timmerman, 13 days ago) Autocommit for distribution
+   Test::DBIC::SQLite 0.99_02 (test)
 
+ - (Abe Timmerman, 13 days ago) Fix another test for dropping
 
-M	Makefile.PL
-M	lib/Test/DBIC/SQLite.pm
-________________________________________________________________________________
-[a9bf17e] by abeltje on Wed, 9 Sep 2015 16:24:56 +0200
+0.99_01 2021-12-22T17:50:49+01:00 (17973c6 => Abe Timmerman)
+ - (Abe Timmerman, 2 weeks ago) Autocommit for distribution
+   Test::DBIC::SQLite 0.99_01 (test)
 
-     Autocommit for distribution Test::DBIC::SQLite 0.00_02 (same)
+ - (abeltje, 13 days ago) Disconnect from the storage before dropping the
+   database
+ -     Also add a warning to the POD.
 
+0.01 2015-09-18T12:55:59+02:00 (623efc2 => abeltje)
+ - (abeltje, 6 years ago) Autocommit for distribution Test::DBIC::SQLite
+   0.01 (minor)
 
-M	Changes
-M	lib/Test/DBIC/SQLite.pm
-________________________________________________________________________________
-[897b426] by abeltje on Wed, 2 Sep 2015 15:14:26 +0200
+ - (Abe Timmerman, 9 months ago) Introduce `t::Test::abeltje`
+ -     This changes the `xt/` tests to more standard ones.
+ -     New dependencies for BUILD stage (during testing)
 
-     FIX: Forgot Makefile.PL, Changes in the MANIFEST
+ - (Abe Timmerman, 9 months ago) Prepare for the new version of
+   Test::DBIC::SQLite
+ -     I introduced a Moo::Role that should be able to serve as a base for
+ -     implementing other Database drivers.
 
+ - (Abe Timmerman, 2 weeks ago) Mostly cleaning up of docs, code and repo
+ -     Added an examle of version-check to test Schema.
 
-M	MANIFEST
-________________________________________________________________________________
-[a33c5c6] by abeltje on Wed, 2 Sep 2015 11:51:42 +0200
+ - (Abe Timmerman, 2 weeks ago) Update t-Test-abeltje (with Kwalitee check)
 
-     Autocommit for distribution Test::DBIC::SQLite 0.00_01 (test)
+0.00_02 2015-09-09T16:24:56+02:00 (a9bf17e => abeltje)
+ - (abeltje, 6 years ago) Autocommit for distribution Test::DBIC::SQLite
+   0.00_02 (same)
 
+ - (abeltje, 6 years ago) Improve kwalitee-score
+ -     Add MIN_PERL_VERSION and AUTHOR to WriteMakefile(()
+ -     Add LICENSE section to the documentation
 
-A	Changes
-M	lib/Test/DBIC/SQLite.pm
-________________________________________________________________________________
-[677bf20] by abeltje on Mon, 31 Aug 2015 17:57:47 +0200
+0.00_01 2015-09-02T11:51:42+02:00 (a33c5c6 => abeltje)
+ - (abeltje, 6 years ago) Autocommit for distribution Test::DBIC::SQLite
+   0.00_01 (test)
 
-     Initial commit.
+ - (abeltje, 6 years ago) FIX: Forgot Makefile.PL, Changes in the MANIFEST
 
-
-A	.gitignore
-A	MANIFEST
-A	MANIFEST.SKIP
-A	Makefile.PL
-A	README
-A	lib/Test/DBIC/SQLite.pm
-A	t/10-connect_ok.t
-A	t/lib/DummyNocompile.pm
-A	t/lib/DummyNoconnect.pm
-A	t/lib/DummySchema.pm
-A	xt/00-compile.t
-A	xt/10-manifest.t
-A	xt/20-pod.t
-A	xt/30-pod-coverage.t
+0.00_00 2015-08-31T17:57:47+02:00 (677bf20 => abeltje)
+ - (abeltje, 6 years ago) Initial commit.

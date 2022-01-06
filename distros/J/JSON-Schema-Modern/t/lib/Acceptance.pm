@@ -40,11 +40,12 @@ sub acceptance_tests (%options) {
   $accepter = $accepter->new(%$accepter,
       test_dir => $accepter->test_dir->child($options{acceptance}{test_subdir}))
     if not $ENV{TEST_DIR} and $options{acceptance}{test_subdir};
+  $accepter->_json_decoder->allow_bignum; # TODO: switch to public accessor with TJSA 1.015
 
   my $js = JSON::Schema::Modern->new($options{evaluator}->%*);
   my $js_short_circuit = $ENV{NO_SHORT_CIRCUIT} || JSON::Schema::Modern->new($options{evaluator}->%*, short_circuit => 1);
 
-  my $encoder = JSON::MaybeXS->new(allow_nonref => 1, utf8 => 0, convert_blessed => 1, canonical => 1, pretty => 1);
+  my $encoder = JSON::MaybeXS->new(allow_nonref => 1, utf8 => 0, allow_blessed => 1, canonical => 1, pretty => 1);
   $encoder->indent_length(2) if $encoder->can('indent_length');
 
   my $add_resource = sub ($uri, $schema) {

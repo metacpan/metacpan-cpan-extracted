@@ -4,7 +4,7 @@ package Chart::GGPlot::Geom::Functions;
 
 use Chart::GGPlot::Setup;
 
-our $VERSION = '0.0016'; # VERSION
+our $VERSION = '0.002000'; # VERSION
 
 use Chart::GGPlot::Util qw(collect_functions_from_package);
 
@@ -52,7 +52,7 @@ Chart::GGPlot::Geom::Functions - Function interface for Chart::GGPlot::Geom
 
 =head1 VERSION
 
-version 0.0016
+version 0.002000
 
 =head1 DESCRIPTION
 

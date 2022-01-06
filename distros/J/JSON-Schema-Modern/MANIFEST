@@ -164,6 +164,7 @@ t/zzz-acceptance-draft2020-12.t
 t/zzz-acceptance-draft7-format.t
 t/zzz-acceptance-draft7.t
 update-schemas
+weaver.ini
 xt/author/00-compile.t
 xt/author/clean-namespaces.t
 xt/author/distmeta.t

@@ -17,5 +17,5 @@ is_deeply(
         q{/dev/null'ing report for deliverabilityteam#epsilon.com@devnull.spamcop.net}
     ],
     'It has the expected receivers'
-);
+    );
 

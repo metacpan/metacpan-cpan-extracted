@@ -1,4 +1,5 @@
 requires 'perl' => 5.14.0;
+requires 'indirect' => 0.36;
 requires 'strictures' => 1.0;
 
 recommends 'Curses::UI' => '0.9603';

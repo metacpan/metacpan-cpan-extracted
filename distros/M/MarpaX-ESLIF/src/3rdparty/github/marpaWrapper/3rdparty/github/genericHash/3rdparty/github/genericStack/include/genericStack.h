@@ -884,4 +884,6 @@ static GENERICSTACK_INLINE short _GENERICSTACK_SET_NA(genericStack_t *stackp, in
     }                                                                   \
   } while (0)
 
+#define GENERICSTACK_SORT(stackName, callback) qsort((void *) (stackName)->items, (size_t) (stackName)->usedi, sizeof(genericStackItem_t), callback)
+
 #endif /* GENERICSTACK_H */

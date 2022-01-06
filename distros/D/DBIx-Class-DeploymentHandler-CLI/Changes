@@ -1,5 +1,10 @@
 Revision history for DBIx::Class::DeploymentHandler::CLI
 
+0.3.0  Mon Jan  3 17:43:46 2022 CET
+
+    * Add support for configuration files.
+    * Add install_custom and run_custom methods.
+
 0.002  Tue Jan  3 15:43:59 2017 CET
 
     * Force current mysql_version for SQL::Translator instead of using the

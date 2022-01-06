@@ -4,13 +4,12 @@ use Moo;
 
 use namespace::autoclean;
 
-our $VERSION = '0.000027';
+our $VERSION = '0.000028';
 
 use feature qw( say state );
 
-use Data::GUID;
+use Data::GUID ();
 use List::AllUtils qw( any );
-use LWP::UserAgent;
 use MooX::StrictConstructor;
 use Type::Params qw( compile );
 use Types::Common::Numeric qw( PositiveNum );
@@ -27,32 +26,32 @@ use Types::Standard qw(
     Optional
 );
 use Types::URI qw( Uri );
-use URI;
-use URI::FromHash qw( uri uri_object );
+use URI ();
+use URI::FromHash qw( uri_object );
 use URI::QueryParam;
 
 #<<< don't perltidy
-use WebService::PayPal::PaymentsAdvanced::Error::Generic;
-use WebService::PayPal::PaymentsAdvanced::Error::HostedForm;
-use WebService::PayPal::PaymentsAdvanced::Response;
-use WebService::PayPal::PaymentsAdvanced::Response::Authorization;
-use WebService::PayPal::PaymentsAdvanced::Response::Authorization::CreditCard;
-use WebService::PayPal::PaymentsAdvanced::Response::Authorization::PayPal;
-use WebService::PayPal::PaymentsAdvanced::Response::Capture;
-use WebService::PayPal::PaymentsAdvanced::Response::Credit;
-use WebService::PayPal::PaymentsAdvanced::Response::FromHTTP;
-use WebService::PayPal::PaymentsAdvanced::Response::FromRedirect;
-use WebService::PayPal::PaymentsAdvanced::Response::FromSilentPOST;
-use WebService::PayPal::PaymentsAdvanced::Response::FromSilentPOST::CreditCard;
-use WebService::PayPal::PaymentsAdvanced::Response::FromSilentPOST::PayPal;
-use WebService::PayPal::PaymentsAdvanced::Response::Inquiry;
-use WebService::PayPal::PaymentsAdvanced::Response::Inquiry::CreditCard;
-use WebService::PayPal::PaymentsAdvanced::Response::Inquiry::PayPal;
-use WebService::PayPal::PaymentsAdvanced::Response::Sale;
-use WebService::PayPal::PaymentsAdvanced::Response::Sale::CreditCard;
-use WebService::PayPal::PaymentsAdvanced::Response::Sale::PayPal;
-use WebService::PayPal::PaymentsAdvanced::Response::SecureToken;
-use WebService::PayPal::PaymentsAdvanced::Response::Void;
+use WebService::PayPal::PaymentsAdvanced::Error::Generic ();
+use WebService::PayPal::PaymentsAdvanced::Error::HostedForm ();
+use WebService::PayPal::PaymentsAdvanced::Response ();
+use WebService::PayPal::PaymentsAdvanced::Response::Authorization ();
+use WebService::PayPal::PaymentsAdvanced::Response::Authorization::CreditCard ();
+use WebService::PayPal::PaymentsAdvanced::Response::Authorization::PayPal ();
+use WebService::PayPal::PaymentsAdvanced::Response::Capture ();
+use WebService::PayPal::PaymentsAdvanced::Response::Credit ();
+use WebService::PayPal::PaymentsAdvanced::Response::FromHTTP ();
+use WebService::PayPal::PaymentsAdvanced::Response::FromRedirect ();
+use WebService::PayPal::PaymentsAdvanced::Response::FromSilentPOST ();
+use WebService::PayPal::PaymentsAdvanced::Response::FromSilentPOST::CreditCard ();
+use WebService::PayPal::PaymentsAdvanced::Response::FromSilentPOST::PayPal ();
+use WebService::PayPal::PaymentsAdvanced::Response::Inquiry ();
+use WebService::PayPal::PaymentsAdvanced::Response::Inquiry::CreditCard ();
+use WebService::PayPal::PaymentsAdvanced::Response::Inquiry::PayPal ();
+use WebService::PayPal::PaymentsAdvanced::Response::Sale ();
+use WebService::PayPal::PaymentsAdvanced::Response::Sale::CreditCard ();
+use WebService::PayPal::PaymentsAdvanced::Response::Sale::PayPal ();
+use WebService::PayPal::PaymentsAdvanced::Response::SecureToken ();
+use WebService::PayPal::PaymentsAdvanced::Response::Void ();
 #>>>
 
 has nonfatal_result_codes => (
@@ -361,7 +360,8 @@ sub sale_from_paypal_reference_transaction {
 
 sub _paypal_reference_transaction {
     my $self = shift;
-    state $check = compile( NonEmptyStr, NonEmptyStr, Num, NonEmptyStr,
+    state $check = compile(
+        NonEmptyStr, NonEmptyStr, Num, NonEmptyStr,
         Optional [HashRef]
     );
     my ( $type, $baid, $amount, $currency, $extra ) = $check->(@_);
@@ -456,7 +456,7 @@ WebService::PayPal::PaymentsAdvanced - A simple wrapper around the PayPal Paymen
 
 =head1 VERSION
 
-version 0.000027
+version 0.000028
 
 =head1 SYNOPSIS
 
@@ -514,8 +514,6 @@ version 0.000027
     print $response->secure_token;
 
 =head1 DESCRIPTION
-
-BETA BETA BETA.  The interface is still subject to change.
 
 This is a wrapper around the "PayPal Payments Advanced" (AKA "PayPal Payflow
 Link") hosted forms.  This code does things like facilitating secure token
@@ -808,7 +806,7 @@ Olaf Alders <olaf@wundercounter.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Andy Jack Dave Rolsky Greg Oschwald Mark Fowler Mateu X Hunter Narsimham Chelluri Olaf Alders William Storey
+=for stopwords Andy Jack Dave Rolsky Greg Oschwald Mark Fowler Mateu X Hunter Narsimham Chelluri Nick Logan Olaf Alders William Storey
 
 =over 4
 
@@ -838,6 +836,10 @@ Narsimham Chelluri <nchelluri@users.noreply.github.com>
 
 =item *
 
+Nick Logan <nlogan@maxmind.com>
+
+=item *
+
 Olaf Alders <oalders@maxmind.com>
 
 =item *
@@ -848,7 +850,7 @@ William Storey <wstorey@maxmind.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by MaxMind, Inc.
+This software is copyright (c) 2022 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

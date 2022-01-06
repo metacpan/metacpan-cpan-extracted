@@ -24,6 +24,7 @@
             "CPAN::Meta::Prereqs" : "0",
             "CPAN::Meta::Requirements" : "2.130",
             "Exporter" : "5.57",
+            "Scalar::Util" : "0",
             "YAML::PP" : "0.027",
             "perl" : "5.008001"
          }
@@ -38,7 +39,7 @@
    "provides" : {
       "Module::cpmfile" : {
          "file" : "lib/Module/cpmfile.pm",
-         "version" : "0.003"
+         "version" : "0.005"
       },
       "Module::cpmfile::Prereqs" : {
          "file" : "lib/Module/cpmfile/Prereqs.pm"
@@ -59,7 +60,7 @@
          "web" : "https://github.com/skaji/cpmfile"
       }
    },
-   "version" : "0.003",
+   "version" : "0.005",
    "x_generated_by_perl" : "v5.34.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",

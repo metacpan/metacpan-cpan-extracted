@@ -1,70 +1,114 @@
 NAME
-    idi - Easy Command-line MIDI
+    idi - Easy, command-line MIDI
 
 SYNOPSIS
-      perl -Midi -E'x(qw(c1 f o5)); n(qw(qn Cs)); n("F"); n("Ds"); n(qw(hn Gs_d1)); w()'
-
-      timidity idi.mid
+      $ perl -Midi -E'x(qw(c1 f o5)); n(qw(qn Cs)); n("F"); n("Ds"); n(qw(hn Gs_d1))' | timidity -
 
       # Compare with:
-      perl -MMIDI::Simple -E'new_score; noop qw(c1 f o5); n qw(qn Cs); n "F"; n "Ds"; n qw(hn Gs_d1); write_score shift()' idi.mid
+      $ perl -MMIDI::Simple -E'new_score; noop qw(c1 f o5); n qw(qn Cs); n "F"; n "Ds"; n qw(hn Gs_d1); write_score shift()' idi.mid
+      $ timidity idi.mid
 
 DESCRIPTION
-    Easy Command-line MIDI
+    Easy, command-line MIDI!
 
 FUNCTIONS
   b
-    BPM
+      b(100)
+
+    Set BPM
 
   c
+      c(15)
+
     Channel
 
     Default: 0
 
   d
+      d(128)
+
     Duration
 
-    Default: <96>
+    Default: 96
+
+  e
+      e(0)
+
+    Play at end
+
+    Default: 1
 
   n
-    Add note
+      n(@note_spec)
+
+    Add note. See the MIDI::Simple documentation for what a "note_spec" is.
 
   o
+      o(3)
+
     Octave
 
     Default: 5
 
   p
+      p($channel, $patch_number)
+
     Patch
 
-    Default: 0 (piano)
+    Default: "0, 0" (channel 0, piano)
 
   r
-    Add rest
+      r($note_duration)
+
+    Add rest. See the MIDI::Simple documentation for what "note_durations"
+    are valid.
 
   t
+      t("$numerator/$denominator")
+
     Time signature
 
     Default: "none"
 
   v
+      v(127)
+
     Volume
 
     Default: 64
 
   w
-    Write score. Supply a string argument for different name.
+      w('filename.mid')
 
-    Default filename: "idi.mid"
+    Write score to a file.
 
   x
     No-op (with "MIDI::Simple::noop")
+
+SEE ALSO
+    The t/01-methods.t file in this distribution
+
+    Exporter
+
+    File::Slurper
+
+    File::Temp
+
+    MIDI::Simple
+
+    Music::Tempo
+
+    Moo
+
+    strictures
+
+    namespace::clean
 
 AUTHOR
     Gene Boggs <gene@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is Copyright (c) 2021 by Gene Boggs.
+    This software is Copyright (c) 2022 by Gene Boggs.
 
     This is free software, licensed under: The Artistic License 2.0 (GPL
     Compatible)

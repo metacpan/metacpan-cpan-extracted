@@ -102,7 +102,7 @@ $dst = File::Spec->catdir('src', 'src', 'bindings', 'lua');
 print "... Copying directory $src to $dst\n",
 _dircopy($src, $dst);
 
-foreach (qw/bootstrap.c lua.c marpaESLIF.c json.c floattos.c/) {
+foreach (qw/bootstrap.c lua.c marpaESLIF.c json.c json_decode_extended_grammar.c json_decode_strict_grammar.c json_encode_extended_grammar.c json_encode_strict_grammar.c floattos.c/) {
   $src = File::Spec->catfile(($updir) x 3, 'src', $_);
   $dst = File::Spec->catfile('src', 'src', $_);
   print "... Copying file $src to $dst\n";

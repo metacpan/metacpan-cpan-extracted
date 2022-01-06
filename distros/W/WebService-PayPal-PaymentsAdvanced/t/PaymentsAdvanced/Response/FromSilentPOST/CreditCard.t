@@ -5,10 +5,10 @@ use Test::More;
 
 use Scalar::Util qw( blessed );
 use Test::Fatal qw( exception );
-use WebService::PayPal::PaymentsAdvanced::Mocker::SilentPOST;
+use WebService::PayPal::PaymentsAdvanced::Mocker::SilentPOST ();
 
 use lib 't/lib';
-use Util;
+use Util ();
 
 ## no critic (ProhibitCallsToUnexportedSubs)
 ## no critic (RequireExplicitInclusion)

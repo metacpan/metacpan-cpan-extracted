@@ -6,7 +6,7 @@ use warnings;
 use XSLoader;
 
 use vars qw( $VERSION @ISA @EXPORT @EXPORT_OK );
-$VERSION   = "0.50";
+$VERSION   = "0.51";
 @ISA       = qw( Exporter );
 @EXPORT    = qw( DDumper DTidy DDsort DPeek DDisplay DDump DHexDump
 		 DDual DGrow );
@@ -698,11 +698,11 @@ L<Data::Dump::Streamer>, L<Data::Dumper::Perltidy>, L<Perl::Tidy>.
 
 =head1 AUTHOR
 
-H.Merijn Brand <h.m.brand@xs4all.nl>
+H.Merijn Brand <hmbrand@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2020 H.Merijn Brand
+Copyright (C) 2008-2022 H.Merijn Brand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

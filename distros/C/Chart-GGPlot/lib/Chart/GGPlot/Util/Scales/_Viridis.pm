@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.0016'; # VERSION
+our $VERSION = '0.002000'; # VERSION
 
 use Convert::Color::RGB;
 
@@ -1315,6 +1315,7 @@ my %data = (
 sub viridis {
     my ( $n, $begin, $end, $direction, $option ) = @_;
 
+    $n = int($n);
     $begin     //= 0;
     $end       //= 1;
     $direction //= 1;
@@ -1361,7 +1362,7 @@ Chart::GGPlot::Util::Scales::_Viridis
 
 =head1 VERSION
 
-version 0.0016
+version 0.002000
 
 =head1 AUTHOR
 

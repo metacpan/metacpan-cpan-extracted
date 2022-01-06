@@ -3,8 +3,7 @@ use warnings;
 
 use Test::More;
 use Test::Fatal qw( exception );
-use WebService::PayPal::PaymentsAdvanced;
-use WebService::PayPal::PaymentsAdvanced::Response::FromRedirect;
+use WebService::PayPal::PaymentsAdvanced ();
 
 my $payments = WebService::PayPal::PaymentsAdvanced->new(
     password => 'seekrit',

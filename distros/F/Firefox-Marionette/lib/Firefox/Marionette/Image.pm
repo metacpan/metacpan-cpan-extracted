@@ -6,7 +6,14 @@ use URI::URL();
 
 use base qw(Firefox::Marionette::Element);
 
-our $VERSION = '1.16';
+our $VERSION = '1.17';
+
+sub new {
+    my ( $class, $element ) = @_;
+    my $self = $element;
+    bless $self, $class;
+    return $self;
+}
 
 sub url {
     my ($self) = @_;
@@ -82,7 +89,7 @@ Firefox::Marionette::Image - Represents an image from the images method
 
 =head1 VERSION
 
-Version 1.16
+Version 1.17
 
 =head1 SYNOPSIS
 
@@ -119,6 +126,10 @@ returns the image height
 =head2 name
 
 returns the name attribute, if any.
+
+=head2 new
+
+accepts an L<element|Firefox::Marionette::Element> as a parameter and returns an L<image|Firefox::Marionette::Image> object
 
 =head2 tag
 

@@ -6,9 +6,12 @@ build_requires:
   English: 0
   Error::Pure::Utils: 0
   ExtUtils::MakeMaker: 6.59
+  File::Object: 0
+  File::Spec::Functions: 0
   Test::LWP::UserAgent: 0
   Test::More: 0
   Test::NoWarnings: 0
+  Test::Output: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
@@ -39,4 +42,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/App-CPAN-Get
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-CPAN-Get
-version: '0.03'
+version: '0.05'

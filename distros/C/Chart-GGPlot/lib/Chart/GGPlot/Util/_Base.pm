@@ -4,7 +4,7 @@ package Chart::GGPlot::Util::_Base;
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-our $VERSION = '0.0016'; # VERSION
+our $VERSION = '0.002000'; # VERSION
 
 use Data::Frame::Util qw(:all);
 use PDL::Ufunc qw(qsorti);
@@ -119,7 +119,7 @@ Chart::GGPlot::Util::_Base - R 'base' package functions used by Chart::GGPlot
 
 =head1 VERSION
 
-version 0.0016
+version 0.002000
 
 =head1 FUNCTIONS
 

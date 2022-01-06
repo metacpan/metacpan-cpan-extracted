@@ -11,15 +11,16 @@ use Bio::RNA::Treekin;
 use Scalar::Util qw(reftype);
 use File::Slurp qw(read_file);
 
-plan tests => 3;
+plan tests => 1 + 3;
 
 
 ##############################################################################
 ##                                Input data                                ##
 ##############################################################################
 
-my $treekin_single_small = catfile qw(t data treekin_single_small.kin);
-my $treekin_multi_small  = catfile qw(t data treekin_multi_small.kin);
+my $treekin_single_small     = catfile qw(t data treekin_single_small.kin);
+my $treekin_single_small_new = catfile qw(t data treekin_single_small_new.kin);
+my $treekin_multi_small      = catfile qw(t data treekin_multi_small.kin);
 
 
 ##############################################################################
@@ -109,7 +110,8 @@ sub test_stringify_multi_eq {
 ##                                Call tests                                ##
 ##############################################################################
 
-test_stringify_single_eq $treekin_single_small, 'single small';
-test_stringify_multi_eq  $treekin_multi_small,  'multi small';
+test_stringify_single_eq $treekin_single_small,     'single small';
+test_stringify_single_eq $treekin_single_small_new, 'single small new';
+test_stringify_multi_eq  $treekin_multi_small,      'multi small';
 
 exit 0;                             # EOF

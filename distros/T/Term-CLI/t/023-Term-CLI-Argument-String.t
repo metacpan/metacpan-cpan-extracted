@@ -17,6 +17,7 @@ sub Main {
             : 0
     );
     Term_CLI_Argument_String_test->runtests();
+    return;
 }
 
 package Term_CLI_Argument_String_test {
@@ -46,6 +47,7 @@ sub startup : Test(startup => 1) {
     isa_ok( $arg, 'Term::CLI::Argument::String',
             'Term::CLI::Argument::String->new' );
     $self->{arg} = $arg;
+    return;
 }
 
 sub check_attributes: Test(2) {
@@ -53,6 +55,7 @@ sub check_attributes: Test(2) {
     my $arg = $self->{arg};
     is( $arg->name, $ARG_NAME, "name attribute is $ARG_NAME" );
     is( $arg->type, 'String', "type attribute is String" );
+    return;
 }
 
 sub check_complete: Test(1) {
@@ -62,6 +65,7 @@ sub check_complete: Test(1) {
     my @expected = ();
     is_deeply( [$arg->complete('')], \@expected,
         "complete returns (@expected) for ''");
+    return;
 }
 
 sub check_validate: Test(6) {
@@ -89,6 +93,7 @@ sub check_validate: Test(6) {
     ok( defined $arg->validate($test_value), "'$test_value' validates");
     is ( $arg->error, '',
         "error is cleared on successful validation" );
+    return;
 }
 
 sub check_limits: Test(5) {
@@ -112,6 +117,7 @@ sub check_limits: Test(5) {
     ok( !defined $arg->validate($test_value), "'$test_value' does not validate");
     like ( $arg->error, qr/too long/,
         "error on long value is set correctly" );
+    return;
 }
 
 

@@ -51,13 +51,14 @@
 /* ============================================= */
 /* Forward declarations needed for the callbacks */
 /* ============================================= */
-typedef struct marpaESLIFRecognizer      marpaESLIFRecognizer_t;
-typedef struct marpaESLIFValue           marpaESLIFValue_t;
-typedef struct marpaESLIFValueResult     marpaESLIFValueResult_t;
-typedef enum   marpaESLIFValueResultBool marpaESLIFValueResultBool_t;
-typedef int                              marpaESLIFValueResultInt_t;
-typedef struct marpaESLIFEvent           marpaESLIFEvent_t;
-typedef struct marpaESLIFSymbol          marpaESLIFSymbol_t;
+typedef struct marpaESLIFRecognizer        marpaESLIFRecognizer_t;
+typedef struct marpaESLIFValue             marpaESLIFValue_t;
+typedef struct marpaESLIFValueResult       marpaESLIFValueResult_t;
+typedef enum   marpaESLIFValueResultBool   marpaESLIFValueResultBool_t;
+typedef int                                marpaESLIFValueResultInt_t;
+typedef struct marpaESLIFValueResultString marpaESLIFValueResultString_t;
+typedef struct marpaESLIFEvent             marpaESLIFEvent_t;
+typedef struct marpaESLIFSymbol            marpaESLIFSymbol_t;
 
 /* ========= */
 /* Callbacks */
@@ -72,32 +73,43 @@ typedef void  (*marpaESLIFValueResultFreeCallback_t)(void *userDatavp, marpaESLI
 typedef void  (*marpaESLIFReaderDispose_t)(void *userDatavp, char *inputcp, size_t inputl, short eofb, short characterStreamb, char *encodings, size_t encodingl);
 typedef short (*marpaESLIFReader_t)(void *userDatavp, char **inputcpp, size_t *inputlp, short *eofbp, short *characterStreambp, char **encodingsp, size_t *encodinglp, marpaESLIFReaderDispose_t *disposeCallbackpp);
 
-/* If recognizer callback: marpaESLIFValueResultLexemep is of type ARRAY and represents the binary memory chunk of current lexeme */
-typedef short (*marpaESLIFRecognizerIfCallback_t)(void *userDatavp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFValueResult_t *marpaESLIFValueResultLexemep, marpaESLIFValueResultBool_t *marpaESLIFValueResultBoolp);
+/* If recognizer callback: marpaESLIFValueResultp is of type ARRAY and represents the binary memory chunk of current symbol */
+typedef short (*marpaESLIFRecognizerIfCallback_t)(void *userDatavp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFValueResult_t *marpaESLIFValueResultp, marpaESLIFValueResultBool_t *marpaESLIFValueResultBoolp);
 typedef marpaESLIFRecognizerIfCallback_t (*marpaESLIFRecognizerIfActionResolver_t)(void *userDatavp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, char *actions);
 
 /* Event recognizer callback */
 typedef short (*marpaESLIFRecognizerEventCallback_t)(void *userDatavp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFEvent_t *eventArrayp, size_t eventArrayl, marpaESLIFValueResultBool_t *marpaESLIFValueResultBoolp);
 typedef marpaESLIFRecognizerEventCallback_t (*marpaESLIFRecognizerEventActionResolver_t)(void *userDatavp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, char *actions);
 
-/* -------------------------------------------------------------------------------- */
-/* regex recognizer callback: marpaESLIFCalloutBlockp is of type TABLE:             */
-/*                                                                                  */
-/* KeyType key                => valueType       value                              */
-/* ------- ---                   ---------       -----                              */
-/* STRING  "callout_number"   => LONG or UNDEF   Callout number                     */
-/* STRING  "callout_string"   => STRING or UNDEF Callout string                     */
-/* STRING  "subject"          => ARRAY           Subject                            */
-/* STRING  "pattern"          => STRING          Pattern                            */
-/* STRING  "capture_top"      => LONG            Max current capture                */
-/* STRING  "capture_last"     => LONG            Most recently closed capture       */
-/* STRING  "offset_vector"    => ROW of LONGs    Offset vector                      */
-/* STRING  "mark"             => LONG or UNDEF   Current mark offset                */
-/* STRING  "start_match"      => LONG            Current match start attempt offset */
-/* STRING  "current_position" => LONG            Current subject offset             */
-/* STRING  "next_item"        => STRING or UNDEF Next item in the pattern           */
-/*                                                                                  */
-/* The following indices are just helpers to reach the correct pair keyvalue        */
+/* ------------------------------------------------------------------------------------------------ */
+/* regex recognizer callback: marpaESLIFCalloutBlockp is of type TABLE:                             */
+/*                                                                                                  */
+/* KeyType key                => valueType       value                              key/pair indice */
+/* ------- ---                   ---------       -----                                              */
+/* STRING  "callout_number"   => LONG or UNDEF   Callout number                                   0 */
+/* STRING  "callout_string"   => ARRAY or UNDEF  Callout string (*)                               1 */
+/* STRING  "subject"          => ARRAY           Subject (*)                                      2 */
+/* STRING  "pattern"          => ARRAY           Pattern (*)                                      3 */
+/* STRING  "capture_top"      => LONG            Max current capture                              4 */
+/* STRING  "capture_last"     => LONG            Most recently closed capture                     5 */
+/* STRING  "offset_vector"    => ROW of LONGs    Offset vector                                    6 */
+/* STRING  "mark"             => LONG or UNDEF   Current mark offset                              7 */
+/* STRING  "start_match"      => LONG            Current match start attempt offset               8 */
+/* STRING  "current_position" => LONG            Current subject offset                           9 */
+/* STRING  "next_item"        => ARRAY or UNDEF  Next item in the pattern (*)                    10 */
+/* STRING  "grammar_level"    => INT             The grammar level                               11 */
+/* STRING  "symbol_id"        => INT             The symbol identifier                           12 */
+/*                                                                                                  */
+/* (*) Direct memory pointer is returned. Any attempt to change the underlying bytes will result    */
+/*     to undefined behaviour.                                                                      */
+/*     ESLIF guarantees that:                                                                       */
+/*     - subject correspond to the output of marpaESLIFRecognizer_input()                           */
+/*     - pattern can be retreived using the symbol's description using symbol_id value in input to  */
+/*       marpaESLIFGrammar_symbolproperty_by_levelb().                                              */
+/*                                                                                                  */
+/* ESLIF guarantees that this marpaESLIFCalloutBlockp is filled in this exact order, therefore      */
+/* using an indice in the marpaESLIFCalloutBlockEnum_t enum below is safe.                          */
+/* ------------------------------------------------------------------------------------------------ */
 typedef enum marpaESLIFCalloutBlockEnum {
                                          MARPAESLIFCALLOUTBLOCK_CALLOUT_NUMBER = 0,
                                          MARPAESLIFCALLOUTBLOCK_CALLOUT_STRING,
@@ -110,8 +122,28 @@ typedef enum marpaESLIFCalloutBlockEnum {
                                          MARPAESLIFCALLOUTBLOCK_START_MATCH,
                                          MARPAESLIFCALLOUTBLOCK_CURRENT_POSITION,
                                          MARPAESLIFCALLOUTBLOCK_NEXT_ITEM,
+                                         MARPAESLIFCALLOUTBLOCK_GRAMMAR_LEVEL,
+                                         MARPAESLIFCALLOUTBLOCK_SYMBOL_ID,
                                          _MARPAESLIFCALLOUTBLOCK_SIZE
 } marpaESLIFCalloutBlockEnum_t;
+
+/* marpaESLIFCallout table Keys */
+static const char *marpaESLIFCalloutKeysp[_MARPAESLIFCALLOUTBLOCK_SIZE] = {
+  "callout_number",
+  "callout_string",
+  "subject",
+  "pattern",
+  "capture_top",
+  "capture_last",
+  "offset_vector",
+  "mark",
+  "start_match",
+  "current_position",
+  "next_item",
+  "grammar_level",
+  "symbol_id"
+};
+
 
 /* -------------------------------------------------------------------------------- */
 /* You MUST refer to                                                                */
@@ -141,23 +173,27 @@ typedef enum marpaESLIFCalloutBlockEnum {
 typedef short (*marpaESLIFRecognizerRegexCallback_t)(void *userDatavp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFValueResult_t *marpaESLIFCalloutBlockp, marpaESLIFValueResultInt_t *marpaESLIFValueResultOutp);
 typedef marpaESLIFRecognizerRegexCallback_t (*marpaESLIFRecognizerRegexActionResolver_t)(void *userDatavp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, char *actions);
 
+typedef short (*marpaESLIFRecognizerGeneratorCallback_t)(void *userDatavp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFValueResult_t *contextp, marpaESLIFValueResultString_t *marpaESLIFValueResultOutp);
+typedef marpaESLIFRecognizerGeneratorCallback_t (*marpaESLIFRecognizerGeneratorActionResolver_t)(void *userDatavp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, char *actions);
+
 /* Ask the host system to import a marpaESLIFValueResult in the recognizer namespace */
 typedef short (*marpaESLIFRecognizerImport_t)(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp);
 
 typedef struct marpaESLIFRecognizerOption {
-  void                                     *userDatavp;          /* User specific context */
-  marpaESLIFReader_t                        readerCallbackp;     /* Reader */
-  short                                     disableThresholdb;   /* Default: 0 */
-  short                                     exhaustedb;          /* Exhaustion event. Default: 0 */
-  short                                     newlineb;            /* Count line/column numbers. Default: 0 */
-  short                                     trackb;              /* Track absolute position. Default: 0 */
-  size_t                                    bufsizl;             /* Minimum stream buffer size: Recommended: 0 (internally, a system default will apply) */
-  unsigned int                              buftriggerperci;     /* Excess number of bytes, in percentage of bufsizl, where stream buffer size is reduced. Recommended: 50 */
-  unsigned int                              bufaddperci;         /* Policy of minimum of bytes for increase, in percentage of current allocated size, when stream buffer size need to augment. Recommended: 50 */
-  marpaESLIFRecognizerIfActionResolver_t    ifActionResolverp;   /* Will return the function doing the wanted if action */
-  marpaESLIFRecognizerEventActionResolver_t eventActionResolverp; /* Will return the function doing the wanted event action */
-  marpaESLIFRecognizerRegexActionResolver_t regexActionResolverp; /* Will return the function doing the wanted regex callout action */
-  marpaESLIFRecognizerImport_t              importerp;           /* If end-user want to import a marpaESLIFValueResult */
+  void                                          *userDatavp;          /* User specific context */
+  marpaESLIFReader_t                             readerCallbackp;     /* Reader */
+  short                                          disableThresholdb;   /* Default: 0 */
+  short                                          exhaustedb;          /* Exhaustion event. Default: 0 */
+  short                                          newlineb;            /* Count line/column numbers. Default: 0 */
+  short                                          trackb;              /* Track absolute position. Default: 0 */
+  size_t                                         bufsizl;             /* Minimum stream buffer size: Recommended: 0 (internally, a system default will apply) */
+  unsigned int                                   buftriggerperci;     /* Excess number of bytes, in percentage of bufsizl, where stream buffer size is reduced. Recommended: 50 */
+  unsigned int                                   bufaddperci;         /* Policy of minimum of bytes for increase, in percentage of current allocated size, when stream buffer size need to augment. Recommended: 50 */
+  marpaESLIFRecognizerIfActionResolver_t         ifActionResolverp;   /* Will return the function doing the wanted if action */
+  marpaESLIFRecognizerEventActionResolver_t      eventActionResolverp; /* Will return the function doing the wanted event action */
+  marpaESLIFRecognizerRegexActionResolver_t      regexActionResolverp; /* Will return the function doing the wanted regex callout action */
+  marpaESLIFRecognizerGeneratorActionResolver_t  generatorActionResolverp; /* Will return the function doing the wanted symbol generation action */
+  marpaESLIFRecognizerImport_t                   importerp;           /* If end-user want to import a marpaESLIFValueResult */
 } marpaESLIFRecognizerOption_t;
 
 typedef enum marpaESLIFEventType {
@@ -165,8 +201,8 @@ typedef enum marpaESLIFEventType {
   MARPAESLIF_EVENTTYPE_COMPLETED  = 0x01, /* Grammar event */
   MARPAESLIF_EVENTTYPE_NULLED     = 0x02, /* Grammar event */
   MARPAESLIF_EVENTTYPE_PREDICTED  = 0x04, /* Grammar event */
-  MARPAESLIF_EVENTTYPE_BEFORE     = 0x08, /* Just before lexeme is commited */
-  MARPAESLIF_EVENTTYPE_AFTER      = 0x10, /* Just after lexeme is commited */
+  MARPAESLIF_EVENTTYPE_BEFORE     = 0x08, /* Just before symbol is commited */
+  MARPAESLIF_EVENTTYPE_AFTER      = 0x10, /* Just after symbol is commited */
   MARPAESLIF_EVENTTYPE_EXHAUSTED  = 0x20, /* Exhaustion */
   MARPAESLIF_EVENTTYPE_DISCARD    = 0x40  /* Discard */
 } marpaESLIFEventType_t;
@@ -204,14 +240,37 @@ typedef short (*marpaESLIFValueSymbolCallback_t)(void *userDatavp, marpaESLIFVal
 typedef marpaESLIFValueRuleCallback_t (*marpaESLIFValueRuleActionResolver_t)(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, char *actions);
 typedef marpaESLIFValueSymbolCallback_t (*marpaESLIFValueSymbolActionResolver_t)(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, char *actions);
 
-/* Valuation result */
-/* The representation returns a sequence of bytes, eventually meaning a string */
-/* It is legal to return NULL in *inputcpp or 0 in *inputlp: representation will be ignored */
+/* --------------------------------------------------------------------------------------------- */
+/* The representation returns a sequence of bytes, eventually meaning a string                   */
+/* It is legal to return NULL in *inputcpp or 0 in *inputlp: the callback will be like a no-op.  */
 /* It is legal to return NULL in encodingmaybesp, then this is an opaque sequence of bytes, else */
-/* this is considered as a string in this given encoding. */
-/* Note that it is the responsibility of the caller to make sure that *inputcpp and **encodingmaybesp points to valid memory area when the call returns */
+/* this is considered as a string in this given encoding, /unless/ *stringbp is overwritten.     */
+/* Note that it is the responsibility of the caller to make sure that *inputcpp and              */
+/* **encodingmaybesp points to valid memory area when the call returns.                          */
+/* The *disposeCallbackpp, if set, will be called back to release memory in user-land.           */
+/*                                                                                               */
+/* A specific case in when marpaESLIFValueResultp->type is MARPAESLIF_VALUE_TYPE_PTR:            */
+/* It is not a hasard that ESLIF never produces PTR internally, such type can only be injected   */
+/* by an external call, and usually represents something that the end-user wants to remain       */
+/* opaque to ESLIF. In such a case, if there is a representation callback, the end-user can      */
+/* inform ESLIF if he wanted to use marpaESLIFValueResultp as a string or not.                   */
+/* This has an impact on how ESLIF will represent *inputcp depending on serialization context    */
+/* (e.g. the :json action).                                                                      */
+/* The default value of *stringbp is always the safe thing, i.e. a true value.                   */
+/* The eventual overwrite of *stringbp is ignored when marpaESLIFValueResultp->type is not       */
+/* MARPAESLIF_VALUE_TYPE_PTR.                                                                    */
+/* Typical usages are:                                                                           */
+/* - Host variables whose type depend on the language context, e.g. in Perl.                     */
+/* - Host languages that took over number representations, e.g. Math::BigDecimal in              */
+/*   Java, Math::BigFloat and Math::BigInt in Perl.                                              */
+/* It is strongly advised to overwrite *stringb to 0 /ONLY/ when the intended usage is a number. */
+/* --------------------------------------------------------------------------------------------- */
 typedef void (*marpaESLIFRepresentationDispose_t)(void *userDatavp, char *inputcp, size_t inputl, char *encodingasciis);
-typedef short (*marpaESLIFRepresentation_t)(void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, char **inputcpp, size_t *inputlp, char **encodingasciisp, marpaESLIFRepresentationDispose_t *disposeCallbackpp);
+typedef short (*marpaESLIFRepresentation_t)(void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, char **inputcpp, size_t *inputlp, char **encodingasciisp, marpaESLIFRepresentationDispose_t *disposeCallbackpp, short *stringbp);
+
+/* --------------------------------------------------------------------------------------------- */
+/* Valuation result                                                                              */
+/* --------------------------------------------------------------------------------------------- */
 typedef char marpaESLIFValueResultChar_t;
 typedef short marpaESLIFValueResultShort_t;
 typedef long marpaESLIFValueResultLong_t;
@@ -219,42 +278,42 @@ typedef float marpaESLIFValueResultFloat_t;
 typedef double marpaESLIFValueResultDouble_t;
 typedef struct marpaESLIFValueResultPtr {
   void                                *p;
+  short                                shallowb;
   void                                *freeUserDatavp;
   marpaESLIFValueResultFreeCallback_t  freeCallbackp;
-  short                                shallowb;
 } marpaESLIFValueResultPtr_t;
 typedef struct marpaESLIFValueResultArray {
   char                                *p;
+  short                                shallowb;
   void                                *freeUserDatavp;
   marpaESLIFValueResultFreeCallback_t  freeCallbackp;
-  short                                shallowb;
   size_t                               sizel;
 } marpaESLIFValueResultArray_t;
 enum marpaESLIFValueResultBool {
   MARPAESLIFVALUERESULTBOOL_FALSE = 0,
   MARPAESLIFVALUERESULTBOOL_TRUE = 1
 };
-typedef struct marpaESLIFValueResultString {
+struct marpaESLIFValueResultString {
   unsigned char                       *p;
+  short                                shallowb;
   void                                *freeUserDatavp;
   marpaESLIFValueResultFreeCallback_t  freeCallbackp;
-  short                                shallowb;
   size_t                               sizel;
   char                                *encodingasciis;
-} marpaESLIFValueResultString_t;
+};
 typedef struct marpaESLIFValueResultRow {
   marpaESLIFValueResult_t             *p;
+  short                                shallowb;
   void                                *freeUserDatavp;
   marpaESLIFValueResultFreeCallback_t  freeCallbackp;
-  short                                shallowb;
   size_t                               sizel;
 } marpaESLIFValueResultRow_t;
 typedef struct marpaESLIFValueResultPair marpaESLIFValueResultPair_t;
 typedef struct marpaESLIFValueResultTable {
   marpaESLIFValueResultPair_t         *p;
+  short                                shallowb;
   void                                *freeUserDatavp;
   marpaESLIFValueResultFreeCallback_t  freeCallbackp;
-  short                                shallowb;
   size_t                               sizel;
 } marpaESLIFValueResultTable_t;
 typedef long double marpaESLIFValueResultLongDouble_t;
@@ -293,7 +352,7 @@ struct marpaESLIFValueResultPair {
 
 /* An alternative from external lexer point of view */
 typedef struct marpaESLIFAlternative {
-  char                      *lexemes;     /* Lexeme name */
+  char                      *names;       /* Symbol name (from automatic description or explicit name adverb) */
   marpaESLIFValueResult_t    value;       /* Value */
   size_t                     grammarLengthl; /* Length within the grammar (1 in the token-stream model) */
 } marpaESLIFAlternative_t;
@@ -323,7 +382,8 @@ typedef struct marpaESLIFRecognizerProgress {
 typedef enum marpaESLIFActionType {
   MARPAESLIF_ACTION_TYPE_NAME = 0,
   MARPAESLIF_ACTION_TYPE_STRING,
-  MARPAESLIF_ACTION_TYPE_LUA
+  MARPAESLIF_ACTION_TYPE_LUA,
+  MARPAESLIF_ACTION_TYPE_LUA_FUNCTION
 } marpaESLIFActionType_t;
 
 /* A string */
@@ -338,22 +398,33 @@ typedef struct marpaESLIFString {
    */
 } marpaESLIFString_t;
 
+typedef struct marpaESLIFLuaFunction {
+  char  *luas;       /* Original action as per the grammar */
+  char  *actions;    /* The action injected into lua */
+  short  luacb;      /* True if action was in the form ::luac->function */
+  char  *luacp;      /* Precompiled chunk. Not NULL only when luacb is true and action as been used at least once */
+  size_t luacl;      /* Precompiled chunk length */
+  char  *luacstripp; /* Precompiled stripped chunk - never NULL (it is done during grammar validation) */
+  size_t luacstripl; /* Precompiled stripped chunk length */
+} marpaESLIFLuaFunction_t;
+
 typedef struct marpaESLIFAction {
   marpaESLIFActionType_t type;
   union {
-    char               *names;
-    marpaESLIFString_t *stringp;
-    char               *luas;
+    char                          *names;
+    marpaESLIFString_t            *stringp;
+    char                          *luas;
+    marpaESLIFLuaFunction_t        luaFunction;
   } u;
 } marpaESLIFAction_t;
 
 typedef struct marpaESLIFGrammarDefaults {
-  marpaESLIFAction_t *defaultRuleActionp;   /* Default action for rules */
-  marpaESLIFAction_t *defaultSymbolActionp; /* Default action for symbols */
-  marpaESLIFAction_t *defaultEventActionp;  /* Default action for events */
-  marpaESLIFAction_t *defaultRegexActionp;  /* Default action for regex */
-  char               *defaultEncodings;     /* Default encoding */
-  char               *fallbackEncodings;    /* Fallback encoding */
+  marpaESLIFAction_t *defaultRuleActionp;      /* Default action for rules */
+  marpaESLIFAction_t *defaultSymbolActionp;    /* Default action for symbols */
+  marpaESLIFAction_t *defaultEventActionp;     /* Default action for events */
+  marpaESLIFAction_t *defaultRegexActionp;     /* Default action for regex */
+  char               *defaultEncodings;        /* Default encoding */
+  char               *fallbackEncodings;       /* Fallback encoding */
 } marpaESLIFGrammarDefaults_t;
 
 /* Rule property */
@@ -383,22 +454,23 @@ typedef enum marpaESLIFSymbolEventBit {
 } marpaESLIFSymbolEventBit_t;
 
 typedef struct marpaESLIFGrammarProperty {
-  int                    leveli;                       /* Grammar level */
-  int                    maxLeveli;                    /* Maximum grammar level */
-  marpaESLIFString_t    *descp;                        /* Grammar description (auto-generated if none) */
-  short                  latmb;                        /* LATM ? */
-  marpaESLIFAction_t    *defaultSymbolActionp;         /* Default action for symbols - never NULL */
-  marpaESLIFAction_t    *defaultRuleActionp;           /* Default action for rules - never NULL */
-  marpaESLIFAction_t    *defaultEventActionp;          /* Default action for event - can be NULL */
-  marpaESLIFAction_t    *defaultRegexActionp;          /* Default action for regex - can be NULL */
-  int                    starti;                       /* Start symbol Id - always >= 0 */
-  int                    discardi;                     /* Discard symbol Id (-1 if none) */
-  size_t                 nsymboll;                     /* Number of symbols - always > 0*/
-  int                   *symbolip;                     /* Array of symbols Ids - never NULL */
-  size_t                 nrulel;                       /* Number of rules - always > 0*/
-  int                   *ruleip;                       /* Array of rule Ids - never NULL */
-  char                  *defaultEncodings;             /* Default encoding */
-  char                  *fallbackEncodings;            /* Fallback encoding */
+  int                    leveli;                  /* Grammar level */
+  int                    maxLeveli;               /* Maximum grammar level */
+  marpaESLIFString_t    *descp;                   /* Grammar description (auto-generated if none) */
+  short                  latmb;                   /* LATM ? */
+  short                  discardIsFallbackb;      /* Discard is fallback ? */
+  marpaESLIFAction_t    *defaultSymbolActionp;    /* Default action for symbols - never NULL */
+  marpaESLIFAction_t    *defaultRuleActionp;      /* Default action for rules - never NULL */
+  marpaESLIFAction_t    *defaultEventActionp;     /* Default action for event - can be NULL */
+  marpaESLIFAction_t    *defaultRegexActionp;     /* Default action for regex - can be NULL */
+  int                    starti;                  /* Start symbol Id - always >= 0 */
+  int                    discardi;                /* Discard symbol Id (-1 if none) */
+  size_t                 nsymboll;                /* Number of symbols - always > 0*/
+  int                   *symbolip;                /* Array of symbols Ids - never NULL */
+  size_t                 nrulel;                  /* Number of rules - always > 0*/
+  int                   *ruleip;                  /* Array of rule Ids - never NULL */
+  char                  *defaultEncodings;        /* Default encoding */
+  char                  *fallbackEncodings;       /* Fallback encoding */
 } marpaESLIFGrammarProperty_t;
 
 typedef struct marpaESLIFRuleProperty {
@@ -419,7 +491,6 @@ typedef struct marpaESLIFRuleProperty {
   short                  sequenceb;                    /* Sequence ? */
   short                  properb;                      /* Proper ? */
   int                    minimumi;                     /* minimum in case of sequence ? */
-  short                  internalb;                    /* This rule is internal */
   int                    propertyBitSet;               /* C.f. marpaESLIFRulePropertyBit_t */
   short                  hideseparatorb;               /* Separator hiden from arguments ? */
 } marpaESLIFRuleProperty_t;
@@ -455,8 +526,10 @@ typedef struct marpaESLIFSymbolProperty {
   marpaESLIFAction_t          *nullableActionp;        /* Nullable semantic */
   int                          propertyBitSet;
   int                          eventBitSet;
-  marpaESLIFAction_t          *symbolActionp;          /* Symbol value specific action */
-  marpaESLIFAction_t          *ifActionp;              /* Symbol recognizer if action */
+  marpaESLIFAction_t          *symbolActionp;          /* symbol-action */
+  marpaESLIFAction_t          *ifActionp;              /* if-action */
+  marpaESLIFAction_t          *generatorActionp;       /* generator-action */
+  short                        verboseb;               /* Symbol is verbose */
 } marpaESLIFSymbolProperty_t;
 
 /* Whenever marpaESLIF fails to parse exactly a JSON number it will call the proposal callback if defined. */
@@ -493,6 +566,14 @@ typedef struct marpaESLIFGrammarOption {
 typedef struct marpaESLIF        marpaESLIF_t;
 typedef struct marpaESLIFGrammar marpaESLIFGrammar_t;
 
+/* Ask the host system to import a marpaESLIFValueResult in the symbol namespace */
+typedef short (*marpaESLIFSymbolImport_t)(marpaESLIFSymbol_t *marpaESLIFSymbolp, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp);
+
+typedef struct marpaESLIFSymbolOption {
+  void                     *userDatavp;          /* User specific context */
+  marpaESLIFSymbolImport_t  importerp;           /* If end-user want to import a marpaESLIFValueResult */
+} marpaESLIFSymbolOption_t;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -506,7 +587,7 @@ extern "C" {
   /* Helper function that tells if a string could be parsed to a number using the non-strict ESLIF's JSON number formalism */
   /* restricted to not special numbers, i.e. /[+-]?(?:[0-9]+)(?:\\.[0-9]+)?(?:[eE][+-]?[0-9]+)?/.                          */
   /* This does NOT handle Infinity nor Nans, see the specific functions later that check on the explicit value.            */
-  marpaESLIF_EXPORT short                         marpaESLIF_numberb(marpaESLIF_t *marpaESLIFp, char *s, marpaESLIFValueResult_t *marpaESLIFValueResultp, short *confidencebp);
+  marpaESLIF_EXPORT short                         marpaESLIF_numberb(marpaESLIF_t *marpaESLIFp, char *s, size_t sizel, marpaESLIFValueResult_t *marpaESLIFValueResultp, short *confidencebp);
 
   marpaESLIF_EXPORT marpaESLIFGrammar_t          *marpaESLIFGrammar_newp(marpaESLIF_t *marpaESLIFp, marpaESLIFGrammarOption_t *marpaESLIFGrammarOptionp);
   marpaESLIF_EXPORT marpaESLIF_t                 *marpaESLIFGrammar_eslifp(marpaESLIFGrammar_t *marpaESLIFGrammarp);
@@ -547,30 +628,37 @@ extern "C" {
   marpaESLIF_EXPORT short                         marpaESLIFRecognizer_isExhaustedb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, short *exhaustedbp);
   marpaESLIF_EXPORT short                         marpaESLIFRecognizer_isCanContinueb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, short *isCanContinuebp);
   marpaESLIF_EXPORT short                         marpaESLIFRecognizer_shareb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFRecognizer_t *marpaESLIFRecognizerSharedp);
+  marpaESLIF_EXPORT short                         marpaESLIFRecognizer_peekb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFRecognizer_t *marpaESLIFRecognizerPeekedp);
   marpaESLIF_EXPORT marpaESLIFGrammar_t          *marpaESLIFRecognizer_grammarp(marpaESLIFRecognizer_t *marpaESLIFRecognizerp);
   marpaESLIF_EXPORT marpaESLIFRecognizerOption_t *marpaESLIFRecognizer_optionp(marpaESLIFRecognizer_t *marpaESLIFRecognizerp);
   marpaESLIF_EXPORT short                         marpaESLIFRecognizer_scanb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, short initialEventsb, short *continuebp, short *exhaustedbp);
   marpaESLIF_EXPORT short                         marpaESLIFRecognizer_resumeb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, size_t deltaLengthl, short *continuebp, short *exhaustedbp);
-  marpaESLIF_EXPORT short                         marpaESLIFRecognizer_lexeme_alternativeb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFAlternative_t *marpaESLIFAlternativep);
-  marpaESLIF_EXPORT short                         marpaESLIFRecognizer_lexeme_completeb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, size_t lengthl);
-  marpaESLIF_EXPORT short                         marpaESLIFRecognizer_lexeme_readb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFAlternative_t *marpaESLIFAlternativep, size_t lengthl);
-  marpaESLIF_EXPORT short                         marpaESLIFRecognizer_lexeme_tryb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, char *lexemes, short *matchbp);
+  marpaESLIF_EXPORT short                         marpaESLIFRecognizer_alternativeb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFAlternative_t *marpaESLIFAlternativep);
+  marpaESLIF_EXPORT short                         marpaESLIFRecognizer_alternative_completeb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, size_t lengthl);
+  marpaESLIF_EXPORT short                         marpaESLIFRecognizer_alternative_readb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFAlternative_t *marpaESLIFAlternativep, size_t lengthl);
+  marpaESLIF_EXPORT short                         marpaESLIFRecognizer_name_tryb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, char *names, short *matchbp);
+  marpaESLIF_EXPORT short                         marpaESLIFRecognizer_discardb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, size_t *discardlp);
   marpaESLIF_EXPORT short                         marpaESLIFRecognizer_discard_tryb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, short *matchbp);
-  marpaESLIF_EXPORT short                         marpaESLIFRecognizer_lexeme_expectedb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, size_t *nLexemelp, char ***lexemesArraypp);
-  marpaESLIF_EXPORT short                         marpaESLIFRecognizer_lexeme_last_pauseb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, char *lexemes, char **pausesp, size_t *pauselp);
-  marpaESLIF_EXPORT short                         marpaESLIFRecognizer_lexeme_last_tryb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, char *lexemes, char **trysp, size_t *trylp);
+  marpaESLIF_EXPORT short                         marpaESLIFRecognizer_name_expectedb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, size_t *nNamelp, char ***namesArraypp);
+  marpaESLIF_EXPORT short                         marpaESLIFRecognizer_name_last_pauseb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, char *names, char **pausesp, size_t *pauselp);
+  marpaESLIF_EXPORT short                         marpaESLIFRecognizer_name_last_tryb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, char *names, char **trysp, size_t *trylp);
   marpaESLIF_EXPORT short                         marpaESLIFRecognizer_discard_last_tryb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, char **trysp, size_t *trylp);
   marpaESLIF_EXPORT short                         marpaESLIFRecognizer_discard_lastb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, char **lastsp, size_t *lastlp);
   marpaESLIF_EXPORT short                         marpaESLIFRecognizer_isEofb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, short *eofbp);
+  marpaESLIF_EXPORT short                         marpaESLIFRecognizer_isStartCompleteb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, short *completebp);
   marpaESLIF_EXPORT short                         marpaESLIFRecognizer_event_onoffb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, char *symbols, marpaESLIFEventType_t eventSeti, short onoffb);
   marpaESLIF_EXPORT short                         marpaESLIFRecognizer_eventb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, size_t *eventArraylp, marpaESLIFEvent_t **eventArraypp);
   marpaESLIF_EXPORT short                         marpaESLIFRecognizer_progressLogb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, int starti, int endi, genericLoggerLevel_t logleveli);
+  marpaESLIF_EXPORT short                         marpaESLIFRecognizer_progressb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, int starti, int endi, size_t *progresslp, marpaESLIFRecognizerProgress_t **progresspp);
   marpaESLIF_EXPORT short                         marpaESLIFRecognizer_inputb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, char **inputsp, size_t *inputlp);
+  marpaESLIF_EXPORT short                         marpaESLIFRecognizer_errorb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp);
   marpaESLIF_EXPORT short                         marpaESLIFRecognizer_locationb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, size_t *linelp, size_t *columnlp);
   marpaESLIF_EXPORT short                         marpaESLIFRecognizer_readb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, char **inputsp, size_t *inputlp);
   marpaESLIF_EXPORT short                         marpaESLIFRecognizer_last_completedb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, char *names, char **offsetpp, size_t *lengthlp);
   marpaESLIF_EXPORT short                         marpaESLIFRecognizer_hook_discardb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, short discardOnOffb);
   marpaESLIF_EXPORT short                         marpaESLIFRecognizer_hook_discard_switchb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp);
+  /* TAKE CARE: trying to match an external to an existing recognizer will use, in case of a match, the RECOGNIZER's import configuration, not the external symbol */
+  marpaESLIF_EXPORT short                         marpaESLIFRecognizer_symbol_tryb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFSymbol_t *marpaESLIFSymbolp, short *matchbp);
   marpaESLIF_EXPORT void                          marpaESLIFRecognizer_freev(marpaESLIFRecognizer_t *marpaESLIFRecognizerp);
 
   marpaESLIF_EXPORT marpaESLIFValue_t            *marpaESLIFValue_newp(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFValueOption_t *marpaESLIFValueOptionp);
@@ -582,23 +670,21 @@ extern "C" {
   marpaESLIF_EXPORT short                         marpaESLIFValue_contextb(marpaESLIFValue_t *marpaESLIFValuep, char **symbolsp, int *symbolip, char **rulesp, int *ruleip);
   marpaESLIF_EXPORT void                          marpaESLIFValue_freev(marpaESLIFValue_t *marpaESLIFValuep);
 
-  /* ------------------------------------- */
-  /* Stack management when doing valuation */
-  /* ------------------------------------- */
-  /* Generic setter */
+  /* ------------------------------- */
+  /* marpaESLIFValueResult_t helpers */
+  /* ------------------------------- */
   marpaESLIF_EXPORT short                         marpaESLIFValue_stack_setb(marpaESLIFValue_t *marpaESLIFValuep, int indicei, marpaESLIFValueResult_t *marpaESLIFValueResultp);
-  /* Generic getter */
-  marpaESLIF_EXPORT short                         marpaESLIFValue_stack_getb(marpaESLIFValue_t *marpaESLIFValuep, int indicei, marpaESLIFValueResult_t *marpaESLIFValueResultp);
-  /* Optimized generic getter: returns a direct pointer to the marpaESLIFValuep in memory instead of a copy via marpaESLIFValue_stack_getb */
   marpaESLIF_EXPORT marpaESLIFValueResult_t      *marpaESLIFValue_stack_getp(marpaESLIFValue_t *marpaESLIFValuep, int indicei);
-
-  /* Helpers */
-  
   /* marpaESLIFValue_stack_forgetb is like setting a value of type MARPAESLIFVALUE_TYPE_UNDEF saying that memory management is switched off at this specific indice */
   marpaESLIF_EXPORT short                         marpaESLIFValue_stack_forgetb(marpaESLIFValue_t *marpaESLIFValuep, int indicei);
   /* marpaESLIFValue_stack_getAndForgetb transfers the memory management from the stack to the end-user in one call */
-  /* It is nothing else but a wrapper on marpaESLIFValue_stack_getb followed by marpaESLIFValue_stack_forgetb */
+  /* It is nothing else but a wrapper on marpaESLIFValue_stack_getp followed by marpaESLIFValue_stack_forgetb */
   marpaESLIF_EXPORT short                         marpaESLIFValue_stack_getAndForgetb(marpaESLIFValue_t *marpaESLIFValuep, int indicei, marpaESLIFValueResult_t *marpaESLIFValueResultp);
+  marpaESLIF_EXPORT short                         marpaESLIFValue_marpaESLIFValueResult_freeb(marpaESLIFValue_t *marpaESLIFValuep, marpaESLIFValueResult_t *marpaESLIFValueResultp, short deepb);
+  marpaESLIF_EXPORT short                         marpaESLIFRecognizer_marpaESLIFValueResult_freeb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short deepb);
+
+  /* Helpers */
+  
   /* -------------------------------------------------------------------------------------------------------------------------------------------------------------- */
   /* Import helpers                                                                                                                                                 */
   /* -------------------------------------------------------------------------------------------------------------------------------------------------------------- */
@@ -630,18 +716,11 @@ extern "C" {
   /* Embedded JSON support */
   /* --------------------- */
   marpaESLIF_EXPORT marpaESLIFGrammar_t          *marpaESLIFJSON_encode_newp(marpaESLIF_t *marpaESLIFp, short strictb);
-  /* When encoding, marpaESLIFValueResultp is injected as a Lexeme, so, unless the caller sets the shallow flag to a true value */
+  /* When encoding, marpaESLIFValueResultp is injected to an internal grammar so, unless the caller sets the shallow flag to a true value */
   /* ESLIF will automatically frees marpaESLIFValueResultp content. */
   marpaESLIF_EXPORT short                         marpaESLIFJSON_encodeb(marpaESLIFGrammar_t *marpaESLIFGrammarJSONp, marpaESLIFValueResult_t *marpaESLIFValueResultp, marpaESLIFValueOption_t *marpaESLIFValueOptionp);
   marpaESLIF_EXPORT marpaESLIFGrammar_t          *marpaESLIFJSON_decode_newp(marpaESLIF_t *marpaESLIFp, short strictb);
-  /* For decoding, a marpaESLIFValueOption_t* argument is required. In it the following settings will be ignored, */
-  /* being overwriten by marpaESLIFJSON_decodeb: */
-  /* symbolActionResolverp - We use the default "::transfer" implementation */
-  /* highRankOnlyb         - Fixed to 1 */
-  /* orderByRankb          - Fixed to 1 */
-  /* ambiguousb            - Fixed to 0 */
-  /* nullb                 - Fixed to 0 */
-  /* maxParsesi            - Fixed to 0 */
+  /* For decoding, a marpaESLIFValueOption_t* argument is required. Only the importer callback and its context will be used */
   marpaESLIF_EXPORT short                         marpaESLIFJSON_decodeb(marpaESLIFGrammar_t *marpaESLIFGrammarJSONp, marpaESLIFJSONDecodeOption_t *marpaESLIFJSONDecodeOptionp, marpaESLIFRecognizerOption_t *marpaESLIFRecognizerOptionp, marpaESLIFValueOption_t *marpaESLIFValueOptionp);
 
   /* ------------------------------------- */
@@ -663,22 +742,24 @@ extern "C" {
   marpaESLIF_EXPORT char                         *marpaESLIF_dtos(marpaESLIF_t *marpaESLIFp, double d);
   marpaESLIF_EXPORT char                         *marpaESLIF_ldtos(marpaESLIF_t *marpaESLIFp, long double ld);
 
-  /* -------------------------------------- */
-  /* Terminals not not bound to any grammar */
-  /* -------------------------------------- */
-  marpaESLIF_EXPORT marpaESLIFSymbol_t           *marpaESLIFSymbol_string_newp(marpaESLIF_t *marpaESLIFp, marpaESLIFString_t *stringp, char *modifiers);
-  marpaESLIF_EXPORT marpaESLIFSymbol_t           *marpaESLIFSymbol_regex_newp(marpaESLIF_t *marpaESLIFp, marpaESLIFString_t *stringp, char *modifiers);
+  /* ---------------------------------------------- */
+  /* Symbols not not bound to any grammar           */
+  /* ---------------------------------------------- */
+  marpaESLIF_EXPORT marpaESLIFSymbol_t           *marpaESLIFSymbol_string_newp(marpaESLIF_t *marpaESLIFp, marpaESLIFString_t *stringp, char *modifiers, marpaESLIFSymbolOption_t *marpaESLIFSymbolOptionp);
+  marpaESLIF_EXPORT marpaESLIFSymbol_t           *marpaESLIFSymbol_regex_newp(marpaESLIF_t *marpaESLIFp, marpaESLIFString_t *stringp, char *modifiers, marpaESLIFSymbolOption_t *marpaESLIFSymbolOptionp);
+  /* For meta external symbol, the start symbol of the given grammar is duplicated */
+  marpaESLIF_EXPORT marpaESLIFSymbol_t           *marpaESLIFSymbol_meta_newp(marpaESLIF_t *marpaESLIFp, marpaESLIFGrammar_t *marpaESLIFGrammarp, char *symbols, marpaESLIFSymbolOption_t *marpaESLIFSymbolOptionp);
+  marpaESLIF_EXPORT marpaESLIFSymbol_t           *marpaESLIFSymbol_meta_new_by_levelp(marpaESLIF_t *marpaESLIFp, marpaESLIFGrammar_t *marpaESLIFGrammarp, char *symbols, int leveli, marpaESLIFString_t *descp, marpaESLIFSymbolOption_t *marpaESLIFSymbolOptionp);
   marpaESLIF_EXPORT marpaESLIF_t                 *marpaESLIFSymbol_eslifp(marpaESLIFSymbol_t *marpaESLIFSymbolp);
   /* An external symbol can be used directly inside the recognizer phase in the current input stream. The later will automatically expand if needed */
   /* as in normal recognizer lifetime. */
   /* It can be also used outside of any grammar on a free input string */
-  /* If there is match, *matchbp will contain a true value, else a false value */
-  /* When there is match marpaESLIFValueResultArrayp will contain the result. The caller is responsible to free it it is not shallow */
-  marpaESLIF_EXPORT short                        marpaESLIFSymbol_tryb(marpaESLIFSymbol_t *marpaESLIFSymbolp, char *inputs, size_t inputl, short *matchbp, marpaESLIFValueResultArray_t *marpaESLIFValueResultArrayp);
-  marpaESLIF_EXPORT short                        marpaESLIFRecognizer_symbol_tryb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFSymbol_t *marpaESLIFSymbolp, short *matchbp, marpaESLIFValueResultArray_t *marpaESLIFValueResultArrayp);
+  /* If there is a match, *matchbp will contain a true value, else a false value */
+  /* If there is a match and importer is set, the later is called */
+  marpaESLIF_EXPORT short                        marpaESLIFSymbol_tryb(marpaESLIFSymbol_t *marpaESLIFSymbolp, char *inputs, size_t inputl, short *matchbp);
   marpaESLIF_EXPORT void                         marpaESLIFSymbol_freev(marpaESLIFSymbol_t *marpaESLIFSymbolp);
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* MARPAESLIF_H*/
+#endif /* MARPAESLIF_H */

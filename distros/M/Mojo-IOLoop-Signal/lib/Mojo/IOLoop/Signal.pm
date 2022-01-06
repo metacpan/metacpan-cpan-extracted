@@ -7,7 +7,7 @@ use Mojo::IOLoop;
 use Mojo::Util ();
 use Scalar::Util 'weaken';
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 my %SIGNAME = map { $_ => 1 } split /\s+/, $Config{sig_name};
 our %EXCLUDE = map { $_ => 1 } qw(PIPE KILL);
 
@@ -34,9 +34,7 @@ sub _new {
     bless { keep => {}, is_ev => $is_ev }, $class;
 }
 
-sub DESTROY {
-    Mojo::Util::_global_destruction() or shift->stop;
-}
+sub DESTROY { shift->stop unless ${^GLOBAL_PHASE} eq 'DESTRUCT' }
 
 sub stop {
     my $self = _instance(shift);

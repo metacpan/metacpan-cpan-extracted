@@ -14,7 +14,7 @@ require Win32::Console::ANSI if $^O =~ /Win/;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-08-27'; # DATE
 our $DIST = 'Text-ANSITable'; # DIST
-our $VERSION = '0.606'; # VERSION
+our $VERSION = '0.607'; # VERSION
 
 # see Module::Features for more details on this
 our %FEATURES = (
@@ -23,6 +23,19 @@ our %FEATURES = (
     },
 
     features => {
+        PerlTrove => {
+            "Development Status" => "5 - Production/Stable",
+            "Environment" => "Console",
+            # Framework
+            "Intended Audience" => ["Developers"],
+            "License" => "OSI Approved :: Artistic License",
+            # Natural Language
+            # Operating System
+            "Programming Language" => "Perl",
+            "Topic" => ["Software Development :: Libraries :: Perl Modules", "Utilities"],
+            # Typing
+        },
+
         TextTable => {
             can_align_cell_containing_wide_character => 1,
             can_align_cell_containing_color_code     => 1,
@@ -1762,7 +1775,7 @@ Text::ANSITable - Create nice formatted tables using extended ASCII and ANSI col
 
 =head1 VERSION
 
-This document describes version 0.606 of Text::ANSITable (from Perl distribution Text-ANSITable), released on 2021-08-27.
+This document describes version 0.607 of Text::ANSITable (from Perl distribution Text-ANSITable), released on 2021-08-27.
 
 =head1 SYNOPSIS
 
@@ -1840,6 +1853,38 @@ fine-grained options to customize appearance.
 =head1 DECLARED FEATURES
 
 Features declared by this module:
+
+=head2 From feature set PerlTrove
+
+Features from feature set L<PerlTrove|Module::Features::PerlTrove> declared by this module:
+
+=over
+
+=item * Development Status
+
+Value: "5 - ProductionE<sol>Stable".
+
+=item * Environment
+
+Value: "Console".
+
+=item * Intended Audience
+
+Value: ["Developers"].
+
+=item * License
+
+Value: "OSI Approved :: Artistic License".
+
+=item * Programming Language
+
+Value: "Perl".
+
+=item * Topic
+
+Value: ["Software Development :: Libraries :: Perl Modules","Utilities"].
+
+=back
 
 =head2 From feature set TextTable
 

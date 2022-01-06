@@ -18,59 +18,57 @@
 #
 #=============================================================================
 
-package Term::CLI::Argument::Number  0.053006 {
+package Term::CLI::Argument::Number 0.054002;
 
 use 5.014;
-use strict;
 use warnings;
 
-use Term::CLI::L10N;
+use Term::CLI::L10N qw( loc );
+use Carp qw( croak );
 
 use Moo 1.000001;
 use namespace::clean 0.25;
 
 extends 'Term::CLI::Argument';
 
-has min => ( is => 'rw', clearer => 1, predicate => 1 );
-has max => ( is => 'rw', clearer => 1, predicate => 1 );
+has min       => ( is => 'rw', clearer => 1, predicate => 1 );
+has max       => ( is => 'rw', clearer => 1, predicate => 1 );
 has inclusive => ( is => 'rw', default => sub {1} );
 
 sub coerce_value {
-    die "coerce_value() has not been overloaded";
+    croak "coerce_value() has not been overloaded";
 }
 
 sub validate {
-    my ($self, $value) = @_;
+    my ( $self, $value ) = @_;
 
-    if (!defined $value || length($value) == 0) {
-        return $self->set_error(loc('not a valid number'));
+    if ( !defined $value || length($value) == 0 ) {
+        return $self->set_error( loc('not a valid number') );
     }
 
     my $num = $self->coerce_value($value);
 
-    if (!defined $num) {
-        return $self->set_error(loc('not a valid number'));
+    if ( !defined $num ) {
+        return $self->set_error( loc('not a valid number') );
     }
 
-    if ($self->inclusive) {
-        if ($self->has_min && $num < $self->min) {
-            return $self->set_error(loc('too small'));
+    if ( $self->inclusive ) {
+        if ( $self->has_min && $num < $self->min ) {
+            return $self->set_error( loc('too small') );
         }
-        elsif ($self->has_max && $num > $self->max) {
-            return $self->set_error(loc('too large'));
+        if ( $self->has_max && $num > $self->max ) {
+            return $self->set_error( loc('too large') );
         }
     }
     else {
-        if ($self->has_min && $num <= $self->min) {
-            return $self->set_error(loc('too small'));
+        if ( $self->has_min && $num <= $self->min ) {
+            return $self->set_error( loc('too small') );
         }
-        elsif ($self->has_max && $num >= $self->max) {
-            return $self->set_error(loc('too large'));
+        if ( $self->has_max && $num >= $self->max ) {
+            return $self->set_error( loc('too large') );
         }
     }
     return $num;
-}
-
 }
 
 1;
@@ -85,7 +83,7 @@ Term::CLI::Argument::Number - base class for numerical arguments in Term::CLI
 
 =head1 VERSION
 
-version 0.053006
+version 0.054002
 
 =head1 SYNOPSIS
 

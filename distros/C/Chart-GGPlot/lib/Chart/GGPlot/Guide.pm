@@ -6,7 +6,7 @@ use Chart::GGPlot::Setup;
 use Function::Parameters qw(classmethod);
 use namespace::autoclean;
 
-our $VERSION = '0.0016'; # VERSION
+our $VERSION = '0.002000'; # VERSION
 
 use parent qw(Chart::GGPlot::Params);
 
@@ -46,7 +46,7 @@ Chart::GGPlot::Guide - Role for guide
 
 =head1 VERSION
 
-version 0.0016
+version 0.002000
 
 =head1 ATTRIBUTES
 

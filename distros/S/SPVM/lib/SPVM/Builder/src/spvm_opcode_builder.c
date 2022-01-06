@@ -17,7 +17,7 @@
 #include "spvm_method.h"
 #include "spvm_var.h"
 #include "spvm_my.h"
-#include "spvm_compiler_allocator.h"
+#include "spvm_allocator.h"
 #include "spvm_class.h"
 #include "spvm_field_access.h"
 #include "spvm_call_method.h"
@@ -93,60 +93,6 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
       {
         int32_t method_index;
         for (method_index = 0; method_index < methods->length; method_index++) {
-          // opcode index stack for if start
-          SPVM_LIST* if_eq_or_if_ne_goto_opcode_rel_index_stack = SPVM_LIST_new(0);
-          
-          // opcode index stack for if end
-          SPVM_LIST* if_block_end_goto_opcode_rel_index_stack = SPVM_LIST_new(0);
-          
-          // opcode index stack for loop start
-          SPVM_LIST* loop_first_goto_opcode_rel_index_stack = SPVM_LIST_new(0);
-          
-          // opcode index stack for last
-          SPVM_LIST* last_goto_opcode_rel_index_stack = SPVM_LIST_new(0);
-
-          // opcode index stack for break
-          SPVM_LIST* break_goto_opcode_rel_index_stack = SPVM_LIST_new(0);
-          
-          // opcode index stack for next
-          SPVM_LIST* next_goto_opcode_rel_index_stack = SPVM_LIST_new(0);
-          
-          // opcode index stack for eval start
-          SPVM_LIST* push_eval_opcode_rel_index_stack = SPVM_LIST_new(0);
-          
-          // IF_EXCEPTION_CATCH opcode index stack
-          SPVM_LIST* if_die_catch_goto_opcode_rel_index_stack = SPVM_LIST_new(0);
-
-          // IF_EXCEPTION_RETURN opcode index stack
-          SPVM_LIST* if_die_return_goto_opcode_rel_index_stack = SPVM_LIST_new(0);
-
-          // RETURN goto opcode index stack
-          SPVM_LIST* return_goto_opcode_rel_index_stack = SPVM_LIST_new(0);
-          
-          // Switch stack
-          SPVM_LIST* switch_info_stack = SPVM_LIST_new(0);
-          
-          // next block base stack
-          SPVM_LIST* next_block_base_stack = SPVM_LIST_new(0);
-          
-          // last block base stack
-          SPVM_LIST* last_block_base_stack = SPVM_LIST_new(0);
-
-          // break block base stack
-          SPVM_LIST* break_block_base_stack = SPVM_LIST_new(0);
-          
-          // Block stack
-          SPVM_LIST* op_block_stack = SPVM_LIST_new(0);
-          
-          // Mortal variable stack
-          SPVM_LIST* mortal_stack = SPVM_LIST_new(0);
-          
-          // Mortal variable base stack
-          SPVM_LIST* mortal_top_stack = SPVM_LIST_new(0);
-
-          // Object temporary variable stack
-          SPVM_LIST* object_op_var_tmp_stack = SPVM_LIST_new(0);
-
           SPVM_METHOD* method = SPVM_LIST_fetch(methods, method_index);
           
           // Check sub information
@@ -158,6 +104,60 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
           if (method->flag & SPVM_METHOD_C_FLAG_NATIVE) {
             continue;
           }
+
+          // opcode index stack for if start
+          SPVM_LIST* if_eq_or_if_ne_goto_opcode_rel_index_stack = SPVM_LIST_new(compiler, 0, 0, NULL);
+          
+          // opcode index stack for if end
+          SPVM_LIST* if_block_end_goto_opcode_rel_index_stack = SPVM_LIST_new(compiler, 0, 0, NULL);
+          
+          // opcode index stack for loop start
+          SPVM_LIST* loop_first_goto_opcode_rel_index_stack = SPVM_LIST_new(compiler, 0, 0, NULL);
+          
+          // opcode index stack for last
+          SPVM_LIST* last_goto_opcode_rel_index_stack = SPVM_LIST_new(compiler, 0, 0, NULL);
+
+          // opcode index stack for break
+          SPVM_LIST* break_goto_opcode_rel_index_stack = SPVM_LIST_new(compiler, 0, 0, NULL);
+          
+          // opcode index stack for next
+          SPVM_LIST* next_goto_opcode_rel_index_stack = SPVM_LIST_new(compiler, 0, 0, NULL);
+          
+          // opcode index stack for eval start
+          SPVM_LIST* push_eval_opcode_rel_index_stack = SPVM_LIST_new(compiler, 0, 0, NULL);
+          
+          // IF_EXCEPTION_CATCH opcode index stack
+          SPVM_LIST* if_die_catch_goto_opcode_rel_index_stack = SPVM_LIST_new(compiler, 0, 0, NULL);
+
+          // IF_EXCEPTION_RETURN opcode index stack
+          SPVM_LIST* if_die_return_goto_opcode_rel_index_stack = SPVM_LIST_new(compiler, 0, 0, NULL);
+
+          // RETURN goto opcode index stack
+          SPVM_LIST* return_goto_opcode_rel_index_stack = SPVM_LIST_new(compiler, 0, 0, NULL);
+          
+          // Switch stack
+          SPVM_LIST* switch_info_stack = SPVM_LIST_new(compiler, 0, 0, NULL);
+          
+          // Block stack
+          SPVM_LIST* op_block_stack = SPVM_LIST_new(compiler, 0, 0, NULL);
+          
+          // next block base stack
+          SPVM_LIST* next_block_base_stack = SPVM_LIST_new(compiler, 0, 0, NULL);
+          
+          // last block base stack
+          SPVM_LIST* last_block_base_stack = SPVM_LIST_new(compiler, 0, 0, NULL);
+
+          // break block base stack
+          SPVM_LIST* break_block_base_stack = SPVM_LIST_new(compiler, 0, 0, NULL);
+          
+          // Mortal variable stack
+          SPVM_LIST* mortal_stack = SPVM_LIST_new(compiler, 0, 0, NULL);
+          
+          // Mortal variable base stack
+          SPVM_LIST* mortal_top_stack = SPVM_LIST_new(compiler, 0, 0, NULL);
+
+          // Object temporary variable stack
+          SPVM_LIST* object_op_var_tmp_stack = SPVM_LIST_new(compiler, 0, 0, NULL);
           
           int32_t method_opcodes_base = opcode_array->length;
           
@@ -4770,13 +4770,12 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
           SPVM_LIST_free(return_goto_opcode_rel_index_stack);
           SPVM_LIST_free(switch_info_stack);
           SPVM_LIST_free(op_block_stack);
-          SPVM_LIST_free(mortal_stack);
-          SPVM_LIST_free(mortal_top_stack);
-          SPVM_LIST_free(object_op_var_tmp_stack);
-
           SPVM_LIST_free(next_block_base_stack);
           SPVM_LIST_free(last_block_base_stack);
           SPVM_LIST_free(break_block_base_stack);
+          SPVM_LIST_free(mortal_stack);
+          SPVM_LIST_free(mortal_top_stack);
+          SPVM_LIST_free(object_op_var_tmp_stack);
         }
       }
     }

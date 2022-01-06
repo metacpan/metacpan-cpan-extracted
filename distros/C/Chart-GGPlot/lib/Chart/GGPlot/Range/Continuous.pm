@@ -5,7 +5,7 @@ package Chart::GGPlot::Range::Continuous;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0016'; # VERSION
+our $VERSION = '0.002000'; # VERSION
 
 with qw(Chart::GGPlot::Range);
 
@@ -41,7 +41,7 @@ Chart::GGPlot::Range::Continuous - Continuous range
 
 =head1 VERSION
 
-version 0.0016
+version 0.002000
 
 =head1 SEE ALSO
 

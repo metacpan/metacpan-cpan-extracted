@@ -1,5 +1,9 @@
 Revision history for WebService-PayPal-PaymentsAdvanced
 
+0.000028 2022-01-01
+
+  - Update 12/21 expiration dates in mocked data to 12/31.
+
 0.000027 2021-06-28
 
   - The transaction_time method on responses will now return undef if

@@ -91,7 +91,7 @@ or UTF-8 bytes.
   use utf8;
   my $spvm_byte_array = SPVM::new_byte_array_from_string("あいう");
 
-Convert a Perl string to SPVM byte[] value. Return value is L<SPVM::BlessedObject::Array> object which wraps the SPVM array.
+Convert a decoded string to SPVM byte[] value using L<utf8::encode|utf8>. Return value is L<SPVM::BlessedObject::Array> object which wraps the SPVM array.
 
 =head2 SPVM::new_short_array
 
@@ -461,14 +461,17 @@ If the SPVM data type is not a string array, an exception occurs.
 my $exception = SPVM::get_exception();
 </pre>
 
-Gets the SPVM exception of the default SPVM runtime as a decoded string.
+Get the exception of the SPVM runtime environment as L<SPVM::BlessedObject::String> object.
 
 =head2 SPVM::set_exception
 
-Set a SPVM exception of the default SPVM runtime. The argument must be a decoded string or C<undef>. There is one exception per runtime. Perl starts a default SPVM runtime when a first SVPM method is called.
+Set a SPVM exception of the SPVM runtime environment.
+
+The argument must be a L<SPVM::BlessedObject::String> object, a decoded string or C<undef>, otherwise an exception occurs.
 
 <pre>
-SPVM::set_exception("Aiu");
+SPVM::set_exception(SPVM::new_string("abc"));
+SPVM::set_exception("abc");
 SPVM::set_exception(undef);
 </pre>
 

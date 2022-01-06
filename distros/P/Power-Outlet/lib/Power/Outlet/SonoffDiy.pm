@@ -4,7 +4,7 @@ use warnings;
 use base qw{Power::Outlet::Common::IP::HTTP::JSON};
 use JSON qw{decode_json};
 
-our $VERSION='0.27';
+our $VERSION='0.43';
 
 =head1 NAME
 
@@ -19,29 +19,48 @@ Power::Outlet::SonoffDiy - Control and query a Sonoff DIY device
 
 =head1 DESCRIPTION
 
-Power::Outlet::SonoffDiy is a package for controlling and querying Sonoff ESP8266 hardware running Sonoff firmware in DIY mode.  My hardware is running firmware version 3.3.0 which supports 1.4 version of the HTTP protocol.  But, the 2.0 version of the protocol appears to be 100% backwards compatible with the protocol.
+Power::Outlet::SonoffDiy is a package for controlling and querying Sonoff ESP8266 hardware running Sonoff firmware in DIY mode.  This package supports and has been tested on both the version 1.4 (firmware 3.3.0) and version 2.0 (firmware 3.6.0) of the API.
 
 From: L<https://github.com/itead/Sonoff_Devices_DIY_Tools>
 
 Commands can be executed via HTTP POST requests, for example:
 
-  curl -i -XPOST -d '{"deviceid":"","data":{}}'                http://10.10.7.1:8081/zeroconf/info
+  curl -i -XPOST -d '{"deviceid":"","data":{}}' http://10.10.7.1:8081/zeroconf/info
+
+1.4 Return where data is a string
+
   {
-   "seq"   : 21,
-   "error" : 0,
-   "data"  : "{\"switch\":\"off\",\"startup\":\"stay\",\"pulse\":\"off\",\"pulseWidth\":500,\"ssid\":\"my_ssid\",\"otaUnlock\":false}"
+    "seq"   : 21,
+    "error" : 0,
+    "data"  : "{\"switch\":\"off\",\"startup\":\"stay\",\"pulse\":\"off\",\"pulseWidth\":500,\"ssid\":\"my_ssid\",\"otaUnlock\":false}"
   }
 
-Note: My firmware 3.3.0 returns the data value as a string not an object.  I support both since I'm sure it must be a bug.
+2.0 Return where data is an object
 
+  {
+    "seq"   : 12,
+    "error" : 0,
+    "data":{
+      "switch"         : "on",
+      "startup"        : "stay",
+      "pulse"          : "off",
+      "pulseWidth"     : 500,
+      "ssid"           : "my_ssid",
+      "otaUnlock"      : false,
+      "fwVersion"      : "3.6.0",
+      "deviceid"       : "1001262ec1",
+      "bssid"          : "fc:ec:da:81:c:98",
+      "signalStrength" : -61
+    }
+  }
 
-  curl -i -XPOST -d '{"deviceid":"","data":{"switch":"off"}}'  http://10.10.7.1:8081/zeroconf/switch
+  curl -i -XPOST -d '{"deviceid":"","data":{"switch":"off"}}' http://10.10.7.1:8081/zeroconf/switch
   {
    "seq"   : 22,
    "error" : 0
   }
 
-  curl -i -XPOST -d '{"deviceid":"","data":{"switch":"on"}}'   http://10.10.7.1:8081/zeroconf/switch
+  curl -i -XPOST -d '{"deviceid":"","data":{"switch":"on"}}' http://10.10.7.1:8081/zeroconf/switch
   {
    "seq"   : 23,
    "error" : 0
@@ -198,7 +217,7 @@ sub _call {
   unless ($switch) { #info
     my $data  = $hash->{'data'} or die('Error: JSON malformed missing data key');
     local $@;
-    $data     = eval{decode_json($data)} unless ref($data) eq 'HASH'; #assumed bug in firmware 3.3.0
+    $data     = eval{decode_json($data)} unless ref($data) eq 'HASH'; #bug in 1.4 API fixed in 2.0
     my $error = $@;
     die(qq{Error: JSON malformed converting data JSON}) if $error;
     die(qq{Error: JSON malformed converting data JSON}) unless ref($data) eq 'HASH';

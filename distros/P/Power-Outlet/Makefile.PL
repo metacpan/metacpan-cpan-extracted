@@ -20,6 +20,21 @@ WriteMakefile(
                      'List::MoreUtils'          => 0,    #for iBootBarGroup
                      'Package::Role::ini'       => 0.07, #for Config
                     },
+    META_MERGE       => {
+          'meta-spec' =>  { version => 2 },
+          'resources' =>  {
+                            homepage   => 'https://github.com/mrdvt92/perl-Power-Outlet',
+                            bugtracker => {
+                                web  => 'https://github.com/mrdvt92/perl-Power-Outlet/issues',
+                            },
+                            repository => {
+                                type => 'git',
+                                url  => 'git@github.com:mrdvt92/perl-Power-Outlet.git',
+                                web  => 'https://github.com/mrdvt92/perl-Power-Outlet.git',
+                            },
+                          },
+                        },
+
     EXE_FILES    => [
                     qw{
                        scripts/power-outlet

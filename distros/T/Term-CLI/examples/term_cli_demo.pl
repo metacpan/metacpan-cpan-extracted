@@ -13,7 +13,7 @@ use Term::CLI::Argument::Filename;
 use Term::CLI::Argument::Number::Float;
 use Term::CLI::Argument::Enum;
 use Term::CLI::Argument::String;
-use Term::CLI::L10N;
+use Term::CLI::L10N qw( loc );
 
 my $test_1_cmd = Term::CLI::Command->new(
     name => 'test_1',

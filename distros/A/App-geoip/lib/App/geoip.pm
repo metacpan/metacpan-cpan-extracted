@@ -3,12 +3,12 @@
 use 5.14.0;
 use warnings;
 
-our $VERSION = "0.14";
+our $VERSION = "0.16";
 our $CMD = $0 =~ s{.*/}{}r;
 
 sub usage {
     my $err = shift and select STDERR;
-    say "usage: $CMD [--fetch] [--no-update] [--dist] [--whois] ip|host ...";
+    say "usage: $CMD [--fetch] [--no-update] [--dist] [--whois] [ip|host ...]";
     say "   -f   --fetch        Fetch new ZIP sources";
     say "        --no-update    Do not update the database on new data";
     say "   -s   --short        Skip location and flags";
@@ -24,6 +24,7 @@ sub usage {
     say "                       may be specified in \$GEOIP_DBI_DSN";
     say "        --country=c    Find CIDR's for country c";
     say "$CMD --man will show the full manual";
+    say "\$GEOIP_HOST will be used if no IP or host is given";
     exit $err;
     } # usage
 
@@ -123,6 +124,23 @@ if (defined $opt_J) {
 	}
     }
 $conf{json} and $opt_J = $conf{json_pretty};
+
+if (@ARGV == 0 and my $eh = $ENV{GEOIP_HOST}) {
+    $eh =~ s{[\s\r\n]+\z}{};
+    # No IPv6 support yet
+    if ($eh =~ m{^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$} and
+	$1 > 0 && $1 < 256 && $2 < 256 && $3 < 256 && $4 < 256) {
+	# Simplistic IPv4
+	push @ARGV => $eh;
+	}
+    elsif ($eh =~ m/^\w[-.\w]{0,252}\z/) { # Skip invalid clipboard content
+	# https://en.wikipedia.org/wiki/Hostname#Syntax
+	for (split m/\./ => $eh) {
+	    m/^\w[-\w]{0,62}$/ or die "$eh is not a valid hostname or IPv4\n";
+	    }
+	push @ARGV => $eh;
+	}
+    }
 
 my $dbh = do {
     my $dsn = $conf{dsn} =~ s{^b=(?=\w+:)}{}ir; # catch -DB=.. instead of --DB=
@@ -847,7 +865,7 @@ geoip - a tool to show geographical data based on hostname or IP address(es)
 
  geoip --fetch [--no-update]
 
- geoip [options] host|IP ...
+ geoip [options] [host|IP ...]
 
 =head1 DESCRIPTION
 
@@ -1077,6 +1095,8 @@ can copy or move to your liking. This file will be somewhere around 500 Mb.
 
  $ geoip --json --no-json-pretty 1.2.3.4
 
+ $ env GEOIP_HOST=1.2.3.4 geoip
+
 =head2 Full report
 
  $ geoip --dist --whois 1.2.3.4
@@ -1156,7 +1176,7 @@ mentioning features of or use of this database.
 This tool uses, but does not include, the GeoLite2 data created by MaxMind,
 available from [http://www.maxmind.com](http://www.maxmind.com).
 
- Copyright (C) 2018-2020 H.Merijn Brand.  All rights reserved.
+ Copyright (C) 2018-2022 H.Merijn Brand.  All rights reserved.
 
 This library is free software;  you can redistribute and/or modify it under
 the same terms as Perl itself.

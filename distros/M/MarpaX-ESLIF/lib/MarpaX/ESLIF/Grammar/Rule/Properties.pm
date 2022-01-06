@@ -7,7 +7,7 @@ package MarpaX::ESLIF::Grammar::Rule::Properties;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '5.0.7'; # VERSION
+our $VERSION = '6.0.10'; # VERSION
 
 
 #
@@ -33,7 +33,6 @@ sub new {
         'sequence'                 => $args{sequence},
         'proper'                   => $args{proper},
         'minimum'                  => $args{minimum},
-        'internal'                 => $args{internal},
         'propertyBitSet'           => $args{propertyBitSet},
         'hideseparator'            => $args{hideseparator}
     };
@@ -174,18 +173,6 @@ sub getMinimum {
 }
 
 
-sub isInternal {
-    my ($self) = @_;
-
-    return $self->{internal}
-}
-
-
-sub getInternal {
-    goto &isInternal
-}
-
-
 sub getPropertyBitSet {
     my ($self) = @_;
 
@@ -216,7 +203,7 @@ MarpaX::ESLIF::Grammar::Rule::Properties - ESLIF Grammar Rule Properties
 
 =head1 VERSION
 
-version 5.0.7
+version 6.0.10
 
 =head1 SYNOPSIS
 
@@ -258,8 +245,8 @@ version 5.0.7
   whitespaces ::= WHITESPACES
   comment ::= /(?:(?:(?:\/\/)(?:[^\n]*)(?:\n|\z))|(?:(?:\/\*)(?:(?:[^\*]+|\*(?!\/))*)(?:\*\/)))/u
 
-  :lexeme ::= NUMBER pause => before event => ^NUMBER
-  :lexeme ::= NUMBER pause => after  event => NUMBER$
+  :symbol ::= NUMBER pause => before event => ^NUMBER
+  :symbol ::= NUMBER pause => after  event => NUMBER$
 
   :desc      ~ 'Calculator Tokens'
   NUMBER     ~ /[\d]+/   name => 'NUMBER Lexeme'
@@ -352,16 +339,6 @@ Alias to isProper()
 =head2 $self->getMinimum
 
 Returns Rule's minimum number of RHS (meaningful only when rule is a sequence)
-
-=head2 $self->isInternal
-
-Returns Rule is internal ? (possible only when there is the loosen operator "||")
-
-=head2 $self->getInternal
-
-Returns Rule is internal ? (possible only when there is the loosen operator "||")
-
-Alias to isInternal()
 
 =head2 $self->getPropertyBitSet
 

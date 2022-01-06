@@ -14,7 +14,6 @@ requires "List::AllUtils" => "0";
 requires "Mojolicious::Lite" => "0";
 requires "Moo" => "1.004005";
 requires "Moo::Role" => "0";
-requires "MooX::HandlesVia" => "0";
 requires "MooX::StrictConstructor" => "0";
 requires "Net::Works::Address" => "0";
 requires "Net::Works::Network" => "0";
@@ -32,7 +31,7 @@ requires "URI::QueryParam" => "0";
 requires "Web::Scraper" => "0";
 requires "feature" => "0";
 requires "namespace::autoclean" => "0";
-requires "perl" => "5.014";
+requires "perl" => "5.016";
 
 on 'test' => sub {
   requires "ExtUtils::MakeMaker" => "0";

@@ -38,7 +38,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-Bencher-Scenario
   homepage: https://metacpan.org/release/Pod-Weaver-Plugin-Bencher-Scenario
   repository: git://github.com/perlancar/perl-Pod-Weaver-Plugin-Bencher-Scenario.git
-version: '0.250'
+version: '0.252'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

@@ -16,6 +16,7 @@ use lib "./lib"; # UPDATE IF NEEDED
 use Data::Dumper;
 use Net::Upwork::API;
 use Net::Upwork::API::Routers::Auth;
+use Net::Upwork::API::Routers::Graphql;
 
 $config = Net::Upwork::API::Config->new(
     'client_id'     => 'xxxxxxxx',
@@ -55,3 +56,24 @@ $auth = Net::Upwork::API::Routers::Auth->new($api);
 $data = $auth->get_user_info();
 
 print Dumper $data;
+
+my $query = <<'EOF';
+query {
+      user {
+        id
+        nid
+        rid
+      }
+      organization {
+        id
+      }
+    }
+EOF
+$graphql = Net::Upwork::API::Routers::Graphql->new($api);
+#$graphql->set_org_uid_header('1234567890'); # Organization UID (optional)
+%params = (
+    'query' => $query
+);
+$data2 = $graphql->execute(%params);
+
+print Dumper $data2;

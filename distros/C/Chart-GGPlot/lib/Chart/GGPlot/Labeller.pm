@@ -5,7 +5,7 @@ package Chart::GGPlot::Labeller;
 use Chart::GGPlot::Class;
 use namespace::autoclean;
 
-our $VERSION = '0.0016'; # VERSION
+our $VERSION = '0.002000'; # VERSION
 
 use Data::Munge qw(elem);
 use Types::Standard qw(CodeRef HashRef InstanceOf Str);
@@ -194,7 +194,7 @@ Chart::GGPlot::Labeller - Labeller functions for facets
 
 =head1 VERSION
 
-version 0.0016
+version 0.002000
 
 =head1 DESCRIPTION
 

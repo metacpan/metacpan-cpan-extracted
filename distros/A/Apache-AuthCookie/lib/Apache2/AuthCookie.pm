@@ -1,5 +1,5 @@
 package Apache2::AuthCookie;
-$Apache2::AuthCookie::VERSION = '3.30';
+$Apache2::AuthCookie::VERSION = '3.31';
 # ABSTRACT: Perl Authentication and Authorization via cookies
 
 use strict;
@@ -87,7 +87,7 @@ sub get_satisfy {
 
     my $auth_name = $r->auth_name;
 
-    return lc $r->dir_config("${auth_name}Satisfy") || 'all';
+    return lc( $r->dir_config("${auth_name}Satisfy") || 'all' );
 }
 
 
@@ -118,7 +118,7 @@ Apache2::AuthCookie - Perl Authentication and Authorization via cookies
 
 =head1 VERSION
 
-version 3.30
+version 3.31
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,9 @@
 Revision history for API::GitForge
 
+0.007     2022-01-02 15:59:09-07:00 America/Phoenix
+    - README: include an entry for API::GitForge::Role::GitForge near the top,
+      as that API is probably the one someone wants to look at first.
+
 0.006     2021-02-09 15:10:36-07:00 America/Phoenix
     - API::GitForge::Role::GitForge::clean_fork(): fix checking the exit
       status of the push of the gitforge branch.

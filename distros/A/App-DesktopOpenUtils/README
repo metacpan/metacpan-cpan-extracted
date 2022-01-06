@@ -1,0 +1,76 @@
+NAME
+    App::DesktopOpenUtils - Utilities related to Desktop::Open
+
+VERSION
+    This document describes version 0.002 of App::DesktopOpenUtils (from
+    Perl distribution App-DesktopOpenUtils), released on 2021-08-01.
+
+SYNOPSIS
+DESCRIPTION
+    This distribution includes several utilities:
+
+    #INSERT_EXECS_LIST
+
+FUNCTIONS
+  open_desktop
+    Usage:
+
+     open_desktop(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   paths_or_urls* => *array[str]*
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-DesktopOpenUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-DesktopOpenUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-DesktopOpenUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Desktop::Open
+
+    App::BrowserOpenUtils
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

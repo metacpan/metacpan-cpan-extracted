@@ -6,14 +6,14 @@ use warnings;
 use base qw( Device::Chip::Adapter );
 use Carp qw/croak/;
 
-our $VERSION = '0.00004';
+our $VERSION = '0.00005';
 
 use Carp;
 
 sub new {
    my $class = shift;
 
-   bless { }, $class;
+   bless {@_ }, $class;
 }
 
 # Most modes have no GPIO on this system

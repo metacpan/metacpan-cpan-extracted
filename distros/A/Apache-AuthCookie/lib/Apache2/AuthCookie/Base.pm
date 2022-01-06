@@ -1,5 +1,5 @@
 package Apache2::AuthCookie::Base;
-$Apache2::AuthCookie::Base::VERSION = '3.30';
+$Apache2::AuthCookie::Base::VERSION = '3.31';
 # ABSTRACT: Common Methods Shared by Apache2 and Apache2_4 AuthCookie Subclasses.
 
 use strict;
@@ -568,7 +568,7 @@ Apache2::AuthCookie::Base - Common Methods Shared by Apache2 and Apache2_4 AuthC
 
 =head1 VERSION
 
-version 3.30
+version 3.31
 
 =head1 DESCRIPTION
 

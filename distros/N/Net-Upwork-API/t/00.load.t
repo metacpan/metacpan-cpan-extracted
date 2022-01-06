@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 use strict;
-use Test::More tests => 29;
+use Test::More tests => 30;
 use lib qw(lib);
 
 use_ok('Net::Upwork::API');
@@ -32,3 +32,4 @@ use_ok('Net::Upwork::API::Routers::Hr::Clients::Applications');
 use_ok('Net::Upwork::API::Routers::Hr::Clients::Offers');
 use_ok('Net::Upwork::API::Routers::Hr::Freelancers::Applications');
 use_ok('Net::Upwork::API::Routers::Hr::Freelancers::Offers');
+use_ok('Net::Upwork::API::Routers::Graphql');

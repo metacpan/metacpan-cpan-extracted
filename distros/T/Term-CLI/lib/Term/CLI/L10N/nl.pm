@@ -15,18 +15,16 @@
 #
 #=============================================================================
 
-package Term::CLI::L10N::nl;
+package Term::CLI::L10N::nl 0.054002;
 
 use 5.014;
-use strict;
 use warnings;
-
-our $VERSION = 0.053006;
 
 use parent 0.225 qw( Term::CLI::L10N );
 
 use Locale::Maketext::Lexicon::Gettext 1.00;
 
+## no critic (ProhibitPackageVars)
 our %Lexicon = %{ Locale::Maketext::Lexicon::Gettext->parse(<DATA>) };
 close DATA;
 
@@ -38,37 +36,36 @@ use subs 1.00 qw( singularise );
 sub singularize {
     my $self = shift;
 
-    local($_) = shift;
+    local ($_) = shift;
 
     # -zen, -ven -> -s, -f
-    s/zen$/s/ and return $_;
-    s/ven$/f/ and return $_;
+    s/zen$/s/x and return $_;
+    s/ven$/f/x and return $_;
 
     # -eu?en, -ei?en
-    s/(eu|ei)([^aeiou])en$/$1$2/ and return $_;
-    
+    s/(eu|ei)([^aeiou])en$/$1$2/x and return $_;
+
     # gelegenheden -> gelegenheid
-    s/heden$/heid/ and return $_;
+    s/heden$/heid/x and return $_;
 
     # musea -> museum
     # aquaria -> aquarium
-    s/([ei])a$/$1um/  and return $_;
+    s/([ei])a$/$1um/x and return $_;
 
     # rijen -> rij
-    s/ijen$/ij/ and return $_;
+    s/ijen$/ij/x and return $_;
 
     # leraren -> leraar
-    s/([aeiou])([^aeiou])en$/$1$1$2/ and return $_;
-    
+    s/([aeiou])([^aeiou])en$/$1$1$2/x and return $_;
+
     # ballen -> bal
-    s/([^aeiou])\1en$/$1/ and return $_;
+    s/([^aeiou])\1en$/$1/x and return $_;
 
     # schermen -> scherm
     # auto's   -> auto
     # lepels   -> lepel
-    return s/(?:'?en|'s|s)$//r;
+    return s/(?:'?en|'s|s)$//rx;
 }
-
 
 # $str = $lh->numerate($num, $plural [, $singular ]);
 #
@@ -77,21 +74,22 @@ sub singularize {
 # to go from plural to singular in Dutch.
 #
 sub numerate {
-    my ($handle, $num, @forms) = @_;
+    my ( $handle, $num, @forms ) = @_;
 
-    my $is_plural = ($num != 1);
+    my $is_plural = ( $num != 1 );
 
-    return '' unless @forms;
-    if (@forms == 1) { # only plural specified
-        my $word = $forms[0];
-        if ($is_plural) {
-            return $word;
-        }
-        return $handle->singularize($word);
-    }
-    else { # Both plural and singular are supplied
+    return '' if @forms == 0;
+
+    if (@forms > 1) {       # Both plural and singular are supplied
         return $is_plural ? $forms[0] : $forms[1];
     }
+
+    # Only plural specified
+    my $word = $forms[0];
+    if ($is_plural) {
+        return $word;
+    }
+    return $handle->singularize($word);
 }
 
 1;
@@ -301,14 +299,14 @@ Term::CLI::L10N::nl - Dutch localizations for Term::CLI
 
 =head1 VERSION
 
-version 0.053006
+version 0.054002
 
 =head1 SYNOPSIS
 
- use Term::CLI::L10N;
+ use Term::CLI::L10N qw( loc );
 
  Term::CLI::L10N->set_language('nl');
- 
+
  say loc("ERROR"); # -> FOUT
 
  say Term::CLI::L10N->quant(1, 'dingen'); # -> 1 ding

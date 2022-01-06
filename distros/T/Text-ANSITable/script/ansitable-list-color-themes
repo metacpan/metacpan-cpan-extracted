@@ -10,7 +10,7 @@ use Text::ANSITable;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-08-27'; # DATE
 our $DIST = 'Text-ANSITable'; # DIST
-our $VERSION = '0.606'; # VERSION
+our $VERSION = '0.607'; # VERSION
 
 binmode(STDOUT, ":encoding(utf8)");
 
@@ -69,7 +69,7 @@ ansitable-list-color-themes - List available color themes for Text::ANSITable
 
 =head1 VERSION
 
-This document describes version 0.606 of ansitable-list-color-themes (from Perl distribution Text-ANSITable), released on 2021-08-27.
+This document describes version 0.607 of ansitable-list-color-themes (from Perl distribution Text-ANSITable), released on 2021-08-27.
 
 =head1 SYNOPSIS
 
@@ -78,50 +78,51 @@ This document describes version 0.606 of ansitable-list-color-themes (from Perl 
 Sample output:
 
  Tip: you can run me with color theme name as argument to try it out.
- .------------------------------------------------------------------------------------------------------------------------------------------------------------.
- | Name                                                               Summary                                                                                 |
- |                                                                                                                                                            |
- | Data::Dump::Color::Default16                                                                                                                               |
- | Data::Dump::Color::Default256                                                                                                                              |
- | Data::Dump::Color::Light                                                                                                                                   |
- | Distinct::WhiteBG                                                  Pick some distinct colors (that are suitable for white background) for you              |
- | GraphicsColorNames                                                 Display Graphics::ColorNames::* color scheme as color theme                             |
- | Harmony::Analogous                                                 Create theme with colors equidistant in hue                                             |
- | Harmony::Monochromatic                                             Create a monochromatic color theme                                                      |
- | Lens::Darken                                                       Darken other theme                                                                      |
- | Lens::Lighten                                                      Lighten other theme                                                                     |
- | Lens::Tint                                                         Tint other theme                                                                        |
- | NoColor (*)                                                        An empty color theme that provides no items                                             |
- | Perinci::CmdLine::Classic::Default                                 Default color theme for Perinci::CmdLine::Classic (for terminals with black background) |
- | Perinci::CmdLine::Classic::DefaultWhiteBG                          Default color theme for Perinci::CmdLine::Classic (for terminals with white background) |
- | Search::Light                                                      Light theme for text viewer/search application                                          |
- | Test::Dynamic                                                      A dynamic color theme                                                                   |
- | Test::Random                                                       A color theme which gives random colors                                                 |
- | Test::RandomANSI16                                                 A color theme which gives random 16-color ANSI codes                                    |
- | Test::RandomANSI256                                                A color theme which gives random 256-color ANSI codes                                   |
- | Test::Static                                                       A static color theme                                                                    |
- | Text::ANSITable::OldCompat::Default::default_gradation             Gradation border (for terminal with black background)                                   |
- | Text::ANSITable::OldCompat::Default::default_gradation_whitebg     Gradation (for terminal with white background)                                          |
- | Text::ANSITable::OldCompat::Default::default_nogradation           No gradation, for black background                                                      |
- | Text::ANSITable::OldCompat::Default::default_nogradation_whitebg   Default (no gradation, for white background)                                            |
- | Text::ANSITable::OldCompat::Default::no_color                      An empty color theme that provides no items                                             |
- | Text::ANSITable::Standard::Gradation                               Gradation border (for terminal with black background)                                   |
- | Text::ANSITable::Standard::GradationWhiteBG                        Gradation (for terminal with white background)                                          |
- | Text::ANSITable::Standard::NoGradation                             No gradation, for black background                                                      |
- | Text::ANSITable::Standard::NoGradationWhiteBG                      Default (no gradation, for white background)                                            |
- `------------------------------------------------------------------------------------------------------------------------------------------------------------'
+ .-----------------------------------------------------------------------------------------------------------------------------------------------------------.
+ | Name                                                              Summary                                                                                 |
+ |                                                                                                                                                           |
+ | Data::Dump::Color::Default16                                                                                                                              |
+ | Data::Dump::Color::Default256                                                                                                                             |
+ | Data::Dump::Color::Light                                                                                                                                  |
+ | Distinct::WhiteBG                                                 Pick some distinct colors (that are suitable for white background) for you              |
+ | GraphicsColorNames                                                Display Graphics::ColorNames::* color scheme as color theme                             |
+ | Harmony::Analogous                                                Create theme with colors equidistant in hue                                             |
+ | Harmony::Monochromatic                                            Create a monochromatic color theme                                                      |
+ | Lens::Darken                                                      Darken other theme                                                                      |
+ | Lens::Lighten                                                     Lighten other theme                                                                     |
+ | Lens::Tint                                                        Tint other theme                                                                        |
+ | NoColor (*)                                                       An empty color theme that provides no items                                             |
+ | Perinci::CmdLine::Classic::Default                                Default color theme for Perinci::CmdLine::Classic (for terminals with black background) |
+ | Perinci::CmdLine::Classic::DefaultWhiteBG                         Default color theme for Perinci::CmdLine::Classic (for terminals with white background) |
+ | Search::Light                                                     Light theme for text viewer/search application                                          |
+ | Test::Dynamic                                                     A dynamic color theme                                                                   |
+ | Test::Random                                                      A color theme which gives random colors                                                 |
+ | Test::RandomANSI16                                                A color theme which gives random 16-color ANSI codes                                    |
+ | Test::RandomANSI256                                               A color theme which gives random 256-color ANSI codes                                   |
+ | Test::Static                                                      A static color theme                                                                    |
+ | Text::ANSITable::OldCompat::Default::default_gradation            Gradation border (for terminal with black background)                                   |
+ | Text::ANSITable::OldCompat::Default::default_gradation_whitebg    Gradation (for terminal with white background)                                          |
+ | Text::ANSITable::OldCompat::Default::default_nogradation          No gradation, for black background                                                      |
+ | Text::ANSITable::OldCompat::Default::default_nogradation_whiteb   Default (no gradation, for white background)                                            |
+ | g                                                                                                                                                         |
+ | Text::ANSITable::OldCompat::Default::no_color                     An empty color theme that provides no items                                             |
+ | Text::ANSITable::Standard::Gradation                              Gradation border (for terminal with black background)                                   |
+ | Text::ANSITable::Standard::GradationWhiteBG                       Gradation (for terminal with white background)                                          |
+ | Text::ANSITable::Standard::NoGradation                            No gradation, for black background                                                      |
+ | Text::ANSITable::Standard::NoGradationWhiteBG                     Default (no gradation, for white background)                                            |
+ `-----------------------------------------------------------------------------------------------------------------------------------------------------------'
  Demo table
  .-------------------------------------------------------.
  |  num   percent%          date           bool?   text  |
  |                                                       |
- |    1     40,00%   2021-08-27 09:50:49     Y     hello |
- | -3.3    100,00%   2021-08-27 09:50:49     N     world |
+ |    1     40,00%   2021-08-27 15:49:59     Y     hello |
+ | -3.3    100,00%   2021-08-27 15:49:59     N     world |
  +-------------------------------------------------------+
- |    1     10,00%   2013-05-02 09:26:24     Y     x1    |
+ |    1     10,00%   2013-05-02 09:26:24     N     x1    |
  |    2     20,00%   2013-05-02 12:13:04     Y     x2    |
  |    3     30,00%   2013-05-02 14:59:44     Y     x3    |
- |    4     40,00%   2013-05-02 17:46:24     N     x4    |
- |    5     50,00%   2013-05-02 20:33:04     Y     x5    |
+ |    4     40,00%   2013-05-02 17:46:24     Y     x4    |
+ |    5     50,00%   2013-05-02 20:33:04     N     x5    |
  `-------------------------------------------------------'
 
 =head1 HOMEPAGE

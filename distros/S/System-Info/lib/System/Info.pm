@@ -3,7 +3,7 @@ package System::Info;
 use strict;
 use warnings;
 
-our $VERSION = "0.061";
+our $VERSION = "0.062";
 
 use base "Exporter";
 our @EXPORT_OK = qw( &sysinfo &sysinfo_hash &si_uname );
@@ -259,7 +259,7 @@ alternative to C<$^O>.
 
 =head1 COPYRIGHT AND LICENSE
 
-(c) 2016-2021, Abe Timmerman & H.Merijn Brand, All rights reserved.
+(c) 2016-2022, Abe Timmerman & H.Merijn Brand, All rights reserved.
 
 With contributions from Jarkko Hietaniemi, Campo Weijerman, Alan Burlison,
 Allen Smith, Alain Barbet, Dominic Dunlop, Rich Rauenzahn, David Cantrell.

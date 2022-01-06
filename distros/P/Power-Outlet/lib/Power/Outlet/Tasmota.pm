@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use base qw{Power::Outlet::Common::IP::HTTP::JSON};
 
-our $VERSION='0.41';
+our $VERSION='0.43';
 
 =head1 NAME
 

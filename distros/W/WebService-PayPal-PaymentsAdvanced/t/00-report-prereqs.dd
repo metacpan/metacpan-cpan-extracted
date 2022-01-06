@@ -47,7 +47,6 @@ do { my $x = {
                                       'Mojolicious::Lite' => '0',
                                       'Moo' => '1.004005',
                                       'Moo::Role' => '0',
-                                      'MooX::HandlesVia' => '0',
                                       'MooX::StrictConstructor' => '0',
                                       'Net::Works::Address' => '0',
                                       'Net::Works::Network' => '0',
@@ -65,7 +64,7 @@ do { my $x = {
                                       'Web::Scraper' => '0',
                                       'feature' => '0',
                                       'namespace::autoclean' => '0',
-                                      'perl' => '5.014'
+                                      'perl' => '5.016'
                                     }
                     },
        'test' => {

@@ -42,7 +42,6 @@ on 'test' => sub {
   requires "Test::MockObject::Extends" => "0";
   requires "Test::More" => "0";
   requires "lib" => "0";
-  requires "open" => "0";
 };
 
 on 'configure' => sub {

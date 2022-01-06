@@ -11,7 +11,7 @@ use POSIX qw( strftime );
 use Moo;
 with "Archive::BagIt::Role::Portability";
 
-our $VERSION = '0.086'; # VERSION
+our $VERSION = '0.089'; # VERSION
 
 # ABSTRACT: The main module to handle bags.
 
@@ -30,7 +30,10 @@ around 'BUILDARGS' , sub {
 
 sub BUILD {
     my ($self, $args) = @_;
-    return $self->load_plugins(("Archive::BagIt::Plugin::Manifest::MD5", "Archive::BagIt::Plugin::Manifest::SHA512"));
+    if (!defined $self->use_plugins()) {
+        return $self->load_plugins(("Archive::BagIt::Plugin::Manifest::MD5", "Archive::BagIt::Plugin::Manifest::SHA512"));
+    }
+    return $self->load_plugins($self->use_plugins());
 }
 
 ###############################################
@@ -57,7 +60,7 @@ has 'use_async' => (
 has 'force_utf8' => (
     is        => 'rw',
     lazy      => 1,
-    predicate => 1,
+    predicate => 'has_force_utf8',
 );
 
 ###############################################
@@ -65,6 +68,12 @@ has 'force_utf8' => (
 
 has 'bag_path' => (
     is => 'rw',
+);
+
+# if the user wants specific plugins!
+has 'use_plugins' => (
+    is       => 'rw',
+    lazy     => 1,
 );
 
 ###############################################
@@ -170,7 +179,7 @@ has 'bag_info' => (
     is        => 'rw',
     lazy      => 1,
     builder   => '_build_bag_info',
-    predicate => 1
+    predicate => 'has_bag_info'
 );
 
 ###############################################
@@ -408,10 +417,15 @@ sub add_or_replace_baginfo_by_key {
 
 
 has 'forced_fixity_algorithm' => (
-    is   => 'ro',
-    lazy => 1,
-    builder  => '_build_forced_fixity_algorithm',
+    is        => 'ro',
+    lazy      => 1,
+    builder   => '_build_forced_fixity_algorithm',
 );
+
+sub has_forced_fixity_algorithm {
+    my $self = shift;
+    return (defined $self->forced_fixity_algorithm() );
+} # false if use_plugins used
 
 ###############################################
 
@@ -511,8 +525,8 @@ sub _build_rel_metadata_path {
 
 sub _build_checksum_algos {
     my($self) = @_;
-    my $checksums = [ 'md5', 'sha1', 'sha256', 'sha512' ];
-    return $checksums;
+    my @checksums = keys %{ $self->manifests() };
+    return \@checksums;
 }
 
 sub _build_manifest_files {
@@ -745,11 +759,15 @@ sub _build_non_payload_files {
 
 sub _build_forced_fixity_algorithm {
     my ($self) = @_;
-    if ($self->bag_version() >= 1.0) {
-        return Archive::BagIt::Plugin::Algorithm::SHA512->new(bagit => $self);
-    }
-    else {
-        return Archive::BagIt::Plugin::Algorithm::MD5->new(bagit => $self);
+    if ($self->use_plugins()) {
+        return;
+    } else {
+        if ($self->bag_version() >= 1.0) {
+            return Archive::BagIt::Plugin::Algorithm::SHA512->new(bagit => $self);
+        }
+        else {
+            return Archive::BagIt::Plugin::Algorithm::MD5->new(bagit => $self);
+        }
     }
 }
 
@@ -800,23 +818,26 @@ sub verify_bag {
     my $version = $self->bag_version(); # to call trigger
     my $encoding = $self->bag_encoding(); # to call trigger
     my $baginfo = $self->verify_baginfo(); #to call trigger
-    my $forced_fixity_alg = $self->forced_fixity_algorithm()->name();
+
     my $fetch_file = File::Spec->catfile($self->metadata_path, "fetch.txt");
-    my $manifest_file = File::Spec->catfile($self->metadata_path, "manifest-$forced_fixity_alg.txt");
     my $payload_dir   = $self->payload_path;
     my $return_all_errors = $opts->{return_all_errors};
 
     if (-f $fetch_file) {
         croak("Fetching via file '$fetch_file' is not supported by current Archive::BagIt implementation")
     }
-    croak("Manifest '$manifest_file' is not a regular file or does not exist for given bagit version '$version'") unless -f ($manifest_file);
+    # check forced fixity
+    if ($self->has_forced_fixity_algorithm()) {
+        my $forced_fixity_alg = $self->forced_fixity_algorithm()->name();
+        my $manifest_file = File::Spec->catfile($self->metadata_path, "manifest-$forced_fixity_alg.txt");
+        croak("Manifest '$manifest_file' is not a regular file or does not exist for given bagit version '$version'") unless -f ($manifest_file);
+    }
     croak("Payload-directory '$payload_dir' is not a directory or does not exist") unless -d ($payload_dir);
 
     unless ($version > .95) {
         croak ("Bag Version $version is unsupported");
     }
 
-    # check forced fixity
 
     my @errors;
 
@@ -971,7 +992,7 @@ Archive::BagIt - The main module to handle bags.
 
 =head1 VERSION
 
-version 0.086
+version 0.089
 
 =head1 NAME
 
@@ -1189,6 +1210,10 @@ The arguments are:
 =item C<use_parallel> - if set it uses Parallel::parallel_map to calculate digests of payload files in parallel,
       only useful if underlying filesystem supports parallel read and if multiple CPU cores available.
 
+=item C<use_plugins> - expected manifest plugin strings, if set it uses the requested plugins,
+      example C<Archive::BagIt::Plugin::Manifest::SHA256>.
+      HINT: this option *disables* the forced fixity check in C<verify_bag()>!
+
 =back
 
 The bag object will use $bag_dir, BUT an existing $bag_dir is not read. If you use C<store()> an existing bag will be overwritten!
@@ -1374,13 +1399,13 @@ existing values in internal bag-info representation will be overwritten!
 
 store a bagit-obj if bagit directory-structure was already constructed.
 
-=head2 init_metadata()
+=head2 init_metadata( $bag_path, $options)
 
 A constructor that will just create the metadata directory
 
 This won't make a bag, but it will create the conditions to do that eventually
 
-=head2 make_bag( $bag_path )
+=head2 make_bag( $bag_path, $options )
 
 A constructor that will make and return a bag from a directory,
 
@@ -1404,7 +1429,7 @@ Andreas Romeyke <cpan@andreas.romeyke.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Rob Schmidt <rjeschmi@gmail.com>, William Wueppelmann and Andreas Romeyke.
+This software is copyright (c) 2022 by Rob Schmidt <rjeschmi@gmail.com>, William Wueppelmann and Andreas Romeyke.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

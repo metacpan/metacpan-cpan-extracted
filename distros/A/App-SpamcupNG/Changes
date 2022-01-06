@@ -1,10 +1,78 @@
 ==================================================
-Changes from 2020-12-12 00:00:00 +0000 to present.
+Changes from 2021-01-01 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.006 at 2021-12-12 21:39:55 +0000
+version 0.008 at 2022-01-01 16:15:58 +0000
 ------------------------------------------
+
+  Change: ba2d1f6e7fe2fba2d0b186b36f8121a610f7b5f5
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-12-30 18:34:21 +0000
+
+    Merge pull request #2 from glasswalk3r/bugfix/fatal_errors
+
+    Bugfix/fatal errors 
+
+  Change: 9b9bc8be1ec909ba388770bc5d006b167d22cdea
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-12-30 18:30:53 +0000
+
+    feat: logging next SPAM ID 
+
+  Change: ca50665002330af7351c2e5f8bd81633ac8f0fa6
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-12-30 17:59:20 +0000
+
+    fix: deprecated regex 
+
+  Change: f0c7c8971be36acf38b1a05c7cd5f71e3cc37e83
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-12-30 17:52:52 +0000
+
+    doc: added missing Pod 
+
+  Change: 1cce85004c9568b9cd473d63ea0ca5e8e03b55ac
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-12-30 14:40:46 +0000
+
+    fix: distzilla issues 
+
+  Change: 05caae4ef41f19b3ab7d10df84fccd63b126138e
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-12-30 14:20:43 +0000
+
+    fix: linter issues 
+
+  Change: 8afbb04edcc63cf02d42992d68d6a67f2e448819
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-12-13 02:35:35 +0000
+
+    chore: bumped version 
+
+  Change: d9704cd9bea2e980d06256deb4f47e6b3f4f6583
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-12-13 02:34:59 +0000
+
+    refactor: using new classes 
+
+  Change: 0d6151259f0722e2f3347b234e55f85a108eeb79
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-12-13 02:34:01 +0000
+
+    feat: warnings and errors parsing 
+
+  Change: ae3e06b9863715f38b650afe5effd75505d07b1c
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-12-12 18:50:23 +0000
+
+    fix: typo 
+
+  Change: ba53546156cd07e2b529a7cd46825d4985e22ee7
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2021-12-12 18:44:56 +0000
+
+    doc: references not valid anymore 
 
   Change: d4434c99b182b481bf293b3c581abf54a9af0111
   Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>

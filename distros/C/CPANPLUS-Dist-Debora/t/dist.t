@@ -8,7 +8,6 @@ use utf8;
 
 use CPANPLUS::Dist::Debora;
 
-use open ':std', ':encoding(utf8)';
 use Test::More tests => 1;
 
 my @methods = qw(format_available init prepare create install);

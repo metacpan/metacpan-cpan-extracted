@@ -29,6 +29,7 @@ lib/Test2/Harness/UI/Controller/Events.pm
 lib/Test2/Harness/UI/Controller/Failed.pm
 lib/Test2/Harness/UI/Controller/Job.pm
 lib/Test2/Harness/UI/Controller/JobField.pm
+lib/Test2/Harness/UI/Controller/Lookup.pm
 lib/Test2/Harness/UI/Controller/Project.pm
 lib/Test2/Harness/UI/Controller/Query.pm
 lib/Test2/Harness/UI/Controller/Run.pm
@@ -191,6 +192,7 @@ share/js/jquery-ui.js
 share/js/jquery-ui.min.js
 share/js/jquery.js
 share/js/json-formatter.umd.js
+share/js/lookup.js
 share/js/main.js
 share/js/project.js
 share/js/runtable.js
@@ -202,6 +204,7 @@ share/schema/MySQL.sql
 share/schema/MySQL56.sql
 share/schema/PostgreSQL.sql
 share/templates/login.tx
+share/templates/lookup.tx
 share/templates/main.tx
 share/templates/project.tx
 share/templates/upload.tx

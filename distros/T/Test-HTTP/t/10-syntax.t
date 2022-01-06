@@ -4,7 +4,7 @@ use strict;
 use Test::HTTP '-syntax', tests => 2;
 
 test_http "Socialtext" {
-    >> GET http://www.socialtext.com/
+    >> GET http://neverssl.com/
 
     << 200
 }
@@ -14,7 +14,7 @@ test_http "Socialtext" {
 test_http "method in variable" {
     my $method = 'GET';
 
-    >> $method http://www.socialtext.com/
+    >> $method http://neverssl.com/
 
     << 200
 }

@@ -20,9 +20,9 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::CekBpom",
   "PREREQ_PM" => {
-    "Data::Sah::Compiler::perl::TH::array" => "0.910",
-    "Data::Sah::Compiler::perl::TH::bool" => "0.910",
-    "Data::Sah::Compiler::perl::TH::str" => "0.910",
+    "Data::Sah::Compiler::perl::TH::array" => "0.911",
+    "Data::Sah::Compiler::perl::TH::bool" => "0.911",
+    "Data::Sah::Compiler::perl::TH::str" => "0.911",
     "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
     "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
     "Date::Format::ISO8601" => 0,
@@ -46,7 +46,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.014",
+  "VERSION" => "0.016",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,9 +54,9 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Data::Sah::Compiler::perl::TH::array" => "0.910",
-  "Data::Sah::Compiler::perl::TH::bool" => "0.910",
-  "Data::Sah::Compiler::perl::TH::str" => "0.910",
+  "Data::Sah::Compiler::perl::TH::array" => "0.911",
+  "Data::Sah::Compiler::perl::TH::bool" => "0.911",
+  "Data::Sah::Compiler::perl::TH::str" => "0.911",
   "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
   "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
   "Date::Format::ISO8601" => 0,

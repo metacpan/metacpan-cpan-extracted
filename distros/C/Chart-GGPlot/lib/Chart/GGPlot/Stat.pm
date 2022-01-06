@@ -5,7 +5,7 @@ package Chart::GGPlot::Stat;
 use Chart::GGPlot::Role qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0016'; # VERSION
+our $VERSION = '0.002000'; # VERSION
 
 use List::AllUtils qw(reduce pairmap);
 use Types::Standard qw(ArrayRef CodeRef Str InstanceOf Bool);
@@ -58,8 +58,8 @@ method compute_layer ( $data, $params, $layout ) {
                 try {
                     return $self->compute_panel( $d, $scales, $params );
                 }
-                catch {
-                    die sprintf( "Computation failed in '%s': $@", ref($self) );
+                catch ($e) {
+                    die sprintf( "Computation failed in '%s': $e", ref($self) );
                 }
             }
         )->flatten
@@ -117,7 +117,7 @@ Chart::GGPlot::Stat - The stat role
 
 =head1 VERSION
 
-version 0.0016
+version 0.002000
 
 =head1 DESCRIPTION
 

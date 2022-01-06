@@ -143,7 +143,7 @@ This prints a table like this:
 
 Some unicode characters, such as `婧` (`U+5A67`) are wider than others. These
 will render just fine if you `use utf8;` as necessary, and
-[Unicode::GCString](https://metacpan.org/pod/Unicode::GCString) is installed, however if the module is not installed there
+[Unicode::GCString](https://metacpan.org/pod/Unicode%3A%3AGCString) is installed, however if the module is not installed there
 will be anomalies in the table:
 
     +-----+-----+---+

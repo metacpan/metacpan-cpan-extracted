@@ -1,5 +1,17 @@
 Revision history for JSON-Schema-Tiny
 
+0.014     2022-01-06 04:05:12Z
+         - updated error message for the "type" keyword to include the actual
+           type, as well as the expected type(s)
+
+0.013     2021-12-31 21:20:46Z
+          - enable bignum mode when deserializing test data
+
+0.012     2021-12-31 02:24:05Z
+          - minimum perl version raised to 5.020
+          - very large/small numbers are now properly accomodated in all
+            cases, including from JSON-serialized data
+
 0.011     2021-10-22 22:08:02Z
           - update acceptance tests for Test::JSON::Schema::Acceptance 1.013
 

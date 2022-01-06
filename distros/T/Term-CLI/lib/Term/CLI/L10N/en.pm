@@ -15,19 +15,15 @@
 #
 #=============================================================================
 
-package Term::CLI::L10N::en  0.053006 {
+package Term::CLI::L10N::en 0.054002;
 
 use 5.014;
-use strict;
 use warnings;
 
 use parent 0.225 qw( Term::CLI::L10N );
 
-our %Lexicon = (
-    _AUTO => 1,
-);
-
-}
+## no critic (ProhibitPackageVars)
+our %Lexicon = ( _AUTO => 1, );
 
 1;
 
@@ -41,11 +37,11 @@ Term::CLI::L10N::en - English localizations for Term::CLI
 
 =head1 VERSION
 
-version 0.053006
+version 0.054002
 
 =head1 SYNOPSIS
 
- use Term::CLI::L10N;
+ use Term::CLI::L10N qw( loc );
 
  Term::CLI::L10N->set_language('en');
 
@@ -59,7 +55,7 @@ Provide English language strings for L<Term::CLI>(3p).
 
 =head1 VARIABLES
 
-=over 
+=over
 
 =item <%LEXICON>
 

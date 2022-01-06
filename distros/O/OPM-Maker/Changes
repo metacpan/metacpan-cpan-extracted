@@ -1,6 +1,10 @@
 Changes file for OPM::Maker
 ===========================
 
+1.12 2021-12-31 08:09:00
+
+  + check if more than one sopm file is found and adjust tests (thanks to CPANTesters)
+
 1.11 2021-12-29 15:03:00
 
   + try to find a .sopm file if no file path was given (build, dependencies, sopmtest, ...)

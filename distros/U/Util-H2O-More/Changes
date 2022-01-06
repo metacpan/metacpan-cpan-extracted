@@ -8,3 +8,9 @@
 0.0.3  Mon Dec 13 12:05:09 2021
     - `h2o` can now be properly exported
       via Util::H2O::More qw/h2o/;
+
+0.0.4   Sun Jan 2 12:05:09 2021
+    - no functional change, build only impacts
+    - specified minimal Util::H2O version
+      due to "-isa" not being supported
+      before v0.14

@@ -1,5 +1,5 @@
 package Data::Frame::Column::Helper;
-$Data::Frame::Column::Helper::VERSION = '0.003';
+$Data::Frame::Column::Helper::VERSION = '0.006002';
 use strict;
 use warnings;
 
@@ -18,6 +18,9 @@ sub AUTOLOAD {
 	$self->dataframe->column($colname);
 }
 
+# empty DESTROY to avoid call from AUTOLOAD
+sub DESTROY { }
+
 1;
 
 __END__
@@ -32,15 +35,25 @@ Data::Frame::Column::Helper
 
 =head1 VERSION
 
-version 0.003
+version 0.006002
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Zakariyya Mughal <zmughal@cpan.org>
 
+=item *
+
+Stephan Loyd <sloyd@cpan.org>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Zakariyya Mughal.
+This software is copyright (c) 2014, 2019-2022 by Zakariyya Mughal, Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

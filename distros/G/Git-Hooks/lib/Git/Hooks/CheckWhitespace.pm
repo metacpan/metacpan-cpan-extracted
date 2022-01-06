@@ -2,7 +2,7 @@ use warnings;
 
 package Git::Hooks::CheckWhitespace;
 # ABSTRACT: Git::Hooks plugin for checking whitespace errors
-$Git::Hooks::CheckWhitespace::VERSION = '3.2.0';
+$Git::Hooks::CheckWhitespace::VERSION = '3.2.1';
 use v5.16.0;
 use utf8;
 use Log::Any '$log';
@@ -96,9 +96,9 @@ EOS
 }
 
 # Install hooks
-GITHOOKS_CHECK_AFFECTED_REFS \&check_ref;
-GITHOOKS_CHECK_PRE_COMMIT    \&check_commit;
-GITHOOKS_CHECK_PATCHSET      \&check_patchset;
+GITHOOKS_CHECK_AFFECTED_REFS(\&check_ref);
+GITHOOKS_CHECK_PRE_COMMIT(\&check_commit);
+GITHOOKS_CHECK_PATCHSET(\&check_patchset);
 
 1;
 
@@ -114,7 +114,7 @@ Git::Hooks::CheckWhitespace - Git::Hooks plugin for checking whitespace errors
 
 =head1 VERSION
 
-version 3.2.0
+version 3.2.1
 
 =head1 SYNOPSIS
 
@@ -184,7 +184,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by CPQD <www.cpqd.com.br>.
+This software is copyright (c) 2022 by CPQD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

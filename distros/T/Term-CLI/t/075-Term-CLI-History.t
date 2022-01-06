@@ -17,6 +17,7 @@ sub Main {
             : 0
     );
     Term_CLI_History_test->runtests();
+    return;
 }
 
 package Term_CLI_History_test {
@@ -63,6 +64,7 @@ sub check_history : Test(12) {
     $fh->autoflush(1);
     my $history = "   \ncommand 1\ncommand 2\ncommand 3\n";
     say $fh $history;
+    $fh->close;
 
     ok($cli->read_history($filename), 'read_history from new file works')
         or diag("history error: ".$cli->error);
@@ -72,19 +74,19 @@ sub check_history : Test(12) {
 
     is($hist_read, $history, 'history is read correctly');
 
-    $fh->close;
-
-    ($fh, $filename) = tempfile();
-    $fh->close();
+    my ($fh2, $filename2) = tempfile();
+    $fh2->close();
     $cli->term->AddHistory("command 4", "command 5");
-    ok($cli->write_history($filename), 'write_history to new file works')
+    ok($cli->write_history($filename2), 'write_history to new file works')
         or diag("history error: ".$cli->error);
-    is($cli->history_file, $filename, 'history_file is set correctly after write');
+    is($cli->history_file, $filename2, 'history_file is set correctly after write');
 
-    open $fh, '<', $filename;
     my $expected = $history."command 4\ncommand 5\n";
-    my $new_history = join('', $fh->getlines());
+    open my $fh3, '<', $filename2;
+    my $new_history = join('', $fh3->getlines());
+    $fh3->close;
     is($new_history, $expected, 'history is correctly saved');
+    return;
 }
 
 }

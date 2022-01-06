@@ -17,6 +17,7 @@ sub Main {
             : 0
     );
     Term_CLI_Argument_Bool_test->runtests();
+    return;
 }
 
 package Term_CLI_Argument_Bool_test {
@@ -49,6 +50,7 @@ sub startup : Test(startup => 1) {
 
     isa_ok( $arg, 'Term::CLI::Argument::Bool', 'Term::CLI::Argument::Bool->new' );
     $self->{arg} = $arg;
+    return;
 }
 
 sub check_attributes: Test(2) {
@@ -56,6 +58,7 @@ sub check_attributes: Test(2) {
     my $arg = $self->{arg};
     is( $arg->name, $ARG_NAME, "name attribute is $ARG_NAME" );
     is( $arg->type, 'Bool', "type attribute is Bool" );
+    return;
 }
 
 sub check_complete: Test(6) {
@@ -98,6 +101,7 @@ sub check_complete: Test(6) {
     @expected = sort qw( on ok off );
     is_deeply( [$arg->complete($partial)], \@expected,
         "case-sensitive complete returns (@expected) for '$partial'");
+    return;
 }
 
 sub check_validate: Test(15) {
@@ -151,6 +155,7 @@ sub check_validate: Test(15) {
         "'FALSE' does not validate in case-sensitive mode");
     like ( $arg->error, qr/invalid/,
         "error on invalid value is set correctly" );
+    return;
 }
 
 }

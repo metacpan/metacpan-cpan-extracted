@@ -52,6 +52,7 @@ IPVerification
 Inc
 Inquiry
 Jack
+Logan
 MAXMIND
 MAXMIND's
 Mark
@@ -61,6 +62,7 @@ MaxMind's
 Mocker
 Mojo
 Narsimham
+Nick
 ORIGID
 Olaf
 Oschwald
@@ -102,6 +104,7 @@ mark
 mhunter
 mock
 nchelluri
+nlogan
 oalders
 olaf
 param

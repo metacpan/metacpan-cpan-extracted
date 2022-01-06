@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.535-5-g4a79749c
+package JSON::Schema::Modern; # git description: v0.538-6-g530f7cb5
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.536';
+our $VERSION = '0.539';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -923,7 +923,7 @@ JSON::Schema::Modern - Validate data against a schema
 
 =head1 VERSION
 
-version 0.536
+version 0.539
 
 =head1 SYNOPSIS
 
@@ -1077,7 +1077,7 @@ or a URI string indicating the location where such a schema is located.
 
 Optionally, a hashref can be passed as a third parameter which allows changing the values of the
 L</short_circuit>, L</collect_annotations>, L</annotate_unknown_keywords>, L</scalarref_booleans>,
-L</validate_formats>, and/or L<validate_content_schemas>
+L</validate_formats>, and/or L</validate_content_schemas>
 settings for just this evaluation call.
 
 The result is a L<JSON::Schema::Modern::Result> object, which can also be used as a boolean.
@@ -1112,7 +1112,7 @@ or a URI string indicating the location where such a schema is located.
 
 Optionally, a hashref can be passed as a third parameter which allows changing the values of the
 L</short_circuit>, L</collect_annotations>, L</annotate_unknown_keywords>, L</scalarref_booleans>,
-L</validate_formats>, and/or L<validate_content_schemas>
+L</validate_formats>, and/or L</validate_content_schemas>
 settings for just this evaluation call.
 
 You can pass a series of callback subs to this method corresponding to keywords, which is useful for
@@ -1495,8 +1495,6 @@ L<https://json-schema.org/draft-07/json-schema-release-notes.html>
 L<Understanding JSON Schema|https://json-schema.org/understanding-json-schema>: tutorial-focused documentation
 
 =back
-
-=head1 SUPPORT
 
 =for stopwords OpenAPI
 

@@ -61,7 +61,7 @@ int main(char *argv[], int argc)
    return 0;
 }
 __BUILTIN_EXPECT
-    if (try_compile($__builtin_expect)) {
+    if (try_link($__builtin_expect)) {
         $ac->msg_result('yes');
         $ac->define_var("C___BUILTIN_EXPECT", "__builtin_expect");
     } else {
@@ -235,8 +235,9 @@ C_WRAPPER
 }
 
 sub try_compile {
-    my ($csource, $extra_compiler_flags) = @_;
+    my ($csource, $extra_compiler_flags, $link) = @_;
 
+    $link //= 0;
     my $fh = File::Temp->new(UNLINK => 0, SUFFIX => '.c');
     print $fh "$csource\n";
     close($fh);
@@ -251,9 +252,20 @@ sub try_compile {
             object_file          => $obj,
             extra_compiler_flags => $extra_compiler_flags
             );
+        if ($link) {
+            $cbuilder->link_executable(
+                objects              => [ $obj ],
+                );
+        }
         $rc = 1;
     };
     unlink $fh->filename;
 
     return $rc;
+}
+
+sub try_link {
+    my ($csource, $extra_compiler_flags) = @_;
+
+    return try_compile($csource, $extra_compiler_flags, 1);
 }

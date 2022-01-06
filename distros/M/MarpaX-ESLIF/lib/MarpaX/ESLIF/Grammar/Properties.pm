@@ -7,7 +7,7 @@ package MarpaX::ESLIF::Grammar::Properties;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '5.0.7'; # VERSION
+our $VERSION = '6.0.10'; # VERSION
 
 
 #
@@ -24,6 +24,7 @@ sub new {
                    maxLevel            => $args{maxLevel},
                    description         => $args{description},
                    latm                => $args{latm},
+                   discardIsFallback   => $args{discardIsFallback},
                    defaultSymbolAction => $args{defaultSymbolAction},
                    defaultRuleAction   => $args{defaultRuleAction},
                    defaultEventAction  => $args{defaultEventAction},
@@ -72,6 +73,18 @@ sub isLatm {
 
 sub getLatm {
   goto &isLatm
+}
+
+
+sub isDiscardIsFallback {
+  my ($self) = @_;
+
+  return $self->{discardIsFallback}
+}
+
+
+sub getDiscardIsFallback {
+  goto &isDiscardIsFallback
 }
 
 
@@ -158,7 +171,7 @@ MarpaX::ESLIF::Grammar::Properties - ESLIF Grammar Properties
 
 =head1 VERSION
 
-version 5.0.7
+version 6.0.10
 
 =head1 SYNOPSIS
 
@@ -200,8 +213,8 @@ version 5.0.7
   whitespaces ::= WHITESPACES
   comment ::= /(?:(?:(?:\/\/)(?:[^\n]*)(?:\n|\z))|(?:(?:\/\*)(?:(?:[^\*]+|\*(?!\/))*)(?:\*\/)))/u
 
-  :lexeme ::= NUMBER pause => before event => ^NUMBER
-  :lexeme ::= NUMBER pause => after  event => NUMBER$
+  :symbol ::= NUMBER pause => before event => ^NUMBER
+  :symbol ::= NUMBER pause => after  event => NUMBER$
 
   :desc      ~ 'Calculator Tokens'
   NUMBER     ~ /[\d]+/   name => 'NUMBER Lexeme'
@@ -236,6 +249,10 @@ Grammar description
 =item latm
 
 Grammar is in LATM (Longest Accepted Token Mode) ?
+
+=item discardIsFallback
+
+Grammar's :discard is a fallback
 
 =item defaultSymbolAction
 
@@ -298,6 +315,14 @@ Returns a boolean that indicates if this grammar is in the LATM (Longest Accepta
 =head2 $self->getLatm
 
 Alias to isLatm()
+
+=head2 $self->isDiscardIsFallback
+
+Returns a boolean that returns the grammar's discard-is-fallback setting
+
+=head2 $self->getDiscardIsFallback
+
+Alias to isDiscardIsFallback()
 
 =head2 $self->getDefaultSymbolAction
 

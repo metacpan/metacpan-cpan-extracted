@@ -1,4 +1,4 @@
-#!perl -T
+#!perl
 ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
 use strict;
 use warnings;

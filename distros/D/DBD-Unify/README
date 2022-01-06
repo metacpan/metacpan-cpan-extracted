@@ -13,7 +13,7 @@ REQUIREMENTS
     and 9.1B, but this does not mean it might not work on U2000 databases or
     other DataServer releases.
 
-    I have tested with DBI-1.632 .. DBI 1.643 and perl-5.8.6 through 5.31.8,
+    I have tested with DBI-1.632 .. DBI 1.643 and perl-5.8.6 through 5.34.0,
     but you might get it to work with DBI 0.93 or higher.  But then again, in
     that case you should consider an upgrade. As of DBD-Unify-0.40 I've made
     DBI-1.42 prerequisite.  DBD-Unify-0.70 raised the minimum supported
@@ -34,6 +34,8 @@ REQUIREMENTS
       Perl version
       Stable  Devel   Unicode
       ------  ------- -------
+              5.35.4   14.0.0  UCD 14.0.0 released 14 Sep 2021
+      5.32.0  5.31.10  13.0.0  UCD 13.0.0 released 10 Mar 2020
       5.30.0  5.29.10  12.1.0  UCD 12.1.0 released 07 May 2019
               5.29.9   12.0.0  UCD 12.0.0 released 05 Mar 2019
               5.29.2   11.0.0  UCD 11.0.0 released 05 Jun 2018
@@ -262,7 +264,7 @@ ACKNOWLEDGEMENTS
 
 COPYRIGHT AND LICENSE
 
-    Copyright (C) 1999-2020  H.Merijn Brand <h.m.brand@xs4all.nl>
+    Copyright (C) 1999-2022  H.Merijn Brand <h.m.brand@xs4all.nl>
 
     This library is free software; you can redistribute it and/or modify
     it under the same terms as Perl itself. 

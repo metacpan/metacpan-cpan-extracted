@@ -217,7 +217,7 @@ subtest 'top level document fields' => sub {
         instanceLocation => '/'.$_,
         keywordLocation => ignore,  # a $defs somewhere
         absoluteKeywordLocation => ignore,
-        error => re(qr/^wrong type/),
+        error => re(qr/^got string, not (object|array)$/),
       }, qw(externalDocs security servers tags)),
       {
         instanceLocation => '',
@@ -249,7 +249,7 @@ subtest 'top level document fields' => sub {
         instanceLocation => '/'.$_,
         keywordLocation => ignore,  # a $defs somewhere
         absoluteKeywordLocation => ignore,
-        error => re(qr/^wrong type/),
+        error => 'got string, not object',
       }, qw(components paths webhooks)),
       {
         instanceLocation => '',

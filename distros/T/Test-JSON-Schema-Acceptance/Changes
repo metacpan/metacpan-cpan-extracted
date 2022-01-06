@@ -1,5 +1,11 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+1.015     2021-12-31 21:17:27Z
+        - removed bignum deserialization that was added in 1.014: you should
+          override the json_decoder attribute if you want this
+        - updated test suite:
+          https://github.com/json-schema-org/JSON-Schema-Test-Suite/compare/26f74befcd2286cce0b74c9ae17ecdd560245924...20fb14bde8f3c45a8933cd13283557c1b1fdf5b5
+
 1.014     2021-12-30 05:08:33Z
         - "draft-future" is now known as "draft-next"
         - minimum perl version raised to 5.020

@@ -6,7 +6,10 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = 0.003;
+our $VERSION = 0.007;
+
+use IP::Geolocation::MMDB::Metadata;
+use Math::BigInt 1.999807;
 
 require XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -38,6 +41,20 @@ sub getcc {
   return $country_code;
 }
 
+sub metadata {
+  my ($self) = @_;
+
+  return IP::Geolocation::MMDB::Metadata->new(%{$self->_metadata});
+}
+
+## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+
+sub _to_bigint {
+  my ($self, $bytes) = @_;
+
+  return Math::BigInt->from_bytes($bytes);
+}
+
 1;
 __END__
 
@@ -49,12 +66,13 @@ IP::Geolocation::MMDB - Read MaxMind DB files
 
 =head1 VERSION
 
-version 0.003
+version 0.007
 
 =head1 SYNOPSIS
 
   use IP::Geolocation::MMDB;
   my $db = IP::Geolocation::MMDB->new(file => 'GeoIP2-Country.mmdb');
+  my $metadata = $db->metadata;
   my $lookup_result = $db->record_for_address('1.2.3.4');
   my $country_code = $db->getcc('2620:fe::9');
 
@@ -86,6 +104,15 @@ Takes an IPv4 or IPv6 address as a string and returns the data associated with
 the IP address or the undefined value.  Dies if the address is not a valid IP
 address.
 
+The returned data is usually a hash reference but could also be a an array
+reference or a scalar for custom databases.
+
+=head2 metadata
+
+  my $metadata = $db->metadata;
+
+Returns an L<IP::Geolocation::MMDB::Metadata> object for the database.
+
 =head2 version
 
   my $version = IP::Geolocation::MMDB->version;
@@ -113,6 +140,10 @@ A database error occurred while looking up an IP address.
 A database error occurred while reading the data associated with an IP
 address.
 
+=item B<< Couldn't read metadata >>
+
+An error occurred while reading the database's metadata.
+
 =back
 
 =head1 CONFIGURATION AND ENVIRONMENT
@@ -121,8 +152,9 @@ None.
 
 =head1 DEPENDENCIES
 
-Requires Alien::libmaxminddb from CPAN.  On Windows, Alien::MSYS needs to be
-installed.
+Requires L<Alien::libmaxminddb> from CPAN.  On Windows, L<Alien::MSYS> needs
+to be installed.  Requires L<Math::BigInt> version 1.999807, which is
+distributed with Perl 5.28 and newer.
 
 Requires an IP to country database in the MaxMind DB file format from
 L<DP-IP.com|https://db-ip.com/> or L<MaxMind|https://www.maxmind.com/>.
@@ -137,15 +169,16 @@ Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
 
 =head1 BUGS AND LIMITATIONS
 
-libmaxminddb uses 64-bit integers.
+If your Perl interpreter does not support 64-bit integers,
+MMDB_DATA_TYPE_UINT64 values are put into Math::BigInt objects;
 
-The data type MMDB_DATA_TYPE_UINT128 is currently not mapped to a number.
+MMDB_DATA_TYPE_UINT128 values are put into Math::BigInt objects;
 
 Some Windows versions do not support IPv6.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2021 Andreas Vögele
+Copyright 2022 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

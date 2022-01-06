@@ -346,6 +346,9 @@ examples/native/zlib/lib/SPVM/MyZlib.c
 examples/native/zlib/lib/SPVM/MyZlib.config
 examples/native/zlib/lib/SPVM/MyZlib.spvm
 examples/native/zlib/zlib.pl
+examples/spvmcc/basic/myapp
+examples/spvmcc/basic/README.txt
+examples/spvmcc/basic/SPVM/MyApp.spvm
 lib/SPVM.pm
 lib/SPVM/BlessedObject.pm
 lib/SPVM/BlessedObject/Array.pm
@@ -355,6 +358,8 @@ lib/SPVM/Bool.pm
 lib/SPVM/Builder.pm
 lib/SPVM/Builder/CC.pm
 lib/SPVM/Builder/Config.pm
+lib/SPVM/Builder/Exe.pm
+lib/SPVM/Builder/include/spvm_allocator.h
 lib/SPVM/Builder/include/spvm_allow.h
 lib/SPVM/Builder/include/spvm_api.h
 lib/SPVM/Builder/include/spvm_array_field_access.h
@@ -367,7 +372,6 @@ lib/SPVM/Builder/include/spvm_class.h
 lib/SPVM/Builder/include/spvm_class_var.h
 lib/SPVM/Builder/include/spvm_class_var_access.h
 lib/SPVM/Builder/include/spvm_compiler.h
-lib/SPVM/Builder/include/spvm_compiler_allocator.h
 lib/SPVM/Builder/include/spvm_constant.h
 lib/SPVM/Builder/include/spvm_csource_builder_precompile.h
 lib/SPVM/Builder/include/spvm_descriptor.h
@@ -395,11 +399,11 @@ lib/SPVM/Builder/include/spvm_toke.h
 lib/SPVM/Builder/include/spvm_type.h
 lib/SPVM/Builder/include/spvm_typedecl.h
 lib/SPVM/Builder/include/spvm_use.h
-lib/SPVM/Builder/include/spvm_util_allocator.h
 lib/SPVM/Builder/include/spvm_var.h
 lib/SPVM/Builder/include/spvm_weaken_backref.h
 lib/SPVM/Builder/include/spvm_yacc.h
 lib/SPVM/Builder/include/spvm_yacc_util.h
+lib/SPVM/Builder/src/spvm_allocator.c
 lib/SPVM/Builder/src/spvm_allow.c
 lib/SPVM/Builder/src/spvm_api.c
 lib/SPVM/Builder/src/spvm_array_field_access.c
@@ -411,7 +415,6 @@ lib/SPVM/Builder/src/spvm_class.c
 lib/SPVM/Builder/src/spvm_class_var.c
 lib/SPVM/Builder/src/spvm_class_var_access.c
 lib/SPVM/Builder/src/spvm_compiler.c
-lib/SPVM/Builder/src/spvm_compiler_allocator.c
 lib/SPVM/Builder/src/spvm_constant.c
 lib/SPVM/Builder/src/spvm_csource_builder_precompile.c
 lib/SPVM/Builder/src/spvm_descriptor.c
@@ -434,7 +437,6 @@ lib/SPVM/Builder/src/spvm_switch_info.c
 lib/SPVM/Builder/src/spvm_toke.c
 lib/SPVM/Builder/src/spvm_type.c
 lib/SPVM/Builder/src/spvm_use.c
-lib/SPVM/Builder/src/spvm_util_allocator.c
 lib/SPVM/Builder/src/spvm_var.c
 lib/SPVM/Builder/src/spvm_yacc.c
 lib/SPVM/Builder/src/spvm_yacc_util.c
@@ -531,6 +533,7 @@ Makefile.PL
 MANIFEST			This list of files
 ppport.h
 README.md
+script/spvmcc
 solo/solo_Makefile.PL
 solo/SPVM/Main.spvm
 solo/SPVM/TestCase.spvm
@@ -570,6 +573,9 @@ solo/SPVM/TestCase/Weaken.spvm
 solo/SPVM/TestCase/Weaken2.spvm
 solo/spvm_boot.c
 SPVM.xs
+t/builder_config.t
+t/builder_config/libpng.def
+t/builder_config/zlib.def
 t/copy_default_to_precompile.pl
 t/default/000_use_spvm.t
 t/default/001_use_empty_class.t
@@ -724,6 +730,8 @@ t/default/lib/SPVM/TestCase/CompileError/TypeCantBeDetectedUndef.spvm
 t/default/lib/SPVM/TestCase/CompileError/TypeCantBeDetectedUndefDefault.spvm
 t/default/lib/SPVM/TestCase/CompileError/UnaryMinus/NotNumeric.spvm
 t/default/lib/SPVM/TestCase/CompileError/UnaryPlus/NotNumeric.spvm
+t/default/lib/SPVM/TestCase/CompileError/Use/AliasDuplication.spvm
+t/default/lib/SPVM/TestCase/CompileError/Use/AliasStartsLowerCase.spvm
 t/default/lib/SPVM/TestCase/CompileError/Use/ImportMethodNotFound.spvm
 t/default/lib/SPVM/TestCase/CompileError/Value/Fields17.spvm
 t/default/lib/SPVM/TestCase/CompileError/Value/FieldsZero.spvm
@@ -902,9 +910,26 @@ t/default/value_array.t
 t/default/warn.t
 t/default/weaken.t
 t/default/while.t
+t/exe/lib/SPVM/MyExe.spvm
+t/exe/lib/SPVM/MyExe/Foo/Bar.spvm
+t/exe/lib/SPVM/MyExe/Precompile.spvm
+t/exe/lib/SPVM/TestCase/NativeAPI2.c
+t/exe/lib/SPVM/TestCase/NativeAPI2.config
+t/exe/lib/SPVM/TestCase/NativeAPI2.native/include/bar.h
+t/exe/lib/SPVM/TestCase/NativeAPI2.native/include/base.h
+t/exe/lib/SPVM/TestCase/NativeAPI2.native/include/baz/baz.h
+t/exe/lib/SPVM/TestCase/NativeAPI2.native/include/foo.h
+t/exe/lib/SPVM/TestCase/NativeAPI2.native/src/bar.c
+t/exe/lib/SPVM/TestCase/NativeAPI2.native/src/baz/baz.c
+t/exe/lib/SPVM/TestCase/NativeAPI2.native/src/baz/noneed.txt
+t/exe/lib/SPVM/TestCase/NativeAPI2.native/src/foo.c
+t/exe/lib/SPVM/TestCase/NativeAPI2.native/src/noneed.txt
+t/exe/lib/SPVM/TestCase/NativeAPI2.spvm
+t/exe/spvmcc.t
 t/get_native_api_indexes.pl
 t/lib/TestAuto.pm
 t/lib/TestFile.pm
+t/memory.t
 t/sort_method_name_native.pl
 t/sort_method_name_pod.pl
 t/sort_method_name_spvm.pl

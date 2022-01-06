@@ -19,7 +19,7 @@ name: Text-Table-Any
 provides:
   Text::Table::Any:
     file: lib/Text/Table/Any.pm
-    version: '0.105'
+    version: '0.106'
 recommends:
   Term::TablePrint: '0'
   Text::ANSITable: '0.602'
@@ -54,7 +54,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Table-Any
   homepage: https://metacpan.org/release/Text-Table-Any
   repository: git://github.com/perlancar/perl-Text-Table-Any.git
-version: '0.105'
+version: '0.106'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

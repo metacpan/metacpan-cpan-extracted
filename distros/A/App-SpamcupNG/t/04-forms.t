@@ -32,7 +32,7 @@ is_deeply(
     $best_ref,
     [qw(abuse@ovh.net noc@ovh.net)],
     'It has the expected best contacts'
-);
+    );
 throws_ok { find_best_contacts('foobar') } qr/scalar\sreference/,
     'find_best_contacts dies with invalid parameter';
 

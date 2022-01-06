@@ -10,7 +10,7 @@ use namespace::clean; # to avoid having an "in_global_destruction" method
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '5.0.7'; # VERSION
+our $VERSION = '6.0.10'; # VERSION
 
 
 #
@@ -82,6 +82,7 @@ sub new {
                     multiton  => $multiton,
                     clonable  => $clonable,
                     class     => $class,
+                    shallow   => 0,
                     arguments => \@_}, $class;
 
     if ($multiton) {
@@ -97,6 +98,11 @@ sub new {
 
 sub _destroy {
     my $self = shift;
+
+    #
+    # No op if it is a shallow'ed instance
+    #
+    return if $self->{shallow};
 
     #
     # Here it should never happen that engine is not set
@@ -215,6 +221,24 @@ sub CLONE {
     map { $_->_clone() } grep { $_->{class} ne 'MarpaX::ESLIF' } @multitons;
 }
 
+
+sub SHALLOW {
+    my $proto = shift;
+
+    my $class = ref($proto) || $proto;                # Because of MarpaX::ESLIF::Recognizer::newFrom that is an instance method
+
+    my $engine = shift // croak "\$engine is not defined";
+
+    return bless { engine    => $engine,
+                   allocate  => undef,
+                   dispose   => undef,
+                   multiton  => 0,
+                   clonable  => 0,
+                   class     => $class,
+                   shallow   => 1,
+                   arguments => undef}, $class;
+}
+
 1;
 
 __END__
@@ -229,7 +253,7 @@ MarpaX::ESLIF::Base - ESLIF base
 
 =head1 VERSION
 
-version 5.0.7
+version 6.0.10
 
 =head1 DESCRIPTION
 
@@ -248,6 +272,10 @@ Generic destructor. It always calls C<$self>'s C<dispose> method.
 =head2 CLONE()
 
 Manages clonable instances.
+
+=head2 $class->SHALLOW($engine)
+
+Create a shallow instance of C<$class> based on C<$engine>, that is required. This instance cannot be cloned and, when being destroyed, will have no effect on the engine.
 
 =head1 AUTHOR
 

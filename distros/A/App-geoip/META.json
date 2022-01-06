@@ -1,80 +1,43 @@
 {
-   "resources" : {
-      "repository" : {
-         "web" : "https://github.com/Tux/GeoIP2",
-         "url" : "https://github.com/Tux/GeoIP2",
-         "type" : "git"
-         },
-      "x_IRC" : "irc://irc.perl.org/#csv",
-      "license" : [
-         "http://dev.perl.org/licenses/"
-         ],
-      "homepage" : "https://metacpan.org/pod/App::geoip",
-      "bugtracker" : {
-         "web" : "https://github.com/Tux/GeoIP2/issues"
-         }
-      },
-   "meta-spec" : {
-      "version" : 2,
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
-      },
-   "version" : "0.14",
-   "abstract" : "Show geographical data based on hostname or IP address(es)",
-   "author" : [
-      "H.Merijn Brand <h.m.brand@xs4all.nl>"
-      ],
-   "license" : [
-      "perl_5"
-      ],
-   "dynamic_config" : 1,
-   "name" : "App-geoip",
-   "release_status" : "stable",
-   "generated_by" : "Author",
-   "provides" : {
-      "App::geoip" : {
-         "version" : "0.14",
-         "file" : "lib/App/geoip.pm"
-         }
-      },
    "prereqs" : {
-      "test" : {
-         "requires" : {
-            "Test::More" : "0"
-            }
-         },
       "build" : {
          "requires" : {
             "Config" : "0"
             }
          },
-      "runtime" : {
-         "recommends" : {
-            "Socket" : "2.030",
-            "Math::Trig" : "1.23",
-            "Net::CIDR" : "0.20",
-            "Archive::Zip" : "1.68",
-            "Text::CSV_XS" : "1.44",
-            "Data::Dumper" : "2.174",
-            "JSON::PP" : "4.05",
-            "Getopt::Long" : "2.52",
-            "Pod::Usage" : "2.01",
-            "DBI" : "1.643",
-            "LWP::Simple" : "6.50"
-            },
+      "test" : {
          "requires" : {
+            "Test::More" : "0"
+            }
+         },
+      "runtime" : {
+         "requires" : {
+            "LWP::Simple" : "0",
+            "Archive::Zip" : "0",
+            "Pod::Text" : "0",
             "Text::CSV_XS" : "1.39",
-            "Net::CIDR" : "0",
-            "Math::Trig" : "0",
             "Socket" : "0",
             "DBI" : "0",
+            "Net::CIDR" : "0",
+            "Math::Trig" : "0",
+            "JSON::PP" : "0",
             "perl" : "5.014",
             "Data::Dumper" : "0",
-            "Archive::Zip" : "0",
             "List::Util" : "0",
-            "LWP::Simple" : "0",
-            "Pod::Text" : "0",
-            "Getopt::Long" : "0",
-            "JSON::PP" : "0"
+            "Getopt::Long" : "0"
+            },
+         "recommends" : {
+            "LWP::Simple" : "6.60",
+            "Archive::Zip" : "1.68",
+            "Pod::Usage" : "2.01",
+            "Text::CSV_XS" : "1.47",
+            "Math::Trig" : "1.23",
+            "Socket" : "2.032",
+            "JSON::PP" : "4.07",
+            "DBI" : "1.643",
+            "Data::Dumper" : "2.183",
+            "Getopt::Long" : "2.52",
+            "Net::CIDR" : "0.21"
             }
          },
       "configure" : {
@@ -82,5 +45,42 @@
             "ExtUtils::MakeMaker" : "0"
             }
          }
-      }
+      },
+   "abstract" : "Show geographical data based on hostname or IP address(es)",
+   "provides" : {
+      "App::geoip" : {
+         "version" : "0.16",
+         "file" : "lib/App/geoip.pm"
+         }
+      },
+   "name" : "App-geoip",
+   "license" : [
+      "perl_5"
+      ],
+   "release_status" : "stable",
+   "generated_by" : "Author",
+   "author" : [
+      "H.Merijn Brand <h.m.brand@xs4all.nl>"
+      ],
+   "dynamic_config" : 1,
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+         ],
+      "homepage" : "https://metacpan.org/pod/App::geoip",
+      "bugtracker" : {
+         "web" : "https://github.com/Tux/GeoIP2/issues"
+         },
+      "repository" : {
+         "url" : "https://github.com/Tux/GeoIP2",
+         "type" : "git",
+         "web" : "https://github.com/Tux/GeoIP2"
+         },
+      "x_IRC" : "irc://irc.perl.org/#csv"
+      },
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+      },
+   "version" : "0.16"
    }

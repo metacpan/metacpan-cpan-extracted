@@ -32,15 +32,17 @@
       },
       "runtime" : {
          "requires" : {
-            "File::Spec" : "3.3",
+            "File::Spec" : "3.30",
             "File::Temp" : "0.22",
+            "perl" : "5.008001",
             "strict" : "0",
             "utf8" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "1.001002"
+            "Test::More" : "1.001002",
+            "Test::Pod" : "1.51"
          }
       }
    },
@@ -58,6 +60,6 @@
          "web" : "https://github.com/ronsavage/Config-Tiny"
       }
    },
-   "version" : "2.27",
+   "version" : "2.28",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -13,6 +13,7 @@ do { my $x = {
                                       },
                       'requires' => {
                                       'Encode' => '0',
+                                      'ExtUtils::HasCompiler' => '0.014',
                                       'File::Spec' => '0',
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',
@@ -62,6 +63,8 @@ do { my $x = {
                                     },
                       'suggests' => {
                                       'Class::XSAccessor' => '0',
+                                      'Cpanel::JSON::XS' => '0',
+                                      'Ref::Util::XS' => '0',
                                       'Type::Tiny::XS' => '0'
                                     }
                     },
@@ -102,6 +105,7 @@ do { my $x = {
                                            'Dist::Zilla::Plugin::CheckStrictVersion' => '0',
                                            'Dist::Zilla::Plugin::ConfirmRelease' => '0',
                                            'Dist::Zilla::Plugin::CopyFilesFromRelease' => '0',
+                                           'Dist::Zilla::Plugin::DynamicPrereqs' => '0.029',
                                            'Dist::Zilla::Plugin::EnsureLatestPerl' => '0',
                                            'Dist::Zilla::Plugin::FileFinder::ByName' => '0',
                                            'Dist::Zilla::Plugin::GenerateFile' => '0',

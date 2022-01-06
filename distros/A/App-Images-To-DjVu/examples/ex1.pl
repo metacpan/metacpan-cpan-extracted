@@ -16,7 +16,7 @@ exit App::Images::To::DjVu->new->run;
 # Output like:
 # Usage: ./ex1.pl [-e encoder] [-h] [-o out_file] [-q] [--version] images_list_file
 #         -e encoder              Encoder (default value is 'c44').
-#         -h                      Help.
+#         -h                      Print help.
 #         -o out_file             Output file (default value is 'output.djvu').
 #         -q                      Quiet mode.
 #         --version               Print version.

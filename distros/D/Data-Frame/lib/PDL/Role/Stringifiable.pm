@@ -1,8 +1,8 @@
 package PDL::Role::Stringifiable;
-$PDL::Role::Stringifiable::VERSION = '0.003';
+$PDL::Role::Stringifiable::VERSION = '0.006002';
 use strict;
 use warnings;
-use Moo::Role;
+use Role::Tiny;
 
 requires 'element_stringify';
 requires 'element_stringify_max_width';
@@ -15,10 +15,16 @@ sub element_stringify {
 sub string {
 	# TODO
 	my ($self) = @_;
-	if( $self->ndims == 0 ) {
+
+    if ($self->nelem > $PDL::toolongtoprint) {
+        return "TOO LONG TO PRINT";
+    }
+
+    my $ndims = $self->ndims;
+	if( $ndims == 0 ) {
 		return $self->element_stringify( $self->at() );
 	}
-	if( $self->ndims == 1 ) {
+	elsif( $ndims == 1 ) {
 		return $self->string1d;
 	}
 	# TODO string2d, stringNd
@@ -57,15 +63,25 @@ PDL::Role::Stringifiable
 
 =head1 VERSION
 
-version 0.003
+version 0.006002
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Zakariyya Mughal <zmughal@cpan.org>
 
+=item *
+
+Stephan Loyd <sloyd@cpan.org>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Zakariyya Mughal.
+This software is copyright (c) 2014, 2019-2022 by Zakariyya Mughal, Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

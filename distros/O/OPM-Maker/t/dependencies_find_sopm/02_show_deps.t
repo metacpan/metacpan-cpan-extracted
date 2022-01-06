@@ -14,8 +14,7 @@ use File::Temp qw(tempdir);
 use_ok 'OPM::Maker::Command::dependencies';
 
 my $dir       = File::Spec->rel2abs( dirname __FILE__ );
-my $files_dir = File::Spec->catdir( $dir, '..', 'valid', 'SecondSMTP' );
-my $opm       = File::Spec->catfile( $files_dir, 'SecondSMTP-0.0.1.opm' );
+my $files_dir = File::Spec->catdir( $dir, '..', 'valid', 'deps' );
 
 chdir $files_dir;
 

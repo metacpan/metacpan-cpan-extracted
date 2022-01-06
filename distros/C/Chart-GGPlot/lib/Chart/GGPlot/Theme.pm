@@ -5,7 +5,7 @@ package Chart::GGPlot::Theme;
 use Chart::GGPlot::Setup;
 use Function::Parameters qw(classmethod);
 
-our $VERSION = '0.0016'; # VERSION
+our $VERSION = '0.002000'; # VERSION
 
 use parent qw(Chart::GGPlot::Params);
 
@@ -208,7 +208,7 @@ Chart::GGPlot::Theme - Class for themes
 
 =head1 VERSION
 
-version 0.0016
+version 0.002000
 
 =head1 DESCRIPTION
 

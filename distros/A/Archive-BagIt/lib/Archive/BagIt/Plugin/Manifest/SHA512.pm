@@ -1,6 +1,6 @@
 package Archive::BagIt::Plugin::Manifest::SHA512;
 # ABSTRACT: The role to load the sha512 plugin (default for v1.0)
-our $VERSION = '0.086'; # VERSION
+our $VERSION = '0.089'; # VERSION
 
 use strict;
 use warnings;
@@ -46,7 +46,7 @@ Archive::BagIt::Plugin::Manifest::SHA512 - The role to load the sha512 plugin (d
 
 =head1 VERSION
 
-version 0.086
+version 0.089
 
 =head1 AVAILABILITY
 
@@ -65,7 +65,7 @@ Andreas Romeyke <cpan@andreas.romeyke.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Rob Schmidt <rjeschmi@gmail.com>, William Wueppelmann and Andreas Romeyke.
+This software is copyright (c) 2022 by Rob Schmidt <rjeschmi@gmail.com>, William Wueppelmann and Andreas Romeyke.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

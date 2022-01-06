@@ -5,7 +5,7 @@ package BorderStyle::Text::ANSITable::OldCompat::Default::spacei_ascii;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-08-27'; # DATE
 our $DIST = 'Text-ANSITable'; # DIST
-our $VERSION = '0.606'; # VERSION
+our $VERSION = '0.607'; # VERSION
 
 use alias::module 'BorderStyle::ASCII::SpaceInnerOnly';
 
@@ -24,7 +24,7 @@ BorderStyle::Text::ANSITable::OldCompat::Default::spacei_ascii - ASCII::SpaceInn
 
 =head1 VERSION
 
-This document describes version 0.606 of BorderStyle::Text::ANSITable::OldCompat::Default::spacei_ascii (from Perl distribution Text-ANSITable), released on 2021-08-27.
+This document describes version 0.607 of BorderStyle::Text::ANSITable::OldCompat::Default::spacei_ascii (from Perl distribution Text-ANSITable), released on 2021-08-27.
 
 =head1 HOMEPAGE
 

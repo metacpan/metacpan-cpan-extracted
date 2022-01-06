@@ -5,8 +5,8 @@ use warnings;
 BEGIN {
     my $out = "";
     local *STDOUT;
-    open(STDOUT, '>', \$out) or die "Could not open a temp STDOUT: $!";
-    ok(!-t STDOUT, "STDOUT is not a term");
+    open(*STDOUT, '>', \$out) or die "Could not open a temp STDOUT: $!";
+    ok(!-t *STDOUT, "STDOUT is not a term");
 
     require Term::Table::Util;
     Term::Table::Util->import(qw/term_size USE_TERM_READKEY USE_TERM_SIZE_ANY/);

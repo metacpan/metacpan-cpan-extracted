@@ -64,9 +64,6 @@ int32_t main(int32_t argc, const char *argv[]) {
   // Create env
   SPVM_ENV* env = SPVM_API_create_env(compiler);
   
-  // Call init blocks
-  SPVM_API_call_init_blocks(env);
-
   // Class
   int32_t method_id = SPVM_API_get_class_method_id(env, class_name, "main", "int(string[])");
   
@@ -106,7 +103,7 @@ int32_t main(int32_t argc, const char *argv[]) {
   // Leave scope
   env->leave_scope(env, scope_id);
   
-  SPVM_API_free_env(env);
+  env->free_env(env);
 
   // Free compiler
   SPVM_COMPILER_free(compiler);

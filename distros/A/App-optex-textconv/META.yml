@@ -28,32 +28,38 @@ provides:
     file: lib/App/optex/tc.pm
   App::optex::textconv:
     file: lib/App/optex/textconv.pm
-    version: '0.1401'
+    version: '1.01'
   App::optex::textconv::Converter:
     file: lib/App/optex/textconv/Converter.pm
   App::optex::textconv::default:
     file: lib/App/optex/textconv/default.pm
+  App::optex::textconv::doc:
+    file: lib/App/optex/textconv/doc.pm
+    version: '1.01'
   App::optex::textconv::msdoc:
     file: lib/App/optex/textconv/msdoc.pm
-    version: '0.1401'
+    version: '1.01'
   App::optex::textconv::ooxml:
     file: lib/App/optex/textconv/ooxml.pm
-    version: '0.1401'
+    version: '1.01'
   App::optex::textconv::ooxml::regex:
     file: lib/App/optex/textconv/ooxml/regex.pm
-    version: '0.1401'
+    version: '1.01'
   App::optex::textconv::ooxml::xslt:
     file: lib/App/optex/textconv/ooxml/xslt.pm
-    version: '0.1401'
+    version: '1.01'
   App::optex::textconv::pandoc:
     file: lib/App/optex/textconv/pandoc.pm
-    version: '0.1401'
+    version: '1.01'
   App::optex::textconv::pdf:
     file: lib/App/optex/textconv/pdf.pm
-    version: '0.1401'
+    version: '1.01'
   App::optex::textconv::tika:
     file: lib/App/optex/textconv/tika.pm
-    version: '0.1401'
+    version: '1.01'
+  App::optex::textconv::xls:
+    file: lib/App/optex/textconv/xls.pm
+    version: '1.01'
 recommends:
   XML::LibXML: '0'
   XML::LibXSLT: '0'
@@ -63,13 +69,14 @@ requires:
   Archive::Zip: '1.37'
   Encode: '0'
   List::Util: '1.45'
+  Spreadsheet::ParseExcel: '0'
   Text::Extract::Word: '0'
   perl: v5.14.0
 resources:
   bugtracker: https://github.com/kaz-utashiro/optex-textconv/issues
   homepage: https://github.com/kaz-utashiro/optex-textconv
   repository: git://github.com/kaz-utashiro/optex-textconv.git
-version: '0.1401'
+version: '1.01'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

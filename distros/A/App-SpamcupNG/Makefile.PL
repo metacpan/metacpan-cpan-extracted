@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010001;
+use 5.014004;
 
 use ExtUtils::MakeMaker;
 
@@ -17,18 +17,20 @@ my %WriteMakefileArgs = (
     "bin/spamcup"
   ],
   "LICENSE" => "gpl",
-  "MIN_PERL_VERSION" => "5.010001",
+  "MIN_PERL_VERSION" => "5.014004",
   "NAME" => "App::SpamcupNG",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "Data::Dumper" => 0,
+    "File::Spec" => 0,
     "Getopt::Std" => 0,
     "HTML::Form" => "6.07",
     "HTML::TreeBuilder::XPath" => "0.14",
     "HTTP::Cookies" => "6.01",
+    "Hash::Util" => 0,
     "LWP::UserAgent" => "6.05",
     "Log::Log4perl" => "1.48",
-    "YAML::XS" => "0.62"
+    "YAML::XS" => "0.62",
+    "parent" => 0
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -40,7 +42,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,13 +51,13 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
-  "Data::Dumper" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "Getopt::Std" => 0,
   "HTML::Form" => "6.07",
   "HTML::TreeBuilder::XPath" => "0.14",
   "HTTP::Cookies" => "6.01",
+  "Hash::Util" => 0,
   "LWP::UserAgent" => "6.05",
   "Log::Log4perl" => "1.48",
   "Perl::Tidy::Sweetened" => "1.18",
@@ -64,7 +66,8 @@ my %FallbackPrereqs = (
   "Test::Exception" => 0,
   "Test::More" => 0,
   "YAML::XS" => "0.62",
-  "lib" => 0
+  "lib" => 0,
+  "parent" => 0
 );
 
 

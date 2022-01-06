@@ -8,6 +8,7 @@ use Getopt::Long;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 use Getopt::Long 'GetOptions';
+use File::Find 'find';
 
 use SPVM::Builder::Util;
 
@@ -42,7 +43,10 @@ unless ($optimize) {
 
 # CCFLAGS
 my $ccflags = $Config{ccflags};
-$ccflags .= ' -std=c99';
+
+# SPVM is compiled as C99, but some platforms can't compile XS which contains perl.h with pure C99(-std=c99). I select -std=gnu99.
+$ccflags .= ' -std=gnu99';
+
 # I want to print warnings, but if gcc version is different, can't suppress no needed warning message.
 # so I dicide not to print warning in release version
 if ($ENV{SPVM_TEST_ENABLE_WARNINGS}) {
@@ -53,8 +57,7 @@ if ($ENV{SPVM_TEST_ENABLE_WARNINGS}) {
 my $inc = '-Ilib/SPVM/Builder/include';
 
 # Source files
-my @csource_files = qw(
-  SPVM.c
+my @spvm_csource_files = qw(
   lib/SPVM/Builder/src/spvm_allow.c
   lib/SPVM/Builder/src/spvm_api.c
   lib/SPVM/Builder/src/spvm_array_field_access.c
@@ -65,7 +68,7 @@ my @csource_files = qw(
   lib/SPVM/Builder/src/spvm_class.c
   lib/SPVM/Builder/src/spvm_class_var_access.c
   lib/SPVM/Builder/src/spvm_class_var.c
-  lib/SPVM/Builder/src/spvm_compiler_allocator.c
+  lib/SPVM/Builder/src/spvm_allocator.c
   lib/SPVM/Builder/src/spvm_compiler.c
   lib/SPVM/Builder/src/spvm_constant.c
   lib/SPVM/Builder/src/spvm_csource_builder_precompile.c
@@ -89,11 +92,15 @@ my @csource_files = qw(
   lib/SPVM/Builder/src/spvm_toke.c
   lib/SPVM/Builder/src/spvm_type.c
   lib/SPVM/Builder/src/spvm_use.c
-  lib/SPVM/Builder/src/spvm_util_allocator.c
   lib/SPVM/Builder/src/spvm_var.c
   lib/SPVM/Builder/src/spvm_yacc.c
   lib/SPVM/Builder/src/spvm_yacc_util.c
 );
+my @csource_files = ('SPVM.c', @spvm_csource_files);
+
+# Header files(This is only used to resolve dependencies)
+my @spvm_header_files = glob 'lib/SPVM/Builder/include/*.h';
+my @header_files = ('ppport.h', @spvm_header_files);
 
 WriteMakefile(
     NAME              => 'SPVM',
@@ -106,6 +113,7 @@ WriteMakefile(
     CCFLAGS => $ccflags,
     OPTIMIZE => $optimize,
     C => [@csource_files],
+    H => [@header_files],
     OBJECT            => '$(O_FILES)', # link all the C files too
     INC => $inc,
     test => {TESTS => 't/*.t t/*/*.t t/*/*/*.t'},
@@ -121,21 +129,19 @@ WriteMakefile(
             },
         },
     },
+    EXE_FILES => ['script/spvmcc'],
     PREREQ_PM => {
         'ExtUtils::CBuilder' => '0.2602',
     },
 );
 
-# Create precompile test
-my $create_precompile_test_cmd = 'perl t/copy_default_to_precompile.pl';
-system($create_precompile_test_cmd) == 0
-  or die "Can't execute $create_precompile_test_cmd: $!";
-
 # Add Build shared library make rule
 sub MY::postamble {
-
+  
+  # The content of Makefile
   my $make_rule = '';
   
+  # Compile native and precompile codes of standard modules
   unless (grep { $_ eq '-DSPVM_DONT_COMPILE_CORE_MODULES' } @defines) {
     # Native compile make rule
     $make_rule .= SPVM::Builder::Util::create_make_rule_native('Fn');
@@ -158,6 +164,24 @@ sub MY::postamble {
     $make_rule .= SPVM::Builder::Util::create_make_rule_precompile('Unicode');
     $make_rule .= SPVM::Builder::Util::create_make_rule_precompile('Regex');
   }
+  
+  # Create precompile tests
+  my @test_files;
+  find(
+    sub {
+      if (-f $File::Find::name) {
+        my $rel_path = $File::Find::name;
+        $rel_path =~ s|^\Q$FindBin::Bin/||;
+        if ($rel_path =~ /(\.t|\.pm|\.spvm|\.c|\.cpp|\.h)$/) {
+          push @test_files, $rel_path;
+        }
+      }
+    },
+    "$FindBin::Bin/t/default"
+  );
+  my $test_files_str = join(' ', @test_files);
+  $make_rule .= "dynamic :: $test_files_str\n";
+  $make_rule .= "\tperl t/copy_default_to_precompile.pl\n";
   
   return $make_rule;
 }

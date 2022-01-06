@@ -17,6 +17,7 @@ sub Main() {
             : 0
     );
     Term_CLI_Argument_test->runtests();
+    return;
 }
 
 package Term_CLI_Argument_test {
@@ -42,6 +43,7 @@ sub startup : Test(startup => 1) {
 
     isa_ok( $arg, 'Term::CLI::Argument', 'Term::CLI::Argument->new' );
     $self->{arg} = $arg;
+    return;
 }
 
 sub check_attributes: Test(2) {
@@ -49,6 +51,7 @@ sub check_attributes: Test(2) {
     my $arg = $self->{arg};
     is( $arg->name, $ARG_NAME, "name attribute is $ARG_NAME" );
     is( $arg->type, 'GENERIC', "type attribute is GENERIC" );
+    return;
 }
 
 sub check_occur: Test(8) {
@@ -78,6 +81,7 @@ sub check_occur: Test(8) {
     ($min_occur, $max_occur) = $arg->occur;
     is($min_occur, 9, 'min_occur after occur(9) is 9');
     is($max_occur, 9, 'max_occur after occur(9) is 9');
+    return;
 }
 
 sub check_validate: Test(8) {
@@ -108,6 +112,7 @@ sub check_validate: Test(8) {
 
     is ( $arg->error, '',
         "error is cleared on successful validation" );
+    return;
 }
 
 }

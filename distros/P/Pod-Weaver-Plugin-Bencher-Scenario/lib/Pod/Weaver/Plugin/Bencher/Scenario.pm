@@ -3,7 +3,7 @@ package Pod::Weaver::Plugin::Bencher::Scenario;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-07-31'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-Bencher-Scenario'; # DIST
-our $VERSION = '0.250'; # VERSION
+our $VERSION = '0.252'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -247,7 +247,7 @@ sub _process_bencher_scenario_or_acme_cpanmodules_module {
                     my $cres = convert_args_to_argv(args => $res->{args}, meta => $meta);
                     $self->log_fatal(["Invalid sample_bench[$i] specification: invalid args: %s - %s", $cres->[0], $cres->[1]])
                         unless $cres->[0] == 200;
-                    my $cmd = "C<< bencher ".($is_cpanmodules ? "--cpanmodules-module $cpanmodules_name" : "-m $scenario_name")." ".join(" ", map {shell_quote($_)} @{$cres->[2]})." >>";
+                    my $cmd = "bencher ".($is_cpanmodules ? "--cpanmodules-module $cpanmodules_name" : "-m $scenario_name")." ".join(" ", map {shell_quote($_)} @{$cres->[2]});
                     $res->{cmdline} = $cmd;
                 } elsif ($res->{file}) {
                     $res->{result} = decode_json(read_text($res->{file}));
@@ -271,8 +271,12 @@ sub _process_bencher_scenario_or_acme_cpanmodules_module {
 
         my $i = -1;
         my $first_run_on;
+        my $sample_bench_num = 0;
         for my $bench (@$sample_benches) {
             $i++;
+            $sample_bench_num++;
+
+            push @pod, "=head2 Sample benchmark #$sample_bench_num\n\n";
 
             my $bench_res;
             if ($bench->{result}) {
@@ -339,6 +343,9 @@ sub _process_bencher_scenario_or_acme_cpanmodules_module {
         } # for sample_benches
 
         if ($self->bench_startup && @modules && !$scenario->{module_startup}) {
+            $sample_bench_num++;
+            push @pod, "=head2 Sample benchmark #$sample_bench_num\n\n";
+
             $self->log(["Running module_startup benchmark of scenario $package"]);
             my $bench_res2 = Bencher::Backend::bencher(
                 action => 'bench',
@@ -349,7 +356,8 @@ sub _process_bencher_scenario_or_acme_cpanmodules_module {
             $fres = Bencher::Backend::format_result($bench_res2);
             $fres =~ s/^/ /gm;
             $table_num++;
-            push @pod, "Benchmark module startup overhead (C<< bencher ".($is_cpanmodules ? "--cpanmodules-module $cpanmodules_name" : "-m $scenario_name")." --module-startup >>):\n\n";
+            push @pod, "Benchmark command (benchmarking module startup overhead):\n\n";
+            push @pod, " % bencher ".($is_cpanmodules ? "--cpanmodules-module $cpanmodules_name" : "-m $scenario_name")." --module-startup\n\n";
             push @pod, "Result formatted as table:\n\n";
             push @pod, " #table$table_num#\n", $fres, "\n\n";
             {
@@ -676,7 +684,7 @@ Pod::Weaver::Plugin::Bencher::Scenario - Plugin to use when building Bencher::Sc
 
 =head1 VERSION
 
-This document describes version 0.250 of Pod::Weaver::Plugin::Bencher::Scenario (from Perl distribution Pod-Weaver-Plugin-Bencher-Scenario), released on 2021-07-31.
+This document describes version 0.252 of Pod::Weaver::Plugin::Bencher::Scenario (from Perl distribution Pod-Weaver-Plugin-Bencher-Scenario), released on 2021-07-31.
 
 =head1 SYNOPSIS
 
@@ -762,10 +770,10 @@ already excluded.
 
 =head2 sample_bench+ => hash
 
-Add a sample benchmark. Value is a hash which can contain these keys: C<title>
-(specify title for the benchmark), C<args> (hash arguments for bencher()) or
-C<file> (instead of running bencher(), use the result from JSON file). Can be
-specified multiple times.
+Add a sample benchmark. Value is a hash which can contain these keys:
+C<cmdline_comment> (specify commenttitle for the benchmark command), C<args>
+(hash arguments for bencher()) or C<file> (instead of running bencher(), use the
+result from JSON file). Can be specified multiple times.
 
 =head2 bench => bool (default: 1)
 

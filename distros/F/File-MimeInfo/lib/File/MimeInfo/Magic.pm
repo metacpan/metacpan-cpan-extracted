@@ -17,7 +17,7 @@ BEGIN {
 our @ISA = qw(Exporter File::MimeInfo);
 our @EXPORT = qw(mimetype);
 our @EXPORT_OK = qw(extensions describe globs inodetype magic);
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 our $DEBUG;
 
 our $_hashed = 0;
@@ -343,7 +343,7 @@ and will cause a warning.
 =head1 AUTHOR
 
 Jaap Karssenberg E<lt>pardus@cpan.orgE<gt>
-Maintained by Michiel Beijen E<lt>michiel.beijen@gmail.comE<gt>
+Maintained by Michiel Beijen E<lt>mb@x14.nlE<gt>
 
 =head1 COPYRIGHT
 

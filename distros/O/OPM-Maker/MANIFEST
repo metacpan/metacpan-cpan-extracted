@@ -80,3 +80,4 @@ t/valid/SecondSMTP/SecondSMTP.sopm
 t/valid/TestSMTP/Kernel/Config/Files/TestSMTP.xml
 t/valid/TestSMTP/Kernel/System/Email.pm
 t/valid/TestSMTP/TestSMTP.sopm
+t/valid/deps/SecondSMTP-0.0.1.opm

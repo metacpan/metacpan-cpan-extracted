@@ -10,7 +10,7 @@ use Text::ANSITable;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-08-27'; # DATE
 our $DIST = 'Text-ANSITable'; # DIST
-our $VERSION = '0.606'; # VERSION
+our $VERSION = '0.607'; # VERSION
 
 binmode(STDOUT, ":encoding(utf8)");
 
@@ -66,7 +66,7 @@ ansitable-list-border-styles - List available border styles for Text::ANSITable
 
 =head1 VERSION
 
-This document describes version 0.606 of ansitable-list-border-styles (from Perl distribution Text-ANSITable), released on 2021-08-27.
+This document describes version 0.607 of ansitable-list-border-styles (from Perl distribution Text-ANSITable), released on 2021-08-27.
 
 =head1 SYNOPSIS
 
@@ -75,107 +75,111 @@ This document describes version 0.606 of ansitable-list-border-styles (from Perl
 Sample output:
 
  Tip: you can run me with border style name as argument to try it out.
- .-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------.
- | Name                                        Summary                                                                                                      box_chars?   utf8? |
- |                                                                                                                                                                             |
- | ASCII::None                                 No borders, but data row separator is still drawn using dashes                                                   N          N   |
- | ASCII::SingleLine                           Single line border with ASCII characters                                                                         N          N   |
- | ASCII::SingleLineDoubleAfterHeader          Just like ASCII::SingleLine but uses double line to separate header row and first data row                       N          N   |
- | ASCII::SingleLineHorizontalOnly             Single line border with ASCII characters, horizontal only                                                        N          N   |
- | ASCII::SingleLineInnerOnly                  Single line border with ASCII characters, between columns only                                                   N          N   |
- | ASCII::SingleLineOuterOnly (*)              Single line border with ASCII characters, outer borders only                                                     N          N   |
- | ASCII::SingleLineVerticalOnly               Single line border with ASCII characters, vertical only                                                          N          N   |
- | ASCII::Space                                Space as borders, but data row separator is still drawn using dashes                                             N          N   |
- | ASCII::SpaceInnerOnly                       No borders, but columns are still separated using spaces and data row separator is still drawn using             N          N   |
- |                                             dashes                                                                                                                          |
- | BoxChar::None                               No borders, but data row separator is still drawn using horizontal line                                          Y          N   |
- | BoxChar::SingleLine                         Single line border with box-drawing characters                                                                   Y          N   |
- | BoxChar::SingleLineHorizontalOnly           Single line border with box-drawing characters, horizontal only                                                  Y          N   |
- | BoxChar::SingleLineInnerOnly                Single line border with box-drawing characters, between columns only                                             Y          N   |
- | BoxChar::SingleLineOuterOnly                Single line border with box-drawing characters, outer borders only                                               Y          N   |
- | BoxChar::SingleLineVerticalOnly             Single line border with box-drawing characters, vertical only                                                    Y          N   |
- | BoxChar::Space                              Space as borders, but data row separator is still drawn using horizontal line                                    Y          N   |
- | BoxChar::SpaceInnerOnly                     No borders, but columns are still separated using spaces and data row separator is still drawn using             Y          N   |
- |                                             horizontal line                                                                                                                 |
- | Test::CustomChar                            A border style that uses a single custom character                                                               N          N   |
- | Test::Random                                A border style that uses random characters                                                                       N          N   |
- | Text::ANSITable::OldCompat::Default::none   No borders, but data row separator is still drawn using dashes                                                   N          N   |
- | _ascii                                                                                                                                                                      |
- | Text::ANSITable::OldCompat::Default::none   No borders, but data row separator is still drawn using horizontal line                                          Y          N   |
- | _boxchar                                                                                                                                                                    |
- | Text::ANSITable::OldCompat::Default::sing   Single line border with ASCII characters                                                                         N          N   |
- | le_ascii                                                                                                                                                                    |
- | Text::ANSITable::OldCompat::Default::sing   Single line border with box-drawing characters                                                                   Y          N   |
- | le_boxchar                                                                                                                                                                  |
- | Text::ANSITable::OldCompat::Default::sing   Single line border with ASCII characters, horizontal only                                                        N          N   |
- | leh_ascii                                                                                                                                                                   |
- | Text::ANSITable::OldCompat::Default::sing   Single line border with box-drawing characters, horizontal only                                                  Y          N   |
- | leh_boxchar                                                                                                                                                                 |
- | Text::ANSITable::OldCompat::Default::sing   Single line border with ASCII characters, between columns only                                                   N          N   |
- | lei_ascii                                                                                                                                                                   |
- | Text::ANSITable::OldCompat::Default::sing   Single line border with box-drawing characters, between columns only                                             Y          N   |
- | lei_boxchar                                                                                                                                                                 |
- | Text::ANSITable::OldCompat::Default::sing   Single line border with ASCII characters, outer borders only                                                     N          N   |
- | leo_ascii                                                                                                                                                                   |
- | Text::ANSITable::OldCompat::Default::sing   Single line border with box-drawing characters, outer borders only                                               Y          N   |
- | leo_boxchar                                                                                                                                                                 |
- | Text::ANSITable::OldCompat::Default::sing   Single line border with ASCII characters, vertical only                                                          N          N   |
- | lev_ascii                                                                                                                                                                   |
- | Text::ANSITable::OldCompat::Default::sing   Single line border with box-drawing characters, vertical only                                                    Y          N   |
- | lev_boxchar                                                                                                                                                                 |
- | Text::ANSITable::OldCompat::Default::spac   Space as borders, but data row separator is still drawn using dashes                                             N          N   |
- | e_ascii                                                                                                                                                                     |
- | Text::ANSITable::OldCompat::Default::spac   Space as borders, but data row separator is still drawn using horizontal line                                    Y          N   |
- | e_boxchar                                                                                                                                                                   |
- | Text::ANSITable::OldCompat::Default::spac   No borders, but columns are still separated using spaces and data row separator is still drawn using             N          N   |
- | ei_ascii                                    dashes                                                                                                                          |
- | Text::ANSITable::OldCompat::Default::spac   No borders, but columns are still separated using spaces and data row separator is still drawn using             Y          N   |
- | ei_boxchar                                  horizontal line                                                                                                                 |
- | Test::Labeled                               A border style that uses labeled characters as described in specification, to show which character goes          N          Y   |
- |                                             where                                                                                                                           |
- +-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
- | Text::ANSITable::OldCompat::Default::bold   Bold single-line border with UTF8 characters                                                                     N          Y   |
- | Text::ANSITable::OldCompat::Default::bric   Single-line, bold on bottom right to give illusion of depth                                                      N          Y   |
- | k                                                                                                                                                                           |
- | Text::ANSITable::OldCompat::Default::bric   Single-line (outer only), bold on bottom right to give illusion of depth                                         N          Y   |
- | ko                                                                                                                                                                          |
- | Text::ANSITable::OldCompat::Default::csin   Single-line border with UTF8 characters, curved edges                                                            N          Y   |
- | gle                                                                                                                                                                         |
- | Text::ANSITable::OldCompat::Default::doub   Double-line border with UTF8 characters                                                                          N          Y   |
- | le                                                                                                                                                                          |
- | Text::ANSITable::OldCompat::Default::none   No borders, but data row separator is still drawn using horizontal line                                          N          Y   |
- | _utf8                                                                                                                                                                       |
- | Text::ANSITable::OldCompat::Default::sing   Single-line border with UTF8 characters                                                                          N          Y   |
- | le_utf8                                                                                                                                                                     |
- | Text::ANSITable::OldCompat::Default::sing   Single line border with box-drawing characters, horizontal only                                                  N          Y   |
- | leh_utf8                                                                                                                                                                    |
- | Text::ANSITable::OldCompat::Default::sing   Single line border with UTF8 characters, between columns only                                                    N          Y   |
- | lei_utf8                                                                                                                                                                    |
- | Text::ANSITable::OldCompat::Default::sing   Single line border with UTF8 characters, outer borders only                                                      N          Y   |
- | leo_utf8                                                                                                                                                                    |
- | Text::ANSITable::OldCompat::Default::sing   Single line border with UTF8 characters, vertical only                                                           N          Y   |
- | lev_utf8                                                                                                                                                                    |
- | Text::ANSITable::OldCompat::Default::spac   Space as borders, but data row separator is still drawn using horizontal line                                    N          Y   |
- | e_utf8                                                                                                                                                                      |
- | Text::ANSITable::OldCompat::Default::spac   No borders, but columns are still separated using spaces and data row separator is still drawn using             N          Y   |
- | ei_utf8                                     horizontal line                                                                                                                 |
- | UTF8::Brick                                 Single-line, bold on bottom right to give illusion of depth                                                      N          Y   |
- | UTF8::BrickOuterOnly                        Single-line (outer only), bold on bottom right to give illusion of depth                                         N          Y   |
- | UTF8::DoubleLine                            Double-line border with UTF8 characters                                                                          N          Y   |
- | UTF8::None                                  No borders, but data row separator is still drawn using horizontal line                                          N          Y   |
- | UTF8::SingleLine                            Single-line border with UTF8 characters                                                                          N          Y   |
- | UTF8::SingleLineBold                        Bold single-line border with UTF8 characters                                                                     N          Y   |
- | UTF8::SingleLineBoldHeader                  Single-line border (header box bold) with UTF8 characters                                                        N          Y   |
- | UTF8::SingleLineCurved                      Single-line border with UTF8 characters, curved edges                                                            N          Y   |
- | UTF8::SingleLineDoubleAfterHeader           Just like UTF8::SingleLine but uses double line to separate header row and first data row                        N          Y   |
- | UTF8::SingleLineHorizontalOnly              Single line border with box-drawing characters, horizontal only                                                  N          Y   |
- | UTF8::SingleLineInnerOnly                   Single line border with UTF8 characters, between columns only                                                    N          Y   |
- | UTF8::SingleLineOuterOnly                   Single line border with UTF8 characters, outer borders only                                                      N          Y   |
- | UTF8::SingleLineVerticalOnly                Single line border with UTF8 characters, vertical only                                                           N          Y   |
- | UTF8::Space                                 Space as borders, but data row separator is still drawn using horizontal line                                    N          Y   |
- | UTF8::SpaceInnerOnly                        No borders, but columns are still separated using spaces and data row separator is still drawn using             N          Y   |
- |                                             horizontal line                                                                                                                 |
- `-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------'
+ .-----------------------------------------------------------------------------------------------------------------------------------------------------------.
+ | Name                               Summary                                                                                             box_chars?   utf8? |
+ |                                                                                                                                                           |
+ | ASCII::None                        No borders, but data row separator is still drawn using dashes                                          N          N   |
+ | ASCII::SingleLine                  Single line border with ASCII characters                                                                N          N   |
+ | ASCII::SingleLineDoubleAfterHead   Just like ASCII::SingleLine but uses double line to separate header row and first data row              N          N   |
+ | er                                                                                                                                                        |
+ | ASCII::SingleLineHorizontalOnly    Single line border with ASCII characters, horizontal only                                               N          N   |
+ | ASCII::SingleLineInnerOnly         Single line border with ASCII characters, between columns only                                          N          N   |
+ | ASCII::SingleLineOuterOnly (*)     Single line border with ASCII characters, outer borders only                                            N          N   |
+ | ASCII::SingleLineVerticalOnly      Single line border with ASCII characters, vertical only                                                 N          N   |
+ | ASCII::Space                       Space as borders, but data row separator is still drawn using dashes                                    N          N   |
+ | ASCII::SpaceInnerOnly              No borders, but columns are still separated using spaces and data row separator is still drawn          N          N   |
+ |                                    using dashes                                                                                                           |
+ | BoxChar::None                      No borders, but data row separator is still drawn using horizontal line                                 Y          N   |
+ | BoxChar::SingleLine                Single line border with box-drawing characters                                                          Y          N   |
+ | BoxChar::SingleLineHorizontalOnl   Single line border with box-drawing characters, horizontal only                                         Y          N   |
+ | y                                                                                                                                                         |
+ | BoxChar::SingleLineInnerOnly       Single line border with box-drawing characters, between columns only                                    Y          N   |
+ | BoxChar::SingleLineOuterOnly       Single line border with box-drawing characters, outer borders only                                      Y          N   |
+ | BoxChar::SingleLineVerticalOnly    Single line border with box-drawing characters, vertical only                                           Y          N   |
+ | BoxChar::Space                     Space as borders, but data row separator is still drawn using horizontal line                           Y          N   |
+ | BoxChar::SpaceInnerOnly            No borders, but columns are still separated using spaces and data row separator is still drawn          Y          N   |
+ |                                    using horizontal line                                                                                                  |
+ | Test::CustomChar                   A border style that uses a single custom character                                                      N          N   |
+ | Test::Random                       A border style that uses random characters                                                              N          N   |
+ | Text::ANSITable::OldCompat::Defa   No borders, but data row separator is still drawn using dashes                                          N          N   |
+ | ult::none_ascii                                                                                                                                           |
+ | Text::ANSITable::OldCompat::Defa   No borders, but data row separator is still drawn using horizontal line                                 Y          N   |
+ | ult::none_boxchar                                                                                                                                         |
+ | Text::ANSITable::OldCompat::Defa   Single line border with ASCII characters                                                                N          N   |
+ | ult::single_ascii                                                                                                                                         |
+ | Text::ANSITable::OldCompat::Defa   Single line border with box-drawing characters                                                          Y          N   |
+ | ult::single_boxchar                                                                                                                                       |
+ | Text::ANSITable::OldCompat::Defa   Single line border with ASCII characters, horizontal only                                               N          N   |
+ | ult::singleh_ascii                                                                                                                                        |
+ | Text::ANSITable::OldCompat::Defa   Single line border with box-drawing characters, horizontal only                                         Y          N   |
+ | ult::singleh_boxchar                                                                                                                                      |
+ | Text::ANSITable::OldCompat::Defa   Single line border with ASCII characters, between columns only                                          N          N   |
+ | ult::singlei_ascii                                                                                                                                        |
+ | Text::ANSITable::OldCompat::Defa   Single line border with box-drawing characters, between columns only                                    Y          N   |
+ | ult::singlei_boxchar                                                                                                                                      |
+ | Text::ANSITable::OldCompat::Defa   Single line border with ASCII characters, outer borders only                                            N          N   |
+ | ult::singleo_ascii                                                                                                                                        |
+ | Text::ANSITable::OldCompat::Defa   Single line border with box-drawing characters, outer borders only                                      Y          N   |
+ | ult::singleo_boxchar                                                                                                                                      |
+ | Text::ANSITable::OldCompat::Defa   Single line border with ASCII characters, vertical only                                                 N          N   |
+ | ult::singlev_ascii                                                                                                                                        |
+ | Text::ANSITable::OldCompat::Defa   Single line border with box-drawing characters, vertical only                                           Y          N   |
+ | ult::singlev_boxchar                                                                                                                                      |
+ | Text::ANSITable::OldCompat::Defa   Space as borders, but data row separator is still drawn using dashes                                    N          N   |
+ | ult::space_ascii                                                                                                                                          |
+ | Text::ANSITable::OldCompat::Defa   Space as borders, but data row separator is still drawn using horizontal line                           Y          N   |
+ | ult::space_boxchar                                                                                                                                        |
+ | Text::ANSITable::OldCompat::Defa   No borders, but columns are still separated using spaces and data row separator is still drawn          N          N   |
+ | ult::spacei_ascii                  using dashes                                                                                                           |
+ | Text::ANSITable::OldCompat::Defa   No borders, but columns are still separated using spaces and data row separator is still drawn          Y          N   |
+ | ult::spacei_boxchar                using horizontal line                                                                                                  |
+ | Test::Labeled                      A border style that uses labeled characters as described in specification, to show which                N          Y   |
+ |                                    character goes where                                                                                                   |
+ +-----------------------------------------------------------------------------------------------------------------------------------------------------------+
+ | Text::ANSITable::OldCompat::Defa   Bold single-line border with UTF8 characters                                                            N          Y   |
+ | ult::bold                                                                                                                                                 |
+ | Text::ANSITable::OldCompat::Defa   Single-line, bold on bottom right to give illusion of depth                                             N          Y   |
+ | ult::brick                                                                                                                                                |
+ | Text::ANSITable::OldCompat::Defa   Single-line (outer only), bold on bottom right to give illusion of depth                                N          Y   |
+ | ult::bricko                                                                                                                                               |
+ | Text::ANSITable::OldCompat::Defa   Single-line border with UTF8 characters, curved edges                                                   N          Y   |
+ | ult::csingle                                                                                                                                              |
+ | Text::ANSITable::OldCompat::Defa   Double-line border with UTF8 characters                                                                 N          Y   |
+ | ult::double                                                                                                                                               |
+ | Text::ANSITable::OldCompat::Defa   No borders, but data row separator is still drawn using horizontal line                                 N          Y   |
+ | ult::none_utf8                                                                                                                                            |
+ | Text::ANSITable::OldCompat::Defa   Single-line border with UTF8 characters                                                                 N          Y   |
+ | ult::single_utf8                                                                                                                                          |
+ | Text::ANSITable::OldCompat::Defa   Single line border with box-drawing characters, horizontal only                                         N          Y   |
+ | ult::singleh_utf8                                                                                                                                         |
+ | Text::ANSITable::OldCompat::Defa   Single line border with UTF8 characters, between columns only                                           N          Y   |
+ | ult::singlei_utf8                                                                                                                                         |
+ | Text::ANSITable::OldCompat::Defa   Single line border with UTF8 characters, outer borders only                                             N          Y   |
+ | ult::singleo_utf8                                                                                                                                         |
+ | Text::ANSITable::OldCompat::Defa   Single line border with UTF8 characters, vertical only                                                  N          Y   |
+ | ult::singlev_utf8                                                                                                                                         |
+ | Text::ANSITable::OldCompat::Defa   Space as borders, but data row separator is still drawn using horizontal line                           N          Y   |
+ | ult::space_utf8                                                                                                                                           |
+ | Text::ANSITable::OldCompat::Defa   No borders, but columns are still separated using spaces and data row separator is still drawn          N          Y   |
+ | ult::spacei_utf8                   using horizontal line                                                                                                  |
+ | UTF8::Brick                        Single-line, bold on bottom right to give illusion of depth                                             N          Y   |
+ | UTF8::BrickOuterOnly               Single-line (outer only), bold on bottom right to give illusion of depth                                N          Y   |
+ | UTF8::DoubleLine                   Double-line border with UTF8 characters                                                                 N          Y   |
+ | UTF8::None                         No borders, but data row separator is still drawn using horizontal line                                 N          Y   |
+ | UTF8::SingleLine                   Single-line border with UTF8 characters                                                                 N          Y   |
+ | UTF8::SingleLineBold               Bold single-line border with UTF8 characters                                                            N          Y   |
+ | UTF8::SingleLineBoldHeader         Single-line border (header box bold) with UTF8 characters                                               N          Y   |
+ | UTF8::SingleLineCurved             Single-line border with UTF8 characters, curved edges                                                   N          Y   |
+ | UTF8::SingleLineDoubleAfterHeade   Just like UTF8::SingleLine but uses double line to separate header row and first data row               N          Y   |
+ | r                                                                                                                                                         |
+ | UTF8::SingleLineHorizontalOnly     Single line border with box-drawing characters, horizontal only                                         N          Y   |
+ | UTF8::SingleLineInnerOnly          Single line border with UTF8 characters, between columns only                                           N          Y   |
+ | UTF8::SingleLineOuterOnly          Single line border with UTF8 characters, outer borders only                                             N          Y   |
+ | UTF8::SingleLineVerticalOnly       Single line border with UTF8 characters, vertical only                                                  N          Y   |
+ | UTF8::Space                        Space as borders, but data row separator is still drawn using horizontal line                           N          Y   |
+ | UTF8::SpaceInnerOnly               No borders, but columns are still separated using spaces and data row separator is still drawn          N          Y   |
+ |                                    using horizontal line                                                                                                  |
+ `-----------------------------------------------------------------------------------------------------------------------------------------------------------'
 
 =head1 HOMEPAGE
 

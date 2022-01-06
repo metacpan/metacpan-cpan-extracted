@@ -17,6 +17,7 @@ sub Main {
             : 0
     );
     Term_CLI_Argument_Enum_test->runtests();
+    return;
 }
 
 package Term_CLI_Argument_Enum_test {
@@ -49,6 +50,7 @@ sub startup : Test(startup => 1) {
 
     isa_ok( $arg, 'Term::CLI::Argument::Enum', 'Term::CLI::Argument::Enum->new' );
     $self->{arg} = $arg;
+    return;
 }
 
 sub check_constructor: Test(1) {
@@ -58,6 +60,7 @@ sub check_constructor: Test(1) {
         { Term::CLI::Argument::Enum->new( name => $ARG_NAME) }
         qr/Missing required arguments: value_list/,
         'error on missing value_list';
+    return;
 }
 
 sub check_attributes: Test(2) {
@@ -65,6 +68,7 @@ sub check_attributes: Test(2) {
     my $arg = $self->{arg};
     is( $arg->name, $ARG_NAME, "name attribute is $ARG_NAME" );
     is( $arg->type, 'Enum', "type attribute is Enum" );
+    return;
 }
 
 sub check_complete: Test(4) {
@@ -86,6 +90,7 @@ sub check_complete: Test(4) {
     @expected = ();
     is_deeply( [$arg->complete('X')], \@expected,
         "complete returns (@expected) for 'X'");
+    return;
 }
 
 sub check_validate: Test(10) {
@@ -120,6 +125,7 @@ sub check_validate: Test(10) {
 
     is ( $arg->error, '',
         "error is cleared on successful validation" );
+    return;
 }
 
 }

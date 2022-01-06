@@ -13,7 +13,7 @@ WriteMakefile (
   'VERSION_FROM'     => 'lib/File/MimeInfo.pm',
   'LICENSE'          => 'perl',
   'MIN_PERL_VERSION' => '5.6.1',
-  'BUILD_REQUIRES'   => {
+  'PREREQ_PM'        => {
     'Carp'               => 0,
     'Exporter'           => 0,
     'Encode::Locale'     => 0,
@@ -52,11 +52,12 @@ WriteMakefile (
         'Jitka Plesnikova <jplesnik@redhat.com>',
         'Jonathan Dowland <jmtd@debian.org>',
         'Martin Vassor <martin.vassor@alumni.epfl.ch>',
-        'Michiel Beijen <michiel.beijen@gmail.com>',
+        'Michiel Beijen <mb@x14.nl>',
         'Nikos Skalkotos <skalkoto@grnet.gr>',
         'Nitish Bezzala <nbezzala@yahoo.com>',
         'Oleg Kostyuk <cub.uanic@gmail.com>',
         'Patrick Burroughs (Celti) <celti@celti.name>',
+        'Philippe Bruhat (BooK) <book@cpan.org>',
         'Rudolf Leermakers <rudolf@hatsuseno.org>',
         'Sean Smith <ssmith@ncsgraphics.com>',
         'Stefan Seifert <nine@detonation.org>',

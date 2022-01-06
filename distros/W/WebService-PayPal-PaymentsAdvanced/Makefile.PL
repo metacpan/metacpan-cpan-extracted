@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.014;
+use 5.016;
 
 use ExtUtils::MakeMaker;
 
@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
     "bin/mock-payflow-pro"
   ],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.014",
+  "MIN_PERL_VERSION" => "5.016",
   "NAME" => "WebService::PayPal::PaymentsAdvanced",
   "PREREQ_PM" => {
     "Const::Fast" => 0,
@@ -34,7 +34,6 @@ my %WriteMakefileArgs = (
     "Mojolicious::Lite" => 0,
     "Moo" => "1.004005",
     "Moo::Role" => 0,
-    "MooX::HandlesVia" => 0,
     "MooX::StrictConstructor" => 0,
     "Net::Works::Address" => 0,
     "Net::Works::Network" => 0,
@@ -70,7 +69,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.000027",
+  "VERSION" => "0.000028",
   "test" => {
     "TESTS" => "t/*.t t/PaymentsAdvanced/*.t t/PaymentsAdvanced/Mocker/*.t t/PaymentsAdvanced/Response/*.t t/PaymentsAdvanced/Response/FromSilentPOST/*.t"
   }
@@ -95,7 +94,6 @@ my %FallbackPrereqs = (
   "Mojolicious::Lite" => 0,
   "Moo" => "1.004005",
   "Moo::Role" => 0,
-  "MooX::HandlesVia" => 0,
   "MooX::StrictConstructor" => 0,
   "Mozilla::CA" => 20130114,
   "Net::Works::Address" => 0,

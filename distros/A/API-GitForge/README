@@ -7,6 +7,10 @@ scripts which make use of this interface.
 API::GitForge -- functions to create objects which do
                  API::GitForge::Role::GitForge
 
+API::GitForge::Role::GitForge -- all the generic operations against git forges
+                                 we currently support, such as forking a
+                                 repository into your own namespace
+
 git-clean-forge-fork -- create tidy forks for pull requests
 
 git-clean-forge-repo -- create repos on git forges with optional

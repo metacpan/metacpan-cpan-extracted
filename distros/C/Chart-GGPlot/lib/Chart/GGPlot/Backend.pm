@@ -5,7 +5,7 @@ package Chart::GGPlot::Backend;
 use Chart::GGPlot::Role;
 use namespace::autoclean;
 
-our $VERSION = '0.0016'; # VERSION
+our $VERSION = '0.002000'; # VERSION
 
 use Chart::GGPlot::Layout;
 use Chart::GGPlot::Built;
@@ -135,7 +135,7 @@ Chart::GGPlot::Backend - Role for backend classes for Chart::GGPlot
 
 =head1 VERSION
 
-version 0.0016
+version 0.002000
 
 =head1 DESCRIPTION
 

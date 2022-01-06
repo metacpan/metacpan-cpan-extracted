@@ -3,7 +3,7 @@
    "author" : [
       "Ben Hutton (@relequestual) <relequest@cpan.org>"
    ],
-   "dynamic_config" : 0,
+   "dynamic_config" : 1,
    "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
@@ -37,6 +37,7 @@
          },
          "requires" : {
             "Encode" : "0",
+            "ExtUtils::HasCompiler" : "0.014",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
@@ -86,6 +87,8 @@
          },
          "suggests" : {
             "Class::XSAccessor" : "0",
+            "Cpanel::JSON::XS" : "0",
+            "Ref::Util::XS" : "0",
             "Type::Tiny::XS" : "0"
          }
       },
@@ -126,6 +129,7 @@
             "Dist::Zilla::Plugin::CheckStrictVersion" : "0",
             "Dist::Zilla::Plugin::ConfirmRelease" : "0",
             "Dist::Zilla::Plugin::CopyFilesFromRelease" : "0",
+            "Dist::Zilla::Plugin::DynamicPrereqs" : "0.029",
             "Dist::Zilla::Plugin::EnsureLatestPerl" : "0",
             "Dist::Zilla::Plugin::FileFinder::ByName" : "0",
             "Dist::Zilla::Plugin::GenerateFile" : "0",
@@ -196,7 +200,7 @@
    "provides" : {
       "Test::JSON::Schema::Acceptance" : {
          "file" : "lib/Test/JSON/Schema/Acceptance.pm",
-         "version" : "1.014"
+         "version" : "1.015"
       }
    },
    "release_status" : "stable",
@@ -211,7 +215,7 @@
          "web" : "https://github.com/karenetheridge/Test-JSON-Schema-Acceptance"
       }
    },
-   "version" : "1.014",
+   "version" : "1.015",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.035007"
@@ -1138,7 +1142,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.014",
+                  "tag" : "v1.015",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
@@ -1308,6 +1312,17 @@
             },
             "name" : "TestRequires",
             "version" : "6.024"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::DynamicPrereqs",
+            "config" : {
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000037",
+                  "version" : "0.006"
+               }
+            },
+            "name" : "DynamicPrereqs",
+            "version" : "0.039"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenerateFile",

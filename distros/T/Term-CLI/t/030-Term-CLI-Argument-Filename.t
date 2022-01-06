@@ -17,6 +17,7 @@ sub Main {
             : 0
     );
     Term_CLI_Argument_Filename_test->runtests();
+    return;
 }
 
 package Term_CLI_Argument_Filename_test {
@@ -53,6 +54,7 @@ sub startup : Test(startup => 2) {
             'Term::CLI::Argument::Filename->new' );
 
     $self->{arg} = $arg;
+    return;
 }
 
 sub check_constructor: Test(1) {
@@ -62,6 +64,7 @@ sub check_constructor: Test(1) {
         { Term::CLI::Argument::Filename->new() }
         qr/Missing required arguments: name/,
         'error on missing name';
+    return;
 }
 
 sub check_attributes: Test(2) {
@@ -69,6 +72,7 @@ sub check_attributes: Test(2) {
     my $arg = $self->{arg};
     is( $arg->name, $ARG_NAME, "name attribute is $ARG_NAME" );
     is( $arg->type, 'Filename', "type attribute is Filename" );
+    return;
 }
 
 sub check_complete: Test(4) {
@@ -89,6 +93,7 @@ sub check_complete: Test(4) {
     for my $f (@fnames) {
         my $path = "$dir/testdir/$f";
         open my $fh, ">", $path || fail("cannot create $path: $!");
+        close $fh;
     }
 
     my @expected;
@@ -100,6 +105,7 @@ sub check_complete: Test(4) {
     @expected = map { "$dir/testdir/$_" } qw( two three );
     is_deeply( [sort $arg->complete("$dir/testdir/t")], [sort @expected],
         "complete returns (@expected) for '$dir/testdir/t'");
+    return;
 }
 
 }

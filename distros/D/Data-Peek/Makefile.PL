@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright PROCURA B.V. (c) 2008-2020 H.Merijn Brand
+# Copyright PROCURA B.V. (c) 2008-2022 H.Merijn Brand
 
 require 5.008001; # <- also see postamble at the bottom for META.yml
 use strict;
@@ -19,7 +19,7 @@ my %wm = (
     NAME         => "Data::Peek",
     DISTNAME     => "Data-Peek",
     ABSTRACT     => "Extended/Modified debugging utilities",
-    AUTHOR       => "H.Merijn Brand <h.merijn\@xs4all.nl>",
+    AUTHOR       => "H.Merijn Brand <hmbrand\@cpan.org>",
     VERSION_FROM => "Peek.pm",
     PREREQ_PM	 => { "XSLoader"	=> 0,
 		      "Data::Dumper"	=> 0,
@@ -165,11 +165,11 @@ See L<Data::Peek>.
 
 =head1 AUTHOR
 
-H.Merijn Brand <h.m.brand@xs4all.nl>
+H.Merijn Brand <hmbrand@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2020 H.Merijn Brand
+Copyright (C) 2008-2022 H.Merijn Brand
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

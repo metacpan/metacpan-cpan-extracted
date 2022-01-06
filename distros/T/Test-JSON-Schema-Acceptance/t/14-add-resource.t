@@ -1,6 +1,8 @@
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 use strict;
 use warnings;
+use 5.020;
+use experimental qw(signatures postderef);
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
@@ -20,12 +22,10 @@ my $accepter = Test::JSON::Schema::Acceptance->new(
 );
 
 $accepter->acceptance(
-  validate_data => sub {
-    my ($schema, $data) = @_;
+  validate_data => sub ($schema, $data) {
     return 1; # all schemas evaluate to true here
   },
-  add_resource => sub {
-    my ($uri, $schema) = @_;
+  add_resource => sub ($uri, $schema) {
     $additional_resources{$uri} = $schema;
   },
 );

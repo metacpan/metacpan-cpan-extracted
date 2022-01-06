@@ -18,31 +18,39 @@
 #
 #=============================================================================
 
-package Term::CLI::Command::Help  0.053006 {
+package Term::CLI::Command::Help 0.054002;
 
 use 5.014;
-use strict;
 use warnings;
+use version;
 
-use Pod::Text::Termcap 2.06;
 use List::Util 1.23 qw( first min );
 use File::Which 1.09;
 use Types::Standard 1.000005 qw( ArrayRef Str );
 use Getopt::Long 2.38 qw( GetOptionsFromArray );
-use Term::CLI::L10N;
+use Term::CLI::L10N qw( loc );
+
+use Pod::Text::Termcap    2.06;
+use Pod::Text::Overstrike 2.04;
+
+my $POD_PARSER_CLASS = $Pod::Text::Termcap::VERSION >= 4.11
+    ? 'Pod::Text::Termcap'
+    : 'Pod::Text::Overstrike';
 
 my @PAGERS = (
-    [qw(
-        less --no-lessopen --no-init
-        --dumb --quit-at-eof
-        --quit-if-one-screen
-    )],
-    ['more'], ['pg'],
+    [   qw(
+            less --no-lessopen --no-init
+            --dumb --quit-at-eof
+            --quit-if-one-screen
+        )
+    ],
+    ['more'],
+    ['pg'],
 );
 
 my @PAGER;
 
-if (my $pager = first { defined which($_->[0]) } @PAGERS) {
+if ( my $pager = first { defined which( $_->[0] ) } @PAGERS ) {
     @PAGER = @$pager;
 }
 
@@ -52,14 +60,12 @@ use namespace::clean 0.25;
 extends 'Term::CLI::Command';
 
 has 'pager' => (
-    is => 'rw',
-    isa => ArrayRef[Str],
+    is      => 'rw',
+    isa     => ArrayRef [Str],
     default => sub { [@PAGER] },
 );
 
-has '+name' => (
-    default => sub { 'help' }
-);
+has '+name' => ( default => sub {'help'} );
 
 has '+callback' => (
     default => sub {
@@ -70,109 +76,100 @@ has '+callback' => (
     }
 );
 
-has '+options' => (
-    default => sub { [ 'pod|p', 'all|a' ] },
-);
+has '+options' => ( default => sub { [ 'pod|p', 'all|a' ] }, );
 
 has '+description' => (
     default => sub {
-        loc(qq{Show help for any given command sequence (or a command\n}
-           .qq{overview if no argument is given.\n\n}
-           .qq{The C<--pod> (C<-p>) option will cause raw POD\n}
-           .qq{to be shown.\n\n}
-           .qq{The C<--all> (C<-a>) option will list help text for all commands.}
-       );
+        loc(      qq{Show help for any given command sequence (or a command\n}
+                . qq{overview if no argument is given.\n\n}
+                . qq{The C<--pod> (C<-p>) option will cause raw POD\n}
+                . qq{to be shown.\n\n}
+                . qq{The C<--all> (C<-a>) option will list help text for all commands.}
+        );
     }
 );
 
-has '+summary' => (
-    default => sub { loc('show help') },
-);
+has '+summary' => ( default => sub { loc('show help') }, );
 
 has '+_arguments' => (
-    default => sub { [
-        Term::CLI::Argument::String->new(
-            name => 'cmd',
-            min_occur => 0,
-            max_occur => 0,
-        )
-    ] },
+    default => sub {
+        [   Term::CLI::Argument::String->new(
+                name      => 'cmd',
+                min_occur => 0,
+                max_occur => 0,
+            )
+        ]
+    },
 );
-
 
 sub _format_pod {
     my $self = shift;
     my $text = shift;
 
     my $output;
-    my $parser = Pod::Text::Termcap->new( width => $self->term->term_width - 1 );
-    $parser->output_string(\$output);
+
+    my $parser =
+        $POD_PARSER_CLASS->new( width => $self->term->term_width - 1 );
+
+    $parser->output_string( \$output );
     $parser->parse_string_document($text);
     return $output;
 }
 
-
 # ($pod, $text) = $self->_make_command_summary( %args );
 sub _make_command_summary {
-    my ($self, %args) = @_;
+    my ( $self, %args ) = @_;
 
     my @cmd_path   = map { $_->name } @{ $args{cmd_path} };
     my $commands   = $args{commands};
     my $pod_prefix = $args{pod_prefix};
 
-    my $text = '';
+    my $text     = '';
     my $full_pod = '';
 
     my $item_length = 0;
     for my $cmd_ref (@$commands) {
-        for my $usage ($cmd_ref->usage_text(with_options => 'none')) {
-            my $item_text = join(' ',
-                (map { "B<$_>" } @cmd_path),
-                $usage
-            );
+        for my $usage ( $cmd_ref->usage_text( with_options => 'none' ) ) {
+            my $item_text = join( ' ', ( map {"B<$_>"} @cmd_path ), $usage );
             $full_pod .= "=item $item_text\n\n";
-            my $l = length($item_text =~ s/[BCEIL]<([^>]*)>/$1/gr);
+            my $l = length( $item_text =~ s/[BCEIL] < ([^>]*) >/$1/grx );
             $item_length = $l if $l > $item_length;
         }
         $full_pod .= $cmd_ref->summary;
-        $full_pod =~ s/\n*$/\n\n/s;
+        $full_pod =~ s/\n*$/\n\n/sx;
     }
 
-    my $max_over_width = int(($self->term->term_width - 4) / 2);
-    my $over_width = min($item_length+4, $max_over_width);
+    my $max_over_width = int( ( $self->term->term_width - 4 ) / 2 );
+    my $over_width     = min( $item_length + 4, $max_over_width );
 
-    $full_pod = $pod_prefix."=over $over_width\n\n$full_pod";
+    $full_pod = $pod_prefix . "=over $over_width\n\n$full_pod";
     $full_pod .= "=back\n\n";
 
     # Format POD to text, remove extraneous empty lines.
     $text = $self->_format_pod($full_pod);
-    $text =~ s/\n\n+/\n/gs;
-    $text =~ s/^\n+//;
+    $text =~ s/\n\n+/\n/gxs;
+    $text =~ s/^\n+//x;
 
-    return ($full_pod, $text);
+    return ( $full_pod, $text );
 }
 
-
 sub _get_help {
-    my ($self, %args) = @_;
-
-    my $text = '';
+    my ( $self, %args ) = @_;
 
     # Handle "--all" in a separate routine.
-    if ($args{options}->{all}) {
+    if ( $args{options}->{all} ) {
         return $self->_get_all_help(%args);
     }
 
     # Top-level help, i.e. "help" without arguments.
     # Produce a simple command summary.
-    if (@{$args{arguments}} == 0) {
-        my ($pod, $text)
-            = $self->_make_command_summary(
-                cmd_path   => [],
-                pod_prefix => "=head2 ".loc("Commands").":\n\n",
-                commands   => [$self->root_node->commands]
-            );
-        return (%args, pod => $pod, text => $text);
+    if ( @{ $args{arguments} } == 0 ) {
+        my ( $pod, $text ) = $self->_make_command_summary(
+            cmd_path   => [],
+            pod_prefix => "=head2 " . loc("Commands") . ":\n\n",
+            commands   => [ $self->root_node->commands ]
+        );
+        return ( %args, pod => $pod, text => $text );
     }
 
     # We've been given arguments to "help". Find the
@@ -181,14 +178,16 @@ sub _get_help {
     my $cur_cmd_ref = $self->root_node;
     my @cmd_ref_path;
 
-    for my $cmd_name (@{ $args{arguments} }) {
+    for my $cmd_name ( @{ $args{arguments} } ) {
         my $new_cmd_ref = $cur_cmd_ref->find_command($cmd_name);
-        if (!$new_cmd_ref) {
+        if ( !$new_cmd_ref ) {
             my @cmd_path = map { $_->name } @cmd_ref_path;
-            return (%args, status => -1,
-                error => @cmd_path > 0
-                            ? "@cmd_path: ".$cur_cmd_ref->error
-                            : $cur_cmd_ref->error
+            return (
+                %args,
+                status => -1,
+                error  => @cmd_path > 0
+                ? "@cmd_path: " . $cur_cmd_ref->error
+                : $cur_cmd_ref->error
             );
         }
         push @cmd_ref_path, $new_cmd_ref;
@@ -197,132 +196,127 @@ sub _get_help {
 
     my $pod = $self->_get_help_cmd(
         cmd_path => \@cmd_ref_path,
-        style => 'head1',
+        style    => 'head1',
     );
 
-    $pod =~ s/\n*$/\n\n/s;
+    $pod =~ s/\n*$/\n\n/sx;
 
     my $pod2txt = $self->_format_pod($pod);
 
     # Only list sub-commands if there are more than one.
-    if (scalar($cur_cmd_ref->commands) > 1) {
-        my ($cmd_pod, $cmd_text) =
-            $self->_make_command_summary(
-                cmd_path => \@cmd_ref_path,
-                pod_prefix => "=head2 ".loc("Sub-Commands").":\n\n",
-                commands => [$cur_cmd_ref->commands],
-            );
-        $pod .= $cmd_pod;
+    if ( scalar( $cur_cmd_ref->commands ) > 1 ) {
+        my ( $cmd_pod, $cmd_text ) = $self->_make_command_summary(
+            cmd_path   => \@cmd_ref_path,
+            pod_prefix => "=head2 " . loc("Sub-Commands") . ":\n\n",
+            commands   => [ $cur_cmd_ref->commands ],
+        );
+        $pod     .= $cmd_pod;
         $pod2txt .= $cmd_text;
     }
 
     # Play fast and loose with the POD formatter output.
     # Remove leading and trailing newlines.
-    $pod2txt =~ s/^\n+//s;
-    $pod2txt =~ s/\n+$//s;
-    $text .= "$pod2txt\n";
+    $pod2txt =~ s/^\n+//sx;
+    $pod2txt =~ s/\n+$//sx;
 
-    return (%args, pod => $pod, text => $text);
+    return ( %args, pod => $pod, text => $pod2txt . "\n" );
 }
 
-
 sub _get_help_cmd {
-    my ($self, %args) = @_;
+    my ( $self, %args ) = @_;
 
-    my $style = $args{style} // 'item';
-    my @cmd_path = @{$args{cmd_path}};
+    my $style    = $args{style} // 'item';
+    my @cmd_path = @{ $args{cmd_path} };
 
-    my $cmd = $cmd_path[$#cmd_path];
+    my $cmd = $cmd_path[-1];
 
-    my $usage_prefix = join(' ',
-        map { $_->usage_text(with_options => 'none', with_subcommands => 0) }
-        @cmd_path[0..$#cmd_path-1]
+    my $usage_prefix = join(
+        ' ',
+        map {
+            $_->usage_text( with_options => 'none', with_subcommands => 0 )
+        } @cmd_path[ 0 .. $#cmd_path - 1 ]
     );
 
     $usage_prefix .= ' ' if length $usage_prefix;
 
     my $pod;
 
-    if ($style =~ /head/) {
-        $pod .= "=$style ".loc("Usage").":\n\n";
+    if ( $style =~ /head/ ) {
+        $pod .= "=$style " . loc("Usage") . ":\n\n";
     }
 
-    for my $usage ($cmd->usage_text(with_options => 'both')) {
+    for my $usage ( $cmd->usage_text( with_options => 'both' ) ) {
         $pod .= "=item " if $style eq 'item';
         $pod .= "$usage_prefix$usage\n\n";
     }
 
-    $pod =~ s/\n*$//s;
+    $pod =~ s/\n*$//sx;
     $pod .= "\n\n";
 
-    my $description = ($cmd->description || $cmd->summary);
+    my $description = ( $cmd->description || $cmd->summary );
     if ($description) {
-        $pod .= "=$style ".loc("Description").":\n\n" if $style =~ /head/;
+        $pod .= "=$style " . loc("Description") . ":\n\n" if $style =~ /head/;
         $pod .= $description;
     }
 
-    $pod =~ s/\n*$/\n\n/s;
+    $pod =~ s/\n*$/\n\n/sx;
 
     return $pod;
 }
 
-
 sub _get_help_all_commands {
-    my ($self, %args) = @_;
+    my ( $self, %args ) = @_;
 
     my @cmd_path = @{ $args{cmd_path} // [] };
-    my $cmd = $cmd_path[$#cmd_path] // $self->root_node;
+    my $cmd      = $cmd_path[-1] // $self->root_node;
 
     my $pod = '';
 
-    if ($cmd->has_commands) {
-        for my $command ($cmd->commands) {
+    if ( $cmd->has_commands ) {
+        for my $command ( $cmd->commands ) {
             $pod .= $self->_get_help_all_commands(
-                cmd_path => [@cmd_path, $command]
-            );
+                cmd_path => [ @cmd_path, $command ] );
         }
         return $pod;
     }
 
-    return $self->_get_help_cmd(cmd_path => \@cmd_path);
+    return $self->_get_help_cmd( cmd_path => \@cmd_path );
 }
 
-
 sub _get_all_help {
-    my ($self, %args) = @_;
+    my ( $self, %args ) = @_;
 
-    my ($pod1, $txt1)
-        = $self->_make_command_summary(
-            cmd_path   => [],
-            pod_prefix => "=head1 ".loc("COMMAND SUMMARY")."\n\n",
-            commands   => [$self->root_node->commands]
-        );
+    my ( $pod1, $txt1 ) = $self->_make_command_summary(
+        cmd_path   => [],
+        pod_prefix => "=head1 " . loc("COMMAND SUMMARY") . "\n\n",
+        commands   => [ $self->root_node->commands ]
+    );
 
-    my $pod2 .= "\n=head1 ".loc("COMMANDS")."\n\n"
-         . "=over\n\n"
-         . $self->_get_help_all_commands()
-         . "=back\n"
-         ;
+    my $pod2 =
+          "\n=head1 "
+        . loc("COMMANDS") . "\n\n"
+        . "=over\n\n"
+        . $self->_get_help_all_commands()
+        . "=back\n";
 
     my $txt2 = $self->_format_pod($pod2);
 
     # Play fast and loose with the POD formatter output.
     # Remove leading and trailing newlines.
-    $txt2 =~ s/^\n+//s;
-    $txt2 =~ s/\n+$//s;
+    $txt2 =~ s/^\n+//sx;
+    $txt2 =~ s/\n+$//sx;
     $txt2 .= "\n";
 
-    return (%args, pod => $pod1.$pod2, text => "$txt1\n$txt2");
+    return ( %args, pod => $pod1 . $pod2, text => "$txt1\n$txt2" );
 }
 
-
 sub complete_line {
-    my ($self, @words) = @_;
+    my ( $self, @words ) = @_;
 
-    my $partial = $words[$#words] // '';
+    my $partial = $words[-1] // '';
 
     # uncoverable branch false
-    if ($self->has_options) {
+    if ( $self->has_options ) {
 
         Getopt::Long::Configure(qw(bundling require_order pass_through));
 
@@ -330,31 +324,36 @@ sub complete_line {
 
         my %parsed_opts;
 
-        my $has_terminator = first { $_ eq '--' } @words[0..$#words-1];
+        my $has_terminator = first { $_ eq '--' } @words[ 0 .. $#words - 1 ];
 
-        eval { GetOptionsFromArray(\@words, \%parsed_opts, @$opt_specs) };
+        ## no critic (RequireCheckingReturnValueOfEval)
+        eval { GetOptionsFromArray( \@words, \%parsed_opts, @$opt_specs ) };
 
-        if (!$has_terminator && @words <= 1 && $partial =~ /^-/) {
+        if ( !$has_terminator && @words <= 1 && $partial =~ /^-/x ) {
+
             # We have to complete a command-line option.
-            return grep { rindex($_, $partial, 0) == 0 } $self->option_names;
+            return
+                grep { rindex( $_, $partial, 0 ) == 0 } $self->option_names;
         }
     }
 
     my $cur_cmd_ref = $self->root_node;
     while (@words) {
-        my $new_cmd_ref = $cur_cmd_ref->find_command($words[0]);
-        if (!$new_cmd_ref) {
+        my $new_cmd_ref = $cur_cmd_ref->find_command( $words[0] );
+        if ( !$new_cmd_ref ) {
             last;
         }
         shift @words;
         $cur_cmd_ref = $new_cmd_ref;
     }
 
-    if (@words == 0) {
+    if ( @words == 0 ) {
         return $cur_cmd_ref->name;
     }
-    elsif ($cur_cmd_ref->has_commands && @words == 1) {
-        return grep { rindex($_, $partial, 0) == 0 } $cur_cmd_ref->command_names;
+    if ( $cur_cmd_ref->has_commands && @words == 1 ) {
+        return
+            grep { rindex( $_, $partial, 0 ) == 0 }
+            $cur_cmd_ref->command_names;
     }
     return ();
 }
@@ -364,7 +363,7 @@ sub complete_line {
 # Callback for the builtin "help" command.
 #
 sub _execute_help {
-    my ($self, %args) = @_;
+    my ( $self, %args ) = @_;
 
     return %args if $args{status} < 0;
 
@@ -372,44 +371,45 @@ sub _execute_help {
 
     return %args if $args{status} < 0;
 
-    if ($args{options}->{pod}) {
+    if ( $args{options}->{pod} ) {
         print "\n$args{pod}";
         return %args;
     }
 
-    my $pager_fh;
     my $pager_cmd = $self->pager;
 
     if (@$pager_cmd) {
-        no warnings 'exec';
-        if (!open $pager_fh, "|-", @{$pager_cmd}) {
+        no warnings 'exec';    ## no critic (ProhibitNoWarnings)
+        local ( $SIG{PIPE} ) = 'IGNORE';    # Temporarily avoid accidents.
+
+        my $pager_fh;
+        if (! open $pager_fh, '|-', @{$pager_cmd}) {
             $args{status} = -1;
-            $args{error} = loc("cannot run '[_1]': [_2]", $$pager_cmd[0], $!);
+            $args{error} =
+                loc( "cannot run '[_1]': [_2]", $$pager_cmd[0], $! );
             return %args;
         }
 
-        local( $SIG{PIPE} ) = 'IGNORE'; # Temporarily avoid accidents.
         print $pager_fh $args{text};
-
         $pager_fh->close;
+
         $args{status} = $?;
-        $args{error} = $! if $args{status} != 0;
+        $args{error}  = $! if $args{status} != 0;
     }
     else {
-        if (!open $pager_fh, '>&', \*STDOUT) {
+        my $pager_fh;
+        if (! open $pager_fh, '>&', \*STDOUT) {
             $args{status} = -1;
-            $args{error} = "dup(STDOUT): $!";
+            $args{error}  = "cannot dup STDOUT: $!";
             return %args;
         }
         print $pager_fh $args{text};
-        if (!$pager_fh->close) {
+        if ( !$pager_fh->close ) {
             $args{status} = -1;
-            $args{error} = $!;
+            $args{error}  = $!;
         }
     }
     return %args;
-}
-
 }
 
 1;
@@ -424,7 +424,7 @@ Term::CLI::Command::Help - A generic 'help' command for Term::CLI
 
 =head1 VERSION
 
-version 0.053006
+version 0.054002
 
 =head1 SYNOPSIS
 

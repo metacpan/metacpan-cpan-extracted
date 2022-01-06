@@ -1,47 +1,29 @@
 {
-   "generated_by" : "Author",
-   "abstract" : "DBI driver for CSV files",
-   "resources" : {
-      "repository" : {
-         "type" : "git",
-         "web" : "https://github.com/perl5-dbi/DBD-CSV",
-         "url" : "https://github.com/perl5-dbi/DBD-CSV"
-         },
-      "bugtracker" : {
-         "web" : "https://github.com/perl5-dbi/DBD-CSV/issues"
-         },
-      "license" : [
-         "http://dev.perl.org/licenses/"
-         ]
-      },
+   "dynamic_config" : 1,
    "author" : [
       "Jochen Wiedmann",
       "Jeff Zucker",
       "H.Merijn Brand <h.m.brand@xs4all.nl>",
       "Jens Rehsack <rehsack@cpan.org>"
       ],
-   "version" : "0.58",
-   "meta-spec" : {
-      "version" : 2,
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
-      },
+   "name" : "DBD-CSV",
    "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "DBI" : "1.628"
+            }
+         },
       "test" : {
          "recommends" : {
-            "Test::More" : "1.302183"
+            "Test::More" : "1.302188"
             },
          "requires" : {
             "Test::Harness" : "0",
-            "Cwd" : "0",
-            "Encode" : "0",
             "charnames" : "0",
-            "Test::More" : "0.90"
-            }
-         },
-      "configure" : {
-         "requires" : {
-            "DBI" : "1.628",
-            "ExtUtils::MakeMaker" : "0"
+            "Cwd" : "0",
+            "Test::More" : "0.90",
+            "Encode" : "0"
             }
          },
       "build" : {
@@ -50,31 +32,49 @@
             }
          },
       "runtime" : {
-         "requires" : {
-            "Text::CSV_XS" : "1.01",
-            "perl" : "5.008001",
-            "SQL::Statement" : "1.405",
-            "DBD::File" : "0.42",
-            "DBI" : "1.628"
-            },
          "recommends" : {
+            "Text::CSV_XS" : "1.47",
             "SQL::Statement" : "1.414",
-            "Text::CSV_XS" : "1.45",
             "DBD::File" : "0.44",
             "DBI" : "1.643"
+            },
+         "requires" : {
+            "SQL::Statement" : "1.405",
+            "DBI" : "1.628",
+            "DBD::File" : "0.42",
+            "perl" : "5.008001",
+            "Text::CSV_XS" : "1.01"
             }
          }
       },
+   "release_status" : "stable",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+      },
+   "generated_by" : "Author",
+   "abstract" : "DBI driver for CSV files",
+   "x_installdirs" : "site",
+   "version" : "0.59",
    "license" : [
       "perl_5"
       ],
-   "name" : "DBD-CSV",
-   "x_installdirs" : "site",
-   "release_status" : "stable",
-   "dynamic_config" : 1,
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/perl5-dbi/DBD-CSV/issues"
+         },
+      "repository" : {
+         "web" : "https://github.com/perl5-dbi/DBD-CSV",
+         "type" : "git",
+         "url" : "https://github.com/perl5-dbi/DBD-CSV"
+         },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+         ]
+      },
    "provides" : {
       "DBD::CSV" : {
-         "version" : "0.58",
+         "version" : "0.59",
          "file" : "lib/DBD/CSV.pm"
          }
       }

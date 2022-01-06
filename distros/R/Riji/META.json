@@ -87,7 +87,7 @@
    "provides" : {
       "Riji" : {
          "file" : "lib/Riji.pm",
-         "version" : "v0.9.10"
+         "version" : "v1.0.0"
       },
       "Riji::CLI" : {
          "file" : "lib/Riji/CLI.pm"
@@ -134,7 +134,7 @@
          "web" : "https://github.com/Songmu/p5-Riji"
       }
    },
-   "version" : "v0.9.10",
+   "version" : "v1.0.0",
    "x_contributors" : [
       "Takuya Tsuchida <tsucchi@cpan.org>",
       "hitode909 <hitode909@gmail.com>",

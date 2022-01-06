@@ -18,10 +18,9 @@
 #
 #=============================================================================
 
-package Term::CLI::Argument::Number::Int  0.053006 {
+package Term::CLI::Argument::Number::Int 0.054002;
 
 use 5.014;
-use strict;
 use warnings;
 
 use Moo 1.000001;
@@ -30,14 +29,13 @@ use namespace::clean 0.25;
 extends 'Term::CLI::Argument::Number';
 
 sub coerce_value {
-    my $val = $_[1];
+    my ( $self, $val ) = @_;
 
-    if ($val =~ /^[+-]?\d+$/) {
+    if ( $val =~ /^ [+-]? \d+ $/xsm ) {
         return int($val);
     }
+    ## no critic (ProhibitExplicitReturnUndef)
     return undef;
-}
-
 }
 
 1;
@@ -52,7 +50,7 @@ Term::CLI::Argument::Number::Int - class for integer arguments in Term::CLI
 
 =head1 VERSION
 
-version 0.053006
+version 0.054002
 
 =head1 SYNOPSIS
 

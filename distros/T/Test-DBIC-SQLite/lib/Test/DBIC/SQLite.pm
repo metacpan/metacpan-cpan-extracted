@@ -1,132 +1,277 @@
 package Test::DBIC::SQLite;
-use v5.10.1;
-use utf8;
-use warnings;
-use strict;
+use Moo;
+with 'Test::DBIC::DBDConnector';
 
-our $VERSION = '0.01';
+our $VERSION = "1.00";
 
 use parent 'Test::Builder::Module';
+our @EXPORT = qw( connect_dbic_sqlite_ok drop_dbic_sqlite_ok );
 
-our @EXPORT = qw/ connect_dbic_sqlite_ok /;
+use Types::Standard qw( Str );
+has '+dbi_connect_info' => (
+    is      => 'ro',
+    isa     => Str,
+    default => sub {':memory:'},
+);
+
+# Keep a "singleton" around for the functional interface.
+my $_tdbc_cache;
+
+sub connect_dbic_sqlite_ok {
+    my $class = __PACKAGE__;
+    my %args = $class->validate_positional_parameters(
+        [
+            $class->parameter(schema_class      => $class->Required),
+            $class->parameter(dbi_connect_info  => $class->Optional),
+            $class->parameter(post_connect_hook => $class->Optional),
+        ],
+        \@_
+    );
+
+    # if one provides a post_connect_hook but undef for dbi_connect_info of
+    # type Maybe[Str], the default cannot kick in.
+    $args{dbi_connect_info} //= ':memory:';
+    delete($args{post_connect_hook}) if @_ < 3;
+
+    $_tdbc_cache = $class->new(%args);
+
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    my $schema = $_tdbc_cache->connect_dbic_ok();
+
+    return $schema;
+}
+
+sub drop_dbic_sqlite_ok {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    my $result = $_tdbc_cache->drop_dbic_ok();
+
+    undef($_tdbc_cache);
+
+    return $result;
+}
+
+sub drop_dbic_ok {
+    my $self = shift;
+    my $dbname = $self->dbi_connect_info;
+    my $msg = "$dbname DROPPED";
+
+    if ($dbname ne ':memory:') {
+        my $count = unlink($dbname);
+        if (not $count) {
+            $self->builder->diag("Could not unlink($dbname): $!");
+            return $self->builder->ok(0, $msg);
+        }
+    }
+    return $self->builder->ok(1, $msg);
+}
+
+sub MyDBD_connection_parameters {
+    my $self = shift;
+    $self->validate_positional_parameters(
+        [
+            $self->parameter(
+                dbi_connect_info => $self->Required,
+                { store => \my $db_name }
+            ),
+        ],
+        \@_
+    );
+
+    return [ "dbi:SQLite:dbname=$db_name" ];
+}
+
+sub MyDBD_check_wants_deploy {
+    my $self = shift;
+    $self->validate_positional_parameters(
+        [
+            $self->parameter(
+                connection_info => $self->Required,
+                { store => \my $connection_params }
+            )
+        ],
+        \@_
+    );
+
+    my ($db_name) = $connection_params->[0] =~ m{dbname=(.+)(?:;|$)};
+    my $wants_deploy = $db_name eq ':memory:'
+        ? 1
+        : ((not -f $db_name) ? 1 : 0);
+
+    return $wants_deploy;
+}
+
+around ValidationTemplates => sub {
+    my $vt = shift;
+    my $class = shift;
+
+    use Types::Standard qw( Maybe Str ArrayRef );
+
+    my $validation_templates = $class->$vt();
+    return {
+        %$validation_templates,
+        dbi_connect_info => { type => Maybe[Str], default => ':memory:' },
+        connection_info  => { type => ArrayRef },
+    };
+};
+
+use namespace::autoclean 0.16;
+1;
+
+=pod
 
 =head1 NAME
 
-Test::DBIC::SQLite - Connect and deploy a DBIx::Class::Schema on SQLite
+Test::DBIC::SQLite - Connect to and deploy a L<DBIx::Class::Schema> on SQLite
 
 =head1 SYNOPSIS
 
+The preferred way:
+
+    #! perl -w
+    use Test::More;
+    use Test::DBIC::SQLite;
+
+    my $t = Test::DBIC::SQLite->new(schema_class => 'My::Schema');
+    my $schema = $t->connect_dbic_ok();
+    ...
+    $schema->disconnect();
+    $t->drop_dbic_ok();
+    done_testing();
+
+The compatible with C<v0.01> way:
+
+    #! perl -w
     use Test::More;
     use Test::DBIC::SQLite;
     my $schema = connect_dbic_sqlite_ok('My::Schema');
+    ...
+    drop_dbic_sqlite_ok();
     done_testing();
 
 =head1 DESCRIPTION
 
-=begin hide
+This is a re-implementation of C<Test::DBIC::SQLite v0.01> that uses the
+L<Moo::Role>: L<Test::DBIC::DBDConnector>.
 
-=head2 import_extra
+It will C<import()> L<warnings> and L<strict> for you.
 
-L<Test::Builder::Module>'s way to import extra stuff, in this case enable
-L<warnings> and L<strict> in the calling scope.
+=head2 C<< Test::DBIC::SQLite->new >>
 
-=end hide
+    my $t = Test::DBIC::SQLite->new(%parameters);
+    my $schema = $t->connect_dbic_ok();
+    ...
+    $schema->disconnect();
+    $t->drop_dbic_ok();
 
-=cut
+=head3 Parameters
 
-sub import_extra {
-    strict->import();
-    warnings->import();
-}
-
-=head2 connect_dbic_sqlite_ok($class[, $dbname[, $callback]])
-
-Create an SQLite database (default in memory) and deploy the schema.
-
-=head3 Arguments
-
-Positional.
+Named, list:
 
 =over
 
-=item $class (Required)
+=item B<< C<schema_class> >> => C<$schema_class> (I<Required>)
 
 The class name of the L<DBIx::Class::Schema> to use.
 
-=item $dbname (Optional)
 
-The default is B<:memory:>, but a name for diskfile can be set here.
+=item B<< C<dbi_connect_info> >> => C<$sqlite_dbname> (I<Optional>, C<:memory:>)
 
-=item $callback (Optional)
+The default is B<C<:memory:>> which will create a temporary in-memory database.
+One can also pass a file name for a database on disk. See
+L<MyDBD_connection_parameters|/mydbd_connection_parameters>.i
 
-The callback is a codereference that is called after deploy and just before
-returning the schema instance. Usefull for populating the database.
+
+=item B<< C<pre_deploy_hook> >> => C<$pre_deploy_hook> (I<Optional>)
+
+This is an optional C<CodeRef> that will be executed right after the connection
+is established but before C<< $schema->deploy >> is called. The CodeRef will
+only be called if deploy is also needed. See
+L<MyDBD_check_wants_deploy|/mydbd_check_wants_deploy>.
+
+
+=item B<< C<post_connect_hook> >> => C<$post_connect_hook> (I<Optional>)
+
+This is an optional `CodeRef` that will be executed right after deploy (if any)
+and just before returning the schema instance. Useful for populating the
+database.
+
 
 =back
 
+=head2 C<< $td->connect_dbic_ok >>
+
+This method is inherited from L<Test::DBIC::DBDConnoctor>.
+
 =head3 Returns
 
-An initialized instance of C<$class>.
+An initialised instance of C<$schema_class>.
 
-=cut
+=head2 C<< $td->drop_dbic_ok >>
 
-sub connect_dbic_sqlite_ok {
-    my $tb = __PACKAGE__->builder;
+This method implements C<< rm $dbname >>, in order not to letter your test
+directory with left over test databases.
 
-    my ($dbic_class, $dbname, $callback) = @_;
-    $dbname ||= ':memory:';
-    $tb->note("dbname => $dbname");
+B<NOTE>: Make sure you called C<< $schema->storage->disconnect() >> first.
 
-    my $msg = "$dbname ISA $dbic_class";
+=head2 C<connect_dbic_sqlite_ok(@parameters)>
 
-    my $wants_deploy = $dbname eq ':memory:' ? 1 : 0;
-    if (! $wants_deploy) {
-        $wants_deploy = (! -f $dbname) ? 1 : 0;
-    }
-    $tb->note("wants_deploy => $wants_deploy");
+Create a SQLite3 database and deploy a dbic_schema. This function is provided
+for compatibility with C<v0.01> of this module.
+
+See L<< Test::DBIC::SQLite->new|/Test::DBIC::SQLite->new >> for further information,
+although only these 3 arguments are supported.
+
+=head3 Parameters
+
+Positional:
+
+=over
+
+=item 1. C<$schema_class> (Required)
+
+=item 2. C<$sqlite_dbname> (Optional)
+
+=item 3. C<$post_connect_hook> (Optional)
+
+=back
+
+=head2 C<drop_dbic_sqlite_ok()>
+
+This function uses the cached information of the call to C<connect_dbic_sqlite_ok()>
+and clears it after the database is dropped, using another temporary connection
+to the template database.
+
+See L<the C<drop_dbic_ok()> method|/"-td-drop_dbic_ok">.
+
+=head2 Implementation of C<MyDBD_connection_parameters>
+
+The value of the C<dbi_connect_info> parameter to the `new()`
+constructor, is passed to this method. For this I<SQLite3> implementation this is a
+single string that should contain the name of the database on disk, that can be
+accessed with C<sqlite3 (1)>. By default we use the "special" value of
+B<C<:memory:>> to create a temporary in-memory database.
+
+This method returns a list of parameters to be passed to
+C<< DBIx::Class::Schema->connect() >>. Keep in mind that the last argument
+(options-hash) will always be augmented with key-value pair: C<< skip_version => 1 >>.
+
+### Note
+
+At this moment we do not support the C<uri=file:$db_file_name?mode=rwc> style of
+I<dsn>, only the C<dbname=$db_file_name> style, as we only support
+C<$sqlite_dbname> as a single parameter.
 
 
-    eval "require $dbic_class";
-    if (my $error = $@) {
-        $tb->diag("Error loading '$dbic_class': «$error»");
-        return $tb->ok(0, $msg);
-    }
-    $tb->note("Loaded => $dbic_class");
-    my $db = eval {
-        $dbic_class->connect(
-            "dbi:SQLite:dbname=$dbname", undef, undef,
-            {$wants_deploy ? (ignore_version => 1) : ()}
-        );
-    };
-    if (my $error = $@) {
-        $tb->diag("Error connecting $dbic_class to $dbname: «$error»");
-        return $tb->ok(0, $msg);
-    }
+=head2 Implementation of C<MyDBD_check_wants_deploy>
 
-    if ($wants_deploy) {
-        eval { $db->deploy };
-        if (my $error = $@) {
-            $tb->diag("Error deploying $dbic_class to $dbname: «$error»");
-            return $tb->ok(0, $msg);
-        }
-    }
-    if (ref($callback) eq 'CODE') {
-        eval { $callback->($db) };
-        if (my $error = $@) {
-            $tb->diag("Error in callback: «$error»");
-            return $tb->ok(0, $msg);
-        }
-    }
-    $tb->is_eq(ref($db), $dbic_class, $msg);
+For in-memory databases this will always return B<true>. For databases on disk
+this will return B<true> if the file does not exist and B<false> if it does.
 
-    return $db;
-}
+=head1 AUTHOR
 
-1;
+E<copy> MMXV-MMXXI - Abe Timmerman <abeltje@cpan.org>
 
 =head1 LICENSE
-
-(c) MMXV - Abe Timmerman <abeltje@cpan.org>
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

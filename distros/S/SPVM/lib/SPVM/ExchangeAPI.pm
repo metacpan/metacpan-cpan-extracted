@@ -3,15 +3,14 @@ package SPVM::ExchangeAPI;
 use strict;
 use warnings;
 
-use Encode 'encode', 'decode';
 use Carp 'confess';
 
 sub new_byte_array_from_string {
   my ($env, $string) = @_;
   
-  my $bin = encode('UTF-8', $string);
+  utf8::encode($string);
   
-  return SPVM::ExchangeAPI::new_byte_array_from_bin($env, $bin);
+  return SPVM::ExchangeAPI::new_byte_array_from_bin($env, $string);
 }
 
 sub new_object_array {
@@ -116,19 +115,11 @@ sub new_mulnum_array_from_bin {
 sub set_exception {
   my ($env, $exception) = @_;
   
-  $exception = encode('UTF-8', $exception);
+  if (defined $exception && !ref $exception) {
+    $exception = SPVM::ExchangeAPI::new_string($env, $exception);
+  }
   
   _set_exception($env, $exception);
-}
-
-sub get_exception {
-  my ($env) = @_;
-  
-  my $exception = _get_exception($env);
-  
-  $exception = decode('UTF-8', $exception);
-  
-  return $exception;
 }
 
 # other functions is implemented in SPVM.xs

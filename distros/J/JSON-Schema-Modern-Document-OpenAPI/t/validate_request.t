@@ -18,7 +18,7 @@ use JSON::Schema::Modern::Utilities 'jsonp';
 use Test::File::ShareDir -share => { -dist => { 'JSON-Schema-Modern-Document-OpenAPI' => 'share' } };
 use constant { true => JSON::PP::true, false => JSON::PP::false };
 use HTTP::Request::Common;
-use YAML::PP;
+use YAML::PP 0.005;
 
 my $path_template = '/foo/{foo_id}/bar/{bar_id}';
 

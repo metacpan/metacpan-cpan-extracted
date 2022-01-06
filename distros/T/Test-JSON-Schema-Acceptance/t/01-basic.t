@@ -1,6 +1,8 @@
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 use strict;
 use warnings;
+use 5.020;
+use experimental qw(signatures postderef);
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
@@ -21,8 +23,7 @@ my $line;
 my $parser = SchemaParser->new;
 my $events = intercept(
   sub {
-    $accepter->acceptance(sub {
-      my ($schema, $data_string) = @_;
+    $accepter->acceptance(sub ($schema, $data_string) {
       return $parser->validate_json_string($data_string, $schema);
     # we didn't adjust level, so test appears to originate where the subref ends
     }); $line = __LINE__;

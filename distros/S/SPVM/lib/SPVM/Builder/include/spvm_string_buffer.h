@@ -2,14 +2,18 @@
 #define SPVM_STRING_BUFFER_H
 
 #include "spvm_typedecl.h"
+#include "spvm_native.h"
 
 struct spvm_string_buffer {
+  SPVM_COMPILER* compiler;
   char* buffer;
   int32_t capacity;
   int32_t length;
+  int8_t memory_block_type;
+  SPVM_ENV* env;
 };
 
-SPVM_STRING_BUFFER* SPVM_STRING_BUFFER_new(int32_t capacity);
+SPVM_STRING_BUFFER* SPVM_STRING_BUFFER_new(SPVM_COMPILER* compiler, int32_t capacity, int32_t memory_block_type, SPVM_ENV* env);
 char* SPVM_STRING_BUFFER_get_buffer(SPVM_STRING_BUFFER* string_buffer);
 void SPVM_STRING_BUFFER_maybe_extend(SPVM_STRING_BUFFER* string_buffer, int32_t new_length);
 
@@ -27,9 +31,7 @@ int32_t SPVM_STRING_BUFFER_add_char(SPVM_STRING_BUFFER* string_buffer, int8_t va
 int32_t SPVM_STRING_BUFFER_add_short(SPVM_STRING_BUFFER* string_buffer, int16_t value);
 int32_t SPVM_STRING_BUFFER_add_int(SPVM_STRING_BUFFER* string_buffer, int32_t value);
 int32_t SPVM_STRING_BUFFER_add_long(SPVM_STRING_BUFFER* string_buffer, int64_t value);
-int32_t SPVM_STRING_BUFFER_add_float(SPVM_STRING_BUFFER* string_buffer, float value);
-int32_t SPVM_STRING_BUFFER_add_double(SPVM_STRING_BUFFER* string_buffer, double value);
 
 void SPVM_STRING_BUFFER_free(SPVM_STRING_BUFFER* string_buffer);
-  
+
 #endif

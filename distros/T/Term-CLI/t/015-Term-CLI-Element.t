@@ -19,6 +19,7 @@ sub Main() {
             : 0
     );
     Term_CLI_Element_test->runtests();
+    return;
 }
 
 package Term_CLI_Element_test {
@@ -39,12 +40,14 @@ sub startup : Test(startup => 1) {
 
     isa_ok( $elt, 'Term::CLI::Element', 'Term::CLI::Element->new' );
     $self->{arg} = $elt;
+    return;
 }
 
 sub check_attributes: Test(1) {
     my $self = shift;
     my $elt = $self->{arg};
     is( $elt->name, $ELT_NAME, "name attribute is $ELT_NAME" );
+    return;
 }
 
 sub check_term: Test(3) {
@@ -60,23 +63,32 @@ sub check_term: Test(3) {
 
     #is( $t->ReadLine, 'Term::ReadLine::Gnu',
     #    'M6::CLI::ReadLine selects GNU ReadLine' );
+    return;
 }
 
-sub check_error: Test(8) {
+sub check_error: Test(10) {
     my $self = shift;
     my $elt = $self->{arg};
+
 
     ok( ! defined $elt->set_error('ERROR'), 'set_error returns undef' );
     is( $elt->error, 'ERROR', "error is ERROR");
 
+    ok( $elt->clear_error, "clear_error() returns success" );
+    is( $elt->error, '', "clear_error() -> error is ''");
+
+    $elt->set_error('ERROR');
     ok( ! defined $elt->set_error(''), "set_error('') returns undef" );
     is( $elt->error, '', "set_error('') -> error is ''");
 
+    $elt->set_error('ERROR');
     ok( ! defined $elt->set_error(), 'set_error returns undef' );
     is( $elt->error, '', "set_error() -> error is ''");
 
+    $elt->set_error('ERROR');
     ok( ! defined $elt->set_error(undef), 'set_error returns undef' );
     is( $elt->error, '', "set_error(undef) -> error is ''");
+    return;
 }
 
 sub check_complete: Test(1) {
@@ -84,6 +96,7 @@ sub check_complete: Test(1) {
     my $elt = $self->{arg};
 
     ok( ! defined $elt->complete('FOO'), 'no completions for "FOO"' );
+    return;
 }
 
 }

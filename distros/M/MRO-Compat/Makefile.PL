@@ -7,22 +7,22 @@ my %META = (
   license => 'perl_5',
   prereqs => {
     configure => { requires => {
-      'ExtUtils::MakeMaker'   => 0,
+      'ExtUtils::MakeMaker' => 0,
     } },
     test => {
       requires => {
-        'Test::More' => '0.47',
+        'Test::More'    => '0.47',
       },
     },
     runtime => {
       requires => {
-        'perl'          => 5.006,
+        'perl'          => '5.006',
       },
     },
     develop => {
       requires => {
-        'Test::Pod' => 1.14,
-        'Test::Pod::Coverage' => 1.04,
+        'Test::Pod'           => '1.14',
+        'Test::Pod::Coverage' => '1.04',
       },
     },
   },
@@ -69,6 +69,9 @@ $MM_ARGS{NO_MYMETA} = 1
   if $mymeta_broken;
 $MM_ARGS{META_ADD} = { 'meta-spec' => { version => 2 }, %META }
   unless -f 'META.yml';
+$MM_ARGS{PL_FILES} ||= {};
+$MM_ARGS{NORECURS} = 1
+  if not exists $MM_ARGS{NORECURS};
 
 for (qw(configure build test runtime)) {
   my $key = $_ eq 'runtime' ? 'PREREQ_PM' : uc $_.'_REQUIRES';

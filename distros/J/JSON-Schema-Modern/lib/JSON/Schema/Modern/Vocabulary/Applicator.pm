@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Applicator;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Applicator vocabulary
 
-our $VERSION = '0.536';
+our $VERSION = '0.539';
 
 use 5.020;
 use Moo;
@@ -575,7 +575,7 @@ JSON::Schema::Modern::Vocabulary::Applicator - Implementation of the JSON Schema
 
 =head1 VERSION
 
-version 0.536
+version 0.539
 
 =head1 DESCRIPTION
 
@@ -600,8 +600,6 @@ the equivalent Draft 2019-09 keywords, indicated in metaschemas with the URI C<h
 the equivalent Draft 7 keywords that correspond to this vocabulary and are formally specified in L<https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-validation-01#section-6>.
 
 =back
-
-=head1 SUPPORT
 
 =for stopwords OpenAPI
 

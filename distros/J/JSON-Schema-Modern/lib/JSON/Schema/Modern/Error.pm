@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Error;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains a single error from a JSON Schema evaluation
 
-our $VERSION = '0.536';
+our $VERSION = '0.539';
 
 use 5.020;
 use Moo;
@@ -75,7 +75,7 @@ JSON::Schema::Modern::Error - Contains a single error from a JSON Schema evaluat
 
 =head1 VERSION
 
-version 0.536
+version 0.539
 
 =head1 SYNOPSIS
 
@@ -134,8 +134,6 @@ L<https://json-schema.org/draft/2019-09/output/schema>, except that C<instanceLo
 C<keywordLocation> are JSON pointers, B<not> URI fragments. (See the
 C<strict_basic> L<JSON::Schema::Modern/output_format>
 if the distinction is important to you.)
-
-=head1 SUPPORT
 
 =for stopwords OpenAPI
 

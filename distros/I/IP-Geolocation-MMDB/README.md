@@ -11,7 +11,8 @@ country codes such as "DE", "FR" and "US".
 ## DEPENDENCIES
 
 Requires Alien::libmaxminddb from CPAN.  On Windows, Alien::MSYS needs to be
-installed.
+installed.  Requires Math::BigInt version 1.999807, which is distributed with
+Perl 5.28 and newer.
 
 Requires an IP to country database in the MaxMind DB file format from
 [DP-IP.com](https://db-ip.com/) or [MaxMind](https://www.maxmind.com/).
@@ -34,7 +35,7 @@ Type the following command to see the module usage information:
 
 ## LICENSE AND COPYRIGHT
 
-Copyright 2021 Andreas Vögele
+Copyright 2022 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 use parent qw(Pod::Simple);
 
@@ -302,7 +302,7 @@ CPANPLUS::Dist::Debora::Pod - Parse Pod documents
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -316,7 +316,7 @@ version 0.006
 
 =head1 DESCRIPTION
 
-This Pod::Simple subclass finds and parses files in Perl's Pod markup
+This L<Pod::Simple> subclass finds and parses files in Perl's Pod markup
 language.  Information that is not relevant for extracting descriptions and
 license information is ignored.
 
@@ -348,7 +348,7 @@ Parses the specified Pod file.
 Returns the Pod document, which is simplified for the purpose of finding
 descriptions and license information.
 
-Use Software::LicenseUtils to guess the license.
+Uses L<Software::LicenseUtils> to guess the license.
 
   my @licenses = Software::LicenseUtils->guess_license_from_pod($pod_text);
 
@@ -410,7 +410,7 @@ None.
 
 =head1 DEPENDENCIES
 
-Requires the modules Pod::Simple and Pod::Simple::Search, which are
+Requires the modules L<Pod::Simple> and L<Pod::Simple::Search>, which are
 distributed with Perl.
 
 =head1 INCOMPATIBILITIES
@@ -427,7 +427,7 @@ None known.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2021 Andreas Vögele
+Copyright 2022 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

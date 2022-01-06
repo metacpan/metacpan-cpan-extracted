@@ -10,6 +10,7 @@ Makefile.PL
 README
 dist.ini
 examples/run_all_tests
+inc/ExtUtils/HasCompiler.pm
 inc/OldShareDirFiles.pm
 lib/Test/JSON/Schema/Acceptance.pm
 share/LICENSE

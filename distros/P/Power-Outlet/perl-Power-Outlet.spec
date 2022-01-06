@@ -1,7 +1,7 @@
 %define lowername  power-outlet
 
 Name:           perl-Power-Outlet
-Version:        0.42
+Version:        0.43
 Release:        1%{?dist}
 Summary:        Control and query network attached power outlets
 License:        GPL+ or Artistic
@@ -130,7 +130,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%doc Changes LICENSE perl-Power-Outlet.spec README Todo
+%doc Changes LICENSE perl-Power-Outlet.spec README.md
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
 %{_mandir}/man1/%{lowername}.1

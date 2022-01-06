@@ -1,10 +1,11 @@
-use Test::Most tests => 6;
+#!perl
 
-use strict;
-use warnings;
+use Data::Frame::Setup;
+
+use Test2::V0;
 
 use Data::Frame::Rlike;
-use PDL;
+use PDL::Basic qw(sequence);
 
 my $N  = 42;
 my $first_x = 0;

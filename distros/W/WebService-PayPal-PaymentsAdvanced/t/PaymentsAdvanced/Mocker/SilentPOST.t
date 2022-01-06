@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More;
 
-use WebService::PayPal::PaymentsAdvanced::Mocker::SilentPOST;
+use WebService::PayPal::PaymentsAdvanced::Mocker::SilentPOST ();
 
 my $post = WebService::PayPal::PaymentsAdvanced::Mocker::SilentPOST->new(
     secure_token_id => 'FOO' );

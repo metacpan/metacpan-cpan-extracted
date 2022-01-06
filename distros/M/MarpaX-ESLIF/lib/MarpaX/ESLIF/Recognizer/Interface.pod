@@ -14,7 +14,7 @@ MarpaX::ESLIF::Recognizer::Interface - MarpaX::ESLIF's recognizer interface
 
 =head1 VERSION
 
-version 5.0.7
+version 6.0.10
 
 =head1 DESCRIPTION
 
@@ -75,6 +75,17 @@ Error reporting can be accurate up to line and column numbers when this is happe
 Returns a boolean indicating if absolute position tracking is on. This is called once at the very beginning of a recognizer lifetime.
 
 Absolute position tracking must be on if you plan to use one of the lastCompletedOffset(), lastCompletedLength() or lastCompletedLocation() recognizer methods. The information returned by these methods is not fully reliable, because ESLIF will not check if there is a turnaround with associated internal variables.
+
+=item $recognizerInterface->setRecognizer($recognizer)
+
+This method is I<not> required, and only necessary if you want to use the current recognizer instance in a callback. Recognizer callbacks all run in the interface namespace, and the current recognizer might be unknown to you if you used the L<MarpaX::ESLIF::Grammar::parse>, or ambiguous if you are sharing recognizers, using e.g. L<MarpaX::ESLIF::Recognizer::newFrom>.
+
+If the method C<setRecognizer> exists in this interface, ESLIF will call it with a special L<MarpaX::ESLIF::Recognizer> instance, that is shallowing the current recognizer.
+
+It is then advisable to do a C<getRecognizer> method to retreive the value, e:g:
+
+  sub setRecognizer { my ($self, $recognizer) = @_; $self->{recognizer} = $recognizer; }
+  sub getRecognizer { my ($self) = shift; $self->{recognizer} }
 
 =back
 

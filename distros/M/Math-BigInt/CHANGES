@@ -1,3 +1,11 @@
+1.999829 2021-12-29
+
+ * Improve methods div_scale() and round_mode() so they work better with
+   subclasses. This fixes CPAN RT #125430.
+
+ * Make div_scale() accept a Math::Big(Int|Float|Rat) object as input. This
+   fixes CPAN RT #140599.
+
 1.999828 2021-12-17
 
  * Add new methods numerator(), denominator(), and fparts().

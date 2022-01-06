@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 use parent qw(CPANPLUS::Dist::Debora::Package);
 
@@ -256,7 +256,7 @@ CPANPLUS::Dist::Debora::Package::Tar - Create tar archives
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -270,7 +270,7 @@ version 0.006
 
 =head1 DESCRIPTION
 
-This CPANPLUS::Dist::Debora::Package subclass creates tar archives from
+This L<CPANPLUS::Dist::Debora::Package> subclass creates tar archives from
 Perl distributions.
 
 =head1 SUBROUTINES/METHODS
@@ -310,7 +310,7 @@ None.
 
 =head1 DEPENDENCIES
 
-Requires the tar program and the Perl module Archive::Tar.
+Requires the tar program and the Perl module L<Archive::Tar>.
 
 =head1 INCOMPATIBILITIES
 
@@ -326,7 +326,7 @@ This module cannot be used in taint mode.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2021 Andreas Vögele
+Copyright 2022 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

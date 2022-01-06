@@ -14,7 +14,7 @@ MarpaX::ESLIF::Tutorial::Calculator - MarpaX::ESLIF Calculator Tutorial
 
 =head1 VERSION
 
-version 5.0.7
+version 6.0.10
 
 =head1 DESCRIPTION
 
@@ -409,6 +409,7 @@ In the example below we take care to I<disable> the initial event otherwise the 
     event Expression$ = completed Expression
     };
   $eslifGrammar = MarpaX::ESLIF::Grammar->new($eslif, $grammar_v5);
+  $eslifRecognizerInterface = MyRecognizer->new($input);
   $eslifRecognizer = MarpaX::ESLIF::Recognizer->new($eslifGrammar, $eslifRecognizerInterface);
   #
   # Always start with scan()
@@ -487,11 +488,11 @@ Grammar events also include the nulled symbols and the exhaustion. Nulled events
 
 Scanner events are not generating by the grammar itself, but by the recognizer, and they always concern the lexemes: parsing can be paused before a lexeme is I<seen>, or after it has been I<seen> (though not yet commited). Pauses after a lexeme is seen can always be simulated with a nulled grammar event, in contrary to pauses before a lexeme is seen. The syntax is always:
 
-  :lexeme ::= lexemeSymbol pause => before event => eventName
+  :symbol ::= lexemeSymbol pause => before event => eventName
 
 or
 
-  :lexeme ::= lexemeSymbol pause => after event => eventName
+  :symbol ::= lexemeSymbol pause => after event => eventName
 
 For example:
 
@@ -507,21 +508,21 @@ For example:
   event Expression$ = completed Expression
   LPAREN ~ '('
   RPAREN ~ ')'
-  :lexeme ::= LPAREN pause => after event => LPAREN$
-  :lexeme ::= RPAREN pause => after event => RPAREN$
+  :symbol ::= LPAREN pause => after event => LPAREN$
+  :symbol ::= RPAREN pause => after event => RPAREN$
 
 =head3 Injecting user-defined values in the parse tree
 
 At any time where the control is given back to the user, user-defined perl values, that can be I<anything>, can be injected. The most common method is:
 
-  $eslifRecognizer->lexemeRead(symbolName, perlValue, lengthInBytes, grammarLength)
+  $eslifRecognizer->alternativeRead(symbolName, perlValue, lengthInBytes, grammarLength)
 
 C<grammarLength> is optional and default to C<1>, this is the number of symbols spanned, and should be rarelly of use... On the other hand, C<lengthInBytes> is required, but C<may be zero> (when it is zero you are really injecting things I<without> moving the internal pointers).
 Please note that when this is a stream of characters, you have to think in terms of UTF-8 encoding for the number of bytes.
 
 Since injecting values is possible only for lexemes, it is often practical to require a pause information from the recognizer with the method:
 
-  $eslifRecognizer->lexemeLastPause(symbolName)
+  $eslifRecognizer->nameLastPause(symbolName)
 
 which will return a perl's string for the last paused information for lexeme C<symbolName>, or C<undef> if there is none. The number of C<bytes> in this string is the relevant thing here.
 
@@ -549,7 +550,7 @@ You have to create a valuator that is using your valuation interface: C<MarpaX::
               ||     Expression  '+' Expression                 action => do_plus
                |     Expression  '-' Expression                 action => do_minus
   :discard ::= /[\s]+/
-  :lexeme ::= NUMBER pause => before event => ^NUMBER
+  :symbol ::= NUMBER pause => before event => ^NUMBER
   NUMBER     ~ /[\d]+/
   POW        ~ '**'
   };
@@ -564,14 +565,14 @@ You have to create a valuator that is using your valuation interface: C<MarpaX::
       foreach (@{$eslifRecognizer->events()}) {
         if ($_->{event}) {   # Can be undef for exhaustion
           if ($_->{event} eq '^NUMBER') {
-            my $lastPause = $eslifRecognizer->lexemeLastPause($_->{symbol});
+            my $lastPause = $eslifRecognizer->nameLastPause($_->{symbol});
             printf "Pause before event %s for symbol %s: \"%s\"\n", $_->{event}, $_->{symbol}, $lastPause;
             # ------------------------------
             # We replace NUMBER by NUMBER*10
             # ------------------------------
-            $eslifRecognizer->lexemeRead('NUMBER', $lastPause, 0);
-            $eslifRecognizer->lexemeRead('POW', '**', 0);
-            $eslifRecognizer->lexemeRead('NUMBER', '2', 0);
+            $eslifRecognizer->alternativeRead('NUMBER', $lastPause, 0);
+            $eslifRecognizer->alternativeRead('POW', '**', 0);
+            $eslifRecognizer->alternativeRead('NUMBER', '2', 0);
             # -------------------------------------------
             # We say to resume exactly where NUMBER ended
             # -------------------------------------------
@@ -601,7 +602,7 @@ This is a neat way to remove automatically C<:discard> rules from the input -;
 
 You have to notice also that I<nothing> obliges you to inject a alternative value that would be of the same length of what I<should> be in the input. For instance, injecting the string C<*ANYTHING*> for the C<POW> token:
 
-          $eslifRecognizer->lexemeRead('POW', '*ANYTHING*', 0);
+          $eslifRecognizer->alternativeRead('POW', '*ANYTHING*', 0);
 
 would result in this stringification:
 

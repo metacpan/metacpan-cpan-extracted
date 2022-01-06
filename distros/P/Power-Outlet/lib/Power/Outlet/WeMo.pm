@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use base qw{Power::Outlet::Common::IP::HTTP::UPnP};
 
-our $VERSION='0.24';
+our $VERSION='0.43';
 
 =head1 NAME
 

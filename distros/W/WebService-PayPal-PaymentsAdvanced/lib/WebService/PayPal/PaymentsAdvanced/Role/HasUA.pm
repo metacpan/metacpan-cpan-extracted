@@ -4,9 +4,9 @@ use Moo::Role;
 
 use namespace::autoclean;
 
-our $VERSION = '0.000027';
+our $VERSION = '0.000028';
 
-use LWP::UserAgent;
+use LWP::UserAgent ();
 use Types::Standard qw( InstanceOf );
 
 has ua => (

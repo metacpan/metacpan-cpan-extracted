@@ -91,5 +91,13 @@ my $DST_BAG = File::Spec->catdir(@ROOT, 'dst_bag');
   is($tagcnt, $tagexpect, "All tagmanifests counted");
 
 }
+{
+  my $bag = $Class->new(bag_path=>$SRC_BAG, use_plugins => 'Archive::BagIt::Plugin::Manifest::MD5');
+  isa_ok($bag, 'Archive::BagIt');
+  my %plugins = %{ $bag->plugins() };
+  foreach my $k (keys %plugins) {
+    isa_ok($plugins{$k}, 'Archive::BagIt::Plugin::Algorithm::MD5');
+  }
+}
 
 __END__

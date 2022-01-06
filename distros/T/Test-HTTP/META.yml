@@ -1,30 +1,32 @@
---- #YAML:1.0
-name:               Test-HTTP
-version:            0.18
-abstract:           Testing for HTTP services
+---
+abstract: 'Testing for HTTP services'
 author:
-    - Socialtext <socialtext@socialtext.com>
-license:            unknown
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Matt Liggett <mml@pobox.com>'
+  - 'Socialtext <socialtext@socialtext.com>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Carp:                 0
-    Class::Field:         0
-    Encode:               0
-    Filter::Simple:       0
-    LWP:                  5.827
-    LWP::UserAgent:       0
-    Test::Builder::Module:  0
-    Test::More:           0
-    Text::Balanced:       0
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.56
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-HTTP
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Class::Field: '0'
+  Encode: '0'
+  Filter::Simple: '0'
+  LWP: '5.827'
+  LWP::UserAgent: '0'
+  Test::Builder::Module: '0'
+  Test::More: '0'
+  Text::Balanced: '0'
+version: 0.19
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

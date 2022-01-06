@@ -11,12 +11,12 @@ use Term::CLI;
 $SIG{INT} = 'IGNORE';
 
 my $term = Term::CLI->new(
-    name => 'bssh',             # A basically simple shell.
-    skip => qr/^\s*(?:#.*)?$/,  # Skip comments and empty lines.
+    name => 'bssh',               # A basically simple shell.
+    skip => qr/^\s*(?:#.*)?$/,    # Skip comments and empty lines.
 );
 
 say "\n[Welcome to BSSH]";
-while ( defined(my $line = $term->readline) ) {
+while ( defined( my $line = $term->readline ) ) {
     $term->execute($line);
 }
 say "\n-- exit";

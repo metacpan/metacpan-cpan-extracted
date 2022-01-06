@@ -113,7 +113,7 @@ qx.Class.define("callbackery.ui.form.Auto", {
                     tm[s.key] = 'date';
                     break;
 
-               case 'dateTime':
+                case 'dateTime':
                     control = new callbackery.ui.form.DateTime().set({
                         dateFormat  : new qx.util.format.DateFormat(this.tr("dd.MM.yyyy"))
                     });

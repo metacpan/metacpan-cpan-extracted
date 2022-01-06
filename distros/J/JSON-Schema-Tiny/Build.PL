@@ -19,7 +19,7 @@ if (!grep { $_ } values %errors)
     use strict;
     use warnings;
 
-    use 5.016;
+    use 5.020;
     # use Module::Build::Tiny 0.034;
     Module::Build::Tiny::Build_PL();
 }
@@ -80,14 +80,14 @@ EOW
       "configure_requires" => {
         "ExtUtils::MakeMaker" => 0,
         "Module::Build::Tiny" => "0.034",
-        "perl" => "5.016"
+        "perl" => "5.020"
       },
       "dist_abstract" => "Validate data against a schema, minimally",
       "dist_author" => [
         "Karen Etheridge <ether\@cpan.org>"
       ],
       "dist_name" => "JSON-Schema-Tiny",
-      "dist_version" => "0.011",
+      "dist_version" => "0.014",
       "license" => "perl",
       "module_name" => "JSON::Schema::Tiny",
       "recursive_test_files" => 1,
@@ -105,9 +105,10 @@ EOW
         "Ref::Util" => "0.100",
         "Scalar::Util" => 0,
         "Storable" => 0,
+        "experimental" => 0,
         "if" => 0,
         "namespace::clean" => 0,
-        "perl" => "5.016",
+        "perl" => "5.020",
         "strict" => 0,
         "warnings" => 0
       },
@@ -115,17 +116,19 @@ EOW
         "Data::Dumper" => 0,
         "File::Spec" => 0,
         "List::Util" => "1.50",
+        "Math::BigFloat" => 0,
+        "Math::BigInt" => 0,
         "Module::Metadata" => 0,
         "Path::Tiny" => 0,
         "Test::Deep" => 0,
         "Test::Fatal" => 0,
-        "Test::JSON::Schema::Acceptance" => "1.007",
+        "Test::JSON::Schema::Acceptance" => "1.014",
         "Test::More" => "0.96",
         "Test::Warnings" => 0,
         "constant" => 0,
         "lib" => 0,
         "open" => 0,
-        "perl" => "5.016",
+        "perl" => "5.020",
         "utf8" => 0
       }
     );
@@ -135,17 +138,19 @@ EOW
       "Data::Dumper" => 0,
       "File::Spec" => 0,
       "List::Util" => "1.50",
+      "Math::BigFloat" => 0,
+      "Math::BigInt" => 0,
       "Module::Metadata" => 0,
       "Path::Tiny" => 0,
       "Test::Deep" => 0,
       "Test::Fatal" => 0,
-      "Test::JSON::Schema::Acceptance" => "1.007",
+      "Test::JSON::Schema::Acceptance" => "1.014",
       "Test::More" => "0.96",
       "Test::Warnings" => 0,
       "constant" => 0,
       "lib" => 0,
       "open" => 0,
-      "perl" => "5.016",
+      "perl" => "5.020",
       "utf8" => 0
     );
 

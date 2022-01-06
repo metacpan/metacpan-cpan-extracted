@@ -167,6 +167,17 @@ subtest gradient_n_pal => sub {
         'gradient_n_pal($colors, $values)' );
 };
 
+subtest viridis_pal => sub {
+    no warnings 'qw';
+
+    # NOTE: This is now slightly different from R's viridis_pal but fine.
+    pdl_is(
+        viridis_pal()->(5),
+        PDL::SV->new( [qw(#440154 #3a528b #20908c #5bc862 #fde724)] ),
+        'viridis_pal()'
+    );
+};
+
 subtest 'pretty' => sub {
     pdl_is(
         pretty( pdl( 1 .. 15 ) ),

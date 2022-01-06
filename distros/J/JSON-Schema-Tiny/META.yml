@@ -6,22 +6,24 @@ build_requires:
   Data::Dumper: '0'
   File::Spec: '0'
   List::Util: '1.50'
+  Math::BigFloat: '0'
+  Math::BigInt: '0'
   Module::Metadata: '0'
   Path::Tiny: '0'
   Test::Deep: '0'
   Test::Fatal: '0'
-  Test::JSON::Schema::Acceptance: '1.007'
+  Test::JSON::Schema::Acceptance: '1.014'
   Test::More: '0.96'
   Test::Warnings: '0'
   constant: '0'
   lib: '0'
   open: '0'
-  perl: '5.016'
+  perl: '5.020'
   utf8: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   Module::Build::Tiny: '0.034'
-  perl: '5.016'
+  perl: '5.020'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 keywords:
@@ -44,7 +46,7 @@ no_index:
 provides:
   JSON::Schema::Tiny:
     file: lib/JSON/Schema/Tiny.pm
-    version: '0.011'
+    version: '0.014'
 requires:
   B: '0'
   Carp: '0'
@@ -59,19 +61,20 @@ requires:
   Ref::Util: '0.100'
   Scalar::Util: '0'
   Storable: '0'
+  experimental: '0'
   if: '0'
   namespace::clean: '0'
-  perl: '5.016'
+  perl: '5.020'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/karenetheridge/JSON-Schema-Tiny/issues
   homepage: https://github.com/karenetheridge/JSON-Schema-Tiny
   repository: https://github.com/karenetheridge/JSON-Schema-Tiny.git
-version: '0.011'
+version: '0.014'
 x_Dist_Zilla:
   perl:
-    version: '5.035003'
+    version: '5.035007'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -227,7 +230,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Test::MinimumVersion
       config:
         Dist::Zilla::Plugin::Test::MinimumVersion:
-          max_target_perl: '5.016'
+          max_target_perl: '5.020'
       name: '@Author::ETHER/Test::MinimumVersion'
       version: '2.000010'
     -
@@ -297,8 +300,6 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::PodWeaver
       config:
         Dist::Zilla::Plugin::PodWeaver:
-          config_plugins:
-            - '@Author::ETHER'
           finder:
             - ':InstallModules'
             - ':ExecFiles'
@@ -380,10 +381,6 @@ x_Dist_Zilla:
               name: '@Author::ETHER/generate SUPPORT'
               version: '4.018'
             -
-              class: Pod::Weaver::Section::AllowOverride
-              name: '@Author::ETHER/allow override SUPPORT'
-              version: '0.05'
-            -
               class: Pod::Weaver::Section::Authors
               name: '@Author::ETHER/Authors'
               version: '4.018'
@@ -403,6 +400,10 @@ x_Dist_Zilla:
               class: Pod::Weaver::Section::Region
               name: '@Author::ETHER/footer'
               version: '4.018'
+            -
+              class: Pod::Weaver::Section::AllowOverride
+              name: 'append to SUPPORT'
+              version: '0.05'
       name: '@Author::ETHER/PodWeaver'
       version: '4.009'
     -
@@ -523,7 +524,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.31.1
+          git_version: 2.34.1
           include_authors: 0
           include_releaser: 1
           order_by: commits
@@ -590,7 +591,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20210920'
+          Module::CoreList: '5.20211220'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.008'
     -
@@ -615,7 +616,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.31.1
+          git_version: 2.34.1
           repo_root: .
       name: '@Author::ETHER/initial check'
       version: '2.048'
@@ -623,7 +624,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.31.1
+          git_version: 2.34.1
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -631,7 +632,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.31.1
+          git_version: 2.34.1
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::CorrectBranch'
       version: '0.014'
@@ -657,7 +658,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.31.1
+          git_version: 2.34.1
           repo_root: .
       name: '@Author::ETHER/after tests'
       version: '2.048'
@@ -741,7 +742,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.31.1
+          git_version: 2.34.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -754,11 +755,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.011
+          tag: v0.014
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.31.1
+          git_version: 2.34.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -795,7 +796,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.31.1
+          git_version: 2.34.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -817,7 +818,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.31.1
+          git_version: 2.34.1
           repo_root: .
       name: '@Author::ETHER/Git::Push'
       version: '2.048'
@@ -869,6 +870,14 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: RuntimeRequires
+      version: '6.024'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: suggests
+      name: RuntimeSuggests
       version: '6.024'
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -930,7 +939,7 @@ x_Dist_Zilla:
 x_authority: cpan:ETHER
 x_contributors:
   - 'Matt S Trout <mst@shadowcat.co.uk>'
-x_generated_by_perl: v5.35.3
+x_generated_by_perl: v5.35.7
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

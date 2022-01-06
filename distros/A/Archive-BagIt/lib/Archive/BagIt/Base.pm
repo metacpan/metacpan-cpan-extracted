@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Moo;
 extends "Archive::BagIt";
-our $VERSION = '0.086'; # VERSION
+our $VERSION = '0.089'; # VERSION
 # ABSTRACT: deprecated, used for backwards compatibility
 
 
@@ -23,7 +23,7 @@ Archive::BagIt::Base - deprecated, used for backwards compatibility
 
 =head1 VERSION
 
-version 0.086
+version 0.089
 
 =head1 NAME
 
@@ -46,7 +46,7 @@ Andreas Romeyke <cpan@andreas.romeyke.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Rob Schmidt <rjeschmi@gmail.com>, William Wueppelmann and Andreas Romeyke.
+This software is copyright (c) 2022 by Rob Schmidt <rjeschmi@gmail.com>, William Wueppelmann and Andreas Romeyke.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

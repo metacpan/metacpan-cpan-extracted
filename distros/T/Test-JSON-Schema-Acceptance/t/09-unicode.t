@@ -1,6 +1,8 @@
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 use strict;
 use warnings;
+use 5.020;
+use experimental qw(signatures postderef);
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
@@ -22,8 +24,7 @@ $accepter->acceptance(
     group_description => 'latin1 schema',
     test_description => 'latin1 data',
   },
-  validate_data => sub {
-    my ($schema, $data) = @_;
+  validate_data => sub ($schema, $data) {
     note 'validate_data passed data "'.$data.'", schema "'.$schema->{const}.'"';
 
     is(index($schema->{const}, 'Les hivers de mon enfance étaient'), 0,
@@ -41,8 +42,7 @@ $accepter->acceptance(
     group_description => 'very wide schema',
     test_description => 'very wide data',
   },
-  validate_data => sub {
-    my ($schema, $data) = @_;
+  validate_data => sub ($schema, $data) {
     note 'validate_data passed data "'.$data.'", schema "'.$schema->{const}.'"';
 
     is($schema->{const}, 'ಠ_ಠ', 'schema was decoded from data file correctly')
@@ -60,8 +60,7 @@ $accepter->acceptance(
     group_description => 'latin1 schema',
     test_description => 'latin1 data',
   },
-  validate_json_string => sub {
-    my ($schema, $data) = @_;
+  validate_json_string => sub ($schema, $data) {
     note 'validate_data passed data "'.$data.'", schema "'.$schema->{const}.'"';
 
     is(index($schema->{const}, 'Les hivers de mon enfance étaient'), 0,
@@ -81,8 +80,7 @@ $accepter->acceptance(
     group_description => 'very wide schema',
     test_description => 'very wide data',
   },
-  validate_json_string => sub {
-    my ($schema, $data) = @_;
+  validate_json_string => sub ($schema, $data) {
     note 'validate_data passed data "'.$data.'", schema "'.$schema->{const}.'"';
 
     is($schema->{const}, 'ಠ_ಠ', 'schema was decoded from data file correctly')

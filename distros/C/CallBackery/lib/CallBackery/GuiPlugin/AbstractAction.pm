@@ -138,7 +138,8 @@ sub __fixActionCfg {
     my $name = $self->name;
     my $pkg = ref $self;
     for my $action (@{$self->actionCfg}) {
-        next if $action->{action} eq 'separator';
+        next if $action->{action} eq 'separator'
+            or $action->{action} eq 'refresh';
         if ($action->{name}) {
             $self->log->warn(
                $pkg . " action should not have a name attribute:"

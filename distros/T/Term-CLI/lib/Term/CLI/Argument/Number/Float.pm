@@ -18,10 +18,9 @@
 #
 #=============================================================================
 
-package Term::CLI::Argument::Number::Float  0.053006 {
+package Term::CLI::Argument::Number::Float 0.054002;
 
 use 5.014;
-use strict;
 use warnings;
 
 use Scalar::Util 1.23 qw( looks_like_number );
@@ -32,12 +31,12 @@ use namespace::clean 0.25;
 extends 'Term::CLI::Argument::Number';
 
 sub coerce_value {
-    if (looks_like_number($_[1])) {
-        return $_[1] + 0.0;
+    my ( $self, $arg ) = @_;
+    if ( looks_like_number($arg) ) {
+        return $arg + 0.0;
     }
+    ## no critic (ProhibitExplicitReturnUndef)
     return undef;
-}
-
 }
 
 1;
@@ -52,7 +51,7 @@ Term::CLI::Argument::Number::Float - class for floating point arguments in Term:
 
 =head1 VERSION
 
-version 0.053006
+version 0.054002
 
 =head1 SYNOPSIS
 

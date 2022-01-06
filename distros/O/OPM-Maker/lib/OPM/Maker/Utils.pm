@@ -1,5 +1,5 @@
 package OPM::Maker::Utils;
-$OPM::Maker::Utils::VERSION = '1.11';
+$OPM::Maker::Utils::VERSION = '1.12';
 # ABSTRACT: Utility functions for OPM::Maker
 
 use strict;
@@ -43,10 +43,14 @@ sub check_args_sopm {
     my @suffixes = $opm ? ('*.opm', '*.sopm') : ('*.sopm');
 
     if ( !$sopm ) {
-        ($sopm) = map {
+        my @all_sopm = map {
             $_ =~ s{\A\.[/\\]}{};
             $_;
         } File::Find::Rule->file->name(@suffixes)->maxdepth(1)->in('.');
+
+        die 'Found more than one .sopm file' if @all_sopm > 1;
+
+        $sopm = $all_sopm[0];
     }
 
     $sopm //= '';
@@ -71,7 +75,7 @@ OPM::Maker::Utils - Utility functions for OPM::Maker
 
 =head1 VERSION
 
-version 1.11
+version 1.12
 
 =head1 FUNCTIONS
 

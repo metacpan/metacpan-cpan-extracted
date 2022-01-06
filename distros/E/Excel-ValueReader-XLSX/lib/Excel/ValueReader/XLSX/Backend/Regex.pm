@@ -5,7 +5,7 @@ use Moose;
 use Scalar::Util qw/looks_like_number/;
 extends 'Excel::ValueReader::XLSX::Backend';
 
-our $VERSION = '1.05';
+our $VERSION = '1.07';
 
 #======================================================================
 # LAZY ATTRIBUTE CONSTRUCTORS
@@ -45,7 +45,7 @@ sub _workbook_data {
 
   # does this workbook use the 1904 calendar ?
   my ($date1904) = $workbook =~ m[date1904="(.+?)"];
-  my $base_year  = $date1904 ? 1904 : 1900;
+  my $base_year  = $date1904 && $date1904 =~ /^(1|true)$/ ? 1904 : 1900;
 
   return {sheets => \%sheets, base_year => $base_year};
 }

@@ -22,7 +22,7 @@ Term::CLI::Tutorial - tips, tricks, and examples for Term::CLI
 
 =head1 VERSION
 
-version 0.053006
+version 0.054002
 
 =head1 SYNOPSIS
 
@@ -1072,10 +1072,10 @@ Results for C<set verbose>:
     bssh> help set
       Usage:
         set {delimiters|verbose}
-    
+
       Description:
         Set various CLI parameters.
-    
+
       Sub-Commands:
         set delimiters string    set word delimiter(s)
         set verbose bool         set verbose flag
@@ -1299,10 +1299,10 @@ usage line is too long (it lists every possible sub-command):
     bssh> help debug
       Usage:
         debug cmd ...
-    
+
       Description:
         Print some debugging information regarding the execution of cmd.
-    
+
       Sub-Commands:
         debug cp path1 path2 ...                     copy files
         debug do action while activity               Do action while activity
@@ -1324,7 +1324,7 @@ L<Term::CLI::Command> to another
 L<Term::CLI::Command> or a
 L<Term::CLI>
 object (or any object that consumes the L<Term::CLI::Role::CommandSet> role)
-will cause the 
+will cause the
 L<Term::CLI::Command> object's
 C<parent> attribute to be set.
 
@@ -1401,12 +1401,12 @@ specific C<--timezone> option to the C<clock> sub-command.
 The following commands should be allowed now:
 
     bash$ perl tutorial/example_16_options.pl
-    
+
     [Welcome to BSSH]
     bssh> help show clock
       Usage:
         show clock [--timezone=s] [--tz=s] [-ts]
-    
+
       Description:
         Show system time and date.
     bssh> show clock
@@ -1466,7 +1466,7 @@ application. You usually don't want this during keyboard input
 (having an accidental I<Ctrl-\> kill your session can be annoying),
 so L<Term::CLI> will disable this for you already.
 
-However, if you run any of the previous examples and enter 
+However, if you run any of the previous examples and enter
 I<Ctrl-Z>, you'll notice that the program suspends and you are
 dropped back into the shell you started from.
 
@@ -1501,12 +1501,12 @@ Now do this:
 =item 1.
 
 perl tutorial/example_16_options.pl
-    
+
 =item 2.
 
 Enter I<Ctrl-Z>; this should suspend the program.
 
-=item 3. 
+=item 3.
 
 Type C<fg> + I<ENTER> to continue again.
 
@@ -1519,7 +1519,7 @@ Compare that to the version with C<suspend>:
 =item 1.
 
 perl tutorial/example_17_suspend.pl
-    
+
 =item 2.
 
 Enter I<Ctrl-Z>; nothing should happen (unless you have
@@ -1562,7 +1562,7 @@ By default, if the application is named C<bssh>, the history will
 be read/written to/from C<~/.bssh_history>, and L<Term::CLI> will
 remember 1000 lines of input history.
 
-See the L<History Control|Term::CLI/History Control> 
+See the L<History Control|Term::CLI/History Control>
 section in the L<Term::CLI> documentation for more information
 on how to change the defaults.
 
@@ -1581,7 +1581,7 @@ L<Term::CLI's cleanup|Term::CLI/cleanup> attribute:
         ...,
         cleanup => sub {
             my ($term) = @_;
-            $term->write_history() or 
+            $term->write_history() or
                 or warn "cannot write history: ".$term->error."\n";
         }
     );
@@ -1726,7 +1726,7 @@ L<Syntax::Keyword::Defer>):
     my $term = Term::CLI->new( ... );
 
     defer {
-        $term->write_history() or 
+        $term->write_history() or
             or warn "cannot write history: ".$term->error."\n";
     }
 
@@ -1738,7 +1738,7 @@ correct scope:
     sub initialise_term {
         my $term = Term::CLI->new( ... );
         defer {
-            $term->write_history() or 
+            $term->write_history() or
                 or warn "cannot write history: ".$term->error."\n";
         }
         return $term;

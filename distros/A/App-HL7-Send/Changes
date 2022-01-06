@@ -1,3 +1,11 @@
+0.03 2022-01-06T15:05:35+01:00
+ - Add test for constructor.
+ - Add test for help.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve help message.
+ - Move argument processing to run() method.
+ - Update copyright years.
+
 0.02 2018-02-07T08:12:09+01:00
  - Add support for sending HL7 messages from stdin.
  - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.

@@ -88,6 +88,7 @@ do { my $x = {
                                    'Log::Any::Adapter::Log4perl' => '0',
                                    'Log::Any::Adapter::Util' => '1.03',
                                    'Log::Log4perl' => '1.32',
+                                   'POSIX' => '0',
                                    'Safe::Isa' => '0',
                                    'Test::Deep' => '1.128',
                                    'Test::Deep::NoTest' => '0',

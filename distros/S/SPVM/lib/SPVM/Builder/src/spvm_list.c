@@ -3,109 +3,182 @@
 #include <assert.h>
 
 #include "spvm_list.h"
+#include "spvm_compiler.h"
+#include "spvm_allocator.h"
+#include "spvm_native.h"
 
-SPVM_LIST* SPVM_LIST_new(int32_t capacity) {
+SPVM_LIST* SPVM_LIST_new(SPVM_COMPILER* compiler, int32_t capacity, int32_t memory_block_type, SPVM_ENV* env) {
   
   assert(capacity >= 0);
   
-  SPVM_LIST* array = calloc(1, sizeof(SPVM_LIST));
-  
-  array->length = 0;
-  
-  if (capacity == 0) {
-    array->capacity = 1;
+  SPVM_LIST* list;
+  if (memory_block_type == SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_COMPILE_TIME_TEMPORARY) {
+    list = SPVM_ALLOCATOR_new_block_compile_tmp(compiler, sizeof(SPVM_LIST));
+  }
+  else if (memory_block_type == SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_COMPILE_TIME_ETERNAL) {
+    list = SPVM_ALLOCATOR_new_block_compile_eternal(compiler, sizeof(SPVM_LIST));
+  }
+  else if (memory_block_type == SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_RUN_TIME) {
+    list = SPVM_ALLOCATOR_new_block_runtime(compiler, sizeof(SPVM_LIST), env);
   }
   else {
-    array->capacity = capacity;
+    assert(0);
   }
   
-  void** values = calloc(array->capacity, sizeof(void*));
+  list->length = 0;
   
-  array->values = values;
+  if (capacity == 0) {
+    list->capacity = 1;
+  }
+  else {
+    list->capacity = capacity;
+  }
   
-  return array;
+  void** values;
+  if (memory_block_type == SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_COMPILE_TIME_TEMPORARY) {
+    values = SPVM_ALLOCATOR_new_block_compile_tmp(compiler, list->capacity * sizeof(void*));
+  }
+  else if (memory_block_type == SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_COMPILE_TIME_ETERNAL) {
+    values = SPVM_ALLOCATOR_new_block_compile_eternal(compiler, list->capacity * sizeof(void*));
+  }
+  else if (memory_block_type == SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_RUN_TIME) {
+    values = SPVM_ALLOCATOR_new_block_runtime(compiler, list->capacity * sizeof(void*), env);
+  }
+  else {
+    assert(0);
+  }
+
+  list->values = values;
+  
+  list->compiler = compiler;
+  
+  list->memory_block_type = memory_block_type;
+  
+  list->env = env;
+  
+  return list;
 }
 
-void SPVM_LIST_maybe_extend(SPVM_LIST* array) {
+void SPVM_LIST_maybe_extend(SPVM_LIST* list) {
   
-  assert(array);
+  assert(list);
   
-  int32_t length = array->length;
-  int32_t capacity = array->capacity;
+  SPVM_COMPILER* compiler = list->compiler;
+  
+  int32_t length = list->length;
+  int32_t capacity = list->capacity;
   
   if (length >= capacity) {
     int32_t new_capacity = capacity * 2;
     
-    void** new_values = calloc(new_capacity, sizeof(void*));
-    memcpy(new_values, array->values, capacity * sizeof(void*));
-    free(array->values);
-    array->values = new_values;
-    
-    array->capacity = new_capacity;
-  }
-}
-
-void SPVM_LIST_free(SPVM_LIST* array) {
-  
-  free(array->values);
-  free(array);
-}
-
-void SPVM_LIST_push(SPVM_LIST* array, void* value) {
-  
-  SPVM_LIST_maybe_extend(array);
-  
-  int32_t length = array->length;
-  
-  *(void**)&array->values[length] = value;
-  array->length++;
-}
-
-void* SPVM_LIST_fetch(SPVM_LIST* array, int32_t index) {
-  assert(array);
-  assert(index >= 0);
-  assert(index < array->length);
-  
-  
-  return *(void**)&array->values[index];
-}
-
-void SPVM_LIST_store(SPVM_LIST* array, int32_t index, void* value) {
-  
-  assert(array);
-  assert(index >= 0);
-  assert(index < array->length);
-  
-  *(void**)&array->values[index] = value;
-}
-
-void* SPVM_LIST_pop(SPVM_LIST* array) {
-  
-  assert(array->length >= 0);
-  
-  if (array->length == 0) {
-    return NULL;
-  }
-  else {
-    array->length--;
-    return *(void**)&array->values[array->length];
-  }
-}
-
-void* SPVM_LIST_shift(SPVM_LIST* array) {
-  
-  assert(array->length >= 0);
-  
-  if (array->length == 0) {
-    return NULL;
-  }
-  else {
-    void* return_value = array->values[0];
-    for (int32_t i = 0; i < array->length - 1; i++) {
-      array->values[i] = array->values[i + 1];
+    void** new_values;
+    if (list->memory_block_type == SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_COMPILE_TIME_TEMPORARY) {
+      new_values = SPVM_ALLOCATOR_new_block_compile_tmp(compiler, new_capacity * sizeof(void*));
+    }
+    else if (list->memory_block_type == SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_COMPILE_TIME_ETERNAL) {
+      new_values = SPVM_ALLOCATOR_new_block_compile_eternal(compiler, new_capacity * sizeof(void*));
+    }
+    else if (list->memory_block_type == SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_RUN_TIME) {
+      new_values = SPVM_ALLOCATOR_new_block_runtime(compiler, new_capacity * sizeof(void*), list->env);
+    }
+    else {
+      assert(0);
+    }
+    memcpy(new_values, list->values, capacity * sizeof(void*));
+    if (list->memory_block_type == SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_COMPILE_TIME_TEMPORARY) {
+      SPVM_ALLOCATOR_free_block_compile_tmp(compiler, list->values);
+    }
+    else if (list->memory_block_type == SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_COMPILE_TIME_ETERNAL) {
+      // Nothing
+    }
+    else if (list->memory_block_type == SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_RUN_TIME) {
+      SPVM_ALLOCATOR_free_block_runtime(compiler, list->values, list->env);
+    }
+    else {
+      assert(0);
     }
 
-    array->length--;
+    list->values = new_values;
+    
+    list->capacity = new_capacity;
+  }
+}
+
+void SPVM_LIST_free(SPVM_LIST* list) {
+
+  SPVM_COMPILER* compiler = list->compiler;
+
+  if (list->memory_block_type == SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_COMPILE_TIME_TEMPORARY) {
+    SPVM_ALLOCATOR_free_block_compile_tmp(compiler, list->values);
+    SPVM_ALLOCATOR_free_block_compile_tmp(compiler, list);
+  }
+  else if (list->memory_block_type == SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_COMPILE_TIME_ETERNAL) {
+    // Nothing
+  }
+  else if (list->memory_block_type == SPVM_COMPIER_ALLOCATOR_C_MEMORY_BLOCK_TYPE_RUN_TIME) {
+    SPVM_ALLOCATOR_free_block_runtime(compiler, list->values, list->env);
+    SPVM_ALLOCATOR_free_block_runtime(compiler, list, list->env);
+  }
+  else {
+    assert(0);
+  }
+}
+
+void SPVM_LIST_push(SPVM_LIST* list, void* value) {
+  
+  SPVM_LIST_maybe_extend(list);
+  
+  int32_t length = list->length;
+  
+  *(void**)&list->values[length] = value;
+  list->length++;
+}
+
+void* SPVM_LIST_fetch(SPVM_LIST* list, int32_t index) {
+  assert(list);
+  assert(index >= 0);
+  assert(index < list->length);
+  
+  
+  return *(void**)&list->values[index];
+}
+
+void SPVM_LIST_store(SPVM_LIST* list, int32_t index, void* value) {
+  
+  assert(list);
+  assert(index >= 0);
+  assert(index < list->length);
+  
+  *(void**)&list->values[index] = value;
+}
+
+void* SPVM_LIST_pop(SPVM_LIST* list) {
+  
+  assert(list->length >= 0);
+  
+  if (list->length == 0) {
+    return NULL;
+  }
+  else {
+    list->length--;
+    return *(void**)&list->values[list->length];
+  }
+}
+
+void* SPVM_LIST_shift(SPVM_LIST* list) {
+  
+  assert(list->length >= 0);
+  
+  if (list->length == 0) {
+    return NULL;
+  }
+  else {
+    void* return_value = list->values[0];
+    for (int32_t i = 0; i < list->length - 1; i++) {
+      list->values[i] = list->values[i + 1];
+    }
+
+    list->length--;
     return return_value;
   }
 }

@@ -12,7 +12,14 @@ bin/spamcup
 cpanfile
 dist.ini
 lib/App/SpamcupNG.pm
+lib/App/SpamcupNG/Error.pm
+lib/App/SpamcupNG/Error/Bounce.pm
+lib/App/SpamcupNG/Error/Factory.pm
+lib/App/SpamcupNG/Error/Mailhost.pm
 lib/App/SpamcupNG/HTMLParse.pm
+lib/App/SpamcupNG/Warning.pm
+lib/App/SpamcupNG/Warning/Factory.pm
+lib/App/SpamcupNG/Warning/Yum.pm
 perlcriticrc
 perltidyrc
 t/00-report-prereqs.dd

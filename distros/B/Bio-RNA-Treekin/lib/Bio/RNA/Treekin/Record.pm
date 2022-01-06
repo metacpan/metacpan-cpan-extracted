@@ -3,7 +3,7 @@
 # Stores a data from a single row of the Treekin file, i.e. the populations of
 # all minima at a given time point.
 package Bio::RNA::Treekin::Record;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use 5.006;
 use strict;
@@ -53,6 +53,7 @@ has $_ => (
                  rates_file
                  file_index
                  cmd
+                 of_iterations
             );
 
 # Get number of population data rows stored.
@@ -310,24 +311,52 @@ sub _read_record_lines {
 
     # Separate lines into header and population data.  All header lines
     # begin with a '# ' (remove it!)
-    my ($current_line, @header_lines);
+    # Note: Newer versions of treekin also add header info *below* data lines.
+    my ($current_line, @header_lines, @population_data_lines);
     while (defined ($current_line = <$record_handle>)) {
-        next if $current_line =~ /^@/;  # drop xmgrace annotations
-        # header lines start with '# ', remove it
-        last unless $current_line =~ s/^# //;
-        push @header_lines, $current_line;
+        next if $current_line =~ /^@/               # drop xmgrace annotations
+                or $current_line =~ m{ ^ \s* $ }x;  # or empty lines
+
+        print "current line: $current_line\n";
+        # Header lines start with '# ', remove it.
+        if ($current_line =~ s/^# //) {         # header line
+            push @header_lines, $current_line;
+        }
+        else {                                  # data line
+            push @population_data_lines, $current_line;
+        }
     }
+
+    # Sanity checks.
+    confess 'No header lines found in Treekin file'
+        unless @header_lines;
     chomp @header_lines;
 
-    #say STDERR '<', @header_lines, '>' and
-    confess 'Unexpected end of record while parsing header'
-        unless defined $current_line;
-
-    my @population_data_lines = ($current_line);
-    while (defined ($current_line = <$record_handle>)) {
-        push @population_data_lines, $current_line;
-    }
+    confess 'No population data lines found in Treekin file'
+        unless @population_data_lines;
     chomp @population_data_lines;
+
+    ###################### Old implementation #################
+
+    # # Separate lines into header and population data.  All header lines
+    # # begin with a '# ' (remove it!)
+    # my ($current_line, @header_lines);
+    # while (defined ($current_line = <$record_handle>)) {
+    #     next if $current_line =~ /^@/;  # drop xmgrace annotations
+    #     # header lines start with '# ', remove it
+    #     last unless $current_line =~ s/^# //;
+    #     push @header_lines, $current_line;
+    # }
+    # chomp @header_lines;
+
+    # confess 'Unexpected end of record while parsing header'
+    #     unless defined $current_line;
+
+    # my @population_data_lines = ($current_line);
+    # while (defined ($current_line = <$record_handle>)) {
+    #     push @population_data_lines, $current_line;
+    # }
+    # chomp @population_data_lines;
 
     return \@header_lines, \@population_data_lines;
 }
@@ -425,7 +454,14 @@ sub stringify {
     my $population_str
         = join "\n", map { "$_" } @{ $self->_population_data };
 
-    my $self_as_str = $header_str . "\n" . $population_str;
+    # Footer (new Treekin versions only).
+    my $footer_str = $self->has_of_iterations
+                     ? '# of iterations: ' . $self->of_iterations
+                     : q{};
+
+    my $self_as_str  = $header_str . "\n" . $population_str;
+    $self_as_str    .= "\n" . $footer_str if $footer_str;
+
     return $self_as_str;
 }
 

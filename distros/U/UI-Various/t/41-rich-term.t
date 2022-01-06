@@ -179,8 +179,17 @@ stdout_is(sub {   $win1->_show();   },
 
 $win1->width(12);
 $win1->title('');
-$text1->height(undef);
-$button1->height(undef);
+if ($^V lt 'v5.20')		# workaround for Perl bugs #7508 / #109726
+{
+    $text1->{height} = undef;
+    $button1->{height} = undef;
+}
+else
+{
+    $text1->height(undef);
+    $button1->height(undef);
+
+}
 my $output1 =
     #_____123456_        _____123456_        _____123456_
     '#=======<0>#'."\n".'"    Hello "'."\n".'"    World!"'."\n".

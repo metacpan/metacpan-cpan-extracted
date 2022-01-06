@@ -2,7 +2,7 @@ use warnings;
 
 package Git::Hooks::CheckCommit;
 # ABSTRACT: Git::Hooks plugin to enforce commit policies
-$Git::Hooks::CheckCommit::VERSION = '3.2.0';
+$Git::Hooks::CheckCommit::VERSION = '3.2.1';
 use v5.16.0;
 use utf8;
 use Carp;
@@ -225,7 +225,7 @@ sub signature_errors {
     my $signature = $git->get_config($CFG => 'signature');
 
     if (defined $signature && $signature ne 'nocheck') {
-        my $status = $git->run(qw/log -1 --format=%G?/, $commit);
+        my $status = $git->run(qw/log -1 --format=%G?/, $commit->commit);
 
         if ($status eq 'B') {
             $git->fault(<<'EOS', {commit => $commit, option => 'signature'});
@@ -409,12 +409,12 @@ sub check_patchset {
 # Install hooks
 my $options = {config => \&_setup_config};
 
-GITHOOKS_CHECK_AFFECTED_REFS \&check_ref,      $options;
-GITHOOKS_CHECK_PRE_COMMIT    \&check_commit,   $options;
-GITHOOKS_CHECK_PATCHSET      \&check_patchset, $options;
+GITHOOKS_CHECK_AFFECTED_REFS(\&check_ref, $options);
+GITHOOKS_CHECK_PRE_COMMIT(\&check_commit, $options);
+GITHOOKS_CHECK_PATCHSET(\&check_patchset, $options);
 
-POST_APPLYPATCH  \&check_post_commit;
-POST_COMMIT      \&check_post_commit;
+POST_APPLYPATCH(\&check_post_commit);
+POST_COMMIT(\&check_post_commit);
 
 1;
 
@@ -430,7 +430,7 @@ Git::Hooks::CheckCommit - Git::Hooks plugin to enforce commit policies
 
 =head1 VERSION
 
-version 3.2.0
+version 3.2.1
 
 =head1 SYNOPSIS
 
@@ -737,7 +737,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by CPQD <www.cpqd.com.br>.
+This software is copyright (c) 2022 by CPQD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

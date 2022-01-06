@@ -5,7 +5,7 @@ package ColorTheme::Text::ANSITable::OldCompat::Default::default_gradation;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-08-27'; # DATE
 our $DIST = 'Text-ANSITable'; # DIST
-our $VERSION = '0.606'; # VERSION
+our $VERSION = '0.607'; # VERSION
 
 use alias::module 'ColorTheme::Text::ANSITable::Standard::Gradation';
 
@@ -24,7 +24,7 @@ ColorTheme::Text::ANSITable::OldCompat::Default::default_gradation - Text::ANSIT
 
 =head1 VERSION
 
-This document describes version 0.606 of ColorTheme::Text::ANSITable::OldCompat::Default::default_gradation (from Perl distribution Text-ANSITable), released on 2021-08-27.
+This document describes version 0.607 of ColorTheme::Text::ANSITable::OldCompat::Default::default_gradation (from Perl distribution Text-ANSITable), released on 2021-08-27.
 
 =head1 DESCRIPTION
 

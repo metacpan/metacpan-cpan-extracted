@@ -5,7 +5,7 @@ package BorderStyle::Text::ANSITable::OldCompat::Default::csingle;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-08-27'; # DATE
 our $DIST = 'Text-ANSITable'; # DIST
-our $VERSION = '0.606'; # VERSION
+our $VERSION = '0.607'; # VERSION
 
 use alias::module 'BorderStyle::UTF8::SingleLineCurved';
 
@@ -24,7 +24,7 @@ BorderStyle::Text::ANSITable::OldCompat::Default::csingle - UTF8::SingleLineCurv
 
 =head1 VERSION
 
-This document describes version 0.606 of BorderStyle::Text::ANSITable::OldCompat::Default::csingle (from Perl distribution Text-ANSITable), released on 2021-08-27.
+This document describes version 0.607 of BorderStyle::Text::ANSITable::OldCompat::Default::csingle (from Perl distribution Text-ANSITable), released on 2021-08-27.
 
 =head1 HOMEPAGE
 

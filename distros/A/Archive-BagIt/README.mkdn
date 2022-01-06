@@ -4,7 +4,7 @@ Archive::BagIt - The main module to handle bags.
 
 # VERSION
 
-version 0.086
+version 0.089
 
 # NAME
 
@@ -194,6 +194,9 @@ The arguments are:
 - `use_async` - if set it uses IO::Async to read payload files asynchronly, only useful under Linux.
 - `use_parallel` - if set it uses Parallel::parallel\_map to calculate digests of payload files in parallel,
       only useful if underlying filesystem supports parallel read and if multiple CPU cores available.
+- `use_plugins` - expected manifest plugin strings, if set it uses the requested plugins,
+      example `Archive::BagIt::Plugin::Manifest::SHA256`.
+      HINT: this option \*disables\* the forced fixity check in `verify_bag()`!
 
 The bag object will use $bag\_dir, BUT an existing $bag\_dir is not read. If you use `store()` an existing bag will be overwritten!
 
@@ -378,13 +381,13 @@ existing values in internal bag-info representation will be overwritten!
 
 store a bagit-obj if bagit directory-structure was already constructed.
 
-## init\_metadata()
+## init\_metadata( $bag\_path, $options)
 
 A constructor that will just create the metadata directory
 
 This won't make a bag, but it will create the conditions to do that eventually
 
-## make\_bag( $bag\_path )
+## make\_bag( $bag\_path, $options )
 
 A constructor that will make and return a bag from a directory,
 
@@ -408,7 +411,7 @@ Andreas Romeyke <cpan@andreas.romeyke.de>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Rob Schmidt <rjeschmi@gmail.com>, William Wueppelmann and Andreas Romeyke.
+This software is copyright (c) 2022 by Rob Schmidt <rjeschmi@gmail.com>, William Wueppelmann and Andreas Romeyke.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -9,7 +9,7 @@ use Text::ANSITable;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-08-27'; # DATE
 our $DIST = 'Text-ANSITable'; # DIST
-our $VERSION = '0.606'; # VERSION
+our $VERSION = '0.607'; # VERSION
 
 binmode(STDOUT, ":encoding(utf8)");
 
@@ -44,7 +44,7 @@ ansitable-list-style-sets - List available style sets for Text::ANSITable
 
 =head1 VERSION
 
-This document describes version 0.606 of ansitable-list-style-sets (from Perl distribution Text-ANSITable), released on 2021-08-27.
+This document describes version 0.607 of ansitable-list-style-sets (from Perl distribution Text-ANSITable), released on 2021-08-27.
 
 =head1 SYNOPSIS
 

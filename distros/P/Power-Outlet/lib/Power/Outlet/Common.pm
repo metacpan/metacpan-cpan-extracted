@@ -4,7 +4,7 @@ use warnings;
 use Time::HiRes qw{};
 use base qw{Package::New};
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 our $STATE   = 'OFF';
 
 =head1 NAME
@@ -33,6 +33,13 @@ Power::Outlet::Common is a base class for controlling and querying a power outle
 
 Smart case insensitive text-based wrapper around methods 0|ON => on, 1|OFF => off, SWITCH|TOGGLE => switch, CYCLE => cycle, QUERY => query
 
+  my $state = $outlet->action("on");
+  my $state = $outlet->action("1");
+  my $state = $outlet->action("off");
+  my $state = $outlet->action("0");
+  my $state = $outlet->action("switch");
+  my $state = $outlet->action("toggle");
+
 =cut
 
 sub action {
@@ -57,7 +64,7 @@ sub action {
 
 The query method must be overridden in the sub class.
 
-  $outlet->query;  #returns ON|OFF Note: may return other values for edge case
+  my $state = $outlet->query;  #returns ON|OFF Note: may return other values for edge case
 
 =cut
 
@@ -67,7 +74,7 @@ sub query {return $STATE};
 
 The on method must be overridden in the sub class.
 
-  $outlet->on;   #turns the outlet on reguardless of current state and returns ON.
+  my $state = $outlet->on;   #turns the outlet on reguardless of current state and returns ON.
 
 Note: This should cancel any non-blocking cycle requests
 
@@ -79,7 +86,7 @@ sub on {return $STATE = 'ON'};
 
 The off method must be overridden in the sub class.
 
-  $outlet->off;   #turns the outlet off reguardless of current state and returns OFF.
+  my $state = $outlet->off;   #turns the outlet off reguardless of current state and returns OFF.
 
 Note: This should cancel any non-blocking cycle requests
 
@@ -91,7 +98,7 @@ sub off {return $STATE = 'OFF'};
 
 Only override the switch method if your hardware natively supports this capability.  However, it should still be documented.
 
-  $outlet->switch; #turns the outlet off if on and on if off and returns the final state ON|OFF.
+  my $state = $outlet->switch; #turns the outlet off if on and on if off and returns the final state ON|OFF.
 
 Note: The default implementations does not cancel non-blocking cycle requests
 
@@ -109,7 +116,7 @@ sub switch {
 
 Only override the cycle method if your hardware natively supports this capability.  However, it should still be documented.
 
-  $outlet->cycle; #turns the outlet off-on-off or on-off-on with a delay and returns the final state ON|OFF.
+  my $state = $outlet->cycle; #turns the outlet off-on-off or on-off-on with a delay and returns the final state ON|OFF.
 
 Note: Implementations may be blocking or non-blocking.
 

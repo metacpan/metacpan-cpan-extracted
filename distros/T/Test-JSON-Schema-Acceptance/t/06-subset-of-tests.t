@@ -1,6 +1,8 @@
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 use strict;
 use warnings;
+use 5.020;
+use experimental qw(signatures postderef);
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
@@ -73,8 +75,7 @@ foreach my $test (
   my $events = intercept(
     sub {
       $accepter->acceptance(
-        validate_data => sub {
-          my ($schema, $data) = @_;
+        validate_data => sub ($schema, $data) {
           return $parser->validate_data($data, $schema);
         },
         tests => $test_options,

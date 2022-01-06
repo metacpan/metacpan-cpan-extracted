@@ -1,5 +1,8 @@
 Revision history for Log-Tiny
 
+1.1     Tue Jan  4 2022 23:44 UTC
+        * Fix bug with buffering output to file.
+
 1.0     Sun Dec 27 2015 22:00 UTC
         * Support multiple instances of Log::Tiny
         * Fix tests, add strict/warnings to all tests

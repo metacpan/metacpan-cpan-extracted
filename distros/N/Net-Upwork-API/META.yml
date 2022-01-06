@@ -20,7 +20,7 @@ name: Net-Upwork-API
 provides:
   Net::Upwork::API:
     file: lib/Net/Upwork/API.pm
-    version: v2.1.3
+    version: v2.1.4
   Net::Upwork::API::Client:
     file: lib/Net/Upwork/API/Client.pm
   Net::Upwork::API::Config:
@@ -35,6 +35,8 @@ provides:
     file: lib/Net/Upwork/API/Routers/Freelancers/Profile.pm
   Net::Upwork::API::Routers::Freelancers::Search:
     file: lib/Net/Upwork/API/Routers/Freelancers/Search.pm
+  Net::Upwork::API::Routers::Graphql:
+    file: lib/Net/Upwork/API/Routers/Graphql.pm
   Net::Upwork::API::Routers::Hr::Clients::Applications:
     file: lib/Net/Upwork/API/Routers/Hr/Clients/Applications.pm
   Net::Upwork::API::Routers::Hr::Clients::Offers:
@@ -95,5 +97,5 @@ resources:
   bugtracker: https://github.com/upwork/perl-upwork-oauth2/issues
   homepage: http://developers.upwork.com
   repository: https://github.com/upwork/perl-upwork-oauth2.git
-version: v2.1.3
+version: v2.1.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

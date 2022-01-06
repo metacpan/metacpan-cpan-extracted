@@ -1,3 +1,9 @@
+${NEXTVER}
+
+0.00005 - Oct 10 2020
+  * Add spi_bus and i2c_bus parameters
+  * handle max_bitrate parameter for i2c, we can't affect it from userspace but the api requires we handle it
+
 0.00004 - Oct 4 2020
   * Use rev 4 of starter-git
   * fix config requires

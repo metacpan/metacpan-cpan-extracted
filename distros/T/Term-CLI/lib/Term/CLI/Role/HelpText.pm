@@ -18,10 +18,9 @@
 #
 #=============================================================================
 
-package Term::CLI::Role::HelpText  0.053006 {
+package Term::CLI::Role::HelpText 0.054002;
 
 use 5.014;
-use strict;
 use warnings;
 
 use Types::Standard 1.000005 qw(
@@ -37,141 +36,155 @@ requires 'has_commands';
 requires 'commands';
 
 has usage => (
-    is => 'rw',
-    isa => Maybe[Str],
+    is  => 'rw',
+    isa => Maybe [Str],
 );
 
 has description => (
-    is => 'rw',
-    isa => Maybe[Str],
+    is  => 'rw',
+    isa => Maybe [Str],
 );
 
 has summary => (
-    is => 'rw',
-    isa => Str,
-    default => sub{''},
+    is      => 'rw',
+    isa     => Str,
+    default => sub {''},
 );
 
-
 sub get_options_summary {
-    my $self = shift;
-    my %args = (with_options => 'both', @_);
+    my ( $self, @args ) = @_;
+    my %args = ( with_options => 'both', @args );
 
     my $with_options = 0x00;
 
-    if ($args{with_options} =~ /short/i) {
+    if ( $args{with_options} =~ /short/i ) {
         $with_options |= 0x01;
     }
-    if ($args{with_options} =~ /long/i) {
+    if ( $args{with_options} =~ /long/i ) {
         $with_options |= 0x02;
     }
-    if ($args{with_options} =~ /both/i) {
+    if ( $args{with_options} =~ /both/i ) {
         $with_options |= 0x03;
     }
 
     my @options;
     my $short_opts_no_arg = '';
-    if (my $opt_specs = $self->options) {
+    if ( my $opt_specs = $self->options ) {
         for my $spec (@$opt_specs) {
-            my $long_arg = my $short_arg = '';
-            if ($spec =~ /=(.*)$/) {
-                $long_arg = "=I<$1>";
-                $short_arg = "I<$1>";
-            }
-            elsif ($spec =~ /:(.*)$/) {
-                $long_arg = "[=I<$1>]";
-                $short_arg = "[I<$1>]";
-            }
-            for my $optname (split(qr/\|/, $spec =~ s/^([^!+=:]+).*/$1/r)) {
-                if (length $optname == 1) {
-                    if ($with_options & 0x01) {
-                        if (length $short_arg == 0) {
-                            $short_opts_no_arg .= $optname;
-                        }
-                        else {
-                            push @options, "[B<-$optname>$short_arg]";
-                        }
-                    }
+            my ( $opt_names, $arg_req, $opt_arg ) = $spec =~ m{
+                    \A ([^!+=:]+)
+                    (?: ([:=]) (.*) )?
+                }xms;
+
+            my $long_arg = my $short_arg = q{};
+            if ( defined $opt_arg ) {
+                $long_arg  = "=I<$opt_arg>";
+                $short_arg = "I<$opt_arg>";
+                if ( $arg_req eq ':' ) {
+                    $long_arg  = "[$long_arg]";
+                    $short_arg = "[$short_arg]";
                 }
-                elsif ($with_options & 0x02) {
+            }
+
+            for my $optname ( split qr{ \| }x, $opt_names ) {
+                if ( length $optname == 1 ) {
+                    next unless $with_options & 0x01;
+                    if ( length $short_arg == 0 ) {
+                        $short_opts_no_arg .= $optname;
+                        next;
+                    }
+                    push @options, "[B<-$optname>$short_arg]";
+                    next;
+                }
+                if ( $with_options & 0x02 ) {
                     push @options, "[B<--$optname>$long_arg]";
                 }
             }
         }
     }
-    if (length $short_opts_no_arg) {
+    if ( length $short_opts_no_arg ) {
         push @options, "[B<-$short_opts_no_arg>]";
     }
-    return join(' ', @options);
+    return join( ' ', @options );
 }
 
+sub _usage_arg_str {
+    my ( $self, $arg ) = @_;
+
+    my $name = $arg->name;
+    my $str  = $arg->max_occur > 1 ? "I<${name}1>" : "I<$name>";
+
+    if ( $arg->min_occur > 1 ) {
+        for my $n ( 2 .. $arg->min_occur ) {
+            $str .= " I<${name}$n>";
+        }
+    }
+
+SWITCH: {
+        if ( $arg->max_occur <= 0 ) {
+            $str .= ' ...';
+            last SWITCH;
+        }
+        if ( $arg->max_occur == $arg->min_occur + 1 ) {
+            if ( $arg->max_occur > 1 ) {
+                $str .= " [I<${name}" . $arg->max_occur . ">]";
+            }
+            last SWITCH;
+        }
+        if ( $arg->max_occur == 2 && $arg->min_occur <= 1 ) {
+            $str .= " [I<${name}" . $arg->max_occur . ">]";
+            last SWITCH;
+        }
+        if ( $arg->max_occur > $arg->min_occur ) {
+            $str
+                .= ' ['
+                . "I<$name"
+                . ( $arg->min_occur + 1 ) . ">" . ' ... '
+                . "I<$name"
+                . $arg->max_occur . ">" . ']';
+            last SWITCH;
+        }
+    }
+
+    if ( $arg->min_occur <= 0 ) {
+        $str = "[$str]";
+    }
+    return $str;
+}
 
 sub usage_text {
-    my $self = shift;
+    my ( $self, @args ) = @_;
 
     my %args = (
-        with_options => 'both',
-        with_arguments => 1,
+        with_options     => 'both',
+        with_arguments   => 1,
         with_subcommands => 1,
-        @_
+        @args,
     );
 
-    if ($self->usage) {
+    if ( $self->usage ) {
         return $self->usage;
     }
 
-    my $usage_prefix = 'B<'.$self->name.'>';
+    my $usage_prefix = 'B<' . $self->name . '>';
     my $usage_suffix = '';
 
-    if ($args{with_arguments} and $self->has_arguments) {
-        my @args;
-        for my $arg ($self->arguments) {
-            #my $name = 'I<'.$arg->name.'>';
-            my $name = $arg->name;
-            my $str = $arg->max_occur > 1 ? "I<${name}1>" : "I<$name>";
-
-            if ($arg->min_occur > 1) {
-                for my $n (2..$arg->min_occur) {
-                    $str .= " I<${name}$n>";
-                }
-            }
-
-            if ($arg->max_occur <= 0) {
-                $str .= ' ...';
-            }
-            elsif ($arg->max_occur == $arg->min_occur + 1) {
-                $str .= " [I<${name}".$arg->max_occur.">]" if $arg->max_occur > 1;
-            }
-            elsif ($arg->max_occur == 2 && $arg->min_occur <= 1) {
-                $str .= " [I<${name}".$arg->max_occur.">]";
-            }
-            elsif ($arg->max_occur > $arg->min_occur) {
-                $str .= ' ['
-                        . "I<$name".($arg->min_occur+1).">"
-                        . ' ... '
-                        . "I<$name".$arg->max_occur.">"
-                        . ']'
-                        ;
-            }
-
-            if ($arg->min_occur <= 0) {
-                $str = "[$str]";
-            }
-            push @args, $str;
-        }
-        $usage_suffix = join(' ', @args);
+    if ( $args{with_arguments} and $self->has_arguments ) {
+        my @arg_l = map { $self->_usage_arg_str($_) } $self->arguments;
+        $usage_suffix = join( ' ', @arg_l );
     }
 
-    if ($args{with_subcommands} and $self->has_commands) {
+    if ( $args{with_subcommands} and $self->has_commands ) {
         my @sub_commands = $self->commands;
         my $sub_commands_text;
-        if (@sub_commands == 1) {
-            $sub_commands_text
-                = $sub_commands[0]->usage_text(%args, with_options => 'none');
+        if ( @sub_commands == 1 ) {
+            $sub_commands_text =
+                $sub_commands[0]->usage_text( %args, with_options => 'none' );
         }
         else {
-            $sub_commands_text
-                = '{'.join('|', map { 'B<'.$_->name.'>' } @sub_commands).'}';
+            $sub_commands_text = '{'
+                . join( '|', map { 'B<' . $_->name . '>' } @sub_commands )
+                . '}';
         }
         $usage_suffix .= ' ' if length $usage_suffix;
         $usage_suffix .= $sub_commands_text;
@@ -179,17 +192,13 @@ sub usage_text {
 
     $usage_suffix = " $usage_suffix" if length $usage_suffix;
 
-    my $opts = $self->get_options_summary( with_options => $args{with_options} );
+    my $opts =
+        $self->get_options_summary( with_options => $args{with_options} );
 
-    if (length $opts) {
+    if ( length $opts ) {
         return "$usage_prefix $opts$usage_suffix";
     }
-    else {
-        return "$usage_prefix$usage_suffix";
-    }
-}
-
-
+    return "$usage_prefix$usage_suffix";
 }
 
 1;
@@ -204,7 +213,7 @@ Term::CLI::Role::HelpText - Role for generating help text in Term::CLI
 
 =head1 VERSION
 
-version 0.053006
+version 0.054002
 
 =head1 SYNOPSIS
 
@@ -252,7 +261,7 @@ help text.
 
 This role is consumed by L<Term::CLI::Command>(3p).
 
-The functionality of this role is primarily used by 
+The functionality of this role is primarily used by
 L<Term::CLI::Command::Help>(3p).
 
 =head1 ATTRIBUTES

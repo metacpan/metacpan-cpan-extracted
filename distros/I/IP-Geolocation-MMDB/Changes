@@ -1,5 +1,23 @@
 Revision history for IP::Geolocation::MMDB
 
+0.007  2022-01-03 13:19:29 CET
+
+  - Implement IP::Geolocation::MMDB::Metadata
+
+0.006  2022-01-02 04:14:40 CET
+
+  - Remove loop initial declarations from MMDB.xs
+  - _to_bigint is now a virtual method
+  - Improved tests
+
+0.005  2021-12-31 21:16:14 CET
+
+  - Handle MMDB_UINT128_IS_BYTE_ARRAY
+
+0.004  2021-12-31 17:00:26 CET
+
+  - Store 64- and 128-bit integers in Math::BigInt objects
+
 0.003  2021-12-30 10:04:58 CET
 
   - Don't call gai_strerror(), which may return UTF-16 on Windows

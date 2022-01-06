@@ -1,5 +1,18 @@
 Revision history for Music-Chord-Progression
 
+0.0602 2022-01-05 22:33:08
+    - Appease Win32 by declaring Set::Object as a prereq, because it barfs.
+
+0.0601 2022-01-04 18:12:57
+    - Improve documentation slightly.
+    - Test that the return of the generate method equals the chords.
+
+0.0600 2022-01-04 11:22:53
+    - Add phrase and chords attributes.
+
+0.0504 2022-01-03 21:35:41
+    - Improve documentation.
+
 0.0503 2021-05-10 09:39:43
     - Update the eg/ programs.
 

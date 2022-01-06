@@ -11,6 +11,7 @@ lib/Net/Upwork/API/Routers/Activities/Team.pm
 lib/Net/Upwork/API/Routers/Auth.pm
 lib/Net/Upwork/API/Routers/Freelancers/Profile.pm
 lib/Net/Upwork/API/Routers/Freelancers/Search.pm
+lib/Net/Upwork/API/Routers/Graphql.pm
 lib/Net/Upwork/API/Routers/Hr/Clients/Applications.pm
 lib/Net/Upwork/API/Routers/Hr/Clients/Offers.pm
 lib/Net/Upwork/API/Routers/Hr/Contracts.pm
@@ -76,4 +77,5 @@ t/28.routers_reports_time.t
 t/29.routers_reports_finance_accounts.t
 t/30.routers_reports_finance_billings.t
 t/31.routers_reports_finance_earnings.t
+t/32.routers_graphql.t
 SIGNATURE    Added here by Module::Build

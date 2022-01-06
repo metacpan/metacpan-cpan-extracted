@@ -18,23 +18,22 @@
 #
 #=============================================================================
 
-package Term::CLI::Argument::Filename  0.053006 {
+package Term::CLI::Argument::Filename 0.054002;
 
 use 5.014;
-use strict;
 use warnings;
 
 use Moo 1.000001;
 use namespace::clean 0.25;
-
 extends 'Term::CLI::Argument';
 
 use File::Glob 'bsd_glob';
+use Fcntl ':mode';
 
 use namespace::clean;
 
 sub complete {
-    my $self = shift;
+    my $self    = shift;
     my $partial = shift;
 
     my $func_ref = $self->term->Attribs->{filename_completion_function}
@@ -43,7 +42,7 @@ sub complete {
     if ($func_ref) {
         my $state = 0;
         my @list;
-        while (my $f = $func_ref->($partial, $state)) {
+        while ( my $f = $func_ref->( $partial, $state ) ) {
             push @list, $f;
             $state = 1;
         }
@@ -52,28 +51,36 @@ sub complete {
 }
 
 sub _glob_complete {
-    my ($self, $partial) = @_;
+    my ( $self, $partial ) = @_;
     my @list = bsd_glob("$partial*");
 
-    return @list if @list <= 1;
+    return if @list == 0;
+
+    if (@list == 1) {
+        if (-d $list[0]) {
+            # Dumb trick to get readline to expand a directory
+            # with a trailing "/", but *not* add a space.
+            # Simulates the Gnu way of doing it.
+            return ("$list[0]/", "$list[0]//");
+        }
+        return @list;
+    }
 
     # If there is more than one possible completion,
     # add filetype suffixes.
     foreach (@list) {
-        if (-l $_) {
-            $_ .= '@';
-        } elsif (-d _) {
-            $_ .= '/';
-        } elsif (-x _) {
-            $_ .= '*';
-        } elsif (-S _ || -p _) {
-            $_ .= '=';
-        }
+        lstat;
+        if ( -l _ )  { $_ .= q{@}; next }
+        if ( -d _ )  { $_ .= q{/}; next }
+        if ( -c _ )  { $_ .= q{%}; next }
+        if ( -b _ )  { $_ .= q{#}; next }
+        if ( -S _ )  { $_ .= q{=}; next }
+        if ( -p _ )  { $_ .= q{=}; next }
+        if ( -x _ )  { $_ .= q{*}; next }
     }
     return @list;
 }
 
-}
 1;
 
 __END__
@@ -86,7 +93,7 @@ Term::CLI::Argument::Filename - class for file name arguments in Term::CLI
 
 =head1 VERSION
 
-version 0.053006
+version 0.054002
 
 =head1 SYNOPSIS
 

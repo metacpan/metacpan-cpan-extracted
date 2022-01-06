@@ -85,7 +85,7 @@ Please report problems at: L<https://github.com/pombase/chobo/issues>
 
 =head2 License and Copyright
 
-Copyright (C) 2016 Kim Rutherford
+Copyright (C) 2013-2022 Kim Rutherford
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

@@ -22,5 +22,7 @@ Send.pm
 SIGNATURE
 t/App-HL7-Send/01-use.t
 t/App-HL7-Send/02-version.t
+t/App-HL7-Send/03-new.t
+t/App-HL7-Send/04-run.t
 xt/App-HL7-Send/01-pod_coverage.t
 xt/App-HL7-Send/02-pod.t

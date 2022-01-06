@@ -16,11 +16,9 @@ use FindBin;
 use SPVM::Builder;
 use SPVM::ExchangeAPI;
 
-use Encode 'encode', 'decode';
-
 use Carp 'confess';
 
-our $VERSION = '0.9102';
+our $VERSION = '0.9109';
 
 my $SPVM_INITED;
 my $BUILDER;
@@ -288,7 +286,7 @@ sub call_spvm_method {
 
 1;
 
-=encoding UTF-8
+=encoding utf8
 
 =head1 NAME
 
@@ -443,6 +441,16 @@ SPVM Native APIs is C APIs used in SPVM native method.
 =over 2
 
 =item * L<NativeAPI|SPVM::Document::NativeAPI>
+
+=back
+
+=head2 Generate Execution File
+
+spvmcc is a compiler to compile SPVM source codes to a execution file. The execution file can be run by itself.
+
+=over 2
+
+=item * L<spvmcc>
 
 =back
 

@@ -4,16 +4,13 @@ NAME
 
 VERSION
 
-    version 0.0016
+    version 0.002000
 
 STATUS
 
     At this moment this library is experimental and still under active
     development (at my after-work time). It's still quite incomplete
     compared to R's ggplot2 library, but the core features are working.
-
-    Besides, it heavily depends on my Alt::Data::Frame::ButMore library,
-    which is also experimental.
 
 SYNOPSIS
 
@@ -113,7 +110,7 @@ SEE ALSO
 
     Chart::GGPlot::Plot
 
-    Alt::Data::Frame::ButMore
+    Data::Frame
 
 AUTHOR
 

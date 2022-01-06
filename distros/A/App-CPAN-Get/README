@@ -51,6 +51,11 @@ SEE ALSO
 
         "cpan -g Some::Module"
 
+    cpanp
+        The CPANPLUS launcher
+
+        "cpanp d --fetchdir=. Some::Module"
+
     cpanspec
         Generate a spec file for a CPAN module
 
@@ -73,10 +78,10 @@ ACKNOWLEDGMENTS
      Paul Evans for notes about usage.
 
 LICENSE AND COPYRIGHT
-    © 2021 Michal Josef Špaček
+    © 2021-2022 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.05
 

@@ -12,7 +12,7 @@ use lib qw(lib);
 
 my @modules = qw(
   Git::Background
-  Git::Background::Exception
+  Git::Background::Future
 );
 
 plan tests => scalar @modules;

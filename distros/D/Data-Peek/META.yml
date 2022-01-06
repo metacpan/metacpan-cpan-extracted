@@ -16,11 +16,11 @@ name: Data-Peek
 provides: 
   Data::Peek: 
     file: Peek.pm
-    version: '0.50'
+    version: '0.51'
 recommends: 
-  Data::Dumper: '2.174'
+  Data::Dumper: '2.183'
   Perl::Tidy: 0
-  Test::More: '1.302183'
+  Test::More: '1.302188'
 requires: 
   Data::Dumper: 0
   Test::More: '0.90'
@@ -32,4 +32,4 @@ resources:
   bugtracker: https://github.com/Tux/Data-Peek/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/Data-Peek
-version: '0.50'
+version: '0.51'

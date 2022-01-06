@@ -229,6 +229,8 @@ t/etc/dsm-6.1/DISTNAME
 t/etc/dsm-6.1/VERSION
 t/etc/dsm-6.2/DISTNAME
 t/etc/dsm-6.2/VERSION
+t/etc/dsm-7.0/DISTNAME
+t/etc/dsm-7.0/VERSION
 t/etc/fedora-14/DISTNAME
 t/etc/fedora-14/fedora-release
 t/etc/fedora-14/issue
@@ -408,6 +410,15 @@ t/etc/rocky-8.4/rocky-release
 t/etc/rocky-8.4/rocky-release-upstream
 t/etc/rocky-8.4/system-release
 t/etc/rocky-8.4/system-release-cpe
+t/etc/rocky-8.5/DISTNAME
+t/etc/rocky-8.5/centos-release
+t/etc/rocky-8.5/issue
+t/etc/rocky-8.5/os-release
+t/etc/rocky-8.5/redhat-release
+t/etc/rocky-8.5/rocky-release
+t/etc/rocky-8.5/rocky-release-upstream
+t/etc/rocky-8.5/system-release
+t/etc/rocky-8.5/system-release-cpe
 t/etc/s390x-sles11-sp2/DISTNAME
 t/etc/s390x-sles11-sp2/issue
 t/etc/s390x-sles11-sp2/lsb-release

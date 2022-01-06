@@ -2,15 +2,13 @@
 
 # This script generates pod from packages that supports ggplot_functions()
 
-use 5.010;
-use strict;
+use 5.012;
 use warnings;
 
 use FindBin;
 use lib "$FindBin::RealBin/../lib";
 
 use Getopt::Long;
-use Path::Tiny;
 use Module::Load;
 
 my ($namespace) = @ARGV;

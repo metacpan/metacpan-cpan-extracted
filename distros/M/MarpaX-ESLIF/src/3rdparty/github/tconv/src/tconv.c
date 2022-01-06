@@ -734,7 +734,7 @@ static inline short _tconvDefaultCharsetOption(tconv_t tconvp, tconv_charset_ext
   return 1;
 
  err:
-  TCONV_TRACE(tconvp, "%s - character converter %s is not available", funcs);
+  TCONV_TRACE(tconvp, "%s - character converter %s is not available", funcs, converts);
   errno = ENOSYS;
   return 0;
 }

@@ -4,7 +4,7 @@ package Chart::GGPlot::Theme::Defaults;
 
 use Chart::GGPlot::Setup;
 
-our $VERSION = '0.0016'; # VERSION
+our $VERSION = '0.002000'; # VERSION
 
 use Chart::GGPlot::Theme;
 use Chart::GGPlot::Theme::Element::Functions qw(:all);
@@ -466,7 +466,7 @@ Chart::GGPlot::Theme::Defaults - Pre-defined themes
 
 =head1 VERSION
 
-version 0.0016
+version 0.002000
 
 =head1 SYNOPSIS
 

@@ -18,13 +18,12 @@
 #
 #=============================================================================
 
-package Term::CLI::Role::CommandSet  0.053006 {
+package Term::CLI::Role::CommandSet 0.054002;
 
 use 5.014;
-use strict;
 use warnings;
 
-use Term::CLI::L10N;
+use Term::CLI::L10N qw( loc );
 
 use Types::Standard 1.000005 qw(
     ArrayRef
@@ -40,26 +39,27 @@ use namespace::clean 0.25;
 has parent => (
     is       => 'rwp',
     weak_ref => 1,
-    isa      => ConsumerOf['Term::CLI::Role::CommandSet'],
+    isa      => ConsumerOf ['Term::CLI::Role::CommandSet'],
 );
 
 has _commands => (
-    is        => 'rw',
-    writer    => '_set_commands',
-    init_arg  => 'commands',
-    isa       => Maybe[ArrayRef[InstanceOf['Term::CLI::Command']]],
-    trigger   => 1,
-    coerce    => sub {
+    is       => 'rw',
+    writer   => '_set_commands',
+    init_arg => 'commands',
+    isa      => Maybe [ ArrayRef [ InstanceOf ['Term::CLI::Command'] ] ],
+    trigger  => 1,
+    coerce   => sub {
+
         # Copy the array, so the reference we store becomes
         # "internal", preventing accidental modification
         # from the outside.
-        return [@{$_[0]}]
+        return [ @{ $_[0] } ];
     },
 );
 
 has callback => (
     is        => 'rw',
-    isa       => Maybe[CodeRef],
+    isa       => Maybe [CodeRef],
     predicate => 1
 );
 
@@ -67,100 +67,88 @@ has callback => (
 #
 # Trigger to run whenever the object's _commands array ref is set.
 #
-sub _trigger__commands {
-    my ($self, $arg) = @_;
+sub _trigger__commands {    ## no critic (ProhibitUnusedPrivateSubroutines)
+    my ( $self, $arg ) = @_;
+
     # No need to check for defined-ness of $arg.
     # The writer method already checks & croaks.
     for my $cmd (@$arg) {
         $cmd->_set_parent($self);
     }
-};
-
+    return;
+}
 
 sub commands {
     my $self = shift;
-    my @l = sort { $a->name cmp $b->name } @{$self->_commands // []};
+    my @l    = sort { $a->name cmp $b->name } @{ $self->_commands // [] };
     return @l;
 }
 
-
 sub has_commands {
     my $self = shift;
-    return ($self->_commands and scalar @{$self->_commands} > 0);
+    return ( $self->_commands and scalar @{ $self->_commands } > 0 );
 }
 
-
 sub add_command {
-    my ($self, @commands) = @_;
+    my ( $self, @commands ) = @_;
 
-    if (!$self->_commands) {
-        $self->_set_commands([]);
+    if ( !$self->_commands ) {
+        $self->_set_commands( [] );
     }
 
     for my $cmd (@commands) {
-        push @{$self->_commands}, $cmd;
+        push @{ $self->_commands }, $cmd;
         $cmd->_set_parent($self);
     }
     return $self;
 }
-
 
 sub command_names {
     my $self = shift;
     return map { $_->name } $self->commands;
 }
 
-
 sub find_matches {
-    my ($self, $partial) = @_;
+    my ( $self, $partial ) = @_;
     return () if !$self->has_commands;
-    my @found = grep { rindex($_->name, $partial, 0) == 0 } $self->commands;
+    my @found = grep { rindex( $_->name, $partial, 0 ) == 0 } $self->commands;
     return @found;
 }
-
 
 sub root_node {
     my $curr_node = shift;
 
-    while (my $parent = $curr_node->parent) {
+    while ( my $parent = $curr_node->parent ) {
         $curr_node = $parent;
     }
     return $curr_node;
 }
 
-
 sub find_command {
-    my ($self, $partial) = @_;
+    my ( $self, $partial ) = @_;
     my @matches = $self->find_matches($partial);
 
-    if (@matches == 1) {
+    if ( @matches == 1 ) {
         return $matches[0];
     }
-    elsif (@matches == 0) {
-        return $self->set_error(loc("unknown command '[_1]'", $partial));
+    if ( @matches == 0 ) {
+        return $self->set_error( loc( "unknown command '[_1]'", $partial ) );
     }
-    else {
-        return $self->set_error(
-            loc("ambiguous command '[_1]' (matches: [_2])",
-                $partial,
-                join(', ', sort map {$_->name} @matches)
-            )
-        );
-    }
+    return $self->set_error(
+        loc("ambiguous command '[_1]' (matches: [_2])",
+            $partial,
+            join( ', ', sort map { $_->name } @matches )
+        )
+    );
 }
-
 
 sub try_callback {
-    my ($self, %args) = @_;
+    my ( $self, %args ) = @_;
 
-    if ($self->has_callback && defined $self->callback) {
-        return $self->callback->($self, %args);
+    if ( $self->has_callback && defined $self->callback ) {
+        return $self->callback->( $self, %args );
     }
-    else {
-        return %args;
-    }
-}
-
+    return %args;
 }
 
 1;
@@ -175,7 +163,7 @@ Term::CLI::Role::CommandSet - Role for (sub-)commands in Term::CLI
 
 =head1 VERSION
 
-version 0.053006
+version 0.054002
 
 =head1 SYNOPSIS
 

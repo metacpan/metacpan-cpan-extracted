@@ -1,3 +1,8 @@
+0.106   2021-12-09  Released-By: PERLANCAR; Urgency: medium
+
+	- Also pass 'title' parameter to Text::Table::HTML.
+
+
 0.105   2021-12-09  Released-By: PERLANCAR; Urgency: medium
 
 	- Pass 'title' parameter to Text::Table::HTML::DataTables.

@@ -1,16 +1,26 @@
 use strict;
 use warnings;
+
 package Health::SHC;
 
 # ABSTRACT: Extract and verify Smart Health Card information
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 =head1 NAME
 
 Health::SHC - Verify Smart Health Card Signature and Extract data.
 
 =head1 SYNOPSIS
+
+    use Health::SHC::Validate;
+    my $shc_valid = Health::SHC::Validate->new();
+
+    # Use builtin trusted keys
+    my $data = $shc_valid->get_valid_data($qr);
+
+    # Use your own keys to validate - you may trust them
+    my $data = $shc_valid->get_valid_data($qr, $keys_json);
 
     use Health::SHC;
     my $sh = Health::SHC->new();
@@ -40,12 +50,33 @@ Health::SHC - Verify Smart Health Card Signature and Extract data.
         print "\n";
     }
 
-
 =head1 DESCRIPTION
+
+=encoding utf-8
 
 This perl module can extract a Smart Health Card's data from PDFs or image file.
 The extracted shc:/ Smart Health Card URI is decoded and the signature checked.
 The module provide several methods to retrieve the data in a more usable format.
+
+Health::SHC supports QR codes for the following regions:
+
+    * Québec
+    * British Columbia
+    * Saskatchewan
+    * Alberta
+    * Newfoundland and Labrador
+    * Nova Scotia
+    * Ontario
+    * Northwest Territories
+    * Yukon
+    * New Brunswick/Nouveau-Brunswick
+    * Japan
+
+The keys in share/keys.json (and supported regions) are based on the keys
+included with https://github.com/obrassard/shc-extractor.
+
+Additional regions can be added with a pull request or by logging an issue
+at https://github.com/timlegge/perl-Health-SHC/issues.
 
 =cut
 

@@ -4,7 +4,7 @@ package Chart::GGPlot::Util::Stats;
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-our $VERSION = '0.0016'; # VERSION
+our $VERSION = '0.002000'; # VERSION
 
 use parent qw(Exporter::Tiny);
 
@@ -97,7 +97,7 @@ Chart::GGPlot::Util::Stats - Utility statistics functions
 
 =head1 VERSION
 
-version 0.0016
+version 0.002000
 
 =head1 DESCRIPTION
 

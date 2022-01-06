@@ -2,7 +2,7 @@ CMAKE_MINIMUM_REQUIRED (VERSION 3.0.0 FATAL_ERROR)
 IF (NOT MYPACKAGEBOOTSTRAP_DONE)
   INCLUDE ("3rdparty/github/cmake-utils/cmake/MyPackageBootstrap.cmake")
 ENDIF ()
-MYPACKAGESTART (tconv 1 0 71)
+MYPACKAGESTART (tconv 1 0 73)
 
 ####################
 # Specific options #
@@ -16,20 +16,22 @@ OPTION(TCONV_USE_ICONV "Enable ICONV plugin plugin" ON)
 SET (libtconv_src src/tconv.c src/tconv/charset/tconv_charset_cchardet.c)
 SET (libtconv_inc)
 
+SET (TCONV_ICONV_VERSION 1.16)
+
 IF (TCONV_USE_ICONV)
   # ------------------------------------
-  # iconv sources: libiconv-1.15 builtin
+  # iconv sources: libiconv-${TCONV_ICONV_VERSION} builtin
   # ------------------------------------
   MESSAGE (STATUS "Unpacking libiconv")
   EXECUTE_PROCESS(
-    COMMAND "${CMAKE_COMMAND}" -E tar xzf ${PROJECT_SOURCE_DIR}/3rdparty/tar/libiconv-1.15.tar.gz
+    COMMAND "${CMAKE_COMMAND}" -E tar xzf ${PROJECT_SOURCE_DIR}/3rdparty/tar/libiconv-${TCONV_ICONV_VERSION}.tar.gz
     WORKING_DIRECTORY "${3RDPARTY_OUTPUT_PATH}"
     )
   #
   # iconv uses config.h, we are using tconv_config.h, so there is no clash luckily
   #
   FILE (WRITE
-    ${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/include/config.h
+    ${3RDPARTY_OUTPUT_PATH}/libiconv-${TCONV_ICONV_VERSION}/include/config.h
 "
 /* Generated file */
 /* localcharset.c will play itself with WIN32_LEAN_AND_MEAN... */
@@ -50,8 +52,8 @@ IF (TCONV_USE_ICONV)
     CONFIGURE_FILE (${src} ${dst})
   ENDFUNCTION ()
 
-  CREATE_ICONV_H(${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/include/iconv.h.in ${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/include/iconv.h @ONLY)
-  CREATE_LOCALCHARSET_H(${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/libcharset/include/localcharset.h.in ${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/libcharset/include/localcharset.h @ONLY)
+  CREATE_ICONV_H(${3RDPARTY_OUTPUT_PATH}/libiconv-${TCONV_ICONV_VERSION}/include/iconv.h.in ${3RDPARTY_OUTPUT_PATH}/libiconv-${TCONV_ICONV_VERSION}/include/iconv.h @ONLY)
+  CREATE_LOCALCHARSET_H(${3RDPARTY_OUTPUT_PATH}/libiconv-${TCONV_ICONV_VERSION}/libcharset/include/localcharset.h.in ${3RDPARTY_OUTPUT_PATH}/libiconv-${TCONV_ICONV_VERSION}/libcharset/include/localcharset.h @ONLY)
   INCLUDE (CheckCSourceCompiles)
   CHECK_C_SOURCE_COMPILES("
   #include <stdlib.h>
@@ -74,15 +76,15 @@ IF (TCONV_USE_ICONV)
   ENDIF ()
 
   LIST (APPEND libtconv_iconv_src
-    ${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/libcharset/lib/localcharset.c
-    ${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/lib/relocatable.c
-    ${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/lib/iconv.c
+    ${3RDPARTY_OUTPUT_PATH}/libiconv-${TCONV_ICONV_VERSION}/libcharset/lib/localcharset.c
+    ${3RDPARTY_OUTPUT_PATH}/libiconv-${TCONV_ICONV_VERSION}/lib/relocatable.c
+    ${3RDPARTY_OUTPUT_PATH}/libiconv-${TCONV_ICONV_VERSION}/lib/iconv.c
     )
   FOREACH (_iconv_src ${libtconv_iconv_src})
     SET_PROPERTY(
       SOURCE ${_iconv_src}
       PROPERTY COMPILE_FLAGS
-      " -I${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/include -I${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/libcharset/include"
+      " -I${3RDPARTY_OUTPUT_PATH}/libiconv-${TCONV_ICONV_VERSION}/include -I${3RDPARTY_OUTPUT_PATH}/libiconv-${TCONV_ICONV_VERSION}/libcharset/include"
       )
     #
     # Remove the const thingy
@@ -247,7 +249,7 @@ IF (ICONV_FOUND)
   SET (ICONV_CAN_TRANSLIT TRUE)
   SET (ICONV_CAN_IGNORE TRUE)
   LIST (APPEND libtconv_src src/tconv/convert/tconv_convert_iconv.c)
-  LIST (APPEND libtconv_inc ${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/include)
+  LIST (APPEND libtconv_inc ${3RDPARTY_OUTPUT_PATH}/libiconv-${TCONV_ICONV_VERSION}/include)
 ENDIF ()
 
 MYPACKAGELIBRARY(

@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 use parent qw(CPANPLUS::Dist::Debora::Package);
 
@@ -373,15 +373,19 @@ Standards-Version: 4.5.1
 Homepage: [% $package->url %]
 
 Package: [% $package->name %]
-Architecture: [% $package->is_noarch ? 'all' : 'any' %]
 [%
+$OUT .= 'Architecture: ';
+$OUT .=  $package->is_noarch ? 'all' : 'any';
 my @provides = @{$package->provides};
 if (@provides) {
-    $OUT .= 'Provides: ' . shift @provides;
+    $OUT .= "\n";
+    $OUT .= 'Provides: ';
+    $OUT .= shift @provides;
     for my $name (@provides) {
         $OUT .= ", $name";
     }
 }
+q{};
 %]
 [%
 $OUT .= 'Depends: ${misc:Depends}, ${perl:Depends}';
@@ -404,14 +408,15 @@ for my $dependency (@dependencies) {
         $OUT .= ' | libossp-uuid-perl';
     }
 }
+q{};
 %]
 Description: [% $package->summary %]
 [%
-  local $Text::Wrap::unexpand = 0;
-  my $text = Text::Wrap::wrap(q{ }, q{ }, $package->description);
-  $text =~ s{^ [ ] [.]}{ \N{U+200B}.}xmsg; # Put a non-visible space before dots.
-  $text =~ s{^ [ ] (\h*) $}{ .$1}xmsg;     # Put a dot into empty lines.
-  $OUT .= $text;
+local $Text::Wrap::unexpand = 0;
+my $text = Text::Wrap::wrap(q{ }, q{ }, $package->description);
+$text =~ s{^ [ ] [.]}{ \N{U+200B}.}xmsg; # Put a non-visible space before dots.
+$text =~ s{^ [ ] (\h*) $}{ .$1}xmsg;     # Put a dot into empty lines.
+$text;
 %]
 END_TEMPLATE
 
@@ -461,6 +466,7 @@ for my $license (@licenses) {
         $OUT .= "\n";
     }
 }
+q{};
 %]
 END_TEMPLATE
 
@@ -509,6 +515,7 @@ if ($first_changelog) {
     $OUT .= "\noverride_dh_installchangelogs:\n";
     $OUT .= "\tdh_installchangelogs $first_changelog";
 }
+q{};
 %]
 [%
 my $installdirs = $package->installdirs;
@@ -525,6 +532,7 @@ if ($installdirs eq 'site') {
     $OUT .= "\trm -rf '$debiandocdir'\n";
     $OUT .= "\tfind '$buildrootdir' -type d -empty -delete";
 }
+q{};
 %]
 END_TEMPLATE
 
@@ -918,7 +926,7 @@ CPANPLUS::Dist::Debora::Package::Debian - Create Debian packages
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -932,7 +940,7 @@ version 0.006
 
 =head1 DESCRIPTION
 
-This CPANPLUS::Dist::Debora::Package subclass creates Debian packages from
+This L<CPANPLUS::Dist::Debora::Package> subclass creates Debian packages from
 Perl distributions.
 
 =head1 SUBROUTINES/METHODS
@@ -1029,15 +1037,15 @@ Fills in a template and returns a rules file.
 
 =head1 DIAGNOSTICS
 
-See CPANPLUS::Dist::Debora for diagnostics.
+See L<CPANPLUS::Dist::Debora> for diagnostics.
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
-See CPANPLUS::Dist::Debora for supported files and environment variables.
+See L<CPANPLUS::Dist::Debora> for supported files and environment variables.
 
 =head1 DEPENDENCIES
 
-Requires the Perl modules CPANPLUS and Text::Template from CPAN.
+Requires the Perl modules L<CPANPLUS> and L<Text::Template> from CPAN.
 
 Requires the operating system packages "perl", "build-essential", "debhelper",
 "fakeroot" and "sudo".  The minimum supported debhelper version is 12.
@@ -1060,7 +1068,7 @@ This module cannot be used in taint mode.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2021 Andreas Vögele
+Copyright 2022 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

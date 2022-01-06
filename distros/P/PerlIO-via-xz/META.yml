@@ -14,13 +14,15 @@ name: PerlIO-via-xz
 provides: 
   PerlIO::via::xz: 
     file: lib/PerlIO/via/xz.pm
-    version: '0.03'
+    version: '0.04'
 recommends: 
-  Test::More: '1.302183'
+  IO::Compress::Xz: '2.101'
+  IO::Uncompress::UnXz: '2.101'
+  Test::More: '1.302188'
 requires: 
   Carp: 0
-  IO::Compress::Xz: '2.096'
-  IO::Uncompress::UnXz: '2.096'
+  IO::Compress::Xz: '2.100'
+  IO::Uncompress::UnXz: '2.100'
   PerlIO: 0
   Test::More: 0
   perl: '5.012000'
@@ -30,4 +32,4 @@ resources:
   homepage: https://metacpan.org/pod/PerlIO::via::xz
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/PerlIO-via-xs
-version: '0.03'
+version: '0.04'

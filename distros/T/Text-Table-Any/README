@@ -2,7 +2,7 @@ NAME
     Text::Table::Any - Generate text table using one of several backends
 
 VERSION
-    This document describes version 0.105 of Text::Table::Any (from Perl
+    This document describes version 0.106 of Text::Table::Any (from Perl
     distribution Text-Table-Any), released on 2021-12-09.
 
 SYNOPSIS
@@ -199,8 +199,8 @@ FUNCTIONS
 
         Optional. Str. Title of the table.
 
-        Currently the only backend supporting this is
-        "Text::Table::HTML::DataTables".
+        Currently the only backends supporting this are "Text::Table::HTML"
+        and "Text::Table::HTML::DataTables".
 
   backends
     Return list of supported backends. You can also get the list from the

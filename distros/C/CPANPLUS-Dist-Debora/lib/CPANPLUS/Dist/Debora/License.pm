@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 use parent qw(Software::License);
 
@@ -138,7 +138,7 @@ CPANPLUS::Dist::Debora::License - Read license files
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -154,7 +154,7 @@ version 0.006
 
 =head1 DESCRIPTION
 
-This Software::License subclass reads license texts from files and Pod
+This L<Software::License> subclass reads license texts from files and Pod
 documents.
 
 =head1 SUBROUTINES/METHODS
@@ -166,7 +166,7 @@ documents.
       holder  => $holder,
   });
 
-Creates a new object.  The CPANPLUS::Dist::Debora::Package object parameter
+Creates a new object.  The L<CPANPLUS::Dist::Debora::Package> object parameter
 and the copyright holder are mandatory.
 
 =head2 name
@@ -203,7 +203,7 @@ None.
 
 =head1 DEPENDENCIES
 
-Requires the module Software::License from CPAN.
+Requires the module L<Software::License> from CPAN.
 
 =head1 INCOMPATIBILITIES
 
@@ -219,7 +219,7 @@ None known.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2021 Andreas Vögele
+Copyright 2022 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

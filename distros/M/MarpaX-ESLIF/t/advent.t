@@ -70,7 +70,7 @@ FACE ~ [2-9jqka] | '10'
 WS ~ [\s]
 :discard ::= WS
 
-:lexeme ::= <CARD>  pause => after event => CARD
+:symbol ::= <CARD>  pause => after event => CARD
 };
 
 my $eslif = MarpaX::ESLIF->new($log);
@@ -147,7 +147,7 @@ for my $test_data (@tests) {
 
     for my $suit_line_data (@suit_line) {
         my ($suit_line, $suit_line_type) = @{$suit_line_data};
-        $log->infof('Testing suite line: %s, type: %s, expected value: %s', $suit_line, $suit_line_type);
+        $log->infof('Testing suite line: %s, type: %s', $suit_line, $suit_line_type);
       PROCESSING: {
           # Note: in production, you would compute the three grammar variants
           # ahead of time.
@@ -168,7 +168,7 @@ for my $test_data (@tests) {
           while ($ok && $re->isCanContinue()) {
 
             # In our example there is a single event: no need to ask what it is
-            my $CARD = $re->lexemeLastPause('CARD');
+            my $CARD = $re->nameLastPause('CARD');
             ok(utf8::is_utf8($CARD), "Card '$CARD' have the utf8 flag");
             if ( ++$played{$CARD} > 1 ) {
                 $actual_result = 'Parse stopped by application';
@@ -213,8 +213,8 @@ for my $test_data (@tests) {
           $actual_value  = 'No hands were found';
         }
 
-        is( $actual_result, $expected_result, "Result of $input using $suit_line_type" );
-        is( $actual_value, $expected_value, "Value of $input using $suit_line_type" ) if $expected_value;
+        is( $actual_result, $expected_result, "Result of $input using $suit_line_type should be: $expected_result" );
+        is( $actual_value, $expected_value, "Value of $input using $suit_line_type should be: $expected_value" ) if $expected_value;
     }
 }
 

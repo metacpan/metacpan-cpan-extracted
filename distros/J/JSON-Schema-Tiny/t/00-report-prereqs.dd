@@ -3,12 +3,12 @@ do { my $x = {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0',
                                         'Module::Build::Tiny' => '0.034',
-                                        'perl' => '5.016'
+                                        'perl' => '5.020'
                                       }
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.161',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.162',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
@@ -50,11 +50,16 @@ do { my $x = {
                                       'Ref::Util' => '0.100',
                                       'Scalar::Util' => '0',
                                       'Storable' => '0',
+                                      'experimental' => '0',
                                       'if' => '0',
                                       'namespace::clean' => '0',
-                                      'perl' => '5.016',
+                                      'perl' => '5.020',
                                       'strict' => '0',
                                       'warnings' => '0'
+                                    },
+                      'suggests' => {
+                                      'Cpanel::JSON::XS' => '0',
+                                      'Ref::Util::XS' => '0'
                                     }
                     },
        'test' => {
@@ -65,17 +70,19 @@ do { my $x = {
                                    'Data::Dumper' => '0',
                                    'File::Spec' => '0',
                                    'List::Util' => '1.50',
+                                   'Math::BigFloat' => '0',
+                                   'Math::BigInt' => '0',
                                    'Module::Metadata' => '0',
                                    'Path::Tiny' => '0',
                                    'Test::Deep' => '0',
                                    'Test::Fatal' => '0',
-                                   'Test::JSON::Schema::Acceptance' => '1.007',
+                                   'Test::JSON::Schema::Acceptance' => '1.014',
                                    'Test::More' => '0.96',
                                    'Test::Warnings' => '0',
                                    'constant' => '0',
                                    'lib' => '0',
                                    'open' => '0',
-                                   'perl' => '5.016',
+                                   'perl' => '5.020',
                                    'utf8' => '0'
                                  }
                  },

@@ -11,7 +11,6 @@ use Scalar::Util qw(tainted);
 
 use CPANPLUS::Dist::Debora::Package::RPM;
 
-use open ':std', ':encoding(utf8)';
 use Test::More;
 
 if (tainted($ENV{PWD})) {

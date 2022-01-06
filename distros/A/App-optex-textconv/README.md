@@ -5,7 +5,7 @@ textconv - optex module to replace document file by its text contents
 
 # VERSION
 
-Version 0.1401
+Version 1.01
 
 # SYNOPSIS
 
@@ -41,7 +41,21 @@ Next command simply produces the same result.
 
     Microsoft office format files in XML (.docx, .pptx, .xlsx, .docm,
     .pptm, .xlsm).
-    See [App::optex::textconv::msdoc](https://metacpan.org/pod/App::optex::textconv::msdoc).
+    Use
+    [App::optex::textconv::msdoc](https://metacpan.org/pod/App::optex::textconv::msdoc),
+    [App::optex::textconv::ooxml](https://metacpan.org/pod/App::optex::textconv::ooxml),
+    [App::optex::textconv::ooxml::regex](https://metacpan.org/pod/App::optex::textconv::ooxml::regex),
+    [App::optex::textconv::ooxml::xslt](https://metacpan.org/pod/App::optex::textconv::ooxml::xslt).
+
+- doc
+
+    Microsoft Word file.
+    Use [Text::Extract::Word](https://metacpan.org/pod/Text::Extract::Word) module.
+
+- xls
+
+    Microsoft Excel file.
+    Use [Spreadsheet::ParseExcel](https://metacpan.org/pod/Spreadsheet::ParseExcel) module.
 
 - pdf
 
@@ -132,7 +146,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2019-2021 Kazumasa Utashiro.
+Copyright 2019-2022 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

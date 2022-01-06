@@ -14,8 +14,8 @@ my $cgi      = CGI->new;
 my $ini      = '/etc/power-outlet.ini';
 my $cfg      = Config::IniFiles->new(-file=>$ini);
 my $switch   = $cgi->param('switch.x');
-my $group    = $cgi->param('group') || 'Main';
 my @groups   = uniq map {$cfg->val($_=>'groups', 'Main')} $cfg->Sections;
+my $group    = $cgi->param('group') || $groups[0];
 my $pm       = Parallel::ForkManager->new(16);
 
 my @outlets  = map {
@@ -59,7 +59,7 @@ foreach my $outlet (@outlets) {#main forking loop
   local $@;
   my $status = eval{
                     local $SIG{ALRM} = sub {die "timeout\n"};
-                    alarm 1.25; #some devices are slow to warmup
+                    alarm 1.5; #some devices are slow to warmup
                     my $return       = $Power_Outlet->query;
                     alarm 0;
                     $return;

@@ -1,5 +1,10 @@
 Revision history for Thread-Csp
 
+0.004     2022-01-04 18:44:16+01:00 Europe/Amsterdam
+          - Fix allocation of mthread
+          - Add atomics support for Visual C++
+          - Fix return type of run_thread on Windows
+
 0.003     2021-12-30 10:34:27+01:00 Europe/Amsterdam
           - Use stdc malloc instead of PerlMemShared
           - Define CX_LEAVE_SCOPE when not available

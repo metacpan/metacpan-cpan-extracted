@@ -1,8 +1,6 @@
 use strict;
 use warnings;
 
-require 5.008001;
-
 use ExtUtils::MakeMaker;
 
 # ----------------------
@@ -12,19 +10,19 @@ use ExtUtils::MakeMaker;
 
 my(%params) =
 (
-	($] ge '5.005') ?
+	("$]" >= '5.005') ?
 	(
 		AUTHOR		=> 'Adam Kennedy <adamk@cpan.org>',
 		ABSTRACT	=> 'Read/Write .ini style files with as little code as possible',
 	) : (),
 	clean =>
 	{
-		FILES => 'blib/* Makefile MANIFEST Config-Tiny-*'
+		FILES => 'blib/* Makefile MANIFEST Config-Tiny-*',
 	},
 	dist =>
 	{
 		COMPRESS	=> 'gzip',
-		SUFFIX		=> 'gz'
+		SUFFIX		=> 'gz',
 	},
 	BUILD_REQUIRES =>
 	{
@@ -32,32 +30,32 @@ my(%params) =
 		# 0.47 means 5.6.2 or newer, which everyone on Win32 has.
 		($^O eq 'MSWin32' ? () : ('Test::More' => '0.47') ),
 	},
-	DISTNAME	=> 'Config-Tiny',
-	NAME		=> 'Config::Tiny',
-	PL_FILES	=> {},
-	LICENSE		=> 'perl',
-	PREREQ_PM	=>
+	DISTNAME			=> 'Config-Tiny',
+	EXE_FILES			=> [],
+	MIN_PERL_VERSION	=> '5.008001',
+	NAME				=> 'Config::Tiny',
+	PL_FILES			=> {},
+	PREREQ_PM			=>
 	{
-		'File::Spec'	=> 3.30,
-		'File::Temp'	=> 0.22,
-		'strict'		=> 0,
-		'utf8'			=> 0,
+		'File::Spec'	=> '3.30',
+		'File::Temp'	=> '0.22',
+		'strict'		=> '0',
+		'utf8'			=> '0',
 	},
 	TEST_REQUIRES =>
 	{
-		'Test::More' => 1.001002,
+		'Test::More'	=> '1.001002',
+		'Test::Pod'		=> '1.51',
 	},
-	VERSION_FROM	=> 'lib/Config/Tiny.pm',
-	INSTALLDIRS		=> 'site',
-	EXE_FILES		=> [],
+	VERSION_FROM => 'lib/Config/Tiny.pm',
 );
 
-if ( ($ExtUtils::MakeMaker::VERSION =~ /^\d\.\d\d$/) && ($ExtUtils::MakeMaker::VERSION > 6.30) )
+if (eval{ExtUtils::MakeMaker->VERSION('6.30')})
 {
 	$params{LICENSE} = 'perl';
 }
 
-if ($ExtUtils::MakeMaker::VERSION ge '6.46')
+if (eval{ExtUtils::MakeMaker->VERSION('6.46')})
 {
 	$params{META_MERGE} =
 	{

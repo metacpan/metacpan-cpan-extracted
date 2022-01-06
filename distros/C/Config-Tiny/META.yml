@@ -4,6 +4,7 @@ author:
   - 'Adam Kennedy <adamk@cpan.org>'
 build_requires:
   Test::More: '1.001002'
+  Test::Pod: '1.51'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -18,13 +19,14 @@ no_index:
     - t
     - inc
 requires:
-  File::Spec: '3.3'
+  File::Spec: '3.30'
   File::Temp: '0.22'
+  perl: '5.008001'
   strict: '0'
   utf8: '0'
 resources:
   bugtracker: https://github.com/ronsavage/Config-Tiny/issues
   license: http://opensource.org/licenses/Perl
   repository: https://github.com/ronsavage/Config-Tiny.git
-version: '2.27'
+version: '2.28'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

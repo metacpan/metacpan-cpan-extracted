@@ -1,3 +1,10 @@
+0.005   2021-12-09  Released-By: PERLANCAR; Urgency: medium
+
+        - Support 'title' parameter (put as table <caption> element).
+
+	- [doc] Mention Text::Table::HTML::DataTables.
+
+
 0.004   2021-03-11  Released-By: PERLANCAR; Urgency: medium
 
 	- Allow cell to be hashref containing keys like 'text', 'colspan'

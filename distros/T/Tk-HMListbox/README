@@ -5,7 +5,7 @@ NAME
 AUTHOR
     Jim Turner
 
-    (c) 2015-2019, Jim Turner under the same license that Perl 5 itself is.
+    (c) 2015-2022, Jim Turner under the same license that Perl 5 itself is.
     All rights reserved.
 
     Tk::SMListbox author: me
@@ -21,15 +21,15 @@ SYNOPSIS
     $hml = $parent->HMListbox (<options>);
 
 DESCRIPTION
-    Tk::HMListbox is a derivitive of my Tk::SMListbox (and thus Tk::MListbox
-    that uses Tk::HListbox (instead of Tk::Listbox, as used by the latter
-    two) which was done to allow for image icons to be included in columns
-    along with the traditional text strings. I created both of these
-    Tk::H*Listbox widgets in order to include a column of tiny file-type
-    icons, in addition to the other file attribute columns in my JFM4
-    Perl/Tk-based file-manager application. Tk::HMListbox is designed to
-    work as a drop-in replacement for either Tk::SMListbox or Tk::MListbox,
-    maintaining backward-compatability with both.
+    Tk::HMListbox is a derivitive of my Tk::SMListbox (and thus
+    Tk::MListbox) that uses Tk::HListbox (instead of Tk::Listbox, as used by
+    the latter two) which was done to allow for image icons to be included
+    in columns along with the traditional text strings. I created both of
+    these Tk::H*Listbox widgets in order to include a column of tiny
+    file-type icons, in addition to the other file attribute columns in my
+    JFM5 Perl/Tk-based file-manager application. Tk::HMListbox is designed
+    to work as a drop-in replacement for either Tk::SMListbox or
+    Tk::MListbox, maintaining backward-compatability with both.
 
     Sorting is done by clicking on one of the column headings in the widget.
     The first click will sort the data with the selected column as key, a
@@ -78,6 +78,8 @@ EXAMPLES
                     -expand => 'yes',
 
             );
+
+    #See also "make test" (test.pl).
 
 STANDARD OPTIONS
     -background -foreground -relief -takefocus -borderwidth -heigh
@@ -152,7 +154,7 @@ WIDGET SPECIFIC OPTIONS
         be useful in correcting vertical misallignment between the columns
         when some columns contain images and others are text only! NOTE:
         This changes the height of the affected rows. Default: 1 (and
-        setting to 0 is the same as 1).
+        setting to 0 is seems to be the same as 2).
 
     -moveable => *boolean*
         A value of 1 indicates that it is okay for the user to move the

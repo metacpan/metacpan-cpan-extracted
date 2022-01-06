@@ -15,6 +15,7 @@ lib/CPANPLUS/Dist/Debora.pm
 lib/CPANPLUS/Dist/Debora/License.pm
 lib/CPANPLUS/Dist/Debora/Package.pm
 lib/CPANPLUS/Dist/Debora/Package/Debian.pm
+lib/CPANPLUS/Dist/Debora/Package/Mageia.pm
 lib/CPANPLUS/Dist/Debora/Package/RPM.pm
 lib/CPANPLUS/Dist/Debora/Package/Tar.pm
 lib/CPANPLUS/Dist/Debora/Pod.pm
@@ -27,6 +28,7 @@ t/dist.t
 t/inc/MockModule.pm
 t/inc/MockPackage.pm
 t/license.t
+t/mageia.t
 t/package.t
 t/pod.t
 t/release-external.t

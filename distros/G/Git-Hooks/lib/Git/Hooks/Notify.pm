@@ -2,7 +2,7 @@ use warnings;
 
 package Git::Hooks::Notify;
 # ABSTRACT: Git::Hooks plugin to notify users via email
-$Git::Hooks::Notify::VERSION = '3.2.0';
+$Git::Hooks::Notify::VERSION = '3.2.1';
 use v5.16.0;
 use utf8;
 use Log::Any '$log';
@@ -298,7 +298,7 @@ sub notify_affected_refs {
 }
 
 # Install hooks
-POST_RECEIVE \&notify_affected_refs;
+POST_RECEIVE(\&notify_affected_refs);
 
 1;
 
@@ -314,7 +314,7 @@ Git::Hooks::Notify - Git::Hooks plugin to notify users via email
 
 =head1 VERSION
 
-version 3.2.0
+version 3.2.1
 
 =head1 SYNOPSIS
 
@@ -638,7 +638,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by CPQD <www.cpqd.com.br>.
+This software is copyright (c) 2022 by CPQD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

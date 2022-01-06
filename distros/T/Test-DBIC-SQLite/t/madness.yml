@@ -1,0 +1,24 @@
+---
+artist:
+  -
+    name: Madness
+    description: Madness
+    albums:
+      -
+        name: Devine Madness
+        year: 1992
+        songs:
+          - {track:  1, name: 'The Prince'}
+          - {track:  2, name: 'One Step Beyond'}
+          - {track:  3, name: 'My Girl'}
+          - {track:  4, name: 'Night Boat to Cairo'}
+          - {track:  5, name: 'Baggy Trousers'}
+          - {track:  6, name: 'Embarrassment'}
+          - {track:  7, name: 'The Return of Los Palmas 7'}
+          - {track:  8, name: 'Grey Day'}
+          - {track:  9, name: 'Shut Up'}
+          - {track: 10, name: 'It Must Be Love'}
+          - {track: 11, name: 'Cardiac Arrest'}
+          - {track: 12, name: 'House of Fun'}
+          - {track: 13, name: 'Driving in My Car'}
+          - {track: 14, name: 'Our House'}

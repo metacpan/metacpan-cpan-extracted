@@ -11,7 +11,7 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(mimetype);
 our @EXPORT_OK = qw(extensions describe globs inodetype mimetype_canon mimetype_isa);
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 our $DEBUG;
 
 our ($_hashed, $_hashed_aliases, $_hashed_subclasses, $_has_mimeinfo_database);
@@ -482,7 +482,7 @@ To install on macOS, you can install it like this:
 =head1 AUTHOR
 
 Jaap Karssenberg E<lt>pardus@cpan.orgE<gt>
-Maintained by Michiel Beijen E<lt>michiel.beijen@gmail.comE<gt>
+Maintained by Michiel Beijen E<lt>mb@x14.nlE<gt>
 
 =head1 COPYRIGHT
 

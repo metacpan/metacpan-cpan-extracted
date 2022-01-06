@@ -5,7 +5,7 @@ package Chart::GGPlot::Position::Dodge2;
 use Chart::GGPlot::Class;
 use namespace::autoclean;
 
-our $VERSION = '0.0016'; # VERSION
+our $VERSION = '0.002000'; # VERSION
 
 extends 'Chart::GGPlot::Position::Dodge';
 
@@ -68,7 +68,7 @@ Chart::GGPlot::Position::Dodge2 - Position for 'dodge2'
 
 =head1 VERSION
 
-version 0.0016
+version 0.002000
 
 =head1 DESCRIPTION
 

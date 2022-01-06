@@ -6,7 +6,7 @@ use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean -except => 'stat';
 use MooseX::Singleton;
 
-our $VERSION = '0.0016'; # VERSION
+our $VERSION = '0.002000'; # VERSION
 
 use Data::Frame;
 
@@ -113,7 +113,7 @@ method compute_group ($data, $scales, $params) {
 
     my $uniq = $x->uniq->qsort;
     my $count = pdl(
-        $uniq->unpdl->map( sub { $weight->where($x == $_)->sum; } )
+        $uniq->unpdl->map( sub { int( $weight->where( $x == $_ )->sum ) } )
     );
     $count->setbadtoval(0);
 
@@ -143,7 +143,7 @@ Chart::GGPlot::Stat::Count - Statistic method that counts number of data in bin
 
 =head1 VERSION
 
-version 0.0016
+version 0.002000
 
 =head1 SEE ALSO
 

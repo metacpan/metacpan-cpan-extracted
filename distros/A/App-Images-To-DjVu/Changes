@@ -1,2 +1,8 @@
+0.02 2022-01-06T15:22:25+01:00
+ - Add test for constructor.
+ - Add test for help.
+ - Improve help message.
+ - Update copyright years.
+
 0.01 2021-11-13T15:28:00+01:00
  - First version.

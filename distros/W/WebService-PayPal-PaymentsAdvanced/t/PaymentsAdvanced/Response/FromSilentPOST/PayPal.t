@@ -4,10 +4,10 @@ use warnings;
 use Test::More;
 
 use Scalar::Util qw( blessed );
-use WebService::PayPal::PaymentsAdvanced::Mocker::SilentPOST;
+use WebService::PayPal::PaymentsAdvanced::Mocker::SilentPOST ();
 
 use lib 't/lib';
-use Util;
+use Util ();
 
 ## no critic (ProhibitCallsToUnexportedSubs)
 my $ppa    = Util::mocked_ppa;

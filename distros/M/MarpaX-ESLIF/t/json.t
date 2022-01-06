@@ -9,7 +9,7 @@ use Log::Any qw/$log/;
 # Init log
 #
 our $defaultLog4perlConf = '
-log4perl.rootLogger              = TRACE, Screen
+log4perl.rootLogger              = INFO, Screen
 log4perl.appender.Screen         = Log::Log4perl::Appender::Screen
 log4perl.appender.Screen.stderr  = 0
 log4perl.appender.Screen.layout  = PatternLayout
@@ -21,12 +21,6 @@ Log::Any::Adapter->set('Log4perl');
 BEGIN { require_ok('MarpaX::ESLIF') };
 
 my @inputs = (
-    "{\"test\":[1,2,3]}",
-    "{\"test\":\"1\"}",
-    "{\"test\":true}",
-    "{\"test\":false}",
-    "{\"test\":null}",
-    "{\"test\":null, \"test2\":\"hello world\"}",
     "{\"test\":\"1.25\"}",
     "{\"test\":\"1.25e4\"}",
     "{\"test\":1.25}",
@@ -103,7 +97,46 @@ my @inputs = (
        }
      }",
     "{\"+Inf\":+Inf, \"-Inf\":-Inf, \"+NaN\":+NaN, \"-NaN\":-NaN}",
+    "{\"\\uDFAA\":0}",
+    "[\"\\uDADA\"]",
+    "[\"\\uD888\\u1234\"]",
+    "[\"\\uD800\\n\"]",
+    "[\"\\uDd1ea\"]",
+    "[\"\\uD800\\uD800\\n\"]",
+    "[\"\\ud800\"]",
+    "[\"\\ud800abc\"]",
+    "[\"\\uDd1e\\uD834\"]",
+    "[\"\\uDFAA\"]",
+    "[\"\\u0060\\u012a\\u12AB\"]",
+    "[\"\\uD801\\udc37\"]",
+    "[\"\\ud83d\\ude39\\ud83d\\udc8d\"]",
+    "[\"\\\"\\\\\\/\\b\\f\\n\\r\\t\"]",
+    "[\"\\\\u0000\"]",
+    "[\"\\\"\"]",
+    "[\"a/*b*/c/*d//e\"]",
+    "[\"\\\\a\"]",
+    "[\"\\\\n\"]",
+    "[\"\\u0012\"]",
+    "[\"\\uFFFF\"]",
+    "[\"\\uDBFF\\uDFFF\"]",
+    "[\"new\\u00A0line\"]",
+    "[\"\\u0000\"]",
+    "[\"\\u002c\"]",
+    "[\"\\uD834\\uDd1e\"]",
+    "[\"\\u0061\\u30af\\u30EA\\u30b9\"]",
+    "[\"\\uA66D\"]",
+    "[\"\\u005C\"]",
+    "[\"\\uDBFF\\uDFFE\"]",
+    "[\"\\uD83F\\uDFFE\"]",
+    "[\"\\u200B\"]",
+    "[\"\\u2064\"]",
+    " [] ",
     );
+{
+  use POSIX qw(setlocale);
+  setlocale(&POSIX::LC_ALL, "fr_FR.utf-8");
+  push(@inputs, "{\"invalid\": 123.45e-17}");
+}
 
 my $eslif = MarpaX::ESLIF->new($log);
 isa_ok($eslif, 'MarpaX::ESLIF');

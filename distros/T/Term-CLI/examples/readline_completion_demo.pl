@@ -79,4 +79,4 @@ while (1) {
     next if $input =~ /^\s*(?:#.*)?$/;
     my @words = shellwords($input);
     say "input:", map { " <$_>" } @words;
-is_escaped
+}

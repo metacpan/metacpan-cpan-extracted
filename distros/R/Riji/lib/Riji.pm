@@ -8,7 +8,7 @@ use Encode;
 use File::Spec;
 use YAML::Tiny ();
 
-use version 0.77; our $VERSION = version->declare("v0.9.10");
+use version 0.77; our $VERSION = version->declare("v1.0.0");
 
 __PACKAGE__->setting(
     handle_static => 1,
@@ -154,6 +154,8 @@ sub create_view {
 1;
 __END__
 
+=for stopwords cli riji
+
 =encoding utf-8
 
 =head1 NAME
@@ -162,9 +164,13 @@ Riji - Simple, git based blog tool
 
 =head1 SYNOPSIS
 
-    % rjji setup
-    % riji server
-    % riji publish
+    % cpanm -qn Riji           # install `riji` cli
+    % rjji setup               # setup new blog site
+    % $EDITOR riji.yml         # adjust configuration
+    % riji new-entry your-slug # create new blog entry in Markdown
+    % git add article/ && git commit -m "add new entry"
+    % riji server              # local server for staging starts on the port 3650.
+    % riji publish             # static site will be created in the ./riji directory
 
 =head1 TUTORIAL
 
@@ -174,9 +180,37 @@ English L<http://perlmaven.com/blogging-with-riji>
 
 =head1 DESCRIPTION
 
-Riji is a simple and git based blog tool.
+Riji is a static site generator using Markdown, featuring RSS generation from git history.
 
-'Riji' means diary in Chinese.
+'Riji'(日记) means diary in Chinese.
+
+=head1 FEATURES
+
+=over
+
+=item Static site generation with Markdown files.
+
+=item All operations can be performed with the cli "riji".
+
+=item Commits Markdown files to your git repository and automatically generates RSS from the git log.
+
+=item Name of markdown file will be directly mapped to the URL as HTML.
+
+=item YAML Frontmatter can be written optionally in Markdown file for meta-information, like tags, etc.
+
+=item Customizable site template with Text::Xslate Kolon format.
+
+=item Kolon template notation can also be used in Markdown files.
+
+=item Your own template macros can be defined in the functions.pl file.
+
+=back
+
+=head1 DOCKER
+
+docker container is also available.
+
+    % docker run --rm -v $(PWD):/riji -v $(PWD)/.git:/riji/.git -i ghcr.io/songmu/riji publish
 
 =head1 LICENSE
 

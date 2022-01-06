@@ -19,6 +19,7 @@ t/data/treekin_multi_small.30.bar
 t/data/treekin_multi_small.kin
 t/data/treekin_single_small.bar
 t/data/treekin_single_small.kin
+t/data/treekin_single_small_new.kin
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

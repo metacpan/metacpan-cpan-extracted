@@ -1,3 +1,8 @@
+0.51	- 2022-01-01, H.Merijn Brand   <hmbrand@cpan.org>
+    * It's 2021
+    * Update to Devel::PPPort-3.63
+    * It's 2022
+
 0.50	- 2020-12-21, H.Merijn Brand   <h.m.brand@xs4all.nl>
     * Update to Devel::PPPort-3.58
     * Prevent false negative CPANTESTERS fail reports

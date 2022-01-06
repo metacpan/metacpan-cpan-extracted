@@ -9,7 +9,7 @@ use File::MimeInfo qw/mimetype_canon mimetype_isa/;
 use File::DesktopEntry;
 require Exporter;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(
@@ -306,7 +306,7 @@ F<$XDG_CONFIG_HOME/mimeapps.list>.
 =head1 AUTHOR
 
 Jaap Karssenberg E<lt>pardus@cpan.orgE<gt>
-Maintained by Michiel Beijen E<lt>michiel.beijen@gmail.comE<gt>
+Maintained by Michiel Beijen E<lt>mb@x14.nlE<gt>
 
 =head1 COPYRIGHT
 

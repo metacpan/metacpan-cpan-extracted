@@ -18,10 +18,9 @@
 #
 #=============================================================================
 
-package Term::CLI::Element  0.053006 {
+package Term::CLI::Element 0.054002;
 
 use 5.014;
-use strict;
 use warnings;
 
 use Term::CLI::ReadLine;
@@ -35,8 +34,6 @@ extends 'Term::CLI::Base';
 
 sub complete { return () }
 
-}
-
 1;
 
 __END__
@@ -49,7 +46,7 @@ Term::CLI::Element - generic parent class for elements in Term::CLI
 
 =head1 VERSION
 
-version 0.053006
+version 0.054002
 
 =head1 SYNOPSIS
 

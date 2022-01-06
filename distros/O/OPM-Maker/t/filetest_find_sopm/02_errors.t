@@ -5,7 +5,6 @@ use warnings;
 
 use Test::More;
 use Test::LongString;
-use Capture::Tiny qw(capture_stdout);
 
 use File::Spec;
 use File::Basename;
@@ -20,25 +19,13 @@ my $args = [];
 
 
 {
-    my $error = 'Files listed in .sopm but not found on disk:
-    - Kernel/Config/Files/TestSMTP.xml
-    - Kernel/System/Email.pm
-';
 
-    my $exec_output = capture_stdout {
+    my $error;
+    eval {
         OPM::Maker::Command::filetest::execute( undef, {}, $args );
-    };
+    } or $error = $@;
 
-    #diag $exec_output;
-
-    like_string $exec_output, qr/$error/;
-
-    $error = 'Files found on disk but not listed in .sopm:
-    - invalid.sopm
-    - test.sopm
-';
-
-    like_string $exec_output, qr/$error/;
+    like_string $error, qr/Found more than one .sopm file/;
 }
 
 done_testing();

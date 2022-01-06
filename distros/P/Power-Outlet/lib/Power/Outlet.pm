@@ -2,7 +2,7 @@ package Power::Outlet;
 use strict;
 use warnings;
 
-our $VERSION='0.42';
+our $VERSION='0.43';
 
 =head1 NAME
 
@@ -12,12 +12,13 @@ Power::Outlet - Control and query network attached power outlets
 
 Command Line
 
-  power-outlet iBoot    ON   host mylamp
-  power-outlet iBoot    OFF  host mylamp
-  power-outlet iBootBar ON   host mybar   outlet 1
-  power-outlet iBootBar OFF  host mybar   outlet 1
-  power-outlet WeMo     ON   host mywemo
-  power-outlet WeMo     OFF  host mywemo
+  power-outlet Config    ON section "My Section"
+  power-outlet iBoot     ON host mylamp
+  power-outlet Hue       ON host mybridge id 1 username myuser
+  power-outlet Shelly    ON host myshelly
+  power-outlet SonoffDiy ON host mysonoff
+  power-outlet Tasmota   ON host mytasmota
+  power-outlet WeMo      ON host mywemo
 
 Perl Object API
 
@@ -35,15 +36,11 @@ Power::Outlet is a package for controlling and querying network attached power o
 
 =head2 SCOPE
 
-The current scope of these packages is network attached power outlets. I have started with iBoot and iBootBar since I have test hardware.  Hardware configuration is beyond the scope of this group of packages as most power outlets have functional web based or command line configuration tools.
-
-=head2 FUTURE
-
-I hope to integrate with services like IFTTT (ifttt.com).  I would appreciate community support to help develop drivers for USB controlled power strips and serial devices like the X10 family.
+The current scope of these packages is network attached power outlets. I started with iBoot and iBootBar since I had the hardware.  Hardware configuration is beyond the scope of this group of packages as most power outlets have functional web based or command line configuration tools.
 
 =head2 Home Assistant
 
-Integration with Home Assistant L<https://home-assistant.io/> should be as easy as configuring a Command Line Switch. 
+Integration with Home Assistant L<https://home-assistant.io/> can be accomplished by configuring a Command Line Switch. 
 
   switch:
     - platform: command_line
@@ -56,22 +53,26 @@ Integration with Home Assistant L<https://home-assistant.io/> should be as easy 
 
 See L<https://home-assistant.io/components/switch.command_line/>
 
+=head2 Node Red
+
+Integration with Node Red L<https://nodered.org/> can be accomplished with the included JSON web API power-outlet-json.cgi.  The power-outlet-json.cgi script is a layer on top of L<Power::Outlet::Config> where the "name" parameter maps to the section in the /etc/power-outlet.ini INI file.
+
+To access all of these devices use an http request node with a URL https://127.0.0.1/cgi-bin/power-outlet-json.cgi?name={{topic}};action={{payload}} then simply set the topic to the INI section and the action to either ON or OFF.
+
 =head1 USAGE
 
 The Perl one liner
 
-  perl -MPower::Outlet -e 'print Power::Outlet->new(type=>"iBoot", host=>shift)->switch, "\n"' lamp
+  perl -MPower::Outlet -e 'print Power::Outlet->new(type=>"Tasmota", host=>shift)->switch, "\n"' myhost
 
 The included command line script
 
-  power-outlet iBoot ON host lamp
+  power-outlet Shelly ON host myshelly
 
 =head1 CONSTRUCTOR
 
 =head2 new
 
-  my $outlet = Power::Outlet->new(type=>"iBoot",    host=>"mylamp");
-  my $outlet = Power::Outlet->new(type=>"iBootBar", host=>"mybar", outlet=>1);
   my $outlet = Power::Outlet->new(type=>"WeMo",     host=>"mywemo");
 
 =cut
@@ -92,7 +93,7 @@ sub new {
 
 =head1 BUGS
 
-Please log on RT and send an email to the author.
+Please open an issue on github
 
 =head1 SUPPORT
 

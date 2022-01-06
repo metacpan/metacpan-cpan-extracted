@@ -49,7 +49,7 @@ subtest 'bad subschemas' => sub {
       instanceLocation => '/components/schemas/alpha_schema/not/minimum',
       keywordLocation => re(qr{/\$ref/properties/minimum/type$}),
       absoluteKeywordLocation => 'https://json-schema.org/draft/2020-12/meta/validation#/properties/minimum/type',
-      error => 'wrong type (expected number)',
+      error => 'got string, not number',
     },
     'subschemas identified, and error found',
   );

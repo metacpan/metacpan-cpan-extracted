@@ -1,10 +1,9 @@
 use strict;
 use warnings;
 
-use Test::LWP::UserAgent;
 use Test::More;
 
-use WebService::PayPal::PaymentsAdvanced::Mocker;
+use WebService::PayPal::PaymentsAdvanced::Mocker ();
 
 for my $plack ( 1, 0 ) {
     {

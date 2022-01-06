@@ -22,6 +22,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
     construct : function(cfg,buttonClass,layout,getFormData, plugin) {
         this.base(arguments, layout);
         this._plugin = plugin;
+        this._urlActions = [];
         this._buttonMap = {};
         this._buttonSetMap = {};
         this._cfg = cfg;
@@ -83,20 +84,38 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                     break;
             }
         },this);
+
+        // process actions called via URL
+        this.addListener('appear', () => {
+            let config = callbackery.data.Config.getInstance();
+            this._urlActions.forEach(urlAction => {
+                let button   = urlAction.button;
+                let urlValue = config.getUrlConfigValue(urlAction.key);
+                if (urlValue && urlValue == urlAction.value) {
+                    button.execute();
+                    // only do it once for the time being
+                    config.removeUrlConfigEntry(urlAction.key);
+                }
+            });
+        }, this);
     },
+
     events: {
         actionResponse: 'qx.event.type.Data',
         popupClosed: 'qx.event.type.Event'
     },
+
     properties: {
         selection: {}
     },
+
     members: {
         _cfg: null,
         _plugin : null,
         _tableMenu: null,
         _defaultAction: null,
         _buttonMap: null,
+        _urlActions: null,
         _print: function(content, left, top) {
             var win = window.open('', '_blank');
             var doc = win.document;
@@ -149,6 +168,14 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                         }
                         if (btCfg.key){
                             this._buttonMap[btCfg.key]=button;
+                            let urlAction = btCfg.urlAction;
+                            if (urlAction) {
+                                this._urlActions.push({
+                                    button : button,
+                                    value  : urlAction.value,
+                                    key    : urlAction.key
+                                });
+                            }
                         }
                         if (btCfg.buttonSet) {
                             var bs = btCfg.buttonSet;
@@ -300,7 +327,21 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                                         }
                                     };
                                     try {
-                                        response = qx.lang.Json.parse(iframe.getBody().innerHTML);
+                                        // innerHTML is wrapped in `<pre>` tags, which we remove.
+                                        let innerHTML = iframe.getBody().innerHTML;
+                                        if (innerHTML) {
+                                            innerHTML = innerHTML.replace(/^<.*?>/, '');
+                                            innerHTML = innerHTML.replace(/<.*?>$/, '');
+                                        }
+                                        // If there is text left, it should be the json from the server.
+                                        // JSON parsing an empty string is an error.
+                                        if (innerHTML) {
+                                            response =  qx.lang.Json.parse(innerHTML);
+                                        }
+                                        // otherwise remove standard exception.
+                                        else {
+                                            response = '';
+                                        }
                                     } catch (e){};
                                     if (response.exception){
                                         callbackery.ui.MsgBox.getInstance().error(
@@ -497,6 +538,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
             return this._buttonSetMap;
         }
     },
+
     destruct : function() {
         if (! this._buttonMap) {
             return;

@@ -25,6 +25,7 @@ my %args = (
     },
 
     requires => {
+        'indirect' => '0.36',
         'perl' => 'v5.14.0',
         'strictures' => '1',
     },

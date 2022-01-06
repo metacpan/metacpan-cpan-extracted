@@ -1,6 +1,7 @@
 use strict;
 use warnings;
-use 5.016;
+use 5.020;
+use experimental qw(signatures postderef);
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
@@ -22,7 +23,7 @@ subtest 'multiple types' => sub {
         {
           instanceLocation => '',
           keywordLocation => '/type',
-          error => 'wrong type (expected one of string, number)',
+          error => 'got boolean, not one of string, number',
         },
       ],
     },
@@ -557,7 +558,7 @@ subtest 'exceptions' => sub {
         {
           instanceLocation => '/x',
           keywordLocation => '/allOf/0/properties/x',
-          error => 'invalid schema type: number',
+          error => 'invalid schema type: integer',
         },
       ],
     },
@@ -1014,13 +1015,13 @@ subtest 'absoluteKeywordLocation' => sub {
           instanceLocation => '',
           keywordLocation => '/allOf/0/type',
           absoluteKeywordLocation => 'https://localhost:1234/foo.json#/type',
-          error => 'wrong type (expected object)',
+          error => 'got integer, not object',
         },
         {
           instanceLocation => '',
           keywordLocation => '/allOf/1/allOf/0/type',
           absoluteKeywordLocation => 'https://localhost:1234/bar/alpha#/type',
-          error => 'wrong type (expected object)',
+          error => 'got integer, not object',
         },
         {
           instanceLocation => '',
@@ -1032,7 +1033,7 @@ subtest 'absoluteKeywordLocation' => sub {
           instanceLocation => '',
           keywordLocation => '/allOf/2/type',
           absoluteKeywordLocation => 'https://localhost:1234/bloop#/allOf/2/type',
-          error => 'wrong type (expected object)',
+          error => 'got integer, not object',
         },
         {
           instanceLocation => '',
@@ -1056,13 +1057,13 @@ subtest 'absoluteKeywordLocation' => sub {
           instanceLocation => '',
           keywordLocation => '/allOf/0/type',
           absoluteKeywordLocation => 'foo.json#/type',
-          error => 'wrong type (expected object)',
+          error => 'got integer, not object',
         },
         {
           instanceLocation => '',
           keywordLocation => '/allOf/1/allOf/0/type',
           absoluteKeywordLocation => 'bar/alpha#/type',
-          error => 'wrong type (expected object)',
+          error => 'got integer, not object',
         },
         {
           instanceLocation => '',
@@ -1073,7 +1074,7 @@ subtest 'absoluteKeywordLocation' => sub {
         {
           instanceLocation => '',
           keywordLocation => '/allOf/2/type',
-          error => 'wrong type (expected object)',
+          error => 'got integer, not object',
         },
         {
           instanceLocation => '',

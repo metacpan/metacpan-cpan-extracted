@@ -78,7 +78,7 @@ json-schema-eval - A command-line interface to JSON::Schema::Modern::evaluate()
 
 =head1 VERSION
 
-version 0.536
+version 0.539
 
 =head1 SYNOPSIS
 
@@ -138,8 +138,6 @@ and C<--schema> provides the filename containing a json-encoded schema.
 If either or both of these are not provided, STDIN is used as input.
 
 Only JSON-encoded data and schemas are supported at this time.
-
-=head1 SUPPORT
 
 =for stopwords OpenAPI
 

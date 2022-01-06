@@ -20,7 +20,7 @@ name: Text-Table-HTML-DataTables
 provides:
   Text::Table::HTML::DataTables:
     file: lib/Text/Table/HTML/DataTables.pm
-    version: '0.008'
+    version: '0.009'
 requires:
   File::ShareDir: '0'
   HTML::Entities: '0'
@@ -33,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Table-HTML-DataTables
   homepage: https://metacpan.org/release/Text-Table-HTML-DataTables
   repository: git://github.com/perlancar/perl-Text-Table-HTML-DataTables.git
-version: '0.008'
+version: '0.009'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

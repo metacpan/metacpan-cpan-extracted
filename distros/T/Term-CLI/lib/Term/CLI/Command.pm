@@ -18,10 +18,9 @@
 #
 #=============================================================================
 
-package Term::CLI::Command  0.053006 {
+package Term::CLI::Command 0.054002;
 
 use 5.014;
-use strict;
 use warnings;
 
 use List::Util 1.23 qw( first min );
@@ -34,7 +33,7 @@ use Types::Standard 1.000005 qw(
     Str
 );
 
-use Term::CLI::L10N;
+use Term::CLI::L10N qw( loc );
 
 use Moo 1.000001;
 use namespace::clean 0.25;
@@ -42,36 +41,33 @@ use namespace::clean 0.25;
 extends 'Term::CLI::Element';
 
 has options => (
-    is => 'rw',
-    isa => Maybe[ArrayRef[Str]],
+    is        => 'rw',
+    isa       => Maybe [ ArrayRef [Str] ],
     predicate => 1
 );
 
-
-with ('Term::CLI::Role::CommandSet');
-with ('Term::CLI::Role::ArgumentSet');
-with ('Term::CLI::Role::HelpText');
-
+with('Term::CLI::Role::CommandSet');
+with('Term::CLI::Role::ArgumentSet');
+with('Term::CLI::Role::HelpText');
 
 sub option_names {
-    my $self = shift;
+    my $self      = shift;
     my $opt_specs = $self->options or return ();
     my @names;
-    for my $spec (@$opt_specs) {
-        for my $optname (split(qr/\|/, $spec =~ s/^([^!+=:]+).*/$1/r)) {
+    for my $spec ( @{$opt_specs} ) {
+        for my $optname ( split( qr{\|}x, $spec =~ s/^([^!+=:]+).*/$1/rx ) ) {
             push @names, length($optname) == 1 ? "-$optname" : "--$optname";
         }
     }
     return @names;
 }
 
-
 sub complete_line {
-    my ($self, @words) = @_;
+    my ( $self, @words ) = @_;
 
-    my $partial = $words[$#words] // '';
+    my $partial = $words[-1] // q{};
 
-    if ($self->has_options) {
+    if ( $self->has_options ) {
 
         Getopt::Long::Configure(qw(bundling require_order pass_through));
 
@@ -80,179 +76,176 @@ sub complete_line {
         my %parsed_opts;
 
         my $has_terminator;
-        if ($Getopt::Long::VERSION < 2.51) {
+        if ( $Getopt::Long::VERSION < 2.51 ) {
+
             # Getopt::Long before 2.51 removes '--' from word list;
             # Try to work around the bug. Can still be fooled by
             # "--foo --" if "--foo" takes an argument. :-/
-            $has_terminator = first { $_ eq '--' } @words[0..$#words-1];
-            eval { GetOptionsFromArray(\@words, \%parsed_opts, @$opt_specs) };
+            $has_terminator = first { $_ eq '--' } @words[ 0 .. $#words - 1 ];
+            ## no critic (RequireCheckingReturnValueOfEval)
+            eval {
+                GetOptionsFromArray( \@words, \%parsed_opts, @{$opt_specs} );
+            };
         }
         else {
-            eval { GetOptionsFromArray(\@words, \%parsed_opts, @$opt_specs) };
-            if (@words > 1 && $words[0] eq '--') {
+            ## no critic (RequireCheckingReturnValueOfEval)
+            eval {
+                GetOptionsFromArray( \@words, \%parsed_opts, @{$opt_specs} );
+            };
+            if ( @words > 1 && $words[0] eq '--' ) {
                 $has_terminator = shift @words;
             }
         }
-        if (!$has_terminator && @words <= 1 && $partial =~ /^-/) {
+        if ( !$has_terminator && @words <= 1 && $partial =~ /^-/x ) {
+
             # We have to complete a command-line option.
-            return grep { rindex($_, $partial, 0) == 0 } $self->option_names;
+            return grep { rindex( $_, $partial, 0 ) == 0 } $self->option_names;
         }
     }
 
     # If the command has arguments, try to skip over them.
-    if ($self->has_arguments) {
+    if ( $self->has_arguments ) {
         my @args = $self->arguments;
-        my $n = 0;
-        while (@words > 1) {
+        my $n    = 0;
+        while ( @words > 1 ) {
             last if @args == 0;
             shift @words;
             $n++;
-            if ($args[0]->max_occur > 0 and $n >= $args[0]->max_occur) {
+            if ( $args[0]->max_occur > 0 and $n >= $args[0]->max_occur ) {
                 shift @args;
                 $n = 0;
             }
         }
 
         if (@args) {
-            return $args[0]->complete($words[0]);
+            return $args[0]->complete( $words[0] );
         }
     }
 
-    if ($self->has_commands) {
-        if (@words <= 1) {
-            return grep { rindex($_, $partial, 0) == 0 } $self->command_names;
+    if ( $self->has_commands ) {
+        if ( @words <= 1 ) {
+            return grep { rindex( $_, $partial, 0 ) == 0 } $self->command_names;
         }
-        elsif (my $cmd = $self->find_command($words[0])) {
-            return $cmd->complete_line(@words[1..$#words]);
+        if ( my $cmd = $self->find_command( $words[0] ) ) {
+            return $cmd->complete_line( @words[ 1 .. $#words ] );
         }
     }
 
     return ();
 }
 
-
 sub execute {
-    my ($self, %args) = @_;
+    my ( $self, %args ) = @_;
 
     $args{status} = 0;
-    $args{error}  = '';
+    $args{error}  = q{};
 
     # Dereference and copy arguments/unparsed/options to prevent
     # unwanted side-effects.
-    $args{arguments}    = [@{$args{arguments}}];
-    $args{unparsed}     = [@{$args{unparsed}}];
-    $args{options}      = {%{$args{options}}};
-    $args{command_path} = [@{$args{command_path}}];
+    $args{arguments}    = [ @{ $args{arguments} } ];
+    $args{unparsed}     = [ @{ $args{unparsed} } ];
+    $args{options}      = { %{ $args{options} } };
+    $args{command_path} = [ @{ $args{command_path} } ];
 
-    push @{$args{command_path}}, $self;
+    push @{ $args{command_path} }, $self;
 
-    if ($self->has_options) {
+    if ( $self->has_options ) {
         my $opt_specs = $self->options;
 
         Getopt::Long::Configure(qw(bundling require_order no_pass_through));
 
-        my $error = '';
-        my $ok = do {
-            local( $SIG{__WARN__} ) = sub { chomp($error = join('', @_)) };
-            GetOptionsFromArray($args{unparsed}, $args{options}, @$opt_specs);
+        my $error = q{};
+        my $ok    = do {
+            local ( $SIG{__WARN__} ) =
+                sub { chomp( $error = join( q{}, @_ ) ) };
+            GetOptionsFromArray( $args{unparsed}, $args{options}, @$opt_specs );
         };
 
-        if (!$ok) {
+        if ( !$ok ) {
             $args{status} = -1;
-            $args{error} = $error;
+            $args{error}  = $error;
         }
     }
 
-    if ($args{status} >= 0) {
-        if ($self->has_arguments or !$self->has_commands) {
+    if ( $args{status} >= 0 ) {
+        if ( $self->has_arguments || !$self->has_commands ) {
             %args = $self->_check_arguments(%args);
         }
     }
-    if ($args{status} >= 0 and $self->has_commands) {
+    if ( $args{status} >= 0 and $self->has_commands ) {
         %args = $self->_execute_command(%args);
     }
-    return $self->try_callback( %args );
+    return $self->try_callback(%args);
 }
-
 
 sub _too_few_args_error {
-    my ($self, $arg_spec) = @_;
+    my ( $self, $arg_spec ) = @_;
 
-    if ($arg_spec->max_occur == $arg_spec->min_occur) {
-        if ($arg_spec->min_occur == 1) {
-            return loc("missing '[_1]' argument", $arg_spec->name);
+    if ( $arg_spec->max_occur == $arg_spec->min_occur ) {
+        if ( $arg_spec->min_occur == 1 ) {
+            return loc( "missing '[_1]' argument", $arg_spec->name );
         }
-        else {
-            return loc("need [_1] '[_2]' [numerate,_1,argument]",
-                $arg_spec->min_occur, $arg_spec->name,
-            );
-        }
+        return loc( "need [_1] '[_2]' [numerate,_1,argument]",
+                $arg_spec->min_occur, $arg_spec->name, );
     }
-    elsif ($arg_spec->max_occur - $arg_spec->min_occur == 1) {
-        return loc("need [_1] or [_2] '[_3]' arguments",
-            $arg_spec->min_occur,
-            $arg_spec->max_occur,
-            $arg_spec->name,
-        );
+    if ( $arg_spec->max_occur - $arg_spec->min_occur == 1 ) {
+        return loc( "need [_1] or [_2] '[_3]' arguments",
+            $arg_spec->min_occur, $arg_spec->max_occur, $arg_spec->name, );
     }
-    elsif ($arg_spec->max_occur > 1) {
-        return loc("need between [_1] and [_2] '[_3]' arguments",
-            $arg_spec->min_occur,
-            $arg_spec->max_occur,
-            $arg_spec->name,
-        );
+    if ( $arg_spec->max_occur > 1 ) {
+        return loc( "need between [_1] and [_2] '[_3]' arguments",
+            $arg_spec->min_occur, $arg_spec->max_occur, $arg_spec->name, );
     }
-    else {
-        return loc("need at least [_1] '[_2]' [numerate,_1,argument]",
-            $arg_spec->min_occur,
-            $arg_spec->name,
-        );
-    }
+    return loc( "need at least [_1] '[_2]' [numerate,_1,argument]",
+            $arg_spec->min_occur, $arg_spec->name, );
 }
 
-
 sub _check_arguments {
-    my ($self, %args) = @_;
+    my ( $self, %args ) = @_;
 
     my $unparsed = $args{unparsed};
 
     my @arg_spec = $self->arguments;
 
-    if (@arg_spec == 0 and @$unparsed > 0) {
-        return (%args,
+    if ( @arg_spec == 0 and @{$unparsed} > 0 ) {
+        return (
+            %args,
             status => -1,
-            error => loc('no arguments allowed'),
+            error  => loc('no arguments allowed'),
         );
     }
 
     my $argno = 0;
-    my @parsed_args;
     for my $arg_spec (@arg_spec) {
-        if (@$unparsed < $arg_spec->min_occur) {
-            return (%args,
+        if ( @{$unparsed} < $arg_spec->min_occur ) {
+            return (
+                %args,
                 status => -1,
-                error => $self->_too_few_args_error($arg_spec),
+                error  => $self->_too_few_args_error($arg_spec),
             );
         }
 
-        my $args_to_check
-            = $arg_spec->max_occur > 0
-                ? min($arg_spec->max_occur, scalar @$unparsed)
-                : scalar @$unparsed;
+        my $args_to_check =
+            $arg_spec->max_occur > 0
+            ? min( $arg_spec->max_occur, scalar @{$unparsed} )
+            : scalar @{$unparsed};
 
-        for my $i (1..$args_to_check) {
+        for my $i ( 1 .. $args_to_check ) {
             my $arg = $unparsed->[0];
             $argno++;
             my $arg_value = $arg_spec->validate($arg);
-            if (!defined $arg_value) {
-                return (%args,
+            if ( !defined $arg_value ) {
+                return (
+                    %args,
                     status => -1,
-                    error => "arg#$argno, '$arg': " . $arg_spec->error
-                           . " ".loc("for")." '" . $arg_spec->name . "'"
+                    error  => "arg#$argno, '$arg': "
+                        . $arg_spec->error . q{ }
+                        . loc("for") . q{ '}
+                        . $arg_spec->name . q{'}
                 );
             }
-            push @{$args{arguments}}, $arg_value;
-            shift @$unparsed;
+            push @{ $args{arguments} }, $arg_value;
+            shift @{$unparsed};
         }
     }
 
@@ -261,11 +254,13 @@ sub _check_arguments {
     # a max_occur that is exceeded. If the command has no sub-commands that
     # is surely an error. If it does have sub-commands, we'll leave it to
     # be parsed further.
-    if (@$unparsed > 0 and !$self->has_commands) {
-        my $last_spec = $arg_spec[$#arg_spec];
-        return (%args, status => -1,
-            error => loc("too many '[_1]' arguments (max. [_2])",
-                $last_spec->name,
+    if ( @{$unparsed} > 0 && !$self->has_commands ) {
+        my $last_spec = $arg_spec[-1];
+        return (
+            %args,
+            status => -1,
+            error  => loc(
+                "too many '[_1]' arguments (max. [_2])", $last_spec->name,
                 $last_spec->max_occur,
             ),
         );
@@ -273,48 +268,48 @@ sub _check_arguments {
     return %args;
 }
 
-
 sub _execute_command {
-    my ($self, %args) = @_;
+    my ( $self, %args ) = @_;
 
     my $unparsed = $args{unparsed};
 
-    if (@$unparsed == 0) {
-        if (scalar $self->commands == 1) {
+    if ( @{$unparsed} == 0 ) {
+        if ( scalar $self->commands == 1 ) {
             my ($cmd) = $self->commands;
-            return (%args, status => -1,
-                error => loc("incomplete command: missing '[_1]'", $cmd->name)
+            return (
+                %args,
+                status => -1,
+                error => loc( "incomplete command: missing '[_1]'", $cmd->name )
             );
         }
-        return (%args, status => -1, error => loc("missing sub-command"));
+        return ( %args, status => -1, error => loc("missing sub-command") );
     }
 
     my $cmd_name = $unparsed->[0];
 
     my $cmd = $self->find_command($cmd_name);
 
-    if (!$cmd) {
-        if (scalar $self->commands == 1) {
+    if ( !$cmd ) {
+        if ( scalar $self->commands == 1 ) {
             ($cmd) = $self->commands;
-            return (%args, status => -1,
-                error => loc(
-                    "expected '[_1]' instead of '[_2]'",
-                    $cmd->name,
+            return (
+                %args,
+                status => -1,
+                error  => loc(
+                    "expected '[_1]' instead of '[_2]'", $cmd->name,
                     $cmd_name
                 ),
             );
         }
-        return (%args,
+        return (
+            %args,
             status => -1,
-            error => loc("unknown sub-command '[_1]'", $cmd_name)
+            error  => loc( "unknown sub-command '[_1]'", $cmd_name )
         );
     }
 
-    shift @$unparsed;
+    shift @{$unparsed};
     return $cmd->execute(%args);
-}
-
-
 }
 
 1;
@@ -329,7 +324,7 @@ Term::CLI::Command - Class for (sub-)commands in Term::CLI
 
 =head1 VERSION
 
-version 0.053006
+version 0.054002
 
 =head1 SYNOPSIS
 
@@ -585,7 +580,7 @@ Example:
 This method is called by L<Term::CLI::execute|Term::CLI/execute>. It
 should not be called directly.
 
-It accepts the same list of parameters as the 
+It accepts the same list of parameters as the
 L<command callback|Term::CLI::Role::CommandSet/callback>
 function (see
 L<Term::CLI::Role::CommandSet>), and returns the same structure.

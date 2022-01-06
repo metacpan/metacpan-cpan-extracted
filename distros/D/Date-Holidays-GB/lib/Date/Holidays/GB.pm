@@ -1,8 +1,8 @@
 package Date::Holidays::GB;
 
-our $VERSION = '0.019';
+our $VERSION = '0.020';
 
-# ABSTRACT: Determine British holidays - Current UK public and bank holiday dates up to 2022
+# ABSTRACT: Determine British holidays - Current UK public and bank holiday dates up to 2023
 
 use strict;
 use warnings;
@@ -196,7 +196,7 @@ sub _holiday {
     return join( ', ', @strings );
 }
 
-sub date_generated { '2021-01-19' }
+sub date_generated { '2021-12-22' }
 
 1;
 
@@ -504,3 +504,30 @@ __DATA__
 2022-12-27	EAW	Christmas Day
 2022-12-27	NIR	Christmas Day
 2022-12-27	SCT	Christmas Day
+2023-01-02	EAW	New Year’s Day
+2023-01-02	NIR	New Year’s Day
+2023-01-02	SCT	New Year’s Day
+2023-01-03	SCT	2nd January
+2023-03-17	NIR	St Patrick’s Day
+2023-04-07	EAW	Good Friday
+2023-04-07	NIR	Good Friday
+2023-04-07	SCT	Good Friday
+2023-04-10	EAW	Easter Monday
+2023-04-10	NIR	Easter Monday
+2023-05-01	EAW	Early May bank holiday
+2023-05-01	NIR	Early May bank holiday
+2023-05-01	SCT	Early May bank holiday
+2023-05-29	EAW	Spring bank holiday
+2023-05-29	NIR	Spring bank holiday
+2023-05-29	SCT	Spring bank holiday
+2023-07-12	NIR	Battle of the Boyne (Orangemen’s Day)
+2023-08-07	SCT	Summer bank holiday
+2023-08-28	EAW	Summer bank holiday
+2023-08-28	NIR	Summer bank holiday
+2023-11-30	SCT	St Andrew’s Day
+2023-12-25	EAW	Christmas Day
+2023-12-25	NIR	Christmas Day
+2023-12-25	SCT	Christmas Day
+2023-12-26	EAW	Boxing Day
+2023-12-26	NIR	Boxing Day
+2023-12-26	SCT	Boxing Day

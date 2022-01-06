@@ -7,7 +7,7 @@ package MarpaX::ESLIF::Grammar::Symbol::Properties;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '5.0.7'; # VERSION
+our $VERSION = '6.0.10'; # VERSION
 
 
 #
@@ -43,7 +43,9 @@ sub new {
         'propertyBitSet'             => $args{propertyBitSet},
         'eventBitSet'                => $args{eventBitSet},
         'symbolAction'               => $args{symbolAction},
-        'ifAction'                   => $args{ifAction}
+        'ifAction'                   => $args{ifAction},
+        'generatorAction'            => $args{generatorAction},
+        'verbose'                    => $args{verbose}
     };
 
     return bless $self, $pkg
@@ -293,6 +295,25 @@ sub getIfAction {
     return $self->{ifAction}
 }
 
+
+sub getGeneratorAction {
+    my ($self) = @_;
+
+    return $self->{generatorAction}
+}
+
+
+sub isVerbose {
+    my ($self) = @_;
+
+    return $self->{verbose}
+}
+
+
+sub getVerbose {
+    goto &isVerbose
+}
+
 __END__
 
 =pod
@@ -305,7 +326,7 @@ MarpaX::ESLIF::Grammar::Symbol::Properties - ESLIF Grammar Symbol Properties
 
 =head1 VERSION
 
-version 5.0.7
+version 6.0.10
 
 =head1 SYNOPSIS
 
@@ -347,8 +368,8 @@ version 5.0.7
   whitespaces ::= WHITESPACES
   comment ::= /(?:(?:(?:\/\/)(?:[^\n]*)(?:\n|\z))|(?:(?:\/\*)(?:(?:[^\*]+|\*(?!\/))*)(?:\*\/)))/u
 
-  :lexeme ::= NUMBER pause => before event => ^NUMBER
-  :lexeme ::= NUMBER pause => after  event => NUMBER$
+  :symbol ::= NUMBER pause => before event => ^NUMBER
+  :symbol ::= NUMBER pause => after  event => NUMBER$
 
   :desc      ~ 'Calculator Tokens'
   NUMBER     ~ /[\d]+/   name => 'NUMBER Lexeme'
@@ -527,6 +548,20 @@ Returns the symbol specific action, null if there is none
 =head2 $self->getIfAction
 
 Returns the symbol if action, null if there is none
+
+=head2 $self->getGeneratorAction
+
+Returns the symbol generator action, null if there is none
+
+=head2 $self->isVerbose
+
+Returns if the symbol is verbose
+
+=head2 $self->getVerbose
+
+Returns if the symbol is verbose
+
+Alias to isVerbose()
 
 =head1 DESCRIPTION
 

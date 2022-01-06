@@ -31,7 +31,7 @@ no_index:
 provides:
   Riji:
     file: lib/Riji.pm
-    version: v0.9.10
+    version: v1.0.0
   Riji::CLI:
     file: lib/Riji/CLI.pm
   Riji::CLI::Help:
@@ -84,7 +84,7 @@ resources:
   bugtracker: https://github.com/Songmu/p5-Riji/issues
   homepage: https://github.com/Songmu/p5-Riji
   repository: git://github.com/Songmu/p5-Riji.git
-version: v0.9.10
+version: v1.0.0
 x_contributors:
   - 'Takuya Tsuchida <tsucchi@cpan.org>'
   - 'hitode909 <hitode909@gmail.com>'

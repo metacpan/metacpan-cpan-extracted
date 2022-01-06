@@ -1,5 +1,9 @@
 Revision history for Chart::GGPlot
 
+0.002000    2022-01-04
+  - Require Data::Frame 0.006002.
+  - PDL-compatibility fixes.
+
 0.0016      2021-07-01
   - Add geom_text() for text annotations.
   - Bump Alt::Data::Frame::ButMore requirement to 0.0058.

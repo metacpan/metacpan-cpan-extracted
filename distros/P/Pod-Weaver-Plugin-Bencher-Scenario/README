@@ -3,7 +3,7 @@ NAME
     Bencher::Scenario::* distribution
 
 VERSION
-    This document describes version 0.250 of
+    This document describes version 0.252 of
     Pod::Weaver::Plugin::Bencher::Scenario (from Perl distribution
     Pod-Weaver-Plugin-Bencher-Scenario), released on 2021-07-31.
 
@@ -82,9 +82,10 @@ CONFIGURATION
 
   sample_bench+ => hash
     Add a sample benchmark. Value is a hash which can contain these keys:
-    "title" (specify title for the benchmark), "args" (hash arguments for
-    bencher()) or "file" (instead of running bencher(), use the result from
-    JSON file). Can be specified multiple times.
+    "cmdline_comment" (specify commenttitle for the benchmark command),
+    "args" (hash arguments for bencher()) or "file" (instead of running
+    bencher(), use the result from JSON file). Can be specified multiple
+    times.
 
   bench => bool (default: 1)
     Set to 0 if you do not want to produce any sample benchmarks (including

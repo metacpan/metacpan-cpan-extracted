@@ -4,7 +4,7 @@ package Chart::GGPlot::Util;
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-our $VERSION = '0.0016'; # VERSION
+our $VERSION = '0.002000'; # VERSION
 
 use Data::Dumper::Concise ();
 
@@ -335,7 +335,7 @@ Chart::GGPlot::Util - Utility functions
 
 =head1 VERSION
 
-version 0.0016
+version 0.002000
 
 =head1 FUNCTIONS
 

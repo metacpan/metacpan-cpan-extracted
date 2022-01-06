@@ -4,15 +4,14 @@ use Moo;
 
 use namespace::autoclean;
 
-our $VERSION = '0.000027';
+our $VERSION = '0.000028';
 
-use MooX::HandlesVia;
 use MooX::StrictConstructor;
 use Types::Standard qw( HashRef InstanceOf );
 use Types::URI qw( Uri );
-use URI;
+use URI ();
 use URI::QueryParam;
-use WebService::PayPal::PaymentsAdvanced::Error::HTTP;
+use WebService::PayPal::PaymentsAdvanced::Error::HTTP ();
 
 # Don't use HasParams role as we want to build params rather than require them.
 
@@ -69,7 +68,7 @@ WebService::PayPal::PaymentsAdvanced::Response::FromHTTP - Response object for W
 
 =head1 VERSION
 
-version 0.000027
+version 0.000028
 
 =head1 DESCRIPTION
 
@@ -107,7 +106,7 @@ Olaf Alders <olaf@wundercounter.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by MaxMind, Inc.
+This software is copyright (c) 2022 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -10,7 +10,7 @@ use Getopt::Std;
 use Net::HL7::Message;
 use Perl6::Slurp qw(slurp);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -22,6 +22,14 @@ sub new {
 	# Process params.
 	set_params($self, @params);
 
+	# Object.
+	return $self;
+}
+
+# Run.
+sub run {
+	my $self = shift;
+
 	# Process arguments.
 	$self->{'_opts'} = {
 		'c' => 0,
@@ -32,9 +40,9 @@ sub new {
 
 		print STDERR "Usage: $0 [-c] [-h] [--version] hl7_file\n";
 		print STDERR "\t-c\t\tColor mode.\n";
-		print STDERR "\t-h\t\tHelp.\n";
+		print STDERR "\t-h\t\tPrint help.\n";
 		print STDERR "\t--version\tPrint version.\n";
-		exit 1;
+		return 1;
 	}
 	$self->{'_hl7_file'} = $ARGV[0];
 
@@ -50,14 +58,6 @@ sub new {
 				'Eval error', $EVAL_ERROR;
 		}
 	}
-
-	# Object.
-	return $self;
-}
-
-# Run.
-sub run {
-	my $self = shift;
 
 	# Get hl7_file.
 	my $hl7 = slurp($self->{'_hl7_file'});
@@ -291,12 +291,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2016-2021 Michal Josef Špaček
+© 2016-2022 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

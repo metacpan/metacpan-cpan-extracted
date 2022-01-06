@@ -10,8 +10,7 @@
 #include "spvm_op.h"
 #include "spvm_hash.h"
 #include "spvm_list.h"
-#include "spvm_util_allocator.h"
-#include "spvm_compiler_allocator.h"
+#include "spvm_allocator.h"
 #include "spvm_yacc_util.h"
 #include "spvm_list.h"
 #include "spvm_opcode_array.h"
@@ -30,63 +29,64 @@
 #include "spvm_string_buffer.h"
 
 SPVM_COMPILER* SPVM_COMPILER_new() {
-  SPVM_COMPILER* compiler = SPVM_UTIL_ALLOCATOR_safe_malloc_zero(sizeof(SPVM_COMPILER));
+  SPVM_COMPILER* compiler = SPVM_ALLOCATOR_new_block_unmanaged(sizeof(SPVM_COMPILER));
   
   // Allocator
-  compiler->allocator = SPVM_COMPILER_ALLOCATOR_new(compiler);
+  SPVM_ALLOCATOR* allocator = SPVM_ALLOCATOR_new();
+  compiler->allocator = allocator;
+  SPVM_ALLOCATOR_init(compiler);
 
   compiler->bufptr = "";
 
-  compiler->name_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
+  compiler->const_string_symtable = SPVM_ALLOCATOR_new_hash_compile_eternal(compiler, 0);
 
   // Parser information
-  compiler->op_use_stack = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
-  compiler->op_types = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
-  compiler->basic_types = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
-  compiler->basic_type_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
-  compiler->methods = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
-  compiler->method_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
-  compiler->fields = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
-  compiler->classes = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
-  compiler->class_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
-  compiler->class_vars = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
-  compiler->op_constants = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
-  compiler->module_dirs = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
+  compiler->op_use_stack = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
+  compiler->op_types = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
+  compiler->basic_types = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
+  compiler->basic_type_symtable = SPVM_ALLOCATOR_new_hash_compile_eternal(compiler, 0);
+  compiler->methods = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
+  compiler->method_symtable = SPVM_ALLOCATOR_new_hash_compile_eternal(compiler, 0);
+  compiler->fields = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
+  compiler->classes = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
+  compiler->class_symtable = SPVM_ALLOCATOR_new_hash_compile_eternal(compiler, 0);
+  compiler->class_vars = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
+  compiler->op_constants = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
+  compiler->module_dirs = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
   compiler->opcode_array = SPVM_OPCODE_ARRAY_new(compiler);
-  compiler->loaded_module_file_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
-  compiler->module_source_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
-  compiler->added_classes = SPVM_LIST_new(0);
+  compiler->loaded_module_file_symtable = SPVM_ALLOCATOR_new_hash_compile_eternal(compiler, 0);
+  compiler->embedded_module_source_symtable = SPVM_ALLOCATOR_new_hash_compile_eternal(compiler, 0);
 
   // Add basic types
   SPVM_COMPILER_add_basic_types(compiler);
 
   // Add Bool source
   const char* spvm_bool_module_source = "class Bool {\n  INIT {\n    $TRUE = new Bool;\n    $TRUE->{value} = 1;\n    $FALSE = new Bool;\n    $FALSE->{value} = 0;\n  }\n  \n  our $TRUE : ro Bool;\n  our $FALSE : ro Bool;\n  has value : ro int;\n}";
-  SPVM_HASH_insert(compiler->module_source_symtable, "Bool", strlen("Bool"), (void*)spvm_bool_module_source);
+  SPVM_HASH_insert(compiler->embedded_module_source_symtable, "Bool", strlen("Bool"), (void*)spvm_bool_module_source);
 
   // Add Byte source
   const char* spvm_byte_module_source = "class Byte {\n  has value : ro byte;\n  static method new : Byte ($value : byte) {\n    my $self = new Byte;\n    $self->{value} = $value;\n    return $self;\n  }\n}";
-  SPVM_HASH_insert(compiler->module_source_symtable, "Byte", strlen("Byte"), (void*)spvm_byte_module_source);
+  SPVM_HASH_insert(compiler->embedded_module_source_symtable, "Byte", strlen("Byte"), (void*)spvm_byte_module_source);
 
   // Add Short source
   const char* spvm_short_module_source = "class Short {\n  has value : ro short;\n  static method new : Short ($value : short) {\n    my $self = new Short;\n    $self->{value} = $value;\n    return $self;\n  }\n}";
-  SPVM_HASH_insert(compiler->module_source_symtable, "Short", strlen("Short"), (void*)spvm_short_module_source);
+  SPVM_HASH_insert(compiler->embedded_module_source_symtable, "Short", strlen("Short"), (void*)spvm_short_module_source);
 
   // Add Int source
   const char* spvm_int_module_source = "class Int {\n  has value : ro int;\n  static method new : Int ($value : int) {\n    my $self = new Int;\n    $self->{value} = $value;\n    return $self;\n  }\n}";
-  SPVM_HASH_insert(compiler->module_source_symtable, "Int", strlen("Int"), (void*)spvm_int_module_source);
+  SPVM_HASH_insert(compiler->embedded_module_source_symtable, "Int", strlen("Int"), (void*)spvm_int_module_source);
 
   // Add Long source
   const char* spvm_long_module_source = "class Long {\n  has value : ro long;\n  static method new : Long ($value : long) {\n    my $self = new Long;\n    $self->{value} = $value;\n    return $self;\n  }\n}";
-  SPVM_HASH_insert(compiler->module_source_symtable, "Long", strlen("Long"), (void*)spvm_long_module_source);
+  SPVM_HASH_insert(compiler->embedded_module_source_symtable, "Long", strlen("Long"), (void*)spvm_long_module_source);
 
   // Add Float source
   const char* spvm_float_module_source = "class Float {\n  has value : ro float;\n  static method new : Float ($value : float) {\n    my $self = new Float;\n    $self->{value} = $value;\n    return $self;\n  }\n}";
-  SPVM_HASH_insert(compiler->module_source_symtable, "Float", strlen("Float"), (void*)spvm_float_module_source);
+  SPVM_HASH_insert(compiler->embedded_module_source_symtable, "Float", strlen("Float"), (void*)spvm_float_module_source);
 
   // Add Double source
   const char* spvm_double_module_source = "class Double {\n  has value : ro double;\n  static method new : Double ($value : double) {\n    my $self = new Double;\n    $self->{value} = $value;\n    return $self;\n  }\n}";
-  SPVM_HASH_insert(compiler->module_source_symtable, "Double", strlen("Double"), (void*)spvm_double_module_source);
+  SPVM_HASH_insert(compiler->embedded_module_source_symtable, "Double", strlen("Double"), (void*)spvm_double_module_source);
 
   // use Bool module
   {
@@ -326,7 +326,7 @@ void SPVM_COMPILER_add_basic_types(SPVM_COMPILER* compiler) {
   }
 }
 
-void SPVM_COMPILER_compile(SPVM_COMPILER* compiler) {
+int32_t SPVM_COMPILER_compile(SPVM_COMPILER* compiler) {
 
   // If this is set to 1, you can see yacc parsing result
 #ifdef SPVM_DEBUG_YACC
@@ -336,40 +336,44 @@ void SPVM_COMPILER_compile(SPVM_COMPILER* compiler) {
 #endif
   
   // Initialize added class names
-  if (compiler->tmp_added_class_names) {
-    SPVM_LIST_free(compiler->tmp_added_class_names);
-  }
-  compiler->tmp_added_class_names = SPVM_LIST_new(0);
-
-  /* Parse */
+  compiler->added_class_names = SPVM_ALLOCATOR_new_list_compile_eternal(compiler, 0);
+  
+  int32_t error = 0;
+  
+  /* Tokenize and Parse */
+  int32_t parse_start_memory_blocks_count_compile_tmp = compiler->allocator->memory_blocks_count_compile_tmp;
   int32_t parse_error_flag = SPVM_yyparse(compiler);
+  if (compiler->cur_src && compiler->cur_src_need_free) {
+    SPVM_ALLOCATOR_free_block_compile_tmp(compiler, compiler->cur_src);
+  }
+  assert(compiler->allocator->memory_blocks_count_compile_tmp == parse_start_memory_blocks_count_compile_tmp);
   if (parse_error_flag) {
-    return;
+    error = 1;
   }
-  if (compiler->error_count > 0) {
-    return;
+  else {
+    if (compiler->error_count > 0) {
+      error = 1;
+    }
+    else {
+      // Check syntax
+      int32_t check_start_memory_blocks_count_compile_tmp = compiler->allocator->memory_blocks_count_compile_tmp;
+      SPVM_OP_CHECKER_check(compiler);
+      assert(compiler->allocator->memory_blocks_count_compile_tmp == check_start_memory_blocks_count_compile_tmp);
+      if (compiler->error_count > 0) {
+        error = 1;
+      }
+      else {
+        // Build operation code
+        int32_t build_opcode_array_start_memory_blocks_count_compile_tmp = compiler->allocator->memory_blocks_count_compile_tmp;
+        SPVM_OPCODE_BUILDER_build_opcode_array(compiler);
+        assert(compiler->allocator->memory_blocks_count_compile_tmp == build_opcode_array_start_memory_blocks_count_compile_tmp);
+        if (compiler->error_count > 0) {
+          error = 1;
+        }
+      }
+    }
   }
-  
-  // Check syntax
-  SPVM_OP_CHECKER_check(compiler);
-  if (compiler->error_count > 0) {
-    return;
-  }
-
-  // Build operation code
-  SPVM_OPCODE_BUILDER_build_opcode_array(compiler);
-  if (compiler->error_count > 0) {
-    return;
-  }
-  
-  // Add added class names if compile is success
-  SPVM_LIST_free(compiler->added_classes);
-  compiler->added_classes = SPVM_LIST_new(0);
-  for (int32_t i = 0; i < compiler->tmp_added_class_names->length; i++) {
-    const char* class_name = (const char*)SPVM_LIST_fetch(compiler->tmp_added_class_names, i);
-    SPVM_CLASS* pakcage = SPVM_HASH_fetch(compiler->class_symtable, class_name, strlen(class_name));
-    SPVM_LIST_push(compiler->added_classes, pakcage);
-  }
+  return error;
 }
 
 void SPVM_COMPILER_error(SPVM_COMPILER* compiler, const char* message_template, ...) {
@@ -416,7 +420,7 @@ void SPVM_COMPILER_error(SPVM_COMPILER* compiler, const char* message_template, 
   }
   va_end(args);
   
-  char* message = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, message_length + 1);
+  char* message = SPVM_ALLOCATOR_new_block_compile_eternal(compiler, message_length + 1);
   
   va_start(args, message_template);
   vsprintf(message, message_template, args);
@@ -473,7 +477,7 @@ const char* SPVM_COMPILER_create_method_signature(SPVM_COMPILER* compiler, SPVM_
     length += 1;
   }
   
-  char* method_signature = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, length + 1);
+  char* method_signature = SPVM_ALLOCATOR_new_block_compile_eternal(compiler, length + 1);
   
   // Calcurate method signature length
   char* bufptr = method_signature;
@@ -548,7 +552,7 @@ const char* SPVM_COMPILER_create_field_signature(SPVM_COMPILER* compiler, SPVM_F
     length += field->type->dimension * 2;
   }
   
-  char* field_signature = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, length + 1);
+  char* field_signature = SPVM_ALLOCATOR_new_block_compile_eternal(compiler, length + 1);
   
   // Calcurate field signature length
   char* bufptr = field_signature;
@@ -581,7 +585,7 @@ const char* SPVM_COMPILER_create_class_var_signature(SPVM_COMPILER* compiler, SP
     length += class_var->type->dimension * 2;
   }
   
-  char* class_var_signature = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, length + 1);
+  char* class_var_signature = SPVM_ALLOCATOR_new_block_compile_eternal(compiler, length + 1);
   
   // Calcurate class_var signature length
   char* bufptr = class_var_signature;
@@ -602,12 +606,12 @@ const char* SPVM_COMPILER_create_class_var_signature(SPVM_COMPILER* compiler, SP
 }
 
 void SPVM_COMPILER_free(SPVM_COMPILER* compiler) {
-  
-  // Free allocator
-  SPVM_COMPILER_ALLOCATOR_free(compiler);
-  
+
   // Free opcode array
   SPVM_OPCODE_ARRAY_free(compiler, compiler->opcode_array);
+
+  // Free allocator
+  SPVM_ALLOCATOR_free(compiler);
   
-  free(compiler);
+  SPVM_ALLOCATOR_free_block_unmanaged(compiler);
 }

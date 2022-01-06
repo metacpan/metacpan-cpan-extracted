@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.020, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,359 +19,358 @@ name: Chart-GGPlot
 provides:
   Chart::GGPlot:
     file: lib/Chart/GGPlot.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Aes:
     file: lib/Chart/GGPlot/Aes.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Aes::Functions:
     file: lib/Chart/GGPlot/Aes/Functions.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Backend:
     file: lib/Chart/GGPlot/Backend.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Backend::Plotly:
     file: lib/Chart/GGPlot/Backend/Plotly.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Backend::Plotly::Geom:
     file: lib/Chart/GGPlot/Backend/Plotly/Geom.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Backend::Plotly::Geom::Bar:
     file: lib/Chart/GGPlot/Backend/Plotly/Geom/Bar.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Backend::Plotly::Geom::Blank:
     file: lib/Chart/GGPlot/Backend/Plotly/Geom/Blank.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Backend::Plotly::Geom::Boxplot:
     file: lib/Chart/GGPlot/Backend/Plotly/Geom/Boxplot.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Backend::Plotly::Geom::Line:
     file: lib/Chart/GGPlot/Backend/Plotly/Geom/Line.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Backend::Plotly::Geom::Path:
     file: lib/Chart/GGPlot/Backend/Plotly/Geom/Path.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Backend::Plotly::Geom::Point:
     file: lib/Chart/GGPlot/Backend/Plotly/Geom/Point.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Backend::Plotly::Geom::Polygon:
     file: lib/Chart/GGPlot/Backend/Plotly/Geom/Polygon.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Backend::Plotly::Geom::Raster:
     file: lib/Chart/GGPlot/Backend/Plotly/Geom/Raster.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Backend::Plotly::Geom::Rect:
     file: lib/Chart/GGPlot/Backend/Plotly/Geom/Rect.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Backend::Plotly::Geom::Smooth:
     file: lib/Chart/GGPlot/Backend/Plotly/Geom/Smooth.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Backend::Plotly::Geom::Text:
     file: lib/Chart/GGPlot/Backend/Plotly/Geom/Text.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Backend::Plotly::Geom::Tile:
     file: lib/Chart/GGPlot/Backend/Plotly/Geom/Tile.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Backend::Plotly::Util:
     file: lib/Chart/GGPlot/Backend/Plotly/Util.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Bins:
     file: lib/Chart/GGPlot/Bins.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Built:
     file: lib/Chart/GGPlot/Built.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Class:
     file: lib/Chart/GGPlot/Class.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Coord:
     file: lib/Chart/GGPlot/Coord.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Coord::Cartesian:
     file: lib/Chart/GGPlot/Coord/Cartesian.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Coord::Flip:
     file: lib/Chart/GGPlot/Coord/Flip.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Coord::Functions:
     file: lib/Chart/GGPlot/Coord/Functions.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Coord::Polar:
     file: lib/Chart/GGPlot/Coord/Polar.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Facet:
     file: lib/Chart/GGPlot/Facet.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Facet::Functions:
     file: lib/Chart/GGPlot/Facet/Functions.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Facet::Null:
     file: lib/Chart/GGPlot/Facet/Null.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Geom:
     file: lib/Chart/GGPlot/Geom.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Geom::Bar:
     file: lib/Chart/GGPlot/Geom/Bar.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Geom::Blank:
     file: lib/Chart/GGPlot/Geom/Blank.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Geom::Boxplot:
     file: lib/Chart/GGPlot/Geom/Boxplot.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Geom::Functions:
     file: lib/Chart/GGPlot/Geom/Functions.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Geom::Line:
     file: lib/Chart/GGPlot/Geom/Line.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Geom::Path:
     file: lib/Chart/GGPlot/Geom/Path.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Geom::Point:
     file: lib/Chart/GGPlot/Geom/Point.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Geom::Polygon:
     file: lib/Chart/GGPlot/Geom/Polygon.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Geom::Raster:
     file: lib/Chart/GGPlot/Geom/Raster.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Geom::Rect:
     file: lib/Chart/GGPlot/Geom/Rect.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Geom::Smooth:
     file: lib/Chart/GGPlot/Geom/Smooth.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Geom::Text:
     file: lib/Chart/GGPlot/Geom/Text.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Geom::Tile:
     file: lib/Chart/GGPlot/Geom/Tile.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Global:
     file: lib/Chart/GGPlot/Global.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Guide:
     file: lib/Chart/GGPlot/Guide.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Guide::Colorbar:
     file: lib/Chart/GGPlot/Guide/Colorbar.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Guide::Functions:
     file: lib/Chart/GGPlot/Guide/Functions.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Guide::Legend:
     file: lib/Chart/GGPlot/Guide/Legend.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Guides:
     file: lib/Chart/GGPlot/Guides.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::HasCollectibleFunctions:
     file: lib/Chart/GGPlot/HasCollectibleFunctions.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::HasDefaultAes:
     file: lib/Chart/GGPlot/HasDefaultAes.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::HasLabeller:
     file: lib/Chart/GGPlot/HasLabeller.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::HasNonMissingAes:
     file: lib/Chart/GGPlot/HasNonMissingAes.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::HasParams:
     file: lib/Chart/GGPlot/HasParams.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::HasRequiredAes:
     file: lib/Chart/GGPlot/HasRequiredAes.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Labeller:
     file: lib/Chart/GGPlot/Labeller.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Labels:
     file: lib/Chart/GGPlot/Labels.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Labels::Functions:
     file: lib/Chart/GGPlot/Labels/Functions.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Layer:
     file: lib/Chart/GGPlot/Layer.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Layout:
     file: lib/Chart/GGPlot/Layout.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Limits:
     file: lib/Chart/GGPlot/Limits.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Params:
     file: lib/Chart/GGPlot/Params.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Plot:
     file: lib/Chart/GGPlot/Plot.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Position:
     file: lib/Chart/GGPlot/Position.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Position::Dodge:
     file: lib/Chart/GGPlot/Position/Dodge.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Position::Dodge2:
     file: lib/Chart/GGPlot/Position/Dodge2.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Position::Fill:
     file: lib/Chart/GGPlot/Position/Fill.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Position::Functions:
     file: lib/Chart/GGPlot/Position/Functions.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Position::Identity:
     file: lib/Chart/GGPlot/Position/Identity.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Position::Stack:
     file: lib/Chart/GGPlot/Position/Stack.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Position::Util:
     file: lib/Chart/GGPlot/Position/Util.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Range:
     file: lib/Chart/GGPlot/Range.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Range::Continuous:
     file: lib/Chart/GGPlot/Range/Continuous.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Range::Discrete:
     file: lib/Chart/GGPlot/Range/Discrete.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Range::Functions:
     file: lib/Chart/GGPlot/Range/Functions.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Role:
     file: lib/Chart/GGPlot/Role.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Scale:
     file: lib/Chart/GGPlot/Scale.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Scale::Continuous:
     file: lib/Chart/GGPlot/Scale/Continuous.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Scale::ContinuousDateTime:
     file: lib/Chart/GGPlot/Scale/ContinuousDateTime.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Scale::ContinuousIdentity:
     file: lib/Chart/GGPlot/Scale/ContinuousIdentity.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Scale::ContinuousPosition:
     file: lib/Chart/GGPlot/Scale/ContinuousPosition.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Scale::Discrete:
     file: lib/Chart/GGPlot/Scale/Discrete.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Scale::DiscreteIdentity:
     file: lib/Chart/GGPlot/Scale/DiscreteIdentity.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Scale::DiscretePosition:
     file: lib/Chart/GGPlot/Scale/DiscretePosition.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Scale::Functions:
     file: lib/Chart/GGPlot/Scale/Functions.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Scale::Positional:
     file: lib/Chart/GGPlot/Scale/Positional.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Scale::SupportsSecondaryAxis:
     file: lib/Chart/GGPlot/Scale/SupportsSecondaryAxis.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::ScalesList:
     file: lib/Chart/GGPlot/ScalesList.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Setup:
     file: lib/Chart/GGPlot/Setup.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Stat:
     file: lib/Chart/GGPlot/Stat.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Stat::Bin:
     file: lib/Chart/GGPlot/Stat/Bin.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Stat::Boxplot:
     file: lib/Chart/GGPlot/Stat/Boxplot.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Stat::Count:
     file: lib/Chart/GGPlot/Stat/Count.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Stat::Functions:
     file: lib/Chart/GGPlot/Stat/Functions.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Stat::Identity:
     file: lib/Chart/GGPlot/Stat/Identity.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Stat::Smooth:
     file: lib/Chart/GGPlot/Stat/Smooth.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Theme:
     file: lib/Chart/GGPlot/Theme.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Theme::Defaults:
     file: lib/Chart/GGPlot/Theme/Defaults.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Theme::Element:
     file: lib/Chart/GGPlot/Theme/Element.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Theme::Element::Blank:
     file: lib/Chart/GGPlot/Theme/Element.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Theme::Element::Functions:
     file: lib/Chart/GGPlot/Theme/Element/Functions.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Theme::Element::Line:
     file: lib/Chart/GGPlot/Theme/Element.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Theme::Element::Rect:
     file: lib/Chart/GGPlot/Theme/Element.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Theme::Element::Text:
     file: lib/Chart/GGPlot/Theme/Element.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Theme::ElementTree:
     file: lib/Chart/GGPlot/Theme/ElementTree.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Theme::Functions:
     file: lib/Chart/GGPlot/Theme/Functions.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Theme::Rel:
     file: lib/Chart/GGPlot/Theme/Rel.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Trans:
     file: lib/Chart/GGPlot/Trans.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Trans::Functions:
     file: lib/Chart/GGPlot/Trans/Functions.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Types:
     file: lib/Chart/GGPlot/Types.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Util:
     file: lib/Chart/GGPlot/Util.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Util::Pod:
     file: lib/Chart/GGPlot/Util/Pod.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Util::Scales:
     file: lib/Chart/GGPlot/Util/Scales.pm
-    version: '0.0016'
+    version: '0.002000'
   Chart::GGPlot::Util::Stats:
     file: lib/Chart/GGPlot/Util/Stats.pm
-    version: '0.0016'
+    version: '0.002000'
   PDL::Role::HasNames:
     file: lib/PDL/Role/HasNames.pm
-    version: '0.0016'
+    version: '0.002000'
 recommends:
   Math::LOESS: '0'
   PDL::GSL::CDF: '0.75'
   PDL::Stats::GLM: '0.75'
   Text::CSV_XS: '0'
 requires:
-  Alt::Data::Frame::ButMore: '0.0058'
   Autoload::AUTOCAN: '0'
   Carp: '0'
   Chart::Plotly: '0.041'
@@ -385,12 +384,14 @@ requires:
   Convert::Color::RGB: '0'
   Data::Dumper: '0'
   Data::Dumper::Concise: '0'
+  Data::Frame: '0.006002'
   Data::Frame::Autobox: '0'
   Data::Frame::Types: '0'
   Data::Frame::Util: '0'
   Data::Munge: '0'
   Eval::Quosure: '0'
   Exporter::Tiny: '0'
+  Feature::Compat::Try: '0'
   Function::Parameters: '2.001003'
   Hash::Util::FieldHash: '0'
   Import::Into: '0'
@@ -416,10 +417,12 @@ requires:
   PDL: '2.019'
   PDL::Core: '0'
   PDL::DateTime: '0.004'
+  PDL::Factor: '0'
   PDL::Lite: '0'
   PDL::Math: '0'
   PDL::MatrixOps: '0'
   PDL::Primitive: '0'
+  PDL::SV: '0'
   PDL::Ufunc: '0'
   POSIX: '0'
   Package::Stash: '0'
@@ -430,7 +433,6 @@ requires:
   Scalar::Util: '0'
   Storable: '0'
   String::Util: '0'
-  Syntax::Keyword::Try: '0'
   Time::Moment: '0'
   Type::Library: '0'
   Type::Params: '0'
@@ -449,7 +451,7 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/stphnlyd/perl5-Chart-GGPlot.git
-version: '0.0016'
-x_generated_by_perl: v5.26.3
+version: '0.002000'
+x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -19,7 +19,7 @@ use Test::File::ShareDir -share => { -dist => { 'JSON-Schema-Modern-Document-Ope
 use constant { true => JSON::PP::true, false => JSON::PP::false };
 use HTTP::Request::Common;
 use HTTP::Response;
-use YAML::PP;
+use YAML::PP 0.005;
 
 my $path_template = '/foo/{foo_id}/bar/{bar_id}';
 
@@ -393,7 +393,7 @@ YAML
           instanceLocation => '/response/body',
           keywordLocation => jsonp('/paths', '/foo/{foo_id}/bar/{bar_id}', qw(post responses default $ref content application/json schema type)),
           absoluteKeywordLocation => $doc_uri->clone->fragment('/components/responses/default/content/application~1json/schema/type')->to_string,
-          error => 'wrong type (expected object)',
+          error => 'got null, not object',
         },
       ],
     },

@@ -1,28 +1,30 @@
-#!/usr/bin/perl
+use strict;
+use warnings;
 use PDL::LiteF;
 use PDL::Opt::NonLinear;
-use Test;
+use Test::More;
 
-BEGIN { plan tests => 2 };
-
-sub fapprox {
-	my($a,$b) = @_;
-	PDL::abs($a-$b)->max < 0.0001;
+sub approx_ok {
+  my($got,$expected,$eps,$label) = @_;
+  die "No eps" if !$eps or !$label;
+  if (PDL::abs($got-$expected)->max < $eps) {
+    pass $label;
+  } else {
+    fail $label;
+    diag "got=$got\nexpected=$expected\n";
+  }
 }
 
-$res = pdl([1,1,1,1,1]);
+my $res = ones(5);
+my $x = pdl '[0.49823058 0.98093641 0.63151156 0.66477157 0.60801367]';
 
-
-
-$x = random(5);
-
-$gx = rosen_grad($x);
-$hx = rosen_hess($x);
-$fx = rosen($x);
-$xtol = pdl(1e-16);
-$gtol = pdl(1e-8);
+my $gx = rosen_grad($x);
+my $hx = rosen_hess($x);
+my $fx = rosen($x);
+my $xtol = pdl(1e-16);
+my $gtol = pdl(1e-8);
 #$stepmx = pdl(0.5);
-$maxit = pdl(long, 50);
+my $maxit = pdl(long, 50);
 sub min_func{
 	my ($fx, $x) = @_;
 	$fx .= rosen($x);
@@ -40,22 +42,22 @@ tensoropt($fx, $gx, $hx, $x,
 	  ones(5),0.5,$xtol,$gtol,2,6,
 	  \&min_func, \&grad_func, \&hess_func);
 
-ok(fapprox($x,$res));
+approx_ok $x,$res,0.001,'tensoropt';
 
-$x = random(5);
+$x = pdl '[0.49823058 0.98093641 0.63151156 0.66477157 0.60801367]';
 $gx = rosen_grad($x);
 $fx = rosen($x);
-$diag = zeroes(5);
+my $diag = zeroes(5);
 
 $xtol = pdl(1e-16);
 $gtol = pdl(0.9);
-$eps = pdl(1e-10);
-$print = ones(2);
-$maxfc = pdl(long,100);
+my $eps = pdl(1e-10);
+my $print = ones(2);
+my $maxfc = pdl(long,100);
 $maxit = pdl(long,50);
-$info = pdl(long,0);
-$diagco= pdl(long,0);
-$m = pdl(long,10);
+my $info = pdl(long,0);
+my $diagco= pdl(long,0);
+my $m = pdl(long,10);
 
 sub fdiag{};
 sub fg_func{
@@ -66,4 +68,6 @@ sub fg_func{
 }
 lbfgs($fx, $gx, $x, $diag, $diagco, $m, $maxit, $maxfc, $eps, $xtol, $gtol,
                        $print,$info,\&fg_func,\&fdiag);
-ok(fapprox($x,$res));
+approx_ok $x,$res,0.0001,'lbfgs';
+
+done_testing;

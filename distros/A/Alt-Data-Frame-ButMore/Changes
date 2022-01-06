@@ -1,5 +1,9 @@
 Revision history of Alt-Data-Frame-ButMore
 
+0.006001 2022-01-04
+    - DEPRECATED in favor of Data::Frame. Now this distribution
+      its installation simply gets you Data::Frame.
+
 0.0060   2021-11-22
     - Fix some compatibility issue with recent versions of PDL.
 

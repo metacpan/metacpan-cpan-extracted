@@ -8,7 +8,6 @@ use utf8;
 
 use English qw(-no_match_vars);
 
-use open ':std', ':encoding(utf8)';
 use Test::More tests => 1;
 
 BEGIN { use_ok('CPANPLUS::Dist::Debora') || say 'Bail out!' }

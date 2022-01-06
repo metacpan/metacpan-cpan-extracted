@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 use Carp qw(croak);
 use Config;
@@ -685,6 +685,7 @@ sub _get_packager {
 
     if (!$email) {
         my $host = hostfqdn;
+        $host =~ s{[.]$}{}xms;
         $email = $user . q{@} . $host;
     }
 
@@ -1172,7 +1173,7 @@ CPANPLUS::Dist::Debora::Package - Base class for package formats
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -1189,7 +1190,7 @@ version 0.006
 =head1 DESCRIPTION
 
 This module collects information on a yet to be created Debian or RPM package.
-The information is obtained from a CPANPLUS::Module object, the file system
+The information is obtained from a L<CPANPLUS::Module> object, the file system
 and the environment.  Among other things, the module gets the package name, a
 short summary, a description, the license and the dependencies.
 
@@ -1205,7 +1206,7 @@ Any methods marked I<Abstract> must be implemented by subclasses.
       build_number => 1,
   );
 
-Creates a new object.  The CPANPLUS::Module object parameter is mandatory.
+Creates a new object.  The L<CPANPLUS::Module> object parameter is mandatory.
 All other attributes are optional.
 
 =head2 format_priority  I<Abstract>
@@ -1239,7 +1240,7 @@ F<~/rpmbuild/RPMS/noarch/perl-Some-Module-1.0-1.noarch.rpm>.
 
   my $module = $package->module;
 
-Returns the CPANPLUS::Module object that was passed to the constructor.
+Returns the L<CPANPLUS::Module> object that was passed to the constructor.
 
 =head2 installdirs
 
@@ -1403,7 +1404,7 @@ Returns the copyright years and holders.
       my $full_text = $license->license;
   }
 
-Returns Software::License objects.
+Returns L<Software::License> objects.
 
 =head2 license
 
@@ -1480,15 +1481,15 @@ Returns the path to the sudo command.
 
 =head1 DIAGNOSTICS
 
-See CPANPLUS::Dist::Debora for diagnostics.
+See L<CPANPLUS::Dist::Debora> for diagnostics.
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
-See CPANPLUS::Dist::Debora for supported files and environment variables.
+See L<CPANPLUS::Dist::Debora> for supported files and environment variables.
 
 =head1 DEPENDENCIES
 
-Requires the module Software::License from CPAN.
+Requires the module L<Software::License> from CPAN.
 
 =head1 INCOMPATIBILITIES
 
@@ -1496,9 +1497,12 @@ None.
 
 =head1 SEE ALSO
 
-CPANPLUS::Dist::Debora::Package::Debian, CPANPLUS::Dist::Debora::Package::RPM,
-CPANPLUS::Dist::Debora::Package::Tar, CPANPLUS::Dist::Debora::License,
-CPANPLUS::Dist::Debora::Pod, CPANPLUS::Dist::Debora::Util
+L<CPANPLUS::Dist::Debora::Package::Debian>,
+L<CPANPLUS::Dist::Debora::Package::RPM>,
+L<CPANPLUS::Dist::Debora::Package::Tar>,
+L<CPANPLUS::Dist::Debora::License>,
+L<CPANPLUS::Dist::Debora::Pod>,
+L<CPANPLUS::Dist::Debora::Util>
 
 =head1 AUTHOR
 
@@ -1506,15 +1510,15 @@ Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
 
 =head1 BUGS AND LIMITATIONS
 
-Some operating systems numify Perl distribution versions, but not
-consistently.  This module sticks closely to the version string, which seems
-to be the most common approach.
+Some operating systems numify Perl distribution versions but not consistently.
+This module sticks closely to the version string, which seems to be the most
+common approach.
 
 This module cannot be used in taint mode.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2021 Andreas Vögele
+Copyright 2022 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

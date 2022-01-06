@@ -5,7 +5,7 @@ package BorderStyle::Text::ANSITable::OldCompat::Default::spacei_boxchar;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-08-27'; # DATE
 our $DIST = 'Text-ANSITable'; # DIST
-our $VERSION = '0.606'; # VERSION
+our $VERSION = '0.607'; # VERSION
 
 use alias::module 'BorderStyle::BoxChar::SpaceInnerOnly';
 
@@ -24,7 +24,7 @@ BorderStyle::Text::ANSITable::OldCompat::Default::spacei_boxchar - BoxChar::Spac
 
 =head1 VERSION
 
-This document describes version 0.606 of BorderStyle::Text::ANSITable::OldCompat::Default::spacei_boxchar (from Perl distribution Text-ANSITable), released on 2021-08-27.
+This document describes version 0.607 of BorderStyle::Text::ANSITable::OldCompat::Default::spacei_boxchar (from Perl distribution Text-ANSITable), released on 2021-08-27.
 
 =head1 HOMEPAGE
 

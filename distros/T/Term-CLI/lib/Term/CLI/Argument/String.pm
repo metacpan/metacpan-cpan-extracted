@@ -18,13 +18,12 @@
 #
 #=============================================================================
 
-package Term::CLI::Argument::String  0.053006 {
+package Term::CLI::Argument::String 0.054002;
 
 use 5.014;
-use strict;
 use warnings;
 
-use Term::CLI::L10N;
+use Term::CLI::L10N qw( loc );
 
 use Types::Standard 1.000005 qw( Int );
 
@@ -33,31 +32,27 @@ use namespace::clean 0.25;
 
 extends 'Term::CLI::Argument';
 
-has min_len   => ( is => 'rw', isa => Int, clearer => 1, predicate => 1 );
-has max_len   => ( is => 'rw', isa => Int, clearer => 1, predicate => 1 );
+has min_len => ( is => 'rw', isa => Int, clearer => 1, predicate => 1 );
+has max_len => ( is => 'rw', isa => Int, clearer => 1, predicate => 1 );
 
 sub validate {
-    my ($self, $value) = @_;
+    my ( $self, $value ) = @_;
 
-    $self->set_error('');
+    $self->clear_error;
 
-    if (!defined $value) {
-        return $self->set_error(loc('value must be defined'));
+    if ( !defined $value ) {
+        return $self->set_error( loc('value must be defined') );
     }
 
-    if ($self->has_min_len && length $value < $self->min_len) {
+    if ( $self->has_min_len && length $value < $self->min_len ) {
         return $self->set_error(
-            loc("too short (min. length [_1])", $self->min_len)
-        );
+            loc( "too short (min. length [_1])", $self->min_len ) );
     }
-    elsif ($self->has_max_len && length $value > $self->max_len) {
+    if ( $self->has_max_len && length $value > $self->max_len ) {
         return $self->set_error(
-            loc("too long (max. length [_1])", $self->max_len)
-        );
+            loc( "too long (max. length [_1])", $self->max_len ) );
     }
     return $value;
-}
-
 }
 
 1;
@@ -72,7 +67,7 @@ Term::CLI::Argument::String - class for basic string arguments in Term::CLI
 
 =head1 VERSION
 
-version 0.053006
+version 0.054002
 
 =head1 SYNOPSIS
 

@@ -6,7 +6,7 @@ use Chart::GGPlot::Setup;
 use Function::Parameters qw(classmethod);
 use namespace::autoclean;
 
-our $VERSION = '0.0016'; # VERSION
+our $VERSION = '0.002000'; # VERSION
 
 use List::AllUtils qw(pairgrep pairmap);
 use Storable qw(dclone);
@@ -148,7 +148,7 @@ Chart::GGPlot::Params - Collection of key-value pairs used in Chart::GGPlot
 
 =head1 VERSION
 
-version 0.0016
+version 0.002000
 
 =head1 DESCRIPTION
 

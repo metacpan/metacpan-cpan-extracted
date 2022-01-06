@@ -17,6 +17,7 @@ sub Main {
             : 0
     );
     Term_CLI_Argument_Number_Float_test->runtests();
+    return;
 }
 
 package Term_CLI_Argument_Number_Float_test {
@@ -48,6 +49,7 @@ sub startup : Test(startup => 1) {
             'Term::CLI::Argument::Number::Float->new' );
 
     $self->{arg} = $arg;
+    return;
 }
 
 sub check_constructor: Test(1) {
@@ -57,6 +59,7 @@ sub check_constructor: Test(1) {
         { Term::CLI::Argument::Number::Float->new() }
         qr/Missing required arguments: name/,
         'error on missing name';
+    return;
 }
 
 sub check_attributes: Test(2) {
@@ -64,6 +67,7 @@ sub check_attributes: Test(2) {
     my $arg = $self->{arg};
     is( $arg->name, $ARG_NAME, "name attribute is $ARG_NAME" );
     is( $arg->type, 'Number::Float', "type attribute is Number::Float" );
+    return;
 }
 
 sub check_validate: Test(17) {
@@ -139,6 +143,7 @@ sub check_validate: Test(17) {
     ok( !defined $value,
         "'$test_value' does not pass $min <= $test_value <= $max" );
     is( $arg->error, 'too large', 'error is set correctly on too large number' );
+    return;
 }
 
 }

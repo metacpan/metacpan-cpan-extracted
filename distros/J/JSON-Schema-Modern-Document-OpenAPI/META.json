@@ -71,11 +71,12 @@
             "Encode" : "2.89",
             "Feature::Compat::Try" : "0",
             "File::ShareDir" : "0",
-            "JSON::Schema::Modern" : "0.536",
+            "JSON::Schema::Modern" : "0.539",
             "JSON::Schema::Modern::Document" : "0",
             "JSON::Schema::Modern::Utilities" : "0.531",
             "JSON::Schema::Modern::Vocabulary" : "0",
             "List::Util" : "0",
+            "Math::BigInt" : "0",
             "Moo" : "0",
             "MooX::HandlesVia" : "0",
             "MooX::TypeTiny" : "0.002002",
@@ -95,6 +96,7 @@
          },
          "suggests" : {
             "Class::XSAccessor" : "0",
+            "Cpanel::JSON::XS" : "0",
             "Ref::Util::XS" : "0",
             "Type::Tiny::XS" : "0"
          }
@@ -115,7 +117,7 @@
             "Test::Memory::Cycle" : "0",
             "Test::More" : "0.96",
             "URI" : "0",
-            "YAML::PP" : "0",
+            "YAML::PP" : "0.005",
             "open" : "0",
             "perl" : "v5.20.0",
             "utf8" : "0"
@@ -202,15 +204,15 @@
    "provides" : {
       "JSON::Schema::Modern::Document::OpenAPI" : {
          "file" : "lib/JSON/Schema/Modern/Document/OpenAPI.pm",
-         "version" : "0.014"
+         "version" : "0.016"
       },
       "JSON::Schema::Modern::Vocabulary::OpenAPI" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/OpenAPI.pm",
-         "version" : "0.014"
+         "version" : "0.016"
       },
       "OpenAPI::Modern" : {
          "file" : "lib/OpenAPI/Modern.pm",
-         "version" : "0.014"
+         "version" : "0.016"
       }
    },
    "release_status" : "stable",
@@ -225,7 +227,7 @@
          "web" : "https://github.com/karenetheridge/JSON-Schema-Modern-Document-OpenAPI"
       }
    },
-   "version" : "0.014",
+   "version" : "0.016",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.035007"
@@ -1133,7 +1135,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.014",
+                  "tag" : "v0.016",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },

@@ -3,6 +3,7 @@ abstract: 'CLI interpreter based on Term::ReadLine'
 author:
   - 'Steven Bakker <sbakker@cpan.org>'
 build_requires:
+  Capture::Tiny: '0.48'
   File::Temp: '0.22'
   Pod::Coverage::TrustPod: '0'
   Test::Class: '0'
@@ -13,6 +14,7 @@ build_requires:
   Test::Output: '1.03'
   Test::Pod: '0'
   Test::Pod::Coverage: '0'
+  charnames: '0'
   perl: 5.014_001
   strict: '1.00'
   warnings: '1.00'
@@ -28,66 +30,68 @@ name: Term-CLI
 provides:
   Term::CLI:
     file: lib/Term/CLI.pm
-    version: '0.053006'
+    version: '0.054002'
   Term::CLI::Argument:
     file: lib/Term/CLI/Argument.pm
-    version: '0.053006'
+    version: '0.054002'
   Term::CLI::Argument::Bool:
     file: lib/Term/CLI/Argument/Bool.pm
-    version: '0.053006'
+    version: '0.054002'
   Term::CLI::Argument::Enum:
     file: lib/Term/CLI/Argument/Enum.pm
-    version: '0.053006'
+    version: '0.054002'
   Term::CLI::Argument::Filename:
     file: lib/Term/CLI/Argument/Filename.pm
-    version: '0.053006'
+    version: '0.054002'
   Term::CLI::Argument::Number:
     file: lib/Term/CLI/Argument/Number.pm
-    version: '0.053006'
+    version: '0.054002'
   Term::CLI::Argument::Number::Float:
     file: lib/Term/CLI/Argument/Number/Float.pm
-    version: '0.053006'
+    version: '0.054002'
   Term::CLI::Argument::Number::Int:
     file: lib/Term/CLI/Argument/Number/Int.pm
-    version: '0.053006'
+    version: '0.054002'
   Term::CLI::Argument::String:
     file: lib/Term/CLI/Argument/String.pm
-    version: '0.053006'
+    version: '0.054002'
   Term::CLI::Base:
     file: lib/Term/CLI/Base.pm
-    version: '0.053006'
+    version: '0.054002'
   Term::CLI::Command:
     file: lib/Term/CLI/Command.pm
-    version: '0.053006'
+    version: '0.054002'
   Term::CLI::Command::Help:
     file: lib/Term/CLI/Command/Help.pm
-    version: '0.053006'
+    version: '0.054002'
   Term::CLI::Element:
     file: lib/Term/CLI/Element.pm
-    version: '0.053006'
+    version: '0.054002'
   Term::CLI::L10N:
     file: lib/Term/CLI/L10N.pm
-    version: '0.053006'
+    version: '0.054002'
   Term::CLI::L10N::en:
     file: lib/Term/CLI/L10N/en.pm
-    version: '0.053006'
+    version: '0.054002'
   Term::CLI::L10N::nl:
     file: lib/Term/CLI/L10N/nl.pm
-    version: '0.053006'
+    version: '0.054002'
   Term::CLI::ReadLine:
     file: lib/Term/CLI/ReadLine.pm
-    version: '0.053006'
+    version: '0.054002'
   Term::CLI::Role::ArgumentSet:
     file: lib/Term/CLI/Role/ArgumentSet.pm
-    version: '0.053006'
+    version: '0.054002'
   Term::CLI::Role::CommandSet:
     file: lib/Term/CLI/Role/CommandSet.pm
-    version: '0.053006'
+    version: '0.054002'
   Term::CLI::Role::HelpText:
     file: lib/Term/CLI/Role/HelpText.pm
-    version: '0.053006'
+    version: '0.054002'
 requires:
+  Carp: '1.20'
   Exporter: '5.64'
+  Fcntl: '0'
   File::Glob: '0'
   File::Which: '1.09'
   FindBin: '1.50'
@@ -97,6 +101,7 @@ requires:
   Locale::Maketext::Lexicon::Gettext: '1.00'
   Moo: '1.000001'
   Moo::Role: '0'
+  Pod::Text::Overstrike: '2.04'
   Pod::Text::Termcap: '2.06'
   Scalar::Util: '1.23'
   Term::ReadKey: '2.34'
@@ -107,14 +112,14 @@ requires:
   namespace::clean: '0.25'
   parent: '0.225'
   perl: 5.014_001
-  strict: '1.00'
   subs: '1.00'
+  version: '0'
   warnings: '1.00'
 resources:
   bugtracker: https://github.com/sbakker/perl-Term-CLI/issues
   homepage: https://github.com/sbakker/perl-Term-CLI
   repository: https://github.com/sbakker/perl-Term-CLI.git
-version: '0.053006'
+version: '0.054002'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

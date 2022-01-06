@@ -1,11 +1,11 @@
 use strict;
 use warnings;
 
-use HTTP::Response;
-use Test::Fatal;
-use Test::LWP::UserAgent;
+use HTTP::Response ();
+use Test::Fatal qw( exception );
+use Test::LWP::UserAgent ();
 use Test::More;
-use WebService::PayPal::PaymentsAdvanced::Response::SecureToken;
+use WebService::PayPal::PaymentsAdvanced::Response::SecureToken ();
 
 my %params = (
     RESULT        => 0,

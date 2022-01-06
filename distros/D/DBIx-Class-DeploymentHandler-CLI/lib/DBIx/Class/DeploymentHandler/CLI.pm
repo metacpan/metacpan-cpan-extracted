@@ -8,6 +8,11 @@ use FindBin qw($Script);
 use Moo;
 use Types::Standard qw/ArrayRef HashRef InstanceOf Str/;
 use DBIx::Class::DeploymentHandler;
+use DBIx::Class::DeploymentHandler::CLI::ConfigReader;
+use Module::Runtime 'require_module';
+use Path::Tiny qw/path/;
+
+use namespace::clean;
 
 =head1 NAME
 
@@ -15,11 +20,11 @@ DBIx::Class::DeploymentHandler::CLI - Command line interface for deployment hand
 
 =head1 VERSION
 
-Version 0.002
+Version 0.3.0
 
 =cut
 
-our $VERSION = '0.002';
+our $VERSION = '0.3.0';
 
 
 =head1 SYNOPSIS
@@ -69,6 +74,35 @@ C<dh-cli> script:
     BEGIN {
         $ENV{DBICDH_DEBUG} = 1;
     }
+
+=head1 Configuration
+
+We are showing examples for YAML configuration files, but
+you can also use any other format supported by L<Config::Any>.
+
+=head2 Values
+
+=over 4
+
+=item schema_class
+
+=item connection
+
+=item databases
+
+=back
+
+=head2 Files
+
+=over 4
+
+=item F<dh-cli.yaml>
+
+=item F<~/.dh-cli.yaml>
+
+=item F</etc/dh-cli.yaml>
+
+=back
 
 =head1 ATTRIBUTES
 
@@ -148,6 +182,36 @@ has args => (
     default => sub {[]},
 );
 
+=head2 config
+
+Configuration object C<DBIx::Class::DeploymentHandler::CLI::ConfigReader>.
+Created automatically.
+
+=cut
+
+has config => (
+    isa => InstanceOf['DBIx::Class::DeploymentHandler::CLI::ConfigReader'],
+    is => 'ro',
+    builder => '_config_builder',
+);
+
+sub _config_builder {
+    my $config = DBIx::Class::DeploymentHandler::CLI::ConfigReader->new;
+}
+
+=head2 config_files
+
+Candidates for configuration files to be used instead of the default ones.
+
+Type: array reference.
+
+=cut
+
+has config_files => (
+    isa => ArrayRef,
+    is => 'ro',
+);
+
 =head2 run
 
 Determines method to be run.
@@ -157,26 +221,29 @@ Determines method to be run.
 sub run {
     my $self = shift;
     my $cmd;
+    my @params = @{$self->args};
 
-    # check if we have commandline arguments
-    if (@{$self->args}) {
-        $cmd = $self->args->[0];
-    }
-    elsif ($Script =~ /^dh-(.*?)$/) {
+    # check first whether we are using an alias
+    $Script =~ /^dh-(.*?)$/;
+
+    if (defined $1 && $1 ne 'cli') {
         $cmd = $1;
     }
-
-    if (defined $cmd) {
-        $cmd =~ s/-/_/g;
-
-        if ($self->can($cmd)) {
-            return $self->$cmd;
-        }
-
-        die "No method for command $cmd";
+    # if we have commandline arguments
+    elsif (@params) {
+        $cmd = shift @params;
+    }
+    else {
+        die "Missing command.\n";
     }
 
-    die "Cannot determine command from $Script.";
+    $cmd =~ s/(\w)-/$1_/g;
+
+    if ($self->can($cmd)) {
+        return $self->$cmd( @params );
+    }
+
+     die "No method for command $cmd";
 }
 
 =head2 version
@@ -254,6 +321,111 @@ sub custom_upgrade_directory {
     }
 
     return "sql/_common/upgrade/${db_version}-${schema_version}";
+}
+
+=head2 run_custom
+
+Runs a custom upgrade script.
+
+=cut
+
+sub run_custom {
+    my ($self, $module_name) = @_;
+
+    my $module_upgrade = $self->_load_custom_upgrade_module($module_name);
+
+    my $upgrade = $module_upgrade->new( schema => $self->schema );
+
+    $upgrade->clear;
+    $upgrade->upgrade;
+}
+
+=head2 install_custom
+
+Installs a custom upgrade script.
+
+=cut
+
+sub install_custom {
+    my ($self, $module_name, $before_sql) = @_;
+
+    my $module_upgrade = $self->_load_custom_upgrade_module( $module_name );
+    my $custom_lib = $self->custom_upgrade_directory . '/lib';
+
+    # create directory
+    my $module_path = $module_upgrade;
+    $module_path =~ s%::%/%g;
+
+    my $po = path("$custom_lib/$module_path")->parent;
+    my @dirs = $po->mkpath;
+
+    # copy current module there - Path::Tiny 0.070 required
+    my $lib_path = path("lib/${module_path}.pm");
+
+    $lib_path->copy("$custom_lib/${module_path}.pm");
+
+# now we are creating the DH custom script
+my $custom_script = <<EOF;
+#! /usr/bin/env perl
+
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$custom_lib";
+
+use $module_upgrade;
+
+sub {
+    my \$schema = shift;
+    my \$upgrade = $module_upgrade->new(
+        schema => \$schema
+    );
+
+    \$upgrade->upgrade;
+};
+
+EOF
+
+    # prefix
+    my $script_prefix;
+
+    if ($before_sql) {
+        $script_prefix = '000';
+    }
+    else {
+        $script_prefix = '002';
+    }
+
+    # determine script name
+    my $custom_script_name = $self->custom_upgrade_directory . "/$script_prefix-"
+        . lc(path($module_path)->basename) . '.pl';
+
+    path($custom_script_name)->spew($custom_script);
+
+    return;
+}
+
+sub _load_custom_upgrade_module {
+    my ($self, $module_name) = @_;
+
+    unless ($module_name) {
+        die "Need name of upgrade module.";
+    }
+
+    my $module_upgrade = $module_name;
+
+    # determine module name
+    my $schema_class = ref($self->schema);
+
+    unless ($module_upgrade =~ /::/) {
+        # prefix with proper namespace
+        $module_upgrade = "${schema_class}::Upgrades::$module_name";
+    }
+
+    require_module( $module_upgrade );
+
+    return $module_upgrade;
 }
 
 =head2 prepare_version_storage
@@ -336,19 +508,68 @@ sub upgrade {
 }
 
 sub _dh_object {
-    my $self = shift;
+    my ($self, $schema_version) = @_;
     my $dh;
 
-    $dh = DBIx::Class::DeploymentHandler->new(
-        {
-            schema              => $self->schema,
-            databases           => $self->databases,
-            sql_translator_args => $self->sql_translator_args,
-        }
+    my %params = (
+        schema              => $self->schema,
+        databases           => $self->databases,
+        sql_translator_args => $self->sql_translator_args,
     );
+
+    if ($schema_version) {
+        $params{schema_version} = $schema_version;
+    }
+
+    $dh = DBIx::Class::DeploymentHandler->new(\%params);
 
     return $dh;
 }
+
+around BUILDARGS => sub {
+    my ( $orig, $class, @args ) = @_;
+    my $arghash = { @args };
+    my $config;
+    my $config_reader;
+
+    if ( exists $arghash->{config} ) {
+        $config = $arghash->{config};
+    }
+
+    unless ( $arghash->{schema} ) {
+        # build schema based on configuration
+        unless ( $config ) {
+            $config_reader = DBIx::Class::DeploymentHandler::CLI::ConfigReader->new;
+            $config = $config_reader->config;
+            push @args, ( config => $config_reader );
+        }
+
+        if ( exists $config->{schema_class} && exists $config->{connection} ) {
+            my $schema_module = $config->{schema_class};
+            unless (require_module( $schema_module )) {
+                die "Module $schema_module failed to load."
+            };
+            my $schema = $schema_module->connect( $config->{connection} );
+            push @args, ( schema => $schema );
+        }
+    }
+
+    unless ( $arghash->{databases} ) {
+        # build list of database based on configuration
+        unless ( $config ) {
+            $config_reader = DBIx::Class::DeploymentHandler::CLI::ConfigReader->new;
+            $config = $config_reader->config;
+            push @args, ( config => $config_reader );
+        }
+
+        if ( exists $config->{databases} ) {
+            warn "Databases are: ", $config->{databases}, "\n";
+            push @args, ( databases => $config->{databases} );
+        }
+    }
+
+    return $class->$orig ( @args );
+};
 
 =head1 AUTHOR
 
@@ -368,7 +589,7 @@ None so far.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016-2017 Stefan Hornburg (Racke).
+Copyright 2016-2022 Stefan Hornburg (Racke).
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

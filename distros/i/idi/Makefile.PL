@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Easy Command-line MIDI",
+  "ABSTRACT" => "Easy, command-line MIDI",
   "AUTHOR" => "Gene Boggs <gene\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -17,6 +17,8 @@ my %WriteMakefileArgs = (
   "NAME" => "idi",
   "PREREQ_PM" => {
     "Exporter" => 0,
+    "File::Slurper" => 0,
+    "File::Temp" => 0,
     "MIDI::Simple" => 0,
     "Moo" => 0,
     "Music::Tempo" => 0,
@@ -30,7 +32,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.0102",
+  "VERSION" => "0.0302",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,7 +42,9 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Exporter" => 0,
   "ExtUtils::MakeMaker" => 0,
+  "File::Slurper" => 0,
   "File::Spec" => 0,
+  "File::Temp" => 0,
   "MIDI::Simple" => 0,
   "Moo" => 0,
   "Music::Tempo" => 0,

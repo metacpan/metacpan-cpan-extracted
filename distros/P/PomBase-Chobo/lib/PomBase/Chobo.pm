@@ -2,11 +2,13 @@ package PomBase::Chobo;
 
 =head1 NAME
 
-PomBase::Chobo - Read an OBO file and store in a Chado database
+PomBase::Chobo
 
 =cut
 
 =head1 SYNOPSIS
+
+Read an OBO file and store in a Chado database
 
 =head1 SUPPORT
 
@@ -19,7 +21,7 @@ You can also look for information at:
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013 Kim Rutherford.
+Copyright (C) 2013-2021 Kim Rutherford.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
@@ -29,7 +31,7 @@ See http://dev.perl.org/licenses/ for more information.
 
 =cut
 
-our $VERSION = '0.035'; # VERSION
+our $VERSION = '0.036'; # VERSION
 
 use 5.020;
 

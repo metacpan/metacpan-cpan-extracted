@@ -43,6 +43,7 @@
 #endif
 
 typedef @MARPAESLIF_UINT32_T@ marpaESLIF_uint32_t;
+typedef @MARPAESLIF_UINT64_T@ marpaESLIF_uint64_t;
 
 #cmakedefine C_STRTOLD @C_STRTOLD@
 #cmakedefine C_STRTOD @C_STRTOD@

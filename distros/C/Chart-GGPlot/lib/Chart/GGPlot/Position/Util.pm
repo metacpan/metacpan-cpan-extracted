@@ -4,7 +4,7 @@ package Chart::GGPlot::Position::Util;
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-our $VERSION = '0.0016'; # VERSION
+our $VERSION = '0.002000'; # VERSION
 
 use Data::Frame;
 use List::AllUtils qw(reduce);
@@ -242,7 +242,7 @@ Chart::GGPlot::Position::Util - Utilities internally used by Chart::GGPlot::Posi
 
 =head1 VERSION
 
-version 0.0016
+version 0.002000
 
 =head1 AUTHOR
 

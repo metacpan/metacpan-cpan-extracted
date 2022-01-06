@@ -9,7 +9,7 @@ use Carp qw/confess/;
 confess "You must first load a Test2::Harness::UI::Schema::NAME module"
     unless $Test2::Harness::UI::Schema::LOADED;
 
-our $VERSION = '0.000099';
+our $VERSION = '0.000101';
 
 __PACKAGE__->inflate_column(
     parameters => {
@@ -84,7 +84,7 @@ sub TO_JSON {
     return \%cols;
 }
 
-my @GLANCE_FIELDS = qw{ exit_code fail fail_count job_key job_try retry name pass_count file status job_ord };
+my @GLANCE_FIELDS = qw{ exit_code fail fail_count job_key job_try retry name pass_count file status job_ord run_id };
 
 sub glance_data {
     my $self = shift;

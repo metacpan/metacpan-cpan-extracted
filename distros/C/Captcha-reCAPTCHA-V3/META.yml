@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,16 +26,19 @@ no_index:
 provides:
   Captcha::reCAPTCHA::V3:
     file: lib/Captcha/reCAPTCHA/V3.pm
-    version: '0.01'
+    version: '0.03'
+recommends:
+  JSON::XS: '0'
 requires:
-  HTTP::Tiny: '0'
-  JSON: '0'
+  JSON: '2.0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/worthmine/Captcha-reCAPTCHA-V3/issues
   homepage: https://github.com/worthmine/Captcha-reCAPTCHA-V3
   repository: git://github.com/worthmine/Captcha-reCAPTCHA-V3.git
-version: '0.01'
+version: '0.03'
 x_authority: cpan:WORTHMINE
 x_contributors:
   - 'worthmine <worthmine@cpan.org>'

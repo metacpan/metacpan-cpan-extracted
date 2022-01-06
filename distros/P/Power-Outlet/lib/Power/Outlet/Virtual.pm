@@ -5,7 +5,7 @@ use File::Spec qw{};
 use Path::Class qw{};
 use base qw{Power::Outlet::Common};
 
-our $VERSION='0.36';
+our $VERSION='0.43';
 
 =head1 NAME
 

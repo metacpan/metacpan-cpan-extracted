@@ -3,7 +3,7 @@ NAME
     ANSI colors
 
 VERSION
-    This document describes version 0.606 of Text::ANSITable (from Perl
+    This document describes version 0.607 of Text::ANSITable (from Perl
     distribution Text-ANSITable), released on 2021-08-27.
 
 SYNOPSIS
@@ -61,6 +61,34 @@ DESCRIPTION
 
 DECLARED FEATURES
     Features declared by this module:
+
+  From feature set PerlTrove
+    Features from feature set PerlTrove declared by this module:
+
+    *   Development Status
+
+        Value: "5 - Production/Stable".
+
+    *   Environment
+
+        Value: "Console".
+
+    *   Intended Audience
+
+        Value: ["Developers"].
+
+    *   License
+
+        Value: "OSI Approved :: Artistic License".
+
+    *   Programming Language
+
+        Value: "Perl".
+
+    *   Topic
+
+        Value: ["Software Development :: Libraries :: Perl
+        Modules","Utilities"].
 
   From feature set TextTable
     Features from feature set TextTable declared by this module:

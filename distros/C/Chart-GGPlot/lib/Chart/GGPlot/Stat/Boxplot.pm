@@ -6,7 +6,7 @@ use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 use MooseX::Singleton;
 
-our $VERSION = '0.0016'; # VERSION
+our $VERSION = '0.002000'; # VERSION
 
 use Data::Frame;
 use List::AllUtils qw(pairwise);
@@ -156,10 +156,10 @@ method compute_group ($data, $scales, $params) {
 
         # Sum up weights for non-NA positions of y and weight
         my $weight = $data->at('weight');
-        $n = $weight->where( $y->isgood & $weight->isgood )->sum;
+        $n = int( $weight->where( $y->isgood & $weight->isgood )->sum );
     }
     else {
-        $n = $y->isgood->sum;
+        $n = int( $y->isgood->sum );
     }
 
     my $middle = $df->at('middle');
@@ -193,7 +193,7 @@ Chart::GGPlot::Stat::Boxplot - Statistic method that gets the statistics data fo
 
 =head1 VERSION
 
-version 0.0016
+version 0.002000
 
 =head1 SEE ALSO
 

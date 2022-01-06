@@ -23,7 +23,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
   perl: '5.020'
-dynamic_config: 0
+dynamic_config: 1
 generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
@@ -40,7 +40,7 @@ no_index:
 provides:
   Test::JSON::Schema::Acceptance:
     file: lib/Test/JSON/Schema/Acceptance.pm
-    version: '1.014'
+    version: '1.015'
 requires:
   Feature::Compat::Try: '0'
   File::ShareDir: '0'
@@ -67,7 +67,7 @@ resources:
   bugtracker: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance/issues
   homepage: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance
   repository: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance.git
-version: '1.014'
+version: '1.015'
 x_Dist_Zilla:
   perl:
     version: '5.035007'
@@ -775,7 +775,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.014
+          tag: v1.015
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -899,6 +899,14 @@ x_Dist_Zilla:
           type: requires
       name: TestRequires
       version: '6.024'
+    -
+      class: Dist::Zilla::Plugin::DynamicPrereqs
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
+      name: DynamicPrereqs
+      version: '0.039'
     -
       class: Dist::Zilla::Plugin::GenerateFile
       name: submodule_status

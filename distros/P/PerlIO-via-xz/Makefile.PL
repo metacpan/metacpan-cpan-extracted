@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright 2020-2020 H.Merijn Brand
+# Copyright 2020-2022 H.Merijn Brand
 
 require 5.012000;
 use strict;
@@ -24,8 +24,8 @@ my %wm = (
     LICENSE	 => "perl",
     PREREQ_PM	 => { "Carp"			=> 0,
 		      "PerlIO"			=> 0,
-		      "IO::Compress::Xz"	=> 2.096,
-		      "IO::Uncompress::UnXz"	=> 2.096,
+		      "IO::Compress::Xz"	=> 2.100,
+		      "IO::Uncompress::UnXz"	=> 2.100,
 		      "Test::More"		=> 0,
 		      },
     clean        => { FILES => join " ", qw(

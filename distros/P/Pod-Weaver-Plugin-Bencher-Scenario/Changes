@@ -1,6 +1,22 @@
+0.252   2021-07-31  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Forgot to update the documentation.
+
+
+0.251   2021-07-31  Released-By: PERLANCAR; Urgency: medium
+
+	- Even more tweaks to generated text (add subheading for each
+	  sample benchmark).
+
+
 0.250   2021-07-31  Released-By: PERLANCAR; Urgency: medium
 
 	- More tweaks to generated text.
+
+        - [incompatible change] Change sample_bench expected structure: title is
+          changed to cmdline_comment.
 
 
 0.249   2021-07-31  Released-By: PERLANCAR; Urgency: medium

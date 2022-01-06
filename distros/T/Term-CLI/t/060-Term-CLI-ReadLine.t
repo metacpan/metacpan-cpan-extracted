@@ -17,6 +17,7 @@ sub Main() {
             : 0
     );
     Term_CLI_ReadLine_test->runtests();
+    return;
 }
 
 package Term_CLI_ReadLine_test {
@@ -37,12 +38,14 @@ sub startup : Test(startup => 2) {
     isa_ok( $term, 'Term::CLI::ReadLine', 'Term::CLI::ReadLine->new' );
     isa_ok( $term, 'Term::ReadLine', 'Term::CLI::ReadLine->new' );
     $self->{term} = $term;
+    return;
 }
 
 sub check_term: Test(1) {
     my $self = shift;
     my $term = $self->{term};
     is( $term->term, $term, "term() is idempotent" );
+    return;
 }
 
 sub check_size: Test(2) {
@@ -54,6 +57,7 @@ sub check_size: Test(2) {
 
     ok( $width > 0, "terminal width $width > 0");
     ok( $height > 0, "terminal height $height > 0");
+    return;
 }
 
 

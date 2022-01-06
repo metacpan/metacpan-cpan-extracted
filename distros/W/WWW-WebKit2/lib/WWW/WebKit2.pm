@@ -55,7 +55,7 @@ use XSLoader;
 use English '-no_match_vars';
 use POSIX qw(F_SETFD F_GETFD FD_CLOEXEC);
 
-our $VERSION = '0.131';
+our $VERSION = '0.132';
 
 use constant DOM_TYPE_ELEMENT => 1;
 use constant ORDERED_NODE_SNAPSHOT_TYPE => 7;
@@ -500,6 +500,7 @@ sub setup_xvfb {
 
     $ENV{WAYLAND_DISPLAY} = '';
     $ENV{DISPLAY} = ":$display";
+    $ENV{DBUS_SESSION_BUS_ADDRESS} = 'unix:abstract=/dev/null';
 
     return;
 }

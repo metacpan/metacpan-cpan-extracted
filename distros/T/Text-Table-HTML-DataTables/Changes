@@ -1,3 +1,8 @@
+0.009   2021-12-09  Released-By: PERLANCAR; Urgency: medium
+
+	- Observe 'title' parameter.
+
+
 0.008   2021-12-01  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Set default length from 10 to 1000.

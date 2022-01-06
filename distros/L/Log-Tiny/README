@@ -1,4 +1,4 @@
-Log-Tiny 1.0 - Log data with as little code as possible
+Log-Tiny 1.1 - Log data with as little code as possible
 
 INSTALLATION
 
@@ -35,7 +35,7 @@ You can also look for information at:
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2007-2015 Jordan M. Adler
+Copyright (C) 2007-2022 Jordan M. Adler
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

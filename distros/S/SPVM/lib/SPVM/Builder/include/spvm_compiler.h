@@ -35,7 +35,7 @@ struct spvm_compiler {
   int32_t cur_line;
   
   // Allocator
-  SPVM_COMPILER_ALLOCATOR* allocator;
+  SPVM_ALLOCATOR* allocator;
 
   // Line start position
   char* line_start_ptr;
@@ -73,8 +73,8 @@ struct spvm_compiler {
   // Module searching directories
   SPVM_LIST* module_dirs;
 
-  // OP name symtable
-  SPVM_HASH* name_symtable;
+  // Constant string symtable
+  SPVM_HASH* const_string_symtable;
 
   // Class loading stack
   SPVM_LIST* op_use_stack;
@@ -92,16 +92,13 @@ struct spvm_compiler {
   SPVM_LIST* classes;
 
   // added_class_names tmp
-  SPVM_LIST* tmp_added_class_names;
+  SPVM_LIST* added_class_names;
   
-  // added_classes
-  SPVM_LIST* added_classes;
-
   // module file symtable
   SPVM_HASH* loaded_module_file_symtable;
 
   // module source symtable
-  SPVM_HASH* module_source_symtable;
+  SPVM_HASH* embedded_module_source_symtable;
   
   // OP class symtable
   SPVM_HASH* class_symtable;
@@ -124,14 +121,13 @@ struct spvm_compiler {
   // Field ops
   SPVM_LIST* fields;
   
-  // No directory module search
-  int32_t no_directry_module_search;
+  int8_t cur_src_need_free;
   
   char* next_double_quote_start_bufptr;
 };
 
 SPVM_COMPILER* SPVM_COMPILER_new();
-void SPVM_COMPILER_compile(SPVM_COMPILER* compiler);
+int32_t SPVM_COMPILER_compile(SPVM_COMPILER* compiler);
 void SPVM_COMPILER_free(SPVM_COMPILER* compiler);
 void SPVM_COMPILER_add_basic_types(SPVM_COMPILER* compiler);
 SPVM_RUNTIME* SPVM_COMPILER_new_runtime(SPVM_COMPILER* compiler);

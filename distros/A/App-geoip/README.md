@@ -172,7 +172,7 @@ mentioning features of or use of this database.
 This tool uses, but does not include, the GeoLite2 data created by MaxMind,
 available from [http://www.maxmind.com](http://www.maxmind.com).
 
- Copyright (C) 2018-2020 H.Merijn Brand.  All rights reserved.
+ Copyright (C) 2018-2022 H.Merijn Brand.  All rights reserved.
 
 This library is free software;  you can redistribute and/or modify it under
 the same terms as Perl itself.

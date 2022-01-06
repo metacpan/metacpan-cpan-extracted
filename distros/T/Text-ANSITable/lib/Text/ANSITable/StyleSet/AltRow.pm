@@ -12,7 +12,7 @@ has even_fgcolor => (is => 'rw');
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-08-27'; # DATE
 our $DIST = 'Text-ANSITable'; # DIST
-our $VERSION = '0.606'; # VERSION
+our $VERSION = '0.607'; # VERSION
 
 sub summary {
     "Set different foreground and/or background color for odd/even rows";
@@ -58,7 +58,7 @@ Text::ANSITable::StyleSet::AltRow - Set different foreground and/or background c
 
 =head1 VERSION
 
-This document describes version 0.606 of Text::ANSITable::StyleSet::AltRow (from Perl distribution Text-ANSITable), released on 2021-08-27.
+This document describes version 0.607 of Text::ANSITable::StyleSet::AltRow (from Perl distribution Text-ANSITable), released on 2021-08-27.
 
 =for Pod::Coverage ^(summary|apply)$
 

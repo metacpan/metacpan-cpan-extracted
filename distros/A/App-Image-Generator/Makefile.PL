@@ -28,11 +28,13 @@ resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
 	'?Name=App-Image-Generator';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/App-Image-Generator';
 resources 'repository' => 'git://github.com/michal-josef-spacek/App-Image-Generator';
+test_requires 'File::Object' => 0;
+test_requires 'File::Spec::Functions' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Output' => 0;
 tests_recursive;
-version '0.03';
+version '0.04';
 
 # Run.
 WriteAll();

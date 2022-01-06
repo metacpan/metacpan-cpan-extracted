@@ -14,11 +14,11 @@ name: Tk-Clock
 provides: 
   Tk::Clock: 
     file: Clock.pm
-    version: '0.42'
+    version: '0.43'
 recommends: 
-  Encode: '3.08'
-  Test::More: '1.302183'
-  Tk: '804.035'
+  Encode: '3.16'
+  Test::More: '1.302188'
+  Tk: '804.036'
 requires: 
   Carp: 0
   Encode: 0
@@ -34,4 +34,4 @@ resources:
   bugtracker: https://github.com/Tux/Tk-Clock/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/Tk-Clock
-version: '0.42'
+version: '0.43'

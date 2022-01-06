@@ -1,5 +1,7 @@
+^cover_db\/
 ^\.git\/
 ^.*.bak
 ^.*.old
 ^.*.swp
 .gitignore
+.travis.yml

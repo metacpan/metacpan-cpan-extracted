@@ -4,10 +4,10 @@ IF (NOT MYPACKAGEBOOTSTRAP_DONE)
 ENDIF ()
 #
 # Usually the version here correspong to the NEXT version - it is git tagged
-# when we do make marpaESLIFPerlRelease
+# when we do make marpaESLIFPerlRelease or marpaESLIFPerlReleaseTrial
 #
 # SET (MYPACKAGE_DEBUG TRUE)
-MYPACKAGESTART (marpaESLIF 5 0 7)
+MYPACKAGESTART (marpaESLIF 6 0 10)
 
 ###########
 # Library #
@@ -36,6 +36,15 @@ ELSE ()
   MESSAGE (STATUS ".. unsigned 32-bit integer type is ${MYPACKAGE_UINT32_TYPEDEF}")
 ENDIF ()
 SET (MARPAESLIF_UINT32_T ${MYPACKAGE_UINT32_TYPEDEF})
+#
+# ... Portable uint64 type
+#
+IF (NOT HAVE_MYPACKAGE_UINT64)
+  MESSAGE (FATAL_ERROR "Could not detect a valid unsigned 64-bit integer type")
+ELSE ()
+  MESSAGE (STATUS ".. unsigned 64-bit integer type is ${MYPACKAGE_UINT64_TYPEDEF}")
+ENDIF ()
+SET (MARPAESLIF_UINT64_T ${MYPACKAGE_UINT64_TYPEDEF})
 #
 # We need to know endianness in case there is no signbit
 #
@@ -81,17 +90,21 @@ ENDFOREACH ()
 ###############
 # Executables #
 ###############
-MYPACKAGETESTEXECUTABLE(marpaESLIFTester           test/marpaESLIFTester.c)
-MYPACKAGETESTEXECUTABLE(adventTester               test/adventTester.c)
-MYPACKAGETESTEXECUTABLE(jsonTesterStrict           test/jsonTesterStrict.c)
-MYPACKAGETESTEXECUTABLE(jsonTesterNotStrict        test/jsonTesterNotStrict.c)
-MYPACKAGETESTEXECUTABLE(jsonTesterLua              test/jsonTesterLua.c)
-MYPACKAGETESTEXECUTABLE(jsonTesterWithSharedStream test/jsonTesterWithSharedStream.c)
-MYPACKAGETESTEXECUTABLE(selfTester                 test/selfTester.c)
-MYPACKAGETESTEXECUTABLE(exceptionTester            test/exceptionTester.c)
-MYPACKAGETESTEXECUTABLE(exceptionTester2           test/exceptionTester2.c)
-MYPACKAGETESTEXECUTABLE(exceptionTester3           test/exceptionTester3.c)
-MYPACKAGETESTEXECUTABLE(exceptionTester4           test/exceptionTester4.c)
+MYPACKAGETESTEXECUTABLE(marpaESLIFTester            test/marpaESLIFTester.c)
+MYPACKAGETESTEXECUTABLE(adventTester                test/adventTester.c)
+MYPACKAGETESTEXECUTABLE(jsonTesterStrict            test/jsonTesterStrict.c)
+MYPACKAGETESTEXECUTABLE(jsonTesterNotStrict         test/jsonTesterNotStrict.c)
+MYPACKAGETESTEXECUTABLE(jsonTesterStrictExternal    test/jsonTesterStrictExternal.c)
+MYPACKAGETESTEXECUTABLE(jsonTesterNotStrictExternal test/jsonTesterNotStrictExternal.c)
+MYPACKAGETESTEXECUTABLE(jsonTesterLua               test/jsonTesterLua.c)
+MYPACKAGETESTEXECUTABLE(jsonTesterWithSharedStream  test/jsonTesterWithSharedStream.c)
+MYPACKAGETESTEXECUTABLE(selfTester                  test/selfTester.c)
+MYPACKAGETESTEXECUTABLE(exceptionTester             test/exceptionTester.c)
+MYPACKAGETESTEXECUTABLE(exceptionTester2            test/exceptionTester2.c)
+MYPACKAGETESTEXECUTABLE(exceptionTester3            test/exceptionTester3.c)
+MYPACKAGETESTEXECUTABLE(exceptionTester4            test/exceptionTester4.c)
+MYPACKAGETESTEXECUTABLE(yamlTester                  test/yamlTester.c)
+MYPACKAGETESTEXECUTABLE(parameterizedTester         test/parameterizedTester.c)
 
 ################
 # Dependencies #
@@ -141,6 +154,8 @@ MYPACKAGECHECK(marpaESLIFTester)
 MYPACKAGECHECK(adventTester)
 MYPACKAGECHECK(jsonTesterStrict)
 MYPACKAGECHECK(jsonTesterNotStrict)
+MYPACKAGECHECK(jsonTesterStrictExternal)
+MYPACKAGECHECK(jsonTesterNotStrictExternal)
 MYPACKAGECHECK(jsonTesterLua)
 MYPACKAGECHECK(jsonTesterWithSharedStream)
 MYPACKAGECHECK(selfTester)
@@ -148,6 +163,7 @@ MYPACKAGECHECK(exceptionTester)
 MYPACKAGECHECK(exceptionTester2)
 MYPACKAGECHECK(exceptionTester3)
 MYPACKAGECHECK(exceptionTester4)
+MYPACKAGECHECK(parameterizedTester)
 
 ###########
 # Install #

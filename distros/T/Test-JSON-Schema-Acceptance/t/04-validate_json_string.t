@@ -1,6 +1,8 @@
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 use strict;
 use warnings;
+use 5.020;
+use experimental qw(signatures postderef);
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
@@ -23,8 +25,7 @@ my $accepter = Test::JSON::Schema::Acceptance->new(specification => 'draft7');
 my $parser = SchemaParser->new;
 my $events = intercept(
   sub {
-    $accepter->acceptance(validate_json_string => sub {
-      my ($schema, $data_string) = @_;
+    $accepter->acceptance(validate_json_string => sub ($schema, $data_string) {
       return $parser->validate_json_string($data_string, $schema);
     });
   }

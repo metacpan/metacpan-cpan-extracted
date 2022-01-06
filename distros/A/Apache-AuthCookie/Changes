@@ -1,5 +1,8 @@
 Revision history for Apache::AuthCookie
 
+3.31  2022-01-05
+   - Fix uninitialized variable warning if "Satisfy" was not set (github #15, thanks yewtc)
+
 3.30  2020-04-14
    - Fix logic error for EnforceLocalDestination
    - Add a bunch of tests to cover all scenarios of EnforceLocalDestination and

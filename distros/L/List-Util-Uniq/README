@@ -2,18 +2,40 @@ NAME
     List::Util::Uniq - List utilities related to finding unique items
 
 VERSION
-    This document describes version 0.003 of List::Util::Uniq (from Perl
-    distribution List-Util-Uniq), released on 2021-07-23.
+    This document describes version 0.004 of List::Util::Uniq (from Perl
+    distribution List-Util-Uniq), released on 2021-07-31.
 
 SYNOPSIS
-     use List::Util::Uniq qw(uniq_adj uniq_adj_ci uniq_ci);
+     use List::Util::Uniq qw(
+         is_monovalued
+         is_monovalued_ci
+         is_uniq
+         is_uniq_ci
+         uniq_adj
+         uniq_adj_ci
+         uniq_ci
+     );
+
+     $res = is_monovalued(qw/a a a/); # 1
+     $res = is_monovalued(qw/a b a/); # 0
+
+     $res = is_monovalued_ci(qw/a a A/); # 1
+     $res = is_monovalued_ci(qw/a b A/); # 0
+
+     $res = is_uniq(qw/a b a/); # 0
+     $res = is_uniq(qw/a b c/); # 1
+
+     $res = is_uniq_ci(qw/a b A/); # 0
+     $res = is_uniq_ci(qw/a b c/); # 1
 
      @res = uniq_adj(1, 4, 4, 3, 1, 1, 2); # 1, 4, 3, 1, 2
+
      @res = uniq_adj_ci("a", "b", "B", "c", "a"); # "a", "b", "c", "a"
+
      @res = uniq_ci("a", "b", "B", "c", "a"); # "a", "b", "c"
 
 FUNCTIONS
-    Not exported by default but exportable.
+    None exported by default but exportable.
 
   uniq_adj
     Usage:

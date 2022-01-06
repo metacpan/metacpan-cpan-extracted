@@ -18,6 +18,7 @@ features:
         requires:
           P2: { version: '22' }
   bar:
+    description: ディスクリプション
     prereqs:
       test:
         suggests:

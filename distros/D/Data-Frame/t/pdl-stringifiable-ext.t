@@ -1,9 +1,11 @@
-use Test::Most tests => 7;
+#!perl
 
-use strict;
-use warnings;
+use Data::Frame::Setup;
 
-use PDL;
+use Test2::V0;
+
+use PDL::Basic qw(sequence);
+use PDL::Core qw(pdl);
 use PDL::StringfiableExtension;
 
 is( sequence(10)->element_stringify_max_width, 1 );
@@ -28,7 +30,6 @@ for (@each) {
 }
 
 subtest 'lengths' => sub {
-	plan tests => 3 * @each;
 	for my $data (@each) {
 		note $data->{val};
 		is( pdl($data->{val})->element_stringify_max_width, $data->{zerodim} );

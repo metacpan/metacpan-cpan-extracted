@@ -205,7 +205,7 @@ int main(char *argv[], int argc)
    return 0;
 }
 __BUILTIN_EXPECT
-    if (try_compile($__builtin_expect)) {
+    if (try_link($__builtin_expect)) {
         $ac->msg_result('yes');
         $ac->define_var("C___BUILTIN_EXPECT", "__builtin_expect");
     } else {
@@ -514,6 +514,31 @@ typedef unsigned int marpaESLIF_uint32_t;
 #  endif
 #endif
 
+#if defined(SIZEOF_UINT64_T) && (SIZEOF_UINT64_T == 8)
+typedef uint64_t marpaESLIF_uint64_t;
+#else
+#  if defined(SIZEOF__UINT64_T) && (SIZEOF__UINT64_T == 8)
+typedef _uint64_t marpaESLIF_uint64_t;
+#  else
+#    if defined(SIZEOF___UINT64_T) && (SIZEOF___UINT64_T == 8)
+typedef __uint64_t marpaESLIF_uint64_t;
+#      if defined(SIZEOF_UNSIGNED_LONG_LONG) && (SIZEOF_UNSIGNED_LONG_LONG == 8)
+typedef unsigned long long marpaESLIF_uint64_t;
+#      else
+#        if defined(SIZEOF_UNSIGNED_LONG) && (SIZEOF_UNSIGNED_LONG == 8)
+typedef unsigned long marpaESLIF_uint64_t;
+#        else
+#          if defined(SIZEOF_UNSIGNED_INT) && (SIZEOF_UNSIGNED_INT == 8)
+typedef unsigned int marpaESLIF_uint64_t;
+#          else
+#            error "Cannot determine marpaESLIF_uint64_t"
+#          endif
+#        endif
+#      endif
+#    endif
+#  endif
+#endif
+
 #ifdef C_HAVE_HUGE_VAL_REPLACEMENT
 # define C_HUGE_VAL_REPLACEMENT
 #endif
@@ -733,8 +758,9 @@ CONFIG
 }
 
 sub try_compile {
-    my ($csource, $extra_compiler_flags) = @_;
+    my ($csource, $extra_compiler_flags, $link) = @_;
 
+    $link //= 0;
     my $fh = File::Temp->new(UNLINK => 0, SUFFIX => '.c');
     print $fh "$csource\n";
     close($fh);
@@ -749,11 +775,22 @@ sub try_compile {
             object_file          => $obj,
             extra_compiler_flags => $extra_compiler_flags
             );
+        if ($link) {
+            $cbuilder->link_executable(
+                objects              => [ $obj ],
+                );
+        }
         $rc = 1;
     };
     unlink $fh->filename;
 
     return $rc;
+}
+
+sub try_link {
+    my ($csource, $extra_compiler_flags) = @_;
+
+    return try_compile($csource, $extra_compiler_flags, 1);
 }
 
 sub get_math_constant {

@@ -1,23 +1,12 @@
 package Data::Frame::Rlike;
-$Data::Frame::Rlike::VERSION = '0.003';
+$Data::Frame::Rlike::VERSION = '0.006002';
 use strict;
 use warnings;
-use Exporter 'import';
-our @EXPORT = qw(dataframe factor);
 
-use Data::Frame;
-use PDL::Factor;
+use Data::Frame::Util qw(dataframe factor logical);
 
-our $_df_rlike_class = Moo::Role->create_class_with_roles( 'Data::Frame',
-	qw(Data::Frame::Role::Rlike));
-
-sub dataframe {
-	$_df_rlike_class->new( columns => \@_ );
-}
-
-sub factor {
-	PDL::Factor->new(@_);
-}
+use parent qw(Exporter::Tiny);
+our @EXPORT = qw(dataframe factor logical);
 
 1;
 
@@ -33,15 +22,33 @@ Data::Frame::Rlike
 
 =head1 VERSION
 
-version 0.003
+version 0.006002
 
-=head1 AUTHOR
+=head1 DESCRIPTION
+
+This module is superceded by L<Data::Frame::Util>.
+
+=head1 SEE ALSO
+
+L<Data::Frame::Util>
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Zakariyya Mughal <zmughal@cpan.org>
 
+=item *
+
+Stephan Loyd <sloyd@cpan.org>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Zakariyya Mughal.
+This software is copyright (c) 2014, 2019-2022 by Zakariyya Mughal, Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

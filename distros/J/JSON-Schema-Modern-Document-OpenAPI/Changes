@@ -1,5 +1,11 @@
 Revision history for JSON-Schema-Modern-Document-OpenAPI
 
+0.016     2022-01-06 04:22:20Z
+          - fix the prereq specification for YAML::PP
+
+0.015     2021-12-31 21:17:11Z
+          - load Math::BigInt before attempting to use it
+
 0.014     2021-12-30 05:38:03Z
           - use bignums in JSON::Schema::Modern to properly support int32,
             int64 numeric formats

@@ -35,7 +35,7 @@ under the same terms as Perl itself.
 
 =cut
 
-our $VERSION = '0.035'; # VERSION
+our $VERSION = '0.036'; # VERSION
 
 use Mouse;
 use Carp;
@@ -170,8 +170,20 @@ sub make_object
   my ($db_name, $accession);
 
   unless (($db_name, $accession) = $object->{id} =~ /^(\S+):(.+?)\s*$/) {
-    $db_name = '_global';
-    $accession = $object->{id};
+    if ($object->{id} eq 'part_of') {
+      # special case to make sure all the part_of terms are merged - the "part_of"
+      # in the GO and FYPO OBO files has the namespace "external" (and a variety of
+      # others) and the ID is "part_of"
+      # we normalise the id and namespace to match RO
+      $db_name = 'BFO';
+      $accession = '0000050';
+
+      $object->{id} = "$db_name:$accession";
+      $object->{namespace} = "relationship";
+    } else {
+      $db_name = '_global';
+      $accession = $object->{id};
+    }
   }
 
   $object->{accession} = $accession;

@@ -5,7 +5,7 @@ package ColorTheme::Text::ANSITable::Standard::NoGradationWhiteBG;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-08-27'; # DATE
 our $DIST = 'Text-ANSITable'; # DIST
-our $VERSION = '0.606'; # VERSION
+our $VERSION = '0.607'; # VERSION
 
 use parent 'ColorThemeBase::Static::FromStructColors';
 
@@ -37,7 +37,7 @@ ColorTheme::Text::ANSITable::Standard::NoGradationWhiteBG - Default (no gradatio
 
 =head1 VERSION
 
-This document describes version 0.606 of ColorTheme::Text::ANSITable::Standard::NoGradationWhiteBG (from Perl distribution Text-ANSITable), released on 2021-08-27.
+This document describes version 0.607 of ColorTheme::Text::ANSITable::Standard::NoGradationWhiteBG (from Perl distribution Text-ANSITable), released on 2021-08-27.
 
 =head1 HOMEPAGE
 

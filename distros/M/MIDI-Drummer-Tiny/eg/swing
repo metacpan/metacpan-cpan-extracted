@@ -12,50 +12,7 @@ my $d = MIDI::Drummer::Tiny->new(
 
 $d->count_in(1);
 
-my $i = 0;
-
-for my $n ( 1 .. $d->bars ) {
-    $d->note( $d->quarter,          $d->ride1, $d->kick );
-    $d->note( $d->triplet_eighth,   $d->ride1 );
-    $d->rest( $d->triplet_eighth );
-    $d->note( $d->triplet_eighth,   $d->ride1, $d->kick );
-    $d->note( $d->quarter,          $d->ride1, $d->snare );
-    $d->note( $d->triplet_eighth,   $d->ride1, $d->kick );
-    $d->rest( $d->triplet_eighth );
-    $d->note( $d->triplet_eighth,   $d->ride1 );
-
-    if ( $n % 3 == 0 ) {
-        if ( $i % 2 == 0 ) {
-            $d->note( $d->triplet_eighth, $d->snare );
-            $d->note( $d->triplet_eighth, $d->snare );
-            $d->note( $d->triplet_eighth, $d->snare );
-            $d->note( $d->triplet_eighth, $d->hi_tom );
-            $d->note( $d->triplet_eighth, $d->hi_tom );
-            $d->note( $d->triplet_eighth, $d->hi_tom );
-            $d->note( $d->triplet_eighth, $d->hi_mid_tom );
-            $d->note( $d->triplet_eighth, $d->hi_mid_tom );
-            $d->note( $d->triplet_eighth, $d->hi_mid_tom );
-            $d->note( $d->triplet_eighth, $d->low_tom );
-            $d->note( $d->triplet_eighth, $d->low_tom );
-            $d->note( $d->triplet_eighth, $d->low_tom );
-        }
-        else {
-            $d->note( $d->triplet_eighth, $d->snare );
-            $d->note( $d->triplet_eighth, $d->snare );
-            $d->note( $d->triplet_eighth, $d->hi_tom );
-            $d->note( $d->triplet_eighth, $d->snare );
-            $d->rest( $d->triplet_eighth );
-            $d->note( $d->triplet_eighth, $d->hi_mid_tom );
-            $d->note( $d->triplet_eighth, $d->snare );
-            $d->rest( $d->triplet_eighth );
-            $d->note( $d->triplet_eighth, $d->low_tom );
-            $d->note( $d->triplet_eighth, $d->snare );
-            $d->rest( $d->triplet_eighth );
-            $d->note( $d->triplet_eighth, $d->hi_floor_tom );
-        }
-        $i++;
-    }
-}
+$d->metronome44swing;
 
 $d->note( $d->quarter, $d->ride1, $d->kick );
 

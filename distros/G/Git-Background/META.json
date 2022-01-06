@@ -1,5 +1,5 @@
 {
-   "abstract" : "Perl interface to run Git commands (in the background)",
+   "abstract" : "use Git commands with Future",
    "author" : [
       "Sven Kirmess <sven.kirmess@kzone.ch>"
    ],
@@ -31,9 +31,10 @@
          "requires" : {
             "Carp" : "0",
             "File::Temp" : "0",
+            "Future" : "0.40",
             "Proc::Background" : "1.30",
             "Scalar::Util" : "0",
-            "overload" : "0",
+            "parent" : "0",
             "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
@@ -48,8 +49,8 @@
             "File::Spec" : "0",
             "File::Spec::Functions" : "0",
             "Test::More" : "0.88",
-            "constant" : "0",
             "lib" : "0",
+            "overload" : "0",
             "perl" : "5.006"
          }
       }
@@ -66,7 +67,7 @@
          "web" : "https://github.com/skirmess/Git-Background"
       }
    },
-   "version" : "0.001",
+   "version" : "0.003",
    "x_spdx_expression" : "BSD-2-Clause-FreeBSD"
 }
 

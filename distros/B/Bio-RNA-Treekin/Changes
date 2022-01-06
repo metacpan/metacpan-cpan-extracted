@@ -1,5 +1,8 @@
 Revision history for Bio-RNA-Treekin
 
-0.01    Date/time
+0.02    2022-01-03
+        - added support for '# of iterations' footer in new Treekin versions
+
+0.01    2021-12-22
         First version, released on an unsuspecting world.
 

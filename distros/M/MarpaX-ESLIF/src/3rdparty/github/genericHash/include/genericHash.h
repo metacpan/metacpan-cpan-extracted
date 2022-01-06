@@ -290,6 +290,8 @@ typedef struct genericHash {
 	int             _subStackusedi = GENERICSTACK_USED(_subKeyStackp); \
 	int             _i;						\
         short           _valFreeFunctionb = (hashName->valFreeFunctionp != NULL); \
+        short           _keyCmpFunctionb = (hashName->keyCmpFunctionp != NULL); \
+        short           _keyFreeFunctionb = (hashName->keyFreeFunctionp != NULL); \
 									\
 	for (_i = 0; _i < _subStackusedi; _i++) {			\
 	  GENERICSTACKITEMTYPE2TYPE_##keyType _gotKeyVal;		\
@@ -300,7 +302,6 @@ typedef struct genericHash {
 	  _gotKeyVal = GENERICSTACK_GET_##keyType(_subKeyStackp, _i);	\
           GENERICHASH_IIF(GENERICHASH_EQUAL(keyType, PTR)) (            \
             {                                                           \
-              short _keyCmpFunctionb = (hashName->keyCmpFunctionp != NULL); \
               if (_keyCmpFunctionb) {                                   \
                 if (! hashName->keyCmpFunctionp((void *) userDatavp, &_keyVal, &_gotKeyVal)) { \
                   continue;                                             \
@@ -319,7 +320,6 @@ typedef struct genericHash {
 									\
           GENERICHASH_IIF(GENERICHASH_EQUAL(keyType, PTR)) (            \
             {                                                           \
-              short _keyFreeFunctionb = (hashName->keyFreeFunctionp != NULL); \
               if (_keyFreeFunctionb && (_gotKeyVal != NULL)) {          \
                 hashName->keyFreeFunctionp((void *) userDatavp, &_gotKeyVal); \
               }								\
@@ -372,6 +372,8 @@ typedef struct genericHash {
 	genericStack_t *_subValStackp = (genericStack_t *) GENERICSTACK_GET_PTR(hashName->valStackp, _subStackIndex); \
 	int             _subStackusedi = GENERICSTACK_USED(_subKeyStackp); \
         short           _valFreeFunctionb = (hashName->valFreeFunctionp != NULL); \
+        short           _keyCmpFunctionb = (hashName->keyCmpFunctionp != NULL); \
+        short           _keyFreeFunctionb = (hashName->keyFreeFunctionp != NULL); \
 	int _i;								\
 									\
 	for (_i = 0; _i < _subStackusedi; _i++) {			\
@@ -384,7 +386,6 @@ typedef struct genericHash {
 	  _gotKeyVal = GENERICSTACK_GET_##keyType(_subKeyStackp, _i);	\
           GENERICHASH_IIF(GENERICHASH_EQUAL(keyType, PTR)) (            \
             {                                                           \
-              short _keyCmpFunctionb = (hashName->keyCmpFunctionp != NULL); \
               if (_keyCmpFunctionb && (GENERICSTACKITEMTYPE_##keyType == GENERICSTACKITEMTYPE_PTR)) { \
                 if (! hashName->keyCmpFunctionp((void *) userDatavp, (void **) &keyVal, (void **) &_gotKeyVal)) { \
                   continue;                                             \
@@ -409,7 +410,6 @@ typedef struct genericHash {
 	  if (remove) {							\
             GENERICHASH_IIF(GENERICHASH_EQUAL(keyType, PTR)) (          \
 	      {                                                         \
-                short _keyFreeFunctionb = (hashName->keyFreeFunctionp != NULL); \
                 if (_keyFreeFunctionb && (_gotKeyVal != NULL)) {        \
                   hashName->keyFreeFunctionp((void *) userDatavp, &_gotKeyVal); \
                 }                                                       \

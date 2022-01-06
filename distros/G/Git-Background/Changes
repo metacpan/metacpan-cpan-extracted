@@ -1,5 +1,13 @@
 Revision history for Git-Background
 
+0.003  2022-01-01 22:55:58 UTC
+
+  - Bump dependency on Future to 0.40, which introduced Future::Exception
+
+0.002  2022-01-01 19:40:33 UTC
+
+  - API change to use Future
+
 0.001  2021-12-20 20:01:35 UTC
 
   - Initial release

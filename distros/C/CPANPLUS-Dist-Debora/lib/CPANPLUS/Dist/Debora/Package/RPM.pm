@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 use parent qw(CPANPLUS::Dist::Debora::Package);
 
@@ -379,13 +379,14 @@ for my $dependency (@{$package->dependencies}) {
     }
     $OUT .= "\n";
 }
+q{};
 %]
 %{?perl_default_filter}
 
 %description
 [%
-    local $Text::Wrap::unexpand = 0;
-    $escape->(Text::Wrap::wrap(q{}, q{}, $package->description))
+local $Text::Wrap::unexpand = 0;
+$escape->(Text::Wrap::wrap(q{}, q{}, $package->description))
 %]
 
 %{?debug_package}
@@ -423,6 +424,7 @@ for my $file (@{$package->files}) {
     }
     $OUT .= "\n";
 }
+q{};
 %]
 %changelog
 * [% $date %] [% $escape->($package->packager) %] - [% $escape->($package->version) %]-[% $escape->($package->build_number) %]
@@ -535,7 +537,7 @@ CPANPLUS::Dist::Debora::Package::RPM - Create binary RPM packages
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -549,8 +551,8 @@ version 0.006
 
 =head1 DESCRIPTION
 
-This CPANPLUS::Dist::Debora::Package subclass creates binary RPM packages from
-Perl distributions.
+This L<CPANPLUS::Dist::Debora::Package> subclass creates binary RPM packages
+from Perl distributions.
 
 =head1 SUBROUTINES/METHODS
 
@@ -647,15 +649,15 @@ Fills in a template and returns a spec file.
 
 =head1 DIAGNOSTICS
 
-See CPANPLUS::Dist::Debora for diagnostics.
+See L<CPANPLUS::Dist::Debora> for diagnostics.
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
-See CPANPLUS::Dist::Debora for supported files and environment variables.
+See L<CPANPLUS::Dist::Debora> for supported files and environment variables.
 
 =head1 DEPENDENCIES
 
-Requires the Perl modules CPANPLUS and Text::Template from CPAN.
+Requires the Perl modules L<CPANPLUS> and L<Text::Template> from CPAN.
 
 Requires the operating system packages "perl", "rpm-build", "gcc", "make",
 "sudo" and, if available, "perl-generators".
@@ -674,6 +676,8 @@ Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
 
 =head1 BUGS AND LIMITATIONS
 
+The License field is populated with SPDX license expressions.
+
 The date in the RPM changelog is in Coordinated Universal Time (UTC).
 
 AutoReq is enabled for architecture-dependent packages so that shared library
@@ -687,7 +691,7 @@ This module cannot be used in taint mode.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2021 Andreas Vögele
+Copyright 2022 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

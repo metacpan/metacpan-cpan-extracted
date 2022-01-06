@@ -1,11 +1,11 @@
 [
     {
         "description": "mutation of hashes",
-        "schema": { "foo": { "string": "1", "int": 1, "bigint": 99999999999999999999 } },
+        "schema": { "foo": { "string": "1", "int": 1, "bigint": 99999999999999999999, "bignum": 0.2 } },
         "tests": [
             {
                 "description": "object of integers",
-                "data": { "foo": { "string": "1", "int": 1, "bigint": 99999999999999999999 } },
+                "data": { "foo": { "string": "1", "int": 1, "bigint": 99999999999999999999, "bignum": 0.2 } },
                 "valid": true
             }
         ]

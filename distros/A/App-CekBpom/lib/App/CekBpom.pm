@@ -8,9 +8,9 @@ use Log::ger;
 use Time::HiRes qw(time);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-01'; # DATE
+our $DATE = '2021-12-09'; # DATE
 our $DIST = 'App-CekBpom'; # DIST
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(cek_bpom_products);
@@ -367,6 +367,8 @@ sub cek_bpom_products {
         };
     }
 
+    $resmeta{title} = "Check BPOM products: query=[".join(",", @{$args{queries}})."], search_types=[".join(",",@$search_types)."]";
+
     $envres;
 }
 
@@ -385,7 +387,7 @@ App::CekBpom - Check BPOM products/manufacturers ("sarana") via the command-line
 
 =head1 VERSION
 
-This document describes version 0.014 of App::CekBpom (from Perl distribution App-CekBpom), released on 2021-10-01.
+This document describes version 0.016 of App::CekBpom (from Perl distribution App-CekBpom), released on 2021-12-09.
 
 =head1 DESCRIPTION
 

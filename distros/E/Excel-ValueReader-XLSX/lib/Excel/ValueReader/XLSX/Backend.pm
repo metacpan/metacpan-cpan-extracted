@@ -4,7 +4,7 @@ use 5.10.1;
 use Moose;
 use Archive::Zip          qw(AZ_OK);
 
-our $VERSION = '1.05';
+our $VERSION = '1.07';
 
 #======================================================================
 # ATTRIBUTES

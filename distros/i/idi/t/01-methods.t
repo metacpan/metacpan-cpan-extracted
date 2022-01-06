@@ -8,6 +8,8 @@ use_ok 'idi';
 
 my $s = get_score();
 
+e(0); # Turn off "play-on-end"
+
 b(100);
 is_deeply [$s->Score]->[-1], ['set_tempo', 0, 600000], 'b';
 
@@ -41,7 +43,7 @@ is $s->Volume, 64, 'v';
 v(127);
 is $s->Volume, 127, 'v';
 
-w();
+w('idi.mid');
 ok -e 'idi.mid', 'w';
 
 x('c2');

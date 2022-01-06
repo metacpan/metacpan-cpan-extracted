@@ -1,88 +1,26 @@
 ---
-abstract: 'Alternative implementation of Data::Frame with more features'
+abstract: 'DEPRECATED Alternative implementation of Data::Frame'
 author:
   - 'Zakariyya Mughal <zmughal@cpan.org>'
   - 'Stephan Loyd <sloyd@cpan.org>'
-build_requires:
-  FindBin: '0'
-  Math::BigInt: '0'
-  Test2::Tools::PDL: '0.0004'
-  Test2::Tools::Warnings: '0'
-  Test2::V0: '0'
-  Test::File::ShareDir: '0'
+build_requires: {}
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.020, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Alt-Data-Frame-ButMore
 requires:
-  Carp: '0'
-  Class::Method::Modifiers: '0'
-  Data::Dumper: '0'
-  Devel::OverloadInfo: '0.005'
-  Eval::Quosure: '0.001001'
-  Exporter::Tiny: '0'
-  File::ShareDir: '0'
-  Function::Parameters: '2.001003'
-  Hash::Ordered: '0'
-  Import::Into: '0'
-  List::AllUtils: '0.19'
-  Module::Load: '0'
-  Module::Runtime: '0'
-  Moo: '2.003004'
-  Moo::Role: '0'
-  MooX::Traits: '0'
-  PDL: '2.019'
-  PDL::Basic: '0'
-  PDL::Core: '0'
-  PDL::DateTime: '0'
-  PDL::Lite: '0'
-  PDL::Primitive: '0'
-  PDL::Types: '0'
-  POSIX: '0'
-  Package::Stash: '0'
-  Path::Tiny: '0'
-  Ref::Util: '0.204'
-  Role::Tiny: '0'
-  Role::Tiny::With: '0'
-  Safe::Isa: '1.000009'
-  Scalar::Util: '0'
-  Sereal::Encoder: '4.005'
-  Syntax::Keyword::Try: '0.09'
-  Test2::API: '0'
-  Test2::Util::Ref: '0'
-  Test2::Util::Table: '0'
-  Text::CSV: '0'
-  Text::Table::Tiny: '0'
-  Type::Library: '0'
-  Type::Params: '0'
-  Type::Tiny: '1.004004'
-  Type::Utils: '0'
-  Types::PDL: '0'
-  Types::Standard: '0'
-  autobox: '0'
-  boolean: '0'
-  failures: '0'
-  feature: '0'
-  namespace::autoclean: '0.28'
-  overload: '0'
-  parent: '0'
-  perl: '5.016'
-  strict: '0'
-  utf8: '0'
-  warnings: '0'
+  Data::Frame: '0.006002'
 resources:
-  IRC: irc://irc.perl.org/#pdl
-  homepage: https://github.com/stphnlyd/p5-Data-Frame
-  repository: https://github.com/stphnlyd/p5-Data-Frame.git
-version: '0.0060'
+  homepage: https://github.com/stphnlyd/p5-Alt-Data-Frame-ButMore
+  repository: https://github.com/stphnlyd/p5-Alt-Data-Frame-ButMore.git
+version: '0.006001'
 x_contributors:
   - 'Mohammad S Anwar <manwar@cpan.org>'
-x_generated_by_perl: v5.26.3
+x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

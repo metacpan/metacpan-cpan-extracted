@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-01'; # DATE
+our $DATE = '2021-12-09'; # DATE
 our $DIST = 'App-CekBpom'; # DIST
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CekBpom/cek_bpom_products",
@@ -38,7 +38,7 @@ cek-bpom-products - Search BPOM products via https://cekbpom.pom.go.id/
 
 =head1 VERSION
 
-This document describes version 0.014 of cek-bpom-products (from Perl distribution App-CekBpom), released on 2021-10-01.
+This document describes version 0.016 of cek-bpom-products (from Perl distribution App-CekBpom), released on 2021-12-09.
 
 =head1 SYNOPSIS
 
@@ -168,15 +168,15 @@ Shortcut for --search-type=merk.
 
 See C<--search-type>.
 
-=item B<-P>
-
-Shortcut for --search-type=nama_pendaftar.
-
-See C<--search-type>.
-
 =item B<-p>
 
 Shortcut for --search-type=nama_produk.
+
+See C<--search-type>.
+
+=item B<-P>
+
+Shortcut for --search-type=nama_pendaftar.
 
 See C<--search-type>.
 
@@ -379,7 +379,7 @@ For fish and zsh, install L<shcompgen> as described above.
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/cek-bpom-products.conf>, F<~/cek-bpom-products.conf>, or F</etc/cek-bpom-products.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/cek-bpom-products.conf>, F</home/u1/cek-bpom-products.conf>, or F</etc/cek-bpom-products.conf>.
 
 All found files will be read and merged.
 
@@ -426,9 +426,9 @@ Specify additional command-line options.
 
 =head1 FILES
 
-F<~/.config/cek-bpom-products.conf>
+F</home/u1/.config/cek-bpom-products.conf>
 
-F<~/cek-bpom-products.conf>
+F</home/u1/cek-bpom-products.conf>
 
 F</etc/cek-bpom-products.conf>
 

@@ -1,5 +1,5 @@
 {
-   "abstract" : "Easy Command-line MIDI",
+   "abstract" : "Easy, command-line MIDI",
    "author" : [
       "Gene Boggs <gene@cpan.org>"
    ],
@@ -42,6 +42,8 @@
       "runtime" : {
          "requires" : {
             "Exporter" : "0",
+            "File::Slurper" : "0",
+            "File::Temp" : "0",
             "MIDI::Simple" : "0",
             "Moo" : "0",
             "Music::Tempo" : "0",
@@ -65,7 +67,7 @@
    "provides" : {
       "idi" : {
          "file" : "lib/idi.pm",
-         "version" : "0.0102"
+         "version" : "0.0302"
       }
    },
    "release_status" : "stable",
@@ -77,7 +79,7 @@
          "web" : "https://github.com/ology/idi"
       }
    },
-   "version" : "0.0102",
+   "version" : "0.0302",
    "x_generated_by_perl" : "v5.32.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "Artistic-2.0"

@@ -5,7 +5,7 @@ package Chart::GGPlot::Scale::Discrete;
 use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 
-our $VERSION = '0.0016'; # VERSION
+our $VERSION = '0.002000'; # VERSION
 
 use PDL::Primitive qw(which);
 use Types::Standard qw(Any ArrayRef Bool CodeRef ConsumerOf InstanceOf);
@@ -58,7 +58,7 @@ method map_to_limits ( $p, $limits = $self->get_limits ) {
         if ( defined $self->_n_breaks_cache ) {
             warn "Cached palette does not match requested";
         }
-        $pal = $self->palette->($n);
+        $pal = $self->palette->( int($n) );
         $self->_palette_cache($pal);
         $self->_n_breaks_cache($n);
     }
@@ -191,7 +191,7 @@ Chart::GGPlot::Scale::Discrete - Discrete scale
 
 =head1 VERSION
 
-version 0.0016
+version 0.002000
 
 =head1 AUTHOR
 

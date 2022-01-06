@@ -1,5 +1,8 @@
 Revision history for Mojo-IOLoop-Signal
 
+0.003  2022-01-01 10:37:54 JST
+    - Fix Undefined subroutine &Mojo::Util::_global_destruction called (eleksir #4)
+
 0.002  2021-01-19 21:00:03 JST
     - Don't try to clean up during global destruction (greencoloured #1)
 

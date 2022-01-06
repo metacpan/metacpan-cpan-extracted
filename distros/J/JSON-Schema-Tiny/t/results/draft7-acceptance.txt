@@ -1,5 +1,5 @@
-Results using Test::JSON::Schema::Acceptance 1.013
-with commit 329efe59c65ea9f49af9c5c07dd6f5d22cb67ef4 (2.0.0-443-g329efe5)
+Results using Test::JSON::Schema::Acceptance 1.015
+with commit 20fb14bde8f3c45a8933cd13283557c1b1fdf5b5 (2.0.0-454-g20fb14b)
 from git://github.com/json-schema-org/JSON-Schema-Test-Suite.git:
 specification version: draft7
 optional tests included: yes
@@ -44,12 +44,12 @@ ref.json                                    40          8     0
 refRemote.json                               8          9     0
 required.json                                9          0     0
 type.json                                   80          0     0
-uniqueItems.json                            64          0     0
+uniqueItems.json                            68          0     0
 unknownKeyword.json                          2          1     0
-optional/bignum.json                         2          7     0
+optional/bignum.json                         9          0     0
 optional/content.json                        6          4     0
 optional/ecmascript-regex.json              60         14     0
-optional/float-overflow.json                 0          1     0
+optional/float-overflow.json                 1          0     0
 optional/non-bmp-regex.json                 12          0     0
 ---------------------------------------------------------------
-TOTAL                                      852         47     0
+TOTAL                                      864         39     0

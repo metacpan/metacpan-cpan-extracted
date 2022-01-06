@@ -16,7 +16,7 @@ use App::SpamcupNG::HTMLParse (
     'find_next_id',       'find_errors',
     'find_warnings',      'find_spam_header',
     'find_best_contacts', 'find_receivers'
-);
+    );
 
 use constant TARGET_HTML_FORM => 'sendreport';
 
@@ -29,22 +29,17 @@ our %OPTIONS_MAP = (
     'alt_code'   => 'c',
     'alt_user'   => 'l',
     'verbosity'  => 'V',
-);
-
-my %fatal_errors = (
-    mailhost_problem => qr/Mailhost\sconfiguration\sproblem/i,
-    too_old          => qr/^Sorry,\sthis\semail\sis\stoo\sold/
-);
+    );
 
 my %regexes = (
     no_user_id => qr/\>No userid found\</i,
     next_id    => qr/sc\?id\=(.*?)\"\>/i,
     http_500   => qr/500/,
-);
+    );
 
 lock_hash(%OPTIONS_MAP);
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 =head1 NAME
 
@@ -220,7 +215,7 @@ sub config_logger {
         WARN  => $WARN,
         ERROR => $ERROR,
         FATAL => $FATAL
-    );
+        );
     croak "The value '$level' is not a valid value for level"
         unless ( exists( $levels{$level} ) );
 
@@ -339,7 +334,7 @@ sub _self_auth {
             $logger->warn($res_status);
             $logger->fatal(
                 'Cannot connect to server or invalid credentials. Please verify your username and password and try again.'
-            );
+                );
         }
     }
 
@@ -349,7 +344,7 @@ sub _self_auth {
     if ( $content =~ $regexes{no_user_id} ) {
         $logger->logdie(
             'No userid found. Please check that you have entered correct code. Also consider obtaining a password to Spamcop.net instead of using the old-style authorization token.'
-        );
+            );
     }
 
     if ($auth_is_ok) {
@@ -381,6 +376,11 @@ sub main_loop {
 
     if ($response) {
         $next_id = find_next_id( \$response );
+
+        if ($logger->is_debug) {
+            $logger->debug("ID of next SPAM report found: $next_id") if ($next_id);
+        }
+
         return -1 unless ( defined($next_id) );
     }
     else {
@@ -391,7 +391,7 @@ sub main_loop {
     if ( ($last_seen) and ( $next_id eq $last_seen ) ) {
         $logger->fatal(
             "I have seen this ID earlier, we do not want to report it again. This usually happens because of a bug in Spamcup. Make sure you use latest version! You may also want to go check from Spamcop what is happening: http://www.spamcop.net/sc?id=$next_id"
-        );
+            );
     }
 
     $last_seen = $next_id;    # store for comparison
@@ -439,18 +439,7 @@ sub main_loop {
     if ( my $errors_ref = find_errors( \( $res->content ) ) ) {
 
         foreach my $error ( @{$errors_ref} ) {
-            my $is_fatal = 0;
-
-            foreach my $fatal_error ( keys(%fatal_errors) ) {
-
-                if ( $error =~ $fatal_errors{$fatal_error} ) {
-                    $is_fatal = 1;
-                    last;
-                }
-
-            }
-
-            if ($is_fatal) {
+            if ( $error->is_fatal() ) {
                 $logger->fatal($error);
 
               # must stop processing the HTML for this report and move to next
@@ -471,7 +460,7 @@ sub main_loop {
     unless ($base_uri) {
         $logger->fatal(
             'No base URI found. Internal error? Please report this error by registering an issue on Github'
-        );
+            );
     }
 
     if ( $logger->is_debug ) {
@@ -490,74 +479,10 @@ sub main_loop {
     my $form = _report_form( $res->content, $base_uri );
     $logger->fatal(
         'Could not find the HTML form to report the SPAM! May be a temporary Spamcop.net error, try again later! Quitting...'
-    ) unless ($form);
+        ) unless ($form);
 
     if ( $logger->is_info ) {
-        my $spam_header_ref = find_spam_header($1);
-
-        if ($spam_header_ref) {
-            my $as_string = join( "\n", @$spam_header_ref );
-            $logger->info("Head of the SPAM follows:\n$as_string");
-        }
-
-        if ( $logger->is_debug ) {
-            $logger->debug( 'Form data follows: ' . $form->dump );
-        }
-
-        # how many recipients for reports
-        my $max = $form->value("max");
-        my $willsend;
-        my $wontsend;
-
-        # iterate targets
-        for ( my $i = 1; $i <= $max; $i++ ) {
-            my $send   = $form->value("send$i");
-            my $type   = $form->value("type$i");
-            my $master = $form->value("master$i");
-            my $info   = $form->value("info$i");
-
-            # convert %2E -style stuff back to text, if any
-            if ( $info =~ /%([A-Fa-f\d]{2})/g ) {
-                $info =~ s/%([A-Fa-f\d]{2})/chr hex $1/eg;
-            }
-
-            if ($send
-                and (  ( $send eq 'on' )
-                    or ( $type =~ /^mole/ and $send == 1 ) )
-                )
-            {
-                $willsend .= "$master ($info)\n";
-            }
-            else {
-                $wontsend .= "$master ($info)\n";
-            }
-        }
-
-        my $message
-            = 'Would send the report to the following addresses (reason in parenthesis): ';
-
-        if ($willsend) {
-            $message .= $willsend;
-        }
-        else {
-            $message .= '--none--';
-        }
-
-        $logger->info($message);
-        $message = 'Following addresses would not be used: ';
-
-        if ($wontsend) {
-            $message .= $wontsend;
-        }
-        else {
-            $message .= '--none--';
-        }
-
-        $logger->info($message);
-    }
-
-    if ( $logger->is_info ) {
-        my $spam_header_ref = find_spam_header($1);
+        my $spam_header_ref = find_spam_header(\($res->content));
 
         if ($spam_header_ref) {
             my $as_string = join( "\n", @$spam_header_ref );
@@ -622,7 +547,7 @@ sub main_loop {
 
     $logger->fatal(
         'Could not find the HTML form to report the SPAM! May be a temporary Spamcop.net error, try again later! Quitting...'
-    ) unless ($form);
+        ) unless ($form);
 
     # Run without confirming each spam? Stupid. :)
     unless ( $opts_ref->{stupid} ) {
@@ -641,6 +566,7 @@ sub main_loop {
         }
     }
     else {
+
         # little delay for automatic processing
         sleep $opts_ref->{delay};
     }
@@ -662,6 +588,7 @@ sub main_loop {
                 $_cancel = 1;    # mark to be cancelled
             }
             else {
+
                 # Y
                 print "* Accepted.\n";
             }
@@ -676,7 +603,7 @@ sub main_loop {
         my $delay = $1;
         $logger->warn(
             "Spamcop seems to be currently overloaded. Trying again in $delay seconds. Wait..."
-        );
+            );
         sleep $opts_ref->{delay};
 
         # fool it to avoid duplicate detector
@@ -690,21 +617,22 @@ sub main_loop {
     {
         $logger->warn(
             'No source IP address found. Your report might be missing headers. Skipping.'
-        );
+            );
         return 0;
     }
     else {
+
       # Shit happens. If you know it should be parseable, please report a bug!
         $logger->warn(
             "Can't parse Spamcop.net's HTML. If this does not happen very often you can ignore this warning. Otherwise check if there's new version available. Skipping."
-        );
+            );
         return 0;
     }
 
     if ( $opts_ref->{check_only} ) {
         $logger->info(
             'You gave option -n, so we\'ll stop here. The SPAM was NOT reported.'
-        );
+            );
         exit;
     }
 

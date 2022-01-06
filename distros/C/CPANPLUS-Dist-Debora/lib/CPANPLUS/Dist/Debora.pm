@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 use parent qw(CPANPLUS::Dist::Base);
 
@@ -84,7 +84,11 @@ sub prepare {
         # We are not allowed to write to XML/SAX/ParserDetails.ini.
         local $ENV{SKIP_SAX_INSTALL} = 1;
 
-        $self->SUPER::prepare(%params);
+        $self->SUPER::prepare(
+            %params,
+            buildflags     => q{},
+            makemakerflags => q{},
+        );
     };
 
     return $status->prepared($ok);
@@ -130,7 +134,11 @@ sub create {
             }
         }
 
-        $self->SUPER::create(%params);
+        $self->SUPER::create(
+            %params,
+            buildflags     => q{},
+            makemakerflags => q{},
+        );
     };
 
     if ($ok) {
@@ -214,7 +222,7 @@ CPANPLUS::Dist::Debora - Create Debian or RPM packages from Perl modules
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -233,8 +241,9 @@ version 0.006
 
 =head1 DESCRIPTION
 
-This CPANPLUS plugin creates Debian or RPM packages from Perl distributions.
-The created packages can be installed with CPANPLUS, dpkg or rpm.
+This L<CPANPLUS> plugin creates Debian or RPM packages from Perl
+distributions.  The created packages can be installed with CPANPLUS, dpkg or
+rpm.
 
 =head2 Usage
 
@@ -266,6 +275,11 @@ Some Perl distributions fail to show interactive prompts if the C<verbose>
 option is not set.
 
   CPAN Terminal> s conf verbose 1
+
+On some systems signature checks might be enabled by default, but many Perl
+distributions do not provide signatures.
+
+  CPAN Terminal> s conf signature 0
 
 CPANPLUS uses less memory if the SQLite backend is enabled.
 
@@ -385,7 +399,8 @@ A file does not exist or was removed while CPANPLUS was running.
 
 =item B<< Unknown installer type >>
 
-CPANPLUS::Dist::Debora supports CPANPLUS::Dist::Build and CPANPLUS::Dist::MM.
+CPANPLUS::Dist::Debora supports L<CPANPLUS::Dist::Build> and
+L<CPANPLUS::Dist::MM>.
 
 =back
 
@@ -449,9 +464,9 @@ modification time of the source is used.
 
 =head1 DEPENDENCIES
 
-Requires Perl 5.16 and the modules CPANPLUS, CPANPLUS::Dist::Build,
-Module::Pluggable, Software::License and Text::Template from CPAN.  IPC::Run
-and Term::ReadLine::Gnu are recommended.
+Requires Perl 5.16 and the modules L<CPANPLUS>, L<CPANPLUS::Dist::Build>,
+L<Module::Pluggable>, L<Software::License> and L<Text::Template> from CPAN.
+L<IPC::Run> and L<Term::ReadLine::Gnu> are recommended.
 
 On Debian-based systems, install the packages "perl", "build-essential",
 "debhelper", "fakeroot" and "sudo".  The minimum supported debhelper version
@@ -476,7 +491,7 @@ Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
 
 Enable C<verbose> mode if you would like to get feedback while CPANPLUS
 downloads the list of Perl distributions from the Comprehensive Perl Archive
-Network (CPAN).  Use CPAN::Mini or a repository manager to mirror the CPAN
+Network (CPAN).  Use L<CPAN::Mini> or a repository manager to mirror the CPAN
 locally.
 
 Some Perl distributions fail to show interactive prompts if the C<verbose>
@@ -488,13 +503,14 @@ like to build Perl distributions that require C libraries.
 The created packages may provide the same files as packages provided by your
 operating system vendor.
 
-Software::LicenseUtils recognizes a lot of common licenses, but isn't perfect.
+L<Software::LicenseUtils> recognizes a lot of common licenses but isn't
+perfect.
 
 This module cannot be used in taint mode.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2021 Andreas Vögele
+Copyright 2022 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

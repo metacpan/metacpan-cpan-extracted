@@ -62,7 +62,7 @@ my %WriteMakefileArgs = (
     "open" => 0,
     "utf8" => 0
   },
-  "VERSION" => "1.014",
+  "VERSION" => "1.015",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -107,6 +107,12 @@ my %FallbackPrereqs = (
   "warnings" => 0
 );
 
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.039
+if (can_xs()) {
+requires('Cpanel::JSON::XS', '3.0223')
+}
+
+
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
   delete $WriteMakefileArgs{TEST_REQUIRES};
@@ -123,4 +129,36 @@ WriteMakefile(%WriteMakefileArgs);
 package
 MY;
 use File::ShareDir::Install qw(postamble);
+}
+
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.039
+sub _add_prereq {
+  my ($mm_key, $module, $version_or_range) = @_;
+  $version_or_range ||= 0;
+  warn "$module already exists in $mm_key (at version $WriteMakefileArgs{$mm_key}{$module}) -- need to do a sane metamerge!"
+    if exists $WriteMakefileArgs{$mm_key}{$module}
+      and $WriteMakefileArgs{$mm_key}{$module} ne '0'
+      and $WriteMakefileArgs{$mm_key}{$module} ne $version_or_range;
+  warn "$module already exists in FallbackPrereqs (at version $FallbackPrereqs{$module}) -- need to do a sane metamerge!"
+    if exists $FallbackPrereqs{$module} and $FallbackPrereqs{$module} ne '0'
+        and $FallbackPrereqs{$module} ne $version_or_range;
+  $WriteMakefileArgs{$mm_key}{$module} = $FallbackPrereqs{$module} = $version_or_range;
+  return;
+}
+
+use lib 'inc';
+use ExtUtils::HasCompiler 0.014 'can_compile_loadable_object';
+{
+  my $can_xs;
+  sub can_xs {
+    return $can_xs if defined $can_xs;
+    $can_xs = can_compile_loadable_object(quiet => 1) ? 1 : 0;
+  }
+}
+
+sub requires { goto &runtime_requires }
+
+sub runtime_requires {
+  my ($module, $version_or_range) = @_;
+  _add_prereq(PREREQ_PM => $module, $version_or_range);
 }

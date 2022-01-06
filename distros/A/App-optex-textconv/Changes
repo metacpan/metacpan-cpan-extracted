@@ -1,5 +1,9 @@
 Revision history for Perl extension App-optex-textconv
 
+1.01 2021-12-31T17:42:37Z
+
+    - Introduce {doc,xls}.pm.
+
 0.1401 2021-12-28T08:56:12Z
 
     - Fix reverse check bug.

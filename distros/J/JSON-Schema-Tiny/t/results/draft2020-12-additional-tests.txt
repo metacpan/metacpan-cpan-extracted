@@ -1,4 +1,4 @@
-Results using Test::JSON::Schema::Acceptance 1.013
+Results using Test::JSON::Schema::Acceptance 1.015
 specification version: draft2020-12
 using custom test directory: t/additional-tests-draft2020-12
 optional tests included: no
@@ -9,6 +9,7 @@ anchor.json                                  2          0     0
 badRef.json                                  1          0     0
 faux-buggy-schemas.json                      2          0     0
 id.json                                      6          0     0
+integers.json                               29          0     0
 invalid-input.json                           2          0     0
 keyword-independence.json                  756          0     0
 loose-types-const-enum.json                  8          0     0
@@ -17,4 +18,4 @@ short-circuit.json                          16          0     0
 unknownKeyword.json                          4          0     0
 vocabulary.json                              1          0     0
 ---------------------------------------------------------------
-TOTAL                                      802          0     0
+TOTAL                                      831          0     0

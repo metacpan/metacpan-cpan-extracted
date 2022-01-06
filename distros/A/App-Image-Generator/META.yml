@@ -4,6 +4,8 @@ author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: 6.36
+  File::Object: 0
+  File::Spec::Functions: 0
   Test::More: 0
   Test::NoWarnings: 0
   Test::Output: 0
@@ -37,4 +39,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/App-Image-Generator
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-Image-Generator
-version: '0.03'
+version: '0.04'

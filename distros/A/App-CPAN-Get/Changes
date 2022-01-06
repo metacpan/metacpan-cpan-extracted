@@ -1,3 +1,13 @@
+0.05 2022-01-06T10:49:02+01:00
+ - Fix test requirements.
+ - Fix 04-run.t test to run from different places.
+
+0.04 2022-01-05T12:09:13+01:00
+ - Add another way how to download Perl module (cpanp).
+ - Add test for help.
+ - Improve help in tool.
+ - Update COPYRIGHT years.
+
 0.03 2021-11-01T13:00:45+01:00
  - Add support for version of module.
  - Fix minimal version of Perl.

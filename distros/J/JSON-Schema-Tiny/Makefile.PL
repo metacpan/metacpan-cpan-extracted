@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 
-use 5.016;
+use 5.020;
 use ExtUtils::MakeMaker;
 
 BEGIN {
@@ -79,7 +79,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "JSON-Schema-Tiny",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.016",
+  "MIN_PERL_VERSION" => "5.020",
   "NAME" => "JSON::Schema::Tiny",
   "PL_FILES" => {},
   "PREREQ_PM" => {
@@ -96,6 +96,7 @@ my %WriteMakefileArgs = (
     "Ref::Util" => "0.100",
     "Scalar::Util" => 0,
     "Storable" => 0,
+    "experimental" => 0,
     "if" => 0,
     "namespace::clean" => 0,
     "strict" => 0,
@@ -105,11 +106,13 @@ my %WriteMakefileArgs = (
     "Data::Dumper" => 0,
     "File::Spec" => 0,
     "List::Util" => "1.50",
+    "Math::BigFloat" => 0,
+    "Math::BigInt" => 0,
     "Module::Metadata" => 0,
     "Path::Tiny" => 0,
     "Test::Deep" => 0,
     "Test::Fatal" => 0,
-    "Test::JSON::Schema::Acceptance" => "1.007",
+    "Test::JSON::Schema::Acceptance" => "1.014",
     "Test::More" => "0.96",
     "Test::Warnings" => 0,
     "constant" => 0,
@@ -117,7 +120,7 @@ my %WriteMakefileArgs = (
     "open" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.011",
+  "VERSION" => "0.014",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -133,6 +136,8 @@ my %FallbackPrereqs = (
   "JSON::MaybeXS" => "1.004001",
   "JSON::PP" => 0,
   "List::Util" => "1.50",
+  "Math::BigFloat" => 0,
+  "Math::BigInt" => 0,
   "Module::Metadata" => 0,
   "Mojo::JSON::Pointer" => 0,
   "Mojo::URL" => 0,
@@ -143,10 +148,11 @@ my %FallbackPrereqs = (
   "Storable" => 0,
   "Test::Deep" => 0,
   "Test::Fatal" => 0,
-  "Test::JSON::Schema::Acceptance" => "1.007",
+  "Test::JSON::Schema::Acceptance" => "1.014",
   "Test::More" => "0.96",
   "Test::Warnings" => 0,
   "constant" => 0,
+  "experimental" => 0,
   "if" => 0,
   "lib" => 0,
   "namespace::clean" => 0,

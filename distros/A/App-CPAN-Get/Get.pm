@@ -11,7 +11,7 @@ use LWP::UserAgent;
 use Menlo::Index::MetaCPAN;
 use URI::cpan;
 
-our $VERSION = 0.03;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -52,7 +52,7 @@ sub run {
 		|| $self->{'_opts'}->{'h'}) {
 
 		print STDERR "Usage: $0 [-h] [--version] module_name[module_version]\n";
-		print STDERR "\t-h\t\tHelp.\n";
+		print STDERR "\t-h\t\tPrint help.\n";
 		print STDERR "\t--version\tPrint version.\n";
 		print STDERR "\tmodule_name\tModule name. e.g. ".
 			"App::Pod::Example\n";
@@ -208,12 +208,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021 Michal Josef Špaček
+© 2021-2022 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.05
 
 =cut

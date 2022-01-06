@@ -1,5 +1,11 @@
 Revision history for CPANPLUS-Dist-Debora
 
+0.007  2022-01-01 20:01:18 CET
+
+  - Fix the Debian template
+  - Add a Mageia package class
+  - Overwrite buildflags and makemakerflags
+
 0.006  2021-12-28 14:51:57 CET
 
   - Don't require perl(:MODULE_COMPAT_$VERSION) on Mageia

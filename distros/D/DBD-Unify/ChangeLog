@@ -1,3 +1,9 @@
+0.92    - 01 Jan 2022, H.Merijn Brand
+    * It's 2021
+    * Update Unicode and version info
+    * Update to Devel-PPPort-3.63
+    * It's 2022
+
 0.91    - 25 Dec 2020, H.Merijn Brand
     * Update to Devel::PPPort-3.58
     * Update to Devel::PPPort-3.62

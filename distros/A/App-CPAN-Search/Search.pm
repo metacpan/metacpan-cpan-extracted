@@ -6,7 +6,7 @@ use warnings;
 use CPAN;
 use Getopt::Std;
 
-our $VERSION = 0.05;
+our $VERSION = 0.07;
 
 # Constructor.
 sub new {
@@ -31,7 +31,7 @@ sub run {
 		|| $self->{'_opts'}->{'h'}) {
 
 		print STDERR "Usage: $0 [-h] [--version] module_prefix\n";
-		print STDERR "\t-h\t\tHelp.\n";
+		print STDERR "\t-h\t\tPrint help.\n";
 		print STDERR "\t--version\tPrint version.\n";
 		print STDERR "\tmodule_prefix\tModule prefix. e.g. ".
 			"Module::Install\n";
@@ -73,6 +73,8 @@ App::CPAN::Search - Base class for cpan-search script.
  my $app = App::CPAN::Search->new;
 
 Constructor.
+
+Returns instance of object.
 
 =head2 C<run>
 
@@ -125,12 +127,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2015-2021 Michal Josef Špaček
+© 2015-2022 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.07
 
 =cut

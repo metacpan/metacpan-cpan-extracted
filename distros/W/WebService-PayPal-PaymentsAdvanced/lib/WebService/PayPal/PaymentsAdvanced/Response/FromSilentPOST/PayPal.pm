@@ -4,7 +4,7 @@ use Moo;
 
 use namespace::autoclean;
 
-our $VERSION = '0.000027';
+our $VERSION = '0.000028';
 
 extends 'WebService::PayPal::PaymentsAdvanced::Response::FromSilentPOST';
 
@@ -22,7 +22,7 @@ WebService::PayPal::PaymentsAdvanced::Response::FromSilentPOST::PayPal - Respons
 
 =head1 VERSION
 
-version 0.000027
+version 0.000028
 
 =head1 DESCRIPTION
 
@@ -42,7 +42,7 @@ Olaf Alders <olaf@wundercounter.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by MaxMind, Inc.
+This software is copyright (c) 2022 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

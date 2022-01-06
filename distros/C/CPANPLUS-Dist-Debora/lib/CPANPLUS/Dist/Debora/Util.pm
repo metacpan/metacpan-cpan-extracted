@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 use parent qw(Exporter);
 
@@ -304,7 +304,7 @@ CPANPLUS::Dist::Debora::Util - Utility functions
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -445,8 +445,8 @@ An external command could not be run.
 
 =head3 AUTOMATED_TESTING, RELEASE_TESTING
 
-CPANPLUS::Dist::Debora switches into test mode if any of these variables is
-set.  No packages are installed in test mode.
+The test mode is enabled if any of these variables is set.  No packages are
+installed in test mode.
 
 =head1 DEPENDENCIES
 
@@ -462,13 +462,13 @@ Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
 
 =head1 BUGS AND LIMITATIONS
 
-Install IPC::Run if IPC::Open3 causes IO::Select to output warnings.
+Install L<IPC::Run> if IPC::Open3 causes IO::Select to output warnings.
 
 This module cannot be used in taint mode.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2021 Andreas Vögele
+Copyright 2022 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

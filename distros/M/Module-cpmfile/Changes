@@ -1,5 +1,11 @@
 Revision history for Module-cpmfile
 
+0.005  2022-01-03 13:07:30 JST
+    - Add from_cpanmeta method (#2)
+
+0.004  2022-01-02 00:44:53 JST
+    - Add to_string method (#1)
+
 0.003  2021-12-12 12:03:25 JST
     - cpmfile->features now returns undef if there are no features
     - Remove Module::cpmfile::Prereqs->options_for

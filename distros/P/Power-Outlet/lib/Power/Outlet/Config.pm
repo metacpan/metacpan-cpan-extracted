@@ -4,7 +4,7 @@ use warnings;
 use base qw{Package::New Package::Role::ini};
 use Power::Outlet;
 
-our $VERSION='0.34';
+our $VERSION='0.43';
 our $PACKAGE=__PACKAGE__;
 
 =head1 NAME
@@ -52,7 +52,7 @@ Command Line
 =head2 new
 
   my $outlet = Power::Outlet->new(type=>"Config", section=>"My Section");
-  my $outlet = Power::OutletConfig->new(section=>"My Section");
+  my $outlet = Power::Outlet::Config->new(section=>"My Section");
 
 =cut
 

@@ -40,9 +40,11 @@ my @files = (
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/advent.t',
+    't/allluacallbacks.t',
     't/import_export.t',
     't/json.t',
     't/jsonWithSharedStream.t',
+    't/parameterizedRules.t',
     't/symbol.t',
     't/test.t',
     't/thread.t'

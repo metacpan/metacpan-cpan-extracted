@@ -11,7 +11,7 @@ use File::Spec;
 use App::SpamcupNG
   qw(main_loop get_browser read_config %OPTIONS_MAP config_logger);
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.008'; # VERSION
 # Delay between HTTP requests. Adjust this if Spamcop.net asks!
 use constant DELAY => 5;
 
@@ -253,7 +253,7 @@ introducing forced delays to not overwhelm Spamcop.net website. All reports are 
 
 App-SpamcupNG is a fork from the original Spamcup project.
 
-Spamcup is copyright (C) Toni Willberg E<lt>toniw@iki.fiE<gt> L<http://toniw.iki.fi>.
+Spamcup is copyright (C) Toni Willberg.
 
 =head2 FEATURES
 

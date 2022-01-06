@@ -32,3 +32,6 @@ Revision history for Perl extension Tk::SMListbox.
 	- The usual code cleanups.
 	- Tk::SMListbox should now be fully compatable w/Tk::HMListbox, 
 	  except for using standard Tk::Listboxes instead of Tk::HListboxes.
+2.13  Mon Jan 3, 2022
+	- Remember item cursor is on & restore cursor when sorting.
+	- Fix minor focus-traversal issue.

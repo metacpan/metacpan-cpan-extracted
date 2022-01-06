@@ -8,7 +8,6 @@ use utf8;
 
 use CPANPLUS::Dist::Debora::Pod;
 
-use open ':std', ':encoding(utf8)';
 use Test::More tests => 5;
 
 my $pod = CPANPLUS::Dist::Debora::Pod->find('CPANPLUS::Dist::Debora', 'lib');

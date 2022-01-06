@@ -22,6 +22,7 @@ use LWP::UserAgent;
 
 use constant BASE_HOST      => "https://www.upwork.com";
 use constant DEFAULT_EPOINT => "api";
+use constant GRAPHQL_EPOINT => "https://api.upwork.com/graphql";
 
 use constant DATA_FORMAT  => "json";
 use constant OVERLOAD_VAR => "http_method";
@@ -31,8 +32,11 @@ use constant URI_ATOKEN  => "/api/v3/oauth2/token";
 
 use constant ENTRY_POINT_API => "api";
 use constant ENTRY_POINT_GDS => "gds";
+use constant ENTRY_POINT_GQL => "graphql";
 
 use constant UPWORK_LIBRARY_USER_AGENT => "Github Upwork API Perl Client";
+
+our $lwp;
 
 =pod
 
@@ -77,8 +81,8 @@ sub new {
 sub get_oauth_client {
     my $self = shift;
 
-    my $ua = LWP::UserAgent->new();
-    $ua->agent(UPWORK_LIBRARY_USER_AGENT);
+    $lwp = LWP::UserAgent->new();
+    $lwp->agent(UPWORK_LIBRARY_USER_AGENT);
 
     $self->{oauth_client} = Net::OAuth2::Profile::WebServer->new(
 	client_id	   => $self->{config}{client_id},
@@ -92,7 +96,7 @@ sub get_oauth_client {
 	access_token_path  => URI_ATOKEN,
 	refresh_token_path => URI_ATOKEN,
 	redirect_uri       => $self->{config}{redirect_uri},
-	user_agent         => $ua
+	user_agent         => $lwp
     );
 }
 
@@ -243,6 +247,40 @@ sub send_request {
     my $response = $self->{access_token_session}->$_method($self->{oauth_client}->site_url(format_uri($uri, $self->{epoint}), %$params));
 
     return $response->decoded_content;
+}
+
+=item graphql_request
+
+    Send a signed GraphQL request to a specific OAuth2 protected resource
+
+B<Parameters>
+
+$params
+
+    API parameters
+
+B<Return value>
+
+    String, a response content
+
+=cut
+
+sub graphql_request {
+    my ($self, $json, $tenant_id) = @_;
+
+    my $req = HTTP::Request->new('POST', GRAPHQL_EPOINT);
+    $req->header(
+        'Content-Type' => 'application/json',
+        'Authorization' => sprintf("%s %s", $self->{access_token_session}->token_type(), $self->{access_token_session}->access_token())
+    );
+    if (defined($tenant_id)) {
+        $req->header('X-Upwork-API-TenantId' => $tenant_id);
+    }
+    $req->content($json);
+
+    my $res = $lwp->request($req);
+
+    return $res->decoded_content;
 }
 
 =item format_uri

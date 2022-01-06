@@ -259,6 +259,10 @@ Returns the type of the item at position C<index> within stack C<stackName>.
 
 Convenient enum associating a value to the item type C<XXX>, for example:
 
+=head2 GENERICSTACK_SORT(stackName, callback)
+
+Convenient macro to C<qsort> a generic stack.
+
 =over
 
 =item GENERICSTACKITEMTYPE_NA

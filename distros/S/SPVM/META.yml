@@ -21,4 +21,4 @@ requires:
   ExtUtils::CBuilder: '0.2602'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM.git
-version: '0.9102'
+version: '0.9109'

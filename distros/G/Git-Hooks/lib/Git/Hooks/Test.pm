@@ -2,7 +2,7 @@ use warnings;
 
 package Git::Hooks::Test;
 # ABSTRACT: Git::Hooks testing utilities
-$Git::Hooks::Test::VERSION = '3.2.0';
+$Git::Hooks::Test::VERSION = '3.2.1';
 ## no critic (RequireExplicitPackage)
 ## no critic (ErrorHandling::RequireCarping)
 use v5.16.0;
@@ -30,8 +30,16 @@ our %EXPORT_TAGS = (
     all => \@EXPORT_OK
 );
 
-# Make sure the git messages come in English.
-local $ENV{LC_ALL} = 'C';
+# Make sure the git messages come in English. (LC_ALL)
+# Eliminate the effects of system wide (GIT_CONFIG_NOSYSTEM)
+# and global configuration (XDG_CONFIG_HOME and HOME).
+# https://metacpan.org/dist/Git-Repository/view/lib/Git/Repository/Tutorial.pod#Ignore-the-system-and-global-configuration-files
+my %git_test_env = (
+    LC_ALL => 'C',
+    GIT_CONFIG_NOSYSTEM => 1,
+    XDG_CONFIG_HOME     => undef,
+    HOME                => undef,
+);
 
 my $cwd = Path::Tiny->cwd;
 
@@ -100,11 +108,6 @@ $ENV{GIT_DIR}    = '.git' unless exists $ENV{GIT_DIR};
 $ENV{GIT_CONFIG} = "$ENV{GIT_DIR}/config";
 EOS
 
-        # Reset HOME to avoid reading ~/.gitconfig
-        print $fh <<'EOS';
-$ENV{HOME}       = '';
-EOS
-
         # Hooks on Windows are invoked indirectly.
         if ($^O eq 'MSWin32') {
             print $fh <<'EOS';
@@ -167,9 +170,11 @@ sub new_repos {
     my $stderr = $T->child('stderr');
 
     my @result = eval {
-        Git::Repository->run(qw/-c init.defaultBranch=master init -q/, "--template=$tmpldir", $repodir);
+        Git::Repository->run(qw/-c init.defaultBranch=master init -q/,
+            "--template=$tmpldir", $repodir, { env => \%git_test_env });
 
-        my $repo = Git::Repository->new(work_tree => $repodir);
+        my $repo = Git::Repository->new(work_tree => $repodir,
+            { env => \%git_test_env });
 
         $repo->run(qw/config user.email myself@example.com/);
         $repo->run(qw/config user.name/, 'My Self');
@@ -321,7 +326,7 @@ Git::Hooks::Test - Git::Hooks testing utilities
 
 =head1 VERSION
 
-version 3.2.0
+version 3.2.1
 
 =for Pod::Coverage install_hooks new_commit new_repos newdir test_command test_nok test_nok_match test_ok test_ok_match
 
@@ -331,7 +336,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by CPQD <www.cpqd.com.br>.
+This software is copyright (c) 2022 by CPQD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

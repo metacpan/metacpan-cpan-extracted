@@ -18,10 +18,9 @@
 #
 #=============================================================================
 
-package Term::CLI::Base  0.053006 {
+package Term::CLI::Base 0.054002;
 
 use 5.014;
-use strict;
 use warnings;
 
 use Term::CLI::ReadLine;
@@ -33,22 +32,25 @@ use Types::Standard 1.000005 qw(
 use Moo 1.000001;
 use namespace::clean 0.25;
 
-has name => ( is => 'ro', isa => Str, required => 1 );
-has error => ( is => 'rwp', isa => Str, default => sub {''} );
+has name  => ( is => 'ro',  isa => Str, required => 1 );
+has error => ( is => 'rwp', isa => Str, default  => sub {q{}} );
 
 sub term { return Term::CLI::ReadLine->term }
 
-sub set_error {
-    my ($self, @value) = @_;
-    if (!@value or !defined $value[0]) {
-        $self->_set_error('');
-    }
-    else {
-        $self->_set_error(join('', @value));
-    }
-    return;
+sub clear_error {
+    my ($self) = @_;
+    $self->_set_error(q{});
+    return 1;
 }
 
+sub set_error {
+    my ( $self, @value ) = @_;
+    if ( !@value || !defined $value[0] ) {
+        $self->clear_error(q{});
+        return
+    }
+    $self->_set_error( join( q{}, @value ) );
+    return;
 }
 
 1;
@@ -63,7 +65,7 @@ Term::CLI::Base - generic base class for Term::CLI classes
 
 =head1 VERSION
 
-version 0.053006
+version 0.054002
 
 =head1 SYNOPSIS
 
@@ -109,8 +111,16 @@ The active L<Term::CLI::ReadLine> object.
 
 =item B<set_error> ( I<STRING>, ... )
 
-Set the L<error|/error>() attribute to the concatenation of all I<STRING> parameters
-and return a "failure" (C<undef> or the empty list, depending on call context).
+Sets the L<error|/error>() attribute to the concatenation of all I<STRING>
+parameters.  If no arguments are given, or the first argument is C<undef>,
+the error field is cleared (see L<set_error|/set_error> below).
+
+Always returns a "failure" (C<undef> or the empty list, depending on
+call context).
+
+=item B<clear_error>
+
+Set the L<error|/error>() attribute to the empty string and return 1.
 
 =back
 

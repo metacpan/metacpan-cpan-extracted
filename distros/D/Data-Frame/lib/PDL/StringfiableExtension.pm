@@ -1,8 +1,8 @@
 package PDL::StringfiableExtension;
-$PDL::StringfiableExtension::VERSION = '0.003';
+$PDL::StringfiableExtension::VERSION = '0.006002';
 use strict;
 use warnings;
-use PDL::Lite;
+use PDL::Lite ();
 use List::AllUtils ();
 
 
@@ -44,15 +44,25 @@ PDL::StringfiableExtension
 
 =head1 VERSION
 
-version 0.003
+version 0.006002
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Zakariyya Mughal <zmughal@cpan.org>
 
+=item *
+
+Stephan Loyd <sloyd@cpan.org>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Zakariyya Mughal.
+This software is copyright (c) 2014, 2019-2022 by Zakariyya Mughal, Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

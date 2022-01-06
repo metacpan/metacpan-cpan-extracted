@@ -5,7 +5,7 @@ use Moo::Role;
 use Carp qw(croak);
 with 'Archive::BagIt::Role::Plugin';
 # ABSTRACT: A role that defines the interface to a hashing algorithm
-our $VERSION = '0.086'; # VERSION
+our $VERSION = '0.089'; # VERSION
 
 has 'name' => (
     is => 'ro',
@@ -47,7 +47,7 @@ Archive::BagIt::Role::Algorithm - A role that defines the interface to a hashing
 
 =head1 VERSION
 
-version 0.086
+version 0.089
 
 =head2 get_optimal_bufsize($fh)
 
@@ -70,7 +70,7 @@ Andreas Romeyke <cpan@andreas.romeyke.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Rob Schmidt <rjeschmi@gmail.com>, William Wueppelmann and Andreas Romeyke.
+This software is copyright (c) 2022 by Rob Schmidt <rjeschmi@gmail.com>, William Wueppelmann and Andreas Romeyke.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

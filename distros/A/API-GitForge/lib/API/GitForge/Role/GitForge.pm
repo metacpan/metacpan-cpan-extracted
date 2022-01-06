@@ -15,7 +15,7 @@ package API::GitForge::Role::GitForge;
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-$API::GitForge::Role::GitForge::VERSION = '0.006';
+$API::GitForge::Role::GitForge::VERSION = '0.007';
 
 use 5.028;
 use strict;
@@ -123,7 +123,7 @@ API::GitForge::Role::GitForge - role implementing generic git forge operations
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 DESCRIPTION
 

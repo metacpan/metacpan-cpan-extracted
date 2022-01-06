@@ -1,69 +1,69 @@
 {
-   "release_status" : "stable",
-   "author" : [
-      "H.Merijn Brand <h.m.brand@xs4all.nl>"
-      ],
-   "version" : "0.42",
-   "dynamic_config" : 1,
-   "abstract" : "Clock widget with analog and digital display",
+   "name" : "Tk-Clock",
+   "version" : "0.43",
    "license" : [
       "perl_5"
       ],
+   "abstract" : "Clock widget with analog and digital display",
+   "dynamic_config" : 1,
    "resources" : {
       "repository" : {
-         "url" : "https://github.com/Tux/Tk-Clock",
          "web" : "https://github.com/Tux/Tk-Clock",
-         "type" : "git"
+         "type" : "git",
+         "url" : "https://github.com/Tux/Tk-Clock"
+         },
+      "bugtracker" : {
+         "web" : "https://github.com/Tux/Tk-Clock/issues"
          },
       "license" : [
          "http://dev.perl.org/licenses/"
-         ],
-      "bugtracker" : {
-         "web" : "https://github.com/Tux/Tk-Clock/issues"
-         }
+         ]
       },
+   "generated_by" : "Author",
+   "release_status" : "stable",
    "provides" : {
       "Tk::Clock" : {
          "file" : "Clock.pm",
-         "version" : "0.42"
+         "version" : "0.43"
          }
       },
-   "meta-spec" : {
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
-      },
-   "name" : "Tk-Clock",
    "prereqs" : {
-      "test" : {
+      "runtime" : {
          "recommends" : {
-            "Test::More" : "1.302183"
+            "Tk" : "804.036",
+            "Encode" : "3.16"
             },
          "requires" : {
-            "Test::More" : "0.90",
-            "Test::NoWarnings" : "0"
+            "Tk::Widget" : "0",
+            "Carp" : "0",
+            "Encode" : "0",
+            "perl" : "5.006",
+            "Tk" : "402.000",
+            "POSIX" : "0",
+            "Tk::Canvas" : "0",
+            "Tk::Derived" : "0"
+            }
+         },
+      "test" : {
+         "requires" : {
+            "Test::NoWarnings" : "0",
+            "Test::More" : "0.90"
+            },
+         "recommends" : {
+            "Test::More" : "1.302188"
             }
          },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
             }
-         },
-      "runtime" : {
-         "requires" : {
-            "Tk::Derived" : "0",
-            "Carp" : "0",
-            "Encode" : "0",
-            "perl" : "5.006",
-            "POSIX" : "0",
-            "Tk::Canvas" : "0",
-            "Tk::Widget" : "0",
-            "Tk" : "402.000"
-            },
-         "recommends" : {
-            "Tk" : "804.035",
-            "Encode" : "3.08"
-            }
          }
       },
-   "generated_by" : "Author"
+   "author" : [
+      "H.Merijn Brand <h.m.brand@xs4all.nl>"
+      ],
+   "meta-spec" : {
+      "version" : 2,
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
+      }
    }

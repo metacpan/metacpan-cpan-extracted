@@ -61,7 +61,13 @@ typedef struct mthread {
 	Promise* output;
 } mthread;
 
-static void* run_thread(void* arg) {
+
+#ifdef _WIN32
+static DWORD WINAPI
+#else
+static void*
+#endif
+run_thread(void* arg) {
 	static const char* argv[] = { "perl", "-e", "0", NULL };
 	static const int argc = sizeof argv / sizeof *argv - 1;
 
@@ -140,7 +146,7 @@ Promise* S_thread_spawn(pTHX_ AV* to_run) {
 	av_unshift(to_run, 1);
 	av_store(to_run, 0, (SV*)clone_INC());
 
-	mthread* mthread = calloc(1, sizeof(mthread));
+	mthread* mthread = calloc(1, sizeof(*mthread));
 	Promise* input = promise_alloc(2);
 	mthread->input = input;
 	Promise* output = promise_alloc(2);

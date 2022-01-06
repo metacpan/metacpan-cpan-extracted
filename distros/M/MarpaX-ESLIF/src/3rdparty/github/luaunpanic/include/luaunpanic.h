@@ -46,10 +46,6 @@
 extern "C" {
 #endif
   /*
-  ** error string in case of panic
-  */
-  luaunpanic_EXPORT short luaunpanic_panicstring(char **panicstringp, lua_State *L);
-  /*
   ** ***********************************************************************
   ** lua.h wrapper
   ** ***********************************************************************

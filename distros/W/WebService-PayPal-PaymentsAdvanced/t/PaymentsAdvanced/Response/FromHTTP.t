@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 
-use HTTP::Response;
+use HTTP::Response ();
 use Test::Fatal qw( exception );
 use Test::More;
-use WebService::PayPal::PaymentsAdvanced::Response::FromHTTP;
+use WebService::PayPal::PaymentsAdvanced::Response::FromHTTP ();
 
 subtest '200 status code' => sub {
     my $http_response = HTTP::Response->new( 200, undef, undef, 'RESULT=0' );

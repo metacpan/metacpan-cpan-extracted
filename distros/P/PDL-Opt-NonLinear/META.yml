@@ -1,15 +1,15 @@
 ---
 abstract: 'Non linear optimization routines for PDL'
 author:
-  - 'Gregory Vanuxem <gvanuxem.perl@gmail.com>'
+  - 'Grégory Vanuxem <gvanuxem.perl@gmail.com>'
 build_requires:
-  PDL: '0'
-  PDL::LinearAlgebra: '0'
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
 configure_requires:
   ExtUtils::F77: '0'
-  PDL: '0'
+  PDL: '2.063'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,7 +20,12 @@ no_index:
     - t
     - inc
 requires:
-  PDL: '0'
+  PDL: '2.063'
   PDL::LinearAlgebra: '0'
-version: '0.05'
+resources:
+  bugtracker: https://github.com/PDLPorters/PDL-Opt-NonLinear/issues
+  homepage: http://pdl.perl.org/
+  repository: git://github.com/PDLPorters/PDL-Opt-NonLinear.git
+version: '0.07'
+x_IRC: irc://irc.perl.org/#pdl
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

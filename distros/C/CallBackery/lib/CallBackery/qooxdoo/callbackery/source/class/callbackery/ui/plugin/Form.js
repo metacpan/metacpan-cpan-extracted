@@ -19,10 +19,17 @@ qx.Class.define("callbackery.ui.plugin.Form", {
     construct : function(cfg,getParentFormData) {
         this.base(arguments);
         var that = this;
+        this._urlFormElements = [];
         if (cfg.form != null) {
             cfg.form.forEach(function(s){
                 if (s.triggerFormReset) {
                     that._hasTrigger = true;
+                }
+                if (s.urlFormKey) {
+                    that._urlFormElements.push({
+                        urlKey  : s.urlFormKey,
+                        formKey : s.key,
+                    });
                 }
             });
         }
@@ -35,27 +42,10 @@ qx.Class.define("callbackery.ui.plugin.Form", {
         qx.core.Id.getInstance().register(this, cfg.name);
         this.setQxObjectId(cfg.name);
 
-        let urlCfg = callbackery.data.Config.getInstance().getUrlConfig();
-
         this.addListener('appear',function () {
-            this._loadData();
-            let data = {};
-            let gotData = false;
-            for (let key in urlCfg){
-                let match = key.match(/^set_(.+)/);
-                if (match !== null){
-                    data[match[1]] = urlCfg[key];
-                    gotData = true;
-                }
-            }
-            if (gotData) {
-                this._form.setData(data,true);
-                //this._reconfForm();
-                if (urlCfg.cleanup) {
-                    window.location.hash = '';
-                }
-            }
+            this._loadData(true);
         }, this);
+
         // a map of pending reconfigure requests. The keys are the
         // names of the fields for which we postponed reconfiguration.
         // With that we avoid multi-reconfiguration per field.
@@ -96,6 +86,7 @@ qx.Class.define("callbackery.ui.plugin.Form", {
     },
     members: {
         _form: null,
+        _urlFormElements: null,
         _action: null,
         _cfg: null,
         _loading: null,
@@ -324,7 +315,22 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                 that._loading--;
             },'getPluginData',this._cfg.name,'allFields',parentFormData,{ currentFormData: this._form.getData()});
         },
-        _loadData: function(){
+        _getUrlData: function () {
+            let data    = {};
+            let gotData = false;
+            let config  = callbackery.data.Config.getInstance();
+            this._urlFormElements.forEach(urlFormElement => {
+                let urlValue = config.getUrlConfigValue(urlFormElement.urlKey);
+                if (urlValue) {
+                    data[urlFormElement.formKey] = urlValue;
+                    // only do it once for the time being
+                    config.removeUrlConfigEntry(urlFormElement.urlKey);
+                    gotData = true;
+                }
+            });
+            return data;
+        },
+        _loadData: function(mergeUrlData){
             if (!this._form) return;
 
             var that = this;
@@ -338,6 +344,15 @@ qx.Class.define("callbackery.ui.plugin.Form", {
             busy.show(this.tr('Loading Form Data'));
             rpc.callAsync(function(data,exc){
                 if (!exc){
+                    if (mergeUrlData) {
+                        let urlData = that._getUrlData();
+                        if (!data) {
+                            data = urlData;
+                        }
+                        else {
+                            Object.assign(data, urlData);
+                        }
+                    }
                     if (that._form) {
                         that._form.setData(data,true);
                         if (that._hasTrigger) {

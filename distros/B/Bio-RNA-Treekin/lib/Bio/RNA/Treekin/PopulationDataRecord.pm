@@ -1,6 +1,6 @@
 # Bio/RNA/Treekin/PopulationDataRecord.pm
 package Bio::RNA::Treekin::PopulationDataRecord;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use 5.006;
 use strict;
@@ -11,7 +11,7 @@ use MooseX::StrictConstructor;
 use namespace::autoclean;
 
 use autodie qw(:all);
-use Scalar::Util qw(reftype);
+use Scalar::Util qw(reftype looks_like_number);
 use   List::Util qw(max all);
 
 use overload '""' => \&stringify;
@@ -119,6 +119,14 @@ sub _parse_population_data_line {
 
     my ($time, @populations) = split /\s+/, $population_data_line;
 
+    # Sanity checks.
+    confess "No population data found in line:\n$population_data_line\n"
+        unless @populations;
+    confess "Time value '$time' is not a number"
+        unless looks_like_number $time;
+    # For the sake of performance, we do not test the numberness of the data.
+
+    # Pack args for constructor.
     my @args = (
         time        => $time,
         populations => \@populations,

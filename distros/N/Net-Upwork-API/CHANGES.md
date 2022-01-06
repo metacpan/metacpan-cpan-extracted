@@ -1,5 +1,8 @@
+## 2.1.4
+* Add GraphQL support
+
 ## 2.1.3
-* Fixed HR::get_list
+* Fixed HR module
 
 ## 2.1.1
 * Add Room Messages API

@@ -1,5 +1,13 @@
 Revision history for Date-Holidays-GB
 
+0.020  2022-01-04 15:07:04 GMT
+
+ [Update]
+ - 2022 Dates added [thanks Peter Newman]
+
+ [Maintenance]
+ - fix automatic dzil VERSION tagging
+
 0.019  2021-03-31 11:39:43 BST
 
  [Maintenance]

@@ -161,7 +161,7 @@ foreach my $inputArray (@input) {
     my $eslifRecognizerInterface = MyRecognizerInterface->new($characterStream);
     my $eslifRecognizer = MarpaX::ESLIF::Recognizer->new($eslifGrammar, $eslifRecognizerInterface);
     $eslifRecognizer->scan(1); # Initial events
-    $eslifRecognizer->lexemeRead('PERL_INPUT', $input, 1, 1);
+    $eslifRecognizer->alternativeRead('PERL_INPUT', $input, 1, 1);
     my $eslifValueInterface = MyValueInterface->new();
     my $eslifValue = MarpaX::ESLIF::Value->new($eslifRecognizer, $eslifValueInterface);
     $eslifValue->value();

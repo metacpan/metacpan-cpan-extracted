@@ -14,7 +14,7 @@ MarpaX::ESLIF::Bindings - MarpaX::ESLIF's Bindings
 
 =head1 VERSION
 
-version 5.0.7
+version 6.0.10
 
 =head1 DESCRIPTION
 
@@ -228,13 +228,24 @@ Lua bindings never loops on table using the "next", but always with the "pairs" 
 
 string metatable has a new string "encoding" metatada, defaults to nil. Because strings in lua are always unique, two instances of string cannot have different encoding information.
 
+It is quite important, if the intention is to import/export lua string to another language to explicitely say if a Lua string is a sequence of characters: strongly typed language like e.g. Java will see a byte array instead of a string. This will also help the export to other loosely typed languages like Perl, where we provide an explicit class to strongly type a true sequence of characters.
+
+If needed, lua users can create a local function to create real strings as sequence of characters, e.g.:
+
+ <luascript>
+ function String(p_string, p_encoding)
+   local output = p_string
+   p_string:encoding(p_encoding or 'ASCII')
+   return output
+ end
+
 =item canarray table metadata
 
 The "canarray" boolean metadata is looked up on table, to determine if the the end-user definitely wants the binding to see table as an array or not. This applies only to table than <can> be exported as an array, i.e. that have adjacent integer keys.
 
 =item opaque table metadata
 
-The "opaue" boolean metadata is looked up on table, to determine if the the end-user definitely wants the binding to never transform data when doing through marpaESLIF. Then only the lua interpreter will be able to understand what is behind, any other host language will see an opaque ununderstable pointer.
+The "opaque" boolean metadata is looked up on table, to determine if the the end-user definitely wants the binding to never transform data when going through marpaESLIF. Then only the lua interpreter will be able to understand what is behind, any other host language will see an opaque ununderstable pointer.
 
 =item Niled table support
 

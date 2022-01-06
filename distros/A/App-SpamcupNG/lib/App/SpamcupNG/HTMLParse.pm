@@ -4,7 +4,9 @@ use warnings;
 use HTML::TreeBuilder::XPath 0.14;
 use Exporter 'import';
 use Carp 'croak';
-use Data::Dumper;
+
+use App::SpamcupNG::Error::Factory qw(create_error);
+use App::SpamcupNG::Warning::Factory qw(create_warning);
 
 our @EXPORT_OK = (
     'find_next_id',       'find_errors',
@@ -14,11 +16,10 @@ our @EXPORT_OK = (
 
 my %regexes = (
     no_user_id => qr/\>No userid found\</i,
-    next_id    => qr/sc\?id\=(.*?)\"\>/i,
-    http_500   => qr/500/,
+    next_id    => qr/sc\?id\=(.*?)\"\>/i
 );
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 =head1 NAME
 
@@ -82,7 +83,21 @@ sub find_warnings {
     my @warnings;
 
     foreach my $node (@nodes) {
-        push( @warnings, $node->as_trimmed_text );
+        my @all_text;
+        push( @all_text, $node->as_trimmed_text );
+
+  # Spamcop page might add other text lines after the div, until the next div.
+        foreach my $next ( $node->right() ) {
+            if ( ref $next ) {
+                next if ( $next->tag eq 'br' );
+                last if ( $next->tag eq 'div' );
+            }
+            else {
+                push( @all_text, $next );
+            }
+        }
+
+        push( @warnings, create_warning( \@all_text ) );
     }
 
     return \@warnings;
@@ -108,24 +123,38 @@ sub find_errors {
     my @errors;
 
     foreach my $node (@nodes) {
-        push( @errors, $node->as_trimmed_text );
+        my @all_text;
+        push( @all_text, $node->as_trimmed_text );
+
+        foreach my $next ( $node->right() ) {
+            if ( ref $next ) {
+                next if ( $next->tag eq 'br' );
+                last if ( $next->tag eq 'div' );
+            }
+            else {
+                push( @all_text, $next );
+            }
+        }
+
+        push( @errors, create_error( \@all_text ) );
     }
 
-    # bounce errors are inside an form
+    # bounce errors are inside a form
     my $base_xpath = '//form[@action="/mcgi"]';
     @nodes = $tree->findnodes( $base_xpath . '//strong' );
 
     if (@nodes) {
         if ( $nodes[0]->as_trimmed_text() eq 'Bounce error' ) {
-            my @nodes = $tree->findnodes( $base_xpath );
+            my @nodes = $tree->findnodes($base_xpath);
             $nodes[0]->parent(undef);
+            my @messages;
 
-            foreach my $node ($nodes[0]->content_list()) {
-                next unless (ref($node) eq '');
-                $node =~ s/^\s+//;
-                $node =~ s/\s+$//;
-                push( @errors, $node );
+            foreach my $node ( $nodes[0]->content_list() ) {
+                next unless ( ref($node) eq '' );
+                push( @messages, $node );
             }
+
+            push( @errors, create_error( \@messages ) );
         }
     }
 

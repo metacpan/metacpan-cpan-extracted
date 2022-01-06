@@ -16,31 +16,31 @@
 #
 #=============================================================================
 
-package Term::CLI::L10N  0.053006 {
+package Term::CLI::L10N 0.054002;
 
 use 5.014;
-use strict;
 use warnings;
 
 use parent 0.225 qw( Locale::Maketext Exporter );
 
+use Carp qw( croak );
+
+use namespace::clean;
+
 BEGIN {
     our @EXPORT_OK   = qw( __ loc );
-    our @EXPORT      = qw( loc );
-    our %EXPORT_TAGS = (
-        'all' => \@EXPORT_OK
-    );
+    our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 }
 
-our $lh;
+my $lh;
 
 sub _init_handle {
-    $lh //= __PACKAGE__->get_handle() || __PACKAGE__->get_handle('en')
-        or die "No language files for 'en'";
+    $lh //= __PACKAGE__->get_handle() || __PACKAGE__->get_handle('en');
+    $lh or croak "No language files for 'en'";
     return $lh;
 }
 
-*__ = \&loc;        # Alias __ to loc().
+*__ = \&loc;    # Alias __ to loc().
 
 sub handle {
     return _init_handle();
@@ -52,13 +52,11 @@ sub loc {
 }
 
 sub set_language {
-    my $self = shift;
+    my ( $self, @args ) = @_;
 
-    $lh = __PACKAGE__->get_handle(@_)
-        or die "No language files for (@_)";
+    $lh = __PACKAGE__->get_handle(@args)
+        or croak "No language files for (@args)";
     return $lh;
-}
-
 }
 
 1;
@@ -73,14 +71,14 @@ Term::CLI::L10N - localizations for Term::CLI
 
 =head1 VERSION
 
-version 0.053006
+version 0.054002
 
 =head1 SYNOPSIS
 
  use Term::CLI::L10N qw( :all );
 
  say loc("invalid value"); # "loc" is imported by default.
- 
+
  say __("invalid value");  # "__" is not imported by default.
 
 
@@ -130,7 +128,7 @@ Dies with an error if no language can be loaded.
 
 =head1 EXAMPLES
 
-    use Term::CLI::L10N; # Initialise using current locale.
+    use Term::CLI::L10N qw( loc ); # Initialise using current locale.
 
     Term::CLI::L10N->set_language('nl'); # Force "nl" language.
 

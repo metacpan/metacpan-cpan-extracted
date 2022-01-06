@@ -1,19 +1,19 @@
 #ifndef SPVM_LIST_H
 #define SPVM_LIST_H
 
-#include <stdint.h>
-#include <stddef.h>
-
-struct spvm_list;
-typedef struct spvm_list SPVM_LIST;
+#include "spvm_typedecl.h"
+#include "spvm_native.h"
 
 struct spvm_list {
+  SPVM_COMPILER* compiler;
   void** values;
   int32_t length;
   int32_t capacity;
+  int8_t memory_block_type;
+  SPVM_ENV* env;
 };
 
-SPVM_LIST* SPVM_LIST_new(int32_t capacity);
+SPVM_LIST* SPVM_LIST_new(SPVM_COMPILER* compiler, int32_t capacity, int32_t memory_block_type, SPVM_ENV* env);
 void SPVM_LIST_free(SPVM_LIST* array);
 void SPVM_LIST_maybe_extend(SPVM_LIST* array);
 

@@ -1,8 +1,8 @@
 use strict;
 use warnings;
 
-use WebService::PayPal::PaymentsAdvanced::Response;
-use Test::Fatal;
+use WebService::PayPal::PaymentsAdvanced::Response ();
+use Test::Fatal qw( exception );
 use Test::More;
 
 my %params = (

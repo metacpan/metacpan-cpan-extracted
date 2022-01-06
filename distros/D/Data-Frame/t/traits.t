@@ -1,10 +1,11 @@
-use Test::Most tests => 2;
+#!perl
 
-use strict;
-use warnings;
+use Data::Frame::Setup;
+
+use Test2::V0;
 
 use Data::Frame;
-use PDL;
+use PDL::Basic qw(sequence);
 
 my $N  = 5;
 my $colspec = [ x => sequence($N), y => 3 * sequence($N) ];

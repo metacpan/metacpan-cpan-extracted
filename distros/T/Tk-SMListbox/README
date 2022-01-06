@@ -5,6 +5,9 @@ NAME
 AUTHOR
     Jim Turner
 
+    (c) 2015-2022, Jim Turner under the same license that Perl 5 itself is.
+    All rights reserved.
+
     Tk::MListbox authors: Hans Jorgen Helgesen, hans_helgesen@hotmail.com
     (from March 2000: hans.helgesen@novit.no)
 

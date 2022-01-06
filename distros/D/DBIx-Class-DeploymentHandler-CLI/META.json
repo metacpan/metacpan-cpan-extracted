@@ -4,13 +4,13 @@
       "Stefan Hornburg (Racke) <racke@linuxia.de>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "DBIx-Class-DeploymentHandler-CLI",
    "no_index" : {
@@ -22,7 +22,8 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "Test::Warnings" : "0"
          }
       },
       "configure" : {
@@ -32,8 +33,12 @@
       },
       "runtime" : {
          "requires" : {
+            "Config::Any" : "0",
             "DBIx::Class::DeploymentHandler" : "0",
+            "File::HomeDir" : "0",
+            "Module::Runtime" : "0",
             "Moo" : "2",
+            "Path::Tiny" : "0.070",
             "Type::Tiny" : "0.038",
             "perl" : "5.006"
          }
@@ -47,8 +52,8 @@
       "repository" : {
          "url" : "https://github.com/interchange/DBIx-Class-DeploymentHandler-CLI.git"
       },
-      "x_IRC" : "irc://irc.freenode.net/#interchange"
+      "x_IRC" : "irc://irc.libera.chat/#interchange"
    },
-   "version" : "0.002",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "v0.3.0",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

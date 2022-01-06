@@ -17,6 +17,7 @@ sub Main {
             : 0
     );
     Term_CLI_test->runtests();
+    return;
 }
 
 package Term_CLI_test {
@@ -237,6 +238,7 @@ sub startup : Test(startup => 5) {
 
     $self->{cli} = $cli;
     $self->{commands} = [@commands];
+    return;
 }
 
 
@@ -257,6 +259,7 @@ sub check_root_node: Test(6) {
         or diag("actual parent is ".$test_1->parent->name);
     is($test_1->root_node, $cli, "sub-command root_node is CLI object")
         or diag("actual root_node is ".$test_1->root_node->name);
+    return;
 }
 
 
@@ -269,6 +272,7 @@ sub check_command_names: Test(1) {
     is_deeply(\@got, \@commands,
             "commands are (@commands)")
     or diag("command_names returned: (", join(", ", map {"'$_'"} @got), ")");
+    return;
 }
 
 
@@ -276,6 +280,7 @@ sub check_attributes: Test(1) {
     my $self = shift;
     my $cli = $self->{cli};
     is( $cli->prompt, 'test> ', "prompt attribute is 'test> '" );
+    return;
 }
 
 
@@ -300,6 +305,7 @@ sub check__split_line: Test(6) {
     ($error, @got) = $cli->_split_line($line);
     is($error, 'unbalanced quotes in input', '_split_line returns correct error');
     is_deeply(\@got, \@expected, '_split_line returns empty list on error');
+    return;
 }
 
 sub check__is_escaped: Test(6) {
@@ -332,6 +338,7 @@ sub check__is_escaped: Test(6) {
     $line = "$bs$bs foobar";
     ok(!$cli->_is_escaped($line, index($line, ' ')),
         qq{_is_escaped on '$line' returns false});
+    return;
 }
 
 sub check_readline: Test(3) {
@@ -357,18 +364,19 @@ sub check_readline: Test(3) {
     is($got, $expected, qq{default does not skip comments and empty lines})
             or diag("Term::CLI::readline returned: '$got'");
 
-    $expected = $lines[$#lines];
+    $expected = $lines[-1];
     $got = $cli->readline(prompt => 'test> ', skip => $skip );
     is($got, $expected, qq{readline with skip argument skips comments and empty lines})
             or diag("Term::CLI::readline returned: '$got'");
 
     $cli = Term::CLI->new(skip => qr/^\s*(?:#.*)?$/);
     @lines = @test_lines;
-    $expected = $lines[$#lines];
+    $expected = $lines[-1];
 
     $got = $cli->readline();
     is($got, $expected, qq{Term::CLI with skip set skips comments and empty lines})
             or diag("Term::CLI::readline returned: '$got'");
+    return;
 }
 
 sub check_complete_line: Test(12) {
@@ -495,6 +503,7 @@ sub check_complete_line: Test(12) {
     is_deeply(\@got, \@expected,
             "'$line$text' completions are (@expected)")
     or diag("complete_line('$text','$line$text',$start) returned: (", join(", ", map {"'$_'"} @got), ")");
+    return;
 }
 
 sub check_execute: Test(49) {
@@ -682,6 +691,7 @@ sub check_execute: Test(49) {
     is($result{status}, -1, 'failed command execution: no arguments allowed');
     like($result{error}, qr/no arguments allowed/,
         'error message no args allowed');
+    return;
 }
 
 }

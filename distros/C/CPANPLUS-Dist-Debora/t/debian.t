@@ -12,7 +12,6 @@ use Software::LicenseUtils;
 
 use CPANPLUS::Dist::Debora::Package::Debian;
 
-use open ':std', ':encoding(utf8)';
 use Test::More;
 
 if (tainted($ENV{PWD})) {

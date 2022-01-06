@@ -17,6 +17,7 @@ sub Main {
             : 0
     );
     Term_CLI_Argument_Filename_test->runtests();
+    return;
 }
 
 package Term_CLI_Argument_Filename_test {
@@ -48,6 +49,7 @@ sub startup : Test(startup => 1) {
             'Term::CLI::Argument::Number->new' );
 
     $self->{arg} = $arg;
+    return;
 }
 
 sub check_constructor: Test(1) {
@@ -57,6 +59,7 @@ sub check_constructor: Test(1) {
         { Term::CLI::Argument::Number->new() }
         qr/Missing required arguments: name/,
         'error on missing name';
+    return;
 }
 
 sub check_attributes: Test(2) {
@@ -64,6 +67,7 @@ sub check_attributes: Test(2) {
     my $arg = $self->{arg};
     is( $arg->name, $ARG_NAME, "name attribute is $ARG_NAME" );
     is( $arg->type, 'Number', "type attribute is Number" );
+    return;
 }
 
 sub check_validate: Test(7) {
@@ -94,6 +98,7 @@ sub check_validate: Test(7) {
     throws_ok { $arg->validate($test_value) }
         qr/coerce_value.*? has not been overloaded/,
         'validate on Term::CLI::Number fails (coerce_value not overloaded)';
+    return;
 }
 
 }

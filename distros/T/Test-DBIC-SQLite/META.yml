@@ -1,10 +1,17 @@
 ---
-abstract: 'Connect and deploy a DBIx::Class::Schema on SQLite'
+abstract: 'Connect to and deploy a L<DBIx::Class::Schema> on SQLite'
 author:
   - 'Abe Timmerman <abeltje@cpan.org>'
-build_requires: {}
+build_requires:
+  Test::Fatal: '0'
+  Test::Simple: '0.88'
+  Test::Tester: '0'
+  Test::Warnings: '0'
+  YAML: '0'
+configure_requires:
+  ExtUtils::MakeMaker: 6.55_03
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -14,8 +21,19 @@ no_index:
   directory:
     - t
     - inc
+requires:
+  DBD::SQLite: '1.29'
+  DBIx::Class::Schema::Loader: '0.07047'
+  Moo: '2.00'
+  MooX::Params::CompiledValidators: '0.04'
+  SQL::Translator: '1.60'
+  Test::Simple: '0.88'
+  Type::Tiny: '1.008'
+  namespace::autoclean: '0.16'
+  perl: '5.010001'
 resources:
+  homepage: https://github.com/abeltje/Test-DBIC-SQLite.git
   repository: https://github.com/abeltje/Test-DBIC-SQLite.git
-version: '0.01'
+version: '1.00'
 x_IRC: irc://irc.perl.org/#amsterdam.pm
-x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

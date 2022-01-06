@@ -6,7 +6,7 @@ Tk::HMListbox - Sortable Multicolumn HListbox (allowing icons, along with text) 
 
 Jim Turner
 
-(c) 2015-2019, Jim Turner under the same license that Perl 5 itself is.  All rights reserved.
+(c) 2015-2022, Jim Turner under the same license that Perl 5 itself is.  All rights reserved.
 
 Tk::SMListbox author:  me
 
@@ -22,12 +22,12 @@ $hml = $parent->HMListbox (<options>);
 
 =head1 DESCRIPTION
 
-Tk::HMListbox is a derivitive of my L<Tk::SMListbox> (and thus L<Tk::MListbox> 
+Tk::HMListbox is a derivitive of my L<Tk::SMListbox> (and thus L<Tk::MListbox>) 
 that uses L<Tk::HListbox> (instead of L<Tk::Listbox>, as used by the latter 
 two) which was done to allow for image icons to be included in columns 
 along with the traditional text strings.  I created both of these 
 Tk::H*Listbox widgets in order to include a column of tiny file-type icons, 
-in addition to the other file attribute columns in my JFM4 Perl/Tk-based 
+in addition to the other file attribute columns in my JFM5 Perl/Tk-based 
 file-manager application.  Tk::HMListbox is designed to work as a drop-in 
 replacement for either Tk::SMListbox or Tk::MListbox, maintaining 
 backward-compatability with both.
@@ -80,6 +80,8 @@ my $table = $w->Scrolled('HMListbox'
                 -expand => 'yes',
 
         );
+
+#See also "make test" (test.pl).
 
 =head1 STANDARD OPTIONS
 
@@ -166,7 +168,7 @@ for the rows in the listbox which are type I<image> or I<imagetext>.
 This can be useful in correcting vertical misallignment between the 
 columns when some columns contain images and others are text only!
 NOTE:  This changes the height of the affected rows.
-Default:  B<1> (and setting to B<0> is the same as B<1>).
+Default:  B<1> (and setting to B<0> is seems to be the same as B<2>).
 
 =item B<-moveable> => I<boolean>
 
@@ -1052,7 +1054,7 @@ package Tk::HMListbox;
 use strict;
 use Carp;
 use vars qw($VERSION);
-$VERSION = '3.12';
+$VERSION = '3.13';
 
 use Tk;
 
@@ -2090,10 +2092,12 @@ sub sort {
 # for all rows that are currently selected.
 	my $dummy_column = scalar(@{$w->{'_columns'}});
 
+	my $wasActive = $w->index('active');
 	my @data = $w->get(0,'end');
 	foreach ($w->curselection) {
 		$data[$_]->[$dummy_column] = 1;  # Selected...
 	}
+	$data[$wasActive]->[$dummy_column] += 2  if (defined($wasActive) && $wasActive >= 0);
 
 	@data = sort {
 		local $^W = 0;
@@ -2121,8 +2125,9 @@ sub sort {
 
 	my @new_selection = ();
 	foreach (0..$#data) {
-		if ($data[$_]->[$dummy_column]) {
-			$w->selectionSet($_,$_);
+		if (defined $data[$_]->[$dummy_column]) {
+			$w->selectionSet($_,$_)  if ($data[$_]->[$dummy_column] % 2);
+			$w->activate($_)  if ($data[$_]->[$dummy_column] > 1);
 		}
 	}
 

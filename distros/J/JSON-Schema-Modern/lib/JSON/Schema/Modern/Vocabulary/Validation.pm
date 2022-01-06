@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Validation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Validation vocabulary
 
-our $VERSION = '0.536';
+our $VERSION = '0.539';
 
 use 5.020;
 use Moo;
@@ -17,7 +17,7 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use List::Util 'any';
 use Ref::Util 0.100 'is_plain_arrayref';
 use if "$]" >= 5.022, POSIX => 'isinf';
-use JSON::Schema::Modern::Utilities qw(is_type is_equal is_elements_unique E assert_keyword_type assert_pattern jsonp sprintf_num);
+use JSON::Schema::Modern::Utilities qw(is_type get_type is_equal is_elements_unique E assert_keyword_type assert_pattern jsonp sprintf_num);
 use namespace::clean;
 
 with 'JSON::Schema::Modern::Vocabulary';
@@ -59,17 +59,18 @@ sub _traverse_keyword_type ($self, $schema, $state) {
 }
 
 sub _eval_keyword_type ($self, $data, $schema, $state) {
+  my $type = get_type($data);
   if (is_plain_arrayref($schema->{type})) {
     return 1 if any {
-      is_type($_, $data)
-        or ($_ eq 'boolean' and $state->{scalarref_booleans} and is_type('reference to SCALAR', $data))
+      $type eq $_ or ($_ eq 'number' and $type eq 'integer')
+        or ($_ eq 'boolean' and $state->{scalarref_booleans} and $type eq 'reference to SCALAR')
     } $schema->{type}->@*;
-    return E($state, 'wrong type (expected one of %s)', join(', ', $schema->{type}->@*));
+    return E($state, 'got %s, not one of %s', $type, join(', ', $schema->{type}->@*));
   }
   else {
-    return 1 if is_type($schema->{type}, $data)
-      or ($schema->{type} eq 'boolean' and $state->{scalarref_booleans} and is_type('reference to SCALAR', $data));
-    return E($state, 'wrong type (expected %s)', $schema->{type});
+    return 1 if $type eq $schema->{type} or ($schema->{type} eq 'number' and $type eq 'integer')
+      or ($schema->{type} eq 'boolean' and $state->{scalarref_booleans} and $type eq 'reference to SCALAR');
+    return E($state, 'got %s, not %s', $type, $schema->{type});
   }
 }
 
@@ -106,8 +107,11 @@ sub _traverse_keyword_multipleOf ($self, $schema, $state) {
 sub _eval_keyword_multipleOf ($self, $data, $schema, $state) {
   return 1 if not is_type('number', $data);
 
-  if (ref($data) =~ /^Math::Big(?:Int|Float)$/) {
-    my ($quotient, $remainder) = $data->copy->bdiv($schema->{multipleOf});
+  # if either value is a float, use the bignum library for the calculation for an accurate remainder
+  if (ref($data) =~ /^Math::Big(?:Int|Float)$/ or ref($schema->{multipleOf}) =~ /^Math::Big(?:Int|Float)$/) {
+    $data = ref($data) =~ /^Math::Big(?:Int|Float)$/ ? $data->copy : Math::BigFloat->new($data);
+    my $divisor = ref($schema->{multipleOf}) =~ /^Math::Big(?:Int|Float)$/ ? $schema->{multipleOf} : Math::BigFloat->new($schema->{multipleOf});
+    my ($quotient, $remainder) = $data->bdiv($divisor);
     return E($state, 'overflow while calculating quotient') if $quotient->is_inf;
     return 1 if $remainder == 0;
   }
@@ -332,7 +336,7 @@ JSON::Schema::Modern::Vocabulary::Validation - Implementation of the JSON Schema
 
 =head1 VERSION
 
-version 0.536
+version 0.539
 
 =head1 DESCRIPTION
 
@@ -357,8 +361,6 @@ the equivalent Draft 2019-09 keywords, indicated in metaschemas with the URI C<h
 the equivalent Draft 7 keywords that correspond to this vocabulary and are formally specified in L<https://datatracker.ietf.org/doc/html/draft-handrews-json-schema-validation-01#section-6>.
 
 =back
-
-=head1 SUPPORT
 
 =for stopwords OpenAPI
 

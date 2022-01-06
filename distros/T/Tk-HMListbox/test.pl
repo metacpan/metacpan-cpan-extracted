@@ -36,7 +36,7 @@ my %red = qw(-bg red -fg white);
 my %green = qw(-bg green -fg white);
 my %white = qw(-fg black);
 
-my @hlb23ops = ($Tk::HListbox::VERSION >= 2.3) ? ('-font', 'Helvetica -11 bold', '-ipady', 1, '-tpady', 1) : ();
+my @hlb23ops = ($Tk::HListbox::VERSION >= 2.3) ? ('-font', 'Helvetica -11 bold', '-ipady', 1, '-tpady', 3) : ();
 my $ml = $mw->Scrolled('HMListbox',
     -scrollbars => 'osoe',
     -background => 'white', 

@@ -5,7 +5,7 @@ package ColorTheme::Text::ANSITable::Standard::GradationWhiteBG;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-08-27'; # DATE
 our $DIST = 'Text-ANSITable'; # DIST
-our $VERSION = '0.606'; # VERSION
+our $VERSION = '0.607'; # VERSION
 
 use parent 'ColorThemeBase::Static::FromStructColors';
 
@@ -41,7 +41,7 @@ ColorTheme::Text::ANSITable::Standard::GradationWhiteBG - Gradation (for termina
 
 =head1 VERSION
 
-This document describes version 0.606 of ColorTheme::Text::ANSITable::Standard::GradationWhiteBG (from Perl distribution Text-ANSITable), released on 2021-08-27.
+This document describes version 0.607 of ColorTheme::Text::ANSITable::Standard::GradationWhiteBG (from Perl distribution Text-ANSITable), released on 2021-08-27.
 
 =head1 DESCRIPTION
 

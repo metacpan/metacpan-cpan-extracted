@@ -1,4 +1,56 @@
-0.003 2014-12-31 00:39:04-0600
+Revision history of Data-Frame
+
+0.006002    2022-01-03 14:33:22-0500
+    - Fix PDL::Factor's ngood, nbad methods for newer PDL versions.
+      See <https://github.com/EntropyOrg/p5-Data-Frame/pull/34>.
+
+0.006001    2022-01-02 18:29:06-0500
+    - [BREAKING] Requires Perl >= 5.16, PDL >= 2.019
+
+    - [DEPRECATION] Deprecating PDL::number_of_rows() in favor of PDL::length().
+      (Both PDL::number_of_rows() and PDL::length() are methods mixed into PDL.)
+
+    - Fixed compatibility with recent versions of PDL.
+
+    - Autoboxing/role-mixing (via Data::Frame::Autobox and Data::Frame::PDL)
+      to have a similar OO-interface across structures having some similarities,
+      like Perl native array vs PDL piddle, Perl native hash vs Data::Frame's
+      columns.
+
+    - Data::Frame improvements
+      - Added new methods to Data::Frame,
+        PDL-style methods: at(), dims()/shape(), copy(), drop_bad(),
+          slice(), set(), which(), dot-assignment
+        Serialization methods: from_csv(), to_csv()
+        Other methods: append(), id(), isempty(), merge(), rename(),
+          sample(), summary(), sort(), split(), transform(), uniq()
+      - Improved row/column via Data::Frame::Indexer.
+      - Experimental features: syntax sugar for getting columns,
+        R-like tidy_eval().
+    
+    - Reworked PDL::SV
+      Added new PDL-style methods : copy(), glue(), uniqind(), set(), sever(),
+        isbad(), isgood(), setbadif(), setbadtoval(),
+        comparisons, dot-assignment
+      Fixed methods: uniq()
+      Improved stringification to honor $PDL::toolongtoprint
+    - Reworked PDL::Factor
+      Added new PDL-style methods : copy(), glue(), isbad(), isgood(),
+        setbadif(), setbadtoval().
+    - Implemented a basic PDL::Logical, which was empty module, for logical
+      columns.
+
+    - New Data::Frame::Examples module that provides a few example datasets:
+      airquality, diamonds, economics, economics_long, faithfuld,
+      iris, mpg, mtcars, txhousing.
+
+    - Various doc improvements.
+
+    - For developers 
+      - New Test2::Tools::DataFrame module for testing Data::Frame.
+      - Data::Frame::Setup and Data::Frame::Class as Import::Into packages.
+
+0.003       2014-12-31 00:39:04-0600
     - add a role for Rlike data frames
           * support for methods: head(), tail(), subset()
     - use MooX::Traits to support loading roles easily
@@ -6,8 +58,8 @@
     - bump PDL version to use its `unpdl()` method
     - Column::Helper now uses AUTOLOAD to make accessing columns easier in `subset()`
 
-0.002 2014-12-25 03:34:04-0600
+0.002       2014-12-25 03:34:04-0600
     - fix stringifiable length test
 
-0.001 2014-12-23 18:25:37-0600
+0.001       2014-12-23 18:25:37-0600
     - initial version

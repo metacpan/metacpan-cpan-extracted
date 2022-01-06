@@ -7,6 +7,8 @@ Tk::SMListbox - Sortable Multicolumn Listbox with arrows in headers
 
 Jim Turner
 
+(c) 2015-2022, Jim Turner under the same license that Perl 5 itself is. All rights reserved.
+
 Tk::MListbox authors:  Hans Jorgen Helgesen, hans_helgesen@hotmail.com (from March 2000: hans.helgesen@novit.no)
 
 =head1 SYNOPSIS
@@ -965,7 +967,7 @@ package Tk::SMListbox;
 use strict;
 use Carp;
 use vars qw($VERSION);
-$VERSION = '2.12';
+$VERSION = '2.13';
 
 use Tk;
 
@@ -987,6 +989,7 @@ sub Tk::Widget::Scrolled {
 	my $name = delete $args{'Name'};
 	push(@args,'Name' => $name) if (defined $name);
 	my $cw = $parent->Frame(@args);
+	$cw->bind('<FocusIn>', sub { $cw->focusNext; Tk->break;});
 	@args = ();
 
 	## Now remove any args that Frame can handle
@@ -1620,16 +1623,26 @@ sub focus
 	my $w = shift;
 
 	if (!$w->cget('-takefocus')) { 
-		$w->focusNext->focus(@_)  if (defined $w->focusNext);
+		$w->focusNext;
 	} else {
 		my $c = (defined($w->{Configure}{'-focuscolumn'}) && $w->{Configure}{'-focuscolumn'} >= 0)
 				? $w->columnGet($w->{Configure}{'-focuscolumn'})  #User specified which one to get focus.
 				: $w->_firstVisible; 
                   #Default to 1st one visible if user did not pick one.
 		if (defined($c) && $w->cget('-nocolumnfocus') != 1) {
-			$c->Subwidget("listbox")->focus(@_)  if (defined $c);
+			$c->Subwidget("listbox")->focus(@_);
+			$c->Subwidget("listbox")->bind('<<LeftTab>>', sub {
+				$w->focusPrev;
+				$w->focusCurrent->focusPrev;
+				Tk->break;
+			});
 		} else {
 			$w->Tk::focus(@_);
+			$w->bind('<<LeftTab>>', sub {
+				$w->focusPrev;
+				$w->focusCurrent->focusPrev;
+				Tk->break;
+			});
 		}
 	}
 }
@@ -1984,10 +1997,12 @@ sub sort {
 # for all rows that are currently selected.
 	my $dummy_column = scalar(@{$w->{'_columns'}});
 
+	my $wasActive = $w->index('active');
 	my @data = $w->get(0,'end');
 	foreach ($w->curselection) {
 		$data[$_]->[$dummy_column] = 1;  # Selected...
 	}
+	$data[$wasActive]->[$dummy_column] += 2  if (defined($wasActive) && $wasActive >= 0);
 
 	@data = sort {
 		local $^W = 0;
@@ -2015,8 +2030,9 @@ sub sort {
 
 	my @new_selection = ();
 	foreach (0..$#data) {
-		if ($data[$_]->[$dummy_column]) {
-			$w->selectionSet($_,$_);
+		if (defined $data[$_]->[$dummy_column]) {
+			$w->selectionSet($_,$_)  if ($data[$_]->[$dummy_column] % 2);
+			$w->activate($_)  if ($data[$_]->[$dummy_column] > 1);
 		}
 	}
 

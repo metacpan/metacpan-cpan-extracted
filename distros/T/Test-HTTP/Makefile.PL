@@ -2,7 +2,10 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME         => 'Test::HTTP',
     ABSTRACT     => 'Testing for HTTP services',
-    AUTHOR       => 'Socialtext <socialtext@socialtext.com>',
+    AUTHOR       => [
+      'Matt Liggett <mml@pobox.com>',
+      'Socialtext <socialtext@socialtext.com>',
+    ],
     VERSION_FROM => 'lib/Test/HTTP.pm',
     PREREQ_PM    => {
         Test::Builder::Module => 0,

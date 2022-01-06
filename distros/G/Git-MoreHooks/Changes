@@ -1,5 +1,7 @@
 Revision history for Git-MoreHooks
 
+0.012     2021-12-31 17:24:22+01:00 Europe/Stockholm
+
 0.011     2021-12-29 21:07:58+01:00 Europe/Stockholm
             * Remove cpanfile.snapshot.
             * Migrate from Test::More to Test2.

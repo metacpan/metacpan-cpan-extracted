@@ -1,3 +1,66 @@
+0.054002 -- 2022-01-05
+
+    [Testing]
+    - Fix test for help command.
+        Take into account that help text can be rendered using overstrike.
+
+        Files modified:
+            t/065-Term-CLI-Command-Help.t
+
+0.054001 -- 2022-01-04
+
+    [Code Cleanup]
+    - Tests and modules pass perlcritic's "stern" (-4) filter.
+    - Apply perltidy.
+    - Properly localise %SIG in `readline`.
+    - POD fixes.
+    - Remove unnecessary `else` and `elsif`.
+    - Run code through perltidy.
+    - Eliminate some unnecessary else/elsif.
+    - Remove default export of `loc` from `Term::CLI::L10N`
+        Explicitly import `loc` in all modules that need it.
+    - Do not use `package Foo {}` syntax.
+        All modules have only one `package`, so the block syntax
+        doesn't add anything and causes perltidy to unnecessarily
+        indent all code.
+
+    [Enhancements]
+    - Improve filename completion for non-GNU readline
+        The glob variation now uses a trick when completing directory
+        names that prevents the readline module from adding a space.
+
+        Files modified:
+            lib/Term/CLI/Argument/Filename.pm
+
+    - Add CONTRIBUTING.md, Contributors; fix README
+
+    - Add a `clear_error` method to Term::CLI::Base
+      and use it instead of `set_error('')`.
+
+
+    [Bug Fixes]
+    - Fix potential bug in line splitting (Term::CLI).
+
+    - Work around for old Pod::Text::Termcap, closes #12
+        Versions of `Pod::Text::Termcap` before 4.11 had a bug (#124447)
+        that resulted in it using a screen width of 80, regardless of what
+        was specified in the constructor call or environment. As a result,
+        the high `=over` indents could cause very strange output or even
+        make `Pod::Text::Termcap` spin into an eternal loop.
+
+        To make life easier for those with older Perl installations,
+        we test for the older `Pod::Text::Termcap` version and use
+        `Pod::Text::Overstrike` instead if necessary. The overstrike
+        variant does not contain the screen width bug, although it does
+        require a pager that understands overstrike sequences. The default
+        pager for `Term::CLI` (`less`) does, so the invonvenience should
+        be minor.
+
+        Thanks to djerius for reporting and diagnosing the problem.
+
+        Files modified:
+            lib/Term/CLI/Command/Help.pm
+
 0.053006 -- 2021-12-27
 
     [Compatibility]
@@ -108,7 +171,7 @@
         prefix comparison against the list of valid values. This works fine
         as long as the valid values are not prefixes of each other; if they
         are, then the shorter strings will never be considered valid input.
-        
+
     - GNU ReadLine - exclude prompt ornaments for leading/trailing whitespace.
         The Term::ReadLine::GNU implementation will just slap the prompt
         between the ornament-start/ornament-end sequences, but this looks

@@ -94,7 +94,7 @@ use diagnostics;
 use Carp qw/croak/;
 #
 # In our example we have NOT specified a symbol action, therefore
-# lexemes that come directly from the grammar are exactly what is in the input
+# symbols that come directly from the grammar are exactly what is in the input
 #*/
 
 sub new {
@@ -286,7 +286,7 @@ use Encode qw/decode encode/;
 # Init log
 #
 our $defaultLog4perlConf = '
-log4perl.rootLogger              = TRACE, Screen
+log4perl.rootLogger              = INFO, Screen
 log4perl.appender.Screen         = Log::Log4perl::Appender::Screen
 log4perl.appender.Screen.stderr  = 0
 log4perl.appender.Screen.layout  = PatternLayout
@@ -358,6 +358,7 @@ my %GRAMMAR_PROPERTIES_BY_LEVEL = (
              description         => "Grammar level 0",
              discardId           => 1,
              latm                => 1,
+             discardIsFallback   => 0,
              level               => 0,
              maxLevel            => 1,
              ruleIds             => [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],
@@ -372,6 +373,7 @@ my %GRAMMAR_PROPERTIES_BY_LEVEL = (
              description         => "Grammar level 1",
              discardId           => -1,
              latm                => 1,
+             discardIsFallback   => 0,
              level               => 1,
              maxLevel            => 1,
              ruleIds             => [0,1],
@@ -389,7 +391,6 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  exceptionId              => -1,
                  hideseparator            => 0,
                  id                       => 0,
-                 internal                 => 0,
                  lhsId                    => 1,
                  minimum                  => -1,
                  nullRanksHigh            => 0,
@@ -400,7 +401,7 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  separatorId              => -1,
                  sequence                 => 0,
                  propertyBitSet           => MarpaX::ESLIF::Rule::PropertyBitSet->MARPAESLIF_RULE_IS_PRODUCTIVE,
-                 show                     => ":discard ::= <whitespaces> event => discard_whitespaces\$=on" },
+                 show                     => ":discard ::= <whitespaces> event => discard_whitespaces\$ /* Internal rule */" },
         '1' => { action                   => undef,
                  description              => "Rule No 1",
                  discardEvent             => "discard_comment\$",
@@ -408,7 +409,6 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  exceptionId              => -1,
                  hideseparator            => 0,
                  id                       => 1,
-                 internal                 => 0,
                  lhsId                    => 1,
                  minimum                  => -1,
                  nullRanksHigh            => 0,
@@ -419,7 +419,7 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  separatorId              => -1,
                  sequence                 => 0,
                  propertyBitSet           => MarpaX::ESLIF::Rule::PropertyBitSet->MARPAESLIF_RULE_IS_PRODUCTIVE,
-                 show                     => ":discard ::= <comment> event => discard_comment\$=on" },
+                 show                     => ":discard ::= <comment> event => discard_comment\$ /* Internal rule */" },
         '2' => { action                   => "::shift",
                  description              => "Rule No 2",
                  discardEvent             => undef,
@@ -427,7 +427,6 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  exceptionId              => -1,
                  hideseparator            => 0,
                  id                       => 2,
-                 internal                 => 0,
                  lhsId                    => 4,
                  minimum                  => -1,
                  nullRanksHigh            => 0,
@@ -447,7 +446,6 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  exceptionId              => -1,
                  hideseparator            => 0,
                  id                       => 3,
-                 internal                 => 0,
                  lhsId                    => 0,
                  minimum                  => -1,
                  nullRanksHigh            => 0,
@@ -467,7 +465,6 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  exceptionId              => -1,
                  hideseparator            => 0,
                  id                       => 4,
-                 internal                 => 0,
                  lhsId                    => 6,
                  minimum                  => -1,
                  nullRanksHigh            => 0,
@@ -487,7 +484,6 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  exceptionId              => -1,
                  hideseparator            => 0,
                  id                       => 5,
-                 internal                 => 0,
                  lhsId                    => 7,
                  minimum                  => -1,
                  nullRanksHigh            => 0,
@@ -507,7 +503,6 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  exceptionId              => -1,
                  hideseparator            => 0,
                  id                       => 6,
-                 internal                 => 0,
                  lhsId                    => 8,
                  minimum                  => -1,
                  nullRanksHigh            => 0,
@@ -527,7 +522,6 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  exceptionId              => -1,
                  hideseparator            => 0,
                  id                       => 7,
-                 internal                 => 0,
                  lhsId                    => 9,
                  minimum                  => -1,
                  nullRanksHigh            => 0,
@@ -547,7 +541,6 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  exceptionId              => -1,
                  hideseparator            => 0,
                  id                       => 8,
-                 internal                 => 0,
                  lhsId                    => 9,
                  minimum                  => -1,
                  nullRanksHigh            => 0,
@@ -567,7 +560,6 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  exceptionId              => -1,
                  hideseparator            => 0,
                  id                       => 9,
-                 internal                 => 0,
                  lhsId                    => 8,
                  minimum                  => -1,
                  nullRanksHigh            => 0,
@@ -587,7 +579,6 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  exceptionId              => -1,
                  hideseparator            => 0,
                  id                       => 10,
-                 internal                 => 0,
                  lhsId                    => 7,
                  minimum                  => -1,
                  nullRanksHigh            => 0,
@@ -607,7 +598,6 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  exceptionId              => -1,
                  hideseparator            => 0,
                  id                       => 11,
-                 internal                 => 0,
                  lhsId                    => 7,
                  minimum                  => -1,
                  nullRanksHigh            => 0,
@@ -627,7 +617,6 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  exceptionId              => -1,
                  hideseparator            => 0,
                  id                       => 12,
-                 internal                 => 0,
                  lhsId                    => 6,
                  minimum                  => -1,
                  nullRanksHigh            => 0,
@@ -647,7 +636,6 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  exceptionId              => -1,
                  hideseparator            => 0,
                  id                       => 13,
-                 internal                 => 0,
                  lhsId                    => 6,
                  minimum                  => -1,
                  nullRanksHigh            => 0,
@@ -667,7 +655,6 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  exceptionId              => -1,
                  hideseparator            => 0,
                  id                       => 14,
-                 internal                 => 0,
                  lhsId                    => 2,
                  minimum                  => -1,
                  nullRanksHigh            => 0,
@@ -686,7 +673,6 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  exceptionId              => -1,
                  hideseparator            => 0,
                  id                       => 15,
-                 internal                 => 0,
                  lhsId                    => 3,
                  minimum                  => -1,
                  nullRanksHigh            => 0,
@@ -697,7 +683,7 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  separatorId              => -1,
                  sequence                 => 0,
                  propertyBitSet           => MarpaX::ESLIF::Rule::PropertyBitSet->MARPAESLIF_RULE_IS_PRODUCTIVE,
-                 show                     => "<comment> ::= /(?:(?:(?:\\/\\/)(?:[^\\n]*)(?:\\n|\\z))|(?:(?:\\/\\*)(?:(?:[^\\*]+|\\*(?!\\/))*)(?:\\*\\/)))/u"}
+                 show                     => q{<comment> ::= /(?:(?:(?:\\\\/\\\\/)(?:[^\\n]*)(?:\\n|\\z))|(?:(?:\\\\/\\*)(?:(?:[^\\*]+|\\*(?!\\\\/))*)(?:\\*\\\\/)))/u}}
     },
     '1' => {
         '0' => { action                   => undef,
@@ -707,7 +693,6 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  exceptionId              => -1,
                  hideseparator            => 0,
                  id                       => 0,
-                 internal                 => 0,
                  lhsId                    => 0,
                  minimum                  => -1,
                  nullRanksHigh            => 0,
@@ -727,7 +712,6 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  exceptionId              => -1,
                  hideseparator            => 0,
                  id                       => 1,
-                 internal                 => 0,
                  lhsId                    => 2,
                  minimum                  => 1,
                  nullRanksHigh            => 0,
@@ -765,7 +749,9 @@ my %SYMBOL_PROPERTIES_BY_LEVEL = (
                  nullableAction => undef,
                  symbolAction => undef,
                  ifAction => undef,
+                 generatorAction => undef,
                  priority => 0,
+                 verbose => '',
                  propertyBitSet => MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_ACCESSIBLE|
                                    MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_PRODUCTIVE|
                                    MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_START,
@@ -795,11 +781,13 @@ my %SYMBOL_PROPERTIES_BY_LEVEL = (
                  nullableAction => undef,
                  symbolAction => undef,
                  ifAction => undef,
+                 generatorAction => undef,
                  priority => 0,
+                 verbose => '',
                  propertyBitSet => MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_PRODUCTIVE,
                  eventBitSet => 0,
                  start => 0,
-                 top => 1,
+                 top => 0,
                  type => MarpaX::ESLIF::Symbol::Type->MARPAESLIF_SYMBOLTYPE_META},
         '2' => { description => "whitespaces",
                  discard => 0,
@@ -822,7 +810,9 @@ my %SYMBOL_PROPERTIES_BY_LEVEL = (
                  nullableAction => undef,
                  symbolAction => undef,
                  ifAction => undef,
+                 generatorAction => undef,
                  priority => 0,
+                 verbose => '',
                  propertyBitSet => MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_PRODUCTIVE,
                  eventBitSet => 0,
                  start => 0,
@@ -849,7 +839,9 @@ my %SYMBOL_PROPERTIES_BY_LEVEL = (
                  nullableAction => undef,
                  symbolAction => undef,
                  ifAction => undef,
+                 generatorAction => undef,
                  priority => 0,
+                 verbose => '',
                  propertyBitSet => MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_PRODUCTIVE,
                  eventBitSet => 0,
                  start => 0,
@@ -876,7 +868,9 @@ my %SYMBOL_PROPERTIES_BY_LEVEL = (
                  nullableAction => undef,
                  symbolAction => undef,
                  ifAction => undef,
+                 generatorAction => undef,
                  priority => 0,
+                 verbose => '',
                  propertyBitSet => MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_ACCESSIBLE|
                                    MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_PRODUCTIVE,
                  eventBitSet => MarpaX::ESLIF::Symbol::EventBitSet->MARPAESLIF_SYMBOL_EVENT_PREDICTION|
@@ -905,7 +899,9 @@ my %SYMBOL_PROPERTIES_BY_LEVEL = (
                  nullableAction => undef,
                  symbolAction => 'perl_number',
                  ifAction => 'test_if_action',
+                 generatorAction => undef,
                  priority => 0,
+                 verbose => '',
                  propertyBitSet => MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_ACCESSIBLE|
                                    MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_PRODUCTIVE|
                                    MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_TERMINAL,
@@ -934,7 +930,9 @@ my %SYMBOL_PROPERTIES_BY_LEVEL = (
                  nullableAction => undef,
                  symbolAction => undef,
                  ifAction => undef,
+                 generatorAction => undef,
                  priority => 0,
+                 verbose => '',
                  propertyBitSet => MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_ACCESSIBLE|
                                    MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_PRODUCTIVE,
                  eventBitSet => 0,
@@ -962,7 +960,9 @@ my %SYMBOL_PROPERTIES_BY_LEVEL = (
                  nullableAction => undef,
                  symbolAction => undef,
                  ifAction => undef,
+                 generatorAction => undef,
                  priority => 0,
+                 verbose => '',
                  propertyBitSet => MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_ACCESSIBLE|
                                    MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_PRODUCTIVE,
                  eventBitSet => 0,
@@ -990,7 +990,9 @@ my %SYMBOL_PROPERTIES_BY_LEVEL = (
                  nullableAction => undef,
                  symbolAction => undef,
                  ifAction => undef,
+                 generatorAction => undef,
                  priority => 0,
+                 verbose => '',
                  propertyBitSet => MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_ACCESSIBLE|
                                    MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_PRODUCTIVE,
                  eventBitSet => 0,
@@ -1018,7 +1020,9 @@ my %SYMBOL_PROPERTIES_BY_LEVEL = (
                  nullableAction => undef,
                  symbolAction => undef,
                  ifAction => undef,
+                 generatorAction => undef,
                  priority => 0,
+                 verbose => '',
                  propertyBitSet => MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_ACCESSIBLE|
                                    MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_PRODUCTIVE,
                  eventBitSet => 0,
@@ -1046,7 +1050,9 @@ my %SYMBOL_PROPERTIES_BY_LEVEL = (
                  nullableAction => undef,
                  symbolAction => undef,
                  ifAction => undef,
+                 generatorAction => undef,
                  priority => 0,
+                 verbose => '',
                  propertyBitSet => MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_ACCESSIBLE|
                                    MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_PRODUCTIVE|
                                    MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_TERMINAL,
@@ -1075,7 +1081,9 @@ my %SYMBOL_PROPERTIES_BY_LEVEL = (
                  nullableAction => undef,
                  symbolAction => undef,
                  ifAction => undef,
+                 generatorAction => undef,
                  priority => 0,
+                 verbose => '',
                  propertyBitSet => MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_ACCESSIBLE|
                                    MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_PRODUCTIVE|
                                    MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_TERMINAL,
@@ -1104,7 +1112,9 @@ my %SYMBOL_PROPERTIES_BY_LEVEL = (
                  nullableAction => undef,
                  symbolAction => undef,
                  ifAction => undef,
+                 generatorAction => undef,
                  priority => 0,
+                 verbose => '',
                  propertyBitSet => MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_ACCESSIBLE|
                                    MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_PRODUCTIVE|
                                    MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_TERMINAL,
@@ -1133,7 +1143,9 @@ my %SYMBOL_PROPERTIES_BY_LEVEL = (
                  nullableAction => undef,
                  symbolAction => undef,
                  ifAction => undef,
+                 generatorAction => undef,
                  priority => 0,
+                 verbose => '',
                  propertyBitSet => MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_ACCESSIBLE|
                                    MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_PRODUCTIVE|
                                    MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_TERMINAL,
@@ -1162,7 +1174,9 @@ my %SYMBOL_PROPERTIES_BY_LEVEL = (
                  nullableAction => undef,
                  symbolAction => undef,
                  ifAction => undef,
+                 generatorAction => undef,
                  priority => 0,
+                 verbose => '',
                  propertyBitSet => MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_ACCESSIBLE|
                                    MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_PRODUCTIVE|
                                    MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_TERMINAL,
@@ -1191,7 +1205,9 @@ my %SYMBOL_PROPERTIES_BY_LEVEL = (
                  nullableAction => undef,
                  symbolAction => undef,
                  ifAction => undef,
+                 generatorAction => undef,
                  priority => 0,
+                 verbose => '',
                  propertyBitSet => MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_ACCESSIBLE|
                                    MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_PRODUCTIVE|
                                    MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_TERMINAL,
@@ -1220,7 +1236,9 @@ my %SYMBOL_PROPERTIES_BY_LEVEL = (
                  nullableAction => undef,
                  symbolAction => undef,
                  ifAction => undef,
+                 generatorAction => undef,
                  priority => 0,
+                 verbose => '',
                  propertyBitSet => MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_ACCESSIBLE|
                                    MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_PRODUCTIVE|
                                    MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_TERMINAL,
@@ -1249,14 +1267,16 @@ my %SYMBOL_PROPERTIES_BY_LEVEL = (
                  nullableAction => undef,
                  symbolAction => undef,
                  ifAction => undef,
+                 generatorAction => undef,
                  priority => 0,
+                 verbose => '',
                  propertyBitSet => MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_PRODUCTIVE|
                                    MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_TERMINAL,
                  eventBitSet => 0,
                  start => 0,
                  top => 0,
                  type => MarpaX::ESLIF::Symbol::Type->MARPAESLIF_SYMBOLTYPE_META},
-        '18' => {description => "/(?:(?:(?:\\/\\/)(?:[^\\n]*)(?:\\n|\\z))|(?:(?:\\/\\*)(?:(?:[^\\*]+|\\*(?!\\/))*)(?:\\*\\/)))/u",
+        '18' => {description => q{/(?:(?:(?:\\\\/\\\\/)(?:[^\\n]*)(?:\\n|\\z))|(?:(?:\\\\/\\*)(?:(?:[^\\*]+|\\*(?!\\\\/))*)(?:\\*\\\\/)))/u},
                  discard => 0,
                  discardEvent => undef,
                  discardEventInitialState => 1,
@@ -1277,7 +1297,9 @@ my %SYMBOL_PROPERTIES_BY_LEVEL = (
                  nullableAction => undef,
                  symbolAction => undef,
                  ifAction => undef,
+                 generatorAction => undef,
                  priority => 0,
+                 verbose => '',
                  propertyBitSet => MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_PRODUCTIVE|
                                    MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_TERMINAL,
                  eventBitSet => 0,
@@ -1307,7 +1329,9 @@ my %SYMBOL_PROPERTIES_BY_LEVEL = (
                  nullableAction => undef,
                  symbolAction => undef,
                  ifAction => undef,
+                 generatorAction => undef,
                  priority => 0,
+                 verbose => '',
                  propertyBitSet => MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_ACCESSIBLE|
                                    MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_PRODUCTIVE|
                                    MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_START,
@@ -1336,7 +1360,9 @@ my %SYMBOL_PROPERTIES_BY_LEVEL = (
                  nullableAction => undef,
                  symbolAction => undef,
                  ifAction => undef,
+                 generatorAction => undef,
                  priority => 0,
+                 verbose => '',
                  propertyBitSet => MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_ACCESSIBLE|
                                    MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_PRODUCTIVE|
                                    MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_TERMINAL,
@@ -1365,11 +1391,13 @@ my %SYMBOL_PROPERTIES_BY_LEVEL = (
                  nullableAction => undef,
                  symbolAction => undef,
                  ifAction => undef,
+                 generatorAction => undef,
                  priority => 0,
+                 verbose => '',
                  propertyBitSet => MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_PRODUCTIVE,
                  eventBitSet => 0,
                  start => 0,
-                 top => 1,
+                 top => 0,
                  type => MarpaX::ESLIF::Symbol::Type->MARPAESLIF_SYMBOLTYPE_META},
         '3' => { description => "/[\\s]/",
                  discard => 0,
@@ -1392,7 +1420,9 @@ my %SYMBOL_PROPERTIES_BY_LEVEL = (
                  nullableAction => undef,
                  symbolAction => undef,
                  ifAction => undef,
+                 generatorAction => undef,
                  priority => 0,
+                 verbose => '',
                  propertyBitSet => MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_PRODUCTIVE|
                                    MarpaX::ESLIF::Symbol::PropertyBitSet->MARPAESLIF_SYMBOL_IS_TERMINAL,
                  eventBitSet => 0,
@@ -1498,7 +1528,7 @@ my @strings = (
     "5 ** (2 / 3)",
     "1 + ( 2 + ( 3 + ( 4 + 5) )",
     "1 + ( 2 + ( 3 + ( 4 + 50) ) )   /* comment after */",
-    " 100"
+    " 100    "
     );
 
 #
@@ -1546,6 +1576,10 @@ for (my $i = 0; $i <= $#strings; $i++) {
     isa_ok($eslifRecognizer, 'MarpaX::ESLIF::Recognizer');
     if (doScan($log, $eslifRecognizer, 1)) {
         showLocation("After doScan", $log, $eslifRecognizer);
+        showInputLength("After doScan", $log, $eslifRecognizer);
+        showInput("After doScan", $log, $eslifRecognizer);
+        showError("After doScan", $log, $eslifRecognizer);
+        $log->infof("isStartComplete: %s", $eslifRecognizer->isStartComplete());
         if (! $eslifRecognizer->isEof()) {
             if (! $eslifRecognizer->read()) {
                 last;
@@ -1557,6 +1591,7 @@ for (my $i = 0; $i <= $#strings; $i++) {
         }
         my $j = 0;
         while ($eslifRecognizer->isCanContinue()) {
+            $log->infof("isStartComplete: %s", $eslifRecognizer->isStartComplete());
             if (! doResume($log, $eslifRecognizer, 0)) {
                 last;
             }
@@ -1574,16 +1609,16 @@ for (my $i = 0; $i <= $#strings; $i++) {
                     #
                     # Recognizer will wait forever if we do not feed the number
                     #
-                    my $pause = $eslifRecognizer->lexemeLastPause("NUMBER");
+                    my $pause = $eslifRecognizer->nameLastPause("NUMBER");
                     if (! defined($pause)) {
                         BAIL_OUT("Pause before on NUMBER but no pause information!");
                       }
-                    if (! doLexemeRead($log, $eslifRecognizer, "NUMBER", $j, $pause)) {
-                        BAIL_OUT("NUMBER expected but reading such lexeme fails!");
+                    if (! doAlternativeRead($log, $eslifRecognizer, "NUMBER", $j, $pause)) {
+                        BAIL_OUT("NUMBER expected but reading such name fails!");
                     }
                     doDiscardTry($log, $eslifRecognizer);
-                    doLexemeTry($log, $eslifRecognizer, "WHITESPACES");
-                    doLexemeTry($log, $eslifRecognizer, "whitespaces");
+                    doNameTry($log, $eslifRecognizer, "WHITESPACES");
+                    doNameTry($log, $eslifRecognizer, "whitespaces");
                 }
             }
             if ($j == 0) {
@@ -1620,7 +1655,7 @@ sub doScan {
     my $context = "after scan";
     showRecognizerInput($context, $log, $eslifRecognizer);
     showEvents($context, $log, $eslifRecognizer);
-    showLexemeExpected($context, $log, $eslifRecognizer);
+    showNameExpected($context, $log, $eslifRecognizer);
 		
     return 1;
 }
@@ -1628,8 +1663,8 @@ sub doScan {
 sub showRecognizerInput {
     my ($context, $log, $eslifRecognizer) = @_;
 
-    my $input = $eslifRecognizer->input();
-    $log->debugf("[%s] Recognizer buffer:\n%s", $context, $input);
+    my $input = $eslifRecognizer->input(0, 1);
+    $log->debugf("[%s] Recognizer buffer first byte:\n%s", $context, $input);
 }
 
 sub showEvents {
@@ -1638,10 +1673,10 @@ sub showEvents {
     $log->debugf("[%s] Events: %s", $context, $eslifRecognizer->events);
 }
 
-sub showLexemeExpected {
+sub showNameExpected {
     my ($context, $log, $eslifRecognizer) = @_;
 
-    $log->debugf("[%s] Expected lexemes: %s", $context, $eslifRecognizer->lexemeExpected);
+    $log->debugf("[%s] Expected names: %s", $context, $eslifRecognizer->nameExpected);
 }
 
 sub doResume {
@@ -1656,7 +1691,7 @@ sub doResume {
     $context = "after resume";
     showRecognizerInput($context, $log, $eslifRecognizer);
     showEvents($context, $log, $eslifRecognizer);
-    showLexemeExpected($context, $log, $eslifRecognizer);
+    showNameExpected($context, $log, $eslifRecognizer);
 		
     return 1;
 }
@@ -1702,22 +1737,55 @@ sub showLocation {
     }
 }
 
+sub showInputLength {
+    my ($context, $log, $eslifRecognizer)  = @_;
+
+    try {
+        my $inputLength = $eslifRecognizer->inputLength();
+        $log->debugf("[%s] Input length is %d", $context, $inputLength);
+    } catch {
+        $log->warnf("[%s] Location raised an exception, %s", $_);
+    }
+}
+
+sub showInput {
+    my ($context, $log, $eslifRecognizer)  = @_;
+
+    try {
+        my $input = $eslifRecognizer->input(0);
+        $log->debugf("[%s] Input is %s", $context, $input);
+    } catch {
+        $log->warnf("[%s] Location raised an exception, %s", $_);
+    }
+}
+
+sub showError {
+    my ($context, $log, $eslifRecognizer)  = @_;
+
+    try {
+        $log->debugf("[%s] Simulating error report:", $context);
+        $eslifRecognizer->error();
+    } catch {
+        $log->warnf("[%s] Location raised an exception, %s", $_);
+    }
+}
+
 #
 # We replace current NUMBER by the Integer object representing value
 #
-sub doLexemeRead {
+sub doAlternativeRead {
     my ($log, $eslifRecognizer, $symbol, $value, $pause) = @_;
     my $length = length(encode('UTF-8', $pause));
     my $context;
     $log->debugf("... Forcing Integer object for \"%s\" spanned on %d bytes instead of \"%s\"", $value, $length, $pause);
-    if (! $eslifRecognizer->lexemeRead($symbol, int($value), $length, 1)) {
+    if (! $eslifRecognizer->alternativeRead($symbol, int($value), $length, 1)) {
         return 0;
     }
 
-    $context = "after lexemeRead";
+    $context = "after alternativeRead";
     showRecognizerInput($context, $log, $eslifRecognizer);
     showEvents($context, $log, $eslifRecognizer);
-    showLexemeExpected($context, $log, $eslifRecognizer);
+    showNameExpected($context, $log, $eslifRecognizer);
 		
     return 1;
 }
@@ -1730,26 +1798,29 @@ sub doDiscardTry {
         $test = $eslifRecognizer->discardTry();
         $log->debugf("... Testing discard at current position returns %d", $test);
         if ($test) {
-            my $discard = $eslifRecognizer->discardLastTry();
-            $log->debugf("... Testing discard at current position gave \"%s\"", $discard);
+            my $todiscard = $eslifRecognizer->discardLastTry();
+            $log->debugf("... Testing discard at current position gave \"%s\" (%d bytes)", $todiscard, bytes::length($todiscard));
+            my $discardedbytes = $eslifRecognizer->discard();
+            $log->debugf("... Applying discard at current position removed %d bytes, prediction gave '%s' (%d bytes)", $discardedbytes, $todiscard, bytes::length($todiscard));
+            BAIL_OUT("Applying discard at current position removed $discardedbytes bytes != $todiscard bytes as per discardTry!") unless $discardedbytes == bytes::length($todiscard);
         }
     } catch {
         $log->debugf($_);
     }
 }
 
-sub doLexemeTry {
+sub doNameTry {
     my ($log, $eslifRecognizer, $symbol) = @_;
     my $test;
     try {
-        $test = $eslifRecognizer->lexemeTry($symbol);
-        $log->debugf("... Testing %s lexeme at current position returns %d", $symbol, $test);
+        $test = $eslifRecognizer->nameTry($symbol);
+        $log->debugf("... Testing %s name at current position returns %d", $symbol, $test);
         if ($test) {
-            my $try = $eslifRecognizer->lexemeLastTry($symbol);
+            my $try = $eslifRecognizer->nameLastTry($symbol);
             $log->debugf("... Testing symbol %s at current position gave \"%s\"", $symbol, $try);
         }
     } catch {
-        # Because we test with a symbol that is not a lexeme, and that raises an exception
+        # Because we test with a symbol that is not a name, and that raises an exception
         $log->debugf($_);
     }
 }
@@ -1810,8 +1881,8 @@ Expression ::=
    ||     Expression  '+' Expression                                             name => 'Expression is +'
     |     Expression  '-' Expression                                             name => 'Expression is -'
 
-:lexeme ::= NUMBER pause => before event => ^NUMBER symbol-action => perl_number priority => 1 if-action => ::lua->test_if_action
-:lexeme ::= NUMBER pause => after  event => NUMBER$ priority => 0
+:symbol ::= NUMBER pause => before event => ^NUMBER symbol-action => perl_number priority => 1 if-action => ::lua->test_if_action
+:symbol ::= NUMBER pause => after  event => NUMBER$ priority => 0 verbose => 0
 
 :default ~ regex-action => RegexAction
 
@@ -1824,10 +1895,10 @@ comment ::= /(?:(?:(?:\/\/)(?:[^\n]*)(?:\n|\z))|(?:(?:\/\*)(?:(?:[^\*]+|\*(?!\/)
 function test_if_action(lexeme)
   return true
 end
-function lua_regexAction(callout)
-  print('Lua regex callback: '..tostring(callout))
-  print('... Callout number: '..tostring(callout['callout_number']))
-  print('... Callout string: '..tostring(callout['callout_string']))
+function lua_regexAction(block)
+  print('Lua regex callback: '..tostring(block))
+  print('... Callout number: '..tostring(block:getCalloutNumber()))
+  print('... Callout string: '..tostring(block:getCalloutString()))
   return 0
 end
 </luascript>

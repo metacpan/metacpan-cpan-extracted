@@ -6,8 +6,7 @@
 
 #include "spvm_compiler.h"
 #include "spvm_yacc_util.h"
-#include "spvm_compiler_allocator.h"
-#include "spvm_util_allocator.h"
+#include "spvm_allocator.h"
 #include "spvm_yacc.h"
 #include "spvm_constant.h"
 #include "spvm_var.h"
@@ -35,14 +34,14 @@ void SPVM_yyerror(SPVM_COMPILER* compiler, const char* message) {
     ptr++;
   }
   
-  char* token = (char*) SPVM_UTIL_ALLOCATOR_safe_malloc_zero(length + 1);
+  char* token = (char*) SPVM_ALLOCATOR_new_block_compile_tmp(compiler, length + 1);
   memcpy(token, compiler->befbufptr + empty_count, length);
   token[length] = '\0';
   
   int32_t char_pos = (int32_t)(compiler->befbufptr + empty_count + 1 - compiler->line_start_ptr);
   
   fprintf(stderr, "[CompileError]Unexpected token \"%s\" at %s line %d:%d\n", token, compiler->cur_file, compiler->cur_line, char_pos);
-  free(token);
+  SPVM_ALLOCATOR_free_block_compile_tmp(compiler, token);
 }
 
 // Print token value for debug

@@ -29,6 +29,7 @@
             "Test::Pod::Coverage" : "1.08"
          },
          "x_features_from" : {
+            "Module::Features::PerlTrove" : "0",
             "Module::Features::TextTable" : "0"
          },
          "x_spec" : {
@@ -86,163 +87,163 @@
    "provides" : {
       "BorderStyle::Text::ANSITable::OldCompat::Default::bold" : {
          "file" : "lib/BorderStyle/Text/ANSITable/OldCompat/Default/bold.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "BorderStyle::Text::ANSITable::OldCompat::Default::brick" : {
          "file" : "lib/BorderStyle/Text/ANSITable/OldCompat/Default/brick.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "BorderStyle::Text::ANSITable::OldCompat::Default::bricko" : {
          "file" : "lib/BorderStyle/Text/ANSITable/OldCompat/Default/bricko.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "BorderStyle::Text::ANSITable::OldCompat::Default::csingle" : {
          "file" : "lib/BorderStyle/Text/ANSITable/OldCompat/Default/csingle.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "BorderStyle::Text::ANSITable::OldCompat::Default::double" : {
          "file" : "lib/BorderStyle/Text/ANSITable/OldCompat/Default/double.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "BorderStyle::Text::ANSITable::OldCompat::Default::none_ascii" : {
          "file" : "lib/BorderStyle/Text/ANSITable/OldCompat/Default/none_ascii.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "BorderStyle::Text::ANSITable::OldCompat::Default::none_boxchar" : {
          "file" : "lib/BorderStyle/Text/ANSITable/OldCompat/Default/none_boxchar.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "BorderStyle::Text::ANSITable::OldCompat::Default::none_utf8" : {
          "file" : "lib/BorderStyle/Text/ANSITable/OldCompat/Default/none_utf8.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "BorderStyle::Text::ANSITable::OldCompat::Default::single_ascii" : {
          "file" : "lib/BorderStyle/Text/ANSITable/OldCompat/Default/single_ascii.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "BorderStyle::Text::ANSITable::OldCompat::Default::single_boxchar" : {
          "file" : "lib/BorderStyle/Text/ANSITable/OldCompat/Default/single_boxchar.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "BorderStyle::Text::ANSITable::OldCompat::Default::single_utf8" : {
          "file" : "lib/BorderStyle/Text/ANSITable/OldCompat/Default/single_utf8.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "BorderStyle::Text::ANSITable::OldCompat::Default::singleh_ascii" : {
          "file" : "lib/BorderStyle/Text/ANSITable/OldCompat/Default/singleh_ascii.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "BorderStyle::Text::ANSITable::OldCompat::Default::singleh_boxchar" : {
          "file" : "lib/BorderStyle/Text/ANSITable/OldCompat/Default/singleh_boxchar.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "BorderStyle::Text::ANSITable::OldCompat::Default::singleh_utf8" : {
          "file" : "lib/BorderStyle/Text/ANSITable/OldCompat/Default/singleh_utf8.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "BorderStyle::Text::ANSITable::OldCompat::Default::singlei_ascii" : {
          "file" : "lib/BorderStyle/Text/ANSITable/OldCompat/Default/singlei_ascii.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "BorderStyle::Text::ANSITable::OldCompat::Default::singlei_boxchar" : {
          "file" : "lib/BorderStyle/Text/ANSITable/OldCompat/Default/singlei_boxchar.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "BorderStyle::Text::ANSITable::OldCompat::Default::singlei_utf8" : {
          "file" : "lib/BorderStyle/Text/ANSITable/OldCompat/Default/singlei_utf8.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "BorderStyle::Text::ANSITable::OldCompat::Default::singleo_ascii" : {
          "file" : "lib/BorderStyle/Text/ANSITable/OldCompat/Default/singleo_ascii.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "BorderStyle::Text::ANSITable::OldCompat::Default::singleo_boxchar" : {
          "file" : "lib/BorderStyle/Text/ANSITable/OldCompat/Default/singleo_boxchar.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "BorderStyle::Text::ANSITable::OldCompat::Default::singleo_utf8" : {
          "file" : "lib/BorderStyle/Text/ANSITable/OldCompat/Default/singleo_utf8.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "BorderStyle::Text::ANSITable::OldCompat::Default::singlev_ascii" : {
          "file" : "lib/BorderStyle/Text/ANSITable/OldCompat/Default/singlev_ascii.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "BorderStyle::Text::ANSITable::OldCompat::Default::singlev_boxchar" : {
          "file" : "lib/BorderStyle/Text/ANSITable/OldCompat/Default/singlev_boxchar.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "BorderStyle::Text::ANSITable::OldCompat::Default::singlev_utf8" : {
          "file" : "lib/BorderStyle/Text/ANSITable/OldCompat/Default/singlev_utf8.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "BorderStyle::Text::ANSITable::OldCompat::Default::space_ascii" : {
          "file" : "lib/BorderStyle/Text/ANSITable/OldCompat/Default/space_ascii.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "BorderStyle::Text::ANSITable::OldCompat::Default::space_boxchar" : {
          "file" : "lib/BorderStyle/Text/ANSITable/OldCompat/Default/space_boxchar.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "BorderStyle::Text::ANSITable::OldCompat::Default::space_utf8" : {
          "file" : "lib/BorderStyle/Text/ANSITable/OldCompat/Default/space_utf8.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "BorderStyle::Text::ANSITable::OldCompat::Default::spacei_ascii" : {
          "file" : "lib/BorderStyle/Text/ANSITable/OldCompat/Default/spacei_ascii.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "BorderStyle::Text::ANSITable::OldCompat::Default::spacei_boxchar" : {
          "file" : "lib/BorderStyle/Text/ANSITable/OldCompat/Default/spacei_boxchar.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "BorderStyle::Text::ANSITable::OldCompat::Default::spacei_utf8" : {
          "file" : "lib/BorderStyle/Text/ANSITable/OldCompat/Default/spacei_utf8.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "ColorTheme::Text::ANSITable::OldCompat::Default::default_gradation" : {
          "file" : "lib/ColorTheme/Text/ANSITable/OldCompat/Default/default_gradation.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "ColorTheme::Text::ANSITable::OldCompat::Default::default_gradation_whitebg" : {
          "file" : "lib/ColorTheme/Text/ANSITable/OldCompat/Default/default_gradation_whitebg.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "ColorTheme::Text::ANSITable::OldCompat::Default::default_nogradation" : {
          "file" : "lib/ColorTheme/Text/ANSITable/OldCompat/Default/default_nogradation.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "ColorTheme::Text::ANSITable::OldCompat::Default::default_nogradation_whitebg" : {
          "file" : "lib/ColorTheme/Text/ANSITable/OldCompat/Default/default_nogradation_whitebg.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "ColorTheme::Text::ANSITable::OldCompat::Default::no_color" : {
          "file" : "lib/ColorTheme/Text/ANSITable/OldCompat/Default/no_color.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "ColorTheme::Text::ANSITable::Standard::Gradation" : {
          "file" : "lib/ColorTheme/Text/ANSITable/Standard/Gradation.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "ColorTheme::Text::ANSITable::Standard::GradationWhiteBG" : {
          "file" : "lib/ColorTheme/Text/ANSITable/Standard/GradationWhiteBG.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "ColorTheme::Text::ANSITable::Standard::NoGradation" : {
          "file" : "lib/ColorTheme/Text/ANSITable/Standard/NoGradation.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "ColorTheme::Text::ANSITable::Standard::NoGradationWhiteBG" : {
          "file" : "lib/ColorTheme/Text/ANSITable/Standard/NoGradationWhiteBG.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "Text::ANSITable" : {
          "file" : "lib/Text/ANSITable.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       },
       "Text::ANSITable::StyleSet::AltRow" : {
          "file" : "lib/Text/ANSITable/StyleSet/AltRow.pm",
-         "version" : "0.606"
+         "version" : "0.607"
       }
    },
    "release_status" : "stable",
@@ -257,7 +258,7 @@
          "web" : "https://github.com/perlancar/perl-Text-ANSITable"
       }
    },
-   "version" : "0.606",
+   "version" : "0.607",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

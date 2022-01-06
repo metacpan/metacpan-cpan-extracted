@@ -65,7 +65,7 @@
    "provides" : {
       "Device::Chip::Adapter::LinuxKernel" : {
          "file" : "lib/Device/Chip/Adapter/LinuxKernel.pm",
-         "version" : "0.00004"
+         "version" : "0.00005"
       }
    },
    "release_status" : "stable",
@@ -79,7 +79,7 @@
          "web" : "https://github.com/simcop2387/device-chip-adapter-linuxkernel"
       }
    },
-   "version" : "0.00004",
+   "version" : "0.00005",
    "x_generated_by_perl" : "v5.32.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.23",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

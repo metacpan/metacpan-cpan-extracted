@@ -1,79 +1,79 @@
 {
-   "dynamic_config" : 1,
+   "version" : "0.28",
+   "author" : [
+      "H.Merijn Brand <h.m.brand@xs4all.nl>"
+      ],
    "resources" : {
       "bugtracker" : {
          "web" : "https://github.com/Tux/speedtest/issues"
          },
-      "homepage" : "https://metacpan.org/pod/App::SpeedTest",
       "repository" : {
-         "type" : "git",
+         "url" : "https://github.com/Tux/speedtest",
          "web" : "https://github.com/Tux/speedtest",
-         "url" : "https://github.com/Tux/speedtest"
+         "type" : "git"
          },
+      "homepage" : "https://metacpan.org/pod/App::SpeedTest",
       "x_IRC" : "irc://irc.perl.org/#csv",
       "license" : [
          "http://dev.perl.org/licenses/"
          ]
       },
    "meta-spec" : {
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : 2,
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
       },
-   "license" : [
-      "perl_5"
-      ],
-   "abstract" : "Command line interface to speedtest.net",
+   "dynamic_config" : 1,
+   "name" : "App-SpeedTest",
    "prereqs" : {
+      "runtime" : {
+         "recommends" : {
+            "XML::Simple" : "2.25",
+            "Text::CSV_XS" : "1.47",
+            "Socket" : "2.032",
+            "LWP::UserAgent" : "6.60",
+            "HTML::TreeBuilder" : "5.07",
+            "Time::HiRes" : "1.9767",
+            "Data::Peek" : "0.50",
+            "Getopt::Long" : "2.52"
+            },
+         "requires" : {
+            "Socket" : "0",
+            "LWP::UserAgent" : "0",
+            "List::Util" : "0",
+            "Getopt::Long" : "0",
+            "Data::Peek" : "0",
+            "XML::Simple" : "0",
+            "perl" : "5.010000",
+            "Data::Dumper" : "0",
+            "HTML::TreeBuilder" : "0",
+            "Math::Trig" : "0",
+            "Time::HiRes" : "0"
+            }
+         },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
             }
          },
-      "runtime" : {
-         "requires" : {
-            "Getopt::Long" : "0",
-            "Math::Trig" : "0",
-            "Time::HiRes" : "0",
-            "List::Util" : "0",
-            "perl" : "5.010000",
-            "Data::Peek" : "0",
-            "LWP::UserAgent" : "0",
-            "Socket" : "0",
-            "XML::Simple" : "0",
-            "HTML::TreeBuilder" : "0",
-            "Data::Dumper" : "0"
-            },
-         "recommends" : {
-            "Time::HiRes" : "1.9764",
-            "Getopt::Long" : "2.52",
-            "Text::CSV_XS" : "1.44",
-            "LWP::UserAgent" : "6.50",
-            "Data::Peek" : "0.49",
-            "Socket" : "2.030",
-            "XML::Simple" : "2.25",
-            "HTML::TreeBuilder" : "5.07"
-            }
-         },
       "test" : {
+         "recommends" : {
+            "Test::More" : "1.302188"
+            },
          "requires" : {
             "Test::More" : "0"
-            },
-         "recommends" : {
-            "Test::More" : "1.302183"
             }
          }
       },
+   "release_status" : "stable",
+   "license" : [
+      "perl_5"
+      ],
+   "generated_by" : "Author",
+   "abstract" : "Command line interface to speedtest.net",
    "provides" : {
       "App::SpeedTest" : {
-         "version" : "0.27",
+         "version" : "0.28",
          "file" : "speedtest"
          }
-      },
-   "generated_by" : "Author",
-   "author" : [
-      "H.Merijn Brand <h.m.brand@xs4all.nl>"
-      ],
-   "name" : "App-SpeedTest",
-   "version" : "0.27",
-   "release_status" : "stable"
+      }
    }

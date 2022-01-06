@@ -6,6 +6,29 @@
 #include <genericStack.h>
 #include <genericHash/cloak.h>
 
+/* ====================================================================== */
+/* gcc family has the __builtin_expect that optimizes branch prediction.  */
+/* This is off by default, but you can set the macros                     */
+/* GENERICHASH_LIKELY and GENERICHASH_UNLIKELY to handle that.            */
+/* The use case is to set likely macros only on the inner thing, i.e.     */
+/* genericStack. So the genericHash likely macros by default inherit from */
+/* genericStack likely macros.                                            */
+/* ====================================================================== */
+#ifndef GENERICHASH_LIKELY
+#  ifdef GENERICSTACK_LIKELY
+#    define GENERICHASH_LIKELY(x) GENERICSTACK_LIKELY(x)
+#  else
+#    define GENERICHASH_LIKELY(x) x
+#  endif
+#endif
+#ifndef GENERICHASH_UNLIKELY
+#  ifdef GENERICSTACK_UNLIKELY
+#    define GENERICHASH_UNLIKELY(x) GENERICSTACK_UNLIKELY(x)
+#  else
+#    define GENERICHASH_UNLIKELY(x) x
+#  endif
+#endif
+
 /* A hash is nothing else but a generic stack of generic stacks */
 
 typedef int    (*genericHashKeyIndFunction_t)(void *userDatavp, genericStackItemType_t itemType, void **pp);
@@ -62,11 +85,11 @@ typedef struct genericHash {
     genericHashValCopyFunction_t _valCopyFunctionp = (genericHashValCopyFunction_t) (thisValCopyFunctionp); \
     genericHashValFreeFunction_t _valFreeFunctionp = (genericHashValFreeFunction_t) (thisValFreeFunctionp); \
     									\
-    if (_keyIndFunctionp == NULL) {                                     \
+    if (GENERICHASH_UNLIKELY(_keyIndFunctionp == NULL)) {               \
       hashName = NULL;                                                  \
     } else {                                                            \
       hashName = (genericHash_t *) malloc(sizeof(genericHash_t));	\
-      if (hashName != NULL) {						\
+      if (GENERICHASH_LIKELY(hashName != NULL)) {                       \
         hashName->wantedSubSize    = (thisWantedSubSize);               \
         hashName->keyIndFunctionp  = _keyIndFunctionp;			\
         hashName->keyCmpFunctionp  = _keyCmpFunctionp;			\
@@ -106,7 +129,7 @@ typedef struct genericHash {
     hashName->error = 0;						\
     hashName->used = 0;							\
     									\
-    if (_keyIndFunctionp == NULL) {                                     \
+    if (GENERICHASH_UNLIKELY(_keyIndFunctionp == NULL)) {               \
       hashName->error = 1;						\
     } else {                                                            \
       hashName->wantedSubSize    = (thisWantedSubSize);			\
@@ -152,7 +175,7 @@ typedef struct genericHash {
       if (hashName->keyCopyFunctionp != NULL) {                         \
         GENERICSTACKITEMTYPE2TYPE_##keyType _keyValForCopy = (keyVal);  \
         GENERICSTACKITEMTYPE2TYPE_##keyType _p = hashName->keyCopyFunctionp((void *) userDatavp, &_keyValForCopy); \
-        if ((_keyValForCopy != NULL) && (_p == NULL)) {			\
+        if (GENERICHASH_UNLIKELY((_keyValForCopy != NULL) && (_p == NULL))) { \
           hashName->error = 1;						\
         } else {                                                        \
           keyValCopy = _p;                                              \
@@ -167,7 +190,7 @@ typedef struct genericHash {
       if (hashName->valCopyFunctionp != NULL) {                         \
         GENERICSTACKITEMTYPE2TYPE_##valType _valValForCopy = (valVal);  \
         GENERICSTACKITEMTYPE2TYPE_##valType _p = hashName->valCopyFunctionp((void *) userDatavp, &_valValForCopy); \
-        if ((_valValForCopy != NULL) && (_p == NULL)) {                 \
+        if (GENERICHASH_UNLIKELY((_valValForCopy != NULL) && (_p == NULL))) { \
           hashName->error = 1;						\
         } else {                                                        \
           valValCopy = _p;                                              \
@@ -188,7 +211,7 @@ typedef struct genericHash {
     GENERICSTACKITEMTYPE2TYPE_##valType _valValCopy;			\
 									\
     _GENERICHASH_COPY(hashName, userDatavp, keyType, keyVal, _keyValCopy, valType, valVal, _valValCopy); \
-    if (hashName->error == 0) {						\
+    if (GENERICHASH_LIKELY(hashName->error == 0)) {                     \
       GENERICSTACK_PUSH_##keyType(subKeyStackp, _keyValCopy);		\
       GENERICSTACK_PUSH_##valType(subValStackp, _valValCopy);		\
       if (GENERICSTACK_ERROR(subKeyStackp) || GENERICSTACK_ERROR(subValStackp)) { \
@@ -207,7 +230,7 @@ typedef struct genericHash {
     GENERICSTACKITEMTYPE2TYPE_##valType _valValCopy;			\
 									\
     _GENERICHASH_COPY(hashName, userDatavp, keyType, keyVal, _keyValCopy, valType, valVal, _valValCopy); \
-    if (hashName->error == 0) {						\
+    if (GENERICHASH_LIKELY(hashName->error == 0)) {                     \
       GENERICSTACK_SET_##keyType(subKeyStackp, _keyValCopy, index);	\
       GENERICSTACK_SET_##valType(subValStackp, _valValCopy, index);	\
       if (GENERICSTACK_ERROR(subKeyStackp) || GENERICSTACK_ERROR(subValStackp)) { \
@@ -230,7 +253,7 @@ typedef struct genericHash {
     GENERICSTACKITEMTYPE2TYPE_##keyType _keyVal = (GENERICSTACKITEMTYPE2TYPE_##keyType) (keyVal); \
     hashName->error = 0;						\
 									\
-    if (subStackIndex < 0 ) {                                           \
+    if (GENERICHASH_UNLIKELY(subStackIndex < 0)) {                      \
       errno = EINVAL;							\
       hashName->error = 1;						\
     } else {								\
@@ -267,6 +290,8 @@ typedef struct genericHash {
 	int             _subStackusedi = GENERICSTACK_USED(_subKeyStackp); \
 	int             _i;						\
         short           _valFreeFunctionb = (hashName->valFreeFunctionp != NULL); \
+        short           _keyCmpFunctionb = (hashName->keyCmpFunctionp != NULL); \
+        short           _keyFreeFunctionb = (hashName->keyFreeFunctionp != NULL); \
 									\
 	for (_i = 0; _i < _subStackusedi; _i++) {			\
 	  GENERICSTACKITEMTYPE2TYPE_##keyType _gotKeyVal;		\
@@ -277,7 +302,6 @@ typedef struct genericHash {
 	  _gotKeyVal = GENERICSTACK_GET_##keyType(_subKeyStackp, _i);	\
           GENERICHASH_IIF(GENERICHASH_EQUAL(keyType, PTR)) (            \
             {                                                           \
-              short _keyCmpFunctionb = (hashName->keyCmpFunctionp != NULL); \
               if (_keyCmpFunctionb) {                                   \
                 if (! hashName->keyCmpFunctionp((void *) userDatavp, &_keyVal, &_gotKeyVal)) { \
                   continue;                                             \
@@ -296,7 +320,6 @@ typedef struct genericHash {
 									\
           GENERICHASH_IIF(GENERICHASH_EQUAL(keyType, PTR)) (            \
             {                                                           \
-              short _keyFreeFunctionb = (hashName->keyFreeFunctionp != NULL); \
               if (_keyFreeFunctionb && (_gotKeyVal != NULL)) {          \
                 hashName->keyFreeFunctionp((void *) userDatavp, &_gotKeyVal); \
               }								\
@@ -325,7 +348,7 @@ typedef struct genericHash {
 /* ====================================================================== */
 #define _GENERICHASH_FIND_REMOVE(hashName, userDatavp, keyType, keyVal, valType, valValp, findResult, remove) do { \
 									\
-    if (hashName->keyIndFunctionp == NULL) {				\
+    if (GENERICHASH_UNLIKELY(hashName->keyIndFunctionp == NULL)) {      \
       errno = EINVAL;							\
       hashName->error = 1;						\
     } else {								\
@@ -336,7 +359,7 @@ typedef struct genericHash {
 
 #define _GENERICHASH_FIND_REMOVE_BY_IND(hashName, userDatavp, keyType, keyVal, valType, valValp, findResult, _subStackIndex, remove) do { \
 									\
-    if (_subStackIndex < 0) {						\
+    if (GENERICHASH_UNLIKELY(_subStackIndex < 0)) {                     \
       errno = EINVAL;							\
       hashName->error = 1;						\
     } else {								\
@@ -349,6 +372,8 @@ typedef struct genericHash {
 	genericStack_t *_subValStackp = (genericStack_t *) GENERICSTACK_GET_PTR(hashName->valStackp, _subStackIndex); \
 	int             _subStackusedi = GENERICSTACK_USED(_subKeyStackp); \
         short           _valFreeFunctionb = (hashName->valFreeFunctionp != NULL); \
+        short           _keyCmpFunctionb = (hashName->keyCmpFunctionp != NULL); \
+        short           _keyFreeFunctionb = (hashName->keyFreeFunctionp != NULL); \
 	int _i;								\
 									\
 	for (_i = 0; _i < _subStackusedi; _i++) {			\
@@ -361,7 +386,6 @@ typedef struct genericHash {
 	  _gotKeyVal = GENERICSTACK_GET_##keyType(_subKeyStackp, _i);	\
           GENERICHASH_IIF(GENERICHASH_EQUAL(keyType, PTR)) (            \
             {                                                           \
-              short _keyCmpFunctionb = (hashName->keyCmpFunctionp != NULL); \
               if (_keyCmpFunctionb && (GENERICSTACKITEMTYPE_##keyType == GENERICSTACKITEMTYPE_PTR)) { \
                 if (! hashName->keyCmpFunctionp((void *) userDatavp, (void **) &keyVal, (void **) &_gotKeyVal)) { \
                   continue;                                             \
@@ -386,7 +410,6 @@ typedef struct genericHash {
 	  if (remove) {							\
             GENERICHASH_IIF(GENERICHASH_EQUAL(keyType, PTR)) (          \
 	      {                                                         \
-                short _keyFreeFunctionb = (hashName->keyFreeFunctionp != NULL); \
                 if (_keyFreeFunctionb && (_gotKeyVal != NULL)) {        \
                   hashName->keyFreeFunctionp((void *) userDatavp, &_gotKeyVal); \
                 }                                                       \
@@ -490,7 +513,7 @@ typedef struct genericHash {
   } while (0)
 
 #define GENERICHASH_FREE(hashName, userDatavp) do {                     \
-    if (hashName != NULL) {						\
+    if (GENERICHASH_LIKELY(hashName != NULL)) {                         \
       _GENERICHASH_DISPOSE(hashName, userDatavp, 1 /* freeb */, 0 /* relaxb */, 0 /* resetb */); \
       free(hashName);							\
       hashName = NULL;							\

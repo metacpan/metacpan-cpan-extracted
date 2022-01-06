@@ -5,7 +5,7 @@ package Chart::GGPlot::Guide::Colorbar;
 use Chart::GGPlot::Setup;
 use Class::Method::Modifiers;
 
-our $VERSION = '0.0016'; # VERSION
+our $VERSION = '0.002000'; # VERSION
 
 use Data::Frame;
 
@@ -87,7 +87,7 @@ Chart::GGPlot::Guide::Colorbar - Colorbar guide
 
 =head1 VERSION
 
-version 0.0016
+version 0.002000
 
 =head1 ATTRIBUTES
 

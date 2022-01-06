@@ -1,11 +1,7 @@
-#! perl -w
+#! perl -I. -w
 use utf8;
-use strict;
-
-use lib 't/lib';
-
 use Test::Tester;
-use Test::More;
+use t::Test::abeltje;
 
 use Test::DBIC::SQLite;
 
@@ -16,11 +12,20 @@ use Test::DBIC::SQLite;
         },
         {
             ok   => 1,
-            name => ':memory: ISA DummySchema',
+            name => 'the schema ISA DummySchema',
         },
         "connect_dbic_sqlite_ok()"
     );
+    check_test(
+        sub { drop_dbic_sqlite_ok(); },
+        {
+            ok => 1,
+            name => ':memory: DROPPED',
+        },
+        "drop_dbic_sqlite_ok()"
+    );
 }
+
 {
     my $dbname = $0;
     my $schema;
@@ -32,7 +37,7 @@ use Test::DBIC::SQLite;
         },
         {
             ok => 1,
-            name => "$dbname ISA DummySchema",
+            name => "the schema ISA DummySchema",
         },
         "connect_dbic_sqlite_ok($dbname)"
     );
@@ -49,7 +54,7 @@ use Test::DBIC::SQLite;
         },
         {
             ok => 1,
-            name => "$dbname ISA DummySchema",
+            name => "the schema ISA DummySchema",
         },
         "connect_dbic_sqlite_ok($dbname)"
     );
@@ -65,8 +70,7 @@ use Test::DBIC::SQLite;
     like(
         $premature,
         qr{Error\ loading\ 'DummyNocompile':
-          \ «DummyNocompile.pm\ did\ not\ return\ a\ true\ value
-          \ at\ \(eval\ \d+\)\ line\ \d+.\n»\n}x,
+          \ DummyNocompile.pm\ did\ not\ return\ a\ true\ value}x,
         "require DummyNoCompile; fails"
     );
 }
@@ -77,9 +81,9 @@ use Test::DBIC::SQLite;
             my $schema = connect_dbic_sqlite_ok('DummyNoconnect');
         }
     );
-    is(
+    like(
         $premature,
-        "Error connecting DummyNoconnect to :memory:: «No connect\n»\n",
+        qr{Error connecting 'DummyNoconnect' to 'dbi:SQLite:dbname=:memory:'},
         "DummyNoconnect->connect(); fails"
     );
 }
@@ -94,7 +98,7 @@ use Test::DBIC::SQLite;
     );
     like(
         $premature,
-        qr{Error deploying DummySchema to :memory:: «no deploy at $0 line \d+.\n»\n},
+        qr{Error deploying 'DummySchema' to 'dbi:SQLite:dbname=:memory:': no deploy},
         "DummySchema->deploy(); fails"
     );
 }
@@ -108,7 +112,7 @@ use Test::DBIC::SQLite;
     );
     like(
         $premature,
-        qr{Error in callback: «error in callback at $0 line \d+.\n»\n},
+        qr{Error in post-connect-hook: error in callback at $0},
         "calling callback fails"
     );
 }
@@ -121,10 +125,28 @@ use Test::DBIC::SQLite;
         },
         {
             ok   => 1,
-            name => ':memory: ISA DummySchema',
+            name => 'the schema ISA DummySchema',
         },
         "connect_dbic_sqlite_ok()"
      );
 }
-done_testing();
 
+{
+    my ($premature, @results) = run_tests(
+        sub {
+            local $Test::Builder::Level = $Test::Builder::Level + 1;
+            my $t = Test::DBIC::SQLite->new(
+                schema_class => 'DummySchema',
+                pre_deploy_hook => sub { die "In-PreDeployHook\n" },
+            );
+            my $schema = $t->connect_dbic_ok();
+        },
+    );
+    like(
+        $premature,
+        qr{^Error in pre-deploy-hook: In-PreDeployHook},
+        "Premature test fail in pre-deploy-hook"
+    );
+}
+
+abeltje_done_testing();

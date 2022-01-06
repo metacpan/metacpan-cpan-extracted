@@ -1,3 +1,11 @@
+0.05 2022-01-06T14:48:31+01:00
+ - Add test for constructor.
+ - Add test for help.
+ - Improve help message.
+ - Move argument processing to run() method.
+ - Regen example.
+ - Update copyright years.
+
 0.04 2021-06-28T15:16:30+02:00
  - Add exit code do run() method.
  - Add second example with color output.

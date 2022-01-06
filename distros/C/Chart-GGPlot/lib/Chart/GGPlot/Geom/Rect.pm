@@ -6,7 +6,7 @@ use Chart::GGPlot::Class qw(:pdl);
 use namespace::autoclean;
 use MooseX::Singleton;
 
-our $VERSION = '0.0016'; # VERSION
+our $VERSION = '0.002000'; # VERSION
 
 use Chart::GGPlot::Aes;
 use Chart::GGPlot::Util qw(NA);
@@ -96,7 +96,7 @@ Chart::GGPlot::Geom::Rect - Class for rect geom
 
 =head1 VERSION
 
-version 0.0016
+version 0.002000
 
 =head1 SEE ALSO
 

@@ -18,7 +18,6 @@
 #include "spvm_compiler.h"
 #include "spvm_hash.h"
 #include "spvm_list.h"
-#include "spvm_util_allocator.h"
 #include "spvm_op.h"
 #include "spvm_method.h"
 #include "spvm_class.h"
@@ -34,7 +33,7 @@
 #include "spvm_string_buffer.h"
 #include "spvm_use.h"
 #include "spvm_limit.h"
-#include "spvm_compiler_allocator.h"
+#include "spvm_allocator.h"
 #include "spvm_my.h"
 
 static const char* MFILE = "SPVM.xs";
@@ -3379,7 +3378,7 @@ _new_mulnum_array_from_bin(...)
 }
 
 SV*
-_get_exception(...)
+get_exception(...)
   PPCODE:
 {
   (void)RETVAL;
@@ -3393,10 +3392,8 @@ _get_exception(...)
   
   SV* sv_exception;
   if (str_exception) {
-    const char* exception_chars = env->get_chars(env, str_exception);
-    int32_t length = env->length(env, str_exception);
-    
-    sv_exception = sv_2mortal(newSVpv(exception_chars, length));
+    env->inc_ref_count(env, str_exception);
+    sv_exception = SPVM_XS_UTIL_new_sv_object(env, str_exception, "SPVM::BlessedObject::String");
   }
   else {
     sv_exception = &PL_sv_undef;
@@ -3417,13 +3414,13 @@ _set_exception(...)
   
   // Env
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
-  
+
   if (SvOK(sv_exception)) {
-    const char* exception = SvPV_nolen(sv_exception);
-    int32_t length = (int32_t)sv_len(sv_exception);
-    
-    void* str_exception = env->new_string_raw(env, exception, length);
-    env->set_exception(env, str_exception);
+    if (!(sv_isobject(sv_exception) && sv_derived_from(sv_exception, "SPVM::BlessedObject::String"))) {
+      croak("The argument must be a SPVM::BlessedObject::String object");
+    }
+    SPVM_OBJECT* exception = SPVM_XS_UTIL_get_object(sv_exception);
+    env->set_exception(env, exception);
   }
   else {
     env->set_exception(env, NULL);
@@ -3520,12 +3517,12 @@ compile_spvm(...)
   
   // Name
   const char* name = SvPV_nolen(sv_name);
-  char* name_copy = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, sv_len(sv_name) + 1);
+  char* name_copy = SPVM_ALLOCATOR_new_block_compile_eternal(compiler, sv_len(sv_name) + 1);
   memcpy(name_copy, name, sv_len(sv_name));
   
   // File
   const char* file = SvPV_nolen(sv_file);
-  char* file_copy = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, sv_len(sv_file) + 1);
+  char* file_copy = SPVM_ALLOCATOR_new_block_compile_eternal(compiler, sv_len(sv_file) + 1);
   memcpy(file_copy, file, sv_len(sv_file));
   
   // Line
@@ -3556,10 +3553,10 @@ compile_spvm(...)
 
   // Compile SPVM
   compiler->cur_class_base = compiler->classes->length;
-  SPVM_COMPILER_compile(compiler);
+  int32_t compile_error = SPVM_COMPILER_compile(compiler);
   
   SV* sv_compile_success;
-  if (compiler->error_count > 0) {
+  if (compile_error) {
     sv_compile_success = sv_2mortal(newSViv(0));
   }
   else {
@@ -3739,10 +3736,9 @@ get_added_class_names(...)
   AV* av_added_class_names = (AV*)sv_2mortal((SV*)newAV());
   SV* sv_added_class_names = sv_2mortal(newRV_inc((SV*)av_added_class_names));
   
-  for (int32_t added_class_index = 0; added_class_index < compiler->added_classes->length; added_class_index++) {
-    SPVM_CLASS* added_class = SPVM_LIST_fetch(compiler->added_classes, added_class_index);
-    const char* added_class_name = added_class->name;
-    if (!added_class->is_anon) {
+  for (int32_t added_class_index = 0; added_class_index < compiler->added_class_names->length; added_class_index++) {
+    const char* added_class_name = SPVM_LIST_fetch(compiler->added_class_names, added_class_index);
+    if (!strstr(added_class_name, "::anon")) {
       SV* sv_added_class_name = sv_2mortal(newSVpv(added_class_name, 0));
       av_push(av_added_class_names, SvREFCNT_inc(sv_added_class_name));
     }
@@ -3770,9 +3766,8 @@ get_added_class_names_including_anon(...)
   AV* av_added_class_names = (AV*)sv_2mortal((SV*)newAV());
   SV* sv_added_class_names = sv_2mortal(newRV_inc((SV*)av_added_class_names));
   
-  for (int32_t added_class_index = 0; added_class_index < compiler->added_classes->length; added_class_index++) {
-    SPVM_CLASS* added_class = SPVM_LIST_fetch(compiler->added_classes, added_class_index);
-    const char* added_class_name = added_class->name;
+  for (int32_t added_class_index = 0; added_class_index < compiler->added_class_names->length; added_class_index++) {
+    const char* added_class_name = SPVM_LIST_fetch(compiler->added_class_names, added_class_index);
     SV* sv_added_class_name = sv_2mortal(newSVpv(added_class_name, 0));
     av_push(av_added_class_names, SvREFCNT_inc(sv_added_class_name));
   }
@@ -3830,7 +3825,7 @@ get_module_source(...)
 
   // Copy class load path to builder
   SV* sv_module_source;
-  const char* module_source = SPVM_HASH_fetch(compiler->module_source_symtable, class_name, strlen(class_name));
+  const char* module_source = SPVM_HASH_fetch(compiler->embedded_module_source_symtable, class_name, strlen(class_name));
   if (module_source) {
     sv_module_source = sv_2mortal(newSVpv(module_source, 0));
   }
@@ -3899,8 +3894,6 @@ _init(...)
   SV* sviv_env = sv_2mortal(newSViv(iv_env));
   SV* sv_env = sv_2mortal(newRV_inc(sviv_env));
   (void)hv_store(hv_self, "env", strlen("env"), SvREFCNT_inc(sv_env), 0);
-  
-  SPVM_API_call_init_blocks(env);
 }
 
 SV*
@@ -3969,10 +3962,13 @@ DESTROY(...)
   SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
   if (SvOK(sv_env)) {
     SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
-    SPVM_COMPILER* compiler = env->compiler;
-    
-    SPVM_API_free_env(env);
+    env->free_env(env);
   }
+
+  SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
+  SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
+  SPVM_COMPILER* compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
+  SPVM_COMPILER_free(compiler);
 }
 
 MODULE = SPVM::Builder::CC		PACKAGE = SPVM::Builder::CC
@@ -3997,10 +3993,13 @@ build_class_csource_precompile(...)
   compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
   
   // String buffer for csource
-  SPVM_STRING_BUFFER* string_buffer = SPVM_STRING_BUFFER_new(0);
+  SPVM_STRING_BUFFER* string_buffer = SPVM_STRING_BUFFER_new(compiler, 0, 0, NULL);
 
   // Build class csource
+  
+  int32_t build_class_csource_start_memory_blocks_count_compile_tmp = compiler->allocator->memory_blocks_count_compile_tmp;
   SPVM_CSOURCE_BUILDER_PRECOMPILE_build_class_csource(compiler, string_buffer, class_name);
+  assert(compiler->allocator->memory_blocks_count_compile_tmp == build_class_csource_start_memory_blocks_count_compile_tmp);
   
   SV* sv_class_csource = sv_2mortal(newSVpv(string_buffer->buffer, string_buffer->length));
   

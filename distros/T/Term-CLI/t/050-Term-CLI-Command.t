@@ -17,6 +17,7 @@ sub Main {
             : 0
     );
     Term_CLI_Command_test->runtests();
+    return;
 }
 
 package Term_CLI_Command_test {
@@ -74,6 +75,7 @@ sub startup : Test(startup => 1) {
             'Term::CLI::Command->new' );
 
     $self->{cmd} = $cmd;
+    return;
 }
 
 sub check_constructor: Test(2) {
@@ -95,6 +97,7 @@ sub check_constructor: Test(2) {
         ]
     );
     ok($obj, 'command takes both commands and arguments');
+    return;
 }
 
 
@@ -116,6 +119,7 @@ sub check_arguments: Test(4) {
     is_deeply(\@got, [qw(param channel)],
             'sub-command has arguments: (param channel)')
     or diag("argument_names returned: (", join(", ", map {"'$_'"} @got), ")");
+    return;
 }
 
 
@@ -126,6 +130,7 @@ sub simple_command: Test(4) {
     is_deeply( [$cmd->command_names], [], 'simple command has no command_names' );
     is_deeply( [$cmd->option_names], [], 'simple command has no option_names' );
     is_deeply( [$cmd->argument_names], [], 'simple command has no argument_names' );
+    return;
 }
 
 
@@ -133,6 +138,7 @@ sub check_attributes: Test(1) {
     my $self = shift;
     my $cmd = $self->{cmd};
     is( $cmd->name, $CMD_NAME, "name attribute is $CMD_NAME" );
+    return;
 }
 
 
@@ -168,6 +174,7 @@ sub check_complete_command: Test(5) {
     is_deeply( \@got, [],
         "complete returns () for 'X'")
     or diag("complete returned: (", join(", ", map {"'$_'"} @got), ")");
+    return;
 }
 
 
@@ -212,6 +219,7 @@ sub check_complete_options: Test(5) {
     is_deeply( \@got, [],
         "complete returns () for ('--', '--v')")
     or diag("complete returned: (", join(", ", map {"'$_'"} @got), ")");
+    return;
 }
 
 
@@ -238,6 +246,7 @@ sub check_ambiguous_complete: Test(3) {
     @got = $cmd->complete_line(@cmd_line);
     is_deeply( \@got, ['out'],
         "complete returns (out) for (de o)" );
+    return;
 }
 
 
@@ -264,6 +273,7 @@ sub check_complete_show_param: Test(3) {
     @got = $cmd->complete_line(@cmd_line);
     is_deeply( \@got, [],
         "complete returns () for (--verbose param time in useless)" );
+    return;
 }
 
 }

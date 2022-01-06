@@ -26,3 +26,5 @@ Revision history for Perl extension Tk::HMListbox.
 	  and text fields respectively, primarily to assist in adjusting to 
 	  keep icon and text columns' vertical allignment synced.
 	  NOTE:  Requires Tk::HListbox v.2.3+ to use these new options.
+3.13  Mon Jan 3, 2022
+	- Remember item cursor is on & restore cursor when sorting.

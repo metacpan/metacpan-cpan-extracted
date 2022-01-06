@@ -1,11 +1,22 @@
+#define PERL_NO_GET_CONTEXT
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
 
 #include <maxminddb.h>
 
+#ifdef MULTIPLICITY
+#  define storeTHX(var)  (var) = aTHX
+#  define dTHXfield(var) tTHX var;
+#else
+#  define storeTHX(var)  dNOOP
+#  define dTHXfield(var)
+#endif
+
 typedef struct IP__Geolocation__MMDB {
   MMDB_s *mmdb;
+  SV *selfrv;
+  dTHXfield(perl)
 } *IP__Geolocation__MMDB;
 
 #define NEW_IP__Geolocation__MMDB(var, type) \
@@ -13,9 +24,80 @@ typedef struct IP__Geolocation__MMDB {
   Zero(var, sizeof(*var) + sizeof(type), char); \
   var->mmdb = (type *)((char *)var + sizeof(*var));
 
-static MMDB_entry_data_list_s *
-decode_entry_data_list(MMDB_entry_data_list_s *entry_data_list, SV **sv, int *mmdb_error)
+static SV *
+to_bigint(IP__Geolocation__MMDB self, const char *bytes, size_t size)
 {
+  dTHXa(self->perl);
+  dSP;
+  int count;
+  char buf[16];
+  SV *err_tmp;
+  SV *retval;
+  size_t n;
+
+  if (size > sizeof(buf)) {
+    return newSVpvn(bytes, size);
+  }
+
+  switch (BYTEORDER) {
+  case 0x1234:
+  case 0x12345678:
+#if MMDB_UINT128_IS_BYTE_ARRAY
+    if (16 == size) {
+      Copy(bytes, buf, size, char);
+    }
+    else {
+      for (n = 0; n < size; ++n) {
+        buf[n] = bytes[size - n - 1];
+      }
+    }
+#else
+    for (n = 0; n < size; ++n) {
+      buf[n] = bytes[size - n - 1];
+    }
+#endif
+    break;
+  case 0x4321:
+  case 0x87654321:
+    Copy(bytes, buf, size, char);
+    break;
+  default:
+    return newSVpvn(bytes, size);
+  }
+
+  ENTER;
+  SAVETMPS;
+  PUSHMARK(SP);
+  EXTEND(SP, 2);
+  mPUSHs(newRV_inc(self->selfrv));
+  mPUSHp(buf, size);
+  PUTBACK;
+  count = call_method("_to_bigint", G_SCALAR | G_EVAL);
+  SPAGAIN;
+  err_tmp = ERRSV;
+  if (SvTRUE(err_tmp)) {
+    (void) POPs;
+    retval = newSVpvn(bytes, size);
+  }
+  else {
+    if (1 == count) {
+      retval = newSVsv(POPs);
+    }
+    else {
+      retval = newSVpvn(bytes, size);
+    }
+  }
+  PUTBACK;
+  FREETMPS;
+  LEAVE;
+
+  return retval;
+}
+
+static MMDB_entry_data_list_s *
+decode_entry_data_list(IP__Geolocation__MMDB self, MMDB_entry_data_list_s *entry_data_list, SV **sv, int *mmdb_error)
+{
+  dTHXa(self->perl);
   MMDB_entry_data_s *entry_data = &entry_data_list->entry_data;
   switch (entry_data->type) {
   case MMDB_DATA_TYPE_MAP: {
@@ -37,7 +119,7 @@ decode_entry_data_list(MMDB_entry_data_list_s *entry_data_list, SV **sv, int *mm
         return NULL;
       }
       SV *val = &PL_sv_undef;
-      entry_data_list = decode_entry_data_list(entry_data_list, &val, mmdb_error);
+      entry_data_list = decode_entry_data_list(self, entry_data_list, &val, mmdb_error);
       if (MMDB_SUCCESS != *mmdb_error) {
         return NULL;
       }
@@ -55,7 +137,7 @@ decode_entry_data_list(MMDB_entry_data_list_s *entry_data_list, SV **sv, int *mm
          size > 0 && NULL != entry_data_list;
          size--) {
       SV *val = &PL_sv_undef;
-      entry_data_list = decode_entry_data_list(entry_data_list, &val, mmdb_error);
+      entry_data_list = decode_entry_data_list(self, entry_data_list, &val, mmdb_error);
       if (MMDB_SUCCESS != *mmdb_error) {
         return NULL;
       }
@@ -101,13 +183,16 @@ decode_entry_data_list(MMDB_entry_data_list_s *entry_data_list, SV **sv, int *mm
     break;
 
   case MMDB_DATA_TYPE_UINT64:
+#if UVSIZE < 8
+    *sv = to_bigint(self, (const char *) &entry_data->uint64, sizeof(entry_data->uint64));
+#else
     *sv = newSVuv(entry_data->uint64);
+#endif
     entry_data_list = entry_data_list->next;
     break;
 
   case MMDB_DATA_TYPE_UINT128:
-    /* XXX Handle 128-bit integers */
-    *sv = newSVpvn((const char *) &entry_data->uint128, sizeof(entry_data->uint128));
+    *sv = to_bigint(self, (const char *) &entry_data->uint128, sizeof(entry_data->uint128));
     entry_data_list = entry_data_list->next;
     break;
 
@@ -147,8 +232,11 @@ _new(class, file, flags)
       croak("Couldn't open database file \"%s\": %s", file, error);
     }
 
+    storeTHX(self->perl);
+
     RETVAL = newSV(0);
     sv_setref_pv(RETVAL, "IP::Geolocation::MMDB", self);
+    self->selfrv = SvRV(RETVAL); /* no inc */
   OUTPUT:
     RETVAL
 
@@ -182,13 +270,35 @@ record_for_address(self, ip_address)
       entry_data_list = NULL;
       mmdb_error = MMDB_get_entry_data_list(&result.entry, &entry_data_list);
       if (MMDB_SUCCESS == mmdb_error) {
-        (void) decode_entry_data_list(entry_data_list, &RETVAL, &mmdb_error);
+        (void) decode_entry_data_list(self, entry_data_list, &RETVAL, &mmdb_error);
       }
       MMDB_free_entry_data_list(entry_data_list);
       if (MMDB_SUCCESS != mmdb_error) {
         error = MMDB_strerror(mmdb_error);
         croak("Couldn't read data for IP address \"%s\": %s", ip_address, error);
       }
+    }
+  OUTPUT:
+    RETVAL
+
+SV *
+_metadata(self)
+  IP::Geolocation::MMDB self
+  INIT:
+    int mmdb_error;
+    const char *error;
+    MMDB_entry_data_list_s *entry_data_list;
+  CODE:
+    RETVAL = &PL_sv_undef;
+    entry_data_list = NULL;
+    mmdb_error = MMDB_get_metadata_as_entry_data_list(self->mmdb, &entry_data_list);
+    if (MMDB_SUCCESS == mmdb_error) {
+      (void) decode_entry_data_list(self, entry_data_list, &RETVAL, &mmdb_error);
+    }
+    MMDB_free_entry_data_list(entry_data_list);
+    if (MMDB_SUCCESS != mmdb_error) {
+      error = MMDB_strerror(mmdb_error);
+      croak("Couldn't read metadata: %s", error);
     }
   OUTPUT:
     RETVAL

@@ -17,7 +17,7 @@ Apache::AuthCookie::FAQ - Frequently Asked Questions about Apache::AuthCookie.
 
 =head1 VERSION
 
-version 3.30
+version 3.31
 
 =head1 DESCRIPTION
 

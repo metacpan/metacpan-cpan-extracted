@@ -9,6 +9,7 @@ MANIFEST			This list of files
 META.json
 META.yml
 README.md
+t/ulibuck.xlsx
 t/valuereader.t
 t/valuereader.xlsx
 t/valuereader1904.xlsx

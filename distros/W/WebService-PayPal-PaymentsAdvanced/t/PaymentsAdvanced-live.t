@@ -3,17 +3,17 @@
 use strict;
 use warnings;
 
-use Data::GUID;
+use Data::GUID ();
 use LWP::ConsoleLogger::Easy qw( debug_ua );
 use LWP::UserAgent ();
 use Test::Fatal qw( exception );
 use Test::More;
 use Test::RequiresInternet( 'pilot-payflowpro.paypal.com' => 443 );
-use Try::Tiny;
-use WebService::PayPal::PaymentsAdvanced;
+use Try::Tiny qw( try );
+use WebService::PayPal::PaymentsAdvanced ();
 
 use lib 't/lib';
-use Util;
+use Util ();
 
 my $ua = LWP::UserAgent->new();
 debug_ua($ua);

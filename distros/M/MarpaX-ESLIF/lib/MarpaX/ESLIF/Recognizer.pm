@@ -16,7 +16,7 @@ sub _EQ       { return }
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '5.0.7'; # VERSION
+our $VERSION = '6.0.10'; # VERSION
 
 
 sub _allocate_newFrom {
@@ -38,6 +38,27 @@ sub newFrom {
 }
 
 
+sub lexemeAlternative { goto &alternative }
+
+
+sub lexemeComplete { goto &alternativeComplete }
+
+
+sub lexemeRead { goto &alternativeRead }
+
+
+sub lexemeTry { goto &nameTry }
+
+
+sub lexemeExpected { goto &nameExpected }
+
+
+sub lexemeLastPause { goto &nameLastPause }
+
+
+sub lexemeLastTry { goto &nameLastTry }
+
+
 sub CLONE_SKIP {
     return 1
 }
@@ -56,7 +77,7 @@ MarpaX::ESLIF::Recognizer - MarpaX::ESLIF's recognizer
 
 =head1 VERSION
 
-version 5.0.7
+version 6.0.10
 
 =head1 SYNOPSIS
 
@@ -92,7 +113,23 @@ An object implementing L<MarpaX::ESLIF::Recognizer::Interface> methods. Required
 
   my $eslifRecognizerNewFom = $eslifRecognizer->newFrom($eslifGrammar);
 
-Returns a recognizer instance that is sharing the stream of C<$eslifRecognizer>, but applied to the other grammar C<$eslifGrammar>.
+Returns a recognizer instance that is sharing the interface of C<$eslifRecognizer>, but applied to the other grammar C<$eslifGrammar>. It is functionally equivalent to:
+
+  #
+  # $eslifRecognizerInterface is the interface instance used to create $eslifRecognizer
+  #
+  my $eslifRecognizerNewFom = MarpaX::ESLIF::Recognizer->new($eslifGrammar, $eslifRecognizerInterface);
+  #
+  # Say ESLIF that $eslifRecognizer's stream is shared with $eslifRecognizerNewFom's stream
+  #
+  $eslifRecognizerNewFom->share($eslifRecognizer);
+  #
+  # Do some work
+  # ...
+  #
+  # Say ESLIF that sharing is finished
+  #
+  $eslifRecognizerNewFom->unshare();
 
 =head2 $eslifRecognizer->set_exhausted_flag($flag)
 
@@ -113,6 +150,20 @@ Shares the stream of C<$eslifRecognizerShared> recognizer instance with the C<$e
 Unshares the stream of C<$eslifRecognizer> instance. This is equivalent to:
 
   $eslifRecognizer->share(undef);
+
+=head2 $eslifRecognizer->peek($eslifRecognizerPeeked)
+
+  $eslifRecognizer->peek($eslifRecognizerPeeked);
+
+Peeks the stream of C<$eslifRecognizerPeeked> recognizer instance with the C<$eslifRecognizer> instance. This mean that internal buffer of both recognizers will grow until the stream is unpeeked, as if ESLIF was processing a lexeme.
+
+=head2 $eslifRecognizer->unpeek()
+
+  $eslifRecognizer->unpeek();
+
+Unpeeks the stream of C<$eslifRecognizer> instance. This is equivalent to:
+
+  $eslifRecognizer->peek(undef);
 
 =head2 $eslifRecognizer->isCanContinue()
 
@@ -188,31 +239,36 @@ Note that trying to change the state of an event that was not pre-declared in th
 
 Returns a reference to an array of hash references, eventually empty if there is none. Each array element is a reference to a hash containing these keys:
 
-=head2 $eslifRecognizer->lexemeAlternative($name, $anything, $grammarLength)
+=head2 $eslifRecognizer->alternative($name, $anything, $grammarLength)
 
-A lexeme is a terminal in the legacy parsing terminology. The lexeme word mean that in the grammar it is associated to a sub-grammar. Pushing an alternative mean that the end-user is intructing the recognizer that, at this precise moment of lexing, there is a given lexeme associated with the C<$name> parameter, with a given opaque value <$anything>. Grammar length parameter C<$grammarLength> is optional, and defaults to C<1>, i.e. one lexeme (which is a symbol in the grammar) correspond to one token. Nevertheless it is possible to say that an alternative span over more than one symbol.
+Pushes an alternative mean that the end-user is intructing the recognizer that, at this precise moment of lexing, there is a given symbol associated with the C<$name> parameter, with a given opaque value <$anything>. Grammar length parameter C<$grammarLength> is optional, and defaults to C<1>, i.e. one grammar token. Nevertheless it is possible to say that an alternative span over more than one symbol.
 
 Returns a boolean indicating if the call was successful or not.
 
-=head2 $eslifRecognizer->lexemeComplete($length)
+=head2 $eslifRecognizer->alternativeComplete($length)
 
 Say the recognizer that alternatives are complete at this precise moment of parsing, and that the recognizer must move forward by C<$length> B<bytes>, which can be zero (end-user's responsibility).
 This method can generate events.
 
 Returns a boolean indicating if the call was successful or not.
 
-=head2 $eslifRecognizer->lexemeRead($name, $anything, $length, $grammarLength)
+=head2 $eslifRecognizer->alternativeRead($name, $anything, $length, $grammarLength)
 
-A short-hand version of lexemeAlternative() followed by lexemeComplete(), with the same meaning for all parameters.
-This method can generate events.
+A short-hand version of alternative() followed by alternativeComplete(), with the same meaning for all parameters. This method can generate events.
 
 Returns a boolean indicating if the call was successful or not.
 
-=head2 $eslifRecognizer->lexemeTry($name)
+=head2 $eslifRecognizer->nameTry($name)
 
-The end-user can ask the recognizer if a lexeme C<$name> may match.
+The end-user can ask the recognizer if a symbol identified by C<$name> may match.
 
 Returns a boolean indicating if the lexeme is recognized.
+
+=head2 $eslifRecognizer->discard()
+
+Ask the recognizer to apply C<:discard>.
+
+Returns the number of bytes discarded.
 
 =head2 $eslifRecognizer->discardTry()
 
@@ -220,21 +276,21 @@ The end-user can ask the recognizer if C<:discard> rule may match.
 
 Returns a boolean indicating if :discard is recognized.
 
-=head2 $eslifRecognizer->lexemeExpected()
+=head2 $eslifRecognizer->nameExpected()
 
-Ask the recognizer a list of expected lexemes.
+Ask the recognizer a list of expected symbol names.
 
 Returns a reference to an array of names, eventually empty.
 
-=head2 $eslifRecognizer->lexemeLastPause($name)
+=head2 $eslifRecognizer->nameLastPause($name)
 
-Ask the recognizer the end-user data associated to last lexeme I<pause after> event. A I<pause after> event is the when the recognizer was responsible of lexeme recognition, after a call to scan() or resume() methods. This data will be an exact copy of the last bytes that matched for a given lexeme, where data is the internal representation of end-user data, meaning that it may be UTF-8 sequence of bytes in case of character stream.
+Ask the recognizer the end-user data associated to last symbol pause event. A pause event is the when the recognizer was responsible of symbol recognition, after a call to scan() or resume() methods. This data will be an exact copy of the last bytes that matched for a given symbol, where data is the internal representation of end-user data, meaning that it may be UTF-8 sequence of bytes in case of character stream.
 
 Returns the associated bytes, or C<undef>.
 
-=head2 $eslifRecognizer->lexemeLastTry($name)
+=head2 $eslifRecognizer->nameLastTry($name)
 
-Ask the recognizer the end-user data associated to last successful lexeme try. This data will be an exact copy of the last bytes that matched for a given lexeme, where data is the internal representation of end-user data, meaning that it may be UTF-8 sequence of bytes in case of character stream.
+Ask the recognizer the end-user data associated to last successful symbol try. This data will be an exact copy of the last bytes that matched for a given symbol, where data is the internal representation of end-user data, meaning that it may be UTF-8 sequence of bytes in case of character stream.
 
 Returns the associated bytes, or C<undef>.
 
@@ -258,23 +314,99 @@ This method is similar to the isEof()'s recognizer interface. Except that this i
 
 Returns a boolean indicating of end-of-user-data is reached.
 
+=head2 $eslifRecognizer->isStartComplete()
+
+Returns a boolean indicating if start symbol completion is reached. Note that this does not mean that the grammar is exhausted.
+
 =head2 $eslifRecognizer->read()
 
 Forces the recognizer to read more data. Usually, the recognizer interface is called automatically whenever needed.
 
 Returns a boolean value indicating success or not.
 
-=head2 $eslifRecognizer->input()
+=head2 $eslifRecognizer->input([offset[, length]])
 
-Get a copy of the current internal recognizer buffer, starting at the exact byte where resume() would start. An undefined output does not mean there is an error, but that internal buffers are completely consumed. ESLIF will automatically require more data unless the EOF flag is set. Internal buffer is always UTF-8 encoded to every chunk of data that was declared to be a character stream.
+Get a copy of the current internal recognizer buffer, where C<offset> and C<length> are in I<byte> unit and with the same semantics as builtin C<substr> function for the C<offset> parameter, same semantics for the C<length> parameter as well when it is not C<0> (the zero value is ignored). An undefined output does not necessarily mean there is an error, but that the internal buffer is completely consumed. It is recommended to set C<length> parameter to a reasonable value, to prevent an internal copy of a potentially big number of bytes.
 
-Returns the associated input bytes, or C<undef>.
+Default values for C<offset> and <length> are C<0>.
+
+Returns the associated input input, or C<undef>.
+
+=head2 $eslifRecognizer->inputLength()
+
+Returns the length of current internal recognizer buffer, in bytes.
+
+=head2 $eslifRecognizer->error()
+
+Generates an error report for C<$eslifRecognizer>.
 
 =head2 $eslifRecognizer->progressLog($start, $end, $loggerLevel)
 
 Asks to get a logging representation of the current parse progress. The format is fixed by the underlying libraries. The C<$start> and C<$end> parameters follow the perl convention of indices, i.e. when they are negative, start that far from the end. For example, -1 mean the last indice, -2 mean one before the last indice, etc... C<$loggerLevel> is a level as per L<MarpaX::ESLIF::Logger::Level>.
 
 Nothing is returned.
+
+=head2 $eslifRecognizer->progress($start, $end)
+
+Asks to get the internal progress in terms of Earley parsing. The C<$start> and C<$end> parameters follow the perl convention of indices, i.e. when they are negative, start that far from the end. For example, -1 mean the last Earley Set Id, -2 mean one before the last Earley Set Id, etc...
+
+Returns a reference to an array of hash references, eventually empty if there is none. Each array element is a reference to a hash containing these keys:
+
+=over
+
+=item earleySetId
+
+The Earley Set Id.
+
+=item earleySetOrigId
+
+The origin Earley Set Id.
+
+=item rule
+
+The rule number.
+
+=item position
+
+The position in the rule, where a negative number or a number bigger than the length of the rule means the rule is completed, C<0> means the rule is predicted, else the rule is being run.
+
+=item earleme
+
+The Earleme Id corresponding to the Earley Set Id.
+
+=item earlemeOrig
+
+The origin Earleme Id corresponding to the origin Earley Set Id.
+
+=back
+
+=head2 $eslifRecognizer->eventOnOff($symbol, $eventTypes, $onOff)
+
+Events can be switched on or off. For performance reasons, if you know that you do not need an event, it can be a good idea to switch if off. Required parameters are:
+
+=over
+
+=item C<$symbol>
+
+The symbol name to which the event is associated.
+
+=item C<$symbol>
+
+The symbol name to which the event is associated.
+
+=item C<$eventTypes>
+
+A reference to an array of event types, as per L<MarpaX::ESLIF::Event::Type>.
+
+=item C<$onOff>
+
+A flag that set the event on or off.
+
+=back
+
+Note that trying to change the state of an event that was not pre-declared in the grammar is a no-op.
+
+Returns a reference to an array of hash references, eventually empty if there is none. Each array element is a reference to a hash containing these keys:
 
 =head2 $eslifRecognizer->lastCompletedOffset($name)
 
@@ -319,6 +451,36 @@ Hook the recognizer to switch the use of C<:discard> if it exists. This is a I<p
 =head2 $eslifRecognizer->symbolTry($symbol)
 
 Tries to match the external symbol C<$symbol>, that is an instance of L<MarpaX::ESLIF::Symbol>. Return the match or C<undef>.
+
+=head1 DEPRECATED METHODS
+
+=head2 $eslifRecognizer->lexemeAlternative($name, $anything, $grammarLength)
+
+Alias to C<alternative>.
+
+=head2 $eslifRecognizer->lexemeComplete($length)
+
+Alias to C<alternativeComplete>.
+
+=head2 $eslifRecognizer->lexemeRead($name, $anything, $length, $grammarLength)
+
+Alias to C<alternativeRead>.
+
+=head2 $eslifRecognizer->lexemeTry($name)
+
+Alias to C<nameTry>.
+
+=head2 $eslifRecognizer->lexemeExpected()
+
+Alias to C<nameExpected>.
+
+=head2 $eslifRecognizer->lexemeLastPause($name)
+
+Alias to C<nameLastPause>.
+
+=head2 $eslifRecognizer->lexemeLastTry($name)
+
+Alias to C<nameLastTry>.
 
 =head1 SEE ALSO
 

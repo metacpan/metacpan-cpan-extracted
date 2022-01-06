@@ -4,8 +4,15 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#include "spvm_list.h"
-#include "spvm_hash.h"
+// spvm_hash.h
+struct spvm_hash;
+typedef struct spvm_hash SPVM_HASH;
+struct spvm_hash_entry;
+typedef struct spvm_hash_entry SPVM_HASH_ENTRY;
+
+// spvm_list.h
+struct spvm_list;
+typedef struct spvm_list SPVM_LIST;
 
 // spvm_allow.h
 struct spvm_allow;
@@ -83,10 +90,6 @@ typedef struct spvm_use SPVM_USE;
 struct spvm_runtime;
 typedef struct spvm_runtime SPVM_RUNTIME;
 
-// spvm_compiler_allocator.h
-struct spvm_compiler_allocator;
-typedef struct spvm_compiler_allocator SPVM_COMPILER_ALLOCATOR;
-
 // spvm_heap.h
 struct spvm_heap;
 typedef struct spvm_heap SPVM_HEAP;
@@ -107,7 +110,7 @@ typedef struct spvm_vm SPVM_VM;
 struct spvm_switch_info;
 typedef struct spvm_switch_info SPVM_SWITCH_INFO;
 
-// spvm_compiler_allocator.h
+// spvm_allocator.h
 struct spvm_allocator;
 typedef struct spvm_allocator SPVM_ALLOCATOR;
 

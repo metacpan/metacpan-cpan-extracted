@@ -6,7 +6,7 @@ use base qw( Device::Chip::Adapter );
 use Carp qw/croak/;
 use Device::Chip::Adapter::LinuxKernel::_SPI;
 
-our $VERSION = '0.00004';
+our $VERSION = '0.00005';
 
 our $__TESTDIR=""; # blank unless we're being pointed at a test setup
 
@@ -31,6 +31,14 @@ interfaces.
 
    $adapter = Device::Chip::Adapter::LinuxKernel->new( %args )
 
+=over
+
+=item i2c_bus - Optional, which i2c bus to connect to.  i2c-0, i2c-1, ...
+
+=item spi_bus - Optional, which spi controller to use.   spidev0.0, ... 
+
+=back
+
 Returns a new instance of a C<Device::Chip::Adapter::LinuxKernel>.
 
 =head1 KNOWN ISSUES
@@ -53,10 +61,12 @@ I'll also be working to add "interrupt" support for the GPIO so that you can use
 
 sub new {
    my $class = shift;
+   my %args = @_;
+   my $i2c_bus = delete $args{i2c_bus};
 
    # TODO not sure what I'll need to take here yet
    
-   return bless({}, $class);
+   return bless({args => \%args, i2c_bus => $i2c_bus}, $class);
 }
 
 sub new_from_description {
@@ -80,15 +90,19 @@ sub make_protocol_GPIO {
 sub make_protocol_SPI {
    my $self = shift;
 
-   my $proto = Device::Chip::Adapter::LinuxKernel::_SPI->new();
+   die "Missing spi_bus param for adapter" unless defined($self->{spi_bus});
+
+   my $proto = Device::Chip::Adapter::LinuxKernel::_SPI->new(spi_bus => $self->{spi_bus});
 
    Future->done($proto);
 }
 
 sub make_protocol_I2C {
     my $self = shift;
-    
-    my $proto = Device::Chip::Adapter::LinuxKernel::_I2C->new();
+
+    die "Missing i2c_bus param for adapter" unless defined($self->{i2c_bus});
+
+    my $proto = Device::Chip::Adapter::LinuxKernel::_I2C->new(i2c_bus => $self->{i2c_bus});
     
     Future->done($proto);
 }
@@ -282,16 +296,15 @@ sub configure {
     my %args = @_;
     
     $self->{address} = delete $args{addr};
-    # $self->{max_rate} = delete $args{max_bitrate}; # We're unable to affect this from userland it seems
-    $self->{bus} = delete $args{bus}; # i2c-0, ...
+    $self->{max_rate} = delete $args{max_bitrate}; # We're unable to affect this from userland it seems
     
-    croak "Missing required parameter 'bus'" unless defined $self->{bus};
+    croak "Missing required parameter 'bus'" unless defined $self->{i2c_bus};
     croak "Missing required parameter 'addr'" unless defined $self->{address};
         
     croak "Unrecognised configuration options: " . join( ", ", keys %args ) if %args;
 
     $self->{smbus} = Device::SMBus->new(
-        I2CBusDevicePath => $self->{bus},
+        I2CBusDevicePath => $self->{i2c_bus},
         I2CDeviceAddress => $self->{address},
     );
 

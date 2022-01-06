@@ -7,7 +7,7 @@ package Chart::GGPlot::Util::Scales;
 
 use Chart::GGPlot::Setup qw(:base :pdl);
 
-our $VERSION = '0.0016'; # VERSION
+our $VERSION = '0.002000'; # VERSION
 
 use Color::Brewer;
 use Color::Library;
@@ -21,6 +21,7 @@ use PDL::Primitive qw(which interpol);
 use Number::Format 1.75;
 use Scalar::Util qw(looks_like_number);
 use Time::Moment;
+use Types::Standard qw(Int);
 
 use POSIX qw(ceil floor log10);
 
@@ -159,7 +160,7 @@ fun hue_pal (:$h=pdl([0, 360])+15, :$c=100, :$l=65, :$h_start=0, :$direction=1) 
           ->plus_coercions(PiddleFromAny) );
     ($h) = $check->($h);
 
-    return fun($n) {
+    return fun(Int $n) {
         if ( $n == 0 ) {
             die "Must request at least one color from a hue palette.";
         }
@@ -179,7 +180,7 @@ fun brewer_pal ( $type, $palette = 0, $direction = 1 ) {
     my $pal_name = _pal_name( $palette, $type );
 
     # $n is number of colors
-    return fun($n) {
+    return fun(Int $n) {
         my @colors = Color::Brewer::named_color_scheme(
             number_of_data_classes => List::AllUtils::max( $n, 3 ),
             name                   => $pal_name
@@ -262,7 +263,7 @@ fun rescale_pal ( $range = PDL->new( [ 0.1, 1 ] ) ) {
 }
 
 fun viridis_pal ($begin=0, $end=1, $direction=1, $option='viridis') {
-    return fun($n) {
+    return fun(Int $n) {
         my $colors =
           Chart::GGPlot::Util::Scales::_Viridis::viridis( $n, $begin, $end,
             $direction, $option );
@@ -696,8 +697,8 @@ fun pretty_dt($x, :$n = 5, :$min_n = $n % 2, %rest) {
             end => PDL::DateTime->new( $lim->at(1) ),
             by  => $spec
         );
-        my $r1 = List::AllUtils::max(( $at <= $lim->at(0) )->sum - 1, 0);
-        my $r2 = $at->length - ( $at >= $lim->at(1) )->sum;
+        my $r1 = List::AllUtils::max( $at->where( $at <= $lim->at(0) )->length - 1, 0 );
+        my $r2 = $at->length - $at->where( $at >= $lim->at(1) )->length;
         if ( $r2 == $at->length )
         {    # not covering at right -- add point at right
             my $nat = seq_dt(
@@ -705,7 +706,7 @@ fun pretty_dt($x, :$n = 5, :$min_n = $n % 2, %rest) {
                 by  => $spec,
                 length => 2
             )->slice( pdl( [1] ) );
-            if ( !(( $nat > $at->at(-1) )->all) ) {    # failed
+            unless ( $nat->where( $nat > $at->at(-1) )->length == $nat->length ) {    # failed
                 $r2 = $at->length - 1;
             }
             $at = $at->glue( 0, $nat );
@@ -753,8 +754,8 @@ fun pretty_dt($x, :$n = 5, :$min_n = $n % 2, %rest) {
     my $dn = $init_n - ($n - 1);
     if ($dn > 0) {
         # ticks "outside", on left and right, keep at least one on each side
-        my $nl = ($init_at <= $rx->at(0))->sum - 1;
-        my $nr = ($init_at >= $rx->at(1))->sum - 1;
+        my $nl = $init_at->where( $init_at <= $rx->at(0) )->length - 1;
+        my $nr = $init_at->where( $init_at >= $rx->at(1) )->length - 1;
         if ($nl > 0 or $nr > 0) {
             my $n_c = $nl + $nr;
             if ($dn < $n_c) { # remove $dn, not all
@@ -940,7 +941,7 @@ Chart::GGPlot::Util::Scales - R 'scales' package functions used by Chart::GGPlot
 
 =head1 VERSION
 
-version 0.0016
+version 0.002000
 
 =head1 FUNCTIONS
 

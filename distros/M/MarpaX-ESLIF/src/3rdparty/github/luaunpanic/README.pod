@@ -20,9 +20,70 @@ Because playing with C<abort()> try catch in C is not easy, this library hides a
 
 Any function like C<type lua_xxx(...args...)> has a wrapper like C<short luaunpanic_xxx(type *luaunpanic_result, ...args...)>.
 
+Return code is C<0> if C<luaunpanic_xxx> did panic, C<1> if <luaunpanic_xxx> succeeded. In the later case C<*luaunpanic_result> contains the result.
+
+In other words, non-void native calls such as:
+
+  if (lua_call(xxx)) {
+     yyy /* failure */
+  } else {
+     zzz /* success */
+  }
+
+should be translated to:
+
+  if (luaunpanic_call(&luarc, xxx) || luarcrc) {
+    yyy /* failure */
+  } else {
+    zzz /* success */
+  }
+
 =item
 
 Any function like C<void lua_xxx(...args...)> has a wrapper like C<short luaunpanic_xxx(...args...)>.
+
+Return code is C<0> if C<luaunpanic_xxx> did panic, C<1> if <luaunpanic_xxx> succeeded.
+
+In other words, void native calls such as:
+
+  lua_call(xxx);
+
+should be translated to:
+
+  if (luaunpanic_call(xxx)) {
+    /* failure */
+  }
+
+=item
+
+Exceptions are lua calls that will do an abort: if you look to the documentation, despite they have a return code for semantic purpose, they will I<never> return in Lua: they exist only for the purpose of generating an exception. These functions are:
+
+=over
+
+=item C<lua_error>
+
+=item C<luaL_error>
+
+=item C<luaL_argerror>
+
+=back
+
+The corresponding luaunpanic_wrappers will, on the contrary, always return the value 1 to indicate a failure. The argument C<&luarc> itself will I<not> be updated. Therefore the usage for such functions is e.g;:
+
+  if (luaunpanicL_argerror(&luarc, L, arg, extramsg)) {
+    /* failure */
+  } else {
+    /* cannot happen */
+  }
+
+and since it is guaranteed that C<rc> is not updated, it is equivalent, but quite false to be writen like in the general case:
+
+  if (luaunpanicL_argerror(&luarc, L, arg, extramsg) || luarc) {
+    /* failure */
+  } else {
+    /* cannot happen */
+  }
+
 
 =back
 
@@ -36,35 +97,15 @@ luaunpanic wrappers always return C<0> in case of success, C<1> in case of failu
 
 =item
 
-The C<lua_State> pointer returned with the unpanic versions of C<lua_State> creation methods can still be used with I<native> lua methods, available within the library.
+The C<lua_State> pointer returned with the unpanic versions of C<lua_State> creation methods can still be used with I<native> lua methods.
 
 =item
 
-A new method to retreive the latest panic string exists:
-
-  short luaunpanic_panicstring(char **panicstringp, lua_State *L)
+Anything that would abort will not if it is done using a luaunpanic method.
 
 =back
 
-=head2 Wrapper usage
-
-In other words, non-void native calls such as:
-
-  if (lua_call(xxx)) { yyy /* failure */} else { zzz /* success */ }
-
-should be translated to:
-
-  if (luaunpanic_call(&luarc, xxx) || luarcrc) { yyy /* failure */ } else { zzz /* success */ }
-
-Similary for void native lua calls:
-
-  lua_call(xxx);
-
-should be translated to:
-
-  if (luaunpanic_call(xxx)) { /* failure */ }
-
-=head1 USAGE
+=head1 NOTES
 
 Obviously, this is targetting embedded lua interpreters into third-party libraries: by using luaunpanic, you make sure that your library will never exit because of lua default I<abort()> behaviour.
 

@@ -10,7 +10,7 @@ package Text::Table::Any;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-12-09'; # DATE
 our $DIST = 'Text-Table-Any'; # DIST
-our $VERSION = '0.105'; # VERSION
+our $VERSION = '0.106'; # VERSION
 
 our @BACKENDS = qw(
                       Term::TablePrint
@@ -142,6 +142,7 @@ sub table {
         return Text::Table::HTML::table(
             rows => $rows,
             header_row => $header_row,
+            (title => $params{title}) x !!defined($params{title}),
         );
     } elsif ($backend eq 'Text::Table::HTML::DataTables') {
         require Text::Table::HTML::DataTables;
@@ -271,7 +272,7 @@ Text::Table::Any - Generate text table using one of several backends
 
 =head1 VERSION
 
-This document describes version 0.105 of Text::Table::Any (from Perl distribution Text-Table-Any), released on 2021-12-09.
+This document describes version 0.106 of Text::Table::Any (from Perl distribution Text-Table-Any), released on 2021-12-09.
 
 =head1 SYNOPSIS
 
@@ -479,7 +480,8 @@ Not all backends support this.
 
 Optional. Str. Title of the table.
 
-Currently the only backend supporting this is C<Text::Table::HTML::DataTables>.
+Currently the only backends supporting this are C<Text::Table::HTML> and
+C<Text::Table::HTML::DataTables>.
 
 =back
 

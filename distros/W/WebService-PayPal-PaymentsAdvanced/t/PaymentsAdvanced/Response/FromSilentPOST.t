@@ -3,12 +3,11 @@ use warnings;
 
 use Test::More;
 
-use Scalar::Util qw( blessed );
-use Test::Fatal;
+use Test::Fatal qw( exception );
 use WebService::PayPal::PaymentsAdvanced::Response::FromSilentPOST ();
 
 use lib 't/lib';
-use Util;
+use Util ();
 
 ## no critic (RequireExplicitInclusion)
 my $ppa = Util::mocked_ppa;

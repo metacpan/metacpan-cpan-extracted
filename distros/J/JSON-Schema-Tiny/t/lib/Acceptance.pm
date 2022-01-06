@@ -2,7 +2,8 @@ use strict;
 use warnings;
 # no package, so things defined here appear in the namespace of the parent.
 
-use 5.016;
+use 5.020;
+use experimental qw(signatures postderef);
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
@@ -12,7 +13,7 @@ use Test::More;
 use Path::Tiny;
 
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings' => ':fail_on_warning'; # hooks into done_testing unless overridden
-use Test::JSON::Schema::Acceptance 1.007;
+use Test::JSON::Schema::Acceptance 1.014;
 use JSON::Schema::Tiny;
 
 BEGIN {
@@ -22,28 +23,26 @@ BEGIN {
   note '';
 }
 
-sub acceptance_tests {
-  my (%options) = @_;
-
+sub acceptance_tests (%options) {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   my $accepter = Test::JSON::Schema::Acceptance->new(
     include_optional => 1,
     verbose => 1,
     test_schemas => 0,
-    %{$options{acceptance}},
+    $options{acceptance}->%*,
     $ENV{TEST_DIR} ? (test_dir => $ENV{TEST_DIR})
       : $ENV{TEST_PREFIXDIR} ? (test_dir => path($ENV{TEST_PREFIXDIR}, 'tests', $options{acceptance}{specification})) : (),
   );
+  $accepter->_json_decoder->allow_bignum; # TODO: switch to public accessor with TJSA 1.015
 
-  my $js = JSON::Schema::Tiny->new(%{$options{evaluator}});
-  my $js_short_circuit = $ENV{NO_SHORT_CIRCUIT} || JSON::Schema::Tiny->new(%{$options{evaluator}}, short_circuit => 1);
+  my $js = JSON::Schema::Tiny->new($options{evaluator}->%*);
+  my $js_short_circuit = $ENV{NO_SHORT_CIRCUIT} || JSON::Schema::Tiny->new($options{evaluator}->%*, short_circuit => 1);
 
   my $encoder = JSON::MaybeXS->new(allow_nonref => 1, utf8 => 0, convert_blessed => 1, canonical => 1, pretty => 1);
   $encoder->indent_length(2) if $encoder->can('indent_length');
 
   $accepter->acceptance(
-    validate_data => sub {
-      my ($schema, $instance_data) = @_;
+    validate_data => sub ($schema, $instance_data) {
       my $result = $js->evaluate($instance_data, $schema);
       my $result_short = $ENV{NO_SHORT_CIRCUIT} || $js_short_circuit->evaluate($instance_data, $schema);
 
@@ -63,13 +62,13 @@ sub acceptance_tests {
             grep +($_->{error} =~ /^EXCEPTION/
                 && $_->{error} !~ /but short_circuit is enabled/            # unevaluated*
                 && $_->{error} !~ /(max|min)imum value is not a number$/),  # optional/bignum.json
-              @{$r->{errors}};
+              $r->{errors}->@*;
       }
 
       $result->{valid};
     },
     @ARGV ? (tests => { file => \@ARGV }) : (),
-    %{$options{test} // {}},
+    ($options{test} // {})->%*,
   );
 
   path('t/results/'.$options{output_file})->spew_utf8($accepter->results_text)

@@ -9,8 +9,9 @@ use Music::Chord::Progression;
 my $score = setup_score();
 
 my $prog = Music::Chord::Progression->new(
-    chord_map => [qw(M7 m7 m7 M7 7 m7 dim7)],
-    substitute => 1,
+#    chord_map => [qw(M7 m7 m7 M7 7 m7 dim7)],
+    chord_map => ['', 'm', 'm', '', '', 'm', 'm'],
+#    substitute => 1,
 #    resolve => 0,
     verbose => 1,
 );

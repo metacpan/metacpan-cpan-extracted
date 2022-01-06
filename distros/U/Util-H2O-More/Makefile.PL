@@ -16,13 +16,13 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Util::H2O::More",
   "PREREQ_PM" => {
-    "Util::H2O" => 0
+    "Util::H2O" => "0.14"
   },
   "TEST_REQUIRES" => {
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.0.3",
+  "VERSION" => "0.0.4",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Test::Exception" => 0,
   "Test::More" => 0,
-  "Util::H2O" => 0
+  "Util::H2O" => "0.14"
 );
 
 

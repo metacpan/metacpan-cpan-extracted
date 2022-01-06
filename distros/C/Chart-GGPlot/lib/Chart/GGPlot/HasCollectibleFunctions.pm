@@ -5,7 +5,7 @@ package Chart::GGPlot::HasCollectibleFunctions;
 use Chart::GGPlot::Role;
 use namespace::autoclean;
 
-our $VERSION = '0.0016'; # VERSION
+our $VERSION = '0.002000'; # VERSION
 
 
 requires 'ggplot_functions';
@@ -24,7 +24,7 @@ Chart::GGPlot::HasCollectibleFunctions - The role for the 'ggplot_functions' cla
 
 =head1 VERSION
 
-version 0.0016
+version 0.002000
 
 =head1 DESCRIPTION
 

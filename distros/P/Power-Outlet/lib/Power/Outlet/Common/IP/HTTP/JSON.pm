@@ -5,7 +5,7 @@ use base qw{Power::Outlet::Common::IP::HTTP};
 #use Data::Dumper qw{Dumper};
 use JSON qw{encode_json decode_json};
 
-our $VERSION='0.24';
+our $VERSION='0.43';
 
 =head1 NAME
 

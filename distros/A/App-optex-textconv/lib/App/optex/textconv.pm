@@ -1,6 +1,6 @@
 package App::optex::textconv;
 
-our $VERSION = '0.1401';
+our $VERSION = '1.01';
 
 use v5.14;
 use warnings;
@@ -16,7 +16,7 @@ textconv - optex module to replace document file by its text contents
 
 =head1 VERSION
 
-Version 0.1401
+Version 1.01
 
 =head1 SYNOPSIS
 
@@ -54,7 +54,21 @@ Next command simply produces the same result.
 
 Microsoft office format files in XML (.docx, .pptx, .xlsx, .docm,
 .pptm, .xlsm).
-See L<App::optex::textconv::msdoc>.
+Use
+L<App::optex::textconv::msdoc>,
+L<App::optex::textconv::ooxml>,
+L<App::optex::textconv::ooxml::regex>,
+L<App::optex::textconv::ooxml::xslt>.
+
+=item doc
+
+Microsoft Word file.
+Use L<Text::Extract::Word> module.
+
+=item xls
+
+Microsoft Excel file.
+Use L<Spreadsheet::ParseExcel> module.
 
 =item pdf
 
@@ -147,7 +161,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2019-2021 Kazumasa Utashiro.
+Copyright 2019-2022 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -261,15 +275,19 @@ sub textconv {
 		    next;
 		}
 	    };
-	    use App::optex::Tmpfile;
-	    my $tmp = $persist[@persist] = App::optex::Tmpfile->new;
 	    my $data = do {
 		no strict 'refs';
 		use charnames ':full';
-		local $_ = decode 'utf8', &$func($_);
+		local $_ = &$func($_) // do {
+		    warn "$_: READ ERROR in textconv module.\n";
+		    next;
+		};
+		$_ = decode 'utf8', $_ unless utf8::is_utf8($_);
 		s/[\p{Private_Use}\p{Unassigned}]/\N{GETA MARK}/g;
 		encode 'utf8', $_;
 	    };
+	    use App::optex::Tmpfile;
+	    my $tmp = $persist[@persist] = App::optex::Tmpfile->new;
 	    $_ = $tmp->write($data)->rewind->path;
 	}
 	@_;

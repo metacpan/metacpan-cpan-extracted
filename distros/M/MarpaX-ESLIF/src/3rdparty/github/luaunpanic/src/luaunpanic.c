@@ -10,15 +10,12 @@
 #include "try_throw_catch.h"
 
 typedef struct luaunpanic_userdata {
-  char     *panicstring; /* Latest panic string */
   size_t    envpmallocl; /* Allocated size */
   size_t    envpusedl;   /* Used size */
   jmp_buf  *envp;        /* envpusedl jump buffers */
 } luaunpanic_userdata_t;
 
-static char *LUAUNPANIC_DEFAULT_PANICSTRING = "";
-static char *LUAUNPANIC_UNKNOWN_PANICSTRING = "Could not retreive last error string";
-#define LUAUNPANIC_PANIC 1
+#define LUAUNPANIC_PANIC 1 /* Our exception number */
 
 /****************************************************************************/
 static int luaunpanic_atpanic(lua_State *L)
@@ -27,60 +24,12 @@ static int luaunpanic_atpanic(lua_State *L)
   luaunpanic_userdata_t *LW = (luaunpanic_userdata_t *) lua_getuserdata(L);
 
   if (LW != NULL) {
-    /* free eventual previous error string */
-    if (LW->panicstring != NULL) {
-      if ((LW->panicstring != LUAUNPANIC_DEFAULT_PANICSTRING) && (LW->panicstring != LUAUNPANIC_UNKNOWN_PANICSTRING)) {
-        free(LW->panicstring);
-      }
-    }
-
-    /* Get current stack information */
-    LW->panicstring = (char *) lua_tostring(L, -1);
-    /* Always get a duplicate so that we own it */
-    if (LW->panicstring != NULL) {
-      LW->panicstring = strdup(LW->panicstring);
-      if (LW->panicstring == NULL) {
-        /* Bad luck -; */
-        LW->panicstring = LUAUNPANIC_UNKNOWN_PANICSTRING;
-      }
-    }
     /* Jump to recovery point */
     THROW(LW, LUAUNPANIC_PANIC);
   }
-  /* Done */
+
+  /* Normal flow: abort */
   return 0;
-}
-
-/****************************************************************************/
-short luaunpanic_panicstring(char **panicstringp, lua_State *L)
-/****************************************************************************/
-{
-  luaunpanic_userdata_t *LW;
-  short rc;
-
-  if (L == NULL) {
-    errno = EINVAL;
-    goto err;
-  }
-
-  LW = lua_getuserdata(L);
-  if (LW == NULL) {
-    errno = EINVAL;
-    goto err;
-  }
-  
-  if (panicstringp != NULL) {
-    *panicstringp = LW->panicstring;
-  }
-
-  rc = 0;
-  goto done;
-
- err:
-  rc = 1;
-
- done:
-  return rc;
 }
 
 /****************************************************************************/
@@ -96,7 +45,6 @@ short luaunpanic_newstate(lua_State **Lp, lua_Alloc f, void *ud)
     goto err;
   }
 
-  LW->panicstring = LUAUNPANIC_DEFAULT_PANICSTRING;
   LW->envpmallocl = 0;
   LW->envpusedl   = 0;
   LW->envp        = NULL;
@@ -114,6 +62,7 @@ short luaunpanic_newstate(lua_State **Lp, lua_Alloc f, void *ud)
   if (Lp != NULL) {
     *Lp = L;
   }
+
   rc = 0;
   goto done;
 
@@ -129,7 +78,7 @@ short luaunpanic_close(lua_State *L)
 /****************************************************************************/
 {
   short rc = 1;
-  luaunpanic_userdata_t *LW;
+  volatile luaunpanic_userdata_t *LW;
 
   if (L == NULL) {
     errno = EINVAL;
@@ -141,15 +90,10 @@ short luaunpanic_close(lua_State *L)
         lua_close(L);
         rc = 0;
       } FINALLY(LW) {
-        if (LW->panicstring != NULL) {
-          if ((LW->panicstring != LUAUNPANIC_DEFAULT_PANICSTRING) && (LW->panicstring != LUAUNPANIC_UNKNOWN_PANICSTRING)) {
-            free(LW->panicstring);
-          }
-        }
         if (LW->envp != NULL) {
           free(LW->envp);
         }
-        free(LW);
+        free((void *) LW);
 	LW = NULL;
       }
       ETRY(LW);
@@ -166,18 +110,13 @@ short luaunpanic_close(lua_State *L)
 static short _luaunpanic_newthread(lua_State **LNp, lua_State *L)
 {
   short rc = 1;
-  luaunpanic_userdata_t *LW;
+  volatile luaunpanic_userdata_t *LW;
+
   if (L == NULL) {
     errno = EINVAL;
   } else {
     LW = lua_getuserdata(L);
     if (LW != NULL) {
-      if (LW->panicstring != NULL) {
-        if ((LW->panicstring != LUAUNPANIC_DEFAULT_PANICSTRING) && (LW->panicstring != LUAUNPANIC_UNKNOWN_PANICSTRING)) {
-          free(LW->panicstring);
-        }
-        LW->panicstring = LUAUNPANIC_DEFAULT_PANICSTRING;
-      }
       TRY(LW) {
         lua_State *LN = lua_newthread(L);
         if (LNp != NULL) {
@@ -194,6 +133,7 @@ static short _luaunpanic_newthread(lua_State **LNp, lua_State *L)
       rc = 0;
     }
   }
+
   return rc;
 }
 
@@ -240,7 +180,6 @@ short luaunpanicL_newstate(lua_State **Lp)
     goto err;
   }
 
-  LW->panicstring = LUAUNPANIC_DEFAULT_PANICSTRING;
   LW->envpmallocl = 0;
   LW->envpusedl   = 0;
   LW->envp        = NULL;
@@ -410,7 +349,7 @@ LUAUNPANIC_ON_NON_VOID_FUNCTION(luaunpanic_gc,           ,                int,  
 /*
 ** miscellaneous functions
 */
-LUAUNPANIC_ON_NON_VOID_FUNCTION(luaunpanic_error,        ,                int,                lua_error(L),                   lua_State *L)
+LUAUNPANIC_ON_NON_VOID_ERROR_FUNCTION(luaunpanic_error,  ,                int,                lua_error(L),                   lua_State *L)
 LUAUNPANIC_ON_NON_VOID_FUNCTION(luaunpanic_next,         ,                int,                lua_next(L, idx),               lua_State *L, int idx)
 LUAUNPANIC_ON_VOID_FUNCTION    (luaunpanic_concat,       ,                                    lua_concat(L, n),               lua_State *L, int n)
 LUAUNPANIC_ON_VOID_FUNCTION    (luaunpanic_len,          ,                                    lua_len(L, idx),                lua_State *L, int idx)
@@ -476,7 +415,7 @@ LUAUNPANIC_ON_VOID_FUNCTION    (luaunpanicL_checkversion_,,                     
 LUAUNPANIC_ON_NON_VOID_FUNCTION(luaunpanicL_getmetafield,,                int,                luaL_getmetafield(L, obj, e),   lua_State *L, int obj, const char *e)
 LUAUNPANIC_ON_NON_VOID_FUNCTION(luaunpanicL_callmeta,    ,                int,                luaL_callmeta(L, obj, e),       lua_State *L, int obj, const char *e)
 LUAUNPANIC_ON_NON_VOID_FUNCTION(luaunpanicL_tolstring,   ,                const char *,       luaL_tolstring(L, idx, len),    lua_State *L, int idx, size_t *len)
-LUAUNPANIC_ON_NON_VOID_FUNCTION(luaunpanicL_argerror,    ,                int,                luaL_argerror(L, arg, extramsg), lua_State *L, int arg, const char *extramsg)
+LUAUNPANIC_ON_NON_VOID_ERROR_FUNCTION(luaunpanicL_argerror,,              int,                luaL_argerror(L, arg, extramsg), lua_State *L, int arg, const char *extramsg)
 LUAUNPANIC_ON_NON_VOID_FUNCTION(luaunpanicL_checklstring,,                const char *,       luaL_checklstring(L, arg, l),   lua_State *L, int arg, size_t *l)
 LUAUNPANIC_ON_NON_VOID_FUNCTION(luaunpanicL_optlstring,  ,                const char *,       luaL_optlstring(L, arg, def, l), lua_State *L, int arg, const char *def, size_t *l)
 LUAUNPANIC_ON_NON_VOID_FUNCTION(luaunpanicL_checknumber, ,                lua_Number,         luaL_checknumber(L, arg),       lua_State *L, int arg)
@@ -491,25 +430,23 @@ LUAUNPANIC_ON_VOID_FUNCTION    (luaunpanicL_setmetatable,,                      
 LUAUNPANIC_ON_NON_VOID_FUNCTION(luaunpanicL_testudata,   ,                void *,             luaL_testudata(L, ud, tname),   lua_State *L, int ud, const char *tname)
 LUAUNPANIC_ON_NON_VOID_FUNCTION(luaunpanicL_checkudata,  ,                void *,             luaL_checkudata(L, ud, tname),  lua_State *L, int ud, const char *tname)
 LUAUNPANIC_ON_VOID_FUNCTION    (luaunpanicL_where,       ,                                    luaL_where(L, lvl),             lua_State *L, int lvl)
-/* This function needs to be writen explicitle because of the ... */
+
+/* This function needs to be writen explicitly because of the ellipsis ... */
 short luaunpanicL_error (int *rcp, lua_State *L, const char *fmt, ...)
 {
-  va_list argp;
+  luaunpanic_userdata_t *LW;
+  va_list                argp;
 
+  if (L == NULL) {
+    errno = EINVAL;
+    return 1;
+  }
+
+  luaL_where(L, 1);
   va_start(argp, fmt);
-
-  if (luaunpanicL_where(L, 1)) {
-    va_end(argp);
-    return 1;
-  }
-  if (luaunpanic_pushvfstring(NULL, L, fmt, argp)) {
-    va_end(argp);
-    return 1;
-  }
+  lua_pushvfstring(L, fmt, argp);
   va_end(argp);
-  if (luaunpanic_concat(L, 2)) {
-    return 1;
-  }
+  lua_concat(L, 2);
   return luaunpanic_error(rcp, L);
 }
 
@@ -554,7 +491,7 @@ short luaunpanicL_dofile(int *rcp, lua_State *L, const char *fn)
     if (rcp != NULL) {
       *rcp = rc;
     }
-    return 1;
+    return 0;
   }
 
   return luaunpanic_pcall(rcp, L, 0, LUA_MULTRET, 0);

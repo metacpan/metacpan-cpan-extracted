@@ -1,6 +1,7 @@
 use strict;
 use warnings;
-use 5.016;
+use 5.020;
+use experimental qw(signatures postderef);
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
@@ -31,34 +32,34 @@ subtest 'strict booleans (default)' => sub {
   );
 
   cmp_deeply(
-    evaluate($_, { type => 'boolean' }),
+    evaluate($_->[1], { type => 'boolean' }),
     {
       valid => false,
       errors => [
         {
           instanceLocation => '',
           keywordLocation => '/type',
-          error => 'wrong type (expected boolean)',
+          error => 'got '.$_->[0].', not boolean',
         },
       ],
     },
-    'correct error generated from type for '.serialize($_),
+    'correct error generated from type for '.serialize($_->[1]),
   )
   foreach (
-    undef,
-    0,
-    1,
-    '0',
-    '1',
-    'false',
-    'true',
-    \0,
-    \1,
+    [ null => undef ],
+    [ integer => 0 ],
+    [ integer => 1 ],
+    [ string => '0' ],
+    [ string => '1' ],
+    [ string => 'false' ],
+    [ string => 'true' ],
+    [ 'reference to SCALAR' => \0 ],
+    [ 'reference to SCALAR' => \1 ],
   );
 
   cmp_deeply(
     evaluate(
-      $_,
+      $_->[1],
       $test_schema = {
         allOf => [ { type => 'boolean' }, { type => ['boolean','object'] } ],
         anyOf => [ { const => false }, { const => true } ],
@@ -71,12 +72,12 @@ subtest 'strict booleans (default)' => sub {
         {
           instanceLocation => '',
           keywordLocation => '/allOf/0/type',
-          error => 'wrong type (expected boolean)',
+          error => 'got '.$_->[0].', not boolean',
         },
         {
           instanceLocation => '',
           keywordLocation => '/allOf/1/type',
-          error => 'wrong type (expected one of boolean, object)',
+          error => 'got '.$_->[0].', not one of boolean, object',
         },
         {
           instanceLocation => '',
@@ -105,18 +106,18 @@ subtest 'strict booleans (default)' => sub {
         },
       ],
     },
-    'in data, '.serialize($_).' not is a boolean',
+    'in data, '.serialize($_->[1]).' not is a boolean',
   )
   foreach (
-    undef,
-    0,
-    1,
-    '0',
-    '1',
-    'false',
-    'true',
-    \0,
-    \1,
+    [ null => undef ],
+    [ integer => 0 ],
+    [ integer => 1 ],
+    [ string => '0' ],
+    [ string => '1' ],
+    [ string => 'false' ],
+    [ string => 'true' ],
+    [ 'reference to SCALAR' => \0 ],
+    [ 'reference to SCALAR' => \1 ],
   );
 };
 
@@ -135,18 +136,29 @@ subtest '$SCALARREF_BOOLEANS = 1' => sub {
   );
 
   cmp_deeply(
-    evaluate($_, $test_schema),
-    $failure_result,
+    evaluate($_->[1], $test_schema),
+    {
+      valid => false,
+      errors => [
+        do {
+          my ($type, $value) = $_->@*;
+          map +{
+            $_->%*,
+            $_->{keywordLocation} =~ /\/type$/ ? (error => $_->{error} =~ s/^got .*, not/got $type, not/r) : (),
+          }, $failure_result->{errors}->@*,
+        },
+      ],
+    },
     'correct error generated from type for '.serialize($_),
   )
   foreach (
-    undef,
-    0,
-    1,
-    '0',
-    '1',
-    'false',
-    'true',
+    [ null => undef ],
+    [ integer => 0 ],
+    [ integer => 1 ],
+    [ string => '0' ],
+    [ string => '1' ],
+    [ string => 'false' ],
+    [ string => 'true' ],
   );
 
   cmp_deeply(

@@ -9,5 +9,7 @@ minil.toml
 share/Plack.pl
 share/template.tx
 t/00_compile.t
+t/01_compatibility.t
+t/02_javascript.t
 META.yml
 MANIFEST

@@ -29,7 +29,7 @@ barf($file, $hl7);
 # Run.
 App::HL7::Dump->new->run;
 
-# Output:
+# Output (colored keys):
 # MSH-1:|
 # MSH-2:^~\&
 # MSH-3:FROM

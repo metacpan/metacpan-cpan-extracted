@@ -2,6 +2,8 @@ use strict;
 use warnings;
 package SchemaParser;
 
+use 5.020;
+use experimental qw(signatures postderef);
 use feature 'state';
 use JSON::MaybeXS 1.002004 'is_bool';
 
@@ -12,9 +14,7 @@ sub new {
 # this is a very simple schema validator.
 # It only understands boolean schemas, or schemas that say {"type":"boolean"}.
 # Unrecognized keywords will be treated as the empty schema (i.e. a pass).
-sub validate_data {
-  my ($self, $data, $schema) = @_;
-
+sub validate_data ($self, $data, $schema) {
   return $schema if is_bool($schema);
   die 'unrecognized schema type '.ref $schema if ref $schema ne 'HASH';
 
@@ -24,9 +24,7 @@ sub validate_data {
   return 1;
 }
 
-sub validate_json_string {
-  my ($self, $data_string, $schema) = @_;
-
+sub validate_json_string ($self, $data_string, $schema) {
   state $decoder = JSON::MaybeXS->new(utf8 => 1, allow_nonref => 1);
   return $self->validate_data($decoder->decode($data_string), $schema);
 }

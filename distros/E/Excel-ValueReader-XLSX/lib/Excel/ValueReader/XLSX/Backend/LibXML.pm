@@ -7,7 +7,7 @@ use XML::LibXML::Reader qw/XML_READER_TYPE_END_ELEMENT/;
 
 extends 'Excel::ValueReader::XLSX::Backend';
 
-our $VERSION = '1.05';
+our $VERSION = '1.07';
 
 #======================================================================
 # LAZY ATTRIBUTE CONSTRUCTORS
@@ -58,8 +58,8 @@ sub _workbook_data {
         or die "sheet node without name";
       $sheets{$name} = $sheet_id++;
     }
-    elsif ($reader->name eq 'workbookPr' && $reader->getAttribute('date1904')) {
-      $base_year = 1904; # this workbook uses the 1904 calendar
+    elsif ($reader->name eq 'workbookPr' and my $attr_value = $reader->getAttribute('date1904')) {
+      $base_year = 1904 if $attr_value eq '1' or $attr_value eq 'true'; # this workbook uses the 1904 calendar
     }
   }
 
@@ -153,8 +153,11 @@ sub values {
   # iterate through XML nodes
  NODE:
   while ($xml_reader->read) {
-    next NODE if $xml_reader->nodeType == XML_READER_TYPE_END_ELEMENT;
     my $node_name = $xml_reader->name;
+    my $node_type = $xml_reader->nodeType;
+
+    last NODE if $node_name eq 'sheetData' && $node_type == XML_READER_TYPE_END_ELEMENT;
+    next NODE if $node_type == XML_READER_TYPE_END_ELEMENT;
 
     if ($node_name eq 'c') {
       # new cell node : store its col/row reference and its type
@@ -179,8 +182,13 @@ sub values {
 
       if ($seen_node eq 'v')  {
         if ($cell_type eq 's') {
-          $val = $self->strings->[$val]; # string -- pointer into the global
-                                         # array of shared strings
+          if (looks_like_number($val)) {
+            $val = $self->strings->[$val]; # string -- pointer into the global
+                                           # array of shared strings
+          }
+          else {
+            warn "unexpected non-numerical value: $val inside a node of shape <v t='s'>\n";
+          }
         }
         elsif ($cell_type eq 'e') {
           $val = undef; # error -- silently replace by undef

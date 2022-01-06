@@ -244,15 +244,16 @@ if ((! "$ENV{CXX}") || (! which($ENV{CXX}))) {
 #
 my $isc99 = 0;
 if (($cbuilder_config{cc} // 'cc') ne 'cl') {
-    $ac->msg_checking("Checking if C99 is enabled by default:");
+    $ac->msg_checking("if C99 is enabled by default:");
     if (try_compile("#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L\n#error \"C99 is not enabled\"\n#endif\nint main(){return 0;}")) {
         $ac->msg_result('yes');
         $isc99 = 1;
     } else {
         $ac->msg_result('no');
-        $ac->msg_notice("Checking what CFLAGS is required for C99:");
+        $ac->msg_notice("what CFLAGS is required for C99:");
+        $ac->msg_result('');
         foreach my $flag (qw/-std=gnu99 -std=c99 -c99 -AC99 -xc99=all -qlanglvl=extc99/) {
-            $ac->msg_checking("Checking if flag $flag works:");
+            $ac->msg_checking("if flag $flag works:");
             if (try_compile("#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L\n#error \"C99 is not enabled\"\n#endif\nint main(){return 0;}", $flag)) {
                 $ac->msg_result('yes');
                 $ENV{CFLAGS} .= " $flag";
@@ -315,10 +316,11 @@ if (is_os_type('Windows')) {
 }
 
 # goto no_tweak_on_optimization_flags;
-$ac->msg_checking("Checking optimization flags:");
+$ac->msg_checking("optimization flags:");
+$ac->msg_result('');
 if (($cbuilder_config{cc} // 'cc') eq 'cl') {
     foreach my $flag ("/O2") {
-        $ac->msg_checking("Checking if flag $flag works:");
+        $ac->msg_checking("if flag $flag works:");
         if (try_compile("#include <stdlib.h>\nint main() {\n  exit(0);\n}\n", $flag)) {
             $ac->msg_result('yes');
             $ENV{PERL_EXTUTILS_CBUILDER_CONFIG_optimize} .= " $flag";
@@ -329,14 +331,27 @@ if (($cbuilder_config{cc} // 'cc') eq 'cl') {
     }
 } else {
     #
+    # Some versions of gcc may not yell with bad options unless -Werror is set.
+    # Check that flag and set it temporarly.
+    #
+    my $tmpflag = '-Werror';
+    $ac->msg_checking("if flag $tmpflag works:");
+    if (try_compile("#include <stdlib.h>\nint main() {\n  exit(0);\n}\n", $tmpflag)) {
+        $ac->msg_result('yes');
+    } else {
+        $ac->msg_result('no');
+        $tmpflag = '-Werror';
+    }
+
+    #
     # We test AIX case first because it overlaps with general O3
     #
     foreach my $flag ("-O3 -qstrict", # xlc
                       "-O3",          # cl, gcc
                       "-xO3"          # CC
                       ) {
-        $ac->msg_checking("Checking if flag $flag works:");
-        if (try_compile("#include <stdlib.h>\nint main() {\n  exit(0);\n}\n", $flag)) {
+        $ac->msg_checking("if flag $flag works:");
+        if (try_compile("#include <stdlib.h>\nint main() {\n  exit(0);\n}\n", "$tmpflag $flag")) {
             $ac->msg_result('yes');
             $ENV{PERL_EXTUTILS_CBUILDER_CONFIG_optimize} .= " $flag";
             last;
@@ -567,6 +582,7 @@ my %WriteMakefileArgs = (
     "Log::Any::Adapter::Log4perl" => 0,
     "Log::Any::Adapter::Util" => "1.03",
     "Log::Log4perl" => "1.32",
+    "POSIX" => 0,
     "Safe::Isa" => 0,
     "Test::Deep" => "1.128",
     "Test::Deep::NoTest" => 0,
@@ -579,7 +595,7 @@ my %WriteMakefileArgs = (
     "threads::shared" => 0,
     "utf8" => 0
   },
-  "VERSION" => "5.0.7",
+  "VERSION" => "6.0.10",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -611,6 +627,7 @@ my %FallbackPrereqs = (
   "Log::Log4perl" => "1.32",
   "Math::BigFloat" => 0,
   "Math::BigInt" => 0,
+  "POSIX" => 0,
   "Safe::Isa" => 0,
   "Test::Deep" => "1.128",
   "Test::Deep::NoTest" => 0,
