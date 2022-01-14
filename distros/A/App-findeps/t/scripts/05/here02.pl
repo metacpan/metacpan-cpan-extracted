@@ -3,15 +3,14 @@ use warnings;
 
 # the inside of here document must be excluded from parsing
 my $here = <<'EOL';
-    require Module::Exists;
-    use Here;
+    require Module::Exists::In::HERE;
+    use Module::Exists::In::HERE;
 EOL
 
 $here = <<"EOL";
-    require Here;
-    use Module::Exists;
+    require Module::Exists::In::HERE;
+    use Module::Exists::In::HERE;
 EOL
 
-require Dummy;    # does not exist anywhere
+require Acme::BadExample;    # does not exist anywhere
 
-exit;

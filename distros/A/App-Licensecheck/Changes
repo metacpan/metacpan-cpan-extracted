@@ -7,6 +7,62 @@ Home page:    <https://metacpan.org/release/App-Licensecheck>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.3.0	2022-01-08
+
+ [ Bug Fixes ]
+ - catch decoding errors and retry as iso-8859-1 encoding
+ - fix dumping of content tail
+
+ [ Documentation ]
+ - clarify option --tail
+ - update TODOs, and reformat as CommonMark
+
+ [ Test Suite ]
+ - add tests reading only header and tail
+ - check full contents of Software::License generated data
+ - enable debug output for encoding tests
+ - fix one devscripts TODO test
+ - parse perl-generated Software::License data as utf8
+ - refactor to directly use App::Licensecheck (i.e. drop local module
+   Test2::Licensecheck)
+ - rewrite Software::License tests to check against library
+ - rewrite devscripts tests to use library
+ - separate script report tests from devscripts.t
+ - use only SPDX shortnames (not also debian shortnames) for
+   Software::License and SPDX tests, and list only deviating entries
+
+ [ Other ]
+ - Added: add options --quiet --debug --trace (and deprecate now no-op
+   option --no-verbose)
+ - Run perltidier (not perltidy) with tidyall
+ - avoid given/when
+ - call log->trace() (not log->tracef()) for simple strings
+ - change option --skipped to use Log::Tiny (not core warn), and log as
+   debug when not set
+ - declare package version with package name, and move POD sections NAME
+   VERSION SYNOPSIS DESCRIPTION closer to top of files
+ - have $fh $license $copyrights as slots (not local variables)
+ - improve resolving offset
+ - logging: dump content as trace (not notice)
+ - logging: log fatal errors using Log::Tiny
+ - logging: log files processed as debug, with decoding details (not
+   tersely as trace)
+ - logging: warn about obsolete options using Log::Tiny (not using core
+   warn)
+ - logging: warn tersely on file decoding failure, and list error message
+   as debug (not all as notice)
+ - merge method parse_lines() into parse_file(), and use $encoding slot
+   (stop redefine as local variable)
+ - pass around File object (not path, content and (currently unused) offset
+   in content)
+ - refactor to have slot $path in main class (not class File)
+ - refactor to hold semi-cleaned content (not cleaned-for-license-parsing)
+   in slot $content
+ - refactor to merge local class File into main class
+ - refactor to read and decode files in method content()
+ - refactor to use Object::Pad (not Moo or MooX::Struct)
+ - use named arguments for struct objects
+
 v3.2.14	2021-11-22
 
  [ Bug Fixes ]

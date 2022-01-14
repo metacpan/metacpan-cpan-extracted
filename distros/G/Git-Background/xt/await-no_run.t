@@ -11,7 +11,7 @@ use Cwd            ();
 use File::Basename ();
 use File::Spec     ();
 
-use Git::Background;
+use Git::Background 0.003;
 
 my $bindir = File::Spec->catdir( File::Basename::dirname( File::Basename::dirname( Cwd::abs_path __FILE__ ) ), 'corpus', 'bin' );
 

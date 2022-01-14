@@ -251,6 +251,13 @@ be mapped into MARC fields. It contains up to five elements:
     - `_holdingsLocation`
     - `_volume`
     - `_yearCaption`
+    - `_accessionNumber`
+    - `_copyNumber`
+    - `_descriptionOfPieces`
+    - `_discoverySuppress`
+    - `_hrid`
+    - `_id`
+    - `_itemIdentifier`
 
     Since there may be multiple items in a single holding, sets of these
     fields can repeat, e.g. for a holding with two items each specifying
@@ -271,11 +278,12 @@ post-processing for JSON and XML records may also be supported.
 Within the `marc` sections, keys are the names of simple MARC fields,
 such as `008`; or of complex field$subfield combinations, such as
 `245$a`. The corresponding values specify the transformations that
-should be applied to the values of these fields and subfields.
+should be applied to the values of these fields and subfields: each
+value may be either a single transformation or an array zero or more
+&#x3d;transformation which will be applied in the specified order.
 
 Transformations are represented by objects with an `op` key whose
-values specifies the required operation. Either single transformation
-or an array of transformations may be provided.
+values specifies the required operation.
 
 The following transformation operations are supported:
 
@@ -306,6 +314,34 @@ The following transformation operations are supported:
         `$2`, etc., to parenthesized sub-expressions in the pattern. (If this
         statement means nothing to you, you need to
         [go and read about regular expressions](https://perldoc.perl.org/perlretut).)
+
+        Replacement strings may also include sequences of the form
+        _%{fieldname}_, where _fieldname_ is either a simple control-field
+        tag such as `001` or a field-and-subfield combination like
+        `245$a`. Such sequences cause the value of the specified field within
+        the current record to be interpolated, so that for example a
+        replacement string `%{001}/%{245a}` will cause the text that matches
+        the regular expression to be replaced by the contents of the `001`
+        and `245$a` fields separated by a slash.
+
+        This mechanism yields a powerful and general facility allowing
+        installations with complex requirements to generate exactly the detail
+        they need. For example, it can be used to implement fallbacks, as in
+        this case where if `952$2` has no value it's replaced by the value in
+        `952$b`. (This could be used for situations like reporting the
+        item-level copy-number if that's present, but falling back to the
+        holdings-level copy-number if not.)
+
+            "952$2": [
+              { "op": "regsub", "pattern": "^$", "replacement": "%{952$b}" }
+            ]
+
+        Or a location string could be built in the `$z` subfield from
+        fragments in `$1`, `$2` and `$2`:
+
+            "952$z": [
+              { "op": "regsub", "pattern": ".*", "replacement": "%{952$1}/%{952$2}/%{952$3}" }
+            ]
 
     - `flags`
 

@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2021 -- leonerd@leonerd.org.uk
 
 package Future::IO;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use 5.010;  # //
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Carp;
 
@@ -95,14 +95,33 @@ A testing module which does this is provided by L<Test::Future::IO>.
 
 =cut
 
+=head2 accept
+
+   $f = Future::IO->accept( $fh )
+
+I<Since version 0.11.>
+
+Returns a L<Future> that will become done when a new connection has been
+accepted on the given filehandle, which should represent a listen-mode socket.
+
+=cut
+
+sub accept
+{
+   shift;
+   my ( $fh ) = @_;
+
+   return ( $IMPL //= "Future::IO::_DefaultImpl" )->accept( $fh );
+}
+
 =head2 alarm
 
    $f = Future::IO->alarm( $epoch )
 
 I<Since version 0.08.>
 
-Returns a L<Future> that will become at a fixed point in the future, given as
-an epoch timestamp (such as returned by C<time()>). This value may be
+Returns a L<Future> that will become done at a fixed point in the future,
+given as an epoch timestamp (such as returned by C<time()>). This value may be
 fractional.
 
 =cut
@@ -120,6 +139,25 @@ sub alarm
    else {
       return $IMPL->sleep( $epoch - Time::HiRes::time() );
    }
+}
+
+=head2 connect
+
+   $f = Future::IO->connect( $fh, $name )
+
+I<Since version 0.11.>
+
+Returns a L<Future> that will become done when a C<connect()> has succeeded on
+the given filehandle to the given sockname address.
+
+=cut
+
+sub connect
+{
+   shift;
+   my ( $fh, $name ) = @_;
+
+   return ( $IMPL //= "Future::IO::_DefaultImpl" )->connect( $fh, $name );
 }
 
 =head2 sleep
@@ -344,19 +382,37 @@ sub override_impl
    ( $IMPL ) = @_;
 }
 
+=head2 HAVE_MULTIPLE_FILEHANDLES
+
+   $has = Future::IO->HAVE_MULTIPLE_FILEHANDLES
+
+I<Since version 0.11.>
+
+Returns true if the underlying IO implementation actually supports multiple
+filehandles. Most real support modules will return true here, but this returns
+false for the internal minimal implementation.
+
+=cut
+
+sub HAVE_MULTIPLE_FILEHANDLES
+{
+   return ( $IMPL //= "Future::IO::_DefaultImpl" )->HAVE_MULTIPLE_FILEHANDLES;
+}
+
 package
    Future::IO::_DefaultImpl;
-use base qw( Future );
+use base qw( Future::IO::ImplBase );
 use Carp;
 
-use Errno qw( EAGAIN EWOULDBLOCK );
 use Struct::Dumb qw( readonly_struct );
 use Time::HiRes qw( time );
 
 readonly_struct Alarm => [qw( time f )];
 
-readonly_struct Reader => [qw( fh length f )];
-readonly_struct Writer => [qw( fh bytes f )];
+readonly_struct Reader => [qw( fh f )];
+readonly_struct Writer => [qw( fh f )];
+
+use constant HAVE_MULTIPLE_FILEHANDLES => 0;
 
 sub alarm
 {
@@ -370,50 +426,50 @@ sub sleep
    return $class->_done_at( time() + shift );
 }
 
-sub sysread
+sub ready_for_read
 {
    my $class = shift;
-   my ( $fh, $length ) = @_;
+   my ( $fh ) = @_;
 
    croak "This implementation can only cope with a single pending filehandle in ->syread"
       if @readers and $readers[-1]->fh != $fh;
 
-   my $self = $class->new;
-   push @readers, Reader( $fh, $length, $self );
+   my $f = Future::IO::_DefaultImpl::F->new;
+   push @readers, Reader( $fh, $f );
 
-   $self->on_cancel( sub {
-      my $self = shift;
+   $f->on_cancel( sub {
+      my $f = shift;
 
       my $idx = 0;
-      $idx++ while $idx < @readers and $readers[$idx]->f != $self;
+      $idx++ while $idx < @readers and $readers[$idx]->f != $f;
 
       splice @readers, $idx, 1, ();
    });
 
-   return $self;
+   return $f;
 }
 
-sub syswrite
+sub ready_for_write
 {
    my $class = shift;
-   my ( $fh, $bytes ) = @_;
+   my ( $fh ) = @_;
 
    croak "This implementation can only cope with a single pending filehandle in ->syswrite"
       if @writers and $writers[-1]->fh != $fh;
 
-   my $self = $class->new;
-   push @writers, Writer( $fh, $bytes, $self );
+   my $f = Future::IO::_DefaultImpl::F->new;
+   push @writers, Writer( $fh, $f );
 
-   $self->on_cancel( sub {
-      my $self = shift;
+   $f->on_cancel( sub {
+      my $f = shift;
 
       my $idx = 0;
-      $idx++ while $idx < @writers and $writers[$idx]->f != $self;
+      $idx++ while $idx < @writers and $writers[$idx]->f != $f;
 
       splice @writers, $idx, 1, ();
    });
 
-   return $self;
+   return $f;
 }
 
 sub waitpid
@@ -423,26 +479,33 @@ sub waitpid
 
 sub _done_at
 {
-   my $self = shift->new;
+   shift;
    my ( $time ) = @_;
+
+   my $f = Future::IO::_DefaultImpl::F->new;
 
    # TODO: Binary search
    my $idx = 0;
    $idx++ while $idx < @alarms and $alarms[$idx]->time < $time;
 
-   splice @alarms, $idx, 0, Alarm( $time, $self );
+   splice @alarms, $idx, 0, Alarm( $time, $f );
 
-   $self->on_cancel( sub {
+   $f->on_cancel( sub {
       my $self = shift;
 
       my $idx = 0;
-      $idx++ while $idx < @alarms and $alarms[$idx]->f != $self;
+      $idx++ while $idx < @alarms and $alarms[$idx]->f != $f;
 
       splice @alarms, $idx, 1, ();
    } );
 
-   return $self;
+   return $f;
 }
+
+package # hide
+   Future::IO::_DefaultImpl::F;
+use base qw( Future );
+use Time::HiRes qw( time );
 
 sub _await_once
 {
@@ -479,43 +542,10 @@ redo_select:
    }
 
    if( $rready ) {
-      my $r = $readers[0];
-
-      my $len = $r->fh->sysread( my $buf, $r->length );
-      if( $len ) {
-         shift @readers;
-         $r->f->done( $buf );
-      }
-      elsif( defined $len ) {
-         # EOF
-         shift @readers;
-         $r->f->done();
-      }
-      elsif( $! == EAGAIN or $! == EWOULDBLOCK ) {
-         $do_select = 1, goto redo_select if !$do_select;
-         # ignore it
-      }
-      else {
-         shift @readers;
-         $r->f->fail( "sysread: $!\n", sysread => $r->fh, $! );
-      }
+      ( shift @readers )->f->done;
    }
    if( $wready ) {
-      my $w = $writers[0];
-
-      my $len = $w->fh->syswrite( $w->bytes );
-      if( $len ) {
-         shift @writers;
-         $w->f->done( $len );
-      }
-      elsif( $! == EAGAIN or $! == EWOULDBLOCK ) {
-         $do_select = 1, goto redo_select if !$do_select;
-         # ignore it
-      }
-      else {
-         shift @writers;
-         $w->f->fail( "syswrite: $!\n", syswrite => $w->fh, $! );
-      }
+      ( shift @writers )->f->done;
    }
 
    my $now = time();
@@ -541,9 +571,6 @@ sub await
    _await_once until $self->is_ready;
    return $self;
 }
-
-# TODO: Consider implementing the _exactly variants of sysread/syswrite for
-#   efficiency
 
 =head1 THE C<$IMPL> VARIABLE
 

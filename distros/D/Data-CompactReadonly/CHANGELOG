@@ -1,3 +1,9 @@
+0.1.0    2022-01-08
+
+- Float type renamed to Float64 in preparation for support for different length floats
+  (no functional or format changes from previous floating point behaviour)
+- Add support for Boolean types (in perl 5.35.7 and later)
+
 0.0.6    2021-06-04
 
 - More accurate detection of int/float/string types when creating a database

@@ -9,7 +9,72 @@ class TestCase::Method {
   use Comparator::Object;
   use TestCase::Simple as TS;
   use Fn;
-  
+
+  # Use keyword name as method name
+  static method int : int () {
+    
+    return 5;
+  }
+  method if : int () {
+    
+    return 3;
+  }
+
+  static method call_keyword_name_method : int () {
+    
+    # Call a static method with parenthes
+    {
+      my $num = TestCase::Method->int();
+      unless ($num == 5) {
+        return 0;
+      }
+    }
+    
+    # Call a static method without parenthes
+    {
+      my $num = TestCase::Method->int;
+      unless ($num == 5) {
+        return 0;
+      }
+    }
+    
+    # Call a static method with parenthes and current class
+    {
+      my $num = &int();
+      unless ($num == 5) {
+        return 0;
+      }
+    }
+    
+    # Call a static method without parenthes and current class
+    {
+      my $num = &int;
+      unless ($num == 5) {
+        return 0;
+      }
+    }
+    
+    # Call a instance method with parenthes
+    {
+      my $method = new TestCase::Method;
+      my $num = $method->if();
+      unless ($num == 3) {
+        return 0;
+      }
+    }
+
+    # Call a instance method without parenthes
+    {
+      my $method = new TestCase::Method;
+      my $num = $method->if;
+      unless ($num == 3) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+
   static method test_import_method : int () {
     unless (TS->import_method1() == 1) {
       return 0;
@@ -47,21 +112,21 @@ class TestCase::Method {
   
   static method return_value_automatical_numeric_convertion : int () {
     {
-      my $num : double = cur->test_return_value_automatical_numeric_convertion_widening();
+      my $num : double = &test_return_value_automatical_numeric_convertion_widening();
       unless ($num == 2.0) {
         return 0;
       }
     }
     
     {
-      my $num : byte = cur->test_return_value_automatical_numeric_convertion_narrowing_byte();
+      my $num : byte = &test_return_value_automatical_numeric_convertion_narrowing_byte();
       unless ($num == 127) {
         return 0;
       }
     }
 
     {
-      my $num : short = cur->test_return_value_automatical_numeric_convertion_narrowing_short();
+      my $num : short = &test_return_value_automatical_numeric_convertion_narrowing_short();
       unless ($num == 32767) {
         return 0;
       }

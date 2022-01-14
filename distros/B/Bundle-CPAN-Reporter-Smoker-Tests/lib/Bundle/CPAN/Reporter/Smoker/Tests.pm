@@ -2,7 +2,7 @@ package Bundle::CPAN::Reporter::Smoker::Tests;
 use strict;
 use warnings;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 =pod
 
@@ -12,8 +12,10 @@ Bundle::CPAN::Reporter::Smoker::Tests - bundles several test modules that might 
 
 =head1 DESCRIPTION
 
-This bundle includes several distributions related to automated testing in Perl. It is intented to provide a easier
-way to include those tests that have a good chance to be required to be used by a L<CPAN::Reporter::Smoker> instance.
+This bundle includes several distributions related to automated testing in Perl.
+
+It is intented to provide a easier way to include those tests that have a good
+chance to be required or used by a L<CPAN::Reporter::Smoker> instance.
 
 =head1 CONTENTS 
 
@@ -78,7 +80,7 @@ Alceu Rodrigues de Freitas Junior, E<lt>arfreitas@cpan.orgE<gt>
 
 This software is copyright (c) 2016 of Alceu Rodrigues de Freitas Junior, E<lt>arfreitas@cpan.orgE<gt>
 
-This file is part of Siebel Monitoring Tools.
+This file is part of Bundle CPAN Reporter Smoker Tests.
 
 Siebel Monitoring Tools is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -91,7 +93,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Siebel Monitoring Tools.  If not, see <http://www.gnu.org/licenses/>.
+along with Siebel Monitoring Tools.  If not, see L<http://www.gnu.org/licenses/>.
 
 =cut
 

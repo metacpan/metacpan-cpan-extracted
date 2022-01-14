@@ -1,0 +1,53 @@
+---
+abstract: "a Perl port of Ruby's gimei."
+author:
+  - 'NAKAJIMA Yusaku < example@example.com >'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+  perl: 5.008_001
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Gimei
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Data::Gimei:
+    file: lib/Data/Gimei.pm
+    version: v0.0.4
+  Data::Gimei::Address:
+    file: lib/Data/Gimei/Address.pm
+  Data::Gimei::Name:
+    file: lib/Data/Gimei/Name.pm
+  Data::Gimei::Word:
+    file: lib/Data/Gimei/Word.pm
+requires:
+  File::Share: '0'
+  Moo: '0'
+  YAML::XS: '0'
+  feature: '0'
+  namespace::clean: '0'
+  version: '0'
+resources:
+  bugtracker: https://github.com/youpong/pl-gimei/issues
+  homepage: https://github.com/youpong/pl-gimei
+  repository: git://github.com/youpong/pl-gimei.git
+version: v0.0.4
+x_contributors:
+  - 'NAKAJIMA Yusaku <yupong7@gmail.com>'
+  - 'youpong <43817652+youpong@users.noreply.github.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

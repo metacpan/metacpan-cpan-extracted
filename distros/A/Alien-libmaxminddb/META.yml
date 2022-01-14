@@ -24,7 +24,7 @@ name: Alien-libmaxminddb
 provides:
   Alien::libmaxminddb:
     file: lib/Alien/libmaxminddb.pm
-    version: '1.000'
+    version: '1.001'
 requires:
   Alien::Base: '0'
   parent: '0'
@@ -35,7 +35,7 @@ resources:
   bugtracker: https://gitlab.com/voegelas/alien-libmaxminddb/-/issues
   homepage: https://gitlab.com/voegelas/alien-libmaxminddb
   repository: https://gitlab.com/voegelas/alien-libmaxminddb.git
-version: '1.000'
+version: '1.001'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:

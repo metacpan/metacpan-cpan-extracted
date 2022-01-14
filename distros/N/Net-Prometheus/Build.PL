@@ -32,6 +32,9 @@ my $build = Module::Build->new(
       'Test::Fatal' => 0,
       'Test::More'  => '0.88', # done_testing
    },
+   test_recommends => {
+      'Future::IO::Impl::UV' => '0.03',
+   },
    ( $build_xs ? () : ( xs_files => {} ) ),
    license => 'perl',
    create_license => 1,

@@ -36,16 +36,27 @@ is stat_as_chr(),       [ 0, 0, S_IFCHR,  (0) x 10 ], 'stat_as_chr';
 is stat_as_block(),     [ 0, 0, S_IFBLK,  (0) x 10 ], 'stat_as_block';
 
 if ( $> == 0 ) {
-  is stat_as_file( uid => 'root', gid => 'root' ), [ 0, 0, S_IFREG, (0) x 10 ],
-    'stat_as_file( uid => root, gid => root )';
+    my ($username, $gid) = (getpwuid $>)[0, 3];
+    my $groupname = getgrgid $gid;
+
+    diag "Running privileged ($username/$groupname)";
+
+    my $got = stat_as_file( uid => $username, gid => $groupname );
+
+    is(
+        $got,
+        [ 0, 0, S_IFREG, (0) x 10 ],
+        "stat_as_file( uid => $username, gid => $groupname )",
+        explain $got,
+    );
 }
 
 SKIP: {
     my $daemon_uid = getpwnam('daemon');
-    skip "daemon uid unknown" unless $daemon_uid;
+    skip "daemon uid unknown" unless defined $daemon_uid;
 
     my $wheel_gid  = getgrnam('wheel');
-    skip "wheel gid unknown" unless $wheel_gid;
+    skip "wheel gid unknown" unless defined $wheel_gid;
 
     if ( $daemon_uid && $wheel_gid ) {
         is stat_as_file( uid => 'daemon', gid => 'wheel' ),

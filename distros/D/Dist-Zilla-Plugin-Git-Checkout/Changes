@@ -1,5 +1,13 @@
 Revision history for Dist-Zilla-Plugin-Git-Checkout
 
+0.004  2022-01-08 20:17:50 UTC
+
+  INCOMPATIBLE CHANGES:
+  - The checkout parameter is replaced with a branch, revision, and tag parameter
+
+  Changes:
+  - Replace Git::Wrapper with Git::Background
+
 0.003  2021-07-16 20:58:22 UTC
 
   - After checking the brandch out, do a "git pull --ff-only" to actually update it

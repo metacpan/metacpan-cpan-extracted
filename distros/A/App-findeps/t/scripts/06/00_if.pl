@@ -3,9 +3,14 @@ use warnings;
 
 use lib 't/lib';
 
-if (0) { require If::BeforeRequire }    # ignored
-if (1) { require If::BeforeRequire }    # ignored by parser
+if (0) { require Module::Exists::Unexpected }    # they can't be ignored so parsed
+if (1) { require Module::Exists }                # must be warned by this module
 
-require Dummy;                          # does not exist anywhere
+delete $INC{'Module/Exists/Unexpected.pm'};
+delete $INC{'Module/Exists.pm'};
 
-exit;
+unless (1) { require Module::Exists::Unexpected }
+unless (0) { require Module::Exists }
+
+require Acme::BadExample;                        # does not exist anywhere
+

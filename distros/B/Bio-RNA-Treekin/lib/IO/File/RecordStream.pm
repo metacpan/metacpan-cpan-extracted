@@ -1,6 +1,6 @@
 # IO/File/RecordStream.pm
 package IO::File::RecordStream;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use 5.006;
 use strict;

@@ -175,7 +175,7 @@ Module::Generic::Array - An Array Manipulation Object Class
 
 =head1 VERSION
 
-    v1.1.0
+    v1.2.0
 
 =head1 DESCRIPTION
 
@@ -225,6 +225,118 @@ This simply returns the current object, so it does nothing special. It is here, 
 Returns the array as string, which is essentially the same as C<"@array">
 
 It takes an optional boolean value that, if true, will sort the array before.
+
+=head2 callback
+
+Sets or gets a callback on the array object. You can set 2 types of callback: C<add> or C<remove> which will be called respectively when you add something to the array or when you remove something from it.
+
+It does this by tieing the array to its internal class C<Module::Generic::Array::Tie> that will call the C<add> or C<remove> callback when data is being added or removed, no matter how, i.e. be it through the methods of this class, or by directly trying to add data to it:
+
+    use Scalar::Util qw( blessed );
+    my $a = Module::Generic::Array->new();
+    $a->callback( add => sub
+    {
+        my( $pos, $ref ) = @_;
+        return unless( blessed( $ref->[0] ) && $ref->[0]->isa( 'MyPackage') );
+        return(1);
+    });
+    $a->push( $some_object );
+    # or
+    push( @$a, $some_object );
+
+In both cases above the object from class C<MyPackage> will be added, and if it were some other data, i.e. not from the class C<MyPackage>, the data would not be added to the array.
+
+So, the callback must return true to allow the data to be added, or C<undef> to refuse. Returning an empty string or 0 will not work to be considered a rejection even though it is a false value.
+
+Both C<add> and C<remove> callbacks receives an hash reference as its sole arguments. This hash reference can also be accessed within the callback subroutine as C<$_>
+
+The C<add> callback receives an hash reference with the following properties:
+
+=over 4
+
+=item added
+
+An array reference of values being added, so you can inspect them. This is also available with the C<data> property
+
+=item caller
+
+An array reference of the values returned by L<perlfunc/caller> indicating where this callback was originally triggered.
+
+=item data
+
+An array reference of values being added, so you can inspect them. This is also available with the C<aded> property
+
+=item start
+
+The offset position (starting from 0)
+
+=item type
+
+The callback type: C<add>
+
+=back
+
+The C<remove> callback works the same way, but for any operation that tries to remove data from the array. It receives an hash reference with the following properties:
+
+=over 4
+
+=item caller
+
+An array reference of the values returned by L<perlfunc/caller> indicating where this callback was originally triggered.
+
+=item data
+
+An array reference of the values being removed. This is also available with the C<removed> property
+
+=item end
+
+The end position (starting from 0)
+
+=item removed
+
+An array reference of the values being removed. This is also available with the C<data> property
+
+=item start
+
+The start position
+
+=item type
+
+The callback type: C<remove>
+
+=back
+
+    my $a = Module::Generic::Array->new();
+    $a->callback( remove => sub
+    {
+        my $def = shift( @_ );
+        my( $start, $end ) = @$def{qw( start end )};
+        printf( STDERR "Called from package %s at line %d\n", @{$def->{caller}}[0,2] );
+        # Do some check to accept or reject
+        return(1); # always return true to accept
+    });
+    $a->splice( 3, 4 ); # Removing 4 elements starting from the position 3
+
+This example above would call the callback passing it the value 3 and 7 since 7 is the last position in the range of data being removed.
+
+    my $removed = $a->shift;
+
+Here, the arguments received by the callback would be 0 and 0.
+
+To replace a callback, simply add another one. It will replace the previous one.
+
+You can get the callback code associated with a callback by calling C<callback> with one argument: the callback type.
+
+    my $code_ref = $a->callback( 'add' );
+
+To remove a callback, pass C<undef>:
+
+    $a->callback( add => undef );
+    $a->callback( remove => undef );
+
+By default, an array object is not tied to C<Module::Generic::Array::Tie> and no callback are set nor used. Be mindful when using callbacks since it will slow things down a little bit even though it is s very thin layer.
+
+See L<perltie> for more information on tieing data.
 
 =head2 chomp
 
@@ -285,6 +397,10 @@ If the value is not defined, or has a zero-length, it is returned as a L<Module:
 
 This is just an intuitive alias for L</reset>
 
+=head2 error
+
+Returns the value of the global variable C<$ERROR>. However, since this package does not set any error, this does not need to be called, but exists nonetheless for conformity with other packages of this distribution.
+
 =head2 exists
 
 Provided with a value and this returns the number of match, as an L<Module::Generic::Number> object, if it is found in the array, or false otherwise.
@@ -302,6 +418,44 @@ say "@$even";
 Produces: C<1 3 5 7 9>
 
 See also L</odd>
+
+=head2 filter
+
+This filters the array and returns a new array object.
+
+As parameters, it takes a code reference, which is called for each element in the array, and an optional value (typically an object). This code reference is passed 3 arguments:
+
+=over 4
+
+=item 1. the current element, which is also available as C<$_>
+
+=item 2. the element zero-based index position
+
+=item 3. the array object itself
+
+=back
+
+However, if an optional value was supplied, it will be passed to the callback as its first parameter.
+
+The code reference can return a true value to have the element added to the resulting array object, or a false value to have it ignored.
+
+For example:
+
+    my $a = Module::Generic::Array->new( [qw( John Jack Peter Gabriel Samuel )] );
+    my $new = $a->filter(sub{ substr( $_, 0, 1 ) ne 'J' });
+    # $new now contains only Peter Gabriel Samuel
+
+Or, passing an optional value:
+
+    my $new = $a->filter(sub
+    {
+        my $self = shift( @_ );
+        # Do something more with $self
+        # Then return true or false
+        substr( $_, 0, 1 ) ne 'J';
+    }, $self );
+
+See also L</map>
 
 =head2 fifth
 
@@ -604,6 +758,8 @@ However, do not return C<undef> explicitly in your anonymous subroutine, because
         return( undef ) if( $_ eq 'John' );
         return( $_ );
     });
+
+See also L</filter>
 
 =head2 max
 

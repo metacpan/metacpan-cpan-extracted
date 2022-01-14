@@ -4,15 +4,12 @@ use strict;
 use warnings;
 
 use Exporter 'import';
-our @EXPORT_OK = qw(dummy is_dummy);
+our $VERSION   = 0.00;
+our @EXPORT_OK = qw( $VERSION dummy is_dummy );
 
-sub dummy {
-    return scalar @_;
-}
+use Module::CoreList;    # MUST be installed in 5.8 or later
 
-sub is_dummy {
-    my @pair = @_;
-    return if $_[0] == $_[1];
-}
+sub dummy    {@_}
+sub is_dummy { defined $_[0] }
 
 1;

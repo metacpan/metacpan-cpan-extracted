@@ -1,6 +1,6 @@
-# Copyright (c) 2007-2017 Martin Becker.  All rights reserved.
-# This package is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
+# Copyright (c) 2007-2019 Martin Becker, Blaubeuren.
+# This package is free software; you can distribute it and/or modify it
+# under the terms of the Artistic License 2.0 (see LICENSE file).
 
 # Check whether POD parses without errors or warnings.
 # This is a test for the distribution maintainer.

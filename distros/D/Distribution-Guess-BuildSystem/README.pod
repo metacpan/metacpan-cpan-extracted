@@ -2,13 +2,13 @@
 
 =encoding utf8
 
-=for HTML <a href="../../actions?query=workflow%3Amacos"><img src="../../workflows/macos/badge.svg"></a>
+=for HTML <a href="https://www.github.com/briandfoy/distribution-guess-buildsystem/actions?query=workflow%3Amacos"><img src="https://www.github.com/briandfoy/distribution-guess-buildsystem/workflows/macos/badge.svg"></a>
 
-=for HTML <a href="../../actions?query=workflow%3Aubuntu"><img src="../../workflows/ubuntu/badge.svg"></a>
+=for HTML <a href="https://www.github.com/briandfoy/distribution-guess-buildsystem/actions?query=workflow%3Aubuntu"><img src="https://www.github.com/briandfoy/distribution-guess-buildsystem/workflows/ubuntu/badge.svg"></a>
 
-=for HTML <a href="../../actions?query=workflow%3Awindows"><img src="../../workflows/windows/badge.svg"></a>
+=for HTML <a href="https://www.github.com/briandfoy/distribution-guess-buildsystem/actions?query=workflow%3Awindows"><img src="https://www.github.com/briandfoy/distribution-guess-buildsystem/workflows/windows/badge.svg"></a>
 
-=for HTML <a href='https://ci.appveyor.com/project/briandfoy/distribution-guess-buildsystem'><img src='https://ci.appveyor.com/api/projects/status/a?svg=true' /></a>
+=for HTML <a href='https://ci.appveyor.com/project/briandfoy/distribution-guess-buildsystem'><img src='https://ci.appveyor.com/api/projects/status/3eyqyp9qce6n4hrk?svg=true' /></a>
 
 =for HTML <a href='https://coveralls.io/github/briandfoy/distribution-guess-buildsystem?branch=master'><img src='https://coveralls.io/repos/github/briandfoy/distribution-guess-buildsystem/badge.svg?branch=master' alt='Coverage Status' /></a>
 
@@ -27,7 +27,7 @@ for any Perl module.
 
 To read about L<Distribution::Guess::BuildSystem>, look at the embedded documentation
 in the module itself. Inside the distribution, you can format it
-with L<perldoc|https://perldoc.perl.orgperldoc.html>:
+with L<perldoc|https://perldoc.perl.org/perldoc.html>:
 
 	% perldoc lib/Distribution/Guess/BuildSystem.pm
 

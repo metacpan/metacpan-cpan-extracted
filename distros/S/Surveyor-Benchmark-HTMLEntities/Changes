@@ -1,5 +1,8 @@
 Revision history for Perl module Surveyor::Benchmark::HTMLEntities
 
+1.023 2022-01-09T01:53:51Z
+	* no code changes. Fix a link in README.pod.
+
 1.022 2021-01-23T20:15:23Z
 	* freshen distro, dump Travis CI, add Github Actions
 

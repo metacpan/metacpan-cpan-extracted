@@ -1,7 +1,7 @@
 # All methods are class methods, it's not meant to be instantiated. It just
 # manages the type name string and converts it to arrows, etc.
 package Bio::RNA::BarMap::Mapping::Type;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use 5.012;
 use warnings;

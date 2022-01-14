@@ -1,6 +1,6 @@
 package App::optex::textconv::ooxml::xslt;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use v5.14;
 use warnings;
@@ -117,7 +117,7 @@ descriptive_docx => q{
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
   <xsl:output method="text" />
   <xsl:template match="/">
-    <xsl:apply-templates select="//w:body | //w:footnote" />
+    <xsl:apply-templates select="//w:body | //w:endnotes | //w:footnotes" />
   </xsl:template>
   <xsl:template match="w:tbl">
     <xsl:text>[ TABLE START ]&#10;&#10;</xsl:text>

@@ -8,7 +8,7 @@ package Test::Future::IO::Impl;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Test::More;
 use Test::Builder;
@@ -52,6 +52,10 @@ my $errstr_EPIPE = do {
    local $! = $^O eq "MSWin32" ? EINVAL : EPIPE; "$!";
 };
 
+my $errstr_ECONNREFUSED = do {
+   local $! = Errno::ECONNREFUSED; "$!";
+};
+
 sub time_about(&@)
 {
    my ( $code, $want_time, $name ) = @_;
@@ -92,6 +96,91 @@ sub run_tests
 The following test suite names may be passed to the L</run_tests> function:
 
 =cut
+
+=head2 accept
+
+Tests the C<< Future::IO->accept >> method.
+
+=cut
+
+sub run_accept_test
+{
+   require IO::Socket::INET;
+
+   my $serversock = IO::Socket::INET->new(
+      Type      => Socket::SOCK_STREAM(),
+      LocalPort => 0,
+      Listen    => 1,
+   ) or die "Cannot socket()/listen() - $@";
+
+   $serversock->blocking( 0 );
+
+   my $f = Future::IO->accept( $serversock );
+
+   my $sockname = $serversock->sockname;
+
+   my $clientsock = IO::Socket::INET->new(
+      Type => Socket::SOCK_STREAM(),
+   ) or die "Cannot socket() - $@";
+   $clientsock->connect( $sockname ) or die "Cannot connect() - $@";
+
+   my $acceptedsock = $f->get;
+
+   ok( $clientsock->peername eq $acceptedsock->sockname, 'Accepted socket address matches' );
+}
+
+=head2 connect
+
+Tests the C<< Future::IO->connect >> method.
+
+=cut
+
+sub run_connect_test
+{
+   require IO::Socket::INET;
+
+   my $serversock = IO::Socket::INET->new(
+      Type      => Socket::SOCK_STREAM(),
+      LocalPort => 0,
+      Listen    => 1,
+   ) or die "Cannot socket()/listen() - $@";
+
+   my $sockname = $serversock->sockname;
+
+   # ->connect success
+   {
+      my $clientsock = IO::Socket::INET->new(
+         Type => Socket::SOCK_STREAM(),
+      ) or die "Cannot socket() - $@";
+      $clientsock->blocking( 0 );
+
+      my $f = Future::IO->connect( $clientsock, $sockname );
+
+      $f->get;
+
+      my $acceptedsock = $serversock->accept;
+      ok( $clientsock->peername eq $acceptedsock->sockname, 'Accepted socket address matches' );
+   }
+
+   $serversock->close;
+   undef $serversock;
+
+   # ->connect fails
+   {
+      my $clientsock = IO::Socket::INET->new(
+         Type => Socket::SOCK_STREAM(),
+      ) or die "Cannot socket() - $@";
+      $clientsock->blocking( 0 );
+
+      my $f = Future::IO->connect( $clientsock, $sockname );
+
+      ok( !eval { $f->get; 1 }, 'Future::IO->connect fails on closed server' );
+
+      is_deeply( [ $f->failure ],
+         [ "connect: $errstr_ECONNREFUSED\n", connect => $clientsock, $errstr_ECONNREFUSED ],
+         'Future::IO->connect failure' );
+   }
+}
 
 =head2 sleep
 

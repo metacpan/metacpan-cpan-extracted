@@ -20,6 +20,11 @@ use DynaLoader;
 
 
 
+
+#line 5 "gsl_sf_ellint.pd"
+use strict;
+use warnings;
+
 =head1 NAME
 
 PDL::GSLSF::ELLINT - PDL interface to GSL Special Functions
@@ -28,11 +33,8 @@ PDL::GSLSF::ELLINT - PDL interface to GSL Special Functions
 
 This is an interface to the Special Function package present in the GNU Scientific Library.
 
-=head1 SYNOPSIS
-
 =cut
-
-
+#line 38 "ELLINT.pm"
 
 
 
@@ -45,6 +47,8 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
+
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_ellint_Kcomp
@@ -64,16 +68,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 72 "ELLINT.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_ellint_Kcomp = \&PDL::gsl_sf_ellint_Kcomp;
+#line 78 "ELLINT.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_ellint_Ecomp
@@ -93,16 +98,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 102 "ELLINT.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_ellint_Ecomp = \&PDL::gsl_sf_ellint_Ecomp;
+#line 108 "ELLINT.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_ellint_F
@@ -122,16 +128,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 132 "ELLINT.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_ellint_F = \&PDL::gsl_sf_ellint_F;
+#line 138 "ELLINT.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_ellint_E
@@ -151,16 +158,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 162 "ELLINT.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_ellint_E = \&PDL::gsl_sf_ellint_E;
+#line 168 "ELLINT.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_ellint_P
@@ -181,16 +189,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 193 "ELLINT.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_ellint_P = \&PDL::gsl_sf_ellint_P;
+#line 199 "ELLINT.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_ellint_D
@@ -211,16 +220,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 224 "ELLINT.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_ellint_D = \&PDL::gsl_sf_ellint_D;
+#line 230 "ELLINT.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_ellint_RC
@@ -240,16 +250,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 254 "ELLINT.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_ellint_RC = \&PDL::gsl_sf_ellint_RC;
+#line 260 "ELLINT.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_ellint_RD
@@ -269,16 +280,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 284 "ELLINT.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_ellint_RD = \&PDL::gsl_sf_ellint_RD;
+#line 290 "ELLINT.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_ellint_RF
@@ -298,16 +310,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 314 "ELLINT.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_ellint_RF = \&PDL::gsl_sf_ellint_RF;
+#line 320 "ELLINT.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_ellint_RJ
@@ -327,18 +340,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 344 "ELLINT.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_ellint_RJ = \&PDL::gsl_sf_ellint_RJ;
+#line 350 "ELLINT.pm"
 
 
 
 
 
+#line 171 "gsl_sf_ellint.pd"
 =head1 AUTHOR
 
 This file copyright (C) 1999 Christian Pellegrin <chri@infis.univ.trieste.it>,
@@ -352,8 +366,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-
-
+#line 370 "ELLINT.pm"
 
 
 

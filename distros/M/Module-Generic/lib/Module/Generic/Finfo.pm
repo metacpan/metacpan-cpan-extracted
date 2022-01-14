@@ -355,7 +355,9 @@ sub _datetime
             time_zone => 'local',
         );
         $dt->set_formatter( $fmt );
-        return( Module::Generic::DateTime->new( $dt ) );
+        my $o = Module::Generic::DateTime->new( $dt ) ||
+            return( $self->pass_error( Module::Generic::DateTime->error ) );
+        return( $o );
     }
     catch( $e )
     {

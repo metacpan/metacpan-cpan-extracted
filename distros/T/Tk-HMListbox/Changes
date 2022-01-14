@@ -28,3 +28,15 @@ Revision history for Perl extension Tk::HMListbox.
 	  NOTE:  Requires Tk::HListbox v.2.3+ to use these new options.
 3.13  Mon Jan 3, 2022
 	- Remember item cursor is on & restore cursor when sorting.
+3.20  Thu Jan 06, 2022
+	- Added option:  -showcursoralways
+	  See updated docs.  Tk::HMListbox (with Tk::HListbox v. 2.4+) no longer 
+	  displays the keyboard cursor (active row) when the HMListbox widget 
+	  does not have the keyboard focus, in order to be consistent with the 
+	  behaviour of Tk::SMListbox and Tk::MListbox.  This option, when set to 1 
+	  (or a "true" value) restores the pre-v3.20 behaviour of always showing 
+	  the keyboard cursor.  NOTE:  Users should upgrade Tk::HListbox to at 
+	  least v. 2.4 before or when upgrading to this version to ensure 
+	  consistant behaviour (as I have not tested with prev. Tk::HListbox vsn)!
+3.21  Thu Jan 06, 2022
+	- Oops - Correct major error in Pod/Docs.

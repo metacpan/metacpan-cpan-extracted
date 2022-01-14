@@ -1,13 +1,13 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2021 by Dominique Dumont.
+# This software is Copyright (c) 2005-2022 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::ValueComputer 2.147;
+package Config::Model::ValueComputer 2.149;
 
 use Mouse;
 use MouseX::StrictConstructor;
@@ -19,6 +19,9 @@ use Data::Dumper ();
 use Log::Log4perl qw(get_logger :levels);
 
 use vars qw($compute_grammar $compute_parser);
+
+use feature qw/postderef signatures/;
+no warnings qw/experimental::postderef experimental::signatures/;
 
 my $logger = get_logger("ValueComputer");
 
@@ -93,11 +96,10 @@ sub BUILD {
 
     $logger->trace("pre_formula: ". ($result_r ? $$result_r : ' pre_compute failed, using original formula'));
     $self->{pre_formula} = $result_r ? $$result_r : $self->{formula};
+    return;
 }
 
-sub compute {
-    my $self  = shift;
-    my %args  = @_;
+sub compute ($self, %args) {
     my $check = $args{check} || 'yes';
 
     my $pre_formula = $self->{pre_formula};
@@ -160,9 +162,7 @@ sub compute {
     return $result;
 }
 
-sub compute_info {
-    my $self  = shift;
-    my %args  = @_;
+sub compute_info ($self, %args) {
     my $check = $args{check} || 'yes';
     $logger->trace("compute_info called with $self->{formula}");
 
@@ -171,8 +171,6 @@ sub compute_info {
     my $str            = "value is computed from '$self->{formula}'";
 
     return $str unless defined $variables;
-
-    #print Dumper $variables ;
 
     if (%$variables) {
         $str .= ", where ";
@@ -215,9 +213,7 @@ sub compute_info {
 
 # internal. resolves variables that contains $foo or &bar
 # returns a hash of variable names -> variable path
-sub compute_variables {
-    my $self  = shift;
-    my %args  = @_;
+sub compute_variables ($self, %args) {
     my $check = $args{check} || 'yes';
 
     # a shallow copy should be enough as we don't allow
@@ -248,8 +244,6 @@ sub compute_variables {
                 if $logger->is_trace;
 
             if ( $$pre_res_r =~ /\$/ ) {
-                ;
-
                 # variables needs to be evaluated
                 my $res_ref =
                     $compute_parser->compute( $$pre_res_r, 1, $self->{value_object}, \%variables,
@@ -261,7 +255,7 @@ sub compute_variables {
                     if $logger->is_trace;
             }
             {
-                no warnings "uninitialized";
+                no warnings "uninitialized"; ## no critic (TestingAndDebugging::ProhibitNoWarnings)
                 $logger->trace("result $key -> '$variables{$key}' left '$var_left'");
             }
         }
@@ -550,7 +544,7 @@ Config::Model::ValueComputer - Provides configuration value computation
 
 =head1 VERSION
 
-version 2.147
+version 2.149
 
 =head1 SYNOPSIS
 
@@ -1015,7 +1009,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2021 by Dominique Dumont.
+This software is Copyright (c) 2005-2022 by Dominique Dumont.
 
 This is free software, licensed under:
 

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Scalar.pm
-## Version v1.0.3
+## Version v1.1.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2021/11/13
+## Modified 2021/12/28
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -78,7 +78,8 @@ BEGIN
         },
         fallback => 1,
     );
-    our( $VERSION ) = 'v1.0.3';
+    our $DEBUG = 0;
+    our( $VERSION ) = 'v1.1.0';
 };
 
 ## sub new { return( shift->_new( @_ ) ); }
@@ -122,8 +123,74 @@ sub as_number { return( $_[0]->_number( ${$_[0]} ) ); }
 
 sub as_string { return( ${$_[0]} ); }
 
-## Credits: John Gruber, Aristotle Pagaltzis
-## https://gist.github.com/gruber/9f9e8650d68b13ce4d78
+sub callback
+{
+    my $self = CORE::shift( @_ );
+    my( $what, $code ) = @_;
+    if( !defined( $what ) )
+    {
+        warnings::warn( "No callback type was provided.\n" ) if( warnings::enabled( 'Module::Generic::Scalar' ) );
+        return;
+    }
+    elsif( $what ne 'add' && $what ne 'remove' )
+    {
+        warnings::warn( "Callback type provided ($what) is unsupported. Use 'add' or 'remove'.\n" ) if( warnings::enabled( 'Module::Generic::Scalar' ) );
+        return;
+    }
+    elsif( scalar( @_ ) == 1 )
+    {
+        warnings::warn( "No callback code was provided. Provide an anonymous subroutine, or reference to existing subroutine.\n" ) if( warnings::enabled( 'Module::Generic::Scalar' ) );
+        return;
+    }
+    elsif( defined( $code ) && ref( $code ) ne 'CODE' )
+    {
+        warnings::warn( "Callback provided is not a code reference. Provide an anonymous subroutine, or reference to existing subroutine." ) if( warnings::enabled( 'Module::Generic::Scalar' ) );
+        return;
+    }
+    
+    if( !defined( $code ) )
+    {
+        # undef is passed as an argument, so we remove the callback
+        if( scalar( @_ ) >= 2 )
+        {
+            # The array is not tied, so there is nothing to remove.
+            my $tie = tied( $$self );
+            return(1) if( !$tie );
+            my $rv = $tie->unset_callback( $what );
+            print( STDERR ref( $self ), "::callback: Any callback left? ", ( $rv ? 'yes' : 'no' ), "\n" ) if( $DEBUG );
+            untie( $$self ) if( !$tie->has_callback );
+            return( $rv );
+        }
+        # Only 1 argument: get mode only
+        else
+        {
+            my $tie = tied( $$self );
+            return if( !$tie );
+            return( $tie->get_callback( $what ) );
+        }
+    }
+    # $code is defined, so we have something to set
+    else
+    {
+        my $tie = tied( $$self );
+        # Not tied yet
+        if( !$tie )
+        {
+            $tie = tie( $$self => 'Module::Generic::Scalar::Tie',
+            {
+                data  => $self,
+                debug => $DEBUG,
+                $what => $code,
+            }) || return;
+            return(1);
+        }
+        $tie->set_callback( $what => $code ) || return;
+        return(1);
+    }
+}
+
+# Credits: John Gruber, Aristotle Pagaltzis
+# https://gist.github.com/gruber/9f9e8650d68b13ce4d78
 sub capitalise
 {
     my $self = CORE::shift( @_ );
@@ -736,6 +803,146 @@ sub _warnings_is_enabled { return( warnings::enabled( ref( $_[0] ) || $_[0] ) );
     sub name { return( shift->_set_get_hash_as_object( 'name', @_ ) ); }
     
     sub result { return( shift->_set_get_array_as_object( 'result', @_ ) ); }
+}
+
+{
+    package
+        Module::Generic::Scalar::Tie;
+    BEGIN
+    {
+        use strict;
+        use warnings;
+        use Scalar::Util ();
+        our $dummy_callback = sub{1};
+    };
+    
+    sub TIESCALAR
+    {
+        my( $class, $opts ) = @_;
+        $opts //= {};
+        if( Scalar::Util::reftype( $opts ) ne 'HASH' )
+        {
+            warn( "Options provided (", overload::StrVal( $opts ), ") is not an hash reference\n" );
+            $opts = {};
+        }
+        $opts->{data} //= '';
+        $opts->{debug} //= 0;
+        if( CORE::length( $opts->{add} ) && ref( $opts->{add} ) ne 'CODE' )
+        {
+            warnings::warn( "Code provided for the scalar add callback is not a code reference.\n" ) if( warnings::enabled( 'Module::Generic::Sscalar' ) || $opts->{debug} );
+            return;
+        }
+        if( CORE::length( $opts->{remove} ) && ref( $opts->{remove} ) ne 'CODE' )
+        {
+            warnings::warn( "Code provided for the scalar remove callback is not a code reference.\n" ) if( warnings::enabled( 'Module::Generic::Sscalar' ) || $opts->{debug} );
+            return;
+        }
+        
+        my $ref =
+        {
+        callback_add => $opts->{add},
+        callback_remove => $opts->{remove},
+        data => ( Scalar::Util::reftype( $opts->{data} ) eq 'SCALAR' ? \"${$opts->{data}}" : \undef ),
+        debug => $opts->{debug},
+        };
+        print( STDERR ( ref( $class ) || $class ), "::TIESCALAR: Using ", CORE::length( ${$ref->{data}} ), " bytes of data in scalar vs ", CORE::length( ${$opts->{data}} ), " bytes received via opts->data.\n" ) if( $ref->{debug} );
+        return( bless( $ref => ( ref( $class ) || $class ) ) );
+    }
+    
+    sub FETCH
+    {
+        my $self = shift( @_ );
+        return( ${$self->{data}} );
+    }
+
+    sub STORE
+    {
+        my( $self, $value ) = @_;
+        my $index = 0;
+        my $rv;
+        # New value is smaller than our current, so this is a removal. It could be partial or total
+        if( CORE::length( "$value" ) < CORE::length( ${$self->{data}} ) )
+        {
+            my $cb = $self->{callback_remove} || $dummy_callback;
+            if( !$cb )
+            {
+                warnings::warn( "No callback remove found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic::Scalar' ) || $self->{debug} );
+                $rv = 1;
+            }
+            else
+            {
+                $rv = $cb->({ type => 'remove', removed => \"${$self->{data}}", added => \$value });
+            }
+        }
+        else
+        {
+            my $cb = $self->{callback_add} || $dummy_callback;
+            if( !$cb )
+            {
+                warnings::warn( "No callback add found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic::Scalar' ) || $self->{debug} );
+                $rv = 1;
+            }
+            else
+            {
+                $rv = $cb->({ type => 'add', added => \$value });
+            }
+        }
+        
+        print( STDERR ref( $self ), "::STORE: adding ", CORE::length( "$value" ), " bytes of data ($value) at position $index with current data of ", CORE::length( ${$self->{data}} ), " bytes (", ${$self->{data}}, ") -> callback returned ", ( defined( $rv ) ? 'true' : 'undef' ), "\n" ) if( $self->{debug} );
+        return if( !defined( $rv ) );
+        ${$self->{data}} = $value;
+    }
+
+    sub has_callback
+    {
+        my $self = shift( @_ );
+        return(1) if( ref( $self->{callback_add} ) eq 'CODE' || ref( $self->{callback_remove} ) eq 'CODE' );
+        return(0);
+    }
+    
+    sub set_callback
+    {
+        my( $self, $what, $code ) = @_;
+        if( !defined( $what ) )
+        {
+            warn( "No callback type was provided. Use \"add\" or \"remove\".\n" );
+            return;
+        }
+        elsif( $what ne 'add' && $what ne 'remove' )
+        {
+            warn( "Unknown callback type was provided: '$what'. Use \"add\" or \"remove\".\n" );
+            return;
+        }
+        elsif( !defined( $code ) )
+        {
+            warn( "No callback anonymous subroutine or subroutine reference was provided.\n" );
+            return;
+        }
+        elsif( ref( $code ) ne 'CODE' )
+        {
+            warn( "Callback provided (", overload::StrVal( $code ), ") is not a code reference.\n" );
+            return;
+        }
+        $self->{ "callback_${what}" } = $code;
+        return(1);
+    }
+    
+    sub unset_callback
+    {
+        my( $self, $what ) = @_;
+        if( !defined( $what ) )
+        {
+            warn( "No callback type was provided. Use \"add\" or \"remove\".\n" );
+            return;
+        }
+        elsif( $what ne 'add' && $what ne 'remove' )
+        {
+            warn( "Unknown callback type was provided: '$what'. Use \"add\" or \"remove\".\n" );
+            return;
+        }
+        $self->{ "callback_${what}" } = undef;
+        return(1);
+    }
 }
 
 1;

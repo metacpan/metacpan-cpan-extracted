@@ -1,13 +1,13 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2021 by Dominique Dumont.
+# This software is Copyright (c) 2005-2022 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::SimpleUI 2.147;
+package Config::Model::SimpleUI 2.149;
 
 use Carp;
 use v5.020;
@@ -296,8 +296,8 @@ sub run_loop {
 
     my $instance = $self->{root}->instance;
     if ( $instance->c_count ) {
-        my @changes = $instance->say_changes;
-        if (@changes) {
+        if ($instance->has_changes) {
+            $instance->say_changes;
             print "write back data before exit ? (Y/n)";
             $user_cmd = <STDIN>;
             $instance->write_back unless $user_cmd =~ /n/i;
@@ -372,7 +372,7 @@ Config::Model::SimpleUI - Simple interface for Config::Model
 
 =head1 VERSION
 
-version 2.147
+version 2.149
 
 =head1 SYNOPSIS
 
@@ -604,7 +604,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2021 by Dominique Dumont.
+This software is Copyright (c) 2005-2022 by Dominique Dumont.
 
 This is free software, licensed under:
 

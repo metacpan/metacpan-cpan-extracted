@@ -1,0 +1,14 @@
+Changes
+Lang-HL-0.03.tar.gz
+Lang-HL-0.05.tar.gz
+Lang-HL-0.07.tar.gz
+lib/Lang/HL.pm
+Makefile.PL
+MANIFEST
+README
+script/hlc
+script/hlg
+script/hlp
+t/Lang-HL.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

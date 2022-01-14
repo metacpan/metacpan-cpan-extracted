@@ -1,18 +1,18 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/ListPerlReleases/list_perl_releases
-# and generated automatically using Perinci::CmdLine::Gen version 0.498
-
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-29'; # DATE
-our $DIST = 'App-ListPerlReleases'; # DIST
-our $VERSION = '0.003'; # VERSION
+# and generated automatically using Perinci::CmdLine::Gen version 0.500
 
 use 5.010001;
 use strict;
 use warnings;
 
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-01-01'; # DATE
+our $DIST = 'App-ListPerlReleases'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/ListPerlReleases/list_perl_releases",
@@ -36,33 +36,21 @@ list-perl-releases - List of Perl releases
 
 =head1 VERSION
 
-This document describes version 0.003 of list-perl-releases (from Perl distribution App-ListPerlReleases), released on 2021-05-29.
+This document describes version 0.004 of list-perl-releases (from Perl distribution App-ListPerlReleases), released on 2021-01-01.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % list-perl-releases [--config-path=path | -c] [--config-profile=profile |
-     -P] [--detail] [--exclude-field=s+] [--exclude-fields-json=s]
-     [--field=s+] [--fields-json=s] [--format=name] [--json] [-l]
-     [--(no)naked-res] [--no-config | -C] [--no-detail] [--no-env]
-     [--no-random] [--nodetail] [--norandom] [--page-result[=program]]
-     [--random] [--result-limit=s] [--result-start=s] [--sort-json=s]
-     [--sort=s+] [--tarball-contains=s] [--tarball-in-json=s]
-     [--tarball-in=s+] [--tarball-is=s] [--tarball-isnt=s]
-     [--tarball-max=s] [--tarball-min=s] [--tarball-not-contains=s]
-     [--tarball-not-in-json=s] [--tarball-not-in=s+] [--tarball-xmax=s]
-     [--tarball-xmin=s] [--tarball=s] [--version-arg=s]
-     [--version-contains=s] [--version-in-json=s] [--version-in=s+]
-     [--version-is=s] [--version-isnt=s] [--version-max=s]
-     [--version-min=s] [--version-not-contains=s] [--version-not-in-json=s]
-     [--version-not-in=s+] [--version-xmax=s] [--version-xmin=s]
-     [--view-result[=program]] [--with-field-names] [--without-field-names]
-     [query]
+% B<list-perl-releases> [B<--config-path>=I<path>|B<-c>|B<--no-config>|B<-C>] [B<--config-profile>=I<profile>|B<-P>] [B<--detail>|B<-l>|B<--no-detail>|B<--nodetail>] [(B<--exclude-field>=I<str>)+] [(B<--field>=I<str>)+] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--no-env>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--random>|B<--no-random>|B<--norandom>] [B<--result-limit>=I<int>] [B<--result-start>=I<int>] [(B<--sort>=I<str>)+] [B<--tarball-contains>=I<str>] [(B<--tarball-in>=I<str>)+] [B<--tarball-is>=I<str>] [B<--tarball-isnt>=I<str>] [B<--tarball-max>=I<str>] [B<--tarball-min>=I<str>] [B<--tarball-not-contains>=I<str>] [(B<--tarball-not-in>=I<str>)+] [B<--tarball-xmax>=I<str>] [B<--tarball-xmin>=I<str>] [B<--tarball>=I<str>] [B<--version-arg>=I<str>] [B<--version-contains>=I<str>] [(B<--version-in>=I<str>)+] [B<--version-is>=I<str>] [B<--version-isnt>=I<str>] [B<--version-max>=I<str>] [B<--version-min>=I<str>] [B<--version-not-contains>=I<str>] [(B<--version-not-in>=I<str>)+] [B<--version-xmax>=I<str>] [B<--version-xmin>=I<str>] [B<--with-field-names>|B<--without-field-names>] [B<--exclude-fields-json>=I<json>] [B<--fields-json>=I<json>] [B<--sort-json>=I<json>] [B<--tarball-in-json>=I<json>] [B<--tarball-not-in-json>=I<json>] [B<--version-in-json>=I<json>] [B<--version-not-in-json>=I<json>] -- [I<query>]
 
 =head1 DESCRIPTION
 
-REPLACE ME
+This utility uses L<CPAN::Perl::Releases>'s C<perl_tarballs()> to list releases
+of Perl interpreters. For each release, it provides information such as version
+number and location of tarballs in releaser author's directory on CPAN.
+
+Update the CPAN::Perl::Releases module to get the latest list of releases.
 
 =head1 OPTIONS
 
@@ -429,7 +417,7 @@ For fish and zsh, install L<shcompgen> as described above.
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/list-perl-releases.conf>, F<~/list-perl-releases.conf>, or F</etc/list-perl-releases.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/s1/.config/list-perl-releases.conf>, F</home/s1/list-perl-releases.conf>, or F</etc/list-perl-releases.conf>.
 
 All found files will be read and merged.
 
@@ -500,9 +488,9 @@ Specify additional command-line options.
 
 =head1 FILES
 
-F<~/.config/list-perl-releases.conf>
+F</home/s1/.config/list-perl-releases.conf>
 
-F<~/list-perl-releases.conf>
+F</home/s1/list-perl-releases.conf>
 
 F</etc/list-perl-releases.conf>
 
@@ -514,6 +502,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-ListPe
 
 Source repository is at L<https://github.com/perlancar/perl-App-ListPerlReleases>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2018 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ListPerlReleases>
@@ -521,16 +537,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2018 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

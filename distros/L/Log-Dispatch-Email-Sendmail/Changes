@@ -1,5 +1,9 @@
 Revision history for Log-Dispatch-Email-Sendmail
 
+0.03	Thu Jan  6 15:10:38 EST 2022
+	Send N/A, not Unknown, on machines without sendmail
+	Workaround for Dreamhost error
+
 0.02	Fri Apr 26 15:45:56 EDT 2013
 	Don't attempt to install on machines without sendmail
 	Error if to is not set

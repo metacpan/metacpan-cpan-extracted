@@ -4,6 +4,10 @@
 #define NEED_mg_findext
 #include "ppport.h"
 
+#ifndef sv_derived_from_pvn
+#define sv_derived_from_pvn(sv, name, namelen, flags) sv_derived_from(sv, name)
+#endif
+
 SV* S_clone_value(pTHX_ SV* original) {
 	dSP;
 	PUSHSTACKi(PERLSI_MAGIC);

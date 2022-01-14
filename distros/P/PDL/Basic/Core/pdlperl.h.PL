@@ -18,12 +18,12 @@ print OUT <<'EOF';
 #ifndef __PDLPERL_H
 #define __PDLPERL_H
 
-#define PDL_XS_SCALAR(type, ctype, val) \
-  SV *b_SV = sv_newmortal(); \
-  pdl *b = pdl_pdlnew(); \
+#define PDL_XS_SCALAR(type, val) \
   PDL_Anyval av; \
   ANYVAL_FROM_CTYPE(av,type,val); \
-  pdl_makescratchhash(b, av); \
+  pdl *b = pdl_scalar(av); \
+  if (!b) XSRETURN_UNDEF; \
+  SV *b_SV = sv_newmortal(); \
   pdl_SetSV_PDL(b_SV, b); \
   EXTEND(SP, 1); \
   ST(0) = b_SV; \
@@ -57,20 +57,20 @@ print OUT <<'EOF';
             outany.type = forced_type >=0 ? forced_type : -1; \
             outany.value.B = 0; \
             break; \
-        } else { \
-            sv2 = get_sv("PDL::undefval",1); \
-            if(SvIV(get_sv("PDL::debug",1))) \
-                fprintf(stderr,"Warning: SvPDLV converted undef to $PDL::undefval (%g).\n",SvNV(sv2)); \
-            if (PDL_SV_IS_UNDEF(sv2)) { \
-                outany.type = forced_type >=0 ? forced_type : PDL_B; \
-                outany.value.B = 0; \
-                break; \
-            } \
+        } \
+        sv2 = get_sv("PDL::undefval",1); \
+        if(SvIV(get_sv("PDL::debug",1))) \
+            fprintf(stderr,"Warning: SvPDLV converted undef to $PDL::undefval (%g).\n",SvNV(sv2)); \
+        if (PDL_SV_IS_UNDEF(sv2)) { \
+            outany.type = forced_type >=0 ? forced_type : PDL_B; \
+            outany.value.B = 0; \
+            break; \
         } \
     } \
     if (sv_derived_from(sv2, "PDL")) { \
         pdl *it = PDL_CORE_(SvPDLV)(sv2); \
         outany = PDL_CORE_(at0)(it); \
+        if (outany.type < 0) croak("Position out of range"); \
     } else if (!SvIOK(sv2)) { /* Perl Double (e.g. 2.0) */ \
         NV tmp_NV = SvNV(sv2); \
         int datatype = forced_type >=0 ? forced_type : _pdl_whichdatatype_double(tmp_NV); \
@@ -106,16 +106,16 @@ print OUT <<'EOF';
 /* Check minimum datatype required to represent number */
 #define PDL_TESTTYPE(sym, ctype) {ctype foo = nv; if(nv == foo) return sym;}
 static inline int _pdl_whichdatatype (IV nv) {
-#define X(sym, ctype, ppsym, shortctype, defbval) \
+#define X(sym, ctype, ...) \
   PDL_TESTTYPE(sym, ctype)
-   PDL_GENERICLIST(X)
+   PDL_TYPELIST_ALL(X)
 #undef X
         croak("Something's gone wrong: %ld cannot be converted by whichdatatype", nv);
 }
-/* Check minimum, at least float, datatype required to represent number */
+/* Check minimum, at least double, datatype required to represent number */
 static inline int _pdl_whichdatatype_double (NV nv) {
-        PDL_TESTTYPE(PDL_F,PDL_Float)
         PDL_TESTTYPE(PDL_D,PDL_Double)
+        PDL_TESTTYPE(PDL_D,PDL_LDouble)
 #undef PDL_TESTTYPE
         /* Default return type PDL_Double */
         return PDL_D;

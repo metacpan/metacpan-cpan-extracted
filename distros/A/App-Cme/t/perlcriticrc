@@ -1,10 +1,12 @@
-severity = 4
+severity = 3
 
 # remove when https://github.com/Perl-Critic/PPI/issues/194 is fixed
 [-Subroutines::ProhibitSubroutinePrototypes]
 
 [TestingAndDebugging::ProhibitNoWarnings]
-allow = experimental::signatures experimental::smartmatch
+allow = experimental::signatures experimental::smartmatch experimental::postderef
 
 [-RegularExpressions::RequireExtendedFormatting]
+minimum_regex_length_to_complain_about = 25
+
 [-ValuesAndExpressions::ProhibitVersionStrings]

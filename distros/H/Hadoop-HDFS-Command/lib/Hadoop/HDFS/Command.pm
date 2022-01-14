@@ -1,5 +1,5 @@
 package Hadoop::HDFS::Command;
-$Hadoop::HDFS::Command::VERSION = '0.006';
+$Hadoop::HDFS::Command::VERSION = '0.007';
 use 5.010;
 use strict;
 use warnings;
@@ -435,7 +435,7 @@ sub _dfs_getfacl {
     my $self    = shift;
     my $options = shift;
     my @params  = @_;
-    my @flags   = qw();
+    my @flags   = qw( R );
     my($arg, $paths) = $self->_parse_options(
                             \@params,
                             \@flags,
@@ -470,7 +470,7 @@ sub _dfs_setfacl {
     my $self    = shift;
     my $options = shift;
     my @params  = @_;
-    my @flags   = qw( b k );
+    my @flags   = qw( b k R );
     my @args    = qw( m=s x=s set=s );
 
     my($arg, $paths) = $self->_parse_options(
@@ -671,7 +671,7 @@ Hadoop::HDFS::Command
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -759,6 +759,10 @@ The C<@subcommand_args> can have these defined: C<-s>, C<-h>.
                 du => -s => @hdfs_paths,
             );
 
+=head3 getfacl
+
+    my $rv = $hdfs->dfs( getfacl => $hdfs_path );
+
 =head3 ls
 
 The C<@subcommand_args> can have these defined: C<-d>, C<-h>, C<R>.
@@ -813,6 +817,13 @@ The C<@subcommand_args> can have these defined: C<-f>, C<-p>, C<-l>
 The C<@subcommand_args> can have these defined: C<-f>, C<-r>, C<-skipTrash>
 
     $hdfs->dfs( rm => @subcommand_args, $hdfs_path );
+
+=head3 setfacl
+
+The C<@subcommand_args> can have these defined: C<-b>, C<-k>, C<-m acl_spec>,
+C<-x acl_spec>, C<--set acl_spec>
+
+    $hdfs->dfs( setfacl => @subcommand_args, $hdfs_path );
 
 =head3 test
 

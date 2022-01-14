@@ -1,3 +1,19 @@
+1.036 2022-01-12
+
+  Bug fix:
+    * fix test broken by output change in Config::Model 2.148
+
+  Misc changes:
+    * tests requires Config::Model 2.148
+
+1.035 2022-01-09
+
+  Bug fix:
+    * fix postderef syntax with perl 5.20
+    * fix (run): --no-commit option
+    * fix (run): do not try to commit when no changes are done
+    * fix (test): broken by Config::Model 2.145
+
 1.034 2021-10-30
 
   New feature:

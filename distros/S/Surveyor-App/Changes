@@ -1,5 +1,8 @@
 Revision history for Perl module Surveyor::App
 
+0.123 2022-01-09T01:48:02Z
+	* no code changes. Fix a link in README.pod.
+
 0.122 2021-01-23T19:44:12Z
 	* freshen distro, dump Travis CI, add Github Actions
 

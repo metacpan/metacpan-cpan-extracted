@@ -1,5 +1,8 @@
 Revision history for Perl module Brick
 
+0.902 2022-01-09T01:10:56Z
+	* No code changes. Fix a link in README.pod.
+
 0.901 2021-01-15T07:33:03Z
 	* Freshen distro, remove Travis CI, add Github actions
 	* Remove t/prereq.t test

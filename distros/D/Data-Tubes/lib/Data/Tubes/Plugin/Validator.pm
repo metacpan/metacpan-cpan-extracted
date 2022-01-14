@@ -2,7 +2,7 @@ package Data::Tubes::Plugin::Validator;
 use strict;
 use warnings;
 use English qw< -no_match_vars >;
-our $VERSION = '0.736';
+our $VERSION = '0.738';
 
 use Log::Log4perl::Tiny qw< :easy :dead_if_first >;
 

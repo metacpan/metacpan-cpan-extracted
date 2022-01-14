@@ -4,22 +4,25 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 
 use Moose;
+with 'Dist::Zilla::Role::BeforeBuild';
 
-with qw(
-  Dist::Zilla::Role::BeforeBuild
-);
+use Carp;
+use Git::Background 0.003;
+use Path::Tiny;
+
+use namespace::autoclean;
+
+sub mvp_multivalue_args { return (qw( ignore )) }
 
 has _git => (
     is      => 'ro',
-    isa     => 'Git::Wrapper',
+    isa     => 'Git::Background',
     lazy    => 1,
-    default => sub { Git::Wrapper->new( path( shift->zilla->root )->absolute->stringify ) },
+    default => sub { Git::Background->new( path( shift->zilla->root )->absolute ) },
 );
-
-sub mvp_multivalue_args { return (qw( ignore )) }
 
 has ignore => (
     is      => 'ro',
@@ -27,19 +30,11 @@ has ignore => (
     default => sub { [] },
 );
 
-use Carp;
-use Git::Wrapper;
-use Path::Tiny;
-use Safe::Isa;
-use Try::Tiny;
-
-use namespace::autoclean;
-
 sub before_build {
     my ($self) = @_;
 
-    my %ignored_file = map { $_ => 1 } @{ $self->ignore };
-    my @files = grep { !exists $ignored_file{$_} } $self->_git_ls_files();
+    my %ignored_file = map  { $_ => 1 } @{ $self->ignore };
+    my @files        = grep { !exists $ignored_file{$_} } $self->_git_ls_files();
     return if !@files;
 
     my @errors;
@@ -81,24 +76,11 @@ sub _git_ls_files {
 
     my $git = $self->_git;
 
-    my @files;
-    try {
-        @files = $git->ls_files();
-    }
-    catch {
-        my $fatal = $_;
-        if ( $fatal->$_isa('Git::Wrapper::Exception') ) {
-            my $err = $git->ERR;
-            if ( $err and @{$err} ) {
-                $self->log( @{$err} );
-            }
+    my $files_f = $git->run('ls-files')->await;
 
-            $self->log_fatal( $fatal->error );
-        }
+    $self->log_fatal( scalar $files_f->failure ) if $files_f->is_failed;
 
-        $self->log_fatal($fatal);
-    };
-
+    my @files = $files_f->stdout;
     return @files;
 }
 
@@ -114,11 +96,11 @@ __END__
 
 =head1 NAME
 
-Dist::Zilla::Plugin::Git::RequireUnixEOL - Enforce the correct line endings in your Git repository with Dist::Zilla
+Dist::Zilla::Plugin::Git::RequireUnixEOL - enforce the correct line endings in your Git repository with Dist::Zilla
 
 =head1 VERSION
 
-Version 1.000
+Version 1.001
 
 =head1 SYNOPSIS
 
@@ -130,7 +112,7 @@ Version 1.000
 This plugin checks that all the files in the Git repository where your
 project is saved use Unix line endings and have no whitespace at the end of
 a line. Files not in the Git index are ignored. You can ignore additional
-files with the B<ignore> option in F<dist.ini>.
+files with the C<ignore> option in F<dist.ini>.
 
 The plugin runs in the before build phase and aborts the build if a violation
 is found.
@@ -164,7 +146,7 @@ Sven Kirmess <sven.kirmess@kzone.ch>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017-2018 by Sven Kirmess.
+This software is Copyright (c) 2017-2022 by Sven Kirmess.
 
 This is free software, licensed under:
 

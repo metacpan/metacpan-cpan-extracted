@@ -103,7 +103,7 @@ static void pixel_rgn_pdl_delete_data (pdl *p, size_t param)
 
 static pdl *redim_pdl (pdl *p, int ndim, int newsize)
 {
-  pdl *r = PDL->null ();
+  pdl *r = PDL->pdlnew();
   PDL_Indx dims[p->ndims], i; /* copy so as to modify */
   for (i = 0; i < p->ndims; i++) dims[i] = p->dims[i];
   dims[ndim] = newsize;

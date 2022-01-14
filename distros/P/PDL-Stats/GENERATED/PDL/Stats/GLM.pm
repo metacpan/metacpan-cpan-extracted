@@ -3,7 +3,7 @@
 #
 package PDL::Stats::GLM;
 
-our @EXPORT_OK = qw( ols_t anova anova_rptd dummy_code effect_code effect_code_w interaction_code ols ols_rptd r2_change logistic pca pca_sorti plot_means plot_residuals plot_screes PDL::PP fill_m PDL::PP fill_rand PDL::PP dev_m PDL::PP stddz PDL::PP sse PDL::PP mse PDL::PP rmse PDL::PP pred_logistic PDL::PP d0 PDL::PP dm PDL::PP dvrs );
+our @EXPORT_OK = qw(ols_t anova anova_rptd dummy_code effect_code effect_code_w interaction_code ols ols_rptd r2_change logistic pca pca_sorti plot_means plot_residuals plot_screes fill_m fill_rand dev_m stddz sse mse rmse pred_logistic d0 dm dvrs );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -19,6 +19,9 @@ use DynaLoader;
 
 
 
+
+
+#line 4 "glm.pd"
 
 use strict;
 use warnings;
@@ -67,7 +70,7 @@ P-values, where appropriate, are provided if PDL::GSL::CDF is installed.
     print "$_\t$m{$_}\n" for (sort keys %m);
 
 =cut
-
+#line 74 "GLM.pm"
 
 
 
@@ -80,6 +83,8 @@ P-values, where appropriate, are provided if PDL::GSL::CDF is installed.
 
 
 
+
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 fill_m
@@ -117,16 +122,17 @@ The output pdl badflag is cleared.
   
 
 =cut
+#line 126 "GLM.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *fill_m = \&PDL::fill_m;
+#line 132 "GLM.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 fill_rand
@@ -165,16 +171,17 @@ The output pdl badflag is cleared.
   
 
 =cut
+#line 175 "GLM.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *fill_rand = \&PDL::fill_rand;
+#line 181 "GLM.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 dev_m
@@ -199,16 +206,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 210 "GLM.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *dev_m = \&PDL::dev_m;
+#line 216 "GLM.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 stddz
@@ -232,16 +240,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 244 "GLM.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *stddz = \&PDL::stddz;
+#line 250 "GLM.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 sse
@@ -266,16 +275,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 279 "GLM.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *sse = \&PDL::sse;
+#line 285 "GLM.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 mse
@@ -300,16 +310,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 314 "GLM.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *mse = \&PDL::mse;
+#line 320 "GLM.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 rmse
@@ -334,16 +345,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 349 "GLM.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *rmse = \&PDL::rmse;
+#line 355 "GLM.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 pred_logistic
@@ -374,16 +386,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 390 "GLM.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *pred_logistic = \&PDL::pred_logistic;
+#line 396 "GLM.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 d0
@@ -411,16 +424,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 428 "GLM.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *d0 = \&PDL::d0;
+#line 434 "GLM.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 dm
@@ -451,16 +465,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 469 "GLM.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *dm = \&PDL::dm;
+#line 475 "GLM.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 dvrs
@@ -485,18 +500,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 504 "GLM.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *dvrs = \&PDL::dvrs;
+#line 510 "GLM.pm"
 
 
 
+#line 594 "glm.pd"
 
-#line 594 "GLM/glm.pd"
+#line 594 "glm.pd"
 
 # my tmp var for PDL 2.007 slice upate
 my $_tmp;
@@ -2558,9 +2574,11 @@ Copyright (C) 2009 Maggie J. Xiong <maggiexyz users.sourceforge.net>
 All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDL distribution.
 
 =cut
+#line 2657 "glm.pd"
+#line 2579 "GLM.pm"
 
 
-;
+
 
 
 

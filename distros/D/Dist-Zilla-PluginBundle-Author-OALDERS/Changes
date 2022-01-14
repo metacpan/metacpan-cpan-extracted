@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-PluginBundle-Author-OALDERS
 
+0.000030  2022-01-13 21:35:47Z
+    - Remove Dist::Zilla::Plugin::OALDERS::TidyAll
+
 0.000029  2020-11-10 16:39:47Z
     - Remove TravisCI::StatusBadge
 

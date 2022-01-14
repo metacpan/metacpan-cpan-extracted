@@ -1,5 +1,6 @@
-use Test::More tests => 27;
 use strict;
+use warnings;
+use Test::More tests => 27;
 use Config;
 
 use CGI::Simple::Standard qw(:all -default);
@@ -92,7 +93,7 @@ is(
 
 is(
   redirect( 'http://somewhere.else' ),
-  "Status: 302 Moved${CRLF}Location: http://somewhere.else${CRLF}${CRLF}",
+  "Status: 302 Found${CRLF}Location: http://somewhere.else${CRLF}${CRLF}",
   "CGI::redirect() 1"
 );
 
@@ -103,7 +104,7 @@ my $h = redirect(
 
 is(
   $h,
-  "Status: 302 Moved${CRLF}Location: http://somewhere.else${CRLF}"
+  "Status: 302 Found${CRLF}Location: http://somewhere.else${CRLF}"
    . "Content-Type: text/html; charset=ISO-8859-1${CRLF}${CRLF}",
   "CGI::redirect() 2"
 );
@@ -113,7 +114,7 @@ is(
     -Location => 'http://somewhere.else/bin/foo&bar',
     -Type     => 'text/html'
   ),
-  "Status: 302 Moved${CRLF}Location: http://somewhere.else/bin/foo&bar${CRLF}"
+  "Status: 302 Found${CRLF}Location: http://somewhere.else/bin/foo&bar${CRLF}"
    . "Content-Type: text/html; charset=ISO-8859-1${CRLF}${CRLF}",
   "CGI::redirect() 2"
 );

@@ -17,22 +17,22 @@ name: Bio-RNA-BarMap
 provides:
   Bio::RNA::BarMap:
     file: lib/Bio/RNA/BarMap.pm
-    version: '0.01'
+    version: '0.02'
   Bio::RNA::BarMap::Mapping:
     file: lib/Bio/RNA/BarMap/Mapping.pm
-    version: '0.01'
+    version: '0.02'
   Bio::RNA::BarMap::Mapping::FileMappingEntry:
     file: lib/Bio/RNA/BarMap/Mapping/FileMappingEntry.pm
-    version: '0.01'
+    version: '0.02'
   Bio::RNA::BarMap::Mapping::MinMappingEntry:
     file: lib/Bio/RNA/BarMap/Mapping/MinMappingEntry.pm
-    version: '0.01'
+    version: '0.02'
   Bio::RNA::BarMap::Mapping::Set:
     file: lib/Bio/RNA/BarMap/Mapping/Set.pm
-    version: '0.01'
+    version: '0.02'
   Bio::RNA::BarMap::Mapping::Type:
     file: lib/Bio/RNA/BarMap/Mapping/Type.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   File::Spec: '3.75'
   IPC::System::Simple: '1.25'
@@ -42,5 +42,5 @@ requires:
   Scalar::Util: '1.5'
   autodie: '2.29'
   namespace::autoclean: '0.28'
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

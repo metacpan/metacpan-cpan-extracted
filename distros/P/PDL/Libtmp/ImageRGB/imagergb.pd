@@ -1,13 +1,14 @@
+use strict;
+use warnings;
 
 pp_add_exported('',"interlrgb rgbtogr bytescl cquant ");
 pp_addhdr('
 #include "pdlppm.h"  /* Local decs */
 ');
 
-
-############################## PM CODE ########################################
-
-pp_addpm({At=>Top},<<'EOD');
+pp_addpm({At=>'Top'},<<'EOD');
+use strict;
+use warnings;
 
 =head1 NAME
 
@@ -253,15 +254,15 @@ EOD
 pp_def(
 	'cquant_c',Doc=>undef,
 	Pars => 'a(m,n,o); [o]b(n,o); [o]c(m,p);',
-	GenericTypes => [B],
+	GenericTypes => ['B'],
 	OtherPars => 'int psz => p',
 	Code => 'int status;
-		 if ($SIZE(m) != 3) barf("need RGB data (3,x,...)");
+		 if ($SIZE(m) != 3) $CROAK("need RGB data (3,x,...)");
 	         status = ppm_quant($P(a), NULL, NULL, $SIZE(n),
 				$SIZE(o),$P(b), NULL, $P(c), 0,
 				$SIZE(p), 1);
 		 if (!status)
-	   		barf("ppm_quant returned error status");'
+			$CROAK("ppm_quant returned error status");'
 );
 
 pp_done();

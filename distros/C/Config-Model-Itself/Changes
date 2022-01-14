@@ -1,3 +1,14 @@
+2.023 2022-01-07
+
+  Model update:
+    * add use_backend_argument_as_config_file parameter in Application
+
+  Bug fix:
+    * delete files of deleted models
+
+  Misc:
+    * itself test requires Config::Model 2.142
+
 2.022 2021-01-21
 
   Model update:

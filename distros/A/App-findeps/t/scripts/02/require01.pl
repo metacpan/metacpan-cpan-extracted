@@ -3,10 +3,9 @@ use warnings;
 
 use lib 't/lib';
 
-# require Module::CommentOuted; # does exist but will be ignored
-my $dummys = 1;    # require Module::CommentOuted; # does exist but will be ignored
+require Module::Exists;    # exists in t/lib
 
-require Module::Exists;    # does exist in t/lib
-require Dummy;             # does not exist anywhere
+# require Module::Exists::Unexpected; # exists but the comennted will be ignored
 
-exit;
+require Acme::BadExample;    # does not exist anywhere
+

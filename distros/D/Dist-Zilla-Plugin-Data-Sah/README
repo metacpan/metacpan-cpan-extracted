@@ -1,0 +1,57 @@
+NAME
+    Dist::Zilla::Plugin::Data::Sah - Plugin for building Data-Sah and
+    Data-Sah-* distributions
+
+VERSION
+    This document describes version 0.005 of Dist::Zilla::Plugin::Data::Sah
+    (from Perl distribution Dist-Zilla-Plugin-Data-Sah), released on
+    2021-07-04.
+
+SYNOPSIS
+    In dist.ini:
+
+     [Data::Sah]
+
+DESCRIPTION
+    This plugin is to be used when building "Data-Sah" distribution (see
+    Data::Sah) and "Data-Sah-*" distribution like "Data-Sah-Compiler-*"
+    distributions. Currently it does the following:
+
+    *   For "lib/Data/Sah/Type/*.pm", check that schema specified in each
+        clause's "schema" is normalized
+
+    *   TODO: For "lib/Data/Sah/Type/*.pm", check that schema specified in
+        each clause attribute's "schema" is normalized
+
+    Note that for "Data-Sah-Coerce-*" distributions there are
+    Dist::Zilla::Plugin::Data::Sah::Coerce. For "Data-Sah-Filter-*"
+    distributions there are Dist::Zilla::Plugin::Data::Sah::Filter.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Zilla-Plugin-Data-Sah>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Dist-Zilla-Plugin-Data-Sah>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Dat
+    a-Sah>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Data::Sah
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021, 2019, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

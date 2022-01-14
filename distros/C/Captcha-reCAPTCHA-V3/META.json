@@ -4,7 +4,7 @@
       "worthmine <worthmine@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.11",
+   "generated_by" : "Minilla/v3.1.13",
    "license" : [
       "perl_5"
    ],
@@ -60,7 +60,7 @@
    "provides" : {
       "Captcha::reCAPTCHA::V3" : {
          "file" : "lib/Captcha/reCAPTCHA/V3.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -74,7 +74,7 @@
          "web" : "https://github.com/worthmine/Captcha-reCAPTCHA-V3"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_authority" : "cpan:WORTHMINE",
    "x_contributors" : [
       "worthmine <worthmine@cpan.org>"

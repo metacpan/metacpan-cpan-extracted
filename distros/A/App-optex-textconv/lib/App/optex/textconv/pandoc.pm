@@ -1,10 +1,9 @@
 package App::optex::textconv::pandoc;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
-use v5.14;
+use strict;
 use warnings;
-use Carp;
 
 use App::optex::textconv::Converter 'import';
 

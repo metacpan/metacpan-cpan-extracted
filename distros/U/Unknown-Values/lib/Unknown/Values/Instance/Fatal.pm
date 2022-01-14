@@ -4,7 +4,7 @@ use warnings;
 # ABSTRACT: Internal fatal value object for the "Unknown::Values" distribution
 
 package Unknown::Values::Instance::Fatal;
-$Unknown::Values::Instance::Fatal::VERSION = '0.100';
+$Unknown::Values::Instance::Fatal::VERSION = '0.101';
 use Carp 'confess';
 use base 'Unknown::Values::Instance';
 
@@ -39,7 +39,7 @@ Unknown::Values::Instance::Fatal - Internal fatal value object for the "Unknown:
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 AUTHOR
 

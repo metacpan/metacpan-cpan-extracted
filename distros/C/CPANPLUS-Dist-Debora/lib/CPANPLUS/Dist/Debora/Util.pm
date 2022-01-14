@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 use parent qw(Exporter);
 
@@ -37,7 +37,7 @@ use version 0.77;
 
 use CPANPLUS::Error qw(error);
 
-# Avoid warnings from IO::Select.
+# Avoid warnings from IO::Select by using IPC::Run.
 $IPC::Cmd::USE_IPC_RUN = IPC::Cmd->can_use_ipc_run;
 
 my $perl_version = parse_version($PERL_VERSION);
@@ -304,7 +304,7 @@ CPANPLUS::Dist::Debora::Util - Utility functions
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

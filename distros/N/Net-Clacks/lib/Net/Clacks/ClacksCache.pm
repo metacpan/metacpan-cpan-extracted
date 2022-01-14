@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp;
-our $VERSION = 18;
+our $VERSION = 20;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -359,7 +359,7 @@ Rene Schickbauer, E<lt>cavac@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2020 Rene Schickbauer
+Copyright (C) 2008-2022 Rene Schickbauer
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

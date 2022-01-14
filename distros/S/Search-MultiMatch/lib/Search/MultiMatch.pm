@@ -12,11 +12,11 @@ Search::MultiMatch - An efficient, tree-based, 2D multimatcher.
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -53,13 +53,25 @@ Where C<%opt> understands the following options:
 
 The value of the C<table> must be a multidimensional hash-like data structure.
 
+Starting with version 0.03, using a L<DBM::Deep> database is also supported.
+
+=item * special_key => "\0\0\1\0\0"
+
+Special unique key, used internally to store the original values.
+
 =back
 
 =cut
 
 sub new {
     my ($class, %opt) = @_;
-    bless {table => $opt{table} // {}}, $class;
+
+    bless {
+
+        table       => $opt{table} // {},
+        special_key => "\0\0\1\0\0",
+
+    }, $class;
 }
 
 =head2 add
@@ -82,14 +94,13 @@ Example:
 sub add {
     my ($self, $key, $value) = @_;
 
-    my $vref  = \$value;
     my $table = $self->{table};
 
     foreach my $group (@$key) {
         my $ref = $table;
         foreach my $item (@$group) {
             $ref = $ref->{$item} //= {};
-            push @{$ref->{$ref}}, $vref;
+            push @{$ref->{$self->{special_key}}}, $value;
         }
     }
 
@@ -181,8 +192,8 @@ sub search {
             }
         }
 
-        if (defined($ref) and exists($ref->{$ref})) {
-            foreach my $match (@{$ref->{$ref}}) {
+        if (defined($ref) and exists($ref->{$self->{special_key}})) {
+            foreach my $match (@{$ref->{$self->{special_key}}}) {
                 if (not exists $seen{$match}) {
                     $seen{$match} = 1;
                     push @matches, $match;
@@ -204,7 +215,7 @@ sub search {
         @matches = grep { $seen{$_} == $max } @matches;
     }
 
-    map { ; {match => $$_, score => $seen{$_}} } @matches;
+    map { ; {match => $_, score => $seen{$_}} } @matches;
 }
 
 =head1 EXAMPLE
@@ -270,7 +281,7 @@ Daniel Șuteu, C<< <trizen at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 Daniel Șuteu.
+Copyright 2016-2022 Daniel Șuteu.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

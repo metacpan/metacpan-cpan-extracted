@@ -19,5 +19,6 @@ WriteMakefile(
         'Devel::Peek'     => 0,
         'Capture::Tiny'   => 0,
         'Carp'            => 0,
+        'if'              => 0,
     },
 );

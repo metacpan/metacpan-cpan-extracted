@@ -1,6 +1,17 @@
 Revision history for Perl extension UI-Various
 
-0.11 2022-01-06T08:22:57Z
+0.13 2022-01-10T09:09:22Z
+
+0.13 2022-01-10T09:08:37Z
+
+    - replaced bareword filehandle in call_with_stdin unit-test helper
+    - moved diagnostics introduced in 0.12
+
+0.12 2022-01-09T07:25:51Z
+
+    - added another missing dependency (multidimensional)
+    - added diagnostics for bug on FreeBSD 14 with Tk
+    - fixed bug in DoD check after change in 0.11
 
 0.11 2022-01-06T08:22:16Z
 

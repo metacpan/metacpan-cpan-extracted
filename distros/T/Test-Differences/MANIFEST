@@ -22,5 +22,7 @@ MANIFEST.SKIP
 t/unicode.t
 t/lib/Test/Differences/TestUtils/Capture.pm
 t/sub-refs.t
+t/unknown-values.t
+t/script/unknown-values
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

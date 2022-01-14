@@ -1,0 +1,22 @@
+Revision history for Dist-Zilla-PluginBundle-GitLab
+
+1.0002 2022-01-09T11:25:13-05:00 America/New_York
+ [BUG FIXES]
+ - Remote not being set properly--wrong field from repo-creation return
+ - Fixed a docs typo
+
+ [STATISTICS]
+ - code churn: 3 files changed, 5 insertions(+), 3 deletions(-)
+
+1.0001 2022-01-08T22:26:01-05:00 America/New_York
+ [REVISION]
+ - Minor documentation tweaks
+
+ [STATISTICS]
+ - code churn: 5 files changed, 28 insertions(+), 26 deletions(-)
+
+1.0000 2022-01-08
+ - First release
+
+ [STATISTICS]
+ - code churn: 17 files changed, 1585 insertions(+), 5 deletions(-)

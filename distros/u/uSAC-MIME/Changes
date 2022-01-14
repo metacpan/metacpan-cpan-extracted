@@ -1,0 +1,7 @@
+Revision history for Perl extension uSAC::MIME.
+
+0.2  Thu 13 Jan 2022 14:11:11 AEST
+	- Added minimum perl version of 5.24 in Makefile.PL
+
+0.1  Wed 12 Jan 2022 22:48:47 AEST
+	- original version

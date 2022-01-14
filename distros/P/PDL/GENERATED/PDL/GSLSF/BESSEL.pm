@@ -20,6 +20,11 @@ use DynaLoader;
 
 
 
+
+#line 5 "gsl_sf_bessel.pd"
+use strict;
+use warnings;
+
 =head1 NAME
 
 PDL::GSLSF::BESSEL - PDL interface to GSL Special Functions
@@ -28,11 +33,8 @@ PDL::GSLSF::BESSEL - PDL interface to GSL Special Functions
 
 This is an interface to the Special Function package present in the GNU Scientific Library. 
 
-=head1 SYNOPSIS
-
 =cut
-
-
+#line 38 "BESSEL.pm"
 
 
 
@@ -45,6 +47,8 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
+
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_bessel_Jn
@@ -64,16 +68,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 72 "BESSEL.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_bessel_Jn = \&PDL::gsl_sf_bessel_Jn;
+#line 78 "BESSEL.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_bessel_Jn_array
@@ -93,16 +98,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 102 "BESSEL.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_bessel_Jn_array = \&PDL::gsl_sf_bessel_Jn_array;
+#line 108 "BESSEL.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_bessel_Yn
@@ -122,16 +128,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 132 "BESSEL.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_bessel_Yn = \&PDL::gsl_sf_bessel_Yn;
+#line 138 "BESSEL.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_bessel_Yn_array
@@ -151,16 +158,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 162 "BESSEL.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_bessel_Yn_array = \&PDL::gsl_sf_bessel_Yn_array;
+#line 168 "BESSEL.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_bessel_In
@@ -180,16 +188,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 192 "BESSEL.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_bessel_In = \&PDL::gsl_sf_bessel_In;
+#line 198 "BESSEL.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_bessel_I_array
@@ -209,16 +218,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 222 "BESSEL.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_bessel_I_array = \&PDL::gsl_sf_bessel_I_array;
+#line 228 "BESSEL.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_bessel_In_scaled
@@ -238,16 +248,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 252 "BESSEL.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_bessel_In_scaled = \&PDL::gsl_sf_bessel_In_scaled;
+#line 258 "BESSEL.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_bessel_In_scaled_array
@@ -267,16 +278,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 282 "BESSEL.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_bessel_In_scaled_array = \&PDL::gsl_sf_bessel_In_scaled_array;
+#line 288 "BESSEL.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_bessel_Kn
@@ -296,16 +308,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 312 "BESSEL.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_bessel_Kn = \&PDL::gsl_sf_bessel_Kn;
+#line 318 "BESSEL.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_bessel_K_array
@@ -325,16 +338,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 342 "BESSEL.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_bessel_K_array = \&PDL::gsl_sf_bessel_K_array;
+#line 348 "BESSEL.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_bessel_Kn_scaled
@@ -354,16 +368,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 372 "BESSEL.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_bessel_Kn_scaled = \&PDL::gsl_sf_bessel_Kn_scaled;
+#line 378 "BESSEL.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_bessel_Kn_scaled_array
@@ -383,16 +398,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 402 "BESSEL.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_bessel_Kn_scaled_array = \&PDL::gsl_sf_bessel_Kn_scaled_array;
+#line 408 "BESSEL.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_bessel_jl
@@ -412,16 +428,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 432 "BESSEL.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_bessel_jl = \&PDL::gsl_sf_bessel_jl;
+#line 438 "BESSEL.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_bessel_jl_array
@@ -441,16 +458,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 462 "BESSEL.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_bessel_jl_array = \&PDL::gsl_sf_bessel_jl_array;
+#line 468 "BESSEL.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_bessel_yl
@@ -470,16 +488,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 492 "BESSEL.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_bessel_yl = \&PDL::gsl_sf_bessel_yl;
+#line 498 "BESSEL.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_bessel_yl_array
@@ -499,16 +518,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 522 "BESSEL.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_bessel_yl_array = \&PDL::gsl_sf_bessel_yl_array;
+#line 528 "BESSEL.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_bessel_il_scaled
@@ -528,16 +548,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 552 "BESSEL.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_bessel_il_scaled = \&PDL::gsl_sf_bessel_il_scaled;
+#line 558 "BESSEL.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_bessel_il_scaled_array
@@ -557,16 +578,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 582 "BESSEL.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_bessel_il_scaled_array = \&PDL::gsl_sf_bessel_il_scaled_array;
+#line 588 "BESSEL.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_bessel_kl_scaled
@@ -586,16 +608,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 612 "BESSEL.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_bessel_kl_scaled = \&PDL::gsl_sf_bessel_kl_scaled;
+#line 618 "BESSEL.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_bessel_kl_scaled_array
@@ -615,16 +638,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 642 "BESSEL.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_bessel_kl_scaled_array = \&PDL::gsl_sf_bessel_kl_scaled_array;
+#line 648 "BESSEL.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_bessel_Jnu
@@ -644,16 +668,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 672 "BESSEL.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_bessel_Jnu = \&PDL::gsl_sf_bessel_Jnu;
+#line 678 "BESSEL.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_bessel_Ynu
@@ -673,16 +698,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 702 "BESSEL.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_bessel_Ynu = \&PDL::gsl_sf_bessel_Ynu;
+#line 708 "BESSEL.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_bessel_Inu_scaled
@@ -702,16 +728,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 732 "BESSEL.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_bessel_Inu_scaled = \&PDL::gsl_sf_bessel_Inu_scaled;
+#line 738 "BESSEL.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_bessel_Inu
@@ -731,16 +758,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 762 "BESSEL.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_bessel_Inu = \&PDL::gsl_sf_bessel_Inu;
+#line 768 "BESSEL.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_bessel_Knu_scaled
@@ -760,16 +788,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 792 "BESSEL.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_bessel_Knu_scaled = \&PDL::gsl_sf_bessel_Knu_scaled;
+#line 798 "BESSEL.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_bessel_Knu
@@ -789,16 +818,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 822 "BESSEL.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_bessel_Knu = \&PDL::gsl_sf_bessel_Knu;
+#line 828 "BESSEL.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_bessel_lnKnu
@@ -818,18 +848,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 852 "BESSEL.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_bessel_lnKnu = \&PDL::gsl_sf_bessel_lnKnu;
+#line 858 "BESSEL.pm"
 
 
 
 
 
+#line 350 "gsl_sf_bessel.pd"
 
 =head1 AUTHOR
 
@@ -843,8 +874,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-
-
+#line 878 "BESSEL.pm"
 
 
 

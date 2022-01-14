@@ -3,15 +3,14 @@
 package Perinci::CmdLine;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-12-03'; # DATE
+our $DATE = '2021-12-19'; # DATE
 our $DIST = 'Perinci-CmdLine'; # DIST
-our $VERSION = '1.913.0'; # VERSION
+our $VERSION = '2.000.0'; # VERSION
 
 sub new {
-    die "This module is currently empty, for now please use Perinci::CmdLine::{Lite,Classic,Any} instead. There is also Perinci::CmdLine::Inline.";
+    die "Perinci::CmdLine::Lite is empty. Please use of the implementations: Perinci::CmdLine::Plugin, Perinci::CmdLine::Inline, etc";
 }
 
-1;
 1;
 # ABSTRACT: Rinci/Riap-based command-line application framework
 
@@ -27,18 +26,23 @@ Perinci::CmdLine - Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.913.0 of Perinci::CmdLine (from Perl distribution Perinci-CmdLine), released on 2021-12-03.
+This document describes version 2.000.0 of Perinci::CmdLine (from Perl distribution Perinci-CmdLine), released on 2021-12-19.
 
 =head1 DESCRIPTION
 
-This module is currently empty, because the implementation is currently split
-into L<Perinci::CmdLine::Lite> (the lightweight version) and
-L<Perinci::CmdLine::Classic> (the full but heavier version). There's also
-L<Perinci::CmdLine::Any> that lets you choose between the two dynamically, à la
-Any::Moose. And finally there's also L<Perinci::CmdLine::Inline>, the even more
-lightweight version.
+Perinci::CmdLine is a Rinci/Riap-based command-line application framework. It
+has a few implementations; use one depending on your needs.
 
-This module exists solely for convenience of linking purposes.
+=over
+
+=item * L<Perinci::CmdLine::Plugin>
+
+=item * L<Perinci::CmdLine::Inline>
+
+=back
+
+Use L<Perinci::CmdLine::Any> to automatically choose one of several
+implementations.
 
 =for Pod::Coverage ^(new)$
 
@@ -52,13 +56,14 @@ Source repository is at L<https://github.com/perlancar/perl-Perinci-CmdLine>.
 
 =head1 SEE ALSO
 
-L<Perinci::CmdLine::Lite>
+L<Perinci::CmdLine::Plugin>
 
-L<Perinci::CmdLine::Classic>
+L<Perinci::CmdLine::Inline>
 
 L<Perinci::CmdLine::Any>
 
-L<Perinci::CmdLine::Inline>
+L<Perinci::CmdLine::Lite> and L<Perinci::CmdLine::Classic>, two older
+implementations.
 
 =head1 AUTHOR
 

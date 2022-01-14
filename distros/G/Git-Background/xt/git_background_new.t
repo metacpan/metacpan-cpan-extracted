@@ -14,7 +14,7 @@ use lib File::Spec->catdir( File::Basename::dirname( Cwd::abs_path __FILE__ ), q
 
 use Local::Test::TempDir qw(tempdir);
 
-use Git::Background;
+use Git::Background 0.003;
 
 note(q{new( { invalid_argument => 17 } )});
 {

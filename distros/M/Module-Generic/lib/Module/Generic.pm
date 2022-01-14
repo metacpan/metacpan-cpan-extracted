@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.18.4
+## Version v0.19.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2021/12/17
+## Modified 2022/01/13
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -59,7 +59,7 @@ BEGIN
     @EXPORT      = qw( );
     @EXPORT_OK   = qw( subclasses );
     %EXPORT_TAGS = ();
-    $VERSION     = 'v0.18.4';
+    $VERSION     = 'v0.19.0';
     $VERBOSE     = 0;
     $DEBUG       = 0;
     $SILENT_AUTOLOAD      = 1;
@@ -2960,6 +2960,61 @@ sub _parse_timestamp
     }
 }
 
+sub _lvalue : lvalue
+{
+    my $self = shift( @_ );
+    my $def  = shift( @_ );
+    my $has_arg = 0;
+    my $arg;
+    if( want( qw( LVALUE ASSIGN ) ) )
+    {
+        ( $arg ) = want( 'ASSIGN' );
+        $arg = [ $arg ];
+        $has_arg = 'assign';
+    }
+    else
+    {
+        if( @_ )
+        {
+            $arg = [@_];
+            $has_arg++;
+        }
+    }
+    
+    if( $has_arg && CORE::exists( $def->{set} ) && ref( $def->{set} ) eq 'CODE' )
+    {
+        my $code = $def->{set};
+        my $rv = $code->( $self, $arg );
+        if( !defined( $rv ) )
+        {
+            if( $has_arg eq 'assign' )
+            {
+                my $dummy = '';
+                return( $dummy );
+            }
+            return if( want( 'LVALUE' ) );
+            rreturn;
+        }
+        return( $rv ) if( want( 'LVALUE' ) );
+        rreturn( $rv );
+    }
+    else
+    {
+        if( CORE::exists( $def->{get} ) && ref( $def->{get} ) eq 'CODE' )
+        {
+            if( want( 'LVALUE' ) )
+            {
+                return( $def->{get}->( $self ) );
+            }
+            rreturn( $def->{get}->( $self ) );
+        }
+        # lnoreturn;
+        return;
+    }
+}
+
+sub _refaddr { return( Scalar::Util::refaddr( $_[1] ) ); }
+
 sub _set_get
 {
     my $self  = shift( @_ );
@@ -3028,6 +3083,14 @@ sub _set_get_array_as_object : lvalue
         }
     }
     
+    my $callbacks = {};
+    if( ref( $field ) eq 'HASH' )
+    {
+        my $def = $field;
+        $field = $def->{field} if( CORE::exists( $def->{field} ) && defined( $def->{field} ) && CORE::length( $def->{field} ) );
+        $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
+    }
+    
     if( $has_arg )
     {
         my $val = ( ( Scalar::Util::blessed( $arg ) && $arg->isa( 'ARRAY' ) ) || ref( $arg ) eq 'ARRAY' ) ? $arg : [ $arg ];
@@ -3047,6 +3110,14 @@ sub _set_get_array_as_object : lvalue
         {
             $o = Module::Generic::Array->new( $val );
             $data->{ $field } = $o;
+            if( scalar( keys( %$callbacks ) ) && CORE::exists( $callbacks->{add} ) )
+            {
+                my $coderef = ref( $callbacks->{add} ) eq 'CODE' ? $callbacks->{add} : $self->can( $callbacks->{add} );
+                if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
+                {
+                    $coderef->( $self );
+                }
+            }
         }
     }
     if( !$data->{ $field } || !$self->_is_object( $data->{ $field } ) )
@@ -3080,6 +3151,14 @@ sub _set_get_boolean : lvalue
         }
     }
     
+    my $callbacks = {};
+    if( ref( $field ) eq 'HASH' )
+    {
+        my $def = $field;
+        $field = $def->{field} if( CORE::exists( $def->{field} ) && defined( $def->{field} ) && CORE::length( $def->{field} ) );
+        $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
+    }
+    
     if( $has_arg )
     {
         my $val = $arg;
@@ -3107,6 +3186,15 @@ sub _set_get_boolean : lvalue
             $data->{ $field } = $val
                 ? Module::Generic::Boolean->true
                 : Module::Generic::Boolean->false;
+        }
+        
+        if( scalar( keys( %$callbacks ) ) && CORE::exists( $callbacks->{add} ) )
+        {
+            my $coderef = ref( $callbacks->{add} ) eq 'CODE' ? $callbacks->{add} : $self->can( $callbacks->{add} );
+            if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
+            {
+                $coderef->( $self );
+            }
         }
     }
     # If there is a value set, like a default value and it is not an object or at least not one we recognise
@@ -3850,10 +3938,32 @@ sub _set_get_number : lvalue
     my $this  = $self->_obj2h;
     no overload;
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    
+    my $callbacks = {};
+    if( ref( $field ) eq 'HASH' )
+    {
+        my $def = $field;
+        $field = $def->{field} if( CORE::exists( $def->{field} ) && defined( $def->{field} ) && CORE::length( $def->{field} ) );
+        $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
+    }
+    
+    local $do_callback = sub
+    {
+        if( scalar( keys( %$callbacks ) ) && CORE::exists( $callbacks->{add} ) )
+        {
+            my $coderef = ref( $callbacks->{add} ) eq 'CODE' ? $callbacks->{add} : $self->can( $callbacks->{add} );
+            if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
+            {
+                $coderef->( $self );
+            }
+        }
+    };
+    
     if( want( qw( LVALUE ASSIGN ) ) )
     {
         my( $a ) = want( 'ASSIGN' );
         $data->{ $field } = Module::Generic::Number->new( $a );
+        $do_callback->();
         return( $data->{ $field } );
     }
     else
@@ -3862,7 +3972,9 @@ sub _set_get_number : lvalue
         if( @_ )
         {
             $data->{ $field } = Module::Generic::Number->new( shift( @_ ) );
+            $do_callback->();
         }
+        
         if( CORE::length( $data->{ $field } ) && !ref( $data->{ $field } ) )
         {
             $data->{ $field } = Module::Generic::Number->new( $data->{ $field } );
@@ -3992,6 +4104,76 @@ sub _set_get_object
     }
     # $self->message( 3, "Returning for field '$field' value: ", $self->{ $field } );
     return( $data->{ $field } );
+}
+
+sub _set_get_object_lvalue : lvalue
+{
+    my $self  = shift( @_ );
+    my $field = shift( @_ );
+    my $class = shift( @_ );
+    no overloading;
+    my $this  = $self->_obj2h;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    my $has_arg = 0;
+    my $arg;
+    if( want( qw( LVALUE ASSIGN ) ) )
+    {
+        ( $arg ) = want( 'ASSIGN' );
+        $has_arg = 'assign';
+    }
+    else
+    {
+        if( @_ )
+        {
+            $arg = shift( @_ );
+            $has_arg++;
+        }
+    }
+    if( $has_arg )
+    {
+        if( !defined( $arg ) )
+        {
+            $data->{ $field } = undef();
+        }
+        # User pass an object
+        elsif( Scalar::Util::blessed( $arg ) )
+        {
+            if( !$arg->isa( "$class" ) )
+            {
+                my $error = "Object provided (" . ref( $arg ) . ") for $field is not a valid $class object";
+                if( $has_arg eq 'assign' )
+                {
+                    $self->error( $error );
+                    my $dummy = 'dummy';
+                    return( $dummy );
+                }
+                return( $self->error( $error ) ) if( want( 'LVALUE' ) );
+                rreturn( $self->error( $error ) );
+            }
+            $data->{ $field } = $arg;
+        }
+        else
+        {
+            my $error = "Value provided (" . overload::StrVal( $arg ) . " is not an object.";
+            if( $has_arg eq 'assign' )
+            {
+                $self->error( $error );
+                my $dummy = 'dummy';
+                return( $dummy );
+            }
+            return( $self->error( $error ) ) if( want( 'LVALUE' ) );
+            rreturn( $self->error( $error ) );
+        }
+        my $dummy = 'dummy';
+        # We need to return something else than our object, or by virtue of perl's way of working
+        # we would return our object as coded below, and that object will be assigned the
+        # very value we will have passed in assignment !
+        return( $dummy ) if( $has_arg eq 'assign' );
+    }
+    return( $data->{ $field } ) if( want( 'LVALUE' ) );
+    rreturn( $data->{ $field } );
+    # To make perl happy
+    return;
 }
 
 sub _set_get_object_without_init
@@ -4304,6 +4486,14 @@ sub _set_get_scalar_as_object : lvalue
             $has_arg++;
         }
     }
+    
+    my $callbacks = {};
+    if( ref( $field ) eq 'HASH' )
+    {
+        my $def = $field;
+        $field = $def->{field};
+        $callbacks = $def->{callbacks};
+    }
 
     if( $has_arg )
     {
@@ -4338,6 +4528,7 @@ sub _set_get_scalar_as_object : lvalue
         {
             $val = $arg;
         }
+        
         my $o = $data->{ $field };
         # $self->message( 3, "Value to use is '$val' and current object is '", ref( $o ), "'." );
         if( ref( $o ) )
@@ -4347,6 +4538,14 @@ sub _set_get_scalar_as_object : lvalue
         else
         {
             $data->{ $field } = Module::Generic::Scalar->new( $val );
+            if( scalar( keys( %$callbacks ) ) && CORE::exists( $callbacks->{add} ) )
+            {
+                my $coderef = ref( $callbacks->{add} ) eq 'CODE' ? $callbacks->{add} : $self->can( $callbacks->{add} );
+                if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
+                {
+                    $coderef->( $self );
+                }
+            }
         }
         # $self->message( 3, "Object now is: '", ref( $data->{ $field } ), "'." );
     }
@@ -4914,7 +5113,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.18.4
+    v0.19.0
 
 =head1 DESCRIPTION
 
@@ -5892,6 +6091,75 @@ The minimum version for this class to load. This value is passed directly to L<p
 
 =back
 
+=head2 _lvalue
+
+This provides a generic L<lvalue|perlsub> method that can be used both in assign context or lvalue context.
+
+You only need to specify a setter and getter callback.
+
+This takes an hash reference having either of the following properties:
+
+=over 4
+
+=item I<get>
+
+A code reference that will be called, passing it the module object. It takes whatever value is returned and returns it to the caller.
+
+=item I<set>
+
+A code reference that will be called when values were provided either in assign or regular method context:
+
+    my $now = DateTime->now;
+    $o->datetime = $now;
+    # or
+    $o->datetime( $now );
+
+=back
+
+For example, in your module:
+
+    sub datetime : lvalue { return( shift->_lvalue({
+        set => sub
+        {
+            my( $self, $args ) = @_;
+            if( $self->_is_a( $args->[0] => 'DateTime' ) )
+            {
+                return( $self->{datetime} = shift( @$args ) );
+            }
+            else
+            {
+                return( $self->error( "Value provided is not a datetime." ) );
+            }
+        },
+        get => sub
+        {
+            my $self = shift( @_ );
+            my $dt = $self->{datetime};
+            return( $dt );
+        }
+    }, @_ ) ); }
+
+Be mindful that even if the setter callback returns C<undef> in case of an error, perl does not permit C<undef> to be returned from an lvalue method, and besides the return value in assign context is useless anyway:
+
+    my $dt = $o->datetime = DateTime->now;
+
+If you want to check if assignment worked, you should opt to make error fatal and catch exceptions, such as:
+
+    $o->fatal(1);
+    try
+    {
+        $o->datetime = $not_a_datetime_object;
+    }
+    catch( $e )
+    {
+        die( "You provided a non DateTime object!: $e\n" );
+    }
+
+or you can check if an error was set:
+
+    $o->datetime = $not_a_datetime_object;
+    die( "Did not work: ", $o->error ) if( $o->error );
+
 =head2 _obj2h
 
 This ensures the module object is an hash reference, such as when the module object is based on a file handle for example. This permits L<Module::Generic> to work no matter what is the underlying data type blessed into an object.
@@ -5932,6 +6200,35 @@ And using your method:
     printf( "There are %d products\n", $object->products->length );
     $object->products->push( $new_product );
 
+Alternatively, you can pass an hash reference instead of an object property to provide callbacks that will be called upon addition or removal of value.
+
+This hash reference can contain the following properties:
+
+=over 4
+
+=item field
+
+The object property name
+
+=item callbacks
+
+An hash reference of operation type (C<add> or C<remove>) to callback subroutine name or code reference pairs.
+
+=back
+
+For example:
+
+    sub children { return( shift->set_get_array_as_object({
+        field => 'children',
+        callbacks => 
+        {
+            add => '_some_add_callback',
+            remove => 'som_remove_callback',
+        },
+    }), @_ ); }
+
+The value of the callback can be either a subroutine name or a code reference.
+
 =head2 _set_get_boolean
 
 Provided with an object property name and some data and this will store the data as a boolean value.
@@ -5945,6 +6242,35 @@ If the data is a string with value of C<true> or C<val> L<Module::Generic::Boole
 Otherwise the data provided is checked if it is a true value or not and L<Module::Generic::Boolean/"true"> or L<Module::Generic::Boolean/"false"> is set accordingly.
 
 If no value is provided, and the object property has already been set, this performs the same checks as above and returns either a L<JSON::PP::Boolean> or a L<Module::Generic::Boolean> object.
+
+Alternatively, you can pass an hash reference instead of an object property to provide callbacks that will be called upon addition or removal of value.
+
+This hash reference can contain the following properties:
+
+=over 4
+
+=item field
+
+The object property name
+
+=item callbacks
+
+An hash reference of operation type (C<add> or C<remove>) to callback subroutine name or code reference pairs.
+
+=back
+
+For example:
+
+    sub is_valid { return( shift->set_get_boolean({
+        field => 'is_valid',
+        callbacks => 
+        {
+            add => '_some_add_callback',
+            remove => 'som_remove_callback',
+        },
+    }), @_ ); }
+
+The value of the callback can be either a subroutine name or a code reference.
 
 =head2 __create_class
 
@@ -6202,6 +6528,35 @@ In the script using module C<MyObject>:
     # Is it an od number: no
     $obj->level++; # level is now 5
 
+Alternatively, you can pass an hash reference instead of an object property to provide callbacks that will be called upon addition or removal of value.
+
+This hash reference can contain the following properties:
+
+=over 4
+
+=item field
+
+The object property name
+
+=item callbacks
+
+An hash reference of operation type (C<add> or C<remove>) to callback subroutine name or code reference pairs.
+
+=back
+
+For example:
+
+    sub length { return( shift->set_get_number({
+        field => 'length',
+        callbacks => 
+        {
+            add => '_some_add_callback',
+            remove => 'som_remove_callback',
+        },
+    }), @_ ); }
+
+The value of the callback can be either a subroutine name or a code reference.
+
 =head2 _set_get_number_or_object
 
 Provided with an object property name and a number or an object and this call the value using L</"_set_get_number"> or L</"_set_get_object"> respectively
@@ -6215,6 +6570,12 @@ If you pass an undefined value, it will set the property as undefined, removing 
 You can also provide an existing object of the given class. L</"_set_get_object"> will check the object provided does belong to the specified class or it will set an error and return undef.
 
 It returns the object currently set, if any.
+
+=head2 _set_get_object_lvalue
+
+Same as L</_set_get_object_without_init> but with the possibility of setting the object value as an lvalue method:
+
+    $o->my_property = $my_object;
 
 =head2 _set_get_object_without_init
 
@@ -6264,6 +6625,35 @@ Getting the value :
 
     my $cust_name = $object->name;
     print( "Nothing set yet.\n" ) if( !$cust_name->length );
+
+Alternatively, you can pass an hash reference instead of an object property to provide callbacks that will be called upon addition or removal of value.
+
+This hash reference can contain the following properties:
+
+=over 4
+
+=item field
+
+The object property name
+
+=item callbacks
+
+An hash reference of operation type (C<add> or C<remove>) to callback subroutine name or code reference pairs.
+
+=back
+
+For example:
+
+    sub name { return( shift->set_get_scalar_as_object({
+        field => 'name',
+        callbacks => 
+        {
+            add => '_some_add_callback',
+            remove => 'som_remove_callback',
+        },
+    }), @_ ); }
+
+The value of the callback can be either a subroutine name or a code reference.
 
 =head2 _set_get_scalar_or_object
 

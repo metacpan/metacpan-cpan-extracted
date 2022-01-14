@@ -1,5 +1,10 @@
 Changes file for Test::Differences
 
+0.69   2022-01-07
+    - Special-case Unknown::Values objects in comparisons, as it's better to spit
+      out a diagnostic failure than to just die;
+    - Correct misleading Unicode doco
+
 0.68   2021-05-18
     - Revert undocumented change that was causing unreasonably verbose output
       See https://github.com/DrHyde/perl-modules-Test-Differences/issues/5

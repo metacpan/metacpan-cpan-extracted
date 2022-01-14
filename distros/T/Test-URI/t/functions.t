@@ -11,7 +11,7 @@ BEGIN {
 	[qw( nntp://nntp.perl.org         nntp    nntp.perl.org       119) ],
 	[qw( mailto:bdfoy@example.com     mailto  PASS               PASS) ],
 	);
-	
+
 	@bad_uri_pairs = (
 	[qw( http://www.example.com           NULL  NULL            NULL)],
 	[qw( ftp://ftp.example.org            http  www.example.com   80)],
@@ -20,16 +20,9 @@ BEGIN {
 	[qw( nntp://nntp.perl.org          nntp:    NULL            NULL)],
 	[qw( mailto:bdfoy@example.com      mail     example.com       25)],
 	);
-	
-	@functions = map "uri_${_}_ok", qw(
-		scheme host port)
 }
 
-use Test::Builder::Tester tests => 
-	2 * @good_uri_pairs + 
-	3 * @bad_uri_pairs  +
-	3 * @functions      +
-	0;
+use Test::Builder::Tester;
 use Test::More;
 use Test::URI;
 
@@ -40,9 +33,9 @@ foreach my $pair ( @good_uri_pairs )
 	$pair->[2] eq 'PASS' ? ok(1) : uri_host_ok( $pair->[0], $pair->[2] );
 	$pair->[3] eq 'PASS' ? ok(1) : uri_port_ok( $pair->[0], $pair->[3] );
 	test_test("uri_scheme_ok, uri_host_ok, uri_port_ok with string");
-	
+
 	my $uri = URI->new( $$pair[0] );
-	
+
 	if( UNIVERSAL::isa( $uri, 'URI' ) )
 		{
 		test_out( map "ok $_", 1 .. 3 );
@@ -56,17 +49,17 @@ foreach my $pair ( @good_uri_pairs )
 		ok(0, 'URI did not like good URI');
 		}
 	}
-	
+
 foreach my $pair ( @bad_uri_pairs )
 	{
 	my @array = map { $_ eq NULL ? '' : $_ } @$pair;
-	
+
 	my $uri = URI->new( $array[0] );
-	
+
 	my $scheme = $uri->can('scheme') ? $uri->scheme : '';
 	my $host   = $uri->can('host')   ? $uri->host   : '';
 	my $port   = $uri->can('port')   ? $uri->port   : '';
-	
+
 	test_out( "not ok 1" );
 	if( $array[1] eq 'PASS' )
 		{
@@ -80,7 +73,7 @@ foreach my $pair ( @bad_uri_pairs )
 			"\tExpected [$array[1]]",
 			"\tGot [$scheme]");
 		}
-	test_test( 
+	test_test(
 		title    => 'uri_host_ok scheme errors',
 		skip_err => 1,
 		);
@@ -107,7 +100,7 @@ foreach my $pair ( @bad_uri_pairs )
 				"$scheme schemes do not have a host" );
 			}
 		}
-	test_test( 
+	test_test(
 		title    => 'uri_host_ok catches errors',
 		skip_err => 1,
 		);
@@ -133,24 +126,11 @@ foreach my $pair ( @bad_uri_pairs )
 				"$scheme schemes do not have a port" );
 			}
 		}
-	test_test( 
+	test_test(
 		title    => 'uri_port_ok catches errors',
 		skip_err => 1,
 		);
 
 	}
 
-foreach my $function ( @functions )
-	{
-	eval { eval "$function( 'http://www.example.com', 'http', 'bar' )"; die $@ };
-	like( $@, qr/Too many arguments for Test::URI::$function/,
-		"$function catches too many arguments" );
-
-	eval { eval "$function( 'http://www.example.com' )"; die $@ };
-	like( $@, qr/Not enough arguments for Test::URI::$function/,
-			"$function catches single arguments" );
-	
-	eval { eval "$function( )"; die $@ };
-	like( $@, qr/Not enough arguments for Test::URI::$function/,
-				"$function catches no arguments" );
-	}
+done_testing();

@@ -1,14 +1,41 @@
-package App::Licensecheck;
+use Object::Pad 0.27;
 
 use v5.12;
 use utf8;
-use warnings;
 use autodie;
 
-use Log::Any qw($log);
+=head1 NAME
+
+App::Licensecheck - functions for a simple license checker for source files
+
+=head1 VERSION
+
+Version v3.3.0
+
+=head1 SYNOPSIS
+
+    use App::Licensecheck;
+
+    my $app = App::Licensecheck->new;
+
+    my $app2 = App::Licensecheck->new( top_lines => 0 );  # Parse whole files
+
+    printf "License: %s\nCopyright: %s\n", $app->parse( 'some-file' );
+
+=head1 DESCRIPTION
+
+L<App::Licensecheck> is the core of L<licensecheck> script
+to check for licenses of source files.
+See the script for casual usage.
+
+=cut
+
+package App::Licensecheck v3.3.0;
+
+use Log::Any ();
 use List::SomeUtils qw(nsort_by uniq);
 use Path::Iterator::Rule;
-use Path::Tiny;
+use Path::Tiny();
 use Try::Tiny;
 use Fcntl qw(:seek);
 use Encode 2.93;
@@ -24,127 +51,165 @@ use String::Copyright 0.003 {
 	},
 	'copyright' => { -as => 'copyright_optimistic' };
 
-use Moo;
-use MooX::Struct File => [
-	qw( $path! $content! ),
-	BUILDARGS => sub {
-		$log->tracef( 'examining file: %s', ${ $_[1] }[0] );
-		return MooX::Struct::BUILDARGS(@_);
-	},
-	TO_STRING => sub { $_[0]->path->stringify }
-	],
-	Thing => [
-	qw( $name! +begin! +end! $file! ),
-	BUILDARGS => sub {
-		$log->tracef( 'detected something: %s: %d-%d', @{ $_[1] } );
-		return MooX::Struct::BUILDARGS(@_);
-	}
-	],
-	Trait => [
-	-extends  => ['Thing'],
-	BUILDARGS => sub {
+class Trait {
+	has $log = Log::Any->get_logger;
+	has $name :reader;
+	has $begin :reader;
+	has $end :reader;
+	has $file :reader;
+
+	BUILD {
+		my %opts = @_;
+
+		# TODO: use Object::Pad 0.41 and slot attribute :param
+		$name  = $opts{name};
+		$begin = $opts{begin};
+		$end   = $opts{end};
+		$file  = $opts{file};
+
 		$log->tracef(
 			'located trait: %s: %d-%d "%s"',
-			@{ $_[1] }[ 0 .. 2 ],
-			${ $_[1] }[3]
+			$name, $begin, $end,
+			$file
 			? substr(
-				${ $_[1] }[3]->content, ${ $_[1] }[1],
-				${ $_[1] }[2] - ${ $_[1] }[1]
+				$file->content_extracleaned, $begin,
+				$end - $begin
 				)
-			: ()
+			: ''
 		);
-		return MooX::Struct::BUILDARGS(@_);
 	}
-	],
-	Exception => [
-	qw( %id! +begin! +end! $file ),
-	BUILDARGS => sub {
+}
+
+class Exception {
+	has $log = Log::Any->get_logger;
+	has $id :reader;
+	has $begin :reader;
+	has $end :reader;
+	has $file :reader;
+
+	BUILD {
+		my %opts = @_;
+
+		# TODO: use Object::Pad 0.41 and slot attribute :param
+		$id    = $opts{id};
+		$begin = $opts{begin};
+		$end   = $opts{end};
+		$file  = $opts{file};
+
 		$log->tracef(
 			'detected exception: %s: %d-%d',
-			@{ $_[1] }[0]->{caption},
-			@{ $_[1] }[ 1 .. 2 ]
+			$id->{caption}, $begin, $end
 		);
-		return MooX::Struct::BUILDARGS(@_);
-	},
-	],
-	Flaw => [
-	qw( %id! +begin! +end! $file ),
-	BUILDARGS => sub {
+	}
+}
+
+class Flaw {
+	has $log = Log::Any->get_logger;
+	has $id :reader;
+	has $begin :reader;
+	has $end :reader;
+	has $file :reader;
+
+	BUILD {
+		my %opts = @_;
+
+		# TODO: use Object::Pad 0.41 and slot attribute :param
+		$id    = $opts{id};
+		$begin = $opts{begin};
+		$end   = $opts{end};
+		$file  = $opts{file};
+
 		$log->tracef(
 			'detected flaw: %s: %d-%d',
-			@{ $_[1] }[0]->{caption},
-			@{ $_[1] }[ 1 .. 2 ]
+			$id->{caption}, $begin, $end
 		);
-		return MooX::Struct::BUILDARGS(@_);
-	},
-	],
-	Licensing => [
-	qw( $name! ),
-	BUILDARGS => sub {
-		$log->debugf( 'collected some licensing: %s: %d-%d', @{ $_[1] } );
-		return MooX::Struct::BUILDARGS(@_);
 	}
-	],
-	Fulltext => [
-	-extends  => ['Thing'], qw(@traits),
-	BUILDARGS => sub {
-		$log->debugf( 'collected fulltext: %s: %d-%d', @{ $_[1] } );
-		return MooX::Struct::BUILDARGS(@_);
+}
+
+class Licensing {
+	has $log = Log::Any->get_logger;
+	has $name :reader;
+
+	BUILD {
+		my %opts = @_;
+
+		# TODO: use Object::Pad 0.41 and slot attribute :param
+		$name = $opts{name};
+
+		$log->debugf(
+			'collected some licensing: %s',
+			$name
+		);
 	}
-	],
-	Grant => [
-	-extends  => ['Thing'], qw(@traits),
-	BUILDARGS => sub {
+}
+
+class Fulltext {
+	has $log = Log::Any->get_logger;
+	has $name :reader;
+	has $begin :reader;
+	has $end :reader;
+	has $file :reader;
+	has $traits :reader;
+
+	BUILD {
+		my %opts = @_;
+
+		# TODO: use Object::Pad 0.41 and slot attribute :param
+		$name   = $opts{name};
+		$begin  = $opts{begin};
+		$end    = $opts{end};
+		$file   = $opts{file};
+		$traits = $opts{traits} // [];
+
+		$log->debugf(
+			'collected fulltext: %s: %d-%d',
+			$name, $begin, $end
+		);
+	}
+}
+
+class Grant {
+	has $log = Log::Any->get_logger;
+	has $name :reader;
+	has $begin :reader;
+	has $end :reader;
+	has $file :reader;
+	has $traits :reader;
+
+	BUILD {
+		my %opts = @_;
+
+		# TODO: use Object::Pad 0.41 and slot attribute :param
+		$name   = $opts{name};
+		$begin  = $opts{begin};
+		$end    = $opts{end};
+		$file   = $opts{file};
+		$traits = $opts{traits} // [];
+
 		$log->debugf(
 			'collected grant: %s: %d-%d "%s"',
-			@{ $_[1] }[ 0 .. 2 ],
-			${ $_[1] }[3]
+			$name, $begin, $end,
+			$file
 			? substr(
-				${ $_[1] }[3]->content, ${ $_[1] }[1],
-				${ $_[1] }[2] - ${ $_[1] }[1]
+				$file->content_extracleaned, $begin,
+				$end - $begin
 				)
-			: ()
+			: ''
 		);
-		return MooX::Struct::BUILDARGS(@_);
 	}
-	];
+}
 
-use experimental qw(switch);
-use namespace::clean;
+use namespace::clean qw(-except new);
 
-=head1 NAME
-
-App::Licensecheck - functions for a simple license checker for source files
-
-=head1 VERSION
-
-Version v3.2.14
-
-=cut
-
-our $VERSION = 'v3.2.14';
-
-=head1 SYNOPSIS
-
-    use App::Licensecheck;
-
-    my $app = App::Licensecheck->new;
-
-    $app->lines(0); # Speedup parsing - our file is not huge
-
-    printf "License: %s\nCopyright: %s\n", $app->parse( 'some-file' );
-
-=head1 DESCRIPTION
-
-L<App::Licensecheck> is the core of L<licensecheck> script
-to check for licenses of source files.
-See the script for casual usage.
-
-=cut
+class App::Licensecheck;
 
 # try enable RE2 engine
 eval { require re::engine::RE2 };
 my @OPT_RE2 = $@ ? () : ( engine => 'RE2' );
+
+# fatalize Unicode::UTF8 and PerlIO::encoding decoding errors
+use warnings FATAL => 'utf8';
+$PerlIO::encoding::fallback = Encode::FB_CROAK;
 
 my $default_check_regex = q!
 	/[\w-]+$ # executable scripts or README like file
@@ -199,93 +264,88 @@ my $default_ignore_regex = q!
 	\.shelf|_MTN|\.bzr(?:\.backup|tags)?)(?:$|/.*$)
 !;
 
-has log => (
-	is      => 'ro',
-	default => sub { Log::Any->get_logger },
-);
+has $log = Log::Any->get_logger;
+
+has $path;
 
 # resolve patterns
 
-has shortname_scheme => (
-	is     => 'ro',
-	coerce => sub {
-		[ split /[\s,]+/, $_[0] || '' ];
-	},
-	default => sub { [qw(debian spdx)] if $_[0]->deb_machine },
-);
+has $shortname_scheme :reader;
 
 # select
 
-has check_regex => (
-	is     => 'rw',
-	lazy   => 1,
-	coerce => sub {
-		my $value = shift;
-		return qr/$default_check_regex/x
-			if $value eq 'common source files';
-		return $value if ref $value eq 'Regexp';
-		return qr/$value/;
-	},
-	default => sub {qr/$default_check_regex/x},
-);
-
-has ignore_regex => (
-	is     => 'rw',
-	lazy   => 1,
-	coerce => sub {
-		my $value = shift;
-		return qr/$default_ignore_regex/x
-			if $value eq 'some backup and VCS files';
-		return $value if ref $value eq 'Regexp';
-		return qr/$value/;
-	},
-	default => sub {qr/$default_ignore_regex/x},
-);
-
-has recursive => (
-	is => 'rw',
-);
+has $check_regex;
+has $ignore_regex;
+has $recursive;
 
 # parse
 
-has lines => (
-	is      => 'rw',
-	default => sub {60},
-);
-
-has tail => (
-	is      => 'rw',
-	default => sub {5000},    # roughly 60 lines of 80 chars
-);
-
-has encoding => (
-	is     => 'rw',
-	coerce => sub {
-		find_encoding( $_[0] ) unless ref( $_[0] ) eq 'OBJECT';
-	},
-);
+has $top_lines;
+has $end_bytes;
+has $encoding;
+has $fh;
+has $content;
+has $tail_content;
+has $offset;
+has $license;
+has $copyrights;
 
 # report
 
-has verbose => (
-	is => 'rw',
-);
+has $skipped;
+has $deb_machine;
 
-has skipped => (
-	is => 'rw',
-);
+BUILD {
+	my %opts = @_;
 
-has deb_machine => (
-	is => 'rw',
-);
+	# TODO: use Object::Pad 0.41 and slot attribute :param
+	$recursive   = $opts{recursive};
+	$top_lines   = $opts{top_lines} // 60;
+	$end_bytes   = $opts{end_bytes} // 5000;    # roughly 60 lines of 80 chars
+	$encoding    = $opts{encoding};
+	$skipped     = $opts{skipped};
+	$deb_machine = $opts{deb_machine};
+
+	$shortname_scheme = $opts{shortname_scheme};
+	if ($shortname_scheme) {
+		if ( not ref($shortname_scheme) eq 'ARRAY' ) {
+			$shortname_scheme = [ split /[\s,]+/, $shortname_scheme ];
+		}
+	}
+	elsif ($deb_machine) {
+		$shortname_scheme = [qw(debian spdx)];
+	}
+	else {
+		$shortname_scheme = [];
+	}
+
+	$check_regex = $opts{check_regex};
+	if ( !$check_regex or $check_regex eq 'common source files' ) {
+		$check_regex = qr/$default_check_regex/x;
+	}
+	elsif ( not ref($check_regex) eq 'Regexp' ) {
+		$check_regex = qr/$check_regex/;
+	}
+
+	$ignore_regex = $opts{ignore_regex};
+	if ( !$ignore_regex or $ignore_regex eq 'some backup and VCS files' ) {
+		$ignore_regex = qr/$default_ignore_regex/x;
+	}
+	elsif ( not ref($ignore_regex) eq 'Regexp' ) {
+		$ignore_regex = qr/$ignore_regex/;
+	}
+
+	$encoding = $opts{encoding};
+	if ( $encoding and not ref($encoding) eq 'OBJECT' ) {
+		$encoding = find_encoding($encoding);
+	}
+}
 
 # TODO: drop when R::P::License v3.8.1 is required
 my $hack_3_8_1 = $Regexp::Pattern::License::VERSION < v3.8.1;
 
-sub list_licenses
+method list_licenses
 {
-	my ($self) = @_;
-
 	my %names;
 	for my $key ( keys %Regexp::Pattern::License::RE ) {
 		for ( keys %{ $Regexp::Pattern::License::RE{$key} } ) {
@@ -306,7 +366,7 @@ sub list_licenses
 				%attr = @attr[ 2 .. $#attr ];
 				next if exists $attr{until};
 			}
-			for my $org ( @{ $self->shortname_scheme } ) {
+			for my $org (@$shortname_scheme) {
 				if ( exists $attr{$org} ) {
 					$names{$key} //= $attr{$org};
 					next KEY;
@@ -321,8 +381,6 @@ sub list_licenses
 
 sub list_naming_schemes
 {
-	my ($self) = @_;
-
 	my $_prop = '(?:[a-z][a-z0-9_]*)';
 	my $_any  = '[a-z0-9_.()]';
 
@@ -332,173 +390,211 @@ sub list_naming_schemes
 		grep              {/^[a-z]/} keys %Regexp::Pattern::License::RE;
 }
 
-sub find
+method find
 {
-	my ( $self, @paths ) = @_;
+	my @paths = @_;
 
-	my $check_re  = $self->check_regex;
-	my $ignore_re = $self->ignore_regex;
-	my $rule      = Path::Iterator::Rule->new;
-	my %options   = (
+	my $do      = Path::Iterator::Rule->new;
+	my %options = (
 		follow_symlinks => 0,
 	);
 
-	$rule->max_depth(1)
-		unless $self->recursive;
-	$rule->not( sub {/$ignore_re/} );
-	$rule->file->nonempty;
+	$do->max_depth(1)
+		unless $recursive;
+	$do->not( sub {/$ignore_regex/} );
+	$do->file->nonempty;
 
 	if ( @paths >> 1 ) {
-		if ( $self->skipped ) {
-			my $skipped = $rule->clone->not( sub {/$check_re/} );
-			foreach ( $skipped->all( @paths, \%options ) ) {
-				warn "skipped file $_\n";
+		if ( $log->is_debug or $skipped && $log->is_warn ) {
+			my $dont = $do->clone->not( sub {/$check_regex/} );
+			foreach ( $dont->all( @paths, \%options ) ) {
+				if ($skipped) {
+					$log->warnf( 'skipped file %s', $_ );
+				}
+				else {
+					$log->debugf( 'skipped file %s', $_ );
+				}
 			}
 		}
-		$rule->and( sub {/$check_re/} );
+		$do->and( sub {/$check_regex/} );
 	}
 
-	return $rule->all( @paths, \%options );
+	return $do->all( @paths, \%options );
 }
 
-sub parse
+method parse
 {
-	my $self     = shift;
-	my $file     = path(shift);
-	my $encoding = $self->encoding;
-	my $all      = $self->lines == 0;
+	($path) = @_;
+
+	$path = Path::Tiny::path($path);
 
 	try {
-		return $all
-			? $self->parse_file( $file, $encoding )
-			: $self->parse_lines( $file, $encoding );
+		return $self->parse_file;
 	}
 	catch {
 		if ( $encoding and /does not map to Unicode/ ) {
-			print
-				"file $file cannot be read with $encoding->name encoding, will try iso-8859-1:\n$_"
-				if $self->verbose;
+			$log->warnf(
+				'failed decoding file %s as %s, will try iso-8859-1',
+				$path, $encoding->name
+			);
+			$log->debugf( 'decoding error: %s', $_ );
 			try {
 				$encoding = find_encoding('iso-8859-1');
-				return $all
-					? $self->parse_file( $file, $encoding )
-					: $self->parse_lines( $file, $encoding );
+				return $self->parse_file;
 			}
 			catch {
 				if (/does not map to Unicode/) {
-					print
-						"file $file cannot be read with iso-8859-1 encoding, will try binary:\n$_"
-						if $self->verbose;
-					return $all
-						? $self->parse_file($file)
-						: $self->parse_lines($file);
+					$log->warnf(
+						'failed decoding file %s as iso-8859-1, will try raw',
+						$path
+					);
+					$log->debugf( 'decoding error: %s', $_ );
+					$encoding = undef;
+					return $self->parse_file;
 				}
 				else {
-					die $_;
+					die $log->fatalf( 'unknown error: %s', $_ );
 				}
 			}
 		}
 		else {
-			die $_;
+			die $log->fatalf( 'unknown error: %s', $_ );
 		}
 	}
 }
 
-sub parse_file
+method parse_file
 {
-	my $self     = shift;
-	my $file     = path(shift);
-	my $encoding = shift || undef;
+	# TODO: stop reuse slots across files, and drop this hack
+	$content    = undef;
+	$license    = undef;
+	$copyrights = undef;
 
-	my $content;
+	if ( $top_lines == 0 ) {
+		$license    = $self->parse_license;
+		$copyrights = copyright( $self->content_cleaned );
+	}
+	else {
+		$license    = $self->parse_license;
+		$copyrights = copyright_optimistic( $self->content_cleaned );
+		if ( $offset and not $copyrights and $license eq 'UNKNOWN' ) {
 
-	given ($encoding) {
-		when (undef)  { $content = $file->slurp_raw }
-		when ('utf8') { $content = $file->slurp_utf8 }
-		default {
-			$content
-				= $file->slurp(
-				{ binmode => sprintf ':encoding(%s)', $encoding->name } )
+			# TODO: stop reuse slots across files, and drop this hack
+			$tail_content = undef;
+
+			$license    = $self->parse_license;
+			$copyrights = copyright_optimistic( $self->content_cleaned );
 		}
-	}
-	print qq(----- $file content -----\n$content----- end content -----\n\n)
-		if $self->verbose;
-
-	my $cleaned_content = clean_comments($content);
-
-	return (
-		$self->parse_license(
-			clean_cruft_and_spaces($cleaned_content), $file, 0
-		),
-		copyright( clean_cruft($cleaned_content) ),
-	);
-}
-
-sub parse_lines
-{
-	my $self     = shift;
-	my $file     = path(shift);
-	my $encoding = shift || undef;
-	my $content  = '';
-
-	my $fh;
-	my $st = $file->stat;
-
-	given ($encoding) {
-		when (undef)  { $fh = $file->openr_raw }
-		when ('utf8') { $fh = $file->openr_utf8 }
-		default {
-			$fh = $file->openr(
-				sprintf ':encoding(%s)',
-				$encoding->name
-			)
-		}
+		$fh->close;
 	}
 
-	while ( my $line = $fh->getline ) {
-		last if ( $fh->input_line_number > $self->lines );
-		$content .= $line;
-	}
-	print qq(----- $file header -----\n$content----- end header -----\n\n)
-		if $self->verbose;
-
-	my $cleaned_content = clean_comments($content);
-
-	my $license = $self->parse_license(
-		clean_cruft_and_spaces($cleaned_content),
-		$file, 0
-	);
-	my $copyrights = copyright_optimistic( clean_cruft($cleaned_content) );
-
-	if ( not $copyrights and $license eq 'UNKNOWN' ) {
-		my $position = $fh->tell;                 # See IO::Seekable
-		my $jump     = $st->size - $self->tail;
-		$jump = $position if $jump < $position;
-
-		my $tail = '';
-		if ( $self->tail and $jump < $st->size ) {
-			$fh->seek( $jump, SEEK_SET );         # also IO::Seekable
-			$tail .= join( '', $fh->getlines );
-		}
-		print qq(----- $file tail -----\n$tail----- end tail -----\n\n)
-			if $self->verbose;
-
-		my $cleaned_tail = clean_comments($tail);
-
-		$copyrights = copyright_optimistic( clean_cruft($cleaned_tail) );
-		$license    = $self->parse_license(
-			clean_cruft_and_spaces($cleaned_tail),
-			$file, $jump
-		);
-	}
-
-	$fh->close;
 	return ( $license, $copyrights );
 }
 
-sub clean_comments
+method content
 {
-	local $_ = shift or return q{};
+	if ( $top_lines == 0 ) {
+		return $content
+			if defined($content);
+
+		if ( not defined($encoding) ) {
+			$log->debugf( 'reading whole file %s as raw bytes', $path );
+			$content = $path->slurp_raw;
+		}
+		else {
+			my $id = $encoding->name;
+			$log->debugf( 'decoding whole file %s as %s', $path, $id );
+			$content = $path->slurp( { binmode => ":encoding($id)" } );
+		}
+		$log->trace("----- content -----\n$content----- end content -----")
+			if $log->is_trace;
+	}
+	elsif ( not defined($license) or not defined($copyrights) ) {
+
+		# TODO: distinguish header from full content
+		return $content
+			if defined($content);
+
+		$content = '';
+
+		if ( not defined($encoding) ) {
+			$log->debugf( 'reading part(s) of file %s as raw bytes', $path );
+			$fh = $path->openr_raw;
+		}
+		else {
+			my $id = $encoding->name;
+			$log->debugf( 'decoding part(s) of file %s as %s', $path, $id );
+			$fh = $path->openr(":encoding($id)");
+		}
+
+		while ( my $line = $fh->getline ) {
+			last if ( $fh->input_line_number > $top_lines );
+			$content .= $line;
+		}
+		$log->trace("----- header -----\n$content----- end header -----")
+			if $log->is_trace;
+
+		if ($end_bytes) {
+			my $position = $fh->tell;           # see IO::Seekable
+			my $filesize = $path->stat->size;
+			if ( $position >= $filesize - $end_bytes ) {    # header overlaps
+				if ( $position < $filesize ) {
+					$log->debugf(
+						'tail offset set to %s (end of header)',
+						$position
+					);
+					$offset = $position;
+				}
+				elsif ( $position = $filesize ) {
+					$log->debug('header end matches file size');
+					$offset = 0;
+				}
+				else {
+					$log->error('header end beyond file size');
+					$offset = 0;
+				}
+			}
+			elsif ( $position > 0 ) {
+				$offset = $filesize - $end_bytes;
+				$log->debugf(
+					'tail offset set to %s',
+					$offset
+				);
+			}
+			elsif ( $position < 0 ) {
+				$log->error('header end could not be resolved');
+				$offset = 0;
+			}
+			else {
+				$log->error('header end oddly at beginning of file');
+				$offset = 0;
+			}
+		}
+	}
+	elsif ($offset) {
+
+		# TODO: distinguish tail from full content
+		return $content
+			if defined($tail_content);
+
+		$tail_content = '';
+		$fh->seek( $offset, SEEK_SET );    # see IO::Seekable
+		$tail_content .= join( '', $fh->getlines );
+		$log->trace("----- tail -----\n$tail_content----- end tail -----")
+			if $log->is_trace;
+
+		$content = $tail_content;
+	}
+	else {
+		$log->errorf(
+			'tail offset not usable: %s',
+			$offset
+		);
+		return '';
+	}
+
+	# TODO: distinguish comment-mangled content from pristine content
+	local $_ = $content or return '';
 
 	# Remove generic comments: look for 4 or more lines beginning with
 	# regular comment pattern and trim it. Fall back to old algorithm
@@ -528,14 +624,17 @@ sub clean_comments
 	# Strip escaped newline
 	s/\s*\\n\s*/ /g;
 
-	return $_;
+	$content = $_;
+
+	return $content;
 }
 
 my $html_xml_tags_re = qr/<\/?(?:p|br|ref)(?:\s[^>]*)?>/i;
 
-sub clean_cruft
+# clean cruft
+method content_cleaned
 {
-	local $_ = shift or return q{};
+	local $_ = $self->content or return '';
 
 	# strip common html and xml tags
 	s/$html_xml_tags_re//g;
@@ -550,9 +649,10 @@ sub clean_cruft
 	return $_;
 }
 
-sub clean_cruft_and_spaces
+# clean cruft and whitespace
+method content_extracleaned
 {
-	local $_ = shift or return q{};
+	local $_ = $self->content or return '';
 
 	# strip trailing dash, assuming it is soft-wrap
 	# (example: disclaimers in GNU autotools file "install-sh")
@@ -582,14 +682,14 @@ my $re_prop_attrs = qr/
 		(?'other'\.$any)
 	)*\z/x;
 
-sub best_value
+method best_value
 {
-	my ( $self, $hashref, @props ) = @_;
+	my ( $hashref, @props ) = @_;
 	my $value;
 
 	PROPERTY:
 	for my $prop (@props) {
-		for my $org ( @{ $self->shortname_scheme } ) {
+		for my $org (@$shortname_scheme) {
 			for ( keys %$hashref ) {
 				/$re_prop_attrs/;
 				next unless $+{prop} and $+{prop} eq $prop;
@@ -614,10 +714,8 @@ my $type_re
 our %RE;
 my ( %L, @RE_EXCEPTION, @RE_LICENSE, @RE_NAME );
 
-sub init_licensepatterns
+method init_licensepatterns
 {
-	my ($self) = @_;
-
 	# reuse if already resolved
 	return %L if exists $L{re_trait};
 
@@ -829,11 +927,9 @@ my @L_contains_bsd   = grep {
 
 my $id2patterns_re = qr/(.*)(?:_(\d+(?:\.\d+)*)(_or_later)?)?/;
 
-sub parse_license
+method parse_license
 {
-	my ( $self, $licensetext, $path, $position ) = @_;
-
-	my $file = File [ $path, $licensetext ];
+	my $licensetext = $self->content_extracleaned;
 
 	$self->init_licensepatterns;
 
@@ -903,18 +999,22 @@ sub parse_license
 			$v2    ? "(v$v2)"    : (),
 		);
 		my $expr = join( ' or ', sort @spdx );
-		push @expressions, Licensing [$expr];
+		push @expressions, Licensing->new( name => $expr );
 		$license = join( ' ', $L{caption}{$legacy} || $legacy, $license );
 	};
 
 	# fulltext
-	$self->log->tracef('scan for license fulltext');
+	$log->trace('scan for license fulltext');
 	my %pos_license;
 	foreach my $id (@RE_LICENSE) {
 		next unless ( $RE{"LICENSE_$id"} );
 		while ( $licensetext =~ /$RE{"LICENSE_$id"}/g ) {
-			$pos_license{ $-[0] }{$id}
-				= Trait [ "license($id)", $-[0], $+[0], $file ];
+			$pos_license{ $-[0] }{$id} = Trait->new(
+				name  => "license($id)",
+				begin => $-[0],
+				end   => $+[0],
+				file  => $self,
+			);
 		}
 	}
 
@@ -928,7 +1028,13 @@ sub parse_license
 					$coverage->get_range( $-[0], $+[0] )->get_element(0)
 				)
 				);
-			push @clues, Trait [ $trait, $-[0], $+[0], $file ];
+			push @clues,
+				Trait->new(
+				name  => $trait,
+				begin => $-[0],
+				end   => $+[0],
+				file  => $self,
+				);
 		}
 	}
 	foreach my $pos ( sort { $a <=> $b } keys %pos_license ) {
@@ -950,14 +1056,15 @@ sub parse_license
 			$coverage->get_range( $pos, $pos_license{$pos}{$license}->end )
 				->get_element(0) );
 		$coverage->set_range(
-			@{ $pos_license{$pos}{$license}->TO_ARRAY }[ 1, 2 ],
+			$pos_license{$pos}{$license}->begin,
+			$pos_license{$pos}{$license}->end,
 			$pos_license{$pos}{$license}
 		);
 		$license{$license} = 1;
 	}
 
 	# grant, stepwise
-	$self->log->tracef('scan stepwise for license grant');
+	$log->trace('scan stepwise for license grant');
 	foreach my $trait ( keys %{ $L{TRAITS_grant_prefix} } ) {
 
 		while ( $licensetext =~ /$RE{"TRAIT_$trait"}/g ) {
@@ -967,7 +1074,13 @@ sub parse_license
 					$coverage->get_range( $-[0], $+[0] )->get_element(0)
 				)
 				);
-			push @clues, Trait [ $trait, $-[0], $+[0], $file ];
+			push @clues,
+				Trait->new(
+				name  => $trait,
+				begin => $-[0],
+				end   => $+[0],
+				file  => $self,
+				);
 		}
 	}
 	LICENSED_UNDER:
@@ -994,18 +1107,33 @@ sub parse_license
 		substr( $licensetext, $pos ) =~ $RE{ANCHORLEFT_NAMED_version};
 		if ( $+{version_number} ) {
 			push @clues,
-				Trait [ 'version', $pos + $-[0], $pos + $+[0], $file ];
+				Trait->new(
+				name  => 'version',
+				begin => $pos + $-[0],
+				end   => $pos + $+[0],
+				file  => $self,
+				);
 			$version = $+{version_number};
 			if ( $+{version_later} ) {
 				push @clues,
-					Trait [ 'or_later', $pos + $-[2], $pos + $+[2], $file ];
+					Trait->new(
+					name  => 'or_later',
+					begin => $pos + $-[2],
+					end   => $pos + $+[2],
+					file  => $self,
+					);
 				$later = $+{version_later};
 			}
 			if (substr( $licensetext, $pos + $+[0] )
 				=~ $L{LEFTANCHOR_version_of} )
 			{
 				push @clues,
-					Trait [ 'version_of', $pos + $-[0], $pos + $+[0], $file ];
+					Trait->new(
+					name  => 'version_of',
+					begin => $pos + $-[0],
+					end   => $pos + $+[0],
+					file  => $self,
+					);
 				$pos += $+[0];
 				@grant_types = @L_type_versioned;
 			}
@@ -1017,10 +1145,12 @@ sub parse_license
 		# scan for name
 		foreach my $id (@RE_NAME) {
 			if ( substr( $licensetext, $pos ) =~ $RE{"NAME_$id"} ) {
-				$match{$id}{name}{ $pos + $-[0] } = Trait [
-					"name($id)", $pos + $-[0], $pos + $+[0],
-					$file
-				];
+				$match{$id}{name}{ $pos + $-[0] } = Trait->new(
+					name  => "name($id)",
+					begin => $pos + $-[0],
+					end   => $pos + $+[0],
+					file  => $self,
+				);
 			}
 		}
 
@@ -1045,17 +1175,21 @@ sub parse_license
 			if ( !$version and grep { $_ eq $name } @L_type_versioned ) {
 				substr( $licensetext, $pos ) =~ $RE{ANCHORLEFT_NAMED_version};
 				if ( $+{version_number} ) {
-					push @clues, Trait [
-						'version',
-						$pos + $-[0], $pos + $+[0], $file
-					];
+					push @clues, Trait->new(
+						name  => 'version',
+						begin => $pos + $-[0],
+						end   => $pos + $+[0],
+						file  => $self,
+					);
 					$version = $+{version_number};
 					$pos_end = $pos + $+[1];
 					if ( $+{version_later} ) {
-						push @clues, Trait [
-							'or_later',
-							$pos + $-[2], $pos + $+[2], $file
-						];
+						push @clues, Trait->new(
+							name  => 'or_later',
+							begin => $pos + $-[2],
+							end   => $pos + $+[2],
+							file  => $self,
+						);
 						$later   = $+{version_later};
 						$pos_end = $pos + $+[2];
 					}
@@ -1066,10 +1200,12 @@ sub parse_license
 				substr( $licensetext, $pos )
 					=~ $RE{ANCHORLEFT_NAMED_version_later};
 				if ( $+{version_later} ) {
-					push @clues, Trait [
-						'or_later',
-						$pos + $-[1], $pos + $+[1], $file
-					];
+					push @clues, Trait->new(
+						name  => 'or_later',
+						begin => $pos + $-[1],
+						end   => $pos + $+[1],
+						file  => $self,
+					);
 					$later   = $+{version_later};
 					$pos_end = $pos + $+[1];
 				}
@@ -1081,23 +1217,28 @@ sub parse_license
 			}
 			if ($later) {
 				my $latername = "${name}_or_later";
-				push @clues, Trait [
-					$latername, $licensed_under->begin, $pos_end, $file,
-				];
+				push @clues, Trait->new(
+					name  => $latername,
+					begin => $licensed_under->begin,
+					end   => $pos_end,
+					file  => $self,
+				);
 				$grant{$latername} = $clues[-1];
 				next LICENSED_UNDER if grep { $grant{$_} } @RE_NAME;
 			}
-			$grant{$name} = Trait [
-				"grant($name)", $licensed_under->begin, $pos_end,
-				$file
-			];
+			$grant{$name} = Trait->new(
+				name  => "grant($name)",
+				begin => $licensed_under->begin,
+				end   => $pos_end,
+				file  => $self,
+			);
 			push @clues, $grant{$name};
 		}
 	}
 
 	# GNU oddities
 	if ( grep { $match{$_}{name} } @agpl, @gpl, @lgpl ) {
-		$self->log->tracef('scan for GNU oddities');
+		$log->trace('scan for GNU oddities');
 
 		# address in AGPL/GPL/LGPL
 		while ( $licensetext =~ /$RE{TRAIT_addr_fsf}/g ) {
@@ -1105,10 +1246,12 @@ sub parse_license
 				qw(addr_fsf_franklin_steet addr_fsf_mass addr_fsf_temple))
 			{
 				if ( defined $+{$_} ) {
-					push @flaws, Flaw [
-						$Regexp::Pattern::License::RE{$_}, $-[0], $+[0],
-						$file,
-					];
+					push @flaws, Flaw->new(
+						id    => $Regexp::Pattern::License::RE{$_},
+						begin => $-[0],
+						end   => $+[0],
+						file  => $self,
+					);
 				}
 			}
 		}
@@ -1118,26 +1261,28 @@ sub parse_license
 	# TODO: conditionally limit to AGPL/GPL/LGPL
 	foreach (@RE_EXCEPTION) {
 		if ( $licensetext =~ $RE{"EXCEPTION_$_"} ) {
-			my $exception = Exception [
-				$Regexp::Pattern::License::RE{$_}, $-[0], $+[0],
-				$file,
-			];
+			my $exception = Exception->new(
+				id    => $Regexp::Pattern::License::RE{$_},
+				begin => $-[0],
+				end   => $+[0],
+				file  => $self,
+			);
 			$coverage->set_range( $-[0], $+[0], $exception );
 			push @exceptions, $exception;
 		}
 	}
 
 	# oddities
-	$self->log->tracef('scan for oddities');
-	given ($licensetext) {
+	$log->trace('scan for oddities');
 
-		# generated file
-		when ( $RE{TRAIT_generated} ) {
-			push @flaws, Flaw [
-				$Regexp::Pattern::License::RE{generated}, $-[0], $+[0],
-				$file
-			];
-		}
+	# generated file
+	if ( $licensetext =~ $RE{TRAIT_generated} ) {
+		push @flaws, Flaw->new(
+			id    => $Regexp::Pattern::License::RE{generated},
+			begin => $-[0],
+			end   => $+[0],
+			file  => $self,
+		);
 	}
 
 	# multi-licensing
@@ -1146,12 +1291,17 @@ sub parse_license
 	# LGPL, dual-licensed
 	# FIXME: add test covering this pattern
 	if ( grep { $match{$_}{name} } @lgpl ) {
-		$self->log->tracef('scan for LGPL dual-license grant');
+		$log->trace('scan for LGPL dual-license grant');
 		if ( $licensetext =~ $L{multi_1} ) {
-			my $meta = Trait [ 'grant(multi#1)', $-[0], $+[0], $file ];
-			$self->log->tracef(
+			my $meta = Trait->new(
+				name  => 'grant(multi#1)',
+				begin => $-[0],
+				end   => $+[0],
+				file  => $self,
+			);
+			$log->tracef(
 				'detected custom pattern multi#1: %s %s %s: %s [%s]',
-				'lgpl', $1, $2, $-[0], $file
+				'lgpl', $1, $2, $-[0], $path
 			);
 			push @multilicenses, 'lgpl', $1, $2;
 		}
@@ -1160,11 +1310,11 @@ sub parse_license
 	# GPL, dual-licensed
 	# FIXME: add test covering this pattern
 	if ( grep { $match{$_}{name} } @gpl ) {
-		$self->log->tracef('scan for GPL dual-license grant');
+		$log->trace('scan for GPL dual-license grant');
 		if ( $licensetext =~ $L{multi_2} ) {
-			$self->log->tracef(
+			$log->tracef(
 				'detected custom pattern multi#2: %s %s %s: %s [%s]',
-				'gpl', $1, $2, $-[0], $file
+				'gpl', $1, $2, $-[0], $path
 			);
 			push @multilicenses, 'gpl', $1, $2;
 		}
@@ -1174,33 +1324,44 @@ sub parse_license
 
 	# LGPL
 	if ( grep { $match{$_}{name} } @lgpl ) {
-		$self->log->tracef('scan for LGPL fulltext/grant');
-		given ($licensetext) {
+		$log->trace('scan for LGPL fulltext/grant');
 
-			# LGPL, dual versions last
-			when ( $L{lgpl_5} ) {
-				my $grant = Trait [ 'grant(lgpl#5)', $-[0], $+[0], $file ];
-				$license = "LGPL (v$1 or v$2) $license";
-				my $expr = "LGPL-$1 or LGPL-$2";
-				push @expressions,
-					Grant [ $expr, @{ $grant->TO_ARRAY }[ 1 .. 3 ] ];
-				$match{ 'lgpl_' . $1 =~ tr/./_/r }{custom} = 1;
-				$match{ 'lgpl_' . $2 =~ tr/./_/r }{custom} = 1;
-				$match{lgpl}{custom} = 1;
-			}
+		# LGPL, dual versions last
+		if ( $licensetext =~ $L{lgpl_5} ) {
+			my $grant = Trait->new(
+				name  => 'grant(lgpl#5)',
+				begin => $-[0],
+				end   => $+[0],
+				file  => $self,
+			);
+			$license = "LGPL (v$1 or v$2) $license";
+			my $expr = "LGPL-$1 or LGPL-$2";
+			push @expressions,
+				Grant->new(
+				name  => $expr,
+				begin => $grant->begin,
+				end   => $grant->end,
+				file  => $grant->file,
+				);
+			$match{ 'lgpl_' . $1 =~ tr/./_/r }{custom} = 1;
+			$match{ 'lgpl_' . $2 =~ tr/./_/r }{custom} = 1;
+			$match{lgpl}{custom} = 1;
 		}
 	}
 
 	# GPL or LGPL
 	if ( grep { $match{$_}{name} } @gpl ) {
-		$self->log->tracef('scan for GPL or LGPL dual-license grant');
-		given ($licensetext) {
-			when ( $L{gpl_7} ) {
-				my $grant = Trait [ "grant(gpl#7)", $-[0], $+[0], $file ];
-				$gen_license->( 'gpl', $1, $2, 'lgpl', $3, $4 );
-				$match{gpl}{custom}  = 1;
-				$match{lgpl}{custom} = 1;
-			}
+		$log->trace('scan for GPL or LGPL dual-license grant');
+		if ( $licensetext =~ $L{gpl_7} ) {
+			my $grant = Trait->new(
+				name  => "grant(gpl#7)",
+				begin => $-[0],
+				end   => $+[0],
+				file  => $self,
+			);
+			$gen_license->( 'gpl', $1, $2, 'lgpl', $3, $4 );
+			$match{gpl}{custom}  = 1;
+			$match{lgpl}{custom} = 1;
 		}
 	}
 
@@ -1208,112 +1369,175 @@ sub parse_license
 	if ( grep { $match{$_}{name} } @L_contains_bsd
 		and $licensetext =~ $L{bsd_1} )
 	{
-		$self->log->tracef('scan for BSD fulltext');
-		my $grant = Trait [ 'license(bsd#1)', $-[0], $+[0], $file ];
-		given ($licensetext) {
-			break if ( $license{bsd_4_clause} );
-			when ( $RE{TRAIT_clause_advertising} ) {
-				my $grant
-					= Trait [ 'clause_advertising', $-[0], $+[0], $file ];
+		$log->trace('scan for BSD fulltext');
+		my $grant = Trait->new(
+			name  => 'license(bsd#1)',
+			begin => $-[0],
+			end   => $+[0],
+			file  => $self,
+		);
+		for ($licensetext) {
+			next if ( $license{bsd_4_clause} );
+			if ( $licensetext =~ $RE{TRAIT_clause_advertising} ) {
+				my $grant = Trait->new(
+					name  => 'clause_advertising',
+					begin => $-[0],
+					end   => $+[0],
+					file  => $self,
+				);
 				$gen_license->('bsd_4_clause');
+				next;
 			}
-			break if ( $license{bsd_3_clause} );
-			when ( $RE{TRAIT_clause_non_endorsement} ) {
-				my $grant
-					= Trait [ 'clause_non_endorsement', $-[0], $+[0], $file ];
+			next if ( $license{bsd_3_clause} );
+			if ( $licensetext =~ $RE{TRAIT_clause_non_endorsement} ) {
+				my $grant = Trait->new(
+					name  => 'clause_non_endorsement',
+					begin => $-[0],
+					end   => $+[0],
+					file  => $self,
+				);
 				$gen_license->('bsd_3_clause');
+				next;
 			}
-			break if ( $license{bsd_2_clause} );
-			when ( $RE{TRAIT_clause_reproduction} ) {
-				break
+			next if ( $license{bsd_2_clause} );
+			if ( $licensetext =~ $RE{TRAIT_clause_reproduction} ) {
+				next
 					if (
 					defined(
 						$coverage->get_range( $-[0], $+[0] )->get_element(0)
 					)
 					);
-				my $grant
-					= Trait [ 'clause_reproduction', $-[0], $+[0], $file ];
+				my $grant = Trait->new(
+					name  => 'clause_reproduction',
+					begin => $-[0],
+					end   => $+[0],
+					file  => $self,
+				);
 				$gen_license->('bsd_2_clause');
+				next;
 			}
-			default {
-				$gen_license->('bsd');
-			}
+			$gen_license->('bsd');
 		}
 	}
 
 	# Apache dual-licensed with GPL/BSD/MIT
 	if ( $match{apache}{name} ) {
-		$self->log->tracef('scan for Apache license grant');
-		given ($licensetext) {
-			when ( $L{apache_1} ) {
-				my $grant = Trait [ 'grant(apache#1)', $-[0], $+[0], $file ];
+		$log->trace('scan for Apache license grant');
+		for ($licensetext) {
+			if ( $licensetext =~ $L{apache_1} ) {
+				my $grant = Trait->new(
+					name  => 'grant(apache#1)',
+					begin => $-[0],
+					end   => $+[0],
+					file  => $self,
+				);
 				$gen_license->( 'apache', $1, $2, 'gpl', $3, $4 );
 				$match{ $patterns2id->( 'apache', $1 ) }{custom} = 1;
+				next;
 			}
-			when ( $L{apache_2} ) {
-				my $grant = Trait [ 'grant(apache#2)', $-[0], $+[0], $file ];
+			if ( $licensetext =~ $L{apache_2} ) {
+				my $grant = Trait->new(
+					name  => 'grant(apache#2)',
+					begin => $-[0],
+					end   => $+[0],
+					file  => $self,
+				);
 				$gen_license->(
 					'apache', $1, $2,
 					$3 ? "bsd_${3}_clause" : ''
 				);
 				$match{ $patterns2id->( 'apache', $1 ) }{custom} = 1;
+				next;
 			}
-			when ( $L{apache_4} ) {
-				my $grant = Trait [ 'grant(apache#4)', $-[0], $+[0], $file ];
+			if ( $licensetext =~ $L{apache_4} ) {
+				my $grant = Trait->new(
+					name  => 'grant(apache#4)',
+					begin => $-[0],
+					end   => $+[0],
+					file  => $self,
+				);
 				$gen_license->( 'apache', $1, $2, 'mit', $3, $4 );
 				$match{ $patterns2id->( 'apache', $1 ) }{custom} = 1;
+				next;
 			}
 		}
 	}
 
 	# FSFUL
 	# FIXME: add test covering this pattern
-	$self->log->tracef('scan for FSFUL fulltext');
-	given ($licensetext) {
-		break if ( $license{fsful} );
-		when ( $L{fsful} ) {
-			my $grant = Trait [ 'grant(fsful#1)', $-[0], $+[0], $file ];
+	$log->trace('scan for FSFUL fulltext');
+	if ( not $license{fsful} ) {
+		if ( $licensetext =~ $L{fsful} ) {
+			my $grant = Trait->new(
+				name  => 'grant(fsful#1)',
+				begin => $-[0],
+				end   => $+[0],
+				file  => $self,
+			);
 			$license = "FSF Unlimited ($1 derivation) $license";
 			my $expr = "FSFUL~$1";
 			push @expressions,
-				Fulltext [ $expr, @{ $grant->TO_ARRAY }[ 1 .. 3 ] ];
+				Fulltext->new(
+				name  => $expr,
+				begin => $grant->begin,
+				end   => $grant->end,
+				file  => $grant->file,
+				);
 			$match{fsful}{custom} = 1;
 		}
 	}
 
 	# FSFULLR
 	# FIXME: add test covering this pattern
-	$self->log->tracef('scan for FSFULLR fulltext');
-	given ($licensetext) {
-		break if ( $license{fsfullr} );
-		when ( $L{fsfullr} ) {
-			my $grant = Trait [ 'grant(fsfullr#1)', $-[0], $+[0], $file ];
+	$log->trace('scan for FSFULLR fulltext');
+	if ( not $license{fsfullr} ) {
+		if ( $licensetext =~ $L{fsfullr} ) {
+			my $grant = Trait->new(
+				name  => 'grant(fsfullr#1)',
+				begin => $-[0],
+				end   => $+[0],
+				file  => $self,
+			);
 			$license
 				= "FSF Unlimited (with Retention, $1 derivation) $license";
 			my $expr = "FSFULLR~$1";
 			push @expressions,
-				Fulltext [ $expr, @{ $grant->TO_ARRAY }[ 1 .. 3 ] ];
+				Fulltext->new(
+				name  => $expr,
+				begin => $grant->begin,
+				end   => $grant->end,
+				file  => $grant->file,
+				);
 			$match{fsfullr}{custom} = 1;
 		}
 	}
 
 	# usage
-	$self->log->tracef('scan atomic for singleversion usage license grant');
+	$log->trace('scan atomic for singleversion usage license grant');
 	foreach my $id (@L_type_usage) {
 		next if ( $match{$id}{custom} );
 		if ( !$grant{$id}
 			and ( $L_grant_stepwise_incomplete{$id} or $force_atomic ) )
 		{
 			if ( $licensetext =~ $RE{"GRANT_$id"} ) {
-				my $grant = Trait [ "grant($id)", $-[0], $+[0], $file ];
+				my $grant = Trait->new(
+					name  => "grant($id)",
+					begin => $-[0],
+					end   => $+[0],
+					file  => $self,
+				);
 				unless (
 					defined(
 						$coverage->get_range( $-[0], $+[0] )->get_element(0)
 					)
 					)
 				{
-					$grant{$id}
-						= Grant [ $id, @{ $grant->TO_ARRAY }[ 1 .. 3 ] ];
+					$grant{$id} = Grant->new(
+						name  => $id,
+						begin => $grant->begin,
+						end   => $grant->end,
+						file  => $grant->file,
+					);
 				}
 			}
 		}
@@ -1327,15 +1551,15 @@ sub parse_license
 
 			# skip singleversion and unversioned equivalents
 			if ( $L{usage}{$id} ) {
-				$self->log->tracef(
+				$log->tracef(
 					'flagged license object: %s [%s]',
-					$id, $file
+					$id, $path
 				);
 				$match{ $L{usage}{$id} }{custom} = 1;
 				if ( $L{series}{ $L{usage}{$id} } ) {
-					$self->log->tracef(
+					$log->tracef(
 						'flagged license object: %s [%s]',
-						$L{usage}{$id}, $file
+						$L{usage}{$id}, $path
 					);
 					$match{ $L{series}{ $L{usage}{$id} } }{custom} = 1;
 				}
@@ -1344,7 +1568,7 @@ sub parse_license
 	}
 
 	# singleversion
-	$self->log->tracef('scan atomic for singleversion license grant');
+	$log->trace('scan atomic for singleversion license grant');
 	foreach my $id (@L_type_singleversion) {
 		if (    !$license{$id}
 			and !$grant{$id}
@@ -1352,15 +1576,24 @@ sub parse_license
 			and ( $L_grant_stepwise_incomplete{$id} or $force_atomic ) )
 		{
 			if ( $licensetext =~ $RE{"GRANT_$id"} ) {
-				my $grant = Trait [ "grant($id)", $-[0], $+[0], $file ];
+				my $grant = Trait->new(
+					name  => "grant($id)",
+					begin => $-[0],
+					end   => $+[0],
+					file  => $self,
+				);
 				unless (
 					defined(
 						$coverage->get_range( $-[0], $+[0] )->get_element(0)
 					)
 					)
 				{
-					$grant{$id}
-						= Grant [ $id, @{ $grant->TO_ARRAY }[ 1 .. 3 ] ];
+					$grant{$id} = Grant->new(
+						name  => $id,
+						begin => $grant->begin,
+						end   => $grant->end,
+						file  => $grant->file,
+					);
 				}
 			}
 		}
@@ -1375,9 +1608,9 @@ sub parse_license
 
 			# skip unversioned equivalent
 			if ( $L{series}{$id} ) {
-				$self->log->tracef(
+				$log->tracef(
 					'flagged license object: %s [%s]',
-					$id, $file
+					$id, $path
 				);
 				$match{ $L{series}{$id} }{custom} = 1;
 			}
@@ -1385,7 +1618,7 @@ sub parse_license
 	}
 
 	# versioned
-	$self->log->tracef('scan atomic for versioned license grant');
+	$log->trace('scan atomic for versioned license grant');
 	foreach my $id (@L_type_versioned) {
 		next if ( $match{$id}{custom} );
 
@@ -1404,7 +1637,12 @@ sub parse_license
 		{
 			if ( $RE{"GRANT_$id"} ) {
 				if ( $licensetext =~ $RE{"GRANT_$id"} ) {
-					my $grant = Trait [ "grant($id)", $-[0], $+[0], $file ];
+					my $grant = Trait->new(
+						name  => "grant($id)",
+						begin => $-[0],
+						end   => $+[0],
+						file  => $self,
+					);
 					unless (
 						defined(
 							$coverage->get_range( $-[0], $+[0] )
@@ -1412,8 +1650,12 @@ sub parse_license
 						)
 						)
 					{
-						$grant{$id}
-							= Grant [ $id, @{ $grant->TO_ARRAY }[ 1 .. 3 ] ];
+						$grant{$id} = Grant->new(
+							name  => $id,
+							begin => $grant->begin,
+							end   => $grant->end,
+							file  => $grant->file,
+						);
 					}
 				}
 			}
@@ -1430,7 +1672,7 @@ sub parse_license
 
 	# other
 	# TODO: add @L_type_group
-	$self->log->tracef('scan atomic for misc fulltext/grant');
+	$log->trace('scan atomic for misc fulltext/grant');
 	foreach my $id ( @L_type_unversioned, @L_type_combo ) {
 		next if ( !$license{$id} and $match{$id}{custom} );
 
@@ -1451,14 +1693,24 @@ sub parse_license
 			and !$grant{$id}
 			and $licensetext =~ $RE{"GRANT_$id"} )
 		{
-			my $grant = Trait [ "grant($id)", $-[0], $+[0], $file ];
+			my $grant = Trait->new(
+				name  => "grant($id)",
+				begin => $-[0],
+				end   => $+[0],
+				file  => $self,
+			);
 			unless (
 				defined(
 					$coverage->get_range( $-[0], $+[0] )->get_element(0)
 				)
 				)
 			{
-				$grant{$id} = Grant [ $id, @{ $grant->TO_ARRAY }[ 1 .. 3 ] ];
+				$grant{$id} = Grant->new(
+					name  => $id,
+					begin => $grant->begin,
+					end   => $grant->end,
+					file  => $grant->file,
+				);
 			}
 		}
 		if ( $license{$id} or $grant{$id} ) {
@@ -1478,21 +1730,20 @@ sub parse_license
 			if ( @expressions > 1 );
 		$expr .= ' with ' . join(
 			'_AND_',
-			sort map { $self->best_value( $_->{id}, 'name' ) } @exceptions
+			sort map { $self->best_value( $_->id, 'name' ) } @exceptions
 		) . ' exception';
 	}
 	if (@flaws) {
 		$license .= ' [' . join(
 			', ',
-			sort map { $self->best_value( $_->{id}, qw(caption name) ) }
-				@flaws
+			sort map { $self->best_value( $_->id, qw(caption name) ) } @flaws
 		) . ']';
 	}
-	$self->log->infof(
+	$log->infof(
 		'resolved license expression: %s [%s]', $expr,
-		$file
+		$path
 	);
-	return ( @{ $self->shortname_scheme } ? $expr : $license ) || 'UNKNOWN';
+	return ( @$shortname_scheme ? $expr : $license ) || 'UNKNOWN';
 }
 
 =encoding UTF-8

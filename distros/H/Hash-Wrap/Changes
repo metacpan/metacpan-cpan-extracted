@@ -1,5 +1,16 @@
 Revision history for Hash-Wrap
 
+0.19      2022-01-06 22:52:29-05:00 America/New_York
+
+  [BUG FIX]
+
+    * the can() method didn't acknowledge the existence of 'exists',
+      'defined', or predicate methods.
+
+    * recursively built constructors didn't use attributes passed to
+      the top level constructor (like -exists, -defined, etc).
+
+
 0.18      2021-08-11 16:17:38-04:00 America/New_York
 
   [ENHANCEMENT]

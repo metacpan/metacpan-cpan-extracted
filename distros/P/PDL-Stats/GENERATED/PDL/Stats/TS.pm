@@ -3,7 +3,7 @@
 #
 package PDL::Stats::TS;
 
-our @EXPORT_OK = qw(PDL::PP _acf PDL::PP _acvf PDL::PP diff PDL::PP inte PDL::PP dseason PDL::PP _fill_ma PDL::PP filter_exp PDL::PP filter_ma PDL::PP mae PDL::PP mape PDL::PP wmape PDL::PP portmanteau PDL::PP _pred_ar );
+our @EXPORT_OK = qw(_acf _acvf diff inte dseason _fill_ma filter_exp filter_ma mae mape wmape portmanteau _pred_ar );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -19,6 +19,9 @@ use DynaLoader;
 
 
 
+
+
+#line 2 "ts.pd"
 
 =encoding utf8
 
@@ -49,7 +52,7 @@ use PDL::Stats::Basic;
 use PDL::Stats::Kmeans;
 
 my $DEV = ($^O =~ /win/i)? '/png' : '/xs';
-
+#line 56 "TS.pm"
 
 
 
@@ -63,19 +66,21 @@ my $DEV = ($^O =~ /win/i)? '/png' : '/xs';
 
 
 
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *_acf = \&PDL::_acf;
+#line 72 "TS.pm"
 
 
 
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *_acvf = \&PDL::_acvf;
+#line 78 "TS.pm"
 
 
 
+#line 113 "ts.pd"
 
-#line 113 "TS/ts.pd"
+#line 113 "ts.pd"
 
 =head2 acf
 
@@ -145,8 +150,12 @@ sub PDL::acvf {
   $h ||= $self->dim(0) - 1;
   return $self->_acvf($h+1);
 }
+#line 184 "ts.pd"
+#line 155 "TS.pm"
 
 
+
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 diff
@@ -169,16 +178,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 182 "TS.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *diff = \&PDL::diff;
+#line 188 "TS.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 inte
@@ -201,16 +211,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 215 "TS.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *inte = \&PDL::inte;
+#line 221 "TS.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 dseason
@@ -234,18 +245,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 249 "TS.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *dseason = \&PDL::dseason;
+#line 255 "TS.pm"
 
 
 
+#line 363 "ts.pd"
 
-#line 363 "TS/ts.pd"
+#line 363 "ts.pd"
 
 =head2 fill_ma
 
@@ -277,14 +289,18 @@ sub PDL::fill_ma {
 
   return $x_filled;
 }
+#line 396 "ts.pd"
+#line 294 "TS.pm"
 
 
 
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *_fill_ma = \&PDL::_fill_ma;
+#line 300 "TS.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 filter_exp
@@ -310,16 +326,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 330 "TS.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *filter_exp = \&PDL::filter_exp;
+#line 336 "TS.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 filter_ma
@@ -343,16 +360,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 364 "TS.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *filter_ma = \&PDL::filter_ma;
+#line 370 "TS.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 mae
@@ -382,16 +400,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 404 "TS.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *mae = \&PDL::mae;
+#line 410 "TS.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 mape
@@ -421,16 +440,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 444 "TS.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *mape = \&PDL::mape;
+#line 450 "TS.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 wmape
@@ -460,16 +480,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 484 "TS.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *wmape = \&PDL::wmape;
+#line 490 "TS.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 portmanteau
@@ -511,18 +532,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 536 "TS.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *portmanteau = \&PDL::portmanteau;
+#line 542 "TS.pm"
 
 
 
+#line 701 "ts.pd"
 
-#line 701 "TS/ts.pd"
+#line 701 "ts.pd"
 
 =head2 pred_ar
 
@@ -579,16 +601,20 @@ sub PDL::pred_ar {
     return $x->append($ext($b->dim(0) : -1));
   }
 }
+#line 759 "ts.pd"
+#line 606 "TS.pm"
 
 
 
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *_pred_ar = \&PDL::_pred_ar;
+#line 612 "TS.pm"
 
 
 
+#line 791 "ts.pd"
 
-#line 791 "TS/ts.pd"
+#line 791 "ts.pd"
 
 =head2 season_m
 
@@ -814,9 +840,11 @@ Copyright (C) 2009 Maggie J. Xiong <maggiexyz users.sourceforge.net>
 All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDL distribution.
 
 =cut
+#line 1018 "ts.pd"
+#line 845 "TS.pm"
 
 
-;
+
 
 
 

@@ -1,19 +1,17 @@
-
 #
 # GENERATED WITH PDL::PP! Don't modify!
 #
 package PDL::NetCDF;
 
 our @EXPORT_OK = qw();
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 
 
-
-   our $VERSION = '4.22';
+   our $VERSION = '4.23';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::NetCDF $VERSION;
@@ -21,6 +19,9 @@ use DynaLoader;
 
 
 
+
+
+#line 13 "netcdf.pd"
 =head1 NAME
 
 PDL::NetCDF - Object-oriented interface between NetCDF files and PDL objects.
@@ -761,23 +762,31 @@ Edward Baudrez, Royal Meteorological Institute of Belgium, edward.baudrez\@meteo
 perl(1), PDL(1), netcdf(3).
 
 =cut
+#line 766 "NetCDF.pm"
 
 
 
 
 
 
+
+#line 1018 "netcdf.pd"
 
 use Carp;
 use Fcntl; # importing constants O_CREAT,O_RDONLY,O_RDWR
 use constant DEBUG => 0;
+#line 779 "NetCDF.pm"
 
 
 
+#line 1028 "netcdf.pd"
 
 use constant PACKTYPE => "Q*";
+#line 786 "NetCDF.pm"
 
 
+
+#line 1040 "netcdf.pd"
 
 #line 1040 "netcdf.pd"
 
@@ -1269,6 +1278,9 @@ sub getdimensionnames {
   my $varnm = shift;
   my $dimnames = [];
   my $dimids = [values %{$self->{DIMIDS}}];
+#line 1531 "netcdf.pd"
+#line 1531 "netcdf.pd"
+#line 1533 "netcdf.pd"
 #line 1529 "netcdf.pd"
   if (defined $varnm) {
     my ($ndims, $rc);
@@ -1291,6 +1303,9 @@ sub getdimensionnames {
   }
   foreach my $id (@$dimids) {
     foreach(keys %{$self->{DIMIDS}}){
+#line 1556 "netcdf.pd"
+#line 1554 "netcdf.pd"
+#line 1558 "netcdf.pd"
 #line 1550 "netcdf.pd"
       push(@$dimnames,$_) if $self->{DIMIDS}{$_} == $id;
     }
@@ -1309,6 +1324,9 @@ sub getvariablenames {
   my @varnames = ();
   return [()] unless (exists $self->{VARIDS});
   for my $varn (keys %{$self->{VARIDS}}){
+#line 1577 "netcdf.pd"
+#line 1573 "netcdf.pd"
+#line 1579 "netcdf.pd"
 #line 1567 "netcdf.pd"
     next if($self->{VARIDS}{$varn} == NC_GLOBAL());
     push (@varnames, $varn);
@@ -1325,6 +1343,9 @@ sub getattributenames {
   $varname = 'GLOBAL' unless(defined $varname);
   my $attnames = [];
   foreach(keys %{$self->{ATTTYPE}{$varname}}){
+#line 1596 "netcdf.pd"
+#line 1590 "netcdf.pd"
+#line 1598 "netcdf.pd"
 #line 1582 "netcdf.pd"
         push(@$attnames,$_);
   }
@@ -1350,6 +1371,9 @@ sub put {
   my $shuffle = delete $opt->{SHUFFLE} || 0;
   my $fillValue = delete $opt->{_FillValue};
   barf ("Unknown options to put: ". join(",", keys %{$opt})) if (keys %{$opt});
+#line 1624 "netcdf.pd"
+#line 1616 "netcdf.pd"
+#line 1626 "netcdf.pd"
 #line 1606 "netcdf.pd"
   
   if ($self->{REVERSE_DIMS}) {
@@ -1509,6 +1533,9 @@ sub putslice {
   my $shuffle = delete $opt->{SHUFFLE} || 0;
   my $fillValue = delete $opt->{_FillValue};
   barf ("Unknown options to putslice: ". join(",", keys %{$opt})) if (keys %{$opt});
+#line 1786 "netcdf.pd"
+#line 1776 "netcdf.pd"
+#line 1788 "netcdf.pd"
 #line 1764 "netcdf.pd"
 
   if ($self->{REVERSE_DIMS}) {
@@ -1965,6 +1992,9 @@ sub puttext {
   my $deflate = delete $opt->{DEFLATE} || 0;
   my $shuffle = delete $opt->{SHUFFLE} || 0;
   barf ("Unknown options to puttext: ". join(",", keys %{$opt})) if (keys %{$opt});
+#line 2245 "netcdf.pd"
+#line 2233 "netcdf.pd"
+#line 2247 "netcdf.pd"
 #line 2219 "netcdf.pd"
   
   my $ndims = scalar(@$dimlens);
@@ -2154,14 +2184,14 @@ sub getrec {
                                   $self->{RECS}{$rec}{STRLEN}, $idx);
 
 }
+#line 2437 "netcdf.pd"
+#line 2189 "NetCDF.pm"
 
 
-;
+
 
 
 
 # Exit with OK status
 
 1;
-
-		   

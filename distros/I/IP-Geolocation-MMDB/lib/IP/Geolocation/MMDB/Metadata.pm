@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = 0.007;
+our $VERSION = 0.009;
 
 sub new {
   my ($class, %attrs) = @_;
@@ -81,12 +81,12 @@ IP::Geolocation::MMDB::Metadata - Metadata from a MaxMind DB file
 
 =head1 VERSION
 
-version 0.007
+version 0.009
 
 =head1 SYNOPSIS
 
   use IP::Geolocation::MMDB;
-  my $db = IP::Geolocation::MMDB->new(file => 'GeoIP2-City.mmdb');
+  my $db = IP::Geolocation::MMDB->new(file => 'City.mmdb');
   my $metadata = $db->metadata;
 
 =head1 DESCRIPTION
@@ -101,7 +101,7 @@ A class for metadata from a MaxMind DB file.
     binary_format_major_version => 2,
     binary_format_minor_version => 0,
     build_epoch   => time,
-    database_type => 'GeoIP2-City',
+    database_type => 'City',
     languages     => [qw(en fr pt-BR)],
     description   => {
       en => 'IP to city',

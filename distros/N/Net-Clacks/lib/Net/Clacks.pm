@@ -1,4 +1,4 @@
-package Net::Clacks::Server;
+package Net::Clacks;
 #---AUTOPRAGMASTART---
 use 5.020;
 use strict;
@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp;
-our $VERSION = 18;
+our $VERSION = 20;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -17,6 +17,8 @@ use Encode qw(is_utf8 encode_utf8 decode_utf8);
 use Net::Clacks::Client;
 use Net::Clacks::Server;
 use Net::Clacks::ClacksCache;
+
+1;
 
 =head1 NAME
 
@@ -37,7 +39,7 @@ A slave can also run itself as master for it's own slaves, so a tree-like setup 
 Clacks has two ways to handle data. One is (near) real time messaging, the other is storing in
 memory (as a replacement for memcached).
 
-Clacks has also a DEBUG feature, that forwards all messages to a requesting client.
+Clacks has also a DEBUG feature that forwards all messages to a requesting client.
 
 The Net::Clacks system implements a fast client/server based interprocess messaging. For
 handling a high number of clients, you can run multiple servers in a master/slave configuration.
@@ -71,7 +73,7 @@ L<https://cavac.at/public/mercurial/Net-Clacks/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2020 Rene Schickbauer
+Copyright (C) 2008-2022 Rene Schickbauer
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

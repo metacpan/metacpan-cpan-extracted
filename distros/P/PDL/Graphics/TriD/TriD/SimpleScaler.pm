@@ -3,11 +3,13 @@
 ## ScaleController -- this is the module that controls 3-D window scaling
 ## when you drag the mouse in the display window.
 
-
-
 package PDL::Graphics::TriD::ScaleController;
+use strict;
+use warnings;
 use base qw/PDL::Graphics::TriD::ButtonControl/;
 use fields qw/Dist/;
+
+$PDL::Graphics::TriD::verbose //= 0;
 
 sub new {
   my($type,$win,$dist) = @_;

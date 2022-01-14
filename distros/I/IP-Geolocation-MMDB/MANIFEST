@@ -15,7 +15,7 @@ lib/IP/Geolocation/MMDB.pm
 lib/IP/Geolocation/MMDB/Metadata.pm
 t/author-pod-coverage.t
 t/author-pod-syntax.t
-t/data/Test-GeoLite2-City.mmdb
+t/data/Test-City.mmdb
 t/mmdb.t
 t/release-kwalitee.t
 typemap

@@ -2,11 +2,15 @@ package RT::Extension::QuickCalls;
 use warnings;
 use strict;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 =head1 NAME
 
 RT::Extension::QuickCalls - Quickly create tickets in specific queues with default values
+
+=head1 RT VERSION
+
+Works with RT 4.4, 5.0
 
 =head1 SYNOPSIS
 

@@ -7,6 +7,9 @@ the command line as arguments and it returns the total distance.
 
   $> ./marathon.pl foo.txt bar.txt baz.txt
 
+The first argument may be --qwerty or --dvorak, to specify the keyboard
+layout. It defaults to QWERTY.
+
 =cut
 
 use Acme::KeyboardMarathon;
@@ -14,7 +17,8 @@ use Math::BigInt lib => 'GMP';
 use strict;
 use warnings;
 
-my $akm = new Acme::KeyboardMarathon;
+my $akm = new Acme::KeyboardMarathon
+  layout => $ARGV[0] =~ /^--\w/ ? substr shift(@ARGV), 2 : 'qwerty';
 
 our @ARGV;
 my $total = Math::BigInt->bzero();

@@ -3,7 +3,7 @@ package OpenTracing::Batch;
 use strict;
 use warnings;
 
-our $VERSION = '1.004'; # VERSION
+our $VERSION = '1.005'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 use parent qw(OpenTracing::Common);

@@ -20,6 +20,11 @@ use DynaLoader;
 
 
 
+
+#line 5 "gsl_sf_laguerre.pd"
+use strict;
+use warnings;
+
 =head1 NAME
 
 PDL::GSLSF::LAGUERRE - PDL interface to GSL Special Functions
@@ -28,11 +33,8 @@ PDL::GSLSF::LAGUERRE - PDL interface to GSL Special Functions
 
 This is an interface to the Special Function package present in the GNU Scientific Library. 
 
-=head1 SYNOPSIS
-
 =cut
-
-
+#line 38 "LAGUERRE.pm"
 
 
 
@@ -45,6 +47,8 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
+
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_laguerre_n
@@ -64,18 +68,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 72 "LAGUERRE.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_laguerre_n = \&PDL::gsl_sf_laguerre_n;
+#line 78 "LAGUERRE.pm"
 
 
 
 
 
+#line 40 "gsl_sf_laguerre.pd"
 
 =head1 AUTHOR
 
@@ -89,8 +94,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-
-
+#line 98 "LAGUERRE.pm"
 
 
 

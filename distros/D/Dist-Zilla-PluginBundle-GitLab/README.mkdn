@@ -1,0 +1,109 @@
+# NAME
+
+Dist::Zilla::PluginBundle::GitLab - Access GitLab functionality to maintain distros from Dist::Zilla
+
+# VERSION
+
+version 1.0002
+
+# SYNOPSIS
+
+Configure git with your GitLab credentials:
+
+    $ git config --global gitlab.user LoginName
+    $ git config --global gitlab.token AccessToken
+
+Alternatively you can install [Config::Identity](https://metacpan.org/pod/Config%3A%3AIdentity) and write your credentials
+in the (optionally GPG-encrypted) `~/.gitlab` file as follows:
+
+    login LoginName
+    token AccessToken
+
+Set up an access token on GitLab, in your profile under "Personal Access Tokens." You
+must grant the token the `api` scope!
+
+then, in your `dist.ini`:
+
+    [@GitLab]
+    repo = SomeRepo
+
+# DESCRIPTION
+
+This bundle automatically adds the plugins
+[GitLab::Meta](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3AGitLab%3A%3AMeta)
+and [GitLab::Update](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3AGitLab%3A%3AUpdate).
+
+# ATTRIBUTES
+
+- `bugs`
+
+    The META bugtracker web field will be set to the issue's page of the repository
+    on GitLab, if this options is set to true (default) and if the GitLab Issues happen to
+    be activated (see the GitLab repository's `Admin` panel).
+
+- `fork`
+
+    If the repository is a GitLab fork of another repository this option will make
+    all the information be taken from the original repository instead of the forked
+    one, if it's set to true (default).
+
+- `metacpan`
+
+    The GitLab homepage field will be set to the metacpan.org distribution URL
+    (e.g. `https://metacpan.org/release/Dist-Zilla-Plugin-GitLab`) if this option is set to true
+    (default is false).
+
+    This takes precedence over the `p3rl` options (if both are
+    true, metacpan will be used).
+
+- `meta_home`
+
+    The GitLab homepage field will be set to the value present in the dist meta
+    (e.g. the one set by other plugins) if this option is set to true (default is
+    false). If no value is present in the dist meta, this option is ignored.
+
+    This takes precedence over the `metacpan` and `p3rl` options (if all
+    three are true, meta\_home will be used).
+
+- `p3rl`
+
+    The GitLab homepage field will be set to the p3rl.org shortened URL
+    (e.g. `https://p3rl.org/Dist::Zilla::PluginBundle::GitLab`) if this option is set to true (default is
+    false).
+
+- `remote`
+
+    Specifies the git remote name to be used when guessing the repo name (default `origin`). 
+
+- `repo`
+
+    The name of the GitLab repository. By default the name will be extracted from
+    the URL of the remote specified in the `remote` option, and if that fails the
+    dist name (from dist.ini) is used. It can also be in the form `user/repo`
+    when it belongs to another GitLab user/organization.
+
+- `wiki`
+
+    The META homepage field will be set to the URL of the wiki of the GitLab
+    repository, if this option is set to true (default is false) and if the GitLab
+    Wiki happens to be activated (see the GitLab repository's `Admin` panel).
+
+# SEE ALSO
+
+[Dist::Zilla::Plugin::GitLab::Meta](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3AGitLab%3A%3AMeta), [Dist::Zilla::Plugin::GitLab::Update](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3AGitLab%3A%3AUpdate)
+
+# ACKNOWLEDGEMENTS
+
+Alessandro Ghedini <alexbio@cpan.org> made [Dist::Zilla::PluginBundle::GitLab](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APluginBundle%3A%3AGitLab) from
+which this module is created. Much of the underlying code is from that module.
+
+# AUTHOR
+
+D Ruth Holloway <ruth@hiruthie.me>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022 by D Ruth Holloway.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

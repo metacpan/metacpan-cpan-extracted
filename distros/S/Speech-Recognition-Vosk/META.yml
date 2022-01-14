@@ -1,0 +1,36 @@
+---
+abstract: 'offline voice recognition using the Vosk toolkit'
+author:
+  - 'Max Maischein <corion@cpan.org>'
+build_requires:
+  Alien::cmake3: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Basename: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Speech-Recognition-Vosk
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: '5'
+  Filter::signatures: '0.09'
+  JSON: '0'
+  Moo: '2'
+  XSLoader: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/Corion/Speech-Recognition-Vosk/issues
+  license: https://dev.perl.org/licenses/
+  repository: git://github.com/Corion/Speech-Recognition-Vosk.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

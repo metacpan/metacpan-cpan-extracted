@@ -127,7 +127,7 @@ BEGIN {
 		);
 	};
 
-our $VERSION   = '3.006';
+our $VERSION   = '3.007';
 
 sub ARTICLE_CODE_OUT_OF_RANGE () { -5 }
 sub INVALID_PREFIX            () { -4 };
@@ -752,15 +752,13 @@ my @methods = (
 sub _parse_isbn {
 	my $self = shift;
 
-	foreach my $pair ( @methods )
-		{
+	foreach my $pair ( @methods ) {
 		my( $method, $error_code ) = @$pair;
 
 		my $parser = "_parse_$method";
 		my $result = $self->$parser;
 
-		unless( defined $result )
-			{
+		unless( defined $result ) {
 			$self->_set_is_valid( $error_code );
 			#print STDERR "Got bad result for $method [$$self{isbn}]\n";
 			return;
@@ -785,10 +783,8 @@ sub _parse_group_code {
 	my $count = 1;
 
 	GROUP_CODE:
-	while( defined( $trial= substr($self->isbn, $self->_prefix_length, $count++) ) )
-		{
-		if( defined $self->_group_data( $trial ) )
-			{
+	while( defined( $trial= substr($self->isbn, $self->_prefix_length, $count++) ) ) {
+		if( defined $self->_group_data( $trial ) ) {
 			return $trial;
 			last GROUP_CODE;
 			}
@@ -902,7 +898,7 @@ brian d foy C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2001-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2001-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This module is licensed under the Artistic License 2.0. See the LICENSE
 file in the distribution, or https://opensource.org/licenses/Artistic-2.0

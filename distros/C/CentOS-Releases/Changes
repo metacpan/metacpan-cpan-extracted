@@ -1,13 +1,20 @@
-0.030   2017-09-08 (PERLANCAR)
+0.031   2022-01-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Rebuild to update data (8 & 9).
+
+        - Mark deprecated.
+
+
+0.030   2017-09-08  Released-By: PERLANCAR
 
         - Update data.
 
 
-0.02    2016-08-19 (PERLANCAR)
+0.02    2016-08-19  Released-By: PERLANCAR
 
         - Update data.
 
 
-0.01    2015-10-06 (PERLANCAR)
+0.01    2015-10-06  Released-By: PERLANCAR
 
         - First version.

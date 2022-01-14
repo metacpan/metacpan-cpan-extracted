@@ -1,5 +1,8 @@
 Revision history for PerlIO-utf8_strict
 
+0.009     2022-01-08 17:26:23+01:00 Europe/Amsterdam
+          - Mark functions that croak as noreturn
+
 0.008     2020-09-19 00:11:59+02:00 Europe/Amsterdam
           - Make unread by :crlf on top of :utf8_strict reliable
 

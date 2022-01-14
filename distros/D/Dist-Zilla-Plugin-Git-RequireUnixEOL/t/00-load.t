@@ -6,7 +6,7 @@ use warnings;
 
 # Automatically generated file; DO NOT EDIT.
 
-use Test::More;
+use Test::More 0.88;
 
 use lib qw(lib);
 
@@ -17,5 +17,5 @@ my @modules = qw(
 plan tests => scalar @modules;
 
 for my $module (@modules) {
-    require_ok($module) || BAIL_OUT();
+    require_ok($module) or BAIL_OUT();
 }

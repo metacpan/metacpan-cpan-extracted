@@ -28,7 +28,7 @@ You can run tests directly using the prove tool:
 
 or with the Makefile:
 
-  $ export AUTOMATED_TESTING=1
+  $ export EXTENDED_TESTING=1
   $ perl Makefile.PL
   $ make
   $ make test

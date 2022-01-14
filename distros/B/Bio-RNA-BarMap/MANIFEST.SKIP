@@ -94,6 +94,8 @@
 \W?[.]gitignore$
 
  # Misc
-\bconda_env.yml$
+\bconda_env[.]yml$
+\bupdate_version[.]sh$
 [.]swp$
 [.]bak$
+

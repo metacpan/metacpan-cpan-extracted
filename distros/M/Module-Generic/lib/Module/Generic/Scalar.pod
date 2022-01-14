@@ -12,7 +12,7 @@ Module::Generic::Scalar - String Manipulation Object Class
 
 =head1 VERSION
 
-    v1.0.3
+    v1.1.0
 
 =head1 DESCRIPTION
 
@@ -71,6 +71,85 @@ Returns the object string as a string.
     my $s = Module::Generic::Scalar->new( "Mary Jane" );
     print( "Hello $s\n" );
     # Hello Mary Jane
+
+=head2 callback
+
+Sets or gets a callback on the scalar object. You can set 2 types of callback: C<add> or C<remove> which will be called respectively when you add something to the scalar or when you remove something from it.
+
+It does this by tieing the scalar to its internal class C<Module::Generic::Scalar::Tie> that will call the C<add> or C<remove> callback when data is being added or removed, no matter how, i.e. be it through the methods of this class, or by directly trying to add data to it:
+
+    my $str = Module::Generic::Scalar->new();
+    $a->callback( add => sub
+    {
+        my( $new ) = @_;
+        return unless( $$new eq $approved_string );
+        return(1);
+    });
+    $str->append( $some_string );
+    # or
+    $str .= $some_string;
+
+In both cases above the string will be added, and if it were some other unapproved text, the data would not be added to the string.
+
+So, the callback must return true to allow the data to be added, or C<undef> to refuse. Returning an empty string or 0 will not work to be considered a rejection even though it is a false value.
+
+Both C<add> and C<remove> callbacks receives an hash reference as its sole arguments.
+
+The C<add> callback receives an hash reference with the following properties:
+
+=over 4
+
+=item added
+
+A scalar reference to the new value being set in replacement of the old one, so you can inspect it.
+
+=item removed
+
+A scalar reference to the old value being replaced, so you can inspect it.
+
+=item type
+
+The callback type: C<add>
+
+=back
+
+The C<remove> callback works the same way, but for any operation that tries to remove data from the string. It receives an hash reference with the following properties:
+
+=over 4
+
+=item removed
+
+=item type
+
+The callback type: C<remove>
+
+=back
+
+    my $str = Module::Generic::Scalar->new();
+    $str->callback( remove => sub
+    {
+        my( $old, $new ) = @_;
+        # Do some check to accept or reject
+        return(1); # always return true to accept
+    });
+    $str->substr( 3, 4, $some_other_text ); # Attempt to change the string
+
+This example above would call the callback passing it the old and new string.
+
+To replace a callback, simply add another one. It will replace the previous one.
+
+You can get the callback code associated with a callback by calling C<callback> with one argument: the callback type.
+
+    my $code_ref = $str->callback( 'add' );
+
+To remove a callback, pass C<undef>:
+
+    $str->callback( add => undef );
+    $str->callback( remove => undef );
+
+By default, a scalar object is not tied to C<Module::Generic::Scalar::Tie> and no callback are set nor used. Be mindful when using callbacks since it will slow things down a little bit even though it is s very thin layer.
+
+See L<perltie> for more information on tieing data.
 
 =head2 capitalise
 

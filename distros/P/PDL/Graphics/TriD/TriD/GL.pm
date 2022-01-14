@@ -4,9 +4,14 @@
 #
 #package PDL::Graphics::TriD::GL;
 
-use OpenGL qw(:all);
+use strict;
+use warnings;
+no warnings 'redefine';
+use OpenGL qw/ :glfunctions :glconstants gluPerspective gluOrtho2D /;
+use OpenGL::GLUT qw( :all );
 use PDL::Graphics::OpenGL::Perl::OpenGL;
 
+$PDL::Graphics::TriD::create_window_sub = # warnings
 $PDL::Graphics::TriD::create_window_sub = sub {
   return PDL::Graphics::TriD::GL::Window->new(@_);
 };
@@ -24,6 +29,7 @@ sub PDL::Graphics::TriD::Material::togl{
 }
 
 $PDL::Graphics::TriD::any_cannots = 0;
+$PDL::Graphics::TriD::verbose //= 0;
 
 sub PDL::Graphics::TriD::Object::cannot_mklist {
 	return 0;
@@ -133,7 +139,7 @@ sub PDL::Graphics::TriD::CylindricalEquidistantAxes::togl_axis {
    
         my (@nadd,@nc,@ns);
 
-	for $dim (0..1) {
+	for my $dim (0..1) {
 	  my $width = $this->{Scale}[$dim][1]-$this->{Scale}[$dim][0];
 	  if($width > 100){
 	    $nadd[$dim] = 10;
@@ -151,7 +157,7 @@ sub PDL::Graphics::TriD::CylindricalEquidistantAxes::togl_axis {
 	# can be changed to topo heights?
 	my $verts = zeroes(3,$ns[0],$ns[1]);
 
-	($t = $verts->slice("2")) .= 1012.5;
+	(my $t = $verts->slice("2")) .= 1012.5;
 	($t = $verts->slice("0")) .= $verts->ylinvals($nc[0],$nc[0]+$nadd[0]*($ns[0]-1));
 	($t = $verts->slice("1")) .= $verts->zlinvals($nc[1],$nc[1]+$nadd[1]*($ns[1]-1));
 
@@ -222,8 +228,8 @@ sub PDL::Graphics::TriD::EuclidAxes::togl_axis {
 		my $nc = $s->[0];
 		for(0..$ndiv) {
 			&glRasterPos3f(@coords);
-			if ( OpenGL::done_glutInit() ) {
-			   OpenGL::glutBitmapString($fontbase, sprintf("%.3f",$nc));
+			if ( done_glutInit() ) {
+			   glutBitmapString($fontbase, sprintf("%.3f",$nc));
 			} else {
 			   OpenGL::glpPrintString($fontbase, sprintf("%.3f",$nc));
 			}
@@ -238,8 +244,8 @@ sub PDL::Graphics::TriD::EuclidAxes::togl_axis {
 		}
 		$coords0[$dim] = 1.1;
 		&glRasterPos3f(@coords0);
-		if ( OpenGL::done_glutInit() ) {
-			OpenGL::glutBitmapString($fontbase, $this->{Names}[$dim]);
+		if ( done_glutInit() ) {
+			glutBitmapString($fontbase, $this->{Names}[$dim]);
 		} else {
 			OpenGL::glpPrintString($fontbase, $this->{Names}[$dim]);
 		}
@@ -628,7 +634,8 @@ sub PDL::Graphics::TriD::SimpleController::togl {
 #
 package PDL::Graphics::TriD::Window;
 
-use OpenGL qw(:all);
+use OpenGL qw/ :glfunctions :glconstants :glxconstants /;
+use OpenGL::GLUT qw( :all );
 use PDL::Graphics::OpenGL::Perl::OpenGL;
 
 use base qw/PDL::Graphics::TriD::Object/;
@@ -647,7 +654,7 @@ sub gdriver {
 	 print "WARNING: Graphics Driver already defined for this window \n";
 	 return;
   }
-  my @db = GLX_DOUBLEBUFFER;
+  my @db = OpenGL::GLX_DOUBLEBUFFER;
 
   if($PDL::Graphics::TriD::offline) {$options->{x} = -1; @db=()}
 
@@ -779,7 +786,7 @@ sub twiddle {
          }
   }
   if(!defined $getout) {
-	 $getout = not $PDL::Graphics::TriD::keeptwiddling;
+	 $getout = not ($PDL::Graphics::TriD::keeptwiddling && $PDL::Graphics::TriD::keeptwiddling);
   }
   
   $this->display();
@@ -807,6 +814,13 @@ sub twiddle {
 		  print "CONFIGNOTIFE\n" if($PDL::Graphics::TriD::verbose);
 		  $this->reshape($e[1],$e[2]);
 		  $hap=1;
+		} elsif ($e[0] == DestroyNotify) {
+		  print "DESTROYNOTIFE\n" if $PDL::Graphics::TriD::verbose;
+		  $quit = 1;
+		  $hap=1;
+		  undef $this->{_GLObject};
+		  $PDL::Graphics::TriD::cur = $PDL::Graphics::TriD::current_window = undef;
+		  last TWIDLOOP;
 		} elsif($e[0] == KeyPress) {
 		  print "KEYPRESS: '$e[1]'\n" if($PDL::Graphics::TriD::verbose);
 		  if((lc $e[1]) eq "q") {
@@ -826,7 +840,7 @@ sub twiddle {
 		#			print "HANDLING $this->{EHandler}\n";
 		foreach my $vp (@{$this->{_ViewPorts}}) {
 		  if(defined($vp->{EHandler})) {
-			 $hap += $vp->{EHandler}->event(@e);
+			 $hap += $vp->{EHandler}->event(@e) || 0;
 		  }
 		}
 	 }
@@ -836,18 +850,14 @@ sub twiddle {
 		}
 		if($getout) {last TWIDLOOP}
 	 }
-	 undef @e;
+	 @e = ();
   }
   print "STOPTWIDDLE\n" if($PDL::Graphics::TriD::verbose);
   return $quit;
 }
 
-
-
-
 sub setlist { my($this,$list) = @_;
 	$this->{List} = $list;
-
 }
 
 # Resize window.
@@ -927,7 +937,10 @@ sub read_picture {
 
 package PDL::Graphics::TriD::EventHandler;
 
-use OpenGL qw(ConfigureNotify MotionNotify ButtonPress ButtonRelease Button1Mask Button2Mask Button3Mask);
+use OpenGL qw(
+  ConfigureNotify MotionNotify DestroyNotify
+  ButtonPress ButtonRelease Button1Mask Button2Mask Button3Mask
+);
 use PDL::Graphics::OpenGL::Perl::OpenGL;
 
 use fields qw/X Y Buttons VP/;
@@ -1005,7 +1018,6 @@ sub set_button {
 	$this->{Buttons}[$butno] = $act;
 }
 
-  
 ######################################################################
 ######################################################################
 # VIEWPORT MINI_PACKAGE FOLLOWS!
@@ -1015,7 +1027,8 @@ use base qw/PDL::Graphics::TriD::Object/;
 use fields qw/X0 Y0 W H Transformer EHandler Active ResizeCommands 
               DefMaterial AspectRatio Graphs/;
 
-use OpenGL qw(:all);
+use OpenGL qw/ :glfunctions :glconstants :glufunctions /;
+use OpenGL::GLUT qw( :all );
 use PDL::Graphics::OpenGL::Perl::OpenGL;
 use PDL::Graphics::OpenGLQ;
 

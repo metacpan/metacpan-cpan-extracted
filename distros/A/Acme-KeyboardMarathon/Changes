@@ -1,6 +1,6 @@
 Revision history for Perl extension ACME::KeyboardMarathon.
 
-1.25  2016/08/23
+1.27  2022/01/07
 
 	Using GNU TAR now. The previous release had PAX headers in the tar file.
 	Build scripts now automatically configure minium perl version.

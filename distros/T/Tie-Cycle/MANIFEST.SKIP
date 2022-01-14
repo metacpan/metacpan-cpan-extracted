@@ -59,10 +59,14 @@
 
 MANIFEST\s\d
 Changes\s\d
-\.travis\.yml
 \.?appveyor.yml
 \.releaserc
 \.lwpcookies
 \.gitignore
 \.github\b
 Tie-\.*
+\bMANIFEST\s\d
+\bChanges\s\d
+\.icloud$
+\A\.github\b
+

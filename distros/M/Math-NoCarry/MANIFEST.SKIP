@@ -68,10 +68,9 @@
 
 \.releaserc
 \.lwpcookies
-\.travis\.yml
 \.appveyor\.yml
 \bMANIFEST\s\d
 \bChanges\s\d
-.*.icloud
+\.icloud$
 \A\.github\b
 

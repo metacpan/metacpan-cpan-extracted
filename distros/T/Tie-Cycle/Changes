@@ -1,5 +1,8 @@
 Revision history for Perl module Tie::Cycle
 
+1.227 2022-01-08T21:25:01Z
+	* No code changes. Fix a link in the README.pod.
+
 1.226 2021-01-12T09:38:15Z
 	* Freshening the distro, Travis is gone, Github Actions are in.
 

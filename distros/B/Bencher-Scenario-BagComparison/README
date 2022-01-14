@@ -1,12 +1,145 @@
-prepend:DESCRIPTION
+NAME
+    Bencher::Scenario::BagComparison - Benchmark bag comparison
 
+VERSION
+    This document describes version 0.005 of
+    Bencher::Scenario::BagComparison (from Perl distribution
+    Bencher-Scenario-BagComparison), released on 2021-07-31.
+
+SYNOPSIS
+    To run benchmark with default option:
+
+     % bencher -m BagComparison
+
+    To run module startup overhead benchmark:
+
+     % bencher --module-startup -m BagComparison
+
+    For more options (dump scenario, list/include/exclude/add participants,
+    list/include/exclude/add datasets, etc), see bencher or run "bencher
+    --help".
+
+DESCRIPTION
     TODO: find another bag comparison module.
 
     TODO: compare complex elements.
 
     TODO: compare with Data::Compare + sorting.
 
-SEE ALSO
+    Packaging a benchmark script as a Bencher scenario makes it convenient
+    to include/exclude/add participants/datasets (either via CLI or Perl
+    code), send the result to a central repository, among others . See
+    Bencher and bencher (CLI) for more details.
 
+BENCHMARKED MODULES
+    Version numbers shown below are the versions used when running the
+    sample benchmark.
+
+    Test::Deep 1.130
+
+BENCHMARK PARTICIPANTS
+    *   Test::Deep (perl_code)
+
+        Code template:
+
+         state $bag = Test::Deep::bag(@{<bag>}); Test::Deep::eq_deeply(<array>, $bag)
+
+BENCHMARK DATASETS
+    *   elems=10num
+
+    *   elems=100num
+
+    *   elems=200num
+
+BENCHMARK SAMPLE RESULTS
+  Sample benchmark #1
+    Run on: perl: *v5.34.0*, CPU: *Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz
+    (4 cores)*, OS: *GNU/Linux LinuxMint version 19*, OS kernel: *Linux
+    version 5.3.0-68-generic*.
+
+    Benchmark command (default options):
+
+     % bencher -m BagComparison
+
+    Result formatted as table:
+
+     #table1#
+     | dataset      | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+     |--------------+-----------+-----------+-----------------------+-----------------------+---------+---------|
+     | elems=200num |      14.5 |     69    |                 0.00% |             21844.48% | 4.7e-05 |      20 |
+     | elems=100num |      33   |     30    |               128.97% |              9483.95% | 4.1e-05 |      20 |
+     | elems=10num  |    3200   |      0.31 |             21844.48% |                 0.00% | 4.3e-07 |      20 |
+
+    The above result formatted in Benchmark.pm style:
+
+                      Rate  elems=200num  elems=100num  elems=10num 
+      elems=200num  14.5/s            --          -56%         -99% 
+      elems=100num    33/s          129%            --         -98% 
+      elems=10num   3200/s        22158%         9577%           -- 
+ 
+     Legends:
+       elems=100num: dataset=elems=100num
+       elems=10num: dataset=elems=10num
+       elems=200num: dataset=elems=200num
+
+    The above result presented as chart:
+
+  Sample benchmark #2
+    Benchmark command (benchmarking module startup overhead):
+
+     % bencher -m BagComparison --module-startup
+
+    Result formatted as table:
+
+     #table2#
+     | participant         | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
+     |---------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------|
+     | Test::Deep          |      45   |              40.1 |                 0.00% |               817.50% |   0.00019 |      20 |
+     | perl -e1 (baseline) |       4.9 |               0   |               817.50% |                 0.00% | 2.2e-05   |      21 |
+
+    The above result formatted in Benchmark.pm style:
+
+                              Rate   T:D  perl -e1 (baseline) 
+      T:D                   22.2/s    --                 -89% 
+      perl -e1 (baseline)  204.1/s  818%                   -- 
+ 
+     Legends:
+       T:D: mod_overhead_time=40.1 participant=Test::Deep
+       perl -e1 (baseline): mod_overhead_time=0 participant=perl -e1 (baseline)
+
+    The above result presented as chart:
+
+    To display as an interactive HTML table on a browser, you can add option
+    "--format html+datatables".
+
+CONTRIBUTOR
+    perlancar (@pc-office) <perlancar@gmail.com>
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bencher-Scenario-BagComparison>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Bencher-Scenario-BagComparison>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenario-BagC
+    omparison>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Bencher::Scenario::SetComparison
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021, 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

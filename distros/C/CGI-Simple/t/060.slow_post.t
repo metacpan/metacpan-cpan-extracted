@@ -1,5 +1,6 @@
-use Test::More tests => 2;
 use strict;
+use warnings;
+use Test::More tests => 2;
 use Config;
 
 use CGI::Simple;

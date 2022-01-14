@@ -1,6 +1,6 @@
-# Copyright (c) 2009-2017 Martin Becker.  All rights reserved.
-# This package is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
+# Copyright (c) 2009-2021 Martin Becker, Blaubeuren.
+# This package is free software; you can distribute it and/or modify it
+# under the terms of the Artistic License 2.0 (see LICENSE file).
 
 # Checking whether all scripts in the examples directory run fine.
 # These are tests for the distribution maintainer, mostly.
@@ -25,7 +25,7 @@ BEGIN {
 }
 
 my $examples_dir = 'examples';
-my $shebang_pat  = qr{^#!/usr/bin/perl\s};
+my $shebang_pat  = qr{^#!/usr/bin/(?:env )?perl\s};
 my $this_perl    = Test::MyUtils::this_perl();
 my $stdin_file   = File::Spec->devnull;
 my $stdout_file  = 't/example.out';

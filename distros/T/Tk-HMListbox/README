@@ -200,6 +200,15 @@ WIDGET SPECIFIC OPTIONS
         Note that you can also specify -separatorwidth on a column by column
         basis. See the COLUMNS section below.
 
+    -showcursoralways *boolean*
+        Starting with version 3.20 (and Tk::HListbox version 2.4),
+        Tk::HMListbox no longer displays the keyboard cursor (active row)
+        when the HMListbox widget does not have the keyboard focus, in order
+        to be consistent with the behaviour of Tk::SMListbox and
+        Tk::MListbox. This option, when set to 1 (or a "true" value)
+        restores the pre-v3.20 behaviour of always showing the keyboard
+        cursor. Default *0* (False).
+
     -sortable => *boolean*
         A value of 1 indicates that it is okay for the user to sort the data
         by clicking column headings. 0 disables this function. Default: 1.

@@ -1,7 +1,7 @@
 use warnings;
 use strict;
 
-use Test::Simple tests => 11;
+use Test::Simple tests => 13;
 
 # chdir to t/
 $_ = $0;
@@ -45,3 +45,12 @@ pl_e $files[1], '-oP1', '/[23]/', @files;
 pl_e $filesn, '-opl12', '', @files;
 pl_e $files, '-Op', '$_ = $ARGV', @files;
 pl_e $filesn, '-O', 'e $A', @files;
+
+pl_e <<O4, '-O4', '-E e $I, @A', 'e $I, @$A', 1..9;
+0 1 2 3 4
+4 5 6 7 8
+8 9 undef undef undef
+12 1 2 3 4 5 6 7 8 9 undef undef undef
+O4
+
+pl_e '6 1 -4 3 4 -10 6', '-o3E E $I, @A', '$_->[1] *= -2', 1..6;

@@ -2,3 +2,4 @@
 - Capture how old is the SPAM.
 - Capture TRACKING URL info.
 - Capture X-Mailer info.
+- Save all captured data to SQLite database.

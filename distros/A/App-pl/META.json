@@ -37,7 +37,9 @@
       }
    },
    "release_status" : "stable",
-   "resources" : {},
-   "version" : "v0.62.0",
+   "resources" : {
+      "homepage" : "https://perl1liner.sourceforge.io/"
+   },
+   "version" : "v0.63.0",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

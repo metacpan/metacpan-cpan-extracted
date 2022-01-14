@@ -1,5 +1,15 @@
 Revision history for Perl module Module::Generic
 
+v0.19.0 2022-12-23T14:04:47+0900
+    - Added method mkdir in Module::Generic::File for a simpler way to create a directory than mkpath
+    - Minor change to _move_or_copy() in Module::Generic::File
+    - Added callback method to Module::Generic::Array to control, accept or reject insertion or deletion
+    - Added callback method to Module::Generic::Scalar to control, accept or reject addition or removal
+    - Added method _set_get_object_lvalue in Module::Generic to allow setting object in lvalue context
+    - Added method error in Module::Generic::Array
+    - Added method _lvalue as a generic lvalue method to Module::Generic
+    - Added method filter to Module::Generic::Array
+
 v0.18.4 2021-12-17T09:10:36+0900
     - Updated _parse_timestamp to handle unix timestamp provided by Time::HiRes, i.e with a decimal
     - Small correction in _obj2h in Module::Generic

@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 use Carp qw(croak);
 use Config;
@@ -183,6 +183,15 @@ sub stagingdir {
         sub { tempdir('stagingXXXX', DIR => $self->outputdir) });
 
     return $stagingdir;
+}
+
+sub shared_objects {
+    my $self = shift;
+
+    my $shared_objects
+        = $self->_read('shared_objects', sub { $self->_get_shared_objects });
+
+    return $shared_objects;
 }
 
 sub is_noarch {
@@ -576,24 +585,46 @@ sub _pod {
     return $self->_read('pod', sub { $self->_get_pod });
 }
 
+sub _get_shared_objects {
+    my $self = shift;
+
+    my $stagingdir = $self->{stagingdir};
+    if (!defined $stagingdir) {
+        croak 'Call shared_objects after the distribution has been built';
+    }
+
+    my $shared_objects = find_shared_objects($stagingdir);
+
+    return $shared_objects;
+}
+
 sub _get_is_noarch {
     my $self = shift;
 
-    # We search for shared objects after the distribution has been installed
-    # in the staging directory.
+    # Searching for source code files isn't reliable as there are Perl
+    # distributions with C files in example directories.
     #
-    # Searching for source code files isn't reliable as distributions from the
-    # Alien namespace may not build shared objects if the software is provided
-    # by the operating system.
+    # Instead, we look for an "auto" directory and search for shared objects
+    # after the distribution has been installed in the staging directory.
 
     my $stagingdir = $self->{stagingdir};
     if (!defined $stagingdir) {
         croak 'Call is_arch after the distribution has been built';
     }
 
-    my @shared_objects = @{find_shared_objects($stagingdir)};
+    my $is_noarch = @{$self->shared_objects} == 0;
+    if ($is_noarch) {
+        my $installdirs = $self->installdirs;
+        my $archdir     = $Config{"install${installdirs}arch"};
+        if (defined $archdir) {
+            my $autodir = catdir($stagingdir, $archdir, 'auto');
+            if (-d $autodir) {
+                $is_noarch = 0;
+            }
+        }
+    }
 
-    return @shared_objects == 0;
+    return $is_noarch;
 }
 
 sub _get_module_name {
@@ -1069,6 +1100,9 @@ sub _get_docfiles {
 sub _get_excludedirs {
     my $self = shift;
 
+    # A list of directories that are provided by Perl and must not be removed
+    # by packages.
+
     my @vars = qw(
         installsitearch
         installsitebin
@@ -1173,7 +1207,7 @@ CPANPLUS::Dist::Debora::Package - Base class for package formats
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -1289,6 +1323,16 @@ F<~/.cpanplus/5.34.0/build/XXXX>.
 
 Returns the staging directory where CPANPLUS installs the Perl distribution,
 e.g. F<~/.cpanplus/5.34.0/build/XXXX/stagingYYYY>.
+
+=head2 shared_objects
+
+  for my $shared_object (@{$package->shared_objects}) {
+      say $shared_object;
+  }
+
+Returns a list of shared object files in the staging directory.
+
+This method must only be called after the distribution has been built.
 
 =head2 is_noarch
 

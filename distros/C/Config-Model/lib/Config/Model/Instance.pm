@@ -1,13 +1,13 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2021 by Dominique Dumont.
+# This software is Copyright (c) 2005-2022 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Instance 2.147;
+package Config::Model::Instance 2.149;
 
 #use Scalar::Util qw(weaken) ;
 use strict;
@@ -36,6 +36,7 @@ use Carp qw/carp croak confess cluck/;
 
 my $logger        = get_logger("Instance");
 my $change_logger = get_logger("Anything::Change");
+my $user_logger = get_logger("User");
 
 has [qw/root_class_name/] => ( is => 'ro', isa => 'Str', required => 1 );
 
@@ -104,6 +105,7 @@ has changes => (
     handles => {
         add_change => 'push',
         c_count    => 'count',
+        has_changes => 'count',
 
         #needs_save => 'count' ,
         clear_changes => 'clear',
@@ -114,11 +116,11 @@ sub needs_save {
     my $arg  = shift;
     if ( defined $arg ) {
         if ($arg) {
-            carp "replace needs_save(1) call with add_change";
+            croak "replace needs_save(1) call with add_change";
             $self->add_change();    # may not work
         }
         else {
-            carp "replace needs_save(0) call with clear_changes";
+            croak "replace needs_save(0) call with clear_changes";
             $self->clear_changes;
         }
     }
@@ -387,8 +389,9 @@ sub modify {
     my %args   = @_ eq 1 ? ( step => $_[0] ) : @_;
     my $force = delete $args{force_save} || delete $args{force};
     my $quiet = delete $args{quiet};
-    $self->load(%args)->write_back( force => $force );
+    $self->load(%args);
     $self->say_changes() unless $quiet;
+    $self->write_back( force => $force );
     return $self;
 }
 
@@ -503,11 +506,14 @@ sub list_changes {
 sub say_changes {
     my $self    = shift;
     my @changes = $self->list_changes;
-    say "\n",
-        join( "\n- ", "Changes applied to " . ($self->application // $self->name) . " configuration:", @changes ),
-        "\n"
-        if @changes;
-    return @changes;
+    return $self unless @changes;
+
+    my $msg =  "\n" .
+        join( "\n- ", "Changes applied to " . ($self->application // $self->name) . " configuration:", @changes ) .
+        "\n";
+
+    $user_logger->info($msg);
+    return $self;
 }
 
 sub write_back {
@@ -667,7 +673,7 @@ Config::Model::Instance - Instance of configuration tree
 
 =head1 VERSION
 
-version 2.147
+version 2.149
 
 =head1 SYNOPSIS
 
@@ -863,14 +869,18 @@ list element have this feature.
 Returns 1 (or more) if the instance contains data that needs to be
 saved. I.e some change were done in the tree that needs to be saved.
 
+=head2 has_changes
+
+Returns true if the instance contains unsasved changes.
+
 =head2 list_changes
 
-In list context, returns a array ref of strings describing the changes. 
+In list context, returns a array ref of strings describing the changes.
 In scalar context, returns a big string. Useful to print.
 
 =head2 say_changes
 
-Print all changes on STDOUT and return the list of changes.
+Print all changes on STDOUT and return C<$self>.
 
 =head2 clear_changes
 
@@ -1110,7 +1120,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2021 by Dominique Dumont.
+This software is Copyright (c) 2005-2022 by Dominique Dumont.
 
 This is free software, licensed under:
 

@@ -1,8 +1,14 @@
 Revision history for HarfBuzz::Shaper.
 
+0.026 2022-01-07
+
+    - Add get_font_extents method.
+      Required by Text::Layout 0.028.
+
 0.025 2021-12-24
 
     - Add get_extents method.
+      Required by Text::Layout 0.028.
 
 0.024 2021-04-12
 

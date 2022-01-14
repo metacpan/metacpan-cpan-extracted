@@ -3,12 +3,11 @@ use warnings;
 
 use lib 't/lib';
 
-# eval { use Module::CommentOuted; return Module::CommentOuted->new(); }; # will be ignored
-1;    # eval { use Module::CommentOuted; return Module::CommentOuted->new(); }; # will be ignored
-my $dummy = eval "use Eval::With::DoubleQuote; return Eval::With::DoubleQuote->new();";
+# eval { use Module::Exists::Unexpected; return Module::Exists::Unexpected->new(); }; # will be ignored
+my $dummy
+    ; # eval { use Module::Exists::Unexpected; return Module::Exists::Unexpected->new(); }; # will be ignored
+$dummy = eval "use Module::Exists::Unexpected; return Module::Exists::Unexpected->new();";
 
 # will be ignored
 
-require Dummy;    # does not exist anywhere
-
-exit;
+require Acme::BadExample;    # does not exist anywhere

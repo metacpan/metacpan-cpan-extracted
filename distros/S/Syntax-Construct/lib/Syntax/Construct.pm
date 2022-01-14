@@ -4,7 +4,7 @@ use 5.006002;
 use strict;
 use warnings;
 
-our $VERSION = '1.022';
+our $VERSION = '1.024';
 
 my %introduces = do { no warnings 'qw';
                  ( '5.034' => [qw[
@@ -248,10 +248,11 @@ sub import {
                            ++$minor;
                            "$major.$minor"
                        };
-    warn "Faking version $nearest_stable to test removed constructs.\n"
-        unless $is_stable;
-    die "$d_constr removed in $max_version at ", _position(), ".\n"
-        if $max_version le $nearest_stable;
+    if ($max_version le $nearest_stable) {
+        warn "Faking version $nearest_stable to test removed constructs.\n"
+            if ! $is_stable && $max_version eq $nearest_stable;
+        die "$d_constr removed in $max_version at ", _position(), ".\n";
+    }
 
     die "Unsupported construct $constr at ", _position(),
         sprintf " (Perl %s needed)\n", $min_version
@@ -268,7 +269,7 @@ Syntax::Construct - Explicitly state which non-feature constructs are used in th
 
 =head1 VERSION
 
-Version 1.022
+Version 1.024
 
 =head1 SYNOPSIS
 
@@ -967,7 +968,7 @@ L<Perl::MinimumVersion>, L<Perl::MinimumVersion::Fast>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013 - 2021 E. Choroba.
+Copyright 2013 - 2022 E. Choroba.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

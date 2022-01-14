@@ -18,8 +18,8 @@ print {$fh_real} "not\nmocked\n";
 close $fh_real;
 
 note "-------------- REAL MODE --------------";
-is( -s $filename, 11, "Temp file is on disk and right size" );
-is( open( $fh_real, '<', $filename ), 1, "Open a real file written by File::Temp" );
+is( -s $filename,                     11, "Temp file is on disk and right size" );
+is( open( $fh_real, '<', $filename ), 1,  "Open a real file written by File::Temp" );
 like( "$fh_real", qr/^GLOB\(0x[0-9a-f]+\)$/, '$fh2 stringifies to a GLOB' );
 is( <$fh_real>, "not\n",    " ... line 1" );
 is( <$fh_real>, "mocked\n", " ... line 2" );
@@ -28,7 +28,7 @@ is( <$fh_real>, "mocked\n", " ... line 2" );
     my $warn_msg;
     local $SIG{__WARN__} = sub { $warn_msg = shift };
     is( print( {$fh_real} "TEST" ), undef, "Fails to write to a read handle in mock mode." );
-    is( $! + 0, EBADF, q{$! when the file is written to and it's a read file handle.} );
+    is( $! + 0,                     EBADF, q{$! when the file is written to and it's a read file handle.} );
     like( $warn_msg, qr{^Filehandle \S+ opened only for input at t/readline.t line \d+}, "Warns about writing to a read file handle" );
 }
 
@@ -60,7 +60,7 @@ is( <$fh>, undef,   '9th read on $fh undef at EOF' );
     my $warn_msg;
     local $SIG{__WARN__} = sub { $warn_msg = shift };
     is( print( {$fh} "TEST" ), undef, "Fails to write to a read handle in mock mode." );
-    is( $! + 0, EBADF, q{$! when the file is written to and it's a read file handle.} );
+    is( $! + 0,                EBADF, q{$! when the file is written to and it's a read file handle.} );
     like( $warn_msg, qr{^Filehandle .+? opened only for input at .+? line \d+\.$}, "Warns about writing to a read file handle" );
 }
 
@@ -84,14 +84,14 @@ close $fh_real;
 }
 
 undef $fh;
-is( open( $fh, '<', $filename ), undef, qq{Can't open a missing file "$filename"} );
-is( $! + 0, ENOENT, 'What $! looks like when failing to open the missing file.' );
+is( open( $fh, '<', $filename ), undef,  qq{Can't open a missing file "$filename"} );
+is( $! + 0,                      ENOENT, 'What $! looks like when failing to open the missing file.' );
 
 {
     note "-------------- MOCK MODE --------------";
     my $baz = Test::MockFile->file($filename);
-    is( open( my $fh, '<', $filename ), undef, qq{Can't open a missing file "$filename"} );
-    is( $! + 0, ENOENT, 'What $! looks like when failing to open the missing file.' );
+    is( open( my $fh, '<', $filename ), undef,  qq{Can't open a missing file "$filename"} );
+    is( $! + 0,                         ENOENT, 'What $! looks like when failing to open the missing file.' );
 }
 
 #### Slurp

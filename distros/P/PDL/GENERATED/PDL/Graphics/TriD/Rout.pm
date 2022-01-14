@@ -20,6 +20,11 @@ use DynaLoader;
 
 
 
+
+#line 5 "rout.pd"
+use strict;
+use warnings;
+
 =head1 NAME
 
 PDL::Graphics::TriD::Rout - Helper routines for Three-dimensional graphics
@@ -28,7 +33,7 @@ PDL::Graphics::TriD::Rout - Helper routines for Three-dimensional graphics
 
 This module is for miscellaneous PP-defined utility routines for
 the PDL::Graphics::TriD module. Currently, there are
-
+#line 37 "Rout.pm"
 
 
 
@@ -41,6 +46,8 @@ the PDL::Graphics::TriD module. Currently, there are
 
 
 
+
+#line 1059 "../../../blib/lib/PDL/PP.pm"
 
 
 =head2 combcoords
@@ -66,16 +73,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 77 "Rout.pm"
 
 
 
-
-
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *combcoords = \&PDL::combcoords;
+#line 83 "Rout.pm"
 
 
 
+#line 1059 "../../../blib/lib/PDL/PP.pm"
 
 
 =head2 repulse
@@ -112,16 +120,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 124 "Rout.pm"
 
 
 
-
-
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *repulse = \&PDL::repulse;
+#line 130 "Rout.pm"
 
 
 
+#line 1059 "../../../blib/lib/PDL/PP.pm"
 
 
 =head2 attract
@@ -158,16 +167,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 171 "Rout.pm"
 
 
 
-
-
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *attract = \&PDL::attract;
+#line 177 "Rout.pm"
 
 
 
+#line 1059 "../../../blib/lib/PDL/PP.pm"
 
 
 =head2 vrmlcoordsvert
@@ -189,16 +199,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 203 "Rout.pm"
 
 
 
-
-
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *vrmlcoordsvert = \&PDL::vrmlcoordsvert;
+#line 209 "Rout.pm"
 
 
 
+#line 228 "rout.pd"
 
 =head2 contour_segments
 
@@ -267,16 +278,19 @@ sub PDL::Graphics::TriD::Contours::contour_segments {
 	$this->{Points} = $this->{Points}->transpose;
 	
 }
+#line 282 "Rout.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *contour_segments_internal = \&PDL::contour_segments_internal;
+#line 288 "Rout.pm"
 
 
 
 
 
+#line 470 "rout.pd"
 
 =head1 AUTHOR
 
@@ -289,8 +303,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-
-
+#line 307 "Rout.pm"
 
 
 

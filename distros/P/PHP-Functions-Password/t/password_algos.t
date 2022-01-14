@@ -1,4 +1,3 @@
-# This file must be saved in UTF-8 encoding!
 use strict;
 use warnings;
 use Test::More;
@@ -27,5 +26,5 @@ ok((grep { $_ eq '2y' } @algos), 'Result of password_algos() contains at least "
 
 unless($ENV{'HARNESS_ACTIVE'}) {
 	#require Data::Dumper; Data::Dumper->import('Dumper'); no warnings; local $Data::Dumper::Terse = 1;
-	diag('password_algos: ' . join(', ', @algos));
+	note('password_algos: ' . join(', ', @algos));
 }

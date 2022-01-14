@@ -1,26 +1,51 @@
 use strict;
 use ExtUtils::MakeMaker;
 
-WriteMakefile(
-  #( MM->can( 'signature_target' ) ? ( SIGN => 1 ) : () ),
-  license( 'perl' ),
-  NAME          => 'CGI::Simple',
-  AUTHOR        => 'Andy Armstrong <andy@hexten.net>',
-  VERSION_FROM  => 'lib/CGI/Simple.pm',
-  ABSTRACT_FROM => 'lib/CGI/Simple.pm',
-  PL_FILES      => {},
-  PREREQ_PM     => {
-    'Test::More' => 0,
-    'IO::Scalar' => 0
-  },
-  dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-  clean => { FILES    => 'CGI-Simple-*' },
+my %conf = (
+    NAME          => 'CGI::Simple',
+    AUTHOR        => 'Andy Armstrong <andy@hexten.net>',
+    VERSION_FROM  => 'lib/CGI/Simple.pm',
+    ABSTRACT_FROM => 'lib/CGI/Simple.pm',
+    TEST_REQUIRES     => {
+        'Test::More'       => 0,
+        'Test::NoWarnings' => 0,
+        'Test::Exception'  => 0,
+        'File::Temp'       => 0,
+    },
+    dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    clean => { FILES    => 'CGI-Simple-*' },
 );
 
-sub license {
-  my $lic = shift;
-  local $^W = 0;    # Silence warning about non-numeric version
-  return
-   unless $ExtUtils::MakeMaker::VERSION >= '6.31';
-  return ( LICENSE => $lic );
+if (eval { ExtUtils::MakeMaker->VERSION(6.3002) }) {
+    $conf{LICENSE} = 'perl';
 }
+
+if (eval { ExtUtils::MakeMaker->VERSION(6.46) }) {
+    $conf{META_MERGE} = {
+        'meta-spec' => { version => 2 },
+        resources => {
+            repository => {
+                type    => 'git',
+                url     => 'http://github.com/manwar/CGI--Simple.git',
+                web     => 'http://github.com/manwar/CGI--Simple',
+                license => 'http://dev.perl.org/licenses/',
+            },
+        },
+    };
+}
+
+if (!eval { ExtUtils::MakeMaker->VERSION(6.64) }) {
+    $conf{BUILD_REQUIRES} = {
+        %{ $conf{BUILD_REQUIRES} || {} },
+        %{ delete $conf{TEST_REQUIRES} || {} },
+    };
+}
+
+if (!eval { ExtUtils::MakeMaker->VERSION(6.5503) }) {
+    $conf{PREREQ_PM} = {
+        %{ $conf{PREREQ_PM} || {} },
+        %{ delete $conf{BUILD_REQUIRES} || {} },
+    };
+}
+
+WriteMakefile(%conf);

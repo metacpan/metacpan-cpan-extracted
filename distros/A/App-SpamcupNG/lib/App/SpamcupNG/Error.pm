@@ -2,7 +2,7 @@ package App::SpamcupNG::Error;
 use strict;
 use warnings;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 =head1 NAME
 
@@ -38,7 +38,7 @@ sub new {
     my ( $class, $message_ref, $is_fatal ) = @_;
     $is_fatal //= 0;
 
-    die 'message must be an no empty array reference'
+    die 'message must be an non empty array reference'
         unless ( ( ref($message_ref) eq 'ARRAY' )
         and ( scalar( @{$message_ref} ) > 0 ) );
 

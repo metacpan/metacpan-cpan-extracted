@@ -3,7 +3,7 @@ NAME
     files without touching the file system.
 
 VERSION
-    Version 0.022
+    Version 0.023
 
 SYNOPSIS
     Intercepts file system calls for specific files so unit testing can take
@@ -19,34 +19,39 @@ SYNOPSIS
         # Loaded before Test::MockFile so uses the core perl functions without any hooks.
         use Module::I::Dont::Want::To::Alter;
 
-        use Test::MockFile;
+        # strict mode
+        use Test::MockFile qw< strict >;
 
         # Be sure to assign the output of mocks, they disappear when they go out of scope
         my $mock_file = Test::MockFile->file("/foo/bar", "contents\ngo\nhere");
-        open(my $fh, "<", "/foo/bar") or die; # Does not actually open the file on disk.
-        say "ok" if -e $fh;
+        open my $fh, '<', '/foo/bar' or die; # Does not actually open the file on disk
+        say 'ok' if -e $fh;
         close $fh;
-        say "ok" if (-f "/foo/bar");
-        say "/foo/bar is THIS BIG: " . -s "/foo/bar"
+        say 'ok' if -f '/foo/bar';
+        say '/foo/bar is THIS BIG: ' . -s '/foo/bar';
 
-        my $missing_mocked_file = Test::MockFile->file("/foo/baz"); # File starts out missing.
-        my $opened = open(my $baz_fh, "<", "/foo/baz"); # File reports as missing so fails.
-        say "ok" if !-e "/foo/baz";
-    
-        open($baz_fh, ">", "/foo/baz") or die; # open for writing
-        print <$baz_fh> "replace contents\n";
-    
-        open($baz_fh, ">>", "/foo/baz") or die; # open for append.
-        print <$baz_fh> "second line";
+        my $missing_mocked_file = Test::MockFile->file('/foo/baz'); # File starts out missing
+        my $opened              = open my $baz_fh, '<', '/foo/baz'; # File reports as missing so fails
+        say 'ok' if !-e '/foo/baz';
+
+        open $baz_fh, '>', '/foo/baz' or die; # open for writing
+        print {$baz_fh} "replace contents\n";
+
+        open $baz_fh, '>>', '/foo/baz' or die; # open for append.
+        print {$baz_fh} "second line";
         close $baz_fh;
-    
+
         say $baz->contents;
-    
+
         # Unmock your file.
         undef $missing_mocked_file;
-    
+
         # The file check will now happen on file system now the file is no longer mocked.
-        say "ok" if !-e "/foo/baz";
+        say 'ok' if !-e '/foo/baz';
+
+        my $quux    = Test::MockFile->file('/foo/bar/quux.txt');
+        my @matches = </foo/bar/*.txt>;       # ( 'quux.txt' )
+        my @matches = glob('/foo/bar/*.txt'); # same as above
 
 IMPORT
     If the module is loaded in strict mode, any file checks, open, sysopen,
@@ -54,20 +59,34 @@ IMPORT
 
     For example:
 
-        use Test::MockFile qw/strict/;
+        use Test::MockFile qw< strict >;
 
         # This will not die.
-        my $file = Test::MockFile->file("/bar", "...");
+        my $file    = Test::MockFile->file("/bar", "...");
         my $symlink = Test::MockFile->symlink("/foo", "/bar");
-        -l "/foo" or print "ok\n";
-        open(my $fh, ">", "/foo");
-    
+        -l '/foo' or print "ok\n";
+        open my $fh, '>', '/foo';
+
         # All of these will die
-        open(my $fh, ">", "/unmocked/file"); # Dies
-        sysopen(my $fh, "/other/file", O_RDONLY);
-        opendir(my $fh, "/dir");
-        -e "/file";
-        -l "/file"
+        open my $fh, '>', '/unmocked/file'; # Dies
+        sysopen my $fh, '/other/file', O_RDONLY;
+        opendir my $fh, '/dir';
+        -e '/file';
+        -l '/file';
+
+    Relative paths are not supported:
+
+        use Test::MockFile;
+
+        # Checking relative vs absolute paths
+        $file = Test::MockFile->file( '/foo/../bar', '...' ); # not ok - relative path
+        $file = Test::MockFile->file( '/bar',        '...' ); # ok     - absolute path
+        $file = Test::MockFile->file( 'bar', '...' );         # ok     - current dir
+
+    And if you have multiple forward slashes, it will croak as well:
+
+        use Test::MockFile;
+        $file = Test::MockFile->file( '//bar', '...' );
 
 SUBROUTINES/METHODS
   file
@@ -75,9 +94,19 @@ SUBROUTINES/METHODS
 
     This will make cause $file to be mocked in all file checks, opens, etc.
 
-    undef contents means that the file should act like it's not there.
+    "undef" contents means that the file should act like it's not there. You
+    can only set the stats if you provide content.
 
-    See "Mock Stats" for what goes in this hash ref.
+    If you give file content, the directory inside it will be mocked as
+    well.
+
+        my $f = Test::MockFile->file( '/foo/bar' );
+        -d '/foo' # not ok
+
+        my $f = Test::MockFile->file( '/foo/bar', 'some content' );
+        -d '/foo' # ok
+
+    See "Mock Stats" for what goes into the stats hashref.
 
   file_from_disk
     Args: "($file_to_mock, $file_on_disk, $stats)"
@@ -86,7 +115,7 @@ SUBROUTINES/METHODS
 
     If "file_on_disk" isn't present, then this will die.
 
-    See "Mock Stats" for what goes in this hash ref.
+    See "Mock Stats" for what goes into the stats hashref.
 
   symlink
     Args: ($readlink, $file )
@@ -105,28 +134,69 @@ SUBROUTINES/METHODS
     permissions on a symlink.
 
   dir
-    Args: ($dir, \@contents, $stats)
+    Args: ($dir)
 
-    This will cause $dir to be mocked in all file checks, and opendir
+    This will cause $dir to be mocked in all file checks, and "opendir"
     interactions.
 
-    @contents should be provided in the sort order you expect to see the
-    files from readdir. NOTE: Because "." and ".." will always be the first
-    things readdir returns, These files are automatically inserted at the
-    front of the array.
+    The directory name is normalized so any trailing slash is removed.
 
-    See "Mock Stats" for what goes in this hash ref.
+        $dir = Test::MockFile->dir( 'mydir/', ... ); # ok
+        $dir->filename();                            # mydir
+
+    If there were previously mocked files (within the same scope), the
+    directory will exist. Otherwise, the directory will be nonexistent.
+
+        my $dir = Test::MockFile->dir('/etc');
+        -d $dir;          # not ok since directory wasn't created yet
+        $dir->contents(); # undef
+
+        # Now we can create an empty directory
+        mkdir '/etc';
+        $dir_etc->contents(); # . ..
+
+        # Alternatively, we can already create files with ->file()
+        $dir_log  = Test::MockFile->dir('/var');
+        $file_log = Test::MockFile->file( '/var/log/access_log', $some_content );
+        $dir_log->contents(); # . .. access_log
+
+        # If you create a nonexistent file but then give it content, it will create
+        # the directory for you
+        my $file = Test::MockFile->file('/foo/bar');
+        my $dir  = Test::MockFile->dir('/foo');
+        -d '/foo'                 # false
+        -e '/foo/bar';            # false
+        $dir->contents();         # undef
+
+        $file->contents('hello');
+        -e '/foo/bar';            # true
+        -d '/foo';                # true
+        $dir->contents();         # . .. bar
+
+    NOTE: Because "." and ".." will always be the first things "readdir"
+    returns, These files are automatically inserted at the front of the
+    array. The order of files is sorted.
+
+    If you want to affect the stat information of a directory, you need to
+    use the available core Perl keywords. (We might introduce a special
+    helper method for it in the future.)
+
+        $d = Test::MockFile->dir( '/foo', [], { 'mode' => 0755 } );    # dies
+        $d = Test::MockFile->dir( '/foo', undef, { 'mode' => 0755 } ); # dies
+
+        $d = Test::MockFile->dir('/foo');
+        mkdir $d, 0755;                   # ok
 
   Mock Stats
     When creating mocked files or directories, we default their stats to:
 
-        my $mattrs = Test::MockFile->file( $file, $contents, {
+        my $attrs = Test::MockFile->file( $file, $contents, {
                 'dev'       => 0,        # stat[0]
                 'inode'     => 0,        # stat[1]
                 'mode'      => $mode,    # stat[2]
                 'nlink'     => 0,        # stat[3]
-                'uid'       => 0,        # stat[4]
-                'gid'       => 0,        # stat[5]
+                'uid'       => int $>,   # stat[4]
+                'gid'       => int $),   # stat[5]
                 'rdev'      => 0,        # stat[6]
                 'atime'     => $now,     # stat[8]
                 'mtime'     => $now,     # stat[9]
@@ -155,10 +225,12 @@ SUBROUTINES/METHODS
   contents
     Optional Arg: $contents
 
-    Reports or updates the current contents of the file.
+    Retrieves or updates the current contents of the file.
 
-    To update, pass an array ref of strings for a dir or a string for a
-    file. Symlinks have no contents.
+    Only retrieves the content of the directory (as an arrayref). You can
+    set directory contents with calling the "file()" method described above.
+
+    Symlinks have no contents.
 
   filename
     The name of the file this mock object is controlling.

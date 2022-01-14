@@ -1,9 +1,10 @@
-Log-Dispatch-Email-Sendmail Version 0.02
+Log-Dispatch-Email-Sendmail Version 0.03
 
 INSTALLATION
 
 To install this module, run the following commands:
 
+	cpan -i Devel::CheckBin
 	perl Makefile.PL
 	make
 	LOG_DISPATCH_TEST_EMAIL=your_address@example.org make test
@@ -33,6 +34,6 @@ You can also look for information at:
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2013 Nigel Horne
+Copyright (C) 2013-2022 Nigel Horne
 
-This program is released under the following licence: GPL
+This program is released under the following licence: GPL2

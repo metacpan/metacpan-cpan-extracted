@@ -1,15 +1,17 @@
 package CentOS::Releases;
 
-our $DATE = '2017-09-08'; # DATE
-our $VERSION = '0.030'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
+use Exporter;
 use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
 
-use Exporter;
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-01-01'; # DATE
+our $DIST = 'CentOS-Releases'; # DIST
+our $VERSION = '0.031'; # VERSION
+
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(
                        list_redhat_releases
@@ -46,6 +48,23 @@ our $data = do {
     no warnings 'void';
     [];
  [
+   {
+     apache_httpd_version => "--",
+     bash_version         => "2.05b",
+     code_name            => undef,
+     eoldate              => undef,
+     linux_version        => "2.4.9",
+     mariadb_version      => "--",
+     mysql_version        => "3.23.58",
+     nginx_version        => undef,
+     perl_version         => "5.6.1",
+     php_version          => "4.1.2",
+     postgresql_version   => "7.1.3",
+     python_version       => "1.5.2",
+     reldate              => "2004-05-24",
+     ruby_version         => undef,
+     version              => "2.0",
+   },
    {
      apache_httpd_version => "2.0.46",
      bash_version         => "2.05b",
@@ -110,9 +129,9 @@ our $data = do {
      php_version          => "5.3.3",
      postgresql_version   => "8.4.20",
      python_version       => "2.6.6",
-     reldate              => "2017-04-05",
+     reldate              => "2018-07-03",
      ruby_version         => undef,
-     version              => 6.9,
+     version              => "6.10",
    },
    {
      apache_httpd_version => "2.4.6",
@@ -120,19 +139,52 @@ our $data = do {
      code_name            => undef,
      eoldate              => "2024-06",
      linux_version        => "3.10",
-     mariadb_version      => "5.5.52",
+     mariadb_version      => "5.5.65",
      mysql_version        => "--",
      nginx_version        => undef,
      perl_version         => "5.16.3",
      php_version          => "5.4.16",
-     postgresql_version   => "9.2.18",
+     postgresql_version   => "9.2.24",
      python_version       => "2.7.5",
-     reldate              => "2016-12-12",
+     reldate              => "2020-04-27",
      ruby_version         => undef,
-     version              => "7-1611",
+     version              => "7.8.2003",
+   },
+   {
+     apache_httpd_version => "2.4.37",
+     bash_version         => 4.4,
+     code_name            => undef,
+     eoldate              => "2021-12",
+     linux_version        => 4.18,
+     mariadb_version      => "10.3.28",
+     mysql_version        => "8.0.26",
+     nginx_version        => undef,
+     perl_version         => "5.30.1",
+     php_version          => "7.4.19",
+     postgresql_version   => 13.3,
+     python_version       => "3.9.6",
+     reldate              => "2021-11-16",
+     ruby_version         => undef,
+     version              => "8.5.2111",
+   },
+   {
+     apache_httpd_version => "2.4.48",
+     bash_version         => 5.1,
+     code_name            => undef,
+     eoldate              => "2021-12",
+     linux_version        => "5.14.0",
+     mariadb_version      => "10.5.12",
+     mysql_version        => "8.0.22",
+     nginx_version        => undef,
+     perl_version         => "5.32.1",
+     php_version          => "8.0.12",
+     postgresql_version   => 13.3,
+     python_version       => "",
+     reldate              => "2021-12-03",
+     ruby_version         => undef,
+     version              => 9,
    },
  ]
-
 };
 
 my $res = gen_read_table_func(
@@ -144,7 +196,7 @@ my $res = gen_read_table_func(
 die "BUG: Can't generate func: $res->[0] - $res->[1]" unless $res->[0] == 200;
 
 1;
-# ABSTRACT: List CentOS releases
+# ABSTRACT: (DEPRECATED) List CentOS releases
 
 __END__
 
@@ -154,11 +206,11 @@ __END__
 
 =head1 NAME
 
-CentOS::Releases - List CentOS releases
+CentOS::Releases - (DEPRECATED) List CentOS releases
 
 =head1 VERSION
 
-This document describes version 0.030 of CentOS::Releases (from Perl distribution CentOS-Releases), released on 2017-09-08.
+This document describes version 0.031 of CentOS::Releases (from Perl distribution CentOS-Releases), released on 2021-01-01.
 
 =head1 SYNOPSIS
 
@@ -167,6 +219,10 @@ This document describes version 0.030 of CentOS::Releases (from Perl distributio
  # raw data is in $CentOS::Releases::data;
 
 =head1 DESCRIPTION
+
+B<DEPRECATION NOTICE:> Since CentOS has been discontinued by RedHat in 2020,
+this module is also deprecated. RedHat-based alternatives to CentOS include
+RHEL itself, Rocky Linux, and Alma Linux.
 
 This module contains list of CentOS releases. Data source is currently at:
 L<https://github.com/perlancar/gudangdata-distrowatch> (table/centos_release)
@@ -179,7 +235,7 @@ which in turn is retrieved from L<http://distrowatch.com>.
 
 Usage:
 
- list_centos_releases(%args) -> [status, msg, result, meta]
+ list_centos_releases(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 CentOS releases.
 
@@ -364,6 +420,10 @@ Only return records where the 'eoldate' field is less than specified value.
 =item * B<eoldate.xmin> => I<date>
 
 Only return records where the 'eoldate' field is greater than specified value.
+
+=item * B<exclude_fields> => I<array[str]>
+
+Select fields to return.
 
 =item * B<fields> => I<array[str]>
 
@@ -870,22 +930,23 @@ Only return records where the 'version' field is greater than specified value.
 
 =item * B<with_field_names> => I<bool>
 
-Return field names in each record (as hash/associative array).
+Return field names in each record (as hashE<sol>associative array).
 
 When enabled, function will return each record as hash/associative array
 (field name => value pairs). Otherwise, function will return each record
 as list/array (field value, field value, ...).
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -896,14 +957,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/CentOS-Rel
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-CentOS-Releases>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=CentOS-Releases>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -919,11 +972,36 @@ L<RedHat::Releases>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=CentOS-Releases>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

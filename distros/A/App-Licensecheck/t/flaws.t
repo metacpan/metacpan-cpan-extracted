@@ -5,45 +5,36 @@ use Path::Tiny;
 
 plan 20;
 
-my $app = App::Licensecheck->new;
-$app->lines(0);
+my $app = App::Licensecheck->new(
+	top_lines => 0,
+);
 
 path('t/flaws/fsf_address')->visit(
 	sub {
-		my ( $license, $copyright ) = $app->parse($_);
-		like(
-			$license, qr/ \[(?:mis-spelled|obsolete) FSF postal address /,
-			"Corpus file $_"
-		);
+		like [ $app->parse($_) ], array {
+			item qr/ \[(?:mis-spelled|obsolete) FSF postal address /;
+		};
 	}
 );
 
 path('t/flaws/no_fsf_address')->visit(
 	sub {
-		my ( $license, $copyright ) = $app->parse($_);
-		unlike(
-			$license, qr/ \[(?:mis-spelled|obsolete) FSF postal address /,
-			"Corpus file $_"
-		);
+		like [ $app->parse($_) ], array {
+			item mismatch qr/ \[(?:mis-spelled|obsolete) FSF postal address /;
+		};
 	}
 );
 
 path('t/flaws/generated')->visit(
 	sub {
-		my ( $license, $copyright ) = $app->parse($_);
-		like(
-			$license, qr/\Q [generated file]/,
-			"Corpus file $_"
-		);
+		like [ $app->parse($_) ], array {
+			item qr/\Q [generated file]/;
+		};
 	}
 );
 
-subtest 'false positive: BSL-1.0 license fulltext' => sub {
-	my ( $license, $copyright ) = $app->parse( path('t/SPDX/BSL-1.0.txt') );
-	unlike(
-		$license, qr/\Q [generated file]/,
-		"Corpus file t/SPDX/BSL-1.0.txt"
-	);
-};
+like [ $app->parse('t/SPDX/BSL-1.0.txt') ], array {
+	item mismatch qr/\Q [generated file]/;
+}, 'false positive: BSL-1.0 license fulltext';
 
 done_testing;

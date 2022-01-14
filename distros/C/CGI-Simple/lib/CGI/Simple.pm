@@ -5,15 +5,15 @@ require 5.006001;
 # this module is both strict (and warnings) compliant, but they are only used
 # in testing as they add an unnecessary compile time overhead in production.
 use strict;
+#use warnings;
 use Carp;
 
-use vars qw(
- $VERSION $USE_CGI_PM_DEFAULTS $DISABLE_UPLOADS $POST_MAX
- $NO_UNDEF_PARAMS $USE_PARAM_SEMICOLONS $PARAM_UTF8 $HEADERS_ONCE
- $NPH $DEBUG $NO_NULL $FATAL *in
-);
+use vars qw(*in);
+our ($VERSION, $USE_CGI_PM_DEFAULTS, $DISABLE_UPLOADS, $POST_MAX,
+     $NO_UNDEF_PARAMS, $USE_PARAM_SEMICOLONS, $PARAM_UTF8, $HEADERS_ONCE,
+     $NPH, $DEBUG, $NO_NULL, $FATAL);
 
-$VERSION = "1.115";
+$VERSION = "1.280";
 
 # you can hard code the global variable settings here if you want.
 # warning - do not delete the unless defined $VAR part unless you
@@ -431,9 +431,10 @@ sub _add_param {
     next
      if $value eq ''
        and $self->{'.globals'}->{'NO_UNDEF_PARAMS'};
-    $value =~ tr/\000//d if $self->{'.globals'}->{'NO_NULL'};
+    $value =~ tr/\000//d
+     if $self->{'.globals'}->{'NO_NULL'} and $param ne 'PUTDATA' and $param ne 'POSTDATA';
     $value = Encode::decode( utf8 => $value )
-     if $self->{'.globals'}->{PARAM_UTF8};
+     if $self->{'.globals'}->{PARAM_UTF8} and $param ne 'PUTDATA' and $param ne 'POSTDATA';
     push @{ $self->{$param} }, $value;
     unless ( $self->{'.fieldnames'}->{$param} ) {
       push @{ $self->{'.parameters'} }, $param;
@@ -504,7 +505,7 @@ sub _parse_multipart {
     while ( $data =~ m/^$boundary$CRLF/ ) {
       ## TAB and high ascii chars are definitivelly allowed in headers.
       ## Not accepting them in the following regex prevents the upload of
-      ## files with filenames like "España.txt".
+      ## files with filenames like "EspaÃ±a.txt".
       # next READ unless $data =~ m/^([\040-\176$CRLF]+?$CRLF$CRLF)/o;
       next READ
        unless $data =~ m/^([\x20-\x7E\x80-\xFF\x09$CRLF]+?$CRLF$CRLF)/o;
@@ -701,6 +702,7 @@ sub TIEHASH { $_[1] ? $_[1] : new $_[0] }
 
 sub STORE {
   my ( $q, $p, $v ) = @_;
+  return unless defined $v;
   $q->param( $p, split $q->{'.sep'}, $v );
 }
 
@@ -918,13 +920,13 @@ sub cookie {
   my ( $self, @params ) = @_;
   require CGI::Simple::Cookie;
   require CGI::Simple::Util;
-  my ( $name, $value, $path, $domain, $secure, $expires, $httponly )
+  my ( $name, $value, $path, $domain, $secure, $expires, $httponly, $samesite )
    = CGI::Simple::Util::rearrange(
     [
       'NAME', [ 'VALUE', 'VALUES' ],
       'PATH',   'DOMAIN',
       'SECURE', 'EXPIRES',
-      'HTTPONLY'
+      'HTTPONLY', 'SAMESITE'
     ],
     @params
    );
@@ -955,6 +957,7 @@ sub cookie {
   push @params, '-expires'  => $expires if $expires;
   push @params, '-secure'   => $secure if $secure;
   push @params, '-httponly' => $httponly if $httponly;
+  push @params, '-samesite' => $samesite if $samesite;
   return CGI::Simple::Cookie->new( @params );
 }
 
@@ -1114,7 +1117,7 @@ sub redirect {
   my @o;
   for ( @other ) { tr/\"//d; push @o, split "=", $_, 2; }
   unshift @o,
-   '-Status'   => '302 Moved',
+   '-Status'   => '302 Found',
    '-Location' => $url,
    '-nph'      => $nph;
   unshift @o, '-Target' => $target if $target;
@@ -1488,7 +1491,7 @@ CGI::Simple - A Simple totally OO CGI interface that is CGI.pm compliant
 
 =head1 VERSION
 
-This document describes CGI::Simple version 1.114.
+This document describes CGI::Simple version 1.280.
 
 =head1 SYNOPSIS
 
@@ -1867,7 +1870,7 @@ in more detail later:
 
 =head2 param() Retrieving non-application/x-www-form-urlencoded data
 
-If POSTed or PUTed data is not of type application/x-www-form-urlencoded or multipart/form-data, 
+If POSTed or PUTed data is not of type application/x-www-form-urlencoded or multipart/form-data,
 then the data will not be processed, but instead be returned as-is in a parameter named POSTDATA
 or PUTDATA.  To retrieve it, use code like this:
 
@@ -3943,4 +3946,3 @@ B<CGI>, L<CGI::Simple::Standard>, L<CGI::Simple::Cookie>,
 L<CGI::Simple::Util>, L<CGI::Minimal>
 
 =cut
-

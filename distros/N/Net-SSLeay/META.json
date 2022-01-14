@@ -1,5 +1,5 @@
 {
-   "abstract" : "Perl extension for using OpenSSL",
+   "abstract" : "Perl bindings for OpenSSL and LibreSSL",
    "author" : [
       "Sampo Kellomäki <sampo@iki.fi>",
       "Florian Ragwitz <rafl@debian.org>",
@@ -15,7 +15,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-SSLeay",
    "no_index" : {
@@ -34,7 +34,11 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "English" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec::Functions" : "0",
+            "Text::Wrap" : "0",
+            "constant" : "0"
          }
       },
       "develop" : {
@@ -61,6 +65,7 @@
             "SelectSaver" : "0",
             "Socket" : "0",
             "Storable" : "0",
+            "Test::Builder" : "0",
             "Test::More" : "0.60_01",
             "base" : "0"
          }
@@ -77,6 +82,6 @@
          "web" : "https://github.com/radiator-software/p5-net-ssleay"
       }
    },
-   "version" : "1.90",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "1.92",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

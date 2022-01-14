@@ -20,6 +20,11 @@ use DynaLoader;
 
 
 
+
+#line 5 "gsl_sf_exp.pd"
+use strict;
+use warnings;
+
 =head1 NAME
 
 PDL::GSLSF::EXP - PDL interface to GSL Special Functions
@@ -28,11 +33,8 @@ PDL::GSLSF::EXP - PDL interface to GSL Special Functions
 
 This is an interface to the Special Function package present in the GNU Scientific Library. 
 
-=head1 SYNOPSIS
-
 =cut
-
-
+#line 38 "EXP.pm"
 
 
 
@@ -45,6 +47,8 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
+
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_exp
@@ -64,16 +68,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 72 "EXP.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_exp = \&PDL::gsl_sf_exp;
+#line 78 "EXP.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_exprel_n
@@ -93,16 +98,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 102 "EXP.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_exprel_n = \&PDL::gsl_sf_exprel_n;
+#line 108 "EXP.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_exp_err
@@ -122,18 +128,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 132 "EXP.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_exp_err = \&PDL::gsl_sf_exp_err;
+#line 138 "EXP.pm"
 
 
 
 
 
+#line 66 "gsl_sf_exp.pd"
 =head1 AUTHOR
 
 This file copyright (C) 1999 Christian Pellegrin <chri@infis.univ.trieste.it>
@@ -146,8 +153,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-
-
+#line 157 "EXP.pm"
 
 
 

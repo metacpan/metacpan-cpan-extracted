@@ -4,10 +4,11 @@ use lib 'inc';
 
 use Net::SSLeay;
 use Test::Net::SSLeay qw(
-    can_fork data_file_path initialise_libssl is_libressl is_openssl tcp_socket
+    can_fork data_file_path initialise_libssl is_libressl is_openssl new_ctx
+    tcp_socket
 );
 
-plan tests => 103;
+plan tests => 105;
 
 initialise_libssl();
 
@@ -40,9 +41,20 @@ SKIP: {
 
 SKIP: {
   skip 'openssl-0.9.8a required', 3 unless Net::SSLeay::SSLeay >= 0x0090801f;
-  ok(Net::SSLeay::X509_VERIFY_PARAM_get_flags($pm) == Net::SSLeay::X509_V_FLAG_ALLOW_PROXY_CERTS(), 'X509_VERIFY_PARAM_get_flags');
+
+  # Between versions 3.2.4 and 3.4.0, LibreSSL signals the use of its legacy
+  # X.509 verifier via the X509_V_FLAG_LEGACY_VERIFY flag; this flag persists
+  # even after X509_VERIFY_PARAM_clear_flags() is called
+  my $base_flags =
+      is_libressl()
+          && Net::SSLeay::constant("LIBRESSL_VERSION_NUMBER") >= 0x3020400f
+          && Net::SSLeay::constant("LIBRESSL_VERSION_NUMBER") <= 0x3040000f
+    ? Net::SSLeay::X509_V_FLAG_LEGACY_VERIFY()
+    : 0;
+
+  ok(Net::SSLeay::X509_VERIFY_PARAM_get_flags($pm) == ($base_flags | Net::SSLeay::X509_V_FLAG_ALLOW_PROXY_CERTS()), 'X509_VERIFY_PARAM_get_flags');
   ok(Net::SSLeay::X509_VERIFY_PARAM_clear_flags($pm, Net::SSLeay::X509_V_FLAG_ALLOW_PROXY_CERTS()), 'X509_VERIFY_PARAM_clear_flags');
-  ok(Net::SSLeay::X509_VERIFY_PARAM_get_flags($pm) == 0, 'X509_VERIFY_PARAM_get_flags');
+  ok(Net::SSLeay::X509_VERIFY_PARAM_get_flags($pm) == ($base_flags | 0), 'X509_VERIFY_PARAM_get_flags');
 };
 
 SKIP: {
@@ -86,8 +98,8 @@ SKIP: {
 
     $server = tcp_socket();
 
-    run_server();
-    $server->close();
+    run_server(); # Forks: child does not return
+    $server->close() || die("client listen socket close: $!");
     client();
 }
 
@@ -223,7 +235,7 @@ sub verify_local_trust {
     ok(my $store = Net::SSLeay::X509_STORE_new(), "X509_STORE_new creates new store");
     ok(Net::SSLeay::X509_STORE_add_cert($store, $ca), "X509_STORE_add_cert CA cert");
     ok(my $ctx = Net::SSLeay::X509_STORE_CTX_new(), "X509_STORE_CTX_new creates new store context");
-    Net::SSLeay::X509_STORE_CTX_init($ctx, $store, $cert);
+    is(Net::SSLeay::X509_STORE_CTX_init($ctx, $store, $cert), 1, 'X509_STORE_CTX_init succeeds');
     ok(!Net::SSLeay::X509_verify_cert($ctx), 'X509_verify_cert correctly fails');
     is(Net::SSLeay::X509_STORE_CTX_get_error($ctx),
         Net::SSLeay::X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY(), "X509_STORE_CTX_get_error returns unable to get local issuer certificate");
@@ -241,7 +253,7 @@ sub verify_local_trust {
     ok($store = Net::SSLeay::X509_STORE_new(), "X509_STORE_new creates new store");
     ok(Net::SSLeay::X509_STORE_add_cert($store, $ca), "X509_STORE_add_cert CA cert");
     ok($ctx = Net::SSLeay::X509_STORE_CTX_new(), "X509_STORE_CTX_new creates new store context");
-    Net::SSLeay::X509_STORE_CTX_init($ctx, $store, $cert, $x509_sk);
+    is(Net::SSLeay::X509_STORE_CTX_init($ctx, $store, $cert, $x509_sk), 1, 'X509_STORE_CTX_init succeeds');
     ok(Net::SSLeay::X509_verify_cert($ctx), 'X509_verify_cert correctly succeeds');
     is(Net::SSLeay::X509_STORE_CTX_get_error($ctx), Net::SSLeay::X509_V_OK(), "X509_STORE_CTX_get_error returns ok");
     Net::SSLeay::X509_STORE_free($store);
@@ -283,7 +295,7 @@ sub client {
 		      wildcard_checks
 		      finish))
     {
-	$ctx = Net::SSLeay::CTX_new();
+	$ctx = new_ctx();
 	is(Net::SSLeay::CTX_load_verify_locations($ctx, $ca_pem, $ca_dir), 1, "load_verify_locations($ca_pem $ca_dir)");
 
 	$cl = $server->connect();
@@ -295,11 +307,11 @@ sub client {
 	test_wildcard_checks($ctx, $cl) if $task eq 'wildcard_checks';
 	last if $task eq 'finish'; # Leaves $cl alive
 
-	close($cl);
+	close($cl) || die("client close: $!");
     }
 
     # Tell the server to quit and see that our connection is still up
-    $ctx = Net::SSLeay::CTX_new();
+    $ctx = new_ctx();
     my $ssl = Net::SSLeay::new($ctx);
     Net::SSLeay::set_fd($ssl, $cl);
     Net::SSLeay::connect($ssl);
@@ -307,6 +319,8 @@ sub client {
     Net::SSLeay::ssl_write_all($ssl, $end);
     Net::SSLeay::shutdown($ssl);
     ok($end eq Net::SSLeay::ssl_read_all($ssl), 'Successful termination');
+    Net::SSLeay::free($ssl);
+    close($cl) || die("client final close: $!");
     return;
 }
 
@@ -320,7 +334,7 @@ sub run_server
     return if $pid != 0;
 
     $SIG{'PIPE'} = 'IGNORE';
-    my $ctx = Net::SSLeay::CTX_new();
+    my $ctx = new_ctx();
     Net::SSLeay::set_cert_and_key($ctx, $cert_pem, $key_pem);
     my $ret = Net::SSLeay::CTX_check_private_key($ctx);
     BAIL_OUT("Server: CTX_check_private_key failed: $cert_pem, $key_pem") unless $ret == 1;
@@ -348,6 +362,10 @@ sub run_server
 	if (defined $msg and $msg eq 'end')
 	{
 	    Net::SSLeay::ssl_write_all($ssl, 'end');
+	    Net::SSLeay::shutdown($ssl);
+	    Net::SSLeay::free($ssl);
+	    close($cl) || die("server close: $!");
+	    $server->close() || die("server listen socket close: $!");
 	    exit (0);
 	}
     }

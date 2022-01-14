@@ -3,14 +3,19 @@
 use 5.006;
 use strict;
 use warnings;
-use autodie;
 
-use Git::Wrapper;
+use Git::Background 0.003;
 use Path::Tiny;
 use Test::DZil;
 use Test::Fatal;
-use Test::More;
-use Test::TempDir::Tiny;
+use Test::More 0.88;
+
+use Cwd            ();
+use File::Basename ();
+use File::Spec     ();
+use lib File::Spec->catdir( File::Basename::dirname( Cwd::abs_path __FILE__ ), 'lib' );
+
+use Local::Test::TempDir qw(tempdir);
 
 main();
 
@@ -18,7 +23,7 @@ sub main {
 
   SKIP:
     {
-        skip 'Cannot find Git in PATH' if !Git::Wrapper->has_git_in_path();
+        skip 'Cannot find Git in PATH', 1 if !defined Git::Background->version;
 
         _test_with_unix_file();
         _test_with_windows_file();
@@ -52,12 +57,12 @@ sub _test_with_unix_file {
     # Get the directory where the source of the new distributions is
     my $root_dir = path( $tzil->root );
 
-    my $git = Git::Wrapper->new($root_dir);
-    $git->init();
+    my $git = Git::Background->new($root_dir);
+    $git->run('init')->get;
 
     my $file_name = 'file.txt';
     path($root_dir)->child($file_name)->spew_raw("this\nis\na\nUNIX\nline\nending\ntest\nfile\n");
-    $git->add($file_name);
+    $git->run( 'add', $file_name )->get;
 
     is( exception { $tzil->build; }, undef, 'Built dist successfully' );
 
@@ -85,11 +90,11 @@ sub _test_with_windows_file {
     # Get the directory where the source of the new distributions is
     my $root_dir = path( $tzil->root );
 
-    my $git = Git::Wrapper->new($root_dir);
-    $git->init();
+    my $git = Git::Background->new($root_dir);
+    $git->run('init')->get;
     my $file_name = 'windows_eol.txt';
     path($root_dir)->child($file_name)->spew_raw("windows\r\neol\r\nfile\r\n");
-    $git->add($file_name);
+    $git->run( 'add', $file_name )->get;
 
     my $exception = exception { $tzil->build; };
     my @exception = split /\n/xsm, $exception;
@@ -122,11 +127,11 @@ sub _test_with_whitespace_at_end_file {
     # Get the directory where the source of the new distributions is
     my $root_dir = path( $tzil->root );
 
-    my $git = Git::Wrapper->new($root_dir);
-    $git->init();
+    my $git = Git::Background->new($root_dir);
+    $git->run('init')->get;
     my $file_name = 'whitespace.txt';
     path($root_dir)->child($file_name)->spew_raw("whitespace file\t\n");
-    $git->add($file_name);
+    $git->run( 'add', $file_name )->get;
 
     my $exception = exception { $tzil->build; };
     my @exception = split /\n/xsm, $exception;
@@ -164,12 +169,12 @@ sub _test_with_ignored_whitespace_at_end_file {
     # Get the directory where the source of the new distributions is
     my $root_dir = path( $tzil->root );
 
-    my $git = Git::Wrapper->new($root_dir);
-    $git->init();
+    my $git = Git::Background->new($root_dir);
+    $git->run('init')->get;
 
     my $file_name = 'whitespace.txt';
     path($root_dir)->child($file_name)->spew_raw("whitespace file\t\n");
-    $git->add($file_name);
+    $git->run( 'add', $file_name )->get;
 
     is( exception { $tzil->build; }, undef, 'Built dist successfully' );
 

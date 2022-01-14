@@ -2,7 +2,7 @@ package Crypt::PK::RSA;
 
 use strict;
 use warnings;
-our $VERSION = '0.075';
+our $VERSION = '0.076';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 5.57 'import';
 our %EXPORT_TAGS = ( all => [qw(rsa_encrypt rsa_decrypt rsa_sign_message rsa_verify_message rsa_sign_hash rsa_verify_hash)] );
@@ -489,7 +489,7 @@ See L<http://tools.ietf.org/html/draft-ietf-jose-json-web-key>
    "qi":"GyM_p6JrXySiz1toFgKbWV...4ypu9bMWx3QJBfm0FoYzUIZEVEcOqwmRN81oDAaaBk0KWGDjJHDdDmFW3AN7I-pux_mHZG",
  }
 
-B<BEWARE:> For JWK support you need to have L<JSON::PP>, L<JSON::XS> or L<Cpanel::JSON::XS> module.
+B<BEWARE:> For JWK support you need to have L<JSON> module installed.
 
 =item * RSA public keys in JSON Web Key (JWK) format
 
@@ -499,7 +499,7 @@ B<BEWARE:> For JWK support you need to have L<JSON::PP>, L<JSON::XS> or L<Cpanel
    "e":"AQAB",
  }
 
-B<BEWARE:> For JWK support you need to have L<JSON::PP>, L<JSON::XS> or L<Cpanel::JSON::XS> module.
+B<BEWARE:> For JWK support you need to have L<JSON> module installed.
 
 =back
 
@@ -559,7 +559,7 @@ Also exports public/private keys as a perl HASH with JWK structure.
  #or
  my $jwk_hash = $pk->export_key_jwk('public', 1);
 
-B<BEWARE:> For JWK support you need to have L<JSON::PP>, L<JSON::XS> or L<Cpanel::JSON::XS> module.
+B<BEWARE:> For JWK support you need to have L<JSON> module installed.
 
 =head2 export_key_jwk_thumbprint
 

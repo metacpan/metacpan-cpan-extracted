@@ -1,5 +1,8 @@
 Revision history for Perl module Modulino::Demo
 
+1.004 2022-01-09T00:33:10Z
+	* No code changes. Fix link in README.pod.
+
 1.003 2021-01-25T18:01:59Z
 	* freshen distro, remove Travis CI, add Github Actions
 

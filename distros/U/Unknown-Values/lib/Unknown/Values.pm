@@ -4,7 +4,7 @@ use warnings;
 # ABSTRACT: Use 'unknown' values instead of undef ones
 
 package Unknown::Values;
-$Unknown::Values::VERSION = '0.100';
+$Unknown::Values::VERSION = '0.101';
 use 5.01000;
 use Unknown::Values::Instance;
 use Unknown::Values::Instance::Fatal;
@@ -59,7 +59,7 @@ Unknown::Values - Use 'unknown' values instead of undef ones
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SYNOPSIS
 
@@ -493,17 +493,6 @@ every operator and ensuring that it's handled correctly.
 
 Of course, this would eat up both memory and performance and certainly be
 filled with fiddly bugs.
-
-=head1 AUTHOR
-
-Curtis "Ovid" Poe <ovid@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2013 by Curtis "Ovid" Poe.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =head1 AUTHOR
 

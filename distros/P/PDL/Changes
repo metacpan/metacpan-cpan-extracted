@@ -1,3 +1,90 @@
+2.068 2022-01-14
+- add pdl.nbytes
+- specify SByte as explicitly "signed" as C99 allows unsigned if not say
+
+2.067 2022-01-13
+- remove PDL.grow from API
+- remove $PDL::BIGPDL check for 1GB data
+- fix 2.064 regression in $pdl->sequence - thanks @moocow-the-bovine
+
+2.066 2022-01-10
+- re-release without erroneous OpenGL::GLUT requires dep
+
+2.065 2022-01-10
+- switch TriD stuff to use OpenGL::GLUT for GLUT functionality
+- GLUT TriD now reopens the window on next draw if was closed
+- bifuncs like Ops::plus no longer need explicit swap parameter
+- add C "PDL_Value" union type
+- replace Convert::UU as dep with own code - thanks @sebastic for suggestion
+
+2.064 2022-01-08
+- enable perldl -glut on Win32
+
+2.063_05 2022-01-08
+- rename PDL::get_trans to trans_parent
+- add PDL::Trans::{parents,children}
+- rename pdl.child_transes to trans_children, add PDL::trans_children
+
+2.063_04 2022-01-07
+- pdlpp_mkgen runs .pd files in correct dir
+- PDL.changesoon removed
+- longlong default bad value now LLONG_MIN
+- add signed byte (SB), unsigned long (UL) and longlong (ULL)
+- add Bad::locf - thanks @kmx
+- fix qsortvec* with bad values - thanks @d-lamb for report
+- hook @drzowie-created RICE_1 compression up to wfits
+- PDL::FFT now thread- and 64-bit-safe
+- sclr to croak if called on multi-element array
+- $TXYZ() macros fatal error if any of trans's GenericTypes not dealt with
+- add long double both real (LD) and complex (CLD)
+- NiceSlice uses the better Filter::Simple version as is now quick
+- IO::Pic::wpic assume PBM can do 16-bits per sample as exists since 2003
+- added PDL::Graphics, an overview of modules - thanks @mascip
+- add Type::bswap
+- IO::Pnm::{r,w}pnm can work on open file-handle
+- IO::Pic::rmpeg added
+- IO::Pic::rpic will return an n+1-dim ndarray if multiple images in file
+- set_datatype (and PDL.converttype) now badval-aware
+- add dependency on File::Which - thanks @zmughal
+- pp_addpm automatically adds line-number from .pd to aid debugging
+- PDL_Indx now a C ptrdiff_t, PDL_*Long now C {,u}int{32,64}_t to simplify config
+- xvals etc now return at least a double
+- Primitive::{fibonacci,axisvalues} not output-only but can work inplace
+
+2.063_03 2021-12-23
+- add pp_add_macros
+
+2.063_02 2021-12-23
+- add PDL.scalar
+- add dummy pdl_pthread_main_thread for when no POSIX threads
+- PDL.pdlnew to make a null pdl except not ALLOCATED
+- stopped disabling pthreads on BSD
+
+2.063_01 2021-12-21
+- define, use PDL_REPRINCS
+- PDL.{pdlnew,null,get_thread{dims,offsp{,_int}}} return NULL on error, not croak
+- PDL.{trans_check_pdls,barf_if_error,error_accumulate}
+- PDL.{magic_get_thread,{start,iter}threadloop} return -1 not die
+- PDL.sever returns pdl_error not pdl * (Perl interface stays same)
+- ANYVAL_ISBAD interface change
+- fix ->at with pdl having non-default badvalue
+- macro args can contain () eg $CROAK("%d", $SIZE(n))
+- remove Slices::flowconvert
+- PDL_ISBAD macro
+- bad values of NaN now work right with $ISBAD() etc
+- rename PDL.slice_args_parse to slice_args_parse_sv
+- stop redodims leaking memory
+- remove PDL.{dim_checks,get,put_offs} from Core
+- rename PDL.children_changesoon to changesoon
+- GIS::Proj inplace funcs set output bad if any input bad
+- switched GIS::Proj to PROJ 6 API
+- PDL.make_error{,_simple} for error-handling instead of croak et al - can't just return as generated functions no longer return void
+- remove PDL.vaffinechanged
+- fix zeroes() regression from 2.057_01 where zeroes($byte_pdl) would give double
+- make PDL::Compression functions thread-safe
+- remove Core::set_dataflow_b
+- PDL.affine_new to take PDL_Indx* not SV*
+
 2.063 2021-11-19
 - PDL::Core::seed - thanks @zmughal
 

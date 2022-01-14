@@ -1,0 +1,30 @@
+0.005   2021-07-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename module/dist Dist-Zilla-Plugin-{For-,}Data-Sah.
+
+
+0.004   2019-01-06  Released-By: PERLANCAR
+
+	- No functional changes.
+
+	- Replace the use of Package::MoreUtil with Package::Stash.
+
+
+0.003   2016-06-02  Released-By: PERLANCAR
+
+	- No functional changes.
+
+	- Update POD.
+
+
+0.002   2016-06-01  Released-By: PERLANCAR
+
+	- Adjust to Data::Sah 0.79 (clause specification property 'arg'
+	  renamed to 'schema').
+
+	- Fixes, add log statements.
+
+
+0.001   2016-05-15  Released-By: PERLANCAR
+
+        - First release.

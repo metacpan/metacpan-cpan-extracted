@@ -1,4 +1,5 @@
 use strict;
+use warnings;
 use Test::More;
 use PDL::LiteF;
 use PDL::Types;
@@ -20,26 +21,21 @@ sub tapprox {
 }
 
 my $x = PDL->pdl([[5,4,3],[2,3,1.5]]);
-
 ok(tapprox($x->average(), PDL->pdl([4, 2.16666])), "average");
 ok(tapprox($x->sumover(), PDL->pdl([12, 6.5])), "sumover");
 ok(tapprox($x->prodover(), PDL->pdl([60, 9])), "prodover");
 
 my $y = PDL->pdl(4,3,1,0,0,0,0,5,2,0,3,6);
-# diag "Y: $y\n";
 my $c = ($y->xvals) + 10;
-# diag "C: $c\n";
-
-# diag "YW: ", $y->where, "\n";
 ok(tapprox($y->where($y>4), PDL->pdl(5,6)), "where with >");
 ok(tapprox($y->which, PDL->pdl(0,1,2,7,8,10,11)), "which");
-
-# diag "Y, ",$y->which();
-# diag "C: $c\n";
-# diag "\nCI, ", $c->index($y->which());
-# diag "D\n";
-
 ok(tapprox($c->where($y), PDL->pdl(10,11,12,17,18,20,21)), "where with mask");
+
+{
+  my $orig = ones(byte, 300);
+  my $xvals = $orig->xvals;
+  is $xvals->at(280), 280, 'non-wrapped xvals from byte ndarray';
+}
 
 ##############################
 # originally in pptest
@@ -261,7 +257,6 @@ ok(tapprox($statsRes[6],4.462), "stats: float rms");
 
 my $ones = ones(5,5);
 @statsRes = $im->stats($ones);
-# print "StatRes with moments = ".join(", ",@statsRes)."\n";
 ok(tapprox($statsRes[0],5.36), "stats: trivial weights mean" );
 ok(tapprox($statsRes[1],4.554), "stats: trivial weights prms" );
 ok(tapprox($statsRes[2],3), "stats: trivial weights median" );
@@ -280,7 +275,7 @@ my $a1 = PDL->sequence(10,10,3,4);
 
 # $PDL::whichND_no_warning = 1;
 # ($x, $y, $z, $w)=whichND($a1 == 203);
-my ($x, $y, $z, $w) = whichND($a1 == 203)->mv(0,-1)->dog;  # quiet deprecation warning
+($x, $y, $z, my $w) = whichND($a1 == 203)->mv(0,-1)->dog;  # quiet deprecation warning
 ok($a1->at($x->list,$y->list,$z->list,$w->list) == 203, "whichND" );
 
 $a1 = pdl(1,2,3,4);
@@ -291,6 +286,13 @@ ok(int(sum($b1))==12, "append");
 ok(tapprox($im->hclip(5)->sum,83), "hclip" );
 ok(tapprox($im->lclip(5)->sum,176), "lclip" );
 ok(tapprox($im->clip(5,7)->sum,140), "clip" );
+# with NaN badvalue
+$im = sequence(3);
+$im->badvalue(nan());
+$im->badflag(1);
+$im->set(1, nan());
+my $clipped = $im->lclip(0);
+is $clipped.'', '[0 BAD 2]', 'ISBAD() works when badvalue is NaN';
 
 # indadd Test:
 $a1 = pdl( 1,2,3);

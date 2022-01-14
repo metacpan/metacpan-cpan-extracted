@@ -13,7 +13,7 @@ use File::Spec::Functions qw(catfile);
 
 use Module::Extract::VERSION;
 
-our $VERSION = '1.003';
+our $VERSION = '1.004';
 
 =encoding utf8
 
@@ -707,7 +707,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2008-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2008-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

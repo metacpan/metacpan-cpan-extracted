@@ -7,7 +7,7 @@ use warnings;
 use English qw< -no_match_vars >;
 use Data::Dumper;
 use Scalar::Util qw< blessed >;
-our $VERSION = '0.736';
+our $VERSION = '0.738';
 
 use Log::Log4perl::Tiny
   qw< :easy :dead_if_first get_logger LOGLEVEL LEVELID_FOR >;
@@ -144,7 +144,6 @@ sub dispatch {
 
    my $selector = _get_selector(\%args);
 
-   my $handler_for = {%{$args{handlers} || {}}};    # our cache
    my $factory = $args{factory};
    if (!defined($factory)) {
       $factory = sub {
@@ -155,9 +154,9 @@ sub dispatch {
          };
       };
    } ## end if (!defined($factory))
-   LOGDIE "$name: required factory or handlers"
-     unless defined $factory;
 
+   my %predefined_for = %{$args{handlers} || {}};
+   my %handler_for;
    my $default = $args{default};
    return sub {
       my $record = shift;
@@ -170,11 +169,11 @@ sub dispatch {
         }
         unless defined $key;
 
-      # register a new handler... or die!
-      ($handler_for->{$key}) = tubify(\%args, $factory->($key, $record))
-        unless exists $handler_for->{$key};
+      $handler_for{$key} //= exists $predefined_for{$key}
+            ? (tubify($predefined_for{$key}))[0]
+            : (tubify(\%args, $factory->($key, $record)))[0];
 
-      return $handler_for->{$key}->($record);
+      return $handler_for{$key}->($record);
    };
 } ## end sub dispatch
 

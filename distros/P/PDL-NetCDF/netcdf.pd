@@ -1,7 +1,7 @@
 # -*- Perl -*-
 use Config;
 use Devel::CheckLib qw(check_lib);
-our $VERSION = '4.22';
+our $VERSION = '4.23';
 pp_setversion($VERSION);
 
 my $ncversion = {nc_inq_var_deflate => check_lib(
@@ -2459,8 +2459,6 @@ PPCODE:
 
   STRLEN len;
 
-  char errmsg[256];
-
   SV **elem;
   size_t nc_index[2]; // Index for use in inserting variables
   size_t nc_count[2]; // For 'classic' string variables
@@ -2515,11 +2513,8 @@ PPCODE:
       nc_count[1] = (int)SvIV(*elem); // nc_count[1] is the length of the string dimension for this variable
       rc = nc_put_vara_text   (ncid, varid, nc_index, nc_count, t_elem);
     }
-    if (rc != NC_NOERR) {
-      const char *myerrstr = nc_strerror(rc);
-      snprintf(errmsg, sizeof(errmsg), "Error writing NCID %d: %s\n", varid, myerrstr);
-      barf ("Error writing NCID %d: %s\n", varid, myerrstr);
-    }
+    if (rc != NC_NOERR)
+      croak("Error writing NCID %d: %s\n", varid, nc_strerror(rc));
   }
 EOXS
 
@@ -2548,8 +2543,6 @@ PPCODE:
   float  f_elem;
   double d_elem;
   char   t_elem[256]; // Hard-coded 256 char limit to string sizes!
-
-  char errmsg[256];
 
   SV **elem;
   size_t nc_index[2]; // Index for use in inserting variables
@@ -2604,11 +2597,8 @@ PPCODE:
       rc = nc_get_vara_text (ncid, varid, nc_index, nc_count, (char *)&t_elem);
       PUSHs (sv_2mortal (newSVpv(t_elem, nc_count[1])));
     }
-    if (rc != NC_NOERR) {
-      const char *myerrstr = nc_strerror(rc);
-      snprintf(errmsg, sizeof(errmsg), "Error reading NCID %d: %s\n", varid, myerrstr);
-      barf ("Error reading NCID %d: %s\n", varid, myerrstr);
-    }
+    if (rc != NC_NOERR)
+      croak("Error writing NCID %d: %s\n", varid, nc_strerror(rc));
   }
 EOXS
 

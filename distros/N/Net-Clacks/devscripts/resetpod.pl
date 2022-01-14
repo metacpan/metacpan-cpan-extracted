@@ -7,14 +7,14 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp;
-our $VERSION = 18;
+our $VERSION = 20;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
 use Encode qw(is_utf8 encode_utf8 decode_utf8);
 #---AUTOPRAGMAEND---
 
-# PAGECAMEL  (C) 2008-2020 Rene Schickbauer
+# PAGECAMEL  (C) 2008-2022 Rene Schickbauer
 # Developed under Artistic license
 
 die("Program disabled, because it destroys POD on purpose. Enable program by commenting out this line!");
@@ -112,7 +112,7 @@ Rene Schickbauer, E<lt>cavac\@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2020 Rene Schickbauer
+Copyright (C) 2008-2022 Rene Schickbauer
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

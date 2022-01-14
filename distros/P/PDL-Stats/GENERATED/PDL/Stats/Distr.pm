@@ -3,7 +3,7 @@
 #
 package PDL::Stats::Distr;
 
-our @EXPORT_OK = qw( PDL::PP mme_beta PDL::PP pdf_beta PDL::PP mme_binomial PDL::PP pmf_binomial PDL::PP mle_exp PDL::PP pdf_exp PDL::PP mme_gamma PDL::PP pdf_gamma PDL::PP mle_gaussian PDL::PP pdf_gaussian PDL::PP mle_geo PDL::PP pmf_geo PDL::PP mle_geosh PDL::PP pmf_geosh PDL::PP mle_lognormal PDL::PP mme_lognormal PDL::PP pdf_lognormal PDL::PP mme_nbd PDL::PP pmf_nbd PDL::PP mme_pareto PDL::PP pdf_pareto PDL::PP mle_poisson PDL::PP pmf_poisson PDL::PP pmf_poisson_stirling PDL::PP _pmf_poisson_factorial );
+our @EXPORT_OK = qw(mme_beta pdf_beta mme_binomial pmf_binomial mle_exp pdf_exp mme_gamma pdf_gamma mle_gaussian pdf_gaussian mle_geo pmf_geo mle_geosh pmf_geosh mle_lognormal mme_lognormal pdf_lognormal mme_nbd pmf_nbd mme_pareto pdf_pareto mle_poisson pmf_poisson pmf_poisson_stirling _pmf_poisson_factorial );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -19,6 +19,9 @@ use DynaLoader;
 
 
 
+
+
+#line 4 "distr.pd"
 
 use strict;
 use warnings;
@@ -68,7 +71,7 @@ Or, play with different distributions with B<plot_distr> :)
     $data->plot_distr( 'gaussian', 'lognormal' );
 
 =cut
-
+#line 75 "Distr.pm"
 
 
 
@@ -81,6 +84,8 @@ Or, play with different distributions with B<plot_distr> :)
 
 
 
+
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 mme_beta
@@ -109,16 +114,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 118 "Distr.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *mme_beta = \&PDL::mme_beta;
+#line 124 "Distr.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 pdf_beta
@@ -143,16 +149,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 153 "Distr.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *pdf_beta = \&PDL::pdf_beta;
+#line 159 "Distr.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 mme_binomial
@@ -181,16 +188,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 192 "Distr.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *mme_binomial = \&PDL::mme_binomial;
+#line 198 "Distr.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 pmf_binomial
@@ -215,16 +223,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 227 "Distr.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *pmf_binomial = \&PDL::pmf_binomial;
+#line 233 "Distr.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 mle_exp
@@ -253,16 +262,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 266 "Distr.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *mle_exp = \&PDL::mle_exp;
+#line 272 "Distr.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 pdf_exp
@@ -287,16 +297,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 301 "Distr.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *pdf_exp = \&PDL::pdf_exp;
+#line 307 "Distr.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 mme_gamma
@@ -325,16 +336,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 340 "Distr.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *mme_gamma = \&PDL::mme_gamma;
+#line 346 "Distr.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 pdf_gamma
@@ -359,16 +371,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 375 "Distr.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *pdf_gamma = \&PDL::pdf_gamma;
+#line 381 "Distr.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 mle_gaussian
@@ -397,16 +410,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 414 "Distr.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *mle_gaussian = \&PDL::mle_gaussian;
+#line 420 "Distr.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 pdf_gaussian
@@ -431,16 +445,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 449 "Distr.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *pdf_gaussian = \&PDL::pdf_gaussian;
+#line 455 "Distr.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 mle_geo
@@ -465,16 +480,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 484 "Distr.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *mle_geo = \&PDL::mle_geo;
+#line 490 "Distr.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 pmf_geo
@@ -499,16 +515,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 519 "Distr.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *pmf_geo = \&PDL::pmf_geo;
+#line 525 "Distr.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 mle_geosh
@@ -533,16 +550,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 554 "Distr.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *mle_geosh = \&PDL::mle_geosh;
+#line 560 "Distr.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 pmf_geosh
@@ -567,16 +585,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 589 "Distr.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *pmf_geosh = \&PDL::pmf_geosh;
+#line 595 "Distr.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 mle_lognormal
@@ -605,16 +624,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 628 "Distr.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *mle_lognormal = \&PDL::mle_lognormal;
+#line 634 "Distr.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 mme_lognormal
@@ -643,16 +663,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 667 "Distr.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *mme_lognormal = \&PDL::mme_lognormal;
+#line 673 "Distr.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 pdf_lognormal
@@ -677,16 +698,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 702 "Distr.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *pdf_lognormal = \&PDL::pdf_lognormal;
+#line 708 "Distr.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 mme_nbd
@@ -715,16 +737,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 741 "Distr.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *mme_nbd = \&PDL::mme_nbd;
+#line 747 "Distr.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 pmf_nbd
@@ -749,16 +772,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 776 "Distr.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *pmf_nbd = \&PDL::pmf_nbd;
+#line 782 "Distr.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 mme_pareto
@@ -787,16 +811,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 815 "Distr.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *mme_pareto = \&PDL::mme_pareto;
+#line 821 "Distr.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 pdf_pareto
@@ -821,16 +846,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 850 "Distr.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *pdf_pareto = \&PDL::pdf_pareto;
+#line 856 "Distr.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 mle_poisson
@@ -859,16 +885,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 889 "Distr.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *mle_poisson = \&PDL::mle_poisson;
+#line 895 "Distr.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 pmf_poisson
@@ -893,16 +920,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 924 "Distr.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *pmf_poisson = \&PDL::pmf_poisson;
+#line 930 "Distr.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 pmf_poisson_stirling
@@ -927,18 +955,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 959 "Distr.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *pmf_poisson_stirling = \&PDL::pmf_poisson_stirling;
+#line 965 "Distr.pm"
 
 
 
+#line 1139 "distr.pd"
 
-#line 1139 "Distr/distr.pd"
+#line 1139 "distr.pd"
 
 =head2 pmf_poisson_factorial
 
@@ -963,18 +992,22 @@ sub PDL::pmf_poisson_factorial {
 		return _pmf_poisson_factorial(@_);
 	}
 }
+#line 1165 "distr.pd"
+#line 997 "Distr.pm"
 
 
 
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *_pmf_poisson_factorial = \&PDL::_pmf_poisson_factorial;
+#line 1003 "Distr.pm"
 
 
 
-;
 
 
-#line 1201 "Distr/distr.pd"
+#line 1201 "distr.pd"
+
+#line 1201 "distr.pd"
 
 =head2 plot_distr
 
@@ -1118,6 +1151,8 @@ Copyright (C) 2009 Maggie J. Xiong <maggiexyz users.sourceforge.net>, David Mert
 All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDL distribution.
 
 =cut
+#line 1346 "distr.pd"
+#line 1156 "Distr.pm"
 
 
 

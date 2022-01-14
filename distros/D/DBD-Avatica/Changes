@@ -1,5 +1,9 @@
 Revision history for DBD-Phoenix
 
+0.2.2  2022-01-11
+    - Synchronized docker files with perl-avatica-client.
+    - Improved test.
+
 0.2.1  2021-12-21
     - Improved performance of ping request
     - Fixed bug with closed statements

@@ -22,7 +22,10 @@ subtest 'recursion' => sub {
 
             ok(
                 lives {
-                    Hash::Wrap->import( { -as => \$new, -recurse => $recurse } )
+                    Hash::Wrap->import( { -as => \$new,
+                                          -recurse => $recurse,
+                                          -methods => { say => sub { $_[1] } },
+                                          -exists => '_exists' } )
                 },
                 'constructor'
             ) or note $@;
@@ -54,6 +57,7 @@ subtest 'recursion' => sub {
               ? object {
                 call l => 2;
                 call c => $c;
+                call [ _exists => 'c' ] => T();
             }
               : meta {
                 prop blessed => undef;
@@ -69,6 +73,7 @@ subtest 'recursion' => sub {
               ? object {
                 call l => 1;
                 call b => $b;
+                call [ _exists => 'b' ] => T();
             }
               : meta {
                 prop blessed => undef;
@@ -85,6 +90,7 @@ subtest 'recursion' => sub {
                 object {
                     call l => 0;
                     call a => $a;
+                    call [ _exists => 'a' ] => T();
                 },
                 'object'
             );

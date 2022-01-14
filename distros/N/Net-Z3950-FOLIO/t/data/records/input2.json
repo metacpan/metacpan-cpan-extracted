@@ -25,7 +25,7 @@
       "chronology": "March",
       "copyNumber": "1",
       "descriptionOfPieces": null,
-      "discoverySuppress": null,
+      "discoverySuppress": true,
       "electronicAccess": [
         {
           "linkText": null,

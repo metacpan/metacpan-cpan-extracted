@@ -2,6 +2,7 @@ package PDL::Graphics::OpenGL::Perl::OpenGL;
 
 use OpenGL ();
 use OpenGL::Config;
+use OpenGL::GLUT ();
 
 BEGIN {
    eval 'OpenGL::ConfigureNotify()';
@@ -89,11 +90,6 @@ interface and build environment matures
 
 =cut
 
-*glpOpenWindow = \&OpenGL::glpOpenWindow;
-
-*glpcOpenWindow = \&OpenGL::glpcOpenWindow;
-
-
 =head2 TBD
 
 =cut
@@ -102,7 +98,9 @@ package PDL::Graphics::OpenGL::OO;
 use PDL::Graphics::TriD::Window qw();
 use PDL::Options;
 use strict;
-my $debug = 0;
+
+$PDL::Graphics::TriD::verbose //= 0;
+
 my (@fakeXEvents) = ();
 my (@winObjects) = ();
 #
@@ -170,78 +168,85 @@ sub new {
 
    my $self;
    if ( $window_type =~ /x11/i ) {       # X11 windows
-      print STDERR "Creating X11 OO window\n" if $debug;
+      print STDERR "Creating X11 OO window\n" if $PDL::Graphics::TriD::verbose;
       $self =  OpenGL::glpcOpenWindow(
          $p->{x},$p->{y},$p->{width},$p->{height},
          $p->{parent},$p->{mask}, $p->{steal}, @{$p->{attributes}});
    } else {                              # GLUT or FreeGLUT windows
-      print STDERR "Creating GLUT OO window\n" if $debug;
-      OpenGL::glutInit() unless OpenGL::done_glutInit();        # make sure glut is initialized
-      OpenGL::glutInitWindowPosition( $p->{x}, $p->{y} );
-      OpenGL::glutInitWindowSize( $p->{width}, $p->{height} );      
-      OpenGL::glutInitDisplayMode( OpenGL::GLUT_RGBA() | OpenGL::GLUT_DOUBLE() | OpenGL::GLUT_DEPTH() );        # hardwire for now
-      if ($^O ne 'MSWin32' and not $OpenGL::Config->{DEFINE} =~ /-DHAVE_W32API/) { # skip these MODE checks on win32, they don't work
-         if (not OpenGL::glutGet(OpenGL::GLUT_DISPLAY_MODE_POSSIBLE()))
-         {
-            warn "glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_ALPHA) not possible";
-            warn "...trying without GLUT_ALPHA";
-            # try without GLUT_ALPHA
-            OpenGL::glutInitDisplayMode( OpenGL::GLUT_RGBA() | OpenGL::GLUT_DOUBLE() | OpenGL::GLUT_DEPTH() );
-            if ( not OpenGL::glutGet( OpenGL::GLUT_DISPLAY_MODE_POSSIBLE() ) )
-            {
-               die "display mode not possible";
-            }
-         }
-      }
-
-      my($glutwin) = OpenGL::glutCreateWindow( "GLUT TriD" );
-      OpenGL::glutSetWindowTitle("GLUT TriD #$glutwin");        # add GLUT window id to title
-
-      $self = { 'glutwindow' => $glutwin, 'xevents' => \@fakeXEvents, 'winobjects' => \@winObjects };
-
-      OpenGL::glutReshapeFunc( \&_pdl_fake_ConfigureNotify );
-      OpenGL::glutCloseFunc( \&_pdl_fake_exit_handler );
-      OpenGL::glutKeyboardFunc( \&_pdl_fake_KeyPress );
-      OpenGL::glutMouseFunc( \&_pdl_fake_button_event );
-      OpenGL::glutMotionFunc( \&_pdl_fake_MotionNotify );
-      OpenGL::glutDisplayFunc( \&_pdl_display_wrapper );
-
-      OpenGL::glutSetOption(OpenGL::GLUT_ACTION_ON_WINDOW_CLOSE(), OpenGL::GLUT_ACTION_GLUTMAINLOOP_RETURNS()) if OpenGL::_have_freeglut();
-
-      OpenGL::glutMainLoopEvent();       # pump event loop so window appears
+      print STDERR "Creating GLUT OO window\n" if $PDL::Graphics::TriD::verbose;
+      OpenGL::GLUT::glutInit() unless OpenGL::GLUT::done_glutInit();        # make sure glut is initialized
+      $self = bless {
+        xevents => \@fakeXEvents,
+        winobjects => \@winObjects,
+        windowparams => $p,
+      }, ref($class_or_hash)||$class_or_hash;
+      $self->_init_glut_window;
    }
-   if(ref($self) ne 'HASH'){
-      die "Could not create OpenGL window";
-   }
-
-#  psuedo-hash style see note above  
-#  no strict 'refs';
-#  my $self = bless [ \%{"$class\::FIELDS"}], $class;
-   #
+   die "Could not create OpenGL window" if !$self;
    $self->{Options} = $p;
    $self->{window_type} = $window_type;
    if($isref){
-      if(defined($class_or_hash->{Options})){
-         return bless $self,ref($class_or_hash);
-      }else{
-         @$class_or_hash{keys %$self} = values %$self;
-         return $class_or_hash;
-      }
+      return $self if defined $class_or_hash->{Options};
+      @$class_or_hash{keys %$self} = values %$self;
+      return $class_or_hash;
    }
-   bless $self,$class_or_hash;
+   $self;
+}
+
+sub _init_glut_window {
+  my ($self) = @_;
+  my $p = $self->{windowparams};
+  OpenGL::GLUT::glutInitWindowPosition( $p->{x}, $p->{y} );
+  OpenGL::GLUT::glutInitWindowSize( $p->{width}, $p->{height} );
+  OpenGL::GLUT::glutInitDisplayMode( OpenGL::GLUT::GLUT_RGBA() | OpenGL::GLUT::GLUT_DOUBLE() | OpenGL::GLUT::GLUT_DEPTH() );        # hardwire for now
+  if ($^O ne 'MSWin32' and not $OpenGL::Config->{DEFINE} =~ /-DHAVE_W32API/) { # skip these MODE checks on win32, they don't work
+     if (not OpenGL::GLUT::glutGet(OpenGL::GLUT::GLUT_DISPLAY_MODE_POSSIBLE()))
+     {
+        warn "glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_ALPHA) not possible";
+        warn "...trying without GLUT_ALPHA";
+        # try without GLUT_ALPHA
+        OpenGL::GLUT::glutInitDisplayMode( OpenGL::GLUT::GLUT_RGBA() | OpenGL::GLUT::GLUT_DOUBLE() | OpenGL::GLUT::GLUT_DEPTH() );
+        if ( not OpenGL::GLUT::glutGet( OpenGL::GLUT::GLUT_DISPLAY_MODE_POSSIBLE() ) )
+        {
+           die "display mode not possible";
+        }
+     }
+  }
+  $self->{glutwindow} = OpenGL::GLUT::glutCreateWindow( "GLUT TriD" );
+  OpenGL::GLUT::glutSetWindowTitle("GLUT TriD #$self->{glutwindow}");
+  OpenGL::GLUT::glutReshapeFunc( \&_pdl_fake_ConfigureNotify );
+  OpenGL::GLUT::glutCloseFunc( \&_pdl_fake_exit_handler );
+  OpenGL::GLUT::glutKeyboardFunc( \&_pdl_fake_KeyPress );
+  OpenGL::GLUT::glutMouseFunc( \&_pdl_fake_button_event );
+  OpenGL::GLUT::glutMotionFunc( \&_pdl_fake_MotionNotify );
+  OpenGL::GLUT::glutDisplayFunc( \&_pdl_display_wrapper );
+  OpenGL::GLUT::glutSetOption(OpenGL::GLUT::GLUT_ACTION_ON_WINDOW_CLOSE(), OpenGL::GLUT::GLUT_ACTION_GLUTMAINLOOP_RETURNS()) if OpenGL::GLUT::_have_freeglut();
+  OpenGL::GLUT::glutMainLoopEvent();       # pump event loop so window appears
+}
+
+sub DESTROY {
+  my ($self) = @_;
+  OpenGL::GLUT::glutReshapeFunc();
+  OpenGL::GLUT::glutCloseFunc();
+  OpenGL::GLUT::glutKeyboardFunc();
+  OpenGL::GLUT::glutMouseFunc();
+  OpenGL::GLUT::glutMotionFunc();
+  OpenGL::GLUT::glutDisplayFunc();
+  glutDestroyWindow($self->{glutwindow});
+  delete $self->{glutwindow};
 }
 
 =head2 default GLUT callbacks
 
 These routines are set as the default GLUT callbacks for when GLUT windows
-are used for PDL/POGL.  Their only function at the moment is to drive an
+are used for PDL/POGL.  Their only function at the moment is to drive a
 fake XEvent queue to feed the existing TriD GUI controls.  At some point,
-the X11 stuff will the deprecated and we can rewrite this more cleanly.
+the X11 stuff will be deprecated and we can rewrite this more cleanly.
 
 =cut
 
 sub _pdl_display_wrapper {
-   my ($win) = OpenGL::glutGetWindow();
+   my ($win) = OpenGL::GLUT::glutGetWindow();
    if ( defined($win) and defined($winObjects[$win]) ) {
       $winObjects[$win]->display();
    }
@@ -249,18 +254,18 @@ sub _pdl_display_wrapper {
 
 sub _pdl_fake_exit_handler {
    my ($win) = shift;
-   print "_pdl_fake_exit_handler: clicked for window $win\n" if $debug;
-   # Need to clean up better and exit/transition cleanly
+   print "_pdl_fake_exit_handler: clicked for window $win\n" if $PDL::Graphics::TriD::verbose;
+   push @fakeXEvents, [ 17, @_ ];
 }
 
 sub _pdl_fake_ConfigureNotify {
-   print "_pdl_fake_ConfigureNotify: got (@_)\n" if $debug;
-   OpenGL::glutPostRedisplay();
+   print "_pdl_fake_ConfigureNotify: got (@_)\n" if $PDL::Graphics::TriD::verbose;
+   OpenGL::GLUT::glutPostRedisplay();
    push @fakeXEvents, [ 22, @_ ];
 }
 
 sub _pdl_fake_KeyPress {
-   print "_pdl_fake_KeyPress: got (@_)\n" if $debug;
+   print "_pdl_fake_KeyPress: got (@_)\n" if $PDL::Graphics::TriD::verbose;
    push @fakeXEvents, [ 2, chr($_[0]) ];
 }
 
@@ -270,7 +275,7 @@ sub _pdl_fake_KeyPress {
    my $last_fake_mouse_state;
 
    sub _pdl_fake_button_event {
-      print "_pdl_fake_button_event: got (@_)\n" if $debug;
+      print "_pdl_fake_button_event: got (@_)\n" if $PDL::Graphics::TriD::verbose;
       $last_fake_mouse_state = $fake_mouse_state;
       if ( $_[1] == 0 ) {       # a press
          $fake_mouse_state |= $button_to_mask[$_[0]];
@@ -284,7 +289,7 @@ sub _pdl_fake_KeyPress {
    }
 
    sub _pdl_fake_MotionNotify {
-      print "_pdl_fake_MotionNotify: got (@_)\n" if $debug;
+      print "_pdl_fake_MotionNotify: got (@_)\n" if $PDL::Graphics::TriD::verbose;
       push @fakeXEvents, [ 6, $fake_mouse_state, @_ ];
    }
 
@@ -319,7 +324,7 @@ sub XPending {
    my($self) = @_;
    if ( $self->{window_type} eq 'glut' ) {
       # monitor state of @fakeXEvents, return number on queue
-      print STDERR "OO::XPending: have " .  scalar( @{$self->{xevents}} ) . " xevents\n" if $debug > 1;
+      print STDERR "OO::XPending: have " .  scalar( @{$self->{xevents}} ) . " xevents\n" if $PDL::Graphics::TriD::verbose > 1;
       scalar( @{$self->{xevents}} );
    } else {
       OpenGL::XPending($self->{Display});
@@ -355,7 +360,7 @@ sub glpXNextEvent {
    if ( $self->{window_type} eq 'glut' ) {
       while ( !scalar( @{$self->{xevents}} ) ) {
          # If no events, we keep pumping the event loop
-         OpenGL::glutMainLoopEvent();
+         OpenGL::GLUT::glutMainLoopEvent();
       }
       # Extract first event from fake event queue and return
       return @{ shift @{$self->{xevents}} };
@@ -392,7 +397,7 @@ sub AUTOLOAD {
   return if($sub =~ /DESTROY/);
   $sub =~ s/.*:://;
   $sub = "OpenGL::$sub";
-  if(defined $debug){
+  if(defined $PDL::Graphics::TriD::verbose){
     print "In AUTOLOAD: $sub at ",__FILE__," line ",__LINE__,".\n";
   }
   no strict 'refs';

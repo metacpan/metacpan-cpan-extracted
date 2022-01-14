@@ -8,7 +8,7 @@ BEGIN {
 use strict;
 use warnings;
 use 5.010;
-my $VERSION = "0.736";
+my $VERSION = "0.738";
 use Log::Log4perl::Tiny qw< :easy LOGLEVEL >;
 use Data::Tubes qw< pipeline >;
 
@@ -21,12 +21,13 @@ my %config = get_options(
    ['loglevel|log=s', default => 'INFO'],
 
    # start putting your options here
-   ['abstract|A=s', required => 1],
-   ['author|a=s',   required => 1],
-   ['email|e=s',    required => 1],
-   ['name|n=s',     required => 1],
-   ['output|o=s'],
-   ['year|y=s', default => 1900 + (localtime)[5]],
+   ['abstract|A=s', environment => 'TG_ABSTRACT', required => 1],
+   ['author|a=s',   environment => 'TG_AUTHOR',   required => 1],
+   ['email|e=s',    environment => 'TG_EMAIL',    required => 1],
+   ['name|n=s',     environment => 'TG_NAME',     required => 1],
+   ['output|o=s',   environment => 'TG_OUTPUT'],
+   ['year|y=s',     environment => 'TG_YEAR',
+         default => 1900 + (localtime)[5]],
 );
 
 ########################################################################
@@ -67,6 +68,10 @@ sub get_options {
          my ($name) = split /\|/, $spec, 2;
          if (exists $opts{default}) {
             $config{$name} = $opts{default};
+         }
+         if (exists $opts{environment}) {
+            $config{$name} = $ENV{$opts{environment}}
+               if defined $ENV{$opts{environment}};
          }
          if (exists $opts{fallback}) {
             $fallback_for{$name} = $opts{fallback};
@@ -117,12 +122,13 @@ BEGIN {
 
       'Log/Log4perl/Tiny.pm' => <<'END_OF_FILE',
  package Log::Log4perl::Tiny;
- $Log::Log4perl::Tiny::VERSION = '1.2.9';
- # ABSTRACT: mimic Log::Log4perl in one single module
  
- use warnings;
  use strict;
+ use warnings;
+ { our $VERSION = '1.4.0'; }
+ 
  use Carp;
+ use POSIX ();
  
  our ($TRACE, $DEBUG, $INFO, $WARN, $ERROR, $FATAL, $OFF, $DEAD);
  my ($_instance, %name_of, %format_for, %id_for);
@@ -142,7 +148,7 @@ BEGIN {
           1;
        " and return;
        unshift @list, ':fake';
-    } ## end if (grep { $_ eq ':full_or_fake'...
+    } ## end if (grep { $_ eq ':full_or_fake'...})
  
     my (%done, $level_set);
   ITEM:
@@ -185,7 +191,7 @@ BEGIN {
                    $_instance->level($conf);
                 }
              };
-          } ## end if (!'Log::Log4perl'->can...
+          } ## end if (!'Log::Log4perl'->...)
        } ## end elsif ($item =~ /\A : (mimic | mask | fake) \z/mxs)
        elsif ($item eq ':easy') {
           push @list, qw( :levels :subs :fake );
@@ -197,7 +203,7 @@ BEGIN {
        elsif (lc($item) eq ':no_extra_logdie_message') {
           $LOGDIE_MESSAGE_ON_STDERR = 0;
        }
-    } ## end for my $item (@list)
+    } ## end ITEM: for my $item (@list)
  
     if (!$level_set) {
        my $logger = get_logger();
@@ -214,19 +220,19 @@ BEGIN {
  
     $args{format} = $args{layout} if exists $args{layout};
  
-    my $channels_input = [ fh => \*STDERR ];
+    my $channels_input = [fh => \*STDERR];
     if (exists $args{channels}) {
        $channels_input = $args{channels};
     }
     else {
        for my $key (qw< file_append file_create file_insecure file fh >) {
           next unless exists $args{$key};
-          $channels_input = [ $key => $args{$key} ];
+          $channels_input = [$key => $args{$key}];
           last;
        }
-    }
+    } ## end else [ if (exists $args{channels...})]
     my $channels = build_channels($channels_input);
-    $channels = $channels->[0] if @$channels == 1; # remove outer shell
+    $channels = $channels->[0] if @$channels == 1;    # remove outer shell
  
     my $self = bless {
        fh    => $channels,
@@ -240,6 +246,11 @@ BEGIN {
  
     $self->format('[%d] [%5p] %m%n') unless exists $self->{format};
  
+    if (exists $args{loglocal}) {
+       my $local = $args{loglocal};
+       $self->loglocal($_, $local->{$_}) for keys %$local;
+    }
+ 
     return $self;
  } ## end sub new
  
@@ -251,9 +262,9 @@ BEGIN {
  
        # some initial validation
        croak "build_channels(): undefined key in list"
-          unless defined $key;
+         unless defined $key;
        croak "build_channels(): undefined value for key $key"
-          unless defined $value;
+         unless defined $value;
  
        # analyze the key-value pair and set the channel accordingly
        my ($channel, $set_autoflush);
@@ -284,51 +295,91 @@ BEGIN {
           my $previous = select($channel);
           $|++;
           select($previous);
-       } ## end if (exists $args{file})
+       }
  
        # record the channel, on to the next
        push @channels, $channel;
-    }
+    } ## end while (@pairs)
     return \@channels;
- }
+ } ## end sub build_channels
  
  sub get_logger { return $_instance ||= __PACKAGE__->new(); }
  sub LOGLEVEL { return get_logger()->level(@_); }
+ 
  sub LEVELID_FOR {
     my $level = shift;
     return $id_for{$level} if exists $id_for{$level};
     return;
- }
+ } ## end sub LEVELID_FOR
+ 
  sub LEVELNAME_FOR {
     my $id = shift;
     return $name_of{$id} if exists $name_of{$id};
     return $id if exists $id_for{$id};
     return;
- }
+ } ## end sub LEVELNAME_FOR
+ 
+ sub loglocal {
+    my $self   = shift;
+    my $key    = shift;
+    my $retval = delete $self->{loglocal}{$key};
+    $self->{loglocal}{$key} = shift if @_;
+    return $retval;
+ } ## end sub loglocal
+ sub LOGLOCAL { return get_logger->loglocal(@_) }
  
  sub format {
     my $self = shift;
  
     if (@_) {
        $self->{format} = shift;
-       $self->{args} = \my @args;
+       $self->{args}   = \my @args;
        my $replace = sub {
-          my ($num, $op) = @_;
-          return '%%' if $op eq '%';
-          return "%%$op" unless defined $format_for{$op};
-          push @args, $op;
-          return "%$num$format_for{$op}[0]";
+          if (defined $_[2]) {    # op with options
+             my ($num, $opts, $op) = @_[0 .. 2];
+             push @args, [$op, $opts];
+             return "%$num$format_for{$op}[0]";
+          }
+          if (defined $_[4]) {    # op without options
+             my ($num, $op) = @_[3, 4];
+             push @args, [$op];
+             return "%$num$format_for{$op}[0]";
+          }
+ 
+          # not an op
+          my $char = ((!defined($_[5])) || ($_[5] eq '%')) ? '' : $_[5];
+          return '%%' . $char;    # keep the percent AND the char, if any
        };
  
        # transform into real format
-       my $format_chars = join '', keys %format_for;
-       $self->{format} =~ s{
+       my ($with_options, $standalone) = ('', '');
+       for my $key (keys %format_for) {
+          my $type = $format_for{$key}[2] || '';
+          $with_options .= $key if $type;
+          $standalone   .= $key if $type ne 'required';
+       }
+ 
+       # quotemeta or land on impossible character class if empty
+       $_ = length($_) ? quotemeta($_) : '^\\w\\W'
+         for ($with_options, $standalone);
+       $self->{format} =~ s<
              %                      # format marker
-             ( -? \d* (?:\.\d+)? )  # number
-             ([$format_chars])      # specifier
-          }
+             (?:
+                   (?:                       # something with options
+                      ( -? \d* (?:\.\d+)? )  # number
+                      ( (?:\{ .*? \}) )      # options
+                      ([$with_options])     # specifier
+                   )
+                |  (?:
+                      ( -? \d* (?:\.\d+)? )  # number
+                      ([$standalone])        # specifier
+                   )
+                |  (.)                       # just any char
+                |  \z                        # just the end of it!
+             )
+          >
           {
-             $replace->($1, $2);
+             $replace->($1, $2, $3, $4, $5, $6);
           }gsmex;
     } ## end if (@_)
     return $self->{format};
@@ -340,11 +391,12 @@ BEGIN {
     my ($self, $message) = @_;
     my $fh = $self->{fh};
     for my $channel ((ref($fh) eq 'ARRAY') ? (@$fh) : ($fh)) {
-       (ref($channel) eq 'CODE') ? $channel->($message, $self)
-                                 : print {$channel} $message;
+       (ref($channel) eq 'CODE')
+         ? $channel->($message, $self)
+         : print {$channel} $message;
     }
     return;
- }
+ } ## end sub emit_log
  
  sub log {
     my $self = shift;
@@ -356,9 +408,10 @@ BEGIN {
     my %data_for = (
        level   => $level,
        message => \@_,
+       (exists($self->{loglocal}) ? (loglocal => $self->{loglocal}) : ()),
     );
     my $message = sprintf $self->{format},
-      map { $format_for{$_}[1]->(\%data_for); } @{$self->{args}};
+      map { $format_for{$_->[0]}[1]->(\%data_for, @$_); } @{$self->{args}};
  
     return $self->emit_log($message);
  } ## end sub log
@@ -383,7 +436,7 @@ BEGIN {
     # add 'at <file> line <line>' unless argument ends in "\n";
     my (undef, $file, $line) = caller(1);
     push @_, sprintf " at %s line %d.\n", $file, $line
-       if substr($_[-1], -1, 1) ne "\n";
+      if substr($_[-1], -1, 1) ne "\n";
  
     # go for it!
     CORE::warn(@_) if $LOGDIE_MESSAGE_ON_STDERR;
@@ -399,7 +452,7 @@ BEGIN {
     # add 'at <file> line <line>' unless argument ends in "\n";
     my (undef, $file, $line) = caller(1);
     push @_, sprintf " at %s line %d.\n", $file, $line
-       if substr($_[-1], -1, 1) ne "\n";
+      if substr($_[-1], -1, 1) ne "\n";
  
     # go for it!
     CORE::die(@_) if $LOGDIE_MESSAGE_ON_STDERR;
@@ -417,7 +470,7 @@ BEGIN {
     my $self = shift;
     require Carp;
     $Carp::Internal{$_} = 1 for __PACKAGE__;
-    if ($self->is_warn()) { # avoid unless we're allowed to emit
+    if ($self->is_warn()) {    # avoid unless we're allowed to emit
        my $message = Carp::shortmess(@_);
        $self->warn($_) for split m{\n}mxs, $message;
     }
@@ -432,7 +485,7 @@ BEGIN {
     my $self = shift;
     require Carp;
     $Carp::Internal{$_} = 1 for __PACKAGE__;
-    if ($self->is_warn()) { # avoid unless we're allowed to emit
+    if ($self->is_warn()) {    # avoid unless we're allowed to emit
        my $message = Carp::longmess(@_);
        $self->warn($_) for split m{\n}mxs, $message;
     }
@@ -447,7 +500,7 @@ BEGIN {
     my $self = shift;
     require Carp;
     $Carp::Internal{$_} = 1 for __PACKAGE__;
-    if ($self->is_fatal()) { # avoid unless we're allowed to emit
+    if ($self->is_fatal()) {    # avoid unless we're allowed to emit
        my $message = Carp::shortmess(@_);
        $self->fatal($_) for split m{\n}mxs, $message;
     }
@@ -462,7 +515,7 @@ BEGIN {
     my $self = shift;
     require Carp;
     $Carp::Internal{$_} = 1 for __PACKAGE__;
-    if ($self->is_fatal()) { # avoid unless we're allowed to emit
+    if ($self->is_fatal()) {    # avoid unless we're allowed to emit
        my $message = Carp::longmess(@_);
        $self->fatal($_) for split m{\n}mxs, $message;
     }
@@ -498,16 +551,32 @@ BEGIN {
  
     # Time tracking's start time. Used to be tied to $^T but Log::Log4perl
     # does differently and uses Time::HiRes if available
-    my $start_time = time(); # default, according to Log::Log4perl
     my $has_time_hires;
+    my $gtod = sub { return (time(), 0) };
     eval {
        require Time::HiRes;
        $has_time_hires = 1;
-       $start_time = [ Time::HiRes::gettimeofday() ];
+       $gtod           = \&Time::HiRes::gettimeofday;
     };
+ 
+    my $start_time = [$gtod->()];
  
     # For supporting %R
     my $last_log = $start_time;
+ 
+    # Timezones are... differently supported somewhere
+    my $strftime_has_tz_offset =
+       POSIX::strftime('%z', localtime()) =~ m<\A [-+] \d{4} \z>mxs;
+    if (! $strftime_has_tz_offset) {
+       require Time::Local;
+    }
+ 
+    { # alias to the one in Log::Log4perl, for easier switching towards that
+       no strict 'refs';
+       *caller_depth = *Log::Log4perl::caller_depth;
+    }
+    our $caller_depth;
+    $caller_depth ||= 0;
  
     # %format_for idea from Log::Tiny by J. M. Adler
     %format_for = (    # specifiers according to Log::Log4perl
@@ -515,56 +584,123 @@ BEGIN {
        C => [
           s => sub {
              my ($internal_package) = caller 0;
-             for my $i (1 .. 4) {
-                my ($package) = caller $i;
-                last unless defined $package;
-                return $package if $package ne $internal_package;
-             }
-             return '*undef*';
-            }
+             my $i = 1;
+             my $package;
+             while ($i <= 4) {
+                ($package) = caller $i;
+                return '*undef*' unless defined $package;
+                last if $package ne $internal_package;
+                ++$i;
+             } ## end while ($i <= 4)
+             return '*undef' if $i > 4;
+             ($package) = caller($i += $caller_depth) if $caller_depth;
+             return $package;
+          },
        ],
        d => [
           s => sub {
-             my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday,
-                $isdst) = localtime();
-             sprintf '%04d/%02d/%02d %02d:%02d:%02d',
-               $year + 1900, $mon + 1, $mday, $hour, $min, $sec;
-            }
+             my ($epoch) = @{shift->{tod} ||= [$gtod->()]};
+             return POSIX::strftime('%Y/%m/%d %H:%M:%S', localtime($epoch));
+          },
+       ],
+       D => [
+          s => sub {
+             my ($data, $op, $options) = @_;
+             $options = '{}' unless defined $options;
+             $options = substr $options, 1, length($options) - 2;
+             my %flag_for = map { $_ => 1 } split /\s*,\s*/, lc($options);
+             my ($s, $u) = @{$data->{tod} ||= [$gtod->()]};
+             $u = substr "000000$u", -6, 6;    # padding left with 0
+             return POSIX::strftime("%Y-%m-%d %H:%M:%S.$u+0000", gmtime $s)
+               if $flag_for{utc};
+ 
+             my @localtime = localtime $s;
+             return POSIX::strftime("%Y-%m-%d %H:%M:%S.$u%z", @localtime)
+                if $strftime_has_tz_offset;
+ 
+             my $sign = '+';
+             my $offset = Time::Local::timegm(@localtime) - $s;
+             ($sign, $offset) = ('-', -$offset) if $offset < 0;
+             my $z = sprintf '%s%02d%02d',
+               $sign,                    # sign
+               int($offset / 3600),      # hours
+               (int($offset / 60) % 60); # minutes
+             return POSIX::strftime("%Y-%m-%d %H:%M:%S.$u$z", @localtime);
+          },
+          'optional'
+       ],
+       e => [
+          s => sub {
+             my ($data, $op, $options) = @_;
+             $data->{tod} ||= [$gtod->()];     # guarantee consistency here
+             my $local = $data->{loglocal} or return '';
+             my $key = substr $options, 1, length($options) - 2;
+             return '' unless exists $local->{$key};
+             my $target = $local->{$key};
+             return '' unless defined $target;
+             my $reft = ref $target or return $target;
+             return '' unless $reft eq 'CODE';
+             return $target->($data, $op, $options);
+          },
+          'required',
        ],
        F => [
           s => sub {
              my ($internal_package) = caller 0;
-             for my $i (1 .. 4) {
-                my ($package, $file) = caller $i;
-                last unless defined $package;
-                return $file if $package ne $internal_package;
-             }
-             return '*undef*';
-            }
+             my $i = 1;
+             my ($package, $file);
+             while ($i <= 4) {
+                ($package, $file) = caller $i;
+                return '*undef*' unless defined $package;
+                last if $package ne $internal_package;
+                ++$i;
+             } ## end while ($i <= 4)
+             return '*undef' if $i > 4;
+             (undef, $file) = caller($i += $caller_depth) if $caller_depth;
+             return $file;
+          },
        ],
        H => [
           s => sub {
              eval { require Sys::Hostname; Sys::Hostname::hostname() }
                || '';
-            }
+          },
        ],
        l => [
           s => sub {
-             my (undef, undef, undef, $subroutine) = caller(4);
-             my (undef, $filename, $line) = caller(3);
-             sprintf '%s %s (%d)', $subroutine, $filename, $line;
-            }
+             my ($internal_package) = caller 0;
+             my $i = 1;
+             my ($package, $filename, $line);
+             while ($i <= 4) {
+                ($package, $filename, $line) = caller $i;
+                return '*undef*' unless defined $package;
+                last if $package ne $internal_package;
+                ++$i;
+             } ## end while ($i <= 4)
+             return '*undef' if $i > 4;
+             (undef, $filename, $line) = caller($i += $caller_depth)
+               if $caller_depth;
+             my (undef, undef, undef, $subroutine) = caller($i + 1);
+             $subroutine = "main::" unless defined $subroutine;
+             return sprintf '%s %s (%d)', $subroutine, $filename, $line;
+          },
        ],
        L => [
           d => sub {
              my ($internal_package) = caller 0;
-             for my $i (1 .. 4) {
-                my ($package, undef, $line) = caller $i;
-                last unless defined $package;
-                return $line if $package ne $internal_package;
-             }
-             return -1;
-            }
+             my $i = 1;
+             my ($package, $line);
+             while ($i <= 4) {
+                ($package, undef, $line) = caller $i;
+                return -1 unless defined $package;
+                last if $package ne $internal_package;
+                ++$i;
+             } ## end while ($i <= 4)
+             return -1 if $i > 4;
+             (undef, undef, $line) = caller($i += $caller_depth)
+               if $caller_depth;
+             return $line;
+          },
        ],
        m => [
           s => sub {
@@ -577,52 +713,63 @@ BEGIN {
        M => [
           s => sub {
              my ($internal_package) = caller 0;
-             for my $i (1 .. 4) {
+             my $i = 1;
+             while ($i <= 4) {
                 my ($package) = caller $i;
-                last unless defined $package;
-                return (caller($i + 1))[3] if $package ne $internal_package;
-             }
-             return '*undef*';
-            }
+                return '*undef*' unless defined $package;
+                last if $package ne $internal_package;
+                ++$i;
+             } ## end while ($i <= 4)
+             return '*undef' if $i > 4;
+             $i += $caller_depth if $caller_depth;
+             my (undef, undef, undef, $subroutine) = caller($i + 1);
+             $subroutine = "main::" unless defined $subroutine;
+             return $subroutine;
+          },
        ],
        n => [s => sub { "\n" },],
        p => [s => sub { $name_of{shift->{level}} },],
        P => [d => sub { $$ },],
-       r => [d => ( $has_time_hires # install sub depending on Time::HiRes
-          ?  sub {
-                my ($s, $m) = Time::HiRes::gettimeofday();
-                $s -= $start_time->[0];
-                $m = int(($m - $start_time->[1]) / 1000);
-                ($s, $m) = ($s - 1, $m + 1000) if $m < 0;
-                return $m + 1000 * $s;
-             }
-          :  sub {
-                return 1000 * (time() - $start_time);
-             }
-       ) ],
-       R => [d => ( $has_time_hires # install sub depending on Time::HiRes
-          ?  sub {
-                my ($sx, $mx) = Time::HiRes::gettimeofday();
-                my $s = $sx - $last_log->[0];
-                my $m = int(($mx - $last_log->[1]) / 1000);
-                ($s, $m) = ($s - 1, $m + 1000) if $m < 0;
-                $last_log = [ $sx, $mx ];
-                return $m + 1000 * $s;
-             }
-          :  sub {
-                my $l = $last_log;
-                return 1000 * (($last_log = time()) - $l);
-             }
-       ) ],
+       r => [
+          d => sub {
+             my ($s, $u) = @{shift->{tod} ||= [$gtod->()]};
+             $s -= $start_time->[0];
+             my $m = int(($u - $start_time->[1]) / 1000);
+             ($s, $m) = ($s - 1, $m + 1000) if $m < 0;
+             return $m + 1000 * $s;
+          },
+       ],
+       R => [
+          d => sub {
+             my ($sx, $ux) = @{shift->{tod} ||= [$gtod->()]};
+             my $s = $sx - $last_log->[0];
+             my $m = int(($ux - $last_log->[1]) / 1000);
+             ($s, $m) = ($s - 1, $m + 1000) if $m < 0;
+             $last_log = [$sx, $ux];
+             return $m + 1000 * $s;
+          },
+       ],
        T => [
           s => sub {
-             my $level = 4;
-             my @chunks;
-             while (my @caller = caller($level++)) {
-                push @chunks,
-                  "$caller[3]() called at $caller[1] line $caller[2]";
-             }
-             join ', ', @chunks;
+             my ($internal_package) = caller 0;
+             my $level = 1;
+             while ($level <= 4) {
+                my ($package) = caller $level;
+                return '*undef*' unless defined $package;
+                last if $package ne $internal_package;
+                ++$level;
+             } ## end while ($level <= 4)
+             return '*undef' if $level > 4;
+ 
+             # usage of Carp::longmess() and substitutions is mostly copied
+             # from Log::Log4perl for better alignment and easier
+             # transition to the "bigger" module
+             local $Carp::CarpLevel =
+               $Carp::CarpLevel + $level + $caller_depth;
+             chomp(my $longmess = Carp::longmess());
+             $longmess =~ s{(?:\A\s*at.*?\n|^\s*)}{}mxsg;
+             $longmess =~ s{\n}{, }g;
+             return $longmess;
           },
        ],
     );
@@ -657,7 +804,7 @@ BEGIN {
        *{__PACKAGE__ . '::' . $name} = sub {
           $_instance->can(lc $name)->($_instance, @_);
        };
-    } ## end for my $name (qw( FATAL ERROR WARN INFO DEBUG TRACE...
+    } ## end for my $name (qw( FATAL ERROR WARN INFO DEBUG TRACE...))
  
     for my $accessor (qw( fh logexit_code )) {
        *{__PACKAGE__ . '::' . $accessor} = sub {
@@ -680,9 +827,6 @@ BEGIN {
  } ## end BEGIN
  
  1;                  # Magic true value required at end of module
- 
- __END__
- 
 
 END_OF_FILE
 
@@ -720,7 +864,7 @@ END_OF_FILE
  use Carp;
  use English qw( -no_match_vars );
  use constant ERROR_CONTEXT => 3;
- { our $VERSION = '1.52'; }
+ { our $VERSION = '1.56'; }
  use Scalar::Util qw< blessed reftype >;
  
  # Function-oriented interface
@@ -753,7 +897,7 @@ END_OF_FILE
  
  # Object-oriented interface
  {
-    my %preset_for;
+    my (%preset_for, %inhibits_defaults);
     BEGIN {
        %preset_for = (
           'default' => {
@@ -771,14 +915,19 @@ END_OF_FILE
              traverse_methods => 1,
           },
        );
+ 
+       # some defaults are inhibited by the presence of certain input
+       # parameters. These parameters can still be put externally, though.
+       %inhibits_defaults = (
+          binmode => [qw< utf8 >],
+       );
     }
     sub new {
        my $package = shift;
-       my $self = bless {%{$preset_for{'default'}}, variables => {}},
-         $package;
  
+       my %external;
        if (@_ == 1) {
-          %{$self} = (%{$self}, %{$_[0]});
+          %external = %{$_[0]};
        }
        elsif (scalar(@_) % 2 == 0) {
           while (@_) {
@@ -786,17 +935,25 @@ END_OF_FILE
              if ($key eq '-preset') {
                 croak "invalid preset $value in new()"
                   unless exists $preset_for{$value};
-                %{$self} = (%{$self}, %{$preset_for{$value}});
+                %external = (%external, %{$preset_for{$value}});
              }
              else {
-                $self->{$key} = $value;
+                $external{$key} = $value;
              }
           }
        }
        else {
           croak 'invalid number of input arguments for constructor';
        }
-       return $self;
+ 
+       # compute defaults, removing inhibitions
+       my %defaults =(%{$preset_for{'default'}}, variables => {});
+       for my $inhibitor (keys %inhibits_defaults) {
+          next unless exists $external{$inhibitor};
+          delete $defaults{$_} for @{$inhibits_defaults{$inhibitor}};
+       }
+ 
+       return bless {%defaults, %external}, $package;
     } ## end sub new
  }
  
@@ -1069,6 +1226,8 @@ END_OF_FILE
  
        push @code, "binmode $handle, ':encoding(utf8)';\n"
           if $utf8;
+       push @code, "binmode $handle, '$self->{binmode}';\n"
+          if defined $self->{binmode};
  
        push @code, <<'END_OF_CODE';
  
@@ -2086,7 +2245,7 @@ END_OF_FILE
  use strict;
  use warnings;
  use English qw< -no_match_vars >;
- our $VERSION     = '0.736';
+ our $VERSION     = '0.738';
  our $API_VERSION = $VERSION;
  use Exporter ();
  our @ISA = qw< Exporter >;
@@ -2276,7 +2435,7 @@ END_OF_FILE
  use warnings;
  use English qw< -no_match_vars >;
  use Exporter 'import';
- our $VERSION = '0.736';
+ our $VERSION = '0.738';
  
  use Log::Log4perl::Tiny qw< :easy :dead_if_first >;
  
@@ -2730,6 +2889,307 @@ END_OF_FILE
 
 # __MOBUNDLE_FILE__
 
+      'Data/Tubes/Util/Cache.pm' => <<'END_OF_FILE',
+ package Data::Tubes::Util::Cache;
+ use strict;
+ use warnings;
+ use English qw< -no_match_vars >;
+ use 5.010;
+ our $VERSION = '0.738';
+ use File::Path qw< mkpath >;
+ 
+ use File::Spec::Functions qw< splitpath catpath >;
+ use Storable qw< nstore retrieve >;
+ use Log::Log4perl::Tiny qw< :easy :dead_if_first >;
+ use Mo qw< default >;
+ has repository => (default => sub { return {} });
+ has __filenames => (default => sub { return undef });
+ has max_items => (default => 0);
+ 
+ sub _path {
+    my ($dir, $filename) = @_;
+    my ($v, $d) = splitpath($dir, 'no-file');
+    return catpath($v, $d, $filename);
+ }
+ 
+ sub get {
+    my ($self, $key) = @_;
+    my $repo = $self->repository();
+    if (ref($repo) eq 'HASH') {
+       return unless exists $repo->{$key};
+       return $repo->{$key};
+    }
+    my $path = _path($repo, $key);
+    return retrieve($path) if -r $path;
+    return;
+ } ## end sub get
+ 
+ sub _filenames {
+    my $self = shift;
+    if (my $retval = $self->__filenames()) {
+       return $retval;
+    }
+    my $repo = $self->repository();
+    my ($v, $d) = splitpath($repo, 'no-file');
+    opendir my $dh, $repo or return;
+    my @filenames = map { catpath($v, $d, $_) } readdir $dh;
+    closedir $dh;
+    $self->__filenames(\@filenames);
+    return \@filenames;
+ }
+ 
+ sub purge {
+    my $self = shift;
+    my $max  = $self->max_items() or return;
+    my $repo = $self->repository();
+ 
+    if (ref($repo) eq 'HASH') {
+       my $n = scalar keys %$repo;
+       delete $repo->{(keys %$repo)[0]} while $n-- > $max;
+       return;
+    }
+ 
+    my $filenames = $self->_filenames() or return;
+    while (@$filenames > $max) {
+       my $filename = shift @$filenames;
+       unlink $filename;
+    }
+    return;
+ } ## end sub purge
+ 
+ sub set {
+    my ($self, $key, $data) = @_;
+    my $repo = $self->repository();
+    return $repo->{$key} = $data if ref($repo) eq 'HASH';
+    eval {
+       mkpath($repo) unless -d $repo;
+       nstore($data, _path($repo, $key));
+       1;
+    } or LOGWARN $EVAL_ERROR;
+    return $data;
+ }
+
+END_OF_FILE
+
+
+# __MOBUNDLE_FILE__
+
+      'Data/Tubes/Util/Output.pm' => <<'END_OF_FILE',
+ package Data::Tubes::Util::Output;
+ use strict;
+ use warnings;
+ use English qw< -no_match_vars >;
+ use 5.010;
+ use File::Path qw< make_path >;
+ use File::Basename qw< dirname >;
+ our $VERSION = '0.738';
+ 
+ use Log::Log4perl::Tiny qw< :easy :dead_if_first >;
+ use Mo qw< default >;
+ has binmode => (default => ':raw');
+ has footer  => ();
+ has header  => ();
+ has interlude => ();
+ has output    => (default => \*STDOUT);
+ has policy    => (default => undef);
+ has track     => (
+    default => sub {
+       return {
+          files       => 0,
+          records     => 0,
+          chars_file  => 0,
+          chars_total => 0,
+       };
+    }
+ );
+ 
+ sub open {
+    my ($self, $hint) = @_;
+ 
+    # reset some tracking parameters
+    my $track = $self->track();
+    $track->{files}++;
+    $track->{records}    = 0;
+    $track->{chars_file} = 0;
+ 
+    # get new filehandle
+    my ($fh, $fh_releaser) =
+      @{$track}{qw< current_fh current_fh_releaser>} = $self->get_fh($hint);
+ 
+    # do header handling
+    $self->_print($fh, $self->header(), $track);
+ 
+    return $fh;
+ } ## end sub open
+ 
+ sub __open_file {
+    my ($filename, $binmode) = @_;
+ 
+    # ensure its directory exists
+    make_path(dirname($filename), {error => \my $errors});
+    if (@$errors) {
+       my ($error) = values %{$errors->[0]};
+       LOGCONFESS "make_path() for '$filename': $error";
+    }
+ 
+    # can open the file, at last
+    CORE::open my $fh, '>', $filename
+      or LOGCONFESS "open('$filename'): $OS_ERROR";
+    binmode $fh, $binmode;
+ 
+    return $fh;
+ } ## end sub __open_file
+ 
+ sub get_fh {
+    my ($self, $handle) = @_;
+    $handle //= $self->output();
+ 
+    # define a default releaser, but not for GLOBs as they have their own
+    # life outside of here
+    my $releaser = ref($handle) eq 'GLOB' ? undef : sub {
+       CORE::close $_[0] or LOGCONFESS "close(): $OS_ERROR";
+       return undef;
+    };
+ 
+    # if $handle is a factory, treat it as such
+    if (ref($handle) eq 'CODE') {
+       my @items = $handle->($self);
+       $handle = shift @items;
+ 
+       # override the $releaser if and only if the factory instructed to
+       # do so. Otherwise, the default one will be kept.
+       $releaser = shift @items if @items;
+    } ## end if (ref($handle) eq 'CODE')
+ 
+    # now, we either have a filehandle, or a filename
+    return ($handle, $releaser) if ref($handle) eq 'GLOB';
+    return (__open_file($handle, $self->binmode()), $releaser);
+ } ## end sub get_fh
+ 
+ sub release_fh {
+    my ($self, $fh) = @_;
+    my $track = $self->track();
+    if (my $releaser = delete $track->{current_fh_releaser}) {
+       $releaser->($fh);
+    }
+    delete $track->{current_fh};
+    return undef;
+ } ## end sub release_fh
+ 
+ sub close {
+    my ($self, $fh, $track) = @_;
+ 
+    # do footer handling
+    $self->_print($fh, $self->footer(), $track);
+ 
+    # call close, prepare $fh for other possible records
+    return $self->release_fh($fh);
+ } ## end sub close
+ 
+ sub just_close {
+    my $self  = shift;
+    my $track = $self->track();
+    my $fh    = $track->{current_fh} or return;
+    $self->close($fh, $track);
+    return;
+ } ## end sub just_close
+ 
+ sub print {
+    my $self = shift;
+ 
+    my $iterator  = ref($_[0]) && $_[0];
+    my $checker   = $self->checker();
+    my $track     = $self->track();
+    my $fh        = $track->{current_fh};
+    my $interlude = $self->interlude();
+ 
+    while ('necessary') {
+       my $record = $iterator ? $iterator->() : shift(@_);
+       last unless defined $record;
+ 
+       # get filehandle if needed
+       $fh ||= $self->open();
+ 
+       # print interlude if we have previous records, increase count
+       $self->_print($fh, $interlude, $track)
+         if $track->{records};
+ 
+       # print record
+       $self->_print($fh, $record, $track);
+ 
+       # increment number of records, for next print
+       $track->{records}++;
+ 
+       # do checks if activated
+       $fh = $self->close($fh, $track)
+         if $checker && (!$checker->($self));
+    } ## end while ('necessary')
+ 
+    return;
+ } ## end sub print
+ 
+ sub _print {
+    my ($self, $fh, $data, $track) = @_;
+    return unless defined $data;
+    $data = $data->($self) if ref $data;
+ 
+    # do print data
+    ref($fh) or LOGCONFESS("$fh is not a reference");
+    print {$fh} $data or LOGCONFESS "print(): $OS_ERROR";
+ 
+    # update trackers
+    my $new_chars = length($data);
+    $track->{chars_file}  += $new_chars;
+    $track->{chars_total} += $new_chars;
+ 
+    return $new_chars;
+ } ## end sub _print
+ 
+ sub default_check {
+    my $self = shift;
+ 
+    my $policy = $self->policy()
+      or return 1;    # no policy, always fine
+    my $track = $self->track();
+    if (my $mr = $policy->{records_threshold}) {
+       return 0 if $track->{records} >= $mr;
+    }
+    if (my $cpf = $policy->{characters_threshold}) {
+       return 0 if $track->{chars_file} >= $cpf;
+    }
+    return 1;
+ } ## end sub default_check
+ 
+ sub checker {
+    my $self = shift;
+ 
+    # allow for overriding tout-court
+    if (my $method = $self->can('check')) {
+       return $method;    # will eventually be called in the right way
+    }
+ 
+    # if no policy is set, there's no reason to do checks
+    my $policy = $self->policy() or return;
+ 
+    # at this point, let's use the default_check, whatever it is
+    return $self->can('default_check');
+ } ## end sub checker
+ 
+ sub DESTROY { shift->just_close() }
+ 
+ sub writer {
+    my $package = shift;
+    my $self    = $package->new(@_);
+    return sub { return $self->print(@_) };
+ }
+ 
+ 1;
+
+END_OF_FILE
+
+
+# __MOBUNDLE_FILE__
+
       'Data/Tubes/Plugin/Source.pm' => <<'END_OF_FILE',
  package Data::Tubes::Plugin::Source;
  
@@ -2739,7 +3199,7 @@ END_OF_FILE
  use warnings;
  use English qw< -no_match_vars >;
  use Log::Log4perl::Tiny qw< :easy :dead_if_first LOGLEVEL >;
- our $VERSION = '0.736';
+ our $VERSION = '0.738';
  
  use Data::Tubes::Util
    qw< normalize_args normalize_filename args_array_with_options >;
@@ -2867,13 +3327,256 @@ END_OF_FILE
 
 # __MOBUNDLE_FILE__
 
+      'Data/Tubes/Plugin/Util.pm' => <<'END_OF_FILE',
+ package Data::Tubes::Plugin::Util;
+ 
+ # vim: ts=3 sts=3 sw=3 et ai :
+ 
+ use strict;
+ use warnings;
+ use English qw< -no_match_vars >;
+ use Data::Dumper;
+ our $VERSION = '0.738';
+ 
+ use Template::Perlish;
+ use Log::Log4perl::Tiny qw< :easy :dead_if_first get_logger >;
+ use Data::Tubes::Util qw< normalize_args read_file tube >;
+ 
+ use Exporter qw< import >;
+ our @EXPORT_OK = qw< identify log_helper read_file tubify >;
+ 
+ sub identify {
+    my ($args, $opts) = @_;
+    $args //= {};
+    $opts //= $args->{identification} // {};
+ 
+    my $name = $args->{name};
+    $name = '*unknown*' unless defined $name;
+ 
+    my @caller_fields = qw<
+      package
+      filename
+      line
+      subroutine
+      hasargs
+      wantarray
+      evaltext
+      is_require
+      hints
+      bitmask
+      hintsh
+    >;
+    my %caller;
+ 
+    if (exists $opts->{caller}) {
+       @caller{@caller_fields} = @{$opts->{caller}};
+    }
+    else {
+       my $level = $opts->{level};
+       $level = 1 unless defined $level;
+       @caller{@caller_fields} = caller($level);
+    }
+ 
+    my $message = $opts->{message};
+    $message = 'building [% name %] as [% subroutine %]'
+      unless defined $message;
+ 
+    my $tp = Template::Perlish->new(%{$opts->{tp_opts} || {}});
+    $message = $tp->process(
+       $message,
+       {
+          %caller,
+          name => $name,
+          args => $args,
+          opts => $opts,
+       }
+    );
+ 
+    my $loglevel = $opts->{loglevel};
+    $loglevel = $DEBUG unless defined $loglevel;
+    get_logger->log($loglevel, $message);
+ 
+    return;
+ } ## end sub identify
+ 
+ sub log_helper {
+    my ($args, $opts) = @_;
+    $opts //= $args->{logger};
+    return unless $opts;
+    return $opts if ref($opts) eq 'CODE';
+ 
+    # generate one
+    my $name = $args->{name};
+    $name = '*unknown*' unless defined $name;
+ 
+    my $message = $opts->{message};
+    $message = '==> [% args.name %]' unless defined $message;
+ 
+    my $tp = Template::Perlish->new(%{$opts->{tp_opts} || {}});
+    $message = $tp->compile($message);
+ 
+    my $logger   = get_logger();
+    my $loglevel = $opts->{loglevel};
+    $loglevel = $DEBUG unless defined $loglevel;
+ 
+    return sub {
+       my $level = $logger->level();
+       return if $level < $loglevel;
+       my $record = shift;
+       my $rendered =
+         $tp->evaluate($message,
+          {record => $record, args => $args, opts => $opts});
+       $logger->log($loglevel, $rendered);
+    };
+ } ## end sub log_helper
+ 
+ sub tubify {
+    my $opts = {};
+    $opts = shift(@_) if (@_ && ref($_[0]) eq 'HASH');
+    map {
+       my $ref = ref $_;
+       ($ref eq 'CODE')
+         ? $_
+         : tube($opts, ($ref eq 'ARRAY') ? @$_ : $_)
+    } grep { $_ } @_;
+ } ## end sub tubify
+ 
+ 1;
+
+END_OF_FILE
+
+
+# __MOBUNDLE_FILE__
+
+      'Data/Tubes/Plugin/Reader.pm' => <<'END_OF_FILE',
+ package Data::Tubes::Plugin::Reader;
+ use strict;
+ use warnings;
+ use English qw< -no_match_vars >;
+ our $VERSION = '0.738';
+ 
+ use Log::Log4perl::Tiny qw< :easy :dead_if_first LOGLEVEL >;
+ 
+ use Data::Tubes::Util qw< normalize_args shorter_sub_names >;
+ use Data::Tubes::Plugin::Util qw< identify >;
+ my %global_defaults = (
+    input  => 'source',
+    output => 'raw',
+ );
+ 
+ sub read_by_line {
+    return read_by_separator(
+       normalize_args(
+          @_,
+          {
+             name           => 'read_by_line',
+             identification => {caller => [caller(0)]},
+          }
+       ),
+       separator => "\n",
+    );
+ } ## end sub read_by_line
+ 
+ sub read_by_paragraph {
+    return read_by_separator(
+       normalize_args(
+          @_,
+          {
+             name           => 'read_by_paragraph',
+             identification => {caller => [caller(0)]},
+          }
+       ),
+       separator => '',
+    );
+ } ## end sub read_by_paragraph
+ 
+ sub read_by_record_reader {
+    my %args = normalize_args(
+       @_,
+       [
+          {
+             %global_defaults,
+             emit_eof       => 0,
+             name           => 'read_by_record_reader',
+             identification => {caller => [caller(0)]},
+          },
+          'record_reader'
+       ],
+    );
+    identify(\%args);
+    my $name = $args{name};
+ 
+    my $record_reader = $args{record_reader};
+    LOGDIE "$name undefined record_reader" unless defined $record_reader;
+    LOGDIE "$name record_reader MUST be a sub reference"
+      unless ref($record_reader) eq 'CODE';
+ 
+    my $emit_eof  = $args{emit_eof};
+    my $input     = $args{input};
+    my $has_input = defined($input) && length($input);
+    my $output    = $args{output};
+    return sub {
+       my $record = shift;
+       my $source = $has_input ? $record->{$input} : $record;
+       my $fh     = $source->{fh};
+ 
+       return (
+          iterator => sub {
+             my $read = $record_reader->($fh);
+             my $retval = {%$record, $output => $read};
+             return $retval if defined $read;
+             if ($emit_eof) {
+                $emit_eof = 0;
+                return $retval;
+             }
+             return;
+          },
+       );
+    };
+ } ## end sub read_by_record_reader
+ 
+ sub read_by_separator {
+    my %args = normalize_args(
+       @_,
+       [
+          {
+             name           => 'read_by_separator',
+             chomp          => 1,
+             identification => {caller => [caller(0)]},
+          },
+          'separator'
+       ]
+    );
+    my $separator = $args{separator};
+    my $chomp     = $args{chomp};
+    return read_by_record_reader(
+       %args,
+       record_reader => sub {
+          my $fh = shift;
+          local $INPUT_RECORD_SEPARATOR = $separator;
+          my $retval = <$fh>;
+          chomp($retval) if defined($retval) && $chomp;
+          return $retval;
+       },
+    );
+ } ## end sub read_by_separator
+ 
+ shorter_sub_names(__PACKAGE__, 'read_');
+ 
+ 1;
+
+END_OF_FILE
+
+
+# __MOBUNDLE_FILE__
+
       'Data/Tubes/Plugin/Parser.pm' => <<'END_OF_FILE',
  package Data::Tubes::Plugin::Parser;
  use strict;
  use warnings;
  use English qw< -no_match_vars >;
  use Data::Dumper;
- our $VERSION = '0.736';
+ our $VERSION = '0.738';
  
  use Log::Log4perl::Tiny qw< :easy :dead_if_first >;
  
@@ -3387,12 +4090,627 @@ END_OF_FILE
 
 # __MOBUNDLE_FILE__
 
+      'Data/Tubes/Plugin/Writer.pm' => <<'END_OF_FILE',
+ package Data::Tubes::Plugin::Writer;
+ 
+ # vim: ts=3 sts=3 sw=3 et ai :
+ 
+ use strict;
+ use warnings;
+ use English qw< -no_match_vars >;
+ use POSIX qw< strftime >;
+ our $VERSION = '0.738';
+ 
+ use Log::Log4perl::Tiny qw< :easy :dead_if_first LOGLEVEL >;
+ use Template::Perlish;
+ 
+ use Data::Tubes::Util
+   qw< normalize_args read_file_maybe shorter_sub_names sprintffy >;
+ use Data::Tubes::Plugin::Util qw< identify log_helper >;
+ use Data::Tubes::Plugin::Plumbing;
+ my %global_defaults = (input => 'rendered',);
+ 
+ sub _filenames_generator {
+    my $template = shift;
+ 
+    my $n             = 0; # counter, used in closures inside $substitutions
+    my $substitutions = [
+       [qr{(\d*)n} => sub { return sprintf "%${1}d",    $n; }],
+       [qr{Y}      => sub { return strftime('%Y',       localtime()); }],
+       [qr{m}      => sub { return strftime('%m',       localtime()); }],
+       [qr{d}      => sub { return strftime('%d',       localtime()); }],
+       [qr{H}      => sub { return strftime('%H',       localtime()); }],
+       [qr{M}      => sub { return strftime('%M',       localtime()); }],
+       [qr{S}      => sub { return strftime('%S',       localtime()); }],
+       [qr{z}      => sub { return strftime('%z',       localtime()); }],
+       [qr{D}      => sub { return strftime('%Y%m%d',   localtime()); }],
+       [qr{T}      => sub { return strftime('%H%M%S%z', localtime()); }],
+       [qr{t} => sub { return strftime('%Y%m%dT%H%M%S%z', localtime()); }],
+    ];
+ 
+    # see if the template depends on the counter
+    my $expanded = sprintffy($template, $substitutions);
+    return sub {
+       my $retval = sprintffy($template, $substitutions);
+       ++$n;
+       return $retval;
+      }
+      if ($expanded ne $template);    # it does!
+ 
+    # then, by default, revert to poor's man expansion of name...
+    return sub {
+       my $retval = $n ? "${template}_$n" : $template;
+       ++$n;
+       return $retval;
+    };
+ } ## end sub _filenames_generator
+ 
+ sub dispatch_to_files {
+    my %args = normalize_args(
+       @_,
+       [
+          {
+             %global_defaults,
+             name    => 'write dispatcher',
+             binmode => ':encoding(UTF-8)'
+          },
+          'filename'
+       ],
+    );
+    identify(\%args);
+    my $name = delete $args{name};    # so that it can be overridden
+ 
+    if (defined(my $filename = delete $args{filename})) {
+       my $ref = ref $filename;
+       if (!$ref) {
+          $args{filename_template} //= $filename;
+       }
+       elsif ($ref eq 'CODE') {
+          $args{filename_factory} //= $filename;
+       }
+       else {
+          LOGDIE "argument filename has invalid type $ref";
+       }
+    } ## end if (defined(my $filename...))
+ 
+    my $factory = delete $args{filename_factory};
+    if (!defined($factory) && defined($args{filename_template})) {
+       my $tp = Template::Perlish->new(%{$args{tp_opts} || {}});
+       my $template = $tp->compile($args{filename_template});
+       $factory = sub {
+          my ($key, $record) = @_;
+          return $tp->evaluate($template, {key => $key, record => $record});
+       };
+    } ## end if (!defined($factory)...)
+ 
+    $args{factory} //= sub {
+       my $filename = $factory->(@_);
+       return write_to_files(%args, filename => $filename);
+    };
+ 
+    return Data::Tubes::Plugin::Plumbing::dispatch(%args);
+ } ## end sub dispatch_to_files
+ 
+ sub write_to_files {
+    my %args = normalize_args(
+       @_,
+       [
+          {
+             %global_defaults,
+             name     => 'write to file',
+             binmode  => ':encoding(UTF-8)',
+             filename => \*STDOUT,
+          },
+          'filename'
+       ],
+    );
+    identify(\%args);
+    my $name = $args{name};
+    LOGDIE "$name: need a filename" unless defined $args{filename};
+    LOGDIE "$name: need an input"   unless defined $args{input};
+ 
+    my $output = $args{filename};
+    $output = _filenames_generator($output) unless ref($output);
+ 
+    my %oha =
+      map { ($_ => $args{$_}) }
+      grep { defined $args{$_} } qw< binmode policy >;
+    for my $marker (qw< footer header interlude >) {
+       $oha{$marker} = read_file_maybe($args{$marker})
+         if defined $args{$marker};
+    }
+    require Data::Tubes::Util::Output;
+    my $output_handler =
+      Data::Tubes::Util::Output->new(%oha, output => $output,);
+ 
+    my $input = $args{input};
+    return sub {
+       my $record = shift;
+       $output_handler->print($record->{$input});
+       return $record;    # relaunch for further processing
+    };
+ } ## end sub write_to_files
+ 
+ shorter_sub_names(__PACKAGE__, 'write_');
+ 
+ 1;
+
+END_OF_FILE
+
+
+# __MOBUNDLE_FILE__
+
+      'Data/Tubes/Plugin/Plumbing.pm' => <<'END_OF_FILE',
+ package Data::Tubes::Plugin::Plumbing;
+ 
+ # vim: ts=3 sts=3 sw=3 et ai :
+ 
+ use strict;
+ use warnings;
+ use English qw< -no_match_vars >;
+ use Data::Dumper;
+ use Scalar::Util qw< blessed >;
+ our $VERSION = '0.738';
+ 
+ use Log::Log4perl::Tiny
+   qw< :easy :dead_if_first get_logger LOGLEVEL LEVELID_FOR >;
+ use Data::Tubes::Util qw<
+   args_array_with_options
+   load_module
+   load_sub
+   pump
+   normalize_args
+   traverse
+ >;
+ use Data::Tubes::Plugin::Util qw< identify log_helper tubify >;
+ 
+ sub alternatives {
+    my ($tubes, $args) =
+      args_array_with_options(@_, {name => 'alternatives'});
+    identify($args);
+    my $name = $args->{name};
+ 
+    my @tubes = tubify($args, @$tubes);
+ 
+    return sub {
+       my $record = shift;
+       for my $tube (@tubes) {
+          if (my @retval = $tube->($record)) {
+             return @retval;
+          }
+       }
+       return;
+    };
+ } ## end sub alternatives
+ 
+ sub _get_selector {
+    my $args     = shift;
+    my $selector = $args->{selector};
+    if (!defined($selector) && defined($args->{key})) {
+       my $key = $args->{key};
+       my $ref = ref $key;
+       $selector =
+         ($ref eq 'CODE')
+         ? $key
+         : sub { return traverse($_[0], $ref ? @$key : $key); };
+    } ## end if (!defined($selector...))
+    LOGDIE "$args->{name}: required dispatch key or selector"
+      if (! defined $selector) && (! $args->{missing_ok});
+    return $selector;
+ } ## end sub _get_selector
+ 
+ sub cache {
+    my %args = normalize_args(@_, [{name => 'cache'}, 'tube']);
+    identify(\%args);
+    my $name = $args{name};
+ 
+    # the cached tube
+    my ($tube) = tubify(\%args, $args{tube});
+    LOGCROAK "$name: no tube to cache" unless defined $tube;
+ 
+    # the cache! We will use something compatible with CHI
+    my $cache = $args{cache} // {};
+    $cache = ['^Data::Tubes::Util::Cache', repository => $cache]
+      if ref($cache) eq 'HASH';
+    if (!blessed($cache)) {
+       my ($x, @args) = ref($cache) ? @$cache : $cache;
+       $cache = ref($x) ? $x->(@args) : load_module($x)->new(@args);
+    }
+    my @get_options = $args{get_options} ? @{$args{get_options}} : ();
+    my @set_options = $args{set_options} ? @{$args{set_options}} : ();
+ 
+    # what allows me to look in the cache?
+    my $selector = _get_selector({%args, missing_ok => 1});
+    LOGCROAK "missing key or selector, but output is set"
+      if (! defined $selector) && defined($args{output});
+ 
+    # cleaning trigger, if any
+    my $cleaner = $args{cleaner};
+    $cleaner = $cache->can($cleaner) if defined($cleaner) && !ref($cleaner);
+ 
+    # cloning facility, if needed
+    my $merger = $args{merger};
+    $merger = load_sub($merger) if defined($merger) && !ref($merger);
+ 
+    my $output = $args{output};
+    return sub {
+       my $record = shift;
+       my $key    = $selector ? $selector->($record) : $record;
+       my $data   = $cache->get($key, @get_options);
+       if (!$data) {    # MUST be an array reference at this point
+          my @oc = $tube->($record);
+          if (scalar(@oc) == 2) {
+             my $rcs = ($oc[0] eq 'records') ? $oc[1] : pump($oc[1]);
+             $rcs = [map { $_->{$output} } @$rcs] if defined($output);
+             $data = [records => $rcs];
+          }
+          elsif (scalar @oc) {
+             $data = defined($output) ? [$oc[0]{$output}] : \@oc;
+          }
+          else {
+             $data = \@oc;
+          }
+ 
+          $cache->set($key, $data, @set_options);
+          $cleaner->($cache) if $cleaner;
+       } ## end if (!$data)
+ 
+       return unless scalar @$data;
+ 
+       if (scalar(@$data) == 1) {    # single record
+          return $merger->($record, $output, $data->[0]) if $merger;
+          return $data->[0] unless $output;
+          $record->{$output} = $data->[0];
+          return $record;
+       } ## end if (scalar(@$data) == ...)
+ 
+       # array of records here
+       my $aref = $data->[1];
+       my $records =
+         $merger
+         ? [map { $merger->($record, $output, $_) } @$aref]
+         : $output ? [
+          map {
+             { %$record, $output => $_ }
+          } @$aref
+         ]
+         : $aref;
+       return (records => $records);
+    };
+ } ## end sub cache
+ 
+ sub dispatch {
+    my %args = normalize_args(@_,
+       {default => undef, name => 'dispatch', loglevel => $INFO});
+    identify(\%args);
+    my $name = $args{name};
+ 
+    my $selector = _get_selector(\%args);
+ 
+    my $factory = $args{factory};
+    if (!defined($factory)) {
+       $factory = sub {
+          my ($key, $record) = @_;
+          die {
+             message => "$name: unhandled selection key '$key'",
+             record  => $record,
+          };
+       };
+    } ## end if (!defined($factory))
+ 
+    my %predefined_for = %{$args{handlers} || {}};
+    my %handler_for;
+    my $default = $args{default};
+    return sub {
+       my $record = shift;
+ 
+       # get a key into the cache
+       my $key = $selector->($record) // $default;
+       die {
+          message => "$name: selector key is undefined",
+          record  => $record,
+         }
+         unless defined $key;
+ 
+       $handler_for{$key} //= exists $predefined_for{$key}
+             ? (tubify($predefined_for{$key}))[0]
+             : (tubify(\%args, $factory->($key, $record)))[0];
+ 
+       return $handler_for{$key}->($record);
+    };
+ } ## end sub dispatch
+ 
+ sub fallback {
+ 
+    # we lose syntax sugar but allow for Try::Tiny to remain optional
+    eval { require Try::Tiny; }
+      or LOGCONFESS 'Data::Tubes::Plugin::Plumbing::fallback '
+      . 'needs Try::Tiny, please install';
+ 
+    my ($tubes, $args) = args_array_with_options(@_, {name => 'fallback'});
+    identify($args);
+    my $name = $args->{name};
+ 
+    my @tubes = tubify($args, @$tubes);
+    my $catch = $args->{catch};
+    return sub {
+       my $record = shift;
+       for my $tube (@tubes) {
+          my (@retval, $do_fallback);
+          Try::Tiny::try(
+             sub {
+                @retval = $tube->($record);
+             },
+             Try::Tiny::catch(
+                sub {
+                   $catch->($_, $record) if $catch;
+                   $do_fallback = 1;
+                }
+             )
+          );
+          return @retval unless $do_fallback;
+       } ## end for my $tube (@tubes)
+       return;
+    };
+ } ## end sub fallback
+ 
+ sub logger {
+    my %args = normalize_args(@_, {name => 'log pipe', loglevel => $INFO});
+    identify(\%args);
+    my $loglevel = LEVELID_FOR($args{loglevel});
+    my $mangler  = $args{target};
+    if (!defined $mangler) {
+       $mangler = sub { return shift; }
+    }
+    elsif (ref($mangler) ne 'CODE') {
+       my @keys = ref($mangler) ? @$mangler : ($mangler);
+       $mangler = sub {
+          my $record = shift;
+          return traverse($record, @keys);
+       };
+    } ## end elsif (ref($mangler) ne 'CODE')
+    my $logger = get_logger();
+    return sub {
+       my $record = shift;
+       $logger->log($loglevel, $mangler->($record));
+       return $record;
+    };
+ } ## end sub logger
+ 
+ sub pipeline {
+    my ($tubes, $args) = args_array_with_options(@_, {name => 'pipeline'});
+    return sequence(%$args, tubes => $tubes);
+ }
+ 
+ sub sequence {
+    my %args =
+      normalize_args(@_, [{name => 'sequence', tubes => []}, 'tubes']);
+    identify(\%args);
+ 
+    # cope with an empty list of tubes - equivalent to an "id" function but
+    # always returning an iterator for consistency
+    my $tubes = $args{tubes} || [];
+    return sub {
+       my @record = shift;
+       return (
+          iterator => sub {
+             return unless @record;
+             return shift @record;
+          }
+       );
+      }
+      unless @$tubes;
+ 
+    # auto-generate tubes if you get definitions
+    my @tubes = tubify(\%args, @$tubes);
+ 
+    my $gate = $args{gate} // undef;
+ 
+    my $logger = log_helper(\%args);
+    my $name   = $args{name};
+    return sub {
+       my $record = shift;
+       $logger->($record, \%args) if $logger;
+ 
+       my @stack = ({record => $record});
+       my $iterator = sub {
+        STEP:
+          while (@stack) {
+             my $pos = $#stack;
+ 
+             my $f = $stack[$pos];
+             my @record =
+                 exists($f->{record})   ? delete $f->{record}
+               : exists($f->{iterator}) ? $f->{iterator}->()
+               : @{$f->{records} || []} ? shift @{$f->{records}}
+               :                          ();
+             if (!@record) {    # no more at this level...
+                my $n = @stack;
+                TRACE "$name: level $n backtracking, no more records";
+                pop @stack;
+                next STEP;
+             } ## end if (!@record)
+ 
+             my $record = $record[0];
+             return $record if @stack > @tubes;    # output cache
+ 
+             # cut the sequence early if the gate function says so
+             return $record if $gate && ! $gate->($record);
+ 
+             # something must be done...
+             my @outcome = $tubes[$pos]->($record)
+               or next STEP;
+ 
+             unshift @outcome, 'record' if @outcome == 1;
+             push @stack, {@outcome};              # and go to next level
+          } ## end STEP: while (@stack)
+ 
+          return;    # end of output, empty list
+       };
+       return (iterator => $iterator);
+    };
+ } ## end sub sequence
+ 
+ 1;
+
+END_OF_FILE
+
+
+# __MOBUNDLE_FILE__
+
+      'Data/Tubes/Plugin/Validator.pm' => <<'END_OF_FILE',
+ package Data::Tubes::Plugin::Validator;
+ use strict;
+ use warnings;
+ use English qw< -no_match_vars >;
+ our $VERSION = '0.738';
+ 
+ use Log::Log4perl::Tiny qw< :easy :dead_if_first >;
+ 
+ use Data::Tubes::Util
+   qw< args_array_with_options normalize_args shorter_sub_names >;
+ use Data::Tubes::Plugin::Util qw< identify >;
+ my %global_defaults = (input => 'structured',);
+ 
+ sub validate_admit {
+    my ($validators, $args) = args_array_with_options(
+       @_,
+       {
+          input => 'raw',
+          name  => 'validate with acceptance regexp',
+       }
+    );
+    identify($args);
+    my $name   = $args->{name};
+    my $input  = $args->{input};
+    my $refuse = $args->{refuse};
+    return sub {
+       my $record = shift;
+       my $target = defined($input) ? $record->{$input} : $record;
+       for my $validator (@$validators) {
+          my $outcome =
+            (ref($validator) eq 'CODE')
+            ? $validator->($target)
+            : ($target =~ m{$validator});
+          return unless ($outcome xor $refuse);
+       } ## end for my $validator (@$validators)
+       return $record;
+    };
+ } ## end sub validate_admit
+ 
+ sub validate_refuse {
+    my ($validators, $args) = args_array_with_options(
+       @_,
+       {
+          input => 'raw',
+          name  => 'validate with rejection regexp',
+       }
+    );
+    $args->{refuse} = 1;
+    return validate_admit(@$validators, $args);
+ } ## end sub validate_refuse
+ 
+ sub validate_refuse_comment {
+    my $args = normalize_args(@_, {name => 'validate reject comment line'});
+    identify($args);
+    return validate_refuse(qr{(?mxs:\A \s* \#)}, $args);
+ }
+ 
+ sub validate_refuse_comment_or_empty {
+    my $args = normalize_args(@_,
+       {name => 'validate reject comment or non-spaces-only line'});
+    identify($args);
+    return validate_refuse(qr{(?mxs:\A \s* (?: \# | \z ))}, $args);
+ } ## end sub validate_refuse_comment_or_empty
+ 
+ sub validate_refuse_empty {
+    my $args = normalize_args(@_,
+       {name => 'validate reject empty (non-spaces only) string'});
+    identify($args);
+    return validate_refuse(qr{(?mxs:\A \s* \z)}, $args);
+ } ## end sub validate_refuse_empty
+ 
+ 
+ sub validate_thoroughly {
+    my ($validators, $args) = args_array_with_options(
+       @_,
+       {
+          %global_defaults,
+          name           => 'validate with subs',
+          output         => 'validation',
+          keep_positives => 0,
+          keep_empty     => 0,
+          wrapper        => undef,
+       }
+    );
+    identify($args);
+    my $name = $args->{name};
+ 
+    my $wrapper = $args->{wrapper};
+    if ($wrapper && $wrapper eq 'try') {
+       eval { require Try::Tiny; }
+         or LOGCONFESS 'Validator::validate_with_subs '
+         . 'needs Try::Tiny, please install';
+ 
+       $wrapper = sub {
+          my ($validator, @params) = @_;
+          return Try::Tiny::try(
+             sub { $validator->(@params); },
+             Try::Tiny::catch(sub { return (0, $_); }),
+          );
+       };
+    } ## end if ($wrapper && $wrapper...)
+ 
+    my $input          = $args->{input};
+    my $output         = $args->{output};
+    my $keep_positives = $args->{keep_positives};
+    my $keep_empty     = $args->{keep_empty};
+    return sub {
+       my $record = shift;
+       my $target = defined($input) ? $record->{$input} : $record;
+       my @outcomes;
+       for my $i (0 .. $#$validators) {
+          my ($name, $validator, @params) =
+            (ref($validators->[$i]) eq 'ARRAY')
+            ? @{$validators->[$i]}
+            : ("validator-$i", $validators->[$i]);
+          my @outcome =
+              $wrapper
+            ? $wrapper->($validator, $target, $record, $args, @params)
+            : (ref($validator) eq 'CODE')
+            ? $validator->($target, $record, $args, @params)
+            : (
+                $target =~ m{$validator}
+                ? (1)
+                : (0, regex => "$validator")
+             );
+          push @outcome, 0 unless @outcome;
+          push @outcomes, [$name, @outcome]
+            if !$outcome[0] || $keep_positives;
+       } ## end for my $i (0 .. $#$validators)
+       $record->{$output} = undef;
+       $record->{$output} = \@outcomes if @outcomes || $keep_empty;
+       return $record;
+    };
+ } ## end sub validate_with_subs
+ 
+ *validate_with_subs = \&validate_thoroughly;
+ 
+ shorter_sub_names(__PACKAGE__, 'validate_');
+ 
+ 1;
+
+END_OF_FILE
+
+
+# __MOBUNDLE_FILE__
+
       'Data/Tubes/Plugin/Renderer.pm' => <<'END_OF_FILE',
  package Data::Tubes::Plugin::Renderer;
  use strict;
  use warnings;
  use English qw< -no_match_vars >;
- our $VERSION = '0.736';
+ our $VERSION = '0.738';
  
  use Log::Log4perl::Tiny qw< :easy :dead_if_first >;
  
@@ -3549,1166 +4867,6 @@ END_OF_FILE
 END_OF_FILE
 
 
-# __MOBUNDLE_FILE__
-
-      'Data/Tubes/Plugin/Reader.pm' => <<'END_OF_FILE',
- package Data::Tubes::Plugin::Reader;
- use strict;
- use warnings;
- use English qw< -no_match_vars >;
- our $VERSION = '0.736';
- 
- use Log::Log4perl::Tiny qw< :easy :dead_if_first LOGLEVEL >;
- 
- use Data::Tubes::Util qw< normalize_args shorter_sub_names >;
- use Data::Tubes::Plugin::Util qw< identify >;
- my %global_defaults = (
-    input  => 'source',
-    output => 'raw',
- );
- 
- sub read_by_line {
-    return read_by_separator(
-       normalize_args(
-          @_,
-          {
-             name           => 'read_by_line',
-             identification => {caller => [caller(0)]},
-          }
-       ),
-       separator => "\n",
-    );
- } ## end sub read_by_line
- 
- sub read_by_paragraph {
-    return read_by_separator(
-       normalize_args(
-          @_,
-          {
-             name           => 'read_by_paragraph',
-             identification => {caller => [caller(0)]},
-          }
-       ),
-       separator => '',
-    );
- } ## end sub read_by_paragraph
- 
- sub read_by_record_reader {
-    my %args = normalize_args(
-       @_,
-       [
-          {
-             %global_defaults,
-             emit_eof       => 0,
-             name           => 'read_by_record_reader',
-             identification => {caller => [caller(0)]},
-          },
-          'record_reader'
-       ],
-    );
-    identify(\%args);
-    my $name = $args{name};
- 
-    my $record_reader = $args{record_reader};
-    LOGDIE "$name undefined record_reader" unless defined $record_reader;
-    LOGDIE "$name record_reader MUST be a sub reference"
-      unless ref($record_reader) eq 'CODE';
- 
-    my $emit_eof  = $args{emit_eof};
-    my $input     = $args{input};
-    my $has_input = defined($input) && length($input);
-    my $output    = $args{output};
-    return sub {
-       my $record = shift;
-       my $source = $has_input ? $record->{$input} : $record;
-       my $fh     = $source->{fh};
- 
-       return (
-          iterator => sub {
-             my $read = $record_reader->($fh);
-             my $retval = {%$record, $output => $read};
-             return $retval if defined $read;
-             if ($emit_eof) {
-                $emit_eof = 0;
-                return $retval;
-             }
-             return;
-          },
-       );
-    };
- } ## end sub read_by_record_reader
- 
- sub read_by_separator {
-    my %args = normalize_args(
-       @_,
-       [
-          {
-             name           => 'read_by_separator',
-             chomp          => 1,
-             identification => {caller => [caller(0)]},
-          },
-          'separator'
-       ]
-    );
-    my $separator = $args{separator};
-    my $chomp     = $args{chomp};
-    return read_by_record_reader(
-       %args,
-       record_reader => sub {
-          my $fh = shift;
-          local $INPUT_RECORD_SEPARATOR = $separator;
-          my $retval = <$fh>;
-          chomp($retval) if defined($retval) && $chomp;
-          return $retval;
-       },
-    );
- } ## end sub read_by_separator
- 
- shorter_sub_names(__PACKAGE__, 'read_');
- 
- 1;
-
-END_OF_FILE
-
-
-# __MOBUNDLE_FILE__
-
-      'Data/Tubes/Plugin/Plumbing.pm' => <<'END_OF_FILE',
- package Data::Tubes::Plugin::Plumbing;
- 
- # vim: ts=3 sts=3 sw=3 et ai :
- 
- use strict;
- use warnings;
- use English qw< -no_match_vars >;
- use Data::Dumper;
- use Scalar::Util qw< blessed >;
- our $VERSION = '0.736';
- 
- use Log::Log4perl::Tiny
-   qw< :easy :dead_if_first get_logger LOGLEVEL LEVELID_FOR >;
- use Data::Tubes::Util qw<
-   args_array_with_options
-   load_module
-   load_sub
-   pump
-   normalize_args
-   traverse
- >;
- use Data::Tubes::Plugin::Util qw< identify log_helper tubify >;
- 
- sub alternatives {
-    my ($tubes, $args) =
-      args_array_with_options(@_, {name => 'alternatives'});
-    identify($args);
-    my $name = $args->{name};
- 
-    my @tubes = tubify($args, @$tubes);
- 
-    return sub {
-       my $record = shift;
-       for my $tube (@tubes) {
-          if (my @retval = $tube->($record)) {
-             return @retval;
-          }
-       }
-       return;
-    };
- } ## end sub alternatives
- 
- sub _get_selector {
-    my $args     = shift;
-    my $selector = $args->{selector};
-    if (!defined($selector) && defined($args->{key})) {
-       my $key = $args->{key};
-       my $ref = ref $key;
-       $selector =
-         ($ref eq 'CODE')
-         ? $key
-         : sub { return traverse($_[0], $ref ? @$key : $key); };
-    } ## end if (!defined($selector...))
-    LOGDIE "$args->{name}: required dispatch key or selector"
-      if (! defined $selector) && (! $args->{missing_ok});
-    return $selector;
- } ## end sub _get_selector
- 
- sub cache {
-    my %args = normalize_args(@_, [{name => 'cache'}, 'tube']);
-    identify(\%args);
-    my $name = $args{name};
- 
-    # the cached tube
-    my ($tube) = tubify(\%args, $args{tube});
-    LOGCROAK "$name: no tube to cache" unless defined $tube;
- 
-    # the cache! We will use something compatible with CHI
-    my $cache = $args{cache} // {};
-    $cache = ['^Data::Tubes::Util::Cache', repository => $cache]
-      if ref($cache) eq 'HASH';
-    if (!blessed($cache)) {
-       my ($x, @args) = ref($cache) ? @$cache : $cache;
-       $cache = ref($x) ? $x->(@args) : load_module($x)->new(@args);
-    }
-    my @get_options = $args{get_options} ? @{$args{get_options}} : ();
-    my @set_options = $args{set_options} ? @{$args{set_options}} : ();
- 
-    # what allows me to look in the cache?
-    my $selector = _get_selector({%args, missing_ok => 1});
-    LOGCROAK "missing key or selector, but output is set"
-      if (! defined $selector) && defined($args{output});
- 
-    # cleaning trigger, if any
-    my $cleaner = $args{cleaner};
-    $cleaner = $cache->can($cleaner) if defined($cleaner) && !ref($cleaner);
- 
-    # cloning facility, if needed
-    my $merger = $args{merger};
-    $merger = load_sub($merger) if defined($merger) && !ref($merger);
- 
-    my $output = $args{output};
-    return sub {
-       my $record = shift;
-       my $key    = $selector ? $selector->($record) : $record;
-       my $data   = $cache->get($key, @get_options);
-       if (!$data) {    # MUST be an array reference at this point
-          my @oc = $tube->($record);
-          if (scalar(@oc) == 2) {
-             my $rcs = ($oc[0] eq 'records') ? $oc[1] : pump($oc[1]);
-             $rcs = [map { $_->{$output} } @$rcs] if defined($output);
-             $data = [records => $rcs];
-          }
-          elsif (scalar @oc) {
-             $data = defined($output) ? [$oc[0]{$output}] : \@oc;
-          }
-          else {
-             $data = \@oc;
-          }
- 
-          $cache->set($key, $data, @set_options);
-          $cleaner->($cache) if $cleaner;
-       } ## end if (!$data)
- 
-       return unless scalar @$data;
- 
-       if (scalar(@$data) == 1) {    # single record
-          return $merger->($record, $output, $data->[0]) if $merger;
-          return $data->[0] unless $output;
-          $record->{$output} = $data->[0];
-          return $record;
-       } ## end if (scalar(@$data) == ...)
- 
-       # array of records here
-       my $aref = $data->[1];
-       my $records =
-         $merger
-         ? [map { $merger->($record, $output, $_) } @$aref]
-         : $output ? [
-          map {
-             { %$record, $output => $_ }
-          } @$aref
-         ]
-         : $aref;
-       return (records => $records);
-    };
- } ## end sub cache
- 
- sub dispatch {
-    my %args = normalize_args(@_,
-       {default => undef, name => 'dispatch', loglevel => $INFO});
-    identify(\%args);
-    my $name = $args{name};
- 
-    my $selector = _get_selector(\%args);
- 
-    my $handler_for = {%{$args{handlers} || {}}};    # our cache
-    my $factory = $args{factory};
-    if (!defined($factory)) {
-       $factory = sub {
-          my ($key, $record) = @_;
-          die {
-             message => "$name: unhandled selection key '$key'",
-             record  => $record,
-          };
-       };
-    } ## end if (!defined($factory))
-    LOGDIE "$name: required factory or handlers"
-      unless defined $factory;
- 
-    my $default = $args{default};
-    return sub {
-       my $record = shift;
- 
-       # get a key into the cache
-       my $key = $selector->($record) // $default;
-       die {
-          message => "$name: selector key is undefined",
-          record  => $record,
-         }
-         unless defined $key;
- 
-       # register a new handler... or die!
-       ($handler_for->{$key}) = tubify(\%args, $factory->($key, $record))
-         unless exists $handler_for->{$key};
- 
-       return $handler_for->{$key}->($record);
-    };
- } ## end sub dispatch
- 
- sub fallback {
- 
-    # we lose syntax sugar but allow for Try::Tiny to remain optional
-    eval { require Try::Tiny; }
-      or LOGCONFESS 'Data::Tubes::Plugin::Plumbing::fallback '
-      . 'needs Try::Tiny, please install';
- 
-    my ($tubes, $args) = args_array_with_options(@_, {name => 'fallback'});
-    identify($args);
-    my $name = $args->{name};
- 
-    my @tubes = tubify($args, @$tubes);
-    my $catch = $args->{catch};
-    return sub {
-       my $record = shift;
-       for my $tube (@tubes) {
-          my (@retval, $do_fallback);
-          Try::Tiny::try(
-             sub {
-                @retval = $tube->($record);
-             },
-             Try::Tiny::catch(
-                sub {
-                   $catch->($_, $record) if $catch;
-                   $do_fallback = 1;
-                }
-             )
-          );
-          return @retval unless $do_fallback;
-       } ## end for my $tube (@tubes)
-       return;
-    };
- } ## end sub fallback
- 
- sub logger {
-    my %args = normalize_args(@_, {name => 'log pipe', loglevel => $INFO});
-    identify(\%args);
-    my $loglevel = LEVELID_FOR($args{loglevel});
-    my $mangler  = $args{target};
-    if (!defined $mangler) {
-       $mangler = sub { return shift; }
-    }
-    elsif (ref($mangler) ne 'CODE') {
-       my @keys = ref($mangler) ? @$mangler : ($mangler);
-       $mangler = sub {
-          my $record = shift;
-          return traverse($record, @keys);
-       };
-    } ## end elsif (ref($mangler) ne 'CODE')
-    my $logger = get_logger();
-    return sub {
-       my $record = shift;
-       $logger->log($loglevel, $mangler->($record));
-       return $record;
-    };
- } ## end sub logger
- 
- sub pipeline {
-    my ($tubes, $args) = args_array_with_options(@_, {name => 'pipeline'});
-    return sequence(%$args, tubes => $tubes);
- }
- 
- sub sequence {
-    my %args =
-      normalize_args(@_, [{name => 'sequence', tubes => []}, 'tubes']);
-    identify(\%args);
- 
-    # cope with an empty list of tubes - equivalent to an "id" function but
-    # always returning an iterator for consistency
-    my $tubes = $args{tubes} || [];
-    return sub {
-       my @record = shift;
-       return (
-          iterator => sub {
-             return unless @record;
-             return shift @record;
-          }
-       );
-      }
-      unless @$tubes;
- 
-    # auto-generate tubes if you get definitions
-    my @tubes = tubify(\%args, @$tubes);
- 
-    my $gate = $args{gate} // undef;
- 
-    my $logger = log_helper(\%args);
-    my $name   = $args{name};
-    return sub {
-       my $record = shift;
-       $logger->($record, \%args) if $logger;
- 
-       my @stack = ({record => $record});
-       my $iterator = sub {
-        STEP:
-          while (@stack) {
-             my $pos = $#stack;
- 
-             my $f = $stack[$pos];
-             my @record =
-                 exists($f->{record})   ? delete $f->{record}
-               : exists($f->{iterator}) ? $f->{iterator}->()
-               : @{$f->{records} || []} ? shift @{$f->{records}}
-               :                          ();
-             if (!@record) {    # no more at this level...
-                my $n = @stack;
-                TRACE "$name: level $n backtracking, no more records";
-                pop @stack;
-                next STEP;
-             } ## end if (!@record)
- 
-             my $record = $record[0];
-             return $record if @stack > @tubes;    # output cache
- 
-             # cut the sequence early if the gate function says so
-             return $record if $gate && ! $gate->($record);
- 
-             # something must be done...
-             my @outcome = $tubes[$pos]->($record)
-               or next STEP;
- 
-             unshift @outcome, 'record' if @outcome == 1;
-             push @stack, {@outcome};              # and go to next level
-          } ## end STEP: while (@stack)
- 
-          return;    # end of output, empty list
-       };
-       return (iterator => $iterator);
-    };
- } ## end sub sequence
- 
- 1;
-
-END_OF_FILE
-
-
-# __MOBUNDLE_FILE__
-
-      'Data/Tubes/Plugin/Validator.pm' => <<'END_OF_FILE',
- package Data::Tubes::Plugin::Validator;
- use strict;
- use warnings;
- use English qw< -no_match_vars >;
- our $VERSION = '0.736';
- 
- use Log::Log4perl::Tiny qw< :easy :dead_if_first >;
- 
- use Data::Tubes::Util
-   qw< args_array_with_options normalize_args shorter_sub_names >;
- use Data::Tubes::Plugin::Util qw< identify >;
- my %global_defaults = (input => 'structured',);
- 
- sub validate_admit {
-    my ($validators, $args) = args_array_with_options(
-       @_,
-       {
-          input => 'raw',
-          name  => 'validate with acceptance regexp',
-       }
-    );
-    identify($args);
-    my $name   = $args->{name};
-    my $input  = $args->{input};
-    my $refuse = $args->{refuse};
-    return sub {
-       my $record = shift;
-       my $target = defined($input) ? $record->{$input} : $record;
-       for my $validator (@$validators) {
-          my $outcome =
-            (ref($validator) eq 'CODE')
-            ? $validator->($target)
-            : ($target =~ m{$validator});
-          return unless ($outcome xor $refuse);
-       } ## end for my $validator (@$validators)
-       return $record;
-    };
- } ## end sub validate_admit
- 
- sub validate_refuse {
-    my ($validators, $args) = args_array_with_options(
-       @_,
-       {
-          input => 'raw',
-          name  => 'validate with rejection regexp',
-       }
-    );
-    $args->{refuse} = 1;
-    return validate_admit(@$validators, $args);
- } ## end sub validate_refuse
- 
- sub validate_refuse_comment {
-    my $args = normalize_args(@_, {name => 'validate reject comment line'});
-    identify($args);
-    return validate_refuse(qr{(?mxs:\A \s* \#)}, $args);
- }
- 
- sub validate_refuse_comment_or_empty {
-    my $args = normalize_args(@_,
-       {name => 'validate reject comment or non-spaces-only line'});
-    identify($args);
-    return validate_refuse(qr{(?mxs:\A \s* (?: \# | \z ))}, $args);
- } ## end sub validate_refuse_comment_or_empty
- 
- sub validate_refuse_empty {
-    my $args = normalize_args(@_,
-       {name => 'validate reject empty (non-spaces only) string'});
-    identify($args);
-    return validate_refuse(qr{(?mxs:\A \s* \z)}, $args);
- } ## end sub validate_refuse_empty
- 
- 
- sub validate_thoroughly {
-    my ($validators, $args) = args_array_with_options(
-       @_,
-       {
-          %global_defaults,
-          name           => 'validate with subs',
-          output         => 'validation',
-          keep_positives => 0,
-          keep_empty     => 0,
-          wrapper        => undef,
-       }
-    );
-    identify($args);
-    my $name = $args->{name};
- 
-    my $wrapper = $args->{wrapper};
-    if ($wrapper && $wrapper eq 'try') {
-       eval { require Try::Tiny; }
-         or LOGCONFESS 'Validator::validate_with_subs '
-         . 'needs Try::Tiny, please install';
- 
-       $wrapper = sub {
-          my ($validator, @params) = @_;
-          return Try::Tiny::try(
-             sub { $validator->(@params); },
-             Try::Tiny::catch(sub { return (0, $_); }),
-          );
-       };
-    } ## end if ($wrapper && $wrapper...)
- 
-    my $input          = $args->{input};
-    my $output         = $args->{output};
-    my $keep_positives = $args->{keep_positives};
-    my $keep_empty     = $args->{keep_empty};
-    return sub {
-       my $record = shift;
-       my $target = defined($input) ? $record->{$input} : $record;
-       my @outcomes;
-       for my $i (0 .. $#$validators) {
-          my ($name, $validator, @params) =
-            (ref($validators->[$i]) eq 'ARRAY')
-            ? @{$validators->[$i]}
-            : ("validator-$i", $validators->[$i]);
-          my @outcome =
-              $wrapper
-            ? $wrapper->($validator, $target, $record, $args, @params)
-            : (ref($validator) eq 'CODE')
-            ? $validator->($target, $record, $args, @params)
-            : (
-                $target =~ m{$validator}
-                ? (1)
-                : (0, regex => "$validator")
-             );
-          push @outcome, 0 unless @outcome;
-          push @outcomes, [$name, @outcome]
-            if !$outcome[0] || $keep_positives;
-       } ## end for my $i (0 .. $#$validators)
-       $record->{$output} = undef;
-       $record->{$output} = \@outcomes if @outcomes || $keep_empty;
-       return $record;
-    };
- } ## end sub validate_with_subs
- 
- *validate_with_subs = \&validate_thoroughly;
- 
- shorter_sub_names(__PACKAGE__, 'validate_');
- 
- 1;
-
-END_OF_FILE
-
-
-# __MOBUNDLE_FILE__
-
-      'Data/Tubes/Plugin/Util.pm' => <<'END_OF_FILE',
- package Data::Tubes::Plugin::Util;
- 
- # vim: ts=3 sts=3 sw=3 et ai :
- 
- use strict;
- use warnings;
- use English qw< -no_match_vars >;
- use Data::Dumper;
- our $VERSION = '0.736';
- 
- use Template::Perlish;
- use Log::Log4perl::Tiny qw< :easy :dead_if_first get_logger >;
- use Data::Tubes::Util qw< normalize_args read_file tube >;
- 
- use Exporter qw< import >;
- our @EXPORT_OK = qw< identify log_helper read_file tubify >;
- 
- sub identify {
-    my ($args, $opts) = @_;
-    $args //= {};
-    $opts //= $args->{identification} // {};
- 
-    my $name = $args->{name};
-    $name = '*unknown*' unless defined $name;
- 
-    my @caller_fields = qw<
-      package
-      filename
-      line
-      subroutine
-      hasargs
-      wantarray
-      evaltext
-      is_require
-      hints
-      bitmask
-      hintsh
-    >;
-    my %caller;
- 
-    if (exists $opts->{caller}) {
-       @caller{@caller_fields} = @{$opts->{caller}};
-    }
-    else {
-       my $level = $opts->{level};
-       $level = 1 unless defined $level;
-       @caller{@caller_fields} = caller($level);
-    }
- 
-    my $message = $opts->{message};
-    $message = 'building [% name %] as [% subroutine %]'
-      unless defined $message;
- 
-    my $tp = Template::Perlish->new(%{$opts->{tp_opts} || {}});
-    $message = $tp->process(
-       $message,
-       {
-          %caller,
-          name => $name,
-          args => $args,
-          opts => $opts,
-       }
-    );
- 
-    my $loglevel = $opts->{loglevel};
-    $loglevel = $DEBUG unless defined $loglevel;
-    get_logger->log($loglevel, $message);
- 
-    return;
- } ## end sub identify
- 
- sub log_helper {
-    my ($args, $opts) = @_;
-    $opts //= $args->{logger};
-    return unless $opts;
-    return $opts if ref($opts) eq 'CODE';
- 
-    # generate one
-    my $name = $args->{name};
-    $name = '*unknown*' unless defined $name;
- 
-    my $message = $opts->{message};
-    $message = '==> [% args.name %]' unless defined $message;
- 
-    my $tp = Template::Perlish->new(%{$opts->{tp_opts} || {}});
-    $message = $tp->compile($message);
- 
-    my $logger   = get_logger();
-    my $loglevel = $opts->{loglevel};
-    $loglevel = $DEBUG unless defined $loglevel;
- 
-    return sub {
-       my $level = $logger->level();
-       return if $level < $loglevel;
-       my $record = shift;
-       my $rendered =
-         $tp->evaluate($message,
-          {record => $record, args => $args, opts => $opts});
-       $logger->log($loglevel, $rendered);
-    };
- } ## end sub log_helper
- 
- sub tubify {
-    my $opts = {};
-    $opts = shift(@_) if (@_ && ref($_[0]) eq 'HASH');
-    map {
-       my $ref = ref $_;
-       ($ref eq 'CODE')
-         ? $_
-         : tube($opts, ($ref eq 'ARRAY') ? @$_ : $_)
-    } grep { $_ } @_;
- } ## end sub tubify
- 
- 1;
-
-END_OF_FILE
-
-
-# __MOBUNDLE_FILE__
-
-      'Data/Tubes/Plugin/Writer.pm' => <<'END_OF_FILE',
- package Data::Tubes::Plugin::Writer;
- 
- # vim: ts=3 sts=3 sw=3 et ai :
- 
- use strict;
- use warnings;
- use English qw< -no_match_vars >;
- use POSIX qw< strftime >;
- our $VERSION = '0.736';
- 
- use Log::Log4perl::Tiny qw< :easy :dead_if_first LOGLEVEL >;
- use Template::Perlish;
- 
- use Data::Tubes::Util
-   qw< normalize_args read_file_maybe shorter_sub_names sprintffy >;
- use Data::Tubes::Plugin::Util qw< identify log_helper >;
- use Data::Tubes::Plugin::Plumbing;
- my %global_defaults = (input => 'rendered',);
- 
- sub _filenames_generator {
-    my $template = shift;
- 
-    my $n             = 0; # counter, used in closures inside $substitutions
-    my $substitutions = [
-       [qr{(\d*)n} => sub { return sprintf "%${1}d",    $n; }],
-       [qr{Y}      => sub { return strftime('%Y',       localtime()); }],
-       [qr{m}      => sub { return strftime('%m',       localtime()); }],
-       [qr{d}      => sub { return strftime('%d',       localtime()); }],
-       [qr{H}      => sub { return strftime('%H',       localtime()); }],
-       [qr{M}      => sub { return strftime('%M',       localtime()); }],
-       [qr{S}      => sub { return strftime('%S',       localtime()); }],
-       [qr{z}      => sub { return strftime('%z',       localtime()); }],
-       [qr{D}      => sub { return strftime('%Y%m%d',   localtime()); }],
-       [qr{T}      => sub { return strftime('%H%M%S%z', localtime()); }],
-       [qr{t} => sub { return strftime('%Y%m%dT%H%M%S%z', localtime()); }],
-    ];
- 
-    # see if the template depends on the counter
-    my $expanded = sprintffy($template, $substitutions);
-    return sub {
-       my $retval = sprintffy($template, $substitutions);
-       ++$n;
-       return $retval;
-      }
-      if ($expanded ne $template);    # it does!
- 
-    # then, by default, revert to poor's man expansion of name...
-    return sub {
-       my $retval = $n ? "${template}_$n" : $template;
-       ++$n;
-       return $retval;
-    };
- } ## end sub _filenames_generator
- 
- sub dispatch_to_files {
-    my %args = normalize_args(
-       @_,
-       [
-          {
-             %global_defaults,
-             name    => 'write dispatcher',
-             binmode => ':encoding(UTF-8)'
-          },
-          'filename'
-       ],
-    );
-    identify(\%args);
-    my $name = delete $args{name};    # so that it can be overridden
- 
-    if (defined(my $filename = delete $args{filename})) {
-       my $ref = ref $filename;
-       if (!$ref) {
-          $args{filename_template} //= $filename;
-       }
-       elsif ($ref eq 'CODE') {
-          $args{filename_factory} //= $filename;
-       }
-       else {
-          LOGDIE "argument filename has invalid type $ref";
-       }
-    } ## end if (defined(my $filename...))
- 
-    my $factory = delete $args{filename_factory};
-    if (!defined($factory) && defined($args{filename_template})) {
-       my $tp = Template::Perlish->new(%{$args{tp_opts} || {}});
-       my $template = $tp->compile($args{filename_template});
-       $factory = sub {
-          my ($key, $record) = @_;
-          return $tp->evaluate($template, {key => $key, record => $record});
-       };
-    } ## end if (!defined($factory)...)
- 
-    $args{factory} //= sub {
-       my $filename = $factory->(@_);
-       return write_to_files(%args, filename => $filename);
-    };
- 
-    return Data::Tubes::Plugin::Plumbing::dispatch(%args);
- } ## end sub dispatch_to_files
- 
- sub write_to_files {
-    my %args = normalize_args(
-       @_,
-       [
-          {
-             %global_defaults,
-             name     => 'write to file',
-             binmode  => ':encoding(UTF-8)',
-             filename => \*STDOUT,
-          },
-          'filename'
-       ],
-    );
-    identify(\%args);
-    my $name = $args{name};
-    LOGDIE "$name: need a filename" unless defined $args{filename};
-    LOGDIE "$name: need an input"   unless defined $args{input};
- 
-    my $output = $args{filename};
-    $output = _filenames_generator($output) unless ref($output);
- 
-    my %oha =
-      map { ($_ => $args{$_}) }
-      grep { defined $args{$_} } qw< binmode policy >;
-    for my $marker (qw< footer header interlude >) {
-       $oha{$marker} = read_file_maybe($args{$marker})
-         if defined $args{$marker};
-    }
-    require Data::Tubes::Util::Output;
-    my $output_handler =
-      Data::Tubes::Util::Output->new(%oha, output => $output,);
- 
-    my $input = $args{input};
-    return sub {
-       my $record = shift;
-       $output_handler->print($record->{$input});
-       return $record;    # relaunch for further processing
-    };
- } ## end sub write_to_files
- 
- shorter_sub_names(__PACKAGE__, 'write_');
- 
- 1;
-
-END_OF_FILE
-
-
-# __MOBUNDLE_FILE__
-
-      'Data/Tubes/Util/Cache.pm' => <<'END_OF_FILE',
- package Data::Tubes::Util::Cache;
- use strict;
- use warnings;
- use English qw< -no_match_vars >;
- use 5.010;
- our $VERSION = '0.736';
- use File::Path qw< mkpath >;
- 
- use File::Spec::Functions qw< splitpath catpath >;
- use Storable qw< nstore retrieve >;
- use Log::Log4perl::Tiny qw< :easy :dead_if_first >;
- use Mo qw< default >;
- has repository => (default => sub { return {} });
- has __filenames => (default => sub { return undef });
- has max_items => (default => 0);
- 
- sub _path {
-    my ($dir, $filename) = @_;
-    my ($v, $d) = splitpath($dir, 'no-file');
-    return catpath($v, $d, $filename);
- }
- 
- sub get {
-    my ($self, $key) = @_;
-    my $repo = $self->repository();
-    if (ref($repo) eq 'HASH') {
-       return unless exists $repo->{$key};
-       return $repo->{$key};
-    }
-    my $path = _path($repo, $key);
-    return retrieve($path) if -r $path;
-    return;
- } ## end sub get
- 
- sub _filenames {
-    my $self = shift;
-    if (my $retval = $self->__filenames()) {
-       return $retval;
-    }
-    my $repo = $self->repository();
-    my ($v, $d) = splitpath($repo, 'no-file');
-    opendir my $dh, $repo or return;
-    my @filenames = map { catpath($v, $d, $_) } readdir $dh;
-    closedir $dh;
-    $self->__filenames(\@filenames);
-    return \@filenames;
- }
- 
- sub purge {
-    my $self = shift;
-    my $max  = $self->max_items() or return;
-    my $repo = $self->repository();
- 
-    if (ref($repo) eq 'HASH') {
-       my $n = scalar keys %$repo;
-       delete $repo->{(keys %$repo)[0]} while $n-- > $max;
-       return;
-    }
- 
-    my $filenames = $self->_filenames() or return;
-    while (@$filenames > $max) {
-       my $filename = shift @$filenames;
-       unlink $filename;
-    }
-    return;
- } ## end sub purge
- 
- sub set {
-    my ($self, $key, $data) = @_;
-    my $repo = $self->repository();
-    return $repo->{$key} = $data if ref($repo) eq 'HASH';
-    eval {
-       mkpath($repo) unless -d $repo;
-       nstore($data, _path($repo, $key));
-       1;
-    } or LOGWARN $EVAL_ERROR;
-    return $data;
- }
-
-END_OF_FILE
-
-
-# __MOBUNDLE_FILE__
-
-      'Data/Tubes/Util/Output.pm' => <<'END_OF_FILE',
- package Data::Tubes::Util::Output;
- use strict;
- use warnings;
- use English qw< -no_match_vars >;
- use 5.010;
- use File::Path qw< make_path >;
- use File::Basename qw< dirname >;
- our $VERSION = '0.736';
- 
- use Log::Log4perl::Tiny qw< :easy :dead_if_first >;
- use Mo qw< default >;
- has binmode => (default => ':raw');
- has footer  => ();
- has header  => ();
- has interlude => ();
- has output    => (default => \*STDOUT);
- has policy    => (default => undef);
- has track     => (
-    default => sub {
-       return {
-          files       => 0,
-          records     => 0,
-          chars_file  => 0,
-          chars_total => 0,
-       };
-    }
- );
- 
- sub open {
-    my ($self, $hint) = @_;
- 
-    # reset some tracking parameters
-    my $track = $self->track();
-    $track->{files}++;
-    $track->{records}    = 0;
-    $track->{chars_file} = 0;
- 
-    # get new filehandle
-    my ($fh, $fh_releaser) =
-      @{$track}{qw< current_fh current_fh_releaser>} = $self->get_fh($hint);
- 
-    # do header handling
-    $self->_print($fh, $self->header(), $track);
- 
-    return $fh;
- } ## end sub open
- 
- sub __open_file {
-    my ($filename, $binmode) = @_;
- 
-    # ensure its directory exists
-    make_path(dirname($filename), {error => \my $errors});
-    if (@$errors) {
-       my ($error) = values %{$errors->[0]};
-       LOGCONFESS "make_path() for '$filename': $error";
-    }
- 
-    # can open the file, at last
-    CORE::open my $fh, '>', $filename
-      or LOGCONFESS "open('$filename'): $OS_ERROR";
-    binmode $fh, $binmode;
- 
-    return $fh;
- } ## end sub __open_file
- 
- sub get_fh {
-    my ($self, $handle) = @_;
-    $handle //= $self->output();
- 
-    # define a default releaser, but not for GLOBs as they have their own
-    # life outside of here
-    my $releaser = ref($handle) eq 'GLOB' ? undef : sub {
-       CORE::close $_[0] or LOGCONFESS "close(): $OS_ERROR";
-       return undef;
-    };
- 
-    # if $handle is a factory, treat it as such
-    if (ref($handle) eq 'CODE') {
-       my @items = $handle->($self);
-       $handle = shift @items;
- 
-       # override the $releaser if and only if the factory instructed to
-       # do so. Otherwise, the default one will be kept.
-       $releaser = shift @items if @items;
-    } ## end if (ref($handle) eq 'CODE')
- 
-    # now, we either have a filehandle, or a filename
-    return ($handle, $releaser) if ref($handle) eq 'GLOB';
-    return (__open_file($handle, $self->binmode()), $releaser);
- } ## end sub get_fh
- 
- sub release_fh {
-    my ($self, $fh) = @_;
-    my $track = $self->track();
-    if (my $releaser = delete $track->{current_fh_releaser}) {
-       $releaser->($fh);
-    }
-    delete $track->{current_fh};
-    return undef;
- } ## end sub release_fh
- 
- sub close {
-    my ($self, $fh, $track) = @_;
- 
-    # do footer handling
-    $self->_print($fh, $self->footer(), $track);
- 
-    # call close, prepare $fh for other possible records
-    return $self->release_fh($fh);
- } ## end sub close
- 
- sub just_close {
-    my $self  = shift;
-    my $track = $self->track();
-    my $fh    = $track->{current_fh} or return;
-    $self->close($fh, $track);
-    return;
- } ## end sub just_close
- 
- sub print {
-    my $self = shift;
- 
-    my $iterator  = ref($_[0]) && $_[0];
-    my $checker   = $self->checker();
-    my $track     = $self->track();
-    my $fh        = $track->{current_fh};
-    my $interlude = $self->interlude();
- 
-    while ('necessary') {
-       my $record = $iterator ? $iterator->() : shift(@_);
-       last unless defined $record;
- 
-       # get filehandle if needed
-       $fh ||= $self->open();
- 
-       # print interlude if we have previous records, increase count
-       $self->_print($fh, $interlude, $track)
-         if $track->{records};
- 
-       # print record
-       $self->_print($fh, $record, $track);
- 
-       # increment number of records, for next print
-       $track->{records}++;
- 
-       # do checks if activated
-       $fh = $self->close($fh, $track)
-         if $checker && (!$checker->($self));
-    } ## end while ('necessary')
- 
-    return;
- } ## end sub print
- 
- sub _print {
-    my ($self, $fh, $data, $track) = @_;
-    return unless defined $data;
-    $data = $data->($self) if ref $data;
- 
-    # do print data
-    ref($fh) or LOGCONFESS("$fh is not a reference");
-    print {$fh} $data or LOGCONFESS "print(): $OS_ERROR";
- 
-    # update trackers
-    my $new_chars = length($data);
-    $track->{chars_file}  += $new_chars;
-    $track->{chars_total} += $new_chars;
- 
-    return $new_chars;
- } ## end sub _print
- 
- sub default_check {
-    my $self = shift;
- 
-    my $policy = $self->policy()
-      or return 1;    # no policy, always fine
-    my $track = $self->track();
-    if (my $mr = $policy->{records_threshold}) {
-       return 0 if $track->{records} >= $mr;
-    }
-    if (my $cpf = $policy->{characters_threshold}) {
-       return 0 if $track->{chars_file} >= $cpf;
-    }
-    return 1;
- } ## end sub default_check
- 
- sub checker {
-    my $self = shift;
- 
-    # allow for overriding tout-court
-    if (my $method = $self->can('check')) {
-       return $method;    # will eventually be called in the right way
-    }
- 
-    # if no policy is set, there's no reason to do checks
-    my $policy = $self->policy() or return;
- 
-    # at this point, let's use the default_check, whatever it is
-    return $self->can('default_check');
- } ## end sub checker
- 
- sub DESTROY { shift->just_close() }
- 
- sub writer {
-    my $package = shift;
-    my $self    = $package->new(@_);
-    return sub { return $self->print(@_) };
- }
- 
- 1;
-
-END_OF_FILE
-
-
 
 # __MOBUNDLE_FILE__
    );
@@ -4767,7 +4925,7 @@ sub template {
     # start putting your options here
     'foo|f=s',
     ['bar|b=s', default  => 'default value for bar'],
-    ['baz|B=i', required => 1],
+    ['baz|B=i', required => 0, environment => 'MYAPP_BAZ'],
  );
  
  # Remove following line if you remove 'loglevel' in options above
@@ -4861,6 +5019,10 @@ sub template {
           my ($name) = split /\|/, $spec, 2;
           if (exists $opts{default}) {
              $config{$name} = $opts{default};
+          }
+          if (exists $opts{environment}) {
+             $config{$name} = $ENV{$opts{environment}}
+                if defined $ENV{$opts{environment}};
           }
           if (exists $opts{fallback}) {
              $fallback_for{$name} = $opts{fallback};

@@ -196,6 +196,41 @@ just restart them one-by-one, waiting inbetween for the interclacks sync to fini
 You can use the example rawclient.pl. Connect to the server you keep running and start the MONITOR command. While interclacks sync is in progress, you will see KEYSYNC commands
 flying between the servers. If you stop seeing them for a few seconds, KEYSYNC is finished.
 
+=head2 VERSION 19
+
+Version 19 allows for more flexible config file handling. You can define the environment variable PC_CONFIG_PATHS to define the search paths for the config file and the use a the config file name without path. This is
+very handy for deploying the same start scripts and config files to multiple systems with different environments and installation paths.
+
+for example:
+
+  export PC_CONFIG_PATHS=/home/username/src/chatserver/configs:/usr/share/chatserver/configs
+  perl chatserver.pl minecraftchat.xml
+
+This would search the config file minecraftchat.xml in /home/username/src/chatserver/configs first, and fall back to /usr/share/chatserver/configs.
+
+Version 19 also allows you to define other environment variables starting with PC_.* and those will replace the corresponding text strings in the config file (only in memory, not on disk).
+
+Say you want to change the TCP port where the server is listening when you are debugging. If you define the port in the config like this:
+
+  <port>PC_CLACKSPORT</port>
+
+then you can say
+  export PC_CLACKSPORT=18889
+  perl chatserver.pl minecraftchat.xml
+
+or even
+
+  PC_CLACKSPORT=18889 perl chatserver.pl minecraftchat.xml
+
+This change is largely backwards compatible. If you don't change anything on your system, the only change in behaviour will be a few additional messages on STDOUT during startup.
+
+
+=head2 VERSION 20
+
+Bugfix release: Fix package name in Net/Clacks.pm
+
+Net::Clacks is dummy class for documentation purposes, so there should be no functional changes (except to fix "cpan install Net::Clacks" and some issues with MetaCPAN)
+
 
 =head1 AUTHOR
 
@@ -208,7 +243,7 @@ L<https://cavac.at/public/mercurial/Net-Clacks/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2020 Rene Schickbauer
+Copyright (C) 2008-2022 Rene Schickbauer
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

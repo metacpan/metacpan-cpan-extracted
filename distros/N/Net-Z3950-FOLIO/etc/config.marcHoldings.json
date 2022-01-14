@@ -16,7 +16,14 @@
       "v": "_volume",
       "e": "_enumeration",
       "y": "_yearCaption",
-      "c": "_chronology"
+      "c": "_chronology",
+      "1": "_accessionNumber",
+      "2": "_copyNumber",
+      "3": "_descriptionOfPieces",
+      "4": "_discoverySuppress",
+      "5": "_hrid",
+      "6": "_id",
+      "7": "_itemIdentifier"
     }
   }
 }

@@ -1,0 +1,15 @@
+---
+abstract: 'A test corpus'
+author:
+  - 'Sven Kirmess <sven.kirmess@kzone.ch>'
+build_requires: {}
+dynamic_config: 0
+generated_by: 'CPAN::Meta version 2.150010, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Local-Corpus
+requires:
+  Local::Alpha: '1.12'
+version: '0.000001'

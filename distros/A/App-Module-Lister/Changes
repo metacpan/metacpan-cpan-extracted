@@ -1,5 +1,8 @@
 Revision history for Perl module App::Module::Lister
 
+0.155 2022-01-08T03:37:58Z
+	* No code changes - fix link in README.pod
+
 0.154 2021-01-14T08:21:40Z
 	* Freshen distro, remove Travis CI, add Github actions
 

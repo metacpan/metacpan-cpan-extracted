@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 BEGIN {
-   our $VERSION = '0.11';
+   our $VERSION = '0.12';
 }
 
 use constant HAVE_XS => defined eval {

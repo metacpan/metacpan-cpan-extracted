@@ -1,3 +1,10 @@
+0.008   2021-08-14  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention App::GitUtils.
+
+
 0.007   2021-05-10  Released-By: PERLANCAR; Urgency: medium
 
 	- Add option: --github-cmd-config-profile to pass to github-cmd

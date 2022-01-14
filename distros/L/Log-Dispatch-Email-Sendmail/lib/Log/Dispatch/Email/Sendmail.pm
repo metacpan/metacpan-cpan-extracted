@@ -11,11 +11,11 @@ Log::Dispatch::Email::Sendmail - Subclass of Log::Dispatch::Email that sends e-m
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -53,25 +53,33 @@ sub send_email {
 	my $self = shift;
 	my %p = @_;
 
-	my $to = join(' ', @{$self->{to}});
-
-	unless($to) {
-		warn 'To whom should I be sending this e-mail?';
+	unless(defined($self->{to})) {
+		# Don't warn - it could send a message back through
+		# here
+		# warn 'To whom should I be sending this e-mail?';
 		return;
 	}
 
-	my $subject = $self->{subject};
-	my $message = $p{message};
+	my $to = join(',', @{$self->{to}});
 
-	if(open(my $mail, '|-', '/usr/sbin/sendmail -t')) {
+	# This workaround is for Dreamhost which misconfigures their e-mail clients
+	#	producing "sendmail: warning: inet_protocols: disabling IPv6 name/address support: Address family not supported by protocol"
+	#	which breaks CGI script, and they have removed root access to you can't fix it
+	my $mail;
+	{
+		local *STDERR;
+		open STDERR, '>', '/dev/null';
+		open($mail, '|-', '/usr/sbin/sendmail -t');
+	}
+
+	if($mail) {
 		print $mail "To: $to\n";
 		if($self->{from}) {
 			my $from = $self->{from};
 			print $mail "From: $from\n";
 		}
-		print $mail "Subject: $subject\n\n";
-
-		print $mail $message;
+		my $subject = $self->{subject};
+		print $mail "Subject: $subject\n\n", $p{message};
 
 		close $mail;
 	} else {
@@ -125,7 +133,7 @@ Kudos to Dave Rolksy for the entire Log::Dispatch framework.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013 Nigel Horne.
+Copyright 2013-2022 Nigel Horne.
 
 This program is released under the following licence: GPL
 

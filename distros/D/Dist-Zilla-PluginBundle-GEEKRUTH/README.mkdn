@@ -1,0 +1,150 @@
+# NAME
+
+Dist::Zilla::PluginBundle::GEEKRUTH - Be like GeekRuthie when you build your dists
+
+# VERSION
+
+version 1.0001
+
+# DESCRIPTION
+
+This is the plugin bundle that Ruthie uses to release
+her distributions. It's roughly equivalent to
+
+    [Git::Contributors]
+    [ContributorsFile]
+    [Test::Compile]
+    [CoalescePod]
+    [MakeMaker]
+    [InstallGuide]
+    [Covenant]
+    [ContributorCovenant]
+    [GitLab::Update]
+    [GitLab::Meta]
+       p3rl = 1
+       metacpan = 0
+
+    [MetaYAML]
+    [MetaJSON]
+    [PodWeaver]
+    [License]
+    [NextRelease]
+    time_zone = America/New_York
+    
+    [MetaProvides::Package]
+    [Manifest]
+    [ManifestSkip]
+    [Git::GatherDir]
+    [CopyFilesFromBuild]
+    [ExecDir]
+    [PkgVersion]
+    use_package = 1
+    
+    [Authority]
+    do_munging = 0
+    
+    [Test::ReportPrereqs]
+    [TidyAll]
+    [AutoPrereqs]
+    [CheckChangesHasContent]
+    [ReadmeMarkdownFromPod]
+    [TestRelease]
+    [ConfirmRelease]
+    [Git::Check]
+    [CopyrightYearFromGit]
+    
+    [PreviousVersion::Changelog]
+    [NextVersion::Semantic]
+    major = MAJOR, API CHANGE
+    minor = MINOR, ENHANCEMENTS
+    revision = REVISION, BUG FIXES
+    format = %d.%02d%02d
+    
+    [ChangeStats::Git]
+    group=STATISTICS
+    develop_branch=main
+    
+    [Git::CommitBuild]
+    release_branch = releases
+    multiple_inheritance = 1
+    
+    [Git::Tag]
+    tag_format = v%v
+    branch     = releases
+    
+    [Git::Commit]
+    [UploadToCPAN]
+    [Git::Push]
+    push_to = origin main releases
+    
+    [InstallRelease]
+    install_command = cpanm .
+    
+    [SchwartzRatio]
+    [RunExtraTests]
+    [Test::UnusedVars]
+    [CPANFile]
+    [MinimumPerlFast]
+
+# ARGUMENTS
+
+- `autoprereqs_skip`
+
+    Passed as `skip` to AutoPrereqs.
+
+- `authority`
+
+    Passed to [Dist::Zilla::Plugin::Authority](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3AAuthority).
+
+    Defaults to `cpan:GEEKRUTH`.
+
+- `fake_release`
+
+    If given a true value, uses [Dist::Zilla::Plugin::FakeRelease](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3AFakeRelease)
+    instead of
+    [Dist::Zilla::Plugin::Git::Push](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3AGit%3A%3APush),
+    [Dist::Zilla::Plugin::UploadToCPAN](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3AUploadToCPAN), and
+    [Dist::Zilla::Plugin::InstallRelease](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3AInstallRelease)
+
+    Can also be triggered via the _FAKE_ environment variable.
+
+- `builder`
+
+    `ModuleBuild` or `MakeMaker`. Defaults to `MakeMaker`.
+
+- `mb_class`
+
+    Passed to `ModuleBuild` plugin.
+
+- `dev_branch`
+
+    Master development branch.
+
+    Defaults to `main`.
+
+- `release_branch`
+
+    Branch on which the CPAN images are commited.
+
+    Defaults to `releases`.
+
+- `upstream`
+
+    The name of the upstream repo. 
+
+    Defaults to `origin`.
+
+# ACKNOWLEDGEMENT
+
+There is much shameless plagarism here from the work of Yanick Champoux. He never seems to complain.
+
+# AUTHOR
+
+D Ruth Holloway <ruth@hiruthie.me>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022 by D Ruth Holloway.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

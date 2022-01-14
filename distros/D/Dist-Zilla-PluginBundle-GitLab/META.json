@@ -1,0 +1,120 @@
+{
+   "abstract" : "Access GitLab functionality to maintain distros from Dist::Zilla",
+   "author" : [
+      "D Ruth Holloway <ruth@hiruthie.me>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-PluginBundle-GitLab",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Code::TidyAll" : "0",
+            "Test::More" : "0.96",
+            "Test::Perl::Critic" : "0",
+            "Test::Vars" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Load" : "0",
+            "Cwd" : "0",
+            "Data::Dumper" : "0",
+            "Dist::Zilla::App" : "0",
+            "Dist::Zilla::Dist::Minter" : "0",
+            "Dist::Zilla::Role::AfterMint" : "0",
+            "Dist::Zilla::Role::AfterRelease" : "0",
+            "Dist::Zilla::Role::MetaProvider" : "0",
+            "Dist::Zilla::Role::PluginBundle::Easy" : "0",
+            "Dist::Zilla::Role::TextTemplate" : "0",
+            "File::Basename" : "0",
+            "Git::Wrapper" : "0",
+            "HTTP::Tiny" : "0",
+            "JSON::MaybeXS" : "0",
+            "List::Util" : "0",
+            "Modern::Perl" : "0",
+            "Moose" : "0",
+            "Try::Tiny" : "0",
+            "URL::Encode" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Path::Tiny" : "0",
+            "Test2::Tools::Compare" : "0",
+            "Test2::Tools::Explain" : "0",
+            "Test2::Tools::JSON" : "0",
+            "Test2::V0" : "0",
+            "Test::DZil" : "0",
+            "Test::More" : "0",
+            "lib" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::App::Command::gl" : {
+         "file" : "lib/Dist/Zilla/App/Command/gl.pm",
+         "version" : "1.0002"
+      },
+      "Dist::Zilla::Plugin::GitLab" : {
+         "file" : "lib/Dist/Zilla/Plugin/GitLab.pm",
+         "version" : "1.0002"
+      },
+      "Dist::Zilla::Plugin::GitLab::Create" : {
+         "file" : "lib/Dist/Zilla/Plugin/GitLab/Create.pm",
+         "version" : "1.0002"
+      },
+      "Dist::Zilla::Plugin::GitLab::Meta" : {
+         "file" : "lib/Dist/Zilla/Plugin/GitLab/Meta.pm",
+         "version" : "1.0002"
+      },
+      "Dist::Zilla::Plugin::GitLab::Update" : {
+         "file" : "lib/Dist/Zilla/Plugin/GitLab/Update.pm",
+         "version" : "1.0002"
+      },
+      "Dist::Zilla::PluginBundle::GitLab" : {
+         "file" : "lib/Dist/Zilla/PluginBundle/GitLab.pm",
+         "version" : "1.0002"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.0002",
+   "x_author_pledge" : {
+      "version" : 1
+   },
+   "x_authority" : "cpan:GEEKRUTH",
+   "x_contributor_covenant" : {
+      "version" : 0.02
+   },
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

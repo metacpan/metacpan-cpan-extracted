@@ -307,22 +307,26 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
 
 { note "Check with tags";
     my $c = HealthCheck->new(
-        id     => 'main',
-        tags   => ['default'],
-        checks => [
+        id      => 'main',
+        runbook => 'https://runbook-main.grantstreet.com',
+        tags    => ['default'],
+        checks  => [
             sub { +{ status => 'OK' } },
             {
                 check => sub { +{ id => 'fast_cheap', status => 'OK' } },
+                runbook => 'https://runbook1.grantstreet.com',
                 tags => [qw( fast cheap )],
             },
             {
                 check => sub { +{ id => 'fast_easy', status => 'OK' } },
+                runbook => 'https://runbook2.grantstreet.com',
                 tags => [qw( fast easy )],
             },
             HealthCheck->new(
-                id     => 'subcheck',
-                tags   => [qw( subcheck easy )],
-                checks => [
+                id      => 'subcheck',
+                runbook => 'https://runbook3.grantstreet.com',
+                tags    => [qw( subcheck easy )],
+                checks  => [
                     sub { +{ id => 'subcheck_default', status => 'OK' } },
                     {
                         check => sub { +{ status => 'CRITICAL' } },
@@ -335,6 +339,7 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
     is $c->check, {
         'id'      => 'main',
         'status'  => 'CRITICAL',
+        'runbook' => 'https://runbook-main.grantstreet.com',
         'tags'    => ['default'],
         'results' => [
             {
@@ -342,17 +347,20 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
                 'tags'   => [ 'default' ]
             },
             {
-                'id'     => 'fast_cheap',
-                'status' => 'OK',
-                'tags'   => [ qw(fast cheap) ]
+                'id'      => 'fast_cheap',
+                'runbook' => 'https://runbook1.grantstreet.com',
+                'status'  => 'OK',
+                'tags'    => [ qw(fast cheap) ]
             },
             {
-                'id'     => 'fast_easy',
-                'status' => 'OK',
-                'tags'   => [ qw(fast easy) ]
+                'id'      => 'fast_easy',
+                'runbook' => 'https://runbook2.grantstreet.com',
+                'status'  => 'OK',
+                'tags'    => [ qw(fast easy) ]
             },
             {
                 'id'      => 'subcheck',
+                'runbook' => 'https://runbook3.grantstreet.com',
                 'status'  => 'CRITICAL',
                 'results' => [
                     {
@@ -374,15 +382,17 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
         local $c->{collapse_single_result} = 1;
         is $c->check( tags => ['default'] ), {
             'id'      => 'main',
+            'runbook' => 'https://runbook-main.grantstreet.com',
             'tags'    => ['default'],
             'status'  => 'OK',
         }, "Check with 'default' tags collapses as requested";
     }
 
     is $c->check( tags => ['default'] ), {
-        'id'     => 'main',
-        'tags'   => ['default'],
-        'status' => 'OK',
+        'id'      => 'main',
+        'runbook' => 'https://runbook-main.grantstreet.com',
+        'tags'    => ['default'],
+        'status'  => 'OK',
         'results' => [ {
             'status' => 'OK',
             'tags'   => ['default'],
@@ -391,17 +401,20 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
 
     is $c->check( tags => ['easy'] ), {
         'id'      => 'main',
+        'runbook' => 'https://runbook-main.grantstreet.com',
         'status'  => 'OK',
         'tags'    => ['default'],
         'results' => [
             {
-                'id'     => 'fast_easy',
-                'tags'   => [ 'fast', 'easy' ],
-                'status' => 'OK' },
+                'id'      => 'fast_easy',
+                'runbook' => 'https://runbook2.grantstreet.com',
+                'tags'    => [ 'fast', 'easy' ],
+                'status'  => 'OK' },
             {
-                'id'     => 'subcheck',
-                'tags'   => [ 'subcheck', 'easy' ],
-                'status' => 'OK',
+                'id'      => 'subcheck',
+                'runbook' => 'https://runbook3.grantstreet.com',
+                'tags'    => [ 'subcheck', 'easy' ],
+                'status'  => 'OK',
                 'results' => [ {
                     'id'     => 'subcheck_default',
                     'tags'   => [ 'subcheck', 'easy' ],
@@ -417,6 +430,7 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
         # so there are no results.
         is $c->check( tags => ['hard'] ), {
             'id'      => 'main',
+            'runbook' => 'https://runbook-main.grantstreet.com',
             'tags'    => ['default'],
             'status'  => 'UNKNOWN',
             'info'    => 'missing status',
@@ -426,10 +440,10 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
 
 { note "Result inheritance";
     my $c = HealthCheck->new(
-        id     => 'main',
-        label  => 'Main',
-        tags   => ['main'],
-        checks => [
+        id      => 'main',
+        label   => 'Main',
+        tags    => ['main'],
+        checks  => [
             {   check => sub { +{ status => 'OK' } }
             },
 

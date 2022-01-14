@@ -1,3 +1,9 @@
+0.003   2021-12-11  Released-By: PERLANCAR; Urgency: medium
+
+	- [doc] Fix description, tweak examples (make sure all invalid
+	  examples have explanation).
+
+
 0.002   2021-07-19  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

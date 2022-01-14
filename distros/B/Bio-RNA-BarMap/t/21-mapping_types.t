@@ -39,7 +39,7 @@ SKIP:
             89 => [26, '~>'],
             96 => [75, '~>'],
         );
-        plan tests => 3 * %from_to_min;
+        plan tests => 3 * keys %from_to_min;
 
         # Verify each entry.
         while (my ($from_min, $true_mapping) = each %from_to_min) {
@@ -85,7 +85,7 @@ SKIP:
             56 => [11, '~>'],
             86 => [63, '~>'],
         );
-        plan tests => 5 * %from_to_min;
+        plan tests => 5 * keys %from_to_min;
 
         # Verify each entry.
         while (my ($from_min, $true_mapping) = each %from_to_min) {

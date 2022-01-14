@@ -62,6 +62,14 @@ else {
     MYEXTLIB => "src/liballinone$Config{lib_ext}",
     clean    => { 'FILES' => join(' ', @myobjs, "src/liballinone$Config{lib_ext}") },
   );
+
+  #FIX: https://github.com/DCIT/perl-CryptX/pull/79
+  # not needed on MS Windows
+  # does not work on macos - Apple LLVM 12.0.5 (clang-1205.0.22.9) ld: unknown option: --exclude-libs
+  # does not work on solaris - gcc 9.3.0 - ld: fatal: unrecognized option '--exclude-libs'
+  if ($^O !~ /^(MSWin32|darwin|solaris)$/ && ($Config{ld} =~ /gcc|g\+\+/ || $Config{gccversion})) {
+     push @EUMM_INC_LIB, (LDDLFLAGS => "$Config{lddlflags} -Wl,--exclude-libs,ALL");
+  }
 }
 
 my %eumm_args = (
@@ -137,3 +145,4 @@ rebuild: rebuild-pre all
 
   return $extra_targets;
 }
+

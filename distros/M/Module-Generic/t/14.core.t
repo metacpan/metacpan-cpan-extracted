@@ -224,6 +224,45 @@ $v = $o->value;
 isa_ok( $v, 'Module::Generic::Scalar', '_set_get_scalar_as_object' );
 is( $v, 'pending', '_set_get_scalar_as_object value' );
 
+my $dt = $o->datetime;
+is( $dt, undef, 'lvalue->get -> undef' );
+# $o->debug(4);
+$o->datetime = { dt => 'nope' };
+is( $o->datetime, undef, 'lvalue->set wrong value -> error' );
+is( $o->error->message, 'Value provided is not a datetime.', 'error message' );
+$o->fatal(1);
+try
+{
+    $o->datetime = "plop";
+}
+catch( $e )
+{
+    is( $e->message, 'Value provided is not a datetime.', 'lvalue -> fatal error' );
+}
+
+my $now = DateTime->now;
+try
+{
+    $o->datetime = $now;
+}
+catch( $e )
+{
+    fail( "proper assignment failed: $e" );
+}
+$o->fatal(0);
+my $dt2 = $o->datetime;
+isa_ok( $dt2, 'DateTime', 'lvalue->get is a DateTime object' );
+# is( ( $dt2->epoch - $now->epoch ), 10, 'lvalue->get' );
+is( $dt2, $now, 'lvalue->get' );
+my $now2 = DateTime->now->add( hours => 1 );
+isnt( $now2, $now, "new datetime ($now2) isnt same as old datetime ($now)" );
+my $now3 = $o->datetime( $now2 );
+is( $now3, $now2, 'lvalue->set( $value ) -> return value' );
+is( $o->datetime, $now2, 'lvalue->set( $value )' );
+isnt( $now3, $now );
+# diag( "Is ", overload::StrVal( $now ), " same as ", overload::StrVal( $now3 ) );
+# ok( $now3 ne $now );
+
 done_testing();
 
 package MyObject;
@@ -249,6 +288,27 @@ sub array_object : lvalue { return( shift->_set_get_array_as_object( 'array_obje
 sub callback : lvalue { return( shift->_set_get_code( 'callback', @_ ) ); }
 
 sub created : lvalue { return( shift->_set_get_datetime( 'created', @_ ) ); }
+
+sub datetime : lvalue { return( shift->_lvalue({
+    set => sub
+    {
+        my( $self, $args ) = @_;
+        if( $self->_is_a( $args->[0] => 'DateTime' ) )
+        {
+            return( $self->{datetime} = shift( @$args ) );
+        }
+        else
+        {
+            return( $self->error( "Value provided is not a datetime." ) );
+        }
+    },
+    get => sub
+    {
+        my $self = shift( @_ );
+        my $dt = $self->{datetime};
+        return( $dt );
+    }
+}, @_ ) ); }
 
 sub file : lvalue { return( shift->_set_get_file( 'file', @_ ) ); }
 

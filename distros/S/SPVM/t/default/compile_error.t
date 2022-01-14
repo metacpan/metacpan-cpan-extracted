@@ -7,7 +7,7 @@ use FindBin;
 
 use SPVM::Builder;
 
-use Test::More 'no_plan';
+use Test::More;
 
 my $file = 't/' . basename $0;
 
@@ -23,7 +23,7 @@ use lib "$FindBin::Bin/lib";
   }
   {
     my $build = SPVM::Builder->new;
-    my $success = $build->compile_spvm('TestCase::CompileError::Class::classPartNameStartWithUpperCase', __FILE__, __LINE__);
+    my $success = $build->compile_spvm('TestCase::CompileError::Class::classPartNameStartWithLowerCase', __FILE__, __LINE__);
     ok($success == 0);
   }
   {
@@ -113,7 +113,7 @@ use lib "$FindBin::Bin/lib";
   }
   {
     my $build = SPVM::Builder->new;
-    my $success = $build->compile_spvm('TestCase::CompileError::Literal::Interger::IntOutOfRange', __FILE__, __LINE__);
+    my $success = $build->compile_spvm('TestCase::CompileError::Literal::Integer::IntOutOfRange', __FILE__, __LINE__);
     ok($success == 0);
   }
 }
@@ -121,11 +121,6 @@ use lib "$FindBin::Bin/lib";
 
 # Lexcarl Variable
 {
-  {
-    my $build = SPVM::Builder->new;
-    my $success = $build->compile_spvm('TestCase::CompileError::LexVar::Private', __FILE__, __LINE__);
-    ok($success == 0);
-  }
   {
     my $build = SPVM::Builder->new;
     my $success = $build->compile_spvm('TestCase::CompileError::LexVar::LexVarNameStartDigit', __FILE__, __LINE__);
@@ -259,11 +254,16 @@ use lib "$FindBin::Bin/lib";
   }
 }
 
-# Call sub
+# Call method
 {
   {
     my $build = SPVM::Builder->new;
     my $success = $build->compile_spvm('TestCase::CompileError::CallMethod::NotFound', __FILE__, __LINE__);
+    ok($success == 0);
+  }
+  {
+    my $build = SPVM::Builder->new;
+    my $success = $build->compile_spvm('TestCase::CompileError::CallMethod::ClassNotFound', __FILE__, __LINE__);
     ok($success == 0);
   }
 }
@@ -332,7 +332,12 @@ use lib "$FindBin::Bin/lib";
 {
   {
     my $build = SPVM::Builder->new;
-    my $success = $build->compile_spvm('TestCase::CompileError::Remainder::LeftIsNotNumeric', __FILE__, __LINE__);
+    my $success = $build->compile_spvm('TestCase::CompileError::Remainder::RightIsNotIntegral', __FILE__, __LINE__);
+    ok($success == 0);
+  }
+  {
+    my $build = SPVM::Builder->new;
+    my $success = $build->compile_spvm('TestCase::CompileError::Remainder::LeftIsNotIntegral', __FILE__, __LINE__);
     ok($success == 0);
   }
 }
@@ -468,3 +473,5 @@ use lib "$FindBin::Bin/lib";
     ok($success == 0);
   }
 }
+
+done_testing;

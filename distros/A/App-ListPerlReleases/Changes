@@ -1,3 +1,10 @@
+0.004   2022-01-01  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Add description and mention CPAN::Perl::Release.
+
+
 0.003   2021-05-29  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Add missing prereq to Sah::Schema::filename (RT#136652).

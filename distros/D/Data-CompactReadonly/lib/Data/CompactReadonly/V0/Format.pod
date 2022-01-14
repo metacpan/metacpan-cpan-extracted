@@ -56,9 +56,13 @@ integer numeric types are also available as NegativeByte, NegativeMedium and so 
 
 =item Huge - 64 bit integer
 
-=item Float - 64 bit IEEE754 double-precision
+=item Float64 - 64 bit IEEE754 double-precision
 
 =item Null
+
+=item True
+
+=item False
 
 =back
 
@@ -121,11 +125,13 @@ Byte, Short, Medium, and Long are valid for lengths.
 
     0b1010 - Null
 
-    0b1011 - Float
+    0b1011 - Float64
 
-    0b1100 to 0b1111 - Reserved
+    0b1100 - True
 
-Finally the last two bits are Reserved.
+    0b1101 - False
+
+Any unspecified bits or combinations of bits are reserved for future use. Unspecified bits should be set to zero if you want your data to be compatible with future versions.
 
 =head2 NODE DATA
 
@@ -133,7 +139,7 @@ Finally the last two bits are Reserved.
 
 The header is followed by the appropriate number of bytes of data.
 
-=head3 NULL NODES
+=head3 NULL, TRUE and FALSE NODES
 
 These are just a header.
 

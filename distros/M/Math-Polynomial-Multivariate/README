@@ -1,5 +1,5 @@
-Math-Polynomial-Multivariate version 0.006
-==========================================
+Math-Polynomial-Multivariate
+============================
 
 Math::Polynomial::Multivariate is a Perl class representing polynomials
 in one or more variables.  It provides a set of operations defined
@@ -51,11 +51,23 @@ Recommended modules for increased functionality are:
   arithmetic operators "+", "-", "*", "**", "==", "!=", and
   stringification.
 
-COPYRIGHT AND LICENSE
+SUPPORT AND DOCUMENTATION
 
-Copyright (c) 2011-2017 by Martin Becker.  All rights reserved.
+Once installed, you can find documentation for this module with the perldoc command.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.0 or,
-at your option, any later version of Perl 5 you may have available.
+  perldoc Math::Polynomial::Multivariate
 
+You can also look for information at:
+
+  GitHub, the home of this distribution's repository
+    https://github.com/mhasch/perl-Math-Polynomial-Multivariate
+
+  metacpan, a CPAN search engine
+    https://metacpan.org/release/Math-Polynomial-Multivariate
+
+LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2011-2022 by Martin Becker, Blaubeuren.
+
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).

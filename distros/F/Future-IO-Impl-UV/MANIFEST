@@ -1,14 +1,17 @@
 Build.PL
 Changes
 lib/Future/IO/Impl/UV.pm
-LICENSE
 MANIFEST			This list of files
-META.json
-META.yml
-README
 t/00use.t
 t/01sleep.t
 t/02sysread.t
 t/04syswrite.t
-t/06waitpid.t
+t/06connect.t
+t/07accept.t
+t/08waitpid.t
+t/50mixed-read-write.t
 t/99pod.t
+README
+LICENSE
+META.yml
+META.json

@@ -1,5 +1,11 @@
 Revision history for Perl extension Math::Polynomial::Multivariate.
 
+0.007 Fri, 07 Jan 2022 11:47:52 +0100
+        Changed license to Artistic License 2.0.
+        Migrated from subversion to git.
+        Switched bugtracker to github.
+        Added CONTRIBUTING file.
+
 0.006 Mon, 09 Oct 2017 07:36:22 +0200
         Added enclosing parentheses to string representation.
         Added flatten and extract methods.

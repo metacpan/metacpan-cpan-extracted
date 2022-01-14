@@ -1,5 +1,9 @@
 Revision history for Perl extension CAPTCHA-reCAPTCHA-V3
 
+0.04 2022-01-07T14:34:31Z
+    - updated around creating javascript tags
+    - now no need to set sitekey when constructing
+
 0.03 2021-12-31T14:21:59Z
     - fixed a bug aroud score 
 

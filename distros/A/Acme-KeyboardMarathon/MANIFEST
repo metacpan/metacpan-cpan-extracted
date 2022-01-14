@@ -13,5 +13,6 @@ t/02-charset.t
 t/03-fox.t
 t/04-wild.t
 t/wild.txt
+t/05-dvorak.t
 source-tree-marathon.pl
 TODO

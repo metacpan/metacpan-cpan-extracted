@@ -2,12 +2,33 @@
 use strict;
 use warnings;
 use Test::More;
+use Test::More::UTF8;
 use lib qw(../lib);
+use utf8;	# i.e. strings declared in this file are in UTF-8 encoding
+
+# Tell Perl what the terminal encoding is:
+if (defined($ENV{'LANG'})) {
+	if ($ENV{'LANG'} =~ /\bUTF-8\b/i) {
+		binmode(STDOUT, ':utf8');
+		binmode(STDERR, ':utf8');
+		note("Terminal encoding is UTF-8.\n");
+	}
+	else {
+		note("Terminal encoding is not UTF-8.\n");
+	}
+}
+else {
+	note("Unable to determine terminal encoding. Assuming UTF-8.\n");
+	binmode(STDOUT, ':utf8');
+	binmode(STDERR, ':utf8');
+}
+
 
 my @test_passwords = (
-	'hello',
-	'Test 123',
+	'Random first name and birthday',
 	'€U maffia',
+	'これは、それぞれが複数のバイトで構成される文字である日本語の文です。',	# 34 chars, 102 bytes
+	#'これは、それぞれが複数のバイトで構成される文字である日本語の文です。',	# 34 chars, 102 bytes
 );
 
 my @methods = map { $_, "password_$_"; } qw(
@@ -22,13 +43,17 @@ if (!($ENV{'HARNESS_ACTIVE'} || ($^O eq 'MSWin32'))) {	# experimental: that's wh
 	if (-x $php) {
 		my $phpversion = `php -v`;
 		$phpversion =~ s/^PHP (\S+)\s.*/$1/s;
+		my $too_old;
 		if ($phpversion =~ /^(\d{1,3}\.\d{1,6})\b/) {
 			#if ($1 < 5.5) {
 			if ($1 < 7.3) {
-				undef($php);
+				$too_old = 1;
 			}
 		}
-		diag("Found PHP executable $php with version $phpversion: " . ($php ? 'OK' : 'TOO OLD') . "\n");
+		note("Found PHP executable $php with version $phpversion: " . ($too_old ? 'TOO OLD' : 'OK') . "\n");
+		if ($too_old) {
+			undef($php);
+		}
 	}
 	else {
 		undef($php);
@@ -50,28 +75,29 @@ foreach my $method (@methods) {
 	}
 }
 
-my %sig_to_algo = (
-	'2y'       => $class->PASSWORD_BCRYPT,
+my %alias_to_algo = (
+	'bcrypt(2y)' => $class->PASSWORD_BCRYPT,
 );
 
 if ($INC{'Crypt/Argon2.pm'} || eval { require Crypt::Argon2; }) {
-	$sig_to_algo{'argon2i'}  = $class->PASSWORD_ARGON2I;
-	$sig_to_algo{'argon2id'} = $class->PASSWORD_ARGON2ID;
+	$alias_to_algo{'argon2i'}  = $class->PASSWORD_ARGON2I;
+	$alias_to_algo{'argon2id'} = $class->PASSWORD_ARGON2ID;
 }
 else {
 	diag('Skipping some tests because the Crypt::Argon2 module is not installed');
 }
-foreach my $sig (sort keys %sig_to_algo) {
-	my $algo = $sig_to_algo{$sig};
-	foreach my $password (@test_passwords) {
+foreach my $password (@test_passwords) {
+	foreach my $sig (sort keys %alias_to_algo) {
+		my $algo = $alias_to_algo{$sig};
+		note("Testing $sig using \$password = '$password';");
 		my $crypted = $class->hash($password, 'algo' => $algo);
-		ok(length($crypted) >= 60, "$class->hash(\"$password\", 'algo' => $algo) returns a crypted string");
-		#diag("length $sig: " . length($crypted));
+		ok(length($crypted) >= 60, "$class->hash(\$password, 'algo' => $algo) returns a crypted string");
+		#note("length $sig: " . length($crypted));
 		if (1) {
 			my $result = $class->verify($password, $crypted);
-			ok($result, "Expect success from verify method using password \"$password\" and new crypted string \"$crypted\"");
+			ok($result, "Expect success from verify method using password and new crypted string \"$crypted\"");
 			$result = password_verify($password, $crypted);
-			ok($result, "Expect success from password_verify function using password \"$password\" and new crypted string \"$crypted\"");
+			ok($result, "Expect success from password_verify function using password and new crypted string \"$crypted\"");
 		}
 		if ($php) {
 			my $phpcode = "var_export(password_verify('" . $password . "', '" . $crypted . "'));";
@@ -79,8 +105,9 @@ foreach my $sig (sort keys %sig_to_algo) {
 			open($h, '-|', $php, '-r', $phpcode) || die("Failed to execute $php: $!");
 			my $line = <$h>;
 			close($h);
-			ok($line eq 'true', "Expect true from PHP's password_verify(\"$password\", \"$crypted\")");
+			ok($line eq 'true', "Expect true from PHP's password_verify(\$password, '$crypted')");
 		}
+		note('');
 	}
 }
 

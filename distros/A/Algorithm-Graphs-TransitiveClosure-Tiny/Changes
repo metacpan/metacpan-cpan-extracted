@@ -1,0 +1,11 @@
+Revision history for Algorithm-Graphs-TransitiveClosure-Tiny
+
+0.03    2022/01/14
+        Added test, corrected typos in POD.
+
+0.02    2022/01/14
+        Improved POD.
+
+0.01    2022/01/13
+        First version, released on an unsuspecting world.
+

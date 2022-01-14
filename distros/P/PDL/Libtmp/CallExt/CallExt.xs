@@ -38,8 +38,8 @@ _callext_int(...)
         New( 42, x, npdl, pdlsimple* ); /* Ptr array */
         for(i=0; i<npdl; i++) {
            t = PDL->SvPDLV(ST(i+1));
-	   PDL->make_physical(t); 
-	   PDL->make_physdims(t); 
+	   PDL->barf_if_error(PDL->make_physical(t));
+	   PDL->barf_if_error(PDL->make_physdims(t));
 	   New(42, x[i], 1, pdlsimple); /* Each ptr */
 	   x[i]->datatype = t->datatype;
 	   x[i]->data     = t->data;
@@ -55,10 +55,10 @@ _callext_int(...)
         for(i=0; i<npdl; i++) /* Free stuff */
 	   Safefree(x[i]);
 	Safefree(x);
-	   
+
 BOOT:
    /* Get pointer to structure of core shared C routines */
-   CoreSV = perl_get_sv("PDL::SHARE",FALSE);  /* SV* value */
-   if (CoreSV==NULL)
-     croak("This module requires use of PDL::Core first");
-   PDL = INT2PTR(Core*,SvIV( CoreSV ));  /* Core* value */
+   if (!(CoreSV = perl_get_sv("PDL::SHARE",FALSE))) /* SV* value */
+     Perl_croak(aTHX_ "We require the PDL::Core module, which was not found");
+   if (!(PDL = INT2PTR(Core*,SvIV( CoreSV )))) /* Core* value */
+     Perl_croak(aTHX_ "Got NULL pointer for PDL");

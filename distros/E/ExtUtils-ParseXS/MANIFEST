@@ -1,5 +1,4 @@
 Changes
-INSTALL
 lib/ExtUtils/ParseXS.pm
 lib/ExtUtils/ParseXS.pod
 lib/ExtUtils/ParseXS/Constants.pm
@@ -14,7 +13,6 @@ lib/ExtUtils/Typemaps/Type.pm
 lib/ExtUtils/xsubpp
 Makefile.PL
 MANIFEST			This list of files
-README
 t/001-basic.t
 t/002-more.t
 t/003-usage.t
@@ -56,6 +54,7 @@ t/lib/PrimitiveCapture.pm
 t/lib/TypemapTest/Foo.pm
 t/pseudotypemap1
 t/typemap
+t/XSBroken.xs
 t/XSInclude.xsh
 t/XSMore.xs
 t/XSTest.pm

@@ -2,7 +2,7 @@
 # Faster then Set::Scalar for this specific use case. It significantly reduces
 # the runtime.
 package Bio::RNA::BarMap::Mapping::Set;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use v5.12;
 use warnings;

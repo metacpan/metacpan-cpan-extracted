@@ -1,5 +1,8 @@
 Revision history for Perl module App::PPI::Dumper
 
+1.023 2022-01-09T01:11:41Z
+	* no code changes. Fix link in README.pod.
+
 1.022 2021-01-14T08:24:38Z
 	* Freshen distro, remove Travis CI, add Github actions
 

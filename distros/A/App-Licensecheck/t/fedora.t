@@ -1,36 +1,37 @@
 use Test2::V0;
 use Test2::Require::Module 'Regexp::Pattern::License' => '3.7.0';
 
-use lib 't/lib';
-use Test2::Licensecheck;
+use App::Licensecheck;
 
 plan 22;
 
-license_like(
-	't/fedora/MIT',
-	[   qr/Adobe\-Glyph/,
-		qr/BSL/,
-		qr/DSDP/,
-		qr/Expat/,
-		qr/ICU/,
-		qr/MIT~Boehm/,
-		qr/MIT\-CMU/,
-		qr/MIT\-CMU~warranty/,
-		qr/MIT\-enna/,
-		qr/MIT~Epinions/,
-		qr/MIT\-feh/,
-		qr/MIT~old/,
-		qr/MIT~oldstyle/,
-		qr/MIT~oldstyle~disclaimer/,
-		qr/MIT-Open-Group/,
-		qr/MIT~OpenVision/,
-		qr/MIT~OSF/,
-		qr/MIT~UnixCrypt/,
-		qr/MIT~whatever/,
-		qr/MIT~Widget/,
-		qr/MIT~Xfig/,
-		qr/PostgreSQL/,
-	]
+my $app = App::Licensecheck->new(
+	shortname_scheme => 'debian,spdx',
+	top_lines        => 0,
 );
+
+my ($license) = $app->parse('t/fedora/MIT');
+like $license, qr/Adobe\-Glyph/;
+like $license, qr/BSL/;
+like $license, qr/DSDP/;
+like $license, qr/Expat/;
+like $license, qr/ICU/;
+like $license, qr/MIT~Boehm/;
+like $license, qr/MIT\-CMU/;
+like $license, qr/MIT\-CMU~warranty/;
+like $license, qr/MIT\-enna/;
+like $license, qr/MIT~Epinions/;
+like $license, qr/MIT\-feh/;
+like $license, qr/MIT~old/;
+like $license, qr/MIT~oldstyle/;
+like $license, qr/MIT~oldstyle~disclaimer/;
+like $license, qr/MIT-Open-Group/;
+like $license, qr/MIT~OpenVision/;
+like $license, qr/MIT~OSF/;
+like $license, qr/MIT~UnixCrypt/;
+like $license, qr/MIT~whatever/;
+like $license, qr/MIT~Widget/;
+like $license, qr/MIT~Xfig/;
+like $license, qr/PostgreSQL/;
 
 done_testing;

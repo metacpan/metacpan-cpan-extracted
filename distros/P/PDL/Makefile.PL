@@ -120,9 +120,9 @@ my @podpms = map { $_.".pod", '$(INST_LIBDIR)/PDL/' . $_ .".pod"}
   qw/Bugs/;
 
 my @cpan_deps = my @prereq = (
-  'Convert::UU'         => 0,         # for PDL::IO::Dumper
   'Data::Dumper'        => 2.121,     # for PDL::IO::Dumper
   'File::Map'           => 0.57,      # test new mmap implementation
+  'File::Which'         => 0,
   'Filter::Util::Call'  => 0,         # for PDL::NiceSlice
   'Filter::Simple'      => 0.88,      # for new PDL::NiceSlice
   'List::Util'          => '1.33',
@@ -136,6 +136,7 @@ my @cpan_deps = my @prereq = (
 );
 my %min_version = (
   'OpenGL' => '0.70', # see also Graphics/Makefile.PL
+  'OpenGL::GLUT' => '0.72', # see also Graphics/Makefile.PL
   'ExtUtils::F77' => '1.26', # eg 1.20 can leave off -lgfortran
   'Inline'              => 0.83,      # fixed ILSM-finding
   'Inline::C'           => 0.62,
@@ -163,7 +164,7 @@ if($Config{archname}=~m/x86_64/) {
 }
 
 # create GENERATED subdir with *.pm files during 'make dist' (to make metacpan.org happy)
-my $preop = '$(PERL) -I$(INST_ARCHLIB) -I$(INST_LIB) -MPDL::Core::Dev -e pdlpp_mkgen $(DISTVNAME)';
+my $preop = '$(PERLRUNINST) -MPDL::Core::Dev -e pdlpp_mkgen $(DISTVNAME)';
 
 my @optimize = (OPTIMIZE => $PDL::Config{OPTIMIZE}) if $PDL::Config{OPTIMIZE};
 
@@ -318,7 +319,7 @@ $text .= "\n" . ::coretarget($self);
 my $coretest = join ' ', map File::Spec->catfile('t', $_.'.t'), qw(
   01-pptest autoload bad basic bool clump config constructor core croak lvalue
   math matrix matrixops nat_complex ops-bitwise ops pdl_from_string
-  pp_croaking pp_line_numbers primitive pthread reduce
+  pdlchar pp_croaking pp_line_numbers primitive pthread reduce
   slice subclass thread thread_def ufunc
 );
 $text .= <<EOF;
@@ -331,6 +332,18 @@ return $text
 
 }
 
+# the modules to test the ones in full PDL
+my @basics; BEGIN { @basics = (
+  [qw(IO Misc)],
+  [qw(Libtmp Compression)],
+  [qw(IO FITS)],
+  [qw(Libtmp ImageRGB)],
+  [qw(IO Pnm)],
+  [qw(IO Storable)],
+  [qw(Libtmp Image2D)],
+  [qw(Libtmp ImageND)],
+  [qw(Libtmp FFT)],
+) }
 sub coretarget {
     my ($self) = @_;
     # remember the fundamental ones end up far to right as much deps on them
@@ -342,7 +355,7 @@ sub coretarget {
     # all a left's rights are made concurrently, no sequence - list ALL prereqs
     my @left2rights = (
         [
-            basics => [
+            coregen => [
                 [ [ qw(Basic) ], [ qw(pm_to_blib) ], ],
                 [ [ qw(Basic Core) ], [ qw(pm_to_blib) ], ],
                 [ [ qw(Basic Gen) ], [ qw(all) ], ],
@@ -351,12 +364,30 @@ sub coretarget {
         [
             core => [
                 [ [ qw(Basic SourceFilter) ], [ qw(pm_to_blib) ], ],
-                map { [
+                map [
                     [ 'Basic', $_ ],
-                    [ 'pm_to_blib', 'dynamic' ],
-                    [ 'basics' ],
+                    [ qw(pm_to_blib dynamic) ],
+                    [ 'coregen' ],
                 # the modules in PDL::LiteF, used in t/core.t
-                ] } qw(Core Ops Primitive Ufunc Slices Bad Math MatrixOps),
+                ], qw(Core Ops Primitive Ufunc Slices Bad Math MatrixOps),
+            ]
+        ],
+        [
+            basic => [
+                map [
+                    $_,
+                    [ qw(pm_to_blib dynamic) ],
+                    [ 'core' ],
+                ], @basics,
+            ]
+        ],
+        [
+            basictest => [
+                map [
+                    $_,
+                    [ 'test' ],
+                    [ 'basic' ],
+                ], @basics,
             ]
         ],
     );

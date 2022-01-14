@@ -6,8 +6,9 @@ on 'runtime' => sub {
     requires 'parent';
     requires 'utf8';
     requires 'Carp';
-    requires 'Crypt::Eksblowfish::Bcrypt';
+    requires 'Crypt::Bcrypt';
     requires 'Digest';
+    requires 'MIME::Base64';
 };
 
 on 'test' => sub {

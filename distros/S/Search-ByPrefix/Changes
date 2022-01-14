@@ -1,5 +1,10 @@
 Revision history for Search-ByPrefix
 
+0.04    2021-01-09
+
+        - Internal improvements.
+        - DBM::Deep can now be used for the table.
+
 0.03    2020-06-14
 
         - Fixed a bug for a keyword named "values".
@@ -9,4 +14,5 @@ Revision history for Search-ByPrefix
         - Fixed an example.
 
 0.01    2016-07-29
-        First version, released on an unsuspecting world.
+
+        - First version, released on an unsuspecting world.

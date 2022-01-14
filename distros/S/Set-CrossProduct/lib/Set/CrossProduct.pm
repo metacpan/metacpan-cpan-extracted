@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use warnings::register;
 
-our $VERSION = '2.006';
+our $VERSION = '2.007';
 
 =encoding utf8
 
@@ -572,7 +572,7 @@ Matt Miller implemented the named sets feature.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2001-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2001-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

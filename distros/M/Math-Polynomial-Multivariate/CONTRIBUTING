@@ -1,0 +1,68 @@
+Contributing to Math-Polynomial-Multivariate
+============================================
+
+Thank you for your interest in contributing to this Perl 5
+library.  Currently, it is in active development and maintained
+by its original author.  Bug reports (with or without patch),
+suggestions, feature requests, and comments are welcome.  You may
+submit them through this distribution's bug tracker on github:
+https://github.com/mhasch/perl-Math-Polynomial-Multivariate/issues
+
+You can also reach the author by e-mail:
+Martin Becker, <becker-cpan-mp (at) cozap.com>
+
+The code for this distribution is hosted at GitHub.  The repository is:
+https://github.com/mhasch/perl-Math-Polynomial-Multivariate
+
+If your contribution is accepted, you will be mentioned by name under
+ACKNOWLEDGEMENTS in the documentation.  Please indicate if you prefer
+to stay anonymous.
+
+Development Guidelines
+----------------------
+
+This library, dealing with a mathematical concept, should first and
+foremost be scientifically sound.  Correctness is rated over all other
+quality aspects.  The second most important goal is a documentation and
+over-all presentation that makes it useful for experts and informative
+for anybody interested in the field.  Thirdly, it should be easy to
+integrate correctly and efficiently with other software.
+
+Like many other components of computer algebra systems, this library
+is a tool centered on algorithms and notational conventions.  It does
+not, in general, establish strict preconditions on the applicability
+of such algorithms that would be essential for mathematical proof.
+While documentation should indicate important limitations to watch out
+for, it is ultimately the resonsibility of the user to provide context
+for operations to be meaningful.  This allows the software to skip
+expensive plausibility checks and focus on the actual computation.
+
+On the other hand, integration into a type system providing more
+algebraic meta-information of coefficient spaces might ultimately lead
+to a truly rigorous treatment of preconditions and thus lend provability
+to computed results.  Polynomial spaces will be an interesting feature of
+such a type system and thus our module may be eligible to take part in it.
+Meanwhile, functional extensions seem to be more imminent.
+
+Topics of interest
+------------------
+
+Some topics already on the roadmap are mentioned in the main
+documentation.
+
+Other possible improvements may support interoperability with related,
+or more general, or application software.  An XS implementation could
+increase performance with large numbers of terms or complex expressions.
+
+Other improvements could help the documentation to be clearer, or more
+complete, or better formatted.  We might create POD, TEX, HTML, and PDF
+from a common source.  And, of course, there is always room for good
+examples and references to application modules.
+
+Author's Note
+-------------
+
+Thanks again for your interest.
+I am looking forward to your report or e-mail.
+
+Martin Becker, January 7, 2022

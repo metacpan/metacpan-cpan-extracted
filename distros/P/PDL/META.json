@@ -48,12 +48,13 @@
             "ExtUtils::F77" : "1.26",
             "Inline" : "0.83",
             "Inline::C" : "0.62",
-            "OpenGL" : "0.70"
+            "OpenGL" : "0.70",
+            "OpenGL::GLUT" : "0.72"
          },
          "requires" : {
-            "Convert::UU" : "0",
             "Data::Dumper" : "2.121",
             "File::Map" : "0.57",
+            "File::Which" : "0",
             "Filter::Simple" : "0.88",
             "Filter::Util::Call" : "0",
             "List::Util" : "1.33",
@@ -93,6 +94,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "2.063",
+   "version" : "2.068",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2022 -- leonerd@leonerd.org.uk
 
 package Net::Prometheus;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Carp;
 
@@ -322,6 +322,9 @@ current values of all the registered metrics.
 An optional HASH reference may be provided; if so it will be passed into the
 C<collect> method of every registered collector.
 
+Values that are set to C<undef> will be absent from the output (this usually
+applies to gauges). Values set to NaN will be rendered as C<NaN>.
+
 =cut
 
 sub _render_label_value
@@ -363,10 +366,13 @@ sub render
       "# TYPE $fullname " . $metricsamples->type . "\n",
       map {
          my $sample = $_;
-         sprintf "%s%s %s\n",
-            $sample->varname,
-            _render_labels( $sample->labels ),
-            $sample->value
+         my $value = $sample->value;
+         ( defined $value ) ?
+            sprintf "%s%s %s\n",
+               $sample->varname,
+               _render_labels( $sample->labels ),
+               ( ( $value != $value ) ? "NaN" : $value ) :
+            ();
       } @{ $metricsamples->samples }
    } $self->collect( $opts );
 }
@@ -492,6 +498,61 @@ sub psgi_app
          [ $self->render( $opts ) ],
       ];
    };
+}
+
+=head2 export_to_Future_IO
+
+   $f = $prometheus->export_to_Future_IO( %args )
+
+Performs the necessary steps to create a minimal HTTP server for exporting
+metrics over HTTP, by using L<Future::IO> directly. This requires
+C<Future::IO> version 0.11 or above, and a containing process that has already
+loaded a non-default loop implementation that supports multiple filehandles.
+
+This new server will listen on its own port number for any incoming request,
+and will serve metrics regardless of path.
+
+This server is a very small, minimal implementation just sufficient to support
+C<prometheus> itself, or simple tools like C<wget>, C<curl> or perhaps a
+web-browser for manual inspection. It is not intended to be a fully-featured
+HTTP server and certainly does not support many HTTP features at all.
+
+Takes the following named arguments:
+
+=over 4
+
+=item port => INT
+
+Port number on which to listen for incoming HTTP requests.
+
+=back
+
+The returned L<Future> instance will remain pending for the entire lifetime of
+the process. If the containing program has nothing else to do it can call the
+C<await> method on it, or else combine it with other toplevel event futures it
+is using for its own purposes.
+
+=cut
+
+sub export_to_Future_IO
+{
+   my $self = shift;
+   my %args = @_;
+
+   require Net::Prometheus::_FutureIO;
+   require IO::Socket::IP;
+
+   my $listensock = IO::Socket::IP->new(
+      LocalPort => $args{port},
+      Type      => Socket::SOCK_STREAM(),
+      # TODO: LocalHost
+      Listen     => 1,
+      ReuseAddr  => 1,
+   ) or die "Cannot create listening socket - $@";
+
+   $args{on_listen} and $args{on_listen}->( $listensock );
+
+   return Net::Prometheus::_FutureIO->start( $self, $listensock );
 }
 
 =head2 export_to_IO_Async

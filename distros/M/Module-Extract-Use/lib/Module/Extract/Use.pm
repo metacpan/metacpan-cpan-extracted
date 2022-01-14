@@ -1,13 +1,12 @@
+use v5.10;
+
 package Module::Extract::Use;
 use strict;
 
 use warnings;
 no warnings;
 
-use subs qw();
-use vars qw($VERSION);
-
-$VERSION = '1.047';
+our $VERSION = '1.051';
 
 =encoding utf8
 
@@ -259,8 +258,11 @@ sub _expression_load {
 
 	my $in_statements = $Document->find(
 		sub {
+			my $sib;
 			$_[1]->isa( 'PPI::Token::Word' ) &&
-			$_[1]->content eq 'require'
+			$_[1]->content eq 'require' &&
+			( $sib = $_[1]->snext_sibling() ) &&
+			$sib->isa( 'PPI::Token::Word' )
 			}
 		);
 
@@ -346,7 +348,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2008-2020, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
+Copyright © 2008-2022, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
 
 This project is under the Artistic License 2.0.
 

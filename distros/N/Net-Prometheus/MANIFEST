@@ -1,9 +1,11 @@
 Build.PL
 Changes
+examples/future-io-server.pl
 examples/net-async-http-server.pl
 examples/parent-process.psgi
 examples/static.psgi
 lib/Net/Prometheus.pm
+lib/Net/Prometheus/_FutureIO.pm
 lib/Net/Prometheus/Counter.pm
 lib/Net/Prometheus/Gauge.pm
 lib/Net/Prometheus/Histogram.pm
@@ -15,11 +17,7 @@ lib/Net/Prometheus/ProcessCollector/linux.pm
 lib/Net/Prometheus/Registry.pm
 lib/Net/Prometheus/Summary.pm
 lib/Net/Prometheus/Types.pm
-LICENSE
 MANIFEST			This list of files
-META.json
-META.yml
-README
 t/00use.t
 t/01metric.t
 t/02labels.t
@@ -33,8 +31,13 @@ t/22metric-grouping.t
 t/23collector.t
 t/30handle.t
 t/31psgi.t
+t/32export-future-io.t
 t/40process-collector.t
 t/41process-collector-linux.t
 t/50perl-collector.t
 t/51perl-collector-detail.t
 t/99pod.t
+README
+LICENSE
+META.yml
+META.json

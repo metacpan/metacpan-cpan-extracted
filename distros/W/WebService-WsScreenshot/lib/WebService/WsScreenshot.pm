@@ -3,8 +3,9 @@ use Moo;
 use URI::Encode qw( uri_encode );
 use LWP::UserAgent;
 use JSON::MaybeXS qw( decode_json );
+use URI;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 has base_url => (
     is       => 'rw',
@@ -61,6 +62,9 @@ sub create_screenshot_url {
 
     die "Error: create_screenshot_url() requires a url argument.\n" unless 
         $args->{url};
+
+    die "Error: create_screenshot_url() must be http(s)\n"
+        unless URI->new($args->{url})->scheme =~ /^https?$/;
 
     return sprintf( "%s/api/screenshot?resX=%d&resY=%d&outFormat=%s&waitTime=%d&isFullPage=%s&url=%s",
         $self->base_url,

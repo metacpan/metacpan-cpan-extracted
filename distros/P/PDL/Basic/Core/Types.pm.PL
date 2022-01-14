@@ -1,9 +1,3 @@
-#
-# this script is executed directly from the top-level Makefile.PL
-# (ie before the standard "loop through the directories" behaviour
-#  of the WriteMakefile() call in that file)
-#
-
 use strict;
 use Config;
 use File::Basename qw(&basename &dirname);
@@ -26,26 +20,23 @@ sub packtypeof_PDL_Indx {
    }
 }
 
-sub typeof_PDL_Indx {
-   warn "Types.pm.PL: using typedef $Config{'ivtype'} PDL_Indx\n";
-   return $Config{'ivtype'} 
-}
-
-sub typeof_PDL_Long {
-   return 'int'  if $Config{'intsize'}==4;
-   return 'long' if $Config{'longsize'}==4;
-   die "Can not find an integer datatype of size 4 bytes!!!\n";
-}
-
-sub typeof_PDL_i64 {
-  return $Config{i64type} or
-    die "Can not find an integer 64 bit type";
-}
-
 # Data types *must* be listed in order of complexity!!
 # this is critical for type conversions!!!
 #
 my @types = (
+	     {
+	      identifier => 'SB',
+	      onecharident => 'A',   # only needed if different from identifier
+	      pdlctype => 'PDL_SByte',# to be defined in pdl.h
+	      realctype => 'signed char',
+	      ppforcetype => 'sbyte', # for some types different from ctype
+	      usenan => 0,           # do we need NaN handling for this type?
+	      packtype => 'c*',      # the perl pack type
+	      defaultbadval => 'SCHAR_MIN',
+	      real=>1,
+	      integer=>1,
+	      unsigned=>0,
+	     },
 	     {
 	      identifier => 'B',
 	      pdlctype => 'PDL_Byte',# to be defined in pdl.h
@@ -86,14 +77,27 @@ my @types = (
 	     {
 	      identifier => 'L',
 	      pdlctype => 'PDL_Long',
-	      realctype => &typeof_PDL_Long,
+	      realctype => 'int32_t',
 	      ppforcetype => 'int',
 	      usenan => 0,
 	      packtype => 'l*',
-	      defaultbadval => 'INT_MIN',
+	      defaultbadval => 'INT32_MIN',
 	      real=>1,
 	      integer=>1,
 	      unsigned=>0,
+	     },
+	     {
+	      identifier => 'UL',
+	      onecharident => 'K',   # only needed if different from identifier
+	      pdlctype => 'PDL_ULong',
+	      realctype => 'uint32_t',
+	      ppforcetype => 'uint',
+	      usenan => 0,
+	      packtype => 'L*',
+	      defaultbadval => 'UINT32_MAX',
+	      real=>1,
+	      integer=>1,
+	      unsigned=>1,
 	     },
 
 # The PDL_Indx type will be either the same as PDL_Long or, probably,
@@ -103,11 +107,11 @@ my @types = (
         identifier => 'IND',
         onecharident => 'N',   # only needed if different from identifier
         pdlctype => 'PDL_Indx',
-        realctype => &typeof_PDL_Indx,
+        realctype => 'ptrdiff_t',
         ppforcetype => 'indx',
         usenan => 0,
         packtype => &packtypeof_PDL_Indx,
-        defaultbadval => 'LONG_MIN',
+        defaultbadval => 'PTRDIFF_MIN',
         real=>1,
         integer=>1,
         unsigned=>0,
@@ -115,20 +119,28 @@ my @types = (
 
 # note that the I/O routines have *not* been updated to be aware of
 # such a type yet
+       { # this one before LL so last integer is signed, to avoid default-type (last in list) changing to unsigned
+	identifier => 'ULL',
+	onecharident => 'P',   # only needed if different from identifier
+	pdlctype => 'PDL_ULongLong',
+	realctype => 'uint64_t',
+	ppforcetype => 'ulonglong',
+	usenan => 0,
+	packtype => 'Q*',
+	defaultbadval => 'UINT64_MAX',
+	real=>1,
+	integer=>1,
+	unsigned=>1,
+      },
        {
 	identifier => 'LL',
 	onecharident => 'Q',   # only needed if different from identifier
 	pdlctype => 'PDL_LongLong',
-	realctype => &typeof_PDL_i64,
+	realctype => 'int64_t',
 	ppforcetype => 'longlong',
 	usenan => 0,
 	packtype => 'q*',
-	defaultbadval => 'LONG_MIN', # this is far from optimal
-		                     # but LLONG_MIN/LLONG_MAX are probably
-		                     # nonportable
-	                             # on the other hand 2^63 should be the
-                                     # value of llong_max which we should be
-                                     # able to compute at runtime ?!
+	defaultbadval => 'INT64_MIN',
 	real=>1,
 	integer=>1,
 	unsigned=>0,
@@ -171,6 +183,23 @@ my @types = (
 	          isfinite=>'isfinite(%1$s)',
 	          floatsuffix=>'',
 	      },
+	      {
+		  identifier => 'LD',
+		  onecharident => 'E',   # only needed if different from identifier
+		  pdlctype => 'PDL_LDouble',
+		  realctype => 'long double',
+		  ppforcetype => 'ldouble',
+		  usenan => 1,
+		  packtype => 'D*',
+	          defaultbadval => '-LDBL_MAX',
+	          real=>1,
+		  complexversion=> 'CLD',
+	          integer=>0,
+	          unsigned=>0,
+	          isnan=>'isnan(%1$s)',
+	          isfinite=>'isfinite(%1$s)',
+	          floatsuffix=>'l',
+	      },
 # the complex types need to be in the same order as their real
 # counterparts, because the "real" ppforcetype relies on a fixed interval
 # between real and complex versions
@@ -210,6 +239,23 @@ my @types = (
 	          isnan=>'(isnan(creal(%1$s)) || isnan(cimag(%1$s)))',
 	          isfinite=>'(isfinite(creal(%1$s)) && isfinite(cimag(%1$s)))',
 	          floatsuffix=>'',
+	      },
+	      {
+		  identifier => 'CLD',
+		  onecharident => 'H',   # only needed if different from identifier
+		  pdlctype => 'PDL_CLDouble',
+		  realctype => 'complex long double',
+		  ppforcetype => 'cldouble',
+		  usenan => 1,
+		  packtype => '(DD)*',
+	          defaultbadval => '(-LDBL_MAX - I*LDBL_MAX)',
+	          real=>0,
+	          realversion=>'LD',
+	          integer=>0,
+	          unsigned=>0,
+	          isnan=>'(isnan(creall(%1$s)) || isnan(cimagl(%1$s)))',
+	          isfinite=>'(isfinite(creall(%1$s)) && isfinite(cimagl(%1$s)))',
+	          floatsuffix=>'l',
 	      },
 	      );
 
@@ -557,56 +603,7 @@ sub typesynonyms {
   my $add = join "\n",
       map {"#define PDL_".typefld($_,'ppsym')." ".typefld($_,'sym')}
         grep {"PDL_".typefld($_,'ppsym') ne typefld($_,'sym')} typesrtkeys;
-  print "adding...\n$add\n";
   return "$add\n";
-}
-
-=head2 datatypes_header
-
-=for ref
-
-return C header text for F<pdl.h> and F<pdlsimple.h>.
-
-=cut
-
-sub datatypes_header {
-    require Config;
-    warn "Using new 64bit index support\n" if $Config::Config{'ivsize'}==8;
-
-    my $enum = join ', ', 'PDL_INVALID=-1', map $_->{sym}, @HASHES;
-    my $typedefs = join '', map "typedef $_->{realctype} $_->{ctype};\n", @HASHES;
-    $typedefs .= "typedef struct {\n  pdl_datatypes type;\n  union {\n";
-    $typedefs .= join '', map "  $_->{ctype} $_->{ppsym};\n", @HASHES;
-    $typedefs .= "  } value;\n} PDL_Anyval;\n";
-
-    my $indx_type = typefld('PDL_IND','realctype');
-    $typedefs .= '#define IND_FLAG ';
-    if ($indx_type eq 'long'){
-	$typedefs .= qq|"ld"|;
-    } elsif ($indx_type eq 'long long'){
-	$typedefs .= qq|"lld"|;
-    } else {
-	$typedefs .= qq|"d"|;
-    }
-    $typedefs .= "\n";
-
-    <<EOD . "\n".typesynonyms()."\n";
-
-/*****************************************************************************/
-/*** This section of .h file generated automatically by ***/
-/*** PDL::Types::datatypes_header() - don't edit manually ***/
-
-/* Data types/sizes [must be in order of complexity] */
-
-typedef enum { $enum } pdl_datatypes;
-
-/* Define the pdl data types */
-
-$typedefs
-
-/*****************************************************************************/
-
-EOD
 }
 
 =head1 PDL::Type OBJECTS
@@ -655,13 +652,13 @@ The value returned by C<ctype> without the 'PDL_' prefix.
 =item badvalue
 
 The special numerical value used to represent bad values for this type.
-See L<badvalue routine in PDL::Bad|PDL::Bad/badvalue> for more details.
+See L<PDL::Bad/badvalue> for more details.
 
 =item isnan
 
 Given a string representing a C value, will return a C expression for
 this type that indicates whether that value is NaN (for complex values,
-if I<either> is finite).
+if I<either> is NaN).
 
 =item isfinite
 
@@ -674,14 +671,20 @@ if I<both> are finite).
 The string appended to floating-point functions for this floating-point
 type. Dies if called on non-floating-point type.
 
-=cut
-
 =item orig_badvalue
 
 The default special numerical value used to represent bad values for this
 type. (You can change the value that represents bad values for each type
 during runtime.) See the
 L<orig_badvalue routine in PDL::Bad|PDL::Bad/orig_badvalue> for more details.
+
+=item bswap
+
+Returns the appropriate C<bswap*> from L<PDL::IO::Misc> for the size of
+this type, including a no-op for types of size 1. Note this means a
+one-line construction means you must call the return value:
+
+  $pdl->type->bswap->($pdl);
 
 =back
 
@@ -726,6 +729,20 @@ sub types { @CACHED_TYPES }
     sub isfinite { sprintf $_[0][1]{isfinite}, $_[1] }
 
     sub floatsuffix { $_[0][1]{floatsuffix} // 'floatsuffix called on non-float type' }
+
+    my %bswap_cache;
+    sub bswap {
+      PDL::Core::barf('Usage: $type->bswap with no args') if @_ > 1;
+      return $bswap_cache{$_[0][0]} if $bswap_cache{$_[0][0]};
+      my $size = PDL::Core::howbig($_[0][0]);
+      return $bswap_cache{$_[0][0]} = sub {} if $size < 2;
+      require PDL::IO::Misc;
+      $bswap_cache{$_[0][0]} =
+        $size == 2 ? \&PDL::bswap2 :
+        $size == 4 ? \&PDL::bswap4 :
+        $size == 8 ? \&PDL::bswap8 :
+        PDL::Core::barf("bswap couldn't find swap function for $_[0][1]{shortctype}");
+    }
 
 !NO!SUBS!
 

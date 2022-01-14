@@ -1,4 +1,3 @@
-# This file must be saved in UTF-8 encoding!
 use strict;
 use warnings;
 use Test::More;
@@ -10,7 +9,7 @@ my @tests = (
 		'algo'		=> 1, #$class::PASSWORD_BCRYPT,
 		'options'	=> {},
 		'expect'	=> 1,
-		'reason'	=> 'algorithm signature is old',
+		'reason'	=> 'algorithm signature is not 2y',
 	},
 	{
 		'crypted'	=> '$2b$10$wOmSB/8mvcXJBAnPTJzO..tFOq4nCxP21vTfWqunrVi5Irsi3Obcy',
@@ -20,7 +19,7 @@ my @tests = (
 			'salt'	=> 'wOmSB/8mvcXJBAnPTJzO..',
 		},
 		'expect'	=> 1,
-		'reason'	=> 'algorithm signature is old',
+		'reason'	=> 'algorithm signature is not 2y',
 	},
 	{
 		'crypted'	=> '$2y$04$f5VgvyHCr0OiPbvjdZ8zJuPBHD6Tul6nleZSWUVkk/HSOKOC8DmFy',
@@ -130,13 +129,17 @@ if (!($ENV{'HARNESS_ACTIVE'} || ($^O eq 'MSWin32'))) {	# experimental: that's wh
 	if (-x $php) {
 		my $phpversion = `php -v`;
 		$phpversion =~ s/^PHP (\S+)\s.*/$1/s;
+		my $too_old;
 		if ($phpversion =~ /^(\d{1,3}\.\d{1,6})\b/) {
 			#if ($1 < 5.5) {
 			if ($1 < 7.3) {
-				undef($php);
+				$too_old = 1;
 			}
 		}
-		diag("Found PHP executable $php with version $phpversion: " . ($php ? 'OK' : 'TOO OLD') . "\n");
+		diag("Found PHP executable $php with version $phpversion: " . ($too_old ? 'TOO OLD' : 'OK') . "\n");
+		if ($too_old) {
+			undef($php);
+		}
 	}
 	else {
 		undef($php);
@@ -169,7 +172,7 @@ foreach my $test (@tests) {
 	is($result, $expect, "Expect $expect from password_needs_rehash(\"$crypted\",...) because $reason");
 
 	if ($php) {
-		my $phpcode = "password_needs_rehash('" . $crypted . "', $algo, array(";
+		my $phpcode = "password_needs_rehash('" . $crypted . "', $algo, [";
 		if (defined($options->{'salt'})) {
 			$phpcode .= "'salt'=>'" . $options->{'salt'} . "',";
 		}
@@ -189,7 +192,7 @@ foreach my $test (@tests) {
 				$phpcode .= "'threads'=>" . $options->{'threads'} . ",";
 			}
 		}
-		$phpcode .= "))";
+		$phpcode .= '])';
 		#print "$phpcode\n";
 		my $h;
 		open($h, '-|', $php, '-r', "var_export($phpcode);") || die("Failed to execute $php: $!");
@@ -202,6 +205,6 @@ foreach my $test (@tests) {
 	}
 }
 
-#diag('-----');
+#note('-----');
 #use Crypt::Argon2;
-#diag('Crypt::Argon2::VERSION: ' . $Crypt::Argon2::VERSION);
+#note('Crypt::Argon2::VERSION: ' . $Crypt::Argon2::VERSION);

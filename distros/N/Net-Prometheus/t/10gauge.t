@@ -44,6 +44,11 @@ sub HASHfromSample
 
    @samples = $gauge->samples;
    is( $samples[0]->value, 6, 'sample->value after $gauge->dec( 5 )' );
+
+   $gauge->set( undef );
+
+   @samples = $gauge->samples;
+   is( $samples[0]->value, undef, 'sample->value after $gauge->set( undef )' );
 }
 
 # Functions

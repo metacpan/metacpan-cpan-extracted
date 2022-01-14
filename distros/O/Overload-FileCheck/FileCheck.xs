@@ -367,6 +367,14 @@ PP(pp_overload_stat) { /* stat & lstat */
       /* Unexpected warning: Attempt to free unreferenced scalar: SV 0x119bd80. */
       //SV *previous_stack = sv_2mortal(POPs); /* what do we want to do with this ? */
       SV *previous_stack = POPs;
+
+      /* Here, we cut early when stat() returned no values
+       * In such a case, we do not want to set the statcache,
+       * nor do we want to call the real op (CALL_REAL_OP)
+      */
+      if ( !size )
+        RETURN;
+
       PUSHs( MUTABLE_SV( PL_defgv ) ); /* add *_ to the stack */
 
       /* copy the content of mocked_stat to PL_statcache */

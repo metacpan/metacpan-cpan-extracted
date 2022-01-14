@@ -89,7 +89,7 @@ of the file F<pdlcore.h>. So what does the structure look like:
 	   unsigned char *threadids;  /* Starting index of the thread index set n */
 	   unsigned char nthreadids;
 
-	   pdl_children children;
+	   pdl_trans_children trans_children;
 
 	   PDL_Indx   def_dims[PDL_NDIMS];   /* Preallocated space for efficiency */
 	   PDL_Indx   def_dimincs[PDL_NDIMS];   /* Preallocated space for efficiency */
@@ -102,9 +102,7 @@ of the file F<pdlcore.h>. So what does the structure look like:
 
 This is quite a structure for just storing some data in - what is going on?
 
-=over 5
-
-=item Data storage
+=head3 Data storage
 
 We are going to start with some of the simpler members: first of all,
 there is the member
@@ -144,7 +142,7 @@ F<pdl.h>). Currently we have byte, short, unsigned short, long, index
 (either long or long long), long long, float and double (plus complex
 equivalents) types, see also L<PDL::Types>.
 
-=item Dimensions
+=head3 Dimensions
 
 The number of dimensions in the ndarray is given by the member
 
@@ -175,7 +173,7 @@ by code like
 but this is not always the right thing to do,
 at least without checking for certain things first.
 
-=item Default storage
+=head3 Default storage
 
 Since the vast majority of ndarrays don't have more than 6 dimensions,
 it is more efficient to have default storage for the dimensions and dimincs
@@ -191,7 +189,7 @@ The same applies for the threadids:
 
    	unsigned char def_threadids[PDL_NTHREADIDS];
 
-=item Magic
+=head3 Magic
 
 It is possible to attach magic to ndarrays, much like Perl's own magic
 mechanism. If the member pointer
@@ -201,7 +199,7 @@ mechanism. If the member pointer
 is nonzero, the PDL has some magic attached to it. The implementation
 of magic can be gleaned from the file F<pdlmagic.c> in the distribution.
 
-=item State
+=head3 State
 
 One of the first members of the structure is 
 
@@ -211,7 +209,7 @@ The possible flags and their meanings are given in C<pdl.h>.
 These are mainly used to implement the lazy evaluation mechanism
 and keep track of ndarrays in these operations.
 
-=item Transformations and virtual affine transformations
+=head3 Transformations and virtual affine transformations
 
 As you should already know, ndarrays often carry information about
 where they come from. For example, the code
@@ -231,7 +229,7 @@ about the transformation in appropriate slots of the C<pdl> structure.
 C<pdl_trans> and C<pdl_vaffine> are structures that we will look at in
 more detail below.
 
-=item The Perl SVs
+=head3 The Perl SVs
 
 When ndarrays are referred to through Perl SVs, we store an additional
 reference to it in the member
@@ -248,8 +246,6 @@ Also, we store an opaque
 which is just for use by the user to hook up arbitrary data with this sv.
 This one is generally manipulated through L<sethdr|PDL::Core/sethdr> and
 L<gethdr|PDL::Core/gethdr> calls.
-
-=back
 
 =head2 Smart references and transformations: slicing and dicing
 
@@ -329,7 +325,7 @@ suggested above input and output ndarrays are referred to as parents
 and children, respectively.
 
 An example of processing the children of an ndarray is provided
-by the C<baddata> method of L<PDL::Bad>.
+by the method L<PDL::Bad/badflag>.
 
 Consider the following situation:
 
@@ -434,11 +430,10 @@ simplified from F<pdl.h> for clarity)
 	int nparents;   /* number of parent pdls (input) */
 	int npdls;      /* number of child pdls (output) */
 	char *per_pdl_flags;  /* optimization flags */
-	void (*redodims)(pdl_trans *tr);  /* figure out dims of children */
-	void (*readdata)(pdl_trans *tr);  /* flow parents to children  */
-	void (*writebackdata)(pdl_trans *tr); /* flow backwards */
-	void (*freetrans)(pdl_trans *tr); /* Free both the contents and it of
-					the trans member */
+	pdl_error (*redodims)(pdl_trans *tr);  /* figure out dims of children */
+	pdl_error (*readdata)(pdl_trans *tr);  /* flow parents to children  */
+	pdl_error (*writebackdata)(pdl_trans *tr); /* flow backwards */
+	pdl_error (*freetrans)(pdl_trans *tr, char);
   	int structsize;
 	char *name; /* the function's name */
   } pdl_transvtable;
@@ -472,26 +467,32 @@ to be created and is called from within the API function that
 should be called to ensure that the dimensions of an ndarray are
 accessible (F<pdlapi.c>):
 
-   void pdl_make_physdims(pdl *it)
+   pdl_error pdl_make_physdims(pdl *it)
 
 =head3 readdata and writebackdata
 
 Responsible for the actual
 computations of the child data from the parents or parent data
 from those of the children, respectively (the dataflow aspect).
+C<readdata> populates the children from the parents, and C<writebackdata>
+implements updating the parent(s) from the child(ren) if dataflow is
+part of that transformation.
 The PDL core makes sure that these are called as needed when
 ndarray data is accessed (lazy-evaluation). The general API
 function to ensure that an ndarray is up-to-date is
 
-  void pdl_make_physvaffine(pdl *it)
+  pdl_error pdl_make_physvaffine(pdl *it)
 
 which should be called before accessing ndarray data from
 XS/C (see F<Core.xs> for some examples).
 
 =head3 freetrans
 
-Frees dynamically allocated memory associated
-with the trans as needed.
+Frees dynamically allocated memory associated with the trans as needed.
+If C<redodims> has previously been called, it will free any
+vaffine-associated memory. If the C<destroy> parameter is true, it will
+also free any bespoke C<params>-connected memory - this will not be the
+case if called before doing another C<redodims>.
 Again, functions built with L<PDL::PP> make sure that
 freeing via these callbacks happens at the right times.
 
@@ -528,7 +529,7 @@ F<pdlcore.h> in F<Basic/Core>) and looks something like
     pdl*   (*pdlnew)      ( );
     pdl*   (*tmp)         ( );
     pdl*   (*create)      (int type);
-    void   (*destroy)     (pdl *it);
+    pdl_error (*destroy)     (pdl *it);
     ...
  }
  typedef struct Core Core;

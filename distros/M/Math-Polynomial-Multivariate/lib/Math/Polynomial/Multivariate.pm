@@ -1,6 +1,6 @@
-# Copyright (c) 2011-2017 Martin Becker.  All rights reserved.
+# Copyright (c) 2011-2022 Martin Becker, Blaubeuren.
 # This package is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
+# under the terms of the Artistic License 2.0 (see LICENSE file).
 
 package Math::Polynomial::Multivariate;
 
@@ -45,7 +45,7 @@ use constant _MINUS_INFINITY => - (~0) ** (~0);
 
 # ----- class data -----
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 # ----- private subroutines -----
 
@@ -467,7 +467,7 @@ Math::Polynomial::Multivariate - Perl class for multivariate polynomials
 
 =head1 VERSION
 
-This documentation refers to version 0.006 of Math::Polynomial::Multivariate.
+This documentation refers to version 0.007 of Math::Polynomial::Multivariate.
 
 =head1 SYNOPSIS
 
@@ -966,13 +966,13 @@ stay well below 2**32 you probably should not worry.
 
 The functionality of this module should not be taken as final.
 
-Bug reports and suggestions are always welcome -- please submit
-them via the CPAN RT:
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Math-Polynomial-Multivariate>
+Bug reports and suggestions are always welcome.
+Please submit them through the github issue tracker,
+L<https://github.com/mhasch/perl-Math-Polynomial-Multivariate/issues>.
 
 =head1 ROADMAP
 
-As of version 0.006, the module interface is still in beta state.
+As of version 0.007, the module interface is still in beta state.
 While upcoming improvements are intended to be mostly extensions,
 changes breaking backwards compatibility may yet be considered.
 
@@ -1020,15 +1020,18 @@ L<Math::Symbolic> - perl class for more general arithmetic expressions
 
 =head1 AUTHOR
 
-Martin Becker, E<lt>becker-cpan-mp@cozap.comE<gt>
+Martin Becker, Blaubeuren, E<lt>becker-cpan-mp (at) cozap.comE<gt>
+
+=head1 CONTRIBUTING
+
+Contributions to this library are welcome (see the CONTRIBUTING file).
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2011-2017 by Martin Becker.  All rights reserved.
+Copyright (c) 2011-2022 by Martin Becker, Blaubeuren.
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.0 or,
-at your option, any later version of Perl 5 you may have available.
+it under the terms of the Artistic License 2.0 (see the LICENSE file).
 
 =head1 DISCLAIMER OF WARRANTY
 

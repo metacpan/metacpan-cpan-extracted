@@ -27,6 +27,7 @@ Basic/Core/pdlperl.h.PL
 Basic/Core/pdlsimple.h.PL
 Basic/Core/pdlthread.c
 Basic/Core/pdlthread.h
+Basic/Core/pdlutil.c
 Basic/Core/ppport.h
 Basic/Core/typemap
 Basic/Core/Types.pm.PL
@@ -67,7 +68,6 @@ Basic/Math/quiet_nan.c
 Basic/Math/rint.c
 Basic/Math/yn.c
 Basic/Matrix.pm
-Basic/MatrixOps/blas.c
 Basic/MatrixOps/eigen.c
 Basic/MatrixOps/eigen.h
 Basic/MatrixOps/eigens.c
@@ -91,6 +91,7 @@ Basic/Pod/Course.pod
 Basic/Pod/Dataflow.pod
 Basic/Pod/Delta.pod
 Basic/Pod/FAQ.pod
+Basic/Pod/Graphics.pod
 Basic/Pod/Index.pod
 Basic/Pod/Indexing.pod
 Basic/Pod/Internals.pod
@@ -130,32 +131,6 @@ cygwin/drivers.list
 cygwin/g77_gcc.conf
 cygwin/INSTALL
 cygwin/README
-debian/changelog
-debian/compat
-debian/control
-debian/copyright
-debian/dh_pdl
-debian/f77conf.pl
-debian/fix_man_encoding.sed
-debian/fix_man_name.sed
-debian/patches/series
-debian/pdl.dirs
-debian/pdl.doc-base
-debian/pdl.docs
-debian/pdl.install
-debian/pdl.links
-debian/pdl.lintian-overrides
-debian/pdl.manpages
-debian/pdl.menu
-debian/pdl.postinst
-debian/pdl.prerm
-debian/pdl.remove
-debian/pdl.triggers
-debian/perldl.conf
-debian/README.Debian
-debian/rules
-debian/source/format
-debian/write_config_debian.pl
 Demos/BAD2_demo.pm.PL
 Demos/BAD_demo.pm.PL
 Demos/Cartography_demo.pm
@@ -207,7 +182,6 @@ Example/InlinePdlpp/inlppminimal.pl
 Example/InlinePdlpp/Module/Makefile.PL
 Example/InlinePdlpp/Module/MyInlineMod.pm
 Example/InlinePdlpp/Module/t/myinlinemod.t
-Example/IO/wmpeg.pl
 Example/PGPLOT/pgplot.pl
 Example/PGPLOT/std_pgplot.pl
 Example/Simplex/tsimp2.pl
@@ -353,6 +327,7 @@ IO/FastRaw/t/fastraw.t
 IO/FITS/FITS.pm
 IO/FITS/Makefile.PL
 IO/FITS/t/fits.t
+IO/FITS/t/m51.fits.fz
 IO/FlexRaw/FlexRaw.pm
 IO/FlexRaw/Makefile.PL
 IO/FlexRaw/t/flexraw.t
@@ -412,6 +387,7 @@ Libtmp/Compression/compression.pd
 Libtmp/Compression/Makefile.PL
 Libtmp/Compression/ricecomp.c
 Libtmp/Compression/ricecomp.h
+Libtmp/Compression/t/basic.t
 Libtmp/DiskCache.pm
 Libtmp/FFT/fft.pd
 Libtmp/FFT/fftn.c
@@ -441,12 +417,12 @@ Libtmp/GSL/DIFF/FUNC.c
 Libtmp/GSL/DIFF/gsl_diff.pd
 Libtmp/GSL/DIFF/Makefile.PL
 Libtmp/GSL/DIFF/t/gsl_diff.t
+Libtmp/GSL/gslerr.h
 Libtmp/GSL/INTEG/FUNC.c
 Libtmp/GSL/INTEG/gsl_integ.pd
 Libtmp/GSL/INTEG/Makefile.PL
 Libtmp/GSL/INTEG/t/gsl_integ.t
 Libtmp/GSL/INTERP/gsl_interp.pd
-Libtmp/GSL/INTERP/gslerr.h
 Libtmp/GSL/INTERP/Makefile.PL
 Libtmp/GSL/INTERP/t/gsl_interp.t
 Libtmp/GSL/INTERP/typemap
@@ -497,7 +473,6 @@ Libtmp/GSL/SF/gamma/gsl_sf_gamma.pd
 Libtmp/GSL/SF/gamma/Makefile.PL
 Libtmp/GSL/SF/gegenbauer/gsl_sf_gegenbauer.pd
 Libtmp/GSL/SF/gegenbauer/Makefile.PL
-Libtmp/GSL/SF/gslerr.h
 Libtmp/GSL/SF/hyperg/gsl_sf_hyperg.pd
 Libtmp/GSL/SF/hyperg/Makefile.PL
 Libtmp/GSL/SF/laguerre/gsl_sf_laguerre.pd
@@ -751,7 +726,6 @@ t/subclass.t
 t/thread.t
 t/thread_def.t
 t/ufunc.t
-TODO
 utils/perldlpp.pl
 win32/INSTALL
 win32/win32f77.pl
@@ -805,8 +779,9 @@ GENERATED/PDL/Image2D.pm                 mod=PDL::Image2D pd=Libtmp/Image2D/imag
 GENERATED/PDL/ImageND.pm                 mod=PDL::ImageND pd=Libtmp/ImageND/imagend.pd (added by pdlpp_mkgen)
 GENERATED/PDL/ImageRGB.pm                mod=PDL::ImageRGB pd=Libtmp/ImageRGB/imagergb.pd (added by pdlpp_mkgen)
 GENERATED/PDL/IO/Browser.pm              mod=PDL::IO::Browser pd=IO/Browser/browser.pd (added by pdlpp_mkgen)
-GENERATED/PDL/IO/HDF.pm                  mod=PDL::IO::HDF pd=IO/HDF/VS/VS.pd (added by pdlpp_mkgen)
+GENERATED/PDL/IO/GD.pm                   mod=PDL::IO::GD pd=IO/GD/GD.pd (added by pdlpp_mkgen)
 GENERATED/PDL/IO/HDF/SD.pm               mod=PDL::IO::HDF::SD pd=IO/HDF/SD/SD.pd (added by pdlpp_mkgen)
+GENERATED/PDL/IO/HDF/VS.pm               mod=PDL::IO::HDF::VS pd=IO/HDF/VS/VS.pd (added by pdlpp_mkgen)
 GENERATED/PDL/IO/Misc.pm                 mod=PDL::IO::Misc pd=IO/Misc/misc.pd (added by pdlpp_mkgen)
 GENERATED/PDL/IO/Pnm.pm                  mod=PDL::IO::Pnm pd=IO/Pnm/pnm.pd (added by pdlpp_mkgen)
 GENERATED/PDL/IO/Storable.pm             mod=PDL::IO::Storable pd=IO/Storable/storable.pd (added by pdlpp_mkgen)

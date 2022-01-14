@@ -1,0 +1,8 @@
+Revision history for string-eertree
+
+0.02    2022-01-09
+        Require Test::V0 with working bag implementation.
+
+0.01    2022-01-08
+        First version, released on an unsuspecting world.
+

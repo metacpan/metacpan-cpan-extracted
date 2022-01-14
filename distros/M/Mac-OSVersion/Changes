@@ -1,5 +1,10 @@
 Revision history for Perl module Ma::OSVersion
 
+1.007 2022-01-09T03:15:09Z
+
+	* Added macOS 13 Mammoth. Maybe that's the name, maybe it's not. I'll
+	update it if it changes.
+
 1.006 2021-07-28T17:18:59Z
 	* More updates to make this behave properly under 11.x and 12.x.
 	The previous release is broken.

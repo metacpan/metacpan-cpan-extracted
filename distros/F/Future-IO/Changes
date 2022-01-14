@@ -1,5 +1,14 @@
 Revision history for Future-IO
 
+0.11    2022-01-07
+        [CHANGES]
+         * Added ->connect and ->accept for socket-based code
+         * Provide ->HAVE_MULTIPLE_FILEHANDLES for user code to check if a
+           real impl has been loaded
+         * Simplify the default implementation so it can reuse most of the
+           ImplBase class
+         * Wording fix in docs for ->alarm
+
 0.10    2021-08-26
         [BUGFIXES]
          * Skip the unit test about filling pipes with ->syswrite on MSWin32

@@ -1,5 +1,5 @@
 package Date::Holidays::BY;
-our $VERSION = '1.2021.1'; # VERSION
+our $VERSION = '1.2022.1'; # VERSION
 
 =encoding utf8
 
@@ -61,8 +61,8 @@ INACCURATE_TIMES_SINCE after this year dates of holidays and working day shift a
 
 use List::Util;
 
-our $HOLIDAYS_VALID_SINCE = 2017; # TODO add all old
-our $INACCURATE_TIMES_SINCE = 2022;
+our $HOLIDAYS_VALID_SINCE = 2016; # TODO add all old
+our $INACCURATE_TIMES_SINCE = 2023;
 
 =head2 $Date::Holidays::BY::strict
 
@@ -117,27 +117,33 @@ my @REGULAR_HOLIDAYS = (
 );
 
 my %HOLIDAYS_SPECIAL = (
-    2017 => [ qw( 0102 0424 0425 0508 1106) ],
-    2018 => [ qw( 0102 0309 0416 0417 0430 0702 1224 1231) ],
-    2019 => [ qw( 0506 0507 0508 1108) ],
-    2020 => [ qw( 0106 0427 0428) ],
-    2021 => [ qw( 0108 0510 0511) ],
+    2016 => [ qw( 0108 0307  ) ],
+    2017 => [ qw( 0102 0424 0425 0508 1106 ) ],
+    2018 => [ qw( 0102 0309 0416 0417 0430 0702 1224 1231 ) ],
+    2019 => [ qw( 0506 0507 0508 1108 ) ],
+    2020 => [ qw( 0106 0427 0428 ) ],
+    2021 => [ qw( 0108 0510 0511 ) ],
+    2022 => [ qw( 0307 0502 ) ],
 );
 
 my %BUSINESS_DAYS_ON_WEEKENDS = (
-    2017 => [ qw( 0121 0429 0506 1104) ],
-    2018 => [ qw( 0120 0303 0414 0428 0707 1222 1229) ],
-	2019 => [ qw( 0504 0511 1116) ],
-	2020 => [ qw( 0104 0404) ],
-	2021 => [ qw( 0116 0515) ],
+    2016 => [ qw( 0116 0305 ) ],
+    2017 => [ qw( 0121 0429 0506 1104 ) ],
+    2018 => [ qw( 0120 0303 0414 0428 0707 1222 1229 ) ],
+	2019 => [ qw( 0504 0511 1116 ) ],
+	2020 => [ qw( 0104 0404 ) ],
+	2021 => [ qw( 0116 0515 ) ],
+	2022 => [ qw( 0312 0514 ) ],
 );
 
 my %SHORT_BUSINESS_DAYS = (
-    2017 => [ qw( 0106 0307 0429 0506 1104) ],
-    2018 => [ qw( 0307 0508 1106) ],
-    2019 => [ qw( 0307 0430 0506 0702 1106 1224) ],
+    2017 => [ qw( 0106 ) ],
+    2017 => [ qw( 0106 0307 0429 0506 1104 ) ],
+    2018 => [ qw( 0307 0508 1106 ) ],
+    2019 => [ qw( 0307 0430 0506 0702 1106 1224 ) ],
 	2020 => [ qw( ) ],
 	2021 => [ qw( ) ],
+    2022 => [ qw( ) ],
 );
 
 
@@ -288,7 +294,7 @@ sub _get_date_key {
 
 =head1 LICENSE
 
-This software is copyright (c) 2021 by Vladimir Varlamov.
+This software is copyright (c) 2022 by Vladimir Varlamov.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

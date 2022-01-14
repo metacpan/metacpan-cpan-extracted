@@ -2,18 +2,20 @@ NAME
     Perinci::CmdLine - Rinci/Riap-based command-line application framework
 
 VERSION
-    This document describes version 1.913.0 of Perinci::CmdLine (from Perl
-    distribution Perinci-CmdLine), released on 2021-12-03.
+    This document describes version 2.000.0 of Perinci::CmdLine (from Perl
+    distribution Perinci-CmdLine), released on 2021-12-19.
 
 DESCRIPTION
-    This module is currently empty, because the implementation is currently
-    split into Perinci::CmdLine::Lite (the lightweight version) and
-    Perinci::CmdLine::Classic (the full but heavier version). There's also
-    Perinci::CmdLine::Any that lets you choose between the two dynamically,
-    à la Any::Moose. And finally there's also Perinci::CmdLine::Inline, the
-    even more lightweight version.
+    Perinci::CmdLine is a Rinci/Riap-based command-line application
+    framework. It has a few implementations; use one depending on your
+    needs.
 
-    This module exists solely for convenience of linking purposes.
+    *   Perinci::CmdLine::Plugin
+
+    *   Perinci::CmdLine::Inline
+
+    Use Perinci::CmdLine::Any to automatically choose one of several
+    implementations.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -24,13 +26,14 @@ SOURCE
     <https://github.com/perlancar/perl-Perinci-CmdLine>.
 
 SEE ALSO
-    Perinci::CmdLine::Lite
+    Perinci::CmdLine::Plugin
 
-    Perinci::CmdLine::Classic
+    Perinci::CmdLine::Inline
 
     Perinci::CmdLine::Any
 
-    Perinci::CmdLine::Inline
+    Perinci::CmdLine::Lite and Perinci::CmdLine::Classic, two older
+    implementations.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

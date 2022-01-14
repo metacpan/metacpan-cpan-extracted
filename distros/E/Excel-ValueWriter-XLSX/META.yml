@@ -1,0 +1,34 @@
+---
+abstract: 'generating data-only Excel workbooks in XLSX format, fast'
+author:
+  - 'Laurent Dami <dami@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Excel-ValueWriter-XLSX
+provides:
+  Excel::ValueWriter::XLSX:
+    file: lib/Excel/ValueWriter/XLSX.pm
+    version: '0.1'
+requires:
+  Archive::Zip: '0'
+  Carp: '0'
+  Date::Calc: '0'
+  List::Util: '0'
+  POSIX: '0'
+  Params::Validate: '0'
+  Scalar::Util: '0'
+  perl: '5.014001'
+  utf8: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/damil/Excel-ValueWriter-XLSX
+version: '0.1'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

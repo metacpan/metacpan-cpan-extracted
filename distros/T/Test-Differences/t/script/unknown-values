@@ -1,0 +1,22 @@
+use strict;
+use warnings;
+
+use Test::More;
+use Test::Differences;
+
+use Unknown::Values;
+
+my $unknown = unknown;
+
+my @tests = (
+    # the same unknown value
+    sub { eq_or_diff($unknown, $unknown) },
+    sub { eq_or_diff(unknown(), undef) },
+    # different unknown values
+    sub { eq_or_diff([1, unknown()], [1, unknown()]) },
+    sub { eq_or_diff([1, unknown()], [1, undef]) },
+);
+
+plan tests => scalar @tests;
+
+$_->() foreach(@tests);

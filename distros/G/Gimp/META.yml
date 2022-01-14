@@ -11,7 +11,7 @@ build_requires:
   HTML::Entities: '0'
   IO::All: '0'
   IO::Scalar: '0'
-  PDL: 2.063_01
+  PDL: '2.064'
   Test::More: '0.88'
   Web::Scraper: '0'
 configure_requires:
@@ -40,11 +40,11 @@ requires:
   HTML::Entities: '0'
   IO::All: '0'
   IO::Scalar: '0'
-  PDL: 2.063_01
+  PDL: '2.064'
   Web::Scraper: '0'
   perl: '5.014001'
 resources:
   IRC: irc://irc.gnome.org/#gimp
   repository: https://gitlab.gnome.org/GNOME/gimp-perl/
-version: '2.36'
+version: '2.37'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

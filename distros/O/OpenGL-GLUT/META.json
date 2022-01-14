@@ -4,13 +4,13 @@
       "Chris Marshall <chm at cpan dot org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "OpenGL-GLUT",
    "no_index" : {
@@ -27,26 +27,33 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
          "requires" : {
-            "Test::More" : "0"
+            "OpenGL" : "0.70"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://sourceforge.net/tracker/?group_id=562483&atid=2281758"
+         "web" : "https://github.com/Perl-GPU/OpenGL-GLUT/issues"
       },
       "homepage" : "http://sourceforge.net/projects/pogl/",
       "repository" : {
          "type" : "git",
-         "url" : "git://pogl.git.sourceforge.net/gitroot/pogl/pogl"
-      }
+         "url" : "git://github.com/Perl-GPU/OpenGL-GLUT.git",
+         "web" : "https://github.com/Perl-GPU/OpenGL-GLUT"
+      },
+      "x_IRC" : "irc://irc.perl.org/#pogl"
    },
-   "version" : "0.71",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.72",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

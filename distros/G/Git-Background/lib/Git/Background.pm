@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Carp       ();
 use File::Temp ();
@@ -65,6 +65,8 @@ sub new {
 sub run {
     my ( $self, @cmd ) = @_;
 
+    Carp::croak 'Cannot use run() in void context. (The git process would immediately get killed.)' if !defined wantarray;    ## no critic (Community::Wantarray)
+
     my $config;
     if ( @cmd && ref $cmd[-1] eq ref {} ) {
         my $args = pop @cmd;
@@ -122,8 +124,6 @@ sub version {
     if ( defined $args ) {
         push @cmd, $args;
     }
-
-    $self->run(@cmd);
 
     my $version = eval {
         for my $line ( $self->run(@cmd)->stdout ) {
@@ -202,7 +202,7 @@ Git::Background - use Git commands with L<Future>
 
 =head1 VERSION
 
-Version 0.003
+Version 0.004
 
 =head1 SYNOPSIS
 
@@ -293,6 +293,8 @@ temporary file.
 
 C<Proc::Background> is run with C<autoterminate> set, which will kill the
 Git process if the future is destroyed.
+
+Since version 0.004 C<run> C<croaks> if it gets called in void context.
 
 =head2 version( [ARGS] )
 

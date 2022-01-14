@@ -2,7 +2,7 @@
 package App::Module::Lister;
 use strict;
 
-our $VERSION = '0.154';
+our $VERSION = '0.155';
 
 =encoding utf8
 
@@ -276,7 +276,7 @@ Some bits stolen from C<mldistwatch> in the PAUSE code, by Andreas König.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2007-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2007-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic 2 license.
 

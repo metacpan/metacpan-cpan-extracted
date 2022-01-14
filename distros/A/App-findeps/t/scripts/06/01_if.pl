@@ -3,9 +3,7 @@ use warnings;
 
 use lib 't/lib';
 
-require If::AfterRequire if 0;    # ignored
-require If::AfterRequire if 1;    # ignored by parser
+require Module::Exists::Unexpected if 0;    # ignored
+require Module::Exists             if 1;    # ignored by parser
+require Acme::BadExample;                   # does not exist anywhere
 
-require Dummy;                    # does not exist anywhere
-
-exit;

@@ -3,7 +3,7 @@
 #
 package PDL::Stats::Kmeans;
 
-our @EXPORT_OK = qw( random_cluster iv_cluster PDL::PP _random_cluster PDL::PP which_cluster PDL::PP assign PDL::PP centroid PDL::PP _d_p2l );
+our @EXPORT_OK = qw(random_cluster iv_cluster _random_cluster which_cluster assign centroid _d_p2l );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -19,6 +19,9 @@ use DynaLoader;
 
 
 
+
+
+#line 4 "kmeans.pd"
 
 use Carp;
 use PDL::LiteF;
@@ -77,7 +80,7 @@ plot the clusters if there are only 2 vars in $data,
       for (0 .. $k{cluster}->dim(1)-1);
 
 =cut
-
+#line 84 "Kmeans.pm"
 
 
 
@@ -91,7 +94,9 @@ plot the clusters if there are only 2 vars in $data,
 
 
 
-#line 75 "Kmeans/kmeans.pd"
+#line 75 "kmeans.pd"
+
+#line 75 "kmeans.pd"
 
 # my tmp var for PDL 2.007 slice upate
 my $_tmp;
@@ -122,14 +127,18 @@ sub random_cluster {
   } while (PDL::any $cluster->sumover == 0 );
   return $cluster;
 }
+#line 107 "kmeans.pd"
+#line 132 "Kmeans.pm"
 
 
 
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *_random_cluster = \&PDL::_random_cluster;
+#line 138 "Kmeans.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 which_cluster
@@ -164,16 +173,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 177 "Kmeans.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *which_cluster = \&PDL::which_cluster;
+#line 183 "Kmeans.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 assign
@@ -224,16 +234,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 238 "Kmeans.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *assign = \&PDL::assign;
+#line 244 "Kmeans.pm"
 
 
 
+#line 1059 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 
 =head2 centroid
@@ -293,18 +304,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 308 "Kmeans.pm"
 
 
 
-
-
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *centroid = \&PDL::centroid;
+#line 314 "Kmeans.pm"
 
 
 
+#line 432 "kmeans.pd"
 
-#line 432 "Kmeans/kmeans.pd"
+#line 432 "kmeans.pd"
 
 sub _scree_ind {
   # use as scree cutoff the point with max distance to the line formed
@@ -319,10 +331,10 @@ sub _scree_ind {
     croak "1D pdl only please";
 
   my $a = zeroes 2, $self->nelem;
-  ($_tmp = $a((0), )) .= sequence $self->nelem;
-  ($_tmp = $a((1), )) .= $self;
+  ($_tmp = $a->slice('(0)')) .= sequence $self->nelem;
+  ($_tmp = $a->slice('(1)')) .= $self;
 
-  my $d = _d_point2line( $a, $a( ,(0)), $a( ,(-1)) );
+  my $d = _d_point2line( $a, $a->slice(':,(0)'), $a->slice(':,(-1)') );
 
   return $d->maximum_ind;
 }
@@ -337,16 +349,20 @@ sub _d_point2line {
 
   return _d_p2l( $self->mv(0,-1)->dog, $p1->mv(0,-1)->dog, $p2->mv(0,-1)->dog );
 }
+#line 466 "kmeans.pd"
+#line 354 "Kmeans.pm"
 
 
 
-
+#line 1061 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 *_d_p2l = \&PDL::_d_p2l;
+#line 360 "Kmeans.pm"
 
 
 
+#line 495 "kmeans.pd"
 
-#line 495 "Kmeans/kmeans.pd"
+#line 495 "kmeans.pd"
 
 =head2 kmeans
 
@@ -710,9 +726,11 @@ Copyright (C) 2009 Maggie J. Xiong <maggiexyz users.sourceforge.net>
 All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDL distribution.
 
 =cut
+#line 860 "kmeans.pd"
+#line 731 "Kmeans.pm"
 
 
-;
+
 
 
 

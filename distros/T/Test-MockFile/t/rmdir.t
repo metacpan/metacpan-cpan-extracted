@@ -21,19 +21,19 @@ umask 022;
 subtest "basic rmdir" => sub {
     $! = 0;
     is( CORE::mkdir($temp_dir_name), 1, "REAL mkdir when dir is missing." );
-    is( $! + 0, 0, ' - $! is unset.' ) or diag "$!";
-    is( CORE::rmdir $temp_dir_name, 1, "REAL rmdir when dir is there" );
+    is( $! + 0,                      0, ' - $! is unset.' ) or diag "$!";
+    is( CORE::rmdir $temp_dir_name,  1, "REAL rmdir when dir is there" );
 
     my $mock = Test::MockFile->dir($temp_dir_name);
 
-    is( mkdir($temp_dir_name), 1, "MOCK mkdir when dir is missing." );
-    is( $! + 0, 0, ' - $! is unset.' ) or diag "$!";
-    is( $mock->permissions, 0755, "Perms are 0755" );
+    is( mkdir($temp_dir_name), 1,    "MOCK mkdir when dir is missing." );
+    is( $! + 0,                0,    ' - $! is unset.' ) or diag "$!";
+    is( $mock->permissions,    0755, "Perms are 0755" );
     ok( -d $temp_dir_name, "-d" );
 
-    is( $! + 0, 0, ' - $! is unset.' ) or diag "$!";
+    is( $! + 0,               0, ' - $! is unset.' ) or diag "$!";
     is( rmdir $temp_dir_name, 1, "MOCK rmdir when dir is there" );
-    is( $! + 0, 0, ' - $! is unset.' ) or diag "$!";
+    is( $! + 0,               0, ' - $! is unset.' ) or diag "$!";
     ok( !-d $temp_dir_name, "Directory is not there with -d" );
     ok( !-e $temp_dir_name, "Directory is not there with -e" );
 };
@@ -58,15 +58,15 @@ subtest "rmdir existing file" => sub {
     touch($temp_file);
 
     $! = 0;
-    is( rmdir($temp_file), 0, "real rmdir on existing file." );
-    is( $! + 0, ENOTDIR, ' - $! is ENOTDIR.' ) or diag "$!";
+    is( rmdir($temp_file), 0,       "real rmdir on existing file." );
+    is( $! + 0,            ENOTDIR, ' - $! is ENOTDIR.' ) or diag "$!";
     CORE::unlink $temp_file;
 
     my $m = Test::MockFile->file( '/abc', '' );
 
     $! = 0;
-    is( rmdir('/abc'), 0, "mock rmdir on existing file." );
-    is( $! + 0, ENOTDIR, ' - $! is ENOTDIR.' ) or diag "$!";
+    is( rmdir('/abc'), 0,       "mock rmdir on existing file." );
+    is( $! + 0,        ENOTDIR, ' - $! is ENOTDIR.' ) or diag "$!";
 };
 
 subtest "rmdir existing symlink" => sub {
@@ -75,15 +75,15 @@ subtest "rmdir existing symlink" => sub {
     CORE::symlink( "$temp_dir_name/ab", $temp_file );
 
     $! = 0;
-    is( rmdir($temp_file), 0, "real rmdir on existing file." );
-    is( $! + 0, ENOTDIR, ' - $! is ENOTDIR.' ) or diag "$!";
+    is( rmdir($temp_file), 0,       "real rmdir on existing file." );
+    is( $! + 0,            ENOTDIR, ' - $! is ENOTDIR.' ) or diag "$!";
     CORE::unlink $temp_file;
 
     my $m = Test::MockFile->symlink( '/someotherpath', '/abc' );
 
     $! = 0;
-    is( rmdir('/abc'), 0, "mock rmdir on existing file." );
-    is( $! + 0, ENOTDIR, ' - $! is ENOTDIR.' ) or diag "$!";
+    is( rmdir('/abc'), 0,       "mock rmdir on existing file." );
+    is( $! + 0,        ENOTDIR, ' - $! is ENOTDIR.' ) or diag "$!";
 };
 
 subtest "rmdir when nothing is there." => sub {
@@ -91,14 +91,14 @@ subtest "rmdir when nothing is there." => sub {
     my $temp_dir = "$temp_dir_name/a";
 
     $! = 0;
-    is( rmdir($temp_dir), 0, "real rmdir on existing file." );
-    is( $! + 0, ENOENT, ' - $! is ENOENT.' ) or diag "$!";
+    is( rmdir($temp_dir), 0,      "real rmdir on existing file." );
+    is( $! + 0,           ENOENT, ' - $! is ENOENT.' ) or diag "$!";
 
     my $m = Test::MockFile->dir('/abc');
 
     $! = 0;
-    is( rmdir('/abc'), 0, "mock rmdir on existing file." );
-    is( $! + 0, ENOENT, ' - $! is ENOENT.' ) or diag "$!";
+    is( rmdir('/abc'), 0,      "mock rmdir on existing file." );
+    is( $! + 0,        ENOENT, ' - $! is ENOENT.' ) or diag "$!";
 };
 
 done_testing();

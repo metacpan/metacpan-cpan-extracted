@@ -1,10 +1,104 @@
 ==================================================
-Changes from 2021-01-01 00:00:00 +0000 to present.
+Changes from 2021-01-10 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.008 at 2022-01-01 16:15:58 +0000
+version 0.009 at 2022-01-10 14:57:45 +0000
 ------------------------------------------
+
+  Change: 00a0f1b8517298179dcc787f4bf2a3dd7106f887
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-01-10 11:57:26 +0000
+
+    fix: missing dependencies 
+
+  Change: e5ed5ed7bc588027ad0310b29e3b55c23a2867e9
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-01-09 22:51:59 +0000
+
+    Merge pull request #3 from glasswalk3r/bugfix/warn_error_msgs
+
+    Bugfix/warn error msgs 
+
+  Change: ef21c6576fe2acdc0d38c79c1600586c4724c3c4
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-01-09 22:48:25 +0000
+
+    Merge branch 'refactor/find_next_id' into bugfix/warn_error_msgs 
+
+  Change: 9bce77cc7f9188f37d5eefb526e027460a6f6d4f
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-01-09 22:45:38 +0000
+
+    feat: full warning test coverage 
+
+  Change: c04f3f301c720b9bc4c6e552b0883ea8a4d64227
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-01-09 22:45:18 +0000
+
+    feat: full error testing coverage 
+
+  Change: ddba5aeedcb552ad7cbb1bd3817a3196a126766d
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-01-09 22:22:52 +0000
+
+    chore: version bump 
+
+  Change: a07f906e19026d64163c05f35305ca0335a763b9
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-01-09 22:22:42 +0000
+
+    fix: typo 
+
+  Change: 19b9bdc33ea23e81443af502e4fcdd697bb19fd9
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-01-09 22:22:22 +0000
+
+    feat: increased error testing coverage 
+
+  Change: 200563fdc6affe2bb59b40349a6efe35fbe921fc
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-01-09 18:49:29 +0000
+
+    fix: missing message invocation 
+
+  Change: 78a1cf8db08e8ba4bd3bdaa99cb0dd57d6b7f432
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-01-09 13:30:23 +0000
+
+    refactor: find_next_id proper parsing 
+
+  Change: dcfa0e08f5cac81ecba0d14a7dc07d5f079a2633
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-01-09 13:29:46 +0000
+
+    doc: updated list
+
+    Please enter the commit message for your changes. Lines starting 
+
+  Change: e0ecededb33f0e18c71949892f6f70ef614eb494
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-01-06 18:21:26 +0000
+
+    fix: versioning happens at building time 
+
+  Change: 69d6ddb92adf97d4362f98a5d54f66f52648db34
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-01-02 13:05:15 +0000
+
+    fix: typos 
+
+  Change: 91fc1a156e34fba8348e6bccfeec472a49e3cf51
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-01-02 12:56:15 +0000
+
+    fix: bugs and cleanup 
+
+  Change: 5a17efe24c4f22ba169cbe6feb329e1a96b999b4
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-01-02 12:52:51 +0000
+
+    fix: minimum perl version 
 
   Change: ba2d1f6e7fe2fba2d0b186b36f8121a610f7b5f5
   Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>

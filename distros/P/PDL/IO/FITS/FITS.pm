@@ -1,3 +1,23 @@
+package PDL::IO::FITS;
+
+use strict;
+use warnings;
+
+our $VERSION = 0.92; # Will be 1.0 when ascii table read/write works.
+our @EXPORT_OK = qw( rfits rfitshdr wfits );
+our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @ISA = ('PDL::Exporter');
+
+use PDL::Core;
+use PDL::Config;
+use PDL::IO::Misc;
+use PDL::Exporter;
+use PDL::Primitive;
+use PDL::Types;
+use PDL::Options;
+use PDL::Bad;
+use Carp;
+
 =head1 NAME
 
 PDL::IO::FITS -- Simple FITS support for PDL
@@ -47,56 +67,22 @@ PDL distribution, the copyright notice should be pasted into in this file.
 
 =cut
 
-use strict;
-
-BEGIN {
-
-  package PDL::IO::FITS;
-
-  $PDL::IO::FITS::VERSION = 0.92; # Will be 1.0 when ascii table read/write works.
-
-  our @EXPORT_OK = qw( rfits rfitshdr wfits );
-  our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
-  our @ISA = ('PDL::Exporter');
-
-  use PDL::Core;
-  use PDL::Config;
-  use PDL::IO::Misc;
-  use PDL::Exporter;
-  use PDL::Primitive;
-  use PDL::Types;
-  use PDL::Options;
-  use PDL::Bad;
-#  use PDL::NiceSlice;
-  use Carp;
-  use strict;
-
-  ##############################
-  #
-  # Check if there's Astro::FITS::Header support, and set flag.
-  # Kludgy but it only has to run once, on first load.  --CED
-  #
-  eval "use Astro::FITS::Header;";
-  $PDL::Astro_FITS_Header = (defined $Astro::FITS::Header::VERSION);
-  if($PDL::Astro_FITS_Header) {
-    my($x) = $Astro::FITS::Header::VERSION;
-    $x =~ s/[^0-9\.].*//;
-    $PDL::Astro_FITS_Header = 0 if($x < 1.12);
-  }
-
-  unless($PDL::Astro_FITS_Header) {
-    unless($ENV{"PDL_FITS_LEGACY"} || $PDL::Config{FITS_LEGACY}) {
-      print(STDERR "\n\nWARNING: Can't find the Astro::FITS::Header module, limiting FITS support.\n\n  PDL will use the deprecated legacy perl hash handling code but will not\n  properly support tables, FITS extensions, or COMMENT cards. You really\n  ought to install the Astro::FITS::Header module, available from\n  'http://www.cpan.org'.  (You can also get rid of this message by setting\n  the environment variable 'PDL_FITS_LEGACY' or the global PDL config value (in perldl.conf)\n  \$PDL::Config{FITS_LEGACY} to 1.\n\n");
-    }
-  }
-}
-
-package PDL::IO::FITS;
-
-## declare subroutines 
-
-sub _wfits_nullhdu ($);
-sub _wfits_table ($$$);
+# Check if there's Astro::FITS::Header support, and set flag.
+# Kludgy but it only has to run once, on first load.  --CED
+$PDL::Astro_FITS_Header = eval {
+    require Astro::FITS::Header;
+    Astro::FITS::Header->VERSION(1.12);
+    1;
+};
+warn <<'EOF' if !$PDL::Astro_FITS_Header and !($ENV{"PDL_FITS_LEGACY"} || $PDL::Config{FITS_LEGACY});
+WARNING: Can't find the Astro::FITS::Header module, limiting FITS support.
+  PDL will use the deprecated legacy perl hash handling code but will not
+  properly support tables, FITS extensions, or COMMENT cards. You really
+  ought to install the Astro::FITS::Header module, available from
+  'http://www.cpan.org'.  (You can also get rid of this message by setting
+  the environment variable 'PDL_FITS_LEGACY' or the global PDL config
+  value (in perldl.conf) $PDL::Config{FITS_LEGACY} to 1.
+EOF
 
 =head2 rfits()
 
@@ -352,9 +338,8 @@ sub PDL::rfits {
 
   $file = "gunzip -c $file |" if $file =~ /\.gz$/;    # Handle compression
   $file = "uncompress -c $file |" if $file =~ /\.Z$/;
-  
-  my $fh = IO::File->new( $file )
-      or barf "FITS file $file not found";
+
+  open my $fh, $file or barf "FITS file $file not found: $!";
   binmode $fh;
 
   my @extensions;  # This accumulates the list in list context...
@@ -366,27 +351,25 @@ sub PDL::rfits {
    my $foo={};       # To go in pdl
    my @history=();
    my @cards = ();
-   
+
    $pdl = $class->new;
- 
 
    # If $opt->{data} is false, then the reading routines leave the
    # file alone, so the file pointer is left at the end of the last
    # header.  Skip over the unread data to the next extension...
-   
+
    if( wantarray and !$opt->{data} and @extensions) {
-       while( $fh->read($line,80) && ($line !~ /^XTENSION=/) && !$fh->eof() ) {
-	   $fh->read($line,2880-80);
+       while( read($fh,$line,80) && ($line !~ /^XTENSION=/) && !$fh->eof() ) {
+	   read($fh,$line,2880-80);
        };
-       
        return @extensions 
-	   if($fh->eof());
+	   if(eof $fh);
 
    } else {
-       my $ct = $fh->read($line,80);
+       my $ct = read $fh, $line,80;
        barf "file $file is not in FITS-format:\n$line\n"
 	   if( $nbytes==0 && ($line !~ /^SIMPLE  = +T/));
-       last hdu if($fh->eof() || !$ct);
+       last hdu if(eof($fh) || !$ct);
    }
 
    $nbytes = 80; # Number of bytes read from this extension (1 line so far)
@@ -415,11 +398,11 @@ sub PDL::rfits {
 
     skipper: while(1) {
       # Move to next record
-      $nbytes += $fh->read($line,2880-80);
-      barf "Unexpected end of FITS file\n" if $fh->eof();
+      $nbytes += read $fh,$line,2880-80;
+      barf "Unexpected end of FITS file\n" if eof $fh;
       # Read start of next record
-      $nbytes += $fh->read($line,80);
-      barf "Unexpected end of FITS file\n" if $fh->eof();
+      $nbytes += read $fh,$line,80;
+      barf "Unexpected end of FITS file\n" if eof $fh;
       # Check if we have found the new extension
       # if not move on
 
@@ -442,11 +425,11 @@ sub PDL::rfits {
      ## and pass them to Astro::FITS::Header.
 
      do {
-       $nbytes += $fh->read($line, 80);
+       $nbytes += read $fh, $line, 80;
        push(@cards,$line);
-     } while(!$fh->eof() && $line !~ m/^END(\s|\000)/);
+     } while(!eof($fh) && $line !~ m/^END(\s|\000)/);
 
-     $nbytes += $fh->read(my $dummy, 2879 - ($nbytes-1)%2880);
+     $nbytes += read $fh, my $dummy, 2879 - ($nbytes-1)%2880;
 
      my($hdr) = Astro::FITS::Header->new(Cards => \@cards);
      my(%hdrhash);
@@ -479,15 +462,15 @@ sub PDL::rfits {
           }
        } # non-blank
        last hdr_legacy if ((defined $name) && $name eq "END");
-       $nbytes += $fh->read($line, 80);
-     } while(!$fh->eof()); }
+       $nbytes += read $fh, $line, 80;
+     } while !eof $fh; }
 
      # Clean up HISTORY card
      $$foo{"HISTORY"} = \@history if $#history >= 0;
    
      # Step to end of header block in file
      my $skip = 2879 - ($nbytes-1)%2880;
-     $fh->read(my $dummy, $skip) if $skip; 
+     read $fh, my $dummy, $skip if $skip;
      $nbytes += $skip;
 
    } # End of legacy header parsing
@@ -520,25 +503,17 @@ sub PDL::rfits {
      $pdl = $foo;
 
    } else {
-     
      ##########
      # Switch based on extension type to do the dirty work of reading
      # the data.  Handlers are listed in the _Extension patch-panel.
-     
-     if (ref $PDL::IO::FITS::_Extension->{$ext_type} ) {
-       
+     if (ref(my $reader = $PDL::IO::FITS::_Extension->{$ext_type})) {
        # Pass $pdl into the extension reader for easier use -- but
        # it just gets overwritten (and disappears) if ignored.
-       
-       $pdl = &{$PDL::IO::FITS::_Extension->{$ext_type}}($fh,$foo,$opt,$pdl);
-       
+       $pdl = $reader->($fh,$foo,$opt,$pdl);
      } else {
-
-       print STDERR "rfits: Ignoring unknown extension '$ext_type'...\n"
+       warn "rfits: Ignoring unknown extension '$ext_type'...\n"
 	 if($PDL::verbose || $PDL::debug);
-       
        $pdl = undef;
-
      }
    }
 
@@ -548,24 +523,17 @@ sub PDL::rfits {
    #
    push(@extensions,$pdl) if(wantarray);
    $currentext++;
- 
-  } while( wantarray && !$fh->eof() );}  # Repeat if we are in list context
-   
- $fh->close;
-  
- if(wantarray) { 
-     ## By default, ditch primary HDU placeholder 
-     if( ref($extensions[0]) eq 'HASH'  and 
-	 $extensions[0]->{SIMPLE} and
-	 exists($extensions[0]->{NAXIS}) and
-	 $extensions[0]->{NAXIS} == 0
-	 ) {
-	 shift @extensions;
-     }
-     # Return all the extensions 
-     return @extensions;
- } 
- return $pdl;
+  } while( wantarray && !eof $fh );}  # Repeat if we are in list context
+
+  close $fh;
+  return $pdl if !wantarray;
+  ## By default, ditch primary HDU placeholder 
+  shift @extensions if ref($extensions[0]) eq 'HASH' and
+      $extensions[0]->{SIMPLE} and
+      exists($extensions[0]->{NAXIS}) and
+      $extensions[0]->{NAXIS} == 0
+      ;
+  @extensions; # Return all the extensions
 }
 
 
@@ -651,27 +619,14 @@ sub _rfits_image($$$$) {
   
   # Read the data and pad to the next HDU
   my $rdct = $size * PDL::Core::howbig($pdl->get_datatype);
-  $fh->read( $$dref, $rdct );
-  $fh->read( my $dummy, 2880 - (($rdct-1) % 2880) - 1 );
+  read $fh, $$dref, $rdct;
+  read $fh, my $dummy, 2880 - (($rdct-1) % 2880) - 1;
   $pdl->upd_data();
 
-  if (!isbigendian() ) {
-    # Need to byte swap on little endian machines
-    bswap2($pdl) if $pdl->get_datatype == $PDL_S;
-    bswap4($pdl) if $pdl->get_datatype == $PDL_L || $pdl->get_datatype == $PDL_F;
-    bswap8($pdl) if $pdl->get_datatype == $PDL_D || $pdl->get_datatype==$PDL_LL;
-  }
-  
-  if(exists $opt->{bscale}) {
-      $pdl = treat_bscale($pdl, $foo);
-  }
-  
-  # Header
-  
+  $pdl->type->bswap->($pdl) if !isbigendian(); # Need to byte swap on little endian machines
+  $pdl = treat_bscale($pdl, $foo) if exists $opt->{bscale};
   $pdl->sethdr($foo);
-
   $pdl->hdrcpy($opt->{hdrcpy});
-
   return $pdl;
 } 
 
@@ -815,10 +770,8 @@ $PDL::IO::FITS_bintable_handlers = {
   ]
   ,'A' => [  sub { # constructor               # String  - handle as perl list
                my($rowlen, $extra, $nrows, $szptr) = @_;
-               my($i,@a);
                $$szptr += $rowlen;
-               for $i(1..$nrows) { push(@a,' 'x$rowlen); }
-               \@a;
+               [(' 'x$rowlen) x $nrows];
             }
           , sub { # reader 
               my( $list, $row, $strptr, $rpt ) = @_;
@@ -885,8 +838,8 @@ sub _wrcomplx { # complex-number writer
 }
 sub _fncomplx { # complex-number finisher-upper
   my( $type, $pdl, $n, $hdr, $opt)  = shift;
-  eval 'bswap'.(PDL::Core::howbig($type)).'($pdl)';
-  print STDERR "Ignoring poorly-defined TSCAL/TZERO for complex data in col. $n (".$hdr->{"TTYPE$n"}.").\n" 
+  $pdl->type->bswap->($pdl) if !isbigendian(); # Need to byte swap on little endian machines
+  warn "Ignoring poorly-defined TSCAL/TZERO for complex data in col. $n (".$hdr->{"TTYPE$n"}.").\n"
     if( length($hdr->{"TSCAL$n"}) or length($hdr->{"TZERO$n"}) );
   return $pdl->reorder(2,1,0);
 }
@@ -949,23 +902,13 @@ sub _wrP {
 
 sub _fnP {
     my( $type, $pdl, $n, $hdr, $opt ) = @_;
-    my $post = PDL::Core::howbig($type);
-    unless( isbigendian() ) {
-	if(    $post == 2 ) { bswap2($pdl); }
-	elsif( $post == 4 ) { bswap4($pdl); }
-	elsif( $post == 8 ) { bswap8($pdl); }
-	elsif( $post != 1 ) {
-	    print STDERR "Unknown swapsize $post!  This is a bug.  You (may) lose..\n";
-	}
-    }
-
+    $pdl->type->bswap->($pdl) if !isbigendian(); # Need to byte swap on little endian machines
     my $tzero = defined($hdr->{"TZERO$n"}) ? $hdr->{"TZERO$n"} : 0.0;
     my $tscal = defined($hdr->{"TSCAL$n"}) ? $hdr->{"TSCAL$n"} : 1.0;
     my $valid_tzero = ($tzero != 0.0);
     my $valid_tscal = ($tscal != 1.0);
-    if( length($hdr->{"TZERO$n"}) or length($hdr->{"TSCAL$n"})) {
-	print STDERR "Ignoring TSCAL/TZERO keywords for binary table array column - sorry, my mind is blown!\n";
-    }
+    warn "Ignoring TSCAL/TZERO keywords for binary table array column - sorry, my mind is blown!\n"
+	if grep defined && length, map $hdr->{"$_$n"}, qw(TZERO TSCAL);
     return $pdl->mv(-1,0);
 }
 
@@ -982,7 +925,7 @@ sub _rfits_bintable ($$$$) {
   my $opt = shift;
   ##shift;  ### (ignore $pdl argument)
 
-  print STDERR "Warning: BINTABLE extension should have BITPIX=8, found ".$hdr->{BITPIX}.".  Winging it...\n" unless($hdr->{BITPIX} == 8);
+  warn "Warning: BINTABLE extension should have BITPIX=8, found ".$hdr->{BITPIX}.".  Winging it...\n" unless($hdr->{BITPIX} == 8);
     
   ### Allocate the main table hash
   my $tbl = {};    # Table is indexed by name
@@ -1067,7 +1010,6 @@ sub _rfits_bintable ($$$$) {
     
     
   }  ### End of prefrobnication loop...
-  
 
   barf "Calculated row length is $rowlen, hdr claims ".$hdr->{NAXIS1}
        . ".  Giving up.  (Set \$PDL::debug for more detailed info)\n"
@@ -1092,10 +1034,10 @@ sub _rfits_bintable ($$$$) {
 
   print "Reading $n1 bytes of table data and $n2 bytes of heap data....\n"
     if($PDL::verbose);
-  $fh->read($rawtable, $n1);
+  read $fh, $rawtable, $n1;
 
   if($n2) {
-      $fh->read($heap, $n2)
+      read $fh, $heap, $n2;
   } else {
       $heap = which(pdl(0)); # empty PDL
   }
@@ -1144,35 +1086,17 @@ sub _rfits_bintable ($$$$) {
   for my $i(1..$hdr->{TFIELDS}) { # Postfrobnication loop
     my $tmpcol = $tmp->[$i];
     my $post = $tmpcol->{handler}->[3];
-    
     if(ref $post eq 'CODE') {
       # Do postprocessing on all special types
-      
       $tbl->{$tmpcol->{name}} = &$post($tmpcol->{data}, $i, $hdr, $opt);
-      
     } elsif( (ref ($tmpcol->{data})) eq 'PDL' ) {
       # Do standard PDL-type postprocessing
-      
-      ## Is this call to upd_data necessary?
-      ## I think not. (reinstate if there are bugs)
-      # $tmpcol->{data}->upd_data;
-      
-      
       # Do swapping as necessary
-      unless( isbigendian() ) {
-	if(    $post == 2 ) { bswap2($tmpcol->{data}); }
-	elsif( $post == 4 ) { bswap4($tmpcol->{data}); }
-	elsif( $post == 8 ) { bswap8($tmpcol->{data}); }
-	elsif( $post != 1 ) {
-	  print STDERR "Unknown swapsize $post for column $i ("
-	    . $tmpcol->{name} . ")!  This is a bug.  Winging it.\n";
-	}
-      }
-    
+      $tmpcol->{data}->type->bswap->($tmpcol->{data}) if !isbigendian();
+
       # Apply scaling and badval keys, which are illegal for A, L, and X
       # types but legal for anyone else.  (A shouldn't be here, L and X 
       # might be)
-      
       if($opt->{bscale}) {
 	my $tzero = defined($hdr->{"TZERO$i"}) ? $hdr->{"TZERO$i"} : 0.0;
 	my $tscal = defined($hdr->{"TSCAL$i"}) ? $hdr->{"TSCAL$i"} : 1.0;
@@ -1183,38 +1107,29 @@ sub _rfits_bintable ($$$$) {
 	
 	if ( $valid_tzero or $valid_tscal ) {
 	  if ( $tmpcol->{type} =~ m/[ALX]/i ) {
-	    
-	    print STDERR "Ignoring illegal TSCAL/TZERO keywords for col $i (" .
+	    warn "Ignoring illegal TSCAL/TZERO keywords for col $i (" .
 	      $tmpcol->{name} . "); type is $tmpcol->{type})\n";
 	    
 	  } else { # Not an illegal type -- do the scaling
-	    
 	    # (Normal execution path) 
 	    # Use PDL's cleverness to work out the final datatype...
-	    
 	    my $tmp;
 	    my $pdl = $tmpcol->{data};
-	    
+
 	    if($pdl->badflag() == 0) {
-	      
 	      $tmp = $pdl->flat()->slice("0:0");
-	      
 	    } elsif($pdl->ngood > 0) {
-	      
 	      my $index = which( $pdl->flat()->isbad()==0 )->at(0);
 	      $tmp = $pdl->flat()->slice("${index}:${index}");
-	      
 	    } else { # Do nothing if it's all bad....
 	      $tmp = $pdl;
 	    }
-	    
+
 	    # Figure out the type by scaling the single element.
 	    $tmp = ($tmp - $tzero) * $tscal;
-	    
 	    # Convert the whole PDL as necessary for the scaling.
 	    $tmpcol->{data} = $pdl->convert($tmp->type) 
 	      if($tmp->get_datatype != $pdl->get_datatype);
-	    
 	    # Do the scaling.
 	    $tmpcol->{data} -= $tzero;
 	    $tmpcol->{data} *= $tscal;
@@ -1246,17 +1161,16 @@ sub _rfits_bintable ($$$$) {
 	      @tdims = map { $_+0 } split(/\,/,$x);
 	      my $tdims = pdl(@tdims);
 	      my $tds = $tdims->prodover;
-	      if($tds > $tmpcol->{data}->dim(0)) {
-		  die("rfits: TDIM$i is too big in binary table.  I give up.\n");
-	      } elsif($tds < $tmpcol->{data}->dim(0)) {
-		  print STDERR "rfits: WARNING: TDIM$i is too small in binary table.  Carrying on...\n";
-	      }
+	      die("rfits: TDIM$i is too big in binary table.  I give up.\n")
+		  if $tds > $tmpcol->{data}->dim(0);
+	      warn "rfits: WARNING: TDIM$i is too small in binary table.  Carrying on...\n"
+		  if $tds < $tmpcol->{data}->dim(0);
 
 	      $tmpcol->{data}->hdrcpy(1);
 	      my $td = $tmpcol->{data}->transpose;
 	      $tbl->{$tmpcol->{name}} = $td->reshape($td->dim(0),@tdims);
 	  } else {
-	      print STDERR "rfits: WARNING: invalid TDIM$i field in binary table.  Ignoring.\n";
+	      warn "rfits: WARNING: invalid TDIM$i field in binary table.  Ignoring.\n";
 	  }
       } else {
 	  # Copy the PDL out to the table itself.
@@ -1272,25 +1186,31 @@ sub _rfits_bintable ($$$$) {
       # End of PDL postfrobnication case
     } elsif(defined $post) {
       
-      print STDERR "Postfrobnication bug detected in column $i ("
+      warn "Postfrobnication bug detected in column $i ("
 	. $tmpcol->{name}. ").  Winging it.\n";
       
     }
   } # End of postfrobnication loop over columns
 
   ### Check whether this is actually a compressed image, in which case we hand it off to the image decompressor
-  if($hdr->{ZIMAGE} && $hdr->{ZCMPTYPE} && $opt->{expand}) {
-      eval 'use PDL::Compression;';
-      if($@) {
-	  die "rfits: error while loading PDL::Compression to unpack tile-compressed image.\n\t$@\n\tUse option expand=>0 to get the binary table.\n";
-      }
-      return _rfits_unpack_zimage($tbl,$opt);
-  }
-
-  ### Done!
-  return $tbl;
+  return $tbl if !($hdr->{ZIMAGE} && $hdr->{ZCMPTYPE} && $opt->{expand});
+  eval { require PDL::Compression };
+  die "rfits: error while loading PDL::Compression to unpack tile-compressed image.\n\t$@\n\tUse option expand=>0 to get the binary table.\n" if $@;
+  return _rfits_unpack_zimage($tbl,$opt);
 }
 
+## List of the eight mandatory keywords and their ZIMAGE preservation pigeonholes, for copying after we
+## expand an image.
+our $hdrconv = {
+    "ZSIMPLE" => "SIMPLE",
+    "ZTENSION" => "XTENSION",
+    "ZEXTEND" => "EXTEND",
+    "ZBLOCKED" => "BLOCKED",
+    "ZPCOUNT" => "PCOUNT",
+    "ZGCOUNT" => "GCOUNT",
+    "ZHECKSUM" => "CHECKSUM",
+    "ZDATASUM" => "DATASUM"
+};
 
 ##############################
 ##############################
@@ -1309,87 +1229,67 @@ sub _rfits_bintable ($$$$) {
 ## Master jump table for compressors/uncompressors.
 ## 0 element of each array ref is the compressor; 1 element is the uncompressor.
 ## Uncompressed tiles are reshaped to rows of a tile table handed in (to the compressor)
-## or out (of the uncompressor); actual tile shape is fed in as $params->{tiledims}, so 
-## higher-than-1D compression algorithms can be used.
+## or out (of the uncompressor)
 our $tile_compressors = {
-          'GZIP_1' => undef
-	      , 'RICE_1' => [ ### RICE_1 compressor
-			      sub { my ($tiles, $tbl, $params) = @_; 
-				    my ($compressed,$len) = $tiles->rice_compress($params->{BLOCKSIZE} || 32);
-				    $tbl->{ZNAME1} = "BLOCKSIZE";
-				    $tbl->{ZVAL1} = $params->{BLOCKSIZE};
-				    $tbl->{ZNAME2} = "BYTEPIX";
-				    $tbl->{ZVAL2} = PDL::howbig($tiles->get_datatype);
-				    # Convert the compressed data to a byte array...
-				    if($tbl->{ZVAL2} != 1) {
-					my @dims = $compressed->dims;
-					$dims[0] *= $tbl->{ZVAL2};
-					my $cd2 = zeroes( byte, @dims );
-					my $cdr = $compressed->get_dataref;
-					my $cd2r = $cd2->get_dataref;
-					$$cd2r = $$cdr;
-					$cd2->upd_data;
-					$compressed = $cd2;
-				    }
-				    $tbl->{COMPRESSED_DATA} = $compressed->mv(0,-1);
-				    $tbl->{len_COMPRESSED_DATA} = $len;
-			      },
-			      ### RICE_1 expander
-			      sub { my ($tilesize, $tbl, $params) = @_;
-				    my $compressed = $tbl->{COMPRESSED_DATA} -> mv(-1,0);
-				    my $bytepix = $params->{BYTEPIX} || 4;
-
-				    # Put the compressed tile bitstream into a variable of appropriate type.
-				    # This works by direct copying of the PDL data, which sidesteps local 
-				    # byteswap issues in the usual case that the compressed stream is type 
-				    # byte.  But it does add the extra complication that we have to pad the 
-				    # compressed array out to a factor-of-n elements in certain cases.
-
-				    if( PDL::howbig($compressed->get_datatype) != $bytepix ) {
-					my @dims = $compressed->dims;
-					my $newdim0;
-					my $scaledim0;
-
-					$scaledim0 = $dims[0] * PDL::howbig($compressed->get_datatype) / $bytepix;
-					$newdim0 = pdl($scaledim0)->ceil;
-
-					if($scaledim0 != $newdim0) {
-					    my $padding = zeroes($compressed->type, 
-							      ($newdim0-$scaledim0) * $bytepix / PDL::howbig($compressed->get_datatype), 
-							      @dims[1..$#dims]
-						);
-					    $compressed = $compressed->append($padding);
-					}
-					
-					my $c2 = zeroes( $type_table_2->{$bytepix * 8}, $newdim0, @dims[1..$#dims] );
-
-					my $c2dr = $c2->get_dataref;
-					my $cdr = $compressed->get_dataref;
-					substr($$c2dr,0,length($$cdr)) = $$cdr;
-					$c2->upd_data;
-					$compressed = $c2;
-				    }
-
-				    return $compressed->rice_expand( $tilesize, $params->{BLOCKSIZE} || 32);
-			      }
-			      ]
-	, 'PLIO_1' => undef
-	, 'HCOMPRESS_1' => undef
+  'GZIP_1' => undef,
+  'RICE_1' => [
+    sub { ### RICE_1 compressor
+      my ($tiles, $tbl, $params) = @_;
+      my $blocksize = $params->{BLOCKSIZE} || 32;
+      my ($compressed,undef,undef,$len) = $tiles->rice_compress($blocksize);
+      $tbl->{ZNAME1} = "BLOCKSIZE";
+      $tbl->{ZVAL1} = $blocksize;
+      $tbl->{ZNAME2} = "BYTEPIX";
+      $tbl->{ZVAL2} = PDL::howbig($tiles->get_datatype);
+      # Convert the compressed data to a byte array...
+      if($tbl->{ZVAL2} != 1) {
+	my @dims = $compressed->dims;
+	$dims[0] *= $tbl->{ZVAL2};
+	my $cd2 = zeroes( byte, @dims );
+	my $cdr = $compressed->get_dataref;
+	my $cd2r = $cd2->get_dataref;
+	$$cd2r = $$cdr;
+	$cd2->upd_data;
+	$compressed = $cd2;
+      }
+      $tbl->{COMPRESSED_DATA} = $compressed->mv(0,-1);
+      $tbl->{len_COMPRESSED_DATA} = $len;
+    },
+    sub { ### RICE_1 expander
+      my ($tilesize, $tbl, $params) = @_;
+      my $compressed = $tbl->{COMPRESSED_DATA} -> mv(-1,0);
+      my $bytepix = $params->{BYTEPIX} || 4;
+      # Put the compressed tile bitstream into a variable of appropriate type.
+      # This works by direct copying of the PDL data, which sidesteps local
+      # byteswap issues in the usual case that the compressed stream is type
+      # byte.  But it does add the extra complication that we have to pad the
+      # compressed array out to a factor-of-n elements in certain cases.
+      if( PDL::howbig($compressed->get_datatype) != $bytepix ) {
+	my @dims = $compressed->dims;
+	my $newdim0;
+	my $scaledim0;
+	$scaledim0 = $dims[0] * PDL::howbig($compressed->get_datatype) / $bytepix;
+	$newdim0 = pdl($scaledim0)->ceil;
+	if($scaledim0 != $newdim0) {
+	  my $padding = zeroes($compressed->type,
+	    ($newdim0-$scaledim0) * $bytepix / PDL::howbig($compressed->get_datatype),
+	    @dims[1..$#dims]
+	  );
+	  $compressed = $compressed->append($padding);
+	}
+	my $c2 = zeroes( $type_table_2->{$bytepix * 8}, $newdim0, @dims[1..$#dims] );
+	my $c2dr = $c2->get_dataref;
+	my $cdr = $compressed->get_dataref;
+	substr($$c2dr,0,length($$cdr)) = $$cdr;
+	$c2->upd_data;
+	$compressed = $c2;
+      }
+      $compressed->rice_expand( $tilesize, $params->{BLOCKSIZE} || 32);
+    }
+  ],
+  'PLIO_1' => undef,
+  'HCOMPRESS_1' => undef,
 };
-
-## List of the eight mandatory keywords and their ZIMAGE preservation pigeonholes, for copying after we
-## expand an image.
-our $hdrconv = {
-    "ZSIMPLE" => "SIMPLE",
-    "ZTENSION" => "XTENSION",
-    "ZEXTEND" => "EXTEND",
-    "ZBLOCKED" => "BLOCKED",
-    "ZPCOUNT" => "PCOUNT",
-    "ZGCOUNT" => "GCOUNT",
-    "ZHECKSUM" => "CHECKSUM",
-    "ZDATASUM" => "DATASUM"
-};
-
 
 sub _rfits_unpack_zimage($$$) {
     my $tbl = shift;
@@ -1397,58 +1297,41 @@ sub _rfits_unpack_zimage($$$) {
 
     my $hdr = $tbl->{hdr};
 
-    my $tc = $tile_compressors->{$hdr->{ZCMPTYPE}};
+    (my $cmptype = $hdr->{ZCMPTYPE}) =~ s/\s+//g;
+    my $tc = $tile_compressors->{$cmptype};
     unless(defined $tc) {
-	print STDERR "WARNING: rfits: Compressed image has unsupported comp. type ('$hdr->{ZCMPTYPE}').\n";
+	warn "WARNING: rfits: Compressed image has unsupported comp. type ('$hdr->{ZCMPTYPE}').\n";
 	return $tbl;
     }
 
     #############
     # Declare the output image
-    my $type;
-    unless($type_table->{$hdr->{ZBITPIX}}) {
-	print STDERR "WARNING: rfits: unrecognized ZBITPIX value $hdr->{ZBITPIX} in compressed image. Assuming -64.\n";
+    my $type = $type_table_2->{$hdr->{ZBITPIX}};
+    unless($type) {
+	warn "WARNING: rfits: unrecognized ZBITPIX value $hdr->{ZBITPIX} in compressed image. Assuming -64.\n";
 	$type = $type_table_2->{-64};
-    } else {
-	$type = $type_table_2->{$hdr->{ZBITPIX}};
     }
-    my @dims;
-    for my $i(1..$hdr->{ZNAXIS}) {
-	push(@dims,$hdr->{"ZNAXIS$i"});
-    }
-
+    my @dims = @$hdr{map "ZNAXIS$_", 1..$hdr->{ZNAXIS}};
     my $pdl = PDL->new_from_specification( $type, @dims );
 
     ############
     # Calculate tile size and allocate a working tile.
-    my @tiledims;
-    for my $i(1..$hdr->{ZNAXIS}) {
-	if($hdr->{"ZTILE$i"}) {
-	    push(@tiledims, $hdr->{"ZTILE$i"});
-	} else {
-	    push(@tiledims, (($i==1) ? $hdr->{ZNAXIS1} : 1)  );
-	}
-    }
-
-
-#    my $tile = PDL->new_from_specification( $type, @tiledims ); 
+    my @tiledims = map $hdr->{"ZTILE$_"} || (($_==1) ? $hdr->{ZNAXIS1} : 1),
+	1..$hdr->{ZNAXIS};
     my $tiledims = pdl(@tiledims);
     my $tilesize = $tiledims->prodover;
     ###########
     # Calculate tile counts and compare to the number of stored tiles
     my $ntiles = ( pdl(@dims) / pdl(@tiledims) )->ceil;
     my $tilecount = $ntiles->prodover;
-
-    if($tilecount != $tbl->{COMPRESSED_DATA}->dim(0)) {
-	printf STDERR "WARNING: rfits: compressed data has $hdr->{NAXIS2} rows; we expected $tilecount (",join("x",list $ntiles),").  Winging it...\n";
-    }
+    warn "WARNING: rfits: compressed data has $hdr->{NAXIS2} rows; we expected $tilecount (",join("x",list $ntiles),").  Winging it...\n"
+	if $tilecount != $tbl->{COMPRESSED_DATA}->dim(0);
 
     ##########
     # Quantization - ignore for now
-    if($hdr->{ZQUANTIZ}) {
-	printf STDERR "WARNING: rfits: ignoring quantization/dithering (ZQUANTIZ=$hdr->{ZQUANTIZ})\n";
-    }
-    
+    warn "WARNING: rfits: ignoring quantization/dithering (ZQUANTIZ=$hdr->{ZQUANTIZ})\n"
+	if $hdr->{ZQUANTIZ};
+
     ##########
     # Snarf up compression parameters
     my $params = {};
@@ -1460,31 +1343,25 @@ sub _rfits_unpack_zimage($$$) {
 
     ##########
     # Enumerate tile coordinates for looping, and the corresponding row number
-    my ($step, @steps, $steps);
-    $step = 1;
+    my ($step, @steps) = 1;
     for my $i(0..$ntiles->nelem-1) {
 	push(@steps, $step);
 	$step *= $ntiles->at($i);
     }
-    $step = pdl(@steps);
 
     # $tiledex is 2-D (coordinate-index, list-index) and enumerates all tiles by image
-    # location; $tilerow is 1-D (list-index) and enumerates all tiles by row in the bintable
+    # location
     my $tiledex = PDL::ndcoords($ntiles->list)->mv(0,-1)->clump($ntiles->dim(0))->mv(-1,0);
-    $TMP::tiledex = $tiledex;
-    my $tilerow = ($tiledex * $step)->sumover;
     
     ##########
     # Restore all the tiles at once
-    my $tiles = &{$tc->[1]}( $tilesize, $tbl, $params ); # gets a (tilesize x ntiles) output
+    my $tiles = $tc->[1]->( $tilesize, $tbl, $params ); # gets a (tilesize x ntiles) output
     my $patchup = which($tbl->{len_COMPRESSED_DATA} <= 0);
     if($patchup->nelem) {
-	unless(defined $tbl->{UNCOMPRESSED_DATA}) {
-	    die "rfits: need some uncompressed data for missing compressed rows, but none were found!\n";
-	}
-	if($tbl->{UNCOMPRESSED_DATA}->dim(1) != $tilesize) {
-	    die "rfits: tile size is $tilesize, but uncompressed data rows have size ".$tbl->{UNCOMPRESSED_DATA}->dim(1)."\n";
-	}
+	die "rfits: need some uncompressed data for missing compressed rows, but none were found!\n"
+	    unless defined $tbl->{UNCOMPRESSED_DATA};
+	die "rfits: tile size is $tilesize, but uncompressed data rows have size ".$tbl->{UNCOMPRESSED_DATA}->dim(1)."\n"
+	    if $tbl->{UNCOMPRESSED_DATA}->dim(1) != $tilesize;
 	$tiles->dice_axis(1,$patchup) .= $tbl->{UNCOMPRESSED_DATA}->dice_axis(0,$patchup)->transpose;
     }
 
@@ -1494,9 +1371,8 @@ sub _rfits_unpack_zimage($$$) {
     my $cutup = $pdl->range( $tiledex, [@tiledims], 't') # < ntiles, tilesize0..tilesizen >
 	->mv(0,-1)                                       # < tilesize0..tilesizen, ntiles >
 	->clump($tiledims->nelem);                       # < tilesize, ntiles >
-
     $cutup .= $tiles; # dump all the tiles at once into the image - they flow back to $pdl.
-    undef $cutup;     # sever connection to prevent expensive future dataflow.
+    $cutup->sever;    # sever connection to prevent expensive future dataflow.
 
     ##########
     # Perform scaling if necessary ( Just the ZIMAGE quantization step )
@@ -1511,41 +1387,25 @@ sub _rfits_unpack_zimage($$$) {
     delete $hdr->{GCOUNT};
 
     # Copy the mandated name-conversions
-    for my $k(keys %$hdrconv) {
-	if($hdr->{$k}) {
-	    $hdr->{$hdrconv->{$k}} = $hdr->{$k};
-	    delete $hdr->{$k};
-	}
+    for my $k (grep $hdr->{$_}, keys %$hdrconv) {
+	$hdr->{$hdrconv->{$k}} = $hdr->{$k};
+	delete $hdr->{$k};
     }
 
     # Copy the ZNAXIS* keywords to NAXIS*
-    foreach (grep /^NAXIS/,keys %$hdr){
-	if (exists($hdr->{'Z'.$_}) && defined($hdr->{'Z'.$_})){
-	    $hdr->{$_} = $hdr->{'Z'.$_};
-	}
-    }
+    $hdr->{$_} = $hdr->{"Z$_"}
+	for grep /^NAXIS/ && defined($hdr->{"Z$_"}), keys %$hdr;
 
     # Clean up the ZFOO extensions and table cruft
-    for my $k(keys %{$hdr}) {
-	delete $hdr->{$k} if(
-	    $k=~ m/^Z/ ||
-	    $k eq "TFIELDS" ||
-	    $k =~ m/^TTYPE/ ||
-	    $k =~ m/^TFORM/
-	    );
-    }
+    delete @$hdr{grep m/^(?:TTYPE|TFORM|Z|TFIELDS$)/, keys %$hdr};
 
-    if(exists $hdr->{BSCALE} || exists $hdr->{BLANK}) {
-	$pdl = treat_bscale($pdl, $hdr);
-    }
+    $pdl = treat_bscale($pdl, $hdr)
+	if exists $hdr->{BSCALE} || exists $hdr->{BLANK};
     $pdl->sethdr($hdr);
     $pdl->hdrcpy($opt->{hdrcpy});
 
     return $pdl;
 }
-
-
-    
 
 =head2 wfits()
 
@@ -1606,8 +1466,6 @@ FITS standard, by adding an option hash to the arguments:
 
 =item compress 
 
-CURRENTLY UNIMPLEMENTED.  Below describes the envisioned usage.
-
 This can be either unity, in which case Rice compression is used,
 or a (case-insensitive) string matching the CFITSIO compression 
 type names.  Currently supported compression algorithms are:
@@ -1622,18 +1480,9 @@ by much less than the dynamic range of the image).
 
 =back
 
-=item tilesize (default C<[-1,1]>)
+=item BLOCKSIZE (RICE_1 only; default C<32>)
 
-This specifies the dimension of the compression tiles, in pixels.  You
-can hand in a PDL, a scalar, or an array ref. If you specify fewer
-dimensions than exist in the image, the last dim is repeated - so "32"
-yields 32x32 pixel tiles in a 2-D image.  A dim of -1 in any dimension
-duplicates the image size, so the default C<[-1,1]> causes compression
-along individual rows.
-
-=item tilesize (RICE_1 only; default C<32>)
-
-For RICE_1, BLOCKSIZE indicates the number of pixel samples to use
+For RICE_1, indicates the number of pixel samples to use
 for each compression block within the compression algorithm.  The 
 blocksize is independent of the tile dimensions.  For RICE
 compression the pixels from each tile are arranged in normal pixel 
@@ -1744,10 +1593,9 @@ called C<Y> and the second column is C<X>.
 
 =item * multi-value handling
 
-If you feed in a perl list rather than a PDL or a hash, then 
+If you feed in a perl array-ref rather than a PDL or a hash, then
 each element is written out as a separate HDU in the FITS file.  
-Each element of the list must be a PDL or a hash. [This is not implemented
-yet but should be soon!]
+Each element of the list must be a PDL or a hash.
 
 =item * DEVEL NOTES
 
@@ -1771,93 +1619,90 @@ converted to NaN (if necessary) before writing.
 
 *wfits = \&PDL::wfits;
 
-BEGIN {
-  @PDL::IO::FITS::wfits_keyword_order = 
-    ('SIMPLE','BITPIX','NAXIS','NAXIS1','BUNIT','BSCALE','BZERO');
-  @PDL::IO::FITS::wfits_numbered_keywords =
-    ('CTYPE','CRPIX','CRVAL','CDELT','CROTA');
-}
-
-# Until we do a rewrite these have to be file global since they
-# are used by the wheader routine
-my (%hdr, $nbytes);
+our @wfits_keyword_order = qw(SIMPLE BITPIX NAXIS NAXIS1 BUNIT BSCALE BZERO);
+our @wfits_numbered_keywords = qw(CTYPE CRPIX CRVAL CDELT CROTA);
 
 # Local utility routine of wfits()
-sub wheader ($$) {
-    my $fh = shift;
-    my $k = shift;
-  
+sub wheader {
+    my ($fh, $k, $hdr, $nbytes) = @_;
     if ($k =~ m/(HISTORY|COMMENT)/) {
 	my $hc = $1;
-	return unless ref($hdr{$k}) eq 'ARRAY';
-	foreach my $line (@{$hdr{$k}}) {
-	    $fh->printf( "$hc %-72s", substr($line,0,72) );
+	return $nbytes unless ref($hdr->{$k}) eq 'ARRAY';
+	foreach my $line (@{$hdr->{$k}}) {
+	    printf $fh "$hc %-72s", substr($line,0,72);
 	    $nbytes += 80;
 	}
-	delete $hdr{$k};
+	delete $hdr->{$k};
     } else {
 	# Check that we are dealing with a scalar value in the header
 	# Need to make sure that the header does not include PDLs or
-	# other structures. Return unless $hdr{$k} is a scalar.
-	my($hdrk) = $hdr{$k};
-    
-	if(ref $hdrk eq 'ARRAY') {
-	    $hdrk = join("\n",@$hdrk);
-	}
-    
-	return unless not ref($hdrk);
-    
+	# other structures. Return unless $hdr->{$k} is a scalar.
+	my $hdrk = $hdr->{$k};
+	$hdrk = join("\n",@$hdrk) if ref $hdrk eq 'ARRAY';
+	return $nbytes if ref($hdrk);
 	if ($hdrk eq "") {
-	    $fh->printf( "%-80s", substr($k,0,8) );
+	    printf $fh "%-80s", substr($k,0,8);
 	} else {
-	    $fh->printf( "%-8s= ", substr($k,0,8) );
-      
-	    my $com = ( ref $hdr{COMMENT} eq 'HASH' ) ?
-		$hdr{COMMENT}{$k} : undef;
-      
+	    printf $fh "%-8s= ", substr($k,0,8);
+	    my $com = ( ref $hdr->{COMMENT} eq 'HASH' ) ?
+		$hdr->{COMMENT}{$k} : undef;
 	    if ($hdrk =~ /^ *([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))? *$/) { # Number?
 		my $cl=60-($com ? 2 : 0);
 		my $end=' ' x $cl;
 		$end =' /'. $com if($com);
-		$fh->printf( "%20s%-50s", substr($hdrk,0,20),
-			     substr($end, 0, 50) );
+		printf $fh "%20s%-50s", substr($hdrk,0,20), substr($end, 0, 50);
              } elsif ($hdrk eq 'F' or $hdrk eq 'T') {
 		 # Logical flags ?
-		 $fh->printf( "%20s", $hdrk );
+		 printf $fh "%20s", $hdrk;
 		 my $end=' ' x 50;
 		 $end =' /'.$com if($com);
-		 $fh->printf( "%-50s", $end );
+		 printf $fh "%-50s", $end;
 	     } else {
 		 # Handle strings, truncating as necessary
 		 # (doesn't do multicard strings like Astro::FITS::Header does)
-        
 		 # Convert single quotes to doubled single quotes 
 		 # (per FITS standard)
-		 my($st) = $hdrk;
-		 $st =~ s/\'/\'\'/g;
-        
+		 (my $st = $hdrk) =~ s/\'/\'\'/g;
 		 my $sl=length($st)+2;
 		 my $cl=70-$sl-($com ? 2 : 0);
-		 $fh->print( "'$st'" );
-        
+		 print $fh "'$st'";
 		 if (defined $com) {
-		     $fh->printf( " /%-$ {cl}s", substr($com, 0, $cl) );
+		     printf $fh " /%-${cl}s", substr($com, 0, $cl);
 		 } else {
-		     $fh->printf( "%-$ {cl}s", ' ' x $cl );
+		     printf $fh "%-${cl}s", ' ' x $cl;
 		 }
 	     }
 	}
-	$nbytes += 80; delete $hdr{$k};
+	$nbytes += 80; delete $hdr->{$k};
     }
-    delete $hdr{COMMENT}{$k} if ref $hdr{COMMENT} eq 'HASH';
-    1;
+    delete $hdr->{COMMENT}{$k} if ref $hdr->{COMMENT} eq 'HASH';
+    $nbytes;
+}
+
+# ordered hash: [ \@key_order, \%hdr, \%type, \%comment ]
+sub _k_add {
+    my ($ohash, $key, $val, $type, $comment) = @_;
+    my ($k_o, $hdr, $t, $com) = @$ohash;
+    push @$k_o, $key;
+    $hdr->{$key} = $val;
+    $t->{$key} = $type if defined $type;
+    $com->{$key} = $comment if defined $comment;
 }
 
 # Write a PDL to a FITS format file
 #
+my %wfits_reftype = map +($_=>1), qw(PDL HASH ARRAY);
+my %wfits_zpreserve = (reverse(%$hdrconv), map +($_=>"Z$_"), qw(BITPIX NAXIS));
 sub PDL::wfits {
   barf 'Usage: wfits($pdl,$file,[$BITPIX],[{options}])' if $#_<1 || $#_>3;
   my ($pdl,$file,$x,$y) = @_;
+
+  #### Figure output type
+  barf "wfits: needs a HASH, ARRAY or PDL argument to write out\n" if !ref $pdl;
+  barf "wfits: unknown ref type ".ref($pdl)."\n" if !$wfits_reftype{ref $pdl};
+  my $issue_nullhdu = !UNIVERSAL::isa($pdl,'PDL');
+  my @outputs = ref($pdl) eq 'ARRAY' ? @$pdl : $pdl;
+
   my ($opt, $BITPIX);
 
   local $\ = undef;  # fix sf.net bug #3394327 
@@ -1869,8 +1714,6 @@ sub PDL::wfits {
       $BITPIX = $x;
       $opt = $y;
   }
-
-  my ($k, $buff, $off, $ndims, $sz);
 
   $file =~ s/^(~)/glob($1)/e; # tilde expansion
 
@@ -1887,30 +1730,10 @@ sub PDL::wfits {
   else{
     $file = ">$file";
   }
-  
-  #### Figure output type
-
-  my @outputs = ();
-  my $issue_nullhdu;
-
-  if( UNIVERSAL::isa($pdl,'PDL') ) {
-      $issue_nullhdu = 0;
-      push(@outputs, $pdl);
-  } elsif( ref($pdl) eq 'HASH' ) {
-      $issue_nullhdu = 1;
-      push(@outputs, $pdl);
-  } elsif( ref($pdl) eq 'ARRAY' ) {
-      $issue_nullhdu = 1;
-      @outputs = @$pdl;
-  } elsif( length(ref($pdl))==0 ) {
-      barf "wfits: needs a HASH or PDL argument to write out\n";
-  } else {
-      barf "wfits: unknown ref type ".ref($pdl)."\n";
-  }
 
   ## Open file & prepare to write binary info
-  my $fh = IO::File->new( $file )
-      or barf "Unable to create FITS file $file\n";
+  open my $fh, $file
+      or barf "Unable to create FITS file $file: $!\n";
   binmode $fh;
 
   if($issue_nullhdu) {
@@ -1925,346 +1748,265 @@ sub PDL::wfits {
 			     "binary" 
 	      );
 	  _wfits_table($fh,$pdl,$table_type);
-      } elsif( UNIVERSAL::isa($pdl,'PDL') ) {
-
-	  ### Regular image writing.
-	  
-	  $BITPIX = "" unless defined $BITPIX;
-	  if ($BITPIX eq "") {
-	      $BITPIX =   8 if $pdl->get_datatype == $PDL_B;
-	      $BITPIX =  16 if $pdl->get_datatype == $PDL_S || $pdl->get_datatype == $PDL_US;
-	      $BITPIX =  32 if $pdl->get_datatype == $PDL_L;
-	      $BITPIX =  64 if $pdl->get_datatype == $PDL_LL;
-	      $BITPIX = -32 if $pdl->get_datatype == $PDL_F;
-	      $BITPIX = -64 if $pdl->get_datatype == $PDL_D;
-	      $BITPIX = 8 * PDL::Core::howbig($PDL_IND) if($pdl->get_datatype==$PDL_IND);
-	  }
-	  if ($BITPIX eq "") {
-	      $BITPIX = -64;
-	      warn "wfits: PDL has an unsupported datatype -- defaulting to 64-bit float.\n";
-	  }
-
-	  my $convert = sub { return $_[0] }; # Default - do nothing
-	  $convert = sub {byte($_[0])}     if $BITPIX ==   8;
-	  $convert = sub {short($_[0])}    if $BITPIX ==  16;
-	  $convert = sub {long($_[0])}     if $BITPIX ==  32;
-	  $convert = sub {longlong($_[0])} if $BITPIX == 64;
-	  $convert = sub {float($_[0])}    if $BITPIX == -32;
-	  $convert = sub {double($_[0])}   if $BITPIX == -64;
-	  
-	  # Automatically figure output scaling
-	  
-	  my $bzero = 0; my $bscale = 1;
-	  if ($BITPIX>0) {
-	      my $min = $pdl->min;
-	      my $max = $pdl->max;
-	      my ($dmin,$dmax) = (0, 2**8-1)     if $BITPIX == 8;
-	      ($dmin,$dmax) = (-2**15, 2**15-1)  if $BITPIX == 16;
-	      ($dmin,$dmax) = (-2**31, 2**31-1)  if $BITPIX == 32;
-	      ($dmin,$dmax) = (-(pdl(longlong,1)<<63), (pdl(longlong,1)<<63)-1) if $BITPIX==64;
-
-	      if ($min<$dmin || $max>$dmax) {
-		  $bzero = $min - $dmin;
-		  $max -= $bzero;
-		  $bscale = $max/$dmax if $max>$dmax;
-	      }
-	      print "BSCALE = $bscale &&  BZERO = $bzero\n" if $PDL::verbose;
-	  }
-	  
-	  # Check for tile-compression format for the image, and handle it.
-	  # We add the image-compression format tags and reprocess the whole
-	  # shebang as a binary table.
-	  if($opt->{compress}) {
-	      croak "Placeholder -- tile compression not yet supported\n";
-	  }
-	  
-	  
-	  ##############################
-	  ## Check header and prepare to write it out
-	  
-	  my($h) = $pdl->gethdr();
-	  
-	  # Extra logic: if we got handed a vanilla hash that that is *not* an Astro::FITS::Header, but 
-	  # looks like it's a FITS header encoded in a hash, then attempt to process it with 
-	  # Astro::FITS::Header before writing it out -- this helps with cleanup of tags.
-	  if($PDL::Astro_FITS_Header and 
-	     defined($h) and
-	     ref($h) eq 'HASH' and
-	     !defined( tied %$h )
-	      ) {
-	      
-	      my $all_valid_fits = 1;
-	      for my $k(keys %$h) {
-		  if(length($k) > 8 or
-		     $k !~ m/^[A-Z_][A-Z\d\_]*$/i
-		      ) {
-		      $all_valid_fits = 0;
-		      last;
-		  }
-	      }
-	      
-	      if($all_valid_fits) {
-		  # All the keys look like valid FITS header keywords -- so 
-		  # create a tied FITS header object and use that instead.
-		  my $afh = new Astro::FITS::Header( );
-		  my %hh;
-		  tie %hh, "Astro::FITS::Header", $afh;
-		  for (keys %$h) {
-		      $hh{$_} = $h->{$_};
-		  }
-		  $h = \%hh;
-	      }
-	  }
-	  
-	  # Now decide whether to emit a hash or an AFH object
-	  if(defined($h) && 
-	     ( (defined (tied %$h)) && 
-	       (UNIVERSAL::isa(tied %$h,"Astro::FITS::Header")))
-	      ){
-	      my $k;
-	      
-	      ##n############################
-	      ## Tied-hash code -- I'm too lazy to incorporate this into KGB's
-	      ## direct hash handler below, so I've more or less just copied and
-	      ## pasted with some translation.  --CED
-	      ##
-	      my $hdr = tied %$h;
-	      
-	      #
-	      # Put advertising comment in the SIMPLE field
-	      #n
-	      if($issue_nullhdu) {
-		  $h->{XTENSION} = "IMAGE";
-	      } else {
-		  $h->{SIMPLE} = 'T';
-		  my(@a) = $hdr->itembyname('SIMPLE');
-		  $a[0]->comment('Created with PDL (http://pdl.perl.org)');
-		  # and register it as a LOGICAL rather than a string
-		  $a[0]->type('LOGICAL');
-	      }
-	      
-	      #
-	      # Use tied interface to set all the keywords.  Note that this
-	      # preserves existing per-line comments, only changing the values.
-	      #
-	      $h->{BITPIX} = $BITPIX;
-	      $h->{NAXIS} = $pdl->getndims;
-	      my $correction = 0;
-	      for $k(1..$h->{NAXIS}) { 
-		  $correction |= (exists $h->{"NAXIS$k"} and 
-				  $h->{"NAXIS$k"} != $pdl->dim($k-1)
-                      );
-		  $h->{"NAXIS$k"} = $pdl->getdim($k-1); 
-	      }
-	      carp("Warning: wfits corrected dimensions of FITS header") 
-		  if($correction);
-	      
-	      $h->{BUNIT} = "Data Value" unless exists $h->{BUNIT};
-	      $h->{BSCALE} = $bscale if($bscale != 1);
-	      $h->{BZERO}  = $bzero  if($bzero  != 0);
-	      
-	      if ( $pdl->badflag() ) {
-		  if ( $BITPIX > 0 ) { my $x = &$convert(pdl(0.0));
-				       $h->{BLANK} = $x->badvalue->sclr; }
-		  else               { delete $h->{BLANK}; }
-	      }
-	      
-	      # Use object interface to sort the lines. This is complicated by
-	      # the need for an arbitrary number of NAXIS<n> lines in the middle
-	      # of the sorting.  Keywords with a trailing '1' in the sorted-order
-	      # list get looped over.
-	      my($kk) = 0; 
-	      my(@removed_naxis) = ();
-	      for $k(0..$#PDL::IO::FITS::wfits_keyword_order) {
-		  my($kn) = 0;
-		  
-		  my @index;
-		  do {            # Loop over numericised keywords (e.g. NAXIS1)
-		      
-		      my $kw = $PDL::IO::FITS::wfits_keyword_order[$k]; # $kw get keyword
-		      $kw .= (++$kn) if( $kw =~ s/\d$//);               # NAXIS1 -> NAXIS<n>
-		      @index = $hdr->index($kw);
-		      
-		      if(defined $index[0]) {
-			  if($kn <= $pdl->getndims){
-			      $hdr->insert($kk, $hdr->remove($index[0])) 
-				  unless ($index[0] == $kk) ;
-			      $kk++;
-			  } 
-			  else{ #remove e.g. NAXIS3 from hdr if NAXIS==2
-			      $hdr->removebyname($kw);
-			      push(@removed_naxis,$kw);
-			  }
-		      }
-		  } while((defined $index[0]) && $kn);
-	      }
-	      
-	      foreach my $naxis(@removed_naxis){
-		  $naxis =~ m/(\d)$/;
-		  my $n = $1;
-		  foreach my $kw(@PDL::IO::FITS::wfits_numbered_keywords){
-		      $hdr->removebyname($kw . $n);
-		  }
-	      }
-	      #
-	      # Delete the END card if necessary (for later addition at the end)
-	      #
-	      $hdr->removebyname('END');
-	      
-	      #
-	      # Make sure that the HISTORY lines all come at the end
-	      # 
-	      my @hindex = $hdr->index('HISTORY');
-	      for $k(0..$#hindex) {
-		  $hdr->insert(-1-$k, $hdr->remove($hindex[-1-$k]));
-	      }
-	      
-	      #
-	      # Make sure the last card is an END
-	      #
-	      $hdr->insert(scalar($hdr->cards),
-			   Astro::FITS::Header::Item->new(Keyword=>'END'));
-	      
-	      #
-	      # Write out all the cards, and note how many bytes for later padding.
-	      #
-	      my $s = join("",$hdr->cards);
-	      
-	      $fh->print( $s );
-	      $nbytes = length $s;
-	  } else {
-	      ##
-	      ## Legacy emitter (note different advertisement in the SIMPLE
-	      ## comment, for debugging!)
-	      ##
-
-	      if($issue_nullhdu) {
-		  $fh->printf( "%-80s", "XTENSION= 'IMAGE'" );
-	      } else {
-		  $fh->printf( "%-80s", "SIMPLE  =                    T / PDL::IO::FITS::wfits (http://pdl.perl.org)" );
-	      }
-	      
-	      $nbytes = 80; # Number of bytes written so far
-	      
-	      # Write FITS header
-	      
-	      %hdr = ();
-	      if (defined($h)) {
-		  for (keys %$h) { $hdr{uc $_} = $$h{$_} } # Copy (ensuring keynames are uppercase)
-	      }
-	      
-	      delete $hdr{SIMPLE}; delete $hdr{'END'};
-	      
-	      $hdr{BITPIX} =  $BITPIX;
-	      $hdr{BUNIT} = "Data Value" unless exists $hdr{BUNIT};
-	      wheader($fh, 'BITPIX');
-	      
-	      $ndims = $pdl->getndims; # Dimensions of data array
-	      $hdr{NAXIS}  = $ndims;
-	      wheader($fh, 'NAXIS');
-	      for $k (1..$ndims) { $hdr{"NAXIS$k"} = $pdl->getdim($k-1) }
-	      for $k (1..$ndims) { wheader($fh,"NAXIS$k") }
-	      
-	      if ($bscale != 1 || $bzero  != 0) {
-		  $hdr{BSCALE} =  $bscale;
-		  $hdr{BZERO}  =  $bzero;
-		  wheader($fh,'BSCALE');
-		  wheader($fh,'BZERO');
-	      }
-	      wheader($fh,'BUNIT');
-	      
-	      # IF badflag is set
-	      #   and BITPIX > 0 - ensure the header contains the BLANK keyword
-	      #                    (make sure it's for the correct type)
-	      #   otherwise      - make sure the BLANK keyword is removed
-	      if ( $pdl->badflag() ) {
-		  if ( $BITPIX > 0 ) { my $x = &$convert(pdl(0.0)); $hdr{BLANK} = $x->badvalue->sclr; }
-		  else               { delete $hdr{BLANK}; }
-	      }
-	      
-	      for $k (sort fits_field_cmp keys %hdr) { 
-		  wheader($fh,$k) unless $k =~ m/HISTORY/;
-	      }
-	      wheader($fh, 'HISTORY'); # Make sure that HISTORY entries come last.
-	      $fh->printf( "%-80s", "END" );
-	      $nbytes += 80;
-	  }
-	  
-	  #
-	  # Pad the header to a legal value and write the rest of the FITS file.
-	  #
-	  $nbytes %= 2880;
-	  $fh->print( " "x(2880-$nbytes) )
-	      if $nbytes != 0; # Fill up HDU
-	  
-	  # Decide how to byte swap - note does not quite work yet. Needs hack
-	  # to IO.xs
-	  
-	  my $bswap = sub {};     # Null routine
-	  if ( !isbigendian() ) { # Need to set a byte swap routine
-	      $bswap = \&bswap2 if $BITPIX==16;
-	      $bswap = \&bswap4 if $BITPIX==32 || $BITPIX==-32;
-	      $bswap = \&bswap8 if $BITPIX==-64 || $BITPIX==64;
-	  }
-	  
-	  # Write FITS data
-	  
-	  my $p1d = $pdl->copy->reshape($pdl->nelem); # Data as 1D stream;
-	  
-	  $off = 0;
-	  $sz  = PDL::Core::howbig(&$convert($p1d->slice('0:0'))->get_datatype);
-	  
-	  $nbytes = $p1d->getdim(0) * $sz;
-	  
-	  # Transfer data in blocks (because might need to byte swap)
-	  # Buffer is also type converted on the fly
-	  
-	  my $BUFFSZ = 360*2880; # = ~1Mb - must be multiple of 2880
-	  my $tmp;
-	  
-	  if ( $pdl->badflag() and $BITPIX < 0 and $PDL::Bad::UseNaN == 0 ) {
-	      # just print up a message - conversion is actually done in the loop
-	      print "Converting PDL bad value to NaN\n" if $PDL::verbose;
-	  }
-	  
-	  while ($nbytes - $off > $BUFFSZ) {
-	      
-	      # Data to be transferred
-	      
-	      $buff = &$convert( ($p1d->slice( ($off/$sz).":". (($off+$BUFFSZ)/$sz-1))
-				  -$bzero)/$bscale );
-	      
-	      # if there are bad values present, and output type is floating-point,
-	      # convert the bad values to NaN's.  We can ignore integer types, since
-	      # we have set the BLANK keyword
-	      #
-	      if ( $pdl->badflag() and $BITPIX < 0 and $PDL::Bad::UseNaN == 0 ) {
-		  $buff->inplace->setbadtonan();
-	      }
-	      
-	      &$bswap($buff);
-	      $fh->print( ${$buff->get_dataref} );
-	      $off += $BUFFSZ;
-	  }
-	  $buff = &$convert( ($p1d->slice($off/$sz.":-1") - $bzero)/$bscale );
-	  
-	  if ( $pdl->badflag() and $BITPIX < 0 and $PDL::Bad::UseNaN == 0 ) {
-	      $buff->inplace->setbadtonan();
-	  }
-	  
-	  &$bswap($buff);
-	  $fh->print( ${$buff->get_dataref} );
-	  # Fill HDU and close
-	  # note that for the data space the fill character is \0 not " "
-	  #
-	  $fh->print( "\0"x(($BUFFSZ - $buff->getdim(0) * $sz)%2880) );
-      } # end of image writing block 
-      else { 
+	  next;
+      }
+      if( !UNIVERSAL::isa($pdl,'PDL') ) {
 	  # Not a PDL and not a hash ref
 	  barf("wfits: unknown data type - quitting");
-     }
+      }
+      ### Regular image writing.
+      $BITPIX = "" unless defined $BITPIX;
+      if ($BITPIX eq "") {
+	  $BITPIX =   8 if $pdl->get_datatype == $PDL_B;
+	  $BITPIX =  16 if $pdl->get_datatype == $PDL_S || $pdl->get_datatype == $PDL_US;
+	  $BITPIX =  32 if $pdl->get_datatype == $PDL_L;
+	  $BITPIX =  64 if $pdl->get_datatype == $PDL_LL;
+	  $BITPIX = -32 if $pdl->get_datatype == $PDL_F;
+	  $BITPIX = -64 if $pdl->get_datatype == $PDL_D;
+	  $BITPIX = 8 * PDL::Core::howbig($PDL_IND) if($pdl->get_datatype==$PDL_IND);
+      }
+      if ($BITPIX eq "") {
+	  $BITPIX = -64;
+	  warn "wfits: PDL has an unsupported datatype -- defaulting to 64-bit float.\n";
+      }
+
+      my $convert = sub { return $_[0] }; # Default - do nothing
+      $convert = sub {byte($_[0])}     if $BITPIX ==   8;
+      $convert = sub {short($_[0])}    if $BITPIX ==  16;
+      $convert = sub {long($_[0])}     if $BITPIX ==  32;
+      $convert = sub {longlong($_[0])} if $BITPIX == 64;
+      $convert = sub {float($_[0])}    if $BITPIX == -32;
+      $convert = sub {double($_[0])}   if $BITPIX == -64;
+
+      # Automatically figure output scaling
+      my $bzero = 0; my $bscale = 1;
+      if ($BITPIX>0) {
+	  my $min = $pdl->min;
+	  my $max = $pdl->max;
+	  my ($dmin,$dmax) = (0, 2**8-1)     if $BITPIX == 8;
+	  ($dmin,$dmax) = (-2**15, 2**15-1)  if $BITPIX == 16;
+	  ($dmin,$dmax) = (-2**31, 2**31-1)  if $BITPIX == 32;
+	  ($dmin,$dmax) = (-(pdl(longlong,1)<<63), (pdl(longlong,1)<<63)-1) if $BITPIX==64;
+	  if ($min<$dmin || $max>$dmax) {
+	      $bzero = $min - $dmin;
+	      $max -= $bzero;
+	      $bscale = $max/$dmax if $max>$dmax;
+	  }
+	  print "BSCALE = $bscale &&  BZERO = $bzero\n" if $PDL::verbose;
+      }
+
+      ##############################
+      ## Check header and prepare to write it out
+      my($h) = $pdl->gethdr();
+      # Extra logic: if we got handed a vanilla hash that that is *not* an Astro::FITS::Header, but 
+      # looks like it's a FITS header encoded in a hash, then attempt to process it with 
+      # Astro::FITS::Header before writing it out -- this helps with cleanup of tags.
+      if($PDL::Astro_FITS_Header and 
+	 defined($h) and
+	 ref($h) eq 'HASH' and
+	 !defined( tied %$h )
+	  ) {
+	  my $all_valid_fits = 1;
+	  for my $k(keys %$h) {
+	      if(length($k) > 8 or
+		 $k !~ m/^[A-Z_][A-Z\d\_]*$/i
+		  ) {
+		  $all_valid_fits = 0;
+		  last;
+	      }
+	  }
+	  if($all_valid_fits) {
+	      # All the keys look like valid FITS header keywords -- so 
+	      # create a tied FITS header object and use that instead.
+	      my $afh = new Astro::FITS::Header( );
+	      my %hh;
+	      tie %hh, "Astro::FITS::Header", $afh;
+	      for (keys %$h) {
+		  $hh{$_} = $h->{$_};
+	      }
+	      $h = \%hh;
+	  }
+      }
+
+      # ordered hash with type and comment capability
+      my (@key_order, %ohdr, %type, %comment);
+      my $use_afh = defined($h) && defined(tied %$h) &&
+	   UNIVERSAL::isa(tied %$h,"Astro::FITS::Header");
+      if ($use_afh) {
+	  # Delete the END card if necessary (for later addition at the end)
+	  tied(%$h)->removebyname('END');
+	  %ohdr = %$h;
+      } else {
+	  @ohdr{map uc, keys %$h} = values %$h if $h;
+	  delete $ohdr{END};
+      }
+      my $ohash = [ \@key_order, \%ohdr, \%type, \%comment ];
+      _k_add($ohash, $issue_nullhdu
+	  ? qw(XTENSION IMAGE)
+	  : (qw(SIMPLE T LOGICAL), 'Created with PDL (http://pdl.perl.org)'));
+      _k_add($ohash, 'BITPIX', $BITPIX);
+      _k_add($ohash, 'NAXIS', $pdl->getndims);
+      my $correction = 0;
+      for (1..$pdl->getndims) {
+	  $correction ||= exists $ohdr{"NAXIS$_"} &&
+			  $ohdr{"NAXIS$_"} != $pdl->dim($_-1);
+	  _k_add($ohash, "NAXIS$_", $pdl->getdim($_-1));
+      }
+      carp "Warning: wfits corrected dimensions of FITS header" if $correction;
+      _k_add($ohash, 'BUNIT', "Data Value") unless exists $ohdr{BUNIT};
+      _k_add($ohash, 'BSCALE', $bscale) if $bscale != 1;
+      _k_add($ohash, 'BZERO', $bzero) if $bzero  != 0;
+      if ( $pdl->badflag() ) {
+	  if ( $BITPIX > 0 ) { _k_add($ohash, 'BLANK', $convert->(pdl(0.0))->badvalue->sclr); }
+	  else               { delete $ohdr{BLANK}; }
+      }
+      my %removed_naxis;
+      for my $kw_base (map {(my $r=$_)=~s/\d$//;$r} grep /\d$/, @wfits_keyword_order) {
+	  my $kn = 0;
+	  do {            # Loop over numericised keywords (e.g. NAXIS1)
+	      my $kw = $kw_base;
+	      $kw .= ++$kn; # NAXIS1 -> NAXIS<n>
+	      last if !exists $ohdr{$kw};
+	      next if $kn <= $pdl->getndims;
+	      #remove e.g. NAXIS3 from afhdr if NAXIS==2
+	      delete $ohdr{$kw};
+	      delete $h->{$kw} if $use_afh;
+	      $removed_naxis{$kn} = 1;
+	  } while(1);
+      }
+      foreach my $n (sort keys %removed_naxis){
+	  delete @ohdr{map $_.$n, @wfits_numbered_keywords};
+	  delete @$h{map $_.$n, @wfits_numbered_keywords} if $use_afh;
+      }
+
+      # Check for tile-compression format for the image, and handle it.
+      # We add the image-compression format tags and reprocess the whole
+      # shebang as a binary table.
+      if(my $cmptype = $opt->{compress}) {
+	  $cmptype = 'RICE_1' if $cmptype eq '1';
+	  confess "wfits: given unknown compress '$cmptype'"
+	      unless my $tc = $tile_compressors->{$cmptype};
+	  _k_add($ohash, qw(ZIMAGE T LOGICAL));
+	  _k_add($ohash, 'ZCMPTYPE', $cmptype);
+	  _k_add($ohash, $wfits_zpreserve{$_}, delete $ohdr{$_})
+	      for sort grep exists $ohdr{$_}, keys %wfits_zpreserve;
+	  _k_add($ohash, "ZNAXIS$_", $ohdr{"NAXIS$_"}) for 1..$pdl->getndims;
+#	  _k_add($ohash, "ZTILE$_", delete $ohdr{"NAXIS$_"}) for 1..$pdl->getndims;
+	  $tc->[0]->( $pdl, \%ohdr, $opt );
+	  my %tbl;
+	  $tbl{$_} = delete $ohdr{$_} for map $_."COMPRESSED_DATA", '', 'len_';
+	  $tbl{hdr} = \%ohdr;
+	  if (!$issue_nullhdu) {
+	      _wfits_nullhdu($fh); # needed only once
+	      $issue_nullhdu = 1;
+	  }
+	  _wfits_table($fh,\%tbl,'binary');
+	  next;
+      }
+
+      my $nbytes = 0;
+      # Now decide whether to emit a hash or an AFH object
+      if ($use_afh) {
+	  my $afhdr = tied %$h;
+	  # Use tied interface to set all the keywords.  Note that this
+	  # preserves existing per-line comments, only changing the values.
+	  for my $key (@key_order) {
+	      $h->{$key} = $ohdr{$key};
+	      my ($afhitem) = $afhdr->itembyname($key);
+	      $afhitem->type($type{$key}) if defined $type{$key};
+	      $afhitem->comment($comment{$key}) if defined $comment{$key};
+	  }
+	  # sort the lines. This is complicated by
+	  # the need for an arbitrary number of NAXIS<n> lines in the middle
+	  # of the sorting.  Keywords with a trailing '1' in the sorted-order
+	  # list get looped over.
+	  my $kk = 0;
+	  for my $kw_base (@wfits_keyword_order) {
+	      my $kn = 0;
+	      do {            # Loop over numericised keywords (e.g. NAXIS1)
+		  my $kw = $kw_base;
+		  $kw .= ++$kn if $kw =~ s/\d$//; # NAXIS1 -> NAXIS<n>
+		  last if !(my ($ind) = $afhdr->index($kw));
+		  $afhdr->insert($kk, $afhdr->remove($ind)) if $ind != $kk;
+		  $kk++;
+	      } while($kn);
+	  }
+	  # Make sure that the HISTORY lines all come at the end
+	  my @hindex = $afhdr->index('HISTORY');
+	  $afhdr->insert(-1-$_, $afhdr->remove($hindex[-1-$_])) for 0..$#hindex;
+	  # Make sure the last card is an END
+	  $afhdr->insert(scalar($afhdr->cards),
+		       Astro::FITS::Header::Item->new(Keyword=>'END'));
+	  # Write out all the cards, and note how many bytes for later padding.
+	  my $s = join("",$afhdr->cards);
+	  print $fh $s;
+	  $nbytes = length $s;
+      } else {
+	  my %hdr = %ohdr;
+	  for my $key (@key_order) {
+	      $hdr{$key} = $ohdr{$key};
+	      $hdr{COMMENT}{$key} = $comment{$key} if defined $comment{$key};
+	      $nbytes = wheader($fh, $key, \%hdr, $nbytes);
+	  }
+	  $nbytes = wheader($fh, $_, \%hdr, $nbytes)
+	      for sort fits_field_cmp grep !/HISTORY/, keys %hdr;
+	  $nbytes = wheader($fh, 'HISTORY', \%hdr, $nbytes); # Make sure that HISTORY entries come last.
+	  printf $fh "%-80s", "END";
+	  $nbytes += 80;
+      }
+
+      #
+      # Pad the header to a legal value and write the rest of the FITS file.
+      #
+      $nbytes %= 2880;
+      print $fh " "x(2880-$nbytes)
+	  if $nbytes != 0; # Fill up HDU
+
+      # Write FITS data
+      my $p1d = $pdl->copy->reshape($pdl->nelem); # Data as 1D stream;
+
+      my $off = 0;
+      my $sz  = PDL::Core::howbig($convert->($p1d->slice('0:0'))->get_datatype);
+      $nbytes = $p1d->getdim(0) * $sz;
+      # Transfer data in blocks (because might need to byte swap)
+      # Buffer is also type converted on the fly
+      my $BUFFSZ = 360*2880; # = ~1Mb - must be multiple of 2880
+      my $tmp;
+
+      if ( $pdl->badflag() and $BITPIX < 0 ) {
+	  # just print up a message - conversion is actually done in the loop
+	  print "Converting PDL bad value to NaN\n" if $PDL::verbose;
+      }
+
+      while ($nbytes - $off > $BUFFSZ) {
+	  # Data to be transferred
+	  my $buff = $convert->( ($p1d->slice( ($off/$sz).":". (($off+$BUFFSZ)/$sz-1))
+			      -$bzero)/$bscale );
+	  # if there are bad values present, and output type is floating-point,
+	  # convert the bad values to NaN's.  We can ignore integer types, since
+	  # we have set the BLANK keyword
+	  #
+	  if ( $pdl->badflag() and $BITPIX < 0 ) {
+	      $buff->inplace->setbadtonan();
+	  }
+	  $buff->type->bswap->($buff) if !isbigendian();
+	  print $fh ${$buff->get_dataref};
+	  $off += $BUFFSZ;
+      }
+      my $buff = $convert->( ($p1d->slice($off/$sz.":-1") - $bzero)/$bscale );
+
+      if ( $pdl->badflag() and $BITPIX < 0 ) {
+	  $buff->inplace->setbadtonan();
+      }
+
+      $buff->type->bswap->($buff) if !isbigendian();
+      print $fh ${$buff->get_dataref};
+      # Fill HDU and close
+      # note that for the data space the fill character is \0 not " "
+      #
+      print $fh "\0"x(($BUFFSZ - $buff->getdim(0) * $sz)%2880);
   } # end of output loop
-  $fh->close();
+  close $fh;
   1;
 }
 
@@ -2284,7 +2026,7 @@ of some FITS header fields.  Sort your hash keys using "fits_field_cmp" and
 you will get (e.g.) your "TTYPE" fields in the correct order even if there
 are 140 of them.
 
-This is a standard kludgey perl comparison sub -- it uses the magical
+This is a standard perl comparison sub -- it uses the magical
 $a and $b variables, rather than normal argument passing.
 
 =cut
@@ -2320,7 +2062,7 @@ sub _rows {
   return 1+$#$var if(ref $var eq 'ARRAY');
   return 1 unless(ref $var);
   
-  print STDERR "Warning: _rows found an unacceptable ref. ".ref $var.". Ignoring...\n"
+  warn "Warning: _rows found an unacceptable ref. ".ref $var.". Ignoring...\n"
     if($PDL::verbose);
   
   return undef;
@@ -2355,25 +2097,12 @@ our %bintable_types = (
 
 sub _prep_table {
   my ($hash,$tbl,$nosquish) = @_;
-  
-  my $ohash;
-
-  my $hdr = $hash->{hdr};
-  
-  my $heap = "";
-
-  # Make a local copy of the header.
-  my $h = {};
-  if(defined $hdr) {
-    local $_;
-    for (keys %$hdr) {$h->{$_} = $hdr->{$_}};
-  }
-  $hdr = $h;
-
-  $tbl = $hash->{tbl} unless defined($tbl);
-
   barf "_prep_table called without a HASH reference as the first argument"
     unless ref $hash eq 'HASH';
+  my $ohash = {};
+  my %hdr = %{$hash->{hdr} || {}};
+  $tbl //= $hdr{tbl};
+  my $heap = "";
 
   #####
   # Figure out how many columns are in the table
@@ -2397,7 +2126,6 @@ sub _prep_table {
       barf "_prep_table: inconsistent number of rows ($rkey: $rows vs. $key: $r)\n";
     }
   }
-  
   print "Table seems to have $rows rows...\n"
     if($PDL::verbose);
 
@@ -2412,14 +2140,11 @@ sub _prep_table {
 
   for my $key(@colkeys) {
     my $name = $key;
-
     $name =~ tr/[a-z]/[A-Z]/;   # Uppercaseify (required by FITS standard)
     $name =~ s/\s+/_/g;         # Remove whitespace (required by FITS standard)
-    
     unless($nosquish) {     
       $name =~ s/[^A-Z0-9_-]//g;  # Squish (recommended by FITS standard)
     }
-    
     ### Disambiguate...
     if(defined $ohash->{$name}) {
       my $iter = 1;
@@ -2428,15 +2153,12 @@ sub _prep_table {
            while(defined $ohash->{$name2});
       $name = $name2;
     }
-
     $ohash->{$name} = $hash->{$key};
     $keysbyname{$name} = $key;
     $namesbykey{$key} = $name;
-
     print "\tkey '$key'\t-->\tname '$name'\n"
       if($PDL::debug || (($name ne $key) and $PDL::verbose));
   }
-
 
   # The first element of colnames is ignored (since FITS starts the
   # count at 1)
@@ -2446,20 +2168,16 @@ sub _prep_table {
 
   ### Allocate any table columns that are already in the header...
   local $_;
-  map { for my $x(1) { # [Shenanigans to make next work right]
+  for (sort fits_field_cmp keys %hdr) {
     next unless m/^TTYPE(\d*)$/;
-
     my $num = $1;
-    
     if($num > $cols || $num < 1) {
       print "Ignoring illegal column number $num ( should be in range 1..$cols )\n"
 	if($PDL::verbose);
-      delete $hdr->{$_};
+      delete $hdr{$_};
       next;
     }
-
-    my $key = $hdr->{$_};
-
+    my $key = $hdr{$_};
     my $name;
     unless( $name = $namesbykey{$key}) { # assignment
       $name = $key;
@@ -2469,18 +2187,15 @@ sub _prep_table {
 	next;
       }
     }
-
     $colnames[$num] = $name;
     $colnums{$name} = $num;
-  } } sort fits_field_cmp keys %$hdr;
+  }
 
   ### Allocate all other table columns in alphabetical order...
   my $i = 0;
-  for my $k (@colkeys) {
-    my $name = $namesbykey{$k};
-
+  for my $name (@namesbykey{@colkeys}) {
     unless($colnums{$name}) {
-      while($colnames[++$i]) { }
+      1 while($colnames[++$i]);
       $colnames[$i] = $name;
       $colnums{$name} = $i;
     } else { $i++; }
@@ -2502,14 +2217,13 @@ sub _prep_table {
   my @fieldvars = ();    # Gets refs to all the fields of the hash.
 
   if($tbl eq 'binary') {
-    $hdr->{XTENSION} = 'BINTABLE';
-    $hdr->{BITPIX} = 8;
-    $hdr->{NAXIS} = 2;
-    #$hdr->{NAXIS1} = undef; # Calculated below; inserted here as placeholder.
-    $hdr->{NAXIS2} = $rows;
-    $hdr->{PCOUNT} = 0; # Change this is variable-arrays are adopted
-    $hdr->{GCOUNT} = 1;
-    $hdr->{TFIELDS} = $cols;
+    $hdr{XTENSION} = 'BINTABLE';
+    $hdr{BITPIX} = 8;
+    $hdr{NAXIS} = 2;
+    $hdr{NAXIS2} = $rows;
+    $hdr{PCOUNT} = 0; # Change this is variable-arrays are adopted
+    $hdr{GCOUNT} = 1;
+    $hdr{TFIELDS} = $cols;
 
     # Figure out data types, and accumulate a row length at the same time.
 
@@ -2526,7 +2240,7 @@ sub _prep_table {
       $fieldvars[$i] = $hash->{$keysbyname{$colnames[$i]}};
       my $var = $fieldvars[$i];
 
-      $hdr->{"TTYPE$i"} = $colnames[$i];
+      $hdr{"TTYPE$i"} = $colnames[$i];
       my $tform;
       
       my $tstr;
@@ -2610,8 +2324,8 @@ sub _prep_table {
 	      $lengths->ndims != 1 ||
 	      $lengths->dim(0) != $var->dim(0)
 	      ) {
-	      die <<'FOO';
-wfits(): you specified a 'len_$keysbyname{$colnames[$i]}' field in
+	      die <<FOO;
+wfits(): you specified a '$lname' field in
     your binary table output hash, indicating a variable-length array for
     each row of the output table, but I'm having trouble interpreting it.
     Either your source column isn't a 2-D PDL, or your length column isn't
@@ -2636,23 +2350,21 @@ FOO
 	      my $row = shift;
 	      my $col = shift;
 	      
-	      my $len = $hash->{"len_".$keysbyname{$colnames[$i]}};
+	      my $len = $hash->{$lname};
 	      my $l;
 	      if(ref $len eq 'ARRAY') {
 		  $l = $len->[$row];
 	      } elsif( UNIVERSAL::isa($len,'PDL') ) {
-		  $l = $len->dice_axis(0,$row);
+		  $l = $len->dice_axis(0,$row)->sclr;
 	      } elsif( ref $len ) {
-		  die "wfits: Couldn't understand length spec 'len_".$keysbyname{$colnames[$i]}."' in bintable output (length spec must be a PDL or array ref).\n";
+		  die "wfits: Couldn't understand length spec '$lname' in bintable output (length spec must be a PDL or array ref).\n";
 	      } else {
 		  $l = $len;
 	      }
-	      
 	      # The standard says we should give a zero-offset 
 	      # pointer if the current row is zero-length; hence
 	      # the ternary operator.
 	      my $ret = pdl( $l, $l ? length($heap) : 0)->long;
-
 
 	      if($l) {
 		  # This echoes the normal-table swap and accumulation 
@@ -2660,12 +2372,7 @@ FOO
 		  my $tmp = $csub ? &$csub($var, $row, $col) : $var;
 		  $tmp = $tmp->slice("0:".($l-1))->sever;
 		  
-		  if(!isbigendian()) {
-		      bswap2($tmp) if($tmp->get_datatype == $PDL_S);
-		      bswap4($tmp) if($tmp->get_datatype == $PDL_L ||
-				      $tmp->get_datatype == $PDL_F);
-		      bswap8($tmp) if($tmp->get_datatype == $PDL_D);
-		  }
+		  $tmp->type->bswap->($tmp) if !isbigendian();
 		  my $t = $tmp->get_dataref;
 		  $heap .= $$t;
 	      }
@@ -2675,22 +2382,22 @@ FOO
 
 	  # Having defined the conversion routine, now modify tstr to make this a heap-array
 	  # reference.
-	  $tstr = sprintf("P%s(%d)",$tstr, $hash->{"len_".$keysbyname{$colnames[$i]}}->max );
+	  $tstr = sprintf("P%s(%d)",$tstr, $hash->{$lname}->max );
 	  $rpt = 1;
 	  $bytes = 8; # two longints per row in the main table.
       }
 
       
-      $hdr->{"TFORM$i"} = "$rpt$tstr";
+      $hdr{"TFORM$i"} = "$rpt$tstr";
 
       if(UNIVERSAL::isa($var, 'PDL') and $var->ndims > 1) {
-	  $hdr->{"TDIM$i"} = "(".join(",",$var->slice("(0)")->dims).")";
+	  $hdr{"TDIM$i"} = "(".join(",",$var->slice("(0)")->dims).")";
       }
 
       $rowlen += ($field_len[$i] = $rpt * $bytes);
     }
       
-    $hdr->{NAXIS1} = $rowlen;
+    $hdr{NAXIS1} = $rowlen;
     
     ## Now accumulate the binary table
 
@@ -2709,14 +2416,7 @@ FOO
 
 	  ## This would go faster if moved outside the loop but I'm too
 	  ## lazy to do it Right just now.  Perhaps after it actually works.
-	  ##
-	  if(!isbigendian()) {
-	    bswap2($tmp) if($tmp->get_datatype == $PDL_S);
-	    bswap4($tmp) if($tmp->get_datatype == $PDL_L ||
-			    $tmp->get_datatype == $PDL_F);
-	    bswap8($tmp) if($tmp->get_datatype == $PDL_D);
-	  }
-
+	  $tmp->type->bswap->($tmp) if !isbigendian();
 	  my $t = $tmp->get_dataref;  
 	  $tmp = $$t;
 	} else {                                  # Only other case is ASCII just now...
@@ -2738,9 +2438,7 @@ FOO
     if( (length $table) != $table_size ) {
       print "Warning: Table length is ".(length $table)."; expected $table_size\n";
     }
-
-    return ($hdr,$table, $heap);
-      
+    return (\%hdr,$table, $heap);
   } elsif($tbl eq 'ascii') {
     barf "ASCII tables not yet supported...\n";
   } else {
@@ -2757,7 +2455,7 @@ sub _print_to_fits ($$$) {
     my $blank = shift;
 
     my $len = ((length $data) - 1) % 2880 + 1;
-    $fh->print( $data . ($blank x (2880-$len)) );
+    print $fh $data . ($blank x (2880-$len));
 }
   
 {
@@ -2787,11 +2485,11 @@ sub _print_to_fits ($$$) {
 #   can not think of a sensible name for the extension so calling
 #   it TABLE for now
 #
-sub _wfits_table ($$$) {
+sub _wfits_table {
   my $fh = shift;
   my $hash = shift;
   my $tbl = shift;
-  
+
   barf "FITS BINTABLES are not supported without the Astro::FITS::Header module.\nGet it from www.cpan.org.\n"
     unless($PDL::Astro_FITS_Header);
 
@@ -2808,7 +2506,7 @@ sub _wfits_table ($$$) {
   add_hdr_item $h, "NAXIS1", $hdr->{NAXIS1}, 'int', 'Bytes per row';
   add_hdr_item $h, "NAXIS2", $hdr->{NAXIS2}, 'int', 'Number of rows';
   add_hdr_item $h, "PCOUNT", length($heap), 'int', ($tbl eq 'ascii' ? undef : "No heap") ;
-  add_hdr_item $h, "THEAP", "0", "(No gap before heap)" if(length($heap));
+  add_hdr_item $h, "THEAP", "0", 'int', "(No gap before heap)" if(length($heap));
   add_hdr_item $h, "GCOUNT", 1, 'int';
   add_hdr_item $h, "TFIELDS", $hdr->{TFIELDS},'int';
   add_hdr_item $h, "HDUNAME", "TABLE", 'string';
@@ -2833,7 +2531,7 @@ sub _wfits_table ($$$) {
   # Add heap dump
 }
 
-sub _wfits_nullhdu ($) {
+sub _wfits_nullhdu {
   my $fh = shift;
   if($Astro::FITS::Header) {
     my $h = Astro::FITS::Header->new();
@@ -2868,6 +2566,4 @@ sub _wfits_nullhdu ($) {
   }
 }
 
-    
 1;
-

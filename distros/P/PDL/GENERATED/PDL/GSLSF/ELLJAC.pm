@@ -20,6 +20,11 @@ use DynaLoader;
 
 
 
+
+#line 5 "gsl_sf_elljac.pd"
+use strict;
+use warnings;
+
 =head1 NAME
 
 PDL::GSLSF::ELLJAC - PDL interface to GSL Special Functions
@@ -28,11 +33,8 @@ PDL::GSLSF::ELLJAC - PDL interface to GSL Special Functions
 
 This is an interface to the Special Function package present in the GNU Scientific Library. 
 
-=head1 SYNOPSIS
-
 =cut
-
-
+#line 38 "ELLJAC.pm"
 
 
 
@@ -45,6 +47,8 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
+
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_elljac
@@ -64,18 +68,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 72 "ELLJAC.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_elljac = \&PDL::gsl_sf_elljac;
+#line 78 "ELLJAC.pm"
 
 
 
 
 
+#line 36 "gsl_sf_elljac.pd"
 =head1 AUTHOR
 
 This file copyright (C) 1999 Christian Pellegrin <chri@infis.univ.trieste.it>
@@ -88,8 +93,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-
-
+#line 97 "ELLJAC.pm"
 
 
 

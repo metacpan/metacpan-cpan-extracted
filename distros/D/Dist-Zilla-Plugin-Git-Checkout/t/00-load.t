@@ -17,5 +17,5 @@ my @modules = qw(
 plan tests => scalar @modules;
 
 for my $module (@modules) {
-    require_ok($module) || BAIL_OUT();
+    require_ok($module) or BAIL_OUT();
 }

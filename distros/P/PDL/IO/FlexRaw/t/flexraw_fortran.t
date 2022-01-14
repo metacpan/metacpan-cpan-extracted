@@ -1,15 +1,16 @@
 use strict;
+use warnings;
 use PDL::LiteF;
 use PDL::IO::FlexRaw;
 use Config;
 use Test::More;
 use File::Temp qw(tempfile);
 use File::Spec;
+use File::Which ();
 
 my $prog_iter;
 
 (undef, my $data) = tempfile("rawXXXX", SUFFIX=>'_data', TMPDIR=>1);
-$data =~ s/\\/\//g if $^O =~ /MSWin32/;
 my $hdr = $data . '.hdr';
 (my $head = $data) =~ s/_data$//;
 
@@ -21,14 +22,11 @@ my $DEBUG = 0;
 $PDL::Verbose = 0;
 $Verbose |= $PDL::Verbose;
 
-my $exec = $^O =~ /win32/i ? '.exe' : '';
-my $null = $^O =~ /win32/i ? ' 2>nul' : ' 2>/dev/null';
+my $null = ' 2>' . File::Spec->devnull;
 
 my $datalen = length($data);
 eval "use PDL::Slatec";
 plan skip_all => "Skipped tests as no Slatec" if $@;
-plan skip_all => "Skipped tests for 64 bit architecture: $1"
-  if $Config{archname} =~ /(x86_64|ia64)/;
 plan skip_all => "temp file path too long for f77 ($datalen chars), skipping all tests"
   if $datalen > 70;
 eval "use ExtUtils::F77";
@@ -57,19 +55,17 @@ sub byte4swap {
     my ($ofile) = $file.'~';
     my ($word);
 
-    my $ifh = IO::File->new( "<$file" )
-      or die "Can't open $file to read";
-    my $ofh = IO::File->new( ">$ofile" )
-      or die "Can't open $ofile to write";
+    open my $ifh, "<", $file or die "Can't open $file to read: $!";
+    open my $ofh, ">", $ofile or die "Can't open $ofile to write: $!";
     binmode $ifh;
     binmode $ofh;
-    while ( !$ifh->eof ) {
-	$ifh->read( $word, 4 );
+    while ( !eof $ifh ) {
+	read $ifh, $word, 4;
 	$word = pack 'c4',reverse unpack 'c4',$word;
-	$ofh->print( $word );
+	print $ofh $word;
     }
-    $ofh->close;
-    $ifh->close;
+    close $ofh;
+    close $ifh;
     rename $ofile, $file;
 }
 
@@ -78,16 +74,14 @@ sub byte8swap {
     my ($ofile) = $file.'~';
     my ($word);
 
-    my $ifh = IO::File->new( "<$file" )
-      or die "Can't open $file to read";
-    my $ofh = IO::File->new( ">$ofile" )
-      or die "Can't open $ofile to write";
+    open my $ifh, "<", $file or die "Can't open $file to read: $!";
+    open my $ofh, ">", $ofile or die "Can't open $ofile to write: $!";
     binmode $ifh;
     binmode $ofh;
     while ( !$ifh->eof ) {
-	$ifh->read( $word, 8 );
+	read $ifh, $word, 8;
 	$word = pack 'c8',reverse unpack 'c8',$word;
-	$ofh->print( $word );
+	print $ofh $word;
     }
     $ofh->close;
     $ifh->close;
@@ -142,14 +136,6 @@ sub codefold {
    return $newcode;
 }
 
-sub inpath {
-  my ($prog) = @_;
-  my $pathsep = $^O =~ /win32/i ? ';' : ':';
-  my $exe = $^O =~ /win32/i ? '.exe' : '';
-  for (split $pathsep, $ENV{PATH}) { return 1 if -x "$_/$prog$exe" }
-  return 0;
-}
-
 # createData $head, $code
 #
 # given a F77 program (in $code), compile and run it.
@@ -172,8 +158,8 @@ sub createData {
     # system with $head as the argument
     #
     if($^O =~ /mswin32/i) {
-      die '$head [' . $head . '] should match /^[A-Z]:\//'
-            unless $head =~ /^[A-Z]:\//;
+      die '$head [' . $head . '] should match /^[A-Z]:/'
+            unless $head =~ /^[A-Z]:/;
       }      
     else {
       die '$head [' . $head . '] must start with a / or ./'
@@ -183,26 +169,26 @@ sub createData {
     my $file = ${head} . '.f';
     my $prog = $head;
 
-    my $fh = IO::File->new( "> $file" )
-      or die "ERROR: Unable to write F77 code to $file\n";
-    $fh->print( $code );
-    $fh->close;
+    open my $fh, ">", $file
+      or die "ERROR: Unable to write F77 code to $file: $!\n";
+    print $fh $code;
+    close $fh;
 
-    if (-e "$prog$exec") {
-        my $success = unlink "$prog$exec";
+    if (-e "$prog$Config{_exe}") {
+        my $success = unlink "$prog$Config{_exe}";
         if (!$success) {
             #  Antivirus might be holding on to the exec
             #  file so use a different name
             #  Poss path length issues?
             #  See $dalen in 2nd begin block$prog_iter++;
-            warn "Unable to delete $prog$exec, generating new name"
+            warn "Unable to delete $prog$Config{_exe}, generating new name"
               if $Verbose;
             $prog_iter++;
             $prog .= $prog_iter;
         };
     }
 
-    system("$F77 $F77flags -o $prog$exec $file".
+    system("$F77 $F77flags -o $prog$Config{_exe} $file".
 	     (($Verbose || $DEBUG)?'': $null));
     
     unlink $data if -f $data;
@@ -211,7 +197,7 @@ sub createData {
     die "ERROR: code did not create data file $data\n"
       unless -e $data;
 
-    unlink $prog.$exec, $file;
+    unlink $prog.$Config{_exe}, $file;
 
 } # sub: createData()
 
@@ -538,11 +524,11 @@ foreach (@req) {
 ok( $ok, "readflex combined types" );
 
 SKIP: {
-   my $compress = inpath('compress') ? 'compress' : 'gzip'; # some linuxes don't have compress
+   my $compress = File::Which::which('compress') ? 'compress' : 'gzip'; # some linuxes don't have compress
    $compress = 'gzip' if $^O eq 'cygwin';                   # fix bogus compress script prob
 
    if ( $^O eq 'MSWin32' ) {    # fix for ASPerl + MinGW, needs to be more general
-      skip "No compress or gzip command on MSWin32", 1 unless inpath($compress) and $^O;
+      skip "No compress or gzip command on MSWin32", 1 unless File::Which::which($compress) and $^O;
    }
 
 # Try compressed data

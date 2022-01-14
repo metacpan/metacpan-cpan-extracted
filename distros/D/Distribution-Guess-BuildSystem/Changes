@@ -1,5 +1,8 @@
 Revision history for Perl module Distribution::Guess::BuildSystem
 
+1.004 2022-01-08T23:56:26Z
+	* No code changes. Fix a link in README.pod.
+
 1.003 2021-01-19T16:31:02Z
 	* freshen distro, drop Travis CI, add Github Actions
 

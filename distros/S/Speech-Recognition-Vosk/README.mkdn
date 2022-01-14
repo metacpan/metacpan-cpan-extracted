@@ -1,0 +1,48 @@
+
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/Speech-Recognition-Vosk?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/Speech-Recognition-Vosk)
+[![Windows](https://github.com/Corion/Speech-Recognition-Vosk/workflows/windows/badge.svg)](https://github.com/Corion/Speech-Recognition-Vosk/actions?query=workflow%3Awindows)
+[![MacOS](https://github.com/Corion/Speech-Recognition-Vosk/workflows/macos/badge.svg)](https://github.com/Corion/Speech-Recognition-Vosk/actions?query=workflow%3Amacos)
+[![Linux](https://github.com/Corion/Speech-Recognition-Vosk/workflows/linux/badge.svg)](https://github.com/Corion/Speech-Recognition-Vosk/actions?query=workflow%3Alinux)
+
+# NAME
+
+Speech::Recognition::Vosk - offline voice recognition using the Vosk toolkit
+
+# SYNOPSIS
+
+Most likely, you want to use the more convenient OO wrapper in
+[Speech::Recognition::Vosk::Recognizer](https://metacpan.org/pod/Speech%3A%3ARecognition%3A%3AVosk%3A%3ARecognizer).
+
+    use Speech::Recognition::Vosk;
+    use JSON 'decode_json';
+
+    my $model = Speech::Recognition::Vosk::model_new("model-en");
+    my $recognizer = Speech::Recognition::Vosk::recognizer_new($model, 44100);
+
+    binmode STDIN, ':raw';
+
+    while( ! eof(*STDIN)) {
+        read(STDIN, my $buf, 3200);
+        my $complete = Speech::Recognition::Vosk::recognizer_accept_waveform($recognizer, $buf);
+        my $spoken;
+        if( $complete ) {
+            $spoken = Speech::Recognition::Vosk::recognizer_result($recognizer);
+        } else {
+            $spoken = Speech::Recognition::Vosk::recognizer_partial_result($recognizer);
+        }
+
+        my $info = decode_json($spoken);
+        if( $info->{text}) {
+            print $info->{text},"\n";
+        } else {
+            local $| = 1;
+            print $info->{partial}, "\r";
+        };
+    }
+
+    # Flush the buffers
+    my $spoken = Speech::Recognition::Vosk::recognizer_final_result($recognizer);
+    my $info = decode_json($spoken);
+    print $info->{text},"\n";
+
+# FUNCTIONS

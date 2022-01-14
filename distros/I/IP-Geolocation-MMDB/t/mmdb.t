@@ -6,11 +6,11 @@ use 5.016;
 use warnings;
 use utf8;
 
-use Test::More tests => 34;
+use Test::More tests => 42;
 
 use File::Spec::Functions qw(catfile);
 use IP::Geolocation::MMDB;
-use Math::BigInt;
+use Math::BigInt 1.999811;
 
 ok !eval { IP::Geolocation::MMDB->new },
   'constructor without "file" parameter dies';
@@ -18,13 +18,15 @@ ok !eval { IP::Geolocation::MMDB->new },
 ok !eval { IP::Geolocation::MMDB->new(file => 'nonexistent') },
   'constructor with non-existing file dies';
 
-my $file = catfile(qw(t data Test-GeoLite2-City.mmdb));
+my $file = catfile(qw(t data Test-City.mmdb));
 
 my $mmdb = new_ok 'IP::Geolocation::MMDB' => [file => $file];
 
-can_ok $mmdb, qw(getcc record_for_address version);
+can_ok $mmdb, qw(getcc record_for_address iterate_search_tree metadata);
 
-isnt $mmdb->version, q{}, 'library version is not empty';
+my $version = IP::Geolocation::MMDB::libmaxminddb_version;
+isnt $version, q{}, 'library version is not empty';
+diag 'libmaxminddb version is ' . $version;
 
 ok !eval { $mmdb->record_for_address('-1') },
   'invalid ip address throws exception';
@@ -74,3 +76,38 @@ isa_ok $m->description, 'HASH';
 cmp_ok $m->ip_version,  '>=', 0, 'ip_version is set';
 cmp_ok $m->node_count,  '>=', 0, 'node_count is set';
 cmp_ok $m->record_size, '>=', 0, 'record_size is set';
+
+my %data_for;
+
+sub data_callback {
+  my ($numeric_ip, $prefix_length, $data) = @_;
+
+  my $address = $numeric_ip->to_hex . '/' . $prefix_length;
+  $data_for{$address} = $data;
+
+  return;
+}
+
+my %children_for;
+
+sub node_callback {
+  my ($node_number, $left_node_number, $right_node_number) = @_;
+
+  $children_for{$node_number} = [$left_node_number, $right_node_number];
+
+  return;
+}
+
+$mmdb->iterate_search_tree(\&data_callback, \&node_callback);
+
+cmp_ok scalar keys %data_for,     '>', 0, 'data_callback was called';
+cmp_ok scalar keys %children_for, '>', 0, 'node_callback was called';
+ok exists $children_for{0}, 'node 0 exists';
+isnt $children_for{0}->[0], $children_for{0}->[1], 'children differ';
+
+my $ipv4_data = $data_for{'ffffb0090000/112'};
+my $ipv6_data = $data_for{'2a0104f8000000000000000000000000/32'};
+ok defined $ipv4_data,           'IPv4 data exists';
+ok defined $ipv6_data,           'IPv6 data exists';
+ok exists $ipv4_data->{city},    'city key exists';
+ok exists $ipv6_data->{country}, 'country key exists';

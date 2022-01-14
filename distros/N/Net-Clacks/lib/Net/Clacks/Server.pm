@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp;
-our $VERSION = 18;
+our $VERSION = 20;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -75,8 +75,6 @@ BEGIN {
 sub new {
     my ($class, $isDebugging, $configfile) = @_;
 
-    croak("Config file $configfile not found!") unless(-f $configfile);
-
     my $self = bless {}, $class;
 
     $self->{isDebugging} = $isDebugging;
@@ -88,9 +86,44 @@ sub new {
 sub init {
     my ($self) = @_;
 
-    print "Loading config file ", $self->{configfile}, "\n";
-    my $config = XMLin($self->{configfile},
-                        ForceArray => [ 'ip', 'socket' ],);
+
+    my @paths;
+    if(defined($ENV{'PC_CONFIG_PATHS'})) {
+        push @paths, split/\:/, $ENV{'PC_CONFIG_PATHS'};
+        print "Found config paths:\n", Dumper(\@paths), " \n";
+    } else {
+        print("PC_CONFIG_PATHS undefined, falling back to legacy mode\n");
+        @paths = ('', 'configs/');
+    }
+
+    my $filedata;
+    my $fname = $self->{configfile};
+    foreach my $path (@paths) {
+        if($path ne '' && $path !~ /\/$/) {
+            $path .= '/';
+        }
+        my $fullfname = $path . $fname;
+        next unless (-f $fullfname);
+        print "   Loading config file $fullfname\n";
+
+        $filedata = slurpBinFile($fullfname);
+
+        foreach my $varname (keys %ENV) {
+            next unless $varname =~ /^PC\_/;
+
+            my $newval = $ENV{$varname};
+            $filedata =~ s/$varname/$newval/g;
+        }
+
+        last;
+    }
+
+    if(!defined($filedata) || $filedata eq "") {
+        croak("Can't load config file: Not found or empty!");
+    }
+
+    print "------- Parsing config file $fname ------\n";
+    my $config = XMLin($filedata, ForceArray => [ 'ip', 'socket' ]);
 
     my $hname = hostname;
 
@@ -491,6 +524,11 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                         authtimeout => time + $self->{config}->{authtimeout},
                         authok => 0,
                         failcount => 0,
+                        outmessages => [],
+                        inmessages => [],
+                        messagedelay => 0,
+                        inmessagedelay => 0,
+                        outmessagedelay => 0,
                     );
 
                     if(defined($self->{config}->{master}->{ip})) {
@@ -574,6 +612,10 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                     authtimeout => time + $self->{config}->{authtimeout},
                     authok => 0,
                     failcount => 0,
+                    outmessages => [],
+                    inmessages => [],
+                    inmessagedelay => 0,
+                    outmessagedelay => 0,
                 );
                 if(0 && $self->{isDebugging}) {
                     $tmp{authok} = 1;
@@ -710,12 +752,6 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
         }
 
         foreach my $cid (keys %clients) {
-            if($interclackslock && !$clients{$cid}->{interclacksclient}) {
-                # We are locked into interclacks sync lock, but this is not the connection to master,
-                # so we don't handle the inputr buffer for this client at the moment.
-                next;
-            }
-
             while(@{$clients{$cid}->{charbuffer}}) {
                 my $buf = shift @{$clients{$cid}->{charbuffer}};
 
@@ -725,365 +761,390 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                 } elsif($buf eq "\n") {
                     next if($clients{$cid}->{buffer} eq ''); # Empty lines
 
-                    # Handle CLACKS identification header
-                    if($clients{$cid}->{buffer} =~ /^CLACKS\ (.+)/) {
-                        $clients{$cid}->{clientinfo} = $1;
-                        $clients{$cid}->{clientinfo} =~ s/\;/\_/g;
-                        print "Client at ", $cid, " identified as ", $clients{$cid}->{clientinfo}, "\n";
-                        $clients{$cid}->{buffer} = '';
-                        next;
+                    my %inmsg = (
+                        message => $clients{$cid}->{buffer},
+                        releasetime => time + $clients{$cid}->{inmessagedelay},
+                    );
+                    push @{$clients{$cid}->{inmessages}}, \%inmsg;
+                    $clients{$cid}->{buffer} = '';
+                } else {
+                    $clients{$cid}->{buffer} .= $buf;
+                }
+            }
+
+            if($interclackslock && !$clients{$cid}->{interclacksclient}) {
+                # We are locked into interclacks sync lock, but this is not the connection to master,
+                # so we don't handle the input buffer for this client at the moment.
+                next;
+            }
+
+
+            # ******************************************************************************
+            # ******************************************************************************
+            # ******************************************************************************
+            # ******************************************************************************
+            # ******************************************************************************
+            # ******************************************************************************
+            # ******************************************************************************
+            while(scalar @{$clients{$cid}->{inmessages}}) {
+                last if($clients{$cid}->{inmessages}->[0]->{releasetime} > time);
+                my $inmsgtmp = shift @{$clients{$cid}->{inmessages}};
+                my $inmsg = $inmsgtmp->{message};
+
+                # Handle CLACKS identification header
+                if($inmsg =~ /^CLACKS\ (.+)/) {
+                    $clients{$cid}->{clientinfo} = $1;
+                    $clients{$cid}->{clientinfo} =~ s/\;/\_/g;
+                    print "Client at ", $cid, " identified as ", $clients{$cid}->{clientinfo}, "\n";
+                    next;
+                }
+
+                my $nodebug = 0;
+                my $sendinterclacks = 1;
+                my $discardafterlogging = 0;
+                # Handle OVERHEAD messages before logging (for handling 'N' flag correctly)
+                if($inmsg =~ /^OVERHEAD\ (.+?)\ (.+)/) {
+                    my ($flags, $value) = ($1, $2);
+                    $sendinterclacks = 0;
+                    my @flagparts = split//, $flags;
+                    my %parsedflags;
+                    my %newflags;
+                    foreach my $key (sort keys %overheadflags) {
+                        if(contains($key, \@flagparts)) {
+                            $parsedflags{$overheadflags{$key}} = 1;
+                            $newflags{$overheadflags{$key}} = 1;
+                        } else {
+                            $parsedflags{$overheadflags{$key}} = 0;
+                            $newflags{$overheadflags{$key}} = 0;
+                        }
                     }
 
-                    my $nodebug = 0;
-                    my $sendinterclacks = 1;
-                    my $discardafterlogging = 0;
-                    # Handle OVERHEAD messages before logging (for handling 'N' flag correctly)
-                    if($clients{$cid}->{buffer} =~ /^OVERHEAD\ (.+?)\ (.+)/) {
-                        my ($flags, $value) = ($1, $2);
-                        $sendinterclacks = 0;
-                        my @flagparts = split//, $flags;
-                        my %parsedflags;
-                        my %newflags;
-                        foreach my $key (sort keys %overheadflags) {
-                            if(contains($key, \@flagparts)) {
-                                $parsedflags{$overheadflags{$key}} = 1;
-                                $newflags{$overheadflags{$key}} = 1;
-                            } else {
-                                $parsedflags{$overheadflags{$key}} = 0;
-                                $newflags{$overheadflags{$key}} = 0;
-                            }
-                        }
-
-                        if($parsedflags{auth_token}) {
-                            if($value eq $self->{authtoken}) {
-                                $clients{$cid}->{authok} = 1;
-                                $clients{$cid}->{outbuffer} .= "OVERHEAD O Welcome!\r\n";
-                            } else {
-                                $clients{$cid}->{authok} = 0;
-                                $clients{$cid}->{outbuffer} .= "OVERHEAD F Login failed!\r\n";
-                                push @toremove, $cid; # Disconnect the client
-                            }
-                        }
-
-                        # Ignore other command when not authenticated
-                        if(!$clients{$cid}->{authok}) {
-                            $clients{$cid}->{buffer} = '';
-                            next;
-                        }
-
-                        if($parsedflags{lock_for_sync} && $clients{$cid}->{interclacksclient}) {
-                            if($value) {
-                                print "Interclacks sync lock ON.\n";
-                                $interclackslock = 1;
-                            } else {
-                                print "Interclacks sync lock OFF.\n";
-                                $interclackslock = 0;
-
-                                # Send server our keys AFTER we got everything FROM the server (e.g. after unlock)
-                                foreach my $ckey (sort keys %clackscache) {
-                                    $clients{$cid}->{outbuffer} .= "KEYSYNC " . $clackscachetime{$ckey} . " U $ckey=" . $clackscache{$ckey} . "\r\n";
-                                    $clients{$cid}->{outbuffer} .= "PING\r\n";
-                                }
-                                foreach my $ckey (sort keys %clackscachetime) {
-                                    next if(defined($clackscache{$ckey}));
-                                    $clients{$cid}->{outbuffer} .= "KEYSYNC " . $clackscachetime{$ckey} . " D $ckey=REMOVED\r\n";
-                                    $clients{$cid}->{outbuffer} .= "PING\r\n";
-                                }
-                            }
-                            $parsedflags{forward_message} = 0; # Don't forward
-                            $newflags{return_to_sender} = 0; # Don't return to sender
-                        }
-
-                        if($parsedflags{close_all_connections} && $value) {
-                            foreach my $closecid (keys %clients) {
-                                if($clients{$closecid}->{interclacks} && $parsedflags{forward_message}) {
-                                    $self->evalsyswrite($clients{$closecid}->{socket}, "\r\nOVERHEAD GC 1\r\n");
-                                }
-                                $self->evalsyswrite($clients{$closecid}->{socket}, "\r\nQUIT\r\n");
-                                push @toremove, $closecid;
-                            }
-                            $parsedflags{forward_message} = 0; # Already forwarded where needed
-                        }
-
-                        if($parsedflags{shutdown_service}) {
-                            $value = 0 + $value;
-                            if($value > 0) {
-                                $shutdowntime = $value + time;
-                                print STDERR "Shutting down in $value seconds\n";
-                            }
-                        }
-                        if($parsedflags{discard_message}) {
-                            $discardafterlogging = 1;
-                        }
-                        if($parsedflags{no_logging}) {
-                            $nodebug = 1;
-                        }
-
-                        if($parsedflags{error_message}) {
-                            print STDERR 'ERROR from ', $cid, ': ', $value, "\n";
-                        }
-
-                        if($parsedflags{set_interclacks_mode}) {
-                            $newflags{forward_message} = 0;
-                            $newflags{return_to_sender} = 0;
-
-                            if($value) {
-                                $clients{$cid}->{interclacks} = 1;
-                                $clients{$cid}->{lastping} = time;
-
-
-                                $clients{$cid}->{outbuffer} .= "CLACKS PageCamel $VERSION in interclacks master mode\r\n" .  # Tell client we are in interclacks master mode
-                                                               "OVERHEAD M Authentication required\r\n" .                 # Informal message
-                                                               "OVERHEAD A " . $self->{authtoken} . "\r\n" .              # ...and send Auth token...
-                                                               "OVERHEAD L 1\r\n";                                            # ...and lock client for sync
-
-                                # Make sure our new interclacks client has an *exact* copy of our buffer
-                                #$clients{$cid}->{outbuffer} .= "CLEARCACHE\r\n";
-                                foreach my $ckey (sort keys %clackscache) {
-                                    $clients{$cid}->{outbuffer} .= "KEYSYNC " . $clackscachetime{$ckey} . " U $ckey=" . $clackscache{$ckey} . "\r\n";
-                                    $clients{$cid}->{outbuffer} .= "PING\r\n";
-                                }
-                                foreach my $ckey (sort keys %clackscachetime) {
-                                    next if(defined($clackscache{$ckey}));
-                                    $clients{$cid}->{outbuffer} .= "KEYSYNC " . $clackscachetime{$ckey} . " D $ckey=REMOVED\r\n";
-                                    $clients{$cid}->{outbuffer} .= "PING\r\n";
-                                }
-                                $clients{$cid}->{outbuffer} .= "OVERHEAD L 0\r\n"; # unlock client after sync
-                                $clients{$cid}->{outbuffer} .= "PING\r\n";
-                                $clients{$cid}->{lastinterclacksping} = time;
-                            } else {
-                                $clients{$cid}->{interclacks} = 0;
-                                $clients{$cid}->{lastping} = time;
-                            }
-                        }
-
-                        my $newflagstring = '';
-                        $newflags{return_to_sender} = 0;
-
-                        foreach my $key (sort keys %overheadflags) {
-                            next if($key eq 'Z');
-                            if($newflags{$overheadflags{$key}}) {
-                                $newflagstring .= $key;
-                            }
-                        }
-                        if($newflagstring eq '') {
-                            $newflagstring = 'Z';
-                        }
-
-                        if($parsedflags{forward_message}) {
-                            foreach my $overheadcid (keys %clients) {
-                                next if($cid eq $overheadcid && !$parsedflags{return_to_sender});
-
-                                $clients{$overheadcid}->{outbuffer} .= "OVERHEAD $newflagstring $value\r\n";
-                            }
+                    if($parsedflags{auth_token}) {
+                        if($value eq $self->{authtoken}) {
+                            $clients{$cid}->{authok} = 1;
+                            #$clients{$cid}->{outbuffer} .= "OVERHEAD O Welcome!\r\n";
+                            push @{$clients{$cid}->{outmessages}}, {releasetime => time + $clients{$cid}->{outmessagedelay}, message => 'OVERHEAD O Welcome!'};
+                        } else {
+                            $clients{$cid}->{authok} = 0;
+                            #$clients{$cid}->{outbuffer} .= "OVERHEAD F Login failed!\r\n";
+                            push @{$clients{$cid}->{outmessages}}, {releasetime => time + $clients{$cid}->{outmessagedelay}, message => 'OVERHEAD F Login failed!'};
+                            push @{$clients{$cid}->{outmessages}}, {releasetime => time + $clients{$cid}->{outmessagedelay}, message => 'EXIT'};
+                            push @toremove, $cid; # Disconnect the client
+                            last;
                         }
                     }
 
                     # Ignore other command when not authenticated
                     if(!$clients{$cid}->{authok}) {
-                        $clients{$cid}->{buffer} = '';
                         next;
                     }
 
-                    if(!$nodebug) {
-                        # Add ALL incoming messages as debug-type messages to the outbox
-                        my %tmp = (
-                            sender => $cid,
-                            type => 'DEBUG',
-                            data => $clients{$cid}->{buffer},
-                        );
+                    if($parsedflags{lock_for_sync} && $clients{$cid}->{interclacksclient}) {
+                        if($value) {
+                            print "Interclacks sync lock ON.\n";
+                            $interclackslock = 1;
+                        } else {
+                            print "Interclacks sync lock OFF.\n";
+                            $interclackslock = 0;
 
-                        push @outbox, \%tmp;
-                    }
-
-                    if($discardafterlogging) {
-                        $clients{$cid}->{buffer} = '';
-                        next;
-                    }
-
-
-                    if($clients{$cid}->{buffer} =~ /^OVERHEAD\ /) { ## no critic (ControlStructures::ProhibitCascadingIfElse)
-                        # Already handled
-                    } elsif($clients{$cid}->{buffer} =~ /^LISTEN\ (.*)/) {
-                        $clients{$cid}->{listening}->{$1} = 1;
-                        $sendinterclacks = 0;
-                    } elsif($clients{$cid}->{buffer} =~ /^UNLISTEN\ (.*)/) {
-                        delete $clients{$cid}->{listening}->{$1};
-                        $sendinterclacks = 0;
-                    } elsif($clients{$cid}->{buffer} =~ /^MONITOR/) {
-                        $clients{$cid}->{mirror} = 1;
-                        $sendinterclacks = 0;
-                    } elsif($clients{$cid}->{buffer} =~ /^UNMONITOR/) {
-                        $clients{$cid}->{mirror} = 0;
-                        $sendinterclacks = 0;
-                    } elsif($clients{$cid}->{buffer} =~ /^QUIT/) {
-                        print STDERR "Client disconnected cleanly!\n";
-                        push @toremove, $cid;
-                        $sendinterclacks = 0;
-                    } elsif($clients{$cid}->{buffer} =~ /^TIMEOUT/ && $clients{$cid}->{interclacks}) {
-                        print STDERR "Ooops, didn't send timely PINGS through interclacks link!\n";
-                        push @toremove, $cid;
-                        $sendinterclacks = 0;
-                    } elsif($clients{$cid}->{buffer} =~ /^PING/) {
-                        $clients{$cid}->{lastping} = time;
-                        $sendinterclacks = 0;
-                    } elsif($clients{$cid}->{buffer} =~ /^NOPING/) {
-                        # Disable PING check until next PING recieved
-                        $clients{$cid}->{lastping} = 0;
-                        $sendinterclacks = 0;
-                    } elsif($clients{$cid}->{buffer} =~ /^NOTIFY\ (.*)/) {
-                        my %tmp = (
-                            sender => $cid,
-                            type => 'NOTIFY',
-                            name => $1,
-                        );
-                        push @outbox, \%tmp;
-                    } elsif($clients{$cid}->{buffer} =~ /^SET\ (.+?)\=(.*)/) {
-                        my %tmp = (
-                            sender => $cid,
-                            type => 'SET',
-                            name => $1,
-                            value => $2,
-                        );
-                        push @outbox, \%tmp;
-                    } elsif($clients{$cid}->{buffer} =~ /^KEYSYNC\ (.+?)\ (.+?)\ (.+?)\=(.*)/) {
-                        print $clients{$cid}->{buffer}, "\n";
-                        $clients{$cid}->{lastping} = time;
-                        my ($ctimestamp, $cmode, $ckey, $cval) = ($1, $2, $3, $4);
-
-                        if(!defined($clackscachetime{$ckey})) {
-                            $clackscachetime{$ckey} = 0;
-                        }
-                        if($cmode eq "U") { # "Update"
-                            if($ctimestamp > $clackscachetime{$ckey}) {
-                                $clackscache{$ckey} = $cval;
-                                $clackscachetime{$ckey} = $ctimestamp;
+                            # Send server our keys AFTER we got everything FROM the server (e.g. after unlock)
+                            foreach my $ckey (sort keys %clackscache) {
+                                $clients{$cid}->{outbuffer} .= "KEYSYNC " . $clackscachetime{$ckey} . " U $ckey=" . $clackscache{$ckey} . "\r\n";
+                                $clients{$cid}->{outbuffer} .= "PING\r\n";
                             }
-                        } else { # REMOVE request from server
-                            if($ctimestamp > $clackscachetime{$ckey}) {
+                            foreach my $ckey (sort keys %clackscachetime) {
+                                next if(defined($clackscache{$ckey}));
+                                $clients{$cid}->{outbuffer} .= "KEYSYNC " . $clackscachetime{$ckey} . " D $ckey=REMOVED\r\n";
+                                $clients{$cid}->{outbuffer} .= "PING\r\n";
+                            }
+                        }
+                        $parsedflags{forward_message} = 0; # Don't forward
+                        $newflags{return_to_sender} = 0; # Don't return to sender
+                    }
+
+                    if($parsedflags{close_all_connections} && $value) {
+                        foreach my $closecid (keys %clients) {
+                            if($clients{$closecid}->{interclacks} && $parsedflags{forward_message}) {
+                                $self->evalsyswrite($clients{$closecid}->{socket}, "\r\nOVERHEAD GC 1\r\n");
+                            }
+                            $self->evalsyswrite($clients{$closecid}->{socket}, "\r\nQUIT\r\n");
+                            push @toremove, $closecid;
+                        }
+                        $parsedflags{forward_message} = 0; # Already forwarded where needed
+                    }
+
+                    if($parsedflags{shutdown_service}) {
+                        $value = 0 + $value;
+                        if($value > 0) {
+                            $shutdowntime = $value + time;
+                            print STDERR "Shutting down in $value seconds\n";
+                        }
+                    }
+                    if($parsedflags{discard_message}) {
+                        $discardafterlogging = 1;
+                    }
+                    if($parsedflags{no_logging}) {
+                        $nodebug = 1;
+                    }
+
+                    if($parsedflags{error_message}) {
+                        print STDERR 'ERROR from ', $cid, ': ', $value, "\n";
+                    }
+
+                    if($parsedflags{set_interclacks_mode}) {
+                        $newflags{forward_message} = 0;
+                        $newflags{return_to_sender} = 0;
+
+                        if($value) {
+                            $clients{$cid}->{interclacks} = 1;
+                            $clients{$cid}->{lastping} = time;
+
+
+                            $clients{$cid}->{outbuffer} .= "CLACKS PageCamel $VERSION in interclacks master mode\r\n" .  # Tell client we are in interclacks master mode
+                                                           "OVERHEAD M Authentication required\r\n" .                 # Informal message
+                                                           "OVERHEAD A " . $self->{authtoken} . "\r\n" .              # ...and send Auth token...
+                                                           "OVERHEAD L 1\r\n";                                            # ...and lock client for sync
+
+                            # Make sure our new interclacks client has an *exact* copy of our buffer
+                            #$clients{$cid}->{outbuffer} .= "CLEARCACHE\r\n";
+                            foreach my $ckey (sort keys %clackscache) {
+                                $clients{$cid}->{outbuffer} .= "KEYSYNC " . $clackscachetime{$ckey} . " U $ckey=" . $clackscache{$ckey} . "\r\n";
+                                $clients{$cid}->{outbuffer} .= "PING\r\n";
+                            }
+                            foreach my $ckey (sort keys %clackscachetime) {
+                                next if(defined($clackscache{$ckey}));
+                                $clients{$cid}->{outbuffer} .= "KEYSYNC " . $clackscachetime{$ckey} . " D $ckey=REMOVED\r\n";
+                                $clients{$cid}->{outbuffer} .= "PING\r\n";
+                            }
+                            $clients{$cid}->{outbuffer} .= "OVERHEAD L 0\r\n"; # unlock client after sync
+                            $clients{$cid}->{outbuffer} .= "PING\r\n";
+                            $clients{$cid}->{lastinterclacksping} = time;
+                        } else {
+                            $clients{$cid}->{interclacks} = 0;
+                            $clients{$cid}->{lastping} = time;
+                        }
+                    }
+
+                    my $newflagstring = '';
+                    $newflags{return_to_sender} = 0;
+
+                    foreach my $key (sort keys %overheadflags) {
+                        next if($key eq 'Z');
+                        if($newflags{$overheadflags{$key}}) {
+                            $newflagstring .= $key;
+                        }
+                    }
+                    if($newflagstring eq '') {
+                        $newflagstring = 'Z';
+                    }
+
+                    if($parsedflags{forward_message}) {
+                        foreach my $overheadcid (keys %clients) {
+                            next if($cid eq $overheadcid && !$parsedflags{return_to_sender});
+
+                            $clients{$overheadcid}->{outbuffer} .= "OVERHEAD $newflagstring $value\r\n";
+                        }
+                    }
+                }
+
+                # Ignore other command when not authenticated
+                if(!$clients{$cid}->{authok}) {
+                    next;
+                }
+
+                if(!$nodebug) {
+                    # Add ALL incoming messages as debug-type messages to the outbox
+                    my %tmp = (
+                        sender => $cid,
+                        type => 'DEBUG',
+                        data => $inmsg,
+                    );
+
+                    push @outbox, \%tmp;
+                }
+
+                if($discardafterlogging) {
+                    next;
+                }
+
+
+                if($inmsg =~ /^OVERHEAD\ /) { ## no critic (ControlStructures::ProhibitCascadingIfElse)
+                    # Already handled
+                } elsif($inmsg =~ /^LISTEN\ (.*)/) {
+                    $clients{$cid}->{listening}->{$1} = 1;
+                    $sendinterclacks = 0;
+                } elsif($inmsg =~ /^UNLISTEN\ (.*)/) {
+                    delete $clients{$cid}->{listening}->{$1};
+                    $sendinterclacks = 0;
+                } elsif($inmsg =~ /^MONITOR/) {
+                    $clients{$cid}->{mirror} = 1;
+                    $sendinterclacks = 0;
+                } elsif($inmsg =~ /^UNMONITOR/) {
+                    $clients{$cid}->{mirror} = 0;
+                    $sendinterclacks = 0;
+                } elsif($inmsg =~ /^QUIT/) {
+                    print STDERR "Client disconnected cleanly!\n";
+                    push @toremove, $cid;
+                    $sendinterclacks = 0;
+                } elsif($inmsg =~ /^TIMEOUT/ && $clients{$cid}->{interclacks}) {
+                    print STDERR "Ooops, didn't send timely PINGS through interclacks link!\n";
+                    push @toremove, $cid;
+                    $sendinterclacks = 0;
+                } elsif($inmsg =~ /^PING/) {
+                    $clients{$cid}->{lastping} = time;
+                    $sendinterclacks = 0;
+                } elsif($inmsg =~ /^NOPING/) {
+                    # Disable PING check until next PING recieved
+                    $clients{$cid}->{lastping} = 0;
+                    $sendinterclacks = 0;
+                } elsif($inmsg =~ /^NOTIFY\ (.*)/) {
+                    my %tmp = (
+                        sender => $cid,
+                        type => 'NOTIFY',
+                        name => $1,
+                    );
+                    push @outbox, \%tmp;
+                } elsif($inmsg =~ /^SET\ (.+?)\=(.*)/) {
+                    my %tmp = (
+                        sender => $cid,
+                        type => 'SET',
+                        name => $1,
+                        value => $2,
+                    );
+                    push @outbox, \%tmp;
+                } elsif($inmsg =~ /^KEYSYNC\ (.+?)\ (.+?)\ (.+?)\=(.*)/) {
+                    print $inmsg, "\n";
+                    $clients{$cid}->{lastping} = time;
+                    my ($ctimestamp, $cmode, $ckey, $cval) = ($1, $2, $3, $4);
+
+                    if(!defined($clackscachetime{$ckey})) {
+                        $clackscachetime{$ckey} = 0;
+                    }
+                    if($cmode eq "U") { # "Update"
+                        if($ctimestamp > $clackscachetime{$ckey}) {
+                            $clackscache{$ckey} = $cval;
+                            $clackscachetime{$ckey} = $ctimestamp;
+                        }
+                    } else { # REMOVE request from server
+                        if($ctimestamp > $clackscachetime{$ckey}) {
+                            delete $clackscache{$ckey};
+                            $clackscachetime{$ckey} = $ctimestamp;
+                        } else { # check if we have a value that happened after deletion at the server end
+                            if(!defined($clackscache{$ckey})) {
                                 delete $clackscache{$ckey};
                                 $clackscachetime{$ckey} = $ctimestamp;
-                            } else { # check if we have a value that happened after deletion at the server end
-                                if(!defined($clackscache{$ckey})) {
-                                    delete $clackscache{$ckey};
-                                    $clackscachetime{$ckey} = $ctimestamp;
-                                }
                             }
                         }
+                    }
 
-                        $savecache = 1;
-                        $sendinterclacks = 1;
-                    } elsif($clients{$cid}->{buffer} =~ /^STORE\ (.+?)\=(.*)/) {
-                        $clackscache{$1} = $2;
-                        $clackscachetime{$1} = time;
-                        $savecache = 1;
-                    } elsif($clients{$cid}->{buffer} =~ /^RETRIEVE\ (.+)/) {
-                        #$clients{$cid}->{outbuffer} .= "SET ". $line->{name} . "=" . $line->{value} . "\r\n";
-                        my $ckey = $1;
-                        if(defined($clackscache{$ckey})) {
-                            $clients{$cid}->{outbuffer} .= "RETRIEVED $ckey=" . $clackscache{$ckey} . "\r\n";
-                        } else {
-                            $clients{$cid}->{outbuffer} .= "NOTRETRIEVED $ckey\r\n";
-                        }
-                        $sendinterclacks = 0;
-                    } elsif($clients{$cid}->{buffer} =~ /^REMOVE\ (.+)/) {
-                        my $ckey = $1;
-                        if(defined($clackscache{$ckey})) {
-                            delete $clackscache{$ckey};
-                            $clackscachetime{$ckey} = time;
-                        }
-                        $savecache = 1;
-                    } elsif($clients{$cid}->{buffer} =~ /^INCREMENT\ (.+)/) {
-                        my $ckey = $1;
-                        my $cval = 1;
-                        if($ckey =~ /(.+)\=(.+)/) {
-                            ($ckey, $cval) = ($1, $2);
-                            $cval = 0 + $cval;
-                        }
-                        if(defined($clackscache{$ckey})) {
-                            $clackscache{$ckey} += $cval;
-                        } else {
-                            $clackscache{$ckey} = $cval;
-                        }
-                        $clackscachetime{$ckey} = time;
-                        $savecache = 1;
-                    } elsif($clients{$cid}->{buffer} =~ /^DECREMENT\ (.+)/) {
-                        my $ckey = $1;
-                        my $cval = 1;
-                        if($ckey =~ /(.+)\=(.+)/) {
-                            ($ckey, $cval) = ($1, $2);
-                            $cval = 0 + $cval;
-                        }
-                        if(defined($clackscache{$ckey})) {
-                            $clackscache{$ckey} -= $cval;
-                        } else {
-                            $clackscache{$ckey} = 0 - $cval;
-                        }
-                        $clackscachetime{$ckey} = time;
-                        $savecache = 1;
-                    } elsif($clients{$cid}->{buffer} =~ /^KEYLIST/) {
-                        $clients{$cid}->{outbuffer} .= "KEYLISTSTART\r\n";
-                        foreach my $ckey (sort keys %clackscache) {
-                            $clients{$cid}->{outbuffer} .= "KEY $ckey\r\n";
-                        }
-                        $clients{$cid}->{outbuffer} .= "KEYLISTEND\r\n";
-                        $sendinterclacks = 0;
-                    } elsif($clients{$cid}->{buffer} =~ /^CLEARCACHE/) {
-                        %clackscache = ();
-                        %clackscachetime = ();
-                        $savecache = 1;
-
-                    # local managment commands
-                    } elsif($clients{$cid}->{buffer} =~ /^CLIENTLIST/) {
-                        $clients{$cid}->{outbuffer} .= "CLIENTLISTSTART\r\n";
-                        foreach my $lmccid (sort keys %clients) {
-                            $clients{$cid}->{outbuffer} .= "CLIENT CID=$lmccid;" .
-                                                                "HOST=" . $clients{$lmccid}->{host} . ";" .
-                                                                "PORT=" . $clients{$lmccid}->{port} . ";" .
-                                                                "CLIENTINFO=" . $clients{$lmccid}->{clientinfo} . ";" .
-                                                                "OUTBUFFER_LENGTH=" . length($clients{$lmccid}->{outbuffer}) . ";" .
-                                                                "INBUFFER_LENGTH=" . length($clients{$lmccid}->{buffer}) . ";" .
-                                                                "INTERCLACKS=" . $clients{$lmccid}->{interclacks} . ";" .
-                                                                "MONITOR=" . $clients{$lmccid}->{mirror} . ";" .
-                                                                "LASTPING=" . $clients{$lmccid}->{lastping} . ";" .
-                                                                "LASTINTERCLACKSPING=" . $clients{$lmccid}->{lastinterclacksping} . ";" .
-                                                                "\r\n";
-                        }
-                        $clients{$cid}->{outbuffer} .= "CLIENTLISTEND\r\n";
-                        $sendinterclacks = 0;
-                    } elsif($clients{$cid}->{buffer} =~ /^CLIENTDISCONNECT\ (.+)/) {
-                        my $lmccid = $1;
-                        if(defined($clients{$lmccid})) {
-                            # Try to notify the client (may or may not work);
-                            $self->evalsyswrite($clients{$lmccid}->{socket}, "\r\nQUIT\r\n");
-                            push @toremove, $lmccid;
-                        }
-                        $sendinterclacks = 0;
-                    } elsif($clients{$cid}->{buffer} =~ /^FLUSH\ (.+)/) {
-                        my $retid = $1;
-                        $clients{$cid}->{outbuffer} .= "FLUSHED $retid\r\n";
-                        $sendinterclacks = 0;
+                    $savecache = 1;
+                    $sendinterclacks = 1;
+                } elsif($inmsg =~ /^STORE\ (.+?)\=(.*)/) {
+                    $clackscache{$1} = $2;
+                    $clackscachetime{$1} = time;
+                    $savecache = 1;
+                } elsif($inmsg =~ /^RETRIEVE\ (.+)/) {
+                    #$clients{$cid}->{outbuffer} .= "SET ". $line->{name} . "=" . $line->{value} . "\r\n";
+                    my $ckey = $1;
+                    if(defined($clackscache{$ckey})) {
+                        $clients{$cid}->{outbuffer} .= "RETRIEVED $ckey=" . $clackscache{$ckey} . "\r\n";
                     } else {
-                        print STDERR "ERROR Unknown_command ", $clients{$cid}->{buffer}, "\r\n";
-                        $sendinterclacks = 0;
-                        $clients{$cid}->{outbuffer} .= "OVERHEAD E unknown_command " . $clients{$cid}->{buffer} . "\r\n";
+                        $clients{$cid}->{outbuffer} .= "NOTRETRIEVED $ckey\r\n";
                     }
-
-                    # forward interclacks messages
-                    if($sendinterclacks) {
-                        foreach my $interclackscid (keys %clients) {
-                            if($cid eq $interclackscid || !$clients{$interclackscid}->{interclacks}) {
-                                next;
-                            }
-                            $clients{$interclackscid}->{outbuffer} .= $clients{$cid}->{buffer} . "\r\n";
-                        }
+                    $sendinterclacks = 0;
+                } elsif($inmsg =~ /^REMOVE\ (.+)/) {
+                    my $ckey = $1;
+                    if(defined($clackscache{$ckey})) {
+                        delete $clackscache{$ckey};
+                        $clackscachetime{$ckey} = time;
                     }
+                    $savecache = 1;
+                } elsif($inmsg =~ /^INCREMENT\ (.+)/) {
+                    my $ckey = $1;
+                    my $cval = 1;
+                    if($ckey =~ /(.+)\=(.+)/) {
+                        ($ckey, $cval) = ($1, $2);
+                        $cval = 0 + $cval;
+                    }
+                    if(defined($clackscache{$ckey})) {
+                        $clackscache{$ckey} += $cval;
+                    } else {
+                        $clackscache{$ckey} = $cval;
+                    }
+                    $clackscachetime{$ckey} = time;
+                    $savecache = 1;
+                } elsif($inmsg =~ /^DECREMENT\ (.+)/) {
+                    my $ckey = $1;
+                    my $cval = 1;
+                    if($ckey =~ /(.+)\=(.+)/) {
+                        ($ckey, $cval) = ($1, $2);
+                        $cval = 0 + $cval;
+                    }
+                    if(defined($clackscache{$ckey})) {
+                        $clackscache{$ckey} -= $cval;
+                    } else {
+                        $clackscache{$ckey} = 0 - $cval;
+                    }
+                    $clackscachetime{$ckey} = time;
+                    $savecache = 1;
+                } elsif($inmsg =~ /^KEYLIST/) {
+                    $clients{$cid}->{outbuffer} .= "KEYLISTSTART\r\n";
+                    foreach my $ckey (sort keys %clackscache) {
+                        $clients{$cid}->{outbuffer} .= "KEY $ckey\r\n";
+                    }
+                    $clients{$cid}->{outbuffer} .= "KEYLISTEND\r\n";
+                    $sendinterclacks = 0;
+                } elsif($inmsg =~ /^CLEARCACHE/) {
+                    %clackscache = ();
+                    %clackscachetime = ();
+                    $savecache = 1;
 
-
-                    $clients{$cid}->{buffer} = '';
+                # local managment commands
+                } elsif($inmsg =~ /^CLIENTLIST/) {
+                    $clients{$cid}->{outbuffer} .= "CLIENTLISTSTART\r\n";
+                    foreach my $lmccid (sort keys %clients) {
+                        $clients{$cid}->{outbuffer} .= "CLIENT CID=$lmccid;" .
+                                                            "HOST=" . $clients{$lmccid}->{host} . ";" .
+                                                            "PORT=" . $clients{$lmccid}->{port} . ";" .
+                                                            "CLIENTINFO=" . $clients{$lmccid}->{clientinfo} . ";" .
+                                                            "OUTBUFFER_LENGTH=" . length($clients{$lmccid}->{outbuffer}) . ";" .
+                                                            "INBUFFER_LENGTH=" . length($clients{$lmccid}->{buffer}) . ";" .
+                                                            "INTERCLACKS=" . $clients{$lmccid}->{interclacks} . ";" .
+                                                            "MONITOR=" . $clients{$lmccid}->{mirror} . ";" .
+                                                            "LASTPING=" . $clients{$lmccid}->{lastping} . ";" .
+                                                            "LASTINTERCLACKSPING=" . $clients{$lmccid}->{lastinterclacksping} . ";" .
+                                                            "\r\n";
+                    }
+                    $clients{$cid}->{outbuffer} .= "CLIENTLISTEND\r\n";
+                    $sendinterclacks = 0;
+                } elsif($inmsg =~ /^CLIENTDISCONNECT\ (.+)/) {
+                    my $lmccid = $1;
+                    if(defined($clients{$lmccid})) {
+                        # Try to notify the client (may or may not work);
+                        $self->evalsyswrite($clients{$lmccid}->{socket}, "\r\nQUIT\r\n");
+                        push @toremove, $lmccid;
+                    }
+                    $sendinterclacks = 0;
+                } elsif($inmsg =~ /^FLUSH\ (.+)/) {
+                    my $retid = $1;
+                    $clients{$cid}->{outbuffer} .= "FLUSHED $retid\r\n";
+                    $sendinterclacks = 0;
                 } else {
-                    $clients{$cid}->{buffer} .= $buf;
+                    print STDERR "ERROR Unknown_command ", $inmsg, "\r\n";
+                    $sendinterclacks = 0;
+                    $clients{$cid}->{outbuffer} .= "OVERHEAD E unknown_command " . $inmsg . "\r\n";
                 }
+
+                # forward interclacks messages
+                if($sendinterclacks) {
+                    foreach my $interclackscid (keys %clients) {
+                        if($cid eq $interclackscid || !$clients{$interclackscid}->{interclacks}) {
+                            next;
+                        }
+                        $clients{$interclackscid}->{outbuffer} .= $inmsg . "\r\n";
+                    }
+                }
+
             }
 
         }
@@ -1098,6 +1159,8 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
         }
 
 
+        # Outbox contains the messages that have to be forwarded to the clients when listening (or when the connection is in interclacks mode)
+        # We iterate over the outbox and put those messages into the output buffers of the corresponding client connection
         while((my $line = shift @outbox)) {
             $workCount++;
             foreach my $cid (keys %clients) {
@@ -1115,14 +1178,37 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                         $clients{$cid}->{outbuffer} .= "NOTIFY ". $line->{name} . "\r\n";
                     } elsif($line->{type} eq 'SET') {
                         $clients{$cid}->{outbuffer} .= "SET ". $line->{name} . "=" . $line->{value} . "\r\n";
-                    } elsif($line->{type} eq 'STORE' && $clients{$cid}->{interclacks}) {
-                        $clients{$cid}->{outbuffer} .= "STORE ". $line->{name} . "=" . $line->{value} . "\r\n";
-                    } elsif($line->{type} eq 'REMOVE' && $clients{$cid}->{interclacks}) {
-                        $clients{$cid}->{outbuffer} .= "REMOVE ". $line->{name} . "\r\n";
+                        #} elsif($line->{type} eq 'STORE' && $clients{$cid}->{interclacks}) {
+                        #    $clients{$cid}->{outbuffer} .= "STORE ". $line->{name} . "=" . $line->{value} . "\r\n";
+                        #} elsif($line->{type} eq 'REMOVE' && $clients{$cid}->{interclacks}) {
+                        #    $clients{$cid}->{outbuffer} .= "REMOVE ". $line->{name} . "\r\n";
                     }
                 }
             }
         }
+
+
+        # Push all messages that can be released at this time into the corresponding char based output for each client
+        foreach my $cid (keys %clients) {
+            while(scalar @{$clients{$cid}->{outmessages}}) {
+                last if($clients{$cid}->{outmessages}->[0]->{releasetime} > time);
+
+                my $outmsg = shift @{$clients{$cid}->{outmessages}};
+                if($outmsg->{message} eq 'EXIT') {
+                    push @toremove, $cid; # Disconnect the client
+                } else {
+                    $clients{$cid}->{outbuffer} .= $outmsg->{message} . "\r\n";
+                }
+            }
+        }
+
+            # ******************************************************************************
+            # ******************************************************************************
+            # ******************************************************************************
+            # ******************************************************************************
+            # ******************************************************************************
+            # ******************************************************************************
+            # ******************************************************************************
 
         # Send as much as possible
         foreach my $cid (keys %clients) {
@@ -1219,6 +1305,22 @@ sub evalsyswrite {
     return $written;
 }
 
+sub slurpBinFile {
+    my $fname = shift;
+
+    # Read in file in binary mode, slurping it into a single scalar.
+    # We have to make sure we use binmode *and* turn on the line termination variable completly
+    # to work around the multiple idiosynchrasies of Perl on Windows
+    open(my $fh, "<", $fname) or croak($ERRNO);
+    local $INPUT_RECORD_SEPARATOR = undef;
+    binmode($fh);
+    my $data = <$fh>;
+    close($fh);
+
+    return $data;
+}
+
+
 
 1;
 __END__
@@ -1265,7 +1367,7 @@ Rene Schickbauer, E<lt>cavac@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2020 Rene Schickbauer
+Copyright (C) 2008-2022 Rene Schickbauer
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

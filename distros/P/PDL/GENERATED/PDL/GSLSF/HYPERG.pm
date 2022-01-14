@@ -20,6 +20,11 @@ use DynaLoader;
 
 
 
+
+#line 5 "gsl_sf_hyperg.pd"
+use strict;
+use warnings;
+
 =head1 NAME
 
 PDL::GSLSF::HYPERG - PDL interface to GSL Special Functions
@@ -28,11 +33,8 @@ PDL::GSLSF::HYPERG - PDL interface to GSL Special Functions
 
 This is an interface to the Special Function package present in the GNU Scientific Library. 
 
-=head1 SYNOPSIS
-
 =cut
-
-
+#line 38 "HYPERG.pm"
 
 
 
@@ -45,6 +47,8 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
+
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_hyperg_0F1
@@ -64,16 +68,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 72 "HYPERG.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_hyperg_0F1 = \&PDL::gsl_sf_hyperg_0F1;
+#line 78 "HYPERG.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_hyperg_1F1
@@ -93,16 +98,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 102 "HYPERG.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_hyperg_1F1 = \&PDL::gsl_sf_hyperg_1F1;
+#line 108 "HYPERG.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_hyperg_U
@@ -122,16 +128,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 132 "HYPERG.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_hyperg_U = \&PDL::gsl_sf_hyperg_U;
+#line 138 "HYPERG.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_hyperg_2F1
@@ -151,16 +158,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 162 "HYPERG.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_hyperg_2F1 = \&PDL::gsl_sf_hyperg_2F1;
+#line 168 "HYPERG.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_hyperg_2F1_conj
@@ -180,16 +188,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 192 "HYPERG.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_hyperg_2F1_conj = \&PDL::gsl_sf_hyperg_2F1_conj;
+#line 198 "HYPERG.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_hyperg_2F1_renorm
@@ -209,16 +218,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 222 "HYPERG.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_hyperg_2F1_renorm = \&PDL::gsl_sf_hyperg_2F1_renorm;
+#line 228 "HYPERG.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_hyperg_2F1_conj_renorm
@@ -238,16 +248,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 252 "HYPERG.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_hyperg_2F1_conj_renorm = \&PDL::gsl_sf_hyperg_2F1_conj_renorm;
+#line 258 "HYPERG.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_hyperg_2F0
@@ -267,18 +278,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 282 "HYPERG.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_hyperg_2F0 = \&PDL::gsl_sf_hyperg_2F0;
+#line 288 "HYPERG.pm"
 
 
 
 
 
+#line 131 "gsl_sf_hyperg.pd"
 
 =head1 AUTHOR
 
@@ -292,8 +304,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-
-
+#line 308 "HYPERG.pm"
 
 
 

@@ -1,4 +1,3 @@
-#undef FOODEB
 #include "pdl.h"      /* Data structure declarations */
 #define PDL_IN_CORE /* access funcs directly not through PDL-> */
 #include "pdlcore.h"  /* Core declarations */
@@ -7,12 +6,8 @@
 static SV *getref_pdl(pdl *it) {
         SV *newref;
         if(!it->sv) {
-                SV *ref;
-                HV *stash = gv_stashpv("PDL",TRUE);
-                SV *psv = newSViv(PTR2IV(it));
-                it->sv = psv;
-                newref = newRV_noinc(it->sv);
-                (void)sv_bless(newref,stash);
+                newref = newRV_noinc(it->sv = newSViv(PTR2IV(it)));
+                (void)sv_bless(newref,gv_stashpv("PDL",TRUE));
         } else {
                 newref = newRV_inc(it->sv);
                 SvAMAGIC_on(newref);
@@ -30,54 +25,39 @@ void pdl_SetSV_PDL ( SV *sv, pdl *it ) {
 /* Size of data type information */
 
 size_t pdl_howbig (int datatype) {
-#define X(datatype, generic, generic_ppsym, shortctype, defbval) \
-    return sizeof(generic);
-  PDL_GENERICSWITCH(datatype, X)
+#define X(datatype, ctype, ...) \
+    return sizeof(ctype);
+  PDL_GENERICSWITCH(PDL_TYPELIST2_ALL, datatype, X, croak("Not a known data type code=%d", datatype))
 #undef X
 }
 
 /* Make a scratch dataspace for a scalar pdl */
-
-void pdl_makescratchhash(pdl *ret, PDL_Anyval data) {
-  STRLEN n_a;
-  HV *hash;
-  SV *dat; PDL_Indx fake[1];
-  
-  /* Compress to smallest available type.  */
+pdl_error pdl_makescratchhash(pdl *ret, PDL_Anyval data) {
+  pdl_error PDL_err = {0, NULL, 0};
+  PDLDEBUG_f(printf("pdl_makescratchhash type=%d val=", data.type); pdl_dump_anyval(data); printf("\n"););
   ret->datatype = data.type;
-
-  /* Create a string SV of apropriate size.  The string is arbitrary
-   * and just has to be larger than the largest datatype.   */
-  dat = newSVpvn("                                ",pdl_howbig(ret->datatype));
-  
-  ret->data = SvPV(dat,n_a);
-  ret->datasv = dat;
+  ret->ndims = 0; pdl_resize_defaultincs(ret);
+  PDL_RETERROR(PDL_err, pdl_allocdata(ret));
+  ret->ndims = 1; ret->dims[0] = 0; pdl_resize_defaultincs(ret);
+  ret->state &= ~PDL_ALLOCATED;
   /* Refcnt should be 1 already... */
-    
   /* Make the whole pdl mortal so destruction happens at the right time.
    * If there are dangling references, pdlapi.c knows not to actually
    * destroy the C struct. */
   sv_2mortal(getref_pdl(ret));
-  
-  pdl_setdims(ret, fake, 0); /* 0 dims in a scalar */
-  ret->nvals = 1;            /* 1 val  in a scalar */
-  
   /* NULLs should be ok because no dimensions. */
-  pdl_set(ret->data, ret->datatype, NULL, NULL, NULL, 0, 0, data);
-  
+  PDL_RETERROR(PDL_err, pdl_set(ret->data, ret->datatype, NULL, NULL, NULL, 0, 0, data));
+  return PDL_err;
 }
-
 
 /*
   "Convert" a perl SV into a pdl (alright more like a mapping as
    the data block is not actually copied in the most common case
    of a single scalar) scalars are automatically converted to PDLs.
 */
-
 pdl* pdl_SvPDLV ( SV* sv ) {
 
    pdl* ret;
-   PDL_Indx fake[1];
    SV *sv2;
 
    if(sv_derived_from(sv, "PDL") && !SvROK(sv)) {
@@ -88,11 +68,9 @@ pdl* pdl_SvPDLV ( SV* sv ) {
    if ( !SvROK(sv) ) {
       /* The scalar is not a ref, so we can use direct conversion. */
       PDL_Anyval data;
-      ret = pdl_pdlnew();  /* Scratch pdl */
-      /* Scratch hash for the pdl :( - slow but safest. */
       ANYVAL_FROM_SV(data, sv, TRUE, -1);
-      pdl_makescratchhash(ret, data);
-      return ret;
+      PDLDEBUG_f(printf("pdl_SvPDLV type: %d\n", data.type));
+      return pdl_scalar(data);
    } /* End of scalar case */
 
    if(sv_derived_from(sv, "Math::Complex")) {
@@ -113,11 +91,9 @@ pdl* pdl_SvPDLV ( SV* sv ) {
         PUTBACK;
       }
       FREETMPS; LEAVE;
-      ret = pdl_pdlnew();  /* Scratch pdl */
       data.type = PDL_CD;
       data.value.C = (PDL_CDouble)(vals[0] + I * vals[1]);
-      pdl_makescratchhash(ret, data);
-      return ret;
+      return pdl_scalar(data);
    }
 
    /* If execution reaches here, then sv is NOT a scalar
@@ -178,16 +154,14 @@ pdl* pdl_SvPDLV ( SV* sv ) {
     if(SvTYPE(SvRV(sv)) == SVt_PVAV) {
         /* This is similar to pdl_avref in Core.xs.PL -- we do the same steps here. */
         AV *dims, *av;
-        int i, depth; 
         int datalevel = -1;
-        pdl *dest_pdl;
 
         av = (AV *)SvRV(sv);
         dims = (AV *)sv_2mortal((SV *)newAV());
         av_store(dims,0,newSViv( (IV) av_len(av)+1 ) );
         
         /* Pull sizes using av_ndcheck */
-        depth = 1 + av_ndcheck(av,dims,0,&datalevel);
+        av_ndcheck(av,dims,0,&datalevel);
 
         return pdl_from_array(av, dims, -1, NULL); /* -1 means pdltype autodetection */
 
@@ -219,8 +193,7 @@ PDL_Indx* pdl_packdims ( SV* sv, PDL_Indx *ndims ) {
    AV *array = (AV *) SvRV(sv);   /* dereference */
    *ndims = (PDL_Indx) av_len(array) + 1;  /* Number of dimensions */
    PDL_Indx *dims = (PDL_Indx *) pdl_smalloc( (*ndims) * sizeof(*dims) ); /* Array space */
-   if (dims == NULL)
-      croak("Out of memory");
+   if (dims == NULL) return NULL;
    PDL_Indx i;
    for(i=0; i<(*ndims); i++) {
       dims[i] = (PDL_Indx) SvIV(*(av_fetch( array, i, 0 )));
@@ -242,17 +215,10 @@ PDL_Indx pdl_safe_indterm( PDL_Indx dsz, PDL_Indx at, char *file, int lineno)
    context is terminated without having to call free(). Naughty but
    nice!
 */
-
-
 void* pdl_smalloc ( STRLEN nbytes ) {
-    STRLEN n_a;
-   SV* work;
-
-   work = sv_2mortal(newSVpv("", 0));
-
+   SV* work = sv_2mortal(newSVpv("", 0));
    SvGROW( work, nbytes);
-
-   return (void *) SvPV(work, n_a);
+   return (void *) SvPV_nolen(work);
 }
 
 /*********** Stuff for barfing *************/
@@ -275,28 +241,27 @@ static void pdl_barf_or_warn(const char* pat, int iswarn, va_list* args)
      * the perl-level PDL::barf() or PDL::cluck()
      */
 
-    { /* scope block for C89 compatibility */
-
-        SV * sv;
-
-        dSP;
-        ENTER;
-        SAVETMPS;
-        PUSHMARK(SP);
-
-        sv = sv_2mortal(newSV(0));
-        sv_vsetpvfn(sv, pat, strlen(pat), args, Null(SV**), 0, Null(bool*));
-        va_end(*args);
-
-        XPUSHs(sv);
-
-        PUTBACK;
-
-        call_pv(iswarn ? "PDL::cluck" : "PDL::barf", G_DISCARD);
-
-        FREETMPS;
-        LEAVE;
-    } /* end C89 compatibility scope block */
+    dSP;
+    ENTER;
+    SAVETMPS;
+    PUSHMARK(SP);
+    SV *sv = sv_2mortal(newSV(0));
+    int size = vsnprintf(NULL, 0, pat, *args);
+    va_end(*args);
+    if (size < 0) {
+      sv_setpv(sv, "vsnprintf error");
+    } else {
+      size += 2;             /* For '\0' + 1 as CentOS 7 is off by 1 */
+      char buf[size];
+      size = vsnprintf(buf, size, pat, *args);
+      va_end(*args);
+      sv_setpv(sv, size < 0 ? "vsnprintf error" : buf);
+    }
+    XPUSHs(sv);
+    PUTBACK;
+    call_pv(iswarn ? "PDL::cluck" : "PDL::barf", G_DISCARD);
+    FREETMPS;
+    LEAVE;
 }
 
 #define GEN_PDL_BARF_OR_WARN_I_STDARG(type, iswarn)     \
@@ -390,14 +355,9 @@ PDL_Indx av_ndcheck(AV* av, AV* dims, int level, int *datalevel)
         int j;
         short pndims;
         PDL_Indx *dest_dims;
-        PDL_Indx pnvals;
-        
-        pdl_make_physdims(dest_pdl);
-        
+        pdl_barf_if_error(pdl_make_physdims(dest_pdl));
         pndims = dest_pdl->ndims;
         dest_dims = dest_pdl->dims;
-        pnvals = dest_pdl->nvals;
-        
         for(j=0;j<pndims;j++) {
           int jl = pndims-j+level;
           
@@ -525,7 +485,7 @@ static int _detect_datatype(AV *av) {
 pdl* pdl_from_array(AV* av, AV* dims, int dtype, pdl* dest_pdl)
 {
   int ndims, i, level=0;
-  PDL_Anyval undefval = { -1, 0 };
+  PDL_Anyval undefval = { PDL_INVALID, {0} };
 
   ndims = av_len(dims)+1;
   PDL_Indx dest_dims[ndims];
@@ -535,21 +495,26 @@ pdl* pdl_from_array(AV* av, AV* dims, int dtype, pdl* dest_pdl)
 
   if (dest_pdl == NULL)
      dest_pdl = pdl_pdlnew();
-  pdl_setdims (dest_pdl, dest_dims, ndims);
+  if (!dest_pdl) return dest_pdl;
+  pdl_error err = pdl_setdims (dest_pdl, dest_dims, ndims);
+  if (err.error) return NULL;
   if (dtype == -1) {
     dtype = _detect_datatype(av);
   }
   dest_pdl->datatype = dtype;
-  pdl_allocdata (dest_pdl);
-  pdl_make_physical(dest_pdl);
+  err = pdl_allocdata (dest_pdl);
+  if (err.error) return NULL;
+  err = pdl_make_physical(dest_pdl);
+  if (err.error) return NULL;
 
   /******
    * Copy the undefval to fill empty spots in the ndarray...
    */
+  PDLDEBUG_f(printf("pdl_from_array type: %d\n", dtype));
   ANYVAL_FROM_SV(undefval, NULL, TRUE, dtype);
-#define X(dtype, generic, generic_ppsym, shortctype, defbval) \
-    pdl_setav_ ## generic_ppsym(dest_pdl->data,av,dest_dims,ndims,level, undefval.value.generic_ppsym, dest_pdl);
-  PDL_GENERICSWITCH(dtype, X)
+#define X(dtype, ctype, ppsym, ...) \
+    pdl_setav_ ## ppsym(dest_pdl->data,av,dest_dims,ndims,level, undefval.value.ppsym, dest_pdl);
+  PDL_GENERICSWITCH(PDL_TYPELIST2_ALL, dtype, X, return NULL)
 #undef X
   return dest_pdl;
 }
@@ -560,7 +525,7 @@ PDL_Indx pdl_get_offset(PDL_Indx* pos, PDL_Indx* dims, PDL_Indx *incs, PDL_Indx 
    PDL_Indx result;
    for(i=0; i<ndims; i++) { /* Check */
       if(pos[i]<-dims[i] || pos[i]>=dims[i])
-         croak("Position out of range");
+         return -1;
    }
    result = offset;
    for (i=0; i<ndims; i++) {
@@ -571,12 +536,13 @@ PDL_Indx pdl_get_offset(PDL_Indx* pos, PDL_Indx* dims, PDL_Indx *incs, PDL_Indx 
 
 /* wrapper for pdl_at where only want first item, cf sclr_c */
 PDL_Anyval pdl_at0( pdl* it ) {
+    PDL_Anyval result = { PDL_INVALID, {0} };
     PDL_Indx nullp = 0;
     PDL_Indx dummyd = 1;
     PDL_Indx dummyi = 1;
-    pdl_make_physvaffine( it );
-    if (it->nvals < 1)
-       croak("ndarray must have at least one element");
+    pdl_error err = pdl_make_physvaffine( it );
+    if (err.error) { return result; }
+    if (it->nvals < 1) { return result; }
     return pdl_at(PDL_REPRP(it), it->datatype, &nullp, &dummyd,
             &dummyi, PDL_REPROFFS(it),1);
 }
@@ -584,16 +550,20 @@ PDL_Anyval pdl_at0( pdl* it ) {
 /* Return value at position (x,y,z...) */
 PDL_Anyval pdl_at( void* x, int datatype, PDL_Indx* pos, PDL_Indx* dims,
 	PDL_Indx* incs, PDL_Indx offset, PDL_Indx ndims) {
-   PDL_Anyval result = { -1, 0 };
+   PDL_Anyval result = { PDL_INVALID, {0} };
    PDL_Indx ioff = pdl_get_offset(pos, dims, incs, offset, ndims);
+   if (ioff < 0) return result;
    ANYVAL_FROM_CTYPE_OFFSET(result, datatype, x, ioff);
    return result;
 }
 
 /* Set value at position (x,y,z...) */
-void pdl_set( void* x, int datatype, PDL_Indx* pos, PDL_Indx* dims, PDL_Indx* incs, PDL_Indx offs, PDL_Indx ndims, PDL_Anyval value){
+pdl_error pdl_set( void* x, int datatype, PDL_Indx* pos, PDL_Indx* dims, PDL_Indx* incs, PDL_Indx offs, PDL_Indx ndims, PDL_Anyval value){
+   pdl_error PDL_err = {0, NULL, 0};
    PDL_Indx ioff = pdl_get_offset(pos, dims, incs, offs, ndims);
+   if (ioff < 0) return pdl_make_error_simple(PDL_EUSERERROR, "Position out of range");
    ANYVAL_TO_CTYPE_OFFSET(x, ioff, datatype, value);
+   return PDL_err;
 }
 
 /*
@@ -632,7 +602,7 @@ void pdl_set( void* x, int datatype, PDL_Indx* pos, PDL_Indx* dims, PDL_Indx* in
  * block of memory.
  */
 
-#define INNERLOOP_X(datatype, ctype, ppsym, shortctype, defbval) \
+#define INNERLOOP_X(datatype, ctype, ppsym, ...) \
       /* copy data (unless the source pointer is null) */ \
       i=0; \
       if(source_data && dest_data && pdlsiz) { \
@@ -663,7 +633,7 @@ void pdl_set( void* x, int datatype, PDL_Indx* pos, PDL_Indx* dims, PDL_Indx* in
         for(; i< dest_dims[0]-dest_off; i++) dest_data[i] = undefval; \
       }
 
-#define PDL_KLUDGE_COPY_X(X, datatype_out, ctype_out, ppsym_out, shortctype, defbval) \
+#define PDL_KLUDGE_COPY_X(X, datatype_out, ctype_out, ppsym_out, ...) \
 PDL_Indx pdl_kludge_copy_ ## ppsym_out(PDL_Indx dest_off, /* Offset into the dest data array */ \
                            ctype_out* dest_data,  /* Data pointer in the dest data array */ \
                            PDL_Indx* dest_dims,/* Pointer to the dimlist for the dest pdl */ \
@@ -701,9 +671,11 @@ PDL_Indx pdl_kludge_copy_ ## ppsym_out(PDL_Indx dest_off, /* Offset into the des
     } \
     /* This is used inside the switch in order to detect badvalues. */ \
     PDL_Anyval source_badval = pdl_get_pdl_badvalue(source_pdl); \
+    if (source_badval.type < 0) barf("Error getting badvalue, type=%d", source_badval.type); \
     PDL_Anyval dest_badval = pdl_get_pdl_badvalue(dest_pdl); \
+    if (dest_badval.type < 0) barf("Error getting badvalue, type=%d", dest_badval.type); \
     char found_bad = 0; \
-    PDL_GENERICSWITCH2(source_pdl->datatype, X) \
+    PDL_GENERICSWITCH(PDL_TYPELIST2_ALL_, source_pdl->datatype, X, croak("Not a known data type code=%d", source_pdl->datatype)) \
     return undef_count; \
   } \
   /* If we are here, we are not at the bottom level yet.  So walk \
@@ -747,25 +719,27 @@ PDL_Indx pdl_kludge_copy_ ## ppsym_out(PDL_Indx dest_off, /* Offset into the des
       } \
   } /* end of padding IF statement */ \
   return undef_count; \
-} \
- \
-/* \
- * pdl_setav_<type> loads a new PDL with values from a Perl AV, another PDL, or \
- * a mix of both.  Heterogeneous sizes are handled by padding the new PDL's \
- * values out to size with the undefval.  It is only called by pdl_setav in Core.XS, \
- * via the trampoline pdl_from_array just above. pdl_from_array dispatches execution \
- * to pdl_setav_<type> according to the type of the destination PDL.  \
- * \
- * The code is complicated by the "bag-of-stuff" nature of AVs.  We handle  \
- * Perl scalars, AVs, *and* PDLs (via pdl_kludge_copy). \
- *  \
- *   -  dest_data is the data pointer from a PDL \
- *   -  av is the array ref (or PDL) to use to fill the data with, \
- *   -  dest_dims is the dimlist \
- *   -  ndims is the size of the dimlist \
- *   -  level is the recursion level, which is also the dimension that we are filling \
- */ \
- \
+}
+PDL_TYPELIST2_ALL(PDL_KLUDGE_COPY_X, INNERLOOP_X)
+#undef PDL_KLUDGE_COPY_X
+
+/*
+ * pdl_setav_<type> loads a new PDL with values from a Perl AV, another PDL, or
+ * a mix of both.  Heterogeneous sizes are handled by padding the new PDL's
+ * values out to size with the undefval.  It is only called by pdl_setav in Core.XS,
+ * via the trampoline pdl_from_array just above. pdl_from_array dispatches execution
+ * to pdl_setav_<type> according to the type of the destination PDL.
+ *
+ * The code is complicated by the "bag-of-stuff" nature of AVs.  We handle
+ * Perl scalars, AVs, *and* PDLs (via pdl_kludge_copy).
+ *
+ *   -  dest_data is the data pointer from a PDL
+ *   -  av is the array ref (or PDL) to use to fill the data with,
+ *   -  dest_dims is the dimlist
+ *   -  ndims is the size of the dimlist
+ *   -  level is the recursion level, which is also the dimension that we are filling
+ */
+#define PDL_SETAV_X(X, datatype_out, ctype_out, ppsym_out, ...) \
 PDL_Indx pdl_setav_ ## ppsym_out(ctype_out* dest_data, AV* av, \
                      PDL_Indx* dest_dims, int ndims, int level, ctype_out undefval, pdl *dest_pdl) \
 { \
@@ -797,7 +771,7 @@ PDL_Indx pdl_setav_ ## ppsym_out(ctype_out* dest_data, AV* av, \
       /* The element was a PDL - use pdl_kludge_copy to copy it into the destination */ \
       PDL_Indx pd; \
       int pddex; \
-      pdl_make_physical(pdl); \
+      pdl_barf_if_error(pdl_make_physical(pdl)); \
       pddex = ndims - 2 - level; \
       pd = (pddex >= 0 && pddex < ndims ? dest_dims[ pddex ] : 0); \
       if(!pd) \
@@ -838,8 +812,8 @@ PDL_Indx pdl_setav_ ## ppsym_out(ctype_out* dest_data, AV* av, \
   return undef_count; \
 }
 
-PDL_GENERICLIST2(PDL_KLUDGE_COPY_X, INNERLOOP_X)
-#undef PDL_KLUDGE_COPY_X
+PDL_TYPELIST2_ALL(PDL_SETAV_X, INNERLOOP_X)
+#undef PDL_SETAV_X
 #undef INNERLOOP_X
 
 SV *pdl_hdr_copy(SV *hdrp) {
@@ -948,14 +922,14 @@ void pdl_dump_slice_args(pdl_slice_args* args) {
 /***  :            - keep this dim in its entirety            ***/
 /***  X            - keep this dim in its entirety            ***/
 /****************************************************************/
-pdl_slice_args pdl_slice_args_parse_string(char* s) {
+pdl_error pdl_slice_args_parse_string(char* s, pdl_slice_args *retvalp) {
   PDLDEBUG_f(printf("slice_args_parse_string input: '%s'\n", s));
-  STRLEN len;
+  pdl_error PDL_error = {0, NULL, 0};
   int subargno = 0;
   char flagged = 0;
-  char squish_closed = 0, all_flag = 0, squish_flag = 0, dummy_flag = 0;
+  char squish_closed = 0, squish_flag = 0, dummy_flag = 0;
   pdl_slice_args this_arg = {0,-1,0}; /* start,end,inc 0=do in RedoDims */
-  PDL_Indx i;
+  PDL_Indx i = 0;
   while(*s) {
     if( isspace( *s ) ) {
       s++;  /* ignore and loop again */
@@ -965,7 +939,7 @@ pdl_slice_args pdl_slice_args_parse_string(char* s) {
     switch(*(s++)) {
       case '*':
         if(flagged || subargno)
-          barf("slice: Erroneous '*' (arg %d)",i);
+          return pdl_make_error(PDL_EUSERERROR, "slice: Erroneous '*' (arg %d)",i);
         dummy_flag = flagged = 1;
         this_arg.start = 1;  /* default this number to 1 (size 1); '*0' yields an empty */
         this_arg.end = 1;  /* no second arg allowed - default to 1 so start is element count */
@@ -973,14 +947,14 @@ pdl_slice_args pdl_slice_args_parse_string(char* s) {
         break;
       case '(':
         if(flagged || subargno)
-          barf("slice: Erroneous '(' (arg %d)",i);
+          return pdl_make_error(PDL_EUSERERROR, "slice: Erroneous '(' (arg %d)",i);
         squish_flag = flagged = 1;
         break;
       case 'X': case 'x':
         if(flagged || subargno > 1)
-          barf("slice: Erroneous 'X' (arg %d)",i);
+          return pdl_make_error(PDL_EUSERERROR, "slice: Erroneous 'X' (arg %d)",i);
         if(subargno==0) {
-          all_flag = flagged = 1;
+          flagged = 1;
         } else /* subargno is 1 - squish */ {
           squish_flag = squish_closed = flagged = 1;
         }
@@ -999,43 +973,45 @@ pdl_slice_args pdl_slice_args_parse_string(char* s) {
             break;
           case 2: /* third arg - parse and keep inc */
             if ( squish_flag || dummy_flag )
-              barf("slice: erroneous third field in slice specifier (arg %d)",i);
+              return pdl_make_error(PDL_EUSERERROR, "slice: erroneous third field in slice specifier (arg %d)",i);
             this_arg.inc = strtoll(--s, &s, 10);
             break;
           default: /* oops */
-            barf("slice: too many subargs in scalar slice specifier %d",i);
+            return pdl_make_error(PDL_EUSERERROR, "slice: too many subargs in scalar slice specifier %d",i);
             break;
         }
         break;
       case ')':
         if( squish_closed || !squish_flag || subargno > 0)
-          barf("slice: erroneous ')' (arg %d)",i);
+          return pdl_make_error(PDL_EUSERERROR, "slice: erroneous ')' (arg %d)",i);
         squish_closed = 1;
         break;
       case ':':
         if(squish_flag && !squish_closed)
-          barf("slice: must close squishing parens (arg %d)",i);
+          return pdl_make_error(PDL_EUSERERROR, "slice: must close squishing parens (arg %d)",i);
         if( subargno == 0 )
           this_arg.end = -1;   /* Set "<n>:" default to get the rest of the range */
         if( subargno > 1 )
-          barf("slice: too many ':'s in scalar slice specifier %d",i);
+          return pdl_make_error(PDL_EUSERERROR, "slice: too many ':'s in scalar slice specifier %d",i);
         subargno++;
         break;
       case ',':
-        barf("slice: ','  not allowed (yet) in scalar slice specifiers!");
+        return pdl_make_error_simple(PDL_EUSERERROR, "slice: ','  not allowed (yet) in scalar slice specifiers!");
         break;
       default:
-        barf("slice: unexpected '%c' in slice specifier (arg %d)",*s,i);
+        return pdl_make_error(PDL_EUSERERROR, "slice: unexpected '%c' in slice specifier (arg %d)",*s,i);
         break;
     }
+    i++;
   } /* end of parse loop */
   this_arg.squish = squish_flag;
   this_arg.dummy = dummy_flag;
   PDLDEBUG_f(pdl_dump_slice_args(&this_arg));
-  return this_arg;
+  *retvalp = this_arg;
+  return PDL_error;
 }
 
-pdl_slice_args* pdl_slice_args_parse(SV* sv) {
+pdl_slice_args* pdl_slice_args_parse_sv(SV* sv) {
   /*** Make sure we got an array ref as input and extract its corresponding AV ***/
   if(!(sv && SvROK(sv) && SvTYPE(SvRV(sv))==SVt_PVAV))
     barf("slice requires an ARRAY ref containing zero or more arguments");
@@ -1070,13 +1046,12 @@ pdl_slice_args* pdl_slice_args_parse(SV* sv) {
   /**********************************************************************/
   /**** Loop over the elements of the AV input and parse into values ****/
   /**** in the start/inc/end array                                   ****/
-  PDL_Indx i, idim, odim;
-  for(odim=idim=i=0; i<nargs; i++) {
+  PDL_Indx i;
+  for(i=0; i<nargs; i++) {
     SV *this;
     SV **thisp;
-    SV *sv, **svp;
+    SV **svp;
     char all_flag = 0;
-    char *str;
     pdl_slice_args this_arg = {0,-1,0}; /* start,end,inc 0=do in RedoDims */
     thisp = av_fetch( arglist, i, 0 );
     this = (thisp  ?  *thisp  : 0 );
@@ -1161,7 +1136,7 @@ pdl_slice_args* pdl_slice_args_parse(SV* sv) {
           /* this argument has a cached string */
           STRLEN len;
           char *s = SvPVbyte(this, len);
-          this_arg = PDL_CORE_(slice_args_parse_string)(s);
+          pdl_barf_if_error(pdl_slice_args_parse_string(s, &this_arg));
         } else /* end of string parsing */ {
           /* Simplest case -- there's no cached string, so it   */
           /* must be a number.  In that case it's a simple      */
@@ -1184,6 +1159,7 @@ pdl_slice_args* pdl_slice_args_parse(SV* sv) {
     else {
       this_arg_ptr = this_arg_ptr->next = pdl_smalloc(sizeof(*retval));
     }
+    if (!this_arg_ptr) croak("Out of Memory\n");
     /* Copy parsed values into the limits */
     *this_arg_ptr = this_arg;
   } /* end of arg-parsing loop */

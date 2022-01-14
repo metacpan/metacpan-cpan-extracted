@@ -83,7 +83,7 @@ You can also look for information at:
 
 ## LICENSE AND COPYRIGHT
 
-Copyright (C) 2016-2017 Daniel Șuteu
+Copyright (C) 2016-2022 Daniel Șuteu
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

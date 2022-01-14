@@ -1,4 +1,5 @@
 use strict; 
+use warnings;
 use PDL::LiteF;
 use PDL::IO::Misc;
 use File::Temp qw( tempfile tempdir );
@@ -91,7 +92,11 @@ is( (sum($x)==15 && max($y)==66 && $y->getdim(0)==5), 1, "rgrep" );
 
 $x = short(3); $y = long(3); # $c=long([3,3]);
 bswap2($x); bswap4($y);
-is(sum($x)==768 && sum($y)==50331648,1,"bswap2");
+is sum($x)."", 768, "bswap2";
+is sum($y)."", 50331648, "bswap4";
+$x = short(3);
+$x->type->bswap->($x);
+is sum($x)."", 768, "bswap Type method";
 
 ############# Test rasc  #############
 

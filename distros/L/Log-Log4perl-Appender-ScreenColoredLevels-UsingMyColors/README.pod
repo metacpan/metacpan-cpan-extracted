@@ -2,11 +2,11 @@
 
 =encoding utf8
 
-=for HTML <a href="../../actions?query=workflow%3Amacos"><img src="../../workflows/macos/badge.svg"></a>
+=for HTML <a href="https://www.github.com/briandfoy/log-log4perl-appender-screencoloredlevels-usingmycolors/actions?query=workflow%3Amacos"><img src="https://www.github.com/briandfoy/log-log4perl-appender-screencoloredlevels-usingmycolors/workflows/macos/badge.svg"></a>
 
-=for HTML <a href="../../actions?query=workflow%3Aubuntu"><img src="../../workflows/ubuntu/badge.svg"></a>
+=for HTML <a href="https://www.github.com/briandfoy/log-log4perl-appender-screencoloredlevels-usingmycolors/actions?query=workflow%3Aubuntu"><img src="https://www.github.com/briandfoy/log-log4perl-appender-screencoloredlevels-usingmycolors/workflows/ubuntu/badge.svg"></a>
 
-=for HTML <a href="../../actions?query=workflow%3Awindows"><img src="../../workflows/windows/badge.svg"></a>
+=for HTML <a href="https://www.github.com/briandfoy/log-log4perl-appender-screencoloredlevels-usingmycolors/actions?query=workflow%3Awindows"><img src="https://www.github.com/briandfoy/log-log4perl-appender-screencoloredlevels-usingmycolors/workflows/windows/badge.svg"></a>
 
 =for HTML <a href='https://ci.appveyor.com/project/briandfoy/Log-Log4perl-Appender-ScreenColoredLevels-UsingMyColors'><img src='https://ci.appveyor.com/api/projects/status/49g0761f09o7grc9?svg=true' /></a>
 
@@ -27,7 +27,7 @@ for any Perl module.
 
 To read about L<Log::Log4perl::Appender::ScreenColoredLevels::UsingMyColors>, look at the embedded documentation
 in the module itself. Inside the distribution, you can format it
-with L<perldoc|https://perldoc.perl.orgperldoc.html>:
+with L<perldoc|https://perldoc.perl.org/perldoc.html>:
 
 	% perldoc lib/Log/Log4perl/Appender/ScreenColoredLevels/UsingMyColors.pm
 

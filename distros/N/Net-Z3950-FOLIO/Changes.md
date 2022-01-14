@@ -1,5 +1,16 @@
 # Revision history for Perl extension Net::Z3950::FOLIO.
 
+## [2.5.0](https://github.com/folio-org/Net-Z3950-FOLIO/tree/v2.5.0) (Fri  7 Jan 17:45:05 GMT 2022)
+
+* If `restrictToItem` is set, do not return a MARC holdings field for holdings records with no items. Fixes ZF-55.
+* Add support for additional item-level fields (including `_copyNumber`) to be reported in MARC holdings. Fixes ZF-56.
+* Allow post-processing substitutions to interpolate field values using sequences of the form `%{245$a}`. Documentation is in the `replacement` section of [the configuration-file manual](doc/from-pod/Net-Z3950-FOLIO-Config.md). Fixes ZF-57.
+* New MARC fields/subfields come into existence when named in post-processing rules, unless generated value is empty. Fixes ZF-59.
+* OPAC circulation-record `temporaryLocation` now reflects FOLIO "effective location" logic, including item-level permanent location as first fallback if item-level temporary location is absent. Fixes ZF-58.
+* In the OPAC record-format (and MARC holdings generated from holdings data), the `availableNow` field in item records is now 0 if the item's `discoverySuppress` field is true. Fixes ZF-60.
+* Use a different Index Data-hosted FOLIO instance for test 08.
+* Rename `MANIFEST.skip` file to the correctly cased `MANIFEST.SKIP`.
+
 ## [2.4.0](https://github.com/folio-org/Net-Z3950-FOLIO/tree/v2.4.0) (Tue Aug 24 15:33:57 BST 2021)
 
 * Upgrade `source-storage-source-records` interface dependency to v3.0. (This is what is used in Juniper, so the Z-server would not build against that release.) Fixes ZF-53.
@@ -115,4 +126,3 @@
 
 * Determine FOLIO tenant from database name, and postpone initialisation and authentication until we know that (ZF-2).
 * Automatic generation of MARC records (ZF-14). Thi will need a non-trivial version of `etc/folio2marcxml.xsl` (ZF-8).
-

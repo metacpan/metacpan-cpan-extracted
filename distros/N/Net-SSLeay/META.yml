@@ -1,5 +1,5 @@
 ---
-abstract: 'Perl extension for using OpenSSL'
+abstract: 'Perl bindings for OpenSSL and LibreSSL'
 author:
   - 'Sampo Kellomäki <sampo@iki.fi>'
   - 'Florian Ragwitz <rafl@debian.org>'
@@ -19,10 +19,15 @@ build_requires:
   SelectSaver: '0'
   Socket: '0'
   Storable: '0'
+  Test::Builder: '0'
   Test::More: 0.60_01
   base: '0'
 configure_requires:
+  English: '0'
   ExtUtils::MakeMaker: '0'
+  File::Spec::Functions: '0'
+  Text::Wrap: '0'
+  constant: '0'
 dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
@@ -42,5 +47,5 @@ requires:
 resources:
   bugtracker: https://github.com/radiator-software/p5-net-ssleay/issues
   repository: git://github.com/radiator-software/p5-net-ssleay.git
-version: '1.90'
+version: '1.92'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

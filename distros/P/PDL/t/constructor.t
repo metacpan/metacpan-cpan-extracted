@@ -1,7 +1,5 @@
-# Test for bug in the pdl constructor for mixed arguments.
-# Separate from core.t because the problem crashes perl
-# and I'd like to keep the granularity of the core.t tests
-#
+use strict;
+use warnings;
 use Test::More;
 use PDL::LiteF;
 use Test::Exception;
@@ -155,7 +153,7 @@ is $p->ndims, 2, "piddlifying two 0-PDLs makes a 2D-PDL";
 is $p->dim(0),0, "piddlifying two empty ndarrays makes a 0x2-PDL";
 is $p->dim(1),2, "piddlifying two empty ndarrays makes a 0x2-PDL";
 eval { $p->at(0,0) };
-ok( $@ =~ m/^Position out of range/ , "can't index an empty PDL with at" );
+like $@, qr/^Position\s*\d+\s*out of range/, "can't index an empty PDL with at";
 
 $p = pdl(pdl([4]),5);
 is $p->ndims, 2,  "catenating a 1-PDL and a scalar yields a 2D PDL";
@@ -191,15 +189,15 @@ my $d = pdl(@c);
 
 ##############################
 # test bad values
-$x = pdl(3,4,5);
+my $x = pdl(3,4,5);
 $x=$x->setbadif($x==4);
-eval '$y = pdl($x,5);';
-ok(!$@, "a badvalue PDL works in the constructor");
+my $y = eval { pdl($x,5) };
+is $@, '', "a badvalue PDL works in the constructor";
 ok( $y->badflag, "bad value propagates from inner PDL to constructed PDL" );
 ok( $y->slice("(1),(0)") == $y->badvalue, "bad value was passed in" );
 ok( $y->at(1,1) == 0, "padding was correct" );
 eval '$y = pdl(short, $x, 5);';
-ok(!$@, "constructed a short PDL");
+is $@, '', "constructed a short PDL";
 ok( $y->slice("(1),(0)") == $y->badvalue, "bad value was translated" );
 ok( $y->at(1,1) == 0, "padding was correct");
 

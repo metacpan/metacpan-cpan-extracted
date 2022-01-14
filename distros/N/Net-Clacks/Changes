@@ -1,5 +1,40 @@
-@  changeset:   137:857454901ffa
+@  changeset:   144:55ed1ba21267
 |  tag:         tip
+|  user:        Rene Schickbauer <cavac@earthrise>
+|  date:        Fri Jan 14 15:40:40 2022 +0100
+|  summary:     Bugfix: Wrong package name in Net::Clacks.pm
+|
+o  changeset:   143:ed100d123c25
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Fri Jan 14 13:40:29 2022 +0100
+|  summary:     Update Changes file
+|
+o  changeset:   142:8fc4d88cfc64
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Fri Jan 14 13:39:55 2022 +0100
+|  summary:     Add missing function
+|
+o  changeset:   141:0683c38e4bab
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Fri Jan 14 13:37:13 2022 +0100
+|  summary:     BF, Prepare for release of version 19
+|
+o  changeset:   140:b1cfe41fd2cb
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Fri Jan 14 13:34:28 2022 +0100
+|  summary:     Port dynamic config loading from PageCamel to Clacks
+|
+o  changeset:   139:209c1d4b8f15
+|  user:        Rene Schickbauer <cavac@earthrise>
+|  date:        Wed Jul 07 13:18:14 2021 +0200
+|  summary:     Add missing "1;" at the end of Net/Clacks.pm
+|
+o  changeset:   138:43ca06769e20
+|  user:        Rene Schickbauer <cavac@earthrise>
+|  date:        Mon Jul 05 13:45:31 2021 +0200
+|  summary:     Upodates Changes file
+|
+o  changeset:   137:857454901ffa
 |  user:        Rene Schickbauer <cavac@earthrise>
 |  date:        Mon Jul 05 13:36:43 2021 +0200
 |  summary:     Use a multi-stage approach to try to preserve data by trying to load the backup and the temporary persistance file as fallback.

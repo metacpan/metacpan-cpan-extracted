@@ -1,3 +1,7 @@
+1.02        Fri Jan  7 14:44:34 2022
+
+* wget: use --passive-ftp switch only for ftp scheme
+
 1.00        Wed Nov 11 12:49:58 2020
 
 * Fixed the mitigations for CVE-2016-1238

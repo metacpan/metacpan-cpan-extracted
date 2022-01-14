@@ -1,27 +1,21 @@
 use strict;
 use warnings;
 
-use FastGlob qw(glob);
-use Test::More 0.98 tests => 1;
+use Test::More 0.98 tests => 2;
 
-use_ok $_ for qw(App::findeps);
+use_ok 'App::findeps';
 
-my @files = &glob('t/scripts/00/*.pl');
-my $map   = App::findeps::scan( files => \@files );
-my @list  = ();
+my $map  = App::findeps::scan( files => ['t/scripts/00_basic.pl'] );
+my @list = ();
 foreach my $key ( sort keys %$map ) {
     my $version = $map->{$key};
     my $dist    = App::findeps::_name($key);
-    $dist .= "~$version" if length $version;
+    $dist .= "~$version" if defined $version;
     push @list, $dist;
 }
 
 for (@list) {
-    is $_, 'Dummy', "succeed to exclude ./lib/";
-}
-
-if ( eval 'require Pod::Markdown' ) {
-    qx'pod2markdown script/findeps >| findeps.md';
+    is $_, 'Acme::BadExample', "succeed to scan a file";
 }
 
 done_testing;

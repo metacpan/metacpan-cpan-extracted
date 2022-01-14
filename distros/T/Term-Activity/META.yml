@@ -3,15 +3,15 @@ abstract: 'Process Activity Display Module'
 author:
   - 'Phil Pollard <bennie@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.96, CPAN::Meta::Converter version 2.120630'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Term-Activity
 no_index:
   directory:
@@ -21,13 +21,14 @@ no_index:
 provides:
   Term::Activity:
     file: lib/Term/Activity.pm
-    version: 1.20
+    version: '1.21'
 requires:
-  Term::Size: 0
-  Test::More: 0
-  Test::Simple: 0
-  perl: 5.006000
+  Term::Size: '0'
+  Test::More: '0'
+  Test::Simple: '0'
+  perl: '5.006000'
 resources:
   bugtracker: https://rt.cpan.org/Dist/Display.html?Name=Term-Activity
   repository: git://github.com/bennie/perl-Term-Activity.git
-version: 1.20
+version: '1.21'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

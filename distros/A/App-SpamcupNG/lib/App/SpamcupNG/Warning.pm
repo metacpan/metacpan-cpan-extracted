@@ -2,7 +2,7 @@ package App::SpamcupNG::Warning;
 use strict;
 use warnings;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 =head1 NAME
 
@@ -31,9 +31,9 @@ Expects as parameter an array reference containing the associated strings.
 sub new {
     my ( $class, $message_ref ) = @_;
 
-    die 'message is a required parameter'
+    die 'message must be an array reference with length of at least 1'
         unless ( ( ref($message_ref) eq 'ARRAY' )
-        and ( scalar($message_ref) > 0 ) );
+        and ( scalar(@{$message_ref}) > 0 ) );
 
     my @trimmed;
 

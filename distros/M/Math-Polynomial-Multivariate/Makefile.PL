@@ -1,53 +1,71 @@
-# Copyright (c) 2011-2017 Martin Becker.  All rights reserved.
+# Copyright (c) 2011-2022 Martin Becker, Blaubeuren.
 # This package is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
+# under the terms of the Artistic License 2.0 (see LICENSE file).
 
 use strict;
+use warnings;
 use ExtUtils::MakeMaker;
+use File::Spec;
+
+my $DN = 'Math-Polynomial-Multivariate';
+my %versions = map {
+    my $module = $_;
+    my @path   = ('lib', split /::/, "$module.pm");
+    my $file   = join '/', @path;
+    my $osfile = File::Spec->catfile(@path);
+    $module => {
+        file    => $file,
+        version => MM->parse_version($osfile),
+    }
+} qw(
+    Math::Polynomial::Multivariate
+);
 
 WriteMakefile(
     NAME                => 'Math::Polynomial::Multivariate',
+    AUTHOR              => 'Martin Becker <becker-cpan-mp (at) cozap.com>',
     VERSION_FROM        => 'lib/Math/Polynomial/Multivariate.pm',
-    PREREQ_PM           => {
-        'overload'      => 0,
-        'Carp',         => 0,
-    },
     ABSTRACT_FROM       => 'lib/Math/Polynomial/Multivariate.pm',
-    AUTHOR              => 'Martin Becker <becker-cpan-mp@cozap.com>',
-    $ExtUtils::MakeMaker::VERSION >= 6.18? (
-        SIGN            => 1,
-    ): (),
-    $ExtUtils::MakeMaker::VERSION >= 6.31? (
-        LICENSE         => 'perl',
-    ): (),
-    $ExtUtils::MakeMaker::VERSION >= 6.46? (
-        META_MERGE => {
-            'meta-spec' => {
-                url     => 'http://search.cpan.org/perldoc?CPAN::Meta::Spec',
-                version => 2,
+    LICENSE             => 'artistic_2',
+    MIN_PERL_VERSION    => '5.008',
+    SIGN                => 1,
+    CONFIGURE_REQUIRES  => {
+        'ExtUtils::MakeMaker' => '6.64',
+        'File::Spec'          => '0',
+    },
+    TEST_REQUIRES => {
+        'Test::More'          => '0',
+    },
+    PREREQ_PM => {
+        'overload'            => 0,
+        'Carp',               => 0,
+    },
+    META_MERGE => {
+        'meta-spec'    => {
+            url        => 'http://search.cpan.org/perldoc?CPAN::Meta::Spec',
+            version    => 2,
+        },
+        provides       => \%versions,
+        dynamic_config => 0,
+        resources      => {
+            bugtracker => {
+                web => "https://github.com/mhasch/perl-$DN/issues",
             },
-            provides => {
-                'Math::Polynomial::Multivariate' => {
-                    file    => 'lib/Math/Polynomial/Multivariate.pm',
-                    version => '0.006',
+            license => [
+                'https://www.perlfoundation.org/artistic-license-20.html'
+            ],
+            repository => {
+                url  => "git://github.com/mhasch/perl-$DN.git",
+                web  => "https://github.com/mhasch/perl-$DN",
+                type => 'git',
+            },
+        },
+        prereqs => {
+            runtime => {
+                recommends => {
+                    'Math::BigRat' => '0.2619',
                 },
             },
-            prereqs => {
-                runtime => {
-                    suggests => {
-                        'Math::BigRat' => '0.2613',
-                    },
-                },
-            },    
-        },        
-    ): (),        
-    $ExtUtils::MakeMaker::VERSION >= 6.47? (
-        MIN_PERL_VERSION => '5.008',
-    ): (),
-    $ExtUtils::MakeMaker::VERSION >= 6.56? (
-        BUILD_REQUIRES => {
-            'ExtUtils::MakeMaker' => 0,
-            'Test::More'          => 0,
-        }, 
-    ): (),
+        },
+    },
 );

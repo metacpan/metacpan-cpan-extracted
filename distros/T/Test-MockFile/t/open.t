@@ -44,17 +44,17 @@ my $mock_file = Test::MockFile->file( $filename, $test_string );
 my $mock_link = Test::MockFile->symlink( $filename, '/qwerty' );
 
 {
-    is( open( my $fh, '<', '/qwerty' ), 1, "Open a mocked file via its symlink" );
-    is( <$fh>, "abcd\n", " ... line 1" );
-    is( <$fh>, "efgh\n", " ... line 2" );
-    is( <$fh>, undef,    " ... EOF" );
+    is( open( my $fh, '<', '/qwerty' ), 1,        "Open a mocked file via its symlink" );
+    is( <$fh>,                          "abcd\n", " ... line 1" );
+    is( <$fh>,                          "efgh\n", " ... line 2" );
+    is( <$fh>,                          undef,    " ... EOF" );
     close $fh;
 }
 
 {
     $mock_file->unlink;
-    is( open( my $fh, '<', '/qwerty' ), undef, "Open a mocked file via its symlink when the file is missing fails." );
-    is( $! + 0, ENOENT, '$! is ENOENT' );
+    is( open( my $fh, '<', '/qwerty' ), undef,  "Open a mocked file via its symlink when the file is missing fails." );
+    is( $! + 0,                         ENOENT, '$! is ENOENT' );
 }
 
 done_testing();

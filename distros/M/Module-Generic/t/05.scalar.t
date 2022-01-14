@@ -304,6 +304,81 @@ subtest 'unpack and pack' => sub
     is( $pack_data, '€', 'pack' );
 };
 
+subtest 'callback' => sub
+{
+    use utf8;
+    $Module::Generic::Scalar::DEBUG = $DEBUG;
+    diag( "Setting \$Module::Generic::Scalar::DEBUG to '$Module::Generic::Scalar::DEBUG'" ) if( $DEBUG );
+    my $test = Module::Generic::Scalar->new( q{Allons enfants de la Patrie !} );
+    is( $test->length, 29, 'init' );
+    ok( !tied( $$test ), 'not tied' );
+    $test->callback( add => sub
+    {
+        my $this = shift( @_ );
+        my $new = $this->{added};
+        diag( "Adding ", length( $$new ), " bytes of data ('$$new')" ) if( $DEBUG );
+        is( length( $$new ), 59, 'append' );
+        return(1);
+    });
+    $test->append( "\nLe jour de gloire est arrivé." );
+    diag( "String is: '", $test->scalar, "'" ) if( $DEBUG );
+    is( $test->substr( -7, 6 ), 'arrivé', 'append (2)' );
+    
+    $test->callback( add => sub
+    {
+        my $this = shift( @_ );
+        my $new = $this->{added};
+        diag( "Adding ", length( $$new ), " bytes of data ('$$new')" ) if( $DEBUG );
+        is( length( $$new ), 62, 'substr' );
+        return(1);
+    });
+    $test->substr( 31, 6, 'a journée' );
+    is( $test->scalar, "Allons enfants de la Patrie !\nLa journée de gloire est arrivé.", 'substr (2)' );
+    my $copy = $$test;
+    
+    diag( "Blocking modification." ) if( $DEBUG );
+    my $try = 0;
+    $test->callback( add => sub
+    {
+        my $this = shift( @_ );
+        my $new = $this->{added};
+        diag( "Attempting to add ", length( $$new ), " bytes of data ('$$new') " ) if( $DEBUG );
+        $try++;
+        return;
+    });
+    $test->append( "Contre nous de la tyrannie,\nL’étendard sanglant est levé !\n" );
+    is( $try, 1, 'addition rejected' );
+    is( $$test, $copy, 'addition rejected' );
+    $try = 0;
+    $test->callback( remove => sub
+    {
+        my $this = shift( @_ );
+        my( $old, $new ) = @$this{qw( removed added )};
+        diag( "Attempting to remove ", length( $$old ), " bytes of data ('$$old')" ) if( $DEBUG );
+        $try++;
+        return;
+    });
+    $test->reset;
+    is( $try, 1, 'removal rejected' );
+    is( $$test, $copy, 'removal rejected' );
+    
+    $test->callback( remove => sub
+    {
+        my $this = shift( @_ );
+        my( $old, $new ) = @$this{qw( removed added )};
+        diag( "Removing data from ", length( $$old ), " bytes to ", length( $$new ), " bytes: '", $$old, "' -> '", $$mew, "'" ) if( $DEBUG );
+        is( length( $$old ), 62, 'undef' );
+        is( length( $$new ), 0, 'undef (1)' );
+        return(1);
+    });
+    $test->reset;
+
+    diag( "Removing callbacks" ) if( $DEBUG );
+    $test->callback( add => undef );
+    $test->callback( remove => undef );
+    ok( !tied( $$test ), 'callbacks removed' );
+};
+
 done_testing();
 
 package MyObject;

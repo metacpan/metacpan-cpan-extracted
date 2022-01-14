@@ -33,14 +33,14 @@ $obj->put ('recvart', ['dim2', 'chardim'], PDL::Char->new (['abc', 'def', 'hij']
 my $rec_id = $obj->setrec('recvar1', 'recvar2', 'recvart');
 $obj->putrec($rec_id, 1, [9, 8, 'foo']);
 my @rec = $obj->getrec($rec_id, 1);
-ok((($rec[0] == 9) && ($rec[1] == 8) && ($rec[2] eq 'foo')), "setrec/recput/recget OK");
+is_deeply \@rec, [9, 8, 'foo'], "setrec/recput/recget OK";
 
 eval { $obj->putrec($rec_id, 9, [9, 8, 'bar']) };
-ok ($@ =~ /NetCDF: Index exceeds dimension bound/, "Correctly failed to put record with illegal index");
+like $@, qr/NetCDF: Index exceeds dimension bound/, "Correctly failed to put record with illegal index";
 
 $obj->put ('recvar3', ['dim2long'], float ([1,2,3,4]));
 my $rec_id_bad = eval { $obj->setrec('recvar1', 'recvar2', 'recvar3') };
-ok ($@ =~ /All variables in a record must have the same dimension/, "Correctly failed to create record with mis-matched variable sizes");
+like $@, qr/All variables in a record must have the same dimension/, "Correctly failed to create record with mis-matched variable sizes";
 
 my $str = "Station1  Station2  Station3  ";
 $obj->puttext('textvar', ['n_station', 'n_string'], [3,10], $str);
@@ -60,7 +60,7 @@ ok( ($dims == $dims1)->sum == $dims->nelem, "puttext 3");
 
 my $in2 = pdl [[1,2,3,4], [5,6,7,8]]; # dim1 is already 3, not 4
 eval { $obj->put ('var2', ['dim1', 'dim2'], $in2); }; # Dimension error
-ok ($@ =~ /Attempt to redefine length of dimension/, "Dimension redefinition error");
+like $@, qr/Attempt to redefine length of dimension/, "Dimension redefinition error";
 
 my $pdlchar = PDL::Char->new ([['abc', 'def', 'hij'],['aaa', 'bbb', 'ccc']]);
 $obj->put ('varchar', ['dimc1', 'dimc2', 'dimc3'], $pdlchar);
@@ -188,7 +188,7 @@ print IN "I'm not a netCDF file\n";
 close IN;
 my $obj2;
 eval { $obj2 = PDL::NetCDF->new ('bogus.nc'); };
-ok ($@ =~ /(Not a netCDF file|Unknown file format)/, "Read bogus file");
+like $@, qr/(Not a netCDF file|Unknown file format)/, "Read bogus file";
 
 $obj = PDL::NetCDF->new ('foo1.nc');
 # test chars with unlimited dimension

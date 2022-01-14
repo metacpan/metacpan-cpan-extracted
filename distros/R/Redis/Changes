@@ -1,7 +1,8 @@
 Revision history for Redis
 
-1.998     2020-08-18 11:04:12+02:00 Europe/Paris
+1.999     2022-01-14 21:42:33+01:00 Europe/Paris
 
+  * enable ssl support
   * remove test expression that is problematic on OpenBSD and NetBSD
 
 1.997     2020-80-17 10:03:00+01:00 Europe/Paris

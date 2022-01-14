@@ -8,9 +8,9 @@ package Text::Table::Sprintf;
 #END IFUNBUILT
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-27'; # DATE
+our $DATE = '2022-01-07'; # DATE
 our $DIST = 'Text-Table-Sprintf'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 our %FEATURES = (
     set_v => {
@@ -87,14 +87,14 @@ sub table {
             $line,
             $rowfmt,
             $line,
-            (map { $rowfmt } 1..@$rows-1),
+            (map { $rowfmt . ($params{separate_rows} && $_ < $#{$rows} ? $line : '') } 1..@$rows-1),
             $line,
         );
     } else {
         $tblfmt = join(
             "",
             $line,
-            (map { $rowfmt } 1..@$rows),
+            (map { $rowfmt . ($params{separate_rows} && $_ < $#{$rows} ? $line : '') } 1..@$rows),
             $line,
         );
     }
@@ -120,7 +120,7 @@ Text::Table::Sprintf - Generate simple text tables from 2D arrays using sprintf(
 
 =head1 VERSION
 
-This document describes version 0.005 of Text::Table::Sprintf (from Perl distribution Text-Table-Sprintf), released on 2021-08-27.
+This document describes version 0.006 of Text::Table::Sprintf (from Perl distribution Text-Table-Sprintf), released on 2022-01-07.
 
 =head1 SYNOPSIS
 
@@ -368,6 +368,10 @@ each row is an array reference.
 If given a true value, the first row in the data will be interpreted as a header
 row, and separated from the rest of the table with a ruled line.
 
+=item * separate_row (bool)
+
+If set to true, will draw separator line between data rows.
+
 =back
 
 =head2 generate_table
@@ -413,7 +417,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

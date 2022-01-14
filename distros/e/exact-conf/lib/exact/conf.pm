@@ -5,7 +5,7 @@ use 5.014;
 use exact;
 use strict;
 
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.06'; # VERSION
 
 sub import {
     my ( $self, $caller, $params ) = @_;
@@ -14,7 +14,7 @@ sub import {
     my @params = grep { length } split( /[,\s]+/, $params || '' );
 
     require Config::App;
-    Config::App->import(@params);
+    Config::App->import(@params) if ( @params or not length $params );
 
     {
         no strict 'refs';
@@ -42,7 +42,7 @@ exact::conf - Cascading merged application configuration extension for exact
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =for markdown [![test](https://github.com/gryphonshafer/exact-conf/workflows/test/badge.svg)](https://github.com/gryphonshafer/exact-conf/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/exact-conf/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/exact-conf)
@@ -83,8 +83,12 @@ This...
     use Config::App;
     say Config::App->new->get('answer');
 
-To pass input into C<Config::App->new>, do this:
+If you'd like to load L<Config::App> but skip its default import process that
+looks for default-location-located configuration files and errors if it can't
+find such, pass some false value. For example, if you want to specify a
+non-default-located configuration file at runtime, do this:
 
+    use exact 'conf(0)';
     say conf('settings/conf.yaml')->get('answer');
 
 =head1 SEE ALSO

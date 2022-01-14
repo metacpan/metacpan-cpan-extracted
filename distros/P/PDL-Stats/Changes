@@ -1,3 +1,6 @@
+0.81 2022-01-11
+- fix Kmeans NiceSlice for PDL 2.066
+
 0.80 2021-10-02
 - add COV option to GLM::logistic - thanks David Myers for suggestion (in 2011)
 - make all PLOT options default to off; only load PGPLOT when try to use

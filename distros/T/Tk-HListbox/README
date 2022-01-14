@@ -129,15 +129,16 @@ WIDGET-SPECIFIC OPTIONS
         Subroutine reference to be invoked when an indicator image is
         clicked.
 
-    Name: -ipadx => *number*
+    Name: -ipadx
         Specify horizontal padding style in pixels around the image for the
         rows in the listbox which are type *image* or *imagetext*. Default:
         0
 
-    Name: -ipady => *number*
+    Name: -ipady
         Specify vertical padding style in pixels around the image for the
         rows in the listbox which are type *image* or *imagetext*. NOTE:
-        This changes the height of the affected rows. Default: 0
+        This changes the height of the affected rows. Default: 1 (and
+        setting to 0 is the same as 1).
 
     Name: itemType
     Class: ItemType
@@ -181,6 +182,14 @@ WIDGET-SPECIFIC OPTIONS
         expect it to be either single, browse, multiple, extended or
         dragdrop; the default value is browse.
 
+    Name: -showcursoralways => *boolean*
+        Starting with version 2.4, Tk::HListbox no longer displays the
+        keyboard cursor (active element) when the HListbox widget does not
+        have the keyboard focus, in order to be consistent with the
+        behaviour of Tk::Listbox. This option, when set to 1 (or a "true"
+        value) restores the pre-v2.4 behaviour of always showing the
+        keyboard cursor. Default *0* (False).
+
     Name: state
     Class: State
     Switch: -state
@@ -197,7 +206,8 @@ WIDGET-SPECIFIC OPTIONS
     Name: -tpady => *number*
         Specify vertical padding style in pixels around the text for the
         rows in the listbox which are type *text*. NOTE: This changes the
-        height of the affected rows. Default: 2
+        height of the affected rows. Default (seems to be): 2 (and setting
+        to 0 is the same as 2).
 
     Name: width
     Class: Width
@@ -937,7 +947,7 @@ AUTHOR
     Jim Turner, "<https://metacpan.org/author/TURNERJW>".
 
 COPYRIGHT
-    Copyright (c) 2015-2018 Jim Turner "<mailto://turnerjw784@yahoo.com>".
+    Copyright (c) 2015-2022 Jim Turner "<mailto://turnerjw784@yahoo.com>".
     All rights reserved.
 
     This program is free software; you can redistribute it and/or modify it

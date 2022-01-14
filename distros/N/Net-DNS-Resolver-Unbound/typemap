@@ -1,0 +1,7 @@
+#
+#
+TYPEMAP
+const EVP_MD*		T_PTRREF
+struct ub_ctx*		T_PTRREF
+struct ub_result*	T_PTRREF
+#

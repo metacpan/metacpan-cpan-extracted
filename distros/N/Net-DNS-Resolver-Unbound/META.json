@@ -1,0 +1,54 @@
+{
+   "abstract" : "Unbound resolver base for Net::DNS",
+   "author" : [
+      "Dick Franks"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-DNS-Resolver-Unbound",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.66"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.1",
+            "DynaLoader" : "1.04",
+            "perl" : "5.008009"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.66",
+            "File::Find" : "1.05",
+            "File::Spec" : "0.86",
+            "IO::File" : "1.08",
+            "Net::DNS" : "1.18",
+            "Test::More" : "0.47"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.01",
+   "x_serialization_backend" : "JSON::PP version 2.27200"
+}

@@ -1,6 +1,6 @@
 # This file is here for PAUSE and will be replaced at build time
 package Object::Iterate;
-our $VERSION = '1.145';
+our $VERSION = '1.146';
 
 =head1 NAME
 

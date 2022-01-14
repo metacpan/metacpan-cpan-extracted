@@ -4,7 +4,7 @@ use warnings;
 # ABSTRACT: Internal value object for the "Unknown::Values" distribution
 
 package Unknown::Values::Instance;
-$Unknown::Values::Instance::VERSION = '0.100';
+$Unknown::Values::Instance::VERSION = '0.101';
 use Carp 'confess';
 
 use 5.01000;
@@ -98,30 +98,11 @@ Unknown::Values::Instance - Internal value object for the "Unknown::Values" dist
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 DESCRIPTION
 
 For Internal Use Only! See L<Unknown::Values>.
-
-=head1 NAME
-
-Unknown::Values::Instance - Internal value object for the "Unknown::Values" distribution
-
-=head1 VERSION
-
-version 0.004
-
-=head1 AUTHOR
-
-Curtis "Ovid" Poe <ovid@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2013 by Curtis "Ovid" Poe.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =head1 AUTHOR
 

@@ -1,5 +1,13 @@
 Revision history for Dist-Zilla-Plugin-Git-FilePermissions
 
+1.001  2022-01-08 22:42:13 UTC
+
+  - Replace Git::Wrapper with Git::Background
+  - Removed minimal dependency on Test::TempDir::Tiny 0.017 and Moose 2.1203
+  - skip needs $how_many with Test::More < 1.302013_009
+  - Removed autodie in tests
+  - Code cleanup - moved all 'use' before 'has'
+
 1.000  2018-04-02 22:38:46 UTC
 
   - No code changes

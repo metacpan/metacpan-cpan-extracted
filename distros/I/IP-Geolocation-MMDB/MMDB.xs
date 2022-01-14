@@ -3,6 +3,7 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#include <stdlib.h>
 #include <maxminddb.h>
 
 #ifdef MULTIPLICITY
@@ -13,7 +14,7 @@
 #  define dTHXfield(var)
 #endif
 
-typedef struct IP__Geolocation__MMDB {
+typedef struct {
   MMDB_s *mmdb;
   SV *selfrv;
   dTHXfield(perl)
@@ -24,53 +25,52 @@ typedef struct IP__Geolocation__MMDB {
   Zero(var, sizeof(*var) + sizeof(type), char); \
   var->mmdb = (type *)((char *)var + sizeof(*var));
 
+typedef struct {
+  IP__Geolocation__MMDB self;
+  SV *data_callback;
+  SV *node_callback;
+  int max_depth;
+} iterate_data;
+
+#define INIT_iterate_data(DATA, SELF, DATA_CALLBACK, NODE_CALLBACK) { \
+  (DATA)->self = SELF; \
+  (DATA)->data_callback = DATA_CALLBACK; \
+  (DATA)->node_callback = NODE_CALLBACK; \
+  (DATA)->max_depth = (6 == (SELF)->mmdb->metadata.ip_version) ? 128 : 32; \
+}
+
+typedef struct {
+  char bytes[16];
+} numeric_ip;
+
+#define INIT_numeric_ip(IPNUM) \
+  Zero(&(IPNUM), sizeof(IPNUM), char)
+
+#define numeric_ip_to_bigint(SELF, IPNUM) \
+  to_bigint(SELF, (IPNUM).bytes, sizeof((IPNUM).bytes))
+
+#define numeric_ip_set_bit(IPNUM, BIT) { \
+  div_t d = div(BIT, 8 * sizeof(char)); \
+  (IPNUM).bytes[15 - d.quot] |= (128 >> (7 - d.rem)); \
+}
+
 static SV *
 to_bigint(IP__Geolocation__MMDB self, const char *bytes, size_t size)
 {
   dTHXa(self->perl);
+
   dSP;
   int count;
-  char buf[16];
   SV *err_tmp;
   SV *retval;
-  size_t n;
-
-  if (size > sizeof(buf)) {
-    return newSVpvn(bytes, size);
-  }
-
-  switch (BYTEORDER) {
-  case 0x1234:
-  case 0x12345678:
-#if MMDB_UINT128_IS_BYTE_ARRAY
-    if (16 == size) {
-      Copy(bytes, buf, size, char);
-    }
-    else {
-      for (n = 0; n < size; ++n) {
-        buf[n] = bytes[size - n - 1];
-      }
-    }
-#else
-    for (n = 0; n < size; ++n) {
-      buf[n] = bytes[size - n - 1];
-    }
-#endif
-    break;
-  case 0x4321:
-  case 0x87654321:
-    Copy(bytes, buf, size, char);
-    break;
-  default:
-    return newSVpvn(bytes, size);
-  }
 
   ENTER;
   SAVETMPS;
+
   PUSHMARK(SP);
   EXTEND(SP, 2);
   mPUSHs(newRV_inc(self->selfrv));
-  mPUSHp(buf, size);
+  mPUSHp(bytes, size);
   PUTBACK;
   count = call_method("_to_bigint", G_SCALAR | G_EVAL);
   SPAGAIN;
@@ -88,14 +88,68 @@ to_bigint(IP__Geolocation__MMDB self, const char *bytes, size_t size)
     }
   }
   PUTBACK;
+
   FREETMPS;
   LEAVE;
 
   return retval;
 }
 
+#if MMDB_UINT128_IS_BYTE_ARRAY
+static SV *
+createSVu128(IP__Geolocation__MMDB self, uint8_t u[16])
+{
+  char bytes[16];
+  size_t n;
+  for (n = 0; n < 16; ++n) {
+    bytes[n] = (char) u[n];
+  }
+  return to_bigint(self, bytes, sizeof(bytes));
+}
+#else
+static SV *
+createSVu128(IP__Geolocation__MMDB self, mmdb_uint128_t u)
+{
+#if BYTEORDER == 0x4321 || BYTEORDER == 0x87654321
+  return to_bigint(self, (const char *) &u, sizeof(u));
+#elif BYTEORDER == 0x1234 || BYTEORDER == 0x12345678
+  char bytes[sizeof(u)];
+  size_t n;
+  for (n = 0; n < sizeof(u); ++n) {
+    bytes[n] = ((const char *) &u)[sizeof(u) - n - 1];
+  }
+  return to_bigint(self, bytes, sizeof(bytes));
+#else
+#error "Unknown BYTEORDER"
+#endif
+}
+#endif
+
+#if UVSIZE >= 8
+#define createSVu64(self, u) newSVuv(u)
+#else
+static SV *
+createSVu64(IP__Geolocation__MMDB self, uint64_t u)
+{
+#if BYTEORDER == 0x4321 || BYTEORDER == 0x87654321
+  return to_bigint(self, (const char *) &u, sizeof(u));
+#elif BYTEORDER == 0x1234 || BYTEORDER == 0x12345678
+  char bytes[sizeof(u)];
+  size_t n;
+  for (n = 0; n < sizeof(u); ++n) {
+    bytes[n] = ((const char *) &u)[sizeof(u) - n - 1];
+  }
+  return to_bigint(self, bytes, sizeof(bytes));
+#else
+#error "Unknown BYTEORDER"
+#endif
+}
+#endif
+
 static MMDB_entry_data_list_s *
-decode_entry_data_list(IP__Geolocation__MMDB self, MMDB_entry_data_list_s *entry_data_list, SV **sv, int *mmdb_error)
+decode_entry_data_list(IP__Geolocation__MMDB self,
+                       MMDB_entry_data_list_s *entry_data_list,
+                       SV **sv, int *mmdb_error)
 {
   dTHXa(self->perl);
   MMDB_entry_data_s *entry_data = &entry_data_list->entry_data;
@@ -119,7 +173,8 @@ decode_entry_data_list(IP__Geolocation__MMDB self, MMDB_entry_data_list_s *entry
         return NULL;
       }
       SV *val = &PL_sv_undef;
-      entry_data_list = decode_entry_data_list(self, entry_data_list, &val, mmdb_error);
+      entry_data_list =
+        decode_entry_data_list(self, entry_data_list, &val, mmdb_error);
       if (MMDB_SUCCESS != *mmdb_error) {
         return NULL;
       }
@@ -137,7 +192,8 @@ decode_entry_data_list(IP__Geolocation__MMDB self, MMDB_entry_data_list_s *entry
          size > 0 && NULL != entry_data_list;
          size--) {
       SV *val = &PL_sv_undef;
-      entry_data_list = decode_entry_data_list(self, entry_data_list, &val, mmdb_error);
+      entry_data_list =
+        decode_entry_data_list(self, entry_data_list, &val, mmdb_error);
       if (MMDB_SUCCESS != *mmdb_error) {
         return NULL;
       }
@@ -183,16 +239,12 @@ decode_entry_data_list(IP__Geolocation__MMDB self, MMDB_entry_data_list_s *entry
     break;
 
   case MMDB_DATA_TYPE_UINT64:
-#if UVSIZE < 8
-    *sv = to_bigint(self, (const char *) &entry_data->uint64, sizeof(entry_data->uint64));
-#else
-    *sv = newSVuv(entry_data->uint64);
-#endif
+    *sv = createSVu64(self, entry_data->uint64);
     entry_data_list = entry_data_list->next;
     break;
 
   case MMDB_DATA_TYPE_UINT128:
-    *sv = to_bigint(self, (const char *) &entry_data->uint128, sizeof(entry_data->uint128));
+    *sv = createSVu128(self, entry_data->uint128);
     entry_data_list = entry_data_list->next;
     break;
 
@@ -208,6 +260,129 @@ decode_entry_data_list(IP__Geolocation__MMDB self, MMDB_entry_data_list_s *entry
 
   *mmdb_error = MMDB_SUCCESS;
   return entry_data_list;
+}
+
+static void
+call_node_callback(iterate_data *data, uint32_t node_num,
+                   MMDB_search_node_s *node)
+{
+  IP__Geolocation__MMDB self = data->self;
+  dTHXa(self->perl);
+
+  if (!SvOK(data->node_callback)) {
+    return;
+  }
+
+  dSP;
+  SV *left_record = createSVu64(self, node->left_record);
+  SV *right_record = createSVu64(self, node->right_record);
+
+  ENTER;
+  SAVETMPS;
+
+  PUSHMARK(SP);
+  EXTEND(SP, 3);
+  mPUSHu(node_num);
+  mPUSHs(left_record);
+  mPUSHs(right_record);
+  PUTBACK;
+  (void) call_sv(data->node_callback, G_VOID);
+
+  FREETMPS;
+  LEAVE;
+}
+
+static void
+call_data_callback(iterate_data *data, numeric_ip ipnum, int depth,
+                   MMDB_entry_s *record_entry)
+{
+  IP__Geolocation__MMDB self = data->self;
+  dTHXa(self->perl);
+
+  if (!SvOK(data->data_callback)) {
+    return;
+  }
+
+  SV *decoded_entry = &PL_sv_undef;
+  MMDB_entry_data_list_s *entry_data_list = NULL;
+  int mmdb_error = MMDB_get_entry_data_list(record_entry, &entry_data_list);
+  if (MMDB_SUCCESS == mmdb_error) {
+    (void) decode_entry_data_list(self, entry_data_list,
+                                  &decoded_entry, &mmdb_error);
+  }
+  MMDB_free_entry_data_list(entry_data_list);
+  if (MMDB_SUCCESS != mmdb_error) {
+    const char *error = MMDB_strerror(mmdb_error);
+    croak("Entry data error looking at offset %u: %s",
+          (unsigned int) record_entry->offset, error);
+  }
+
+  SV *ip = numeric_ip_to_bigint(self, ipnum);
+
+  dSP;
+
+  ENTER;
+  SAVETMPS;
+
+  PUSHMARK(SP);
+  EXTEND(SP, 3);
+  mPUSHs(ip);
+  mPUSHi(depth);
+  mPUSHs(decoded_entry);
+  PUTBACK;
+
+  (void) call_sv(data->data_callback, G_VOID);
+
+  FREETMPS;
+  LEAVE;
+}
+
+static void iterate_search_nodes(iterate_data *, uint32_t, numeric_ip, int);
+
+static void
+iterate_record_entry(iterate_data *data, numeric_ip ipnum, int depth,
+                     uint64_t record, uint8_t record_type,
+                     MMDB_entry_s *record_entry)
+{
+  switch (record_type) {
+    case MMDB_RECORD_TYPE_INVALID:
+      croak("%s", "Invalid record when reading node");
+      break;
+    case MMDB_RECORD_TYPE_SEARCH_NODE:
+      iterate_search_nodes(data, (uint32_t) record, ipnum, depth + 1);
+      break;
+    case MMDB_RECORD_TYPE_EMPTY:
+      /* Empty branches are ignored. */
+      break;
+    case MMDB_RECORD_TYPE_DATA:
+      call_data_callback(data, ipnum, depth, record_entry);
+      break;
+    default:
+      croak("Unknown record type: %u", (unsigned int) record_type);
+      break;
+  }
+}
+
+static void
+iterate_search_nodes(iterate_data *data, uint32_t node_num, numeric_ip ipnum,
+                     int depth)
+{
+  MMDB_search_node_s node;
+  int mmdb_error = MMDB_read_node(data->self->mmdb, node_num, &node);
+  if (MMDB_SUCCESS != mmdb_error) {
+    const char *error = MMDB_strerror(mmdb_error);
+    croak("Error reading node %u: %s", (unsigned int) node_num, error);
+  }
+
+  call_node_callback(data, node_num, &node);
+
+  iterate_record_entry(data, ipnum, depth, node.left_record,
+                       node.left_record_type, &node.left_record_entry);
+
+  numeric_ip_set_bit(ipnum, data->max_depth - depth);
+
+  iterate_record_entry(data, ipnum, depth, node.right_record,
+                       node.right_record_type, &node.right_record_entry);
 }
 
 MODULE = IP::Geolocation::MMDB PACKAGE = IP::Geolocation::MMDB
@@ -229,7 +404,7 @@ _new(class, file, flags)
     if (MMDB_SUCCESS != mmdb_error) {
       Safefree(self);
       error = MMDB_strerror(mmdb_error);
-      croak("Couldn't open database file \"%s\": %s", file, error);
+      croak("Error opening database file \"%s\": %s", file, error);
     }
 
     storeTHX(self->perl);
@@ -248,38 +423,70 @@ DESTROY(self)
     Safefree(self);
 
 SV *
-record_for_address(self, ip_address)
+record_for_address(self, ...)
   IP::Geolocation::MMDB self
-  const char *ip_address
   INIT:
+    const char *ip_address;
     int gai_error, mmdb_error;
     const char *error;
     MMDB_lookup_result_s result;
     MMDB_entry_data_list_s *entry_data_list;
   CODE:
-    result = MMDB_lookup_string(self->mmdb, ip_address, &gai_error, &mmdb_error);
+    ip_address = NULL;
+    if (items > 1) {
+      ip_address = SvPVbyte_nolen(ST(1));
+    }
+    if (NULL == ip_address|| '\0' == *ip_address) {
+      croak("%s", "You must provide an IP address to look up");
+    }
+    result =
+      MMDB_lookup_string(self->mmdb, ip_address, &gai_error, &mmdb_error);
     if (0 != gai_error) {
-      croak("Couldn't parse IP address \"%s\"", ip_address);
+      croak("The IP address you provided (%s) is not a valid IPv4 or IPv6 address",
+            ip_address);
     }
     if (MMDB_SUCCESS != mmdb_error) {
       error = MMDB_strerror(mmdb_error);
-      croak("Couldn't look up IP address \"%s\": %s", ip_address, error);
+      croak("Error looking up IP address \"%s\": %s", ip_address, error);
     }
     RETVAL = &PL_sv_undef;
     if (result.found_entry) {
       entry_data_list = NULL;
       mmdb_error = MMDB_get_entry_data_list(&result.entry, &entry_data_list);
       if (MMDB_SUCCESS == mmdb_error) {
-        (void) decode_entry_data_list(self, entry_data_list, &RETVAL, &mmdb_error);
+        (void) decode_entry_data_list(self, entry_data_list,
+                                      &RETVAL, &mmdb_error);
       }
       MMDB_free_entry_data_list(entry_data_list);
       if (MMDB_SUCCESS != mmdb_error) {
         error = MMDB_strerror(mmdb_error);
-        croak("Couldn't read data for IP address \"%s\": %s", ip_address, error);
+        croak("Entry data error looking up \"%s\": %s",
+              ip_address, error);
       }
     }
   OUTPUT:
     RETVAL
+
+void
+iterate_search_tree(self, ...)
+  IP::Geolocation::MMDB self
+  INIT:
+    SV *data_callback;
+    SV *node_callback;
+    iterate_data data;
+    numeric_ip ipnum;
+  CODE:
+    data_callback = &PL_sv_undef;
+    node_callback = &PL_sv_undef;
+    if (items > 1) {
+      data_callback = ST(1);
+      if (items > 2) {
+        node_callback = ST(2);
+      }
+    }
+    INIT_iterate_data(&data, self, data_callback, node_callback);
+    INIT_numeric_ip(ipnum);
+    iterate_search_nodes(&data, 0, ipnum, 1);
 
 SV *
 _metadata(self)
@@ -291,20 +498,22 @@ _metadata(self)
   CODE:
     RETVAL = &PL_sv_undef;
     entry_data_list = NULL;
-    mmdb_error = MMDB_get_metadata_as_entry_data_list(self->mmdb, &entry_data_list);
+    mmdb_error =
+      MMDB_get_metadata_as_entry_data_list(self->mmdb, &entry_data_list);
     if (MMDB_SUCCESS == mmdb_error) {
-      (void) decode_entry_data_list(self, entry_data_list, &RETVAL, &mmdb_error);
+      (void) decode_entry_data_list(self, entry_data_list,
+                                    &RETVAL, &mmdb_error);
     }
     MMDB_free_entry_data_list(entry_data_list);
     if (MMDB_SUCCESS != mmdb_error) {
       error = MMDB_strerror(mmdb_error);
-      croak("Couldn't read metadata: %s", error);
+      croak("Error getting metadata: %s", error);
     }
   OUTPUT:
     RETVAL
 
 const char *
-version(class)
+libmaxminddb_version()
   CODE:
     RETVAL = MMDB_lib_version();
   OUTPUT:

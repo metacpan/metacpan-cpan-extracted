@@ -20,6 +20,11 @@ use DynaLoader;
 
 
 
+
+#line 5 "gsl_sf_transport.pd"
+use strict;
+use warnings;
+
 =head1 NAME
 
 PDL::GSLSF::TRANSPORT - PDL interface to GSL Special Functions
@@ -32,11 +37,8 @@ This is an interface to the Special Function package present in the GNU Scientif
 Transport function:
   J(n,x) := Integral[ t^n e^t /(e^t - 1)^2, {t,0,x}]
 
-=head1 SYNOPSIS
-
 =cut
-
-
+#line 42 "TRANSPORT.pm"
 
 
 
@@ -49,6 +51,8 @@ Transport function:
 
 
 
+
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_transport_2
@@ -68,16 +72,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 76 "TRANSPORT.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_transport_2 = \&PDL::gsl_sf_transport_2;
+#line 82 "TRANSPORT.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_transport_3
@@ -97,16 +102,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 106 "TRANSPORT.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_transport_3 = \&PDL::gsl_sf_transport_3;
+#line 112 "TRANSPORT.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_transport_4
@@ -126,16 +132,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 136 "TRANSPORT.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_transport_4 = \&PDL::gsl_sf_transport_4;
+#line 142 "TRANSPORT.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_transport_5
@@ -155,18 +162,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 166 "TRANSPORT.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_transport_5 = \&PDL::gsl_sf_transport_5;
+#line 172 "TRANSPORT.pm"
 
 
 
 
 
+#line 81 "gsl_sf_transport.pd"
 =head1 AUTHOR
 
 This file copyright (C) 1999 Christian Pellegrin <chri@infis.univ.trieste.it>
@@ -179,8 +187,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-
-
+#line 191 "TRANSPORT.pm"
 
 
 

@@ -4,13 +4,13 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.130880",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Log-Dispatch-Email-Sendmail",
    "no_index" : {
@@ -22,7 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Devel::CheckBin" : "0"
          }
       },
       "configure" : {
@@ -34,12 +34,31 @@
          "requires" : {
             "Log::Dispatch" : "0",
             "Sys::Hostname" : "0",
-            "Test::More" : "0.82",
+            "perl" : "5.006002"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Most" : "0",
             "Test::NoWarnings" : "0",
             "Test::Requires" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.02"
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Log-Dispatch-Email-Sendmail@rt.cpan.org",
+         "web" : "https://github.com/nigelhorne/Log-Dispatch-Email-Sendmail/issues",
+         "x_url" : "https://github.com/nigelhorne/Log-Dispatch-Email-Sendmail/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/Log-Dispatch-Email-Sendmail.git",
+         "web" : "https://github.com/nigelhorne/Log-Dispatch-Email-Sendmail",
+         "x_repisitory" : "https://github.com/nigelhorne/Log-Dispatch-Email-Sendmail"
+      }
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

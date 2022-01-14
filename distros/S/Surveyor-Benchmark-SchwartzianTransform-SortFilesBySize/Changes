@@ -1,5 +1,8 @@
 Revision history for Perl module Surveyor::Benchmark::SchwartzianTransform::SortFilesBySize
 
+0.123 2022-01-09T02:16:46Z
+	* No code changes. Fix a link in the README.pod.
+
 0.122 2021-01-23T19:53:46Z
 	* freshen distro, dump Travis CI, add Github Actions
 

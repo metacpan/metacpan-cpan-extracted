@@ -126,25 +126,11 @@ run_thread(void* arg) {
 	return NULL;
 }
 
-AV* S_clone_INC(pTHX) {
-	AV* inc = GvAVn(PL_incgv);
-	IV len = av_len(inc) + 1;
-	AV* copy = newAV();
-	int i;
-	for (i = 0; i < len; ++i) {
-		SV** entry = av_fetch(inc, i, FALSE);
-		if (entry && *entry && !SvROK(*entry))
-			av_push(copy, SvREFCNT_inc(*entry));
-	}
-	return copy;
-}
-#define clone_INC() S_clone_INC(aTHX)
-
 Promise* S_thread_spawn(pTHX_ AV* to_run) {
 	static const size_t stack_size = 512 * 1024;
 
 	av_unshift(to_run, 1);
-	av_store(to_run, 0, (SV*)clone_INC());
+	av_store(to_run, 0, (SV*)GvAVn(PL_incgv));
 
 	mthread* mthread = calloc(1, sizeof(*mthread));
 	Promise* input = promise_alloc(2);

@@ -1,3 +1,4 @@
+dist: trusty
 branches:
   except:
     - gh-pages
@@ -9,3 +10,6 @@ perl:
   - "5.14"
   - "5.12"
   - "5.10"
+before_install:
+  - cpanm --notest Test::Version
+#  - cpanm --notest Test::DistManifest   (should run make manifest before this)

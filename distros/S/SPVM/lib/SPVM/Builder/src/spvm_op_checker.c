@@ -3220,20 +3220,19 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                       is_valid = 0;
                     }
                   }
-                  // Source type is class type
-                  else if (SPVM_TYPE_is_class_type(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag)) {
-                    is_valid = 1;
-                  }
-                  // Source type is object type
-                  else if (SPVM_TYPE_is_object_type(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag)) {
-                    is_valid = 1;
-                  }
-                  // Source type is undef type
-                  else if (SPVM_TYPE_is_undef_type(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag)) {
-                    is_valid = 1;
-                  }
+                  // Dist type is ohter object types
                   else {
-                    is_valid = 0;
+                    // Source type is object type
+                    if (SPVM_TYPE_is_object_type(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag)) {
+                      is_valid = 1;
+                    }
+                    // Source type is undef type
+                    else if (SPVM_TYPE_is_undef_type(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag)) {
+                      is_valid = 1;
+                    }
+                    else {
+                      is_valid = 0;
+                    }
                   }
                 }
               }
@@ -3244,7 +3243,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               if (!is_valid) {
                 const char* src_type_name = SPVM_TYPE_new_type_name(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag);
                 const char* dist_type_name = SPVM_TYPE_new_type_name(compiler, dist_type->basic_type->id, dist_type->dimension, dist_type->flag);
-                SPVM_COMPILER_error(compiler, "Can't convert %s to %s by type convert at %s line %d\n", src_type_name, dist_type_name, op_src->file, op_src->line);
+                SPVM_COMPILER_error(compiler, "Can't convert %s to %s in type conversion at %s line %d\n", src_type_name, dist_type_name, op_src->file, op_src->line);
                 return;
               }
               
@@ -4642,16 +4641,15 @@ void SPVM_OP_CHECKER_resolve_call_method(SPVM_COMPILER* compiler, SPVM_OP* op_ca
     else {
       const char* basic_type_name = type->basic_type->name;
       
-      SPVM_CLASS* class = SPVM_HASH_fetch(compiler->class_symtable, basic_type_name, strlen(basic_type_name));
+      found_class = SPVM_HASH_fetch(compiler->class_symtable, basic_type_name, strlen(basic_type_name));
       
-      if (!class) {
+      if (!found_class) {
         SPVM_COMPILER_error(compiler, "Unknown instance method \"%s->%s\" at %s line %d\n", basic_type_name, method_name, op_call_method->file, op_call_method->line);
         return;
       }
       
-      found_class = class;
       found_method = SPVM_HASH_fetch(
-        class->method_symtable,
+        found_class->method_symtable,
         method_name,
         strlen(method_name)
       );
@@ -4674,15 +4672,19 @@ void SPVM_OP_CHECKER_resolve_call_method(SPVM_COMPILER* compiler, SPVM_OP* op_ca
         }
       }
       
-      SPVM_CLASS* class = SPVM_HASH_fetch(compiler->class_symtable, class_name, strlen(class_name));
-      assert(class);
+      found_class = SPVM_HASH_fetch(compiler->class_symtable, class_name, strlen(class_name));
       
-      found_class = class;
-      found_method = SPVM_HASH_fetch(
-        class->method_symtable,
-        method_name,
-        strlen(method_name)
-      );
+      if (found_class) {
+        found_method = SPVM_HASH_fetch(
+          found_class->method_symtable,
+          method_name,
+          strlen(method_name)
+        );
+      }
+      else {
+        SPVM_COMPILER_error(compiler, "Class \"%s\" not found at %s line %d\n", class_name, op_call_method->file, op_call_method->line);
+        return;
+      }
     }
     else {
       SPVM_COMPILER_error(compiler, "Unqualified method names are forbbiden \"%s\" at %s line %d\n", method_name, op_call_method->file, op_call_method->line);

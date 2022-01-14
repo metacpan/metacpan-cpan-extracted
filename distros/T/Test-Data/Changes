@@ -1,5 +1,8 @@
 Revision history for Perl module Test::Data
 
+1.244 2022-01-09T03:24:09Z
+	* no code changes. Fix a link in README.pod.
+
 1.243 2021-01-16T13:15:58Z
 	* freshen distro, remove Travis CI, add Github Actions
 

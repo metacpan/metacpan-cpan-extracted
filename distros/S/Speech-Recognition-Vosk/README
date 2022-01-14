@@ -1,0 +1,42 @@
+Speech::Recognition::Vosk - offline voice recognition using the Vosk toolkit
+
+
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+The Makefile.PL will download and compile the prerequisite C parts. If
+the automatic build fails, you'll have to run the shell
+script C<build-vosk-api.sh> yourself.
+
+The build file expects the following programs to be available:
+
+    cmake
+    autoconf
+    git
+    bash
+
+Consult https://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+
+
+
+
+
+
+
+
+
+

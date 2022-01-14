@@ -1,5 +1,8 @@
 Revision history for Perl module ConfigReader::Simple
 
+1.295 2022-01-09T00:15:28Z
+	* No code changes. Fix a link in the README.pod.
+
 1.294 2021-01-15T07:52:01Z
 	* freshen distro, remove Travis CI, add Github Actions
 	* fix problem with blank line ending processing (Github #2, Axel Beckert)

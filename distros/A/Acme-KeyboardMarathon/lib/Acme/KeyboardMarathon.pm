@@ -1,5 +1,5 @@
 package Acme::KeyboardMarathon;
-$Acme::KeyboardMarathon::VERSION = '1.25';
+$Acme::KeyboardMarathon::VERSION = '1.27';
 
 use Carp;
 use Data::Dumper;
@@ -14,6 +14,14 @@ sub new {
   my $class = shift @args;
   my $self = {};
   bless($self,$class);
+
+  croak("Odd number of arguments") if @args%2;
+  my %args = @args;
+  my $layout = delete $args{layout} || 'qwerty';
+  croak("Unsupported layout $layout")
+    unless $layout =~ /^(?:qwerty|dvorak)\z/;
+
+  croak "Unknown options: " . join ", ", keys(%args) if keys %args;
 
   # all measures in 100ths of a cm
 
@@ -33,6 +41,17 @@ sub new {
   map { $self->{k}->{$_} = 230 } ( qw/[ {/ );
   map { $self->{k}->{$_} = 200 } ( qw/Q q W w G g H h E e R r T t Y y U u I i O o P p Z z X x C c V v N n M m , < > . \/ ? ' "/ );
   map { $self->{k}->{$_} =   0 } ( qw/A a S s D d F f J j K k L l ; :/ );
+
+  if ($layout eq 'dvorak') {
+    map { $self->{k}->{$_} = 550 } ( '\\', '|' );
+    map { $self->{k}->{$_} = 500 } ( qw/6 ^ ` ~/ );
+    map { $self->{k}->{$_} = 450 } ( qw/] }/ );
+    map { $self->{k}->{$_} = 400 } ( qw/+ = 1 2 3 4 7 8 9 0 5 [ { ! @ # $ % & * ( )/ );
+    map { $self->{k}->{$_} = 350 } ( qw/X x/ );
+    map { $self->{k}->{$_} = 230 } ( qw/? \// );
+    map { $self->{k}->{$_} = 200 } ( qw/" ' < , I i D d > . P p Y y F f G g C c R r L l : ; Q q J j K k B b M m W w V v Z z - _/ );
+    map { $self->{k}->{$_} =   0 } ( qw/A a O o E e U u H h T t N n S s/ );
+  }
 
   $self->{k}->{"\n"} = 400;
   $self->{k}->{"\t"} = 230;
@@ -192,9 +211,6 @@ and horizontal motion of the finger. The motion traversed is actually an
 arc, and while that calculation would be more accurate, this is an 
 Acme module, after all. Send me a patch with the right math if you're bored.
 
-* A QWERTY keyboard is assumed. DVORAK people are thus left out in the cold. 
-As they should be. The freaks.
-
 * I assume there are no gaps between your keys. This means all those stylish 
 Mac keyboard folks are actually doing more work than they're credited for. 
 But I'm ok with that.
@@ -226,11 +242,11 @@ diacritics later, so I can feel better while still ignoring UTF's existence.
 
 =head1 VERSION
 
-	Acme::KeyboardMarathon v1.25 (2016/08/23)
+	Acme::KeyboardMarathon v1.27 (2022/01/07)
 
 =head1 COPYRIGHT
 
-	(c) 2012-2016, Evelyn Klein <evelykay@gmail.com> & Phillip Pollard <bennie@cpan.org>
+	(c) 2012-2022, Evelyn Klein <evelykay@gmail.com> & Phillip Pollard <bennie@cpan.org>
 
 =head1 LICENSE
 
@@ -240,13 +256,16 @@ reviewed here: http://opensource.org/licenses/artistic-license-2.0
 
 =head1 AUTHORSHIP
 
-Evelyn Klein <Evelyn.klein@gmail.com> & Phillip Pollard <bennie@cpan.org>
+Evelyn Klein <evelykay@gmail.com> & Phillip Pollard <bennie@cpan.org>
 
 As much as I wish I could be fully blamed for this, I must admit that
-Mr. Evelyn Klein came up with the awesome idea, took the time to make the
+Mrs. Evelyn Klein came up with the awesome idea, took the time to make the
 measurements, and wrote the original code in Python. I just made sure it 
 was less readable, in Perl.
 
 A significant boost in speed via a patch from James Raspass <jraspass@gmail.com>
 
 Additional patches from Mark A. Smith. <jprogrammer082@gmail.com>
+
+Non-judgemental support for DVORAK keyboards added anonymously by RT user
+'spro^^*%*^6ut#@&$%*c in https://rt.cpan.org/Ticket/Display.html?id=117203

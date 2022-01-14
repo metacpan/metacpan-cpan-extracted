@@ -3,9 +3,8 @@ use warnings;
 
 use lib 't/lib';
 
-unless (0) { require If::BeforeRequire }    # ignored
-unless (1) { require If::BeforeRequire }    # ignored by parser
+unless (0) { require Module::Exists }                # ignored by parser
+unless (1) { require Module::Exists::Unexpected }    # ignored
 
-require Dummy;                              # does not exist anywhere
+require Acme::BadExample;                            # does not exist anywhere
 
-exit;

@@ -1,4 +1,3 @@
-# This file must be saved in UTF-8 encoding!
 use strict;
 use warnings;
 use Test::More;
@@ -66,13 +65,17 @@ if (!($ENV{'HARNESS_ACTIVE'} || ($^O eq 'MSWin32'))) {	# experimental: that's wh
 	if (-x $php) {
 		my $phpversion = `php -v`;
 		$phpversion =~ s/^PHP (\S+)\s.*/$1/s;
+		my $too_old;
 		if ($phpversion =~ /^(\d{1,3}\.\d{1,6})\b/) {
 			#if ($1 < 5.5) {
 			if ($1 < 7.3) {
-				undef($php);
+				$too_old = 1;
 			}
 		}
-		diag("Found PHP executable $php with version $phpversion: " . ($php ? 'OK' : 'TOO OLD') . "\n");
+		note("Found PHP executable $php with version $phpversion: " . ($too_old ? 'TOO OLD' : 'OK') . "\n");
+		if ($too_old) {
+			undef($php);
+		}
 	}
 	else {
 		undef($php);
@@ -81,7 +84,7 @@ if (!($ENV{'HARNESS_ACTIVE'} || ($^O eq 'MSWin32'))) {	# experimental: that's wh
 		require	JSON::PP;
 	};
 	if ($@) {
-		diag("JSON::PP not avaible. Won't use PHP\n");
+		note("JSON::PP not avaible. Won't use PHP\n");
 		undef($php);
 	}
 }
@@ -102,11 +105,11 @@ foreach my $crypted (sort keys %tests_info) {
 	my $expect = $tests_info{$crypted};
 
 	my $info = $class->get_info($crypted);
-	#diag(JSON::PP::encode_json($info));
+	#note(JSON::PP::encode_json($info));
 	is_deeply($info, $expect, "$class->get_info(\"$crypted\")");
 
 	$info = password_get_info($crypted);
-	#diag(JSON::PP::encode_json($info));
+	#note(JSON::PP::encode_json($info));
 	is_deeply($info, $expect, "password_get_info(\"$crypted\")");
 
 	if ($php) {
@@ -121,7 +124,7 @@ foreach my $crypted (sort keys %tests_info) {
 		delete($expect->{'salt'});
 		delete($expect->{'hash'});
 		delete($expect->{'version'});
-		#diag("$json\n");
-		is_deeply($info, $expect, "PHP's password_get_info(\"$crypted\")");
+		#note("$json\n");
+		is_deeply($info, $expect, "PHP's password_get_info(\"$crypted\") matches ours");
 	}
 }

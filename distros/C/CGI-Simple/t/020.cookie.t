@@ -9,8 +9,11 @@ BEGIN {
   *CORE::GLOBAL::time = sub { 100 };
 }
 
-use Test::More tests => 98;
 use strict;
+use warnings;
+use Test::More tests => 115;
+use Test::NoWarnings;
+
 use CGI::Simple::Util qw(escape unescape);
 use POSIX qw(strftime);
 
@@ -165,7 +168,8 @@ my @test_cookie = (
     -domain   => '.capricorn.com',
     -path     => '/cgi-bin/database',
     -secure   => 1,
-    -httponly => 1
+    -httponly => 1,
+    -samesite => 'Lax'
   );
   is( ref( $c ), 'CGI::Simple::Cookie',
     'new returns objects of correct type' );
@@ -180,6 +184,7 @@ my @test_cookie = (
   is( $c->path,   '/cgi-bin/database', 'path is correct' );
   ok( $c->secure,   'secure attribute is set' );
   ok( $c->httponly, 'httponly attribute is set' );
+  is( $c->samesite, 'Lax', 'samesite attribute is correct' );
 
 # now try it with the only two manditory values (should also set the default path)
   $c = CGI::Simple::Cookie->new(
@@ -191,10 +196,12 @@ my @test_cookie = (
   is( $c->name,  'baz', 'name is correct' );
   is( $c->value, 'qux', 'value is correct' );
   ok( !defined $c->expires, 'expires is not set' );
+  ok( !defined $c->max_age, 'max_age is not set' );
   ok( !defined $c->domain,  'domain attributeis not set' );
   is( $c->path, '/', 'path atribute is set to default' );
   ok( !defined $c->secure,   'secure attribute is not set' );
   ok( !defined $c->httponly, 'httponly attribute is not set' );
+  ok( !defined $c->samesite, 'samesite attribute is not set' );
 
   # I'm really not happy about the restults of this section.  You pass
   # the new method invalid arguments and it just merilly creates a
@@ -221,13 +228,15 @@ my @test_cookie = (
 
 {
   my $c = CGI::Simple::Cookie->new(
-    -name     => 'Jam',
-    -value    => 'Hamster',
-    -expires  => '+3M',
-    -domain   => '.pie-shop.com',
-    -path     => '/',
-    -secure   => 1,
-    -httponly => 1
+    -name      => 'Jam',
+    -value     => 'Hamster',
+    -expires   => '+3M',
+    '-max-age' => '+3M',
+    -domain    => '.pie-shop.com',
+    -path      => '/',
+    -secure    => 1,
+    -httponly  => 1,
+    -samesite  => 'strict'
   );
 
   my $name = $c->name;
@@ -241,6 +250,10 @@ my @test_cookie = (
   like( $c->as_string, "/$expires/",
     "Stringified cookie contains expires" );
 
+  my $max_age = $c->max_age;
+  like( $c->as_string, "/$max_age/",
+    "Stringified cookie contains max_age" );
+
   my $domain = $c->domain;
   like( $c->as_string, "/$domain/",
     "Stringified cookie contains domain" );
@@ -253,6 +266,9 @@ my @test_cookie = (
 
   like( $c->as_string, '/HttpOnly/',
     "Stringified cookie contains HttpOnly" );
+
+  like( $c->as_string, '/SameSite=Strict/',
+    "Stringified cookie contains normalized SameSite" );
 
   $c = CGI::Simple::Cookie->new(
     -name  => 'Hamster-Jam',
@@ -269,6 +285,9 @@ my @test_cookie = (
   ok( $c->as_string !~ /expires/,
     "Stringified cookie has no expires field" );
 
+  ok( $c->as_string !~ /max-age/,
+    "Stringified cookie has no max_age field" );
+
   ok( $c->as_string !~ /domain/,
     "Stringified cookie has no domain field" );
 
@@ -280,6 +299,9 @@ my @test_cookie = (
 
   ok( $c->as_string !~ /HttpOnly/,
     "Stringified cookie does not contain HttpOnly" );
+
+  ok( $c->as_string !~ /SameSite/,
+    "Stringified cookie does not contain SameSite" );
 }
 
 #-----------------------------------------------------------------------------
@@ -348,7 +370,8 @@ my @test_cookie = (
     -domain   => '.pie-shop.com',
     -path     => '/',
     -secure   => 1,
-    -httponly => 1
+    -httponly => 1,
+    -samesite => 'strict'
   );
 
   is( $c->name,            'Jam',   'name is correct' );
@@ -396,6 +419,13 @@ my @test_cookie = (
   ok( $c->httponly,       'httponly attribute is set' );
   ok( !$c->httponly( 0 ), 'httponly attribute is cleared' );
   ok( !$c->httponly,      'httponly attribute is cleared' );
+
+  is( $c->samesite,           'Strict', 'SameSite is correct' );
+  is( $c->samesite( 'Lax' ), 'Lax',    'SameSite is set correctly' );
+  is( $c->samesite,          'Lax',    'SameSite now returns updated value' );
+
+  is( $c->samesite( 'None' ), 'None',    'SameSite is set correctly' );
+  is( $c->samesite,          'None',    'SameSite now returns updated value' );
 }
 
 #----------------------------------------------------------------------------
@@ -424,6 +454,24 @@ MAX_AGE: {
 
     $cookie->max_age( '113' );
     is $cookie->max_age => 13, 'max_age(num) as delta';
+  }
+
+  {
+    my $cookie
+     = CGI::Simple::Cookie->new( -name=>'a', value=>'b', '-max-age' => '+3d');
+    is( $cookie->max_age,3*24*60*60,'-max-age in constructor' );
+    ok( !$cookie->expires,' ... lack of expires' );
+  }
+
+  {
+    my $cookie = CGI::Simple::Cookie->new(
+      -name    => 'a',
+      value    => 'b',
+      -expires => 'now',
+      '-max-age' => '+3d'
+    );
+    is( $cookie->max_age,3*24*60*60,'-max-age in constructor' );
+    ok( $cookie->expires,'-expires in constructor' );
   }
 }
 

@@ -7,12 +7,16 @@
 
 package PDL::Graphics::TriD::GoBoard;
 
+use strict;
+use warnings;
 use base qw/PDL::Graphics::TriD::Object/;
 use fields qw /Data InLays BG/;
 
 use OpenGL qw(:all);
 use PDL::Graphics::OpenGL::Perl::OpenGL;
 use PDL::Lite;
+
+$PDL::Graphics::TriD::verbose //= 0;
 
 sub new {
 	my($type,$opts) = @_;

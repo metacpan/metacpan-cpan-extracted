@@ -29,3 +29,5 @@ __PACKAGE__->meta->make_immutable;
 1;
 
 __END__
+
+# vim: ts=4 sts=4 sw=4 et: syntax=perl

@@ -1,3 +1,12 @@
+0.3.1    2022-01-07
+
+- add the bool_supported method that can be used to detect
+  whether the BOOL type is supported
+
+0.3.0    2022-01-07
+
+- add support for BOOL type on perl 5.35.7 and later
+
 0.2.0    2021-11-08
 
 - add sizeof() function for numeric types

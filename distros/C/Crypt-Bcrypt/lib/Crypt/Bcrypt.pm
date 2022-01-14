@@ -1,5 +1,5 @@
 package Crypt::Bcrypt;
-$Crypt::Bcrypt::VERSION = '0.002';
+$Crypt::Bcrypt::VERSION = '0.005';
 use strict;
 use warnings;
 
@@ -37,7 +37,7 @@ Crypt::Bcrypt - A modern bcrypt implementation
 
 =head1 VERSION
 
-version 0.002
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -53,7 +53,9 @@ version 0.002
 
 This module provides a modern and user-friendly implementation of the bcrypt password hash.
 
-Note that in bcrypt passwords may only contain 72 characters.
+Note that in bcrypt passwords may only contain 72 characters. It may seem tempting to prehash the password before bcrypting it but that may make it vulnerable to password shucking, a salted solution (for example using a MAC) should be used instead if one wants to support large passwords.
+
+The password is always expected to come as a (utf8-encoded) byte-string.
 
 =head1 FUNCTIONS
 
@@ -91,7 +93,17 @@ This checks if the C<$password> satisfies the C<$hash>, and does so in a timing-
 
 =head1 SEE OTHER
 
-L<Crypt::Eksblowfish::Bcrypt|Crypt::Eksblowfish::Bcrypt> also offers bcrypt, but only supports the C<2a> subtype.
+=over 4
+
+=item * L<Crypt::Passphrase|Crypt::Passphrase>
+
+This is usually a better approach to managing your passwords, it can use this module via L<Crypt::Passphrase::Bcrypt|Crypt::Passphrase::Bcrypt>. It adds support for automatic pre-hashing, and facilitates upgrading the algorithm parameters or even the algorithm itself.
+
+=item * L<Crypt::Eksblowfish::Bcrypt|Crypt::Eksblowfish::Bcrypt>
+
+This also offers bcrypt, but only supports the C<2a> subtype.
+
+=back
 
 =head1 AUTHOR
 

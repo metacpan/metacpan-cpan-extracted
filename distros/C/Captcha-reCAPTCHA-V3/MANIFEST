@@ -11,5 +11,6 @@ share/template.tx
 t/00_compile.t
 t/01_compatibility.t
 t/02_javascript.t
+t/03_overload.t
 META.yml
 MANIFEST

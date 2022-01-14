@@ -255,3 +255,25 @@ CODE:
   RETVAL = newRV_inc((SV *)results);
 OUTPUT:
   RETVAL
+
+SV *
+hb_buffer_get_font_extents( hb_font_t *font, bytestring_t s, size_t length(s) )
+PREINIT:
+  hb_direction_t dir;
+INIT:
+  HV* rh;
+  rh = (HV *)sv_2mortal((SV *)newHV());
+CODE:
+  dir = hb_direction_from_string(s, XSauto_length_of_s);
+  if ( !dir )
+    XSRETURN_UNDEF;
+
+  hb_font_extents_t e;
+  hb_font_get_extents_for_direction( font, dir, &e );
+  hv_store(rh, "ascender",  8, newSViv(e.ascender),  0);
+  hv_store(rh, "descender", 9, newSViv(e.descender), 0);
+  hv_store(rh, "line_gap",  8, newSViv(e.line_gap),  0);
+
+  RETVAL = newRV_inc((SV *)rh);
+OUTPUT:
+  RETVAL

@@ -1,0 +1,58 @@
+{
+   "abstract" : "generating data-only Excel workbooks in XLSX format, fast",
+   "author" : [
+      "Laurent Dami <dami@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Excel-ValueWriter-XLSX",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Zip" : "0",
+            "Carp" : "0",
+            "Date::Calc" : "0",
+            "List::Util" : "0",
+            "POSIX" : "0",
+            "Params::Validate" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.014001",
+            "utf8" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Excel::ValueWriter::XLSX" : {
+         "file" : "lib/Excel/ValueWriter/XLSX.pm",
+         "version" : "0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/damil/Excel-ValueWriter-XLSX"
+      }
+   },
+   "version" : "0.1",
+   "x_serialization_backend" : "JSON::PP version 4.05"
+}

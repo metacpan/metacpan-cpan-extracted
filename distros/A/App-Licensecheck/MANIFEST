@@ -9,12 +9,16 @@ META.yml
 Makefile.PL
 README
 SIGNATURE
-TODO
+TODO.md
 bin/licensecheck
 dist.ini
 doap.ttl
 lib/App/Licensecheck.pm
 scripts/licensecheck.bash_completion
+t/20-script-encoding.t
+t/20-script-no-RE2.t
+t/20-script-report.t
+t/20-script-resolve.t
 t/OSI.t
 t/OSI/AFL-3.0
 t/OSI/AGPL-3.0
@@ -133,7 +137,6 @@ t/SPDX/curl.txt
 t/SPDX/zlib-acknowledgement.txt
 t/Software-License.t
 t/basic-lib-no-RE2.t
-t/basic-script-no-RE2.t
 t/devscripts.t
 t/devscripts/academic.h
 t/devscripts/artistic-2-0-modules.pm
@@ -176,7 +179,6 @@ t/devscripts/mpl-2.0.sh
 t/devscripts/multi-line-copyright.c
 t/devscripts/regexp-killer.c
 t/devscripts/texinfo.tex
-t/encoding.t
 t/encoding/README.gs550j
 t/encoding/copr-iso8859.h
 t/encoding/copr-utf8.h
@@ -283,8 +285,7 @@ t/grant/NTP/map.h
 t/grant/NTP/monlist.c
 t/grant/WTFPL/COPYING.WTFPL
 t/grant/misc/rpplexer.h
-t/lib/Test2/Licensecheck.pm
 t/lib/Test2/Licensecheck/ScanCode.pm
 t/lib/Test2/Require/TestCorpus.pm
 t/license.t
-t/options-resolve.t
+t/reading.t

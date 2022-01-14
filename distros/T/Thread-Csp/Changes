@@ -1,5 +1,8 @@
 Revision history for Thread-Csp
 
+0.005     2022-01-07 14:46:45+01:00 Europe/Amsterdam
+          - Improve compatibility with older perl versions
+
 0.004     2022-01-04 18:44:16+01:00 Europe/Amsterdam
           - Fix allocation of mthread
           - Add atomics support for Visual C++

@@ -1,12 +1,16 @@
-use Test::More tests => 319;
-use Carp;
 use strict;
+use warnings;
+use Test::More tests => 320;
+use Test::NoWarnings;
+use Carp;
+use File::Temp qw(tempdir);
 use vars qw(%field %in);
 
 use CGI::Simple;
 
 my ( $q, $sv, @av );
-my $tmpfile = './cgi-tmpfile.tmp';
+my $dir = tempdir( CLEANUP => 1 );
+my $tmpfile = "$dir/cgi-tmpfile.tmp";
 
 $ENV{'AUTH_TYPE'}      = 'PGP MD5 DES rot13';
 $ENV{'CONTENT_LENGTH'} = '42';
@@ -639,6 +643,7 @@ $upload = join '', <$handle>;
 is( $upload, $data, 'upload(\'invalid\'), 4' );
 $sv = $q->upload( '/some/path/to/myfile', "$tmpfile.bak" );
 is( $sv, undef, 'upload(\'invalid\'), 5' );
+close($handle);
 unlink $tmpfile, "$tmpfile.bak";
 
 $ENV{'CONTENT_TYPE'} = 'application/x-www-form-urlencoded';
@@ -910,7 +915,7 @@ ok( $sv =~ /Date:$1GMT/ . 'cache(1), 4' );
 # redirect() - scalar and array context, void argument
 $sv     = $q->redirect( 'http://a.galaxy.far.away.gov' );
 $header = <<'HEADER';
-Status: 302 Moved
+Status: 302 Found
 Expires: Tue, 13 Nov 2001 06:45:15 GMT
 Date: Tue, 13 Nov 2001 06:45:15 GMT
 Pragma: no-cache
@@ -925,9 +930,9 @@ is( $sv, $header, 'redirect(), 1' );
 # redirect() - scalar and array context, void argument
 $sv = $q->redirect( -uri => 'http://a.galaxy.far.away.gov', -nph => 1 );
 $header = <<'HEADER';
-HTTP/1.0 302 Moved
+HTTP/1.0 302 Found
 Server: Apache - accept no substitutes
-Status: 302 Moved
+Status: 302 Found
 Expires: Tue, 13 Nov 2001 06:49:24 GMT
 Date: Tue, 13 Nov 2001 06:49:24 GMT
 Pragma: no-cache

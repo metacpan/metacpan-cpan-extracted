@@ -4,8 +4,6 @@ PDL::IO::Pic -- image I/O for PDL
 
 =head1 DESCRIPTION
 
-=head2 Image I/O for PDL based on the netpbm package.
-
 This package implements I/O for a number of popular image formats
 by exploiting the xxxtopnm and pnmtoxxx converters from the netpbm package
 (which is based on the original pbmplus by Jef Poskanzer).
@@ -31,10 +29,14 @@ temporary directory). For this to work you need the program ffmpeg also.
 
 package PDL::IO::Pic;
 
+use strict;
+use warnings;
 
-@EXPORT_OK = qw( wmpeg rim wim rpic wpic rpiccan wpiccan imageformat);
+our @EXPORT_OK = ('imageformat', map +("r$_", "w$_"), qw(mpeg im pic piccan));
+our %EXPORT_TAGS = (Func => \@EXPORT_OK);
+our ($Dflags, %converter);
+our @ISA    = qw( PDL::Exporter );
 
-%EXPORT_TAGS = (Func => [@EXPORT_OK]);
 use PDL::Core;
 use PDL::Exporter;
 use PDL::Types;
@@ -43,15 +45,9 @@ use PDL::IO::Pnm;
 use PDL::Options;
 use PDL::Config;
 use File::Basename;
-use SelfLoader;
 use File::Spec;
-require File::Temp;
-
-use strict;
-use vars qw( $Dflags @ISA %converter );
-
-@ISA    = qw( PDL::Exporter );
-
+use Text::ParseWords qw(shellwords);
+use File::Which ();
 
 =head2 Configuration
 
@@ -139,62 +135,21 @@ sub init_converter_table {
   my $key;
   for $key (sort keys %converter) {
 
-    $converter{$key}->{Rok} = inpath($converter{$key}->{'get'})
+    $converter{$key}->{Rok} = File::Which::which($converter{$key}->{'get'})
       if defined($converter{$key}->{'get'});
 
-    $converter{$key}->{Wok} = inpath($converter{$key}->{'put'})
+    $converter{$key}->{Wok} = File::Which::which($converter{$key}->{'put'})
       if defined($converter{$key}->{'put'});
 
     if (defined $converter{$key}->{Prefilt}) {
       my $filt = $1 if $converter{$key}->{Prefilt} =~ /^\s*(\S+)\s+/;
-      $converter{$key}->{Wok} = inpath($filt) if $converter{$key}->{Wok};
+      $converter{$key}->{Wok} = File::Which::which($filt) if $converter{$key}->{Wok};
     }
   }
 
-  $PDL::IO::Pic::biggrays = &hasbiggrays();
-  print "using big grays\n" if $PDL::IO::Pic::debug &&
-    $PDL::IO::Pic::biggrays;
-
   for (sort keys %converter) {
-    $converter{$_}->{ushortok} = $PDL::IO::Pic::biggrays ?
-      (m/GIF/ ? 0 : 1) : (m/GIF|RAST|IFF/ ? 0 : 1);
+    $converter{$_}{ushortok} = (m/GIF/ ? 0 : 1);
   }
-}
-
-sub inpath {
-  my ($prog) = @_;
-  my $pathsep = $^O =~ /win32/i ? ';' : ':';
-  my $exe = $^O =~ /win32/i ? '.exe' : '';
-  for(split $pathsep,$ENV{PATH}){return 1 if -x "$_/$prog$exe" || $prog =~ /^NONE$/}
-  return 0;
-}
-
-
-sub hasbiggrays {
-  my ($checked,$form) = (0,'');
-  require IO::File;
-  for (&rpiccan()) { next if /^PNM$/; $form = $_; $checked=1; last }
-  unless ($checked) {
-    warn "PDL::IO::Pic - couldn't find any pbm converter"
-      if $PDL::IO::Pic::debug;
-    return 0;
-  }
-  *SAVEERR = *SAVEERR;  # stupid fix to shut up -w (AKA pain-in-the-...-flag)
-  open(SAVEERR, ">&STDERR");
-  my $tmp = new_tmpfile IO::File or barf "couldn't open tmpfile";
-  my $pos = $tmp->getpos;
-  my $txt;
-  { local *IN;
-    *IN = *$tmp;  # doesn't seem to work otherwise
-    open(STDERR,">&IN") or barf "couldn't redirect stdder";
-
-    system("$converter{$form}->{get} -version");
-    open(STDERR, ">&PDL::IO::Pic::SAVEERR");
-    $tmp->setpos($pos);  # rewind
-    $txt = join '',<IN>;
-    close IN; undef $tmp;
-  }
-  return ($txt =~ /PGM_BIGGRAYS/);
 }
 
 =head1 FUNCTIONS
@@ -312,15 +267,23 @@ sub PDL::rpic {
       }
     }
 
-    my $flags = $converter{$type}->{FLAGS};
-    $flags = "$Dflags" unless defined($flags);
-    $flags .= " $$hints{XTRAFLAGS}" if defined($$hints{XTRAFLAGS});
-    my $cmd = qq{$converter{$type}->{get} $flags "$file" |};
-    $cmd = $file if $converter{$type}->{'get'} =~ /^NONE/;
-
-    print("conversion by '$cmd'\n") if $PDL::IO::Pic::debug > 10;
-
-    return rpnm($pdl,$cmd);
+    my $fh;
+    if ($converter{$type}->{'get'} =~ /^NONE/) {
+      open $fh, $file;
+    } else {
+      my @cmd = $converter{$type}->{get};
+      push @cmd, shellwords $converter{$type}->{FLAGS} // $Dflags;
+      push @cmd, shellwords $$hints{XTRAFLAGS} if defined($$hints{XTRAFLAGS});
+      open $fh, '-|', @cmd, $file
+        or barf "spawning '@cmd' failed: $? ($!)";
+      print "conversion by '@cmd'\n" if $PDL::IO::Pic::debug > 10;
+    }
+    binmode $fh;
+    my @frames;
+    while (!eof $fh) {
+      push @frames, rpnm $fh;
+    }
+    @frames == 1 ? $frames[0] : cat(@frames);
 }
 
 =head2 wpic
@@ -688,6 +651,38 @@ sub PDL::wim {
   wpic(@args);
 }
 
+=head2 rmpeg
+
+=for ref
+
+Read an image sequence (a (3,x,y,n) byte pdl) from an animation.
+
+=for usage
+
+  $ndarray = rmpeg('movie.mpg'); # $ndarray is (3,x,y,nframes) byte
+
+Reads a stack of RGB images from a movie. While the
+format generated is nominally MPEG, the file extension
+is used to determine the video encoder type.
+It uses the program C<ffmpeg>, and throws an exception if not found.
+
+=cut
+
+*rmpeg = \&PDL::rmpeg;
+sub PDL::rmpeg {
+  barf 'Usage: rmpeg($filename)' if @_ != 1;
+  my ($file) = @_;
+  die "rmpeg: ffmpeg not found in PATH" if !File::Which::which('ffmpeg');
+  open my $fh, '-|', qw(ffmpeg -loglevel quiet -i), $file, qw(-f image2pipe -codec:v ppm -)
+    or barf "spawning ffmpeg failed: $?";
+  binmode $fh;
+  my @frames;
+  while (!eof $fh) {
+    push @frames, rpnm $fh;
+  }
+  cat(@frames);
+}
+
 =head2 wmpeg
 
 =for ref
@@ -701,13 +696,8 @@ Write an image sequence (a (3,x,y,n) byte pdl) as an animation.
 Writes a stack of RGB images as a movie.  While the
 format generated is nominally MPEG, the file extension
 is used to determine the video encoder type.
-
-  E.g.:
-    .mpg for MPEG-1 encoding
-    .mp4 for MPEG-4 encoding
-
-  And even:
-    .gif for GIF animation (uncompressed)
+E.g. F<.mpg> for MPEG-1 encoding, F<.mp4> for MPEG-4 encoding, F<.gif>
+for GIF animation
 
 C<wmpeg> requires a 4-D pdl of type B<byte> as
 input.  The first dim B<has> to be of size 3 since
@@ -716,19 +706,30 @@ C<wmpeg> returns 1 on success and undef on failure.
 
 =for example
 
-  $anim->wmpeg("GreatAnimation.mpg")
-      or die "can't create mpeg1 output";
+  use strict; use warnings;
+  use PDL;
+  use PDL::IO::Pic;
+  my ($width, $height, $framecount, $xvel, $maxheight, $ballsize) = (320, 80, 100, 15, 60, 8);
+  my $frames = zeros byte, $width, $height, $framecount;
+  my $coords = yvals(3, $framecount); # coords for drawing ball, all val=frameno
+  my ($xcoords, $ycoords) = map $coords->slice($_), 0, 1;
+  $xcoords *= $xvel; # moves $xvel pixels/frame
+  $xcoords .= $width - abs(($xcoords % (2*$width)) - $width); # back and forth
+  my $sqrtmaxht = sqrt $maxheight;
+  $ycoords .= indx($maxheight - ((($ycoords % (2*$sqrtmaxht)) - $sqrtmaxht)**2));
+  my $val = pdl(byte,250);  # start with white
+  $frames->range($coords, [$ballsize,$ballsize,1], 't') .= $val;
+  $frames = $frames->dummy(0, 3)->copy; # now make the movie
+  $frames->wmpeg('bounce.gif');  # or bounce.mp4, ffmpeg deals OK
 
-  $anim->wmpeg("GreatAnimation.mp4")
-      or die "can't create mpeg4 output";
+  # iterate running this with:
+  rm bounce.gif; perl scriptname.pl && animate bounce.gif
 
 Some of the input data restrictions will have to
 be relaxed in the future but routine serves as
 a proof of principle at the moment. It uses the
 program ffmpeg to encode the frames into video.
-The arguments and parameters used for ffmpeg have
-not been tuned. This is a first implementation
-replacing mpeg_encode by ffmpeg. Currently, wmpeg
+Currently, wmpeg
 doesn't allow modification of the parameters
 written through its calling interface. This will
 change in the future as needed.
@@ -744,70 +745,37 @@ in memory to be passed into wmpeg (when you are,
 e.g. writing a large animation from PDL3D rendered
 fly-throughs).
 
-Having said that, the actual storage requirements
-might not be so big in the future any more if
-you could pass 'virtual' transform pdls into
-wmpeg that will only be actually calculated when
-accessed by the wpic routines, you know what I
-mean...
-
-
 =cut
 
 *wmpeg = \&PDL::wmpeg;
-
 sub PDL::wmpeg {
-   barf 'Usage: wmpeg($pdl,$filename) ' .
-   'or $pdl->wmpeg($filename)' if $#_ != 1;
-
+   barf 'Usage: wmpeg($pdl,$filename) or $pdl->wmpeg($filename)' if @_ != 2;
    my ($pdl,$file) = @_;
-
    # return undef if no ffmpeg in path
-   if (! inpath('ffmpeg')) {
+   if (! File::Which::which('ffmpeg')) {
       warn("wmpeg: ffmpeg not found in PATH");
       return;
    }
-
    my @Dims = $pdl->dims;
    # too strict in general but alright for the moment
    # especially restriction to byte will have to be relaxed
    barf "input must be byte (3,x,y,z)" if (@Dims != 4) || ($Dims[0] != 3)
    || ($pdl->get_datatype != $PDL_B);
    my $nims = $Dims[3];
-   my $tmp = File::Temp::tempdir(CLEANUP=>1);
-
-   # get tmpdir for parameter file
-   # see PDL-2.4.6 version for original code
-
-   # check the pdl for correct dimensionality
-
-   # write all the images as ppms and write the appropriate parameter file
-   my ($i,$fname);
-   # add blank cells to each image to fit with 16N x 16N mpeg standard
-   # $frame is full frame, insert each image in as $inset
+   # $frame is 16N x 16N frame (per mpeg standard), insert each image in as $inset
    my (@MDims) = (3,map(16*int(($_+15)/16),@Dims[1..2]));
-   my ($frame) = zeroes(byte,@MDims);
-   my ($inset) = $frame->slice(join(',',
-         map(int(($MDims[$_]-$Dims[$_])/2).':'.
-            int(($MDims[$_]+$Dims[$_])/2-1),0..2)));
-   my $range = sprintf "[%d-%d]",0,$nims-1;
+   my $frame = zeroes(byte,@MDims);
+   my $inset = $frame->slice(join ',',
+         map int(($MDims[$_]-$Dims[$_])/2).':'.
+            int(($MDims[$_]+$Dims[$_])/2-1),0..2);
    local $SIG{PIPE} = 'IGNORE';
-   open MPEG, "| ffmpeg -f image2pipe -vcodec ppm -i -  $file"
+   open my $fh, '|-', qw(ffmpeg -loglevel quiet -f image2pipe -codec:v ppm -i -), $file
       or barf "spawning ffmpeg failed: $?";
-   binmode MPEG;
-   # select ((select (MPEG), $| = 1)[0]);  # may need for win32
-   my (@slices) = $pdl->dog;
-   for ($i=0; $i<$nims; $i++) {
-      local $PDL::debug = 1;
-      print STDERR "Writing frame $i, " . $frame->slice(':,:,-1:0')->clump(2)->info . "\n";
-      $inset .= $slices[$i];
-      print MPEG "P6\n$MDims[1] $MDims[2]\n255\n";
-      pnmout($frame->slice(':,:,-1:0')->clump(2), 1, 0, 'PDL::IO::Pic::MPEG');
+   binmode $fh;
+   for ($pdl->dog) {
+      $inset .= $_;
+      wpnm($frame, $fh, 'PPM', 1);
    }
-   # clean up
-   close MPEG;
-
-   # rm tmpdir and files if needed
    return 1;
 }
 
@@ -840,12 +808,6 @@ sub PDL::imageformat {
     my($class, $file)=@_;
     return chkform($file);
 }
-
-1; # Return OK status
-
-__DATA__
-
-# SelfLoaded code
 
 sub piccan {
   my $class = shift;
@@ -910,18 +872,16 @@ sub chkext {
 sub chkform {
     my $file = shift;
     my ($format, $magic, $len, $ext) = ("","",0,"");
-
-    open(IMG, $file) or barf "Can't open image file";
-    binmode IMG;
+    open my $fh, $file or barf "Can't open image file";
+    binmode $fh;
     # should first check if file is long enough
-    $len = read(IMG, $magic,12);
+    $len = read($fh, $magic,12);
     if (!defined($len) ||$len != 12) {
 	barf "end of file when checking magic number";
-	close IMG;
+	close $fh;
 	return 'UNKNOWN';
     }
-    close IMG;
-
+    close $fh;
     return 'PNM'  if $magic =~ /^P[1-6]/;
     return 'GIF'  if $magic =~ /(^GIF87a)|(^GIF89a)/;
     return 'TIFF' if $magic =~ /(^MM)|(^II)/;
@@ -933,8 +893,6 @@ sub chkform {
     return 'PS'   if $magic =~ /%!\s*PS/;
     return 'FITS' if $magic =~ /^SIMPLE  \=/;
     return 'PNG'  if $magic =~ /^.PNG\r/;
-
-
     return chkext(getext($file));    # then try extensions
 }
 
@@ -1039,5 +997,6 @@ conditions. For details, see the file COPYING in the PDL
 distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
-
 =cut
+
+1; # Return OK status

@@ -20,6 +20,11 @@ use DynaLoader;
 
 
 
+
+#line 7 "gsl_interp.pd"
+use strict;
+use warnings;
+
 =head1 NAME
 
 PDL::GSL::INTERP - PDL interface to Interpolation routines in GSL
@@ -53,6 +58,7 @@ C<b>. Since good Perl coding practices discourage the use of Perl
 variables C<$a> and C<$b>, here we refer to Parameters C<a> and C<b>
 as C<$pa> and C<$pb>, respectively, and Limits (of domain or
 integration) as C<$la> and C<$lb>.
+#line 62 "INTERP.pm"
 
 
 
@@ -65,6 +71,8 @@ integration) as C<$la> and C<$lb>.
 
 
 
+
+#line 1059 "../../../blib/lib/PDL/PP.pm"
 
 
 =head2 init
@@ -129,10 +137,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 141 "INTERP.pm"
 
 
 
-
+#line 1060 "../../../blib/lib/PDL/PP.pm"
 sub init {
   my $opt;
   if (ref($_[$#_]) eq 'HASH'){ $opt = pop @_; }
@@ -153,12 +162,17 @@ sub init {
   my @ret_a = ($obj1,$obj2);
   return bless(\@ret_a, $class);
 }
+#line 166 "INTERP.pm"
 
 
+
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *init = \&PDL::GSL::INTERP::init;
+#line 172 "INTERP.pm"
 
 
 
+#line 1059 "../../../blib/lib/PDL/PP.pm"
 
 
 =head2 eval
@@ -193,10 +207,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 211 "INTERP.pm"
 
 
 
-
+#line 1060 "../../../blib/lib/PDL/PP.pm"
 sub eval {
   my $opt;
   my ($obj,$x) = @_;
@@ -205,12 +220,17 @@ sub eval {
   _eval_int($x,my $o=PDL->null,$$s_obj,$$a_obj);
   $o;
 }
+#line 224 "INTERP.pm"
 
 
+
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *eval = \&PDL::GSL::INTERP::eval;
+#line 230 "INTERP.pm"
 
 
 
+#line 1059 "../../../blib/lib/PDL/PP.pm"
 
 
 =head2 deriv
@@ -246,10 +266,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 270 "INTERP.pm"
 
 
 
-
+#line 1060 "../../../blib/lib/PDL/PP.pm"
 sub deriv {
   my ($obj,$x) = @_;
   my $s_obj = $$obj[0];
@@ -257,12 +278,17 @@ sub deriv {
   _deriv_int($x,my $o=PDL->null,$$s_obj,$$a_obj);
   $o;
 }
+#line 282 "INTERP.pm"
 
 
+
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *deriv = \&PDL::GSL::INTERP::deriv;
+#line 288 "INTERP.pm"
 
 
 
+#line 1059 "../../../blib/lib/PDL/PP.pm"
 
 
 =head2 deriv2
@@ -298,10 +324,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 328 "INTERP.pm"
 
 
 
-
+#line 1060 "../../../blib/lib/PDL/PP.pm"
 sub deriv2 {
   my ($obj,$x) = @_;
   my $s_obj = $$obj[0];
@@ -309,12 +336,17 @@ sub deriv2 {
   _deriv2_int($x,my $o=PDL->null,$$s_obj,$$a_obj);
   $o;
 }
+#line 340 "INTERP.pm"
 
 
+
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *deriv2 = \&PDL::GSL::INTERP::deriv2;
+#line 346 "INTERP.pm"
 
 
 
+#line 1059 "../../../blib/lib/PDL/PP.pm"
 
 
 =head2 integ
@@ -350,10 +382,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 386 "INTERP.pm"
 
 
 
-
+#line 1060 "../../../blib/lib/PDL/PP.pm"
 sub integ {
   my ($obj,$la,$lb) = @_;
   my $s_obj = $$obj[0];
@@ -361,14 +394,19 @@ sub integ {
   _integ_int($la,$lb,my $o=PDL->null,$$s_obj,$$a_obj);
   $o;
 }
+#line 398 "INTERP.pm"
 
 
+
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *integ = \&PDL::GSL::INTERP::integ;
+#line 404 "INTERP.pm"
 
 
 
 
 
+#line 46 "gsl_interp.pd"
 =head1 BUGS
 
 Feedback is welcome.
@@ -391,6 +429,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL interpolation module was written by Gerard Jungman.
 
 =cut
+#line 433 "INTERP.pm"
 
 
 

@@ -1,0 +1,74 @@
+{
+   "abstract" : "determine hyphenation positions in portuguese words",
+   "author" : [
+      "Leonardo Araujo C<< <leolca@gmail.com> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.14",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-Hyphen-PT",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Text::Hyphen" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Text::Hyphen::PT" : {
+         "file" : "lib/Text/Hyphen/PT.pm",
+         "version" : "1.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/leolca/Text-Hyphen-PT/issues"
+      },
+      "homepage" : "https://github.com/leolca/Text-Hyphen-PT",
+      "repository" : {
+         "url" : "git://github.com/leolca/Text-Hyphen-PT.git",
+         "web" : "https://github.com/leolca/Text-Hyphen-PT"
+      }
+   },
+   "version" : "1.03",
+   "x_contributors" : [
+      "Mario Domgoergen <mario@domgoergen.com>",
+      "Mario Domgoergen <mdom@taz.de>",
+      "leolca <leolca@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_static_install" : 1
+}

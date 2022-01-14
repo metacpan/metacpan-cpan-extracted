@@ -3,9 +3,8 @@ use warnings;
 
 use lib 't/lib';
 
-# require "Module/CommentOuted.pm" # does exist but will be ignored
-my $dummys = 1;                # require "Module/CommentOuted.pm" # does exist but will be ignored
-require "Module/Exists.pm";    # does exist
-require "Dummy.pm";            # does not exist anywhere
+# require "Module/CommentOuted.pm" # exists but will be ignored
+my $dummys = 1;                  # require "Module/CommentOuted.pm" # exists but will be ignored
+require "Module/Exists.pm";      # exists
+require "Acme/BadExample.pm";    # does not exist anywhere
 
-exit;

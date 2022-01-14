@@ -4,13 +4,13 @@
       "Yuki Kimoto<kimoto.yuki@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "SPVM",
    "no_index" : {
@@ -34,6 +34,11 @@
          "requires" : {
             "ExtUtils::CBuilder" : "0.2602"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.92"
+         }
       }
    },
    "release_status" : "stable",
@@ -44,5 +49,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM"
       }
    },
-   "version" : "0.9109"
+   "version" : "0.9120",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

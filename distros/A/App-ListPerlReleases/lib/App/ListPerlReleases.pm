@@ -1,19 +1,18 @@
 package App::ListPerlReleases;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-29'; # DATE
-our $DIST = 'App-ListPerlReleases'; # DIST
-our $VERSION = '0.003'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
-use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
-# undetected
-use Sah::Schema::filename;
-
 use Exporter;
+use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
+use Sah::Schema::filename; # for scan_prereqs
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-01-01'; # DATE
+our $DIST = 'App-ListPerlReleases'; # DIST
+our $VERSION = '0.004'; # VERSION
+
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(
                        list_perl_releases
@@ -53,6 +52,15 @@ my $res = gen_read_table_func(
         },
         pk => 'version',
     },
+    description => <<'_',
+
+This utility uses <pm:CPAN::Perl::Releases>'s `perl_tarballs()` to list releases
+of Perl interpreters. For each release, it provides information such as version
+number and location of tarballs in releaser author's directory on CPAN.
+
+Update the CPAN::Perl::Releases module to get the latest list of releases.
+
+_
 );
 die "BUG: Can't generate list_perl_releases: $res->[0] - $res->[1]"
     unless $res->[0] == 200;
@@ -72,7 +80,7 @@ App::ListPerlReleases - List Perl releases
 
 =head1 VERSION
 
-This document describes version 0.003 of App::ListPerlReleases (from Perl distribution App-ListPerlReleases), released on 2021-05-29.
+This document describes version 0.004 of App::ListPerlReleases (from Perl distribution App-ListPerlReleases), released on 2021-01-01.
 
 =head1 SYNOPSIS
 
@@ -94,7 +102,11 @@ Usage:
 
 List of Perl releases.
 
-REPLACE ME
+This utility uses L<CPAN::Perl::Releases>'s C<perl_tarballs()> to list releases
+of Perl interpreters. For each release, it provides information such as version
+number and location of tarballs in releaser author's directory on CPAN.
+
+Update the CPAN::Perl::Releases module to get the latest list of releases.
 
 This function is not exported by default, but exportable.
 
@@ -240,12 +252,12 @@ as list/array (field value, field value, ...).
 
 Returns an enveloped result (an array).
 
-First element ($status_code) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-($reason) is a string containing error message, or "OK" if status is
-200. Third element ($payload) is optional, the actual result. Fourth
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
 element (%result_meta) is called result metadata and is optional, a hash
-that contains extra information.
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -256,14 +268,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-ListPe
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-App-ListPerlReleases>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ListPerlReleases>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -278,11 +282,36 @@ L<https://www.cpan.org>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2018 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ListPerlReleases>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

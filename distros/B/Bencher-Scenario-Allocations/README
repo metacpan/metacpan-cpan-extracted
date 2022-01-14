@@ -1,0 +1,189 @@
+NAME
+    Bencher::Scenario::Allocations - Benchmark allocations
+
+VERSION
+    This document describes version 0.040 of Bencher::Scenario::Allocations
+    (from Perl distribution Bencher-Scenario-Allocations), released on
+    2021-07-31.
+
+SYNOPSIS
+    To run benchmark with default option:
+
+     % bencher -m Allocations
+
+    For more options (dump scenario, list/include/exclude/add participants,
+    list/include/exclude/add datasets, etc), see bencher or run "bencher
+    --help".
+
+DESCRIPTION
+    Packaging a benchmark script as a Bencher scenario makes it convenient
+    to include/exclude/add participants/datasets (either via CLI or Perl
+    code), send the result to a central repository, among others . See
+    Bencher and bencher (CLI) for more details.
+
+BENCHMARK PARTICIPANTS
+    *   1k-array0 (perl_code)
+
+        Allocating empty array 1000 times.
+
+        Code template:
+
+         my $val; for (1..1000) { $val = [] }
+
+    *   1k-hash0 (perl_code)
+
+        Allocating empty hash 1000 times.
+
+        Code template:
+
+         my $val; for (1..1000) { $val = {} }
+
+    *   1k-array1 (perl_code)
+
+        Allocating 1-element array 1000 times.
+
+        Code template:
+
+         my $val; for (1..1000) { $val = [1] }
+
+    *   1k-hash1 (perl_code)
+
+        Allocating 1-key hash 1000 times.
+
+        Code template:
+
+         my $val; for (1..1000) { $val = {a=>1} }
+
+    *   1k-array5 (perl_code)
+
+        Allocating 5-element array 1000 times.
+
+        Code template:
+
+         my $val; for (1..1000) { $val = [1..5] }
+
+    *   1k-hash5 (perl_code)
+
+        Allocating 5-key hash 1000 times.
+
+        Code template:
+
+         my $val; for (1..1000) { $val = {a=>1, b=>2, c=>3, d=>4, e=>5} }
+
+    *   1k-array10 (perl_code)
+
+        Allocating 10-element array 1000 times.
+
+        Code template:
+
+         my $val; for (1..1000) { $val = [1..10] }
+
+    *   1k-hash10 (perl_code)
+
+        Allocating 10-key hash 1000 times.
+
+        Code template:
+
+         my $val; for (1..1000) { $val = {1..20} }
+
+    *   1k-array100 (perl_code)
+
+        Allocating 100-element array 1000 times.
+
+        Code template:
+
+         my $val; for (1..1000) { $val = [1..100] }
+
+    *   1k-hash100 (perl_code)
+
+        Allocating 100-key hash 1000 times.
+
+        Code template:
+
+         my $val; for (1..1000) { $val = {1..200} }
+
+BENCHMARK SAMPLE RESULTS
+  Sample benchmark #1
+    Run on: perl: *v5.34.0*, CPU: *Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz
+    (4 cores)*, OS: *GNU/Linux LinuxMint version 19*, OS kernel: *Linux
+    version 5.3.0-68-generic*.
+
+    Benchmark command (default options):
+
+     % bencher -m Allocations
+
+    Result formatted as table:
+
+     #table1#
+     | participant | rate (/s) |  time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+     |-------------+-----------+------------+-----------------------+-----------------------+---------+---------|
+     | 1k-hash100  |   150     | 6.5        |                 0.00% |              8882.72% | 6.8e-06 |      20 |
+     | 1k-array100 |   813     | 1.23       |               427.13% |              1604.08% |   2e-07 |      23 |
+     | 1k-hash10   |  1370     | 0.728      |               791.05% |               908.10% | 1.6e-07 |      20 |
+     | 1k-hash5    |  2680     | 0.372      |              1640.85% |               416.00% |   5e-08 |      23 |
+     | 1k-array10  |  4293.021 | 0.2329362  |              2683.74% |               222.68% | 5.7e-12 |      22 |
+     | 1k-hash1    |  5900     | 0.17       |              3743.94% |               133.69% | 2.1e-07 |      21 |
+     | 1k-array5   |  6190     | 0.162      |              3913.30% |               123.82% | 1.6e-07 |      21 |
+     | 1k-array1   |  9803.81  | 0.102001   |              6257.13% |                41.30% |   0     |      20 |
+     | 1k-hash0    | 12204.32  | 0.08193819 |              7813.71% |                13.51% | 5.7e-12 |      20 |
+     | 1k-array0   | 13852.9   | 0.0721869  |              8882.72% |                 0.00% |   0     |      20 |
+
+    The above result formatted in Benchmark.pm style:
+
+                         Rate  1k-hash100  1k-array100  1k-hash10  1k-hash5  1k-array10  1k-hash1  1k-array5  1k-array1  1k-hash0  1k-array0 
+      1k-hash100        150/s          --         -81%       -88%      -94%        -96%      -97%       -97%       -98%      -98%       -98% 
+      1k-array100       813/s        428%           --       -40%      -69%        -81%      -86%       -86%       -91%      -93%       -94% 
+      1k-hash10        1370/s        792%          68%         --      -48%        -68%      -76%       -77%       -85%      -88%       -90% 
+      1k-hash5         2680/s       1647%         230%        95%        --        -37%      -54%       -56%       -72%      -77%       -80% 
+      1k-array10   4293.021/s       2690%         428%       212%       59%          --      -27%       -30%       -56%      -64%       -69% 
+      1k-hash1         5900/s       3723%         623%       328%      118%         37%        --        -4%       -39%      -51%       -57% 
+      1k-array5        6190/s       3912%         659%       349%      129%         43%        4%         --       -37%      -49%       -55% 
+      1k-array1     9803.81/s       6272%        1105%       613%      264%        128%       66%        58%         --      -19%       -29% 
+      1k-hash0     12204.32/s       7832%        1401%       788%      354%        184%      107%        97%        24%        --       -11% 
+      1k-array0     13852.9/s       8904%        1603%       908%      415%        222%      135%       124%        41%       13%         -- 
+ 
+     Legends:
+       1k-array0: participant=1k-array0
+       1k-array1: participant=1k-array1
+       1k-array10: participant=1k-array10
+       1k-array100: participant=1k-array100
+       1k-array5: participant=1k-array5
+       1k-hash0: participant=1k-hash0
+       1k-hash1: participant=1k-hash1
+       1k-hash10: participant=1k-hash10
+       1k-hash100: participant=1k-hash100
+       1k-hash5: participant=1k-hash5
+
+    The above result presented as chart:
+
+    To display as an interactive HTML table on a browser, you can add option
+    "--format html+datatables".
+
+CONTRIBUTOR
+    perlancar (@pc-office) <perlancar@gmail.com>
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bencher-Scenario-Allocations>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Bencher-Scenario-Allocations>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenario-Allo
+    cations>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -3,7 +3,5 @@ use warnings;
 
 use lib 't/lib';
 
-use App::findeps;
-require Dummy;    # does not exist anywhere
+require Acme::BadExample;    # does not exist anywhere
 
-exit;

@@ -9,7 +9,7 @@ use parent qw(Hash::AsObject);
 
 use Carp;
 
-our $VERSION = '0.901';
+our $VERSION = '0.902';
 
 =encoding utf8
 
@@ -186,7 +186,7 @@ brian d foy, <bdfoy@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2013-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2013-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

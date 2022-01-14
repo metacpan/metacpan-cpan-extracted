@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 keywords:
   - module
   - distribution
@@ -29,5 +29,5 @@ resources:
   bugtracker: https://github.com/briandfoy/data-constraint/issues
   homepage: https://github.com/briandfoy/data-constraint
   repository: https://github.com/briandfoy/data-constraint.git
-version: '1.202'
+version: '1.203'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

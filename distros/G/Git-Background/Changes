@@ -1,5 +1,9 @@
 Revision history for Git-Background
 
+0.004  2022-01-08 21:19:34 UTC
+
+  - run() throws an error if it is run in void context
+
 0.003  2022-01-01 22:55:58 UTC
 
   - Bump dependency on Future to 0.40, which introduced Future::Exception

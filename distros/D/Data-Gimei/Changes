@@ -1,0 +1,21 @@
+Revision history for Perl extension Data-Gimei
+
+v0.0.4 2022-01-11T08:29:51Z
+
+    - Introduce Address
+    - Introduce Deteministic random
+    - Change License
+
+v0.0.3
+
+    - Support Romaji
+    - Introduce param 'gender' to new()
+    - Split .pm files by package
+
+v0.0.2
+
+    - Change YAML module to YAML::XS.
+
+v0.0.1
+
+    - original version

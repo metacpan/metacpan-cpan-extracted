@@ -45,6 +45,29 @@
 %# those contributions and any derivatives thereof.
 %# 
 %# END BPS TAGGED BLOCK }}}
+
+% if ( RT::Handle::cmp_version($RT::VERSION, '5.0.0') >= 0 ) {
+% # RT 5 version
+<&| /Widgets/TitleBox, title => loc('Quick Calls') &>
+<div class="form-row">
+  <div class="col-auto">
+    <form method="post"
+          action="<%$RT::WebPath%>/Helpers/QuickCalls">
+    <select name="QuickCall" class="selectpicker form-control">
+%     foreach my $QuickCall (@{$RT::QuickCalls||[]}) {
+      <option value="<%$QuickCall->{Name}%>"><%$QuickCall->{Name}%>
+%     }
+    </select>
+  </div>
+  <div class="col-auto">
+    <& /Elements/Submit, Name => 'SubmitTicket', Label => loc('Create') &>
+  </div>
+</div>
+</form>
+</&>
+% }
+% else {
+% # RT 4 version
 <&| /Widgets/TitleBox, title => loc('Quick Calls') &>
 <form action="<%$RT::WebPath%>/Helpers/QuickCalls">
 <select name="QuickCall">
@@ -55,3 +78,4 @@
 <input type="submit" value="Create">
 </form>
 </&>
+% }

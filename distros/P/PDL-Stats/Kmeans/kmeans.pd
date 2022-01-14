@@ -443,10 +443,10 @@ sub _scree_ind {
     croak "1D pdl only please";
 
   my $a = zeroes 2, $self->nelem;
-  ($_tmp = $a((0), )) .= sequence $self->nelem;
-  ($_tmp = $a((1), )) .= $self;
+  ($_tmp = $a->slice('(0)')) .= sequence $self->nelem;
+  ($_tmp = $a->slice('(1)')) .= $self;
 
-  my $d = _d_point2line( $a, $a( ,(0)), $a( ,(-1)) );
+  my $d = _d_point2line( $a, $a->slice(':,(0)'), $a->slice(':,(-1)') );
 
   return $d->maximum_ind;
 }

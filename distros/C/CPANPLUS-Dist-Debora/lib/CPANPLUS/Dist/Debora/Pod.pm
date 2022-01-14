@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 use parent qw(Pod::Simple);
 
@@ -302,7 +302,7 @@ CPANPLUS::Dist::Debora::Pod - Parse Pod documents
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -348,7 +348,7 @@ Parses the specified Pod file.
 Returns the Pod document, which is simplified for the purpose of finding
 descriptions and license information.
 
-Uses L<Software::LicenseUtils> to guess the license.
+Use L<Software::LicenseUtils> to guess the license.
 
   my @licenses = Software::LicenseUtils->guess_license_from_pod($pod_text);
 

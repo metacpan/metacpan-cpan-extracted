@@ -21,6 +21,10 @@ use DynaLoader;
 
 
 
+#line 8 "misc.pd"
+use strict;
+use warnings;
+
 =head1 NAME
 
 PDL::IO::Misc - misc IO routines for PDL
@@ -34,7 +38,7 @@ Some basic I/O functionality: FITS, tables, byte-swapping
  use PDL::IO::Misc;
 
 =cut
-
+#line 42 "Misc.pm"
 
 
 
@@ -48,6 +52,8 @@ Some basic I/O functionality: FITS, tables, byte-swapping
 
 
 
+#line 48 "misc.pd"
+
 use PDL::Primitive;
 use PDL::Types;
 use PDL::Options;
@@ -56,9 +62,11 @@ use Carp;
 use Symbol qw/ gensym /;
 use List::Util;
 use strict;
+#line 66 "Misc.pm"
 
 
 
+#line 1059 "../../blib/lib/PDL/PP.pm"
 
 
 =head2 bswap2
@@ -78,16 +86,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 90 "Misc.pm"
 
 
 
-
-
-
+#line 1061 "../../blib/lib/PDL/PP.pm"
 *bswap2 = \&PDL::bswap2;
+#line 96 "Misc.pm"
 
 
 
+#line 1059 "../../blib/lib/PDL/PP.pm"
 
 
 =head2 bswap4
@@ -107,16 +116,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 120 "Misc.pm"
 
 
 
-
-
-
+#line 1061 "../../blib/lib/PDL/PP.pm"
 *bswap4 = \&PDL::bswap4;
+#line 126 "Misc.pm"
 
 
 
+#line 1059 "../../blib/lib/PDL/PP.pm"
 
 
 =head2 bswap8
@@ -136,16 +146,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 150 "Misc.pm"
 
 
 
-
-
-
+#line 1061 "../../blib/lib/PDL/PP.pm"
 *bswap8 = \&PDL::bswap8;
+#line 156 "Misc.pm"
 
 
 
+#line 125 "misc.pd"
 
 
 
@@ -1197,13 +1208,18 @@ of C<$1>, C<$2> etc.
   Determine endianness of machine - returns 0 or 1 accordingly
 
 =cut
+#line 1212 "Misc.pm"
 
 
 
+#line 1181 "misc.pd"
 sub PDL::isbigendian { return 0; };
 *isbigendian = \&PDL::isbigendian;
+#line 1219 "Misc.pm"
 
 
+
+#line 1203 "misc.pd"
 
 
 =head2 rasc
@@ -1236,15 +1252,16 @@ sub PDL::isbigendian { return 0; };
 
 sub rasc {PDL->rasc(@_)}
 sub PDL::rasc {
-  use IO::File;
   my ($pdl, $file, $num) = @_;
   $num = -1 unless defined $num;
-  my $fi = $file;
-  my $is_openhandle = defined fileno $fi ? 1 : 0;
-  unless ($is_openhandle) {
+  my $is_openhandle = defined fileno $file;
+  my $fi;
+  if ($is_openhandle) {
+    $fi = $file;
+  } else {
     barf 'usage: rasc $pdl, "filename"|FILEHANDLE, [$num_to_read]'
        if !defined $file || ref $file;
-    $fi = new IO::File "<$file" or barf "Can't open $file";
+    open $fi, "<", $file or barf "Can't open $file";
   }
   $pdl->_rasc(my $ierr=null,$num,$fi);
   close $fi unless $is_openhandle;
@@ -1308,18 +1325,19 @@ sub rcube {
 
       return $cube;
 }
+#line 1329 "Misc.pm"
 
 
 
-
-
-
+#line 1061 "../../blib/lib/PDL/PP.pm"
 *_rasc = \&PDL::_rasc;
+#line 1335 "Misc.pm"
 
 
 
 
 
+#line 28 "misc.pd"
 
 =head1 AUTHOR
 
@@ -1332,7 +1350,7 @@ separated from the PDL distribution, the copyright notice
 should be included in the file.
 
 =cut
-
+#line 1354 "Misc.pm"
 
 
 

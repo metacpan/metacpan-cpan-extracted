@@ -2,7 +2,7 @@ do { my $x = {
        'configure' => {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0',
-                                        'perl' => 'v5.10.0'
+                                        'perl' => '5.010'
                                       }
                       },
        'develop' => {
@@ -30,12 +30,13 @@ do { my $x = {
                                       'Test::Spelling' => '0.12',
                                       'Test::Synopsis' => '0',
                                       'Test::Vars' => '0.014',
-                                      'Test::Version' => '1'
+                                      'Test::Version' => '1',
+                                      'strict' => '0',
+                                      'warnings' => '0'
                                     }
                     },
        'runtime' => {
                       'requires' => {
-                                      'Code::TidyAll::Config::INI::Reader' => '0.44',
                                       'Code::TidyAll::Plugin::SortLines::Naturally' => '0.000003',
                                       'Code::TidyAll::Plugin::UniqueLines' => '0.000003',
                                       'Dist::Zilla::Plugin::AutoPrereqs' => '0',
@@ -88,11 +89,9 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::TravisCI::StatusBadge' => '0',
                                       'Dist::Zilla::Plugin::UploadToCPAN' => '0',
                                       'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.002',
-                                      'Dist::Zilla::Role::BeforeBuild' => '0',
                                       'Dist::Zilla::Role::PluginBundle::Config::Slicer' => '0',
                                       'Dist::Zilla::Role::PluginBundle::Easy' => '0',
                                       'Dist::Zilla::Role::PluginBundle::PluginRemover' => '0',
-                                      'Dist::Zilla::Role::TextTemplate' => '0',
                                       'List::AllUtils' => '0',
                                       'List::Util' => '1.45',
                                       'Moose' => '0',
@@ -106,12 +105,9 @@ do { my $x = {
                                       'Test::Code::TidyAll' => '0.70',
                                       'Types::Path::Tiny' => '0',
                                       'Types::Standard' => '0',
-                                      'autodie' => '0',
                                       'feature' => '0',
                                       'namespace::autoclean' => '0',
-                                      'perl' => 'v5.10.0',
-                                      'strict' => '0',
-                                      'warnings' => '0'
+                                      'perl' => '5.010'
                                     }
                     },
        'test' => {
@@ -124,7 +120,9 @@ do { my $x = {
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
                                    'Test::More' => '0',
-                                   'perl' => 'v5.10.0'
+                                   'perl' => '5.010',
+                                   'strict' => '0',
+                                   'warnings' => '0'
                                  }
                  }
      };

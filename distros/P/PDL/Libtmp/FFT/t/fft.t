@@ -6,6 +6,8 @@ use PDL::FFT;
 use Test::More;
 use Test::Exception;
 
+set_autopthread_size(0);
+
 sub tapprox {
         my($pa,$pb) = @_;
 	all approx $pa, $pb, 0.01;
@@ -35,16 +37,16 @@ ifft($pd);
 ok (tapprox($pc,0), "fft zeroes");
 ok (tapprox($pd->im,0), "fft zeroes using complex ndarrays");
 
-#print "\n",$pc->info("Type: %T Dim: %-15D State: %S"),"\n";
-#print "Max: ",$pc->max,"\n";
-#print "Min: ",$pc->min,"\n";
-   
 ok (tapprox($pa,$pb), "m51 image recovered");
 
 $pb = $pa->copy;
-$pc = $pb->zeroes; fftnd($pb,$pc); ifftnd($pb,$pc);
+$pc = $pb->zeroes;
+$pd=czip($pb, $pc);
+fftnd($pb,$pc); ifftnd($pb,$pc);
 ok ( tapprox($pc,0), "fftnd zeroes");
 ok ( tapprox($pa,$pb), "fftnd real image");
+fftnd($pd); ifftnd($pd);
+ok ( tapprox($pd,$pb), "fftnd native complex image with imag zeroes");
 
 $pb = $pa->slice("1:35,1:69");
 $pc = $pb->copy; fftnd($pb,$pc); ifftnd($pb,$pc);

@@ -2,16 +2,17 @@ use strict;
 use warnings;
 
 use Carp::Always;
-use Git::Helpers qw( is_inside_work_tree );
 use Open::This qw( maybe_get_url_from_parsed_text );
 use Test::More import => [qw( done_testing is ok skip )];
+use Test::Needs qw( Git::Helpers );
 use Test::Requires::Git;
 use URI ();
 
 test_requires_git();
 
 SKIP: {
-    skip 'must be inside Git checkout', 1 unless is_inside_work_tree();
+    skip 'must be inside Git checkout', 1
+        unless Git::Helpers::is_inside_work_tree();
     is( maybe_get_url_from_parsed_text(),     undef, 'undef on undef' );
     is( maybe_get_url_from_parsed_text( {} ), undef, 'undef on empty hash' );
 

@@ -1,6 +1,6 @@
 # Mini class for entries of the file mapping hash.
 package Bio::RNA::BarMap::Mapping::FileMappingEntry;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use 5.012;
 use warnings;

@@ -7,6 +7,7 @@ BEGIN
     use Test::More qw( no_plan );
     use JSON;
     use Nice::Try;
+    our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
 BEGIN { use_ok( 'Module::Generic::Array' ) || BAIL_OUT( "Unable to load Module::Generic::Array" ); }
@@ -381,5 +382,238 @@ ok( !$max_val->defined, 'max on empty list returns undef as an object' );
 
 my $min = $values->min;
 is( "$min", 3, 'min' );
+
+subtest 'callback' => sub
+{
+    $Module::Generic::Array::DEBUG = $DEBUG;
+    diag( "Setting \$Module::Generic::Array::DEBUG to '$Module::Generic::Array::DEBUG'" ) if( $DEBUG );
+    my $test = Module::Generic::Array->new( qw( John Peter Paul ) );
+    is( $test->length, 3, 'init' );
+    ok( !tied( @$test ), 'not tied' );
+    $test->callback( add => sub
+    {
+        my $this = shift( @_ );
+        my( $pos, $ref ) = @$this{qw( start added )};
+        diag( "Adding ", scalar( @$ref ), " element ('", join( "', '", @$ref ), "') at offset $pos" ) if( $DEBUG );
+        is( $pos, 3, 'push' );
+        return(1);
+    });
+    $test->push( 'Gabriel' );
+    diag( "Elements are: '", $test->join( "', '" ), "'" ) if( $DEBUG );
+    is( $test->last, 'Gabriel', 'push (2)' );
+    $test->callback( add => sub
+    {
+        my $this = shift( @_ );
+        my( $pos, $ref ) = @$this{qw( start added )};
+        diag( "Adding ", scalar( @$ref ), " element ('", join( "', '", @$ref ), "') at offset $pos" ) if( $DEBUG );
+        is( $pos, 0, 'unshift' );
+        return(1);
+    });
+    $test->unshift( 'Emmanuel' );
+    is( $test->first, 'Emmanuel', 'unshift (2)' );
+    $test->callback( add => sub
+    {
+        my $this = shift( @_ );
+        my( $pos, $ref ) = @$this{qw( start added )};
+        diag( "Adding ", scalar( @$ref ), " element ('", join( "', '", @$ref ), "') at offset $pos" ) if( $DEBUG );
+        is( $pos, 2, 'splice' );
+        return(1);
+    });
+    $test->splice( 2, 0, 'Raphael' );
+    is( $test->index(2), 'Raphael', 'splice (2)' );
+    
+    # Now do removing tests
+    diag( "Now do removing tests" ) if( $DEBUG );
+    diag( "Elements are: '", $test->join( "', '" ), "'" ) if( $DEBUG );
+    $test->callback( remove => sub
+    {
+        my $this = shift( @_ );
+        my( $from, $to ) = @$this{qw( start end )};
+        diag( "Removing data from position $from to $to: '", $test->offset( $from, ( $to - $from ) )->join( "', '" ), "'" ) if( $DEBUG );
+        is( $from, 5, 'pop' );
+        is( $to, 5, 'pop (1)' );
+        return(1);
+    });
+    my $removed = $test->pop;
+    is( $removed, 'Gabriel', 'pop (2)' );
+    $test->callback( remove => sub
+    {
+        my $this = shift( @_ );
+        my( $from, $to ) = @$this{qw( start end )};
+        diag( "Removing data from position $from to $to: '", $test->offset( $from, ( $to - $from ) )->join( "', '" ), "'" ) if( $DEBUG );
+        is( $from, 0, 'shift (start position)' );
+        is( $to, 0, 'shift (end position)' );
+        return(1);
+    });
+    $removed = $test->shift;
+    is( $removed, 'Emmanuel', 'shift (2)' );
+    $test->callback( remove => sub
+    {
+        my $this = shift( @_ );
+        my( $from, $to ) = @$this{qw( start end )};
+        diag( "Removing data from position $from to $to: '", $test->offset( $from, ( $to - $from ) )->join( "', '" ), "'" ) if( $DEBUG );
+        is( $from, 1, 'splice (start position)' );
+        is( $to, 2, 'splice (end position)' );
+        is( join( ' ', @$test[ 1, 2 ] ), 'Raphael Peter', 'splice (1)' );
+        return(1);
+    });
+    my @removed = $test->splice( 1, 2 );
+    is( scalar( @removed ), 2, 'splice (2)' );
+    is( "@removed", 'Raphael Peter', 'splice (3)' );
+    
+    diag( "Elements are: '", $test->join( "', '" ), "'" );
+    $test->callback( remove => sub
+    {
+        my $this = shift( @_ );
+        my( $from, $to ) = @$this{qw( start end )};
+        my $caller = [caller];
+        diag( "Removing data from position $from to $to: '", $test->offset( $from, ( $to - $from ) )->join( "', '" ), "' called from package ", $caller->[0], " at line ", $caller->[2] ) if( $DEBUG );
+        # diag( "Removing data from position $from to $to: '", join( "', '", @$test[ $from...$to ] ), "' called from package ", $caller->[0], " at line ", $caller->[2] ) if( $DEBUG );
+        # diag( "Removing data from position $from to $to called from package ", $caller->[0], " at line ", $caller->[2] ) if( $DEBUG );
+        is( $from, 1, 'delete (start position)' );
+        is( $to, 1, 'delete (end position)' );
+        return(1);
+    });
+    # diag( "Removing '", $test->[1], "'" ) if( $DEBUG );
+    $removed = delete( $test->[1] );
+    is( $removed, 'Paul', 'delete (2)' );
+    
+    diag( "No check blocking addition." ) if( $DEBUG );
+    diag( "Elements are: '", $test->join( "', '" ), "'" ) if( $DEBUG );
+    $test->callback( add => sub
+    {
+        my $this = shift( @_ );
+        my( $pos, $ref ) = @$this{qw( start added )};
+        diag( "Attempting to add ", scalar( @$ref ), " element ('", join( "', '", @$ref ), "') at offset $pos" ) if( $DEBUG );
+        is( $pos, 1, 'push' );
+        return;
+    });
+    $test->push( qw( Madeleine Isabelle Gabrielle ) );
+    is( $test->length, 1, 'push rejected' );
+
+    $test->callback( add => sub
+    {
+        my $this = shift( @_ );
+        my( $pos, $ref ) = @$this{qw( start added )};
+        diag( "Attempting to add ", scalar( @$ref ), " element ('", join( "', '", @$ref ), "') at offset $pos" ) if( $DEBUG );
+        is( $pos, 0, 'unshift' );
+        return;
+    });
+    # $test->unshift( qw( Madeleine Isabelle Gabrielle ) );
+    $test->unshift( qw( Madeleine ) );
+    is( $test->length, 1, 'unshift rejected' );
+
+    diag( "Elements are: '", $test->join( "', '" ), "'" ) if( $DEBUG );
+    $test->callback( add => sub
+    {
+        my $this = shift( @_ );
+        my( $pos, $ref ) = @$this{qw( start added )};
+        diag( "Attempting to add ", scalar( @$ref ), " element ('", join( "', '", @$ref ), "') at offset $pos" ) if( $DEBUG );
+        is( $pos, 2, 'direct insertion' );
+        return;
+    });
+    $test->[2] = 'Samuel';
+    is( $test->length, 1, 'direct insertion rejected' );
+    $test->callback( add => sub
+    {
+        my $this = shift( @_ );
+        my( $pos, $ref ) = @$this{qw( start added )};
+        diag( "Attempting to add ", scalar( @$ref ), " element ('", join( "', '", @$ref ), "') at offset $pos" ) if( $DEBUG );
+        is( $pos, 2, 'splice insertion rejected' );
+        return;
+    });
+    $test->splice( 2, 0, qw( Marie Madeleine ) );
+    is( $test->length, 1, 'splice insertion rejected (2)' );
+
+    diag( "Elements are: '", $test->join( "', '" ), "'" ) if( $DEBUG );
+    $test->callback( remove => sub
+    {
+        my $this = shift( @_ );
+        my( $from, $to ) = @$this{qw( start end )};
+        my $caller = [caller];
+        diag( "Removing data from position $from to $to: '", $test->offset( $from, ( $to - $from ) )->join( "', '" ), "' called from package ", $caller->[0], " at line ", $caller->[2] ) if( $DEBUG );
+        is( $from, 0, 'shift rejected (start position)' );
+        is( $to, 0, 'shift rejected (end position)' );
+        return;
+    });
+    $removed = $test->shift;
+    is( $removed, undef, 'shift rejected' );
+    is( $test->length, 1, 'shift rejected' );
+    $test->callback( add => undef );
+    $test->push( qw( Madeleine Isabelle Gabrielle ) );
+    is( $test->length, 4, 'remove callback' );
+    diag( "Elements are: '", $test->join( "', '" ), "'" ) if( $DEBUG );
+    
+    $test->callback( remove => sub
+    {
+        my $this = shift( @_ );
+        my( $from, $to ) = @$this{qw( start end )};
+        my $caller = [caller];
+        diag( "Removing data from position $from to $to: '", $test->offset( $from, ( $to - $from ) )->join( "', '" ), "' called from package ", $caller->[0], " at line ", $caller->[2] ) if( $DEBUG );
+        is( $from, 3, 'shift rejected (start position)' );
+        is( $to, 3, 'shift rejected (end position)' );
+        return;
+    });
+    $removed = $test->pop;
+    is( $removed, undef, 'pop rejected' );
+    is( $test->length, 4, 'pop rejected' );
+    
+    $test->callback( remove => sub
+    {
+        my $this = shift( @_ );
+        my( $from, $to ) = @$this{qw( start end )};
+        my $caller = [caller];
+        diag( "Removing data from position $from to $to: '", $test->offset( $from, ( $to - $from ) )->join( "', '" ), "' called from package ", $caller->[0], " at line ", $caller->[2] ) if( $DEBUG );
+        is( $from, 2, 'direct removal rejected (start position)' );
+        is( $to, 2, 'direct removal rejected (end position)' );
+        return;
+    });
+    $removed = delete( $test->[2] );
+    is( $removed, undef, 'direct removal' );
+    is( $test->length, 4, 'direct removal' );
+    
+    $test->callback( remove => sub
+    {
+        my $this = shift( @_ );
+        my( $from, $to ) = @$this{qw( start end )};
+        my $caller = [caller];
+        diag( "Removing data from position $from to $to: '", $test->offset( $from, ( $to - $from ) )->join( "', '" ), "' called from package ", $caller->[0], " at line ", $caller->[2] ) if( $DEBUG );
+        is( $from, 1, 'splice removal rejected (start position)' );
+        is( $to, 2, 'splice removal rejected (end position)' );
+        return;
+    });
+    my @removed = $test->splice( 1, 2 );
+    is( scalar( @removed ), 0, 'splice removed rejected' );
+    
+    diag( "Removing callbacks" ) if( $DEBUG );
+    $test->callback( add => undef );
+    $test->callback( remove => undef );
+    ok( !tied( @$test ), 'callbacks removed' );
+};
+
+subtest 'filter' => sub
+{
+    my $a = Module::Generic::Array->new( [qw( John Jack Peter Gabriel Samuel )] );
+    my $n = -1;
+    my $new = $a->filter(sub
+    {
+        is( $_[0], $a->[ ++$n ], "value at index $n" );
+        is( $n, $_[1], "value at index $n" );
+        is( ref( $_[2] ), ref( $a ), 'array object' );
+        substr( $_, 0, 1 ) ne 'J';
+    });
+    is( $new->length, 3 );
+    is( "@$new", 'Peter Gabriel Samuel' );
+    # With a first object argument
+    $n = -1;
+    $new = $a->filter(sub
+    {
+        isa_ok( $_[0], 'Module::Generic::Array', "'this' additional value pass" );
+        is( $_[1], $a->[ ++$n ], "value at index $n" );
+        is( $n, $_[2], "value at index $n" );
+        is( ref( $_[3] ), ref( $a ), 'array object' );
+        substr( $_, 0, 1 ) ne 'J';
+    }, $a);
+};
 
 done_testing();

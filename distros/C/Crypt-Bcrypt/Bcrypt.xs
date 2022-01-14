@@ -7,29 +7,14 @@
 
 #define BCRYPT_HASHSIZE 64
 
-static int timing_safe_strcmp(const char *str1, const char *str2) {
-	const unsigned char *u1;
-	const unsigned char *u2;
-	int ret;
+static int timing_safe_compare(const unsigned char *str1, const unsigned char *str2, STRLEN length) {
+	int ret = 0;
 	int i;
 
-	int len1 = strlen(str1);
-	int len2 = strlen(str2);
+	for (i = 0; i < length; ++i)
+		ret |= (str1[i] ^ str2[i]);
 
-	/* In our context both strings should always have the same length
-	 * because they will be hashed passwords. */
-	if (len1 != len2)
-		return 1;
-
-	/* Force unsigned for bitwise operations. */
-	u1 = (const unsigned char *)str1;
-	u2 = (const unsigned char *)str2;
-
-	ret = 0;
-	for (i = 0; i < len1; ++i)
-		ret |= (u1[i] ^ u2[i]);
-
-	return ret;
+	return ret == 0;
 }
 
 MODULE = Crypt::Bcrypt              PACKAGE = Crypt::Bcrypt
@@ -37,9 +22,10 @@ MODULE = Crypt::Bcrypt              PACKAGE = Crypt::Bcrypt
 PROTOTYPES: DISABLE
 
 SV*
-_bcrypt_hashpw(const char* password, const char* settings)
+_bcrypt_hashpw(SV* password_sv, const char* settings)
 CODE:
 	char outhash[BCRYPT_HASHSIZE];
+	const char* password = SvPVbyte_nolen(password_sv);
 	const char* output = _crypt_blowfish_rn(password, settings, outhash, BCRYPT_HASHSIZE);
 	if (output == NULL)
 		Perl_croak(aTHX_ "Could not hash: %s", strerror(errno));
@@ -48,10 +34,15 @@ OUTPUT:
 	RETVAL
 
 int
-bcrypt_check(const char* password, const char* hash)
+bcrypt_check(char* password, SV* hash_sv)
 CODE:
 	char outhash[BCRYPT_HASHSIZE];
+	STRLEN hashlen;
+	const char* hash = SvPVbyte(hash_sv, hashlen);
 	const char* ret = _crypt_blowfish_rn(password, hash, outhash, BCRYPT_HASHSIZE);
-	RETVAL = ret && timing_safe_strcmp(hash, outhash) == 0;
+	if (!ret || strlen(outhash) != hashlen)
+		RETVAL = 0;
+	else
+		RETVAL = timing_safe_compare((const unsigned char *)hash, (const unsigned char *)outhash, hashlen);
 OUTPUT:
 	RETVAL

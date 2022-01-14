@@ -1,5 +1,8 @@
 Revision history for Perl module Tie::Toggle
 
+1.084 2022-01-08T22:21:14Z
+	* No code changes. Fix a link in README.pod.
+
 1.083 2021-01-12T14:37:31Z
 	* freshen the distro; Travis CI is gone; GitHub Actions are in
 

@@ -39,7 +39,8 @@ use PDL::LiteF;
 	my $pb = $pa + $pa;
 	is($pb->at(0), 4);
 	is($pb->at(1), 6);
-	$pb->set(0,50); # This must break the dataflow completely
+	$pb->set(0,50);
+	$pb->sever; # As of 2.064 you must break the dataflow manually
 	is($pb->at(0), 50);
 	is($pb->at(1), 6);
 	is($pa->at(0), 2);
@@ -148,8 +149,6 @@ SKIP: { # XXX DISABLED
  [6 7 8]
 ]
 END
-	#note $pb;
-	# $foo2 = pdl 2;
 	$pc = $pb * 2; # This should stay the same flowed structure.
 	is("$pc", <<END);
 
@@ -158,29 +157,16 @@ END
  [12 14 16]
 ]
 END
-	# note $pc;
 	$pd = $pb->slice('1:2,:');
 	$pe = $pd->slice('1,:');
-	# NOW
-	#print "DDUMP1\n";
-	# $pd->jdump();
 	$pd += 0.5;
-	#print "DDUMP2\n";
-	# $pd->jdump();
-	# print $pd;
-	# $pd->jdump();
 	$pf = $pb * 2;
 	# This checks whether the system realizes to look for the new $pe.
 	$pg = $pe - 15;
-	# print $pa,$pb,$pc,$pd,$pe,$pf,$pg;
 	$pa->set(0,0,8);
 	$pa->set(1,0,9);
 	$pa->set(2,0,10);
 	@ps = ($pa,$pb,$pc,$pd,$pe,$pf,$pg);
-	# print "PRINTS\n"; $pb->jdump;
-	# $pc->jdump;
-	#map {if($_) {# $_->jdump;
-	#	print $_} else {print "FOO\n";}} @ps;
 	undef @ps;
 	is("$pa", <<END);
 
@@ -243,40 +229,21 @@ SKIP: { # XXX DISABLED
 		my $a2 = pdl 2;
 		$pb = $pa * $a2;
 
-	#	note $pb;
-
 		is("$pb", "[4 6 8]");
-
-	#	$pb->jdump;
 
 		$pc = pdl 1;
 		$pb += $pc;
-	#	$pb->jdump;
-	#	$pc->jdump;
 
-	#	note $pb;
 		is("$pb", "[5 7 9]");
-	#	$pb->jdump;
 
-	#	note "TOSETA\n";
 		$pa->set(1,5);
-	#	note "TODUMPA\n";
-	#	$pa->jdump();
-	#	$pb->jdump();
-	#	note "TOPRINTB\n";
-	#	note $pb;
 		is("$pb", "[5 11 9]");
-
-	#	print "EXITING SCOPE\n";
-
 	}
 }
-#print "EXITED SCOPE\n";
 
 # 7. What about axisvals:
 {
 	my $pa = zeroes 5,3;
-#	note $pa;
 	is("$pa", <<END);
 
 [
@@ -285,16 +252,9 @@ SKIP: { # XXX DISABLED
  [0 0 0 0 0]
 ]
 END
-#	note "NEW_OR_INPLACE_NOW\n";
 	my $pb = PDL::Core::new_or_inplace($pa);
-#	note "NEW_OR_INPLACE_DONE\n";
-#	$pb->jdump();
 	my $pc = $pb->transpose;
-#	$pc->jdump();
-	$pc->make_physical();
-#	$pc->jdump();
-	axisvalues($pc);
-#	note $pc;
+	axisvalues($pc->inplace);
 	is("$pc", <<END);
 
 [
@@ -305,7 +265,6 @@ END
  [0 1 2]
 ]
 END
-#	note $pb;
 	is("$pb", <<END);
 
 [
@@ -314,7 +273,6 @@ END
  [2 2 2 2 2]
 ]
 END
-#	note $pa;
 	is("$pa", <<END);
 
 [
@@ -323,11 +281,6 @@ END
  [0 0 0 0 0]
 ]
 END
-#	$pb->jdump;
-#	print $pb;
-#	$pb = axisvalues($pa);
-#	note $pb;
-#       warn "Two tests disabled (31-32) as do not work\n";
 	$pa = zeroes 5,5;
 	$pb = $pa->slice("1:3,1:3");
 	$pc = $pb->slice("(1),(1)");
@@ -341,8 +294,6 @@ END
 {
 my $pa = pdl [2,3,4],[5,6,7];
 $pa->doflow;
-#print $pa;
-# $pa->jdump;
 my $a2 = pdl 1;
 my $pb = $pa + $a2;
 is("$pb", <<END, 'pb doflow');
@@ -366,20 +317,14 @@ END
 # Then, the more difficult ways: explicit threading.
 # Dims: 3,3,2
 my $pa = pdl [[0,1,2],[3,4,5],[6,7,8]],[[10,11,12],[13,14,15],[16,17,18]];
-# print $pa;
 my $pb = zeroes(3,3);
 my $pc = $pb->thread(0,1);
 $pb->make_physical();
 $pc->make_physical();
-# print "B:\n"; $pb->dump(); print "C:\n";$pc->dump();
 maximum($pa->thread(0,1),$pc);
-# print "B:\n"; $pb->dump(); print "C:\n";$pc->dump();
-# print $pb;
 cmp_ok($pb->at(0,0), '==', 10, 'at(0,0)');
 cmp_ok($pb->at(1,1), '==', 14, 'at(1,1)');
-# print "B:\n"; $pb->dump(); print "C:\n";$pc->dump();
 minimum($pa->thread(0,1),$pb->thread(0,1));
-# print $pb;
 cmp_ok($pb->at(0,0), '==', 0, 'at(0,0)');
 cmp_ok($pb->at(1,1), '==', 4, 'at(1,1)');
 }

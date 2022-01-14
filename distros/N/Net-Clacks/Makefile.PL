@@ -6,7 +6,7 @@ use ExtUtils::MakeMaker;
 # the contents of the Makefile that is written.
 WriteMakefile(
     NAME              => 'Net::Clacks',
-    VERSION_FROM      => 'lib/Net/Clacks/Server.pm', # finds $VERSION
+    VERSION_FROM      => 'lib/Net/Clacks.pm', # finds $VERSION
     PREREQ_PM         => {
         "Array::Contains" => 2.7,
         "XML::Simple" => 0,

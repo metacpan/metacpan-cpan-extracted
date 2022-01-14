@@ -2,9 +2,22 @@ use strict;
 use warnings;
 use utf8;
 
+use MARC::Record;
+
+sub makeMarcRecord {
+    my $marc = new MARC::Record();
+    my $field = new MARC::Field('999','','','z' => 'water');
+    $marc->append_fields($field);
+    my $field2 = new MARC::Field('001','fire');
+    $marc->append_fields($field2);
+    # warn $marc->as_formatted();
+    return $marc;
+}
+
+
 BEGIN {
     binmode(STDOUT, "encoding(UTF-8)");
-    use vars qw(@stripDiacriticsTests @regsubTests @applyRuleTests @transformTests);
+    use vars qw(@stripDiacriticsTests @regsubTests @applyRuleTests @transformTests @postProcessTests);
     @stripDiacriticsTests = (
 	# value, expected, caption
 	[ 'water', 'water', 'null transformation' ],
@@ -65,12 +78,86 @@ BEGIN {
 	    },
 	], '*xp*r**nc*', 'stripDiacritics and regsub' ],
     );
+    my $marc = makeMarcRecord();
+    @postProcessTests = (
+	# MARC record, ruleset, field, expected, caption
+	[ $marc, {}, '001', 'fire', 'null transformation on control field' ],
+	[ $marc, {}, '999$z', 'water', 'null transformation on subfield' ],
+	[ $marc, {
+	    '999$z' => [
+		{
+		    op => 'regsub',
+		    pattern => 'a',
+		    replacement => 'A',
+		}
+	    ]
+	  }, '999$z', 'wAter', 'single transformation'
+
+	],
+	[ $marc, {
+	    '999$z' => [
+		{
+		    op => 'regsub',
+		    pattern => 'a',
+		    replacement => 'A',
+		},
+		{
+		    op => 'regsub',
+		    pattern => '(.*)',
+		    replacement => '$1/$1',
+		}
+	    ]
+	  }, '999$z', 'wAter/wAter', 'double transformation'
+	],
+	[ $marc, {
+	    '999$z' => [
+		{
+		    op => 'regsub',
+		    pattern => 'a',
+		    replacement => 'foo%{001}bar',
+		}
+	    ]
+	  }, '999$z', 'wfoofirebarter', 'substituting field value'
+
+	],
+	[ $marc, {
+	    '001' => [
+		{
+		    op => 'regsub',
+		    pattern => '[aeiou]',
+		    replacement => '%{999$z}',
+		    flags => 'g',
+		}
+	    ]
+	  }, '001', 'fwaterrwater', 'substituting multiple subfield values'
+	],
+	[ $marc, {
+	    '002' => [ { op => 'regsub', pattern => '^$', replacement => '%{999$z}' } ]
+	  }, '002', 'water', 'creating new control field'
+	],
+	[ $marc, {
+	    '999$y' => [ { op => 'regsub', pattern => '^$', replacement => '%{999$z}' } ]
+	  }, '999$y', 'water', 'creating subfield of existing field'
+	],
+	[ $marc, {
+	    '998$y' => [ { op => 'regsub', pattern => '^$', replacement => '%{999$z}' } ]
+	  }, '998$y', 'water', 'creating subfield of new field'
+	],
+	[ $marc, {
+	    '002' => [ { op => 'regsub', pattern => '^$', replacement => '%{999$x}' } ]
+	  }, '002', undef, 'not creating field by substituting empty value'
+	],
+	[ $marc, {
+	    '998$y' => [ { op => 'regsub', pattern => '^$', replacement => '%{999$x}' } ]
+	  }, '998$y', undef, 'not creating subfield by substituting empty value'
+	],
+    );
 }
 
-use Test::More tests => 1 + @stripDiacriticsTests + @regsubTests + @applyRuleTests + @transformTests;
+use Test::More tests => 1 + @stripDiacriticsTests + @regsubTests + @applyRuleTests + @transformTests + @postProcessTests;
 
 BEGIN { use_ok('Net::Z3950::FOLIO::PostProcess') };
-use Net::Z3950::FOLIO::PostProcess qw(applyStripDiacritics applyRegsub applyRule transform);
+use Net::Z3950::FOLIO::PostProcess qw(applyStripDiacritics applyRegsub applyRule transform postProcessMARCRecord fieldOrSubfield);
 
 foreach my $stripDiacriticsTest (@stripDiacriticsTests) {
     my($value, $expected, $caption) = @$stripDiacriticsTest;
@@ -99,5 +186,12 @@ foreach my $transformTest (@transformTests) {
     my($value, $cfg, $expected, $caption) = @$transformTest;
     my $got = transform($cfg, $value);
     is($got, $expected, "transform '$value' ($caption)");
+}
+
+foreach my $postProcessTest (@postProcessTests) {
+    my($marc, $cfg, $field, $expected, $caption) = @$postProcessTest;
+    my $newMarc = postProcessMARCRecord($cfg, $marc);
+    my $got = fieldOrSubfield($newMarc, $field);
+    is($got, $expected, "postProcessMARCRecord field $field ($caption)");
 }
 

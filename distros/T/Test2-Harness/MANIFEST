@@ -224,6 +224,8 @@ t/integration/reload/lib/Preload/WarningA.pm
 t/integration/reload/lib/Preload/WarningB.pm
 t/integration/reload/lib/Preload/nonperl1
 t/integration/reload/lib/Preload/nonperl2
+t/integration/reload_syntax_error.t
+t/integration/reload_syntax_error.tx
 t/integration/replay.t
 t/integration/replay/fail.tx
 t/integration/replay/pass.tx

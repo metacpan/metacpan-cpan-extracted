@@ -1,5 +1,7 @@
 # Test the error reporting for malformed PDL::PP code.
-use Test::More tests => 3;
+use strict;
+use warnings;
+use Test::More;
 
 # Load up PDL::PP
 use PDL::PP qw(foo::bar foo::bar foobar);
@@ -29,3 +31,14 @@ TODO: {
 	unlike($@, qr/PP\.pm/, 'Should not report error as coming from PDL::PP');
 };
 
+eval {
+  pp_def(test1 =>
+    Pars => 'a(n)',
+    OtherPars => 'int b; int c',
+    OtherParsDefaults => { b => 0 },
+    Code => q{;},
+  );
+};
+isnt $@, '', 'error to give default for non-last params';
+
+done_testing;

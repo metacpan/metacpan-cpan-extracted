@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 use Encode;
 
-our $VERSION = '0.025';
+our $VERSION = '0.026';
 
 require XSLoader;
 XSLoader::load('HarfBuzz::Shaper', $VERSION);
@@ -465,11 +465,13 @@ each glyph.
 
 The hash contains the following items:
 
-    x_bearing; Distance from the x-origin to the left extremum of the glyph.
-    y_bearing; Distance from the top extremum of the glyph to the y-origin.
+    x_bearing  Distance from the x-origin to the left extremum of the glyph.
+    y_bearing  Distance from the top extremum of the glyph to the y-origin.
     width;     Distance from the left extremum of the glyph to the right extremum.
-    height;    Distance from the top extremum of the glyph to the bottom extremum.
-    g:         glyph index in font (CId)
+    height     Distance from the top extremum of the glyph to the bottom extremum.
+    g          Glyph index in font (CId)
+
+The values are scaled to the font size as set with set_size().
 
 Note that the number of glyphs does not necessarily match the number
 of input characters!
@@ -488,6 +490,42 @@ sub get_extents {
     foreach my $i ( @$info ) {
 	$i->{$_} *= $scale for qw( x_bearing y_bearing width height );
     }
+
+    return $info;
+}
+
+=head2 $info = $hb->get_font_extents(dir)
+
+Get the extents of the font in the given direction.
+
+I<dir> may be omitted, it defaults to the direction currently set, or
+C<'ltr'> if no direction was set.
+
+Upon completion returns a hash with the following items:
+
+    ascend     The height of typographic ascenders.
+    descend    The height of typographic ascenders.
+    line_gap   The suggested line-spacing gap.
+
+The values are scaled to the font size as set with set_size().
+
+Note that typically ascender is positive and descender negative, in
+coordinate systems that grow up.
+
+=cut
+
+sub get_font_extents {
+    my ( $self, $dir ) = @_;
+
+    croak("HarfBuzz get_font_extents() without font")
+      unless $self->{font};
+
+    $dir //= $self->{direction} // 'ltr';
+
+    my $scale = ( $self->{size} || 1 ) / 1000;
+    my $info = hb_buffer_get_font_extents( $self->{font}, $dir );
+
+    $info->{$_} *= $scale for qw( ascender descender line_gap );
 
     return $info;
 }

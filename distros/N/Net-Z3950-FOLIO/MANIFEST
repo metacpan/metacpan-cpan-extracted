@@ -2,7 +2,7 @@ CONTRIBUTING.md
 Changes.md
 LICENSE
 MANIFEST
-MANIFEST.skip
+MANIFEST.SKIP
 Makefile.PL
 README.md
 bin/z2folio

@@ -1,5 +1,17 @@
 Revision history for String-Interpolate-Named
 
+1.03	2022-01-13
+
+	Fix substituting empty in %{key|} even if key has a value.
+	Fix some edge cases with nesting and escaping.
+
+1.02	2022-01-12
+
+	Fix problem with de-escaping \{ \} \| outside of substitution
+	(issue #6);
+	Silently provide empty values when an array selector exceeds
+	the number of elements in the array.
+
 1.01	2021-05-18
 
 	Allow variable lookup using a callback.

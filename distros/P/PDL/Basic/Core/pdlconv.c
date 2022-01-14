@@ -1,9 +1,9 @@
 #include "pdl.h"      /* Data structure declarations */
 #include "pdlcore.h"  /* Core declarations */
 
-#define XCODE(code, datatype, generic, generic_ppsym, shortctype, defbval) \
-    generic *ap = (generic *) a->data; \
-    generic *pp = (generic *) a->vafftrans->from->data; \
+#define XCODE(code, datatype, ctype, ...) \
+    ctype *ap = (ctype *) a->data; \
+    ctype *pp = (ctype *) a->vafftrans->from->data; \
     pp += a->vafftrans->offs; \
     for(i=0; i<a->nvals; i++) { \
         code; \
@@ -20,15 +20,17 @@
     }
 
 #define VAFF_IO(name, X) \
-void pdl_ ## name(pdl *a) { \
+pdl_error pdl_ ## name(pdl *a) { \
+	pdl_error PDL_err = {0, NULL, 0}; \
 	PDL_Indx i; \
 	int j; \
 	int intype = a->datatype; \
 	if(!PDL_VAFFOK(a)) { \
-		die("pdl_" #name " without vaffine"); \
+		return pdl_make_error_simple(PDL_EUSERERROR, "pdl_" #name " without vaffine"); \
 	} \
 	PDL_ENSURE_ALLOCATED(a); \
-    PDL_GENERICSWITCH(intype, X); \
+    PDL_GENERICSWITCH(PDL_TYPELIST2_ALL, intype, X, return pdl_make_error(PDL_EUSERERROR, "Not a known data type code=%d", intype)) \
+    return PDL_err; \
 }
 
 #define X(...) XCODE(*ap = *pp, __VA_ARGS__)
@@ -39,38 +41,22 @@ VAFF_IO(writebackdata_vaffine, X)
 #undef X
 #undef XCODE
 
-/* Various conversion utilities for pdl data types */
-
-/* Change the type of all the data in a pdl struct, either changing the
-   original perl structure or making a temporary copy  */
-
-/* 
- * it seems this does not have to be aware of bad values
- * (at least in the current scheme)
- */
-
-void pdl_converttype( pdl* a, int targtype ) {
-    int intype;
+pdl_error pdl_converttype( pdl* a, int targtype ) {
+    pdl_error PDL_err = {0, NULL, 0};
     void* b;     /* Scratch data ptr */
-    SV*   bar;
-    HV*   hash;
-    STRLEN   nbytes;
-    int   diffsize;
-    PDL_Indx   i;
     PDLDEBUG_f(printf("pdl_converttype %p, %d, %d\n", (void*)a, a->datatype,
-	targtype);)
+	targtype));
+    if(a->state & PDL_DONTTOUCHDATA)
+      return pdl_make_error_simple(PDL_EUSERERROR, "Trying to converttype magical (mmaped?) pdl");
 
-    intype = a->datatype;
+    int intype = a->datatype;
     if (intype == targtype)
-       return;
+       return PDL_err;
 
-    diffsize = pdl_howbig(targtype) != pdl_howbig(a->datatype);
+    int diffsize = pdl_howbig(targtype) != pdl_howbig(a->datatype);
 
-    nbytes = a->nvals * pdl_howbig(targtype); /* Size of converted data */
+    STRLEN nbytes = a->nvals * pdl_howbig(targtype); /* Size of converted data */
 
-    if(a->state & PDL_DONTTOUCHDATA) {
-      croak("Trying to convert of magical (mmaped?) pdl");
-    }
     if (diffsize) {
        b = a->data;                      /* pointer to old data */
        a->data     = pdl_smalloc(nbytes); /* Space for changed data */
@@ -79,27 +65,42 @@ void pdl_converttype( pdl* a, int targtype ) {
        b = a->data; /* In place */
     }
 
-    /* Do the conversion as nested switch statements */
-#define X_OUTER(datatype_out, generic_out, generic_ppsym_out, shortctype_out, defbval_out) \
-    generic_out *bb = (generic_out *) b; \
-    i = a->nvals; \
-    PDL_GENERICSWITCH2(targtype, X_INNER);
-#define X_INNER(datatype_in, generic_in, generic_ppsym_in, shortctype_in, defbval_in) \
-    generic_in *aa = (generic_in *) a->data; \
+#define THIS_ISBAD(from_badval_isnan, from_badval, from_val) \
+  ((from_badval_isnan) \
+    ? isnan((double)(from_val)) \
+    : (from_val) == (from_badval))
+#define X_OUTER(datatype_from, ctype_from, ppsym_from, ...) \
+    PDL_Indx i = a->nvals; \
+    ctype_from *bb = (ctype_from *) b; \
+    ctype_from from_badval = pdl_get_pdl_badvalue(a).value.ppsym_from; \
+    char from_badval_isnan = PDL_ISNAN_##ppsym_from(from_badval); \
+    PDL_GENERICSWITCH2(PDL_TYPELIST2_ALL_, targtype, X_INNER, return pdl_make_error(PDL_EUSERERROR, "Not a known data type code=%d", targtype))
+#define X_INNER(datatype_to, ctype_to, ppsym_to, shortctype_to, defbval_to, ...) \
+    ctype_to *aa = (ctype_to *) a->data; \
     aa += i-1; bb += i-1; \
-    while (i--) \
-      *aa-- = (generic_in) *bb--;
-    PDL_GENERICSWITCH(intype, X_OUTER);
+    if (a->state & PDL_BADVAL) { \
+      ctype_to to_badval = defbval_to; \
+      a->has_badvalue = 0; \
+      while (i--) { \
+        *aa-- = THIS_ISBAD(from_badval_isnan, from_badval, *bb) \
+          ? to_badval : (ctype_to) *bb; \
+        bb--; \
+      } \
+    } else \
+      while (i--) \
+        *aa-- = (ctype_to) *bb--;
+    PDL_GENERICSWITCH(PDL_TYPELIST2_ALL, intype, X_OUTER, return pdl_make_error(PDL_EUSERERROR, "Not a known data type code=%d", intype))
 #undef X_INNER
 #undef X_OUTER
+#undef THIS_ISBAD
 
     /* Store new data */
     if (diffsize) {
-      STRLEN n_a;
-       bar = a->datasv;
+       SV *bar = a->datasv;
        sv_setpvn( bar, (char*) a->data, nbytes );
-       a->data = (void*) SvPV(bar, n_a);
+       a->data = (void*) SvPV_nolen(bar);
     }
 
     a->datatype = targtype;
+    return PDL_err;
 }

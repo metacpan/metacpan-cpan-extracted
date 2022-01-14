@@ -3,18 +3,20 @@ Changes
 lib/Future/IO.pm
 lib/Future/IO/ImplBase.pm
 lib/Test/Future/IO/Impl.pm
-LICENSE
 MANIFEST			This list of files
-META.json
-META.yml
-README
 t/00use.t
 t/01sleep.t
 t/02sysread.t
 t/03sysread_exactly.t
 t/04syswrite.t
 t/05syswrite_exactly.t
+t/06connect.t
+t/07accept.t
 t/10sleep+sysread.t
 t/20impl-override.t
 t/21impl-before-load.t
 t/99pod.t
+README
+LICENSE
+META.yml
+META.json

@@ -1,5 +1,9 @@
 Revision history for CPANPLUS-Dist-Debora
 
+0.008  2022-01-07 19:56:53 CET
+
+  - Handle architecture-dependent packages without shared objects
+
 0.007  2022-01-01 20:01:18 CET
 
   - Fix the Debian template

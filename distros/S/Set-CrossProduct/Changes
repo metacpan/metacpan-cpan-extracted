@@ -1,5 +1,8 @@
 Revision history for Perl module Set::CrossProduct
 
+2.007 2022-01-08T22:17:43Z
+	* No code changes. Fixed a link in README.pod.
+
 2.006 2021-02-03T16:11:31Z
 	* Note that combinations() has a scalar and list context.
 	* Re-order the method names to be alphabetical.

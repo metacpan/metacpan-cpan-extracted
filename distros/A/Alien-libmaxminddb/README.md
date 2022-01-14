@@ -32,7 +32,9 @@ Type the following command to see the module usage information:
 
 ## LICENSE AND COPYRIGHT
 
-Copyright 2021 Andreas Vögele
+Copyright 2022 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+The libmaxminddb library is licensed under the Apache License, Version 2.0.

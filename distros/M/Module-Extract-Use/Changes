@@ -1,5 +1,11 @@
 Revision history for Perl module Module::Extract::Use
 
+1.051 2022-01-09T18:16:19Z
+	* Fix up t/rt/79273.t regression, GitHub #7
+
+1.049 2022-01-08T21:24:03Z
+	* No code changes. Fix a link in the README.pod.
+
 1.047 2020-04-26T13:06:59Z
 	* extract_modules now has a -e switch to exclude core modules
 

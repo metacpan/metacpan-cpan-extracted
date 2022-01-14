@@ -21,6 +21,7 @@ use DynaLoader;
 
 
 
+#line 5 "iis.pd"
 =head1 NAME
 
 PDL::Graphics::IIS - Display PDL images on IIS devices (saoimage/ximtool)
@@ -91,6 +92,9 @@ using the module this will guarantee correct file names!
 
 =cut
 
+use strict;
+use warnings;
+#line 98 "IIS.pm"
 
 
 
@@ -98,6 +102,7 @@ using the module this will guarantee correct file names!
 
 
 
+#line 85 "iis.pd"
 
 use PDL::Core '';
 use PDL::Basic '';
@@ -420,24 +425,25 @@ sub findfifo {
       }
    }
 1;}
+#line 429 "IIS.pm"
 
 
 
-
-
-
+#line 1061 "../../blib/lib/PDL/PP.pm"
 *_iis = \&PDL::Graphics::IIS::_iis;
+#line 435 "IIS.pm"
 
 
 
-
-
+#line 1061 "../../blib/lib/PDL/PP.pm"
 *_iiscirc = \&PDL::Graphics::IIS::_iiscirc;
+#line 441 "IIS.pm"
 
 
 
 
 
+#line 620 "iis.pd"
 
 =head1 BUGS
 
@@ -453,8 +459,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-
-
+#line 463 "IIS.pm"
 
 
 

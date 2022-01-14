@@ -6,6 +6,8 @@ package   # have to break this up so the
           # CPAN indexer doesn't barf
           Inline;
 
+use strict;
+use warnings;
 #==============================================================================
 # override the original Inline::install method
 # to allow Inline::Pdlpp code to be installed
@@ -26,6 +28,7 @@ package   # have to break this up so the
 #==============================================================================
 
 # copied verbatim from Inline 0.43 apart from language_id check below
+{ no warnings 'redefine';
 sub install {
     my ($module, $DIRECTORY);
     my $o = shift;
@@ -70,6 +73,7 @@ sub install {
       "$o->{API}{modpname}/$o->{API}{modfname}.$o->{INLINE}{ILSM_suffix}";
     unshift @::INC, $o->{API}{install_lib};
     $o->{INLINE}{object_ready} = 0;
+}
 }
 
 

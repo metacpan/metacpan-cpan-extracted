@@ -8,7 +8,7 @@ package Net::Prometheus::ProcessCollector;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Net::Prometheus::Types qw( MetricSamples Sample );
 

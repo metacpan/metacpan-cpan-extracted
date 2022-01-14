@@ -223,6 +223,15 @@ Default:  B<1>.
 Note that you can also specify -separatorwidth on a column
 by column basis. See the B<COLUMNS> section below.
 
+=item B<-showcursoralways> I<boolean>
+
+Starting with version 3.20 (and Tk::HListbox version 2.4), Tk::HMListbox 
+no longer displays the keyboard cursor (active row) when the HMListbox 
+widget does not have the keyboard focus, in order to be consistent with the 
+behaviour of Tk::SMListbox and Tk::MListbox.  This option, when set to 1 
+(or a "true" value) restores the pre-v3.20 behaviour of always showing the 
+keyboard cursor.  Default I<0> (False).
+
 =item B<-sortable> => I<boolean>
 
 A value of B<1> indicates that it is okay for the user to sort
@@ -939,6 +948,7 @@ END_STR
 			foreach my $padarg (qw/-tpady -tpadx -ipady -ipadx/) {
 				$dynamic .= " $padarg => $args->{$padarg},"  if (defined($args->{$padarg}) && $args->{$padarg} =~ /\d/o);
 			}
+			$dynamic .= "-showcursoralways => 1,"  if ($Tk::HListbox::VERSION >= 2.4);
 		} else {
 			foreach my $padarg (qw/-tpady -tpadx -ipady -ipadx/) {
 				delete $args->{$padarg}  if (defined $args->{$padarg});
@@ -1054,7 +1064,7 @@ package Tk::HMListbox;
 use strict;
 use Carp;
 use vars qw($VERSION);
-$VERSION = '3.13';
+$VERSION = '3.21';
 
 use Tk;
 
@@ -1124,6 +1134,7 @@ sub ClassInit {
 	$mw->bind($class,'<Control-slash>','_selectAll');
 	$mw->bind($class,'<Control-backslash>','_deselectAll');
 	$mw->bind($class,'<FocusIn>','focus');
+	$mw->bind($class,'<FocusOut>','unfocus');
 	$mw->bind($class,'<Escape>', '_Cancel'); 
 	$mw->bind($class, '<Home>',  ['_chgView','xview','moveto',0]);
 	$mw->bind($class, '<End>',   ['_chgView','xview','moveto',1]);
@@ -1199,6 +1210,7 @@ sub InitObject {
 sub Populate {
 	my ($w, $args) = @_;
 
+	$w->{'-showcursoralways'} = delete($args->{'-showcursoralways'})  if (defined $args->{'-showcursoralways'});
 #    $w->SUPER::Populate($args);   
 
 	$w->{'_columns'} = [];          ## Array of HMLColumn objects 
@@ -1207,6 +1219,8 @@ sub Populate {
 	$w->{'_sort_descending'} = 0;   ## Flag for ascending/desc. sort order
 	$w->{'_top'} = 0;
 	$w->{'_bottom'} = 0;
+	$w->{'_lastactive'} = undef;
+	$w->{'_hasfocus'} = 0;
 
 	my $pane = $w->Component(
 			Pane => "pane",
@@ -1256,6 +1270,7 @@ sub Populate {
 			-ipady             => [qw/PASSIVE/],
 			-tpadx             => [qw/PASSIVE/],
 			-tpady             => [qw/PASSIVE/],
+			-showcursoralways  => [qw/PASSIVE showcursoralways showcursoralways 0/],
 	);
 
 	$w->ConfigAlias(
@@ -1706,15 +1721,31 @@ sub _yscrollCallback  {
 ######################################################################
 
 ## Activate a row
-sub activate { shift->_firstVisible->activate(@_)}   #DOES NOT APPEAR TO EVER GET CALLED.
+sub activate {
+	my $w = shift;
+
+	if ($w->{'-showcursoralways'} || $w->{'_hasfocus'}) {
+		$w->_firstVisible->activate(@_)   #DOES NOT APPEAR TO EVER GET CALLED.
+	} else {
+		$w->{'_lastactive'} = $_[0];
+		$w->_firstVisible->activate(undef);
+		$w->_firstVisible->anchorSet(@_);
+	}
+}
 
 sub focus
 {
 	my $w = shift;
 
+	unless ($w->focusCurrent) {  #UNLESS THE MAIN WINDOW'S NOT FOCUSED (ie. Ctrl-Mouse), GIVE IT RIGHT BACK!:
+		$w->unfocus();
+		return;
+	}
+
 	if (!$w->cget('-takefocus')) { 
 		$w->focusNext;
 	} else {
+		$w->{'_hasfocus'} = 1;
 		my $c = (defined($w->{Configure}{'-focuscolumn'}) && $w->{Configure}{'-focuscolumn'} >= 0)
 				? $w->columnGet($w->{Configure}{'-focuscolumn'})  #User specified which one to get focus.
 				: $w->_firstVisible; 
@@ -1734,7 +1765,19 @@ sub focus
 				Tk->break;
 			});
 		}
+		#RESTORE CURSOR WHEN FOCUS IS GAINED:
+		$w->activate($w->index('active') || $w->{'_lastactive'}); #  if (defined($w->{'_lastactive'}) && $w->{'_lastactive'} >= 0);
 	}
+}
+
+sub unfocus
+{
+	my $w = shift;
+
+	$w->{'_lastactive'} = $w->index('active');
+	$w->{'_hasfocus'} = 0;
+	#EMULATE SMListbox & MListbox BY REMOVING CURSOR WHEN FOCUS IS LOST:
+	$w->activate($w->{'_lastactive'});
 }
 
 sub bindColumns    {  shift->_bindSubwidgets('heading',@_) }
@@ -1847,7 +1890,7 @@ sub columnInsert {
 	}
 	if ($Tk::HListbox::VERSION >= 2.3) {
 		foreach (qw/-tpady -tpadx -ipady -ipadx/) {
-			$opts{$_} = $w->cget($_) if defined $w->cget($_);
+			$opts{$_} = $w->cget($_)  if defined $w->cget($_);
 		}
 	}
 	## All options (and more) might be overridden by %args.
@@ -1997,7 +2040,13 @@ sub getRow {
 	}
 }
 
-sub index { shift->_firstVisible->index(@_)}
+sub index {
+	my $w = shift;
+	
+	return undef  unless (defined $_[0]);
+	return $w->_firstVisible->index(@_)  if ($w->{'-showcursoralways'});
+	return (!$w->{'_hasfocus'} && $_[0] =~ /^active/o) ? $w->{'_lastactive'} : $w->_firstVisible->index(@_);
+}
 
 sub insert {
 	my ($w, $index, @data) = @_;

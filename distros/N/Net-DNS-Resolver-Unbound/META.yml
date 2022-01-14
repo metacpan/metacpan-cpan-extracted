@@ -1,0 +1,30 @@
+---
+abstract: 'Unbound resolver base for Net::DNS'
+author:
+  - 'Dick Franks'
+build_requires:
+  ExtUtils::MakeMaker: '6.66'
+  File::Find: '1.05'
+  File::Spec: '0.86'
+  IO::File: '1.08'
+  Net::DNS: '1.18'
+  Test::More: '0.47'
+configure_requires:
+  ExtUtils::MakeMaker: '6.66'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-DNS-Resolver-Unbound
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '1.1'
+  DynaLoader: '1.04'
+  perl: '5.008009'
+version: '1.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

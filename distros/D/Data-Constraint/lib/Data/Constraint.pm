@@ -156,7 +156,7 @@ You wish!  This module can't help you there.
 
 =cut
 
-our $VERSION = '1.202';
+our $VERSION = '1.203';
 
 use base qw(Class::Prototyped);
 
@@ -264,7 +264,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2004-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2004-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

@@ -4,7 +4,7 @@
       "brian d foy <bdfoy@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -53,6 +53,6 @@
          "web" : "https://github.com/briandfoy/Log-Log4perl-Appender-ScreenColoredLevels-UsingMyColors"
       }
    },
-   "version" : "0.113",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.114",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

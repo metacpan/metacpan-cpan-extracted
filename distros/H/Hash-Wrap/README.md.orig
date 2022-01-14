@@ -1,0 +1,549 @@
+# NAME
+
+Hash::Wrap - create on-the-fly objects from hashes
+
+# VERSION
+
+version 0.19
+
+# SYNOPSIS
+
+    use Hash::Wrap;
+
+    my $result = wrap_hash( { a => 1 } );
+    print $result->a;  # prints
+    print $result->b;  # throws
+
+    # import two constructors, <cloned> and <copied> with different behaviors.
+    use Hash::Wrap
+      { -as => 'cloned', clone => 1},
+      { -as => 'copied', copy => 1 };
+
+    my $cloned = cloned( { a => 1 } );
+    print $cloned->a;
+
+    my $copied = copied( { a => 1 } );
+    print $copied->a;
+
+    # don't pollute up your namespace
+    my $wrap;
+    use Hash::Wrap { -as => \$wrap};
+    my $obj = $wrap->( { a => 1 } );
+
+    # apply constructors to hashes two levels deep into the hash
+    use Hash::Wrap { -recurse => 2 };
+
+    # apply constructors to hashes at any level
+    use Hash::Wrap { -recurse => -1 };
+
+# DESCRIPTION
+
+**Hash::Wrap** creates objects from hashes, providing accessors for
+hash elements.  The objects are hashes, and may be modified using the
+standard Perl hash operations and the object's accessors will behave
+accordingly.
+
+Why use this class? Sometimes a hash is created on the fly and it's too
+much of a hassle to build a class to encapsulate it.
+
+    sub foo () { ... ; return { a => 1 }; }
+
+With `Hash::Wrap`:
+
+    use Hash::Wrap;
+
+    sub foo () { ... ; return wrap_hash( { a => 1 ); }
+
+    my $obj = foo ();
+    print $obj->a;
+
+Elements can be added or removed to the object and accessors will
+track them.  The object may be made immutable, or may have a restricted
+set of attributes.
+
+There are many similar modules on CPAN (see ["SEE ALSO"](#see-also) for comparisons).
+
+What sets **Hash::Wrap** apart is that it's possible to customize
+object construction and accessor behavior:
+
+- It's possible to use the passed hash directly, or make shallow or deep copies of it.
+- Accessors can be customized so that accessing a non-existent element can throw an exception or return the undefined value.
+- On recent enough versions of Perl, accessors can be lvalues, e.g.
+
+        $obj->existing_key = $value;
+
+# USAGE
+
+## Simple Usage
+
+`use`'ing **Hash::Wrap** without options imports a subroutine called
+`wrap_hash` which takes a hash, blesses it into a wrapper class and
+returns the hash:
+
+    use Hash::Wrap;
+
+    my $h = wrap_hash { a => 1 };
+    print $h->a, "\n";             # prints 1
+
+The wrapper class has no constructor method, so the only way to create
+an object is via the `wrap_hash` subroutine. (See ["WRAPPER CLASSES"](#wrapper-classes)
+for more about wrapper classes)  If `wrap_hash` is called without
+arguments, it will create a hash for you.
+
+## Advanced Usage
+
+### `wrap_hash` is an awful name for the constructor subroutine
+
+So rename it:
+
+    use Hash::Wrap { -as => "a_much_better_name_for_wrap_hash" };
+
+    $obj = a_much_better_name_for_wrap_hash( { a => 1 } );
+
+### The Wrapper Class name matters
+
+If the class _name_ matters, but it'll never be instantiated
+except via the imported constructor subroutine:
+
+    use Hash::Wrap { -class => 'My::Class' };
+
+    my $h = wrap_hash { a => 1 };
+    print $h->a, "\n";             # prints 1
+    $h->isa( 'My::Class' );        # returns true
+
+or, if you want it to reflect the current package, try this:
+
+    package Foo;
+    use Hash::Wrap { -class => '-caller', -as => 'wrapit' };
+
+    my $h = wrapit { a => 1 };
+    $h->isa( 'Foo::wrapit' );  # returns true
+
+Again, the wrapper class has no constructor method, so the only way to create
+an object is via the generated subroutine.
+
+### The Wrapper Class needs its own class constructor method
+
+To generate a wrapper class which can be instantiated via its own
+constructor method:
+
+    use Hash::Wrap { -class => 'My::Class', -new => 1 };
+
+The default `wrap_hash` constructor subroutine is still exported, so
+
+    $h = My::Class->new( { a => 1 } );
+
+and
+
+    $h = wrap_hash( { a => 1 } );
+
+do the same thing.
+
+To give the constructor method a different name:
+
+    use Hash::Wrap { -class => 'My::Class',  -new => '_my_new' };
+
+To prevent the constructor subroutine from being imported:
+
+    use Hash::Wrap { -as => undef, -class => 'My::Class', -new => 1 };
+
+### A stand alone Wrapper Class
+
+To create a stand alone wrapper class,
+
+    package My::Class;
+
+    use Hash::Wrap { -base => 1 };
+
+    1;
+
+And later...
+
+    use My::Class;
+
+    $obj = My::Class->new( \%hash );
+
+It's possible to modify the constructor and accessors:
+
+    package My::Class;
+
+    use Hash::Wrap { -base => 1, -new => 'new_from_hash', -undef => 1 };
+
+    1;
+
+# OPTIONS
+
+**Hash::Wrap** works at compile time.  To modify its behavior pass it
+options when it is `use`'d:
+
+    use Hash::Wrap { %options1 }, { %options2 }, ... ;
+
+Multiple options hashes may be passed; each hash specifies options for
+a separate constructor or class.
+
+For example,
+
+    use Hash::Wrap
+      { -as => 'cloned', clone => 1},
+      { -as => 'copied', copy => 1 };
+
+creates two constructors, `cloned` and `copied` with different
+behaviors.
+
+## Constructor
+
+- `-as` => _subroutine name_  || `undef` || _scalar ref_ || `-return`
+
+    (This defaults to the string `wrap_hash` )
+
+    If the argument is
+
+    - a string (but not the string `-return`)
+
+        Import the constructor subroutine with the given name.
+
+    - undefined
+
+        Do not import the constructor. This is usually only used with the ["-new"](#new) option.
+
+    - a scalar ref
+
+        Do not import the constructor. Store a reference to the constructor into the scalar.
+
+    - The string `-return`.
+
+        Do not import the constructor. The constructor subroutine(s) will be returned
+        from `Hash::Import`'s `import` method.  This is a fairly esoteric way of doing things:
+
+            require Hash::Wrap;
+            ( $copy, $clone ) = Hash::Wrap->import( { -as => '-return', copy => 1 },
+                                                    { -as => '-return', clone => 1 } );
+
+        A list is always returned, even if only one constructor is created.
+
+- `-copy` => _boolean_
+
+    If true, the object will store the data in a _shallow_ copy of the
+    hash. By default, the object uses the hash directly.
+
+- `-clone` => _boolean_ | _coderef_
+
+    Store the data in a deep copy of the hash. if _true_, ["dclone" in Storable](https://metacpan.org/pod/Storable#dclone)
+    is used. If a coderef, it will be called as
+
+        $clone = coderef->( $hash )
+
+    By default, the object uses the hash directly.
+
+- `-immutable` => _boolean_
+
+    The object's attributes and values are locked and may not be altered. Note that this
+    locks the underlying hash.
+
+- `-lockkeys` => _boolean_ | _arrayref_
+
+    If the value is _true_, the object's attributes are restricted to the existing keys in the hash.
+    If it is an array reference, it specifies which attributes are allowed, _in addition to existing attributes_.
+    The attribute's values are not locked.  Note that this locks the underlying hash.
+
+## Accessors
+
+- `-undef` => _boolean_
+
+    Normally an attempt to use an accessor for an non-existent key will
+    result in an exception.  This option causes the accessor
+    to return `undef` instead.  It does _not_ create an element in
+    the hash for the key.
+
+- `-lvalue` => _flag_
+
+    If non-zero, the accessors will be lvalue routines, e.g. they can
+    change the underlying hash value by assigning to them:
+
+        $obj->attr = 3;
+
+    The hash entry _must already exist_ or this will throw an exception.
+
+    lvalue subroutines are only available on Perl version 5.16 and later.
+
+    If `-lvalue = 1` this option will silently be ignored on earlier versions of Perl.
+
+    If `-lvalue = -1` this option will cause an exception on earlier versions of Perl.
+
+- `-recurse` => _integer level_
+
+    Normally only the top level hash is wrapped in a class.  This option specifies
+    how many levels deep into the hash hashes should be wrapped.  For example,
+    if
+
+        %h = ( l => 0, a => { l => 1, b => { l => 2, c => { l => 3 } } } };
+
+        use Hash::Wrap { -recurse => 0 };
+        $h->l          # => 0
+        $h->a->l       # => ERROR
+
+        use Hash::Wrap { -recurse => 1 };
+        $h->l          # => 0
+        $h->a->l       # => 1
+        $h->a->b->l    # => ERROR
+
+        use Hash::Wrap { -recurse => 2 };
+        $h->l          # => 0
+        $h->a->l       # => 1
+        $h->a->b->l    # => 2
+        $h->a->b->c->l # => ERROR
+
+    For infinite recursion, set `-recurse` to `-1`.
+
+    Constructors built for deeper hash levels will not heed the `-as_scalar_ref`,
+    `-class`, `-base`, or `-as` attributes.
+
+## Class
+
+- `-base` => _boolean_
+
+    If true, the enclosing package is converted into a proxy wrapper class.  This should
+    not be used in conjunction with `-class`.  See ["A stand alone Wrapper Class"](#a-stand-alone-wrapper-class).
+
+- `-class` => _class name_
+
+    A class with the given name will be created and new objects will be
+    blessed into the specified class by the constructor subroutine.  The
+    new class will not have a constructor method.
+
+    If _class name_ is the string `-caller`, then the class name is
+    set to the fully qualified name of the constructor, e.g.
+
+        package Foo;
+        use Hash::Wrap { -class => '-caller', -as => 'wrap_it' };
+
+    results in a class name of `Foo::wrap_it`.
+
+    If not specified, the class name will be constructed based upon the
+    options.  Do not rely upon this name to determine if an object is
+    wrapped by **Hash::Wrap**.
+
+- `-new` => _boolean_ | _Perl Identifier_
+
+    Add a class constructor method.
+
+    If `-new` is a true boolean value, the method will be called
+    `new`. Otherwise `-new` specifies the name of the method.
+
+### Extra Class Methods
+
+- `-defined` => _boolean_ | _Perl Identifier_
+
+    Add a method which returns true if the passed hash key is defined or
+    does not exist. If `-defined` is a true boolean value, the method will be called
+    `defined`. Otherwise it specifies the name of the method. For
+    example,
+
+        use Hash::Wrap { -defined => 1 };
+        $obj = wrap_hash( { a => 1, b => undef } );
+
+        $obj->defined( 'a' ); # TRUE
+        $obj->defined( 'b' ); # FALSE
+        $obj->defined( 'c' ); # FALSE
+
+    or
+
+        use Hash::Wrap { -defined => 'is_defined' };
+        $obj = wrap_hash( { a => 1 } );
+        $obj->is_defined( 'a' );
+
+- `-exists` => _boolean_ | _Perl Identifier_
+
+    Add a method which returns true if the passed hash key exists. If
+    `-exists` is a boolean, the method will be called
+    `exists`. Otherwise it specifies the name of the method. For example,
+
+        use Hash::Wrap { -exists => 1 };
+        $obj = wrap_hash( { a => 1 } );
+        $obj->exists( 'a' );
+
+    or
+
+        use Hash::Wrap { -exists => 'is_present' };
+        $obj = wrap_hash( { a => 1 } );
+        $obj->is_present( 'a' );
+
+    \-item `-predicate` => _boolean_
+
+    This adds the more traditionally named predicate methods, such as
+    `has_foo` for attribute `foo`.  Note that this option makes any
+    elements which begin with `has_` unavailable via the generated
+    accessors.
+
+- `-methods` => { _method name_ => _code reference_, ... }
+
+    Install the passed code references into the class with the specified
+    names. These override any attributes in the hash.  For example,
+
+        use Hash::Wrap { -methods => { a => sub { 'b' } } };
+
+        $obj = wrap_hash( { a => 'a' } );
+        $obj->a;  # returns 'b'
+
+# WRAPPER CLASSES
+
+A wrapper class has the following characteristics.
+
+- It has the methods `DESTROY`, `AUTOLOAD` and `can`.
+- It will have other methods if the `-undef` and `-exists` options are specified. It may
+have other methods if it is [a stand alone class](#a-stand-alone-wrapper-class).
+- It will have a constructor if either of `-base` or `-new` is specified.
+
+## Wrapper Class Limitations
+
+- Wrapper classes have `DESTROY`, `can` method, and
+`AUTOLOAD` methods, which will mask hash keys with the same names.
+- Classes which are generated without the `-base` or `-new` options do
+not have a class constructor method, e.g `Class->new()` will
+_not_ return a new object.  The only way to instantiate them is via
+the constructor subroutine generated via **Hash::Wrap**.  This allows
+the underlying hash to have a `new` attribute which would otherwise be
+masked by the constructor.
+
+# LIMITATIONS
+
+## Lvalue accessors
+
+Lvalue accessors are available only on Perl 5.16 and later.
+
+## Accessors for deleted hash elements
+
+Accessors for deleted elements are not removed.  The class's `can`
+method will return `undef` for them, but they are still available in
+the class's stash.
+
+# EXAMPLES
+
+# Existing keys are not compatible with method names
+
+If a hash key contains characters that aren't legal in method names,
+there's no way to access that hash entry.  One way around this is to
+use a custom clone subroutine which modifies the keys so they are
+legal method names.  The user can directly insert a non-method-name
+key into the `Hash::Wrap` object after it is created, and those still
+have a key that's not available via a method, but there's no cure for
+that.
+
+# SEE ALSO
+
+Here's a comparison of this module and others on CPAN.
+
+- [Hash::Wrap](https://metacpan.org/pod/Hash%3A%3AWrap) (this module)
+    - core dependencies only
+    - object tracks additions and deletions of entries in the hash
+    - optionally applies object paradigm recursively
+    - accessors may be lvalue subroutines
+    - accessing a non-existing element via an accessor
+    throws by default, but can optionally return `undef`
+    - can use custom package
+    - can copy/clone existing hash. clone may be customized
+    - can add additional methods to the hash object's class
+    - optionally stores the constructor in a scalar
+    - optionally provides per-attribute predicate methods (e.g. `has_foo`)
+    - optionally provides methods to check an attribute existence or whether its value is defined
+- [Object::Result](https://metacpan.org/pod/Object%3A%3AResult)
+
+    As you might expect from a
+    [DCONWAY](https://metacpan.org/author/DCONWAY) module, this does just
+    about everything you'd like.  It has a very heavy set of dependencies.
+
+- [Hash::AsObject](https://metacpan.org/pod/Hash%3A%3AAsObject)
+    - core dependencies only
+    - applies object paradigm recursively
+    - accessing a non-existing element via an accessor creates it
+- [Data::AsObject](https://metacpan.org/pod/Data%3A%3AAsObject)
+    - moderate dependency chain (no XS?)
+    - applies object paradigm recursively
+    - accessing a non-existing element throws
+- [Class::Hash](https://metacpan.org/pod/Class%3A%3AHash)
+    - core dependencies only
+    - only applies object paradigm to top level hash
+    - can add generic accessor, mutator, and element management methods
+    - accessing a non-existing element via an accessor creates it (not documented, but code implies it)
+    - `can()` doesn't work
+- [Hash::Inflator](https://metacpan.org/pod/Hash%3A%3AInflator)
+    - core dependencies only
+    - accessing a non-existing element via an accessor returns undef
+    - applies object paradigm recursively
+- [Hash::AutoHash](https://metacpan.org/pod/Hash%3A%3AAutoHash)
+    - moderate dependency chain.  Requires XS, tied hashes
+    - applies object paradigm recursively
+    - accessing a non-existing element via an accessor creates it
+- [Hash::Objectify](https://metacpan.org/pod/Hash%3A%3AObjectify)
+    - light dependency chain.  Requires XS.
+    - only applies object paradigm to top level hash
+    - accessing a non-existing element throws, but if an existing
+    element is accessed, then deleted, accessor returns undef rather than
+    throwing
+    - can use custom package
+- [Data::OpenStruct::Deep](https://metacpan.org/pod/Data%3A%3AOpenStruct%3A%3ADeep)
+    - uses source filters
+    - applies object paradigm recursively
+- [Object::AutoAccessor](https://metacpan.org/pod/Object%3A%3AAutoAccessor)
+    - light dependency chain
+    - applies object paradigm recursively
+    - accessing a non-existing element via an accessor creates it
+- [Data::Object::Autowrap](https://metacpan.org/pod/Data%3A%3AObject%3A%3AAutowrap)
+    - core dependencies only
+    - no documentation
+- [Object::Accessor](https://metacpan.org/pod/Object%3A%3AAccessor)
+    - core dependencies only
+    - only applies object paradigm to top level hash
+    - accessors may be lvalue subroutines
+    - accessing a non-existing element via an accessor
+    returns `undef` by default, but can optionally throw. Changing behavior
+    is done globally, so all objects are affected.
+    - accessors must be explicitly added.
+    - accessors may have aliases
+    - values may be validated
+    - invoking an accessor may trigger a callback
+- [Object::Adhoc](https://metacpan.org/pod/Object%3A%3AAdhoc)
+    - minimal non-core dependencies ([Exporter::Shiny](https://metacpan.org/pod/Exporter%3A%3AShiny)
+    - uses [Class::XSAccessor](https://metacpan.org/pod/Class%3A%3AXSAccessor) if available
+    - only applies object paradigm to top level hash
+    - provides separate getter and predicate methods, but only
+    for existing keys in hash.
+    - hash keys are locked.
+    - operates directly on hash.
+- [Util::H2O](https://metacpan.org/pod/Util%3A%3AH2O)
+    - has a cool name
+    - core dependencies only
+    - locks hash by default
+    - optionally recurses into the hash
+    - does not track changes to hash
+    - can destroy class
+    - can add methods
+    - can use custom package
+
+# SUPPORT
+
+## Bugs
+
+Please report any bugs or feature requests to bug-hash-wrap@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=Hash-Wrap
+
+## Source
+
+Source is available at
+
+    https://gitlab.com/djerius/hash-wrap
+
+and may be cloned from
+
+    https://gitlab.com/djerius/hash-wrap.git
+
+# AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+    The GNU General Public License, Version 3, June 2007

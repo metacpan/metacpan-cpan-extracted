@@ -2,7 +2,7 @@ use lib 'inc';
 
 use Net::SSLeay;
 use Test::Net::SSLeay qw(
-    can_fork data_file_path initialise_libssl is_libressl tcp_socket
+    can_fork data_file_path initialise_libssl is_libressl new_ctx tcp_socket
 );
 
 if (not can_fork()) {
@@ -35,12 +35,19 @@ our %tls_1_2_aead_cipher_to_keyblock_size = (
      'AES256-GCM-SHA384' => 88,
     );
 
-our %tls_1_3_aead_cipher_to_keyblock_size = (
-     # Only in TLS 1.3
-     'TLS_AES_128_GCM_SHA256' => 56,
-     'TLS_AES_256_GCM_SHA384' => 88,
-     'TLS_CHACHA20_POLY1305_SHA256' => 88,
-    );
+# LibreSSL uses different names for the TLSv1.3 ciphersuites:
+our %tls_1_3_aead_cipher_to_keyblock_size =
+      is_libressl()
+    ? (
+          'AEAD-AES128-GCM-SHA256'        => 56,
+          'AEAD-AES256-GCM-SHA384'        => 88,
+          'AEAD-CHACHA20-POLY1305-SHA256' => 88,
+      )
+    : (
+         'TLS_AES_128_GCM_SHA256'       => 56,
+         'TLS_AES_256_GCM_SHA384'       => 88,
+         'TLS_CHACHA20_POLY1305_SHA256' => 88,
+      );
 
 # Combine the AEAD hashes
 our %aead_cipher_to_keyblock_size = (%tls_1_2_aead_cipher_to_keyblock_size, %tls_1_3_aead_cipher_to_keyblock_size);
@@ -48,14 +55,13 @@ our %aead_cipher_to_keyblock_size = (%tls_1_2_aead_cipher_to_keyblock_size, %tls
 # Combine the hashes
 our %cipher_to_keyblock_size = (%non_aead_cipher_to_keyblock_size, %aead_cipher_to_keyblock_size);
 
-our %version_str2int =
-    (
-     'SSLv3'   => sub {return eval {Net::SSLeay::SSL3_VERSION();}},
-     'TLSv1'   => sub {return eval {Net::SSLeay::TLS1_VERSION();}},
-     'TLSv1.1' => sub {return eval {Net::SSLeay::TLS1_1_VERSION();}},
-     'TLSv1.2' => sub {return eval {Net::SSLeay::TLS1_2_VERSION();}},
-     'TLSv1.3' => sub {return eval {Net::SSLeay::TLS1_3_VERSION();}},
-    );
+our %version_str2int = (
+    'SSLv3'   => sub { return eval { Net::SSLeay::SSL3_VERSION(); } },
+    'TLSv1'   => sub { return eval { Net::SSLeay::TLS1_VERSION(); } },
+    'TLSv1.1' => sub { return eval { Net::SSLeay::TLS1_1_VERSION(); } },
+    'TLSv1.2' => sub { return eval { Net::SSLeay::TLS1_2_VERSION(); } },
+    'TLSv1.3' => sub { return eval { Net::SSLeay::TLS1_3_VERSION(); } },
+);
 
 # Tests that don't need a connection
 client_test_ciphersuites();
@@ -74,7 +80,7 @@ my $server = tcp_socket();
     defined($pid = fork()) or BAIL_OUT("failed to fork: $!");
     if ($pid == 0) {
 	my $cl = $server->accept();
-	my $ctx = Net::SSLeay::CTX_new();
+	my $ctx = new_ctx();
 	Net::SSLeay::set_cert_and_key($ctx, $cert_pem, $key_pem);
 #	my $get_keyblock_size_ciphers = join(':', keys(%cipher_to_keyblock_size));
 	my $get_keyblock_size_ciphers = join(':', keys(%non_aead_cipher_to_keyblock_size));
@@ -96,6 +102,10 @@ my $server = tcp_socket();
 	# Echo back the termination request from client
 	my $end = Net::SSLeay::read($ssl);
 	Net::SSLeay::write($ssl, $end);
+	Net::SSLeay::shutdown($ssl);
+	Net::SSLeay::free($ssl);
+	close($cl) || die("server close: $!");
+	$server->close() || die("server listen socket close: $!");
 	exit(0);
     }
 }
@@ -107,7 +117,7 @@ sub client {
     my ($f_len, $f_len_trunc, $finished_s, $finished_c, $msg, $expected);
 
     my $cl = $server->connect();
-    my $ctx = Net::SSLeay::CTX_new();
+    my $ctx = new_ctx();
     Net::SSLeay::CTX_set_options($ctx, &Net::SSLeay::OP_ALL);
     my $ssl = Net::SSLeay::new($ctx);
 
@@ -121,6 +131,10 @@ sub client {
     my $end = "end";
     Net::SSLeay::write($ssl, $end);
     ok($end eq Net::SSLeay::read($ssl),  'Successful termination');
+    Net::SSLeay::shutdown($ssl);
+    Net::SSLeay::free($ssl);
+    close($cl) || die("client close: $!");
+    $server->close() || die("client listen socket close: $!");
     return;
 }
 
@@ -245,8 +259,19 @@ sub client_test_ciphersuites
 
     my $ciphersuites = join(':', keys(%tls_1_3_aead_cipher_to_keyblock_size));
 
+    # In OpenSSL 3.0.0 alpha 11 (commit c1e8a0c66e32b4144fdeb49bd5ff7acb76df72b9)
+    # SSL_CTX_set_ciphersuites() and SSL_set_ciphersuites() were
+    # changed to ignore unknown ciphers
+    my $ret_partially_bad_ciphersuites = 1;
+    if (Net::SSLeay::SSLeay() == 0x30000000) {
+	my $ssleay_version = Net::SSLeay::SSLeay_version(Net::SSLeay::SSLEAY_VERSION());
+	$ret_partially_bad_ciphersuites = 0 if ($ssleay_version =~ m/-alpha(\d+)/s) && $1 < 11;
+    } elsif (Net::SSLeay::SSLeay() < 0x30000000) {
+	$ret_partially_bad_ciphersuites = 0;
+    }
+
     my ($ctx, $rv, $ssl);
-    $ctx = Net::SSLeay::CTX_new();
+    $ctx = new_ctx();
     $rv = Net::SSLeay::CTX_set_ciphersuites($ctx, $ciphersuites);
     is($rv, 1, 'CTX set good ciphersuites');
     $rv = Net::SSLeay::CTX_set_ciphersuites($ctx, '');
@@ -257,7 +282,7 @@ sub client_test_ciphersuites
     };
     is($rv, 1, 'CTX set undef ciphersuites');
     $rv = Net::SSLeay::CTX_set_ciphersuites($ctx, 'nosuchthing:' . $ciphersuites);
-    is($rv, 0, 'CTX set partially bad ciphersuites');
+    is($rv, $ret_partially_bad_ciphersuites, 'CTX set partially bad ciphersuites');
     $rv = Net::SSLeay::CTX_set_ciphersuites($ctx, 'nosuchthing:');
     is($rv, 0, 'CTX set bad ciphersuites');
 
@@ -272,7 +297,7 @@ sub client_test_ciphersuites
     };
     is($rv, 1, 'SSL set undef ciphersuites');
     $rv = Net::SSLeay::set_ciphersuites($ssl, 'nosuchthing:' . $ciphersuites);
-    is($rv, 0, 'SSL set partially bad ciphersuites');
+    is($rv, $ret_partially_bad_ciphersuites, 'SSL set partially bad ciphersuites');
     $rv = Net::SSLeay::set_ciphersuites($ssl, 'nosuchthing:');
     is($rv, 0, 'SSL set bad ciphersuites');
 
@@ -283,7 +308,7 @@ sub test_cipher_funcs
 {
 
     my ($ctx, $rv, $ssl);
-    $ctx = Net::SSLeay::CTX_new();
+    $ctx = new_ctx();
     $ssl = Net::SSLeay::new($ctx);
 
     # OpenSSL API says these can accept NULL ssl

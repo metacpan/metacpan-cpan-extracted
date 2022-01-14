@@ -1,0 +1,6 @@
+Revision history for Perl extension Lang::HEX::Export.
+
+0.01  Mon Jan 10 17:54:58 2022
+	- original version; created by h2xs 1.23 with options
+		-AXn Lang::HEX::Export
+

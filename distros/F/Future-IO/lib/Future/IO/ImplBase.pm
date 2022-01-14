@@ -8,9 +8,15 @@ package Future::IO::ImplBase;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
-use Errno qw( EAGAIN EWOULDBLOCK );
+use Errno qw( EAGAIN EWOULDBLOCK EINPROGRESS );
+use Socket qw( SOL_SOCKET SO_ERROR );
+
+# connect() yields EWOULDBLOCK on MSWin32
+use constant CONNECT_EWOULDBLOCK => ( $^O eq "MSWin32" );
+
+use constant HAVE_MULTIPLE_FILEHANDLES => 1;
 
 =head1 NAME
 
@@ -54,6 +60,28 @@ implementing class should provide.
 
 =cut
 
+=head2 accept
+
+Implemented by wrapping C<ready_for_read>, as L</sysread> uses.
+
+=cut
+
+sub accept
+{
+   my $self = shift;
+   my ( $fh ) = @_;
+
+   return $self->ready_for_read( $fh )->then( sub {
+      my $accepted = $fh->accept;
+      if( $accepted ) {
+         return Future->done( $accepted );
+      }
+      else {
+         return Future->fail( "accept: $!\n", accept => $fh, $! );
+      }
+   } );
+}
+
 =head2 alarm
 
 Implemented by wrapping C<sleep>.
@@ -66,6 +94,44 @@ sub alarm
    my ( $time ) = @_;
 
    return $self->sleep( $time - Time::HiRes::time() );
+}
+
+=head2 connect
+
+Implemented by wrapping C<ready_for_write>, as L</syswrite> uses.
+
+=cut
+
+sub connect
+{
+   my $self = shift;
+   my ( $fh, $name ) = @_;
+
+   # We can't use IO::Socket->connect here because
+   #   https://github.com/Perl/perl5/issues/19326
+
+   my $ret = CORE::connect( $fh, $name );
+   my $errno = $!;
+
+   if( $ret ) {
+      return Future->done;
+   }
+   elsif( $errno != EINPROGRESS and !CONNECT_EWOULDBLOCK || $errno != EWOULDBLOCK ) {
+      return Future->fail( "connect: $errno\n", connect => $fh, $errno );
+   }
+
+   # not synchronous result
+
+   return $self->ready_for_write( $fh )->then( sub {
+      $errno = $fh->getsockopt( SOL_SOCKET, SO_ERROR );
+
+      if( $errno ) {
+         $! = $errno;
+         return Future->fail( "connect: $!\n", connect => $fh, $! );
+      }
+
+      return Future->done;
+   } );
 }
 
 =head2 sysread

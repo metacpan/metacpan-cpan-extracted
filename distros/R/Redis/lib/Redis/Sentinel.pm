@@ -8,7 +8,7 @@
 #   The Artistic License 2.0 (GPL Compatible)
 #
 package Redis::Sentinel;
-$Redis::Sentinel::VERSION = '1.998';
+$Redis::Sentinel::VERSION = '1.999';
 # ABSTRACT: Redis Sentinel interface
 
 use warnings;
@@ -54,7 +54,7 @@ Redis::Sentinel - Redis Sentinel interface
 
 =head1 VERSION
 
-version 1.998
+version 1.999
 
 =head1 SYNOPSIS
 

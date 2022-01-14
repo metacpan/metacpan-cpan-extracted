@@ -10,7 +10,7 @@ use Tk::widgets qw/ JPEG LabEntry Pane PNG Balloon /;
 use base qw/ Tk::Derived Tk::Pane /;
 use vars qw/ $VERSION $err $info $CORNER $haveAnimation/;
 
-$VERSION = '2.2';
+$VERSION = '2.3';
 $haveAnimation = 0;
 eval 'use Tk::widgets qw/ Animation /; $haveAnimation = 1; 1';
 
@@ -20,6 +20,7 @@ sub ClassInit {
 
 	my( $class, $mw ) = @_;
 
+#	$err  = $mw->Photo( -data => $class->err );
 	$err  = Tk->findINC( 'JThumbnail/images/failimg.png' );
 	$info = Tk->findINC( 'JThumbnail/images/info3.png' );
 	$CORNER = __PACKAGE__ . "::corner";
@@ -350,6 +351,7 @@ sub render {
 	my( $self ) = @_;
 
 	$self->clear;		# clear Table
+#!!	delete $self->{'descendants'};
 
 	my $pxx = $self->cget( '-iwidth' );  # thumbnail pixel width
 	my $pxy = $self->cget( '-iheight' ); # thumbnail pixel height
@@ -436,7 +438,7 @@ sub render {
 	my $indx = 0;
 	my $ext;
 
-	THUMB:  foreach my $r ( 0 .. $rows - 1 ) {
+THUMB:	foreach my $r ( 0 .. $rows - 1 ) {
 		foreach my $c ( 0 .. $cols - 1 ) {
 			last THUMB if --$count < 0;
 
@@ -584,6 +586,7 @@ sub render {
 					}
 				}
 				$self->{'anchor'} = $clickedon;
+#x				$self->{'deselecting'} = $self->isSelected($self->{'anchor'} ? 0 : 1);
 				$self->{'_shifted'} = 1;
 			});
 			$b->bind('<ButtonPress-1>', sub {   #NEEDED FOR "MOTION-DRAG SELECT TO WORK:
@@ -634,6 +637,7 @@ sub render {
 			} else {
 				$b->bind('<ButtonRelease-1>', sub {
 					return  if ($self->cget('-state') =~ /d/);
+					#x $self->selectionToggle($self->index('mouse'))  unless (defined($self->{'_shifted'}) && $self->{'_shifted'});
 					$self->activate($self->index('mouse'));
 					$self->{'_shifted'} = 0;
 				});
@@ -726,8 +730,13 @@ sub bindRows {   #SYNONYM FOR bindImages(), NAMED FOR COMPAT. W/Tk::HMListbox IN
 	my ($w, $sequence, $callback) = @_;
 
 	my $subwidget = $w;
-
 	return (keys %{$w->{'_binds'}})  unless (defined $sequence);
+
+#	unless (defined $callback) {
+#		$callback = $w->{'_bindings'}->{$subwidget}->{$sequence};
+#		$callback = '' unless defined $callback;
+#		return $callback;
+#	}
 
 	if ($callback eq '') {
 		delete $w->{'_binds'}->{$sequence};
@@ -830,7 +839,12 @@ sub index
 {
 	my ($self, $mousexy) = @_;
 
-	return -1  unless ($mousexy);
+	return -1  unless (defined($mousexy) && $mousexy =~ /\S/);  #NOTHING - PUNT!
+	return $mousexy  if ($mousexy =~ /^[0-9]+$/ && $mousexy <= $#{$self->{'descendants'}}); #JUST A RAW INDEX#
+	if ($mousexy =~ /^([0-9]+)[\.\,]([0-9]+)$/ && defined($self->{'cols'}) && $self->{'cols'} > 0) {
+		$mousexy = int($1 * $self->{'cols'}) + $2 % $self->{'cols'};
+		return ($mousexy <= $#{$self->{'descendants'}} && $2 < $self->{'cols'}) ? $mousexy : -1;
+	}
 	return $self->{'active'}  if ($mousexy =~ /^active$/io);
 	return $#{$self->{'descendants'}}  if ($mousexy =~ /^end$/io);
 
@@ -849,6 +863,7 @@ sub get
 
 	$indx = $#{$self->{'descendants'}}  if ($indx =~ /^end$/io);
 	$indx = $self->{'active'}  if ($indx =~ /^active$/io);
+
 	return undef  if ($indx < 0 || $indx > $#{$self->{'descendants'}});
 	return ${$self->cget('-images')}[$indx];
 }
@@ -899,6 +914,7 @@ sub selectionSet
 	}
 	my @indexRange = (@args);
 	@indexRange = ($args[1] < $args[0]) ? reverse($args[1]..$args[0]) : ($args[0]..$args[1])  if (defined($args[1]) && !defined($args[2]));
+#	return undef  if ($indexRange[0] < 0 || $indexRange[$#indexRange] > $#{$self->{'descendants'}});
 
 	foreach my $indx (@indexRange) {
 		my $fn = $self->get($indx);
@@ -954,6 +970,7 @@ sub selectionClear
 	}
 	my @indexRange = (@args);
 	@indexRange = ($args[1] < $args[0]) ? reverse($args[1]..$args[0]) : ($args[0]..$args[1])  if (defined($args[1]) && !defined($args[2]));
+#	return undef  if ($indexRange[0] < 0 || $indexRange[$#indexRange] > $#{$self->{'descendants'}});
 
 	foreach my $indx (@indexRange) {
 		my $fn = $self->get($indx);
@@ -975,7 +992,6 @@ sub Motion
 	my $w = shift;
 	my $el = $w->{'anchor'};
 	my $Ev = $w->XEvent;
-
 	$w->xscan('dragto',$w->pointerx,$w->pointery);
 }
 
@@ -1029,15 +1045,15 @@ Tk::JThumbnail - Present a list of files in a directory as a grid of icons with 
 
 Jim Turner
 
-(c) 2019, Jim Turner under the same license that Perl 5 itself is.  All rights reserved.
+(c) 2019-2022, Jim Turner under the same license that Perl 5 itself is.  All rights reserved.
 
 =head1 ACKNOWLEDGEMENTS
 
-Derived from L<Tk::Thumbnail>, by Stephen O. Lidie (Copyright (C) 2001 - 2005, Steve Lidie. All rights reserved.)
+Derived from L<Tk::Thumbnail>, by Stephen O. Lidie (Copyright (C) 2001-2005, Steve Lidie. All rights reserved.)
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2019 Jim Turner.
+Copyright (c) 2019-2022 Jim Turner.
 
 Tk::JThumbnail is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -1237,7 +1253,7 @@ Example:  I<$thumb>->B<bindImages>('<Button-1>' => [\&I<mycallbackfn> [, args] ]
 
 B<JThumbnail-added feature>:  Optional reference to a hash of icon images 
 to be displayed for non-image files.  The hash keys are file extensions 
-and the values image files for the icons.  Default:  {} (I<none>).
+and the values are image files for the icons.  Default:  {} (I<none>).
 
 Example:  {'txt' => '/usr/local/pixmaps/texticon.png', 'pdf' => '/usr/local/pixmaps/adobe.jpg' [, ...]}
 
@@ -1370,8 +1386,8 @@ background, a different shade of gray will be used.
 =item B<-selected>
 
 B<JThumbnail-added feature>:  Optional reference to a list of boolean 
-values corresponding to the indicies of images to be marked as currently 
-"selected".
+values corresponding to the indicies of images to be initially marked as 
+currently "selected".
 Default:  [] (I<none>).
 
 Example:  To select the first and fifth images:  -selected => [1,0,0,0,1]
@@ -1498,7 +1514,10 @@ the mouse cursor in the widget).  I<'mouse'> can be used to get the
 index of the widget under the mouse pointer (or just clicked on).
 NOTE:  $thumb->index('end') returns the index of the last image in 
 the list, so adding 1 to this gets the total count of images in the 
-list!
+list!  I<number> can be a positive integer (which just returns that number 
+(or -1, if greater than the number of elements)), or a decimal number (#.#) or 
+string: "#,#" to return the index of a specific zero-based row.column.
+All index#s are zero-based, and valid range is (0..#elements-1).
 
 =item $thumb->B<indexOf>(I<image-filename>);
 

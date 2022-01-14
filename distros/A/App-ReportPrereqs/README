@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    Version 0.006
+    Version 0.008
 
 SYNOPSIS
 
@@ -12,8 +12,9 @@ SYNOPSIS
 
 DESCRIPTION
 
-    The report-prereqs utility will examine cpanfile for prerequisites with
-    Module::CPANfile. It reports the version of all modules listed as
+    The report-prereqs utility will examine a cpanfile, META.json, or
+    META.yml file for prerequisites with Module::CPANfile respectively
+    CPAN::Meta. It reports the version of all modules listed as
     prerequisites (including 'recommends', 'suggests', etc.). However, any
     'develop' prerequisites are not reported, unless they show up in
     another category or the --with-develop option is used.
@@ -30,6 +31,21 @@ DESCRIPTION
     list of all versions.
 
 OPTIONS
+
+    --cpanfile [ FILENAME ]
+
+      Parse the filename with Module::CPANfile instead of the default
+      behavior. If the filename is omitted it defaults to cpanfile - which
+      is also the default.
+
+      Can not be used together with --meta or a url.
+
+    --meta [ FILENAME ]
+
+      Parse the filename with CPAN::Meta instead of the default behavior.
+      If the filename is omitted it defaults to META.json.
+
+      Can not be used together with --cpanfile or a url.
 
     --with-develop
 
@@ -85,6 +101,10 @@ EXAMPLES
 
         report-prereqs https://raw.githubusercontent.com/skirmess/App-ReportPrereqs/master/cpanfile
 
+ Example 6 Show prerequisites from a MYMETA.json
+
+        report-prereqs --meta MYMETA.json
+
 RATIONALE
 
  Why this instead of Dist::Zilla::Plugin::Test::ReportPrereqs
@@ -127,7 +147,7 @@ CONTRIBUTORS
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2018-2021 by Sven Kirmess.
+    This software is Copyright (c) 2018-2022 by Sven Kirmess.
 
     This is free software, licensed under:
 

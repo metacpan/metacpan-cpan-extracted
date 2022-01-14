@@ -144,7 +144,7 @@ DBD::Avatica::Adapter::Phoenix
 
 =head1 VERSION
 
-version 0.2.1
+version 0.2.2
 
 =head1 AUTHOR
 

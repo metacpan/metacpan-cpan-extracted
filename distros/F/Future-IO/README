@@ -62,15 +62,34 @@ DESCRIPTION
 
 METHODS
 
+ accept
+
+       $f = Future::IO->accept( $fh )
+
+    Since version 0.11.
+
+    Returns a Future that will become done when a new connection has been
+    accepted on the given filehandle, which should represent a listen-mode
+    socket.
+
  alarm
 
        $f = Future::IO->alarm( $epoch )
 
     Since version 0.08.
 
-    Returns a Future that will become at a fixed point in the future, given
-    as an epoch timestamp (such as returned by time()). This value may be
-    fractional.
+    Returns a Future that will become done at a fixed point in the future,
+    given as an epoch timestamp (such as returned by time()). This value
+    may be fractional.
+
+ connect
+
+       $f = Future::IO->connect( $fh, $name )
+
+    Since version 0.11.
+
+    Returns a Future that will become done when a connect() has succeeded
+    on the given filehandle to the given sockname address.
 
  sleep
 
@@ -180,6 +199,16 @@ METHODS
     in use, therefore a module that wishes to override this ought to invoke
     it as soon as possible on program startup, before any of the main
     Future::IO methods may have been called.
+
+ HAVE_MULTIPLE_FILEHANDLES
+
+       $has = Future::IO->HAVE_MULTIPLE_FILEHANDLES
+
+    Since version 0.11.
+
+    Returns true if the underlying IO implementation actually supports
+    multiple filehandles. Most real support modules will return true here,
+    but this returns false for the internal minimal implementation.
 
  await
 

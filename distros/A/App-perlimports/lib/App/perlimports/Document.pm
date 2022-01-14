@@ -3,7 +3,7 @@ package App::perlimports::Document;
 use Moo;
 use utf8;
 
-our $VERSION = '0.000030';
+our $VERSION = '0.000031';
 
 use App::perlimports::Annotations     ();
 use App::perlimports::ExportInspector ();
@@ -255,6 +255,7 @@ my %default_ignore = (
     'HTTP::Message::PSGI'            => 1,    # HTTP::Request::(to|from)_psgi
     'Import::Into'                   => 1,
     'MLDBM'                          => 1,
+    'Modern::Perl'                   => 1,
     'Mojo::Base'                     => 1,
     'Mojo::Date'                     => 1,
     'Mojolicious::Lite'              => 1,
@@ -271,6 +272,7 @@ my %default_ignore = (
     'MooseX::Types'                                       => 1,
     'MooX::StrictConstructor'                             => 1,
     'namespace::autoclean'                                => 1,
+    'PerlIO::gzip'                                        => 1,
     'Regexp::Common'                                      => 1,
     'Sort::ByExample'                                     => 1,
     'Struct::Dumb'                                        => 1,
@@ -1019,7 +1021,7 @@ App::perlimports::Document - Make implicit imports explicit
 
 =head1 VERSION
 
-version 0.000030
+version 0.000031
 
 =head2 inspector_for( $module_name )
 

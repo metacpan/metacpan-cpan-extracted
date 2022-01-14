@@ -11,9 +11,9 @@ it's a dummy POD for testing
 
 Via the command-line program L<findeps>;
 
-    require Nothing;
-    use Nothing::Else;
-    use parent 'Something';
+    require Module::Exists::In::POD;
+    use Module::Exists::In::POD::Else;
+    use parent qw( Module::Exists::In::POD );
 
 =head1 DESCRIPTION
 
@@ -32,6 +32,5 @@ Yuki Yoshida(L<worthmine|https://github.com/worthmine>)
 
 =cut
 
-require Dummy;    # does not exist anywhere
+require Acme::BadExample;    # does not exist anywhere
 
-exit;

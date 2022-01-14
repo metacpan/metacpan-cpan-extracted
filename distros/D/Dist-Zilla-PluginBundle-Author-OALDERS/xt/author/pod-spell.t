@@ -19,10 +19,8 @@ Karen
 MaxMind
 OALDERS
 Olaf
-Plugin
 PluginBundle
 Rolsky
-TidyAll
 Zilla
 bar
 ether

@@ -84,12 +84,24 @@ notes on how to "opt-in" for your own modules):
 
 Add code to the generated .pm file
 
-
 =head2 pp_addxs
 
 =for ref
 
 Add extra XS code to the generated XS file
+
+=head2 pp_add_macros
+
+=for ref
+
+Add extra C<$MACRO()> definitions for these functions. Note these generate
+C code.
+
+=for example
+
+  pp_add_macros(SUCC => sub { "($_[0] + 1)" });
+  # ...
+    Code => '$a() = $SUCC($b());',
 
 =head2 pp_beginwrap
 
@@ -326,6 +338,12 @@ the information in that file. For simple cases like the above,
 the author (Tjl) currently favors the hash syntax like the above -
 it's not too much more characters than the corresponding array
 syntax but much easier to understand and change.
+
+As of 2.064, the C<Code> must not just C<return>, since the signature of
+the generated functions has changed from returning C<void> to returning a
+C<pdl_error>, which is pre-initialised to a successful return value. You
+can easily just replace the C<return;> with C<return PDL_err;>, which
+is the variable's name.
 
 We should mention here also the ability to get the pointer to the
 beginning of the data in memory - a prerequisite for interfacing
@@ -1215,7 +1233,7 @@ another example that illustrates typical usage of both new features:
 	GenericTypes => [qw(B U S L)],
 	Code => '
 		 if (PerlIO_write($COMP(fp),$P(a),len) != len)
-				croak("Error writing pnm file");
+				$CROAK("Error writing pnm file");
   ');
 
 This function is used to write data from a pdl to a file. The file descriptor
@@ -1272,6 +1290,7 @@ defaults will happen first):
     MakeComp => '
       PDL_Indx i;
       PDL_Indx *tmp= PDL->packdims(list,&($COMP(whichdims_count)));
+      if (!tmp) $CROAK("Failed to packdims for creating");
       if ($COMP(whichdims_count) < 1)
         $CROAK("Diagonal: must have at least 1 dimension");
       $DOCOMPALLOC(); /* malloc()s the whichdims */
@@ -1344,7 +1363,7 @@ function:
 		 len = $SIZE(m) * sizeof($GENERIC());
 		 threadloop %{
 		    if (PerlIO_write($COMP(fp),$P(a),len) != len)
-				croak("Error writing pnm file");
+				$CROAK("Error writing pnm file");
 		 %}
   ');
 
@@ -1378,7 +1397,7 @@ especially CPU intensive code) only once per thread, i.e.
                         %}
 		        break;
 		    default:
-			croak("unknown mode");
+			$CROAK("unknown mode");
 		   }'
    );
 
@@ -1556,7 +1575,7 @@ C<EquivPDimExpr> and maybe a C<EquivDimCheck>:
       if ($COMP(n2) <0) $COMP(n2) += $PARENT(threadids[0]);
       if (PDLMIN($COMP(n1),$COMP(n2)) <0 ||
           PDLMAX($COMP(n1),$COMP(n2)) >= $PARENT(threadids[0]))
-            barf("One of dims %d, %d out of range: should be 0<=dim<%d",
+            $CROAK("One of dims %d, %d out of range: should be 0<=dim<%d",
                 $COMP(n1),$COMP(n2),$PARENT(threadids[0]));',
     EquivPDimExpr => '
       (($CDIM == $COMP(n1)) ? $COMP(n2) :
@@ -1673,7 +1692,7 @@ consider this excerpt from F<Basic/Bad/bad.pd>:
 Since this routine removes all bad values, the output ndarray had
 its bad flag cleared. If run inplace (so C<a == b>), then we have to
 tell all the children of C<a> that the bad flag has been cleared (to
-save time we make sure that we call C<PDL-E<gt>propagate_badgflag> only
+save time we make sure that we call C<< PDL->propagate_badflag >> only
 if the input ndarray had its bad flag set).
 
 NOTE: one idea is that the documentation for the routine could be 
@@ -1689,6 +1708,15 @@ supplied (it's not an ideal solution).
 The value is a hash-ref mapping parameter-names to an expression giving
 an override of the type for that parameter. The example above shows the
 type being overridden to the C<OtherPars> "totype".
+
+=head3 OtherParsDefaults
+
+  OtherPars => 'int a; int b',
+  OtherParsDefaults => { b => 0 },
+
+Allows specifying default values for C<OtherPars>. It is an error to
+specify a default for one that is before another that does not have
+a default.
 
 =head2 Other PDL::PP functions to support concise package definition
 
@@ -1988,6 +2016,11 @@ is completed, and then call the perl versions of these routines.
 
 See L<PDL::ParallelCPU> for more information on pthreading.
 
+B<NB> As of 2.064, it is B<highly recommended> that you do not call
+C<barf> at all in PP code, but instead use C<$CROAK()>. This will return
+a C<pdl_error> which will transparently be used to throw the correct
+exception in Perl code, but can be handled suitably by non-Perl callers.
+
 =head1 MAKEFILES FOR PP FILES
 
 If you are going to generate a package from your PP file (typical file
@@ -2001,8 +2034,6 @@ the PDL::Core::Dev package. We just have to tell MakeMaker to use
 it.
 
 In most cases you can define your Makefile like
-
-  # Makefile.PL for a package defined by PP code.
 
   use PDL::Core::Dev;            # Pick up development utilities
   use ExtUtils::MakeMaker;
@@ -2022,7 +2053,7 @@ In most cases you can define your Makefile like
     for (i=0;i<len;i++) *dst++=*src++;
   }
 
-Here, the list in $package is: first: PP source file name,
+Here, the list in C<$package> is: first: PP source file name,
 then the prefix for the produced files, the whole package name, the
 package to add XS functions to (empty string to use the same as the
 PP functions), and a boolean to dictate whether to have PDL generate a
@@ -2054,6 +2085,16 @@ as follows:
 Here, C<$src> is the name of the source file with PP code, C<$pref> the
 prefix for the generated .pm and .xs files and C<$mod> the name of the
 extension module to generate.
+
+If your C<VERSION_FROM> provides a version, PP will use that to set the
+C<XS_VERSION>. If you need to influence the value of that variable so
+that L<XSLoader> etc don't reject the loaded dynamic library, you can
+use this workaround in a C<pp_addpm> (the C<BEGIN> is because the
+C<bootstrap> happens at runtime, and your code appears after that call,
+but with a C<BEGIN> it will take place beforehand):
+
+  our $VERSION; BEGIN { $VERSION = '2.019106' };
+  our $XS_VERSION; BEGIN { $XS_VERSION = $VERSION };
 
 =head1 INTERNALS
 
@@ -2162,13 +2203,6 @@ pthreads or POSIX threads) to split up work across multiple CPU cores. This opti
 is typically set to 1 if the underlying PDL function is not threadsafe. If this option
 isn't present, then the function is assumed to be threadsafe. This option only
 applies if PDL has been compiled with POSIX threads enabled. 
-
-=cut
-
-# flowconvert, on the other hand, claims that it 'converts vaffine
-# ndarrays without physicalizing them'. However, its only use, in Core.pm,
-# is followed immediately by a "->make_physical->sever", so I don't see the
-# advantage of not making things physical.
 
 =head3 PMCode
 
@@ -2371,8 +2405,11 @@ To access fields in the C<pdl_trans>, eg C<$PRIV(offs)>.
 
 =head3 $CROAK()
 
-Calls C<pdl_barf> with the supplied (var-args) message, adding the
-function name at the start.
+Returns a C<pdl_error> with the supplied (var-args) message, adding the
+function name at the start, which will cause a C<barf> within the Perl
+code. This is (as of 2.064) a change in PDL functions' API, so that
+callers can handle exceptions in their preferred way, which may not use
+Perl at all.
 
 =head3 $EQUIVCPOFFS()
 

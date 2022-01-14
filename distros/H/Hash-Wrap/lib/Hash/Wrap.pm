@@ -7,9 +7,11 @@ use 5.01000;
 use strict;
 use warnings;
 
+## no critic(ValuesAndExpressions::ProhibitAccessOfPrivateData)
+
 use Scalar::Util;
 use Digest::MD5;
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 our @EXPORT = qw[ wrap_hash ];
 
@@ -25,6 +27,19 @@ sub _croak {
     require Carp;
     goto \&Carp::croak;
 }
+
+sub _croak_class_method {
+    my ( $class, $method ) = @_;
+    $class = ref( $class ) || $class;
+    _croak ( qq[Can't locate class method "$method" via package "$class"] );
+}
+
+sub _croak_object_method {
+    my ( $object, $method ) = @_;
+    my $class = Scalar::Util::blessed( $object ) || ref( $object ) || $object;
+    _croak ( qq[Can't locate object method "$method" via package "$class"] );
+}
+
 
 sub _find_symbol {
     my ( $package, $symbol, $reftype ) = @_;
@@ -51,7 +66,7 @@ sub _generate_accessor {
         class => $class,
     );
 
-    my $code = $REGISTRY{$hash_class}{accessor_template};
+    my $code    = $REGISTRY{$hash_class}{accessor_template};
     my $coderef = _compile_from_tpl( \$code, \%dict );
     _croak_about_code( \$code, 'accessor' )
       if $@;
@@ -67,7 +82,7 @@ sub _generate_predicate {
         class => $class,
     );
 
-    my $code = $REGISTRY{$hash_class}{predicate_template};
+    my $code    = $REGISTRY{$hash_class}{predicate_template};
     my $coderef = _compile_from_tpl( \$code, \%dict );
     _croak_about_code( \$code, 'predicate' )
       if $@;
@@ -81,20 +96,45 @@ sub _autoload {
 
     my ( $class, $key ) = $method =~ /(.*)::(.*)/;
 
-    _croak( qq[Can't locate class method "$key" via package @{[ ref $object]}] )
+    _croak_class_method( $object, $key )
       unless Scalar::Util::blessed( $object );
 
-    if ( exists $REGISTRY{$hash_class}{predicate_template} && $key =~ /^has_(.*)/ ) {
+    if ( exists $REGISTRY{$hash_class}{predicate_template}
+        && $key =~ /^has_(.*)/ )
+    {
         return _generate_predicate( $hash_class, $class, $1 );
     }
 
-    _croak(
-        qq[Can't locate object method "$key" via package @{[ ref $object]}] )
+    _croak_object_method( $object, $key )
       unless $REGISTRY{$hash_class}{validate}->( $object, $key );
 
     _generate_accessor( $hash_class, $class, $key );
 }
 
+sub _can {
+    my ( $self, $key, $CLASS ) = @_;
+
+    my $class = Scalar::Util::blessed( $self );
+    return if !defined $class;
+
+    if ( !exists $self->{$key} ) {
+
+        if ( exists $Hash::Wrap::REGISTRY{$class}{methods}{$key} ) {
+            ## no critic (ProhibitNoStrict)
+            no strict 'refs';
+            my $method = "${class}::$key";
+            return *{$method}{CODE};
+        }
+        return;
+    }
+
+    my $method = "${class}::$key";
+
+    ## no critic (ProhibitNoStrict)
+    no strict 'refs';
+    return *{$method}{CODE}
+      || Hash::Wrap::_generate_accessor( $CLASS, $class, $key );
+}
 
 sub import {
     shift;
@@ -160,7 +200,7 @@ sub import {
             _croak( "don't use -as => -return with -base" )
               if $args->{-as_return};
             $args->{-class} = $caller;
-            $args->{-new} = 1 unless !!$args->{-new};
+            $args->{-new}   = 1 unless !!$args->{-new};
             _build_class( $caller, $name, $args );
         }
 
@@ -175,8 +215,8 @@ sub import {
         # clean out known attributes
         delete @{$args}{
             qw[ -as -as_return -as_scalar_ref -base -class -clone
-                -copy -defined -exists -immutable -lockkeys -lvalue
-                -methods -new -predicate -recurse -undef ]
+              -copy -defined -exists -immutable -lockkeys -lvalue
+              -methods -new -predicate -recurse -undef ]
         };
 
         if ( keys %$args ) {
@@ -221,7 +261,9 @@ sub _build_class {
     my $class = $attr->{-class};
 
     return $class if defined $REGISTRY{$class};
+    my $rentry = $REGISTRY{$class} = { methods => {} };
 
+    my %closures;
     my %dict = (
         class                 => $class,
         signature             => '',
@@ -233,7 +275,7 @@ sub _build_class {
         return_value          => '$self->{q[\<<KEY>>]}',
         recursion_constructor => '',
         meta => [ map { ( qq[q($_) => q($attr->{$_}),] ) } keys %$attr ],
-        predicate_template    => '',
+        predicate_template => '',
     );
 
     if ( $attr->{-lvalue} ) {
@@ -255,11 +297,13 @@ sub _build_class {
     if ( $attr->{-exists} ) {
         $dict{exists} = $attr->{-exists} =~ PerlIdentifier ? $1 : 'exists';
         push @{ $dict{body} }, q[ sub <<EXISTS>> { exists $_[0]->{$_[1] } } ];
+        $rentry->{methods}{$dict{exists}} = undef;
     }
 
     if ( $attr->{-defined} ) {
         $dict{defined} = $attr->{-defined} =~ PerlIdentifier ? $1 : 'defined';
         push @{ $dict{body} }, q[ sub <<DEFINED>> { defined $_[0]->{$_[1] } } ];
+        $rentry->{methods}{$dict{defined}} = undef;
     }
 
     if ( $attr->{-immutable} ) {
@@ -299,11 +343,18 @@ END
 our $recurse_into_hash;
 our $setup_recurse_into_hash = sub {
       require Hash::Wrap;
-      ( $recurse_into_hash ) = Hash::Wrap->import ( { -as => '-return', -recurse => <<RECURSE_LIMIT>> } );
+      ( $recurse_into_hash ) = Hash::Wrap->import ( { %$attr, -as => '-return',
+                                                      -recurse => <<RECURSE_LIMIT>> } );
       goto &$recurse_into_hash;
 };
 $recurse_into_hash = $setup_recurse_into_hash;
 END
+
+        my %attr = ( %$attr,
+                     -recurse => --$attr->{-recurse} < 0 ? -1 : $attr->{-recurse},
+                   );
+        delete @attr{ qw( -as_scalar_ref -class -base -as ) };
+        $closures{'$attr'} =  \%attr;
     }
 
 
@@ -318,13 +369,14 @@ our $predicate_template = q[
   sub has_\<<KEY>> {
     my $self = shift;
 
-    unless ( Scalar::Util::blessed( $self ) ) {
-      require Carp;
-      Carp::croak( qq[Can't locate class method "has_\<<KEY>>" via package $self] );
-    }
+    Hash::Wrap::_croak_class_method( $self, "has_\<<KEY>>" )
+        unless Scalar::Util::blessed( $self );
 
    return exists $self->{\<<KEY>>};
   }
+
+  \$Hash::Wrap::REGISTRY{methods}{'has_\<<KEY>>'} = undef;
+
   \&has_\<<KEY>>;
 ];
 END
@@ -354,15 +406,11 @@ our $accessor_template = q[
   sub \<<KEY>> <<SIGNATURE>> {
     my $self = shift;
 
-    unless ( Scalar::Util::blessed( $self ) ) {
-      require Carp;
-      Carp::croak( qq[Can't locate class method "\<<KEY>>" via package $self] );
-    }
+    Hash::Wrap::_croak_class_method( $self, "\<<KEY>>" )
+        unless Scalar::Util::blessed( $self );
 
-    unless ( <<VALIDATE_INLINE>> ) {
-      require Carp;
-      Carp::croak( qq[Can't locate object method "\<<KEY>>" via package @{[ Scalar::Util::blessed( $self ) ]}] );
-    }
+    Hash::Wrap::_croak_object_method( $self, "\<<KEY>>" )
+        unless ( <<VALIDATE_INLINE>> );
 
    <<SET>>
 
@@ -384,42 +432,19 @@ sub AUTOLOAD <<AUTOLOAD_ATTR>> {
 sub DESTROY { }
 
 sub can {
-    my ( $self, $key ) = @_;
-
-    my $class = Scalar::Util::blessed( $self );
-    return if !defined $class;
-
-    if ( !exists $self->{$key} ) {
-
-      if ( exists $Hash::Wrap::REGISTRY{$class}{methods}{$key} ) {
-         ## no critic (ProhibitNoStrict)
-         no strict 'refs';
-         my $method = "${class}::$key";
-         return *{$method}{CODE}
-      }
-      return;
-    }
-
-    my $method = "${class}::$key";
-
-    ## no critic (ProhibitNoStrict)
-    no strict 'refs';
-    return *{$method}{CODE}
-      || Hash::Wrap::_generate_accessor( q[<<CLASS>>], $class, $key );
+    return Hash::Wrap::_can( @_, q[<<CLASS>>] );
 }
 
 1;
 END
 
-    _compile_from_tpl( \$class_template, \%dict )
+    _compile_from_tpl( \$class_template, \%dict, \%closures )
       or _croak_about_code( \$class_template, "class $class" );
 
     if ( !!$attr->{-new} ) {
         my $name = $attr->{-new} =~ PerlIdentifier ? $1 : 'new';
         _build_constructor( $class, $name, { %$attr, -as_method => 1 } );
     }
-
-    my $rentry = $REGISTRY{$class} = {};
 
     if ( $attr->{-methods} ) {
 
@@ -438,7 +463,7 @@ END
             *{"${class}::${mth}"} = $code;
         }
 
-        $rentry->{methods} = { map { $_ => undef } keys %$methods };
+        $rentry->{methods}{$_} = undef for keys %$methods;
     }
 
     push @CARP_NOT, $class;
@@ -467,9 +492,9 @@ sub _build_constructor {
       if exists $args->{-copy} && exists $args->{-clone};
 
     my %dict = (
-        package => $package,
-        constructor_name    => $name,
-        use     => [],
+        package              => $package,
+        constructor_name     => $name,
+        use                  => [],
         package_return_value => '1;',
     );
 
@@ -503,20 +528,22 @@ sub _build_constructor {
     $dict{lock} = do {
         if ( $args->{-immutable} ) {
             push @{ $dict{use} }, q[use Hash::Util ();];
-            'Hash::Util::lock_hash(%$hash)'
+            'Hash::Util::lock_hash(%$hash)';
         }
         elsif ( defined $args->{-lockkeys} ) {
 
             if ( 'ARRAY' eq ref $args->{-lockkeys} ) {
-                _croak( "-lockkeys: attribute name ($_) is not a valid Perl identifier" )
-                  for grep { $_ !~ PerlIdentifier } @{ $args->{-lockkeys} };
+                _croak(
+                    "-lockkeys: attribute name ($_) is not a valid Perl identifier"
+                ) for grep { $_ !~ PerlIdentifier } @{ $args->{-lockkeys} };
 
                 push @{ $dict{use} }, q[use Hash::Util ();];
-                'Hash::Util::lock_keys_plus(%$hash, qw{ ' . join( ' ', @{ $args->{-lockkeys} } ) . ' });'
+                'Hash::Util::lock_keys_plus(%$hash, qw{ '
+                  . join( ' ', @{ $args->{-lockkeys} } ) . ' });';
             }
             elsif ( $args->{-lockkeys} ) {
                 push @{ $dict{use} }, q[use Hash::Util ();];
-                'Hash::Util::lock_keys(%$hash)'
+                'Hash::Util::lock_keys(%$hash)';
             }
         }
     };
@@ -525,7 +552,7 @@ sub _build_constructor {
     # name into the package namespace
     if ( $args->{-as_scalar_ref} || $args->{-as_return} ) {
         $dict{package_return_value} = '';
-        $dict{constructor_name} = '';
+        $dict{constructor_name}     = '';
     }
 
     #<<< no tidy
@@ -543,7 +570,7 @@ sub _build_constructor {
 
       if ( 'HASH' ne Scalar::Util::reftype($hash) ) {
          require Carp;
-         Carp::croak( "argument to <<PACKAGE>>::<<NAME>> must be a hashref" )
+         Carp::croak( "argument to <<PACKAGE>>::<<CONSTRUCTOR_NAME>> must be a hashref" )
       }
       <<COPY>>
       bless $hash, $class;
@@ -553,7 +580,7 @@ sub _build_constructor {
     ];
     #>>>
 
-    my $result = _compile_from_tpl( \$code, \%dict, { '$clone' => $clone }  )
+    my $result = _compile_from_tpl( \$code, \%dict, { '$clone' => $clone } )
       || _croak(
         "error generating constructor (as $name) subroutine: $@\n$code" );
 
@@ -571,8 +598,8 @@ sub _croak_about_code {
 
 sub _line_number_code {
     my ( $code ) = @_;
-    my $space = length( $$code =~ tr/\n// );
-    my $line  = 0;
+    my $space    = length( $$code =~ tr/\n// );
+    my $line     = 0;
     $$code =~ s/^/sprintf "%${space}d: ", ++$line/emg;
 }
 
@@ -580,8 +607,9 @@ sub _line_number_code {
 sub _compile_from_tpl {
     my ( $code, $dict, $closures ) = @_;
 
-    if ( defined $closures ) {
-        $dict->{closures} = join( "\n", map { "my $_ = \$closures->{'$_'};" } keys %$closures ) ;
+    if ( defined $closures && %$closures) {
+        $dict->{closures}
+          = join( "\n", map { "my $_ = \$closures->{'$_'};" } keys %$closures );
     }
 
     _interpolate( $code, $dict );
@@ -650,7 +678,7 @@ Hash::Wrap - create on-the-fly objects from hashes
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 
@@ -970,6 +998,9 @@ if
  $h->a->b->c->l # => ERROR
 
 For infinite recursion, set C<-recurse> to C<-1>.
+
+Constructors built for deeper hash levels will not heed the C<-as_scalar_ref>,
+C<-class>, C<-base>, or C<-as> attributes.
 
 =back
 

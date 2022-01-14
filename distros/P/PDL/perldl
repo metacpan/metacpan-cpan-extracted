@@ -89,10 +89,6 @@ my $read_from_file;
 
 while(defined($_ = shift @ARGV)) {
 	if($_ eq "-tk") {
-                if ($^O eq 'MSWin32') {
-                   print "-tk option not supported for windows\n";
-                   next;
-                }
 		print "Using Tk";
 		eval "use Tk;";
                 if ($@ eq "") {
@@ -103,19 +99,19 @@ while(defined($_ = shift @ARGV)) {
                 }
 		next;
         } elsif($_ eq "-glut") {
-                if ($^O eq 'MSWin32') {
-                   print "-glut option not supported for windows\n";
-                   next;
-                }
 		print "Using OpenGL for GLUT support";
-		eval "use OpenGL;";
-                if ($@ eq "") {
-                   print " v$OpenGL::VERSION\n"
-                      if defined $OpenGL::VERSION; # make -w happy
+		eval <<'EOF';
+use OpenGL qw/ :glfunctions :glconstants /;
+use OpenGL::GLUT qw/ :all /;
+EOF
+                if (!$@) {
+                   print ", OpenGL v$OpenGL::VERSION" if defined $OpenGL::VERSION;
+                   print ", OpenGL::GLUT v$OpenGL::GLUT::VERSION" if defined $OpenGL::GLUT::VERSION;
                 } else {
-                   print ", sorry can't load module OpenGL\n";
+                   print ", sorry can't load module OpenGL";
                 }
-                OpenGL::glutInit() unless OpenGL::done_glutInit();
+                print "\n";
+                OpenGL::GLUT::glutInit() unless OpenGL::GLUT::done_glutInit();
 		next;
 	} elsif(/^-f(.*)/) {
 		my $file = $1;
@@ -224,7 +220,7 @@ if ( $readlines ){
 
    $PERLDL::TERM = Term::ReadLine->new('perlDL', \*STDIN, \*STDOUT);
 
-    if (defined &OpenGL::done_glutInit ) {
+    if (defined &OpenGL::GLUT::done_glutInit ) {
        # Attempt to use with FreeGLUT
        if ($PERLDL::TERM->can('event_loop')) {
           print "Using FreeGLUT event loop\n";
@@ -243,7 +239,7 @@ if ( $readlines ){
                 while(1) {
                    select my $rout = $rvec, undef, undef, 0;
                    last if vec($rout, $fileno, 1);
-                   OpenGL::glutMainLoopEvent();
+                   OpenGL::GLUT::glutMainLoopEvent();
                 }
              },
              sub {

@@ -8,12 +8,14 @@ WriteMakefile(
 	'BUILD_REQUIRES' => {
 		'ExtUtils::MakeMaker'	=> 6.48,
 		'Test::More'			=> 0,
+		'Test::More::UTF8'		=> 0,
 	},
 	'PREREQ_PM' =>	{
 		'Crypt::Argon2'				=> 0.004,
 		'Crypt::Eksblowfish'		=> 0,
 		'Crypt::OpenSSL::Random'	=> 0,
 		'MIME::Base64'				=> 0,
+		'Readonly'					=> 2.0,
 		'version'					=> 0.77,
 	},
 	'MIN_PERL_VERSION'	=> 5.010000,

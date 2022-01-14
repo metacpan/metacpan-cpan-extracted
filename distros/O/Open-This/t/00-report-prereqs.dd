@@ -36,14 +36,17 @@ do { my $x = {
                                     }
                     },
        'runtime' => {
+                      'recommends' => {
+                                        'Git::Helpers' => '0.000016'
+                                      },
                       'requires' => {
                                       'Browser::Open' => '0',
                                       'Getopt::Long' => '0',
-                                      'Git::Helpers' => '0.000016',
                                       'Module::Runtime' => '0',
                                       'Module::Util' => '0.016',
                                       'Path::Tiny' => '0',
                                       'Pod::Usage' => '0',
+                                      'Try::Tiny' => '0',
                                       'URI' => '0',
                                       'perl' => 'v5.12.0',
                                       'strict' => '0',
@@ -52,7 +55,8 @@ do { my $x = {
                     },
        'test' => {
                    'recommends' => {
-                                     'CPAN::Meta' => '2.120900'
+                                     'CPAN::Meta' => '2.120900',
+                                     'Git::Helpers' => '0.000016'
                                    },
                    'requires' => {
                                    'Carp::Always' => '0',
@@ -60,6 +64,7 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'Test::Differences' => '0',
                                    'Test::More' => '0',
+                                   'Test::Needs' => '0',
                                    'Test::Requires::Git' => '0',
                                    'Test::Script' => '1.29',
                                    'Test::Simple' => '1.302177',

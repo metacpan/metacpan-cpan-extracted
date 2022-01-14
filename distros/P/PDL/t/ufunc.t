@@ -1,4 +1,5 @@
 use strict;
+use warnings;
 use Test::More;
 use PDL::LiteF;
 
@@ -33,49 +34,64 @@ ok( tapprox($x->pctover( 2.0), $a_sort->at($x->dim(0)-1)), "pct above 1 for 25-e
 # test for sf.net bug report 2753869
 #
 $x = sequence(10);
-ok( tapprox($x->pctover(0.2 ), 1.8 ), "20th percential of 10-elem ndarray [SF bug 2753869]");
-ok( tapprox($x->pctover(0.23), 2.07), "23rd percential of 10-elem ndarray [SF bug 2753869]");
+ok( tapprox($x->pctover(0.2 ), 1.8 ), "20th percentile of 10-elem ndarray [SF bug 2753869]");
+ok( tapprox($x->pctover(0.23), 2.07), "23rd percentile of 10-elem ndarray [SF bug 2753869]");
 
 # test for sf.net bug report 2110074
 #
 ok( ( eval { pdl([])->qsorti }, $@ eq '' ), "qsorti coredump,[SF bug 2110074]");
 
-# Test inplace sorting
 $d->inplace->qsort;
 ok(all($d == $d_sort), "inplace sorting");
 
-# Test inplace sorting with bad values
 $d->setbadat(3);
 $d_sort = $d->qsort;
 $d->inplace->qsort;
 ok(all($d == $d_sort), "inplace sorting with bad values");
 
-# Test inplace lexicographical sorting
 $e->inplace->qsortvec;
 ok(all($e == $e_sort), "inplace lexicographical sorting");
 
-# Test inplace lexicographical sorting with bad values
+my $ei = $e->copy;
+$ei->setbadat(1,3);
+my $ei_sort = $ei->qsortveci;
+is $ei_sort."", '[0 1 2 4 5 3]', "qsortveci with bad values"
+  or diag "got:$ei_sort";
+
 $e->setbadat(1,3);
 $e_sort = $e->qsortvec;
 $e->inplace->qsortvec;
-ok(all($e == $e_sort), "inplace lexicographical sorting with bad values");
+ok(all($e == $e_sort), "inplace lexicographical sorting with bad values") or diag "inplace=$e\nnormal=$e_sort";
 
 # Test sf.net bug 379 "Passing qsort an extra argument causes a segfault"
 # (also qsorti, qsortvec, qsortveci)
 eval { random(15)->qsort(5); };
-ok($@ ne '', "qsort extra argument");
+isnt($@, '', "qsort extra argument");
 eval { random(15)->qsorti(5); };
-ok($@ ne '', "qsorti extra argument");
+isnt($@, '', "qsorti extra argument");
 eval {random(10,4)->qsortvec(5); };
-ok($@ ne '', "qsortvec extra argument");
+isnt($@, '', "qsortvec extra argument");
 eval {random(10,4)->qsortveci(2); };
-ok(@$ ne '', "qsortveci extra argument");
+isnt($@, '', "qsortveci extra argument");
 #but the dimension size checks for those cases shouldn't derail trivial qsorts:
 is(pdl(5)->qsort,pdl(5),'trivial qsort');
 is(pdl(8)->qsorti,pdl(0),'trivial qsorti');
 ok(all(pdl(42,41)->qsortvec == pdl(42,41)->dummy(1)),'trivial qsortvec');
 is(pdl(53,35)->qsortveci,pdl(0),'trivial qsortveci');
 
+# test qsort moves vectors with BAD components to end
+is pdl("0 -100 BAD 100")->qsort."", '[-100 0 100 BAD]', 'qsort moves BAD elts to end';
+
+# test qsortvec moves vectors with BAD components to end - GH#252
+is pdl("[0 0] [-100 0] [BAD 0] [100 0]")->qsortvec."", <<'EOF', 'qsortvec moves vectors with BAD components to end';
+
+[
+ [-100    0]
+ [   0    0]
+ [ 100    0]
+ [ BAD    0]
+]
+EOF
 
 # test for sf.net bug report 3234141 "max() fails on nan"
 #   NaN values are handled inconsistently by min, minimum, max, maximum...

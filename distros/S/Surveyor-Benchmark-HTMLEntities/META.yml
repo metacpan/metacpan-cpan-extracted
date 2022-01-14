@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,5 +28,5 @@ resources:
   bugtracker: https://github.com/briandfoy/surveyor-benchmark-htmlentities/issues
   homepage: https://github.com/briandfoy/surveyor-benchmark-htmlentities
   repository: https://github.com/briandfoy/surveyor-benchmark-htmlentities.git
-version: '1.022'
+version: '1.023'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,3 +1,5 @@
+use strict;
+use warnings;
 
 pp_addpm({At=>'Top'},<<'EOD');
 
@@ -24,6 +26,8 @@ loaded.
  
 =cut
 
+use strict;
+use warnings;
 
 EOD
 
@@ -39,8 +43,6 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-
-
 EOD
 
 # N-dim utilities
@@ -157,10 +159,10 @@ sub PDL::convolve{
    PDL_Indx i,i2,j,k,n,offcen,cen,ncen,nrow;
 
    if (andims != bndims)
-      barf("Arguments do not have the same dimensionality");
+      $CROAK("Arguments do not have the same dimensionality");
    for(i=0; i<andims; i++)
          if (dimsb[i]>dimsa[i])
-             barf("Second argument must be smaller in all dimensions that first"
+             $CROAK("Second argument must be smaller in all dimensions that first"
 );
 
    PDL_Indx pos[andims];
@@ -502,13 +504,12 @@ sub PDL::kernctr {
 	  $strk .= $strk[$n][$y & 1];
 	}
 	chop ($stri); chop ($strk);
-	($t = $newk->slice($stri)) .= $kern->slice($strk);
+	(my $t = $newk->slice($stri)) .= $kern->slice($strk);
     }
     $newk;
 }
 
 EOPM
-
 
 pp_def(
        'convolveND',
@@ -670,8 +671,7 @@ sub PDL::convolveND {
                ->sever;
 
   if($fft) {
-    #  The eval here keeps conflicts from happening at compile time
-    eval "use PDL::FFT" ;
+    require PDL::FFT;
 
     print "convolveND: using FFT method\n" if($PDL::debug);
 
@@ -738,15 +738,15 @@ Code => <<'EOD'
   pdl *aa =    PDL->SvPDLV($COMP(aa));
 
   if(!k || !a || !aa) 
-    barf("convolveND: Can't convert args to PDLs (should never happen)\n");
+    $CROAK("convolveND: Can't convert args to PDLs - should never happen\n");
 
-  PDL->make_physical(aa);
-  PDL->make_physical(a);
-  PDL->make_physical(k); 
+  PDL_RETERROR(PDL_err, PDL->make_physical(aa));
+  PDL_RETERROR(PDL_err, PDL->make_physical(a));
+  PDL_RETERROR(PDL_err, PDL->make_physical(k));
 
   ndims = aa->ndims;
   if(ndims != k->ndims || ndims != aa->ndims)
-     barf("convolveND: dims don't agree (should never happen)\n");
+     $CROAK("convolveND: dims don't agree - should never happen\n");
 
   PDL_Indx koffs[k->nvals];
   $GENERIC() kvals[k->nvals];

@@ -1,12 +1,12 @@
-#! /usr/bin/perl
+#! /usr/bin/env perl
 
 # Beware: DON'T PERFORM ANY ACTIONS AT TOP LEVEL: this file runs many times under -n!
 
 BEGIN {
-    $pl::VERSION = 'v0.62.0';
+    $pl::VERSION = 'v0.63.0';
     my $execed = shift if @ARGV && $ARGV[0] eq '+'; # don't recursively call perl again for -p
     return unless @ARGV and $ARGV[0] =~ /^-/s;
-    my $onepl = qr/[oOrhv?]|[pP](?:[1-9][0-9]*)?/; # simple pl opts, reflect these in pod/html
+    my $onepl = qr/[rhv?]|[oOpP](?:[1-9][0-9]*)?/; # simple pl opts, reflect these in pod/html
     my $one = qr/[cfTtUuWwXan]|$onepl/; # simple opts to pass to perl, which handles them well
     my( $perl, @perl, @pl1, %seen );
     while( @ARGV ) {		# no for, may need to shift
@@ -158,7 +158,7 @@ sub form($@) {
 
 # Form without newline
 sub Form($@) {
-    (my $form = shift) =~ s/(%[^a-z]+)/ my $x = $1; $x =~ tr!:!$!; $x /eg; # also matches %%, todo /r
+    (my $form = shift) =~ s/%\K(%|[^a-z]+)/ my $x = $1; $x =~ tr!:!$!; $x /eg; # also matches %%, todo /r
     Echo sprintf $form, &Echo;
 }
 
@@ -337,13 +337,13 @@ sub help(;$) {
 usage: pl {-{BbeE} program} [-o] [-Vversion] [-perlopt...] [--] [main program] [arg ...]
   -Aprog            map prog over @A (or undef) returning new @A
   -bprog & -eprog   wrap begin/end program around each file in -n/-p...
-  -Bprog & -Eprog   wrap begin/end program around program in same scope, my-vars work.
-  -o                assume "for(@A) { ... }" loop around main program
-  -O                assume "for $A (@A) { ... }" loop around main program
+  -Bprog & -Eprog   wrap begin/end program around program in same scope, my-vars work
+  -o[number]        assume "for(@A) { ... }" loop around main program or array of number args
+  -O[number]        like -o, but use $A as loop var
   -p[number]        print on each loop (also -o/-O) iteration, at most number times
   -P[number]        like -p, but print only if main program evaluates to true, like grep
   -r                reset "$." and -p/-P counter for each file
-  -VVERSION         rerun with given version, which is just appended to "perl".
+  -VVERSION         rerun with given version, which is just appended to "perl"
   --color[=when]    colorize the output; when can be 'never', 'always', or 'auto' (the default)
 These options are handled by perl:
 EOF
@@ -590,7 +590,6 @@ BEGIN {
 	   '} continue {',		# program didn't do last
 	   '$pl::last = 0 }',
 	   '}');
-
 	while( @pl::opts ) {	# no for, need to shift
 	    $_ = shift @pl::opts;
 	    if( /^--color(?:()|=(a)lways|=(n)ever|=auto)$/s ) {
@@ -628,10 +627,17 @@ GNU General Public License, which may be found in the Perl 5 source kit.";
 		    $prog[9] = "\n;END { $bit 1 }";
 		}
 	    }
-	    @prog[3, 14] =
-	      (/O/ ? 'for $ARGV (@ARGV) {' : 'for(@ARGV) {',
-	       '} continue { ++$ARGIND; last if $pl::last }')
-		if /o/i;
+	    if( /o([1-9][0-9]*)?/i ) {
+		if( my $o = $1 ) {
+		    @prog[3, 14] =
+		      ('while( @ARGV > $ARGIND ) { sub {' . (/o/ ? '$_' : '$ARGV') . ' = \@_ }->( @ARGV[$ARGIND..$ARGIND+' . ($o - 1) . '] );', # hack to ref into @ARGV
+		       '} continue { $ARGIND += ' . $o . '; last if $pl::last }')
+		} else {
+		    @prog[3, 14] =
+		      (/O/ ? 'for $ARGV (@ARGV) {' : 'for(@ARGV) {',
+		       '} continue { ++$ARGIND; last if $pl::last }');
+		}
+	    }
 	    if( /p([1-9][0-9]*)?/i ) {
 		my $p = $1;
 		$prog[1] = '$pl::_pn = 0;';
@@ -734,7 +740,7 @@ Though they are sometimes slightly, sometimes quite a bit more complicated,
 most Perl one-liners from the internet work, just by omitting C<-e> or C<-E>
 (pl has only one main program, but you can just as well concatenate the C<-e>s
 with C<;>).  See L<minor differences|/"Minor Differences with perl -e"> for
-exceptions.  There are L<many varied examples|examples>.
+exceptions.  There are L<many varied examples|https://metacpan.org/dist/App-pl/view/pod/examples.pod>.
 
 =head1 DESCRIPTION
 
@@ -808,7 +814,9 @@ I<perl:> Enables the listed Unicode features.
 
 =item C<--colorI<[=when]>>
 
-Colorize some of the output; when can be C<never>, C<always>, or C<auto> (the default).
+Colorize (people with impairment have hopefully adapted their system or
+browser) some of the output; when can be C<never>, C<always>, or C<auto> (the
+default).
 
 =item C<-dI<[:debugger]>>
 
@@ -857,19 +865,37 @@ I<perl:> Assume C<< while (<>) { ... } >> loop around program.  It's a little
 richer than that: if you use C<last>, it closes the current file, leaving you
 to continue the loop on the next file.
 
-=item C<-O>
+=item C<-oI<[number]>>
 
-Assume C<for $ARGV (@ARGV) { ... }> loop around main program.  In this case B<-p> doesn't imply B<-n>.
+Assume C<for(@ARGV) { ... }> loop around main program, and C<$ARGIND> (or
+C<$I>) is the current position.  In this case B<-p> doesn't imply B<-n>.  If
+number is given, that many args are passed at once as an array, referencing
+the original values.  If there are not enough on the last round, C<@A(RGV)> is
+filled up with C<undef>.
 
-=item C<-o>
+    pl -opl '' I II III IV
+    pl -o3 'echo $ARGIND, @$_' i ii iii iv v vi vii viii ix
+    pl -opl '' I II III IV
+    pl -o3 'e $I, @$_' i ii iii iv v vi vii viii ix
 
-Assume C<for(@ARGV) { ... }> loop around main program.  In this case B<-p> doesn't imply B<-n>.
+    >   I
+    >   II
+    >   III
+    >   IV
+    >   0 i ii iii
+    >   3 iv v vi
+    >   6 vii viii ix
+
+=item C<-OI<[number]>>
+
+like B<-o>, but use C<@A(RGV)> as loop variable.
 
 =item C<-pI<[number]>>
 
 I<Does C<pl -penis> do pussy?  B< >It implements C<cat>. :-*>
 
-I<perl++:> On each loop C<print> (also B<-o>/B<-O>) iteration.  If number is given, print at most number times.
+I<perl++:> On each loop C<print> (also B<-o> and B<-O>, in which case you must
+fill C<$_>) iteration.  If number is given, print at most number times.
 
 =item C<-PI<[number]>>
 
@@ -942,7 +968,7 @@ Import and return C<%Config>, e.g. C<< Config->{sitelib} >>, optionally only par
 =item C<Date I<[arg...][, tz]>> |
 C<D I<[arg...][, tz]>>
 
-I<Why is Halloween Christmas?  Because Oct 31 = Dec 25. ;-)>
+I<Why is Halloween Christmas?  Because Oct 31 = Dec 25. (^)>
 
 Date (from arg [s, us], s{.us}, offset [+-]s{.us}, tz ([+-]0-14{:mm|.ff}).
 Microseconds should be passed as strings, because floats have
@@ -957,8 +983,8 @@ some context, else echoes it.
         $_ = D -86400, "+3600";
         e $_, " -- ", D "+8:45"'
 
-    >   Sun Nov 21 20:51:19.053752 2021
-    >   Sat Nov 20 21:51:19.053849 2021  --  Mon Nov 22 04:36:19.053891 +08:45 2021
+    >   Thu Jan  6 23:44:02.147683 2022
+    >   Thu Jan  6 00:44:02.147744 2022  --  Fri Jan  7 07:29:02.147769 +08:45 2022
 
 =item C<echo I<[arg...]>> |
 C<e I<[arg...]>>
@@ -1002,8 +1028,8 @@ Same as C<D(ate)>, but uses ISO format.
         $_ = I 7 * -86400;
         e $_, " -- ", I "+8.75"'
 
-    >   2021-11-21T20:51:19.073235
-    >   2021-11-14T20:51:19.073299  --  2021-11-22T04:36:19.073320 +08:45
+    >   2022-01-06T23:44:02.165406
+    >   2021-12-30T23:44:02.165471  --  2022-01-07T07:29:02.165494 +08:45
 
 =item C<keydiff I<[key[, value]]>> |
 C<k I<[key[, value]]>>

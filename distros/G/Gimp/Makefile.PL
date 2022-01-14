@@ -38,7 +38,7 @@ my $pkg = eval {
 
 my $runtime_reqs = {
   'Gtk2'		=> 1.0,
-  'PDL'		=> '2.063_01', # affine_new non-SV input
+  'PDL'		=> '2.064', # pdlnew returns viable null
   'Data::Dumper'	=> 2.0,
   'IO::All'		=> 0,
   'Gtk2::Ex::PodViewer'	=> 0,

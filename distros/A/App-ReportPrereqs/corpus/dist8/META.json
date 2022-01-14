@@ -1,0 +1,25 @@
+{
+   "abstract" : "A test corpus",
+   "author" : [
+      "Sven Kirmess <sven.kirmess@kzone.ch>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "CPAN::Meta version 2.150010",
+   "license" : [
+      "freebsd"
+   ],
+   "meta-spec" : {
+      "version" : 2
+   },
+   "name" : "Local-Corpus",
+   "prereqs" : {
+      "runtime" : {
+         "requires" : {
+            "Local::Omega" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.000001",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

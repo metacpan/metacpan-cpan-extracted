@@ -16,7 +16,7 @@ my $client = Avatica::Client->new(url => $url);
 
 my $connection_id = int(rand(1000)) . $$;
 my ($res, $c) = $client->open_connection($connection_id);
-is $res, 1, 'open connection';
+BAIL_OUT($c->{message}) unless $res;
 
 ($res, my $statement) = $client->create_statement($connection_id);
 is $res, 1, 'create statement for drop table';

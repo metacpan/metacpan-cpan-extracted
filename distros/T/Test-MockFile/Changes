@@ -1,5 +1,14 @@
 Revision history for Test-MockFile
 
+0.023   1/14/2022
+ - GH #58: Fix synopsis typos
+ - GH #65: Fix typos in the typo fixes.
+ - GH #34: Support open() with barewords
+ - GH #59: Detect and reject common path mistakes when mocking
+ - GH #69: Redesigned dir() (and some file()) interface <--- breaks previous interface
+ - GH #40: Support glob()
+ - GH #15: Implement chown/chmod
+
 0.022   12/27/2021
  -  GH #47: Manage bareword filehandles in runtime:
 

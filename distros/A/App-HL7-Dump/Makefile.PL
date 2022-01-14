@@ -33,8 +33,9 @@ test_requires 'File::Object' => 0;
 test_requires 'File::Spec::Functions' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
+test_requires 'Test::Output' => 0;
 tests_recursive;
-version '0.05';
+version '0.06';
 
 # Run.
 WriteAll();

@@ -2,8 +2,8 @@ NAME
     Text::Table::Any - Generate text table using one of several backends
 
 VERSION
-    This document describes version 0.106 of Text::Table::Any (from Perl
-    distribution Text-Table-Any), released on 2021-12-09.
+    This document describes version 0.108 of Text::Table::Any (from Perl
+    distribution Text-Table-Any), released on 2022-01-07.
 
 SYNOPSIS
      use Text::Table::Any;
@@ -124,6 +124,8 @@ FUNCTIONS
         Optional. Str, default "Text::Table::Sprintf". Pick a backend
         module. Supported backends:
 
+        *   Term::Table
+
         *   Term::TablePrint
 
         *   Text::ANSITable
@@ -156,6 +158,8 @@ FUNCTIONS
 
         *   Text::Table::Sprintf
 
+        *   Text::Table::TSV
+
         *   Text::Table::TickitWidget
 
         *   Text::Table::Tiny
@@ -168,13 +172,45 @@ FUNCTIONS
 
         *   Text::Table::TinyWide
 
-        *   Text::Table::TSV
-
         *   Text::Table::XLSX
 
         *   Text::TabularDisplay
 
         *   Text::UnicodeBox::Table
+
+        Support matrix for each backend:
+
+         +-------------------------------+------------+------+---------------+-------+
+         | backend                       | header_row | rows | separate_rows | title |
+         +-------------------------------+------------+------+---------------+-------+
+         | Term::Table                   | 1          | 1    | 0             | 0     |
+         | Term::TablePrint              | 1          | 1    | 0             | 0     |
+         | Text::ANSITable               | 1          | 1    | 1             | 0     |
+         | Text::ASCIITable              | 1          | 1    | 0             | 0     |
+         | Text::FormatTable             | 0          | 1    | 0             | 0     |
+         | Text::MarkdownTable           | 1          | 1    | 0             | 0     |
+         | Text::Table                   | 0          | 1    | 0             | 0     |
+         | Text::Table::ASV              | 1          | 1    | 0             | 0     |
+         | Text::Table::CSV              | 1          | 1    | 0             | 0     |
+         | Text::Table::HTML             | 1          | 1    | 0             | 1     |
+         | Text::Table::HTML::DataTables | 1          | 1    | 0             | 1     |
+         | Text::Table::LTSV             | 0          | 1    | 0             | 0     |
+         | Text::Table::Manifold         | 1          | 1    | 0             | 0     |
+         | Text::Table::More             | 1          | 1    | 1             | 0     |
+         | Text::Table::Org              | 1          | 1    | 1             | 0     |
+         | Text::Table::Paragraph        | 1          | 1    | 0             | 0     |
+         | Text::Table::Sprintf          | 1          | 1    | 1             | 0     |
+         | Text::Table::TSV              | 0          | 1    | 0             | 0     |
+         | Text::Table::TickitWidget     | 1          | 1    | 0             | 0     |
+         | Text::Table::Tiny             | 1          | 1    | 1             | 0     |
+         | Text::Table::TinyBorderStyle  | 1          | 1    | 1             | 0     |
+         | Text::Table::TinyColor        | 1          | 1    | 1             | 0     |
+         | Text::Table::TinyColorWide    | 1          | 1    | 1             | 0     |
+         | Text::Table::TinyWide         | 1          | 1    | 1             | 0     |
+         | Text::Table::XLSX             | 1          | 1    | 0             | 0     |
+         | Text::TabularDisplay          | 0          | 1    | 0             | 0     |
+         | Text::UnicodeBox::Table       | 1          | 1    | 0             | 0     |
+         +-------------------------------+------------+------+---------------+-------+
 
     *   rows
 
@@ -237,8 +273,8 @@ CONTRIBUTING
     me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015
-    by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016,
+    2015 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

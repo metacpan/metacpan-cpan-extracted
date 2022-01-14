@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Array.pm
-## Version v1.1.0
+## Version v1.2.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2021/08/31
+## Modified 2021/12/27
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -35,10 +35,12 @@ BEGIN
         '%{}' => 'as_hash',
         fallback => 1,
     );
+    our $DEBUG  = 0;
+    our $ERROR;
     our $RETURN = {};
     our $TRUE  = ${"Module::Generic::Boolean::true"};
     our $FALSE = ${"Module::Generic::Boolean::false"};
-    our( $VERSION ) = 'v1.1.0';
+    our( $VERSION ) = 'v1.2.0';
 };
 
 no warnings 'redefine';
@@ -91,6 +93,71 @@ sub as_string
     $sort = CORE::shift( @_ ) if( @_ );
     CORE::return( $self->sort->as_string ) if( $sort );
     CORE::return( "@$self" );
+}
+
+sub callback
+{
+    my $self = CORE::shift( @_ );
+    my( $what, $code ) = @_;
+    if( !defined( $what ) )
+    {
+        warnings::warn( "No callback type was provided.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) );
+        return;
+    }
+    elsif( $what ne 'add' && $what ne 'remove' )
+    {
+        warnings::warn( "Callback type provided ($what) is unsupported. Use 'add' or 'remove'.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) );
+        return;
+    }
+    elsif( scalar( @_ ) == 1 )
+    {
+        warnings::warn( "No callback code was provided. Provide an anonymous subroutine, or reference to existing subroutine.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) );
+        return;
+    }
+    elsif( defined( $code ) && ref( $code ) ne 'CODE' )
+    {
+        warnings::warn( "Callback provided is not a code reference. Provide an anonymous subroutine, or reference to existing subroutine." ) if( warnings::enabled( 'Module::Generic::Array' ) );
+        return;
+    }
+    
+    if( !defined( $code ) )
+    {
+        # undef is passed as an argument, so we remove the callback
+        if( scalar( @_ ) >= 2 )
+        {
+            # The array is not tied, so there is nothing to remove.
+            my $tie = tied( @$self );
+            return(1) if( !$tie );
+            my $rv = $tie->unset_callback( $what );
+            untie( @$self ) if( !$tie->has_callback );
+            return( $rv );
+        }
+        # Only 1 argument: get mode only
+        else
+        {
+            my $tie = tied( @$self );
+            return if( !$tie );
+            return( $tie->get_callback( $what ) );
+        }
+    }
+    # $code is defined, so we have something to set
+    else
+    {
+        my $tie = tied( @$self );
+        # Not tied yet
+        if( !$tie )
+        {
+            $tie = tie( @$self => 'Module::Generic::Array::Tie',
+            {
+                data => $self,
+                debug => $DEBUG,
+                $what => $code,
+            }) || return;
+            return(1);
+        }
+        $tie->set_callback( $what => $code ) || return;
+        return(1);
+    }
 }
 
 sub chomp
@@ -161,6 +228,8 @@ sub eighth { CORE::return( CORE::shift->get_null(7) ); }
 
 sub empty { CORE::return( CORE::shift->reset( @_ ) ); }
 
+sub error { return( $ERROR ); }
+
 # Credits: <https://www.perlmonks.org/?node_id=871696>
 sub even
 {
@@ -185,6 +254,21 @@ sub exists
 }
 
 sub fifth { CORE::return( CORE::shift->get_null(4) ); }
+
+sub filter
+{
+    my $self = CORE::shift( @_ );
+    my( $code, $this ) = @_;
+    CORE::return if( ref( $code ) ne 'CODE' );
+    my $n = -1;
+    return( $self->map(sub
+    {
+        local $_ = shift( @_ );
+        my $rv = $code->( ( defined( $this ) ? $this : () ), $_, ++$n, $self );
+        return if( !$rv );
+        return( $_ );
+    }) );
+}
 
 sub first { CORE::return( CORE::shift->get_null(0) ); }
 
@@ -792,6 +876,383 @@ sub _scalar
 }
 
 sub _warnings_is_enabled { CORE::return( warnings::enabled( ref( $_[0] ) || $_[0] ) ); }
+
+# XXX Module::Generic::Array::Tie class
+{
+    package
+        Module::Generic::Array::Tie;
+    BEGIN
+    {
+        use strict;
+        use warnings;
+        use Scalar::Util ();
+        our $dummy_callback = sub{1};
+    };
+    
+    sub TIEARRAY
+    {
+        my( $class, $opts ) = @_;
+        $opts //= {};
+        if( Scalar::Util::reftype( $opts ) ne 'HASH' )
+        {
+            warn( "Options provided (", overload::StrVal( $opts ), ") is not an hash reference\n" );
+            $opts = {};
+        }
+        $opts->{data} //= [];
+        $opts->{debug} //= 0;
+        if( CORE::length( $opts->{add} ) && ref( $opts->{add} ) ne 'CODE' )
+        {
+            warnings::warn( "Code provided for the array add callback is not a code reference.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) || $opts->{debug} );
+            return;
+        }
+        if( CORE::length( $opts->{remove} ) && ref( $opts->{remove} ) ne 'CODE' )
+        {
+            warnings::warn( "Code provided for the array remove callback is not a code reference.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) || $opts->{debug} );
+            return;
+        }
+        
+        my $ref =
+        {
+        callback_add => $opts->{add},
+        callback_remove => $opts->{remove},
+        data => ( Scalar::Util::reftype( $opts->{data} ) eq 'ARRAY' ? [@{$opts->{data}}] : [] ),
+        debug => $opts->{debug},
+        };
+        print( STDERR ( ref( $class ) || $class ), "::TIEARRAY: Using ", scalar( @{$ref->{data}} ), " elements in array vs ", scalar( @{$opts->{data}} ), " received via opts->data.\n" ) if( $ref->{debug} );
+        return( bless( $ref => ( ref( $class ) || $class ) ) );
+    }
+    
+    sub CLEAR
+    {
+        my $self = shift( @_ );
+        my $data = $self->{data};
+        my $cb = $self->{callback_remove} || $dummy_callback;
+        my $rv;
+        if( !$cb )
+        {
+            warnings::warn( "No callback remove found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) || $self->{debug} );
+            $rv = 1;
+        }
+        else
+        {
+            my $removed = [ @$data ];
+            my $caller = $self->get_caller;
+            my $def = { type => 'remove', start => 0, end => $#$data, removed => $removed, data => $removed, 'caller' => $caller };
+            local $_ = $def;
+            $rv = $cb->( $def );
+        }
+        print( STDERR ref( $self ), "::CLEAR: removing all data from 0 to ", $#$data, " -> callback returned ", ( defined( $rv ) ? 'true' : 'undef' ), "\n" ) if( $self->{debug} );
+        return if( !defined( $rv ) );
+        @{$self->{data}} = ();
+    }
+    
+    sub DELETE
+    {
+        my( $self, $key ) = @_;
+        my $data = $self->{data};
+        return(0) if( $key > $#$data || $key < 0 );
+        my $cb = $self->{callback_remove} || $dummy_callback;
+        my $rv;
+        if( !$cb )
+        {
+            warnings::warn( "No callback remove found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) || $self->{debug} );
+            $rv = 1;
+        }
+        else
+        {
+            my $removed = [ @$data[ $key ] ];
+            my $caller = $self->get_caller;
+            my $def = { type => 'remove', start => $key, end => $key, removed => $removed, data => $removed, 'caller' => $caller };
+            local $_ = $def;
+            $rv = $cb->( $def );
+        }
+        print( STDERR ref( $self ), "::DELETE: removing data from $key to ", ( $key + 1 ), " -> callback returned ", ( defined( $rv ) ? 'true' : 'undef' ), "\n" ) if( $self->{debug} );
+        return if( !defined( $rv ) );
+        return( CORE::splice( @$data, $key, 1 ) );
+    }
+    
+    sub EXISTS
+    {
+        my( $self, $key ) = @_;
+        my $data = $self->{data};
+        return(0) if( $key > $#$data || $key < 0 );
+        return(1);
+    }
+    
+    sub EXTEND
+    {
+        my( $self, $count ) = @_;
+        # This is an optional method, so we set it as a noop
+    }
+    
+    sub FETCH
+    {
+        my( $self, $index ) = @_;
+        return( $self->{data}->[ $index ] );
+    }
+    
+    sub FETCHSIZE
+    {
+        my $self = shift( @_ );
+        my $data = $self->{data};
+        return( $#$data + 1 );
+    }
+    
+    sub POP
+    {
+        my $self = shift( @_ );
+        my $data = $self->{data};
+        my $cb = $self->{callback_remove} || $dummy_callback;
+        my $rv;
+        if( !$cb )
+        {
+            warnings::warn( "No callback remove found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) || $self->{debug} );
+            $rv = 1;
+        }
+        else
+        {
+            my $removed = [ @$data[ $#$data ] ];
+            my $caller = $self->get_caller;
+            my $def = { type => 'remove', start => $#$data, end => $#$data, removed => $removed, data => $removed, 'caller' => $caller };
+            local $_ = $def;
+            $rv = $cb->( $def );
+        }
+        print( STDERR ref( $self ), "::POP: removing data from ", $#$data, " to ", ( $#$data + 1 ), " -> callback returned ", ( defined( $rv ) ? 'true' : 'undef' ), "\n" ) if( $self->{debug} );
+        return if( !defined( $rv ) );
+        return( CORE::splice( @$data, -1 ) );
+    }
+    
+    sub PUSH
+    {
+        my( $self, @values ) = @_;
+        my $data = $self->{data};
+        my $cb = $self->{callback_add} || $dummy_callback;
+        my $rv;
+        if( !$cb )
+        {
+            warnings::warn( "No callback add found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) || $self->{debug} );
+            $rv = 1;
+        }
+        else
+        {
+            my $added = \@values;
+            my $caller = $self->get_caller;
+            my $def = { type => 'add', start => ( $#$data + 1 ), added => $added, data => $added, 'caller' => $caller };
+            local $_ = $def;
+            $rv = $cb->( $def );
+        }
+        print( STDERR ref( $self ), "::PUSH: adding ", scalar( @values ), " data at position ", ( $#$data + 1 ), " -> callback returned ", ( defined( $rv ) ? 'true' : 'undef' ), ". Array contains ", scalar( @$data ), " elements.\n" ) if( $self->{debug} );
+        return if( !defined( $rv ) );
+        CORE::splice( @$data, ( $#$data + 1 ), 0, @values );
+    }
+    
+    sub SHIFT
+    {
+        my $self = shift( @_ );
+        my $data = $self->{data};
+        my $cb = $self->{callback_remove} || $dummy_callback;
+        my $rv;
+        if( !$cb )
+        {
+            warnings::warn( "No callback remove found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) || $self->{debug} );
+            $rv = 1;
+        }
+        else
+        {
+            my $removed = [ @$data[0] ];
+            my $caller = $self->get_caller;
+            my $def = { type => 'remove', start => 0, end => 0, removed => $removed, data => $removed, 'caller' => $caller };
+            local $_ = $def;
+            $rv = $cb->( $def );
+        }
+        return if( !defined( $rv ) );
+        return( CORE::splice( @$data, 0, 1 ) );
+    }
+    
+    sub SPLICE
+    {
+        my( $self, $offset, $len, @values ) = @_;
+        my $data = $self->{data};
+        my $size = $#$data + 1;
+        $offset //= 0;
+        $offset += $size if( $offset < 0 );
+        $len //= ( ( $#$data + 1 ) - $offset );
+        print( STDERR ref( $self ), "::SPLICE: called with offset '$offset', length '$len' and ", scalar( @values ), "\n" ) if( $self->{debug} );
+        my $rv;
+        if( scalar( @values ) )
+        {
+            my $cb = $self->{callback_add} || $dummy_callback;
+            if( !$cb )
+            {
+                warnings::warn( "No callback add found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) || $self->{debug} );
+                $rv = 1;
+            }
+            else
+            {
+                my $added = \@values;
+                my $caller = $self->get_caller;
+                my $def = { type => 'add', start => $offset, added => $added, data => $added, 'caller' => $caller };
+                local $_ = $def;
+                $rv = $cb->( $def );
+            }
+            print( STDERR ref( $self ), "::SPLICE: adding ", scalar( @values ), " data at position $offset -> callback returned ", ( defined( $rv ) ? 'true' : 'undef' ), "\n" ) if( $self->{debug} );
+        }
+        else
+        {
+            my $cb = $self->{callback_remove} || $dummy_callback;
+            if( !$cb )
+            {
+                warnings::warn( "No callback remove found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) || $self->{debug} );
+                $rv = 1;
+            }
+            else
+            {
+                my $removed = [ @$data[ $offset..( $offset + ( $len - 1 ) ) ] ];
+                my $caller = $self->get_caller;
+                my $def = { type => 'remove', start => $offset, end => ( $offset + ( $len - 1 ) ), removed => $removed, data => $removed, 'caller' => $caller };
+                local $_ = $def;
+                $rv = $cb->( $def );
+            }
+            print( STDERR ref( $self ), "::SPLICE: removing data from $offset to ", ( $offset + $len ), " -> callback returned ", ( defined( $rv ) ? 'true' : 'undef' ), "\n" ) if( $self->{debug} );
+        }
+        return if( !defined( $rv ) );
+        return( CORE::splice( @$data, $offset, $len, @values ) );
+    }
+    
+    sub STORE
+    {
+        my( $self, $index, $value ) = @_;
+        my $cb = $self->{callback_add} || $dummy_callback;
+        my $rv;
+        if( !$cb )
+        {
+            warnings::warn( "No callback add found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) || $self->{debug} );
+            $rv = 1;
+        }
+        else
+        {
+            my $added = [ $value ];
+            my $caller = $self->get_caller;
+            my $def = { type => 'add', start => $index, added => $added, data => $added, 'caller' => $caller };
+            local $_ = $def;
+            $rv = $cb->( $def );
+        }
+        print( STDERR ref( $self ), "::STORE: adding 1 data at position $index -> callback returned ", ( defined( $rv ) ? 'true' : 'undef' ), "\n" ) if( $self->{debug} );
+        return if( !defined( $rv ) );
+        $self->{data}->[ $index ] = $value;
+    }
+    
+    sub STORESIZE
+    {
+        my( $self, $count ) = @_;
+        my $data = $self->{data};
+        $#$data = ( $count - 1 );
+#         if( $count > ( $#$data + 1 ) )
+#         {
+#             $#$data = ( $count - 1 );
+#         }
+#         else
+#         {
+#             CORE::splice( @$data, ( $count - 1 ) );
+#         }
+    }
+    
+    sub UNSHIFT
+    {
+        my( $self, @values ) = @_;
+        my $data = $self->{data};
+        my $cb = $self->{callback_add} || $dummy_callback;
+        my $rv;
+        if( !$cb )
+        {
+            warnings::warn( "No callback add found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) || $self->{debug} );
+            $rv = 1;
+        }
+        else
+        {
+            print( STDERR ref( $self ), "::UNSHIFT: got here for values to add '", join( "', '", @values ), "' with callback '$cb'\n" ) if( $self->{debug} );
+            my $added = \@values;
+            my $caller = $self->get_caller;
+            my $def = { type => 'add', start => 0, added => $added, data => $added, 'caller' => $caller };
+            local $_ = $def;
+            $rv = $cb->( $def );
+        }
+        print( STDERR ref( $self ), "::UNSHIFT: adding ", scalar( @values ), " data at position 0 -> callback returned ", ( defined( $rv ) ? 'true' : 'undef' ), "\n" ) if( $self->{debug} );
+        return if( !defined( $rv ) );
+        return( CORE::splice( @$data, 0, 0, @values ) );
+    }
+    
+    sub UNTIE
+    {
+        my( $self, $ref_count ) = @_;
+        # noop
+    }
+    
+    sub get_caller
+    {
+        my $self = shift( @_ );
+        my $frame = 2;
+        my $info = [caller( $frame )];
+        print( STDERR ref( $self ), "::get_caller: At frame $frame, called from package ", $info->[0], " at line ", $info->[2], "\n" ) if( $self->{debug} );
+        while( scalar( @$info ) && substr( $info->[0], 0, 22 ) eq 'Module::Generic::Array' )
+        {
+            $info = [caller( ++$frame )];
+            print( STDERR ref( $self ), "::get_caller: At frame $frame, called from package ", $info->[0], " at line ", $info->[2], "\n" ) if( $self->{debug} );
+        }
+        return( $info );
+    }
+    
+    sub has_callback
+    {
+        my $self = shift( @_ );
+        return(1) if( ref( $self->{callback_add} ) eq 'CODE' || ref( $self->{callback_remove} ) eq 'CODE' );
+        return(0);
+    }
+    
+    sub set_callback
+    {
+        my( $self, $what, $code ) = @_;
+        if( !defined( $what ) )
+        {
+            warn( "No callback type was provided. Use \"add\" or \"remove\".\n" );
+            return;
+        }
+        elsif( $what ne 'add' && $what ne 'remove' )
+        {
+            warn( "Unknown callback type was provided: '$what'. Use \"add\" or \"remove\".\n" );
+            return;
+        }
+        elsif( !defined( $code ) )
+        {
+            warn( "No callback anonymous subroutine or subroutine reference was provided.\n" );
+            return;
+        }
+        elsif( ref( $code ) ne 'CODE' )
+        {
+            warn( "Callback provided (", overload::StrVal( $code ), ") is not a code reference.\n" );
+            return;
+        }
+        $self->{ "callback_${what}" } = $code;
+        return(1);
+    }
+    
+    sub unset_callback
+    {
+        my( $self, $what ) = @_;
+        if( !defined( $what ) )
+        {
+            warn( "No callback type was provided. Use \"add\" or \"remove\".\n" );
+            return;
+        }
+        elsif( $what ne 'add' && $what ne 'remove' )
+        {
+            warn( "Unknown callback type was provided: '$what'. Use \"add\" or \"remove\".\n" );
+            return;
+        }
+        $self->{ "callback_${what}" } = undef;
+        return(1);
+    }
+}
 
 1;
 

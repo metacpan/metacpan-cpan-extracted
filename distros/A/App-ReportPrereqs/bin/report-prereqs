@@ -4,10 +4,11 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.006';
+our $VERSION = '0.008';
 
 package App::ReportPrereqs;
 
+use CPAN::Meta;
 use ExtUtils::MakeMaker ();
 use File::Basename qw(fileparse);
 use Getopt::Long qw(GetOptions);
@@ -25,35 +26,80 @@ if ( !caller ) {
 }
 
 sub _main {
+    my $cpanfile;
+    my $meta;
     my $with_develop = 0;
     my @features;
-    return _usage() if !GetOptions( 'with-develop' => \$with_develop, 'with-feature=s@' => \@features );
+    my $getoptions_ok = GetOptions(
+        'cpanfile:s'      => \$cpanfile,
+        'meta:s'          => \$meta,
+        'with-develop'    => \$with_develop,
+        'with-feature=s@' => \@features,
+    );
 
-    my $cpanfile     = 'cpanfile';
-    my $cpanfile_src = $cpanfile;
+    my $url = shift @ARGV;
 
-    if ( @ARGV == 1 ) {
-        $cpanfile_src = $ARGV[0];
+    if (
+        # Wrong options used
+        !$getoptions_ok
 
-        my $res = HTTP::Tiny->new->get($cpanfile_src);
-        if ( !$res->{success} ) {
-            print {*STDERR} $res->{content};
-            return 1;
-        }
+        # --cpanfile and --meta cannot be used together
+        || ( defined $cpanfile && defined $meta )
 
-        $cpanfile = \$res->{content};
-    }
-    elsif (@ARGV) {
-        return _usage();
+        # --cpanfile or --meta cannot be used together with a URL
+        || ( ( defined $cpanfile || defined $meta ) && defined $url )
+
+        # Only at most one URL can be specified
+        || (@ARGV)
+      )
+    {
+        _usage();
+        return 2;
     }
 
     my $prereqs;
-    if ( !eval { $prereqs = Module::CPANfile->load($cpanfile)->prereqs_with(@features); 1; } ) {
-        my $error = $@;
-        print {*STDERR} "\n$error\n";
-        return 1;
+    my $source;
+    if ( defined $meta ) {
+        if ( $meta eq q{} ) {
+            $meta = 'META.json';
+        }
+        $source = $meta;
+
+        local $@;    ## no critic (Variables::RequireInitializationForLocalVars)
+        if ( !eval { $prereqs = CPAN::Meta->load_file($meta)->effective_prereqs( \@features ); 1 } ) {
+            my $error = $@;
+            print {*STDERR} "Cannot read meta file '$meta': $error\n";
+            return 1;
+        }
+    }
+    else {
+        if ( defined $url ) {
+            $source = $url;
+
+            my $res = HTTP::Tiny->new->get($source);
+            if ( !$res->{success} ) {
+                print {*STDERR} $res->{content};
+                return 1;
+            }
+
+            $cpanfile = \$res->{content};
+        }
+        else {
+            if ( !defined $cpanfile || $cpanfile eq q{} ) {
+                $cpanfile = 'cpanfile';
+            }
+            $source = $cpanfile;
+        }
+
+        local $@;    ## no critic (Variables::RequireInitializationForLocalVars)
+        if ( !eval { $prereqs = Module::CPANfile->load($cpanfile)->prereqs_with(@features); 1; } ) {
+            my $error = $@;
+            print {*STDERR} "Cannot read cpanfile file '$cpanfile': $error\n";
+            return 1;
+        }
     }
 
+    # ---
     my @full_reports;
     my @dep_errors;
 
@@ -135,7 +181,7 @@ sub _main {
     }
 
     if (@full_reports) {
-        print "Versions for all modules listed in $cpanfile_src:\n\n", @full_reports;
+        print "Versions for all modules listed in $source:\n\n", @full_reports;
     }
 
     if (@dep_errors) {
@@ -153,8 +199,11 @@ sub _main {
 sub _usage {
     my $basename = fileparse($0);
 
-    print {*STDERR} "usage: $basename [--with-{develop,feature=id}] [URL]\n";
-    return 2;
+    print {*STDERR} "usage: $basename [--with-develop] [--with-feature <feature>] [URL]\n";
+    print {*STDERR} "       $basename [--with-develop] [--with-feature <feature>] [--cpanfile [<cpanfile>]]\n";
+    print {*STDERR} "       $basename [--with-develop] [--with-feature <feature>] [--meta [<META.json>|<META.yml>]]\n";
+
+    return;
 }
 
 1;
@@ -171,7 +220,7 @@ report-prereqs - report prerequisite versions
 
 =head1 VERSION
 
-Version 0.006
+Version 0.008
 
 =head1 SYNOPSIS
 
@@ -183,8 +232,9 @@ Version 0.006
 
 =head1 DESCRIPTION
 
-The C<report-prereqs> utility will examine F<cpanfile> for prerequisites with
-L<Module::CPANfile|Module::CPANfile>. It reports the version of all modules
+The C<report-prereqs> utility will examine a F<cpanfile>, F<META.json>, or
+F<META.yml> file for prerequisites with L<Module::CPANfile>
+respectively L<CPAN::Meta>. It reports the version of all modules
 listed as prerequisites (including 'recommends', 'suggests', etc.). However,
 any 'develop' prerequisites are not reported, unless they show up in another
 category or the C<--with-develop> option is used.
@@ -193,7 +243,7 @@ Option C<--with-feature> enables optional features provided by a CPAN
 distribution. Option may be used more than once.
 
 Versions are reported based on the result of C<parse_version> from
-L<ExtUtils::MakeMaker|ExtUtils::MakeMaker>, which means prerequisite modules
+L<ExtUtils::MakeMaker>, which means prerequisite modules
 are not actually loaded. Parse errors are reported as "undef". If a module is
 not installed, "missing" is reported instead of a version string.
 
@@ -203,6 +253,21 @@ of all versions.
 =head1 OPTIONS
 
 =over
+
+=item B<--cpanfile [ FILENAME ]>
+
+Parse the C<filename> with L<Module::CPANfile> instead of the default behavior.
+If the C<filename> is omitted it defaults to F<cpanfile> - which is also the
+default.
+
+Can not be used together with C<--meta> or a url.
+
+=item B<--meta [ FILENAME ]>
+
+Parse the C<filename> with L<CPAN::Meta> instead of the default behavior. If
+the C<filename> is omitted it defaults to F<META.json>.
+
+Can not be used together with C<--cpanfile> or a url.
 
 =item B<--with-develop>
 
@@ -259,6 +324,10 @@ after all your dependencies are installed.
 
     report-prereqs https://raw.githubusercontent.com/skirmess/App-ReportPrereqs/master/cpanfile
 
+=head2 Example 6 Show prerequisites from a MYMETA.json
+
+    report-prereqs --meta MYMETA.json
+
 =head1 RATIONALE
 
 =head2 Why this instead of L<Dist::Zilla::Plugin::Test::ReportPrereqs|Dist::Zilla::Plugin::Test::ReportPrereqs>
@@ -307,7 +376,7 @@ Stephan Sachse <ste.sachse@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2021 by Sven Kirmess.
+This software is Copyright (c) 2018-2022 by Sven Kirmess.
 
 This is free software, licensed under:
 

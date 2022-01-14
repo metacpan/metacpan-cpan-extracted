@@ -1,5 +1,8 @@
 Revision history for Perl module Log::Log4perl::Appender::ScreenColoredLevels::UsingMyColors
 
+0.114 2022-01-09T02:27:08Z
+	* No code changes. Fix a link in README.pod.
+
 0.113 2021-01-29T02:21:58Z
 	* Freshen distro, dump Travis CI, add Github Actions
 

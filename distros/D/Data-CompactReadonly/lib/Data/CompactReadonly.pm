@@ -7,7 +7,7 @@ use Data::CompactReadonly::V0::Node;
 
 # Yuck, semver. I give in, the stupid cult that doesn't understand
 # what the *number* bit of *version number* means has won.
-our $VERSION = '0.0.6';
+our $VERSION = '0.1.0';
 
 =head1 NAME
 
@@ -64,11 +64,14 @@ point values too. C<"7.10"> is stored as a four byte string, but C<7.10> is stor
 the same as C<7.1>, as an eight byte IEEE754 double precision float. Note that
 perl parses values like C<7.0> as floating point, and thus so does this module.
 
-Finally, while the file format permits numeric keys in hashes, this method
-always coerces them to text. This is because if you allow numeric keys,
-numbers that can't be represented in an C<int>, such as 1e100 or 3.14 will
-be subject to floating point imprecision, and so it is unlikely that you
-will ever be able to retrieve them as no exact match is possible.
+Finally, while the file format permits numeric keys and Booleans in hashes,
+this method always coerces them to text. It does that to numbers because if you
+allow numeric keys, numbers that can't be represented in an C<int>, such as
+1e100 or 3.14 will be subject to floating point imprecision, and so it is
+unlikely that you will ever be able to retrieve them as no exact match is
+possible. And it does it to Booleans because when you un-serialise them on an
+older perl they may be confused with strings, leading to loss of data if those
+strings are also present as keys in the dictionary.
 
 =head2 read
 
@@ -108,7 +111,7 @@ This is not yet implemented for Arrays.
 =back
 
 Returns the "root node" of the database. If that root node is a number, some
-piece of text, or Null, then it is decoded and the value returned. Otherwise an
+piece of text, True, False, or Null, then it is decoded and the value returned. Otherwise an
 object (possibly a tied object) representing an Array or a Dictionary is returned.
 
 =head1 OBJECTS
@@ -148,7 +151,13 @@ a Null dictionary entry.
 
 =head1 UNSUPPORTED PERL TYPES
 
-Globs, Regexes, References (except to Arrays and Dictionaries)
+Globs, Regexes, References (except to Arrays and Dictionaries).
+
+Booleans are only supported on perl version 5.35.7 or later. On earlier perls, a
+Boolean in the database will be decoded as a true or false I<value>, but its type
+will be numeric or string. And a older perls will never write a True or False node
+to the database, they'll always write numbers or strings with true/false values,
+which other implementations will decode as numbers or strings.
 
 =head1 BUGS/FEEDBACK
 

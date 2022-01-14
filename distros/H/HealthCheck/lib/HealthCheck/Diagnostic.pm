@@ -2,7 +2,7 @@ package HealthCheck::Diagnostic;
 
 # ABSTRACT: A base clase for writing health check diagnositics
 use version;
-our $VERSION = 'v1.7.0'; # VERSION
+our $VERSION = 'v1.8.0'; # VERSION
 
 use 5.010;
 use strict;
@@ -106,6 +106,7 @@ my $rfc3339_timestamp = qr/^(?:
 #pod
 #pod     {   id      => "my_id",
 #pod         label   => "My Label",
+#pod         runbook => "https://grantstreetgroup.github.io/HealthCheck.html",
 #pod         results => [ {
 #pod             label  => "Sub Label",
 #pod             status => "OK",
@@ -114,9 +115,10 @@ my $rfc3339_timestamp = qr/^(?:
 #pod
 #pod Collapses to:
 #pod
-#pod     {   id     => "my_id",
-#pod         label  => "Sub Label",
-#pod         status => "OK",
+#pod     {   id      => "my_id",
+#pod         label   => "Sub Label",
+#pod         runbook => "https://grantstreetgroup.github.io/HealthCheck.html",
+#pod         status  => "OK",
 #pod     }
 #pod
 #pod
@@ -140,6 +142,10 @@ my $rfc3339_timestamp = qr/^(?:
 #pod =item label
 #pod
 #pod A human readable name for this check.
+#pod
+#pod =item runbook
+#pod
+#pod A runbook link to help troubleshooting if the status is not OK.
 #pod
 #pod =back
 #pod
@@ -188,6 +194,14 @@ sub id { return unless ref $_[0]; return shift->{id} }
 #pod =cut
 
 sub label { return unless ref $_[0]; return shift->{label} }
+
+#pod =head2 runbook
+#pod
+#pod Read only accessor that returns the runbook registered with this object.
+#pod
+#pod =cut
+
+sub runbook { return unless ref $_[0]; return shift->{runbook} }
 
 #pod =head2 check
 #pod
@@ -253,7 +267,7 @@ sub check {
 
     local $@;
     my $start = $params{runtime} ? [ gettimeofday ] : undef;
-    my @res = eval { local $SIG{__DIE__}; $class_or_self->run(%params) };
+    my @res = eval { $class_or_self->run(%params) };
     @res = { status => 'CRITICAL', info => "$@" } if $@;
 
     if ( @res == 1 && ( ref $res[0] || '' ) eq 'HASH' ) { }    # noop, OK
@@ -276,7 +290,7 @@ sub check {
 #pod Validates, pre-formats, and returns the C<result> so that it is easily
 #pod usable by HealthCheck.
 #pod
-#pod The attributes C<id>, C<label>, and C<tags>
+#pod The attributes C<id>, C<label>, C<runbook>, and C<tags>
 #pod get copied from the C<$diagnostic> into the C<result>
 #pod if they exist in the former and not in the latter.
 #pod
@@ -322,7 +336,7 @@ sub check {
 sub summarize {
     my ( $self, $result ) = @_;
 
-    $self->_set_default_fields($result, qw(id label tags));
+    $self->_set_default_fields($result, qw(id label runbook tags));
 
     return $self->_summarize( $result, $result->{id} // 0 );
 }
@@ -462,7 +476,7 @@ HealthCheck::Diagnostic - A base clase for writing health check diagnositics
 
 =head1 VERSION
 
-version v1.7.0
+version v1.8.0
 
 =head1 SYNOPSIS
 
@@ -547,6 +561,7 @@ For example:
 
     {   id      => "my_id",
         label   => "My Label",
+        runbook => "https://grantstreetgroup.github.io/HealthCheck.html",
         results => [ {
             label  => "Sub Label",
             status => "OK",
@@ -555,9 +570,10 @@ For example:
 
 Collapses to:
 
-    {   id     => "my_id",
-        label  => "Sub Label",
-        status => "OK",
+    {   id      => "my_id",
+        label   => "Sub Label",
+        runbook => "https://grantstreetgroup.github.io/HealthCheck.html",
+        status  => "OK",
     }
 
 =item tags
@@ -581,6 +597,10 @@ The unique id for this check.
 
 A human readable name for this check.
 
+=item runbook
+
+A runbook link to help troubleshooting if the status is not OK.
+
 =back
 
 =head2 collapse_single_result
@@ -598,6 +618,10 @@ Read only accessor that returns the id registered with this object.
 =head2 label
 
 Read only accessor that returns the label registered with this object.
+
+=head2 runbook
+
+Read only accessor that returns the runbook registered with this object.
 
 =head2 check
 
@@ -650,7 +674,7 @@ in some way.
 Validates, pre-formats, and returns the C<result> so that it is easily
 usable by HealthCheck.
 
-The attributes C<id>, C<label>, and C<tags>
+The attributes C<id>, C<label>, C<runbook>, and C<tags>
 get copied from the C<$diagnostic> into the C<result>
 if they exist in the former and not in the latter.
 
@@ -709,7 +733,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 - 2020 by Grant Street Group.
+This software is Copyright (c) 2017 - 2022 by Grant Street Group.
 
 This is free software, licensed under:
 

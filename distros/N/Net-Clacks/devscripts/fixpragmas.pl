@@ -7,14 +7,14 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp;
-our $VERSION = 18;
+our $VERSION = 20;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
 use Encode qw(is_utf8 encode_utf8 decode_utf8);
 #---AUTOPRAGMAEND---
 
-# PAGECAMEL  (C) 2008-2020 Rene Schickbauer
+# PAGECAMEL  (C) 2008-2022 Rene Schickbauer
 # Developed under Artistic license
 
 
@@ -71,7 +71,7 @@ foreach my $file (@files) {
             print $ofh "use mro 'c3';\n";
             print $ofh "use English;\n";
             print $ofh "use Carp;\n";
-            print $ofh "our \$VERSION = 18;\n";
+            print $ofh "our \$VERSION = 20;\n";
             print $ofh "use autodie qw( close );\n";
             print $ofh "use Array::Contains;\n";
             print $ofh "use utf8;\n";

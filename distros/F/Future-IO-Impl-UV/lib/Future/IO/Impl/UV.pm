@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
 
-package Future::IO::Impl::UV 0.02;
+package Future::IO::Impl::UV 0.03;
 
 use v5.14;
 use warnings;
@@ -51,15 +51,57 @@ sub sleep
    return $f;
 }
 
-my %read_futures_by_fileno; # {fileno} => [@futures]
-my %poll_read_by_fileno;
+# libuv doesn't like having more than one uv_poll_t instance per filehandle,
+# so we'll have to combine reads and writes
+
+my %read_futures_by_fileno;  # {fileno} => [@futures]
+my %write_futures_by_fileno; # {fileno} => [@futures]
+my %poll_by_fileno;
+
+sub _update_poll
+{
+   my ( $fh ) = @_;
+   my $fileno = $fh->fileno;
+
+   my $poll = $poll_by_fileno{$fileno} //=
+      UV::Poll->new(
+         fh => $fh,
+         on_poll => sub {
+            my ( $poll, $status, $events ) = @_;
+
+            if( $status or $events & UV::Poll::UV_READABLE ) {
+               my $f = shift @{ $read_futures_by_fileno{$fileno} };
+               $f and $f->done;
+            }
+            if( $status or $events & UV::Poll::UV_WRITABLE ) {
+               my $f = shift @{ $write_futures_by_fileno{$fileno} };
+               $f and $f->done;
+            }
+
+            _update_poll( $fh );
+         },
+      );
+
+   my $want = 0;
+   $want |= UV::Poll::UV_READABLE if scalar @{ $read_futures_by_fileno{$fileno}  // [] };
+   $want |= UV::Poll::UV_WRITABLE if scalar @{ $write_futures_by_fileno{$fileno} // [] };
+
+   if( $want ) {
+      $poll->start( $want );
+   }
+   else {
+      $poll->stop;
+      delete $poll_by_fileno{$fileno};
+   }
+}
 
 sub ready_for_read
 {
    shift;
    my ( $fh ) = @_;
+   my $fileno = $fh->fileno;
 
-   my $futures = $read_futures_by_fileno{ $fh->fileno } //= [];
+   my $futures = $read_futures_by_fileno{$fileno} //= [];
 
    my $f = Future::IO::Impl::UV::_Future->new;
 
@@ -68,29 +110,19 @@ sub ready_for_read
 
    return $f if $was;
 
-   my $poll = $poll_read_by_fileno{ $fh->fileno } =
-      UV::Poll->new( fh => $fh );
-   $poll->start( UV::Poll::UV_READABLE, sub {
-      my ( $self ) = @_;
-
-      $futures->[0]->done;
-      shift @$futures;
-
-      $self->stop if !@$futures;
-   });
-
+   _update_poll( $fh );
    return $f;
 }
 
-my %write_futures_by_fileno; # {fileno} => [@futures]
 my %poll_write_by_fileno;
 
 sub ready_for_write
 {
    shift;
    my ( $fh ) = @_;
+   my $fileno = $fh->fileno;
 
-   my $futures = $write_futures_by_fileno{ $fh->fileno } //= [];
+   my $futures = $write_futures_by_fileno{$fileno} //= [];
 
    my $f = Future::IO::Impl::UV::_Future->new;
 
@@ -99,17 +131,7 @@ sub ready_for_write
 
    return $f if $was;
 
-   my $poll = $poll_write_by_fileno{ $fh->fileno } =
-      UV::Poll->new( fh => $fh );
-   $poll->start( UV::Poll::UV_WRITABLE, sub {
-      my ( $self ) = @_;
-
-      $futures->[0]->done;
-      shift @$futures;
-
-      $self->stop if !@$futures;
-   });
-
+   _update_poll( $fh );
    return $f;
 }
 

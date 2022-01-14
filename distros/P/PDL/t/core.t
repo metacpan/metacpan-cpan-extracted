@@ -1,4 +1,5 @@
 use strict;
+use warnings;
 use Test::More;
 use PDL::LiteF;
 use Config;
@@ -23,18 +24,13 @@ my $c_dbl  = $a_dbl->slice('4:7');
 # test 'sclr' method
 #
 is $b_long->sclr, 5, "sclr test of 1-elem pdl (long)";
-is $c_long->sclr, 4, "sclr test of 3-elem pdl (long)";
 
 ok tapprox( $b_dbl->sclr, 5 ), "sclr test of 1-elem pdl (dbl)";
-ok tapprox( $c_dbl->sclr, 4 ), "sclr test of 3-elem pdl (dbl)";
 
-# switch multielement check on
-is( PDL->sclr({Check=>'barf'}), 2, "changed error mode of sclr" );
-
-eval '$c_long->sclr';
+eval { $c_long->sclr };
 like $@, qr/multielement ndarray in 'sclr' call/, "sclr failed on multi-element ndarray (long)";
 
-eval '$c_dbl->sclr';
+eval { $c_dbl->sclr };
 like $@, qr/multielement ndarray in 'sclr' call/, "sclr failed on multi-element ndarray (dbl)";
 
 # test reshape barfing with negative args
@@ -204,15 +200,22 @@ ok( ($x->ndims==2 and $x->dim(0)==2 and $x->dim(1)==2), 'weird cat case has the 
 ok( all( $x == pdl([1,1],[2,3]) ), "cat does the right thing with catting a 0-pdl and 2-pdl together");
 $@='';
 
-my $by=xvals(byte,5)+253;
-my $so=xvals(short,5)+32766;
-my $lo=xvals(long,5)+32766;
-my $fl=float(xvals(5)+0.2);
+my $lo=sequence(long,5)+32766;
+my $so=sequence(short,5)+32766;
+my $fl=float(sequence(5)+0.2); # different as 0.2 is an NV so now a double
+my $by=sequence(byte,5)+253;
 my @list = ($lo,$so,$fl,$by);
 my $c2 = cat(@list);
-is($c2->type,'float','concatentating different datatypes returns the highest type');
-my $i=0;
-map{ ok(all($_==$list[$i]),"cat/dog symmetry for values ($i)"); $i++; }$c2->dog;
+is($c2->type,'float','concatenating different datatypes returns the highest type');
+ok(all($_==shift @list),"cat/dog symmetry for values") for $c2->dog;
+my ($dogcopy) = $c2->dog({Break=>1});
+$dogcopy++;
+ok all($dogcopy != $c2->slice(':,(0)')), 'Break means copy'; # not lo as cat no flow
+my ($dogslice) = $c2->dog;
+$dogslice->dump;
+$lo->dump;
+$dogslice++;
+ok all($dogslice == $c2->slice(':,(0)')), 'no Break means dataflow' or diag "got=$dogslice\nexpected=$lo";
 
 $x = sequence(byte,5);
 
@@ -248,13 +251,15 @@ my $empty = zeroes(0);
 ok($empty->nelem==0,"you can make an empty PDL with zeroes(0)");
 ok("$empty" =~ m/Empty/, "an empty PDL prints 'Empty'");
 
-ok($null->info =~ /^PDL->null$/, "null ndarray's info is 'PDL->null'");
+is $null->info, 'PDL->null', "null ndarray's info is 'PDL->null'";
 my $mt_info = $empty->info;
 $mt_info =~m/\[([\d,]+)\]/;
 my $mt_info_dims = pdl("$1");
 ok(any($mt_info_dims==0), "empty ndarray's info contains a 0 dimension");
-ok($null->isnull && $null->isempty, "a null ndarray is both null and empty");
-ok(!$empty->isnull && $empty->isempty, "an empty ndarray is empty but not null");
+ok($null->isnull, "a null ndarray is null");
+ok($null->isempty, "a null ndarray is empty") or diag $null->info;
+ok(!$empty->isnull, "an empty ndarray is not null");
+ok($empty->isempty, "an empty ndarray is empty");
 
 $x = short pdl(3,4,5,6);
 eval { $x->reshape(2,2);};
@@ -387,7 +392,7 @@ is($pc->get_datatype, $PDL_B, "C also byte");
 note "C ($pb * 3) is $pc";
 
 my $pd = $pb * 600.0;
-is($pd->get_datatype, $PDL_F, "D promoted to float");
+is($pd->get_datatype, $PDL_D, "pdl-ed NV is double, D promoted to double");
 note "D ($pb * 600) is $pd";
 
 my $pi = 4*atan2(1,1);
@@ -446,10 +451,26 @@ for (['ones', 1], ['zeroes', 0], ['nan', 'NaN'], ['inf', 'Inf'], ['i', 'i', 'cdo
   $w = $y->copy; $w->inplace->$name; ok all tapprox $w, pdl($val);
 }
 
+is short(1)->zeroes->type, 'short', '$existing->zeroes right type';
+
 eval { PDL->is_inplace }; # shouldn't infinite-loop
 isnt $@, '', 'is_inplace as class method throws exception';
 
-is sequence(3)->get_trans, undef, 'get_trans without trans undef';
-isnt sequence(3)->slice()->get_trans, undef, 'get_trans with trans defined';
+my $s = sequence(3);
+is $s->trans_parent, undef, 'trans_parent without trans undef';
+my $slice = $s->slice;
+isnt +(my $tp=$slice->trans_parent), undef, 'trans_parent with trans defined';
+is ${($s->trans_children)[0]}, $$tp, 'correct trans_children';
+my @parents = $tp->parents;
+is ${$parents[0]}, $$s, 'correct parent ndarray';
+my @children = $tp->children;
+is ${$children[0]}, $$slice, 'correct child ndarray';
+
+my $notouch = sequence(4);
+$notouch->set_donttouchdata(4 * PDL::Core::howbig($notouch->get_datatype));
+eval { $notouch->setdims([2,2]); $notouch->make_physical; };
+is $@, '', 'setdims to same total size of set_donttouchdata should be fine';
+eval { $notouch->setdims([3,2]); $notouch->make_physical; };
+isnt $@, '', 'setdims/make_physical to different size of set_donttouchdata should fail';
 
 done_testing;

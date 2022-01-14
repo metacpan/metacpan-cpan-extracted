@@ -2,7 +2,11 @@
 require PDL::Core::Dev;
 my $isbigendian = PDL::Core::Dev::isbigendian();
 
+use strict;
+use warnings;
 pp_addpm({At=>'Top'},<<'EOD');
+use strict;
+use warnings;
 
 =head1 NAME
 
@@ -1228,15 +1232,16 @@ pp_addpm(<<'EOPM');
 
 sub rasc {PDL->rasc(@_)}
 sub PDL::rasc {
-  use IO::File;
   my ($pdl, $file, $num) = @_;
   $num = -1 unless defined $num;
-  my $fi = $file;
-  my $is_openhandle = defined fileno $fi ? 1 : 0;
-  unless ($is_openhandle) {
+  my $is_openhandle = defined fileno $file;
+  my $fi;
+  if ($is_openhandle) {
+    $fi = $file;
+  } else {
     barf 'usage: rasc $pdl, "filename"|FILEHANDLE, [$num_to_read]'
        if !defined $file || ref $file;
-    $fi = new IO::File "<$file" or barf "Can't open $file";
+    open $fi, "<", $file or barf "Can't open $file";
   }
   $pdl->_rasc(my $ierr=null,$num,$fi);
   close $fi unless $is_openhandle;
@@ -1309,7 +1314,7 @@ EOPM
 pp_def('_rasc',
        Pars => '[o] nums(n); int [o] ierr(n)',
        OtherPars => 'int num => n; PerlIO *fp',
-       GenericTypes => [F,D],
+       GenericTypes => ['F','D'],
        Code => q@ 
                  int ns, i, j;
                  ns = $SIZE(n);

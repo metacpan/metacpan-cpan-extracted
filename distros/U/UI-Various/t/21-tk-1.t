@@ -23,6 +23,8 @@ use strictures;
 no indirect 'fatal';
 no multidimensional;
 
+use Cwd 'abs_path';
+
 use Test::More;
 use Test::Output;
 
@@ -37,6 +39,23 @@ BEGIN {
 }
 
 use UI::Various({use => ['Tk']});
+
+#########################################################################
+# specific check for problematic configuration, is sub-test as the
+# additional check otherwise might affect further tests in some Perl and/or
+# Tk versions:
+use constant T_PATH => map { s|/[^/]+$||; $_ } abs_path($0);
+do(T_PATH . '/functions/sub_perl.pl');
+$_ = _sub_perl('require Tk;
+		$_ = MainWindow->new();
+		$_->fontActual("", "-size");
+		$_->destroy;');
+if ($_)
+{
+    diag('Your ', $^O,
+	 ' apparently has a strange font configuration (no default font?).',
+	 '  This will hurt!');
+}
 
 #########################################################################
 # identical parts of messages:

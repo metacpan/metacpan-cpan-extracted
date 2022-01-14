@@ -4,7 +4,7 @@
       "Dominique Dumont"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "lgpl_2_1"
    ],
@@ -30,7 +30,7 @@
          },
          "requires" : {
             "App::Cmd::Setup" : "0",
-            "Config::Model" : "2.124",
+            "Config::Model" : "2.148",
             "Config::Model::FuseUI" : "0",
             "Config::Model::Lister" : "0",
             "Config::Model::ObjTreeScanner" : "0",
@@ -57,13 +57,15 @@
       "test" : {
          "requires" : {
             "App::Cmd::Tester" : "0",
+            "Config::Model" : "2.148",
             "English" : "0",
             "File::Spec" : "0",
             "Term::ANSIColor" : "2.01",
             "Test::File::Contents" : "0",
             "Test::More" : "0",
             "Test::Perl::Critic" : "0",
-            "Test::Pod" : "1.00"
+            "Test::Pod" : "1.00",
+            "XXX" : "0"
          }
       }
    },
@@ -80,7 +82,7 @@
          "web" : "http://github.com/dod38fr/cme-perl"
       }
    },
-   "version" : "1.034",
+   "version" : "1.036",
    "x_generated_by_perl" : "v5.32.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "LGPL-2.1"

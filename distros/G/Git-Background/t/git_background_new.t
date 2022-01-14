@@ -16,7 +16,7 @@ use lib File::Spec->catdir( File::Basename::dirname( Cwd::abs_path __FILE__ ), '
 use Local::Thing;
 use Local::Test::TempDir qw(tempdir);
 
-use Git::Background;
+use Git::Background 0.003;
 
 note('new()');
 {

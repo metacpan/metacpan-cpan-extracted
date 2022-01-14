@@ -1,0 +1,88 @@
+{
+   "abstract" : "A test corpus",
+   "author" : [
+      "Sven Kirmess <sven.kirmess@kzone.ch>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "CPAN::Meta version 2.150010",
+   "license" : [
+      "freebsd"
+   ],
+   "meta-spec" : {
+      "version" : 2
+   },
+   "name" : "Local-Corpus",
+   "optional_features" : {
+      "omega" : {
+         "description" : "Omega",
+         "prereqs" : {
+            "build" : {
+               "requires" : {
+                  "Local::Psi::DoesNotExist" : "0"
+               }
+            },
+            "test" : {
+               "requires" : {
+                  "Local::Chi::DoesNotExist" : "0"
+               }
+            },
+            "develop" : {
+               "requires" : {
+                  "Local::Omega::DoesNotExist" : "0"
+               }
+            }
+         }
+      }
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Local::Epsilon" : "0",
+            "Local::Epsilon::DoesNotExist" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Local::Zeta" : "0",
+            "Local::Zeta::DoesNotExist" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Local::Theta" : "0",
+            "Local::Theta::DoesNotExist" : "0"
+         }
+      },
+      "runtime" : {
+         "conflicts" : {
+            "Local::Delta" : "0",
+            "Local::Delta::DoesNotExist" : "0"
+         },
+         "recommends" : {
+            "Local::Beta" : "1.12",
+            "Local::Beta::DoesNotExist" : "0"
+         },
+         "requires" : {
+            "Local::Alpha" : "0",
+            "Local::Alpha::DoesNotExist" : "0",
+            "perl" : "5.006"
+         },
+         "suggests" : {
+            "Local::Gamma" : "0",
+            "Local::Gamma::DoesNotExist" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Local::Eta" : "0",
+            "Local::Eta::DoesNotExist" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.000001",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

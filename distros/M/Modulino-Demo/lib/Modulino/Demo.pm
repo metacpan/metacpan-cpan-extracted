@@ -6,7 +6,7 @@ use utf8;
 
 use warnings;
 
-our $VERSION = '1.003';
+our $VERSION = '1.004';
 
 UNITCHECK {
 sub _running_under_docreader {
@@ -165,7 +165,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2012-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2012-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the terms as the Artistic License 2.0.
 

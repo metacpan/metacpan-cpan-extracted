@@ -1,6 +1,12 @@
 Changelog for HealthCheck
 
-v1.7.0 2020-11-11T17:09:00
+v1.8.0 2022-01-07T17:40:21
+ - Update README (Andrew Hewus Fresh)
+ - PCR-802 Add runbook attribute to the base class (Hu Yin)
+ - Pull request #9: SM-3261 Unclobber $SIG{__DIE__} (Tom Christiansen)
+ - SM-3261 Unclobber $SIG{__DIE__} (Tom Christiansen)
+
+v1.7.0 2020-11-11T17:08:42
  - Update README (Andrew Hewus Fresh)
  - Support leap seconds (Andrew Hewus Fresh)
  - Switch to stricter RFC 3339 timestamps (Andrew Hewus Fresh)

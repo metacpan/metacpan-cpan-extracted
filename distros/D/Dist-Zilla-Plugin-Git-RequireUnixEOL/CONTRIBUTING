@@ -28,6 +28,7 @@ You can run tests directly using the prove tool:
 
 or with the Makefile:
 
+  $ export EXTENDED_TESTING=1
   $ perl Makefile.PL
   $ make
   $ make test
@@ -53,12 +54,15 @@ If you would like to work with the project, clone it with the following
 commands:
 
   $ git clone https://github.com/skirmess/Dist-Zilla-Plugin-Git-RequireUnixEOL.git
-  $ git submodule update --init
 
 You may need to satisfy some dependencies. You can use cpanminus in the
 cloned project to install them:
 
   $ cpanm --installdeps --with-develop .
+
+Or if you plan on using Dist::Zilla, install all author dependencies with:
+
+  $ cpanm --installdeps --with-develop --with-feature dzil .
 
 You can run tests directly using the prove tool:
 
@@ -70,7 +74,7 @@ Including the author tests:
 
   $ prove -lvr xt/
 
-or with Dist::Zilla
+or with Dist::Zilla:
 
   $ dzil test
   $ dzil test --release

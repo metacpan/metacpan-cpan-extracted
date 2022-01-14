@@ -168,7 +168,7 @@ sub _makeSingleItemRecord {
     my $ecnc = $item->{effectiveCallNumberComponents} || {};
 
     return bless [
-	[ 'availableNow', $item->{status} && $item->{status}->{name} eq 'Available' ? 1 : 0, 'value' ],
+	[ 'availableNow', _makeAvailableNow($item), 'value' ],
 	[ 'availabilityDate', _makeAvailabilityDate($item) ],
         [ 'availableThru', _makeAvailableThru($item) ],
         [ 'restrictions', _makeRestrictions($item) ],
@@ -183,7 +183,7 @@ sub _makeSingleItemRecord {
         [ '_chronology', $item->{chronology} ],
         [ 'enumAndChron', $enumAndChronForItem ],
         [ 'midspine', undef ], # XXX Will be added in UIIN-220 but doesn't exist yet
-        [ 'temporaryLocation', _makeLocation($item->{temporaryLocation} || $defaultLocation) ],
+        [ 'temporaryLocation', _makeLocation($item->{temporaryLocation} || $item->{permanentLocation} || $defaultLocation) ],
 	[ '_permanentLocation', _makeLocation($item->{permanentLocation} || $defaultPermamentLocation) ],
         [ '_holdingsLocation', _makeLocation($defaultLocation) ],
         [ '_callNumber', $ecnc->{callNumber} ],
@@ -191,6 +191,13 @@ sub _makeSingleItemRecord {
         [ '_callNumberSuffix', $ecnc->{suffix} ],
         [ '_volume', $item->{volume} ],
         [ '_yearCaption', _makeYearCaption($item->{yearCaption}) ],
+	[ '_accessionNumber', $item->{accessionNumber} ],
+	[ '_copyNumber', $item->{copyNumber} ],
+	[ '_descriptionOfPieces', $item->{descriptionOfPieces} ],
+	[ '_discoverySuppress', $item->{discoverySuppress} ],
+	[ '_hrid', $item->{hrid} ],
+	[ '_id', $item->{id} ],
+	[ '_itemIdentifier', $item->{itemIdentifier} ],
     ], 'Net::z3950::FOLIO::OPACXMLRecord::item';
 }
 
@@ -209,6 +216,20 @@ sub _format {
     return undef if !defined $field007;
     my $data = $field007->data();
     return substr($data, 0, 2);
+}
+
+
+# Initially, the calculation here was just that an item is available
+# if it has a status and that status is 'Available'. But since there
+# is no way to directly represent item suppression in the Z39.50 OPAC
+# record, we also use this field for it: an item that is suppressed
+# from discovery is reported as unavailable. See ZF-60.
+#
+sub _makeAvailableNow {
+    my($item) = @_;
+
+    return 0 if $item->{discoverySuppress};
+    return $item->{status} && $item->{status}->{name} eq 'Available' ? 1 : 0;
 }
 
 

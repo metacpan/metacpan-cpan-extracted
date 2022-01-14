@@ -1,12 +1,16 @@
-use Test::More tests => 289;
-use Carp;
 use strict;
+use warnings;
+use Test::More tests => 290;
+use Test::NoWarnings;
+use Carp;
+use File::Temp qw(tempdir);
 use vars qw(%field %in);
 
 use CGI::Simple::Standard qw( :all );
 
 my ( $q, $sv, @av );
-my $tmpfile = './cgi-tmpfile.tmp';
+my $dir = tempdir( CLEANUP => 1 );
+my $tmpfile = "$dir/cgi-tmpfile.tmp";
 
 my $debug = 0;
 
@@ -618,6 +622,7 @@ $upload = join '', <$handle>;
 is( $upload, $data, 'upload( \'/some/path/to/myfile\', \, 2' );
 $sv = upload( '/some/path/to/myfile', "$tmpfile.bak" );
 is( $sv, undef, 'upload( \'/some/path/to/myfile\', \, 3' );
+close($handle);
 unlink $tmpfile, "$tmpfile.bak";
 
 $ENV{'CONTENT_TYPE'} = 'application/x-www-form-urlencoded';
@@ -916,7 +921,7 @@ is(
 
 $sv     = redirect( 'http://a.galaxy.far.away.gov' );
 $header = <<'HEADER';
-Status: 302 Moved
+Status: 302 Found
 Expires: Tue, 13 Nov 2001 06:45:15 GMT
 Date: Tue, 13 Nov 2001 06:45:15 GMT
 Pragma: no-cache
@@ -932,9 +937,9 @@ is( $sv, $header, 'redirect(), 1' );
 
 $sv = redirect( -uri => 'http://a.galaxy.far.away.gov', -nph => 1 );
 $header = <<'HEADER';
-HTTP/1.0 302 Moved
+HTTP/1.0 302 Found
 Server: Apache - accept no substitutes
-Status: 302 Moved
+Status: 302 Found
 Expires: Tue, 13 Nov 2001 06:49:24 GMT
 Date: Tue, 13 Nov 2001 06:49:24 GMT
 Pragma: no-cache

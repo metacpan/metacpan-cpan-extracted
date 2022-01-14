@@ -1,5 +1,8 @@
 Revision history for Perl module Test::ISBN
 
+2.043 2022-01-09T03:48:53Z
+	* no code changes. Fix a link in README.pod.
+
 2.042 2021-01-16T12:53:01Z
 	* freshen distro, remove Travis CI, add Github Actions
 

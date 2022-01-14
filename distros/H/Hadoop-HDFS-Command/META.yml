@@ -40,7 +40,7 @@ requires:
 resources:
   bugtracker: https://github.com/Perl-Hadoop/Hadoop-HDFS-Command/issues
   repository: git://github.com/Perl-Hadoop/Hadoop-HDFS-Command.git
-version: '0.006'
+version: '0.007'
 x_contributors:
   - 'Burak Gursoy <burak@cpan.org>'
 x_generated_by_perl: v5.34.0

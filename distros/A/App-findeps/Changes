@@ -1,7 +1,15 @@
 Revision history for Perl extension App-findeps
 
+0.13 2022-01-13T13:24:46Z
+    - removed irrelevant modules to pass the test in any environments
+    - looked over the algorysm agian (incomplete)
+
+0.12 2022-01-11T13:21:51Z
+    - optimized sources with using Directory::Iterator
+    - re-range support perl versions 5.10 to 5.34
+
 0.11 2020-10-07T13:44:46Z
-    - fiexd #4
+    - fixed #4
 
 0.10 2020-09-29T06:04:22Z
     - removed surplus files

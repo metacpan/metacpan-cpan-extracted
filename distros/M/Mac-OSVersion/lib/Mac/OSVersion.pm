@@ -8,7 +8,7 @@ use Carp;
 
 use subs qw();
 
-our $VERSION = '1.006';
+our $VERSION = '1.007';
 
 =encoding utf8
 
@@ -180,6 +180,7 @@ my %names = (
 	'High Sierra', 'Mojave', 'Catalina'],
 	'11' => [ 'Big Sur' ],
 	'12' => [ 'Monterey' ],
+	'13' => [ 'Mammoth' ],
 	 );
 
 my %release_dates = (
@@ -506,7 +507,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2007-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2007-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

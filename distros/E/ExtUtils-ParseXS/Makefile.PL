@@ -77,8 +77,9 @@ WriteMakefile(
   },
   META_MERGE => {
     resources => {
-      bugtracker => 'http://rt.perl.org/rt3/',
-      repository => 'git://perl5.git.perl.org/gitroot/perl.git',
+      repository => 'https://github.com/Perl/perl5.git',
+      bugtracker => 'https://github.com/Perl/perl5/issues',
+      homepage   => "https://github.com/Perl/perl5",
     },
   },
   ($] >= 5.005 ?     ## Add these new keywords supported since 5.005

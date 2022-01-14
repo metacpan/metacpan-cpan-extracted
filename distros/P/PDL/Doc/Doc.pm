@@ -2,22 +2,22 @@
 # pod format but with special interpretation of some =for directives)
 
 package PDL::PodParser;
+use strict;
+use warnings;
 use PDL::Core '';
 use Pod::Select;
 use File::Spec;
 use File::Basename;
 
-@ISA = qw(Pod::Select);
+our @ISA = qw(Pod::Select);
 
-%Title = ('Example' => 'Example',
+our %Title = ('Example' => 'Example',
 	  'Ref'     => 'Reference',
 	  'Sig'     => 'Signature',
 	  'Opt'     => 'Options',
 	  'Usage'   => 'Usage',
           'Bad'     => 'Bad value support',  
 	 );
-
-
 
 sub new {
   my $class = shift;
@@ -410,7 +410,6 @@ alternatives.
 
 package PDL::Doc;
 use PDL::Core '';
-use IO::File;  # for file handles
 use File::Basename;
 use PDL::Doc::Config;
 
@@ -680,7 +679,7 @@ sub scan {
   # Handle RPM etc. case where we are building away from the final
   # location. Alright it's a hack - KGB
   my $file2 = $file;
-  $file2 =~ s/^$ENV{BUILDROOTPREFIX}// if $ENV{BUILDROOTPREFIX} ne "";
+  $file2 =~ s/^$ENV{BUILDROOTPREFIX}// if $ENV{BUILDROOTPREFIX};
 
   my $parser = new PDL::PodParser;
   $parser->{verbose} = $verbose;
@@ -729,12 +728,12 @@ sub scan {
        ($name,$does) = (undef,undef) unless $does =~ /shell|script/i;
      }
    }
-   $does = 'Hmmm ????' if $does =~ /^\s*$/;
+   $does = 'Hmmm ????' if $does and $does =~ /^\s*$/;
    my $type = ($file =~ /\.pod$/ ? 
 	       ($does =~ /shell|script/i && $name =~ /^[a-z][a-z0-9]*$/) ? 'Script:' 
 	       : 'Manual:'
 	       : 'Module:');
-   $hash->{$name}->{$name} = {Ref=>"$type $does",File=>$file2} if $name !~ /^\s*$/;
+   $hash->{$name}{$name} = {Ref=>"$type $does",File=>$file2} if $name and $name !~ /^\s*$/;
    return $n;
 }
 
@@ -780,7 +779,7 @@ sub funcdocs {
   my ($this,$func,$module,$fout) = @_;
   my $hash = $this->ensuredb;
   barf "unknown function '$func'" unless defined($hash->{$func});
-  barf "funcdocs now requires 3 arguments" if UNIVERSAL::isa($module,IO::File);
+  barf "funcdocs now requires 3 arguments" if defined fileno $module;
   my $file = $hash->{$func}->{$module}->{File};
   my $dbf = $hash->{$func}->{$module}->{Dbfile};
   if (!File::Spec->file_name_is_absolute($file) && $dbf) {
@@ -797,16 +796,12 @@ sub funcdocs_fromfile {
   my ($func,$file) = @_;
   barf "can't find file '$file'" unless -f $file;
   local $SIG{PIPE}= sub {}; # Prevent crashing if user exits the pager
-  open my $in, '<', $file;
-  my $out = ($#_ > 1 && defined($_[2])) ? $_[2] :
-    new IO::File "| pod2text | $PDL::Doc::pager";
-  barf "can't open file $file" unless $in;
+  open my $in, '<', $file or barf "can't open file $file";
+  my $out = $_[2];
+  open $out, "| pod2text | $PDL::Doc::pager" if !defined $out;
   barf "can't open output handle" unless $out;
   getfuncdocs($func,$in,$out);
-
-  if (ref $out eq 'GLOB') {
-  	print $out "Docs from $file\n\n"; } else {
-	$out->print("Docs from $file\n\n"); }
+  print $out "Docs from $file\n\n";
 }
 
 sub extrdoc {

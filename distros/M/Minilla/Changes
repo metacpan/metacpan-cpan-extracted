@@ -1,5 +1,14 @@
 Revision history for Perl extension Minilla
 
+v3.1.14 2022-01-07T14:52:37Z
+    - Improve deciding default branch(Songmu #313)
+    - suppress warnings of redundant argument(Songmu #314)
+
+v3.1.13 2022-01-07T09:14:48Z
+    - Improve inputing new version(Songmu #310)
+    - Use `release.branch` as default branch for badge URL instead of `master` (Songmu #311)
+    - Improve checking remote name(Songmu #312)
+
 v3.1.12 2021-03-25T06:13:42Z
     - Introduce CheckReleaseBranch step (kfly8 #305)
     - Take author name from AUTHOR section even if it appears later (kaz-utashiro #302)

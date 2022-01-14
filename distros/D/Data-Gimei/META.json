@@ -1,0 +1,94 @@
+{
+   "abstract" : "a Perl port of Ruby's gimei.",
+   "author" : [
+      "NAKAJIMA Yusaku < example@example.com >"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.12",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Gimei",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035",
+            "perl" : "5.008_001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Perl::Tidy" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Share" : "0",
+            "Moo" : "0",
+            "YAML::XS" : "0",
+            "feature" : "0",
+            "namespace::clean" : "0",
+            "version" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Gimei" : {
+         "file" : "lib/Data/Gimei.pm",
+         "version" : "v0.0.4"
+      },
+      "Data::Gimei::Address" : {
+         "file" : "lib/Data/Gimei/Address.pm"
+      },
+      "Data::Gimei::Name" : {
+         "file" : "lib/Data/Gimei/Name.pm"
+      },
+      "Data::Gimei::Word" : {
+         "file" : "lib/Data/Gimei/Word.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/youpong/pl-gimei/issues"
+      },
+      "homepage" : "https://github.com/youpong/pl-gimei",
+      "repository" : {
+         "url" : "git://github.com/youpong/pl-gimei.git",
+         "web" : "https://github.com/youpong/pl-gimei"
+      }
+   },
+   "version" : "v0.0.4",
+   "x_contributors" : [
+      "NAKAJIMA Yusaku <yupong7@gmail.com>",
+      "youpong <43817652+youpong@users.noreply.github.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_static_install" : 1
+}

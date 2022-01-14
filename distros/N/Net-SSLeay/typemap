@@ -2,6 +2,7 @@ TYPEMAP
 SSL_METHOD *	T_PTR
 const SSL_METHOD *	T_PTR
 SSL_CTX *	T_PTR
+const SSL_CTX *	T_PTR
 SSL_SESSION *	T_PTR
 SSL *		T_PTR
 RSA *		T_PTR
@@ -81,8 +82,19 @@ cb_ssl_int_int_ret_void *  T_PTR
 cb_ssl_int_int_ret_RSA *  T_PTR
 cb_ssl_int_int_ret_DH  *  T_PTR
 perl_filehandle_t T_PERL_IO_HANDLE
+OSSL_LIB_CTX * T_PTR
+OSSL_PROVIDER * T_PTR
+const OSSL_PROVIDER * T_PTR
+
+uint64_t T_UINT64
+
+OUTPUT
+T_UINT64
+    sv_setuv($arg, (UV)$var);
 
 INPUT
+T_UINT64
+    $var = (uint64_t)SvUV($arg)
 
 T_PERL_IO_HANDLE
 	if ($arg && SvOK($arg) && SvROK($arg)) {

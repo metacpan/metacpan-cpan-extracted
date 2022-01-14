@@ -1,4 +1,4 @@
-# OpenGL-GLUT
+# OpenGL-GLUT 0.71_01
 
 This project is to implement a standalone version of OpenGL::GLUT
 to provide bindings to GLUT/FreeGLUT.  For optimum backwards compatibility,

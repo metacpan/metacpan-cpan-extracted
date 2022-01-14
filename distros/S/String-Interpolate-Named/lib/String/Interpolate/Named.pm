@@ -16,7 +16,7 @@ String::Interpolate::Named - Interpolated named arguments in string
 
 =cut
 
-our $VERSION = '1.01';
+our $VERSION = '1.03';
 
 =head1 SYNOPSIS
 
@@ -105,6 +105,8 @@ Assume C<customer> has value C<[ "Jones", "Smith" ]>, then:
     "%{customer.2} will be Jones"
     "%{customer} will be Jones Smith"
 
+When the value exceeds the number of elements in the list, an empty
+value is returned.
 When no element is selected the values are concatenated.
 
 =head2 The Control Hash
@@ -257,7 +259,11 @@ sub interpolate {
 
 	# %{ key [ .index ] [ = value ] [ | then [ | else ] ] }
 
-	$tpl =~ s; ( \x{fddf}
+	my $pre  = '';
+	my $post = '';
+	if ( $tpl =~ s; ( ^
+		     (?<pre> .*? )
+		     \x{fddf}
 		     (?<key> $keypat )
 		     (?: (?<op> \= )
 			 (?<test> [^|}\x{fddf}]*) )?
@@ -265,24 +271,39 @@ sub interpolate {
 			 (?: \| (?<else> [^|}\x{fddf}]* ) )?
 		     )?
 		     \}
+		     (?<post> .* )
+		     $
 		   )
-		 ; _interpolate($ctl, {%+} ) ;exo;
-
-	# Unescape escaped specials.
-	$tpl =~ s/\x{fdd0}/\\\\/g;
-	$tpl =~ s/\x{fdd1}/\\\{/g;
-	$tpl =~ s/\x{fdd2}/\\\}/g;
-	$tpl =~ s/\x{fdd3}/\\\|/g;
-	$tpl =~ s/\x{fdd4}/\\$activator/g;
-
-	# Restore (some) seqs.
-	$tpl =~ s/\x{fdde}/$activator."{}"/ge;
-	$tpl =~ s/\x{fddf}/$activator."{"/ge;
-
-	if ( $prev eq $tpl ) {
-	    $tpl =~ s/\\(\Q$activator\E|[%{}|])/$1/g;
-	    return $tpl;
+		      ; _interpolate($ctl, {%+} ) ;exso ) {
+	    $pre  = $+{pre};
+	    $post = $+{post};
 	}
+	else {
+	    $pre = $tpl;
+	    $tpl = '';
+	}
+	for ( $pre, $tpl, $post ) {
+	    # Unescape escaped specials.
+	    s/\x{fdd0}/\\\\/g;
+	    s/\x{fdd1}/\\\{/g;
+	    s/\x{fdd2}/\\\}/g;
+	    s/\x{fdd3}/\\\|/g;
+	    s/\x{fdd4}/\\$activator/g;
+
+	    # Restore (some) seqs.
+	    s/\x{fdde}/$activator."{}"/ge;
+	    s/\x{fddf}/$activator."{"/ge;
+	}
+	$tpl =~ s/\\(\Q$activator\E|[{}|\\])/$1/g;
+	warn ("'$prev' => '$pre' '$tpl' '$post'\n" ) if $ctl->{trace};
+
+	my $t = $pre . $tpl . $post;
+	if ( $prev eq $t ) {
+	    # De-escape in subst part only (issue #6);
+	    $tpl =~ s/\\(\Q$activator\E|[{}|])/$1/g;
+	    return $pre . $tpl . $post;
+	}
+	$tpl = $t;
 	warn("$cnt: $prev -> $tpl\n") if $ctl->{trace};
     }
     Carp::croak("Maximum number of iterations exceeded");
@@ -309,8 +330,13 @@ sub _interpolate {
 	if ( UNIVERSAL::isa( $val, 'ARRAY' ) ) {
 	    # 1, 2, ... selects 1st, 2nd value; -1 counts from end.
 	    if ( $inx ) {
-		if ( $inx > 0 && $inx <= @$val ) {
-		    $val = $val->[$inx-1];
+		if ( $inx > 0 ) {
+		    if ( $inx <= @$val ) {
+			$val = $val->[$inx-1];
+		    }
+		    else {
+			$val = "";
+		    }
 		}
 		else {
 		    $val = $val->[$inx];
@@ -337,13 +363,10 @@ sub _interpolate {
 	}
     }
     elsif ( $val ne '' ) {
-	$subst = ($i->{then}//'') ne ''
-	  ? $i->{then}
-	  : ($i->{else}//'') ne ''
-	    ? '' : $val;
+	$subst = $i->{then} // $val;
     }
     else {
-	$subst = ($i->{else}//'') ne '' ? $i->{else} : '';
+	$subst = $i->{else} // '';
     }
 
     $subst =~ s/\x{fdde}/$val/g;

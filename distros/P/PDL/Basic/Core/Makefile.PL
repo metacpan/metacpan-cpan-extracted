@@ -15,13 +15,6 @@ my $pthread_library = '-lpthread';
 if ( defined $PDL::Config{POSIX_THREADS_LIBS} ) {
     $pthread_library = $PDL::Config{POSIX_THREADS_LIBS};
 }
-if ($^O eq 'freebsd' and $Config{libs} !~ /-lc_r/) {
-    print "On FreeBSD try building perl with libc_r instead of libc\n";
-    $pthread_library = '';
-} elsif ($^O =~ /bsd$/i and $Config{usemymalloc} ne 'y') {
-    print "Got usemymalloc=$Config{usemymalloc} so not building with pthreads\n";
-    $pthread_library = '';
-}
 my $pthread_conf = $PDL::Config{WITH_POSIX_THREADS};
 if (defined $pthread_conf and !$pthread_conf) {
     print "\tpthread disabled in perldl.conf\n";
@@ -54,7 +47,7 @@ undef &MY::postamble; # suppress warning
       qw(pdlsimple.h pdl.h pdlperl.h);
 };
 
-my @cfiles = qw(pdlcore pdlapi pdlthread pdlconv pdlmagic pdlaffine);
+my @cfiles = qw(pdlcore pdlapi pdlthread pdlconv pdlmagic pdlaffine pdlutil);
 my $cobj = join ' ', map qq{$_\$(OBJ_EXT)}, @cfiles;
 WriteMakefile(
  'NAME'	        => 'PDL::Core',
@@ -86,6 +79,7 @@ WriteMakefile(
     'Core$(OBJ_EXT)' => '$(INST_ARCHLIB)$(DFSEP).exists pm_to_blib pdl.h pdlperl.h pdlcore.h',
         # Core.xs needs blib/arch for -Mblib to work, as well as pm_to_blib
     $cobj => 'pdl.h pdlcore.h pdlthread.h pdlmagic.h',
+    'pdlcore$(OBJ_EXT)' => 'pdlperl.h',
   },
   NO_MYMETA => 1,
 );

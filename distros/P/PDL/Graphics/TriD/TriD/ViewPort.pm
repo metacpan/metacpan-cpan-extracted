@@ -5,6 +5,9 @@
 # 
 package PDL::Graphics::TriD::ViewPort;
 use strict;
+use warnings;
+
+$PDL::Graphics::TriD::verbose //= 0;
 
 sub new {
      my($type,$x0,$y0,$w,$h) = @_;
@@ -20,10 +23,8 @@ sub new {
      return $this;
 }
 
-
 sub graph {
   my($this,$graph) = @_;
-
   if(defined($graph)){  
 	 $this->add_object($graph);
 	 push(@{$this->{Graphs}},$graph);
@@ -31,7 +32,6 @@ sub graph {
 	 $graph = $this->{Graphs}[0];
   }
   return($graph);
-  
 }  
 
 sub delete_graph {
@@ -44,22 +44,16 @@ sub delete_graph {
       redo;
     }
   }
-  
-
 }
-
 
 sub resize {
   my($this,$x0,$y0,$w,$h) = @_;
-
   $this->{X0} = $x0;
   $this->{Y0} = $y0;
   $this->{W} = $w;
   $this->{H} = $h;
   return $this;
 }
-
-
 
 sub add_resizecommand {
 	my($this,$com) = @_;
@@ -92,15 +86,12 @@ sub transformer {
   return $this->{Transformer};
 }
 
-
 #
 # restore the image view to a known value
 #
 sub setview{
   my($vp,$view) = @_;
-
   my $transformer = $vp->transformer();
-
   if(ref($view) eq "ARRAY"){
 	 $transformer->set({WRotation=>$view});
   }elsif($view eq "Top"){
@@ -110,9 +101,6 @@ sub setview{
   }elsif($view eq "South"){
 	 $transformer->set({WRotation=>[0.6,-0.6,0,0]});
   }
-
 }
-
-
 
 1;

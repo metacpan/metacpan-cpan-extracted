@@ -1,4 +1,5 @@
 use strict;
+use warnings;
 use File::Basename;
 use PDL::LiteF;
 use PDL::Core ':Internal'; # For howbig()
@@ -22,7 +23,6 @@ my %hdr = ('Foo'=>'foo', 'Bar'=>42, 'NUM'=>'0123',NUMSTR=>['0123']);
 $t->sethdr(\%hdr);
 
 wfits($t, $file);
-print "#file is $file\n";
 my $t2 = rfits $file;
 
 is( sum($t->slice('0:4,:')), -sum($t2->slice('5:-1,:')),
@@ -199,11 +199,9 @@ unless($PDL::Astro_FITS_Header) {
 	    my $flag = 1;
             if ( ${$p->get_dataref} ne ${$q->get_dataref} ) {
 	        $flag = 0;
-	        { local $, = " ";
-		  print "\tnelem=",$p->nelem,"datatype=",$p->get_datatype,"\n";
-                  print "\tp:", unpack("c" x ($p->nelem*howbig($p->get_datatype)), ${$p->get_dataref}),"\n";
-                  print "\tq:", unpack("c" x ($q->nelem*howbig($q->get_datatype)), ${$q->get_dataref}),"\n";
-		}
+	        diag "\tnelem=",$p->nelem,"datatype=",$p->get_datatype;
+	        diag "\tp:", unpack("c" x ($p->nelem*howbig($p->get_datatype)), ${$p->get_dataref});
+	        diag "\tq:", unpack("c" x ($q->nelem*howbig($q->get_datatype)), ${$q->get_dataref});
             }
 	    is($q->hdr->{BITPIX},$target_bitpix[$bp_i],"BITPIX implicitly set to " . $target_bitpix[$bp_i]);
 	    ok($flag,"hash reference - type check: " . &$cref ); #64-73
@@ -229,13 +227,11 @@ unless($PDL::Astro_FITS_Header) {
            $flag = 1;
         } else {
            $flag = 0;
-	   print "s=@s\n";
-           print "\tBITPIX=$i, nelem=", $p->nelem, "\n";
-           print "\tbug: $s[0] == 1.5 and $s[1] == 0.5\n";
-	   { local $, = " ";
-	     print "\tp:", unpack("c8" x         $p->nelem,  ${$p->get_dataref}),"\n";
-	     print "\tq:", unpack("c" x abs($i/8*$q->nelem), ${$q->get_dataref}),"\n";
-           }
+           diag "s=@s\n";
+           diag "\tBITPIX=$i, nelem=", $p->nelem;
+           diag "\tbug: $s[0] == 1.5 and $s[1] == 0.5";
+           diag "\tp:", unpack("c8" x         $p->nelem,  ${$p->get_dataref});
+           diag "\tq:", unpack("c" x abs($i/8*$q->nelem), ${$q->get_dataref});
         }
 	is($q->hdr->{BITPIX},$i,"BITPIX explicitly set to $i"); #check that explicitly setting BITPIX in wfits works.
 	ok($flag,"ndarray - bitpix=$i" ); #74-83
@@ -293,9 +289,9 @@ SKIP:{
 
 	$x = rvals(longlong,7,7);
 	eval { wfits($x, $file); };
-	ok(!$@, sprintf("writing a longlong image succeeded %s",($@?"($@)":"")));
+	is $@, '', "writing a longlong image succeeded";
 	eval { $y = rfits($file); };
-	ok(!$@, sprintf("Reading the longlong image succeeded %s",($@?"($@)":"")));
+	is $@, '', "Reading the longlong image succeeded";
 	ok(ref($y->hdr) eq "HASH", "Reading the longlong image produced a PDL with a hash header");
 	ok($y->hdr->{BITPIX} == 64, "BITPIX value was correct");
 	ok(all($y==$x),"The new image matches the old one (longlong)");
@@ -325,17 +321,31 @@ my $x = sequence(10)->setbadat(0);
 $x->wfits($fname);
 my $y = rfits($fname);
 #diag "Read from fits:  $y  type = (", $y->get_datatype, ")\n";
-
 ok( $y->slice('0:0')->isbad, "rfits/wfits propagated bad flag" );
 ok( sum(abs($x-$y)) < 1.0e-5, "  and values" );
-
 # now force to integer
 $x->wfits($fname,16);
 $y = rfits($fname);
-print "BITPIX 16: datatype == ", $y->get_datatype, " badvalue == ", $y->badvalue(), "\n";
 my $got = $y->slice('0:0');
 ok( $got->isbad, "wfits coerced bad flag with integer datatype" ) or diag "got: $got (from $y)";
 ok( sum(abs(convert($x,short)-$y)) < 1.0e-5, "  and the values" );
+unlink $fname if -e $fname;
+}
+
+{
+my $m51 = rfits('t/m51.fits.fz');
+is_deeply [$m51->dims], [384,384], 'right dims from compressed FITS file';
+(undef, my $fname) = File::Temp::tempfile( 'delmeXXXXX', SUFFIX => '.fits', OPEN => 0 );
+my $m51_2;
+if ($PDL::Astro_FITS_Header) {
+my $m51_tbl = rfits('t/m51.fits.fz',{expand=>0});
+wfits($m51_tbl, $fname);
+$m51_2 = rfits($fname);
+ok all(approx $m51, $m51_2), 'read back written-out bintable FITS file' or diag "got:", $m51_2->info;
+$m51->wfits($fname, {compress=>1});
+$m51_2 = rfits($fname);
+ok all(approx $m51, $m51_2), 'read back written-out compressed FITS file' or diag "got:", $m51_2->info;
+}
 unlink $fname if -e $fname;
 }
 

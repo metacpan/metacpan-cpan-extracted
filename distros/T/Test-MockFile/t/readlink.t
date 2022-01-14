@@ -69,7 +69,7 @@ $bad_symlink   = "$temp_dir_name/c";
 my @mocks;
 push @mocks, Test::MockFile->file($file);
 push @mocks, Test::MockFile->dir($temp_dir_name);
-push @mocks, Test::MockFile->symlink( "a", $symlink );
+push @mocks, Test::MockFile->symlink( "a",        $symlink );
 push @mocks, Test::MockFile->symlink( "notafile", $bad_symlink );
 
 $! = 0;

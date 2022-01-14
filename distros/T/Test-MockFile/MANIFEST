@@ -7,9 +7,15 @@ Makefile.PL
 MANIFEST			This list of files
 README
 t/00-load.t
+t/chmod.t
+t/chown-chmod-nostrict.t
+t/chown.t
+t/detect-common-mistakes.t
+t/dir_interface.t
 t/file_access_hooks.t
 t/file_from_disk.t
 t/filename.t
+t/globbing.t
 t/goto_is_available.t
 t/manifest.t
 t/mkdir.t
@@ -22,6 +28,7 @@ t/pod.t
 t/readline.t
 t/readlink.t
 t/rmdir.t
+t/runtime-bareword-filehandles.t
 t/sysopen.t
 t/Test-MockFile_file.t
 t/touch.t

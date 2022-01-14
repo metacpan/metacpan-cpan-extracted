@@ -1,8 +1,14 @@
 Revision history for Search-MultiMatch
 
+0.03    2022-01-09
+
+        - Internal improvements.
+        - DBM::Deep can now be used for the table.
+
 0.02    2020-06-14
 
         - Fixed a bug for a keyword named "values".
 
 0.01    2016-07-25
-        First version, released on an unsuspecting world.
+
+        - First version, released on an unsuspecting world.

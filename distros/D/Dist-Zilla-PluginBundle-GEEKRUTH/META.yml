@@ -1,0 +1,48 @@
+---
+abstract: 'Be like GeekRuthie when you build your dists'
+author:
+  - 'D Ruth Holloway <ruth@hiruthie.me>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-PluginBundle-GEEKRUTH
+provides:
+  Dist::Zilla::PluginBundle::GEEKRUTH:
+    file: lib/Dist/Zilla/PluginBundle/GEEKRUTH.pm
+    version: '1.0001'
+requires:
+  Dist::Zilla: '0'
+  Dist::Zilla::Role::PluginBundle::Config::Slicer: '0'
+  Dist::Zilla::Role::PluginBundle::Easy: '0'
+  Modern::Perl: '0'
+  Moose: '0'
+  Type::Tiny: '0'
+  Types::Standard: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://gitlab.com/GeekRuthie/Dist-Zilla-PluginBundle-GEEKRUTH/-/issues
+  homepage: https://p3rl.org/Dist::Zilla::PluginBundle::GEEKRUTH
+  repository: https://gitlab.com/GeekRuthie/Dist-Zilla-PluginBundle-GEEKRUTH.git
+version: '1.0001'
+x_author_pledge:
+  version: 1
+x_authority: cpan:GEEKRUTH
+x_contributor_covenant:
+  version: 0.02
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -29,16 +29,17 @@ Window object to be supplied as an argument.
 
 The ButtonControl class is a base class which all TriD event
 controllers should inherit from.  By itself it does not do much.  It
-defines ButtonPressed and ButtonRelease functions which are expected by
+defines ButtonPress and ButtonRelease functions which are expected by
 the Event loop.
-
-
 
 =cut
 
 package PDL::Graphics::TriD::ButtonControl;
 use strict;
+use warnings;
 use fields qw/Win W H SC/;
+
+$PDL::Graphics::TriD::verbose //= 0;
 
 sub new {
   my ($class,$win) = @_;
@@ -74,7 +75,7 @@ sub ButtonRelease{
   print "ButtonRelease @_\n"  if $PDL::Graphics::TriD::verbose;
 }
 
-=head2 ButtonPressed
+=head2 ButtonPress
 
 =for ref
 
@@ -82,10 +83,10 @@ sub ButtonRelease{
 
 =cut
 
+$PDL::Graphics::TriD::cur = $PDL::Graphics::TriD::cur; # warnings
+
 sub ButtonPress{
   my ($this,$x,$y) = @_;
-
-  
 #
 # GL (0,0) point is Lower left X and Tk is upper left.
 #

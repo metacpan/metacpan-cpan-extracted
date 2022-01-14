@@ -14,9 +14,9 @@ static int done_pdl_main_pthreadID_init = 0;
  *  altogether later
  */
 static char* pdl_pthread_barf_msgs     = NULL;
-static int   pdl_pthread_barf_msgs_len = 0;
+static size_t pdl_pthread_barf_msgs_len = 0;
 static char* pdl_pthread_warn_msgs     = NULL;
-static int   pdl_pthread_warn_msgs_len = 0;
+static size_t pdl_pthread_warn_msgs_len = 0;
 
 #endif
 
@@ -34,8 +34,9 @@ void pdl__magic_add(pdl *it,pdl_magic *mag)
 	mag->next = NULL;
 }
 
-void pdl__magic_rm(pdl *it,pdl_magic *mag)
+pdl_error pdl__magic_rm(pdl *it,pdl_magic *mag)
 {
+        pdl_error PDL_err = {0, NULL, 0};
         pdl_magic **foo = (pdl_magic **)(&(it->magic));
 	int found = 0;
 	while(*foo) {
@@ -48,9 +49,9 @@ void pdl__magic_rm(pdl *it,pdl_magic *mag)
 		}
 	}
 	if( !found ){
-		die("PDL:Magic not found: Internal error\n");
+		return pdl_make_error_simple(PDL_EUSERERROR, "PDL:Magic not found: Internal error\n");
 	}
-	return;
+	return PDL_err;
 }
 
 void pdl__magic_free(pdl *it)
@@ -184,6 +185,7 @@ pdl_magic *pdl_add_svmagic(pdl *it,SV *func)
 {
 	AV *av;
 	pdl_magic_perlfunc *ptr = malloc(sizeof(pdl_magic_perlfunc));
+	if (!ptr) return NULL;
 	ptr->what = PDL_MAGIC_MARKCHANGED | PDL_MAGIC_DELAYED;
 	ptr->vtable = &svmagic_vtable;
 	ptr->sv = newSVsv(func);
@@ -225,6 +227,7 @@ struct pdl_magic_vtable familymutmagic_vtable = {
 pdl_magic *pdl_add_fammutmagic(pdl *it,pdl_trans *ft)
 {
 	pdl_magic_fammut *ptr = malloc(sizeof(pdl_magic_fammut));
+	if (!ptr) return NULL;
 	ptr->what = PDL_MAGIC_MUTATEDPARENT;
 	ptr->vtable = &familymutmagic_vtable;
 	ptr->ftr = ft;
@@ -244,9 +247,10 @@ pdl_magic *pdl_add_fammutmagic(pdl *it,pdl_trans *ft)
 
 typedef struct ptarg {
 	pdl_magic_pthread *mag;
-	void (*func)(pdl_trans *);
+	pdl_error (*func)(pdl_trans *);
 	pdl_trans *t;
 	int no;
+	pdl_error error_return;
 } ptarg;
 
 int pdl_pthreads_enabled(void) {return 1;}
@@ -254,10 +258,10 @@ int pdl_pthreads_enabled(void) {return 1;}
 
 static void *pthread_perform(void *vp) {
 	struct ptarg *p = (ptarg *)vp;
-	PDLDEBUG_f(printf("STARTING THREAD %d (%lu)\n",p->no, (long unsigned)pthread_self());)
+	PDLDEBUG_f(printf("STARTING THREAD %d (%lu)\n",p->no, (long unsigned)pthread_self()));
 	pthread_setspecific(p->mag->key,(void *)&(p->no));
-	(p->func)(p->t);
-	PDLDEBUG_f(printf("ENDING THREAD %d (%lu)\n",p->no, (long unsigned)pthread_self());)
+	p->error_return = (p->func)(p->t);
+	PDLDEBUG_f(printf("ENDING THREAD %d (%lu)\n",p->no, (long unsigned)pthread_self()));
 	return NULL;
 }
 
@@ -270,20 +274,17 @@ int pdl_magic_thread_nthreads(pdl *it,PDL_Indx *nthdim) {
 
 int pdl_magic_get_thread(pdl *it) {
 	pdl_magic_pthread *ptr = (pdl_magic_pthread *)pdl__find_magic(it, PDL_MAGIC_THREADING);
-	if(!ptr) die("Invalid pdl_magic_get_thread!");
+	if(!ptr) return -1;
 	int *p = (int*)pthread_getspecific(ptr->key);
-	if(!p) die("Invalid pdl_magic_get_thread specific!!!!");
+	if(!p) return -1;
 	return *p;
 }
 
-void pdl_magic_thread_cast(pdl *it,void (*func)(pdl_trans *),pdl_trans *t, pdl_thread *thread) {
+pdl_error pdl_magic_thread_cast(pdl *it,pdl_error (*func)(pdl_trans *),pdl_trans *t, pdl_thread *thread) {
+	pdl_error PDL_err = {0, NULL, 0};
 	PDL_Indx i;
 	int clearMagic = 0; /* Flag = 1 if we are temporarily creating pthreading magic in the
 						   supplied pdl.  */
-	SV * barf_msg;	  /* Deferred barf message. Using a perl SV here so it's memory can be freed by perl
-						 after it is sent to croak */
-	SV * warn_msg;	  /* Similar deferred warn message. */
-
 	pdl_magic_pthread *ptr = (pdl_magic_pthread *)pdl__find_magic(it, PDL_MAGIC_THREADING);
 	if(!ptr) {
 		/* Magic doesn't exist, create it
@@ -291,22 +292,19 @@ void pdl_magic_thread_cast(pdl *it,void (*func)(pdl_trans *),pdl_trans *t, pdl_t
 			pdl lazy evaluation.
 		*/
 
-		pdl_add_threading_magic(it, thread->mag_nth, thread->mag_nthr);
+		PDL_RETERROR(PDL_err, pdl_add_threading_magic(it, thread->mag_nth, thread->mag_nthr));
 		clearMagic = 1; /* Set flag to delete magic later */
 
 		/* Try to get magic again */
 		ptr = (pdl_magic_pthread *)pdl__find_magic(it, PDL_MAGIC_THREADING);
 
-		if(!ptr) {die("Invalid pdl_magic_thread_cast!");}
+		if(!ptr) {return pdl_make_error_simple(PDL_EFATAL, "Invalid pdl_magic_thread_cast!");}
 
 	}
 
 	pthread_t tp[thread->mag_nthr];
 	ptarg tparg[thread->mag_nthr];
 	pthread_key_create(&(ptr->key),NULL);
-
-	PDLDEBUG_f(printf("CREATING THREADS, ME: TBD, key: %ld\n", (unsigned long)(ptr->key));)
-
 	/* Get the pthread ID of this main thread we are in.
 	 *	Any barf, warn, etc calls in the spawned pthreads can use this
 	 *	to tell if its a spawned pthread
@@ -314,85 +312,90 @@ void pdl_magic_thread_cast(pdl *it,void (*func)(pdl_trans *),pdl_trans *t, pdl_t
 	pdl_main_pthreadID = pthread_self();
 	done_pdl_main_pthreadID_init = 1;
 
+	PDLDEBUG_f(printf("CREATING THREADS, ME: TBD, key: %ld\n", (unsigned long)(ptr->key)));
 	for(i=0; i<thread->mag_nthr; i++) {
 	    tparg[i].mag = ptr;
 	    tparg[i].func = func;
 	    tparg[i].t = t;
 	    tparg[i].no = i;
+	    tparg[i].error_return = PDL_err;
 	    if (pthread_create(tp+i, NULL, pthread_perform, tparg+i)) {
-		die("Unable to create pthreads!");
+		return pdl_make_error_simple(PDL_EFATAL, "Unable to create pthreads!");
 	    }
 	}
 
-	PDLDEBUG_f(printf("JOINING THREADS, ME: TBD, key: %ld\n", (unsigned long)(ptr->key));)
+	PDLDEBUG_f(printf("JOINING THREADS, ME: TBD, key: %ld\n", (unsigned long)(ptr->key)));
 	for(i=0; i<thread->mag_nthr; i++) {
 		pthread_join(tp[i], NULL);
 	}
-	PDLDEBUG_f(printf("FINISHED THREADS, ME: TBD, key: %ld\n", (unsigned long)(ptr->key));)
+	PDLDEBUG_f(printf("FINISHED THREADS, ME: TBD, key: %ld\n", (unsigned long)(ptr->key)));
 
 	pthread_key_delete((ptr->key));
+	done_pdl_main_pthreadID_init = 0;
 
 	/* Remove pthread magic if we created in this function */
 	if( clearMagic ){
-		pdl_add_threading_magic(it, -1, -1);
+		PDL_RETERROR(PDL_err, pdl_add_threading_magic(it, -1, -1));
 	}
 
-	// handle any errors that may have occurred in the worker threads I reset the
-	// length before actually barfing/warning because barf() may not come back.
-	// In that case, I'll have len==0, but an unfreed pointer. This memory will
-	// be reclaimed the next time we barf/warn something (since I'm using
-	// realloc). If we never barf/warn again, we'll hold onto this memory until
-	// the interpreter exits. This is a one-time penalty, though so it's fine
-#define handle_deferred_errors(type)							\
+#define handle_deferred_errors(type, action)							\
 	do{															\
 		if(pdl_pthread_##type##_msgs_len != 0)					\
 		{														\
 			pdl_pthread_##type##_msgs_len = 0;					\
-			pdl_pdl_##type ("%s", pdl_pthread_##type##_msgs);	\
+			action;	\
 			free(pdl_pthread_##type##_msgs);					\
 			pdl_pthread_##type##_msgs	  = NULL;				\
 		}														\
 	} while(0)
 
-	handle_deferred_errors(warn);
-	handle_deferred_errors(barf);
+	handle_deferred_errors(warn, pdl_pdl_warn("%s", pdl_pthread_warn_msgs));
+	handle_deferred_errors(barf, PDL_err = pdl_error_accumulate(PDL_err, pdl_make_error(PDL_EFATAL, "%s", pdl_pthread_barf_msgs)));
+	for(i=0; i<thread->mag_nthr; i++) {
+	    PDL_err = pdl_error_accumulate(PDL_err, tparg[i].error_return);
+	}
+	return PDL_err;
 }
 
 /* Function to remove threading magic (added by pdl_add_threading_magic) */
-void pdl_rm_threading_magic(pdl *it)
+pdl_error pdl_rm_threading_magic(pdl *it)
 {
+	pdl_error PDL_err = {0, NULL, 0};
 	pdl_magic_pthread *ptr = (pdl_magic_pthread *)pdl__find_magic(it, PDL_MAGIC_THREADING);
-
 	/* Don't do anything if threading magic not found */
-	if( !ptr) return;
-
+	if( !ptr) return PDL_err;
 	/* Remove magic */
-	pdl__magic_rm(it, (pdl_magic *) ptr);
-
+	PDL_RETERROR(PDL_err, pdl__magic_rm(it, (pdl_magic *) ptr));
 	/* Free magic */
 	free( ptr );
+	return PDL_err;
 }
 
 /* Function to add threading magic (i.e. identify which PDL dimension should
    be pthreaded and how many pthreads to create
    Note: If nthdim and nthreads = -1 then any pthreading magic is removed */
-void pdl_add_threading_magic(pdl *it,PDL_Indx nthdim,PDL_Indx nthreads)
+pdl_error pdl_add_threading_magic(pdl *it,PDL_Indx nthdim,PDL_Indx nthreads)
 {
-      pdl_magic_pthread *ptr;
-
+	pdl_error PDL_err = {0, NULL, 0};
+	pdl_magic_pthread *ptr;
 	/* Remove threading magic if called with parms -1, -1 */
 	if( (nthdim == -1) && ( nthreads == -1 ) ){
-		 pdl_rm_threading_magic(it);
-		 return;
+		 PDL_RETERROR(PDL_err, pdl_rm_threading_magic(it));
+		 return PDL_err;
 	}
-
 	ptr = malloc(sizeof(pdl_magic_pthread));
+	if (!ptr) return pdl_make_error_simple(PDL_EFATAL, "Out of memory");
 	ptr->what = PDL_MAGIC_THREADING;
 	ptr->vtable = NULL;
 	ptr->next = NULL;
 	ptr->nthdim = nthdim;
 	ptr->nthreads = nthreads;
 	pdl__magic_add(it,(pdl_magic *)ptr);
+	return PDL_err;
+}
+
+char pdl_pthread_main_thread() {
+  return !done_pdl_main_pthreadID_init || pthread_equal( pdl_main_pthreadID, pthread_self() );
 }
 
 // Barf/warn function for deferred barf message handling during pthreading We
@@ -404,51 +407,25 @@ void pdl_add_threading_magic(pdl *it,PDL_Indx nthdim,PDL_Indx nthreads)
 int pdl_pthread_barf_or_warn(const char* pat, int iswarn, va_list *args)
 {
 	char** msgs;
-	int*   len;
+	size_t* len;
 
 	/* Don't do anything if we are in the main pthread */
-	if( !done_pdl_main_pthreadID_init || pthread_equal( pdl_main_pthreadID, pthread_self() ) )
-		return 0;
+	if (pdl_pthread_main_thread()) return 0;
 
 	if(iswarn)
 	{
 		msgs = &pdl_pthread_warn_msgs;
-		len	 = &pdl_pthread_warn_msgs_len;
+		len = &pdl_pthread_warn_msgs_len;
 	}
 	else
 	{
 		msgs = &pdl_pthread_barf_msgs;
-		len	 = &pdl_pthread_barf_msgs_len;
+		len = &pdl_pthread_barf_msgs_len;
 	}
 
+	size_t extralen = vsnprintf(NULL, 0, pat, *args);
 	// add the new complaint to the list
-	{
-		static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-		pthread_mutex_lock( &mutex );
-		{
-			/* In the chunk I'm adding I need to store the actual data and trailing newline. */
-			int extralen = vsnprintf(NULL, 0, pat, *args) + 1;
-
-			/* 1 more for the trailing '\0'. (For windows, we first #undef realloc
-			   so that the system realloc function is used instead of the PerlMem_realloc
-			   macro. This currently works fine, though could conceivably require some
-			   tweaking in the future if it's found to cause any problem.) */
-#ifdef WIN32
-#undef realloc
-#endif
-            /* FIXME: Common realloc mistake: 'msgs' nulled but not freed upon failure */
-			*msgs = realloc(*msgs, *len + extralen + 1);
-			vsnprintf( *msgs + *len, extralen + 1, pat, *args);
-
-			/* update the length-so-far. This does NOT include the trailing '\0' */
-			*len += extralen;
-
-			/* add the newline to the end */
-			(*msgs)[*len-1] = '\n';
-			(*msgs)[*len  ] = '\0';
-		}
-		pthread_mutex_unlock( &mutex );
-	}
+	pdl_pthread_realloc_vsnprintf(msgs, len, extralen, pat, args, 1);
 
 	if(iswarn)
 	{
@@ -459,6 +436,37 @@ int pdl_pthread_barf_or_warn(const char* pat, int iswarn, va_list *args)
 	/* Exit the current pthread. Since this was a barf call, and we should be halting execution */
 	pthread_exit(NULL);
 	return 0;
+}
+
+void pdl_pthread_realloc_vsnprintf(char **p, size_t *len, size_t extralen, const char *pat, va_list *args, char add_newline) {
+  static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+  pthread_mutex_lock( &mutex );
+  /* (For windows, we first #undef realloc
+     so that the system realloc function is used instead of the PerlMem_realloc
+     macro. This currently works fine, though could conceivably require some
+     tweaking in the future if it's found to cause any problem.) */
+#ifdef WIN32
+#undef realloc
+#endif
+/* FIXME: Common realloc mistake: 'msgs' nulled but not freed upon failure */
+  if (add_newline) extralen += 1;
+  *p = realloc(*p, *len + extralen + 1); /* +1 for '\0' at end */
+  vsnprintf(*p + *len, extralen + 1, pat, *args);
+  /* update the length-so-far. This does NOT include the trailing '\0' */
+  *len += extralen;
+  if (add_newline)(*p)[*len] = '\n';
+  (*p)[*len+1] = '\0';
+  pthread_mutex_unlock( &mutex );
+}
+
+void pdl_pthread_free(void *p) {
+#ifdef WIN32 /* same reasons as above */
+#undef free
+#endif
+  static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+  pthread_mutex_lock( &mutex );
+  free(p);
+  pthread_mutex_unlock( &mutex );
 }
 
 /* copied from git@github.com:git/git.git 2.34-ish thread-util.c */
@@ -515,9 +523,10 @@ int pdl_online_cpus(void)
 
 #else
 /* Dummy versions */
-void pdl_add_threading_magic(pdl *it,PDL_Indx nthdim,PDL_Indx nthreads) {}
+pdl_error pdl_add_threading_magic(pdl *it,PDL_Indx nthdim,PDL_Indx nthreads) {pdl_error PDL_err = {0,NULL,0}; return PDL_err;}
+char pdl_pthread_main_thread() { return 1; }
 int pdl_magic_get_thread(pdl *it) {return 0;}
-void pdl_magic_thread_cast(pdl *it,void (*func)(pdl_trans *),pdl_trans *t, pdl_thread *thread) {}
+pdl_error pdl_magic_thread_cast(pdl *it,pdl_error (*func)(pdl_trans *),pdl_trans *t, pdl_thread *thread) {pdl_error PDL_err = {0,NULL,0}; return PDL_err;}
 int pdl_magic_thread_nthreads(pdl *it,PDL_Indx *nthdim) {return 0;}
 int pdl_pthreads_enabled() {return 0;}
 int pdl_pthread_barf_or_warn(const char* pat, int iswarn, va_list *args){ return 0;}
@@ -542,13 +551,16 @@ struct pdl_magic_vtable deletedatamagic_vtable = {
 	NULL
 };
 
-void pdl_add_deletedata_magic(pdl *it, void (*func)(pdl *, Size_t param), Size_t param)
+pdl_error pdl_add_deletedata_magic(pdl *it, void (*func)(pdl *, Size_t param), Size_t param)
 {
+	pdl_error PDL_err = {0, NULL, 0};
 	pdl_magic_deletedata *ptr = malloc(sizeof(pdl_magic_deletedata));
+	if (!ptr) return pdl_make_error_simple(PDL_EFATAL, "Out of memory");
 	ptr->what = PDL_MAGIC_DELETEDATA;
 	ptr->vtable = &deletedatamagic_vtable;
 	ptr->pdl = it;
 	ptr->func = func;
 	ptr->param = param;
 	pdl__magic_add(it, (pdl_magic *)ptr);
+	return PDL_err;
 }

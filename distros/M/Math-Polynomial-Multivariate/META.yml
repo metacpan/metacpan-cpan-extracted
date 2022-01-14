@@ -1,15 +1,16 @@
 ---
 abstract: 'Perl class for multivariate polynomials'
 author:
-  - 'Martin Becker <becker-cpan-mp@cozap.com>'
+  - 'Martin Becker <becker-cpan-mp (at) cozap.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.28, CPAN::Meta::Converter version 2.150010'
-license: perl
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -21,10 +22,16 @@ no_index:
 provides:
   Math::Polynomial::Multivariate:
     file: lib/Math/Polynomial/Multivariate.pm
-    version: '0.006'
+    version: '0.007'
+recommends:
+  Math::BigRat: '0.2619'
 requires:
   Carp: '0'
   overload: '0'
   perl: '5.008'
-version: '0.006'
+resources:
+  bugtracker: https://github.com/mhasch/perl-Math-Polynomial-Multivariate/issues
+  license: https://www.perlfoundation.org/artistic-license-20.html
+  repository: git://github.com/mhasch/perl-Math-Polynomial-Multivariate.git
+version: '0.007'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

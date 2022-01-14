@@ -3,10 +3,17 @@ package Scalar::Type;
 use strict;
 use warnings;
 
+our $BOOL_SUPPORTED;
+
+BEGIN { $BOOL_SUPPORTED = ($] >= 5.035007) }
+sub bool_supported { $BOOL_SUPPORTED; }
+
+use if bool_supported(), qw(builtin isbool);
+
 use Carp qw(croak);
 use Config;
 
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.1';
 
 require XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -63,7 +70,7 @@ For Reasons, C<:is_*> is equivalent.
 =cut
 
 our @EXPORT_OK = qw(
-    type sizeof is_integer is_number
+    type sizeof is_integer is_number is_bool bool_supported
 );
 our %EXPORT_TAGS = (
     all => \@EXPORT_OK,
@@ -81,22 +88,36 @@ them without.
 
 =head2 type
 
-Returns the type of its argument. If the argument is a reference then it
-returns either C<blessed($argument)> (if it's an object),
-C<'REF_TO_'.ref($argument)>, or C<'UNDEF'> for undefined values. Otherwise it
-looks for the IOK or NOK flags on the underlying SV (see <L/"GORY DETAILS"> for
-the exact mechanics) and returns C<INTEGER> or C<NUMBER> as appropriate.
-Finally, if neither of those are set it returns C<SCALAR>.
+Returns the type of its argument.
+
+If the argument is a reference then it returns either
+C<blessed($argument)> (if it's an object),
+or C<'REF_TO_'.ref($argument)>.
+
+If the argument is C<undef> then it returns C<'UNDEF'>.
+
+If you are using perl 5.35.7 or later and the argument is the result of a
+comparison then it returns C<'BOOL'>.
+
+Otherwise it looks for the IOK or NOK flags on the underlying SV (see
+L</"GORY DETAILS"> for the exact mechanics) and returns C<INTEGER> or C<NUMBER>
+as appropriate. Finally, if neither of those are set it returns C<SCALAR>.
+
+=head2 bool_supported
+
+Returns true if the C<'BOOL'> type is supported on this perl (ie if your
+perl version is 5.35.7 or later) and false otherwise.
 
 =cut
 
 sub type {
     croak(__PACKAGE__."::type requires an argument") if($#_ == -1);
     my $arg = shift;
-    return blessed($arg)  ? blessed($arg)       :
-           ref($arg)      ? 'REF_TO_'.ref($arg) :
-           !defined($arg) ? 'UNDEF'             :
-                            _scalar_type($arg);
+    return blessed($arg)                    ? blessed($arg)       :
+           ref($arg)                        ? 'REF_TO_'.ref($arg) :
+           !defined($arg)                   ? 'UNDEF'             :
+           (bool_supported && isbool($arg)) ? 'BOOL'              :
+                                              _scalar_type($arg);
 }
 
 =head2 sizeof
@@ -144,6 +165,20 @@ Returns true if its argument is a number. "1" is not a number, it is a string.
 sub is_number {
     croak(__PACKAGE__."::is_number requires an argument") if($#_ == -1);
     is_integer(@_) || type(@_) eq 'NUMBER' ? 1 : 0;
+}
+
+=head2 is_bool
+
+It is a fatal error to call this on perl versions earlier than 5.35.7.
+
+Returns true if its argument is a Boolean - ie, the result of a comparison.
+
+=cut
+
+sub is_bool {
+    croak(__PACKAGE__."::is_bool not supported on your perl") if(!bool_supported);
+    croak(__PACKAGE__."::is_bool requires an argument") if($#_ == -1);
+    type(@_) eq 'BOOL';
 }
 
 =head1 GORY DETAILS
@@ -259,6 +294,14 @@ slot to be filled, and the C<IOK> flag set. It should, of course, be clear
 to any fan of classic literature that "007" and 7 are very different things.
 "007" is not an integer.
 
+=head3 Booleans
+
+In perl 5.35.7 and later, Boolean values - ie the results of comparisons -
+have some extra magic. As well as their value, which is either C<1> (true,
+an integer) or C<''> (false, an empty string), they have a flag to indicate
+their Booleanness. This is exposed via the C<builtin::isbool> perl function
+so we don't need to do XS voodoo to interrogate it.
+
 =head2 WHAT Scalar::Type DOES (at least in version 0.1.0)
 
 NB that this section documents an internal function that is not intended
@@ -299,6 +342,8 @@ the number.
 =head1 SEE ALSO
 
 L<Scalar::Util> in particular its C<blessed> function.
+
+L<builtin> if you have perl 5.35.7 or later.
 
 =head1 BUGS
 

@@ -1,9 +1,9 @@
 Revision history for Perl module Module::Extract::Version
 
-1.114 2021-01-20T09:55:13Z
-	* freshen distro, dump Travis CI, add Github Actions
+1.115 2022-01-08T23:56:54Z
+	* No code changes. Fix link in README.pod.
 
-1.113 2021-01-20T09:54:21Z
+1.114 2021-01-20T09:54:21Z
 	* freshen distro, dump Travis CI, add Github Actions
 
 1.113 2016-12-07T13:59:05Z
@@ -17,7 +17,7 @@ Revision history for Perl module Module::Extract::Version
 
 1.111 2016-10-18T01:54:39Z
 	* Support v5.12 and v5.14 PACKAGE NAMESPACE VERSION BLOCK
-	* Andrey Starodubtsev contributed the changes as part of 
+	* Andrey Starodubtsev contributed the changes as part of
 	Hacktoberfest.
 
 1.01 - 2011-04-26

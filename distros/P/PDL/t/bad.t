@@ -1,4 +1,5 @@
 use strict;
+use warnings;
 use Test::More;
 use PDL::LiteF;
 use PDL::Math;
@@ -50,13 +51,8 @@ is( $y->badflag, 0, "slice handling okay with no badflag" );
 
 $x->badflag(1);
 
-my $i = "Type: %T Dim: %-15D State: %5S  Dataflow: %F";
-print "Info: x = ", $x->info($i), "\n";
-print "Info: y = ", $y->info($i), "\n";
-print "Info: c = ", $c->info($i), "\n";
-
 # let's check that it gets through to a child of a child
-ok( $c->badflag, "badflag propagated throufh to a child" );
+ok( $c->badflag, "badflag propagated through to a child" );
 
 # can we change bad values
 is( byte->badvalue, byte->orig_badvalue, "byte bad value is set to the default value" );
@@ -69,6 +65,18 @@ $x = pdl(1,2,3,4,5);
 $x->setbadat(2);
 is( PDL::Core::string($x), "[1 2 BAD 4 5]", "setbadat worked" );
 
+$y = $x->copy;
+is $y."", "[1 2 BAD 4 5]", "y correct bad before set_datatype";
+$y->set_datatype(ushort->enum);
+is $y."", "[1 2 BAD 4 5]", "y correct bad after set_datatype";
+
+$y = $x->copy;
+$y->badvalue('nan');
+$y->setbadat(2);
+is $y."", "[1 2 BAD 4 5]", "y correct bad before set_datatype with badval=nan";
+$y->set_datatype(ushort->enum);
+is $y."", "[1 2 BAD 4 5]", "y correct bad after set_datatype with badval=nan";
+
 # now check that badvalue() changes the ndarray
 # (only for integer types)
 $x = convert($x,ushort);
@@ -76,8 +84,7 @@ my $badval = $x->badvalue;
 $x->badvalue(44);
 is( PDL::Core::string($x), "[1 2 BAD 4 5]", "changed badvalue" );
 $x->badflag(0);
-is( PDL::Core::string($x), "[1 2 44 4 5]", "can remove the bad value setting" );
-
+is( PDL::Core::string($x), "[1 2 44 4 5]", "can remove the badflag setting" );
 # restore the bad value
 $x->badvalue($badval);
 
@@ -128,7 +135,7 @@ is( PDL::Core::string($x),
   );
 
 $x = byte->badvalue * ones(byte,3,2);
-is( $x->get_datatype, 0, "datatype remains a byte" );
+is( $x->get_datatype, byte->enum, "datatype remains a byte" );
 $x->badflag(1);
 is( PDL::Core::string( PDL::zcover($x) ), "[BAD BAD]", "zcover() okay" );
 $x->set(1,1,1);
@@ -211,10 +218,7 @@ $x = sequence( byte, 2, 3 );
 $y = $x->slice("(1),:");
 my $mask = sequence( byte, 2, 3 );
 $mask = $mask->setbadif( ($mask % 3) == 2 );
-print "x,y == ", $x->badflag, ",", $y->badflag, "\n";
 $x->inplace->copybad( $mask );
-print "x,y == ", $x->badflag, ",", $y->badflag, "\n";
-print "$x $y\n";
 is( $y->badflag, 1, "badflag propagated using inplace copybad()" );
 
 # test some of the qsort functions
@@ -249,6 +253,12 @@ is( PDL::Core::string($x), 'BAD', 'can convert PDL to string' );
 is( $x->at, 'BAD', 'at() returns BAD for a bad value' );
 isnt( $x->sclr, 'BAD', 'sclr() ignores bad value' );
 
+$x = pdl 4;
+$x->badflag(1);
+$x->badvalue(4);
+is( $x->at, 'BAD', 'at() returns BAD for a bad value with non-default badvalue' );
+is( $x->sclr, 4, 'sclr() ignores bad value' );
+
 $x = pdl(0.5,double->badvalue,0);
 $x->badflag(1);
 $y = bessj0($x);
@@ -282,8 +292,6 @@ $x = sequence(3,3);
 $c = $x->slice(',(1)');
 $y = $x->setbadif( $x % 2 );
 $x->inplace->plus($y,0);
-print $x;
-print "$c\n";
 is( PDL::Core::string($c), "[BAD 8 BAD]", "inplace biop - plus()" );
 
 # test bifunc fns
@@ -291,25 +299,16 @@ $x = sequence(3,3);
 $c = $x->slice(',(1)');
 $y = $x->setbadif( $x % 3 != 0 );
 $x->inplace->power($y,0);
-print $x;
-print "$c\n";
 is( PDL::Core::string($c), "[27 BAD BAD]", "inplace bifunc - power()" );
 
 # test histogram (using hist)
 $x = pdl( qw/1 2 3 4 5 4 3 2 2 1/ );
 $x->setbadat(1);
 $y = hist $x, 0, 6, 1;
-print "values:    $x\n";
-print "histogram: $y\n";
 is( PDL::Core::string($y), "[0 2 2 2 2 1]", "hist()" );
 
-#$y = $x->isfinite;
-#print "isfinite(X): datatype = [",$y->get_datatype,"]\n";
-
 $x->inplace->isfinite;
-#print "X: datatype = [",$x->get_datatype,"]\n";
 is( PDL::Core::string($x), "[1 0 1 1 1 1 1 1 1 1]", "isfinite()" );
-#print "X: datatype = [",$x->get_datatype,"]\n";
 
 # histogram2d
 $x = long(1,1,1,2,2);
@@ -393,8 +392,9 @@ for my $t (map +([$_, undef], [$_, 'nan']), grep !$_->integer, types()) {
   my $p = sequence $t->[0], 2;
   $p->badvalue($t->[1]) if defined $t->[1];
   $p->setbadat(1);
-  eval {is $p.'', '[0 BAD]', "badvalue works right $t->[0], bv=".explain($->[1])};
-  is $@, '';
+  my $msg = "badvalue works right $t->[0], bv=".join '', grep $_, explain($t->[1]);
+  eval {is $p.'', '[0 BAD]', $msg};
+  is $@, '', $msg;
 }
 
 ## Name: "isn't numeric in null operation" warning could be more helpful
@@ -660,6 +660,12 @@ subtest "Throw a warning when badvalue is set to 0 or 1 and a comparison operato
 
 		warning_like { $p + 1 } undef, "No warning thrown for badval == 0 and + operator";
 	};
+};
+
+subtest "locf" => sub {
+  my $withbad = pdl '[BAD 1 BAD 3 BAD 5]';
+  my $locf = $withbad->locf;
+  is $locf."", '[0 1 1 3 3 5]', 'locf worked';
 };
 
 done_testing;

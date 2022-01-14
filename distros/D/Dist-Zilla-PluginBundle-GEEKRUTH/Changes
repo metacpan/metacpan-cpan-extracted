@@ -1,0 +1,14 @@
+Revision history for Dist-Zilla-PluginBundle-GEEKRUTH
+
+1.0001 2022-01-09T11:14:12-05:00 America/New_York
+ [BUGS]
+ - Fix a typo
+
+ [STATISTICS]
+ - code churn: 4 files changed, 16 insertions(+), 14 deletions(-)
+
+1.0000 2022-01-08
+ - First release
+
+ [STATISTICS]
+ - code churn: 6 files changed, 522 insertions(+)

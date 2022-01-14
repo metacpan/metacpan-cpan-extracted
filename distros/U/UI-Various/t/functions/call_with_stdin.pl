@@ -10,12 +10,12 @@ sub _call_with_stdin($$)
     if (-f $stdin_text)
     {
 	local $/;		# local slurp mode
-	use bareword::filehandles;
-	open INPUT, '<', $stdin_text
+	my $input;
+	open $input, '<', $stdin_text
 	    or  die "can't open ", $stdin_text, ': ', $!, "\n";
-	$stdin_text = <INPUT>;
-	$stdin_text = join('', <INPUT>);
-	close INPUT;
+	$stdin_text = <$input>;
+	$stdin_text = join('', <$input>);
+	close $input;
     }
     my $orgin = undef;
     open $orgin, '<&', \*STDIN  or  die "can't duplicate STDIN\n";

@@ -63,3 +63,14 @@ Revision history for Perl extension Tk::HListbox.
 	  and text fields respectively, primarily to assist users of 
 	  Tk::HMListbox in adjusting to keep icon and text columns' vertical 
 	  allignment synced.
+2.4    Thu Jan 06, 2022
+	- Added option:  -showcursoralways
+	  See updated docs.  Tk::HListbox no longer displays the keyboard cursor 
+	  (active element) when the HListbox widget does not have the keyboard 
+	  focus, in order to be consistent with the behaviour of Tk::Listbox.  
+	  This option, when set to 1 (or a "true" value) restores the pre-v2.4 
+	  behaviour of always showing the keyboard cursor.
+2.41   Thu Jan 06, 2022
+	- Oops - Correct major error in Pod/Docs.
+2.42   Thu Jan 07, 2022
+	- Fix bug introduced in v2.4 that prevented selecting by mouse-dragging.

@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Config;
 use Carp 'confess';
+use File::Basename 'dirname';
 
 # Fields
 sub exported_funcs {
@@ -50,6 +51,17 @@ sub cc {
   }
 }
 
+sub cc_each {
+  my $self = shift;
+  if (@_) {
+    $self->{cc_each} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{cc_each};
+  }
+}
+
 sub ccflags {
   my $self = shift;
   if (@_) {
@@ -58,6 +70,17 @@ sub ccflags {
   }
   else {
     return $self->{ccflags};
+  }
+}
+
+sub ccflags_each {
+  my $self = shift;
+  if (@_) {
+    $self->{ccflags_each} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{ccflags_each};
   }
 }
 
@@ -138,14 +161,14 @@ sub libs {
   }
 }
 
-sub sources {
+sub source_files {
   my $self = shift;
   if (@_) {
-    $self->{sources} = $_[0];
+    $self->{source_files} = $_[0];
     return $self;
   }
   else {
-    return $self->{sources};
+    return $self->{source_files};
   }
 }
 
@@ -255,9 +278,9 @@ sub new {
     $self->resources([]);
   }
 
-  # sources
-  unless (defined $self->{sources}) {
-    $self->sources([]);
+  # source_files
+  unless (defined $self->{source_files}) {
+    $self->source_files([]);
   }
   
   # libs
@@ -292,7 +315,7 @@ sub new {
 sub new_c {
   my $class = shift;
   
-  my $self = SPVM::Builder::Config->new;
+  my $self = SPVM::Builder::Config->new(@_);
   
   # NativeAPI
   $self->ext('c');
@@ -303,7 +326,7 @@ sub new_c {
 sub new_c99 {
   my $class = shift;
   
-  my $self = SPVM::Builder::Config->new_c;
+  my $self = SPVM::Builder::Config->new_c(@_);
   
   # C99
   $self->set_std('c99');
@@ -311,10 +334,21 @@ sub new_c99 {
   return $self;
 }
 
+sub new_gnu99 {
+  my $class = shift;
+  
+  my $self = SPVM::Builder::Config->new_c(@_);
+  
+  # C99
+  $self->set_std('gnu99');
+  
+  return $self;
+}
+
 sub new_cpp {
   my $class = shift;
   
-  my $self = SPVM::Builder::Config->new;
+  my $self = SPVM::Builder::Config->new(@_);
   
   # CC
   $self->cc('g++');
@@ -331,7 +365,7 @@ sub new_cpp {
 sub new_cpp11 {
   my $class = shift;
   
-  my $self = SPVM::Builder::Config->new_cpp;
+  my $self = SPVM::Builder::Config->new_cpp(@_);
   
   # C++11
   $self->set_std('c++11');
@@ -388,10 +422,10 @@ sub add_exported_funcs {
   push @{$self->{exported_funcs}}, @exported_funcs;
 }
 
-sub add_sources {
-  my ($self, @sources) = @_;
+sub add_source_files {
+  my ($self, @source_files) = @_;
   
-  push @{$self->{sources}}, @sources;
+  push @{$self->{source_files}}, @source_files;
 }
 
 sub add_resources {
@@ -399,6 +433,8 @@ sub add_resources {
   
   push @{$self->{resources}}, @resources;
 }
+
+sub use { shift->add_resources(@_) }
 
 sub add_static_libs {
   my ($self, @static_libs) = @_;
@@ -514,13 +550,16 @@ Fields.
   my $ext = $config->ext;
   $config->ext($ext);
 
-Get and set the extension of native sources. This is used by the compiler.
+Get and set the extension of the SPVM native source.
 
 The default is C<undef>.
 
 B<Examples:>
-
+  
+  # Foo/Bar.c
   $config->ext('c');
+  
+  # Foo/Bar.cpp
   $config->ext('cpp');
   
 =head2 cc
@@ -528,7 +567,49 @@ B<Examples:>
   my $cc = $config->cc;
   $config->cc($cc);
 
-Get and set a compiler. The default is the value of C<cc> of L<Config> module.
+Get and set a compiler name. The default is the value of C<cc> of L<Config> module.
+
+B<Examples:>
+  
+  # gcc
+  $config->cc('gcc');
+  
+  # g++ for C++
+  $config->cc('g++');
+  
+  # nvcc for CUDA/GUP
+  $config->cc('nvcc');
+  
+  # cc that compiled this Perl
+  use Config;
+  $config->cc($Config{cc});
+
+=head2 cc_each
+
+  my $cc_each = $config->cc_each;
+  $config->cc_each($cc_each);
+
+Get and set a callback that returns the compiler name for each source file. The call back receives L<SPVM::Bulder::Config> object and each source file.
+
+C<cc_each> takes precedence over C<cc>.
+
+B<Examples:>
+  
+  $config->cc_each(sub {
+    my ($config, $source_file) = @_;
+    
+    my $cc;
+    # C source file
+    if ($source_file =~ /\.c$/) {
+      $cc = 'gcc';
+    }
+    # C++ source file
+    elsif ($source_file =~ /\.cpp$/) {
+      $cc = 'g++';
+    }
+    
+    return $cc;
+  });
 
 =head2 include_dirs
 
@@ -546,7 +627,46 @@ At runtime, the "include" directory of the native module is added before C<inclu
   my $ccflags = $config->ccflags;
   $config->ccflags($ccflags);
 
-Get and set compiler flags. the default is a empty string.
+Get and set compiler flags.
+
+B<Default:>
+
+  # $Config{cccdlflags} has -fPIC.
+  ['-fPIC']
+  
+  # Other
+  []
+
+=head2 ccflags_each
+
+  my $ccflags_each = $config->ccflags_each;
+  $config->ccflags_each($ccflags_each);
+
+Get and set a callback that returns the compiler flags for each source file. The call back receives L<SPVM::Bulder::Config> object and each source file.
+
+C<ccflags_each> takes precedence over C<ccflags>.
+
+B<Examples:>
+  
+  $config->ccflags_each(sub {
+    my ($config, $source_file) = @_;
+    
+    my $config_ccflags = $config->ccflags;
+    
+    my $ccflags = [];
+    # C source file
+    if ($source_file =~ /\.c$/) {
+      $ccflags = ['-DFoo', @$config_ccflags];
+    }
+    # C++ source file
+    elsif ($source_file =~ /\.cpp$/) {
+      $ccflags = ['-DBar', @$config_ccflags];
+    }
+    
+    return $ccflags;
+  });
+
+C<cc_each> takes precedence over C<cc>.
 
 =head2 optimize
 
@@ -563,16 +683,16 @@ B<Examples:>
   $config->optimize('-O2');
   $config->optimize('-g3 -O0');
 
-=head2 sources
+=head2 source_files
 
-  my $sources = $config->sources;
-  $config->sources($sources);
+  my $source_files = $config->source_files;
+  $config->source_files($source_files);
 
 Get and get source files. These sourceraries are linked by the compiler.
 
 B<Examples:>
 
-  $config->sources(['foo.c', 'bar.c']);
+  $config->source_files(['foo.c', 'bar.c']);
 
 =head2 ld
 
@@ -646,17 +766,17 @@ B<Examples:>
   my ldflags = $config->ldflags;
   $config->ldflags(ldflags);
 
-Get and set linker flags. 
+Get and set linker flags. The default is emtpy array reference.
 
 B<Default:>
 
 Windows
 
-  "-mdll -s"
+  ['-mdll', '-s']
   
 Non-Windows
 
-  "-shared"
+  ['-shared']
 
 =head2 ld_optimize
 
@@ -757,11 +877,11 @@ Add values after the last element of C<include_dirs> field.
 
 Add values after the last element of  C<lib_dirs> field.
 
-=head2 add_sources
+=head2 add_source_files
 
-  $config->add_sources(@sources);
+  $config->add_source_files(@source_files);
 
-Add the values after the last element of C<sources> field.
+Add the values after the last element of C<source_files> field.
 
 =head2 add_exported_funcs
 
@@ -802,6 +922,16 @@ Add the values that each element is converted to the following hash reference af
 B<Examples:>
 
   $config->add_dynamic_libs('gsl');
+
+=head2 use
+
+  $config->use(@resources);
+
+This method is the alias for L<"add_resources"> to improve user experiences.
+
+B<Examples:>
+
+  $config->use('SPVM::Resouce::Zlib::V1_15');
 
 =head2 add_resources
 

@@ -133,11 +133,11 @@ current delimiter and with newline appended.
 
 =head1 VERSION
 
-    Text::Delimited v2.11 (2014/04/30)
+    Text::Delimited v2.12 (2022/01/06)
 
 =head1 COPYRIGHT
 
-    (c) 2004-2014, Phillip Pollard <bennie@cpan.org>
+    (c) 2004-2022, Phillip Pollard <bennie@cpan.org>
 
 =head1 LICENSE
 
@@ -166,7 +166,7 @@ use 5.006001;
 use warnings;
 use strict;
 
-$Text::Delimited::VERSION = '2.11';
+$Text::Delimited::VERSION = '2.12';
 
 ### Private mthods
 
@@ -177,8 +177,12 @@ sub DESTROY {
 sub _line {
   my $self = shift @_;
   $self->{CURRENT_LINE} = readline($self->{FP});
-  $self->{CURRENT_LINE} =~ s/[\r\n]+$//;
-  $self->{CURRENT_DATA} = [ split /\Q$self->{DELIMITER}\E/o, $self->{CURRENT_LINE} ];
+  if ( defined $self->{CURRENT_LINE} ) {
+    $self->{CURRENT_LINE} =~ s/[\r\n]+$// if defined $self->{CURRENT_LINE};
+    $self->{CURRENT_DATA} = [ split /\Q$self->{DELIMITER}\E/o, $self->{CURRENT_LINE} ];
+  } else {
+    $self->{CURRENT_DATA} = [ ];
+  }
   $self->{LINE_NUMBER}++;
   return $self->{CURRENT_DATA};
 }

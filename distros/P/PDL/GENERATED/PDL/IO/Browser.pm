@@ -21,6 +21,8 @@ use DynaLoader;
 
 
 
+#line 2 "browser.pd"
+
 =head1 NAME
 
 PDL::IO::Browser -- 2D data browser for PDL
@@ -35,7 +37,9 @@ cursor terminal browser for ndarrays.
 
 =cut
 
-
+use strict;
+use warnings;
+#line 43 "Browser.pm"
 
 
 
@@ -48,6 +52,8 @@ cursor terminal browser for ndarrays.
 
 
 
+
+#line 1059 "../../blib/lib/PDL/PP.pm"
 
 
 =head2 browse
@@ -80,18 +86,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 90 "Browser.pm"
 
 
 
-
-
-
+#line 1061 "../../blib/lib/PDL/PP.pm"
 *browse = \&PDL::browse;
+#line 96 "Browser.pm"
 
 
 
 
 
+#line 57 "browser.pd"
 
 =head1 AUTHOR
 
@@ -104,8 +111,7 @@ the copyright notice should be included in the file.
 
 
 =cut
-
-
+#line 115 "Browser.pm"
 
 
 

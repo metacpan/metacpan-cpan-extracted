@@ -157,12 +157,14 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           
           const char* class_name = op_use->uv.use->op_type->uv.type->basic_type->name;
 
-          SPVM_CLASS* found_class = SPVM_HASH_fetch(compiler->class_symtable, class_name, strlen(class_name));
-          
-          if (found_class) {
+          const char* used_class_name = (const char*)SPVM_HASH_fetch(compiler->used_class_symtable, class_name, strlen(class_name));
+
+          if (used_class_name) {
             continue;
           }
           else {
+            SPVM_HASH_insert(compiler->used_class_symtable, class_name, strlen(class_name), (void*)class_name);
+            
             // Create moudle relative file name from class name by changing :: to / and add ".spvm"
             int32_t cur_rel_file_length = (int32_t)(strlen(class_name) + 6);
             char* cur_rel_file = SPVM_ALLOCATOR_new_block_compile_eternal(compiler, cur_rel_file_length + 1);
@@ -228,7 +230,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               // Module not found
               if (!fh) {
                 if (!op_use->uv.use->is_require) {
-                  fprintf(stderr, "[CompileError]Can't locate %s in @INC (@INC contains:", cur_rel_file);
+                  fprintf(stderr, "[CompileError]Can't locate %s to load %s class in @INC (@INC contains:", cur_rel_file, class_name);
                   for (int32_t i = 0; i < module_dirs_length; i++) {
                     const char* include_dir = (const char*) SPVM_LIST_fetch(compiler->module_dirs, i);
                     fprintf(stderr, " %s", include_dir);
@@ -541,13 +543,14 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
 
       case '&':
         compiler->bufptr++;
-        // Or
+        // &&
         if (*compiler->bufptr == '&') {
           compiler->bufptr++;
           SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_LOGICAL_AND);
           yylvalp->opval = op;
           return LOGICAL_AND;
         }
+        // &=
         else if (*compiler->bufptr == '=') {
           compiler->bufptr++;
           SPVM_OP* op_special_assign = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_SPECIAL_ASSIGN);
@@ -557,6 +560,13 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           
           return SPECIAL_ASSIGN;
         }
+        // &foo - Current class
+        else if (isalpha(*compiler->bufptr)) {
+          yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_CURRENT_CLASS);
+          compiler->expect_method_name = 1;
+          return CURRENT_CLASS;
+        }
+        // &
         else {
           SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_BIT_AND);
           yylvalp->opval = op;
@@ -1376,7 +1386,11 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
 
             // Variable name can't conatain __
             if (strstr(var_name, "__")) {
-              SPVM_COMPILER_error(compiler, "Variable name \"%s\" must not contains __ at %s line %d\n", var_name, compiler->cur_file, compiler->cur_line);
+              SPVM_COMPILER_error(compiler, "Variable name \"%s\" can't contain \"__\" at %s line %d\n", var_name, compiler->cur_file, compiler->cur_line);
+            }
+
+            if (strstr(var_name, ":::")) {
+              SPVM_COMPILER_error(compiler, "Variable name \"%s\" can't contain \":::\" at %s line %d\n", var_name, compiler->cur_file, compiler->cur_line);
             }
 
             // Variable name can't start with number
@@ -1387,6 +1401,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             if (strlen(var_name) > 1 && var_name[var_name_length_without_sigil] == ':' && var_name[var_name_length_without_sigil - 1] == ':') {
               SPVM_COMPILER_error(compiler, "Variable name \"%s\" must not end with \"::\" at %s line %d\n", var_name, compiler->cur_file, compiler->cur_line);
             }
+            
             
             // Class variable
             return VAR_NAME;
@@ -1787,11 +1802,6 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_CLASS);
                   
                   return CLASS;
-                }
-                else if (strcmp(keyword, "cur") == 0) {
-                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_CURRENT_CLASS);
-                  
-                  return CURRENT_CLASS;
                 }
                 break;
               }

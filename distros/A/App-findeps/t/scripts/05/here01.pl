@@ -2,10 +2,9 @@ use strict;
 use warnings;
 
 my $here = <<EOL;    # the inside of here document must be excluded from parsing
-    require HERE;
-    use HERE::Somthing;
+    require Module::Exists::In::HERE;
+    use Module::Exists::In::HERE;
 EOL
 
-require Dummy;       # does not exist anywhere
+require Acme::BadExample;    # does not exist anywhere
 
-exit;

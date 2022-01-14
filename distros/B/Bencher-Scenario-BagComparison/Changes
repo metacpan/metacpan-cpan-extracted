@@ -1,4 +1,12 @@
-0.004   2017-01-25 (PERLANCAR)
+0.005   2021-07-31  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [build] Rebuild with updated Pod::Weaver::Plugin::Bencher::Scenario
+          (0.251) to tweak texts in generated POD section. Generate charts.
+
+
+0.004   2017-01-25  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -7,7 +15,7 @@
           type=x_benchmarks.
 
 
-0.003   2017-01-25 (PERLANCAR)
+0.003   2017-01-25  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -16,12 +24,12 @@
           type=requires.
 
 
-0.002   2016-10-19 (PERLANCAR)
+0.002   2016-10-19  Released-By: PERLANCAR
 
         - [build] Rebuild with updated PWP:Bencher::Scenario that produces
           lib/Bencher/ScenarioR/* files.
 
 
-0.001   2016-10-19 (PERLANCAR)
+0.001   2016-10-19  Released-By: PERLANCAR
 
         - First release.

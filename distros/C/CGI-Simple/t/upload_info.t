@@ -1,7 +1,6 @@
 use Test::More tests => 3;
 use strict;
 use warnings;
-use IO::Scalar;
 
 use CGI::Simple;
 # Set up a CGI environment
@@ -44,7 +43,16 @@ fake\r
 EOF
 $ENV{CONTENT_LENGTH} = length $body;
 
-my $h = IO::Scalar->new( \$body );
+my $h;
+if ("$]" < 5.008) {
+  require File::Temp;
+  $h = File::Temp->new(TEMPLATE => 'CGI-Simple-upload_info-XXXXXX', TMPDIR => 1);
+  $h->print($body);
+  $h->seek(0, 0);
+}
+else {
+  open $h, '<', \$body;
+}
 my $q = CGI::Simple->new( $h );
 ok( $q->upload_info( $q->param( 'file0' ), 'mime' ) eq 'image/png',
   'Guess mime for  image/png' );

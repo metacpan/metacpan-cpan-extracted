@@ -2,7 +2,6 @@ use strict;
 use warnings;
 
 require './Types.pm';
-my $PDL_DATATYPES = PDL::Types::datatypes_header();
 
 require './Config.pm';
 die "No PDL::Config found" unless %PDL::Config;
@@ -14,7 +13,7 @@ open OUT,">$file" or die "Can't create $file: $!";
 chmod 0644, $file;
 
 print OUT sprintf qq{#line %d "%s"\n}, __LINE__ + 2,  __FILE__;
-print OUT <<"!GROK!THIS!";
+print OUT <<'EOF';
 
 /*
  * THIS FILE IS GENERATED FROM pdl.h.PL! Do NOT edit!
@@ -24,22 +23,74 @@ print OUT <<"!GROK!THIS!";
 #define __PDL_H
 
 #include <complex.h>
+#include <math.h>
+#include <stddef.h>
+#include <stdint.h>
+
+#define IND_FLAG "td"
 
 #define PDL_DEBUGGING 1
 
 #ifdef PDL_DEBUGGING
 extern int pdl_debugging;
-#define PDLDEBUG_f(a)           if(pdl_debugging) a
+#define PDLDEBUG_f(a)           if(pdl_debugging) { a; fflush(stdout); }
 #else
 #define PDLDEBUG_f(a)
 #endif
 
-#define ANYVAL_ISBAD(inany,pdl,badval) \\
-  (ANYVAL_ISNAN(badval) ? ANYVAL_ISNAN(inany) : ANYVAL_EQ_ANYVAL(inany, badval))
-
 typedef struct pdl pdl;
+EOF
 
-$PDL_DATATYPES
+my @methods = qw(symbol ctype ppsym shortctype defbval realctype);
+sub makeg { map { my $t = $_; [map $t->$_, @methods] } grep $_[0]->($_), PDL::Types::types() }
+sub makelister {
+  my ($name, $is2, $underscore, @list) = @_;
+  my $suff = $is2 ? '2' : '';
+  my $arg1 = $is2 ? 'X, X2' : 'X';
+  my $arg2 = $is2 ? 'X2, ' : '';
+  $underscore = $underscore ? '_' : '';
+  ("#define PDL_TYPELIST${suff}_$name$underscore($arg1) \\\n",
+    (map " X($arg2".join(',', @$_).")\\\n", @list), "\n\n");
+}
+my @generics = makeg(sub {1});
+my @generics_real = makeg(sub {$_[0]->real});
+my @generics_complex = makeg(sub {!$_[0]->real});
+print OUT makelister('ALL', 0, 0, @generics);
+print OUT makelister('ALL', 1, 0, @generics);
+# extra as macro gets expanded twice, gets painted blue
+print OUT makelister('ALL', 1, 1, @generics);
+print OUT makelister('REAL', 0, 0, @generics_real);
+print OUT makelister('REAL', 1, 0, @generics_real);
+print OUT makelister('COMPLEX', 0, 0, @generics_real);
+print OUT makelister('COMPLEX', 1, 0, @generics_real);
+
+print OUT sprintf qq{#line %d "%s"\n}, __LINE__ + 2,  __FILE__;
+print OUT <<'EOF';
+
+#define X(sym, ...) \
+  , sym
+typedef enum {
+   PDL_INVALID=-1
+PDL_TYPELIST_ALL(X)
+} pdl_datatypes;
+#undef X
+
+#define X(sym, ctype, ppsym, shortctype, defbval, realctype, ...) \
+  typedef realctype ctype;
+PDL_TYPELIST_ALL(X)
+#undef X
+
+typedef union {
+#define X(sym, ctype, ppsym, shortctype, defbval, realctype, ...) \
+  ctype ppsym;
+PDL_TYPELIST_ALL(X)
+#undef X
+} PDL_Value;
+
+typedef struct {
+  pdl_datatypes type;
+  PDL_Value value;
+} PDL_Anyval;
 
 #include "pdlthread.h"
 
@@ -57,31 +108,35 @@ extern int pdl_autopthread_actual;
     is used to define that threshold (in M-elements, or 2^20 elements ) */
 extern int pdl_autopthread_size;
 extern PDL_Indx pdl_autopthread_dim;
-
-$mymalloc
-
-#define ANYVAL_EQ_ANYVAL(x,y) (_anyval_eq_anyval(x,y))
-
-!GROK!THIS!
-
-print OUT sprintf qq{#line %d "%s"\n}, __LINE__ + 2,  __FILE__;
-print OUT <<'EOF';
-static inline int _anyval_eq_anyval(PDL_Anyval x, PDL_Anyval y) {
-  switch (x.type) {
 EOF
-for my $o (PDL::Types::types()) { # outer
-  print OUT "    case @{[$o->sym]}:\n      switch (y.type) {\n";
-  for my $i (PDL::Types::types()) { # inner
-    print OUT "        case @{[$i->sym]}: return (x.value.".$o->ppsym." == y.value.".$i->ppsym.") ? 1 : 0;\n";
-  }
-  print OUT "        default: return 0;\n      }\n";
-}
+print OUT "$mymalloc\n";
+
 print OUT <<'EOF';
-    default:
-      return 0;
+#define PDL_GENERICSWITCH_CASE(X, symbol, ...) \
+  case symbol: { X(symbol, __VA_ARGS__) } break;
+#define PDL_GENERICSWITCH(LISTER2, typevar, X2, dflt) \
+  switch (typevar) { \
+    LISTER2(PDL_GENERICSWITCH_CASE, X2) \
+    default: dflt; \
   }
-}
+/* extra as first one gets painted blue */
+#define PDL_GENERICSWITCH_CASE2(X, symbol, ...) \
+  case symbol: { X(symbol, __VA_ARGS__) } break;
+/* for use in inner loops avoiding extreme lambda-calculus stuff */
+#define PDL_GENERICSWITCH2(LISTER2, typevar, X2, dflt) \
+  switch (typevar) { \
+    LISTER2(PDL_GENERICSWITCH_CASE2, X2) \
+    default: dflt; \
+  }
 EOF
+
+for my $type (PDL::Types::types()) {
+  my ($ppsym) = map $type->$_, qw(ppsym);
+  my $expr = !$type->usenan ? 0 : $type->isnan('x') . '?1:0'; # isnan can return any non-0
+  print OUT "#define PDL_ISNAN_$ppsym(x) ($expr)\n";
+  my $expr2 = !$type->usenan ? 1 : $type->isfinite('x') . '?1:0';
+  print OUT "#define PDL_ISFINITE_$ppsym(x) ($expr2)\n";
+}
 
 print OUT sprintf qq{#line %d "%s"\n}, __LINE__ + 2,  __FILE__;
 print OUT <<'EOF';
@@ -118,72 +173,49 @@ print OUT <<'EOF';
  } while (0)
 EOF
 
-print OUT <<'EOF';
+print OUT sprintf qq{#line %d "%s"\n}, __LINE__ + 2,  __FILE__;
+print OUT <<'!NO!SUBS!';
 /* input vars have to be called exactly these as not expanded */
-#define ANYVAL_TO_CTYPE_OFFSET_X(datatype, generic, generic_ppsym, shortctype, defbval) \
-    ANYVAL_TO_CTYPE(((generic *)x)[ioff], generic, value);
+#define ANYVAL_TO_CTYPE_OFFSET_X(datatype, ctype, ...) \
+    ANYVAL_TO_CTYPE(((ctype *)x)[ioff], ctype, value);
 #define ANYVAL_TO_CTYPE_OFFSET(x,ioff,datatype,value) \
-    PDL_GENERICSWITCH(datatype, ANYVAL_TO_CTYPE_OFFSET_X)
-EOF
+    PDL_GENERICSWITCH(PDL_TYPELIST2_ALL, datatype, ANYVAL_TO_CTYPE_OFFSET_X, return pdl_make_error(PDL_EUSERERROR, "Not a known data type code=%d", datatype))
 
-my $isnan = join " \\\n  ",
-  map "(x).type == ".$_->sym." ? @{[$_->isnan('(x).value.'.$_->ppsym)]} :",
-  grep $_->usenan, PDL::Types::types();
-print OUT <<EOF;
-#define ANYVAL_ISNAN(x) (\\
-  (x).type < PDL_F ? 0 : \\
-  $isnan \\
-  (croak("ANYVAL_ISNAN should not get here, had type %d", (x).type), 1) \\
-)
-EOF
-
-for my $type (PDL::Types::types()) {
-  my ($ppsym) = map $type->$_, qw(ppsym);
-  my $expr = !$type->usenan ? 'FALSE' : $type->isnan('x');
-  print OUT "#define PDL_ISNAN_$ppsym(x) ($expr)\n";
-  my $expr2 = !$type->usenan ? 'TRUE' : $type->isfinite('x');
-  print OUT "#define PDL_ISFINITE_$ppsym(x) ($expr2)\n";
+#define ANYVAL_ISNAN(x) _anyval_isnan(x)
+static inline int _anyval_isnan(PDL_Anyval x) {
+#define X(datatype, ctype, ppsym, ...) \
+  return PDL_ISNAN_ ## ppsym(x.value.ppsym);
+  PDL_GENERICSWITCH(PDL_TYPELIST2_ALL, x.type, X, return -1)
+#undef X
 }
 
-my @methods = qw(symbol ctype ppsym shortctype defbval);
-my @generics = map { my $t = $_; [map $t->$_, @methods] } PDL::Types::types();
-print OUT "#define PDL_GENERICLIST(X) \\\n";
-print OUT (map ' X('.join(',', @$_).")\\\n", @generics), "\n\n";
-print OUT "#define PDL_GENERICLIST2(X, X2) \\\n";
-print OUT (map ' X(X2, '.join(',', @$_).")\\\n", @generics), "\n\n";
-# extra as macro gets expanded twice, gets painted blue
-print OUT "#define PDL_GENERICLIST2_(X, X2) \\\n";
-print OUT (map ' X(X2, '.join(',', @$_).")\\\n", @generics), "\n\n";
-my @generics_real = map { my $t = $_; [map $t->$_, @methods] } grep $_->real, PDL::Types::types();
-print OUT "#define PDL_GENERICLIST_REAL(X) \\\n";
-print OUT (map ' X('.join(',', @$_).")\\\n", @generics_real), "\n\n";
+#define ANYVAL_EQ_ANYVAL(x,y) (_anyval_eq_anyval(x,y))
+static inline int _anyval_eq_anyval(PDL_Anyval x, PDL_Anyval y) {
+#define X_OUTER(datatype_x, ctype_x, ppsym_x, ...) \
+  ctype_x cvalue_x = x.value.ppsym_x; \
+  PDL_GENERICSWITCH2(PDL_TYPELIST2_ALL_, y.type, X_INNER, return -1)
+#define X_INNER(datatype_y, ctype_y, ppsym_y, ...) \
+  return (cvalue_x == y.value.ppsym_y) ? 1 : 0;
+  PDL_GENERICSWITCH(PDL_TYPELIST2_ALL, x.type, X_OUTER, return -1)
+#undef X_INNER
+#undef X_OUTER
+}
 
-print OUT <<'EOF';
+#define ANYVAL_ISBAD(inany,badval) _anyval_isbad(inany,badval)
+static inline int _anyval_isbad(PDL_Anyval inany, PDL_Anyval badval) {
+  int isnan_badval = ANYVAL_ISNAN(badval);
+  if (isnan_badval == -1) return -1;
+  return isnan_badval ? ANYVAL_ISNAN(inany) : ANYVAL_EQ_ANYVAL(inany, badval);
+}
+
+#define PDL_ISBAD(inval,badval,ppsym) \
+  (PDL_ISNAN_ ## ppsym(badval) ? PDL_ISNAN_ ## ppsym(inval) : inval == badval)
+
 typedef struct badvals {
-#define X(symbol, ctype, ppsym, shortctype, defbval) ctype shortctype;
-PDL_GENERICLIST(X)
+#define X(symbol, ctype, ppsym, shortctype, ...) ctype shortctype;
+PDL_TYPELIST_ALL(X)
 #undef X
 } badvals;
-
-#define PDL_GENERICSWITCH_CASE(X, symbol, ...) \
-  case symbol: { X(symbol, __VA_ARGS__) } break;
-#define PDL_GENERICSWITCH(typevar, X2) \
-  switch (typevar) { \
-    PDL_GENERICLIST2(PDL_GENERICSWITCH_CASE, X2) \
-    default: croak("Not a known data type code=%d", typevar); \
-  }
-/* extra as first one gets painted blue */
-#define PDL_GENERICSWITCH_CASE2(X, symbol, ...) \
-  case symbol: { X(symbol, __VA_ARGS__) } break;
-/* for use in inner loops avoiding extreme lambda-calculus stuff */
-#define PDL_GENERICSWITCH2(typevar, X2) \
-  switch (typevar) { \
-    PDL_GENERICLIST2_(PDL_GENERICSWITCH_CASE2, X2) \
-    default: croak("Not a known data type code=%d", typevar); \
-  }
-EOF
-
-print OUT <<'!NO!SUBS!';
 
 /*
  * Define the pdl C data structure which maps onto the original PDL
@@ -199,7 +231,7 @@ print OUT <<'!NO!SUBS!';
 */
 
 #define PDL_NDIMS      6 /* Number of dims[] to preallocate */
-#define PDL_NCHILDREN  8 /* Number of children ptrs to preallocate */
+#define PDL_NCHILDREN  8 /* Number of trans_children ptrs to preallocate */
 #define PDL_NTHREADIDS 4 /* Number of different threadids/pdl to preallocate */
 
 /* Constants for pdl.state - not all combinations make sense */
@@ -213,8 +245,7 @@ print OUT <<'!NO!SUBS!';
 #define  PDL_PARENTDIMSCHANGED   0x0004
   /* Physical data representation of the parent has changed (e.g.           */
   /* physical transposition), so incs etc. need to be recalculated.         */
-#define  PDL_PARENTREPRCHANGED   0x0008
-#define  PDL_ANYCHANGED          (PDL_PARENTDATACHANGED|PDL_PARENTDIMSCHANGED|PDL_PARENTREPRCHANGED)
+#define  PDL_ANYCHANGED          (PDL_PARENTDATACHANGED|PDL_PARENTDIMSCHANGED)
   /* Dataflow tracking flags -- F/B for forward/back.  These get set        */
   /* by transformations when they are set up.                               */
 #define  PDL_DATAFLOW_F          0x0010
@@ -250,7 +281,6 @@ print OUT <<'!NO!SUBS!';
  X(PDL_ALLOCATED) \
  X(PDL_PARENTDATACHANGED) \
  X(PDL_PARENTDIMSCHANGED) \
- X(PDL_PARENTREPRCHANGED) \
  X(PDL_DATAFLOW_F) \
  X(PDL_DATAFLOW_B) \
  X(PDL_NOMYDIMS) \
@@ -290,6 +320,17 @@ print OUT <<'!NO!SUBS!';
 
 typedef struct pdl_trans pdl_trans;
 
+typedef enum {
+  PDL_ENONE = 0, /* usable as boolean */
+  PDL_EUSERERROR, /* user error, no need to destroy */
+  PDL_EFATAL
+} pdl_error_type;
+typedef struct {
+  pdl_error_type error;
+  const char *message; /* if error but this NULL, parsing/alloc error */
+  char needs_free;
+} pdl_error;
+
 typedef struct pdl_transvtable {
         int flags;
         int iflags; /* flags that are starting point for pdl_trans.flags */
@@ -306,11 +347,10 @@ typedef struct pdl_transvtable {
         PDL_Indx nind_ids;
         PDL_Indx ninds;
         char **ind_names; /* sorted names of "indices", eg for a(m), the "m" */
-        void (*redodims)(pdl_trans *tr);      /* Only dims and internal trans (makes phys) */
-        void (*readdata)(pdl_trans *tr);      /* Only data, to "data" ptr  */
-        void (*writebackdata)(pdl_trans *tr); /* "data" ptr to parent or granny */
-        void (*freetrans)(pdl_trans *tr);     /* Free both the contents and it of
-                                                 the trans_parent member */
+        pdl_error (*redodims)(pdl_trans *tr); /* Only dims and internal trans (makes phys) */
+        pdl_error (*readdata)(pdl_trans *tr); /* Only data, to "data" ptr  */
+        pdl_error (*writebackdata)(pdl_trans *tr); /* "data" ptr to parent or granny */
+        pdl_error (*freetrans)(pdl_trans *tr, char);
         int structsize;
         char *name;                           /* For debuggers, mostly */
 } pdl_transvtable;
@@ -363,16 +403,12 @@ typedef struct pdl_transvtable {
 #define  PDL_ITRANS_DO_DATAFLOW_ANY   (PDL_ITRANS_DO_DATAFLOW_F|PDL_ITRANS_DO_DATAFLOW_B)
 
 #define  PDL_ITRANS_ISAFFINE          0x1000
-#define  PDL_ITRANS_VAFFINEVALID      0x2000
-#define  PDL_ITRANS_NONMUTUAL         0x4000  /* flag for destruction */
 
 #define PDL_LIST_FLAGS_PDLTRANS(X) \
  X(PDL_ITRANS_TWOWAY) \
  X(PDL_ITRANS_DO_DATAFLOW_F) \
  X(PDL_ITRANS_DO_DATAFLOW_B) \
- X(PDL_ITRANS_ISAFFINE) \
- X(PDL_ITRANS_VAFFINEVALID) \
- X(PDL_ITRANS_NONMUTUAL)
+ X(PDL_ITRANS_ISAFFINE)
 
 #define PDL_MAXSPACE 256 /* maximal number of prefix spaces in dump routines */
 #define PDL_MAXLIN 60
@@ -390,15 +426,13 @@ typedef struct pdl_transvtable {
   short flags;                                                          \
   pdl_transvtable *vtable;                                              \
   int bvalflag;                                                         \
-  int has_badvalue;                                                     \
-  PDL_Anyval badvalue;                                                  \
   pdl_thread pdlthread;                                                 \
   PDL_Indx *ind_sizes;                                                  \
   PDL_Indx *inc_sizes;                                                  \
   char dims_redone;                                                     \
   PDL_Indx *incs; PDL_Indx offs; /* only used for affine */             \
   void *params;                                                         \
-  int __datatype
+  pdl_datatypes __datatype
 
 #define PDL_TRANS_START(np) \
   PDL_TRANS_START_COMMON; \
@@ -410,7 +444,7 @@ typedef struct pdl_transvtable {
   /* The pdls involved in the transformation */ \
   pdl *pdls[]
 
-#define PDL_CHKMAGIC_GENERAL(it,this_magic,type) if((it)->magicno != this_magic) croak("INVALID " #type "MAGIC NO 0x%p %d%s\n",it,(int)((it)->magicno), ((it)->magicno) == PDL_CLEARED_MAGICNO ? " (cleared)" : ""); else (void)0
+#define PDL_CHKMAGIC_GENERAL(it,this_magic,type) if((it)->magicno != this_magic) return pdl_make_error(PDL_EFATAL, "INVALID " #type "MAGIC NO 0x%p %d%s\n",it,(int)((it)->magicno), ((it)->magicno) == PDL_CLEARED_MAGICNO ? " (cleared)" : ""); else (void)0
 
 #define PDL_TR_MAGICNO      0x91827364
 #define PDL_TR_SETMAGIC(it) it->magicno = PDL_TR_MAGICNO
@@ -427,28 +461,26 @@ struct pdl_trans {
 typedef struct pdl_vaffine {
 	PDL_TRANS_START(2);
 	PDL_Indx ndims;
-	PDL_Indx def_incs[PDL_NDIMS];
 	pdl *from;
 } pdl_vaffine;
 
 #define PDL_VAFFOK(pdl) (pdl->state & PDL_OPT_VAFFTRANSOK)
-#define PDL_REPRINC(pdl,which) (PDL_VAFFOK(pdl) ? \
-                pdl->vafftrans->incs[which] : pdl->dimincs[which])
+#define PDL_REPRINCS(pdl) (PDL_VAFFOK(pdl) ? pdl->vafftrans->incs : pdl->dimincs)
+#define PDL_REPRINC(pdl,which) (PDL_REPRINCS(pdl)[which])
 
 #define PDL_REPROFFS(pdl) (PDL_VAFFOK(pdl) ? pdl->vafftrans->offs : 0)
 
 #define PDL_REPRP(pdl) (PDL_VAFFOK(pdl) ? pdl->vafftrans->from->data : pdl->data)
 
+#define PDL_TR_VAFFOK(flag) (flag & PDL_TPDL_VAFFINE_OK)
 #define PDL_REPRP_TRANS(pdl,flag) ((PDL_VAFFOK(pdl) && \
-      (flag & PDL_TPDL_VAFFINE_OK)) ? pdl->vafftrans->from->data : pdl->data)
+      PDL_TR_VAFFOK(flag)) ? pdl->vafftrans->from->data : pdl->data)
+#define VAFFINE_FLAG_OK(flags,i) ((flags == NULL) ? 1 : PDL_TR_VAFFOK(flags[i]))
 
-#define VAFFINE_FLAG_OK(flags,i) ((flags == NULL) ? 1 : (flags[i] & \
-                                  PDL_TPDL_VAFFINE_OK))
-
-typedef struct pdl_children {
-        pdl_trans *trans_parent[PDL_NCHILDREN];
-        struct pdl_children *next;
-} pdl_children;
+typedef struct pdl_trans_children {
+        pdl_trans *trans[PDL_NCHILDREN];
+        struct pdl_trans_children *next;
+} pdl_trans_children;
 
 struct pdl_magic;
 
@@ -491,10 +523,10 @@ struct pdl {
                           never get destroyed */
    void *datasv;        /* Pointer to SV containing data. We own one inc of refcnt */
    void *data;            /* Pointer to actual data (in SV), or NULL if we have no data      */
-   /* bad value stored as double, since get_badvalue returns a double */
    PDL_Anyval badvalue; /* BAD value is stored as a PDL_Anyval for portability */
-   int has_badvalue;     /* flag is required by pdlapi.c (compare to PDL_BADVAL above -- why two? --CED) */
-   PDL_Indx nvals; /* Actual size of data (not quite nelem in case of dummy) */
+   int has_badvalue;     /* whether this pdl has non-default badval */
+   PDL_Indx nvals; /* Real number of elements (not quite nelem in case of dummy) */
+   PDL_Indx nbytes; /* number of bytes allocated in data */
    pdl_datatypes datatype; /* One of the usual suspects (PDL_L, PDL_D, etc.) */
    PDL_Indx   *dims;      /* Array of data dimensions - could point below or to an allocated array */
    PDL_Indx   *dimincs;   /* Array of data default increments, aka strides through memory for each dim (0 for dummies) */
@@ -503,7 +535,7 @@ struct pdl {
    PDL_Indx *threadids;  /* Starting index of the thread index set n */
    PDL_Indx nthreadids;
 
-   pdl_children children;
+   pdl_trans_children trans_children;
 
    PDL_Indx   def_dims[PDL_NDIMS];   /* Preallocated space for efficiency */
    PDL_Indx   def_dimincs[PDL_NDIMS];   /* Preallocated space for efficiency */
@@ -523,16 +555,16 @@ typedef struct pdl_slice_args {
 } pdl_slice_args;
 
 /*************
- * Some macros for looping over the children of a given PDL
+ * Some macros for looping over the trans_children of a given PDL
  */
 #define PDL_DECL_CHILDLOOP(p) \
-                int p##__i; pdl_children *p##__c;
+                int p##__i; pdl_trans_children *p##__c;
 #define PDL_START_CHILDLOOP(p) \
-                p##__c = &p->children; \
+                p##__c = &p->trans_children; \
                 do { \
                         for(p##__i=0; p##__i<PDL_NCHILDREN; p##__i++) { \
-                                if(p##__c->trans_parent[p##__i]) {
-#define PDL_CHILDLOOP_THISCHILD(p) p##__c->trans_parent[p##__i]
+                                if(p##__c->trans[p##__i]) {
+#define PDL_CHILDLOOP_THISCHILD(p) p##__c->trans[p##__i]
 #define PDL_END_CHILDLOOP(p) \
                                 } \
                         } \
@@ -549,17 +581,20 @@ typedef struct pdl_slice_args {
  * Some macros to guard against dataflow infinite recursion.
  */
 #define DECL_RECURSE_GUARD static int __nrec=0;
-#define START_RECURSE_GUARD __nrec++; if(__nrec > 1000) {__nrec=0; die("PDL:Internal Error: data structure recursion limit exceeded (max 1000 levels)\n\tThis could mean that you have found an infinite-recursion error in PDL, or\n\tthat you are building data structures with very long dataflow dependency\n\tchains.  You may want to try using sever() to break the dependency.\n");}
+#define START_RECURSE_GUARD __nrec++; if(__nrec > 1000) {__nrec=0; return pdl_make_error_simple(PDL_EUSERERROR, "PDL:Internal Error: data structure recursion limit exceeded (max 1000 levels)\n\tThis could mean that you have found an infinite-recursion error in PDL, or\n\tthat you are building data structures with very long dataflow dependency\n\tchains.  You may want to try using sever() to break the dependency.\n");}
 #define ABORT_RECURSE_GUARD __nrec=0;
 #define END_RECURSE_GUARD __nrec--;
 
-#define PDL_ENSURE_ALLOCATED(it) ( (void)((it->state & PDL_ALLOCATED) || ((pdl_allocdata(it)),1)) )
-#define PDL_ENSURE_VAFFTRANS(it) \
-  ( ((!it->vafftrans) || (it->vafftrans->ndims < it->ndims)) && \
-    (pdl_vafftrans_alloc(it),1) )
+#define PDL_RETERROR(rv, expr) \
+  do { rv = expr; if (rv.error) return rv; } while (0)
 
-/* for use with PDL_GENERICLIST_REAL */
-#define PDL_QSORT(symbol, ctype, ppsym, shortctype, defbval) \
+#define PDL_ENSURE_ALLOCATED(it) \
+  if (!(it->state & PDL_ALLOCATED)) { \
+    PDL_RETERROR(PDL_err, pdl_allocdata(it)); \
+  }
+
+/* for use with PDL_TYPELIST_REAL */
+#define PDL_QSORT(symbol, ctype, ppsym, ...) \
   static inline void qsort_ ## ppsym(ctype* xx, PDL_Indx a, PDL_Indx b) { \
      PDL_Indx i,j; \
      ctype t, median; \

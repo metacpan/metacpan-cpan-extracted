@@ -22,7 +22,7 @@
       "runtime" : {
          "requires" : {
             "Future" : "0",
-            "Future::IO::ImplBase" : "0",
+            "Future::IO::ImplBase" : "0.11",
             "UV" : "1.900",
             "perl" : "5.014"
          }
@@ -37,7 +37,7 @@
    "provides" : {
       "Future::IO::Impl::UV" : {
          "file" : "lib/Future/IO/Impl/UV.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -46,6 +46,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

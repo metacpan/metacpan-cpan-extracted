@@ -34,7 +34,7 @@ Install Carton ( https://metacpan.org/pod/Carton  ), then dependencies:
 	perl dev/dev.pl
 Do something with code and test:
 	carton exec dzil test
-	(don't forget change release in dist.init)
+	(don't forget change release in dist.ini)
 	carton exec dzil build
 	(git commit/push)
 	carton exec dzil release (sets the tag verstion in git)
@@ -56,7 +56,7 @@ You can also look for information at:
 
 COPYRIGHT AND LICENCE
 
-Copyright © 2017-2021 Vladimir Varlamov <bes.internal@gmail.com>
+Copyright © 2017-2022 Vladimir Varlamov <bes.internal@gmail.com>
 This module is adapted copy of Date-Holidays-RU:
 Copyright © 2014 Alexander Nalobin <alexander@nalobin.ru>
 

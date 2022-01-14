@@ -10,7 +10,7 @@ my $build = Module::Build->new(
       'perl' => '5.014',
 
       'Future' => 0,
-      'Future::IO::ImplBase' => 0,
+      'Future::IO::ImplBase' => '0.11',
       'UV' => "1.900",
    },
    test_requires => {

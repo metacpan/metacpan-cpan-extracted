@@ -15,7 +15,6 @@ my @files = (
     't/as_return.t',
     't/as_scalar_ref.t',
     't/basic.t',
-    't/basic.t.orig',
     't/croak.t',
     't/defined.t',
     't/exists.t',
@@ -25,7 +24,6 @@ my @files = (
     't/lvalue.t',
     't/lvalue_undef.t',
     't/methods.t',
-    't/predicate.t',
     't/recurse.t',
     't/subclass.t',
     't/undef.t'

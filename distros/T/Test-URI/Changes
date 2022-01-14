@@ -1,5 +1,8 @@
 Revision history for Perl module Test::URI
 
+1.084 2022-01-09T02:38:09Z
+	* no code changes. Fix link in README.pod.
+
 1.083 2021-01-17T11:04:56Z
 	* freshen distro, remove Travis CI, add Github Actions
 

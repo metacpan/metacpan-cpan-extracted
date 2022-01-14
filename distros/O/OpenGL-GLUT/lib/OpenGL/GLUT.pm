@@ -8,18 +8,17 @@ package OpenGL::GLUT;
 #  This program is free software; you can redistribute it and/or
 #  modify it under the same terms as Perl itself.
 
+use strict;
+use warnings;
 require Exporter;
 require DynaLoader;
 
 use Carp;
 
-our $VERSION = '0.71';
-$XS_VERSION = $VERSION;
-$VERSION = eval($VERSION);
-
-@ISA = qw(Exporter AutoLoader DynaLoader);
-
-our $gl_version;
+our $VERSION = '0.72';
+our $XS_VERSION = $VERSION;
+our @ISA = qw(Exporter DynaLoader);
+our ($gl_version, $AUTOLOAD);
 our $glext_installed = {};
 
 # Implemented extensions and their dependencies
@@ -108,8 +107,7 @@ our $glext_dependencies =
    GL_SUN_slice_accum=>'1.0' #258
 };
 
-
-@glut_func = qw(
+my @glut_func = qw(
    done_glutInit
    glutAddMenuEntry
    glutAddSubMenu
@@ -247,7 +245,7 @@ our $glext_dependencies =
 ##
 ##------------------------------------------------------------------------
 
-@glut_const = qw(
+my @glut_const = qw(
    GLUT_API_VERSION
    GLUT_XLIB_IMPLEMENTATION
    GLUT_RGB
@@ -407,15 +405,15 @@ our $glext_dependencies =
    GLUT_GAME_MODE_DISPLAY_CHANGED
 );
 
-@EXPORT = ();
+our @EXPORT = ();
 
 # Other items we are prepared to export if requested
-@EXPORT_OK = (@glut_func, @glut_const);
+our @EXPORT_OK = (@glut_func, @glut_const);
 
-@constants = (@glut_const);
-@functions = (@glut_func);
+my @constants = (@glut_const);
+my @functions = (@glut_func);
 
-%EXPORT_TAGS = ('constants' => \@constants, 'functions' => \@functions, 'all' => \@EXPORT_OK,
+our %EXPORT_TAGS = ('constants' => \@constants, 'functions' => \@functions, 'all' => \@EXPORT_OK,
 	'glutconstants' => \@glut_const, 'glutfunctions' => \@glut_func,
 );
 
@@ -428,22 +426,19 @@ sub AUTOLOAD {
     # Avoid old-style ``&CONST'' usage. Either remove the ``&'' or add ``()''.
     if (@_ > 0) {
         # Is it an old OpenGL-0.4 function? If so, remap it to newer variant
-        local($constname);
-        ($constname = $AUTOLOAD) =~ s/.*:://;
-
+        (my $constname = $AUTOLOAD) =~ s/.*:://;
         $AutoLoader::AUTOLOAD = $AUTOLOAD;
         goto &AutoLoader::AUTOLOAD;
     }
-    local($constname);
-    ($constname = $AUTOLOAD) =~ s/.*:://;
-    $val = constant($constname, @_ ? $_[0] : 0);
+    (my $constname = $AUTOLOAD) =~ s/.*:://;
+    my $val = constant($constname, @_ ? $_[0] : 0);
     if (not defined $val) {
 	if ($! =~ /Invalid/) {
 	    $AutoLoader::AUTOLOAD = $AUTOLOAD;
 	    goto &AutoLoader::AUTOLOAD;
 	}
 	else {
-	    ($pack,$file,$line) = caller;
+	    my ($pack,$file,$line) = caller;
 	    die "Your vendor has not defined OpenGL macro $constname, used at $file line $line.
 ";
 	}
@@ -477,6 +472,9 @@ OpenGL module.  The purpose is to make this functionality
 available independent of the legacy OpenGL module for use with
 OpenGL::Modern.
 
+When you register a C<glutCloseFunc>, ensure that you de-register it
+before destroying the window. See the supplied F<test.pl>.
+
 =head2 EXPORT
 
   :all - exports all GLUT functions and constants
@@ -494,6 +492,7 @@ OpenGL::Modern.
   void glutButtonBoxFunc( void (* callback)( int, int ) )
   void glutChangeToMenuEntry( int item, const char* label, int value )
   void glutChangeToSubMenu( int item, const char* label, int value )
+  void glutCloseFunc( void (* callback)( void ) )
   void glutCopyColormap( int window )
   int glutCreateMenu( void (* callback)( int menu ) )
   int glutCreateSubWindow( int window, int x, int y, int width, int height )
@@ -599,11 +598,9 @@ OpenGL::Modern.
   void glutWireTetrahedron( void )
   void glutWireTorus( GLdouble innerRadius, GLdouble outerRadius, GLint sides, GLint rings )
 
-
-
 =head1 SEE ALSO
 
-TODO
+L<OpenGL> (for now)
 
 =head1 AUTHOR
 

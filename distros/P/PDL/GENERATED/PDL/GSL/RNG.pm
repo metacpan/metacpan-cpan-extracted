@@ -20,6 +20,11 @@ use DynaLoader;
 
 
 
+
+#line 10 "gsl_random.pd"
+use strict;
+use warnings;
+
 =head1 NAME
 
 PDL::GSL::RNG - PDL interface to RNG and randist routines in GSL
@@ -1273,6 +1278,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL RNG and randist modules were written by James Theiler.
 
 =cut
+#line 1282 "RNG.pm"
 
 
 
@@ -1280,7 +1286,7 @@ The GSL RNG and randist modules were written by James Theiler.
 
 
 
-
+#line 1310 "gsl_random.pd"
 
 use strict;
 
@@ -1292,8 +1298,11 @@ sub nullcreate{
 
 	PDL->nullcreate($arg);
 }
+#line 1302 "RNG.pm"
 
 
+
+#line 1324 "gsl_random.pd"
 
 sub get_uniform {
 my ($obj,@var) = @_;if (ref($var[0]) eq 'PDL') {
@@ -1308,8 +1317,11 @@ else {
     return $p;
 }
 }
+#line 1321 "RNG.pm"
 
 
+
+#line 1325 "gsl_random.pd"
 
 sub get_uniform_pos {
 my ($obj,@var) = @_;if (ref($var[0]) eq 'PDL') {
@@ -1324,8 +1336,11 @@ else {
     return $p;
 }
 }
+#line 1340 "RNG.pm"
 
 
+
+#line 1326 "gsl_random.pd"
 
 sub get {
 my ($obj,@var) = @_;if (ref($var[0]) eq 'PDL') {
@@ -1340,8 +1355,11 @@ else {
     return $p;
 }
 }
+#line 1359 "RNG.pm"
 
 
+
+#line 1327 "gsl_random.pd"
 
 sub get_int {
 my ($obj,$n,@var) = @_;if (!($n>0)) {barf("first parameter must be an int >0")};if (ref($var[0]) eq 'PDL') {
@@ -1356,38 +1374,41 @@ else {
     return $p;
 }
 }
+#line 1378 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *gsl_get_uniform_meat = \&PDL::GSL::RNG::gsl_get_uniform_meat;
+#line 1384 "RNG.pm"
 
 
 
-
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *gsl_get_uniform_pos_meat = \&PDL::GSL::RNG::gsl_get_uniform_pos_meat;
+#line 1390 "RNG.pm"
 
 
 
-
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *gsl_get_meat = \&PDL::GSL::RNG::gsl_get_meat;
+#line 1396 "RNG.pm"
 
 
 
-
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *gsl_get_int_meat = \&PDL::GSL::RNG::gsl_get_int_meat;
+#line 1402 "RNG.pm"
 
 
 
-
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_gaussian_meat = \&PDL::GSL::RNG::ran_gaussian_meat;
+#line 1408 "RNG.pm"
 
 
 
+#line 1408 "gsl_random.pd"
 
 sub ran_gaussian {
 my ($obj,$a,@var) = @_;
@@ -1403,28 +1424,34 @@ else {
     return $p;
 }
 }
+#line 1428 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_gaussian_var_meat = \&PDL::GSL::RNG::ran_gaussian_var_meat;
+#line 1434 "RNG.pm"
 
 
 
+#line 1432 "gsl_random.pd"
 
 sub ran_gaussian_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 1) {barf("Bad number of parameters!");}
     return ran_gaussian_var_meat(@var,$$obj);
 }
+#line 1445 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_ugaussian_tail_meat = \&PDL::GSL::RNG::ran_ugaussian_tail_meat;
+#line 1451 "RNG.pm"
 
 
 
+#line 1408 "gsl_random.pd"
 
 sub ran_ugaussian_tail {
 my ($obj,$a,@var) = @_;
@@ -1440,28 +1467,34 @@ else {
     return $p;
 }
 }
+#line 1471 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_ugaussian_tail_var_meat = \&PDL::GSL::RNG::ran_ugaussian_tail_var_meat;
+#line 1477 "RNG.pm"
 
 
 
+#line 1432 "gsl_random.pd"
 
 sub ran_ugaussian_tail_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 1) {barf("Bad number of parameters!");}
     return ran_ugaussian_tail_var_meat(@var,$$obj);
 }
+#line 1488 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_exponential_meat = \&PDL::GSL::RNG::ran_exponential_meat;
+#line 1494 "RNG.pm"
 
 
 
+#line 1408 "gsl_random.pd"
 
 sub ran_exponential {
 my ($obj,$a,@var) = @_;
@@ -1477,28 +1510,34 @@ else {
     return $p;
 }
 }
+#line 1514 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_exponential_var_meat = \&PDL::GSL::RNG::ran_exponential_var_meat;
+#line 1520 "RNG.pm"
 
 
 
+#line 1432 "gsl_random.pd"
 
 sub ran_exponential_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 1) {barf("Bad number of parameters!");}
     return ran_exponential_var_meat(@var,$$obj);
 }
+#line 1531 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_laplace_meat = \&PDL::GSL::RNG::ran_laplace_meat;
+#line 1537 "RNG.pm"
 
 
 
+#line 1408 "gsl_random.pd"
 
 sub ran_laplace {
 my ($obj,$a,@var) = @_;
@@ -1514,28 +1553,34 @@ else {
     return $p;
 }
 }
+#line 1557 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_laplace_var_meat = \&PDL::GSL::RNG::ran_laplace_var_meat;
+#line 1563 "RNG.pm"
 
 
 
+#line 1432 "gsl_random.pd"
 
 sub ran_laplace_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 1) {barf("Bad number of parameters!");}
     return ran_laplace_var_meat(@var,$$obj);
 }
+#line 1574 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_exppow_meat = \&PDL::GSL::RNG::ran_exppow_meat;
+#line 1580 "RNG.pm"
 
 
 
+#line 1408 "gsl_random.pd"
 
 sub ran_exppow {
 my ($obj,$a,$b,@var) = @_;
@@ -1551,28 +1596,34 @@ else {
     return $p;
 }
 }
+#line 1600 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_exppow_var_meat = \&PDL::GSL::RNG::ran_exppow_var_meat;
+#line 1606 "RNG.pm"
 
 
 
+#line 1432 "gsl_random.pd"
 
 sub ran_exppow_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 2) {barf("Bad number of parameters!");}
     return ran_exppow_var_meat(@var,$$obj);
 }
+#line 1617 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_cauchy_meat = \&PDL::GSL::RNG::ran_cauchy_meat;
+#line 1623 "RNG.pm"
 
 
 
+#line 1408 "gsl_random.pd"
 
 sub ran_cauchy {
 my ($obj,$a,@var) = @_;
@@ -1588,28 +1639,34 @@ else {
     return $p;
 }
 }
+#line 1643 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_cauchy_var_meat = \&PDL::GSL::RNG::ran_cauchy_var_meat;
+#line 1649 "RNG.pm"
 
 
 
+#line 1432 "gsl_random.pd"
 
 sub ran_cauchy_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 1) {barf("Bad number of parameters!");}
     return ran_cauchy_var_meat(@var,$$obj);
 }
+#line 1660 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_rayleigh_meat = \&PDL::GSL::RNG::ran_rayleigh_meat;
+#line 1666 "RNG.pm"
 
 
 
+#line 1408 "gsl_random.pd"
 
 sub ran_rayleigh {
 my ($obj,$a,@var) = @_;
@@ -1625,28 +1682,34 @@ else {
     return $p;
 }
 }
+#line 1686 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_rayleigh_var_meat = \&PDL::GSL::RNG::ran_rayleigh_var_meat;
+#line 1692 "RNG.pm"
 
 
 
+#line 1432 "gsl_random.pd"
 
 sub ran_rayleigh_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 1) {barf("Bad number of parameters!");}
     return ran_rayleigh_var_meat(@var,$$obj);
 }
+#line 1703 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_rayleigh_tail_meat = \&PDL::GSL::RNG::ran_rayleigh_tail_meat;
+#line 1709 "RNG.pm"
 
 
 
+#line 1408 "gsl_random.pd"
 
 sub ran_rayleigh_tail {
 my ($obj,$a,$b,@var) = @_;
@@ -1662,28 +1725,34 @@ else {
     return $p;
 }
 }
+#line 1729 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_rayleigh_tail_var_meat = \&PDL::GSL::RNG::ran_rayleigh_tail_var_meat;
+#line 1735 "RNG.pm"
 
 
 
+#line 1432 "gsl_random.pd"
 
 sub ran_rayleigh_tail_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 2) {barf("Bad number of parameters!");}
     return ran_rayleigh_tail_var_meat(@var,$$obj);
 }
+#line 1746 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_levy_meat = \&PDL::GSL::RNG::ran_levy_meat;
+#line 1752 "RNG.pm"
 
 
 
+#line 1408 "gsl_random.pd"
 
 sub ran_levy {
 my ($obj,$a,$b,@var) = @_;
@@ -1699,28 +1768,34 @@ else {
     return $p;
 }
 }
+#line 1772 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_levy_var_meat = \&PDL::GSL::RNG::ran_levy_var_meat;
+#line 1778 "RNG.pm"
 
 
 
+#line 1432 "gsl_random.pd"
 
 sub ran_levy_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 2) {barf("Bad number of parameters!");}
     return ran_levy_var_meat(@var,$$obj);
 }
+#line 1789 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_gamma_meat = \&PDL::GSL::RNG::ran_gamma_meat;
+#line 1795 "RNG.pm"
 
 
 
+#line 1408 "gsl_random.pd"
 
 sub ran_gamma {
 my ($obj,$a,$b,@var) = @_;
@@ -1736,28 +1811,34 @@ else {
     return $p;
 }
 }
+#line 1815 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_gamma_var_meat = \&PDL::GSL::RNG::ran_gamma_var_meat;
+#line 1821 "RNG.pm"
 
 
 
+#line 1432 "gsl_random.pd"
 
 sub ran_gamma_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 2) {barf("Bad number of parameters!");}
     return ran_gamma_var_meat(@var,$$obj);
 }
+#line 1832 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_flat_meat = \&PDL::GSL::RNG::ran_flat_meat;
+#line 1838 "RNG.pm"
 
 
 
+#line 1408 "gsl_random.pd"
 
 sub ran_flat {
 my ($obj,$a,$b,@var) = @_;
@@ -1773,28 +1854,34 @@ else {
     return $p;
 }
 }
+#line 1858 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_flat_var_meat = \&PDL::GSL::RNG::ran_flat_var_meat;
+#line 1864 "RNG.pm"
 
 
 
+#line 1432 "gsl_random.pd"
 
 sub ran_flat_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 2) {barf("Bad number of parameters!");}
     return ran_flat_var_meat(@var,$$obj);
 }
+#line 1875 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_lognormal_meat = \&PDL::GSL::RNG::ran_lognormal_meat;
+#line 1881 "RNG.pm"
 
 
 
+#line 1408 "gsl_random.pd"
 
 sub ran_lognormal {
 my ($obj,$a,$b,@var) = @_;
@@ -1810,28 +1897,34 @@ else {
     return $p;
 }
 }
+#line 1901 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_lognormal_var_meat = \&PDL::GSL::RNG::ran_lognormal_var_meat;
+#line 1907 "RNG.pm"
 
 
 
+#line 1432 "gsl_random.pd"
 
 sub ran_lognormal_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 2) {barf("Bad number of parameters!");}
     return ran_lognormal_var_meat(@var,$$obj);
 }
+#line 1918 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_chisq_meat = \&PDL::GSL::RNG::ran_chisq_meat;
+#line 1924 "RNG.pm"
 
 
 
+#line 1408 "gsl_random.pd"
 
 sub ran_chisq {
 my ($obj,$a,@var) = @_;
@@ -1847,28 +1940,34 @@ else {
     return $p;
 }
 }
+#line 1944 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_chisq_var_meat = \&PDL::GSL::RNG::ran_chisq_var_meat;
+#line 1950 "RNG.pm"
 
 
 
+#line 1432 "gsl_random.pd"
 
 sub ran_chisq_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 1) {barf("Bad number of parameters!");}
     return ran_chisq_var_meat(@var,$$obj);
 }
+#line 1961 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_fdist_meat = \&PDL::GSL::RNG::ran_fdist_meat;
+#line 1967 "RNG.pm"
 
 
 
+#line 1408 "gsl_random.pd"
 
 sub ran_fdist {
 my ($obj,$a,$b,@var) = @_;
@@ -1884,28 +1983,34 @@ else {
     return $p;
 }
 }
+#line 1987 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_fdist_var_meat = \&PDL::GSL::RNG::ran_fdist_var_meat;
+#line 1993 "RNG.pm"
 
 
 
+#line 1432 "gsl_random.pd"
 
 sub ran_fdist_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 2) {barf("Bad number of parameters!");}
     return ran_fdist_var_meat(@var,$$obj);
 }
+#line 2004 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_tdist_meat = \&PDL::GSL::RNG::ran_tdist_meat;
+#line 2010 "RNG.pm"
 
 
 
+#line 1408 "gsl_random.pd"
 
 sub ran_tdist {
 my ($obj,$a,@var) = @_;
@@ -1921,28 +2026,34 @@ else {
     return $p;
 }
 }
+#line 2030 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_tdist_var_meat = \&PDL::GSL::RNG::ran_tdist_var_meat;
+#line 2036 "RNG.pm"
 
 
 
+#line 1432 "gsl_random.pd"
 
 sub ran_tdist_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 1) {barf("Bad number of parameters!");}
     return ran_tdist_var_meat(@var,$$obj);
 }
+#line 2047 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_beta_meat = \&PDL::GSL::RNG::ran_beta_meat;
+#line 2053 "RNG.pm"
 
 
 
+#line 1408 "gsl_random.pd"
 
 sub ran_beta {
 my ($obj,$a,$b,@var) = @_;
@@ -1958,28 +2069,34 @@ else {
     return $p;
 }
 }
+#line 2073 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_beta_var_meat = \&PDL::GSL::RNG::ran_beta_var_meat;
+#line 2079 "RNG.pm"
 
 
 
+#line 1432 "gsl_random.pd"
 
 sub ran_beta_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 2) {barf("Bad number of parameters!");}
     return ran_beta_var_meat(@var,$$obj);
 }
+#line 2090 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_logistic_meat = \&PDL::GSL::RNG::ran_logistic_meat;
+#line 2096 "RNG.pm"
 
 
 
+#line 1408 "gsl_random.pd"
 
 sub ran_logistic {
 my ($obj,$a,@var) = @_;
@@ -1995,28 +2112,34 @@ else {
     return $p;
 }
 }
+#line 2116 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_logistic_var_meat = \&PDL::GSL::RNG::ran_logistic_var_meat;
+#line 2122 "RNG.pm"
 
 
 
+#line 1432 "gsl_random.pd"
 
 sub ran_logistic_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 1) {barf("Bad number of parameters!");}
     return ran_logistic_var_meat(@var,$$obj);
 }
+#line 2133 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_pareto_meat = \&PDL::GSL::RNG::ran_pareto_meat;
+#line 2139 "RNG.pm"
 
 
 
+#line 1408 "gsl_random.pd"
 
 sub ran_pareto {
 my ($obj,$a,$b,@var) = @_;
@@ -2032,28 +2155,34 @@ else {
     return $p;
 }
 }
+#line 2159 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_pareto_var_meat = \&PDL::GSL::RNG::ran_pareto_var_meat;
+#line 2165 "RNG.pm"
 
 
 
+#line 1432 "gsl_random.pd"
 
 sub ran_pareto_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 2) {barf("Bad number of parameters!");}
     return ran_pareto_var_meat(@var,$$obj);
 }
+#line 2176 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_weibull_meat = \&PDL::GSL::RNG::ran_weibull_meat;
+#line 2182 "RNG.pm"
 
 
 
+#line 1408 "gsl_random.pd"
 
 sub ran_weibull {
 my ($obj,$a,$b,@var) = @_;
@@ -2069,28 +2198,34 @@ else {
     return $p;
 }
 }
+#line 2202 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_weibull_var_meat = \&PDL::GSL::RNG::ran_weibull_var_meat;
+#line 2208 "RNG.pm"
 
 
 
+#line 1432 "gsl_random.pd"
 
 sub ran_weibull_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 2) {barf("Bad number of parameters!");}
     return ran_weibull_var_meat(@var,$$obj);
 }
+#line 2219 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_gumbel1_meat = \&PDL::GSL::RNG::ran_gumbel1_meat;
+#line 2225 "RNG.pm"
 
 
 
+#line 1408 "gsl_random.pd"
 
 sub ran_gumbel1 {
 my ($obj,$a,$b,@var) = @_;
@@ -2106,28 +2241,34 @@ else {
     return $p;
 }
 }
+#line 2245 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_gumbel1_var_meat = \&PDL::GSL::RNG::ran_gumbel1_var_meat;
+#line 2251 "RNG.pm"
 
 
 
+#line 1432 "gsl_random.pd"
 
 sub ran_gumbel1_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 2) {barf("Bad number of parameters!");}
     return ran_gumbel1_var_meat(@var,$$obj);
 }
+#line 2262 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_gumbel2_meat = \&PDL::GSL::RNG::ran_gumbel2_meat;
+#line 2268 "RNG.pm"
 
 
 
+#line 1408 "gsl_random.pd"
 
 sub ran_gumbel2 {
 my ($obj,$a,$b,@var) = @_;
@@ -2143,28 +2284,34 @@ else {
     return $p;
 }
 }
+#line 2288 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_gumbel2_var_meat = \&PDL::GSL::RNG::ran_gumbel2_var_meat;
+#line 2294 "RNG.pm"
 
 
 
+#line 1432 "gsl_random.pd"
 
 sub ran_gumbel2_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 2) {barf("Bad number of parameters!");}
     return ran_gumbel2_var_meat(@var,$$obj);
 }
+#line 2305 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_poisson_meat = \&PDL::GSL::RNG::ran_poisson_meat;
+#line 2311 "RNG.pm"
 
 
 
+#line 1408 "gsl_random.pd"
 
 sub ran_poisson {
 my ($obj,$a,@var) = @_;
@@ -2180,28 +2327,34 @@ else {
     return $p;
 }
 }
+#line 2331 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_poisson_var_meat = \&PDL::GSL::RNG::ran_poisson_var_meat;
+#line 2337 "RNG.pm"
 
 
 
+#line 1432 "gsl_random.pd"
 
 sub ran_poisson_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 1) {barf("Bad number of parameters!");}
     return ran_poisson_var_meat(@var,$$obj);
 }
+#line 2348 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_bernoulli_meat = \&PDL::GSL::RNG::ran_bernoulli_meat;
+#line 2354 "RNG.pm"
 
 
 
+#line 1408 "gsl_random.pd"
 
 sub ran_bernoulli {
 my ($obj,$a,@var) = @_;
@@ -2217,28 +2370,34 @@ else {
     return $p;
 }
 }
+#line 2374 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_bernoulli_var_meat = \&PDL::GSL::RNG::ran_bernoulli_var_meat;
+#line 2380 "RNG.pm"
 
 
 
+#line 1432 "gsl_random.pd"
 
 sub ran_bernoulli_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 1) {barf("Bad number of parameters!");}
     return ran_bernoulli_var_meat(@var,$$obj);
 }
+#line 2391 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_binomial_meat = \&PDL::GSL::RNG::ran_binomial_meat;
+#line 2397 "RNG.pm"
 
 
 
+#line 1408 "gsl_random.pd"
 
 sub ran_binomial {
 my ($obj,$a,$b,@var) = @_;
@@ -2254,28 +2413,34 @@ else {
     return $p;
 }
 }
+#line 2417 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_binomial_var_meat = \&PDL::GSL::RNG::ran_binomial_var_meat;
+#line 2423 "RNG.pm"
 
 
 
+#line 1432 "gsl_random.pd"
 
 sub ran_binomial_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 2) {barf("Bad number of parameters!");}
     return ran_binomial_var_meat(@var,$$obj);
 }
+#line 2434 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_negative_binomial_meat = \&PDL::GSL::RNG::ran_negative_binomial_meat;
+#line 2440 "RNG.pm"
 
 
 
+#line 1408 "gsl_random.pd"
 
 sub ran_negative_binomial {
 my ($obj,$a,$b,@var) = @_;
@@ -2291,28 +2456,34 @@ else {
     return $p;
 }
 }
+#line 2460 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_negative_binomial_var_meat = \&PDL::GSL::RNG::ran_negative_binomial_var_meat;
+#line 2466 "RNG.pm"
 
 
 
+#line 1432 "gsl_random.pd"
 
 sub ran_negative_binomial_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 2) {barf("Bad number of parameters!");}
     return ran_negative_binomial_var_meat(@var,$$obj);
 }
+#line 2477 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_pascal_meat = \&PDL::GSL::RNG::ran_pascal_meat;
+#line 2483 "RNG.pm"
 
 
 
+#line 1408 "gsl_random.pd"
 
 sub ran_pascal {
 my ($obj,$a,$b,@var) = @_;
@@ -2328,28 +2499,34 @@ else {
     return $p;
 }
 }
+#line 2503 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_pascal_var_meat = \&PDL::GSL::RNG::ran_pascal_var_meat;
+#line 2509 "RNG.pm"
 
 
 
+#line 1432 "gsl_random.pd"
 
 sub ran_pascal_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 2) {barf("Bad number of parameters!");}
     return ran_pascal_var_meat(@var,$$obj);
 }
+#line 2520 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_geometric_meat = \&PDL::GSL::RNG::ran_geometric_meat;
+#line 2526 "RNG.pm"
 
 
 
+#line 1408 "gsl_random.pd"
 
 sub ran_geometric {
 my ($obj,$a,@var) = @_;
@@ -2365,28 +2542,34 @@ else {
     return $p;
 }
 }
+#line 2546 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_geometric_var_meat = \&PDL::GSL::RNG::ran_geometric_var_meat;
+#line 2552 "RNG.pm"
 
 
 
+#line 1432 "gsl_random.pd"
 
 sub ran_geometric_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 1) {barf("Bad number of parameters!");}
     return ran_geometric_var_meat(@var,$$obj);
 }
+#line 2563 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_hypergeometric_meat = \&PDL::GSL::RNG::ran_hypergeometric_meat;
+#line 2569 "RNG.pm"
 
 
 
+#line 1408 "gsl_random.pd"
 
 sub ran_hypergeometric {
 my ($obj,$a,$b,$c,@var) = @_;
@@ -2402,28 +2585,34 @@ else {
     return $p;
 }
 }
+#line 2589 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_hypergeometric_var_meat = \&PDL::GSL::RNG::ran_hypergeometric_var_meat;
+#line 2595 "RNG.pm"
 
 
 
+#line 1432 "gsl_random.pd"
 
 sub ran_hypergeometric_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 3) {barf("Bad number of parameters!");}
     return ran_hypergeometric_var_meat(@var,$$obj);
 }
+#line 2606 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_logarithmic_meat = \&PDL::GSL::RNG::ran_logarithmic_meat;
+#line 2612 "RNG.pm"
 
 
 
+#line 1408 "gsl_random.pd"
 
 sub ran_logarithmic {
 my ($obj,$a,@var) = @_;
@@ -2439,140 +2628,149 @@ else {
     return $p;
 }
 }
+#line 2632 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_logarithmic_var_meat = \&PDL::GSL::RNG::ran_logarithmic_var_meat;
+#line 2638 "RNG.pm"
 
 
 
+#line 1432 "gsl_random.pd"
 
 sub ran_logarithmic_var {
 my ($obj,@var) = @_;
     if (scalar(@var) != 1) {barf("Bad number of parameters!");}
     return ran_logarithmic_var_meat(@var,$$obj);
 }
+#line 2649 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_additive_gaussian_meat = \&PDL::GSL::RNG::ran_additive_gaussian_meat;
+#line 2655 "RNG.pm"
 
 
 
+#line 1522 "gsl_random.pd"
 
        sub ran_additive_gaussian {
-	 my ($obj,$sigma,@var) = @_;
-	 if (ref($var[0]) eq 'PDL') {
-	   ran_additive_gaussian_meat($var[0],$sigma,$$obj);
-	   return $var[0];
-	 }
-	 else {
-	   barf("In additive gaussian mode you must specify an ndarray!");
-	 }
+	 my ($obj,$sigma,$var) = @_;
+	 barf("In additive gaussian mode you must specify an ndarray!")
+	   if ref($var) ne 'PDL';
+	 ran_additive_gaussian_meat($var,$sigma,$$obj);
+	 return $var;
        }
        
+#line 2669 "RNG.pm"
 
 
 
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_additive_poisson_meat = \&PDL::GSL::RNG::ran_additive_poisson_meat;
+#line 2675 "RNG.pm"
 
 
 
+#line 1538 "gsl_random.pd"
 
        sub ran_additive_poisson {
-	 my ($obj,$sigma,@var) = @_;
-	 if (ref($var[0]) eq 'PDL') {
-	   ran_additive_poisson_meat($var[0],$sigma,$$obj);
-	   return $var[0];
-	 }
-	 else {
-	   barf("In additive poisson mode you must specify an ndarray!");
-	 }
+	 my ($obj,$sigma,$var) = @_;
+	 barf("In additive poisson mode you must specify an ndarray!")
+	   if ref($var) ne 'PDL';
+	 ran_additive_poisson_meat($var,$sigma,$$obj);
+	 return $var;
        }
        
+#line 2689 "RNG.pm"
 
 
 
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_feed_poisson_meat = \&PDL::GSL::RNG::ran_feed_poisson_meat;
+#line 2695 "RNG.pm"
 
 
 
+#line 1554 "gsl_random.pd"
 
        sub ran_feed_poisson {
-	 my ($obj,@var) = @_;
-	 if (ref($var[0]) eq 'PDL') {
-	   ran_feed_poisson_meat($var[0],$$obj);
-	   return $var[0];
-	 }
-	 else {
-	   barf("In poisson mode you must specify an ndarray!");
-	 }
+	 my ($obj,$var) = @_;
+	 barf("In poisson mode you must specify an ndarray!")
+	   if ref($var) ne 'PDL';
+	 ran_feed_poisson_meat($var,$$obj);
+	 return $var;
        }
        
+#line 2709 "RNG.pm"
 
 
 
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_bivariate_gaussian_meat = \&PDL::GSL::RNG::ran_bivariate_gaussian_meat;
+#line 2715 "RNG.pm"
 
 
 
+#line 1575 "gsl_random.pd"
 
        sub ran_bivariate_gaussian {
 	 my ($obj,$sigma_x,$sigma_y,$rho,$n) = @_;
-	 if ($n>0) {
-	   my $p = zeroes(2,$n);
-	   ran_bivariate_gaussian_meat($p,$sigma_x,$sigma_y,$rho,$$obj);
-	   return $p;
-	 }
-	 else {
-	   barf("Not enough parameters for gaussian bivariate!");
-	 }
+	 barf("Not enough parameters for gaussian bivariate!") if $n<=0;
+	 my $p = zeroes(2,$n);
+	 ran_bivariate_gaussian_meat($p,$sigma_x,$sigma_y,$rho,$$obj);
+	 return $p;
        }
        
+#line 2729 "RNG.pm"
 
 
 
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_dir_2d_meat = \&PDL::GSL::RNG::ran_dir_2d_meat;
+#line 2735 "RNG.pm"
 
 
 
-
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_dir_3d_meat = \&PDL::GSL::RNG::ran_dir_3d_meat;
+#line 2741 "RNG.pm"
 
 
 
-
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_dir_nd_meat = \&PDL::GSL::RNG::ran_dir_nd_meat;
+#line 2747 "RNG.pm"
 
 
 
+#line 1619 "gsl_random.pd"
 
        sub ran_dir {
 	 my ($obj,$ndim,$n) = @_;
-	 if ($n>0) {
-	   my $p = zeroes($ndim,$n);
-	   if ($ndim==2) { ran_dir_2d_meat($p,$$obj); }
-	   elsif ($ndim==3) { ran_dir_3d_meat($p,$$obj); }
-	   elsif ($ndim>=4 && $ndim<=100) { ran_dir_nd_meat($p,$ndim,$$obj); }
-	   else { barf("Bad number of dimensions!"); }
-	   return $p;
-	 }
-	 else {
-	   barf("Not enough parameters for random vectors!");
-	 }
+	 barf("Not enough parameters for random vectors!") if $n<=0;
+	 my $p = zeroes($ndim,$n);
+	 if ($ndim==2) { ran_dir_2d_meat($p,$$obj); }
+	 elsif ($ndim==3) { ran_dir_3d_meat($p,$$obj); }
+	 elsif ($ndim>=4 && $ndim<=100) { ran_dir_nd_meat($p,$ndim,$$obj); }
+	 else { barf("Bad number of dimensions!"); }
+	 return $p;
        }
        
+#line 2764 "RNG.pm"
 
 
 
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_discrete_meat = \&PDL::GSL::RNG::ran_discrete_meat;
+#line 2770 "RNG.pm"
 
 
 
+#line 1639 "gsl_random.pd"
 
 sub ran_discrete {
 my ($obj, $rdt, @var) = @_;
@@ -2588,8 +2786,11 @@ else {
     return $p;
 }
 }
+#line 2790 "RNG.pm"
 
 
+
+#line 1656 "gsl_random.pd"
 
 sub ran_shuffle_vec {
 my ($obj,@in) = @_;
@@ -2602,8 +2803,11 @@ $out[$p->at($i)]=$in[$i];
 }
 return @out;
 }
+#line 2807 "RNG.pm"
 
 
+
+#line 1670 "gsl_random.pd"
 
 sub ran_choose_vec {
 my ($obj,$nout,@in) = @_;
@@ -2617,47 +2821,48 @@ $out[$i]=$in[$pout->at($i)];
 }
 return @out;
 }
+#line 2825 "RNG.pm"
 
 
 
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_ver_meat = \&PDL::GSL::RNG::ran_ver_meat;
+#line 2831 "RNG.pm"
 
 
 
-
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *ran_caos_meat = \&PDL::GSL::RNG::ran_caos_meat;
+#line 2837 "RNG.pm"
 
 
 
+#line 1704 "gsl_random.pd"
 
        sub ran_ver {
 	 my ($obj,$x0,$r,$n) = @_;
-	 if ($n>0) {
-	   my $p = zeroes($n);
-	   ran_ver_meat($p,$x0,$r,$n,$$obj);
-	   return $p;
-	 }
-	 else {
-	   barf("Not enough parameters for ran_ver!");
-	 }
+	 barf("Not enough parameters for ran_ver!") if $n<=0;
+	 my $p = zeroes($n);
+	 ran_ver_meat($p,$x0,$r,$n,$$obj);
+	 return $p;
        }
        
+#line 2851 "RNG.pm"
 
+
+
+#line 1714 "gsl_random.pd"
 
        sub ran_caos {
 	 my ($obj,$m,$n) = @_;
-	 if ($n>0) {
-	   my $p = zeroes($n);
-	   ran_caos_meat($p,$m,$n,$$obj);
-	   return $p;
-	 }
-	 else {
-	   barf("Not enough parameters for ran_caos!");
-	 }
+	 barf("Not enough parameters for ran_caos!") if $n<=0;
+	 my $p = zeroes($n);
+	 ran_caos_meat($p,$m,$n,$$obj);
+	 return $p;
        }
        
+#line 2865 "RNG.pm"
+
 
 
 

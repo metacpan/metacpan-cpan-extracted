@@ -44,8 +44,14 @@ use Carp;
     foreach my $f (@$fixtures) {
 
         # use lstat otherwise we will read the target for symlink
-        $save_lstats->{$f} = [ lstat($f) ];
-        $save_stats->{$f}  = [ stat($f) ];    # we need both...
+        my @lstat = lstat($f)
+            or next;
+
+        my @stat  = stat($f)
+            or next;
+
+        $save_lstats->{$f} = [ @lstat ];
+        $save_stats->{$f}  = [ @stat  ];    # we need both...
         $save_checks->{$f} = {};
 
         # let keys add some randomness
@@ -114,12 +120,13 @@ use Carp;
             next if $check =~ qr{stat};        # TODO also check mocked stat maybe first
             next if $forbidden{"$check-$f"};
 
+            my $expect = $save_checks->{$f}->{$check}
+                or next;
+
             $last_check = "-$check $f";
 
             note "Checking Mocked: -$check '$f' ";
             my $got = eval qq{scalar -$check 'FAKE/$f'};
-
-            my $expect = $save_checks->{$f}->{$check};
 
             if ( $todo{"$check-$f"} || $check =~ qr{^[BT]$} ) {
 

@@ -2,6 +2,8 @@
 #define PDL_IN_CORE
 #include "pdlcore.h"
 
+#define PDL_ALL_GENTYPES { PDL_SB, PDL_B, PDL_S, PDL_US, PDL_L, PDL_UL, PDL_IND, PDL_LL, PDL_ULL, PDL_F, PDL_D, PDL_LD, PDL_CF, PDL_CD, PDL_CLD, -1 }
+
 /* generated from:
 pp_def(
        'affineinternal',
@@ -47,18 +49,22 @@ pp_def(
     } \
   }
 
-void pdl_readdata_affine(pdl_trans *trans) {
-  if (!(trans->pdls[0]->state & trans->pdls[1]->state & PDL_ALLOCATED)) return;
-#define X(sym, ctype, ppsym, shortctype, defbval) COPYDATA(ctype, 0, 1)
-  PDL_GENERICSWITCH(trans->__datatype, X)
+pdl_error pdl_readdata_affine(pdl_trans *trans) {
+  pdl_error PDL_err = {0, NULL, 0};
+  if (!(trans->pdls[0]->state & trans->pdls[1]->state & PDL_ALLOCATED)) return PDL_err;
+#define X(sym, ctype, ...) COPYDATA(ctype, 0, 1)
+  PDL_GENERICSWITCH(PDL_TYPELIST2_ALL, trans->__datatype, X, return pdl_make_error(PDL_EUSERERROR, "Not a known data type code=%d", trans->__datatype))
 #undef X
+  return PDL_err;
 }
 
-void pdl_writebackdata_affine(pdl_trans *trans) {
-  if (!(trans->pdls[0]->state & trans->pdls[1]->state & PDL_ALLOCATED)) return;
-#define X(sym, ctype, ppsym, shortctype, defbval) COPYDATA(ctype, 1, 0)
-  PDL_GENERICSWITCH(trans->__datatype, X)
+pdl_error pdl_writebackdata_affine(pdl_trans *trans) {
+  pdl_error PDL_err = {0, NULL, 0};
+  if (!(trans->pdls[0]->state & trans->pdls[1]->state & PDL_ALLOCATED)) return PDL_err;
+#define X(sym, ctype, ...) COPYDATA(ctype, 1, 0)
+  PDL_GENERICSWITCH(PDL_TYPELIST2_ALL, trans->__datatype, X, return pdl_make_error(PDL_EUSERERROR, "Not a known data type code=%d", trans->__datatype))
 #undef X
+  return PDL_err;
 }
 
 /* generated from:
@@ -67,23 +73,21 @@ pp_def( 'affine',
         TwoWay => 1,
         AffinePriv => 1,
         GlobalNew => 'affine_new',
-        OtherPars => 'PDL_Indx offspar; SV *dimlist; SV *inclist;',
+        OtherPars => 'PDL_Indx offspar; PDL_Indx dims[]; PDL_Indx incs[]',
         Comp => 'PDL_Indx nd; PDL_Indx offset; PDL_Indx sdims[$COMP(nd)];
                 PDL_Indx sincs[$COMP(nd)];',
         MakeComp => '
-                PDL_Indx i = 0, n2 = 0;
-                PDL_Indx *tmpi = pdl_packdims(inclist,&n2);
-                PDL_Indx *tmpd = pdl_packdims(dimlist,&($COMP(nd)));
-                if ($COMP(nd) < 0) {
+                PDL_Indx i = 0;
+                $COMP(nd) = dims_count;
+                if ($COMP(nd) < 0)
                       $CROAK("Affine: can not have negative no of dims");
-                }
-                if ($COMP(nd) != n2)
+                if ($COMP(nd) != incs_count)
                       $CROAK("Affine: number of incs does not match dims");
                 $DOCOMPALLOC();
                 $COMP(offset) = offspar;
                 for (i=0; i<$COMP(nd); i++) {
-                        $COMP(sdims)[i] = tmpd[i];
-                        $COMP(sincs)[i] = tmpi[i];
+                        $COMP(sdims)[i] = dims[i];
+                        $COMP(sincs)[i] = incs[i];
                 }
                 ',
         RedoDims => '
@@ -108,31 +112,37 @@ typedef struct pdl_params_affine {
   PDL_Indx  *sincs;
 } pdl_params_affine;
 
-void pdl_affine_redodims(pdl_trans *trans) {
+pdl_error pdl_affine_redodims(pdl_trans *trans) {
+  pdl_error PDL_err = {0, NULL, 0};
   pdl_params_affine *params = trans->params;
   pdl *__it = trans->pdls[1];
   pdl_hdr_childcopy(trans);
   PDL_Indx i;
-  pdl_reallocdims(__it, params->nd);
+  PDL_RETERROR(PDL_err, pdl_reallocdims(__it, params->nd));
   trans->incs = malloc(sizeof(*trans->incs) * trans->pdls[1]->ndims);
+  if (!trans->incs) return pdl_make_error_simple(PDL_EFATAL, "Out of Memory\n");
   trans->offs = params->offset;
   for (i=0;i<trans->pdls[1]->ndims;i++) {
     trans->incs[i] = params->sincs[i];
     trans->pdls[1]->dims[i] = params->sdims[i];
   }
-  pdl_setdims_careful(__it);
+  PDL_RETERROR(PDL_err, pdl_setdims_careful(__it));
   trans->dims_redone = 1;
+  return PDL_err;
 }
 
-void pdl_affine_free(pdl_trans *trans) {
+pdl_error pdl_affine_free(pdl_trans *trans, char destroy) {
+  pdl_error PDL_err = {0, NULL, 0};
   pdl_params_affine *params = trans->params;
-  PDL_TR_CLRMAGIC(trans);
-  free(params->sdims);
-  free(params->sincs);
+  if (destroy) {
+    free(params->sdims);
+    free(params->sincs);
+  }
   if ((trans)->dims_redone) free(trans->incs);
+  return PDL_err;
 }
 
-static pdl_datatypes pdl_affine_vtable_gentypes[] = { PDL_B, PDL_S, PDL_US, PDL_L, PDL_IND, PDL_LL, PDL_F, PDL_D, PDL_CF, PDL_CD, -1 };
+static pdl_datatypes pdl_affine_vtable_gentypes[] = PDL_ALL_GENTYPES;
 static char pdl_affine_vtable_flags[] = {
   PDL_TPDL_VAFFINE_OK, PDL_TPDL_VAFFINE_OK
 };
@@ -147,7 +157,7 @@ static PDL_Indx pdl_affine_vtable_realdims_starts[] = { 0, 0 };
 static PDL_Indx pdl_affine_vtable_realdims_ind_ids[] = { 0 };
 static char *pdl_affine_vtable_indnames[] = { "" };
 pdl_transvtable pdl_affine_vtable = {
-  0, PDL_ITRANS_ISAFFINE|PDL_ITRANS_TWOWAY|PDL_ITRANS_DO_DATAFLOW_F|PDL_ITRANS_DO_DATAFLOW_B, pdl_affine_vtable_gentypes, 1, 2, pdl_affine_vtable_flags,
+  0, PDL_ITRANS_ISAFFINE|PDL_ITRANS_TWOWAY|PDL_ITRANS_DO_DATAFLOW_ANY, pdl_affine_vtable_gentypes, 1, 2, pdl_affine_vtable_flags,
   pdl_affine_vtable_realdims, pdl_affine_vtable_parnames,
   pdl_affine_vtable_parflags, pdl_affine_vtable_partypes,
   pdl_affine_vtable_realdims_starts, pdl_affine_vtable_realdims_ind_ids, 0,
@@ -157,32 +167,36 @@ pdl_transvtable pdl_affine_vtable = {
   sizeof(pdl_params_affine),"affine_new"
 };
 
-void pdl_affine_new(pdl *PARENT,pdl *CHILD,PDL_Indx offspar,SV *dimlist,SV *inclist) {
+pdl_error pdl_affine_new(pdl *PARENT,pdl *CHILD,PDL_Indx offspar,PDL_Indx *dims,PDL_Indx dims_count, PDL_Indx *incs, PDL_Indx incs_count) {
+  pdl_error PDL_err = {0, NULL, 0};
   pdl_trans *trans = (void *)pdl_create_trans(&pdl_affine_vtable);
   pdl_params_affine *params = trans->params;
   trans->pdls[0] = PARENT;
   trans->pdls[1] = CHILD;
+  PDL_RETERROR(PDL_err, pdl_trans_check_pdls(trans));
   char badflag_cache = pdl_trans_badflag_from_inputs((pdl_trans *)trans);
   pdl_type_coerce((pdl_trans *)trans);
   PARENT = trans->pdls[0];
   CHILD = trans->pdls[1];
-  PDL_Indx i = 0, n2 = 0;
-  PDL_Indx *tmpi = pdl_packdims(inclist,&n2);
-  PDL_Indx *tmpd = pdl_packdims(dimlist,&(params->nd));
+  PDL_Indx i = 0;
+  params->nd = dims_count;
   if (params->nd < 0)
-    pdl_pdl_barf("Error in affine: can not have negative no of dims");
-  if (params->nd != n2)
-    pdl_pdl_barf("Error in affine: number of incs does not match dims");
+    return pdl_make_error_simple(PDL_EUSERERROR, "Error in affine: can not have negative no of dims");
+  if (params->nd != incs_count)
+    return pdl_make_error_simple(PDL_EUSERERROR, "Error in affine: number of incs does not match dims");
   params->sdims = malloc(sizeof(* params->sdims) * params->nd);
+  if (!params->sdims) return pdl_make_error_simple(PDL_EFATAL, "Out of Memory\n");
   params->sincs = malloc(sizeof(* params->sincs) * params->nd);
+  if (!params->sincs) return pdl_make_error_simple(PDL_EFATAL, "Out of Memory\n");
   params->offset = offspar;
   for (i=0; i<params->nd; i++) {
-    params->sdims[i] = tmpd[i];
-    params->sincs[i] = tmpi[i];
+    params->sdims[i] = dims[i];
+    params->sincs[i] = incs[i];
   }
-  pdl_make_trans_mutual((pdl_trans *)trans);
+  PDL_RETERROR(PDL_err, pdl_make_trans_mutual((pdl_trans *)trans));
   if (badflag_cache)
     CHILD->state |= PDL_BADVAL;
+  return PDL_err;
 }
 
 /* generated from:
@@ -201,18 +215,20 @@ typedef struct pdl_params_converttypei {
   int  totype;
 } pdl_params_converttypei;
 
-void pdl_converttypei_redodims(pdl_trans *trans) {
+pdl_error pdl_converttypei_redodims(pdl_trans *trans) {
+  pdl_error PDL_err = {0, NULL, 0};
   pdl *__it = trans->pdls[1];
   pdl_hdr_childcopy(trans);
   PDL_Indx i;
-  pdl_reallocdims(__it, trans->pdls[0]->ndims);
+  PDL_RETERROR(PDL_err, pdl_reallocdims(__it, trans->pdls[0]->ndims));
   for (i=0; i<trans->pdls[1]->ndims; i++)
     trans->pdls[1]->dims[i] = trans->pdls[0]->dims[i];
-  pdl_setdims_careful(__it);
+  PDL_RETERROR(PDL_err, pdl_setdims_careful(__it));
   pdl_reallocthreadids(trans->pdls[1], trans->pdls[0]->nthreadids);
   for (i=0; i<trans->pdls[0]->nthreadids; i++)
     trans->pdls[1]->threadids[i] = trans->pdls[0]->threadids[i];
   trans->dims_redone = 1;
+  return PDL_err;
 }
 
 #define COPYCONVERT(from_pdl, to_pdl) \
@@ -226,29 +242,33 @@ void pdl_converttypei_redodims(pdl_trans *trans) {
     } \
   }
 
-void pdl_converttypei_readdata(pdl_trans *trans) {
+pdl_error pdl_converttypei_readdata(pdl_trans *trans) {
+  pdl_error PDL_err = {0, NULL, 0};
   pdl_params_converttypei *params = trans->params;
-#define X_OUTER(datatype_out, ctype_out, ppsym_out, shortctype_out, defbval_out) \
+#define X_OUTER(datatype_out, ctype_out, ...) \
   PDL_DECLARE_PARAMETER_BADVAL(ctype_out, (trans->vtable->per_pdl_flags[1]), CHILD, (trans->pdls[1])) \
-  PDL_GENERICSWITCH2(trans->__datatype, X_INNER);
-#define X_INNER(datatype_in, ctype_in, ppsym_in, shortctype_in, defbval_in) \
+  PDL_GENERICSWITCH2(PDL_TYPELIST2_ALL_, trans->__datatype, X_INNER, return pdl_make_error(PDL_EUSERERROR, "Not a known data type code=%d", trans->__datatype))
+#define X_INNER(datatype_in, ctype_in, ...) \
   PDL_DECLARE_PARAMETER_BADVAL(ctype_in, (trans->vtable->per_pdl_flags[0]), PARENT, (trans->pdls[0])) \
   COPYCONVERT(PARENT, CHILD)
-  PDL_GENERICSWITCH(params->totype, X_OUTER);
+  PDL_GENERICSWITCH(PDL_TYPELIST2_ALL, params->totype, X_OUTER, return pdl_make_error(PDL_EUSERERROR, "Not a known data type code=%d", params->totype))
 #undef X_INNER
+  return PDL_err;
 }
 
-void pdl_converttypei_writebackdata(pdl_trans *trans) {
+pdl_error pdl_converttypei_writebackdata(pdl_trans *trans) {
+  pdl_error PDL_err = {0, NULL, 0};
   pdl_params_converttypei *params = trans->params;
-#define X_INNER(datatype_in, ctype_in, ppsym_in, shortctype_in, defbval_in) \
+#define X_INNER(datatype_in, ctype_in, ...) \
   PDL_DECLARE_PARAMETER_BADVAL(ctype_in, (trans->vtable->per_pdl_flags[0]), PARENT, (trans->pdls[0])) \
   COPYCONVERT(CHILD, PARENT)
-  PDL_GENERICSWITCH(params->totype, X_OUTER);
+  PDL_GENERICSWITCH(PDL_TYPELIST2_ALL, params->totype, X_OUTER, return pdl_make_error(PDL_EUSERERROR, "Not a known data type code=%d", params->totype))
 #undef X_INNER
 #undef X_OUTER
+  return PDL_err;
 }
 
-static pdl_datatypes pdl_converttypei_vtable_gentypes[] = { PDL_B, PDL_S, PDL_US, PDL_L, PDL_IND, PDL_LL, PDL_F, PDL_D, PDL_CF, PDL_CD, -1 };
+static pdl_datatypes pdl_converttypei_vtable_gentypes[] = PDL_ALL_GENTYPES;
 static char pdl_converttypei_vtable_flags[] = {
   0, 0
 };
@@ -263,7 +283,7 @@ static PDL_Indx pdl_converttypei_vtable_realdims_starts[] = { 0, 0 };
 static PDL_Indx pdl_converttypei_vtable_realdims_ind_ids[] = { 0 };
 static char *pdl_converttypei_vtable_indnames[] = { "" };
 pdl_transvtable pdl_converttypei_vtable = {
-  PDL_TRANS_BADPROCESS, PDL_ITRANS_TWOWAY|PDL_ITRANS_DO_DATAFLOW_F|PDL_ITRANS_DO_DATAFLOW_B, pdl_converttypei_vtable_gentypes, 1, 2, pdl_converttypei_vtable_flags,
+  PDL_TRANS_BADPROCESS, PDL_ITRANS_TWOWAY|PDL_ITRANS_DO_DATAFLOW_ANY, pdl_converttypei_vtable_gentypes, 1, 2, pdl_converttypei_vtable_flags,
   pdl_converttypei_vtable_realdims, pdl_converttypei_vtable_parnames,
   pdl_converttypei_vtable_parflags, pdl_converttypei_vtable_partypes,
   pdl_converttypei_vtable_realdims_starts, pdl_converttypei_vtable_realdims_ind_ids, 0,
@@ -273,17 +293,20 @@ pdl_transvtable pdl_converttypei_vtable = {
   sizeof(pdl_params_converttypei),"converttypei_new"
 };
 
-void pdl_converttypei_new(pdl  *PARENT,pdl  *CHILD,int  totype) {
+pdl_error pdl_converttypei_new(pdl  *PARENT,pdl  *CHILD,int  totype) {
+  pdl_error PDL_err = {0, NULL, 0};
   pdl_trans *trans = (void *)pdl_create_trans(&pdl_converttypei_vtable);
   pdl_params_converttypei *params = trans->params;
   trans->pdls[0] = PARENT;
   trans->pdls[1] = CHILD;
+  PDL_RETERROR(PDL_err, pdl_trans_check_pdls(trans));
   char badflag_cache = pdl_trans_badflag_from_inputs((pdl_trans *)trans);
   pdl_type_coerce((pdl_trans *)trans);
   PARENT = trans->pdls[0];
   CHILD = trans->pdls[1];
   CHILD->datatype = params->totype = totype;
-  pdl_make_trans_mutual((pdl_trans *)trans);
+  PDL_RETERROR(PDL_err, pdl_make_trans_mutual((pdl_trans *)trans));
   if (badflag_cache)
     CHILD->state |= PDL_BADVAL;
+  return PDL_err;
 }

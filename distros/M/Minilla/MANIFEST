@@ -120,6 +120,7 @@ t/project/static_install.t
 t/project/unstable.t
 t/project/unsupported.t
 t/project/xsutil.t
+t/release/bump_version.t
 t/release_test/config.t
 t/work_dir/_rewrite_pod.t
 t/work_dir/copy.t

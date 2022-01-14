@@ -1,3 +1,14 @@
+0.108   2022-01-07  Released-By: PERLANCAR; Urgency: medium
+
+	- [doc] Document what parameters each backend supports (also in
+	  %BACKEND_FEATURES).
+
+
+0.107   2022-01-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Add backend: Term::Table.
+
+
 0.106   2021-12-09  Released-By: PERLANCAR; Urgency: medium
 
 	- Also pass 'title' parameter to Text::Table::HTML.

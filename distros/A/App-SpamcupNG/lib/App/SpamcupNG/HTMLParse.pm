@@ -12,14 +12,13 @@ our @EXPORT_OK = (
     'find_next_id',       'find_errors',
     'find_warnings',      'find_spam_header',
     'find_best_contacts', 'find_receivers'
-);
+    );
 
 my %regexes = (
-    no_user_id => qr/\>No userid found\</i,
-    next_id    => qr/sc\?id\=(.*?)\"\>/i
-);
+    next_id    => qr#^/sc\?id=(\w+)#
+    );
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 =head1 NAME
 
@@ -47,15 +46,27 @@ Returns the ID if found, otherwise C<undef>.
 
 =cut
 
-# TODO: use XPath instead of regex
 sub find_next_id {
     my $content_ref = shift;
     croak "Must receive an scalar reference as parameter"
         unless ( ref($content_ref) eq 'SCALAR' );
+    my $tree = HTML::TreeBuilder::XPath->new;
+    $tree->parse_content($$content_ref);
+    my @nodes
+        = $tree->findnodes('//strong/a');
     my $next_id;
 
-    if ( $$content_ref =~ $regexes{next_id} ) {
-        $next_id = $1;
+    foreach my $element(@nodes) {
+        if ($element->as_trimmed_text eq 'Report Now') {
+
+            if ( $element->attr('href') =~ $regexes{next_id} ) {
+                $next_id = $1;
+                my $length = length($next_id);
+                my $expected = 45;
+                warn "Unexpected length for SPAM ID: got $length, expected $expected" unless ($length == $expected);
+                last;
+            }
+        }
     }
 
     return $next_id;

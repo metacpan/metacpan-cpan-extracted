@@ -139,16 +139,19 @@ use warnings 'once';
 
         multi   => { level => 1 },
 
+        runbook => 'https://runbook.grantstreet.com',
+
         undef   => undef,
         empty   => '',
         zero    => 0,
     );
 
     my $diagnostic = My::HealthCheck::Diagnostic->new(
-        id     => 'my_id',
-        label  => 'My Label',
-        status => 'WARNING',
-        tags   => [ 'foo', 'bar' ],
+        id      => 'my_id',
+        label   => 'My Label',
+        runbook => 'https://runbook.grantstreet.com',
+        status  => 'WARNING',
+        tags    => [ 'foo', 'bar' ],
 
         foo => 1,
         bar => { baz => 2 },

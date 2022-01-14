@@ -1,9 +1,7 @@
 use strict;
 use warnings;
 
-use Dummy;    # does not exist anywhere
-
-exit;
+use Acme::BadExample;    # does not exist anywhere
 
 __END__
 
@@ -17,9 +15,9 @@ it's a dummy POD for testing
 
 Via the command-line program L<findeps>;
 
-    require Nothing;
-    use Nothing;
-    use parent Nothing;
+    require Module::Exists::In::POD;
+    use Module::Exists::In::POD;
+    use parent Module::Exists::In::POD;
 
 =head1 DESCRIPTION
 

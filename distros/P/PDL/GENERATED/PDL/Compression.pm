@@ -21,6 +21,8 @@ use DynaLoader;
 
 
 
+#line 6 "compression.pd"
+
 =head1 NAME
 
 PDL::Compression - compression utilities
@@ -32,9 +34,8 @@ into a smaller PDL.  Algorithms typically work on a single dimension
 and thread over other dimensions, producing a threaded table of
 compressed values if more than one dimension is fed in.
 
-The Rice algorithm, in particular, is designed to be identical to the 
+The Rice algorithm, in particular, is designed to be identical to the
 RICE_1 algorithm used in internal FITS-file compression (see PDL::IO::FITS).
-
 
 =head1 SYNOPSIS
 
@@ -45,7 +46,9 @@ RICE_1 algorithm used in internal FITS-file compression (see PDL::IO::FITS).
 
 =cut
 
-
+use strict;
+use warnings;
+#line 52 "Compression.pm"
 
 
 
@@ -59,21 +62,23 @@ RICE_1 algorithm used in internal FITS-file compression (see PDL::IO::FITS).
 
 
 
+#line 75 "compression.pd"
+
 =head1 METHODS
 
 =cut
+#line 71 "Compression.pm"
 
 
 
-
+#line 1059 "../../blib/lib/PDL/PP.pm"
 
 
 =head2 rice_compress
 
 =for sig
 
-  Signature: (in(n); [o]out(m); int[o]len(); lbuf(n); int blocksize)
-
+  Signature: (in(n); [o]out(m); int[o]len(); int blocksize)
 
 =for ref
 
@@ -123,7 +128,6 @@ Working on astronomical or solar image data, typical compression ratios of
   $new = $out->rice_expand;
 
 
-
 =for bad
 
 rice_compress ignores the bad-value flag of the input ndarrays.
@@ -131,14 +135,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 139 "Compression.pm"
 
 
 
-
+#line 1060 "../../blib/lib/PDL/PP.pm"
 sub PDL::rice_compress {
     my $in = shift;
     my $blocksize = shift || 32;
-
     ## Reject floating-point inputs
     if( $in->type != byte &&
         $in->type != short &&
@@ -147,41 +151,33 @@ sub PDL::rice_compress {
 	) {
 	die("rice_compress: input needs to have type byte, short, ushort, or long, not ".($in->type)."\n");
     }
-
     # output buffer starts the same size; truncate at the end.
     my ($out) = zeroes($in);
-
-    # line buffer is here to make sure we don't get fouled up by transpositions
-    my ($lbuf) = zeroes($in->type, $in->dim(0)); 
-
     # lengths go here
     my ($len) = zeroes(long, $in->slice("(0)")->dims);
-
-    &PDL::_rice_compress_int( $in, $out, $len, $lbuf, $blocksize  );
-    
-    $l = $len->max;
+    PDL::_rice_compress_int( $in, $out, $len, $blocksize  );
+    my $l = $len->max;
     $out = $out->slice("0:".($l-1))->sever;
-    
-    if(wantarray) {
-    return ($out, $in->dim(0), $blocksize, $len);
-    } else {
-    return $out;
-    }
+    return wantarray ? ($out, $in->dim(0), $blocksize, $len) : $out;
 }
+#line 164 "Compression.pm"
 
 
+
+#line 1061 "../../blib/lib/PDL/PP.pm"
 *rice_compress = \&PDL::rice_compress;
+#line 170 "Compression.pm"
 
 
 
+#line 1059 "../../blib/lib/PDL/PP.pm"
 
 
 =head2 rice_expand
 
 =for sig
 
-  Signature: (in(n); [o]out(m); lbuf(n); int blocksize)
-
+  Signature: (in(n); [o]out(m); int blocksize)
 
 =for ref
 
@@ -191,7 +187,6 @@ Unsquishes a PDL that has been squished by rice_compress.
 
      ($out, $len, $blocksize, $dim0) = $pdl->rice_compress;
      $copy = $out->rice_expand($dim0, $blocksize);
-     
 
 
 =for bad
@@ -201,33 +196,33 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 200 "Compression.pm"
 
 
 
-
+#line 1060 "../../blib/lib/PDL/PP.pm"
 sub PDL::rice_expand {
     my $squished = shift;
     my $dim0 =shift;
     my $blocksize = shift || 32;
-    
     # Allocate output array
     my $out = zeroes( $squished->slice("(0),*$dim0") );
-       
-    # Allocate row buffer to avoid weird memory edge case
-    my $lbuf = zeroes($squished->type, $squished->dim(0));
-   
-   &PDL::_rice_expand_int( $squished, $out, $lbuf, $blocksize );
-
-   return $out;
+    PDL::_rice_expand_int( $squished, $out, $blocksize );
+    return $out;
 }
+#line 214 "Compression.pm"
 
 
+
+#line 1061 "../../blib/lib/PDL/PP.pm"
 *rice_expand = \&PDL::rice_expand;
+#line 220 "Compression.pm"
 
 
 
 
 
+#line 36 "compression.pd"
 
 =head1 AUTHORS
 
@@ -263,8 +258,7 @@ terms than PDL itself; that notice is present in the file "ricecomp.c".
 =back
 
 =cut
-
-
+#line 262 "Compression.pm"
 
 
 

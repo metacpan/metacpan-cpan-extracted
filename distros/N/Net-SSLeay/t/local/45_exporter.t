@@ -56,6 +56,8 @@ sub server
 
 	    $ctx = new_ctx( $round, $round );
 
+	    Net::SSLeay::CTX_set_security_level($ctx, 0)
+		if Net::SSLeay::SSLeay() >= 0x30000000 && ($round eq 'TLSv1' || $round eq 'TLSv1.1');
 	    Net::SSLeay::set_cert_and_key($ctx, $cert_pem, $key_pem);
 	    $ssl = Net::SSLeay::new($ctx);
 	    Net::SSLeay::set_fd($ssl, fileno($cl));
@@ -66,7 +68,9 @@ sub server
 
 	    Net::SSLeay::shutdown($ssl);
 	    Net::SSLeay::free($ssl);
+	    close($cl) || die("server close: $!");
 	}
+	$server->close() || die("server listen socket close: $!");
 	exit(0);
     }
 }
@@ -78,9 +82,14 @@ sub client {
             my $cl = $server->connect();
 
             my $ctx = new_ctx( $round, $round );
+	    Net::SSLeay::CTX_set_security_level($ctx, 0)
+		if Net::SSLeay::SSLeay() >= 0x30000000 && ($round eq 'TLSv1' || $round eq 'TLSv1.1');
             my $ssl = Net::SSLeay::new($ctx);
             Net::SSLeay::set_fd( $ssl, $cl );
-            Net::SSLeay::connect($ssl);
+            my $ret = Net::SSLeay::connect($ssl);
+            if ($ret <= 0) {
+                diag("Protocol $round, connect() returns $ret, Error: ".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error()));
+            }
 
             my $msg = Net::SSLeay::read($ssl);
 
@@ -90,6 +99,7 @@ sub client {
 
             Net::SSLeay::shutdown($ssl);
             Net::SSLeay::free($ssl);
+            close($cl) || die("client close: $!");
         }
         else {
             SKIP: {
@@ -97,6 +107,7 @@ sub client {
             }
         }
     }
+    $server->close() || die("client listen socket close: $!");
 
     return 1;
 }

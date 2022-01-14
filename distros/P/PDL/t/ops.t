@@ -1,12 +1,11 @@
+use strict;
+use warnings;
 use Test::More;
 use PDL::LiteF;
 use Config;
-kill INT,$$ if $ENV{UNDER_DEBUGGER}; # Useful for debugging.
+kill 'INT',$$ if $ENV{UNDER_DEBUGGER}; # Useful for debugging.
 use Test::Exception;
 require PDL::Core::Dev;
-
-use strict;
-use warnings;
 
 kill 'INT',$$ if $ENV{UNDER_DEBUGGER}; # Useful for debugging.
 
@@ -20,7 +19,7 @@ my $pb = yvals zeroes 3,5;
 my $pc = $pa + $pb;
 ok($pc->at(2,2) == 4, 'pdl addition 1');
 ok($pc->at(2,3) == 5, 'pdl addition 2');
-throws_ok { $pc->at(3,3); } qr/Position out of range/, 'invalid position';
+throws_ok { $pc->at(3,3); } qr/Position\s*\d+\s*out of range/, 'invalid position';
 }
 
 {
@@ -44,7 +43,7 @@ ok(approx(cdouble(25 - 10*i) - cdouble(25 - 10*i), 0), 'pdl complex subtraction'
 ok(approx($pc->double->at(2,2), 24), 'pdl complex addition 1');
 is $pc->at(2,3), '25-10i', 'at stringifies complex';
 ok(approx($pc->slice([2], [3]), cdouble(25 - 10*i)), 'pdl complex addition 2');
-throws_ok { $pc->at(3,3); } qr/Position out of range/, 'invalid position';
+throws_ok { $pc->at(3,3); } qr/Position\s*\d+\s*out of range/, 'invalid position';
 is_deeply \@w, [], 'no warnings' or diag explain \@w;
 }
 
@@ -145,9 +144,9 @@ ok (all( approx(atan2(pdl(1,1), pdl(1,1)), ones(2) * atan2(1,1))), 'atan2');
 {
 my $pa = sequence (3,4);
 my $pb = sequence (3,4) + 1;
-ok (all( approx($pa->or2($pb,0), $pa | $pb)), 'or2');
-ok (all( approx($pa->and2($pb,0), $pa & $pb)), 'and2');
-ok (all( approx($pb->minus($pa,0), $pb - $pa)), 'explicit minus call');
+ok (all( approx($pa->or2($pb), $pa | $pb)), 'or2');
+ok (all( approx($pa->and2($pb), $pa & $pb)), 'and2');
+ok (all( approx($pb->minus($pa), $pb - $pa)), 'explicit minus call');
 ok (all( approx($pb - $pa, ones(3,4))), 'pdl subtraction');
 }
 
@@ -156,10 +155,9 @@ ok (all( approx($pb - $pa, ones(3,4))), 'pdl subtraction');
 {
 my $pa = pdl 1;
 my $sq2 = sqrt 2; # perl sqrt
-$pa->inplace->plus(1,0);  # trailing 0 is ugly swap-flag
+$pa->inplace->plus(1);
 ok(all( approx($pa, pdl 2)), 'inplace plus');
-my $warning_shutup;
-$warning_shutup = $warning_shutup = sqrt $pa->inplace;
+my $warning_shutup = sqrt $pa->inplace;
 ok(all( approx( $pa, pdl($sq2))), 'inplace pdl sqrt vs perl scalar sqrt');
 my $pb = pdl 4;
 ok(all( approx( 2, sqrt($pb->inplace))),'perl scalar vs inplace pdl sqrt');
@@ -212,15 +210,13 @@ $data &= 0;
 ok(all($data == 0), 'and assign complex');
 }
 
-SKIP:
-{
-  skip("ipow skipped without 64bit support", 1) if $Config{ivsize} < 8;
-  # check ipow routine
-  my $xdata = indx(0xeb * ones(8));
-  my $n = sequence(indx,8);
-  my $exact = indx(1,235,55225,12977875,3049800625,716703146875,168425239515625,39579931286171875);
-  ok(all($exact - ipow($xdata,$n) == indx(0)), 'ipow');
-}
+# check ipow routine
+my $xdata = longlong(0xeb * ones(8));
+my $n = sequence(longlong,8);
+is $n->type, 'longlong', 'sequence with specified type has that type';
+my $exact = longlong(1,235,55225,12977875,3049800625,716703146875,168425239515625,39579931286171875);
+my $got = ipow($xdata,$n);
+ok(all($exact - $got == longlong(0)), 'ipow') or diag "got=$got\nexpected=$exact";
 
 #### Modulus checks ####
 

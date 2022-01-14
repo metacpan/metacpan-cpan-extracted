@@ -1,4 +1,137 @@
-SEE ALSO
+NAME
+    Bencher::Scenario::ArrayVsHashBuilding - Benchmark building array vs
+    hash
 
+VERSION
+    This document describes version 0.002 of
+    Bencher::Scenario::ArrayVsHashBuilding (from Perl distribution
+    Bencher-Scenario-ArrayVsHashBuilding), released on 2021-07-31.
+
+SYNOPSIS
+    To run benchmark with default option:
+
+     % bencher -m ArrayVsHashBuilding
+
+    For more options (dump scenario, list/include/exclude/add participants,
+    list/include/exclude/add datasets, etc), see bencher or run "bencher
+    --help".
+
+DESCRIPTION
+    Packaging a benchmark script as a Bencher scenario makes it convenient
+    to include/exclude/add participants/datasets (either via CLI or Perl
+    code), send the result to a central repository, among others . See
+    Bencher and bencher (CLI) for more details.
+
+BENCHMARK PARTICIPANTS
+    *   array (perl_code)
+
+        Code template:
+
+         state $elems=<elems>; my $ary = []; for my $elem (@$elems) { push @$ary, $elems }; $ary
+
+    *   hash (perl_code)
+
+        Code template:
+
+         state $elems=<elems>; my $hash = {}; for my $elem (@$elems) { $hash->{$elem} = 1 }; $hash
+
+BENCHMARK DATASETS
+    *   elems=1
+
+    *   elems=10
+
+    *   elems=100
+
+    *   elems=1000
+
+    *   elems=10000
+
+BENCHMARK SAMPLE RESULTS
+  Sample benchmark #1
+    Run on: perl: *v5.34.0*, CPU: *Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz
+    (4 cores)*, OS: *GNU/Linux LinuxMint version 19*, OS kernel: *Linux
+    version 5.3.0-68-generic*.
+
+    Benchmark command (default options):
+
+     % bencher -m ArrayVsHashBuilding
+
+    Result formatted as table:
+
+     #table1#
+     | participant | dataset     | rate (/s) | time (μs)   | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+     |-------------+-------------+-----------+-------------+-----------------------+-----------------------+---------+---------|
+     | hash        | elems=10000 |       740 | 1300        |                 0.00% |            641955.16% | 1.4e-06 |      20 |
+     | array       | elems=10000 |      1960 |  510        |               164.40% |            242732.24% | 2.6e-07 |      21 |
+     | hash        | elems=1000  |      8200 |  120        |               999.66% |             58286.54% | 2.1e-07 |      20 |
+     | array       | elems=1000  |     19434 |   51.4562   |              2518.03% |             24424.33% | 5.8e-12 |      20 |
+     | hash        | elems=100   |     95200 |   10.5      |             12727.28% |              4905.39% | 3.3e-09 |      21 |
+     | array       | elems=100   |    159000 |    6.31     |             21252.27% |              2906.96% | 3.2e-09 |      22 |
+     | hash        | elems=10    |    844360 |    1.1843   |            113647.15% |               464.46% | 5.8e-12 |      20 |
+     | array       | elems=10    |   1191880 |    0.839009 |            160463.55% |               299.88% |   0     |      20 |
+     | hash        | elems=1     |   3958000 |    0.2527   |            533044.34% |                20.43% | 5.7e-12 |      20 |
+     | array       | elems=1     |   4766000 |    0.2098   |            641955.16% |                 0.00% | 5.8e-12 |      20 |
+
+    The above result formatted in Benchmark.pm style:
+
+                              Rate  hash elems=10000  array elems=10000  hash elems=1000  array elems=1000  hash elems=100  array elems=100  hash elems=10  array elems=10  hash elems=1  array elems=1 
+      hash elems=10000       740/s                --               -60%             -90%              -96%            -99%             -99%           -99%            -99%          -99%           -99% 
+      array elems=10000     1960/s              154%                 --             -76%              -89%            -97%             -98%           -99%            -99%          -99%           -99% 
+      hash elems=1000       8200/s              983%               325%               --              -57%            -91%             -94%           -99%            -99%          -99%           -99% 
+      array elems=1000     19434/s             2426%               891%             133%                --            -79%             -87%           -97%            -98%          -99%           -99% 
+      hash elems=100       95200/s            12280%              4757%            1042%              390%              --             -39%           -88%            -92%          -97%           -98% 
+      array elems=100     159000/s            20502%              7982%            1801%              715%             66%               --           -81%            -86%          -95%           -96% 
+      hash elems=10       844360/s           109669%             42963%           10032%             4244%            786%             432%             --            -29%          -78%           -82% 
+      array elems=10     1191880/s           154844%             60685%           14202%             6032%           1151%             652%            41%              --          -69%           -74% 
+      hash elems=1       3958000/s           514344%            201720%           47387%            20262%           4055%            2397%           368%            232%            --           -16% 
+      array elems=1      4766000/s           619537%            242988%           57097%            24426%           4904%            2907%           464%            299%           20%             -- 
+ 
+     Legends:
+       array elems=1: dataset=elems=1 participant=array
+       array elems=10: dataset=elems=10 participant=array
+       array elems=100: dataset=elems=100 participant=array
+       array elems=1000: dataset=elems=1000 participant=array
+       array elems=10000: dataset=elems=10000 participant=array
+       hash elems=1: dataset=elems=1 participant=hash
+       hash elems=10: dataset=elems=10 participant=hash
+       hash elems=100: dataset=elems=100 participant=hash
+       hash elems=1000: dataset=elems=1000 participant=hash
+       hash elems=10000: dataset=elems=10000 participant=hash
+
+    The above result presented as chart:
+
+    To display as an interactive HTML table on a browser, you can add option
+    "--format html+datatables".
+
+CONTRIBUTOR
+    perlancar (@netbook-zenbook-ux305) <perlancar@gmail.com>
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bencher-Scenario-ArrayVsHashBuilding>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Bencher-Scenario-ArrayVsHashBuilding>
+    .
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenario-Arra
+    yVsHashBuilding>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Bencher::Scenario::HashBuilding
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

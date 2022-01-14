@@ -20,6 +20,7 @@ my %WriteMakefileArgs = (
     "LWP::UserAgent" => 0,
     "Moo" => 0,
     "Test::More" => 0,
+    "URI" => 0,
     "URI::Encode" => 0
   },
   "TEST_REQUIRES" => {
@@ -28,7 +29,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,6 +42,7 @@ my %FallbackPrereqs = (
   "LWP::UserAgent" => 0,
   "Moo" => 0,
   "Test::More" => 0,
+  "URI" => 0,
   "URI::Encode" => 0,
   "strict" => 0,
   "warnings" => 0

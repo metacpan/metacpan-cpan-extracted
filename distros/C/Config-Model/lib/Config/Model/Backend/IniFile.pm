@@ -1,13 +1,13 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2021 by Dominique Dumont.
+# This software is Copyright (c) 2005-2022 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Backend::IniFile 2.147;
+package Config::Model::Backend::IniFile 2.149;
 
 use Carp;
 use Mouse;
@@ -18,14 +18,20 @@ use Log::Log4perl qw(get_logger :levels);
 
 use base qw/Config::Model::Backend::Any/;
 
+use feature qw/postderef signatures/;
+no warnings qw/experimental::postderef experimental::signatures/;
+
+# change inherited attribute. See Moose::Manual::Attributes
+has '+node' => (
+    handles => ['load_data'],
+);
+
 my $logger = get_logger("Backend::IniFile");
 
 sub annotation { return 1; }
 
-sub read {
-    my $self = shift;
-    my %args = @_;
-
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
+sub read ($self, %args) {
     # args is:
     # object     => $obj,         # Config::Model::Node object
     # root       => './my_test',  # fake root directory, userd for tests
@@ -143,11 +149,6 @@ sub read {
     return 1;
 }
 
-sub load_data {
-    my $self = shift;
-    $self->node->load_data(@_);
-}
-
 sub set_or_push {
     my ( $self, $ref, $name, $val ) = @_;
     my $cell = $ref->{$name};
@@ -167,10 +168,8 @@ sub set_or_push {
     return $path;
 }
 
-sub write {
-    my $self = shift;
-    my %args = @_;
-
+## no critic (Subroutines::ProhibitBuiltinHomonyms)
+sub write ($self, %args) {
     # args is:
     # object     => $obj,         # Config::Model::Node object
     # root       => './my_test',  # fake root directory, userd for tests
@@ -204,6 +203,7 @@ sub write {
     elsif ($self->auto_delete) {
         $args{file_path}->remove;
     }
+    return;
 }
 
 sub _write_list{
@@ -356,10 +356,7 @@ sub _write_node {
     return $res;
 }
 
-sub _write {
-    my $self = shift;
-    my %args = @_;
-
+sub _write ($self, %args) {
     my $node          = $args{object};
     my $delimiter     = $args{comment_delimiter} || '#';
 
@@ -430,7 +427,7 @@ Config::Model::Backend::IniFile - Read and write config as a INI file
 
 =head1 VERSION
 
-version 2.147
+version 2.149
 
 =head1 SYNOPSIS
 
@@ -772,7 +769,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2021 by Dominique Dumont.
+This software is Copyright (c) 2005-2022 by Dominique Dumont.
 
 This is free software, licensed under:
 

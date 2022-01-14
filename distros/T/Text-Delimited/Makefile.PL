@@ -5,11 +5,11 @@ WriteMakefile(
   AUTHOR   => 'Phil Pollard <bennie@cpan.org>',
   LICENSE  => 'artistic_2',
   NAME     => 'Text::Delimited',
-  VERSION  => '2.11',
+  VERSION  => '2.12',
 
   PREREQ_PM => {
-          'Test::More' => 0,
           'Test::Simple' => '0',
+          'Test::More' => 0,
           'Symbol' => 0
         },
 
@@ -22,8 +22,8 @@ WriteMakefile(
 
 	{
           'Text::Delimited' => {
-                                 'version' => '2.11',
-                                 'file' => 'lib/Text/Delimited.pm'
+                                 'file' => 'lib/Text/Delimited.pm',
+                                 'version' => '2.12'
                                }
         },
 

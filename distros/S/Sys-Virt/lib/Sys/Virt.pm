@@ -81,7 +81,7 @@ use Sys::Virt::DomainSnapshot;
 use Sys::Virt::DomainCheckpoint;
 use Sys::Virt::Stream;
 
-our $VERSION = '7.10.0';
+our $VERSION = '8.0.0';
 require XSLoader;
 XSLoader::load('Sys::Virt', $VERSION);
 
@@ -1611,6 +1611,14 @@ Platform diffie-hellman key
 =item Sys::Virt::SEV_REDUCED_PHYS_BITS
 
 The number of physical address bits used by SEV
+
+=item Sys::Virt::SEV_MAX_GUESTS
+
+Maximum number of SEV guests that can be launched
+
+=item Sys::Virt::SEV_MAX_ES_GUESTS
+
+Maximum number of SEV-ES guests that can be launched
 
 =back
 

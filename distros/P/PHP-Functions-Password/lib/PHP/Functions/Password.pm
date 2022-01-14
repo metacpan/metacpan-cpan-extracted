@@ -5,6 +5,7 @@ use Carp qw(carp croak);
 use Crypt::Eksblowfish ();
 use Crypt::OpenSSL::Random ();
 use MIME::Base64 qw(encode_base64 decode_base64);
+use Readonly qw(Readonly);
 use version 0.77 ();
 use base qw(Exporter);
 
@@ -26,36 +27,65 @@ our %EXPORT_TAGS = (
 	'consts'	=> [ grep /^PASSWORD_/, @EXPORT_OK ],
 	'funcs'		=> [ grep /^password_/, @EXPORT_OK ],
 );
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
+
+# Exported constants
 use constant PASSWORD_BCRYPT   => 1;
 use constant PASSWORD_ARGON2I  => 2;
 use constant PASSWORD_ARGON2ID => 3;
 use constant PASSWORD_DEFAULT  => PASSWORD_BCRYPT;
 
-use constant PASSWORD_BCRYPT_DEFAULT_COST => 10;	# no such PHP constant
-use constant PASSWORD_ARGON2_DEFAULT_SALT_LENGTH => 16;	# no such PHP constant
-use constant PASSWORD_ARGON2_DEFAULT_MEMORY_COST => 65536;
-use constant PASSWORD_ARGON2_DEFAULT_TIME_COST => 4;
-use constant PASSWORD_ARGON2_DEFAULT_THREADS => 1;
-use constant PASSWORD_ARGON2_DEFAULT_TAG_LENGTH => 32;	# no such PHP constant
 
-use constant SIG_BCRYPT   => '2y';
-use constant SIG_ARGON2I  => 'argon2i';
-use constant SIG_ARGON2ID => 'argon2id';
+# Internal constants
+Readonly my $PASSWORD_BCRYPT_DEFAULT_COST => 10;	# no such PHP constant
+Readonly my $PASSWORD_ARGON2_DEFAULT_SALT_LENGTH => 16;	# no such PHP constant
+Readonly my $PASSWORD_ARGON2_DEFAULT_MEMORY_COST => 65536;
+Readonly my $PASSWORD_ARGON2_DEFAULT_TIME_COST => 4;
+Readonly my $PASSWORD_ARGON2_DEFAULT_THREADS => 1;
+Readonly my $PASSWORD_ARGON2_DEFAULT_TAG_LENGTH => 32;	# no such PHP constant
 
-use constant RE_BCRYPT_SALT		=> qr#^[./A-Za-z0-9]{22}$#;	# fixed 16 byte salt
-use constant RE_BCRYPT_SETTINGS => qr#^\$(2[abxy]?)\$([0-3]\d)\$([./A-Za-z0-9]{22})#;	# intentionally unanchored at the end
-use constant RE_BCRYPT_STRING   => qr#^\$(2[abxy]?)\$([0-3]\d)\$([./A-Za-z0-9]{22})([./A-Za-z0-9]+)$#;
+Readonly my $SIG_BCRYPT => '2y';	# PHP default
+Readonly my $SIG_ARGON2I  => 'argon2i';
+Readonly my $SIG_ARGON2ID => 'argon2id';
+
+Readonly my %SIG_TO_ALGO => (
+	$SIG_BCRYPT		=> PASSWORD_BCRYPT,
+	$SIG_ARGON2I	=> PASSWORD_ARGON2I,
+	$SIG_ARGON2ID	=> PASSWORD_ARGON2ID,
+);
+
+# https://en.wikipedia.org/wiki/Bcrypt
+Readonly my $RE_BCRYPT_ALGO => qr#2[abxy]?#;
+Readonly my $RE_BCRYPT_SALT => qr#[./A-Za-z0-9]{22}#;	# fixed 16 byte salt
+Readonly my $RE_BCRYPT_COST => qr#[0-3]\d#;
+Readonly my $RE_BCRYPT_HASH => qr#[./A-Za-z0-9]+#;
+Readonly my $RE_BCRYPT_STRING => qr/^
+	\$
+	($RE_BCRYPT_ALGO)	# $1 type
+	\$
+	($RE_BCRYPT_COST)	# $2 cost
+	\$
+	($RE_BCRYPT_SALT)	# $3 salt
+	($RE_BCRYPT_HASH)	# $4 hash
+$/x;
 
 # See https://www.alexedwards.net/blog/how-to-hash-and-verify-passwords-with-argon2-in-go
-use constant RE_ARGON2_STRING   => qr#^\$(argon2id?)\$v=(\d{1,3})\$m=(\d{1,10}),t=(\d{1,3}),p=(\d{1,3})\$([A-Za-z0-9+/]+)\$([A-Za-z0-9+/]+)$#;
-
-my %sig_to_algo = (
-	&SIG_BCRYPT		=> PASSWORD_BCRYPT,
-	&SIG_ARGON2I	=> PASSWORD_ARGON2I,
-	&SIG_ARGON2ID	=> PASSWORD_ARGON2ID,
-);
+Readonly my $RE_ARGON2_ALGO => qr#argon2id?#;
+Readonly my $RE_ARGON2_STRING => qr/^
+	\$
+	($RE_ARGON2_ALGO)	# $1 signature
+	\$
+	v=(\d{1,3})			# $2 version
+	\$
+		m=(\d{1,10}),	# $3 memory_cost
+		t=(\d{1,3}),	# $4 time_cost
+		p=(\d{1,3})		# $5 threads
+	\$
+	([A-Za-z0-9+\/]+)	# $6 salt
+	\$
+	([A-Za-z0-9+\/]+)	# $7 hash
+$/x;
 
 =head1 NAME
 
@@ -127,9 +157,9 @@ Returns an array of supported password algorithm signatures.
 =cut
 
 sub password_algos {
-	my @result = (SIG_BCRYPT);
+	my @result = ($SIG_BCRYPT);
 	if ($INC{'Crypt/Argon2.pm'} || eval { require Crypt::Argon2; }) {
-		push(@result, SIG_ARGON2I, SIG_ARGON2ID);
+		push(@result, $SIG_ARGON2I, $SIG_ARGON2ID);
 	}
 	return @result;
 }
@@ -154,7 +184,7 @@ Returns a hash in array context, else a hashref.
 sub password_get_info {
 	my $proto = @_ && UNIVERSAL::isa($_[0],__PACKAGE__) ? shift : __PACKAGE__;
 	my $crypted = shift;
-	if ($crypted =~ RE_BCRYPT_STRING) {
+	if ($crypted =~ $RE_BCRYPT_STRING) {
 		my $type = $1;
 		my $cost = int($2);
 		my $salt = $3;
@@ -171,9 +201,7 @@ sub password_get_info {
 		);
 		return wantarray ? %result : \%result;
 	}
-	elsif ($crypted =~ RE_ARGON2_STRING) {
-		# e.g.: $argon2id$v=19$m=65536,t=4,p=1$ZTl0OXE2QTQ3QXVsWTUvMWxhNlYwdQ$WqVh2B1XQlXAvcaKcYAc48Y3im4gPemuGgQ
-		#use constant RE_ARGON2_STRING   => qr#^\$(argon2id?)\$v=(\d{1,3})\$m=(\d{1,10}),t=(\d{1,3}),p=(\d{1,3})\$(.+?)\$(.+)$#;
+	elsif ($crypted =~ $RE_ARGON2_STRING) {
 		my $sig = $1;
 		my $version = int($2);
 		my $memory_cost = int($3);
@@ -184,7 +212,7 @@ sub password_get_info {
 		#my $raw_salt = decode_base64($salt);
 		#my $raw_hash = decode_base64($hash);
 		my %result = (
-			'algo'		=> $sig_to_algo{$sig},
+			'algo'		=> $SIG_TO_ALGO{$sig},
 			'algoName'	=> $sig,
 			'options'	=> {
 				'memory_cost'	=> $memory_cost,
@@ -231,7 +259,7 @@ sub password_hash {
 	if ($algo == PASSWORD_BCRYPT) {
 		my $salt;
 		if (defined($options{'salt'}) && length($options{'salt'})) {	# bcrypt custom base64 encoded!
-			unless ($options{'salt'} =~ RE_BCRYPT_SALT) {
+			unless ($options{'salt'} =~ /^$RE_BCRYPT_SALT$/) {
 				croak('Bad syntax in given and deprecated salt option (' . $options{'salt'} . ')');
 			}
 			$salt = $options{'salt'};
@@ -239,8 +267,8 @@ sub password_hash {
 		else {
 			$salt = $proto->_bcrypt_base64_encode(Crypt::OpenSSL::Random::random_bytes(16));
 		}
-		my $cost = $options{'cost'} || PASSWORD_BCRYPT_DEFAULT_COST;
-		my $settings = '$' . SIG_BCRYPT . '$' . sprintf('%.2u', $cost) . '$' . $salt;
+		my $cost = $options{'cost'} || $PASSWORD_BCRYPT_DEFAULT_COST;
+		my $settings = '$' . $SIG_BCRYPT . '$' . sprintf('%.2u', $cost) . '$' . $salt;
 		return $proto->_bcrypt($password, $settings);
 	}
 	elsif (($algo == PASSWORD_ARGON2ID) || ($algo == PASSWORD_ARGON2I)) {
@@ -248,11 +276,15 @@ sub password_hash {
 			my $algo_const_name = $algo == PASSWORD_ARGON2ID ? PASSWORD_ARGON2ID : PASSWORD_ARGON2I;
 			croak("Cannot use the $algo_const_name algorithm because the module Crypt::Argon2 is not installed");
 		}
-		my $salt = $options{'salt'} || Crypt::OpenSSL::Random::random_bytes(PASSWORD_ARGON2_DEFAULT_SALT_LENGTH);	# undocumented; not a PHP option; raw!
-		my $memory_cost = $options{'memory_cost'} || PASSWORD_ARGON2_DEFAULT_MEMORY_COST;
-		my $time_cost = $options{'time_cost'} || PASSWORD_ARGON2_DEFAULT_TIME_COST;
-		my $threads = $options{'threads'} || PASSWORD_ARGON2_DEFAULT_THREADS;
-		my $tag_length = $options{'tag_length'} || PASSWORD_ARGON2_DEFAULT_TAG_LENGTH;	# undocumented; not a PHP option; 4 - 2^32 - 1
+		my $salt = $options{'salt'} || Crypt::OpenSSL::Random::random_bytes($PASSWORD_ARGON2_DEFAULT_SALT_LENGTH);	# undocumented; not a PHP option; raw!
+		my $memory_cost = $options{'memory_cost'} || $PASSWORD_ARGON2_DEFAULT_MEMORY_COST;
+		my $time_cost = $options{'time_cost'} || $PASSWORD_ARGON2_DEFAULT_TIME_COST;
+		my $threads = $options{'threads'} || $PASSWORD_ARGON2_DEFAULT_THREADS;
+		my $tag_length = $options{'tag_length'} || $PASSWORD_ARGON2_DEFAULT_TAG_LENGTH;	# undocumented; not a PHP option; 4 - 2^32 - 1
+
+		# Ignore characters and treat strings as strings of bytes
+		utf8::is_utf8($password) && utf8::encode($password);	# "\x{100}"  becomes "\xc4\x80"; preferred equivalent of Encode::is_utf8($string) && Encode::_utf8_off($password);
+
 		my @args = ($password, $salt, $time_cost, $memory_cost . 'k', $threads, $tag_length);
 		if ($algo == PASSWORD_ARGON2ID) {
 			return Crypt::Argon2::argon2id_pass(@args);
@@ -286,34 +318,34 @@ sub password_needs_rehash {
 		return 1;
 	}
 	if ($algo == PASSWORD_BCRYPT) {
-		if ($info{'algoSig'} ne SIG_BCRYPT) {
-			$options{'debug'} && warn('Algorithm signatures differ: ' . $info{'algoSig'} . ' vs ' . SIG_BCRYPT);
+		if ($info{'algoSig'} ne $SIG_BCRYPT) {
+			$options{'debug'} && warn('Algorithm signatures differ: ' . $info{'algoSig'} . ' vs ' . $SIG_BCRYPT);
 			return 1;
 		}
-		my $cost = $options{'cost'} // PASSWORD_BCRYPT_DEFAULT_COST;
+		my $cost = $options{'cost'} // $PASSWORD_BCRYPT_DEFAULT_COST;
 		unless (defined($info{'options'}->{'cost'}) && ($info{'options'}->{'cost'} == $cost)) {
 			$options{'debug'} && warn('Cost mismatch: ' . $info{'options'}->{'cost'} . "<>$cost");
 			return 1;
 		}
 	}
 	elsif (($algo == PASSWORD_ARGON2ID) || ($algo == PASSWORD_ARGON2I)) {
-		my $memory_cost = $options{'memory_cost'} // PASSWORD_ARGON2_DEFAULT_MEMORY_COST;
+		my $memory_cost = $options{'memory_cost'} // $PASSWORD_ARGON2_DEFAULT_MEMORY_COST;
 		if ($info{'options'}->{'memory_cost'} != $memory_cost) {
 			$options{'debug'} && warn('memory_cost mismatch: ' . $info{'options'}->{'memory_cost'} . "<>$memory_cost");
 			return 1;
 		}
-		my $time_cost = $options{'time_cost'} // PASSWORD_ARGON2_DEFAULT_TIME_COST;
+		my $time_cost = $options{'time_cost'} // $PASSWORD_ARGON2_DEFAULT_TIME_COST;
 		if ($info{'options'}->{'time_cost'} != $time_cost) {
 			$options{'debug'} && warn('time_cost mismatch: ' . $info{'options'}->{'time_cost'} . "<>$time_cost");
 			return 1;
 		}
-		my $threads = $options{'threads'} // PASSWORD_ARGON2_DEFAULT_THREADS;
+		my $threads = $options{'threads'} // $PASSWORD_ARGON2_DEFAULT_THREADS;
 		if ($info{'options'}->{'threads'} != $threads) {
 			$options{'debug'} && warn('threads mismatch: ' . $info{'options'}->{'threads'} . "<>$threads");
 			return 1;
 		}
-		my $wanted_salt_length = defined($options{'salt'}) && length($options{'salt'}) ? length($options{'salt'}) : PASSWORD_ARGON2_DEFAULT_SALT_LENGTH;
-		my $wanted_tag_length = $options{'tag_length'} || PASSWORD_ARGON2_DEFAULT_TAG_LENGTH;	# undocumented; not a PHP option; 4 - 2^32 - 1
+		my $wanted_salt_length = defined($options{'salt'}) && length($options{'salt'}) ? length($options{'salt'}) : $PASSWORD_ARGON2_DEFAULT_SALT_LENGTH;
+		my $wanted_tag_length = $options{'tag_length'} || $PASSWORD_ARGON2_DEFAULT_TAG_LENGTH;	# undocumented; not a PHP option; 4 - 2^32 - 1
 
 		if ($INC{'Crypt/Argon2.pm'} || eval { require Crypt::Argon2; }) {
 			if (version->parse($Crypt::Argon2::VERSION) < version->parse('0.008')) {
@@ -363,7 +395,7 @@ The same as L<http://php.net/manual/en/function.password-verify.php>.
 sub password_verify {
 	my $proto = @_ && UNIVERSAL::isa($_[0],__PACKAGE__) ? shift : __PACKAGE__;
 	my ($password, $crypted) = @_;
-	if ($crypted =~ RE_BCRYPT_STRING) {
+	if ($crypted =~ $RE_BCRYPT_STRING) {
 		my $cost = int($2);
 		my $salt = $3;
 		my $hash = $4;
@@ -376,14 +408,18 @@ sub password_verify {
 			return 1;
 		}
 		# Since the signature may vary slightly, try comparing only the hash.
-		return ($new_crypt =~ RE_BCRYPT_STRING) && ($4 eq $hash);
+		return ($new_crypt =~ $RE_BCRYPT_STRING) && ($4 eq $hash);
 	}
-	elsif ($crypted =~ RE_ARGON2_STRING) {
+	elsif ($crypted =~ $RE_ARGON2_STRING) {
 		unless ($INC{'Crypt/Argon2.pm'} || eval { require Crypt::Argon2; }) {
 			#carp("Verifying the $sig algorithm requires the module Crypt::Argon2 to be installed");
 			return 0;
 		}
-		my $algo = $sig_to_algo{$1};
+		my $algo = $SIG_TO_ALGO{$1};
+
+		# Ignore characters and treat strings as strings of bytes
+		utf8::is_utf8($password) && utf8::encode($password);	# "\x{100}"  becomes "\xc4\x80"; preferred equivalent of Encode::is_utf8($string) && Encode::_utf8_off($password);
+
 		my @args = ($crypted, $password);
 		if ($algo == PASSWORD_ARGON2ID) {
 			return Crypt::Argon2::argon2id_verify(@args);
@@ -491,7 +527,14 @@ sub verify {
 sub _bcrypt {
 	my $proto = @_ && UNIVERSAL::isa($_[0],__PACKAGE__) ? shift : __PACKAGE__;
 	my ($password, $settings) = @_;
-	unless ($settings =~ RE_BCRYPT_SETTINGS) {
+	unless ($settings =~ qr/^
+		\$
+		($RE_BCRYPT_ALGO)
+		\$
+		($RE_BCRYPT_COST)
+		\$
+		($RE_BCRYPT_SALT)
+	/x) {
 		croak('Bad bcrypt settings argument');
 	}
 	my ($type, $cost, $salt_base64) = ($1, $2, $3);
@@ -503,7 +546,7 @@ sub _bcrypt {
 			'salt'		=> $proto->_bcrypt_base64_decode($salt_base64),
 		}
 	);
-	return '$' . SIG_BCRYPT . '$' . $cost . '$' . $salt_base64 . $proto->_bcrypt_base64_encode($hash);
+	return '$' . $SIG_BCRYPT . '$' . $cost . '$' . $salt_base64 . $proto->_bcrypt_base64_encode($hash);
 }
 
 
@@ -517,6 +560,10 @@ sub _bcrypt_hash {
 	if ($settings->{'key_nul'} || ($password eq '')) {
 		$password .= "\0";
 	}
+
+	# Ignore characters and treat strings as strings of bytes
+	utf8::is_utf8($password) && utf8::encode($password);	# "\x{100}"  becomes "\xc4\x80"; preferred equivalent of Encode::is_utf8($string) && Encode::_utf8_off($password);
+
 	my $cipher = Crypt::Eksblowfish->new(
 		$settings->{'cost'},
 		$settings->{'salt'},

@@ -20,6 +20,11 @@ use DynaLoader;
 
 
 
+
+#line 5 "gsl_sf_psi.pd"
+use strict;
+use warnings;
+
 =head1 NAME
 
 PDL::GSLSF::PSI - PDL interface to GSL Special Functions
@@ -30,14 +35,10 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 Poly-Gamma Functions
 
-psi(m,x) := (d/dx)^m psi(0,x) = (d/dx)^{m+1} log(gamma(x))
-
-
-=head1 SYNOPSIS
+  psi(m,x) := (d/dx)^m psi(0,x) = (d/dx)^{m+1} log(gamma(x))
 
 =cut
-
-
+#line 42 "PSI.pm"
 
 
 
@@ -50,6 +51,8 @@ psi(m,x) := (d/dx)^m psi(0,x) = (d/dx)^{m+1} log(gamma(x))
 
 
 
+
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_psi
@@ -69,16 +72,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 76 "PSI.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_psi = \&PDL::gsl_sf_psi;
+#line 82 "PSI.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_psi_1piy
@@ -98,16 +102,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 106 "PSI.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_psi_1piy = \&PDL::gsl_sf_psi_1piy;
+#line 112 "PSI.pm"
 
 
 
+#line 1059 "../../../../blib/lib/PDL/PP.pm"
 
 
 =head2 gsl_sf_psi_n
@@ -127,18 +132,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 136 "PSI.pm"
 
 
 
-
-
-
+#line 1061 "../../../../blib/lib/PDL/PP.pm"
 *gsl_sf_psi_n = \&PDL::gsl_sf_psi_n;
+#line 142 "PSI.pm"
 
 
 
 
 
+#line 70 "gsl_sf_psi.pd"
 =head1 AUTHOR
 
 This file copyright (C) 1999 Christian Pellegrin <chri@infis.univ.trieste.it>
@@ -151,8 +157,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-
-
+#line 161 "PSI.pm"
 
 
 

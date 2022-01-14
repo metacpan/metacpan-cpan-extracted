@@ -1,10 +1,18 @@
 Revision history for Dist-Zilla-Plugin-Git-RequireUnixEOL
 
+1.001  2022-01-08 22:52:23 UTC
+
+  - Replace Git::Wrapper with Git::Background
+  - Removed minimal dependency on Test::TempDir::Tiny 0.017 and Moose 2.1203
+  - skip needs $how_many with Test::More < 1.302013_009
+  - Removed unused test dependency on autodie
+  - Code cleanup - moved all 'use' before 'has'
+
 1.000  2018-04-02 16:13:25 UTC
 
   - No code changes
   - Distribution cleanup
-  - Bumped depenency on Moose to 2.1203
+  - Bumped dependency on Moose to 2.1203
 
 0.002  2017-10-21 05:45:10 UTC
 

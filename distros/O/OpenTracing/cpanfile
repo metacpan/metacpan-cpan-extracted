@@ -5,6 +5,7 @@ requires 'Bytes::Random::Secure';
 requires 'Log::Any';
 requires 'Role::Tiny';
 requires 'JSON::MaybeXS';
+requires 'JSON::MaybeUTF8', '>= 2.000';
 requires 'Module::Pluggable';
 requires 'Module::Load';
 requires 'Net::Address::IP::Local';

@@ -21,6 +21,10 @@ use DynaLoader;
 
 
 
+#line 9 "matrixops.pd"
+use strict;
+use warnings;
+
 =head1 NAME
 
 PDL::MatrixOps -- Some Useful Matrix Operations
@@ -81,12 +85,12 @@ operator (which is, of course, threadable):
 Because of the (column,row) addressing order, 1-D PDLs are treated as
 _row_ vectors; if you want a _column_ vector you must add a dummy dimension:
 
-    $rowvec  = pdl(1,2);            # row vector
-    $colvec  = $rowvec->(*1);	      # 1x2 column vector
-    $matrix  = pdl([[3,4],[6,2]]);  # 2x2 matrix
-    $rowvec2 = $rowvec x $matrix;   # right-multiplication by matrix
-    $colvec  = $matrix x $colvec;   # left-multiplication by matrix
-    $m2      = $matrix x $rowvec;   # Throws an error
+    $rowvec  = pdl(1,2);             # row vector
+    $colvec  = $rowvec->slice('*1'); # 1x2 column vector
+    $matrix  = pdl([[3,4],[6,2]]);   # 2x2 matrix
+    $rowvec2 = $rowvec x $matrix;    # right-multiplication by matrix
+    $colvec  = $matrix x $colvec;    # left-multiplication by matrix
+    $m2      = $matrix x $rowvec;    # Throws an error
 
 Implicit threading works correctly with most matrix operations, but
 you must be extra careful that you understand the dimensionality.  In 
@@ -124,9 +128,8 @@ document it!
 =cut
 
 use Carp;
-use PDL::NiceSlice;
 use strict;
-
+#line 133 "MatrixOps.pm"
 
 
 
@@ -139,6 +142,8 @@ use strict;
 
 
 
+
+#line 124 "matrixops.pd"
 =head2 identity
 
 =for sig
@@ -167,8 +172,11 @@ sub identity {
   (my $tmp = $out->diagonal(0,1))++; # work around perl -d "feature"
   $out;
 }
+#line 176 "MatrixOps.pm"
 
 
+
+#line 157 "matrixops.pd"
 
 =head2 stretcher
 
@@ -193,9 +201,11 @@ sub stretcher {
   ($tmp = $out->diagonal(0,1)) += $in;	
   $out;
 }
+#line 205 "MatrixOps.pm"
 
 
 
+#line 188 "matrixops.pd"
 
 =head2 inv
 
@@ -290,9 +300,11 @@ sub inv {
   $x .= $out;
   $x;
 }
+#line 304 "MatrixOps.pm"
 
 
 
+#line 289 "matrixops.pd"
 
 =head2 det
 
@@ -348,9 +360,11 @@ sub det {
    
   ( (defined $lu) ? $lu->diagonal(0,1)->prodover * $par : 0 );
 }
+#line 364 "MatrixOps.pm"
 
 
 
+#line 351 "matrixops.pd"
 
 =head2 determinant
 
@@ -416,27 +430,28 @@ sub determinant {
   }
   
   my($i);
-  my($sum) = zeroes($x->((0),(0)));
+  my($sum) = zeroes($x->slice('(0),(0)'));
 
   # Do middle submatrices
   for $i(1..$n-2) {
-    my $el = $x->(($i),(0));
+    my $el = $x->slice("($i),(0)");
     next if( ($el==0)->all );  # Optimize away unnecessary recursion
-
     $sum += $el * (1-2*($i%2)) * 
-      determinant(        $x->(0:$i-1,1:-1)->
-		   append($x->($i+1:-1,1:-1)));
+      determinant($x->slice("0:".($i-1).",1:-1")->
+		  append($x->slice(($i+1).":-1,1:-1")));
   }
 
   # Do beginning and end submatrices
-  $sum += $x->((0),(0))  * determinant($x->(1:-1,1:-1));
-  $sum -= $x->((-1),(0)) * determinant($x->(0:-2,1:-1)) * (1 - 2*($n % 2));
+  $sum += $x->slice("(0),(0)")  * determinant($x->slice('1:-1,1:-1'));
+  $sum -= $x->slice("(-1),(0)") * determinant($x->slice('0:-2,1:-1')) * (1 - 2*($n % 2));
   
   return $sum;
 }
+#line 451 "MatrixOps.pm"
 
 
 
+#line 1059 "../../blib/lib/PDL/PP.pm"
 
 
 =head2 eigens_sym
@@ -468,8 +483,8 @@ makes it slightly easier to access individual eigenvectors, since the
 runs across their components.
 
     ($ev,$e) = eigens_sym $x;  # Make eigenvector matrix
-    $vector = $ev->($n);       # Select nth eigenvector as a column-vector
-    $vector = $ev->(($n));     # Select nth eigenvector as a row-vector
+    $vector = $ev->slice($n);       # Select nth eigenvector as a column-vector
+    $vector = $ev->slice("($n)");     # Select nth eigenvector as a row-vector
 
 =for usage
 
@@ -485,10 +500,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 504 "MatrixOps.pm"
 
 
 
-
+#line 1060 "../../blib/lib/PDL/PP.pm"
 
    sub PDL::eigens_sym {
       my ($x) = @_;
@@ -522,12 +538,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 	if(wantarray);
       $e;                #just eigenvalues
    }
+#line 542 "MatrixOps.pm"
 
 
+
+#line 1061 "../../blib/lib/PDL/PP.pm"
 *eigens_sym = \&PDL::eigens_sym;
+#line 548 "MatrixOps.pm"
 
 
 
+#line 1059 "../../blib/lib/PDL/PP.pm"
 
 
 =head2 eigens
@@ -579,8 +600,8 @@ eigenvectors, since the 0th dim of the output PDL runs across the
 eigenvectors and the 1st dim runs across their components.
 
 	($ev,$e) = eigens $x;  # Make eigenvector matrix
-	$vector = $ev->($n);   # Select nth eigenvector as a column-vector
-	$vector = $ev->(($n)); # Select nth eigenvector as a row-vector
+	$vector = $ev->slice($n);   # Select nth eigenvector as a column-vector
+	$vector = $ev->slice("($n)"); # Select nth eigenvector as a row-vector
 
 DEVEL NOTES: 
 
@@ -602,10 +623,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 627 "MatrixOps.pm"
 
 
 
-
+#line 1060 "../../blib/lib/PDL/PP.pm"
 
    sub PDL::eigens {
       my ($x) = @_;
@@ -652,12 +674,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
           return $e->index(0)->sever;  #just eigenvalues
       }
    }
+#line 678 "MatrixOps.pm"
 
 
+
+#line 1061 "../../blib/lib/PDL/PP.pm"
 *eigens = \&PDL::eigens;
+#line 684 "MatrixOps.pm"
 
 
 
+#line 1059 "../../blib/lib/PDL/PP.pm"
 
 
 =head2 svd
@@ -699,7 +726,7 @@ transpose of C<$a>, and reconstructing the original matrix like so:
 
     ($u,$s,$v) = svd($x->transpose);
     $ess = zeroes($x->dim(1),$x->dim(1));
-    $ess->slice("$_","$_").=$s->slice("$_") foreach (0..$x->dim(1)-1); #generic diagonal
+    $ess->slice($_,$_).=$s->slice($_) foreach (0..$x->dim(1)-1); #generic diagonal
     $x_copy = $v x $ess x $u->transpose;
 
 EXAMPLE
@@ -724,16 +751,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 755 "MatrixOps.pm"
 
 
 
-
-
-
+#line 1061 "../../blib/lib/PDL/PP.pm"
 *svd = \&PDL::svd;
+#line 761 "MatrixOps.pm"
 
 
 
+#line 817 "matrixops.pd"
 
 =head2 lu_decomp
 
@@ -834,7 +862,7 @@ sub lu_decomp {
          $permute->dim(0) != $out->dim(0));
       $permute .= PDL->xvals($in->dim(0));
    } else {
-      $permute = $in->((0))->xvals;
+      $permute = $in->slice("(0)")->xvals;
    }
 
    if(defined $parity) {
@@ -843,7 +871,7 @@ sub lu_decomp {
          $parity->dim(0) != 1);
       $parity .= 1.0;
    } else {
-      $parity = $in->((0),(0))->ones;
+      $parity = $in->slice('(0),(0)')->ones;
    }
 
    my($scales) = $in->copy->abs->maximum; # elementwise by rows
@@ -853,8 +881,8 @@ sub lu_decomp {
    }
 
    # Some holding tanks
-   my($tmprow) = $out->((0))->double->zeroes;
-   my($tmpval) = $tmprow->((0))->sever;
+   my($tmprow) = $out->slice('(0)')->double->zeroes;
+   my($tmpval) = $tmprow->slice('(0)')->sever;
 
    my($col,$row);
    for $col(0..$n1) {       
@@ -863,8 +891,8 @@ sub lu_decomp {
          if($klim > 0) {
             $klim--;
             my($el) = $out->index2d($col,$row);
-            $el -= ( $out->(($col),0:$klim) *
-               $out->(0:$klim,($row)) )->sumover;
+            $el -= ( $out->slice("($col),0:$klim") *
+               $out->slice("0:$klim,($row)") )->sumover;
          }
 
       }
@@ -873,7 +901,7 @@ sub lu_decomp {
 
       if($col < $n1) {
          # Find the maximum value in the rest of the row
-         my $sl = $out->(($col),$col:$n1);
+         my $sl = $out->slice("($col),$col:$n1");
          my $wh = $sl->abs->maximum_ind;
          my $big = $sl->index($wh)->sever;
 
@@ -882,9 +910,8 @@ sub lu_decomp {
          { # Permute rows to place maximum element on diagonal.
             my $whc = $wh+$col;
 
-            # my $sl1 = $out->(:,($whc));
-            my $sl1 = $out->mv(1,0)->index($whc(*$n));
-            my $sl2 = $out->(:,($col));
+            my $sl1 = $out->mv(1,0)->index($whc->slice("*$n"));
+            my $sl2 = $out->slice(":,($col)");
             $tmprow .= $sl1;  $sl1 .= $sl2;  $sl2 .= $tmprow;
 
             $sl1 = $permute->index($whc);
@@ -903,7 +930,7 @@ sub lu_decomp {
 
          # Divide by the diagonal element (which is now the largest element)
          my $tout;
-         ($tout = $out->(($col),$col+1:$n1)) /= $big->(*1);
+         ($tout = $out->slice("($col),".($col+1).":$n1")) /= $big->slice('*1');
       } # end of pivoting part
    } # end of column loop
 
@@ -912,9 +939,11 @@ sub lu_decomp {
    }
    $out;
 }
+#line 943 "MatrixOps.pm"
 
 
 
+#line 1000 "matrixops.pd"
 
 =head2 lu_decomp2
 
@@ -1014,8 +1043,8 @@ sub lu_decomp2 {
 	$klim--;
 	my($el) = $out->index2d($col,$row);
 
-	$el -= ( $out->(($col),0:$klim) *
-		 $out->(0:$klim,($row)) )->sumover;
+	$el -= ( $out->slice("($col),0:$klim") *
+		 $out->slice("0:$klim,($row)") )->sumover;
       }
 
     }
@@ -1024,7 +1053,7 @@ sub lu_decomp2 {
     if($col < $n1) {
       # Divide the rest of the column by the diagonal element 
       my $tmp; # work around for perl -d "feature"
-      ($tmp = $out->(($col),$col+1:$n1)) /= $diagonal->index($col)->dummy(0,$n1-$col);
+      ($tmp = $out->slice("($col),".($col+1).":$n1")) /= $diagonal->index($col)->dummy(0,$n1-$col);
     }
 
   } # end of column loop
@@ -1034,9 +1063,11 @@ sub lu_decomp2 {
   }
   $out;
 }
+#line 1067 "MatrixOps.pm"
 
 
 
+#line 1125 "matrixops.pd"
 
 =head2 lu_backsub
 
@@ -1168,16 +1199,16 @@ sub lu_backsub {
 
    print STDERR "lu_backsub: called with args:  \$lu$ludims, \$perm$permdims, \$y$bdims\n" if $PDL::debug;
 
-   my $m = $ludims((0));  # this is the sig dimension
-   unless ( ($ludims(0) == $m) and ($ludims(1) == $m) and
-      ($permdims(0) == $m) and ($bdims(0) == $m)) {
+   my $m = $ludims->slice("(0)");  # this is the sig dimension
+   unless ( ($ludims->slice(0) == $m) and ($ludims->slice(1) == $m) and
+      ($permdims->slice(0) == $m) and ($bdims->slice(0) == $m)) {
       barf "lu_backsub: mismatched sig dimensions";
    }
 
    my $lunumthr = $ludims->dim(0)-2;
    my $permnumthr = $permdims->dim(0)-1;
    my $bnumthr = $bdims->dim(0)-1;
-   unless ( ($lunumthr == $permnumthr) and ($ludims(1:-1) == $permdims)->all )  {
+   unless ( ($lunumthr == $permnumthr) and ($ludims->slice("1:-1") == $permdims)->all )  {
       barf "lu_backsub: \$lu and \$perm thread dims not equal! \n";
    }
 
@@ -1222,8 +1253,8 @@ THREAD_OK:
    for $row(1..$n1) {
       $r1 = $row-1;
       my $tmp; # work around perl -d "feature
-      ($tmp = $out->index($row)) -= ($lu->(0:$r1,$row) * 
-         $out->(0:$r1)
+      ($tmp = $out->index($row)) -= ($lu->slice("0:$r1,$row") *
+         $out->slice("0:$r1")
       )->sumover;
    }
 
@@ -1237,8 +1268,8 @@ THREAD_OK:
    for ($row=$n1; $row>0; $row--) {
       $r1 = $row-1;
       my $tmp; # work around for perl -d "feature"
-      ($tmp = $out->index($r1)) -= ($lu->($row:$n1,$r1) *                  # TODO: check thread dims
-         $out->($row:$n1)
+      ($tmp = $out->index($r1)) -= ($lu->slice("$row:$n1,$r1") *                  # TODO: check thread dims
+         $out->slice("$row:$n1")
       )->sumover;
       ($tmp = $out->index($r1)) /= $ludiag->index($r1)->dummy(0);        # TODO: check thread dims
    }
@@ -1249,10 +1280,11 @@ THREAD_OK:
    }
    $out;
 }
+#line 1284 "MatrixOps.pm"
 
 
 
-
+#line 1059 "../../blib/lib/PDL/PP.pm"
 
 
 =head2 simq
@@ -1293,16 +1325,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 1329 "MatrixOps.pm"
 
 
 
-
-
-
+#line 1061 "../../blib/lib/PDL/PP.pm"
 *simq = \&PDL::simq;
+#line 1335 "MatrixOps.pm"
 
 
 
+#line 1059 "../../blib/lib/PDL/PP.pm"
 
 
 =head2 squaretotri
@@ -1325,18 +1358,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 1362 "MatrixOps.pm"
 
 
 
-
-
-
+#line 1061 "../../blib/lib/PDL/PP.pm"
 *squaretotri = \&PDL::squaretotri;
+#line 1368 "MatrixOps.pm"
 
 
 
 
 
+#line 1420 "matrixops.pd"
 
 =head1 AUTHOR
 
@@ -1348,7 +1382,7 @@ itself.  If this file is separated from the PDL distribution, then the
 PDL copyright notice should be included in this file.
 
 =cut
-
+#line 1386 "MatrixOps.pm"
 
 
 

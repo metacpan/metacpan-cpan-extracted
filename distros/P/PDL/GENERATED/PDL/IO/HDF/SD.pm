@@ -21,6 +21,8 @@ use DynaLoader;
 
 
 
+#line 4 "SD.pd"
+
 =head1 NAME 
 
 PDL::IO::HDF::SD - PDL interface to the HDF4 SD library.
@@ -119,6 +121,9 @@ interchangeably.
 
 =cut
 
+use strict;
+use warnings;
+#line 127 "SD.pm"
 
 
 
@@ -126,6 +131,7 @@ interchangeably.
 
 
 
+#line 362 "SD.pd"
 
 use PDL::Primitive;
 use PDL::Basic;
@@ -432,6 +438,8 @@ sub SDgetvariablenames
 {
     my($self) = @_;
     return sort keys %{$self->{DATASET}};
+#line 442 "SD.pm"
+#line 668 "SD.pd"
 } # End of SDgetvariablenames()...
 sub SDgetvariablename
 {
@@ -474,10 +482,14 @@ sub SDgetattributenames
         return( undef )
             unless defined( $self->{DATASET}->{$name} );
         return sort keys %{ $self->{DATASET}->{$name}->{ATTRS} };
+#line 486 "SD.pm"
+#line 710 "SD.pd"
     }
     else 
     {
         return sort keys %{ $self->{GLOBATTR} };
+#line 492 "SD.pm"
+#line 714 "SD.pd"
     }
 } # End of SDgetattributenames()...
 # Wrapper (this is now defunct):
@@ -648,6 +660,8 @@ sub SDgetdimsize
         unless defined( $self->{DATASET}->{$name} );
     my @dims;
     foreach( sort keys %{ $self->{DATASET}->{$name}->{DIMS} } )
+#line 664 "SD.pm"
+#line 884 "SD.pd"
     { 
         push @dims, $self->{DATASET}->{$name}->{DIMS}->{$_}->{SIZE};
     }
@@ -684,6 +698,8 @@ sub SDgetunlimiteddimsize
     
     my @dim;
     foreach( sort keys %{$self->{DATASET}{$name}{DIMS}} )
+#line 702 "SD.pm"
+#line 920 "SD.pd"
     {
         if( $self->{DATASET}->{$name}->{DIMS}->{$_}->{SIZE} == 0 )
         {
@@ -734,6 +750,8 @@ sub SDgetdimnames
         
     my @dims=();
     foreach( sort keys %{ $self->{DATASET}->{$name}->{DIMS} } )
+#line 754 "SD.pm"
+#line 970 "SD.pd"
     {
 	push @dims,$self->{DATASET}->{$name}->{DIMS}->{$_}->{NAME};
     }
@@ -1174,6 +1192,8 @@ sub SDsetdimname
     
     my $res = 0;
     foreach( sort keys %{$self->{DATASET}->{$name}->{DIMS}} )
+#line 1196 "SD.pm"
+#line 1410 "SD.pd"
     {
         return( undef )
             unless defined( $$dimname[ $_ ] );
@@ -1297,7 +1317,7 @@ sub SDput
     $stride = pack ("L*", @$stride);
     $data->make_physical();
 
-    $res = _SDwritedata( $self->{DATASET}->{$name}->{SDSID}, $start, $stride, $dimsize, $data );
+    my $res = _SDwritedata( $self->{DATASET}->{$name}->{SDSID}, $start, $stride, $dimsize, $data );
     return( undef )
         if ($res == PDL::IO::HDF->FAIL);
 
@@ -1318,7 +1338,7 @@ sub SDput
         my $dimname = " "x(PDL::IO::HDF->MAX_NC_NAME);
         my $size = 0;
         my $num_dim_attrs = 0;
-        $res = _SDdiminfo( $dim_id, $dimname, $size, $numtype=0, $num_dim_attrs);
+        $res = _SDdiminfo( $dim_id, $dimname, $size, my $numtype=0, $num_dim_attrs);
         
         return( undef )
             if ($res == PDL::IO::HDF->FAIL);
@@ -1360,9 +1380,11 @@ sub DESTROY
     my $self = shift;
     $self->close;
 } # End of DESTROY()...
+#line 1384 "SD.pm"
 
 
 
+#line 1603 "SD.pd"
 
 =head1 CURRENT AUTHOR & MAINTAINER
 
@@ -1379,8 +1401,7 @@ contribs of Olivier Archer olivier.archer@ifremer.fr
 perl(1), PDL(1), PDL::IO::HDF(1).
 
 =cut
-
-
+#line 1405 "SD.pm"
 
 
 

@@ -39,7 +39,7 @@ my %regexes = (
 
 lock_hash(%OPTIONS_MAP);
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 =head1 NAME
 
@@ -427,7 +427,7 @@ sub main_loop {
         if ( @{$warns_ref} ) {
 
             foreach my $warning ( @{$warns_ref} ) {
-                $logger->warn($warning);
+                $logger->warn($warning->message);
             }
 
         }
@@ -446,7 +446,7 @@ sub main_loop {
                 return 0;
             }
             else {
-                $logger->error($error);
+                $logger->error($error->message);
             }
 
         }
@@ -546,12 +546,12 @@ sub main_loop {
     }
 
     $logger->fatal(
-        'Could not find the HTML form to report the SPAM! May be a temporary Spamcop.net error, try again later! Quitting...'
+        'Could not find the HTML form to report the SPAM! May be a temporary Spamcop website error, try again later! Quitting...'
         ) unless ($form);
 
     # Run without confirming each spam? Stupid. :)
     unless ( $opts_ref->{stupid} ) {
-        print "* Are you sure this is spam? [y/N] ";
+        print "* Are you sure this is SPAM? [y/N] ";
 
         my $reply = <>;    # this should be done differently!
         if ( $reply && $reply !~ /^y/i ) {
@@ -576,7 +576,7 @@ sub main_loop {
 
         unless ( $opts_ref->{stupid} ) {
             print
-                "* Preview headers not available, but you can still report this. Are you sure this is spam? [y/N] ";
+                "* Preview headers not available, but you can still report this. Are you sure this is SPAM? [y/N] ";
 
             my $reply = <>;
             chomp($reply);

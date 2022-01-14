@@ -1,5 +1,21 @@
 Revision history for Digest-Bcrypt
 
+1.211     2022-01-12
+    - Fixed some typos and organization of documentation
+    - Ensured all code was run through perltidy
+    - Get rid of TravisCI config
+    - Add some more guidance about not using this module
+    - Fix syntax use that broke compatibility with 5.8
+    - Setup GH Workflows for testing
+
+1.210     2022-01-10
+    - Update to Starter::Git and clean up the dist.ini file
+    - Switch to Crypt::Bcrypt
+    - Change all tests to use a cost of 5 at least
+    - Add a 'type' attribute so selecting the encoding type is possible
+    - Default the type to 2a to keep it as it was prior to switching to
+      Crypt::Bcrypt
+
 1.209     2017-03-25
     - Revert to using bytes as that broke salt length tests
     - Added a few author tests for Data::Entropy::Algorithms::rand_bits()

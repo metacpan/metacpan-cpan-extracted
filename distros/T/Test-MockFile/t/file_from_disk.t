@@ -20,9 +20,9 @@ my ( undef, $fake_file_name ) = tempfile();
 unlink $fake_file_name;
 
 my $mock = Test::MockFile->file_from_disk( $fake_file_name, $file_on_disk );
-is( open( my $fh, "<", $fake_file_name ), 1, "open fake file for read" );
-is( <$fh>, "abc\n", "Read line 1." );
-is( <$fh>, ( "x" x 20 ) . "\n", "Read line 2." );
+is( open( my $fh, "<", $fake_file_name ), 1,                   "open fake file for read" );
+is( <$fh>,                                "abc\n",             "Read line 1." );
+is( <$fh>,                                ( "x" x 20 ) . "\n", "Read line 2." );
 close $fh;
 undef $fh;
 

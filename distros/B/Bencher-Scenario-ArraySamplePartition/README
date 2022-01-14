@@ -3,9 +3,9 @@ NAME
     Array::Sample::Partition hash
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Bencher::Scenario::ArraySamplePartition (from Perl distribution
-    Bencher-Scenario-ArraySamplePartition), released on 2017-07-23.
+    Bencher-Scenario-ArraySamplePartition), released on 2021-07-31.
 
 SYNOPSIS
     To run benchmark with default option:
@@ -58,41 +58,87 @@ BENCHMARK DATASETS
 
     *   500/1000
 
-SAMPLE BENCHMARK RESULTS
-    Run on: perl: *v5.24.0*, CPU: *Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz
-    (4 cores)*, OS: *GNU/Linux Debian version 8.5*, OS kernel: *Linux
-    version 3.16.0-4-amd64*.
+BENCHMARK SAMPLE RESULTS
+  Sample benchmark #1
+    Run on: perl: *v5.34.0*, CPU: *Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz
+    (4 cores)*, OS: *GNU/Linux LinuxMint version 19*, OS kernel: *Linux
+    version 5.3.0-68-generic*.
 
-    Benchmark with default options ("bencher -m ArraySamplePartition"):
+    Benchmark command (default options):
+
+     % bencher -m ArraySamplePartition
+
+    Result formatted as table:
 
      #table1#
-     +----------+------------+-----------+------------+---------+---------+
-     | dataset  | rate (/s)  | time (μs) | vs_slowest |  errors | samples |
-     +----------+------------+-----------+------------+---------+---------+
-     | 500/1000 |    8195.54 | 122.018   |    1       |   0     |      20 |
-     | 100/1000 |   27000    |  37       |    3.3     | 5.3e-08 |      20 |
-     | 10/1000  |   56000    |  18       |    6.8     | 3.3e-08 |      20 |
-     | 1/1000   |   61000    |  16       |    7.4     |   2e-08 |      20 |
-     | 50/100   |   77844.2  |  12.8462  |    9.49836 |   0     |      38 |
-     | 10/100   |  240000    |   4.2     |   29       | 6.7e-09 |      20 |
-     | 1/100    |  469700    |   2.129   |   57.31    | 4.6e-11 |      29 |
-     | 5/10     |  547890    |   1.82518 |   66.8523  |   0     |      20 |
-     | 1/10     | 1200000    |   0.87    |  140       | 1.7e-09 |      20 |
-     +----------+------------+-----------+------------+---------+---------+
+     | dataset  | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+     |----------+-----------+-----------+-----------------------+-----------------------+---------+---------|
+     | 500/1000 |    8650   |  116      |                 0.00% |             14836.87% | 5.3e-08 |      20 |
+     | 100/1000 |   28900   |   34.6    |               234.18% |              4369.68% |   1e-08 |      34 |
+     | 10/1000  |   61200   |   16.3    |               607.56% |              2011.04% | 6.5e-09 |      21 |
+     | 1/1000   |   68900   |   14.5    |               695.89% |              1776.76% | 5.6e-09 |      28 |
+     | 50/100   |   83954.7 |   11.9112 |               870.43% |              1439.20% | 5.8e-12 |      26 |
+     | 10/100   |  257240   |    3.8874 |              2873.47% |               402.34% | 5.8e-12 |      20 |
+     | 1/100    |  492000   |    2.03   |              5590.87% |               162.47% | 8.3e-10 |      20 |
+     | 5/10     |  620000   |    1.6    |              7061.39% |               108.58% | 3.3e-09 |      20 |
+     | 1/10     | 1300000   |    0.77   |             14836.87% |                 0.00% | 1.2e-09 |      21 |
 
-    Benchmark module startup overhead ("bencher -m ArraySamplePartition
-    --module-startup"):
+    The above result formatted in Benchmark.pm style:
+
+                     Rate  500/1000  100/1000  10/1000  1/1000  50/100  10/100  1/100  5/10  1/10 
+      500/1000     8650/s        --      -70%     -85%    -87%    -89%    -96%   -98%  -98%  -99% 
+      100/1000    28900/s      235%        --     -52%    -58%    -65%    -88%   -94%  -95%  -97% 
+      10/1000     61200/s      611%      112%       --    -11%    -26%    -76%   -87%  -90%  -95% 
+      1/1000      68900/s      700%      138%      12%      --    -17%    -73%   -86%  -88%  -94% 
+      50/100    83954.7/s      873%      190%      36%     21%      --    -67%   -82%  -86%  -93% 
+      10/100     257240/s     2883%      790%     319%    272%    206%      --   -47%  -58%  -80% 
+      1/100      492000/s     5614%     1604%     702%    614%    486%     91%     --  -21%  -62% 
+      5/10       620000/s     7150%     2062%     918%    806%    644%    142%    26%    --  -51% 
+      1/10      1300000/s    14964%     4393%    2016%   1783%   1446%    404%   163%  107%    -- 
+ 
+     Legends:
+       1/10: dataset=1/10
+       1/100: dataset=1/100
+       1/1000: dataset=1/1000
+       10/100: dataset=10/100
+       10/1000: dataset=10/1000
+       100/1000: dataset=100/1000
+       5/10: dataset=5/10
+       50/100: dataset=50/100
+       500/1000: dataset=500/1000
+
+    The above result presented as chart:
+
+  Sample benchmark #2
+    Benchmark command (benchmarking module startup overhead):
+
+     % bencher -m ArraySamplePartition --module-startup
+
+    Result formatted as table:
 
      #table2#
-     +--------------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
-     | participant              | proc_private_dirty_size (kB) | proc_rss_size (MB) | proc_size (MB) | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
-     +--------------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
-     | Array::Sample::Partition | 836                          | 4.1                | 20             |       5.1 |                    2.3 |        1   | 3.9e-05 |      20 |
-     | perl -e1 (baseline)      | 936                          | 4.2                | 20             |       2.8 |                    0   |        1.8 | 7.8e-06 |      20 |
-     +--------------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
+     | participant              | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+     |--------------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------|
+     | Array::Sample::Partition |         7 |                 3 |                 0.00% |                64.41% | 0.00025 |      21 |
+     | perl -e1 (baseline)      |         4 |                 0 |                64.41% |                 0.00% | 0.00014 |      27 |
+
+    The above result formatted in Benchmark.pm style:
+
+                              Rate  AS:P  perl -e1 (baseline) 
+      AS:P                 142.9/s    --                 -42% 
+      perl -e1 (baseline)  250.0/s   75%                   -- 
+ 
+     Legends:
+       AS:P: mod_overhead_time=3 participant=Array::Sample::Partition
+       perl -e1 (baseline): mod_overhead_time=0 participant=perl -e1 (baseline)
+
+    The above result presented as chart:
 
     To display as an interactive HTML table on a browser, you can add option
     "--format html+datatables".
+
+CONTRIBUTOR
+    perlancar (on pc-home) <perlancar@gmail.com>
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -116,7 +162,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2017 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

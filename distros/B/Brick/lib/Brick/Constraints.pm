@@ -2,7 +2,7 @@ package Brick::Constraints;
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = '0.901';
+$VERSION = '0.902';
 
 package Brick::Bucket;
 use strict;
@@ -157,7 +157,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright © 2007-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2007-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

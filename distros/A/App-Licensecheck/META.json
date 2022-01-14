@@ -46,8 +46,7 @@
             "List::SomeUtils" : "0",
             "Log::Any" : "0",
             "Log::Any::Adapter::Screen" : "0",
-            "Moo" : "1.001000",
-            "MooX::Struct" : "0",
+            "Object::Pad" : "0.27",
             "Path::Iterator::Rule" : "0",
             "Path::Tiny" : "0.062",
             "Pod::Constants" : "0",
@@ -83,7 +82,7 @@
    "provides" : {
       "App::Licensecheck" : {
          "file" : "lib/App/Licensecheck.pm",
-         "version" : "v3.2.14"
+         "version" : "v3.3.0"
       }
    },
    "release_status" : "stable",
@@ -101,13 +100,13 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/App-Licensecheck/project"
    },
-   "version" : "v3.2.14",
+   "version" : "v3.3.0",
    "x_contributors" : [
       "Paul Wise <pabs@debian.org>"
    ],
    "x_help_wanted" : [
-      "tester",
-      "documenter"
+      "documenter",
+      "tester"
    ],
    "x_provides_scripts" : {
       "licensecheck" : {

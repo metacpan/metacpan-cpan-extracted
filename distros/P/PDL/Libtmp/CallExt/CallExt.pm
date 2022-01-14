@@ -1,16 +1,17 @@
-
 package PDL::CallExt;
 
-@EXPORT_OK  = qw( callext callext_cc );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
-@EXPORT = @EXPORT_OK;
-
+use strict;
+use warnings;
 use Config;
 use PDL::Core;
 use PDL::Exporter;
 use DynaLoader;
 use Carp;
-@ISA    = qw( PDL::Exporter DynaLoader );
+
+our @ISA    = qw( PDL::Exporter DynaLoader );
+our @EXPORT_OK  = qw( callext callext_cc );
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
+our @EXPORT = @EXPORT_OK;
 
 bootstrap PDL::CallExt;
 
@@ -64,12 +65,12 @@ pdlsimple.h defines a simple N-dimensional data structure which looks like this:
   struct pdlsimple {
      int    datatype;  /* whether byte/int/float etc. */
      void  *data;      /* Generic pointer to the data block */
-     int    nvals;     /* Number of data values */
-     PDL_Long *dims;   /* Array of data dimensions */
-     int    ndims;     /* Number of data dimensions */
+     PDL_Indx nvals;   /* Number of data values */
+     PDL_Indx *dims;   /* Array of data dimensions */
+     PDL_Indx ndims;   /* Number of data dimensions */
   };
 
-(PDL_Long is always a 4 byte int and is defined in pdlsimple.h)
+(PDL_Indx is 32- or 64-bit depending on architecture and is defined in pdlsimple.h)
 
 This is a simplification of the internal representation of ndarrays in PDL which is
 more complicated because of threading, dataflow, etc. It will usually be found

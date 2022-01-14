@@ -5,4 +5,8 @@ sub do_it {
 
 my $rc = require Mojo::Util;
 
+my %data = (
+    require	=> 42,	# Should not report '=>'.
+);
+
 1;

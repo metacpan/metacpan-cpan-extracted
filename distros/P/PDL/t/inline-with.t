@@ -45,10 +45,12 @@ SKIP: {
 static pdl* new_pdl(int datatype, PDL_Indx dims[], int ndims)
 {
   pdl *p = PDL->pdlnew();
-  PDL->setdims (p, dims, ndims);  /* set dims */
-  p->datatype = datatype;         /* and data type */
-  PDL->allocdata (p);             /* allocate the data chunk */
-
+  if (!p) return p;
+  pdl_error err = PDL->setdims(p, dims, ndims);  /* set dims */
+  if (err.error) { PDL->destroy(p); return NULL; }
+  p->datatype = datatype;  /* and data type */
+  err = PDL->allocdata(p); /* allocate the data chunk */
+  if (err.error) { PDL->destroy(p); return NULL; }
   return p;
 }
 
@@ -56,6 +58,7 @@ pdl* myfloatseq()
 {
   PDL_Indx dims[] = {5,5,5};
   pdl *p = new_pdl(PDL_F,dims,3);
+  if (!p) return p;
   PDL_Float *dataf = (PDL_Float *) p->data;
   PDL_Indx i; /* dimensions might be 64bits */
 

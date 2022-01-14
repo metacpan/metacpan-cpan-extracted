@@ -2,7 +2,7 @@
 
 use ExtUtils::testlib;
 use Test::More ;
-use Config::Model 2.138;
+use Config::Model 2.142;
 use Config::Model::Tester::Setup qw/init_test setup_test_dir/;
 use Data::Dumper ;
 use Path::Tiny;
@@ -119,6 +119,9 @@ my $expected_map
                                      'MasterModel::References::Node',
                                      'MasterModel::References'
                                     ],
+     'MasterModel/ToTrash.pl' => [
+                             'MasterModel::ToTrash'
+                            ],
     };
 
 is_deeply($expected_map, $map, "Check file class map") ;
@@ -135,8 +138,13 @@ $meta_root->load("class:Master::Created element:created1 type=leaf value_type=nu
                      ." - element:created2 type=leaf value_type=uniline") ;
 ok(1,"added new class Master::Created") ;
 
-my $cds = $meta_root->dump_tree (mode => 'backend') ;
+$meta_root->load("class:.rm(MasterModel::ToTrash)");
+ok(1, "removed class ToTrash");
+
+my $cds = $meta_root->dump_tree () ;
 my @cds_orig = split /\n/,$cds ;
+
+unlike($cds,qr/ToTrash/, "class to trash was removed from model");
 
 print $cds if $trace ;
 ok($cds,"dumped full tree in cds format") ;
@@ -145,23 +153,31 @@ ok($cds,"dumped full tree in cds format") ;
 
 $wr_conf1->child("orig.cds")->spew($cds);
 
+$rw_obj -> write_all();
+ok( ! $wr_model1->child("models/MasterModel/ToTrash.pl")->exists,
+    "trashed model is not written back");
+
 #create a 2nd empty model
 my $meta_inst2 = $meta_model->instance (
     root_class_name   => 'Itself::Model', 
-    instance_name     => 'itself_instance'
+    instance_name     => 'itself_instance2'
 );
 
 my $meta_root2 = $meta_inst2 -> config_root ;
-$meta_root2 -> load ($cds) ;
+# no check since included classes can be specified before they are
+# loaded.
+$meta_root2 -> load (steps => $cds, check => 'no') ;
 ok(1,"Created and loaded 2nd instance") ;
 
-my $cds2 = $meta_root2 ->dump_tree (mode => 'backend') ;
+my $cds2 = $meta_root2 ->dump_tree () ;
 $wr_conf1->child("inst2.cds")->spew($cds2);
 
 is_deeply([split /\n/,$cds2],\@cds_orig,"Compared the 2 full dumps") ; 
 
 my $pdata2 = $meta_root2 -> dump_as_data ;
 print Dumper $pdata2 if $trace ;
+
+$wr_conf1->child("inst2.pl")->spew(Dumper $pdata2);
 
 my $rw_obj2 = Config::Model::Itself -> new(
     model_object => $meta_root2,
@@ -178,14 +194,14 @@ file_contents_like  $written_model_file,  qr/use strict;/,  "stricture was added
 
 my $meta_inst3 = $meta_model->instance (
     root_class_name   => 'Itself::Model',
-    instance_name     => 'itself_instance'
+    instance_name     => 'itself_instance3'
 );
 
 my $meta_root3 = $meta_inst3 -> config_root ;
-$meta_root3 -> load_data ($pdata2) ;
+$meta_root3 -> load_data (data => $pdata2, check => 'no') ;
 ok(1,"Created and loaded 3nd instance with perl data") ;
 
-my $cds3 = $meta_root3 ->dump_tree (mode => 'backend') ;
+my $cds3 = $meta_root3 ->dump_tree () ;
 $wr_conf1->child("inst3.cds")->spew($cds3);
 
 is_deeply([split /\n/,$cds3],\@cds_orig,"Compared the 3rd full dump with first one") ; 
@@ -205,7 +221,7 @@ my $model4 = Config::Model->new(
 
 my $inst4 = $model4->instance (
     root_class_name   => 'MasterModel',
-    instance_name     => 'test_instance',
+    instance_name     => 'test_instance4',
     root_dir  => $wr_conf1->stringify,
 );
 ok($inst4,"Read MasterModel and created instance") ;

@@ -1,3 +1,7 @@
+4.23 2022-01-13
+- fix to work with PDL 2.066
+- spelling fixes - thanks @sebastic
+
 4.22 2021-08-22
 - incorporate int-size patch from https://rt.cpan.org/Public/Bug/Display.html?id=80379 - thanks @sisyphus
 - incorporate Debian patches from https://rt.cpan.org/Public/Bug/Display.html?id=115393

@@ -4,9 +4,9 @@ PDL::Graphics::TriD::Objects - Simple Graph Objects for TriD
 
 =head1 SYNOPSIS
 
-  Look in PDL/Demos/TkTriD_demo.pm for several examples, the code
-  in PDL/Demos/TriD1.pm and PDL/Demos/TriD2.pm also uses objects
-  but it hides them from the user.
+Look in PDL/Demos/TkTriD_demo.pm for several examples, the code
+in PDL/Demos/TriD1.pm and PDL/Demos/TriD2.pm also uses objects
+but it hides them from the user.
 
 =head1 DESCRIPTION
 
@@ -24,8 +24,12 @@ Options.  Need lots more here...
 =cut
 
 package PDL::Graphics::TriD::GObject;
+use strict;
+use warnings;
 use base qw/PDL::Graphics::TriD::Object/;
 use fields qw/Points Colors Options/;
+
+$PDL::Graphics::TriD::verbose //= 0;
 
 sub new {
 	my($type,$points,$colors,$options) = @_;
@@ -137,12 +141,13 @@ package PDL::Graphics::TriD::GPObject;
 use base qw/PDL::Graphics::TriD::GObject/;
 # use fields qw/.../;
 
-sub new { my($type,$points,$faceidx,$colors,$options) = @_;
+sub new {
+  my($type,$points,$faceidx,$colors,$options) = @_;
   # faceidx is 2D pdl of indices into points for each face
   if(!defined $options and ref $colors eq "HASH") {
     $options = $colors;undef $colors; } 
   $points = PDL::Graphics::TriD::realcoords($type->r_type,$points);
-  $faces = $points->dice_axis(1,$faceidx->clump(-1))->splitdim(1,3);
+  my $faces = $points->dice_axis(1,$faceidx->clump(-1))->splitdim(1,3);
   # faces is 3D pdl slices of points, giving cart coords of face verts
   if(!defined $colors) { $colors = PDL->pdl(1,1,1);
     $colors = $type->cdummies($colors,$faces);
@@ -150,7 +155,8 @@ sub new { my($type,$points,$faceidx,$colors,$options) = @_;
   else { $colors = PDL::Graphics::TriD::realcoords("COLOR",$colors); }
   my $this = bless { Points => $points, Faceidx => $faceidx, Faces => $faces,
                      Colors => $colors, Options => $options},$type;
-  $this->check_options();return $this; }
+  $this->check_options();return $this;
+}
 
 sub get_valid_options {
   return { UseDefcols=>0, Lines=>0, Smooth=>1, Material=>0 }; }  

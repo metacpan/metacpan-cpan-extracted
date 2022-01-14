@@ -7,7 +7,7 @@ use vars qw( $VERSION );
 
 use Tie::Cycle;
 
-$VERSION = '1.083';
+$VERSION = '1.084';
 
 sub TIESCALAR {
 	my $class    = shift;
@@ -62,7 +62,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2000-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2000-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

@@ -1,5 +1,12 @@
 Revision history for Future-IO-Impl-UV
 
+0.03    2022-01-07
+        [CHANGES]
+         * Unit-test the new ->connect and ->accept methods of Future::IO 0.11
+
+        [BUGFIXES]
+         * Ensure that mixed read/write on the same filehandle works correctly
+
 0.02    2021-08-24
         [CHANGES]
          * Implement the ->waitpid method

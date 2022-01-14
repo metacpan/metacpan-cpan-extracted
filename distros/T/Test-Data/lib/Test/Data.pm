@@ -3,7 +3,7 @@ use 5.008;
 package Test::Data;
 use strict;
 
-our $VERSION = '1.243';
+our $VERSION = '1.244';
 
 use Carp qw(carp);
 
@@ -90,7 +90,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2002-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

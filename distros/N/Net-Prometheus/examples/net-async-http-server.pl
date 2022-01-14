@@ -17,6 +17,8 @@ $client->new_gauge(
    help => "The number ten",
 )->set( 10 );
 
+printf STDERR "Serving metrics on http://[::]:%d\n", LISTEN_PORT;
+
 my $loop = IO::Async::Loop->new;
 
 $client->export_to_IO_Async( $loop, port => LISTEN_PORT );

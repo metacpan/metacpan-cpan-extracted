@@ -69,6 +69,12 @@ return [
                 description => "set when the application backend requires an argument passed "
                 . "as 3rd argument to cme, e.g. cme <cmd> <app> <backend_arg>."
             },
+            use_backend_argument_as_config_file  => {
+                type => 'leaf',
+                upstream_default => '0',
+                value_type => 'boolean',
+                description => "When backend argument is also used as the name of the config file."
+            },
             backend_argument_info => {
                 type => 'leaf',
                 value_type => 'uniline',

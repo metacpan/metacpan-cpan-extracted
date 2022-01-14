@@ -1,0 +1,192 @@
+package Algorithm::Graphs::TransitiveClosure::Tiny;
+
+use 5.010;
+use strict;
+use warnings;
+
+use Exporter 'import';
+
+our @EXPORT_OK = qw(floyd_warshall);
+
+our $VERSION = '0.03';
+
+
+sub floyd_warshall {
+  my ($graph, $n) = @_;
+
+  for (my $k = 0; $k < $n; ++$k) {
+    for (my $i = 0; $i < $n; ++$i) {
+      for (my $j = 0; $j < $n; ++$j) {
+        $graph->{$i}->{$j} = undef if (exists($graph->{$k}) && exists($graph->{$k}->{$j}) &&
+                                       exists($graph->{$i}) && exists($graph->{$i}->{$k}));
+      }
+    }
+  }
+  return $graph;
+}
+
+
+
+1; # End of Algorithm::Graphs::TransitiveClosure::Tiny
+
+
+
+
+__END__
+
+
+=head1 NAME
+
+Algorithm::Graphs::TransitiveClosure::Tiny - Calculate the transitive closure.
+
+
+=head1 VERSION
+
+Version 0.03
+
+
+=head1 SYNOPSIS
+
+    use Algorithm::Graphs::TransitiveClosure::Tiny qw(floyd_warshall);
+
+    # The hash values here need not to be undef, but floyd_warshall()
+    # only adds undef.
+    my $graph = {
+                 0 => {0 => undef},
+                 1 => {1 => undef, 2 => undef, 3 => undef},
+                 2 => {1 => undef, 2 => undef},
+                 3 => {0 => undef, 2 => undef, 3 => undef},
+                };
+
+    floyd_warshall $graph;
+
+    print "There is a path from 2 to 0.\n" if
+        exists($graph->{2}) && exists($graph->{2}->{0});
+
+The latter can also be written shorter provided you accept autovivification:
+
+    print "There is a path from 2 to 0.\n" if exists($graph->{2}->{0});
+
+
+
+=head1 DESCRIPTION
+
+This is taken from L<Algorithm::Graphs::TransitiveClosure>. The difference
+is that this implementation of C<floyd_warshall()>:
+
+=over
+
+=item *
+
+works on hashes only,
+
+=item *
+
+uses C<undef> for hash values, so an incidence must be checked with
+C<exists()> (but for the input hash you are not forced to use C<undef>),
+
+=item *
+
+assumes that the hash keys are integers 0, ..., I<N>-1 (for some positive
+integer I<N>) and this I<N> must be passed as second argument. This is needed
+to fix a problem in the original implementation (see next item).
+
+=item *
+
+The following problem of L<Algorithm::Graphs::TransitiveClosure> is resolved:
+
+Example:
+
+   my $g = {
+            0 => { 2 => 1},
+            1 => { 0 => 1},
+           };
+
+So there is a vertice from 0 to 2 and a vertice from 1 to 0. So the transitive
+closure would contain a vertice from 1 to 2. But calling C<floyd_warshall($g)>
+from L<Algorithm::Graphs::TransitiveClosure> results in:
+
+           {
+            0 => { 2 => 1},
+            1 => { 0 => 1},
+           }
+
+No change. The vertice from 1 to 2 is missing (you would need to add
+C<2=E<gt>{}> to C<$g> to get it right). But if you call C<floyd_warshall($g,
+3)> from C<Algorithm::Graphs::TransitiveClosure::Tiny>, then the result is
+correct:
+
+           {
+            0 => { 2 => 1},
+            1 => { 0 => 1,
+                   2 => undef},
+           }
+
+Vertice from 1 to 2 has been added! (Also note that you could use 1 instead of
+C<undef> as hash value, but the value added by the function is C<undef> anyway!)
+
+=back
+
+
+For convenience, C<floyd_warshall($graph, $n)> returns C<$graph>.
+
+For further information refer to L<Algorithm::Graphs::TransitiveClosure>.
+
+
+=head1 AUTHOR
+
+Abdul al Hazred, C<< <451 at gmx.eu> >>
+
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-algorithm-graphs-transitiveclosure-tiny at rt.cpan.org>, or through
+the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Algorithm-Graphs-TransitiveClosure-Tiny>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+
+
+=head1 SEE ALSO
+
+L<Algorithm::Graphs::TransitiveClosure>,
+L<Text::Table::Read::RelationOn::Tiny>
+
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Algorithm::Graphs::TransitiveClosure::Tiny
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Algorithm-Graphs-TransitiveClosure-Tiny>
+
+=item * CPAN Ratings
+
+L<https://cpanratings.perl.org/d/Algorithm-Graphs-TransitiveClosure-Tiny>
+
+=item * Search CPAN
+
+L<https://metacpan.org/release/Algorithm-Graphs-TransitiveClosure-Tiny>
+
+=back
+
+
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2022 by Abdul al Hazred.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+
+
+

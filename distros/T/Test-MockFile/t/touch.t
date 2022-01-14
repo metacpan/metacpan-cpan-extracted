@@ -27,16 +27,20 @@ use Test::MockFile ();
 note "-------------- MOCK MODE --------------";
 my @mock;
 my $file = Test::MockFile->file( '/file', "" );
-my $dir  = Test::MockFile->dir( '/dir', [] );
+my $dir  = Test::MockFile->dir('/dir');
 my $link = Test::MockFile->symlink( '/link', '/tonowhere' );
+
+ok( !-d '/dir',    'Directory does not exist yet' );
+ok( mkdir('/dir'), 'Successfully created /dir' );
+ok( -d '/dir',     'Directory now exists' );
 
 is( $link->unlink, 1, "unlink /link works." );
 is( $link->exists, 0, "/link is now gone" );
 SKIP: {
     skip q{This docker container doesn't emit $! failures reliably.}, 2 if on_broken_docker();
     local $!;
-    is( $dir->unlink, 0, "unlink /dir doesn't work." );
-    is( $! + 0, $unlink_dir_errorno, "   ... and throws a \$\!" );
+    is( $dir->unlink, 0,                   "unlink /dir doesn't work." );
+    is( $! + 0,       $unlink_dir_errorno, "   ... and throws a \$\!" );
 }
 
 like( dies { $dir->touch },  qr/^touch only supports files at \S/, "touch /dir doesn't work." );
@@ -61,9 +65,9 @@ ok( !-e "/file", "/file is removed via -e check" );
 
 is( $file->contents("ABC"), "ABC", "Set file to have stuff in it." );
 is( $file->touch(1234),     1,     "Touch an existing file." );
-is( $file->mtime, 1234, "mtime is set to 1234." ) or diag $file->mtime;
-is( $file->ctime, 1234, "ctime is set to 1234." ) or diag $file->ctime;
-is( $file->atime, 1234, "atime is set to 1234." ) or diag $file->atime;
+is( $file->mtime,           1234,  "mtime is set to 1234." ) or diag $file->mtime;
+is( $file->ctime,           1234,  "ctime is set to 1234." ) or diag $file->ctime;
+is( $file->atime,           1234,  "atime is set to 1234." ) or diag $file->atime;
 
 done_testing();
 exit;

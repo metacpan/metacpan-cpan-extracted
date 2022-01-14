@@ -1,5 +1,8 @@
 Revision history for Perl module Business::ISBN
 
+3.007 2022-01-09T04:33:56Z
+	* no code changes. Fix a link in README.pod.
+
 3.006 2021-01-19T14:44:51Z
 	* freshen distro, dump Travis CI, add Github Actions
 	* New Business::ISBN::Data is on the way too

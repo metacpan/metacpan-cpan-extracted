@@ -21,8 +21,9 @@ requires:
   LWP::UserAgent: '0'
   Moo: '0'
   Test::More: '0'
+  URI: '0'
   URI::Encode: '0'
-version: '0.001'
+version: '0.002'
 x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

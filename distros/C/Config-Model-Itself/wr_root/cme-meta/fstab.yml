@@ -1,0 +1,500 @@
+---
+application:
+  fstab:
+    category: system
+    model: Fstab
+class:
+  Fstab:
+    author:
+    - Dominique Dumont
+    class_description: "static information about the filesystems. fstab contains descriptive
+      information about the various file systems. \n"
+    copyright:
+    - 2010,2011 Dominique Dumont
+    element:
+      __element_order:
+      - fs
+      fs:
+        cargo:
+          config_class_name: Fstab::FsLine
+          type: node
+        description: Each "fs" element contain the information about one filesystem.
+          Each filesystem is referred in this model by a label constructed by the
+          fstab parser. This label cannot be stored in the fstab file, so if you create
+          a new file system, the label you will choose may not be stored and will
+          be re-created by the fstab parser
+        index_type: string
+        summary: specification of one file system
+        type: hash
+    license: LGPL2
+    rw_config:
+      backend: Fstab
+      config_dir: /etc
+      file: fstab
+  Fstab::CommonOptions:
+    author:
+    - Dominique Dumont
+    class_description: options valid for all types of file systems.
+    copyright:
+    - 2010,2011 Dominique Dumont
+    element:
+      __element_order:
+      - async
+      - atime
+      - auto
+      - dev
+      - exec
+      - suid
+      - group
+      - mand
+      - user
+      - defaults
+      - rw
+      - relatime
+      - umask
+      async:
+        description: |
+          All I/O to the filesystem should be done asynchronously. (See also the sync option.)
+        type: leaf
+        value_type: boolean
+      atime:
+        description: Do not use the noatime feature, so the inode access time is controlled
+          by kernel defaults. See also the descriptions of the relatime and strictatime
+          mount options.
+        type: leaf
+        value_type: boolean
+      auto:
+        description: Can be mounted with the -a option of C<mount> command
+        type: leaf
+        value_type: boolean
+      defaults:
+        description: |-
+          Use the default options: rw, suid, dev, exec, auto, nouser, and async.
+
+          Note that the real set of all default mount options depends on the kernel and filesystem type. See the beginning of this section for more details.
+        help:
+          '1': option equivalent to rw, suid, dev, exec, auto, nouser, and async
+        type: leaf
+        value_type: boolean
+      dev:
+        description: Interpret character or block special devices on the filesystem.
+        type: leaf
+        value_type: boolean
+      exec:
+        description: Permit execution of binaries.
+        type: leaf
+        value_type: boolean
+      group:
+        description: Allow an ordinary user to mount the filesystem if one of that
+          user’s groups matches the group of the device. This option implies the options
+          nosuid and nodev (unless overridden by subsequent options, as in the option
+          line group,dev,suid).
+        type: leaf
+        value_type: boolean
+      mand:
+        description: Allow mandatory locks on this filesystem. See L<fcntl(2)>.
+        type: leaf
+        value_type: boolean
+      relatime:
+        description: Update inode access times relative to modify or change time.
+          Access time is only updated if the previous access time was earlier than
+          the current modify or change time. (Similar to noatime, but it doesn’t break
+          mutt(1) or other applications that need to know if a file has been read
+          since the last time it was modified.)
+        type: leaf
+        value_type: boolean
+      rw:
+        description: Mount the filesystem read-write.
+        help:
+          '0': read-only file system
+        type: leaf
+        value_type: boolean
+      suid:
+        description: Honor set-user-ID and set-group-ID bits or file capabilities
+          when executing programs from this filesystem.
+        type: leaf
+        value_type: boolean
+      umask:
+        description: Set the umask (the bitmask of the permissions that are not present).
+          The default is the umask of the current process. The value is given in octal.
+        type: leaf
+        value_type: uniline
+      user:
+        description: Allow an ordinary user to mount the filesystem. The name of the
+          mounting user is written to the mtab file (or to the private libmount file
+          in /run/mount on systems without a regular mtab) so that this same user
+          can unmount the filesystem again. This option implies the options noexec,
+          nosuid, and nodev (unless overridden by subsequent options, as in the option
+          line user,exec,dev,suid).
+        help:
+          '0': Only root can mount the file system
+          '1': user can mount the file system
+        type: leaf
+        value_type: boolean
+    license: LGPL2
+  Fstab::Ext2FsOpt:
+    accept:
+      .*:
+        description: unknown parameter
+        type: leaf
+        value_type: uniline
+      __accept_order:
+      - .*
+    author:
+    - Dominique Dumont
+    copyright:
+    - 2010,2011 Dominique Dumont
+    element:
+      __element_order:
+      - acl
+      - user_xattr
+      - statfs_behavior
+      - errors
+      acl:
+        type: leaf
+        value_type: boolean
+      errors:
+        choice:
+        - continue
+        - remount-ro
+        - panic
+        type: leaf
+        value_type: enum
+      statfs_behavior:
+        choice:
+        - bsddf
+        - minixdf
+        type: leaf
+        value_type: enum
+      user_xattr:
+        description: 'Support "user." extended attributes '
+        type: leaf
+        value_type: boolean
+    include:
+    - Fstab::CommonOptions
+    license: LGPL2
+  Fstab::Ext3FsOpt:
+    author:
+    - Dominique Dumont
+    class_description: Options for ext4 file systems. Please contact author (domi.dumont
+      at cpan.org) if options are missing.
+    copyright:
+    - 2010,2011 Dominique Dumont
+    element:
+      __element_order:
+      - journalling_mode
+      journalling_mode:
+        choice:
+        - journal
+        - ordered
+        - writeback
+        description: Specifies the journalling mode for file data. Metadata is always
+          journaled. To use modes other than ordered on the root file system, pass
+          the mode to the kernel as boot parameter, e.g. rootflags=data=journal.
+        help:
+          journal: 'All data is committed into the journal prior to being written
+            into the main file system. '
+          ordered: This is the default mode. All data is forced directly out to the
+            main file system prior to its metadata being committed to the journal.
+          writeback: Data ordering is not preserved - data may be writteninto the
+            main file system after its metadata has been committed to the journal.
+            This is rumoured to be the highest-throughput option. It guarantees internal
+            file system integrity, however it can allow old data to appear in files
+            after a crash and journal recovery.
+        type: leaf
+        value_type: enum
+    include:
+    - Fstab::Ext2FsOpt
+    license: LGPL2
+  Fstab::Ext4FsOpt:
+    author:
+    - Dominique Dumont
+    copyright:
+    - 2010,2011 Dominique Dumont
+    element:
+      __element_order:
+      - lazy_itable_init
+      lazy_itable_init:
+        description: If enabled and the uninit_bg feature is enabled, the inode table
+          will not be fully initialized by mke2fs. This speeds up filesystem initialization
+          noticeably, but it requires the kernel to finish initializing the filesystem
+          in the background when the filesystem is first mounted.
+        type: leaf
+        upstream_default: '1'
+        value_type: boolean
+    include:
+    - Fstab::Ext2FsOpt
+    license: LGPL2
+  Fstab::FsLine:
+    author:
+    - Dominique Dumont
+    class_description: data of one /etc/fstab line
+    copyright:
+    - 2010,2011 Dominique Dumont
+    element:
+      __element_order:
+      - fs_spec
+      - fs_file
+      - fs_vfstype
+      - fs_mntopts
+      - fs_freq
+      - fs_passno
+      fs_file:
+        description: mount point for the filesystem
+        mandatory: 1
+        type: leaf
+        value_type: uniline
+        warp:
+          follow:
+            f1: '- fs_vfstype'
+          rules:
+            $f1 eq 'proc':
+              default: /proc
+            $f1 eq 'swap':
+              default: none
+            __rules_order:
+            - $f1 eq 'proc'
+            - $f1 eq 'swap'
+      fs_freq:
+        choice:
+        - '0'
+        - '1'
+        default: '0'
+        description: Specifies if the file system needs to be dumped
+        type: leaf
+        value_type: enum
+        warp:
+          follow:
+            fstyp: '- fs_vfstype'
+            isbound: '- fs_mntopts bind'
+          rules:
+            $fstyp eq "none" and $isbound:
+              choice:
+              - '0'
+            __rules_order:
+            - $fstyp eq "none" and $isbound
+      fs_mntopts:
+        description: mount options associated with the filesystem
+        type: warped_node
+        warp:
+          follow:
+            f1: '- fs_vfstype'
+          rules:
+            $f1 eq 'auto':
+              config_class_name: Fstab::CommonOptions
+            $f1 eq 'davfs':
+              config_class_name: Fstab::CommonOptions
+            $f1 eq 'debugfs':
+              config_class_name: Fstab::CommonOptions
+            $f1 eq 'ext2':
+              config_class_name: Fstab::Ext2FsOpt
+            $f1 eq 'ext3':
+              config_class_name: Fstab::Ext3FsOpt
+            $f1 eq 'ext4':
+              config_class_name: Fstab::Ext4FsOpt
+            $f1 eq 'iso9660':
+              config_class_name: Fstab::Iso9660_Opt
+            $f1 eq 'nfs':
+              config_class_name: Fstab::CommonOptions
+            $f1 eq 'nfs4':
+              config_class_name: Fstab::CommonOptions
+            $f1 eq 'none':
+              config_class_name: Fstab::NoneOptions
+            $f1 eq 'proc':
+              config_class_name: Fstab::CommonOptions
+            $f1 eq 'swap':
+              config_class_name: Fstab::SwapOptions
+            $f1 eq 'usbfs':
+              config_class_name: Fstab::UsbFsOptions
+            $f1 eq 'vfat':
+              config_class_name: Fstab::CommonOptions
+            __rules_order:
+            - $f1 eq 'proc'
+            - $f1 eq 'auto'
+            - $f1 eq 'vfat'
+            - $f1 eq 'swap'
+            - $f1 eq 'ext2'
+            - $f1 eq 'ext3'
+            - $f1 eq 'ext4'
+            - $f1 eq 'usbfs'
+            - $f1 eq 'davfs'
+            - $f1 eq 'iso9660'
+            - $f1 eq 'nfs'
+            - $f1 eq 'nfs4'
+            - $f1 eq 'none'
+            - $f1 eq 'debugfs'
+      fs_passno:
+        default: 0
+        description: used by the fsck(8) program to determine the order in which filesystem
+          checks are done at reboot time
+        summary: fsck pass number
+        type: leaf
+        value_type: integer
+        warp:
+          follow:
+            fstyp: '- fs_vfstype'
+            isbound: '- fs_mntopts bind'
+          rules:
+            $fstyp eq "none" and $isbound:
+              max: '0'
+            __rules_order:
+            - $fstyp eq "none" and $isbound
+      fs_spec:
+        description: block special device or remote filesystem to be mounted
+        mandatory: 1
+        type: leaf
+        value_type: uniline
+        warp:
+          follow:
+            f1: '- fs_vfstype'
+          rules:
+            $f1 eq 'proc':
+              default: proc
+            __rules_order:
+            - $f1 eq 'proc'
+      fs_vfstype:
+        choice:
+        - auto
+        - davfs
+        - ext2
+        - ext3
+        - ext4
+        - swap
+        - proc
+        - iso9660
+        - vfat
+        - usbfs
+        - ignore
+        - nfs
+        - nfs4
+        - none
+        - ignore
+        - debugfs
+        description: file system type
+        help:
+          auto: file system type is probed by the kernel when mounting the device
+          davfs: WebDav access
+          ext2: Common Linux file system.
+          ext3: 'Common Linux file system with journaling '
+          ignore: unused disk partition
+          iso9660: CD-ROM or DVD file system
+          proc: Kernel info through a special file system
+          usbfs: USB pseudo file system. Gives a file system view of kernel data related
+            to usb
+          vfat: Older Windows file system often used on removable media
+        mandatory: 1
+        type: leaf
+        value_type: enum
+    gist: '{fs_vfstype}: {fs_file}'
+    license: LGPL2
+  Fstab::Iso9660_Opt:
+    author:
+    - Dominique Dumont
+    copyright:
+    - 2010,2011 Dominique Dumont
+    element:
+      __element_order:
+      - rock
+      - joliet
+      joliet:
+        type: leaf
+        value_type: boolean
+      rock:
+        type: leaf
+        value_type: boolean
+    include:
+    - Fstab::CommonOptions
+    license: LGPL2
+  Fstab::NoneOptions:
+    author:
+    - Dominique Dumont
+    class_description: Options for special file system like 'bind'
+    copyright:
+    - 2010,2011 Dominique Dumont
+    element:
+      __element_order:
+      - bind
+      bind:
+        type: leaf
+        value_type: boolean
+    license: LGPL2
+  Fstab::SwapOptions:
+    author:
+    - Dominique Dumont
+    class_description: Swap options
+    copyright:
+    - 2010,2011 Dominique Dumont
+    element:
+      __element_order:
+      - sw
+      sw:
+        type: leaf
+        value_type: boolean
+    license: LGPL2
+  Fstab::UsbFsOptions:
+    author:
+    - Dominique Dumont
+    class_description: usbfs options
+    copyright:
+    - 2010,2011 Dominique Dumont
+    element:
+      __element_order:
+      - devuid
+      - devgid
+      - busuid
+      - budgid
+      - listuid
+      - listgid
+      - devmode
+      - busmode
+      - listmode
+      budgid:
+        type: leaf
+        upstream_default: '0'
+        value_type: integer
+      busmode:
+        type: leaf
+        upstream_default: '0555'
+        value_type: integer
+      busuid:
+        type: leaf
+        upstream_default: '0'
+        value_type: integer
+      devgid:
+        type: leaf
+        upstream_default: '0'
+        value_type: integer
+      devmode:
+        type: leaf
+        upstream_default: '0644'
+        value_type: integer
+      devuid:
+        type: leaf
+        upstream_default: '0'
+        value_type: integer
+      listgid:
+        type: leaf
+        upstream_default: '0'
+        value_type: integer
+      listmode:
+        type: leaf
+        upstream_default: '0444'
+        value_type: integer
+      listuid:
+        type: leaf
+        upstream_default: '0'
+        value_type: integer
+    include:
+    - Fstab::CommonOptions
+    license: LGPL2
+  __class_order:
+  - Fstab
+  - Fstab::CommonOptions
+  - Fstab::Ext2FsOpt
+  - Fstab::Ext3FsOpt
+  - Fstab::Ext4FsOpt
+  - Fstab::FsLine
+  - Fstab::Iso9660_Opt
+  - Fstab::NoneOptions
+  - Fstab::SwapOptions
+  - Fstab::UsbFsOptions

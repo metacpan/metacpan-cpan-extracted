@@ -12,7 +12,7 @@ my $Test = Test::Builder->new();
 @EXPORT = qw(uri_scheme_ok uri_host_ok uri_port_ok uri_fragment_ok
 	uri_path_ok);
 
-$VERSION = '1.083';
+$VERSION = '1.084';
 
 =encoding utf8
 
@@ -52,7 +52,7 @@ STRING can be an URI object.
 
 =cut
 
-sub uri_scheme_ok($$) {
+sub uri_scheme_ok {
 	my $string = shift;
 	my $scheme = lc shift;
 
@@ -87,7 +87,7 @@ STRING can be an URI object.
 
 =cut
 
-sub uri_host_ok($$) {
+sub uri_host_ok {
 	_methodx_ok( $_[0], $_[1], 'host' );
 	}
 
@@ -104,7 +104,7 @@ STRING can be an URI object.
 
 my %Portless = map { $_, $_ } qw(mailto file);
 
-sub uri_port_ok($$)
+sub uri_port_ok
 	{
 	_methodx_ok( $_[0], $_[1], 'port' );
 	}
@@ -116,7 +116,7 @@ If anyone else knows, I'll implement it.
 
 =cut
 
-sub uri_canonical_ok($$) {}
+sub uri_canonical_ok {}
 
 =item uri_path_ok( STRING|URI, PATH )
 
@@ -129,7 +129,7 @@ STRING can be an URI object.
 
 =cut
 
-sub uri_path_ok($$) {
+sub uri_path_ok {
 	_methodx_ok( $_[0], $_[1], 'path' );
 	}
 
@@ -143,13 +143,12 @@ STRING can be an URI object.
 
 =cut
 
-sub uri_fragment_ok($$)
-	{
+sub uri_fragment_ok {
 	_methodx_ok( $_[0], $_[1], 'fragment' );
 	}
 
 
-sub _methodx_ok($$$) {
+sub _methodx_ok {
 	my $string   = shift;
 	my $expected = shift;
 	my $methodx  = lc shift;
@@ -207,7 +206,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2004-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2004-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

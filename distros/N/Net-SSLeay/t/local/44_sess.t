@@ -163,6 +163,8 @@ sub server
 
 	    $ctx = new_ctx( $proto, $proto );
 
+	    Net::SSLeay::CTX_set_security_level($ctx, 0)
+		if Net::SSLeay::SSLeay() >= 0x30000000 && ($proto eq 'TLSv1' || $proto eq 'TLSv1.1');
 	    Net::SSLeay::set_cert_and_key($ctx, $cert_pem, $key_pem);
 	    Net::SSLeay::CTX_set_session_cache_mode($ctx, Net::SSLeay::SESS_CACHE_SERVER());
 	    # Need OP_NO_TICKET to enable server side (Session ID based) resumption.
@@ -212,6 +214,7 @@ sub server
 
 	    Net::SSLeay::SESSION_free($sess) unless $ret; # Not cached, undo get1
 	    Net::SSLeay::free($ssl);
+	    close($cl) || die("server close: $!");
 	}
 
 	$cl = $server->accept();
@@ -219,9 +222,8 @@ sub server
 	print $cl "end\n";
 	print $cl unpack( 'H*', Storable::freeze(\%server_stats) ), "\n";
 
-	close $cl;
-
-	$server->close();
+	close($cl) || die("server close stats socket: $!");
+	$server->close() || die("server listen socket close: $!");
 
 	#use Data::Dumper; print "Server:\n" . Dumper(\%server_stats);
 	exit(0);
@@ -243,6 +245,8 @@ sub client {
 
 	$ctx = new_ctx( $proto, $proto );
 
+	Net::SSLeay::CTX_set_security_level($ctx, 0)
+	    if Net::SSLeay::SSLeay() >= 0x30000000 && ($proto eq 'TLSv1' || $proto eq 'TLSv1.1');
 	Net::SSLeay::CTX_set_session_cache_mode($ctx, Net::SSLeay::SESS_CACHE_CLIENT());
         Net::SSLeay::CTX_set_options($ctx, Net::SSLeay::OP_ALL());
 	Net::SSLeay::CTX_sess_set_new_cb($ctx, sub {client_new_cb(@_, $ctx, $round);});
@@ -250,7 +254,10 @@ sub client {
 	$ssl = Net::SSLeay::new($ctx);
 
 	Net::SSLeay::set_fd($ssl, $cl);
-	Net::SSLeay::connect($ssl);
+	my $ret = Net::SSLeay::connect($ssl);
+	if ($ret <= 0) {
+	    diag("Protocol $proto, connect() returns $ret, Error: ".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error()));
+	}
 	my $msg = Net::SSLeay::read($ssl);
 	#print "server said: $msg\n";
 
@@ -267,6 +274,7 @@ sub client {
 
 	Net::SSLeay::shutdown($ssl);
 	Net::SSLeay::free($ssl);
+	close($cl) || die("client close: $!");
     }
 
     $cl = $server->connect();
@@ -276,7 +284,9 @@ sub client {
     # Stats from server
     chomp( my $server_stats = <$cl> );
     my $server_stats_ref = Storable::thaw( pack( 'H*', $server_stats ) );
-    close $cl;
+
+    close($cl) || die("client close stats socket: $!");
+    $server->close() || die("client listen socket close: $!");
 
     test_stats($server_stats_ref, \%client_stats);
 

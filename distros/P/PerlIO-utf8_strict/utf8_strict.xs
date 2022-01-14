@@ -51,6 +51,12 @@ static STRLEN skip_sequence(const U8 *cur, const STRLEN len) {
 	return i;
 }
 
+#if defined(PERL_STATIC_NO_RET) && defined(__attribute__noreturn__)
+PERL_STATIC_NO_RET void report_illformed(pTHX_ const U8 *cur, STRLEN len, bool eof) __attribute__noreturn__;
+#elif defined(__attribute__noreturn__)
+static void report_illformed(pTHX_ const U8 *cur, STRLEN len, bool eof) __attribute__noreturn__;
+#endif
+
 static void report_illformed(pTHX_ const U8 *cur, STRLEN len, bool eof) {
 	static const char *hex = "0123456789ABCDEF";
 	const char *fmt;
@@ -72,6 +78,12 @@ static void report_illformed(pTHX_ const U8 *cur, STRLEN len, bool eof) {
 	*d = 0;
 	Perl_croak(aTHX_ fmt, seq);
 }
+
+#if defined(PERL_STATIC_NO_RET) && defined(__attribute__noreturn__)
+PERL_STATIC_NO_RET void report_noncharacter(pTHX_ UV usv) __attribute__noreturn__;
+#elif defined(__attribute__noreturn__)
+static void report_noncharacter(pTHX_ UV usv) __attribute__noreturn__;
+#endif
 
 static void report_noncharacter(pTHX_ UV usv) {
 	static const char *fmt = "Can't interchange noncharacter code point U+%"UVXf;

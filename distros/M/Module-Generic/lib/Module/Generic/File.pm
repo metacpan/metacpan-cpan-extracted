@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.1.12
+## Version v0.1.14
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2021/12/19
+## Modified 2021/12/25
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -42,7 +42,7 @@ BEGIN
         fallback => 1,
     );
     use constant HAS_PERLIO_MMAP => ( version->parse($]) >= version->parse('v5.16.0') ? 1 : 0 );
-    our $VERSION = 'v0.1.12';
+    our $VERSION = 'v0.1.14';
     # https://en.wikipedia.org/wiki/Path_(computing)
     # perlport
     our $OS2SEP  =
@@ -1592,6 +1592,22 @@ sub max_recursion { return( shift->_set_get_number( 'max_recursion', @_ ) ); }
 
 sub makepath { return( shift->mkpath( @_ ) ); }
 
+sub mkdir
+{
+    my $self = shift( @_ );
+    my $oct;
+    $oct = shift( @_ ) if( @_ );
+    my $filename = $self->filename;
+    if( $self->exists )
+    {
+        return( $self->error( "There is already a file \"$filename\", so I cannot create a directory." ) ) if( $self->is_file );
+        return( $self->error( "Directory \"$filename\" already exists." ) );
+    }
+    my $rv = CORE::mkdir( $filename, ( defined( $oct ) ? $oct : () ) );
+    return( $self->error( "Error creating directory \"$filename\": $!" ) ) if( !defined( $rv ) );
+    return( $self );
+}
+
 sub mkpath
 {
     my $self = shift( @_ );
@@ -1897,6 +1913,14 @@ sub open
         {
             my $existed = $self->exists;
             my $mode = shift( @_ ) || '<';
+            if( CORE::exists( $opts->{create} ) && $opts->{create} )
+            {
+                $mode = '>';
+            }
+            elsif( CORE::exists( $opts->{append} ) && $opts->{append} )
+            {
+                $mode = '>>';
+            }
             $self->message( 3, "Opening file \"$file\" with mode '$mode'." );
             $io = IO::File->new( $file, $mode, @_ ) || return( $self->error( "Unable to open file \"$file\": $!" ) );
             if( CORE::exists( $opts->{binmode} ) )
@@ -2072,6 +2096,7 @@ sub read
         }
         else
         {
+            $self->message( 4, "Loading data for length '$_[2]' from offset '$_[3]'" );
             # $io->read( $buff, $size, $offset );
             return( $io->read( $_[1], $_[2], $_[3] ) ) if( scalar( @_ ) >= 4 );
             # $io->read( $buff, $size );
@@ -2563,7 +2588,7 @@ sub tempfile
             tmpdir  => 1,
         );
         return( $self->error( "Found an existing directory with the name just generated: \"$dir\". This should never happen." ) ) if( -e( $dir ) );
-        mkdir( $dir ) || return( $self->error( "Unable to create temporary directory \"$dir\": $!" ) );
+        CORE::mkdir( $dir ) || return( $self->error( "Unable to create temporary directory \"$dir\": $!" ) );
     }
     
     unless( defined( $dir ) )
@@ -2627,7 +2652,7 @@ sub tmpdir
     my( $vol, $basedir, $fname ) = $self->_spec_splitpath( $parent );
     my $dir  = $self->_spec_catpath( $vol, $self->_spec_catdir( [ $basedir, $fname ] ), $uuid->create_str );
     return( $self->error( "Found an existing directory with the name just generated: \"${dir}\". This should never happen." ) ) if( -e( $dir ) );
-    mkdir( $dir ) || return( $self->error( "Unable to create temporary directory \"$dir\": $!" ) );
+    CORE::mkdir( $dir ) || return( $self->error( "Unable to create temporary directory \"$dir\": $!" ) );
     $opts->{resolved} = 1;
     if( CORE::exists( $opts->{unlink} ) )
     {
@@ -3145,7 +3170,7 @@ sub _move_or_copy
         # It would have been nice if File::Copy::move returned the new file path
         # Note that we do so even if the destination directory does not exist.
         # It would then be only virtual
-        if( -d( "$dest" ) || ( $dest->isa( 'Module::Generic::File' ) && $dest->type eq 'directory' ) )
+        if( -d( "$dest" ) || ( $dest->isa( 'Module::Generic::File' ) && $dest->is_dir ) )
         {
             # No need to recompute it
             if( defined( $new_path ) )
@@ -3636,7 +3661,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.1.12
+    v0.1.14
 
 =head1 DESCRIPTION
 
@@ -4248,6 +4273,12 @@ This returns the current object upon success or undef and set an exception objec
 =head2 locked
 
 Returns true if the file is locked. More specifically, this returns the value of the flags originally used to lock the file.
+
+=head2 mkdir
+
+Creates the directory represented by the file object. This will fail if the parent directory does not exist, so this does not create a path. For that check L</makepath>
+
+It returns true upon success and C<undef> upon failure. The error, if any, can be retrieved with L<error|Module::Generic/error>
 
 =head2 makepath
 

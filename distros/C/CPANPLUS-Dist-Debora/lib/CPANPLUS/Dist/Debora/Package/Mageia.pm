@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 use parent qw(CPANPLUS::Dist::Debora::Package::RPM);
 
@@ -25,6 +25,8 @@ sub format_priority {
 
     return $priority;
 }
+
+## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
 
 sub _normalize_version {
     my ($self, $dist_version) = @_;
@@ -47,7 +49,7 @@ CPANPLUS::Dist::Debora::Package::Mageia - Create binary RPM packages
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

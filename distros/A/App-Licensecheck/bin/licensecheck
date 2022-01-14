@@ -6,49 +6,13 @@ use open qw(:locale);
 use warnings;
 use autodie;
 
-use Getopt::Long 2.24 qw(:config gnu_getopt);
-use IO::Interactive qw(is_interactive);
-
-my $USE_COLOR;
-
-BEGIN {
-	$USE_COLOR = !(
-		   exists $ENV{NO_COLOR}
-		or ( $ENV{COLOR} and !$ENV{COLOR} )
-		or !is_interactive
-	);
-	$Pod::Usage::Formatter = 'Pod::Text::Color' if $USE_COLOR;
-}
-use Pod::Usage;
-my $COPYRIGHT;
-use Pod::Constants
-	-trim => 1,
-	'COPYRIGHT AND LICENSE' =>
-	sub { ($COPYRIGHT) = s/C<< (.*) >>/$1/gr; $COPYRIGHT =~ s/Â©/©/g };
-use Path::Tiny;
-use String::Escape qw(unbackslash);
-use List::SomeUtils qw(uniq);
-use Log::Any::Adapter;
-Log::Any::Adapter->set( 'Screen', use_color => $USE_COLOR );
-
-use App::Licensecheck;
-
 =head1 NAME
 
 licensecheck - simple license checker for source files
 
 =head1 VERSION
 
-Version v3.2.14
-
-=cut
-
-our $VERSION = 'v3.2.14';
-
-my $progname = path($0)->basename;
-
-our %OPT = ();
-my @OPT = ();
+Version v3.3.0
 
 =head1 SYNOPSIS
 
@@ -71,6 +35,42 @@ to the list of files to process.
 
 When multiple F<PATH>s are provided,
 only files matching B<--check> and not B<--ignore> are checked.
+
+=cut
+
+use Getopt::Long 2.24 qw(:config gnu_getopt);
+use IO::Interactive qw(is_interactive);
+
+my $USE_COLOR;
+
+BEGIN {
+	$USE_COLOR = !(
+		   exists $ENV{NO_COLOR}
+		or ( $ENV{COLOR} and !$ENV{COLOR} )
+		or !is_interactive
+	);
+	$Pod::Usage::Formatter = 'Pod::Text::Color' if $USE_COLOR;
+}
+use Pod::Usage;
+my $COPYRIGHT;
+use Pod::Constants
+	-trim => 1,
+	'COPYRIGHT AND LICENSE' =>
+	sub { ($COPYRIGHT) = s/C<< (.*) >>/$1/gr; $COPYRIGHT =~ s/Â©/©/g };
+use Path::Tiny;
+use String::Escape qw(unbackslash);
+use List::SomeUtils qw(uniq);
+use Log::Any qw($log);
+use Log::Any::Adapter;
+
+use App::Licensecheck;
+
+our $VERSION = 'v3.3.0';
+
+my $progname = path($0)->basename;
+
+our %OPT = ();
+my @OPT = ();
 
 =head1 OPTIONS
 
@@ -157,7 +157,7 @@ I<Since v2.10.3.>
 number of lines to parse from top of each file;
 implies optimistic search
 including only first cluster of detected copyrights or licenses;
-set to 0 to parse the whole file
+set to I<0> to parse the whole file
 (and ignore B<--tail>)
 S<(default value: I<60>)>
 
@@ -165,8 +165,10 @@ S<(default value: I<60>)>
 
 I<Since v2.15.10.>
 
-number of bytes to parse from bottom of each file;
+number of bytes to parse from bottom of each file
+when parsing only from top of each file and finding nothing there;
 set to 0 to avoid parsing from end of file
+(or set B<--lines> to I<0> and ignore this setting)
 S<(default value: 5000 (roughly 60 lines))>
 
 =item B<-e> I<CODEC>, B<--encoding>=I<CODEC>
@@ -193,12 +195,6 @@ $OPT{tail}  = 5000;
 
 =over 16
 
-=item B<--[no-]verbose>
-
-I<Since v2.10.3.>
-
-add header of each file to license information
-
 =item B<--copyright>
 
 I<Since v2.10.7.>
@@ -207,10 +203,12 @@ add copyright statements to license information
 
 =item B<-s>, B<--skipped>
 
-I<Since v2.15.10.>
+I<Since v3.3.0.>
 
-print to STDERR files in F<PATH>s
+Log files in F<PATH>s
 matching neither B<--check> nor B<--ignore>
+as warnings
+S<(default: log as debug)>
 
 =item B<-m>, B<--machine>
 
@@ -218,7 +216,6 @@ I<Since v2.12.2.>
 
 print license information as C<TAB>-separated fields,
 for processing with line-oriented tools like C<awk> and C<sort>
-S<(NB! B<--verbose> will kill readability)>
 
 =item B<--[no-]deb-machine>
 
@@ -262,7 +259,6 @@ merge same-licensed files in Debian copyright file
 =cut
 
 push @OPT, qw(
-	verbose!
 	copyright
 	skipped|s
 	machine|m
@@ -288,6 +284,15 @@ print help message and exit
 
 print version and copyright information and exit
 
+=item B<--quiet>, B<--verbose>, B<--debug>, B<--trace>
+
+I<Since v3.3.0.>
+
+Emit only error messages to STDERR (with option B<--quiet>),
+or (in addition errors and warnings) also notices/debug/traces.
+The more "noisy" option wins if several are set.
+S<(default: emit errors and warnings>
+
 =back
 
 =cut
@@ -295,6 +300,10 @@ print version and copyright information and exit
 push @OPT, qw(
 	help|h
 	version|v
+	quiet
+	verbose
+	debug
+	trace
 );
 
 # deprecated
@@ -306,9 +315,38 @@ push @OPT, qw(
 push @OPT, qw(
 	text|t
 	noconf|no-conf
+	no-verbose
 );
 
 GetOptions( \%OPT, @OPT ) or pod2usage(2);
+
+if ( $OPT{trace} ) {
+	Log::Any::Adapter->set(
+		'Screen', use_color => $USE_COLOR,
+		default_level => 'trace'
+	);
+}
+elsif ( $OPT{debug} ) {
+	Log::Any::Adapter->set(
+		'Screen', use_color => $USE_COLOR,
+		default_level => 'debug'
+	);
+}
+elsif ( $OPT{verbose} ) {
+	Log::Any::Adapter->set(
+		'Screen', use_color => $USE_COLOR,
+		default_level => 'info'
+	);
+}
+elsif ( $OPT{quiet} ) {
+	Log::Any::Adapter->set(
+		'Screen', use_color => $USE_COLOR,
+		default_level => 'error'
+	);
+}
+else {
+	Log::Any::Adapter->set( 'Screen', use_color => $USE_COLOR );
+}
 
 pod2usage(1) if ( $OPT{help} );
 if ( $OPT{version} ) { version(); exit 0; }
@@ -335,10 +373,13 @@ if ( $OPT{'list-naming-schemes'} ) {
 }
 
 if ( $OPT{text} ) {
-	warn "$0 warning: option -text is deprecated\n";   # remove -text end 2015
+	$log->warn('option -text ignored: obsolete');    # since 2015
 }
 if ( $OPT{noconf} ) {
-	warn "$0 warning: option --no-conf is deprecated\n";    # No-op
+	$log->warn('option --no-conf ingored: obsolete');    # since 2016
+}
+if ( $OPT{noverbose} ) {
+	$log->warn('option --no-verbose ignored: obsolete');    # since 2021
 }
 
 pod2usage("$progname: No paths provided.")
@@ -353,12 +394,11 @@ my $app = App::Licensecheck->new(
 	recursive    => $OPT{recursive},
 
 	# parse
-	lines    => $OPT{lines},
-	tail     => $OPT{tail},
-	encoding => $OPT{encoding},
+	top_lines => $OPT{lines},
+	end_bytes => $OPT{tail},
+	encoding  => $OPT{encoding},
 
 	# report
-	verbose     => $OPT{verbose},
 	skipped     => $OPT{skipped},
 	deb_machine => $OPT{'deb-machine'},
 );
@@ -467,7 +507,9 @@ The default is to use color when connected to a terminal.
 =item DEBUG
 =item TRACE
 
-Used to emit varying details about discoveries to STDERR.
+Used to emit varying details about discoveries to STDERR
+when verbosity is not set
+using either of options B<--quiet>, B<--verbose>, B<--debug> or B<--trace>.
 See L<Log::Any::Adapter::Screen> for more details.
 
 =item LOG_PREFIX

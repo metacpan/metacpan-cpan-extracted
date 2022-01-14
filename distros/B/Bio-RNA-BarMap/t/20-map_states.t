@@ -59,7 +59,7 @@ SKIP:
             91 => 3,
             41 => 42,
         );
-        plan tests => 1 * %from_to_min;
+        plan tests => 1 * keys %from_to_min;
 
         # Verify each entry.
         while (my ($from_min, $true_to_min) = each %from_to_min) {
@@ -93,7 +93,7 @@ SKIP:
             91 => 5,
             41 => 63,
         );
-        plan tests => 1 * %from_to_min;
+        plan tests => 1 * keys %from_to_min;
 
         # Verify each entry.
         while (my ($from_min, $true_to_min) = each %from_to_min) {

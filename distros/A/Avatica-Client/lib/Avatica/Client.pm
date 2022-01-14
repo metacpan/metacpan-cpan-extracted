@@ -10,10 +10,10 @@ use Time::HiRes qw/sleep/;
 
 use Google::ProtocolBuffers::Dynamic 0.30;
 
-use constant MAX_RETRIES => 1;
+use constant MAX_RETRIES => 0;
 use constant CLASS_REQUEST_PREFIX => 'org.apache.calcite.avatica.proto.Requests$';
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 sub new {
   my ($class, %params) = @_;
@@ -50,7 +50,7 @@ sub post_request {
   my ($self, $body) = @_;
 
   my $response;
-  my $retry_count = $self->max_retries;
+  my $retry_count = $self->max_retries + 1;
   while ($retry_count > 0) {
     $retry_count--;
 
@@ -66,7 +66,7 @@ sub post_request {
       last if int($response->{status} / 100) == 4;
       # server errors
       if (int($response->{status} / 100) == 5) {
-        sleep(exp -$retry_count);
+        sleep(exp -($retry_count - 1)) if $retry_count > 0;
         next;
       }
     }
@@ -623,17 +623,31 @@ Avatica::Client - Client for Apache Calcite Avatica
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 AUTHOR
 
 Alexey Stavrov <logioniz@ya.ru>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Denis Ibaev
+=for stopwords Denis Ibaev Ivan Putintsev uid66
+
+=over 4
+
+=item *
 
 Denis Ibaev <dionys@gmail.com>
+
+=item *
+
+Ivan Putintsev <uid@rydlab.ru>
+
+=item *
+
+uid66 <19481514+uid66@users.noreply.github.com>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

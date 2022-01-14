@@ -173,11 +173,11 @@ way, it is not informative. Remember to keep your label strings short.
 
 =head1 VERSION
 
-	Term::Activity v1.20 2014/04/30
+	Term::Activity v1.21 2022/01/06
 
 =head1 COPYRIGHT
 
-    (c) 2003-2014, Phillip Pollard <bennie@cpan.org>
+    (c) 2003-2022, Phillip Pollard <bennie@cpan.org>
 
 =head1 LICENSE
 
@@ -206,7 +206,7 @@ use 5.6.0;
 use strict;
 use warnings;
 
-$Term::Activity::VERSION='1.20';
+$Term::Activity::VERSION='1.21';
 
 sub new {
   my $class = $_[0];
@@ -457,7 +457,7 @@ sub _width_init {
   import Term::Size 'chars';
   my ( $cols, $rows ) = chars(*STDOUT{IO});
 
-  if ( $cols > 0 ) {
+  if ( defined($cols) and $cols > 0 ) {
     $use_term_size = 1;
     return $cols;
   }

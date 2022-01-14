@@ -3,8 +3,8 @@ NAME
     sprintf()
 
 VERSION
-    This document describes version 0.005 of Text::Table::Sprintf (from Perl
-    distribution Text-Table-Sprintf), released on 2021-08-27.
+    This document describes version 0.006 of Text::Table::Sprintf (from Perl
+    distribution Text-Table-Sprintf), released on 2022-01-07.
 
 SYNOPSIS
      use Text::Table::Sprintf;
@@ -256,6 +256,10 @@ FUNCTIONS
         as a header row, and separated from the rest of the table with a
         ruled line.
 
+    *   separate_row (bool)
+
+        If set to true, will draw separator line between data rows.
+
   generate_table
     Alias for "table", for compatibility with Text::Table::Tiny.
 
@@ -295,7 +299,7 @@ CONTRIBUTING
     me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020 by perlancar
+    This software is copyright (c) 2022, 2021, 2020 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

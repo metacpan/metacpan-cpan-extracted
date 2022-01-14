@@ -59,6 +59,6 @@
          "web" : "https://github.com/PDLPorters/PDL-Stats"
       }
    },
-   "version" : "0.80",
+   "version" : "0.81",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

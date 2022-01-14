@@ -3,7 +3,7 @@ package Dist::Zilla::PluginBundle::Author::OALDERS;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '0.000029';
+our $VERSION = '0.000030';
 
 use feature qw( say );
 
@@ -66,9 +66,6 @@ sub configure {
                 check_all_prereqs => 1,
             }
         ],
-
-        'OALDERS::TidyAll',
-
         'AutoPrereqs',
         'CheckChangesHasContent',
         'MakeMaker',    # needs to precede InstallGuide
@@ -200,7 +197,7 @@ Dist::Zilla::PluginBundle::Author::OALDERS - A plugin bundle for distributions b
 
 =head1 VERSION
 
-version 0.000029
+version 0.000030
 
 =head2 configure
 

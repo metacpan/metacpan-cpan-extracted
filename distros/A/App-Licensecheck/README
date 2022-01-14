@@ -3,14 +3,14 @@ NAME
     files
 
 VERSION
-    Version v3.2.14
+    Version v3.3.0
 
 SYNOPSIS
         use App::Licensecheck;
 
         my $app = App::Licensecheck->new;
 
-        $app->lines(0); # Speedup parsing - our file is not huge
+        my $app2 = App::Licensecheck->new( top_lines => 0 );  # Parse whole files
 
         printf "License: %s\nCopyright: %s\n", $app->parse( 'some-file' );
 

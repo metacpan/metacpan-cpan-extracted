@@ -1,0 +1,14 @@
+benchmarks/usac.pl
+Changes
+lib/uSAC/MIME.pm
+lib/uSAC/MIME.pod
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+README.md
+t/uSAC-MIME.t
+update-readme.pl
+uSAC-MIME-v0.1.tar
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

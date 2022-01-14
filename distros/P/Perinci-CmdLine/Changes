@@ -1,3 +1,8 @@
+2.000.0  2021-12-19  Released-By: PERLANCAR; Urgency: medium
+
+	 - Mention Perinci::CmdLine::Plugin, minor tweaks.
+
+
 1.913.0  2021-12-03  Released-By: PERLANCAR
 
          - Add POD: Perinci::CmdLine::Manual::Explanation::ArgumentValidation.

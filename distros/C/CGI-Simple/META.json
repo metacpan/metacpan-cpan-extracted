@@ -4,13 +4,13 @@
       "Andy Armstrong <andy@hexten.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "CGI-Simple",
    "no_index" : {
@@ -30,13 +30,24 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
-      "runtime" : {
+      "test" : {
          "requires" : {
-            "IO::Scalar" : "0",
-            "Test::More" : "0"
+            "File::Temp" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::NoWarnings" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.115"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/manwar/CGI--Simple.git",
+         "web" : "http://github.com/manwar/CGI--Simple",
+         "x_license" : "http://dev.perl.org/licenses/"
+      }
+   },
+   "version" : "1.280",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -6,8 +6,10 @@ use Path::Tiny;
 
 plan 26;
 
-my $app = App::Licensecheck->new( shortname_scheme => 'osi' );
-$app->lines(0);
+my $app = App::Licensecheck->new(
+	shortname_scheme => 'osi',
+	top_lines        => 0,
+);
 
 path("t/OSI")->visit(
 	sub {

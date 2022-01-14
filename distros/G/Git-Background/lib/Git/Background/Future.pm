@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Future 0.40;
 
@@ -173,7 +173,7 @@ Git::Background::Future - use L<Future> with L<Git::Background>
 
 =head1 VERSION
 
-Version 0.003
+Version 0.004
 
 =head1 SYNOPSIS
 
@@ -199,9 +199,13 @@ C<run> method of L<Git::Background>.
 
 =head2 await
 
-Blocks and waits until the Git process finishes. Returns a finished future.
+Blocks and waits until the Git process finishes.
+
+Returns the invocant future itself, so it is useful for chaining.
 
 This method is called by C<get> or C<failure>.
+
+See L<Future/await> for more information.
 
 =head2 exit_code
 
@@ -230,7 +234,7 @@ the stdout, stderr and exit code of the Git process.
 
 =head2 is_done
 
-L<Future/is_dome>
+L<Future/is_done>
 
 =head2 is_failed
 

@@ -12,8 +12,6 @@ use Test2::Compare qw(compare strict_convert);
 use Test2::Require::Module qw(YAML::XS);
 use Test2::Require::TestCorpus qw(ScanCode);
 
-use Test2::Licensecheck;
-
 use Path::Tiny 0.053;
 use App::Licensecheck;
 use List::SomeUtils qw(uniq);
@@ -23,8 +21,10 @@ our @EXPORT = qw(are_licensed_like_scancode);
 
 my $corpus = File::BaseDir::data_dirs('tests/ScanCode');
 
-my $app = App::Licensecheck->new( shortname_scheme => 'debian,spdx' );
-$app->lines(0);
+my $app = App::Licensecheck->new(
+	shortname_scheme => 'debian,spdx',
+	top_lines        => 0,
+);
 
 sub licenses ($)
 {

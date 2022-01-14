@@ -12,6 +12,6 @@ is(run('--version')->status, 0, '--version');
 
 is(run('-Mtextconv --version')->status, 0, '-Mtextconv --version');
 is(run('-Mtextconv true')->status, 0, '-Mtextconv true');
-is(run('-Mtextconv false')->status, 1, '-Mtextconv false');
+isnt(run('-Mtextconv false')->status, 0, '-Mtextconv false');
 
 done_testing;

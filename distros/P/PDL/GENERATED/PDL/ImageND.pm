@@ -21,6 +21,8 @@ use DynaLoader;
 
 
 
+#line 5 "imagend.pd"
+
 =head1 NAME
 
 PDL::ImageND - useful image processing in N dimensions
@@ -44,7 +46,9 @@ loaded.
  
 =cut
 
-
+use strict;
+use warnings;
+#line 52 "ImageND.pm"
 
 
 
@@ -58,10 +62,14 @@ loaded.
 
 
 
+#line 96 "imagend.pd"
+
 use Carp;
+#line 69 "ImageND.pm"
 
 
 
+#line 1059 "../../blib/lib/PDL/PP.pm"
 
 
 =head2 convolve
@@ -96,10 +104,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 108 "ImageND.pm"
 
 
 
-
+#line 1060 "../../blib/lib/PDL/PP.pm"
 
 
 # Custom Perl wrapper
@@ -121,13 +130,17 @@ sub PDL::convolve{
     }
     return $c;
 }
+#line 134 "ImageND.pm"
 
 
 
+#line 1061 "../../blib/lib/PDL/PP.pm"
 *convolve = \&PDL::convolve;
+#line 140 "ImageND.pm"
 
 
 
+#line 226 "imagend.pd"
 
 =head2 ninterpol()
 
@@ -169,9 +182,11 @@ sub PDL::ninterpol {
     for (list ($p-$ip)) { $y = interpol($_,$y->xvals,$y); }
     $y;
 }
+#line 186 "ImageND.pm"
 
 
 
+#line 1059 "../../blib/lib/PDL/PP.pm"
 
 
 =head2 rebin
@@ -213,10 +228,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 232 "ImageND.pm"
 
 
 
-
+#line 1060 "../../blib/lib/PDL/PP.pm"
 
 
 # Custom Perl wrapper
@@ -268,12 +284,17 @@ sub PDL::rebin {
       return $x -> copy;
     }
 }
+#line 288 "ImageND.pm"
 
 
+
+#line 1061 "../../blib/lib/PDL/PP.pm"
 *rebin = \&PDL::rebin;
+#line 294 "ImageND.pm"
 
 
 
+#line 379 "imagend.pd"
 
 =head2 circ_mean_p
 
@@ -343,9 +364,11 @@ sub circ_mean {
 
  return $x;
 }
+#line 368 "ImageND.pm"
 
 
 
+#line 455 "imagend.pd"
 
 =head2 kernctr
 
@@ -398,13 +421,15 @@ sub PDL::kernctr {
 	  $strk .= $strk[$n][$y & 1];
 	}
 	chop ($stri); chop ($strk);
-	($t = $newk->slice($stri)) .= $kern->slice($strk);
+	(my $t = $newk->slice($stri)) .= $kern->slice($strk);
     }
     $newk;
 }
+#line 429 "ImageND.pm"
 
 
 
+#line 1059 "../../blib/lib/PDL/PP.pm"
 
 
 =head2 convolveND
@@ -505,10 +530,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 534 "ImageND.pm"
 
 
 
-
+#line 1060 "../../blib/lib/PDL/PP.pm"
 
 use PDL::Options;
 
@@ -578,8 +604,7 @@ sub PDL::convolveND {
                ->sever;
 
   if($fft) {
-    #  The eval here keeps conflicts from happening at compile time
-    eval "use PDL::FFT" ;
+    require PDL::FFT;
 
     print "convolveND: using FFT method\n" if($PDL::debug);
 
@@ -615,15 +640,19 @@ sub PDL::convolveND {
 
   $x;
 }
+#line 644 "ImageND.pm"
 
 
 
+#line 1061 "../../blib/lib/PDL/PP.pm"
 *convolveND = \&PDL::convolveND;
+#line 650 "ImageND.pm"
 
 
 
 
 
+#line 35 "imagend.pd"
 
 =head1 AUTHORS
 
@@ -635,8 +664,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-
-
+#line 668 "ImageND.pm"
 
 
 

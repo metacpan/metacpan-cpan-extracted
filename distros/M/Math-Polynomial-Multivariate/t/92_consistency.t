@@ -1,6 +1,6 @@
-# Copyright (c) 2008-2017 Martin Becker.  All rights reserved.
-# This package is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
+# Copyright (c) 2008-2022 Martin Becker, Blaubeuren.
+# This package is free software; you can distribute it and/or modify it
+# under the terms of the Artistic License 2.0 (see LICENSE file).
 
 # Checking package consistency (version numbers, file names, ...).
 # These are tests for the distribution maintainer.
@@ -93,7 +93,7 @@ undef $/;
 
 maintainer_only();
 
-plan 42;
+plan 43;
 
 my $MAKEFILE_PL            = 'Makefile.PL';
 my $README                 = 'README';
@@ -109,7 +109,9 @@ $modfilename .= '.pm';
 my $items_to_provide       = undef;
 
 my %ignore_copyright = map {($_ => 1)} qw(
+    CONTRIBUTING
     Changes
+    LICENSE
     MANIFEST
     META.json
     META.yml
@@ -120,11 +122,15 @@ my %ignore_copyright = map {($_ => 1)} qw(
     t/data/KNOWN_VERSIONS
 );
 
+my %ignore_whitespace = map {($_ => 1)} qw(
+    LICENSE
+);
+
 my %pattern = (
-    'binary_file'      => qr{\.(?i:png|jpg|gif)\z},
+    'binary_file'      => qr{\.(?i:png|jpg|gif|db)\z},
     'perl_code'        => qr{\.(?i:pm|pl|t|pod)\z},
     'library_module'   => qr{^lib/.*\.pm\z},
-    'copyright_info'   => qr{\bCopyright \(c\) (?:\d{4}-)?(\d{4})?\b},
+    'copyright_info'   => qr{\b[Cc]opyright \(c\) (?:\d{4}-)?(\d{4})?\b},
     'revision_id'      => qr{^\s*#\s+\$Id[\:\$]},
     'revision_info'    =>
         qr{
@@ -141,16 +147,23 @@ my %pattern = (
     'script_ref'       =>
         qr{
             ^\s*\#[^\n]*\b
-            After\s+\`make\s+install\'\s+it\s+should\s+work\s+as\s+
-            \`perl\s+t/
+            After\s+['`]make\s+install\'\s+it\s+should\s+work\s+as\s+
+            ['`]perl\s+(?:t/)?
             ([\-\w]+\.t)
             \'
         }mx,
     'changes_version_std' =>
         qr{^(\d+\.\d\S*)\s+(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b},
+    'changes_version_short_dates' =>
+        qr{^(\d+\.\d\S*)\s+\d{4}-\d{2}-\d{2}\b},
     'changes_version_headlines' =>
         qr{^\s*\Q$modname\E\s+(?:[Vv]ersion\s+)?(\d\S*)\s*$},
-    'authormail_code' => qr[\QE<lt>$ambox\E(?:\@|E<64>)\Q${amhost}E<gt>\E],
+    'authormail_code' =>
+        qr[
+            \QE<lt>$ambox\E
+            (?:\@|E<64>|\s*\(at\)\s*|\s*I<at>\s*)
+            \Q${amhost}E<gt>\E
+        ]x,
     'package_line' => qr/^\s*package\s+(\w+(?:\:\:\w+)*)\s*;/,
     'version_line' => qr/^\s*(?:our\s*)\$VERSION\s*=\s*(.*?)\s*\z/,
     'version' => qr/^'([\d._]+)';\z/,
@@ -182,14 +195,23 @@ else {
 if (open FILE, '<', $README) {
     my $readme = <FILE>;
     close FILE;
-    my $found = $readme =~ /^(\S+)\s+version\s+(\d+\.\d+)\n/i;
-    test $found, "$README contains distro name and version number";
+    my $found = $readme =~ /^(\S+)(?:\s+version\s+(\d+\.\d+))?\n/i;
+    test $found, "$README contains distro name and optional version number";
     if ($found) {
         my ($readme_distname, $readme_version) = ($1, $2);
-        print "# $README refers to $readme_distname version $readme_version\n";
+        my $qrv =
+            defined($readme_version)?
+                "version $readme_version":
+                'without version';
+        print "# $README refers to $readme_distname $qrv\n";
         test $readme_distname eq $distname || $readme_distname eq $modname,
             "distro name in $README matches";
-        test $readme_version eq $mod_version, "version in $README matches";
+        if (defined $readme_version) {
+            test $readme_version eq $mod_version, "version in $README matches";
+        }
+        else {
+            skip 1, "version number not specified in $README";
+        }
     }
     else {
         skip 2, "unknown $README version";
@@ -268,6 +290,7 @@ if (open FILE, '<', $CHANGES) {
     while (<FILE>) {
         if (
             /$pattern{'changes_version_std'}/o ||
+            /$pattern{'changes_version_short_dates'}/o ||
             /$pattern{'changes_version_headlines'}/o
         ) {
             $changes_version = $1;
@@ -331,6 +354,7 @@ my @todo_distfiles      = ();
 my @debug_distfiles     = ();
 my @badchar_distfiles   = ();
 my @hardtab_distfiles   = ();
+my @invspace_distfiles  = ();
 my @lacking_copyright   = ();
 my @lacking_revision_id = ();
 my @lacking_author_pod  = ();
@@ -356,6 +380,7 @@ if ($manifest_open) {
             my $is_perlcode = $file =~ /$pattern{'perl_code'}/o;
             my $is_module   = $file =~ /$pattern{'library_module'}/o;
             my $has_pod = 0;
+            my $has_provider = 0;
             if ($file !~ /$pattern{'binary_file'}/o) {
                 my $seen_copyright   = 0;
                 my $seen_revision_id = 0;
@@ -364,6 +389,7 @@ if ($manifest_open) {
                 my $seen_debug       = 0;
                 my $seen_badchar     = 0;
                 my $seen_hardtab     = 0;
+                my $seen_invspace    = 0;
                 my $in_signature     = 0;
                 my $before_end       = 1;
                 my $in_author        = 0;
@@ -398,6 +424,9 @@ if ($manifest_open) {
                     if (/\t/) {
                         ++$seen_hardtab;
                     }
+                    if (/[^\S\n]\n/) {
+                        ++$seen_invspace;
+                    }
                     if (/-----(BEGIN|END) PGP SIGNATURE-----/) {
                         $in_signature = 'BEGIN' eq $1;
                     }
@@ -405,6 +434,11 @@ if ($manifest_open) {
                     if (/^=head1 AUTHOR/) {
                         $in_author = 1;
                         $has_pod = 1;
+                    }
+                    elsif (/^=head1 PROVIDER/) {
+                        $in_author = 1;
+                        $has_pod = 1;
+                        $has_provider = 1;
                     }
                     elsif (/^=head1/) {
                         $in_author = 0;
@@ -438,7 +472,11 @@ if ($manifest_open) {
                         }
                     }
                 }
-                if (!$seen_copyright && !exists $ignore_copyright{$file}) {
+                if (
+                    !$seen_copyright &&
+                    !$has_provider &&
+                    !exists $ignore_copyright{$file}
+                ) {
                     push @lacking_copyright, $file;
                 }
                 if (!$seen_revision_id && $is_perlcode) {
@@ -456,8 +494,13 @@ if ($manifest_open) {
                 if ($seen_badchar) {
                     push @badchar_distfiles, $file;
                 }
-                elsif ($seen_hardtab) {
-                    push @hardtab_distfiles, $file;
+                elsif (!exists $ignore_whitespace{$file}) {
+                    if ($seen_hardtab) {
+                        push @hardtab_distfiles, $file;
+                    }
+                    if ($seen_invspace) {
+                        push @invspace_distfiles, $file;
+                    }
                 }
                 if ($seen_revision_id) {
                     if (!defined $checkin_year) {
@@ -466,6 +509,7 @@ if ($manifest_open) {
                     else {
                         if (
                             defined($copyright_year) &&
+                            !defined($ignore_copyright{$file}) &&
                             $copyright_year ne $checkin_year
                         ) {
                             push @stale_copyright, $file;
@@ -480,6 +524,7 @@ if ($manifest_open) {
                     my $myear = (localtime $mtime)[5] + 1900;
                     if (
                         defined($copyright_year) &&
+                        !defined($ignore_copyright{$file}) &&
                         $copyright_year ne $myear
                     ) {
                         push @mtime_copyright, $file;
@@ -575,6 +620,10 @@ if ($manifest_open) {
         print "# file with hardtab characters: $file\n";
     }
     test !@hardtab_distfiles, 'no text files with hardtab characters';
+    foreach my $file (@invspace_distfiles) {
+        print "# file with whitespace at end of line: $file\n";
+    }
+    test !@invspace_distfiles, 'no text files with whitespace at end of line';
     foreach my $file (@lacking_author_pod) {
         print "# POD source file without AUTHOR section: $file\n";
     }
@@ -674,7 +723,11 @@ sub info_from_makefile_pl {
             ([^\s<>]+ (?:\s+ [^\s<>]+)* )   # civilian name in $3
             \s* \<                          # left angular bracket
             ([\w.-]+)                       # mailbox in $4
+            (?:
             \\? \@                          # optional backslash, at-sign
+            |
+            \s*\(at\)\s*                    # optionally replaced by (at)
+            )
             ([\w.-]+)                       # host in $5
             \>                              # right angular bracket
             \2                              # quote from $2

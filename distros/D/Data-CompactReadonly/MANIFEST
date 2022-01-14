@@ -31,7 +31,7 @@ lib/Data/CompactReadonly/V0/Format.pod
 lib/Data/CompactReadonly/V0/NegativeScalar.pm
 lib/Data/CompactReadonly/V0/Node.pm
 lib/Data/CompactReadonly/V0/Scalar/Byte.pm
-lib/Data/CompactReadonly/V0/Scalar/Float.pm
+lib/Data/CompactReadonly/V0/Scalar/Float64.pm
 lib/Data/CompactReadonly/V0/Scalar/Huge.pm
 lib/Data/CompactReadonly/V0/Scalar/Long.pm
 lib/Data/CompactReadonly/V0/Scalar/Medium.pm
@@ -54,5 +54,8 @@ lib/Data/CompactReadonly/V0/TiedArray.pm
 lib/Data/CompactReadonly/V0/TiedDictionary.pm
 t/lib/TestFloat.pm
 t/bug-Number-Phone-1546702248.t
+lib/Data/CompactReadonly/V0/Scalar/False.pm
+lib/Data/CompactReadonly/V0/Scalar/True.pm
+lib/Data/CompactReadonly/V0/Scalar/HeaderOnly.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

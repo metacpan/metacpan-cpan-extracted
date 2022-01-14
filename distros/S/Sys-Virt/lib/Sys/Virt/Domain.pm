@@ -2191,6 +2191,45 @@ contain the following keys
 
 The AMD SEV launch measurement
 
+=item Sys::Virt::Domain::LAUNCH_SECURITY_SEV_API_MAJOR
+
+The host SEV API major version
+
+=item Sys::Virt::Domain::LAUNCH_SECURITY_SEV_API_MINOR
+
+The host SEV API minor version
+
+=item Sys::Virt::Domain::LAUNCH_SECURITY_SEV_BUILD_ID
+
+The host SEV firmware build ID
+
+=item Sys::Virt::Domain::LAUNCH_SECURITY_SEV_POLICY
+
+The guest SEV policy
+
+=back
+
+=item $dom->set_launch_security_state(\%params, $flags=0)
+
+Set information about the domain launch security state. C<$flags>
+is currently unused and defaults to zero. The provided hash may
+contain the following keys
+
+=over 4
+
+=item Sys::Virt::Domain::LAUNCH_SECURITY_SEV_SECRET
+
+The SEV secret string to inject
+
+=item Sys::Virt::Domain::LAUNCH_SECURITY_SEV_SECRET_HEADER
+
+The SEV secret header string to inject
+
+=item Sys::Virt::Domain::LAUNCH_SECURITY_SEV_SECRET_SET_ADDRESS
+
+The address at which to inject the SEV secret. If omitted
+it can be automatically determined from the firmware
+
 =back
 
 =item $info = $dom->get_guest_info($types, $flags=0)
@@ -2802,6 +2841,13 @@ destination, the migration will fail.
 Send memory pages to the destination host through several network
 connections. See C<Sys::Virt::Domain::MIGRATE_PARAM_PARALLEL_*>
 parameters for configuring the parallel migration.
+
+=item Sys::Virt::Domain::MIGRATE_NON_SHARED_SYNCHRONOUS_WRITES
+
+Force the guest writes which happen when copying disk images for
+non-shared storage migration to be synchronously written to the
+destination. This ensures the storage migration converges for VMs
+doing heavy I/O on fast local storage and slow mirror.
 
 =back
 
@@ -3998,6 +4044,11 @@ Reuse existing external file for copy
 =item Sys::Virt::Domain::BLOCK_COPY_TRANSIENT_JOB
 
 Don't force usage of recoverable job for the copy operation
+
+=item Sys::Virt::Domain::BLOCK_COPY_SYNCHRONOUS_WRITES
+
+Force the copy job to synchronously propagate guest writes into
+the destination image, so that the copy is guaranteed to converge
 
 =back
 

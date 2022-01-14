@@ -1,20 +1,18 @@
 #!/usr/bin/env perl
-
-use 5.012005;
-use version 0.77;
-my $pVer = version->parse('5.012_005');
-
 use strict;
 use warnings;
 use feature qw(say);
 
-our $VERSION = "0.11";
+our $VERSION = "0.13";
+
 use List::Util qw(first);
-use FastGlob qw(glob);
+use Directory::Iterator;
 use Getopt::Long;
 use Module::CoreList;
 
-use lib 'lib';
+use version 0.77;
+my $pVer = version->parse($]);    # parse version from running environment
+
 use App::findeps;
 
 use File::Basename qw(basename);
@@ -55,7 +53,7 @@ sub scan {
         my $version = $map->{$key};
         my $name    = App::findeps::_name($key);
         my $dist    = $name;
-        $dist .= "~$version" if length $version;
+        $dist .= "~$version" if defined $version;
         push @list, $dist;
     }
     return @list;
@@ -71,9 +69,12 @@ sub makeCpanfile {
     my ( @require, @test_require );
     push @require, make_line($_) for @list;
 
-    for my $test ( scan( &glob('t/*.t') ) ) {
+    my $list = Directory::Iterator->new('t');
+    while ( $list->next ) {
+        my $test = scan( $list->get );
         push @test_require, make_line($test) unless first { $test =~ /^$_/ } @list, $name;
     }
+
     local $" = "\n";
     print <<"EOL";
 requires 'perl', '$pVer';

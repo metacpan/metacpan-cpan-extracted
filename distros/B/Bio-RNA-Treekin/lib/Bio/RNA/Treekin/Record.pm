@@ -3,7 +3,7 @@
 # Stores a data from a single row of the Treekin file, i.e. the populations of
 # all minima at a given time point.
 package Bio::RNA::Treekin::Record;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use 5.006;
 use strict;
@@ -317,7 +317,6 @@ sub _read_record_lines {
         next if $current_line =~ /^@/               # drop xmgrace annotations
                 or $current_line =~ m{ ^ \s* $ }x;  # or empty lines
 
-        print "current line: $current_line\n";
         # Header lines start with '# ', remove it.
         if ($current_line =~ s/^# //) {         # header line
             push @header_lines, $current_line;

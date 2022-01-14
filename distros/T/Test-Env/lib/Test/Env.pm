@@ -6,7 +6,7 @@ use vars qw(@EXPORT $VERSION);
 use Exporter qw(import);
 
 @EXPORT  = qw(env_ok);
-$VERSION = '1.085';
+$VERSION = '1.086';
 
 use Test::Builder;
 
@@ -72,7 +72,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2002-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

@@ -35,15 +35,12 @@ required steps.
      my $class = shift;
      my $pdl  = $class->new;
      $pdl->set_datatype($PDL_B);
-     my @dims = (1,3,4);
-     my $size = 1;
-     for (@dims) { $size *= $_ }
-     $pdl->setdims([@dims]);
+     $pdl->setdims([1,3,4]);
      my $dref = $pdl->get_dataref();
 
      # read data directly from file
      open my $file, '<data.dat' or die "couldn't open data.dat";
-     my $len = $size*PDL::Core::howbig($pdl->get_datatype);
+     my $len = $pdl->nelems*PDL::Core::howbig($pdl->get_datatype);
      croak "couldn't read enough data" if
        read( $file, $$dref, $len) != $len;
      close $file;
@@ -79,10 +76,12 @@ C<ndims> as zero.
    static pdl* new_pdl(int datatype, PDL_Indx dims[], int ndims)
    {
      pdl *p = PDL->pdlnew();
-     PDL->setdims (p, dims, ndims);  /* set dims */
+     if (!p) return p;
+     pdl_error err = PDL->setdims(p, dims, ndims);  /* set dims */
+     if (err.error) { PDL->destroy(p); return NULL; }
      p->datatype = datatype;         /* and data type */
-     PDL->allocdata (p);             /* allocate the data chunk */
-
+     err = PDL->allocdata (p);       /* allocate the data chunk */
+     if (err.error) { PDL->destroy(p); return NULL; }
      return p;
    }
 
@@ -90,6 +89,7 @@ C<ndims> as zero.
    {
      PDL_Indx dims[] = {5,5,5};
      pdl *p = new_pdl(PDL_F,dims,3);
+     if (!p) return p;
      PDL_Float *dataf = (PDL_Float *) p->data;
      PDL_Indx i; /* dimensions might be 64bits */
 
@@ -132,7 +132,7 @@ The following script demonstrates a simple example:
     * the datatype (constants for the datatypes are declared
     * in pdl.h; e.g. PDL_B for byte type, etc)
     *
-    * when the created ndarray 'npdl' is destroyed on the
+    * when the created ndarray 'p' is destroyed on the
     * Perl side the function passed as the 'delete_magic'
     * parameter will be called with the pointer to the pdl structure
     * and the 'delparam' argument.
@@ -156,18 +156,19 @@ The following script demonstrates a simple example:
    static pdl* pdl_wrap(void *data, int datatype, PDL_Indx dims[],
 			int ndims, DelMagic delete_magic, int delparam)
    {
-     pdl* npdl = PDL->pdlnew(); /* get the empty container */
-
-     PDL->setdims(npdl,dims,ndims); /* set dims      */
-     npdl->datatype = datatype;     /* and data type */
-     npdl->data = data;             /* point it to your data */
+     pdl* p = PDL->pdlnew(); /* get the empty container */
+     if (!p) return p;
+     pdl_error err = PDL->setdims(p, dims, ndims);  /* set dims */
+     if (err.error) { PDL->destroy(p); return NULL; }
+     p->datatype = datatype;     /* and data type */
+     p->data = data;             /* point it to your data */
      /* make sure the core doesn't meddle with your data */
-     npdl->state |= PDL_DONTTOUCHDATA | PDL_ALLOCATED;
+     p->state |= PDL_DONTTOUCHDATA | PDL_ALLOCATED;
      if (delete_magic != NULL)
-       PDL->add_deletedata_magic(npdl, delete_magic, delparam);
+       PDL->add_deletedata_magic(p, delete_magic, delparam);
      else
-       PDL->add_deletedata_magic(npdl, default_magic, 0);
-     return npdl;
+       PDL->add_deletedata_magic(p, default_magic, 0);
+     return p;
    }
 
    #define SZ 256
@@ -249,10 +250,10 @@ their way around the Perl API here is the code:
 #define aTHX_
 #endif
    if (SvTRUE (ERRSV)) Perl_croak(aTHX_ "%s",SvPV_nolen (ERRSV));
-   CoreSV = perl_get_sv("PDL::SHARE",FALSE);  /* SV* value */
-   if (CoreSV==NULL)
+   if (!(CoreSV = perl_get_sv("PDL::SHARE",FALSE))) /* SV* value */
      Perl_croak(aTHX_ "We require the PDL::Core module, which was not found");
-   PDL = INT2PTR(Core*,SvIV( CoreSV ));  /* Core* value */
+   if (!(PDL = INT2PTR(Core*,SvIV( CoreSV )))) /* Core* value */
+     Perl_croak(aTHX_ "Got NULL pointer for PDL");
    if (PDL->Version != PDL_CORE_VERSION)
      Perl_croak(aTHX_ "[PDL->Version: \%d PDL_CORE_VERSION: \%d XS_VERSION: \%s] The code needs to be recompiled against the newly installed PDL", PDL->Version, PDL_CORE_VERSION, XS_VERSION);
 
@@ -307,16 +308,22 @@ C<pdl *SetSV_PDL(SV *sv, pdl *it)>
 
 C<pdl *pdlnew()>
 
-C<pdlnew> returns an empty pdl object that needs further initialization
-to turn it into a proper ndarray. Example:
+C<pdlnew> returns an empty pdl object that is initialised like a "null"
+but with no data. Example:
 
   pdl *p = PDL->pdlnew();
-  PDL->setdims(p,dims,ndims);
+  if (!p) return p;
+  pdl_error err = PDL->setdims(p, dims, ndims);  /* set dims */
+  if (err.error) { PDL->destroy(p); return NULL; }
   p->datatype = PDL_B;
+
+Returns C<NULL> if a problem occurred, so check for that.
 
 =item *
 
 C<pdl *null()>
+
+Returns C<NULL> if a problem occurred, so check for that.
 
 =item *
 
@@ -332,23 +339,23 @@ C<int howbig(int pdl_datatype)>
 
 =item *
 
-C<void add_deletedata_magic(pdl *p, void (*func)(pdl*, int), int param)>
+C<pdl_error add_deletedata_magic(pdl *p, void (*func)(pdl*, int), int param)>
 
 =item *
 
-C<void allocdata(pdl *p)>
+C<pdl_error allocdata(pdl *p)>
 
 =item *
 
-C<void make_physical(pdl *p)>
+C<pdl_error make_physical(pdl *p)>
 
 =item *
 
-C<void make_physdims(pdl *p)>
+C<pdl_error make_physdims(pdl *p)>
 
 =item *
 
-C<void make_physvaffine(pdl *p)>
+C<pdl_error make_physvaffine(pdl *p)>
 
 =item *
 
@@ -366,27 +373,104 @@ cause segfaults during pthreading.
 
 See L<PDL::ParallelCPU> for more information on pthreading.
 
+B<NB> As of 2.064, it is B<highly recommended> that you do not call
+C<barf> at all in PP code, but instead use C<$CROAK()>. This will return
+a C<pdl_error> which will transparently be used to throw the correct
+exception in Perl code, but can be handled suitably by non-Perl callers.
+
+=item *
+
+  safe_indterm
+
+Checks given offset is within given ndarray's bounds, else throws an
+exception.
+
+=item *
+
+  converttype
+
+Used by C<set_datatype> to change an ndarray's type, converting and
+possibly re-allocating the data if a different size. If the ndarray's
+C<badflag> was set, its C<badvalue> will become the default for the
+new type. Bad values will still be bad.
+
+=item *
+
+  converttypei_new
+
+Affine transformation used only by C<get_convertedpdl> to convert an
+ndarray's type. Not bad-value aware.
+
+=item *
+
+  get_convertedpdl
+
+Used by L<PDL::Core/convert>.
+
+=item *
+
+  affine_new
+
+Creates a child vaffine ndarray from given parent ndarray, with given offs
+(starting point for that pthread in that ndarray), inclist and dims.
+
+=item *
+
+  make_trans_mutual
+
+Triggers the actual running of a previously-set-up C<pdl_trans>.
+
+=item *
+
+  get
+
+Get data at given coordinates.
+
+=item *
+
+  get_offs
+
+Get data at given offset.
+
+=item *
+
+  put_offs
+
+Put data at given offset.
+
+=item *
+
+  setdims_careful
+
+Despite the name, just calls C<resize_defaultincs> then
+C<reallocthreadids> with one.
+
+=item *
+
+  destroy
+
+Destroy ndarray.
+
+=item *
+
+  reallocdims
+
+Cause the ndarray to have given number of dimensions, destroying
+previous ones.
+
+=item *
+
+  reallocthreadids
+
+Reallocate n threadids. Set the new extra ones to the end.
+
+=item *
+
+  resize_defaultincs
+
+Recalculate default increments from C<dims>, and grow the PDL data.
+
 =back
-
-=cut
-
-# ones that are not clear:
-# safe_indterm
-# converttypei_new
-# converttype
-# get_convertedpdl
-# affine_new
-# make_trans_mutual
-# make_now
-# get
-# get_offs
-# put_offs
-# setdims_careful
-# destroy
-# grow
-# reallocdims
-# reallocthreadids
-# resize_defaultincs
 
 =head2 Handy macros from pdl.h
 
@@ -400,7 +484,9 @@ You might want to use for example C<get_pdl_badvalue> function:
 
  /* THIS IS CORRECT */
  double bad_a;
- ANYVAL_TO_CTYPE(bad_a, double, PDL->get_pdl_badvalue(a));
+ PDL_Anyval bv = PDL->get_pdl_badvalue(a);
+ if (bv.type < 0) croak("error getting badvalue");
+ ANYVAL_TO_CTYPE(bad_a, double, bv);
  if( bad_a == 0 ) { ... }
 
 As of PDL 2.014, in F<pdl.h> there are the following macros for handling
@@ -408,16 +494,31 @@ PDL_Anyval from C code:
 
  ANYVAL_FROM_CTYPE(out_anyval, out_anyval_type, in_variable)
  ANYVAL_TO_CTYPE(out_variable, out_ctype, in_anyval)
- ANYVAL_EQ_ANYVAL(x, y)
+ ANYVAL_EQ_ANYVAL(x, y) /* returns -1 on type error */
 
-As of PDL 2.039 there is:
+As of PDL 2.039 (returns -1 rather than croaking on failure as of
+2.064) there is:
 
  ANYVAL_ISNAN(anyval)
 
-As of PDL 2.040 (the additional parameters are to detect the badflag,
-and handle caching the bad value for efficiency):
+As of PDL 2.040 (changed parameter list, also returns -1 rather than
+croaking on failure, in 2.064) - you need to check the badflag first:
 
- ANYVAL_ISBAD(in_anyval, pdl, badval)
+ ANYVAL_ISBAD(in_anyval, badval)
+
+e.g.
+
+ int badflag = (x->state & PDL_BADVAL) > 0;
+ PDL_Anyval badval = pdl_get_pdl_badvalue(x);
+ if (badflag) {
+   int isbad = ANYVAL_ISBAD(result, badval);
+   if (isbad == -1) croak("ANYVAL_ISBAD error on types %d, %d", result.type, badval.type);
+   if (isbad)
+     RETVAL = newSVpvn( "BAD", 3 );
+   else
+     ANYVAL_TO_SV(RETVAL, result);
+ } else
+   ANYVAL_TO_SV(RETVAL, result);
 
 As of PDL 2.058, there are:
 

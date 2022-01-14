@@ -1,0 +1,8 @@
+Changes
+lib/Lang/HEX/Export.pm
+Makefile.PL
+MANIFEST
+README
+t/Lang-HEX-Export.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

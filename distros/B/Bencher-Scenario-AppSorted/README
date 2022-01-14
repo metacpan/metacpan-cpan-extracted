@@ -2,9 +2,9 @@ NAME
     Bencher::Scenario::AppSorted - Benchmark sorted vs is-sorted
 
 VERSION
-    This document describes version 0.001 of Bencher::Scenario::AppSorted
+    This document describes version 0.002 of Bencher::Scenario::AppSorted
     (from Perl distribution Bencher-Scenario-AppSorted), released on
-    2020-05-24.
+    2021-07-31.
 
 SYNOPSIS
     To run benchmark with default option:
@@ -29,9 +29,9 @@ BENCHMARKED MODULES
     Version numbers shown below are the versions used when running the
     sample benchmark.
 
-    App::sorted 0.001
+    App::sorted 0.002
 
-    File::IsSorted 0.0.3
+    File::IsSorted 0.0.6
 
 BENCHMARK PARTICIPANTS
     *   sorted (command)
@@ -53,39 +53,81 @@ BENCHMARK DATASETS
 
     *   100k-unsorted-beginning
 
-SAMPLE BENCHMARK RESULTS
-    Run on: perl: *v5.30.0*, CPU: *Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz
-    (2 cores)*, OS: *GNU/Linux Ubuntu version 19.10*, OS kernel: *Linux
-    version 5.3.0-46-generic*.
+BENCHMARK SAMPLE RESULTS
+  Sample benchmark #1
+    Run on: perl: *v5.34.0*, CPU: *Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz
+    (4 cores)*, OS: *GNU/Linux LinuxMint version 19*, OS kernel: *Linux
+    version 5.3.0-68-generic*.
 
-    Benchmark with default options ("bencher -m AppSorted"):
+    Benchmark command (default options):
+
+     % bencher -m AppSorted
+
+    Result formatted as table:
 
      #table1#
-     +-------------+-------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
-     | participant | dataset                 | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
-     +-------------+-------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
-     | sorted      | 100k-sorted             |       7.4 |       140 |                 0.00% |                93.01% |   0.00026 |      11 |
-     | sorted      | 100k-unsorted-middle    |       9.2 |       110 |                25.42% |                53.89% |   0.00014 |       7 |
-     | is-sorted   | 100k-sorted             |      12   |        85 |                60.86% |                19.99% |   0.00032 |       7 |
-     | sorted      | 100k-unsorted-beginning |      12   |        82 |                66.10% |                16.20% |   0.00019 |       7 |
-     | is-sorted   | 100k-unsorted-middle    |      13   |        79 |                72.72% |                11.75% |   0.00014 |       7 |
-     | is-sorted   | 100k-unsorted-beginning |      14   |        70 |                93.01% |                 0.00% | 7.1e-05   |       7 |
-     +-------------+-------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
+     | participant | dataset                 | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+     |-------------+-------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------|
+     | sorted      | 100k-sorted             |       8.1 |       120 |                 0.00% |                96.99% | 0.0011  |       7 |
+     | sorted      | 100k-unsorted-middle    |      10   |        98 |                27.06% |                55.04% | 0.00018 |       7 |
+     | sorted      | 100k-unsorted-beginning |      13   |        75 |                64.21% |                19.97% | 0.00029 |       8 |
+     | is-sorted   | 100k-sorted             |      13   |        75 |                65.08% |                19.33% | 0.00031 |       7 |
+     | is-sorted   | 100k-unsorted-middle    |      14   |        70 |                77.62% |                10.91% | 0.00016 |       8 |
+     | is-sorted   | 100k-unsorted-beginning |      16   |        63 |                96.99% |                 0.00% | 0.00023 |       7 |
 
-    Benchmark module startup overhead ("bencher -m AppSorted
-    --module-startup"):
+    The above result formatted in Benchmark.pm style:
+
+                                          Rate  sorted 100k-sorted  sorted 100k-unsorted-middle  sorted 100k-unsorted-beginning  is-sorted 100k-sorted  is-sorted 100k-unsorted-middle  is-sorted 100k-unsorted-beginning 
+      sorted 100k-sorted                 8.1/s                  --                         -18%                            -37%                   -37%                            -41%                               -47% 
+      sorted 100k-unsorted-middle         10/s                 22%                           --                            -23%                   -23%                            -28%                               -35% 
+      sorted 100k-unsorted-beginning      13/s                 60%                          30%                              --                     0%                             -6%                               -16% 
+      is-sorted 100k-sorted               13/s                 60%                          30%                              0%                     --                             -6%                               -16% 
+      is-sorted 100k-unsorted-middle      14/s                 71%                          39%                              7%                     7%                              --                                -9% 
+      is-sorted 100k-unsorted-beginning   16/s                 90%                          55%                             19%                    19%                             11%                                 -- 
+ 
+     Legends:
+       is-sorted 100k-sorted: dataset=100k-sorted participant=is-sorted
+       is-sorted 100k-unsorted-beginning: dataset=100k-unsorted-beginning participant=is-sorted
+       is-sorted 100k-unsorted-middle: dataset=100k-unsorted-middle participant=is-sorted
+       sorted 100k-sorted: dataset=100k-sorted participant=sorted
+       sorted 100k-unsorted-beginning: dataset=100k-unsorted-beginning participant=sorted
+       sorted 100k-unsorted-middle: dataset=100k-unsorted-middle participant=sorted
+
+    The above result presented as chart:
+
+  Sample benchmark #2
+    Benchmark command (benchmarking module startup overhead):
+
+     % bencher -m AppSorted --module-startup
+
+    Result formatted as table:
 
      #table2#
-     +---------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
      | participant         | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
-     +---------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
-     | File::IsSorted      |      35   |              29.4 |                 0.00% |               525.86% | 5.5e-05 |       7 |
-     | App::sorted         |       8.2 |               2.6 |               325.09% |                47.23% | 1.4e-05 |       7 |
-     | perl -e1 (baseline) |       5.6 |               0   |               525.86% |                 0.00% |   2e-05 |       7 |
-     +---------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
+     |---------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------|
+     | File::IsSorted      |        32 |                28 |                 0.00% |               693.00% | 0.00012 |       7 |
+     | App::sorted         |         9 |                 5 |               242.68% |               131.41% | 0.00032 |       7 |
+     | perl -e1 (baseline) |         4 |                 0 |               693.00% |                 0.00% | 0.00016 |       9 |
+
+    The above result formatted in Benchmark.pm style:
+
+                              Rate   F:I   A:s  perl -e1 (baseline) 
+      F:I                   31.2/s    --  -71%                 -87% 
+      A:s                  111.1/s  255%    --                 -55% 
+      perl -e1 (baseline)  250.0/s  700%  125%                   -- 
+ 
+     Legends:
+       A:s: mod_overhead_time=5 participant=App::sorted
+       F:I: mod_overhead_time=28 participant=File::IsSorted
+       perl -e1 (baseline): mod_overhead_time=0 participant=perl -e1 (baseline)
+
+    The above result presented as chart:
 
     To display as an interactive HTML table on a browser, you can add option
     "--format html+datatables".
+
+CONTRIBUTOR
+    perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -107,7 +149,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020 by perlancar@cpan.org.
+    This software is copyright (c) 2021 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

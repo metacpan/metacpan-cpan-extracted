@@ -12,12 +12,11 @@ Search::ByPrefix - An efficient, tree-based, multi-match prefix searcher.
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
-
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -52,13 +51,24 @@ Where C<%opt> can have the following keys:
 
 The value of the C<table> must be a multidimensional hash-like data structure.
 
+Starting with version 0.04, using a L<DBM::Deep> database is also supported.
+
+=item * special_key => "\0\0\1\0\0"
+
+Special unique key, used internally to store the original values.
+
 =back
 
 =cut
 
 sub new {
     my ($class, %opt) = @_;
-    bless {table => $opt{table} // {}}, $class;
+    bless {
+
+        table       => $opt{table} // {},
+        special_key => "\0\0\1\0\0",
+
+    }, $class;
 }
 
 =head2 add
@@ -82,12 +92,11 @@ or:
 sub add {
     my ($self, $key, $value) = @_;
 
-    my $vref = \$value;
-    my $ref  = $self->{table};
+    my $ref = $self->{table};
 
     foreach my $item (@$key) {
         $ref = $ref->{$item} //= {};
-        push @{$ref->{$ref}}, $vref;
+        push @{$ref->{$self->{special_key}}}, $value;
     }
 
     $self;
@@ -126,7 +135,7 @@ sub search {
         }
     }
 
-    map { $$_ } @{$ref->{$ref}};
+    @{$ref->{$self->{special_key}}};
 }
 
 =head1 EXAMPLE
@@ -173,7 +182,7 @@ Daniel Șuteu, C<< <trizen at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016-2017 Daniel Șuteu.
+Copyright 2016-2022 Daniel Șuteu.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -183,4 +192,4 @@ L<http://www.perlfoundation.org/artistic_license_2_0>
 
 =cut
 
-1; # End of Search::ByPrefix
+1;    # End of Search::ByPrefix

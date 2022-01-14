@@ -1,9 +1,7 @@
-#!/bin/perl -w
-
 ## Test of PDL::Char subclass -- treating byte PDLs as matrices of fixed strings
 
-use Test::More tests => 6;
-use PDL;
+use Test::More;
+use PDL::LiteF;
 use PDL::Char;
 use strict;
 use warnings;
@@ -43,7 +41,7 @@ is($stringized, $comp);
 {
 # Variable-length string test
 my $varstr = PDL::Char->new( [ ["longstring", "def", "ghi"],["jkl", "mno", 'pqr'] ] );
- 
+
 # Variable Length Strings: Expected Results
 my $comp2 = 
 "[
@@ -54,3 +52,7 @@ my $comp2 =
 
 is("$varstr", $comp2);
 }
+
+is +PDL::Char->new( "" ).'', q{'' };
+
+done_testing;

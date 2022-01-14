@@ -1,5 +1,120 @@
 Revision history for SPVM
 
+0.9120  2021-01-14
+        [CHANGES]
+        * Native and precompile shared object files are cached.
+
+0.9119  2021-01-14
+        [CHANGES]
+        * Suppress clang 12+ -Wcompound-token-split-by-macro warnings in perl.h when compiling SPVM.xs
+
+        [NON BACKWORD COMPATIBLE CHANGES]
+        * This is interface bug fix required. The effect is little.
+          [Before]
+          void* (*alloc_memory_block_zero)(SPVM_ENV* env, int64_t byte_size);
+          
+          [After]
+          void* (*alloc_memory_block_zero)(SPVM_ENV* env, size_t byte_size);
+
+        [FIX BUGS]
+        * Fix pointer class test bugs.
+
+0.9118  2021-01-13
+        [CHANGES]
+        * Add cc_each, ccflags_each methods to SPVM::Builder::Config.
+        * Add new_gnu99 method to SPVM::Builder::Config.
+        * Remove perllib $Config{bin} dependency of creating Windows DLL.
+        * Improve resource not found messages.
+        * Output build commands in build_shared_lib_dist method.
+        * Don't create ar file in precompile.
+        [FIX BUGS]
+        * Fix the document that ccflags and ldflags of SPVM::Builder::Config default value is empty string.
+          The right description is an array reference that has default values.
+        * Fix the bug that SPVM::Builder::CC can't load resource include directories.
+        * Fix the bug that mac output ar warnings.
+
+0.9117  2021-01-12
+        [CHANGES]
+        * ar file don't contains static link files.
+        * ar file don't contains SPVM module object file.
+        * Add checking resource symbol duplication. SPVM depends on nm command.
+        * Improve resource system. It resolve the depenedent resources,
+          and become more safety adding symbol duplication checking and the depenent file created time checking.
+
+0.9116  2021-01-11
+        [FIX BUGS]
+        * Fix the bugs that C++ code can't be compiled
+        [CHANGES]
+        * Add "ext" field of SPVM::Builder::Config again for the SPVM native source extension.
+
+0.9115  2021-01-11
+        [NON BACKWORD COMPATIBLE CHANGES]
+        * Revert most of 0.9114 Changes
+          
+          Revert: Add file, file_optional, native_include_dir,
+          native_src_dir native_lib_dir, native_bin_dir
+          fields to SPVM::Builder::Config.
+          
+          Revert: Need file field new, new_c, new_c99, new_cpp, new_cpp11 of SPVM::Builder::Config
+          
+0.9114  2021-01-10
+        [FIX BUGS]
+        * new_c, new_c99, new_cpp, new_cpp11 of SPVM::Builder::Config pass
+          arguments to new of SPVM::Builder::Config.
+        [CHANGES]
+        * Add file, file_optional, native_include_dir,
+          native_src_dir native_lib_dir, native_bin_dir
+          fields to SPVM::Builder::Config.
+        [NON BACKWORD COMPATIBLE CHANGES]
+        * Need file field new, new_c, new_c99, new_cpp, new_cpp11 of SPVM::Builder::Config
+          [Now Runtime Exception]
+          my $config = SPVM::Config->new;
+          
+          [New Code]
+          my $config = SPVM::Config->new(file => __FILE__);
+
+0.9113  2021-01-09
+        [CHANGES]
+        * Add "use" method to SPVM::Builder::Config. This method is the alias for "add_resources".
+        * Remove "ext" field of SPVM::Builder::Config because source files was needed to be specifed.
+        * Need Test::More 0.92+ to do tests.
+        * Rename sources field of SPVM::Builder::Config to source_files.
+        * Rename add_sources method of SPVM::Builder::Config to add_source_files.
+        
+0.9112  2021-01-07
+        [BUGS]
+        * Fix a unweaken memory leak bug.
+        
+0.9111  2021-01-07
+        [CHANGES]
+        * Improve compile error message "Can't locate ...". 
+          [Before]
+          Can't locate Foo/Bar.spvm in @INC ...
+          
+          [After]
+          Can't locate Foo/Bar.spvm to load Foo::Bar class in @INC ...
+        * Improve compile error message "... is different from". And this message is output only once.
+          [Before]
+          Class name "ClassNameDifferntFromModuleNameXXXXXXX" is different from
+          the class name corresponding to the module file "TestCase::CompileError::Class::ClassNameDifferntFromModuleName"
+          [After]
+          Wrong class name "ClassNameDifferntFromModuleNameXXXXXXX".
+          The class name must be "TestCase::CompileError::Class::ClassNameDifferntFromModuleName"
+
+        [BUGS]
+        * Fix the bugs that variable names can contain ":::".
+        * Fix the bugs that the type conversion from multi numrci type to object type is allowed.
+        * Fix the bugs that when class is not found in static method call, a segmentation fault occurs.
+
+0.9110  2021-01-07
+        [CHANGES]
+        * Current class "cur->" is changed to "&"
+          [Before]
+          cur->sum(1, 2)
+          
+          [After]
+          &sum(1, 2)
+
 0.9109  2021-01-06
         [CHANGES]
         * SPVM is compiled as GNU99 instead of C99

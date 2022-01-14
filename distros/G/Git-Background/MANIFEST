@@ -23,5 +23,6 @@ xt/await-slurp_error.t
 xt/git_background_new.t
 xt/git_background_run.t
 xt/lib/Local/FalseThing.pm
+xt/no-void-context.t
 xt/proc_background_new-exception.t
 xt/proc_background_wait-exception.t

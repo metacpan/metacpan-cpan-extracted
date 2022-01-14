@@ -4,22 +4,24 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 
 use Moose;
+with 'Dist::Zilla::Role::BeforeBuild';
 
-with qw(
-  Dist::Zilla::Role::BeforeBuild
-);
+use Git::Background 0.003;
+use Path::Tiny;
+
+use namespace::autoclean;
+
+sub mvp_multivalue_args { return (qw( perms )) }
 
 has _git => (
     is      => 'ro',
-    isa     => 'Git::Wrapper',
+    isa     => 'Git::Background',
     lazy    => 1,
-    default => sub { Git::Wrapper->new( path( shift->zilla->root )->absolute->stringify ) },
+    default => sub { Git::Background->new( path( shift->zilla->root )->absolute ) },
 );
-
-sub mvp_multivalue_args { return (qw( perms )) }
 
 has default => (
     is      => 'ro',
@@ -32,13 +34,6 @@ has perms => (
     isa     => 'Maybe[ArrayRef]',
     default => sub { [] },
 );
-
-use Git::Wrapper;
-use Path::Tiny;
-use Safe::Isa;
-use Try::Tiny;
-
-use namespace::autoclean;
 
 sub before_build {
     my ($self) = @_;
@@ -94,24 +89,11 @@ sub _git_ls_files {
 
     my $git = $self->_git;
 
-    my @files;
-    try {
-        @files = $git->ls_files();
-    }
-    catch {
-        my $fatal = $_;
-        if ( $fatal->$_isa('Git::Wrapper::Exception') ) {
-            my $err = $git->ERR;
-            if ( $err and @{$err} ) {
-                $self->log( @{$err} );
-            }
+    my $files_f = $git->run('ls-files')->await;
 
-            $self->log_fatal( $fatal->error );
-        }
+    $self->log_fatal( scalar $files_f->failure ) if $files_f->is_failed;
 
-        $self->log_fatal($fatal);
-    };
-
+    my @files = $files_f->stdout;
     return @files;
 }
 
@@ -153,7 +135,7 @@ Dist::Zilla::Plugin::Git::FilePermissions - fix the file permissions in your Git
 
 =head1 VERSION
 
-Version 1.000
+Version 1.001
 
 =head1 SYNOPSIS
 
@@ -169,9 +151,9 @@ where your project is saved. Files not in the Git index, and directories, are
 ignored.
 
 Without configuration, every file is changed to the default permission of
-0644. The default permissions can be changed with the B<default> option
+0644. The default permissions can be changed with the C<default> option
 and you can configure different permissions for some files with the
-B<perms> option in the F<dist.ini>.
+C<perms> option in the F<dist.ini>.
 
 The plugin runs in the before build phase, which means it will fix the file
 permissions before the files are picked up in the file gather phase. The new
@@ -182,7 +164,7 @@ permissions.
 
 =head2 perms
 
-The B<perms> configuration option takes the form of:
+The C<perms> configuration option takes the form of:
 
   perms = REGEX WHITESPACE PERMS
 
@@ -190,10 +172,10 @@ or
 
   perms = REGEX WHITESPACE -
 
-The B<perms> configuration options are processed in order for every file. If
-a file matches the B<REGEX> the file permissions are changed to the
-corresponding B<PERMS> instead of the default permissions of 0644. If the
-B<PERMS> are B<-> the file is ignored.
+The C<perms> configuration options are processed in order for every file. If
+a file matches the C<REGEX> the file permissions are changed to the
+corresponding C<PERMS> instead of the default permissions of 0644. If the
+C<PERMS> are C<-> the file is ignored.
 
 =head1 SUPPORT
 
@@ -218,7 +200,7 @@ Sven Kirmess <sven.kirmess@kzone.ch>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017-2018 by Sven Kirmess.
+This software is Copyright (c) 2017-2022 by Sven Kirmess.
 
 This is free software, licensed under:
 

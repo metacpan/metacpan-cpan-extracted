@@ -58,8 +58,7 @@ cpp.sh
 freeglut-funs-name.txt
 ^ogl-calls-in-test.txt
 pogl_gl_funcs.txt
-utils/glversion.exe
-utils/glversion.o
-utils/glversion.txt
+utils/glversion(\.exe|\.o.*|\.txt|)$
 utils/glxinfo.c
 test.png
+^xt/

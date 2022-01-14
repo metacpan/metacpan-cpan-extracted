@@ -3,6 +3,7 @@ use warnings;
 no warnings qw(portable);
 
 use File::Temp qw(tempfile);
+use Scalar::Type qw(bool_supported is_bool);
 use Test::More;
 use Test::Exception;
 use lib 't/lib';
@@ -19,21 +20,26 @@ isa_ok($data, 'Data::CompactReadonly::Array', "and that isa Data::CompactReadonl
 is($data->count(), 0, "it's empty");
 is((stat($filename))[7], 7, "file size is correct");
 
+my $true = 1 == 1;
+my $false = 1 == 0;
 my $array = [
     # header                        5 bytes
     # OMGANARRAY                    1 byte
     # number of elements (in Byte)  1 byte
-    # 11 pointers                  11 bytes
+    # 14 pointers                  14 bytes
     0x10000,     # Scalar::Medium,  4 bytes
     undef,       # Scalar::Null,    1 byte
     "apple",     # Text::Byte,      7 bytes
     0x1,         # Scalar::Byte,    2 bytes
     0x100,       # Scalar::Short,   3 bytes 
-    3.4,         # Scalar::Float,   9 bytes
+    3.4,         # Scalar::Float64, 9 bytes
     0x12345678,  # Scalar::Long,    5 bytes
     0x100000000, # Scalar::Huge,    9 bytes
     0x100000000, # Scalar::Huge, no storage, same as one already in db
     "apple",     # Text::Byte, no storage
+    $true,       # Scalar::True,    1 byte
+    $true,       # Scalar::True, no storage
+    $false,      # Scalar::False,   1 byte
     'x' x 256    # Text::Short,     259 bytes
 ];
 Data::CompactReadonly->create($filename, $array);
@@ -42,19 +48,36 @@ isa_ok($data = Data::CompactReadonly->read($filename), 'Data::CompactReadonly::V
 # yes, 1 byte despite the file being more than 255 bytes long. The
 # last thing pointed to starts before the boundary.
 is($data->_ptr_size(), 1, "pointers are 1 byte");
-is($data->count(), 11, "got a non-empty array");
+is($data->count(), 14, "got a non-empty array");
 is($data->element(0), 0x10000,     "read a Medium from the array");
 is($data->element(1), undef,       "read a Null");
 is($data->element(2), 'apple',     "read a Text::Byte");
 is($data->element(3), 1,           "read a Byte");
 is($data->element(4), 256,         "read a Short");
+cmp_float($data->element(5), 3.4,  "read a Float64");
 is($data->element(6), 0x12345678,  "read a Long");
 is($data->element(7), 0x100000000, "read a Huge");
 is($data->element(8), 0x100000000, "read another Huge");
 is($data->element(9), 'apple',     "read another Text");
-is($data->element(10), 'x' x 256,  "read another Text");
-cmp_float($data->element(5), 3.4,  "read a Float");
-is((stat($filename))[7], 317, "file size is correct");
+
+ok($data->element(10),             "read a True");
+if(bool_supported) {
+    ok(is_bool($data->element(10)), "and on super-modern perl the Boolean flag is set correctly");
+} 
+
+ok($data->element(11),             "read another True");
+if(bool_supported) {
+    ok(is_bool($data->element(11)), "and on super-modern perl the Boolean flag is set correctly");
+} 
+
+ok(!$data->element(12),            "read a False");
+if(bool_supported) {
+    ok(is_bool($data->element(12)), "and on super-modern perl the Boolean flag is set correctly");
+} 
+
+is($data->element(13), 'x' x 256,  "read another Text");
+is((stat($filename))[7], 322, "file size is correct");
+
 
 push @{$array}, [], $array;
 Data::CompactReadonly->create($filename, $array);
@@ -65,30 +88,42 @@ isa_ok($data = Data::CompactReadonly->read($filename), 'Data::CompactReadonly::V
 # that this array can have items after the long text, but they're
 # stored before it, so we can keep using short pointers for longer
 is($data->_ptr_size(), 2, "pointers are 2 bytes");
-is($data->count(), 13, "got a non-empty array");
+is($data->count(), 16, "got a non-empty array");
 is($data->element(0), 0x10000,     "read a Medium from the array");
 is($data->element(1), undef,       "read a Null");
 is($data->element(2), 'apple',     "read a Text::Byte");
 is($data->element(3), 1,           "read a Byte");
 is($data->element(4), 256,         "read a Short");
+cmp_float($data->element(5), 3.4,  "read a Float64");
 is($data->element(6), 0x12345678,  "read a Long");
 is($data->element(7), 0x100000000, "read a Huge");
 is($data->element(8), 0x100000000, "read another Huge");
 is($data->element(9), 'apple',     "read another Text");
-is($data->element(10), 'x' x 256,  "read a Text::Short");
-cmp_float($data->element(5), 3.4,  "read a Float");
-isa_ok(my $embedded_array = $data->element(11), 'Data::CompactReadonly::V0::Array::Byte',
+ok($data->element(10),             "read a True");
+if(bool_supported) {
+    ok(is_bool($data->element(10)), "and on super-modern perl the Boolean flag is set correctly");
+} 
+ok($data->element(11),             "read another True");
+if(bool_supported) {
+    ok(is_bool($data->element(11)), "and on super-modern perl the Boolean flag is set correctly");
+} 
+ok(!$data->element(12),            "read a False");
+if(bool_supported) {
+    ok(is_bool($data->element(12)), "and on super-modern perl the Boolean flag is set correctly");
+} 
+is($data->element(13), 'x' x 256,  "read a Text::Short");
+isa_ok(my $embedded_array = $data->element(14), 'Data::CompactReadonly::V0::Array::Byte',
     "can embed an array in an array");
 is($embedded_array->count(), 0, "sub-array is empty");
-is($data->element(12)->element(12)->element(11)->id(),
+is($data->element(15)->element(15)->element(14)->id(),
    $embedded_array->id(),
    "circular array-refs work");
 # this is:
 #   original size +
 #   two extra pointers +
-#   thirteen for the pointers now being Shorts
+#   sixteen for the pointers now being Shorts
 #   two for the empty array
-is((stat($filename))[7], 317 + 2 + 13 + 2, "file size is correct");
+is((stat($filename))[7], 322 + 2 + 16 + 2, "file size is correct");
 
 Data::CompactReadonly->create($filename, {});
 isa_ok($data = Data::CompactReadonly->read($filename), 'Data::CompactReadonly::V0::Dictionary::Byte',
@@ -100,7 +135,10 @@ my $hash = {
     # header                          5 bytes
     # OMGADICT                        1 byte
     # number of elements (in Byte)    1 byte
-    # 17 pairs of pointers         #  34 bytes
+    # 20 pairs of pointers         #  40 bytes
+    true   => $true,               #  6 bytes for key, 1 for value
+    false  => $false,              #  7 bytes for key, 1 for value
+    $false => $false,              #  2 bytes for stringified key, value is FREE!!!
     float  => 3.14,                #  7 bytes for key, 9 bytes for value
     byte   => 65,                  #  6 bytes for key, 2 bytes for value
     short  => 65534,               #  7 bytes for key, 3 bytes for value
@@ -119,15 +157,29 @@ my $hash = {
     6.28   => 65,                  #  6 bytes for key, free storage for value
     # the last element in the hash, cos its key sorts last
     zzlongtext => 'z' x 300,       # 12 bytes for key, 303 for value (Text::Short)
-    # 501 bytes total
+    # 524 bytes total
 };
 Data::CompactReadonly->create($filename, $hash);
 isa_ok($data = Data::CompactReadonly->read($filename), 'Data::CompactReadonly::V0::Dictionary::Byte',
     "got a Dictionary::Byte");
 isa_ok($data, 'Data::CompactReadonly::Dictionary', "and that isa Data::CompactReadonly::Dictionary");
-is($data->count(), 17, "17 entries");
+is($data->count(), 20, "20 entries");
 is($data->_ptr_size(), 1, "pointers are 1 byte");
-cmp_float($data->element('float'), 3.14,        "read a Float");
+cmp_float($data->element('float'), 3.14,        "read a Float64");
+
+ok($data->element('true'),   "read a True");
+if(bool_supported) {
+    ok(is_bool($data->element('true')), "and on super-modern perl the Boolean flag is set correctly");
+} 
+ok(!$data->element('false'), "read a False");
+if(bool_supported) {
+    ok(is_bool($data->element('false')), "and on super-modern perl the Boolean flag is set correctly");
+} 
+ok(!$data->element($false),  "False as a key");
+if(bool_supported) {
+    ok(is_bool($data->element($false)), "and on super-modern perl the Boolean flag is set correctly");
+} 
+
 is($data->element('byte'),         65,          "read a Byte");
 is($data->element('short'),        65534,       "read a Short");
 is($data->element('medium'),       65536,       "read a Medium");
@@ -147,18 +199,26 @@ is($data->element("\x{5317}\x{4eac}\x{5e02}"),
     "Beijing", "non-ASCII keys work");
 is($data->element('Beijing'), "\x{5317}\x{4eac}\x{5e02}",
     "non-ASCII values work");
-is((stat($filename))[7], 501, "file size is correct");
+is((stat($filename))[7], 524, "file size is correct");
+if(bool_supported) {
+    ok((!grep { is_bool($_) } $data->indices), "bools as keys are stringified");
+}
 
-$hash->{zzz} = 'say the bees'; # extra pair of pointers, plus 5 bytes for key, 14 bytes for value
+# the previous 20 pointer pairs are now 20 * 2 * _2_ bytes == 80, so an extra 40 bytes
+$hash->{zzz} = 'say the bees'; # extra pair of pointers (4 bytes), plus 5 bytes for key, 14 bytes for value
 Data::CompactReadonly->create($filename, $hash);
 isa_ok($data = Data::CompactReadonly->read($filename), 'Data::CompactReadonly::V0::Dictionary::Byte',
     "got a Dictionary::Byte");
-is($data->count(), 18, "got a hash with 18 entries");
+is($data->count(), 21, "got a hash with 18 entries");
 is($data->_ptr_size(), 2, "pointers are 2 bytes");
 is($data->element('null'), undef,          "read a Null");
 is($data->element('text'), 'hi mum!',      "read a Text::Byte");
 is($data->element('zzz'),  'say the bees', "can retrieve data after the long text");
-is((stat($filename))[7], 558, "file size is correct");
+is(
+    (stat($filename))[7],
+    587, # 524 (original size) + 40 (extra pointer bytes for previous data) + 23 (new pointers/data)
+    "file size is correct"
+);
 
 $hash = {
     'Bond' => '007',

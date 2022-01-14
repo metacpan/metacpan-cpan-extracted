@@ -1,5 +1,10 @@
 Revision history for Perl extension App-optex-textconv
 
+1.02 2022-01-13T02:17:44Z
+
+    - Simplified algorithm.
+    - Clean up code.
+
 1.01 2021-12-31T17:42:37Z
 
     - Introduce {doc,xls}.pm.

@@ -6,10 +6,10 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = 0.007;
+our $VERSION = 0.009;
 
 use IP::Geolocation::MMDB::Metadata;
-use Math::BigInt 1.999807;
+use Math::BigInt 1.999811;
 
 require XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -30,9 +30,9 @@ sub getcc {
 
   my $country_code;
 
-  my $lookup_result = $self->record_for_address($ip_address);
-  if (exists $lookup_result->{country}) {
-    my $country = $lookup_result->{country};
+  my $data = $self->record_for_address($ip_address);
+  if (exists $data->{country}) {
+    my $country = $data->{country};
     if (exists $country->{iso_code}) {
       $country_code = $country->{iso_code};
     }
@@ -66,14 +66,14 @@ IP::Geolocation::MMDB - Read MaxMind DB files
 
 =head1 VERSION
 
-version 0.007
+version 0.009
 
 =head1 SYNOPSIS
 
   use IP::Geolocation::MMDB;
-  my $db = IP::Geolocation::MMDB->new(file => 'GeoIP2-Country.mmdb');
+  my $db = IP::Geolocation::MMDB->new(file => 'Country.mmdb');
   my $metadata = $db->metadata;
-  my $lookup_result = $db->record_for_address('1.2.3.4');
+  my $data = $db->record_for_address('1.2.3.4');
   my $country_code = $db->getcc('2620:fe::9');
 
 =head1 DESCRIPTION
@@ -85,7 +85,7 @@ country codes such as "DE", "FR" and "US".
 
 =head2 new
 
-  my $db = IP::Geolocation::MMDB->new(file => 'GeoIP2-Country.mmdb');
+  my $db = IP::Geolocation::MMDB->new(file => 'Country.mmdb');
 
 Returns a new database object.  Dies if the specified file cannot be read.
 
@@ -98,7 +98,7 @@ code or the undefined value.  Dies if the address is not a valid IP address.
 
 =head2 record_for_address
 
-  my $lookup_result = $db->record_for_address($ip_address);
+  my $data = $db->record_for_address($ip_address);
 
 Takes an IPv4 or IPv6 address as a string and returns the data associated with
 the IP address or the undefined value.  Dies if the address is not a valid IP
@@ -107,15 +107,36 @@ address.
 The returned data is usually a hash reference but could also be a an array
 reference or a scalar for custom databases.
 
+=head2 iterate_search_tree
+
+  sub data_callback {
+    my ($numeric_ip, $prefix_length, $data) = @_;
+  }
+
+  sub node_callback {
+    my ($node_number, $left_node_number, $right_node_number) = @_;
+  }
+
+  $db->iterate_search_tree(\&data_callback, \&node_callback);
+
+Iterates over the entire search tree.  Calls the provided callbacks for each
+data record and node in the tree.  Both callbacks are optional.
+
+The data callback is called with a numeric IP address as a L<Math::BigInt>
+object, a network prefix length and the data associated with the network.
+
+The node callback is called with a node number and the children's node
+numbers.
+
 =head2 metadata
 
   my $metadata = $db->metadata;
 
 Returns an L<IP::Geolocation::MMDB::Metadata> object for the database.
 
-=head2 version
+=head2 libmaxminddb_version
 
-  my $version = IP::Geolocation::MMDB->version;
+  my $version = IP::Geolocation::MMDB::libmaxminddb_version;
 
 Returns the libmaxminddb version.
 
@@ -123,26 +144,34 @@ Returns the libmaxminddb version.
 
 =over
 
-=item B<< Couldn't open database file >>
+=item B<< Error opening database file >>
 
 The database file could not be read.
 
-=item B<< Couldn't parse IP address >>
+=item B<< The IP address you provided is not a valid IPv4 or IPv6 address >>
 
-A string did not contain a valid IP address.
+A parameter did not contain a valid IP address.
 
-=item B<< Couldn't look up IP address >>
+=item B<< Error looking up IP address >>
 
 A database error occurred while looking up an IP address.
 
-=item B<< Couldn't read data for IP address >>
+=item B<< Entry data error looking up >>
 
 A database error occurred while reading the data associated with an IP
 address.
 
-=item B<< Couldn't read metadata >>
+=item B<< Error getting metadata >>
 
 An error occurred while reading the database's metadata.
+
+=item B<< Invalid record when reading node >>
+
+Either an invalid node was looked up or the database is corrupt.
+
+=item B<< Unknown record type >>
+
+An unknown record type was found in the database.
 
 =back
 

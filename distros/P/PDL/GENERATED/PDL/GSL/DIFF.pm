@@ -20,6 +20,12 @@ use DynaLoader;
 
 
 
+
+#line 5 "gsl_diff.pd"
+
+use strict;
+use warnings;
+
 =head1 NAME
 
 PDL::GSL::DIFF - PDL interface to numerical differentiation routines in GSL
@@ -50,6 +56,7 @@ GNU Scientific Library.
      my ($x) = @_;
      return $x**2;
    }
+#line 60 "DIFF.pm"
 
 
 
@@ -62,6 +69,8 @@ GNU Scientific Library.
 
 
 
+
+#line 120 "gsl_diff.pd"
 
 sub gsldiff{
   my $opt;
@@ -81,13 +90,15 @@ sub gsldiff{
     ($res,$abserr) = PDL::GSL::DIFF::diff_forward($x,$f);
   }
   else{
-    barf("Unknown differentiation method $method in gsldiff\n");
+    barf("Unknown differentiation method $$opt{Method} in gsldiff\n");
   }
   return ($res,$abserr);
 }
+#line 98 "DIFF.pm"
 
 
 
+#line 1059 "../../../blib/lib/PDL/PP.pm"
 
 
 =head2 diff_central
@@ -109,16 +120,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 124 "DIFF.pm"
 
 
 
-
-
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *diff_central = \&PDL::diff_central;
+#line 130 "DIFF.pm"
 
 
 
+#line 1059 "../../../blib/lib/PDL/PP.pm"
 
 
 =head2 diff_backward
@@ -140,16 +152,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 156 "DIFF.pm"
 
 
 
-
-
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *diff_backward = \&PDL::diff_backward;
+#line 162 "DIFF.pm"
 
 
 
+#line 1059 "../../../blib/lib/PDL/PP.pm"
 
 
 =head2 diff_forward
@@ -171,18 +184,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 188 "DIFF.pm"
 
 
 
-
-
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *diff_forward = \&PDL::diff_forward;
+#line 194 "DIFF.pm"
 
 
 
 
 
+#line 42 "gsl_diff.pd"
 =head2 gsldiff
 
 =for ref
@@ -247,7 +261,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL differentiation routines were written by David Morrison.
 
 =cut
-
+#line 265 "DIFF.pm"
 
 
 

@@ -1,5 +1,10 @@
 Revision history for Avatica-Client
 
+0.003  2022-01-11
+    - Made default MAX_RETRIES value equal to 0 because of issue CALCITE-4900.
+    - Synchronized docker files with perl-dbd-avatica.
+    - Improved test.
+
 0.002  2021-12-14
     - Cleaned the release from extraneous files.
 

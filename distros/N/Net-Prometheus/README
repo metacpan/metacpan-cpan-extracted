@@ -164,6 +164,9 @@ METHODS
     An optional HASH reference may be provided; if so it will be passed
     into the collect method of every registered collector.
 
+    Values that are set to undef will be absent from the output (this
+    usually applies to gauges). Values set to NaN will be rendered as NaN.
+
  handle
 
        $response = $prometheus->handle( $request )
@@ -215,6 +218,36 @@ METHODS
           mount "/metrics" => $prometheus->psgi_app;
           ...
        }
+
+ export_to_Future_IO
+
+       $f = $prometheus->export_to_Future_IO( %args )
+
+    Performs the necessary steps to create a minimal HTTP server for
+    exporting metrics over HTTP, by using Future::IO directly. This
+    requires Future::IO version 0.11 or above, and a containing process
+    that has already loaded a non-default loop implementation that supports
+    multiple filehandles.
+
+    This new server will listen on its own port number for any incoming
+    request, and will serve metrics regardless of path.
+
+    This server is a very small, minimal implementation just sufficient to
+    support prometheus itself, or simple tools like wget, curl or perhaps a
+    web-browser for manual inspection. It is not intended to be a
+    fully-featured HTTP server and certainly does not support many HTTP
+    features at all.
+
+    Takes the following named arguments:
+
+    port => INT
+
+      Port number on which to listen for incoming HTTP requests.
+
+    The returned Future instance will remain pending for the entire
+    lifetime of the process. If the containing program has nothing else to
+    do it can call the await method on it, or else combine it with other
+    toplevel event futures it is using for its own purposes.
 
  export_to_IO_Async
 

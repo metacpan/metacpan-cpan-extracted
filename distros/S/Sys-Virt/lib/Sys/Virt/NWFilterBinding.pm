@@ -49,7 +49,7 @@ sub _new {
     if (exists $params{portdev}) {
 	$self = Sys::Virt::NWFilterBinding::_lookup_by_port_dev($con,  $params{portdev});
     } elsif (exists $params{xml}) {
-	$self = Sys::Virt::NWFilterBinding::_create_xml($con,  $params{xml});
+	$self = Sys::Virt::NWFilterBinding::_create_xml($con,  $params{xml}, $params{flags});
     } else {
 	die "portdev or xml parameters are required";
     }

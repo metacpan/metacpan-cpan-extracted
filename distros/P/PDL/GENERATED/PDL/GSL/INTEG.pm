@@ -22,6 +22,11 @@ use DynaLoader;
 
 
 
+
+#line 5 "gsl_integ.pd"
+use strict;
+use warnings;
+
 =head1 NAME
 
 PDL::GSL::INTEG - PDL interface to numerical integration routines in GSL
@@ -123,7 +128,7 @@ Please check the GSL documentation for more information.
      my ($x) = @_;
      return exp(-$x**2);
    }
-
+#line 132 "INTEG.pm"
 
 
 
@@ -137,6 +142,8 @@ Please check the GSL documentation for more information.
 
 
 
+#line 554 "gsl_integ.pd"
+
 sub gslinteg_qng{
   my ($opt,$warn);
   if (ref($_[$#_]) eq 'HASH'){ $opt = pop @_; }
@@ -149,8 +156,11 @@ sub gslinteg_qng{
   my ($res,$abserr,$neval,$ierr) = qng_meat($la,$lb,$epsabs,$epsrel,$warn,$f);
   return ($res,$abserr,$ierr,$neval);
 }
+#line 160 "INTEG.pm"
 
 
+
+#line 1059 "../../../blib/lib/PDL/PP.pm"
 
 
 =head2 qng_meat
@@ -174,16 +184,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 188 "INTEG.pm"
 
 
 
-
-
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *qng_meat = \&PDL::qng_meat;
+#line 194 "INTEG.pm"
 
 
 
+#line 586 "gsl_integ.pd"
 
 sub gslinteg_qag{
    my ($opt,$warn);
@@ -197,8 +208,11 @@ sub gslinteg_qag{
    my ($res,$abserr,$ierr) = qag_meat($la,$lb,$epsabs,$epsrel,$limit,$key,$limit,$warn,$f);
    return ($res,$abserr,$ierr);
 }
+#line 212 "INTEG.pm"
 
 
+
+#line 1059 "../../../blib/lib/PDL/PP.pm"
 
 
 =head2 qag_meat
@@ -221,16 +235,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 239 "INTEG.pm"
 
 
 
-
-
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *qag_meat = \&PDL::qag_meat;
+#line 245 "INTEG.pm"
 
 
 
+#line 622 "gsl_integ.pd"
 
 sub gslinteg_qags{
   my ($opt,$warn);
@@ -244,8 +259,11 @@ sub gslinteg_qags{
   my ($res,$abserr,$ierr) = qags_meat($la,$lb,$epsabs,$epsrel,$limit,$limit,$warn,$f);
   return ($res,$abserr,$ierr);
 }
+#line 263 "INTEG.pm"
 
 
+
+#line 1059 "../../../blib/lib/PDL/PP.pm"
 
 
 =head2 qags_meat
@@ -268,16 +286,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 290 "INTEG.pm"
 
 
 
-
-
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *qags_meat = \&PDL::qags_meat;
+#line 296 "INTEG.pm"
 
 
 
+#line 657 "gsl_integ.pd"
 
 sub gslinteg_qagp{
   my ($opt,$warn);
@@ -291,8 +310,11 @@ sub gslinteg_qagp{
   my ($res,$abserr,$ierr) = qagp_meat($points,$epsabs,$epsrel,$limit,$limit,$warn,$f);
   return ($res,$abserr,$ierr);
 }
+#line 314 "INTEG.pm"
 
 
+
+#line 1059 "../../../blib/lib/PDL/PP.pm"
 
 
 =head2 qagp_meat
@@ -315,16 +337,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 341 "INTEG.pm"
 
 
 
-
-
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *qagp_meat = \&PDL::qagp_meat;
+#line 347 "INTEG.pm"
 
 
 
+#line 691 "gsl_integ.pd"
 
 sub gslinteg_qagi{
   my ($opt,$warn);
@@ -338,8 +361,11 @@ sub gslinteg_qagi{
   my ($res,$abserr,$ierr) = qagi_meat($epsabs,$epsrel,$limit,$limit,$warn,$f);
   return ($res,$abserr,$ierr);
 }
+#line 365 "INTEG.pm"
 
 
+
+#line 1059 "../../../blib/lib/PDL/PP.pm"
 
 
 =head2 qagi_meat
@@ -362,16 +388,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 392 "INTEG.pm"
 
 
 
-
-
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *qagi_meat = \&PDL::qagi_meat;
+#line 398 "INTEG.pm"
 
 
 
+#line 725 "gsl_integ.pd"
 
 sub gslinteg_qagiu{
   my ($opt,$warn);
@@ -385,8 +412,11 @@ sub gslinteg_qagiu{
   my ($res,$abserr,$ierr) = qagiu_meat($la,$epsabs,$epsrel,$limit,$limit,$warn,$f);
   return ($res,$abserr,$ierr);
 }
+#line 416 "INTEG.pm"
 
 
+
+#line 1059 "../../../blib/lib/PDL/PP.pm"
 
 
 =head2 qagiu_meat
@@ -409,16 +439,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 443 "INTEG.pm"
 
 
 
-
-
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *qagiu_meat = \&PDL::qagiu_meat;
+#line 449 "INTEG.pm"
 
 
 
+#line 760 "gsl_integ.pd"
 
 sub gslinteg_qagil{
   my ($opt,$warn);
@@ -432,8 +463,11 @@ sub gslinteg_qagil{
   my ($res,$abserr,$ierr) = qagil_meat($lb,$epsabs,$epsrel,$limit,$limit,$warn,$f);
   return ($res,$abserr,$ierr);
 }
+#line 467 "INTEG.pm"
 
 
+
+#line 1059 "../../../blib/lib/PDL/PP.pm"
 
 
 =head2 qagil_meat
@@ -456,16 +490,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 494 "INTEG.pm"
 
 
 
-
-
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *qagil_meat = \&PDL::qagil_meat;
+#line 500 "INTEG.pm"
 
 
 
+#line 795 "gsl_integ.pd"
 
 sub gslinteg_qawc{
   my ($opt,$warn);
@@ -479,8 +514,11 @@ sub gslinteg_qawc{
   my ($res,$abserr,$ierr) = qawc_meat($la,$lb,$c,$epsabs,$epsrel,$limit,$limit,$warn,$f);
   return ($res,$abserr,$ierr);
 }
+#line 518 "INTEG.pm"
 
 
+
+#line 1059 "../../../blib/lib/PDL/PP.pm"
 
 
 =head2 qawc_meat
@@ -503,16 +541,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 545 "INTEG.pm"
 
 
 
-
-
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *qawc_meat = \&PDL::qawc_meat;
+#line 551 "INTEG.pm"
 
 
 
+#line 829 "gsl_integ.pd"
 
 sub gslinteg_qaws{
   my ($opt,$warn);
@@ -526,8 +565,11 @@ sub gslinteg_qaws{
   my ($res,$abserr,$ierr) = qaws_meat($la,$lb,$epsabs,$epsrel,$limit,$limit,$alpha,$beta,$mu,$nu,$warn,$f);
   return ($res,$abserr,$ierr);
 }
+#line 569 "INTEG.pm"
 
 
+
+#line 1059 "../../../blib/lib/PDL/PP.pm"
 
 
 =head2 qaws_meat
@@ -551,16 +593,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 597 "INTEG.pm"
 
 
 
-
-
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *qaws_meat = \&PDL::qaws_meat;
+#line 603 "INTEG.pm"
 
 
 
+#line 869 "gsl_integ.pd"
 
 sub gslinteg_qawo{
   my ($opt,$warn);
@@ -581,8 +624,11 @@ sub gslinteg_qawo{
   my ($res,$abserr,$ierr) = qawo_meat($la,$lb,$epsabs,$epsrel,$limit,$limit,$OPTION_SIN_COS,$omega,$L,$nlevels,$warn,$f);
   return ($res,$abserr,$ierr);
 }
+#line 628 "INTEG.pm"
 
 
+
+#line 1059 "../../../blib/lib/PDL/PP.pm"
 
 
 =head2 qawo_meat
@@ -606,16 +652,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 656 "INTEG.pm"
 
 
 
-
-
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *qawo_meat = \&PDL::qawo_meat;
+#line 662 "INTEG.pm"
 
 
 
+#line 920 "gsl_integ.pd"
 
 sub gslinteg_qawf{
   my ($opt,$warn);
@@ -634,8 +681,11 @@ sub gslinteg_qawf{
   my ($res,$abserr,$ierr) = qawf_meat($la,$epsabs,$limit,$limit,$OPTION_SIN_COS,$omega,$nlevels,$warn,$f);
   return ($res,$abserr,$ierr);
 }
+#line 685 "INTEG.pm"
 
 
+
+#line 1059 "../../../blib/lib/PDL/PP.pm"
 
 
 =head2 qawf_meat
@@ -659,21 +709,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 713 "INTEG.pm"
 
 
 
-
-
-
+#line 1061 "../../../blib/lib/PDL/PP.pm"
 *qawf_meat = \&PDL::qawf_meat;
+#line 719 "INTEG.pm"
 
 
 
 
 
-=head2 gslinteg_qng
-
-Non-adaptive Gauss-Kronrod integration
+#line 113 "gsl_integ.pd"
+=head2 gslinteg_qng - Non-adaptive Gauss-Kronrod integration
 
 This function applies the Gauss-Kronrod 10-point, 21-point, 43-point and 87-point
 integration rules in succession until an estimate of the integral of f over ($la,$lb)
@@ -703,9 +752,7 @@ Example:
    }
 
 
-=head2 gslinteg_qag
-
-Adaptive integration
+=head2 gslinteg_qag - Adaptive integration
 
 This function applies an integration rule adaptively until an estimate of
 the integral of f over ($la,$lb) is achieved within the desired absolute and
@@ -742,9 +789,7 @@ Example:
      return ($x**2.6)*log(1.0/$x);
    }
 
-=head2 gslinteg_qags
-
-Adaptive integration with singularities
+=head2 gslinteg_qags - Adaptive integration with singularities
 
 This function applies the Gauss-Kronrod 21-point integration rule
 adaptively until an estimate of the integral of f over ($la,$lb) is
@@ -779,9 +824,7 @@ Example:
      return ($x)*log(1.0/$x);
    }
 
-=head2 gslinteg_qagp
-
-Adaptive integration with known singular points
+=head2 gslinteg_qagp - Adaptive integration with known singular points
 
 This function applies the adaptive integration algorithm used by
 gslinteg_qags taking into account the location of singular points
@@ -822,9 +865,7 @@ Example:
     return $x3 * log(abs(($x2-1.0)*($x2-2.0)));
   }
 
-=head2 gslinteg_qagi
-
-Adaptive integration on infinite interval
+=head2 gslinteg_qagi - Adaptive integration on infinite interval
 
 This function estimates the integral of the function f over the
 infinite interval (-\infty,+\infty) within the desired absolute and
@@ -859,9 +900,7 @@ Example:
   }
 
 
-=head2 gslinteg_qagiu
-
-Adaptive integration on infinite interval
+=head2 gslinteg_qagiu - Adaptive integration on infinite interval
 
 This function estimates the integral of the function f over the
 infinite interval (la,+\infty) within the desired absolute and
@@ -898,9 +937,7 @@ Example:
     return ($x**($alfa-1))/((1+10*$x)**2);
   }
 
-=head2 gslinteg_qagil
-
-Adaptive integration on infinite interval
+=head2 gslinteg_qagil - Adaptive integration on infinite interval
 
 This function estimates the integral of the function f over the
 infinite interval (-\infty,lb) within the desired absolute and
@@ -934,9 +971,7 @@ Example:
     return exp($x);
   }
 
-=head2 gslinteg_qawc
-
-Adaptive integration for Cauchy principal values
+=head2 gslinteg_qawc - Adaptive integration for Cauchy principal values
 
 This function computes the Cauchy principal value of the integral of f over (la,lb),
 with a singularity at c, I = \int_{la}^{lb} dx f(x)/(x - c). The integral is
@@ -967,9 +1002,7 @@ Example:
     return 1.0 / (5.0 * $x * $x * $x + 6.0) ;
   }
 
-=head2 gslinteg_qaws
-
-Adaptive integration for singular functions
+=head2 gslinteg_qaws - Adaptive integration for singular functions
 
 The algorithm in gslinteg_qaws is designed for integrands with algebraic-logarithmic
 singularities at the end-points of an integration region.
@@ -1010,9 +1043,7 @@ Example:
     }
   }
 
-=head2 gslinteg_qawo
-
-Adaptive integration for oscillatory functions
+=head2 gslinteg_qawo - Adaptive integration for oscillatory functions
 
 This function uses an adaptive algorithm to compute the integral of f over
 (la,lb) with the weight function sin(omega*x) or cos(omega*x) -- which of
@@ -1049,9 +1080,7 @@ Example:
   }
 
 
-=head2 gslinteg_qawf
-
-Adaptive integration for Fourier integrals
+=head2 gslinteg_qawf - Adaptive integration for Fourier integrals
 
 This function attempts to compute a Fourier integral of the function
 f over the semi-infinite interval [la,+\infty). Specifically, it attempts
@@ -1112,8 +1141,7 @@ The GSL integration routines were written by Brian Gough. QUADPACK
 was written by Piessens, Doncker-Kapenga, Uberhuber and Kahaner.
 
 =cut
-
-
+#line 1145 "INTEG.pm"
 
 
 

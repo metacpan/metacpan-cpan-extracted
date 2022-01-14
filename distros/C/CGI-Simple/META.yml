@@ -4,10 +4,14 @@ author:
   - 'Andy Armstrong <andy@hexten.net>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  File::Temp: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::NoWarnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,7 +21,7 @@ no_index:
   directory:
     - t
     - inc
-requires:
-  IO::Scalar: '0'
-  Test::More: '0'
-version: '1.115'
+resources:
+  repository: http://github.com/manwar/CGI--Simple.git
+version: '1.280'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

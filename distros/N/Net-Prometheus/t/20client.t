@@ -39,6 +39,43 @@ gauge 123
 EOF
 }
 
+# NaN rendering
+{
+   my $client = Net::Prometheus->new(
+      disable_process_collector => 1,
+      disable_perl_collector    => 1,
+   );
+
+   $client->new_gauge(
+      name => "gauge",
+      help => "undefined",
+   )->set( "nan" );
+
+   is( $client->render, <<'EOF', '$client->render renders NaN' );
+# HELP gauge undefined
+# TYPE gauge gauge
+gauge NaN
+EOF
+}
+
+# undef is absent
+{
+   my $client = Net::Prometheus->new(
+      disable_process_collector => 1,
+      disable_perl_collector    => 1,
+   );
+
+   $client->new_gauge(
+      name => "gauge",
+      help => "undefined",
+   )->set( undef );
+
+   is( $client->render, <<'EOF', '$client->render renders undef absent' );
+# HELP gauge undefined
+# TYPE gauge gauge
+EOF
+}
+
 # HELP escaping
 {
    my $client = Net::Prometheus->new(

@@ -4,15 +4,17 @@ Avatica::Client - Client for Apache Calcite Avatica
 
 # VERSION
 
-version 0.002
+version 0.003
 
 # AUTHOR
 
 Alexey Stavrov <logioniz@ya.ru>
 
-# CONTRIBUTOR
+# CONTRIBUTORS
 
-Denis Ibaev <dionys@gmail.com>
+- Denis Ibaev <dionys@gmail.com>
+- Ivan Putintsev <uid@rydlab.ru>
+- uid66 <19481514+uid66@users.noreply.github.com>
 
 # COPYRIGHT AND LICENSE
 

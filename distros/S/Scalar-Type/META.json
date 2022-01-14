@@ -38,7 +38,8 @@
             "Devel::Peek" : "0",
             "Scalar::Util" : "0",
             "Test::Exception" : "0",
-            "Test::More" : "0.96"
+            "Test::More" : "0.96",
+            "if" : "0"
          }
       }
    },
@@ -51,6 +52,6 @@
          "url" : "https://github.com/DrHyde/perl-modules-Scalar-Type"
       }
    },
-   "version" : "v0.2.0",
+   "version" : "v0.3.1",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

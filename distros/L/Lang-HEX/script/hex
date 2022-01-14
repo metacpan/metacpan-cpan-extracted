@@ -1,0 +1,52 @@
+#!perl
+
+# change HEX to something else
+
+use strict;
+use warnings;
+use utf8;
+use Lang::HEX;
+
+sub readFile {
+    my ($fileName) = @_;
+    my $fileContent;
+    open(my $fh, '<:encoding(UTF-8)', $fileName) or die "Cannot open the program file";
+    {
+        local $/;
+        $fileContent = <$fh>;
+    }
+    close($fh);
+    return $fileContent;
+}
+
+my $dirName = $ARGV[0];
+
+if(! defined $dirName ) {
+    die("give a directory path");
+}
+
+opendir(Dir, $dirName) || die "Can't open directory pieces: $!\n";
+my @list = readdir(Dir);
+closedir(Dir);
+
+my $mainPath = $dirName . '/main.hex';
+my $code = readFile($mainPath);
+
+if($#list > 0) {
+    foreach my $file (@list) {
+        if( $file eq '.' ) { next; }
+        if( $file eq '..' ) { next; }
+        if( $file ne "main.hex" ) {
+            my $filePath = $dirName . '/' . $file;
+            #print $filePath, "\n";
+
+            my $fileContent = readFile($filePath);
+
+            $code .= "\n";
+            $code .= $fileContent;
+        }
+    }
+}
+
+my $hexObject = Lang::HEX->new();
+$hexObject->parse($code);

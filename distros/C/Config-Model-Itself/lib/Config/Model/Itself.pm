@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Itself 2.022;
+package Config::Model::Itself 2.023;
 
 use Mouse ;
 use Config::Model 2.141;
@@ -543,8 +543,14 @@ sub write_all {
         my ($data,$notes) = $self->check_model_to_write($file, \%map_to_write, \%loaded_classes);
         next unless @$data ; # don't write empty model
         write_model_file ($dir->child($file), $self->{header}{$file}, $notes, $data);
+        delete $map_to_write{$file};
     }
 
+    # remove existing files that contain only deleted classes
+    foreach my $goner (%map_to_write) {
+        $logger->debug("Removing model file $goner.");
+        $dir->child($goner)->remove;
+    }
     $self->meta_instance->clear_changes ;
 }
 
@@ -851,7 +857,7 @@ Config::Model::Itself - Model (or schema) editor for Config::Model
 
 =head1 VERSION
 
-version 2.022
+version 2.023
 
 =head1 SYNOPSIS
 

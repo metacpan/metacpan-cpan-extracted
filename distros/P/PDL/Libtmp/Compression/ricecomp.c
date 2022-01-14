@@ -57,8 +57,6 @@
  *
  */
 
-
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -111,12 +109,13 @@ static int output_nbits(Buffer *buffer, int bits, int n);
  * 
  */
 
-int rcomp(void *a_v,		/* input array			*/
+char *rcomp(void *a_v,		/* input array			*/
 	  int bsize,            /* sample size (in bytes)       */
 	  int nx,		/* number of input pixels	*/
 	  unsigned char *c,	/* output buffer		*/
 	  int clen,		/* max length of output		*/
-	  int nblock)		/* coding block size		*/
+	  int nblock,		/* coding block size		*/
+	  int *ret)		/* pointer to bytes		*/
 {
 Buffer bufmem, *buffer = &bufmem;
 int *a = (int *)a_v;
@@ -129,11 +128,8 @@ double pixelsum, dpsum;
 unsigned int *diff;
 
  // Blocksize is picked so that boundaries lie on 64-bit word edges for all data types
- if(nblock & 0x7 ) { 
-   fprintf(stderr,"rcomp: nblock must be divisible by 4 (is %d)\n",nblock);
-   fflush(stderr);
-   return(-1);
- }
+ if(nblock & 0x7 )
+   return "rcomp: nblock must be divisible by 4";
 
  /* Magic numbers from fits_rcomp in CFITSIO; these have to match the ones in 
  *  rdecomp, below 
@@ -152,9 +148,7 @@ unsigned int *diff;
    fsmax = 25;
    break;
  default:
-   fprintf(stderr,"rcomp: bsize must be 1, 2, or 4 bytes");
-   fflush(stderr);
-   return(-1);
+   return "rcomp: bsize must be 1, 2, or 4 bytes";
  }
  
  bbits = 1<<fsbits;
@@ -174,9 +168,7 @@ unsigned int *diff;
   */
  diff = (unsigned int *) malloc(nblock*sizeof(unsigned int));
  if (diff == (unsigned int *) NULL) {
-   fprintf(stderr,"rcomp: insufficient memory (allocating %d ints for internal buffer)",nblock);
-   fflush(stderr);
-   return(-1);
+   return "rcomp: insufficient memory (allocating nblock ints for internal buffer)";
  }
  /*
   * Code in blocks of nblock pixels
@@ -190,9 +182,8 @@ unsigned int *diff;
    a0 = a[0];
    z = output_nbits(buffer, a0, bsize * 8);
    if (z) {
-     // no error message - buffer overruns are silent
      free(diff);
-     return(-1);
+     return "buffer overrun";
  }
  }
 
@@ -258,14 +249,13 @@ unsigned int *diff;
 	   * Just write pixel difference values directly, no Rice coding at all.
 	   */
 	  if (output_nbits(buffer, fsmax+1, fsbits) ) {
-	    // no error message - buffer overrun is silent.
 	    free(diff);
-	    return(-1);
+	    return "buffer overrun";
 	  }
 	  for (j=0; j<thisblock; j++) {
 	    if (output_nbits(buffer, diff[j], bbits) ) {
 	      free(diff);
-	      return(-1);
+	      return "buffer overrun";
 	    }
 	  }
 	} else if (fs == 0 && pixelsum == 0) {
@@ -276,13 +266,13 @@ unsigned int *diff;
 	   */
 	  if (output_nbits(buffer, 0, fsbits) ) {
 	    free(diff);
-	    return(-1);
+	    return NULL;
 	  }
 	} else {
 	  /* normal case: not either very high or very low entropy */
 	  if (output_nbits(buffer, fs+1, fsbits) ) {
 	    free(diff);
-	    return(-1);
+	    return NULL;
 	  }
 	  fsmask = (1<<fs) - 1;
 	  /*
@@ -330,7 +320,7 @@ unsigned int *diff;
 	  /* check if overflowed output buffer */
 	  if (buffer->current > buffer->end) {
 	    free(diff);
-	    return(-1);
+	    return "buffer overrun";
 	  }
 	  buffer->bitbuffer = lbitbuffer;
 	  buffer->bits_to_go = lbits_to_go;
@@ -341,7 +331,8 @@ unsigned int *diff;
  /*
   * return number of bytes used
   */
- return(buffer->current - buffer->start);
+ *ret = buffer->current - buffer->start;
+ return NULL;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -463,7 +454,23 @@ static int done_outputing_bits(Buffer *buffer)
  *   0 is returned.
  */
 
-int rdecomp (unsigned char *c,		/* input buffer			    */
+static int nonzero_count[] = {
+  0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5,
+  5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6,
+  6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+  6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+  7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+  7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+  7, 7, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+  8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+  8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+  8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+  8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+  8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+  8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8
+};
+
+char *rdecomp(unsigned char *c,		/* input buffer			    */
 	     int clen,			/* length of input (bytes)	    */
 	     void *array,	        /* output array		 	    */
 	     int bsize,                 /* bsize - bytes per pix of output  */
@@ -475,8 +482,7 @@ int rdecomp (unsigned char *c,		/* input buffer			    */
   unsigned char *cend, bytevalue;
   unsigned int b, diff, lastpix;
   int fsmax, fsbits, bbits;
-  static int *nonzero_count = (int *)NULL;
-  
+
   /*
    * From bsize derive:
    * FSBITS = # bits required to store FS
@@ -485,8 +491,7 @@ int rdecomp (unsigned char *c,		/* input buffer			    */
    *
    * (These magic numbers have to match the ones in rcomp above.)
    */
-  
-  
+
   switch (bsize) {
   case 1:
     fsbits = 3;
@@ -501,35 +506,10 @@ int rdecomp (unsigned char *c,		/* input buffer			    */
     fsmax = 25;
     break;
   default:
-    fprintf(stderr,"rdecomp: bsize must be 1, 2, or 4 bytes");
-    fflush(stderr);
-    return 1;
+    return "rdecomp: bsize must be 1, 2, or 4 bytes";
   }
-  
-  bbits = 1<<fsbits;
 
-  if (nonzero_count == (int *) NULL) {
-    /*
-     * nonzero_count is lookup table giving number of bits
-     * in 8-bit values not including leading zeros; gets allocated 
-     * and calculated the first time through
-     */
-    
-    /*  NOTE!!!  This memory never gets freed (permanent table)  */
-    nonzero_count = (int *) malloc(256*sizeof(int));
-    if (nonzero_count == (int *) NULL) {
-      fprintf(stderr,"rdecomp: insufficient memory!\n");
-      fflush(stderr);
-      return 1;
-    }
-    nzero = 8;
-    k = 128;
-    for (i=255; i>=0; ) {
-      for ( ; i>=k; i--) nonzero_count[i] = nzero;
-      k = k/2;
-      nzero--;
-    }
-  }
+  bbits = 1<<fsbits;
 
     /*
      * Decode in blocks of nblock pixels
@@ -540,7 +520,7 @@ int rdecomp (unsigned char *c,		/* input buffer			    */
 
 
     cend = c + clen;
-    
+
     lastpix = 0;
     switch(bsize) {
     case 4:
@@ -686,11 +666,8 @@ int rdecomp (unsigned char *c,		/* input buffer			    */
 	    }
 	}
 	if (c > cend) {
-	  fprintf(stderr,"rdecomp: decompression error: hit end of compressed byte stream\n");
-	  fflush(stderr);
-	  return 1;
+	  return "rdecomp: decompression error: hit end of compressed byte stream";
 	}
     }
-    return 0;
+    return NULL;
 }
-

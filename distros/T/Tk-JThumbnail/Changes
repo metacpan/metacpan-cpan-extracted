@@ -45,3 +45,9 @@ Revision history for Perl extension Tk::JThumbnail.
 	- Make the "default" (-command => undef) mouse-button down function
 	  work more user-friendly when selecting/deselecting.
 	- Misc. code cleanups.
+2.3
+	- Fix index() function not accepting integer values, namely zero (0) 
+	  (like *Listbox modules) as raw zero-based indices into the list.
+	- Also added decimal numbers to allow for specifying specific zero-based 
+	  row.column indices, which will return the equivalent raw index# for a 
+	  specific item.  Bounds checking is done in both cases.

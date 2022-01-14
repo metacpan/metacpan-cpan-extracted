@@ -74,10 +74,10 @@ sub PDL_BOOT {
 #define aTHX_
 #endif
    if (SvTRUE (ERRSV)) Perl_croak(aTHX_ "%s",SvPV_nolen (ERRSV));
-   CoreSV = perl_get_sv("PDL::SHARE",FALSE);  /* SV* value */
-   if (CoreSV==NULL)
+   if (!(CoreSV = perl_get_sv("PDL::SHARE",FALSE))) /* SV* value */
      Perl_croak(aTHX_ "We require the PDL::Core module, which was not found");
-   $symname = INT2PTR(Core*,SvIV( CoreSV ));  /* Core* value */
+   if (!($symname = INT2PTR(Core*,SvIV( CoreSV )))) /* Core* value */
+     Perl_croak(aTHX_ "Got NULL pointer for $symname");
    if ($symname->Version != PDL_CORE_VERSION)
      Perl_croak(aTHX_ "[$symname->Version: \%d PDL_CORE_VERSION: \%d XS_VERSION: \%s] $module needs to be recompiled against the newly installed PDL", $symname->Version, PDL_CORE_VERSION, XS_VERSION);
 
@@ -90,39 +90,14 @@ my $MY_DIR2 = dirname(dirname($MY_FILE));
 my $IS_INST = $MY_DIR2 =~ /PDL\W*$/i;
 sub whereami_any { $MY_DIR2 } # something containing "Core/Dev.pm"
 
-# true arg = something containing "Core/Dev.pm"
-# no good if want "Config.pm" as varies between installed and dev tree
-# hence extra logic in PDL::Config-finding below
-sub whereami {
-  return undef if $IS_INST;
-  return $MY_DIR2 if $_[0];
-  dirname($MY_DIR2);
-}
-
-sub whereami_inst {
-  return undef if !$IS_INST;
-  return $MY_DIR2 if $_[0];
-  dirname($MY_DIR2);
-}
-
 # To access PDL's configuration use %PDL::Config. Makefile.PL has been set up
 # to create this variable so it is available during 'perl Makefile.PL' and
 # it can be eval-ed during 'make'
 unless ( %PDL::Config ) {
-    # look for the distribution and then the installed version
-    # (a manual version of whereami_any)
-    require File::Spec::Functions;
-    my $dir = whereami(1);
-    if ( defined $dir ) {
-	$dir = File::Spec::Functions::catdir($dir, qw(Core));
-    } else {
-	# as no argument given whereami_inst will die if it fails
-        # (and it also returns a slightly different path than whereami(1)
-        #  does, since it does not include "/PDL")
-	$dir = File::Spec::Functions::catdir(whereami_inst, qw(PDL));
-    }
-    eval { require "$dir/Config.pm" };
-    die "Unable to find PDL's configuration info\n [$@]" if $@;
+  require File::Spec::Functions;
+  my $dir = File::Spec::Functions::catdir($MY_DIR2, $IS_INST ? () : qw(Core));
+  eval { require "$dir/Config.pm" };
+  die "Unable to find PDL's configuration info\n [$@]" if $@;
 }
 
 my $inc = $PDL::Config{MALLOCDBG}{include} || '';
@@ -181,7 +156,7 @@ sub _pp_call_arg {
 sub _postamble {
   my ($w, $internal, $src, $pref, $mod, $callpack, $multi_c) = @_;
   $callpack //= '';
-  $w =~ s%/((PDL)|(Basic))$%%;  # remove the trailing subdir
+  $w = dirname($w);
   my ($perlrun, $pmdep, $install, $cdep) = ($internal ? '$(PERLRUNINST)' : "\$(PERL) \"-I$w\"", $src, '', '');
   if ($internal) {
     require File::Spec::Functions;
@@ -189,7 +164,7 @@ sub _postamble {
     my $core = File::Spec::Functions::catdir($top, qw(Basic Core));
     $pmdep .= join ' ', '',
       File::Spec::Functions::catfile($top, qw(Basic Gen pm_to_blib)),
-      File::Spec::Functions::catfile($core, qw(Types.pm)),
+      File::Spec::Functions::catfile($core, qw(pm_to_blib)),
       ;
     $cdep .= join ' ', map File::Spec::Functions::catfile($core, $_),
       qw(pdl.h pdlcore.h pdlthread.h pdlmagic.h);
@@ -206,6 +181,7 @@ qq|
 
 $pref.pm : $pmdep
 	$perlrun \"$pp_call_arg\" $src
+	\$(TOUCH) $pref.pm
 
 @generanda : $pref.pm
 	\$(NOECHO) \$(NOOP)
@@ -267,8 +243,7 @@ sub _stdargs {
 }
 
 sub pdlpp_stdargs_int {
-  my $w = whereami();
-  _stdargs($w, 1, @{$_[0]}[0..3], 1);
+  _stdargs(dirname($MY_DIR2), 1, @{$_[0]}[0..3], 1);
 }
 
 sub pdlpp_stdargs {
@@ -285,46 +260,39 @@ sub pdlpp_stdargs {
 #     perl -MPDL::Core::Dev -e pdlpp_mkgen DirName
 #
 sub pdlpp_mkgen {
+  require File::Spec::Functions;
+  require File::Copy;
   my $dir = @_ > 0 ? $_[0] : $ARGV[0];
   die "pdlpp_mkgen: unspecified directory" unless defined $dir && -d $dir;
   my $file = "$dir/MANIFEST";
-  die "pdlpp_mkgen: non-existing '$dir/MANIFEST'" unless -f $file;
-
+  die "pdlpp_mkgen: non-existing '$file\'" unless -f $file;
   my @pairs = ();
   my $manifest = ExtUtils::Manifest::maniread($file);
-  for (sort keys %$manifest) {
-    next if $_ !~ m/\.pd$/;     # skip non-pd files
-    next if $_ =~ m/^(t|xt)\//; # skip *.pd files in test subdirs
-    next unless -f $_;
+  for (grep !/^(t|xt)\// && /\.pd$/ && -f, sort keys %$manifest) {
     my $content = do { local $/; open my $in, '<', $_; <$in> };
-    if ($content =~ /=head1\s+NAME\s+(\S+)\s+/sg) {
-      push @pairs, [$_, $1];
-    }
-    else {
-      warn "pdlpp_mkgen: unknown module name for '$_' (use proper '=head1 NAME' section)\n";
-    }
+    warn("pdlpp_mkgen: unknown module name for '$_' (use proper '=head1 NAME' section)\n"), next
+      if !(my ($name) = $content =~ /=head1\s+NAME\s+(\S+)\s+/sg);
+    push @pairs, [$_, $name];
   }
-
   my %added = ();
+  my @in = map "-I".File::Spec::Functions::rel2abs($_), @INC, 'inc';
   for (@pairs) {
     my ($pd, $mod) = @$_;
     (my $prefix = $mod) =~ s|::|/|g;
-    my $manifestpm = "GENERATED/$prefix.pm";
-    $prefix = "$dir/GENERATED/$prefix";
-    File::Path::mkpath(dirname($prefix));
+    my $basename = (split '/', $prefix)[-1];
+    my $basefile = "$basename.pm";
+    my $outfile = File::Spec::Functions::rel2abs("$dir/GENERATED/$prefix.pm");
+    File::Path::mkpath(dirname($outfile));
+    my $old_cwd = Cwd::cwd();
+    chdir dirname($pd);
     #there is no way to use PDL::PP from perl code, thus calling via system()
-    my @in = map { "-I$_" } @INC, 'inc';
-    my $pp_call_arg = _pp_call_arg($mod, $mod, $prefix, '');
-    my $rv = system($^X, @in, $pp_call_arg, $pd);
-    if ($rv == 0 && -f "$prefix.pm") {
-      $added{$manifestpm} = "mod=$mod pd=$pd (added by pdlpp_mkgen)";
-      unlink "$prefix.xs"; #we need only .pm
-    }
-    else {
-      warn "pdlpp_mkgen: cannot convert '$pd'\n";
-    }
+    my $pp_call_arg = _pp_call_arg($mod, $mod, $basename, '', 1);
+    my $rv = system($^X, @in, $pp_call_arg, File::Spec::Functions::abs2rel(basename($pd)));
+    die "pdlpp_mkgen: cannot convert '$pd'\n" unless $rv == 0 && -f $basefile;
+    File::Copy::copy($basefile, $outfile) or die "$outfile: $!";
+    chdir $old_cwd or die "chdir $old_cwd: $!";
+    $added{"GENERATED/$prefix.pm"} = "mod=$mod pd=$pd (added by pdlpp_mkgen)";
   }
-
   if (scalar(keys %added) > 0) {
     #maniadd works only with this global variable
     local $ExtUtils::Manifest::MANIFEST = $file;
@@ -521,7 +489,7 @@ my %flags = (
     vaffine => { FLAG => "OPT_VAFFTRANSOK" },
     anychgd => { FLAG => "ANYCHANGED" },
     dimschgd => { FLAG => "PARENTDIMSCHANGED" },
-    tracedebug => { FLAG => "TRACEDEBUG", set => 1},
+    tracedebug => { set => 1},
 );
 
 sub generate_core_flags {
@@ -530,46 +498,19 @@ sub generate_core_flags {
     # to ndarray's state
     foreach my $name ( sort keys %flags ) {
         my $flag = "PDL_" . ($flags{$name}{FLAG} || uc($name));
-        if ( $flags{$name}{set} ) {
-            print <<"!WITH!SUBS!";
+        my $with_mode = $flags{$name}{set} || $flags{$name}{postset};
+        printf <<'EOF', $name, ($with_mode ? ",mode=0" : ''), ($with_mode ? "        int mode\n" : '');
 int
-$name(x,mode=0)
+%s(x%s)
         pdl *x
-        int mode
-        CODE:
-        if (items>1)
-           { setflag(x->state,$flag,mode); }
-        RETVAL = ((x->state & $flag) > 0);
-        OUTPUT:
-        RETVAL
-
-!WITH!SUBS!
-        } elsif ($flags{$name}{postset}) {
-            print <<"!WITH!SUBS!";
-int
-$name(x,mode=0)
-        pdl *x
-        int mode
-        CODE:
-        RETVAL = ((x->state & $flag) > 0);
-        if (items>1)
-           { setflag(x->state,$flag,mode); }
-        OUTPUT:
-        RETVAL
-
-!WITH!SUBS!
-        } else {
-            print <<"!WITH!SUBS!";
-int
-$name(self)
-        pdl *self
-        CODE:
-        RETVAL = ((self->state & $flag) > 0);
-        OUTPUT:
-        RETVAL
-
-!WITH!SUBS!
-        }
+%s        CODE:
+EOF
+        my $set = "        if (items>1) setflag(x->state,$flag,mode);\n";
+        my $ret = "        RETVAL = ((x->state & $flag) > 0);\n";
+        print $set if $flags{$name}{set};
+        print $ret;
+        print $set if $flags{$name}{postset};
+        print "        OUTPUT:\n        RETVAL\n\n";
     } # foreach: keys %flags
 }
 

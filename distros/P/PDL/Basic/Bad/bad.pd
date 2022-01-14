@@ -1,4 +1,5 @@
 use strict;
+use warnings;
 
 use PDL::Types qw(ppdefs_all types);
 my $A = [ppdefs_all()];
@@ -247,18 +248,6 @@ sub PDL::check_badflag {
 
 !NO!SUBS!
 
-pp_addhdr <<'EOHDR';
-static pdl* new_pdlscalar(int datatype)
-       {
-         pdl *p = PDL->pdlnew();
-         PDL->setdims (p, NULL, 0);  /* set dims */
-         p->datatype = datatype;         /* and data type */
-         PDL->allocdata (p);             /* allocate the data chunk */
-
-         return p;
-       }
-EOHDR
-
 my $str = <<'EOF';
 pdl *
 _badvalue_int(val, type)
@@ -266,16 +255,18 @@ _badvalue_int(val, type)
     int type
   CODE:
    {
-    pdl* p = new_pdlscalar(type);
+    PDL_Anyval newval = {type, {0}};
+    pdl* p = PDL->scalar(newval);
+    if (!p) PDL->pdl_barf("Error making new pdl");
     if ( val.type != -1 ) {
-#define X(datatype, generic, generic_ppsym, shortctype, defbval) \
-    ANYVAL_TO_CTYPE(PDL->bvals.shortctype, generic, val);
-    PDL_GENERICSWITCH(type, X)
+#define X(datatype, ctype, ppsym, shortctype, ...) \
+    ANYVAL_TO_CTYPE(PDL->bvals.shortctype, ctype, val);
+    PDL_GENERICSWITCH(PDL_TYPELIST2_ALL, type, X, croak("Not a known data type code=%d", type))
 #undef X
     }
-#define X(datatype, generic, generic_ppsym, shortctype, defbval) \
-    *((generic *)p->data) = PDL->bvals.shortctype;
-    PDL_GENERICSWITCH(type, X)
+#define X(datatype, ctype, ppsym, shortctype, ...) \
+    *((ctype *)p->data) = PDL->bvals.shortctype;
+    PDL_GENERICSWITCH(PDL_TYPELIST2_ALL, type, X, croak("Not a known data type code=%d", type))
 #undef X
     RETVAL = p;
    }
@@ -289,21 +280,23 @@ _badvalue_per_pdl_int(pdl_val, val, type)
     int type
   CODE:
    {
-    pdl* p = new_pdlscalar(type);
+    PDL_Anyval newval = {type, {0}};
+    pdl* p = PDL->scalar(newval);
+    if (!p) PDL->pdl_barf("Error making new pdl");
     if ( val.type != -1) {
        pdl_val->badvalue = val;
        pdl_val->has_badvalue = 1;
        PDL->propagate_badvalue( pdl_val );
     }
     if (pdl_val->has_badvalue == 0) {
-#define X(datatype, generic, generic_ppsym, shortctype, defbval) \
-       *((generic *)p->data) = PDL->bvals.shortctype;
-       PDL_GENERICSWITCH(type, X)
+#define X(datatype, ctype, ppsym, shortctype, ...) \
+       *((ctype *)p->data) = PDL->bvals.shortctype;
+       PDL_GENERICSWITCH(PDL_TYPELIST2_ALL, type, X, croak("Not a known data type code=%d", type))
 #undef X
     } else {
-#define X(datatype, generic, generic_ppsym, shortctype, defbval) \
-       ANYVAL_TO_CTYPE(*((generic *)p->data), generic, pdl_val->badvalue);
-       PDL_GENERICSWITCH(type, X)
+#define X(datatype, ctype, ...) \
+       ANYVAL_TO_CTYPE(*((ctype *)p->data), ctype, pdl_val->badvalue);
+       PDL_GENERICSWITCH(PDL_TYPELIST2_ALL, type, X, croak("Not a known data type code=%d", type))
 #undef X
     }
     RETVAL = p;
@@ -315,10 +308,12 @@ pdl *
 _default_badvalue_int(type)
     int type
   CODE:
-    pdl* p = new_pdlscalar(type);
-#define X(datatype, generic, generic_ppsym, shortctype, defbval) \
-    *((generic *)p->data) = defbval;
-    PDL_GENERICSWITCH(type, X)
+    PDL_Anyval val = {type, {0}};
+    pdl* p = PDL->scalar(val);
+    if (!p) PDL->pdl_barf("Error making new pdl");
+#define X(datatype, ctype, ppsym, shortctype, defbval, ...) \
+    *((ctype *)p->data) = defbval;
+    PDL_GENERICSWITCH(PDL_TYPELIST2_ALL, type, X, croak("Not a known data type code=%d", type))
 #undef X
     RETVAL = p;
   OUTPUT:
@@ -1000,7 +995,7 @@ operation, it clears the bad flag.
     },
     Code => q{
         if ( $ISBAD(a()) ) {
-            $b() = $TFDGC(NAN,NAN,NAN+I*NAN,NAN+I*NAN);
+            $b() = $TFDEGCH(NAN,NAN,NAN,NAN+I*NAN,NAN+I*NAN,NAN+I*NAN);
         }
         else {
             $b() = $a();
@@ -1121,6 +1116,26 @@ its bad value flag set to true.
     },
     GenericTypes => $A,
 ); # pp_def: copybad
+
+pp_def('locf',
+    Pars => 'a(n); [o]b(n);',
+    HandleBad => 1,
+    GenericTypes => $A,
+    Doc => <<'EOF',
+=for ref
+
+Last Observation Carried Forward - replace
+every BAD value with the most recent non-BAD value prior to it.
+Any leading BADs will be set to 0.
+EOF
+    Code => q{
+        $GENERIC() tmp = 0;
+        loop(n) %{
+            if ( $ISGOOD(a()) ) tmp = $a();
+            $b() = tmp;
+        %}
+    },
+);
 
 #########################################################
 

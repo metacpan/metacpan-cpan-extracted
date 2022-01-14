@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Bio-RNA-BarMap",
    "prereqs" : {
@@ -41,30 +41,30 @@
    "provides" : {
       "Bio::RNA::BarMap" : {
          "file" : "lib/Bio/RNA/BarMap.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Bio::RNA::BarMap::Mapping" : {
          "file" : "lib/Bio/RNA/BarMap/Mapping.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Bio::RNA::BarMap::Mapping::FileMappingEntry" : {
          "file" : "lib/Bio/RNA/BarMap/Mapping/FileMappingEntry.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Bio::RNA::BarMap::Mapping::MinMappingEntry" : {
          "file" : "lib/Bio/RNA/BarMap/Mapping/MinMappingEntry.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Bio::RNA::BarMap::Mapping::Set" : {
          "file" : "lib/Bio/RNA/BarMap/Mapping/Set.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Bio::RNA::BarMap::Mapping::Type" : {
          "file" : "lib/Bio/RNA/BarMap/Mapping/Type.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

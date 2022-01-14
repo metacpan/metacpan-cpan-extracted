@@ -4,7 +4,7 @@ DBD::Avatica - Driver for Apache Avatica compatible servers
 
 # VERSION
 
-version 0.2.1
+version 0.2.2
 
 # SYNOPSIS
 

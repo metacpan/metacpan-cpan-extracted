@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 use parent qw(CPANPLUS::Dist::Base);
 
@@ -222,7 +222,7 @@ CPANPLUS::Dist::Debora - Create Debian or RPM packages from Perl modules
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

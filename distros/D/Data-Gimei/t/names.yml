@@ -1,0 +1,5 @@
+first_name:
+  male:
+    - ['愛斗', 'あいと', 'アイト', 'aito']
+last_name:
+  - ['佐藤', 'さとう', 'サトウ', 'sato']

@@ -764,8 +764,8 @@ array_access
   | field_access '[' expression ']'
 
 call_method
-  : CURRENT_CLASS ARROW NAME '(' opt_expressions  ')'
-  | CURRENT_CLASS ARROW NAME
+  : CURRENT_CLASS NAME '(' opt_expressions  ')'
+  | CURRENT_CLASS NAME
   | basic_type ARROW method_name '(' opt_expressions  ')'
   | basic_type ARROW method_name
   | expression ARROW method_name '(' opt_expressions ')'
@@ -1010,7 +1010,7 @@ The following is a correspondence table between tokens in yacc/bison and keyword
     <td>PRINT</td><td>print</td>
   </tr>
   <tr>
-    <td>CURRENT_CLASS</td><td>cur</td>
+    <td>CURRENT_CLASS</td><td>&</td>
   </tr>
   <tr>
     <td>CURRENT_CLASS_NAME</td><td>__CLASS__</td>
@@ -3920,7 +3920,7 @@ my $ret = Foo->bar(1, 2, 3);
 
 <h3 id="language-expression-callmethod-current-class">Current Class</h3>
 
-<b>cur</b> keyword expresses the current class. You can call method using <b>cur</b> keyword instead of the class name.
+<b>&</b> before method name means the current class. You can call method using "&" keyword instead of the current class name.
 
 <b>Current Class Example</b>
 
@@ -3929,7 +3929,7 @@ class Foo {
   
   static method test : void () {
     # This means Foo->sum(1, 2)
-    my $ret = cur->sum(1, 2);
+    my $ret = &sum(1, 2);
   }
 
   static method sum : int ($num1 : int, $num2 : int) {

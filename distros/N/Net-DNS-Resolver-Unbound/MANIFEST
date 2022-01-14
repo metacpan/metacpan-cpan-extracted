@@ -1,0 +1,20 @@
+Changes
+LICENSE
+MANIFEST				This list of files
+Makefile.PL
+README
+typemap
+Unbound.xs
+lib/Net/DNS/Resolver/Unbound.pm
+t/00-install.t
+t/00-load.t
+t/00-pod.t
+t/10-context.t
+t/20-synchronous.t
+t/21-decode_result.t
+t/30-asynchronous.t
+t/31-bgbusy.t
+t/32-bgread.t
+t/NonFatal.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

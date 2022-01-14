@@ -1,6 +1,6 @@
 package App::optex::textconv::Converter;
 
-use v5.14;
+use strict;
 no strict 'refs';
 use warnings;
 

@@ -4,8 +4,12 @@
 package PDL::Graphics::TriD::Object;
 
 use strict;
+use warnings;
 
 use fields qw(Objects ValidList ChangedSub List VRML);
+
+$PDL::Graphics::TriD::verbose //= 0;
+
 sub new{
   my $class = shift;
   my $self = fields::new($class);

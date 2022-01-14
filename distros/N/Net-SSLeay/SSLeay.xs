@@ -195,7 +195,21 @@ which conflicts with perls
 #if OPENSSL_VERSION_NUMBER >= 0x10000000L
 #include <openssl/ocsp.h>
 #endif
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#include <openssl/provider.h>
+#endif
 #undef BLOCK
+
+/* Beginning with OpenSSL 3.0.0-alpha17, SSL_CTX_get_options() and
+ * related functions return uint64_t instead of long. For this reason
+ * constant() in constant.c and Net::SSLeay must also be able to
+ * return 64bit constants. However, this creates a problem with Perls
+ * that have only 32 bit integers. The define below helps with
+ * handling this API change.
+ */
+#if (OPENSSL_VERSION_NUMBER < 0x30000000L) || defined(NET_SSLEAY_32BIT_INT_PERL)
+#define NET_SSLEAY_32BIT_CONSTANTS
+#endif
 
 /* Debugging output - to enable use:
  *
@@ -424,16 +438,16 @@ static void handler_list_md_fn(const EVP_MD *m, const char *from, const char *to
  *
  * There are basically 2 types of callbacks used in SSLeay:
  *
- * 1/ "one-time" callbacks - these are created+used+destroyed within one perl function implemented in XS
- *    these callbacks use a cpecial C structupe simple_cb_data_t to pass necessary data
- *    there are 2 related helper functions: simple_cb_data_new() + simple_cb_data_free
- *    for example see implementation of these functions:
+ * 1/ "one-time" callbacks - these are created+used+destroyed within one perl function implemented in XS.
+ *    These callbacks use a special C structure simple_cb_data_t to pass necessary data.
+ *    There are 2 related helper functions: simple_cb_data_new() + simple_cb_data_free()
+ *    For example see implementation of these functions:
  *    - RSA_generate_key
  *    - PEM_read_bio_PrivateKey
  *
- * 2/ "advanced" callbacks - these are setup/destroyed by one function but used by another function; these
- *    callbacks use global hash MY_CXT.global_cb_data to store perl functions + data to be uset at callback time
- *    there are 2 related helper functions: cb_data_advanced_put() + cb_data_advanced_get for manipulating
+ * 2/ "advanced" callbacks - these are setup/destroyed by one function but used by another function. These
+ *    callbacks use global hash MY_CXT.global_cb_data to store perl functions + data to be uset at callback time.
+ *    There are 2 related helper functions: cb_data_advanced_put() + cb_data_advanced_get() for manipulating
  *    global hash MY_CXT.global_cb_data which work like this:
  *        cb_data_advanced_put(<pointer>, "data_name", dataSV)
  *        >>>
@@ -442,7 +456,7 @@ static void handler_list_md_fn(const EVP_MD *m, const char *from, const char *to
  *        data = cb_data_advanced_get(<pointer>, "data_name")
  *        >>>
  *        my $data = global_cb_data->{"ptr_<pointer>"}->{"data_name"}
- *    for example see implementation of these functions:
+ *    For example see implementation of these functions:
  *    - SSL_CTX_set_verify
  *    - SSL_set_verify
  *    - SSL_CTX_set_cert_verify_callback
@@ -493,7 +507,7 @@ void simple_cb_data_free(simple_cb_data_t* cb)
     Safefree(cb);
 }
 
-int cb_data_advanced_put(void *ptr, const char* data_name, SV* data)
+int cb_data_advanced_put(const void *ptr, const char* data_name, SV* data)
 {
     HV * L2HV;
     SV ** svtmp;
@@ -532,7 +546,7 @@ int cb_data_advanced_put(void *ptr, const char* data_name, SV* data)
     return 1;
 }
 
-SV* cb_data_advanced_get(void *ptr, const char* data_name)
+SV* cb_data_advanced_get(const void *ptr, const char* data_name)
 {
     HV * L2HV;
     SV ** svtmp;
@@ -562,7 +576,7 @@ SV* cb_data_advanced_get(void *ptr, const char* data_name)
     return *svtmp;
 }
 
-int cb_data_advanced_drop(void *ptr)
+int cb_data_advanced_drop(const void *ptr)
 {
     int len;
     char key_name[500];
@@ -1474,6 +1488,71 @@ void ssleay_ctx_info_cb_invoke(const SSL *ssl, int where, int ret)
     LEAVE;
 }
 
+void ssleay_msg_cb_invoke(int write_p, int version, int content_type, const void *buf, size_t len, SSL *ssl, void *arg)
+{
+    dSP;
+    SV *cb_func, *cb_data;
+
+    cb_func = cb_data_advanced_get(ssl, "ssleay_msg_cb!!func");
+    cb_data = cb_data_advanced_get(ssl, "ssleay_msg_cb!!data");
+
+    if ( ! SvROK(cb_func) || (SvTYPE(SvRV(cb_func)) != SVt_PVCV))
+    croak ("Net::SSLeay: ssleay_msg_cb_invoke called, but not set to point to any perl function.\n");
+
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(SP);
+    XPUSHs(sv_2mortal(newSViv(write_p)));
+    XPUSHs(sv_2mortal(newSViv(version)));
+    XPUSHs(sv_2mortal(newSViv(content_type)));
+    XPUSHs(sv_2mortal(newSVpv((const char*)buf, len)));
+    XPUSHs(sv_2mortal(newSViv(len)));
+    XPUSHs(sv_2mortal(newSViv(PTR2IV(ssl))));
+    XPUSHs(sv_2mortal(newSVsv(cb_data)));
+    PUTBACK;
+
+    call_sv(cb_func, G_VOID);
+
+    SPAGAIN;
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+}
+
+void ssleay_ctx_msg_cb_invoke(int write_p, int version, int content_type, const void *buf, size_t len, SSL *ssl, void *arg)
+{
+    dSP;
+    SV *cb_func, *cb_data;
+    SSL_CTX *ctx = SSL_get_SSL_CTX(ssl);
+
+    cb_func = cb_data_advanced_get(ctx, "ssleay_ctx_msg_cb!!func");
+    cb_data = cb_data_advanced_get(ctx, "ssleay_ctx_msg_cb!!data");
+
+    if ( ! SvROK(cb_func) || (SvTYPE(SvRV(cb_func)) != SVt_PVCV))
+    croak ("Net::SSLeay: ssleay_ctx_msg_cb_invoke called, but not set to point to any perl function.\n");
+
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(SP);
+    XPUSHs(sv_2mortal(newSViv(write_p)));
+    XPUSHs(sv_2mortal(newSViv(version)));
+    XPUSHs(sv_2mortal(newSViv(content_type)));
+    XPUSHs(sv_2mortal(newSVpv((const char*)buf, len)));
+    XPUSHs(sv_2mortal(newSViv(len)));
+    XPUSHs(sv_2mortal(newSViv(PTR2IV(ssl))));
+    XPUSHs(sv_2mortal(newSVsv(cb_data)));
+    PUTBACK;
+
+    call_sv(cb_func, G_VOID);
+
+    SPAGAIN;
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+}
+
 /* 
  * Support for tlsext_ticket_key_cb_invoke was already in 0.9.8 but it was
  * broken in various ways during the various 1.0.0* versions.
@@ -1652,9 +1731,78 @@ void ssleay_ssl_ctx_sess_remove_cb_invoke(SSL_CTX *ctx, SSL_SESSION *sess)
     LEAVE;
 }
 
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+int ossl_provider_do_all_cb_invoke(OSSL_PROVIDER *provider, void *cbdata) {
+    dSP;
+    int ret = 1;
+    int count = -1;
+    simple_cb_data_t *cb = cbdata;
+
+    PR1("STARTED: ossl_provider_do_all_cb_invoke\n");
+    if (cb->func && SvOK(cb->func)) {
+        ENTER;
+        SAVETMPS;
+
+        PUSHMARK(SP);
+        XPUSHs(sv_2mortal(newSViv(PTR2IV(provider))));
+        if (cb->data) XPUSHs(cb->data);
+
+        PUTBACK;
+
+        count = call_sv(cb->func, G_SCALAR);
+
+        SPAGAIN;
+
+        if (count != 1)
+          croak("Net::SSLeay: ossl_provider_do_all_cb_invoke perl function did not return a scalar\n");
+
+        ret = POPi;
+
+        PUTBACK;
+        FREETMPS;
+        LEAVE;
+    }
+
+    return ret;
+}
+#endif
+
+#if OPENSSL_VERSION_NUMBER >= 0x10101001 && !defined(LIBRESSL_VERSION_NUMBER)
+void ssl_ctx_keylog_cb_func_invoke(const SSL *ssl, const char *line)
+{
+    dSP;
+    SV *cb_func, *cb_data;
+    SSL_CTX *ctx = SSL_get_SSL_CTX(ssl);
+
+    PR1("STARTED: ssl_ctx_keylog_cb_func_invoke\n");
+    cb_func = cb_data_advanced_get(ctx, "ssleay_ssl_ctx_keylog_callback!!func");
+
+    if(!SvOK(cb_func))
+	croak ("Net::SSLeay: ssl_ctx_keylog_cb_func_invoke called, but not set to point to any perl function.\n");
+
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(SP);
+    XPUSHs(sv_2mortal(newSViv(PTR2IV(ssl))));
+    XPUSHs(sv_2mortal(newSVpv(line, 0)));
+
+    PUTBACK;
+
+    call_sv(cb_func, G_VOID);
+
+    SPAGAIN;
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+
+    return;
+}
+#endif
+
 /* ============= end of callback stuff, begin helper functions ============== */
 
-time_t ASN1_TIME_timet(ASN1_TIME *asn1t) {
+time_t ASN1_TIME_timet(ASN1_TIME *asn1t, time_t *gmtoff) {
     struct tm t;
     const char *p = (const char*) asn1t->data;
     size_t msec = 0, tz = 0, i, l;
@@ -1720,7 +1868,14 @@ time_t ASN1_TIME_timet(ASN1_TIME *asn1t) {
 
     result = mktime(&t);
     if (result == -1) return 0; /* broken time */
-    return result + adj + ( t.tm_isdst ? 3600:0 );
+    result += adj;
+    if (gmtoff && *gmtoff == -1) {
+	*gmtoff = result - mktime(gmtime(&result));
+	result += *gmtoff;
+    } else {
+	result += result - mktime(gmtime(&result));
+    }
+    return result;
 }
 
 X509 * find_issuer(X509 *cert,X509_STORE *store, STACK_OF(X509) *chain) {
@@ -1814,6 +1969,7 @@ CODE:
     PR1("CLONE: but USE_ITHREADS not defined\n");
 #endif
 
+#ifdef NET_SSLEAY_32BIT_CONSTANTS
 double
 constant(name)
         char * name
@@ -1822,6 +1978,19 @@ constant(name)
         RETVAL = constant(name, strlen(name));
     OUTPUT:
         RETVAL
+
+#else
+
+uint64_t
+constant(name)
+        char * name
+    CODE:
+        errno = 0;
+        RETVAL = constant(name, strlen(name));
+    OUTPUT:
+        RETVAL
+
+#endif
 
 int
 hello()
@@ -1851,6 +2020,27 @@ OpenSSL_version(t=OPENSSL_VERSION)
 
 #endif /* OpenSSL 1.1.0 */
 
+#if (OPENSSL_VERSION_MAJOR >= 3)
+
+unsigned int
+OPENSSL_version_major()
+
+unsigned int
+OPENSSL_version_minor()
+
+unsigned int
+OPENSSL_version_patch()
+
+const char *
+OPENSSL_version_pre_release()
+
+const char *
+OPENSSL_version_build_metadata()
+
+const char *
+OPENSSL_info(int t)
+
+#endif
 
 #define REM1 "============= SSL CONTEXT functions =============="
 
@@ -2664,6 +2854,8 @@ SSL_CTX_ctrl(ctx,cmd,larg,parg)
     long larg
     char * parg
 
+#ifdef NET_SSLEAY_32BIT_CONSTANTS
+
 long
 SSL_get_options(ssl)
      SSL *          ssl
@@ -2681,6 +2873,28 @@ long
 SSL_CTX_set_options(ctx,op)
      SSL_CTX *      ctx
      long	    op
+
+#else
+
+uint64_t
+SSL_get_options(ssl)
+     SSL *          ssl
+
+uint64_t
+SSL_set_options(ssl,op)
+     SSL *          ssl
+     uint64_t	    op
+
+uint64_t
+SSL_CTX_get_options(ctx)
+     SSL_CTX *      ctx
+
+uint64_t
+SSL_CTX_set_options(ctx,op)
+     SSL_CTX *      ctx
+     uint64_t	    op
+
+#endif
 
 #if OPENSSL_VERSION_NUMBER >= 0x10000000L
 
@@ -3114,7 +3328,7 @@ RAND_file_name(num)
     PREINIT:
         char *buf;
     CODE:
-        New(0, buf, num, char);
+        Newxz(buf, num, char);
         if (!RAND_file_name(buf, num)) {
             Safefree(buf);
             XSRETURN_UNDEF;
@@ -4103,7 +4317,7 @@ X509V3_EXT_d2i(ext)
 X509_STORE_CTX *
 X509_STORE_CTX_new()
 
-void
+int
 X509_STORE_CTX_init(ctx, store=NULL, x509=NULL, chain=NULL)
      X509_STORE_CTX * ctx
      X509_STORE * store
@@ -4336,6 +4550,10 @@ ASN1_TIME_free(s)
 time_t
 ASN1_TIME_timet(s)
      ASN1_TIME *s
+     CODE:
+     RETVAL = ASN1_TIME_timet(s,NULL);
+     OUTPUT:
+     RETVAL
 
 ASN1_TIME *
 ASN1_TIME_new()
@@ -5447,6 +5665,65 @@ SSL_CTX_set_info_callback(ctx,callback,data=&PL_sv_undef)
             SSL_CTX_set_info_callback(ctx, ssleay_ctx_info_cb_invoke);
         }
 
+void
+SSL_set_msg_callback(ssl,callback,data=&PL_sv_undef)
+        SSL * ssl
+        SV * callback
+    SV * data
+    CODE:
+        if (callback==NULL || !SvOK(callback)) {
+            SSL_set_msg_callback(ssl, NULL);
+            cb_data_advanced_put(ssl, "ssleay_msg_cb!!func", NULL);
+            cb_data_advanced_put(ssl, "ssleay_msg_cb!!data", NULL);
+        } else {
+            cb_data_advanced_put(ssl, "ssleay_msg_cb!!func", newSVsv(callback));
+            cb_data_advanced_put(ssl, "ssleay_msg_cb!!data", newSVsv(data));
+            SSL_set_msg_callback(ssl, ssleay_msg_cb_invoke);
+        }
+
+void
+SSL_CTX_set_msg_callback(ctx,callback,data=&PL_sv_undef)
+        SSL_CTX * ctx
+        SV * callback
+    SV * data
+    CODE:
+        if (callback==NULL || !SvOK(callback)) {
+            SSL_CTX_set_msg_callback(ctx, NULL);
+            cb_data_advanced_put(ctx, "ssleay_ctx_msg_cb!!func", NULL);
+            cb_data_advanced_put(ctx, "ssleay_ctx_msg_cb!!data", NULL);
+        } else {
+            cb_data_advanced_put(ctx, "ssleay_ctx_msg_cb!!func", newSVsv(callback));
+            cb_data_advanced_put(ctx, "ssleay_ctx_msg_cb!!data", newSVsv(data));
+            SSL_CTX_set_msg_callback(ctx, ssleay_ctx_msg_cb_invoke);
+        }
+
+
+#if OPENSSL_VERSION_NUMBER >= 0x10101001 && !defined(LIBRESSL_VERSION_NUMBER)
+
+void
+SSL_CTX_set_keylog_callback(SSL_CTX *ctx, SV *callback)
+    CODE:
+	if (callback==NULL || !SvOK(callback)) {
+	    SSL_CTX_set_keylog_callback(ctx, NULL);
+	    cb_data_advanced_put(ctx, "ssleay_ssl_ctx_keylog_callback!!func", NULL);
+	} else {
+	    cb_data_advanced_put(ctx, "ssleay_ssl_ctx_keylog_callback!!func", newSVsv(callback));
+	    SSL_CTX_set_keylog_callback(ctx, ssl_ctx_keylog_cb_func_invoke);
+	}
+
+SV *
+SSL_CTX_get_keylog_callback(const SSL_CTX *ctx)
+    CODE:
+	SV *func = cb_data_advanced_get(ctx, "ssleay_ssl_ctx_keylog_callback!!func");
+	/* without increment the reference will go away and ssl_ctx_keylog_cb_func_invoke croaks */
+	SvREFCNT_inc(func);
+	RETVAL = func;
+    OUTPUT:
+	RETVAL
+
+#endif
+
+
 int
 SSL_set_purpose(s,purpose)
      SSL *	s
@@ -6172,7 +6449,7 @@ SSL_total_renegotiations(ssl)
   OUTPUT:
   RETVAL
 
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+#if (OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x2070000fL)
 void
 SSL_SESSION_get_master_key(s)
      SSL_SESSION *   s
@@ -7348,6 +7625,7 @@ OCSP_response_results(rsp,...)
 	OCSP_BASICRESP *bsr;
 	int i,want_array;
 	time_t nextupd = 0;
+	time_t gmtoff = -1;
 	int getall,sksn;
 
 	bsr = OCSP_response_get1_basic(rsp);
@@ -7413,7 +7691,7 @@ OCSP_response_results(rsp,...)
 		    /* getall: create new SV with OCSP_CERTID */
 		    unsigned char *pi,*pc;
 #if OPENSSL_VERSION_NUMBER >= 0x10100003L && !defined(LIBRESSL_VERSION_NUMBER)
-		    int len = i2d_OCSP_CERTID(OCSP_SINGLERESP_get0_id(sir),NULL);
+		    int len = i2d_OCSP_CERTID((OCSP_CERTID *)OCSP_SINGLERESP_get0_id(sir),NULL);
 #else
 		    int len = i2d_OCSP_CERTID(sir->certId,NULL);
 #endif
@@ -7422,7 +7700,7 @@ OCSP_response_results(rsp,...)
 		    if (!pc) croak("out of memory");
 		    pi = pc;
 #if OPENSSL_VERSION_NUMBER >= 0x10100003L && !defined(LIBRESSL_VERSION_NUMBER)
-		    i2d_OCSP_CERTID(OCSP_SINGLERESP_get0_id(sir),&pi);
+		    i2d_OCSP_CERTID((OCSP_CERTID *)OCSP_SINGLERESP_get0_id(sir),&pi);
 #else
 		    i2d_OCSP_CERTID(sir->certId,&pi);
 #endif
@@ -7440,15 +7718,15 @@ OCSP_response_results(rsp,...)
 		    hv_store(details,"statusType",10,
 			newSViv(status),0);
 		    if (nextupdate) hv_store(details,"nextUpdate",10,
-			newSViv(ASN1_TIME_timet(nextupdate)),0);
+			newSViv(ASN1_TIME_timet(nextupdate, &gmtoff)),0);
 		    if (thisupdate) hv_store(details,"thisUpdate",10,
-			newSViv(ASN1_TIME_timet(thisupdate)),0);
+			newSViv(ASN1_TIME_timet(thisupdate, &gmtoff)),0);
 		    if (status == V_OCSP_CERTSTATUS_REVOKED) {
 #if OPENSSL_VERSION_NUMBER < 0x10100000L
 			OCSP_REVOKEDINFO *rev = sir->certStatus->value.revoked;
 			revocationReason = ASN1_ENUMERATED_get(rev->revocationReason);
 #endif
-			hv_store(details,"revocationTime",14,newSViv(ASN1_TIME_timet(revocationTime)),0);
+			hv_store(details,"revocationTime",14,newSViv(ASN1_TIME_timet(revocationTime, &gmtoff)),0);
 			hv_store(details,"revocationReason",16,newSViv(revocationReason),0);
 			hv_store(details,"revocationReason_str",20,newSVpv(
 		            OCSP_crl_reason_str(revocationReason),0),0);
@@ -7457,7 +7735,7 @@ OCSP_response_results(rsp,...)
 		XPUSHs(sv_2mortal(newRV_noinc((SV*)idav)));
 	    } else if (!error) {
 		/* compute lowest nextUpdate */
-		time_t nu = ASN1_TIME_timet(nextupdate);
+		time_t nu = ASN1_TIME_timet(nextupdate, &gmtoff);
 		if (!nextupd || nextupd>nu) nextupd = nu;
 	    }
 
@@ -7596,6 +7874,73 @@ SSL_export_keying_material(ssl, outlen, label, context=&PL_sv_undef)
         PUSHs(sv_2mortal(ret>0 ? newSVpvn((const char *)out, outlen) : newSV(0)));
         EXTEND(SP, 1);
 	Safefree(out);
+
+#endif
+
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+
+OSSL_LIB_CTX *
+OSSL_LIB_CTX_get0_global_default()
+
+
+OSSL_PROVIDER *
+OSSL_PROVIDER_load(SV *libctx, const char *name)
+    CODE:
+        OSSL_LIB_CTX *ctx = NULL;
+        if (libctx != &PL_sv_undef)
+	    ctx = INT2PTR(OSSL_LIB_CTX *, SvIV(libctx));
+        RETVAL = OSSL_PROVIDER_load(ctx, name);
+        if (RETVAL == NULL)
+	    XSRETURN_UNDEF;
+    OUTPUT:
+	  RETVAL
+
+OSSL_PROVIDER *
+OSSL_PROVIDER_try_load(SV *libctx, const char *name, int retain_fallbacks)
+    CODE:
+        OSSL_LIB_CTX *ctx = NULL;
+        if (libctx != &PL_sv_undef)
+	    ctx = INT2PTR(OSSL_LIB_CTX *, SvIV(libctx));
+        RETVAL = OSSL_PROVIDER_try_load(ctx, name, retain_fallbacks);
+        if (RETVAL == NULL)
+	    XSRETURN_UNDEF;
+    OUTPUT:
+	  RETVAL
+
+int
+OSSL_PROVIDER_unload(OSSL_PROVIDER *prov)
+
+int
+OSSL_PROVIDER_available(SV *libctx, const char *name)
+    CODE:
+        OSSL_LIB_CTX *ctx = NULL;
+        if (libctx != &PL_sv_undef)
+	    ctx = INT2PTR(OSSL_LIB_CTX *, SvIV(libctx));
+        RETVAL = OSSL_PROVIDER_available(ctx, name);
+    OUTPUT:
+	  RETVAL
+
+int
+OSSL_PROVIDER_do_all(SV *libctx, SV *perl_cb, SV *perl_cbdata = &PL_sv_undef)
+    PREINIT:
+        simple_cb_data_t* cbdata = NULL;
+    CODE:
+        OSSL_LIB_CTX *ctx = NULL;
+        if (libctx != &PL_sv_undef)
+	    ctx = INT2PTR(OSSL_LIB_CTX *, SvIV(libctx));
+
+        /* setup our callback */
+        cbdata = simple_cb_data_new(perl_cb, perl_cbdata);
+        RETVAL = OSSL_PROVIDER_do_all(ctx, ossl_provider_do_all_cb_invoke, cbdata);
+        simple_cb_data_free(cbdata);
+    OUTPUT:
+        RETVAL
+
+const char *
+OSSL_PROVIDER_get0_name(const OSSL_PROVIDER *prov)
+
+int
+OSSL_PROVIDER_self_test(const OSSL_PROVIDER *prov)
 
 #endif
 

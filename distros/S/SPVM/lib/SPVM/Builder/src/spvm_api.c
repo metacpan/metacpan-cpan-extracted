@@ -332,7 +332,10 @@ SPVM_OBJECT* SPVM_API_dump_raw(SPVM_ENV* env, SPVM_OBJECT* object) {
   SPVM_OBJECT* dump = SPVM_API_new_string_raw(env, string_buffer->buffer, string_buffer->length);
   
   SPVM_HASH_free(address_symtable);
+  address_symtable = NULL;
+  
   SPVM_STRING_BUFFER_free(string_buffer);
+  string_buffer = NULL;
   
   return dump;
 }
@@ -1084,7 +1087,10 @@ int32_t SPVM_API_die(SPVM_ENV* env, const char* message, ...) {
   void* exception = env->new_string_raw(env, buffer, strlen(buffer));
   
   env->free_memory_block(env, message_with_line);
+  message_with_line = NULL;
+  
   env->free_memory_block(env, buffer);
+  buffer = NULL;
   
   env->set_exception(env, exception);
   
@@ -1144,10 +1150,12 @@ void SPVM_API_free_env(SPVM_ENV* env) {
 
   // Free class variables heap
   SPVM_API_free_memory_block(env, env->class_vars_heap);
+  env->class_vars_heap = NULL;
   
   // Free mortal stack
   SPVM_API_free_memory_block(env, env->native_mortal_stack);
-
+  env->native_mortal_stack = NULL;
+  
   SPVM_ALLOCATOR_free_block_runtime_noenv(compiler, env);
 
   {
@@ -5120,6 +5128,7 @@ int32_t SPVM_API_call_spvm_method_vm(SPVM_ENV* env, int32_t method_id, SPVM_VALU
   }
   
   SPVM_API_free_memory_block(env, call_stack);
+  call_stack = NULL;
   
   return exception_flag;
 }
@@ -5210,6 +5219,7 @@ int32_t SPVM_API_push_mortal(SPVM_ENV* env, SPVM_OBJECT* object) {
       memcpy(new_mortal_stack, env->native_mortal_stack, sizeof(void*) * (intptr_t)env->native_mortal_stack_capacity);
       env->native_mortal_stack_capacity = (void*)(intptr_t)new_mortal_stack_capacity;
       SPVM_API_free_memory_block(env, env->native_mortal_stack);
+      env->native_mortal_stack = NULL;
       env->native_mortal_stack = new_mortal_stack;
     }
     
@@ -5422,14 +5432,14 @@ int32_t SPVM_API_get_memory_blocks_count(SPVM_ENV* env) {
 void SPVM_API_free_weaken_back_refs(SPVM_ENV* env, SPVM_WEAKEN_BACKREF* weaken_backref_head) {
   (void)env;
   
-  SPVM_WEAKEN_BACKREF* temp = weaken_backref_head;
-  SPVM_WEAKEN_BACKREF* swap = NULL;
-
-  while(temp != NULL){
-    swap = temp->next;
-    *(temp->object_address) = NULL;
-    SPVM_API_free_memory_block(env, temp);
-    temp = swap;
+  SPVM_WEAKEN_BACKREF* weaken_backref_head_cur = weaken_backref_head;
+  SPVM_WEAKEN_BACKREF* weaken_backref_head_next = NULL;
+  while (weaken_backref_head_cur != NULL){
+    *(weaken_backref_head_cur->object_address) = NULL;
+    weaken_backref_head_next = weaken_backref_head_cur->next;
+    SPVM_API_free_memory_block(env, weaken_backref_head_cur);
+    weaken_backref_head_cur = NULL;
+    weaken_backref_head_cur = weaken_backref_head_next;
   }
 }
 
@@ -5519,18 +5529,24 @@ void SPVM_API_unweaken(SPVM_ENV* env, SPVM_OBJECT** object_address) {
   
   // Increment reference count
   object->ref_count++;
-  
+
   // Remove weaken back ref
   SPVM_WEAKEN_BACKREF** weaken_backref_next_address = &object->weaken_backref_head;
   assert(*weaken_backref_next_address);
-  while ((*weaken_backref_next_address)->next != NULL){
-    if ((*weaken_backref_next_address)->next->object_address == object_address) {
-      SPVM_API_free_memory_block(env, (*weaken_backref_next_address)->next);
-      *weaken_backref_next_address = (*weaken_backref_next_address)->next->next;
+  
+  int32_t pass_one = 0;
+  while (*weaken_backref_next_address != NULL){
+    if ((*weaken_backref_next_address)->object_address == object_address) {
+      pass_one++;
+      SPVM_WEAKEN_BACKREF* tmp = (*weaken_backref_next_address)->next;
+      SPVM_API_free_memory_block(env, *weaken_backref_next_address);
+      *weaken_backref_next_address = NULL;
+      *weaken_backref_next_address = tmp;
       break;
     }
     *weaken_backref_next_address = (*weaken_backref_next_address)->next;
   }
+  assert(pass_one == 1);
 }
 
 int32_t SPVM_API_set_exception(SPVM_ENV* env, SPVM_OBJECT* exception) {
@@ -6239,6 +6255,7 @@ void SPVM_API_dec_ref_count(SPVM_ENV* env, SPVM_OBJECT* object) {
   
     // Free object
     SPVM_API_free_memory_block(env, object);
+    object = NULL;
   }
   else {
     // Decrement reference count
@@ -6669,7 +6686,7 @@ void SPVM_API_set_field_object(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field
   SPVM_API_OBJECT_ASSIGN(get_field_object_address, value);
 }
 
-void* SPVM_API_alloc_memory_block_zero(SPVM_ENV* env, int64_t byte_size) {
+void* SPVM_API_alloc_memory_block_zero(SPVM_ENV* env, size_t byte_size) {
 
   // Runtime
   SPVM_COMPILER* compiler = env->compiler;

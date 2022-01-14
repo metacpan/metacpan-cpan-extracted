@@ -41,15 +41,13 @@ package PDL::Doc::Perldl;
 
 use Exporter;
 use strict;
-use vars qw(@ISA @EXPORT);
+use warnings;
 
-@ISA = qw(Exporter);
-
-@EXPORT = qw( apropos aproposover usage help sig badinfo whatis );
+our @ISA = qw(Exporter);
+our @EXPORT = qw( apropos aproposover usage help sig badinfo whatis );
 
 use PDL::Doc;
 use Pod::Select;
-use IO::File;
 use Pod::PlainText;
 use Term::ReadKey; #for GetTerminalSize
 
@@ -99,7 +97,7 @@ sub printmatch {
 sub shortmod {
   my $module = shift;
   $module =~ s/::$//;
-  unless ($PERLDL::long_mod_names){
+  unless ($PERLDL::long_mod_names && $PERLDL::long_mod_names){ # silence warn
       $module =~ s/^PDL::/P::/;
       $module =~ s/^P::Graphics::/P::G::/;
       #additional abbreviation substitutions go here
@@ -258,7 +256,7 @@ sub finddoc  {
 
     # print out the matches
 
-    my $out = IO::File->new( "| pod2text | $PDL::Doc::pager" );
+    open my $out, "| pod2text | $PDL::Doc::pager";
     
     if($subfield) {
       if($subfield <= @match) {
@@ -305,7 +303,7 @@ sub finddoc  {
 	   unless ($absfile) {
 	       die "Documentation error: couldn't find absolute path to $relfile\n";
 	   }
-	   my $in = IO::File->new("<$absfile");
+	   open my $in, "<", $absfile;
 	   print $out join("",<$in>);
        } else {
           if(defined $m->[2]{CustomFile}) {
@@ -749,7 +747,7 @@ sub badinfo {
 	    }
 	}
 	if ($pagerstr){
-	    my $out = new IO::File "| pod2text | $PDL::Doc::pager";
+	    open my $out, "| pod2text | $PDL::Doc::pager";
 	    print $out $pagerstr, $noinfostr;
 	} else {
 	    print $noinfostr;

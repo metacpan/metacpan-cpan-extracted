@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use parent 'App::SpamcupNG::Error';
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 =head1 NAME
 

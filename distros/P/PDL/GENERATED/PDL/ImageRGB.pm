@@ -21,6 +21,10 @@ use DynaLoader;
 
 
 
+#line 10 "imagergb.pd"
+use strict;
+use warnings;
+
 =head1 NAME
 
 PDL::ImageRGB -- some utility functions for RGB image data handling
@@ -255,6 +259,7 @@ the copyright notice should be included in the file.
 
 
 =cut
+#line 263 "ImageRGB.pm"
 
 
 
@@ -262,11 +267,9 @@ the copyright notice should be included in the file.
 
 
 
-
-
-
+#line 1061 "../../blib/lib/PDL/PP.pm"
 *cquant_c = \&PDL::cquant_c;
-
+#line 273 "ImageRGB.pm"
 
 
 

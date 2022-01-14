@@ -28,6 +28,7 @@ extends 'Business::Fixflo::Resource';
     AssignedTeam
     BlockId
     BlockName
+    Brand
     Created
     ExternalPropertyRef
     PropertyManager
@@ -51,6 +52,7 @@ has [ qw/
     AssignedTeam
     BlockId
     BlockName
+    Brand
     Created
     ExternalPropertyRef
     PropertyAddressId

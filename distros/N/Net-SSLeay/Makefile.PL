@@ -4,10 +4,25 @@ use strict;
 use warnings;
 
 use Config;
+use English qw( $OSNAME -no_match_vars );
 use ExtUtils::MakeMaker;
 use File::Basename ();
 use File::Spec;
+use File::Spec::Functions qw(catfile);
 use Symbol qw(gensym);
+use Text::Wrap;
+
+# According to http://cpanwiki.grango.org/wiki/CPANAuthorNotes, the ideal
+# behaviour to exhibit when a prerequisite does not exist is to use exit code 0
+# to ensure smoke testers stop immediately without reporting a FAIL; in all
+# other environments, we want to fail more loudly
+use constant {
+    MISSING_PREREQ     => ( $ENV{AUTOMATED_TESTING} ? 0 : 1 ),
+    UNSUPPORTED_LIBSSL => ( $ENV{AUTOMATED_TESTING} ? 0 : 1 ),
+};
+
+# Error messages displayed with alert() will be this many columns wide
+use constant ALERT_WIDTH => 78;
 
 # Define this to one if you want to link the openssl libraries statically into 
 # the Net-SSLeay loadable object on Windows
@@ -21,7 +36,7 @@ my $tests = prompt(
 
 my %eumm_args = (
   NAME => 'Net::SSLeay',
-  ABSTRACT => 'Perl extension for using OpenSSL',
+  ABSTRACT => 'Perl bindings for OpenSSL and LibreSSL',
   LICENSE => 'artistic_2',
   AUTHOR => [
     'Sampo Kellomäki <sampo@iki.fi>',
@@ -34,7 +49,11 @@ my %eumm_args = (
   VERSION_FROM => 'lib/Net/SSLeay.pm',
   MIN_PERL_VERSION => '5.8.1',
   CONFIGURE_REQUIRES => {
+    'English' => '0',
     'ExtUtils::MakeMaker' => '0',
+    'File::Spec::Functions' => '0',
+    'Text::Wrap' => '0',
+    'constant' => '0',
   },
   TEST_REQUIRES => {
     'Carp' => '0',
@@ -47,6 +66,7 @@ my %eumm_args = (
     'SelectSaver' => '0',
     'Socket' => '0',
     'Storable' => '0',
+    'Test::Builder' => '0',
     'Test::More' => '0.60_01',
     'base' => '0',
   },
@@ -91,6 +111,18 @@ my %eumm_args = (
   ssleay(),
 );
 
+# See if integers are only 32 bits long. If they are, add a flag to
+# CCFLAGS. Since OpenSSL 1.1.0, a growing number of APIs are using 64
+# bit integers. This causes a problem if Perl is compiled without 64
+# bit integers. DEFINE is not used because Makefile.PL command line
+# DEFINE argument is used for enabling compile time PR1
+# etc. debugging.
+#
+# Note: 32bit integers are treated as the non-default case. When you
+# use this define, do it so that 64bit case is the default whenever
+# possible. This is safer for future library and Net::SSLeay releases.
+$eumm_args{CCFLAGS} = "-DNET_SSLEAY_32BIT_INT_PERL $Config{ccflags}" if !defined $Config{use64bitint} || $Config{use64bitint} ne 'define';
+
 # This can go when EU::MM older than 6.58 are gone
 $eumm_args{AUTHOR} = join(', ', @{$eumm_args{AUTHOR}}) unless eval { ExtUtils::MakeMaker->VERSION(6.58); };
 
@@ -100,16 +132,8 @@ delete $eumm_args{TEST_REQUIRES} unless eval { ExtUtils::MakeMaker->VERSION(6.64
 WriteMakefile(%eumm_args);
 
 sub MY::postamble {
-my $regen_script = File::Spec->catfile('helper_script', 'regen_openssl_constants.pl');
-my $constants_t = File::Spec->catfile('t', 'local', '21_constants.t');
 <<"MAKE";
-constants.c : $regen_script
-	\$(ABSPERLRUN) $regen_script -gen-c constants.c
-
-$constants_t : $regen_script
-	\$(ABSPERLRUN) $regen_script -gen-t $constants_t
-
-SSLeay$Config{'obj_ext'} : constants.c $constants_t
+SSLeay$Config{'obj_ext'} : constants.c
 
 MAKE
 }
@@ -126,12 +150,38 @@ sub ssleay {
 EOM
         exit 0; # according https://wiki.cpantesters.org/wiki/CPANAuthorNotes this is best-practice when "missing library"
     }
+
+    my $opts = ssleay_get_build_opts($prefix);
+
+    # Ensure libssl headers exist before continuing - compilation will fail
+    # without them
+    if ( !defined $opts->{inc_path} ) {
+        my $detail =
+              'The libssl header files are required to build Net-SSLeay, but '
+            . 'they are missing from ' . $prefix . '. They would typically '
+            . 'reside in ' . catfile( $prefix, 'include', 'openssl' ) . '.';
+
+        if ( $OSNAME eq 'linux' ) {
+            $detail .=
+                  "\n\n"
+                . 'If you are using the version of OpenSSL/LibreSSL packaged '
+                . 'by your Linux distribution, you may need to install the '
+                . 'corresponding "development" package via your package '
+                . 'manager (e.g. libssl-dev for OpenSSL on Debian and Ubuntu, '
+                . 'or openssl-devel for OpenSSL on Red Hat Enterprise Linux '
+                . 'and Fedora).';
+        }
+
+        alert( 'Could not find libssl headers', $detail );
+
+        exit MISSING_PREREQ;
+    }
+
     check_openssl_version($prefix, $exec);
-    my $opts = ssleay_get_build_opts($prefix, $exec);
     my %args = (
         CCCDLFLAGS => $opts->{cccdlflags},
         OPTIMIZE => $opts->{optimize},
-        INC => join(' ', map qq{-I"$_"}, @{$opts->{inc_paths}}),
+        INC => qq{-I"$opts->{inc_path}"},
         LIBS => join(' ', (map '-L'.maybe_quote($_), @{$opts->{lib_paths}}), (map {"-l$_"} @{$opts->{lib_links}})),
     );
     # From HMBRAND to handle multple version of OPENSSL installed
@@ -145,17 +195,49 @@ EOM
 sub maybe_quote { $_[0] =~ / / ? qq{"$_[0]"} : $_[0] }
 
 sub ssleay_get_build_opts {
-    my ($prefix, $exec) = @_;
+    my ($prefix) = @_;
 
     my $opts = {
         lib_links  => [],
         cccdlflags => '',
     };
-    for ("$prefix/include", "$prefix/inc32", '/usr/kerberos/include') {
-      push @{$opts->{inc_paths}}, $_ if -f "$_/openssl/ssl.h";
+
+    my @try_includes = (
+        'include' => sub { 1 },
+        'inc32'   => sub { $OSNAME eq 'MSWin32' },
+    );
+
+    while (
+           !defined $opts->{inc_path}
+        && defined( my $dir = shift @try_includes )
+        && defined( my $cond = shift @try_includes )
+    ) {
+        if ( $cond->() && (-f "$prefix/$dir/openssl/ssl.h"
+                           || -f "$prefix/$dir/ssl.h")) {
+            $opts->{inc_path} = "$prefix/$dir";
+        }
     }
-    for ($prefix, "$prefix/lib64", "$prefix/lib", "$prefix/out32dll") {
-      push @{$opts->{lib_paths}}, $_ if -d $_;
+
+    # Directory order matters. With macOS Monterey a poisoned dylib is
+    # returned if the directory exists without the desired
+    # library. See GH-329 for more information. With Strawberry Perl
+    # 5.26 and later the paths must be in different order or the link
+    # phase fails.
+    my @try_lib_paths = (
+	["$prefix/lib64", "$prefix/lib", "$prefix/out32dll", $prefix] => sub {$OSNAME eq 'darwin' },
+	[$prefix, "$prefix/lib64", "$prefix/lib", "$prefix/out32dll"] => sub { 1 },
+	);
+
+    while (
+	!defined $opts->{lib_paths}
+	&& defined( my $dirs = shift @try_lib_paths )
+	&& defined( my $cond = shift @try_lib_paths )
+    ) {
+	if ( $cond->() ) {
+	    foreach my $dir (@{$dirs}) {
+		push @{$opts->{lib_paths}}, $dir if -d $dir;
+	    }
+	}
     }
 
     print <<EOM;
@@ -197,6 +279,10 @@ EOM
         if (-r 'sslroot:[000000]openssl.cnf') {      # openssl.org source install
           @{ $opts->{lib_paths} } = 'SSLLIB';
           @{ $opts->{lib_links} } = qw( ssl_libssl32.olb ssl_libcrypto32.olb );
+        }
+        elsif (-r 'ssl111$root:[000000]openssl.cnf') {  # VSI SSL111 install
+            @{ $opts->{lib_paths} } = 'SYS$SHARE';
+            @{ $opts->{lib_links} } = qw( SSL111$LIBSSL_SHR32 SSL111$LIBCRYPTO_SHR32 );
         }
         elsif (-r 'ssl1$root:[000000]openssl.cnf') {  # VSI or HPE SSL1 install
             @{ $opts->{lib_paths} } = 'SYS$SHARE';
@@ -251,6 +337,7 @@ sub find_openssl_prefix {
 
     my @guesses = (
 	'/home/linuxbrew/.linuxbrew/opt/openssl/bin/openssl' => '/home/linuxbrew/.linuxbrew/opt/openssl', # LinuxBrew openssl
+	'/opt/homebrew/opt/openssl/bin/openssl' => '/opt/homebrew/opt/openssl', # macOS ARM homebrew
 	'/usr/local/opt/openssl/bin/openssl' => '/usr/local/opt/openssl', # OSX homebrew openssl
 	'/usr/local/bin/openssl'         => '/usr/local', # OSX homebrew openssl
 	'/opt/local/bin/openssl'         => '/opt/local', # Macports openssl
@@ -267,6 +354,7 @@ sub find_openssl_prefix {
 	$Config{prefix} . '\bin\openssl.exe'      => $Config{prefix},           # strawberry perl
 	$Config{prefix} . '\..\c\bin\openssl.exe' => $Config{prefix} . '\..\c', # strawberry perl
 	'/sslexe/openssl.exe'            => '/sslroot',  # VMS, openssl.org
+	'/ssl111$exe/openssl.exe'        => '/ssl111$root',# VMS, VSI install
 	'/ssl1$exe/openssl.exe'          => '/ssl1$root',# VMS, VSI or HPE install
 	'/ssl$exe/openssl.exe'           => '/ssl$root', # VMS, HP install
     );
@@ -287,7 +375,7 @@ sub find_openssl_exec {
     my ($prefix) = @_;
 
     my $exe_path;
-    for my $subdir (qw( bin sbin out32dll ia64_exe alpha_exe )) {
+    for my $subdir (qw( bin sbin out32dll x86_64_exe ia64_exe alpha_exe )) {
         my $path = File::Spec->catfile($prefix, $subdir, "openssl$Config{_exe}");
         if ( -x $path ) {
             return $path;
@@ -300,7 +388,7 @@ sub find_openssl_exec {
 
 sub check_openssl_version {
     my ($prefix, $exec) = @_;
-    my ($output, $major, $minor, $letter);
+    my ( $output, $libssl, $major, $minor, $letter );
 
     {
         my $pipe = gensym();
@@ -312,6 +400,7 @@ sub check_openssl_version {
 
 	if ( ($major, $minor, $letter) = $output =~ /^OpenSSL\s+(\d+\.\d+)\.(\d+)([a-z]?)/ ) {
 	    print "*** Found OpenSSL-${major}.${minor}${letter} installed in $prefix\n";
+	    $libssl = 'openssl';
 	} elsif ( ($major, $minor) = $output =~ /^LibreSSL\s+(\d+\.\d+)(?:\.(\d+))?/ ) {
 	    # LibreSSL 2.0.x releases only identify themselves as "LibreSSL 2.0",
 	    # with no patch release number
@@ -319,6 +408,7 @@ sub check_openssl_version {
 	        $minor = "x";
 	    }
 	    print "*** Found LibreSSL-${major}.${minor} installed in $prefix\n";
+	    $libssl = 'libressl';
 	} else {
             die <<EOM
 *** OpenSSL version test failed
@@ -349,6 +439,16 @@ EOM
         exit 0;
     }
 
+    # In the LibreSSL 3.2 series, versions below 3.2.4 are not supported because
+    # of their libssl-incompatible X.509 verification behaviour (see GH-232)
+    if ( $libssl eq 'libressl' && $major eq '3.2' && $minor < 4 ) {
+        print <<EOM;
+*** LibreSSL 3.2 releases prior to version 3.2.4 are not supported.
+    Upgrade to a newer version of LibreSSL.
+EOM
+        exit UNSUPPORTED_LIBSSL;
+    }
+
     if ($major == 1.1 && $minor > 1) {
         print <<EOM;
 *** That's newer than what this module was tested with
@@ -363,4 +463,22 @@ sub fixpath {
     my $sep = File::Spec->catdir('');
     $text =~ s{\b/}{$sep}g;
     return $text;
+}
+
+sub alert {
+    my ( $err, $detail ) = @_;
+
+    local $Text::Wrap::columns = ALERT_WIDTH - 4;
+
+    print "\n";
+
+    print '*' x ALERT_WIDTH, "\n";
+    print '* ', uc($err), ' ' x ( ALERT_WIDTH - length($err) - 4 ), ' *', "\n";
+    print '*', ' ' x ( ALERT_WIDTH - 2 ), '*', "\n";
+
+    for ( split /\n/, Text::Wrap::wrap( '', '', $detail ) ) {
+        print '* ', $_, ' ' x ( ALERT_WIDTH - length($_) - 4 ), ' *', "\n";
+    }
+
+    print '*' x ALERT_WIDTH, "\n";
 }

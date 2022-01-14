@@ -13,7 +13,7 @@ use lib File::Spec->catdir( File::Basename::dirname( Cwd::abs_path __FILE__ ), '
 
 use Local::Test::TempDir qw(tempdir);
 
-use Git::Background;
+use Git::Background 0.003;
 
 my $bindir = File::Spec->catdir( File::Basename::dirname( File::Basename::dirname( Cwd::abs_path __FILE__ ) ), 'corpus', 'bin' );
 
@@ -35,9 +35,9 @@ isa_ok( $f->{_run}{_proc},   'Proc::Background', '... and _proc' );
 ok( !$f->{ready}, 'future is not yet ready' );
 
 # await can be called multiple times
-$f->await;
-$f->await;
-$f->await;
+is( $f->await, $f, 'await returns itself' );
+is( $f->await, $f, '... and can be called multiple times' );
+is( $f->await, $f, '... really' );
 my ( $stdout, $stderr, $rc ) = $f->get;
 
 ok( $f->{ready},    'future is ready' );

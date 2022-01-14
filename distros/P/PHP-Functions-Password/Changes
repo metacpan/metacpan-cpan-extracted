@@ -43,3 +43,9 @@ v1.10	2020-05-26
 
 v1.11	2021-02-19
 	- Add check and support for Crypt::Argon2 function argon2_needs_rehash() since version 0.008.
+
+v1.12	2022-01-13
+	- Use Readonly module for private constants.
+	- Improve legability of some regexes.
+	- Improved unit tests, in particular for long and UTF-8 passwords.
+	- Treat given passwords as strings of bytes instead of characters.

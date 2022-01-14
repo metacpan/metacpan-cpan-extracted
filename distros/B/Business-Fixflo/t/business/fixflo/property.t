@@ -36,6 +36,7 @@ can_ok(
         Id
         BlockId
         BlockName
+        Brand
         ExternalPropertyRef
         PropertyManager
         PropertyAddressId

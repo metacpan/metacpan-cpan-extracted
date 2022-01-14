@@ -1,5 +1,10 @@
 Revision history for Bio-RNA-BarMap
 
-0.01    Date/time
+0.02    2022-01-13
+        - fixed "multiplication with hash" errors encountered with old Perl
+          versions in two tests
+        - increased parsing speed of mappings by about 20%
+
+0.01    2021-12-22
         First version, released on an unsuspecting world.
 

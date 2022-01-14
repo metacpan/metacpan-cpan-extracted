@@ -1,77 +1,113 @@
 package App::findeps;
 
-use 5.012005;
 use strict;
 use warnings;
+use feature qw(state);
 
-our $VERSION = "0.11";
+our $VERSION = "0.13";
 
 use Carp qw(carp croak);
 use ExtUtils::Installed;
 use List::Util qw(first);
-use FastGlob qw(glob);
+
 use Module::CoreList;
+use Directory::Iterator;
 
 our $Upgrade    = 0;
 our $myLib      = 'lib';
 our $toCpanfile = 0;
-my $RE      = qr/\w+\.((?i:p[ml]|t|cgi|psgi))$/;
+my $qr4ext  = qr/\w+\.(p[ml]|t|cgi|psgi)$/;
 my $qr4name = qr/[a-zA-Z][a-zA-Z\d]+(?:::[a-zA-Z\d]+){0,}/;
+
+sub scanDir {    # To Do
+    my $dir = shift || $myLib || 'lib';
+    die "$dir is not a directory" unless -d $dir;
+
+    my @list = ();
+    my $list = Directory::Iterator->new($dir);
+    while ( $list->next ) {
+        my $file = $list->get;
+        next unless $file =~ /\.p[lm]$/;
+        scan( file => $file, list => \@list );
+    }
+    return @list;
+}
 
 sub scan {
     my %args = @_;
     my %pairs;
     while ( my $file = shift @{ $args{files} } ) {
-        $file =~ $RE;
-        my $ext = $1 || croak 'Unvalid extension was set';
+        ( my $ext = $file ) =~ $qr4ext;
+        warn "Invalid extension was set: $ext" unless $1;
         open my $fh, '<', $file or die "Can't open < $file: $!";
         while (<$fh>) {
             chomp;
-            next unless length $_;
+            next unless defined $_;
             last if /^__(?:END|DATA)__$/;
-            next if /^\s*#.*$/;
             state( $pod, $here, $eval );
+            next if $pod  and $_ ne '=cut';
+            next if $here and $_ ne $here;
             if ( !$pod and /^=(\w+)/ ) {
                 $pod = $1;
-            } elsif ( $pod and /^=cut$/ ) {
+                next;
+            } elsif ( $pod and $_ eq '=cut' ) {
                 undef $pod;
                 next;
             }
             if ( !$here and my @catch = /(?:<<(['"])?(\w+)\1?){1,}/g ) {
                 $here = $catch[-1];
-            } elsif ( $here and /^$here$/ ) {
+                next;
+            } elsif ( $here and $_ eq $here ) {
                 undef $here;
                 next;
             }
-            s/\s+#.*$//g;
+            next if /^\s*#.*/;
+            s/\s+#.*$//;
             if ( !$eval and /eval\s*(['"{])$/ ) {
                 $eval = $1 eq '{' ? '}' : $1;
             } elsif ( $eval and /$eval(?:.*)?;$/ ) {
                 undef $eval;
                 next;
-            } elsif ( $eval and /(require|use)\s+($qr4name)/ ) {
+            } elsif ( $eval and /\b(require|use)\s+($qr4name)/ ) {
                 warnIgnored( $2, $1, 'eval' );
             }
+            next if $eval;
+
+            if (/\buse\b/) {
+                scan_line( \%pairs, $_ );
+                next;
+            }
+
             state $if = 0;
-            if (/^\s*(?:if|unless)\s*\(.*\)\s*{$/) {
+            if (/^\b(?:if|unless)\s*\(.*\)\s*{$/) {
                 $if++;
             } elsif ( $if > 0 and /^\s*}$/ ) {
                 $if--;
+                warn "something wrong to parse: $file" if $if < 0;
                 next;
-            } elsif ( $if > 0 and /^\s*(require|use)\s+($qr4name)/ ) {
-                warnIgnored( $2, $1, 'if' );
+            } elsif ( $if > 0 and /^\brequire\s+($qr4name)/ ) {
+                warnIgnored( 'require', $1, 'if' );
             }
-            next if $pod or $here or $eval or $if;
+            next unless /\b(require|use)\s+/;
             scan_line( \%pairs, $_ );
         }
         close $fh;
     }
     my $deps  = {};
-    my @local = &glob("$myLib/*.p[lm]");
+    my @local = ();
+    my $list  = Directory::Iterator->new($myLib)
+        ;    # To Do: $myLib must be got from local::lib within plenv/PerlBrew
+    while ( $list->next ) {
+        my $file = $list->get;
+        next unless $file =~ s!\.pm$!!;
+        $file =~ s!/!::!g;
+        push @local, $file;
+    }
+
     while ( my ( $name, $version ) = each %pairs ) {
         next                      if !defined $name;
         next                      if exists $deps->{$name};
-        next                      if first { $_ =~ /$name\.p[lm]$/ } @local;
+        next                      if first { $_ eq $name } @local;
         $deps->{$name} = $version if !defined $version or $Upgrade or $toCpanfile;
     }
     return $deps;
@@ -92,9 +128,10 @@ my @pragmas = qw(
 sub scan_line {
     my $pairs = shift;
     local $_ = shift;
-    s/#.*$//;
     my @names = ();
-    return if /^\s*(?:require|use)\s+5\.\d{3}_?\d{3};$/;
+    return if /^\buse\s+v5(?:\.\d{2}){1,2}\s*;/;    #ignore VERSION
+    return if /^\buse\s+5\.\d{3}(?:_\d{3})?;/;      #ignore old version
+
     if (/use\s+(?:base|parent)\s+qw[\("']\s*((?:$qr4name\s*){1,})[\)"']/) {
         push @names, split /\s+/, $1;
     } elsif (/use\s+(?:base|parent|autouse)\s+(['"])?($qr4name)\1?/) {
@@ -107,7 +144,6 @@ sub scan_line {
         warnIgnored( $1, 'require', 'if' );
     } elsif (/^\s*(?:require|use)\s+($qr4name)/) {
         $names[0] = $1;
-
     } elsif (m!^\s*require\s*(["'])((?:\./)?(?:\w+/){0,}$qr4name\.pm)\1!) {
         $names[0] = _name($2);
     } elsif (/^\s*(require|use)\s+(['"]?)(.*)\2/) {
@@ -116,11 +152,11 @@ sub scan_line {
         warn "just detected but not listed: $name($exists) $1d\n";
     }
     for my $name (@names) {
-        next unless length $name;
+        next unless defined $name;
         next if exists $pairs->{$name};
         next if $name eq 'Plack::Builder';
-        next if $Upgrade and Module::CoreList->is_core($name);
         next if first { $name eq $_ } @pragmas;
+        next if !$Upgrade and Module::CoreList->is_core($name);
         $pairs->{$name} = get_version($name);
     }
     return %$pairs;
@@ -131,9 +167,9 @@ sub get_version {
     my $installed = ExtUtils::Installed->new( skip_cwd => 1 );
     my $module    = first { $_ eq $name } $installed->modules();
     my $version   = eval { $installed->version($module) };
-    return "$version" if $version;
+    return $version if defined $version;
     eval "use lib '$myLib'; require $name" or return undef;
-    return eval "no strict 'subs';\$${name}::VERSION" || 0;
+    return eval "no strict 'subs';\$${name}::VERSION";
 }
 
 sub warnIgnored {
@@ -147,7 +183,7 @@ sub _name {
     my $str = shift;
     $str =~ s!/!::!g if $str =~ /\.pm$/;
     $str =~ s!^lib::!!;
-    $str =~ s!.pm$!!i;
+    $str =~ s!\.pm$!!;
     $str =~ s!^auto::(.+)::.*!$1!;
     return $str;
 }

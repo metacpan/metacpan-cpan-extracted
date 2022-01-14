@@ -53,6 +53,6 @@
          "url" : "https://github.com/sciurius/perl-String-Interpolate-Named"
       }
    },
-   "version" : "1.01",
+   "version" : "1.03",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

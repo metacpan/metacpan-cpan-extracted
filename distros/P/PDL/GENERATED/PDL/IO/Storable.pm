@@ -25,6 +25,8 @@ use DynaLoader;
 
 
 
+#line 2 "storable.pd"
+
 =head1 NAME
 
 PDL::IO::Storable - helper functions to make PDL usable with Storable
@@ -49,8 +51,13 @@ be able to store and retrieve ndarrays via Storable.
 
 =cut
 
+use strict;
+use warnings;
+#line 57 "Storable.pm"
 
 
+
+#line 74 "storable.pd"
 
 
 { package # hide from PAUSE
@@ -330,8 +337,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-
-
+#line 341 "Storable.pm"
 
 
 

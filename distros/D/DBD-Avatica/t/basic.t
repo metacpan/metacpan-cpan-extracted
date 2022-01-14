@@ -12,7 +12,7 @@ my $is_mock = !($ENV{TEST_ONLINE});
 my $url = $ENV{TEST_ONLINE} || 'http://127.0.0.1:8765';
 
 &mock_common if $is_mock;
-my $dbh = DBI->connect("dbi:Avatica:adapter_name=phoenix;url=$url");
+my $dbh = DBI->connect("dbi:Avatica:adapter_name=phoenix;url=$url") or BAIL_OUT( DBI->errstr );
 my $ret = $dbh->do(q{DROP TABLE IF EXISTS TEST});
 is $ret, '0E0', 'check drop res';
 $ret = $dbh->do(q{CREATE TABLE TEST(ID BIGINT PRIMARY KEY, TEXT VARCHAR)});

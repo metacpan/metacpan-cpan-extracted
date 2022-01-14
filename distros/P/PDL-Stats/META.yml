@@ -25,5 +25,5 @@ requires:
   PDL: '2.057'
 resources:
   repository: git://github.com/PDLPorters/PDL-Stats
-version: '0.80'
+version: '0.81'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

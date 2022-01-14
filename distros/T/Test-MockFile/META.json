@@ -26,7 +26,8 @@
             "Test2::Bundle::Extended" : "0.000084",
             "Test2::Plugin::NoWarnings" : "0",
             "Test2::Tools::Explain" : "0",
-            "Test::More" : "1.302133"
+            "Test::More" : "1.302133",
+            "Text::Glob" : "0"
          }
       },
       "configure" : {
@@ -53,6 +54,6 @@
          "url" : "https://github.com/cpanelinc/Test-MockFile"
       }
    },
-   "version" : "0.022",
+   "version" : "0.023",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

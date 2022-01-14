@@ -2,8 +2,9 @@
 # The only change is to change the use statement and change references
 # from CGI to CGI::Simple
 
-use Test::More tests => 43;
 use strict;
+use warnings;
+use Test::More tests => 43;
 use Config;
 
 use CGI::Simple ( -default );

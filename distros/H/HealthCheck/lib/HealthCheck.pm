@@ -3,7 +3,7 @@ use parent 'HealthCheck::Diagnostic';
 
 # ABSTRACT: A health check for your code
 use version;
-our $VERSION = 'v1.7.0'; # VERSION
+our $VERSION = 'v1.8.0'; # VERSION
 
 use 5.010;
 use strict;
@@ -35,20 +35,22 @@ Hash::Util::FieldHash::fieldhash my %registered_checks;
 #pod     }
 #pod
 #pod     my $checker = HealthCheck->new(
-#pod         id     => 'main_checker',
-#pod         label  => 'Main Health Check',
-#pod         tags   => [qw( fast cheap )],
-#pod         checks => [
+#pod         id      => 'main_checker',
+#pod         label   => 'Main Health Check',
+#pod         runbook => 'https://grantstreetgroup.github.io/HealthCheck.html',
+#pod         tags    => [qw( fast cheap )],
+#pod         checks  => [
 #pod             sub { return { id => 'coderef', status => 'OK' } },
 #pod             'my_check',          # Name of a method on caller
 #pod         ],
 #pod     );
 #pod
 #pod     my $other_checker = HealthCheck->new(
-#pod         id     => 'my_health_check',
-#pod         label  => "My Health Check",
-#pod         tags   => [qw( cheap easy )],
-#pod         other  => "Other details to pass to the check call",
+#pod         id      => 'my_health_check',
+#pod         label   => "My Health Check",
+#pod         runbook => 'https://grantstreetgroup.github.io/HealthCheck.html',
+#pod         tags    => [qw( cheap easy )],
+#pod         other   => "Other details to pass to the check call",
 #pod     )->register(
 #pod         'My::Checker',       # Name of a loaded class that ->can("check")
 #pod         My::Checker->new,    # Object that ->can("check")
@@ -59,6 +61,7 @@ Hash::Util::FieldHash::fieldhash my %registered_checks;
 #pod     $other_checker->register( My::Checker->new(
 #pod         id      => 'my_checker',
 #pod         label   => 'My Checker',
+#pod         runbook => 'https://grantstreetgroup.github.io/HealthCheck.html',
 #pod         tags    => [qw( cheap copied_to_the_result )],
 #pod     ) );
 #pod
@@ -72,6 +75,7 @@ Hash::Util::FieldHash::fieldhash my %registered_checks;
 #pod     $checker->register( {
 #pod         invocant    => 'My::Checker',      # to call the "check" on
 #pod         check       => 'another_check',    # name of the check method
+#pod         runbook     => 'https://grantstreetgroup.github.io/HealthCheck.html',
 #pod         tags        => [qw( fast easy )],
 #pod         more_params => 'anything',
 #pod     } );
@@ -108,9 +112,10 @@ Hash::Util::FieldHash::fieldhash my %registered_checks;
 #pod     sub another_check {
 #pod         my ($self, %params) = @_;
 #pod         return {
-#pod             id     => 'another_check',
-#pod             label  => 'A Super custom check',
-#pod             status => ( $params{more_params} eq 'fine' ? "OK" : "CRITICAL" ),
+#pod             id      => 'another_check',
+#pod             label   => 'A Super custom check',
+#pod             runbook => 'https://grantstreetgroup.github.io/HealthCheck.html',
+#pod             status  => ( $params{more_params} eq 'fine' ? "OK" : "CRITICAL" ),
 #pod         };
 #pod     }
 #pod
@@ -120,6 +125,7 @@ Hash::Util::FieldHash::fieldhash my %registered_checks;
 #pod
 #pod     id      => "main_checker",
 #pod     label   => "Main Health Check",
+#pod     runbook => 'https://grantstreetgroup.github.io/HealthCheck.html',
 #pod     tags    => [ "fast", "cheap" ],
 #pod     status  => "WARNING",
 #pod     results => [
@@ -162,6 +168,7 @@ Hash::Util::FieldHash::fieldhash my %registered_checks;
 #pod     id      => "my_health_check",
 #pod     label   => "My Health Check",
 #pod     runtime => "0.000",
+#pod     runbook => 'https://grantstreetgroup.github.io/HealthCheck.html',
 #pod     tags    => [ "cheap", "easy" ],
 #pod     status  => "WARNING",
 #pod     results => [
@@ -247,6 +254,10 @@ Hash::Util::FieldHash::fieldhash my %registered_checks;
 #pod =item label
 #pod
 #pod A human readable name for this check.
+#pod
+#pod =item runbook
+#pod
+#pod A runbook link to help troubleshooting if the status is not OK.
 #pod
 #pod =back
 #pod
@@ -349,7 +360,7 @@ sub register {
             # runner does the right thing.
             if ( $c{check} and not $c{invocant} and do {
                     local $@;
-                    eval { local $SIG{__DIE__}; $c{check}->can('check') };
+                    eval { $c{check}->can('check') };
                 } )
             {
                 $c{invocant} = $c{check};
@@ -441,8 +452,7 @@ sub run {
         # (for fear of exception-catching magic and rabbitholes).
         {
             local $@;
-            @r = eval { local $SIG{__DIE__};
-                $i ? $i->$m( %c, %params ) : $m->( %c, %params ) };
+            @r = eval { $i ? $i->$m( %c, %params ) : $m->( %c, %params ) };
             @r = { status => 'CRITICAL', info => $@ } if $@ and not @r;
         }
 
@@ -472,7 +482,7 @@ sub _set_check_response_defaults {
     return if exists $c->{_respond};
 
     my %defaults;
-    FIELD: for my $field ( qw(id label tags) ) {
+    FIELD: for my $field ( qw(id label runbook tags) ) {
         if (exists $c->{$field}) {
             $defaults{$field} = $c->{$field};
             next FIELD;
@@ -587,7 +597,7 @@ HealthCheck - A health check for your code
 
 =head1 VERSION
 
-version v1.7.0
+version v1.8.0
 
 =head1 SYNOPSIS
 
@@ -605,20 +615,22 @@ version v1.7.0
     }
 
     my $checker = HealthCheck->new(
-        id     => 'main_checker',
-        label  => 'Main Health Check',
-        tags   => [qw( fast cheap )],
-        checks => [
+        id      => 'main_checker',
+        label   => 'Main Health Check',
+        runbook => 'https://grantstreetgroup.github.io/HealthCheck.html',
+        tags    => [qw( fast cheap )],
+        checks  => [
             sub { return { id => 'coderef', status => 'OK' } },
             'my_check',          # Name of a method on caller
         ],
     );
 
     my $other_checker = HealthCheck->new(
-        id     => 'my_health_check',
-        label  => "My Health Check",
-        tags   => [qw( cheap easy )],
-        other  => "Other details to pass to the check call",
+        id      => 'my_health_check',
+        label   => "My Health Check",
+        runbook => 'https://grantstreetgroup.github.io/HealthCheck.html',
+        tags    => [qw( cheap easy )],
+        other   => "Other details to pass to the check call",
     )->register(
         'My::Checker',       # Name of a loaded class that ->can("check")
         My::Checker->new,    # Object that ->can("check")
@@ -629,6 +641,7 @@ version v1.7.0
     $other_checker->register( My::Checker->new(
         id      => 'my_checker',
         label   => 'My Checker',
+        runbook => 'https://grantstreetgroup.github.io/HealthCheck.html',
         tags    => [qw( cheap copied_to_the_result )],
     ) );
 
@@ -642,6 +655,7 @@ version v1.7.0
     $checker->register( {
         invocant    => 'My::Checker',      # to call the "check" on
         check       => 'another_check',    # name of the check method
+        runbook     => 'https://grantstreetgroup.github.io/HealthCheck.html',
         tags        => [qw( fast easy )],
         more_params => 'anything',
     } );
@@ -678,9 +692,10 @@ version v1.7.0
     sub another_check {
         my ($self, %params) = @_;
         return {
-            id     => 'another_check',
-            label  => 'A Super custom check',
-            status => ( $params{more_params} eq 'fine' ? "OK" : "CRITICAL" ),
+            id      => 'another_check',
+            label   => 'A Super custom check',
+            runbook => 'https://grantstreetgroup.github.io/HealthCheck.html',
+            status  => ( $params{more_params} eq 'fine' ? "OK" : "CRITICAL" ),
         };
     }
 
@@ -690,6 +705,7 @@ C<%result> will be from the subset of checks run due to the tags.
 
     id      => "main_checker",
     label   => "Main Health Check",
+    runbook => 'https://grantstreetgroup.github.io/HealthCheck.html',
     tags    => [ "fast", "cheap" ],
     status  => "WARNING",
     results => [
@@ -732,6 +748,7 @@ which can be enabled by adding a truthy C<runtime> param to the C<check>.
     id      => "my_health_check",
     label   => "My Health Check",
     runtime => "0.000",
+    runbook => 'https://grantstreetgroup.github.io/HealthCheck.html',
     tags    => [ "cheap", "easy" ],
     status  => "WARNING",
     results => [
@@ -817,6 +834,10 @@ The unique id for this check.
 =item label
 
 A human readable name for this check.
+
+=item runbook
+
+A runbook link to help troubleshooting if the status is not OK.
 
 =back
 
@@ -956,7 +977,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 - 2020 by Grant Street Group.
+This software is Copyright (c) 2017 - 2022 by Grant Street Group.
 
 This is free software, licensed under:
 

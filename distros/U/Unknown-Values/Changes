@@ -1,5 +1,8 @@
 Revision history for Perl extension Unknown::Values.
 
+0.101   January 12,2021
+        - Fix some POD. No functional change.
+
 0.100   December 29, 2021
         - Breaking change: stringification of unknown values is now fatal
           This is to case fatal errors if you try to use an unknown value as a

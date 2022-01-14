@@ -1,7 +1,7 @@
 #
 # This file is part of App-Cme
 #
-# This software is Copyright (c) 2014-2021 by Dominique Dumont.
+# This software is Copyright (c) 2014-2022 by Dominique Dumont <ddumont@cpan.org>.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 # ABSTRACT: Run a cme script
 
 package App::Cme::Command::run ;
-$App::Cme::Command::run::VERSION = '1.034';
+$App::Cme::Command::run::VERSION = '1.036';
 use strict;
 use warnings;
 use v5.20;
@@ -24,8 +24,9 @@ use Encode qw(decode_utf8);
 use App::Cme -command ;
 
 use base qw/App::Cme::Common/;
-use experimental qw/signatures/;
-no warnings qw(experimental::smartmatch experimental::signatures);
+use feature qw/postderef signatures/;
+no warnings qw/experimental::postderef experimental::signatures experimental::smartmatch/;
+
 
 my $__test_home = '';
 # used only by tests
@@ -44,7 +45,7 @@ push @script_paths, path($INC{"Config/Model.pm"})->parent->child("Model/scripts"
 sub opt_spec {
     my ( $class, $app ) = @_;
     return ( 
-        [ "arg=s@"  => "script argument. run 'cme run $app -doc' for possible arguments" ],
+        [ "arg=s@"  => "script argument. run 'cme run <script> -doc' for possible arguments" ],
         [ "backup:s"  => "Create a backup of configuration files before saving." ],
         [ "commit|c:s" => "commit change with passed message" ],
         [ "cat" => "Show the script file" ],
@@ -264,7 +265,7 @@ sub execute {
     }
 
     # check if workspace and index are clean
-    if ($commit_msg) {
+    if ($commit_msg and not $opt->{no_commit}) {
         ## no critic(InputOutput::ProhibitBacktickOperators)
         my $r = `git status --porcelain --untracked-files=no`;
         die "Cannot run commit command in a non clean repo. Please commit or stash pending changes: $r\n"
@@ -277,10 +278,15 @@ sub execute {
     my ($model, $inst, $root) = $self->init_cme($opt,$app_args);
     map { $root->load($_) } $script_data->{load}->@*;
 
+    unless ($inst->needs_save) {
+        say "No change were applied";
+        return;
+    }
+
     $self->save($inst,$opt) ;
 
     # commit if needed
-    if ($commit_msg and not $opt->{'no-commit'}) {
+    if ($commit_msg and not $opt->{no_commit}) {
         system(qw/git commit -a -m/, $commit_msg);
     }
 
@@ -288,7 +294,7 @@ sub execute {
 }
 
 package App::Cme::Run::Var; ## no critic (Modules::ProhibitMultiplePackages)
-$App::Cme::Run::Var::VERSION = '1.034';
+$App::Cme::Run::Var::VERSION = '1.036';
 require Tie::Hash;
 
 ## no critic (ClassHierarchies::ProhibitExplicitISA)
@@ -316,7 +322,7 @@ App::Cme::Command::run - Run a cme script
 
 =head1 VERSION
 
-version 1.034
+version 1.036
 
 =head1 SYNOPSIS
 
@@ -582,7 +588,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014-2021 by Dominique Dumont.
+This software is Copyright (c) 2014-2022 by Dominique Dumont <ddumont@cpan.org>.
 
 This is free software, licensed under:
 

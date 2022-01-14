@@ -58,14 +58,17 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Git::Helpers" : "0.000016"
+         },
          "requires" : {
             "Browser::Open" : "0",
             "Getopt::Long" : "0",
-            "Git::Helpers" : "0.000016",
             "Module::Runtime" : "0",
             "Module::Util" : "0.016",
             "Path::Tiny" : "0",
             "Pod::Usage" : "0",
+            "Try::Tiny" : "0",
             "URI" : "0",
             "perl" : "v5.12.0",
             "strict" : "0",
@@ -74,7 +77,8 @@
       },
       "test" : {
          "recommends" : {
-            "CPAN::Meta" : "2.120900"
+            "CPAN::Meta" : "2.120900",
+            "Git::Helpers" : "0.000016"
          },
          "requires" : {
             "Carp::Always" : "0",
@@ -82,6 +86,7 @@
             "File::Spec" : "0",
             "Test::Differences" : "0",
             "Test::More" : "0",
+            "Test::Needs" : "0",
             "Test::Requires::Git" : "0",
             "Test::Script" : "1.29",
             "Test::Simple" : "1.302177",
@@ -103,10 +108,10 @@
          "web" : "https://github.com/oalders/open-this"
       }
    },
-   "version" : "0.000029",
+   "version" : "0.000030",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.030003"
+         "version" : "5.030002"
       },
       "plugins" : [
          {
@@ -658,7 +663,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.000029",
+                  "tag" : "v0.000030",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
@@ -756,11 +761,33 @@
             "class" : "Dist::Zilla::Plugin::Prereqs",
             "config" : {
                "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "runtime",
+                  "type" : "recommends"
+               }
+            },
+            "name" : "RuntimeRecommends",
+            "version" : "6.024"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
                   "phase" : "test",
                   "type" : "requires"
                }
             },
             "name" : "TestRequires",
+            "version" : "6.024"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "test",
+                  "type" : "recommends"
+               }
+            },
+            "name" : "TestRecommends",
             "version" : "6.024"
          },
          {
@@ -836,8 +863,8 @@
       "Olaf Alders <olaf.alders@gmail.com>",
       "Olaf Alders <olaf@wundersolutions.com>"
    ],
-   "x_generated_by_perl" : "v5.30.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_generated_by_perl" : "v5.30.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1
 }

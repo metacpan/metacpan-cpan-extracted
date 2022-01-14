@@ -20,6 +20,12 @@ use DynaLoader;
 
 
 
+
+#line 10 "pnm.pd"
+
+use strict;
+use warnings;
+
 =head1 NAME
 
 PDL::IO::Pnm -- pnm format I/O for PDL
@@ -48,41 +54,10 @@ use File::Temp qw( tempfile );
 sub dmax {
     my $type = shift;
     my $sz = 8*howbig($type);
-    $sz-- if ($type == $PDL_S || $type == $PDL_L);  # signed types
+    $sz-- if !PDL::Type->new($type)->unsigned;
     return ((1 << $sz)-1);
 }
-
-# output any errors that have accumulated
-sub show_err {
-  my ($file,$showflag) = @_;
-  my $err;
-  $showflag = 1 unless defined $showflag;
-  if (-s "$file") {
-    open(INPUT,$file) or barf "Can't open error file";
-    if ($showerr) {
-      while (<INPUT>) {
-       print STDERR "converter: $_";
-      }} else {
-       $err = join('',<INPUT>);
-    }
-  }
-  close INPUT;
-  unlink $file;
-  return $err unless $showflag;
-}
-
-# barf after showing any accumulated errors
-sub rbarf {
-  my $err = show_err(shift, 0);
-  $err = '' unless defined $err;
-  barf @_,"converter error: $err";
-}
-
-# carp after showing any accumulated errors
-sub rcarp {
-  show_err(shift);
-  carp @_;
-}
+#line 61 "Pnm.pm"
 
 
 
@@ -96,6 +71,8 @@ sub rcarp {
 
 
 
+#line 1059 "../../blib/lib/PDL/PP.pm"
+
 
 =head2 pnminraw
 
@@ -103,7 +80,6 @@ sub rcarp {
 
   Signature: (type(); byte+ [o] im(m,n); int ms => m; int ns => n;
 			int isbin; PerlIO *fp)
-
 
 
 =for ref
@@ -116,7 +92,6 @@ the appropriate type conversion (maybe we want a byte+ here so that
 C<im> follows I<strictly> the type of C<type>).
 
 
-
 =for bad
 
 pnminraw does not process bad values.
@@ -124,16 +99,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 103 "Pnm.pm"
 
 
 
-
-
-
+#line 1061 "../../blib/lib/PDL/PP.pm"
 *pnminraw = \&PDL::pnminraw;
+#line 109 "Pnm.pm"
 
 
 
+#line 1059 "../../blib/lib/PDL/PP.pm"
 
 
 =head2 pnminascii
@@ -149,7 +125,6 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 Read in an ascii pnm file.
 
 
-
 =for bad
 
 pnminascii does not process bad values.
@@ -157,16 +132,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 136 "Pnm.pm"
 
 
 
-
-
-
+#line 1061 "../../blib/lib/PDL/PP.pm"
 *pnminascii = \&PDL::pnminascii;
+#line 142 "Pnm.pm"
 
 
 
+#line 1059 "../../blib/lib/PDL/PP.pm"
 
 
 =head2 pnmout
@@ -184,7 +160,6 @@ This function is implemented this way so that threading works
 naturally.
 
 
-
 =for bad
 
 pnmout does not process bad values.
@@ -192,18 +167,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
+#line 171 "Pnm.pm"
 
 
 
-
-
-
+#line 1061 "../../blib/lib/PDL/PP.pm"
 *pnmout = \&PDL::pnmout;
+#line 177 "Pnm.pm"
 
 
 
 
 
+#line 48 "pnm.pd"
 =head2 rpnm
 
 =for ref
@@ -214,7 +190,7 @@ Read a pnm (portable bitmap/pixmap, pbm/ppm) file into an ndarray.
 
   Usage:  $im = rpnm $file;
 
-Reads a file in pnm format (ascii or raw) into a pdl (magic numbers P1-P6).
+Reads a file (or open file-handle) in pnm format (ascii or raw) into a pdl (magic numbers P1-P6).
 Based on the input format it returns pdls with arrays of size (width,height)
 if binary or grey value data (pbm and pgm) or (3,width,height) if rgb
 data (ppm). This also means for a palette image that the distinction between
@@ -244,106 +220,73 @@ inplace transpose/inversion that way.
 sub rpnm {PDL->rpnm(@_)}
 sub PDL::rpnm {
     barf 'Usage: $im = rpnm($file) or $im = $pdl->rpnm($file)'
-       if $#_<0 || $#_>2;
-    my ($pdl,$file,$maybe) = @_;
+       if !@_ || @_>3;
+    my $pdl = ref($_[1]) && UNIVERSAL::isa($_[1], 'PDL')
+      ? (splice @_, 0, 2)[1] : shift->initialize;
+    my $file = shift;
 
-
-    if (ref($file)) { # $file is really a pdl in this case
-	$pdl = $file;
-	$file = $maybe;
+    my $fh;
+    if (ref $file) {
+      $fh = $file;
     } else {
-        $pdl = $pdl->initialize;
+      open $fh, $file or barf "Can't open pnm file '$file': $!";
     }
-
-    my ($errfh, $efile) = tempfile();
-    # catch STDERR
-    open(SAVEERR, ">&STDERR");
-    open(STDERR, ">$efile") || barf "Can't redirect stderr";
-    my $succeed = open(my $fh, $file);
-    # redirection now in effect for child
-    # close(STDERR);
-    open(STDERR, ">&PDL::IO::Pnm::SAVEERR");
-    rbarf $efile,"Can't open pnm file '$file'" unless $succeed;
     binmode $fh;
 
     read($fh,(my $magic),2);
-    rbarf $efile, "Oops, this is not a PNM file" unless $magic =~ /P[1-6]/;
+    barf "Oops, this is not a PNM file" unless $magic =~ /P([1-6])/;
+    my $magicno = $1;
     print "reading pnm file with magic $magic\n" if $PDL::debug>1;
 
-    my ($isrgb,$israw,$params) = (0,0,3);
-    $israw = 1 if $magic =~ /P[4-6]/;
-    $isrgb = 1 if $magic =~ /P[36]/;
-    if ($magic =~ /P[14]/) {  # PBM data
-	$params = 2;
-	$dims[2] = 1; }
-
+    my $israw = $magicno > 3 ? 1 : 0;
+    my $isrgb = ($magicno % 3) == 0;
+    my $ispbm = ($magicno % 3) == 1;
+    my ($params, @dims) = ($ispbm ? 2 : 3, 0, 0, $ispbm ? 1 : 0);
     # get the header information
-    my ($line, $pgot, @dims) = ("",0,0,0,0);
-    while (($pgot<$params) && ($line=<$fh>)) {
+    my $pgot = 0;
+    while (($pgot<$params) && defined(my $line=<$fh>)) {
        $line =~ s/#.*$//;
 	next if $line =~ /^\s*$/;    # just white space
 	while ($line !~ /^\s*$/ && $pgot < $params) {
 	    if ($line =~ /\s*(\S+)(.*)$/) {
 		$dims[$pgot++] = $1; $line = $2; }
 	    else {
-		rbarf $efile, "no valid header info in pnm";}
+		barf "no valid header info in pnm";}
 	}
     }
-
-    my $type = $PDL_B;
-    do {
-TYPES:	{  my $pdlt;
-	   foreach $pdlt ($PDL_B,$PDL_US,$PDL_L){
-	     if ($dims[2] <= dmax($pdlt))
-	       { $type = $pdlt;
-	         last TYPES;
-	       }
-	   }
-	   rbarf $efile, "rraw: data from ascii pnm file out of range";
-        }
-    };
-
     # the file ended prematurely
-    rbarf $efile, "no valid header info in pnm" if $pgot < $params;
-    rbarf $efile,
-        "Dimensions must be > 0" if ($dims[0] <= 0) || ($dims[1] <= 0);
+    barf "no valid header info in pnm" if $pgot < $params;
+    barf "Dimensions must be > 0" if ($dims[0] <= 0) || ($dims[1] <= 0);
+
+    my ($type) = grep $dims[2] <= dmax($_), $PDL_B,$PDL_US,$PDL_L;
+    barf "rraw: data from ascii pnm file out of range" if !defined $type;
 
     my @Dims = @dims[0,1];
     $Dims[0] *= 3 if $isrgb;
-    if ($pdl->getndims==1 && $pdl->getdim(0)==0 && $isrgb) { #input pdl is null
-	local $PDL::debug = 0; # shut up
-	$pdl = $pdl->zeroes(PDL::Type->new($type),3,@dims[0,1]);
-    }
+    $pdl = $pdl->zeroes(PDL::Type->new($type),3,@dims[0,1])
+      if $pdl->isnull and $isrgb;
     my $npdl = $isrgb ? $pdl->clump(2) : $pdl;
     if ($israw) {
        pnminraw (convert(pdl(0),$type), $npdl, $Dims[0], $Dims[1],
-	 $magic eq "P4", $fh);
+	 $ispbm, $fh);
     } else {
-       my $form = $1 if $magic =~ /P([1-3])/;
        pnminascii (convert(pdl(0),$type), $npdl, $Dims[0], $Dims[1],
-	$form, $fh);
+	$magicno, $fh);
     }
     print("loaded pnm file, $dims[0]x$dims[1], gmax: $dims[2]",
 	   $isrgb ? ", RGB data":"", $israw ? ", raw" : " ASCII"," data\n")
 	if $PDL::debug;
-    unlink($efile);
 
     # need to byte swap for little endian platforms
-    unless ( isbigendian() ) {
-       if ($israw ) {
-          $pdl->bswap2 if $type==$PDL_US or $pdl->type == ushort;
-          $pdl->bswap4 if $type==$PDL_L;  # not likely, but supported anyway
-       }
-    }
+    $pdl->type->bswap->($pdl) if !isbigendian() and $israw;
     return $pdl;
 }
-
 
 =head2 wpnm
 
 =for ref
 
-Write a pnm (portable bitmap/pixmap, pbm/ppm) file into a file.
+Write a pnm (portable bitmap/pixmap, pbm/ppm) file into a file or open file-handle.
 
 =for usage
 
@@ -364,19 +307,18 @@ packages.
 
 =cut
 
+my %type2base = (PBM => 1, PGM => 2, PPM => 3);
 *wpnm = \&PDL::wpnm;
 sub PDL::wpnm {
     barf ('Usage: wpnm($pdl,$filename,$format[,$raw]) ' .
 	   'or $pdl->wpnm($filename,$format[,$raw])') if $#_ < 2;
     my ($pdl,$file,$type,$raw) = @_;
-    my ($israw,$max,$isrgb,$magic) = (0,255,0,"");
+    barf "wpnm: unknown format '$type'" if !exists $type2base{$type};
 
     # need to copy input arg since bswap[24] work inplace
     # might be better if the bswap calls detected if run in
     # void context
     my $swap_inplace = $pdl->is_inplace;
-
-    barf "wpnm: unknown format '$type'" if $type !~ /P[PGB]M/;
 
     # check the data
     my @Dims = $pdl->dims;
@@ -384,45 +326,37 @@ sub PDL::wpnm {
 	if ($type =~ /PPM/) && (($#Dims != 2) || ($Dims[0] != 3));
     barf "wpnm: expecting 2D (w,h) input"
 	if ($type =~ /P[GB]M/) && ($#Dims != 1);
-    barf "wpnm: user should convert float and double data to appropriate type"
-	if ($pdl->get_datatype == $PDL_F) || ($pdl->get_datatype == $PDL_D);
-    barf "wpnm: expecting prescaled data"
-	if (($pdl->get_datatype != $PDL_B) || ($pdl->get_datatype != $PDL_US)) &&
-	    ($pdl->min < 0);
+    barf "wpnm: user should convert float etc data to appropriate type"
+	if !$pdl->type->integer;
+    my $max = $pdl->max;
+    barf "wpnm: expecting prescaled data (0-65535)"
+	if $pdl->min < 0 or $max > 65535;
 
     # check for raw format
-    $israw = 1 if (($pdl->get_datatype == $PDL_B) || ($pdl->get_datatype == $PDL_US) || ($type =~ /PBM/));
-    $israw = 0 if (defined($raw) && !$raw);
+    my $israw =
+      (defined($raw) && !$raw) ? 0 :
+      (($pdl->get_datatype == $PDL_B) || ($pdl->get_datatype == $PDL_US) || ($type eq 'PBM')) ? 3 :
+      0;
 
-
-    $magic = $israw ? "P4" : "P1" if $type =~ /PBM/;
-    $magic = $israw ? "P5" : "P2" if $type =~ /PGM/;
-    $magic = $israw ? "P6" : "P3" if $type =~ /PPM/;
-    $isrgb = 1 if $magic =~ /P[36]/;
-
-    # catch STDERR and sigpipe
-    my ($errfh, $efile) = tempfile();
-    local $SIG{"PIPE"} = sub { show_err($efile);
-			       die "Bad write to pipe $? $!"; };
+    my $magic = 'P' . ($type2base{$type} + $israw);
+    my $isrgb = $type eq 'PPM';
 
     my $pref = ($file !~ /^\s*[|>]/) ? ">" : "";  # test for plain file name
-    open(SAVEERR, ">&STDERR");
-    open(STDERR, ">$efile") || barf "Can't redirect stderr";
-    my $succeed = open(my $fh, $pref . $file);
-    # close(STDERR);
-    open(STDERR, ">&PDL::IO::Pnm::SAVEERR");
-    rbarf $efile, "Can't open pnm file" unless $succeed;
+    my ($already_open, $fh) = 0;
+    if (ref $file) {
+      $fh = $file, $already_open = 1;
+    } else {
+      open $fh, $pref . $file or barf "Can't open pnm file: $!";
+    }
     binmode $fh;
 
-    $max =$pdl->max;
     print "writing ". ($israw ? "raw" : "ascii") .
       "format with magic $magic, max=$max\n" if $PDL::debug;
     # write header
     print $fh "$magic\n";
     print $fh "$Dims[-2] $Dims[-1]\n";
-    if ($type !~ /PBM/) {	# fix maxval for raw output formats
+    if ($type ne 'PBM') {	# fix maxval for raw output formats
        my $outmax = 0;
-
        if ($max < 256) {
           $outmax =   "255";
        } elsif ($max < 65536) {
@@ -430,34 +364,20 @@ sub PDL::wpnm {
        } else {
           $outmax = $max;
        };
-
-       print $fh "$outmax\n" unless $type =~ /PBM/;
+       print $fh "$outmax\n";
     };
 
     # if rgb clump first two dims together
     my $out = ($isrgb ? $pdl->slice(':,:,-1:0')->clump(2)
 		 : $pdl->slice(':,-1:0'));
-
     # handle byte swap issues for little endian platforms
-    unless ( isbigendian() ) {
-       if ($israw ) {
-          # make copy if needed
-          $out = $out->copy unless $swap_inplace;
-          if ( (255 < $max) and ($max < 65536)) {
-             $out->bswap2;
-          } elsif ($max >= 65536) {
-             $out->bswap4;
-          }
-       }
+    if (!isbigendian() and $israw) {
+      $out = $out->copy unless $swap_inplace;
+      $out->type->bswap->($out);
     }
     pnmout($out,$israw,$type eq "PBM",$fh);
-
     # check if our child returned an error (in case of a pipe)
-    if (!(close $fh)) {
-      my $err = show_err($efile,0);
-      barf "wpnm: pbmconverter error: $err";
-    }
-    unlink($efile);
+    barf "wpnm: pbmconverter error: $!" if !$already_open and !close $fh;
 }
 
 
@@ -467,10 +387,6 @@ sub PDL::wpnm {
 1;
 
 =head1 BUGS
-
-The stderr of the converters is redirected to a file. The filename is
-currently generated in a probably non-portable way. A method that avoids
-a file (and is portable) would be preferred.
 
 C<rpnm> currently relies on the fact that the header is separated
 from the image data by a newline. This is not required by the p[bgp]m
@@ -492,6 +408,7 @@ the copyright notice should be included in the file.
 
 
 ############################## END PM CODE ################################
+#line 412 "Pnm.pm"
 
 
 

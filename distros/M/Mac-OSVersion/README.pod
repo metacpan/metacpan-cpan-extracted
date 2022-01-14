@@ -19,7 +19,7 @@ for any Perl module.
 
 To read about L<Mac::OSVersion>, look at the embedded documentation
 in the module itself. Inside the distribution, you can format it
-with L<perldoc|https://perldoc.perl.orgperldoc.html>:
+with L<perldoc|https://perldoc.perl.org/perldoc.html>:
 
 	% perldoc lib/Mac/OSVersion.pm
 

@@ -798,7 +798,25 @@ sub PDL::pdl { my $x = shift; return $x->new(@_) }
 
 =for ref
 
-Turn on/off dataflow
+Turn on dataflow, forward only. This means any transformations (a.k.a. PDL
+operations) applied to this ndarray afterwards will have forward dataflow:
+
+  $x = sequence 3;
+  $x->doflow;
+  $y = $x + 1;
+  $x += 3;
+  print "$y\n"; # [4 5 6]
+
+As of 2.064, the core API does I<not> automatically sever transformations
+that have forward dataflow into them:
+
+  # following from the above
+  $y->set(1, 9); # value now [4 9 6]
+  $x += 11;
+  print "$y\n"; # [15 16 17] - previously would have been [4 9 6]
+
+If you want to sever such transformations, call L</sever> on the child
+ndarray (above, C<$y>).
 
 =for usage
 
@@ -809,7 +827,6 @@ Turn on/off dataflow
 sub PDL::doflow {
 	my $this = shift;
 	$this->set_dataflow_f(1);
-	$this->set_dataflow_b(1);
 }
 
 =head2 flows
@@ -2119,7 +2136,7 @@ a list ref containing several of them, or a string containing several of them),
 then the copy is coerced into the first preferred type listed if it is not
 already one of the preferred types.
 
-Note that if the inplace flag is set, no coersion happens even if you specify
+Note that if the inplace flag is set, no coercion happens even if you specify
 a preferred type.
 
 =cut
@@ -2321,14 +2338,16 @@ for details on using ndarrays in the dimensions list.
 sub zeroes { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? PDL::zeroes($_[0]) : PDL->zeroes(@_) }
 sub PDL::zeroes {
     my $class = shift;
-    if (ref $class and UNIVERSAL::isa($class, 'PDL') and $class->is_inplace) {
+    my $ispdl = ref $class && UNIVERSAL::isa($class, 'PDL');
+    if ($ispdl and $class->is_inplace) {
         $class .= 0; # resets the "inplace"
         return $class;
     }
-    my $type = ref($_[0]) eq 'PDL::Type' ? ${shift @_}[0]  : $PDL_D;
-    my @dims = _dims_from_args(
-      ref $class && UNIVERSAL::isa($class, 'PDL') && !@_ ? $class->dims : @_
-    );
+    my $type =
+      ref($_[0]) eq 'PDL::Type' ? ${shift @_}[0] :
+      $ispdl ? $class->get_datatype :
+      $PDL_D;
+    my @dims = _dims_from_args($ispdl && !@_ ? $class->dims : @_);
     my $pdl = $class->initialize();
     $pdl->set_datatype($type);
     $pdl->setdims(\@dims);
@@ -2370,10 +2389,12 @@ for details on using ndarrays in the dimensions list.
 
 =cut
 
+sub _construct {
+    @_>1 ? $_[0]->new_from_specification(@_[1..$#_]) : $_[0]->new_or_inplace;
+}
 sub ones { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? PDL::ones($_[0]) : PDL->ones(@_) }
 sub PDL::ones {
-    my $class = shift;
-    my $pdl = scalar(@_)? $class->new_from_specification(@_) : $class->new_or_inplace;
+    my $pdl = &_construct;
     $pdl.=1;
     return $pdl;
 }
@@ -2401,8 +2422,7 @@ for details on using ndarrays in the dimensions list.
 
 sub nan { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? PDL::nan($_[0]) : PDL->nan(@_) }
 sub PDL::nan {
-    my $class = shift;
-    my $pdl = scalar(@_)? $class->new_from_specification(@_) : $class->new_or_inplace;
+    my $pdl = &_construct;
     $pdl .= PDL::_nan();
     return $pdl;
 }
@@ -2430,8 +2450,7 @@ for details on using ndarrays in the dimensions list.
 
 sub inf { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? PDL::inf($_[0]) : PDL->inf(@_) }
 sub PDL::inf {
-    my $class = shift;
-    my $pdl = scalar(@_)? $class->new_from_specification(@_) : $class->new_or_inplace;
+    my $pdl = &_construct;
     $pdl .= PDL::_inf();
     return $pdl;
 }
@@ -2543,10 +2562,10 @@ then the connection is first severed.
 
 *reshape = \&PDL::reshape;
 sub PDL::reshape{
-    if (@_ == 2 && $_[1] == -1) {  # a slicing reshape that drops 1-dims
-	return $_[0]->slice( map { $_==1 ? [0,0,0] : [] } $_[0]->dims);
-    }
     my $pdl = topdl($_[0]);
+    if (@_ == 2 && $_[1] == -1) {  # a slicing reshape that drops 1-dims
+	return $pdl->slice( map $_==1 ? [0,0,0] : [], $pdl->dims);
+    }
     $pdl->sever;
     my $nelem = $pdl->nelem;
     my @dims = grep defined, @_[1..$#_];
@@ -2614,39 +2633,35 @@ Generic datatype conversion function
 
 =for usage
 
- $y = convert($x, $newtypenum);
+ $y = convert($x, $newtype);
+
+C<$newtype> is a type number or L<PDL::Type> object, for convenience they are
+returned by C<long()> etc when called without arguments.
 
 =for example
 
- $y = convert $x, long
- $y = convert $x, ushort
-
-C<$newtype> is a type B<number>, for convenience they are
-returned by C<long()> etc when called without arguments.
+ $y = convert $x, long;
+ $y = convert $x, ushort;
 
 =cut
-
-# type to type conversion functions (with automatic conversion to pdl vars)
 
 sub PDL::convert {
   # we don't allow inplace conversion at the moment
   # (not sure what needs to be changed)
-  barf 'Usage: $y = convert($x, $newtypenum)'."\n" if $#_!=1;
+  barf 'Usage: $y = convert($x, $newtype)'."\n" if @_ != 2;
   my ($pdl,$type)= @_;
-  $pdl = pdl($pdl) unless ref $pdl; # Allow normal numbers
+  $pdl = topdl($pdl); # Allow normal numbers
   $type = $type->enum if ref($type) eq 'PDL::Type';
-  barf 'Usage: $y = convert($x, $newtypenum)'."\n" unless Scalar::Util::looks_like_number($type);
+  barf 'Usage: $y = convert($x, $newtype)'."\n" unless Scalar::Util::looks_like_number($type);
   return $pdl if $pdl->get_datatype == $type;
-  # make_physical-call: temporary stopgap to work around core bug
-  my $conv = $pdl->flowconvert($type)->make_physical->sever;
-  return $conv;
+  $pdl->_convert_int($type)->sever;
 }
 
 =head2 Datatype_conversions
 
 =for ref
 
-byte|short|ushort|long|indx|longlong|float|double|cfloat|cdouble (shorthands to convert datatypes)
+sbyte|byte|short|ushort|long|ulong|indx|longlong|ulonglong|float|double|ldouble|cfloat|cdouble|cldouble (shorthands to convert datatypes)
 
 =for usage
 
@@ -3002,7 +3017,7 @@ return a single value from an ndarray as a scalar, ignoring whether it is bad.
   $val = $x(10)->sclr;
   $val = sclr inner($x,$y);
 
-The C<sclr> method is useful to turn an ndarray into a normal Perl
+The C<sclr> method is useful to turn a single-element ndarray into a normal Perl
 scalar. Its main advantage over using C<at> for this purpose is the fact
 that you do not need to worry if the ndarray is 0D, 1D or higher dimensional.
 Using C<at> you have to supply the correct number of zeroes, e.g.
@@ -3013,43 +3028,16 @@ Using C<at> you have to supply the correct number of zeroes, e.g.
   print $y->at(); # error: needs at least one zero
 
 C<sclr> is generally used when a Perl scalar is required instead
-of a one-element ndarray. If the input is a multielement ndarray
-the first value is returned as a Perl scalar. You can optionally
-switch on checks to ensure that the input ndarray has only one element:
-
-  PDL->sclr({Check => 'warn'}); # carp if called with multi-el pdls
-  PDL->sclr({Check => 'barf'}); # croak if called with multi-el pdls
-
-are the commands to switch on warnings or raise an error if
-a multielement ndarray is passed as input. Note that these options
-can only be set when C<sclr> is called as a class method (see
-example above). Use
-
-  PDL->sclr({Check=>0});
-
-to switch these checks off again (default setting);
-When called as a class method the resulting check mode is returned
-(0: no checking, 1: warn, 2: barf).
+of a one-element ndarray. As of 2.064, if the input is a multielement ndarray
+it will throw an exception.
 
 =cut
 
-my $chkmode = 0; # default mode no checks
-use PDL::Options;
 sub PDL::sclr {
   my $this = shift;
-  if (ref $this) { # instance method
-    carp "multielement ndarray in 'sclr' call"
-      if ($chkmode == 1 && $this->nelem > 1);
-    croak "multielement ndarray in 'sclr' call"
-      if ($chkmode == 2 && $this->nelem > 1);
-    return sclr_c($this);
-  } else {  # class method
-    my $check = (iparse({Check=>0},ifhref($_[0])))[1];
-    if (lc($check) eq 'warn') {$chkmode = 1}
-    elsif (lc($check) eq 'barf') {$chkmode = 2}
-    else {$chkmode = $check != 0 ? 1 : 0}
-    return $chkmode;
-  }
+  confess "multielement ndarray in 'sclr' call"
+    if $this->nelem > 1;
+  return sclr_c($this);
 }
 
 =head2 cat
@@ -3258,15 +3246,11 @@ The output ndarrays are set bad if the original ndarray has its bad flag set.
 =cut
 
 sub PDL::dog {
-  my $opt = pop @_ if ref($_[-1]) eq 'HASH';
+  my $opt = ref($_[-1]) eq 'HASH' ? pop @_ : {};
   my $p = shift;
-  my @res; my $s = ":,"x($p->getndims-1);
-  for my $i (0..$p->getdim($p->getndims-1)-1) {
-     $res[$i] = $p->slice($s."(".$i.")");
-     $res[$i] = $res[$i]->copy if $$opt{Break};
-     $i++;
-  }
-  return @res;
+  my $s = ":,"x($p->getndims-1);
+  my @res = map $p->slice($s."(".$_.")"), 0..$p->dim(-1)-1;
+  $$opt{Break} ? map $_->copy, @res : @res
 }
 
 ###################### Misc internal routines ####################
@@ -3940,7 +3924,7 @@ sub PDL::set_data_by_file_map {
       if ($PDL::debug) {
          printf STDERR "set_data_by_file_map: length \${\$pdl_dataref} is %d.\n", length ${$pdl_dataref};
       }
-      $pdl->set_donttouchdata;
+      $pdl->set_donttouchdata($len);
 
    } else {
 

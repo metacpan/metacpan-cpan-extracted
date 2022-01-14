@@ -9,8 +9,10 @@ use Test2::Require::Module 'Regexp::Pattern::License' => '3.6.0';
 
 plan 2;
 
-my $app = App::Licensecheck->new( shortname_scheme => 'debian,spdx' );
-$app->lines(0);
+my $app = App::Licensecheck->new(
+	shortname_scheme => 'debian,spdx',
+	top_lines        => 0,
+);
 
 my ( $license, $copyright ) = $app->parse('t/devscripts/texinfo.tex');
 like $license,

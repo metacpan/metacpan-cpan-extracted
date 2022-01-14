@@ -47,13 +47,6 @@
  *
  * Slightly more detailed information:
  * ----------------------------------------------------------------------*
- * void fft_free (void);
- *
- * free-up allocated temporary storage after finished all the Fourier
- * transforms.
- *
- * ----------------------------------------------------------------------*
- *
  * int fftn (int ndim, const int dims[], REAL Re[], REAL Im[],
  *	    int iSign, double scaling);
  *
@@ -90,23 +83,28 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-   extern void fft_free (void);
-
    /* double precision routine */
-   extern int fftn (int /* ndim */,
-		    const int /* dims */[],
+   extern int fftn (size_t /* ndim */,
+		    const size_t /* dims */[],
 		    double /* Re */[],
 		    double /* Im */[],
 		    int /* isign */,
 		    double /* scaling */);
 
    /* float precision routine */
-   extern int fftnf (int /* ndim */,
-		     const int /* dims */[],
+   extern int fftnf (size_t /* ndim */,
+		     const size_t /* dims */[],
 		     float /* Re */[],
 		     float /* Im */[],
 		     int   /* isign */,
 		     float /* scaling */);
+
+   extern int fftnl (size_t /* ndim */,
+		     const size_t /* dims */[],
+		     long double /* Re */[],
+		     long double /* Im */[],
+		     int   /* isign */,
+		     long double /* scaling */);
 
 #ifdef __cplusplus
 }

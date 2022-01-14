@@ -160,16 +160,6 @@ qx.Class.define("callbackery.ui.form.Auto", {
                         }
                     });
                     this.setSelectBoxData(s.key,cfg.structure);
-
-                    // to be removed as soon as fritz.zaucker@oetiker.ch
-                    // has cleaned up the Camas application (fz, 2021-05-05)
-                    // set initial selection
-                    if (s.set && s.set.modelSelection) {
-                        console.error('FRITZ! Do NOT use set => { value => ...} in formCfg!');
-                        let sel = s.set.modelSelection;
-                        delete s.set.modelSelection;
-                        control.setValue(this._selectBoxKeyToItem[s.key][sel]);
-                    }
                     break;
 
                 case 'comboBox':
@@ -373,9 +363,6 @@ qx.Class.define("callbackery.ui.form.Auto", {
             }
             else {
                 data.forEach(function(item,i){
-                    // if (item.key == selectionKey) {
-                    //     newSelectionIndex = i;
-                    // }
                     item.title = item.title != null 
                         ? this.xtr(item.title) 
                         : null;

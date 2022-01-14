@@ -18,15 +18,18 @@ use Pod::Wordlist;
 add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
+19481514
 Alexey
 AutoCommit
 Avatica
 Client
 Denis
 Ibaev
+Ivan
 JDBC
 PreparedStatement
 Protobuf
+Putintsev
 QueryState
 ReadOnly
 ResultSet
@@ -36,3 +39,5 @@ TypedValue
 dionys
 lib
 logioniz
+uid
+uid66

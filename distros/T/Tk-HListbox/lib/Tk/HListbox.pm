@@ -156,18 +156,18 @@ the indicator image will appear to the left of the entry.
 
 Subroutine reference to be invoked when an indicator image is clicked.
 
-=item Name: B<-ipadx> => I<number>
+=item Name: B<-ipadx>
 
 Specify horizontal padding style in pixels around the image 
 for the rows in the listbox which are type I<image> or I<imagetext>.
 Default:  B<0>
 
-=item Name: B<-ipady> => I<number>
+=item Name: B<-ipady>
 
 Specify vertical padding style in pixels around the image 
 for the rows in the listbox which are type I<image> or I<imagetext>.
 NOTE:  This changes the height of the affected rows.
-Default:  B<0>
+Default:  B<1> (and setting to B<0> is the same as B<1>).
 
 =item Name:	B<itemType>
 
@@ -223,6 +223,15 @@ The value of the option may be arbitrary, but the default bindings
 expect it to be either B<single>, B<browse>, B<multiple>, 
 B<extended> or B<dragdrop>;  the default value is B<browse>.
 
+=item Name: B<-showcursoralways> => I<boolean>
+
+Starting with version 2.4, Tk::HListbox no longer displays the keyboard 
+cursor (active element) when the HListbox widget does not have the 
+keyboard focus, in order to be consistent with the behaviour of 
+Tk::Listbox.  This option, when set to 1 (or a "true" value) restores 
+the pre-v2.4 behaviour of always showing the keyboard cursor.
+Default I<0> (False).
+
 =item Name:	B<state>
 
 =item Class:	B<State>
@@ -246,7 +255,7 @@ Default:  B<2>
 Specify vertical padding style in pixels around the text 
 for the rows in the listbox which are type I<text>.  
 NOTE:  This changes the height of the affected rows.
-Default:  B<2>
+Default (seems to be):  B<2> (and setting to B<0> is the same as B<2>).
 
 =item Name:	B<width>
 
@@ -1144,7 +1153,7 @@ Jim Turner, C<< <https://metacpan.org/author/TURNERJW> >>.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2015-2018 Jim Turner C<< <mailto://turnerjw784@yahoo.com> >>.
+Copyright (c) 2015-2022 Jim Turner C<< <mailto://turnerjw784@yahoo.com> >>.
 All rights reserved.  
 
 This program is free software; you can redistribute 
@@ -1169,7 +1178,7 @@ use Tk;
 use Tk::ItemStyle;
 use base qw(Tk::Derived Tk::HList);
 use vars qw($VERSION @Selection $Prev $tixIndicatorArmed);
-$VERSION = '2.3';
+$VERSION = '2.42';
 
 Tk::Widget->Construct('HListbox');
 
@@ -1231,6 +1240,8 @@ sub ClassInit
 	$mw->bind($class,'<2>',['scan','mark',Ev('x'),Ev('y')]);
 	$mw->bind($class,'<B2-Motion>',['scan','dragto',Ev('x'),Ev('y')]);
 	$mw->bind($class,'<Return>', ['InvokeCommand']);
+	$mw->bind($class,'<FocusIn>','focus');
+	$mw->bind($class,'<FocusOut>','unfocus');
 	$mw->MouseWheelBind($class); # XXX Both needed?
 	$mw->YMouseWheelBind($class);
 
@@ -1243,6 +1254,7 @@ sub Populate {
 	$w->toplevel->bind('<<setPalette>>' => [$w => 'fixPalette']);
 	$w->{Configure}{'-font'} = $args->{'-font'}   #MUST ACTUALLY SET THE HList "DEFAULT" FONT FOR BOTH PLATFORMS!:
 			|| ($bummer ? "{MS Sans Serif} 8" : "Helvetica -12 bold");
+	$w->{'-showcursoralways'} = delete($args->{'-showcursoralways'})  if (defined $args->{'-showcursoralways'});
 	$w->SUPER::Populate($args);
 	$w->ConfigSpecs(
 			-background    => [qw/METHOD background Background/, $Tk::NORMAL_BG],
@@ -1262,6 +1274,7 @@ sub Populate {
 			-listvariable  => [qw/PASSIVE listVariable Variable undef/],
 			-state         => [qw/METHOD state   State normal/],
 			-font          => [qw/METHOD font    Font/],
+			-showcursoralways    => [qw/PASSIVE/],
 	);
 
 	#EMULATE "-listvariable" USING THE TIE FEATURE:
@@ -1285,6 +1298,8 @@ sub Populate {
 	}
 	$w->configure('-activeforeground' => $args->{'-activeforeground'})  if ($args->{'-activeforeground'});
 	$w->configure('-selectforeground' => $args->{'-selectforeground'})  if ($args->{'-selectforeground'});
+	$w->{'_lastactive'} = undef;
+	$w->{'_hasfocus'} = 0;
 }
 
 sub fixPalette {     #WITH OUR setPalette, WE CAN CATCH PALETTE CHANGES AND ADJUST EVERYTHING ACCORDINGLY!:
@@ -1439,7 +1454,7 @@ sub state {  #SINCE HList DOESN'T SUPPORT STATES (NORMAL, DISABLED), WE MUST HAN
 
 	#THE STUPID HList WIDGET IS BROKEN: WON'T TAKE STATE CHANGE?!  $w->Tk::HList::configure('-state' => $val);
 	#SO WE HAVE TO "EMULATE" IT OURSELVES MANUALLY - GRRRRRRRR!:
-	return  if ($val eq $w->{'_prevstate'});  #DON'T DO TWICE IN A ROW!
+	return  if (defined($w->{'_prevstate'}) && $val eq $w->{'_prevstate'});  #DON'T DO TWICE IN A ROW!
 
 	$w->{'_statechg'} = 1;
 	if ($val =~ /d/o) {               #WE'RE DISABLING (SAVE CURRENT ENABLED STATUS STUFF, THEN DISABLE USER-INTERACTION):
@@ -1518,12 +1533,13 @@ sub selectionClear {
 }
 
 sub anchorSet {  #HList's "anchor" is it's (active) cursor, so we use a "virtual anchor" for ours.
+	my ($w) = shift;
 	return  if ($w->{Configure}{'-state'} =~ /d/o);
-	return  unless (defined($_[1]) && $_[1] =~ /\S/o);
+	return  unless (defined($_[0]) && $_[0] =~ /\S/o);
 
-	my $ent = $_[0]->getEntry($_[1]);
-	$_[0]->{'_vanchor'} = (!defined($ent) || $_[0]->entrycget($ent, '-state') eq 'disabled' || $_[0]->info('hidden', $ent))
-			? undef : $_[0]->index($_[1]);
+	my $ent = $w->getEntry($_[0]);
+	$w->{'_vanchor'} = (!defined($ent) || $w->entrycget($ent, '-state') eq 'disabled' || $w->info('hidden', $ent))
+			? undef : $w->index($_[0]);
 }
 
 sub anchorClear {
@@ -1535,14 +1551,26 @@ sub selectionAnchor {  #SET THE SELECTION ANCHOR (Listbox's version of HList's "
 
 	$_[0]->anchorSet($_[1]);
 }
+
 sub activate {    #HListbox "anchor" == Listbox "active"!
 	my ($w) = shift;
 	return  if ($w->{Configure}{'-state'} =~ /d/o);
 
 	my @v = @_;
+	return  unless (defined($v[0]) || $w->{'-showcursoralways'});
 	my $ent = $w->getEntry($v[0]);
-	$w->Tk::HList::anchorSet($ent)
-			unless ($w->entrycget($ent, '-state') eq 'disabled' || $w->info('hidden', $ent));
+	unless ($w->entrycget($ent, '-state') eq 'disabled' || $w->info('hidden', $ent)) {
+		if (defined($v[0]) && defined($ent)) {
+			if ($w->{'-showcursoralways'} || $w->{'_hasfocus'}) {
+				$w->Tk::HList::anchorSet($ent);
+			} else {
+				$w->Tk::HList::anchorClear($ent);
+				$w->{'_lastactive'} = $w->indexOf($ent);
+			}
+		} else {
+			$w->Tk::HList::anchorClear();
+		}
+	}
 }
 
 sub curselection { 
@@ -1765,7 +1793,7 @@ sub getLastEntry {
 sub getEntry {    #GIVEN A VALID LISTBOX "INDEX", RETURN THE EQUIVALENT HList "ENTRY" (NUMERIC, BUT NOT ZERO-BASED!):
 	my ($w, $index) = @_;
 
-	return $w->getLastEntry  if ($index =~ /^end/io);
+	return $w->getLastEntry  if (defined($index) && $index =~ /^end/io);
 	$index = $w->index($index);
 	my $next = $w->getFirstEntry;
 	my $next0;
@@ -1804,7 +1832,8 @@ sub indexOf {  #GIVEN A VALID HList "ENTRY", RETURN IT'S RELATIVE (TO ZERO=1ST) 
 	return undef;   #ENTRY DOES NOT EXIST!			
 }
 
-sub index {    #GIVEN A VALIE "LISTBOX INDEX", RETURN A ZERO-BASED "INDEX" (CONVERTS STUFF LIKE "@x,y", "end". etc:
+sub index {    #GIVEN A VALUE "LISTBOX INDEX", RETURN A ZERO-BASED "INDEX" (CONVERTS STUFF LIKE "@x,y", "end". etc:
+	my $w = $_[0];
 	if ($_[1] =~ /^\d+$/o) {
 		return $_[1];
 	} elsif (!$_[1]) {
@@ -1814,7 +1843,7 @@ sub index {    #GIVEN A VALIE "LISTBOX INDEX", RETURN A ZERO-BASED "INDEX" (CONV
 	} elsif ($_[1] =~ /^anchor/o) {
 		return $_[0]->{'_vanchor'};
 	} elsif ($_[1] =~ /^active/o) {
-		return $_[0]->indexOf($_[0]->info('anchor'));
+		return ($w->{'-showcursoralways'} || $w->{'_hasfocus'}) ? $_[0]->indexOf($_[0]->info('anchor')) : $w->{'_lastactive'};
 	} elsif ($_[1] =~ /^\@\d+\,(\d+)/o) {
 		return $_[0]->indexOf($_[0]->nearest($1));
 	}
@@ -2623,7 +2652,7 @@ sub BeginExtend    #JWT: SELECT FROM ACTIVE TO THE ONE WE CLICKED ON (INCLUSIVE)
 
 	if ($ENV{'jwtlistboxhack'}) {
 		if ($w->cget('-selectmode') =~ /^extended/o) {
-			my $active = $w->index('active');
+			my $active = $w->index('active') || $w->index('anchor') || 0;
 			if ($el == $active) {  #IF CLICKED ON ACTIVE, TOGGLE SELECT-STATUS:
 				if ($w->selectionIncludes($el))
 				{
@@ -2815,6 +2844,27 @@ sub hide
 sub bbox
 {
 	return $_[0]->infoBbox($_[0]->getEntry($_[1]));
+}
+
+sub focus
+{
+	my $w = shift;
+	$w->Tk::focus;
+	return  if ($w->{'-showcursoralways'});
+
+	$w->{'_hasfocus'} = 1;
+	#RESTORE CURSOR WHEN FOCUS IS GAINED:
+	$w->activate($w->index('active') || $w->{'_lastactive'}); #  if (defined($w->{'_lastactive'}) && $w->{'_lastactive'} >= 0);
+}
+
+sub unfocus
+{
+	return  if ($w->{'-showcursoralways'});
+	my $w = shift;
+
+	$w->{'_lastactive'} = $w->index('active');
+	$w->{'_hasfocus'} = 0;
+	$w->activate($w->{'_lastactive'});
 }
 
 1
