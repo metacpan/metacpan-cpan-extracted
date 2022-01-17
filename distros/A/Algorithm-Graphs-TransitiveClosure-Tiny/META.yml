@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Algorithm-Graphs-TransitiveClosure-Tiny
-version:            0.03
+version:            1.00
 abstract:           Calculate the transitive closure.
 author:
     - Abdul al Hazred <451@gmx.eu>

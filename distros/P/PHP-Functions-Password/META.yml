@@ -21,14 +21,13 @@ no_index:
     - inc
 requires:
   Crypt::Argon2: '0.004'
-  Crypt::Eksblowfish: '0'
+  Crypt::Bcrypt: '0'
   Crypt::OpenSSL::Random: '0'
   MIME::Base64: '0'
   Readonly: '2'
   perl: '5.01'
-  version: '0.77'
 resources:
   bugtracker: https://github.com/cmanley/p5-PHP-Functions-Password/issues
   repository: https://github.com/cmanley/p5-PHP-Functions-Password.git
-version: '1.12'
+version: '1.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

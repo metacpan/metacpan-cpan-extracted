@@ -10,7 +10,7 @@ use App::HomeBank2Ledger::Util qw(commify rtrim);
 
 use parent 'App::HomeBank2Ledger::Formatter';
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 my %STATUS_SYMBOLS = (
     cleared => '*',
@@ -131,16 +131,18 @@ sub _format_transaction {
 
     my $account_width = $self->account_width;
 
-    my $date        = $transaction->{date};
-    my $status      = $transaction->{status};
-    my $payee       = $self->_format_string($transaction->{payee} || '');
-    my $memo        = $self->_format_string($transaction->{memo}  || '');
-    my @postings    = @{$transaction->{postings}};
+    my $date        = $transaction->{date} or _croak 'Transaction date is required';
+    my $aux_date    = $transaction->{aux_date} || $transaction->{effective_date} || '';
+    my $status      = $transaction->{status} // '';
+    my $code        = $transaction->{code};
+    my $payee       = $self->_format_string($transaction->{payee});
+    my $note        = $self->_format_string($transaction->{note} // $transaction->{memo});
+    my @postings    = @{$transaction->{postings} || _croak 'At least one transaction posting is required'};
 
     my @out;
 
     # figure out the Ledger transaction status
-    my $status_symbol = $STATUS_SYMBOLS{$status || ''};
+    my $status_symbol = $STATUS_SYMBOLS{$status};
     if (!$status_symbol) {
         my %posting_statuses = map { ($_->{status} || '') => 1 } @postings;
         if (keys(%posting_statuses) == 1) {
@@ -149,17 +151,28 @@ sub _format_transaction {
         }
     }
 
-    $payee =~ s/(?:  )|\t;/ ;/g;    # don't turn into a memo
+    $aux_date = '' if $date eq $aux_date;
+    $code =~ s/[\(\)]+// if defined $code;
+    $payee =~ s/(?:  )|\t;/ ;/g if defined $payee;    # don't turn into a note
 
-    push @out, sprintf('%s%s%s%s', $date,
-        $status_symbol && " ${status_symbol}",
-        $payee         && " $payee",
-        $memo          && "  ; $memo",
+    my $has_code = defined $code && $code ne '';
+    my $has_payee = defined $payee && $payee ne '';
+    my $has_note = defined $note && $note ne '';
+
+    push @out, join('', $date,
+        $aux_date               && "=${aux_date}",
+        $status_symbol          && " ${status_symbol}",
+        $has_code               && " (${code})",
+        $has_payee              && " ${payee}",
+        $has_note && $has_payee && "  ; ${note}",
     );
+    if ($has_note && !$has_payee) {
+        push @out, "    ; ${note}";
+    }
 
     my $metadata = $transaction->{metadata} || {};
     for my $key (sort keys %$metadata) {
-        my $value = $self->_format_string($metadata->{$key});
+        my $value = $self->_format_string($metadata->{$key}) ;
         push @out, "    ; ${key}: ${value}";
     }
 
@@ -176,15 +189,21 @@ sub _format_transaction {
         push @line, '  ';
         if (defined $posting->{amount}) {
             push @line, $self->_format_amount($posting->{amount}, $posting->{commodity});
-            if (my $price = $posting->{lot_price}) {
-                my $is_fixed = $posting->{lot_fixed};
+            my $lot = $posting->{lot} || {};
+            if (my $lot_price = $lot->{price} // $posting->{lot_price}) {
+                my $is_fixed = $lot_price->{fixed} // $posting->{lot_fixed};
                 my $fixed_symbol = $is_fixed ? '=' : '';
                 push @line, " {${fixed_symbol}",
-                            $self->_format_amount($price->{amount}, $price->{commodity}),
+                            $self->_format_amount($lot_price->{amount}, $lot_price->{commodity}),
                             '}';
             }
-            if (my $lot_date = $posting->{lot_date}) {
-                push @line, " [$posting->{lot_date}]";
+            if (my $lot_date = $lot->{date} // $posting->{lot_date}) {
+                push @line, " [${lot_date}]";
+            }
+            if (my $lot_note = $self->_format_string($lot->{note} // $posting->{lot_note} // '')) {
+                $lot_note =~ s/[\(\)]+//;   # cleanup
+                $lot_note =~ s/^\@+//;
+                push @line, " (${lot_note})" if $lot_note;
             }
             if (my $cost = $posting->{total_cost} // $posting->{cost}) {
                 my $is_total = defined $posting->{total_cost};
@@ -193,9 +212,22 @@ sub _format_transaction {
                             $self->_format_amount($cost->{amount}, $cost->{commodity});
             }
         }
-        if (my $note = $posting->{note}) {
-            $note = $self->_format_string($note);
-            push @line, "  ; $note" if $note ne $memo;
+        my $posting_date        = $posting->{date} || '';
+        my $posting_aux_date    = $posting->{aux_date} || '';
+        my $posting_note        = $self->_format_string($posting->{note} // $posting->{memo} // '');
+        $posting_date       = '' if $posting_date eq $date;
+        $posting_aux_date   = '' if $posting_aux_date eq $aux_date;
+        $posting_note       = '' if $has_note && $posting_note eq $note;
+        my $has_posting_note = defined $posting_note && $posting_note ne '';
+        if ($posting_date || $posting_aux_date || $has_posting_note) {
+            if ($posting_date || $posting_aux_date) {
+                $posting_note = sprintf('[%s%s]%s',
+                    $posting_date,
+                    $posting_aux_date && "=${posting_aux_date}",
+                    $has_posting_note && " ${posting_note}",
+                );
+            }
+            push @line, "  ; ${posting_note}";
         }
 
         push @out, join('', @line);
@@ -206,9 +238,8 @@ sub _format_transaction {
             push @out, "      ; ${key}: ${value}";
         }
 
-        if (my $posting_payee = $posting->{payee}) {
-            $posting_payee = $self->_format_string($posting_payee);
-            push @out, "      ; Payee: $posting_payee" if $posting_payee ne $payee;
+        if (my $posting_payee = $self->_format_string($posting->{payee} // '')) {
+            push @out, "      ; Payee: $posting_payee" if !$has_payee || $posting_payee ne $payee;
         }
 
         if (my @tags = @{$posting->{tags} || []}) {
@@ -223,7 +254,7 @@ sub _format_transaction {
 
 sub _format_string {
     my $self = shift;
-    my $str  = shift;
+    my $str  = shift // return;
     $str =~ s/\v//g;
     return $str;
 }
@@ -271,7 +302,7 @@ App::HomeBank2Ledger::Formatter::Ledger - Ledger formatter
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 DESCRIPTION
 

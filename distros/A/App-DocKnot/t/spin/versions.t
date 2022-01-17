@@ -19,8 +19,10 @@ use Test::More tests => 20;
 
 require_ok('App::DocKnot::Spin::Versions');
 
-# All dates in the sample data are in America/Los_Angeles.
-local $ENV{TZ} = 'America/Los_Angeles';
+# All dates in the sample data are in America/Los_Angeles.  Specify this in
+# the POSIX format in the hope this will also work on systems without tzinfo
+# installed.
+local $ENV{TZ} = 'PST8PDT,M3.2.0,M11.1.0';
 tzset();
 
 # Parse the file.

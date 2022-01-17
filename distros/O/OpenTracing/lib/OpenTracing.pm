@@ -4,7 +4,7 @@ package OpenTracing;
 use strict;
 use warnings;
 
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 no indirect;

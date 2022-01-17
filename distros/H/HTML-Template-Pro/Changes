@@ -342,3 +342,8 @@ Revision history for Perl extension HTML::Template::Pro.
 	- fixed memory leak in perl wrapper code. libhtmltmplpro
 	  was not affected by it.
 	- closed rt.cpan.org #140477 - 'Possible memory leak'
+
+0.9524 Sun Jan 16 22:36:21 EET 2022
+	- fixed misprint in error message
+	- closed rt.cpan.org #140731 - 'Misprint'
+

@@ -38,6 +38,8 @@ sub brik_properties {
          csv_encoded_fields => [ qw(fields) ],
          csv_object_fields => [ qw(fields) ],
          encoding => [ qw(utf8|ascii) ],
+         disable_deprecation_logging => [ qw(0|1) ],
+         es_version => [ qw(0|1) ],
          _es => [ qw(INTERNAL) ],
          _bulk => [ qw(INTERNAL) ],
          _scroll => [ qw(INTERNAL) ],
@@ -60,6 +62,8 @@ sub brik_properties {
          use_ignore_id => 0,
          use_type => 1,
          encoding => 'utf8',
+         disable_deprecation_logging => 0,
+         es_version => '7',
       },
       commands => {
          open => [ qw(nodes_list|OPTIONAL cxn_pool|OPTIONAL) ],
@@ -239,7 +243,7 @@ sub open {
    # Search::Elasticsearch::Role::Cxn
    #
 
-   my $es = Search::Elasticsearch->new(
+   my %args = (
       nodes => $nodes,
       cxn_pool => $cxn_pool,
       timeout => $timeout,
@@ -253,6 +257,12 @@ sub open {
       sniff_request_timeout => 15, # seconds, default 2
       #trace_to => 'Stderr',  # For debug purposes
    );
+
+   if ($self->disable_deprecation_logging) {
+      $args{deprecate_to} = ['File', '/dev/null'];
+   }
+
+   my $es = Search::Elasticsearch->new(%args);
    if (! defined($es)) {
       return $self->log->error("open: failed");
    }
@@ -390,7 +400,8 @@ sub open_scroll {
 
    my %args = (
       scroll => "${timeout}s",
-      scroll_in_qs => 1,  # By default (0), pass scroll_id in request body. When 1, pass 
+      # Starting with Search::Elasticsearch 7.x, scroll_in_qs does not exist anymore
+      #scroll_in_qs => 1,  # By default (0), pass scroll_id in request body. When 1, pass
                           # it in query string.
       index => $index,
       size => $size,
@@ -1059,18 +1070,6 @@ sub count {
    }
    else {
       eval {
-         my %this_args = (
-            index => $index,
-            search_type => 'count',
-            body => {
-               query => {
-                  match_all => {},
-               },
-            },
-         );
-         if ($self->use_type) {
-            $this_args{type} = $type;
-         }
          $r = $es->search(%args);
       };
    }
@@ -1115,11 +1114,16 @@ sub query {
    $self->brik_help_run_invalid_arg('query', $query, 'HASH') or return;
 
    my $timeout = $self->rtimeout;
+   my $es_version = $self->es_version;
 
    my %args = (
       index => $index,
       body => $query,
    );
+
+   if ($es_version == 7) {
+      $args{track_total_hits} = 'true';
+   }
 
    if (defined($hash)) {
       $self->brik_help_run_invalid_arg('query', $hash, 'HASH') or return;
@@ -1257,7 +1261,6 @@ sub delete_document {
    my $es = $self->_es;
    $self->brik_help_run_undef_arg('open', $es) or return;
    $self->brik_help_run_undef_arg('delete_document', $index) or return;
-   $self->brik_help_run_undef_arg('delete_document', $type) or return;
    $self->brik_help_run_undef_arg('delete_document', $id) or return;
 
    my %args = (
@@ -3872,6 +3875,11 @@ sub get_hits_total {
 
    if (ref($run) eq 'HASH') {
       if (exists($run->{hits}) && exists($run->{hits}{total})) {
+         # In ES 7.x, total is now a hash. We rewrite it to only keep the
+         # number:
+         if (ref($run->{hits}{total}) eq 'HASH') {
+            return $run->{hits}{total}{value};
+         }
          return $run->{hits}{total};
       }
    }
@@ -4290,7 +4298,7 @@ Template to write a new Metabrik Brik.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2020, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2022, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

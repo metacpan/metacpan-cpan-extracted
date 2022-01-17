@@ -8,17 +8,30 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(floyd_warshall);
 
-our $VERSION = '0.03';
+our $VERSION = '1.00';
 
 
 sub floyd_warshall {
-  my ($graph, $n) = @_;
+  my $graph    = shift;
+  my $delEmpty = !shift;
 
-  for (my $k = 0; $k < $n; ++$k) {
-    for (my $i = 0; $i < $n; ++$i) {
-      for (my $j = 0; $j < $n; ++$j) {
+  my @vertices = do {
+    my %vertices;
+    foreach my $v (keys(%$graph)) {
+      if (%{$graph->{$v}}) {
+        @vertices{$v, keys(%{$graph->{$v}})} = ();
+      } elsif ($delEmpty) {
+        delete $graph->{$v};
+      }
+    }
+    keys %vertices;
+  };
+  foreach my $k (@vertices) {
+    foreach my $i (@vertices) {
+      foreach my $j (@vertices) {
         $graph->{$i}->{$j} = undef if (exists($graph->{$k}) && exists($graph->{$k}->{$j}) &&
-                                       exists($graph->{$i}) && exists($graph->{$i}->{$k}));
+                                       exists($graph->{$i}) && exists($graph->{$i}->{$k})
+                                       && !exists($graph->{$i}->{$j}));
       }
     }
   }
@@ -42,7 +55,7 @@ Algorithm::Graphs::TransitiveClosure::Tiny - Calculate the transitive closure.
 
 =head1 VERSION
 
-Version 0.03
+Version 1.00
 
 
 =head1 SYNOPSIS
@@ -71,8 +84,12 @@ The latter can also be written shorter provided you accept autovivification:
 
 =head1 DESCRIPTION
 
-This is taken from L<Algorithm::Graphs::TransitiveClosure>. The difference
-is that this implementation of C<floyd_warshall()>:
+This module provides a single function, C<floyd_warshall>, which is exported
+on demand. It is an implementation of the well known I<Floyd-Warshall>
+algorithm computing the transitive closure of a graph.
+
+The code is taken from L<Algorithm::Graphs::TransitiveClosure> but has been
+modified. The difference is that this implementation of C<floyd_warshall()>:
 
 =over
 
@@ -87,13 +104,7 @@ C<exists()> (but for the input hash you are not forced to use C<undef>),
 
 =item *
 
-assumes that the hash keys are integers 0, ..., I<N>-1 (for some positive
-integer I<N>) and this I<N> must be passed as second argument. This is needed
-to fix a problem in the original implementation (see next item).
-
-=item *
-
-The following problem of L<Algorithm::Graphs::TransitiveClosure> is resolved:
+fixes following problem of L<Algorithm::Graphs::TransitiveClosure>:
 
 Example:
 
@@ -102,8 +113,8 @@ Example:
             1 => { 0 => 1},
            };
 
-So there is a vertice from 0 to 2 and a vertice from 1 to 0. So the transitive
-closure would contain a vertice from 1 to 2. But calling C<floyd_warshall($g)>
+There is an edge from 0 to 2 and an edge from 1 to 0. So the transitive
+closure would contain an edge from 1 to 2. But calling C<floyd_warshall($g)>
 from L<Algorithm::Graphs::TransitiveClosure> results in:
 
            {
@@ -111,10 +122,9 @@ from L<Algorithm::Graphs::TransitiveClosure> results in:
             1 => { 0 => 1},
            }
 
-No change. The vertice from 1 to 2 is missing (you would need to add
-C<2=E<gt>{}> to C<$g> to get it right). But if you call C<floyd_warshall($g,
-3)> from C<Algorithm::Graphs::TransitiveClosure::Tiny>, then the result is
-correct:
+No change. The edge from 1 to 2 is missing (you would need to add C<2=E<gt>{}>
+to C<$g> to get it right). But if you call C<floyd_warshall($g)> from
+C<Algorithm::Graphs::TransitiveClosure::Tiny>, then the result is correct:
 
            {
             0 => { 2 => 1},
@@ -122,13 +132,36 @@ correct:
                    2 => undef},
            }
 
-Vertice from 1 to 2 has been added! (Also note that you could use 1 instead of
-C<undef> as hash value, but the value added by the function is C<undef> anyway!)
+Edge from 1 to 2 has been added! (Also note that you could use 1 instead of
+C<undef> as hash value, but the value added by the function is C<undef>
+anyway!)
+
+
+=item *
+
+By default, C<floyd_warshall($graph)> removes empty subhashes from C<$graph>,
+e.g.
+
+    my $graph = {
+                 this => {that => undef},
+                 that => {}
+                };
+    floyd_warshall($graph);
+
+will result in
+
+   {
+    this => {that => undef}
+   }
+
+This behavior can be changed by setting optional second argument of
+C<floyd_warshall> to a true value, i.e., calling C<floyd_warshall($graph, 1)>
+with the above example hash will not remove C<that =E<gt> {}>.
+
 
 =back
 
-
-For convenience, C<floyd_warshall($graph, $n)> returns C<$graph>.
+For convenience, C<floyd_warshall> returns C<$graph>.
 
 For further information refer to L<Algorithm::Graphs::TransitiveClosure>.
 

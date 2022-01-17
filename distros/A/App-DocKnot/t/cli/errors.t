@@ -10,9 +10,11 @@ use 5.024;
 use autodie;
 use warnings;
 
+use POSIX qw(LC_ALL setlocale);
 use Test::More tests => 11;
 
 # Isolate from the environment.
+setlocale(LC_ALL, 'C');
 local $ENV{XDG_CONFIG_HOME} = '/nonexistent';
 local $ENV{XDG_CONFIG_DIRS} = '/nonexistent';
 
@@ -61,7 +63,13 @@ is_error($@, 'generate-all: too many arguments', 'Too many arguments');
 
 # Trigger an error in a submodule to test error rewriting.
 eval { $docknot->run('generate', '-m', '/nonexistent', 'readme') };
-is_error($@, 'generate: metadata path /nonexistent does not exist');
+is_error(
+    $@,
+    (
+        'generate: can\'t open \'/nonexistent\' for input:'
+          . ' No such file or directory'
+    ),
+);
 
 # Check for a missing required argument.
 eval { $docknot->run('dist') };

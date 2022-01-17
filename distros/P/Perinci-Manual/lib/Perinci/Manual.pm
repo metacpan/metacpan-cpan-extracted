@@ -1,9 +1,9 @@
 package Perinci::Manual;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-28'; # DATE
+our $DATE = '2021-07-31'; # DATE
 our $DIST = 'Perinci-Manual'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 1;
 # ABSTRACT: Extra documentation for Perinci
@@ -20,7 +20,7 @@ Perinci::Manual - Extra documentation for Perinci
 
 =head1 VERSION
 
-This document describes version 0.006 of Perinci::Manual (from Perl distribution Perinci-Manual), released on 2021-07-28.
+This document describes version 0.007 of Perinci::Manual (from Perl distribution Perinci-Manual), released on 2021-07-31.
 
 =head1 DESCRIPTION
 

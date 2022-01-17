@@ -9,7 +9,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Spin::Thread 6.00;
+package App::DocKnot::Spin::Thread 6.01;
 
 use 5.024;
 use autodie;
@@ -17,9 +17,6 @@ use warnings;
 
 use App::DocKnot;
 use App::DocKnot::Util qw(print_fh);
-use Cwd qw(getcwd realpath);
-use File::Basename qw(fileparse);
-use File::Spec ();
 use Git::Repository ();
 use Image::Size qw(html_imgsize);
 use Path::Tiny qw(path);
@@ -89,19 +86,37 @@ my %COMMANDS = (
 # Input and output
 ##############################################################################
 
+# Determine the path to a file relative to the current file being processed.
+# If the current file being processed is standard input, the path is relative
+# to the current working directory.
+#
+# $path - File path as a string
+#
+# Returns: Path::Tiny object holding the absolute path
+sub _file_path {
+    my ($self, $file) = @_;
+    my $input_path = $self->{input}[-1][1];
+    if (defined($input_path)) {
+        my $path = $input_path->sibling($file);
+        return $path->exists() ? $path->realpath() : $path;
+    } else {
+        return path($file);
+    }
+}
+
 # Read a file and check it for bad line endings.
 #
-# $path - File path
+# $path - Path::Tiny object
 #
 # Returns: Contents of the file
 sub _read_file {
-    my ($self, $fh, $path) = @_;
-    my $text = slurp($fh);
+    my ($self, $path) = @_;
+    my $text = $path->slurp_utf8();
 
     # Check for broken line endings.
     if ("\n" !~ m{ \015 }xms && $text =~ m{ \015 }xms) {
         my $m = 'found CR characters; are your line endings correct?';
-        $self->_warning($m);
+        $self->_warning($m, $path);
     }
 
     # Return the contents.
@@ -159,15 +174,24 @@ sub _output {
 sub _fatal {
     my ($self, $problem) = @_;
     my (undef, $file, $lineno) = $self->{input}[-1]->@*;
+    $file //= q{-};
     die "$file:$lineno: $problem\n";
 }
 
 # Warn about a problem with the current file and line.
 #
 # $problem - Warning message to report
+# $file    - Optional path where the problem was seen, otherwise the current
+#            input file is used
 sub _warning {
-    my ($self, $problem) = @_;
-    my (undef, $file, $lineno) = $self->{input}[-1]->@*;
+    my ($self, $problem, $file) = @_;
+    my $lineno;
+    if (!defined($file)) {
+        (undef, $file, $lineno) = $self->{input}[-1]->@*;
+        $file //= q{-};
+    } else {
+        $lineno = 0;
+    }
     warn "$file:$lineno: $problem\n";
     return;
 }
@@ -637,9 +661,9 @@ sub _parse {
 # needs to access.
 #
 # $thread     - Thread to spin
-# $in_path    - Input file path if any, used for error reporting
+# $in_path    - Input file path as a Path::Tiny object, or undef
 # $out_fh     - Output file handle to which to write the HTML
-# $out_path   - Optional output file path for error reporting and page links
+# $out_path   - Output file path as a Path::Tiny object, or undef
 # $input_type - Optional one-word description of input type
 sub _parse_document {
     my ($self, $thread, $in_path, $out_fh, $out_path, $input_type) = @_;
@@ -653,7 +677,7 @@ sub _parse_document {
     $self->{input_type} = $input_type // 'thread';
     $self->{macro}      = {};
     $self->{out_fh}     = $out_fh;
-    $self->{out_path}   = $out_path // q{-};
+    $self->{out_path}   = $out_path;
     $self->{rss}        = [];
     $self->{space}      = q{};
     $self->{state}      = ['BLOCK'];
@@ -1019,9 +1043,9 @@ sub _cmd_heading {
     $style = $self->_parse($style);
 
     # Get the relative URL of the output page, used for sitemap information.
-    my $page = $self->{out_path};
-    if ($self->{output}) {
-        $page =~ s{ \A \Q$self->{output}\E }{}xms;
+    my $page;
+    if (defined($self->{out_path}) && defined($self->{output})) {
+        $page = $self->{out_path}->relative($self->{output});
     }
 
     # Build the page header.
@@ -1054,8 +1078,8 @@ sub _cmd_heading {
     }
 
     # Add <link> tags based on the sitemap.
-    if ($self->{sitemap}) {
-        my @links = $self->{sitemap}->links($page);
+    if ($self->{sitemap} && defined($page)) {
+        my @links = $self->{sitemap}->links("/$page");
         if (@links) {
             $output .= join(q{}, @links);
         }
@@ -1066,17 +1090,15 @@ sub _cmd_heading {
 
     # Add some generator comments.
     my $date = strftime('%Y-%m-%d %T -0000', gmtime());
-    my $from
-      = $self->{input}[-1][1] eq q{-}
-      ? q{}
-      : ' from ' . fileparse($self->{input}[-1][1]);
+    my $input_path = $self->{input}[-1][1];
+    my $from = defined($input_path) ? ' from ' . $input_path->basename() : q{};
     my $version = $App::DocKnot::VERSION;
     $output .= "<!-- Spun$from by DocKnot $version on $date -->\n";
 
     # Add the <body> tag and the navbar (if we have a sitemap).
     $output .= "\n<body>\n";
-    if ($self->{sitemap}) {
-        my @navbar = $self->{sitemap}->navbar($page);
+    if ($self->{sitemap} && defined($page)) {
+        my @navbar = $self->{sitemap}->navbar("/$page");
         if (@navbar) {
             $output .= join(q{}, @navbar);
         }
@@ -1096,7 +1118,8 @@ sub _cmd_image {
     $text = $self->_parse($text);
 
     # Determine the size attributes of the image if possible.
-    my $size = -e $image ? q{ } . lc(html_imgsize($image)) : q{};
+    my $path = $self->_file_path($image);
+    my $size = $path->exists() ? q{ } . lc(html_imgsize("$path")) : q{};
 
     # Generate the tag.
     my $output = qq{<img src="$image" alt="$text"$size};
@@ -1108,7 +1131,7 @@ sub _cmd_image {
 # not immediately, which may be a bit surprising.
 sub _cmd_include {
     my ($self, $file) = @_;
-    $file = realpath($self->_parse($file));
+    $file = $self->_file_path($self->_parse($file));
 
     # Read the thread, split it on paragraphs, and reverse it to make a stack.
     my $thread = $self->_read_file($file);
@@ -1242,33 +1265,34 @@ sub _cmd_rss {
 # address block.
 sub _cmd_signature {
     my ($self) = @_;
-    my $source = $self->{input}[-1][1];
+    my $input_path = $self->{input}[-1][1];
     my $output = $self->_border_end();
 
     # If we're spinning from standard input to standard output, don't add any
     # of the standard footer, just close the HTML tags.
-    if ($source eq q{-} && $self->{out_path} eq q{-}) {
+    if (!defined($input_path) && !defined($self->{out_path})) {
         $output .= "</body>\n</html>\n";
         return (1, $output);
     }
 
     # Add the end-of-page navbar if we have sitemap information.
     if ($self->{sitemap} && $self->{output}) {
-        my $page = $self->{out_path};
-        $page =~ s{ \A \Q$self->{output}\E }{}xms;
-        $output .= join(q{}, $self->{sitemap}->navbar($page)) . "\n";
+        my $page = $self->{out_path}->relative($self->{output});
+        $output .= join(q{}, $self->{sitemap}->navbar("/$page")) . "\n";
     }
 
     # Figure out the modification dates.  Use the Git repository if available.
     my $now = strftime('%Y-%m-%d', gmtime());
     my $modified = $now;
-    if ($source ne q{-}) {
-        $modified = strftime('%Y-%m-%d', gmtime((stat($source))[9]));
+    if (defined($input_path)) {
+        $modified = strftime('%Y-%m-%d', gmtime($input_path->stat()->[9]));
     }
     if ($self->{repository} && $self->{source}) {
-        if (path($self->{source})->subsumes(path($source))) {
+        if (path($self->{source})->subsumes($input_path)) {
             my $repository = $self->{repository};
-            $modified = $repository->run('log', '-1', '--format=%ct', $source);
+            $modified = $self->{repository}->run(
+                'log', '-1', '--format=%ct', "$input_path",
+            );
             if ($modified) {
                 $modified = strftime('%Y-%m-%d', gmtime($modified));
             }
@@ -1295,10 +1319,13 @@ sub _cmd_signature {
 # enough and doesn't seem worth the trouble of another dependency.
 sub _cmd_size {
     my ($self, $file) = @_;
-    $file = $self->_parse($file);
+    $file = $self->_file_path($self->_parse($file));
 
     # Get the size of the file.
-    my ($size) = (stat($file))[7];
+    my $size;
+    if ($file->exists()) {
+        $size = $file->stat()->[7];
+    }
     if (!defined($size)) {
         $self->_warning("cannot stat file $file: $!");
         return (0, q{});
@@ -1394,6 +1421,10 @@ sub _cmd_version {
 # Returns: Newly created object
 sub new {
     my ($class, $args_ref) = @_;
+    my $output;
+    if (defined($args_ref->{output})) {
+        $output = path($args_ref->{output});
+    }
 
     # Add a trailing slash to the partial URL for style sheets.
     my $style_url = $args_ref->{'style-url'} // q{};
@@ -1403,19 +1434,21 @@ sub new {
 
     # Use a Git::Repository object to get modification timestamps if a source
     # tree was specified and it appears to be a git repository.
-    my $source = $args_ref->{source};
-    my $repository;
-    if (defined($source) && -d File::Spec->catdir($source, '.git')) {
-        $repository = Git::Repository->new(work_tree => $source);
+    my ($source, $repository);
+    if (defined($args_ref->{source})) {
+        $source = path($args_ref->{source});
+        if ($source->child('.git')->is_dir()) {
+            $repository = Git::Repository->new(work_tree => "$source");
+        }
     }
 
     # Create and return the object.
     #<<<
     my $self = {
-        output     => $args_ref->{output},
+        output     => $output,
         repository => $repository,
         sitemap    => $args_ref->{sitemap},
-        source     => $args_ref->{source},
+        source     => $source,
         style_url  => $style_url,
         versions   => $args_ref->{versions},
     };
@@ -1427,14 +1460,15 @@ sub new {
 # Convert thread to HTML and return the output as a string.  The working
 # directory still matters for file references in the thread.
 #
-# $thread  - Thread to spin
+# $thread - Thread to spin
+# $input  - Optional input file path (for relative path and timestamps)
 #
 # Returns: Resulting HTML
 sub spin_thread {
-    my ($self, $thread) = @_;
+    my ($self, $thread, $input) = @_;
     my $result;
     open(my $out_fh, '>', \$result);
-    $self->_parse_document($thread, q{-}, $out_fh, q{-});
+    $self->_parse_document($thread, $input, $out_fh, undef);
     close($out_fh);
     return $result;
 }
@@ -1447,40 +1481,30 @@ sub spin_thread {
 # Raises: Text exception on processing error
 sub spin_thread_file {
     my ($self, $input, $output) = @_;
-    my $cwd = getcwd() or die "cannot get current directory: $!\n";
     my $out_fh;
     my $thread;
 
-    # Read the input file.  We do the work from the directory of the file to
-    # ensure that relative file references resolve properly.
+    # Read the input file.
     if (defined($input)) {
-        my $path = realpath($input) or die "cannot canonicalize $input: $!\n";
-        $input = $path;
-        $thread = slurp($input);
-        my (undef, $input_dir) = fileparse($input);
-        chdir($input_dir);
+        $input = path($input)->realpath();
+        $thread = $input->slurp_utf8();
     } else {
-        $input = q{-};
         $thread = slurp(\*STDIN);
     }
 
     # Open the output file.
     if (defined($output)) {
-        my $path = realpath($output)
-          or die "cannot canonicalize $output: $!\n";
-        $output = $path;
-        open($out_fh, '>', $output);
+        $output = path($output)->absolute();
+        $out_fh = $output->openw_utf8();
     } else {
-        $output = q{-};
         open($out_fh, '>&', 'STDOUT');
     }
 
     # Do the work.
     $self->_parse_document($thread, $input, $out_fh, $output);
 
-    # Clean up and restore the working directory.
+    # Clean up.
     close($out_fh);
-    chdir($cwd);
     return;
 }
 
@@ -1489,23 +1513,21 @@ sub spin_thread_file {
 # output from some other conversion process.
 #
 # $thread     - Thread to spin
-# $input      - Original input file (for modification timestamps)
+# $input      - Original input file path (for relative path and timestamps)
 # $input_type - One-word description of input type for the page footer
 # $output     - Output file
 #
 # Returns: Resulting HTML
 sub spin_thread_output {
     my ($self, $thread, $input, $input_type, $output) = @_;
+    $input = path($input);
 
     # Open the output file.
     my $out_fh;
     if (defined($output)) {
-        my $path = realpath($output)
-          or die "cannot canonicalize $output: $!\n";
-        $output = $path;
-        open($out_fh, '>', $output);
+        $output = path($output)->absolute();
+        $out_fh = $output->filehandle('>');
     } else {
-        $output = q{-};
         open($out_fh, '>&', 'STDOUT');
     }
 
@@ -1623,11 +1645,13 @@ data for the C<\release> and C<\version> commands.
 
 =over 4
 
-=item spin_thread(THREAD)
+=item spin_thread(THREAD[, INPUT])
 
 Convert the given thread to HTML, returning the result.  When run via this
 API, App::DocKnot::Spin::Thread will not be able to obtain sitemap information
 even if a sitemap was provided and therefore will not add inter-page links.
+INPUT, if given, is the full path to the original source file, used for
+relative paths and modification time information.
 
 =item spin_thread_file([INPUT[, OUTPUT]])
 
@@ -1647,8 +1671,9 @@ not given, write the results to standard output.  This is like spin_thread()
 but does use sitemap information and adds inter-page links.  It should be used
 when the thread input is the result of an intermediate conversion step of a
 known input file.  INPUT should be the full path to the original source file,
-used for modification time information.  TYPE should be set to a one-word
-description of the format of the input file and is used for the page footer.
+used for relative paths and modification time information.  TYPE should be set
+to a one-word description of the format of the input file and is used for the
+page footer.
 
 =back
 

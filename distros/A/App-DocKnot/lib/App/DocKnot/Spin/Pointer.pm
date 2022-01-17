@@ -10,7 +10,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Spin::Pointer 6.00;
+package App::DocKnot::Spin::Pointer 6.01;
 
 use 5.024;
 use autodie;
@@ -18,12 +18,13 @@ use parent qw(App::DocKnot);
 use warnings;
 
 use App::DocKnot::Config;
-use App::DocKnot::Util qw(is_newer print_fh);
+use App::DocKnot::Util qw(is_newer);
 use Carp qw(croak);
-use Encode qw(decode encode);
+use Encode qw(decode);
 use File::BaseDir qw(config_files);
 use IPC::System::Simple qw(capturex);
-use Kwalify qw(validate);
+use Path::Tiny qw(path);
+use Pod::Thread 3.01 ();
 use POSIX qw(strftime);
 use Template ();
 use YAML::XS ();
@@ -41,12 +42,13 @@ my $URL = 'https://www.eyrie.org/~eagle/software/web/';
 # $data_ref - Data from the pointer file
 #   path  - Path to the Markdown file to convert
 #   style - Style sheet to use
+# $base     - Base path of pointer file (for relative paths)
 # $output   - Path to the output file
 #
 # Throws: Text exception on conversion failure
 sub _spin_markdown {
-    my ($self, $data_ref, $output) = @_;
-    my $source = $data_ref->{path};
+    my ($self, $data_ref, $base, $output) = @_;
+    my $source = path($data_ref->{path})->absolute($base);
 
     # Do the Markdown conversion using pandoc.
     my $html = capturex(
@@ -63,13 +65,12 @@ sub _spin_markdown {
     # Construct the template variables.
     my ($links, $navbar, $style);
     if ($self->{sitemap}) {
-        my $page = $output;
-        $page =~ s{ \A \Q$self->{output}\E }{}xms;
-        my @links = $self->{sitemap}->links($page);
+        my $page = $output->relative($self->{output});
+        my @links = $self->{sitemap}->links("/$page");
         if (@links) {
             $links = join(q{}, @links);
         }
-        my @navbar = $self->{sitemap}->navbar($page);
+        my @navbar = $self->{sitemap}->navbar("/$page");
         if (@navbar) {
             $navbar = join(q{}, @navbar);
         }
@@ -82,7 +83,7 @@ sub _spin_markdown {
         docknot_url => $URL,
         html        => decode('utf-8', $html),
         links       => $links,
-        modified    => strftime('%Y-%m-%d', gmtime((stat($source))[9])),
+        modified    => strftime('%Y-%m-%d', gmtime($source->stat()->[9])),
         navbar      => $navbar,
         now         => strftime('%Y-%m-%d', gmtime()),
         style       => $style,
@@ -96,9 +97,7 @@ sub _spin_markdown {
       or croak($self->{template}->error());
 
     # Write the result to the output file.
-    open(my $outfh, '>', $output);
-    print_fh($outfh, $output, encode('utf-8', $result));
-    close($outfh);
+    $output->spew_utf8($result);
     return;
 }
 
@@ -110,18 +109,20 @@ sub _spin_markdown {
 #     navbar   - Whether to add a navigation bar
 #   path    - Path to the POD file to convert
 #   style   - Style sheet to use
+# $base     - Base path of pointer file (for relative paths)
 # $output   - Path to the output file
 #
 # Throws: Text exception on conversion failure
 sub _spin_pod {
-    my ($self, $data_ref, $output) = @_;
-    my $source = $data_ref->{path};
+    my ($self, $data_ref, $base, $output) = @_;
+    my $source = path($data_ref->{path})->absolute($base);
 
     # Construct the Pod::Thread formatter object.
     #<<<
     my %options = (
         contents => $data_ref->{options}{contents},
         style    => $data_ref->{style} // 'pod',
+        title    => $data_ref->{title},
     );
     #<<<
     if (exists($data_ref->{options}{navbar})) {
@@ -129,15 +130,12 @@ sub _spin_pod {
     } else {
         $options{navbar} = 1;
     }
-    if (exists($data_ref->{title})) {
-        $options{title} = $data_ref->{title};
-    }
     my $podthread = Pod::Thread->new(%options);
 
     # Convert the POD to thread.
     my $data;
     $podthread->output_string(\$data);
-    $podthread->parse_file($source);
+    $podthread->parse_file("$source");
 
     # Spin that page into HTML.
     $self->{thread}->spin_thread_output($data, $source, 'POD', $output);
@@ -192,8 +190,8 @@ sub new {
 
 # Check if the result of a pointer file needs to be regenerated.
 #
-# $pointer - Pointer file to process
-# $output  - Corresponding output path
+# $pointer - Path to pointer file
+# $output  - Path to corresponding output file
 #
 # Returns: True if the output file does not exist or has a modification date
 #          older than either the pointer file or the underlying source file,
@@ -201,31 +199,35 @@ sub new {
 #  Throws: YAML::XS exception on invalid pointer
 sub is_out_of_date {
     my ($self, $pointer, $output) = @_;
+    $pointer = path($pointer);
     my $data_ref = $self->load_yaml_file($pointer, 'pointer');
-    if (!-e $data_ref->{path}) {
-        die "$pointer: path $data_ref->{path} does not exist\n";
+    my $path = path($data_ref->{path})->absolute($pointer->parent());
+    if (!$path->exists()) {
+        die "$pointer: path $data_ref->{path} ($path) does not exist\n";
     }
-    return !is_newer($output, $pointer, $data_ref->{path});
+    return !is_newer($output, $pointer, $path);
 }
 
 # Process a given pointer file.
 #
-# $pointer - Pointer file to process
-# $output  - Corresponding output path
+# $pointer - Path to pointer file to process
+# $output  - Path to corresponding output file
 #
 # Throws: YAML::XS exception on invalid pointer
 #         Text exception for missing input file
 #         Text exception on failure to convert the file
 sub spin_pointer {
     my ($self, $pointer, $output, $options_ref) = @_;
+    $pointer = path($pointer);
+    $output = path($output);
     my $data_ref = $self->load_yaml_file($pointer, 'pointer');
     $data_ref->{options} //= {};
 
     # Dispatch to the appropriate conversion function.
     if ($data_ref->{format} eq 'markdown') {
-        $self->_spin_markdown($data_ref, $output);
+        $self->_spin_markdown($data_ref, $pointer->parent(), $output);
     } elsif ($data_ref->{format} eq 'pod') {
-        $self->_spin_pod($data_ref, $output);
+        $self->_spin_pod($data_ref, $pointer->parent(), $output);
     } else {
         die "$pointer: unknown output format $data_ref->{format}\n";
     }
@@ -263,7 +265,7 @@ App::DocKnot::Spin::Pointer - Generate HTML from a pointer to an external file
 =head1 REQUIREMENTS
 
 Perl 5.24 or later and the modules File::ShareDir, Kwalify, List::SomeUtils,
-Pod::Thread, and YAML::XS, all of which are available from CPAN.
+Path::Tiny, Pod::Thread, and YAML::XS, all of which are available from CPAN.
 
 =head1 DESCRIPTION
 

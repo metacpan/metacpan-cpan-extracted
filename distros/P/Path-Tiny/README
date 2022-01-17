@@ -2,7 +2,7 @@ NAME
     Path::Tiny - File path utility
 
 VERSION
-    version 0.120
+    version 0.122
 
 SYNOPSIS
       use Path::Tiny;
@@ -747,6 +747,32 @@ METHODS
     "$path->parent->child(...)".
 
     Current API available since 0.058.
+
+  size, size_human
+        my $p = path("foo"); # with size 1025 bytes
+
+        $p->size;                            # "1025"
+        $p->size_human;                      # "1.1 K"
+        $p->size_human( {format => "iec"} ); # "1.1 KiB"
+
+    Returns the size of a file. The "size" method is just a wrapper around
+    "-s".
+
+    The "size_human" method provides a human-readable string similar to "ls
+    -lh". Like "ls", it rounds upwards and provides one decimal place for
+    single-digit sizes and no decimal places for larger sizes. The only
+    available option is "format", which has three valid values:
+
+    *   'ls' (the default): base-2 sizes, with "ls" style single-letter
+        suffixes (K, M, etc.)
+
+    *   'iec': base-2 sizes, with IEC binary suffixes (KiB, MiB, etc.)
+
+    *   'si': base-10 sizes, with SI decimal suffixes (kB, MB, etc.)
+
+    If "-s" would return "undef", "size_human" returns the empty string.
+
+    Current API available since 0.122.
 
   slurp, slurp_raw, slurp_utf8
         $data = path("foo.txt")->slurp;

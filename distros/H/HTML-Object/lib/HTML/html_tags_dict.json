@@ -1,0 +1,1407 @@
+{
+   "dict" : {
+      "a" : {
+         "description" : "Defines a hyperlink",
+         "is_empty" : false,
+         "is_inline" : true,
+         "link_in" : [
+            "href"
+         ],
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a"
+      },
+      "abbr" : {
+         "description" : "Defines an abbreviation or an acronym",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/abbr"
+      },
+      "acronym" : {
+         "description" : "Defines an acronym. Not supported in HTML5. Use <abbr> instead. Not supported in HTML5. Use <abbr> instead.",
+         "is_deprecated" : true,
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/acronym"
+      },
+      "address" : {
+         "description" : "Defines contact information for the author/owner of a document",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/address"
+      },
+      "animate" : {
+         "description" : "The SVG <animate> element provides a way to animate an attribute of an element over time.",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/animate"
+      },
+      "animateMotion" : {
+         "description" : "The SVG <animateMotion> element provides a way to define how an element moves along a motion path.",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/animateMotion"
+      },
+      "animateTransform" : {
+         "description" : "The animateTransform element animates a transformation attribute on its target element, thereby allowing animations to control translation, scaling, rotation, and/or skewing.",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/animateTransform"
+      },
+      "applet" : {
+         "description" : "Defines an embedded applet. Not supported in HTML5. Use <embed> or <object> instead.",
+         "is_deprecated" : true,
+         "is_empty" : false,
+         "is_inline" : true,
+         "link_in" : [
+            "archive",
+            "codebase",
+            "code"
+         ],
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/applet"
+      },
+      "area" : {
+         "description" : "Defines an area inside an image map",
+         "is_empty" : true,
+         "is_inline" : true,
+         "link_in" : [
+            "href"
+         ],
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/area"
+      },
+      "article" : {
+         "description" : "Defines an article",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/article"
+      },
+      "aside" : {
+         "description" : "Defines content aside from the page content",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/aside"
+      },
+      "audio" : {
+         "description" : "Defines embedded sound content",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/audio"
+      },
+      "b" : {
+         "description" : "Defines bold text",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/b"
+      },
+      "base" : {
+         "description" : "Specifies the base URL/target for all relative URLs in a document",
+         "is_empty" : true,
+         "is_inline" : true,
+         "link_in" : [
+            "href"
+         ],
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base"
+      },
+      "basefont" : {
+         "description" : "Specifies a default color, size, and font for all text in a document. Not supported in HTML5. Use CSS instead.",
+         "is_deprecated" : true,
+         "is_empty" : true,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/basefont"
+      },
+      "bdi" : {
+         "description" : "Isolates a part of text that might be formatted in a different direction from other text outside it",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/bdi"
+      },
+      "bdo" : {
+         "description" : "Overrides the current text direction",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/bdo"
+      },
+      "bgsound" : {
+         "description" : "The background sound element",
+         "is_deprecated" : true,
+         "is_empty" : true,
+         "is_inline" : true,
+         "link_in" : [
+            "src"
+         ],
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/bgsound"
+      },
+      "big" : {
+         "description" : "Defines big text. Not supported in HTML5. Use CSS instead.",
+         "is_deprecated" : true,
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/big"
+      },
+      "blink" : {
+         "description" : "The blinking text element",
+         "is_deprecated" : true,
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/blink"
+      },
+      "blockquote" : {
+         "description" : "Defines a section that is quoted from another source",
+         "is_empty" : false,
+         "is_inline" : false,
+         "link_in" : [
+            "cite"
+         ],
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/blockquote"
+      },
+      "body" : {
+         "description" : "Defines the document's body",
+         "is_empty" : false,
+         "is_inline" : false,
+         "link_in" : [
+            "background"
+         ],
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/body"
+      },
+      "br" : {
+         "description" : "Defines a single line break",
+         "is_empty" : true,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/br"
+      },
+      "button" : {
+         "description" : "Defines a clickable button",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button"
+      },
+      "canvas" : {
+         "description" : "Used to draw graphics, on the fly, via scripting (usually JavaScript)",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas"
+      },
+      "caption" : {
+         "description" : "Defines a table caption",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/caption"
+      },
+      "center" : {
+         "description" : "Defines centered text. Not supported in HTML5. Use CSS instead.",
+         "is_deprecated" : true,
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/center"
+      },
+      "circle" : {
+         "description" : "The <circle> SVG element is an SVG basic shape, used to draw circles based on a center point and a radius.",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/circle"
+      },
+      "cite" : {
+         "description" : "Defines the title of a work",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/cite"
+      },
+      "clipPath" : {
+         "description" : "The <clipPath> SVG element defines a clipping path, to be used by the clip-path property.",
+         "is_empty" : false,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/clipPath"
+      },
+      "code" : {
+         "description" : "Defines a piece of computer code",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/code"
+      },
+      "col" : {
+         "description" : "Specifies column properties for each column within a <colgroup> element",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/col"
+      },
+      "colgroup" : {
+         "description" : "Specifies a group of one or more columns in a table for formatting",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/colgroup"
+      },
+      "comment" : {
+         "description" : "Defines a comment",
+         "is_empty" : false,
+         "is_inline" : true
+      },
+      "content" : {
+         "description" : "",
+         "is_deprecated" : true,
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/content"
+      },
+      "data" : {
+         "description" : "Adds a machine-readable translation of a given content",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/data"
+      },
+      "datalist" : {
+         "description" : "Specifies a list of pre-defined options for input controls",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/datalist"
+      },
+      "dd" : {
+         "description" : "Defines a description/value of a term in a description list",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dd"
+      },
+      "declaration" : {
+         "description" : "Defines the document type",
+         "is_empty" : true,
+         "is_inline" : false
+      },
+      "defs" : {
+         "description" : "The <defs> element is used to store graphical objects that will be used at a later time.",
+         "is_empty" : false,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/defs"
+      },
+      "del" : {
+         "description" : "Defines text that has been deleted from a document",
+         "is_empty" : false,
+         "is_inline" : true,
+         "link_in" : [
+            "cite"
+         ],
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/del"
+      },
+      "desc" : {
+         "description" : "The <desc> element provides an accessible, long-text description of any SVG container element or graphics element.",
+         "is_empty" : false,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/desc"
+      },
+      "details" : {
+         "description" : "Defines additional details that the user can view or hide",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/details"
+      },
+      "dfn" : {
+         "description" : "Specifies a term that is going to be defined within the content",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dfn"
+      },
+      "dialog" : {
+         "description" : "Defines a dialog box or window",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog"
+      },
+      "dir" : {
+         "description" : "Defines a directory list. Not supported in HTML5. Use <ul> instead.",
+         "is_deprecated" : true,
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dir"
+      },
+      "div" : {
+         "description" : "Defines a section in a document",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/div"
+      },
+      "dl" : {
+         "description" : "Defines a description list",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dl"
+      },
+      "dt" : {
+         "description" : "Defines a term/name in a description list",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dt"
+      },
+      "ellipse" : {
+         "description" : "The <ellipse> element is an SVG basic shape, used to create ellipses based on a center coordinate, and both their x and y radius.",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/ellipse"
+      },
+      "em" : {
+         "description" : "Defines emphasized textÂ ",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/em"
+      },
+      "embed" : {
+         "description" : "Defines a container for an external application",
+         "is_empty" : false,
+         "is_inline" : true,
+         "link_in" : [
+            "pluginspage",
+            "src"
+         ],
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/embed"
+      },
+      "feBlend" : {
+         "description" : "The <feBlend> SVG filter primitive composes two objects together ruled by a certain blending mode.",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feBlend"
+      },
+      "feColorMatrix" : {
+         "description" : "The <feColorMatrix> SVG filter element changes colors based on a transformation matrix.",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feColorMatrix"
+      },
+      "feComponentTransfer" : {
+         "description" : "The <feComponentTransfer> SVG filter primitive performs color-component-wise remapping of data for each pixel.",
+         "is_empty" : false,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feComponentTransfer"
+      },
+      "feComposite" : {
+         "description" : "The <feComposite> SVG filter primitive performs the combination of two input images pixel-wise in image space using one of the Porter-Duff compositing operations: over, in, atop, out, xor, lighter, or arithmetic.",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feComposite"
+      },
+      "feConvolveMatrix" : {
+         "description" : "The <feConvolveMatrix> SVG filter primitive applies a matrix convolution filter effect.",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feConvolveMatrix"
+      },
+      "feDiffuseLighting" : {
+         "description" : "The <feDiffuseLighting> SVG filter primitive lights an image using the alpha channel as a bump map. ",
+         "is_empty" : false,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feDiffuseLighting"
+      },
+      "feDisplacementMap" : {
+         "description" : "The <feDisplacementMap> SVG filter primitive uses the pixel values from the image from in2 to spatially displace the image from in.",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feDisplacementMap"
+      },
+      "feDistantLight" : {
+         "description" : "The <feDistantLight> filter primitive defines a distant light source that can be used within a lighting filter primitive: <feDiffuseLighting> or <feSpecularLighting>.",
+         "is_empty" : false,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feDistantLight"
+      },
+      "feFlood" : {
+         "description" : "The <feFlood> SVG filter primitive fills the filter subregion with the color and opacity defined by flood-color and flood-opacity.",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feFlood"
+      },
+      "feFuncA" : {
+         "description" : "The <feFuncA> SVG filter primitive defines the transfer function for the alpha component of the input graphic of its parent <feComponentTransfer> element.",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feFuncA"
+      },
+      "feFuncB" : {
+         "description" : "The <feFuncB> SVG filter primitive defines the transfer function for the blue component of the input graphic of its parent <feComponentTransfer> element.",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feFuncB"
+      },
+      "feFuncG" : {
+         "description" : "The <feFuncG> SVG filter primitive defines the transfer function for the green component of the input graphic of its parent <feComponentTransfer> element.",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feFuncG"
+      },
+      "feFuncR" : {
+         "description" : "The <feFuncR> SVG filter primitive defines the transfer function for the red component of the input graphic of its parent <feComponentTransfer> element.",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feFuncR"
+      },
+      "feGaussianBlur" : {
+         "description" : "The <feGaussianBlur> SVG filter primitive blurs the input image by the amount specified in stdDeviation, which defines the bell-curve.",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feGaussianBlur"
+      },
+      "feImage" : {
+         "description" : "The <feImage> SVG filter primitive fetches image data from an external source and provides the pixel data as output (meaning if the external source is an SVG image, it is rasterized.)",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feImage"
+      },
+      "feMerge" : {
+         "description" : "The <feMerge> SVG element allows filter effects to be applied concurrently instead of sequentially.",
+         "is_empty" : false,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feMerge"
+      },
+      "feMergeNode" : {
+         "description" : "The feMergeNode takes the result of another filter to be processed by its parent <feMerge>.",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feMergeNode"
+      },
+      "feMorphology" : {
+         "description" : "The <feMorphology> SVG filter primitive is used to erode or dilate the input image.",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feMorphology"
+      },
+      "feOffset" : {
+         "description" : "The <feOffset> SVG filter primitive allows to offset the input image.",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feOffset"
+      },
+      "fePointLight" : {
+         "description" : "The <fePointLight> filter primitive defines a light source which allows to create a point light effect.",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/fePointLight"
+      },
+      "feSpecularLighting" : {
+         "description" : "The <feSpecularLighting> SVG filter primitive lights a source graphic using the alpha channel as a bump map.",
+         "is_empty" : false,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feSpecularLighting"
+      },
+      "feSpotLight" : {
+         "description" : "The <feSpotLight> SVG filter primitive defines a light source which allows to create a spotlight effect.",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feSpotLight"
+      },
+      "feTile" : {
+         "description" : "The <feTile> SVG filter primitive allows to fill a target rectangle with a repeated, tiled pattern of an input image.",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feTile"
+      },
+      "feTurbulence" : {
+         "description" : "The <feTurbulence> SVG filter primitive creates an image using the Perlin turbulence function.",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feTurbulence"
+      },
+      "fieldset" : {
+         "description" : "Groups related elements in a form",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/fieldset"
+      },
+      "figcaption" : {
+         "description" : "Defines a caption for a <figure> element",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/figcaption"
+      },
+      "figure" : {
+         "description" : "Specifies self-contained content",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/figure"
+      },
+      "filter" : {
+         "description" : "The <filter> SVG element defines a custom filter effect by grouping atomic filter primitives.",
+         "is_empty" : false,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/filter"
+      },
+      "font" : {
+         "description" : "Defines font, color, and size for text. Not supported in HTML5. Use CSS instead.",
+         "is_deprecated" : true,
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/font"
+      },
+      "footer" : {
+         "description" : "Defines a footer for a document or section",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/footer"
+      },
+      "foreignObject" : {
+         "description" : "The <foreignObject> SVG element includes elements from a different XML namespace.",
+         "is_empty" : false,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/foreignObject"
+      },
+      "form" : {
+         "description" : "Defines an HTML form for user input",
+         "is_empty" : false,
+         "is_inline" : false,
+         "link_in" : [
+            "action"
+         ],
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/form"
+      },
+      "frame" : {
+         "description" : "Defines a window (a frame) in a frameset. Not supported in HTML5.",
+         "is_deprecated" : true,
+         "is_empty" : false,
+         "is_inline" : false,
+         "link_in" : [
+            "src",
+            "longdesc"
+         ],
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/frame"
+      },
+      "frameset" : {
+         "description" : "Defines a set of frames. Not supported in HTML5.",
+         "is_deprecated" : true,
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/frameset"
+      },
+      "g" : {
+         "description" : "The <g> SVG element is a container used to group other SVG elements.",
+         "is_empty" : false,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/g"
+      },
+      "h1" : {
+         "description" : "Defines HTML headings",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/Heading_Elements"
+      },
+      "h2" : {
+         "description" : "Defines HTML headings",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/Heading_Elements"
+      },
+      "h3" : {
+         "description" : "Defines HTML headings",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/Heading_Elements"
+      },
+      "h4" : {
+         "description" : "Defines HTML headings",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/Heading_Elements"
+      },
+      "h5" : {
+         "description" : "Defines HTML headings",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/Heading_Elements"
+      },
+      "h6" : {
+         "description" : "Defines HTML headings",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/Heading_Elements"
+      },
+      "head" : {
+         "description" : "The document metadata (header) element",
+         "is_empty" : false,
+         "is_inline" : false,
+         "link_in" : [
+            "profile"
+         ],
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/head"
+      },
+      "header" : {
+         "description" : "Represents introductory content, typically a group of introductory or navigational aids",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/header"
+      },
+      "hgroup" : {
+         "description" : "Multi-level heading for a section of a document",
+         "is_deprecated" : true,
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/hgroup"
+      },
+      "hr" : {
+         "description" : "Defines a thematic change in the content",
+         "is_empty" : true,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/hr"
+      },
+      "html" : {
+         "description" : "Defines the root of an HTML document",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/html"
+      },
+      "i" : {
+         "description" : "Defines a part of text in an alternate voice or mood",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/i"
+      },
+      "iframe" : {
+         "description" : "Defines an inline frame",
+         "is_empty" : false,
+         "is_inline" : false,
+         "link_in" : [
+            "src",
+            "longdesc"
+         ],
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe"
+      },
+      "image" : {
+         "description" : "Obsolete image element",
+         "is_deprecated" : true,
+         "is_empty" : true,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/image"
+      },
+      "img" : {
+         "description" : "Defines an image",
+         "is_empty" : true,
+         "is_inline" : true,
+         "link_in" : [
+            "src",
+            "lowsrc",
+            "longdesc",
+            "usemap"
+         ],
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img"
+      },
+      "input" : {
+         "description" : "Defines an input control",
+         "is_empty" : true,
+         "is_inline" : true,
+         "link_in" : [
+            "src",
+            "usemap"
+         ],
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input"
+      },
+      "ins" : {
+         "description" : "Defines a text that has been inserted into a document",
+         "is_empty" : false,
+         "is_inline" : true,
+         "link_in" : [
+            "cite"
+         ],
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/ins"
+      },
+      "isindex" : {
+         "description" : "Put a text field in a page for querying the document.",
+         "is_empty" : false,
+         "is_inline" : false,
+         "link_in" : [
+            "action"
+         ],
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/isindex"
+      },
+      "kbd" : {
+         "description" : "Defines keyboard input",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/kbd"
+      },
+      "keygen" : {
+         "description" : "Facilitate generation of key material, and submission of the public key as part of an HTML form",
+         "is_deprecated" : true,
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/keygen"
+      },
+      "label" : {
+         "description" : "Defines a labelÂ for an <input> element",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/label"
+      },
+      "legend" : {
+         "description" : "Defines a caption for a <fieldset> element",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/legend"
+      },
+      "li" : {
+         "description" : "Defines a list item",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/li"
+      },
+      "line" : {
+         "description" : "The <line> element is an SVG basic shape used to create a line connecting two points.",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/line"
+      },
+      "linearGradient" : {
+         "description" : "The <linearGradient> element lets authors define linear gradients that can be applied to fill or stroke of graphical elements.",
+         "is_empty" : false,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/linearGradient"
+      },
+      "link" : {
+         "description" : "Defines the relationship between a document and an external resource (most used to link to style sheets)",
+         "is_empty" : true,
+         "is_inline" : false,
+         "link_in" : [
+            "href"
+         ],
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/link"
+      },
+      "listing" : {
+         "description" : "Renders text between the start and end tags without interpreting the HTML in between and using a monospaced font.",
+         "is_deprecated" : true,
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/listing"
+      },
+      "main" : {
+         "description" : "Specifies the main content of a document",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/main"
+      },
+      "map" : {
+         "description" : "Defines an image map",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/map"
+      },
+      "mark" : {
+         "description" : "Defines marked/highlighted text",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/mark"
+      },
+      "marker" : {
+         "description" : "The <marker> element defines the graphic that is to be used for drawing arrowheads or polymarkers on a given <path>, <line>, <polyline> or <polygon> element.",
+         "is_empty" : false,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/marker"
+      },
+      "marquee" : {
+         "description" : "Insert a scrolling area of text",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/marquee"
+      },
+      "mask" : {
+         "description" : "The <mask> element defines an alpha mask for compositing the current object into the background.",
+         "is_empty" : false,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/mask"
+      },
+      "math" : {
+         "description" : "The top-level element in MathML is math",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/MathML/Element/math"
+      },
+      "menu" : {
+         "description" : "Represents a group of commands that a user can perform or activate.",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/menu"
+      },
+      "menuitem" : {
+         "description" : "Represents a command that a user is able to invoke through a popup menu.",
+         "is_deprecated" : true,
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/menuitem"
+      },
+      "meta" : {
+         "description" : "Defines metadata about an HTML document",
+         "is_empty" : true,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta"
+      },
+      "metadata" : {
+         "description" : "The <metadata> SVG element adds metadata to SVG content.",
+         "is_empty" : false,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/metadata"
+      },
+      "meter" : {
+         "description" : "Defines a scalar measurement within a known range (a gauge)",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meter"
+      },
+      "mpath" : {
+         "description" : "The <mpath> sub-element for the <animateMotion> element provides the ability to reference an external <path> element as the definition of a motion path.",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/mpath"
+      },
+      "multicol" : {
+         "description" : "Experimental element designed to allow multi-column layouts",
+         "is_deprecated" : true,
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/multicol"
+      },
+      "nav" : {
+         "description" : "Defines navigation links",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/nav"
+      },
+      "nextid" : {
+         "description" : "The NeXT ID element",
+         "is_deprecated" : true,
+         "is_empty" : true,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/nextid"
+      },
+      "nobr" : {
+         "description" : "ThenNon-breaking text element",
+         "is_deprecated" : true,
+         "is_empty" : true,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/nobr"
+      },
+      "noembed" : {
+         "description" : "Non-standard way to provide alternative, or \"fallback\", content for browsers that do not support the <embed> element.",
+         "is_deprecated" : true,
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/noembed"
+      },
+      "noframes" : {
+         "description" : "Defines an alternate content for users that do not support frames. Not supported in HTML5.",
+         "is_deprecated" : true,
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/noframes"
+      },
+      "noscript" : {
+         "description" : "Defines an alternate content for users that do not support client-side scripts",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/noscript"
+      },
+      "object" : {
+         "description" : "Defines a container for an external application",
+         "is_empty" : false,
+         "is_inline" : false,
+         "link_in" : [
+            "classid",
+            "codebase",
+            "data",
+            "archive",
+            "usemap"
+         ],
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/object"
+      },
+      "ol" : {
+         "description" : "Defines an ordered list",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/ol"
+      },
+      "optgroup" : {
+         "description" : "Defines a group of related options in a drop-down list",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/optgroup"
+      },
+      "option" : {
+         "description" : "Defines an option in a drop-down list",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/option"
+      },
+      "output" : {
+         "description" : "Defines the result of a calculation",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/output"
+      },
+      "p" : {
+         "description" : "Defines a paragraph",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/p"
+      },
+      "param" : {
+         "description" : "Defines a parameter for an object",
+         "is_empty" : true,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/param"
+      },
+      "path" : {
+         "description" : "The <path> SVG element is the generic element to define a shape.",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/path"
+      },
+      "pattern" : {
+         "description" : "The <pattern> element defines a graphics object which can be redrawn at repeated x- and y-coordinate intervals (\"tiled\") to cover an area.",
+         "is_empty" : false,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/pattern"
+      },
+      "picture" : {
+         "description" : "Defines a container for multiple image resources",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/picture"
+      },
+      "plaintext" : {
+         "description" : "Renders everything following the start tag as raw text, ignoring any following HTML",
+         "is_deprecated" : true,
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/plaintext"
+      },
+      "polygon" : {
+         "description" : "The <polygon> element defines a closed shape consisting of a set of connected straight line segments.",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/polygon"
+      },
+      "polyline" : {
+         "description" : "The <polyline> SVG element is an SVG basic shape that creates straight lines connecting several points.",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/polyline"
+      },
+      "portal" : {
+         "description" : "Enables the embedding of another HTML page into the current one for the purposes of allowing smoother navigation into new pages.",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/portal"
+      },
+      "pre" : {
+         "description" : "Defines preformatted text",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/pre"
+      },
+      "progress" : {
+         "description" : "Represents the progress of a task",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/progress"
+      },
+      "q" : {
+         "description" : "Defines a short quotation",
+         "is_empty" : false,
+         "is_inline" : true,
+         "link_in" : [
+            "cite"
+         ],
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/q"
+      },
+      "radialGradient" : {
+         "description" : "The <radialGradient> element lets authors define radial gradients that can be applied to fill or stroke of graphical elements.",
+         "is_empty" : false,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/radialGradient"
+      },
+      "rb" : {
+         "description" : "Delimit the base text component of a  <ruby> annotation",
+         "is_deprecated" : true,
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/rb"
+      },
+      "rect" : {
+         "description" : "The <rect> element is a basic SVG shape that draws rectangles, defined by their position, width, and height.",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/rect"
+      },
+      "rp" : {
+         "description" : "Defines what to show in browsers that do not support ruby annotations",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/rp"
+      },
+      "rt" : {
+         "description" : "Defines an explanation/pronunciation of characters (for East Asian typography)",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/rt"
+      },
+      "rtc" : {
+         "description" : "Embraces semantic annotations of characters presented in a ruby of <rb> elements used inside of <ruby> element. ",
+         "is_deprecated" : true,
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/rtc"
+      },
+      "ruby" : {
+         "description" : "Defines a ruby annotation (for East Asian typography)",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/ruby"
+      },
+      "s" : {
+         "description" : "Defines text that is no longer correct",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/s"
+      },
+      "samp" : {
+         "description" : "Defines sample output from a computer program",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/samp"
+      },
+      "script" : {
+         "description" : "Defines a client-side script",
+         "is_empty" : false,
+         "is_inline" : false,
+         "link_in" : [
+            "src",
+            "for"
+         ],
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script"
+      },
+      "section" : {
+         "description" : "Defines a section in a document",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/section"
+      },
+      "select" : {
+         "description" : "Defines a drop-down list",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select"
+      },
+      "set" : {
+         "description" : "The SVG <set> element provides a simple means of just setting the value of an attribute for a specified duration.",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/set"
+      },
+      "shadow" : {
+         "description" : "An obsolete tool that was intended to be used as a shadow DOM insertion point.",
+         "is_deprecated" : true,
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/shadow"
+      },
+      "slot" : {
+         "description" : "A placeholder inside a web component that you can fill with your own markup, which lets you create separate DOM trees and present them together.",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/slot"
+      },
+      "small" : {
+         "description" : "Defines smaller text",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/small"
+      },
+      "source" : {
+         "description" : "Defines multiple media resources for media elements (<video> and <audio>)",
+         "is_empty" : true,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/source"
+      },
+      "spacer" : {
+         "description" : "Obsolete tool that allowed insertion of empty spaces on pages",
+         "is_deprecated" : true,
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/spacer"
+      },
+      "span" : {
+         "description" : "Defines a section in a document",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/span"
+      },
+      "stop" : {
+         "description" : "The SVG <stop> element defines a color and its position to use on a gradient. This element is always a child of a <linearGradient> or <radialGradient> element.",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/stop"
+      },
+      "strike" : {
+         "description" : "Defines strikethrough text. Not supported in HTML5. Use <del> or <s> instead.",
+         "is_deprecated" : true,
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/strike"
+      },
+      "strong" : {
+         "description" : "Defines important text",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/strong"
+      },
+      "style" : {
+         "description" : "Defines style information for a document",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/style"
+      },
+      "sub" : {
+         "description" : "Defines subscripted text",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/sub"
+      },
+      "summary" : {
+         "description" : "Defines a visible heading for a <details> element",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/summary"
+      },
+      "sup" : {
+         "description" : "Defines superscripted text",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/sup"
+      },
+      "svg" : {
+         "description" : "Defines a container for SVG graphics",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/svg"
+      },
+      "switch" : {
+         "description" : "The <switch> SVG element evaluates any requiredFeatures, requiredExtensions and systemLanguage attributes on its direct child elements in order, and then renders the first child where these attributes evaluate to true.",
+         "is_empty" : false,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/switch"
+      },
+      "symbol" : {
+         "description" : "The <symbol> element is used to define graphical template objects which can be instantiated by a <use> element.",
+         "is_empty" : false,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/symbol"
+      },
+      "table" : {
+         "description" : "Defines a table",
+         "is_empty" : false,
+         "is_inline" : false,
+         "link_in" : [
+            "background"
+         ],
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/table"
+      },
+      "tbody" : {
+         "description" : "Groups the body content in a table",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/tbody"
+      },
+      "td" : {
+         "description" : "Defines a cell in a table",
+         "is_empty" : false,
+         "is_inline" : false,
+         "link_in" : [
+            "background"
+         ],
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/td"
+      },
+      "template" : {
+         "description" : "Defines a container for content that should be hidden when the page loads",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template"
+      },
+      "text" : {
+         "description" : "The SVG <text> element draws a graphics element consisting of text.",
+         "is_empty" : false,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/text"
+      },
+      "textPath" : {
+         "description" : "To render text along the shape of a <path>, enclose the text in a <textPath> element that has an href attribute with a reference to the <path> element.",
+         "is_empty" : false,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/textPath"
+      },
+      "textarea" : {
+         "description" : "Defines a multiline input control (text area)",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/textarea"
+      },
+      "tfoot" : {
+         "description" : "Groups the footer content in a table",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/tfoot"
+      },
+      "th" : {
+         "description" : "Defines a header cell in a table",
+         "is_empty" : false,
+         "is_inline" : false,
+         "link_in" : [
+            "background"
+         ],
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/th"
+      },
+      "thead" : {
+         "description" : "Groups the header content in a table",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/thead"
+      },
+      "time" : {
+         "description" : "Defines a specific time (or datetime)",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/time"
+      },
+      "title" : {
+         "description" : "Defines a title for the document",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/title"
+      },
+      "tr" : {
+         "description" : "Defines a row in a table",
+         "is_empty" : false,
+         "is_inline" : false,
+         "link_in" : [
+            "background"
+         ],
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/tr"
+      },
+      "track" : {
+         "description" : "Defines text tracks for media elements (<video> and <audio>)",
+         "is_empty" : true,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/track"
+      },
+      "tspan" : {
+         "description" : "The SVG <tspan> element defines a subtext within a <text> element or another <tspan> element.",
+         "is_empty" : false,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/tspan"
+      },
+      "tt" : {
+         "description" : "Defines teletype text. Not supported in HTML5. Use CSS instead.",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/tt"
+      },
+      "u" : {
+         "description" : "Defines some text that is unarticulated and styled differently from normal text",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/u"
+      },
+      "ul" : {
+         "description" : "Defines an unordered list",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/ul"
+      },
+      "use" : {
+         "description" : "The <use> element takes nodes from within the SVG document, and duplicates them somewhere else.",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/use"
+      },
+      "var" : {
+         "description" : "Defines a variable",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/var"
+      },
+      "video" : {
+         "description" : "Defines embedded video content",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video"
+      },
+      "view" : {
+         "description" : "A view is a defined way to view the image, like a zoom level or a detail view.",
+         "is_empty" : true,
+         "is_inline" : true,
+         "is_svg" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/view"
+      },
+      "wbr" : {
+         "description" : "Defines a possible line-break",
+         "is_empty" : false,
+         "is_inline" : true,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/wbr"
+      },
+      "xmp" : {
+         "description" : "Renders text between the start and end tags without interpreting the HTML in between and using a monospaced font.",
+         "is_empty" : false,
+         "is_inline" : false,
+         "link_in" : [
+            "href"
+         ],
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/xmp"
+      }
+   },
+   "meta" : {
+      "author" : "Jacques Deguest",
+      "updated" : "2021-12-20T01:33:09+0900",
+      "version" : "v0.1.1"
+   }
+}

@@ -57,7 +57,7 @@
    "provides" : {
       "Calendar::Indonesia::Holiday" : {
          "file" : "lib/Calendar/Indonesia/Holiday.pm",
-         "version" : "0.345"
+         "version" : "0.346"
       }
    },
    "release_status" : "stable",
@@ -72,12 +72,17 @@
          "web" : "https://github.com/perlancar/perl-Calendar-Indonesia-Holiday"
       }
    },
-   "version" : "0.345",
+   "version" : "0.346",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
       },
       "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::InsertCodeOutput",
+            "name" : "InsertCodeOutput",
+            "version" : "0.045"
+         },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease",
             "name" : "@Author::PERLANCAR/PERLANCAR::CheckPendingRelease",

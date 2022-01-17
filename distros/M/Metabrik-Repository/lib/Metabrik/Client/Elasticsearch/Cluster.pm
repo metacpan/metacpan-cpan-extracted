@@ -8,7 +8,7 @@ use strict;
 use warnings;
 
 #
-# DOC: Search::Elasticsearch::Client::6_0::Direct::Cluster
+# DOC: Search::Elasticsearch::Client::7_0::Direct::Cluster
 #
 
 use base qw(Metabrik::Client::Elasticsearch);
@@ -35,6 +35,9 @@ sub brik_properties {
          exclude => [ qw(node) ],
          include => [ qw(node) ],
          reset_settings_transient_cluster_routing_allocation => [ ],
+         allocation_explain => [ ],
+         reroute => [ qw(args|OPTIONAL) ],
+         reroute_retry_failed => [ ],
       },
    };
 }
@@ -172,6 +175,31 @@ sub reset_settings_transient_cluster_routing_allocation {
    return $self->put_settings($settings);
 }
 
+sub allocation_explain {
+   my $self = shift;
+
+   return $self->_es->cluster->allocation_explain();
+}
+
+sub reroute {
+   my $self = shift;
+   my ($args) = @_;
+
+   $args ||= {};
+
+   return $self->_es->cluster->reroute(%$args);
+}
+
+sub reroute_retry_failed {
+   my $self = shift;
+
+   my %args = (
+      retry_failed => 'true',
+   );
+
+   return $self->reroute(\%args);
+}
+
 1;
 
 __END__
@@ -182,7 +210,7 @@ Metabrik::Client::Elasticsearch::Cluster - client::elasticsearch::cluster Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2020, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2021, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

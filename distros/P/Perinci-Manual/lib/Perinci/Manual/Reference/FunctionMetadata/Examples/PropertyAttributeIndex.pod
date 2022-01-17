@@ -20,7 +20,7 @@ Perinci::Manual::Reference::FunctionMetadata::Examples::PropertyAttributeIndex -
 
 =head1 VERSION
 
-This document describes version 0.006 of Perinci::Manual::Reference::FunctionMetadata::Examples::PropertyAttributeIndex (from Perl distribution Perinci-Manual), released on 2021-07-28.
+This document describes version 0.007 of Perinci::Manual::Reference::FunctionMetadata::Examples::PropertyAttributeIndex (from Perl distribution Perinci-Manual), released on 2021-07-31.
 
 =head1 INDEX
 

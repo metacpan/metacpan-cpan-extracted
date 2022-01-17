@@ -7,6 +7,22 @@ Home page:    <https://metacpan.org/release/String-Copyright>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=libstring-copyright-perl>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+0.003013	2022-01-16
+
+ [ Documentation ]
+ - slightly improve POD section DESCRIPTION
+
+ [ Test Suite ]
+ - silence author test pod-spell
+ - simplify context tests to not require utf8 IO
+
+ [ Packaging ]
+ - work around tidyall string-encoding bug
+
+ [ Other ]
+ - skip bogus copyright holder starting with more year template patterns,
+   including [yyyy]
+
 0.003012	2021-12-16
 
  [ Bug Fixes ]

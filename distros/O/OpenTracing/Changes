@@ -1,5 +1,10 @@
 Revision history for OpenTracing
 
+1.006     2022-01-17 00:33:50+08:00 Asia/Kuala_Lumpur
+    [Bugs fixed]
+
+    - missing Class::Method::Modifiers dependency added to `cpanfile`
+
 1.005     2022-01-12 15:53:02+08:00 Asia/Kuala_Lumpur
     [Bugs fixed]
 

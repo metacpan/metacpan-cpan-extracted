@@ -172,7 +172,7 @@ exp_read_number (struct expr_parser* exprobj, const char* *curposptr, const char
 	offset=1;
       } else {
 	/* (*curposptr)--; ??? */
-	log_expr(exprobj, TMPL_LOG_ERROR, "while reading number: %s\n", "uninspected declimal point");
+	log_expr(exprobj, TMPL_LOG_ERROR, "while reading number: %s\n", "uninspected decimal point");
 	retval.val.dblval=dretval*sign;
 	retval.type=EXPR_TYPE_DBL;
 	return retval;

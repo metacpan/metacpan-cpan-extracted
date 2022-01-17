@@ -1,0 +1,46 @@
+=encoding utf-8
+
+=head1 NAME
+
+HTML::Object::HierarchyRequestError - HTML Hierarchy Exception
+
+=head1 SYNOPSIS
+
+    use HTML::Object
+    my $parser = HTML::Object->new || die( HTML::Object->error, "\n" );
+    my $doc = $parser->parse_file( $some_file ) || die( $parser->error );
+    my $elem = $parser->new_element( tag => 'html' );
+    $doc->append( $elem ) || die( $doc->error );
+    # This would die with an HTML::Object::HierarchyRequestError exception object
+    # because there cannot be 2 html tags
+    exit(0);
+
+=head1 VERSION
+
+    v0.1.0
+
+=head1 DESCRIPTION
+
+This exception class inherits all its features from L<HTML::Object::Exception>
+
+=head1 METHODS
+
+See L<HTML::Object::Exception>
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 SEE ALSO
+
+L<HTML::Object::Exception>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2021 DEGUEST Pte. Ltd.
+
+All rights reserved
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut

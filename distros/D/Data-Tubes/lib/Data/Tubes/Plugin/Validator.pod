@@ -236,7 +236,7 @@ even required to be a sub reference.
 
 In addition to setting C<wrapper> to a sub reference, you can also set
 it to the string C<try>. This will wrap the call to the validator in a
-C<try>/C<catch> using L<Try::Tiny>, which you are supposed to have
+C<try>/C<catch> using L<Try::Catch>, which you are supposed to have
 installed independently.
 
 Allowed arguments are:
@@ -290,7 +290,7 @@ passed to the validator itself.
 You can also pass the special value C<try>, that allows you to set the
 following wrapper subroutine equivalent:
 
-   use Try::Tiny;
+   use Try::Catch;
    sub {
       my ($validator, @parameters) = @_;
       return try {
@@ -301,7 +301,7 @@ following wrapper subroutine equivalent:
       };
    }
 
-except that L<Try::Tiny> is loaded dynamically at runtime and no
+except that L<Try::Catch> is loaded dynamically at runtime and no
 function is imported. This allows you to turn exceptions into failed
 validations (note that the first item in the expression inside the
 C<catch> part is C<0>, i.e. a failed validation) where the exception

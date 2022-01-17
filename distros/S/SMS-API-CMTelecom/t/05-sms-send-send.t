@@ -41,7 +41,7 @@ subtest send_real => sub {
         text       => 'You message may use more than 160 chars.',
         to         => $ENV{SMS_CMTELECOM_PHONE_NUMBER},
         _from      => $ENV{SMS_CMTELECOM_PHONE_NUMBER},
-        _reference => 'SMS::Send::CMTelecom test',
+        reference  => 'SMS::Send::CMTelecom test',
     );
 
     is $sent, 1, 'message successfully sent';

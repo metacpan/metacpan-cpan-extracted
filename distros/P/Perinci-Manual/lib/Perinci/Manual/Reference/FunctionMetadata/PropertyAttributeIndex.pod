@@ -20,7 +20,7 @@ Perinci::Manual::Reference::FunctionMetadata::PropertyAttributeIndex - Alphabeti
 
 =head1 VERSION
 
-This document describes version 0.006 of Perinci::Manual::Reference::FunctionMetadata::PropertyAttributeIndex (from Perl distribution Perinci-Manual), released on 2021-07-28.
+This document describes version 0.007 of Perinci::Manual::Reference::FunctionMetadata::PropertyAttributeIndex (from Perl distribution Perinci-Manual), released on 2021-07-31.
 
 =head1 INDEX
 
@@ -132,6 +132,10 @@ Any. L<Rinci> standard. See: L<Rinci::function>.
 
 Bool. Observed by L<App::rimetadb> to allow excluding a function from being
 included in the database.
+
+See also:
+L<Perinci::Manual::Reference::FunctionMetadata::Arguments::PropertyAttributeIndex/"x.app.rimetadb.exclude">
+(per-function argument exclude setting).
 
 =head2 x.dist.zilla.plugin.rinci.wrap.wrap_args
 

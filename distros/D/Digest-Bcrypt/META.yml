@@ -28,7 +28,7 @@ no_index:
 provides:
   Digest::Bcrypt:
     file: lib/Digest/Bcrypt.pm
-    version: '1.211'
+    version: '1.212'
 requires:
   Carp: '0'
   Crypt::Bcrypt: '0'
@@ -44,7 +44,7 @@ resources:
   bugtracker: https://github.com/genio/digest-bcrypt/issues
   homepage: https://github.com/genio/digest-bcrypt
   repository: https://github.com/genio/digest-bcrypt.git
-version: '1.211'
+version: '1.212'
 x_contributors:
   - 'Chase Whitener <capoeirab@cpan.org>'
   - 'James Aitken <loonypandora@gmail.com>'

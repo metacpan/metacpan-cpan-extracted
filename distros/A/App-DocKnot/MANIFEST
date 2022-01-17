@@ -11,6 +11,7 @@ lib/App/DocKnot/Command.pm
 lib/App/DocKnot/Config.pm
 lib/App/DocKnot/Dist.pm
 lib/App/DocKnot/Generate.pm
+lib/App/DocKnot/Release.pm
 lib/App/DocKnot/Spin.pm
 lib/App/DocKnot/Spin/Pointer.pm
 lib/App/DocKnot/Spin/RSS.pm
@@ -139,6 +140,12 @@ t/data/spin/sitemap/complex
 t/data/spin/sitemap/complex.html
 t/data/spin/sitemap/duplicate
 t/data/spin/sitemap/invalid
+t/data/spin/update/input/module.rpod
+t/data/spin/update/input/readme.rpod
+t/data/spin/update/input/script.rpod
+t/data/spin/update/output/module.spin
+t/data/spin/update/output/readme.spin
+t/data/spin/update/output/script.spin
 t/data/spin/versions/continuation
 t/data/spin/versions/invalid-continuation
 t/data/spin/versions/invalid-date
@@ -235,6 +242,7 @@ t/lib/Test/RRA.pm
 t/lib/Test/RRA/Config.pm
 t/lib/Test/RRA/ModuleVersion.pm
 t/metadata/licenses.t
+t/release/basic.t
 t/spin/errors.t
 t/spin/file.t
 t/spin/markdown.t
@@ -249,6 +257,7 @@ t/style/module-version.t
 t/style/obsolete-strings.t
 t/style/strict.t
 t/update/basic.t
+t/update/spin.t
 TODO
 META.yml
 META.json

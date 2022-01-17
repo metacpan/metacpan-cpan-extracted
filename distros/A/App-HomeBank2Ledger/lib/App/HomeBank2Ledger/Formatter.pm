@@ -9,7 +9,7 @@ use Module::Load;
 use Module::Pluggable search_path   => [__PACKAGE__],
                       sub_name      => 'available_formatters';
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 sub _croak { require Carp; Carp::croak(@_) }
 
@@ -59,7 +59,7 @@ App::HomeBank2Ledger::Formatter - Abstract class for formatting a ledger
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

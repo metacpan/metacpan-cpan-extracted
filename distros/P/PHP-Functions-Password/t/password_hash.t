@@ -64,7 +64,7 @@ my $class = 'PHP::Functions::Password';
 my $require_ok = eval "require $class";
 $require_ok || BAIL_OUT("Failed to require $class");
 
-plan tests => 1 + scalar(@methods) + ($php ? 4 : 3) * scalar(@test_passwords) * scalar($class->algos());
+plan tests => 1 + scalar(@methods) + ($php ? 6 : 5) * scalar(@test_passwords) * scalar($class->algos());
 
 require_ok($class) || BAIL_OUT("Failed to require $class");
 
@@ -86,26 +86,44 @@ if ($INC{'Crypt/Argon2.pm'} || eval { require Crypt::Argon2; }) {
 else {
 	diag('Skipping some tests because the Crypt::Argon2 module is not installed');
 }
+
+note('');
 foreach my $password (@test_passwords) {
 	foreach my $sig (sort keys %alias_to_algo) {
 		my $algo = $alias_to_algo{$sig};
 		note("Testing $sig using \$password = '$password';");
-		my $crypted = $class->hash($password, 'algo' => $algo);
-		ok(length($crypted) >= 60, "$class->hash(\$password, 'algo' => $algo) returns a crypted string");
-		#note("length $sig: " . length($crypted));
-		if (1) {
-			my $result = $class->verify($password, $crypted);
-			ok($result, "Expect success from verify method using password and new crypted string \"$crypted\"");
-			$result = password_verify($password, $crypted);
-			ok($result, "Expect success from password_verify function using password and new crypted string \"$crypted\"");
+		my $crypted = eval {
+			$class->hash($password, 'algo' => $algo);
+		};
+		ok(!$@, "$class->hash(\$password, 'algo' => $algo) does not die");
+		if ($@) {
+			diag($@);
 		}
-		if ($php) {
-			my $phpcode = "var_export(password_verify('" . $password . "', '" . $crypted . "'));";
-			my $h;
-			open($h, '-|', $php, '-r', $phpcode) || die("Failed to execute $php: $!");
-			my $line = <$h>;
-			close($h);
-			ok($line eq 'true', "Expect true from PHP's password_verify(\$password, '$crypted')");
+		else {
+			ok(length($crypted) >= 60, "$class->hash(\$password, 'algo' => $algo) returns a crypted string");
+			#note("length $sig: " . length($crypted));
+			if (1) {
+				my $result = eval {
+					$class->verify($password, $crypted);
+				};
+				ok(!$@, "$class->verify(\$password, '$crypted') does not die");
+				if ($@) {
+					diag($@);
+				}
+				else {
+					ok($result, "Expect success from verify method using password and new crypted string \"$crypted\"");
+					$result = password_verify($password, $crypted);
+					ok($result, "Expect success from password_verify function using password and new crypted string \"$crypted\"");
+				}
+			}
+			if ($php) {
+				my $phpcode = "var_export(password_verify('" . $password . "', '" . $crypted . "'));";
+				my $h;
+				open($h, '-|', $php, '-r', $phpcode) || die("Failed to execute $php: $!");
+				my $line = <$h>;
+				close($h);
+				ok($line eq 'true', "Expect true from PHP's password_verify(\$password, '$crypted')");
+			}
 		}
 		note('');
 	}
@@ -119,4 +137,26 @@ unless ($ENV{'HARNESS_ACTIVE'}) {
 		#print password_hash($password, $class->PASSWORD_BCRYPT) . "\n";
 		last;
 	}
+
+	if ('pepper demonstration') {
+		note('Demonstrating pepper use:');
+		eval {
+			require Digest::SHA;
+		};
+		if ($@) {
+			note("Digest::SHA not available, so peppering can't be demonstrated");
+		}
+		else {
+			Digest::SHA->import('hmac_sha256');
+			my $password = 'Random childs firstname and birthday';
+			note("password: $password");
+			my $pepper = 'Abracadabra and Hocus pocus';  # retrieve this from a secrets config file for example (and don't loose it!)
+			note("pepper: $pepper");
+			my $peppered_password = hmac_sha256($password, $pepper);
+			note('peppered password (in hex for viewing): ' .  unpack('H*', $peppered_password));
+			my $crypted_string = password_hash($password);  # store this in your database
+			note("hash: $crypted_string");
+		}
+	}
+
 }

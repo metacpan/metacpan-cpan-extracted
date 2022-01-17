@@ -1,3 +1,8 @@
+0.06 2022-01-15T15:58:52+01:00
+ - Add check_array().
+ - Add check_bool().
+ - Update copyright years.
+
 0.05 2021-10-19T13:07:37+02:00
  - Fix existing of key in check_length().
  - Fix undefined value in check_length().

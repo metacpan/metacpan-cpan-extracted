@@ -1,4 +1,9 @@
 Revision history for Excel-ValueWriter-XLSX
 
+0.2      15.01.2022
+  - fix UTF8 support
+  - new optional parameter: $headers
+  
+
 0.1      14.01.2022
   - initial release

@@ -81,10 +81,15 @@ sub start {
    $self->create_manager or return;
    my $manager = $self->manager;
 
-   my $pid = $manager->start and return 1;  # Success, return to parent
+   my $pid = $manager->start;
+   if ($pid) {  # Success, return to parent
+      # This is the child pid, to be used by parent:
+      $self->pid($pid);
+      return $pid;
+   }
 
    # Continue within son
-   $self->pid($pid);
+   $self->pid($$);  # This pid is the child pid, gathered from within child
    &{$sub}();
 
    $manager->finish;
@@ -121,7 +126,7 @@ Metabrik::Worker::Parallel - worker::parallel Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2020, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2021, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

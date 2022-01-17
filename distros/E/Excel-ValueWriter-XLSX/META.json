@@ -24,7 +24,7 @@
             "Archive::Zip" : "0",
             "Carp" : "0",
             "Date::Calc" : "0",
-            "List::Util" : "0",
+            "List::Util" : "1.33",
             "POSIX" : "0",
             "Params::Validate" : "0",
             "Scalar::Util" : "0",
@@ -41,7 +41,7 @@
    "provides" : {
       "Excel::ValueWriter::XLSX" : {
          "file" : "lib/Excel/ValueWriter/XLSX.pm",
-         "version" : "0.1"
+         "version" : "0.2"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,6 @@
          "url" : "https://github.com/damil/Excel-ValueWriter-XLSX"
       }
    },
-   "version" : "0.1",
+   "version" : "0.2",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

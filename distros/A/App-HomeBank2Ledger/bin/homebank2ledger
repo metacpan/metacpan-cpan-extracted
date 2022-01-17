@@ -10,7 +10,7 @@ use strict;
 
 use App::HomeBank2Ledger;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 App::HomeBank2Ledger->main(@ARGV);
 
@@ -26,7 +26,7 @@ homebank2ledger - A tool to convert HomeBank files to Ledger format
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -41,7 +41,7 @@ version 0.008
 
 F<homebank2ledger> converts L<HomeBank|http://homebank.free.fr/> files to a format usable by
 L<Ledger|https://www.ledger-cli.org/>. It can also convert directly to the similar
-L<Beancount|http://furius.ca/beancount/> format.
+L<Beancount|https://beancount.github.io/docs/index.html> format.
 
 This software is B<EXPERIMENTAL>, in early development. Its interface may change without notice.
 

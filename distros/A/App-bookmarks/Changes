@@ -1,5 +1,10 @@
 Revision history for App-bookmarks
 
+0.32    2022-01-13
+        - fixed bug in txt files regex (space)
+        - fixed bug with option -a (files not existing silently dropped)
+        - added support for arg '-' (read from STDIN as plain text file)
+
 0.31    2021-03-30
         - skip gemini.t if URI::Find not installed
 

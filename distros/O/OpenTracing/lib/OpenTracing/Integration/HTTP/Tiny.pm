@@ -3,7 +3,7 @@ package OpenTracing::Integration::HTTP::Tiny;
 use strict;
 use warnings;
 
-our $VERSION = '1.005'; # VERSION
+our $VERSION = '1.006'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 no indirect;

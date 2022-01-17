@@ -8,7 +8,9 @@ README.md
 t/basic.t
 t/password_algos.t
 t/password_get_info.t
+t/password_hash.php
 t/password_hash.t
+t/password_needs_rehash.php
 t/password_needs_rehash.t
 t/password_verify.php
 t/password_verify.t

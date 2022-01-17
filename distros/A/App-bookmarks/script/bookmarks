@@ -37,6 +37,12 @@
 # - Since Firefox sets an EXCLUSIVE SQLite lock, a tmp DB file copy is used.
 # - sources are read as UTF-8.
 #
+# TODO :
+# - document support for arg '-'
+#
+# 2022.01.10 v0.32 jul : fixed bug in txt files regex (space)
+#                        fixed bug with option -a (files not existing silently dropped)
+#                        added support for arg '-' (read from STDIN as plain text file)
 # 2021.03.30 v0.31 jul : skip gemini.t if URI::Find not installed
 # 2021.03.29 v0.30 jul : added great markdown regex by Michaël Perrin
 #                        process files without extension as plain text
@@ -70,7 +76,7 @@ use File::Basename;
 use File::Temp qw(tempdir);
 use File::Copy qw(copy);
 
-our $VERSION = '0.30';
+our $VERSION = '0.32';
 my $program  = basename($0);
 my $usage    = <<EOF;
 
@@ -103,23 +109,25 @@ die $VERSION . "\n" if $version;
 # option -a
 if (!@ARGV or $all)
 {
+	my @default = ();
+	
     if ($^O eq "darwin")
     {    
-        push @ARGV, glob('~/Library/Safari/Bookmarks.plist');
-        push @ARGV, glob('~/Library/Application\ Support/Firefox/Profiles/*.default*/places.sqlite');
-        push @ARGV, glob('~/Library/Application\ Support/Google/Chrome/Default/Bookmarks');
+        push @default, glob('~/Library/Safari/Bookmarks.plist');
+        push @default, glob('~/Library/Application\ Support/Firefox/Profiles/*.default*/places.sqlite');
+        push @default, glob('~/Library/Application\ Support/Google/Chrome/Default/Bookmarks');
     }
     elsif ($^O eq "linux")
     {
-        push @ARGV, glob('~/.mozilla/firefox/*.default/places.sqlite');
-        push @ARGV, glob('~/.config/google-chrome/Default/Bookmarks');
+        push @default, glob('~/.mozilla/firefox/*.default/places.sqlite');
+        push @default, glob('~/.config/google-chrome/Default/Bookmarks');
     }
     elsif ($^O eq "MSWin32")
     {
-        push @ARGV, $ENV{APPDATA} . '\Mozilla\Firefox\Profiles\*.default\places.sqlite';
-        push @ARGV, $ENV{LOCALAPPDATA} . '\Google\Chrome\User Data\Default\Bookmarks';
-        push @ARGV, $ENV{USERPROFILE} . '\Favorites';
-        push @ARGV, $ENV{LOCALAPPDATA} . '\Microsoft\Edge\User Data\Default\Bookmarks';
+        push @default, $ENV{APPDATA} . '\Mozilla\Firefox\Profiles\*.default\places.sqlite';
+        push @default, $ENV{LOCALAPPDATA} . '\Google\Chrome\User Data\Default\Bookmarks';
+        push @default, $ENV{USERPROFILE} . '\Favorites';
+        push @default, $ENV{LOCALAPPDATA} . '\Microsoft\Edge\User Data\Default\Bookmarks';
     }
     else
     {
@@ -127,7 +135,9 @@ if (!@ARGV or $all)
     }
     
     # do they indeed exist?
-    @ARGV = grep { -e $_ } @ARGV;
+	@default = grep { -e $_ } @default;
+	
+	push @ARGV, @default;
 }
 
 # option -f
@@ -380,11 +390,19 @@ sub _txt {
     $regex = $regex . '|' . $finder->schemeless_uri_re if $schemeless;
 
     # read file as text
-    open(my $fh, '<:encoding(UTF-8)', $file) or die "unable to read file : $file";
- 
+	my $fh;
+	if ($file eq '-')
+	{
+	    $fh = *STDIN;
+	}
+	else
+	{
+		open($fh, '<:encoding(UTF-8)', $file) or die "unable to read file : $file";
+ 	}
+
     while (my $line = <$fh>)
     {
-        if ( $line =~ /(.*)\s+($regex)\s+(.*)/ )    # match <title> <url> <description>
+        if ( $line =~ /(?:(.*)\s)?($regex)(?:\s+(.*))?/ ) # match <title> <url> <description>
         {
             my $title       = $1;
             my $url         = $2;
@@ -492,14 +510,15 @@ sub _md {
 foreach my $file (@ARGV)
 {
     my $name = basename($file);
-    
+
     if    (-f $file and $name =~ /\.plist$/)   { _safari($file);    }
     elsif (-f $file and $name =~ /\.sqlite$/)  { _firefox($file);   }
     elsif (-f $file and $name =~ /Bookmarks$/) { _chrome($file);    }
     elsif (-d $file and $name =~ /Favorites$/) { _iexplorer($file); }
     elsif (-f $file and $name =~ /\.md$/)      { _md($file);        }
     elsif (-f $file and $name =~ /\.gmi$/)     { _gemini($file);    }
-    elsif (-f $file )                          { _txt($file);       }
+    elsif (-f $file )                          { _txt($file);       } 
+    elsif ( $file eq '-' )                     { _txt($file);       }
     else  { die "unable to process file : $file"; }
 }
 

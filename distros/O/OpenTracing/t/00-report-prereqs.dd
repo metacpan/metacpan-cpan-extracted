@@ -27,6 +27,7 @@ do { my $x = {
                                       },
                       'requires' => {
                                       'Bytes::Random::Secure' => '0',
+                                      'Class::Method::Modifiers' => '0',
                                       'Exporter' => '0',
                                       'JSON::MaybeUTF8' => '2.000',
                                       'JSON::MaybeXS' => '0',

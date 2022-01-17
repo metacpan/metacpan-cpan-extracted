@@ -5,7 +5,7 @@ package App::HomeBank2Ledger::Ledger;
 use warnings;
 use strict;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 
 sub new {
@@ -63,7 +63,7 @@ App::HomeBank2Ledger::Ledger - Ledger data representation
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -94,7 +94,7 @@ accounts. Examples:
 
 =item *
 
-"Liabilities:Credit Card:CapitalOne"
+"Liabilities:Credit Card:Capital One"
 
 =back
 
@@ -123,9 +123,11 @@ This is a hashref like this:
 
     {
         date        => '2019-06-12',        # required
-        payee       => 'Malcolm Reynolds',  # required
+        aux_date    => '2019-06-13',        # optional
         status      => 'cleared',           # optional; can be "cleared" or "pending"
-        memo        => 'Medical supplies',  # optional
+        code        => '1234',              # optional
+        payee       => 'Malcolm Reynolds',  # required
+        note        => 'Medical supplies',  # optional
         postings    => [                    # required
             {
                 account     => 'Some Account',  # required
@@ -141,9 +143,20 @@ This is a hashref like this:
                     frac    => 2,
                 },
                 payee       => 'Somebody',      # optional
-                memo        => 'Whatever',      # optional
+                note        => 'Whatever',      # optional
                 status      => 'pending',       # optional; can be "cleared" or "pending"
                 tags        => [qw(niska train-job)],
+                lot         => {                # optional
+                    date        => '2019-01-28',
+                    price       => {
+                        amount      => '15.00',
+                        commodity   => { ... },
+                    },
+                },
+                cost        => {                # optional
+                    amount      => '10.00',
+                    commodity   => { ... },
+                },
             },
             ...
         ],

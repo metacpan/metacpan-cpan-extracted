@@ -2,7 +2,7 @@ NAME
     String::Copyright - Representation of text-based copyright statements
 
 VERSION
-    Version 0.003012
+    Version 0.003013
 
 SYNOPSIS
         use String::Copyright;
@@ -22,8 +22,8 @@ SYNOPSIS
         # Copyright 2003 Foo B. and friends
 
 DESCRIPTION
-    String::Copyright Parses common styles of copyright statements and
-    serializes in normalized format.
+    String::Copyright identifies copyright statements in a string and
+    serializes them in a normalized format.
 
 OPTIONS
     Options can be set as an argument to the 'use' statement.

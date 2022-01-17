@@ -32,13 +32,13 @@ isa_ok($ctx, 'Digest::Bcrypt', 'new: got a proper object');
     try {
         $ctx->reset;
         $ctx->add($secret);
-        $ctx->settings('$2a$40$GA.eY03tb02ea0DqbA.eG.');
+        $ctx->settings('$2a$-1$GA.eY03tb02ea0DqbA.eG.');
         $res = $ctx->digest;
     }
     catch {
         $err = $_;
     };
-    like $err, qr/Cost must/i, 'settings: dies with bad cost';
+    like $err, qr/bad bcrypt/i, 'settings: dies with bad cost';
     is $res, undef, 'no digest';
 
     $res = undef;
@@ -76,13 +76,14 @@ isa_ok($ctx, 'Digest::Bcrypt', 'new: got a proper object');
     try {
         $ctx->reset;
         $ctx->add($secret);
+        $ctx->salt($salt);
         $ctx->cost(32);
         $res = $ctx->digest;
     }
     catch {
         $err = $_;
     };
-    like $err, qr/Cost must/i, 'cost: dies when greater than 31';
+    like $err, qr/Invalid cost/i, 'cost: dies when greater than 31';
     is $res, undef, 'no digest';
 
     $res = undef;
@@ -90,13 +91,14 @@ isa_ok($ctx, 'Digest::Bcrypt', 'new: got a proper object');
     try {
         $ctx->reset;
         $ctx->add($secret);
+        $ctx->salt($salt);
         $ctx->cost(0);
         $res = $ctx->digest;
     }
     catch {
         $err = $_;
     };
-    like $err, qr/Cost must/i, 'cost: dies when less than 5';
+    like $err, qr/Invalid cost/i, 'cost: dies when too low';
     is $res, undef, 'no digest';
 
     $res = undef;

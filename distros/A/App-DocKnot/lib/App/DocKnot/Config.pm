@@ -9,7 +9,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Config 6.00;
+package App::DocKnot::Config 6.01;
 
 use 5.024;
 use autodie;
@@ -31,18 +31,9 @@ use YAML::XS ();
 #   metadata - Path to the docknot.yaml file
 #
 # Returns: Newly created object
-#  Throws: Text exceptions on invalid metadata directory path
 sub new {
     my ($class, $args_ref) = @_;
-
-    # Ensure we were given a valid metadata argument.
-    my $metadata = $args_ref->{metadata} // 'docs/docknot.yaml';
-    if (!-e $metadata) {
-        croak("metadata path $metadata does not exist");
-    }
-
-    # Create and return the object.
-    my $self = { metadata => $metadata };
+    my $self = { metadata => $args_ref->{metadata} // 'docs/docknot.yaml' };
     bless($self, $class);
     return $self;
 }
@@ -116,7 +107,7 @@ __END__
 
 =for stopwords
 Allbery DocKnot MERCHANTABILITY NONINFRINGEMENT sublicense CPAN XDG Kwalify
-distdir
+distdir archivedir
 
 =head1 NAME
 
@@ -179,6 +170,16 @@ default) may contain the following keys:
 
 =over 4
 
+=item archivedir
+
+Specifies the directory into which distribution tarballs are placed by the
+C<docknot release> command.  The current distribution will be put in a
+subdirectory named after the C<distribution.section> key in the package
+configuration.  Older versions will be moved to the F<ARCHIVE> subdirectory of
+I<archivedir>.
+
+If this is not specified, the B<-a> option to C<docknot release> is mandatory.
+
 =item distdir
 
 Specifies the directory into which to build and store distribution tarballs
@@ -186,7 +187,8 @@ Specifies the directory into which to build and store distribution tarballs
 as working directories while the distribution is being built, and the final
 tarballs are stored in this directory.
 
-If this is not specified, the B<-d> option to C<docknot dist> is mandatory.
+If this is not specified, the B<-d> options to C<docknot dist> and C<docknot
+release> is mandatory.
 
 =item pgp_key
 
@@ -237,7 +239,7 @@ Russ Allbery <rra@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2013-2021 Russ Allbery <rra@cpan.org>
+Copyright 2013-2022 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

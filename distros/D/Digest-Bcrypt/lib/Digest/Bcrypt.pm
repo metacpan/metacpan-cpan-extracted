@@ -10,7 +10,7 @@ use Crypt::Bcrypt qw(bcrypt bcrypt_check);
 use MIME::Base64 qw(decode_base64 encode_base64);
 use utf8;
 
-our $VERSION = '1.211';
+our $VERSION = '1.212';
 
 sub add {
     my $self = shift;
@@ -136,12 +136,12 @@ sub type {
     return $self;
 }
 
-# Checks that the cost is an integer in the range 1-31. Croaks if it isn't
+# Checks that the cost is a positive integerCroaks if it isn't
 sub _check_cost {
     my ($self, $cost) = @_;
     $cost = defined $cost ? $cost : $self->cost;
-    if (!defined $cost || $cost !~ /^\d+$/ || ($cost < 5 || $cost > 31)) {
-        Carp::croak "Cost must be an integer between 5 and 31";
+    if (!defined $cost || $cost !~ /^\d+$/) {
+        Carp::croak "Cost must be a positive integer";
     }
 }
 

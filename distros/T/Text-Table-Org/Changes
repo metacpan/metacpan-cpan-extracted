@@ -1,12 +1,15 @@
-Revision history for Text-Table-Org
+0.030   2022-01-07  Released-By: PERLANCAR; Urgency: medium
 
-0.02    2015-12-17 (PERLANCAR)
+	- Support parameter: separate_rows.
+
+
+0.02    2015-12-17  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [dzil] Forgot to load IfBuilt plugin.
 
 
-0.01    2015-12-17 (PERLANCAR)
+0.01    2015-12-17  Released-By: PERLANCAR
 
         - First release.

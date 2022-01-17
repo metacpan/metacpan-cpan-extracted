@@ -10,8 +10,9 @@ use Params::Validate      qw/validate_with SCALARREF UNDEF/;
 use POSIX                 qw/strftime/;
 use Date::Calc            qw/Delta_Days/;
 use Carp                  qw/croak/;
+use Encode                qw/encode_utf8/;
 
-my $VERSION = '0.1';
+my $VERSION = '0.2';
 
 #======================================================================
 # GLOBALS
@@ -70,7 +71,11 @@ sub new {
 
 
 sub add_sheet {
-  my ($self, $sheet_name, $table_name, $code_or_array) = @_;
+  # 3rd parameter ($headers) may be omitted -- so we insert an undef if necessary
+  splice @_, 3, 0, undef if @_ < 5;
+
+  # now we can parse the parameters
+  my ($self, $sheet_name, $table_name, $headers, $code_or_array) = @_;
 
   # check if the given sheet name is valid
   $sheet_name =~ $SHEET_NAME
@@ -82,9 +87,13 @@ sub add_sheet {
   my $date_regex = $self->{date_regex};
 
   # iterator for generating rows; either received as argument or built as a closure upon an array
-  my $next_row = ref $code_or_array eq 'CODE'  ? $code_or_array
-               : ref $code_or_array ne 'ARRAY' ? croak "add_sheet() : invalid row generator"
-               : do {my $i = 0; sub { $i < @$code_or_array ? $code_or_array->[$i++] : undef}};
+  my $next_row 
+    = ref $code_or_array eq 'CODE'  ? $code_or_array
+    : ref $code_or_array ne 'ARRAY' ? croak 'add_sheet() : missing or invalid $rows argument'
+    : do {my $i = 0; sub { $i < @$code_or_array ? $code_or_array->[$i++] : undef}};
+
+  # if $headers were not given explicitly, the first row will do
+  $headers //= $next_row->();
 
   # array of column references in A1 Excel notation
   my @col_letters = ('A'); # this array will be expanded on demand in the loop below
@@ -95,19 +104,18 @@ sub add_sheet {
   # start building XML for the sheet
   my @xml = (
     q{<?xml version="1.0" encoding="UTF-8" standalone="yes"?>},
-    q{<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">},
+    q{<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"},
+              q{ xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">},
     q{<sheetData>},
     );
 
   # loop over rows and columns
   my $row_num = 0;
-  my @headers;
  ROW:
-  while (my $row = $next_row->()) {
+  for (my $row = $headers; $row; $row = $next_row->()) {
     $row_num++;
     my $last_col = @$row or next ROW;
     my @cells;
-    @headers = @$row if not @headers;
 
   COLUMN:
     foreach my $col (0 .. $last_col-1) {
@@ -140,8 +148,8 @@ sub add_sheet {
 
   # if required, add the table corresponding to this sheet into the zip archive, and refer to it in XML
   my @table_rels;
-  if ($table_name) {
-    my $table_id = $self->add_table($table_name, $col_letters[-1], $row_num, @headers);
+  if ($table_name && $row_num) {
+    my $table_id = $self->add_table($table_name, $col_letters[-1], $row_num, @$headers);
     push @table_rels, $table_id;
     push @xml, q{<tableParts count="1"><tablePart r:id="rId1"/></tableParts>};
   }
@@ -194,7 +202,8 @@ sub add_table {
   # assemble XML for the table
   my @xml = (
     qq{<?xml version="1.0" encoding="UTF-8" standalone="yes"?>},
-    qq{<table xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" id="$table_id" displayName="$table_name" ref="$ref" totalsRowShown="0">},
+    qq{<table xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"}.
+         qq{ id="$table_id" displayName="$table_name" ref="$ref" totalsRowShown="0">},
     qq{<autoFilter ref="A1:D4"/>},
     qq{<tableColumns count="$#col_names">},
     @columns,
@@ -204,7 +213,7 @@ sub add_table {
    );
 
   # insert into the zip archive
-  $self->{zip}->addString(join("", @xml), "xl/tables/table$table_id.xml");
+  $self->{zip}->addString(encode_utf8(join "", @xml), "xl/tables/table$table_id.xml");
 
   return $table_id;
 }
@@ -270,7 +279,8 @@ sub workbook {
   # opening XML
   my @xml = (
     qq{<?xml version="1.0" encoding="UTF-8" standalone="yes"?>},
-    qq{<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">},
+    qq{<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"},
+             qq{ xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">},
     qq{<sheets>},
     );
 
@@ -284,27 +294,29 @@ sub workbook {
   # closing XML
   push @xml, q{</sheets>}, q{</workbook>};
 
-  return join "", @xml;
+  return encode_utf8(join "", @xml);
 }
 
 
 sub content_types {
   my ($self) = @_;
 
+  my $spreadsheetml = "application/vnd.openxmlformats-officedocument.spreadsheetml";
+
   my @sheets_xml
-    = map {qq{<Override PartName="/xl/worksheets/sheet$_.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>}} 1 .. $self->n_sheets;
+    = map {qq{<Override PartName="/xl/worksheets/sheet$_.xml" ContentType="$spreadsheetml.worksheet+xml"/>}} 1 .. $self->n_sheets;
 
   my @tables_xml
-    = map {qq{  <Override PartName="/xl/tables/table$_.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml"/>}} 1 .. $self->n_tables;
+    = map {qq{  <Override PartName="/xl/tables/table$_.xml" ContentType="$spreadsheetml.table+xml"/>}} 1 .. $self->n_tables;
 
   my @xml = (
     qq{<?xml version="1.0" encoding="UTF-8" standalone="yes"?>},
     qq{<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">},
     qq{<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>},
     qq{<Default Extension="xml" ContentType="application/xml"/>},
-    qq{<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>},
-    qq{<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>},
-    qq{<Override PartName="/xl/sharedStrings.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"/>},
+    qq{<Override PartName="/xl/workbook.xml" ContentType="$spreadsheetml.sheet.main+xml"/>},
+    qq{<Override PartName="/xl/styles.xml" ContentType="$spreadsheetml.styles+xml"/>},
+    qq{<Override PartName="/xl/sharedStrings.xml" ContentType="$spreadsheetml.sharedStrings+xml"/>},
     qq{<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>},
     qq{<Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>},
     @sheets_xml,
@@ -323,7 +335,11 @@ sub core {
 
   my @xml = (
     qq{<?xml version="1.0" encoding="UTF-8" standalone="yes"?>},
-    qq{<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dcmitype="http://purl.org/dc/dcmitype/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">},
+    qq{<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" },
+                      qq{ xmlns:dc="http://purl.org/dc/elements/1.1/"},
+                      qq{ xmlns:dcterms="http://purl.org/dc/terms/"},
+                      qq{ xmlns:dcmitype="http://purl.org/dc/dcmitype/"},
+                      qq{ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">},
     qq{<dcterms:created xsi:type="dcterms:W3CDTF">$now</dcterms:created>},
     qq{<dcterms:modified xsi:type="dcterms:W3CDTF">$now</dcterms:modified>},
     qq{</cp:coreProperties>},
@@ -337,7 +353,8 @@ sub app {
 
   my @xml = (
     qq{<?xml version="1.0" encoding="UTF-8" standalone="yes"?>},
-    qq{<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">},
+    qq{<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"},
+               qq{ xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes">},
     qq{<Application>Microsoft Excel</Application>},
     qq{</Properties>},
    );
@@ -358,12 +375,13 @@ sub shared_strings {
   # assemble XML
   my @xml = (
     qq{<?xml version="1.0" encoding="UTF-8" standalone="yes"?>},
-    qq{<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="$self->{n_strings_in_workbook}" uniqueCount="$self->{last_string_id}">},
+    qq{<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"},
+         qq{ count="$self->{n_strings_in_workbook}" uniqueCount="$self->{last_string_id}">},
     @si_nodes,
     qq{</sst>},
    );
 
-  return join "", @xml;
+  return encode_utf8(join "", @xml);
 }
 
 
@@ -449,7 +467,7 @@ sub n_days {
   my ($y, $m, $d) = @_;
 
   # convert the given date into a number of days since 1st January 1900
-  my $n_days = Delta_Days(1900, 1, 1, $+{y}, $+{m}, $+{d}) + 1;
+  my $n_days = Delta_Days(1900, 1, 1, $y, $m, $d) + 1;
   my $is_after_february_1900 = $n_days > 59;
   $n_days += 1 if $is_after_february_1900; # because Excel wrongly treats 1900 as a leap year
 
@@ -470,8 +488,8 @@ Excel::ValueWriter::XLSX - generating data-only Excel workbooks in XLSX format, 
 =head1 SYNOPSIS
 
   my $writer = Excel::ValueWriter::XLSX->new;
-  $writer->add_sheet($sheet_name1, $table_name1, [[qw/a b/], [1, 2], [3, 4]]);
-  $writer->add_sheet($sheet_name2, $table_name2, $row_generator);
+  $writer->add_sheet($sheet_name1, $table_name1, [qw/a b/], [[1, 2], [3, 4]]);
+  $writer->add_sheet($sheet_name2, $table_name2, \@headers, $row_generator);
   $writer->save_as($filename);
 
 
@@ -503,7 +521,7 @@ Constructor for a new writer object. Currently the only option is :
 
 =over
 
-* date_regex
+=item date_regex
 
 A compiled regular expression for detecting data cells that contain dates.
 The default implementation recognizes dates in C<dd.mm.yyyy>, C<yyyy-mm-dd>
@@ -515,7 +533,7 @@ in C<< $+{d} >>, C<< $+{m} >> and C<< $+{y} >>.
 
 =head2 add_sheet
 
-  $writer->add_sheet($sheet_name, $table_name, $rows);
+  $writer->add_sheet($sheet_name, $table_name, [$headers,] $rows);
 
 Adds a new worksheet into the workbook.
 
@@ -523,14 +541,23 @@ Adds a new worksheet into the workbook.
 
 =item *
 
-The C<$sheet_name> must be unique and between 1 and 31 characters long.
+The C<$sheet_name> is mandatory; it must be unique and between 1 and 31 characters long.
 
 =item *
 
 The C<$table_name> is optional; if not C<undef>, the sheet contents
 will be registered as an Excel table. The table name must be unique,
 of minimum 3 characters, without spaces or special characters.
-Values in the first row will become the headers of the table.
+
+=item *
+
+The C<$headers> argument is optional; it may be C<undef> or may even be absent.
+If present, it should contain an arrayref of scalar values, that will
+be used as column names for the table associated with that worksheet.
+Column names should be unique (otherwise Excel will automatically add
+a discriminating number). If C<$headers> are not present, the first
+row in C<$rows> will be treated as headers.
+
 
 =item *
 
@@ -538,7 +565,13 @@ The C<$rows> argument may be either a reference to a 2-dimensional array of valu
 or a reference to a callback function that will return a new row at each call, in the
 form of a 1-dimensional array reference. An empty return from the callback
 function signals the end of data (but intermediate empty rows may be returned
-as C<< [] >>).
+as C<< [] >>). Callback functions should typically be I<closures> over a lexical
+variable that remembers when the last row has been met. Here is an example of a
+callback function used to feed a sheet with 500 lines of 300 columns of random numbers:
+
+  my @headers_for_rand = map {"h$_"} 1 .. 300;
+  my $random_rows = do {my $count = 500; sub {$count-- > 0 ? [map {rand()} 1 .. 300] : undef}};
+  $writer->add_sheet(RAND_SHEET => rand => \@headers_for_rand, $random_rows);
 
 =back
 
@@ -571,10 +604,8 @@ Not done yet
 
 =head1 TO DO
 
-  - tests (use LibXML for checking schema validity)
   - options for workbook properties : author, etc.
   - support for 1904 date schema
-  - easier API for headers when using a row callback function
 
 
 =head1 AUTHOR
@@ -587,4 +618,3 @@ Copyright 2022 by Laurent Dami.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
-

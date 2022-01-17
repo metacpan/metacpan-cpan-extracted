@@ -509,8 +509,12 @@ sub install {
    $packages = [ sort { $a cmp $b } keys %$uniq_packages ];
    $modules = [ sort { $a cmp $b } keys %$uniq_modules ];
 
-   $self->install_packages($packages) or return;
-   $self->install_modules($modules) or return;
+   if (@$packages) {
+      $self->install_packages($packages) or return;
+   }
+   if (@$modules) {
+      $self->install_modules($modules) or return;
+   }
 
    # Execute special install Command if any.
    for my $brik (@$briks) {
@@ -764,7 +768,7 @@ $package - $brik Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2020, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2022, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.
@@ -1062,7 +1066,7 @@ Metabrik::Brik::Tool - brik::tool Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2020, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2022, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

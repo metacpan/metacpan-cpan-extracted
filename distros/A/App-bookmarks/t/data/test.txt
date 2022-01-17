@@ -1,2 +1,4 @@
 test.txt
 plain text example http://example.txt #tag1 #tag2
+https://example.txt another one
+and more ssh://example.txt

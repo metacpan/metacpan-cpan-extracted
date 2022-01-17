@@ -1,8 +1,8 @@
-                               DocKnot 6.00
+                               DocKnot 6.01
               (Static web site and documentation generator)
                 Maintained by Russ Allbery <rra@cpan.org>
 
-  Copyright 1999-2021 Russ Allbery <rra@cpan.org>.  This software is
+  Copyright 1999-2022 Russ Allbery <rra@cpan.org>.  This software is
   distributed under a BSD-style license.  Please see the section LICENSE
   below for more information.
 
@@ -64,9 +64,11 @@ REQUIREMENTS
   * JSON::MaybeXS
   * Kwalify
   * List::SomeUtils 0.07 or later
-  * Path::Tiny
+  * Path::Iterator::Rule
+  * Path::Tiny 0.101 or later
   * Perl6::Slurp
-  * Pod::Thread 3.00 or later
+  * Pod::Thread 3.01 or later
+  * Sort::Versions
   * Template (part of Template Toolkit)
   * YAML::XS 0.81 or later
 
@@ -158,7 +160,7 @@ LICENSE
   The DocKnot package as a whole is covered by the following copyright
   statement and license:
 
-    Copyright 1999-2021 Russ Allbery <rra@cpan.org>
+    Copyright 1999-2022 Russ Allbery <rra@cpan.org>
 
     Permission is hereby granted, free of charge, to any person obtaining
     a copy of this software and associated documentation files (the

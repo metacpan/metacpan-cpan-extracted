@@ -16,5 +16,11 @@ else
 {
     plan tests => 1;
 	
-    is(scalar(`"$^X" -Ilib script/bookmarks t/data/test.txt`), "plain text example http://example.txt #tag1 #tag2\n", "bookmarks - txt");
+is(scalar(`"$^X" -Ilib script/bookmarks t/data/test.txt`), <<'EOF'
+plain text example http://example.txt #tag1 #tag2
+https://example.txt another one
+and more ssh://example.txt
+EOF
+, "bookmarks - txt");
+
 }

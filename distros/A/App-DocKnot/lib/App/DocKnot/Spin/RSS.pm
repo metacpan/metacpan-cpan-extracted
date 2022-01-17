@@ -9,7 +9,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Spin::RSS 6.00;
+package App::DocKnot::Spin::RSS 6.01;
 
 use 5.024;
 use autodie;
@@ -18,10 +18,9 @@ use warnings;
 use App::DocKnot;
 use App::DocKnot::Spin::Thread;
 use App::DocKnot::Util qw(print_checked print_fh);
-use Cwd qw(getcwd);
 use Date::Language ();
 use Date::Parse qw(str2time);
-use File::Basename qw(fileparse);
+use Path::Tiny qw(path);
 use Perl6::Slurp qw(slurp);
 use POSIX qw(strftime);
 
@@ -123,21 +122,28 @@ sub _relative_url {
     return ('../' x scalar(@base)) . $url;
 }
 
-# Spin a file into HTML, changing directories to the directory of that file so
-# that relative file references resolve correctly.
+# Spin a file into HTML.
 #
-# $file - Path to the file
+# $file - Path::Tiny path to the file
 #
 # Returns: Rendered HTML as a list with one element per line
 sub _spin_file {
     my ($self, $file) = @_;
-    my $source = slurp($file);
-    my $cwd = getcwd();
-    my (undef, $dir) = fileparse($file);
-    chdir($dir);
-    my $page = $self->{spin}->spin_thread($source);
-    chdir($cwd);
+    my $source = $file->slurp_utf8();
+    my $page = $self->{spin}->spin_thread($source, $file);
     return map { "$_\n" } split(m{ \n }xms, $page);
+}
+
+# Report an action to standard output.
+#
+# $action - String description of the action
+# $output - Output file generated
+# $base   - Base path for all output
+sub _report_action {
+    my ($self, $action, $output) = @_;
+    my $shortout = $output->relative($self->{base} // path());
+    print_checked("$action .../$shortout\n");
+    return;
 }
 
 ##############################################################################
@@ -158,7 +164,7 @@ sub _read_rfc2822_file {
     # Parse the file.  $key holds the last key seen, used to append
     # continuation values to the previous key.  $current holds the current
     # block being parsed and @blocks all blocks seen so far.
-    open(my $fh, '<', $file);
+    my $fh = $file->openr_utf8();
     while (defined(my $line = <$fh>)) {
         if ($line =~ m{ \A \s* \z }xms) {
             if ($key) {
@@ -208,7 +214,7 @@ sub _read_rfc2822_file {
 # the changes into the provided array reference.  Each element of the array
 # will be a hash with keys title, date, link, and description.
 #
-# $file - File to read
+# $file - Path::Tiny path to file to read
 #
 # Returns: List of reference to metadata hash and reference to a list of
 #          hashes of changes
@@ -273,7 +279,7 @@ sub _parse_changes {
 # Format a journal post into HTML for inclusion in an RSS feed.  This depends
 # heavily on my personal layout for journal posts.
 #
-# $file - Path to the journal post
+# $file - Path::Tiny path to the journal post
 #
 # Returns: HTML suitable for including in an RSS feed
 sub _rss_journal {
@@ -303,7 +309,7 @@ sub _rss_journal {
 # Format a review into HTML for inclusion in an RSS feed.  This depends even
 # more heavily on my personal layout for review posts.
 #
-# $file - Path to the review
+# $file - Path::Tiny path to the review
 #
 # Returns: HTML suitable for inclusion in an RSS feed
 sub _rss_review {
@@ -373,12 +379,13 @@ sub _rss_review {
 # time as <lastBuildDate>; it's not completely clear to me that this is
 # correct.
 #
-# $fh           - Output file handle
-# $file         - Name of the output file
+# $file         - Path::Tiny path to the output file
+# $base         - Base Path::Tiny path for input files
 # $metadata_ref - Hash of metadata for the RSS feed
 # $entries_ref  - Array of entries in the RSS feed
 sub _rss_output {
-    my ($self, $fh, $file, $metadata_ref, $entries_ref) = @_;
+    my ($self, $file, $base, $metadata_ref, $entries_ref) = @_;
+    my $fh = $file->openw_utf8();
     my $version = '1.25';
 
     # Determine the current date and latest publication date of all of the
@@ -405,7 +412,7 @@ sub _rss_output {
     <generator>DocKnot $App::DocKnot::VERSION</generator>
 EOC
     if ($metadata_ref->{'rss-base'}) {
-        my ($name) = fileparse($file);
+        my $name = $file->basename();
         my $url = $metadata_ref->{'rss-base'} . $name;
         print_fh(
             $fh,
@@ -427,9 +434,11 @@ EOC
             $description =~ s{ \A (\s*) }{$1<p>}xms;
             $description =~ s{ \n* \z }{</p>\n}xms;
         } elsif ($entry_ref->{journal}) {
-            $description = $self->_rss_journal($entry_ref->{journal});
+            my $path = path($entry_ref->{journal})->absolute($base);
+            $description = $self->_rss_journal($path);
         } elsif ($entry_ref->{review}) {
-            $description = $self->_rss_review($entry_ref->{review});
+            my $path = path($entry_ref->{review})->absolute($base);
+            $description = $self->_rss_review($path);
         }
 
         # Make all relative URLs absolute.
@@ -464,6 +473,7 @@ EOC
 
     # Close the RSS structure.
     print_fh($fh, $file, "  </channel>\n</rss>\n");
+    close($fh);
     return;
 }
 
@@ -473,12 +483,12 @@ EOC
 
 # Print out the thread version of the recent changes list.
 #
-# $fh           - File handle to which to output
-# $file         - Name of the file for error reporting
+# $file         - Path::Tiny output path
 # $metadata_ref - RSS feed metadata
 # $entries_ref  - Entries
 sub _thread_output {
-    my ($self, $fh, $file, $metadata_ref, $entries_ref) = @_;
+    my ($self, $file, $metadata_ref, $entries_ref) = @_;
+    my $fh = $file->openw_utf8();
 
     # Page prefix.
     if ($metadata_ref->{'thread-prefix'}) {
@@ -520,6 +530,7 @@ sub _thread_output {
 
     # Print out the end of the page.
     print_fh($fh, $file, "\\signature\n");
+    close($fh);
     return;
 }
 
@@ -529,12 +540,12 @@ sub _thread_output {
 
 # Translate the thread of a journal entry for inclusion in an index page.
 #
-# $file - Path to the journal entry
+# $file - Path::Tiny to the journal entry
 #
 # Returns: Thread to include in the index page
 sub _index_journal {
     my ($self, $file, $url) = @_;
-    open(my $fh, '<', $file);
+    my $fh = $file->openr_utf8();
 
     # Skip to the first \h1 and exclude it.
     while (defined(my $line = <$fh>)) {
@@ -558,7 +569,7 @@ sub _index_journal {
 
 # Translate the thread of a book review for inclusion into an index page.
 #
-# $file - Path to the book review
+# $file - Path::Tiny to the book review
 #
 # Returns: Thread to include in the index page
 sub _index_review {
@@ -571,7 +582,7 @@ sub _index_review {
 
     # Scan for the author information and save it.  Handle the case where the
     # \header or \edited line is continued on the next line.
-    open(my $fh, '<', $file);
+    my $fh = $file->openr_utf8();
     while (defined(my $line = <$fh>)) {
         if ($line =~ m{ \\ (?:header|edited) \s* \[ $char+ \] \s* \z }xms) {
             $line .= <$fh>;
@@ -619,12 +630,13 @@ sub _index_review {
 
 # Print out the index version of the recent changes list.
 #
-# $fh           - File handle to which to output
-# $file         - Name of the file for error reporting
+# $file         - Path::Tiny path to the output file
+# $base         - Base Path::Tiny path for input files
 # $metadata_ref - RSS feed metadata
 # $entries_ref  - Entries
 sub _index_output {
-    my ($self, $fh, $file, $metadata_ref, $entries_ref) = @_;
+    my ($self, $file, $base, $metadata_ref, $entries_ref) = @_;
+    my $fh = $file->openw_utf8();
 
     # Output the prefix.
     if ($metadata_ref->{'index-prefix'}) {
@@ -640,9 +652,11 @@ sub _index_output {
         # Get the text of the entry.
         my $text;
         if ($entry_ref->{journal}) {
-            $text = $self->_index_journal($entry_ref->{journal});
+            my $path = path($entry_ref->{journal})->absolute($base);
+            $text = $self->_index_journal($path);
         } elsif ($entry_ref->{review}) {
-            $text = $self->_index_review($entry_ref->{review});
+            my $path = path($entry_ref->{review})->absolute($base);
+            $text = $self->_index_review($path);
         } else {
             die "unknown entry type\n";
         }
@@ -674,6 +688,7 @@ sub _index_output {
         print_fh($fh, $file, $metadata_ref->{'index-suffix'}, "\n");
     }
     print_fh($fh, $file, "\\signature\n");
+    close($fh);
     return;
 }
 
@@ -683,8 +698,8 @@ sub _index_output {
 
 # Create a new RSS generator object.
 #
-# $args - Anonymous hash of arguments with the following keys:
-#   base - Base path for output files
+# $args_ref - Anonymous hash of arguments with the following keys:
+#   base - Path::Tiny base path for output files
 #
 # Returns: Newly created object
 sub new {
@@ -692,7 +707,7 @@ sub new {
 
     # Create and return the object.
     my $self = {
-        base => $args_ref->{base},
+        base => defined($args_ref->{base}) ? path($args_ref->{base}) : undef,
         spin => App::DocKnot::Spin::Thread->new(),
     };
     bless($self, $class);
@@ -701,14 +716,13 @@ sub new {
 
 # Generate specified output files from an .rss input file.
 #
-# $source - Path to the .rss file
-# $base   - Optional base path for output
+# $source - Path::Tiny path to the .rss file
+# $base   - Optional Path::Tiny base path for output
 sub generate {
     my ($self, $source, $base) = @_;
+    $source = path($source);
     $base //= $self->{base};
-    if ($base) {
-        $base =~ s{ /* \z}{/}xms;
-    }
+    $base = defined($base) ? path($base) : path();
 
     # Read in the changes.
     my ($metadata_ref, $changes_ref) = $self->_parse_changes($source);
@@ -722,14 +736,13 @@ sub generate {
     # Iterate through each specified output file.
     for my $output (@output) {
         my ($tags, $format, $file) = split(m{ : }xms, $output);
-        my $path = ($base && $file !~ m{ \A / }xms) ? "$base$file" : $file;
-        my $prettyfile = $path;
-        if ($prettyfile !~ m{ \A / }xms) {
-            $prettyfile = ".../$prettyfile";
+        $file = path($file);
+        if ($file->is_relative()) {
+            $file = $file->absolute($base);
         }
 
         # If the output file is newer than the input file, do nothing.
-        next if (-e $path && -M $path <= -M $source);
+        next if ($file->exists() && -M "$file" <= -M "$source");
 
         # Find all the changes of interest to this output file.
         my @entries;
@@ -743,26 +756,21 @@ sub generate {
 
         # Write the output.
         if ($format eq 'thread') {
-            print_checked("Generating thread file $prettyfile\n");
-            open(my $fh, '>', $path);
-            $self->_thread_output($fh, $path, $metadata_ref, \@entries);
-            close($fh);
+            $self->_report_action('Generating thread file', $file);
+            $self->_thread_output($file, $metadata_ref, \@entries);
         } elsif ($format eq 'rss') {
             if (scalar(@entries) > $metadata_ref->{recent}) {
                 splice(@entries, $metadata_ref->{recent});
             }
-            print_checked("Generating RSS file $prettyfile\n");
-            open(my $fh, '>', $path);
-            $self->_rss_output($fh, $path, $metadata_ref, \@entries);
-            close($fh);
+            $self->_report_action('Generating RSS file', $file);
+            $self->_rss_output($file, $base, $metadata_ref, \@entries);
         } elsif ($format eq 'index') {
             if (scalar(@entries) > $metadata_ref->{recent}) {
                 splice(@entries, $metadata_ref->{recent});
             }
-            print_checked("Generating index file $prettyfile\n");
-            open(my $fh, '>', $path);
-            $self->_index_output($fh, $path, $metadata_ref, \@entries);
-            close($fh);
+            $self->_report_action('Generating index file', $file);
+            my $index_base = $source->parent();
+            $self->_index_output($file, $index_base, $metadata_ref, \@entries);
         }
     }
     return;
@@ -792,9 +800,9 @@ App::DocKnot::Spin::RSS - Generate RSS and thread from a feed description file
 
 =head1 REQUIREMENTS
 
-Perl 5.006 or later and the modules Date::Language, Date::Parse (both part of
-the TimeDate distribution), List::SomeUtils, and Perl6::Slurp, both of which
-are available from CPAN.
+Perl 5.24 or later and the modules Date::Language, Date::Parse (both part of
+the TimeDate distribution), List::SomeUtils, Path::Tiny, and Perl6::Slurp,
+both of which are available from CPAN.
 
 =head1 DESCRIPTION
 
@@ -834,7 +842,7 @@ with one or more of the following keys, all of which are optional:
 By default, App::DocKnot::Spin::RSS output files are relative to the current
 working directory.  If the C<base> argument is given, output files will be
 relative to the value of C<base> instead.  Output files specified as absolute
-paths will not be affected.
+paths will not be affected.  C<base> may be a string or a Path::Tiny object.
 
 =back
 
@@ -848,7 +856,8 @@ paths will not be affected.
 
 Parse the input file FILE and generate the output files that it specifies.
 BASE, if given, specifies the root directory for output files specified with
-relative paths, and overrides any C<base> argument given to new().
+relative paths, and overrides any C<base> argument given to new().  Both FILE
+and BASE may be strings or Path::Tiny objects.
 
 =back
 

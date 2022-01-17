@@ -2,7 +2,7 @@ package App::perlimports::Include;
 
 use Moo;
 
-our $VERSION = '0.000031';
+our $VERSION = '0.000032';
 
 use Data::Dumper qw( Dumper );
 use List::Util qw( any none uniq );
@@ -594,7 +594,7 @@ sub _build_formatted_ppi_statement {
         for ( @{ $self->_imports } ) {
             $statement .= "    $_\n";
         }
-        $statement .= ");";
+        $statement .= ');';
     }
 
     return $self->_maybe_get_new_include($statement);
@@ -754,7 +754,7 @@ App::perlimports::Include - Encapsulate one use statement in a document
 
 =head1 VERSION
 
-version 0.000031
+version 0.000032
 
 =head1 METHODS
 

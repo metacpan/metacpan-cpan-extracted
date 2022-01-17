@@ -33,65 +33,66 @@ no_index:
 provides:
   OpenTracing:
     file: lib/OpenTracing.pm
-    version: '1.005'
+    version: '1.006'
   OpenTracing::Any:
     file: lib/OpenTracing/Any.pm
-    version: '1.005'
+    version: '1.006'
   OpenTracing::Batch:
     file: lib/OpenTracing/Batch.pm
-    version: '1.005'
+    version: '1.006'
   OpenTracing::Common:
     file: lib/OpenTracing/Common.pm
-    version: '1.005'
+    version: '1.006'
   OpenTracing::DSL:
     file: lib/OpenTracing/DSL.pm
-    version: '1.005'
+    version: '1.006'
   OpenTracing::Integration:
     file: lib/OpenTracing/Integration.pm
-    version: '1.005'
+    version: '1.006'
   OpenTracing::Integration::HTTP::Tiny:
     file: lib/OpenTracing/Integration/HTTP/Tiny.pm
-    version: '1.005'
+    version: '1.006'
   OpenTracing::Integration::System:
     file: lib/OpenTracing/Integration/System.pm
-    version: '1.005'
+    version: '1.006'
   OpenTracing::Log:
     file: lib/OpenTracing/Log.pm
-    version: '1.005'
+    version: '1.006'
   OpenTracing::Process:
     file: lib/OpenTracing/Process.pm
-    version: '1.005'
+    version: '1.006'
   OpenTracing::Protocol:
     file: lib/OpenTracing/Protocol.pm
-    version: '1.005'
+    version: '1.006'
   OpenTracing::Protocol::Jaeger:
     file: lib/OpenTracing/Protocol/Jaeger.pm
-    version: '1.005'
+    version: '1.006'
   OpenTracing::Protocol::Zipkin:
     file: lib/OpenTracing/Protocol/Zipkin.pm
-    version: '1.005'
+    version: '1.006'
   OpenTracing::Reference:
     file: lib/OpenTracing/Reference.pm
-    version: '1.005'
+    version: '1.006'
   OpenTracing::Span:
     file: lib/OpenTracing/Span.pm
-    version: '1.005'
+    version: '1.006'
   OpenTracing::SpanContext:
     file: lib/OpenTracing/SpanContext.pm
-    version: '1.005'
+    version: '1.006'
   OpenTracing::SpanProxy:
     file: lib/OpenTracing/SpanProxy.pm
-    version: '1.005'
+    version: '1.006'
   OpenTracing::Tag:
     file: lib/OpenTracing/Tag.pm
-    version: '1.005'
+    version: '1.006'
   OpenTracing::Tracer:
     file: lib/OpenTracing/Tracer.pm
-    version: '1.005'
+    version: '1.006'
 recommends:
   Math::Random::ISAAC::XS: '0'
 requires:
   Bytes::Random::Secure: '0'
+  Class::Method::Modifiers: '0'
   Exporter: '0'
   JSON::MaybeUTF8: '2.000'
   JSON::MaybeXS: '0'
@@ -108,7 +109,7 @@ resources:
   bugtracker: https://github.com/team-at-cpan/OpenTracing/issues
   homepage: https://github.com/team-at-cpan/OpenTracing
   repository: https://github.com/team-at-cpan/OpenTracing.git
-version: '1.005'
+version: '1.006'
 x_authority: cpan:TEAM
 x_contributors:
   - 'Francis Tremblay <francis.tremblay@unity3d.com>'

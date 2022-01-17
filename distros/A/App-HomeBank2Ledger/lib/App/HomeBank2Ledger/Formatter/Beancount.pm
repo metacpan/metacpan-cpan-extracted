@@ -11,7 +11,7 @@ use Scalar::Util qw(looks_like_number);
 
 use parent 'App::HomeBank2Ledger::Formatter';
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 my %STATUS_SYMBOLS = (
     cleared => '*',
@@ -117,7 +117,7 @@ sub _format_transaction {
     my $date        = $transaction->{date};
     my $status      = $transaction->{status};
     my $payee       = $transaction->{payee} || '';
-    my $memo        = $transaction->{memo}  || '';
+    my $memo        = $transaction->{note} // $transaction->{memo} // '';
     my @postings    = @{$transaction->{postings}};
 
     my @out;
@@ -165,9 +165,10 @@ sub _format_transaction {
         push @line, '  ';
         if (defined $posting->{amount}) {
             push @line, $self->_format_amount($posting->{amount}, $posting->{commodity});
-            my $lot_price = $posting->{lot_price};
-            my $lot_date  = $posting->{lot_date};
-            my $lot_ref   = $posting->{lot_ref};
+            my $lot = $posting->{lot} || {};
+            my $lot_price = $lot->{price} // $posting->{lot_price};
+            my $lot_date  = $lot->{date}  // $posting->{lot_date};
+            my $lot_ref   = $lot->{ref}   // $posting->{lot_ref};
             if ($lot_price || $lot_date || $lot_ref) {
                 push @line, ' {',
                             join(', ',
@@ -301,11 +302,11 @@ App::HomeBank2Ledger::Formatter::Beancount - Beancount formatter
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 DESCRIPTION
 
-This is a formatter for L<Beancount|http://furius.ca/beancount/>.
+This is a formatter for L<Beancount|https://beancount.github.io/docs/index.html>.
 
 =head1 METHODS
 

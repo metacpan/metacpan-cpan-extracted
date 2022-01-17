@@ -20,7 +20,7 @@ Perinci::Manual::HowTo::FunctionMetadata - How-to guides related to function met
 
 =head1 VERSION
 
-This document describes version 0.006 of Perinci::Manual::HowTo::FunctionMetadata (from Perl distribution Perinci-Manual), released on 2021-07-28.
+This document describes version 0.007 of Perinci::Manual::HowTo::FunctionMetadata (from Perl distribution Perinci-Manual), released on 2021-07-31.
 
 =head1 HIDING ARGUMENT
 

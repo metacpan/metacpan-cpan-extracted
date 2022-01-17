@@ -8,7 +8,7 @@ version](https://img.shields.io/cpan/v/App-DocKnot)](https://metacpan.org/releas
 [![Debian
 package](https://img.shields.io/debian/v/docknot/unstable)](https://tracker.debian.org/pkg/docknot)
 
-Copyright 1999-2021 Russ Allbery <rra@cpan.org>.  This software is
+Copyright 1999-2022 Russ Allbery <rra@cpan.org>.  This software is
 distributed under a BSD-style license.  Please see the section
 [License](#license) below for more information.
 
@@ -69,9 +69,11 @@ The following additional Perl modules are required to use it:
 * JSON::MaybeXS
 * Kwalify
 * List::SomeUtils 0.07 or later
-* Path::Tiny
+* Path::Iterator::Rule
+* Path::Tiny 0.101 or later
 * Perl6::Slurp
-* Pod::Thread 3.00 or later
+* Pod::Thread 3.01 or later
+* Sort::Versions
 * Template (part of Template Toolkit)
 * YAML::XS 0.81 or later
 
@@ -159,7 +161,7 @@ requests are gratefully reviewed and normally accepted.
 The DocKnot package as a whole is covered by the following copyright
 statement and license:
 
-> Copyright 1999-2021
+> Copyright 1999-2022
 >     Russ Allbery <rra@cpan.org>
 >
 > Permission is hereby granted, free of charge, to any person obtaining a

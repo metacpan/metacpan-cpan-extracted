@@ -12,8 +12,6 @@ requires 'String::Util';
 test_requires 'Test::More' => '0.42';
 test_requires 'Test::Pod'  => '1.51';
 
-configure_requires 'Module::Install::AutoManifest';
-
 auto_install;
 auto_manifest;
 

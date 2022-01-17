@@ -3,15 +3,12 @@
 use strict;
 use warnings;
 
-use Mo::utils qw(check_array_object);
-use Test::MockObject;
+use Mo::utils qw(check_array);
 
 my $self = {
-        'key' => [
-                Test::MockObject->new,
-        ],
+        'key' => ['foo'],
 };
-check_array_object($self, 'key', 'Test::MockObject', 'Value');
+check_array($self, 'key');
 
 # Print out.
 print "ok\n";

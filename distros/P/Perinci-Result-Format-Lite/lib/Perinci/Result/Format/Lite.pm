@@ -1,9 +1,9 @@
 package Perinci::Result::Format::Lite;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-17'; # DATE
+our $DATE = '2021-08-01'; # DATE
 our $DIST = 'Perinci-Result-Format-Lite'; # DIST
-our $VERSION = '0.280'; # VERSION
+our $VERSION = '0.281'; # VERSION
 
 use 5.010001;
 #IFUNBUILT
@@ -186,11 +186,11 @@ sub __gen_table {
                 #say "D:j=$j fmt_name=$fmt_name";
                 next unless $fmt_name;
                 my $fmt_opts = $fmt_opts [$j];
-                if ($fmt_name eq 'iso8601_datetime' || $fmt_name eq 'iso8601_date') {
+                if ($fmt_name eq 'iso8601_datetime' || $fmt_name eq 'iso8601_date' || $fmt_name eq 'datetime' || $fmt_name eq 'date') {
                     if ($row->[$j] =~ /\A[0-9]+(\.[0-9]*)?\z/) {
                         my $frac = $1 ? "0$1"+0 : 0;
                         my @t = gmtime($row->[$j]);
-                        if ($fmt_name eq 'iso8601_datetime') {
+                        if ($fmt_name eq 'iso8601_datetime' || $fmt_name eq 'datetime') {
                             $row->[$j] = sprintf(
                                 "%04d-%02d-%02dT%02d:%02d:".($frac ? "%06.3f" : "%02d")."Z",
                                 $t[5]+1900, $t[4]+1, $t[3], $t[2], $t[1], $t[0]+$frac);
@@ -537,7 +537,7 @@ Perinci::Result::Format::Lite - Format enveloped result
 
 =head1 VERSION
 
-This document describes version 0.280 of Perinci::Result::Format::Lite (from Perl distribution Perinci-Result-Format-Lite), released on 2021-07-17.
+This document describes version 0.281 of Perinci::Result::Format::Lite (from Perl distribution Perinci-Result-Format-Lite), released on 2021-08-01.
 
 =head1 SYNOPSIS
 

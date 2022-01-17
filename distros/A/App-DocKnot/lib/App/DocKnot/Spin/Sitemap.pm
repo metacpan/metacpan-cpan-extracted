@@ -12,7 +12,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Spin::Sitemap 6.00;
+package App::DocKnot::Spin::Sitemap 6.01;
 
 use 5.024;
 use autodie;
@@ -226,7 +226,7 @@ sub new {
 # Return the <link> tags for a given output file, suitable for its <head>
 # section.
 #
-# $path - Path to the output, relative to the top of the web site
+# $path - URL path to the output with leading slash
 #
 # Returns: List of lines to add to the <head> section
 sub links {
@@ -268,7 +268,7 @@ sub links {
 
 # Return the navigation bar for a given output file.
 #
-# $path - Path to the output, relative to the top of the web site
+# $path - URL path to the output with leading slash
 #
 # Returns: List of lines that create the navbar
 sub navbar {

@@ -11,7 +11,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Spin 6.00;
+package App::DocKnot::Spin 6.01;
 
 use 5.024;
 use autodie;
@@ -23,15 +23,11 @@ use App::DocKnot::Spin::Sitemap;
 use App::DocKnot::Spin::Thread;
 use App::DocKnot::Spin::Versions;
 use App::DocKnot::Util qw(is_newer print_checked print_fh);
-use Carp qw(croak);
-use Cwd qw(getcwd realpath);
-use File::Basename qw(fileparse);
-use File::Copy qw(copy);
-use File::Find qw(find finddepth);
-use File::Spec ();
 use Git::Repository ();
 use IPC::System::Simple qw(capture);
-use Pod::Thread 3.00 ();
+use Path::Iterator::Rule ();
+use Path::Tiny qw(path);
+use Pod::Thread 3.01 ();
 use POSIX qw(strftime);
 
 # The default list of files and/or directories to exclude from spinning.  This
@@ -53,8 +49,8 @@ my $URL = 'https://www.eyrie.org/~eagle/software/web/';
 # Build te page footer, which consists of the navigation links, the regular
 # signature, and the last modified date.
 #
-# $source    - Full path to the source file
-# $out_path  - Full path to the output file
+# $source    - Path::Tiny path to the source file
+# $out_path  - Path::Tiny path to the output file
 # $id        - CVS Id of the source file or undef if not known
 # @templates - Two templates to use.  The first will be used if the
 #              modification and current dates are the same, and the second
@@ -67,15 +63,14 @@ sub _footer {
     my ($self, $source, $out_path, $id, @templates) = @_;
     my $output = q{};
     my $in_tree = 0;
-    if ($self->{source} && $source =~ m{ \A \Q$self->{source}\E }xms) {
+    if ($self->{source} && $self->{source}->subsumes($source)) {
         $in_tree = 1;
     }
 
     # Add the end-of-page navbar if we have sitemap information.
     if ($self->{sitemap} && $self->{output}) {
-        my $page = $out_path;
-        $page =~ s{ \A \Q$self->{output}\E }{}xms;
-        $output .= join(q{}, $self->{sitemap}->navbar($page)) . "\n";
+        my $page = $out_path->relative($self->{output});
+        $output .= join(q{}, $self->{sitemap}->navbar("/$page")) . "\n";
     }
 
     # Figure out the modification dates.  Use the RCS/CVS Id if available,
@@ -88,13 +83,13 @@ sub _footer {
         }
     } elsif ($self->{repository} && $in_tree) {
         $modified
-          = $self->{repository}->run('log', '-1', '--format=%ct', $source);
+          = $self->{repository}->run('log', '-1', '--format=%ct', "$source");
         if ($modified) {
             $modified = strftime('%Y-%m-%d', gmtime($modified));
         }
     }
     if (!$modified) {
-        $modified = strftime('%Y-%m-%d', gmtime((stat $source)[9]));
+        $modified = strftime('%Y-%m-%d', gmtime($source->stat()->[9]));
     }
     my $now = strftime('%Y-%m-%d', gmtime());
 
@@ -121,9 +116,8 @@ sub _footer {
 # the output of an external converter.
 sub _write_converter_output {
     my ($self, $page_ref, $output, $footer) = @_;
-    my $page = $output;
-    $page =~ s{ \A \Q$self->{output}\E }{}xms;
-    open(my $out_fh, '>', $output);
+    my $page = $output->relative($self->{output});
+    my $out_fh = $output->openw_utf8();
 
     # Grab the first few lines of input, looking for a blurb and Id string.
     # Give up if we encounter <body> first.  Also look for a </head> tag and
@@ -211,7 +205,8 @@ sub _cvs2xhtml {
     $style ||= $self->{style_url} . 'cvs.css';
 
     # Separate the source file into a directory and filename.
-    my ($name, $dir) = fileparse($source);
+    my $name = $source->basename();
+    my $dir = $source->parent();
 
     # Construct the options to cvs2xhtml.
     if ($options !~ m{ -n [ ] }xms) {
@@ -274,14 +269,12 @@ sub _pod2html {
     # Grab the thread output.
     my $data;
     $podthread->output_string(\$data);
-    $podthread->parse_file($source);
+    $podthread->parse_file("$source");
 
     # Spin that thread into HTML.
     my $page = $self->{thread}->spin_thread($data);
 
     # Push the result through _write_converter_output.
-    my $file = $source;
-    $file =~ s{ [.] [^.]+ \z }{.html}xms;
     my $footer = sub {
         my ($blurb) = @_;
         my $link = '<a href="%URL%">spun</a>';
@@ -305,7 +298,7 @@ sub _pod2html {
 # Given a pointer file, read the master file name and any options, returning
 # them as a list with the newlines chomped off.
 #
-# $file - The path to the file to read
+# $file - Path::Tiny for the file to read
 #
 # Returns: List of the master file, any command-line options, and the style
 #          sheet to use, as strings
@@ -315,11 +308,7 @@ sub _read_pointer {
     my ($self, $file) = @_;
 
     # Read the pointer file.
-    open(my $pointer, '<', $file);
-    my $master = <$pointer>;
-    my $options = <$pointer>;
-    my $style = <$pointer>;
-    close($pointer);
+    my ($master, $options, $style) = $file->lines_utf8();
 
     # Clean up the contents.
     if (!$master) {
@@ -339,29 +328,42 @@ sub _read_pointer {
     return ($master, $options, $style);
 }
 
-# This routine is called by File::Find for every file in the source tree.  It
-# decides what to do with each file, whether spinning it or copying it.
+# Convert an input path to an output path.
+#
+# $input     - Path::Tiny input path
+# $extension - If given, remove this extension and add .html in its place
+sub _output_for_file {
+    my ($self, $input, $extension) = @_;
+    my $output = $input->relative($self->{source})->absolute($self->{output});
+    if ($extension) {
+        my $output_file = $input->basename($extension) . '.html';
+        $output = $output->sibling($output_file);
+    }
+    return $output;
+}
+
+# Report an action to standard output.
+#
+# $action - String description of the action
+# $output - Output file generated
+sub _report_action {
+    my ($self, $action, $output) = @_;
+    my $shortout = $output->relative($self->{output});
+    print_checked("$action .../$shortout\n");
+    return;
+}
+
+# This routine is called for every file in the source tree.  It decides what
+# to do with each file, whether spinning it or copying it.
+#
+# $input - Path::Tiny path to the input file
 #
 # Throws: Text exception on any processing error
 #         autodie exception if files could not be accessed or written
 #
 ## no critic (Subroutines::ProhibitExcessComplexity)
 sub _process_file {
-    my ($self) = @_;
-    my $file = $_;
-    return if $file eq q{.};
-    for my $regex ($self->{excludes}->@*) {
-        if ($file =~ m{$regex}xms) {
-            $File::Find::prune = 1;
-            return;
-        }
-    }
-    my $input = $File::Find::name;
-    my $output = $input;
-    $output =~ s{ \A \Q$self->{source}\E }{$self->{output}}xms
-      or die "input file $file out of tree\n";
-    my $shortout = $output;
-    $shortout =~ s{ \A \Q$self->{output}\E }{...}xms;
+    my ($self, $input) = @_;
 
     # Conversion rules for pointers.  The key is the extension, the first
     # value is the name of the command for the purposes of output, and the
@@ -376,87 +378,84 @@ sub _process_file {
     #>>>
 
     # Figure out what to do with the input.
-    if (-d $file) {
-        $self->{generated}{$output} = 1;
-        if (-e $output && !-d $output) {
+    if ($input->is_dir()) {
+        my $output = $self->_output_for_file($input);
+        $self->{generated}{"$output"} = 1;
+        if ($output->exists() && !$output->is_dir()) {
             die "cannot replace $output with a directory\n";
-        } elsif (!-d $output) {
-            print_checked("Creating $shortout\n");
-            mkdir($output, 0755);
+        } elsif (!$output->is_dir()) {
+            $self->_report_action('Creating', $output);
+            $output->mkpath();
         }
-        my $rss_path = File::Spec->catfile($file, '.rss');
-        if (-e $rss_path) {
-            $self->{rss}->generate($rss_path, $file);
+        my $rss_path = path($input, '.rss');
+        if ($rss_path->exists()) {
+            $self->{rss}->generate("$rss_path", "$input");
         }
-    } elsif ($file =~ m{ [.] spin \z }xms) {
-        $output =~ s{ [.] spin \z }{.html}xms;
-        $shortout =~ s{ [.] spin \z }{.html}xms;
-        $self->{generated}{$output} = 1;
-        if ($self->{pointer}->is_out_of_date($input, $output)) {
-            print_checked("Converting $shortout\n");
-            $self->{pointer}->spin_pointer($input, $output);
+    } elsif ($input->basename() =~ m{ [.] spin \z }xms) {
+        my $output = $self->_output_for_file($input, '.spin');
+        $self->{generated}{"$output"} = 1;
+        if ($self->{pointer}->is_out_of_date("$input", "$output")) {
+            $self->_report_action('Converting', $output);
+            $self->{pointer}->spin_pointer("$input", "$output");
         }
-    } elsif ($file =~ m{ [.] th \z }xms) {
-        $output =~ s{ [.] th \z }{.html}xms;
-        $shortout =~ s{ [.] th \z }{.html}xms;
-        $self->{generated}{$output} = 1;
+    } elsif ($input->basename() =~ m{ [.] th \z }xms) {
+        my $output = $self->_output_for_file($input, '.th');
+        $self->{generated}{"$output"} = 1;
 
         # See if we're forced to regenerate the file because it is affected by
         # a software release.
-        if (-e $output && $self->{versions}) {
-            my $relative = $input;
-            $relative =~ s{ ^ \Q$self->{source}\E / }{}xms;
-            my $time = $self->{versions}->latest_release($relative);
-            return if is_newer($output, $file) && (stat($output))[9] >= $time;
+        if ($output->exists() && $self->{versions}) {
+            my $relative = $input->relative($self->{source});
+            my $time = $self->{versions}->latest_release("$relative");
+            return
+              if is_newer("$output", "$input")
+              && $output->stat()->[9] >= $time;
         } else {
-            return if is_newer($output, $file);
+            return if is_newer("$output", "$input");
         }
 
         # The output file is not newer.  Respin it.
-        print_checked("Spinning $shortout\n");
+        $self->_report_action('Spinning', $output);
         $self->{thread}->spin_thread_file($input, $output);
     } else {
-        my ($extension) = ($file =~ m{ [.] ([^.]+) \z }xms);
+        my ($extension) = ($input->basename =~ m{ [.] ([^.]+) \z }xms);
         if (defined($extension) && $rules{$extension}) {
             my ($name, $sub) = $rules{$extension}->@*;
-            $output =~ s{ [.] \Q$extension\E \z }{.html}xms;
-            $shortout =~ s{ [.] \Q$extension\E \z }{.html}xms;
-            $self->{generated}{$output} = 1;
+            my $output = $self->_output_for_file($input, $extension);
+            $self->{generated}{"$output"} = 1;
             my ($source, $options, $style) = $self->_read_pointer($input);
             return if is_newer($output, $input, $source);
-            print_checked("Running $name for $shortout\n");
+            $self->_report_action("Running $name for", $output);
             $self->$sub($source, $output, $options, $style);
         } else {
-            $self->{generated}{$output} = 1;
-            return if is_newer($output, $file);
-            print_checked("Updating $shortout\n");
-            copy($file, $output)
-              or die "copy of $input to $output failed: $!\n";
+            my $output = $self->_output_for_file($input);
+            $self->{generated}{"$output"} = 1;
+            return if is_newer("$output", "$input");
+            $self->_report_action('Updating', $output);
+            $input->copy($output);
         }
     }
     return;
 }
 ## use critic
 
-# This routine is called by File::Find for every file in the destination tree
-# in depth-first order, if the user requested file deletion of files not
-# generated from the source tree.  It checks each file to see if it is in the
-# $self->{generated} hash that was generated during spin processing, and if
-# not, removes it.
+# This routine is called for every file in the destination tree in depth-first
+# order, if the user requested file deletion of files not generated from the
+# source tree.  It checks each file to see if it is in the $self->{generated}
+# hash that was generated during spin processing, and if not, removes it.
+#
+# $file - Path::Tiny path to the file
 #
 # Throws: autodie exception on failure of rmdir or unlink
 sub _delete_files {
-    my ($self) = @_;
-    return if $_ eq q{.};
-    my $file = $File::Find::name;
-    return if $self->{generated}{$file};
-    my $shortfile = $file;
-    $shortfile =~ s{ ^ \Q$self->{output}\E }{...}xms;
-    print_checked("Deleting $shortfile\n");
-    if (-d $file) {
+    my ($self, $file) = @_;
+    return if $self->{generated}{"$file"};
+    my $shortfile = $file->relative($self->{output});
+    print_checked("Deleting .../$shortfile\n");
+    if ($file->is_dir()) {
         rmdir($file);
     } else {
-        unlink($file);
+        $file->remove();
     }
     return;
 }
@@ -495,7 +494,6 @@ sub new {
     my $self = {
         delete    => $args_ref->{delete},
         excludes  => [@excludes],
-        rss       => App::DocKnot::Spin::RSS->new(),
         style_url => $style_url,
     };
     #>>>
@@ -514,44 +512,47 @@ sub spin {
 
     # Reset data from a previous run.
     delete $self->{repository};
+    delete $self->{rss};
     delete $self->{sitemap};
     delete $self->{versions};
 
     # Canonicalize and check input.
-    $input = realpath($input) or die "cannot canonicalize $input: $!\n";
-    if (!-d $input) {
+    $input = path($input)->realpath();
+    if (!$input->is_dir()) {
         die "input tree $input must be a directory\n";
     }
     $self->{source} = $input;
 
     # Canonicalize and check output.
-    if (!-d $output) {
-        print_checked("Creating $output\n");
-        mkdir($output, 0755);
+    $output = path($output);
+    if (!$output->is_dir()) {
+        for my $created ($output->mkpath()) {
+            print_checked("Creating $created\n");
+        }
     }
-    $output = realpath($output) or die "cannot canonicalize $output: $!\n";
+    $output = $output->realpath();
     $self->{output} = $output;
 
     # Read metadata from the top of the input directory.
-    my $sitemap_path = File::Spec->catfile($input, '.sitemap');
-    if (-e $sitemap_path) {
-        $self->{sitemap} = App::DocKnot::Spin::Sitemap->new($sitemap_path);
+    my $sitemap_path = $input->child('.sitemap');
+    if ($sitemap_path->exists()) {
+        $self->{sitemap} = App::DocKnot::Spin::Sitemap->new("$sitemap_path");
     }
-    my $versions_path = File::Spec->catfile($input, '.versions');
-    if (-e $versions_path) {
+    my $versions_path = $input->child('.versions');
+    if ($versions_path->exists()) {
         $self->{versions} = App::DocKnot::Spin::Versions->new($versions_path);
     }
-    if (-d File::Spec->catdir($input, '.git')) {
+    if ($input->child('.git')->is_dir()) {
         $self->{repository} = Git::Repository->new(work_tree => $input);
     }
 
+    # Create a new RSS generator object.
+    $self->{rss} = App::DocKnot::Spin::RSS->new({ base => $input });
+
     # Process an .rss file at the top of the tree, if present.
-    my $rss_path = File::Spec->catfile($input, '.rss');
-    if (-e $rss_path) {
-        my $cwd = getcwd();
-        chdir($input);
-        $self->{rss}->generate($rss_path);
-        chdir($cwd);
+    my $rss_path = $input->child('.rss');
+    if ($rss_path->exists()) {
+        $self->{rss}->generate("$rss_path", "$input");
     }
 
     # Create a new thread converter object.
@@ -571,7 +572,7 @@ sub spin {
     #<<<
     $self->{pointer} = App::DocKnot::Spin::Pointer->new(
         {
-            output      => $output,
+            output      => "$output",
             sitemap     => $self->{sitemap},
             'style-url' => $self->{style_url},
             thread      => $self->{thread},
@@ -580,11 +581,20 @@ sub spin {
     #>>>
 
     # Process the input tree.
-    my $preprocess = sub { my @files = sort(@_); return @files };
-    my $wanted = sub { $self->_process_file(@_) };
-    find({ preprocess => $preprocess, wanted => $wanted }, $input);
+    my $rule = Path::Iterator::Rule->new();
+    $rule = $rule->skip($rule->new()->name($self->{excludes}->@*));
+    my $iter = $rule->iter("$input", { follow_symlinks => 0 });
+    while (defined(my $file = $iter->())) {
+        $self->_process_file(path($file));
+    }
+
+    # Remove stray files from the output tree.
     if ($self->{delete}) {
-        finddepth(sub { $self->_delete_files(@_) }, $output);
+        my %options = (depthfirst => 1, follow_symlinks => 0);
+        $iter = $rule->iter("$output", \%options);
+        while (defined(my $file = $iter->())) {
+            $self->_delete_files(path($file));
+        }
     }
     return;
 }
@@ -614,10 +624,10 @@ App::DocKnot::Spin - Static site builder supporting thread macro language
 =head1 REQUIREMENTS
 
 Perl 5.24 or later and the modules Git::Repository, Image::Size,
-List::SomeUtils, Path::Tiny, Pod::Thread, Template (part of Template Toolkit),
-and YAML::XS, all of which are available from CPAN.  Also expects to find
-B<faq2html>, B<cvs2xhtml>, and B<cl2xhtml> on the user's PATH to convert
-certain types of files.
+List::SomeUtils, Path::Iterator::Rule, Path::Tiny, Pod::Thread, Template (part
+of Template Toolkit), and YAML::XS, all of which are available from CPAN.
+Also expects to find B<faq2html>, B<cvs2xhtml>, and B<cl2xhtml> on the user's
+PATH to convert certain types of files.
 
 =head1 DESCRIPTION
 
@@ -730,7 +740,7 @@ Russ Allbery <rra@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 1999-2011, 2013, 2021 Russ Allbery <rra@cpan.org>
+Copyright 1999-2011, 2013, 2021-2022 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -6,15 +6,18 @@ Source: https://metacpan.org/pod/String::Copyright
 Files: Changes
  META.json
  META.yml
- dist.ini
  doap.ttl
  lib/String/Copyright.pm
- t/20_parse.t
- t/30_RE2_missing.t
  t/50_context.t
- t/50_encoding.t
  t/50_identifier.t
  t/50_owner.t
+Copyright: Copyright 2022 Jonas Smedegaard.
+License: AGPL_3
+
+Files: dist.ini
+ t/20_parse.t
+ t/30_RE2_missing.t
+ t/50_encoding.t
  t/50_range.t
 Copyright: Copyright 2021 Jonas Smedegaard.
 License: AGPL_3
@@ -37,21 +40,21 @@ Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: AGPL_3
- This software is Copyright (c) 2021 by Jonas Smedegaard.
+ This software is Copyright (c) 2022 by Jonas Smedegaard.
  
  This is free software, licensed under:
  
    The GNU Affero General Public License, Version 3, November 2007
 
 License: Artistic-1.0
- This software is Copyright (c) 2021 by the copyright holder(s).
+ This software is Copyright (c) 2022 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2021 by the copyright holder(s).
+ This software is Copyright (c) 2022 by the copyright holder(s).
  
  This is free software, licensed under:
  

@@ -8,7 +8,7 @@ BEGIN {
 use strict;
 use warnings;
 use 5.010;
-my $VERSION = "0.738";
+my $VERSION = "0.740";
 use Log::Log4perl::Tiny qw< :easy LOGLEVEL >;
 use Data::Tubes qw< pipeline >;
 
@@ -2245,7 +2245,7 @@ END_OF_FILE
  use strict;
  use warnings;
  use English qw< -no_match_vars >;
- our $VERSION     = '0.738';
+ our $VERSION     = '0.740';
  our $API_VERSION = $VERSION;
  use Exporter ();
  our @ISA = qw< Exporter >;
@@ -2435,7 +2435,7 @@ END_OF_FILE
  use warnings;
  use English qw< -no_match_vars >;
  use Exporter 'import';
- our $VERSION = '0.738';
+ our $VERSION = '0.740';
  
  use Log::Log4perl::Tiny qw< :easy :dead_if_first >;
  
@@ -2895,7 +2895,7 @@ END_OF_FILE
  use warnings;
  use English qw< -no_match_vars >;
  use 5.010;
- our $VERSION = '0.738';
+ our $VERSION = '0.740';
  use File::Path qw< mkpath >;
  
  use File::Spec::Functions qw< splitpath catpath >;
@@ -2982,7 +2982,7 @@ END_OF_FILE
  use 5.010;
  use File::Path qw< make_path >;
  use File::Basename qw< dirname >;
- our $VERSION = '0.738';
+ our $VERSION = '0.740';
  
  use Log::Log4perl::Tiny qw< :easy :dead_if_first >;
  use Mo qw< default >;
@@ -3199,7 +3199,7 @@ END_OF_FILE
  use warnings;
  use English qw< -no_match_vars >;
  use Log::Log4perl::Tiny qw< :easy :dead_if_first LOGLEVEL >;
- our $VERSION = '0.738';
+ our $VERSION = '0.740';
  
  use Data::Tubes::Util
    qw< normalize_args normalize_filename args_array_with_options >;
@@ -3336,7 +3336,7 @@ END_OF_FILE
  use warnings;
  use English qw< -no_match_vars >;
  use Data::Dumper;
- our $VERSION = '0.738';
+ our $VERSION = '0.740';
  
  use Template::Perlish;
  use Log::Log4perl::Tiny qw< :easy :dead_if_first get_logger >;
@@ -3453,7 +3453,7 @@ END_OF_FILE
  use strict;
  use warnings;
  use English qw< -no_match_vars >;
- our $VERSION = '0.738';
+ our $VERSION = '0.740';
  
  use Log::Log4perl::Tiny qw< :easy :dead_if_first LOGLEVEL >;
  
@@ -3576,7 +3576,7 @@ END_OF_FILE
  use warnings;
  use English qw< -no_match_vars >;
  use Data::Dumper;
- our $VERSION = '0.738';
+ our $VERSION = '0.740';
  
  use Log::Log4perl::Tiny qw< :easy :dead_if_first >;
  
@@ -4099,7 +4099,7 @@ END_OF_FILE
  use warnings;
  use English qw< -no_match_vars >;
  use POSIX qw< strftime >;
- our $VERSION = '0.738';
+ our $VERSION = '0.740';
  
  use Log::Log4perl::Tiny qw< :easy :dead_if_first LOGLEVEL >;
  use Template::Perlish;
@@ -4250,7 +4250,7 @@ END_OF_FILE
  use English qw< -no_match_vars >;
  use Data::Dumper;
  use Scalar::Util qw< blessed >;
- our $VERSION = '0.738';
+ our $VERSION = '0.740';
  
  use Log::Log4perl::Tiny
    qw< :easy :dead_if_first get_logger LOGLEVEL LEVELID_FOR >;
@@ -4422,10 +4422,10 @@ END_OF_FILE
  
  sub fallback {
  
-    # we lose syntax sugar but allow for Try::Tiny to remain optional
-    eval { require Try::Tiny; }
+    # we lose syntax sugar but allow for Try::Catch to remain optional
+    eval { require Try::Catch; }
       or LOGCONFESS 'Data::Tubes::Plugin::Plumbing::fallback '
-      . 'needs Try::Tiny, please install';
+      . 'needs Try::Catch, please install';
  
     my ($tubes, $args) = args_array_with_options(@_, {name => 'fallback'});
     identify($args);
@@ -4437,11 +4437,11 @@ END_OF_FILE
        my $record = shift;
        for my $tube (@tubes) {
           my (@retval, $do_fallback);
-          Try::Tiny::try(
+          Try::Catch::try(
              sub {
                 @retval = $tube->($record);
              },
-             Try::Tiny::catch(
+             Try::Catch::catch(
                 sub {
                    $catch->($_, $record) if $catch;
                    $do_fallback = 1;
@@ -4563,7 +4563,7 @@ END_OF_FILE
  use strict;
  use warnings;
  use English qw< -no_match_vars >;
- our $VERSION = '0.738';
+ our $VERSION = '0.740';
  
  use Log::Log4perl::Tiny qw< :easy :dead_if_first >;
  
@@ -4648,15 +4648,15 @@ END_OF_FILE
  
     my $wrapper = $args->{wrapper};
     if ($wrapper && $wrapper eq 'try') {
-       eval { require Try::Tiny; }
+       eval { require Try::Catch; }
          or LOGCONFESS 'Validator::validate_with_subs '
-         . 'needs Try::Tiny, please install';
+         . 'needs Try::Catch, please install';
  
        $wrapper = sub {
           my ($validator, @params) = @_;
-          return Try::Tiny::try(
+          return Try::Catch::try(
              sub { $validator->(@params); },
-             Try::Tiny::catch(sub { return (0, $_); }),
+             Try::Catch::catch(sub { return (0, $_); }),
           );
        };
     } ## end if ($wrapper && $wrapper...)
@@ -4710,7 +4710,7 @@ END_OF_FILE
  use strict;
  use warnings;
  use English qw< -no_match_vars >;
- our $VERSION = '0.738';
+ our $VERSION = '0.740';
  
  use Log::Log4perl::Tiny qw< :easy :dead_if_first >;
  

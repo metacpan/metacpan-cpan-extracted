@@ -1,3 +1,9 @@
+1.24     2022-01-16 10:59:29 Europe/Moscow
+       - Minor inner refactoring
+
+1.23     2022-01-15 20:19:14 Europe/Moscow
+       - Start using feature qw(signatures)
+
 1.22     2022-01-13 10:39:07 Europe/Moscow
        - Regex::Object::Matches->count implemented
        - Minor format changes in CHANGES

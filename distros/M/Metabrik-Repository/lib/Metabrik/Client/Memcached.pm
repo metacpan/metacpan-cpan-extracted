@@ -27,6 +27,8 @@ sub brik_properties {
          close => [ ],
          write => [ qw(key value) ],
          read => [ qw(key) ],
+         stats => [ ],
+         get_slabs_info => [ ],
       },
       require_modules => {
          'Cache::Memcached' => [ ],
@@ -98,6 +100,42 @@ sub read {
    return $c->get($k);
 }
 
+# stats
+# stats items
+sub stats {
+   my $self = shift;
+   my ($k) = @_;
+
+   my $c = $self->_c;
+   $self->brik_help_run_undef_arg('open', $c) or return;
+
+   return $c->stats($k);
+}
+
+#
+# High level functions:
+#
+sub get_slabs_info {
+   my $self = shift;
+
+   my $stats = $self->stats('items') or return;
+
+   my @keys = ();
+   for my $host (keys %{$stats->{hosts}}) {
+      my $items = $stats->{hosts}{$host}{items};
+      my @lines = split(/\r\n/, $items);
+
+      # Example: 'STAT items:3:number 628916'
+      for my $line (@lines) {
+         my ($slab, $count) = $line =~ m{^STAT\s+items:(\d+):number\s+(\d+)};
+         next unless (defined($slab) && defined($count));
+         push @keys, [ $slab, $count ];
+      }
+   }
+
+   return \@keys;
+}
+
 1;
 
 __END__
@@ -108,7 +146,7 @@ Metabrik::Client::Memcached - client::memcached Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2020, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2022, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

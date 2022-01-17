@@ -4,7 +4,7 @@ use Moo;
 use utf8;
 use feature qw( say );
 
-our $VERSION = '0.000031';
+our $VERSION = '0.000032';
 
 use App::perlimports           ();
 use App::perlimports::Document ();
@@ -145,9 +145,9 @@ sub _build_args {
         [
             'log-filename=s', 'Log messages to file rather than STDERR',
         ],
-        [ 'help', "Print usage message and exit", { shortcircuit => 1 } ],
+        [ 'help', 'Print usage message and exit', { shortcircuit => 1 } ],
         [
-            'verbose-help', "Print usage message and documentation ",
+            'verbose-help', 'Print usage message and documentation ',
             { shortcircuit => 1 }
         ],
     );
@@ -320,7 +320,7 @@ App::perlimports::CLI - CLI arg parsing for C<perlimports>
 
 =head1 VERSION
 
-version 0.000031
+version 0.000032
 
 =head1 DESCRIPTION
 

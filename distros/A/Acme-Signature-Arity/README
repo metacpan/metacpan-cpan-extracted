@@ -1,0 +1,109 @@
+NAME
+
+    Acme::Signature::Arity - provides reliable, production-ready signature
+    introspection
+
+DESCRIPTION
+
+    You'll know if you need this.
+
+    If you're just curious, perhaps start with
+    https://www.nntp.perl.org/group/perl.perl5.porters/2021/11/msg262009.html.
+
+    No part of this is expected to work in any way when given a sub that
+    has a prototype. There are other tools for those: Sub::Util.
+
+    For subs that don't have a prototype, this is also not expected to
+    work. It might help demonstrate where to look if you wanted to write
+    something proper, though.
+
+Exported functions
+
+ arity
+
+    Returns the UNOP_aux details for the first opcode for a coderef CV. If
+    that code uses signatures, this might give you some internal details
+    which mean something about the expected parameters.
+
+    Expected return information, as a list:
+
+      * number of required scalar parameters
+
+      * number of optional scalar parameters (probably because there are
+      defaults)
+
+      * a character representing the slurping behaviour, might be '@' or
+      '%', or nothing (undef?) if it's just a fixed list of scalar
+      parameters
+
+    This can also throw exceptions. That should only happen if you give it
+    something that isn't a coderef, or if internals change enough that the
+    entirely-unjustified assumptions made by this module are somehow no
+    longer valid. Maybe they never were in the first place.
+
+ max_arity
+
+    Takes a coderef, returns a number or undef.
+
+    If the code uses signatures, this tells you how many parameters you
+    could pass when calling before it complains - undef means unlimited.
+
+    Should also work when there are no signatures, just gives undef again.
+
+ min_arity
+
+    Takes a coderef, returns a number or undef.
+
+    If the code uses signatures, this tells you how many parameters you
+    need to pass when calling - 0 means that no parameters are required.
+
+    Should also work when there are no signatures, returning 0 in that
+    case.
+
+ coderef_ignoring_extra
+
+    Given a coderef, returns a coderef (either the original or wrapped)
+    which won't complain if you try to pass more parameters than it was
+    expecting.
+
+    This is intended for library authors in situations like this:
+
+     $useful_library->each(sub ($item) { say "item here: $item" });
+
+    where you later want to add optional new parameters, and don't trust
+    your users to include the mandatory , @ signature definition that
+    indicates excess parameters can be dropped.
+
+    Usage - let's say your first library version looked like this:
+
+     sub each ($self, $callback) {
+      my $code = $callback;
+      for my $item ($self->{items}->@*) {
+       $code->($item);
+      }
+     }
+
+    and you later want to pass the index as an extra parameter, without
+    breaking existing code that assumed there would only ever be one
+    callback parameter...
+
+     sub each ($self, $callback) {
+      my $code = coderef_ignoring_extra($callback);
+      for my $idx (0..$#{$self->{items}}) {
+       $code->($self->{items}{$idx}, $idx);
+      }
+     }
+
+    Your library is now at least somewhat backwards-compatible, without
+    sacrificing too many signature-related arity checking features: code
+    expecting the new version will still complain if required parameters
+    are not provided.
+
+AUTHOR
+
+    TEAM@cpan.org
+
+WARRANTY
+
+    None, it's an Acme module, you shouldn't even be reading this.
+

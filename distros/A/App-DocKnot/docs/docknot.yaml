@@ -15,14 +15,14 @@ format: v1
 
 name: DocKnot
 maintainer: Russ Allbery <rra@cpan.org>
-version: '6.00'
+version: '6.01'
 synopsis: Static web site and documentation generator
 
 license:
   name: Expat
 copyrights:
   - holder: Russ Allbery <rra@cpan.org>
-    years: 1999-2021
+    years: 1999-2022
 
 build:
   type: Module::Build
@@ -141,9 +141,11 @@ requirements: |
   * JSON::MaybeXS
   * Kwalify
   * List::SomeUtils 0.07 or later
-  * Path::Tiny
+  * Path::Iterator::Rule
+  * Path::Tiny 0.101 or later
   * Perl6::Slurp
-  * Pod::Thread 3.00 or later
+  * Pod::Thread 3.01 or later
+  * Sort::Versions
   * Template (part of Template Toolkit)
   * YAML::XS 0.81 or later
 

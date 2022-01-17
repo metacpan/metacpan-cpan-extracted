@@ -14,5 +14,6 @@ dist.ini
 lib/Crypt/Bcrypt.pm
 t/basic.t
 t/compat.t
+typemap
 xt/author/pod-coverage.t
 xt/author/pod-syntax.t

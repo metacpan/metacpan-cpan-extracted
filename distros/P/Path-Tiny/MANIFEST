@@ -38,6 +38,7 @@ t/parent.t
 t/recurse.t
 t/rel-abs.t
 t/sig_die.t
+t/size.t
 t/subsumes.t
 t/symlinks.t
 t/temp.t

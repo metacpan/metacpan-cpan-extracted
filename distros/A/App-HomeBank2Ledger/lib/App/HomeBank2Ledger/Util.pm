@@ -6,7 +6,7 @@ use strict;
 
 use Exporter qw(import);
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our @EXPORT_OK = qw(commify rtrim);
 
@@ -42,7 +42,7 @@ App::HomeBank2Ledger::Util - Miscellaneous utility functions
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 FUNCTIONS
 

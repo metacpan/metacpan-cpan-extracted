@@ -1,0 +1,1295 @@
+=encoding utf-8
+
+=head1 NAME
+
+HTML::Object::XQuery - HTML XQuery Extension
+
+=head1 SYNOPSIS
+
+    use HTML::Object global_dom => 1;
+    use HTML::Object::XQuery;
+    my $e = HTML::Object::Element->new || die( HTML::Object::Element->error, "\n" );
+
+=head1 VERSION
+
+    v0.1.0
+
+=head1 DESCRIPTION
+
+This class extends L<HTML::Object::Element> and provided jQuery-like methods to manipulate and query L<HTML objects|HTML::Object::Element>. It is very extensive and closely mirrors L<jQuery api|https://api.jquery.com/> with some additional features specific to perl.
+
+By calling C<use HTML::Object global_dom => 1;>, this will instantiate a global DOM mimicking the one on a web page. This, in turns, enables calls such as:
+
+    $("li").addClass("hello");
+
+Without the need to specify any context like:
+
+    my $p = HTML::Object->new;
+    my $context = $p->parse_file( "/path/to/some/file.html" );
+    $("li", $context).addClass("hello");
+
+Calling C<use HTML::Object global_dom => 1;> also enables the use of the special function C<$()>, which is, normally, not possible in perl.
+
+=head1 INHERITANCE
+
+    +--------------+     +----------------------+
+    | HTML::Object | --> | HTML::Object::XQuery |
+    +--------------+     +----------------------+
+
+=head1 METHODS
+
+=head2 add
+
+Create a new object with elements added to the set of matched elements.
+
+This returns a new L<collection element|HTML::Object::Collection>. Contrary to what one could assume, this does not add the elements to the dom, but only to the collection.
+
+The argument to L</add> can be pretty much anything that C<$()> (L</xq>) accepts, including a selector expression, elements objects, or an HTML snippet.
+
+Takes:
+
+=over 4
+
+=item * a selector (e.g. '.some-class'); or
+
+=item * a collection (i.e. one or more elements resulting from a find or equivalent query); or
+
+=item * "HTML fragment to add to the set of matched elements."; or
+
+=item * a selector and a context (i.e. an element object); or
+
+=item * a element object
+
+=back
+
+Returns a new L<HTML::Object::Collection> object.
+
+For example, consider:
+
+    <ul>
+      <li>list item 1</li>
+      <li>list item 2</li>
+      <li>list item 3</li>
+    </ul>
+    <p>a paragraph</p>
+
+    $( "li" ).add( "p" ).css( "background-color", "red" );
+
+This will select the C<li> tags, then add the C<p> tag to the collection set of elements objects and finally will apply the css change of background colour.
+
+If we pass an HTML snippet as argument, such as:
+
+    $( "li" ).add( "<p id='new'>new paragraph</p>" )
+      .css( "background-color", "red" );
+
+The paragraph will have been created dynamically and added to the set, but is not yet part of the dom until some methods are used to insert it.
+
+    $( "p" ).clone().add( "<span>Again</span>" ).appendTo( "body" );
+
+B<Note>: To reverse the L</add> you can use C<$e->not( elements | selector )> to remove elements from the collection results, or L</end> to return to the selection before you added.
+
+See L<https://api.jquery.com/add/>
+
+=head2 addClass
+
+Provided with a css class name and this will add it to the current object, which can be either a collection object (L<HTML::Object::Collection>), or an html element (L<HTML::Object::Element>).
+
+See L<https://api.jquery.com/addClass/>
+
+=head2 after
+
+Insert content, specified by the parameter, after each element in the set of matched elements.
+
+L</after> and L</insertAfter> methods perform the same task. The major difference is in the syntax—specifically, in the placement of the content and target. With L</after>, the content to be inserted comes from the method's argument: 
+
+    xq(target)->after( contentToBeInserted );
+
+With L</insertAfter>, on the other hand, the content precedes the method and is inserted after the target, which in turn is passed as the L</insertAfter> method's argument:
+
+    xq(contentToBeInserted)->insertAfter(target);
+
+For example, consider the following HTML:
+
+    <div class="container">
+      <h2>Greetings</h2>
+      <div class="inner">Hello</div>
+      <div class="inner">Goodbye</div>
+    </div>
+
+    my $p = HTML::Object->new;
+    my $doc = $p->parse_data( $html );
+
+Content can be created and then inserted after several elements at once:
+
+    xq( ".inner", $doc )->after( "<p>Test</p>" );
+
+Each inner C<E<lt>divE<gt>> element gets this new content:
+
+    <div class="container">
+      <h2>Greetings</h2>
+      <div class="inner">Hello</div>
+      <p>Test</p>
+      <div class="inner">Goodbye</div>
+      <p>Test</p>
+    </div>
+
+An element in the DOM can also be selected and inserted after another element:
+
+    xq( ".container", $doc )->after( xq( "h2", $doc ) );
+
+If an element selected this way is inserted into a single location elsewhere in the DOM, it will be moved rather than cloned:
+
+    <div class="container">
+      <div class="inner">Hello</div>
+      <div class="inner">Goodbye</div>
+    </div>
+    <h2>Greetings</h2>
+
+You can also pass a code reference that returns the elements to insert.
+
+    xq( "p", $doc )->after(sub {
+      return "<div>" + $_->className + "</div>";
+    });
+
+L<https://api.jquery.com/after/>
+
+=head2 ajax
+
+Perform an asynchronous HTTP (Ajax) request.
+
+This takes an url and an optional hash reference of parameters.
+
+B<This is still a work in progress>
+
+L<https://api.jquery.com/jQuery.ajax/>
+
+=head2 ajaxSetup
+
+B<This is still a work in progress>
+
+L<https://api.jquery.com/jQuery.ajaxSetup/>
+
+=head2 append
+
+This method inserts the specified content as the last child of each element in the collection (To insert it as the first child, use L</prepend>).
+
+It takes the following possible arguments:
+
+=over 4
+
+=item * an html string
+
+=item * an array reference of html strings
+
+=item * an L<HTML::Object::Element> object
+
+=item * code reference
+
+Will be executed to retrieve the string
+
+=back
+
+For example:
+
+    <h2>Greetings</h2>
+    <div class="container">
+        <div class="inner">Hello</div>
+        <div class="inner">Goodbye</div>
+    </div>
+
+This will create content and insert it into several elements at once:
+
+    $( ".inner" )->append( "<p>Test</p>" );
+
+Each inner <div> element gets this new content, such as:
+
+    <h2>Greetings</h2>
+    <div class="container">
+        <div class="inner">
+            Hello
+            <p>Test</p>
+        </div>
+        <div class="inner">
+            Goodbye
+            <p>Test</p>
+        </div>
+    </div>
+
+You can also select an element on the page and insert it into another:
+
+    $( ".container" )->append( $( "h2" ) );
+
+If an element selected this way is inserted into a single location elsewhere in the DOM, it will be moved into the target (not cloned):
+
+    <div class="container">
+        <div class="inner">Hello</div>
+        <div class="inner">Goodbye</div>
+        <h2>Greetings</h2>
+    </div>
+
+B<Important>: If there is more than one target element, however, cloned copies of the inserted element will be created for each target except for the last one.
+
+=head3 Additional Arguments
+
+Similar to other content-adding methods such as L</prepend> and L</before>, L</append> also supports passing in multiple arguments as input. Supported input includes L<HTML elements|HTML::Object::Element>, L<collection objects|HTML::Object::Collection>, HTML strings, and arrays of L<HTML elements|HTML::Object::Element>.
+
+For example, the following will insert two new <div>s and an existing <div> as the last three child nodes of the body:
+
+    my $newdiv1 = $( "<div id='object1'></div>" ),
+    newdiv2 = document.createElement( "div" ),
+    existingdiv1 = document.getElementById( "foo" );
+    
+    $( "body" ).append( $newdiv1, [ newdiv2, existingdiv1 ] );
+
+L<https://api.jquery.com/append/>
+
+=head2 appendTo
+
+Same as L</append>, except that instead of using the current object, the current object is appended to the object specified.
+
+L<https://api.jquery.com/appendTo/>
+
+=head2 attr
+
+If more than 1 values are provided, it will set the attributes with their keys and associated values.
+
+If only one parameter is provided, this will return the corresponding value.
+
+L<https://api.jquery.com/attr/>
+
+=head2 before
+
+L</before> and L</insertBefore> methods perform the same task. The major difference is in the syntax—specifically, in the placement of the content and target. With L</before>, the content to be inserted comes from the method's argument: 
+
+    xq(target)->before( contentToBeInserted )
+
+With L</insertBefore>, on the other hand, the content precedes the method and is inserted before the target, which in turn is passed as the L</insertBefore> method's argument:
+
+    xq(contentToBeInserted)->insertBefore( target );
+
+    <div class="container">
+      <h2>Greetings</h2>
+      <div class="inner">Hello</div>
+      <div class="inner">Goodbye</div>
+    </div>
+
+    my $p = HTML::Object->new;
+    my $doc = $p->parse_data( $html );
+
+You can create content and insert it before several elements at once:
+
+    xq( ".inner", $doc ).before( "<p>Test</p>" );
+
+Each inner E<lt>divE<gt> element gets this new content:
+
+    <div class="container">
+      <h2>Greetings</h2>
+      <p>Test</p>
+      <div class="inner">Hello</div>
+      <p>Test</p>
+      <div class="inner">Goodbye</div>
+    </div>
+
+You can also select an element on the page and insert it before another:
+
+    xq( ".container", $doc ).before( xq( "h2", $doc ) );
+
+If an element selected this way is inserted into a single location elsewhere in the DOM, it will be moved before the target (not cloned):
+
+    <h2>Greetings</h2>
+    <div class="container">
+      <div class="inner">Hello</div>
+      <div class="inner">Goodbye</div>
+    </div>
+
+L<https://api.jquery.com/before/>
+
+=head2 closest
+
+Takes a selector; or a selector and an L<HTML::Object::Element> as a context; or a L<HTML::Object::Element> object "Given a jQuery object that represents a set of DOM elements, the .closest() method searches through these elements and their ancestors in the DOM tree and constructs a new jQuery object from the matching elements."
+
+It returns a L<HTML::Object::Collection> object.
+
+L<https://api.jquery.com/closest/>
+
+=head2 cmp
+
+Comparison operator between objects
+
+=head2 css
+
+Takes a property name; or an array reference of one or more css properties; or a property name and a value; or a property name and a function; or an hash reference of property name-value pairs
+
+This wil set the css attribute for that element.
+
+=head2 css_cache_check
+
+Provided with some data and this will check the checksum to re-use the cache or not.
+
+It returns an empty string when no cache can be re-used.
+
+=head2 css_cache_store
+
+Provided with some css data for this element and this will cache it.
+
+=head2 data
+
+Provided with a name and some value and this will set the C<data> attribute for this element or collection of elements accordingly.
+
+If the data provided is an hash reference, each key-value pair will be added as data attribute to the element of the collection of elements.
+
+If only a name is provided, with no value, this will return the corresponding value.
+
+L<https://api.jquery.com/data/>
+
+=head2 detach
+
+Detach the current element or the collection of elements and return the current object.
+
+L<https://api.jquery.com/detach/>
+
+=head2 each
+
+    xq('.some-thing')->each(sub
+    {
+        my( $i, $e ) = @_;
+        # do something
+    });
+
+Takes a code reference which receives the element position and element object as parameter.
+
+It returns the current object it was called with.
+
+L<https://api.jquery.com/each/>
+
+=head2 empty
+
+This will empty the current element or collection of elements. This mean there will be no children elements anymore.
+
+L<https://api.jquery.com/empty/>
+
+=head2 end
+
+Sets or gets an L<HTML::Object::Element> object.
+
+L<https://api.jquery.com/end/>
+
+=head2 eq
+
+Returns the children elements matching the value provided.
+
+This calls L</children>, which returns an L<Module::Generic::Array> object and calls L<Module::Generic::Array/index> with the value provided.
+
+L<https://api.jquery.com/eq/>
+
+=head2 even
+
+Returns a new collection of elements whose position is an even number
+
+L<https://api.jquery.com/even/>
+
+=head2 exists
+
+Provided an C<xpath> and this will check if the current object exists in the C<xpath> provided.
+
+=head2 filter
+
+Takes a selector; or
+function with arguments are element position (starting from 0) and the element itself, expecting a true value in return; or
+an array of element objects; or
+an element object;
+
+L<https://api.jquery.com/filter/>
+
+=head2 find
+
+Takes a selector; or
+Element object
+
+L<https://api.jquery.com/find/>
+
+=head2 find_xpath
+
+Provided with an C<xpath> value and this will find and return all matches.
+
+=head2 findnodes
+
+Provided with an C<xpath> value and this will find and return all nodes.
+
+=head2 findnodes_as_string
+
+Provided with an C<xpath> value and this will find and return all nodes as string.
+
+=head2 findnodes_as_strings
+
+Same as L</findnodes_as_string>, but plural
+
+Provided with an C<xpath> value and this will find and return all nodes as strings.
+
+=head2 findvalue
+
+Provided with an C<xpath> value and this will find and return node value.
+
+=head2 findvalues
+
+Same as L</findvalue>, but plural
+
+Provided with an C<xpath> value and this will find and return nodes value.
+
+=head2 first
+
+Returns the first element of the collection if the object is a collection, or the element itself.
+
+L<https://api.jquery.com/first/>
+
+=head2 get
+
+Returns the current element.
+
+Originally, in jQuery, this returns the underlying DOM element, but here, in perl context, this does not mean much, and we return our own object.
+
+L<https://api.jquery.com/get/>
+
+=head2 getAttributes
+
+Returns a new array object L<Module::Generic::Array> of L<HTML::Object::Attribute> in the sequence set with L</attributes_sequence>
+
+=head2 getChildNodes
+
+Returns a new array object L<Module::Generic::Array> of L<HTML::Object::Element> objects.
+
+=head2 getElementById
+
+Provided with an C<id> and this will return the first element found that matches.
+
+=head2 getFirstChild
+
+Returns the first child found as an L<HTML::Object::Element> objects.
+
+=head2 getLastChild
+
+Returns the last child found as an L<HTML::Object::Element> objects.
+
+=head2 getNodePath
+
+Returns the current element C<xpath>
+
+=head2 getParentNode
+
+Returns the current element parent node, or the root element if no parent is set.
+
+=head2 getName
+
+Returns the tag name for the current element.
+
+=head2 getLocalName
+
+Returns the tag name for the current element with any prepended class removed.
+
+=head2 getNextSibling
+
+Returns the next sibling for the current element.
+
+=head2 getPreviousSibling
+
+Returns the previous sibling for the current element.
+
+=head2 getRootNode
+
+Returns the root L<HTML::Object::Root> object.
+
+=head2 getValue
+
+Returns the L</value> if the node is a comment node.
+
+Otherwise returns the node as text, by calling L</as_text>
+
+=head2 has
+
+L</has> method constructs a new L<HTML::Object::Collection> object from a subset of the original object on which it is called, and that only includes elements with descendants that match the given selector.
+
+Let’s say you wanted to find all paragraphs that have links in them. You’d use:
+
+    my $paragraphs = $xq('p', $doc);
+    my $paragraphsWithLinks = $paragraphs->has('a');
+
+The difference with the L</find> method[1], is that rather than returning a subset of the object on which it is called, returns a L<HTML::Object::Collection> object representing the elements that match the given selector that are descendants of the original object.
+
+So, similar to the above example, instead of selecting paragraphs that have links in them, we instead get the links themselves that are inside paragraphs:
+
+    my $paragraphs = $xq('p', $doc); 
+    my $linksInParagraphs = $paragraphs->find('a');
+
+[1] Paraphrasing the explanation provided by L<Andy Farrell|https://www.quora.com/What-is-the-difference-between-has-and-find-in-jQuery>
+
+See also L</children>, L</filter>, L</find>
+
+L<https://api.jquery.com/has/>
+
+=head2 hasClass
+
+Provided with a css class name and this will returns true if the current element has this class, or false otherwise.
+
+L<https://api.jquery.com/hasClass/>
+
+=head2 hide
+
+This is roughly equivalent to calling L</css>( "display", "none" ), except that the value of the display property is saved in the object's internal data cache so that display can later be restored to its initial value. If an element has a display value of inline and is hidden then shown, it will once again be displayed inline.
+
+It takes 1 or 2 argument. THe first one originally in jQuery is either a timer in millisecond or an easing effect or some option hash, but since none of this has any effect under perl, the first argument is ignored.
+
+    $elem->hide( $hash_ref, sub{ $_->show() });
+
+However, if there is only one argument and it is a code reference, it is used.
+
+    $elem->hide( sub{ $_->show() });
+
+The optional second argument is a code reference (a callback) that will be called passing it the element object.
+
+It returns the object used to call this method in the first place.
+
+    $elem->hide->show(); # Kind of meaningless, but hey this is an example
+
+L<https://api.jquery.com/hide/>
+
+=head2 html
+
+When no argument is provided, this returns the html string of its content for element object, or the html string of the content of the first object if this is a collection object, i.e. a L<HTML::Object::Collection> object.
+
+    my $html_string = $element->html();
+    # or, here this is a collection object
+    xq('body', $doc)->html();
+    # or if this is a single html element object
+    xq('body', $doc)->first->html();
+
+When an argument is provided, it takes either some html data as a string, or a code reference.
+
+In the case of a code reference, it is called with the element position, starting at 0 and the old html data string. It expects in returns either:
+
+=over 4
+
+=item 1. an empty or undefined value, in which case the current element will have its content emptied using L</empty>
+
+=item 2. some html data, in which case it is parsed using L<HTML::Object/parse_data> and the object found are used to replace the content of the current element object.
+
+=item 3. an L<HTML::Object::Element> object whose content elements will be used in replacement of the content of the current object
+
+=back
+
+Quoting jQuery documentation, for example, consider this html:
+
+    <div class="demo-container">
+      <div class="demo-box">Demonstration Box</div>
+    </div>
+
+Assuming this html is stored in a variable C<$html>:
+
+    my $p = HTML::Object->new;
+    my $doc = $p->parse_data( $html ) || die( $p->error, "\n" );
+
+The content of <div class="demo-container"> can be set like this:
+
+    xq( "div.demo-container", $doc )
+      ->html( "<p>All new content. <em>You bet!</em></p>" );
+
+That line of code will replace everything inside C<E<lt>div class="demo-container"E<gt>>:
+
+    <div class="demo-container">
+      <p>All new content. <em>You bet!</em></p>
+    </div>
+
+Or
+
+    xq( "div.demo-container", $doc )->html(sub {
+      my $emphasis = "<em>" + $xq( "p", $doc )->length + " paragraphs!</em>";
+      return "<p>All new content for " + emphasis + "</p>";
+    });
+
+Afer the html value is set, it returns the object it was called with.
+
+To set the content of a E<lt>scriptE<gt> element, which does not contain HTML, use the L</text> method and not L</html>.
+
+L<https://api.jquery.com/html/>
+
+=head2 index
+
+Search for a given element from among the matched elements.
+
+When no argument is provided, the return value is an integer indicating the position of the element, starting from 0, within its parent.
+
+If L</index> is called on a collection of elements (i.e. a L<HTML::Object::Collection> object) and an element object (L<HTML::Object::Element>) is provided as argument, L</index> returns an integer indicating the position of the provided element relative to the original collection.
+
+This would behave as a complementary operation to L</get>, which accepts an index and returns a element object. Under jQuery, L</get> would return DOM element, but there is no such thing in this perl context.
+
+If a selector string is passed as an argument, L</index> returns an integer indicating the position of the first element within the object relative to the elements matched by the selector. If the element is not found, C<-1> will be returned.
+
+For example, consider the following html:
+
+    <ul>
+      <li id="foo">foo</li>
+      <li id="bar">bar</li>
+      <li id="baz">baz</li>
+    </ul>
+
+    my $p = HTML::Object->new;
+    my $document = $p->parse_data( $html );
+
+If we retrieve one of the three list items (for example, through one of the element object's functions), L</index> can search for this list item within the set of matched elements:
+
+    my $listItem = $document.getElementById( "bar" );
+    say( "Index: " + xq( "li", $document )->index( $listItem ) );
+
+We get back the zero-based position of the list item:
+
+    Index: 1
+
+Note that if a collection object (L<HTML::Object::Collection>) is used as the L</index> method's argument and it contains more than one element, the first element within that collection will be used.
+
+If we use a string as the L</index> method's argument, it is interpreted as a selector string. The first element among the L<HTML::Object::Collection|collection> object's matched elements which also matches this selector is located. If the object is just one L<HTML::Object::Element> object, the selector is tested against it.
+
+    my $listItem = xq( "#bar", $document );
+    say( "Index: " + $listItem->index( "li" ) );
+
+Or, using a single L<HTML::Object::Element>, the same will check against that element alone.
+
+    my $element = xq( "#bar", $document )->first();
+    say( "Index: " + $listItem->index( "li" ) );
+
+Without any arguments, L</index> will return the position of the first element, if this is a L<HTML::Object::Collection|collection object>, in relation to its siblings, or the position of the element itself if this is just an L<HTML::Object::Element>
+
+    say( "Index: " + xq( "#bar", $document )->index() );
+
+L<https://api.jquery.com/index/>
+
+=head2 insertAfter
+
+Insert every element in the set of matched elements after the target.
+
+The target can be one of a selector, an element object (L<HTML::Object::Element>), an array of elements objects, or an HTML string.
+
+if the current object is a collection, all of its elements contained will be inserted after the target.
+
+If the current object is just an L<HTML::Object::Element> object, it will be moved (not copied) after the target.
+
+L</after> and L</insertAfter> perform the same task. The major difference is in the syntax—specifically, in the placement of the content and target. With L</after>, the object used to call the method is the container after which the content is inserted. While with L</insertAfter>, it is the opposite.
+
+For example, consider the following HTML:
+
+    <div class="container">
+      <h2>Greetings</h2>
+      <div class="inner">Hello</div>
+      <div class="inner">Goodbye</div>
+    </div>
+
+    my $p = HTML::Object->new;
+    my $doc = $p->parse_data( $html );
+
+We can create content and insert it after several elements at once:
+
+    xq( "<p>Test</p>", $doc )->insertAfter( ".inner" );
+
+Each inner C<E<le>divE<gt>> element gets this new content:
+
+    <div class="container">
+      <h2>Greetings</h2>
+      <div class="inner">Hello</div>
+      <p>Test</p>
+      <div class="inner">Goodbye</div>
+      <p>Test</p>
+    </div>
+
+We can also select an element on the page and insert it after another:
+
+    xq( "h2", $doc )->insertAfter( xq( ".container", $doc ) );
+
+If an element selected this way is inserted into a single location elsewhere in the DOM, it will be moved after the target (not cloned) and a new set consisting of the inserted element is returned:
+
+    <div class="container">
+      <div class="inner">Hello</div>
+      <div class="inner">Goodbye</div>
+    </div>
+    <h2>Greetings</h2>
+
+If there is more than one target element, however, cloned copies of the inserted element will be created for each target after the first, and that new set (the original element plus clones) is returned.
+
+L<https://api.jquery.com/insertAfter/>
+
+=head2 insertBefore
+
+Insert every element in the set of matched elements before the target.
+
+The target can be one of a selector, an element object (L<HTML::Object::Element>), an array of elements objects, or an HTML string.
+
+if the current object is a collection, all of its elements contained will be inserted before the target.
+
+If the current object is just an L<HTML::Object::Element> object, it will be moved (not copied) before the target.
+
+L</before> and L</insertBefore> perform the same task. The major difference is in the syntax—specifically, in the placement of the content and target. With L</before>, the object used to call the method is the container before which the content is inserted. While with L</insertBefore>, it is the opposite.
+
+For example, consider the following HTML:
+
+    <div class="container">
+      <h2>Greetings</h2>
+      <div class="inner">Hello</div>
+      <div class="inner">Goodbye</div>
+    </div>
+
+    my $p = HTML::Object->new;
+    my $doc = $p->parse_data( $html );
+
+We can create content and insert it before several elements at once:
+
+    xq( "<p>Test</p>", $doc )->insertBefore( ".inner" );
+
+Each inner C<E<le>divE<gt>> element gets this new content:
+
+    <div class="container">
+      <h2>Greetings</h2>
+      <p>Test</p>
+      <div class="inner">Hello</div>
+      <p>Test</p>
+      <div class="inner">Goodbye</div>
+    </div>
+
+We can also select an element on the page and insert it before another:
+
+    xq( "h2", $doc )->insertBefore( xq( ".container", $doc ) );
+
+If an element selected this way is inserted into a single location elsewhere in the DOM, it will be moved before the target (not cloned) and a new set consisting of the inserted element is returned:
+
+    <h2>Greetings</h2>
+    <div class="container">
+      <div class="inner">Hello</div>
+      <div class="inner">Goodbye</div>
+    </div>
+
+If there is more than one target element, however, cloned copies of the inserted element will be created for each target after the first, and that new set (the original element plus clones) is returned.
+
+L<https://api.jquery.com/insertBefore/>
+
+=head2 is
+
+Check the current matched set of elements against a selector, L<HTML::Object::Element|element object>, L<HTML::Object::Collection|a collection of element> or a code reference and return true if at least one of these elements matches the given arguments.
+
+Unlike other filtering methods, L</is> does not create a new object. Instead, it allows you to test the contents of an object (element or collection) without modification.
+
+Suppose you have a list, with two of its items containing a child element:
+
+    <ul>
+      <li>list <strong>item 1</strong></li>
+      <li><span>list item 2</span></li>
+      <li>list item 3</li>
+    </ul>
+
+    my $p = HTML::Object->new;
+    my $doc = $p->parse_data( $html ) || die( $p->error );
+
+You can check if an object is one of the C<li>'s like:
+
+    if( $elem->is( 'li' ) )
+    {
+        # Make the background red
+        $elem->css( "background-color", "red" );
+    }
+
+L</is> can also evaluate expressions related to elements based on a code reference rather than a selector. For each element, if the code reference returns true, L</is> returns true as well. For example, given a somewhat more involved HTML snippet:
+
+    <ul>
+      <li><strong>list</strong> item 1 - one strong tag</li>
+      <li><strong>list</strong> item <strong>2</strong> -
+        two <span>strong tags</span></li>
+      <li>list item 3</li>
+      <li>list item 4</li>
+      <li>list item 5</li>
+    </ul>
+
+C<$li> here is an element that you have defined earlier in your code.
+
+    my $isWithTwo = $li->is(sub {
+        return xq( "strong", $_ )->length == 2;
+    });
+    if( $isWithTwo ) 
+    {
+        $li->css( "background-color", "green" );
+    } 
+    else
+    {
+        $li->css( "background-color", "red" );
+    }
+
+Or
+
+    <form>
+      <input type="checkbox">
+    </form>
+    <div></div>
+
+    my $isFormParent = xq( "input[type='checkbox']", $doc )->parent()->is( "form" );
+    xq( "div", $doc )->text( "isFormParent = " + $isFormParent );
+
+Checks against an existing collection of alternating list elements. Blue, alternating list elements set background to yellow while others turn red.
+
+    <ul id="browsers">
+      <li>Chrome</li>
+      <li>Safari</li>
+      <li>Firefox</li>
+      <li>Opera</li>
+    </ul>
+ 
+    my $alt = xq( "#browsers li:nth-child(2n)", $doc )->css( "background", "#0ff" );
+    my $li = xq( "li" );
+    if( $li->is( $alt ) )
+    {
+        $li->css( "background", "yellow" );
+    }
+    else
+    {
+        $li->css( "background", "red" );
+    }
+
+See L<https://api.jquery.com/is/>
+
+=head2 isa_collection
+
+Returns true if the current element is a L<HTML::Object::Collection> object, or false otherwise.
+
+=head2 isAttributeNode
+
+Returns false.
+
+=head2 isCommentNode
+
+Returns true if the current element is a comment, or false otherwise.
+
+=head2 isElementNode
+
+Returns true if the current element is a node element, or false otherwise.
+
+=head2 isNamespaceNode
+
+Returns false.
+
+=head2 isPINode
+
+Returns false.
+
+=head2 isProcessingInstructionNode
+
+Returns true if the current element is a processing instruction node, or false otherwise.
+
+=head2 isTextNode
+
+Returns true if the current element is a text node, or false otherwise.
+
+=head2 length
+
+Returns the number of children if the current element is a collection, or 1 if the current element is an element.
+
+=head2 load
+
+    $e->load( $uri );
+    # or
+    $e->load( $uri, { key1 => value1, key2 => value2 } );
+    # or
+    $e->load( $uri, $callback_subroutine );
+    # or
+    $e->load( $uri, { key1 => value1, key2 => value2 }, $callback_subroutine );
+
+The callback function receives 3 arguments: C<$responseContent>, C<$textStatus> and C<$responseObject>
+
+This method fetches data from the given C<uri> and, when a successful response is detected (i.e. when C<textStatus> is C<success> or C<notmodified>), L</load> sets the HTML contents of the matched elements to the returned data. This means that most uses of the method can be quite simple:
+
+    $( "#result" )->load( "/some/test.html" );
+
+Upon error, be it internal, or when the returned http code is not a 2XX code, C<$textStatus> is set to C<error>
+
+If no element is matched by the selector — in this case, if the document does not contain an element with C<id="result"> — the http request will not be sent.
+
+It returns the current element object upon success, or upon error, sets an L<error|Module::Generic/error> and returns undef.
+
+This methods uses L<LWP::UserAgent> to do the work and it must be installed as well as L<URI>, or else this method will return an error.
+
+The C<uri> provided must be an absolute URI, or L<LWP::UserAgent> will return an error.
+
+=head3 Callback subroutine
+
+If a callback subroutine is provided, it is executed after post-processing of the HTML with L<HTML::Object> and insertion of the HTML element objects have been performed. The callback is fired once for each element in the object collection, and C<$_> is set to each L<element object|HTML::Object::Element> in turn.
+
+    $( "#result" )->load( "/somewhere/test.html", sub
+    {
+        print( "Load was performed.\n" );
+    });
+
+The C<$responseObject> is a L<HTTP::Response> object.
+
+The C<$responseContent> is an utf8 decoded (i.e. perl internal utf8) text string.
+
+=head3 Request method
+
+The C<POST> method is used if data is provided as an hash reference; otherwise, C<GET> is assumed.
+
+=head3 Loading page fragments
+
+This method makes it possible to specify a portion of the remote document to be inserted. This is achieved with a special syntax for the uri parameter. If one or more space characters are included in the string, the portion of the string following the first space is assumed to be a C<selector> that determines the content to be loaded. For example:
+
+    $( "#result" )->load( "/somewhere/test.html #container" );
+
+Upon execution, this method retrieves the content of C</somewhere/test.html>, but then L<HTML::Object> parses the returned document to find the element with an ID of container. This element, along with its contents, is inserted into the element with an ID of result, and the rest of the retrieved document is discarded.
+
+For example, given the following HTML document:
+
+    <!DOCTYPE html>
+    <html lang="en-GB">
+        <head>
+            <meta charset="utf-8" />
+            <title>load demo</title>
+            <meta name="generator" content="BBEdit 13.5" />
+        </head>
+        <body>
+            <b>Projects:</b>
+            <ol id="new-projects"></ol>
+        </body>
+    </html>
+
+We could do:
+
+    use HTML::Object;
+    use Module::Generic::File qw( file );
+    my $parser = HTML::Object->new;
+    my $doc = $parser->parse( $html ) || die( $parser->error );
+    HTML::Object->set_dom( $doc );
+    my $part = file( "./resources/load.html" );
+    my $uri  = $part->uri; # e.g. file:///home/joe/www/resources/load.html
+    $( "#new-projects" )->load( "$uri #projects li" );
+
+This would make the following change to the html:
+
+    <ol id="new-projects"><li>jQuery</li><li>jQuery UI</li><li>jQuery Mobile</li><li>QUnit</li><li>Sizzle</li></ol>
+
+=head3 Error handling
+
+If an error occurs, the C<$textStatus> would be set to C<error>, which you can check as follows:
+
+$( "#success" ).load( "https://example.org/not-here.html", sub
+{
+    my( $content, $status, $resp ) = @_;
+    if( $status == "error" )
+    {
+        my $msg = "Sorry but there was an error: ";
+        $( "#error" )->html( $msg . $resp->code . " " . $resp->message );
+    }
+});
+
+See also L<jQuery documentation on load|https://api.jquery.com/load>
+
+=head2 map
+
+Provided with a code reference, and this will execute on each of the children.
+
+=head2 matches
+
+Provided with a C<xpath> and this will return all matching nodes.
+
+=head2 name
+
+Sets or gets the C<name> attribute.
+
+=head2 new_attribute
+
+Provided with an hash or hash reference of parameters, and this will return a new L<HTML::Object::Attribute> object by passing it the parameters.
+
+=head2 new_collection
+
+Provided with an hash or hash reference of parameters, and this will return a new L<HTML::Object::Collection> object by passing it the parameters.
+
+=head2 new_parser
+
+This will return a new L<HTML::Object> object.
+
+=head2 new_root
+
+Provided with an hash or hash reference of parameters, and this will return a new L<HTML::Object::Root> object by passing it the parameters.
+
+=head2 not
+
+Takes a selector expression; or
+a element object; or
+a collection of elements; or
+an array of element objects to match against the set.
+
+It returns all elements that do not match.
+
+L<https://api.jquery.com/not/>
+
+=head2 odd
+
+Returns a new collection of elements whose position is an even number
+
+L<https://api.jquery.com/odd/>
+
+=head2 prepend
+
+Takes html string (start with <tag...), text object (HTML::Object::Text), array or element object
+or alternatively a code reference that returns the above
+
+L<https://api.jquery.com/prepend/>
+
+=head2 prependTo
+
+L<https://api.jquery.com/prependTo/>
+
+=head2 promise
+
+Provided with a code reference to be executed asynchronously and this will return a L<Promise::Me> object.
+
+    my $p = $e->promise(sub
+    {
+       # Some regular code here
+    })->then(sub
+    {
+       my $res = shift( @_ ); # return value from the code executed above
+       # more processing...
+    })->then(sub
+    {
+       my $more = shift( @_ ); # return value from the previous then
+       # more processing...
+    })->catch(sub
+    {
+       my $exception = shift( @_ ); # error that occured is caught here
+    })->finally(sub
+    {
+       # final processing
+    })->then(sub
+    {
+       # A last then may be added after finally
+    };
+
+=head2 remove
+
+If the current object is a collection, this will remove all of its children. Otherwise, if this is an element, it will simply remove it.
+
+You can also provide an C<xpath> as an argument and the matching nodes will be removed.
+
+=head2 removeAttr
+
+Provided with an attribute name and this will remove it from the collection if the current element is a collection, or from the current element itself if it is a L<HTML::Parser::Element> object.
+
+It returns the current object.
+
+L<https://api.jquery.com/removeAttr/>
+
+=head2 removeClass
+
+Provided with a class name and this will remove it from the current element or the current collection.
+
+L<https://api.jquery.com/removeClass/>
+
+=head2 replaceWith
+
+Takes html string, array of elements, an element (including a collection object) or a code reference and this will replace the current element with the new element.
+
+L<https://api.jquery.com/replaceWith/>
+
+=head2 set_namespace
+
+Set the new namespace for the current node.
+
+=head2 show
+
+Since this is a perl context, this only set the inline css 1) back to its previous value,
+if any; or 2) remove the display property if there was no previous value set.
+
+Any parameter provided will be ignored
+
+See the hide() method for its alter ego.
+
+L<https://api.jquery.com/show/>
+
+=head2 string_value
+
+Returns L</value> if the current element is comment node. Otherwise, returns L</as_text>
+
+=head2 tagname
+
+Returns the tag name for the current element.
+
+=head2 toggleClass
+
+Takes a class name; or
+class name and state (true or false); or
+array of class names; or
+array of class names and a state; or
+a code reference called with the index position of the current class and its name. Returns a space separated list of classes or an array
+
+L<https://api.jquery.com/toggleClass/>
+
+=head2 to_number
+
+Returns a new L<HTML::Object::Number> object by passing it the current node value (L</getValue>)
+
+=head2 toString
+
+Returns the current node value as L</as_xml>
+
+=head2 xp
+
+Returns an already instantiated L<XML::XPathEngine> object, or instantiate one and returns it.
+
+=head2 xq
+
+Ref: <https://api.jquery.com/Types/#jQuery>
+
+    xq( '#myId', $document )
+    xq( '<div />', { id => 'Pouec', class => 'Hello' } );
+    xq( '<html><head><title>Hello world</title></head><body>Hello!</body></html>' );
+    xq();
+
+=head1 PRIVATE METHODS
+
+=head2 _append_prepend
+
+Called by L</append> and L</prepend> to do the heavy work.
+
+=head2 _append_prepend_to
+
+Takes html string; or
+selector; or
+element object; or
+array of objects; or
+collection
+"If there is more than one target element, however, cloned copies of the inserted element will be created for each target except the last, and that new set (the original element plus clones) is returned."
+
+Called by L</append_to> and L</prepend_to> to do the heavy work.
+
+=head2 _before_after
+
+Takes html string (start with <tag...), text object (HTML::Object::Text), array or element object
+or alternatively a code reference that returns the above
+
+=head2 _child_as_object
+
+called on a parent, with a child as second argument and its rank as third
+returns the child if it is already an element, or
+a new HTML::Object::Text element if it is a plain string
+
+=head2 _compare
+
+Takes another element and compares the current one to it. Returns true if they are the same, false otherwise.
+
+It achieves this by check if the current element L</eif>is same, of if the element is a collection it check it is of the same size and the other element is among the collection.
+
+=head2 _css_object
+
+If argument is provided, pass a L<CSS::Object::Builder::Rule> object
+
+If no argument is provided, get a L<CSS::Object::Builder::Rule> of the inline css, if any at all.
+
+Returns undef if no css attribute is set yet.
+
+=head2 _css_builder
+
+Returns a new L<CSS*:Object> object using the format set to L<CSS::Object::Format::Inline>.
+
+=head2 _insert_before_after
+
+Takes selector, html, element or array
+
+    xq( '<p>Test</p>' )->insertBefore( xq( '.inner', $doc ) );
+    $elem->insertBefore( '.inner' );
+
+=head2 _is_html
+
+Returns true if the data provided looks like html, or false otherwise.
+
+=head2 _is_same_node
+
+Returns true if the current element and the provided element have he same L</eid>t
+
+=head2 _xpath_value
+
+Returns the C<xpath> value fot the current element
+
+=head1 ERROR HANDLING
+
+Methods in this package returns C<undef> either because no value is available, or because an error occurred
+
+You can find out about an error after a method call by calling L<error|Module::Generic/error>, such as:
+
+    # Try to change the tag name
+    my $rv = $e->tag( $something );
+    die( $e->error ) if( !defined( $rv ) );
+
+But keep in mind that an undefined value returned does not necessarily means there was an error. Consider:
+
+    my $div = $('<div />', { class => 'hello' });
+    my $id = $div->attr( 'id' );
+
+C<$id> will be undefined because there is no 'id' attribute set, and this is not an error.
+
+If you are using the L<global dom feature|HTML::Object/set_dom>, you can get the posible errors like this:
+
+    $('#someId')->load( '/some/where.html' ) || die( HTML::Object->error );
+
+L<HTML::Object/error> is guaranteed to be set upon error. You can also get the global variable C<$HTML::Object::ERROR>
+
+If you prefer, you can choose to make every error fatal and catch them with a try-catch implementation like L<Nice::Try>
+
+    use HTML::Object
+    $HTML::Object::FATAL_ERROR = 1;
+    # or
+    use HTML::Object fatal_error => 1;
+    use Nice::Try;
+
+    try
+    {
+        # Try to change the tag name
+        $e->tag( $something );
+    }
+    catch( $ex )
+    {
+        die( "Could not change the tag name: ", $ex->message );
+    }
+
+Or, if you wanted to filter the exception by class:
+
+    try
+    {
+        # Try to change the tag name
+        $e->tag( $something );
+    }
+    catch( HTML::Object::Exception $ex )
+    {
+        die( "An HTML::Object error occurred: ", $ex->message );
+    }
+    catch( $ex )
+    {
+        die( "Caught an exception: $ex\n" );
+    }
+
+Note that L<HTML::Object::Exception> object has stringification capability so you can embed it in a string:
+
+    die( "Could not change the tag name: $ex\n" );
+
+=head1 TODO
+
+=head2 addBack
+
+L<https://api.jquery.com/addBack/>
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 SEE ALSO
+
+L<HTML::Object>, L<HTML::Object::Attribute>, L<HTML::Object::Boolean>, L<HTML::Object::Closing>, L<HTML::Object::Collection>, L<HTML::Object::Comment>, L<HTML::Object::Declaration>, L<HTML::Object::Document>, L<HTML::Object::Element>, L<HTML::Object::Exception>, L<HTML::Object::Literal>, L<HTML::Object::Number>, L<HTML::Object::Root>, L<HTML::Object::Space>, L<HTML::Object::Text>, L<HTML::Object::XQuery>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2021 DEGUEST Pte. Ltd.
+
+All rights reserved
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut

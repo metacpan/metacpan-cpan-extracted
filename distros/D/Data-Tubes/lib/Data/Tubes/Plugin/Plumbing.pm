@@ -7,7 +7,7 @@ use warnings;
 use English qw< -no_match_vars >;
 use Data::Dumper;
 use Scalar::Util qw< blessed >;
-our $VERSION = '0.738';
+our $VERSION = '0.740';
 
 use Log::Log4perl::Tiny
   qw< :easy :dead_if_first get_logger LOGLEVEL LEVELID_FOR >;
@@ -179,10 +179,10 @@ sub dispatch {
 
 sub fallback {
 
-   # we lose syntax sugar but allow for Try::Tiny to remain optional
-   eval { require Try::Tiny; }
+   # we lose syntax sugar but allow for Try::Catch to remain optional
+   eval { require Try::Catch; }
      or LOGCONFESS 'Data::Tubes::Plugin::Plumbing::fallback '
-     . 'needs Try::Tiny, please install';
+     . 'needs Try::Catch, please install';
 
    my ($tubes, $args) = args_array_with_options(@_, {name => 'fallback'});
    identify($args);
@@ -194,11 +194,11 @@ sub fallback {
       my $record = shift;
       for my $tube (@tubes) {
          my (@retval, $do_fallback);
-         Try::Tiny::try(
+         Try::Catch::try(
             sub {
                @retval = $tube->($record);
             },
-            Try::Tiny::catch(
+            Try::Catch::catch(
                sub {
                   $catch->($_, $record) if $catch;
                   $do_fallback = 1;

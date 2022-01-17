@@ -43,6 +43,7 @@ Graham
 Gregoire
 Hartzell
 Hunt
+IEC
 III
 Ian
 Inkster
@@ -52,12 +53,14 @@ John
 Karen
 Karr
 Keedi
+KiB
 Kim
 Kjeldsen
 Knop
 Lustre
 Mark
 Martin
+MiB
 Michael
 Miyagawa
 NFS
@@ -104,7 +107,9 @@ grinnz
 haarg
 hartzell
 ian
+iec
 james
+kB
 keedi
 lib
 lstat
@@ -127,6 +132,7 @@ realpath
 regina
 rivy
 shlomif
+si
 stat
 stringifying
 subclasses

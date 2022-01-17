@@ -9,7 +9,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Update 6.00;
+package App::DocKnot::Update 6.01;
 
 use 5.024;
 use autodie;
@@ -17,10 +17,10 @@ use parent qw(App::DocKnot);
 use warnings;
 
 use Carp qw(croak);
-use File::Spec;
 use JSON::MaybeXS qw(JSON);
 use Kwalify qw(validate);
-use Perl6::Slurp;
+use Path::Iterator::Rule;
+use Path::Tiny qw(path);
 use YAML::XS ();
 
 # The older JSON metadata format stored text snippets in separate files in the
@@ -49,10 +49,10 @@ our @JSON_METADATA_FILES = qw(
 #
 # @path - The relative path of the file as a list of components
 #
-# Returns: The absolute path in the metadata directory
+# Returns: Path::Tiny for the metadata file
 sub _metadata_path {
     my ($self, @path) = @_;
-    return File::Spec->catdir($self->{metadata}, @path);
+    return path($self->{metadata}, @path);
 }
 
 # Internal helper routine to read a file from the package metadata directory
@@ -65,7 +65,8 @@ sub _metadata_path {
 #  Throws: slurp exception on failure to read the file
 sub _load_metadata {
     my ($self, @path) = @_;
-    return slurp('<:utf8', $self->_metadata_path(@path));
+    my $path = $self->_metadata_path(@path);
+    return $path->slurp_utf8();
 }
 
 # Like _load_metadata, but interprets the contents of the metadata file as
@@ -158,6 +159,90 @@ sub _config_from_json {
 }
 
 ##############################################################################
+# Spin helper methods
+##############################################################################
+
+# Given an old-format *.rpod pointer file, read the master file name and any
+# options.  Return them in the structure used for *.spin pointer files.
+#
+# $path - Path::Tiny for the file to read
+#
+# Returns: Hash in the format of a *.spin pointer file
+#  Throws: Text exception if no master file is present in the pointer
+#          autodie exception if the pointer file could not be read
+sub _read_rpod_pointer {
+    my ($self, $path) = @_;
+
+    # Read the pointer file.
+    my ($master, $options, $style) = $path->lines_utf8();
+    if (!$master) {
+        die "no master file specified in $path\n";
+    }
+    chomp($master);
+
+    # Put the results into the correct format.
+    my %results = (format => 'pod', path => $master);
+    if (defined($style)) {
+        chomp($style);
+        $results{style} = $style;
+    }
+    if (defined($options)) {
+        if ($options =~ m{ -c ( \s | \z ) }xms) {
+            $results{options} = {
+                contents => JSON::MaybeXS::true,
+                navbar => JSON::MaybeXS::false,
+            };
+        }
+        if ($options =~ m{ -t \s+ (?: '(.*)' | ( [^\'] \S+ ) ) }xms) {
+            $results{title} = $1 || $2;
+        }
+    }
+
+    # Return the parsed file.
+    return \%results;
+}
+
+# Given its representation as a hash, write out a new-style *.spin file.
+#
+# $data_ref - Hash of data for the file
+# $path     - Path to output file
+sub _write_spin_pointer {
+    my ($self, $data_ref, $path) = @_;
+
+    # Generate the YAML output and strip off the leading document separator.
+    local $YAML::XS::Boolean = 'JSON::PP';
+    my $yaml = YAML::XS::Dump($data_ref);
+    $yaml =~ s{ \A --- \n }{}xms;
+
+    # Write the output.
+    $path->spew_utf8($yaml);
+    return;
+}
+
+# Convert an *.rpod file to a *.spin file.  Intended to be run via
+# Path::Iterator::Rule.
+#
+# $rpod_path - Path to *.rpod file
+# $repo      - Optional Git::Repository object for input tree
+sub _convert_rpod_pointer {
+    my ($self, $rpod_path, $repo) = @_;
+
+    # Convert the file.
+    my $data_ref = $self->_read_rpod_pointer($rpod_path);
+    my $basename = $rpod_path->basename('.rpod');
+    my $spin_path = $rpod_path->sibling($basename . '.spin');
+    $self->_write_spin_pointer($data_ref, $spin_path);
+
+    # If we have a Git repository, update Git.
+    if (defined($repo)) {
+        my $root = path($repo->work_tree());
+        $repo->run('add', $spin_path->relative($root)->stringify());
+        $repo->run('rm', $rpod_path->relative($root)->stringify());
+    }
+    return;
+}
+
+##############################################################################
 # Public Interface
 ##############################################################################
 
@@ -172,17 +257,9 @@ sub _config_from_json {
 #  Throws: Text exceptions on invalid metadata directory path
 sub new {
     my ($class, $args_ref) = @_;
-
-    # Ensure we were given a valid metadata argument.
-    my $metadata = $args_ref->{metadata} // 'docs/metadata';
-    if (!-d $metadata) {
-        croak("metadata path $metadata does not exist or is not a directory");
-    }
-
-    # Create and return the object.
     my $self = {
-        metadata => $metadata,
-        output => $args_ref->{output} // 'docs/docknot.yaml',
+        metadata => path($args_ref->{metadata} // 'docs/metadata'),
+        output => path($args_ref->{output} // 'docs/docknot.yaml'),
     };
     bless($self, $class);
     return $self;
@@ -196,6 +273,12 @@ sub new {
 #         Text exception if schema checking failed on the converted config
 sub update {
     my ($self) = @_;
+
+    # Ensure we were given a valid metadata argument.
+    if (!$self->{metadata}->is_dir()) {
+        my $metadata = $self->{metadata};
+        croak("metadata path $metadata does not exist or is not a directory");
+    }
 
     # Tell YAML::XS that we'll be feeding it JSON::PP booleans.
     local $YAML::XS::Boolean = 'JSON::PP';
@@ -274,7 +357,29 @@ sub update {
     }
 
     # Write the new YAML package configuration.
-    YAML::XS::DumpFile($self->{output}, $data_ref);
+    YAML::XS::DumpFile($self->{output}->stringify(), $data_ref);
+    return;
+}
+
+# Update an input tree for spin to the current format.
+#
+# $path - Optional path to the spin input tree, defaults to current directory
+#
+# Raises: Text exception on failure
+sub update_spin {
+    my ($self, $path) = @_;
+    $path = defined($path) ? path($path) : path(q{.});
+    my $repo;
+    if ($path->child('.git')->is_dir()) {
+        $repo = Git::Repository->new(work_tree => "$path");
+    }
+
+    # Convert all *.rpod files to *.spin files.
+    my $rule = Path::Iterator::Rule->new()->name(qr{ [.] rpod \z }xms);
+    my $iter = $rule->iter($path, { follow_symlinks => 0 });
+    while (defined(my $file = $iter->())) {
+        $self->_convert_rpod_pointer(path($file), $repo);
+    }
     return;
 }
 
@@ -290,23 +395,27 @@ Allbery DocKnot MERCHANTABILITY NONINFRINGEMENT sublicense CPAN XDG
 
 =head1 NAME
 
-App::DocKnot::Update - Update DocKnot package configuration for new formats
+App::DocKnot::Update - Update DocKnot input or package configuration
 
 =head1 SYNOPSIS
 
     use App::DocKnot::Update;
-    my $reader = App::DocKnot::Update->new(
+
+    my $update = App::DocKnot::Update->new(
         {
             metadata => 'docs/metadata',
             output   => 'docs/docknot.yaml',
         }
     );
-    my $config = $reader->update();
+    $update->update();
+
+    $update->update_spin('/path/to/spin/input');
 
 =head1 REQUIREMENTS
 
-Perl 5.24 or later and the modules File::BaseDir, File::ShareDir, JSON,
-Perl6::Slurp, and YAML::XS, all of which are available from CPAN.
+Perl 5.24 or later and the modules Git::Repository, File::BaseDir,
+File::ShareDir, JSON::MaybeXS, Path::Iterator::Rule, Path::Tiny, Perl6::Slurp,
+and YAML::XS, all of which are available from CPAN.
 
 =head1 DESCRIPTION
 
@@ -348,6 +457,13 @@ F<docs/docknot.yaml> relative to the current directory.
 
 Load the legacy JSON metadata and write out the YAML equivalent.
 
+=item update_spin([PATH])
+
+Update the input tree for App::DocKnot::Spin to follow current expectations.
+PATH is the path to the input tree, which defaults to the current directory
+if not given.  If the input tree is the working tree for a Git repository,
+any changes are also registered with Git (but not committed).
+
 =back
 
 =head1 AUTHOR
@@ -356,7 +472,7 @@ Russ Allbery <rra@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2013-2021 Russ Allbery <rra@cpan.org>
+Copyright 2013-2022 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

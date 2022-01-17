@@ -4,19 +4,17 @@ use strict;
 use warnings;
 
 use Error::Pure;
-use Mo::utils qw(check_array_object);
+use Mo::utils qw(check_array);
 
 $Error::Pure::TYPE = 'Error';
 
 my $self = {
-        'key' => [
-                'foo',
-        ],
+        'key' => 'foo',
 };
-check_array_object($self, 'key', 'Test::MockObject', 'Value');
+check_array($self, 'key');
 
 # Print out.
 print "ok\n";
 
 # Output like:
-# #Error [..utils.pm:?] Value isn't 'Test::MockObject' object.
+# #Error [..utils.pm:?] Parameter 'key' must be a array.

@@ -35,35 +35,35 @@ Generating RSS file .../changes.rss
 Updating .../changes.rss
 Spinning .../changes.html
 Spinning .../index.html
-Updating .../names.png
-Spinning .../random.html
 Creating .../journal
 Generating index file .../journal/index.th
 Generating RSS file .../journal/index.rss
 Generating RSS file .../journal/debian.rss
 Generating RSS file .../journal/reviews.rss
+Updating .../names.png
+Spinning .../random.html
+Creating .../reviews
+Creating .../software
+Creating .../usefor
+Creating .../journal/2011-08
 Updating .../journal/debian.rss
 Updating .../journal/index.rss
 Spinning .../journal/index.html
 Updating .../journal/reviews.rss
-Creating .../journal/2011-08
-Spinning .../journal/2011-08/006.html
-Creating .../reviews
 Creating .../reviews/books
-Spinning .../reviews/books/0-385-49362-2.html
-Creating .../software
-Spinning .../software/index.html
 Creating .../software/docknot
-Spinning .../software/docknot/index.html
-Creating .../software/docknot/api
-Converting .../software/docknot/api/app-docknot.html
-Creating .../usefor
-Spinning .../usefor/index.html
+Spinning .../software/index.html
 Creating .../usefor/drafts
+Spinning .../usefor/index.html
+Spinning .../journal/2011-08/006.html
+Spinning .../reviews/books/0-385-49362-2.html
+Creating .../software/docknot/api
+Spinning .../software/docknot/index.html
 Updating .../usefor/drafts/draft-ietf-usefor-message-id-01.txt
 Updating .../usefor/drafts/draft-ietf-usefor-posted-mailed-01.txt
 Updating .../usefor/drafts/draft-ietf-usefor-useage-01.txt
 Updating .../usefor/drafts/draft-lindsey-usefor-signed-01.txt
+Converting .../software/docknot/api/app-docknot.html
 OUTPUT
 
 BEGIN { use_ok('App::DocKnot::Util', qw(print_fh)) }

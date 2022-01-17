@@ -10,7 +10,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Generate 6.00;
+package App::DocKnot::Generate 6.01;
 
 use 5.024;
 use autodie;
@@ -18,6 +18,7 @@ use parent qw(App::DocKnot);
 use warnings;
 
 use App::DocKnot::Config;
+use App::DocKnot::Util qw(print_fh);
 use Carp qw(croak);
 use Encode qw(encode);
 use Template;
@@ -525,9 +526,9 @@ sub generate_output {
     }
 
     # Generate the output.
+    my $data = $self->generate($template);
     open(my $outfh, '>', $output);
-    print {$outfh} encode('utf-8', $self->generate($template))
-      or croak("cannot write to $output: $!");
+    print_fh($outfh, $output, encode('utf-8', $data));
     close($outfh);
     return;
 }

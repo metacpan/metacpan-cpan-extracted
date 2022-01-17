@@ -1,5 +1,9 @@
 Revision history for Digest-Bcrypt
 
+1.212     2022-01-16
+    - Remove specific cost size restrictions and let those be determined
+      by Crypt::Bcrypt (thanks, Aaron Hall: GH#7)
+
 1.211     2022-01-12
     - Fixed some typos and organization of documentation
     - Ensured all code was run through perltidy

@@ -7,13 +7,13 @@ use warnings;
 use Error::Pure qw(err);
 use Readonly;
 
-Readonly::Array our @EXPORT_OK => qw(check_array_object check_isa
-	check_length check_number check_number_of_items check_required);
+Readonly::Array our @EXPORT_OK => qw(check_array check_array_object check_bool
+	check_isa check_length check_number check_number_of_items check_required);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
-sub check_array_object {
-	my ($self, $key, $class, $class_name) = @_;
+sub check_array {
+	my ($self, $key) = @_;
 
 	if (! exists $self->{$key}) {
 		return;
@@ -21,12 +21,34 @@ sub check_array_object {
 
 	if (ref $self->{$key} ne 'ARRAY') {
 		err "Parameter '".$key."' must be a array.";
-	} else {
-		foreach my $obj (@{$self->{$key}}) {
-			if (! $obj->isa($class)) {
-				err $class_name." isn't '".$class."' object.";
-			}
+	}
+
+	return;
+}
+
+sub check_array_object {
+	my ($self, $key, $class, $class_name) = @_;
+
+	check_array($self, $key);
+
+	foreach my $obj (@{$self->{$key}}) {
+		if (! $obj->isa($class)) {
+			err $class_name." isn't '".$class."' object.";
 		}
+	}
+
+	return;
+}
+
+sub check_bool {
+	my ($self, $key) = @_;
+
+	if (! exists $self->{$key}) {
+		return;
+	}
+
+	if ($self->{$key} !~ m/^\d+$/ms || ($self->{$key} != 0 && $self->{$key} != 1)) {
+		err "Parameter '".$key."' must be a bool (0/1).";
 	}
 
 	return;
@@ -115,9 +137,11 @@ Mo::utils - Mo utilities.
 
 =head1 SYNOPSIS
 
- use Mo::utils qw(check_array_object check_isa check_length check_number check_number_of_items check_required);
+ use Mo::utils qw(check_array check_array_object check_bool check_isa check_length check_number check_number_of_items check_required);
 
+ check_array($self, $key);
  check_array_object($self, $key, $class, $class_name);
+ check_bool($self, $key);
  check_isa($self, $key, $class);
  check_length($self, $key, $max_length);
  check_number($self, $key);
@@ -130,12 +154,32 @@ Mo utilities for checking of data objects.
 
 =head1 SUBROUTINES
 
+=head2 C<check_array>
+
+ check_array($self, $key);
+
+Check parameter defined by C<$key> which is reference to array.
+
+Put error if check isn't ok.
+
+Returns undef.
+
 =head2 C<check_array_object>
 
  check_array_object($self, $key, $class, $class_name);
 
 Check parameter defined by C<$key> which is reference to array with instances
 of some object type (C<$class>). C<$class_name> is used to error message.
+
+Put error if check isn't ok.
+
+Returns undef.
+
+=head2 C<check_bool>
+
+ check_bool($self, $key);
+
+Check parameter defined by C<$key> if value is bool or not.
 
 Put error if check isn't ok.
 
@@ -196,9 +240,15 @@ Returns undef.
 
 =head1 ERRORS
 
+ check_array():
+         Parameter '%s' must be a array.
+
  check_array_object():
          Parameter '%s' must be a array.
          %s isn't '%s' object.
+
+ check_bool():
+         Parameter '%s' must be a bool (0/1).
 
  check_isa():
          Parameter '%s' must be a '%s' object.
@@ -220,6 +270,45 @@ Returns undef.
  use strict;
  use warnings;
 
+ use Mo::utils qw(check_array);
+
+ my $self = {
+         'key' => ['foo'],
+ };
+ check_array($self, 'key');
+
+ # Print out.
+ print "ok\n";
+
+ # Output:
+ # ok
+
+=head1 EXAMPLE2
+
+ use strict;
+ use warnings;
+
+ use Error::Pure;
+ use Mo::utils qw(check_array);
+
+ $Error::Pure::TYPE = 'Error';
+
+ my $self = {
+         'key' => 'foo',
+ };
+ check_array($self, 'key');
+
+ # Print out.
+ print "ok\n";
+
+ # Output like:
+ # #Error [..utils.pm:?] Parameter 'key' must be a array.
+
+=head1 EXAMPLE3
+
+ use strict;
+ use warnings;
+
  use Mo::utils qw(check_array_object);
  use Test::MockObject;
 
@@ -236,7 +325,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE2
+=head1 EXAMPLE4
 
  use strict;
  use warnings;
@@ -259,7 +348,7 @@ Returns undef.
  # Output like:
  # #Error [..utils.pm:?] Value isn't 'Test::MockObject' object.
 
-=head1 EXAMPLE3
+=head1 EXAMPLE5
 
  use strict;
  use warnings;
@@ -278,7 +367,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE4
+=head1 EXAMPLE6
 
  use strict;
  use warnings;
@@ -298,7 +387,7 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Parameter 'key' must be a 'Test::MockObject' object.
 
-=head1 EXAMPLE5
+=head1 EXAMPLE7
 
  use strict;
  use warnings;
@@ -318,7 +407,7 @@ Returns undef.
  # Output like:
  # ok
 
-=head1 EXAMPLE6
+=head1 EXAMPLE8
 
  use strict;
  use warnings;
@@ -338,7 +427,7 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Parameter 'key' has length greater than '2'.
 
-=head1 EXAMPLE7
+=head1 EXAMPLE9
 
  use strict;
  use warnings;
@@ -356,7 +445,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE8
+=head1 EXAMPLE10
 
  use strict;
  use warnings;
@@ -376,7 +465,7 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Parameter 'key' must be a number.
 
-=head1 EXAMPLE9
+=head1 EXAMPLE11
 
  use strict;
  use warnings;
@@ -419,7 +508,7 @@ Returns undef.
  # Output like:
  # ok
 
-=head1 EXAMPLE10
+=head1 EXAMPLE12
 
  use strict;
  use warnings;
@@ -462,7 +551,7 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Test for Item 'value1' has multiple values.
 
-=head1 EXAMPLE11
+=head1 EXAMPLE13
 
  use strict;
  use warnings;
@@ -480,7 +569,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE12
+=head1 EXAMPLE14
 
  use strict;
  use warnings;
@@ -529,12 +618,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2020
+© Michal Josef Špaček 2020-2022
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

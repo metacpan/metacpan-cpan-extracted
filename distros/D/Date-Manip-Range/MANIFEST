@@ -1,4 +1,6 @@
-Date-Manip-Range-1.20.tar.gz
+.project
+CONTRIBUTING.md
+Date-Manip-Range-1.22.tar
 inc/Module/AutoInstall.pm
 inc/Module/Install.pm
 inc/Module/Install/AutoInstall.pm

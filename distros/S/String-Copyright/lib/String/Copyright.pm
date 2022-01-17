@@ -21,11 +21,11 @@ String::Copyright - Representation of text-based copyright statements
 
 =head1 VERSION
 
-Version 0.003012
+Version 0.003013
 
 =cut
 
-our $VERSION = '0.003012';
+our $VERSION = '0.003013';
 
 # Dependencies
 use parent 'Exporter::Tiny';
@@ -65,8 +65,8 @@ use overload (
 
 =head1 DESCRIPTION
 
-L<String::Copyright> Parses common styles of copyright statements
-and serializes in normalized format.
+L<String::Copyright> identifies copyright statements in a string
+and serializes them in a normalized format.
 
 =head1 OPTIONS
 
@@ -143,7 +143,7 @@ my $pseudosign_chatter_
 	= "(?:(?:the$blank+(?:$the_notname|$the_sentence_)|all begin|there|you must)\\b|,? \\(?\\w\\))";
 my $chatter
 	= "(?im:$nonsign_|$nonidentifier_|copyright$blank_or_break_$identifier_chatter(?:\\z|@\\W|[^a-zA-Z0-9@_-])|$blank*$pseudo_sign_(?:$blank_or_break_)+$pseudosign_chatter_)";
-my $nonyears = '(?:<?year>?|19xx|19yy|yyyy|YEAR)';
+my $nonyears_ = '\W?(?i:year|19[xy]{2}|[xy]{4})\W?';
 
 my $year_       = '\b[0-9]{4}\b';
 my $comma_spacy = "(?:$blank*,$blank_or_break_|$blank_or_break_,?$blank*)";
@@ -176,7 +176,7 @@ my ($dash_spacy_re, $owner_intro_A_re, $boilerplate_X_re,
 	$boilerplate_X_re
 		= qr/(?i)${comma_spacy}All$blank+Rights$blank+Reserved[.!]?.*/;
 	$signs_and_more_re
-		= qr/$chatter|$signs(?:$blank$vague_sign_)?$delimiter(?:$broken_sign_)?(?:$nonyears|((?:$years_$delimiter)?(?:(?:$owner_intro_)?$owners_)?))|\n/;
+		= qr/$chatter|$signs(?:$blank$vague_sign_)?$delimiter(?:$broken_sign_)?(?:$nonyears_|((?:$years_$delimiter)?(?:(?:$owner_intro_)?$owners_)?))|\n/;
 }
 
 sub _generate_copyright
@@ -204,19 +204,24 @@ sub _generate_copyright
 			my $owners = $1;
 			if ( $globals->{threshold_before} || $globals->{threshold} ) {
 				last
-					if (!@block
+					if (
+						!@block
 					and !length $owners
-					and ++$skipped >= ( $globals->{threshold_before}
-							|| $globals->{threshold} ) );
+					and ++$skipped >= (
+						$globals->{threshold_before} || $globals->{threshold}
+					)
+					);
 			}
 			if ( $globals->{threshold_after} || $globals->{threshold} ) {
 
 				# "after" detects end of _current_ line so is skewed by one
 				last
-					if (@block
+					if (
+						@block
 					and !length $owners
-					and ++$skipped >= 1
-					+ ( $globals->{threshold_after} || $globals->{threshold} )
+					and ++$skipped >= 1 + (
+						$globals->{threshold_after} || $globals->{threshold}
+					)
 					);
 			}
 			next if ( !length $owners );

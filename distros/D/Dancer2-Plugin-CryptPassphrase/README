@@ -1,0 +1,123 @@
+NAME
+    Dancer2::Plugin::CryptPassphrase - use Crypt::Passphrase with Dancer2
+
+SYNOPSIS
+        package My::App;
+        use Dancer2;
+        use Dancer2::Plugin::CryptPassphrase;
+
+        post '/login' => sub {
+            my $username = body_parameters->get('username');
+            my $password = body_parameters->get('password');
+            my $hash     = my_get_hash_function($username);
+
+            if ( verify_password( $password, $hash ) ) {
+                # login success
+
+                if ( password_needs_rehash($hash) ) {
+                    # upgrade hash in storage
+                    my_update_hash_function( $username, hash_password($pasword) );
+                }
+
+                # ... do stuff
+            }
+            else {
+                # login failed
+
+                # ... do stuff
+            }
+        };
+
+DESCRIPTION
+    This plugin integrates Crypt::Passphrase with your Dancer2 app,
+
+KEYWORDS
+  crypt_passphrase
+    Returns the "Crypt::Passphrase" instance.
+
+  hash_password $password
+    Returns a new hash for the given $password.
+
+    See also "hash_password" in Crypt::Password.
+
+  password_needs_rehash $hash
+    Returns a true value if $hash should be upgraded to use the current
+    "encoder".
+
+    See also "needs_rehash" in Crypt::Password.
+
+  verify_password $password, $hash
+    Returns a true value if the $password matches the given $hash, otherwise
+    returns a false value.
+
+    See also "verify_password" in Crypt::Password.
+
+CONFIGURATION
+    Example:
+
+        plugins:
+          CryptPassphrase:
+            encoder:
+              module: Argon2
+              parallelism: 2
+            validators:
+              - +My::Old::Passphrase::Module
+              - Bcrypt
+
+    Configuration options are used as the arguments for "new" in
+    Crypt::Passphrase, as follows:
+
+  encoder
+    Default: "Argon2" with defaults from Crypt::Passphrase::Argon2.
+
+    This can be one of two different things:
+
+    *   A simple string
+
+        The name of the encoder class. If the value starts with a "+", the
+        "+" will be removed and the remainder will be taken as a
+        fully-qualified package name. Otherwise, "Crypt::Passphrase::" will
+        be prepended to the value.
+
+        The class will be loaded, and constructed without arguments.
+
+    *   A hash
+
+        The "module" entry will be used to load a new Crypt::Passphrase
+        module as described above, the other arguments will be passed to the
+        constructor. This is the recommended option, as it gives you full
+        control over the password parameters.
+
+    NOTE: If you wish to use an encoder other than "Argon2", then you need
+    to install the appropriate "Crypt::Passphrase::" module.
+
+  validators
+    Defaults to an empty list.
+
+    This is a list of additional validators for passwords. These values can
+    each be the same an L/<encoder> value.
+
+    The "encoder" is always considered as a validator and thus doesn't need
+    to be explicitly specified.
+
+SEE ALSO
+    Crypt::Passphrase, Crypt::Passphrase::Argon2.
+
+AUTHOR
+    Peter Mottram (SysPete) <peter@sysnix.com>
+
+CONTRIBUTORS
+    None yet.
+
+COPYRIGHT
+    Copyright (c) 2022 the Catalyst::Plugin::CryptPassphrase "AUTHOR" and
+    "CONTRIBUTORS" as listed above.
+
+    The initial "CONFIGURATION" documentation was taken from
+    Crypt::Passphrase which is copyright (c) 2021 by Leon Timmermans
+    <leont@cpan.org>.
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

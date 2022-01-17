@@ -1,5 +1,5 @@
 package Crypt::Bcrypt;
-$Crypt::Bcrypt::VERSION = '0.005';
+$Crypt::Bcrypt::VERSION = '0.006';
 use strict;
 use warnings;
 
@@ -14,7 +14,7 @@ use MIME::Base64 2.21 qw(encode_base64);
 sub bcrypt {
 	my ($password, $subtype, $cost, $salt) = @_;
 	die "Unknown subtype $subtype" if $subtype !~ /^2[abxy]$/;
-	die "Invalid cost factor $cost" if $cost < 5 || $cost > 31;
+	die "Invalid cost factor $cost" if $cost < 4 || $cost > 31;
 	die "Salt must be 16 bytes" if length $salt != 16;
 	my $encoded_salt = encode_base64($salt, "");
 	$encoded_salt =~ tr{A-Za-z0-9+/=}{./A-Za-z0-9}d;
@@ -37,7 +37,7 @@ Crypt::Bcrypt - A modern bcrypt implementation
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

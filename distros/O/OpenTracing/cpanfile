@@ -11,6 +11,7 @@ requires 'Module::Load';
 requires 'Net::Address::IP::Local';
 requires 'indirect';
 requires 'Syntax::Keyword::Try';
+requires 'Class::Method::Modifiers';
 
 recommends 'Math::Random::ISAAC::XS';
 

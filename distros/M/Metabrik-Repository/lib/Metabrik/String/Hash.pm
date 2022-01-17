@@ -20,9 +20,11 @@ sub brik_properties {
          sha256 => [ qw(data) ],
          sha512 => [ qw(data) ],
          md5 => [ qw(data) ],
+         mmh3 => [ qw(data signed|OPTIONAL) ],
       },
       require_modules => {
          'Crypt::Digest' => [ ],
+         'Digest::MurmurHash3' => [ qw(murmur32) ],
       },
    };
 }
@@ -39,7 +41,16 @@ sub _hash {
       return $self->log->error("$function: unable to load function: $@");
    }
 
-   return Crypt::Digest::digest_data_hex(uc($function), $data);
+   my $hash;
+   eval {
+      $hash = Crypt::Digest::digest_data_hex(uc($function), $data);
+   };
+   if ($@) {
+      chomp($@);
+      return $self->log->error("$function: unable to compute hash: $@");
+   }
+
+   return $hash;
 }
 
 sub sha1 {
@@ -70,6 +81,24 @@ sub md5 {
    return $self->_hash('md5', $data);
 }
 
+sub mmh3 {
+   my $self = shift;
+   my ($data, $signed) = @_;
+
+   $signed ||= 0;
+
+   my $hash;
+   eval {
+      $hash = Digest::MurmurHash3::murmur32($data, 0, $signed);
+   };
+   if ($@) {
+      chomp($@);
+      return $self->log->error("mmh3: unable to compute hash: $@");
+   }
+
+   return $hash;
+}
+
 1;
 
 __END__
@@ -80,7 +109,7 @@ Metabrik::File::Hash - file::hash Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2020, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2022, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

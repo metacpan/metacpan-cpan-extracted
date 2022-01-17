@@ -43,5 +43,5 @@ my ($stdout, $stderr) = capture {
 
 # Simplify the file name, and then check against the expected output.
 $stderr =~ s{ ^ [^:]+/errors[.]th: }{errors.th:}xmsg;
-$stderr =~ s{ (cannot [ ] stat [^:]+): .* }{$1\n}xms;
+$stderr =~ s{ (cannot [ ] stat [ ] file [ ]) /[^:]+/([^/:]+) : .* }{$1$2\n}xms;
 is($stderr, $EXPECTED_ERRORS, 'errors are correct');

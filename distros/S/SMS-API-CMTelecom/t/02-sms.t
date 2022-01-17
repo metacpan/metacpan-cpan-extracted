@@ -9,7 +9,7 @@ plan tests => 4;
 
 subtest no_product_token => sub {
     plan tests => 2;
-    
+
     my $sms = eval { SMS::API::CMTelecom->new() };
     like $@, qr'^SMS::API::CMTelecom->new requires product_token parameter', 'correct error message';
     ok !$sms, 'creating SMS object failed';
@@ -22,7 +22,7 @@ subtest simple_object_creation => sub {
     );
 
     is ref $sms, 'SMS::API::CMTelecom', 'SMS object created';
-    
+
     subtest no_sender_given => sub {
         plan tests => 2;
 
@@ -118,5 +118,5 @@ subtest wrong_product_token => sub {
         reference  => 293854,
     );
     is $res, undef, 'undef returned';
-    is $sms->error_message, 'No account found for the given authentication', 'correct error message';
+    is $sms->error_message, 'No authentication method found.', 'correct error message';
 };

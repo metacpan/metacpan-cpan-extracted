@@ -1,3 +1,9 @@
+0.007   2021-07-31  Released-By: PERLANCAR; Urgency: medium
+
+	- Add
+	  :Reference::FunctionMetadata::Arguments::PropertyAttributeIndex.
+
+
 0.006   2021-07-28  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Made the new pages as .pm instead of .pod.

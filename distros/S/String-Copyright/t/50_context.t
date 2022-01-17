@@ -32,12 +32,12 @@ is copyright("#define foo(c) 1997 Foo (c) 1999 Bar"),
 	'1999:Bar',
 	'bogus sign, then sign on same line';
 
-is copyright("(c) 1999 Foo (c) 2000 Foo © 2002 Foo"),
-	'1999:Foo (c) 2000 Foo © 2002 Foo',
+is copyright("(c) 1999 Foo (c) 2000 Foo (c) 2002 Foo"),
+	'1999:Foo (c) 2000 Foo (c) 2002 Foo',
 	'sign x 3 on same line';
 
 my $todo = todo 'not yet handled';
-is copyright("© 2000 Foo\n    2005 Bar\n2008 Baz"),
+is copyright("(c) 2000 Foo\n    2005 Bar\n2008 Baz"),
 	":2000:Foo\n2005:Bar\n2008:Baz",
 	'multi-line multi-statement';
 

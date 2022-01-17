@@ -12,12 +12,13 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Spin::Versions 6.00;
+package App::DocKnot::Spin::Versions 6.01;
 
 use 5.024;
 use autodie;
 use warnings;
 
+use Path::Tiny qw(path);
 use POSIX qw(mktime strftime);
 
 ##############################################################################
@@ -56,18 +57,20 @@ sub _datetime_to_seconds {
     return mktime(@datetime);
 }
 
-# Parse a .versions file and populate the App::DocKnot::Spin::Versions object.
-#
-# $path - Path to the .versions file
+# Parse the .versions file and populate the App::DocKnot::Spin::Versions
+# object.
 #
 # Raises: autodie exception on file read errors
 #         Text exception on file parsing errors
 sub _read_data {
-    my ($self, $path) = @_;
+    my ($self) = @_;
+    $self->{depends} = {};
+    $self->{versions} = {};
     my $timestamp;
 
-    open(my $fh, '<', $path);
-    while (defined(my $line = <$fh>)) {
+    my $lineno = 0;
+    for my $line ($self->{path}->lines_utf8()) {
+        $lineno++;
         next if $line =~ m{ \A \s* \z }xms;
         next if $line =~ m{ \A \s* \# }xms;
 
@@ -75,17 +78,17 @@ sub _read_data {
         my @depends;
         if ($line =~ m{ \A \s }xms) {
             if (!defined($timestamp)) {
-                die "continuation without previous entry in $path\n";
+                die "continuation without previous entry in $self->{path}\n";
             }
             @depends = split(qr{ \s+ }xms, $line);
         } else {
             my @line = split(qr{ \s+ }xms, $line);
             my ($package, $version, $date, $time, @files) = @line;
             if (!defined($time)) {
-                die "invalid line $. in $path\n";
+                die "invalid line $lineno in $self->{path}\n";
             }
             @depends = @files;
-            $timestamp = _datetime_to_seconds($date, $time, $path);
+            $timestamp = _datetime_to_seconds($date, $time, $self->{path});
             $date = strftime('%Y-%m-%d', gmtime($timestamp));
             $self->{versions}{$package} = [$version, $date];
         }
@@ -100,7 +103,6 @@ sub _read_data {
             }
         }
     }
-    close($fh);
     return;
 }
 
@@ -119,14 +121,11 @@ sub new {
     my ($class, $path) = @_;
 
     # Create an empty object.
-    my $self = {
-        depends => {},
-        versions => {},
-    };
+    my $self = { path => path($path) };
     bless($self, $class);
 
     # Parse the file into the newly-created object.
-    $self->_read_data($path);
+    $self->_read_data();
 
     # Return the populated object.
     return $self;
@@ -134,13 +133,13 @@ sub new {
 
 # Return the timestamp of the latest release affecting a different page.
 #
-# $file - File name that may be listed as an affected file for a release
+# $file - File path that may be listed as an affected file for a release
 #
 # Returns: The timestamp in seconds since epoch of the latest release
 #          affecting that file, or 0 if there are none
 sub latest_release {
     my ($self, $file) = @_;
-    return $self->{depends}{$file} // 0;
+    return $self->{depends}{"$file"} // 0;
 }
 
 # Return the release date for a given package.
@@ -152,6 +151,50 @@ sub release_date {
     my ($self, $package) = @_;
     my $version = $self->{versions}{$package};
     return defined($version) ? $version->[1] : undef;
+}
+
+# Update the version and release date for a package.  Add the change to Git if
+# the .versions file is at the top of a Git repository.
+#
+# $package   - Name of the package
+# $version   - New version
+# $timestamp - New release date as seconds since epoch
+#
+# Throws: Text exception on failure
+sub update_version {
+    my ($self, $package, $version, $timestamp) = @_;
+    my $date = strftime('%Y-%m-%d', localtime($timestamp));
+    my $time = strftime('%H:%M:%S', localtime($timestamp));
+
+    # Edits the line for the package to replace the version and release date.
+    my $edit = sub {
+        my $line = $_;
+        my ($product, $old_version, $old_date, $old_time)
+          = split(q{ }, $line);
+        return if $product ne $package;
+
+        # We're going to replace the old version with the new one, but we need
+        # to space-pad one or the other if they're not the same length.
+        my $version_string = $version;
+        while (length($old_version) > length($version_string)) {
+            $version_string .= q{ };
+        }
+        while (length($old_version) < length($version_string)) {
+            $old_version .= q{ };
+        }
+
+        # Make the replacement.
+        $line =~ s{ \Q$old_version\E }{$version_string}xms;
+        $line =~ s{ \Q$old_date\E }{$date}xms;
+        $line =~ s{ \Q$old_time\E }{$time}xms;
+        $_ = $line;
+    };
+
+    # Apply that change to our versions file, and then re-read the contents to
+    # update the internal data structure.
+    $self->{path}->edit_utf8($edit);
+    $self->_read_data();
+    return;
 }
 
 # Return the latest version for a given package.
@@ -189,7 +232,7 @@ App::DocKnot::Spin::Versions - Parse package release information for spin
 
 =head1 REQUIREMENTS
 
-Perl 5.24 or later.
+Perl 5.24 or later and the Path::Tiny module, available from CPAN.
 
 =head1 DESCRIPTION
 
@@ -271,6 +314,13 @@ PATH, or 0 if no releases affect that file.
 Return the release date of the latest release of PACKAGE (in UTC), or C<undef>
 if there is no release information for PACKAGE.
 
+=item update_version(PACKAGE, VERSION, TIMESTAMP)
+
+Given a new VERSION and TIMESTAMP (in seconds since epoch) for a release of
+PACKAGE, update the release information in the F<.versions> file for that
+package accordingly.  If the F<.versions> file is at the root of a Git
+repository, this change will be staged with C<git add>.
+
 =item version(PACKAGE)
 
 Return the version of the latest release of PACKAGE, or C<undef> if there is
@@ -284,7 +334,7 @@ Russ Allbery <rra@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2004, 2021 Russ Allbery <rra@cpan.org>
+Copyright 2004, 2021-2022 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

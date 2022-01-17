@@ -49,3 +49,9 @@ v1.12	2022-01-13
 	- Improve legability of some regexes.
 	- Improved unit tests, in particular for long and UTF-8 passwords.
 	- Treat given passwords as strings of bytes instead of characters.
+
+v1.13	2022-01-16
+	- Replace use of Crypt::Eksblowfish::Bcrypt with the new Crypt::Bcrypt module.
+	- Replace the dependency on version.pm >= 0.77 with a ->can() check.
+	- Even though the PASSWORD_BCRYPT salt option is deprecated, if you do pass it (which you shouldn't) then it must be 16 bytes long.
+	- Cleaned up some whitespace.

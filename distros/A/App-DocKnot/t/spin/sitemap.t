@@ -40,7 +40,7 @@ is_deeply(\@navbar, [], 'navbar for unknown page');
 # exercised by the test of spinning a tree of files.
 @links = $sitemap->links('/faqs/soundness-inn.html');
 my @expected = (
-        q{  <link rel="next" href="soundness-cnews.html"}
+    q{  <link rel="next" href="soundness-cnews.html"}
       . qq{ title="Soundness for C News" />\n},
     qq{  <link rel="up" href="./" title="FAQs and Documentation" />\n},
     qq{  <link rel="top" href="../" />\n},

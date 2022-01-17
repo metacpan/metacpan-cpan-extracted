@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/polettix/Data-Tubes/issues
   homepage: https://github.com/polettix/Data-Tubes
   repository: https://github.com/polettix/Data-Tubes.git
-version: '0.738'
+version: '0.740'
 x_contributors:
   - 'Flavio Poletti <flavio@polettix.it>'
 x_generated_by_perl: v5.24.1

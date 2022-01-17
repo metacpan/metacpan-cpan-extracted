@@ -1,0 +1,204 @@
+package Perinci::Manual::Reference::FunctionMetadata::Arguments::PropertyAttributeIndex; # just to make podweaver happy
+
+# AUTHORITY
+# DATE
+our $DIST = 'Perinci-Manual'; # DIST
+# VERSION
+
+1;
+# ABSTRACT: Alphabetical list of properties/attributes used in argument specification in Rinci function metadata
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Perinci::Manual::Reference::FunctionMetadata::Arguments::PropertyAttributeIndex - Alphabetical list of properties/attributes used in argument specification in Rinci function metadata
+
+=head1 VERSION
+
+This document describes version 0.007 of Perinci::Manual::Reference::FunctionMetadata::Arguments::PropertyAttributeIndex (from Perl distribution Perinci-Manual), released on 2021-07-31.
+
+=head1 INDEX
+
+=head2 cmdline.*
+
+Since 2012. Observed by C<Perinci::CmdLine::*>.
+
+=head2 cmdline.chomp
+
+Since 2016-01-22.
+
+Observed by L<Perinci::CmdLine::Base>.
+
+=head2 cmdline_aliases
+
+=head2 cmdline_on_getopt
+
+L<Rinci> standard 1.1.43.
+
+=head2 cmdline_src
+
+L<Rinci> standard.
+
+=head2 completion
+
+L<Rinci> standard.
+
+=head2 default
+
+L<Rinci> standard.
+
+Note: an alternative is to set default in schema's C<default> clause.
+
+=head2 element_completion
+
+L<Rinci> standard.
+
+=head2 form.*
+
+Since 2015-09-22.
+
+Observed by L<Borang>.
+
+=head2 index_completion
+
+Since 2016-12-10.
+
+L<Rinci> standard since 1.1.82.
+
+=head2 pos
+
+L<Rinci> standard.
+
+=head2 req
+
+L<Rinci> standard.
+
+=head2 schema
+
+L<Rinci> standard. See L<Rinci::function>.
+
+=head2 x.app.rimetadb.exclude
+
+Since 2019-08-14.
+
+Bool. Observed by L<App::rimetadb>. This setting allows allow excluding this
+function argument from being included in the database.
+
+See also:
+L<Perinci::Manual::Reference::FunctionMetadata::PropertyAttributeIndex/"x.app.rimetadb.exclude">
+(per-function exclude setting).
+
+=head2 x.name.is_plural
+
+Observed by L<Perinci::Sub::GetArgs::Argv>. If set, will create singular version
+of option, e.g. C<name> from L<names>.
+
+Example usage: L<Bencher::Backend>, L<App::grep::url>, L<App::wordlist>, etc.
+
+See also L</"x.name.singular">.
+
+=head2 x.name.singular
+
+Observed by L<Perinci::Sub::GetArgs::Argv>. Supply singular version of argument
+name, otherwise argument name will be converted to singular using
+L<Lingua::EN::PluralToSingular>.
+
+Example usage: L<Bencher::Backend>, L<App::grep::url>, L<App::wordlist>, etc.
+
+See also L</"x.name.is_plural">.
+
+=head2 x.perl.coerce_rules
+
+L<Data::Sah::Compiler::perl> and its type handler modules, e.g.
+L<Data::Sah::Compiler::perl::TH::date>.
+
+=head2 x.perl.coerce_to
+
+L<Data::Sah::Compiler::perl> and its type handler modules, e.g.
+L<Data::Sah::Compiler::perl::TH::date>.
+
+=head1 INDEX (DEPRECATED)
+
+=head2 greedy
+
+Now replaced by L</slurpy>.
+
+=head2 x.schema.element_entity
+
+First added in Spanel project. Deprecated since Sah schema can now be based on
+other schemas.
+
+=head2 x.schema.entity
+
+First added in Spanel project. Deprecated since Sah schema can now be based on
+other schemas.
+
+=head1 INDEX (OLD/REMOVED)
+
+=head2 cmdline_on_getarg
+
+Code. Added in L<Rinci> 1.1.43, removed in 1.1.44.
+
+=head2 x.perl.coerce_to_datetime_duration_obj
+
+Observed by L<Perinci::Sub::CoerceArgs>, replaced by L</"x.perl.coerce_to">.
+
+=head2 x.perl.coerce_to_datetime_obj
+
+Observed by L<Perinci::Sub::CoerceArgs>, replaced by L</"x.perl.coerce_to">.
+
+=head2 x.perl.coerce_to_epoch
+
+2015-09-25.
+
+Observed by L<Perinci::Sub::CoerceArgs>, replaced by L</"x.perl.coerce_to">.
+
+=head2 x.perl.coerce_to_secs
+
+2015-09-25.
+
+Observed by L<Perinci::Sub::CoerceArgs>, replaced by L</"x.perl.coerce_to">.
+
+=head2 x.perl.coerce_to_time_moment_obj
+
+2015-09-25.
+
+Observed by L<Perinci::Sub::CoerceArgs>, replaced by L</"x.perl.coerce_to">.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Manual>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Perinci-Manual>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Manual>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+Other C<Perinci::Manual::Reference::**::PropertyAttributeIndex> pages.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

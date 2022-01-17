@@ -1,5 +1,16 @@
 Revision history for Path-Tiny
 
+0.122     2022-01-16 10:05:08-05:00 America/New_York
+
+    - No changes from 0.121-TRIAL.
+
+0.121     2022-01-08 11:05:33-05:00 America/New_York (TRIAL RELEASE)
+
+    [Additions]
+
+    - Adds `size` and `size_human` methods.  The latter gives `ls -lh` style
+      output, with options to choose base2 or base10 forms.
+
 0.120     2021-10-24 12:12:57-04:00 America/New_York
 
     - No changes from 0.119-TRIAL.

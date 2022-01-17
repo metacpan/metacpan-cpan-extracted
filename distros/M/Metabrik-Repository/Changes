@@ -1,5 +1,9 @@
 Revision history for Perl extension Metabrik::Repository.
 
+1.42.0 Sun 16 Jan 15:12:29 CET 2022
+   - update: latest bugfixes from Metabrik Repositoru
+   - update: copyright notice
+
 1.41.0 Thu  7 May 16:00:31 CEST 2020
    - update: Metabrik source code repository moved to Github
    - update: copyright notice

@@ -2,7 +2,7 @@
 #
 # Build script for the docknot application.
 #
-# Copyright 2013, 2016, 2018-2021 Russ Allbery <rra@cpan.org>
+# Copyright 2013, 2016, 2018-2022 Russ Allbery <rra@cpan.org>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -74,9 +74,11 @@ my $build = Module::Build->new(
         'JSON::MaybeXS'          => 0,
         'Kwalify'                => 0,
         'List::SomeUtils'        => '0.07',
-        'Path::Tiny'             => 0,
+        'Path::Iterator::Rule'   => 0,
+        'Path::Tiny'             => '0.101',
         'Perl6::Slurp'           => 0,
-        'Pod::Thread'            => '3.00',
+        'Pod::Thread'            => '3.01',
+        'Sort::Versions'         => 0,
         'Template'               => 0,
         'YAML::XS'               => '0.81',
         perl                     => '5.024',

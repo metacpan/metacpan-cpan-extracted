@@ -2,7 +2,7 @@ NAME
     Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 VERSION
-    This document describes version 0.345 of Calendar::Indonesia::Holiday
+    This document describes version 0.346 of Calendar::Indonesia::Holiday
     (from Perl distribution Calendar-Indonesia-Holiday), released on
     2022-01-10.
 
@@ -86,7 +86,10 @@ SYNOPSIS
 
 DESCRIPTION
     This module provides functions to list Indonesian holidays. There is a
-    command-line script interface for this module: list-idn-holidays.
+    command-line script interface for this module: list-idn-holidays and a
+    few others distributed in App::IndonesianHolidayUtils distribution.
+
+    Calendar years supported: 1990-2022.
 
     Note: Note that sometimes the holiday (as set by law) falls at a
     different date than the actual religious commemoration date. When you

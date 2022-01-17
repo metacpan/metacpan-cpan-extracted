@@ -12,9 +12,11 @@ requires 'IPC::System::Simple';
 requires 'JSON::MaybeXS';
 requires 'Kwalify';
 requires 'List::SomeUtils', '0.07';
-requires 'Path::Tiny';
+requires 'Path::Iterator::Rule';
+requires 'Path::Tiny', '0.101';
 requires 'Perl6::Slurp';
-requires 'Pod::Thread', '3.00';
+requires 'Pod::Thread', '3.01';
+requires 'Sort::Versions';
 requires 'Template';
 requires 'YAML::XS', '0.81';
 

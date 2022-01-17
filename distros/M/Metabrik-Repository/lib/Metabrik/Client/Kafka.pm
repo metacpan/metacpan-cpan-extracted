@@ -85,7 +85,7 @@ sub create_connection {
          unless(
                defined($server)
                && defined(Kafka::Connection::_STRING($server))
-               #&& !utf8::is_utf8($server)  # this sucks.
+               #&& !utf8::is_utf8($server)  # this sucks.
                && $server =~ /^[^:]+:\d+$/
            ) {
             return;
@@ -428,7 +428,7 @@ Metabrik::Client::Kafka - client::kafka Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2020, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2022, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

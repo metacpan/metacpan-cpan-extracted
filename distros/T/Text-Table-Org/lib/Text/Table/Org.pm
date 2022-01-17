@@ -1,13 +1,12 @@
 package Text::Table::Org;
 
-our $DATE = '2015-12-17'; # DATE
-our $VERSION = '0.02'; # VERSION
+use strict;
+use warnings;
 
-#IFUNBUILT
-# use 5.010001;
-# use strict;
-# use warnings;
-#END IFUNBUILT
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-01-07'; # DATE
+our $DIST = 'Text-Table-Org'; # DIST
+our $VERSION = '0.030'; # VERSION
 
 sub table {
     my %params = @_;
@@ -37,20 +36,23 @@ sub table {
     }
 
     # then the data
-    foreach my $row ( @{ $rows }[$data_begins..$#$rows] ) {
+    my $i = 0;
+    for my $i ($data_begins..$#$rows) {
+        my $row = $rows->[$i];
         push @table, sprintf(
 	    $format,
 	    map { defined($row->[$_]) ? $row->[$_] : '' } (0..$max_index)
 	);
+        push @table, $row_sep if $params{separate_rows} && $i < $#$rows;
     }
 
     return join("", grep {$_} @table);
 }
 
-# FROM_MODULE: List::Util::PP
+# FROM_MODULE: PERLANCAR::List::Util::PP
 # BEGIN_BLOCK: max
 sub max {
-    return undef unless @_;
+    return undef unless @_; ## no critic: Subroutines::ProhibitExplicitReturnUndef
     my $res = $_[0];
     my $i = 0;
     while (++$i < @_) { $res = $_[$i] if $_[$i] > $res }
@@ -58,7 +60,7 @@ sub max {
 }
 # END_BLOCK: max
 
-sub _get_cols_and_rows ($) {
+sub _get_cols_and_rows ($) { ## no critic: Subroutines::ProhibitSubroutinePrototypes
     my $rows = shift;
     return ( max( map { scalar @$_ } @$rows), scalar @$rows);
 }
@@ -107,7 +109,7 @@ Text::Table::Org - Generate Org tables
 
 =head1 VERSION
 
-This document describes version 0.02 of Text::Table::Org (from Perl distribution Text-Table-Org), released on 2015-12-17.
+This document describes version 0.030 of Text::Table::Org (from Perl distribution Text-Table-Org), released on 2022-01-07.
 
 =head1 SYNOPSIS
 
@@ -158,7 +160,19 @@ each row is an array reference.
 If given a true value, the first row in the data will be interpreted as a header
 row, and separated from the rest of the table with a ruled line.
 
+=item * separate_rows (bool)
+
+If set to true, will add separator line between data rows.
+
 =back
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Text-Table-Org>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Text-Table-Org>.
 
 =head1 SEE ALSO
 
@@ -174,13 +188,33 @@ L<Text::FormatTable>, L<Text::Table>, L<Text::TabularDisplay>.
 
 See also L<Bencher::Scenario::TextTableModules>.
 
-=head1 HOMEPAGE
+=head1 AUTHOR
 
-Please visit the project's homepage at L<https://metacpan.org/release/Text-Table-Org>.
+perlancar <perlancar@cpan.org>
 
-=head1 SOURCE
+=head1 CONTRIBUTING
 
-Source repository is at L<https://github.com/perlancar/perl-Text-Table-Org>.
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2015 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =head1 BUGS
 
@@ -189,16 +223,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2015 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

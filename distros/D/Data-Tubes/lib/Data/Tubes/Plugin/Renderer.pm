@@ -2,7 +2,7 @@ package Data::Tubes::Plugin::Renderer;
 use strict;
 use warnings;
 use English qw< -no_match_vars >;
-our $VERSION = '0.738';
+our $VERSION = '0.740';
 
 use Log::Log4perl::Tiny qw< :easy :dead_if_first >;
 

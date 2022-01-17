@@ -10,7 +10,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Command 6.00;
+package App::DocKnot::Command 6.01;
 
 use 5.024;
 use autodie;
@@ -78,6 +78,12 @@ our %COMMANDS = (
         options => ['metadata|m=s', 'width|w=i'],
         maximum => 0,
     },
+    release => {
+        method => 'release',
+        module => 'App::DocKnot::Release',
+        options => ['archivedir|a=s', 'distdir|d=s', 'metadata|m=s'],
+        maximum => 0,
+    },
     spin => {
         method => 'spin',
         module => 'App::DocKnot::Spin',
@@ -103,6 +109,11 @@ our %COMMANDS = (
         module => 'App::DocKnot::Update',
         options => ['metadata|m=s', 'output|o=s'],
         maximum => 0,
+    },
+    'update-spin' => {
+        method => 'update_spin',
+        module => 'App::DocKnot::Update',
+        maximum => 1,
     },
 );
 
@@ -297,8 +308,9 @@ Perl 5.24 or later and the modules Date::Language, Date::Parse (both part of
 TimeDate), File::BaseDir, File::ShareDir, Git::Repository, Image::Size,
 IO::Compress::Xz (part of IO-Compress-Lzma), IO::Uncompress::Gunzip (part of
 IO-Compress), IPC::Run, IPC::System::Simple, JSON::MaybeXS, Kwalify,
-List::SomeUtils, Path::Tiny, Perl6::Slurp, Template (part of Template
-Toolkit), and YAML::XS, all of which are available from CPAN.
+List::SomeUtils, Path::Iterator::Rule, Path::Tiny, Perl6::Slurp, Template
+(part of Template Toolkit), and YAML::XS, all of which are available from
+CPAN.
 
 =head1 DESCRIPTION
 
@@ -337,7 +349,7 @@ Russ Allbery <rra@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2018-2021 Russ Allbery <rra@cpan.org>
+Copyright 2018-2022 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

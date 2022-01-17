@@ -93,6 +93,7 @@ foreach my $method (@methods) {
 	}
 }
 
+note('');
 foreach my $password (sort keys %tests_verify_good) {
 	my $crypted = $tests_verify_good{$password};
 	note("Testing good password: $password");

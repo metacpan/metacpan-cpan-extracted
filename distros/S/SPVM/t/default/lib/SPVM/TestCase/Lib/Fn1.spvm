@@ -1,0 +1,1518 @@
+class TestCase::Lib::Fn1 {
+  use Fn;
+  use Unicode as Un;
+  use TestCase::Minimal;
+
+  static method test_sprintf_d : int () {
+    my $tests = [
+        [ Fn->sprintf("abc%d", 123),          "abc123" ],
+        [ Fn->sprintf("%dabc", 123),          "123abc" ],
+        [ Fn->sprintf("%dabc%d", 1, 10),      "1abc10" ],
+        [ Fn->sprintf("%d%d%d", 1, 10, 100),  "110100" ],
+        [ Fn->sprintf("%d%d%d", 1, 10, 100),  "110100" ],
+        [ Fn->sprintf("%05d", 123),           "00123"  ],
+        [ Fn->sprintf("%+5d", 123),           " +123"  ],
+        [ Fn->sprintf("%-5d", 123),           "123  "  ],
+    ];
+    for (my $i = 0; $i < @$tests; ++$i) {
+      unless ($tests->[$i][0] eq $tests->[$i][1]) {
+        warn("got: '" . $tests->[$i][0] . "', expected: '" . $tests->[$i][1] . "'");
+        return 0;
+      }
+    }
+    {
+      eval {
+        Fn->sprintf("%d", "str");
+      };
+      unless ($@ && Fn->index($@, "Can't cast", 0) > -1) {
+        warn("got error: $@");
+        return 0;
+      }
+      $@ = undef;
+    }
+    return 1;
+  }
+
+  static method test_sprintf_u : int () {
+    my $tests = [
+        [ Fn->sprintf("abc%u", 123),          "abc123" ],
+        [ Fn->sprintf("%uabc", 123),          "123abc" ],
+        [ Fn->sprintf("%uabc%u", 1, 10),      "1abc10" ],
+        [ Fn->sprintf("%u%u%u", 1, 10, 100),  "110100" ],
+        [ Fn->sprintf("%05u", 123),           "00123"  ],
+        [ Fn->sprintf("%+5u", 123),           " +123"  ],
+        [ Fn->sprintf("%-5u", 123),           "123  "  ],
+        [ Fn->sprintf("%-5u", 123),           "123  "  ],
+        [ Fn->sprintf("%u", -1),              "4294967295" ],
+    ];
+    for (my $i = 0; $i < @$tests; ++$i) {
+      unless ($tests->[$i][0] eq $tests->[$i][1]) {
+        warn("got: '" . $tests->[$i][0] . "', expected: '" . $tests->[$i][1] . "'");
+        return 0;
+      }
+    }
+    {
+      eval {
+        Fn->sprintf("%d", "str");
+      };
+      unless ($@ && Fn->index($@, "Can't cast", 0) > -1) {
+        warn("got error: $@");
+        return 0;
+      }
+      $@ = undef;
+    }
+    return 1;
+  }
+
+  static method test_sprintf_ld : int () {
+    my $tests = [
+        [ Fn->sprintf("abc%ld", 10000000000L),                                "abc10000000000"                    ],
+        [ Fn->sprintf("%ldabc", 10000000000L),                                "10000000000abc"                    ],
+        [ Fn->sprintf("%ldabc%ld", 10000000000L, 20000000000L),               "10000000000abc20000000000"         ],
+        [ Fn->sprintf("%ld%ld%ld", 10000000000L, 20000000000L, 30000000000L), "100000000002000000000030000000000" ],
+        [ Fn->sprintf("%013ld", 12345678901L),                                "0012345678901"                     ],
+        [ Fn->sprintf("%+13ld", 12345678901L),                                " +12345678901"                     ],
+        [ Fn->sprintf("%-13ld", 12345678901L),                                "12345678901  "                     ],
+    ];
+    for (my $i = 0; $i < @$tests; ++$i) {
+      unless ($tests->[$i][0] eq $tests->[$i][1]) {
+        warn("got: '" . $tests->[$i][0] . "', expected: '" . $tests->[$i][1] . "'");
+        return 0;
+      }
+    }
+    {
+      eval {
+        Fn->sprintf("%ld", "str");
+      };
+      unless ($@ && Fn->index($@, "Can't cast", 0) > -1) {
+        warn("got error: $@");
+        return 0;
+      }
+      $@ = undef;
+    }
+    {
+      eval {
+        Fn->sprintf("%l", 1L);
+      };
+      unless ($@ && Fn->index($@, "Invalid conversion in sprintf: \"%l\"", 0) > -1) {
+        warn("got error: $@");
+        return 0;
+      }
+      $@ = undef;
+    }
+    return 1;
+  }
+
+  static method test_sprintf_lu : int () {
+    my $tests = [
+        [ Fn->sprintf("abc%lu", 10000000000L),                                "abc10000000000"                    ],
+        [ Fn->sprintf("%luabc", 10000000000L),                                "10000000000abc"                    ],
+        [ Fn->sprintf("%luabc%lu", 10000000000L, 20000000000L),               "10000000000abc20000000000"         ],
+        [ Fn->sprintf("%lu%ld%lu", 10000000000L, 20000000000L, 30000000000L), "100000000002000000000030000000000" ],
+        [ Fn->sprintf("%013lu", 12345678901L),                                "0012345678901"                     ],
+        [ Fn->sprintf("%+13lu", 12345678901L),                                " +12345678901"                     ],
+        [ Fn->sprintf("%-13lu", 12345678901L),                                "12345678901  "                     ],
+        [ Fn->sprintf("%lu", -1L),                                            "18446744073709551615"              ],
+    ];
+    for (my $i = 0; $i < @$tests; ++$i) {
+      unless ($tests->[$i][0] eq $tests->[$i][1]) {
+        warn("got: '" . $tests->[$i][0] . "', expected: '" . $tests->[$i][1] . "'");
+        return 0;
+      }
+    }
+    {
+      eval {
+        Fn->sprintf("%ld", "str");
+      };
+      unless ($@ && Fn->index($@, "Can't cast", 0) > -1) {
+        warn("got error: $@");
+        return 0;
+      }
+      $@ = undef;
+    }
+    {
+      eval {
+        Fn->sprintf("%l", 1L);
+      };
+      unless ($@ && Fn->index($@, "Invalid conversion in sprintf: \"%l\"", 0) > -1) {
+        warn("got error: $@");
+        return 0;
+      }
+      $@ = undef;
+    }
+    return 1;
+  }
+
+  static method test_sprintf_f : int () {
+    my $tests = [
+        [ Fn->sprintf("abc%.2f", 3.1415),                  "abc3.14"      ],
+        [ Fn->sprintf("%.2fabc", 3.14),                  "3.14abc"      ],
+        [ Fn->sprintf("%.2fabc%.2f", 3.14, 2.71),        "3.14abc2.71"  ],
+        [ Fn->sprintf("%.2f%.2f%.2f", 3.14, 2.71, 2.67), "3.142.712.67" ],
+        [ Fn->sprintf("%.10f", 3.14),                    "3.1400000000" ],
+        [ Fn->sprintf("%012.6f", 3.14),                  "00003.140000" ],
+        [ Fn->sprintf("%+12.6f", 3.14),                  "   +3.140000" ],
+        [ Fn->sprintf("%-12.6f", 3.14),                  "3.140000    " ],
+        [ Fn->sprintf("%+-12.6f", 3.14),                 "+3.140000   " ],
+        [ Fn->sprintf("%g", 3.14),                       "3.14"         ],
+    ];
+    for (my $i = 0; $i < @$tests; ++$i) {
+      unless ($tests->[$i][0] eq $tests->[$i][1]) {
+        warn("got: '" . $tests->[$i][0] . "', expected: '" . $tests->[$i][1] . "'");
+        return 0;
+      }
+    }
+    {
+      eval {
+        Fn->sprintf("%f", "str");
+      };
+      unless ($@ && Fn->index($@, "Can't cast", 0) > -1) {
+        warn("got error: $@");
+        return 0;
+      }
+      $@ = undef;
+    }
+    return 1;
+  }
+
+  static method test_sprintf_c : int () {
+    my $tests = [
+        [ Fn->sprintf("abc%c", 'x'),            "abcx"  ],
+        [ Fn->sprintf("%cabc", 'x'),            "xabc"  ],
+        [ Fn->sprintf("%cabc%c", 'x', 'y'),     "xabcy" ],
+        [ Fn->sprintf("%c%c%c", 'x', 'y', 'z'), "xyz"   ],
+        [ Fn->sprintf("%05c", 'x'),             "0000x" ],
+        [ Fn->sprintf("%-5c", 'x'),             "x    " ],
+    ];
+    for (my $i = 0; $i < @$tests; ++$i) {
+      unless ($tests->[$i][0] eq $tests->[$i][1]) {
+        warn("got: '" . $tests->[$i][0] . "', expected: '" . $tests->[$i][1] . "'");
+        return 0;
+      }
+    }
+    {
+      eval {
+        Fn->sprintf("%c", "str");
+      };
+      unless ($@ && Fn->index($@, "Can't cast", 0) > -1) {
+        warn("got error: $@");
+        return 0;
+      }
+      $@ = undef;
+    }
+    return 1;
+  }
+
+  static method test_sprintf_s : int () {
+    my $tests = [
+        [ Fn->sprintf("abc%s", "ABC"),                "abcABC"    ],
+        [ Fn->sprintf("%sabc", "ABC"),                "ABCabc"    ],
+        [ Fn->sprintf("%sabc%s", "ABC", "XYZ"),       "ABCabcXYZ" ],
+        [ Fn->sprintf("%s%s%s", "ABC", "XYZ", "123"), "ABCXYZ123" ],
+        [ Fn->sprintf("%05s", "str"),                 "00str"     ],
+        [ Fn->sprintf("%-5s", "str"),                 "str  "     ],
+    ];
+    for (my $i = 0; $i < @$tests; ++$i) {
+      unless ($tests->[$i][0] eq $tests->[$i][1]) {
+        warn("got: '" . $tests->[$i][0] . "', expected: '" . $tests->[$i][1] . "'");
+        return 0;
+      }
+    }
+    {
+      eval {
+        Fn->sprintf("%s", 1);
+      };
+      unless ($@ && Fn->index($@, "Can't cast", 0) > -1) {
+        warn("got error: $@");
+        return 0;
+      }
+      $@ = undef;
+    }
+    return 1;
+  }
+
+  private static method _first_uchar : int ($string : string) {
+    my $uchar_pos = 0;
+    return Un->uchar($string, \$uchar_pos);
+  }
+
+  static method test_sprintf_U : int () {
+    my $tests = [
+        [ Fn->sprintf("abc%U", &_first_uchar("あ")), "abcあ" ],
+        [ Fn->sprintf("%Uabc", &_first_uchar("あ")), "あabc" ],
+        [ Fn->sprintf("%Uabc%U", &_first_uchar("あ"), &_first_uchar("い")), "あabcい" ],
+        [ Fn->sprintf("%U%U%U", &_first_uchar("あ"), &_first_uchar("い"), &_first_uchar("う")), "あいう" ],
+    ];
+    for (my $i = 0; $i < @$tests; ++$i) {
+      unless ($tests->[$i][0] eq $tests->[$i][1]) {
+        warn("got: '" . $tests->[$i][0] . "', expected: '" . $tests->[$i][1] . "'");
+        return 0;
+      }
+    }
+    {
+      eval {
+        Fn->sprintf("%U", "str");
+      };
+      unless ($@ && Fn->index($@, "Can't cast", 0) > -1) {
+        warn("got error: $@");
+        return 0;
+      }
+      $@ = undef;
+    }
+    return 1;
+  }
+
+  static method test_sprintf_percent : int () {
+    my $tests = [
+        [ Fn->sprintf("%d%%",    1), "1%"    ],
+        [ Fn->sprintf("%%%d",    1), "%1"    ],
+        [ Fn->sprintf("%d%%str", 1), "1%str" ],
+    ];
+    for (my $i = 0; $i < @$tests; ++$i) {
+      unless ($tests->[$i][0] eq $tests->[$i][1]) {
+        warn("got: '" . $tests->[$i][0] . "', expected: '" . $tests->[$i][1] . "'");
+        return 0;
+      }
+    }
+    return 1;
+  }
+
+  static method test_sprintf_all : int () {
+    {
+      # Invalid conversion (end of string)
+      eval {
+        Fn->sprintf("%d%", 1);
+      };
+      unless ($@ && Fn->index($@, "Invalid conversion in sprintf: end of string", 0) > -1) {
+        warn("got error: $@");
+        return 0;
+      }
+      $@ = undef;
+    }
+    {
+      # Invalid conversion (unknown specifier)
+      eval {
+        Fn->sprintf("%d%k", 1, 2);
+      };
+      unless ($@ && Fn->index($@, "Invalid conversion in sprintf: \"%k\"", 0) > -1) {
+        warn("got error: $@");
+        return 0;
+      }
+      $@ = undef;
+    }
+    {
+      # Invalid conversion (no type)
+      eval {
+        Fn->sprintf("%012.3", 3.14);
+      };
+      unless ($@ && Fn->index($@, "Invalid conversion in sprintf: \"%012.3\"", 0) > -1) {
+        warn("got error: $@");
+        return 0;
+      }
+      $@ = undef;
+    }
+    {
+      # Missing argument
+      eval {
+        Fn->sprintf("%d%d", 1);
+      };
+      unless ($@ && Fn->index($@, "Missing argument in sprintf", 0) > -1) {
+        warn("got error: $@");
+        return 0;
+      }
+      $@ = undef;
+    }
+    {
+      my $string = "abc\n";
+      my $ret = Fn->chompr($string);
+      unless ($ret eq "abc") {
+        return 0;
+      }
+    }
+    {
+      my $string = "abc";
+      my $ret = Fn->chompr($string);
+      unless ($ret eq "abc") {
+        return 0;
+      }
+    }
+    {
+      my $string = "";
+      my $ret = Fn->chompr($string);
+      unless ($ret eq "") {
+        return 0;
+      }
+    }
+
+    return 1;
+  }
+
+  static method sort_byte : int () {
+    # Sort array by asc order
+    {
+      my $nums = [(byte)2, 3, 1];
+      
+      Fn->sort_byte($nums, 0, scalar @$nums, method : int ($a : byte, $b : byte) {
+        return $a <=> $b;
+      });
+      
+      unless (Fn->equals_array_byte($nums, [(byte)1, 2, 3])) {
+        return 0;
+      }
+    }
+
+    # Sort array by asc order more long
+    {
+      my $nums = [(byte)5, 7, 9, 2, 4, 8, 1, 3, 6, 0];
+      
+      Fn->sort_byte($nums, 0, scalar @$nums, method : int ($a : byte, $b : byte) {
+        return $a <=> $b;
+      });
+      
+      unless (Fn->equals_array_byte($nums, [(byte)0, 1, 2, 3, 4, 5, 6, 7, 8, 9])) {
+        return 0;
+      }
+    }
+
+    # Sort array by asc order more long with same values
+    {
+      my $nums = [(byte)5, 7, 9, 2, 5, 4, 8, 1, 3, 6, 3, 0];
+      
+      Fn->sort_byte($nums, 0, scalar @$nums, method : int ($a : byte, $b : byte) {
+        return $a <=> $b;
+      });
+      
+      unless (Fn->equals_array_byte($nums, [(byte)0, 1, 2, 3, 3, 4, 5, 5, 6, 7, 8, 9])) {
+        return 0;
+      }
+    }
+
+    # Sort byte array by desc order
+    {
+      my $nums = [(byte)2, 3, 1];
+      
+      Fn->sort_byte($nums, 0, scalar @$nums, method : int ($a : byte, $b : byte) {
+        return $b <=> $a;
+      });
+      
+      unless (Fn->equals_array_byte($nums, [(byte)3, 2, 1])) {
+        return 0;
+      }
+    }
+
+    # If length is 0, There is nothing to do
+    {
+      my $nums = [(byte)2, 3, 1];
+      
+      Fn->sort_byte($nums, 0, 0, method : int ($a : byte, $b : byte) {
+        return $a <=> $b;
+      });
+      
+      unless (Fn->equals_array_byte($nums, [(byte)2, 3, 1])) {
+        return 0;
+      }
+    }
+    
+    # Sort partially
+    {
+      my $nums = [(byte)5, 2, 3, 1, -10];
+      
+      Fn->sort_byte($nums, 1, 3, method : int ($a : byte, $b : byte) {
+        return $a <=> $b;
+      });
+      
+      unless (Fn->equals_array_byte($nums, [(byte)5, 1, 2, 3, -10])) {
+        return 0;
+      }
+    }
+
+    # Exception - Array must be not undef
+    {
+      my $nums = [(byte)2, 3, 1];
+      
+      eval {
+        Fn->sort_byte(undef, 0, scalar @$nums, method : int ($a : byte, $b : byte) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Offset must be more than or equals to 0
+    {
+      my $nums = [(byte)5, 2, 3, 1, -10];
+      
+      eval {
+        Fn->sort_byte($nums, -1, 3, method : int ($a : byte, $b : byte) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Length must be more than or equals to 0
+    {
+      my $nums = [(byte)5, 2, 3, 1, -10];
+      
+      eval {
+        Fn->sort_byte($nums, 1, -1, method : int ($a : byte, $b : byte) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Offset + Length must be in the array range
+    {
+      my $nums = [(byte)5, 2, 3, 1, -10];
+      
+      eval {
+        Fn->sort_byte($nums, 3, 3, method : int ($a : byte, $b : byte) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method sort_short : int () {
+    # Sort array by asc order
+    {
+      my $nums = [(short)2, 3, 1];
+      
+      Fn->sort_short($nums, 0, scalar @$nums, method : int ($a : short, $b : short) {
+        return $a <=> $b;
+      });
+      
+      unless (Fn->equals_array_short($nums, [(short)1, 2, 3])) {
+        return 0;
+      }
+    }
+
+    # Sort array by asc order more long
+    {
+      my $nums = [(short)5, 7, 9, 2, 4, 8, 1, 3, 6, 0];
+      
+      Fn->sort_short($nums, 0, scalar @$nums, method : int ($a : short, $b : short) {
+        return $a <=> $b;
+      });
+      
+      unless (Fn->equals_array_short($nums, [(short)0, 1, 2, 3, 4, 5, 6, 7, 8, 9])) {
+        return 0;
+      }
+    }
+
+    # Sort array by asc order more long with same values
+    {
+      my $nums = [(short)5, 7, 9, 2, 5, 4, 8, 1, 3, 6, 3, 0];
+      
+      Fn->sort_short($nums, 0, scalar @$nums, method : int ($a : short, $b : short) {
+        return $a <=> $b;
+      });
+      
+      unless (Fn->equals_array_short($nums, [(short)0, 1, 2, 3, 3, 4, 5, 5, 6, 7, 8, 9])) {
+        return 0;
+      }
+    }
+
+    # Sort short array by desc order
+    {
+      my $nums = [(short)2, 3, 1];
+      
+      Fn->sort_short($nums, 0, scalar @$nums, method : int ($a : short, $b : short) {
+        return $b <=> $a;
+      });
+      
+      unless (Fn->equals_array_short($nums, [(short)3, 2, 1])) {
+        return 0;
+      }
+    }
+
+    # If length is 0, There is nothing to do
+    {
+      my $nums = [(short)2, 3, 1];
+      
+      Fn->sort_short($nums, 0, 0, method : int ($a : short, $b : short) {
+        return $a <=> $b;
+      });
+      
+      unless (Fn->equals_array_short($nums, [(short)2, 3, 1])) {
+        return 0;
+      }
+    }
+    
+    # Sort partially
+    {
+      my $nums = [(short)5, 2, 3, 1, -10];
+      
+      Fn->sort_short($nums, 1, 3, method : int ($a : short, $b : short) {
+        return $a <=> $b;
+      });
+      
+      unless (Fn->equals_array_short($nums, [(short)5, 1, 2, 3, -10])) {
+        return 0;
+      }
+    }
+
+    # Exception - Array must be not undef
+    {
+      my $nums = [(short)2, 3, 1];
+      
+      eval {
+        Fn->sort_short(undef, 0, scalar @$nums, method : int ($a : short, $b : short) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Offset must be more than or equals to 0
+    {
+      my $nums = [(short)5, 2, 3, 1, -10];
+      
+      eval {
+        Fn->sort_short($nums, -1, 3, method : int ($a : short, $b : short) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Length must be more than or equals to 0
+    {
+      my $nums = [(short)5, 2, 3, 1, -10];
+      
+      eval {
+        Fn->sort_short($nums, 1, -1, method : int ($a : short, $b : short) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Offset + Length must be in the array range
+    {
+      my $nums = [(short)5, 2, 3, 1, -10];
+      
+      eval {
+        Fn->sort_short($nums, 3, 3, method : int ($a : short, $b : short) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method sort_int : int () {
+    # Sort array by asc order
+    {
+      my $nums = [(int)2, 3, 1];
+      
+      Fn->sort_int($nums, 0, scalar @$nums, method : int ($a : int, $b : int) {
+        return $a <=> $b;
+      });
+      
+      unless (Fn->equals_array_int($nums, [(int)1, 2, 3])) {
+        return 0;
+      }
+    }
+
+    # Sort array by asc order more long
+    {
+      my $nums = [(int)5, 7, 9, 2, 4, 8, 1, 3, 6, 0];
+      
+      Fn->sort_int($nums, 0, scalar @$nums, method : int ($a : int, $b : int) {
+        return $a <=> $b;
+      });
+      
+      unless (Fn->equals_array_int($nums, [(int)0, 1, 2, 3, 4, 5, 6, 7, 8, 9])) {
+        return 0;
+      }
+    }
+
+    # Sort array by asc order more long with same values
+    {
+      my $nums = [(int)5, 7, 9, 2, 5, 4, 8, 1, 3, 6, 3, 0];
+      
+      Fn->sort_int($nums, 0, scalar @$nums, method : int ($a : int, $b : int) {
+        return $a <=> $b;
+      });
+      
+      unless (Fn->equals_array_int($nums, [(int)0, 1, 2, 3, 3, 4, 5, 5, 6, 7, 8, 9])) {
+        return 0;
+      }
+    }
+
+    # Sort int array by desc order
+    {
+      my $nums = [(int)2, 3, 1];
+      
+      Fn->sort_int($nums, 0, scalar @$nums, method : int ($a : int, $b : int) {
+        return $b <=> $a;
+      });
+      
+      unless (Fn->equals_array_int($nums, [(int)3, 2, 1])) {
+        return 0;
+      }
+    }
+
+    # If length is 0, There is nothing to do
+    {
+      my $nums = [(int)2, 3, 1];
+      
+      Fn->sort_int($nums, 0, 0, method : int ($a : int, $b : int) {
+        return $a <=> $b;
+      });
+      
+      unless (Fn->equals_array_int($nums, [(int)2, 3, 1])) {
+        return 0;
+      }
+    }
+    
+    # Sort partially
+    {
+      my $nums = [(int)5, 2, 3, 1, -10];
+      
+      Fn->sort_int($nums, 1, 3, method : int ($a : int, $b : int) {
+        return $a <=> $b;
+      });
+      
+      unless (Fn->equals_array_int($nums, [(int)5, 1, 2, 3, -10])) {
+        return 0;
+      }
+    }
+
+    # Exception - Array must be not undef
+    {
+      my $nums = [(int)2, 3, 1];
+      
+      eval {
+        Fn->sort_int(undef, 0, scalar @$nums, method : int ($a : int, $b : int) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Offset must be more than or equals to 0
+    {
+      my $nums = [(int)5, 2, 3, 1, -10];
+      
+      eval {
+        Fn->sort_int($nums, -1, 3, method : int ($a : int, $b : int) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Length must be more than or equals to 0
+    {
+      my $nums = [(int)5, 2, 3, 1, -10];
+      
+      eval {
+        Fn->sort_int($nums, 1, -1, method : int ($a : int, $b : int) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Offset + Length must be in the array range
+    {
+      my $nums = [(int)5, 2, 3, 1, -10];
+      
+      eval {
+        Fn->sort_int($nums, 3, 3, method : int ($a : int, $b : int) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method sort_long : int () {
+    # Sort array by asc order
+    {
+      my $nums = [(long)2, 3, 1];
+      
+      Fn->sort_long($nums, 0, scalar @$nums, method : int ($a : long, $b : long) {
+        return $a <=> $b;
+      });
+      
+      unless (Fn->equals_array_long($nums, [(long)1, 2, 3])) {
+        return 0;
+      }
+    }
+
+    # Sort array by asc order more long
+    {
+      my $nums = [(long)5, 7, 9, 2, 4, 8, 1, 3, 6, 0];
+      
+      Fn->sort_long($nums, 0, scalar @$nums, method : int ($a : long, $b : long) {
+        return $a <=> $b;
+      });
+      
+      unless (Fn->equals_array_long($nums, [(long)0, 1, 2, 3, 4, 5, 6, 7, 8, 9])) {
+        return 0;
+      }
+    }
+
+    # Sort array by asc order more long with same values
+    {
+      my $nums = [(long)5, 7, 9, 2, 5, 4, 8, 1, 3, 6, 3, 0];
+      
+      Fn->sort_long($nums, 0, scalar @$nums, method : int ($a : long, $b : long) {
+        return $a <=> $b;
+      });
+      
+      unless (Fn->equals_array_long($nums, [(long)0, 1, 2, 3, 3, 4, 5, 5, 6, 7, 8, 9])) {
+        return 0;
+      }
+    }
+
+    # Sort long array by desc order
+    {
+      my $nums = [(long)2, 3, 1];
+      
+      Fn->sort_long($nums, 0, scalar @$nums, method : int ($a : long, $b : long) {
+        return $b <=> $a;
+      });
+      
+      unless (Fn->equals_array_long($nums, [(long)3, 2, 1])) {
+        return 0;
+      }
+    }
+
+    # If length is 0, There is nothing to do
+    {
+      my $nums = [(long)2, 3, 1];
+      
+      Fn->sort_long($nums, 0, 0, method : int ($a : long, $b : long) {
+        return $a <=> $b;
+      });
+      
+      unless (Fn->equals_array_long($nums, [(long)2, 3, 1])) {
+        return 0;
+      }
+    }
+    
+    # Sort partially
+    {
+      my $nums = [(long)5, 2, 3, 1, -10];
+      
+      Fn->sort_long($nums, 1, 3, method : int ($a : long, $b : long) {
+        return $a <=> $b;
+      });
+      
+      unless (Fn->equals_array_long($nums, [(long)5, 1, 2, 3, -10])) {
+        return 0;
+      }
+    }
+
+    # Exception - Array must be not undef
+    {
+      my $nums = [(long)2, 3, 1];
+      
+      eval {
+        Fn->sort_long(undef, 0, scalar @$nums, method : int ($a : long, $b : long) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Offset must be more than or equals to 0
+    {
+      my $nums = [(long)5, 2, 3, 1, -10];
+      
+      eval {
+        Fn->sort_long($nums, -1, 3, method : int ($a : long, $b : long) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Length must be more than or equals to 0
+    {
+      my $nums = [(long)5, 2, 3, 1, -10];
+      
+      eval {
+        Fn->sort_long($nums, 1, -1, method : int ($a : long, $b : long) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Offset + Length must be in the array range
+    {
+      my $nums = [(long)5, 2, 3, 1, -10];
+      
+      eval {
+        Fn->sort_long($nums, 3, 3, method : int ($a : long, $b : long) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method sort_float : int () {
+    # Sort array by asc order
+    {
+      my $nums = [(float)2, 3, 1];
+      
+      Fn->sort_float($nums, 0, scalar @$nums, method : int ($a : float, $b : float) {
+        return $a <=> $b;
+      });
+      
+      unless (Fn->equals_array_float($nums, [(float)1, 2, 3])) {
+        return 0;
+      }
+    }
+
+    # Sort array by asc order more long
+    {
+      my $nums = [(float)5, 7, 9, 2, 4, 8, 1, 3, 6, 0];
+      
+      Fn->sort_float($nums, 0, scalar @$nums, method : int ($a : float, $b : float) {
+        return $a <=> $b;
+      });
+      
+      unless (Fn->equals_array_float($nums, [(float)0, 1, 2, 3, 4, 5, 6, 7, 8, 9])) {
+        return 0;
+      }
+    }
+
+    # Sort array by asc order more long with same values
+    {
+      my $nums = [(float)5, 7, 9, 2, 5, 4, 8, 1, 3, 6, 3, 0];
+      
+      Fn->sort_float($nums, 0, scalar @$nums, method : int ($a : float, $b : float) {
+        return $a <=> $b;
+      });
+      
+      unless (Fn->equals_array_float($nums, [(float)0, 1, 2, 3, 3, 4, 5, 5, 6, 7, 8, 9])) {
+        return 0;
+      }
+    }
+
+    # Sort float array by desc order
+    {
+      my $nums = [(float)2, 3, 1];
+      
+      Fn->sort_float($nums, 0, scalar @$nums, method : int ($a : float, $b : float) {
+        return $b <=> $a;
+      });
+      
+      unless (Fn->equals_array_float($nums, [(float)3, 2, 1])) {
+        return 0;
+      }
+    }
+
+    # If length is 0, There is nothing to do
+    {
+      my $nums = [(float)2, 3, 1];
+      
+      Fn->sort_float($nums, 0, 0, method : int ($a : float, $b : float) {
+        return $a <=> $b;
+      });
+      
+      unless (Fn->equals_array_float($nums, [(float)2, 3, 1])) {
+        return 0;
+      }
+    }
+    
+    # Sort partially
+    {
+      my $nums = [(float)5, 2, 3, 1, -10];
+      
+      Fn->sort_float($nums, 1, 3, method : int ($a : float, $b : float) {
+        return $a <=> $b;
+      });
+      
+      unless (Fn->equals_array_float($nums, [(float)5, 1, 2, 3, -10])) {
+        return 0;
+      }
+    }
+
+    # Exception - Array must be not undef
+    {
+      my $nums = [(float)2, 3, 1];
+      
+      eval {
+        Fn->sort_float(undef, 0, scalar @$nums, method : int ($a : float, $b : float) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Offset must be more than or equals to 0
+    {
+      my $nums = [(float)5, 2, 3, 1, -10];
+      
+      eval {
+        Fn->sort_float($nums, -1, 3, method : int ($a : float, $b : float) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Length must be more than or equals to 0
+    {
+      my $nums = [(float)5, 2, 3, 1, -10];
+      
+      eval {
+        Fn->sort_float($nums, 1, -1, method : int ($a : float, $b : float) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Offset + Length must be in the array range
+    {
+      my $nums = [(float)5, 2, 3, 1, -10];
+      
+      eval {
+        Fn->sort_float($nums, 3, 3, method : int ($a : float, $b : float) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method sort_double : int () {
+    # Sort array by asc order
+    {
+      my $nums = [(double)2, 3, 1];
+      
+      Fn->sort_double($nums, 0, scalar @$nums, method : int ($a : double, $b : double) {
+        return $a <=> $b;
+      });
+      
+      unless (Fn->equals_array_double($nums, [(double)1, 2, 3])) {
+        return 0;
+      }
+    }
+
+    # Sort array by asc order more long
+    {
+      my $nums = [(double)5, 7, 9, 2, 4, 8, 1, 3, 6, 0];
+      
+      Fn->sort_double($nums, 0, scalar @$nums, method : int ($a : double, $b : double) {
+        return $a <=> $b;
+      });
+      
+      unless (Fn->equals_array_double($nums, [(double)0, 1, 2, 3, 4, 5, 6, 7, 8, 9])) {
+        return 0;
+      }
+    }
+
+    # Sort array by asc order more long with same values
+    {
+      my $nums = [(double)5, 7, 9, 2, 5, 4, 8, 1, 3, 6, 3, 0];
+      
+      Fn->sort_double($nums, 0, scalar @$nums, method : int ($a : double, $b : double) {
+        return $a <=> $b;
+      });
+      
+      unless (Fn->equals_array_double($nums, [(double)0, 1, 2, 3, 3, 4, 5, 5, 6, 7, 8, 9])) {
+        return 0;
+      }
+    }
+
+    # Sort double array by desc order
+    {
+      my $nums = [(double)2, 3, 1];
+      
+      Fn->sort_double($nums, 0, scalar @$nums, method : int ($a : double, $b : double) {
+        return $b <=> $a;
+      });
+      
+      unless (Fn->equals_array_double($nums, [(double)3, 2, 1])) {
+        return 0;
+      }
+    }
+
+    # If length is 0, There is nothing to do
+    {
+      my $nums = [(double)2, 3, 1];
+      
+      Fn->sort_double($nums, 0, 0, method : int ($a : double, $b : double) {
+        return $a <=> $b;
+      });
+      
+      unless (Fn->equals_array_double($nums, [(double)2, 3, 1])) {
+        return 0;
+      }
+    }
+    
+    # Sort partially
+    {
+      my $nums = [(double)5, 2, 3, 1, -10];
+      
+      Fn->sort_double($nums, 1, 3, method : int ($a : double, $b : double) {
+        return $a <=> $b;
+      });
+      
+      unless (Fn->equals_array_double($nums, [(double)5, 1, 2, 3, -10])) {
+        return 0;
+      }
+    }
+
+    # Exception - Array must be not undef
+    {
+      my $nums = [(double)2, 3, 1];
+      
+      eval {
+        Fn->sort_double(undef, 0, scalar @$nums, method : int ($a : double, $b : double) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Offset must be more than or equals to 0
+    {
+      my $nums = [(double)5, 2, 3, 1, -10];
+      
+      eval {
+        Fn->sort_double($nums, -1, 3, method : int ($a : double, $b : double) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Length must be more than or equals to 0
+    {
+      my $nums = [(double)5, 2, 3, 1, -10];
+      
+      eval {
+        Fn->sort_double($nums, 1, -1, method : int ($a : double, $b : double) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Offset + Length must be in the array range
+    {
+      my $nums = [(double)5, 2, 3, 1, -10];
+      
+      eval {
+        Fn->sort_double($nums, 3, 3, method : int ($a : double, $b : double) {
+          return $a <=> $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method sort_string : int () {
+    # Sort array by asc order
+    {
+      my $strings = [(string)2, 3, 1];
+      
+      Fn->sort_string($strings, 0, scalar @$strings, method : int ($a : string, $b : string) {
+        return $a cmp $b;
+      });
+      
+      unless (Fn->equals_array_string($strings, [(string)1, 2, 3])) {
+        return 0;
+      }
+    }
+
+    # Sort array by asc order more long
+    {
+      my $strings = [(string)5, 7, 9, 2, 4, 8, 1, 3, 6, 0];
+      
+      Fn->sort_string($strings, 0, scalar @$strings, method : int ($a : string, $b : string) {
+        return $a cmp $b;
+      });
+      
+      unless (Fn->equals_array_string($strings, [(string)0, 1, 2, 3, 4, 5, 6, 7, 8, 9])) {
+        return 0;
+      }
+    }
+
+    # Sort array by asc order more long with same values
+    {
+      my $strings = [(string)5, 7, 9, 2, 5, 4, 8, 1, 3, 6, 3, 0];
+      
+      Fn->sort_string($strings, 0, scalar @$strings, method : int ($a : string, $b : string) {
+        return $a cmp $b;
+      });
+      
+      unless (Fn->equals_array_string($strings, [(string)0, 1, 2, 3, 3, 4, 5, 5, 6, 7, 8, 9])) {
+        return 0;
+      }
+    }
+
+    # Sort string array by desc order
+    {
+      my $strings = [(string)2, 3, 1];
+      
+      Fn->sort_string($strings, 0, scalar @$strings, method : int ($a : string, $b : string) {
+        return $b cmp $a;
+      });
+      
+      unless (Fn->equals_array_string($strings, [(string)3, 2, 1])) {
+        return 0;
+      }
+    }
+
+    # If length is 0, There is nothing to do
+    {
+      my $strings = [(string)2, 3, 1];
+      
+      Fn->sort_string($strings, 0, 0, method : int ($a : string, $b : string) {
+        return $a cmp $b;
+      });
+      
+      unless (Fn->equals_array_string($strings, [(string)2, 3, 1])) {
+        return 0;
+      }
+    }
+    
+    # Sort partially
+    {
+      my $strings = [(string)5, 2, 3, 1, -10];
+      
+      Fn->sort_string($strings, 1, 3, method : int ($a : string, $b : string) {
+        return $a cmp $b;
+      });
+      
+      unless (Fn->equals_array_string($strings, [(string)5, 1, 2, 3, -10])) {
+        return 0;
+      }
+    }
+
+    # Sort length is differnt and contain empty string and undef
+    {
+      my $strings = ["11", "1", "2", undef, ""];
+      
+      Fn->sort_string($strings, 0, scalar @$strings, method : int ($a : string, $b : string) {
+        return $a cmp $b;
+      });
+      
+      unless (Fn->equals_array_string($strings, [(string)undef, "", "1", "11", "2"])) {
+        return 0;
+      }
+    }
+
+    # Exception - Array must be not undef
+    {
+      my $strings = [(string)2, 3, 1];
+      
+      eval {
+        Fn->sort_string(undef, 0, scalar @$strings, method : int ($a : string, $b : string) {
+          return $a cmp $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Offset must be more than or equals to 0
+    {
+      my $strings = [(string)5, 2, 3, 1, -10];
+      
+      eval {
+        Fn->sort_string($strings, -1, 3, method : int ($a : string, $b : string) {
+          return $a cmp $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Length must be more than or equals to 0
+    {
+      my $strings = [(string)5, 2, 3, 1, -10];
+      
+      eval {
+        Fn->sort_string($strings, 1, -1, method : int ($a : string, $b : string) {
+          return $a cmp $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Offset + Length must be in the array range
+    {
+      my $strings = [(string)5, 2, 3, 1, -10];
+      
+      eval {
+        Fn->sort_string($strings, 3, 3, method : int ($a : string, $b : string) {
+          return $a cmp $b;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+
+  static method new_minimal : TestCase::Minimal ($x : int, $y : int) {
+    my $minimal = TestCase::Minimal->new;
+    $minimal->set_x($x);
+    $minimal->set_y($y);
+    
+    return $minimal;
+  }
+  
+  static method sort_object : int () {
+    
+    # Sort array by asc order
+    {
+      my $objs = [&new_minimal(2, 0), &new_minimal(3, 0), &new_minimal(1, 0)];
+      
+      Fn->sort_object($objs, 0, scalar @$objs, method : int ($a : object, $b : object) {
+        return ((TestCase::Minimal)$a)->x <=> ((TestCase::Minimal)$b)->x;
+      });
+      
+      my $is_equals = Fn->equals_array_object($objs, [&new_minimal(1, 0), &new_minimal(2, 0), &new_minimal(3, 0)], method : int ($a : object, $b : object) {
+        return ((TestCase::Minimal)$a)->x == ((TestCase::Minimal)$b)->x;
+      });
+      
+      unless ($is_equals) {
+        return 0;
+      }
+    }
+
+    # Sort array by multiple conditions
+    {
+      my $objs = [&new_minimal(2, 1), &new_minimal(2, 2), &new_minimal(1, 3)];
+
+      Fn->sort_object($objs, 0, scalar @$objs, method : int ($a : object, $b : object) {
+        my $a_x = ((TestCase::Minimal)$a)->x;
+        my $a_y = ((TestCase::Minimal)$a)->y;
+        my $b_x = ((TestCase::Minimal)$b)->x;
+        my $b_y = ((TestCase::Minimal)$b)->y;
+        
+        my $cmp = ((TestCase::Minimal)$a)->x <=> ((TestCase::Minimal)$b)->x;
+        if ($cmp != 0) {
+          return $cmp;
+        }
+        else {
+          $cmp = ((TestCase::Minimal)$a)->y <=> ((TestCase::Minimal)$b)->y;
+        }
+        
+        return $cmp;
+      });
+
+      my $is_equals = Fn->equals_array_object($objs, [&new_minimal(1, 3), &new_minimal(2, 1), &new_minimal(2, 2)], method : int ($a : object, $b : object) {
+        if (((TestCase::Minimal)$a)->x == ((TestCase::Minimal)$b)->x && ((TestCase::Minimal)$a)->y == ((TestCase::Minimal)$b)->y) {
+          return 1;
+        }
+        else {
+          return 0;
+        }
+      });
+      
+      unless ($is_equals) {
+        return 0;
+      }
+    }
+
+    # Sort array by desc order
+    {
+      my $objs = [&new_minimal(2, 0), &new_minimal(3, 0), &new_minimal(1, 0)];
+      
+      Fn->sort_object($objs, 0, scalar @$objs, method : int ($a : object, $b : object) {
+        return ((TestCase::Minimal)$b)->x <=> ((TestCase::Minimal)$a)->x;
+      });
+      
+      my $is_equals = Fn->equals_array_object($objs, [&new_minimal(3, 0), &new_minimal(2, 0), &new_minimal(1, 0)], method : int ($a : object, $b : object) {
+        return ((TestCase::Minimal)$a)->x == ((TestCase::Minimal)$b)->x;
+      });
+      
+      unless ($is_equals) {
+        return 0;
+      }
+    }
+
+    # If length is 0, There is nothing to do
+    {
+      my $objs = [&new_minimal(2, 0), &new_minimal(3, 0), &new_minimal(1, 0)];
+      
+      Fn->sort_object($objs, 0, 0, method : int ($a : object, $b : object) {
+        return ((TestCase::Minimal)$a)->x <=> ((TestCase::Minimal)$b)->x;
+      });
+      
+      my $is_equals = Fn->equals_array_object($objs, [&new_minimal(2, 0), &new_minimal(3, 0), &new_minimal(1, 0)], method : int ($a : object, $b : object) {
+        return ((TestCase::Minimal)$a)->x == ((TestCase::Minimal)$b)->x;
+      });
+      unless ($is_equals) {
+        return 0;
+      }
+    }
+    
+    # Sort partially
+    {
+      my $objs = [&new_minimal(5, 0), &new_minimal(2, 0), &new_minimal(3, 0), &new_minimal(1, 0), &new_minimal(-10, 0)];
+      
+      Fn->sort_object($objs, 1, 3, method : int ($a : object, $b : object) {
+        return ((TestCase::Minimal)$a)->x <=> ((TestCase::Minimal)$b)->x;
+      });
+      
+      my $is_equals = Fn->equals_array_object(
+        $objs,
+        [&new_minimal(5, 0), &new_minimal(1, 0), &new_minimal(2, 0), &new_minimal(3, 0), &new_minimal(-10, 0)],
+        method : int ($a : object, $b : object) {
+          return ((TestCase::Minimal)$a)->x == ((TestCase::Minimal)$b)->x;
+        }
+      );
+      unless ($is_equals) {
+        return 0;
+      }
+    }
+
+    # Exception - Array must be not undef
+    {
+      my $objs = [&new_minimal(2, 0), &new_minimal(3, 0), &new_minimal(1, 0)];
+      
+      eval {
+        Fn->sort_object(undef, 0, scalar @$objs, method : int ($a : object, $b : object) {
+          return ((TestCase::Minimal)$a)->x <=> ((TestCase::Minimal)$b)->x;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # Exception - Offset must be more than or equals to 0
+    {
+      my $objs = [&new_minimal(2, 0), &new_minimal(3, 0), &new_minimal(1, 0)];
+      
+      eval {
+        Fn->sort_object($objs, -1, 3, method : int ($a : object, $b : object) {
+          return ((TestCase::Minimal)$a)->x <=> ((TestCase::Minimal)$b)->x;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Length must be more than or equals to 0
+    {
+      my $objs = [&new_minimal(5, 0), &new_minimal(2, 0), &new_minimal(3, 0), &new_minimal(1, 0), &new_minimal(-10, 0)];
+      
+      eval {
+        Fn->sort_object($objs, 1, -1, method : int ($a : object, $b : object) {
+          return ((TestCase::Minimal)$a)->x <=> ((TestCase::Minimal)$b)->x;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+
+    # Exception - Offset + Length must be in the array range
+    {
+      my $objs = [&new_minimal(5, 0), &new_minimal(2, 0), &new_minimal(3, 0), &new_minimal(1, 0), &new_minimal(-10, 0)];
+      
+      eval {
+        Fn->sort_object($objs, 3, 3, method : int ($a : object, $b : object) {
+          return ((TestCase::Minimal)$a)->x <=> ((TestCase::Minimal)$b)->x;
+        });
+      };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+
+    return 1;
+  }
+}

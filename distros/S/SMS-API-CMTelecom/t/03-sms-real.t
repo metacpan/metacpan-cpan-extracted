@@ -30,7 +30,7 @@ subtest simple_message => sub {
     );
 
     is ref $sms, 'SMS::API::CMTelecom', 'SMS object created';
-    
+
     my $res = $sms->send(
         message    => 'This is a test of the Perl module SMS::API::CMTelecom :-)',
         recipients => $phone_number,
@@ -40,11 +40,12 @@ subtest simple_message => sub {
     is_deeply $res, {
             messages => [
                 {
-                    to             => clean_number($phone_number),
-                    parts          => 1,
-                    reference      => undef,
-                    messageDetails => undef,
-                    status         => 'Accepted',
+                    to               => clean_number($phone_number),
+                    parts            => 1,
+                    reference        => undef,
+                    messageDetails   => undef,
+                    status           => 'Accepted',
+                    messageErrorCode => 0,
                 },
             ],
         }, 'correct status information';
@@ -61,7 +62,7 @@ subtest simple_message_with_reference => sub {
     is ref $sms, 'SMS::API::CMTelecom', 'SMS object created';
     my @chars = (0..9, 'A'..'Z', 'a'..'z');
     my $reference = join "" => map { $chars[int rand @chars] } 1..(1+int(rand 32));
-    
+
     my $res = $sms->send(
         message    => 'This is a test of the Perl module SMS::API::CMTelecom :-)',
         recipients => $phone_number,
@@ -72,11 +73,12 @@ subtest simple_message_with_reference => sub {
     is_deeply $res, {
             messages => [
                 {
-                    to             => clean_number($phone_number),
-                    parts          => 1,
-                    reference      => $reference,
-                    messageDetails => undef,
-                    status         => 'Accepted',
+                    to               => clean_number($phone_number),
+                    parts            => 1,
+                    reference        => $reference,
+                    messageDetails   => undef,
+                    status           => 'Accepted',
+                    messageErrorCode => 0,
                 },
             ],
         }, "correct status information with included reference ($reference)";

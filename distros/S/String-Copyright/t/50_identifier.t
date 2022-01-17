@@ -25,8 +25,8 @@ is copyright("RenÃ© Foo"), '', 'bogus latin1-as-utf8 accent acute';
 is copyright("¬© Foo"), ':Foo',
 	'MacRoman-misparsed-as-utf8 copyright sign as identifier';
 
-is copyright("Copyright: Foo"),  ':Foo', '"Copyright:" as identifier';
-is copyright('Copyright : Foo'), ':Foo', '"Copyright :" as identifier';
+is copyright("Copyright: Foo"),        ':Foo', '"Copyright:" as identifier';
+is copyright('Copyright : Foo'),       ':Foo', '"Copyright :" as identifier';
 is copyright("Copyright-holder: Foo"), ':Foo',
 	'"Copyright-holder:" as identifier';
 is copyright("Copyright-holders: Foo"), ':Foo',

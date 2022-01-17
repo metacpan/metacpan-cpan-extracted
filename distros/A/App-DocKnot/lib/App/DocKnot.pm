@@ -11,7 +11,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot 6.00;
+package App::DocKnot 6.01;
 
 use 5.024;
 use autodie;
@@ -70,10 +70,21 @@ sub load_yaml_file {
     # data elements set to false.
     local $YAML::XS::Boolean = 'JSON::PP';
 
-    # Load the metadata and check it against the schema.
-    my $data_ref = YAML::XS::LoadFile($path);
+    # Load the metadata and check it against the schema.  YAML::XS for some
+    # reason puts a newline before the system error part of an error message
+    # when loading a file, so clean up the error a bit.
     my $schema_path = $self->appdata_path('schema', $schema . '.yaml');
-    my $schema_ref = YAML::XS::LoadFile($schema_path);
+    my ($data_ref, $schema_ref);
+    eval {
+        $data_ref = YAML::XS::LoadFile($path);
+        $schema_ref = YAML::XS::LoadFile($schema_path);
+    };
+    if ($@) {
+        my $error = lcfirst($@);
+        chomp($error);
+        $error =~ s{ \n }{ }xms;
+        die "$error\n";
+    }
     eval { validate($schema_ref, $data_ref) };
     if ($@) {
         my $errors = $@;

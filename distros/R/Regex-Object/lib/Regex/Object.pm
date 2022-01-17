@@ -1,17 +1,19 @@
 package Regex::Object;
 
 use 5.20.0;
-use strict;
-use warnings qw(FATAL);
+
 use utf8;
 use English;
+use feature qw(signatures);
 
 use Regex::Object::Match;
 use Regex::Object::Matches;
 use Moo;
+
+no warnings qw(experimental::signatures);
 use namespace::clean;
 
-our $VERSION = '1.22';
+our $VERSION = '1.24';
 
 tie my %nc,  "Tie::Hash::NamedCapture";
 tie my %nca, "Tie::Hash::NamedCapture", all => 1;
@@ -20,15 +22,12 @@ has regex => (
     is => 'ro',
 );
 
-sub match {
-    my ($self, $string) = @_;
-
+sub match($self, $string) {
     $string =~ $self->regex;
     return $self->collect;
 }
 
-sub match_all {
-    my ($self, $string) = @_;
+sub match_all($self, $string) {
     my $regex = $self->regex;
     my @matches;
 
@@ -84,7 +83,7 @@ Regex::Object - solves problems with global Regex variables side effects.
 
 =head1 VERSION
 
-version 1.22
+version 1.24
 
 =head1 SYNOPSIS
 

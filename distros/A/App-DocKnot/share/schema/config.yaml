@@ -1,14 +1,18 @@
 # Kwalify schema for DocKnot configuration file.
 #
-# Copyright 2021 Russ Allbery <rra@cpan.org>
+# Copyright 2021-2022 Russ Allbery <rra@cpan.org>
 #
 # SPDX-License-Identifier: MIT
 
 type: map
 mapping:
+  archivedir:
+    type: text
   distdir:
     type: text
   pandoc:
     type: text
   pgp_key:
+    type: text
+  versions:
     type: text

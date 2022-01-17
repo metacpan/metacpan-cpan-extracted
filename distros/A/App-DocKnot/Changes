@@ -1,5 +1,30 @@
                        Revision history for DocKnot
 
+6.01 - 2022-01-15
+
+ - Add new docknot release command and corresponding App::DocKnot::Release
+   module to copy a tarball releaes (normally created by docknot dist)
+   into a release area, update symlinks, archive any previous releases,
+   and update the .versions file used by docknot spin.  DocKnot now
+   depends on Sort::Versions.
+
+ - Add new docknot update-spin command and corresponding update_spin
+   method in App::DocKnot::Update to update a spin input tree to the
+   latest expectations.  Currently, all this does is convert *.rpod
+   pointer files to *.spin pointer files.
+
+ - docknot spin now uses Path::Iterator::Rule and Path::Tiny to construct
+   its paths, which eliminates the need to change the working directory
+   while processing input files.
+
+ - Fix spurious requirement for a package metadata file when running
+   docknot spin.
+
+ - Don't overwrite output files from docknot generate or generate-all
+   if the generation fails.
+
+ - Require Pod::Thread 3.01 or later.
+
 6.00 - 2021-12-25
 
  - Add a new *.spin input file for docknot spin that points to an external

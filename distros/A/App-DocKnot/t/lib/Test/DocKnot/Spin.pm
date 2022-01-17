@@ -82,6 +82,10 @@ sub is_spin_output_tree {
     # File::Find on the output directory.
     my $check_output = sub {
         my $file = $_;
+        if ($file eq '.git') {
+            $File::Find::prune = 1;
+            return;
+        }
         return if -d $file;
 
         # Determine the relative path and mark it as seen.
@@ -191,7 +195,7 @@ Russ Allbery <rra@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2021 Russ Allbery <rra@cpan.org>
+Copyright 2021-2022 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

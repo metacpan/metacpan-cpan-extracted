@@ -20,6 +20,7 @@ use File::Temp;
 use Git::Repository;
 use IPC::Run qw(run);
 use IPC::System::Simple qw(capturex systemx);
+use List::Util qw(first);
 
 use Test::More;
 
@@ -52,9 +53,13 @@ $repo->run(add => '-A', q{.});
 $repo->run(commit => '-q', '-m', 'Initial commit');
 
 # Check whether we have all the necessary tools to run the test.
+my @branches = $repo->run(
+    'for-each-ref' => '--format=%(refname:short)', 'refs/heads/',
+);
+my $head = first { $_ eq 'main' || $_ eq 'master' } @branches;
 my $result;
 eval {
-    my $archive = $repo->command(archive => 'HEAD');
+    my $archive = $repo->command(archive => '--prefix=foo/', $head);
     my $out;
     $result = run([qw(tar tf -)], '<', $archive->stdout, '>', \$out);
     $archive->close();

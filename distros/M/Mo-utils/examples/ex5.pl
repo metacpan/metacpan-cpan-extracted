@@ -3,17 +3,16 @@
 use strict;
 use warnings;
 
-$Error::Pure::TYPE = 'Error';
-
-use Mo::utils qw(check_length);
+use Mo::utils qw(check_isa);
+use Test::MockObject;
 
 my $self = {
-        'key' => 'foo',
+        'key' => Test::MockObject->new,
 };
-check_length($self, 'key', 3);
+check_isa($self, 'key', 'Test::MockObject');
 
 # Print out.
 print "ok\n";
 
-# Output like:
+# Output:
 # ok

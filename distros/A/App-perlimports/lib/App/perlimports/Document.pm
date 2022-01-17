@@ -3,7 +3,7 @@ package App::perlimports::Document;
 use Moo;
 use utf8;
 
-our $VERSION = '0.000031';
+our $VERSION = '0.000032';
 
 use App::perlimports::Annotations     ();
 use App::perlimports::ExportInspector ();
@@ -983,7 +983,7 @@ sub _maybe_cache_inspectors {
     return unless $self->_cache;
 
     my @names = sort $self->all_inspector_names;
-    $self->logger->info("maybe cache");
+    $self->logger->info('maybe cache');
     return unless @names;
 
     my $append = 0;
@@ -1021,7 +1021,7 @@ App::perlimports::Document - Make implicit imports explicit
 
 =head1 VERSION
 
-version 0.000031
+version 0.000032
 
 =head2 inspector_for( $module_name )
 

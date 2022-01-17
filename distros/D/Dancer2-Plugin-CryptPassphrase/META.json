@@ -1,0 +1,61 @@
+{
+   "abstract" : "Crupt::Passphrase plugin for Dancer2",
+   "author" : [
+      "Peter Mottram (SysPete) <peter@sysnix.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dancer2-Plugin-CryptPassphrase",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Crypt::Passphrase" : "0.004",
+            "Crypt::Passphrase::Argon2" : "0.003",
+            "Dancer2" : "0.200000",
+            "Dancer2::Plugin" : "0",
+            "Types::Standard" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/SysPete/Dancer2-Plugin-CryptPassphrase/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/SysPete/Dancer2-Plugin-CryptPassphrase"
+      },
+      "x_IRC" : "irc://irc.perl.org/#dancer"
+   },
+   "version" : "0.002",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

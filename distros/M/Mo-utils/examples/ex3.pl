@@ -3,13 +3,15 @@
 use strict;
 use warnings;
 
-use Mo::utils qw(check_isa);
+use Mo::utils qw(check_array_object);
 use Test::MockObject;
 
 my $self = {
-        'key' => Test::MockObject->new,
+        'key' => [
+                Test::MockObject->new,
+        ],
 };
-check_isa($self, 'key', 'Test::MockObject');
+check_array_object($self, 'key', 'Test::MockObject', 'Value');
 
 # Print out.
 print "ok\n";

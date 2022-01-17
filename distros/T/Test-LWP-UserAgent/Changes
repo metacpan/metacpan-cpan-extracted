@@ -1,5 +1,11 @@
 Revision history for Test-LWP-UserAgent
 
+0.036     2022-01-16 04:11:38Z
+          - use http rather than https URIs in network tests
+
+0.035     2022-01-15 03:45:06Z
+          - fix network test that failed due to a broken redirect service
+
 0.034     2020-03-06 04:22:25Z
           - fix t/10-request-args-network.t under EXTENDED_TESTING=1 where the
             test URL was returning random content for each request and

@@ -1,0 +1,3 @@
+INPUT
+T_PV
+	$var = SvPVbyte_nolen($arg)

@@ -1,0 +1,75 @@
+NAME
+    Path::Util - Path functions
+
+VERSION
+    This document describes version 0.000002 of Path::Util (from Perl
+    distribution Path-Util), released on 2021-07-05.
+
+SYNOPSIS
+     use Path::Util qw(
+         basename
+     );
+
+     # basename
+     $filename = basename("/home/ujang/foo.txt"); # => "foo.txt"
+     $dirname  = basename("../etc/mysql/"); # => "foo.txt"
+
+DESCRIPTION
+    VERY EARLY RELEASE, ONLY A TINY BIT HAS BEEN IMPLEMENTED.
+
+    Following Perl's "easy things should be easy" motto, the goal of this
+    module is to make many path-related tasks as simple as calling a single
+    function. The functions in this module are usually wrappers for
+    functions of other modules or methods of other classes. You can think of
+    this module as the "List::Util for path" or "a non-OO Path::Tiny".
+
+FUNCTIONS
+  basename
+    Usage:
+
+     my $file = basename($path);
+
+    Examples:
+
+    This function returns the file portion or last directory portion of a
+    path. It uses File::Spec's "splitpath" and grabs the last returned
+    element, optionally does something extra (see below).
+
+    Given a list of suffixes as strings or regular expressions, any that
+    matches at the end of the file portion or last directory portion will be
+    removed before the result is returned.
+
+    Similar to Path::Tiny's "basename".
+
+    See also: File::Basename.
+
+    Available since v0.000001.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Path-Util>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Path-Util>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Path-Util>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Path::Tiny
+
+    File::Spec
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

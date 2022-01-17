@@ -1,3 +1,4 @@
+use utf8;
 use strict;
 use warnings;
 use Test::More;
@@ -5,20 +6,37 @@ use Excel::ValueWriter::XLSX;
 use Archive::Zip;
 
 
-# build an XLSX file with 3 sheets
+# build an XLSX file
 my $filename = 'foo.xlsx';
 my $writer = Excel::ValueWriter::XLSX->new;
-$writer->add_sheet(s1 =>      tabt1 => [[qw/foo bar barbar gig/],
-                                        [1, 2],
-                                        [3, undef, 0, 4],
-                                        [qw(01.01.2022 19.12.1999 2022-3-4 12/30/1998)],
-                                        [qw(01.01.1900 28.02.1900 01.03.1900)],
-                                        [qw/bar foo/]]);
-$writer->add_sheet('FEUILLE', undef,  [[qw/aa bb cc dd/], [45, 56], [qw/il était une bergère/], [99, 33, 33]]);
-my $random_rows = do {my $count = 500; sub {$count-- == 500 ? [map {"h$_"} 1 .. 300] :
-                                            $count          ? [map {rand()} 1 .. 300] : undef}};
-$writer->add_sheet(RAND => rand => $random_rows);
 
+# 1st sheet, plain values and dates
+$writer->add_sheet(s1 => à_table => [[qw/foo bar barbar gig/],
+                                     [1, 2],
+                                     [3, undef, 0, 4],
+                                     [qw(01.01.2022 19.12.1999 2022-3-4 12/30/1998)],
+                                     [qw(01.01.1900 28.02.1900 01.03.1900)],
+                                     [qw/bar foo/]]);
+
+# sheet without table
+$writer->add_sheet(table_oubliée => (undef) => [[qw/aa bb cc dd/],
+                                                [45, 56],
+                                                [qw/il était une bergère/],
+                                                [99, 33, 33]]);
+
+# sheet with a large number of random values
+my @headers_for_rand = map {"h$_"} 1 .. 300;
+my $random_rows = do {my $count = 500; sub {$count-- > 0 ? [map {rand()} 1 .. 300] : undef}};
+$writer->add_sheet(RAND => rand => \@headers_for_rand, $random_rows);
+
+# other call syntax: headers as 3rd arg
+$writer->add_sheet(With_header => t_header => [qw/col1 col2/], [[33, 44], [11, 22]]);
+
+# empty sheets, with and without table
+$writer->add_sheet(Empty1 => t_empty => []);
+$writer->add_sheet(Empty2 => (undef) => []);
+
+# save the worksheet
 $writer->save_as($filename);
 
 

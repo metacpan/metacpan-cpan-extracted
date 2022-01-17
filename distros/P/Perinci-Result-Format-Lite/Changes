@@ -1,3 +1,9 @@
+0.281   2021-08-01  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Add {date,datetime} as shorter alias for format
+	  iso8601_{date,datetime}.
+
+
 0.280   2021-07-17  Released-By: PERLANCAR; Urgency: medium
 
 	- Allow aligning number with percentage as 'number'.

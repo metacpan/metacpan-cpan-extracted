@@ -1,0 +1,16 @@
+Revision history for Acme-Signature-Arity
+
+0.003     2022-01-17 00:28:54+08:00 Asia/Kuala_Lumpur
+    [Bugs fixed]
+
+    - dependencies updated to require perl v5.26+, when signatures were a bit more stable
+
+0.002     2022-01-16 21:34:59+08:00 Asia/Kuala_Lumpur
+    [New features]
+
+    - coderef_ignoring_extra, for library authors
+
+0.001     2022-01-16 21:02:08+08:00 Asia/Kuala_Lumpur
+    [New features]
+
+    - the code now exists

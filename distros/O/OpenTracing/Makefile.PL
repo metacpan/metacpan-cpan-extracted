@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "OpenTracing",
   "PREREQ_PM" => {
     "Bytes::Random::Secure" => 0,
+    "Class::Method::Modifiers" => 0,
     "Exporter" => 0,
     "JSON::MaybeUTF8" => "2.000",
     "JSON::MaybeXS" => 0,
@@ -43,7 +44,7 @@ my %WriteMakefileArgs = (
     "Test::Refcount" => "0.07",
     "Test::Warnings" => "0.024"
   },
-  "VERSION" => "1.005",
+  "VERSION" => "1.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,6 +53,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Bytes::Random::Secure" => 0,
+  "Class::Method::Modifiers" => 0,
   "Exporter" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,

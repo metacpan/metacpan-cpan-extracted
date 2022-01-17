@@ -320,7 +320,7 @@ Returns nothing if all tubes throw an exception, otherwise it returns
 the return value of the first tube that does not throw an exception, and
 ignores the rest of the tubes.
 
-The exception handling is performed via L<Try::Tiny>.
+The exception handling is performed via L<Try::Catch>.
 
 You can set the following options with the optional C<%args>:
 

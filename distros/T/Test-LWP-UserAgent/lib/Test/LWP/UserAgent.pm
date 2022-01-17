@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Test::LWP::UserAgent; # git description: v0.033-10-g54ec8f2
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
+package Test::LWP::UserAgent; # git description: v0.035-2-g1324b10
+# vim: set ts=8 sts=2 sw=2 tw=115 et :
 # ABSTRACT: A LWP::UserAgent suitable for simulating and testing network calls
 # KEYWORDS: testing useragent networking mock server client
 
-our $VERSION = '0.034';
+our $VERSION = '0.036';
 
 use parent 'LWP::UserAgent';
 use Scalar::Util qw(blessed reftype);
@@ -366,7 +366,7 @@ Test::LWP::UserAgent - A LWP::UserAgent suitable for simulating and testing netw
 
 =head1 VERSION
 
-version 0.034
+version 0.036
 
 =head1 SYNOPSIS
 
@@ -799,7 +799,7 @@ L<http://lists.perl.org/list/perl-qa.html>.
 There is also an irc channel available for users of this distribution, at
 L<C<#perl> on C<irc.perl.org>|irc://irc.perl.org/#perl-qa>.
 
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
 
 =head1 AUTHOR
 

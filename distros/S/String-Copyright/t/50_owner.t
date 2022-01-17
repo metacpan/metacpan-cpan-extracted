@@ -1,6 +1,6 @@
 use Test2::V0;
 
-plan 51;
+plan 52;
 
 use String::Copyright {
 	format => sub { join ':', $_->[0] || '', $_->[1] || '' }
@@ -16,18 +16,19 @@ is copyright("© 1999 1234 Steps"),
 
 is copyright("© Foo"), ':Foo', 'year-less owner';
 
-is copyright("© , Foo"), ':Foo', 'messy owner starting with comma';
+is copyright("© , Foo"),         ':Foo', 'messy owner starting with comma';
 is copyright("Copyright,, Foo"),  '', 'messy owner starting with dual comma';
 is copyright("Copyright, , Foo"), '', 'messy owner starting with dual comma';
 
-is copyright("© - Foo"),      ':Foo',     'owner after dash';
-is copyright("© -- Foo"),     ':Foo',     'owner after double dash';
-is copyright("© 1999 - Foo"), '1999:Foo', 'owner after year and dash';
+is copyright("© - Foo"),       ':Foo',     'owner after dash';
+is copyright("© -- Foo"),      ':Foo',     'owner after double dash';
+is copyright("© 1999 - Foo"),  '1999:Foo', 'owner after year and dash';
 is copyright("© 1999 -- Foo"), '1999:Foo',
 	'owner after year and double-dash';
 
-is copyright("© -Foo"),  '', 'bogus owner starting with dash';
-is copyright("© --Foo"), '', 'bogus owner starting with double dash';
+is copyright("© -Foo"),       '', 'bogus owner starting with dash';
+is copyright("© --Foo"),      '', 'bogus owner starting with double dash';
+is copyright("© [yyyy] Foo"), '', 'bogus owner starting with template year';
 
 is copyright("© (Foo)"), ':(Foo)', 'owner starting with paranthesis';
 

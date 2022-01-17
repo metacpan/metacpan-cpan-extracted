@@ -117,9 +117,11 @@ The following additional Perl modules are required to use it:
 \bullet(packed)[JSON::MaybeXS]
 \bullet(packed)[Kwalify]
 \bullet(packed)[List::SomeUtils 0.07 or later]
-\bullet(packed)[Path::Tiny]
+\bullet(packed)[Path::Iterator::Rule]
+\bullet(packed)[Path::Tiny 0.101 or later]
 \bullet(packed)[Perl6::Slurp]
-\bullet(packed)[Pod::Thread 3.00 or later]
+\bullet(packed)[Pod::Thread 3.01 or later]
+\bullet(packed)[Sort::Versions]
 \bullet(packed)[Template (part of Template Toolkit)]
 \bullet(packed)[YAML::XS 0.81 or later]
 
@@ -197,7 +199,7 @@ license:
 
 \block[
 
-    Copyright 1999-2021
+    Copyright 1999-2022
         Russ Allbery <rra@cpan.org>
 
     Permission is hereby granted, free of charge, to any person obtaining

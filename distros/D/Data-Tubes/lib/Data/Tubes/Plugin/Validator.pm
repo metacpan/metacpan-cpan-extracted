@@ -2,7 +2,7 @@ package Data::Tubes::Plugin::Validator;
 use strict;
 use warnings;
 use English qw< -no_match_vars >;
-our $VERSION = '0.738';
+our $VERSION = '0.740';
 
 use Log::Log4perl::Tiny qw< :easy :dead_if_first >;
 
@@ -87,15 +87,15 @@ sub validate_thoroughly {
 
    my $wrapper = $args->{wrapper};
    if ($wrapper && $wrapper eq 'try') {
-      eval { require Try::Tiny; }
+      eval { require Try::Catch; }
         or LOGCONFESS 'Validator::validate_with_subs '
-        . 'needs Try::Tiny, please install';
+        . 'needs Try::Catch, please install';
 
       $wrapper = sub {
          my ($validator, @params) = @_;
-         return Try::Tiny::try(
+         return Try::Catch::try(
             sub { $validator->(@params); },
-            Try::Tiny::catch(sub { return (0, $_); }),
+            Try::Catch::catch(sub { return (0, $_); }),
          );
       };
    } ## end if ($wrapper && $wrapper...)

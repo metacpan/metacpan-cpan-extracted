@@ -10,7 +10,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Dist 6.00;
+package App::DocKnot::Dist 6.01;
 
 use 5.024;
 use autodie;
@@ -262,9 +262,9 @@ sub _sign_tarballs {
 # Create a new App::DocKnot::Dist object, which will be used for subsequent
 # calls.
 #
-# $args  - Anonymous hash of arguments with the following keys:
+# $args_ref - Anonymous hash of arguments with the following keys:
 #   distdir  - Path to the directory for distribution tarball
-#   metadata - Path to the directory containing package metadata
+#   metadata - Path to the package metadata
 #   perl     - Path to Perl to use (default: search the user's PATH)
 #
 # Returns: Newly created object
@@ -520,7 +520,7 @@ Default: The binary named C<gpg> on the user's PATH.
 
 =item metadata
 
-The path to the directory containing metadata for a package.  Default:
+The path to the metadata for the package on which to operate.  Default:
 F<docs/docknot.yaml> relative to the current directory.
 
 =item perl
@@ -598,7 +598,7 @@ Russ Allbery <rra@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2019-2021 Russ Allbery <rra@cpan.org>
+Copyright 2019-2022 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

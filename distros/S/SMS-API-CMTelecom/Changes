@@ -1,5 +1,11 @@
 Revision history for SMS-API-CMTelecom
 
+0.05    2022-01-14
+        corrected tests after small API changes
+
+0.04    2017-04-30
+        removed wrong dependency
+
 0.03    2017-04-30
         Added number validation features (validate_number and number_details).
 

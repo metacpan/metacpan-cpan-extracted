@@ -34,15 +34,14 @@ sub brik_properties {
       },
       require_modules => {
          'Net::Libdnet::Intf' => [ ],
-         'Net::Pcap' => [ ],
          'Net::Routing' => [ ],
          'Net::IPv4Addr' => [ ],
          'Metabrik::Client::Www' => [ ],
       },
       need_packages => {
-         ubuntu => [ qw(libpcap-dev libnet-libdnet-perl) ],
-         debian => [ qw(libpcap-dev libnet-libdnet-perl) ],
-         kali => [ qw(libpcap-dev libnet-libdnet-perl) ],
+         ubuntu => [ qw(libpcap-dev libnet-libdnet-perl libnet-pcap-perl) ],
+         debian => [ qw(libpcap-dev libnet-libdnet-perl libnet-pcap-perl) ],
+         kali => [ qw(libpcap-dev libnet-libdnet-perl libnet-pcap-perl) ],
          freebsd => [ qw(p5-Net-Pcap libdnet) ],
       },
    };
@@ -257,7 +256,7 @@ Metabrik::Network::Device - network::device Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2020, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2022, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

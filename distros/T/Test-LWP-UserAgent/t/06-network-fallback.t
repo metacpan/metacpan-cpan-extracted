@@ -23,7 +23,7 @@ use URI;
 
 # I mostly POST to this URL, rather than using GET, so as to not process the
 # "302 Redirect" response.
-my $redirect_url = 'http://httpbin.org/redirect-to?url=http%3A%2F%2Fhttpbin.org%2Fget';
+my $redirect_url = 'http://nghttp2.org/httpbin/redirect-to?url=http%3A%2F%2Fhttpbin.org%2Fget';
 
 # allow LWP::UserAgent to carp about unknown constructor arguments
 $^W = 1;

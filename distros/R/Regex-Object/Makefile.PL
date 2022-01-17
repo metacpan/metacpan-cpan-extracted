@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "English" => 0,
     "Moo" => 0,
+    "feature" => 0,
     "namespace::clean" => 0,
     "strict" => 0,
     "utf8" => 0,
@@ -28,7 +29,7 @@ my %WriteMakefileArgs = (
     "Test::Pod" => 0,
     "Test::Simple" => 0
   },
-  "VERSION" => "1.22",
+  "VERSION" => "1.24",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,6 +41,7 @@ my %FallbackPrereqs = (
   "Moo" => 0,
   "Test::Pod" => 0,
   "Test::Simple" => 0,
+  "feature" => 0,
   "namespace::clean" => 0,
   "strict" => 0,
   "utf8" => 0,

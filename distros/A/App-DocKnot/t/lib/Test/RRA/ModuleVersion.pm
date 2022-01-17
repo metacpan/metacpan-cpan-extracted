@@ -29,7 +29,7 @@ BEGIN {
     # This version should match the corresponding rra-c-util release, but with
     # two digits for the minor version, including a leading zero if necessary,
     # so that it will sort properly.
-    $VERSION = '10.01';
+    $VERSION = '10.02';
 }
 
 # A regular expression matching the version string for a module using the
@@ -103,9 +103,7 @@ sub _module_version {
     my ($file) = @_;
     open(my $data, q{<}, $file) or die "$0: cannot open $file: $!\n";
     while (defined(my $line = <$data>)) {
-        if (   $line =~ $REGEX_VERSION_PACKAGE
-            || $line =~ $REGEX_VERSION_OLD)
-        {
+        if ($line =~ $REGEX_VERSION_PACKAGE || $line =~ $REGEX_VERSION_OLD) {
             my ($prefix, $version, $suffix) = ($1, $2, $3);
             close($data) or die "$0: error reading from $file: $!\n";
             return $version;
@@ -140,8 +138,8 @@ sub _update_module_version {
       or die "$0: cannot create $file.new: $!\n";
   SCAN:
     while (defined(my $line = <$in>)) {
-        if (   $line =~ s{ $REGEX_VERSION_PACKAGE }{$1$version$3}xms
-            || $line =~ s{ $REGEX_VERSION_OLD     }{$1$old_version$3}xms)
+        if ($line =~ s{ $REGEX_VERSION_PACKAGE }{$1$version$3}xms
+            || $line =~ s{ $REGEX_VERSION_OLD }{$1$old_version$3}xms)
         {
             print {$out} $line or die "$0: cannot write to $file.new: $!\n";
             last SCAN;
@@ -265,7 +263,7 @@ Russ Allbery <eagle@eyrie.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2016, 2018-2020 Russ Allbery <eagle@eyrie.org>
+Copyright 2016, 2018-2020, 2022 Russ Allbery <eagle@eyrie.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

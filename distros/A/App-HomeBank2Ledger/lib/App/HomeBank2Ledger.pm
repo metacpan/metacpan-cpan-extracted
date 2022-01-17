@@ -11,7 +11,7 @@ use File::HomeBank;
 use Getopt::Long 2.38 qw(GetOptionsFromArray);
 use Pod::Usage;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 my %ACCOUNT_TYPES = (   # map HomeBank account types to Ledger accounts
     bank        => 'Assets:Bank',
@@ -264,10 +264,12 @@ sub convert_homebank_to_ledger {
         my $memo    = $transaction->{wording} || '';
         my $payee   = $homebank->find_payee_by_key($transaction->{payee});
         my $tags    = _split_tags($transaction->{tags});
+        my $date    = $transaction->{date};
 
         my @postings;
 
         push @postings, {
+            date        => $date,
             account     => $account->{ledger_name},
             amount      => $amount,
             commodity   => $commodities{$account->{currency}},
@@ -294,9 +296,11 @@ sub convert_homebank_to_ledger {
             $seen{$transaction->{transfer_key}}++        if $transaction->{transfer_key};
             $seen{$paired_transaction->{transfer_key}}++ if $paired_transaction->{transfer_key};
 
+            my $paired_date  = $paired_transaction && $paired_transaction->{date};
             my $paired_payee = $homebank->find_payee_by_key($paired_transaction->{payee});
 
             push @postings, {
+                date        => $paired_date,
                 account     => $dst_account->{ledger_name},
                 amount      => $paired_transaction->{amount} || -$transaction->{amount},
                 commodity   => $commodities{$dst_account->{currency}},
@@ -330,7 +334,7 @@ sub convert_homebank_to_ledger {
                 };
             }
         }
-        else {  # with or without category
+        else {  # normal transaction with or without category
             my $amount          = -$transaction->{amount};
             my $category        = $homebank->find_category_by_key($transaction->{category});
             my $other_account   = $category   ? $category->{ledger_name}
@@ -356,7 +360,7 @@ sub convert_homebank_to_ledger {
         }
 
         $ledger->add_transactions({
-            date        => $transaction->{date},
+            date        => $date,
             payee       => $payee->{name},
             memo        => $memo,
             postings    => \@postings,
@@ -445,7 +449,7 @@ App::HomeBank2Ledger - A tool to convert HomeBank files to Ledger format
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
