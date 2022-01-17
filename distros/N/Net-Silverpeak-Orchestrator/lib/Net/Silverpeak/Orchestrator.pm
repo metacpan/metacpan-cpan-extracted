@@ -1,11 +1,11 @@
 package Net::Silverpeak::Orchestrator;
-$Net::Silverpeak::Orchestrator::VERSION = '0.004000';
+$Net::Silverpeak::Orchestrator::VERSION = '0.005000';
 # ABSTRACT: Silverpeak Orchestrator REST API client library
 
 use 5.024;
 use Moo;
 use feature 'signatures';
-use Types::Standard qw( Str );
+use Types::Standard qw( Bool Str );
 use Carp qw( croak );
 use HTTP::CookieJar;
 use List::Util qw( any );
@@ -28,6 +28,13 @@ has 'api_key' => (
     isa => Str,
     is  => 'rw',
     predicate => 1,
+);
+
+
+has 'is_logged_in' => (
+    isa     => Bool,
+    is      => 'rwp',
+    default => sub { 0 },
 );
 
 with 'Role::REST::Client';
@@ -83,6 +90,8 @@ sub login($self) {
     $self->_error_handler($res)
         unless $res->code == 200;
 
+    $self->_set_is_logged_in(1);
+
     return 1;
 }
 
@@ -94,6 +103,8 @@ sub logout($self) {
     my $res = $self->get('/gms/rest/authentication/logout');
     $self->_error_handler($res)
         unless $res->code == 200;
+
+    $self->_set_is_logged_in(0);
 
     return 1;
 }
@@ -362,6 +373,16 @@ sub delete_application_group($self, $name) {
     return 1;
 }
 
+
+sub DEMOLISH {
+    my $self = shift;
+
+    $self->logout
+        if $self->has_user
+        && $self->has_passwd
+        && $self->is_logged_in;
+}
+
 1;
 
 __END__
@@ -376,7 +397,7 @@ Net::Silverpeak::Orchestrator - Silverpeak Orchestrator REST API client library
 
 =head1 VERSION
 
-version 0.004000
+version 0.005000
 
 =head1 SYNOPSIS
 
@@ -405,6 +426,12 @@ version 0.004000
 
 This module is a client library for the Silverpeak Orchestrator REST API.
 Currently it is developed and tested against version 9.0.2.
+
+=head1 ATTRIBUTES
+
+=head2 is_logged_in
+
+Returns true if successfully logged in.
 
 =head1 METHODS
 
@@ -615,13 +642,15 @@ The only workaround is to set an expiration date for it.
 
 =for Pod::Coverage has_user has_passwd has_api_key
 
+=for Pod::Coverage DEMOLISH
+
 =head1 AUTHOR
 
 Alexander Hartmaier <abraxxa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Alexander Hartmaier.
+This software is copyright (c) 2022 by Alexander Hartmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

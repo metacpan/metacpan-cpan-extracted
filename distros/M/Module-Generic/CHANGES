@@ -1,5 +1,10 @@
 Revision history for Perl module Module::Generic
 
+v0.20.0 2022-01-17T05:17:16+0900
+    - Corrected small time lag in test unit 08.datetime.t
+    - Add class functions stdin, stdout and stderr to Module::Generic::File
+    - Corrected a bug in Module::Generic::File
+
 v0.19.0 2022-12-23T14:04:47+0900
     - Added method mkdir in Module::Generic::File for a simpler way to create a directory than mkpath
     - Minor change to _move_or_copy() in Module::Generic::File

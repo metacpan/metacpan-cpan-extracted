@@ -386,10 +386,10 @@ static inline short                           marpaESLIFPerl_paramIsLoggerInterf
 static inline void                            marpaESLIFPerl_representationDisposev(void *userDatavp, char *inputcp, size_t inputl, char *encodingasciis);
 static inline short                           marpaESLIFPerl_representationb(void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, char **inputcpp, size_t *inputlp, char **encodingasciisp, marpaESLIFRepresentationDispose_t *disposeCallbackpp, short *stringbp);
 static inline char                           *marpaESLIFPerl_sv2byte(pTHX_ marpaESLIF_t *marpaESLIFp, SV *svp, char **bytepp, size_t *bytelp, short encodingInformationb, short *characterStreambp, char **encodingsp, size_t *encodinglp, short warnIsFatalb, short marpaESLIFStringb, MarpaX_ESLIF_constants_t *constantsp);
-static inline short                           marpaESLIFPerl_valueImportb(marpaESLIFValue_t *marpaESLIFValuep, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp);
-static inline short                           marpaESLIFPerl_recognizerImportb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp);
-static inline short                           marpaESLIFPerl_symbolImportb(marpaESLIFSymbol_t *marpaESLIFSymbolp, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp);
-static inline short                           marpaESLIFPerl_importb(pTHX_ marpaESLIFPerl_importContext_t *importContextp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short arraycopyb);
+static inline short                           marpaESLIFPerl_valueImportb(marpaESLIFValue_t *marpaESLIFValuep, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short haveUndefb);
+static inline short                           marpaESLIFPerl_recognizerImportb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short haveUndefb);
+static inline short                           marpaESLIFPerl_symbolImportb(marpaESLIFSymbol_t *marpaESLIFSymbolp, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short haveUndefb);
+static inline short                           marpaESLIFPerl_importb(pTHX_ marpaESLIFPerl_importContext_t *importContextp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short arraycopyb, short haveUndefb);
 static inline void                            marpaESLIFPerl_generateStringWithLoggerCallback(void *userDatavp, genericLoggerLevel_t logLeveli, const char *msgs);
 static inline short                           marpaESLIFPerl_appendOpaqueDataToStringGenerator(marpaESLIFPerl_stringGeneratorContext_t *marpaESLIFPerl_stringGeneratorContextp, char *p, size_t sizel);
 static inline short                           marpaESLIFPerl_is_scalar_string_only(pTHX_ SV *svp, int typei);
@@ -2056,7 +2056,7 @@ static inline char *marpaESLIFPerl_sv2byte(pTHX_ marpaESLIF_t *marpaESLIFp, SV *
 }
 
 /*****************************************************************************/
-static inline short marpaESLIFPerl_importb(pTHX_ marpaESLIFPerl_importContext_t *importContextp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short arraycopyb)
+static inline short marpaESLIFPerl_importb(pTHX_ marpaESLIFPerl_importContext_t *importContextp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short arraycopyb, short haveUndefb)
 /*****************************************************************************/
 {
   static const char                *funcs = "marpaESLIFPerl_importb";
@@ -2474,7 +2474,7 @@ static inline short marpaESLIFPerl_importb(pTHX_ marpaESLIFPerl_importContext_t 
 }
 
 /*****************************************************************************/
-static inline short marpaESLIFPerl_valueImportb(marpaESLIFValue_t *marpaESLIFValuep, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp)
+static inline short marpaESLIFPerl_valueImportb(marpaESLIFValue_t *marpaESLIFValuep, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short haveUndefb)
 /*****************************************************************************/
 {
   static const char              *funcs               = "marpaESLIFPerl_valueImportb";
@@ -2489,11 +2489,11 @@ static inline short marpaESLIFPerl_valueImportb(marpaESLIFValue_t *marpaESLIFVal
   importContext.PerlInterpreterp = MarpaX_ESLIF_Valuep->PerlInterpreterp;
 #endif
 
-  return marpaESLIFPerl_importb(aTHX_ &importContext, marpaESLIFValueResultp, 1 /* arraycopyb */);
+  return marpaESLIFPerl_importb(aTHX_ &importContext, marpaESLIFValueResultp, 1 /* arraycopyb */, haveUndefb);
 }
 
 /*****************************************************************************/
-static inline short marpaESLIFPerl_recognizerImportb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp)
+static inline short marpaESLIFPerl_recognizerImportb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short haveUndefb)
 /*****************************************************************************/
 {
   static const char              *funcs                    = "marpaESLIFPerl_recognizerImportb";
@@ -2508,11 +2508,11 @@ static inline short marpaESLIFPerl_recognizerImportb(marpaESLIFRecognizer_t *mar
   importContext.PerlInterpreterp = MarpaX_ESLIF_Recognizerp->PerlInterpreterp;
 #endif
 
-  return marpaESLIFPerl_importb(aTHX_ &importContext, marpaESLIFValueResultp, 0 /* arraycopyb */);
+  return marpaESLIFPerl_importb(aTHX_ &importContext, marpaESLIFValueResultp, 0 /* arraycopyb */, haveUndefb);
 }
 
 /*****************************************************************************/
-static inline short marpaESLIFPerl_symbolImportb(marpaESLIFSymbol_t *marpaESLIFSymbolp, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp)
+static inline short marpaESLIFPerl_symbolImportb(marpaESLIFSymbol_t *marpaESLIFSymbolp, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short haveUndefb)
 /*****************************************************************************/
 {
   static const char              *funcs                = "marpaESLIFPerl_symbolImportb";
@@ -2527,7 +2527,7 @@ static inline short marpaESLIFPerl_symbolImportb(marpaESLIFSymbol_t *marpaESLIFS
   importContext.PerlInterpreterp = MarpaX_ESLIF_Symbolp->PerlInterpreterp;
 #endif
 
-  return marpaESLIFPerl_importb(aTHX_ &importContext, marpaESLIFValueResultp, 1 /* arraycopyb */);
+  return marpaESLIFPerl_importb(aTHX_ &importContext, marpaESLIFValueResultp, 1 /* arraycopyb */, haveUndefb);
 }
 
 /*****************************************************************************/

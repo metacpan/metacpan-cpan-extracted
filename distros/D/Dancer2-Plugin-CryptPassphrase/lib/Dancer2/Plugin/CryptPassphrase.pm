@@ -2,7 +2,7 @@ package Dancer2::Plugin::CryptPassphrase;
 use strict;
 use warnings;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 $VERSION = eval $VERSION;
 
 use Dancer2::Plugin;
@@ -77,7 +77,7 @@ Dancer2::Plugin::CryptPassphrase - use Crypt::Passphrase with Dancer2
 
             if ( password_needs_rehash($hash) ) {
                 # upgrade hash in storage
-                my_update_hash_function( $username, hash_password($pasword) );
+                my_update_hash_function( $username, hash_password($password) );
             }
 
             # ... do stuff
@@ -183,11 +183,11 @@ Peter Mottram (SysPete) <peter@sysnix.com>
 
 =head1 CONTRIBUTORS
 
-None yet.
+Leon Timmermans <leont@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2022 the Catalyst::Plugin::CryptPassphrase L</AUTHOR>
+Copyright (c) 2022 the Dancer2::Plugin::CryptPassphrase L</AUTHOR>
 and L</CONTRIBUTORS> as listed above.
 
 The initial L</CONFIGURATION> documentation was taken from L<Crypt::Passphrase>

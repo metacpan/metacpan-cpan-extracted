@@ -10,7 +10,7 @@ our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
 use Carp qw/croak/;
 
-our $VERSION = '6.0.11'; # VERSION
+our $VERSION = '6.0.12'; # VERSION
 
 # This section should be replaced on-the-fly at build time
 # AUTOLOAD
@@ -29,7 +29,7 @@ MarpaX::ESLIF::Symbol::EventBitSet - ESLIF Symbol Event Bit Set
 
 =head1 VERSION
 
-version 6.0.11
+version 6.0.12
 
 =head1 SYNOPSIS
 

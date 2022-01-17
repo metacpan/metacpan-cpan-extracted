@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Condensation.t
+lib/CDS.pm
+scripts/cds

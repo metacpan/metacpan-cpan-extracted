@@ -124,13 +124,16 @@ __DATA__
  *
 */
 :discard ::= /[\s]+/
-:default ::= event-action => ::luac->function() error('JDD') end
+:default ::= event-action => ::luac->function()
+                                       print('In event-action')
+                                       return true
+                                     end
 event ^exp = predicted exp
 exp ::=
-    /[\d]+/
-    |    "("  exp ")"    assoc => group action => ::copy[1]
-   || exp (- '**' -) exp assoc => right action => ::lua->function(x,y) return x^y end
-   || exp (-  '*' -) exp                action => ::luac->function(x,y) return x*y end
-    | exp (-  '/' -) exp                action => ::lua->function(x,y) return x/y end
-   || exp (-  '+' -) exp                action => ::luac->function(x,y) return x+y end
-    | exp (-  '-' -) exp                action => ::lua->function(x,y) return x-y end
+    /[\d]+/                             action => ::lua->function(input) return tonumber(input) end
+    |    "("  exp ")"    assoc => group action => ::lua->function(l,e,r) return e               end
+   || exp (- '**' -) exp assoc => right action => ::lua->function(x,y)   return x^y             end
+   || exp (-  '*' -) exp                action => ::luac->function(x,y)  return x*y             end
+    | exp (-  '/' -) exp                action => ::lua->function(x,y)   return x/y             end
+   || exp (-  '+' -) exp                action => ::luac->function(x,y)  return x+y             end
+    | exp (-  '-' -) exp                action => ::lua->function(x,y)   return x-y             end

@@ -7,7 +7,7 @@ ENDIF ()
 # when we do make marpaESLIFPerlRelease or marpaESLIFPerlReleaseTrial
 #
 # SET (MYPACKAGE_DEBUG TRUE)
-MYPACKAGESTART (marpaESLIF 6 0 11)
+MYPACKAGESTART (marpaESLIF 6 0 12)
 
 ###########
 # Library #
@@ -105,6 +105,7 @@ MYPACKAGETESTEXECUTABLE(exceptionTester3            test/exceptionTester3.c)
 MYPACKAGETESTEXECUTABLE(exceptionTester4            test/exceptionTester4.c)
 MYPACKAGETESTEXECUTABLE(yamlTester                  test/yamlTester.c)
 MYPACKAGETESTEXECUTABLE(parameterizedTester         test/parameterizedTester.c)
+MYPACKAGETESTEXECUTABLE(allluacallbacksTester       test/allluacallbacks.c)
 
 ################
 # Dependencies #
@@ -164,6 +165,7 @@ MYPACKAGECHECK(exceptionTester2)
 MYPACKAGECHECK(exceptionTester3)
 MYPACKAGECHECK(exceptionTester4)
 MYPACKAGECHECK(parameterizedTester)
+MYPACKAGECHECK(allluacallbacksTester)
 
 ###########
 # Install #

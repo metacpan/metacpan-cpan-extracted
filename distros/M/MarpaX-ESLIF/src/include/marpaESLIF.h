@@ -177,7 +177,7 @@ typedef short (*marpaESLIFRecognizerGeneratorCallback_t)(void *userDatavp, marpa
 typedef marpaESLIFRecognizerGeneratorCallback_t (*marpaESLIFRecognizerGeneratorActionResolver_t)(void *userDatavp, marpaESLIFRecognizer_t *marpaESLIFRecognizerp, char *actions);
 
 /* Ask the host system to import a marpaESLIFValueResult in the recognizer namespace */
-typedef short (*marpaESLIFRecognizerImport_t)(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp);
+typedef short (*marpaESLIFRecognizerImport_t)(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short haveUndefb);
 
 typedef struct marpaESLIFRecognizerOption {
   void                                          *userDatavp;          /* User specific context */
@@ -358,7 +358,7 @@ typedef struct marpaESLIFAlternative {
 } marpaESLIFAlternative_t;
 
 /* Ask the host system to import a marpaESLIFValueResult in the valuator namespace */
-typedef short (*marpaESLIFValueImport_t)(marpaESLIFValue_t *marpaESLIFValuep, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp);
+typedef short (*marpaESLIFValueImport_t)(marpaESLIFValue_t *marpaESLIFValuep, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short haveUndefb);
 
 typedef struct marpaESLIFValueOption {
   void                                 *userDatavp;            /* User specific context */
@@ -567,7 +567,7 @@ typedef struct marpaESLIF        marpaESLIF_t;
 typedef struct marpaESLIFGrammar marpaESLIFGrammar_t;
 
 /* Ask the host system to import a marpaESLIFValueResult in the symbol namespace */
-typedef short (*marpaESLIFSymbolImport_t)(marpaESLIFSymbol_t *marpaESLIFSymbolp, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp);
+typedef short (*marpaESLIFSymbolImport_t)(marpaESLIFSymbol_t *marpaESLIFSymbolp, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short haveUndefb);
 
 typedef struct marpaESLIFSymbolOption {
   void                     *userDatavp;          /* User specific context */

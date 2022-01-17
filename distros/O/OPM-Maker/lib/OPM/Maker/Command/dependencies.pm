@@ -1,5 +1,5 @@
 package OPM::Maker::Command::dependencies;
-$OPM::Maker::Command::dependencies::VERSION = '1.12';
+$OPM::Maker::Command::dependencies::VERSION = '1.14';
 # ABSTRACT: List dependencies of OTRS packages
 
 use strict;
@@ -94,7 +94,7 @@ OPM::Maker::Command::dependencies - List dependencies of OTRS packages
 
 =head1 VERSION
 
-version 1.12
+version 1.14
 
 =head1 AUTHOR
 

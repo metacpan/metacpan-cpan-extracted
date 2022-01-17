@@ -461,7 +461,7 @@ subtest 'callback' => sub
     is( scalar( @removed ), 2, 'splice (2)' );
     is( "@removed", 'Raphael Peter', 'splice (3)' );
     
-    diag( "Elements are: '", $test->join( "', '" ), "'" );
+    diag( "Elements are: '", $test->join( "', '" ), "'" ) if( $DEBUG );
     $test->callback( remove => sub
     {
         my $this = shift( @_ );

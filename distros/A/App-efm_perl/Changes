@@ -1,5 +1,9 @@
 Revision history for Perl extension App-efm_perl
 
+1.1.0 2022-01-17T07:25:40Z
+    - Detect asdf to use
+    - Do not show filenames in results
+
 1.0.0 2021-07-26T06:17:52Z
 
     - The first public release

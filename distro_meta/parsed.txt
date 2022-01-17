@@ -76659,3 +76659,14 @@ K/KI/KIMOTO/SPVM-0.9121.tar.gz
 J/JO/JONASS/String-Copyright-0.003013.tar.gz
 E/ET/ETHER/Test-LWP-UserAgent-0.036.tar.gz
 P/PE/PERLANCAR/Text-Table-Org-0.030.tar.gz
+D/DE/DELPHINUS/App-efm_perl-1.1.0.tar.gz
+L/LO/LOCHMATT/CDS-0.22.tar.gz
+S/SY/SYSPETE/Dancer2-Plugin-CryptPassphrase-0.003.tar.gz
+Z/ZA/ZARQUON/DBD-Oracle-1.83.tar.gz
+J/JD/JDDPAUSE/MarpaX-ESLIF-6.0.12.tar.gz
+E/EB/EBRUNI/Minion-Backend-MongoDB-1.13.tar.gz
+J/JD/JDEGUEST/Module-Generic-v0.20.0.tar.gz
+A/AB/ABRAXXA/Net-Silverpeak-Orchestrator-0.005000.tar.gz
+S/SS/SSTUEHRM/Net-SMPP-SSL-0.02.tar.gz
+P/PE/PERLSRVDE/OPM-Maker-1.14.tar.gz
+K/KI/KIMOTO/SPVM-0.9122.tar.gz

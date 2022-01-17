@@ -17,6 +17,7 @@ lib/OPM/Maker/Command/dbtest.pm
 lib/OPM/Maker/Command/dependencies.pm
 lib/OPM/Maker/Command/filetest.pm
 lib/OPM/Maker/Command/index.pm
+lib/OPM/Maker/Command/info.pm
 lib/OPM/Maker/Command/sopmtest.pm
 lib/OPM/Maker/Utils.pm
 t/01_sopmtest_valid.t

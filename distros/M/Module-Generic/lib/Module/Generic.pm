@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.19.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.20.0
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2022/01/13
+## Modified 2022/01/17
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -59,7 +59,7 @@ BEGIN
     @EXPORT      = qw( );
     @EXPORT_OK   = qw( subclasses );
     %EXPORT_TAGS = ();
-    $VERSION     = 'v0.19.0';
+    $VERSION     = 'v0.20.0';
     $VERBOSE     = 0;
     $DEBUG       = 0;
     $SILENT_AUTOLOAD      = 1;
@@ -5113,7 +5113,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.19.0
+    v0.20.0
 
 =head1 DESCRIPTION
 
@@ -6138,6 +6138,8 @@ For example, in your module:
             return( $dt );
         }
     }, @_ ) ); }
+    # ^^^^
+    # Don't forget the @_ !
 
 Be mindful that even if the setter callback returns C<undef> in case of an error, perl does not permit C<undef> to be returned from an lvalue method, and besides the return value in assign context is useless anyway:
 

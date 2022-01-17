@@ -595,7 +595,7 @@ my %WriteMakefileArgs = (
     "threads::shared" => 0,
     "utf8" => 0
   },
-  "VERSION" => "6.0.11",
+  "VERSION" => "6.0.12",
   "test" => {
     "TESTS" => "t/*.t"
   }

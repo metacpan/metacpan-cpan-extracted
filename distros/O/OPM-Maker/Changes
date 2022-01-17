@@ -1,6 +1,14 @@
 Changes file for OPM::Maker
 ===========================
 
+1.14 2022-01-17 14:09:00
+
+  + fix version in info command
+
+1.13 2022-01-17 12:57:00
+
+  + add command to get version infos about the commands
+
 1.12 2021-12-31 08:09:00
 
   + check if more than one sopm file is found and adjust tests (thanks to CPANTesters)

@@ -1,5 +1,9 @@
 Revision history for Perl extension Minion-Backend-MongoDB
 
+1.13 2022-01-17T12:25:00 (ebruni)
+    - Solved a bug in _try, list_jobs, stats where inactive jobs was not found
+      if expiration not set.
+
 1.12 2021-11-04T14:25:00 (ebruni)
     - Removed some references to DateTime which cause fails in tests
 

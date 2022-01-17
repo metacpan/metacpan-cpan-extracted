@@ -1,5 +1,5 @@
 package Minion::Backend::MongoDB;
-$Minion::Backend::MongoDB::VERSION = '1.12';
+$Minion::Backend::MongoDB::VERSION = '1.13';
 # ABSTRACT: MongoDB backend for Minion
 
 use 5.016;    # Minion requires this so we require this.
@@ -152,8 +152,9 @@ sub list_jobs {
         }
     }
     $imatch->{'$or'} = [
-        { state   => { '$ne' => 'inactive' } },
-        { expires => { '$gt' => Time::Moment->now } }
+        { state   => { '$ne'     => 'inactive' } },
+        { expires => { '$gt'     => Time::Moment->now } },
+        { expires => { '$exists' => false } }
     ];
 
     my $match  = { '$match' => $imatch };
@@ -575,8 +576,11 @@ sub stats {
       { active_workers => $active, inactive_workers => $all - $active };
     $stats->{inactive_jobs} = $jobs->count_documents(
         {
-            state   => 'inactive',
-            expires => { '$gt' => Time::Moment->now }
+            state => 'inactive',
+            '$or' => [
+                { expires => { '$gt'     => Time::Moment->now } },
+                { expires => { '$exists' => false } }
+            ]
         }
     );
     $stats->{"${_}_jobs"} = $jobs->count_documents( { state => $_ } )
@@ -827,7 +831,10 @@ sub _try {
         state   => 'inactive',
         task    => { '$in' => [ keys %{ $self->minion->tasks } ] },
         queue   => { '$in' => $options->{queues} // ['default'] },
-        expires => { '$gt' => $now },
+        '$or'   => [
+            { expires => { '$gt'     => $now } },
+            { expires => { '$exists' => false } }
+        ]
     );
     $match->Push( '_id' => $self->_oid( $options->{id} ) )
       if defined $options->{id};
@@ -843,57 +850,58 @@ sub _try {
     my $job;
 
     my $make_job_active = [
-        { _id => 'template', state => 'inactive' },
-        {
-            '$set' => {
-                started => $now,
-                state   => 'active',
-                worker  => $self->_oid($id)
-            }
-        },
-        {
-            projection     => { args => 1, retries => 1, task => 1 },
-            upsert         => 0,
-            returnDocument => 'after',
-        }
+          { _id => 'template', state => 'inactive' },
+          {
+              '$set' => {
+                  started => $now,
+                  state   => 'active',
+                  worker  => $self->_oid($id)
+              }
+          },
+          {
+              projection     => { args => 1, retries => 1, task => 1 },
+              upsert         => 0,
+              returnDocument => 'after',
+          }
     ];
     while ( ( my $doc = $docs->next ) && !defined $job ) {
-        $make_job_active->[0]->{_id} = $doc->{_id};
+          $make_job_active->[0]->{_id} = $doc->{_id};
 
-        # try if doc has no parent and is still inactive or not exist... where
-        (
-            # parents = '{}'
-            !scalar @{ $doc->{parents} } ||
+          # try if doc has no parent and is still inactive or not exist... where
+          (
+              # parents = '{}'
+              !scalar @{ $doc->{parents} } ||
 
-              # not exist ... where
-              !$self->jobs->count_documents(
-                {
-                    '$and' => [
-                        { _id => { '$in' => $doc->{parents} } }
-                        ,    # (id = any parents) and
-                        {
-                            '$or' => [
-                                { state => 'active' },
-                                {
-                                    '$and' => [
-                                        { state => 'failed' },
-                                        {
-                                            _id => { '$exists' => !$doc->{lax} }
-                                        }    # a bad way to say "not doc.lax"
-                                    ]
-                                },
-                                {
-                                    '$and' => [
-                                        { state   => 'inactive' },
-                                        { expires => { '$gt' => $now } },
-                                    ]
-                                },
-                            ]
-                        }
-                    ]
-                }
-              )
-        ) && ( $job = $self->jobs->find_one_and_update(@$make_job_active) );
+                # not exist ... where
+                !$self->jobs->count_documents(
+                  {
+                      '$and' => [
+                          { _id => { '$in' => $doc->{parents} } }
+                          ,    # (id = any parents) and
+                          {
+                              '$or' => [
+                                  { state => 'active' },
+                                  {
+                                      '$and' => [
+                                          { state => 'failed' },
+                                          {
+                                              _id =>
+                                                { '$exists' => !$doc->{lax} }
+                                          }    # a bad way to say "not doc.lax"
+                                      ]
+                                  },
+                                  {
+                                      '$and' => [
+                                          { state   => 'inactive' },
+                                          { expires => { '$gt' => $now } },
+                                      ]
+                                  },
+                              ]
+                          }
+                      ]
+                  }
+                )
+          ) && ( $job = $self->jobs->find_one_and_update(@$make_job_active) );
 
     }
     return undef unless ( $job || $job->{_id} );
@@ -902,50 +910,50 @@ sub _try {
 }
 
 sub _update {
-    my ( $self, $fail, $id, $retries, $result ) = @_;
+      my ( $self, $fail, $id, $retries, $result ) = @_;
 
-    my $update = {
-        finished => Time::Moment->now,
-        state    => $fail ? 'failed'     : 'finished',
-        result   => $fail ? $result . '' : $result,
-    };
-    my $query =
-      { _id => $self->_oid($id), state => 'active', retries => $retries };
-    my $doc = $self->jobs->find_one_and_update(
-        $query,
-        { '$set'         => $update },
-        { returnDocument => 'after' }
-    );
+      my $update = {
+          finished => Time::Moment->now,
+          state    => $fail ? 'failed'     : 'finished',
+          result   => $fail ? $result . '' : $result,
+      };
+      my $query =
+        { _id => $self->_oid($id), state => 'active', retries => $retries };
+      my $doc = $self->jobs->find_one_and_update(
+          $query,
+          { '$set'         => $update },
+          { returnDocument => 'after' }
+      );
 
-    return undef unless ( $doc->{attempts} );
+      return undef unless ( $doc->{attempts} );
 
-    # return 1 if !$fail || (my $attempts = $doc->{attempts}) == 1;
-    # return 1 if $retries >= ($attempts - 1);
-    # my $delay = $self->minion->backoff->($retries);
-    return $fail
-      ? $self->auto_retry_job( $id, $retries, $doc->{attempts} )
-      : 1;
+      # return 1 if !$fail || (my $attempts = $doc->{attempts}) == 1;
+      # return 1 if $retries >= ($attempts - 1);
+      # my $delay = $self->minion->backoff->($retries);
+      return $fail
+        ? $self->auto_retry_job( $id, $retries, $doc->{attempts} )
+        : 1;
 }
 
 sub _worker_info {
-    my $self = shift;
+      my $self = shift;
 
-    return undef unless my $worker = shift;
+      return undef unless my $worker = shift;
 
-    # lookup jobs
-    my $cursor =
-      $self->jobs->find( { state => 'active', worker => $worker->{_id} } );
+      # lookup jobs
+      my $cursor =
+        $self->jobs->find( { state => 'active', worker => $worker->{_id} } );
 
-    return {
-        host     => $worker->{host},
-        id       => $worker->{_id}->hex,
-        jobs     => [ map { $_->{_id}->hex } $cursor->all ],
-        pid      => $worker->{pid},
-        started  => $worker->{started}->epoch,
-        notified => $worker->{notified}->epoch,
-        inbox    => $worker->{inbox},
-        status   => $worker->{status},
-    };
+      return {
+          host     => $worker->{host},
+          id       => $worker->{_id}->hex,
+          jobs     => [ map { $_->{_id}->hex } $cursor->all ],
+          pid      => $worker->{pid},
+          started  => $worker->{started}->epoch,
+          notified => $worker->{notified}->epoch,
+          inbox    => $worker->{inbox},
+          status   => $worker->{status},
+      };
 }
 
 1;
@@ -968,7 +976,7 @@ Minion::Backend::MongoDB - MongoDB backend for Minion
 
 =head1 VERSION
 
-version 1.12
+version 1.13
 
 =head1 SYNOPSIS
 

@@ -634,7 +634,7 @@ subtest_buffered 'application groups' => sub {
                     end();
                 };
 
-                end();
+                etc();
             };
 
             etc();

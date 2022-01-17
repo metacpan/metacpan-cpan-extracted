@@ -128,9 +128,11 @@ my $dt2 = DateTime->from_epoch( epoch => $now, time_zone => 'local' );
 diag( "created is '", $dt->iso8601, "' vs '", $dt2->iso8601, "'" ) if( $DEBUG );
 ok( ( $dt->ymd == $dt2->ymd && $dt->hour == $dt2->hour && $dt->minute == $dt2->minute ), 'datetime value' );
 $o->created( '+1d' );
-my $dt3 = $o->created;
-isa_ok( $dt3, 'DateTime', '_set_get_datetime' );
 my $dt4 = DateTime->now( time_zone => 'local' )->add( days => 1 );
+$dt4->truncate( to => 'minute' );
+my $dt3 = $o->created;
+$dt3->truncate( to => 'minute' );
+isa_ok( $dt3, 'DateTime', '_set_get_datetime' );
 is( $dt3->iso8601, $dt4->iso8601, '_set_get_datetime value' );
 
 my $test = $o->file = "./some/file.txt";

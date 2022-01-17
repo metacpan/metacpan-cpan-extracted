@@ -741,8 +741,8 @@ sub splice
         CORE::return( $self ) if( scalar( @list ) );
         CORE::return;
     }
-    ## Adding elements, so we return our object and allow chaining
-    ## @_ = offset, length, replacement list
+    # Adding elements, so we return our object and allow chaining
+    # @_ = offset, length, replacement list
     if( scalar( @_ ) > 2 )
     {
         CORE::splice( @$self, int( $offset ), int( $length ), @list );

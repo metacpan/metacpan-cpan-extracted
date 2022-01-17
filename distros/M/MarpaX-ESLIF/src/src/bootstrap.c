@@ -213,7 +213,7 @@ static        short _marpaESLIF_bootstrap_G1_action_lhs_2b(void *userDatavp, mar
 static        short _marpaESLIF_bootstrap_G1_action_start_symbol_1b(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, int arg0i, int argni, int resulti, short nullableb);
 static        short _marpaESLIF_bootstrap_G1_action_start_symbol_2b(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, int arg0i, int argni, int resulti, short nullableb);
 static inline marpaESLIF_rule_t *_marpaESLIF_bootstrap_check_rulep(marpaESLIF_t *marpaESLIFp, marpaESLIFGrammar_t *marpaESLIFGrammarp, marpaESLIF_grammar_t *grammarp, char *descEncodings, char *descs, size_t descl, int lhsi, size_t nrhsl, int *rhsip, int exceptioni, int ranki, short nullRanksHighb, short sequenceb, int minimumi, int separatori, short properb, marpaESLIF_action_t *actionp, short passthroughb, short hideseparatorb, short *skipbp, marpaESLIF_lua_functiondecl_t *declp, marpaESLIF_lua_functioncall_t **callpp, marpaESLIF_lua_functioncall_t *separatorcallp);
-static short marpaESLIFValueImport(marpaESLIFValue_t *marpaESLIFValuep, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp);
+static short marpaESLIFValueImport(marpaESLIFValue_t *marpaESLIFValuep, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short haveUndefb);
 
 /* Helpers */
 #define MARPAESLIF_BOOTSTRAP_GET_ARRAY(marpaESLIFValuep, indicei, _p, _l) do { \
@@ -5156,7 +5156,6 @@ static short _marpaESLIF_bootstrap_G1_action_terminal_3b(void *userDatavp, marpa
   size_t                            bytel;
   short                             shallowb              = 0;
   char                             *tmps;
-  marpaESLIFGrammar_t               marpaESLIFGrammar; /* Fake grammar for the same reason */
   marpaESLIFValueResult_t           marpaESLIFValueResult;
   size_t                            sizel;
   marpaESLIF_matcher_value_t        rci;
@@ -5189,8 +5188,8 @@ static short _marpaESLIF_bootstrap_G1_action_terminal_3b(void *userDatavp, marpa
     shallowb = 0;
   }
   /* Fake a recognizer. EOF flag will be set automatically in fake mode */
-  marpaESLIFGrammar.marpaESLIFp = marpaESLIFp;
-  marpaESLIFRecognizerp = __marpaESLIFRecognizer_newp(&marpaESLIFGrammar,
+  marpaESLIFRecognizerp = __marpaESLIFRecognizer_newp(marpaESLIFp,
+                                                      NULL, /* grammarp */
                                                       NULL, /* marpaESLIFRecognizerOptionp */
                                                       0, /* discardb - no effect anway because we are in fake mode */
                                                       1, /* noEventb - no effect anway because we are in fake mode */
@@ -7829,7 +7828,6 @@ static inline marpaESLIF_bootstrap_utf_string_t *_marpaESLIF_bootstrap_regex_to_
   void                              *newbytep              = NULL;
   marpaESLIFRecognizer_t            *marpaESLIFRecognizerp = NULL; /* Fake recognizer to use the internal regex */
   size_t                             newbytel;
-  marpaESLIFGrammar_t                marpaESLIFGrammar; /* Fake grammar for the same reason */
   marpaESLIFValueResult_t            marpaESLIFValueResult;
   size_t                             sizel;
   marpaESLIF_matcher_value_t         rci;
@@ -7848,8 +7846,8 @@ static inline marpaESLIF_bootstrap_utf_string_t *_marpaESLIF_bootstrap_regex_to_
   /* ... Since we are internal anyway I choose (what I think is) the costless method: the regexp */
 
   /* Fake a recognizer. EOF flag will be set automatically in fake mode */
-  marpaESLIFGrammar.marpaESLIFp = marpaESLIFp;
-  marpaESLIFRecognizerp = __marpaESLIFRecognizer_newp(&marpaESLIFGrammar,
+  marpaESLIFRecognizerp = __marpaESLIFRecognizer_newp(marpaESLIFp,
+                                                      NULL, /* grammarp */
                                                       NULL, /* marpaESLIFRecognizerOptionp */
                                                       0, /* discardb - no effect anway because we are in fake mode */
                                                       1, /* noEventb - no effect anway because we are in fake mode */
@@ -7962,7 +7960,6 @@ static inline marpaESLIF_bootstrap_utf_string_t *_marpaESLIF_bootstrap_character
   marpaESLIFRecognizer_t            *marpaESLIFRecognizerp = NULL; /* Fake recognizer to use the internal regex */
   void                              *dupp                  = NULL;
   size_t                             dupl;
-  marpaESLIFGrammar_t                marpaESLIFGrammar; /* Fake grammar for the same reason */
   marpaESLIFValueResult_t            marpaESLIFValueResult;
   size_t                             sizel;
   marpaESLIF_matcher_value_t         rci;
@@ -7993,8 +7990,8 @@ static inline marpaESLIF_bootstrap_utf_string_t *_marpaESLIF_bootstrap_character
   /* ... Since we are internal anyway I choose (what I think is) the costless method: the regexp */
 
   /* Fake a recognizer. EOF flag will be set automatically in fake mode */
-  marpaESLIFGrammar.marpaESLIFp = marpaESLIFp;
-  marpaESLIFRecognizerp = __marpaESLIFRecognizer_newp(&marpaESLIFGrammar,
+  marpaESLIFRecognizerp = __marpaESLIFRecognizer_newp(marpaESLIFp,
+                                                      NULL, /* grammarp */
                                                       NULL, /* marpaESLIFRecognizerOptionp */
                                                       0, /* discardb */
                                                       1, /* noEventb - no effect anway because we are in fake mode */
@@ -8713,7 +8710,7 @@ static short _marpaESLIF_bootstrap_G1_action_lua_functionb(void *userDatavp, mar
   *p = '\0';
 
   /* We precompile the stripped version */
-  if (! _marpaESLIFValue_lua_precompileb(marpaESLIFValuep, actions, actionl, 1 /* stripb */, 1 /* popi */)) {
+  if (! _marpaESLIF_lua_value_precompileb(marpaESLIFValuep, actions, actionl, 1 /* stripb */, 1 /* popi */)) {
     goto err;
   }
 
@@ -9326,7 +9323,7 @@ static inline marpaESLIF_rule_t *_marpaESLIF_bootstrap_check_rulep(marpaESLIF_t 
 }
 
 /*****************************************************************************/
-static short marpaESLIFValueImport(marpaESLIFValue_t *marpaESLIFValuep, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp)
+static short marpaESLIFValueImport(marpaESLIFValue_t *marpaESLIFValuep, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short haveUndefb)
 /*****************************************************************************/
 {
   marpaESLIF_t *marpaESLIFp = marpaESLIFValuep->marpaESLIFp;

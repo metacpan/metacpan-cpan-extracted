@@ -149,20 +149,20 @@ static short                                _marpaESLIFJSONDecodeSetValueCallbac
 static short                                _marpaESLIFJSONDecodePushRowCallbackv(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFJSONDecodeDepositCallbackContext_t *marpaESLIFJSONDecodeDepositCallbackContextp, marpaESLIFValueResult_t *dstp, marpaESLIFValueResult_t *srcp);
 static short                                _marpaESLIFJSONDecodeSetHashCallbackv(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFJSONDecodeDepositCallbackContext_t *marpaESLIFJSONDecodeDepositCallbackContextp, marpaESLIFValueResult_t *dstp, marpaESLIFValueResult_t *srcp);
 static inline short                         _marpaESLIFJSONDecodePropagateValueb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFJSONDecodeContext_t *marpaESLIFJSONDecodeContextp, marpaESLIFValueResult_t *marpaESLIFValueresultp);
-static short                                _marpaESLIFJSONDecodeValueResultImportb(marpaESLIFValue_t *marpaESLIFValuep, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp);
-static short                                _marpaESLIFJSONDecodeValueResultInternalImportb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp);
+static short                                _marpaESLIFJSONDecodeValueResultImportb(marpaESLIFValue_t *marpaESLIFValuep, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short haveUndefb);
+static short                                _marpaESLIFJSONDecodeValueResultInternalImportb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short haveUndefb);
 static short                                _marpaESLIFJSONDecodeRepresentationb(void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, char **inputcpp, size_t *inputlp, char **encodingasciisp, marpaESLIFRepresentationDispose_t *disposeCallbackpp, short *stringbp);
 static void                                 _marpaESLIFJSONDecodeRepresentationDisposev(void *userDatavp, char *inputcp, size_t inputl, char *encodingasciis);
 static inline short                          _marpaESLIFJSONDecodeDepositInitb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFJSONDecodeContext_t *marpaESLIFJSONDecodeContextp, marpaESLIFJSONDecodeDeposit_t *depositp, marpaESLIFJSONDecodeDepositCallback_t actionp);
 static inline void                          _marpaESLIFJSONDecodeDepositDisposev(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFJSONDecodeContext_t *marpaESLIFJSONDecodeContextp, marpaESLIFJSONDecodeDeposit_t *depositp);
-static short                                _marpaESLIFJSONEncodeValueResultImportb(marpaESLIFValue_t *marpaESLIFValuep, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp);
+static short                                _marpaESLIFJSONEncodeValueResultImportb(marpaESLIFValue_t *marpaESLIFValuep, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short haveUndefb);
 static short                                _marpaESLIFJSONEncodeRepresentationb(void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, char **inputcpp, size_t *inputlp, char **encodingasciisp, marpaESLIFRepresentationDispose_t *disposeCallbackpp, short *stringbp);
 static void                                 _marpaESLIFJSONEncodeRepresentationDisposev(void *userDatavp, char *inputcp, size_t inputl, char *encodingasciis);
 static inline short                         _marpaESLIFJSONDecodeObjectOpeningb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFJSONDecodeContext_t *marpaESLIFJSONDecodeContextp);
 static inline short                         _marpaESLIFJSONDecodeObjectClosingb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFJSONDecodeContext_t *marpaESLIFJSONDecodeContextp);
 static inline short                         _marpaESLIFJSONDecodeArrayOpeningb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFJSONDecodeContext_t *marpaESLIFJSONDecodeContextp);
 static inline short                         _marpaESLIFJSONDecodeArrayClosingb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIFJSONDecodeContext_t *marpaESLIFJSONDecodeContextp);
-static        short                         _marpaESLIFJSONDecodeSymbolImportProxyb(marpaESLIFSymbol_t *marpaESLIFSymbolp, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp);
+static        short                         _marpaESLIFJSONDecodeSymbolImportProxyb(marpaESLIFSymbol_t *marpaESLIFSymbolp, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short haveUndefb);
 
 /*****************************************************************************/
 static inline marpaESLIFGrammar_t *_marpaESLIFJSON_decode_newp(marpaESLIF_t *marpaESLIFp, short strictb)
@@ -181,7 +181,7 @@ static inline marpaESLIFGrammar_t *_marpaESLIFJSON_decode_newp(marpaESLIF_t *mar
   marpaESLIFGrammarOption.encodings = "ASCII";
   marpaESLIFGrammarOption.encodingl = 5; /* strlen("ASCII") */
 
-  marpaESLIFJSONp = _marpaESLIFGrammar_newp(marpaESLIFp, &marpaESLIFGrammarOption, 0 /* startGrammarIsLexemeb */);
+  marpaESLIFJSONp = _marpaESLIFGrammar_newp(marpaESLIFp, &marpaESLIFGrammarOption, 0 /* startGrammarIsLexemeb */, NULL /* L */, 0 /* bootstrapb */);
   if (MARPAESLIF_UNLIKELY(marpaESLIFJSONp == NULL)) {
     goto err;
   }
@@ -221,7 +221,7 @@ static inline marpaESLIFGrammar_t *_marpaESLIFJSON_encode_newp(marpaESLIF_t *mar
   marpaESLIFGrammarOption.encodings = "ASCII";
   marpaESLIFGrammarOption.encodingl = 5; /* strlen("ASCII") */
 
-  marpaESLIFJSONp = _marpaESLIFGrammar_newp(marpaESLIFp, &marpaESLIFGrammarOption, 0 /* startGrammarIsLexemeb */);
+  marpaESLIFJSONp = _marpaESLIFGrammar_newp(marpaESLIFp, &marpaESLIFGrammarOption, 0 /* startGrammarIsLexemeb */, NULL /* L */, 0 /* bootstrapb */);
   if (MARPAESLIF_UNLIKELY(marpaESLIFJSONp == NULL)) {
     goto err;
   }
@@ -379,7 +379,7 @@ short marpaESLIFJSON_decodeb(marpaESLIFGrammar_t *marpaESLIFGrammarJSONp, marpaE
   marpaESLIFRecognizerOption.regexActionResolverp = _marpaESLIFJSONDecodeRegexActionResolverp;
   marpaESLIFRecognizerOption.importerp            = _marpaESLIFJSONDecodeValueResultInternalImportb;
 
-  marpaESLIFRecognizerp = _marpaESLIFRecognizer_newp(marpaESLIFGrammarJSONp, &marpaESLIFRecognizerOption);
+  marpaESLIFRecognizerp = _marpaESLIFRecognizer_newp(marpaESLIFGrammarJSONp->marpaESLIFp, marpaESLIFGrammarJSONp->grammarp, &marpaESLIFRecognizerOption);
   if (MARPAESLIF_UNLIKELY(marpaESLIFRecognizerp == NULL)) {
     goto err;
   }
@@ -1978,7 +1978,7 @@ static inline short _marpaESLIFJSONDecodePropagateValueb(marpaESLIFRecognizer_t 
 }
 
 /*****************************************************************************/
-static short _marpaESLIFJSONDecodeValueResultInternalImportb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp)
+static short _marpaESLIFJSONDecodeValueResultInternalImportb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short haveUndefb)
 /*****************************************************************************/
 /* Internal importer used for marpaESLIFREcognizer_symbol_tryb               */
 /*****************************************************************************/
@@ -2012,7 +2012,7 @@ static short _marpaESLIFJSONDecodeValueResultInternalImportb(marpaESLIFRecognize
 }
 
 /*****************************************************************************/
-static short _marpaESLIFJSONDecodeValueResultImportb(marpaESLIFValue_t *marpaESLIFValuep, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp)
+static short _marpaESLIFJSONDecodeValueResultImportb(marpaESLIFValue_t *marpaESLIFValuep, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short haveUndefb)
 /*****************************************************************************/
 {
   static const char             *funcs                        = "_marpaESLIFJSONDecodeValueResultImportb";
@@ -2021,7 +2021,8 @@ static short _marpaESLIFJSONDecodeValueResultImportb(marpaESLIFValue_t *marpaESL
   /* Proxy to user-defined importb */
   return marpaESLIFJSONDecodeContextp->marpaESLIFValueOptionp->importerp(marpaESLIFValuep,
                                                                          marpaESLIFJSONDecodeContextp->marpaESLIFValueOptionp->userDatavp,
-                                                                         marpaESLIFValueResultp);
+                                                                         marpaESLIFValueResultp,
+                                                                         haveUndefb);
 }
 
 /*****************************************************************************/
@@ -2142,7 +2143,7 @@ static inline void _marpaESLIFJSONDecodeDepositDisposev(marpaESLIFRecognizer_t *
 }
 
 /*****************************************************************************/
-static short _marpaESLIFJSONEncodeValueResultImportb(marpaESLIFValue_t *marpaESLIFValuep, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp)
+static short _marpaESLIFJSONEncodeValueResultImportb(marpaESLIFValue_t *marpaESLIFValuep, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short haveUndefb)
 /*****************************************************************************/
 {
   static const char             *funcs                        = "_marpaESLIFJSONEncodeValueResultImportb";
@@ -2151,7 +2152,8 @@ static short _marpaESLIFJSONEncodeValueResultImportb(marpaESLIFValue_t *marpaESL
   /* Proxy to user-defined importb */
   return marpaESLIFJSONEncodeContextp->marpaESLIFValueOptionp->importerp(marpaESLIFValuep,
                                                                          marpaESLIFJSONEncodeContextp->marpaESLIFValueOptionp->userDatavp,
-                                                                         marpaESLIFValueResultp);
+                                                                         marpaESLIFValueResultp,
+                                                                         haveUndefb);
 }
 
 /*****************************************************************************/
@@ -2370,7 +2372,7 @@ static inline short _marpaESLIFJSONDecodeArrayClosingb(marpaESLIFRecognizer_t *m
 }
 
 /*****************************************************************************/
-static short _marpaESLIFJSONDecodeSymbolImportProxyb(marpaESLIFSymbol_t *marpaESLIFSymbolp, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp)
+static short _marpaESLIFJSONDecodeSymbolImportProxyb(marpaESLIFSymbol_t *marpaESLIFSymbolp, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp, short haveUndefb)
 /*****************************************************************************/
 /* We want to proxy the the internal JSON Decoder recognizer.                */
 /*****************************************************************************/

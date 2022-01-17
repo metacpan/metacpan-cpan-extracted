@@ -73,8 +73,12 @@ fi
 if which direnv > /dev/null; then
   eval "\$(direnv export bash)"
 fi
+PERL=perl
+if which asdf > /dev/null; then
+  PERL="asdf exec perl"
+fi
 export PERL5LIB=@{[$lib // '']}:\$PERL5LIB
-perl -c $script
+\$PERL -c $script
 EOS
     }
 
@@ -101,7 +105,7 @@ sub run {
             next unless $extracted_file eq $script;
             ## no critic (RegularExpressions::RequireExtendedFormatting)
             $message .= $rest if $rest =~ s/^,//;
-            print "$script:$lineno:$message\n";
+            print "$lineno:$message\n";
         }
     }
     return;
@@ -183,7 +187,7 @@ For efm-langserver, set config.yaml as below.
         lint-ignore-exit-code: true
         lint-stdin: true
         lint-formats:
-          - '%f:%l:%m'
+          - '%l:%m'
 
     languages:
       perl:

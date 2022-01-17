@@ -5,7 +5,7 @@ BEGIN
     use strict;
     use warnings;
     use lib './lib';
-    use_ok( 'Module::Generic::File', qw( file cwd tempfile tempdir ) );
+    use_ok( 'Module::Generic::File', qw( file cwd stdin stderr stdout tempfile tempdir ) );
     use Config;
     use Cwd ();
     use Digest::SHA;
@@ -667,6 +667,32 @@ EOT
             }
         }
     };
+};
+
+subtest 'standard io' => sub
+{
+    ok( defined( &stdin ), 'stdin' );
+    ok( defined( &stdout ), 'stdout' );
+    ok( defined( &stderr ), 'stderr' );
+    my $in = stdin;
+    my $out = stdout;
+    my $err = stderr;
+    my $dummy = file( 'dummy.txt' );
+    my $in2 = $dummy->stdin;
+    my $out2 = $dummy->stdout;
+    my $err2 = $dummy->stderr;
+    isa_ok( $in, 'IO::File' );
+    isa_ok( $out, 'IO::File' );
+    isa_ok( $err, 'IO::File' );
+    isa_ok( $in2, 'IO::File' );
+    isa_ok( $out2, 'IO::File' );
+    isa_ok( $err2, 'IO::File' );
+    is( $in->fileno, fileno( STDIN ), 'stdin descriptor' );
+    is( $out->fileno, fileno( STDOUT ), 'stdout descriptor' );
+    is( $err->fileno, fileno( STDERR ), 'stderr descriptor' );
+    is( $in2->fileno, fileno( STDIN ), 'stdin descriptor' );
+    is( $out2->fileno, fileno( STDOUT ), 'stdout descriptor' );
+    is( $err2->fileno, fileno( STDERR ), 'stderr descriptor' );
 };
 
 done_testing();

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.1.14
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.2.1
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2021/12/25
+## Modified 2022/01/17
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -32,7 +32,7 @@ BEGIN
     use URI ();
     use URI::file ();
     use Want;
-    our @EXPORT_OK = qw( cwd file rootdir sys_tmpdir tempfile tempdir );
+    our @EXPORT_OK = qw( cwd file rootdir stdin stderr stdout sys_tmpdir tempfile tempdir );
     our %EXPORT_TAGS = %Fcntl::EXPORT_TAGS;
     # Export Fcntl O_* constants for convenience
     our @EXPORT = grep( /^O_/, keys( %Fcntl:: ) );
@@ -42,7 +42,7 @@ BEGIN
         fallback => 1,
     );
     use constant HAS_PERLIO_MMAP => ( version->parse($]) >= version->parse('v5.16.0') ? 1 : 0 );
-    our $VERSION = 'v0.1.14';
+    our $VERSION = 'v0.2.1';
     # https://en.wikipedia.org/wiki/Path_(computing)
     # perlport
     our $OS2SEP  =
@@ -1274,7 +1274,11 @@ sub inode { return( shift->finfo->inode ); }
 
 sub ioctl { return( shift->_filehandle_method( 'ioctl', 'file', @_ ) ); }
 
-sub is_absolute { return( $self->_spec_file_name_is_absolute( shift->filepath ) ); }
+sub is_absolute
+{
+    my $self = shift( @_ );
+    return( $self->_spec_file_name_is_absolute( $self->filepath ) );
+}
 
 sub is_dir { return( shift->finfo->is_dir ); }
 
@@ -2486,6 +2490,12 @@ sub spurt_utf8 { return( shift->unload_utf8( @_ ) ); }
 
 sub stat { return( shift->finfo ); }
 
+sub stderr { return( &_function2method( \@_ )->_standard_io( 'stderr', @_ ) ); }
+
+sub stdin { return( &_function2method( \@_ )->_standard_io( 'stdin', @_ ) ); }
+
+sub stdout { return( &_function2method( \@_ )->_standard_io( 'stdout', @_ ) ); }
+
 sub symlink
 {
     my $self = shift( @_ );
@@ -2735,7 +2745,7 @@ sub unload
     my $self = shift( @_ );
     my $data = shift( @_ );
     return( $self ) if( ( ref( $data ) eq 'SCALAR' && !CORE::length( $$data ) ) || ( !ref( $data ) && !CORE::length( $data ) ) );
-    return( $self->error( "I was expecting either a string or a scalar reference, but instead I got '$data'." ) ) if( ref( $data ) && ref( $data ) ne 'SCALAR' );
+    return( $self->error( "I was expecting either a string or a scalar reference, but instead I got '$data'." ) ) if( ref( $data ) && ref( $data ) ne 'SCALAR' && !overload::Method( $data, '""' ) );
     return( $self ) if( $self->is_dir );
     my $opts = $self->_get_args_as_hash( @_ );
     $opts->{append} //= 0;
@@ -3369,6 +3379,42 @@ sub _spec_updir
     return( $class->updir );
 }
 
+sub _standard_io
+{
+    my $self = shift( @_ );
+    my $what = shift( @_ ) ||
+        return( $self->error( "No standard io name was provided." ) );
+    $what = lc( $what );
+    my $opts = $self->_get_args_as_hash( @_ );
+    my $map =
+    {
+    'stdin' => { 'fileno' => CORE::fileno( STDIN ), mode => 'r' },
+    'stdout' => { 'fileno' => CORE::fileno( STDOUT ), mode => 'w' },
+    'stderr' => { 'fileno' => CORE::fileno( STDERR ), mode => 'w' },
+    };
+    return( $self->error( "\L$what\E is not a standard io." ) ) if( !CORE::exists( $map->{ $what } ) );
+    my $def = $map->{ $what };
+    my $io = IO::File->new;
+    $io->fdopen( @$def{qw( fileno mode )} ) || 
+        return( $self->error( "Unable to fdopen io \U${what}\E with fileno ", $def->{fileno}, " and option '", $def->{mode}, "': $!" ) );
+    
+    if( CORE::exists( $opts->{binmode} ) )
+    {
+        if( !defined( $opts->{binmode} ) || !CORE::length( $opts->{binmode} ) )
+        {
+            $io->binmode || return( $self->error( "Unable to set binmode to binary for io \U$what\E: $!" ) );
+        }
+        else
+        {
+            $opts->{binmode} = 'encoding(utf-8)' if( lc( $opts->{binmode} ) eq 'utf-8' );
+            $opts->{binmode} =~ s/^\://g;
+            $io->binmode( ":$opts->{binmode}" ) || return( $self->error( "Unable to set binmode to \"$opts->{binmode}\" for io \U$what\E: $!" ) );
+        }
+    }
+    $io->autoflush( $opts->{autoflush} ) if( CORE::exists( $opts->{autoflush} ) && CORE::length( $opts->{autoflush} ) );
+    return( $io );
+}
+
 sub _uri_file_abs
 {
     my $self = shift( @_ );
@@ -3601,7 +3647,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 SYNOPSIS
 
-    use Module::Generic::File qw( cwd file rootdir tempfile tempdir sys_tmpdir );
+    use Module::Generic::File qw( cwd file rootdir tempfile tempdir sys_tmpdir stdin stderr stdout );
     my $f = Module::Generic::File->new( '/some/file' );
     $f->append( "some data" );
     $f->open && $f->write( "some data" );
@@ -3661,7 +3707,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.1.14
+    v0.2.1
 
 =head1 DESCRIPTION
 
@@ -4674,6 +4720,90 @@ This is an alias for L</unload_utf8>
 =head2 stat
 
 Returns the value from L</finfo>
+
+=head2 stderr
+
+This returns a filehandle object referencing C<STDERR>. It takes an optional hash or hash reference of following options:
+
+=over 4
+
+=item I<autoflush>
+
+This takes a boolean value. If true, auto flushing will be enabled on this filehandle, otherwise, if false, it will be disabled.
+
+=item I<binmode>
+
+This takes the same value as you would provide to L<perlfunc/binmode>
+
+=back
+
+You can import this function into your namespace, such as:
+
+    use Module::Generic::File qw( stderr );
+    my $io = stderr;
+    # etc...
+
+Or you can also call it from another C<Module::Generic::File> object:
+
+    use Module::Generic::File qw( file );
+    my $f = file( $some_file_name );
+    my $err = $f->stderr;
+
+=head2 stdin
+
+This returns a filehandle object referencing C<STDIN>. It takes an optional hash or hash reference of following options:
+
+=over 4
+
+=item I<autoflush>
+
+This takes a boolean value. If true, auto flushing will be enabled on this filehandle, otherwise, if false, it will be disabled.
+
+=item I<binmode>
+
+This takes the same value as you would provide to L<perlfunc/binmode>
+
+=back
+
+You can import this function into your namespace, such as:
+
+    use Module::Generic::File qw( stdin );
+    my $io = stdin;
+    # etc...
+
+Or you can also call it from another C<Module::Generic::File> object:
+
+    use Module::Generic::File qw( file );
+    my $f = file( $some_file_name );
+    my $in = $f->stdin;
+
+=head2 stdout
+
+This returns a filehandle object referencing C<STDOUT>. It takes an optional hash or hash reference of following options:
+
+=over 4
+
+=item I<autoflush>
+
+This takes a boolean value. If true, auto flushing will be enabled on this filehandle, otherwise, if false, it will be disabled.
+
+=item I<binmode>
+
+This takes the same value as you would provide to L<perlfunc/binmode>
+
+=back
+
+You can import this function into your namespace, such as:
+
+    use Module::Generic::File qw( stdout );
+    my $io = stdout;
+    # etc...
+
+Or you can also call it from another C<Module::Generic::File> object:
+
+    use Module::Generic::File qw( file );
+    my $f = file( $some_file_name );
+    my $out = $f->stdout;
 
 =head2 symlink
 

@@ -34,8 +34,8 @@ BEGIN
     };
     ref( $ref ) eq 'HASH' || do
     {
-        print( STDOUT "Shared memory data is not an hash reference.\n" );
-        die( "Shared memory data is not an hash reference." );
+        print( STDOUT "Shared memory data ($ref) is not an hash reference.\n" );
+        die( "Shared memory data ($ref) is not an hash reference." );
     };
     # $ref = {};
     $ref->{year} = 2021;

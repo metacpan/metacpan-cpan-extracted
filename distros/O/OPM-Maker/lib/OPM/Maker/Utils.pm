@@ -1,5 +1,5 @@
 package OPM::Maker::Utils;
-$OPM::Maker::Utils::VERSION = '1.12';
+$OPM::Maker::Utils::VERSION = '1.14';
 # ABSTRACT: Utility functions for OPM::Maker
 
 use strict;
@@ -75,7 +75,7 @@ OPM::Maker::Utils - Utility functions for OPM::Maker
 
 =head1 VERSION
 
-version 1.12
+version 1.14
 
 =head1 FUNCTIONS
 

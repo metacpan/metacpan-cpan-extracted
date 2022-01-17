@@ -47,7 +47,7 @@ For efm-langserver, set config.yaml as below.
         lint-ignore-exit-code: true
         lint-stdin: true
         lint-formats:
-          - '%f:%l:%m'
+          - '%l:%m'
 
     languages:
       perl:

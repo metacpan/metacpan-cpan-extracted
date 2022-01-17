@@ -16,7 +16,7 @@ SYNOPSIS
 
                 if ( password_needs_rehash($hash) ) {
                     # upgrade hash in storage
-                    my_update_hash_function( $username, hash_password($pasword) );
+                    my_update_hash_function( $username, hash_password($password) );
                 }
 
                 # ... do stuff
@@ -107,10 +107,10 @@ AUTHOR
     Peter Mottram (SysPete) <peter@sysnix.com>
 
 CONTRIBUTORS
-    None yet.
+    Leon Timmermans <leont@cpan.org>
 
 COPYRIGHT
-    Copyright (c) 2022 the Catalyst::Plugin::CryptPassphrase "AUTHOR" and
+    Copyright (c) 2022 the Dancer2::Plugin::CryptPassphrase "AUTHOR" and
     "CONTRIBUTORS" as listed above.
 
     The initial "CONFIGURATION" documentation was taken from

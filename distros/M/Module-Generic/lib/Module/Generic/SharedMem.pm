@@ -46,6 +46,7 @@ BEGIN
                                GETNCNT GETZCNT GETVAL SETVAL GETPID GETALL SETALL
                                shmat shmdt memread memwrite ftok ) );
         our $SYSV_SUPPORTED = 1;
+        no strict 'subs';
         eval( <<'EOT' );
         our $SEMOP_ARGS = 
         {
