@@ -37,6 +37,12 @@ Thread-Prefix:
  \link[changes/2011.html][2011], \link[changes/2010.html][2010],
  \link[changes/2009.html][2009], and \link[changes/2008.html][2008].
 
+Date: 2021-08-30 22:30
+Title: Test UTF-8 entry
+Link: /
+Description:
+ Test entry — with UTF-8 dash.
+
 Date: 2021-08-30 21:25
 Title: kstart 4.3
 Link: software/kstart/

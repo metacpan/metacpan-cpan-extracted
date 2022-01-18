@@ -4,8 +4,8 @@
 #
 package PDL::CCS::Utils;
 
-our @EXPORT_OK = qw(PDL::PP nnz PDL::PP nnza PDL::PP ccs_encode_pointers PDL::PP ccs_decode_pointer PDL::PP ccs_pointerlen PDL::PP ccs_xindex1d PDL::PP ccs_xindex2d PDL::PP ccs_dump_which );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+@EXPORT_OK  = qw( PDL::PP nnz PDL::PP nnza PDL::PP ccs_encode_pointers PDL::PP ccs_decode_pointer PDL::PP ccs_pointerlen PDL::PP ccs_xindex1d PDL::PP ccs_xindex2d PDL::PP ccs_dump_which );
+%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
 use PDL::Exporter;
@@ -13,8 +13,8 @@ use DynaLoader;
 
 
 
-   our $VERSION = '1.23.16';
-   our @ISA = ( 'PDL::Exporter','DynaLoader' );
+   $PDL::CCS::Utils::VERSION = 1.23.17;
+   @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::CCS::Utils $VERSION;
 
@@ -492,7 +492,7 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head2 Copyright Policy
 
-Copyright (C) 2007-2013, Bryan Jurish. All rights reserved.
+Copyright (C) 2007-2022, Bryan Jurish. All rights reserved.
 
 This package is free software, and entirely without warranty.
 You may redistribute it and/or modify it under the same terms

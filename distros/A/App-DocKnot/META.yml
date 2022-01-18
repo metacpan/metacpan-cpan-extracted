@@ -17,46 +17,46 @@ name: App-DocKnot
 provides:
   App::DocKnot:
     file: lib/App/DocKnot.pm
-    version: '6.01'
+    version: '7.00'
   App::DocKnot::Command:
     file: lib/App/DocKnot/Command.pm
-    version: '6.01'
+    version: '7.00'
   App::DocKnot::Config:
     file: lib/App/DocKnot/Config.pm
-    version: '6.01'
+    version: '7.00'
   App::DocKnot::Dist:
     file: lib/App/DocKnot/Dist.pm
-    version: '6.01'
+    version: '7.00'
   App::DocKnot::Generate:
     file: lib/App/DocKnot/Generate.pm
-    version: '6.01'
+    version: '7.00'
   App::DocKnot::Release:
     file: lib/App/DocKnot/Release.pm
-    version: '6.01'
+    version: '7.00'
   App::DocKnot::Spin:
     file: lib/App/DocKnot/Spin.pm
-    version: '6.01'
+    version: '7.00'
   App::DocKnot::Spin::Pointer:
     file: lib/App/DocKnot/Spin/Pointer.pm
-    version: '6.01'
+    version: '7.00'
   App::DocKnot::Spin::RSS:
     file: lib/App/DocKnot/Spin/RSS.pm
-    version: '6.01'
+    version: '7.00'
   App::DocKnot::Spin::Sitemap:
     file: lib/App/DocKnot/Spin/Sitemap.pm
-    version: '6.01'
+    version: '7.00'
   App::DocKnot::Spin::Thread:
     file: lib/App/DocKnot/Spin/Thread.pm
-    version: '6.01'
+    version: '7.00'
   App::DocKnot::Spin::Versions:
     file: lib/App/DocKnot/Spin/Versions.pm
-    version: '6.01'
+    version: '7.00'
   App::DocKnot::Update:
     file: lib/App/DocKnot/Update.pm
-    version: '6.01'
+    version: '7.00'
   App::DocKnot::Util:
     file: lib/App/DocKnot/Util.pm
-    version: '6.01'
+    version: '7.00'
 requires:
   Date::Parse: '0'
   File::BaseDir: '0'
@@ -83,5 +83,5 @@ resources:
   homepage: https://www.eyrie.org/~eagle/software/docknot
   license: http://www.opensource.org/licenses/mit-license.php
   repository: https://github.com/rra/docknot.git
-version: '6.01'
+version: '7.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -30,9 +30,12 @@ share/schema/config.yaml
 share/schema/docknot.yaml
 share/schema/licenses.yaml
 share/schema/pointer.yaml
+share/templates/changes.tmpl
 share/templates/html.tmpl
+share/templates/index.tmpl
 share/templates/readme-md.tmpl
 share/templates/readme.tmpl
+share/templates/rss.tmpl
 share/templates/thread.tmpl
 t/cli/errors.t
 t/cli/generate.t

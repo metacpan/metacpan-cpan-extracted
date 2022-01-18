@@ -1,12 +1,10 @@
 Build.PL
 Changes
-Dockerfile
 LICENSE
 META.json
 README.md
 cpanfile
 cpanfile.snapshot
-docker-compose.yml
 lib/WebService/Mailgun.pm
 minil.toml
 t/00_compile.t

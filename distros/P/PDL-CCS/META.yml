@@ -8,7 +8,7 @@ configure_requires:
   Data::Dumper: '0'
   ExtUtils::MakeMaker: '0'
   File::Basename: '0'
-  PDL: '0'
+  PDL: '2.019'
   PDL::VectorValued: v1.0.4
   Test::More: '0'
 dynamic_config: 1
@@ -24,10 +24,10 @@ no_index:
     - inc
 requires:
   File::Basename: '0'
-  PDL: '0'
+  PDL: '2.019'
   PDL::VectorValued: v1.0.4
   Test::More: '0'
 resources:
   repository: git://github.com/moocow-the-bovine/PDL-CCS.git
-version: v1.23.16
+version: v1.23.17
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

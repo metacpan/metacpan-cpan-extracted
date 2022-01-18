@@ -22,7 +22,7 @@ use Plack::Request;
 use HTTP::Message::PSGI;
 
 #plan 'no_plan';
-plan tests => 227;
+plan tests => 238;
 
 Template::Declare->init( dispatch_to => ['PGXN::Site::Templates'] );
 
@@ -41,7 +41,12 @@ $cloud->add($_->{tag}, "/tag/$_->{tag}/", $_->{dist_count}) for (
 my $dists = [
     { dist => 'Foo', version => '1.2.1', abstract => 'Pg Foo' },
     { dist => 'Bar', version => '0.5.5', abstract => 'Pg Bar' },
+    { dist => 'Foo', version => '1.2.0', abstract => 'Pg Foo' },
     { dist => 'Baz', version => '0.4.0', abstract => 'Pg Baz' },
+    { dist => 'bar', version => '0.5.4', abstract => 'Pg Bar' },
+    { dist => 'ick', version => '0.0.1', abstract => 'Pg Ick' },
+    { dist => 'yoo', version => '0.0.1', abstract => 'Pg Yoo' },
+    { dist => 'non', version => '0.0.1', abstract => 'Pg Non' },
 ];
 
 ok my $html = Template::Declare->show('home', $req, {
@@ -98,8 +103,10 @@ test_wrapper($html, {
 
                 $tx->is('./h3', 'Recent Releases', qq{Header should be "Recent Releeases"});
                 $tx->ok('./dl', 'Test release dl' => sub {
-                    my $i = 0;
+                    $tx->is('count(./dt)', 5, 'Should have 5 DT sub-elements');
+                    my ($i, %seen) = (0);
                     for my $dist (@{ $dists }) {
+                        next if $seen->{ lc $dist->{dist} }++;
                         $i++;
                         $tx->ok("./dt[$i]", "Test dt $i" => sub {
                             $tx->ok('./a', "Test dt $i anchor" => sub {
@@ -120,6 +127,7 @@ test_wrapper($html, {
                             $dist->{abstract},
                             "dd $i should be correct"
                         );
+                        last if $i == 5;
                     }
                 });
 

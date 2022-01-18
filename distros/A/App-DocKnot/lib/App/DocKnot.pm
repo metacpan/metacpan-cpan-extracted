@@ -11,7 +11,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot 6.01;
+package App::DocKnot 7.00;
 
 use 5.024;
 use autodie;
@@ -19,8 +19,8 @@ use warnings;
 
 use File::BaseDir qw(config_files);
 use File::ShareDir qw(module_file);
-use File::Spec;
 use Kwalify qw(validate);
+use Path::Tiny qw(path);
 use YAML::XS ();
 
 ##############################################################################
@@ -50,7 +50,7 @@ sub appdata_path {
 
     # If that doesn't work, use the data that came with the module.
     if (!defined($path)) {
-        $path = module_file('App::DocKnot', File::Spec->catfile(@path));
+        $path = module_file('App::DocKnot', path(@path)->stringify());
     }
     return $path;
 }
@@ -113,8 +113,8 @@ App::DocKnot - Documentation and software release management
 
 =head1 REQUIREMENTS
 
-Perl 5.24 or later and the modules File::BaseDir, File::ShareDir, Kwalify, and
-YAML::XS, all of which are available from CPAN.
+Perl 5.24 or later and the modules File::BaseDir, File::ShareDir, Kwalify,
+Path::Tiny, and YAML::XS, all of which are available from CPAN.
 
 =head1 DESCRIPTION
 
@@ -154,7 +154,7 @@ Russ Allbery <rra@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2013-2021 Russ Allbery <rra@cpan.org>
+Copyright 2013-2022 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

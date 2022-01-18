@@ -2,8 +2,8 @@ NAME
     Text::Table::HTML - Generate HTML table
 
 VERSION
-    This document describes version 0.005 of Text::Table::HTML (from Perl
-    distribution Text-Table-HTML), released on 2021-12-09.
+    This document describes version 0.006 of Text::Table::HTML (from Perl
+    distribution Text-Table-HTML), released on 2022-01-07.
 
 SYNOPSIS
      use Text::Table::HTML;
@@ -65,11 +65,9 @@ SOURCE
 SEE ALSO
     Text::Table::HTML::DataTables
 
-    Text::Table::Tiny
-
     Text::Table::Any
 
-    See also Bencher::Scenario::TextTableModules.
+    Bencher::Scenario::TextTableModules
 
 AUTHOR
     perlancar <perlancar@cpan.org>
@@ -91,7 +89,7 @@ CONTRIBUTING
     me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2017, 2016 by perlancar
+    This software is copyright (c) 2022, 2021, 2017, 2016 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

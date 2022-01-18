@@ -4,7 +4,6 @@ LICENSE
 META.json
 README.md
 cpanfile
-docker-compose.yml
 lib/Devel/Cover/Report/Coveralls.pm
 minil.toml
 t/00_compile.t

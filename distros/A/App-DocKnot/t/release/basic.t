@@ -15,7 +15,7 @@ use lib 't/lib';
 use Git::Repository ();
 use Path::Tiny qw(path);
 
-use Test::More tests => 30;
+use Test::More tests => 34;
 
 # Isolate from the environment.
 local $ENV{XDG_CONFIG_HOME} = '/nonexistent';
@@ -35,7 +35,10 @@ $dist_path->mkpath();
 # Make a release when there are no existing files.
 my @extensions = qw(tar.gz tar.gz.asc tar.xz tar.xz.asc);
 for my $ext (@extensions) {
-    $dist_path->child('Empty-1.9.' . $ext)->touch();
+    my $path = $dist_path->child('Empty-1.9.' . $ext);
+    $path->touch();
+    utime(time() - 5, time() - 5, $path)
+      or die "Cannot reset timestamps for $path: $!\n";
 }
 my $metadata = path('t', 'data', 'dist', 'package', 'docs', 'docknot.yaml');
 my %options = (
@@ -49,7 +52,13 @@ $release->release();
 # Check that the files were copied correctly and the symlinks were created.
 for my $ext (@extensions) {
     my $file = 'Empty-1.9.' . $ext;
-    ok($archive_path->child('devel', $file)->is_file(), "Copied $file");
+    my $file_path = $archive_path->child('devel', $file);
+    ok($file_path->is_file(), "Copied $file");
+    is(
+        $dist_path->child($file)->stat()->[9],
+        $file_path->stat()->[9],
+        "Timestamp set on $file",
+    );
     my $link = 'Empty.' . $ext;
     is(readlink($archive_path->child('devel', $link)), $file, "Linked $link");
 }
@@ -59,6 +68,7 @@ my $spin_path = $tempdir->child('spin');
 $spin_path->mkpath();
 my $versions_path = $spin_path->child('.versions');
 $versions_path->spew_utf8(
+    "foo    1.0  2021-12-14 17:31:32  software/foo/index.th\n",
     "empty  1.9  2022-01-01 16:00:00  software/empty/index.th\n",
 );
 Git::Repository->run('init', { cwd => "$spin_path", quiet => 1 });
@@ -105,7 +115,9 @@ for my $ext (@extensions) {
 }
 
 # Check that the version file was updated.
-my @versions = split(q{ }, $versions_path->slurp_utf8());
+my $versions_line;
+(undef, $versions_line) = $versions_path->lines_utf8();
+my @versions = split(q{ }, $versions_line);
 is($versions[0], 'empty', '.versions line');
 is($versions[1], '1.10', '...version updated');
 isnt(join(q{ }, @versions[2, 3]), '2022-01-01 16:00:00', '...date updated');

@@ -12,13 +12,14 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Spin::Sitemap 6.01;
+package App::DocKnot::Spin::Sitemap 7.00;
 
 use 5.024;
 use autodie;
 use warnings;
 
 use List::SomeUtils qw(pairwise);
+use Path::Tiny qw(path);
 
 ##############################################################################
 # File parsing
@@ -48,7 +49,7 @@ sub _read_data {
     my @indents;
 
     # Parse the file.
-    open(my $fh, '<', $path);
+    my $fh = $path->openr_utf8();
     while (defined(my $line = <$fh>)) {
         next if $line =~ m{ \A \s* \# }xms;
         chomp($line);
@@ -67,14 +68,14 @@ sub _read_data {
 
         # Regular line.  Parse it.
         my ($spaces, $url, $desc)
-          = $line =~ m{ \A ([ ]*) ([^\s:]+): \s+ (.+) \z}xms;
+          = $line =~ m{ \A ([ ]*) /([^\s:]*): \s+ (.+) \z}xms;
         if (!defined($desc)) {
             die "invalid line $. in $path\n";
         }
 
         # Error on duplicate lines.
         if ($seen{$url}) {
-            die "duplicate entry for $url in $path (line $.)\n";
+            die "duplicate entry for /$url in $path (line $.)\n";
         }
         $seen{$url} = 1;
 
@@ -121,9 +122,9 @@ sub _read_data {
 # Returns: $desc escaped so that it's safe to interpolate into an attribute
 sub _escape {
     my ($desc, $is_attr) = @_;
-    $desc =~ s{ &  }{&amp;}xmsg;
-    $desc =~ s{ <  }{&lt;}xmsg;
-    $desc =~ s{ >  }{&gt;}xmsg;
+    $desc =~ s{ & }{&amp;}xmsg;
+    $desc =~ s{ < }{&lt;}xmsg;
+    $desc =~ s{ > }{&gt;}xmsg;
     if ($is_attr) {
         $desc =~ s{ \" }{&quot;}xmsg;
     }
@@ -152,8 +153,8 @@ sub _relative {
     # If there are the same number of components in both links, the link
     # should be relative to the current directory.  Otherwise, ascend to the
     # common prefix and then descend to the dest link.
-    if (@origin == 1 && @dest == 1) {
-        return length($dest[0]) > 0 ? $dest[0] : q{./};
+    if (@origin == 1 && @dest <= 1) {
+        return (@dest && length($dest[0])) > 0 ? $dest[0] : q{./};
     } else {
         return ('../' x $#origin) . join(q{/}, @dest);
     }
@@ -168,16 +169,21 @@ sub _relative {
 #          The relative URL and description may be undef if missing.
 sub _page_links {
     my ($self, $path) = @_;
-    $path =~ s{ /index[.]html \z }{/}xms;
+    my $key;
+    if ($path->basename() eq 'index.html') {
+        $key = $path->parent() . q{/};
+    } else {
+        $key = "$path";
+    }
 
     # If the page is not present in the sitemap, return nothing.  There are
     # also no meaningful links to generate for the top page.
-    return () if ($path eq q{/} || !$self->{links}{$path});
+    return () if ($key eq q{/} || !$self->{links}{$key});
 
     # Convert all the links to relative and add the page descriptions.
     return
       map { defined ? [_relative($path, $_), $self->{pagedesc}{$_}] : undef }
-      $self->{links}{$path}->@*;
+      $self->{links}{$key}->@*;
 }
 
 ##############################################################################
@@ -217,7 +223,7 @@ sub new {
     bless($self, $class);
 
     # Parse the file into the newly-created object.
-    $self->_read_data($path);
+    $self->_read_data(path($path));
 
     # Return the populated object.
     return $self;
@@ -226,12 +232,12 @@ sub new {
 # Return the <link> tags for a given output file, suitable for its <head>
 # section.
 #
-# $path - URL path to the output with leading slash
+# $path - Path to the output file relative to the top of the output tree
 #
 # Returns: List of lines to add to the <head> section
 sub links {
     my ($self, $path) = @_;
-    my @links = $self->_page_links($path);
+    my @links = $self->_page_links(path($path));
     return () if !@links;
 
     # We only care about the first parent, not the rest of the chain to the
@@ -259,7 +265,7 @@ sub links {
     }
 
     # Add the link to the top-level page.
-    my $url = _relative($path, q{/});
+    my $url = _relative($path, q{});
     push(@output, qq{  <link rel="top" href="$url" />\n});
 
     # Return the results.
@@ -268,12 +274,12 @@ sub links {
 
 # Return the navigation bar for a given output file.
 #
-# $path - URL path to the output with leading slash
+# $path - Path to the output file relative to the top of the output tree
 #
 # Returns: List of lines that create the navbar
 sub navbar {
     my ($self, $path) = @_;
-    my ($prev, $next, @parents) = $self->_page_links($path);
+    my ($prev, $next, @parents) = $self->_page_links(path($path));
     return () if !@parents;
 
     # Construct the left and right links (previous and next).
@@ -329,7 +335,6 @@ sub sitemap {
     # Build the sitemap as nested unordered lists.
     for my $page ($self->{sitemap}->@*) {
         my ($indent, $url, $desc) = $page->@*;
-        $url =~ s{ \A / }{}xms;
 
         # Skip the top page.
         next if $indent == 0;
@@ -383,7 +388,8 @@ App::DocKnot::Spin::Sitemap - Generate page navigation links for spin
 
 =head1 REQUIREMENTS
 
-Perl 5.24 or later and List::SomeUtils, which is available from CPAN.
+Perl 5.24 or later and the List::SomeUtils and Path::Tiny modules, both of
+which are available from CPAN.
 
 =head1 DESCRIPTION
 
@@ -464,7 +470,7 @@ Russ Allbery <rra@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 1999-2000, 2002-2004, 2008, 2021 Russ Allbery <rra@cpan.org>
+Copyright 1999-2000, 2002-2004, 2008, 2021-2022 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

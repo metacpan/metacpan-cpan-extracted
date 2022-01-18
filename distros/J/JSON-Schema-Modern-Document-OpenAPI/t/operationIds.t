@@ -17,6 +17,8 @@ use JSON::Schema::Modern::Utilities 'jsonp';
 use YAML::PP;
 use Test::File::ShareDir -share => { -dist => { 'JSON-Schema-Modern-Document-OpenAPI' => 'share' } };
 
+my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
+
 subtest 'extract operationIds and identify duplicates' => sub {
   my $yaml = <<'YAML';
 ---
@@ -62,7 +64,7 @@ YAML
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     evaluator => my $js = JSON::Schema::Modern->new,
-    schema => YAML::PP->new( boolean => 'JSON::PP' )->load_string($yaml),
+    schema => $yamlpp->load_string($yaml),
   );
 
   ok(!$doc->errors, 'no errors when parsing this document');
@@ -83,7 +85,7 @@ YAML
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     evaluator => $js = JSON::Schema::Modern->new,
-    schema => YAML::PP->new( boolean => 'JSON::PP' )->load_string($yaml =~ s/operation_id_[a-z]/operation_id_dupe/gr),
+    schema => $yamlpp->load_string($yaml =~ s/operation_id_[a-z]/operation_id_dupe/gr),
   );
 
   cmp_deeply(

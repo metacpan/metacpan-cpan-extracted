@@ -10,7 +10,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Command 6.01;
+package App::DocKnot::Command 7.00;
 
 use 5.024;
 use autodie;
@@ -18,6 +18,7 @@ use warnings;
 
 use App::DocKnot::Dist;
 use App::DocKnot::Generate;
+use App::DocKnot::Release;
 use App::DocKnot::Spin;
 use App::DocKnot::Spin::RSS;
 use App::DocKnot::Spin::Thread;

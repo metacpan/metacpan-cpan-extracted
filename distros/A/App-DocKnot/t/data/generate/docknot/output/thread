@@ -182,6 +182,7 @@ development source].
     \doc[api/app-docknot-config.html][App::DocKnot::Config]
     \doc[api/app-docknot-dist.html][App::DocKnot::Dist]
     \doc[api/app-docknot-generate.html][App::DocKnot::Generate]
+    \doc[api/app-docknot-release.html][App::DocKnot::Release]
     \doc[api/app-docknot-spin.html][App::DocKnot::Spin]
     \doc[api/app-docknot-spin-pointer.html][App::DocKnot::Spin::Pointer]
     \doc[api/app-docknot-spin-rss.html][App::DocKnot::Spin::RSS]

@@ -1,9 +1,9 @@
 ##############################################################################
 #
 #  Data::Stacker is concise text serialization for hash/array nested structs.
-#  (c) Vladi Belperchinov-Shabanski "Cade" 2016
-#  <cade@bis.bg> <cade@biscom.net> <cade@datamax.bg> <cade@cpan.org>
-#  http://cade.datamax.bg
+#  Copyright (c) 2016-2022 Vladi Belperchinov-Shabanski "Cade" 
+#  <cade@bis.bg> <cade@noxrun.com> <cade@cpan.org>
+#  http://cade.noxrun.com
 #
 #  GPL
 #
@@ -11,7 +11,8 @@
 package Data::Stacker;
 use strict;
 use Exporter;
-our $VERSION = '1.01';
+use Scalar::Util;
+our $VERSION = '1.02';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -34,6 +35,8 @@ our %EXPORT_TAGS = (
 # TODO: use Scalar::Util qw( reftype );
 
 # NOTE: escaping/unescaping is intentionally left in-place
+
+# TODO: UTF-8 support
 
 sub stack_data
 {
@@ -64,7 +67,7 @@ sub __stack_hashref
     {
     $k =~ s/([\\\n])/sprintf("%%%02X",ord($1))/geo;
     $ec++;
-    my $ref = ref $v;
+    my $ref = Scalar::Util::reftype( $v );
     if( $ref eq 'HASH' )
       {
       my $cnt = keys %$v;
@@ -82,7 +85,7 @@ sub __stack_hashref
       }
     else
       {
-      die "unsupported";
+      die "unsupported [$ref]";
       }  
     }
   return "%$ec\n" . $str;
@@ -110,8 +113,9 @@ sub __stack_arrayref
       }
     elsif( $ref eq '' )  
       {
-      $v =~ s/([\\\n])/sprintf("%%%02X",ord($1))/geo;
-      $str .= "=$v\n";
+      my $vv = $v;
+      $vv =~ s/([\\\n])/sprintf("%%%02X",ord($1))/geo;
+      $str .= "=$vv\n";
       }
     else
       {
@@ -208,9 +212,6 @@ sub __unstack_data_decode_hash
   
   return ( \%res, $pos );
 }
-
-##############################################################################
-
 
 ##############################################################################
 
@@ -334,7 +335,7 @@ or "BEGIN DATA". Starting with "BEGIN DATA" is a special case where output
 perl structure will hold single scalar reference.
 
 URL-style (%XX where XX is hex ascii code) is used for escaping of special 
-characters in key names and data values. Only chars that need escaping  
+characters in key names and data values. The only chars that need escaping
 are the new-line/LF (%0A) char and % (%5C). Unescaping is performed for all
 found escaped chars (not only for LF and %).
 
@@ -408,17 +409,21 @@ Serialized output data with comments:
 
     * Objects
     * Ordered hashes (i.e. Objects support for Tie::IxHash etc.)  
+    * Circular structures
 
 =head1 KNOWN BUGS
 
 Escaping probably will not work with all unicode new-line chars or when 
 reading from file with different record separator.
 
+Will not work with circular (self-referred) structures.
+
 =head1 SEE ALSO
 
 Few similar-task perl modules:
 
     * Storable
+    * Sereal
     * Data::MessagePack
     * JSON
 

@@ -2,7 +2,7 @@
 #
 # Tests for App::DocKnot::Spin::Sitemap (.sitemap file handling).
 #
-# Copyright 2021 Russ Allbery <rra@cpan.org>
+# Copyright 2021-2022 Russ Allbery <rra@cpan.org>
 #
 # SPDX-License-Identifier: MIT
 
@@ -12,7 +12,7 @@ use warnings;
 
 use lib 't/lib';
 
-use File::Spec;
+use Path::Tiny qw(path);
 use Test::RRA qw(is_file_contents);
 
 use Test::More tests => 10;
@@ -20,25 +20,24 @@ use Test::More tests => 10;
 require_ok('App::DocKnot::Spin::Sitemap');
 
 # Parse a complex .sitemap file.
-my $datadir = File::Spec->catfile('t', 'data', 'spin', 'sitemap');
-my $path = File::Spec->catfile($datadir, 'complex');
-my $sitemap = App::DocKnot::Spin::Sitemap->new($path);
+my $datadir = path('t', 'data', 'spin', 'sitemap');
+my $sitemap = App::DocKnot::Spin::Sitemap->new($datadir->child('complex'));
 isa_ok($sitemap, 'App::DocKnot::Spin::Sitemap');
 
 # Check the generated sitemap.
 my $output = join(q{}, $sitemap->sitemap());
-my $expected = File::Spec->catfile($datadir, 'complex.html');
+my $expected = $datadir->child('complex.html');
 is_file_contents($output, $expected, 'sitemap output');
 
 # Unknown page.
-my @links = $sitemap->links('/unknown');
+my @links = $sitemap->links('unknown');
 is_deeply(\@links, [], 'links for unknown page');
-my @navbar = $sitemap->navbar('/unknown');
+my @navbar = $sitemap->navbar('unknown');
 is_deeply(\@navbar, [], 'navbar for unknown page');
 
 # Check links and navbar for a page near a --- boundary, which may not be
 # exercised by the test of spinning a tree of files.
-@links = $sitemap->links('/faqs/soundness-inn.html');
+@links = $sitemap->links('faqs/soundness-inn.html');
 my @expected = (
     q{  <link rel="next" href="soundness-cnews.html"}
       . qq{ title="Soundness for C News" />\n},
@@ -46,7 +45,7 @@ my @expected = (
     qq{  <link rel="top" href="../" />\n},
 );
 is_deeply(\@links, \@expected, 'links output');
-@navbar = $sitemap->navbar('/faqs/soundness-inn.html');
+@navbar = $sitemap->navbar('faqs/soundness-inn.html');
 @expected = (
     qq{<table class="navbar"><tr>\n},
     qq{  <td class="navleft"></td>\n},
@@ -61,7 +60,7 @@ is_deeply(\@links, \@expected, 'links output');
 is_deeply(\@navbar, \@expected, 'navbar output');
 
 # Check links for a page with long adjacent titles to test the wrapping.
-@links = $sitemap->links('/notes/cvs/basic-usage.html');
+@links = $sitemap->links('notes/cvs/basic-usage.html');
 @expected = (
     qq{  <link rel="previous" href="why.html"\n},
     qq{        title="Why put a set of files into CVS?" />\n},
@@ -73,16 +72,11 @@ is_deeply(\@navbar, \@expected, 'navbar output');
 is_deeply(\@links, \@expected, 'links output with wrapping');
 
 # Check error handling.
-eval {
-    $path = File::Spec->catfile($datadir, 'invalid');
-    App::DocKnot::Spin::Sitemap->new($path);
-};
+my $path = $datadir->child('invalid');
+eval { App::DocKnot::Spin::Sitemap->new($path) };
 is($@, "invalid line 3 in $path\n", 'invalid sitemap file');
-# Check error handling.
-eval {
-    $path = File::Spec->catfile($datadir, 'duplicate');
-    App::DocKnot::Spin::Sitemap->new($path);
-};
+$path = $datadir->child('duplicate');
+eval { App::DocKnot::Spin::Sitemap->new($path) };
 is(
     $@,
     "duplicate entry for /faqs/comments.html in $path (line 4)\n",

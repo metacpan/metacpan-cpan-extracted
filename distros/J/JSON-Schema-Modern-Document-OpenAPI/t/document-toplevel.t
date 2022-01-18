@@ -53,6 +53,24 @@ subtest 'top level document fields' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     evaluator => my $js = JSON::Schema::Modern->new,
+    schema => 1,
+  );
+  cmp_deeply(
+    [ map $_->TO_JSON, $doc->errors ],
+    [
+      {
+        instanceLocation => '',
+        keywordLocation => '',
+        absoluteKeywordLocation => 'http://localhost:1234/api',
+        error => 'invalid document type: integer',
+      },
+    ],
+    'document is wrong type',
+  );
+
+  $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'http://localhost:1234/api',
+    evaluator => $js = JSON::Schema::Modern->new,
     schema => {},
   );
   cmp_deeply(

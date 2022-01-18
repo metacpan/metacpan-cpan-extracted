@@ -18,13 +18,19 @@ meta-spec:
   version: '1.4'
 name: WebService-Mailgun
 no_index:
-  file:
-    - Dockerfile
-    - docker-compose.yml
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
 provides:
   WebService::Mailgun:
     file: lib/WebService/Mailgun.pm
-    version: '0.13'
+    version: '0.14'
 requires:
   Class::Accessor::Lite: '0'
   File::Temp: '0'
@@ -39,8 +45,9 @@ resources:
   bugtracker: https://github.com/kan/p5-web-service-mailgun/issues
   homepage: https://github.com/kan/p5-web-service-mailgun
   repository: git://github.com/kan/p5-web-service-mailgun.git
-version: '0.13'
+version: '0.14'
 x_contributors:
+  - 'Bjorn <bjornjac@gmail.com>'
   - 'Josh Rabinowitz <joshr@joshr.com>'
   - 'justingit <perl@justinsimoni.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

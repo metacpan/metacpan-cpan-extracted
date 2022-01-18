@@ -1,0 +1,1089 @@
+package Venus::Number;
+
+use 5.018;
+
+use strict;
+use warnings;
+
+use Moo;
+
+extends 'Venus::Kind::Value';
+
+use overload (
+  '!' => sub{!$_[0]->get},
+  '!=' => sub{$_[0]->get != ($_[1] + 0)},
+  '%' => sub{$_[0]->get % ($_[1] + 0)},
+  '*' => sub{$_[0]->get * ($_[1] + 0)},
+  '+' => sub{$_[0]->get + ($_[1] + 0)},
+  '-' => sub{$_[0]->get - ($_[1] + 0)},
+  '.' => sub{$_[0]->get . ($_[1] + 0)},
+  '/' => sub{$_[0]->get / ($_[1] + 0)},
+  '0+' => sub{$_[0]->get + 0},
+  '<' => sub{$_[0]->get < ($_[1] + 0)},
+  '<=' => sub{$_[0]->get <= ($_[1] + 0)},
+  '==' => sub{$_[0]->get == ($_[1] + 0)},
+  '>' => sub{$_[0]->get > ($_[1] + 0)},
+  '>=' => sub{$_[0]->get >= ($_[1] + 0)},
+  'bool' => sub{$_[0]->get + 0},
+  'eq' => sub{"$_[0]" eq "$_[1]"},
+  'ne' => sub{"$_[0]" ne "$_[1]"},
+  'qr' => sub{qr/@{[quotemeta($_[0]->get)]}/},
+  'x' => sub{$_[0]->get x ($_[1] + 0)},
+);
+
+# METHODS
+
+sub abs {
+  my ($self) = @_;
+
+  my $data = $self->get;
+
+  return CORE::abs($data);
+}
+
+sub atan2 {
+  my ($self, $arg) = @_;
+
+  my $data = $self->get;
+
+  return CORE::atan2($data, $arg + 0);
+}
+
+sub cos {
+  my ($self) = @_;
+
+  my $data = $self->get;
+
+  return CORE::cos($data);
+}
+
+sub decr {
+  my ($self, $arg) = @_;
+
+  my $data = $self->get;
+
+  return $data - (($arg || 1) + 0);
+}
+
+sub default {
+  return 0;
+}
+
+sub exp {
+  my ($self) = @_;
+
+  my $data = $self->get;
+
+  return CORE::exp($data);
+}
+
+sub hex {
+  my ($self) = @_;
+
+  my $data = $self->get;
+
+  return CORE::sprintf('%#x', $data);
+}
+
+sub incr {
+  my ($self, $arg) = @_;
+
+  my $data = $self->get;
+
+  return $data + (($arg || 1) + 0);
+}
+
+sub int {
+  my ($self) = @_;
+
+  my $data = $self->get;
+
+  return CORE::int($data);
+}
+
+sub log {
+  my ($self) = @_;
+
+  my $data = $self->get;
+
+  return CORE::log($data);
+}
+
+sub mod {
+  my ($self, $arg) = @_;
+
+  my $data = $self->get;
+
+  return $data % ($arg + 0);
+}
+
+sub neg {
+  my ($self) = @_;
+
+  my $data = $self->get;
+
+  return $data =~ /^-(.*)/ ? $1 : -$data;
+}
+
+sub pow {
+  my ($self, $arg) = @_;
+
+  my $data = $self->get;
+
+  return $data ** ($arg + 0);
+}
+
+sub range {
+  my ($self, $arg) = @_;
+
+  my $data = $self->get;
+
+  return [
+    ($data > ($arg + 0)) ? CORE::reverse(($arg + 0)..$data) : ($data..($arg + 0))
+  ];
+}
+
+sub sin {
+  my ($self) = @_;
+
+  my $data = $self->get;
+
+  return CORE::sin($data);
+}
+
+sub sqrt {
+  my ($self) = @_;
+
+  my $data = $self->get;
+
+  return CORE::sqrt($data);
+}
+
+1;
+
+
+
+=head1 NAME
+
+Venus::Number - Number Class
+
+=cut
+
+=head1 ABSTRACT
+
+Number Class for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(1_000);
+
+  # $number->abs;
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides methods for manipulating number data.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Venus::Kind::Value>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 abs
+
+  abs() (Num)
+
+The abs method returns the absolute value of the number.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item abs example 1
+
+  # given: synopsis;
+
+  my $abs = $number->abs;
+
+  # 1000
+
+=back
+
+=over 4
+
+=item abs example 2
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(12);
+
+  my $abs = $number->abs;
+
+  # 12
+
+=back
+
+=over 4
+
+=item abs example 3
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(-12);
+
+  my $abs = $number->abs;
+
+  # 12
+
+=back
+
+=cut
+
+=head2 atan2
+
+  atan2() (Num)
+
+The atan2 method returns the arctangent of Y/X in the range -PI to PI.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item atan2 example 1
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(1);
+
+  my $atan2 = $number->atan2(1);
+
+  # 0.785398163397448
+
+=back
+
+=cut
+
+=head2 cos
+
+  cos() (Num)
+
+The cos method computes the cosine of the number (expressed in radians).
+
+I<Since C<0.01>>
+
+=over 4
+
+=item cos example 1
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(12);
+
+  my $cos = $number->cos;
+
+  # 0.843853958732492
+
+=back
+
+=cut
+
+=head2 decr
+
+  decr() (Num)
+
+The decr method returns the numeric number decremented by 1.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item decr example 1
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(123456789);
+
+  my $decr = $number->decr;
+
+  # 123456788
+
+=back
+
+=over 4
+
+=item decr example 2
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(123456789);
+
+  my $decr = $number->decr(123456788);
+
+  # 1
+
+=back
+
+=cut
+
+=head2 default
+
+  default() (Int)
+
+The default method returns the default value, i.e. C<0>.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item default example 1
+
+  # given: synopsis;
+
+  my $default = $number->default;
+
+  # 0
+
+=back
+
+=cut
+
+=head2 exp
+
+  exp() (Num)
+
+The exp method returns e (the natural logarithm base) to the power of the
+number.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item exp example 1
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(0);
+
+  my $exp = $number->exp;
+
+  # 1
+
+=back
+
+=over 4
+
+=item exp example 2
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(1);
+
+  my $exp = $number->exp;
+
+  # 2.71828182845905
+
+=back
+
+=over 4
+
+=item exp example 3
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(1.5);
+
+  my $exp = $number->exp;
+
+  # 4.48168907033806
+
+=back
+
+=cut
+
+=head2 hex
+
+  hex() (Str)
+
+The hex method returns a hex string representing the value of the number.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item hex example 1
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(175);
+
+  my $hex = $number->hex;
+
+  # "0xaf"
+
+=back
+
+=cut
+
+=head2 incr
+
+  incr() (Num)
+
+The incr method returns the numeric number incremented by 1.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item incr example 1
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(123456789);
+
+  my $incr = $number->incr;
+
+  # 123456790
+
+=back
+
+=over 4
+
+=item incr example 2
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(123456790);
+
+  my $incr = $number->incr(-1);
+
+  # 123456789
+
+=back
+
+=cut
+
+=head2 int
+
+  int() (Int)
+
+The int method returns the integer portion of the number. Do not use this
+method for rounding.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item int example 1
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(12.5);
+
+  my $int = $number->int;
+
+  # 12
+
+=back
+
+=cut
+
+=head2 log
+
+  log() (Num)
+
+The log method returns the natural logarithm (base e) of the number.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item log example 1
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(12345);
+
+  my $log = $number->log;
+
+  # 9.42100640177928
+
+=back
+
+=cut
+
+=head2 mod
+
+  mod() (Int)
+
+The mod method returns the division remainder of the number divided by the
+argment.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item mod example 1
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(12);
+
+  my $mod = $number->mod(1);
+
+  # 0
+
+=back
+
+=over 4
+
+=item mod example 2
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(12);
+
+  my $mod = $number->mod(2);
+
+  # 0
+
+=back
+
+=over 4
+
+=item mod example 3
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(12);
+
+  my $mod = $number->mod(5);
+
+  # 2
+
+=back
+
+=cut
+
+=head2 neg
+
+  neg() (Num)
+
+The neg method returns a negative version of the number.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item neg example 1
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(12345);
+
+  my $neg = $number->neg;
+
+  # -12345
+
+=back
+
+=cut
+
+=head2 pow
+
+  pow() (Num)
+
+The pow method returns a number, the result of a math operation, which is the
+number to the power of the argument.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item pow example 1
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(12345);
+
+  my $pow = $number->pow(3);
+
+  # 1881365963625
+
+=back
+
+=cut
+
+=head2 range
+
+  range() (ArrayRef)
+
+The range method returns an array reference containing integer increasing values
+up-to or down-to the limit specified.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item range example 1
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(5);
+
+  my $range = $number->range(9);
+
+  # [5..9]
+
+=back
+
+=over 4
+
+=item range example 2
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(5);
+
+  my $range = $number->range(1);
+
+  # [5, 4, 3, 2, 1]
+
+=back
+
+=cut
+
+=head2 sin
+
+  sin() (Num)
+
+The sin method returns the sine of the number (expressed in radians).
+
+I<Since C<0.01>>
+
+=over 4
+
+=item sin example 1
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(12345);
+
+  my $sin = $number->sin;
+
+  # -0.993771636455681
+
+=back
+
+=cut
+
+=head2 sqrt
+
+  sqrt() (Num)
+
+The sqrt method returns the positive square root of the number.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item sqrt example 1
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(12345);
+
+  my $sqrt = $number->sqrt;
+
+  # 111.108055513541
+
+=back
+
+=cut
+
+=head1 OPERATORS
+
+This package overloads the following operators:
+
+=cut
+
+=over 4
+
+=item operation: C<(!)>
+
+This package overloads the C<!> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number = !$number;
+
+  # ""
+
+=back
+
+=over 4
+
+=item operation: C<(!=)>
+
+This package overloads the C<!=> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number != 100;
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(%)>
+
+This package overloads the C<%> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number % 2_000;
+
+  # 1_000
+
+=back
+
+=over 4
+
+=item operation: C<(*)>
+
+This package overloads the C<*> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number * 2;
+
+  # 2_000
+
+=back
+
+=over 4
+
+=item operation: C<(+)>
+
+This package overloads the C<+> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number + 100;
+
+  # 1100
+
+=back
+
+=over 4
+
+=item operation: C<(-)>
+
+This package overloads the C<-> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number - 100;
+
+  # 900
+
+=back
+
+=over 4
+
+=item operation: C<(.)>
+
+This package overloads the C<.> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number . 0;
+
+  # 10_000
+
+=back
+
+=over 4
+
+=item operation: C<(/)>
+
+This package overloads the C</> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number / 10;
+
+  # 100
+
+=back
+
+=over 4
+
+=item operation: C<(0+)>
+
+This package overloads the C<0+> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number + 0;
+
+  # 1_000
+
+=back
+
+=over 4
+
+=item operation: C<(<)>
+
+This package overloads the C<<> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number < 1001;
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(<=)>
+
+This package overloads the C<<=> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number <= 1000;
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(==)>
+
+This package overloads the C<==> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number == 1000;
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(>)>
+
+This package overloads the C<>> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number > 999;
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(>=)>
+
+This package overloads the C<>=> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number >= 1000;
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(bool)>
+
+This package overloads the C<bool> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = !!$number;
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(eq)>
+
+This package overloads the C<eq> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number eq "1000";
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(ne)>
+
+This package overloads the C<ne> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number ne "1_000";
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(qr)>
+
+This package overloads the C<qr> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = '1000' =~ qr/$number/;
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(x)>
+
+This package overloads the C<x> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number x 2;
+
+  # 10001000
+
+=back
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

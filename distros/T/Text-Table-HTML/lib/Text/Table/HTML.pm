@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-12-09'; # DATE
+our $DATE = '2022-01-07'; # DATE
 our $DIST = 'Text-Table-HTML'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 sub _encode {
     state $load = do { require HTML::Entities };
@@ -98,7 +98,7 @@ Text::Table::HTML - Generate HTML table
 
 =head1 VERSION
 
-This document describes version 0.005 of Text::Table::HTML (from Perl distribution Text-Table-HTML), released on 2021-12-09.
+This document describes version 0.006 of Text::Table::HTML (from Perl distribution Text-Table-HTML), released on 2022-01-07.
 
 =head1 SYNOPSIS
 
@@ -170,11 +170,9 @@ Source repository is at L<https://github.com/perlancar/perl-Text-Table-HTML>.
 
 L<Text::Table::HTML::DataTables>
 
-L<Text::Table::Tiny>
-
 L<Text::Table::Any>
 
-See also L<Bencher::Scenario::TextTableModules>.
+L<Bencher::Scenario::TextTableModules>
 
 =head1 AUTHOR
 
@@ -199,7 +197,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2017, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2017, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

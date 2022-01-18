@@ -7,56 +7,51 @@
 # output data using the local instance of App::DocKnot.  It should be run from
 # the root of the DocKnot distribution directory.
 #
+# Copyright 2018-2022 Russ Allbery <rra@cpan.org>
+#
 # SPDX-License-Identifier: MIT
 
 use 5.018;
 use autodie;
 use warnings;
 
-use File::Spec;
-
 use lib 'blib/lib';
 
 use App::DocKnot;
 use App::DocKnot::Generate;
 use App::DocKnot::Spin;
+use Path::Tiny qw(path);
 use Pod::Thread;
 
 # For each subdirectory of t/data/generate, regenerate each file in the output
 # subdirectory using the metadata subdirectory and the template matching the
 # output name.  Special-case the docknot subdirectory, which uses DocKnot's
 # own metadata.
-my $data = File::Spec->catdir('t', 'data', 'generate');
-opendir(my $datadir, $data);
-my @packages = grep { -d File::Spec->catdir($data, $_) }
-  File::Spec->no_upwards(readdir($datadir));
-closedir($datadir);
+my $data = path('t', 'data', 'generate');
+my @packages = map { $_->basename() } grep { $_->is_dir() } $data->children();
 for my $package (@packages) {
     my $metadata;
     if ($package eq 'docknot') {
-        $metadata = File::Spec->catdir('docs', 'docknot.yaml');
+        $metadata = path('docs', 'docknot.yaml');
     } else {
-        $metadata = File::Spec->catdir($data, $package, 'docknot.yaml');
+        $metadata = $data->child($package, 'docknot.yaml');
     }
-    my $output = File::Spec->catdir($data, $package, 'output');
-    opendir(my $outputdir, $output);
-    for my $template (File::Spec->no_upwards(readdir($outputdir))) {
+    my $output = $data->child($package, 'output');
+    for my $template (map { $_->basename() } $output->children()) {
         my $docknot = App::DocKnot::Generate->new({ metadata => $metadata });
-        my $outpath = File::Spec->catdir($output, $template);
-        $docknot->generate_output($template, $outpath);
+        $docknot->generate_output($template, $output->child($template));
     }
-    closedir($outputdir);
 }
 
 # The test of spinning a tree of files uses a reference to App::DocKnot's own
 # POD documentation.  Regenerate the expected output in case the POD has
 # changed.
-my $source = File::Spec->catdir('lib', 'App', 'DocKnot.pm');
+my $source = path('lib', 'App', 'DocKnot.pm');
 my $podthread = Pod::Thread->new(navbar => 1);
 my $spin = App::DocKnot::Spin::Thread->new();
 my $thread;
 $podthread->output_string(\$thread);
-$podthread->parse_file($source);
+$podthread->parse_file("$source");
 my $html = $spin->spin_thread($thread);
 
 # Add the additional metadata that should be added by spin.
@@ -91,10 +86,8 @@ $html =~ s{ (<body> \n) }{$1$navbar}xms;
 $html =~ s{ (</body>) }{$navbar\n$address$1}xms;
 
 # Replace the expected data file.
-my $output = File::Spec->catdir(
-    't', 'data', 'spin', 'output', 'software', 'docknot',
-    'api', 'app-docknot.html',
+my $output = path(
+    't', 'data', 'spin', 'output', 'software', 'docknot', 'api',
+    'app-docknot.html',
 );
-open(my $fh, '>', $output);
-print {$fh} $html or die "Cannot write to $output: $!\n";
-close($fh);
+$output->spew_utf8($html);

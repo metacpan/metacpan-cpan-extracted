@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Eagle's Path</title>
+    <title>Eagle&apos;s Path</title>
     <link>https://www.eyrie.org/~eagle/</link>
-    <description>"Passion and dispassion.  Choose two." -- Larry Wall</description>
+    <description>&quot;Passion and dispassion.  Choose two.&quot; -- Larry Wall</description>
     <language>en-us</language>
     <pubDate>%DATE%</pubDate>
     <lastBuildDate>%DATE%</lastBuildDate>
@@ -12,7 +12,7 @@
                type="application/rss+xml" />
 
     <item>
-      <title>Review: Fermat's Enigma</title>
+      <title>Review: Fermat&apos;s Enigma</title>
       <link>https://www.eyrie.org/~eagle/reviews/books/1-250-30112-2.html</link>
       <description><![CDATA[
 <p>Review: <cite>Fermat's Enigma</cite>, by Simon Singh</p>
@@ -55,7 +55,7 @@ Fermat's Last Theorem is the infamous proposal that:
 has no solutions for integer <i>x, y, z, n</i> and <i>n &gt; 2</i>.  It's
 infamous for being very simple to state and understand, a variation on the
 equation produced by the Pythagorean Theorem, but incredibly difficult to
-prove.  It's also infamous for Pierre de Fermat's maddening marginal note:
+prove.  It's also infamous for Pierre de Fermat's maddening marginal note —
 "I have discovered a truly marvelous demonstration of this proposition
 which this margin is too narrow to contain."  350 years after Fermat wrote
 this, the theorem was still unproven in the general case, although the

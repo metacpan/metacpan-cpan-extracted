@@ -4,7 +4,7 @@ pdlmaker_init();
 
 ##-- preqrequistes (for PREREQ_PM)
 my %prereq = (
-	      'PDL' => 0, #'2.4.2',
+	      'PDL' => '2.019',
 	      'PDL::VectorValued' => '1.0.4',
 	      'Test::More' => 0,
 	      'File::Basename' => 0,

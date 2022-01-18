@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Changes to Russ Allbery's Web Pages</title>
+    <title>Changes to Russ Allbery&apos;s Web Pages</title>
     <link>https://www.eyrie.org/~eagle/</link>
-    <description>Recent changes to Russ Allbery's web pages.</description>
+    <description>Recent changes to Russ Allbery&apos;s web pages.</description>
     <language>en-us</language>
     <pubDate>%DATE%</pubDate>
     <lastBuildDate>%DATE%</lastBuildDate>
@@ -11,6 +11,15 @@
     <atom:link href="https://www.eyrie.org/~eagle/changes.rss" rel="self"
                type="application/rss+xml" />
 
+    <item>
+      <title>Test UTF-8 entry</title>
+      <link>https://www.eyrie.org/~eagle/</link>
+      <description><![CDATA[
+        <p>Test entry — with UTF-8 dash.</p>
+      ]]></description>
+      <pubDate>%DATE%</pubDate>
+      <guid isPermaLink="false">%DATE%</guid>
+    </item>
     <item>
       <title>kstart 4.3</title>
       <link>https://www.eyrie.org/~eagle/software/kstart/</link>
@@ -144,15 +153,6 @@
       <link>https://www.eyrie.org/~eagle/reviews/books/0-345-36331-0.html</link>
       <description><![CDATA[
         <p>Review of Demon Lord of Karanda by David Eddings.</p>
-      ]]></description>
-      <pubDate>%DATE%</pubDate>
-      <guid isPermaLink="false">%DATE%</guid>
-    </item>
-    <item>
-      <title>Review: The Magician's Nephew</title>
-      <link>https://www.eyrie.org/~eagle/reviews/books/0-02-044230-0.html</link>
-      <description><![CDATA[
-        <p>Review of The Magician's Nephew by C.S. Lewis.</p>
       ]]></description>
       <pubDate>%DATE%</pubDate>
       <guid isPermaLink="false">%DATE%</guid>

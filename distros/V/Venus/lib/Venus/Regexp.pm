@@ -1,0 +1,253 @@
+package Venus::Regexp;
+
+use 5.018;
+
+use strict;
+use warnings;
+
+use Moo;
+
+extends 'Venus::Kind::Value';
+
+use overload (
+  'eq' => sub{"$_[0]" eq "$_[1]"},
+  'ne' => sub{"$_[0]" ne "$_[1]"},
+  'qr' => sub{$_[0]->value},
+);
+
+# METHODS
+
+sub default {
+  return qr//;
+}
+
+sub replace {
+  my ($self, $string, $substr, $flags) = @_;
+
+  require Venus::Replace;
+
+  my $replace = Venus::Replace->new(
+    regexp => $self->get,
+    string => $string // '',
+    substr => $substr // '',
+    flags => $flags // '',
+  );
+
+  return $replace->do('evaluate');
+}
+
+sub search {
+  my ($self, $string) = @_;
+
+  require Venus::Search;
+
+  my $search = Venus::Search->new(
+    regexp => $self->get,
+    string => $string // '',
+  );
+
+  return $search->do('evaluate');
+}
+
+1;
+
+
+
+=head1 NAME
+
+Venus::Regexp - Regexp Class
+
+=cut
+
+=head1 ABSTRACT
+
+Regexp Class for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Venus::Regexp;
+
+  my $regexp = Venus::Regexp->new(
+    qr/(?<greet>\w+) (?<username>\w+)/,
+  );
+
+  # $regexp->search;
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides methods for manipulating regexp data.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Venus::Kind::Value>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 default
+
+  default() (Regexp)
+
+The default method returns the default value, i.e. C<qr//>.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item default example 1
+
+  # given: synopsis;
+
+  my $default = $regexp->default;
+
+  # qr/(?^u:)/
+
+=back
+
+=cut
+
+=head2 replace
+
+  replace(Str $string, Str $substr, Str $flags) (Replace)
+
+The replace method performs a regular expression substitution on the given
+string. The first argument is the string to match against. The second argument
+is the replacement string. The optional third argument might be a string
+representing flags to append to the s///x operator, such as 'g' or 'e'.  This
+method will always return a L<Venus::Replace> object which can be used to
+introspect the result of the operation.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item replace example 1
+
+  package main;
+
+  use Venus::Regexp;
+
+  my $regexp = Venus::Regexp->new(
+    qr/(?<username>\w+)$/,
+  );
+
+  my $replace = $regexp->replace('Hey, unknown', 'cpanery');
+
+  # bless({ ... }, 'Venus::Replace')
+
+=back
+
+=cut
+
+=head2 search
+
+  search(Str $string) (Search)
+
+The search method performs a regular expression match against the given string,
+this method will always return a L<Venus::Search> object which can be used to
+introspect the result of the operation.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item search example 1
+
+  package main;
+
+  use Venus::Regexp;
+
+  my $regexp = Venus::Regexp->new(
+    qr/(?<greet>\w+), (?<username>\w+)/,
+  );
+
+  my $search = $regexp->search('hey, cpanery');
+
+  # bless({ ... }, 'Venus::Search')
+
+=back
+
+=cut
+
+=head1 OPERATORS
+
+This package overloads the following operators:
+
+=cut
+
+=over 4
+
+=item operation: C<(eq)>
+
+This package overloads the C<eq> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $regexp eq '(?^u:(?<greet>\\w+) (?<username>\\w+))';
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(ne)>
+
+This package overloads the C<ne> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $regexp ne '(?<greet>\w+) (?<username>\w+)';
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(qr)>
+
+This package overloads the C<qr> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = 'Hello Friend' =~  $regexp;
+
+  # 1
+
+=back
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

@@ -12,7 +12,7 @@ use PDL::CCS::Ufunc;
 use PDL::CCS::Ops;
 use strict;
 
-our $VERSION = '1.23.16'; ##-- update with perl-reversion from Perl::Version module
+our $VERSION = '1.23.17'; ##-- update with perl-reversion from Perl::Version module
 our @ISA = ('PDL::Exporter');
 our @ccs_binops = (qw(plus minus mult divide modulo power),
 		   qw(gt ge lt le eq ne spaceship),
@@ -1010,7 +1010,7 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head2 Copyright Policy
 
-Copyright (C) 2005-2018, Bryan Jurish. All rights reserved.
+Copyright (C) 2005-2022, Bryan Jurish. All rights reserved.
 
 This package is free software, and entirely without warranty.
 You may redistribute it and/or modify it under the same terms

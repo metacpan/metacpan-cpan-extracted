@@ -2,5 +2,5 @@ name = "WebService-Mailgun"
 badges = ["travis", "coveralls"]
 module_maker = "ModuleBuildTiny"
 markdown_maker = "Pod::Markdown::Github"
-[no_index]
-file = ["Dockerfile", "docker-compose.yml"]
+[FileGatherer]
+exclude_match = ["Dockerfile", "docker-compose.yml"]

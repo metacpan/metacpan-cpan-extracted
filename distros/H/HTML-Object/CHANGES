@@ -1,4 +1,8 @@
 Revision history for Perl module HTML::Object
 
+v0.1.1 2022-01-18T16:45:55+0900
+    - Documentation improvement
+    - Correction of unit tests in 30.xquery.t
+
 v0.1.0 2022-01-16T21:10:18+0900
     - Initial release

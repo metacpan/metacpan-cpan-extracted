@@ -1,3 +1,10 @@
+0.006   2022-01-07  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Unmention Text::Table::Tiny because it's less related.
+
+
 0.005   2021-12-09  Released-By: PERLANCAR; Urgency: medium
 
         - Support 'title' parameter (put as table <caption> element).

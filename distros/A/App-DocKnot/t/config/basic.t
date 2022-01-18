@@ -2,7 +2,7 @@
 #
 # Tests for the App::DocKnot::Config module API.
 #
-# Copyright 2019-2021 Russ Allbery <rra@cpan.org>
+# Copyright 2019-2022 Russ Allbery <rra@cpan.org>
 #
 # SPDX-License-Identifier: MIT
 
@@ -11,7 +11,7 @@ use autodie;
 use warnings;
 
 use File::ShareDir qw(module_file);
-use File::Spec;
+use Path::Tiny qw(path);
 use YAML::XS ();
 
 use Test::More tests => 5;
@@ -24,11 +24,10 @@ local $ENV{XDG_CONFIG_DIRS} = '/nonexistent';
 BEGIN { use_ok('App::DocKnot::Config') }
 
 # Root of the test data.
-my $dataroot = File::Spec->catfile('t', 'data', 'generate');
+my $dataroot = path('t', 'data', 'generate');
 
 # Load a test configuration and check a few inobvious pieces of it.
-my $metadata_path
-  = File::Spec->catfile($dataroot, 'ansicolor', 'docknot.yaml');
+my $metadata_path = $dataroot->child('ansicolor', 'docknot.yaml');
 my $config = App::DocKnot::Config->new({ metadata => $metadata_path });
 isa_ok($config, 'App::DocKnot::Config');
 my $data_ref = $config->config();

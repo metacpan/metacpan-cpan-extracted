@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.538-6-g530f7cb5
+package JSON::Schema::Modern; # git description: v0.540-3-gcdc5bf90
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.539';
+our $VERSION = '0.541';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -157,6 +157,7 @@ sub add_schema {
       output_format => $self->output_format,
       valid => 0,
       errors => [ $document->errors ],
+      exception => 1,
     )) if $document->has_errors;
 
   if (not grep refaddr($_->{document}) == refaddr($document), $self->_canonical_resources) {
@@ -203,6 +204,7 @@ sub evaluate_json_string ($self, $json_data, $schema, $config_override = {}) {
     return JSON::Schema::Modern::Result->new(
       output_format => $self->output_format,
       valid => 0,
+      exception => 1,
       errors => [
         JSON::Schema::Modern::Error->new(
           keyword => undef,
@@ -262,7 +264,7 @@ sub traverse ($self, $schema_reference, $config_override = {}) {
       push $state->{errors}->@*, $e;
     }
     else {
-      ()= E($state, 'EXCEPTION: '.$e);
+      ()= E({ %$state, exception => 1 }, 'EXCEPTION: '.$e);
     }
 
     return $state;
@@ -277,7 +279,7 @@ sub traverse ($self, $schema_reference, $config_override = {}) {
       push $state->{errors}->@*, $e;
     }
     else {
-      E($state, 'EXCEPTION: '.$e);
+      E({ %$state, exception => 1 }, 'EXCEPTION: '.$e);
     }
   }
 
@@ -296,6 +298,7 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
     traversed_schema_path => $initial_path, # the accumulated path as of the start of evaluation, or last $id or $ref
     initial_schema_uri => $base_uri,    # the canonical URI as of the start of evaluation, or last $id or $ref
     schema_path => '',                  # the rest of the path, since the start of evaluation, or last $id or $ref
+    errors => [],
   };
 
   my $valid;
@@ -331,7 +334,6 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
       document => $schema_info->{document},   # the ::Document object containing this schema
       document_path => $schema_info->{document_path}, # the path within the document of this schema, as of the start of evaluation, or last $id or $ref
       dynamic_scope => [ $schema_info->{canonical_uri} ],
-      errors => [],
       annotations => [],
       seen => {},
       spec_version => $schema_info->{specification_version},
@@ -356,7 +358,7 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
       push $state->{errors}->@*, $e;
     }
     else {
-      $valid = E($state, 'EXCEPTION: '.$e);
+      $valid = E({ %$state, exception => 1 }, 'EXCEPTION: '.$e);
     }
   }
 
@@ -702,6 +704,7 @@ sub _get_metaschema_info ($self, $metaschema_uri, $for_canonical_uri) {
         )
       }
       $state->{errors}->@* ],
+    exception => 1,
   ) if $state->{errors}->@*;
   return ($state->{spec_version}, $state->{vocabularies});
 }
@@ -753,6 +756,7 @@ sub _get_or_load_resource ($self, $uri) {
       output_format => $self->output_format,
       valid => 0,
       errors => [ $document->errors ],
+      exception => 1,
     ) if $document->has_errors;
 
     # we have already performed the appropriate collision checks, so we bypass them here
@@ -828,7 +832,7 @@ has _json_decoder => (
   is => 'ro',
   isa => HasMethods[qw(encode decode)],
   lazy => 1,
-  default => sub { JSON::MaybeXS->new(allow_nonref => 1, canonical => 1, utf8 => 1, allow_bignum => 1, allow_blessed => 1) },
+  default => sub { JSON::MaybeXS->new(allow_nonref => 1, canonical => 1, utf8 => 1, allow_bignum => 1, convert_blessed => 1) },
 );
 
 # since media types are case-insensitive, all type names must be foldcased on insertion.
@@ -923,7 +927,7 @@ JSON::Schema::Modern - Validate data against a schema
 
 =head1 VERSION
 
-version 0.539
+version 0.541
 
 =head1 SYNOPSIS
 
@@ -1498,14 +1502,14 @@ L<Understanding JSON Schema|https://json-schema.org/understanding-json-schema>: 
 
 =for stopwords OpenAPI
 
-You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI Slack
-server|https://open-api.slack.com>, which are also great resources for finding help.
-
 =head1 SUPPORT
 
 Bugs may be submitted through L<https://github.com/karenetheridge/JSON-Schema-Modern/issues>.
 
 I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
+
+You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI Slack
+server|https://open-api.slack.com>, which are also great resources for finding help.
 
 =head1 AUTHOR
 

@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.539';
+our $VERSION = '0.541';
 
 use 5.020;
 use strictures 2;
@@ -41,7 +41,6 @@ our @EXPORT_OK = qw(
   assert_keyword_exists
   assert_keyword_type
   assert_pattern
-  is_uri_reference
   assert_uri_reference
   assert_uri
   annotate_self
@@ -109,7 +108,7 @@ sub get_type ($value) {
     if !($flags & B::SVf_POK) && ($flags & (B::SVf_IOK | B::SVf_NOK));
 
   croak sprintf('ambiguous type for %s',
-    JSON::MaybeXS->new(allow_nonref => 1, canonical => 1, utf8 => 0, allow_bignum => 1, allow_blessed => 1)->encode($value));
+    JSON::MaybeXS->new(allow_nonref => 1, canonical => 1, utf8 => 0, allow_bignum => 1, convert_blessed => 1)->encode($value));
 }
 
 # compares two arbitrary data payloads for equality, as per
@@ -219,6 +218,7 @@ sub E ($state, $error_string, @args) {
     keyword_location => $keyword_location,
     defined $uri ? ( absolute_keyword_location => $uri ) : (),
     error => @args ? sprintf($error_string, @args) : $error_string,
+    $state->{exception} ? ( exception => $state->{exception} ) : (),
   );
 
   return 0;
@@ -263,7 +263,9 @@ sub A ($state, $annotation) {
 # Therefore this is only appropriate during the evaluation phase, not the traverse phase.
 sub abort ($state, $error_string, @args) {
   ()= E($state, $error_string, @args);
-  die pop $state->{errors}->@*;
+  my $error = pop $state->{errors}->@*;
+  $error->exception(1);
+  die $error;
 }
 
 sub assert_keyword_exists ($state, $schema) {
@@ -294,28 +296,24 @@ sub assert_pattern ($state, $pattern) {
   return 1;
 }
 
-sub is_uri_reference ($ref) {
-  croak 'is_uri_reference called in void context' if not defined wantarray;
+# this is only suitable for checking URIs within schemas themselves
+sub assert_uri_reference ($state, $schema) {
+  croak 'assert_uri_reference called in void context' if not defined wantarray;
 
-  return 0
+  my $string = $schema->{$state->{keyword}};
+  return E($state, '%s value is not a valid URI reference', $state->{keyword})
     # see also uri-reference format sub
-    if fc(Mojo::URL->new($ref)->to_unsafe_string) ne fc($ref)
-      or $ref =~ /[^[:ascii:]]/
-      or $ref =~ /#/
-        and $ref !~ m{#$}                          # empty fragment
-        and $ref !~ m{#[A-Za-z][A-Za-z0-9_:.-]*$}  # plain-name fragment
-        and $ref !~ m{#/(?:[^~]|~[01])*$};         # json pointer fragment
+    if fc(Mojo::URL->new($string)->to_unsafe_string) ne fc($string)
+      or $string =~ /[^[:ascii:]]/
+      or $string =~ /#/
+        and $string !~ m{#$}                          # empty fragment
+        and $string !~ m{#[A-Za-z][A-Za-z0-9_:.-]*$}  # plain-name fragment
+        and $string !~ m{#/(?:[^~]|~[01])*$};         # json pointer fragment
 
   return 1;
 }
 
-sub assert_uri_reference ($state, $schema) {
-  croak 'assert_uri_reference called in void context' if not defined wantarray;
-
-  return 1 if is_uri_reference($schema->{$state->{keyword}});
-  return E($state, '%s value is not a valid URI reference', $state->{keyword});
-}
-
+# this is only suitable for checking URIs within schemas themselves
 sub assert_uri ($state, $schema, $override = undef) {
   croak 'assert_uri called in void context' if not defined wantarray;
 
@@ -360,7 +358,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.539
+version 0.541
 
 =head1 SYNOPSIS
 
@@ -372,18 +370,18 @@ This class contains internal utilities to be used by L<JSON::Schema::Modern>.
 
 =for Pod::Coverage is_type get_type is_equal is_elements_unique jsonp unjsonp local_annotations
 canonical_uri E A abort assert_keyword_exists assert_keyword_type assert_pattern assert_uri_reference assert_uri
-annotate_self is_uri_reference sprintf_num
+annotate_self sprintf_num
 
 =for stopwords OpenAPI
-
-You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI Slack
-server|https://open-api.slack.com>, which are also great resources for finding help.
 
 =head1 SUPPORT
 
 Bugs may be submitted through L<https://github.com/karenetheridge/JSON-Schema-Modern/issues>.
 
 I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
+
+You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI Slack
+server|https://open-api.slack.com>, which are also great resources for finding help.
 
 =head1 AUTHOR
 

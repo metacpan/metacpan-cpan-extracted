@@ -10,19 +10,17 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Dist 6.01;
+package App::DocKnot::Dist 7.00;
 
 use 5.024;
 use autodie;
 use warnings;
 
 use App::DocKnot::Config;
+use App::DocKnot::Util qw(latest_tarball print_checked);
 use Archive::Tar ();
 use Carp qw(croak);
-use Cwd qw(getcwd);
-use File::Copy qw(move);
 use File::Find qw(find);
-use File::Path qw(remove_tree);
 use Git::Repository ();
 use IO::Compress::Xz ();
 use IO::Uncompress::Gunzip ();
@@ -30,6 +28,7 @@ use IPC::Run qw(run);
 use IPC::System::Simple qw(systemx);
 use List::SomeUtils qw(lastval);
 use List::Util qw(any first);
+use Path::Tiny qw(path);
 
 # Base commands to run for various types of distributions.  Additional
 # variations may be added depending on additional configuration parameters.
@@ -113,6 +112,11 @@ sub _expected_dist_files {
     # Find all files in the source directory, stripping its path from the file
     # name and excluding (and pruning) anything matching @DIST_IGNORE or in
     # the distribution/ignore key of the package configuration.
+    #
+    # This uses File::Find rather than Path::Iterator::Rule like other parts
+    # of DocKnot because the ignore patterns are based on the whole path
+    # relative to the top of the distribution, and that's more annoying to do
+    # with Path::Iterator::Rule.
     my $wanted = sub {
         my $name = $File::Find::name;
         $name =~ s{ \A \Q$path\E / }{}xms;
@@ -126,7 +130,7 @@ sub _expected_dist_files {
     };
 
     # Generate and return the list of files.
-    find($wanted, $path);
+    find($wanted, "$path");
     return @files;
 }
 
@@ -135,31 +139,16 @@ sub _expected_dist_files {
 # $path   - The directory path
 # $prefix - The tarball file prefix
 #
-# Returns: The full path to the gzip tarball
+# Returns: The path to the gzip tarball
 #  Throws: Text exception if no gzip tarball was found
 sub _find_gzip_tarball {
     my ($self, $path, $prefix) = @_;
-    my @files = $self->_find_matching_tarballs($path, $prefix);
-    my $gzip_file = lastval { m{ [.]tar [.]gz \z }xms } @files;
+    my $files_ref = latest_tarball($path, $prefix)->{files};
+    my $gzip_file = lastval { m{ [.]tar [.]gz \z }xms } $files_ref->@*;
     if (!defined($gzip_file)) {
         die "cannot find gzip tarball for $prefix in $path\n";
     }
-    return File::Spec->catfile($path, $gzip_file);
-}
-
-# Find matching tarballs given a directory and a prefix.
-#
-# $path   - The directory path
-# $prefix - The tarball file prefix
-#
-# Returns: All matching files, without the directory name, as a list
-sub _find_matching_tarballs {
-    my ($self, $path, $prefix) = @_;
-    my $pattern = qr{ \A \Q$prefix\E - \d.* [.]tar [.][xg]z \z }xms;
-    opendir(my $source, $path);
-    my @files = grep { $_ =~ $pattern } readdir($source);
-    closedir($source);
-    return @files;
+    return $path->child($gzip_file);
 }
 
 # Given a directory and a prefix for tarballs in that directory, ensure that
@@ -172,17 +161,15 @@ sub _find_matching_tarballs {
 # Throws: Text exception on failure to read or write compressed files.
 sub _generate_compression_formats {
     my ($self, $path, $prefix) = @_;
-    my @files = $self->_find_matching_tarballs($path, $prefix);
-    if (!any { m{ [.]tar [.]xz \z }xms } @files) {
-        my $gzip_file = lastval { m{ [.]tar [.]gz \z }xms } @files;
-        my $xz_file = $gzip_file;
-        $xz_file =~ s{ [.]gz \z }{.xz}xms;
-        my $gzip_path = File::Spec->catfile($path, $gzip_file);
-        my $xz_path = File::Spec->catfile($path, $xz_file);
+    my $files_ref = latest_tarball($path, $prefix)->{files};
+    if (!any { m{ [.]tar [.]xz \z }xms } $files_ref->@*) {
+        my $gzip_file = lastval { m{ [.]tar [.]gz \z }xms } $files_ref->@*;
+        my $gzip_path = $path->child($gzip_file);
+        my $xz_path = $path->child($gzip_path->basename('.gz') . '.xz');
 
         # Open the input and output files.
-        my $gzip_fh = IO::Uncompress::Gunzip->new($gzip_path);
-        my $xz_fh = IO::Compress::Xz->new($xz_path);
+        my $gzip_fh = IO::Uncompress::Gunzip->new("$gzip_path");
+        my $xz_fh = IO::Compress::Xz->new("$xz_path");
 
         # Read from the gzip file and write to the xz-compressed file.
         my $buffer;
@@ -207,11 +194,9 @@ sub _generate_compression_formats {
 #         Text exception on failure to move a file
 sub _move_tarballs {
     my ($self, $source_path, $prefix, $dest_path) = @_;
-    my @files = $self->_find_matching_tarballs($source_path, $prefix);
-    for my $file (@files) {
-        my $source_file = File::Spec->catfile($source_path, $file);
-        move($source_file, $dest_path)
-          or die "cannot move $source_file to $dest_path: $!\n";
+    my $files_ref = latest_tarball($source_path, $prefix)->{files};
+    for my $file ($files_ref->@*) {
+        $source_path->child($file)->move($dest_path->child($file));
     }
     return;
 }
@@ -244,9 +229,13 @@ sub _replace_perl_path {
 # Throws: Text exception on failure to sign the file
 sub _sign_tarballs {
     my ($self, $path, $prefix) = @_;
-    my @files = $self->_find_matching_tarballs($path, $prefix);
-    for my $file (@files) {
-        my $tarball_path = File::Spec->catdir($path, $file);
+    my $files_ref = latest_tarball($path, $prefix)->{files};
+    for my $file (grep { m{ [.]tar [.][xg]z }xms } $files_ref->@*) {
+        my $tarball_path = $path->child($file);
+        my $sig_path = $path->child($tarball_path->basename() . '.asc');
+        if ($sig_path->exists()) {
+            $sig_path->remove();
+        }
         systemx(
             $self->{gpg}, '--detach-sign', '--armor', '-u',
             $self->{pgp_key}, $tarball_path,
@@ -296,7 +285,7 @@ sub new {
     #<<<
     my $self = {
         config  => $config_reader->config(),
-        distdir => $distdir,
+        distdir => path($distdir),
         gpg     => $args_ref->{gpg} // 'gpg',
         perl    => $args_ref->{perl},
         pgp_key => $args_ref->{pgp_key} // $global_config_ref->{pgp_key},
@@ -318,8 +307,8 @@ sub new {
 #          means all expected files were found)
 sub check_dist {
     my ($self, $source, $tarball) = @_;
-    my @expected = $self->_expected_dist_files(getcwd());
-    my %expected = map { $_ => 1 } @expected;
+    my @expected = $self->_expected_dist_files(path(q{.}));
+    my %expected = map { ("$_", 1) } @expected;
     my $archive = Archive::Tar->new($tarball);
     for my $file ($archive->list_files()) {
         $file =~ s{ \A [^/]* / }{}xms;
@@ -380,20 +369,21 @@ sub make_distribution {
     my ($self) = @_;
 
     # Determine the source directory and the distribution directory name.
-    my $source = getcwd() or die "cannot get current directory: $!\n";
+    my $source = path(q{.})->realpath();
     my $prefix = $self->{config}{distribution}{tarname};
 
     # If the distribution directory name already exists, remove it.  Automake
     # may have made parts of it read-only, so be forceful in the removal.
-    # Note that this does not pass the safe parameter and therefore should not
-    # be called on attacker-controlled directories.
+    # Note that this disables safe mode and therefore should not be called on
+    # attacker-controlled directories.
     chdir($self->{distdir});
-    if (-d $prefix) {
-        remove_tree($prefix);
+    my $workdir = path($prefix);
+    if ($workdir->is_dir()) {
+        $workdir->remove_tree({ safe => 0 });
     }
 
     # Export the Git repository into a new directory.
-    my $repo = Git::Repository->new(work_tree => $source);
+    my $repo = Git::Repository->new(work_tree => "$source");
     my @branches = $repo->run(
         'for-each-ref' => '--format=%(refname:short)', 'refs/heads/',
     );
@@ -408,31 +398,29 @@ sub make_distribution {
     }
 
     # Change to that directory and run the configured commands.
-    chdir($prefix);
+    chdir($workdir);
     for my $command_ref ($self->commands()) {
         systemx($command_ref->@*);
     }
 
-    # Move the generated tarball to the parent directory.
-    $self->_move_tarballs(File::Spec->curdir(), $prefix, File::Spec->updir());
+    # Generate additional compression formats if needed.
+    $self->_generate_compression_formats(path(q{.}), $prefix);
+
+    # Move the generated tarballs to the parent directory.
+    $self->_move_tarballs(path(q{.}), $prefix, $self->{distdir});
 
     # Remove the working tree.
-    chdir(File::Spec->updir());
-    remove_tree($prefix, { safe => 1 });
-
-    # Generate additional compression formats if needed.
-    $self->_generate_compression_formats(getcwd(), $prefix);
+    chdir($self->{distdir});
+    $workdir->remove_tree();
 
     # Check the distribution for any missing files.  If there are any, report
     # them and then fail with an error.
-    my $tarball = $self->_find_gzip_tarball(getcwd(), $prefix);
+    my $tarball = $self->_find_gzip_tarball($self->{distdir}, $prefix);
     chdir($source);
     my @missing = $self->check_dist($source, $tarball);
     if (@missing) {
-        print "Files found in local tree but not in distribution:\n"
-          or die "cannot print to stdout: $!\n";
-        print q{    } . join(qq{\n    }, @missing) . "\n"
-          or die "cannot print to stdout: $!\n";
+        print_checked("Files found in local tree but not in distribution:\n");
+        print_checked(q{    }, join(qq{\n    }, @missing), "\n");
         my $count = scalar(@missing);
         my $files = ($count == 1) ? '1 file' : "$count files";
         die "$files missing from distribution\n";
@@ -472,7 +460,8 @@ App::DocKnot::Dist - Prepare a distribution tarball
 Git, Perl 5.24 or later, and the modules File::BaseDir, File::ShareDir,
 Git::Repository, IO::Compress::Xz (part of IO-Compress-Lzma),
 IO::Uncompress::Gunzip (part of IO-Compress), IPC::Run, IPC::System::Simple,
-Kwalify, List::SomeUtils, and YAML::XS, all of which are available from CPAN.
+Kwalify, List::SomeUtils, Path::Tiny, and YAML::XS, all of which are available
+from CPAN.
 
 The tools to build whatever type of software distribution is being prepared
 are also required, since the distribution is built and tested as part of

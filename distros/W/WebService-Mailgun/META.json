@@ -14,9 +14,15 @@
    },
    "name" : "WebService-Mailgun",
    "no_index" : {
-      "file" : [
-         "Dockerfile",
-         "docker-compose.yml"
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
       ]
    },
    "prereqs" : {
@@ -64,7 +70,7 @@
    "provides" : {
       "WebService::Mailgun" : {
          "file" : "lib/WebService/Mailgun.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       }
    },
    "release_status" : "stable",
@@ -78,8 +84,9 @@
          "web" : "https://github.com/kan/p5-web-service-mailgun"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_contributors" : [
+      "Bjorn <bjornjac@gmail.com>",
       "Josh Rabinowitz <joshr@joshr.com>",
       "justingit <perl@justinsimoni.com>"
    ],

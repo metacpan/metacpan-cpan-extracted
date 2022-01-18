@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Base role for JSON Schema vocabulary classes
 
-our $VERSION = '0.539';
+our $VERSION = '0.541';
 
 use 5.020;
 use Moo::Role;
@@ -103,7 +103,7 @@ JSON::Schema::Modern::Vocabulary - Base role for JSON Schema vocabulary classes
 
 =head1 VERSION
 
-version 0.539
+version 0.541
 
 =head1 SYNOPSIS
 
@@ -124,19 +124,19 @@ must compose, describing the basic structure expected of a vocabulary class.
 
 =head2 vocabulary
 
-The canonical URI(s) describing the vocabulary for each draft specification version, as described in
+Returns the canonical URI(s) describing the vocabulary for each draft specification version, as described in
 L<JSON Schema Core Meta-specification, section 8.1.2|https://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.8.1.2>.
 Must be implemented by the composing class.
 
 =head2 evaluation_order
 
-A positive integer, used as a sort key for determining the evaluation order of this vocabulary. If
+Returns a positive integer, used as a sort key for determining the evaluation order of this vocabulary. If
 not overridden in a custom vocabulary class, its evaluation order will be after all built-in
 vocabularies. You probably don't need to define this.
 
 =head2 keywords
 
-The list of keywords defined by the vocabulary. Must be implemented by the composing class.
+Returns the list of keywords defined by the vocabulary. Must be implemented by the composing class.
 
 =head2 traverse
 
@@ -144,15 +144,15 @@ Traverses a subschema. Callers are expected to establish a new C<$state> scope.
 
 =head2 traverse_subschema
 
-Recursively traverses the schema at the current keyword.
+Recursively traverses the schema at the current keyword, as in the C<not> keyword.
 
 =head2 traverse_array_schemas
 
-Recursively traverses the list of subschemas at the current keyword.
+Recursively traverses the list of subschemas at the current keyword, as in the C<allOf> keyword.
 
 =head2 traverse_object_schemas
 
-Recursively traverses the (subschema) values of the object at the current keyword.
+Recursively traverses the (subschema) values of the object at the current keyword, as in the C<$defs> keyword.
 
 =head2 traverse_property_schema
 
@@ -164,18 +164,18 @@ Evaluates a subschema. Callers are expected to establish a new C<$state> scope.
 
 =head2 eval_subschema_at_uri
 
-Resolves a URI to a subschema, then evaluates that subschema (essentially the `$ref` keyword).
+Resolves a URI to a subschema, then evaluates that subschema (essentially the C<$ref> keyword).
 
 =for stopwords OpenAPI
-
-You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI Slack
-server|https://open-api.slack.com>, which are also great resources for finding help.
 
 =head1 SUPPORT
 
 Bugs may be submitted through L<https://github.com/karenetheridge/JSON-Schema-Modern/issues>.
 
 I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
+
+You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI Slack
+server|https://open-api.slack.com>, which are also great resources for finding help.
 
 =head1 AUTHOR
 

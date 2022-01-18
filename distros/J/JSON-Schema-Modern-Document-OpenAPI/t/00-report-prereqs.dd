@@ -53,6 +53,7 @@ do { my $x = {
                                       'Safe::Isa' => '0',
                                       'Scalar::Util' => '0',
                                       'Types::Standard' => '0',
+                                      'URI::Escape' => '0',
                                       'constant' => '0',
                                       'experimental' => '0',
                                       'if' => '0',

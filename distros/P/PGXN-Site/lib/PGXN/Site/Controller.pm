@@ -11,7 +11,7 @@ use Encode;
 use WWW::PGXN;
 use List::MoreUtils qw(any);
 use namespace::autoclean;
-our $VERSION = v0.22.0;
+our $VERSION = v0.22.1;
 
 Template::Declare->init( dispatch_to => ['PGXN::Site::Templates'] );
 
@@ -91,13 +91,11 @@ sub _cloud {
 
 sub home {
     my $self  = shift;
-    my $dists = $self->api->get_stats('dist')->{recent};
-    splice @{ $dists }, 5;
     $self->render('/home', {
         env => shift,
         vars => {
             cloud => _cloud($self),
-            dists => $dists,
+            dists => $self->api->get_stats('dist')->{recent},
         },
     });
 }

@@ -561,7 +561,7 @@ subtest 'const and enum' => sub {
 
 subtest 'exceptions' => sub {
   cmp_deeply(
-    $js->evaluate_json_string('[ 1, 2, 3, whargarbl ]', true)->TO_JSON,
+    (my $result = $js->evaluate_json_string('[ 1, 2, 3, whargarbl ]', true))->TO_JSON,
     {
       valid => false,
       errors => [
@@ -574,17 +574,18 @@ subtest 'exceptions' => sub {
     },
     'attempting to evaluate a json string returns the exception as an error',
   );
+  ok($result->exception, 'exception flag is true on the result');
 
   cmp_deeply(
-    $js->evaluate(
+    ($result = $js->evaluate(
       { x => 'hello' },
       {
         allOf => [
           { properties => { x => 1 } },
-          { properties => { x => false } },
+          { properties => { x => 'hi' } },
         ],
       }
-    )->TO_JSON,
+    ))->TO_JSON,
     {
       valid => false,
       errors => [
@@ -593,21 +594,27 @@ subtest 'exceptions' => sub {
           keywordLocation => '/allOf/0/properties/x',
           error => 'invalid schema type: integer',
         },
+        {
+          instanceLocation => '',
+          keywordLocation => '/allOf/1/properties/x',
+          error => 'invalid schema type: string',
+        },
       ],
     },
-    'a subschema of an invalid type returns an error at the right position, and evaluation aborts',
+    'a subschema of an invalid type returns an error at the right position, and evaluation continues',
   );
+  ok($result->exception, 'exception flag is true on the result');
 
   cmp_deeply(
-    $js->evaluate(
+    ($result = $js->evaluate(
       1,
       {
         allOf => [
           { type => 'whargarbl' },
-          false,
+          { type => 'whoops' },
         ],
       }
-    )->TO_JSON,
+    ))->TO_JSON,
     {
       valid => false,
       errors => [
@@ -616,10 +623,16 @@ subtest 'exceptions' => sub {
           keywordLocation => '/allOf/0/type',
           error => 'unrecognized type "whargarbl"',
         },
+        {
+          instanceLocation => '',
+          keywordLocation => '/allOf/1/type',
+          error => 'unrecognized type "whoops"',
+        },
       ],
     },
-    'invalid argument to "type" returns an error at the right position, and evaluation aborts',
+    'invalid argument to "type" returns an error at the right position, and evaluation continues',
   );
+  ok($result->exception, 'exception flag is true on the result');
 };
 
 subtest 'errors after crossing multiple $refs using $id and $anchor' => sub {
@@ -756,7 +769,7 @@ subtest 'errors after crossing multiple $refs using $id and $anchor' => sub {
 
 subtest 'unresolvable $ref to a local resource' => sub {
   cmp_deeply(
-    $js->evaluate(
+    (my $result = $js->evaluate(
       1,
       {
         '$ref' => '#/$defs/myint',
@@ -767,7 +780,7 @@ subtest 'unresolvable $ref to a local resource' => sub {
         },
         anyOf => [ false ],
       },
-    )->TO_JSON,
+    ))->TO_JSON,
     {
       valid => false,
       errors => [
@@ -781,6 +794,7 @@ subtest 'unresolvable $ref to a local resource' => sub {
     },
     'error for a bad $ref reports the correct absolute location that was referred to',
   );
+  ok($result->exception, 'exception flag is true on the result');
 };
 
 subtest 'unresolvable $ref to a remote resource' => sub {
@@ -788,7 +802,7 @@ subtest 'unresolvable $ref to a remote resource' => sub {
   my $js = JSON::Schema::Modern->new;
 
   cmp_deeply(
-    $js->evaluate(
+    (my $result = $js->evaluate(
       1,
       {
         '$id' => 'http://localhost:4242/foo/bar/top_id.json',
@@ -801,7 +815,7 @@ subtest 'unresolvable $ref to a remote resource' => sub {
         },
         anyOf => [ false ],
       },
-    )->TO_JSON,
+    ))->TO_JSON,
     {
       valid => false,
       errors => [
@@ -815,11 +829,12 @@ subtest 'unresolvable $ref to a remote resource' => sub {
     },
     'error for a bad $ref reports the correct absolute location that was referred to',
   );
+  ok($result->exception, 'exception flag is true on the result');
 };
 
 subtest 'unresolvable $ref to plain-name fragment' => sub {
   cmp_deeply(
-    $js->evaluate(1, { '$ref' => '#nowhere' })->TO_JSON,
+    (my $result = $js->evaluate(1, { '$ref' => '#nowhere' }))->TO_JSON,
     {
       valid => false,
       errors => [
@@ -832,6 +847,7 @@ subtest 'unresolvable $ref to plain-name fragment' => sub {
     },
     'properly handled a bad $ref to an anchor',
   );
+  ok($result->exception, 'exception flag is true on the result');
 };
 
 subtest 'abort due to a schema error' => sub {

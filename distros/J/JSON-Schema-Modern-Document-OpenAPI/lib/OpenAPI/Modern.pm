@@ -5,7 +5,7 @@ package OpenAPI::Modern;
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.016';
+our $VERSION = '0.018';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -22,8 +22,9 @@ use List::Util 'first';
 use Scalar::Util 'looks_like_number';
 use Feature::Compat::Try;
 use Encode 2.89;
+use URI::Escape ();
 use JSON::Schema::Modern 0.531;
-use JSON::Schema::Modern::Utilities 0.531 qw(jsonp unjsonp canonical_uri E abort);
+use JSON::Schema::Modern::Utilities 0.531 qw(jsonp unjsonp canonical_uri E abort is_equal);
 use JSON::Schema::Modern::Document::OpenAPI;
 use MooX::HandlesVia;
 use MooX::TypeTiny 0.002002;
@@ -78,7 +79,7 @@ around BUILDARGS => sub ($orig, $class, @args) {
 # at the moment, we rely on these values being provided in $options:
 # - path_template OR operationId
 # - path_captures
-sub validate_request ($self, $request, $options) {
+sub validate_request ($self, $request, $options = {}) {
   my $state = {
     data_path => '/request',
     initial_schema_uri => $self->openapi_uri,   # the canonical URI as of the start or last $id, or the last traversed $ref
@@ -87,14 +88,8 @@ sub validate_request ($self, $request, $options) {
     errors => [],
   };
 
-  croak 'missing option path_template or operation_id'
-    if not exists $options->{path_template} and not exists $options->{operation_id};
-
-  my $path_captures = $options->{path_captures};
-  croak 'missing option path_captures' if not is_plain_hashref($path_captures);
-
   try {
-    my $path_template = $self->_find_path($state, $request, $options);
+    my ($path_template, $path_captures) = $self->_find_path($state, $request, $options);
     my $path_item = $self->openapi_document->schema->{paths}{$path_template};
     my $method = lc $request->method;
     my $operation = $path_item->{$method};
@@ -118,7 +113,7 @@ sub validate_request ($self, $request, $options) {
 
         my $fc_name = $param_obj->{in} eq 'header' ? fc($param_obj->{name}) : $param_obj->{name};
 
-        abort($state, 'duplicate path parameter "%s"', $param_obj->{name})
+        abort($state, 'duplicate %s parameter "%s"', $param_obj->{in}, $param_obj->{name})
           if ($request_parameters_processed->{$param_obj->{in}}{$fc_name} // '') eq $section;
         next if exists $request_parameters_processed->{$param_obj->{in}}{$fc_name};
         $request_parameters_processed->{$param_obj->{in}}{$fc_name} = $section;
@@ -131,6 +126,13 @@ sub validate_request ($self, $request, $options) {
           : $param_obj->{in} eq 'cookie' ? $self->_validate_cookie_parameter($state, $param_obj, $request)
           : abort($state, 'unrecognized "in" value "%s"', $param_obj->{in});
       }
+    }
+
+    # 3.2 "Each template expression in the path MUST correspond to a path parameter that is included in
+    # the Path Item itself and/or in each of the Path Item’s Operations."
+    foreach my $path_name (sort keys $path_captures->%*) {
+      abort($state, 'missing path parameter specification for "%s"', $path_name)
+        if not exists $request_parameters_processed->{path}{$path_name};
     }
 
     if (my $body_obj = $operation->{requestBody}) {
@@ -166,7 +168,7 @@ sub validate_request ($self, $request, $options) {
 
 # at the moment, we rely on these values being provided in $options:
 # - path_template OR operationId
-sub validate_response ($self, $response, $options) {
+sub validate_response ($self, $response, $options = {}) {
   my $state = {
     data_path => '/response',
     initial_schema_uri => $self->openapi_uri,   # the canonical URI as of the start or last $id, or the last traversed $ref
@@ -175,11 +177,8 @@ sub validate_response ($self, $response, $options) {
     errors => [],
   };
 
-  croak 'missing option path_template or operation_id'
-    if not exists $options->{path_template} and not exists $options->{operation_id};
-
   try {
-    my $path_template = $self->_find_path($state, $response->request, $options);
+    my ($path_template, $path_captures) = $self->_find_path($state, $response->request, $options);
     my $method = lc $response->request->method;
     my $operation = $self->openapi_document->schema->{paths}{$path_template}{$method};
 
@@ -272,13 +271,55 @@ sub _find_path ($self, $state, $request, $options) {
       if lc $request->method ne $method;
   }
 
-  # TODO: alternatively, look up $path_template and $path_captures from $request->uri,
-  # OR verify that $path_template matches $request->uri
+  my $uri_path = $request->uri->path;
 
-  return $path_template;
+  if (not $path_template) {
+    my $schema = $self->openapi_document->schema;
+    croak 'servers not yet supported when matching request URIs'
+      if exists $schema->{servers} and $schema->{servers}->@*;
+
+    foreach $path_template (sort keys $schema->{paths}->%*) {
+      my $path_pattern = $path_template =~ s!\{[^/}]+\}!([^/?#]*)!gr;
+      next if $uri_path !~ m/^$path_pattern$/;
+
+      # perldoc perlvar, @-: $n coincides with "substr $_, $-[n], $+[n] - $-[n]" if "$-[n]" is defined
+      my @capture_values = map
+        Encode::decode('UTF-8', URI::Escape::uri_unescape(substr($uri_path, $-[$_], $+[$_]-$-[$_]))), 1 .. $#-;
+      my @capture_names = ($path_template =~ m!\{([^/?#}]+)\}!g);
+      my %path_captures; @path_captures{@capture_names} = map URI::Escape::uri_unescape($_), @capture_values;
+      return ($path_template, \%path_captures);
+    }
+
+    abort({ %$state, keyword => 'paths', data_path => jsonp($state->{data_path}, 'path') },
+      'no match found for URI path "%s"', $uri_path);
+  }
+
+  # note: we aren't doing anything special with escaped slashes. this bit of the spec is hazy.
+  my @capture_names = ($path_template =~ m!\{([^/}]+)\}!g);
+  abort({ %$state, keyword => 'paths', _schema_path_suffix => $path_template },
+      'provided path_captures names do not match path template "%s"', $path_template)
+    if exists $options->{path_captures}
+      and not is_equal([ sort keys $options->{path_captures}->%*], [ sort @capture_names ]);
+
+  # 3.2: "The value for these path parameters MUST NOT contain any unescaped “generic syntax”
+  # characters described by [RFC3986]: forward slashes (/), question marks (?), or hashes (#)."
+  my $path_pattern = $path_template =~ s!\{[^/}]+\}!([^/?#]*)!gr;
+  abort({ %$state, keyword => 'paths', _schema_path_suffix => $path_template },
+      'provided %s does not match request URI', exists $options->{path_template} ? 'path_template' : 'operation_id')
+    if $uri_path !~ m/^$path_pattern$/;
+
+  # perldoc perlvar, @-: $n coincides with "substr $_, $-[n], $+[n] - $-[n]" if "$-[n]" is defined
+  my @capture_values = map
+    Encode::decode('UTF-8', URI::Escape::uri_unescape(substr($uri_path, $-[$_], $+[$_]-$-[$_]))), 1 .. $#-;
+  abort({ %$state, keyword => 'paths', _schema_path_suffix => $path_template },
+      'provided path_captures values do not match request URI')
+    if exists $options->{path_captures}
+      and not is_equal([ map $_.'', $options->{path_captures}->@{@capture_names} ], \@capture_values);
+
+  my %path_captures; @path_captures{@capture_names} = @capture_values;
+  return ($path_template, \%path_captures);
 }
 
-# for now, we only use captures, rather than parsing the URI directly.
 sub _validate_path_parameter ($self, $state, $param_obj, $path_captures) {
   # 'required' is always true for path parameters
   return E({ %$state, keyword => 'required' }, 'missing path parameter: %s', $param_obj->{name})
@@ -376,15 +417,15 @@ sub _validate_body_content ($self, $state, $content_obj, $message) {
 
   if (exists $content_obj->{$media_type}{encoding}) {
     my $state = { %$state, schema_path => jsonp($state->{schema_path}, 'content', $media_type) };
-    # "The key, being the property name, MUST exist in the schema as a property."
+    # 4.8.14.1 "The key, being the property name, MUST exist in the schema as a property."
     foreach my $property (sort keys $content_obj->{$media_type}{encoding}->%*) {
       ()= E({ $state, schema_path => jsonp($state->{schema_path}, 'schema', 'properties', $property) },
           'encoding property "%s" requires a matching property definition in the schema')
         if not exists(($content_obj->{$media_type}{schema}{properties}//{})->{$property});
     }
 
-    # "The encoding object SHALL only apply to requestBody objects when the media type is multipart or
-    # application/x-www-form-urlencoded."
+    # 4.8.14.1 "The encoding object SHALL only apply to requestBody objects when the media type is
+    # multipart or application/x-www-form-urlencoded."
     return E({ %$state, keyword => 'encoding' }, 'encoding not yet supported')
       if $content_type =~ m{^multipart/} or $content_type eq 'application/x-www-form-urlencoded';
   }
@@ -502,7 +543,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI docume
 
 =head1 VERSION
 
-version 0.016
+version 0.018
 
 =head1 SYNOPSIS
 
@@ -642,15 +683,12 @@ The L<JSON::Schema::Modern> object to use for all URI resolution and JSON Schema
 
   $result = $openapi->validate_request(
     $request,
+    # optional second argument can contain any combination of:
     {
       path_template => '/foo/{arg1}/bar/{arg2}',
+      operation_id => 'my_operation_id',
       path_captures => { arg1 => 1, arg2 => 2 },
     },
-    # OR:
-    # {
-    #   operation_id => 'my_operation_id',
-    #   path_captures => { arg1 => 1, arg2 => 2 },
-    # },
   );
 
 Validates an L<HTTP::Request> object against the corresponding OpenAPI v3.1 document, returning a
@@ -674,9 +712,13 @@ C<path_captures>: a hashref mapping placeholders in the path to their actual val
 
 =back
 
-More options will be added later, providing more flexible matching of the document to the request.
-C<path_template> OR C<operation_id> is required.
-C<path_captures> is required.
+All of these values are optional, and will be derived from the request URI as needed (albeit less
+efficiently than if they were provided). All passed-in values MUST be consistent with each other and
+the request URI.
+
+Note that the L<C</servers>|https://spec.openapis.org/oas/v3.1.0#server-object> section of the
+OpenAPI document is not used for path matching at this time, for either scheme and host matching nor
+path prefixes.
 
 =head2 validate_response
 
@@ -687,18 +729,7 @@ C<path_captures> is required.
     },
   );
 
-The second argument is a hashref that contains extra information about the request. Possible values include:
-
-=over 4
-
-=item *
-
-C<path_template>: a string representing the request URI, with placeholders in braces (e.g. C</pets/{petId}>); see L<https://spec.openapis.org/oas/v3.1.0#paths-object>.
-
-=back
-
-More options will be added later, providing more flexible matching of the document to the request.
-C<path_template> OR C<operation_id> is required.
+The second argument is a hashref that contains extra information about the request, as in L</validate_request>.
 
 =head2 canonical_uri
 

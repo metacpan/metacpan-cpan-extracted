@@ -2,7 +2,7 @@
 #
 # Tests for the App::DocKnot::Update module API.
 #
-# Copyright 2020-2021 Russ Allbery <rra@cpan.org>
+# Copyright 2020-2022 Russ Allbery <rra@cpan.org>
 #
 # SPDX-License-Identifier: MIT
 
@@ -12,9 +12,7 @@ use warnings;
 
 use lib 't/lib';
 
-use File::Temp;
-use File::Spec;
-use Perl6::Slurp qw(slurp);
+use Path::Tiny qw(path);
 use Test::RRA qw(is_file_contents);
 
 use Test::More;
@@ -28,27 +26,22 @@ BEGIN { use_ok('App::DocKnot::Update') }
 
 # We have a set of test cases in the data directory.  Each of them contains
 # an old directory for the old files and a docknot.yaml file for the results.
-my $dataroot = File::Spec->catfile('t', 'data', 'update');
-opendir(my $tests, $dataroot);
-my @tests = File::Spec->no_upwards(readdir($tests));
-closedir($tests);
+my $dataroot = path('t', 'data', 'update');
+my @tests = map { $_->basename() } $dataroot->children();
 
 # For each of those cases, initialize an object, generate the updated
 # configuration, and compare it with the test output file.
-my $tempdir = File::Temp->newdir();
+my $tempdir = Path::Tiny->tempdir();
 for my $test (@tests) {
-    my $metadata_path = File::Spec->catfile($dataroot, $test, 'old');
-    my $expected_path = File::Spec->catfile($dataroot, $test, 'docknot.yaml');
-    my $output_path = File::Spec->catfile($tempdir, "$test.yaml");
+    my $metadata_path = $dataroot->child($test, 'old');
+    my $expected_path = $dataroot->child($test, 'docknot.yaml');
+    my $output_path = $tempdir->child("$test.yaml");
     my $docknot = App::DocKnot::Update->new(
-        {
-            metadata => $metadata_path,
-            output => $output_path,
-        },
+        { metadata => $metadata_path, output => $output_path },
     );
     isa_ok($docknot, 'App::DocKnot::Update', "for $test");
     $docknot->update();
-    my $got = slurp($output_path);
+    my $got = $output_path->slurp();
     is_file_contents($got, $expected_path, "output for $test");
 }
 

@@ -355,9 +355,11 @@ sub new_cpp {
   my $config_gcc_version = $Config{gccversion};
   if ($config_gcc_version =~ /\bclang\b/) {
     $self->cc('clang++');
+    $self->ld('clang++');
   }
   else {
     $self->cc('g++');
+    $self->ld('g++');
   }
   
   # NativeAPI
@@ -710,7 +712,7 @@ Get and set a linker. Default is C<ld> of L<Config> module.
   my $lib_dirs = $config->lib_dirs;
   $config->lib_dirs($lib_dirs);
 
-Get and set the directories libraries are searched for by the linker. This is same as C<-L> option of C<gcc>.
+Get and set the directories that libraries are searched for by the linker. This is same as C<-L> option of C<gcc>.
 
 B<Default:>
 
@@ -721,8 +723,6 @@ Windows
 Not Windows
 
   empty list
-
-At runtime, the "lib" directory of the native module is added before C<include_dirs>.
 
 =head2 exported_funcs
 
@@ -827,7 +827,7 @@ If you want to use the specific C version, use C<set_std> method.
 
 =head2 new_c99
   
-  my $config = SPVM::Builder::Config->new_c99;
+  my $config = SPVM::Builder::Config->new_gnu99;
 
 Create default build config with C99 settings. This is L<SPVM::Builder::Config> object.
 

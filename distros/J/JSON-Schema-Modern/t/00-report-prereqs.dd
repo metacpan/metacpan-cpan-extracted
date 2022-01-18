@@ -119,6 +119,7 @@ do { my $x = {
                                            'Dist::Zilla::Plugin::Authority' => '1.009',
                                            'Dist::Zilla::Plugin::AutoMetaResources' => '0',
                                            'Dist::Zilla::Plugin::AutoPrereqs' => '5.038',
+                                           'Dist::Zilla::Plugin::Breaks' => '0',
                                            'Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional' => '0.004',
                                            'Dist::Zilla::Plugin::CheckIssues' => '0',
                                            'Dist::Zilla::Plugin::CheckMetaResources' => '0',

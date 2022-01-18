@@ -1,3 +1,10 @@
+1.04        Tue Jan 18 20:46:04 2022
+
+* Resolve test warnings reported in GitHub issue #22
+  relating to Github's deprecation and removal of git:// protocol
+
+* Pointed various RFC links in docs to ietf.org
+
 1.02        Fri Jan  7 14:44:34 2022
 
 * wget: use --passive-ftp switch only for ftp scheme
@@ -165,7 +172,7 @@
   specific, so what a url means on one machine will
   mean something different on another.
   VMS is now treated according to RFC 1738 
-  (http://www.faqs.org/rfcs/rfc1738.html).
+  (https://datatracker.ietf.org/doc/html/rfc1738).
 
 0.13_02 Sun Nov  4 10:38:40 CET 2007
 

@@ -177,8 +177,13 @@ subtest 'load' => sub
     {
         my $page = $parser->parse_file( $f2 ) || do
         {
-            skip( "Unable to parse $f2: " . $parser->error, 3 );
+            skip( "Unable to parse $f2: " . $parser->error, 5 );
         };
+        if( !$parser->_load_class( 'LWP::UserAgent', { version => '6.49' } ) ||
+            !$parser->_load_class( 'URI', { version => '1.74' } ) )
+        {
+            skip( "LWP::UserAgent and URI are required for those tests.", 5 );
+        }
         HTML::Object::DOM->set_dom( $page );
         my $frag_source = file("./t/test_load_fragment.html");
         my $frag_uri = $frag_source->uri;

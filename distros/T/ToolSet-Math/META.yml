@@ -3,11 +3,11 @@ abstract: 'Bring in common math functions and constants.'
 author:
   - 'Gerald Lai <glai@cpan.org>'
 build_requires:
-  Test::More: '0.96'
+  Test::More: '1.001014'
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,18 +22,18 @@ no_index:
     - t
     - xt
 requires:
-  List::Util: '1.26'
-  Math::Complex: '1.39'
-  Math::Trig: '1.06'
-  POSIX: '0'
+  List::Util: '1.41'
+  Math::Complex: '1.59'
+  Math::Trig: '1.23'
+  POSIX: '1.53'
   ToolSet: '1.00'
-  perl: '5.008005'
+  perl: '5.022000'
 resources:
   bugtracker: https://github.com/geraldlai/ToolSet-Math/issues
   homepage: https://github.com/geraldlai/ToolSet-Math
   repository: https://github.com/geraldlai/ToolSet-Math.git
-version: '1.001'
-x_generated_by_perl: v5.30.3
+version: '1.002'
+x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

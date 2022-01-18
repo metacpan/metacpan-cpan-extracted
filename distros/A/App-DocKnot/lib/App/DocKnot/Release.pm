@@ -10,7 +10,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Release 6.01;
+package App::DocKnot::Release 7.00;
 
 use 5.024;
 use autodie;
@@ -20,6 +20,7 @@ use App::DocKnot::Config;
 use App::DocKnot::Spin::Versions;
 use App::DocKnot::Util qw(latest_tarball);
 use Carp qw(croak);
+use List::Util qw(min);
 use Path::Tiny qw(path);
 
 ##############################################################################
@@ -122,9 +123,16 @@ sub release {
     }
 
     # Copy the new version into place and update the symlinks.
+    my @times;
     $current_path->mkpath();
     for my $file ($tarball_ref->{files}->@*) {
-        $self->{distdir}->child($file)->copy($current_path->child($file));
+        my $source = $self->{distdir}->child($file);
+        my $dest = $current_path->child($file);
+        $source->copy($dest);
+        my ($atime, $mtime) = $source->stat()->@[8, 9];
+        push(@times, $mtime);
+        utime($atime, $mtime, $dest)
+          or die "cannot reset timestamps of $dest: $!\n";
         my $generic_name = $file;
         $generic_name =~ s{ \A (\Q$self->{tarname}\E) - [\d.]+ [.] }{$1.}xms;
         my $generic_path = $current_path->child($generic_name);
@@ -136,7 +144,7 @@ sub release {
     if ($self->{versions}) {
         my $name = $self->{version_name};
         my $version = $tarball_ref->{version};
-        my $date = $tarball_ref->{date};
+        my $date = min(@times);
         $self->{versions}->update_version($name, $version, $date);
     }
     return;

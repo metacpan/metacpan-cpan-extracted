@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>[% title | xml %]</title>
+    <link>[% base | xml %]</link>
+    <description>[% description | xml %]</description>
+    <language>[% language | xml %]</language>
+    <pubDate>[% latest | xml %]</pubDate>
+    <lastBuildDate>[% now | xml %]</lastBuildDate>
+    <generator>DocKnot [% docknot_version | xml %]</generator>[% IF url %]
+    <atom:link href="[% url | url %]" rel="self"
+               type="application/rss+xml" />[% END %]
+
+[% FOREACH entry IN entries %]    <item>
+      <title>[% entry.title | xml %]</title>
+      <link>[% entry.link | xml %]</link>
+      <description><![CDATA[
+[% entry.description %]      ]]></description>
+      <pubDate>[% entry.date | xml %]</pubDate>
+      <guid[% IF !entry.guid.match('^http') %] isPermaLink="false"[% END %]>[% entry.guid | xml %]</guid>
+    </item>
+[% END %]  </channel>
+</rss>

@@ -1,8 +1,12 @@
 package Sim::OPT::Parcoord3d;
+# Copyright (C) 2015 by Gian Luca Brunetti and Politecnico di Milano.
+# This is Sim::OPT::Parcoord3d, a program that can receive as input the data for a bi-dimensional parallel coordinate plot in cvs format to produce as output an Autolisp file that can be used from Autocad or Intellicad-based 3D CAD programs to obtain 3D parallel coordinate plots.
+# This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
 use v5.14;
+# use v5.20;
 use Exporter;
-use parent 'Exporter';
+use parent 'Exporter'; # imports and subclasses Exporter
 
 use vars qw( $VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS );
 use Math::Trig;
@@ -17,6 +21,9 @@ use File::Copy qw( move copy );
 use Set::Intersection;
 use List::Compare;
 use Data::Dumper;
+#$Data::Dumper::Indent = 0;
+#$Data::Dumper::Useqq  = 1;
+#$Data::Dumper::Terse  = 1;
 use Data::Dump qw(dump);
 use feature 'say';
 no strict;
@@ -29,538 +36,458 @@ use Sim::OPT::Report;
 use Sim::OPT::Descend;
 use Sim::OPT::Takechance;
 
-our @ISA = qw(Exporter);
 
-@EXPORT  = qw( parcoord3d );
+our @ISA = qw(Exporter); # our @adamkISA = qw(Exporter);
+#%EXPORT_TAGS = ( DEFAULT => [qw( &opt &prepare )]); # our %EXPORT_TAGS = ( 'all' => [ qw( ) ] );
+#@EXPORT_OK   = qw(); # our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
+
+@EXPORT = qw( parcoord3d ); # our @EXPORT = qw( );
 $VERSION = '0.01.5';
-$ABSTRACT =
-'Sim::OPT::Parcoord3d is a program that can process the CSV data for a bi-dimensional parallel coordinate plot and output an Autolisp file for a 3D parallel coordinate plot.';
+$ABSTRACT = 'Sim::OPT::Parcoord3d is a program that can process the CSV data for a bi-dimensional parallel coordinate plot and output an Autolisp file for a 3D parallel coordinate plot.';
 
-sub parcoord3d {
-    if ( not(@ARGV) ) {
-        $tofile = $main::tofile;
-        "\n#Now in Sim::OPT::Takechance.\n";
-        $configfile   = $main::configfile;
-        @sweeps       = @main::sweeps;
-        @sourcesweeps = @main::sourcesweeps;
-        @varnumbers   = @main::varnumbers;
-        "dump(\@varnumbers): " . dump(@varnumbers);
-        @miditers  = @main::miditers;
-        @rootnames = @main::rootnames;
-        %vals      = %main::vals;
+#########################################################################################
+# HERE FOLLOWS THE CONTENT OF "Parcoord3d.pm", Sim::OPT::Parcoord3d
+#########################################################################################
 
-        $mypath         = $main::mypath;
-        $exeonfiles     = $main::exeonfiles;
-        $generatechance = $main::generatechance;
-        $file           = $main::file;
-        $preventsim     = $main::preventsim;
-        $fileconfig     = $main::fileconfig;
-        $outfile        = $main::outfile;
-        $target         = $main::target;
+sub parcoord3d
+{
+	if ( not ( @ARGV ) )
+	{
+		$tofile = $main::tofile;
+		#$tee = new IO::Tee(\*STDOUT, ">>$tofile"); # GLOBAL ZZZ
+		say $tee "\n#Now in Sim::OPT::Takechance.\n";
+		$configfile = $main::configfile;
+		@sweeps = @main::sweeps;
+		@sourcesweeps = @main::sourcesweeps;
+		@varnumbers = @main::varnumbers; say $tee "dump(\@varnumbers): " . dump(@varnumbers);
+		@miditers = @main::miditers;
+		@rootnames = @main::rootnames;
+		%vals = %main::vals;
 
-        $convertfile          = $main::convertfile;
-        $pick                 = $main::pick;
-        $numof_pars           = $main::numof_pars;
-        $xspacing             = $main::xspacing;
-        $yspacing             = $main::yspacing;
-        $zspacing             = $main::zspacing;
-        $ob_column            = $main::ob_column;
-        $numof_layers         = $main::numof_layers;
-        $otherob_column       = $main::otherob_column;
-        $cut_column           = $main::cut_column;
-        $writefile            = $main::writefile;
-        $writefile_pretreated = $main::writefile_pretreated;
-        $transitional         = $main::transitional;
-        $newtransitional      = $main::newtransitional;
-        $lispfile             = $main::lispfile;
-        @layercolours         = @main::layercolours;
-        $offset               = $main::offset;
-        $brushspacing         = $main::brushspacing;
-    }
-    else {
-        my $file = $ARGV[0];
-        require $file;
-    }
+		$mypath = $main::mypath;
+		$exeonfiles = $main::exeonfiles;
+		$generatechance = $main::generatechance;
+		$file = $main::file;
+		$preventsim = $main::preventsim;
+		$fileconfig = $main::fileconfig;
+		$outfile = $main::outfile;
+		$target = $main::target;
 
-    my $scale_xspacing = ( $numof_pars / $xspacing );
+		$convertfile = $main::convertfile;
+		$pick = $main::pick;
+		$numof_pars = $main::numof_pars;
+		$xspacing = $main::xspacing;
+		$yspacing = $main::yspacing;
+		$zspacing = $main::zspacing;
+		$ob_column = $main::ob_column;
+		$numof_layers = $main::numof_layers;
+		$otherob_column = $main::otherob_column;
+		$cut_column = $main::cut_column;
+		$writefile = $main::writefile;
+		$writefile_pretreated = $main::writefile_pretreated;
+		$transitional = $main::transitional;
+		$newtransitional = $main::newtransitional;
+		$lispfile = $main::lispfile;
+		@layercolours = @main::layercolours;
+		$offset = $main::offset;
+		$brushspacing = $main::brushspacing;
+	}
+	else
+	{
+		my $file = $ARGV[0];
+		require $file;
+	}
 
-    open( CONVERTFILE, $convertfile ) or die;
-    my @lines = <CONVERTFILE>;
-    close CONVERTFILE;
+	my $scale_xspacing = ( $numof_pars / $xspacing );
 
-    if ($pick) {
-        $convertedfile = "$convertfile" . "filtered.csv";
-        open( CONVERTEDFILE, ">$convertedfile" ) or die;
-        my $countline = 0;
-        while ( $countline < $pick ) {
-            print CONVERTEDFILE "$lines[$countline]";
-            $countline++;
-        }
+	open ( CONVERTFILE, $convertfile ) or die;
+	my @lines = <CONVERTFILE>;
+	close CONVERTFILE;
 
-        $countline = ( $#lines - $pick );
-        while ( $countline < $#lines ) {
-            print CONVERTEDFILE "$lines[$countline]";
-            $countline++;
-        }
-        close CONVERTEDFILE;
+	if ($pick)
+	{
+		$convertedfile = "$convertfile" . "filtered.csv";
+		open ( CONVERTEDFILE, ">$convertedfile" ) or die;
+		my $countline = 0;
+		while ( $countline < $pick )
+		{
+			print CONVERTEDFILE "$lines[$countline]";
+			$countline++;
+		}
 
-        open( CONVERTEDFILE, "$convertedfile" );
-        @lines = <CONVERTEDFILE>;
-        close CONVERTEDFILE;
-    }
+		$countline = ($#lines - $pick) ;
+		while ( $countline  < $#lines )
+		{
+			print CONVERTEDFILE "$lines[$countline]";
+			$countline++;
+		}
+		close CONVERTEDFILE;
 
-    my $numof_layerelts = ( scalar(@lines) / $numof_layers );
+		open ( CONVERTEDFILE, "$convertedfile" );
+		@lines = <CONVERTEDFILE>;
+		close CONVERTEDFILE;
+	}
 
-    my @newdata;
+	my $numof_layerelts = ( scalar(@lines) / $numof_layers ); # scalar(@lines = num of trials
 
-    sub makedata {
-        my $swap  = shift;
-        my @lines = @$swap;
+	my @newdata;
+	sub makedata
+	{
+		my $swap = shift; my @lines = @$swap;
 
-        my $countline = 0;
-        foreach my $line (@lines) {
-            my @linedata;
-            chomp($line);
-            my @rowelts = split( /,/, $line );
-            my $ob_fun;
-            if ($ob_column) {
-                $ob_fun = $rowelts[$ob_column];
-            }
-            else {
-                $ob_fun = $rowelts[$#rowelts];
-            }
+		my $countline = 0;
+		foreach my $line (@lines)
+		{
+			my @linedata;
+			chomp($line);
+			my @rowelts = split(/,/ , $line);
+			my $ob_fun;
+			if ($ob_column)
+			{
+				$ob_fun = $rowelts[$ob_column];
+			}
+			else
+			{
+				$ob_fun = $rowelts[$#rowelts];
+			}
 
-            my $otherob_fun = $rowelts[$otherob_column];
-            if ( $otherob_fun =~ /-/ ) {
-                my @thesedata = split( /-/, $otherob_fun );
-                $otherob_fun = $thesedata[1];
-            }
+			my $otherob_fun = $rowelts[$otherob_column];
+			if ( $otherob_fun =~ /-/ )
+			{
+				my @thesedata = split( /-/ , $otherob_fun );
+				$otherob_fun = $thesedata[1];
+			}
 
-            my $countvar = 0;
-            foreach my $rowelt (@rowelts) {
-                if ( $countvar < $numof_pars ) {
-                    if ( $rowelt =~ /-/ ) {
-                        my @vardata = split( /-/, $rowelt );
+			my $countvar = 0;
+			foreach my $rowelt (@rowelts)
+			{
+				if ( $countvar < $numof_pars )
+				{
+					if ( $rowelt =~ /-/ )
+					{
+						my @vardata = split( /-/ , $rowelt );
 
-                        push( @linedata, [@vardata] );
-                    }
-                    else {
-                        push( @linedata, [ $countvar, $rowelt ] );
-                    }
-                    $countvar++;
-                }
-            }
-            push( @newdata, [ @linedata, $otherob_fun, $ob_fun ] );
-            $countline++;
-        }
-    }
-    makedata( \@lines );
+						push ( @linedata, [ @vardata ] );
+					}
+					else
+					{
+						push ( @linedata, [ $countvar, $rowelt ] );
+					}
+					$countvar++;
+				}
+			}
+			push ( @newdata, [ @linedata, $otherob_fun, $ob_fun ] );
+			$countline++;
+		}
+	}
+	makedata(\@lines);
 
-    my (
-        @pars,          @obfun,         @otherobfun,
-        $maxobfun,      $minobfun,      @maxpars,
-        @minpars,       $othermaxobfun, $otherminobfun,
-        $countmaxobfun, $countminobfun, $countmaxotherobfun,
-        $countminotherobfun
-    );
+	my ( @pars, @obfun, @otherobfun, $maxobfun, $minobfun, @maxpars, @minpars, $othermaxobfun, $otherminobfun, $countmaxobfun, $countminobfun, $countmaxotherobfun, $countminotherobfun ) ;
+	sub makestats
+	{
+		my $swap = shift; my @newdata = @$swap;
+		foreach my $line (@newdata)
+		{
+			chomp($line);
+			my @elts = @{$line};
 
-    sub makestats {
-        my $swap    = shift;
-        my @newdata = @$swap;
-        foreach my $line (@newdata) {
-            chomp($line);
-            my @elts = @{$line};
+			my $elm1 = pop(@elts);
+			push ( @obfun, $elm1 );
+			my $elm2 = pop(@elts);
+			push ( @otherobfun, $elm2 );
 
-            my $elm1 = pop(@elts);
-            push( @obfun, $elm1 );
-            my $elm2 = pop(@elts);
-            push( @otherobfun, $elm2 );
+			my $count = 0;
+			foreach my $elt (@elts)
+			{
+				my @pair = @{$elt};
+				my $value = $pair[1];
+				push ( @{$pars[$count]}, $value );
+				$count++;
+			}
+		}
 
-            my $count = 0;
-            foreach my $elt (@elts) {
-                my @pair  = @{$elt};
-                my $value = $pair[1];
-                push( @{ $pars[$count] }, $value );
-                $count++;
-            }
-        }
+		$maxobfun = max(@obfun);
+		$minobfun = min(@obfun);
+		$maxotherobfun = max(@otherobfun);
+		$minotherobfun = min(@otherobfun);
 
-        $maxobfun      = max(@obfun);
-        $minobfun      = min(@obfun);
-        $maxotherobfun = max(@otherobfun);
-        $minotherobfun = min(@otherobfun);
+		$countel = 0;
+		foreach my $e (@obfun)
+		{
+			if ($e eq $maxobfun )
+			{
+				$countmaxobfun = $countel;
+			}
+			if ($e eq $minobfun )
+			{
+				$countminobfun = $countel;
+			}
+			$countel++;
+		}
 
-        $countel = 0;
-        foreach my $e (@obfun) {
-            if ( $e eq $maxobfun ) {
-                $countmaxobfun = $countel;
-            }
-            if ( $e eq $minobfun ) {
-                $countminobfun = $countel;
-            }
-            $countel++;
-        }
+		my $countel2 = 0;
+		foreach my $e (@otherobfun)
+		{
+			if ($e eq $maxotherobfun )
+			{
+				$countmaxotherobfun = $countel2;
+			}
+			if ($e eq $minotherobfun )
+			{
+				$countminotherobfun = $countel2;
+			}
+			$countel2++;
+		}
 
-        my $countel2 = 0;
-        foreach my $e (@otherobfun) {
-            if ( $e eq $maxotherobfun ) {
-                $countmaxotherobfun = $countel2;
-            }
-            if ( $e eq $minotherobfun ) {
-                $countminotherobfun = $countel2;
-            }
-            $countel2++;
-        }
+		sub printpar
+		{
+			foreach my $par (@pars)
+			{
+				print WRITEFILE "PAR: @$par \n";
+			}
+		}
+	}
+	makestats(\@newdata);
 
-        sub printpar {
-            foreach my $par (@pars) {
-                print WRITEFILE "PAR: @$par \n";
-            }
-        }
-    }
-    makestats( \@newdata );
+	sub writeminmaxpars
+	{
+		my $swap = shift; my @pars = @$swap;
+		my $countpar = 0;
+		foreach my $par (@pars)
+		{
+			my @elts = @$par;
+			push ( @maxpars, max(@elts) );
+			push ( @minpars, min(@elts) );
+			$countpar++;
+		}
+	}
+	writeminmaxpars(\@pars);
 
-    sub writeminmaxpars {
-        my $swap     = shift;
-        my @pars     = @$swap;
-        my $countpar = 0;
-        foreach my $par (@pars) {
-            my @elts = @$par;
-            push( @maxpars, max(@elts) );
-            push( @minpars, min(@elts) );
-            $countpar++;
-        }
-    }
-    writeminmaxpars( \@pars );
+	my ( @plotdata, @newplotdata, @newnewdata );
+	sub plotdata
+	{
+		my $case_per_layer = ( scalar(@newdata) / $numof_layers );
+		$countcase = 0;
+		foreach my $el ( @{$pars[0]} )
+		{
+			my @provbowl;
+			my $scaled_zvalue = ( ( $newdata[$countcase][($#{$newdata[$countcase]}-1)] - $minotherobfun ) / ( $maxotherobfun - $minotherobfun ) );
+			my $countvar = 0;
+			while ($countvar < $numof_pars)
+			{
+				my $layer_num = ( int( $countcase / $case_per_layer ) + 1) ;
+				my $scaled_xvalue = ( $countvar / $scale_xspacing );
+				my $scaled_yvalue = ( ( $pars[$countvar][$countcase] - $minpars[$countvar] ) / ( $maxpars[$countvar] - $minpars[$countvar] ) );
+				$scaled_yvalue = ($scaled_yvalue * $yspacing);
+				$scaled_zvalue = ($scaled_zvalue * $zspacing);
+				if ($otherob_column)
+				{
+					push (@provbowl, [ $scaled_xvalue, $scaled_yvalue, $scaled_zvalue, $layer_num ] );
+				}
+				else
+				{
+					push (@provbowl, [ $scaled_xvalue, $scaled_yvalue, 0, $layer_num ] );
+				}
+				$countvar++;
+			}
+			push (@plotdata, [ @provbowl ]);
+			$countcase++;
+		}
+	}
+	plotdata;
 
-    my ( @plotdata, @newplotdata, @newnewdata );
+	sub cutcoordinates
+	{
+		foreach (@plotdata)
+		{
+			splice( @{$_}, $cut_column, 1);
+		}
+	}
+	if ($cut_column)
+	{
+		cutcoordinates; # CUTS SPECIFIED COORDINATES
+	}
 
-    sub plotdata {
-        my $case_per_layer = ( scalar(@newdata) / $numof_layers );
-        $countcase = 0;
-        foreach my $el ( @{ $pars[0] } ) {
-            my @provbowl;
-            my $scaled_zvalue = (
-                (
-                    $newdata[$countcase][ ( $#{ $newdata[$countcase] } - 1 ) ]
-                      - $minotherobfun
-                ) / ( $maxotherobfun - $minotherobfun )
-            );
-            my $countvar = 0;
-            while ( $countvar < $numof_pars ) {
-                my $layer_num     = ( int( $countcase / $case_per_layer ) + 1 );
-                my $scaled_xvalue = ( $countvar / $scale_xspacing );
-                my $scaled_yvalue =
-                  ( ( $pars[$countvar][$countcase] - $minpars[$countvar] ) /
-                      ( $maxpars[$countvar] - $minpars[$countvar] ) );
-                $scaled_yvalue = ( $scaled_yvalue * $yspacing );
-                $scaled_zvalue = ( $scaled_zvalue * $zspacing );
-                if ($otherob_column) {
-                    push(
-                        @provbowl,
-                        [
-                            $scaled_xvalue, $scaled_yvalue,
-                            $scaled_zvalue, $layer_num
-                        ]
-                    );
-                }
-                else {
-                    push( @provbowl,
-                        [ $scaled_xvalue, $scaled_yvalue, 0, $layer_num ] );
-                }
-                $countvar++;
-            }
-            push( @plotdata, [@provbowl] );
-            $countcase++;
-        }
-    }
-    plotdata;
+	sub printplotdata_pretreated
+	{
+		open ( WRITEFILE_PRETREATED, ">$writefile_pretreated") or die;
+		print WRITEFILE_PRETREATED dump(@plotdata); #CONTROL!!!
+		close WRITEFILE_PREATREATED;
+	}
+	printplotdata_pretreated;
 
-    sub cutcoordinates {
-        foreach (@plotdata) {
-            splice( @{$_}, $cut_column, 1 );
-        }
-    }
-    if ($cut_column) {
-        cutcoordinates;
-    }
+	sub solidify
+	{print "BEGUN\n";
+		my $swap = shift; my @plotdata = @$swap;
+		open ( WRITEFILE, ">$writefile") or die;
+		my $countgroup = 0;
+		foreach my $e (@plotdata)
+		{
+			my @elts = @{$e};
+			my @newnewbag;
+			my $counter = 0;
+			foreach my $elm (@elts)
+			{
+				my @elms = @{$elm};
+				my @cutelms = @elms[0..2]; # PUT ..2 IF ALSO THE THIRD AXIS HAS TO BE CHECKED FOR NON-REPETITIONS, PUT 1 OTHERWISE.
+				my $counthit = -1;
+				foreach my $el (@plotdata)
+				{
+					my @els = @{$el};
+					foreach my $elem (@els)
+					{
+						my @elems = @{$elem};
+						my @cutelems = @elems[0..2]; # PUT ..2 IF ALSO THE THIRD AXIS HAS TO BE CHECKED FOR NON-REPETITIONS, PUT 1 OTHERWISE.
+						if (@cutelms ~~ @cutelems)
+						{
 
-    sub printplotdata_pretreated {
-        open( WRITEFILE_PRETREATED, ">$writefile_pretreated" ) or die;
-        print WRITEFILE_PRETREATED dump(@plotdata);
-        close WRITEFILE_PREATREATED;
-    }
-    printplotdata_pretreated;
+							$counthit++;
+							print "COUNTGROUP: $countgroup, HIT! $counthit\n";
 
-    sub solidify {
-        print "BEGUN\n";
-        my $swap     = shift;
-        my @plotdata = @$swap;
-        open( WRITEFILE, ">$writefile" ) or die;
-        my $countgroup = 0;
-        foreach my $e (@plotdata) {
-            my @elts = @{$e};
-            my @newnewbag;
-            my $counter = 0;
-            foreach my $elm (@elts) {
-                my @elms     = @{$elm};
-                my @cutelms  = @elms[ 0 .. 2 ];
-                my $counthit = -1;
-                foreach my $el (@plotdata) {
-                    my @els = @{$el};
-                    foreach my $elem (@els) {
-                        my @elems    = @{$elem};
-                        my @cutelems = @elems[ 0 .. 2 ];
-                        if ( @cutelms ~~ @cutelems ) {
+							if ($counthit > 0)
+							{
+								print "COUNTHITNOW: $counthit\n";
+								if ( $counthit % 2 == 1) # odd
+								{
+									$elms[0] = ( $elms[0] - ( $brushspacing * $counthit ) );
+								}
+								else
+								{
+									$elms[0] = ( $elms[0] + ( $brushspacing * $counthit ) );
+								}
+								push ( @newnewbag, [ nlowmult($round, $elms[0]), nlowmult($round, $elms[1]), nlowmult($round, $elms[2]), nlowmult($round, $elms[3]) ]);
+							}
+							else
+							{
+								push(@newnewbag, [ nlowmult($round, $elms[0]), nlowmult($round, $elms[1]), nlowmult($round, $elms[2]), nlowmult($round, $elms[3]) ]);
+							}
+						}
+					}
+				}
 
-                            $counthit++;
-                            print "COUNTGROUP: $countgroup, HIT! $counthit\n";
+				$counter++
+			}
+			push( @newplotdata, [ @newnewbag ] );
+			$countgroup++;
+		}
+		print WRITEFILE dump(@newplotdata);
+		close WRITEFILE;
+	}
+	solidify(\@plotdata);
 
-                            if ( $counthit > 0 ) {
-                                print "COUNTHITNOW: $counthit\n";
-                                if ( $counthit % 2 == 1 ) {
-                                    $elms[0] =
-                                      ( $elms[0] -
-                                          ( $brushspacing * $counthit ) );
-                                }
-                                else {
-                                    $elms[0] =
-                                      ( $elms[0] +
-                                          ( $brushspacing * $counthit ) );
-                                }
-                                push(
-                                    @newnewbag,
-                                    [
-                                        nlowmult( $round, $elms[0] ),
-                                        nlowmult( $round, $elms[1] ),
-                                        nlowmult( $round, $elms[2] ),
-                                        nlowmult( $round, $elms[3] )
-                                    ]
-                                );
-                            }
-                            else {
-                                push(
-                                    @newnewbag,
-                                    [
-                                        nlowmult( $round, $elms[0] ),
-                                        nlowmult( $round, $elms[1] ),
-                                        nlowmult( $round, $elms[2] ),
-                                        nlowmult( $round, $elms[3] )
-                                    ]
-                                );
-                            }
-                        }
-                    }
-                }
 
-                $counter++;
-            }
-            push( @newplotdata, [@newnewbag] );
-            $countgroup++;
-        }
-        print WRITEFILE dump(@newplotdata);
-        close WRITEFILE;
-    }
-    solidify( \@plotdata );
+	#my @plotdata = eval `cat $writefile`;
 
-    sub prepare {
-        open( TRANSITIONAL, ">$transitional" ) or die;
-        my $countgroup = 0;
-        foreach my $group (@newplotdata) {
-            my @elts     = @{$group};
-            my $countpar = 0;
-            my (
-                @newplotdatabottom, @newplotdatafront, @newplotdataback,
-                @newplotdataright,  @newplotdataleft
-            );
-            foreach my $elt (@elts) {
-                my @coords     = @{$elt};
-                my @nextcoords = @{ $elts[ $countpar + 1 ] };
+	sub prepare
+	{
+		open( TRANSITIONAL, ">$transitional" ) or die;
+		my $countgroup = 0;
+		foreach my $group (@newplotdata)
+		{
+			my @elts = @{$group};
+			my $countpar = 0;
+			my ( @newplotdatabottom, @newplotdatafront, @newplotdataback, @newplotdataright, @newplotdataleft );
+			foreach my $elt (@elts)
+			{
+				my @coords = @{$elt};
+				my @nextcoords = @{$elts[$countpar+1]};
 
-                my @newcoords;
-                push( @newcoords, [@coords] );
-                push(
-                    @newcoords,
-                    [
-                        ( $coords[0] - ( $yspacing * $offset ) ),
-                        $coords[1], $coords[2], $coords[3]
-                    ]
-                );
-                push(
-                    @newcoords,
-                    [
-                        ( $coords[0] - ( $yspacing * $offset ) ), $coords[1],
-                        ( $coords[2] - ( $yspacing * $offset ) ), $coords[3]
-                    ]
-                );
-                push(
-                    @newcoords,
-                    [
-                        $coords[0], $coords[1],
-                        ( $coords[2] - ( $yspacing * $offset ) ), $coords[3]
-                    ]
-                );
-                push( @newplotdatabottom, [@newcoords] );
 
-                my @newcoords;
-                unless ( $countpar == $#elts ) {
-                    push( @newcoords, [@coords] );
-                    push(
-                        @newcoords,
-                        [
-                            ( $coords[0] - ( $yspacing * $offset ) ),
-                            $coords[1], $coords[2], $coords[3]
-                        ]
-                    );
-                    push(
-                        @newcoords,
-                        [
-                            ( $nextcoords[0] - ( $yspacing * $offset ) ),
-                            $nextcoords[1], $nextcoords[2], $nextcoords[3]
-                        ]
-                    );
-                    push( @newcoords,        [@nextcoords] );
-                    push( @newplotdatafront, [@newcoords] );
-                }
+				my @newcoords;
+				push( @newcoords, [ @coords ] );
+				push( @newcoords, [ ($coords[0] - ($yspacing * $offset ) ) , $coords[1] , $coords[2], $coords[3] ] );
+				push( @newcoords, [ ($coords[0] - ($yspacing * $offset ) ) , $coords[1] , ( $coords[2] - ($yspacing * $offset ) ) , $coords[3] ] );
+				push( @newcoords, [ $coords[0], $coords[1] , ( $coords[2] - ($yspacing * $offset ) ) , $coords[3] ] );
+				push( @newplotdatabottom, [ @newcoords ] );
 
-                my @newcoords;
-                unless ( $countpar == $#elts ) {
-                    push(
-                        @newcoords,
-                        [
-                            ( $coords[0] - ( $yspacing * $offset ) ),
-                            $coords[1], $coords[2], $coords[3]
-                        ]
-                    );
-                    push(
-                        @newcoords,
-                        [
-                            ( $coords[0] - ( $yspacing * $offset ) ),
-                            $coords[1],
-                            ( $coords[2] - ( $yspacing * $offset ) ),
-                            $coords[3]
-                        ]
-                    );
-                    push(
-                        @newcoords,
-                        [
-                            ( $nextcoords[0] - ( $yspacing * $offset ) ),
-                            $nextcoords[1],
-                            ( $nextcoords[2] - ( $yspacing * $offset ) ),
-                            $nextcoords[3]
-                        ]
-                    );
-                    push(
-                        @newcoords,
-                        [
-                            ( $nextcoords[0] - ( $yspacing * $offset ) ),
-                            $nextcoords[1], $nextcoords[2], $nextcoords[3]
-                        ]
-                    );
-                    push( @newplotdataleft, [@newcoords] );
-                }
 
-                my @newcoords;
-                unless ( $countpar == $#elts ) {
-                    push(
-                        @newcoords,
-                        [
-                            ( $coords[0] - ( $yspacing * $offset ) ),
-                            $coords[1],
-                            ( $coords[2] - ( $yspacing * $offset ) ),
-                            $coords[3]
-                        ]
-                    );
-                    push(
-                        @newcoords,
-                        [
-                            $coords[0], $coords[1],
-                            ( $coords[2] - ( $yspacing * $offset ) ),
-                            $coords[3]
-                        ]
-                    );
-                    push(
-                        @newcoords,
-                        [
-                            $nextcoords[0], $nextcoords[1],
-                            ( $nextcoords[2] - ( $yspacing * $offset ) ),
-                            $nextcoords[3]
-                        ]
-                    );
-                    push(
-                        @newcoords,
-                        [
-                            ( $nextcoords[0] - ( $yspacing * $offset ) ),
-                            $nextcoords[1],
-                            ( $nextcoords[2] - ( $yspacing * $offset ) ),
-                            $nextcoords[3]
-                        ]
-                    );
-                    push( @newplotdataback, [@newcoords] );
-                }
+				my @newcoords;
+				unless ($countpar == $#elts)
+				{
+					push( @newcoords, [ @coords ] );
+					push( @newcoords, [ ($coords[0] - ($yspacing * $offset ) ) , $coords[1] , $coords[2], $coords[3] ] );
+					push( @newcoords, [ ($nextcoords[0] - ($yspacing * $offset ) ) , $nextcoords[1] , $nextcoords[2], $nextcoords[3] ] );
+					push( @newcoords, [ @nextcoords] );
+					push( @newplotdatafront, [ @newcoords ] );
+				}
 
-                my @newcoords;
-                unless ( $countpar == $#elts ) {
-                    push(
-                        @newcoords,
-                        [
-                            $coords[0], $coords[1],
-                            ( $coords[2] - ( $yspacing * $offset ) ),
-                            $coords[3]
-                        ]
-                    );
-                    push( @newcoords, [@coords] );
-                    push( @newcoords, [@nextcoords] );
-                    push(
-                        @newcoords,
-                        [
-                            $nextcoords[0], $nextcoords[1],
-                            ( $nextcoords[2] - ( $yspacing * $offset ) ),
-                            $nextcoords[3]
-                        ]
-                    );
-                    push( @newplotdataright, [@newcoords] );
-                }
 
-                $countpar++;
-            }
+				my @newcoords;
+				unless ($countpar == $#elts)
+				{
+					push( @newcoords, [ ($coords[0] - ($yspacing * $offset ) ) , $coords[1] , $coords[2], $coords[3] ] );
+					push( @newcoords, [ ($coords[0] - ($yspacing * $offset ) ) , $coords[1] , ( $coords[2] - ($yspacing * $offset ) ) , $coords[3] ] );
+					push( @newcoords, [ ($nextcoords[0] - ($yspacing * $offset ) ) , $nextcoords[1] , ( $nextcoords[2] - ($yspacing * $offset ) ) , $nextcoords[3] ] );
+					push( @newcoords, [ ($nextcoords[0] - ($yspacing * $offset ) ) , $nextcoords[1] , $nextcoords[2], $nextcoords[3] ] );
+					push( @newplotdataleft, [ @newcoords ] );
+				}
 
-            if (@newplotdatafront) {
-                push( @newnewdata,
-                    @newplotdatabottom, @newplotdatafront, @newplotdataleft,
-                    @newplotdataback,   @newplotdataright );
-            }
-            else {
-                push( @newnewdata, @newplotdatabottom );
-            }
 
-            $countgroup++;
-        }
-        print TRANSITIONAL dump(@newnewdata);
-        close TRANSITIONAL;
-    }
-    prepare;
+				my @newcoords;
+				unless ($countpar == $#elts)
+				{
+					push( @newcoords, [ ($coords[0] - ($yspacing * $offset ) ) , $coords[1] , ( $coords[2] - ($yspacing * $offset ) ) , $coords[3] ] );
+					push( @newcoords, [ $coords[0], $coords[1] , ( $coords[2] - ($yspacing * $offset ) ) , $coords[3] ] );
+					push( @newcoords, [ $nextcoords[0], $nextcoords[1] , ( $nextcoords[2] - ($yspacing * $offset ) ) , $nextcoords[3] ] );
+					push( @newcoords, [ ($nextcoords[0] - ($yspacing * $offset ) ) , $nextcoords[1] , ( $nextcoords[2] - ($yspacing * $offset ) ) , $nextcoords[3] ] );
+					push( @newplotdataback, [ @newcoords ] );
+				}
 
-    sub writelisp {
-        open( LISPFILE, ">$lispfile" );
-        my $counter = 1;
-        foreach my $colour (@layercolours) {
-            print LISPFILE
-"\( command \"layer\" \"m\" \"$counter\" \"c\" \"$colour\" \"\" \"\" \)\n";
-            $counter++;
-        }
-        foreach my $series (@newnewdata) {
-            my @vs = @{$series};
-            print LISPFILE "\( command \"layer\" \"s\" \"$vs[0][3]\" \"\" \)\n";
-            print LISPFILE
-"\( command \"3dface\" \"$vs[0][0],$vs[0][2],$vs[0][1]\" \"$vs[1][0],$vs[1][2],$vs[1][1]\" \"$vs[2][0],$vs[2][2],$vs[2][1]\" \"$vs[3][0],$vs[3][2],$vs[3][1]\" \"\" \)\n";
-        }
-        close LISPFILE;
-    }
-    writelisp;
+
+				my @newcoords;
+				unless ($countpar == $#elts)
+				{
+					push( @newcoords, [ $coords[0], $coords[1] , ( $coords[2] - ($yspacing * $offset ) ) , $coords[3] ] );
+					push( @newcoords, [ @coords ] );
+					push( @newcoords, [ @nextcoords ] );
+					push( @newcoords, [ $nextcoords[0], $nextcoords[1] , ( $nextcoords[2] - ($yspacing * $offset ) ) , $nextcoords[3] ] );
+					push( @newplotdataright, [ @newcoords ] );
+				}
+
+
+				$countpar++;
+			}
+
+			if (@newplotdatafront)
+			{
+				push(@newnewdata, @newplotdatabottom , @newplotdatafront,  @newplotdataleft, @newplotdataback, @newplotdataright );
+			}
+			else
+			{
+				push(@newnewdata, @newplotdatabottom );
+			}
+
+
+			$countgroup++;
+		}
+		print TRANSITIONAL dump(@newnewdata);
+		close TRANSITIONAL;
+	}
+	prepare;
+
+
+	sub writelisp
+	{
+		open( LISPFILE, ">$lispfile");
+		my $counter = 1;
+		foreach my $colour (@layercolours)
+		{
+			print LISPFILE "\( command \"layer\" \"m\" \"$counter\" \"c\" \"$colour\" \"\" \"\" \)\n";
+			$counter++;
+		}
+		foreach my $series (@newnewdata)
+		{
+			my @vs = @{$series};
+			print LISPFILE "\( command \"layer\" \"s\" \"$vs[0][3]\" \"\" \)\n";
+			print LISPFILE "\( command \"3dface\" \"$vs[0][0],$vs[0][2],$vs[0][1]\" \"$vs[1][0],$vs[1][2],$vs[1][1]\" \"$vs[2][0],$vs[2][2],$vs[2][1]\" \"$vs[3][0],$vs[3][2],$vs[3][1]\" \"\" \)\n";
+		}
+		close LISPFILE;
+	}
+	writelisp;
 }
 
 1;
+
 
 __END__
 

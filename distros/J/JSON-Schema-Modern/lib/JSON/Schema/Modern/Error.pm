@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Error;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains a single error from a JSON Schema evaluation
 
-our $VERSION = '0.539';
+our $VERSION = '0.541';
 
 use 5.020;
 use Moo;
@@ -15,6 +15,7 @@ no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use Safe::Isa;
+use JSON::PP ();
 use MooX::TypeTiny;
 use Types::Standard qw(Str Undef InstanceOf);
 use namespace::clean;
@@ -42,6 +43,12 @@ has keyword => (
   is => 'ro',
   isa => Str|Undef,
   required => 1,
+);
+
+has exception => (
+  is => 'rw',
+  isa => InstanceOf['JSON::PP::Boolean'],
+  coerce => sub { $_[0] ? JSON::PP::true : JSON::PP::false },
 );
 
 sub TO_JSON ($self) {
@@ -75,7 +82,7 @@ JSON::Schema::Modern::Error - Contains a single error from a JSON Schema evaluat
 
 =head1 VERSION
 
-version 0.539
+version 0.541
 
 =head1 SYNOPSIS
 
@@ -137,14 +144,14 @@ if the distinction is important to you.)
 
 =for stopwords OpenAPI
 
-You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI Slack
-server|https://open-api.slack.com>, which are also great resources for finding help.
-
 =head1 SUPPORT
 
 Bugs may be submitted through L<https://github.com/karenetheridge/JSON-Schema-Modern/issues>.
 
 I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
+
+You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI Slack
+server|https://open-api.slack.com>, which are also great resources for finding help.
 
 =head1 AUTHOR
 

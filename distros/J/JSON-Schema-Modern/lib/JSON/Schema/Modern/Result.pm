@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Result;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains the result of a JSON Schema evaluation
 
-our $VERSION = '0.539';
+our $VERSION = '0.541';
 
 use 5.020;
 use Moo;
@@ -20,7 +20,7 @@ use MooX::HandlesVia;
 use JSON::Schema::Modern::Annotation;
 use JSON::Schema::Modern::Error;
 use JSON::PP ();
-use List::Util 1.50 'head';
+use List::Util 1.50 qw(head any);
 use Scalar::Util 'refaddr';
 use Safe::Isa;
 use namespace::clean;
@@ -38,6 +38,14 @@ has valid => (
   coerce => sub { $_[0] ? JSON::PP::true : JSON::PP::false },
 );
 sub result { goto \&valid } # backcompat only
+
+has exception => (
+  is => 'rw',
+  isa => InstanceOf['JSON::PP::Boolean'],
+  coerce => sub { $_[0] ? JSON::PP::true : JSON::PP::false },
+  lazy => 1,
+  default => sub { any { $_->exception } $_[0]->errors },
+);
 
 has $_.'s' => (
   is => 'bare',
@@ -193,7 +201,7 @@ JSON::Schema::Modern::Result - Contains the result of a JSON Schema evaluation
 
 =head1 VERSION
 
-version 0.539
+version 0.541
 
 =head1 SYNOPSIS
 
@@ -306,14 +314,14 @@ See C<&> at L</OVERLOADS>.
 
 =for stopwords OpenAPI
 
-You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI Slack
-server|https://open-api.slack.com>, which are also great resources for finding help.
-
 =head1 SUPPORT
 
 Bugs may be submitted through L<https://github.com/karenetheridge/JSON-Schema-Modern/issues>.
 
 I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
+
+You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI Slack
+server|https://open-api.slack.com>, which are also great resources for finding help.
 
 =head1 AUTHOR
 

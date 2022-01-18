@@ -23,25 +23,25 @@ name: PGXN-Site
 provides:
   PGXN::Site:
     file: lib/PGXN/Site.pm
-    version: v0.22.0
+    version: v0.22.1
   PGXN::Site::Controller:
     file: lib/PGXN/Site/Controller.pm
-    version: v0.22.0
+    version: v0.22.1
   PGXN::Site::Locale:
     file: lib/PGXN/Site/Locale.pm
-    version: v0.22.0
+    version: v0.22.1
   PGXN::Site::Locale::en:
     file: lib/PGXN/Site/Locale/en.pm
-    version: v0.22.0
+    version: v0.22.1
   PGXN::Site::Locale::fr:
     file: lib/PGXN/Site/Locale/fr.pm
-    version: v0.22.0
+    version: v0.22.1
   PGXN::Site::Router:
     file: lib/PGXN/Site/Router.pm
-    version: v0.22.0
+    version: v0.22.1
   PGXN::Site::Templates:
     file: lib/PGXN/Site/Templates.pm
-    version: v0.22.0
+    version: v0.22.1
 requires:
   Carp: '0'
   Data::Dump: '1.17'
@@ -73,5 +73,5 @@ resources:
   bugtracker: https://github.com/pgxn/pgxn-site/issues/
   homepage: https://www.pgxn.org/
   repository: https://github.com/pgxn/pgxn-site/
-version: v0.22.0
+version: v0.22.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

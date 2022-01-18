@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::FormatAssertion;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Format-Assertion vocabulary
 
-our $VERSION = '0.539';
+our $VERSION = '0.541';
 
 use 5.020;
 use Moo;
@@ -14,7 +14,7 @@ use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
-use JSON::Schema::Modern::Utilities qw(is_type E A assert_keyword_type);
+use JSON::Schema::Modern::Utilities qw(is_type E A assert_keyword_type abort);
 use Feature::Compat::Try;
 use namespace::clean;
 
@@ -131,8 +131,6 @@ sub keywords {
       eval { qr/$_[0]/; 1 ? 1 : 0 };
     },
 
-    # TODO: if the metaschema's $vocabulary entry is true, then we must die on
-    # encountering these unimplemented formats.
     'iri-reference' => sub { 1 },
     'uri-template' => sub { 1 },
   };
@@ -148,7 +146,7 @@ sub _traverse_keyword_format ($self, $schema, $state) {
 }
 
 sub _eval_keyword_format ($self, $data, $schema, $state) {
-  return E($state, 'unimplemented format "%s"', $schema->{format})
+  abort($state, 'unimplemented format "%s"', $schema->{format})
     if $schema->{format} eq 'iri-reference' or $schema->{format} eq 'uri-template';
 
   try {
@@ -199,7 +197,7 @@ JSON::Schema::Modern::Vocabulary::FormatAssertion - Implementation of the JSON S
 
 =head1 VERSION
 
-version 0.539
+version 0.541
 
 =head1 DESCRIPTION
 
@@ -234,7 +232,7 @@ Overrides to particular format implementations, or additions of new ones, can be
 L<JSON::Schema::Modern/format_validations>.
 
 Formats C<iri-reference> and C<uri-template> are not yet implemented.
-Use of these formats will always evaluate to C<true>.
+Use of these formats will always result in an error.
 
 =head1 SEE ALSO
 
@@ -248,14 +246,14 @@ L<JSON::Schema::Modern/Format Validation>
 
 =for stopwords OpenAPI
 
-You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI Slack
-server|https://open-api.slack.com>, which are also great resources for finding help.
-
 =head1 SUPPORT
 
 Bugs may be submitted through L<https://github.com/karenetheridge/JSON-Schema-Modern/issues>.
 
 I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
+
+You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI Slack
+server|https://open-api.slack.com>, which are also great resources for finding help.
 
 =head1 AUTHOR
 

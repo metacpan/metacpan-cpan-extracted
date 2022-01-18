@@ -9,15 +9,16 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Util 6.01;
+package App::DocKnot::Util 7.00;
 
 use 5.024;
 use autodie;
-use warnings;
+use warnings FATAL => 'utf8';
 
 use Carp qw(croak);
 use Exporter qw(import);
 use List::SomeUtils qw(all);
+use Path::Tiny qw(path);
 use Sort::Versions qw(versioncmp);
 
 our @EXPORT_OK = qw(is_newer latest_tarball print_checked print_fh);
@@ -34,9 +35,9 @@ our @EXPORT_OK = qw(is_newer latest_tarball print_checked print_fh);
 # Returns: True if $file exists and is newer than @others, false otherwise
 sub is_newer {
     my ($file, @others) = @_;
-    return if !-e $file;
-    my $file_mtime = (stat($file))[9];
-    my @others_mtimes = map { (stat)[9] } @others;
+    return if !$file->exists();
+    my $file_mtime = $file->stat()->[9];
+    my @others_mtimes = map { $_->stat()->[9] } @others;
     return all { $file_mtime >= $_ } @others_mtimes;
 }
 
@@ -48,7 +49,6 @@ sub is_newer {
 #
 # Returns: Anonymous hash with the following keys:
 #            version - Latest version found
-#            date    - Date (in seconds since epoch) of oldest file
 #            files   - Array of files for that version
 #          or undef if no matching files were found
 #  Throws: Text exception on any error
@@ -68,14 +68,10 @@ sub latest_tarball {
     my $latest = $versions[0][0];
     @files = map { $_->[1] } grep { $_->[0] eq $latest } @versions;
 
-    # Find the timestamps of those files.
-    my @times = sort(map { $path->child($_)->stat()->[9] } @files);
-
     # Return the results.
     #<<<
     return {
         version => $latest,
-        date    => $times[0],
         files   => \@files,
     };
     #<<<
@@ -126,19 +122,25 @@ App::DocKnot::Util - Shared utility functions for other DocKnot modules
 
 =head1 SYNOPSIS
 
-    use App::DocKnot::Util qw(is_newer print_checked print_fh);
+    use App::DocKnot::Util qw(
+        is_newer latest_tarball print_checked print_fh
+    );
+    use Path::Tiny qw(path);
 
     print_checked('some stdout output');
-    if (!is_newer('/output', '/input-1', '/input-2')) {
+    my @inputs = (path('/input-1'), path('/input-2'));
+    if (!is_newer(path('/output'), @inputs)) {
         open(my $fh, '>', '/output');
         print_fh($fh, '/output', 'some stuff');
         close($fh);
     }
 
+    my $latest_ref = latest_tarball(path('/archive'), 'App-Foo');
+
 =head1 REQUIREMENTS
 
-Perl 5.24 or later and the modules List::SomeUtils and Sort::Versions,
-available from CPAN.
+Perl 5.24 or later and the modules List::SomeUtils, Path::Tiny, and
+Sort::Versions, available from CPAN.
 
 =head1 DESCRIPTION
 
@@ -155,19 +157,17 @@ used if desired.
 Returns a true value if FILE exists and has a last modified time that is newer
 or equal to the last modified times of all SOURCE files, and otherwise returns
 a false value.  Used primarily to determine if a given output file is
-up-to-date with respect to its source files.
+up-to-date with respect to its source files.  All paths must be Path::Tiny
+objects.
 
 =item latest_tarball(PATH, NAME)
 
 Returns data including a file list for the latest tarballs (by version number)
-for a given software package NAME in the directory PATH.  Versions are compared
-using Sort::Versions.  The return valid is a hash with the following keys:
+for a given software package NAME in the directory PATH (which must be a
+Path::Tiny object).  Versions are compared using Sort::Versions.  The return
+valid is a hash with the following keys:
 
 =over 4
-
-=item date
-
-The timestamp of the oldest file for that version, in seconds since epoch.
 
 =item files
 

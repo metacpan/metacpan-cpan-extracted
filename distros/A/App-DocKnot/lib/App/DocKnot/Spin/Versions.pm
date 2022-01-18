@@ -12,7 +12,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Spin::Versions 6.01;
+package App::DocKnot::Spin::Versions 7.00;
 
 use 5.024;
 use autodie;
@@ -168,9 +168,7 @@ sub update_version {
 
     # Edits the line for the package to replace the version and release date.
     my $edit = sub {
-        my $line = $_;
-        my ($product, $old_version, $old_date, $old_time)
-          = split(q{ }, $line);
+        my ($product, $old_version, $old_date, $old_time) = split(q{ });
         return if $product ne $package;
 
         # We're going to replace the old version with the new one, but we need
@@ -184,6 +182,7 @@ sub update_version {
         }
 
         # Make the replacement.
+        my $line = $_;
         $line =~ s{ \Q$old_version\E }{$version_string}xms;
         $line =~ s{ \Q$old_date\E }{$date}xms;
         $line =~ s{ \Q$old_time\E }{$time}xms;
@@ -192,7 +191,7 @@ sub update_version {
 
     # Apply that change to our versions file, and then re-read the contents to
     # update the internal data structure.
-    $self->{path}->edit_utf8($edit);
+    $self->{path}->edit_lines_utf8($edit);
     $self->_read_data();
     return;
 }

@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern::Document::OpenAPI; # git description: v0.015-3-g4693d99
+package JSON::Schema::Modern::Document::OpenAPI; # git description: v0.017-3-g4f61a45
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.016';
+our $VERSION = '0.018';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -15,7 +15,7 @@ use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
-use JSON::Schema::Modern::Utilities 0.525 qw(assert_keyword_exists assert_keyword_type E canonical_uri);
+use JSON::Schema::Modern::Utilities 0.525 qw(assert_keyword_exists assert_keyword_type E canonical_uri get_type);
 use Safe::Isa;
 use File::ShareDir 'dist_dir';
 use Path::Tiny;
@@ -83,6 +83,11 @@ sub traverse ($self, $evaluator) {
     spec_version => $evaluator->SPECIFICATION_VERSION_DEFAULT,
     vocabularies => [],
   };
+
+  if ((my $type = get_type($schema)) ne 'object') {
+    ()= E($state, 'invalid document type: %s', $type);
+    return $state;
+  }
 
   # /openapi: https://spec.openapis.org/oas/v3.1.0#openapi-object
   return $state if not assert_keyword_exists({ %$state, keyword => 'openapi' }, $schema)
@@ -230,7 +235,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.016
+version 0.018
 
 =head1 SYNOPSIS
 

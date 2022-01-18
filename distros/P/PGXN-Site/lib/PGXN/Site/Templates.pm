@@ -14,7 +14,7 @@ use File::Basename qw(basename);
 use SemVer;
 use Gravatar::URL;
 #use namespace::autoclean; # Do not use; breaks sort {}
-our $VERSION = v0.22.0;
+our $VERSION = v0.22.1;
 
 my $l = PGXN::Site::Locale->get_handle('en');
 sub T { $l->maketext(@_) }
@@ -266,13 +266,16 @@ template home => sub {
                 if ($dists && @{ $dists }) {
                     dl {
                         id is 'recent';
+                        my ($count, %seen) = 0;
                         for my $dist (@{ $dists }) {
+                            next if $seen{ lc $dist->{dist} }++;
                             dt { a {
                                 my @vals = map { $dist->{$_} } qw(dist version);
                                 href is '/dist/' . lc join('/', @vals) . '/';
                                 join ' ', @vals
                             } };
                             dd { $dist->{abstract} };
+                            last if ++$i == 5;
                         };
                     };
                     h6 {

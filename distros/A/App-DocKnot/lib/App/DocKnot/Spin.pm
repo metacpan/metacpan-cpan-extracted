@@ -11,11 +11,11 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Spin 6.01;
+package App::DocKnot::Spin 7.00;
 
 use 5.024;
 use autodie;
-use warnings;
+use warnings FATAL => 'utf8';
 
 use App::DocKnot::Spin::Pointer;
 use App::DocKnot::Spin::RSS;
@@ -70,7 +70,7 @@ sub _footer {
     # Add the end-of-page navbar if we have sitemap information.
     if ($self->{sitemap} && $self->{output}) {
         my $page = $out_path->relative($self->{output});
-        $output .= join(q{}, $self->{sitemap}->navbar("/$page")) . "\n";
+        $output .= join(q{}, $self->{sitemap}->navbar($page)) . "\n";
     }
 
     # Figure out the modification dates.  Use the RCS/CVS Id if available,
@@ -325,7 +325,7 @@ sub _read_pointer {
     }
 
     # Return the details.
-    return ($master, $options, $style);
+    return (path($master), $options, $style);
 }
 
 # Convert an input path to an output path.
@@ -360,8 +360,6 @@ sub _report_action {
 #
 # Throws: Text exception on any processing error
 #         autodie exception if files could not be accessed or written
-#
-## no critic (Subroutines::ProhibitExcessComplexity)
 sub _process_file {
     my ($self, $input) = @_;
 
@@ -387,16 +385,12 @@ sub _process_file {
             $self->_report_action('Creating', $output);
             $output->mkpath();
         }
-        my $rss_path = path($input, '.rss');
-        if ($rss_path->exists()) {
-            $self->{rss}->generate("$rss_path", "$input");
-        }
     } elsif ($input->basename() =~ m{ [.] spin \z }xms) {
         my $output = $self->_output_for_file($input, '.spin');
         $self->{generated}{"$output"} = 1;
-        if ($self->{pointer}->is_out_of_date("$input", "$output")) {
+        if ($self->{pointer}->is_out_of_date($input, $output)) {
             $self->_report_action('Converting', $output);
-            $self->{pointer}->spin_pointer("$input", "$output");
+            $self->{pointer}->spin_pointer($input, $output);
         }
     } elsif ($input->basename() =~ m{ [.] th \z }xms) {
         my $output = $self->_output_for_file($input, '.th');
@@ -406,12 +400,11 @@ sub _process_file {
         # a software release.
         if ($output->exists() && $self->{versions}) {
             my $relative = $input->relative($self->{source});
-            my $time = $self->{versions}->latest_release("$relative");
+            my $time = $self->{versions}->latest_release($relative);
             return
-              if is_newer("$output", "$input")
-              && $output->stat()->[9] >= $time;
+              if is_newer($output, $input) && $output->stat()->[9] >= $time;
         } else {
-            return if is_newer("$output", "$input");
+            return if is_newer($output, $input);
         }
 
         # The output file is not newer.  Respin it.
@@ -421,7 +414,7 @@ sub _process_file {
         my ($extension) = ($input->basename =~ m{ [.] ([^.]+) \z }xms);
         if (defined($extension) && $rules{$extension}) {
             my ($name, $sub) = $rules{$extension}->@*;
-            my $output = $self->_output_for_file($input, $extension);
+            my $output = $self->_output_for_file($input, q{.} . $extension);
             $self->{generated}{"$output"} = 1;
             my ($source, $options, $style) = $self->_read_pointer($input);
             return if is_newer($output, $input, $source);
@@ -430,14 +423,13 @@ sub _process_file {
         } else {
             my $output = $self->_output_for_file($input);
             $self->{generated}{"$output"} = 1;
-            return if is_newer("$output", "$input");
+            return if is_newer($output, $input);
             $self->_report_action('Updating', $output);
             $input->copy($output);
         }
     }
     return;
 }
-## use critic
 
 # This routine is called for every file in the destination tree in depth-first
 # order, if the user requested file deletion of files not generated from the
@@ -512,7 +504,6 @@ sub spin {
 
     # Reset data from a previous run.
     delete $self->{repository};
-    delete $self->{rss};
     delete $self->{sitemap};
     delete $self->{versions};
 
@@ -536,7 +527,7 @@ sub spin {
     # Read metadata from the top of the input directory.
     my $sitemap_path = $input->child('.sitemap');
     if ($sitemap_path->exists()) {
-        $self->{sitemap} = App::DocKnot::Spin::Sitemap->new("$sitemap_path");
+        $self->{sitemap} = App::DocKnot::Spin::Sitemap->new($sitemap_path);
     }
     my $versions_path = $input->child('.versions');
     if ($versions_path->exists()) {
@@ -546,13 +537,14 @@ sub spin {
         $self->{repository} = Git::Repository->new(work_tree => $input);
     }
 
-    # Create a new RSS generator object.
-    $self->{rss} = App::DocKnot::Spin::RSS->new({ base => $input });
-
-    # Process an .rss file at the top of the tree, if present.
-    my $rss_path = $input->child('.rss');
-    if ($rss_path->exists()) {
-        $self->{rss}->generate("$rss_path", "$input");
+    # Process all .rss files in the input tree first.  This is done as a
+    # separate pass because Path::Iterator::Rule appears to not always re-read
+    # the directory when it's modified during the iteration.
+    my $rss = App::DocKnot::Spin::RSS->new({ base => $input });
+    my $rule = Path::Iterator::Rule->new()->name('.rss');
+    my $iter = $rule->iter("$input", { follow_symlinks => 0 });
+    while (defined(my $file = $iter->())) {
+        $rss->generate(path($file), path($file)->parent);
     }
 
     # Create a new thread converter object.
@@ -581,9 +573,9 @@ sub spin {
     #>>>
 
     # Process the input tree.
-    my $rule = Path::Iterator::Rule->new();
+    $rule = Path::Iterator::Rule->new();
     $rule = $rule->skip($rule->new()->name($self->{excludes}->@*));
-    my $iter = $rule->iter("$input", { follow_symlinks => 0 });
+    $iter = $rule->iter("$input", { follow_symlinks => 0 });
     while (defined(my $file = $iter->())) {
         $self->_process_file(path($file));
     }

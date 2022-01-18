@@ -45,7 +45,7 @@ sub acceptance_tests (%options) {
   my $js = JSON::Schema::Modern->new($options{evaluator}->%*);
   my $js_short_circuit = $ENV{NO_SHORT_CIRCUIT} || JSON::Schema::Modern->new($options{evaluator}->%*, short_circuit => 1);
 
-  my $encoder = JSON::MaybeXS->new(allow_nonref => 1, utf8 => 0, allow_blessed => 1, canonical => 1, pretty => 1);
+  my $encoder = JSON::MaybeXS->new(allow_nonref => 1, utf8 => 0, convert_blessed => 1, canonical => 1, pretty => 1);
   $encoder->indent_length(2) if $encoder->can('indent_length');
 
   my $add_resource = sub ($uri, $schema) {
@@ -58,7 +58,7 @@ sub acceptance_tests (%options) {
       $js_short_circuit->add_schema($uri => $schema) if not $ENV{NO_SHORT_CIRCUIT};
     }
     catch ($e) {
-      die $e->$_isa('JSON::Schema::Modern::Result') ? $encoder->encode($e->TO_JSON) : $e;
+      die $e->$_isa('JSON::Schema::Modern::Result') ? $encoder->encode($e) : $e;
     }
   };
 

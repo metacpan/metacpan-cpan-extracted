@@ -101,6 +101,7 @@ my %WriteMakefileArgs = (
     "Safe::Isa" => 0,
     "Scalar::Util" => 0,
     "Types::Standard" => 0,
+    "URI::Escape" => 0,
     "constant" => 0,
     "experimental" => 0,
     "if" => 0,
@@ -125,7 +126,7 @@ my %WriteMakefileArgs = (
     "open" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.016",
+  "VERSION" => "0.018",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -161,6 +162,7 @@ my %FallbackPrereqs = (
   "Test::More" => "0.96",
   "Types::Standard" => 0,
   "URI" => 0,
+  "URI::Escape" => 0,
   "YAML::PP" => "0.005",
   "constant" => 0,
   "experimental" => 0,

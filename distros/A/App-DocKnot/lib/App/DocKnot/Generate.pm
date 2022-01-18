@@ -10,7 +10,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Generate 6.01;
+package App::DocKnot::Generate 7.00;
 
 use 5.024;
 use autodie;
@@ -18,17 +18,18 @@ use parent qw(App::DocKnot);
 use warnings;
 
 use App::DocKnot::Config;
-use App::DocKnot::Util qw(print_fh);
 use Carp qw(croak);
-use Encode qw(encode);
+use Path::Tiny qw(path);
 use Template;
 use Text::Wrap qw(wrap);
 
 # Default output files for specific templates.
+#<<<
 my %DEFAULT_OUTPUT = (
-    'readme' => 'README',
+    'readme'    => 'README',
     'readme-md' => 'README.md',
 );
+#>>>
 
 ##############################################################################
 # Generator functions
@@ -480,11 +481,10 @@ sub generate {
     $vars{to_text} = $self->_code_for_to_text;
     $vars{to_thread} = $self->_code_for_to_thread;
 
-    # Ensure we were given a valid template.
-    $template = $self->appdata_path('templates', "${template}.tmpl");
-
     # Run Template Toolkit processing.
-    my $tt = Template->new({ ABSOLUTE => 1 }) or croak(Template->error());
+    $template = $self->appdata_path('templates', "${template}.tmpl");
+    my $tt = Template->new({ ABSOLUTE => 1, ENCODING => 'utf8' })
+      or croak(Template->error());
     my $result;
     $tt->process($template, \%vars, \$result) or croak($tt->error);
 
@@ -527,9 +527,7 @@ sub generate_output {
 
     # Generate the output.
     my $data = $self->generate($template);
-    open(my $outfh, '>', $output);
-    print_fh($outfh, $output, encode('utf-8', $data));
-    close($outfh);
+    path($output)->spew_utf8($data);
     return;
 }
 
@@ -561,8 +559,8 @@ App::DocKnot::Generate - Generate documentation from package metadata
 =head1 REQUIREMENTS
 
 Perl 5.24 or later and the modules File::BaseDir, File::ShareDir, Kwalify,
-Template (part of Template Toolkit), and YAML::XS, all of which are available
-from CPAN.
+Path::Tiny, Template (part of Template Toolkit), and YAML::XS, all of which
+are available from CPAN.
 
 =head1 DESCRIPTION
 
@@ -661,7 +659,7 @@ Russ Allbery <rra@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2013-2021 Russ Allbery <rra@cpan.org>
+Copyright 2013-2022 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

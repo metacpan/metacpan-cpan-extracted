@@ -1,0 +1,12 @@
+[% IF prefix %][% prefix %][% ELSE %]\heading[Recent Changes][indent]
+
+\h1[Recent Changes][% END %][% FOREACH month IN entries %]
+\h2[[% month.heading %]]
+[% FOREACH entry IN month.entries %]
+\desc[[% entry.date %] —
+      \link[[% entry.link %]]
+           [[% entry.title %]]][
+[% entry.description %]]
+[% END %]
+[% END %]
+\signature

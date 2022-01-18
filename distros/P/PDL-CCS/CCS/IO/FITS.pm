@@ -10,7 +10,7 @@ use PDL::CCS::IO::Common qw(:intern); ##-- for e.g. _ccsio_write_header, _ccsio_
 use Carp qw(confess);
 use strict;
 
-our $VERSION = '1.23.16';
+our $VERSION = '1.23.17';
 our @ISA = ('PDL::Exporter');
 our @EXPORT_OK =
   (
@@ -175,7 +175,7 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head2 Copyright Policy
 
-Copyright (C) 2015-2018, Bryan Jurish. All rights reserved.
+Copyright (C) 2015-2022, Bryan Jurish. All rights reserved.
 
 This package is free software, and entirely without warranty.
 You may redistribute it and/or modify it under the same terms

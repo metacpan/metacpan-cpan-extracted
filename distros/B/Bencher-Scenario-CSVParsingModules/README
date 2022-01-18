@@ -2,9 +2,9 @@ NAME
     Bencher::Scenario::CSVParsingModules - Benchmark CSV parsing modules
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Bencher::Scenario::CSVParsingModules (from Perl distribution
-    Bencher-Scenario-CSVParsingModules), released on 2019-04-23.
+    Bencher-Scenario-CSVParsingModules), released on 2021-07-31.
 
 SYNOPSIS
     To run benchmark with default option:
@@ -29,9 +29,9 @@ BENCHMARKED MODULES
     Version numbers shown below are the versions used when running the
     sample benchmark.
 
-    Text::CSV_PP 1.95
+    Text::CSV_PP 2.01
 
-    Text::CSV_XS 1.31
+    Text::CSV_XS 1.46
 
 BENCHMARK PARTICIPANTS
     *   Text::CSV_PP (perl_code)
@@ -61,45 +61,145 @@ BENCHMARK DATASETS
 
     *   bench-5x5.csv
 
-SAMPLE BENCHMARK RESULTS
-    Run on: perl: *v5.26.0*, CPU: *Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz
-    (4 cores)*, OS: *GNU/Linux LinuxMint version 18.2*, OS kernel: *Linux
-    version 4.8.0-53-generic*.
+BENCHMARK SAMPLE RESULTS
+  Sample benchmark #1
+    Run on: perl: *v5.34.0*, CPU: *Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz
+    (4 cores)*, OS: *GNU/Linux LinuxMint version 19*, OS kernel: *Linux
+    version 5.3.0-68-generic*.
 
-    Benchmark with default options ("bencher -m CSVParsingModules"):
+    Benchmark command (default options):
+
+     % bencher -m CSVParsingModules
+
+    Result formatted as table (split, part 1 of 4):
 
      #table1#
-     +--------------+-------------------+-----------+-----------+------------+---------+---------+
-     | participant  | dataset           | rate (/s) | time (ms) | vs_slowest |  errors | samples |
-     +--------------+-------------------+-----------+-----------+------------+---------+---------+
-     | Text::CSV_PP | bench-100x100.csv |        15 |   65      |          1 | 8.1e-05 |      20 |
-     | Text::CSV_XS | bench-100x100.csv |       460 |    2.2    |         30 | 5.7e-06 |      21 |
-     | naive-split  | bench-100x100.csv |       460 |    2.2    |         30 | 3.8e-06 |      20 |
-     | Text::CSV_PP | bench-10x10.csv   |       960 |    1      |         63 | 3.6e-06 |      20 |
-     | Text::CSV_PP | bench-5x5.csv     |      2540 |    0.394  |        166 | 2.1e-07 |      20 |
-     | Text::CSV_PP | bench-1x1.csv     |      6700 |    0.15   |        440 | 4.3e-07 |      20 |
-     | Text::CSV_XS | bench-10x10.csv   |     11000 |    0.088  |        750 | 1.1e-07 |      20 |
-     | Text::CSV_XS | bench-5x5.csv     |     17000 |    0.06   |       1100 |   8e-08 |      20 |
-     | Text::CSV_XS | bench-1x1.csv     |     22100 |    0.0453 |       1440 | 1.3e-08 |      20 |
-     | naive-split  | bench-10x10.csv   |     25000 |    0.04   |       1600 | 5.3e-08 |      20 |
-     | naive-split  | bench-5x5.csv     |     51000 |    0.019  |       3400 | 1.4e-07 |      20 |
-     | naive-split  | bench-1x1.csv     |     99000 |    0.01   |       6500 | 2.9e-08 |      21 |
-     +--------------+-------------------+-----------+-----------+------------+---------+---------+
+     {dataset=>"bench-100x100.csv"}
+     | participant  | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+     |--------------+-----------+-----------+-----------------------+-----------------------+---------+---------|
+     | Text::CSV_PP |      32.7 |      30.6 |                 0.00% |              2073.95% |   2e-05 |      20 |
+     | Text::CSV_XS |     640   |       1.6 |              1854.86% |                11.21% | 6.2e-06 |      20 |
+     | naive-split  |     710   |       1.4 |              2073.95% |                 0.00% | 2.5e-06 |      20 |
 
-    Benchmark module startup overhead ("bencher -m CSVParsingModules
-    --module-startup"):
+    The above result formatted in Benchmark.pm style:
+
+                      Rate  Text::CSV_PP  Text::CSV_XS  naive-split 
+      Text::CSV_PP  32.7/s            --          -94%         -95% 
+      Text::CSV_XS   640/s         1812%            --         -12% 
+      naive-split    710/s         2085%           14%           -- 
+ 
+     Legends:
+       Text::CSV_PP: participant=Text::CSV_PP
+       Text::CSV_XS: participant=Text::CSV_XS
+       naive-split: participant=naive-split
+
+    The above result presented as chart:
+
+    Result formatted as table (split, part 2 of 4):
 
      #table2#
-     +---------------------+-----------+------------------------+------------+---------+---------+
-     | participant         | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
-     +---------------------+-----------+------------------------+------------+---------+---------+
-     | Text::CSV_PP        |      27   |                   20.3 |       1    | 8.9e-05 |      20 |
-     | Text::CSV_XS        |      24   |                   17.3 |       1.12 | 2.2e-05 |      20 |
-     | perl -e1 (baseline) |       6.7 |                    0   |       4    | 4.9e-05 |      22 |
-     +---------------------+-----------+------------------------+------------+---------+---------+
+     {dataset=>"bench-10x10.csv"}
+     | participant  | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+     |--------------+-----------+-----------+-----------------------+-----------------------+---------+---------|
+     | Text::CSV_PP |      1600 |       620 |                 0.00% |              2364.58% | 1.1e-06 |      20 |
+     | Text::CSV_XS |     19000 |        54 |              1061.89% |               112.12% | 1.1e-07 |      20 |
+     | naive-split  |     39000 |        25 |              2364.58% |                 0.00% | 5.3e-08 |      20 |
+
+    The above result formatted in Benchmark.pm style:
+
+                       Rate  Text::CSV_PP  Text::CSV_XS  naive-split 
+      Text::CSV_PP   1600/s            --          -91%         -95% 
+      Text::CSV_XS  19000/s         1048%            --         -53% 
+      naive-split   39000/s         2380%          116%           -- 
+ 
+     Legends:
+       Text::CSV_PP: participant=Text::CSV_PP
+       Text::CSV_XS: participant=Text::CSV_XS
+       naive-split: participant=naive-split
+
+    The above result presented as chart:
+
+    Result formatted as table (split, part 3 of 4):
+
+     #table3#
+     {dataset=>"bench-1x1.csv"}
+     | participant  | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+     |--------------+-----------+-----------+-----------------------+-----------------------+---------+---------|
+     | Text::CSV_PP |      7500 |     130   |                 0.00% |              2000.62% | 2.7e-07 |      20 |
+     | Text::CSV_XS |     42700 |      23.4 |               466.40% |               270.87% |   2e-08 |      20 |
+     | naive-split  |    160000 |       6.3 |              2000.62% |                 0.00% | 1.3e-08 |      20 |
+
+    The above result formatted in Benchmark.pm style:
+
+                        Rate  Text::CSV_PP  Text::CSV_XS  naive-split 
+      Text::CSV_PP    7500/s            --          -82%         -95% 
+      Text::CSV_XS   42700/s          455%            --         -73% 
+      naive-split   160000/s         1963%          271%           -- 
+ 
+     Legends:
+       Text::CSV_PP: participant=Text::CSV_PP
+       Text::CSV_XS: participant=Text::CSV_XS
+       naive-split: participant=naive-split
+
+    The above result presented as chart:
+
+    Result formatted as table (split, part 4 of 4):
+
+     #table4#
+     {dataset=>"bench-5x5.csv"}
+     | participant  | rate (/s) | time (μs) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+     |--------------+-----------+-----------+-----------------------+-----------------------+---------+---------|
+     | Text::CSV_PP |      3370 |     296   |                 0.00% |              2429.52% | 2.5e-07 |      22 |
+     | Text::CSV_XS |     33000 |      30   |               878.84% |               158.42% | 5.3e-08 |      20 |
+     | naive-split  |     85400 |      11.7 |              2429.52% |                 0.00% | 3.2e-09 |      22 |
+
+    The above result formatted in Benchmark.pm style:
+
+                       Rate  Text::CSV_PP  Text::CSV_XS  naive-split 
+      Text::CSV_PP   3370/s            --          -89%         -96% 
+      Text::CSV_XS  33000/s          886%            --         -61% 
+      naive-split   85400/s         2429%          156%           -- 
+ 
+     Legends:
+       Text::CSV_PP: participant=Text::CSV_PP
+       Text::CSV_XS: participant=Text::CSV_XS
+       naive-split: participant=naive-split
+
+    The above result presented as chart:
+
+  Sample benchmark #2
+    Benchmark command (benchmarking module startup overhead):
+
+     % bencher -m CSVParsingModules --module-startup
+
+    Result formatted as table:
+
+     #table5#
+     | participant         | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+     |---------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------|
+     | Text::CSV_PP        |      20   |              13.9 |                 0.00% |               233.89% | 9.8e-05 |      20 |
+     | Text::CSV_XS        |      17   |              10.9 |                21.13% |               175.64% | 5.4e-05 |      20 |
+     | perl -e1 (baseline) |       6.1 |               0   |               233.89% |                 0.00% | 5.3e-05 |      20 |
+
+    The above result formatted in Benchmark.pm style:
+
+                              Rate  T:C_P  T:C_X  perl -e1 (baseline) 
+      T:C_P                 50.0/s     --   -15%                 -69% 
+      T:C_X                 58.8/s    17%     --                 -64% 
+      perl -e1 (baseline)  163.9/s   227%   178%                   -- 
+ 
+     Legends:
+       T:C_P: mod_overhead_time=13.9 participant=Text::CSV_PP
+       T:C_X: mod_overhead_time=10.9 participant=Text::CSV_XS
+       perl -e1 (baseline): mod_overhead_time=0 participant=perl -e1 (baseline)
+
+    The above result presented as chart:
 
     To display as an interactive HTML table on a browser, you can add option
     "--format html+datatables".
+
+CONTRIBUTOR
+    perlancar (on pc-office) <perlancar@gmail.com>
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -121,7 +221,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

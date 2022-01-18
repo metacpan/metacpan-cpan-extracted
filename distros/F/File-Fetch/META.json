@@ -50,6 +50,6 @@
          "url" : "https://github.com/Perl-Toolchain-Gang/File-Fetch"
       }
    },
-   "version" : "1.02",
+   "version" : "1.04",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

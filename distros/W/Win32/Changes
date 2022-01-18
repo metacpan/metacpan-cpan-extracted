@@ -1,5 +1,13 @@
 Revision history for the Perl extension Win32.
 
+0.58    [2022-01-17]
+        - add Win32::HttpGetFile (thanks to Craig Berry for the implementation
+          and Tomasz Konojacki for code review) [PR/30]
+        - skip failing Unicode.t on Cygwin because cwd() no longer returns an
+          ANSI (short) path there.
+        - Fixed test 14,15 of GetFullPathName.t when package is unpacked in a
+          top level folder (thanks to Jianhong Feng) [PR/20]
+
 0.57    [2021-03-10]
         - fix calling convention for PFNRegGetValueA [PR/28]
 

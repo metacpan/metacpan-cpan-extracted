@@ -1,0 +1,8 @@
+[% prefix %][% FOREACH entry IN entries %]
+\h2[[% entry.day %]: [% entry.title %]]
+
+[% entry.text %]\class(footer)[[% entry.date %] —
+    \link[[% entry.link %]]
+         [Permanent link]]
+[% END %][% IF suffix %][% suffix %][% END %]
+\signature

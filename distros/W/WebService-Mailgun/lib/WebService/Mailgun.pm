@@ -14,12 +14,13 @@ use HTTP::Request::Common;
 use File::Temp;
 
 
-our $VERSION = "0.13";
+our $VERSION = "0.14";
 our $API_BASE = 'api.mailgun.net/v3';
+our $API_BASE_EU = 'api.eu.mailgun.net/v3';
 
 use Class::Accessor::Lite (
     new => 1,
-    rw  => [qw(api_key domain RaiseError)],
+    rw  => [qw(api_key domain RaiseError region)],
     ro  => [qw(error error_status)],
 );
 
@@ -84,18 +85,31 @@ sub client {
     );
 }
 
+sub api_base {
+    my ($self) = @_;
+
+    if ($self->region) {
+        if (lc($self->region) eq "eu") {
+            return $API_BASE_EU;
+        } elsif (lc($self->region) ne "us") {
+            die "unsupported region '" . $self->region ."'";
+        }
+    }
+    return $API_BASE;
+}
+
 sub api_url {
     my ($self, $method) = @_;
 
     sprintf 'https://api:%s@%s/%s',
-        $self->api_key, $API_BASE, $method;
+        $self->api_key, $self->api_base, $method;
 }
 
 sub domain_api_url {
     my ($self, $method) = @_;
 
     sprintf 'https://api:%s@%s/%s/%s',
-        $self->api_key, $API_BASE, $self->domain, $method;
+        $self->api_key, $self->api_base, $self->domain, $method;
 }
 
 sub message {
@@ -309,13 +323,17 @@ WebService::Mailgun is API client for Mailgun (L<https://mailgun.com/>).
 
 =head1 METHOD
 
-=head2 new(api_key => $api_key, domain => $domain, RaiseError => 0|1)
+=head2 new(api_key => $api_key, domain => $domain, region => "us"|"eu", RaiseError => 0|1)
 
 Create mailgun object.
 
 =head3 RaiseError (default: 0)
 
 The RaiseError attribute can be used to force errors to raise exceptions rather than simply return error codes in the normal way. It is "off" by default.
+
+=head3 region (default: "us")
+
+The region attribute determines what region the domain belongs to, either US or EU. Default is US.
 
 =head2 error
 

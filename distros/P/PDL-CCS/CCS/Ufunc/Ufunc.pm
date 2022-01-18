@@ -4,8 +4,8 @@
 #
 package PDL::CCS::Ufunc;
 
-our @EXPORT_OK = qw(PDL::PP ccs_accum_prod PDL::PP ccs_accum_dprod PDL::PP ccs_accum_sum PDL::PP ccs_accum_dsum PDL::PP ccs_accum_or PDL::PP ccs_accum_and PDL::PP ccs_accum_bor PDL::PP ccs_accum_band PDL::PP ccs_accum_maximum PDL::PP ccs_accum_minimum PDL::PP ccs_accum_maximum_nz_ind PDL::PP ccs_accum_minimum_nz_ind PDL::PP ccs_accum_nbad PDL::PP ccs_accum_ngood PDL::PP ccs_accum_nnz PDL::PP ccs_accum_average );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+@EXPORT_OK  = qw( PDL::PP ccs_accum_prod PDL::PP ccs_accum_dprod PDL::PP ccs_accum_sum PDL::PP ccs_accum_dsum PDL::PP ccs_accum_or PDL::PP ccs_accum_and PDL::PP ccs_accum_bor PDL::PP ccs_accum_band PDL::PP ccs_accum_maximum PDL::PP ccs_accum_minimum PDL::PP ccs_accum_maximum_nz_ind PDL::PP ccs_accum_minimum_nz_ind PDL::PP ccs_accum_nbad PDL::PP ccs_accum_ngood PDL::PP ccs_accum_nnz PDL::PP ccs_accum_average );
+%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
 use PDL::Exporter;
@@ -13,8 +13,8 @@ use DynaLoader;
 
 
 
-   our $VERSION = '1.23.16';
-   our @ISA = ( 'PDL::Exporter','DynaLoader' );
+   $PDL::CCS::Ufunc::VERSION = 1.23.17;
+   @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::CCS::Ufunc $VERSION;
 
@@ -633,7 +633,7 @@ The state of the bad-value flag of the output piddles is unknown.
      shift(@nnzOut);
    }
 
-   $nzvalsIn = longlong($nzvalsIn) if ($nzvalsIn->type > longlong()); ##-- max_type_perl=longlong
+   $nzvalsIn = ccs_indx($nzvalsIn) if ($nzvalsIn->type > ccs_indx()); ##-- max_type_perl=ccs_indx
    @nnzOut = $nzvalsOut->dims if (!@nnzOut && defined($nzvalsOut) && !$nzvalsOut->isempty);
    @nnzOut = @nnzIn           if (!@nnzOut);
    $ixOut  = PDL->zeroes(ccs_indx(), $ndims,@nnzOut)
@@ -718,7 +718,7 @@ The state of the bad-value flag of the output piddles is unknown.
      shift(@nnzOut);
    }
 
-   $nzvalsIn = longlong($nzvalsIn) if ($nzvalsIn->type > longlong()); ##-- max_type_perl=longlong
+   $nzvalsIn = ccs_indx($nzvalsIn) if ($nzvalsIn->type > ccs_indx()); ##-- max_type_perl=ccs_indx
    @nnzOut = $nzvalsOut->dims if (!@nnzOut && defined($nzvalsOut) && !$nzvalsOut->isempty);
    @nnzOut = @nnzIn           if (!@nnzOut);
    $ixOut  = PDL->zeroes(ccs_indx(), $ndims,@nnzOut)
@@ -1301,7 +1301,7 @@ The state of the bad-value flag of the output piddles is unknown.
      shift(@nnzOut);
    }
 
-   $nzvalsIn = longlong($nzvalsIn) if ($nzvalsIn->type > longlong()); ##-- max_type_perl=longlong
+   $nzvalsIn = ccs_indx($nzvalsIn) if ($nzvalsIn->type > ccs_indx()); ##-- max_type_perl=ccs_indx
    @nnzOut = $nzvalsOut->dims if (!@nnzOut && defined($nzvalsOut) && !$nzvalsOut->isempty);
    @nnzOut = @nnzIn           if (!@nnzOut);
    $ixOut  = PDL->zeroes(ccs_indx(), $ndims,@nnzOut)
@@ -1475,7 +1475,7 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head2 Copyright Policy
 
-Copyright (C) 2007-2013, Bryan Jurish. All rights reserved.
+Copyright (C) 2007-2022, Bryan Jurish. All rights reserved.
 
 This package is free software, and entirely without warranty.
 You may redistribute it and/or modify it under the same terms

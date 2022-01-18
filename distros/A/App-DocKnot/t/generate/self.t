@@ -2,7 +2,7 @@
 #
 # Test generated files against the files included in the package.
 #
-# Copyright 2016, 2018-2019, 2021 Russ Allbery <rra@cpan.org>
+# Copyright 2016, 2018-2019, 2021-2022 Russ Allbery <rra@cpan.org>
 #
 # SPDX-License-Identifier: MIT
 
@@ -12,7 +12,7 @@ use warnings;
 
 use lib 't/lib';
 
-use File::Spec;
+use Path::Tiny qw(path);
 use Test::RRA qw(is_file_contents);
 
 use Test::More tests => 5;
@@ -34,6 +34,6 @@ is_file_contents($output, 'README', 'README in package');
 $output = $docknot->generate('readme-md');
 is_file_contents($output, 'README.md', 'README.md in package');
 $output = $docknot->generate('thread');
-my $dataroot = File::Spec->catfile('t', 'data', 'generate');
-my $expected = File::Spec->catfile($dataroot, 'docknot', 'output', 'thread');
+my $dataroot = path('t', 'data', 'generate');
+my $expected = $dataroot->child('docknot', 'output', 'thread');
 is_file_contents($output, $expected, 'Thread output for package');

@@ -4,8 +4,8 @@
 #
 package PDL::CCS::Ops;
 
-our @EXPORT_OK = qw(PDL::PP ccs_binop_align_block_mia );
-our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+@EXPORT_OK  = qw( PDL::PP ccs_binop_align_block_mia );
+%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
 use PDL::Exporter;
@@ -13,8 +13,8 @@ use DynaLoader;
 
 
 
-   our $VERSION = '1.23.16';
-   our @ISA = ( 'PDL::Exporter','DynaLoader' );
+   $PDL::CCS::Ops::VERSION = 1.23.17;
+   @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::CCS::Ops $VERSION;
 
@@ -169,7 +169,7 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head2 Copyright Policy
 
-All other parts Copyright (C) 2007-2013, Bryan Jurish. All rights reserved.
+All other parts Copyright (C) 2007-2022, Bryan Jurish. All rights reserved.
 
 This package is free software, and entirely without warranty.
 You may redistribute it and/or modify it under the same terms

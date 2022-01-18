@@ -2567,6 +2567,21 @@ END2
 END1
 (() ? '‚ ' : (() ? '‚¢' : '‚¤'))
 END2
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 497
+defer {1}
+END1
+defer {1}
+END2
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 498
+for my ($key, $value) (%hash) {1}
+END1
+for my ($key, $value) (%hash) {1}
+END2
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 499
+for my ($left, $right, $gripping) (@moties) {1}
+END1
+for my ($left, $right, $gripping) (@moties) {1}
+END2
 );
 
 $|=1; print "1..",scalar(@test),"\n"; my $testno=1; sub ok { print $_[0]?'ok ':'not ok ',$testno++,$_[1]?" - $_[1]\n":"\n" } ok($_->()) for @test;

@@ -1,0 +1,2096 @@
+package Venus::Date;
+
+use 5.018;
+
+use strict;
+use warnings;
+
+use Moo;
+
+extends 'Venus::Kind::Utility';
+
+with 'Venus::Role::Buildable';
+with 'Venus::Role::Explainable';
+
+use overload (
+  '!=' => sub{("$_[0]" + 0) != ($_[1] + 0)},
+  '+' => sub{("$_[0]" + 0) + ($_[1] + 0)},
+  '-' => sub{("$_[0]" + 0) - ($_[1] + 0)},
+  '0+' => sub{("$_[0]" + 0)},
+  '<' => sub{("$_[0]" + 0) < ($_[1] + 0)},
+  '<=' => sub{("$_[0]" + 0) <= ($_[1] + 0)},
+  '==' => sub{("$_[0]" + 0) == ($_[1] + 0)},
+  '>' => sub{("$_[0]" + 0) > ($_[1] + 0)},
+  '>=' => sub{("$_[0]" + 0) >= ($_[1] + 0)},
+  'eq' => sub{"$_[0]" eq "$_[1]"},
+  'ne' => sub{"$_[0]" ne "$_[1]"},
+);
+
+# ATTRIBUTES
+
+has day => (
+  is => 'rw',
+);
+
+has month => (
+  is => 'rw',
+);
+
+has year => (
+  is => 'rw',
+);
+
+has hour => (
+  is => 'rw',
+);
+
+has minute => (
+  is => 'rw',
+);
+
+has second => (
+  is => 'rw',
+);
+
+# BUILDERS
+
+sub build_arg {
+  my ($self, $time) = @_;
+
+  my $data = {};
+  my @time = gmtime $time;
+
+  $data->{day} //= $time[3];
+  $data->{hour} //= $time[2];
+  $data->{minute} //= $time[1];
+  $data->{month} //= $time[4] + 1;
+  $data->{second} //= $time[0];
+  $data->{year} //= $time[5] + 1900;
+
+  return $data;
+}
+
+sub build_args {
+  my ($self, $data) = @_;
+
+  my @time = gmtime time;
+
+  $data->{day} //= $time[3];
+  $data->{hour} //= $time[2];
+  $data->{minute} //= $time[1];
+  $data->{month} //= $time[4] + 1;
+  $data->{second} //= $time[0];
+  $data->{year} //= $time[5] + 1900;
+
+  return $data;
+}
+
+# METHODS
+
+sub add {
+  my ($self, $data) = @_;
+
+  for my $name (qw(days hours minutes months seconds years)) {
+    if (my $code = $self->can("add_$name")) {
+      $self->$code($data->{$name});
+    }
+  }
+
+  return $self;
+}
+
+sub add_days {
+  my ($self, $size) = @_;
+
+  $size //= 0;
+
+  $size = ($self->timeseconds->ONE_DAY * $size) if $size;
+
+  return $self->reset($self->epoch + $size);
+}
+
+sub add_hours {
+  my ($self, $size) = @_;
+
+  $size //= 0;
+
+  $size = ($self->timeseconds->ONE_HOUR * $size) if $size;
+
+  return $self->reset($self->epoch + $size);
+}
+
+sub add_hms {
+  my ($self, $h, $m, $s) = @_;
+
+  my $data = {};
+
+  $data->{hours} = $h if defined $h;
+  $data->{minutes} = $m if defined $m;
+  $data->{seconds} = $s if defined $s;
+
+  return $self->add($data);
+}
+
+sub add_mdy {
+  my ($self, $m, $d, $y) = @_;
+
+  my $data = {};
+
+  $data->{days} = $d if defined $d;
+  $data->{months} = $m if defined $m;
+  $data->{years} = $y if defined $y;
+
+  return $self->add($data);
+}
+
+sub add_minutes {
+  my ($self, $size) = @_;
+
+  $size //= 0;
+
+  $size = ($self->timeseconds->ONE_MINUTE * $size) if $size;
+
+  return $self->reset($self->epoch + $size);
+}
+
+sub add_months {
+  my ($self, $size) = @_;
+
+  $size //= 0;
+
+  $size = ($self->timeseconds->ONE_MONTH * $size) if $size;
+
+  return $self->reset($self->epoch + $size);
+}
+
+sub add_seconds {
+  my ($self, $size) = @_;
+
+  $size //= 0;
+
+  return $self->reset($self->epoch + $size);
+}
+
+sub add_years {
+  my ($self, $size) = @_;
+
+  $size //= 0;
+
+  $size = ($self->timeseconds->ONE_YEAR * $size) if $size;
+
+  return $self->reset($self->epoch + $size);
+}
+
+sub epoch {
+  my ($self) = @_;
+
+  return $self->timepiece->epoch;
+}
+
+sub explain {
+  my ($self) = @_;
+
+  return $self->epoch;
+}
+
+sub format {
+  my ($self, @args) = @_;
+
+  return $self->timepiece->strftime(@args);
+}
+
+sub hms {
+  my ($self) = @_;
+
+  return $self->timepiece->hms;
+}
+
+sub iso8601 {
+  my ($self) = @_;
+
+  return $self->timepiece->datetime;
+}
+
+sub mdy {
+  my ($self) = @_;
+
+  return $self->timepiece->mdy;
+}
+
+sub parse {
+  my ($self, @args) = @_;
+
+  my $timepiece = $self->timepiece->strptime(@args);
+
+  return $self->reset($timepiece->epoch);
+}
+
+sub reset {
+  my ($self, $time) = @_;
+
+  $time ||= time;
+
+  my @time = gmtime $time;
+
+  $self->day($time[3]);
+  $self->hour($time[2]);
+  $self->minute($time[1]);
+  $self->month($time[4] + 1);
+  $self->second($time[0]);
+  $self->year($time[5] + 1900);
+
+  return $self;
+}
+
+sub restart {
+  my ($self, $here) = @_;
+
+  my $timepiece = $self->timepiece->truncate(to => $here);
+
+  return $self->reset($timepiece->epoch);
+}
+
+sub rfc822 {
+  my ($self) = @_;
+
+  return $self->format('%a, %d %b %Y %H:%M:%S %z');
+}
+
+sub rfc1123 {
+  my ($self) = @_;
+
+  return $self->format('%a, %d %b %Y %T GMT');
+}
+
+sub rfc3339 {
+  my ($self) = @_;
+
+  return "@{[$self->iso8601]}Z";
+}
+
+sub rfc7231 {
+  my ($self) = @_;
+
+  return $self->timepiece->strftime;
+}
+
+sub set {
+  my ($self, $data) = @_;
+
+  for my $name (qw(day hour minute month second year)) {
+    if (defined $data->{$name}) {
+      $self->$name($data->{$name});
+    }
+  }
+
+  return $self;
+}
+
+sub set_hms {
+  my ($self, $h, $m, $s) = @_;
+
+  my $data = {};
+
+  $data->{hour} = $h if defined $h;
+  $data->{minute} = $m if defined $m;
+  $data->{second} = $s if defined $s;
+
+  return $self->set($data);
+}
+
+sub set_mdy {
+  my ($self, $m, $d, $y) = @_;
+
+  my $data = {};
+
+  $data->{day} = $d if defined $d;
+  $data->{month} = $m if defined $m;
+  $data->{year} = $y if defined $y;
+
+  return $self->set($data);
+}
+
+sub string {
+  my ($self) = @_;
+
+  return $self->rfc3339;
+}
+
+sub sub {
+  my ($self, $data) = @_;
+
+  for my $name (qw(days hours minutes months seconds years)) {
+    if (my $code = $self->can("sub_$name")) {
+      $self->$code($data->{$name});
+    }
+  }
+
+  return $self;
+}
+
+sub sub_days {
+  my ($self, $size) = @_;
+
+  $size //= 0;
+
+  $size = ($self->timeseconds->ONE_DAY * $size) if $size;
+
+  return $self->reset($self->epoch - $size);
+}
+
+sub sub_hours {
+  my ($self, $size) = @_;
+
+  $size //= 0;
+
+  $size = ($self->timeseconds->ONE_HOUR * $size) if $size;
+
+  return $self->reset($self->epoch - $size);
+}
+
+sub sub_hms {
+  my ($self, $h, $m, $s) = @_;
+
+  my $data = {};
+
+  $data->{hours} = $h if defined $h;
+  $data->{minutes} = $m if defined $m;
+  $data->{seconds} = $s if defined $s;
+
+  return $self->sub($data);
+}
+
+sub sub_mdy {
+  my ($self, $m, $d, $y) = @_;
+
+  my $data = {};
+
+  $data->{days} = $d if defined $d;
+  $data->{months} = $m if defined $m;
+  $data->{years} = $y if defined $y;
+
+  return $self->sub($data);
+}
+
+sub sub_minutes {
+  my ($self, $size) = @_;
+
+  $size //= 0;
+
+  $size = ($self->timeseconds->ONE_MINUTE * $size) if $size;
+
+  return $self->reset($self->epoch - $size);
+}
+
+sub sub_months {
+  my ($self, $size) = @_;
+
+  $size //= 0;
+
+  $size = ($self->timeseconds->ONE_MONTH * $size) if $size;
+
+  return $self->reset($self->epoch - $size);
+}
+
+sub sub_seconds {
+  my ($self, $size) = @_;
+
+  $size //= 0;
+
+  return $self->reset($self->epoch - $size);
+}
+
+sub sub_years {
+  my ($self, $size) = @_;
+
+  $size //= 0;
+
+  $size = ($self->timeseconds->ONE_YEAR * $size) if $size;
+
+  return $self->reset($self->epoch - $size);
+}
+
+sub timelocal {
+  my ($self) = @_;
+
+  require Time::Local;
+
+  my $day = $self->day;
+  my $hour = $self->hour;
+  my $minute = $self->minute;
+  my $month = $self->month - 1;
+  my $second = $self->second;
+  my $year = $self->year;
+
+  return Time::Local::timegm($second, $minute, $hour, $day, $month, $year);
+}
+
+sub timepiece {
+  my ($self) = @_;
+
+  require Time::Piece;
+
+  return Time::Piece->gmtime(0 + $self->timelocal);
+}
+
+sub timeseconds {
+  my ($self, $time) = @_;
+
+  require Time::Seconds;
+
+  return Time::Seconds->new($time // 0);
+}
+
+1;
+
+
+
+=head1 NAME
+
+Venus::Date - Date Class
+
+=cut
+
+=head1 ABSTRACT
+
+Date Class for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Venus::Date;
+
+  my $date = Venus::Date->new(570672000);
+
+  # $date->string;
+  # '1988-02-01T00:00:00Z'
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides methods for formatting, parsing, and manipulating date
+and time data.
+
+=cut
+
+=head1 ATTRIBUTES
+
+This package has the following attributes:
+
+=cut
+
+=head2 day
+
+  day(Int)
+
+This attribute is read-write, accepts C<(Int)> values, and is optional.
+
+=cut
+
+=head2 month
+
+  month(Int)
+
+This attribute is read-write, accepts C<(Int)> values, and is optional.
+
+=cut
+
+=head2 year
+
+  year(Int)
+
+This attribute is read-write, accepts C<(Int)> values, and is optional.
+
+=cut
+
+=head2 hour
+
+  hour(Int)
+
+This attribute is read-write, accepts C<(Int)> values, and is optional.
+
+=cut
+
+=head2 minute
+
+  minute(Int)
+
+This attribute is read-write, accepts C<(Int)> values, and is optional.
+
+=cut
+
+=head2 second
+
+  second(Int)
+
+This attribute is read-write, accepts C<(Int)> values, and is optional.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Venus::Kind::Utility>
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Venus::Role::Buildable>
+
+L<Venus::Role::Explainable>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 add
+
+  add(HashRef $data) (Date)
+
+The add method increments the date and time attributes specified.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item add example 1
+
+  # given: synopsis;
+
+  $date = $date->add({
+    days => 1,
+    months => 1,
+    years => 1,
+  });
+
+  # $date->string; # 1989-03-03T16:17:54Z
+  # $date->epoch; # 604945074
+
+=back
+
+=over 4
+
+=item add example 2
+
+  # given: synopsis;
+
+  $date = $date->add({
+    hours => 1,
+    minutes => 1,
+    seconds => 1,
+  });
+
+  # $date->string; # 1988-02-01T01:01:01Z
+  # $date->epoch; # 570675661
+
+=back
+
+=cut
+
+=head2 add_days
+
+  add_days(Int $days) (Any)
+
+The add_days method increments the C<day> attribute.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item add_days example 1
+
+  # given: synopsis;
+
+  $date = $date->add_days(1);
+
+  # $date->string; # 1988-02-02T00:00:00Z
+  # $date->epoch; # 570758400
+
+=back
+
+=over 4
+
+=item add_days example 2
+
+  # given: synopsis;
+
+  $date = $date->add_days(40);
+
+  # $date->string; # 1988-03-12T00:00:00Z
+  # $date->epoch; # 574128000
+
+=back
+
+=over 4
+
+=item add_days example 3
+
+  # given: synopsis;
+
+  $date = $date->add_days(-1);
+
+  # $date->string; # 1988-01-31T00:00:00Z
+  # $date->epoch; # 570585600
+
+=back
+
+=cut
+
+=head2 add_hms
+
+  add_hms(Maybe[Int] $hours, Maybe[Int] $minutes, Maybe[Int] $seconds) (Date)
+
+The add_hms method increments the C<hour>, C<minute>, and C<second> attributes.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item add_hms example 1
+
+  # given: synopsis;
+
+  $date = $date->add_hms(1, 0, 0);
+
+  # $date->string; # 1988-02-01T01:00:00Z
+  # $date->epoch; # 570675600
+
+=back
+
+=over 4
+
+=item add_hms example 2
+
+  # given: synopsis;
+
+  $date = $date->add_hms(undef, 1, 1);
+
+  # $date->string; # 1988-02-01T00:01:01Z
+  # $date->epoch; # 570672061
+
+=back
+
+=over 4
+
+=item add_hms example 3
+
+  # given: synopsis;
+
+  $date = $date->add_hms(1, 1);
+
+  # $date->string; # 1988-02-01T01:01:00Z
+  # $date->epoch; # 570675660
+
+=back
+
+=cut
+
+=head2 add_hours
+
+  add_hours(Int $hours) (Any)
+
+The add_hours method increments the C<hour> attribute.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item add_hours example 1
+
+  # given: synopsis;
+
+  $date = $date->add_hours(1);
+
+  # $date->string; # 1988-02-01T01:00:00Z
+  # $date->epoch; # 570675600
+
+=back
+
+=over 4
+
+=item add_hours example 2
+
+  # given: synopsis;
+
+  $date = $date->add_hours(25);
+
+  # $date->string; # 1988-02-02T01:00:00Z
+  # $date->epoch; # 570762000
+
+=back
+
+=over 4
+
+=item add_hours example 3
+
+  # given: synopsis;
+
+  $date = $date->add_hours(-1);
+
+  # $date->string; # 1988-01-31T23:00:00Z
+  # $date->epoch; # 570668400
+
+=back
+
+=cut
+
+=head2 add_mdy
+
+  add_mdy(Maybe[Int] $months, Maybe[Int] $days, Maybe[Int] $years) (Date)
+
+The add_mdy method increments the C<month>, C<day>, and C<years> attributes.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item add_mdy example 1
+
+  # given: synopsis;
+
+  $date = $date->add_mdy(1, 0, 0);
+
+  # $date->string; # 1988-03-02T10:29:04Z
+  # $date->epoch; # 573301744
+
+=back
+
+=over 4
+
+=item add_mdy example 2
+
+  # given: synopsis;
+
+  $date = $date->add_mdy(undef, 1, 1);
+
+  # $date->string; # 1989-02-01T05:48:50Z
+  # $date->epoch; # 602315330
+
+=back
+
+=over 4
+
+=item add_mdy example 3
+
+  # given: synopsis;
+
+  $date = $date->add_mdy(1, 1);
+
+  # $date->string; # 1988-03-03T10:29:04Z
+  # $date->epoch; # 573388144
+
+=back
+
+=cut
+
+=head2 add_minutes
+
+  add_minutes(Int $minutes) (Date)
+
+The add_minutes method increments the C<minute> attribute.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item add_minutes example 1
+
+  # given: synopsis;
+
+  $date = $date->add_minutes(1);
+
+  # $date->string; # 1988-02-01T00:01:00Z
+  # $date->epoch; # 570672060
+
+=back
+
+=over 4
+
+=item add_minutes example 2
+
+  # given: synopsis;
+
+  $date = $date->add_minutes(61);
+
+  # $date->string; # 1988-02-01T01:01:00Z
+  # $date->epoch; # 570675660
+
+=back
+
+=over 4
+
+=item add_minutes example 3
+
+  # given: synopsis;
+
+  $date = $date->add_minutes(-1);
+
+  # $date->string; # 1988-01-31T23:59:00Z
+  # $date->epoch; # 570671940
+
+=back
+
+=cut
+
+=head2 add_months
+
+  add_months(Int $months) (Date)
+
+The add_months method increments the C<month> attribute.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item add_months example 1
+
+  # given: synopsis;
+
+  $date = $date->add_months(1);
+
+  # $date->string; # 1988-03-02T10:29:04Z
+  # $date->epoch; # 573301744
+
+=back
+
+=over 4
+
+=item add_months example 2
+
+  # given: synopsis;
+
+  $date = $date->add_months(13);
+
+  # $date->string; # 1989-03-02T16:17:52Z
+  # $date->epoch; # 604858672
+
+=back
+
+=over 4
+
+=item add_months example 3
+
+  # given: synopsis;
+
+  $date = $date->add_months(-1);
+
+  # $date->string; # 1988-01-01T13:30:56Z
+  # $date->epoch; # 568042256
+
+=back
+
+=cut
+
+=head2 add_seconds
+
+  add_seconds(Int $seconds) (Date)
+
+The add_seconds method increments the C<second> attribute.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item add_seconds example 1
+
+  # given: synopsis;
+
+  $date = $date->add_seconds(1);
+
+  # $date->string; # 1988-02-01T00:00:01Z
+  # $date->epoch; # 570672001
+
+=back
+
+=over 4
+
+=item add_seconds example 2
+
+  # given: synopsis;
+
+  $date = $date->add_seconds(61);
+
+  # $date->string; # 1988-02-01T00:01:01Z
+  # $date->epoch; # 570672061
+
+=back
+
+=over 4
+
+=item add_seconds example 3
+
+  # given: synopsis;
+
+  $date = $date->add_seconds(-1);
+
+  # $date->string; # 1988-01-31T23:59:59Z
+  # $date->epoch; # 570671999
+
+=back
+
+=cut
+
+=head2 add_years
+
+  add_years(Int $years) (Date)
+
+The add_years method increments the C<year> attribute.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item add_years example 1
+
+  # given: synopsis;
+
+  $date = $date->add_years(1);
+
+  # $date->string; # 1989-01-31T05:48:50Z
+  # $date->epoch; # 602228930
+
+=back
+
+=over 4
+
+=item add_years example 2
+
+  # given: synopsis;
+
+  $date = $date->add_years(50);
+
+  # $date->string; # 2038-01-31T02:41:40Z
+  # $date->epoch; # 2148518500
+
+=back
+
+=over 4
+
+=item add_years example 3
+
+  # given: synopsis;
+
+  $date = $date->add_years(-1);
+
+  # $date->string; # 1987-01-31T18:11:10Z
+  # $date->epoch; # 539115070
+
+=back
+
+=cut
+
+=head2 epoch
+
+  epoch() (Int)
+
+The epoch method returns the epoch.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item epoch example 1
+
+  # given: synopsis;
+
+  my $epoch = $date->epoch;
+
+  # 570672000
+
+=back
+
+=cut
+
+=head2 explain
+
+  explain() (Int)
+
+The explain method returns the epoch and is used in stringification operations.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item explain example 1
+
+  # given: synopsis;
+
+  my $explain = $date->explain;
+
+  # 570672000
+
+=back
+
+=cut
+
+=head2 format
+
+  format(Str $format) (Str)
+
+The format method returns the formatted date and time string. See
+L<strftime|http://www.unix.com/man-page/FreeBSD/3/strftime/> for formatting
+rules.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item format example 1
+
+  # given: synopsis;
+
+  my $format = $date->format('%A, %B %e, %Y');
+
+  # Monday, February  1, 1988
+
+=back
+
+=over 4
+
+=item format example 2
+
+  # given: synopsis;
+
+  my $format = $date->format('%b %e %a');
+
+  # Feb  1 Mon
+
+=back
+
+=cut
+
+=head2 hms
+
+  hms() (Str)
+
+The hms method returns the time formatted as C<hh:mm:ss>.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item hms example 1
+
+  # given: synopsis;
+
+  my $hms = $date->hms;
+
+  # 00:00:00
+
+=back
+
+=cut
+
+=head2 iso8601
+
+  iso8601() (Str)
+
+The iso8601 method returns the date and time formatted as an ISO8601 string.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item iso8601 example 1
+
+  # given: synopsis;
+
+  my $iso8601 = $date->iso8601;
+
+  # 1988-02-01T00:00:00
+
+=back
+
+=cut
+
+=head2 mdy
+
+  mdy() (Str)
+
+The mdy method returns the date formatted as C<mm-dd-yyyy>.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item mdy example 1
+
+  # given: synopsis;
+
+  my $mdy = $date->mdy;
+
+  # 02-01-1988
+
+=back
+
+=cut
+
+=head2 parse
+
+  parse(Any @data) (Date)
+
+The parse method resets and returns a date object based on the parsed time
+provided. See L<strptime|http://www.unix.com/man-page/FreeBSD/3/strptime/> for
+parsing rules.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item parse example 1
+
+  # given: synopsis;
+
+  $date = $date->parse('Monday, February  1, 1988', '%A, %B %e, %Y');
+
+  # $date->string; # 1988-02-01T00:00:00Z
+  # $date->epoch; # 570672000
+
+=back
+
+=cut
+
+=head2 reset
+
+  reset(Int $time) (Date)
+
+The reset method resets all attributes to correspond with the epoch provided.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item reset example 1
+
+  # given: synopsis;
+
+  $date = $date->reset(631152000);
+
+  # $date->string; # 1990-01-01T00:00:00Z
+  # $date->epoch; # 631152000
+
+=back
+
+=cut
+
+=head2 restart
+
+  restart(Str $interval) (Date)
+
+The restart method truncates the date and time to the specified unit of time,
+e.g. C<year>, C<quarter>, C<month>, C<day>, C<hour>, C<minute>, C<second>.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item restart example 1
+
+  # given: synopsis;
+
+  $date = $date->restart('year');
+
+  # $date->string; # 1988-01-01T00:00:00Z
+  # $date->epoch; # 567993600
+
+=back
+
+=over 4
+
+=item restart example 2
+
+  # given: synopsis;
+
+  $date = $date->restart('quarter');
+
+  # $date->string; # 1988-01-01T00:00:00Z
+  # $date->epoch; # 567993600
+
+=back
+
+=over 4
+
+=item restart example 3
+
+  # given: synopsis;
+
+  $date = $date->restart('month');
+
+  # $date->string; # 1988-02-01T00:00:00Z
+  # $date->epoch; # 570672000
+
+=back
+
+=cut
+
+=head2 rfc3339
+
+  rfc3339() (Str)
+
+The rfc3339 method returns the date and time formatted as an RFC3339 string.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item rfc3339 example 1
+
+  # given: synopsis;
+
+  my $rfc3339 = $date->rfc3339;
+
+  # 1988-02-01T00:00:00Z
+
+=back
+
+=cut
+
+=head2 rfc7231
+
+  rfc7231() (Str)
+
+The rfc7231 method returns the date and time formatted as an RFC7231 string.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item rfc7231 example 1
+
+  # given: synopsis;
+
+  my $rfc7231 = $date->rfc7231;
+
+  # Mon, 01 Feb 1988 00:00:00 UTC
+
+=back
+
+=cut
+
+=head2 set
+
+  set(HashRef $data) (Date)
+
+The set method sets the date and time attributes specified.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item set example 1
+
+  # given: synopsis;
+
+  $date = $date->set({
+    day => 1,
+    month => 1,
+    year => 2000,
+  });
+
+  # $date->string; # 2000-01-01T00:00:00Z
+  # $date->epoch; # 946684800
+
+=back
+
+=over 4
+
+=item set example 2
+
+  # given: synopsis;
+
+  $date = $date->set({
+    day => 1,
+    month => 12,
+  });
+
+  # $date->string; # 1988-12-01T00:00:00Z
+  # $date->epoch; # 596937600
+
+=back
+
+=over 4
+
+=item set example 3
+
+  # given: synopsis;
+
+  $date = $date->set({
+    day => 1,
+    month => 12,
+    year => 1979,
+  });
+
+  # $date->string; # 1979-12-01T00:00:00Z
+  # $date->epoch; # 312854400
+
+=back
+
+=cut
+
+=head2 set_hms
+
+  set_hms(Maybe[Int] $hours, Maybe[Int] $minutes, Maybe[Int] $seconds) (Date)
+
+The set_hms method sets the C<hour>, C<minute>, and C<second> attributes.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item set_hms example 1
+
+  # given: synopsis;
+
+  $date = $date->set_hms(1, 0, 0);
+
+  # $date->string; # 1988-02-01T01:00:00Z
+  # $date->epoch; # 570675600
+
+=back
+
+=over 4
+
+=item set_hms example 2
+
+  # given: synopsis;
+
+  $date = $date->set_hms(undef, 30, 30);
+
+  # $date->string; # 1988-02-01T00:30:30Z
+  # $date->epoch; # 570673830
+
+=back
+
+=over 4
+
+=item set_hms example 3
+
+  # given: synopsis;
+
+  $date = $date->set_hms(0, 59, 59);
+
+  # $date->string; # 1988-02-01T00:59:59Z
+  # $date->epoch; # 570675599
+
+=back
+
+=cut
+
+=head2 set_mdy
+
+  set_mdy(Maybe[Int] $months, Maybe[Int] $days, Maybe[Int] $years) (Date)
+
+The set_mdy method sets the C<month>, C<day>, and C<year> attributes.
+
+
+
+
+I<Since C<0.01>>
+
+=over 4
+
+=item set_mdy example 1
+
+  # given: synopsis;
+
+  $date = $date->set_mdy(4, 30, 1990);
+
+  # $date->string; # 1990-04-30T00:00:00Z
+  # $date->epoch; # 641433600
+
+=back
+
+=over 4
+
+=item set_mdy example 2
+
+  # given: synopsis;
+
+  $date = $date->set_mdy(4, 30, undef);
+
+  # $date->string; # 1988-04-30T00:00:00Z
+  # $date->epoch; # 578361600
+
+=back
+
+=over 4
+
+=item set_mdy example 3
+
+  # given: synopsis;
+
+  $date = $date->set_mdy(undef, 15, undef);
+
+  # $date->string; # 1988-02-15T00:00:00Z
+  # $date->epoch; # 571881600
+
+=back
+
+=cut
+
+=head2 string
+
+  string() (Str)
+
+The string method returns a date and time string, and is an alias for
+L</rfc3339>.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item string example 1
+
+  # given: synopsis;
+
+  my $string = $date->string;
+
+  # 1988-02-01T00:00:00Z
+
+=back
+
+=cut
+
+=head2 sub
+
+  sub(HashRef $data) (Date)
+
+The sub method method decrements the date and time attributes specified.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item sub example 1
+
+  # given: synopsis;
+
+  $date = $date->sub({
+    days => 1,
+    months => 1,
+    years => 1,
+  });
+
+  # $date->string; # 1986-12-31T07:42:06Z
+  # $date->epoch; # 536398926
+
+=back
+
+=over 4
+
+=item sub example 2
+
+  # given: synopsis;
+
+  $date = $date->sub({
+    hours => 1,
+    minutes => 1,
+    seconds => 1,
+  });
+
+  # $date->string; # 1988-01-31T22:58:59Z
+  # $date->epoch; # 570668339
+
+=back
+
+=cut
+
+=head2 sub_days
+
+  sub_days(Int $days) (Date)
+
+The sub_days method decrements the C<day> attribute.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item sub_days example 1
+
+  # given: synopsis;
+
+  $date = $date->sub_days(1);
+
+  # $date->string; # 1988-01-31T00:00:00Z
+  # $date->epoch; # 570585600
+
+=back
+
+=over 4
+
+=item sub_days example 2
+
+  # given: synopsis;
+
+  $date = $date->sub_days(32);
+
+  # $date->string; # 1987-12-31T00:00:00Z
+  # $date->epoch; # 567907200
+
+=back
+
+=over 4
+
+=item sub_days example 3
+
+  # given: synopsis;
+
+  $date = $date->sub_days(-1);
+
+  # $date->string; # 1988-02-02T00:00:00Z
+  # $date->epoch; # 570758400
+
+=back
+
+=cut
+
+=head2 sub_hms
+
+  sub_hms(Maybe[Int] $hours, Maybe[Int] $minutes, Maybe[Int] $seconds) (Date)
+
+The sub_hms method decrements the C<hour>, C<minute>, and C<second> attributes.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item sub_hms example 1
+
+  # given: synopsis;
+
+  $date = $date->sub_hms(1, 0, 0);
+
+  # $date->string; # 1988-01-31T23:00:00Z
+  # $date->epoch; # 570668400
+
+=back
+
+=over 4
+
+=item sub_hms example 2
+
+  # given: synopsis;
+
+  $date = $date->sub_hms(undef, 1, 1);
+
+  # $date->string; # 1988-01-31T23:58:59Z
+  # $date->epoch; # 570671939
+
+=back
+
+=over 4
+
+=item sub_hms example 3
+
+  # given: synopsis;
+
+  $date = $date->sub_hms(1, 1);
+
+  # $date->string; # 1988-01-31T22:59:00Z
+  # $date->epoch; # 570668340
+
+=back
+
+=cut
+
+=head2 sub_hours
+
+  sub_hours(Int $hours) (Any)
+
+The sub_hours method decrements the C<hour> attribute.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item sub_hours example 1
+
+  # given: synopsis;
+
+  $date = $date->sub_hours(1);
+
+  # $date->string; # 1988-01-31T23:00:00Z
+  # $date->epoch; # 570668400
+
+=back
+
+=over 4
+
+=item sub_hours example 2
+
+  # given: synopsis;
+
+  $date = $date->sub_hours(25);
+
+  # $date->string; # 1988-01-30T23:00:00Z
+  # $date->epoch; # 570582000
+
+=back
+
+=over 4
+
+=item sub_hours example 3
+
+  # given: synopsis;
+
+  $date = $date->sub_hours(-1);
+
+  # $date->string; # 1988-02-01T01:00:00Z
+  # $date->epoch; # 570675600
+
+=back
+
+=cut
+
+=head2 sub_mdy
+
+  sub_mdy(Maybe[Int] $months, Maybe[Int] $days, Maybe[Int] $years) (Date)
+
+The sub_mdy method decrements the C<month>, C<day>, and C<year> attributes.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item sub_mdy example 1
+
+  # given: synopsis;
+
+  $date = $date->sub_mdy(1, 1, 1);
+
+  # $date->string; # 1986-12-31T07:42:06Z
+  # $date->epoch; # 536398926
+
+=back
+
+=over 4
+
+=item sub_mdy example 2
+
+  # given: synopsis;
+
+  $date = $date->sub_mdy(1, 1, undef);
+
+  # $date->string; # 1987-12-31T13:30:56Z
+  # $date->epoch; # 567955856
+
+=back
+
+=over 4
+
+=item sub_mdy example 3
+
+  # given: synopsis;
+
+  $date = $date->sub_mdy(1, 1);
+
+  # $date->string; # 1987-12-31T13:30:56Z
+  # $date->epoch; # 567955856
+
+=back
+
+=cut
+
+=head2 sub_minutes
+
+  sub_minutes(Int $minutes) (Date)
+
+The sub_minutes method decrements the C<minute> attribute.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item sub_minutes example 1
+
+  # given: synopsis;
+
+  $date = $date->sub_minutes(1);
+
+  # $date->string; # 1988-01-31T23:59:00Z
+  # $date->epoch; # 570671940
+
+=back
+
+=over 4
+
+=item sub_minutes example 2
+
+  # given: synopsis;
+
+  $date = $date->sub_minutes(61);
+
+  # $date->string; # 1988-01-31T22:59:00Z
+  # $date->epoch; # 570668340
+
+=back
+
+=over 4
+
+=item sub_minutes example 3
+
+  # given: synopsis;
+
+  $date = $date->sub_minutes(-1);
+
+  # $date->string; # 1988-02-01T00:01:00Z
+  # $date->epoch; # 570672060
+
+=back
+
+=cut
+
+=head2 sub_months
+
+  sub_months(Int $months) (Date)
+
+The sub_months method decrements the C<month> attribute.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item sub_months example 1
+
+  # given: synopsis;
+
+  $date = $date->sub_months(1);
+
+  # $date->string; # 1988-01-01T13:30:56Z
+  # $date->epoch; # 568042256
+
+=back
+
+=over 4
+
+=item sub_months example 2
+
+  # given: synopsis;
+
+  $date = $date->sub_months(13);
+
+  # $date->string; # 1987-01-01T07:42:08Z
+  # $date->epoch; # 536485328
+
+=back
+
+=over 4
+
+=item sub_months example 3
+
+  # given: synopsis;
+
+  $date = $date->sub_months(-1);
+
+  # $date->string; # 1988-03-02T10:29:04Z
+  # $date->epoch; # 573301744
+
+=back
+
+=cut
+
+=head2 sub_seconds
+
+  sub_seconds(Int $seconds) (Date)
+
+The sub_seconds method decrements the C<second> attribute.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item sub_seconds example 1
+
+  # given: synopsis;
+
+  $date = $date->sub_seconds(1);
+
+  # $date->string; # 1988-01-31T23:59:59Z
+  # $date->epoch; # 570671999
+
+=back
+
+=over 4
+
+=item sub_seconds example 2
+
+  # given: synopsis;
+
+  $date = $date->sub_seconds(61);
+
+  # $date->string; # 1988-01-31T23:58:59Z
+  # $date->epoch; # 570671939
+
+=back
+
+=over 4
+
+=item sub_seconds example 3
+
+  # given: synopsis;
+
+  $date = $date->sub_seconds(-1);
+
+  # $date->string; # 1988-02-01T00:00:01Z
+  # $date->epoch; # 570672001
+
+=back
+
+=cut
+
+=head2 sub_years
+
+  sub_years(Int $years) (Date)
+
+The sub_years method decrements the C<years> attribute.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item sub_years example 1
+
+  # given: synopsis;
+
+  $date = $date->sub_years(1);
+
+  # $date->string; # 1987-01-31T18:11:10Z
+  # $date->epoch; # 539115070
+
+=back
+
+=over 4
+
+=item sub_years example 2
+
+  # given: synopsis;
+
+  $date = $date->sub_years(25);
+
+  # $date->string; # 1963-01-31T22:39:10Z
+  # $date->epoch; # -218251250
+
+=back
+
+=over 4
+
+=item sub_years example 3
+
+  # given: synopsis;
+
+  $date = $date->sub_years(-1);
+
+  # $date->string; # 1989-01-31T05:48:50Z
+  # $date->epoch; # 602228930
+
+=back
+
+=cut
+
+=head1 OPERATORS
+
+This package overloads the following operators:
+
+=cut
+
+=over 4
+
+=item operation: C<(!=)>
+
+This package overloads the C<!=> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $date != 570672001;
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(+)>
+
+This package overloads the C<+> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $date + 0;
+
+  # 570672000
+
+=back
+
+=over 4
+
+=item operation: C<(-)>
+
+This package overloads the C<-> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $date - 0;
+
+  # 570672000
+
+=back
+
+=over 4
+
+=item operation: C<(0+)>
+
+This package overloads the C<0+> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = 0 + $date;
+
+  # 570672000
+
+=back
+
+=over 4
+
+=item operation: C<(<)>
+
+This package overloads the C<<> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $date < 570672001;
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(<=)>
+
+This package overloads the C<<=> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $date <= 570672000;
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(==)>
+
+This package overloads the C<==> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $date == 570672000;
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(>)>
+
+This package overloads the C<>> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $date > 570671999;
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(>=)>
+
+This package overloads the C<>=> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $date >= 570672000;
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(eq)>
+
+This package overloads the C<eq> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $date eq '570672000';
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(ne)>
+
+This package overloads the C<ne> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $date ne '560672000';
+
+  # 1
+
+=back
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

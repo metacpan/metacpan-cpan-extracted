@@ -1,17 +1,18 @@
 package mb;
+'有朋自遠方来不亦楽乎'=~/^\xE6\x9C\x89/ or die "Perl script '@{[__FILE__]}' must be UTF-8 encoding.\n";
 ######################################################################
 #
 # mb - run Perl script in MBCS encoding (not only CJK ;-)
 #
 # https://metacpan.org/release/mb
 #
-# Copyright (c) 2020, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2020, 2021, 2022 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.36';
+$VERSION = '0.37';
 $VERSION = $VERSION;
 
 # internal use
@@ -456,7 +457,9 @@ sub mb::getc (;*) {
         }
     }
     elsif ($script_encoding =~ /\A (?: utf8 | wtf8 ) \z/xms) {
-        if ($getc =~ /\A [\xC2-\xDF] \z/xms) {
+        if ($getc =~ /\A [\x00-\x7F\x80-\xC1\xF5-\xFF] \z/xms) {
+        }
+        elsif ($getc =~ /\A [\xC2-\xDF] \z/xms) {
             $getc .= CORE::getc $fh;
         }
         elsif ($getc =~ /\A [\xE0-\xEF] \z/xms) {
@@ -2145,19 +2148,27 @@ sub parse_expr {
         $parsed .= parse_ambiguous_char();
     }
 
-    # mb::do { block }   --> do { block }
-    # mb::eval { block } --> eval { block }
-    # do { block }       --> do { block }
-    # eval { block }     --> eval { block }
+    # CORE::do { block }   --> CORE::do { block }
+    # CORE::eval { block } --> CORE::eval { block }
+    elsif (/\G ( CORE:: (?: do | eval ) \s* ) ( \{ ) /xmsgc) {
+        $parsed .= $1;
+        $parsed .= parse_expr_balanced($2);
+        $parsed .= parse_ambiguous_char();
+    }
+
+    # mb::do { block }     --> do { block }
+    # mb::eval { block }   --> eval { block }
+    # do { block }         --> do { block }
+    # eval { block }       --> eval { block }
     elsif (/\G (?: mb:: )? ( (?: do | eval ) \s* ) ( \{ ) /xmsgc) {
         $parsed .= $1;
         $parsed .= parse_expr_balanced($2);
         $parsed .= parse_ambiguous_char();
     }
 
-    # $#{}, ${}, @{}, %{}, &{}, *{}, do {}, eval {}, sub {}
+    # $#{}, ${}, @{}, %{}, &{}, *{}, defer {}, sub {}
     # "\x24" [$] DOLLAR SIGN (U+0024)
-    elsif (/\G ((?: \$[#] | [\$\@%&*] | (?:CORE::)? do | (?:CORE::)? eval | sub ) \s* ) ( \{ ) /xmsgc) {
+    elsif (/\G ((?: \$[#] | [\$\@%&*] | defer | sub ) \s* ) ( \{ ) /xmsgc) {
         $parsed .= $1;
         $parsed .= parse_expr_balanced($2);
         $parsed .= parse_ambiguous_char();
@@ -5239,6 +5250,8 @@ __END__
 
 =pod
 
+=encoding utf8
+
 =head1 NAME
 
 mb - run Perl script in MBCS encoding (not only CJK ;-)
@@ -5257,6 +5270,16 @@ mb - run Perl script in MBCS encoding (not only CJK ;-)
   $ perl mb.pm -e wtf8      MBCS_Perl_script.pl
 
   C:\WINDOWS> perl mb.pm script.pl ??-DOS-like *wildcard* available
+
+  MBCS quotes:
+        qq/ DAMEMOJI 功声乗ソ /
+         q/ DAMEMOJI 功声乗ソ /
+         m/ DAMEMOJI 功声乗ソ /
+         s/ DAMEMOJI 功声乗ソ / DAMEMOJI 功声乗ソ /
+    split / DAMEMOJI 功声乗ソ /
+        tr/ DAMEMOJI 功声乗ソ / DAMEMOJI 功声乗ソ /
+         y/ DAMEMOJI 功声乗ソ / DAMEMOJI 功声乗ソ /
+        qr/ DAMEMOJI 功声乗ソ /
 
   MBCS subroutines:
     mb::chop(...);
@@ -5295,6 +5318,30 @@ mb - run Perl script in MBCS encoding (not only CJK ;-)
   supported perl versions:
     perl version 5.005_03 to newest perl
 
+=head1 EASY INSTALL (Paste and Run)
+
+  1. Open URL https://metacpan.org/pod/mb
+  
+  2. Click ...
+  ----------------------------------
+  Source (raw) <--- This ***raw***
+  Browse (raw)
+  Changes
+  How to Contribute
+  Clone repository
+  Issues
+  Testers (NNN / NNN / NNN)
+  Kwalitee
+  Bus factor: 1
+  NN.NN% Coverage
+  License: perl_5
+  Perl: v5.5.30
+  ----------------------------------
+  
+  3. Select All Text of Page
+  
+  4. Save Text as "lib/mb.pm"
+
 =head1 INSTALLATION BY MAKE
 
 To install this software by make, type the following:
@@ -5330,7 +5377,8 @@ To install this software without make, type the following:
   in Japan since 1978, JIS C 6226-1978,
   in China since 1980, GB 2312-80,
   in Taiwan since 1984, Big5,
-  in South Korea since 1991, KS X 1002:1991, and more.
+  in South Korea since 1991, KS X 1002:1991,
+  in Hong Kong since 1999, Hong Kong Supplementary Character Set, and more.
   Even if you are an avid Unicode proponent, you cannot change this fact. These
   encodings are still used today in most areas except the world wide web.
 
@@ -5741,31 +5789,59 @@ To install this software without make, type the following:
 
 =head1 How to escape 2nd octet of DAMEMOJI
 
-  ex. Japanese KATAKANA "SO" like [ `/ ] code is "\x83\x5C" in Sjis
- 
-                  see     hex dump
-  -----------------------------------------
-  source script   "`/"    [83 5c]
-  -----------------------------------------
- 
-  using mb.pm,
-                          hex dump
-  -----------------------------------------
-  escaped script  "`\/"   [83 [5c] 5c]
-  -----------------------------------------
-                    ^--- escape by mb.pm
- 
-  by the by       see     hex dump
-  -----------------------------------------
-  your eye's      "`/\"   [83 5c] [5c]
-  -----------------------------------------
-  perl eye's      "`\/"   [83] \[5c]
-  -----------------------------------------
- 
-                          hex dump
-  -----------------------------------------
-  in the perl     "`/"    [83] [5c]
-  -----------------------------------------
+  $ perl mb.pm script.pl
+
+  in script.pl,
+    -----------------------------------------
+    encoding     DAMEMOJI      hex dump
+    -----------------------------------------
+    big5         "功"          [A5 5C]
+    big5hkscs    "声"          [89 5C]
+    gb18030      "乗"          [81 5C]
+    gbk          "乗"          [81 5C]
+    sjis         "ソ"          [83 5C]
+    -----------------------------------------
+
+  mb.pm modulino escapes literal DAMEMOJI in your script and save as new script.
+
+  in script.oo.pl,
+    -----------------------------------------
+    encoding     not DAMEMOJI  hex dump
+    -----------------------------------------
+    big5         "功\"         [A5 [5C] 5C]
+    big5hkscs    "声\"         [89 [5C] 5C]
+    gb18030      "乗\"         [81 [5C] 5C]
+    gbk          "乗\"         [81 [5C] 5C]
+    sjis         "ソ\"         [83 [5C] 5C]
+    -----------------------------------------
+
+  then mb.pm executes "script.oo.pl"
+
+  in the perl,
+    -----------------------------------------
+    encoding     memory        hex dump
+    -----------------------------------------
+    big5         "功"          [A5] [5C]
+    big5hkscs    "声"          [89] [5C]
+    gb18030      "乗"          [81] [5C]
+    gbk          "乗"          [81] [5C]
+    sjis         "ソ"          [83] [5C]
+    -----------------------------------------
+
+=head1 MBCS character casing
+
+  lc("A") makes "a", however lc("乙") does "乙", moreover lc("Ａ") does "Ａ".
+
+    -----------------------------------------
+    encoding     script          result
+    -----------------------------------------
+    big5         lc("乙ＡA")     "乙Ａa"
+    big5hkscs    lc("働ＡA")     "働Ａa"
+    gb18030      lc("華ＡA")     "華Ａa"
+    gbk          lc("華ＡA")     "華Ａa"
+    sjis         lc("アＡA")     "アＡa"
+    uhc          lc("갂ＡA")     "갂Ａa"
+    -----------------------------------------
 
 =head1 What transpiles to what by this software?
 

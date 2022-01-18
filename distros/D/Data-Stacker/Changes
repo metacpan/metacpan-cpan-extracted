@@ -1,5 +1,9 @@
 Revision history for Perl extension Data::Stacker
 
+1.02  2022-01-18 CADE
+
+    - avoid modification of input data when stacking
+
 1.01  2016-08-09 CADE
 
     - moved to URL-stype special chars escaping

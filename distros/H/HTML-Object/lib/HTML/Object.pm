@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/20
-## Modified 2021/12/22
+## Modified 2022/01/18
 ## All rights reserved
 ## 
 ## 
@@ -34,7 +34,7 @@ BEGIN
     use Module::Generic::File qw( file );
     use Nice::Try;
     use Scalar::Util ();
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
     our $DICT = {};
     our $LINK_ELEMENTS = {};
     our $FATAL_ERROR = 0;
@@ -864,9 +864,20 @@ HTML::Object - HTML Parser, Modifier and Query Interface
     my $doc = $p->parse( $file, { utf8 => 1 } ) || die( $p->error, "\n" );
     print $doc->as_string;
 
-To enable global dom object used by L<HTML::Object::XQuery>:
+or, using the HTML DOM implementation same as the Web API:
 
-    use HTML::Object global_dom => 1;
+    use HTML::Object::DOM global_dom => 1;
+    # then you can also use HTML::Object::XQuery for jQuery like DOM manipulation
+    my $p = HTML::Object::DOM->new;
+    my $doc = $p->parse_data( $some_html ) || die( $p->error, "\n" );
+    $('div.inner')->after( "<p>Test</p>" );
+    
+    # returns an HTML::Object::DOM::Collection
+    my $divs = $doc->getElementsByTagName( 'div' );
+    my $new = $doc->createElement( 'div' );
+    $new->setAttribute( id => 'newDiv' );
+    $divs->[0]->parent->replaceChild( $new, $divs->[0] );
+    # etc.
 
 To enable fatal error and also implement try-catch (using L<Nice::Try>) :
 
@@ -874,7 +885,7 @@ To enable fatal error and also implement try-catch (using L<Nice::Try>) :
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 
@@ -882,7 +893,23 @@ This module is yet another HTML parser, manipulation and query interface. It use
 
 It uses an external json data dictionary file of html tags (C<html_tags_dict.json>).
 
-There are 2 ways to manipulate and query the html data. Either using L<HTML::Object::Element> or L<HTML::Object::XQuery> that provides a jQuery like interface.
+There are 3 ways to manipulate and query the html data:
+
+=over 4
+
+=item 1. L<HTML::Object::Element>
+
+This is lightweight and simple
+
+=item 2. L<HTML::Object::DOM>
+
+This is an alternative HTML parser also based on L<HTML::Parser>, and that implements fully the Web API with DOM (Data Object Model), so you can query the HTML with perl equivalent to JavaScript methods of the Web API. It has been designed to be strictly identical to the Web API.
+
+=item 3. L<HTML::Object::XQuery>
+
+This interface provides a jQuery like API and requires the use of L<HTML::Object::DOM>. However, this is not designed to be a perl implementation of JavaScript, but rather a perl implementation of DOM manipulation methods found in jQuery.
+
+=back
 
 Note that this interface does not enforce HTML standard. It is up to you the developer to decide what value to use and where the HTML elements should go in the HTML tree and what to do with it.
 
@@ -1110,7 +1137,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 SEE ALSO
 
-L<HTML::Object::Element>, L<HTML::Object::XQuery>
+L<HTML::Object::DOM>, L<HTML::Object::Element>, L<HTML::Object::XQuery>
 
 =head1 COPYRIGHT & LICENSE
 

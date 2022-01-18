@@ -2,7 +2,7 @@ package Devel::Cover::Report::Coveralls;
 use strict;
 use warnings;
 use 5.008005;
-our $VERSION = "0.20";
+our $VERSION = "0.30";
 
 our $CONFIG_FILE = '.coveralls.yml';
 our $API_ENDPOINT_STEM = '/api/v1/jobs';
@@ -13,6 +13,7 @@ use Devel::Cover::DB;
 use HTTP::Tiny;
 use JSON::PP;
 use YAML;
+use Data::Dumper;
 
 sub get_source {
     my ($file, $callback) = @_;
@@ -81,6 +82,7 @@ sub get_config {
     $json->{repo_token} = $config->{repo_token} if $config->{repo_token};
     $json->{repo_token} = $ENV{COVERALLS_REPO_TOKEN} if $ENV{COVERALLS_REPO_TOKEN};
     $json->{flag_name} = $ENV{COVERALLS_FLAG_NAME} if $ENV{COVERALLS_FLAG_NAME};
+    $json->{parallel} = \1 if $ENV{COVERALLS_PARALLEL};
 
     my $is_travis;
     my $endpoint = ($ENV{COVERALLS_ENDPOINT} || $API_ENDPOINT) . $API_ENDPOINT_STEM;
@@ -91,6 +93,9 @@ sub get_config {
     } elsif ($ENV{CIRCLECI}) {
         $json->{service_name} = 'circleci';
         $json->{service_number} = $ENV{CIRCLE_BUILD_NUM};
+    } elsif($ENV{DRONE}) {
+        $json->{service_name} = 'drone';
+        $json->{service_number} = $ENV{DRONE_BUILD_NUMBER};
     } elsif ($ENV{SEMAPHORE}) {
         $json->{service_name} = 'semaphore';
         $json->{service_number} = $ENV{SEMAPHORE_BUILD_NUMBER};
@@ -128,7 +133,7 @@ sub get_config {
         $json->{service_event_type} = 'manual';
     }
 
-    die "required repo_token in $CONFIG_FILE, or launch via Travis" if !$json->{repo_token} && !$is_travis;
+    die "required repo_token in $CONFIG_FILE, make sure the environment var \"COVERALLS_REPO_TOKEN\" is set or launch via Travis" if !$json->{repo_token} && !$is_travis;
 
     if (exists $ENV{COVERALLS_PERL_SERVICE_NAME} && $ENV{COVERALLS_PERL_SERVICE_NAME}) {
         $json->{service_name} = $ENV{COVERALLS_PERL_SERVICE_NAME};
@@ -176,12 +181,19 @@ sub report {
 
     my $res = eval { decode_json $response->{content} };
 
+
+    if(exists($json->{service_number})){
+        print "My build number: ". $json->{service_number} ."\n";
+    }
     if ($@) {
         print "error: " . $response->{content};
     } elsif ($response->{success}) {
         print "register: " . $res->{url} . "\n";
     } else {
         print "error: " . $res->{message} . "\n";
+    }
+    if($ENV{COVERALLS_PARALLEL}){
+        print "Parallel mode: True". "\n"
     }
 }
 
@@ -303,6 +315,15 @@ won't change, and will be correct.
 =head2 COVERALLS_FLAG_NAME
 
 Describe the particular tests being done, e.g. C<Unit> or C<Functional>.
+
+=head2 COVERALLS_PARALLEL
+
+Set this to C<true> in case you run your tests in a parallel environment. It is important to note though:
+If you use this feature, you must ensure that your CI solution calls the parallel webhook when everything is done. Moreover,
+regardless of what CI you use, you have to make sure that the C<build_number> is constant across the different jobs, otherwise
+coveralls is unable to group them together as one build.
+
+See L<https://docs.coveralls.io/parallel-build-webhook>
 
 =head1 SEE ALSO
 

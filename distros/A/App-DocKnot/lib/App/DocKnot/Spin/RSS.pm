@@ -9,19 +9,19 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Spin::RSS 6.01;
+package App::DocKnot::Spin::RSS 7.00;
 
 use 5.024;
 use autodie;
-use warnings;
+use parent qw(App::DocKnot);
+use warnings FATAL => 'utf8';
 
-use App::DocKnot;
 use App::DocKnot::Spin::Thread;
 use App::DocKnot::Util qw(print_checked print_fh);
+use Carp qw(croak);
 use Date::Language ();
 use Date::Parse qw(str2time);
 use Path::Tiny qw(path);
-use Perl6::Slurp qw(slurp);
 use POSIX qw(strftime);
 
 ##############################################################################
@@ -141,7 +141,7 @@ sub _spin_file {
 # $base   - Base path for all output
 sub _report_action {
     my ($self, $action, $output) = @_;
-    my $shortout = $output->relative($self->{base} // path());
+    my $shortout = $output->relative($self->{base} // path(q{.}));
     print_checked("$action .../$shortout\n");
     return;
 }
@@ -385,8 +385,6 @@ sub _rss_review {
 # $entries_ref  - Array of entries in the RSS feed
 sub _rss_output {
     my ($self, $file, $base, $metadata_ref, $entries_ref) = @_;
-    my $fh = $file->openw_utf8();
-    my $version = '1.25';
 
     # Determine the current date and latest publication date of all of the
     # entries, published in the obnoxious format used by RSS.
@@ -398,35 +396,17 @@ sub _rss_output {
         $latest = strftime($format, localtime($entries_ref->[0]{date}));
     }
 
-    # Output the RSS header.
-    print_fh($fh, $file, <<"EOC");
-<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>$metadata_ref->{title}</title>
-    <link>$metadata_ref->{base}</link>
-    <description>$metadata_ref->{description}</description>
-    <language>$metadata_ref->{language}</language>
-    <pubDate>$latest</pubDate>
-    <lastBuildDate>$now</lastBuildDate>
-    <generator>DocKnot $App::DocKnot::VERSION</generator>
-EOC
+    # Determine the URL of the RSS file we're generating, if possible.
+    my $url;
     if ($metadata_ref->{'rss-base'}) {
         my $name = $file->basename();
-        my $url = $metadata_ref->{'rss-base'} . $name;
-        print_fh(
-            $fh,
-            $file,
-            qq{    <atom:link href="$url" rel="self"\n},
-            qq{               type="application/rss+xml" />\n},
-        );
+        $url = $metadata_ref->{'rss-base'} . $name;
     }
-    print_fh($fh, $file, "\n");
 
-    # Output each entry, formatting the contents of the entry as we go.
+    # Format the entries.
+    my @formatted_entries;
     for my $entry_ref ($entries_ref->@*) {
         my $date = $lang->strftime($format, [localtime($entry_ref->{date})]);
-        my $title = _escape($entry_ref->{title});
         my $description;
         if ($entry_ref->{description}) {
             $description = _escape($entry_ref->{description});
@@ -448,32 +428,39 @@ EOC
             ( [./\w] [^\"]+ ) \"
         }{ $1 . _absolute_url($2, $entry_ref->{link}) . qq{\"} }xmsge;
 
-        # Optionally add an attribute indicating this is not a permanent link.
-        # Assume any URL is a permanent link.
-        my $perma = q{};
-        if ($entry_ref->{guid} !~ m{ \A http }xms) {
-            $perma = ' isPermaLink="false"';
-        }
-
-        # Output the entry.
-        print_fh(
-            $fh,
-            $file,
-            "    <item>\n",
-            "      <title>$title</title>\n",
-            "      <link>$entry_ref->{link}</link>\n",
-            "      <description><![CDATA[\n",
-            $description,
-            "      ]]></description>\n",
-            "      <pubDate>$date</pubDate>\n",
-            "      <guid$perma>$entry_ref->{guid}</guid>\n",
-            "    </item>\n",
-        );
+        # Convert this into an object suitable for the output template.
+        #<<<
+        my $formatted_ref = {
+            date        => $date,
+            description => $description,
+            guid        => $entry_ref->{guid},
+            link        => $entry_ref->{link},
+            title       => $entry_ref->{title},
+        };
+        #>>>
+        push(@formatted_entries, $formatted_ref);
     }
 
-    # Close the RSS structure.
-    print_fh($fh, $file, "  </channel>\n</rss>\n");
-    close($fh);
+    # Generate the RSS output using the template.
+    #<<<
+    my %vars = (
+        base            => $metadata_ref->{base},
+        description     => $metadata_ref->{description},
+        docknot_version => $App::DocKnot::VERSION,
+        entries         => \@formatted_entries,
+        language        => $metadata_ref->{language},
+        latest          => $latest,
+        now             => $now,
+        title           => $metadata_ref->{title},
+        url             => $url,
+    );
+    #>>>
+    my $result;
+    $self->{template}->process($self->{templates}{rss}, \%vars, \$result)
+      or croak($self->{template}->error());
+
+    # Write the result to the output file.
+    $file->spew_utf8($result);
     return;
 }
 
@@ -488,49 +475,51 @@ EOC
 # $entries_ref  - Entries
 sub _thread_output {
     my ($self, $file, $metadata_ref, $entries_ref) = @_;
-    my $fh = $file->openw_utf8();
 
-    # Page prefix.
-    if ($metadata_ref->{'thread-prefix'}) {
-        print_fh($fh, $file, $metadata_ref->{'thread-prefix'}, "\n");
-    } else {
-        print_fh(
-            $fh,
-            $file,
-            "\\heading[Recent Changes][indent]\n\n",
-            "\\h1[Recent Changes]\n\n",
-        );
-    }
-
-    # Print out each entry.
-    my $last_month;
+    # The entries are in a flat list, but we want a two-level list of entries
+    # by month so that the template can add appropriate month headings.
+    # Restructure the entry list accordingly.
+    my (@entries_by_month, $last_month);
     for my $entry_ref ($entries_ref->@*) {
         my $month = strftime('%B %Y', localtime($entry_ref->{date}));
-
-        # Put headings before each month.
-        if (!$last_month || $month ne $last_month) {
-            print_fh($fh, $file, "\\h2[$month]\n\n");
-            $last_month = $month;
-        }
-
-        # Format each entry.
         my $date = strftime('%Y-%m-%d', localtime($entry_ref->{date}));
-        print_fh(
-            $fh,
-            $file,
-            "\\desc[$date \\entity[mdash]\n",
-            "      \\link[$entry_ref->{link}]\n",
-            "           [$entry_ref->{title}]][\n",
-        );
+
+        # Copy the entry with a reformatted description.
         my $description = $entry_ref->{description};
         $description =~ s{ ^ }{    }xmsg;
         $description =~ s{ \\ }{\\\\}xmsg;
-        print_fh($fh, $file, $description, "]\n\n");
+        #<<<
+        my $formatted_ref = {
+            date        => $date,
+            description => $description,
+            link        => $entry_ref->{link},
+            title       => $entry_ref->{title},
+        };
+        #<<<
+
+        # Add the entry to the appropriate month.
+        if (!$last_month || $month ne $last_month) {
+            my $month_ref = { heading => $month, entries => [$formatted_ref] };
+            push(@entries_by_month, $month_ref);
+            $last_month = $month;
+        } else {
+            push($entries_by_month[-1]{entries}->@*, $formatted_ref);
+        }
     }
 
-    # Print out the end of the page.
-    print_fh($fh, $file, "\\signature\n");
-    close($fh);
+    # Generate the RSS output using the template.
+    #<<<
+    my %vars = (
+        prefix  => $metadata_ref->{'thread-prefix'},
+        entries => \@entries_by_month,
+    );
+    #>>>
+    my $result;
+    $self->{template}->process($self->{templates}{changes}, \%vars, \$result)
+      or croak($self->{template}->error());
+
+    # Write the result to the output file.
+    $file->spew_utf8($result);
     return;
 }
 
@@ -636,14 +625,9 @@ sub _index_review {
 # $entries_ref  - Entries
 sub _index_output {
     my ($self, $file, $base, $metadata_ref, $entries_ref) = @_;
-    my $fh = $file->openw_utf8();
 
-    # Output the prefix.
-    if ($metadata_ref->{'index-prefix'}) {
-        print_fh($fh, $file, $metadata_ref->{'index-prefix'}, "\n");
-    }
-
-    # Output each entry.
+    # Format each entry.
+    my @formatted_entries;
     for my $entry_ref ($entries_ref->@*) {
         my @time = localtime($entry_ref->{date});
         my $date = strftime('%Y-%m-%d %H:%M', @time);
@@ -671,24 +655,33 @@ sub _index_output {
             ( \\ image \s* \[ ) ( [^\]]+ ) \]
         }{$1 . _relative_url($2, $metadata_ref->{'index-base'}) . ']' }xmsge;
 
-        # Print out the entry.
-        print_fh(
-            $fh,
-            $file,
-            "\\h2[$day: $entry_ref->{title}]\n\n",
-            $text,
-            "\\class(footer)[$date \\entity[mdash]\n",
-            "    \\link[$entry_ref->{link}]\n",
-            "         [Permanent link]]\n\n",
-        );
+        # Add the entry to the list.
+        #<<<
+        my $formatted_ref = {
+            date  => $date,
+            day   => $day,
+            link  => $entry_ref->{link},
+            title => $entry_ref->{title},
+            text  => $text,
+        };
+        #>>>
+        push(@formatted_entries, $formatted_ref);
     }
 
-    # Print out the end of the page.
-    if ($metadata_ref->{'index-suffix'}) {
-        print_fh($fh, $file, $metadata_ref->{'index-suffix'}, "\n");
-    }
-    print_fh($fh, $file, "\\signature\n");
-    close($fh);
+    # Generate the RSS output using the template.
+    #<<<
+    my %vars = (
+        prefix  => $metadata_ref->{'index-prefix'},
+        suffix  => $metadata_ref->{'index-suffix'},
+        entries => \@formatted_entries,
+    );
+    #>>>
+    my $result;
+    $self->{template}->process($self->{templates}{index}, \%vars, \$result)
+      or croak($self->{template}->error());
+
+    # Write the result to the output file.
+    $file->spew_utf8($result);
     return;
 }
 
@@ -706,11 +699,22 @@ sub new {
     my ($class, $args_ref) = @_;
 
     # Create and return the object.
+    my $base = defined($args_ref->{base}) ? path($args_ref->{base}) : undef;
+    my $tt = Template->new({ ABSOLUTE => 1, ENCODING => 'utf8' })
+      or croak(Template->error());
+    #<<<
     my $self = {
-        base => defined($args_ref->{base}) ? path($args_ref->{base}) : undef,
-        spin => App::DocKnot::Spin::Thread->new(),
+        base     => $base,
+        spin     => App::DocKnot::Spin::Thread->new(),
+        template => $tt,
     };
     bless($self, $class);
+    $self->{templates} = {
+        changes => $self->appdata_path('templates', 'changes.tmpl'),
+        index   => $self->appdata_path('templates', 'index.tmpl'),
+        rss     => $self->appdata_path('templates', 'rss.tmpl'),
+    };
+    #>>>
     return $self;
 }
 
@@ -722,7 +726,7 @@ sub generate {
     my ($self, $source, $base) = @_;
     $source = path($source);
     $base //= $self->{base};
-    $base = defined($base) ? path($base) : path();
+    $base = defined($base) ? path($base) : path(q{.});
 
     # Read in the changes.
     my ($metadata_ref, $changes_ref) = $self->_parse_changes($source);
@@ -1082,7 +1086,7 @@ Russ Allbery <rra@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2008, 2010-2012, 2021 Russ Allbery <rra@cpan.org>
+Copyright 2008, 2010-2012, 2021-2022 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

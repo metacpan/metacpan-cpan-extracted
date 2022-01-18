@@ -4,7 +4,7 @@
       "Gerald Lai <glai@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -37,17 +37,17 @@
       },
       "runtime" : {
          "requires" : {
-            "List::Util" : "1.26",
-            "Math::Complex" : "1.39",
-            "Math::Trig" : "1.06",
-            "POSIX" : "0",
+            "List::Util" : "1.41",
+            "Math::Complex" : "1.59",
+            "Math::Trig" : "1.23",
+            "POSIX" : "1.53",
             "ToolSet" : "1.00",
-            "perl" : "5.008005"
+            "perl" : "5.022000"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.96"
+            "Test::More" : "1.001014"
          }
       }
    },
@@ -63,9 +63,9 @@
          "web" : "https://github.com/geraldlai/ToolSet-Math"
       }
    },
-   "version" : "1.001",
-   "x_generated_by_perl" : "v5.30.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "version" : "1.002",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1
 }

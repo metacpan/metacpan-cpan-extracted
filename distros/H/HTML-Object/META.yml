@@ -56,5 +56,5 @@ requires:
 resources:
   bugtracker: https://git.deguest.jp/jack/HTML-Object/issues
   repository: https://git.deguest.jp/jack/HTML-Object
-version: v0.1.0
+version: v0.1.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

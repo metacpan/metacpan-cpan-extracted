@@ -1,3 +1,9 @@
+v1.23.17 Tue, 18 Jan 2022 21:26:32 +0100 moocow
+	+ merged changes for PDL 2.066+ from mohawk2
+	  - opt in to PDL 2.058 multi-C, dep on PDL v2.019
+	  - simplify for 2.014+ types, compat with PDL 2.066+
+	+ updated copyright notices in PODs
+
 v1.23.16 Thu, 29 Apr 2021 08:06:04 +0200 moocow
 	+ fixed $PDL::VERSION checks in Config.PL to reflect reality
 	  - integer-type downcasting behavior actually changed in PDL-2.037 with commit #f892aeb4ae on PDL/Basic/Ufunc/ufunc.pd

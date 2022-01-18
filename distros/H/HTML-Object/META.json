@@ -84,6 +84,6 @@
          "web" : "https://git.deguest.jp/jack/HTML-Object"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v0.1.1",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

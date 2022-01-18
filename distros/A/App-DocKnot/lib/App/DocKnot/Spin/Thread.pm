@@ -9,14 +9,15 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Spin::Thread 6.01;
+package App::DocKnot::Spin::Thread 7.00;
 
 use 5.024;
 use autodie;
-use warnings;
+use warnings FATAL => 'utf8';
 
 use App::DocKnot;
 use App::DocKnot::Util qw(print_fh);
+use Encode qw(decode);
 use Git::Repository ();
 use Image::Size qw(html_imgsize);
 use Path::Tiny qw(path);
@@ -1079,7 +1080,7 @@ sub _cmd_heading {
 
     # Add <link> tags based on the sitemap.
     if ($self->{sitemap} && defined($page)) {
-        my @links = $self->{sitemap}->links("/$page");
+        my @links = $self->{sitemap}->links($page);
         if (@links) {
             $output .= join(q{}, @links);
         }
@@ -1098,7 +1099,7 @@ sub _cmd_heading {
     # Add the <body> tag and the navbar (if we have a sitemap).
     $output .= "\n<body>\n";
     if ($self->{sitemap} && defined($page)) {
-        my @navbar = $self->{sitemap}->navbar("/$page");
+        my @navbar = $self->{sitemap}->navbar($page);
         if (@navbar) {
             $output .= join(q{}, @navbar);
         }
@@ -1278,7 +1279,7 @@ sub _cmd_signature {
     # Add the end-of-page navbar if we have sitemap information.
     if ($self->{sitemap} && $self->{output}) {
         my $page = $self->{out_path}->relative($self->{output});
-        $output .= join(q{}, $self->{sitemap}->navbar("/$page")) . "\n";
+        $output .= join(q{}, $self->{sitemap}->navbar($page)) . "\n";
     }
 
     # Figure out the modification dates.  Use the Git repository if available.
@@ -1467,10 +1468,10 @@ sub new {
 sub spin_thread {
     my ($self, $thread, $input) = @_;
     my $result;
-    open(my $out_fh, '>', \$result);
+    open(my $out_fh, '>:raw:encoding(utf-8)', \$result);
     $self->_parse_document($thread, $input, $out_fh, undef);
     close($out_fh);
-    return $result;
+    return decode('utf-8', $result);
 }
 
 # Spin a single file of thread to HTML.
@@ -1497,7 +1498,7 @@ sub spin_thread_file {
         $output = path($output)->absolute();
         $out_fh = $output->openw_utf8();
     } else {
-        open($out_fh, '>&', 'STDOUT');
+        open($out_fh, '>&:raw:encoding(utf-8)', 'STDOUT');
     }
 
     # Do the work.
@@ -1526,9 +1527,9 @@ sub spin_thread_output {
     my $out_fh;
     if (defined($output)) {
         $output = path($output)->absolute();
-        $out_fh = $output->filehandle('>');
+        $out_fh = $output->openw_utf8();
     } else {
-        open($out_fh, '>&', 'STDOUT');
+        open($out_fh, '>&:raw:encoding(utf-8)', 'STDOUT');
     }
 
     # Do the work.
@@ -2097,7 +2098,7 @@ Russ Allbery <rra@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 1999-2011, 2013, 2021 Russ Allbery <rra@cpan.org>
+Copyright 1999-2011, 2013, 2021-2022 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

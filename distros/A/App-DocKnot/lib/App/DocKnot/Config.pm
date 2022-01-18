@@ -9,7 +9,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Config 6.01;
+package App::DocKnot::Config 7.00;
 
 use 5.024;
 use autodie;
@@ -195,6 +195,12 @@ release> is mandatory.
 Sign distribution tarballs generated via C<docknot dist> with this PGP key.
 Equivalent to the B<-p> option to C<docknot dist>.
 
+=item versions
+
+Path to the F<.versions> file that should be updated by C<docknot release>.  A
+F<.versions> file records the versions and release dates of software packages.
+See L<App::Docknot::Spin::Versions> for more information.
+
 =back
 
 =head1 CLASS METHODS
@@ -261,7 +267,8 @@ SOFTWARE.
 
 =head1 SEE ALSO
 
-L<docknot(1)>
+L<docknot(1)>, L<App::DocKnot::Dist>, L<App:DocKnot::Release>,
+L<App::DocKnot::Spin::Versions>
 
 This module is part of the App-DocKnot distribution.  The current version of
 DocKnot is available from CPAN, or directly from its web site at

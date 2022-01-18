@@ -3,6 +3,6 @@
 ## Description: set version for PDL::CCS
 
 package PDL::CCS::Version;
-our $VERSION = '1.23.16'; ##-- update with perl-reversion from Perl::Version module
+our $VERSION = '1.23.17'; ##-- update with perl-reversion from Perl::Version module
 
 1; ##-- make perl happy

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Eagle's Path</title>
+    <title>Eagle&apos;s Path</title>
     <link>https://www.eyrie.org/~eagle/</link>
-    <description>"Passion and dispassion.  Choose two." -- Larry Wall</description>
+    <description>&quot;Passion and dispassion.  Choose two.&quot; -- Larry Wall</description>
     <language>en-us</language>
     <pubDate>%DATE%</pubDate>
     <lastBuildDate>%DATE%</lastBuildDate>

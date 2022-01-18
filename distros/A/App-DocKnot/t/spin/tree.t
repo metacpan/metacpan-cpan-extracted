@@ -2,7 +2,7 @@
 #
 # Test running spin on a tree of files.
 #
-# Copyright 2021 Russ Allbery <rra@cpan.org>
+# Copyright 2021-2022 Russ Allbery <rra@cpan.org>
 #
 # SPDX-License-Identifier: MIT
 
@@ -13,11 +13,8 @@ use warnings;
 use lib 't/lib';
 
 use Capture::Tiny qw(capture_stdout);
-use Cwd qw(getcwd);
 use File::Copy::Recursive qw(dircopy);
-use File::Spec ();
-use File::Temp ();
-use Perl6::Slurp qw(slurp);
+use Path::Tiny qw(path);
 use POSIX qw(LC_ALL setlocale strftime);
 use Test::DocKnot::Spin qw(is_spin_output_tree);
 
@@ -32,14 +29,14 @@ setlocale(LC_ALL, 'C');
 my $EXPECTED_OUTPUT = <<'OUTPUT';
 Generating thread file .../changes.th
 Generating RSS file .../changes.rss
-Updating .../changes.rss
-Spinning .../changes.html
-Spinning .../index.html
-Creating .../journal
 Generating index file .../journal/index.th
 Generating RSS file .../journal/index.rss
 Generating RSS file .../journal/debian.rss
 Generating RSS file .../journal/reviews.rss
+Updating .../changes.rss
+Spinning .../changes.html
+Spinning .../index.html
+Creating .../journal
 Updating .../names.png
 Spinning .../random.html
 Creating .../reviews
@@ -74,87 +71,72 @@ require_ok('App::DocKnot::Spin');
 # additional thread files.  Replace the POD pointer since it points to a
 # relative path in the source tree, but change its modification timestamp to
 # something in the past.
-my $tmpdir = File::Temp->newdir();
-my $datadir = File::Spec->catfile('t', 'data', 'spin');
-my $input = File::Spec->catfile($datadir, 'input');
-dircopy($input, $tmpdir->dirname)
-  or die "Cannot copy $input to $tmpdir: $!\n";
-my $pod_source = File::Spec->catfile(getcwd(), 'lib', 'App', 'DocKnot.pm');
-my $pointer_path = File::Spec->catfile(
-    $tmpdir->dirname, 'software', 'docknot', 'api',
-    'app-docknot.spin',
+my $tmpdir = Path::Tiny->tempdir();
+my $datadir = path('t', 'data', 'spin');
+my $input = $datadir->child('input');
+dircopy($input, $tmpdir) or die "Cannot copy $input to $tmpdir: $!\n";
+my $pod_source = path('lib', 'App', 'DocKnot.pm')->realpath();
+my $pointer_path = $tmpdir->path(
+    'software', 'docknot', 'api', 'app-docknot.spin',
 );
-chmod(0644, $pointer_path);
-open(my $fh, '>', $pointer_path);
-print_fh($fh, $pointer_path, "format: pod\n");
-print_fh($fh, $pointer_path, "path: $pod_source\n");
-close($fh);
+$pointer_path->spew_utf8("format: pod\n", "path: $pod_source\n");
 my $old_timestamp = time() - 10;
 
 # Spin a tree of files.
-my $output = File::Temp->newdir();
-my $expected = File::Spec->catfile($datadir, 'output');
+my $output = Path::Tiny->tempdir();
+my $expected = $datadir->child('output');
 my $spin = App::DocKnot::Spin->new({ 'style-url' => '/~eagle/styles/' });
-my $stdout = capture_stdout {
-    $spin->spin($tmpdir->dirname, $output->dirname);
-};
+my $stdout = capture_stdout { $spin->spin($tmpdir, $output) };
 my $count = is_spin_output_tree($output, $expected, 'spin');
 is($stdout, $EXPECTED_OUTPUT, 'Expected spin output');
 
 # Create a bogus file in the output tree.
-my $bogus = File::Spec->catfile($output->dirname, 'bogus');
-my $bogus_file = File::Spec->catfile($bogus, 'some-file');
-mkdir($bogus);
-open($fh, '>', $bogus_file);
-print {$fh} "Some stuff\n" or die "Cannot write to $bogus_file: $!\n";
-close($fh);
+my $bogus = $output->child('bogus');
+$bogus->mkpath();
+$bogus->child('some-file')->spew_utf8("Some stuff\n");
 
 # Spinning the same tree of files again should do nothing because of the
 # modification timestamps.
-$stdout = capture_stdout {
-    $spin->spin($tmpdir->dirname, $output->dirname);
-};
+$stdout = capture_stdout { $spin->spin($tmpdir, $output) };
 is($stdout, q{}, 'Spinning again does nothing');
 
 # The extra file shouldn't be deleted.
-ok(-d $bogus, 'Stray file and directory not deleted');
+ok($bogus->is_dir(), 'Stray file and directory not deleted');
 
 # Reconfigure spin to enable deletion, and run it again.  The only action
 # taken should be to delete the stray file.
 $spin
   = App::DocKnot::Spin->new({ delete => 1, 'style-url' => '/~eagle/styles/' });
-$stdout = capture_stdout {
-    $spin->spin($tmpdir->dirname, $output->dirname);
-};
+$stdout = capture_stdout { $spin->spin($tmpdir, $output) };
 is(
     $stdout,
     "Deleting .../bogus/some-file\nDeleting .../bogus\n",
     'Spinning with delete option cleans up',
 );
-ok(!-e $bogus, 'Stray file and directory was deleted');
+ok(!$bogus->exists(), 'Stray file and directory was deleted');
 
 # Override the title of the POD document and request a contents section.  Set
 # the modification timestamp in the future to force a repsin.
-open($fh, '>>', $pointer_path);
-print_fh($fh, $pointer_path, "format: pod\n");
-print_fh($fh, $pointer_path, "path: $pod_source\n");
-print_fh($fh, $pointer_path, "options:\n  contents: true\n  navbar: false\n");
-print_fh($fh, $pointer_path, "title: 'New Title'\n");
-close($fh);
+$pointer_path->spew_utf8(
+    "format: pod\n",
+    "path: $pod_source\n",
+    "options:\n",
+    "  contents: true\n",
+    "  navbar: false\n",
+    "title: 'New Title'\n",
+);
 utime(time() + 5, time() + 5, $pointer_path)
   or die "Cannot reset timestamps of $pointer_path: $!\n";
-$stdout = capture_stdout {
-    $spin->spin($tmpdir->dirname, $output->dirname);
-};
+$stdout = capture_stdout { $spin->spin($tmpdir, $output) };
 is(
     $stdout,
     "Converting .../software/docknot/api/app-docknot.html\n",
     'Spinning again regenerates the App::DocKnot page',
 );
-my $output_path = File::Spec->catfile(
-    $output->dirname, 'software', 'docknot', 'api', 'app-docknot.html',
+my $output_path = $output->child(
+    'software', 'docknot', 'api', 'app-docknot.html',
 );
-my $page = slurp($output_path);
+my $page = $output_path->slurp_utf8();
 like(
     $page,
     qr{ <title> New [ ] Title </title> }xms,
@@ -170,17 +152,13 @@ utime(time() - 5, time() - 5, $pointer_path)
 # Now, update the .versions file at the top of the input tree to change the
 # timestamp to ten seconds into the future.  This should force regeneration of
 # only the software/docknot/index.html file.
-my $versions_path = File::Spec->catfile($tmpdir->dirname, '.versions');
-my $versions = slurp($versions_path);
+my $versions_path = $tmpdir->child('.versions');
+my $versions = $versions_path->slurp_utf8();
 my $new_date = strftime('%Y-%m-%d %T', localtime(time() + 10));
 $versions =~ s{ \d{4}-\d\d-\d\d [ ] [\d:]+ }{$new_date}xms;
-chmod(0644, $versions_path);
-open(my $versions_fh, '>', $versions_path);
-print {$versions_fh} $versions or die "Cannot write to $versions_path: $!\n";
-close($versions_fh);
-$stdout = capture_stdout {
-    $spin->spin($tmpdir->dirname, $output->dirname);
-};
+$versions_path->chmod(0644);
+$versions_path->spew_utf8($versions);
+$stdout = capture_stdout { $spin->spin($tmpdir, $output) };
 is(
     $stdout,
     "Spinning .../software/docknot/index.html\n",

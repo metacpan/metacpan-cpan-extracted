@@ -10,12 +10,12 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Spin::Pointer 6.01;
+package App::DocKnot::Spin::Pointer 7.00;
 
 use 5.024;
 use autodie;
 use parent qw(App::DocKnot);
-use warnings;
+use warnings FATAL => 'utf8';
 
 use App::DocKnot::Config;
 use App::DocKnot::Util qw(is_newer);
@@ -66,11 +66,11 @@ sub _spin_markdown {
     my ($links, $navbar, $style);
     if ($self->{sitemap}) {
         my $page = $output->relative($self->{output});
-        my @links = $self->{sitemap}->links("/$page");
+        my @links = $self->{sitemap}->links($page);
         if (@links) {
             $links = join(q{}, @links);
         }
-        my @navbar = $self->{sitemap}->navbar("/$page");
+        my @navbar = $self->{sitemap}->navbar($page);
         if (@navbar) {
             $navbar = join(q{}, @navbar);
         }
@@ -172,7 +172,8 @@ sub new {
     }
 
     # Create and return the object.
-    my $tt = Template->new({ ABSOLUTE => 1 }) or croak(Template->error());
+    my $tt = Template->new({ ABSOLUTE => 1, ENCODING => 'utf8' })
+      or croak(Template->error());
     #<<<
     my $self = {
         output      => $args_ref->{output},
@@ -199,7 +200,6 @@ sub new {
 #  Throws: YAML::XS exception on invalid pointer
 sub is_out_of_date {
     my ($self, $pointer, $output) = @_;
-    $pointer = path($pointer);
     my $data_ref = $self->load_yaml_file($pointer, 'pointer');
     my $path = path($data_ref->{path})->absolute($pointer->parent());
     if (!$path->exists()) {
@@ -218,8 +218,6 @@ sub is_out_of_date {
 #         Text exception on failure to convert the file
 sub spin_pointer {
     my ($self, $pointer, $output, $options_ref) = @_;
-    $pointer = path($pointer);
-    $output = path($output);
     my $data_ref = $self->load_yaml_file($pointer, 'pointer');
     $data_ref->{options} //= {};
 
@@ -254,13 +252,17 @@ App::DocKnot::Spin::Pointer - Generate HTML from a pointer to an external file
 
     use App::DocKnot::Spin::Pointer;
     use App::DocKnot::Spin::Sitemap;
+    use Path::Tiny qw(path);
 
-    my $sitemap = App::DocKnot::Spin::Sitemap->new('/input/.sitemap');
+    my $sitemap_path = path('/input/.sitemap');
+    my $sitemap = App::DocKnot::Spin::Sitemap->new($sitemap_path);
     my $pointer = App::DocKnot::Spin::Pointer->new({
-        output  => '/output',
+        output  => path('/output'),
         sitemap => $sitemap,
     });
-    $pointer->spin_pointer('/input/file.spin', '/output/file.html');
+    my $input = path('/input/file.spin');
+    my $output = path('/output/file.html');
+    $pointer->spin_pointer($input, $output);
 
 =head1 REQUIREMENTS
 
@@ -326,11 +328,13 @@ C<sitemap> argument.
 
 Returns true if OUTPUT is missing or if it was modified less recently than the
 modification time of either POINTER or the underlying file that it points to.
+Both paths must be Path::Tiny objects.
 
 =item spin_pointer(POINTER, OUTPUT)
 
 Convert a single pointer file to HTML.  POINTER is the path to the pointer
-file, and OUTPUT is the path to where to write the output.
+file, and OUTPUT is the path to where to write the output.  Both paths must
+be Path::Tiny objects.
 
 =back
 
