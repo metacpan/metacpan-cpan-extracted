@@ -1,3 +1,12 @@
+0.109   2022-01-14  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Always enable strict, warnings, and particularly 5.010
+	  to enable defined-or operator; do not just enable this on unbuilt
+	  version.
+
+	- [doc] Document %BACKEND_FEATURES.
+
+
 0.108   2022-01-07  Released-By: PERLANCAR; Urgency: medium
 
 	- [doc] Document what parameters each backend supports (also in

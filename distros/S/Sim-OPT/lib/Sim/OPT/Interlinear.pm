@@ -31,7 +31,7 @@ use Sim::OPT::Parcoord3d;
 
 our @ISA = qw( Exporter );
 our @EXPORT = qw( interlinear, interstart prepfactlev tellstepsize );
-$VERSION = '0.171';
+$VERSION = '0.175';
 $ABSTRACT = 'Interlinear is a program for building metamodels from incomplete, multivariate, discrete dataseries on the basis of nearest-neighbouring gradients weighted by distance.';
 
 #######################################################################
@@ -796,7 +796,6 @@ sub wei
           }
         }
 
-
         #foreach my $elt ( @arra )
         foreach my $it ( @neighbours )
         {
@@ -957,13 +956,10 @@ sub wei
                       }
                     }
 
-
                     $co++;
                   }
                   $count++;
-
                 }
-
               }
 
             }
@@ -1125,7 +1121,7 @@ sub wei
 
   sub cyclearr
   {
-    say $tee "IN CYCLEARR";
+    say "IN CYCLEARR";
     my ( $arr_r, $minreq_forinclusion, $minreq_forgrad, $bank_r, $factlevels, $nfilterpoints, $arrb_r, $first0, $last0,
     $nears_ref, $limitgrads, $limitpoints, $modality_ref ) = @_;
     my @arr = @{ $arr_r };
@@ -1135,7 +1131,8 @@ sub wei
     my %nears = %{ $nears_ref };
     my @modality = @{ $modality_ref };
 
-    my ( @toinspects, @theseneighbours );
+    my $minreq = $minreq_forgrad->[0];
+    my ( @toinspects, @theseneighbours, @otherneighbours );
     if ( "wui" ~~ @modality )
     {
       foreach my $el ( keys %bank )
@@ -1147,12 +1144,19 @@ sub wei
           push ( @toinspects, @pair );
         }
       }
-      @toinspects = uniq( @toinspects ); #say "\@toinspects! " . dump( @toinspects );
+      @toinspects = uniq( @toinspects ); say "\@toinspects! " . dump( @toinspects );
 
       foreach my $e ( @toinspects )
       {
-        @theseneighbours = @{ isnear( $e, $first0, $last0 ) };
+        my @receivedneighbours = @{ isnear( $e, $first0, $last0 ) };
+        push ( @theseneighbours, @receivedneighbours );
       }
+
+      foreach my $e ( @theseneighbours )
+      {
+        my @receivedneighbours = @{ isnear( $e, $first0, $last0 ) };
+      }
+      push ( @theseneighbours, @receivedneighbours );
       @theseneighbours = uniq( @theseneighbours ); say "\@theseneighbours! " . dump( @theseneighbours );
     }
 
@@ -1162,7 +1166,7 @@ sub wei
     {
       my $key =  $el->[0] ;
 
-      if ( ( $key ~~ @theseneighbours ) and ( $el->[2] eq "" ) )
+      if ( ( ( "wui" ~~ @modality ) and ( $key ~~ @theseneighbours ) and ( $el->[2] eq "" ) ) or ( $el->[2] eq "" ) )
       {
         my @neighbours;
         if ( not ( ( "wai" ~~ @modality ) or ( "wooi" ~~ @modality ) ) )
@@ -1368,6 +1372,7 @@ sub wei
   }
   return( \@limb0, \%bank, \%nears )
 } ##### END SUB wei
+
 
 
 sub purelin

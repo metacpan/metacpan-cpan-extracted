@@ -1,3 +1,9 @@
+0.1.2 2022-01-19  Tobias Bossert (tobib at cpan.org)
+
+- Fixed replace regex that (end-of-script marker)
+- Added debug capabilities
+- Improved example
+
 0.1.1 2021-06-24  Tobias Bossert (tobib at cpan.org)
 
 - Fixed code in Synopsis

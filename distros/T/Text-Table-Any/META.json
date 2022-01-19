@@ -74,7 +74,7 @@
    "provides" : {
       "Text::Table::Any" : {
          "file" : "lib/Text/Table/Any.pm",
-         "version" : "0.108"
+         "version" : "0.109"
       }
    },
    "release_status" : "stable",
@@ -89,7 +89,7 @@
          "web" : "https://github.com/perlancar/perl-Text-Table-Any"
       }
    },
-   "version" : "0.108",
+   "version" : "0.109",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

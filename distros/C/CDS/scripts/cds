@@ -1,10 +1,14 @@
 #! /usr/bin/perl
+
+# This is part of the Condensation Perl Module 0.23 (cli) built on 2022-01-18.
+# See https://condensation.io for information about the Condensation Data System.
+
 use strict;
 use warnings;
 use Carp::Always;
 use File::Basename;
-use lib dirname (__FILE__);
-#use lib 'editions/cli-sftp-inotify';
+#use lib dirname (__FILE__);	# enable this if CDS.pm is in the same folder as "cds"
+#use lib '/path/to/CDS.pm';		# enable this if CDS.pm is in a specific folder
 use CDS;
 
 my $isTTY = -t STDOUT;

@@ -1,5 +1,5 @@
 package OPM::Maker::Command::filetest;
-$OPM::Maker::Command::filetest::VERSION = '1.14';
+$OPM::Maker::Command::filetest::VERSION = '1.15';
 # ABSTRACT: check if filelist in .sopm includes the files on your disk
 
 use strict;
@@ -143,7 +143,7 @@ OPM::Maker::Command::filetest - check if filelist in .sopm includes the files on
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 AUTHOR
 

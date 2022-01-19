@@ -1,16 +1,13 @@
-## no critic: TestingAndDebugging::RequireUseStrict
 package Text::Table::Any;
 
-#IFUNBUILT
-# # use 5.010001;
-# # use strict;
-# # use warnings;
-#END IFUNBUILT
+use 5.010001;
+use strict;
+use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-07'; # DATE
+our $DATE = '2022-01-14'; # DATE
 our $DIST = 'Text-Table-Any'; # DIST
-our $VERSION = '0.108'; # VERSION
+our $VERSION = '0.109'; # VERSION
 
 our %BACKEND_FEATURES = (
     "Term::Table" => {
@@ -433,7 +430,7 @@ Text::Table::Any - Generate text table using one of several backends
 
 =head1 VERSION
 
-This document describes version 0.108 of Text::Table::Any (from Perl distribution Text-Table-Any), released on 2022-01-07.
+This document describes version 0.109 of Text::Table::Any (from Perl distribution Text-Table-Any), released on 2022-01-14.
 
 =head1 SYNOPSIS
 
@@ -539,6 +536,13 @@ When using C<Text::TabularDisplay> backend:
 =head2 @BACKENDS
 
 List of supported backends.
+
+=head2 %BACKEND_FEATURES
+
+List of features supported by each backend. Hash key is backend name, e.g.
+C<Text::Table::Sprintf>. Hash value is a hashref containing feature name as
+hashref key and a boolean value or other value as hashref value to describe the
+support of that feature by that backend.
 
 =head1 FUNCTIONS
 

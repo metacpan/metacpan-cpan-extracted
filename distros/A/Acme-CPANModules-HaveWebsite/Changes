@@ -1,3 +1,12 @@
+0.004   2022-01-16  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [build] Rebuild with newer Pod::From::Acme::CPANModules and
+	  Pod::Weaver::Plugin::Acme::CPANModules to tweak generated POD
+	  output.
+
+
 0.003   2021-05-06  Released-By: PERLANCAR; Urgency: medium
 
 	- Add entries: Giblog, SPVM.

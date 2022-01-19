@@ -7,7 +7,6 @@ build_requires:
   Test::More: '0.88'
   base: '0'
   constant: '0'
-  mro: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -29,5 +28,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/neilb/next.git
-version: '0.68'
+version: '0.69'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

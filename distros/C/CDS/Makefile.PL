@@ -1,9 +1,9 @@
-use 5.010000;
-use Inline::MakeMaker;
-# See lib/ExtUtils/MakeMaker.pm for details of how to influence
-# the contents of the Makefile that is written.
+use lib 'inc';
+use ExtUtils::MakeMaker;
+use Inline::Module;
+
 WriteMakefile(
-	NAME			=> 'Condensation',
+	NAME			=> 'CDS',
 	VERSION_FROM	=> 'lib/CDS.pm',
 	PREREQ_PM		=> {
 						'Carp::Always' => 0,
@@ -22,8 +22,15 @@ WriteMakefile(
 						'Term::ReadLine' => 0,
 						'Time::Local' => 0,
 						},
-	ABSTRACT		=> 'Condensation library for Perl with support for folder and HTTP stores, and a command line interface.',
+	ABSTRACT		=> 'Condensation Data System (condensation.io), support for folder and HTTP stores, command line interface',
 	AUTHOR			=> 'Thomas Lochmatter <thomas.lochmatter@viereck.ch>',
 	LICENSE			=> 'mit',
 	EXE_FILES		=> ['scripts/cds'],
-);
+	postamble		=> {
+						inline => {
+							module => 'CDS::C',
+							stub => 'CDS::C::Inline',
+							ilsm => 'Inline::C',
+							},
+						},
+	);

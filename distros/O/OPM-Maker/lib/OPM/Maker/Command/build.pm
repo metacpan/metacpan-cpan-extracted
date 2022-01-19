@@ -1,5 +1,5 @@
 package OPM::Maker::Command::build;
-$OPM::Maker::Command::build::VERSION = '1.14';
+$OPM::Maker::Command::build::VERSION = '1.15';
 use strict;
 use warnings;
 
@@ -19,12 +19,13 @@ sub abstract {
 }
 
 sub usage_desc {
-    return "opmbuild build [--version <version>] [--output <output_path>] <path_to_sopm>";
+    return "opmbuild build [--version <version>] [--basedir <output_path>] [--output <output_path>] <path_to_sopm>";
 }
 
 sub opt_spec {
     return (
         [ "output=s",  "Output path for OPM file" ],
+        [ "basedir=s",  "Base directory of SOPM files" ],
         [ "version=s", "Version to be used (override the one from the sopm file)" ],
     );
 }
@@ -87,7 +88,8 @@ sub execute {
     FILE:
     for my $file ( @files ) {
         my $name         = $file->findvalue( '@Location' );
-        my $file_path    = Path::Class::File->new( $path, $name );
+        my $file_path    = Path::Class::File->new( 
+            $opt->{basedir} ? $opt->{basedir} : $path, $name );
         my $file_content = $file_path->slurp;
         my $base64       = MIME::Base64::encode( $file_content );
         
@@ -136,7 +138,7 @@ OPM::Maker::Command::build - Build OPM packages
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 AUTHOR
 

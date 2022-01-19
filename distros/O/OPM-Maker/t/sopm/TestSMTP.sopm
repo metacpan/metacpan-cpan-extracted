@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<otrs_package version="1.1">
+    <Name>TestSMTP</Name>
+    <Version>0.0.1</Version>
+    <Vendor>Renee Baecker, Perl-Services.de</Vendor>
+    <URL>http://perl-services.de/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <Description Lang="en">A module that restricts email addresses.</Description>
+    <Description Lang="de">Ein Modul, das den Emailversand auf Testsystemen einschränkt.</Description>
+    <Framework>3.0.x</Framework>
+    <Filelist>
+        <File Permission="644" Location="Kernel/Config/Files/TestSMTP.xml" />
+        <File Permission="644" Location="Kernel/System/Email.pm" />
+    </Filelist>
+</otrs_package>

@@ -76690,3 +76690,17 @@ G/GL/GLAI/ToolSet-Math-1.002.tar.gz
 C/CP/CPANERY/Venus-0.01.tar.gz
 M/MI/MIKIHOSHI/WebService-Mailgun-0.14.tar.gz
 J/JD/JDB/Win32-0.58.tar.gz
+P/PE/PERLANCAR/Acme-CPANModules-HaveWebsite-0.004.tar.gz
+L/LO/LOCHMATT/CDS-0.23.tar.gz
+J/JO/JONASBN/Crypt-OpenSSL-X509-1.912.tar.gz
+T/TO/TOBIB/Devel-Deanonymize-0.1.2.tar.gz
+N/NE/NEILB/NEXT-0.69.tar.gz
+R/RA/RAJ/Lang-HL-0.27.tar.gz
+R/RA/RAJ/Lang-HL-Export-0.15.tar.gz
+G/GE/GENE/Music-Cadence-0.1504.tar.gz
+P/PE/PERLSRVDE/OPM-Maker-1.15.tar.gz
+B/BD/BDFOY/PerlPowerTools-1.028.tar.gz
+R/RA/RAJ/qq-0.03.tar.gz
+G/GL/GLBRUNE/Sim-OPT-0.649.tar.gz
+K/KI/KIMOTO/SPVM-0.9125.tar.gz
+P/PE/PERLANCAR/Text-Table-Any-0.109.tar.gz

@@ -17,7 +17,6 @@ my @TEST_REQUIRES = (
     'Test::More'    => 0.88,
     'constant'      => 0,
     'base'          => 0,
-    'mro'           => 0,
 );
 
 push(@REQUIRES, @TEST_REQUIRES) if $mm_ver < 6.64;
@@ -26,7 +25,7 @@ WriteMakefile(
     NAME         => q[NEXT],
     VERSION_FROM => q[lib/NEXT.pm],
     PREREQ_PM   => { @REQUIRES },
-    INSTALLDIRS  => $] >= 5.007003 ? 'perl' : 'site',
+    INSTALLDIRS  => ($] >= 5.007003 && $] < 5.011) ? 'perl' : 'site',
 
     ($mm_ver >= 6.64
         ? (TEST_REQUIRES => { @TEST_REQUIRES })

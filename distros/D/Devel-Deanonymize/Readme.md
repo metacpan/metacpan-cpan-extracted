@@ -1,6 +1,7 @@
 # Devel::Deanonymize
 
-A small tool to make anonymous subs visible to Devel::Coverage (and possibly similar Modules)
+A small tool to make anonymous subs visible to Devel::Coverage (and possibly similar Modules).
+Code is based on https://github.com/pjcj/Devel--Cover/issues/51#issuecomment-17222928
 
 ## Synopsys 
 
@@ -17,6 +18,11 @@ HARNESS_PERL_SWITCHES="-MDevel::Cover=-ignore,^t/,Deanonymize -MDevel::Deanonymi
 # generate report
 cover -report html
 ```
+
+## Debugging
+
+If your tests suddenly fail for some weird reason, you can set `DEANONYMIZE_DEBUG`. If this environment variable is set,
+we print out the filename for every modified file write its contents to `<filpath/filename>_mod.pl`
 
 ## Coverage Reports
 

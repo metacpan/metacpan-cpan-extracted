@@ -1,6 +1,10 @@
 Changes file for OPM::Maker
 ===========================
 
+1.15 2022-01-19 07:04:00
+
+  + add new parameter to set basedir on build command (thanks to kjagosz)
+
 1.14 2022-01-17 14:09:00
 
   + fix version in info command

@@ -1,5 +1,10 @@
 Revision history for Perl extension NEXT.pm
 
+0.69 2022-01-19 NEILB
+    - Removed dependency on mro. PR#5 from HAARG++.
+    - Only install in perl dirs on older perls with bad load order
+      PR#6 from HAARG++.
+
 0.68 2021-04-19 NEILB
     - Fix for RT#123002, so NEXT works with proxy constants
     - Made testsuite clean under strict & warnings

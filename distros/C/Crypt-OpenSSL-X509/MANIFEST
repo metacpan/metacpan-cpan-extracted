@@ -1,5 +1,7 @@
 certs/balt.pem
 certs/broken-utf8.pem
+certs/metacpan.pem
+certs/multiple-san-types.pem
 certs/smime.conf
 certs/smime.pem
 certs/smime.sh
@@ -7,7 +9,7 @@ certs/thawte-ec.pem
 certs/thawte.pem
 certs/turk.pem
 certs/vsign1.pem
-Changes
+Changes.md
 hints/MSWin32.pl
 inc/Module/AutoInstall.pm
 inc/Module/Install.pm
@@ -30,6 +32,7 @@ ppport.h
 README
 t/00-version.t
 t/pod.t
+t/san.t
 t/utf8.t
 t/x509-ec.t
 t/x509.t

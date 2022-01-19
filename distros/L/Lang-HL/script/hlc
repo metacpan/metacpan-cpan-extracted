@@ -33,6 +33,8 @@ sub process_file {
     }
 }
 
+$code =~ s/[\t\r\n\f]+//g;
+
 my $hlObject = Lang::HL->new();
 my $generatedCode = $hlObject->parse($code);
 

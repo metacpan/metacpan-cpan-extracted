@@ -1,5 +1,12 @@
 Revision history for Music-Cadence
 
+0.1504 2022-01-18 20:56:51
+    - Improve documentation ever so slightly.
+
+0.1503 2022-01-18 20:43:44
+    - Update the eg/cadence program.
+    - Improve documentation.
+
 0.1502 2020-06-08 13:16:24
     - Illustrate the ->remove_notes method in eg/cadence.
 

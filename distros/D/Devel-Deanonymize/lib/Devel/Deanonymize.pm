@@ -12,6 +12,7 @@ by the statistic:
     }
 
 This script aims to solve this problem by wrapping each file in a sub and thus making these subs I<visible>.
+Code is based on https://github.com/pjcj/Devel--Cover/issues/51#issuecomment-17222928
 
 =head1 SYNOPSIS
 
@@ -21,6 +22,11 @@ This script aims to solve this problem by wrapping each file in a sub and thus m
     # Perl tests
     HARNESS_PERL_SWITCHES="-MDevel::Cover=-ignore,^t/,Deanonymize -MDevel::Deanonymize=<include_pattern"  prove t/
 
+
+=head1 DEBUGGING
+
+If your tests suddenly fail for some weird reason, you can set C<DEANONYMIZE_DEBUG>. If this environment variable is set,
+we print out the filename for every modified file write its contents to C<filepath/filename_mod.pl>
 
 
 =head1 EXAMPLES
@@ -65,7 +71,7 @@ package Devel::Deanonymize;
 use strict;
 use warnings FATAL => 'all';
 
-our $VERSION = "0.1.1";
+our $VERSION = "0.1.2";
 
 my $include_pattern;
 
@@ -84,6 +90,7 @@ sub modify_files {
         my (undef, $filename) = @_;
         return () if ($filename !~ /$include_pattern/);
         if (my $found = (grep {-e $_} map {"$_/$filename"} grep {!ref} @INC)[0]) {
+            print "Devel::Deanonymize: $found" . "\n" if $ENV{DEANONYMIZE_DEBUG};
             local $/ = undef;
             open my $fh, '<', $found or die("Can't read module file $found\n");
             my $module_text = <$fh>;
@@ -97,7 +104,7 @@ sub modify_files {
             # define everything in a sub, so Devel::Cover will DTRT
             # NB this introduces no extra linefeeds so D::C's line numbers
             # in reports match the file on disk
-            $module_text =~ s/(.*?package\s+\S+)(.*)(__END__|1;|__DATA__)/$1sub classWrapper {$2} classWrapper();/s;
+            $module_text =~ s/(.*?package\s+\S+)(.*)(__END__|1;|__DATA__)/$1sub classWrapper {$2} classWrapper();\n$3/s;
 
             # unhide private methods to avoid "Variable will not stay shared"
             # warnings that appear due to change of applicable scoping rules
@@ -107,6 +114,12 @@ sub modify_files {
 
             # filehandle on the scalar
             open $fh, '<', \$module_text;
+
+            if ($ENV{DEANONYMIZE_DEBUG}) {
+                open my $mod_fh, '>', $found . "_mod.pl";
+                print $mod_fh $module_text;
+                close $mod_fh;
+            }
 
             # and put it into %INC too so that it looks like we loaded the code
             # from the file directly

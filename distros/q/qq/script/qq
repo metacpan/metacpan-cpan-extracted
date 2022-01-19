@@ -90,6 +90,9 @@ while(<STDIN>) {
             list all types
             #list types
 
+            last post
+            #last
+
             clear screen
             #clear
 
@@ -200,6 +203,22 @@ while(<STDIN>) {
         $sth->execute($message, $id);
 
         say "";
+    }
+
+    if($rule[0] eq "last") {
+        if(!defined $rule[1]) {
+            my $sth = $dbh->prepare("select * from JOURNAL order by ID desc limit 1");
+            $sth->execute();
+
+            while(my @row = $sth->fetchrow_array()) {
+                my ($postID, $postDate, $postTime, $postMessage, $postType) = @row;
+                say $postID . "> "
+                  . $postType . "  "
+                  . $postDate . " "
+                  . $postTime . "\n"
+                  . $cipher->decrypt($postMessage) . "\n";
+            }
+        }
     }
 
     if($rule[0] eq "list") {

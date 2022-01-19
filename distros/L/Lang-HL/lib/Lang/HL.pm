@@ -5,7 +5,7 @@ use warnings;
 use utf8;
 use Regexp::Grammars;
 
-our $VERSION = '0.10';
+our $VERSION = '0.27';
 
 sub new {
 	my ($class) = @_;
@@ -44,6 +44,7 @@ sub PT::Class::X {
         use Lang::HL::Export;
         use feature qw(signatures);
         no warnings "experimental::signatures";
+		use Data::Printer;
     ';
 
     $classCode .= $classBlock . "\n1;";
@@ -285,8 +286,28 @@ sub PT::UpperRange::X {
 
 sub PT::IfElse::X {
     my ($class, $className) = @_;
-    my $IfElseIf = $class->{IfElseIf}->X($className);
-    return $IfElseIf;
+	my $if = $class->{If}->X($className);
+    my $elsif;
+    my $else;
+    if( exists $class->{ElsIf} ) {
+        $elsif = $class->{ElsIf}->X($className);
+    }
+    if( exists $class->{Else} ) {
+        $else = $class->{Else}->X($className);
+    }
+
+    my $ifElseIf;
+    if (defined $elsif) {
+        $ifElseIf = $if . $elsif . $else;
+        return $ifElseIf;
+    }
+    if (defined $else) {
+        $ifElseIf = $if . $else;
+        return $ifElseIf;
+    }
+
+    $ifElseIf = $if;
+    return $ifElseIf;
 }
 
 sub PT::IfElseIf::X {
@@ -358,12 +379,15 @@ sub PT::BoolOperator::X {
                 || $class->{LessThanEquals}
                 || $class->{StringEquals}
                 || $class->{StringNotEquals}
-                || $class->{NotEqulas} )->X($className);
+                || $class->{NotEqulas}
+				|| $class->{LogicalAnd}
+			 	|| $class->{LogicalOr} )->X($className);
 }
 
 sub PT::BoolOperands::X {
     my ($class, $className) = @_;
     return (       $class->{Number}
+				|| $class->{String}
                 || $class->{ScalarVariable}
                 || $class->{ArrayElement}
                 || $class->{HashElement} )->X($className);
@@ -457,9 +481,6 @@ sub PT::String::X {
 sub PT::StringValue::X {
     my ($class, $className) = @_;
     my $stringValue = $class->{''};
-    if( $stringValue eq " " ) {
-        print "stringValue is not a space";
-    }
     return $stringValue;
 }
 
@@ -555,7 +576,10 @@ sub PT::PairValue::X {
     return (       $class->{Number}
                 || $class->{String}
                 || $class->{ArrayList}
-                || $class->{HashRef} )->X($className);
+                || $class->{HashRef}
+				|| $class->{VariableName}
+				|| $class->{ArrayElement}
+				|| $class->{HashElement} )->X($className);
 }
 
 sub PT::FunctionCall::X {
@@ -615,7 +639,7 @@ sub PT::AccessorAssignment::X {
 
 sub PT::ScalarAssignment::X {
     my ($class, $className) = @_;
-    my $lhs = $class->{LHS}->X($className);
+    my $lhs = $class->{ScalarVariable}->X($className);
     my $rhs = $class->{RHS}->X($className);
 
     my $scalarAssignment = $lhs . " = " . $rhs . ";\n";
@@ -865,20 +889,24 @@ sub PT::CalcOperator::X {
 
 sub PT::Return::X {
     my ($class, $className) = @_;
-    my $rhs = $class->{RHS}->X($className);
-    my $return = "return " . $rhs . ";\n";
+	if(exists $class->{RHS}) {
+		my $rhs = $class->{RHS}->X($className);
+	    my $return = "return " . $rhs . ";\n";
+		return $return;
+	} else {
+		return "return;";
+	}
+
 }
 
 sub PT::Last::X {
     my ($class, $className) = @_;
-    my $last = $class->{''};
-    return $last;
+    return "last;";
 }
 
 sub PT::Next::X {
     my ($class, $className) = @_;
-    my $next = $class->{''};
-    return $next;
+    return "next;";
 }
 
 sub PT::GreaterThan::X {
@@ -953,34 +981,47 @@ sub PT::NotEqulas::X {
     return $notEqulas;
 }
 
+sub PT::LogicalAnd::X {
+    my ($class, $className) = @_;
+    my $logicalAnd = $class->{''};
+    return $logicalAnd;
+}
+
+sub PT::LogicalOr::X {
+    my ($class, $className) = @_;
+    my $logicalOr = $class->{''};
+    return $logicalOr;
+}
+
 my $parser = qr {
-    <nocontext:>
+    #<nocontext:>
     <debug: off>
     #<logfile: parserLog>
+	#<timeout: 100>
 
     <Lang>
     <objrule:  PT::Lang>                       <[Class]>+
 
     <objrule:  PT::Class>                      <TokenClass> <ClassName> <ClassBlock>
-    <objrule:  PT::ClassName>                  [a-zA-Z]+
+    <objrule:  PT::ClassName>                  [a-zA-Z]+?
     <objrule:  PT::ClassBlock>                 <LBrace> <ClassGroups> <RBrace>
     <objrule:  PT::ClassGroups>                <[Group]>+
 
     <objrule:  PT::Group>                      <ws: (\s++)*> <Comment> | <Function> | <Parent>
 
-    <objrule:  PT::Comment>                    [#] <LineComment> \n
+    <objrule:  PT::Comment>                    [#] <LineComment> @
     <objtoken: PT::LineComment>                .*?
 
     <objrule:  PT::Parent>                     <TokenParent> <LParen> <ClassNames> <RParen> <SemiColon>
     <objrule:  PT::ClassNames>                 <[ClassName]>+ % <Comma>
 
     <objrule:  PT::Function>                   <TokenFunction> <FunctionName> <LParen> <FunctionParamList> <RParen> <CodeBlock>
-    <objtoken: PT::FunctionName>               [a-zA-Z]+
+    <objtoken: PT::FunctionName>               [a-zA-Z]+?
 
     <objrule:  PT::FunctionParamList>          <EmptyParamList> | <FunctionParams>
     <objtoken: PT::EmptyParamList>             .{0}
     <objrule:  PT::FunctionParams>             <[Arg]>+ % <Comma>
-    <objrule:  PT::Arg>                        [a-zA-Z]+
+    <objrule:  PT::Arg>                        [a-zA-Z]+?
 
     <objrule:  PT::CodeBlock>                  <LBrace> <Blocks> <RBrace>
     <objrule:  PT::Blocks>                     <[Block]>+
@@ -996,14 +1037,13 @@ my $parser = qr {
     <objrule:  PT::LowerRange>                 <Number> | <VariableName> | <ArrayElement> | <HashElement>
     <objrule:  PT::UpperRange>                 <Number> | <VariableName> | <ArrayElement> | <HashElement>
 
-    <objrule:  PT::IfElse>                     <IfElseIf>
-    <objrule:  PT::IfElseIf>                   <If> <ElsIf>? <Else>?
+    <objrule:  PT::IfElse>                     <If> <ElsIf>? <Else>?
     <objrule:  PT::If>                         <TokenIf> <LParen> <BoolExpression> <RParen> <CodeBlock>
     <objrule:  PT::BoolExpression>             <BoolOperands> <BoolOperatorExpression>?
     <objrule:  PT::BoolOperatorExpression>     <BoolOperator> <BoolOperands>
-    <objrule:  PT::BoolOperands>               <Number> | <ScalarVariable> | <ArrayElement> | <HashElement>
+    <objrule:  PT::BoolOperands>               <Number> | <String> | <ScalarVariable> | <ArrayElement> | <HashElement>
     <objrule:  PT::BoolOperator>               <GreaterThan> | <LessThan> | <Equals> | <GreaterThanEquals> | <LessThanEquals>
-                                               | <StringEquals> | <StringNotEquals> | <NotEqulas>
+                                               | <StringEquals> | <StringNotEquals> | <NotEqulas> | <LogicalAnd> | <LogicalOr>
     <objrule:  PT::ElsIf>                      <[ElsIfChain]>+
     <objrule:  PT::ElsIfChain>                 <TokenElsIf> <LParen> <BoolExpression> <RParen> <CodeBlock>
     <objrule:  PT::Else>                       <TokenElse> <CodeBlock>
@@ -1015,8 +1055,9 @@ my $parser = qr {
     <objrule:  PT::VariableDeclaration>        <ArrayDeclaration> | <HashDeclaration> | <ScalarDeclaration>
 
     <objrule:  PT::ScalarDeclaration>          <Var> <VariableName> <Equal> <Value> <SemiColon>
+
     <objtoken: PT::Var>                        var
-    <objtoken: PT::VariableName>               [a-zA-Z]+
+    <objtoken: PT::VariableName>               [a-zA-Z]+?
     <objrule:  PT::Value>                      <RHS>
     <objtoken: PT::Number>                     [0-9]+
     <objrule:  PT::String>                     <LQuote> <StringValue> <RQuote>
@@ -1035,6 +1076,7 @@ my $parser = qr {
     <objrule:  PT::KeyValue>                   <PairKey> <Colon> <PairValue>
     <objrule:  PT::PairKey>                    <Number> | <String>
     <objrule:  PT::PairValue>                  <Number> | <String> | <ArrayList> | <HashRef>
+											   | <VariableName> | <ArrayElement> | <HashElement>
 
     <objrule:  PT::FunctionCall>               <FunctionName> <LParen> <Parameters>? <RParen> <SemiColon>
     <objrule:  PT::Parameters>                 <[Param]>+ % <Comma>
@@ -1042,23 +1084,22 @@ my $parser = qr {
 
     <objrule:  PT::Assignment>                 <ScalarAssignment> | <ArrayAssignment> | <HashAssignment> | <AccessorAssignment>
 
-    <objrule:  PT::ScalarAssignment>           <LHS> <Equal> <RHS> <SemiColon>
-    <objrule:  PT::LHS>                        <ScalarVariable>
-    <objtoken: PT::ScalarVariable>             \b[a-zA-Z]+\b
+    <objrule:  PT::ScalarAssignment>           <ScalarVariable> <Equal> <RHS> <SemiColon>
+    <objtoken: PT::ScalarVariable>             [a-zA-Z]+
     <objrule:  PT::RHS>                        <Number> | <FunctionReturn> | <ArrayElement> | <HashElement>
                                                | <ScalarVariable> | <Calc> | <ArrayList> | <HashRef> | <ClassAccessor>
                                                | <OtherClassAccesor> | <ClassFunctionReturn> | <String> | <STDIN>
     <objrule:  PT::FunctionReturn>             <FunctionName> <LParen> <Parameters>? <RParen>
     <objrule:  PT::ArrayElement>               <ArrayName> <[ArrayAccess]>+
     <objrule:  PT::ArrayAccess>                <LBracket> <Number> <RBracket>
-    <objrule:  PT::ArrayName>                  [a-zA-Z]+
+    <objrule:  PT::ArrayName>                  [a-zA-Z]+?
     <objrule:  PT::HashElement>                <HashName> <[HashAccess]>+
     <objrule:  PT::HashAccess>                 <LBrace> <HashKey> <RBrace>
-    <objtoken: PT::HashName>                   [a-zA-Z]+
+    <objtoken: PT::HashName>                   [a-zA-Z]+?
     <objrule:  PT::HashKey>                    <HashKeyString> | <HashKeyNumber>
     <objrule:  PT::HashKeyString>              <LQuote> <HashKeyStringValue> <RQuote>
-    <objtoken: PT::HashKeyStringValue>         [a-zA-Z]+
-    <objtoken: PT::HashKeyNumber>              [0-9]+
+    <objtoken: PT::HashKeyStringValue>         [a-zA-Z]+?
+    <objtoken: PT::HashKeyNumber>              [0-9]+?
 
     <objrule:  PT::STDIN>                      <LessThan>  <TokenSTDIN> <GreaterThan>
 
@@ -1075,7 +1116,7 @@ my $parser = qr {
     <objrule:  PT::CalcOperands>               <Number> | <ScalarVariable> | <ArrayElement> | <HashElement>
     <objtoken: PT::CalcOperator>               <Plus> | <Minus> | <Multiply> | <Divide>
 
-    <objrule:  PT::Return>                     <TokenReturn> <RHS> <SemiColon>
+    <objrule:  PT::Return>                     <TokenReturn> <RHS>? <SemiColon>
     <objrule:  PT::Last>                       <TokenLast> <SemiColon>
     <objrule:  PT::Next>                       <TokenNext> <SemiColon>
 
@@ -1094,6 +1135,8 @@ my $parser = qr {
 
     <objtoken: PT::TokenSTDIN>                 STDIN
 
+	<objtoken: PT::LogicalAnd>		           \&\&
+	<objtoken: PT::LogicalOr>            	   \|\|
     <objtoken: PT::NotEqulas>                  \!=
     <objtoken: PT::StringNotEquals>            ne
     <objtoken: PT::StringEquals>               eq
@@ -1133,6 +1176,7 @@ sub parse {
 1;
 __END__
 
+
 =head1 NAME
 
 Lang::HL
@@ -1144,7 +1188,7 @@ Lang::HL
 
 =head1 DESCRIPTION
 
-HL is a programming language, for more documentation please visit https://hl-lang.github.io
+HL is a programming language.
 
 =head1 AUTHOR
 
@@ -1152,24 +1196,8 @@ Rajkumar Reddy
 
 =head1 COPYRIGHT AND LICENSE
 
-Rajkumar Reddy
-
-=head1 COPYRIGHT AND LICENSE
-
 Copyright (C) 2022 by Rajkumar Reddy. All rights reserved.
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
+Open Source.
 
 =cut

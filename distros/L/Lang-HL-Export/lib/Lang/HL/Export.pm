@@ -1,7 +1,7 @@
 package Lang::HL::Export;
 
 use strict;
-use warnings;
+no warnings;
 use utf8;
 use feature qw(signatures);
 no warnings "experimental::signatures";
@@ -10,11 +10,10 @@ use Hash::Merge;
 
 require Exporter;
 
-our $VERSION = '0.10';
+our $VERSION = '0.15';
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(
-	arrayElement
 	arrayLength
 	arrayMerge
 	arraySort
@@ -26,8 +25,8 @@ our @EXPORT = qw(
 	arrayJoin
 	arrayReverse
 	arrayDelete
-	hashElement
 	hashKeys
+	hashElement
 	hashMerge
 	hashDelete
 	stringConcat
@@ -35,8 +34,6 @@ our @EXPORT = qw(
 	stringLength
 	stringPart
 	stringLast
-	stringChop
-	stringChomp
 	readFile
 	writeFile
 	randomNumber
@@ -50,14 +47,6 @@ sub arrayDelete($array, $element) {
 
 sub hashDelete($hash, $element) {
 	delete($hash->{$element});
-}
-
-sub stringChop($string) {
-	return chop($string);
-}
-
-sub stringChomp($string) {
-	return chomp($string);
 }
 
 sub arrayReverse($array) {
@@ -77,14 +66,10 @@ sub arraySort($array) {
 }
 
 sub arrayUnshift($array, $element) {
-	# Places the element at the beginning of an array,
-	# shifting all the values to the right
-	unshift(@{$array}, $element)
+	unshift(@{$array}, $element);
 }
 
 sub arrayShift($array) {
-	# Shifts the first value of the array off and returns it,
-	# shortening the array by 1 and moving everything down.
 	return shift(@{$array});
 }
 
@@ -93,8 +78,6 @@ sub arrayPush($array, $element) {
 }
 
 sub arrayPop($array) {
-	# Pops and returns the last value of the array,
-	# shortening the array by one element.
 	return pop(@{$array});
 }
 
@@ -125,14 +108,6 @@ sub stringPart($text, $from, $to) {
 
 sub stringLast($text) {
 	return substr($text, -1);
-}
-
-sub arrayElement($array, $element) {
-	if( $element ~~ $array ) {
-		return 1;
-	} else {
-		return 0;
-	}
 }
 
 sub arrayLength($array) {
@@ -197,17 +172,6 @@ Rajkumar Reddy
 
 Copyright (C) 2022 by Rajkumar Reddy. All rights reserved.
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
+Open Source.
 
 =cut

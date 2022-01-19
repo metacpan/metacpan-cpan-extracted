@@ -16,7 +16,7 @@ bugtracker 'https://github.com/dsully/perl-crypt-openssl-x509/issues';
 
 requires_external_cc();
 
-if ($^O ne 'MSWin32' and my $prefix = `brew --prefix --installed openssl 2>@{[File::Spec->devnull]}`) {
+if ($^O ne 'MSWin32' and my $prefix = `brew --prefix --installed openssl\@1.1 2>@{[File::Spec->devnull]}`) {
   chomp $prefix;
   inc "-I$prefix/include";
   libs "-L$prefix/lib -lcrypto -lssl";
@@ -28,6 +28,12 @@ if ($^O ne 'MSWin32' and my $prefix = `brew --prefix --installed openssl 2>@{[Fi
 my $cc_option_flags = '-O2 -g -Wall -Werror';
 
 if ($Config::Config{gccversion} =~ /llvm/i) {
+  $cc_option_flags .= ' -Wno-deprecated-declarations'; # -Wno-compound-token-split-by-macro
+
+  if ($Config::Config{gccversion} =~ /llvm 13/i) {
+      $cc_option_flags .= ' -Wno-compound-token-split-by-macro';
+  }
+
   if ($Config::Config{perl_version} <= 20) {
     $cc_option_flags .= ' -Wno-error=pointer-bool-conversion';
   }
@@ -38,6 +44,8 @@ if ($Config::Config{myuname} =~ /sunos|solaris/i) {
 } else {
   cc_optimize_flags($cc_option_flags);
 }
+
+requires 'Convert::ASN1' => '0.33';
 
 auto_install();
 WriteAll;

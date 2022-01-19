@@ -1,5 +1,6 @@
 package OPM::Maker::Command::info;
-$OPM::Maker::Command::info::VERSION = '1.14';
+$OPM::Maker::Command::info::VERSION = '1.15';
+
 use strict;
 use warnings;
 
@@ -118,7 +119,7 @@ OPM::Maker::Command::info - show version info about opmbuild commands
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 DESCRIPTION
 

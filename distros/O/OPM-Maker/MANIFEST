@@ -30,6 +30,7 @@ t/build/03_version.t
 t/build/04_subs.t
 t/build/05_validate_args.t
 t/build/06_max_file_size.t
+t/build/07_basedir.t
 t/build_find_sopm/01_base.t
 t/build_find_sopm/05_validate_args.t
 t/dbtest/01_base.t
@@ -70,6 +71,7 @@ t/otobo-repo/SecondSMTP-0.0.1.opm
 t/otobo-repo/TestSMTP-0.0.1.opm
 t/repo/SecondSMTP-0.0.1.opm
 t/repo/TestSMTP-0.0.1.opm
+t/sopm/TestSMTP.sopm
 t/sopmtest/01_base.t
 t/sopmtest/02_errors.t
 t/sopmtest/04_subs.t

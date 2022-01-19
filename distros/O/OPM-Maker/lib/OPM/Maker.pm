@@ -1,5 +1,5 @@
 package OPM::Maker;
-$OPM::Maker::VERSION = '1.14';
+$OPM::Maker::VERSION = '1.15';
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ OPM::Maker - Module/App to build and test OPM packages for Znuny, OTOBO, ((OTRS)
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 DESCRIPTION
 

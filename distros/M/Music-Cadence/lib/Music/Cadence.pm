@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Generate musical cadence chords
 
-our $VERSION = '0.1502';
+our $VERSION = '0.1504';
 
 use List::Util 'any';
 use Moo;
@@ -301,7 +301,7 @@ Music::Cadence - Generate musical cadence chords
 
 =head1 VERSION
 
-version 0.1502
+version 0.1504
 
 =head1 SYNOPSIS
 
@@ -392,7 +392,9 @@ Examples: C<G#>, C<Eb>
 
   $scale = $mc->scale;
 
-The modal scale to use.  Default: C<major>
+The modal scale to use.
+
+Default: C<major>
 
 Supported scales are the diatonic modes:
 
@@ -538,10 +540,10 @@ If an B<inversion> is defined for the C<half> cadence, the chords are
 inverted as described above for the C<imperfect> cadence.
 
 The C<evaded> cadence applies inversions to seventh chords.  The
-default (with no B<inversion> defined) is to invert the first chord by
-the third inversion and the second by the first inversion.
+default is to invert the first chord by the third inversion and the
+second by the first inversion.
 
-Here is a summary showing resolutions and options:
+=head3 Handy Summary
 
  1. Deceptive -> V-vi or V-IV
     variation
@@ -603,7 +605,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gene Boggs.
+This software is copyright (c) 2022 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

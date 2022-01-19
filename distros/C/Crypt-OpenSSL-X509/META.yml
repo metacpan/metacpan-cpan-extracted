@@ -19,10 +19,11 @@ no_index:
     - inc
     - t
 requires:
+  Convert::ASN1: '0.33'
   perl: 5.8.0
 resources:
   bugtracker: https://github.com/dsully/perl-crypt-openssl-x509/issues
   homepage: https://github.com/dsully/perl-crypt-openssl-x509
   license: http://dev.perl.org/licenses/
   repository: https://github.com/dsully/perl-crypt-openssl-x509
-version: '1.910'
+version: '1.912'

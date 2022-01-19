@@ -226,6 +226,7 @@ sub resolve_resources {
       
       for my $depend_resource (@$depend_resources) {
         my $depend_config_file = $self->get_config_file_from_class_name($depend_resource);
+
         my $depend_resource_file = $depend_config_file;
         $depend_resource_file =~ s/\.config/\.a/;
         
@@ -253,30 +254,15 @@ sub resolve_resources {
 sub get_config_file_from_class_name {
   my ($self, $class_name) = @_;
   
-  my $class_file_base = $class_name;
-  $class_file_base =~ s|::|/|g;
-  $class_file_base .= '.spvm';
+  my $module_file = $self->builder->get_module_file($class_name);
   
-  my $class_file;
-  my @spvm_inc;
-  for my $inc (@INC) {
-    my $spvm_inc = "$inc/SPVM";
-    push @spvm_inc, $spvm_inc;
-    my $class_file_tmp = "$spvm_inc/$class_file_base";
-    
-    if (-f $class_file_tmp) {
-      $class_file = $class_file_tmp;
-      last;
-    }
-  }
-  
-  unless ($class_file) {
-    confess "Can't find class file $class_file_base for the class \"$class_name\" in (" . join(', ', @spvm_inc) . ")";
+  unless ($module_file) {
+    confess "$module_file is not loaded";
   }
   
   my $config_file;
-  if (-f $class_file) {
-    my $config_file_tmp = $class_file;
+  if (-f $module_file) {
+    my $config_file_tmp = $module_file;
     $config_file_tmp =~ s/\.spvm/\.config/;
     if (-f $config_file_tmp) {
       $config_file = $config_file_tmp;
@@ -314,13 +300,18 @@ sub compile {
     confess "Temporary directory must be specified for " . $self->category . " build";
   }
   
-  # Config file
-  my $config_rel_file = SPVM::Builder::Util::convert_class_name_to_category_rel_file($class_name, $category, 'config');
-  my $config_file = "$src_dir/$config_rel_file";
+  # Module file
+  my $module_file = $self->builder->get_module_file($class_name);
+  unless (defined $module_file) {
+    confess "\"$module_file\" module is not loaded";
+  }
   
   # Config
+  my $config_file = $module_file;
+  $config_file =~ s/\.spvm$/.config/;
   my $config;
   if ($category eq 'native') {
+    # Config file
     if (-f $config_file) {
       $config = SPVM::Builder::Util::load_config($config_file);
     }
@@ -335,8 +326,8 @@ sub compile {
   else { confess 'Unexpected Error' }
 
   # Native Directory
-  my $native_dir = $config_file;
-  $native_dir =~ s/\.config$//;
+  my $native_dir = $module_file;
+  $native_dir =~ s/\.spvm$//;
   $native_dir .= '.native';
   
   # Runtime include directries
@@ -515,7 +506,7 @@ sub compile {
       mkpath dirname $object_file;
       
       my $cc_cmd = $self->create_compile_command({config => $config, output_file => $object_file, source_file => $src_file});
-
+      
       # Execute compile command
       $cbuilder->do_system(@$cc_cmd)
         or confess "Can't compile $src_file: @$cc_cmd";
@@ -625,10 +616,15 @@ sub link {
   my $shared_lib_rel_file = SPVM::Builder::Util::convert_class_name_to_shared_lib_rel_file($class_name, $self->category);
   my $shared_lib_file = "$lib_dir/$shared_lib_rel_file";
 
+  # Module file
+  my $module_file = $self->builder->get_module_file($class_name);
+  unless (defined $module_file) {
+    confess "\"$module_file\" module is not loaded";
+  }
+  
   # Config file
-  my $config_rel_file = SPVM::Builder::Util::convert_class_name_to_category_rel_file($class_name, $category, 'config');
-  my $src_dir = $opt->{src_dir};
-  my $config_file = "$src_dir/$config_rel_file";
+  my $config_file = $module_file;
+  $config_file =~ s/\.spvm$/.config/;
 
   # Config
   my $config;
@@ -676,11 +672,6 @@ sub link {
       my $anon_method_cfunc_name = SPVM::Builder::Util::create_cfunc_name($anon_class_name, "", $category);
       push @$dl_func_list, $anon_method_cfunc_name;
     }
-  }
-
-  my $exported_funcs = $config->exported_funcs;
-  for my $exported_func (@$exported_funcs) {
-    push @$dl_func_list, $exported_func;
   }
 
   # This is bad hack to suppress boot strap function error.
@@ -914,43 +905,40 @@ sub create_precompile_csource {
   my $src_dir = $opt->{src_dir};
   mkpath $src_dir;
   
-  my $category = 'precompile';
+  my $module_file = $self->builder->get_module_file($class_name);
   
   my $class_rel_file_without_ext = SPVM::Builder::Util::convert_class_name_to_rel_file($class_name);
   my $class_rel_dir = SPVM::Builder::Util::convert_class_name_to_rel_dir($class_name);
-  my $source_file = "$src_dir/$class_rel_file_without_ext.$category.c";
-  
-  my $source_dir = "$src_dir/$class_rel_dir";
-  mkpath $source_dir;
-  
-  my $class_csource = $self->build_class_csource_precompile($class_name);
-  
-  my $is_create_csource_file;
+  my $source_file = "$src_dir/$class_rel_file_without_ext.precompile.c";
 
-  # Get old csource source
-  my $old_class_csource;
-  if (-f $source_file) {
-    open my $fh, '<', $source_file
-      or die "Can't open $source_file";
-    $old_class_csource = do { local $/; <$fh> };
+  my $need_create;
+  if ($self->force) {
+    $need_create = 1;
   }
   else {
-    $old_class_csource = '';
+    if (!-f $source_file) {
+      $need_create = 1;
+    }
+    else {
+      my $mtime_module_file = (stat($module_file))[9];
+      my $mtime_source_file = (stat($source_file))[9];
+      if ($mtime_module_file > $mtime_source_file) {
+        $need_create = 1;
+      }
+    }
   }
   
-  if ($class_csource ne $old_class_csource) {
-    $is_create_csource_file = 1;
-  }
-  else {
-    $is_create_csource_file = 0;
-  }
-  
-  # Create source fil
-  if ($is_create_csource_file) {
-    open my $fh, '>', $source_file
-      or die "Can't create $source_file";
-    print $fh $class_csource;
-    close $fh;
+  if ($need_create) {
+    my $source_dir = "$src_dir/$class_rel_dir";
+    mkpath $source_dir;
+    
+    my $class_csource = $self->build_class_csource_precompile($class_name);
+    if ($need_create) {
+      open my $fh, '>', $source_file
+        or die "Can't create $source_file";
+      print $fh $class_csource;
+      close $fh;
+    }
   }
 }
 
