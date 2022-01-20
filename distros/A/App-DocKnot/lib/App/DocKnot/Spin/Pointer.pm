@@ -10,7 +10,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Spin::Pointer 7.00;
+package App::DocKnot::Spin::Pointer 7.01;
 
 use 5.024;
 use autodie;
@@ -136,6 +136,7 @@ sub _spin_pod {
     my $data;
     $podthread->output_string(\$data);
     $podthread->parse_file("$source");
+    $data = decode('utf-8', $data);
 
     # Spin that page into HTML.
     $self->{thread}->spin_thread_output($data, $source, 'POD', $output);

@@ -38,8 +38,12 @@ do(T_PATH . '/functions/run_in_fork.pl');
 # minimal dummy classes needed for unit tests:
 package UI::Various::Window
 {   use UI::Various::widget; our @ISA = qw(UI::Various::toplevel);   };
+package UI::Various::PoorTerm::Window
+{   use UI::Various::widget; our @ISA = qw(UI::Various::Window);   };
 package UI::Various::Dialog
 {   use UI::Various::widget; our @ISA = qw(UI::Various::toplevel);   };
+package UI::Various::PoorTerm::Dialog
+{   use UI::Various::widget; our @ISA = qw(UI::Various::Dialog);   };
 package Dummy
 {   sub new { my $self = {}; bless $self, 'Dummy'; }   };
 
@@ -87,7 +91,7 @@ _run_in_fork
      });
 eval {   UI::Various::PoorTerm::Main::_init(1);   };
 like($@,
-     qr/^.*PoorTerm::Main may only be called from UI::Various::Main$re_msg_tail/,
+     qr/^UI::Various::PoorTerm::Main may only be called from itself$re_msg_tail/,
      'forbidden call to UI::Various::PoorTerm::Main::_init should fail');
 eval {   $_ = UI::Various::Main::height(Dummy->new());   };
 like($@,

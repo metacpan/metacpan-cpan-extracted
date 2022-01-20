@@ -40,13 +40,16 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use UI::Various::core;
 
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw();
+
+# hash of all SCALAR references used:
+my %references = ();
 
 #########################################################################
 
@@ -120,17 +123,53 @@ sub _cleanup($)
     # We recursively remove our references to L<Curses::UI> objects first in
     # order to ease the internal cleanup for L<Curses::UI> itself.  The
     # later is initiated by explicitly removing each element:
+    local $_;
     if ($self->can('remove'))
     {
-	local $_;
 	while ($_ = $self->child)
 	{   $_->_cleanup;   }
     }
+    foreach (keys %references)
+    {   defined $references{$_}{$self}  and  delete $references{$_}{$self};   }
     $self->{_cui}  and  delete $self->{_cui};
 
-    local $_ = $self->parent;
+    $_ = $self->parent;
     $_->{_cui}  and  $_->{_cui}->delete($self->_cid);
     $_->remove($self);
+}
+
+#########################################################################
+
+=head2 B<_reference> - remember SCALAR referenece
+
+    $self->_reference($scalar);
+
+=head3 parameters:
+
+    $scalar             reference to SCALAR
+
+=head3 description:
+
+This method stores all SCALAR references for later updates when the content
+of a SCALAR is changes.
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+sub _reference($$)
+{
+    my ($self, $scalar) = @_;
+    defined $references{$scalar}
+	or  $references{$scalar} = {};
+    defined $references{$scalar}{$self}
+	or  $references{$scalar}{$self} = $self;
+    local $_;
+    foreach (keys %{$references{$scalar}})
+    {
+	next if $_ eq $self;
+	$_ = $references{$scalar}{$_};
+	$_->can('_update')  and  $_->_update();
+    }
 }
 
 1;

@@ -1,5 +1,8 @@
 Revision history for Task-MusicBundle
 
+0.1905 2022-01-19 18:05:10
+    - Remove MIDI::Tab as it is about notation, not creation.
+
 0.1904 2021-07-11 11:15:16
     - Add Music::Guidonian.
 

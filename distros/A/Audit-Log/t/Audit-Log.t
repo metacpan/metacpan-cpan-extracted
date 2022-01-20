@@ -6,7 +6,7 @@ use lib 'lib';
 use Test::More;
 use Test::Deep;
 use Audit::Log;
-use List::Util qw{uniq};
+use List::Util 1.45 qw{uniq};
 
 my $parser = Audit::Log->new('t/audit.log','name','type','nametype','line','timestamp');
 my $rows = $parser->search( type => qr/path/i, nametype => qr/create|delete/i, name => qr/^backups\/[^\.]/, key => qr/backupwatch/, older => 1642448670, newer => 1642441403 );

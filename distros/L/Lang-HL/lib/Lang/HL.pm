@@ -5,7 +5,7 @@ use warnings;
 use utf8;
 use Regexp::Grammars;
 
-our $VERSION = '0.27';
+our $VERSION = '0.33';
 
 sub new {
 	my ($class) = @_;
@@ -44,7 +44,7 @@ sub PT::Class::X {
         use Lang::HL::Export;
         use feature qw(signatures);
         no warnings "experimental::signatures";
-		use Data::Printer;
+	use Data::Printer;
     ';
 
     $classCode .= $classBlock . "\n1;";
@@ -372,25 +372,25 @@ sub PT::BoolOperatorExpression::X {
 
 sub PT::BoolOperator::X {
     my ($class, $className) = @_;
-    return (       $class->{GreaterThan}
-                || $class->{LessThan}
-                || $class->{Equals}
-                || $class->{GreaterThanEquals}
-                || $class->{LessThanEquals}
-                || $class->{StringEquals}
-                || $class->{StringNotEquals}
-                || $class->{NotEqulas}
-				|| $class->{LogicalAnd}
-			 	|| $class->{LogicalOr} )->X($className);
+    return (	   $class->{GreaterThan}
+		|| $class->{LessThan}
+		|| $class->{Equals}
+		|| $class->{GreaterThanEquals}
+		|| $class->{LessThanEquals}
+		|| $class->{StringEquals}
+		|| $class->{StringNotEquals}
+		|| $class->{NotEqulas}
+		|| $class->{LogicalAnd}
+		|| $class->{LogicalOr} )->X($className);
 }
 
 sub PT::BoolOperands::X {
     my ($class, $className) = @_;
-    return (       $class->{Number}
-				|| $class->{String}
-                || $class->{ScalarVariable}
-                || $class->{ArrayElement}
-                || $class->{HashElement} )->X($className);
+    return (	   $class->{Number}
+		|| $class->{String}
+		|| $class->{ScalarVariable}
+		|| $class->{ArrayElement}
+		|| $class->{HashElement} )->X($className);
 }
 
 sub PT::ElsIf::X {
@@ -573,13 +573,13 @@ sub PT::PairKey::X {
 
 sub PT::PairValue::X {
     my ($class, $className) = @_;
-    return (       $class->{Number}
-                || $class->{String}
-                || $class->{ArrayList}
-                || $class->{HashRef}
-				|| $class->{VariableName}
-				|| $class->{ArrayElement}
-				|| $class->{HashElement} )->X($className);
+    return (	   $class->{Number}
+		|| $class->{String}
+		|| $class->{ArrayList}
+		|| $class->{HashRef}
+		|| $class->{VariableName}
+		|| $class->{ArrayElement}
+		|| $class->{HashElement} )->X($className);
 }
 
 sub PT::FunctionCall::X {
@@ -643,18 +643,22 @@ sub PT::ScalarAssignment::X {
     my $rhs = $class->{RHS}->X($className);
 
     my $scalarAssignment = $lhs . " = " . $rhs . ";\n";
+    return $scalarAssignment;
 }
 
 sub PT::LHS::X {
     my ($class, $className) = @_;
     my $scalarVariable = $class->{ScalarVariable}->X($className);
+
     return $scalarVariable;
 }
 
 sub PT::ScalarVariable::X {
     my ($class, $className) = @_;
+
     my $scalarVariable = "\$";
     $scalarVariable .= $class->{''};
+
     return $scalarVariable;
 }
 
@@ -740,6 +744,7 @@ sub PT::FunctionReturn::X {
     }
 
     $functionReturn .= ")";
+    return $functionReturn;
 }
 
 sub PT::ArrayElement::X {
@@ -808,9 +813,11 @@ sub PT::HashKey::X {
 
 sub PT::HashKeyString::X {
     my ($class, $className) = @_;
+
     my $hashKeyStringValue = "\"";
     $hashKeyStringValue .= $class->{HashKeyStringValue}->X($className);
     $hashKeyStringValue .= "\"";
+
     return $hashKeyStringValue;
 }
 
@@ -1135,8 +1142,8 @@ my $parser = qr {
 
     <objtoken: PT::TokenSTDIN>                 STDIN
 
-	<objtoken: PT::LogicalAnd>		           \&\&
-	<objtoken: PT::LogicalOr>            	   \|\|
+    <objtoken: PT::LogicalAnd>		        \&\&
+    <objtoken: PT::LogicalOr>            	\|\|
     <objtoken: PT::NotEqulas>                  \!=
     <objtoken: PT::StringNotEquals>            ne
     <objtoken: PT::StringEquals>               eq
@@ -1179,7 +1186,7 @@ __END__
 
 =head1 NAME
 
-Lang::HL
+Lang::HL HL programming language.
 
 =head1 SYNOPSIS
 
@@ -1189,6 +1196,25 @@ Lang::HL
 =head1 DESCRIPTION
 
 HL is a programming language.
+
+=head1 EXAMPLE
+
+	class NotePad {
+	    function notePad() {
+	        var text = "NotePad Example";
+	        class.text = text;
+	    }
+	}
+
+	class Main {
+	    parent(NotePad);
+
+	    function main() {
+	        class.notePad();
+	        var text = class.NotePad.text;
+	        print(text, "\n");
+	    }
+	}
 
 =head1 AUTHOR
 

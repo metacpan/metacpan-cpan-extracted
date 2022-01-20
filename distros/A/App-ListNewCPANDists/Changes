@@ -1,3 +1,8 @@
+0.015   2021-08-01  Released-By: PERLANCAR; Urgency: low
+
+	- [ux] Add field formats result metadata.
+
+
 0.014   2021-05-02  Released-By: PERLANCAR; Urgency: medium
 
 	- Link to latest version instead of first version (suggested by

@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/ListNewCPANDists/list_monthly_new_cpan_dists
-# and generated automatically using Perinci::CmdLine::Gen version 0.498
+# and generated automatically using Perinci::CmdLine::Gen version 0.499
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-02'; # DATE
+our $DATE = '2021-08-01'; # DATE
 our $DIST = 'App-ListNewCPANDists'; # DIST
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,18 +40,13 @@ list-monthly-new-cpan-dists - List new CPAN distributions in a given month
 
 =head1 VERSION
 
-This document describes version 0.014 of list-monthly-new-cpan-dists (from Perl distribution App-ListNewCPANDists), released on 2021-05-02.
+This document describes version 0.015 of list-monthly-new-cpan-dists (from Perl distribution App-ListNewCPANDists), released on 2021-08-01.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % list-monthly-new-cpan-dists [--debug] [--exclude-author-re=s]
-     [--exclude-author=s+] [--exclude-authors-json=s] [--exclude-dist-re=s]
-     [--exclude-dist=s+] [--exclude-dists-json=s] [--format=name] [--json]
-     [--log-level=level] [--(no)naked-res] [--page-result[=program]]
-     [--quiet] [--trace] [--verbose] [--view-result[=program]] <month>
-     <year>
+% B<list-monthly-new-cpan-dists> [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--exclude-author-re>=I<re>] [(B<--exclude-author>=I<cpan::pause_id>)+] [B<--exclude-dist-re>=I<re>] [(B<--exclude-dist>=I<perl::distname>)+] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--exclude-authors-json>=I<json>] [B<--exclude-dists-json>=I<json>] -- E<lt>I<month>E<gt> E<lt>I<year>E<gt>
 
 =head1 DESCRIPTION
 
@@ -68,7 +63,11 @@ C<*> marks required options.
 
 =item B<--month>=I<s>*
 
+Can also be specified as the 1st command-line argument.
+
 =item B<--year>=I<s>*
+
+Can also be specified as the 2nd command-line argument.
 
 =back
 
@@ -229,7 +228,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-ListNewCPANDists
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-ListNewCPANDists/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ListNewCPANDists>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

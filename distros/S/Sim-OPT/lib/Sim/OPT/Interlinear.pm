@@ -31,7 +31,7 @@ use Sim::OPT::Parcoord3d;
 
 our @ISA = qw( Exporter );
 our @EXPORT = qw( interlinear, interstart prepfactlev tellstepsize );
-$VERSION = '0.175';
+$VERSION = '0.183';
 $ABSTRACT = 'Interlinear is a program for building metamodels from incomplete, multivariate, discrete dataseries on the basis of nearest-neighbouring gradients weighted by distance.';
 
 #######################################################################
@@ -1133,43 +1133,28 @@ sub wei
 
     my $minreq = $minreq_forgrad->[0];
     my ( @toinspects, @theseneighbours, @otherneighbours );
-    if ( "wui" ~~ @modality )
-    {
-      foreach my $el ( keys %bank )
-      {
-        my @orstrefs = @{ $bank{$el}{orstrings} };
-        foreach my $ref ( @orstrefs )
-        {
-          my @pair = @{ $ref };
-          push ( @toinspects, @pair );
-        }
-      }
-      @toinspects = uniq( @toinspects ); say "\@toinspects! " . dump( @toinspects );
-
-      foreach my $e ( @toinspects )
-      {
-        my @receivedneighbours = @{ isnear( $e, $first0, $last0 ) };
-        push ( @theseneighbours, @receivedneighbours );
-      }
-
-      foreach my $e ( @theseneighbours )
-      {
-        my @receivedneighbours = @{ isnear( $e, $first0, $last0 ) };
-      }
-      push ( @theseneighbours, @receivedneighbours );
-      @theseneighbours = uniq( @theseneighbours ); say "\@theseneighbours! " . dump( @theseneighbours );
-    }
 
     my %wand;
     my $coun = 0;
+
+    my @newneighbours;
+    if ( "flat" ~~ @modality )
+    {
+      foreach my $e ( @arrb )
+      {
+        push ( @newneighbours, $e->[0] );
+      }
+    }
+
     foreach my $el ( @arr )
     {
       my $key =  $el->[0] ;
 
-      if ( ( ( "wui" ~~ @modality ) and ( $key ~~ @theseneighbours ) and ( $el->[2] eq "" ) ) or ( $el->[2] eq "" ) )
+      if ( $el->[2] eq "" )
       {
         my @neighbours;
-        if ( not ( ( "wai" ~~ @modality ) or ( "wooi" ~~ @modality ) ) )
+
+        unless ( "flat" ~~ @modality )
         {
           if ( scalar( @{ $nears{$el->[0]}{neighbours} } ) == 0 )
           {
@@ -1181,32 +1166,9 @@ sub wei
             @neighbours = @{ $nears{$el->[0]}{neighbours} };
           }
         }
-        elsif ( "wai" ~~ @modality )
+        else
         {
-          if ( scalar( @{ $nears{$el->[0]}{neighbours} } ) == 0 )
-          {
-            @neighbours = @{ isstar( $el->[0], $first0, $last0 ) };
-            $nears{$el->[0]}{neighbours} = [ @neighbours ];
-          }
-          else
-          {
-            @neighbours = @{ $nears{$el->[0]}{neighbours} };
-          }
-        }
-        elsif ( "wooi" ~~ @modality )
-        {
-          if ( scalar( @{ $nears{$el->[0]}{neighbours} } ) == 0 )
-          {
-            @neighbours = @{ isnear( $el->[0], $first0, $last0 ) };
-            my @otherneighbours = @{ isstar( $el->[0], $first0, $last0 ) };
-            push ( @neighbours, @otherneighbours );
-            @neighbours = uniq( @neighbours );
-            $nears{$el->[0]}{neighbours} = [ @neighbours ];
-          }
-          else
-          {
-            @neighbours = @{ $nears{$el->[0]}{neighbours} };
-          }
+          @neighbours = @newneighbours;
         }
 
         #foreach my $elt ( @arrb )
@@ -1217,7 +1179,7 @@ sub wei
           {
             my @diff1 = diff( \@{ $el->[1] }, \@{ $elt->[1] } );
 
-            if ( ( scalar( @diff1 ) > 0 ) and ( scalar( @diff1 ) <= $minreq_forgrad->[2] ) )
+            if ( ( scalar( @diff1 ) > 0 ) and ( scalar( @diff1 ) <= $minreq_forgrad->[2] ) ) ###DDD!!! TAKE CARE, IT WAS: if ( ( scalar( @diff1 ) > 0 ) and ( scalar( @diff1 ) <= $minreq_forgrad->[2] ) )
             {
               my @diff2 = diff( \@{ $elt->[1] } , \@{ $el->[1] } );
 
@@ -1283,7 +1245,7 @@ sub wei
                             {
                               my $diffpar = abs( $e - $ei );
                              ###################if ( ( ${ $bank{$newtrio}{orstring} }[$cn] ~~ @neighbours ) ) and ( $diffpar <= $minreq_forgrad->[1] ) and ( $diffpar > 0 ) ) ############################HERE
-                              if ( ( $diffpar <= $minreq_forgrad->[1] ) and ( $diffpar > 0 ) )
+                              if ( ( $diffpar <= $minreq_forgrad->[1] ) and ( $diffpar > 0 ) ) ###DDD!!! TAKE CARE, IT WAS: if ( ( $diffpar <= $minreq_forgrad->[1] ) and ( $diffpar > 0 ) )
                               {
                                 push ( @factbag, $fact );
                                 push ( @levbag, $diffpar );
@@ -1347,15 +1309,19 @@ sub wei
     return( \%wand, \%nears );
   }
 
+  my ( %wand, @limb0 );
+
   say $tee "GOING TO CREATE NEW POINTS.";
+
+
   my ( $wand_ref, $nears_ref ) = cyclearr( \@arr__, $minreq_forinclusion, $minreq_forgrad, \%bank, \%factlevels, $nfiltergrads,
     \@arrb, $first0, $last0, \%nears, $limitgrads, $limitpoints, \@modality );
 
-  my %wand = %{ $wand_ref };
+  %wand = %{ $wand_ref };
   say $tee "\nDONE.";
   %nears = %{ $nears_ref };
 
-  my @limb0;
+  @limb0;
   foreach my $ke ( keys %wand )
   {
     my ( $soughtval, $totstrength ) = weightvals_merge( \@{ $wand{$ke}{vals} }, \@{ $wand{$ke}{strength} }, $minreq_formerge, $maxdist );

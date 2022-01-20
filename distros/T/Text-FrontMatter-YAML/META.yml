@@ -27,5 +27,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Bug/Report.html?Queue=Text-FrontMatter-YAML
   repository: https://github.com/vitahall/Text-FrontMatter-YAML.git
-version: '0.11'
+version: '1.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

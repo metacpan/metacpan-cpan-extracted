@@ -21,17 +21,20 @@ use Test::More tests => 47;
 use Test::Warn;
 
 # define fixed environment for unit tests:
-BEGIN { delete $ENV{DISPLAY}; delete $ENV{UI}; }
+use UI::Various({use => [], log => 'WARN', include => 'none'});
 
-use UI::Various({log => 'WARN', include => 'none'});
 use UI::Various::container;
 
 #########################################################################
 # minimal dummy classes needed for unit tests:
 package UI::Various::Leaf
 {   use UI::Various::widget; our @ISA = qw(UI::Various::widget);   };
+package UI::Various::PoorTerm::Leaf
+{   use UI::Various::widget; our @ISA = qw(UI::Various::Leaf);   };
 package UI::Various::Box
 {   use UI::Various::widget; our @ISA = qw(UI::Various::container);   };
+package UI::Various::PoorTerm::Box
+{   use UI::Various::widget; our @ISA = qw(UI::Various::Box);   };
 package Dummy
 {   sub new { my $self = {}; bless $self, 'Dummy'; }   };
 

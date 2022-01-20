@@ -40,7 +40,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use UI::Various::core;
 use UI::Various::toplevel;
@@ -104,7 +104,6 @@ sub new($;\[@$])
 			 @_);
     # Get "Window Manager" singleton even if it is not yet existing:
     local $_ = UI::Various::Main->new();
-    bless $self, UI::Various::core::ui() . '::Window';
     $_->add($self);
     return $self;
 }

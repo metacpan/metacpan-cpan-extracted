@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Partition a musical duration into rhythmic phrases
 
-our $VERSION = '0.0702';
+our $VERSION = '0.0706';
 
 use Math::Random::Discrete;
 use MIDI::Simple ();
@@ -216,44 +216,44 @@ Music::Duration::Partition - Partition a musical duration into rhythmic phrases
 
 =head1 VERSION
 
-version 0.0702
+version 0.0706
 
 =head1 SYNOPSIS
 
-  use MIDI::Simple;
+  use MIDI::Simple ();
   use Music::Duration::Partition;
   use Music::Scales;
 
   my $mdp = Music::Duration::Partition->new(
-    size => 8, # 2 measures in 4/4 time
-    pool => [qw(hn dqn qn en)],
+    size => 8,                  # 2 measures in 4/4 time
+    pool => [qw(hn dqn qn en)], # Made from these durations
   );
 
-  $mdp->pool_select(sub { ... }); # Optional
+  $mdp->pool_select(sub { ... }); # optional
 
-  my $motif = $mdp->motif;
+  my $motif = $mdp->motif; # Random list-ref of pool members
 
   my @scale = get_scale_MIDI('C', 4, 'major');
 
   my $score = MIDI::Simple->new_score;
 
-  for my $n (0 .. 31) { # 4 loops over the motif
+  for my $n (0 .. 31) { # 32/8=4 loops over the motif
     $score->n($motif->[$n % @$motif], $scale[int rand @scale]);
   }
 
   $score->write_score('motif.mid');
 
-  # The pool may also be made of duration ticks
+  # The pool may also be weighted
   $mdp = Music::Duration::Partition->new(
     size    => 100,
-    pool    => [qw(d50 d25)],
-    weights => [0.7, 0.3], # Optional
+    pool    => [qw(d50  d25)],
+    weights => [   0.7, 0.3], # optional
   );
 
   # The pool may also be grouped
   $mdp = Music::Duration::Partition->new(
     pool   => [qw(hn qn tqn)],
-    groups => [0, 0, 3], # Optional
+    groups => [   1, 1, 3], # optional
   );
 
 =head1 DESCRIPTION
@@ -296,9 +296,9 @@ motif.
 
 Default: C<[ keys %MIDI::Simple::Length ]> (wn, hn, qn, ...)
 
-This can be B<either> a list of duration names, as in the example, or
-duration values, specified with a preceding 'd'.  A mixture of both is
-not well defined. YMMV
+This can be either a list of duration names, or duration values,
+specified with a preceding C<d>.  A mixture of both is not well
+defined. YMMV
 
 =head2 pool_select
 
@@ -314,9 +314,9 @@ Default: Random item from B<pool>
 
   $weights = $mdp->weights;
 
-Specification of the frequency of pool item selection.
+The frequencies of pool item selection.
 
-The number of weights must equal the number of pool entries.  The
+The number of weights must equal the number of B<pool> entries.  The
 weights do not have to sum to 1 and can be any relative numbers.
 
 Default: Equal probability for each pool entry
@@ -325,14 +325,13 @@ Default: Equal probability for each pool entry
 
   $groups = $mdp->groups;
 
-An array reference of entries that represent the number of times that a
-pool item is selected in sequence.
+The number of times that a pool item is selected in sequence.
 
-The number of groups must equal the number of pool entries.
+The number of groups must equal the number of B<pool> entries.
 
-Default: Zero for each pool entry
+Default: C<0> for each pool entry
 
-* Zero and one mean the same thing for grouping.  So if needed, an
+* C<0> and C<1> mean the same thing for grouping.  So if needed, an
 entry should have a value greater than one.
 
 =head2 remainder
@@ -341,7 +340,7 @@ entry should have a value greater than one.
 
 Append any remaining duration ticks to the end of the motif.
 
-Default: C<1> Yes. Make it so.
+Default: C<1>  "Yes. Make it so."
 
 =head2 verbose
 
@@ -390,7 +389,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gene Boggs.
+This software is copyright (c) 2022 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

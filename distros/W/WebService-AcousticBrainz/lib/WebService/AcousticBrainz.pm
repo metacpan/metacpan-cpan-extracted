@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Access to the AcousticBrainz API
 
-our $VERSION = '0.0600';
+our $VERSION = '0.0601';
 
 use Moo;
 use strictures 2;
@@ -33,11 +33,10 @@ sub fetch {
 
     croak 'No mbid provided' unless $args{mbid};
     croak 'No endpoint provided' unless $args{endpoint};
-    croak 'No query provided' unless $args{query};
 
     my $url = Mojo::URL->new($self->base)
-        ->path('/api/v1/' . $args{mbid} . '/'. $args{endpoint})
-        ->query(%{ $args{query} });
+        ->path('/api/v1/' . $args{mbid} . '/'. $args{endpoint});
+    $url->query(%{ $args{query} }) if $args{query};
 
     my $tx = $self->ua->get($url);
 
@@ -83,7 +82,7 @@ WebService::AcousticBrainz - Access to the AcousticBrainz API
 
 =head1 VERSION
 
-version 0.0600
+version 0.0601
 
 =head1 SYNOPSIS
 
@@ -94,7 +93,7 @@ version 0.0600
   my $r = $w->fetch(
     mbid     => 'c51f788f-f2ac-4d4e-aa72-205f002b8752',
     endpoint => 'low-level',
-    query    => { n => 2 },
+    query    => { n => 2 }, # optional
   );
 
 =head1 DESCRIPTION
@@ -134,6 +133,8 @@ The F<eg/*> programs
 
 L<https://acousticbrainz.org/data>
 
+L<https://acousticbrainz.readthedocs.io/api.html>
+
 L<Moo>
 
 L<Mojo::UserAgent>
@@ -148,7 +149,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Gene Boggs.
+This software is copyright (c) 2022 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

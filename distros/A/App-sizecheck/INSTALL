@@ -1,0 +1,11 @@
+
+   
+
+## INSTALL
+
+cpanm App::sizecheck 
+
+
+## UNINSTALL 
+
+cpanm -U App::sizecheck

@@ -10,7 +10,7 @@ use Hash::Merge;
 
 require Exporter;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(
@@ -173,5 +173,6 @@ Rajkumar Reddy
 Copyright (C) 2022 by Rajkumar Reddy. All rights reserved.
 
 Open Source.
+
 
 =cut

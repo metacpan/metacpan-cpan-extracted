@@ -6,7 +6,7 @@ use Test::More tests => 6;
     use Moose;
     use Moose::Util::TypeConstraints;
     use MooseX::Types::JSON qw( JSON relaxedJSON );
-    
+
     has json_strict  => ( is => 'rw', isa => JSON        );
     has json_relaxed => ( is => 'rw', isa => relaxedJSON );
 }

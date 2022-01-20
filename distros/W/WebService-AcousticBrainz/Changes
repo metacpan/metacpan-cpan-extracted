@@ -1,5 +1,8 @@
 Revision history for WebService-AcousticBrainz
 
+0.0601 2022-01-19 19:42:31
+    - The query argument is optional!
+
 0.0600 2021-11-17 11:15:13
     - Fix Mojo::URL usage in the module code.
     - Improve documentation slightly.

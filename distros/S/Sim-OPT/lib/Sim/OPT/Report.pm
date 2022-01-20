@@ -1308,8 +1308,6 @@ sub newreport # This function retrieves the results of interest from the texts f
 
     my $touse = $is; ### TAKE CARE!
 
-    say $tee "TOUSE! $touse";
-
     my @box;
     foreach my $line ( @precomputeds )
     {

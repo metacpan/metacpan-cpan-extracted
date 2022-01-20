@@ -1,5 +1,18 @@
                        Revision history for DocKnot
 
+7.01 - 2022-01-19
+
+ - Correctly handle Unicode output from commands run by pointers and from
+   POD processing by Pod::Thread.  Previous versions since 6.01 were
+   double-encoding.  Thanks to Julien ÉLIE for the report.
+
+ - Follow symlinks to ordinary files in docknot spin, just not
+   directories.  The Path::Iterator::Rule conversion in 6.01 broke copying
+   of files referenced by symlink.
+
+ - The \size spin always used 1024-based units.  It now correctly uses the
+   KiB, MiB, etc. abbreviations to match.
+
 7.00 - 2022-01-17
 
  - Various module APIs now take Path::Tiny objects instead of string

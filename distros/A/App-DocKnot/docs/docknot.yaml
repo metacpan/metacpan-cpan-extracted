@@ -15,7 +15,7 @@ format: v1
 
 name: DocKnot
 maintainer: Russ Allbery <rra@cpan.org>
-version: '7.00'
+version: '7.01'
 synopsis: Static web site and documentation generator
 
 license:
@@ -33,7 +33,7 @@ distribution:
       package: docknot
       summary: |
         DocKnot is packaged in Debian 11 (bullseye) and later as docknot.
-  section: devel
+  section: web
   tarname: App-DocKnot
   version: docknot
 support:
@@ -41,12 +41,12 @@ support:
   github: rra/docknot
   web: https://www.eyrie.org/~eagle/software/docknot/
 vcs:
-  browse: https://git.eyrie.org/?p=devel/docknot.git
+  browse: https://git.eyrie.org/?p=web/docknot.git
   github: rra/docknot
   status:
     workflow: build
   type: Git
-  url: https://git.eyrie.org/git/devel/docknot.git
+  url: https://git.eyrie.org/git/web/docknot.git
 
 quote:
   author: Murphy's Fourth Corollary

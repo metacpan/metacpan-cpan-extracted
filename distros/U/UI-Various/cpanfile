@@ -3,8 +3,8 @@ requires 'indirect' => 0.36;
 requires 'multidimensional' => 0.011;
 requires 'strictures' => 1.0;
 
-recommends 'Curses::UI' => '0.9603';
-recommends 'Tk' => '804.030';
+recommends 'Curses::UI' => 0.9603;
+recommends 'Tk' => "804.030";
 
 on 'test' => sub {
     requires 'Test::More'   => 0.98;
@@ -14,6 +14,8 @@ on 'test' => sub {
 
 on 'develop' => sub {
     requires 'perl' => 5.22.0;
-    requires 'Curses::UI' => '0.9603';
-    requires 'Tk' => '804.030';
+    requires 'Curses::UI' => 0.9603;
+    requires 'Tk' => "804.030";
+    requires 'Perl::MinimumVersion';
+    requires 'Minilla';
 };

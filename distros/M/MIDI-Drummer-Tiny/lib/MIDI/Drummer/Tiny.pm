@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.1900';
+our $VERSION = '0.1902';
 
 use Math::Bezier;
 use MIDI::Simple ();
@@ -154,6 +154,18 @@ sub count_in {
     my $bars = shift || $self->bars;
     for my $i ( 1 .. $self->beats * $bars ) {
         $self->note( $self->quarter, $self->closed_hh );
+    }
+}
+
+
+sub metronome38 {
+    my $self = shift;
+    my $bars = shift || $self->bars;
+
+    for ( 1 .. $bars ) {
+        $self->note( $self->eighth, $self->closed_hh, $self->kick );
+        $self->note( $self->eighth, $self->closed_hh);
+        $self->note( $self->eighth, $self->closed_hh, $self->snare );
     }
 }
 
@@ -404,7 +416,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.1900
+version 0.1902
 
 =head1 SYNOPSIS
 
@@ -608,6 +620,13 @@ This method takes the same arguments as L<MIDI::Simple/"Parameters for n/r/noop"
 
 Play the closed hihat for the number of beats times the given bars.
 If no bars are given, the default times the number of beats is used.
+
+=head2 metronome38
+
+  $d->metronome38;
+  $d->metronome38($bars);
+
+Add a steady 3/8 beat to the score.
 
 =head2 metronome34
 

@@ -1,6 +1,17 @@
 Revision history for Perl extension UI-Various
 
-0.13 2022-01-10T09:09:22Z
+0.14 2022-01-20T13:43:25Z
+
+0.14 2022-01-20T13:42:27Z
+
+    - updated DE language, minor modification in DoD check
+    - reversed window order for RichTerm and PoorTerm to match Curses and Tk
+    - added workaround for Text with SCALAR reference for Curses
+    - objects are now blessed before initialisation
+    - fixed handling of SCALAR references
+    - added Input widget
+    - added core function to create dummy SCALAR references
+    - added missing development dependencies
 
 0.13 2022-01-10T09:08:37Z
 

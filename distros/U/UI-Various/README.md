@@ -8,9 +8,9 @@ UI::Various - graphical/non-graphical user interface without external programs
 
 # ABSTRACT
 
-**Currently this module is just a PROOF OF CONCEPT and not yet fully
-functional!** It is only uploaded to see how the tests run and fail on the
-various different platforms.
+**Currently this module is WORK IN PROGRESS and of very limited usage!** It
+is mainly uploaded to see how the tests run (or fail) on the various
+different CPAN test platforms.
 
 Did you ever need to decide if a graphical or text based user interface is
 best for your Perl application?  A GUI may be easier to use, but will not
@@ -79,7 +79,8 @@ with, only one window may be active at any time.  For simple modal queries
 this window may open a dialog window blocking itself until the dialog
 returns.  However, it is possible to have a list of multiple windows and
 switch between them: One is active and the others are inactive, waiting to
-be activated again.  See examples/TODO
+be activated again.  See `examples/hello-two-windows.pl` and
+`examples/hello-variable-content.pl`.
 
 # KNOWN BUGS
 

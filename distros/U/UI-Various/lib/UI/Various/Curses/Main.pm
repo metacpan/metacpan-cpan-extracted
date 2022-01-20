@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Curses::UI;
 
@@ -80,8 +80,8 @@ sub _init($)
 {
     debug(2, __PACKAGE__, '::_init');
     my ($self) = @_;
-    ref($self) eq 'UI::Various::Main'  or
-	fatal('_1_may_only_be_called_from__2', __PACKAGE__, 'UI::Various::Main');
+    ref($self) eq __PACKAGE__  or
+	fatal('_1_may_only_be_called_from_itself', __PACKAGE__);
 
     # can't use accessors as we're not yet correctly blessed:
     $self->{_cui} = Curses::UI->new(-clear_on_exit => 1);

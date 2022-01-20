@@ -33,7 +33,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use UI::Various::core;
 use UI::Various::Main;
@@ -77,8 +77,8 @@ sub _init($)
 {
     debug(1, __PACKAGE__, '::_init');
     my ($self) = @_;
-    ref($self) eq 'UI::Various::Main'  or
-	fatal('_1_may_only_be_called_from__2', __PACKAGE__, 'UI::Various::Main');
+    ref($self) eq __PACKAGE__  or
+	fatal('_1_may_only_be_called_from_itself', __PACKAGE__);
 
     my ($rows, $columns) = (24, 80); # fallback for terminal size
     # FIXME: only works on Linux, use non-core (!) Term::Size for others???
@@ -113,7 +113,7 @@ sub mainloop($)
 {
     my ($self) = @_;
     my $n = $self->children;
-    my $i = $n - 1;
+    my $i = 0;			# behave like Curses::UI and Tk: 1st comes 1st
     debug(1, __PACKAGE__, '::mainloop: ', $i, ' / ', $n);
 
     local $_;

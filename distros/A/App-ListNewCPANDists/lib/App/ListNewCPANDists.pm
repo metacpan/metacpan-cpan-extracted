@@ -1,9 +1,9 @@
 package App::ListNewCPANDists;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-02'; # DATE
+our $DATE = '2021-08-01'; # DATE
 our $DIST = 'App-ListNewCPANDists'; # DIST
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 use 5.010001;
 use strict;
@@ -390,7 +390,8 @@ sub list_new_cpan_dists {
     }
 
     my %resmeta = (
-        'table.fields' => [qw/dist author first_version first_time latest_version latest_time abstract/],
+        'table.fields'        => [qw/dist author first_version first_time  latest_version latest_time abstract/],
+        'table.field_formats' => [undef,  undef, undef,        'datetime', undef,         'datetime', undef],
         'func.stats' => create_new_cpan_dists_stats(dists => \@res)->[2],
     );
 
@@ -569,7 +570,7 @@ App::ListNewCPANDists - List new CPAN distributions in a given time period
 
 =head1 VERSION
 
-This document describes version 0.014 of App::ListNewCPANDists (from Perl distribution App-ListNewCPANDists), released on 2021-05-02.
+This document describes version 0.015 of App::ListNewCPANDists (from Perl distribution App-ListNewCPANDists), released on 2021-08-01.
 
 =head1 FUNCTIONS
 
@@ -578,7 +579,7 @@ This document describes version 0.014 of App::ListNewCPANDists (from Perl distri
 
 Usage:
 
- create_new_cpan_dists_stats(%args) -> [status, msg, payload, meta]
+ create_new_cpan_dists_stats(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 This function is not exported.
 
@@ -593,12 +594,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -608,7 +609,7 @@ Return value:  (any)
 
 Usage:
 
- list_monthly_new_cpan_dists(%args) -> [status, msg, payload, meta]
+ list_monthly_new_cpan_dists(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List new CPAN distributions in a given month.
 
@@ -638,12 +639,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -653,7 +654,7 @@ Return value:  (any)
 
 Usage:
 
- list_monthly_new_cpan_dists_html(%args) -> [status, msg, payload, meta]
+ list_monthly_new_cpan_dists_html(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List new CPAN distributions in a given month (HTML format).
 
@@ -683,12 +684,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -698,7 +699,7 @@ Return value:  (any)
 
 Usage:
 
- list_new_cpan_dists(%args) -> [status, msg, payload, meta]
+ list_new_cpan_dists(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List new CPAN distributions in a given time period.
 
@@ -708,7 +709,7 @@ Examples:
 
 =item * Show new distributions from Jan 1, 2019 to the present:
 
- list_new_cpan_dists( from_time => "2019-01-01");
+ list_new_cpan_dists(from_time => "2019-01-01");
 
 =back
 
@@ -755,12 +756,12 @@ Filename of database.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -774,7 +775,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-ListNewCPANDists
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-ListNewCPANDists/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ListNewCPANDists>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

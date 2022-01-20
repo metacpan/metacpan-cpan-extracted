@@ -32,7 +32,7 @@
     \h2[Download]
 
     \download[DocKnot][docknot]
-        [devel/App-DocKnot-\version[docknot]]
+        [web/App-DocKnot-\version[docknot]]
 
     \link[https://packages.debian.org/source/sid/docknot]
          [Debian packages] \break
@@ -52,7 +52,7 @@
          [GitHub] \break
     \link[https://github.com/rra/docknot/issues]
          [Bug tracker] \break
-    \link[https://git.eyrie.org/?p=devel/docknot.git]
+    \link[https://git.eyrie.org/?p=web/docknot.git]
          [Git repository] \break
     \link[https://metacpan.org/release/App-DocKnot]
          [MetaCPAN] \break
@@ -131,7 +131,7 @@ The distribution:
 
 \table[][
     \program[DocKnot][docknot]
-        [devel/App-DocKnot-\version[docknot]]
+        [web/App-DocKnot-\version[docknot]]
 ]
 
 An \link[https://archives.eyrie.org/software/ARCHIVE/App-DocKnot/]
@@ -149,10 +149,10 @@ DocKnot is maintained using the Git version control system.  To check out
 the current development tree, see
 \link[https://github.com/rra/docknot][GitHub] or clone:
 
-\pre[    https://git.eyrie.org/git/devel/docknot.git]
+\pre[    https://git.eyrie.org/git/web/docknot.git]
 
 Pull requests on GitHub are welcome.  You can also
-\link[https://git.eyrie.org/?p=devel/docknot.git][browse the current
+\link[https://git.eyrie.org/?p=web/docknot.git][browse the current
 development source].
 
 \h2[Documentation]

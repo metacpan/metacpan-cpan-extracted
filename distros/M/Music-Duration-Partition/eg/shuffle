@@ -3,11 +3,11 @@ use strict;
 use warnings;
 
 # Use local libraries
-use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw( MIDI-Drummer-Tiny MIDI-Util Music-Duration-Partition );
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw( MIDI-Drummer-Tiny MIDI-Util Music-Duration Music-Duration-Partition );
 
 use List::Util qw/ shuffle /;
 use MIDI::Drummer::Tiny;
-use MIDI::Util;
+use MIDI::Util qw(setup_score);
 use Music::Duration::Partition;
 use Music::Scales;
 
@@ -16,7 +16,7 @@ my $max  = shift || 8;
 my $bpm  = shift || 90;
 my $mod  = shift || 2; # Default: alternating
 
-my $score = MIDI::Util::setup_score( bpm => $bpm );
+my $score = setup_score( bpm => $bpm );
 
 $score->synch(
     \&melody,

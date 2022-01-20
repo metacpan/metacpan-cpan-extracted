@@ -1,0 +1,75 @@
+#!/usr/bin/perl
+use 5.010 ; 
+use strict ; 
+use warnings ; # also confirmed on 5.011 5.014 5.018  
+use FindBin qw [ $Script ] ; 
+use Getopt::Std ; getopts ':02:d:m' => \my %o ;
+use Term::ANSIColor qw [ :constants color ]  ; $Term::ANSIColor::AUTORESET = 1 ; 
+use Time::HiRes qw [ gettimeofday tv_interval ] ; my ${ dt_start } = [ gettimeofday ] ; 
+use File::Spec ;
+use Digest::MD5 qw [ md5_hex ] ; 
+use autodie qw [ open close ] ; 
+
+$o{d} //= 1 ; # 狙ったディレクトリで、何段階の深さまで掘って読むか。
+my @W = map { File::Spec -> catfile ( ('*') x $_) } 1 .. $o{d} ; # * */*　*/*/* .. を生成。
+my $c = 0 ; # 処理したファイルの個数
+
+& item_proc if $#ARGV == -1 ;
+& item_proc ($_) for @ARGV ; 
+exit 0 ;
+ 
+sub item_proc () {
+  my @wildcards = $#_ == -1 ? "@W" : -d $_[0] ? map { File::Spec->catfile( $_[0], $_ ) } @W : $_[0] ;
+  my @files = sort grep { -f } glob "@wildcards"; # $" に依存。 <-- - sort している。良いか否か。
+  do { say $_ for @files ; $c = @files ; return 0 } if $o{0} ; # -0 が指定されたら最も単純な処理だけする。
+  for ( @files ) { 
+    $c ++ ; 
+    my @out = ( do { -s } , $_ ) ;
+    splice @out , 1 , 0 , md5_hex do { open my $FH , '<' , $_ ; undef $/ ; <$FH> } if $o{m} ;
+    splice @out , 0 , 0, $c if $o{':'} ;
+    say join "\t" , @out ;
+  }
+}
+
+END {
+  my $rt = sprintf '%0.3f' , tv_interval $dt_start  ; # 上記の実行に要した秒数
+  say STDERR CYAN DARK BOLD "$c file(s). ", "Run time: $rt second(s)." if 0 ne ($o{2}//'') ;
+}
+
+#   2022-01-20 thu ; Toshiyuki Shimono 下野寿之 
+
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+  use FindBin qw[ $Script ] ; 
+  $ARGV[1] //= '' ;
+  open my $FH , '<' , $0 ;
+  while(<$FH>){
+    s/\$0/$Script/g ;
+    print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+  }
+  close $FH ;
+  exit 0 ;
+}
+=encoding utf8
+
+=head1 
+
+  $0 [dirname] [dirname] ..
+  
+   カレントディレクトリまたは指定ディレクトリにあるファイルのサイズを表示する。
+   ディレクトリ名ではないファイルが指定された場合は、そのファイルのサイズを表示する。
+   出力形式はTSV形式(タブ文字区切り)である。
+
+ [オプション] :
+   -d N ; 探索する深さ。1で直下のみ。
+   -m   ; MD5 によるハッシュ値を各ファイルで計算する。(MD5 = "Message Digest Algorithm 5")
+   -:   ; ファイルの番号を出力する。
+   -2 0 ; 2次情報(処理したファイル数と経過時間)を出さない。
+   -0   ; 単にファイルの一覧を表示。ドライランと考えることも出来る。
+
+  --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
+  --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+
+=cut

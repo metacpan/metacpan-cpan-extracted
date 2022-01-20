@@ -1,0 +1,112 @@
+#!/usr/bin/env perl
+
+# This is an example of a bass groove + "melodic phrase" generator.
+
+use strict;
+use warnings;
+
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Drummer-Tiny MIDI-Util Music-Duration Music-Duration-Partition);
+
+use MIDI::Drummer::Tiny;
+use MIDI::Util qw(set_chan_patch);
+use Music::Scales;
+use Music::VoiceGen;
+use Music::Duration::Partition;
+
+my $bars   = shift || 16;
+my $bpm    = shift || 70;
+my $note   = shift || 'A';
+my $tscale = shift || 'dorian';
+my $bscale = shift || 'pminor';
+
+my $octave = 1;
+my $tpatch = 4;
+my $bpatch = 35;
+
+my $d = MIDI::Drummer::Tiny->new(
+    file      => "$0.mid",
+    bpm       => $bpm,
+    volume    => 100,
+    reverb    => 15,
+    signature => '3/8',
+    bars      => $bars,
+    kick      => 'n36', # Override default patch
+    snare     => 'n40', # "
+);
+
+$d->score->synch(
+    \&drums,
+    \&bass,
+    \&top,
+);
+
+$d->write;
+
+sub bass {
+    set_chan_patch($d->score, 1, $bpatch);
+
+    my $mdp = Music::Duration::Partition->new(
+        size => 1.5,
+        pool => [qw(dqn qn en sn)],
+        weights => [1,  2, 2, 1],
+    );
+    my @motifs = map { $mdp->motif } 1 .. 4;
+
+    my @pitches = get_scale_MIDI($note, $octave, $bscale);
+    my @intervals = qw(-3 -2 -1 1 2 3);
+    my $voice = Music::VoiceGen->new(
+        pitches   => \@pitches,
+        intervals => \@intervals,
+    );
+
+    my @notes = map { [ map { $voice->rand } @$_ ] } @motifs;
+
+    for my $n (1 .. $d->bars) {
+        my $index = int rand @motifs;
+        my $motif = $motifs[$index];
+        my $pitch = $notes[$index];
+        for my $i (0 .. $#$motif) {
+            $d->note($motif->[$i], $pitch->[$i]);
+        }
+    }
+
+    $d->note($d->dotted_quarter, $pitches[0]);
+}
+
+sub top {
+    set_chan_patch($d->score, 0, $tpatch);
+
+    my $mdp = Music::Duration::Partition->new(
+        size => 1.5,
+        pool => [qw(en sn)],
+        weights => [1, 2],
+    );
+    my @motifs = map { $mdp->motif } 1 .. 8;
+
+    my @pitches = (
+        get_scale_MIDI($note, $octave + 1, $tscale),
+        get_scale_MIDI($note, $octave + 2, $tscale)
+    );
+    my @intervals = qw(-4 -3 -2 -1 1 2 3 4);
+    my $voice = Music::VoiceGen->new(
+        pitches   => \@pitches,
+        intervals => \@intervals,
+    );
+
+    my @notes = map { [ map { $voice->rand } @$_ ] } @motifs;
+
+    for my $n (1 .. $d->bars) {
+        my $index = int rand @motifs;
+        my $motif = $motifs[$index];
+        my $pitch = $notes[$index];
+        for my $i (0 .. $#$motif) {
+            $d->note($motif->[$i], $pitch->[$i]);
+        }
+    }
+
+    $d->note($d->dotted_quarter, $pitches[0]);
+}
+
+sub drums {
+    $d->metronome38($d->bars);
+}

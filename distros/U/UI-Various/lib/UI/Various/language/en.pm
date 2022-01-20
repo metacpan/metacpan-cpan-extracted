@@ -74,7 +74,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 #########################################################################
 
@@ -95,12 +95,12 @@ our %T =
      ####################################################################
      # fatal and non-fatal error message, always without trailing "\n" for
      # automatically added location:
-     _1_attribute_must_be_a_code_reference
-     => "'%s' attribute must be a CODE reference",
+     _1_attribute_must_be_a_2_reference
+     => "'%s' attribute must be a %s reference",
      _1_element_must_be_accompanied_by_parent
      => '%s element must be accompanied by parent',
-     _1_may_only_be_called_from__2
-     => '%s may only be called from %s',
+     _1_may_only_be_called_from_itself
+     => '%s may only be called from itself',
      bad_debug_level__1
      => "bad debug-level '%s'",
      bad_usage_of__1_as__2
@@ -137,12 +137,16 @@ our %T =
      => 'leave window',
      message__1_missing_in__2
      => "message '%s' missing in '%s'",
+     new_value
+     => 'new value',
      next_previous_window
      => ', <+>/<-> next/previous window',
      no_element_found_for_index__1
      => 'no element found for index %d',
      odd_number_of_parameters_in_initialisation_list_of__1
      => 'odd number of parameters in initialisation list of %s',
+     old_value
+     => 'old value',
      options_must_be_specified_as_hash
      => 'options must be specified as {hash}',
      specified_implementation_missing

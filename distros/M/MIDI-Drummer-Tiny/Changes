@@ -1,5 +1,11 @@
 Revision history for MIDI-Drummer
 
+0.1902 2022-01-19 12:13:04
+    - Add missing closed_hh! Whoops
+
+0.1901 2022-01-19 11:59:42
+    - Add the ->metronome38 method.
+
 0.1900 2022-01-04 19:00:57
     - Improve documentation.
 

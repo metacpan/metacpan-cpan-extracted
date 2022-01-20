@@ -19,13 +19,13 @@ no multidimensional;
 
 use Cwd 'abs_path';
 
-use Test::More tests => 83;
+use Test::More tests => 88;
 use Test::Warn;
 
 # define fixed environment for unit tests:
 BEGIN { delete $ENV{DISPLAY}; delete $ENV{UI}; }
 
-use UI::Various({log => 'WARNING'}); # testing the alias here
+use UI::Various({use => [], log => 'WARNING'}); # testing the alias here
 
 use constant T_PATH => map { s|/[^/]+$||; $_ } abs_path($0);
 do(T_PATH . '/functions/sub_perl.pl');
@@ -266,7 +266,7 @@ package Broken2
     sub new($;\[@$])
     {	return construct({ attr => 1 }, [], @_);   }
 };
-package Class1
+package UI::Various::PoorTerm::Class1
 {
     use UI::Various::core;
     require Exporter;
@@ -276,7 +276,7 @@ package Class1
     sub new($;\[@$])
     {	return construct({ attr => 1 }, '^attr$', @_);   }
 };
-package Class2
+package UI::Various::PoorTerm::Class2
 {
     use UI::Various::core;
     require Exporter;
@@ -299,62 +299,62 @@ like($@,
      qr/^invalid parameter '\$re_allowed_parameters' in call to .*$re_msg_tail/,
     "bad 'allowed  parameters' causes error");
 
-eval {   $_ = Class1::new(undef);   };
+eval {   $_ = UI::Various::PoorTerm::Class1::new(undef);   };
 like($@,
      qr/^Can't call method "isa" on an undefined value$re_msg_tail_core/,
     'undefined constructor call causes error');
 
-eval {   $_ = Class1::new('Broken1');   };
+eval {   $_ = UI::Various::PoorTerm::Class1::new('Broken1');   };
 like($@,
-     qr/^invalid object \(\) in call to Class1::new$re_msg_tail/,
+     qr/^invalid object \(\) in call to .*::Class1::new$re_msg_tail/,
     'bad constructor call causes error');
 
-eval {   $_ = Class1->new([]);   };
+eval {   $_ = UI::Various::PoorTerm::Class1->new([]);   };
 like($@,
-     qr/^invalid object \(ARRAY\) in call to Class1::new$re_msg_tail/,
+     qr/^invalid object \(ARRAY\) in call to .*::Class1::new$re_msg_tail/,
     'bad attributes parameter in constructor call causes error');
 
-eval {   $_ = Class1->new(1);   };
+eval {   $_ = UI::Various::PoorTerm::Class1->new(1);   };
 like($@,
-     qr/^invalid scalar '1' in call to Class1::new$re_msg_tail/,
+     qr/^invalid scalar '1' in call to .*::Class1::new$re_msg_tail/,
     'wrong attributes parameter in constructor call causes error');
 
-eval {   $_ = Class2->new(attr1 => 1, 2);   };
+eval {   $_ = UI::Various::PoorTerm::Class2->new(attr1 => 1, 2);   };
 like($@,
-     qr/^odd number of parameters in init.* list of Class2::new$re_msg_tail/,
+     qr/^odd number of parameters in init.* list of .*::Class2::new$re_msg_tail/,
     'bad attribute list in constructor call causes error');
 
-eval {   $_ = Class1->new(attr1 => 1);   };
+eval {   $_ = UI::Various::PoorTerm::Class1->new(attr1 => 1);   };
 like($@,
-     qr/^invalid parameter 'attr1' in call to Class1::new$re_msg_tail/,
+     qr/^invalid parameter 'attr1' in call to .*::Class1::new$re_msg_tail/,
     'invalid attribute in constructor call causes error');
 
-$_ = Class1->new();
+$_ = UI::Various::PoorTerm::Class1->new();
 ok(defined $_, 'simple construction is OK');
 is($_->attr(), 1, 'default value correctly constructed');
 
 $_ = $_->new();
 ok(defined $_, 'construction from other object OK');
 
-$_ = Class1->new(attr => 42);
+$_ = UI::Various::PoorTerm::Class1->new(attr => 42);
 ok(defined $_, 'construction with attribute is OK');
 is($_->attr(), 42, 'constructed value is correct');
 
-$_ = Class1->new({attr => 47});
+$_ = UI::Various::PoorTerm::Class1->new({attr => 47});
 ok(defined $_, 'construction with hashed attribute is OK');
 is($_->attr(), 47, 'constructed value from HASH is correct');
 
-$_ = Class2->new(attr1 => 42);
+$_ = UI::Various::PoorTerm::Class2->new(attr1 => 42);
 ok(defined $_, 'construction using separate setter is OK');
 is($_->attr1(), 42, 'value of separate getter is correct');
 
-$_ = Class2->new(attr2 => 42);
+$_ = UI::Various::PoorTerm::Class2->new(attr2 => 42);
 ok(defined $_, 'construction using simple assignment is OK');
 is($_->{attr2}, 42, 'value of simple assignment is correct');
 
 #####################################
 # other accessor tests:
-package Broken3
+package UI::Various::PoorTerm::Broken3
 {
     use UI::Various::core;
     require Exporter;
@@ -364,7 +364,7 @@ package Broken3
     sub new($;\[@$])
     {	return construct({ attr => 1 }, '^attr$', @_);   }
 };
-package Broken4
+package UI::Various::PoorTerm::Broken4
 {
     use UI::Various::core;
     require Exporter;
@@ -374,7 +374,7 @@ package Broken4
     sub new($;\[@$])
     {	return construct({ attr => 1 }, '^attr$', @_);   }
 };
-package Class3
+package UI::Various::PoorTerm::Class3
 {
     use UI::Various::core;
     require Exporter;
@@ -384,7 +384,7 @@ package Class3
     sub new($;\[@$])
     {	return construct({ attr => 1 }, '^attr$', @_);   }
 };
-package Class4
+package UI::Various::PoorTerm::Class4
 {
     use UI::Various::core;
     require Exporter;
@@ -397,32 +397,32 @@ package Class4
     {	return construct({ attr1 => 1, attr2 => 2 }, '^attr[12]$', @_);   }
 };
 
-eval {   Class1::attr('Broken1');   };
+eval {   UI::Various::PoorTerm::Class1::attr('Broken1');   };
 like($@,
-     qr/^invalid object \(\) in call to Class1::attr$re_msg_tail/,
+     qr/^invalid object \(\) in call to .*::Class1::attr$re_msg_tail/,
     'bad accessor call causes error');
 
-eval {   $_ = Broken3->new(); $_->attr(2);   };
+eval {   $_ = UI::Various::PoorTerm::Broken3->new(); $_->attr(2);   };
 like($@,
-     qr/^invalid parameter '\$sub_set' in call to Broken3::attr$re_msg_tail/,
+     qr/^invalid parameter '\$sub_set' in call to .*::Broken3::attr$re_msg_tail/,
     'bad subroutine in accessor causes error');
 
-eval {   Class2::_attr1('Broken1', 1);   };
+eval {   UI::Various::PoorTerm::Class2::_attr1('Broken1', 1);   };
 like($@,
-     qr/^invalid object \(\) in call to Class2::_attr1$re_msg_tail/,
+     qr/^invalid object \(\) in call to .*::Class2::_attr1$re_msg_tail/,
     'bad setter call causes error');
 
-eval {   Class2::attr1('Broken1');   };
+eval {   UI::Various::PoorTerm::Class2::attr1('Broken1');   };
 like($@,
-     qr/^invalid object \(\) in call to Class2::attr1$re_msg_tail/,
+     qr/^invalid object \(\) in call to .*::Class2::attr1$re_msg_tail/,
     'bad getter call causes error');
 
-eval {   $_ = Broken4->new(); $_->_attr(2);   };
+eval {   $_ = UI::Various::PoorTerm::Broken4->new(); $_->_attr(2);   };
 like($@,
-     qr/^invalid parameter '\$sub_set' in call to Broken4::_attr$re_msg_tail/,
+     qr/^invalid parameter '\$sub_set' in call to .*Broken4::_attr$re_msg_tail/,
     'bad subroutine in setter causes error');
 
-$_ = Class3->new();
+$_ = UI::Various::PoorTerm::Class3->new();
 is($_->attr(21), 42, 'subroutine in accessor is correct');
 is($_->attr(-1), 42, 'subroutine in accessor ignores bad value correctly');
 
@@ -432,7 +432,7 @@ is($_->attr(), 42, 'variable reference in accessor is returned correctly');
 $var = 47;
 is($_->attr(), 47, 'referenced variable can be changed correctly');
 
-$_ = Class4->new();
+$_ = UI::Various::PoorTerm::Class4->new();
 is($_->_attr1(21), 42, 'subroutine in setter is correct');
 is($_->attr1(), 42, 'subroutine in setter was correct');
 is($_->_attr1(-1), 42, 'subroutine in setter ignores bad value correctly');
@@ -442,3 +442,13 @@ is($_->_attr1(\$var), 94, 'variable reference in setter is set correctly');
 is($_->attr1(), 94, 'variable reference in getter is returned correctly');
 $var = 42;
 is($_->attr1(), 42, 'referenced variable can be changed correctly');
+
+my $ref1 = UI::Various::core::dummy_varref();
+my $ref2 = UI::Various::core::dummy_varref();
+is($$ref1, '', 'dummy reference 1 is empty');
+is($$ref2, '', 'dummy reference 2 is empty');
+isnt($ref1, $ref2, 'dummy references differ');
+$$ref1 = 42;
+$$ref2 = 47;
+is($$ref1, 42, 'dummy reference 1 is now 42');
+is($$ref2, 47, 'dummy reference 2 is now 47');

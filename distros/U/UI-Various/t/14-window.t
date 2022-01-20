@@ -39,6 +39,8 @@ package UI::Various::Box
     sub _show() {}
     sub _self_destruct($) { my ($self) = @_; $self->parent()->remove($self); }
 };
+package UI::Various::PoorTerm::Box
+{   use UI::Various::widget; our @ISA = qw(UI::Various::Box);   };
 
 #########################################################################
 # identical parts of messages and some basic building blocks:

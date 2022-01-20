@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use UI::Various::core;
 use UI::Various::Text;
@@ -94,8 +94,32 @@ sub _prepare($$$)
     $self->_cui($_->_cui
 		->add($self->_cid,
 		      'Label', -x => $column, -y => $row,
+		      -width => $self->width,
 		      -text => $self->text));
     return 0;
+}
+
+#########################################################################
+
+=head2 B<_update> - update UI element
+
+    $ui_element->_update();
+
+=head3 description:
+
+Update the UI element after an external change of its SCALAR reference.
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+sub _update($)
+{
+    my ($self) = @_;
+    if (defined $self->_cui)
+    {
+	$self->_cui->text($self->text);
+    }
 }
 
 1;

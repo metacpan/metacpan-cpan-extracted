@@ -1,5 +1,17 @@
 Revision history for Music-Duration-Partition
 
+0.0706 2022-01-19 15:40:39
+    - Improve documentation again!
+
+0.0705 2022-01-19 14:44:20
+    - Improve documentation.
+
+0.0704 2022-01-19 12:48:51
+    - Add an interesting eg/three-eight program.
+
+0.0703 2022-01-19 11:51:15
+    - Update the eg/ programs.
+
 0.0702 2020-11-26 11:17:36
     - Use a TICKS constant.
     - Don't import anything from MIDI::Simple.

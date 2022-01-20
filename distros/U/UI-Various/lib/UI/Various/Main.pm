@@ -48,7 +48,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use UI::Various::core;
 use UI::Various::container;
@@ -180,15 +180,13 @@ sub new($;\[@$])
 			  '^(?:' . join('|', ALLOWED_PARAMETERS) . ')$',
 			  @_);
 	$self->{ui} = UI::Various::core::ui();
-	local $_ = $self->{ui} . '::Main::_init';
-	{   no strict 'refs';   &$_($self);   }
+	$self->_init;
 	if (not defined $self->{height}  or
 	    $self->{height} > $self->{max_height})
 	{   $self->{height} = $self->{max_height};   }
 	if (not defined $self->{width}  or
 	    $self->{width} > $self->{max_width})
 	{   $self->{width} = $self->{max_width};   }
-	bless $self, $self->{ui} . '::Main';
 	debug(1, __PACKAGE__, '::new: ',
 	      $self->{width}, 'x', $self->{height}, ' / ',
 	      $self->{max_width}, 'x', $self->{max_height});

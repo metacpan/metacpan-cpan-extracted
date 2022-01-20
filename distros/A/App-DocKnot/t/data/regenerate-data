@@ -43,6 +43,10 @@ for my $package (@packages) {
     }
 }
 
+# Regenerate the README and README.md for DocKnot itself.
+my $docknot = App::DocKnot::Generate->new();
+$docknot->generate_all();
+
 # The test of spinning a tree of files uses a reference to App::DocKnot's own
 # POD documentation.  Regenerate the expected output in case the POD has
 # changed.

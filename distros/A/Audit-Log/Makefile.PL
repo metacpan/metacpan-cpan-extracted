@@ -17,17 +17,17 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.012000",
   "NAME" => "Audit::Log",
   "PREREQ_PM" => {
-    "List::Util" => "1.33",
+    "List::Util" => "1.45",
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "List::Util" => "1.33",
+    "List::Util" => "1.45",
     "Test::Deep" => 0,
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "List::Util" => "1.33",
+  "List::Util" => "1.45",
   "Test::Deep" => 0,
   "Test::More" => 0,
   "lib" => 0,

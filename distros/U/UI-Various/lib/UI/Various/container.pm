@@ -40,7 +40,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use UI::Various::core;
 use UI::Various::widget;
@@ -154,6 +154,7 @@ sub add($@)
 	$_->parent($self);
 	$n++;
     }
+    defined $self->{children}  or  $self->{children} = [];
     push @{$self->{children}}, @_;
     return $n;
 }

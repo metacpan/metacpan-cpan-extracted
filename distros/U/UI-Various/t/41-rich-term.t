@@ -38,7 +38,7 @@ BEGIN {
     chomp $tty;
     -c $tty  and  -w $tty
 	or  plan skip_all => 'required TTY (' . $tty . ') not available';
-    plan tests => 29;
+    plan tests => 35;
 
     # define fixed environment for unit tests:
     delete $ENV{DISPLAY};
@@ -61,7 +61,7 @@ my $re_msg_tail = qr/ at $0 line \d{2,}\.?$/;
 
 eval {   UI::Various::RichTerm::Main::_init(1);   };
 like($@,
-     qr/^.*RichTerm::Main may only be called from UI::Various::Main$re_msg_tail/,
+     qr/^UI::Various::RichTerm::Main may only be called from itself$re_msg_tail/,
      'forbidden call to UI::Various::RichTerm::Main::_init should fail');
 
 ####################################
@@ -138,6 +138,26 @@ is($_,
    #____1234  ____1234
    "<1> [OK]\n        ",
    'UI::Various::RichTerm::Button::_show returns correct output');
+
+my $var = 'initial value';
+my $input = UI::Various::Input->new(textvar => \$var,);
+is(ref($input), 'UI::Various::RichTerm::Input',
+   'type UI::Various::RichTerm::Input is correct');
+($w, $h) = $input->_prepare(10);
+is($w, 7, 'UI::Various::RichTerm::Input::_prepare returns correct width');
+is($h, 2, 'UI::Various::RichTerm::Input::_prepare returns correct height');
+$_ = $input->_show('<1> ', $w, $h);
+is($_,
+   #____1234  ____1234
+   "<1> initial\n    value  ",
+   'UI::Various::RichTerm::Input::_show returns correct output');
+$main->add($input);
+stdout_is
+{   _call_with_stdin("something new\n", sub { $input->_process(); });   }
+    'new value? ',
+    '_process prints correct test';
+is($var, 'something new', 'input variable has correct new value');
+$main->remove($input);
 
 ####################################
 # test standard behaviour - window:
@@ -222,8 +242,9 @@ $main->add($win1);
 my $prompt = "enter selection: ";
 my $error = "invalid selection\n";
 
-combined_is
-{   _call_with_stdin("1\nx\n2\n+\n0\n-\n1\n", sub { $main->mainloop; });   }
+combined_is			# 2nd window is displayed 1st!
+{   _call_with_stdin("-\n1\nx\n2\n+\n0\n-\n1\n", sub { $main->mainloop; });   }
+    $output2 . $prompt .
     $output1 . $prompt . "OK!\n" .
     $output1 . $prompt . $error . $prompt . $error . $prompt .
     $output2 . $prompt .

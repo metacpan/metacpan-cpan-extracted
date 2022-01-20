@@ -1,5 +1,5 @@
 This archive contains the distribution Audit-Log,
-version 0.001:
+version 0.002:
 
   auditd log parser with no external dependencies, using no perl features past 5.12
 

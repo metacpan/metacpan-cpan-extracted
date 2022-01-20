@@ -15,9 +15,6 @@ throws_ok { $ws->fetch }
 throws_ok { $ws->fetch( mbid => 1234 ) }
     qr/No endpoint provided/, 'fetch with no endpoint';
 
-throws_ok { $ws->fetch( mbid => 1234, endpoint => 'foo' ) }
-    qr/No query provided/, 'fetch with no query';
-
 my $mock = Mojolicious->new;
 $mock->log->level('fatal'); # only log fatal errors to keep the server quiet
 $mock->routes->get('/api/v1/1234567890/low-level' => sub {

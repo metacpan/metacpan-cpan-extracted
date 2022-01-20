@@ -46,20 +46,16 @@ $update->update_spin($tempdir);
 # Check the resulting output.
 my $expected = path('t', 'data', 'spin', 'update', 'output');
 my $count = is_spin_output_tree("$tempdir", "$expected", 'Tree updated');
-my @changes = grep { m{ deleted | new [ ] file }xms } $repo->run('status');
-@changes = map { [split(q{ })] } sort(@changes);
-is_deeply(
-    \@changes,
-    [
-        ['deleted:', 'module.rpod'],
-        ['deleted:', 'readme.rpod'],
-        ['deleted:', 'script.rpod'],
-        ['new', 'file:', 'module.spin'],
-        ['new', 'file:', 'readme.spin'],
-        ['new', 'file:', 'script.spin'],
-    ],
-    'Git operations',
+my @status = sort $repo->run('status', '-s');
+my @changes = (
+    'A  module.spin',
+    'A  readme.spin',
+    'A  script.spin',
+    'D  module.rpod',
+    'D  readme.rpod',
+    'D  script.rpod',
 );
+is_deeply(\@status, \@changes, 'Git operations');
 
 # Report the end of testing.
 done_testing($count + 2);

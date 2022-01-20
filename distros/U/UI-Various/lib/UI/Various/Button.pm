@@ -38,7 +38,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use UI::Various::core;
 use UI::Various::widget;
@@ -62,7 +62,8 @@ sub code($;$)
 		  sub{
 		      unless (ref($_) eq 'CODE')
 		      {
-			  error('_1_attribute_must_be_a_code_reference', 'code');
+			  error('_1_attribute_must_be_a_2_reference',
+				'code', 'CODE');
 			  return undef;
 		      }
 		  },
@@ -116,11 +117,9 @@ constructor for UI elements>
 sub new($;\[@$])
 {
     debug(3, __PACKAGE__, '::new');
-    my $self = construct({ DEFAULT_ATTRIBUTES },
-			 '^(?:' . join('|', ALLOWED_PARAMETERS) . ')$',
-			 @_);
-    bless $self, UI::Various::core::ui() . '::Button';
-    return $self;
+    return construct({ DEFAULT_ATTRIBUTES },
+		     '^(?:' . join('|', ALLOWED_PARAMETERS) . ')$',
+		     @_);
 }
 
 1;

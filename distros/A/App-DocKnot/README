@@ -1,4 +1,4 @@
-                               DocKnot 7.00
+                               DocKnot 7.01
               (Static web site and documentation generator)
                 Maintained by Russ Allbery <rra@cpan.org>
 
@@ -145,11 +145,11 @@ SOURCE REPOSITORY
 
   or by cloning the repository at:
 
-      https://git.eyrie.org/git/devel/docknot.git
+      https://git.eyrie.org/git/web/docknot.git
 
   or view the repository via the web at:
 
-      https://git.eyrie.org/?p=devel/docknot.git
+      https://git.eyrie.org/?p=web/docknot.git
 
   The eyrie.org repository is the canonical one, maintained by the author,
   but using GitHub is probably more convenient for most purposes.  Pull

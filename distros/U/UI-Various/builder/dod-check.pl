@@ -107,15 +107,15 @@ sub check_unit_tests();
 ###############
 
 my $tests;
-BEGIN  {  $tests = 18;  }
+BEGIN  {  $tests = 19;  }
 use Test::More tests => $tests;
 
 my $test_default = 0 == @ARGV ? 1 : 0;
 my %test = map { ($_ => $test_default) } 1..$tests;
 foreach (@ARGV)
 {
-    m/^[1-9][0-9]*$/  or  die "bad non-numeric argument '$_'\n";
-    $test{$_} = 1;
+    m/^\d+$/  or  die "bad non-numeric argument '$_', use 0 for list of steps\n";
+    $_  and  $test{$_} = 1;
 }
 my $n = 0;
 
@@ -210,7 +210,14 @@ skip_or_run('tests', 'repair tests 1st',
 skip_or_run('check unit tests', 'finish tests 1st',
 	    sub {   check_unit_tests();   });
 
-skip_or_run('update Minilla', 'repair tests 1st',
+skip_or_run('check Minilla prerequisites', 'add untracked files 1st',
+	    sub {
+		run_and_check('check Minilla prerequisites',
+			      "git status | grep 'Untracked files:'",
+			      1 << 8);
+	    });
+
+skip_or_run('update Minilla', 'repair Minilla configuration & prerequisites',
 	    sub {
 		run_and_check
 		    ('update Minilla', 'minil test', 0,
@@ -241,28 +248,30 @@ skip_or_run('cross-check uncoverable',
 	    "don't cheat test coverage (or update " . UNCOVERABLE . ')',
 	    sub { check_uncoverable(); });
 
-# disabled due to a probable bug in Devel::Cover:
-skip_or_run('test coverage', '-improve test coverage',
+skip_or_run('test coverage', 'improve test coverage',
 	    sub {
-		run_and_check('test coverage', './Build testcover', 0,
-			      '# Testing UI::Various .* Perl v5\..*',
-			      '# Tk has version 804.033',
-			      '# Curses::UI has version 0.9609',
-			      '# Term::ReadLine has version 1.17',
-			      't/\d\d-.*\.t \.+ ok *$+',
-			      'All tests successful.',
-			      'Files=\d+, Tests=\d+, .*',
-			      'Result: PASS',
-			      'Reading database from .*',
-			      '^$+',
-			      '^-----.*',
-			      '^File .*',
-			      '^-----.*',
-			      '.* 100.0$+',
-			      '^-----.*',
-			      '^$+',
-			      '^HTML output written to .*',
-			      'done\.');
+		run_and_check
+		    ('test coverage', './Build testcover', 0,
+		     '# Testing UI::Various .* Perl v5\..*',
+		     '# Tk has version 804.033',
+		     '# Curses::UI has version 0.9609',
+		     '# Term::ReadLine has version 1.17',
+		     't/\d\d-.*\.t \.+ ok *$+',
+		     'All tests successful.',
+		     'Files=\d+, Tests=\d+, .*',
+		     'Result: PASS',
+		     'Reading database from .*',
+		     '^$+',
+		     '^-----.*',
+		     '^File .*',
+		     '^-----.*',
+		     # 1 uncoverable statement in core.pm missing for 100%:
+		     '(.* 100.0|.*/core.pm +99\.[6-9] .* 99\.[89]|'
+		     . 'Total .* 99\.9)$+',
+		     '^-----.*',
+		     '^$+',
+		     '^HTML output written to .*',
+		     'done\.');
 	    });
 
 skip_or_run('POD tests', 'fix documentation',

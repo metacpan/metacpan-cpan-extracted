@@ -1,4 +1,4 @@
-package Audit::Log 0.001;
+package Audit::Log 0.002;
 
 use strict;
 use warnings;
@@ -88,7 +88,7 @@ Audit::Log - auditd log parser with no external dependencies, using no perl feat
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -181,7 +181,7 @@ George S. Baugh <teodesian@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2020 Troglodyne LLC
+Copyright (c) 2022 Troglodyne LLC
 
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

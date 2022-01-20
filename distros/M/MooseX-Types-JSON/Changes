@@ -1,4 +1,8 @@
-Revision history for MooseX::Types::JSON;
+Revision history for MooseX-Types-JSON
+
+1.01      2022-01-19 11:18:00 -0700
+  - Fix compile error in synopsis (gh#2)
+  - Bump required Perl to 5.8.3, as this is what Moose currently requires (gh#5)
 
 1.00   2014-08-22
        - bump version to 1.00

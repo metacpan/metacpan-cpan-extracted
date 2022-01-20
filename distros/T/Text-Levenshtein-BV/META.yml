@@ -4,6 +4,7 @@ author:
   - 'Helmut Wollmersdorfer <helmut@wollmersdorfer.at>'
 build_requires:
   Test::More: '0.88'
+  Test::More::UTF8: '0'
   Text::Levenshtein: '0'
 configure_requires:
   Module::Build::Tiny: '0.039'
@@ -25,13 +26,13 @@ no_index:
 provides:
   Text::Levenshtein::BV:
     file: lib/Text/Levenshtein/BV.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/wollmers/Text-Levenshtein-BV/issues
   homepage: https://github.com/wollmers/Text-Levenshtein-BV
   repository: https://github.com/wollmers/Text-Levenshtein-BV.git
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'YAML::Tiny version 1.66'
 x_static_install: 1

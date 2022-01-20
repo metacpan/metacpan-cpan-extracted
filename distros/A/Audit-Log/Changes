@@ -1,4 +1,7 @@
 Revision history for Audit-Log
 
+0.002 2022-01-19 TEODESIAN
+    - Fix cpantesters failures related to ancient versions of List::Util
+
 0.001 2022-01-18 TEODESIAN
     - First release to CPAN

@@ -62,7 +62,7 @@ $target %dowhat readsweeps $max_processes $computype $calcprocedure %specularrat
 toil genstar solvestar integratebox filterbox__ clean %dowhat @weighttransforms
 );
 
-$VERSION = '0.649';
+$VERSION = '0.663';
 $ABSTRACT = 'Sim::OPT is an optimization and parametric exploration program oriented to problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. It allows a free mix of sequential and parallel block coordinate searches.';
 
 #################################################################################

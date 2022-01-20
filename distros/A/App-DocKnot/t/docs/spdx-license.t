@@ -9,7 +9,7 @@
 # The canonical version of this file is maintained in the rra-c-util package,
 # which can be found at <https://www.eyrie.org/~eagle/software/rra-c-util/>.
 #
-# Copyright 2018-2021 Russ Allbery <eagle@eyrie.org>
+# Copyright 2018-2022 Russ Allbery <eagle@eyrie.org>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -121,7 +121,7 @@ sub check_file {
     close($file) or BAIL_OUT("Cannot close $path");
 
     # If there is a legacy license notice, report a failure regardless of file
-    # size.  Otherwise, skip files under 1KB.  They can be rolled up into the
+    # size.  Otherwise, skip files under 1KiB.  They can be rolled up into the
     # overall project license and the license notice may be a substantial
     # portion of the file size.
     if ($saw_legacy_notice) {

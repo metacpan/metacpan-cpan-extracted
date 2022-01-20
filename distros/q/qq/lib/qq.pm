@@ -4,7 +4,7 @@ use 5.030000;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 1;
 __END__
@@ -23,15 +23,13 @@ Type 'qq' at the command line to start the application
 
 =head1 AUTHOR
 
-RAJKUAMR REDDY
+Rajkumar Reddy
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2021 by pc
+Copyright (C) 2022 by Rajkumar Reddy. All rights reserved.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.30.0 or,
-at your option, any later version of Perl 5 you may have available.
+Open Source.
 
 
 =cut

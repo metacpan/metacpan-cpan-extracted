@@ -2,7 +2,7 @@
 #
 #  Data::Stacker is concise text serialization for hash/array nested structs.
 #  Copyright (c) 2016-2022 Vladi Belperchinov-Shabanski "Cade" 
-#  <cade@bis.bg> <cade@noxrun.com> <cade@cpan.org>
+#        <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
 #  http://cade.noxrun.com
 #
 #  GPL
@@ -12,7 +12,8 @@ package Data::Stacker;
 use strict;
 use Exporter;
 use Scalar::Util;
-our $VERSION = '1.02';
+use Encode qw( is_utf8 encode decode );
+our $VERSION = '1.03';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -32,11 +33,7 @@ our %EXPORT_TAGS = (
 
 ### STACK ####################################################################
 
-# TODO: use Scalar::Util qw( reftype );
-
 # NOTE: escaping/unescaping is intentionally left in-place
-
-# TODO: UTF-8 support
 
 sub stack_data
 {
@@ -65,23 +62,20 @@ sub __stack_hashref
   my $ec = 0;
   while( my ( $k, $v ) = each %$hr )
     {
-    $k =~ s/([\\\n])/sprintf("%%%02X",ord($1))/geo;
+    $str .= __utf8_val_encode( $k );
     $ec++;
     my $ref = Scalar::Util::reftype( $v );
     if( $ref eq 'HASH' )
       {
-      my $cnt = keys %$v;
-      $str .= "$k\n" . __stack_hashref( $v );
+      $str .= __stack_hashref( $v );
       }
     elsif( $ref eq 'ARRAY' )
       {
-      my $cnt = @$v;
-      $str .= "$k\n" . __stack_arrayref( $v );
+      $str .= __stack_arrayref( $v );
       }
     elsif( $ref eq '' )  
       {
-      $v =~ s/([\\\n])/sprintf("%%%02X",ord($1))/geo;
-      $str .= "$k\n=$v\n";
+      $str .= __utf8_val_encode( $v );
       }
     else
       {
@@ -103,19 +97,15 @@ sub __stack_arrayref
     my $ref = ref $v;
     if( $ref eq 'HASH' )
       {
-      my $cnt = keys %$v;
       $str .= __stack_hashref( $v );
       }
     elsif( $ref eq 'ARRAY' )
       {    
-      my $cnt = @$v;
       $str .= __stack_arrayref( $v );
       }
     elsif( $ref eq '' )  
       {
-      my $vv = $v;
-      $vv =~ s/([\\\n])/sprintf("%%%02X",ord($1))/geo;
-      $str .= "=$vv\n";
+      $str .= __utf8_val_encode( $v );
       }
     else
       {
@@ -130,11 +120,12 @@ sub __stack_arrayref
 sub unstack_data
 {
   my $str = shift;
-  
+
   my @str = split /\n/, $str;
   chomp( @str );
-  
+
   my ( $res_hr ) = __unstack_data_decode( \@str );
+  
   return $res_hr;
 }
 
@@ -159,10 +150,9 @@ sub __unstack_data_decode
       my $count = $1;
       return __unstack_data_decode_hash( $data, $pos + 1, $count );
       }
-    elsif( $line =~ /^\=/ )  
+    elsif( $line =~ /^[=-]/ )  
       {
-      $line =~ s/\%([0-9A-F][0-9A-F])/chr(hex($1))/geo;
-      return ( substr( $line, 1 ), $pos + 1 );
+      return ( __utf8_val_decode( $line ), $pos + 1 );
       }
     else
       {
@@ -201,8 +191,7 @@ sub __unstack_data_decode_hash
   my %res;
   while( $pos <= @$data and $count-- )
     {
-    my $k = $data->[ $pos ];
-    $k =~ s/\%([0-9A-F][0-9A-F])/chr(hex($1))/geo;
+    my $k = __utf8_val_decode( $data->[ $pos ] );
     my $v;
     $pos++;
     ( $v, $pos ) = __unstack_data_decode( $data, $pos );
@@ -213,6 +202,34 @@ sub __unstack_data_decode_hash
   return ( \%res, $pos );
 }
 
+### UTILS ####################################################################
+
+sub __utf8_val_encode
+{
+  my $v = shift;
+  $v =~ s/([\\\n])/sprintf("%%%02X",ord($1))/geo;
+  if( is_utf8( $v ) )
+    {
+    $v = encode( 'UTF-8', $v );
+    return "-$v\n";
+    }
+  else
+    {
+    return "=$v\n";
+    }  
+}
+
+sub __utf8_val_decode
+{
+  my $v = shift;
+  if( $v =~ /^-/ )
+    {
+    $v = decode( 'UTF-8', $v );
+    }
+  $v =~ s/\%([0-9A-F][0-9A-F])/chr(hex($1))/geo;
+  return substr( $v, 1 );
+}      
+
 ##############################################################################
 
 =pod
@@ -220,7 +237,7 @@ sub __unstack_data_decode_hash
 
 =head1 NAME
 
-  Data::Stacker provides concise text serialization for nested hash/array structs.
+  Data::Stacker provides compact text serialization for nested hash/array structs.
 
 =head1 SYNOPSIS
 
@@ -320,10 +337,15 @@ It starts with char '@' followed by array entries values count.
 It represents single line, single string value. It can be either hash key 
 value or array element value.
 
+NOTE: there is special begin key '-', which represents UTF8 string. It is
+needed for perl utf8 scalars, so Stacker can encode/decode them properly.
+
 =item "HASH KEY"  .+
 
 Hash keys are special case. Their position and purpose is clear, so they do
-not need designated type chars (as %, @ or =).
+not need designated type chars (as %, @ or =). However, to support properly 
+UTF8 keys as perl utf8 scalars, keys also need '=' (for non-utf8 keys) and
+'-' for utf8 scalar keys.
 
 =back
 
@@ -437,9 +459,8 @@ Few similar-task perl modules:
 
   Vladi Belperchinov-Shabanski "Cade"
 
-  <cade@biscom.net> <cade@datamax.bg> <cade@cpan.org>
-
-  http://cade.datamax.bg
+        <cade@noxrun.com>  <cade@bis.bg>  <cade@cpan.org>
+  http://cade.noxrun.com
 
 =cut
 

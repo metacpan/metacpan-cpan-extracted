@@ -1,9 +1,9 @@
 This archive contains the distribution WebService-AcousticBrainz,
-version 0.0600:
+version 0.0601:
 
   Access to the AcousticBrainz API
 
-This software is copyright (c) 2021 by Gene Boggs.
+This software is copyright (c) 2022 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

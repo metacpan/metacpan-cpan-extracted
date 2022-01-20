@@ -37,7 +37,7 @@ use warnings 'once';
 use Carp;
 use Storable ();
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use UI::Various::language::en;
 
@@ -68,12 +68,14 @@ our @EXPORT = qw(language logging stderr using
 
 use constant _ROOT_PACKAGE_ => substr(__PACKAGE__, 0, rindex(__PACKAGE__, "::"));
 
+use constant UI_ELEMENTS => qw(Button Input Main Text Window);
+
 our @CARP_NOT =
     (	_ROOT_PACKAGE_,
 	map {( _ROOT_PACKAGE_ . '::' . $_ )}
 	(qw(core base container),
 	 map {( $_, "Tk::$_", "Curses::$_", "RichTerm::$_", "PoorTerm::$_" )}
-	 qw(Button Main Text Window))
+	 UI_ELEMENTS)
     );
 
 # global data-structure holding internal configuration:
@@ -120,8 +122,6 @@ my %log_level = ();
 }
 $log_level{WARNING} = $log_level{WARN};
 $log_level{INFORMATION} = $log_level{INFO};
-
-use constant UI_ELEMENTS => qw(Button Main Text Window);
 
 #########################################################################
 #########################################################################
@@ -692,8 +692,9 @@ sub construct($$@)		# not $$$@, that may put $self in wrong context!
 	or  fatal('invalid_object__1_in_call_to__2',
 		  ref($self), (caller(1))[3]);
 
-    # create default object:
-    $self = bless $attributes, $class;
+    # create (correct!) object:
+    $class =~ s/.*:://;
+    $self = bless $attributes, ui() . '::' . $class;
 
     # handle optional initial attribute values:
     my $parameters = {};
@@ -793,7 +794,7 @@ example above.
 
 =head3 returns:
 
-the current value of the attribute
+the current value of the attribute (SCALAR references are dereferenced)
 
 =cut
 
@@ -817,14 +818,19 @@ sub access($$@)		# not $$$;@, that may put $self in wrong context!
     # handle setter part, if applicable:
     if (exists $_[0])
     {
-	local $_ = shift;
-	my $ref = ref($_) eq 'SCALAR' ? $_ : undef;
-	$ref  and  $_ = $$_;
+	my $val = shift;
+	local $_ = ref($val) eq 'SCALAR' ? $$val : $val;
 	if (defined $sub_set)
 	{   defined &$sub_set($self, @_)  or  return $self->{$attribute};   }
-	if ($ref)
-	{   $$ref = $_; $_ = $ref;   }
-	$self->{$attribute} = $_;
+	if (ref($val) eq 'SCALAR')
+	{
+	    $$val = $_;
+	    # Curses needs to keep track of the references:
+	    $self->can('_reference')  and  $self->_reference($val);
+	}
+	else
+	{   $val = $_;   }
+	$self->{$attribute} = $val;
     }
     return (ref($self->{$attribute}) eq 'SCALAR'
 	    ? ${$self->{$attribute}}
@@ -890,7 +896,7 @@ example above.
 
 =head3 returns:
 
-the new value of the attribute
+the new value of the attribute (SCALAR references are dereferenced)
 
 =cut
 
@@ -910,14 +916,19 @@ sub set($$@)		    # not $$$@, that may put $self in wrong context!
 		   '$sub_set', (caller(1))[3]);
 
     # handle setter part, if applicable:
-    local $_ = shift;
-    my $ref = ref($_) eq 'SCALAR' ? $_ : undef;
-    $ref  and  $_ = $$_;
+    my $val = shift;
+    local $_ = ref($val) eq 'SCALAR' ? $$val : $val;
     if (defined $sub_set)
     {   defined &$sub_set($self, @_)  or  return $self->{$attribute};   }
-    if ($ref)
-    {   $$ref = $_; $_ = $ref;   }
-    $self->{$attribute} = $_;
+    if (ref($val) eq 'SCALAR')
+    {
+	$$val = $_;
+	# Curses needs to keep track of the references:
+	$self->can('_reference')  and  $self->_reference($val);
+    }
+    else
+    {   $val = $_;   }
+    $self->{$attribute} = $val;
     return (ref($self->{$attribute}) eq 'SCALAR'
 	    ? ${$self->{$attribute}}
 	    :   $self->{$attribute});
@@ -933,7 +944,10 @@ sub set($$@)		    # not $$$@, that may put $self in wrong context!
 
 This function contains the common getter code of all UI element classes (
 C<UI::Various::[A-Z]*>), implementing a very simple getter returning the
-current value of the attribute (but still with all sanity checks).
+current value of the attribute (but still with all sanity checks).  Note
+that if the attribute is a SCALAR reference it is nonetheless returned as
+value.  (If you really need the reference itself, access it directly as
+C<$ui_element->{attribute}>.)
 
 The internal implementation has the following interface:
 
@@ -951,7 +965,7 @@ The additional parameters are:
 
 =head3 returns:
 
-the current value of the attribute
+the current value of the attribute (SCALAR references are dereferenced)
 
 =cut
 
@@ -969,6 +983,31 @@ sub get($@)		      # not $$, that may put $self in wrong context!
     return (ref($self->{$attribute}) eq 'SCALAR'
 	    ? ${$self->{$attribute}}
 	    :   $self->{$attribute});
+}
+
+#########################################################################
+
+=head2 B<dummy_varref> - create a dummy SCALAR reference
+
+    $scalar = dummy_varref();
+
+=head3 description:
+
+This function returns a SCALAR reference to a dummy variable initialised
+with an empty string.  Note that each call returns a reference to a
+different variable.  The function can be used to initialise C<use constant>
+constants.
+
+=head3 returns:
+
+a scalar reference to an empty variable
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+BEGIN {
+    sub dummy_varref()
+    {   my $dummy = '';   return \$dummy;   }
 }
 
 # TODO L8R: add option to disable sanity checks

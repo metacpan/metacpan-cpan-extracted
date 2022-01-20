@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Term::ReadLine;
 
@@ -78,8 +78,8 @@ sub _init($)
 {
     my ($self) = @_;
     local $_;
-    ref($self) eq 'UI::Various::Main'  or
-	fatal('_1_may_only_be_called_from__2', __PACKAGE__, 'UI::Various::Main');
+    ref($self) eq __PACKAGE__  or
+	fatal('_1_may_only_be_called_from_itself', __PACKAGE__);
 
     # initialise ReadLine:
     my $rl = Term::ReadLine->new('UI::Various', *STDIN, *STDOUT);
@@ -127,7 +127,7 @@ sub mainloop($)
 {
     my ($self) = @_;
     my $n = $self->children;
-    my $i = $n - 1;
+    my $i = 0;			# behave like Curses::UI and Tk: 1st comes 1st
     debug(1, __PACKAGE__, '::mainloop: ', $i, ' / ', $n);
 
     local $_;
@@ -155,21 +155,23 @@ sub mainloop($)
 
 =head2 B<readline> - get readline input
 
-    $_ = $self->top->readline($prompt, $re_allowed, $history);
+    $_ = $self->top->readline($prompt, $re_allowed, $initial_value);
 
 =head3 parameters:
 
     $self               reference to object
     $prompt             string for the prompt
     $re_allowed         regular expression for allowed values
-    $history            optional flag to put input into RL history
+    $initial_value      initial value for input and flag for RL history
 
 =head3 description:
 
 Prompt for input and get line from L<Term::ReadLine>.  The line will be
 checked against the regular expression.  Input is read over again until a
-valid input is obtained, which is then returned.  If the history flag is
-set, all valid inputs will be put into L<ReadLine's|Term::ReadLine> history.
+valid input is obtained, which is then returned.  If the optional initial
+value is set, it will be used passed as 2nd parameter to C<readline>
+(I<PREPUT> argument).  It also activates storing a valid input in
+L<ReadLine's|Term::ReadLine> history.
 
 =head3 returns:
 
@@ -181,20 +183,19 @@ valid input
 
 sub readline($$$;$)
 {
-    my ($self, $prompt, $re_allowed, $history) = @_;
+    my ($self, $prompt, $re_allowed, $initial_value) = @_;
     local $_ = undef;
 
     do
     {{
-	$_ = $self->{_rl}->readline($prompt);
+	$_ = $self->{_rl}->readline($prompt, $initial_value);
 	# This can only happen with non-interactive input, therefore we use
 	# die instead of fatal:
 	defined $_  or  die msg('undefined_input');
 	unless (m/$re_allowed/)
 	{   error('invalid_selection');   next;   }
-	# uncoverable branch true # TODO: until Input
-	if ($history)
-	{   $self->{_rl}->addhistory($_);   } # uncoverable statement# TODO: same
+	if ($initial_value)
+	{   $self->{_rl}->addhistory($_);   }
 	s/\r?\n$//;
     }} until m/$re_allowed/;
     return $_;

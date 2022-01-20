@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 #########################################################################
 
@@ -51,26 +51,76 @@ our %T =
      ####################################################################
      # fatal and non-fatal error message, always without trailing "\n" for
      # automatically added location:
+     _1_attribute_must_be_a_2_reference
+     => "Attribut '%s' muß %s Referenz sein",
+     _1_element_must_be_accompanied_by_parent
+     => '%s Element benötigt Elternelement',
+     _1_may_only_be_called_from_itself
+     => '%s darf nur innerhalb der Klasse benutzt werden',
      bad_debug_level__1
-     => "unzulässiges debug Level '%s'",
+     => "unzulässiges Debug Level '%s'",
      bad_usage_of__1_as__2
      => "fehlerhafte Nutzung von %s als %s",
      bad_usage_of__1_pkg_is__2
      => "fehlerhafte Nutzung von %s, \$pkg ist '%s'",
+     can_t_remove__1_from_old_parent__2
+     => "kann '%s' nicht von altem Elternelement trennen",
+     can_t_remove__1_no_such_node_in__2
+     => "kann '%s' nicht entfernen: existiert nicht in %s",
+     cyclic_parent_relationship_detected__1_levels_above
+     => 'zyklische Abhängigkeit %d Ebenen höher gefunden',
+     enter_number_to_choose_next_step
+     => 'Nummer für nächste Aktion eingeben',
+     enter_selection
+     => 'Auswahl eingeben',
+     include_option_must_be_an_array_reference_or_a_scalar
+     => "'include' Option muss ARRAY Referenz oder Skalar sein",
+     invalid_object__1_in_call_to__2
+     => 'ungültiges Objekt (%s) in Aufruf von %s',
+     invalid_object__1_in_call_to__2__3
+     => 'ungültiges Objekt (%s) in Aufruf von %s::%s',
+     invalid_parameter__1_in_call_to__2
+     => "ungültiger Parameter '%s'in Aufruf von %s",
+     invalid_parameter__1_in_call_to__2__3
+     => "ungültiger Parameter '%s'in Aufruf von %s::%s",
+     invalid_parent__1_not_a_ui_various_container
+     => "ungültiges Elternelement '%s' (kein UI::Various::container)",
+     invalid_scalar__1_in_call_to__2
+     => "ungültiger Skalar '%s' in Aufruf von %s",
+     invalid_selection
+     => "Auswahl ungültig",
+     leave_window
+     => 'Fenster verlassen',
      message__1_missing_in__2
      => "text '%s' fehlt in '%s'",
+     new_value
+     => 'neuer Wert',
+     next_previous_window
+     => ', <+>/<-> nächstes/vorheriges Fenster',
+     no_element_found_for_index__1
+     => 'Element für index %d fehlt',
+     odd_number_of_parameters_in_initialisation_list_of__1
+     => 'ungerade Anzahl von Parametern in Initialisierungsliste von %s',
+     old_value
+     => 'alter Wert',
      options_must_be_specified_as_hash
      => 'Optionen müssen als {hash} spezifiziert werden',
+     specified_implementation_missing
+     => 'spezifische Implementierung fehlt',
      stderr_not_0_1_2_or_3
      => 'stderr muß 0, 1, 2 oder 3 sein',
      ui_various_core_must_be_1st_used_from_ui_various
      => 'UI::Various::core muß zuerst von UI::Various importiert werden',
+     undefined_input
+     => 'Eingabe undefiniert',
      undefined_logging_level__1
      => "unbekanntes Protokollierungslevel '%s'",
      unknown_option__1
      => "unbekannte Option '%s'",
      unsupported_language__1
      => "'%s' ist kein unterstützte Sprache",
+     unsupported_ui_element__1
+     => "'%s' ist kein unterstütztes UI Element",
      unsupported_ui_package__1
      => "'%s' ist kein unterstütztes UI Paket",
      use_option_must_be_an_array_reference

@@ -3,10 +3,10 @@ use strict;
 use warnings;
 
 # Use local libraries
-use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw( MIDI-Drummer-Tiny MIDI-Util Music-Duration-Partition );
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw( MIDI-Drummer-Tiny MIDI-Util Music-Duration Music-Duration-Partition );
 
 use MIDI::Drummer::Tiny;
-use MIDI::Util;
+use MIDI::Util qw(setup_score midi_format);
 use Music::Duration::Partition;
 use Music::Scales;
 use Music::Voss qw/ powers /;
@@ -15,7 +15,7 @@ my $size = shift || 4;
 my $max  = shift || 8;
 my $bpm  = shift || 90;
 
-my $score = MIDI::Util::setup_score( bpm => $bpm );
+my $score = setup_score( bpm => $bpm );
 
 $score->synch(
     \&melody,
@@ -60,11 +60,7 @@ sub get_genf {
     my ( $note, $octave, $type ) = @_;
 
     my @scale = map { $_ . $octave } get_scale_notes( $note, $type );
-    # Transform to MIDI accidentals
-    for ( @scale ) {
-        s/#/s/;
-        s/b/f/;
-    }
+    @scale = midi_format(@scale);
 
     my $seed = [ map { sub { int rand 2 } } @scale ];
     my $genf = powers( calls => $seed );

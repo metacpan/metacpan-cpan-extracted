@@ -24,7 +24,8 @@ my $text1 = UI::Various::Text->new(text => 'Hello World!');
 my $button1 = UI::Various::Button->new
     (text => 'Goodbye ...',
      code => sub{
-	 $window2 =
+	 $window2  or
+	     $window2 =
 	     $main->window({title => 'Bye!', width => 30, height => 6},
 			   UI::Various::Text->new(text => 'Goodbye World!'),
 			   UI::Various::Button->new

@@ -1,5 +1,9 @@
 Revision history for Perl extension Data::Stacker
 
+1.03  2022-01-19 CADE
+
+    - added support for UTF8 keys and values (for utf8 perl scalars)
+
 1.02  2022-01-18 CADE
 
     - avoid modification of input data when stacking

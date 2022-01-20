@@ -23,7 +23,7 @@ use Test::Output;
 BEGIN {
     eval { require Curses::UI; };
     $@  and  plan skip_all => 'Curses::UI not found';
-    plan tests => 16;
+    plan tests => 20;
 
     # define fixed environment for unit tests:
     delete $ENV{DISPLAY};
@@ -31,6 +31,23 @@ BEGIN {
 }
 
 use UI::Various({use => ['Curses']});
+
+#########################################################################
+# minimal dummy classes needed for unit tests:
+package UI::Various::Dummy
+{
+    use UI::Various::widget;
+    our @ISA = qw(UI::Various::widget);
+    sub new($;\[@$])
+    { return UI::Various::core::construct({ text => '' }, '.', @_); }
+    sub text($;$)
+    { return UI::Various::core::access('text', undef, @_); }
+};
+package UI::Various::Curses::Dummy
+{
+    use UI::Various::widget;
+    our @ISA = qw(UI::Various::Dummy UI::Various::Curses::base);
+};
 
 #########################################################################
 # identical parts of messages:
@@ -73,7 +90,7 @@ is(ref($main), 'UI::Various::Curses::Main',
 
 eval {   UI::Various::Curses::Main::_init(1);   };
 like($@,
-     qr/^.*::Curses::Main may only be called from UI::Various::Main$re_msg_tail/,
+     qr/^UI::Various::Curses::Main may only be called from itself$re_msg_tail/,
      'forbidden call to UI::Various::Curses::Main::_init should fail');
 
 ####################################
@@ -88,6 +105,10 @@ my $button1 = UI::Various::Button->new(text => 'OK',
 				       });
 is(ref($button1), 'UI::Various::Curses::Button',
    'type UI::Various::Curses::Button is correct');
+my $var = 'thing';
+my $input1 = UI::Various::Input->new(textvar => \$var);
+is(ref($input1), 'UI::Various::Curses::Input',
+   'type UI::Various::Curses::Input is correct');
 
 stderr_like
 {   $text1->_prepare(0, 0);   }
@@ -97,32 +118,46 @@ stderr_like
 {   $button1->_prepare(0, 0);   }
     qr/^UI::.*:Curses::Button element must be accompanied by parent$re_msg_tail/,
     'orphaned Button causes error';
+stderr_like
+{   $input1->_prepare(0, 0);   }
+    qr/^UI::.*:Curses::Input element must be accompanied by parent$re_msg_tail/,
+    'orphaned Input causes error';
 
+# additional fields with same SCALAR reference as $input1:
+my $text2  = UI::Various::Text ->new(text    => \$var);
+my $input2 = UI::Various::Input->new(textvar => \$var);
+my $dummy  = UI::Various::Dummy->new(text    => \$var);
+
+my $result = 'not set';
 my $w;
 my $button2 = UI::Various::Button->new(text => 'Quit',
 				       code => sub {
+					   $result =
+					       $text2->_cui->text . ':' .
+					       $input2->_cui->get;
 					   $w->destroy;
 				       });
 $w = $main->window({title => 'Hello', width => 42},
-		   $text1, $button1, $button2);
+		   $text1, $input1, $button1, $button2, $text2, $input2);
 is(ref($w), 'UI::Various::Curses::Window',
    'type UI::Various::Curses::Window is correct');
 
-@chars_to_read = (' ', "\t", ' ');
-# TODO: Remove dummy code inserted to counter strange testing behaviour:
+# Note that the text for an input field needs a '-1' after each character:
+@chars_to_read = ('s', -1, 'o', -1, 'm', -1, 'e', -1,
+		  "\t", ' ', "\t", ' ');
 combined_like
 {   $main->mainloop;   }
-#{ print "- Hello World!- Hello -Quit-\n";  }
     qr/^.* Hello World!.* Hello .*Quit\b.*$/s,
     'mainloop produces correct output';
-#$w->destroy;
 is(@{$main->{children}}, 0, 'main no longer has children');
+is($var, 'something', 'input variable has correct new value');
+is($result, 'something:something', 'all SCALAR references changed correctly');
 
 ####################################
 # test standard behaviour with 2 windows:
 
 my ($w1, $w2);
-my $text2 = UI::Various::Text->new(text => 'Bye!');
+$text2 = UI::Various::Text->new(text => 'Bye!');
 $button2 =
     UI::Various::Button->new(text => 'Quit',
 			     code => sub {   $w1->destroy;   $w2->destroy;   });

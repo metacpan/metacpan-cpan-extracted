@@ -29,15 +29,12 @@ BEGIN { use_ok('App::DocKnot::Command') }
 my $docknot = App::DocKnot::Command->new();
 isa_ok($docknot, 'App::DocKnot::Command');
 
-# Create a temporary directory for test output.
-my $tempdir = Path::Tiny->tempdir();
-
 # Generate the package README file to a temporary file, read it into memory,
 # and compare it to the actual README file.  This duplicates part of the
 # generate/self.t test, but via the command-line parser.  Do this in a
 # separate block so that $tempfile goes out of scope and will be cleaned up.
 {
-    my $tempfile = $tempdir->tempfile();
+    my $tempfile = Path::Tiny->tempfile();
     $docknot->run('generate', 'readme', "$tempfile");
     my $output = $tempfile->slurp_utf8();
     is_file_contents($output, 'README', 'Generated README from argument list');
@@ -45,7 +42,7 @@ my $tempdir = Path::Tiny->tempdir();
 
 # Do the same thing again, but using arguments from @ARGV.
 {
-    my $tempfile = $tempdir->tempfile();
+    my $tempfile = Path::Tiny->tempfile();
     local @ARGV = ('generate', 'readme-md', "$tempfile");
     $docknot->run();
     my $output = $tempfile->slurp_utf8();
@@ -59,6 +56,7 @@ my $metadata_path = path('docs', 'docknot.yaml')->realpath();
 
 # Generate all of the files using generate-all in a new temporary directory.
 my $cwd = getcwd();
+my $tempdir = Path::Tiny->tempdir();
 chdir($tempdir);
 $docknot->run('generate-all', '-m', "$metadata_path");
 my $output = path('README')->slurp_utf8();

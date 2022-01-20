@@ -5,16 +5,22 @@ use strict;
 use warnings;
 use utf8;
 
-use lib qw(../lib/);
+use lib qw(
+../lib/
+./lib/
+);
 
 use Test::More;
-#use Test::Deep;
-#cmp_deeply([],any());
+use Test::More::UTF8;
 
 use Text::Levenshtein::BV;
 use Text::Levenshtein qw(distance);
 
 my $examples = [
+  [ '', ''],
+  [ 'a', ''],
+  [ '', 'b'],
+  [ 'b', 'b'],
   ['ttatc__cg',
    '__agcaact'],
   ['abcabba_',
@@ -103,10 +109,9 @@ my $examples3 = [
     '_b_', ],
 ];
 
-
-
 if (1) {
   for my $example (@$examples) {
+  ##for my $example ([ 'rrp','rep']) {
     my $a = $example->[0];
     my $b = $example->[1];
     my @a = $a =~ /([^_])/g;
@@ -122,16 +127,14 @@ if (1) {
       Text::Levenshtein::BV->hunks2distance(\@a,\@b,
         Text::Levenshtein::BV->SES(\@a,\@b)
       ),
-      #distance($A,$B),
       $distance,
 
-      #"[$a] m: $m, [$b] n: $n -> " . distance($A,$B)
       "[$a] m: $m, [$b] n: $n -> " . $distance
     );
   }
 }
 
-if (0) {
+if (1) {
   for my $example (@$examples2) {
     my $a = $example->[0];
     my $b = $example->[1];
@@ -148,10 +151,8 @@ if (0) {
       Text::Levenshtein::BV->hunks2distance(\@a,\@b,
         Text::Levenshtein::BV->SES(\@a,\@b)
       ),
-      #distance($A,$B),
       $distance,
 
-      #"[$a] m: $m, [$b] n: $n -> " . distance($A,$B)
       "[$a] m: $m, [$b] n: $n -> " . $distance
     );
   }
@@ -174,20 +175,17 @@ if (1) {
 
     is(
       Text::Levenshtein::BV->hunks2distance(\@a,\@b,
-        #Text::Levenshtein::BV->SES(\@a,\@b)
         $hunks
       ),
-      #distance($A,$B),
       $distance,
 
-      #"[$a] m: $m, [$b] n: $n -> " . distance($A,$B)
       "[$a] m: $m, [$b] n: $n -> " . $distance
     );
   }
 }
 
 # test prefix-suffix optimization
-if (0) {
+if (1) {
   my $prefix = 'a';
   my $infix  = 'b';
   my $suffix = 'c';
@@ -229,7 +227,7 @@ if (0) {
 }
 
 # test error-by-one
-if (0) {
+if (1) {
   my $string1 = 'a';
   my $string2 = 'b';
   my @base_lengths = (16, 32, 64, 128, 256);
@@ -259,7 +257,7 @@ if (0) {
 }
 
 # test carry for possible machine words
-if (0) {
+if (1) {
   my $string1 = 'abd';
   my $string2 = 'badc';
   my @base_lengths = (16, 32, 64, 128, 256);

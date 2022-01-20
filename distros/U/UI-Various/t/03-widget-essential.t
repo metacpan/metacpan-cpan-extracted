@@ -22,19 +22,22 @@ use Test::More tests => 28;
 use Test::Warn;
 
 # define fixed environment for unit tests:
-BEGIN { delete $ENV{DISPLAY}; delete $ENV{UI}; }
+use UI::Various({use => [], log => 'WARN', include => 'none'});
 
-use UI::Various({log => 'WARN', include => 'none'});
 use UI::Various::widget;
 
 #########################################################################
 # minimal dummy classes needed for unit tests:
 package UI::Various::Leaf
 {   use UI::Various::widget; our @ISA = qw(UI::Various::widget);   };
+package UI::Various::PoorTerm::Leaf
+{   use UI::Various::widget; our @ISA = qw(UI::Various::Leaf);   };
 package UI::Various::container
 {   use UI::Various::widget; our @ISA = qw(UI::Various::widget);   };
 package UI::Various::Box
 {   use UI::Various::widget; our @ISA = qw(UI::Various::container);   };
+package UI::Various::PoorTerm::Box
+{   use UI::Various::widget; our @ISA = qw(UI::Various::Box);   };
 package Dummy
 {   sub new { my $self = {}; bless $self, 'Dummy'; }   };
 
@@ -46,31 +49,36 @@ my $re_msg_tail = qr/ at $0 line \d{2,}\.?$/;
 # checks of parent():
 my $b1 = UI::Various::Box->new();
 ok($b1, 'created orphan test Box 1');
-is(ref($b1), 'UI::Various::Box', 'orphan test Box 1 has correct type');
+is(ref($b1), 'UI::Various::PoorTerm::Box',
+   'orphan test Box 1 has correct type');
 is($b1->parent(), undef, 'orphaned test Box 1 has no parent');
 
 my $l1 = UI::Various::Leaf->new();
 ok($l1, 'created orphan test Leaf 1');
-is(ref($l1), 'UI::Various::Leaf', 'orphan test Leaf 1 has correct type');
+is(ref($l1), 'UI::Various::PoorTerm::Leaf',
+   'orphan test Leaf 1 has correct type');
 
 eval {   my $b2 = UI::Various::Box->new(parent => $l1);   };
 like($@,
-     qr/^invalid parent 'UI::Various::Leaf' .*$re_msg_tail/,
+     qr/^invalid parent 'UI::Various::PoorTerm::Leaf' .*$re_msg_tail/,
      'creating test Box with Leaf as parent is not allowed');
 
 my $b2 = UI::Various::Box->new(parent => $b1);
 ok($b2, 'created test Box 2 with parent');
-is(ref($b2), 'UI::Various::Box', 'test Box 2 with parent has correct type');
+is(ref($b2), 'UI::Various::PoorTerm::Box',
+   'test Box 2 with parent has correct type');
 is($b2->parent(), $b1, 'test Box 2 has correct parent');
 
 my $l2 = UI::Various::Leaf->new({parent => $b2});
 ok($l2, 'created test Leaf with parent');
-is(ref($l2), 'UI::Various::Leaf', 'test Leaf 2 with parent has correct type');
+is(ref($l2), 'UI::Various::PoorTerm::Leaf',
+   'test Leaf 2 with parent has correct type');
 is($l2->parent(), $b2, 'test Leaf 2 has correct parent Box 2');
 
 my $b3 = UI::Various::Box->new();
 ok($b3, 'created orphan test Box 3');
-is(ref($b3), 'UI::Various::Box', 'orphan test Box 3 has correct type');
+is(ref($b3), 'UI::Various::PoorTerm::Box',
+   'orphan test Box 3 has correct type');
 is($b3->parent(), undef, 'orphaned test Box 3 has no parent');
 $b3->parent($b2);
 is($b3->parent(), $b2, 'test Box 3 now has parent Box 2');
