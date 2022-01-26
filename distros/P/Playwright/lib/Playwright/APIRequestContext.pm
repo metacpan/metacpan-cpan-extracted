@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::APIRequestContext;
-$Playwright::APIRequestContext::VERSION = '0.017';
+$Playwright::APIRequestContext::VERSION = '0.018';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,6 +22,36 @@ sub spec {
     return $Playwright::spec->{'APIRequestContext'}{members};
 }
 
+sub get {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'get',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub storageState {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'storageState',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub put {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'put',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
 sub fetch {
     my $self = shift;
     return $self->_api_request(
@@ -32,11 +62,21 @@ sub fetch {
     );
 }
 
-sub head {
+sub patch {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'head',
+        command => 'patch',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub dispose {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'dispose',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -62,51 +102,11 @@ sub delete {
     );
 }
 
-sub patch {
+sub head {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'patch',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub put {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'put',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub storageState {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'storageState',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub dispose {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'dispose',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub get {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'get',
+        command => 'head',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -156,7 +156,7 @@ Playwright::APIRequestContext - Automatically generated class for Playwright::AP
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 CONSTRUCTOR
 
@@ -167,17 +167,41 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
+=head2 get(@args)
+
+Execute the APIRequestContext::get playwright routine.
+
+See L<https://playwright.dev/api/class-APIRequestContext#APIRequestContext-get> for more information.
+
+=head2 storageState(@args)
+
+Execute the APIRequestContext::storageState playwright routine.
+
+See L<https://playwright.dev/api/class-APIRequestContext#APIRequestContext-storageState> for more information.
+
+=head2 put(@args)
+
+Execute the APIRequestContext::put playwright routine.
+
+See L<https://playwright.dev/api/class-APIRequestContext#APIRequestContext-put> for more information.
+
 =head2 fetch(@args)
 
 Execute the APIRequestContext::fetch playwright routine.
 
 See L<https://playwright.dev/api/class-APIRequestContext#APIRequestContext-fetch> for more information.
 
-=head2 head(@args)
+=head2 patch(@args)
 
-Execute the APIRequestContext::head playwright routine.
+Execute the APIRequestContext::patch playwright routine.
 
-See L<https://playwright.dev/api/class-APIRequestContext#APIRequestContext-head> for more information.
+See L<https://playwright.dev/api/class-APIRequestContext#APIRequestContext-patch> for more information.
+
+=head2 dispose(@args)
+
+Execute the APIRequestContext::dispose playwright routine.
+
+See L<https://playwright.dev/api/class-APIRequestContext#APIRequestContext-dispose> for more information.
 
 =head2 post(@args)
 
@@ -191,35 +215,11 @@ Execute the APIRequestContext::delete playwright routine.
 
 See L<https://playwright.dev/api/class-APIRequestContext#APIRequestContext-delete> for more information.
 
-=head2 patch(@args)
+=head2 head(@args)
 
-Execute the APIRequestContext::patch playwright routine.
+Execute the APIRequestContext::head playwright routine.
 
-See L<https://playwright.dev/api/class-APIRequestContext#APIRequestContext-patch> for more information.
-
-=head2 put(@args)
-
-Execute the APIRequestContext::put playwright routine.
-
-See L<https://playwright.dev/api/class-APIRequestContext#APIRequestContext-put> for more information.
-
-=head2 storageState(@args)
-
-Execute the APIRequestContext::storageState playwright routine.
-
-See L<https://playwright.dev/api/class-APIRequestContext#APIRequestContext-storageState> for more information.
-
-=head2 dispose(@args)
-
-Execute the APIRequestContext::dispose playwright routine.
-
-See L<https://playwright.dev/api/class-APIRequestContext#APIRequestContext-dispose> for more information.
-
-=head2 get(@args)
-
-Execute the APIRequestContext::get playwright routine.
-
-See L<https://playwright.dev/api/class-APIRequestContext#APIRequestContext-get> for more information.
+See L<https://playwright.dev/api/class-APIRequestContext#APIRequestContext-head> for more information.
 
 =head2 on(@args)
 

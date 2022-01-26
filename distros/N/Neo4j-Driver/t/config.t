@@ -5,7 +5,7 @@ use lib qw(./lib t/lib);
 
 use Test::More 0.88;
 use Test::Exception;
-use Test::Warnings;
+use Test::Warnings qw(warning);
 
 
 # The Neo4j::Driver package itself mostly deals with configuration
@@ -14,9 +14,9 @@ use Test::Warnings;
 use Neo4j_Test;
 use Neo4j_Test::MockHTTP;
 
-my ($d, $r);
+my ($d, $r, $w);
 
-plan tests => 15 + 1;
+plan tests => 16 + 1;
 
 
 subtest 'config read/write' => sub {
@@ -26,19 +26,19 @@ subtest 'config read/write' => sub {
 	my $timeout = exp(1);
 	lives_and { is $d->config(timeout => $timeout), $d; } 'set timeout';
 	lives_and { is $d->config('timeout'), $timeout; } 'get timeout';
-	lives_and { is $d->config('ca_file'), undef; } 'get unset ca_file';
-	lives_and { is $d->config({ca_file => ''}), $d; } 'set ca_file ref';
-	lives_and { is $d->config('ca_file'), ''; } 'get ca_file ref';
+	lives_and { is $d->config('trust_ca'), undef; } 'get unset trust_ca';
+	lives_and { is $d->config({trust_ca => ''}), $d; } 'set trust_ca ref';
+	lives_and { is $d->config('trust_ca'), ''; } 'get trust_ca ref';
 	# write and read multiple options
 	my $ca_file = '/dev/null';
-	my @options = (timeout => $timeout * 2, ca_file => $ca_file);
+	my @options = (timeout => $timeout * 2, trust_ca => $ca_file);
 	lives_and { is $d->config(@options), $d; } 'set two options';
 	lives_and { is $d->config('timeout'), $timeout * 2; } 'get timeout 2nd';
-	lives_and { is $d->config('ca_file'), $ca_file; } 'get ca_file';
-	@options = (timeout => $timeout * 3, ca_file => '');
+	lives_and { is $d->config('trust_ca'), $ca_file; } 'get trust_ca 2';
+	@options = (timeout => $timeout * 3, trust_ca => '');
 	lives_and { is $d->config({@options}), $d; } 'set two options ref';
 	lives_and { is $d->config('timeout'), $timeout * 3; } 'get timeout ref';
-	lives_and { is $d->config('ca_file'), ''; } 'get ca_file ref';
+	lives_and { is $d->config('trust_ca'), ''; } 'get trust_ca 3 ref';
 };
 
 
@@ -58,13 +58,16 @@ subtest 'direct hash access' => sub {
 
 
 subtest 'constructor config' => sub {
-	plan tests => 7;
+	plan tests => 10;
 	lives_ok { $d = 0; $d = Neo4j::Driver->new(); } 'new driver default lives';
 	lives_and { is $d->{http_timeout}, undef; } 'new driver default';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new({timeout => 1}); } 'new driver hashref lives';
 	lives_and { is $d->{http_timeout}, 1; } 'new driver hashref';
+	lives_and { like $d->{uri}, qr/\blocalhost\b/; } 'new driver default uri';
 	lives_ok { $d = 0; $d = Neo4j::Driver->new('http://test:10047'); } 'new driver uri lives';
 	lives_and { is $d->{uri}, 'http://test:10047'; } 'new driver uri';
+	lives_ok { $d = 0; $d = Neo4j::Driver->new({}); } 'new driver empty hashref lives';
+	lives_and { like $d->{uri}, qr/\blocalhost\b/; } 'new driver empty hashref default uri';
 	throws_ok { Neo4j::Driver->new({}, 0) } qr/\bmultiple arguments unsupported\b/i, 'extra arg';
 };
 
@@ -93,6 +96,25 @@ subtest 'config illegal args' => sub {
 	throws_ok {
 		 $d->config( aaa => 1, bbb => 2 );
 	} qr/\bUnsupported\b.*\baaa\b.*\bbbb\b/i, 'illegal name set multi';
+};
+
+
+subtest 'config/session sequence' => sub {
+	plan tests => 8;
+	my $config = {net_module => 'Neo4j_Test::MockHTTP'};
+	lives_ok { $d = 0; $d = Neo4j::Driver->new($config) } 'new mock driver';
+	lives_ok { $d->basic_auth(user => 'pw') } 'basic_auth before session';
+	lives_ok { $d->config(auth => undef) } 'config before session';
+	lives_ok { $d->session(database => 'dummy') } 'first session';
+	lives_ok { $w = ''; $w = warning {
+		$d->basic_auth(user => 'pw');
+	}} 'basic_auth after session lives';
+	like $w, qr/\bDeprecated sequence\b.*\bsession\b/i, 'basic_auth after session deprecated'
+		or diag 'got warning(s): ', explain $w;
+	throws_ok {
+		$d->config(auth => undef);
+	} qr/\bUnsupported sequence\b.*\bsession\b/i, 'config after session';
+	lives_ok { $d->session(database => 'dummy') } 'second session';
 };
 
 
@@ -276,7 +298,7 @@ subtest 'auth encoding integration' => sub {
 
 
 subtest 'cypher params' => sub {
-	plan tests => 19;
+	plan tests => 21;
 	my ($t, @q);
 	lives_ok { $d = 0; $d = Neo4j::Driver->new(); } 'new driver 1';
 	lives_ok { $d->config(cypher_params => v2); } 'set filter';
@@ -300,12 +322,16 @@ subtest 'cypher params' => sub {
 	lives_ok { $r = 0; $r = $t->_prepare(@q); } 'prepare unfiltered';
 	is $r->{statement}, 'RETURN {a}', 'unfiltered';
 	# verify that filter flag is automatically cleared for Neo4j 2
-	my $d = Neo4j::Driver->new('http:');
-	lives_ok { $d->config(cypher_params => v2, net_module => 'Neo4j_Test::MockHTTP') } 'set filter mock';
+	my $config = {cypher_params => v2, net_module => 'Neo4j_Test::MockHTTP'};
+	my $d;
+	lives_ok { $d = Neo4j::Driver->new($config) } 'Neo4j 4: set filter mock';
 	lives_and { ok !! $d->session(database => 'dummy')->{cypher_params_v2} } 'Neo4j 4: filter';
+	lives_ok { $d = Neo4j::Driver->new($config) } 'Neo4j 2: set filter mock';
 	$Neo4j_Test::MockHTTP::res[0]->{json}{neo4j_version} = '2.3.12';
 	$Neo4j_Test::MockHTTP::res[0]->{content} = undef;
 	lives_and { ok !  $d->session(database => 'dummy')->{cypher_params_v2} } 'Neo4j 2: no filter';
+	$d = Neo4j::Driver->new('http:');
+	lives_ok { $d = Neo4j::Driver->new($config) } 'Sim: set filter mock';
 	$Neo4j_Test::MockHTTP::res[0]->{json}{neo4j_version} = '0.0.0';
 	$Neo4j_Test::MockHTTP::res[0]->{content} = undef;
 	lives_and { ok !! $d->session(database => 'dummy')->{cypher_params_v2} } 'Sim (0.0.0): filter';

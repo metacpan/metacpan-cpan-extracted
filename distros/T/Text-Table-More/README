@@ -3,8 +3,8 @@ NAME
     options
 
 VERSION
-    This document describes version 0.020 of Text::Table::More (from Perl
-    distribution Text-Table-More), released on 2021-08-28.
+    This document describes version 0.021 of Text::Table::More (from Perl
+    distribution Text-Table-More), released on 2022-01-26.
 
 SYNOPSIS
      #!perl
@@ -441,9 +441,9 @@ FUNCTIONS
 
     *   header_row
 
-        Boolean. Optional. Default 0. Whether to treat the first row as the
-        header row, which means draw a separator line between it and the
-        rest.
+        Int. Optional. Default 0. Number of rows that are header. Note that
+        in Text::Table::Tiny, this option is a boolean. We use integer to
+        support multirow header.
 
     *   border_style
 
@@ -508,6 +508,12 @@ FUNCTIONS
         this requires optional prereq Text::ANSI::Util or
         Text::ANSI::WideUtil.
 
+FAQ
+  Can I have multiple header rows?
+    Yes, by setting "header_row" option to 2 or whatever number of header
+    rows you have. See example script multirow-header.pl in this
+    distribution.
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Text-Table-More>.
@@ -550,7 +556,8 @@ CONTRIBUTING
     me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2022, 2021 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

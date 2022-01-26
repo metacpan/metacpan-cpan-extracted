@@ -2,8 +2,8 @@ NAME
     App::ImageMagickUtils - Utilities related to ImageMagick
 
 VERSION
-    This document describes version 0.008 of App::ImageMagickUtils (from
-    Perl distribution App-ImageMagickUtils), released on 2021-10-12.
+    This document describes version 0.009 of App::ImageMagickUtils (from
+    Perl distribution App-ImageMagickUtils), released on 2022-01-16.
 
 DESCRIPTION
     This distribution includes the following CLI utilities related to
@@ -18,6 +18,8 @@ DESCRIPTION
     *   downsize-image
 
     *   image-resize-notation-to-human
+
+    *   img2pdf
 
 FUNCTIONS
   convert_image_to
@@ -189,7 +191,7 @@ CONTRIBUTING
     me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020 by perlancar
+    This software is copyright (c) 2022, 2021, 2020 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

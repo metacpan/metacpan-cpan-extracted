@@ -56,8 +56,10 @@ SYNOPSIS
 
 ABSTRACT
 
-    This software has upper compatibility to jcode.pl and multiple inheritance
-    both stable jcode.pl library and active Encode module.
+    This software will be useful for DX (Digital Transformation) and IT
+    modernization of Japanese information processing. This software has upper
+    compatibility to jcode.pl and multiple inheritance both stable jcode.pl
+    library and active Encode module.
 
     * jcode.pl upper compatible
     * pkf command upper compatible

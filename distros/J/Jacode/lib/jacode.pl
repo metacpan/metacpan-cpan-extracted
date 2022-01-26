@@ -3,7 +3,7 @@ package jacode;
 #
 # jacode.pl: Perl program for Japanese character code conversion
 #
-# Copyright (c) 2010, 2011, 2014, 2015, 2016, 2017, 2018, 2019, 2020 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2010, 2011, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2022 INABA Hitoshi <ina@cpan.org> in a CPAN
 #
 # The latest version is available here:
 #
@@ -504,7 +504,7 @@ sub BEGIN {
 
 $support_jcode_package_too = 1;
 
-$VERSION = '2.13.4.24';
+$VERSION = '2.13.4.26';
 $VERSION = $VERSION;
 $rcsid = sprintf(q$Id: jacode.pl,v %s branched from jcode.pl,v 2.13 2000/09/29 16:10:05 utashiro Exp $, $VERSION);
 
@@ -11272,6 +11272,8 @@ __END__
 
 =pod
 
+=encoding utf8
+
 =head1 NAME
 
 jacode - Perl program for Japanese character code conversion
@@ -11350,10 +11352,58 @@ jacode - Perl program for Japanese character code conversion
     &{$jcode::z2hf{'xxx'}}(\$line)
     &{$jcode::h2zf{'xxx'}}(\$line)
 
+=head1 EASY INSTALL (Paste and Run)
+
+  1. Open URL https://metacpan.org/pod/Jacode
+  
+  2. Click ...
+  ----------------------------------
+  Source (raw) <--- This ***raw***
+  Browse (raw)
+  Changes
+  How to Contribute
+  Clone repository
+  Issues
+  Testers (NNN / NNN / NNN)
+  Kwalitee
+  Bus factor: 1
+  NN.NN% Coverage
+  License: perl_5
+  Perl: v5.5.30
+  ----------------------------------
+  
+  3. Select All Text of Page
+  
+  4. Save Text as "lib/Jacode.pm"
+  
+  5. Open URL https://metacpan.org/dist/Jacode/view/lib/jacode.pl
+  
+  6. Click ...
+  ----------------------------------
+  Source (raw) <--- This ***raw***
+  Browse (raw)
+  Changes
+  How to Contribute
+  Clone repository
+  Issues
+  Testers (NNN / NNN / NNN)
+  Kwalitee
+  Bus factor: 1
+  NN.NN% Coverage
+  License: perl_5
+  Perl: v5.5.30
+  ----------------------------------
+  
+  7. Select All Text of Page
+  
+  8. Save Text as "lib/jacode.pl"
+
 =head1 ABSTRACT
 
-This software has upper compatibility to jcode.pl and multiple
-inheritance both stable jcode.pl library and active Encode module.
+This software will be useful for DX (Digital Transformation) and IT
+modernization of Japanese information processing. This software has upper
+compatibility to jcode.pl and multiple inheritance both stable jcode.pl
+library and active Encode module.
 
 'Ja' is a meaning of 'Japanese' in ISO 639-1 code and is unrelated
 to 'JA Group Organization'.
@@ -11829,7 +11879,16 @@ this a more useful tool, please let everyone share it.
   2018 Perl5.28                   |          |        Born            Born        
   2019 Perl5.30                   |          |         |               |          
   2020 Perl5.32                   :          :         :               :          
-  2021 Perl7.XX                   :          :         :               :          
+  2030 Perl5.52                   :          :         :               :          
+  2040 Perl5.72                   :          :         :               :          
+  2050 Perl5.92                   :          :         :               :          
+  2060 Perl5.112                  :          :         :               :          
+  2070 Perl5.132                  :          :         :               :          
+  2080 Perl5.152                  :          :         :               :          
+  2090 Perl5.172                  :          :         :               :          
+  2100 Perl5.192                  :          :         :               :          
+  2110 Perl5.212                  :          :         :               :          
+  2120 Perl5.232                  :          :         :               :          
     :     :                       V          V         V               V          
   --------------------------------------------------------------------------------
 
@@ -11859,7 +11918,7 @@ This software is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-Copyright (c) 2010, 2011, 2014, 2015, 2016, 2017, 2018, 2019, 2020 INABA Hitoshi E<lt>ina@cpan.org>E<gt> in a CPAN
+Copyright (c) 2010, 2011, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2022 INABA Hitoshi E<lt>ina@cpan.org>E<gt> in a CPAN
 
 The latest version is available here:
 

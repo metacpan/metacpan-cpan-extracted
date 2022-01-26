@@ -1,4 +1,9 @@
-0.120   2018-11-22 (PERLANCAR)
+0.121   2022-01-16  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to Perinci::CmdLine::{Base,Lite} 1.915+.
+
+
+0.120   2018-11-22  Released-By: PERLANCAR
 
 	- Bump prereq version Perinci::CmdLine::Lite 1.811 -> 1.816
 	  (self-dumps include %main::SPEC in x.main.spec).
@@ -6,7 +11,7 @@
 	- Dump %main::SPEC into x.main.spec.
 
 
-0.11    2017-07-07 (PERLANCAR)
+0.11    2017-07-07  Released-By: PERLANCAR
 
         - [Bugfix] Forgot to pass -I options from 'libs' argument when
           self-dumping.
@@ -14,37 +19,37 @@
         - [dist] Enable static install.
 
 
-0.10    2017-06-24 (PERLANCAR)
+0.10    2017-06-24  Released-By: PERLANCAR
 
 	- Bring back patching method because the self-dump method introduced in
 	  0.09 doesn't work yet for /main URLs. Now one can choose the method
 	  using the `method` argument.
 
 
-0.09    2017-06-17 (PERLANCAR)
+0.09    2017-06-17  Released-By: PERLANCAR
 
 	- Utilize Perinci::CmdLine 1.73's dumping feature.
 
 
-0.08    2017-01-13 (PERLANCAR)
+0.08    2017-01-13  Released-By: PERLANCAR
 
 	- Adjust to Perinci::CmdLine::Inline 0.45+ (read_config & read_env
 	  now supported).
 
 
-0.07    2017-01-07 (PERLANCAR)
+0.07    2017-01-07  Released-By: PERLANCAR
 
 	- [Incompatible change] Rename function dump_perinci_cmdline_script
 	  to dump_pericmd_script, we standardize on the shorter name (old
 	  name is still around but deprecated and undocumented).
 
 
-0.06    2016-10-27 (PERLANCAR)
+0.06    2016-10-27  Released-By: PERLANCAR
 
         - Add skip_detect option.
 
 
-0.05    2015-07-30 (PERLANCAR)
+0.05    2015-07-30  Released-By: PERLANCAR
 
 	- When dumping Perinci::CmdLine::Inline script as
 	  Perinci::CmdLine::Lite script, emulate by turning off features
@@ -52,7 +57,7 @@
 	  read_env=>0).
 
 
-0.04    2015-07-30 (PERLANCAR)
+0.04    2015-07-30  Released-By: PERLANCAR
 
 	- Support dumping Perinci::CmdLine::Inline script (as if it were
 	  Perinci::CmdLine::Lite script).
@@ -60,12 +65,12 @@
 	- Include detect result as extra result.
 
 
-0.03    2015-07-30 (PERLANCAR)
+0.03    2015-07-30  Released-By: PERLANCAR
 
 	- [ux] Include detection reason in error message.
 
 
-0.02    2014-12-21 (PERLANCAR)
+0.02    2014-12-21  Released-By: PERLANCAR
 
         - Rename dist from Perinci-CmdLine-Base-Patch-DumpAndExit to
           Perinci-CmdLine-Dump.
@@ -76,7 +81,7 @@
           potentially others).
 
 
-0.01    2014-12-14 (PERLANCAR)
+0.01    2014-12-14  Released-By: PERLANCAR
 
         - First release, split from Pod-Weaver-Plugin-Rinci and renamed from
           ::DumpOnRun to ::DumpAndExit.

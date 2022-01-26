@@ -6,28 +6,27 @@ use strict;
 use warnings;
 use Config;
 use ExtUtils::MakeMaker;
-my $MM = $ExtUtils::MakeMaker::VERSION;
+
+my $distro = 'Net::DNS::Resolver::Unbound';
+my $module = join '/', 'lib', split /::/, "$distro.pm";
 
 
 # See perldoc ExtUtils::MakeMaker for details of how to influence
 # the contents of the Makefile that is written.
 
 my %metadata = (
-	NAME		 => 'Net::DNS::Resolver::Unbound',
-	VERSION_FROM	 => 'lib/Net/DNS/Resolver/Unbound.pm',
-	ABSTRACT_FROM	 => 'lib/Net/DNS/Resolver/Unbound.pm',
-	AUTHOR		 => 'Dick Franks',
-	LICENSE		 => 'mit',
-	MIN_PERL_VERSION => 5.008009,
-	CONFIGURE_REQUIRES => {
-		'ExtUtils::MakeMaker' => 6.66,
-		},
-	TEST_REQUIRES => {
+	NAME		   => "$distro",
+	VERSION_FROM	   => "$module",
+	ABSTRACT_FROM	   => "$module",
+	AUTHOR		   => 'Dick Franks',
+	LICENSE		   => 'mit',
+	MIN_PERL_VERSION   => 5.008009,
+	CONFIGURE_REQUIRES => {'ExtUtils::MakeMaker' => 6.66},
+	TEST_REQUIRES	   => {
 		'ExtUtils::MakeMaker' => 6.66,
 		'File::Find'	      => 1.05,
 		'File::Spec'	      => 0.86,
 		'IO::File'	      => 1.08,
-		'Net::DNS'	      => 1.18,
 		'Test::More'	      => 0.47,
 		} );
 
@@ -35,10 +34,11 @@ my %metadata = (
 my %prerequisite = (
 	'Carp'	     => 1.10,
 	'DynaLoader' => 1.04,
+	'Net::DNS'   => 1.18,
 	);
 
 
-my @debris = qw(tmp.* *.gcov *.gcda *.gcno *.lock);
+my @debris = qw(*.gcov *.gcda *.gcno *.lock tmp.c);
 
 
 my $inc = '';
@@ -47,7 +47,7 @@ my $nul = $^O eq 'MSWin32' ? 'nul' : '/dev/null';
 
 if ( my $dir = $ENV{UNBOUND_PREFIX} ) {
 	$inc = "-I$dir/include";
-	$lib = "-L$dir/lib -lcrypto";
+	$lib = "-L$dir/lib -lunbound";
 
 } elsif (`pkg-config --modversion libunbound 2>$nul`) {
 	$inc = `pkg-config --cflags libunbound 2>$nul`;
@@ -62,18 +62,21 @@ $inc = $ENV{UNBOUND_INCLUDE} if $ENV{UNBOUND_INCLUDE};
 $lib = $ENV{UNBOUND_LIB}     if $ENV{UNBOUND_LIB};
 
 
-die "$Config{cc} sanity check failed" if system(<<"EOF");
-$Config{echo} "#include <unbound.h>\nint main() { return 0; }" >tmp.c
-$Config{cc} -c tmp.c $inc
+if ( $Config{cc} ) {
+	chomp($inc);			## discard \n (from pkg-config)
+	die "$Config{cc} sanity check failed" if system(<<"EOF");
+	$Config{echo} "#include <unbound.h>\nint main() { return 0; }\n" >tmp.c
+	$Config{cc} $inc -c tmp.c
 EOF
+}
 
 
 WriteMakefile(
 	%metadata,
-	PREREQ_PM  => {%prerequisite},
-	INC	   => $inc,
-	LIBS	   => [$lib],
-	clean	   => {FILES => "@debris"},
+	PREREQ_PM => {%prerequisite},
+	INC	  => $inc,
+	LIBS	  => [$lib],
+	clean	  => {FILES => "@debris"},
 	);
 
 
@@ -99,9 +102,10 @@ sub install {
 		s|([/])[/]+|$1|g;				# remove gratuitous //s
 	}
 
-	my @version = ( 'version', eval { require Net::DNS::Resolver::Unbound; $Net::DNS::Resolver::Unbound::VERSION; } );
+	eval "require $distro";		## no critic
+	my @version = ( 'version', eval { $distro->VERSION || () } );
 
-	my $nameregex = '\W+Net\W+DNS\W+Resolver\W+Unbound.pm$';
+	my $nameregex = join '\W+', '', split /::/, "$distro.pm\$";
 	my @installed = grep { $_ && m/$nameregex/io } values %INC;
 	my %occluded;
 
@@ -122,7 +126,7 @@ sub install {
 	my $message;
 	warn $message = <<"AMEN";
 ##
-##	The install location for this version of Net::DNS::Resolver::Unbound
+##	The install location for this version of $distro
 ##	differs from the existing @version in your perl library at
 ##	@installed
 ##

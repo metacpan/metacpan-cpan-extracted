@@ -11,78 +11,103 @@ use Form::Tiny::Form;
 use Form::Tiny::Utils qw(trim :meta_handlers);
 require Moo;
 
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 
 sub import
 {
 	my ($package, $caller) = (shift, scalar caller);
 
 	my @wanted = @_;
-	my @wanted_subs = qw(form_field form_cleaner form_hook field_validator form_message);
-	my @wanted_roles;
 
-	my %subs = %{$package->_generate_helpers($caller)};
-	my %behaviors = %{$package->_get_behaviors};
+	# special case - we want to always have -base flag, but just once
+	@wanted = (-base, grep { $_ ne -base } @wanted);
 
-	unless (scalar grep { $_ eq -nomoo } @wanted) {
+	# very special case - do something UNLESS -nomoo was passed
+	unless (_get_flag(\@wanted, -nomoo)) {
 		Moo->import::into($caller);
 	}
 
-	require Moo::Role;
-	Moo::Role->apply_roles_to_package(
-		$caller, 'Form::Tiny::Form'
+	ft_install($caller, @wanted);
+	namespace::clean->import(
+		-cleanee => $caller,
+		-except => 'form_meta'
 	);
-
-	foreach my $type (@wanted) {
-		croak "no Form::Tiny import behavior for: $type"
-			unless exists $behaviors{$type};
-		push @wanted_subs, @{$behaviors{$type}->{subs}};
-		push @wanted_roles, @{$behaviors{$type}->{roles}};
-	}
-
-	my $meta = create_form_meta($caller, @wanted_roles);
-
-	carp "Form $caller created without -consistent flag is deprecated. See compatibility docs"
-		unless $meta->consistent_api;
-
-	{
-		no strict 'refs';
-		no warnings 'redefine';
-
-		*{"${caller}::$_"} = $subs{$_} foreach @wanted_subs;
-	}
 
 	return;
 }
 
+sub ft_install
+{
+	my ($caller, @import_flags) = @_;
+
+	my $context;
+	my $wanted = {
+		subs => {},
+		roles => [],
+		meta_roles => [],
+	};
+
+	my $plugins = _get_flag(\@import_flags, 'plugins', 1);
+
+	_select_behaviors($wanted, \@import_flags, _get_behaviors(_generate_helpers($caller, \$context)));
+
+	foreach my $plugin (@$plugins) {
+		$plugin = "Form::Tiny::Plugin::$plugin";
+		$plugin =~ s/^.+\+//;
+		my $success = eval "use $plugin; 1";
+
+		croak "could not load plugin $plugin: $@"
+			unless $success;
+		croak "$plugin is not a Form::Tiny::Plugin"
+			unless $plugin->isa('Form::Tiny::Plugin');
+
+		_select_behaviors($wanted, [$plugin], {$plugin => $plugin->plugin($caller, \$context)});
+	}
+
+	# create metapackage with roles
+	my $meta = create_form_meta($caller, @{$wanted->{meta_roles}});
+	$meta->set_form_roles($wanted->{roles});
+
+	# install DSL
+	{
+		no strict 'refs';
+		no warnings 'redefine';
+
+		*{"${caller}::$_"} = $wanted->{subs}{$_}
+			foreach keys %{$wanted->{subs}};
+		*{"${caller}::form_meta"} = sub {
+			return get_package_form_meta($caller);
+		};
+	}
+
+	return \$context;
+}
+
 sub _generate_helpers
 {
-	my ($package, $caller) = @_;
+	my ($caller, $field_context) = @_;
 
-	my $field_context;
 	my $use_context = sub {
-		if (@_ == 2) {
-			croak 'context using DSL keyword called without context'
-				unless defined $field_context;
-			unshift @_, $field_context;
-		}
+		croak 'context using DSL keyword called without context'
+			unless defined $$field_context;
+		unshift @_, $$field_context;
 		return @_;
 	};
 
 	return {
 		form_field => sub {
-			$field_context = $caller->form_meta->add_field(@_);
+			$$field_context = $caller->form_meta->add_field(@_);
 		},
 		form_cleaner => sub {
-			$field_context = undef;
+			$$field_context = undef;
 			$caller->form_meta->add_hook(cleanup => @_);
 		},
 		form_hook => sub {
-			$field_context = undef;
+			$$field_context = undef;
 			$caller->form_meta->add_hook(@_);
 		},
 		form_filter => sub {
-			$field_context = undef;
+			$$field_context = undef;
 			$caller->form_meta->add_filter(@_);
 		},
 		field_filter => sub {
@@ -92,16 +117,11 @@ sub _generate_helpers
 			$caller->form_meta->add_field_validator($use_context->(@_));
 		},
 		form_trim_strings => sub {
-			$field_context = undef;
-			if ($caller->form_meta->consistent_api) {
-				$caller->form_meta->add_filter(Str, sub { trim $_[1] });
-			}
-			else {
-				$caller->form_meta->add_filter(Str, \&trim);
-			}
+			$$field_context = undef;
+			$caller->form_meta->add_filter(Str, sub { trim $_[1] });
 		},
 		form_message => sub {
-			$field_context = undef;
+			$$field_context = undef;
 			my %params = @_;
 			for my $key (keys %params) {
 				$caller->form_meta->add_message($key, $params{$key});
@@ -112,27 +132,73 @@ sub _generate_helpers
 
 sub _get_behaviors
 {
-	my $empty = {
-		subs => [],
-		roles => [],
-	};
+	my ($subs) = @_;
 
 	return {
-		-base => $empty,
-		-nomoo => $empty,
+		-base => {
+			subs => {
+				map { $_ => $subs->{$_} }
+					qw(
+					form_field field_validator
+					form_cleaner form_hook
+					form_message
+					)
+			},
+			roles => ['Form::Tiny::Form'],
+		},
 		-strict => {
-			subs => [],
-			roles => [qw(Form::Tiny::Meta::Strict)],
+			meta_roles => [qw(Form::Tiny::Meta::Strict)],
 		},
 		-filtered => {
-			subs => [qw(form_filter field_filter form_trim_strings)],
-			roles => [qw(Form::Tiny::Meta::Filtered)],
+			subs => {
+				map { $_ => $subs->{$_} }
+					qw(
+					form_filter field_filter
+					form_trim_strings
+					)
+			},
+			meta_roles => [qw(Form::Tiny::Meta::Filtered)],
 		},
-		-consistent => {
-			subs => [],
-			roles => [qw(Form::Tiny::Meta::Consistent)],
-		},
+
+		# legacy no-op flags
+		-consistent => {},
 	};
+}
+
+sub _select_behaviors
+{
+	my ($wanted, $types, $behaviors) = @_;
+
+	foreach my $type (@$types) {
+		croak "no Form::Tiny import behavior for: $type"
+			unless exists $behaviors->{$type};
+
+		%{$wanted->{subs}} = (%{$wanted->{subs}}, %{$behaviors->{$type}{subs} // {}});
+		push @{$wanted->{roles}}, @{$behaviors->{$type}{roles} // []};
+		push @{$wanted->{meta_roles}}, @{$behaviors->{$type}{meta_roles} // []};
+	}
+}
+
+sub _get_flag
+{
+	my ($flags, $wanted, $with_param) = @_;
+	$with_param //= 0;
+
+	for my $n (0 .. $#$flags) {
+		if ($flags->[$n] eq $wanted) {
+			my $param = 1;
+			if ($with_param) {
+				croak "Form::Tiny flag $wanted needs a parameter"
+					if $n == $#$flags;
+				$param = $flags->[$n + 1];
+			}
+
+			splice @$flags, $n, 1 + $with_param;
+			return $param;
+		}
+	}
+
+	return;
 }
 
 1;
@@ -147,7 +213,7 @@ Form::Tiny - Input validator implementation centered around Type::Tiny
 
 	package MyForm;
 
-	use Form::Tiny -consistent;
+	use Form::Tiny;
 	use Types::Standard qw(Int);
 
 	form_field 'my_field' => (
@@ -187,6 +253,8 @@ Form::Tiny is a customizable hashref validator with DSL for form building.
 
 =item * L<Form::Tiny::Filter> - Filter class specification
 
+=item * L<Form::Tiny::Plugin> - How to write your own plugin?
+
 =back
 
 =head1 IMPORTING
@@ -205,36 +273,27 @@ After C<use Form::Tiny> statement, your package gains all the Moo keywords, some
 
 =head2 Available import flags
 
+No matter which flag was used in import, using C<Form::Tiny> always installs these functions: C<form_field form_cleaner form_hook>
+
 =over
-
-=item * C<-base>
-
-This flag is here only for backwards compatibility. It does not do anything particular on its own.
-
-Installed functions: C<form_field form_cleaner form_hook>
 
 =item * C<-nomoo>
 
 This flag stops Form::Tiny from importing Moo into your namespace. Unless you use a different class system (like L<Moose>) will have to declare your own constructor.
 
-Installed functions: same as C<-base>
-
 =item * C<-filtered>
 
 This flag enables filters in your form.
 
-Installed functions: all of C<-base> plus C<form_filter field_filter form_trim_strings>
+Additional installed functions: C<form_filter field_filter form_trim_strings>
 
 =item * C<-strict>
 
 This flag makes your form check for strictness before the validation.
 
-Installed functions: same as C<-base>
+=item * C<< plugins => ['Plugin1', '+Full::Namespace::To::Plugin2'] >>
 
-=item * C<-consistent>
-
-Turns on consistent subroutine API in the form package. This will become a default in the future, after the deprecation period.
-See L<Form::Tiny::Manual::Compatibility/Current deprecations> for details.
+Load plugins into Form::Tiny. Plugins may introduce additional keywords, mix in roles or add metaclass roles. See L<Form::Tiny::Plugin> for details on how to implement a plugin.
 
 =back
 
@@ -276,22 +335,30 @@ A shortcut for C<< form_hook cleanup => $coderef; >>.
 
 =head3 field_validator
 
-	field_validator $message => $coderef; # uses current context
+	# uses current context
+	field_validator $message => $coderef;
 
 Adds an additional custom validator, ran after the type of the field is validated. C<$message> should be something that can present itself as a string. If for a given input parameter C<$coderef> returns false, that message will be added to form errors for that field. See L<Form::Tiny::Manual/"Additional validators"> for details.
+
+See L<Form::Tiny::Manual/"Context"> for details on context.
 
 =head3 form_filter
 
 	form_filter $type, $coderef;
 
-Filters the input value before the validation. C<$type> should be a Type::Tiny (or compatible) type check. For each input field that passes that check, C<$coderef> will be ran. See L<Form::Tiny::Manual/"Filters"> for details on filters.
+Filters the input value before the validation. C<$type> should be a Type::Tiny (or compatible) type check. For each input field that passes that check, C<$coderef> will be ran.
+
+See L<Form::Tiny::Manual/"Filters"> for details on filters.
 
 =head3 field_filter
 
-	field_filter $type, $coderef; # uses current context
-	field_filter $name => $type, $coderef;
+	# uses current context
+	field_filter $type, $coderef;
+	field_filter Form::Tiny::Filter->new(...);
 
-Same as C<form_filter>, but is narrowed down to a single form field identified by its name. Name can be omitted and the current context will be used. See L<Form::Tiny::Manual/"Context"> for details on context.
+Same as C<form_filter>, but is narrowed down to a single form field.
+
+See L<Form::Tiny::Manual/"Context"> for details on context.
 
 =head3 form_trim_strings
 
@@ -315,7 +382,7 @@ This was enabled by default once. Refer to L<Form::Tiny::Manual::Compatibility/"
 
 =head1 AUTHOR
 
-Bartosz Jarzyna E<lt>brtastic.dev@gmail.comE<gt>
+Bartosz Jarzyna E<lt>bbrtj.pro@gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

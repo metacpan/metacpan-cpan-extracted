@@ -2,7 +2,7 @@
 #
 # KEIS78_by_KEIS83.pl
 #
-# Copyright (c) 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 # Appendix B.2 Character code differences
@@ -16,12 +16,12 @@ if ($0 eq __FILE__) {
     binmode(DUMP);
 }
 
-my %KEIS78_by_KEIS83 = (qw(
-    C4CD 5CC4
-    5CC7 C4CD
-    B9B7 60AE
-    60B6 B9B7
-));
+my %KEIS78_by_KEIS83 = (
+    'C4CD' => '5CC4',
+    '5CC7' => 'C4CD',
+    'B9B7' => '60AE',
+    '60B6' => 'B9B7',
+);
 
 for my $file (qw(
     http.__itdoc.hitachi.co.jp_manuals_3020_3020759580_G5950334.HTM_table_B3.txt

@@ -192,7 +192,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             int32_t do_directry_module_search;
 
             // Byte, Short, Int, Long, Float, Double, Bool is already existsregistered in module source symtable
-            const char* found_module_source = SPVM_HASH_fetch(compiler->embedded_module_source_symtable, class_name, strlen(class_name));
+            const char* found_module_source = SPVM_HASH_fetch(compiler->module_source_symtable, class_name, strlen(class_name));
             if (found_module_source) {
 
             }
@@ -217,7 +217,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 }
 
                 // Add module file symtable
-                SPVM_HASH_insert(compiler->loaded_module_file_symtable, class_name, strlen(class_name), (void*)cur_file);
+                SPVM_HASH_insert(compiler->module_file_symtable, class_name, strlen(class_name), (void*)cur_file);
                 
                 // Open source file
                 fh = fopen(cur_file, "rb");
@@ -230,7 +230,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               // Module not found
               if (!fh) {
                 if (!op_use->uv.use->is_require) {
-                  fprintf(stderr, "[CompileError]Can't locate %s to load %s class in @INC (@INC contains:", cur_rel_file, class_name);
+                  fprintf(stderr, "[CompileError]Can't find \"%s\" to use \"%s\" in @INC (@INC contains:", cur_rel_file, class_name);
                   for (int32_t i = 0; i < module_dirs_length; i++) {
                     const char* include_dir = (const char*) SPVM_LIST_fetch(compiler->module_dirs, i);
                     fprintf(stderr, " %s", include_dir);
@@ -260,7 +260,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 src[file_size] = '\0';
                 
                 found_module_source = src;
-                SPVM_HASH_insert(compiler->embedded_module_source_symtable, class_name, strlen(class_name), src);
+                SPVM_HASH_insert(compiler->module_source_symtable, class_name, strlen(class_name), src);
               }
             }
             
@@ -300,7 +300,9 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 compiler->cur_file = cur_file;
               }
               else {
-                compiler->cur_file = cur_rel_file;
+                char* embedded_file_name = (char*)SPVM_ALLOCATOR_new_block_compile_eternal(compiler, 11 + strlen(cur_rel_file) + 1);
+                sprintf(embedded_file_name, "embedded://%s", cur_rel_file);
+                compiler->cur_file = embedded_file_name;
               }
               
               // Set initial information for tokenization
@@ -772,13 +774,14 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           yylvalp->opval = op;
         return BIT_NOT;
       }
-      // Character Literal
+      // Character literals
       case '\'': {
         compiler->bufptr++;
         char ch = 0;
         
         if (*compiler->bufptr == '\'') {
-          SPVM_COMPILER_error(compiler, "Character Literal must have one character at %s line %d\n", compiler->cur_file, compiler->cur_line);
+          SPVM_COMPILER_error(compiler, "Character literals must have at least one character at %s line %d\n", compiler->cur_file, compiler->cur_line);
+          compiler->bufptr++;
         }
         else {
           if (*compiler->bufptr == '\\') {
@@ -789,10 +792,6 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             }
             else if (*compiler->bufptr == 'a') {
               ch = '\a';
-              compiler->bufptr++;
-            }
-            else if (*compiler->bufptr == 'b') {
-              ch = '\b';
               compiler->bufptr++;
             }
             else if (*compiler->bufptr == 'f') {
@@ -826,7 +825,10 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             // Hex ascii code
             else if (*compiler->bufptr == 'x') {
               compiler->bufptr++;
-              if (*compiler->bufptr == '0' || *compiler->bufptr == '1' || *compiler->bufptr == '2' || *compiler->bufptr == '3' || *compiler->bufptr == '4' || *compiler->bufptr == '5' || *compiler->bufptr == '6' || *compiler->bufptr == '7') {
+              if (isdigit(*compiler->bufptr)
+                  || (*compiler->bufptr >= 'a' && *compiler->bufptr <= 'f')
+                  || (*compiler->bufptr >= 'A' && *compiler->bufptr <= 'F'))
+              {
                 int32_t memory_blocks_count_compile_tmp = compiler->allocator->memory_blocks_count_compile_tmp;
                 
                 char* num_str = SPVM_ALLOCATOR_new_block_compile_tmp(compiler, 3);
@@ -834,9 +836,8 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 compiler->bufptr++;
                 if (
                   isdigit(*compiler->bufptr)
-                  || *compiler->bufptr == 'a'  || *compiler->bufptr == 'b'  || *compiler->bufptr == 'c'  || *compiler->bufptr == 'd'  || *compiler->bufptr == 'e'  || *compiler->bufptr == 'f'
-                  || *compiler->bufptr == 'A'  || *compiler->bufptr == 'B'  || *compiler->bufptr == 'C'  || *compiler->bufptr == 'D'  || *compiler->bufptr == 'E'  || *compiler->bufptr == 'F'
-                )
+                  || (*compiler->bufptr >= 'a' && *compiler->bufptr <= 'f')
+                  || (*compiler->bufptr >= 'A' && *compiler->bufptr <= 'F'))
                 {
                   num_str[1] = *compiler->bufptr;
                   compiler->bufptr++;
@@ -844,17 +845,20 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   ch = (char)strtol(num_str, &end, 16);
                 }
                 else {
-                  SPVM_COMPILER_error(compiler, "Invalid ascii code in escape character of charater literal at %s line %d\n", compiler->cur_file, compiler->cur_line);
+                  SPVM_COMPILER_error(compiler, "A invalid hexadecimal ascii code \"\\x%c%c\" in the second hexadecimal character of the charater literal at %s line %d\n", *(compiler->bufptr - 1), *compiler->bufptr, compiler->cur_file, compiler->cur_line);
+                  compiler->bufptr++;
                 }
                 SPVM_ALLOCATOR_free_block_compile_tmp(compiler, num_str);
                 assert(compiler->allocator->memory_blocks_count_compile_tmp == memory_blocks_count_compile_tmp);
               }
               else {
-                SPVM_COMPILER_error(compiler, "Invalid ascii code in escape character of charater literal at %s line %d\n", compiler->cur_file, compiler->cur_line);
+                SPVM_COMPILER_error(compiler, "A invalid hexadecimal ascii code \"\\x%c%c\" in the first hexadecimal character of the charater literal at %s line %d\n", *compiler->bufptr, *(compiler->bufptr + 1), compiler->cur_file, compiler->cur_line);
+                compiler->bufptr += 2;
               }
             }
             else {
-              SPVM_COMPILER_error(compiler, "Invalid escape character in charater literal at %s line %d\n", compiler->cur_file, compiler->cur_line);
+              SPVM_COMPILER_error(compiler, "A invalid escape character \"\\%c\" in the charater literal at %s line %d\n", *compiler->bufptr, compiler->cur_file, compiler->cur_line);
+              compiler->bufptr++;
             }
           }
           else {
@@ -866,7 +870,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             compiler->bufptr++;
           }
           else {
-            SPVM_COMPILER_error(compiler, "Can't find character literal terminiator at %s line %d\n", compiler->cur_file, compiler->cur_line);
+            SPVM_COMPILER_error(compiler, "Can't find the terminiator \"'\" of the character literal at %s line %d\n", compiler->cur_file, compiler->cur_line);
           }
         }
         

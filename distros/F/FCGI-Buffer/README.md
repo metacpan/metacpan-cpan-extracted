@@ -9,7 +9,7 @@ FCGI::Buffer - Verify, Cache and Optimise FCGI Output
 
 # VERSION
 
-Version 0.16
+Version 0.17
 
 # SYNOPSIS
 
@@ -295,5 +295,5 @@ The licence for cgi\_buffer is:
 
     This software is provided 'as is' without warranty of any kind."
 
-The rest of the program is Copyright 2015-2021 Nigel Horne,
+The rest of the program is Copyright 2015-2022 Nigel Horne,
 and is released under the following licence: GPL2

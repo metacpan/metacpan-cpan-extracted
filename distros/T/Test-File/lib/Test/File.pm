@@ -30,7 +30,7 @@ use Test::Builder;
 	file_mtime_gt_ok file_mtime_lt_ok file_mtime_age_ok
 	);
 
-$VERSION = '1.448';
+$VERSION = '1.991';
 
 my $Test = Test::Builder->new();
 
@@ -57,7 +57,7 @@ matter the permissions.
 Some attributes don't make sense outside of Unix, either, so some
 tests automatically skip if they think they won't work on the
 platform.  If you have a way to make these functions work on Windows,
-for instance, please send me a patch. :) IF you want to pretend to be
+for instance, please send me a patch. :) If you want to pretend to be
 Windows on a non-Windows machine (for instance, to test C<skip()>),
 you can set the C<PRETEND_TO_BE_WINDOWS> environment variable.
 
@@ -68,6 +68,24 @@ generated.
 =head2 Functions
 
 =cut
+
+sub _is_plain_file {
+	my $filename = _normalize( shift );
+
+	my $message = do {
+		   if( ! -e $filename ) { "does not exist" }
+		elsif( ! -f _ )         { "is not a plain file" }
+		elsif( -d _ )           { "is a directory"  }
+		else { () }
+		};
+
+	if( $message ) {
+		$Test->diag( "file [$filename] $message");
+		return 0;
+		}
+
+	return 1;
+	}
 
 sub _normalize {
 	my $file = shift;
@@ -124,7 +142,7 @@ sub file_exists_ok {
 		$Test->ok(1, $name);
 		}
 	else {
-		$Test->diag("File [$filename] does not exist");
+		$Test->diag("file [$filename] does not exist");
 		$Test->ok(0, $name);
 		}
 	}
@@ -145,7 +163,7 @@ sub file_not_exists_ok {
 		$Test->ok(1, $name);
 		}
 	else {
-		$Test->diag("File [$filename] exists");
+		$Test->diag("file [$filename] exists");
 		$Test->ok(0, $name);
 		}
 	}
@@ -164,18 +182,7 @@ sub file_empty_ok {
 	my $filename = _normalize( shift );
 	my $name     = shift || "$filename is empty";
 
-	unless( -e $filename ) {
-		$Test->diag( "File [$filename] does not exist!" );
-		return $Test->ok(0, $name);
-		}
-
-	unless( -f $filename ) {
-		$Test->diag( "File [$filename] is not a plain file, which is deprecated for file_empty_ok" );
-		}
-
-	if( -d $filename ) {
-		$Test->diag( "File [$filename] is a directory, which is deprecated for file_empty_ok" );
-		}
+	return $Test->ok( 0, $name ) unless _is_plain_file( $filename );
 
 	my $ok = -z $filename;
 
@@ -183,7 +190,7 @@ sub file_empty_ok {
 		$Test->ok(1, $name);
 		}
 	else {
-		$Test->diag( "File [$filename] exists with non-zero size!" );
+		$Test->diag( "file [$filename] exists with non-zero size" );
 		$Test->ok(0, $name);
 		}
 	}
@@ -202,18 +209,7 @@ sub file_not_empty_ok {
 	my $filename = _normalize( shift );
 	my $name     = shift || "$filename is not empty";
 
-	unless( -e $filename ) {
-		$Test->diag( "File [$filename] does not exist!" );
-		return $Test->ok(0, $name);
-		}
-
-	unless( -f $filename ) {
-		$Test->diag( "File [$filename] is a directory, which is deprecated for file_not_empty_ok" );
-		}
-
-	if( -d $filename ) {
-		$Test->diag( "File [$filename] is a directory, which is deprecated for file_not_empty_ok" );
-		}
+	return $Test->ok( 0, $name ) unless _is_plain_file( $filename );
 
 	my $ok = not -z _;
 
@@ -221,7 +217,7 @@ sub file_not_empty_ok {
 		$Test->ok(1, $name);
 		}
 	else {
-		$Test->diag( "File [$filename] exists with zero size!" );
+		$Test->diag( "file [$filename] exists with zero size" );
 		$Test->ok(0, $name);
 		}
 	}
@@ -241,18 +237,7 @@ sub file_size_ok {
 	my $expected = int shift;
 	my $name     = shift || "$filename has right size";
 
-	unless( -e $filename ) {
-		$Test->diag( "File [$filename] does not exist!" );
-		return $Test->ok(0, $name);
-		}
-
-	unless( -f $filename ) {
-		$Test->diag( "File [$filename] is a directory, which is deprecated for file_size_ok" );
-		}
-
-	if( -d $filename ) {
-		$Test->diag( "File [$filename] is a directory, which is deprecated for file_size_ok" );
-		}
+	return $Test->ok( 0, $name ) unless _is_plain_file( $filename );
 
 	my $ok = ( -s $filename ) == $expected;
 
@@ -262,7 +247,7 @@ sub file_size_ok {
 	else {
 		my $actual = -s $filename;
 		$Test->diag(
-			"File [$filename] has actual size [$actual] not [$expected]!" );
+			"file [$filename] has actual size [$actual] not [$expected]" );
 
 		$Test->ok(0, $name);
 		}
@@ -284,18 +269,7 @@ sub file_max_size_ok {
 	my $max      = int shift;
 	my $name     = shift || "$filename is under $max bytes";
 
-	unless( -e $filename ) {
-		$Test->diag( "File [$filename] does not exist!" );
-		return $Test->ok(0, $name);
-		}
-
-	unless( -f $filename ) {
-		$Test->diag( "File [$filename] is a directory, which is deprecated for file_max_size_ok" );
-		}
-
-	if( -d $filename ) {
-		$Test->diag( "File [$filename] is a directory, which is deprecated for file_max_size_ok" );
-		}
+	return $Test->ok( 0, $name ) unless _is_plain_file( $filename );
 
 	my $ok = ( -s $filename ) <= $max;
 
@@ -305,8 +279,8 @@ sub file_max_size_ok {
 	else {
 		my $actual = -s $filename;
 		$Test->diag(
-			"File [$filename] has actual size [$actual] " .
-			"greater than [$max]!"
+			"file [$filename] has actual size [$actual] " .
+			"greater than [$max]"
 			);
 
 		$Test->ok(0, $name);
@@ -329,18 +303,7 @@ sub file_min_size_ok {
 	my $min      = int shift;
 	my $name     = shift || "$filename is over $min bytes";
 
-	unless( -e $filename ) {
-		$Test->diag( "File [$filename] does not exist!" );
-		return $Test->ok(0, $name);
-		}
-
-	unless( -f $filename ) {
-		$Test->diag( "File [$filename] is a directory, which is deprecated for file_min_size_ok" );
-		}
-
-	if( -d $filename ) {
-		$Test->diag( "File [$filename] is a directory, which is deprecated for file_min_size_ok" );
-		}
+	return $Test->ok( 0, $name ) unless _is_plain_file( $filename );
 
 	my $ok = ( -s $filename ) >= $min;
 
@@ -350,8 +313,8 @@ sub file_min_size_ok {
 	else {
 		my $actual = -s $filename;
 		$Test->diag(
-			"File [$filename] has actual size ".
-			"[$actual] less than [$min]!"
+			"file [$filename] has actual size ".
+			"[$actual] less than [$min]"
 			);
 
 		$Test->ok(0, $name);
@@ -398,41 +361,35 @@ sub file_line_count_is {
 		shift || "$filename line count is $expected lines";
 		};
 
-	unless( ! -e $filename or -f $filename ) {
-		$Test->diag( "File [$filename] is not a plain file, which is deprecated for file_line_count_is" );
-		}
-
-	if( -d $filename ) {
-		$Test->diag( "File [$filename] is a directory, which is deprecated for file_line_count_is" );
-		}
+	return $Test->ok( 0, $name ) unless _is_plain_file( $filename );
 
 	unless( defined $expected && int( $expected ) == $expected ) {
 		no warnings 'uninitialized';
 		$Test->diag( "file_line_count_is expects a positive whole number for " .
-			"the second argument. Got [$expected]!" );
+			"the second argument. Got [$expected]" );
 		return $Test->ok( 0, $name );
 		}
 
 	my $got = _file_line_counter( $filename );
 
 	if( $got eq _ENOFILE ) {
-		$Test->diag( "File [$filename] does not exist!" );
+		$Test->diag( "file [$filename] does not exist" );
 		$Test->ok( 0, $name );
 		}
 	elsif( $got eq _ENOTPLAIN ) {
-		$Test->diag( "File [$filename] is not a plain file!" );
+		$Test->diag( "file [$filename] is not a plain file" );
 		$Test->ok( 0, $name );
 		}
 	elsif( $got == _ECANTOPEN ) {
-		$Test->diag( "Could not open [$filename]: \$! is [$!]!" );
+		$Test->diag( "file [$filename] could not be opened: \$! is [$!]" );
 		$Test->ok( 0, $name );
 		}
 	elsif( $got == $expected ) {
 		$Test->ok( 1, $name );
 		}
 	else {
-		$Test->diag( "Expected [$expected] lines in [$filename], " .
-			"got [$got] lines!" );
+		$Test->diag( "expected [$expected] lines in [$filename], " .
+			"got [$got] lines" );
 		$Test->ok( 0, $name );
 		}
 
@@ -460,41 +417,35 @@ sub file_line_count_isnt {
 		shift || "$filename line count is not $expected lines";
 		};
 
-	unless( ! -e $filename or -f $filename ) {
-		$Test->diag( "File [$filename] is not a plain file, which is deprecated for file_line_count_isnt" );
-		}
-
-	if( -d $filename ) {
-		$Test->diag( "File [$filename] is a directory, which is deprecated for file_line_count_isnt" );
-		}
+	return $Test->ok( 0, $name ) unless _is_plain_file( $filename );
 
 	unless( defined $expected && int( $expected ) == $expected ) {
 		no warnings 'uninitialized';
 		$Test->diag( "file_line_count_is expects a positive whole number for " .
-			"the second argument. Got [$expected]!" );
+			"the second argument. Got [$expected]" );
 		return $Test->ok( 0, $name );
 		}
 
 	my $got = _file_line_counter( $filename );
 
 	if( $got eq _ENOFILE ) {
-		$Test->diag( "File [$filename] does not exist!" );
+		$Test->diag( "file [$filename] does not exist" );
 		$Test->ok( 0, $name );
 		}
 	elsif( $got eq _ENOTPLAIN ) {
-		$Test->diag( "File [$filename] is not a plain file!" );
+		$Test->diag( "file [$filename] is not a plain file" );
 		$Test->ok( 0, $name );
 		}
 	elsif( $got == _ECANTOPEN ) {
-		$Test->diag( "Could not open [$filename]: \$! is [$!]!" );
+		$Test->diag( "file [$filename] could not be opened: \$! is [$!]" );
 		$Test->ok( 0, $name );
 		}
 	elsif( $got != $expected ) {
 		$Test->ok( 1, $name );
 		}
 	else {
-		$Test->diag( "Expected something other than [$expected] lines in [$filename], " .
-			"but got [$got] lines!" );
+		$Test->diag( "expected something other than [$expected] lines in [$filename], " .
+			"but got [$got] lines" );
 		$Test->ok( 0, $name );
 		}
 
@@ -518,24 +469,17 @@ sub file_line_count_between {
 	my $min      = shift;
 	my $max      = shift;
 
-	unless( ! -e $filename or -f $filename ) {
-		$Test->diag( "File [$filename] is not a plain file, which is deprecated for file_line_count_between" );
-		}
-
-	if( -d $filename ) {
-		$Test->diag( "File [$filename] is a directory, which is deprecated for file_line_count_between" );
-		}
-
 	my $name = do {
 		no warnings 'uninitialized';
 		shift || "$filename line count is between [$min] and [$max] lines";
 		};
+	return $Test->ok( 0, $name ) unless _is_plain_file( $filename );
 
 	foreach my $ref ( \$min, \$max ) {
 		unless( defined $$ref && int( $$ref ) == $$ref ) {
 			no warnings 'uninitialized';
 			$Test->diag( "file_line_count_between expects positive whole numbers for " .
-				"the second and third arguments. Got [$min] and [$max]!" );
+				"the second and third arguments. Got [$min] and [$max]" );
 			return $Test->ok( 0, $name );
 			}
 		}
@@ -543,23 +487,23 @@ sub file_line_count_between {
 	my $got = _file_line_counter( $filename );
 
 	if( $got eq _ENOFILE ) {
-		$Test->diag( "File [$filename] does not exist!" );
+		$Test->diag( "file [$filename] does not exist" );
 		$Test->ok( 0, $name );
 		}
 	elsif( $got eq _ENOTPLAIN ) {
-		$Test->diag( "File [$filename] is not a plain file!" );
+		$Test->diag( "file [$filename] is not a plain file" );
 		$Test->ok( 0, $name );
 		}
 	elsif( $got == _ECANTOPEN ) {
-		$Test->diag( "Could not open [$filename]: \$! is [$!]!" );
+		$Test->diag( "file [$filename] could not be opened: \$! is [$!]" );
 		$Test->ok( 0, $name );
 		}
 	elsif( $min <= $got and $got <= $max ) {
 		$Test->ok( 1, $name );
 		}
 	else {
-		$Test->diag( "Expected a line count between [$min] and [$max] " .
-			"in [$filename], but got [$got] lines!"
+		$Test->diag( "expected a line count between [$min] and [$max] " .
+			"in [$filename], but got [$got] lines"
 			);
 		$Test->ok( 0, $name );
 		}
@@ -696,18 +640,10 @@ sub _file_contains {
 	# test name as the name
 	$name = $patterns{$patterns[0]};
 
-	unless( -e $filename ) {
-		$Test->diag( "File [$filename] does not exist!" );
-		return $Test->ok(0, $name);
-		}
-
-	if( -d $filename ) {
-		my $caller = ( caller(0) )[3];
-		$Test->diag( "File [$filename] is a directory, which is deprecated for $caller" );
-		}
+	return $Test->ok( 0, $name ) unless _is_plain_file( $filename );
 
 	unless( -r $filename ) {
-		$Test->diag( "File [$filename] is not readable!" );
+		$Test->diag( "file [$filename] is not readable" );
 		return $Test->ok(0, $name);
 		}
 
@@ -715,7 +651,7 @@ sub _file_contains {
 	my $file_contents;
 	{
 	unless (open(FH, $filename)) {
-		$Test->diag( "Could not open [$filename]: \$! is [$!]!" );
+		$Test->diag( "file [$filename] could not be opened: \$! is [$!]" );
 		return $Test->ok( 0, $name );
 		}
 
@@ -750,7 +686,7 @@ sub file_readable_ok {
 		$Test->ok(1, $name);
 		}
 	else {
-		$Test->diag( "File [$filename] is not readable!" );
+		$Test->diag( "file [$filename] is not readable" );
 		$Test->ok(0, $name);
 		}
 	}
@@ -772,7 +708,7 @@ sub file_not_readable_ok {
 		$Test->ok(1, $name);
 		}
 	else {
-		$Test->diag( "File [$filename] is readable!" );
+		$Test->diag( "file [$filename] is readable" );
 		$Test->ok(0, $name);
 		}
 	}
@@ -805,7 +741,7 @@ sub file_writable_ok {
 		$Test->ok(1, $name);
 		}
 	else {
-		$Test->diag( "File [$filename] is not writable!" );
+		$Test->diag( "file [$filename] is not writable" );
 		$Test->ok(0, $name);
 		}
 	}
@@ -838,7 +774,7 @@ sub file_not_writable_ok {
 		$Test->ok(1, $name);
 		}
 	else {
-		$Test->diag("File [$filename] is writable!");
+		$Test->diag("file [$filename] is writable");
 		$Test->ok(0, $name);
 		}
 	}
@@ -855,7 +791,7 @@ platform.
 
 sub file_executable_ok {
 	if( _win32() ) {
-		$Test->skip( "file_executable_ok doesn't work on Windows!" );
+		$Test->skip( "file_executable_ok doesn't work on Windows" );
 		return;
 		}
 
@@ -868,7 +804,7 @@ sub file_executable_ok {
 		$Test->ok(1, $name);
 		}
 	else {
-		$Test->diag("File [$filename] is not executable!");
+		$Test->diag("file [$filename] is not executable");
 		$Test->ok(0, $name);
 		}
 	}
@@ -885,7 +821,7 @@ platform.
 
 sub file_not_executable_ok {
 	if( _win32() ) {
-		$Test->skip( "file_not_executable_ok doesn't work on Windows!" );
+		$Test->skip( "file_not_executable_ok doesn't work on Windows" );
 		return;
 		}
 
@@ -898,7 +834,7 @@ sub file_not_executable_ok {
 		$Test->ok(1, $name);
 		}
 	else {
-		$Test->diag("File [$filename] is executable!");
+		$Test->diag("file [$filename] is executable");
 		$Test->ok(0, $name);
 		}
 	}
@@ -917,7 +853,7 @@ Contributed by Shawn Sorichetti C<< <ssoriche@coloredblocks.net> >>
 
 sub file_mode_is {
 	if( _win32() ) {
-		$Test->skip( "file_mode_is doesn't work on Windows!" );
+		$Test->skip( "file_mode_is doesn't work on Windows" );
 		return;
 		}
 
@@ -932,7 +868,7 @@ sub file_mode_is {
 		$Test->ok(1, $name);
 		}
 	else {
-		$Test->diag(sprintf("File [%s] mode is not %04o!", $filename, $mode) );
+		$Test->diag(sprintf("file [%s] mode is not %04o", $filename, $mode) );
 		$Test->ok(0, $name);
 		}
 	}
@@ -951,7 +887,7 @@ Contributed by Shawn Sorichetti C<< <ssoriche@coloredblocks.net> >>
 
 sub file_mode_isnt {
 	if( _win32() ) {
-		$Test->skip( "file_mode_isnt doesn't work on Windows!" );
+		$Test->skip( "file_mode_isnt doesn't work on Windows" );
 		return;
 		}
 
@@ -966,7 +902,7 @@ sub file_mode_isnt {
 		$Test->ok(1, $name);
 		}
 	else {
-		$Test->diag(sprintf("File [%s] mode is %04o!",$filename,$mode));
+		$Test->diag(sprintf("file [%s] mode is %04o",$filename,$mode));
 		$Test->ok(0, $name);
 		}
 	}
@@ -986,7 +922,7 @@ Contributed by Ricardo Signes C<< <rjbs@cpan.org> >>
 
 sub file_mode_has {
 	if( _win32() ) {
-		$Test->skip( "file_mode_has doesn't work on Windows!" );
+		$Test->skip( "file_mode_has doesn't work on Windows" );
 		return;
 		}
 
@@ -1004,7 +940,7 @@ sub file_mode_has {
 		}
 	else {
 		my $missing = ($gotmode ^ $mode) & $mode;
-		$Test->diag(sprintf("File [%s] mode is missing component %04o!", $filename, $missing) );
+		$Test->diag(sprintf("file [%s] mode is missing component %04o", $filename, $missing) );
 		$Test->ok(0, $name);
 		}
 	}
@@ -1024,7 +960,7 @@ Contributed by Ricardo Signes C<< <rjbs@cpan.org> >>
 
 sub file_mode_hasnt {
 	if( _win32() ) {
-		$Test->skip( "file_mode_hasnt doesn't work on Windows!" );
+		$Test->skip( "file_mode_hasnt doesn't work on Windows" );
 		return;
 		}
 
@@ -1042,7 +978,7 @@ sub file_mode_hasnt {
 		}
 	else {
 		my $bad = $gotmode & $mode;
-		$Test->diag(sprintf("File [%s] mode has forbidden component %04o!", $filename, $bad) );
+		$Test->diag(sprintf("file [%s] mode has forbidden component %04o", $filename, $bad) );
 		$Test->ok(0, $name);
 		}
 	}
@@ -1058,7 +994,7 @@ not support symlinks.
 sub file_is_symlink_ok {
 	if( _no_symlinks_here() ) {
 		$Test->skip(
-			"file_is_symlink_ok doesn't work on systems without symlinks!" );
+			"file_is_symlink_ok doesn't work on systems without symlinks" );
 		return;
 		}
 
@@ -1069,7 +1005,7 @@ sub file_is_symlink_ok {
 		$Test->ok(1, $name)
 		}
 	else {
-		$Test->diag( "File [$file] is not a symlink!" );
+		$Test->diag( "file [$file] is not a symlink" );
 		$Test->ok(0, $name);
 		}
 	}
@@ -1085,7 +1021,7 @@ exist, the test fails.
 sub file_is_not_symlink_ok {
 	if( _no_symlinks_here() ) {
 		$Test->skip(
-			"file_is_symlink_ok doesn't work on systems without symlinks!" );
+			"file_is_symlink_ok doesn't work on systems without symlinks" );
 		return;
 		}
 
@@ -1093,7 +1029,7 @@ sub file_is_not_symlink_ok {
 	my $name = shift || "$file is not a symlink";
 
 	unless( -e $file ) {
-		$Test->diag( "File [$file] does not exist!" );
+		$Test->diag( "file [$file] does not exist" );
 		return $Test->ok(0, $name);
 		}
 
@@ -1101,7 +1037,7 @@ sub file_is_not_symlink_ok {
 		$Test->ok(1, $name)
 		}
 	else {
-		$Test->diag( "File [$file] is a symlink!" );
+		$Test->diag( "file [$file] is a symlink" );
 		$Test->ok(0, $name);
 		}
 	}
@@ -1118,7 +1054,7 @@ support symlinks. If the file does not exist, the test fails.
 sub symlink_target_exists_ok {
 	if( _no_symlinks_here() ) {
 		$Test->skip(
-			"symlink_target_exists_ok doesn't work on systems without symlinks!"
+			"symlink_target_exists_ok doesn't work on systems without symlinks"
 			);
 		return;
 		}
@@ -1129,19 +1065,19 @@ sub symlink_target_exists_ok {
 
 	unless( -l $file )
 		{
-		$Test->diag( "File [$file] is not a symlink!" );
+		$Test->diag( "file [$file] is not a symlink" );
 		return $Test->ok( 0, $name );
 		}
 
 	unless( -e $dest ) {
-		$Test->diag( "Symlink [$file] points to non-existent target [$dest]!" );
+		$Test->diag( "symlink [$file] points to non-existent target [$dest]" );
 		return $Test->ok( 0, $name );
 		}
 
 	my $actual = readlink( $file );
 	unless( $dest eq $actual ) {
 		$Test->diag(
-			"Symlink [$file] points to\n" .
+			"symlink [$file] points to\n" .
 			"         got: $actual\n" .
 			"    expected: $dest\n"
 			);
@@ -1163,7 +1099,7 @@ sub symlink_target_dangles_ok
 	{
 	if( _no_symlinks_here() ) {
 		$Test->skip(
-			"symlink_target_dangles_ok doesn't work on systems without symlinks!" );
+			"symlink_target_dangles_ok doesn't work on systems without symlinks" );
 		return;
 		}
 
@@ -1172,13 +1108,13 @@ sub symlink_target_dangles_ok
 	my $name = shift || "$file is a symlink";
 
 	unless( -l $file ) {
-		$Test->diag( "File [$file] is not a symlink!" );
+		$Test->diag( "file [$file] is not a symlink" );
 		return $Test->ok( 0, $name );
 		}
 
 	if( -e $dest ) {
 		$Test->diag(
-			"Symlink [$file] points to existing file [$dest] but shouldn't!" );
+			"symlink [$file] points to existing file [$dest] but shouldn't" );
 		return $Test->ok( 0, $name );
 		}
 
@@ -1196,7 +1132,7 @@ If the file does not exist, the test fails.
 sub symlink_target_is {
 	if( _no_symlinks_here() ) {
 		$Test->skip(
-			"symlink_target_is doesn't work on systems without symlinks!" );
+			"symlink_target_is doesn't work on systems without symlinks" );
 		return;
 		}
 
@@ -1205,7 +1141,7 @@ sub symlink_target_is {
 	my $name = shift || "symlink $file points to $dest";
 
 	unless( -l $file ) {
-		$Test->diag( "File [$file] is not a symlink!" );
+		$Test->diag( "file [$file] is not a symlink" );
 		return $Test->ok( 0, $name );
 		}
 
@@ -1213,7 +1149,7 @@ sub symlink_target_is {
 	my $link_error  = $!;
 
 	unless( defined $actual_dest ) {
-		$Test->diag( "Symlink [$file] does not have a defined target!" );
+		$Test->diag( "symlink [$file] does not have a defined target" );
 		$Test->diag( "readlink error: $link_error" ) if defined $link_error;
 		return $Test->ok( 0, $name );
 		}
@@ -1281,7 +1217,7 @@ sub dir_exists_ok {
 	my $name     = shift || "$filename is a directory";
 
 	unless( -e $filename ) {
-		$Test->diag( "Directory [$filename] does not exist!" );
+		$Test->diag( "directory [$filename] does not exist" );
 		return $Test->ok(0, $name);
 		}
 
@@ -1291,7 +1227,7 @@ sub dir_exists_ok {
 		$Test->ok(1, $name);
 		}
 	else {
-		$Test->diag( "File [$filename] exists but is not a directory!" );
+		$Test->diag( "file [$filename] exists but is not a directory" );
 		$Test->ok(0, $name);
 		}
 	}
@@ -1311,7 +1247,7 @@ sub dir_contains_ok {
 	my $name     = shift || "directory $dirname contains file $filename";
 
 	unless( -d $dirname ) {
-		$Test->diag( "Directory [$dirname] does not exist!" );
+		$Test->diag( "directory [$dirname] does not exist" );
 		return $Test->ok(0, $name);
 		}
 
@@ -1321,7 +1257,7 @@ sub dir_contains_ok {
 		$Test->ok(1, $name);
 		}
 	else {
-		$Test->diag( "File [$filename] does not exist in directory $dirname!" );
+		$Test->diag( "file [$filename] does not exist in directory $dirname" );
 		$Test->ok(0, $name);
 		}
 	}
@@ -1345,7 +1281,7 @@ sub link_count_is_ok {
 
 	unless( $actual == $count ) {
 		$Test->diag(
-			"File [$file] points has [$actual] links: expected [$count]!" );
+			"file [$file] points has [$actual] links: expected [$count]" );
 		return $Test->ok( 0, $name );
 		}
 
@@ -1370,8 +1306,8 @@ sub link_count_gt_ok {
 
 	unless( $actual > $count ) {
 		$Test->diag(
-			"File [$file] points has [$actual] links: ".
-			"expected more than [$count]!" );
+			"file [$file] points has [$actual] links: ".
+			"expected more than [$count]" );
 		return $Test->ok( 0, $name );
 		}
 
@@ -1396,8 +1332,8 @@ sub link_count_lt_ok {
 
 	unless( $actual < $count ) {
 		$Test->diag(
-			"File [$file] points has [$actual] links: ".
-			"expected less than [$count]!" );
+			"file [$file] points has [$actual] links: ".
+			"expected less than [$count]" );
 		return $Test->ok( 0, $name );
 		}
 
@@ -1413,7 +1349,7 @@ sub _dm_skeleton {
 
 	if( _obviously_non_multi_user() ) {
 		my $calling_sub = (caller(1))[3];
-		$Test->skip( $calling_sub . " only works on a multi-user OS!" );
+		$Test->skip( $calling_sub . " only works on a multi-user OS" );
 		return 'skip';
 		}
 
@@ -1422,12 +1358,12 @@ sub _dm_skeleton {
 	my $name          = shift;
 
 	unless( defined $filename ) {
-		$Test->diag( "File name not specified!" );
+		$Test->diag( "file name not specified" );
 		return $Test->ok( 0, $name );
 		}
 
 	unless( -e $filename ) {
-		$Test->diag( "File [$filename] does not exist!" );
+		$Test->diag( "file [$filename] does not exist" );
 		return $Test->ok( 0, $name );
 		}
 
@@ -1455,14 +1391,14 @@ sub owner_is {
 
 	my $owner_uid = _get_uid( $owner );
 	unless( defined $owner_uid ) {
-		$Test->diag("User [$owner] does not exist on this system!");
+		$Test->diag("user [$owner] does not exist on this system");
 		return $Test->ok( 0, $name );
 		}
 
 	my $file_uid = ( stat $filename )[4];
 
 	unless( defined $file_uid ) {
-		$Test->skip("stat failed to return owner uid for $filename!");
+		$Test->skip("stat failed to return owner uid for $filename");
 		return;
 		}
 
@@ -1470,12 +1406,12 @@ sub owner_is {
 
 	my $real_owner = ( getpwuid $file_uid )[0];
 	unless( defined $real_owner ) {
-		$Test->diag("File does not belong to $owner!");
+		$Test->diag("file does not belong to $owner");
 		return $Test->ok( 0, $name );
 		}
 
-	$Test->diag( "File [$filename] belongs to $real_owner ($file_uid), ".
-			"not $owner ($owner_uid)!" );
+	$Test->diag( "file [$filename] belongs to $real_owner ($file_uid), ".
+			"not $owner ($owner_uid)" );
 	return $Test->ok( 0, $name );
 	}
 
@@ -1508,7 +1444,7 @@ sub owner_isnt {
 	#$Test->diag( "owner_isnt: $owner_uid $file_uid" );
 	return $Test->ok( 1, $name ) if $file_uid != $owner_uid;
 
-	$Test->diag( "File [$filename] belongs to $owner ($owner_uid)!" );
+	$Test->diag( "file [$filename] belongs to $owner ($owner_uid)" );
 	return $Test->ok( 0, $name );
 	}
 
@@ -1534,14 +1470,14 @@ sub group_is {
 
 	my $group_gid = _get_gid( $group );
 	unless( defined $group_gid ) {
-		$Test->diag("Group [$group] does not exist on this system!");
+		$Test->diag("group [$group] does not exist on this system");
 		return $Test->ok( 0, $name );
 		}
 
 	my $file_gid  = ( stat $filename )[5];
 
 	unless( defined $file_gid ) {
-		$Test->skip("stat failed to return group gid for $filename!");
+		$Test->skip("stat failed to return group gid for $filename");
 		return;
 		}
 
@@ -1549,12 +1485,12 @@ sub group_is {
 
 	my $real_group = ( getgrgid $file_gid )[0];
 	unless( defined $real_group ) {
-		$Test->diag("File does not belong to $group!");
+		$Test->diag("file does not belong to $group");
 		return $Test->ok( 0, $name );
 		}
 
-	$Test->diag( "File [$filename] belongs to $real_group ($file_gid), ".
-			"not $group ($group_gid)!" );
+	$Test->diag( "file [$filename] belongs to $real_group ($file_gid), ".
+			"not $group ($group_gid)" );
 
 	return $Test->ok( 0, $name );
 	}
@@ -1583,13 +1519,13 @@ sub group_isnt {
 	my $file_gid  = ( stat $filename )[5];
 
 	unless( defined $file_gid ) {
-		$Test->skip("stat failed to return group gid for $filename!");
+		$Test->skip("stat failed to return group gid for $filename");
 		return;
 		}
 
 	return $Test->ok( 1, $name ) if $file_gid != $group_gid;
 
-	$Test->diag( "File [$filename] belongs to $group ($group_gid)!" );
+	$Test->diag( "file [$filename] belongs to $group ($group_gid)" );
 		return $Test->ok( 0, $name );
 	}
 
@@ -1702,7 +1638,7 @@ sub file_mtime_age_ok {
 
 	return $Test->ok(1, $name) if ( $filetime + $within_secs > $time-1  );
 
-	$Test->diag( "Filename [$filename] mtime [$filetime] is not $within_secs seconds within current system time [$time].");
+	$Test->diag( "file [$filename] mtime [$filetime] is not $within_secs seconds within current system time [$time].");
 	return $Test->ok(0, $name);
 	}
 
@@ -1724,7 +1660,7 @@ sub file_mtime_gt_ok {
 
 	return $Test->ok(1, $name) if ( $filetime > $time );
 
-	$Test->diag( "Filename [$filename] mtime [$filetime] not greater than $time" );
+	$Test->diag( "file [$filename] mtime [$filetime] not greater than $time" );
 	$Test->ok(0, $name);
 	}
 
@@ -1747,7 +1683,7 @@ sub file_mtime_lt_ok {
 
 	return $Test->ok(1, $name) if ( $filetime < $time );
 
-	$Test->diag( "Filename [$filename] mtime [$filetime] not less than $time" );
+	$Test->diag( "file [$filename] mtime [$filetime] not less than $time" );
 	$Test->ok(0, $name);
 	}
 
@@ -1767,12 +1703,12 @@ sub _stat_file {
 	my $attr_pos    = shift;
 
 	unless( defined $filename ) {
-		$Test->diag( "Filename not specified!" );
+		$Test->diag( "file name not specified" );
 		return 0;
 		}
 
 	unless( -e $filename ) {
-		$Test->diag( "Filename [$filename] does not exist!" );
+		$Test->diag( "file [$filename] does not exist" );
 		return 0;
 		}
 
@@ -1839,7 +1775,7 @@ working together to align our interfaces.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2021, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2002-2022, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0

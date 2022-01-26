@@ -1,3 +1,15 @@
+0.283   2022-01-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Support formats tsv & ltsv.
+
+
+0.282   2021-12-09  Released-By: PERLANCAR; Urgency: medium
+
+	- Pass 'title' property from result metadata to Text::Table::Any.
+
+	- [doc] Mention Number::Pad (in comment).
+
+
 0.281   2021-08-01  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Add {date,datetime} as shorter alias for format

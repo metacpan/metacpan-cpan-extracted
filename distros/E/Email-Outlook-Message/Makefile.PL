@@ -8,7 +8,7 @@ WriteMakefile
   'PREREQ_PM' => {
                    'Carp' => '0',
                    'Email::Address' => '0',
-                   'Email::MIME' => '1.949',
+                   'Email::MIME' => '1.923',
                    'Email::MIME::ContentType' => '1.014',
                    'Email::Sender' => '1.3',
                    'Email::Simple' => '2.206',

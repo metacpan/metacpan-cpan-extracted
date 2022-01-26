@@ -7,6 +7,7 @@ use URI;
 use URI::Escape;
 use HTTP::Tiny;
 use JSON::ize;
+use Neo4j::Driver 0.1801;
 use REST::Neo4p::Agent;
 use REST::Neo4p::Node;
 use REST::Neo4p::Index;
@@ -16,7 +17,7 @@ use strict;
 use warnings;
 
 BEGIN {
-  $REST::Neo4p::VERSION = '0.4001';
+  $REST::Neo4p::VERSION = '0.4003';
 }
 
 our $CREATE_AUTO_ACCESSORS = 0;
@@ -137,17 +138,20 @@ sub connect {
   REST::Neo4p::LocalException->throw("Server address not set\n")  unless $server_address;
   my ($major, $minor, $patch, $milestone);
   eval {
-    ($major, $minor, $patch, $milestone) = get_neo4j_version($server_address);
+    ($major) = get_neo4j_version( $server_address, $user // $u, $pass // $p );
   };
   if (my $e = Exception::Class->caught) {
     REST::Neo4p::CommException->throw("On version pre-check: $e");
   }
   if ($major >= 4) {
     unless ($AGENT_MODULE eq 'Neo4j::Driver') {
-      unless (eval "require Neo4j::Driver; 1") {
-	REST::Neo4j::Exception->throw("Neo4j version 4 or higher requires Neo4j::Driver as agent module, but Neo4j::Driver is not installed in your system");
-      }
       warn "Neo4j version 4 or higher requires Neo4j::Driver as agent module; using this instead of $AGENT_MODULE";
+      $AGENT_MODULE = 'Neo4j::Driver';
+    }
+  }
+  elsif ($uri->scheme eq 'bolt') {
+    unless ($AGENT_MODULE eq 'Neo4j::Driver') {
+      warn "Bolt requires Neo4j::Driver as agent module; using this instead of $AGENT_MODULE";
       $AGENT_MODULE = 'Neo4j::Driver';
     }
   }
@@ -157,31 +161,12 @@ sub connect {
 }
 
 sub get_neo4j_version {
-  my ($url) = @_;
-  my $version;
-  my $resp = HTTP::Tiny->new( default_headers => { 'Content-Type' => 'application/json'})
-    ->get($url);
-  if ($resp->{success}) {
-    my $content = J($resp->{content});
-    $version = $content->{neo4j_version};
-    unless (defined $version) {
-      $resp = HTTP::Tiny->new( default_headers => { 'Content-Type' => 'application/json'})
-	->get("$url/db/data/");
-      if ($resp->{success}) {
-	$content = J($resp->{content});
-	$version = $content->{neo4j_version};
-      }
-      else {
-	die "$resp->{status} $resp->{reason}";
-      }
-    }
-    die "Neo4j version not found (is $url a Neo4j endpoint?)" unless defined $version;
-  }
-  else {
-    die "$resp->{status} $resp->{reason}";
-  }
+  my ($url, $user, $pass) = @_;
+  my $driver = Neo4j::Driver->new($url);
+  $driver->basic_auth($user, $pass) if $user || $pass;
+  my $version = $driver->session->server->version;
   my ($major, $minor, $patch, $milestone) = 
-    $version =~ /^(?:([0-9]+)\.)(?:([0-9]+)\.)?([0-9]+)?(?:-M([0-9]+))?/;
+    $version =~ /^Neo4j\/(?:([0-9]+)\.)(?:([0-9]+)\.)?([0-9]+)?(?:-M([0-9]+))?/;
   return wantarray ? ($major, $minor, $patch, $milestone) : $version;
 }
 
@@ -735,7 +720,7 @@ L<REST::Neo4p::Schema>,L<REST::Neo4p::Constrain>, L<REST::Neo4p::Constraint>.
 
 =head1 LICENSE
 
-Copyright (c) 2012-2021 Mark A. Jensen. This program is free software; you
+Copyright (c) 2012-2022 Mark A. Jensen. This program is free software; you
 can redistribute it and/or modify it under the same terms as Perl
 itself.
 

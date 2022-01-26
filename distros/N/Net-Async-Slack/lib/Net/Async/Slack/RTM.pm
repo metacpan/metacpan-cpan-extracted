@@ -3,7 +3,7 @@ package Net::Async::Slack::RTM;
 use strict;
 use warnings;
 
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use parent qw(IO::Async::Notifier);
 
@@ -331,5 +331,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2016-2021. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2016-2022. Licensed under the same terms as Perl itself.
 

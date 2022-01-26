@@ -18,7 +18,7 @@ use Cwd;
 BEGIN {
     my $cwd = cwd();
     $cwd =~ s|/examples/?$||;
-    unshift @INC, $cwd.'/lib'  if  $cwd =~ m|UI-Various$|;
+    unshift @INC, $cwd.'/lib'  if  $cwd =~ m|UI-Various(?:-\d\.\d+)?$|;
 }
 
 use constant PACKAGES => qw(Tk Curses RichTerm PoorTerm);

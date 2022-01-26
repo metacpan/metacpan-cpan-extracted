@@ -1,11 +1,16 @@
 #!/usr/bin/env perl
 
+use strict;
+use warnings;
+
 use DateTime;
-use Test::More tests => 15;
+use Test::More;
 
 use_ok('Data::ULID', qw/ulid binary_ulid ulid_date uuid_to_ulid ulid_to_uuid/);
 
 my $b32_re = qr/^[0123456789ABCDEFGHJKMNPQRSTVWXYZ]*$/;
+my $small_ulid = '00000000010000000000000001';
+my $small_ulid_bin = "\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01";
 my $old_ulid = '01B3Z3A7GQ6627FZPDQHQP87PM';
 my $old_ulid_bin = "\x01\x58\xfe\x35\x1e\x17\x31\x84\x77\xfe\xcd\xbc\x6f\x64\x1e\xd4";
 my $fixed_t = 1481797018.267;
@@ -26,12 +31,15 @@ ok($ulid =~ $b32_re,
 
 my $b_ulid = binary_ulid($ulid);
 
-ok(length($b_ulid) == 16,
+is(length($b_ulid), 16,
    "Length of binary ULID is 16");
+if (length($b_ulid) != 16) {
+    use Data::Dumper; die Dumper(unpack 'H*', $b_ulid);
+}
 
 my $ulid2 = ulid($b_ulid);
 
-ok($ulid eq $ulid2,
+is($ulid, $ulid2,
    "Converting back from binary yields same string");
 
 my $dt = ulid_date($ulid);
@@ -46,7 +54,7 @@ ok("$dt" eq "$b_dt",
 
 my $o_dt = ulid_date($old_ulid);
 
-ok($o_dt->hires_epoch == 1481733643.799,
+is($o_dt->hires_epoch, 1481733643.799,
    "Old ULID timestamp has correct hires_epoch");
 
 my $ob_ulid = binary_ulid($old_ulid);
@@ -73,3 +81,10 @@ ok(ulid_to_uuid($old_ulid) eq $uuid_from_old_ulid,
 
 ok(uuid_to_ulid($uuid_from_old_ulid) eq $old_ulid,
    "Back-and-forth UUID<=>ULID conversion works");
+
+is ulid($small_ulid_bin), $small_ulid, 'small ulid conversion ok';
+is ulid($small_ulid), $small_ulid, 'small ulid conversion ok';
+is unpack('H*', binary_ulid($small_ulid)), unpack('H*', $small_ulid_bin), 'small binary ulid conversion ok';
+is binary_ulid($small_ulid_bin), $small_ulid_bin, 'small binary ulid conversion ok';
+
+done_testing;

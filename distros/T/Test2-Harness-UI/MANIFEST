@@ -27,6 +27,7 @@ lib/Test2/Harness/UI/Controller/Download.pm
 lib/Test2/Harness/UI/Controller/Durations.pm
 lib/Test2/Harness/UI/Controller/Events.pm
 lib/Test2/Harness/UI/Controller/Failed.pm
+lib/Test2/Harness/UI/Controller/Interactions.pm
 lib/Test2/Harness/UI/Controller/Job.pm
 lib/Test2/Harness/UI/Controller/JobField.pm
 lib/Test2/Harness/UI/Controller/Lookup.pm
@@ -159,6 +160,7 @@ scripts/yath-ui-sweeper.pl
 share/css/dashboard.css
 share/css/datatables.min.css
 share/css/fieldtable.css
+share/css/interactions.css
 share/css/job.css
 share/css/json-formatter.css
 share/css/main.css
@@ -178,6 +180,7 @@ share/img/download.png
 share/img/error.png
 share/img/favicon.ico
 share/img/goto.png
+share/img/interactions.png
 share/img/link.png
 share/img/locked.png
 share/img/orphan.png
@@ -187,6 +190,7 @@ share/js/chart.min.js
 share/js/datatables.min.js
 share/js/eventtable.js
 share/js/fieldtable.js
+share/js/interactions.js
 share/js/jobtable.js
 share/js/jquery-ui.js
 share/js/jquery-ui.min.js
@@ -203,6 +207,7 @@ share/psgi/test.psgi
 share/schema/MySQL.sql
 share/schema/MySQL56.sql
 share/schema/PostgreSQL.sql
+share/templates/interactions.tx
 share/templates/login.tx
 share/templates/lookup.tx
 share/templates/main.tx

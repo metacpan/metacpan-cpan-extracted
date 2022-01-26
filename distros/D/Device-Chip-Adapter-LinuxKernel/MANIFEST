@@ -12,6 +12,8 @@ inc/Devel/AssertOS/Android.pm
 inc/Devel/AssertOS/Linux.pm
 inc/Devel/CheckOS.pm
 lib/Device/Chip/Adapter/LinuxKernel.pm
+lib/Device/Chip/Adapter/LinuxKernel/_I2C.pm
+lib/Device/Chip/Adapter/LinuxKernel/_I2C.xs
 lib/Device/Chip/Adapter/LinuxKernel/_SPI.pm
 lib/Device/Chip/Adapter/LinuxKernel/_SPI.xs
 lib/Device/Chip/Adapter/LinuxKernel/_base.pm

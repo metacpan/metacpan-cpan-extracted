@@ -23,14 +23,14 @@ WriteMakefile(
 		'meta-spec' => { version => 2 },
 		resources => {
 			license => 'https://dev.perl.org/licenses',
-			homepage => 'https://brtastic.xyz/project/form-tiny',
+			homepage => 'https://bbrtj.eu/project/form-tiny',
 			bugtracker => {
-				web => 'https://github.com/brtastic/perl-form-tiny/issues',
+				web => 'https://github.com/bbrtj/perl-form-tiny/issues',
 			},
 			repository => {
 				type => 'git',
-				url => 'https://github.com/brtastic/perl-form-tiny.git',
-				web => 'https://github.com/brtastic/perl-form-tiny',
+				url => 'https://github.com/bbrtj/perl-form-tiny.git',
+				web => 'https://github.com/bbrtj/perl-form-tiny',
 			},
 		},
 	},
@@ -40,6 +40,6 @@ WriteMakefile(
 	},
 
 	ABSTRACT_FROM => 'lib/Form/Tiny.pm',
-	AUTHOR => 'Bartosz Jarzyna <brtastic@gmail.com>',
+	AUTHOR => 'Bartosz Jarzyna <bbrtj.pro@gmail.com>',
 	LICENSE => 'perl',
 );

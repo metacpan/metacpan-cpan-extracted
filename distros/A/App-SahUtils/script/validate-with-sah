@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2021-07-27'; # DATE
-our $VERSION = '0.478'; # VERSION
+our $DATE = '2021-07-29'; # DATE
+our $VERSION = '0.479'; # VERSION
 
 use 5.010;
 use strict;
@@ -476,6 +476,7 @@ sub validate_with_sah {
 my $cli = Perinci::CmdLine::Any->new(
     url => '/main/validate_with_sah',
     pass_cmdline_object => 1,
+    log => 1,
 );
 $cli->{common_opts}{naked_res}{default} = 1;
 $cli->run;
@@ -495,13 +496,13 @@ validate-with-sah - Validate data with Sah schema
 
 =head1 VERSION
 
-This document describes version 0.478 of validate-with-sah (from Perl distribution App-SahUtils), released on 2021-07-27.
+This document describes version 0.479 of validate-with-sah (from Perl distribution App-SahUtils), released on 2021-07-29.
 
 =head1 SYNOPSIS
 
 Usage:
 
-% B<validate-with-sah> [B<--compiler>=I<str>] [(B<--config-path>=I<path>)+|B<--no-config>] [B<--config-profile>=I<profile>|B<-P>] [B<--core>] [B<--core-or-pp>] [B<--data-file-type>=I<str>] [B<--data-file>=I<str>] [B<--data-with-result>|B<-d>] [B<--format>=I<name>|B<--json>] [B<--linenum>|B<-l>] [B<--multiple-data-file>=I<str>] [B<--multiple-data>=I<any>] [B<--(no)naked-res>] [B<--no-env>] [B<--no-modules>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--pp>] [B<--return-type>=I<str>] [B<--schema-file-type>=I<str>] [B<--schema-file>=I<str>] [B<--schema-module>=I<str>] [B<--show-code>|B<-c>] [B<--show-raw-compile>|B<-R>] [B<--show-schema>|B<-s>] [B<--with-debug>] [B<--multiple-data-json>=I<json>] [B<-C>=I<str>] [B<--bool>|B<--bool-val>|B<--full>|B<-r>=I<str>|B<--str-val>] [B<-f>=I<str>] [B<-m>=I<str>] [B<-t>=I<str>] -- [I<schema>] [I<data>]
+% B<validate-with-sah> [B<--compiler>=I<str>] [(B<--config-path>=I<path>)+|B<--no-config>] [B<--config-profile>=I<profile>|B<-P>] [B<--core>] [B<--core-or-pp>] [B<--data-file-type>=I<str>] [B<--data-file>=I<str>] [B<--data-with-result>|B<-d>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--format>=I<name>|B<--json>] [B<--linenum>|B<-l>] [B<--multiple-data-file>=I<str>] [B<--multiple-data>=I<any>] [B<--(no)naked-res>] [B<--no-env>] [B<--no-modules>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--pp>] [B<--return-type>=I<str>] [B<--schema-file-type>=I<str>] [B<--schema-file>=I<str>] [B<--schema-module>=I<str>] [B<--show-code>|B<-c>] [B<--show-raw-compile>|B<-R>] [B<--show-schema>|B<-s>] [B<--with-debug>] [B<--multiple-data-json>=I<json>] [B<-C>=I<str>] [B<--bool>|B<--bool-val>|B<--full>|B<-r>=I<str>|B<--str-val>] [B<-f>=I<str>] [B<-m>=I<str>] [B<-t>=I<str>] -- [I<schema>] [I<data>]
 
 Examples:
 
@@ -752,6 +753,32 @@ Validate multiple data (array of data) against schema.
 =item B<--no-env>
 
 Do not read environment for default options.
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
 
 =back
 
@@ -1015,6 +1042,7 @@ List of available configuration parameters:
  data_with_result (see --data-with-result)
  format (see --format)
  linenum (see --linenum)
+ log_level (see --log-level)
  multiple_data (see --multiple-data)
  multiple_data_file (see --multiple-data-file)
  naked_res (see --naked-res)

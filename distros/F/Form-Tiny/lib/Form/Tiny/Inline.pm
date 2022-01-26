@@ -12,7 +12,7 @@ use Form::Tiny::Utils qw(trim create_anon_form_meta);
 
 use namespace::clean;
 
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 
 with 'Form::Tiny::Form';
 
@@ -24,6 +24,7 @@ has '_meta' => (
 	default => sub {
 		my ($self) = @_;
 		my $meta = create_anon_form_meta(@{$self->_meta_roles});
+		$meta->inherit_roles_from;    # no inheritance, but we need this
 		$meta->setup;
 
 		return $meta;
@@ -51,7 +52,7 @@ sub BUILD
 	}
 
 	if ($meta->can('add_filter')) {
-		$meta->add_filter(Str, \&trim);
+		$meta->add_filter(Str, sub { trim(pop) });
 		for my $filter (@{$args->{filters} // []}) {
 			$meta->add_filter(@$filter);
 		}
@@ -137,3 +138,4 @@ Inline forms are designed to cover all the basic use cases, but they are not as 
 When ran on a Form::Tiny::Inline class, it produces a new object that you can call C<< ->new >> on.
 
 	$inline_form_builder = Form::Tiny::Inline->is("Filtered", "Strict");
+

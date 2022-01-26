@@ -3,28 +3,29 @@ abstract: 'Universally Unique Lexicographically Sortable Identifier'
 author:
   - 'Baldur Kristinsson <baldur.kristinsson@gmail.com>'
 build_requires:
+  Data::Dumper: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Data-ULID
 requires:
+  Crypt::PRNG: '0'
   DateTime: '0'
-  Encode::Base32::GMP: '0'
   Exporter: '0'
-  Math::BigFloat: '0'
-  Math::BigInt: '0'
-  Math::Random::Secure: '0'
+  Math::BigInt: '1.999808'
   Time::HiRes: '0'
   base: '0'
-  bytes: '0'
-  constant: '0'
   strict: '0'
   warnings: '0'
-version: 1.0.0
-x_serialization_backend: 'YAML::Tiny version 1.69'
+resources:
+  repository: http://github.com/bk/Data-ULID
+version: 1.1.2
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

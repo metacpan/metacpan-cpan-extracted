@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2016-2021 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2016-2022 -- leonerd@leonerd.org.uk
  */
 #define PERL_NO_GET_CONTEXT
 
@@ -1750,7 +1750,7 @@ static void MY_future_on_cancel(pTHX_ SV *f, SV *code)
   mPUSHs(code);
   PUTBACK;
 
-  call_method("on_cancel", G_VOID);
+  call_method("AWAIT_ON_CANCEL", G_VOID);
 
   FREETMPS;
   LEAVE_with_name("future_on_cancel");

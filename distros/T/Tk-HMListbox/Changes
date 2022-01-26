@@ -40,3 +40,28 @@ Revision history for Perl extension Tk::HMListbox.
 	  consistant behaviour (as I have not tested with prev. Tk::HListbox vsn)!
 3.21  Thu Jan 06, 2022
 	- Oops - Correct major error in Pod/Docs.
+4.00  Fri Jan 21, 2022
+	- Add ability to set state to "disabled" (like other Tk widgets).
+	- Add a "-disabledForeground" (color) option to override the default 
+	  text foreground color used when the HListbox widget is set to disabled.
+	- Fix "-listvariable" tiein to work properly with initial values specified 
+	  in the tied array preinitialized with values when the HListbox is 
+	  created (as Listbox works).
+	- Fix some minor focus-traversal issues (when state is set to disabled).
+	- Fix "-resizeable => 0", "-moveable => 0" and "-sortable => 0" options 
+	  which seem to not be blocking resizing, moving, and sorting columns 
+	  respectively in all cases (all are now disabled when HMListbox is 
+	  disabled.
+	- Fix failure to configure some options when set to zero (or a false 
+	  value).
+	- Fix failure of default binding on vertical scrollbar 
+	  (Scrolled('HMListbox'...)) to scroll to the top of the list when the 
+	  <Home> key pressed (<End> already scrolls to the bottom).  Also ensure 
+	  that <Home> and <End> default to their proper actions:  Scroll the whole 
+	  HMListbox *horizontally* to left / right edge unless the vertical 
+	  scrollbar has focus, then scroll vertically to top / bottom.
+	- Overhaul, check, & fix several minor inconsistancies between 
+	  Tk::HMListbox and the other Listbox widgets, namely Tk::Listbox and 
+	  Tk::HListbox.
+	- Make sure to upgrade Tk::HListbox to it's latest version for best 
+	  results, as most of these improvements depend on recent changes there!

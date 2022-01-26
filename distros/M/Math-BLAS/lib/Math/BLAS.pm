@@ -18,7 +18,7 @@ use Math::BLAS::PP;
 
 BEGIN
 {
-  our $VERSION = '1.01';
+  our $VERSION = '1.02';
   our @EXPORT = ();
   our @EXPORT_OK = ();
   our %EXPORT_TAGS = ();
@@ -39,6 +39,7 @@ BEGIN
 	  blas_max_val
 	  blas_amax_val
 	  blas_sumsq
+	  blas_scale
 	  blas_rscale
 	  blas_axpby
 	  blas_waxpby
@@ -166,6 +167,18 @@ sub blas_sumsq ($$%)
 	   int ($opt{x_incr} // 1),
 	   $opt{sumsq},
 	   $opt{scale});
+}
+
+# Scale.
+sub blas_scale ($$%)
+{
+  my ($n, $x, %opt) = @_;
+
+  scale_d (int ($n),
+	   $opt{alpha} // 1,
+	   $x,
+	   int ($opt{x_ind} // 0),
+	   int ($opt{x_incr} // 1));
 }
 
 # Reciprocal scale.
@@ -707,6 +720,54 @@ unchanged values of I<sumsq> and I<scale>.
 =head2 Vector Operations
 
 =over
+
+=item C<blas_scale> (I<n>, I<x>, ...)
+
+Scale.
+
+=over
+
+=item
+
+I<x> ← α I<x>
+
+=back
+
+The C<scale> function multiplies the elements of the vector I<x> by the
+real scalar α.  This is a convenience function since you can perform the
+same operation with the C<axpby> function, too.
+
+=over
+
+=item *
+
+First argument I<n> is the number of vector elements.
+
+=item *
+
+Second argument I<x> is the vector operand.
+
+=item *
+
+The rest of the arguments form a property list.  Applicable standard
+properties are I<x_ind> and I<x_incr>.  The following table lists the
+non-standard property names together with their meaning.
+
+=over
+
+=item I<alpha>
+
+The scale factor for the vector operand.
+Default value is one.
+
+=back
+
+=back
+
+Argument I<x> is only evaluated if I<alpha> is not equal to one.
+
+The procedure returns immediately if I<n> is less than or equal to zero.
+
 
 =item C<blas_rscale> (I<n>, I<x>, ...)
 

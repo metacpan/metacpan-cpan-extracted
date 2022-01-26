@@ -35,7 +35,7 @@ test_test( name => 'file_mtime_age_ok success works', skip_err => 1 );
 
 
 test_out( 'not ok 1 - file_mtime_age_ok failure' );
-test_err( qr/\s*#\s*Filename \[$mtime_file\] [^\n]+\n/ );
+test_err( qr/\s*#\s*file \[$mtime_file\] [^\n]+\n/ );
 test_fail(+1);
 file_mtime_age_ok( $mtime_file, 60*9, 'file_mtime_age_ok failure' );
 test_test( 'file_mime_age_ok failure works' );
@@ -48,7 +48,7 @@ file_mtime_lt_ok( $mtime_file, time() );
 test_test( 'file_mtime_lt_ok success works' );
 
 test_out( 'not ok 1 - file_mtime_lt_ok failure' );
-test_err( qr/\s*#\s*Filename \[$mtime_file\] [^\n]+\n/ );
+test_err( qr/\s*#\s*file \[$mtime_file\] [^\n]+\n/ );
 test_fail(+1);
 file_mtime_lt_ok( $mtime_file, $curtime-60*11, 'file_mtime_lt_ok failure' );
 test_test( 'file_mtime_lt_ok failure works' );
@@ -61,17 +61,17 @@ file_mtime_gt_ok( $mtime_file, $curtime-60*11 );
 test_test( 'file_mtime_gt_ok success works' );
 
 test_out( 'not ok 1 - file_mtime_gt_ok failure' );
-test_err( qr/\s*#\s*Filename \[$mtime_file\] [^\n]+\n/ );
+test_err( qr/\s*#\s*file \[$mtime_file\] [^\n]+\n/ );
 test_fail( +1 );
 file_mtime_gt_ok( $mtime_file, $curtime-60*9, 'file_mtime_gt_ok failure' );
 test_test( 'file_mtime_gt_ok failure works' );
 
 # Test internal _stat_file function
-test_err( qr/\s*#\s*Filename \[.*?\] does not exist!\n/ );
+test_err( qr/\s*#\s*file \[.*?\] does not exist\n/ );
 Test::File::_stat_file( 'non-existent-file-12345', 9 );
 test_test( '_stat_file on non-existent file works' );
 
-test_err( qr/\s*#\s*Filename not specified!\n/ );
+test_err( qr/\s*#\s*file name not specified\n/ );
 Test::File::_stat_file( undef );
 test_test( '_stat_file no file provided works' );
 

@@ -9,14 +9,14 @@ use TestInnerForm;
 
 form_field "no_type";
 form_field "sub_coerced" => (
-	coerce => sub { shift() // 'undef' }
+	coerce => sub { pop() // 'undef' }
 );
 form_field "int" => (type => Int->where(q{$_ >= 0}));
 form_field "int_coerced" => (type => Int->plus_coercions(Num, q{ int($_) }), coerce => 1);
 form_field "str" => (type => SimpleStr);
 form_field "str_adjusted" => (
 	type => Str,
-	adjust => sub { ">>" . shift }
+	adjust => sub { ">>" . pop }
 );
 form_field "bool_cleaned" => (type => Bool);
 form_field "nested.name";
@@ -28,7 +28,7 @@ form_field "not.\\*.nested_array";
 form_field "nested_form" => (type => TestInnerForm->new);
 form_field "nested_form_unadjusted" => (
 	type => TestInnerForm->new,
-	adjust => sub { @_ }
+	adjust => sub { pop }
 );
 form_field "array.*.name";
 form_field "array.*.second.*.name";

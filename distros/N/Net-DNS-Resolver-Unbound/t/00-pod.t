@@ -15,7 +15,7 @@ foreach my $package ( sort keys %prerequisite ) {
 }
 
 
-my @poddirs = qw( blib demo );
+my @poddirs = qw(blib);
 my @allpods = all_pod_files(@poddirs);
 all_pod_files_ok(@allpods);
 

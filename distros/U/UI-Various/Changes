@@ -1,6 +1,14 @@
 Revision history for Perl extension UI-Various
 
-0.14 2022-01-20T13:43:25Z
+0.15 2022-01-25T10:09:39Z
+
+0.15 2022-01-25T10:09:13Z
+
+    - added Check(box) widget
+    - fixed various cut&paste documentation errors
+    - fixed path in examples/_common.pl for extracted tarballs
+    - RichTerm's input fields are now printed with ANSI underline effect
+    - added CONTRIBUTING.md
 
 0.14 2022-01-20T13:42:27Z
 

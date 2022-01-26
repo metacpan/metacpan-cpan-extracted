@@ -12,7 +12,7 @@ use Form::Tiny::Error;
 use Form::Tiny::Utils qw(try get_package_form_meta);
 use Moo::Role;
 
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 
 has 'field_defs' => (
 	is => 'ro',
@@ -441,3 +441,4 @@ It allows you to get errors in format which is easier to navigate:
 	$form->add_error($error_object);
 
 Adds an error to the form. If C<$error_object> style is used, it must be an instance of L<Form::Tiny::Error>.
+

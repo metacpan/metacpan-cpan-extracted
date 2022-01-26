@@ -62,7 +62,7 @@ END
 	lives_ok { $plan = $r->plan;  1; } 'get plan';
 	SKIP: {
 		skip '(plan unavailable)', 1 unless $plan;
-		lives_and { is $plan->{root}->{children}->[0]->{operatorType}, 'CartesianProduct' } 'plan detail';
+		lives_and { like $plan->{root}->{children}->[0]->{operatorType}, qr/CartesianProduct/ } 'plan detail';
 	}
 	lives_ok { @notifications = $r->notifications;  1; } 'get notifications';
 	SKIP: {

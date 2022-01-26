@@ -3,7 +3,7 @@ package Net::Async::Slack::Event::PresenceChange;
 use strict;
 use warnings;
 
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use Net::Async::Slack::EventType;
 

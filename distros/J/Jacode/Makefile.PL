@@ -1,10 +1,10 @@
 use strict;
-BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; $^W=1;
+BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{Jacode},
-    'VERSION'   => q{2.13.4.24},
+    'VERSION'   => q{2.13.4.26},
     'ABSTRACT'  => q{Perl program for Japanese character code conversion},
     'PREREQ_PM' => {
         'ExtUtils::MakeMaker' => '5.4302',
@@ -14,7 +14,7 @@ WriteMakefile(
         'FindBin' => '1.42',
         'Socket' => '0',
         'lib' => '0',
-        'perl' => '5.005_03',
+        'perl' => '5.00503',
         'strict' => '1.01',
         'vars' => '0',
     },

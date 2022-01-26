@@ -1,5 +1,11 @@
 Revision history for BioX-Seq
 
+0.008004 2022-01-21
+         Add check for out-of-date faidx files
+
+0.008003 2021-11-04
+         Added support for streaming xz-compressed files
+
 0.008002 2021-04-08
          Use core module IPC::Cmd instead of File::Which to look for installed
             programs (removes last non-core dependency)

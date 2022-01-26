@@ -1,4 +1,11 @@
 use alienfile;
+use Config;
+
+# NOTE: you can set ALIEN_MESON_SHARE_PREFER to either:
+#
+# - "auto": try source install then try binary install (default)
+# - "source": try source install only
+# - "binary": try binary install only
 
 plugin 'Probe::CommandLine' => (
   command => $_,
@@ -7,24 +14,187 @@ plugin 'Probe::CommandLine' => (
   version => qr/([0-9\.]+)/,
 ) for qw( meson.py meson );
 
-share {
-  requires 'Path::Tiny';
-  start_url 'https://github.com/mesonbuild/meson/releases';
+my $python_bin;
+sub can_source {
+  for my $test_python_bin ( qw(python3 python) ) {
+    if(
+      File::Which::which($test_python_bin)
+      &&
+      Capture::Tiny::capture(sub {
+            system( $test_python_bin, qw( --version ) )
+      }) =~ /^Python 3/
+    ) {
+      $python_bin = $test_python_bin;
+      return;
+    }
+  }
+
+  die "No Python3 found" unless defined $python_bin;
+}
+
+sub do_source {
+  # Python source
   plugin Download => (
     filter  => qr/^meson-.*\.tar\.gz$/,
     version => qr/([0-9\.]+)/,
   );
   plugin 'Extract::CommandLine' => 'tar.gz';
   patch sub {
-	my @tests = Path::Tiny::path('.')->children( qr/.*test.*/ );
-	$_->remove_tree for @tests;
-	Path::Tiny::path('graphics')->remove_tree;
-	Path::Tiny::path('setup.py')->remove_tree;
+    my @tests = Path::Tiny::path('.')->children( qr/.*test.*/ );
+    $_->remove_tree for @tests;
+    Path::Tiny::path('graphics')->remove_tree;
+    Path::Tiny::path('setup.py')->remove_tree;
   };
   plugin 'Build::Copy';
   after build => sub {
-      my($build) = @_;
-      $build->runtime_prop->{'python-source'} = 1;
-      $build->runtime_prop->{command} = 'meson.py';
+    my($build) = @_;
+    $build->runtime_prop->{'style'} = 'source';
+    $build->runtime_prop->{'python-source'} = 1;
+    $build->runtime_prop->{command} = 'meson.py';
+    $build->runtime_prop->{python_bin} = $python_bin;
   };
 }
+
+my ($binary_release_name_re, $binary_release_format);
+sub can_binary {
+  if( $^O eq 'MSWin32' && $Config{ptrsize} == 8 ) {
+    # Windows 64-bit
+    $binary_release_name_re = qr/meson-.*-64\.msi/;
+    $binary_release_format = '.msi';
+    return;
+  }
+
+  if( $^O eq 'darwin' ) {
+    # macOS
+    $binary_release_name_re = qr/meson-.*\.pkg/;
+    $binary_release_format = '.pkg';
+    return;
+  }
+
+  die "No binary packages available for this configuration";
+}
+
+sub do_binary {
+  plugin Download => (
+    filter  => $binary_release_name_re,
+    version => qr/([0-9\.]+)/,
+  );
+
+  if( $binary_release_format eq '.msi' ) {
+    extract sub {
+      my ($build) = @_;
+
+      my $msi = Path::Tiny::path($build->install_prop->{download})->canonpath;
+      my $cwd = Path::Tiny->cwd->canonpath;
+
+      Alien::Build::CommandSequence->new([
+        qw(msiexec /a),
+        $msi,
+        "TARGETDIR=$cwd",
+        '/qn'
+      ])->execute($build);
+    };
+
+    patch sub {
+      my $cwd = Path::Tiny->cwd;
+      $_->remove for $cwd->children( qr/\.msi$/ );
+      my $Meson = $cwd->child('Meson');
+      $Meson->child('ninja.exe')->remove;
+      File::Copy::Recursive::rmove( "$Meson/*", $cwd );
+      $Meson->remove_tree;
+    };
+
+    plugin 'Build::Copy';
+
+    after build => sub {
+      my($build) = @_;
+      $build->runtime_prop->{'style'} = 'binary';
+      $build->runtime_prop->{command} = 'meson';
+    };
+  } elsif( $binary_release_format eq '.pkg' ) {
+    extract sub {
+      my ($build) = @_;
+
+      Alien::Build::CommandSequence->new([
+        qw(pkgutil --expand-full),
+        $build->install_prop->{download},
+        'meson'
+      ])->execute($build);
+    };
+
+    patch sub {
+      my $cwd = Path::Tiny->cwd;
+      my $meson_top = $cwd->child('meson.pkg/Payload/usr/local');
+      # remove some small extra files?
+      #$_->remove_tree for $cwd->children( qr/^(Distribution|Resources)$/ );
+      $meson_top->child('bin', 'ninja')->remove;
+      File::Copy::Recursive::rmove( "$meson_top/*", $cwd );
+      $meson_top->remove_tree;
+    };
+
+    plugin 'Build::Copy';
+
+    after build => sub {
+      my($build) = @_;
+      $build->runtime_prop->{'style'} = 'binary';
+      $build->runtime_prop->{command} = 'meson';
+    };
+  }
+}
+
+share {
+  requires 'Path::Tiny';
+  requires 'File::Which';
+  requires 'Capture::Tiny';
+  requires 'Alien::Build::CommandSequence';
+  requires 'File::Copy::Recursive';
+
+  # same URL used for both source and binary releases
+  start_url 'https://github.com/mesonbuild/meson/releases';
+
+  $ENV{ALIEN_MESON_SHARE_PREFER} ||= 'auto';
+
+  my $release_types = {
+    source => {
+      'can' => \&can_source,
+      'do'  => \&do_source,
+    },
+    binary => {
+      'can' => \&can_binary,
+      'do'  => \&do_binary,
+    },
+  };
+
+  if( $ENV{ALIEN_MESON_SHARE_PREFER} eq 'auto' ) {
+    my $which_type;
+    my @types = qw(source binary);
+    for my $type (@types) {
+      eval { $release_types->{$type}{can}->() };
+      my $catch = $@;
+      if( $catch ) {
+        warn "Unable to install release type $type: $catch";
+        next;
+      }
+
+      $which_type = $type;
+      $release_types->{$type}{do}->();
+      last;
+    }
+
+    if( ! $which_type ) {
+      die "Unable to install from release types: @types";
+    }
+  } elsif( exists $release_types->{ $ENV{ALIEN_MESON_SHARE_PREFER} } ) {
+    $release_types->{ $ENV{ALIEN_MESON_SHARE_PREFER} }{$_}->() for qw(can do);
+  } else {
+    die "Unknown value for ALIEN_MESON_SHARE_PREFER: $ENV{ALIEN_MESON_SHARE_PREFER}";
+  }
+
+};
+
+sys {
+  meta->after_hook( probe => sub {
+    my($build) = @_;
+    $build->runtime_prop->{'style'} = 'system';
+  });
+};

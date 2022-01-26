@@ -66,7 +66,7 @@ subtest wrong_size => sub {
 
 	test_out( "not ok 1 - $file has right size" );
 	test_diag(
-		"File [$file] has actual size [$actual_size] not [$under_size]!\n" .
+		"file [$file] has actual size [$actual_size] not [$under_size]\n" .
 		"    #   Failed test '$file has right size'\n" .
 		"    #   at $0 line " . line_num(+5) . "."
 		);
@@ -75,7 +75,7 @@ subtest wrong_size => sub {
 
 	test_out( "not ok 1 - $file is under $under_size bytes" );
 	test_diag(
-		"File [$file] has actual size [$actual_size] greater than [$under_size]!\n" .
+		"file [$file] has actual size [$actual_size] greater than [$under_size]\n" .
 		"    #   Failed test '$file is under $under_size bytes'\n" .
 		"    #   at $0 line " . line_num(+5) . "."
 		);
@@ -84,7 +84,7 @@ subtest wrong_size => sub {
 
 	test_out( "not ok 1 - $file is over $over_size bytes" );
 	test_diag(
-		"File [$file] has actual size [$actual_size] less than [$over_size]!\n" .
+		"file [$file] has actual size [$actual_size] less than [$over_size]\n" .
 		"    #   Failed test '$file is over $over_size bytes'\n" .
 		"    #   at $0 line " . line_num(+5) . "."
 		);
@@ -93,7 +93,7 @@ subtest wrong_size => sub {
 
 	test_out( "not ok 1 - $file is empty" );
 	test_diag(
-		"File [$file] exists with non-zero size!\n" .
+		"file [$file] exists with non-zero size\n" .
 		"    #   Failed test '$file is empty'\n" .
 		"    #   at $0 line " . line_num(+5) . "."
 		);
@@ -102,7 +102,7 @@ subtest wrong_size => sub {
 
 	test_out( "not ok 1 - zero_file is not empty" );
 	test_diag(
-		"File [zero_file] exists with zero size!\n" .
+		"file [zero_file] exists with zero size\n" .
 		"    #   Failed test 'zero_file is not empty'\n" .
 		"    #   at $0 line " . line_num(+5) . "."
 		);
@@ -113,11 +113,11 @@ subtest wrong_size => sub {
 
 subtest doesnt_work_with_missing_file => sub {
 	my $not_there = 'not_there';
-	ok( ! -e $not_there, "File [$not_there] doesn't exist (good)" );
+	ok( ! -e $not_there, "file [$not_there] doesn't exist (good)" );
 
 	test_out( "not ok 1 - $not_there has right size" );
 	test_diag(
-		"File [$not_there] does not exist!\n" .
+		"file [$not_there] does not exist\n" .
 		"    #   Failed test '$not_there has right size'\n" .
 		"    #   at $0 line " . line_num(+5) . "."
 		);
@@ -126,7 +126,7 @@ subtest doesnt_work_with_missing_file => sub {
 
 	test_out( "not ok 1 - $not_there is under 54 bytes" );
 	test_diag(
-		"File [$not_there] does not exist!\n" .
+		"file [$not_there] does not exist\n" .
 		"    #   Failed test '$not_there is under 54 bytes'\n" .
 		"    #   at $0 line " . line_num(+5) . "."
 		);
@@ -135,7 +135,7 @@ subtest doesnt_work_with_missing_file => sub {
 
 	test_out( "not ok 1 - $not_there is over 50 bytes" );
 	test_diag(
-		"File [$not_there] does not exist!\n" .
+		"file [$not_there] does not exist\n" .
 		"    #   Failed test '$not_there is over 50 bytes'\n" .
 		"    #   at $0 line " . line_num(+5) . "."
 		);
@@ -144,7 +144,7 @@ subtest doesnt_work_with_missing_file => sub {
 
 	test_out( "not ok 1 - $not_there is empty" );
 	test_diag(
-		"File [$not_there] does not exist!\n" .
+		"file [$not_there] does not exist\n" .
 		"    #   Failed test '$not_there is empty'\n" .
 		"    #   at $0 line " . line_num(+5) . "."
 		);
@@ -153,7 +153,7 @@ subtest doesnt_work_with_missing_file => sub {
 
 	test_out( "not ok 1 - $not_there is not empty" );
 	test_diag(
-		"File [$not_there] does not exist!\n" .
+		"file [$not_there] does not exist\n" .
 		"    #   Failed test '$not_there is not empty'\n" .
 		"    #   at $0 line " . line_num(+5) . "."
 		);

@@ -27,9 +27,16 @@ test_cve2019_6977();
 exit 0;
 
 sub write_regression_tests {
+    # TODO get all the supported image formats dynamically
+    my @image_types = qw(png gif jpeg tiff wbmp webp heif avif);
+    if (GD::LIBGD_VERSION() < 2.0302 ) {
+        # GD 2.3.2 disabled the old GD and GD2 formats by default
+        unshift @image_types, 'gd2', 'gd';
+    }
     warn "Writing regression files...";
-    for my $suffix ('gd2','gd','png','gif','jpeg') {
+    for my $suffix (@image_types) {
 	my $op = ucfirst $suffix;
+        $op = 'WBMP' if $suffix eq 'wbmp';
 	unless (GD::Image->can("newFrom$op")) {
 	    print "# not writing $op regression test: not supported\n";
 	    next;
@@ -241,12 +248,16 @@ sub test7 {
 }
 
 sub run_image_regression_tests {
-    my $suffix = $ENV{GDIMAGETYPE} || 'gd2';
+    my $default_image_type = 'gd2';
+    if (!GD::Image->can("newFromGd2") || GD::LIBGD_VERSION() >= 2.0302) {
+      $default_image_type = 'png';
+    }
+    my $suffix = $ENV{GDIMAGETYPE} || $default_image_type;
     print STDERR "# Testing gd ".GD::VERSION_STRING()." using $suffix support.\n";
     for my $t (1..IMAGE_TESTS) {
 	my $gd   = eval "test${t}('$suffix')";
 	if (!$gd) {
-	    fail("unable to generate comparison image for test $t: $@");
+	    fail("unable to generate comparison image for test $t with $suffix: $@");
 	} else {
             my $ok = compare($gd,$t,$suffix);
             unless ($ok) {
@@ -271,12 +282,23 @@ sub run_round_trip_test {
     $image->colorAllocate(255,0,0);
     $image->rectangle(0,0,300,300,0);
     $image->filledRectangle(10,10,50,50,2);
-    my $gd = $image->gd;
-    my $image2 = GD::Image->newFromGdData($gd);
-    ok(!$image->compare($image2) & GD_CMP_IMAGE(),'round trip gd');
-    my $gd2 = $image->gd2;
-    $image2 = GD::Image->newFromGd2Data($gd2);
-    ok(!$image->compare($image2) & GD_CMP_IMAGE(),'round trip gd2');
+    if (GD::Image->can("newFromGd")) {
+        my $gd = $image->gd;
+        my $image2 = GD::Image->newFromGdData($gd);
+        ok(!$image->compare($image2) & GD_CMP_IMAGE(),'round trip gd');
+        my $gd2 = $image->gd2;
+        $image2 = GD::Image->newFromGd2Data($gd2);
+        ok(!$image->compare($image2) & GD_CMP_IMAGE(),'round trip gd2');
+    }
+    else {
+        # GD 2.3.2 disabled the old GD and GD2 formats by default
+        my $png = $image->png;
+        my $image2 = GD::Image->newFromPngData($png);
+        ok(!$image->compare($image2) & GD_CMP_IMAGE(),'round trip png');
+        my $gif = $image->gif;
+        $image2 = GD::Image->newFromGifData($gif);
+        ok(!$image->compare($image2) & GD_CMP_IMAGE(),'round trip gif');
+    }
 }
 
 sub catch_libgd_error {

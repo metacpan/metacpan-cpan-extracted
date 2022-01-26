@@ -33,14 +33,11 @@
       },
       "runtime" : {
          "recommends" : {
-            "Class::XSAccessor" : "0",
             "ExtUtils::Constant" : "0.23",
-            "List::MoreUtils" : "0",
-            "Pod::Spell::CommonMistakes" : "0",
-            "Test::Kwalitee" : "0",
-            "Test::More" : "0.88",
-            "Test::Pod" : "1.00",
-            "Text::CSV_XS" : "0"
+            "ExtUtils::PkgConfig" : "0",
+            "Math::Trig" : "0",
+            "Test::Fork" : "0.02",
+            "Test::More" : "0.88"
          },
          "requires" : {
             "Math::Trig" : "0"
@@ -62,6 +59,6 @@
          "url" : "http://github.com/lstein/Perl-GD"
       }
    },
-   "version" : "2.73",
+   "version" : "2.75",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

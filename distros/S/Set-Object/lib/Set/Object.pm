@@ -475,6 +475,19 @@ On my computer the results are:
      H lookup:  7 secs ( 7.14 usr  0.00 sys =  7.14 cpu)
      S lookup:  6 secs ( 5.94 usr  0.00 sys =  5.94 cpu)
 
+This benchmark compares the unsorted members method, against the sorted @$ list context.
+
+   perl -MBenchmark -mList::Util -mSet::Object -e'
+   $set = Set::Object::set (List::Util::shuffle(1..1000));
+   Benchmark::timethese(-3, {
+      "Slow \@\$set       " => sub { $i++ for @$set; },
+      "Fast set->members" => sub { $i++ for $set->members(); },
+      });'
+
+    Benchmark: running Fast set->members, Slow @$set        for at least 3 CPU seconds...
+    Fast set->members:  4 wallclock secs ( 3.17 usr +  0.00 sys =  3.17 CPU) @ 9104.42/s (n=28861)
+    Slow @$set       :  4 wallclock secs ( 3.23 usr +  0.00 sys =  3.23 CPU) @ 1689.16/s (n=5456)
+
 =head1 THREAD SAFETY
 
 This module is not thread-safe.
@@ -529,7 +542,7 @@ require AutoLoader;
 
 @EXPORT_OK = qw( ish_int is_int is_string is_double blessed reftype
 		 refaddr is_overloaded is_object is_key set weak_set );
-$VERSION = '1.41';
+$VERSION = '1.42';
 
 bootstrap Set::Object $VERSION;
 
@@ -742,7 +755,7 @@ use overload
    '<='  =>		\&subset,
    '>='  =>		\&superset,
    '%{}'  =>		sub { my $self = shift;
-			      my %h = {};
+			      my %h = ();
 			      tie %h, $self->tie_hash_pkg, [], $self;
 			      \%h },
    '@{}'  =>		sub { my $self = shift;

@@ -109,7 +109,7 @@ use warnings 'once';
 
 use Carp;			# may only be used in import!
 
-our $VERSION = "0.14";
+our $VERSION = "0.15";
 
 BEGIN  {  require UI::Various::core;  }
 

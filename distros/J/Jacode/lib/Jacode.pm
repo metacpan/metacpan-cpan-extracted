@@ -3,10 +3,10 @@ package Jacode;
 #
 # Jacode - Perl program for Japanese character code conversion
 #
-# Copyright (c) 2018, 2019, 2020 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2019, 2020, 2022 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSION = '2.13.4.24';
+$VERSION = '2.13.4.26';
 $VERSION = $VERSION;
 
 use 5.00503;
@@ -45,6 +45,8 @@ __END__
 
 =pod
 
+=encoding utf8
+
 =head1 NAME
 
 Jacode - Perl program for Japanese character code conversion
@@ -73,6 +75,52 @@ Jacode - Perl program for Japanese character code conversion
     Jacode::tr(\$line, $from, $to [, $option])
     Jacode::trans($line, $from, $to [, $option])
     Jacode::init()
+
+=head1 EASY INSTALL (Paste and Run)
+
+  1. Open URL https://metacpan.org/pod/Jacode
+  
+  2. Click ...
+  ----------------------------------
+  Source (raw) <--- This ***raw***
+  Browse (raw)
+  Changes
+  How to Contribute
+  Clone repository
+  Issues
+  Testers (NNN / NNN / NNN)
+  Kwalitee
+  Bus factor: 1
+  NN.NN% Coverage
+  License: perl_5
+  Perl: v5.5.30
+  ----------------------------------
+  
+  3. Select All Text of Page
+  
+  4. Save Text as "lib/Jacode.pm"
+  
+  5. Open URL https://metacpan.org/dist/Jacode/view/lib/jacode.pl
+  
+  6. Click ...
+  ----------------------------------
+  Source (raw) <--- This ***raw***
+  Browse (raw)
+  Changes
+  How to Contribute
+  Clone repository
+  Issues
+  Testers (NNN / NNN / NNN)
+  Kwalitee
+  Bus factor: 1
+  NN.NN% Coverage
+  License: perl_5
+  Perl: v5.5.30
+  ----------------------------------
+  
+  7. Select All Text of Page
+  
+  8. Save Text as "lib/jacode.pl"
 
 =head1 SAMPLES
 

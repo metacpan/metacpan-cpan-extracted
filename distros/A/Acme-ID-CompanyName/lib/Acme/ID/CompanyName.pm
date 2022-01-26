@@ -3,7 +3,7 @@ package Acme::ID::CompanyName;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-05-07'; # DATE
 our $DIST = 'Acme-ID-CompanyName'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -18,6 +18,8 @@ our %SPEC;
 our @Words = qw(
 abad
 abadi
+adhi
+adi
 agung
 aksa
 aksara
@@ -31,12 +33,18 @@ amanah
 amanat
 amerta
 ampuh
+andal
+andalan
 angkasa
+anugerah
+arta
+artha
 arunika
 asa
 
 bagus
 bangsa
+bangun
 baru
 baskara
 baswara
@@ -46,6 +54,7 @@ bentang
 berdikari
 berdiri
 berjaya
+berkat
 berlian
 bersama
 bersatu
@@ -54,7 +63,10 @@ beruntung
 besar
 bestari
 bijaksana
+bina
 binar
+bintang
+bisnis
 buana
 bukit
 bulan
@@ -72,21 +84,31 @@ chandra
 cipta
 citra
 
+dagang
+dana
+darma
 dasa
 dasar
 data
+delapan
 delta
+dharma
 digital
 dika
 dirgantara
 dunia
+duta
 
+eden
 eka
+elang
 elegan
 elegi
 elektrik
 elektro
 elektronik
+empat
+enam
 energi
 era
 esa
@@ -97,6 +119,9 @@ fajar
 forsa
 fortuna
 
+gading
+galaksi
+garuda
 gelora
 gemerlap
 gemilang
@@ -104,7 +129,9 @@ gemintang
 gempita
 gilang
 global
+gloria
 graha
+griya
 guna
 gunung
 
@@ -117,6 +144,7 @@ hasil
 hasrat
 hasta
 hati
+hoki
 #hosana-christianish
 hulu
 human
@@ -129,22 +157,30 @@ indah
 indonesia
 indotama
 industri
+insan
 inspirasi
 internasional
 inti
+investa
+investama
 
 jasa
 jatmika
 jaya
 jenggala
 jingga
+juara
 jumantara
+juwara
 juwita
 
 kala
+kapital
 karsa
 karya
 kasih
+keluarga
+kencana
 khatulistiwa
 kidung
 kirana
@@ -154,27 +190,45 @@ krida
 kurnia
 
 laksana
+langgeng
 langit
 lautan
+layanan
+legenda
 lembayung
+lentera
 lestari
+liberti
+lima
 lotus
 luas
 lumbung
 
+mahkota
 maju
 makmur
+maksindo
 mandala
+mandiri
+mapan
+marga
 maritim
+mas
 media
+megah
+mekar
+menara
+menuju
 milenia
 milenial
 mitra
 multi
+multimedia
 
 nirmala
 nirwana
 normal
+nuansa
 nusa
 nusantara
 
@@ -189,15 +243,27 @@ orisinal
 otomatis
 
 paripurna
+pasifik
 pelangi
 perkasa
+permata
 pertama
 perusahaan
 pijar
+pilar
+pionir
+polar
+polarindo
 pratama
+prawira
 prima
+prioritas
+properti
+propertindo
+prospek
 pusaka
 pusat
+putera
 putra
 
 quadra
@@ -219,18 +285,29 @@ ruang
 
 santosa
 sarana
+sari
+satu
 sehat
 sejahtera
 sejati
+selaras
+sembilan
 sempurna
 sentosa
 sentra
 sentral
+setia
 simfoni
+sinar
 sintesa
 sintesis
+solusi
+solusindo
+sukses
 sumber
+surya
 
+talenta
 taktis
 teduh
 teknologi
@@ -238,7 +315,9 @@ tenteram
 tentram
 terang
 terus
+tiga
 tren
+tujuh
 tunggal
 
 ufuk
@@ -251,6 +330,8 @@ utara
 varia
 variasi
 vektor
+ventura
+venturindo
 venus
 versa
 vidia
@@ -275,6 +356,7 @@ wira
 wiratama
 wiyata
 
+xavier
 xcel
 xmas
 xpres
@@ -302,23 +384,30 @@ for my $letter ("a".."z") {
 
 our @Prefixes = qw(
 adi
+dana
 dwi
 eka
 indo
+inti
 media
 mega
 mitra
 multi
+nara
 oto
 panca
+prima
+sapta
 swa
 tekno
 tetra
+trans
 tri
 );
 
 our @Suffixes = qw(
 indo
+jaya
 tama
 );
 
@@ -393,17 +482,25 @@ sub gen_generic_ind_company_names {
         my $word_tries = 0;
         my $has_added_prefix;
         my $has_added_suffix;
+      WORD:
         for my $j (1..$num_words) {
             die "Can't produce a company name that satisfies requirements"
                 if ++$word_tries > 1000;
 
+            my $will_add_prefix =
+                !$add_prefixes ? 0 :
+                $has_added_prefix ? 0 :
+                rand()*$num_words*6 > 1 ? 0 : 1;
+
             my $word;
-            if (length($desired_initials) >= $j and
-                    my $letter = substr($desired_initials, $j-1, 1)) {
-                die "There are no words that start with '$letter'"
-                    unless $Per_Letter_Words{$letter};
-                $word = $Per_Letter_Words{$letter}->[
-                    @{ $Per_Letter_Words{$letter} } * rand()
+            my $desired_initial = length($desired_initials) >= $j ?
+                substr($desired_initials, $j-1, 1) : undef;
+
+            if (!$will_add_prefix && $desired_initial) {
+                die "There are no words that start with '$desired_initial'"
+                    unless $Per_Letter_Words{$desired_initial};
+                $word = $Per_Letter_Words{$desired_initial}->[
+                    @{ $Per_Letter_Words{$desired_initial} } * rand()
                 ];
             } else {
                 $word = $Words[@Words * rand()];
@@ -412,9 +509,9 @@ sub gen_generic_ind_company_names {
 
           ADD_PREFIX:
             {
-                last unless $add_prefixes;
-                last unless !$has_added_prefix && rand()*$num_words*6 < 1;
+                last unless $will_add_prefix;
                 my $prefix = $Prefixes[@Prefixes * rand()];
+                redo WORD if $desired_initial && substr($prefix, 0, 1) ne $desired_initial;
 
                 # avoid prefixing e.g. 'indo-' to 'indonesia'
                 last if $word =~ /^\Q$prefix\E/;
@@ -477,7 +574,7 @@ Acme::ID::CompanyName - Generate nice-sounding, generic Indonesian company names
 
 =head1 VERSION
 
-This document describes version 0.006 of Acme::ID::CompanyName (from Perl distribution Acme-ID-CompanyName), released on 2021-05-07.
+This document describes version 0.007 of Acme::ID::CompanyName (from Perl distribution Acme-ID-CompanyName), released on 2021-05-07.
 
 =head1 DESCRIPTION
 
@@ -503,11 +600,11 @@ Examples:
 Result:
 
  [
-   "PT Krida Akur Tren",
-   "PT Industri Sentral Baru",
-   "PT Vita Humania Cipta",
-   "PT Cakrawalatama Central Hasil",
-   "PT Utara Ekasentralindo Cakra",
+   "PT Hulu Humania Harmoni",
+   "PT Jaya Cipta Indoakurasi",
+   "PT Baru Berjaya Legenda",
+   "PT Normal Zona Gempita",
+   "PT Multi Gelora Baswara",
  ]
 
 =item * Generate three PT names with desired initials "ACME":
@@ -517,9 +614,9 @@ Result:
 Result:
 
  [
-   "PT Angkasatama Cipta Milenial Eka",
-   "PT Agung Chandra Milenia Eka",
-   "PT Amantama Cipta Milenial Elektronik",
+   "PT Aksara Catur Mekar Elektronik",
+   "PT Anugerah Cendrawasih Mandala Esa",
+   "PT Asaindo Cakra Mandala Elang",
  ]
 
 =back

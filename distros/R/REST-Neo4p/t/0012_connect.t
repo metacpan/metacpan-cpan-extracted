@@ -40,8 +40,10 @@ $ht_control->override(
 $ag_control->override( connect => sub { 1 } );
 
 is $REST::Neo4p::AGENT_MODULE, 'LWP::UserAgent';
+*REST::Neo4p::get_neo4j_version = sub { 3 };
 ok(REST::Neo4p->connect($neo4j35_endpt));
 is $REST::Neo4p::AGENT_MODULE, 'LWP::UserAgent';
+*REST::Neo4p::get_neo4j_version = sub { 4 };
 warning_like { REST::Neo4p->connect($neo4j40_endpt) } qr/Neo4j::Driver/;
 is $REST::Neo4p::AGENT_MODULE, 'Neo4j::Driver';
 

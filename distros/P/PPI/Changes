@@ -1,5 +1,14 @@
 Revision history for Perl extension PPI
 
+1.271   2022-01-25 21:47:21Z
+	Summary:
+	- return correct name for lexical subroutines
+	- silence uninitialized warning in t/07_token.t
+	- bump minimum Test::More version to 0.96
+	- fix some typos in Pod
+	- moved repository to Perl-Critic GitHub org:
+		https://github.com/Perl-Critic/PPI
+
 1.270   2019-07-09 15:14:57Z
 	Summary:
 	- attempt to handle new blead binary/hexadecimal parsing behavior in tests
@@ -573,7 +582,7 @@ Revision history for Perl extension PPI
 	- Fixed parsing of @{$foo}-1
 	- Fixed parsing of <$fh1>, <$fh2>
 
-1.199_04 
+1.199_04
 	Summary:
 	- Build tweaks
 	- More regression changes

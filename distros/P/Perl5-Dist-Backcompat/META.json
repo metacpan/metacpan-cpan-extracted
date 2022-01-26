@@ -1,0 +1,54 @@
+{
+   "abstract" : "Will changes to dist/ build on older perls?",
+   "author" : [
+      "James E Keenan (jkeenan@cpan.org)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Perl5-Dist-Backcompat",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Tar" : "0",
+            "CPAN::DistnameInfo" : "0",
+            "Capture::Tiny" : "0",
+            "Carp" : "0",
+            "Cwd" : "0",
+            "Data::Dump" : "0",
+            "File::Copy" : "0",
+            "File::Copy::Recursive::Reduced" : "0",
+            "File::Find" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Getopt::Long" : "0",
+            "Test::Simple" : "0.44"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

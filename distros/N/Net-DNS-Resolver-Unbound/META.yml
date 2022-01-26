@@ -7,7 +7,6 @@ build_requires:
   File::Find: '1.05'
   File::Spec: '0.86'
   IO::File: '1.08'
-  Net::DNS: '1.18'
   Test::More: '0.47'
 configure_requires:
   ExtUtils::MakeMaker: '6.66'
@@ -25,6 +24,7 @@ no_index:
 requires:
   Carp: '1.1'
   DynaLoader: '1.04'
+  Net::DNS: '1.18'
   perl: '5.008009'
-version: '1.01'
+version: '1.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

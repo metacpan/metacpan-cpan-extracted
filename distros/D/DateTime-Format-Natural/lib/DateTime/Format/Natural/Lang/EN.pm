@@ -13,7 +13,7 @@ use constant skip  => true;
 
 use DateTime::Format::Natural::Helpers qw(%flag);
 
-our $VERSION = '1.69';
+our $VERSION = '1.70';
 
 our (%init,
      %timespan,
@@ -2316,7 +2316,10 @@ $regexes{format} = qr/^$regexes{format_}(?:(?=\s)|$)/;
          ],
          [ {} ],
          [ '_count_weekday' ],
-         { truncate_to => [q(day)] },
+         {
+           advance_future => true,
+           truncate_to    => [q(day)],
+         },
        ],
     ],
     count_yearday => [

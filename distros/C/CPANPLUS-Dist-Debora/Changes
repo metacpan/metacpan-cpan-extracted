@@ -1,5 +1,9 @@
 Revision history for CPANPLUS-Dist-Debora
 
+0.009  2022-01-25 16:50:34 CET
+
+  - Die with "OS unsupported" in Makefile.PL on Windows
+
 0.008  2022-01-07 19:56:53 CET
 
   - Handle architecture-dependent packages without shared objects

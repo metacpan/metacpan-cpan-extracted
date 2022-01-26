@@ -1,0 +1,6 @@
+Change history for Sodium-FFI
+
+0.001     2022-01-20
+    - Initial release
+    - Helper functions
+    - Randomness generation functions

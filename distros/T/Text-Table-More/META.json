@@ -4,7 +4,7 @@
       "perlancar <perlancar@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -27,10 +27,6 @@
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08"
-         },
-         "x_features_from" : {
-            "Module::Features::PerlTrove" : "0",
-            "Module::Features::TextTable" : "0"
          },
          "x_spec" : {
             "Module::Features" : "v0.1.7"
@@ -68,7 +64,7 @@
    "provides" : {
       "Text::Table::More" : {
          "file" : "lib/Text/Table/More.pm",
-         "version" : "0.020"
+         "version" : "0.021"
       }
    },
    "release_status" : "stable",
@@ -83,7 +79,7 @@
          "web" : "https://github.com/perlancar/perl-Text-Table-More"
       }
    },
-   "version" : "0.020",
+   "version" : "0.021",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -92,7 +88,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Module::Features",
             "name" : "Module::Features",
-            "version" : "0.004"
+            "version" : "0.005"
          },
          {
             "class" : "Dist::Zilla::Plugin::InsertExample",
@@ -123,52 +119,52 @@
                }
             },
             "name" : "@Author::PERLANCAR/@Filter/GatherDir",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::PruneCruft",
             "name" : "@Author::PERLANCAR/@Filter/PruneCruft",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
             "name" : "@Author::PERLANCAR/@Filter/ManifestSkip",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "@Author::PERLANCAR/@Filter/MetaYAML",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::License",
             "name" : "@Author::PERLANCAR/@Filter/License",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodCoverageTests",
             "name" : "@Author::PERLANCAR/@Filter/PodCoverageTests",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@Author::PERLANCAR/@Filter/PodSyntaxTests",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExtraTests",
             "name" : "@Author::PERLANCAR/@Filter/ExtraTests",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Author::PERLANCAR/@Filter/ExecDir",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
             "name" : "@Author::PERLANCAR/@Filter/ShareDir",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::MakeMaker",
@@ -178,27 +174,27 @@
                }
             },
             "name" : "@Author::PERLANCAR/@Filter/MakeMaker",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
             "name" : "@Author::PERLANCAR/@Filter/Manifest",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
             "name" : "@Author::PERLANCAR/@Filter/ConfirmRelease",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Author::PERLANCAR/ExecDir script",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.605"
+            "version" : "0.606"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -273,12 +269,12 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
             "name" : "@Author::PERLANCAR/MetaJSON",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@Author::PERLANCAR/MetaConfig",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
@@ -288,7 +284,7 @@
                      {
                         "class" : "Dist::Zilla::Plugin::FinderCode",
                         "name" : "@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-                        "version" : "6.017"
+                        "version" : "6.024"
                      }
                   ],
                   "include_underscores" : 0
@@ -490,7 +486,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PruneFiles",
             "name" : "@Author::PERLANCAR/PruneFiles",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::Pod2Readme",
@@ -604,7 +600,7 @@
                }
             },
             "name" : "Prereqs",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -615,7 +611,7 @@
                }
             },
             "name" : "RuntimeRecommends",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -626,7 +622,7 @@
                }
             },
             "name" : "TestRequires",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -637,62 +633,62 @@
                }
             },
             "name" : "DevelopX_spec",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":IncModules",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":TestFiles",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExtraTestFiles",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExecFiles",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":PerlExecFiles",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ShareFiles",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":MainModule",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":AllFiles",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
-            "version" : "6.017"
+            "version" : "6.024"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : "@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-            "version" : "6.017"
+            "version" : "6.024"
          }
       ],
       "zilla" : {
@@ -700,7 +696,7 @@
          "config" : {
             "is_trial" : 0
          },
-         "version" : "6.017"
+         "version" : "6.024"
       }
    },
    "x_authority" : "cpan:PERLANCAR",

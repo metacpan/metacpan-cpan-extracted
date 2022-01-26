@@ -4,7 +4,7 @@ use warnings;
 
 package Neo4j::Driver::StatementResult;
 # ABSTRACT: DEPRECATED (renamed to Neo4j::Driver::Result)
-$Neo4j::Driver::StatementResult::VERSION = '0.27';
+$Neo4j::Driver::StatementResult::VERSION = '0.28';
 
 1;
 
@@ -20,7 +20,7 @@ Neo4j::Driver::StatementResult - DEPRECATED (renamed to Neo4j::Driver::Result)
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2021 by Arne Johannessen.
+This software is Copyright (c) 2016-2022 by Arne Johannessen.
 
 This is free software, licensed under:
 

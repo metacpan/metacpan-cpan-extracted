@@ -1,0 +1,63 @@
+#!/usr/bin/env perl
+use v5.24;
+use warnings;
+use experimental 'signatures';
+no warnings 'experimental::signatures';
+use Path::Tiny 'path';
+use App::Easer 'run';
+
+my $application = {
+   factory       => {prefixes => {'^' => 'MuDu::Command::'}},
+   configuration => {
+      name      => 'mudu',
+      specfetch => '+SpecFromHashOrModule',
+   },
+   commands => {
+      MAIN => {
+         help        => 'to-do application',
+         description => 'A simple to-do application, spread on files',
+
+         sources        => '+SourcesWithFiles',
+         'config-files' => ["$ENV{HOME}/.tudu.conf", '/etc/tudu.conf'],
+         options     => [
+            {
+               help        => 'path to the configuration file',
+               getopt      => 'config|c=s',
+               environment => 1,
+            },
+            {
+               help        => 'base directory where tasks are kept',
+               getopt      => 'basedir|dir|d=s',
+               environment => 1,
+               default     => "$ENV{HOME}/.tudu",
+            },
+            {
+               help   => 'max number of attempts to find non-colliding id',
+               getopt => 'attempts|max-attempts|M=i',
+               default => 9,
+            },
+         ],
+         commit => \&ensure_basedir,
+
+         children => [qw<
+            ^List
+            ^Show
+            ^Cat
+            ^Add
+            ^Edit
+            ^Done
+            ^Wait
+            ^Resume
+            ^Remove
+         >],
+      }
+   }
+};
+exit run($application, [@ARGV]);
+
+sub ensure_basedir ($main, $spec, $args) {
+   my $path = path($main->{configs}[-1]{basedir});
+   $path->mkpath;
+   $path->child($_)->mkpath for qw< ongoing waiting done >;
+   return;
+} ## end sub ensure_basedir

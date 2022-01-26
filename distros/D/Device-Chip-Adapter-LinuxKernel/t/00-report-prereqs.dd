@@ -19,9 +19,11 @@ do { my $x = {
                       'requires' => {
                                       'Carp' => '0',
                                       'Device::Chip::Adapter' => '0',
-                                      'Device::SMBus' => '0',
+                                      'Fcntl' => '0',
+                                      'IO::File' => '0',
                                       'XSLoader' => '0',
                                       'base' => '0',
+                                      'constant' => '0',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }

@@ -2,7 +2,7 @@
 #
 # JEF_by_Unicode_CultiCoLtd.pl
 #
-# Copyright (c) 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 # JEF code book, Culti Co.,Ltd.
@@ -42,6 +42,42 @@ while (<DATA>) {
     $Unicode_by_JEF_CultiCoLtd{$jef}     = $unicode;
 }
 
+# fixed mapping
+# Jacode4e 2.13.6.18 or newer
+# Jacode4e::RoundTrip 2.13.81.12 or newer
+
+my %fix_mapping = (
+    '6F3C' => '',     # 漼 OLD:56F3
+    '81FD' => '',     # 臽 OLD:52E1
+    'FA45' => '55FB', # 海 OLD:53FA
+    'FA46' => 'BDED', # 渚 OLD:55FB
+    'FA47' => '56E6', # 漢 OLD:BDED
+    'FA48' => '58A7', # 煮 OLD:56E6
+    'FA49' => '',     # 爫 OLD:58A7
+    'FA4C' => '5CD3', # 社 OLD:5CB3
+    'FA4D' => '5CD5', # 祉 OLD:5CD3
+    'FA4E' => '5CD4', # 祈 OLD:5CD5
+    'FA4F' => '5CD6', # 祐 OLD:5CD4
+    'FA50' => '5CD7', # 祖 OLD:5CD6
+    'FA51' => '5CD9', # 祝 OLD:5CD7
+    'FA52' => '5CE2', # 禍 OLD:5CD9
+    'FA53' => '5CE3', # 禎 OLD:5CE2
+    'FA54' => '5CF4', # 穀 OLD:5CE3
+    'FA55' => '5DCD', # 突 OLD:5CF4
+    'FA58' => '',     # 縉 OLD:5FC8
+    'FA5A' => '5FF0', # 署 OLD:5EE3
+    'FA5B' => '60B5', # 者 OLD:5FF0
+    'FA5C' => '60E3', # 臭 OLD:60B5
+    'FA5D' => '',     # 艹 OLD:60E3
+    'FF5E' => '',     # ～ OLD:A1C1
+);
+
+for my $unicode (sort keys %fix_mapping) {
+    my $jef = $fix_mapping{$unicode};
+    $JEF_by_Unicode_CultiCoLtd{$unicode} = $jef;
+    $Unicode_by_JEF_CultiCoLtd{$jef}     = $unicode;
+}
+
 sub JEF_by_Unicode_CultiCoLtd {
     my($unicode) = @_;
     return $JEF_by_Unicode_CultiCoLtd{$unicode};
@@ -57,7 +93,7 @@ sub values_of_JEF_by_Unicode_CultiCoLtd {
 
 1;
 
-# Unicode	JIS	SJIS	��_	JEF
+# Unicode	JIS	SJIS	区点	JEF
 __DATA__
 4E02				41A1
 E131				41A2

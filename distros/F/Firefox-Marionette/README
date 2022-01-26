@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 1.17
+    Version 1.20
 
 SYNOPSIS
 
@@ -18,7 +18,7 @@ SYNOPSIS
     
         say $firefox->html();
     
-        $firefox->find_class('container-fluid')->find_id('search-input')->type('Test::More');
+        $firefox->find_class('container-fluid')->find_id('metacpan_search-input')->type('Test::More');
     
         say "Height of search box is " . $firefox->find_class('container-fluid')->css('height');
     
@@ -254,7 +254,7 @@ SUBROUTINES/METHODS
     
         my $firefox = Firefox::Marionette->new(sleep_time_in_ms => 5)->go('https://metacpan.org/');
     
-        $firefox->find_id('search-input')->type('Test::More');
+        $firefox->find_id('metacpan_search-input')->type('Test::More');
     
         $firefox->find_name('lucky')->click();
     
@@ -293,7 +293,7 @@ SUBROUTINES/METHODS
     
         my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
     
-        $firefox->find_id('search-input')->type('Test::More');
+        $firefox->find_id('metacpan_search-input')->type('Test::More');
     
         $firefox->find_name('lucky')->click();
     
@@ -369,14 +369,16 @@ SUBROUTINES/METHODS
     This can be used to switch to this window at a later point. This
     corresponds to a window that may itself contain tabs. This method is
     replaced by window_handle and appropriate context calls for Firefox 94
-    and after.
+    and after
+    <https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Releases/94#webdriver_conformance_marionette>.
 
  chrome_window_handles
 
     returns identifiers for each open chrome window for tests interested in
     managing a set of chrome windows and tabs separately. This method is
     replaced by window_handles and appropriate context calls for Firefox 94
-    and after.
+    and after
+    <https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Releases/94#webdriver_conformance_marionette>.
 
  clear
 
@@ -474,7 +476,7 @@ SUBROUTINES/METHODS
         use v5.10;
     
         my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
-        say $firefox->find_id('search-input')->css('height');
+        say $firefox->find_id('metacpan_search-input')->css('height');
 
  current_chrome_window_handle
 
@@ -615,7 +617,7 @@ SUBROUTINES/METHODS
     
         my $firefox = Firefox::Marionette->new( host => '10.1.2.3' )->go('https://metacpan.org/');
     
-        $firefox->find_class('container-fluid')->find_id('search-input')->type('Test::More');
+        $firefox->find_class('container-fluid')->find_id('metacpan_search-input')->type('Test::More');
     
         $firefox->find('//button[@name="lucky"]')->click();
     
@@ -640,7 +642,7 @@ SUBROUTINES/METHODS
     
         my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
     
-        $firefox->find_class('container-fluid')->find_id('search-input')->type('Test::More');
+        $firefox->find_class('container-fluid')->find_id('metacpan_search-input')->type('Test::More');
     
         $firefox->find('//button[@name="lucky"]')->click();
     
@@ -664,7 +666,7 @@ SUBROUTINES/METHODS
     
         my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
     
-        $firefox->find_class('container-fluid')->find_id('search-input')->type('Test::More');
+        $firefox->find_class('container-fluid')->find_id('metacpan_search-input')->type('Test::More');
     
         $firefox->find('//button[@name="lucky"]')->click();
     
@@ -728,11 +730,11 @@ SUBROUTINES/METHODS
     
         my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
     
-        $firefox->find('//input[@id="search-input"]')->type('Test::More');
+        $firefox->find('//input[@id="metacpan_search-input"]')->type('Test::More');
     
         # OR in list context 
     
-        foreach my $element ($firefox->find('//input[@id="search-input"]')) {
+        foreach my $element ($firefox->find('//input[@id="metacpan_search-input"]')) {
             $element->type('Test::More');
         }
 
@@ -754,11 +756,11 @@ SUBROUTINES/METHODS
     
         my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
     
-        $firefox->find_id('search-input')->type('Test::More');
+        $firefox->find_id('metacpan_search-input')->type('Test::More');
     
         # OR in list context 
     
-        foreach my $element ($firefox->find_id('search-input')) {
+        foreach my $element ($firefox->find_id('metacpan_search-input')) {
             $element->type('Test::More');
         }
 
@@ -801,11 +803,11 @@ SUBROUTINES/METHODS
         use Firefox::Marionette();
     
         my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
-        $firefox->find_class('form-control home-search-input')->type('Test::More');
+        $firefox->find_class('form-control home-metacpan_search-input')->type('Test::More');
     
         # OR in list context 
     
-        foreach my $element ($firefox->find_class('form-control home-search-input')) {
+        foreach my $element ($firefox->find_class('form-control home-metacpan_search-input')) {
             $element->type('Test::More');
         }
 
@@ -826,11 +828,11 @@ SUBROUTINES/METHODS
         use Firefox::Marionette();
     
         my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
-        $firefox->find_selector('input.home-search-input')->type('Test::More');
+        $firefox->find_selector('input.home-metacpan_search-input')->type('Test::More');
     
         # OR in list context 
     
-        foreach my $element ($firefox->find_selector('input.home-search-input')) {
+        foreach my $element ($firefox->find_selector('input.home-metacpan_search-input')) {
             $element->type('Test::More');
         }
 
@@ -964,7 +966,7 @@ SUBROUTINES/METHODS
     
         $firefox->go("http://metacpan.org/");
     
-        $firefox->find('//input[@id="search-input"]')->type('Test::More');
+        $firefox->find('//input[@id="metacpan_search-input"]')->type('Test::More');
         $firefox->find_name('lucky')->click();
     
         my $har = Archive::Har->new();
@@ -987,7 +989,7 @@ SUBROUTINES/METHODS
     
         my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
     
-        if (my $element = $firefox->has('//input[@id="search-input"]')) {
+        if (my $element = $firefox->has('//input[@id="metacpan_search-input"]')) {
             $element->type('Test::More');
         }
 
@@ -1008,7 +1010,7 @@ SUBROUTINES/METHODS
     
         my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
     
-        if (my $element = $firefox->has_id('search-input')) {
+        if (my $element = $firefox->has_id('metacpan_search-input')) {
             $element->type('Test::More');
         }
 
@@ -1047,7 +1049,7 @@ SUBROUTINES/METHODS
         use Firefox::Marionette();
     
         my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
-        if (my $element = $firefox->has_class('form-control home-search-input')) {
+        if (my $element = $firefox->has_class('form-control home-metacpan_search-input')) {
             $element->type('Test::More');
         }
 
@@ -1068,7 +1070,7 @@ SUBROUTINES/METHODS
         use Firefox::Marionette();
     
         my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
-        if (my $element = $firefox->has_selector('input.home-search-input')) {
+        if (my $element = $firefox->has_selector('input.home-metacpan_search-input')) {
             $element->type('Test::More');
         }
 
@@ -1314,6 +1316,51 @@ SUBROUTINES/METHODS
         $firefox->find('//button[@name="lucky"]')->click();
         while(!$firefox->loaded()) {
             # redirecting to Test::More page
+        }
+
+ logins_from_csv
+
+    accepts a filehandle as a parameter and then reads the filehandle for
+    exported logins as CSV. This is known to work with the following
+    formats;
+
+      * Bitwarden CSV
+      <https://bitwarden.com/help/article/condition-bitwarden-import/>
+
+      * LastPass CSV
+      <https://support.logmeininc.com/lastpass/help/how-do-i-nbsp-export-stored-data-from-lastpass-using-a-generic-csv-file>
+
+      * KeePass CSV <https://keepass.info/help/base/importexport.html#csv>
+
+    returns a list of Firefox::Marionette::Login objects.
+
+        use Firefox::Marionette();
+        use FileHandle();
+    
+        my $handle = FileHandle->new('/path/to/last_pass.csv');
+        my $firefox = Firefox::Marionette->new();
+        foreach my $login (Firefox::Marionette->logins_from_csv($handle)) {
+            $firefox->add_login($login);
+        }
+
+ logins_from_zip
+
+    accepts a filehandle as a parameter and then reads the filehandle for
+    exported logins as a zip file. This is known to work with the following
+    formats;
+
+      * 1Password Unencrypted Export format
+      <https://support.1password.com/1pux-format/>
+
+    returns a list of Firefox::Marionette::Login objects.
+
+        use Firefox::Marionette();
+        use FileHandle();
+    
+        my $handle = FileHandle->new('/path/to/1Passwordv8.1pux');
+        my $firefox = Firefox::Marionette->new();
+        foreach my $login (Firefox::Marionette->logins_from_zip($handle)) {
+            $firefox->add_login($login);
         }
 
  links
@@ -1643,6 +1690,11 @@ SUBROUTINES/METHODS
       keys; 'height' and 'width'. Both keys are in cm and default to US
       letter size. See the 'size' key.
 
+      * page_ranges - A list of the pages to print. Available for Firefox
+      96
+      <https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Releases/96#webdriver_conformance_marionette>
+      and after.
+
       * print_background - Print background graphics. Boolean value.
       Defaults to false.
 
@@ -1907,17 +1959,23 @@ SUBROUTINES/METHODS
       * timeout - A timeout to override the default script timeout, which,
       by default is 30 seconds.
 
-    Returns the result of the javascript function.
+    Returns the result of the javascript function. When a parameter is an
+    element (such as being returned from a find type operation), the script
+    method will automatically translate that into a javascript object.
+    Likewise, when the result being returned in a script method is an
+    element <https://dom.spec.whatwg.org/#concept-element> it will be
+    automatically translated into a perl object.
 
         use Firefox::Marionette();
+        use v5.10;
     
         my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
     
-        if ($firefox->script('return window.find("lucky");')) {
-            # luckily!
+        if (my $element = $firefox->script('return document.getElementsByName("lucky")[0];')) {
+            say "Lucky find is a " . $element->tag_name() . " element";
         }
     
-        my $search_input = $firefox->find_by_id('search-input');
+        my $search_input = $firefox->find_id('metacpan_search-input');
     
         $firefox->script('arguments[0].style.backgroundColor = "red"', args => [ $search_input ]); # turn the search input box red
 
@@ -1959,6 +2017,47 @@ SUBROUTINES/METHODS
 
     sends keys to the input field of a currently displayed modal message
     box
+
+ shadow_root
+
+    accepts an element as a parameter and returns it's ShadowRoot
+    <https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot> as a
+    shadow root object or throws an exception.
+
+        use Firefox::Marionette();
+        use Cwd();
+    
+        my $firefox = Firefox::Marionette->new()->go('file://' . Cwd::cwd() . '/t/data/elements.html');
+    
+        $firefox->find_class('add')->click();
+        my $custom_square = $firefox->find_tag('custom-square');
+        my $shadow_root = $firefox->shadow_root($custom_square);
+    
+        foreach my $element (@{$firefox->script('return arguments[0].children', args => [ $shadow_root ])}) {
+            warn $element->tag_name();
+        }
+
+ shadowy
+
+    accepts an element as a parameter and returns true if the element has a
+    ShadowRoot
+    <https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot> or false
+    otherwise.
+
+        use Firefox::Marionette();
+        use Cwd();
+    
+        my $firefox = Firefox::Marionette->new()->go('file://' . Cwd::cwd() . '/t/data/elements.html');
+        $firefox->find_class('add')->click();
+        my $custom_square = $firefox->find_tag('custom-square');
+        if ($firefox->shadowy($custom_square)) {
+            my $shadow_root = $firefox->find_tag('custom-square')->shadow_root();
+            warn $firefox->script('return arguments[0].innerHTML', args => [ $shadow_root ]);
+            ...
+        }
+
+    This function will probably be used to see if the shadow_root method
+    can be called on this element without raising an exception.
 
  sleep_time_in_ms
 

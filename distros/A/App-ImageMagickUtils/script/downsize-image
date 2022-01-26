@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/ImageMagickUtils/downsize_image
-# and generated automatically using Perinci::CmdLine::Gen version 0.500
+# and generated automatically using Perinci::CmdLine::Gen version 0.501
 
 use 5.010001;
 use strict;
@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-12'; # DATE
+our $DATE = '2022-01-16'; # DATE
 our $DIST = 'App-ImageMagickUtils'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/ImageMagickUtils/downsize_image",
@@ -39,7 +39,7 @@ downsize-image - Reduce image size, by default via compressing to JPEG quality 4
 
 =head1 VERSION
 
-This document describes version 0.008 of downsize-image (from Perl distribution App-ImageMagickUtils), released on 2021-10-12.
+This document describes version 0.009 of downsize-image (from Perl distribution App-ImageMagickUtils), released on 2022-01-16.
 
 =head1 SYNOPSIS
 
@@ -276,7 +276,7 @@ For fish and zsh, install L<shcompgen> as described above.
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/downsize-image.conf>, F<~/downsize-image.conf>, or F</etc/downsize-image.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/downsize-image.conf>, F</home/u1/downsize-image.conf>, or F</etc/downsize-image.conf>.
 
 All found files will be read and merged.
 
@@ -321,9 +321,9 @@ Specify additional command-line options.
 
 =head1 FILES
 
-F<~/.config/downsize-image.conf>
+F</home/u1/.config/downsize-image.conf>
 
-F<~/downsize-image.conf>
+F</home/u1/downsize-image.conf>
 
 F</etc/downsize-image.conf>
 
@@ -368,7 +368,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

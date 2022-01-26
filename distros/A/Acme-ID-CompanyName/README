@@ -3,7 +3,7 @@ NAME
     company names
 
 VERSION
-    This document describes version 0.006 of Acme::ID::CompanyName (from
+    This document describes version 0.007 of Acme::ID::CompanyName (from
     Perl distribution Acme-ID-CompanyName), released on 2021-05-07.
 
 DESCRIPTION
@@ -24,11 +24,11 @@ FUNCTIONS
         Result:
 
          [
-           "PT Krida Akur Tren",
-           "PT Industri Sentral Baru",
-           "PT Vita Humania Cipta",
-           "PT Cakrawalatama Central Hasil",
-           "PT Utara Ekasentralindo Cakra",
+           "PT Hulu Humania Harmoni",
+           "PT Jaya Cipta Indoakurasi",
+           "PT Baru Berjaya Legenda",
+           "PT Normal Zona Gempita",
+           "PT Multi Gelora Baswara",
          ]
 
     *   Generate three PT names with desired initials "ACME":
@@ -38,9 +38,9 @@ FUNCTIONS
         Result:
 
          [
-           "PT Angkasatama Cipta Milenial Eka",
-           "PT Agung Chandra Milenia Eka",
-           "PT Amantama Cipta Milenial Elektronik",
+           "PT Aksara Catur Mekar Elektronik",
+           "PT Anugerah Cendrawasih Mandala Esa",
+           "PT Asaindo Cakra Mandala Elang",
          ]
 
     This function is not exported by default, but exportable.

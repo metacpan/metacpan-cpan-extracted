@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010;
+use 5.012;
 
 use ExtUtils::MakeMaker;
 
@@ -14,13 +14,13 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Unknown-Values",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010",
+  "MIN_PERL_VERSION" => "5.012",
   "NAME" => "Unknown::Values",
   "PREREQ_PM" => {},
   "TEST_REQUIRES" => {
     "Test::Most" => 0
   },
-  "VERSION" => "0.101",
+  "VERSION" => "0.102",
   "test" => {
     "TESTS" => "t/*.t"
   }

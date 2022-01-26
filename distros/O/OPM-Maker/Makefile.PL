@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
     "File::Basename" => 0,
     "File::Find::Rule" => 0,
     "Getopt::Long" => 0,
+    "HTTP::Tiny" => 0,
     "MIME::Base64" => 0,
     "OPM::Validate" => "1.10",
     "Path::Class" => 0,
@@ -41,7 +42,7 @@ my %WriteMakefileArgs = (
     "Test::LongString" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.15",
+  "VERSION" => "1.16",
   "test" => {
     "TESTS" => "t/*.t t/build/*.t t/build_find_sopm/*.t t/dbtest/*.t t/dependencies/*.t t/dependencies_find_sopm/*.t t/filetest/*.t t/filetest_find_sopm/*.t t/filetest_ignore/*.t t/index/*.t t/sopmtest/*.t t/sopmtest_find_sopm/*.t"
   }
@@ -58,6 +59,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "File::Spec::Functions" => 0,
   "Getopt::Long" => 0,
+  "HTTP::Tiny" => 0,
   "MIME::Base64" => 0,
   "OPM::Validate" => "1.10",
   "Path::Class" => 0,

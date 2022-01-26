@@ -1,7 +1,8 @@
 #
 #
 TYPEMAP
-const EVP_MD*		T_PTRREF
+Net::DNS::Resolver::Unbound::Context	T_PTROBJ
+Net::DNS::Resolver::Unbound::Handle	T_PTROBJ
 struct ub_ctx*		T_PTRREF
 struct ub_result*	T_PTRREF
 #

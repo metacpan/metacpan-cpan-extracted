@@ -1,4 +1,10 @@
+2022-01-23  Ralph Schleicher  <rs@ralph-schleicher.de>
+
+	* NEWS: Record user-visible changes.
+
 2011-04-19  Ralph Schleicher  <rs@ralph-schleicher.de>
+
+	* Version 1.01.
 
 	* MANIFEST: Update file.
 	* MANIFEST.SKIP: Likewise.

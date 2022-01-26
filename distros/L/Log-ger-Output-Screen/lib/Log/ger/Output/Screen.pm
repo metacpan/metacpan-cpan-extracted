@@ -1,12 +1,12 @@
 package Log::ger::Output::Screen;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-03-25'; # DATE
-our $DIST = 'Log-ger-Output-Screen'; # DIST
-our $VERSION = '0.017'; # VERSION
-
 use strict;
 use warnings;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-01-16'; # DATE
+our $DIST = 'Log-ger-Output-Screen'; # DIST
+our $VERSION = '0.018'; # VERSION
 
 if ($^O eq 'MSWin32') {
     eval { require Win32::Console::ANSI };
@@ -87,7 +87,7 @@ sub get_hooks {
         } elsif (defined $ENV{COLOR}) {
             $ENV{COLOR};
         } else {
-            $stderr ? (-t STDERR) : (-t STDOUT);
+            $stderr ? (-t STDERR) : (-t STDOUT); ## no critic: InputOutput::ProhibitInteractiveTest
         }
     };
     my $color_depth = do {
@@ -107,6 +107,11 @@ sub get_hooks {
     };
     my $formatter = $plugin_conf{formatter};
 
+    if ($plugin_conf{colorize_tags}) {
+        require Color::ANSI::Util;
+        require Color::RGB::Util;
+    }
+
     return {
         create_outputter => [
             __PACKAGE__, # key
@@ -121,7 +126,31 @@ sub get_hooks {
                     }
                     hook_before_log({ _fh=>$handle }, $msg);
                     if ($use_color) {
-                        print $handle _pick_color($level, $color_depth), $msg, "\e[0m";
+                        my $line_color = _pick_color($level, $color_depth);
+
+                        if ($plugin_conf{colorize_tags}) {
+
+                            my $prog_prefix;
+                            if ($msg =~ s/\A([\w-]+:?\s*)//) {
+                                $prog_prefix = $1;
+                            }
+                            my (@tags, @seps);
+                            while ($msg =~ s/\A\[([^\]]+)\](\s*)//g) {
+                                push @tags, $1;
+                                push @seps, $2;
+                            }
+                            #use DD; dd {msg=>$msg, tags=>\@tags, prog_prefix=>$prog_prefix};
+                            print $handle $line_color, $prog_prefix, "\e[0m" if defined $prog_prefix;
+                            for my $i (0 .. $#tags) {
+                                print $handle $line_color, "[", "\e[0m";
+                                # XXX force ansifg() to use the same color depth as us
+                                print $handle Color::ANSI::Util::ansifg( Color::RGB::Util::assign_rgb_light_color($tags[$i]) ), $tags[$i], "\e[0m", $line_color, "[", $seps[$i];
+                            }
+                            print $handle $line_color, $msg, "\e[0m";
+
+                        } else {
+                            print $handle $line_color, $msg, "\e[0m";
+                        }
                     } else {
                         print $handle $msg;
                     }
@@ -147,7 +176,7 @@ Log::ger::Output::Screen - Output log to screen
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 
@@ -155,6 +184,7 @@ version 0.017
      # stderr      => 1,    # set to 0 to print to stdout instead of stderr
      # use_color   => 0,    # set to 1/0 to force usage of color, default is from NO_COLOR/COLOR or (-t STDOUT)
      # color_depth => 16,   # if unset will guess from heuristic
+     # colorize_tags => 0,  # if set to true, will colorize "[...]" prefix in log message to unique colors
      # formatter   => sub { ... },
  );
  use Log::ger;
@@ -162,6 +192,11 @@ version 0.017
  log_warn "blah...";
 
 =head1 DESCRIPTION
+
+This L<Log::ger> plugin outputs log messages as lines to screen (STDERR by
+default), coloring them according to the log messages' levels. There are
+different color schemes available, see C<Log::ger::Screen::ColorScheme::*>
+modules like L<Log::ger::Screen::ColorScheme::Unlike>.
 
 =for Pod::Coverage ^(.+)$
 
@@ -185,6 +220,20 @@ the value of C<truecolor>; if yes then use 16777216. Otherwise, check if TERM
 environment variable contains the string C<256color>; if yes then 256. Otherwise
 16.
 
+=head2 colorize_tags
+
+Bool, default false. Experimental. If set to true, will colorize "[...]" tag
+prefixes in log message with unique RGB color. Will only do this if color is
+enabled, obviously.
+
+For example, if log message is something like one of the following:
+
+ [pericmd][plugin Foo::Bar] skip foobar-ing the program because of qux
+ my-prog: [pericmd] [plugin Foo::Bar] skip foobar-ing the program because of qux
+
+Then the C<< [pericmd] >> and C<< [plugin Foo::Bar] >> will be given a unique
+RGB color each.
+
 =head2 formatter
 
 Coderef. When defined, will pass the formatted message (but being applied with
@@ -205,9 +254,13 @@ set. Consulted before L</COLOR>.
 
 Can be set to disable/enable color by default, if C</use_color> is not set.
 
+=head1 HISTORY
+
+Originally modelled after L<Log::Any::Adapter::Screen>.
+
 =head1 SEE ALSO
 
-Modelled after L<Log::Any::Adapter::Screen>.
+L<Log::ger>
 
 =head1 AUTHOR
 
@@ -215,7 +268,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2021, 2020, 2018, 2017 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

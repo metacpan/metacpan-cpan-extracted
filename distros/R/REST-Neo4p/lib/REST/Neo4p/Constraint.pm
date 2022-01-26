@@ -31,7 +31,7 @@ my $regex_to_json = sub {
 };
 
 BEGIN {
-  $REST::Neo4p::Constraint::VERSION = '0.4001';
+  $REST::Neo4p::Constraint::VERSION = '0.4003';
 }
 
 # valid constraint types
@@ -495,7 +495,7 @@ L<REST::Neo4p::Constraint::RelationshipType>. L<REST::Neo4p::Node>, L<REST::Neo4
 
 =head1 LICENSE
 
-Copyright (c) 2012-2021 Mark A. Jensen. This program is free software; you
+Copyright (c) 2012-2022 Mark A. Jensen. This program is free software; you
 can redistribute it and/or modify it under the same terms as Perl
 itself.
 

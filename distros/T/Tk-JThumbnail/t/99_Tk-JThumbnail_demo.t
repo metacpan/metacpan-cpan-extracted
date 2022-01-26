@@ -51,7 +51,7 @@ sub sam {
 				-width => 150,
 				-scrollbars => 'osoe',
 				-highlightthickness => 1,
-				-focus => 2,
+				-takefocus => 1,
 				-nodirs => 1,
 		)->pack(-side => 'top', -expand => 1, -fill => 'both');
 

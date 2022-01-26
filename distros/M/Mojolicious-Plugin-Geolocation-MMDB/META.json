@@ -23,6 +23,7 @@
          "requires" : {
             "Dist::Zilla" : "0",
             "Dist::Zilla::Plugin::CopyFilesFromBuild" : "0",
+            "Dist::Zilla::Plugin::MakeMaker::Awesome" : "0.26",
             "Dist::Zilla::Plugin::MetaProvides::Package" : "0",
             "Dist::Zilla::Plugin::Test::Kwalitee" : "0",
             "Pod::Coverage::TrustPod" : "0",
@@ -51,7 +52,7 @@
    "provides" : {
       "Mojolicious::Plugin::Geolocation::MMDB" : {
          "file" : "lib/Mojolicious/Plugin/Geolocation/MMDB.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -66,7 +67,7 @@
          "web" : "https://gitlab.com/voegelas/mojolicious-plugin-geolocation-mmdb/-/tree/main"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_generated_by_perl" : "v5.34.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

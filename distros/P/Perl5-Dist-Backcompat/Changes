@@ -1,0 +1,20 @@
+Revision history for Perl module Perl5::Dist::Backcompat
+
+0.01 Wed Jan 12 21:00:51 2022
+    - original version; created by ExtUtils::ModuleMaker 0.63
+
+0.02 Fri Jan 21 22:14:01 UTC 2022
+    - first CPAN release lacked README
+
+0.03 Fri Jan 21 22:32:36 UTC 2022
+    - as did the second
+
+0.04 Sat Jan 22 00:39:13 UTC 2022
+    - Makefile.PL lacked EXE_FILES kvp, so program did not get installed
+
+0.05 Sat Jan 22 13:08:24 UTC 2022
+    - Correct shebang line in front-end program so that, after installation,
+      it gets rewritten properly.  (Investigation only; not released to CPAN.)
+
+0.06 Sat Jan 22 13:38:18 UTC 2022
+    - Add --help option to p5-dist-backcompat

@@ -1,13 +1,14 @@
 package App::GitUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-19'; # DATE
+our $DATE = '2021-07-14'; # DATE
 our $DIST = 'App-GitUtils'; # DIST
-our $VERSION = '0.080'; # VERSION
+our $VERSION = '0.081'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 use Cwd qw(getcwd abs_path);
 use File::chdir;
@@ -71,7 +72,8 @@ sub _search_git_dir {
 
     my $res;
     while (1) {
-        do { $res = "$cwd/.git"; last } if -d ".git";
+        log_trace "Checking for .git/ in $cwd ..." if $ENV{GITUTILS_TRACE};
+        do { $res = "$cwd/.git"; last } if -d "$cwd/.git";
         chdir ".." or goto EXIT;
         $cwd =~ s!(.+)/.+!$1! or last;
     }
@@ -260,7 +262,7 @@ App::GitUtils - Day-to-day command-line utilities for git
 
 =head1 VERSION
 
-This document describes version 0.080 of App::GitUtils (from Perl distribution App-GitUtils), released on 2020-05-19.
+This document describes version 0.081 of App::GitUtils (from Perl distribution App-GitUtils), released on 2021-07-14.
 
 =head1 SYNOPSIS
 
@@ -275,6 +277,12 @@ This distribution provides the following command-line utilities:
 These utilities provide some shortcuts and tab completion to make it more
 convenient when working with git con the command-line.
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <sharyanto@cpan.org>
+
 =head1 FUNCTIONS
 
 
@@ -282,7 +290,7 @@ convenient when working with git con the command-line.
 
 Usage:
 
- clone_to_bare(%args) -> [status, msg, payload, meta]
+ clone_to_bare(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Clone repository to a bare repository.
 
@@ -310,12 +318,12 @@ If not specified, defaults to C<$repodir.bare/>.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -325,7 +333,7 @@ Return value:  (any)
 
 Usage:
 
- info(%args) -> [status, msg, payload, meta]
+ info(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Return information about git repository.
 
@@ -347,12 +355,12 @@ will search C<.git> upwards.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -362,7 +370,7 @@ Return value:  (any)
 
 Usage:
 
- list_hooks(%args) -> [status, msg, payload, meta]
+ list_hooks(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List available hooks for the repository.
 
@@ -384,12 +392,12 @@ will search C<.git> upwards.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -399,7 +407,7 @@ Return value:  (any)
 
 Usage:
 
- post_commit(%args) -> [status, msg, payload, meta]
+ post_commit(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Run post-commit hook.
 
@@ -427,12 +435,12 @@ will search C<.git> upwards.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -442,7 +450,7 @@ Return value:  (any)
 
 Usage:
 
- pre_commit(%args) -> [status, msg, payload, meta]
+ pre_commit(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Run pre-commit hook.
 
@@ -470,12 +478,12 @@ will search C<.git> upwards.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -485,7 +493,7 @@ Return value:  (any)
 
 Usage:
 
- run_hook(%args) -> [status, msg, payload, meta]
+ run_hook(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Run a hook.
 
@@ -517,14 +525,21 @@ Hook name, e.g. post-commit.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
+
+=head1 ENVIRONMENT
+
+=head2 GITUTILS_TRACE
+
+Boolean. If set to true, will produce additional log statements using
+L<Log::ger> at the trace level.
 
 =head1 HOMEPAGE
 
@@ -548,7 +563,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2018, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2021 Aspose.Cells Cloud
+Copyright (c) 2022 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -37,7 +37,7 @@ use utf8;
 use Log::Any qw($log);
 use Carp;
 
-use constant VERSION => '21.12';
+use constant VERSION => '22.1';
 
 =head1 Name
 
@@ -57,7 +57,7 @@ default: 180
 
 String. custom UserAgent header
 
-default: Swagger-Codegen/21.12/perl
+default: Swagger-Codegen/22.1/perl
 
 =item api_key: (optional)
 
@@ -116,7 +116,7 @@ sub new {
 
 	# class/static variables
 	$p{http_timeout} //= 180;
-	$p{http_user_agent} //= 'Swagger-Codegen/21.12/perl';
+	$p{http_user_agent} //= 'Swagger-Codegen/22.1/perl';
 
 	# authentication setting
 	$p{api_key} //= {};

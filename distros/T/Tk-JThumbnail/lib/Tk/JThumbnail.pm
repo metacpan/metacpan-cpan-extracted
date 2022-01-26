@@ -10,7 +10,7 @@ use Tk::widgets qw/ JPEG LabEntry Pane PNG Balloon /;
 use base qw/ Tk::Derived Tk::Pane /;
 use vars qw/ $VERSION $err $info $CORNER $haveAnimation/;
 
-$VERSION = '2.3';
+$VERSION = '2.4';
 $haveAnimation = 0;
 eval 'use Tk::widgets qw/ Animation /; $haveAnimation = 1; 1';
 
@@ -31,7 +31,7 @@ sub ClassInit {
 	$mw->MouseWheelBind($class); # XXX Both needed?
 	$mw->YMouseWheelBind($class);
 	$mw->bind($class,'<FocusIn>','focus');
-	$mw->bind($class,'<FocusOut>', sub { my $self = shift; $self->{'isfocused'} = 0; });
+	$mw->bind($class,'<FocusOut>', 'unfocus');
 	my $bits = pack("b15"x15,     #OPTIONAL IMAGE TO DISPLAY IN CORNER BETWEEN SCROLLBARS:
 			"...............",
 			".#############.",
@@ -58,13 +58,15 @@ sub Populate {
 
 	my( $self, $args ) = @_;
 
-	my $takefocus = delete($args->{'-takefocus'});
+	$self->toplevel->bind('<<setPalette>>' => [$self => 'fixPalette']);
 	#Tk::Scrolled *EATS* THIS, AND DEFAULTS TO "osow"!:  $args->{'-scrollbars'} = 'osoe'  unless (defined $args->{'-scrollbars'});
 	#NOTE:  Tk::Scrolled ALSO EATS (AND HANDLES FOR US): -width, -height, and -highlightthickness, -takefocus, AND POSSIBLY OTHERS!
 	#SO THAT THOSE ARGS DO *NOT* APPEAR IN THE $args HASH HERE!:
-	$args->{'-takefocus'} = 0;  #BUT STILL NEED THIS!
-	
+	$self->{'-showcursoralways'} = delete($args->{'-showcursoralways'})  if (defined $args->{'-showcursoralways'});
+
+	$self->{'-activebackground'} = delete($args->{'-activebackground'})  if (defined $args->{'-activebackground'});
 	$self->SUPER::Populate( $args );
+	$args->{'-activebackground'} = $self->{'-activebackground'}  if (defined $self->{'-activebackground'});
 
 	$self->Delegates(
 			'activate' => $self,
@@ -88,6 +90,10 @@ sub Populate {
 	$self->ConfigSpecs(
 			-background => [ [ 'DESCENDANTS', 'SELF' ], 'background', 'Background',   undef ],
 			-selectbackground  => [qw/PASSIVE selectBackground Background/,  $Tk::SELECT_BG ],
+		-selectforeground  => [qw/PASSIVE selectForeground Background/,  $Tk::SELECT_FG ],
+#ERRORS OUT ON STARTUP?!		-foreground  => [qw/PASSIVE foreground Foreground/,  $Tk::NORMAL_FG ],
+		-disabledforeground => [qw/PASSIVE disabledForeground disabledForeground/, $Tk::DISABLED_FG],
+		-activeforeground => [ 'PASSIVE', 'activeForeground', 'activeForeground', $Tk::ACTIVE_FG ],
 			-blank      => [ 'PASSIVE',           'blank',        'Blank',             0 ],
 			-columns    => [ 'PASSIVE',           'columns',      'Columns',       undef ],
 			-command    => [ 'CALLBACK',          'command',      'Command',   \&button1 ],
@@ -98,7 +104,9 @@ sub Populate {
 			-ilabels    => [ 'PASSIVE',           'labels',       'labels',            1 ],
 			-iballoons  => [ 'PASSIVE',           'balloons',     'Balloons',          0 ],
 			-iborder    => [ 'PASSIVE',           'border',       'Border',            2 ],
+			-highlightthickness =>  [ [ 'DESCENDANTS', 'SELF' ],  'highlightthickness', 'HighlightThickness', 2 ],
 			-ihighlightthickness => [ 'PASSIVE',  'highlightthickness', 'HighlightThickness', 2 ],
+			-ihighlightcolor => [ 'PASSIVE',  'highlightcolor', 'HighlightColor', undef ],
 			-irelief    => [ 'PASSIVE',           'irelief',      'IRelief',      'flat' ],
 			-iactiverelief => [ 'PASSIVE',        'activerelief', 'ActiveRelief','ridge' ],
 			-iwidth     => [ 'PASSIVE',           'width',        'IWidth',           32 ],
@@ -107,9 +115,10 @@ sub Populate {
 			-font       => [ 'PASSIVE',           'font',         'Font',          undef ],
 			-nodirs     => [ 'PASSIVE',           'nodirs',       'NoDirs',            0 ],
 			-noexpand   => [ 'PASSIVE',           'noexpand',     'NoExpand',          0 ],
-			-takefocus  => [ 'PASSIVE',           'takeFocus',    'Focus',         undef ], #MUST HAVE!
-			-focus      => [ 'PASSIVE',           'takeFocus',    'Focus',         undef ],
-			-state      => [qw/PASSIVE state   State normal/],
+			-takefocus  => [ 'METHOD',            'takeFocus',    'Focus',             ''], #MUST HAVE!
+			-palette    => [ 'PASSIVE',           'palette',      'palette',       undef ],
+			-state      => [qw/METHOD state   State normal/],
+			-showcursoralways  => [qw/PASSIVE    showcursoralways showcursoralways 0/],
 	);
 	$self->bind('<4>', sub { $self->yview(scroll => -5, 'units')});
 	$self->bind('<5>', sub { $self->yview(scroll => 5, 'units')});
@@ -123,7 +132,79 @@ sub Populate {
 		}
 	);
 
+	$self->{'isfocused'} = 0;
+	$self->{'_ourtakefocus'} = undef;
+
 } # end Populate
+
+sub fixPalette {     #WITH OUR setPalette, WE CAN CATCH PALETTE CHANGES AND ADJUST EVERYTHING ACCORDINGLY!:
+	my $w = shift;   #WE STILL PROVIDE THIS AS A USER-CALLABLE METHOD FOR THOSE WHO ARE NOT.
+	my $Palette = $w->Palette;
+	$w->configure('-palette' => $Palette->{'background'});
+
+#	$w->configure('-background' => $Palette->{'background'});
+#	$w->configure('-foreground' => $Palette->{'foreground'});
+	if ($w->state =~ /n/o) {  #WHEN NORMAL STATE, WE MUST SAVE/RESTORE ACTIVE+SELECTED JUST AS IF WE'D CHANGED STATE!:
+		$w->{'_saveactive'} = $w->index('active') || -1;
+		$w->{'_savesel'} = undef;
+		eval { @{$w->{'_savesel'}} = $w->curselection; };   #SAVE & CLEAR THE CURRENT SELECTION, FOCUS STATUS & COLORS:
+		my $at = $@;
+		unless ($@ || !defined($w->{'_savesel'})) {
+			my @selected = ();
+			for (my $i=0;$i<=$#{$w->{'_savesel'}};$i++) {
+				$selected[${$w->{'_savesel'}}[$i]] = 1;
+			}
+			$w->configure('-selected' => \@selected);
+			$w->{'_savesel'} = undef;
+		}
+	}
+}
+
+sub state {
+	my ($w, $val) = @_;
+
+	return $w->{Configure}{'-state'} || undef  unless (defined($val) && $val);
+	return  if (defined($w->{'_prevstate'}) && $val eq $w->{'_prevstate'});  #DON'T DO TWICE IN A ROW!
+
+	$w->{'_statechg'} = 1;
+	if ($val =~ /d/o) {              #WE'RE DISABLING (SAVE CURRENT ENABLED STATUS STUFF, THEN DISABLE USER-INTERACTION):
+		$w->{Configure}{'-state'} = 'normal';
+		$w->{'_saveactive'} = $w->index('active') || -1;
+		$w->{'_savesel'} = undef;
+		eval { @{$w->{'_savesel'}} = $w->curselection; };   #SAVE & CLEAR THE CURRENT SELECTION, FOCUS STATUS & COLORS:
+		my $at = $@;
+		unless ($@ || !defined($w->{'_savesel'})) {
+			my @selected = ();
+			print "--CLEAR SELECTED-- len=".$#{$w->{'_savesel'}}."=\n";
+			for (my $i=0;$i<=$#{$w->{'_savesel'}};$i++) {
+				$selected[${$w->{'_savesel'}}[$i]] = 1;
+			}
+			$w->configure('-selected' => \@selected);
+			$w->{'_savesel'} = undef;
+		}
+#		$w->{'_foreground'} = $w->cget('-foreground');  #SAVE CURRENT (ENABLED) FG COLOR!
+		$w->{Configure}{'-state'} = $val;
+		$w->activate($w->{'_saveactive'});
+		$w->takefocus(0, 1);
+		$w->{'frame'}->configure('-takefocus' => 0)  if (defined $w->{'frame'});
+		$w->focusCurrent->focusNext  if ($w->{'isfocused'});  #MOVE FOCUS OFF WIDGET IF IT HAS IT.
+	} elsif ($w->{'_prevstate'}) {   #WE'RE ENABLING (RESTORE PREV. ENABLED STUFF AND REALLOW USER-INTERACTION):
+		$w->{Configure}{'-state'} = $val;
+		$w->takefocus($w->{'_ourtakefocus'}, 0);
+		eval { $w->{'frame'}->configure('-takefocus' => $w->takefocus); };
+	}
+	$w->{'_prevstate'} = $w->{Configure}{'-state'};
+	$w->{'_statechg'} = 0;
+}
+
+sub takefocus {
+	my ($w, $val, $byus) = @_;
+	return $w->{Configure}{'-takefocus'}  unless (defined $val);
+
+	#JWT:NEEDS TO BE '' INSTEAD OF 1 FOR Tk (SO WE KEEP IT IN OUR OWN VARIABLE FOR OUR USE)!:
+	$w->{'_ourtakefocus'} = $val  unless (defined $byus);
+	$w->{Configure}{'-takefocus'} = ($val =~ /0/d) ? 0 : '';
+}
 
 sub button1 {  #LEGACY Tk::Thumbnail DEFAULT MOUSE-BUTTON 1 CALLBACK TO DISPLAY IMAGE/ANIMATION FULL-SIZED IN POPUP WINDOW:
 	my $self = shift;
@@ -133,8 +214,12 @@ sub button1 {  #LEGACY Tk::Thumbnail DEFAULT MOUSE-BUTTON 1 CALLBACK TO DISPLAY 
 		$extphoto = 0;
 	} else {
 		my $indx = shift;
+		my $indx0 = $indx;
 		$indx = $self->index($indx)  unless ($indx =~ /^\d+$/o);
 		return  unless ($indx >= 0);
+
+		$self->activate($indx);
+		return  if ($indx0 =~ /^mouse$/ && $indx != $self->{'_pressedindx'});  #ABORT IF WE DRAGGED HERE FROM ANOTHER ICON!
 
 		my $datavec = $self->{'data'};
 		my $data = ${$datavec}[$indx];
@@ -331,13 +416,20 @@ sub ConfigChanged {
 
 	my $state = $self->cget('-state');
 
+	#JWT: THERE IS A KNOWN BUG IN HERE SOMEWHERE WHERE THE SELECTBACKGROUND *INCORRECTLY* GETS RESET TO 
+	#gray75 WHEN CHANGING DIRECTORIES VIA CLICKING ON A DIRECTORY IN JFM5 WHEN THE DIRECTORY NAME HAS
+	#BEEN HIGHLIGHTED FIRST BY Ctrl-Button1 WITHOUT FIRST DOING A selectClear() BEFORE RELOADING
+	#JTHUMBNAIL WITH THE DIRECTORY CHANGED TO?!:
+
 	$self->{'btnnormalbg'} = $self->cget('-background');
+#	$self->{'btnselbg'} = $self->cget('-selectbackground') || $self->Palette->{'highlightBackground'} || $self->Palette->{'readonlyBackground'};
 	$self->{'btnselbg'} = $self->cget('-selectbackground') || $self->Palette->{'readonlyBackground'} || $self->Palette->{'highlightBackground'};
 	$self->{'btnselbg'} = 'gray75'  if (!$self->{'btnselbg'} || $self->{'btnselbg'} eq $self->{'btnnormalbg'});
 	$self->{'btnselbg'} = 'gray50'  if ($self->{'btnselbg'} eq $self->{'btnnormalbg'});
+#print "-???- btnbg=".$self->{'btnselbg'}."= sbg=".$self->cget('-selectbackground')."= Prdobg=".$self->Palette->{'readonlyBackground'}."= Phlbg=".$self->Palette->{'highlightBackground'}."= bnormbg=".$self->{'btnnormalbg'}."=\n";
 	$self->{'btnnormalfg'} = $state =~ /d/ ? ($self->cget('-disabledForeground') || $self->Palette->{'disabledForeground'})
 			: $self->cget('-foreground');
-	$self->render if grep { /^\-(?:images|state)$/ } keys %$changed_args;
+	$self->render  if grep { /^\-(?:images|state|palette)$/ } keys %$changed_args;
 } # end ConfigChanged
 
 sub render {
@@ -353,20 +445,24 @@ sub render {
 	$self->clear;		# clear Table
 #!!	delete $self->{'descendants'};
 
+	my $Palette = $self->Palette;
 	my $pxx = $self->cget( '-iwidth' );  # thumbnail pixel width
 	my $pxy = $self->cget( '-iheight' ); # thumbnail pixel height
 	my $lbl = $self->cget( '-ilabels' ); # display file names IFF true
 	my $iborder = $self->cget( '-iborder' );
 	my $ihighlightthickness = $self->cget( '-ihighlightthickness' ) || 3;
+	my $ihighlightcolor = $self->cget( '-ihighlightcolor' ) || $Palette->{'background'};
 	my $irelief = $self->cget( '-irelief' ) || 'flat';
 	my $useBalloons = $self->cget( '-iballoons' ); # display file names in balloons
 	my $iwrap = $self->cget( '-iwrap' );  # text label wrapping
 	my $font = $self->cget( '-font' );  # thumbnail pixel width
+	my $lbllineheight = $font ? $self->fontMetrics($font, '-linespace') : 12;
 	my $img = $self->cget( '-images' );  # reference to list of images
 	my $state = $self->cget( '-state' );
 	my $extimg = $self->cget( '-extimages' );
 	my $selected = $self->cget( '-selected' );  # reference to list of booleans whether img is "selected".
 	my $binds = $self->{'_binds'}; # button keybindings
+#print STDERR "--BINDS=(".join('|', keys %{$binds}).")\n";
 	my $col = $self->cget( '-columns' ); # thumbnails per row
 	my $noexpand = $self->cget( '-noexpand' ); #don't expand small images if true
 	my $framewidth = $self->cget( '-width' );
@@ -389,6 +485,7 @@ sub render {
 		$rows++ if $rows * $rows != $count;
 		$cols = $rows;
 	} elsif ($col <= 0) {  #JWT:CALCULATE NO. OF COLUMNS BASED ON WINDOW AND BUTTON WIDTHS (AVOID HORIZ SCROLLING):
+#print STDERR "--COL NOT POSITIVE($col) FW=$framewidth= PXX=$pxx= BORD=$iborder= HL=$ihighlightthickness=\n";
 		if ($pxx > 0 && $framewidth > 0 && ($iwrap >= 0 || ! $lbl)) {
 			my $iwrapthis = $iwrap;
 			if ($iwrap >= 0) {
@@ -410,6 +507,7 @@ sub render {
 			$cols =~ s/\..*$//;
 			$rows = int( $count / $cols + 0.5 );
 			$rows++ if $rows * $cols < $count;
+#print STDERR "--COLS=$cols= FW=$framewidth= CELLWIDTH=$iwrapthis= BORD=$iborder= HL=$ihighlightthickness=\n";
 		} else {
 			$rows = int( sqrt $count );
 			$rows++ if $rows * $rows != $count;
@@ -427,6 +525,7 @@ sub render {
 		return;
 	}
 
+#print STDERR "--COLS=$cols=\n";
 	$self->{'cols'} = $cols;
 	%{$self->{'selected'}} = ();
 	@{$self->{'data'}} = ();
@@ -434,11 +533,11 @@ sub render {
 	$self->{'btnnormalfg'} = $state =~ /d/ ? ($self->cget('-disabledForeground') || $self->Palette->{'disabledForeground'})
 			: $self->cget('-foreground');
 
-	my $takefocus = $state =~ /d/ ? 0 : $self->cget('-focus');
+	my $takefocus = defined($self->{'_ourtakefocus'}) ? $self->{'_ourtakefocus'} : $self->takefocus;
 	my $indx = 0;
 	my $ext;
 
-THUMB:	foreach my $r ( 0 .. $rows - 1 ) {
+	THUMB:  foreach my $r ( 0 .. $rows - 1 ) {
 		foreach my $c ( 0 .. $cols - 1 ) {
 			last THUMB if --$count < 0;
 
@@ -454,7 +553,9 @@ THUMB:	foreach my $r ( 0 .. $rows - 1 ) {
 				$ext = (-d $i) ? 'dir' : ($i =~ /.\.(\w+)$/o) ? $1 : '';
 				$ext =~ tr/A-Z/a-z/;
 				#Tk::catch { $photo = $self->Photo( -file => $i ) };
+#print STDERR "--catch fid=$i= ext=$ext=\n";
 				if ($i =~ /\.xpm$/io) {  #WORK AROUND STUPID PERL BUG THAT *SEGFAULTS* IF XPM PIXMAP DATA CONTAINS "/*"?!:
+#print STDERR "--working around!...\n";
 					if (open IN, $i) {
 						my $img = '';
 						while (<IN>) {
@@ -467,6 +568,7 @@ THUMB:	foreach my $r ( 0 .. $rows - 1 ) {
 						Tk::catch { $photo = $self->Photo(-data => ($imgdata[0].'{'.$imgdata[1]), -format => 'xpm') };
 					}
 				} elsif ($ext =~ /^(?:gif|jpg|jpeg|png)$/o) {  #FOR NON-XPM IMAGES, LOAD THE NORMAL WAY:
+#print STDERR "--CATCH fid=$i= ext=$ext=\n";
 					Tk::catch { $photo = $self->Photo( -file => $i ) };
 					unless ( $@ || !$haveAnimation ) {  #GOOD IMAGE, SEE IF WE'RE AN ANIMATED GIF:
 						Tk::catch { $photo = $self->Animation( -file => $i, -format => 'gif' ) };
@@ -481,6 +583,7 @@ THUMB:	foreach my $r ( 0 .. $rows - 1 ) {
 					if ( UNIVERSAL::isa( $extimg->{$ext}, 'Tk::Photo' ) ) {
 						$photo = $extimg->{$ext};
 					} elsif ($extimg->{$ext} =~ /\.xpm$/io) {  #WORK AROUND STUPID PERL BUG THAT *SEGFAULTS* IF XPM PIXMAP DATA CONTAINS "/*"?!:
+#print STDERR "--working around!...\n";
 						if (open IN, $extimg->{$ext}) {
 							my $img = '';
 							while (<IN>) {
@@ -493,16 +596,21 @@ THUMB:	foreach my $r ( 0 .. $rows - 1 ) {
 							Tk::catch { $photo = $self->Photo(-data => ($imgdata[0].'{'.$imgdata[1]), -format => 'xpm') };
 						}
 					} else {
+#print STDERR "--catch2($extimg->{$ext})\n";
 						Tk::catch { $photo = $self->Photo( -file => $extimg->{$ext} ) };
 					}
 				}
 			}
+#print STDERR "--caught!\n";
 			unless ($photo) {  #WE HAVE NO IMAGE, SO USE THE DEFAULT IMAGE (failimg.png):
 				$photo = $default;
+#print STDERR "--PHOTO:=DEFAULT ($default)!!!!!!!!!!!!!\n";
 				$bad_photo++;
 			}
+#print STDERR "--NO PHOTO($photo) SHOULD BE ERR=$default=!\n"  unless ($photo);
 			( $w, $h ) = ( $photo->width, $photo->height );
 
+#print STDERR "--3: w=$w= h=$h= f=$i=\n";
 			my $subsample;
 			$subsample = $self->Photo;
 			my $sw = $pxx == -1 ? 1 : ( $w / $pxx );
@@ -514,10 +622,12 @@ THUMB:	foreach my $r ( 0 .. $rows - 1 ) {
 				} elsif ($iwrapthis < 128) {
 					$iwrapthis = 2;
 				}
-			} if ($iwrapthis > 0 && $iwrapthis < 5) {
+			}
+			if ($iwrapthis > 0 && $iwrapthis < 5) {
 				$iwrapthis *= ($pxx <= 0) ? $w : $pxx;
 			}
 			$iwrapthis = 64  if ($iwrapthis >= 0 && $iwrapthis < 64);
+#print STDERR "--4: w=$w= h=$h= f=$i= pxx=$pxx= pxy=$pxy= sw=$sw= wrap = $iwrapthis\n";
 
 			if ($w > $pxx || $h > $pxy) {  #ICON IS BIGGER THAN THUMBNAIL SIZE:
 				my $zf = ($w > $h) ? $sw : $sh;
@@ -540,11 +650,16 @@ THUMB:	foreach my $r ( 0 .. $rows - 1 ) {
 			$btnHash{'-text'} = $lbl  if ($lbl);
 			$btnHash{'-wraplength'} = $iwrapthis  if ($iwrapthis > 0);
 			$btnHash{'-font'} = $font  if ($font);
+			$btnHash{'-width'} = (($iwrapthis > $pxx) ? $iwrapthis : $pxx);
+			unless ($lbl && $iwrapthis >= 0) {   #CAN'T CALCULATE HEIGHT IF WRAPPING (UNKNOWN # LINES OF TEST)!
+				$btnHash{'-height'} = $lbl ? $pxy + $lbllineheight : $pxy;
+			}
 			my $b = $self->Label(
 					%btnHash,
 					-compound => 'top',
 					-relief => $irelief,
 					-border => $iborder,
+					-highlightbackground => $ihighlightcolor,
 					-highlightthickness => $ihighlightthickness,
 					-text => $lbl ? $i : '',
 					-background => (${$self->{'selected'}}{$i} ? $self->{'btnselbg'} : $self->{'btnnormalbg'}),
@@ -570,12 +685,14 @@ THUMB:	foreach my $r ( 0 .. $rows - 1 ) {
 				my $lastun = $self->index('end');
 				if (defined($anchor) && ($anchor >= 0 && $anchor <= $lastun)
 						&& $clickedon >= 0 && $clickedon <= $lastun) {
+#print STDERR "-Shift-1: anchor=$anchor= clicked=$clickedon= selectg=".$self->{'deselecting'}."=\n";
 					if ($self->{'deselecting'}) {
 						$self->selectionClear($anchor, $clickedon);
 					} else {
 						$self->selectionSet($anchor, $clickedon);
 					}
 				} else {
+#print STDERR "-Shift-1: anchor is UNDEF!\n";
 					if ($self->selectionIncludes($clickedon))  #TOGGLE SELECT-STATUS OF ENTRY CLICKED ON:
 					{
 						$self->selectionClear($clickedon);
@@ -587,6 +704,7 @@ THUMB:	foreach my $r ( 0 .. $rows - 1 ) {
 				}
 				$self->{'anchor'} = $clickedon;
 #x				$self->{'deselecting'} = $self->isSelected($self->{'anchor'} ? 0 : 1);
+#print STDERR "--Shift-1: anchor:=$clickedon= selectg=".$self->{'deselecting'}."=\n";
 				$self->{'_shifted'} = 1;
 			});
 			$b->bind('<ButtonPress-1>', sub {   #NEEDED FOR "MOTION-DRAG SELECT TO WORK:
@@ -595,21 +713,24 @@ THUMB:	foreach my $r ( 0 .. $rows - 1 ) {
 				$self->xscan('mark',$self->pointerx,$self->pointery);
 				my $clickedon = $self->index('mouse');
 				$self->activate($clickedon);
-				if ($takefocus > 1) {   #IF -focus => 2: TAKE FOCUS WHEN CLICKED ON:
+				if ($takefocus) {   #IF -takefocus => 1: TAKE FOCUS WHEN CLICKED ON:
 					$self->update;
 					$self->focus();
 					$self->parent->focus();
 				}
 				$self->{'anchor'} = $self->index('mouse');
+#print STDERR "--ButtonPress-1: anchor:=".$self->{'anchor'}."=\n";
 				$self->{'prev'} = -1;
 				$self->{'deselecting'} = $self->isSelected($self->{'anchor'});
 				$self->selectionToggle($self->{'anchor'});
+				$self->{'_pressedindx'} = $self->{'anchor'};  #SAVE WHERE WE PRESSED TO COMPARE W/RELEASED.
 			});
 			$b->bind('<Shift-ButtonRelease-1>', sub {
 				return  if ($self->cget('-state') =~ /d/);
 
 				my $clickedon = $self->index('mouse');
 				my $anchor = $self->{'anchor'};
+#print STDERR "-Shift-Buttonrelease-1: clicked=$clickedon= STATE=".$self->cget('-state')."=\n";
 				my $lastun = $self->index('end');
 				if (defined($anchor) && ($anchor >= 0 && $anchor <= $lastun)
 						&& $clickedon >= 0 && $clickedon <= $lastun) {
@@ -624,6 +745,7 @@ THUMB:	foreach my $r ( 0 .. $rows - 1 ) {
 			$b->grid( -row => $r, -column => $c );
 			push @{$self->{'descendants'}}, $b;
 			${$self->{'selected'}}{$i} = $selected->[$indx] || 0;
+#print STDERR "-???-SEL($i)=".${$self->{'selected'}}{$i}."= idx=$indx=\n";
 			push @{$self->{'data'}}, {-index => $indx, -label => $b, -filename => $i, -bad => $bad_photo,
 					-width => $w, -height => $h, -animated => $animated, -blankit => $self->cget( '-blank' ),
 					-row => $r, -col => $c, -photo => $subsample
@@ -631,12 +753,15 @@ THUMB:	foreach my $r ( 0 .. $rows - 1 ) {
 
 			$photo->delete unless UNIVERSAL::isa( $i, 'Tk::Photo' ) or $photo == $default;
 
+#print STDERR "---COMMAND=".$self->cget('-command')."=\n";
 			#BIND THE LEGACY CALLBACK (UNLESS -command => undef):
 			if ($self->cget('-state') !~ /d/ && defined $self->cget('-command')) {  #WE NOW JUST PASS THE INDEX, ${$self->{'data'}}[$indx] HAS ALL THE DATA!
-				$b->bind('<ButtonRelease-1>' => [ $self => 'Callback', '-command', $self, $indx ])
+				$b->bind('<ButtonRelease-1>' => [ $self => 'Callback', '-command', $self, 'mouse' ]);
 			} else {
 				$b->bind('<ButtonRelease-1>', sub {
 					return  if ($self->cget('-state') =~ /d/);
+
+#print STDERR "--ButtonRelease-1: anchor:=".$self->{'anchor'}."= MOUSEINDX=".$self->index('mouse')."=\n";
 					#x $self->selectionToggle($self->index('mouse'))  unless (defined($self->{'_shifted'}) && $self->{'_shifted'});
 					$self->activate($self->index('mouse'));
 					$self->{'_shifted'} = 0;
@@ -658,14 +783,30 @@ THUMB:	foreach my $r ( 0 .. $rows - 1 ) {
 			++$indx;
 		} # forend columns
 	} #forend rows
-	$self->{'active'} = -1;
+	if ($self->state =~ /n/o) {
+		$self->{'active'} = (defined($self->{'_saveactive'}) && $self->{'_saveactive'} >= 0)
+				? $self->{'_saveactive'} : 0;
+		$self->{'_saveactive'} = -1;
+	} else {
+		$self->{'active'} = 0;
+	}
+
 	if ($indx) {  #DEFAULT BINDINGS TO THE FRAME ITSELF (UNLESS WE'RE A COMPLETELY EMPTY LIST):
 		$self->{'frame'} = ${$self->{'descendants'}}[0]->parent;
+		$self->{'frame'}->bind('<<LeftTab>>', sub {
+			shift->focusPrev;
+			Tk->break;
+		});
+		$self->{'frame'}->bind('<FocusOut>', sub {
+			my $w=shift;
+			$w->focusCurrent->focusPrev  if ($w->focusCurrent =~ /JThumbnail/o);
+		});
+		$self->{'frame'}->configure('-takefocus' => $takefocus);
 		$self->{'frame'}->bind('<Right>', sub { my $self = shift->parent; my $i = $self->index('active'); $self->activate($i+1); });
 		$self->{'frame'}->bind('<Left>', sub { my $self = shift->parent; my $i = $self->index('active'); $self->activate($i-1); });
 		$self->{'frame'}->parent->bind('<Up>', sub { my $self = shift->parent; my $i = $self->index('active'); $self->activate($i-$self->{'cols'}); });
 		$self->{'frame'}->parent->bind('<Down>', sub { my $self = shift->parent; my $i = $self->index('active'); $self->activate($i+$self->{'cols'}); });
-		$self->{'frame'}->parent->bind('<ButtonPress-1>', sub { my $self = shift; $self->focus(); })  if ($takefocus > 1);
+		$self->{'frame'}->parent->bind('<ButtonPress-1>', sub { my $self = shift; $self->focus(); })  if ($takefocus);
 		$self->{'frame'}->parent->bind('<Shift-space>', sub {
 				my $self = shift->parent;
 				my $clickedon = $self->index('active');
@@ -698,11 +839,15 @@ THUMB:	foreach my $r ( 0 .. $rows - 1 ) {
 				$self->{'deselecting'} = $self->isSelected($clickedon);
 				$self->selectionToggle($clickedon);
 		});
-		$self->{'frame'}->configure('-takefocus' => (defined($takefocus) && !$takefocus) ? 0 : 1);
+		$self->{'frame'}->configure('-takefocus' => ($self->state =~ /d/o) ? 0 : $takefocus);
 		$self->{'frame'}->bind('<Home>',  sub { shift->parent->xview('moveto' =>  0) });
 		$self->{'frame'}->bind('<End>',   sub { shift->parent->xview('moveto' =>  1) });
-		$self->{'frame'}->bind('<Prior>', sub { shift->parent->yview('moveto' => -1) });
-		$self->{'frame'}->bind('<Next>',  sub { shift->parent->yview('moveto' =>  1) });
+		$self->{'frame'}->bind('<Control-Home>',  sub { shift->parent->activate(0) });
+		$self->{'frame'}->bind('<Control-End>',   sub { shift->parent->activate('end'); });
+#		$self->{'frame'}->bind('<Prior>', sub { shift->parent->yview('moveto' => -1) });
+#		$self->{'frame'}->bind('<Next>',  sub { shift->parent->yview('moveto' =>  1) });
+		$self->{'frame'}->bind('<Prior>', sub { shift->parent->yview('scroll',-1,'pages') });
+		$self->{'frame'}->bind('<Next>',  sub { shift->parent->yview('scroll', 1,'pages') });
 		$self->{'frame'}->bind('<Return>' => [ $self => 'Callback', '-command', $self, 'active' ])
 				if (defined $self->cget('-command'));
 
@@ -718,18 +863,22 @@ THUMB:	foreach my $r ( 0 .. $rows - 1 ) {
 				$self->{'frame'}->bind($bindkey => [$binds->{$bindkey}]);
 			}
 		}
-		$self->activate(0);  #ACTIVATE THE FIRST IMAGE TO START.
+		$self->activate($self->{'active'});  #ACTIVATE THE FIRST IMAGE TO START.
 		$self->{'anchor'} = 0;
 		$self->{'deselecting'} = 1;
 	}
 	$self->update;
+#print STDERR "--render: self=$self= frame=".$self->{'frame'}."= \n";
+#print STDERR "--render: SELF=$self= -max=".$#{$self->{'descendants'}}."=\n";
 
 } # end render
 
 sub bindRows {   #SYNONYM FOR bindImages(), NAMED FOR COMPAT. W/Tk::HMListbox IN jfm5 (HAS NOTHING TO DO WITH "ROWS")!
 	my ($w, $sequence, $callback) = @_;
 
+#print STDERR "-bindRows($w, $sequence, $callback)-\n";
 	my $subwidget = $w;
+#print STDERR "--frame=".$w->{'frame'}."=\n";
 	return (keys %{$w->{'_binds'}})  unless (defined $sequence);
 
 #	unless (defined $callback) {
@@ -790,15 +939,23 @@ sub activate
 
 	$indx = $#{$self->{'descendants'}}  if ($indx =~ /^end$/io);
 	$indx = $self->{'active'}  if ($indx =~ /^active$/io);
-	return undef  if ($indx < 0 || $indx > $#{$self->{'descendants'}});
+#print STDERR "--ACTIVATE:GET($indx) - current active=".$self->{'active'}."=\n";
 
-	unless ($indx < 0 || $indx > $#{$self->{'descendants'}} || $self->{'active'} == $indx) {
-		${$self->{'descendants'}}[$self->{'active'}]->configure(-relief => $self->cget('-irelief'));
+	unless ($indx < 0 || $indx > $#{$self->{'descendants'}}) {
+		my $normalFg = $self->cget('-foreground');
+		my $normalHighlight = $self->cget('-ihighlightcolor') || $self->Palette->{'background'};
+#		${$self->{'descendants'}}[$self->{'active'}]->configure(-relief => $self->cget('-irelief'), -foreground => $normalFg, -highlightbackground => $normalHighlight);
+		${$self->{'descendants'}}[$self->{'active'}]->configure(-relief => $self->cget('-irelief'), -foreground => $normalFg, -highlightbackground => $normalHighlight);
+
 		$self->Tk::Pane::see(${$self->{'descendants'}}[$indx])  unless ($args{'-nosee'});
 		$self->{'active'} = $indx;
 		$self->update;
-		${$self->{'descendants'}}[$self->{'active'}]->configure(-relief => $self->cget('-iactiverelief'))
-				if ($self->{'active'} >= 0);
+		my $activeFg = $self->cget('-activeforeground') || $normalFg;
+		my $activeHighlight = $self->cget('-activeforeground') || $normalHighlight;
+		${$self->{'descendants'}}[$self->{'active'}]->configure(-relief => $self->cget('-iactiverelief'), -foreground => $activeFg, -highlightbackground => $activeHighlight)
+				if ($self->{'active'} >= 0 && ($self->{'isfocused'} || $self->{'-showcursoralways'}));
+#		${$self->{'descendants'}}[$self->{'active'}]->configure(-relief => $self->cget('-iactiverelief'))
+#				if ($self->{'active'} >= 0 && ($self->{'isfocused'} || $self->{'-showcursoralways'}));
 		###FOCUS ACTIVATES, AVOID RECURSION!: ${$self->{'descendants'}}[$indx]->focus()  if ($self->{'isfocused'});
 	}
 }
@@ -812,12 +969,22 @@ sub focus
 {
 	my $w = shift;
 
-	if ($w->cget('-state') =~ /d/) {
-		$w->focusNext();
-	} else {
-		$w->see($w->index('active'));
+	unless ($w->{Configure}{'-state'} =~ /d/o) {
 		$w->{'isfocused'} = 1;
+		$w->activate($w->index('active'));
+		$w->see($w->index('active'));
+		$w->focusNext;
 	}
+}
+
+sub unfocus
+{
+	my $w = shift;
+
+	return  if ($w->{'-showcursoralways'});
+
+	$w->{'isfocused'} = 0;
+	$w->activate($w->index('active'), -nosee => 1);
 }
 
 sub curselection
@@ -852,7 +1019,7 @@ sub index
 	$mousexy =~ s/^\@//o;
 	my ($mousex, $mousey) = split(/\,/o, $mousexy);
 	my $btnwidget = $self->toplevel->containing($mousex, $mousey);
-
+#print STDERR "--self=$self= mx=$mousex= my=$mousey= btnwidget =".$btnwidget."=\n";
 	return $self->getButtonIndex($btnwidget)  if (defined $btnwidget);
 	return -1;
 }
@@ -863,8 +1030,9 @@ sub get
 
 	$indx = $#{$self->{'descendants'}}  if ($indx =~ /^end$/io);
 	$indx = $self->{'active'}  if ($indx =~ /^active$/io);
-
+#print STDERR "--GET($indx)\n";
 	return undef  if ($indx < 0 || $indx > $#{$self->{'descendants'}});
+#print STDERR "--GET returning img=".${$self->cget('-images')}[$indx]."=\n";
 	return ${$self->cget('-images')}[$indx];
 }
 
@@ -874,8 +1042,10 @@ sub getRow   #CONVENIENCE METHOD NAMED FOR COMPAT. W/Tk::HMListbox IN jfm5 (HAS 
 
 	$indx = $#{$self->{'descendants'}}  if ($indx =~ /^end$/io);
 	$indx = $self->{'active'}  if ($indx =~ /^active$/io);
+#print STDERR "--GETROW($indx)\n";
 	return undef  if ($indx < 0 || $indx > $#{$self->{'descendants'}});
 
+#print STDERR "--GETROW returning img=".${$self->cget('-images')}[$indx]."=\n";
 	my $fn = ${$self->cget('-images')}[$indx];
 	return wantarray ? (${$self->{'data'}}[$indx], $fn, ((-d $fn) ? 'd' : '-')) : $fn;
 }
@@ -906,6 +1076,7 @@ sub selectionSet
 {
 	my $self = shift;
 	my @args = @_;
+#print STDERR "--selectionSet: SELF=$self= -max=".$#{$self->{'descendants'}}."= ARGS=".join('|',@args)."=\n";
 
 	for (my $i=0;$i<=$#args;$i++) {
 		$args[$i] = $#{$self->{'descendants'}}  if ($args[$i] =~ /end/io);
@@ -914,13 +1085,16 @@ sub selectionSet
 	}
 	my @indexRange = (@args);
 	@indexRange = ($args[1] < $args[0]) ? reverse($args[1]..$args[0]) : ($args[0]..$args[1])  if (defined($args[1]) && !defined($args[2]));
+#print STDERR "--selectionSet(".join('|',@indexRange).")=\n";
 #	return undef  if ($indexRange[0] < 0 || $indexRange[$#indexRange] > $#{$self->{'descendants'}});
 
+#print "-selectionSet: BEF bg=".$self->cget('-background')."= self=$self=\n";
 	foreach my $indx (@indexRange) {
 		my $fn = $self->get($indx);
 		${$self->{'selected'}}{$fn} = 1;
 		${$self->{'descendants'}}[$indx]->configure(-background => $self->{'btnselbg'});
 	}
+#print "-selectionSet: AFT bg=".$self->cget('-background')."= self=$self=\n";
 }
 
 sub isSelected
@@ -1090,7 +1264,7 @@ Software Foundation, Inc.,
 			-width => 500,
 			-scrollbars => 'osoe',
 			-highlightthickness => 1,
-			-focus => 2,
+			-takefocus => 1,
 			-nodirs => 1,
 	)->pack(-side => 'top', -expand => 1, -fill => 'both');
 
@@ -1260,20 +1434,22 @@ Example:  {'txt' => '/usr/local/pixmaps/texticon.png', 'pdf' => '/usr/local/pixm
 Special keys are:  '' for files with no or unrecognized extension, and 'dir' 
 for directories.
 
+=item B<-activeforeground>
+
+B<JThumbnail-added feature>:  Specify a custom foreground color for the 
+image text label of the "active" item (the one with the keyboard cursor 
+(when the widget is in "normal" (not disabled) state.  Default:  the 
+palette's "I<foreground>" color.
+
+=item B<-disabledforeground>
+
+B<JThumbnail-added feature>:  Specify a custom foreground color for the 
+image text labels when the widget is in "disabled" state.  Default:  the 
+palette's "I<diabledForeground>" color (usually a grayish color).
+
 =item B<-focus>
 
-B<JThumbnail-added feature>:  Specify the focusing model.  Valid values are:
-
-0:  Never take keyboard focus (and skip in the main window's 
-tab-focusing order).
-
-1:  Take focus when tabbed to from the main window (normal "-takefocus => 1" 
-action for Tk widgets).
-
-2:  Also take keyboard focus whenever an icon in the widget or the 
-widget itself is clicked on.
-
-Default:  I<1>.
+B<DEPRECIATED> - see (options are different) and use I<-takefocus> instead!
 
 =item B<-font>
 
@@ -1394,6 +1570,15 @@ Example:  To select the first and fifth images:  -selected => [1,0,0,0,1]
 
 All images beyond the fifth will not be selected.
 
+=item B<-showcursoralways>
+
+Starting with version 2.4, Tk::JThumbnail no longer displays the keyboard 
+cursor (active element) when the JThumbnail widget does not have the 
+keyboard focus, in order to be consistent with the behaviour of 
+Tk::HMListbox.  This option, when set to 1 (or a "true" value) restores 
+the pre-v2.4 behaviour of always showing the keyboard cursor.
+Default I<0> (False).
+
 =item B<-state>
 
 B<JThumbnail-added feature>:  Specifies one of two states for the widget: 
@@ -1401,13 +1586,26 @@ I<normal>, or I<disabled>.  In normal state the label is displayed using the
 foreground and background options.  In the disabled state the 
 disabledForeground option determines how the widget is displayed, and the 
 user can not interact with the widget (or the icon buttons) with the 
-keyboard or mouse.
+keyboard or mouse.  However, application programs can still update the 
+widget's contents.
+
 Default:  I<"normal">.
 
 =item B<-takefocus>
 
-NOTE:  DO NOT USE (it doesn't work properly)!  Instead use the B<-focus> 
-option, see above:
+Specify the focusing model.  Valid values are:
+
+"":  (default) Take focus when tabbed to from the main window (default action for 
+Tk widgets).  (Replaces the old JThumbnail-specific "-focus => 1" option).
+
+0:  Never take keyboard focus (and skip in the main window's 
+tab-focusing order).
+
+1:  Also take keyboard focus whenever an icon in the widget or the 
+widget itself is clicked on in addition to when tabbed to.  
+(Replaces the old JThumbnail-specific"-focus => 2" option).
+
+Default:  I<"">.
 
 =item B<-width>
 

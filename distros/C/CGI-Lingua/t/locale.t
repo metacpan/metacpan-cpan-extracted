@@ -2,21 +2,14 @@
 
 use strict;
 use warnings;
-use Test::More;
+use Test::Most;
 
-unless(-e 't/online.enabled') {
-	plan skip_all => 'On-line tests disabled';
-} else {
-	plan tests => 49;
+if(-e 't/online.enabled') {
+	plan tests => 48;
 
 	use_ok('CGI::Lingua');
 	require Test::NoWarnings;
 	Test::NoWarnings->import();
-
-	eval {
-		CGI::Lingua->new();
-	};
-	ok($@ =~ m/You must give a list of supported languages/);
 
 	# Stop I18N::LangTags::Detect from detecting something
 	delete $ENV{'LANGUAGE'};
@@ -145,4 +138,6 @@ unless(-e 't/online.enabled') {
 	$locale = $l->locale();
 	isa_ok($locale, 'Locale::Object::Country');
 	ok(uc($l->locale()->code_alpha2()) eq 'GB');
+} else {
+	plan skip_all => 'On-line tests disabled';
 }

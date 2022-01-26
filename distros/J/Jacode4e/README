@@ -4,32 +4,24 @@ NAME
 
 SYNOPSIS
 
-    use FindBin;
-    use lib "$FindBin::Bin/lib";
-    use Jacode4e;
-    $return =
-    Jacode4e::convert(\$line, $OUTPUT_encoding, $INPUT_encoding [, { %option }]);
-
-RAISON D'ETRE
-
-    This software has been developed for use promotion of JIS X 0213.
-
-    JIS X 0213 contains almost all of the characters used in everyday life in
-    Japan. In addition, JIS X 0213 was designed with consideration for use
-    in Shift_JIS environment. However, because it did not consider CP932 and
-    GAIJI, it is not very popular.
-
-    "JIS X 0213 bridge" needs last one meter.
-
-    To solve the problem, Jacode4e proposes CP932X [shi:pi:kju:san'nikai].
-
-    CP932X implements JIS X 0213 over CP932.
-
-    We can continue to use CP932 data, application programs, databases, and
-    networks using CP932X.
-
-    This software can convert the following encodings to each other.
-
+  use FindBin;
+  use lib "$FindBin::Bin/lib";
+  use Jacode4e;
+ 
+  $return =
+  Jacode4e::convert(\$line, $OUTPUT_encoding, $INPUT_encoding [, { %option }]);
+ 
+    $return
+      Number of characters in $line
+ 
+    $line
+      String variable to convert
+      After conversion, this variable is overwritten
+ 
+    $OUTPUT_encoding, and $INPUT_encoding
+      To convert, you must specify both $OUTPUT_encoding and $INPUT_encoding.
+      The encodings you can specify are as follows:
+ 
       mnemonic      means
       -----------------------------------------------------------------------
       cp932x        CP932X, Extended CP932 to JIS X 0213 using 0x9C5A as single shift
@@ -49,7 +41,25 @@ RAISON D'ETRE
       utf8          UTF-8.0 (aka UTF-8)
       utf8.1        UTF-8.1
       utf8jp        UTF-8-SPUA-JP, JIS X 0213 on SPUA ordered by JIS level, plane, row, cell
-    -----------------------------------------------------------------------
+      -----------------------------------------------------------------------
+ 
+    %option
+      The options you can specify are as follows:
+ 
+      key mnemonic      value means
+      -----------------------------------------------------------------------
+      INPUT_LAYOUT      input record layout by 'S' and 'D' sequence
+                        'S' means one char as SBCS, 'D' means one char as DBCS
+                        each letter may optionally be followed by a number
+                        indicating the repeat count, see samples
+      OUTPUT_SHIFTING   true means use output shift code, false means not use
+                        default is false
+      SPACE             output space code in DBCS/MBCS
+      GETA              output geta code in DBCS/MBCS
+      OVERRIDE_MAPPING  hash reference of FROM => TO override mapping
+                        { "\x12\x34"=>"\x56\x78", "\x9A\xBC"=>"\xDE\xFE", }
+                        (CAUTION! override also SPACE option)
+      -----------------------------------------------------------------------
 
     If you need round-trip conversion, you had better use Jacode4e::RoundTrip
     module.
@@ -71,32 +81,5 @@ WHAT IS "CP932X"?
 
 SUPPORTED PERL VERSIONS
 
-  perl version 5.005_03 to newest perl
-
-SEE ALSO
-
-    jcode.pl: Perl library for Japanese character code conversion, Kazumasa Utashiro
-    ftp://ftp.iij.ad.jp/pub/IIJ/dist/utashiro/perl/
-    http://web.archive.org/web/20090608090304/http://srekcah.org/jcode/
-    ftp://ftp.oreilly.co.jp/pcjp98/utashiro/
-    http://mail.pm.org/pipermail/tokyo-pm/2002-March/001319.html
-    https://twitter.com/uta46/status/11578906320
-
-    jacode - Perl program for Japanese character code conversion
-    https://metacpan.org/release/Jacode
-
-    Jacode4e - jacode.pl-like program for enterprise
-    https://metacpan.org/release/Jacode4e
-
-    Jacode4e::RoundTrip - Jacode4e for round-trip conversion in JIS X 0213
-    https://metacpan.org/release/Jacode4e-RoundTrip
-
-    mb - run Perl script in MBCS encoding (not only CJK ;-)
-    https://metacpan.org/release/mb
-
-    UTF8::R2 - makes UTF-8 scripting easy for enterprise use or LTS
-    https://metacpan.org/release/UTF8-R2
-
-    Perl7::Handy - Handy Perl7 scripting environment on Perl5
-    https://metacpan.org/release/Perl7-Handy
+    perl version 5.005_03 to newest perl
 

@@ -272,6 +272,34 @@ static OP* croak_SSELECT(pTHX) {
 	return next;
 }
 
+static OP* croak_KILL(pTHX) {
+	dSP;
+	dAXMARKI;
+	dITEMS;
+	size_t expected = items - 1;
+	IV signal = SvIOK(ST(0)) ? SvIV(ST(0)) : -1;
+	SV* procname = expected == 1 ? ST(1) : NULL;
+	OP* next = opcodes[OP_KILL](aTHX);
+	if (signal && expected && autocroak_enabled()) {
+		SPAGAIN;
+		UV got = SvUV(TOPs);
+		if (got < expected && !allowed_for(TYPE, FALSE))
+			if (expected == 1) {
+				SV* message = newSVpvs("Could not kill ");
+				sv_catsv(message, procname);
+				sv_catpvs(message, ": ");
+				sv_caterror(message, errno);
+				throw_sv(message);
+			}
+			else {
+				SV* message = newSVpvf("Could not kill (%lu/%lu times): ", (expected-got) ,expected);
+				sv_caterror(message, errno);
+				throw_sv(message);
+			}
+	}
+	return next;
+}
+
 static unsigned initialized;
 
 MODULE = autocroak				PACKAGE = autocroak
@@ -295,6 +323,7 @@ BOOT:
 		OPCODE_REPLACE(SYSTEM)
 		OPCODE_REPLACE(PRINT)
 		OPCODE_REPLACE(SSELECT)
+		OPCODE_REPLACE(KILL)
 #undef FILETEST_WRAPPER
 #undef NUMERIC_WRAPPER
 #undef UNDEFINED_FILE_WRAPPER

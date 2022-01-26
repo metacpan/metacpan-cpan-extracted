@@ -23,7 +23,7 @@ use Test::Output;
 BEGIN {
     eval { require Curses::UI; };
     $@  and  plan skip_all => 'Curses::UI not found';
-    plan tests => 20;
+    plan tests => 23;
 
     # define fixed environment for unit tests:
     delete $ENV{DISPLAY};
@@ -105,10 +105,14 @@ my $button1 = UI::Various::Button->new(text => 'OK',
 				       });
 is(ref($button1), 'UI::Various::Curses::Button',
    'type UI::Various::Curses::Button is correct');
-my $var = 'thing';
-my $input1 = UI::Various::Input->new(textvar => \$var);
+my $ivar = 'thing';
+my $input1 = UI::Various::Input->new(textvar => \$ivar);
 is(ref($input1), 'UI::Various::Curses::Input',
    'type UI::Various::Curses::Input is correct');
+my $cvar = 1;
+my $check1 = UI::Various::Check->new(text => 'on/off', var => \$cvar);
+is(ref($check1), 'UI::Various::Curses::Check',
+   'type UI::Various::Curses::Check is correct');
 
 stderr_like
 {   $text1->_prepare(0, 0);   }
@@ -122,11 +126,16 @@ stderr_like
 {   $input1->_prepare(0, 0);   }
     qr/^UI::.*:Curses::Input element must be accompanied by parent$re_msg_tail/,
     'orphaned Input causes error';
+stderr_like
+{   $check1->_prepare(0, 0);   }
+    qr/^UI::.*:Curses::Check element must be accompanied by parent$re_msg_tail/,
+    'orphaned Check causes error';
 
 # additional fields with same SCALAR reference as $input1:
-my $text2  = UI::Various::Text ->new(text    => \$var);
-my $input2 = UI::Various::Input->new(textvar => \$var);
-my $dummy  = UI::Various::Dummy->new(text    => \$var);
+my $text2  = UI::Various::Text ->new(text    => \$ivar);
+my $input2 = UI::Various::Input->new(textvar => \$ivar);
+my $dummy  = UI::Various::Dummy->new(text    => \$ivar);
+my $check2 = UI::Various::Check->new(text => '2nd check', var => \$cvar);
 
 my $result = 'not set';
 my $w;
@@ -138,19 +147,21 @@ my $button2 = UI::Various::Button->new(text => 'Quit',
 					   $w->destroy;
 				       });
 $w = $main->window({title => 'Hello', width => 42},
-		   $text1, $input1, $button1, $button2, $text2, $input2);
+		   $text1, $input1, $check1, $button1, $button2,
+		   $text2, $input2, $check2);
 is(ref($w), 'UI::Various::Curses::Window',
    'type UI::Various::Curses::Window is correct');
 
 # Note that the text for an input field needs a '-1' after each character:
 @chars_to_read = ('s', -1, 'o', -1, 'm', -1, 'e', -1,
-		  "\t", ' ', "\t", ' ');
+		  "\t", ' ', ' ', ' ', "\t", ' ', "\t", ' ');
 combined_like
 {   $main->mainloop;   }
-    qr/^.* Hello World!.* Hello .*Quit\b.*$/s,
+    qr/^.* Hello World!.* Hello .*Quit\b.*\[X\].*\[X\].*$/s,
     'mainloop produces correct output';
 is(@{$main->{children}}, 0, 'main no longer has children');
-is($var, 'something', 'input variable has correct new value');
+is($ivar, 'something', 'input variable has correct new value');
+is($cvar, 0, 'check variable has correct value 0 after 3 invocations');
 is($result, 'something:something', 'all SCALAR references changed correctly');
 
 ####################################

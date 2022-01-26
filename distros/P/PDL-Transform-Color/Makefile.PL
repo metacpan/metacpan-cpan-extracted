@@ -30,25 +30,24 @@ WriteMakefile(
     AUTHOR                    => 'Craig DeForest <craig@deforest.org>',
     VERSION_FROM              => 'lib/PDL/Transform/Color.pm',
     ABSTRACT_FROM             => 'lib/PDL/Transform/Color.pm',
-    ( $ExtUtils::MakeMaker::VERSION >= 6.3002
-        ? ('LICENSE'          => 'perl')
-        : ()
-    ),
+    LICENSE                   => 'perl',
     MIN_PERL_VERSION          => 5.006,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 6.48,
+    },
+    TEST_REQUIRES => {
+        'Test::More' => '0.88',
     },
     PREREQ_PM => { 
         'PDL'                 => 0,
         'PDL::MatrixOps'      => 0,
 	'PDL::Transform'      => 0,
-        'Safe::Isa'           => 0
     },
     META_ADD => {
         resources => {
-            homepage          => 'http://github.com/drzowie/PDL-Transform-Color',
-            repository        => 'git://github.com/drzowie/PDL-Transform-Color.git',
-            bugtracker        => 'http://rt.cpan.org/Public/Dist/Display.html?Name=PDL-Transform-Color'
+            homepage          => 'http://github.com/PDLPorters/PDL-Transform-Color',
+            repository        => 'git://github.com/PDLPorters/PDL-Transform-Color.git',
+            bugtracker        => 'http://github.com/PDLPorters/PDL-Transform-Color/issues'
         }
     },  
 

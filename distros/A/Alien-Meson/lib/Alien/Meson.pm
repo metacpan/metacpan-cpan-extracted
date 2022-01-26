@@ -45,10 +45,11 @@ Returns the command name for running meson.
 sub exe {
   my($class) = @_;
   if( $class->install_type('share')
-    && $^O eq 'MSWin32'
     && $class->runtime_prop->{'python-source'}
     ) {
-    return ( 'python3', Path::Tiny->new( $class->bin_dir, $class->runtime_prop->{command}) );
+    return (
+      $class->runtime_prop->{python_bin},
+      Path::Tiny->new( $class->bin_dir, $class->runtime_prop->{command} ) );
   }
   $class->runtime_prop->{command};
 }
@@ -57,6 +58,10 @@ sub bin_dir {
   my ($class) = @_;
   if($class->install_type('share')) {
     my $dir = Path::Tiny->new($class->dist_dir);
+    my $bin_dir = $dir->child('bin');
+    if( -d $bin_dir ) {
+      return ("$bin_dir");
+    }
     return -d $dir ? ("$dir") : ();
   } else {
     return $class->SUPER::bin_dir(@_);

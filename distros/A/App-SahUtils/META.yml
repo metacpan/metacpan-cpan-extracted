@@ -31,8 +31,8 @@ requires:
   Data::Sah::Format: '0'
   Data::Sah::FormatJS: '0'
   Data::Sah::JS: '0.47'
-  Data::Sah::Normalize: 0.050_001
-  Data::Sah::Resolve: '0.009'
+  Data::Sah::Normalize: '0.051'
+  Data::Sah::Resolve: '0.010'
   Data::Sah::Util::Type: '0.45'
   File::Slurper: '0'
   JSON::MaybeXS: '0'
@@ -51,7 +51,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-SahUtils
   homepage: https://metacpan.org/release/App-SahUtils
   repository: git://github.com/perlancar/perl-App-SahUtils.git
-version: '0.478'
+version: '0.479'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

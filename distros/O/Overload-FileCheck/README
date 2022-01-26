@@ -1,5 +1,5 @@
 This archive contains the distribution Overload-FileCheck,
-version 0.011:
+version 0.012:
 
   override/mock perl file check -X: -e, -f, -d, ...
 

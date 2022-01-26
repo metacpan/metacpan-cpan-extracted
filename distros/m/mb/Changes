@@ -1,5 +1,9 @@
 Revision history for this software.
 
+0.38  2022-01-25 00:00:00
+  - remove some documents
+  - created by INABA Hitoshi
+
 0.37  2022-01-18 00:00:00
   - supports iterating over multiple values at a time: for my ($key, $value) (%hash) { ... }
   - supports iterating over multiple values at a time: for my ($left, $right, $gripping) (@moties) { ... }

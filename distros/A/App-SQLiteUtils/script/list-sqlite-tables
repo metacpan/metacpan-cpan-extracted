@@ -13,7 +13,7 @@ use Perinci::CmdLine::Any;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-09-13'; # DATE
 our $DIST = 'App-SQLiteUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/SQLiteUtils/list_sqlite_tables",
@@ -40,7 +40,7 @@ list-sqlite-tables - list-sqlite-tables
 
 =head1 VERSION
 
-This document describes version 0.004 of list-sqlite-tables (from Perl distribution App-SQLiteUtils), released on 2021-09-13.
+This document describes version 0.005 of list-sqlite-tables (from Perl distribution App-SQLiteUtils), released on 2021-09-13.
 
 =head1 SYNOPSIS
 

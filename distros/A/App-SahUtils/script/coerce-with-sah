@@ -1,9 +1,9 @@
 #!perl
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-27'; # DATE
+our $DATE = '2021-07-29'; # DATE
 our $DIST = 'App-SahUtils'; # DIST
-our $VERSION = '0.478'; # VERSION
+our $VERSION = '0.479'; # VERSION
 
 use 5.010;
 use strict;
@@ -327,7 +327,7 @@ coerce-with-sah - Coerce data
 
 =head1 VERSION
 
-This document describes version 0.478 of coerce-with-sah (from Perl distribution App-SahUtils), released on 2021-07-27.
+This document describes version 0.479 of coerce-with-sah (from Perl distribution App-SahUtils), released on 2021-07-29.
 
 =head1 SYNOPSIS
 
@@ -368,22 +368,22 @@ Examples:
                                                                "Ed"                => "d E",
                                                                "Ehm"               => "E h:mm a",
                                                                "EHm"               => "E HH:mm",
-                                                               "EHms"              => "E HH:mm:ss",
                                                                "Ehms"              => "E h:mm:ss a",
+                                                               "EHms"              => "E HH:mm:ss",
                                                                "Gy"                => "y G",
                                                                "GyMMM"             => "MMM y G",
                                                                "GyMMMd"            => "MMM d, y G",
                                                                "GyMMMEd"           => "E, MMM d, y G",
                                                                "H"                 => "HH",
                                                                "h"                 => "h a",
-                                                               "Hm"                => "HH:mm",
                                                                "hm"                => "h:mm a",
-                                                               "hms"               => "h:mm:ss a",
+                                                               "Hm"                => "HH:mm",
                                                                "Hms"               => "HH:mm:ss",
-                                                               "hmsv"              => "h:mm:ss a v",
+                                                               "hms"               => "h:mm:ss a",
                                                                "Hmsv"              => "HH:mm:ss v",
-                                                               "hmv"               => "h:mm a v",
+                                                               "hmsv"              => "h:mm:ss a v",
                                                                "Hmv"               => "HH:mm v",
+                                                               "hmv"               => "h:mm a v",
                                                                "M"                 => "L",
                                                                "Md"                => "M/d",
                                                                "MEd"               => "E, M/d",

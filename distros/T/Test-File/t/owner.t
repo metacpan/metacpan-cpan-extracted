@@ -106,8 +106,8 @@ my $name = 'Intentional owner_is failure with wrong user';
 my $testname = "$filename belongs to $other_name";
 test_out( "not ok 1 - $testname");
 test_diag(
-	"File [$filename] belongs to $owner_name ($owner_uid), not $other_name " .
-	"($other_uid)!\n" .
+	"file [$filename] belongs to $owner_name ($owner_uid), not $other_name " .
+	"($other_uid)\n" .
 	"#   Failed test '$testname'\n".
 	"#   at t/owner.t line " . line_num(+6) . "."
 	);
@@ -119,7 +119,7 @@ $name = "Intentional owner_is failure with invalid user [$invalid_user_name]";
 $testname = "$filename belongs to $invalid_user_name";
 test_out( "not ok 1 - $testname");
 test_diag(
-	"User [$invalid_user_name] does not exist on this system!\n" .
+	"user [$invalid_user_name] does not exist on this system\n" .
 	"#   Failed test '$testname'\n".
 	"#   at t/owner.t line " . line_num(+5) . "."
 	);
@@ -138,7 +138,7 @@ $name = 'Intentional owner_isnt failure';
 $testname = "$filename doesn't belong to $owner_name";
 test_out( "not ok 1 - $testname");
 test_diag(
-	"File [$filename] belongs to $owner_name ($owner_uid)!\n" .
+	"file [$filename] belongs to $owner_name ($owner_uid)\n" .
 	"#   Failed test '$testname'\n" .
 	"#   at t/owner.t line " . line_num(+5) . "."
 	);
@@ -158,9 +158,9 @@ group_isnt( $filename, $other_gid );
 $name = 'Intentional group_is failure';
 test_out( "not ok 1 - $name");
 test_diag(
-	"File [$filename] belongs to $file_group_name ($file_gid), not ".
+	"file [$filename] belongs to $file_group_name ($file_gid), not ".
 	"$other_group_name " .
-	"($other_gid)!\n" .
+	"($other_gid)\n" .
 	"#   Failed test '$name'\n".
 	"#   at t/owner.t line " . line_num(+7) . "."
 	);
@@ -171,7 +171,7 @@ test_test( $name );
 $name = "Intentional group_is failure with invalid group [$invalid_group_name]";
 test_out( "not ok 1 - $name");
 test_diag(
-	"Group [$invalid_group_name] does not exist on this system!\n" .
+	"group [$invalid_group_name] does not exist on this system\n" .
 	"#   Failed test '$name'\n".
 	"#   at t/owner.t line " . line_num(+5) . "."
 	);
@@ -182,7 +182,7 @@ test_test( $name );
 $name = 'Intentional group_isnt failure';
 test_out( "not ok 1 - $name");
 test_diag(
-	"File [$filename] belongs to $file_group_name ($file_gid)!\n" .
+	"file [$filename] belongs to $file_group_name ($file_gid)\n" .
 	"#   Failed test '$name'\n" .
 	"#   at t/owner.t line " . line_num(+5) . "."
 	);

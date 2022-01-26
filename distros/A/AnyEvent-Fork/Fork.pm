@@ -467,7 +467,7 @@ use AnyEvent::Util ();
 
 use IO::FDPass;
 
-our $VERSION = 1.31;
+our $VERSION = 1.32;
 
 # the early fork template process
 our $EARLY;
@@ -626,7 +626,7 @@ C<$^X> is investigated to see if the path ends with something that looks
 as if it were the perl interpreter. Failing this, the module falls back to
 using C<$Config::Config{perlpath}>.
 
-The path to perl can also be overriden by setting the global variable
+The path to perl can also be overridden by setting the global variable
 C<$AnyEvent::Fork::PERL> - it's value will be used for all subsequent
 invocations.
 
@@ -703,8 +703,10 @@ sub pid {
 
 =item $proc = $proc->eval ($perlcode, @args)
 
-Evaluates the given C<$perlcode> as ... Perl code, while setting C<@_> to
-the strings specified by C<@args>, in the "main" package.
+Evaluates the given C<$perlcode> as ... Perl code, while setting C<@_>
+to the strings specified by C<@args>, in the "main" package (so you can
+access the args using C<$_[0]> and so on, but not using implicit C<shit>
+as the latter works on C<@ARGV>).
 
 This call is meant to do any custom initialisation that might be required
 (for example, the C<require> method uses it). It's not supposed to be used

@@ -1,0 +1,320 @@
+#!/usr/local/bin/perl
+use 5.14.0;
+use warnings;
+eval 'exec /usr/local/bin/perl  -S $0 ${1+"$@"}'
+  if 0;    # not running under some shell
+our $VERSION = 0.06; # keep in synch with lib/Perl5/Dist/Backcompat.pm
+use Carp;
+use File::Spec;
+use Perl5::Dist::Backcompat;
+use Getopt::Long qw( GetOptions );
+use File::Temp qw( tempdir );
+#use Data::Dump qw( dd pp );
+
+##### CHECK ENVIRONMENT #####
+
+my ($perl_workdir, $path_to_perls, $tarball_dir, $results_dir,
+    $host, $verbose, $cat_summaries, $help) = ('') x 8;
+my @distros_requested = ();
+GetOptions(
+    "perl_workdir=s"    => \$perl_workdir,
+    "path_to_perls=s"   => \$path_to_perls,
+    "tarball_dir=s"     => \$tarball_dir,
+    "results_dir=s"     => \$results_dir,
+    "verbose"           => \$verbose,
+    "distro=s"          => \@distros_requested,
+    "host=s"            => \$host,
+    "cat_summaries"     => \$cat_summaries,
+    "help"              => \$help,
+) or die "Unable to get command-line options: $!";
+
+if ($help) {
+    system(qq| pod2text $0 |);
+    exit 0;
+}
+
+my @wanthyphens = ();
+for my $d (@distros_requested) {
+    if ($d =~ m/::/) {
+        push @wanthyphens, $d;
+    }
+}
+if (@wanthyphens) {
+    warn "$_: supply distribution name in 'Some-Distro' format, not 'Some::Distro'"
+        for @wanthyphens;
+    die "'distro' switch in incorrect format: $!";
+}
+
+my $self = Perl5::Dist::Backcompat->new( {
+    perl_workdir    => $perl_workdir,
+    path_to_perls   => $path_to_perls,
+    tarball_dir     => $tarball_dir,
+    verbose         => $verbose,
+} );
+
+$self->init();
+
+$self->categorize_distros();
+
+$self->show_makefile_pl_status();
+
+my @distros_for_testing = $self->get_distros_for_testing(\@distros_requested);
+
+my @perls = $self->validate_older_perls();
+
+say "Beginning processing of requested distros;\n  this will take some time ...";
+
+$results_dir ||= tempdir();
+$self->test_distros_against_older_perls($results_dir);
+
+$self->print_distro_summaries({ cat_summaries => $cat_summaries });
+
+unless (@distros_requested) {
+    my $results_ref = $self->tally_results();
+
+    my @lt = gmtime();
+    my $YYYYMMDDHHMM = sprintf("%04d%02d%02d%02d%02d" => (
+        $lt[5] + 1900,
+        $lt[4] + 1,
+        $lt[3],
+        $lt[2],
+        $lt[1],
+    ));
+
+    my $long = `git show | head -1 | cut -d ' ' -f2`;
+    chomp $long;
+    my $sha = substr($long,0,10);
+
+    my $tally_message = join "|" => (
+        $YYYYMMDDHHMM,
+        "Core: $self->{describe}",
+        "P5DBC: $sha",
+        "Tested: $results_ref->[0]",
+        "PASS: $results_ref->[1]",
+        "FAIL: $results_ref->[2]",
+        "Skipped: $results_ref->[3]",
+    );
+    say $tally_message;
+    my $logfile = File::Spec->catfile('.', 'etc', 'tally.log');
+    open my $TALLY, '>>', $logfile
+        or croak "Unable to open $logfile for appending";
+    say $TALLY $tally_message;
+    close $TALLY or croak "Unable to close $logfile after appending";
+}
+
+say "See results in $results_dir";
+say "\nFinished!" if $verbose;
+
+=head1 NAME
+
+p5-dist-backcompat - Will changes to F<dist/> build on older C<perl>s?
+
+=head1 SYNOPSIS
+
+Start in a F<git> checkout of the Perl 5 source code with a threaded build of
+F<perl> at a particular commit, branch or tag:
+
+    $ cd ${PERL_CHECKOUT_DIR}
+    $ git clean -dfx
+    $ sh ./Configure -des -Dusedevel -Duseithreads
+    $ make
+
+From that directory or another, call this program:
+
+    $ perl p5-dist-backcompat \
+        --perl_workdir ${PERL_CHECKOUT_DIR} \
+        --distro Data::Dumper \
+        --distro Path::Tools \
+        --cat_summaries \
+        --verbose \
+        2>&1 | tee /path/to/output/file
+
+Omit the C<--distro> switch-parameter pairs and you will test all F<dist/>
+distros.  (This will take approximately 45 minutes.)
+
+=head1 PREREQUISITES
+
+F<perl> 5.14.0 or newer, with the following modules installed from CPAN:
+
+=over 4
+
+=item * F<CPAN::DistnameInfo>
+
+=item * F<Data::Dump>
+
+=item * F<File::Copy::Recursive::Reduced>
+
+=back
+
+And with the library for which this program is a front end:
+F<Perl5::Dist::Backcompat> (not yet available on CPAN).
+
+Program will use a variety of modules which are shipped with the Perl 5 core
+distribution.
+
+=head1 COMMAND-LINE SWITCHES
+
+=over 4
+
+=item * C<--perl_workdir>
+
+Switch-parameter pair.  Parameter should be an absolute path to the directory
+holding a F<git> checkout of the Perl 5 core distribution; user must checkout
+branch, tag or commit in that directory as needed, then configure and build a
+threaded F<perl> as far as F<make>.
+
+=item * C<--distro>
+
+Switch-parameter pair.  Parameter should be hyphen-separated name of directory
+under F</dist>, I<e.g.>, C<ExtUtils-ParseXS>, not C<ExtUtils::ParseXS>.  May
+be called more than once, I<e.g.>:
+
+    --distro Search-Dict --distro Safe --distro=Data-Dumper
+
+The parameters must be spelled "distribution-style" (C<Some-Distro>) rather
+than "module-style" (C<Some::Distro>).
+
+=item * C<--cat_summaries>
+
+Flag.  When set to true, will direct method C<print_distro_summaries()> to
+concatenate all summaries on STDOUT.
+
+=item * C<--verbose>
+
+Flag.  Extra helpful output on F<STDOUT>.  Recommended, particularly with
+F<tee>-ing of program's output to a file on disk.
+
+=item * C<--host>
+
+Switch-parameter pair.  Parameter should be the string returned by the system
+F<hostname> call.  Defaults to C<dromedary.p5h.org>.  (Until such time as we
+know that another host has a full set of executables for older F<perl>s, this
+is the only host on which this program can actually be run.)
+
+=item * C<--path_to_perls>
+
+Switch-parameter pair.  Parameter should be an absolute path to the directory
+holding binary executables of older F<perl>s.  Defaults to
+F</media/Tux/perls-t/bin>, which is located on Dromedary.
+
+=item * C<--tarball_dir>
+
+Switch-parameter pair.  Parameter should be an absolute path to the directory
+where tarballs have been downloaded from CPAN of those F<dist/> distributions
+which have had a CPAN release.
+
+=item * C<--results_dir>
+
+Switch-parameter pair.  Parameter should be an absolute path to a directory
+where results files will be created.  If not provided, a temporary directory
+created via C<File::Temp::tempdir()> will be created.
+
+=back
+
+=head1 OUTPUT
+
+Results will be reported in plain-text files found in the directory specified
+by C<$results_dir>.  Let's assume that neither C<--verbose> nor
+C<--cat-summaries> has been requested.  Let' further assume that we request
+reports on two distros: F<base> and F<ExtUtils-ParseSX> and that we're content
+to use a tempdir for results.
+
+    $ perl p5-dist-backcompat \
+        --perl_workdir ${PERL_CHECKOUT_DIR} \
+        --distro base \
+        --distro ExtUtils-ParseXS
+
+On F<STDOUT> we would see something like this:
+
+    Beginning processing of requested distros;
+      this will take some time ...
+      FAIL: ExtUtils-ParseXS: 5.008009: make test
+
+      Summaries
+      ---------
+      See results in /tmp/htXsoU2C1
+
+In F</tmp/htXsoU2C1Z> we would see:
+
+    $ ls /tmp/htXsoU2C1Z/
+    base.perl5.10.1.txt  base.perl5.30.3.txt              ExtUtils-ParseXS.perl5.20.3.txt
+    base.perl5.12.5.txt  base.perl5.32.1.txt              ExtUtils-ParseXS.perl5.22.4.txt
+    base.perl5.14.4.txt  base.perl5.34.0.txt              ExtUtils-ParseXS.perl5.24.4.txt
+    base.perl5.16.3.txt  base.perl5.8.9.txt               ExtUtils-ParseXS.perl5.26.3.txt
+    base.perl5.18.4.txt  base.summary.txt                 ExtUtils-ParseXS.perl5.28.3.txt
+    base.perl5.20.3.txt  ExtUtils-ParseXS.perl5.10.1.txt  ExtUtils-ParseXS.perl5.30.3.txt
+    base.perl5.22.4.txt  ExtUtils-ParseXS.perl5.12.5.txt  ExtUtils-ParseXS.perl5.32.1.txt
+    base.perl5.24.4.txt  ExtUtils-ParseXS.perl5.14.4.txt  ExtUtils-ParseXS.perl5.34.0.txt
+    base.perl5.26.3.txt  ExtUtils-ParseXS.perl5.16.3.txt  ExtUtils-ParseXS.perl5.8.9.txt
+    base.perl5.28.3.txt  ExtUtils-ParseXS.perl5.18.4.txt  ExtUtils-ParseXS.summary.txt
+
+That is one F<distro.perl_version.txt> file for each combination of distro
+selected and older F<perl> actually run, plus one F<distro.summary.txt> file
+for each distro selected.  (Some combinations are excluded because older
+F<perl>s cannot supply prerequisites needed by a CPAN distro's F<Makefile.PL>,
+F<*.pm> files or F<t/*.t> files.)
+
+If we examine F<ExtUtils-ParseXS.perl5.8.9.txt>, we would see that the
+configured successfully with the F<Makefile.PL> from its current CPAN
+distribution and that F<make> also completed successfully.  However, three of
+its test files are lacking a prerequisite.  That cannot be supplied by our
+F<perl5.8.9> executable on disk.
+
+If we now look at F<ExtUtils-ParseXS.summary.txt>, we see:
+
+
+    $ cat /tmp/htXsoU2C1Z/ExtUtils-ParseXS.summary.txt
+    ExtUtils-ParseXS                                      v5.35.8-6-g441c427
+    {
+      "5.006002" => { a => "perl5.6.2", configure => undef, make => undef, test => undef },
+      "5.008009" => { a => "perl5.8.9", configure => 1, make => 1, test => 0 },
+      "5.010001" => { a => "perl5.10.1", configure => 1, make => 1, test => 1 },
+      "5.012005" => { a => "perl5.12.5", configure => 1, make => 1, test => 1 },
+      "5.014004" => { a => "perl5.14.4", configure => 1, make => 1, test => 1 },
+      "5.016003" => { a => "perl5.16.3", configure => 1, make => 1, test => 1 },
+      "5.018004" => { a => "perl5.18.4", configure => 1, make => 1, test => 1 },
+      "5.020003" => { a => "perl5.20.3", configure => 1, make => 1, test => 1 },
+      "5.022004" => { a => "perl5.22.4", configure => 1, make => 1, test => 1 },
+      "5.024004" => { a => "perl5.24.4", configure => 1, make => 1, test => 1 },
+      "5.026003" => { a => "perl5.26.3", configure => 1, make => 1, test => 1 },
+      "5.028003" => { a => "perl5.28.3", configure => 1, make => 1, test => 1 },
+      "5.030003" => { a => "perl5.30.3", configure => 1, make => 1, test => 1 },
+      "5.032001" => { a => "perl5.32.1", configure => 1, make => 1, test => 1 },
+      "5.034000" => { a => "perl5.34.0", configure => 1, make => 1, test => 1 },
+    }
+
+We interpret this to mean:  "If we were to plop down ExtUtil-ParseXS's code
+as it appears in blead into a candidate for a CPAN release, we would expect that
+..."
+
+=over 4
+
+=item *
+
+The program would not attempt even to configure against F<perl5.6.2>, because
+we already have ruled that out due to previously observed failures of some
+kind.
+
+=item *
+
+On F<perl5.8.9>, the CPAN distro candidate would pass F<perl Makefile.PL> and
+F<make> but fail during F<make test>.
+
+=item *
+
+On all subsequent F<perl>s, F<ExtUtils-ParseXS> would configure, build and
+test successfully.
+
+=back
+
+We would then leave it to the person designated to do a new CPAN release of
+F<ExtUtils-ParseXS> to determine what efforts need to be made to get it to
+pass on F<perl5.8.9> and whether efforts should be made to get it to work on
+F<perl5.6.2>.  Since, by definition as a F<dist/> distro, F<ExtUtils-ParseXS>
+is "blead-upstream", the releasor might have to file tickets about problem's
+in the Perl 5 core distribution's issue queue.
+
+=cut
+
+__END__
+

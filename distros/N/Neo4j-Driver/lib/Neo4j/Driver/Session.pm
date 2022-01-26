@@ -5,9 +5,9 @@ use utf8;
 
 package Neo4j::Driver::Session;
 # ABSTRACT: Context of work for database interactions
-$Neo4j::Driver::Session::VERSION = '0.27';
+$Neo4j::Driver::Session::VERSION = '0.28';
 
-use Carp qw(croak);
+use Carp qw();
 our @CARP_NOT = qw(Neo4j::Driver);
 use URI 1.25;
 
@@ -17,6 +17,7 @@ use Neo4j::Driver::Transaction;
 
 
 sub new {
+	# uncoverable pod (private method)
 	my ($class, $driver) = @_;
 	
 	return Neo4j::Driver::Session::Bolt->new($driver) if $driver->{uri}->scheme eq 'bolt';
@@ -29,21 +30,10 @@ sub new {
 sub _connect {
 	my ($self, $database) = @_;
 	
-	my $neo4j_version = $self->server->version;  # ensure contact with the server has been made
+	my $neo4j_version = $self->server->agent;  # ensure contact with the server has been made
 	$self->{cypher_params_v2} = 0 if $neo4j_version =~ m{^Neo4j/2\.};  # no conversion required
-	return $self if $neo4j_version =~ m{^Neo4j/[123]\.};  # nothing more to do
 	
-	if (! defined $database) {
-		# discover default database on Neo4j >= 4
-		eval {
-			my $sys = $self->{driver}->session(database => 'system');
-			$database = $sys->run('SHOW DEFAULT DATABASE')->single->get('name');
-		};
-		croak $@ . "Session creation failed because the default database"
-		         . " of $neo4j_version at " . $self->server->address
-		         . " could not be determined" unless defined $database;
-	}
-	
+	$database //= $self->server->_default_database($self->{driver});
 	$self->{net}->_set_database($database);
 	return $self;
 }
@@ -64,6 +54,7 @@ sub run {
 
 
 sub close {
+	# uncoverable pod (see Deprecations.pod)
 	warnings::warnif deprecated => __PACKAGE__ . "->close() is deprecated";
 }
 
@@ -71,7 +62,9 @@ sub close {
 sub server {
 	my ($self) = @_;
 	
-	return $self->{net}->_server;
+	my $server_info = $self->{driver}->{server_info};
+	return $server_info if defined $server_info;
+	return $self->{driver}->{server_info} = $self->{net}->_server;
 }
 
 
@@ -135,7 +128,7 @@ Neo4j::Driver::Session - Context of work for database interactions
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 SYNOPSIS
 
@@ -259,7 +252,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2021 by Arne Johannessen.
+This software is Copyright (c) 2016-2022 by Arne Johannessen.
 
 This is free software, licensed under:
 

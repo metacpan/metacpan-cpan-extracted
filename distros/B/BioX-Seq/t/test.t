@@ -27,6 +27,7 @@ my $test_2bit       = 'test_data/test3.2bit';
 my $test_orfs       = 'test_data/test4.fa';
 my $test_dsrc       = 'test_data/test2.fq.dsrc';
 my $test_fqz        = 'test_data/test2.fq.fqz';
+my $test_xz         = 'test_data/test2.fa.xz';
 my $test_onebyte    = 'test_data/one_byte.fa';
 my $test_foobar     = 'test_data/foobar.txt';
 my $test_notbgzip   = 'test_data/not_bgzip.fa.gz';
@@ -346,6 +347,26 @@ if ( can_run('fqz_comp') ) {
     $seq = $parser->next_seq;
     ok ($seq->seq eq 'ATTGAGAATGACCGATAAACT', "read 2nd seq");
     ok ($seq->qual eq '@11944491019494440111', "read 2nd qual");
+
+}
+
+#----------------------------------------------------------------------------#
+# xz testing
+#----------------------------------------------------------------------------#
+
+if (can_run( 'xz') ) {
+
+    $parser = BioX::Seq::Stream->new($test_xz);
+
+    ok ($parser->isa('BioX::Seq::Stream::FASTA'), "returned BioX::Seq::Stream::FASTA object");
+
+    $seq = $parser->next_seq;
+    ok ($seq->isa('BioX::Seq'), "returned BioX::Seq object");
+
+    ok ($seq->id eq 'Test1|someseq', "read seq ID");
+    ok ($seq->seq eq 'AATGCAAGTACGTAAGACTTATAGCAGTAGGATGGAATGATAGCCATAG', "read seq ");
+    ok ($seq->desc eq 'This is a test of the emergency broadcast system', "read desc");
+    ok (! defined $seq->qual, "undefined qual");
 
 }
 

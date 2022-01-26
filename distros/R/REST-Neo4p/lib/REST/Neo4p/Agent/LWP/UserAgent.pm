@@ -6,7 +6,7 @@ use LWP::ConnCache;
 use strict;
 use warnings;
 BEGIN {
-  $REST::Neo4p::Agent::LWP::UserAgent::VERSION = '0.4001';
+  $REST::Neo4p::Agent::LWP::UserAgent::VERSION = '0.4003';
 }
 sub new {
   my ($class,@args) = @_;

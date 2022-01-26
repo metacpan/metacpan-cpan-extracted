@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Math-BLAS
-version:            1.01
+version:            1.02
 abstract:           basic linear algebra subroutines
 author:
     - Ralph Schleicher <rs@ralph-schleicher.de>

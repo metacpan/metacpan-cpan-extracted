@@ -2,11 +2,11 @@
 
 =encoding utf8
 
-=for HTML <a href="../../actions?query=workflow%3Amacos"><img src="../../workflows/macos/badge.svg"></a>
+=for HTML <a href="https://www.github.com/briandfoy/module-extract-declaredversion/actions?query=workflow%3Amacos"><img src="https://www.github.com/briandfoy/module-extract-declaredversion/workflows/macos/badge.svg"></a>
 
-=for HTML <a href="../../actions?query=workflow%3Aubuntu"><img src="../../workflows/ubuntu/badge.svg"></a>
+=for HTML <a href="https://www.github.com/briandfoy/module-extract-declaredversion/actions?query=workflow%3Aubuntu"><img src="https://www.github.com/briandfoy/module-extract-declaredversion/workflows/ubuntu/badge.svg"></a>
 
-=for HTML <a href="../../actions?query=workflow%3Awindows"><img src="../../workflows/windows/badge.svg"></a>
+=for HTML <a href="https://www.github.com/briandfoy/module-extract-declaredversion/actions?query=workflow%3Awindows"><img src="https://www.github.com/briandfoy/module-extract-declaredversion/workflows/windows/badge.svg"></a>
 
 =for HTML <a href='https://ci.appveyor.com/project/briandfoy/module-extract-declaredversion'><img src='https://ci.appveyor.com/api/projects/status/hwsx2nactaag66qo' /></a>
 

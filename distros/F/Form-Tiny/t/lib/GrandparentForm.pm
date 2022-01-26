@@ -2,7 +2,7 @@ package GrandparentForm;
 
 # a complicated strict form with no required fields
 
-use Form::Tiny -base;
+use Form::Tiny -strict;
 
 form_field 'field1';
 

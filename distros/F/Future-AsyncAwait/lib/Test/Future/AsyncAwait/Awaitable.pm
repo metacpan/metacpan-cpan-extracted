@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
 
-package Test::Future::AsyncAwait::Awaitable 0.55;
+package Test::Future::AsyncAwait::Awaitable 0.56;
 
 use v5.14;
 use warnings;
@@ -173,7 +173,7 @@ sub test_awaitable
 
       my $f2 = $f1->AWAIT_CLONE;
 
-      $f1->AWAIT_ON_CANCEL( $f2 );
+      $f1->AWAIT_CHAIN_CANCEL( $f2 );
 
       ok( !$f2->AWAIT_IS_CANCELLED, 'AWAIT_IS_CANCELLED false before cancellation' );
 
@@ -181,8 +181,14 @@ sub test_awaitable
 
       ok(  $f2->AWAIT_IS_CANCELLED, 'AWAIT_IS_CANCELLED true after AWAIT_ON_CANCEL propagation' );
 
-      $f1->can( "AWAIT_CHAIN_CANCEL" ) or
-         diag "TODO: Class does not implement AWAIT_CHAIN_CANCEL";
+      my $f3 = $new->() or BAIL_OUT( "new did not yield an instance" );
+
+      my $cancelled;
+      $f3->AWAIT_ON_CANCEL( sub { $cancelled++ } );
+
+      $cancel->( $f3 );
+
+      ok( $cancelled, 'AWAIT_ON_CANCEL invoked callback' );
    };
 }
 

@@ -5,6 +5,7 @@ use strict;
 use parent qw(LWP::MemberMixin);
 
 use Carp ();
+use File::Copy ();
 use HTTP::Request ();
 use HTTP::Response ();
 use HTTP::Date ();
@@ -16,7 +17,7 @@ use LWP::Protocol ();
 use Scalar::Util qw(blessed);
 use Try::Tiny qw(try catch);
 
-our $VERSION = '6.60';
+our $VERSION = '6.61';
 
 sub new
 {
@@ -1005,10 +1006,14 @@ sub mirror
             $request->header( 'If-Modified-Since' => HTTP::Date::time2str($mtime) );
         }
     }
-    my $tmpfile = "$file-$$";
+
+    require File::Temp;
+    my ($tmpfh, $tmpfile) = File::Temp::tempfile("$file-XXXXXX");
+    close($tmpfh) or die "Could not close tmpfile '$tmpfile': $!";
 
     my $response = $self->request($request, $tmpfile);
     if ( $response->header('X-Died') ) {
+        unlink($tmpfile);
         die $response->header('X-Died');
     }
 
@@ -1031,13 +1036,18 @@ sub mirror
         # The file was the expected length.
         else {
             # Replace the stale file with a fresh copy
-            if ( -e $file ) {
-                # Some DOSish systems fail to rename if the target exists
-                chmod 0777, $file;
-                unlink $file;
-            }
-            rename( $tmpfile, $file )
+            # File::Copy will attempt to do it atomically,
+            # and fall back to a delete + copy if that fails.
+            File::Copy::move( $tmpfile, $file )
                 or die "Cannot rename '$tmpfile' to '$file': $!\n";
+
+            # Set standard file permissions if umask is supported.
+            # If not, leave what File::Temp created in effect.
+            if ( defined(my $umask = umask()) ) {
+                my $mode = 0666 &~ $umask;
+                chmod $mode, $file
+                    or die sprintf("Cannot chmod %o '%s': %s\n", $mode, $file, $!);
+            }
 
             # make sure the file has the same last modification time
             if ( my $lm = $response->last_modified ) {
@@ -1913,6 +1923,8 @@ time of the file.  If the document on the server has not changed since
 this time, then nothing happens.  If the document has been updated, it
 will be downloaded again.  The modification time of the file will be
 forced to match that of the server.
+
+Uses L<File::Copy/move> to attempt to atomically replace the C<$filename>.
 
 The return value is an L<HTTP::Response> object.
 

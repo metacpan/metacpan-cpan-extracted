@@ -1,3 +1,29 @@
+1.198 2022-01-22
+================
+
+[Quiq::Css]
+* Methode oneLine() hinzugefügt
+
+[Quiq::Html::Widget::SelectMenu]
+* Attribut "addNull" hinzugefügt
+
+[Quiq::Html::Resources]
+* Klasse hinzugefügt
+
+[Quiq::Html::Tag]
+* Methode setDefault() hinzugefügt
+* CSS- und JavaScript-Code kann optional einzeilig generiert werden
+
+[Quiq::JavaScript]
+* Bug in Methode line() behoben, wenn Argument $code leer ist
+
+[Quiq::JQuery::DataTable]
+* Klasse überarbeitet
+
+[Quiq::LockedContent]
+* Test auf nichttemporäre Datei umgestellt, da der Test auf FreeBSD
+  aus nicht näher bekannten Gründen manchmal fehlschlägt
+
 1.197 2021-12-26
 ================
 

@@ -95,6 +95,7 @@ lib/Quiq/Html/Listing.pm
 lib/Quiq/Html/Page.pm
 lib/Quiq/Html/Producer.pm
 lib/Quiq/Html/Pygments.pm
+lib/Quiq/Html/Resources.pm
 lib/Quiq/Html/Table/Base.pm
 lib/Quiq/Html/Table/List.pm
 lib/Quiq/Html/Table/Simple.pm
@@ -321,6 +322,7 @@ t/bin/Quiq/Html/Listing.t
 t/bin/Quiq/Html/Page.t
 t/bin/Quiq/Html/Producer.t
 t/bin/Quiq/Html/Pygments.t
+t/bin/Quiq/Html/Resources.t
 t/bin/Quiq/Html/Table/Base.t
 t/bin/Quiq/Html/Table/List.t
 t/bin/Quiq/Html/Table/Simple.t

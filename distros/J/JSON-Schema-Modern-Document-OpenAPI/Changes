@@ -1,5 +1,13 @@
 Revision history for JSON-Schema-Modern-Document-OpenAPI
 
+0.019     2022-01-23 08:17:30Z
+          - some instanceLocations in errors from validate_request and
+            validate_response have changed to be more specific regarding the
+            source of the error
+          - find_path is now a public method of OpenAPI::Modern, factored out
+            of validate_request and validate_response to enable third-party
+            callers to reuse information between these two method calls
+
 0.018     2022-01-17 23:37:05Z
           - fix parsing of escaped characters in URI paths and capture values
 

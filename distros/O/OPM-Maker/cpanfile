@@ -6,6 +6,7 @@ requires "Carp" => "0";
 requires "File::Basename" => "0";
 requires "File::Find::Rule" => "0";
 requires "Getopt::Long" => "0";
+requires "HTTP::Tiny" => "0";
 requires "MIME::Base64" => "0";
 requires "OPM::Validate" => "1.10";
 requires "Path::Class" => "0";

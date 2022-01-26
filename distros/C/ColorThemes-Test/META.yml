@@ -26,7 +26,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=ColorThemes-Test
   homepage: https://metacpan.org/release/ColorThemes-Test
   repository: git://github.com/perlancar/perl-ColorThemes-Test.git
-version: '0.005'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

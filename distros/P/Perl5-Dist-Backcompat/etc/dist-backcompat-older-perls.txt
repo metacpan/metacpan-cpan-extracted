@@ -1,0 +1,28 @@
+# Porting/dist-backcompat-older-perls.txt
+
+# This file holds configuration data for Porting/dist-backcompat.pl.  Blank or
+# all-whitespace lines are ignored.  Lines starting with a '#' are comments
+# and are also ignored.
+
+# All remaining lines are labels for older perl executables as built over many
+# years by H. Merijn Brand ("Tux") and stored on various iterations of our
+# development server known as Dromedary (currently dromedary.p5h.org).  The
+# labels are spelled with the convention Tux uses, namely, the string 'perl'
+# followed by a 3-part version number for the most recent maintenance or
+# production release for a given Perl release cycle.
+
+perl5.6.2
+perl5.8.9
+perl5.10.1
+perl5.12.5
+perl5.14.4
+perl5.16.3
+perl5.18.4
+perl5.20.3
+perl5.22.4
+perl5.24.4
+perl5.26.3
+perl5.28.3
+perl5.30.3
+perl5.32.1
+perl5.34.0

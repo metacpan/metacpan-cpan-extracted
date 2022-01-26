@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use UI::Various::core;
 use UI::Various::Button;
@@ -69,7 +69,7 @@ our @EXPORT_OK = qw();
 
 Prepare output of the UI element by determining and returning the space it
 wants or needs.  I<The method should only be called from
-C<UI::Various::Curses> container elements!>
+C<UI::Various::RichTerm> container elements!>
 
 =head3 returns:
 
@@ -81,9 +81,10 @@ width and height the UI element will require or need when printed
 
 sub _prepare($$)
 {
-    my ($self, $content_width) = @_;		# v- - 2 chars decoration
+    my ($self, $content_width) = @_;
+    # Note that Button has 2 chars "special" decoration used in each line:
     my ($w, $h) = $self->_size($self->text, $content_width - 2);
-    return ($w + 2, $h);			# + 2 chars decoration
+    return ($w + 2, $h);
 }
 
 #########################################################################
@@ -124,7 +125,7 @@ the rectangular text box for UI element
 sub _show($$$$)
 {
     my ($self, $prefix, $width, $height) = @_;
-    return $self->_format($prefix, $D{BL}, $self->text, $D{BR},
+    return $self->_format($prefix, $D{BL}, '', $self->text, '', $D{BR},
 			  $width - 2, $height);		# - 2 chars decoration
 }
 

@@ -1,5 +1,5 @@
 package Playwright;
-$Playwright::VERSION = '0.017';
+$Playwright::VERSION = '0.018';
 use strict;
 use warnings;
 
@@ -292,7 +292,7 @@ Playwright - Perl client for Playwright
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 
@@ -345,6 +345,18 @@ It should provide you with instructions which will get you working right away.
 
 However, depending on your node installation this may not work due to dependencies for node.js not being in the expected location.
 To fix this, you will need to update your NODE_PATH environment variable to point to the correct location.
+
+=head3 Node Versions
+
+playwright itself tends to need the latest version of node to work properly.
+It is recommended that you use nvm to get a hold of this:
+
+L<https://github.com/nvm-sh/nvm>
+
+From there it's recommended you use the latest version of node:
+
+    nvm install node
+    nvm use node
 
 =head2 Questions?
 

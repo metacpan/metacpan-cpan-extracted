@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2021-07-27'; # DATE
-our $VERSION = '0.478'; # VERSION
+our $DATE = '2021-07-29'; # DATE
+our $VERSION = '0.479'; # VERSION
 
 use 5.010;
 use strict;
@@ -172,7 +172,7 @@ sah-to-human - Convert Sah to human text
 
 =head1 VERSION
 
-This document describes version 0.478 of sah-to-human (from Perl distribution App-SahUtils), released on 2021-07-27.
+This document describes version 0.479 of sah-to-human (from Perl distribution App-SahUtils), released on 2021-07-29.
 
 =head1 SYNOPSIS
 

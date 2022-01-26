@@ -1,3 +1,17 @@
-0.001   2019-03-10 (PERLANCAR)
+0.003   2022-01-21  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Edit Changes entry for 0.002.
+
+
+0.002   2022-01-17  Released-By: PERLANCAR; Urgency: medium
+
+        - Add entry: Parse::nm.
+
+        - Sort entries.
+
+
+0.001   2019-03-10  Released-By: PERLANCAR
 
         - First release.

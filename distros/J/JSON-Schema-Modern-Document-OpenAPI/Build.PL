@@ -87,7 +87,7 @@ EOW
         "Karen Etheridge <ether\@cpan.org>"
       ],
       "dist_name" => "JSON-Schema-Modern-Document-OpenAPI",
-      "dist_version" => "0.018",
+      "dist_version" => "0.019",
       "license" => "perl",
       "module_name" => "JSON::Schema::Modern::Document::OpenAPI",
       "recursive_test_files" => 1,

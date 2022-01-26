@@ -5,8 +5,9 @@ use warnings;
 use base qw( Device::Chip::Adapter );
 use Carp qw/croak/;
 use Device::Chip::Adapter::LinuxKernel::_SPI;
+use Device::Chip::Adapter::LinuxKernel::_I2C;
 
-our $VERSION = '0.00005';
+our $VERSION = '0.00006';
 
 our $__TESTDIR=""; # blank unless we're being pointed at a test setup
 
@@ -284,54 +285,6 @@ sub read_gpios {
     Future->done({map {$_ => $self->_read_gpio_value} @$gpios});
 }
 
-package 
-    Device::Chip::Adapter::LinuxKernel::_I2C;
-
-use base qw( Device::Chip::Adapter::LinuxKernel::_base );
-use Carp qw/croak/;
-use Device::SMBus;
-
-sub configure {
-    my $self = shift;
-    my %args = @_;
-    
-    $self->{address} = delete $args{addr};
-    $self->{max_rate} = delete $args{max_bitrate}; # We're unable to affect this from userland it seems
-    
-    croak "Missing required parameter 'bus'" unless defined $self->{i2c_bus};
-    croak "Missing required parameter 'addr'" unless defined $self->{address};
-        
-    croak "Unrecognised configuration options: " . join( ", ", keys %args ) if %args;
-
-    $self->{smbus} = Device::SMBus->new(
-        I2CBusDevicePath => $self->{i2c_bus},
-        I2CDeviceAddress => $self->{address},
-    );
-
-    Future->done($self);
-}
-
-sub write {
-    my $self = shift;
-    my ($bytes_out) = @_;
-    my @bytes = unpack "C*", $bytes_out; # unpack it into an array for Device::SMBus
-    
-    my $register = shift @bytes; # Not always technically a register, but 99% of things do work that way.
-    
-    $self->{smbus}->writeBlockData($register, \@bytes);
-    
-    Future->done;
-}
-
-sub write_then_read {
-    my $self = shift;
-    my ($bytes_out, $len_in) = @_;
-    my ($register, @bytes) = unpack "C*", $bytes_out; # unpack it into an array for Device::SMBus, this doesn't support larger writes to select multiple registers or other fancy shit
-
-    my $val = join "", map {chr(0+$_)} $self->{smbus}->readBlockData($register, $len_in);
-    
-    Future->done($val);
-}
 
 =head1 AUTHOR
 

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2021 -- leonerd@leonerd.org.uk
 
-package Future::AsyncAwait 0.55;
+package Future::AsyncAwait 0.56;
 
 use v5.14;
 use warnings;
@@ -13,7 +13,7 @@ use Carp;
 require XSLoader;
 XSLoader::load( __PACKAGE__, our $VERSION );
 
-require Future; Future->VERSION( '0.43' );
+require Future; Future->VERSION( '0.48' );
 
 if( !Future->can( "AWAIT_WAIT" ) ) {
    no strict 'refs';
@@ -477,6 +477,18 @@ async subs which await expressions:
          say "code finished";
       }
    }
+
+=head2 Syntax::Keyword::MultiSub
+
+As of L<Future::AsyncAwait> version 0.55 and L<Syntax::Keyword::MultiSub>
+version 0.02 a cross-module integration test asserts that the C<multi>
+modifier can be applied to C<async sub>.
+
+   use Future::AsyncAwait;
+   use Syntax::Keyword::MultiSub;
+
+   async multi sub f () { return "nothing"; }
+   async multi sub f ($key) { return await get_thing($key); }
 
 =cut
 

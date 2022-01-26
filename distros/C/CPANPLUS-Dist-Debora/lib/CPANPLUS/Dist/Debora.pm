@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 use parent qw(CPANPLUS::Dist::Base);
 
@@ -72,6 +72,8 @@ sub prepare {
         local $ENV{PERL_MM_OPT}   = $package->mm_opt;
         local $ENV{PERL_MB_OPT}   = $package->mb_opt;
         local $ENV{MODULEBUILDRC} = 'NONE';
+        $params{buildflags}     = q{};
+        $params{makemakerflags} = q{};
 
         # There are old distributions that expect "." to be in @INC.
         local $ENV{PERL_USE_UNSAFE_INC} = 1;
@@ -84,11 +86,7 @@ sub prepare {
         # We are not allowed to write to XML/SAX/ParserDetails.ini.
         local $ENV{SKIP_SAX_INSTALL} = 1;
 
-        $self->SUPER::prepare(
-            %params,
-            buildflags     => q{},
-            makemakerflags => q{},
-        );
+        $self->SUPER::prepare(%params);
     };
 
     return $status->prepared($ok);
@@ -115,6 +113,8 @@ sub create {
         delete local $ENV{PERL_MM_OPT};
         delete local $ENV{PERL_MB_OPT};
         local $ENV{MODULEBUILDRC} = 'NONE';
+        $params{buildflags}     = q{};
+        $params{makemakerflags} = q{};
 
         # There are old distributions that expect "." to be in @INC.
         local $ENV{PERL_USE_UNSAFE_INC} = 1;
@@ -134,11 +134,7 @@ sub create {
             }
         }
 
-        $self->SUPER::create(
-            %params,
-            buildflags     => q{},
-            makemakerflags => q{},
-        );
+        $self->SUPER::create(%params);
     };
 
     if ($ok) {
@@ -222,7 +218,7 @@ CPANPLUS::Dist::Debora - Create Debian or RPM packages from Perl modules
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

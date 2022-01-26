@@ -18,6 +18,7 @@ use Firefox::Marionette::Proxy();
 use Firefox::Marionette::Exception();
 use Firefox::Marionette::Exception::Response();
 use Firefox::Marionette::UpdateStatus();
+use Firefox::Marionette::ShadowRoot();
 use Waterfox::Marionette::Profile();
 use Compress::Zlib();
 use Config::INI::Reader();
@@ -43,6 +44,7 @@ use FileHandle();
 use MIME::Base64();
 use DirHandle();
 use XML::Parser();
+use Text::CSV_XS();
 use Carp();
 use Config;
 use base qw(Exporter);
@@ -59,7 +61,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '1.17';
+our $VERSION = '1.20';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -80,6 +82,7 @@ sub _MIN_VERSION_FOR_MODERN_EXIT    { return 40 }
 sub _MIN_VERSION_FOR_AUTO_LISTEN    { return 55 }
 sub _MIN_VERSION_FOR_HOSTPORT_PROXY { return 57 }
 sub _MIN_VERSION_FOR_XVFB           { return 12 }
+sub _MIN_VERSION_FOR_WEBDRIVER_IDS  { return 63 }
 sub _MIN_VERSION_FOR_LINUX_SANDBOX  { return 90 }
 sub _DEFAULT_SOCKS_VERSION          { return 5 }
 sub _MILLISECONDS_IN_ONE_SECOND     { return 1_000 }
@@ -1082,6 +1085,8 @@ _JS_
                     $form->has_name( $login->password_field ) )
               )
             {
+                $user_field->clear();
+                $password_field->clear();
                 $user_field->type( $login->user() );
                 $password_field->type( $login->password() );
                 $found = 1;
@@ -1130,6 +1135,204 @@ sub _define_login_info_from_blessed_user {
 let $variable_name = Components.classes["\@mozilla.org/login-manager/loginInfo;1"].createInstance(Components.interfaces.nsILoginInfo);
 $variable_name.init(arguments[0].host, ("realm" in arguments[0] && arguments[0].realm !== null ? null : arguments[0].origin || ""), arguments[0].realm, arguments[0].user, arguments[0].password, "user_field" in arguments[0] && arguments[0].user_field !== null ? arguments[0].user_field : "", "password_field" in arguments[0] && arguments[0].password_field !== null ? arguments[0].password_field : "");
 _JS_
+}
+
+sub _get_1password_login_items {
+    my ( $class, $json ) = @_;
+    my @items;
+    foreach my $account ( @{ $json->{accounts} } ) {
+        foreach my $vault ( @{ $account->{vaults} } ) {
+            foreach my $item ( @{ $vault->{items} } ) {
+                if (   ( $item->{item}->{categoryUuid} eq '001' )
+                    && ( $item->{item}->{overview}->{url} ) )
+                {    # Login
+                    push @items, $item->{item};
+                }
+            }
+        }
+    }
+    return @items;
+}
+
+sub logins_from_csv {
+    my ( $class, $import_handle ) = @_;
+    binmode $import_handle, ':encoding(utf8)';
+    my $parameters =
+      $class->_csv_parameters( $class->_get_extra_parameters($import_handle) );
+    $parameters->{auto_diag} = 1;
+    my $csv = Text::CSV_XS->new($parameters);
+    my @logins;
+    my $count = 0;
+    my %import_headers;
+
+    foreach my $key ( $csv->header($import_handle) ) {
+        $import_headers{$key} = $count;
+        $count += 1;
+    }
+    my %mapping = (
+        'web site'          => 'host',
+        'login name'        => 'user',
+        login_uri           => 'host',
+        login_username      => 'user',
+        login_password      => 'password',
+        url                 => 'host',
+        username            => 'user',
+        password            => 'password',
+        httprealm           => 'realm',
+        formactionorigin    => 'origin',
+        guid                => 'guid',
+        timecreated         => 'creation_in_ms',
+        timelastused        => 'last_used_in_ms',
+        timepasswordchanged => 'password_changed_in_ms',
+    );
+    while ( my $row = $csv->getline($import_handle) ) {
+        my %parameters;
+        foreach my $key ( sort { $a cmp $b } keys %import_headers ) {
+            if (   ( exists $row->[ $import_headers{$key} ] )
+                && ( defined $mapping{$key} ) )
+            {
+                $parameters{ $mapping{$key} } = $row->[ $import_headers{$key} ];
+            }
+        }
+        foreach my $key (qw(host origin)) {
+            if ( defined $parameters{$key} ) {
+                my $uri = URI->new( $parameters{$key} )->canonical();
+                if ( !$uri->has_recognized_scheme() ) {
+                    my $default_scheme = 'https://';
+                    warn
+"$parameters{$key} does not have a recognised scheme.  Prepending '$default_scheme'\n";
+                    $uri = URI->new( $default_scheme . $parameters{$key} );
+                }
+                $parameters{$key} = $uri->scheme() . q[://] . $uri->host();
+                if ( $uri->default_port() != $uri->port() ) {
+                    $parameters{$key} .= q[:] . $uri->port();
+                }
+            }
+        }
+        if (
+            my $login = $class->_csv_record_is_a_login(
+                $row, \%parameters, \%import_headers
+            )
+          )
+        {
+            push @logins, $login;
+        }
+    }
+    return @logins;
+}
+
+sub _csv_record_is_a_login {
+    my ( $class, $row, $parameters, $import_headers ) = @_;
+    if (   ( $parameters->{host} )
+        && ( $parameters->{host} eq 'http://sn' )
+        && ( $import_headers->{extra} )
+        && ( $row->[ $import_headers->{extra} ] )
+        && ( $row->[ $import_headers->{extra} ] =~ /^NoteType:/smx ) )
+    {
+        warn
+"Skipping non-web login for '$parameters->{user}' (probably from a LastPass export)\n";
+        return;
+    }
+    elsif (( defined $import_headers->{'first one-time password'} )
+        && ( $import_headers->{type} )
+        && ( $row->[ $import_headers->{type} ] ne 'Login' )
+      )    # See 001 reference for v8
+    {
+        warn
+"Skipping $row->[ $import_headers->{type} ] record (probably from a 1Password export)\n";
+        return;
+    }
+    elsif (( $parameters->{host} )
+        && ( $parameters->{user} )
+        && ( $parameters->{password} ) )
+    {
+        return Firefox::Marionette::Login->new( %{$parameters} );
+    }
+    return;
+}
+
+sub _csv_parameters {
+    my ( $class, $extra ) = @_;
+    return {
+        binary         => 1,
+        empty_is_undef => 1,
+        %{$extra},
+    };
+}
+
+sub _get_extra_parameters {
+    my ( $class, $import_handle ) = @_;
+    my @extra_parameter_sets = (
+        {},                                                    # normal
+        { escape_char => q[\\], allow_loose_escapes => 1 },    # KeePass
+        {
+            escape_char         => q[\\],
+            allow_loose_escapes => 1,
+            eol                 => ",$INPUT_RECORD_SEPARATOR"
+        },                                                     # 1Password v7
+    );
+    my $extra_parameters = {};
+  SET: foreach my $parameter_set (@extra_parameter_sets) {
+        seek $import_handle, Fcntl::SEEK_SET(), 0
+          or die "Failed to seek to start of file:$EXTENDED_OS_ERROR\n";
+        my $parameters = $class->_csv_parameters($parameter_set);
+        $parameters->{auto_diag} = 2;
+        my $csv = Text::CSV_XS->new($parameters);
+        eval {
+            foreach my $key (
+                $csv->header(
+                    $import_handle,
+                    {
+                        munge_column_names => sub { defined $_ ? lc : q[] }
+                    }
+                )
+              )
+            {
+            }
+            while ( my $row = $csv->getline($import_handle) ) {
+            }
+            $extra_parameters = $parameter_set;
+        } or do {
+            next SET;
+        };
+        last SET;
+    }
+    seek $import_handle, Fcntl::SEEK_SET(), 0
+      or die "Failed to seek to start of file:$EXTENDED_OS_ERROR\n";
+    return $extra_parameters;
+}
+
+sub logins_from_zip {
+    my ( $class, $import_handle ) = @_;
+    my @logins;
+    my $zip = Archive::Zip->new($import_handle);
+    if ( $zip->memberNamed('export.data')
+        && ( $zip->memberNamed('export.attributes') ) )
+    {    # 1Password v8
+        my $json = JSON::decode_json( $zip->contents('export.data') );
+        foreach my $item ( $class->_get_1password_login_items($json) ) {
+            my ( $username, $password );
+            foreach my $login_field ( @{ $item->{details}->{loginFields} } ) {
+                if ( $login_field->{designation} eq 'username' ) {
+                    $username = $login_field->{value};
+                }
+                elsif ( $login_field->{designation} eq 'password' ) {
+                    $password = $login_field->{value};
+                }
+            }
+            if ( ( defined $username ) && ( defined $password ) ) {
+                push @logins,
+                  Firefox::Marionette::Login->new(
+                    guid     => $item->{uuid},
+                    host     => $item->{overview}->{url},
+                    user     => $username,
+                    password => $password,
+                    creation => $item->{createdAt},
+                  );
+            }
+        }
+    }
+    return @logins;
 }
 
 sub add_login {
@@ -1843,7 +2046,9 @@ sub _check_protocol_version_and_pid {
 sub _post_launch_checks_and_setup {
     my ( $self, $timeouts ) = @_;
     $self->_write_local_proxy( $self->_ssh() );
-    $self->timeouts($timeouts);
+    if ( defined $timeouts ) {
+        $self->timeouts($timeouts);
+    }
     if ( $self->{_har} ) {
         $self->_build_local_extension_directory();
         my $path = File::Spec->catfile(
@@ -2236,6 +2441,21 @@ sub _is_xvfb_okay {
     }
 }
 
+sub _is_using_webdriver_ids_exclusively {
+    my ($self) = @_;
+    if (
+        $self->_is_firefox_major_version_at_least(
+            _MIN_VERSION_FOR_WEBDRIVER_IDS()
+        )
+      )
+    {
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
+
 sub _is_new_hostport_okay {
     my ($self) = @_;
     if (
@@ -2353,8 +2573,8 @@ sub execute {
                 "Failed to execute '$binary':$EXTENDED_OS_ERROR");
         };
         my ( $result, $output );
-        while ( $result = read $reader, my $buffer,
-            _READ_LENGTH_OF_OPEN3_OUTPUT() )
+        while ( $result = read $reader,
+            my $buffer, _READ_LENGTH_OF_OPEN3_OUTPUT() )
         {
             $output .= $buffer;
         }
@@ -3268,7 +3488,8 @@ sub macos_binary_paths {
         }
         if ( $self->{requested_version}->{waterfox} ) {
             return (
-                '/Applications/Waterfox Current.app/Contents/MacOS/waterfox', );
+                '/Applications/Waterfox Current.app/Contents/MacOS/waterfox',
+            );
         }
     }
     return (
@@ -6601,6 +6822,7 @@ sub _map_deprecated_pdf_parameters {
     my %mapping = (
         shrink_to_fit    => 'shrinkToFit',
         print_background => 'printBackground',
+        page_ranges      => 'pageRanges',
     );
     foreach my $from ( sort { $a cmp $b } keys %mapping ) {
         my $to = $mapping{$from};
@@ -6620,6 +6842,7 @@ sub _map_deprecated_pdf_parameters {
         next if ( $key eq 'printBackground' );
         next if ( $key eq 'margin' );
         next if ( $key eq 'page' );
+        next if ( $key eq 'pageRanges' );
         next if ( $key eq 'size' );
         next if ( $key eq 'raw' );
         Firefox::Marionette::Exception->throw(
@@ -7316,11 +7539,13 @@ sub _find {
               map { Firefox::Marionette::Element->new( $self, %{$_} ) }
               @{ $response->result() };
         }
-        elsif (( ref $self->_response_result_value($response) )
+        elsif (
+               ( ref $self->_response_result_value($response) )
             && ( ( ref $self->_response_result_value($response) ) eq 'ARRAY' )
             && ( ref $self->_response_result_value($response)->[0] )
             && ( ( ref $self->_response_result_value($response)->[0] ) eq
-                'HASH' ) )
+                'HASH' )
+          )
         {
             return
               map { Firefox::Marionette::Element->new( $self, %{$_} ) }
@@ -7907,7 +8132,67 @@ sub script {
         ]
     );
     my $response = $self->_get_response($message_id);
-    return $self->_response_result_value($response);
+    return $self->_check_for_and_translate_into_objects(
+        $self->_response_result_value($response) );
+}
+
+sub _get_any_class_from_variable {
+    my ( $self, $object ) = @_;
+    my $class;
+    my $old_class;
+    my $count = 0;
+    foreach my $key ( sort { $a cmp $b } keys %{$object} ) {
+        foreach my $known_class (
+            qw(
+            Firefox::Marionette::Element
+            Firefox::Marionette::ShadowRoot
+            )
+          )
+        {
+            if ( $key eq $known_class->IDENTIFIER() ) {
+                $class = $known_class;
+            }
+        }
+        if ( $key eq 'ELEMENT' ) {
+            $old_class = 'Firefox::Marionette::Element';
+        }
+        $count += 1;
+    }
+    if ( ( $count == 1 ) && ( defined $class ) ) {
+        return $class;
+    }
+    elsif ( !$self->_is_using_webdriver_ids_exclusively() ) {
+        if ( ( $count == 1 ) && ( defined $old_class ) ) {
+            return $old_class;
+        }
+        elsif (( $count == 2 )
+            && ( defined $class ) )
+        {
+            return $class;
+        }
+    }
+    return;
+}
+
+sub _check_for_and_translate_into_objects {
+    my ( $self, $value ) = @_;
+    if ( my $ref = ref $value ) {
+        if ( $ref eq 'HASH' ) {
+            if ( my $class = $self->_get_any_class_from_variable($value) ) {
+                my $instance = $class->new( $self, %{$value} );
+                return $instance;
+            }
+        }
+        elsif ( $ref eq 'ARRAY' ) {
+            my @objects;
+            foreach my $object ( @{$value} ) {
+                push @objects,
+                  $self->_check_for_and_translate_into_objects($object);
+            }
+            return \@objects;
+        }
+    }
+    return $value;
 }
 
 sub json {
@@ -8004,6 +8289,37 @@ sub window_type {
     );
     my $response = $self->_get_response($message_id);
     return $self->_response_result_value($response);
+}
+
+sub shadowy {
+    my ( $self, $element ) = @_;
+    if (
+        $self->script(
+q[if (arguments[0].shadowRoot) { return true } else { return false }],
+            args => [$element]
+        )
+      )
+    {
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
+
+sub shadow_root {
+    my ( $self, $element ) = @_;
+    my $message_id = $self->_new_message_id();
+    $self->_send_request(
+        [
+            _COMMAND(), $message_id,
+            $self->_command('WebDriver:GetShadowRoot'),
+            { id => $element->uuid() }
+        ]
+    );
+    my $response = $self->_get_response($message_id);
+    return Firefox::Marionette::ShadowRoot->new( $self,
+        %{ $self->_response_result_value($response) } );
 }
 
 sub switch_to_shadow_root {
@@ -8554,7 +8870,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 1.17
+Version 1.20
 
 =head1 SYNOPSIS
 
@@ -8567,7 +8883,7 @@ Version 1.17
 
     say $firefox->html();
 
-    $firefox->find_class('container-fluid')->find_id('search-input')->type('Test::More');
+    $firefox->find_class('container-fluid')->find_id('metacpan_search-input')->type('Test::More');
 
     say "Height of search box is " . $firefox->find_class('container-fluid')->css('height');
 
@@ -8756,7 +9072,7 @@ accepts a subroutine reference as a parameter and then executes the subroutine. 
 
     my $firefox = Firefox::Marionette->new(sleep_time_in_ms => 5)->go('https://metacpan.org/');
 
-    $firefox->find_id('search-input')->type('Test::More');
+    $firefox->find_id('metacpan_search-input')->type('Test::More');
 
     $firefox->find_name('lucky')->click();
 
@@ -8786,7 +9102,7 @@ accepts a subroutine reference as a parameter and then executes the subroutine. 
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
-    $firefox->find_id('search-input')->type('Test::More');
+    $firefox->find_id('metacpan_search-input')->type('Test::More');
 
     $firefox->find_name('lucky')->click();
 
@@ -8849,11 +9165,11 @@ See the L<context|Firefox::Marionette#context> method for an alternative methods
 
 =head2 chrome_window_handle
 
-returns an server-assigned integer identifiers for the current chrome window that uniquely identifies it within this Marionette instance.  This can be used to switch to this window at a later point. This corresponds to a window that may itself contain tabs.  This method is replaced by L<window_handle|Firefox::Marionette#window_handle> and appropriate L<context|Firefox::Marionette#context> calls for Firefox 94 and after.
+returns an server-assigned integer identifiers for the current chrome window that uniquely identifies it within this Marionette instance.  This can be used to switch to this window at a later point. This corresponds to a window that may itself contain tabs.  This method is replaced by L<window_handle|Firefox::Marionette#window_handle> and appropriate L<context|Firefox::Marionette#context> calls for L<Firefox 94 and after|https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Releases/94#webdriver_conformance_marionette>.
 
 =head2 chrome_window_handles
 
-returns identifiers for each open chrome window for tests interested in managing a set of chrome windows and tabs separately.  This method is replaced by L<window_handles|Firefox::Marionette#window_handles> and appropriate L<context|Firefox::Marionette#context> calls for Firefox 94 and after.
+returns identifiers for each open chrome window for tests interested in managing a set of chrome windows and tabs separately.  This method is replaced by L<window_handles|Firefox::Marionette#window_handles> and appropriate L<context|Firefox::Marionette#context> calls for L<Firefox 94 and after|https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Releases/94#webdriver_conformance_marionette>.
 
 =head2 clear
 
@@ -8935,7 +9251,7 @@ accepts an L<element|Firefox::Marionette::Element> as the first parameter and a 
     use v5.10;
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
-    say $firefox->find_id('search-input')->css('height');
+    say $firefox->find_id('metacpan_search-input')->css('height');
 
 =head2 current_chrome_window_handle 
 
@@ -9054,7 +9370,7 @@ accepts a filesystem path and returns a matching filehandle.  This is trivial fo
 
     my $firefox = Firefox::Marionette->new( host => '10.1.2.3' )->go('https://metacpan.org/');
 
-    $firefox->find_class('container-fluid')->find_id('search-input')->type('Test::More');
+    $firefox->find_class('container-fluid')->find_id('metacpan_search-input')->type('Test::More');
 
     $firefox->find('//button[@name="lucky"]')->click();
 
@@ -9079,7 +9395,7 @@ returns true if any files in L<downloads|Firefox::Marionette#downloads> end in C
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
-    $firefox->find_class('container-fluid')->find_id('search-input')->type('Test::More');
+    $firefox->find_class('container-fluid')->find_id('metacpan_search-input')->type('Test::More');
 
     $firefox->find('//button[@name="lucky"]')->click();
 
@@ -9102,7 +9418,7 @@ returns a list of file paths (including partial downloads) of downloads during t
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
-    $firefox->find_class('container-fluid')->find_id('search-input')->type('Test::More');
+    $firefox->find_class('container-fluid')->find_id('metacpan_search-input')->type('Test::More');
 
     $firefox->find('//button[@name="lucky"]')->click();
 
@@ -9155,11 +9471,11 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
-    $firefox->find('//input[@id="search-input"]')->type('Test::More');
+    $firefox->find('//input[@id="metacpan_search-input"]')->type('Test::More');
 
     # OR in list context 
 
-    foreach my $element ($firefox->find('//input[@id="search-input"]')) {
+    foreach my $element ($firefox->find('//input[@id="metacpan_search-input"]')) {
         $element->type('Test::More');
     }
 
@@ -9175,11 +9491,11 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
-    $firefox->find_id('search-input')->type('Test::More');
+    $firefox->find_id('metacpan_search-input')->type('Test::More');
 
     # OR in list context 
 
-    foreach my $element ($firefox->find_id('search-input')) {
+    foreach my $element ($firefox->find_id('metacpan_search-input')) {
         $element->type('Test::More');
     }
 
@@ -9213,11 +9529,11 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
     use Firefox::Marionette();
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
-    $firefox->find_class('form-control home-search-input')->type('Test::More');
+    $firefox->find_class('form-control home-metacpan_search-input')->type('Test::More');
 
     # OR in list context 
 
-    foreach my $element ($firefox->find_class('form-control home-search-input')) {
+    foreach my $element ($firefox->find_class('form-control home-metacpan_search-input')) {
         $element->type('Test::More');
     }
 
@@ -9232,11 +9548,11 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
     use Firefox::Marionette();
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
-    $firefox->find_selector('input.home-search-input')->type('Test::More');
+    $firefox->find_selector('input.home-metacpan_search-input')->type('Test::More');
 
     # OR in list context 
 
-    foreach my $element ($firefox->find_selector('input.home-search-input')) {
+    foreach my $element ($firefox->find_selector('input.home-metacpan_search-input')) {
         $element->type('Test::More');
     }
 
@@ -9339,7 +9655,7 @@ returns a hashref representing the L<http archive|https://en.wikipedia.org/wiki/
 
     $firefox->go("http://metacpan.org/");
 
-    $firefox->find('//input[@id="search-input"]')->type('Test::More');
+    $firefox->find('//input[@id="metacpan_search-input"]')->type('Test::More');
     $firefox->find_name('lucky')->click();
 
     my $har = Archive::Har->new();
@@ -9359,7 +9675,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
-    if (my $element = $firefox->has('//input[@id="search-input"]')) {
+    if (my $element = $firefox->has('//input[@id="metacpan_search-input"]')) {
         $element->type('Test::More');
     }
 
@@ -9375,7 +9691,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
-    if (my $element = $firefox->has_id('search-input')) {
+    if (my $element = $firefox->has_id('metacpan_search-input')) {
         $element->type('Test::More');
     }
 
@@ -9405,7 +9721,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
     use Firefox::Marionette();
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
-    if (my $element = $firefox->has_class('form-control home-search-input')) {
+    if (my $element = $firefox->has_class('form-control home-metacpan_search-input')) {
         $element->type('Test::More');
     }
 
@@ -9420,7 +9736,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
     use Firefox::Marionette();
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
-    if (my $element = $firefox->has_selector('input.home-search-input')) {
+    if (my $element = $firefox->has_selector('input.home-metacpan_search-input')) {
         $element->type('Test::More');
     }
 
@@ -9617,6 +9933,52 @@ returns true if C<document.readyState === "complete">
     $firefox->find('//button[@name="lucky"]')->click();
     while(!$firefox->loaded()) {
         # redirecting to Test::More page
+    }
+
+=head2 logins_from_csv
+
+accepts a filehandle as a parameter and then reads the filehandle for exported logins as CSV.  This is known to work with the following formats;
+
+=over 4
+
+=item * L<Bitwarden CSV|https://bitwarden.com/help/article/condition-bitwarden-import/>
+
+=item * L<LastPass CSV|https://support.logmeininc.com/lastpass/help/how-do-i-nbsp-export-stored-data-from-lastpass-using-a-generic-csv-file>
+
+=item * L<KeePass CSV|https://keepass.info/help/base/importexport.html#csv>
+
+=back
+
+returns a list of L<Firefox::Marionette::Login|Firefox::Marionette::Login> objects.
+
+    use Firefox::Marionette();
+    use FileHandle();
+
+    my $handle = FileHandle->new('/path/to/last_pass.csv');
+    my $firefox = Firefox::Marionette->new();
+    foreach my $login (Firefox::Marionette->logins_from_csv($handle)) {
+        $firefox->add_login($login);
+    }
+
+=head2 logins_from_zip
+
+accepts a filehandle as a parameter and then reads the filehandle for exported logins as a zip file.  This is known to work with the following formats;
+
+=over 4
+
+=item * L<1Password Unencrypted Export format|https://support.1password.com/1pux-format/>
+
+=back
+
+returns a list of L<Firefox::Marionette::Login|Firefox::Marionette::Login> objects.
+
+    use Firefox::Marionette();
+    use FileHandle();
+
+    my $handle = FileHandle->new('/path/to/1Passwordv8.1pux');
+    my $firefox = Firefox::Marionette->new();
+    foreach my $login (Firefox::Marionette->logins_from_zip($handle)) {
+        $firefox->add_login($login);
     }
 
 =head2 links
@@ -9840,6 +10202,8 @@ accepts a optional hash as the first parameter with the following allowed keys;
 
 =item * page - A hash describing the page.  The hash may have the following keys; 'height' and 'width'.  Both keys are in cm and default to US letter size.  See the 'size' key.
 
+=item * page_ranges - A list of the pages to print. Available for L<Firefox 96|https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Releases/96#webdriver_conformance_marionette> and after.
+
 =item * print_background - Print background graphics.  Boolean value.  Defaults to false. 
 
 =item * raw - rather than a file handle containing the PDF, the binary PDF will be returned.
@@ -10054,17 +10418,18 @@ accepts a scalar containing a javascript function body that is executed in the b
 
 =back
 
-Returns the result of the javascript function.
+Returns the result of the javascript function.  When a parameter is an L<element|Firefox::Marionette::Element> (such as being returned from a L<find|Firefox::Marionette#find> type operation), the L<script|Firefox::Marionette#script> method will automatically translate that into a javascript object.  Likewise, when the result being returned in a L<script|Firefox::Marionette#script> method is an L<element|https://dom.spec.whatwg.org/#concept-element> it will be automatically translated into a L<perl object|Firefox::Marionette::Element>.
 
     use Firefox::Marionette();
+    use v5.10;
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
-    if ($firefox->script('return window.find("lucky");')) {
-        # luckily!
+    if (my $element = $firefox->script('return document.getElementsByName("lucky")[0];')) {
+        say "Lucky find is a " . $element->tag_name() . " element";
     }
 
-    my $search_input = $firefox->find_by_id('search-input');
+    my $search_input = $firefox->find_id('metacpan_search-input');
 
     $firefox->script('arguments[0].style.backgroundColor = "red"', args => [ $search_input ]); # turn the search input box red
 
@@ -10097,6 +10462,41 @@ The parameters after the L<element|Firefox::Marionette::Element> parameter are t
 =head2 send_alert_text
 
 sends keys to the input field of a currently displayed modal message box
+
+=head2 shadow_root
+
+accepts an L<element|Firefox::Marionette::Element> as a parameter and returns it's L<ShadowRoot|https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot> as a L<shadow root|Firefox::Marionette::ShadowRoot> object or throws an exception.
+
+    use Firefox::Marionette();
+    use Cwd();
+
+    my $firefox = Firefox::Marionette->new()->go('file://' . Cwd::cwd() . '/t/data/elements.html');
+
+    $firefox->find_class('add')->click();
+    my $custom_square = $firefox->find_tag('custom-square');
+    my $shadow_root = $firefox->shadow_root($custom_square);
+
+    foreach my $element (@{$firefox->script('return arguments[0].children', args => [ $shadow_root ])}) {
+        warn $element->tag_name();
+    }
+
+=head2 shadowy
+
+accepts an L<element|Firefox::Marionette::Element> as a parameter and returns true if the element has a L<ShadowRoot|https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot> or false otherwise.
+
+    use Firefox::Marionette();
+    use Cwd();
+
+    my $firefox = Firefox::Marionette->new()->go('file://' . Cwd::cwd() . '/t/data/elements.html');
+    $firefox->find_class('add')->click();
+    my $custom_square = $firefox->find_tag('custom-square');
+    if ($firefox->shadowy($custom_square)) {
+        my $shadow_root = $firefox->find_tag('custom-square')->shadow_root();
+        warn $firefox->script('return arguments[0].innerHTML', args => [ $shadow_root ]);
+        ...
+    }
+
+This function will probably be used to see if the L<shadow_root|Firefox::Marionette::Element#shadow_root> method can be called on this element without raising an exception.
 
 =head2 sleep_time_in_ms
 

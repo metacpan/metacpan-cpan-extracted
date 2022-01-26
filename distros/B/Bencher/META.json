@@ -52,6 +52,7 @@
             "Sah::Schema::dirname" : "0",
             "Sah::Schema::filename" : "0",
             "Sah::Schema::perl::modname" : "0.035",
+            "Sah::Schema::true" : "0",
             "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
@@ -69,7 +70,7 @@
    "provides" : {
       "Bencher" : {
          "file" : "lib/Bencher.pm",
-         "version" : "1.052"
+         "version" : "1.056"
       }
    },
    "release_status" : "stable",
@@ -84,7 +85,7 @@
          "web" : "https://github.com/perlancar/perl-Bencher"
       }
    },
-   "version" : "1.052",
+   "version" : "1.056",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

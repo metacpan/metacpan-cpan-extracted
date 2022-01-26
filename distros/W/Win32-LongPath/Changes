@@ -1,5 +1,8 @@
 Revision history for Win32::LongPath
 
+2.2 January 21, 2022
+	- (ChrisTaylor123) added file attribute constants
+
 2.1 June 29, 2020
 	- (vadim-160102) return error if opendirL fails
 	- added test for opendirL failure

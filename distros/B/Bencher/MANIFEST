@@ -8,8 +8,8 @@ Makefile.PL
 README
 dist.ini
 lib/Bencher.pm
-lib/Bencher/Manual/Cookbook.pod
 lib/Bencher/Manual/FAQ.pod
+lib/Bencher/Manual/HowTo.pod
 script/bencher
 script/bencher-fmt
 t/00-compile.t

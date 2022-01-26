@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::ResultSummary;
 # ABSTRACT: Details about the result of running a statement
-$Neo4j::Driver::ResultSummary::VERSION = '0.27';
+$Neo4j::Driver::ResultSummary::VERSION = '0.28';
 
 use Carp qw(croak);
 
@@ -13,6 +13,7 @@ use Neo4j::Driver::SummaryCounters;
 
 
 sub new {
+	# uncoverable pod (private method)
 	my ($class, $result, $notifications, $statement, $server_info) = @_; 
 	my $self = {};
 	if ($result && $result->{stats}) {
@@ -26,7 +27,7 @@ sub new {
 }
 
 
-sub init {
+sub _init {
 	my ($self) = @_; 
 	
 	# The purpose of this method is to fail as early as possible if we don't
@@ -89,7 +90,7 @@ Neo4j::Driver::ResultSummary - Details about the result of running a statement
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 SYNOPSIS
 
@@ -208,7 +209,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2021 by Arne Johannessen.
+This software is Copyright (c) 2016-2022 by Arne Johannessen.
 
 This is free software, licensed under:
 

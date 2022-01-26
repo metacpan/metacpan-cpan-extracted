@@ -18,7 +18,7 @@ use Math::BLAS::PP;
 
 BEGIN
 {
-  our $VERSION = '1.01';
+  our $VERSION = '1.02';
   our @EXPORT = ();
   our @EXPORT_OK = ();
   our %EXPORT_TAGS = ();

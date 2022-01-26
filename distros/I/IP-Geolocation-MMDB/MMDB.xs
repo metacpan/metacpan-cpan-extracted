@@ -374,6 +374,10 @@ iterate_search_nodes(iterate_data *data, uint32_t node_num, numeric_ip ipnum,
     croak("Error reading node %u: %s", (unsigned int) node_num, error);
   }
 
+  if (depth > data->max_depth) {
+    croak("Invalid depth when reading node %u: %d", (unsigned int) node_num, depth);
+  }
+
   call_node_callback(data, node_num, &node);
 
   iterate_record_entry(data, ipnum, depth, node.left_record,

@@ -40,6 +40,7 @@ my %WriteMakefileArgs = (
     "Sah::Schema::dirname" => 0,
     "Sah::Schema::filename" => 0,
     "Sah::Schema::perl::modname" => "0.035",
+    "Sah::Schema::true" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -49,7 +50,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.052",
+  "VERSION" => "1.056",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -79,6 +80,7 @@ my %FallbackPrereqs = (
   "Sah::Schema::dirname" => 0,
   "Sah::Schema::filename" => 0,
   "Sah::Schema::perl::modname" => "0.035",
+  "Sah::Schema::true" => 0,
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0

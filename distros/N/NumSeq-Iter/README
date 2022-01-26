@@ -1,0 +1,106 @@
+NAME
+    NumSeq::Iter - Generate a coderef iterator from a number sequence
+    specification (e.g. '1,3,5,...,101')
+
+VERSION
+    This document describes version 0.005 of NumSeq::Iter (from Perl
+    distribution NumSeq-Iter), released on 2022-01-21.
+
+SYNOPSIS
+      use NumSeq::Iter qw(numseq_parse numseq_iter);
+
+      my $iter = numseq_iter('1,3,5,...,13');
+      while (my $val = $iter->()) { ... } # 1,3,5,7,9,11,13
+
+      $iter = numseq_iter('1,3,5,...,10');
+      while (my $val = $iter->()) { ... } # 1,3,5,7,9
+
+      my $res = numseq_parse('');             # [400, "Parse fail: Please specify one or more number in number sequence: ''"]
+      my $res = numseq_parse('1,5,2');        # [200, "OK", {numbers=>[1,5,2], has_ellipsis=>0, type=>'itemized', inc=>undef}]
+      my $res = numseq_parse('1,2,3');        # [200, "OK", {numbers=>[1,2,3], has_ellipsis=>0, type=>'itemized', inc=>undef}]
+      my $res = numseq_parse('1,2,3,...');    # [200, "OK", {numbers=>[1,2,3], has_ellipsis=>1, type=>'arithmetic', inc=>1, last_number=>undef}]
+      my $res = numseq_parse('1,3,9,...');    # [200, "OK", {numbers=>[1,3,9], has_ellipsis=>1, type=>'geometric',  inc=>3, last_number=>undef}]
+      my $res = numseq_parse('1,3,5,...,13'); # [200, "OK", {numbers=>[1,3,5], has_ellipsis=>1, type=>'arithmetic', inc=>2, last_number=>13}]
+      my $res = numseq_parse('2,3,5,...');    # [400, "Parse fail: Can't determine the pattern from number sequence: 2, 3, 5"]
+
+DESCRIPTION
+    This module provides a simple (coderef) iterator which you can call
+    repeatedly to get numbers specified in a number sequence specification
+    (string). When the numbers are exhausted, the coderef will return undef.
+    No class/object involved.
+
+    A number sequence is a comma-separated list of numbers (either integer
+    like 1, -2 or decimal number like 1.3, -100.70) with at least one
+    number. It can contain an ellipsis (e.g. '1,2,3,...' or '1, 3, 5, ...,
+    10').
+
+    When the sequence has an ellipsis, there must be at least three numbers
+    before the ellipsis. There can optionally be another number after the
+    ellipsis to make the sequence finite; but the last number can also be
+    Inf, +Inf, or -Inf. Currently only simple arithmetic sequence ('1,3,5')
+    or simple geometric sequence ('2,6,18') is recognized.
+
+FUNCTIONS
+  numseq_iter
+    Usage:
+
+     $iter = numseq_iter([ \%opts ], $spec); # coderef
+
+    Options:
+
+  numseq_parse
+     my $res = numseq_parse([ \%opts ], $spec); # enveloped response
+
+    See "numseq_iter" for list of known options.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/NumSeq-Iter>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-NumSeq-Iter>.
+
+SEE ALSO
+    Other iterators: IntRange::Iter, Range::Iter
+
+    CLI for this module: seq-numseq (from App::seq::numseq). There's another
+    CLI named numseq (from App::numseq), but it is only tangentially
+    related.
+
+    Sah::Schemas::NumSeq
+
+    Raku's lazy lists.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2022, 2021 by perlancar
+    <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=NumSeq-Iter>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

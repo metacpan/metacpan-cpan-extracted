@@ -2,7 +2,7 @@ package ChildForm;
 
 # a complicated strict form with no required fields
 
-use Form::Tiny -filtered;
+use Form::Tiny -strict;
 
 extends 'ParentForm';
 

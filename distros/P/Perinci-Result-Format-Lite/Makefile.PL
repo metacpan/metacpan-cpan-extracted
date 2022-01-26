@@ -21,9 +21,9 @@ my %WriteMakefileArgs = (
     "Data::Dumper" => 0,
     "Exporter" => "5.57",
     "JSON::PP" => 0,
-    "List::Util" => "1.45",
+    "List::Util" => "1.54",
     "Sort::BySpec" => "0.03",
-    "Text::Table::Sprintf" => 0,
+    "Text::Table::Sprintf" => "0.006",
     "strict" => 0,
     "warnings" => 0
   },
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::Needs" => 0
   },
-  "VERSION" => "0.281",
+  "VERSION" => "0.283",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,11 +49,11 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "JSON::PP" => 0,
-  "List::Util" => "1.45",
+  "List::Util" => "1.54",
   "Sort::BySpec" => "0.03",
   "Test::More" => "0.98",
   "Test::Needs" => 0,
-  "Text::Table::Sprintf" => 0,
+  "Text::Table::Sprintf" => "0.006",
   "strict" => 0,
   "warnings" => 0
 );

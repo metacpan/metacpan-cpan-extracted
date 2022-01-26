@@ -20,10 +20,10 @@ WriteMakefile(
         'Test2::Tools::Explain'     => '0',
         'Test2::Plugin::NoWarnings' => '0',
         'File::Slurper'             => 0,
-        'Text::Glob'                => 0,
     },
     PREREQ_PM => {
-        'Overload::FileCheck' => '0.007',
+        'Overload::FileCheck' => '0.012',
+        'Text::Glob'                => 0,
     },
     dist       => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean      => { FILES    => 'Test-MockFile-*' },

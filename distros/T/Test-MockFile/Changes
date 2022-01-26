@@ -1,5 +1,21 @@
 Revision history for Test-MockFile
 
+0.025   1/26/2022
+- Fix typo in chmod mock. Was accidentally calling chown.
+- Fix dependency on Text::Glob. It is now a runtime requirement.
+
+0.024   1/24/2022
+- Prefer Carp::confess to die
+- Do not use "$!" in tests as it's not consistent across platforms
+- GH #78: Do not allow rmdir on a populated directory.
+- GH #73: Prefer the term ->path to ->filename as it is more clear between file/dir
+- chown $fh now works.
+- Only warn about mixed files when using mocked files
+
+0.024_01
+ - GH #83: Get Solaris testers passing.
+ - Remove all use of "$!" in tests as this has tranlation problems.
+
 0.023   1/14/2022
  - GH #58: Fix synopsis typos
  - GH #65: Fix typos in the typo fixes.

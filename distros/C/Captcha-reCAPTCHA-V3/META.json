@@ -60,7 +60,7 @@
    "provides" : {
       "Captcha::reCAPTCHA::V3" : {
          "file" : "lib/Captcha/reCAPTCHA/V3.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -74,7 +74,7 @@
          "web" : "https://github.com/worthmine/Captcha-reCAPTCHA-V3"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_authority" : "cpan:WORTHMINE",
    "x_contributors" : [
       "worthmine <worthmine@cpan.org>"

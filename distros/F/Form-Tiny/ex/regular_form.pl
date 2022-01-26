@@ -18,7 +18,7 @@ use warnings;
 	form_field "username" => (
 		type => SimpleStr & StrLength [4, 30],
 		required => 1,
-		adjust => sub { ucfirst shift },
+		adjust => sub { ucfirst pop },
 	);
 
 	form_field "password" => %password;

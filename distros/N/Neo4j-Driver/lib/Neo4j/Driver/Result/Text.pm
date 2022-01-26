@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result::Text;
 # ABSTRACT: Fallback handler for result errors
-$Neo4j::Driver::Result::Text::VERSION = '0.27';
+$Neo4j::Driver::Result::Text::VERSION = '0.28';
 
 use parent 'Neo4j::Driver::Result';
 
@@ -17,6 +17,7 @@ our @CARP_NOT = qw(Neo4j::Driver::Net::HTTP);
 
 
 sub new {
+	# uncoverable pod (private method)
 	my ($class, $params) = @_;
 	
 	my $header = $params->{http_header};
@@ -72,7 +73,7 @@ Neo4j::Driver::Result::Text - Fallback handler for result errors
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 DESCRIPTION
 
@@ -89,7 +90,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2021 by Arne Johannessen.
+This software is Copyright (c) 2016-2022 by Arne Johannessen.
 
 This is free software, licensed under:
 

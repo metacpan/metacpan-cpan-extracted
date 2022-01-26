@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2021-07-27'; # DATE
-our $VERSION = '0.478'; # VERSION
+our $DATE = '2021-07-29'; # DATE
+our $VERSION = '0.479'; # VERSION
 
 #use 5.010001;
 use strict;
@@ -60,7 +60,7 @@ list-sah-schemas-modules - List Sah coerce rule modules
 
 =head1 VERSION
 
-This document describes version 0.478 of list-sah-schemas-modules (from Perl distribution App-SahUtils), released on 2021-07-27.
+This document describes version 0.479 of list-sah-schemas-modules (from Perl distribution App-SahUtils), released on 2021-07-29.
 
 =head1 SYNOPSIS
 

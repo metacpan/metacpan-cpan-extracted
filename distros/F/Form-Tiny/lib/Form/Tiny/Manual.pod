@@ -15,7 +15,7 @@ Form::Tiny::Manual - reference for working with Form::Tiny
 
 	form_field 'name' => (
 		type => SimpleStr,
-		adjust => sub { ucfirst shift },
+		adjust => sub { ucfirst pop },
 		required => 1,
 	);
 
@@ -149,9 +149,8 @@ Each of field definitions will be coerced into an object of the L<Form::Tiny::Fi
 		my ($self) = @_;
 
 		return {
-			name => 'complex_field',
+			name => $self->extra_field_name,
 			required => 1,
-			adjust => sub { $self->some_method(shift) },
 		};
 	};
 
@@ -174,28 +173,34 @@ The type that the field will be validated against. Effectively, this needs to be
 		coerce => 1, # uses coerce from the type
 	);
 
+	form_field 'also_coerced' => (
+		coerce => sub {
+			my ($self, $value) = @_;
+			return int($value);
+		}
+	);
+
 A coercion that will be made B<before> the type is validated and will change the value of the field. This can be a coderef or a boolean:
 
 Value of C<1> means that coercion will be applied from the specified C<type>. This requires the type to also provide C<coerce> and C<has_coercion> method, and the return value of the second one must be true.
 
 Value of C<0> means no coercion will be made. This is the default behavior.
 
-Value that is a coderef will be passed a single scalar, which is the value of the field. It is required to make its own checks and return a scalar which will replace the old value.
-
-B<Upcoming change notice>: This attribute is a subject to an upcoming change in subroutine parameters. See L<Form::Tiny::Manual::Compatibility/Current deprecations> for details.
+Value that is a coderef will be passed C<($self, $value)>. It is required to make its own checks and return a scalar which will replace the old value.
 
 =item adjust
 
 	form_field 'adjusted' => (
 		type => Str,
-		adjust => sub { lc shift() },
+		adjust => sub {
+			my ($self, $value) = @_;
+			return lc($value);
+		},
 	);
 
 An adjustment that will be made B<after> the type is validated and the validation is successful. This must be a coderef that gets passed the validated value and returns the new value for the field (just like the coderef version of coercion).
 
 At the point of adjustment, you can be sure that the value passed to the coderef meets the type constraint specified. It's probably a good idea to provide a type along with the adjustment to avoid unnecessary checks in the subroutine - if no type is specified, then any value from the input data will end up in the coderef.
-
-B<Upcoming change notice>: This attribute is a subject to an upcoming change in subroutine parameters. See L<Form::Tiny::Manual::Compatibility/Current deprecations> for details.
 
 =item required
 
@@ -300,14 +305,15 @@ Having types for fields is great, but often a need arise to have more validators
 	);
 
 	field_validator 'must be even' => sub {
-		shift() % 2 == 0
+		my ($self, $value) = @_;
+		return $value % 2 == 0;
 	};
 
 	field_validator 'must be positive' => sub {
-		shift() > 0
+		pop() > 0
 	};
 
-Validators consist of two parts - an error message that should be added to form in case validation fails, and a subroutine that will perform the check. This subroutine is passed a single value, which is current field value, and should return a boolean value - validation result.
+Validators consist of two parts - an error message that should be added to form in case validation fails, and a subroutine that will perform the check. This subroutine is passed C<($self, $value)>, and should return a boolean value - validation result.
 
 Additional validations will take place after the type is validated, and only if the type validation is successful. This means that:
 
@@ -318,8 +324,6 @@ Additional validations will take place after the type is validated, and only if 
 =item * you do not have to manually validate the value passed to the subroutines
 
 =back
-
-B<Upcoming change notice>: This keyword is a subject to an upcoming change in subroutine parameters. See L<Form::Tiny::Manual::Compatibility/Current deprecations> for details.
 
 =head2 Hooks
 
@@ -367,7 +371,7 @@ B<before_mangle> is fired for every field, just before it is changed ("mangled")
 
 =head3 before_validate
 
-B<before_validate> is fired just once for the form, before any field is validated. It is passed a single hashref - the input data. This method is free to do anything with the input, but its return value is discarded.
+B<before_validate> is fired just once for the form, before any field is validated. It is passed a hashref - the input data. This method is free to do anything with the input, but its return value is discarded.
 
 	form_hook before_validate => sub {
 		my ($self, $input_data) = @_;
@@ -448,14 +452,19 @@ Enables initial filtering for the input fields. This behavior is added to the fo
 
 The filtering system performs a type check on field values and only apply a filtering subroutine when the type matches. This is done before the validation, and so can affect the validation result. Filters behave much like type coercion, but they are more flexible and can be stacked by having multiple filters for the same field, each using value returned by the previous one.
 
+Filter subroutines should accept two parameters: C<($self, $value)>, and must return a C<$value>, changed or unchanged.
+
 An example filter that turns integers into their absolute values:
 
-	form_filter Int, sub { abs shift() };
+	form_filter Int, sub {
+		my ($self, $value) = @_;
+		return abs $value;
+	};
 
 A filter can be also narrowed down to a single form field with C<field_filter> keyword, which will apply to the last field declared:
 
 	form_field 'my_field';
-	field_filter Int, sub { abs shift() };
+	field_filter Int, sub { abs pop() };
 
 One special keyword exists for string trimming using the filters system:
 
@@ -463,7 +472,13 @@ One special keyword exists for string trimming using the filters system:
 
 When the field is filtered, the form filters are applied before field filters. Each type of filter is applied in the order they were defined.
 
-B<Upcoming change notice>: These keywords are subjects to an upcoming change in subroutine parameters. See L<Form::Tiny::Manual::Compatibility/Current deprecations> for details.
+=head3 Plugins
+
+Form::Tiny can be extended with plugins:
+
+	use Form::Tiny plugins => [qw(Plugin1 +Namespace::Plugin2)];
+
+Added behavior is entirely up to the plugin. See L<Form::Tiny::Plugin> for details on how to implement a plugin.
 
 =head2 Inline forms
 

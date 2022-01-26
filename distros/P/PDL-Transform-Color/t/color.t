@@ -1,18 +1,10 @@
+use strict;
+use warnings;
 use Test::More;
 
-
-BEGIN {
-    plan tests=>63;
-
-    use_ok('PDL::Transform::Color') || print "Bail out!\n";
-}
-
-eval "use PDL::Transform::Color;";
-
-ok( $PDL::Transform::Color::VERSION, "looks like there's a version in the module" );
-use PDL;
+use PDL::LiteF;
 use PDL::Transform;
-use PDL::NiceSlice;
+use PDL::Transform::Color;
 
 ##########
 ## test t_gamma
@@ -34,11 +26,11 @@ $itriplet *= pdl(-1,1,1);
 eval {$otriplet = $itriplet->apply($t);};
 is $@, '', "t_gamma transform with negative values works OK";
 ok(all(($otriplet * 10000)->abs->rint == (($itriplet->abs)**2 * 10000)->rint), "gamma=2 gives correct magnitude with negative input values");
-ok($otriplet->((0))<0, "gamma=2 preserves sign");
+ok($otriplet->slice('(0)')<0, "gamma=2 preserves sign");
 eval {$otriplet = $itriplet->invert($t);};
 is $@, '', "t_gamma transformm inverts OK on negative values";
 ok(all(($otriplet * 10000)->abs->rint == (($itriplet->abs)**0.5 * 10000)->rint), "gamma=2 inverse gives correct magnitude with negative input values");
-ok($otriplet->((0))<0, "gamma=2 inverse preserves sign");
+ok($otriplet->slice('(0)')<0, "gamma=2 inverse preserves sign");
 
 
 ##########
@@ -83,8 +75,8 @@ $itriplet = pdl(0.341,0.341,0.341);
 eval { $otriplet = $itriplet->apply($t); };
 is $@, '', "t_cmyk forward runs OK" ;
 ok( $otriplet->nelem==4, "t_cmyk makes a 4-vector");
-ok( all($otriplet->(0:2)==0), "t_cmyk finds an all-k solution");
-ok( $otriplet->((3))==1.0  - 0.341, "t_cmyk gets corrrect k value");
+ok( all($otriplet->slice('0:2')==0), "t_cmyk finds an all-k solution");
+ok( $otriplet->slice('(3)')==1.0  - 0.341, "t_cmyk gets corrrect k value");
 eval { $i2triplet = $otriplet->invert($t);};
 is $@, '', "t_cmyk reverse runs OK";
 ok( $i2triplet->nelem==3, "t_cmyk inverse makes a 3-vector" );
@@ -102,8 +94,8 @@ $itriplet = pdl([1,0,0],[0,1,0],[0,0,1]);
 eval { $otriplet = $itriplet->apply(t_xyz()); };
 is $@, '', "t_xyz runs OK ($@)";
 # Check against chromaticities of the sRGB primaries
-my $xpypzptriplet = $otriplet / $otriplet->sumover->(*1);
-ok( all( ($xpypzptriplet->(0:1)*1000)->rint == 
+my $xpypzptriplet = $otriplet / $otriplet->sumover->slice('*1');
+ok( all( ($xpypzptriplet->slice('0:1')*1000)->rint ==
 	 ( pdl( [ 0.640, 0.330 ], 
 		[ 0.300, 0.600 ],
 		[ 0.150, 0.060 ]
@@ -122,7 +114,6 @@ my $brgbcmyw = pdl([0,0,0],
 		   [0,1,1],[1,0,1],[1,1,0],
 		   [1,1,1]);
 my $ocolors;
-my $t;
 eval { $t = t_rgi(); }; 
 is $@, '', "t_rgi runs OK ($@)";
 eval { $ocolors = $brgbcmyw->apply($t) };
@@ -164,10 +155,10 @@ $a = xvals(256)/255;
 eval { $b = PDL::Transform::Color::_srgb_encode($a); };
 is $@, '', "_srgb_encode ran ok";
 ok(all($b+1e-10 > $a), "_srgb_encode output is always larger than input on [0,1]");
-ok(all($b->(1:-1)>$b->(0:-2)),"_srgb_encode output is monotonically increasing");
-$slope = $b->(1:-1) - $b->(0:-2);
-ok(all($slope->(1:-1) < $slope->(0:-2)),"slope is monotonically decreasing");
-eval { $aa = PDL::Transform::Color::_srgb_decode($b); };
+ok(all($b->slice('1:-1')>$b->slice('0:-2')),"_srgb_encode output is monotonically increasing");
+my $slope = $b->slice('1:-1') - $b->slice('0:-2');
+ok(all($slope->slice('1:-1') < $slope->slice('0:-2')),"slope is monotonically decreasing");
+my $aa = eval { PDL::Transform::Color::_srgb_decode($b) };
 is $@, '', "_srgb_decode ran ok";
 ok(all( ($aa > $a -1e-10) & ($aa < $a + 1e-10) ),"decoding undoes coding");
 
@@ -176,9 +167,17 @@ ok(all( ($aa > $a -1e-10) & ($aa < $a + 1e-10) ),"decoding undoes coding");
 # (minimal testing)
 $a = xvals(101)/100;
 eval {$t = t_pc();};
-ok(($@ && $@=~m/^Usage\:/), "t_pc with no arguments died and threw out an info message");
+like $@, qr/^Usage\:/, "t_pc with no arguments died and threw out an info message";
 eval {$t = t_pc('sepia');};
 is $@, '', "t_pc('sepia') ran OK";
 eval {$b=$a->apply($t);};
 is $@, '', "t_pc applied OK";
 ok($b->ndims==2 && $b->dim(0)==3, "t_pc created an RGB output");
+
+eval {$t = t_xyz2lab();};
+is $@, '', "t_xyz2lab ran OK";
+eval {$b=pdl(1,1,1)->apply($t);};
+is $@, '', "t_xyz2lab applied OK";
+ok all(approx $b, pdl(100, 8.5859237, 5.5509345)), 't_xyz2lab right values' or diag "got=$b";
+
+done_testing;

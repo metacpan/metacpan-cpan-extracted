@@ -1,5 +1,12 @@
 Revision history for Perl module ReturnValue
 
+0.903 2022-01-26T06:46:08Z
+	* This is a release mostly to test adding releases to GitHub, and
+	getting DOI's for all those: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-citation-files
+	* There's a new CITATION.cff file. So, yeah.
+	* Now each CPAN release also triggers an action to make the release
+	to GitHub too. No big whoop—still get this from CPAN.
+
 0.902 2022-01-08T02:47:51Z
 	* No code changes—just fixed link in README.pod
 

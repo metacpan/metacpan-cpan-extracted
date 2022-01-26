@@ -107,6 +107,27 @@ _
     },
 
     {
+        name => 'multirow header',
+        rows => [
+            # header
+            [{text=>'header1', rowspan=>2}, {text=>'header2',colspan=>2}, {text=>'header3',rowspan=>2}],
+            ['header2a', 'header2b'],
+
+            # data
+            [1,2,3,4],
+        ],
+        args => {header_row=>2},
+        result => <<'_',
+.---------+---------------------+---------.
+| header1 | header2             | header3 |
+|         +----------+----------+         |
+|         | header2a | header2b |         |
+| 1       | 2        | 3        | 4       |
+`---------+----------+----------+---------'
+_
+    },
+
+    {
         name => 'row attr: bottom_border',
         rows => [["A","BBB"], ["CC","D"], ["E","FF"],["G","H"]],
         args => {

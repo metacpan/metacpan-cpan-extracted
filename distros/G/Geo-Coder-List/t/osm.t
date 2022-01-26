@@ -77,7 +77,7 @@ OSM: {
 		like($geocoderlist->reverse_geocode('39.00,-77.10'), qr/Bethesda/i, 'test reverse geocode');
 
 		ok($location->{address}{country_code} eq 'us');
-		like($location->{address}{country}, qr/USA$/, 'check USA');
+		like($location->{address}{country}, qr/^United States/, 'check USA');
 
 		my @locations = $geocoderlist->geocode('Vessels, Misc Ships at Sea or Abroad, England');
 		my $count = scalar(@locations);

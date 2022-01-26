@@ -32,7 +32,7 @@ BEGIN {
     $ENV{DISPLAY}  or  plan skip_all => 'DISPLAY not found';
     eval { require Tk; };
     $@  and  plan skip_all => 'Perl/Tk not found';
-    plan tests => 13;
+    plan tests => 16;
 
     # define fixed environment for unit tests:
     delete $ENV{UI};
@@ -82,11 +82,15 @@ my $button1 = UI::Various::Button->new(text => 'OK',
 				       code => sub { print "OK!\n"; });
 is(ref($button1), 'UI::Various::Tk::Button',
    'type UI::Various::Tk::Button is correct');
-my $var = 'thing';
-my $input = UI::Various::Input->new(textvar => \$var);
+my $ivar = 'thing';
+my $input = UI::Various::Input->new(textvar => \$ivar);
 is(ref($input), 'UI::Various::Tk::Input',
    'type UI::Various::Tk::Input is correct');
-my $text2 = UI::Various::Text->new(text => \$var);
+my $cvar = 0;
+my $check = UI::Various::Check->new(text => 'on/off', var => \$cvar);
+is(ref($check), 'UI::Various::Tk::Check',
+   'type UI::Various::Tk::Check is correct');
+my $text2 = UI::Various::Text->new(text => \$ivar);
 is(ref($text2), 'UI::Various::Tk::Text',
    'type UI::Various::Tk::Text is correct again');
 
@@ -102,10 +106,14 @@ stderr_like
 {   $input->_prepare(0, 0);   }
     qr/^UI::.*::Tk::Input element must be accompanied by parent$re_msg_tail/,
     'orphaned Input causes error';
+stderr_like
+{   $check->_prepare(0, 0);   }
+    qr/^UI::.*::Tk::Check element must be accompanied by parent$re_msg_tail/,
+    'orphaned Check causes error';
 
 my $button2 = UI::Various::Button->new(text => 'Quit');
 my $w = $main->window({title => 'Hello', height => 12, width => 42},
-		      $text1, $button1, $input, $text2, $button2);
+		      $text1, $button1, $input, $check, $text2, $button2);
 is(ref($w), 'UI::Various::Tk::Window',
    'type UI::Various::Tk::Window is correct');
 $button2->code(sub { $w->destroy(); });
@@ -115,10 +123,12 @@ combined_is
     $main->_mainloop_prepare;
     $button1->_tk()->invoke;
     $input->_tk()->insert(0, 'some');
+    $check->_tk()->invoke;
     $button2->_tk()->invoke;
     $main->_mainloop_run;
 }
     "OK!\n",
     'mainloop produces correct output';
 is(@{$main->{children}}, 0, 'main no longer has children');
-is($var, 'something', 'input variable has correct new value');
+is($ivar, 'something', 'input variable has correct new value');
+is($cvar, 1, 'checkbox variable has correct new value of 1');

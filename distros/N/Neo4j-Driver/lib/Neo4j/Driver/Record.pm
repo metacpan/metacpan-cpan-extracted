@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Record;
 # ABSTRACT: Container for Cypher result values
-$Neo4j::Driver::Record::VERSION = '0.27';
+$Neo4j::Driver::Record::VERSION = '0.28';
 
 use Carp qw(croak);
 use JSON::MaybeXS 1.003003 qw(is_bool);
@@ -59,6 +59,7 @@ sub get {
 # specific examples for such cases are currently known, this method now seems
 # superfluous.
 sub get_bool {
+	# uncoverable pod (see Deprecations.pod)
 	my ($self, $field) = @_;
 	warnings::warnif deprecated => __PACKAGE__ . "->get_bool is deprecated";
 	
@@ -84,11 +85,12 @@ sub summary {
 	my ($self) = @_;
 	
 	$self->{_summary} //= Neo4j::Driver::ResultSummary->new;
-	return $self->{_summary}->init;
+	return $self->{_summary}->_init;
 }
 
 
 sub stats {
+	# uncoverable pod (see Deprecations.pod)
 	my ($self) = @_;
 	warnings::warnif deprecated => __PACKAGE__ . "->stats is deprecated; use summary instead";
 	
@@ -110,7 +112,7 @@ Neo4j::Driver::Record - Container for Cypher result values
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 SYNOPSIS
 
@@ -199,24 +201,6 @@ continue to inherit from L<Neo4j::Types> and have that interface.
 
 Return the keys and values of this record as a hash reference.
 
-=head1 EXPERIMENTAL FEATURES
-
-L<Neo4j::Driver::Record> implements the following experimental
-features. These are subject to unannounced modification or removal
-in future versions. Expect your code to break if you depend upon
-these features.
-
-=head2 C<graph>
-
- $nodes = $record->{graph}->{nodes};
- $rels  = $record->{graph}->{relationships};
-
-Allows accessing the graph response the Neo4j server can deliver via
-HTTP. Requires the C<return_graph> field to be set on the
-L<Transaction|Neo4j::Driver::Transaction>
-and Jolt to be disabled (which is not recommended)
-before the statement is executed.
-
 =head1 SEE ALSO
 
 =over
@@ -240,7 +224,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2021 by Arne Johannessen.
+This software is Copyright (c) 2016-2022 by Arne Johannessen.
 
 This is free software, licensed under:
 

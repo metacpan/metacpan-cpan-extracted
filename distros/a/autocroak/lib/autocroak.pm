@@ -1,5 +1,5 @@
 package autocroak;
-$autocroak::VERSION = '0.005';
+$autocroak::VERSION = '0.006';
 use strict;
 use warnings;
 
@@ -86,7 +86,7 @@ autocroak - Replace functions with ones that succeed or die with lexical scope
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -99,7 +99,7 @@ version 0.005
 
 The autocroak pragma provides a convenient way to replace functions that normally return false on failure with equivalents that throw an exception on failure.
 
-The autocroak pragma has lexical scope, meaning that functions and subroutines altered with autodie will only change their behaviour until the end of the enclosing block, file, or eval.
+The autocroak pragma has lexical scope, meaning that functions and subroutines altered with autocroak will only change their behaviour until the end of the enclosing block, file, or eval.
 
 Optionally you can pass it an allow hash listing errors that are allowed for certain op:
 

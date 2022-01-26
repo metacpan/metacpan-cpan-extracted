@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Download;
-$Playwright::Download::VERSION = '0.017';
+$Playwright::Download::VERSION = '0.018';
 use parent 'Playwright::Base';
 
 sub new {
@@ -22,31 +22,11 @@ sub spec {
     return $Playwright::spec->{'Download'}{members};
 }
 
-sub cancel {
+sub failure {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'cancel',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub url {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'url',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub delete {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'delete',
+        command => 'failure',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -62,21 +42,11 @@ sub createReadStream {
     );
 }
 
-sub failure {
+sub suggestedFilename {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'failure',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub path {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'path',
+        command => 'suggestedFilename',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -92,6 +62,36 @@ sub page {
     );
 }
 
+sub delete {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'delete',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub path {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'path',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub cancel {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'cancel',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
 sub saveAs {
     my $self = shift;
     return $self->_api_request(
@@ -102,11 +102,11 @@ sub saveAs {
     );
 }
 
-sub suggestedFilename {
+sub url {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
-        command => 'suggestedFilename',
+        command => 'url',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -156,7 +156,7 @@ Playwright::Download - Automatically generated class for Playwright::Download
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 CONSTRUCTOR
 
@@ -167,23 +167,11 @@ Instead it should be returned to you as the result of calls on Playwright object
 
 =head1 METHODS
 
-=head2 cancel(@args)
+=head2 failure(@args)
 
-Execute the Download::cancel playwright routine.
+Execute the Download::failure playwright routine.
 
-See L<https://playwright.dev/api/class-Download#Download-cancel> for more information.
-
-=head2 url(@args)
-
-Execute the Download::url playwright routine.
-
-See L<https://playwright.dev/api/class-Download#Download-url> for more information.
-
-=head2 delete(@args)
-
-Execute the Download::delete playwright routine.
-
-See L<https://playwright.dev/api/class-Download#Download-delete> for more information.
+See L<https://playwright.dev/api/class-Download#Download-failure> for more information.
 
 =head2 createReadStream(@args)
 
@@ -191,17 +179,11 @@ Execute the Download::createReadStream playwright routine.
 
 See L<https://playwright.dev/api/class-Download#Download-createReadStream> for more information.
 
-=head2 failure(@args)
+=head2 suggestedFilename(@args)
 
-Execute the Download::failure playwright routine.
+Execute the Download::suggestedFilename playwright routine.
 
-See L<https://playwright.dev/api/class-Download#Download-failure> for more information.
-
-=head2 path(@args)
-
-Execute the Download::path playwright routine.
-
-See L<https://playwright.dev/api/class-Download#Download-path> for more information.
+See L<https://playwright.dev/api/class-Download#Download-suggestedFilename> for more information.
 
 =head2 page(@args)
 
@@ -209,17 +191,35 @@ Execute the Download::page playwright routine.
 
 See L<https://playwright.dev/api/class-Download#Download-page> for more information.
 
+=head2 delete(@args)
+
+Execute the Download::delete playwright routine.
+
+See L<https://playwright.dev/api/class-Download#Download-delete> for more information.
+
+=head2 path(@args)
+
+Execute the Download::path playwright routine.
+
+See L<https://playwright.dev/api/class-Download#Download-path> for more information.
+
+=head2 cancel(@args)
+
+Execute the Download::cancel playwright routine.
+
+See L<https://playwright.dev/api/class-Download#Download-cancel> for more information.
+
 =head2 saveAs(@args)
 
 Execute the Download::saveAs playwright routine.
 
 See L<https://playwright.dev/api/class-Download#Download-saveAs> for more information.
 
-=head2 suggestedFilename(@args)
+=head2 url(@args)
 
-Execute the Download::suggestedFilename playwright routine.
+Execute the Download::url playwright routine.
 
-See L<https://playwright.dev/api/class-Download#Download-suggestedFilename> for more information.
+See L<https://playwright.dev/api/class-Download#Download-url> for more information.
 
 =head2 on(@args)
 

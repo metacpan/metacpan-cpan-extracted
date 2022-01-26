@@ -93,6 +93,7 @@ my $application = {
       cat => {
          help        => 'print one task (no delimiters)',
          description => 'Print one whole task, without adding delimiters',
+         supports    => [qw< cat >],
          execute     => '#cat',
       },
       add => {

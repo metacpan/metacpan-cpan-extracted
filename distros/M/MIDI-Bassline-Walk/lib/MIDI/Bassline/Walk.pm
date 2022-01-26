@@ -3,16 +3,17 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Generate walking basslines
 
-our $VERSION = '0.0207';
+our $VERSION = '0.0309';
 
 use Data::Dumper::Compact qw(ddc);
 use Carp qw(croak);
-use List::Util qw(any);
+use List::Util qw(any min uniq);
 use Music::Chord::Note;
 use Music::Note;
 use Music::Scales qw(get_scale_notes get_scale_MIDI);
 use Music::VoiceGen;
 use Moo;
+use Set::Array;
 use strictures 2;
 use namespace::clean;
 
@@ -45,6 +46,13 @@ has scale => (
 );
 
 
+has tonic => (
+    is      => 'ro',
+    isa     => sub { croak 'not a boolean' unless $_[0] =~ /^[01]$/ },
+    default => sub { 0 },
+);
+
+
 has verbose => (
     is  => 'ro',
     isa => sub { croak 'not a boolean' unless $_[0] =~ /^[01]$/ },
@@ -53,14 +61,16 @@ has verbose => (
 
 
 sub generate {
-    my ($self, $chord, $num) = @_;
+    my ($self, $chord, $num, $next_chord) = @_;
 
     $chord ||= 'C';
     $num ||= 4;
 
     print "CHORD: $chord\n" if $self->verbose;
+    print "NEXT: $next_chord\n" if $self->verbose && $next_chord;
 
     my $scale = $self->scale->($chord);
+    my $next_scale = defined $next_chord ? $self->scale->($next_chord) : '';
 
     # Parse the chord
     my $chord_note;
@@ -70,12 +80,19 @@ sub generate {
         $flavor = $2;
     }
 
+    # Parse the next chord
+    my $next_chord_note;
+    if ($next_chord && $next_chord =~ /^([A-G][#b]?).*$/) {
+        $next_chord_note = $1;
+    }
+
     my $cn = Music::Chord::Note->new;
 
     my @notes = map { Music::Note->new($_, 'ISO')->format('midinum') }
         $cn->chord_with_octave($chord, $self->octave);
 
     my @pitches = $scale ? get_scale_MIDI($chord_note, $self->octave, $scale) : ();
+    my @next_pitches = $next_scale ? get_scale_MIDI($next_chord_note, $self->octave, $next_scale) : ();
 
     # Add unique chord notes to the pitches
     for my $n (@notes) {
@@ -91,7 +108,7 @@ sub generate {
 
     # Determine if we should skip certain notes given the chord flavor
     my @tones = get_scale_notes($chord_note, $scale);
-    print "\tSCALE: ",ddc(\@tones) if $self->verbose;
+    print "\tSCALE: ", ddc(\@tones) if $self->verbose;
     my @fixed;
     for my $p (@pitches) {
         my $n = Music::Note->new($p, 'midinum');
@@ -128,31 +145,68 @@ sub generate {
         @fixed = sort { $a <=> $b } map { $_ < 40 ? $_ + 12 : $_ } @fixed;
     }
 
-    # DEBUGGING:
-    my @named;
-    if ($self->verbose) {
-        @named = map { Music::Note->new($_, 'midinum')->format('ISO') } @fixed;
-        print "\tNOTES: ",ddc(\@named);
-    }
+    # Make sure there are no duplicate pitches
+    @fixed = uniq @fixed;
+
+    _verbose_notes('NOTES', @fixed) if $self->verbose;
 
     my $voice = Music::VoiceGen->new(
         pitches   => \@fixed,
         intervals => $self->intervals,
     );
 
-    # Try to start in the middle of the range
-    $voice->context($fixed[int @fixed / 2]);
+    # Try to start the phrase at the beginning of the scale
+    $voice->context([$fixed[0]]) if $self->tonic;
 
-    # Choose Or Die!!
+    # Get a passage of quasi-random pitches
     my @chosen = map { $voice->rand } 1 .. $num;
 
-    # Show them what they've won, Bob!
-    if ($self->verbose) {
-        @named = map { Music::Note->new($_, 'midinum')->format('ISO') } @chosen;
-        print "\tCHOSEN: ",ddc(\@named);
+    if ($self->tonic) {
+        if ($scale eq 'major' || $scale eq 'minor') {
+            $chosen[0] = _closest($chosen[1], [ @fixed[0,2,4] ])
+        }
+        elsif ($scale eq 'pentatonic' || $scale eq 'pminor') {
+            $chosen[0] = _closest($chosen[1], [ @fixed[0,1,2] ])
+        }
     }
 
+    # Intersect with the next-chord pitches
+    if ($next_chord) {
+        my $A1 = Set::Array->new(@fixed);
+        my $A2 = Set::Array->new(@next_pitches);
+        my @intersect = @{ $A1->intersection($A2) };
+        _verbose_notes('INTERSECT', @intersect) if $self->verbose;
+        # Anticipate the next chord
+        if (@intersect) {
+            $chosen[-1] = _closest($chosen[-2], \@intersect);
+        }
+    }
+
+    # Show them what they've won, Bob!
+    _verbose_notes('CHOSEN', @chosen) if $self->verbose;
+
     return \@chosen;
+}
+
+# Show a phrase of midinums as ISO notes
+sub _verbose_notes {
+    my ($title, @notes) = @_;
+    @notes = map { Music::Note->new($_, 'midinum')->format('ISO') } @notes;
+    print "\t$title: ", ddc(\@notes);
+}
+
+# Find the closest absolute difference to the key, in the list
+sub _closest {
+    my ($key, $list) = @_;
+    $list = [ grep { $_ != $key } @$list ];
+    my @diff = map { abs($key - $_) } @$list;
+    my $min = min @diff;
+    my @closest;
+    for my $n (0 .. $#diff) {
+        next if $diff[$n] != $min;
+        push @closest, $list->[$n];
+    }
+    return $closest[int rand @closest];
 }
 
 1;
@@ -169,7 +223,7 @@ MIDI::Bassline::Walk - Generate walking basslines
 
 =head1 VERSION
 
-version 0.0207
+version 0.0309
 
 =head1 SYNOPSIS
 
@@ -246,6 +300,15 @@ second walks either the major or minor pentatonic scale, plus the
 notes of the chord.  The last walks only the notes of the chord (no
 scale).
 
+=head2 tonic
+
+  $tonic = $bassline->tonic;
+
+Play one of the first, third or fifth (I, III, V) notes of the scale
+on the first note of the generated phrase.
+
+Default: C<0>
+
 =head2 verbose
 
   $verbose = $bassline->verbose;
@@ -273,15 +336,23 @@ Create a new C<MIDI::Bassline::Walk> object.
 
   $notes = $bassline->generate;
   $notes = $bassline->generate($chord, $n);
+  $notes = $bassline->generate($chord, $n, $next_chord);
 
 Generate B<n> MIDI pitch numbers given the B<chord>.
+
+If given a B<next_chord>, perform an intersection of the two scales,
+and replace the final note of the generated phrase with a note of the
+intersection, if there are notes in common.
 
 Defaults:
 
   chord: C
   n: 4
+  next_chord: undef
 
 =head1 SEE ALSO
+
+The F<t/> and F<eg/> programs
 
 L<Data::Dumper::Compact>
 
@@ -309,7 +380,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Gene Boggs.
+This software is Copyright (c) 2022 by Gene Boggs.
 
 This is free software, licensed under:
 

@@ -1,0 +1,9 @@
+requires 'perl', '5.008001';
+requires 'Scalar::Util', '1.47';
+requires 'Carp';
+requires 'Encode';
+requires 'Text::Unidecode', '1.30';
+
+on 'test' => sub {
+    requires 'Test::More', '0.98';
+};

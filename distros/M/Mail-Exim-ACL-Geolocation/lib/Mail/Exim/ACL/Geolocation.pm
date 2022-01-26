@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = 1.000;
+our $VERSION = 1.001;
 
 use Exporter qw(import);
 use IP::Geolocation::MMDB;
@@ -20,14 +20,14 @@ our @DIRECTORIES = qw(
 );
 
 our @DATABASES = qw(
-  dbip-country.mmdb
   GeoIP2-Country.mmdb
-  dbip-location.mmdb
   GeoIP2-City.mmdb
-  dbip-country-lite.mmdb
+  dbip-country.mmdb
+  dbip-location.mmdb
   GeoLite2-Country.mmdb
-  dbip-city-lite.mmdb
   GeoLite2-City.mmdb
+  dbip-country-lite.mmdb
+  dbip-city-lite.mmdb
 );
 
 our $DATABASE = $ENV{IP_GEOLOCATION_MMDB} || first {-r} map {
@@ -54,7 +54,7 @@ Mail::Exim::ACL::Geolocation - Map IP addresses to country codes
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 SYNOPSIS
 
@@ -138,18 +138,18 @@ Requires the Perl module L<IP::Geolocation::MMDB> from CPAN and the modules
 L<Exporter> and L<List::Util>, which are distributed with Perl.
 
 Requires an IP to country database in the MaxMind DB file format from
-L<DP-IP.com|https://db-ip.com/> or L<MaxMind|https://www.maxmind.com/>.  The
+L<MaxMind|https://www.maxmind.com/> or L<DP-IP.com|https://db-ip.com/>.  The
 module searches the directories F</var/lib/GeoIP> and F</usr/share/GeoIP> for
 one of the following database files:
 
-  dbip-country.mmdb
   GeoIP2-Country.mmdb
-  dbip-location.mmdb
   GeoIP2-City.mmdb
-  dbip-country-lite.mmdb
+  dbip-country.mmdb
+  dbip-location.mmdb
   GeoLite2-Country.mmdb
-  dbip-city-lite.mmdb
   GeoLite2-City.mmdb
+  dbip-country-lite.mmdb
+  dbip-city-lite.mmdb
 
 =head1 INCOMPATIBILITIES
 

@@ -1,0 +1,1572 @@
+JIPSE 41C0: 　　　　 　　　　 　　ⓐⓑ ⓒⓓⓔⓕ 
+JIPSE 41D0: 　　　　 　　　　 　　ⓖⓗ ⓘⓙⓚ㋑ 
+JIPSE 41E0: 　　　　 　　　　 　　㋺㋩ ㋥㋭㋬㋣ 
+JIPSE 41F0: 　　　　 　　　　 　　㋠　 　㋐㋒　 
+JIPSE 4240: 　㋓㋔㋕ ㋖㋗㋘㋙ 　　　　 　　　　 
+JIPSE 4280: 　　　　 　　　　 　　　　 　　ⅰⅱ 
+JIPSE 4290: ⅲⅳⅴⅵ ⅶⅷⅸⅹ 　　　　 　　　　 
+JIPSE 42A0: 　　　　 　　ⅪⅫ 　　　　 　　　　 
+JIPSE 42B0: 　　　　 　　　　 　　　ⅺ ⅻ　　　 
+JIPSE 42F0: 　　　　 　　　　 　　⅓⅔ 　　　　 
+JIPSE 43B0: 　　　↗ ↖↙↘　 　　　　 　⇄↔　 
+JIPSE 43C0: 　　　　 　　　　 　　　　 　◁▷◀ 
+JIPSE 43D0: 　　　　 　　　　 　　▶❶ ❷❸❹❺ 
+JIPSE 43E0: 　　　　 　　　　 　　❻❼ ❽❾❿＇ 
+JIPSE 43F0: 　　　　 　　　　 　　＂　 　　　　 
+JIPSE 4480: 　　　　 　　　　 　　　　 ⓛⓜⓝⓞ 
+JIPSE 4490: ⓟⓠⓡⓢ ⓣⓤⓥⓦ ⓧⓨⓩ　 　　　　 
+JIPSE 44B0: 　　　　 　　　　 　　　　 　　　Å 
+JIPSE 44E0: 　　　　 　　　　 　　　　 　㏋　　 
+JIPSE 44F0: 　　　　 　　　　 　　　　 　　‰　 
+JIPSE 4540: 　ÁÂ　 ÇÉÊÍ ÎÑ　　 　　　　 
+JIPSE 4550: 　ÓÔÖ ŒÚÛ　 Ü　　　 　　　　 
+JIPSE 4580: 　　áà âäçé èêë　 íîÏñ 
+JIPSE 4590: óôöœ 　úùû üÿ　　 　∂　　 
+JIPSE 45A0: 　　　　 　∧∨⊂ ⊃∈∋　 ∓≃　　 
+JIPSE 45B0: 　　≢≪ ≫≷≶　 　∀　　 ∝∽　　 
+JIPSE 45C0: 　　　　 　　　　 　　∃⊕ ⊖⊗　　 
+JIPSE 45D0: 　　　　 　　　　 　　†‡ ¶　♣♦ 
+JIPSE 45E0: 　　　　 　　　　 　　♥♠ 　　　　 
+JIPSE 45F0: 　　　　 　　　　 　　　￤ 　　　　 
+JIPSE 46E0: 　　　　 　　　　 　　⊆⊇ ⇒⇔⌒∇ 
+JIPSE 46F0: 　　　　 　　　　 　　∬♯ ♭♪◯　 
+JIPSE 4A40: 　　　　 　　　　 　　栩朞 杣曩曷曄 
+JIPSE 4A50: 昿　　　 　　　栫 　桙桍桀 曵曰杙栲 
+JIPSE 4A60: 朖朦档桷 桿梟梏梭 梔條棡朏 曠桎枉杰 
+JIPSE 4A70: 梛梃梼梹 桴梵梠梺 椏梳杠曖 枩曦杤暸 
+JIPSE 4A80: 梍　　　 　　　　 　　　桾 　　　　 
+JIPSE 4A90: 　　　　 　　　　 　　　椁 棊　　　 
+JIPSE 4AA0: 椈棍　　 　　　　 　　　棘 　　　　 
+JIPSE 4AB0: 椢　　　 　　　　 　　　　 　　　　 
+JIPSE 4AC0: 椦杼杪枌 枋枦枡枅 枷柯　　 　　　　 
+JIPSE 4AD0: 椌枴柬枳 柩枸柤柞 柝柢　　 　　　　 
+JIPSE 4AE0: 曚　柮枹 柎柆柧桧 栞框　　 　　　　 
+JIPSE 4AF0: 朧霸朮朿 朶杁朸朷 杆杞　　 　　　　 
+JIPSE 4C40: 　　　　 　　　　 　　勺汐 室示自次 
+JIPSE 4C50: 痔　　　 　　　釈 　錫杓尺 耳而嫉灼 
+JIPSE 4C60: 辞鹿若寂 弱惹主取 守手囚蒔 璽爵湿漆 
+JIPSE 4C70: 朱殊狩珠 種腫趣酒 首酌失治 疾磁悉滋 
+JIPSE 4C80: 儒　　　 　　　　 　　　受 　　　　 
+JIPSE 4C90: 　　　　 　　　　 　　　呪 寿　　　 
+JIPSE 4CA0: 授周　　 　　　　 　　　樹 　　　　 
+JIPSE 4CB0: 綬　　　 　　　　 　　　　 　　　　 
+JIPSE 4CC0: 需質実蔀 篠偲柴芝 屢蘂　　 　　　　 
+JIPSE 4CD0: 収縞舎写 射捨赦斜 煮社　　 　　　　 
+JIPSE 4CE0: 爾　紗者 謝車遮蛇 邪借　　 　　　　 
+JIPSE 4CF0: 式識鴫竺 軸宍雫七 叱執　　 　　　　 
+JIPSE 4F40: 　　　　 　　　　 　　】｀ ー；゛　 
+JIPSE 4F50: ・　　　 　　　＝ 　≠－＋ ！？〇± 
+JIPSE 4F60: ´¨＜＞ ≦≧∞∴ ♂♀●゜ ．×‐／ 
+JIPSE 4F70: °′″℃ ￥＄￠￡ ％÷〆。 ＼：―、 
+JIPSE 4F80: ＃　　　 　　　　 　　　＆ 　　　　 
+JIPSE 4F90: 　　　　 　　　　 　　　＊ ＠　　　 
+JIPSE 4FA0: §◇　　 　　　　 　　　☆ 　　　　 
+JIPSE 4FB0: ★　　　 　　　　 　　　　 　　　　 
+JIPSE 4FC0: ○〜∥｜ …‥‘’ “”　　 　　　　 
+JIPSE 4FD0: ◎（）〔 〕［］｛ ｝〈　　 　　　　 
+JIPSE 4FE0: ，　〉《 》「」『 』【　　 　　　　 
+JIPSE 4FF0: ＾￣＿ヽ ヾゝゞ〃 仝々　　 　　　　 
+JIPSE 5040: 　　　　 　　　　 　　　Ξ 　ΘΛΑ 
+JIPSE 5050: Ζ　　　 　　　　 　　　　 ΚΙ　　 
+JIPSE 5060: ΝΟ　　 　　　　 　　　Μ Ε　　　 
+JIPSE 5070: 　　　　 　　　　 　　　Γ 　Η　Β 
+JIPSE 50C0: 　αβγ δεζη θι　　 　　　　 
+JIPSE 50D0: 　κλμ νξοπ ρσ　　 　　　　 
+JIPSE 50E0: Δ　τυ φχψω 　　　　 　　　　 
+JIPSE 50F0: ΠΡΣΤ ΥΦΧΨ Ω　　　 　　　　 
+JIPSE 5740: 　　　　 　　　　 　　痙甌 畆瓱甄瓠 
+JIPSE 5750: 瓲　　　 　　　瘁 　痰痞痣 瓷瓸畛痾 
+JIPSE 5760: 甅甎痺痲 痳瘋瘍瘉 瘟瘧癧甃 瓮痿畩畤 
+JIPSE 5770: 瘠瘡瘢瘤 瘴瘰瘻癇 癈痼畉瓧 畧瓰畚瓣 
+JIPSE 5780: 癆　　　 　　　　 　　　癜 　　　　 
+JIPSE 5790: 　　　　 　　　　 　　　癘 癡　　　 
+JIPSE 57A0: 癢癰　　 　　　　 　　　癨 　　　　 
+JIPSE 57B0: 癩　　　 　　　　 　　　　 　　　　 
+JIPSE 57C0: 癪畫畭畸 當疆疇畴 疊疉　　 　　　　 
+JIPSE 57D0: 癬疂疔疚 疝疥疣痂 疳痃　　 　　　　 
+JIPSE 57E0: 瓩　疵疽 疸疼疱痍 痊痒　　 　　　　 
+JIPSE 57F0: 甍甕甓甞 甦甬甼畄 畍畊　　 　　　　 
+JIPSE 5940: 　　　　 　　　　 　　瞼皰 蘯皋皓癲 
+JIPSE 5950: 皃　　　 　　　矚 　矜瞻瞽 皖皎盪矇 
+JIPSE 5960: 皚皴矣矮 矼砌砒砿 砠砺磅皙 皀矍眈眇 
+JIPSE 5970: 硅碎硴碆 硼碚碌碣 碵矗盧癸 眄皈盻癶 
+JIPSE 5980: 碪　　　 　　　　 　　　碯 　　　　 
+JIPSE 5990: 　　　　 　　　　 　　　磑 磆　　　 
+JIPSE 59A0: 磋磬　　 　　　　 　　　磔 　　　　 
+JIPSE 59B0: 碾　　　 　　　　 　　　　 　　　　 
+JIPSE 59C0: 碼眩眤眞 眥眦眛眷 眸睇　　 　　　　 
+JIPSE 59D0: 磊睚睨睫 睛睥睿睾 睹瞎　　 　　　　 
+JIPSE 59E0: 發　瞋瞑 瞠瞞瞰瞶 瞹瞿　　 　　　　 
+JIPSE 59F0: 皸皹皺盂 盍盖盒盞 盡盥　　 　　　　 
+JIPSE 5A40: 　　　　 　　　　 　　毟櫪 歇檬櫟檗 
+JIPSE 5A50: 檸　　　 　　　氈 　氓毫毬 櫑櫞飮毳 
+JIPSE 5A60: 櫚櫻气氛 氤氣汞汕 汢汪沮檪 櫂毯歉歐 
+JIPSE 5A70: 沂沍沚沁 沛汾汨汳 沒麾欹檻 歙檳歃蘗 
+JIPSE 5A80: 沐　　　 　　　　 　　　泄 　　　　 
+JIPSE 5A90: 　　　　 　　　　 　　　泱 泓　　　 
+JIPSE 5AA0: 沽沾　　 　　　　 　　　泗 　　　　 
+JIPSE 5AB0: 泅　　　 　　　　 　　　　 　　　　 
+JIPSE 5AC0: 泝歔歛歟 歡歸歹歿 殀殄　　 　　　　 
+JIPSE 5AD0: 沱殃殍殘 殕殞殤殪 殫殯　　 　　　　 
+JIPSE 5AE0: 櫃　殲殱 殳殷殼毆 毋毓　　 　　　　 
+JIPSE 5AF0: 欅蘖櫺欒 欖鬱欟欸 欷盜　　 　　　　 
+JIPSE 5B40: 　　　　 　　　　 　　樂椪 楴棣棠棔 
+JIPSE 5B50: 椄　　　 　　　槧 　樅槿樛 棹椥椹權 
+JIPSE 5B60: 椨椚榱樞 槭樔槫樊 樒櫁檄棯 椒槹楙椰 
+JIPSE 5B70: 樣樓橄樌 橲樶橸橇 橢槲楮棕 楡棗椽棧 
+JIPSE 5B80: 橙　　　 　　　　 　　　橦 　　　　 
+JIPSE 5B90: 　　　　 　　　　 　　　橈 樸　　　 
+JIPSE 5BA0: 樢檣　　 　　　　 　　　檐 　　　　 
+JIPSE 5BB0: 檍　　　 　　　　 　　　　 　　　　 
+JIPSE 5BC0: 檠楞楝榁 楪榲榮槐 榿槁　　 　　　　 
+JIPSE 5BD0: 檢槓榾槎 寨槊槝榻 槃榧　　 　　　　 
+JIPSE 5BE0: 椶　樮榑 榠榜榕榴 槞槨　　 　　　　 
+JIPSE 5BF0: 椣椡棆楹 楷楜楸楫 楔楾　　 　　　　 
+JIPSE 5E40: 　　　　 　　　　 　　斯皿 纂雑捌察 
+JIPSE 5E50: 殺　　　 　　　氏 　獅旨施 鯖皐算枝 
+JIPSE 5E60: 鮫晒祉私 糸紙紫肢 脂至慈錆 札止讃賛 
+JIPSE 5E70: 視詞詩試 誌諮資賜 雌死産撮 酸薩蚕拶 
+JIPSE 5E80: 飼　　　 　　　　 　　　歯 　　　　 
+JIPSE 5E90: 　　　　 　　　　 　　　事 似　　　 
+JIPSE 5EA0: 侍時　　 　　　　 　　　児 　　　　 
+JIPSE 5EB0: 字　　　 　　　　 　　　　 　　　　 
+JIPSE 5EC0: 寺餐斬暫 残仕仔伺 使刺　　 　　　　 
+JIPSE 5ED0: 持司史嗣 四士始姉 姿子　　 　　　　 
+JIPSE 5EE0: 擦　屍市 師志思指 支孜　　 　　　　 
+JIPSE 5EF0: 三傘参山 惨撒散桟 燦珊　　 　　　　 
+JIPSE 5F40: 　　　　 　　　　 　　渟洳 渕洶洸沺 
+JIPSE 5F50: 洟　　　 　　　渝 　游渺湃 洽洫淹湎 
+JIPSE 5F60: 洵洒溂溪 溘滉溷滓 溽溯滯洙 泪渤涵淇 
+JIPSE 5F70: 滄溲滔滕 溏溥滂溟 潁滿涅泯 淦衍渊泛 
+JIPSE 5F80: 漑　　　 　　　　 　　　潅 　　　　 
+JIPSE 5F90: 　　　　 　　　　 　　　滬 滸　　　 
+JIPSE 5FA0: 滾滌　　 　　　　 　　　漿 　　　　 
+JIPSE 5FB0: 滲　　　 　　　　 　　　　 　　　　 
+JIPSE 5FC0: 漱涸淆淬 淞淌淨淒 淅淺　　 　　　　 
+JIPSE 5FD0: 漲淙淤淕 淪淮渭湮 渮渙　　 　　　　 
+JIPSE 5FE0: 泙　湲湟 渾渣湫渫 湶湍　　 　　　　 
+JIPSE 5FF0: 洌浣涓浤 浚浹浙涎 涕涛　　 　　　　 
+JIPSE 6040: 　　　　 　　　　 　　　⑭ Ⅷ⑧⑪① 
+JIPSE 6050: ⑥　　　 　　　〟 　№　　 ⑩⑨Ⅶ　 
+JIPSE 6060: ⑬⑮㏍℡ ㊤㊥㊦㊧ ㊨㈱∪⑫ ⑤㍻Ⅹ　 
+JIPSE 6070: ㈲㈹㍾㍽ ㍼≒≡∫ ∮〝Ⅵ③ ㍉⑦Ⅸ② 
+JIPSE 6080: ∑　　　 　　　　 　　　√ 　　　　 
+JIPSE 6090: 　　　　 　　　　 　　　⊥ ∠　　　 
+JIPSE 60A0: ∟　　　 　　　　 　　　⊿ 　　　　 
+JIPSE 60B0: ∵　　　 　　　　 　　　　 　　　　 
+JIPSE 60C0: ∩㌔㌢㍍ ㌘㌧㌃㌶ ㍑㍗　　 　　　　 
+JIPSE 60D0: 　㌍㌦㌣ ㌫㍊㌻㎜ ㎝㎞　　 　　　　 
+JIPSE 60E0: ④　㎎㎏ ㏄㎡　　 　　　　 　　　　 
+JIPSE 60F0: ⑯⑰⑱⑲ ⑳ⅠⅡⅢ ⅣⅤ　　 　　　　 
+JIPSE 6240: 　　　　 　　　　 　　窘祟 禺礙祀磧 
+JIPSE 6250: 礒　　　 　　　竅 　竄窩窖 礫礬禹竃 
+JIPSE 6260: 祗祚窿邃 竇竊竍竏 竕竓笨祠 礇窰秕秧 
+JIPSE 6270: 站竚竝竡 竢竦竭竰 笂窶禳磽 秬礑秉磚 
+JIPSE 6280: 笏　　　 　　　　 　　　笊 　　　　 
+JIPSE 6290: 　　　　 　　　　 　　　笆 笳　　　 
+JIPSE 62A0: 笘筐　　 　　　　 　　　笙 　　　　 
+JIPSE 62B0: 笞　　　 　　　　 　　　　 　　　　 
+JIPSE 62C0: 笵秡秣稈 稍稘稙稠 稟禀　　 　　　　 
+JIPSE 62D0: 笶稱稻稾 稷穃穗穉 穡穢　　 　　　　 
+JIPSE 62E0: 磴　穩龝 穰穹穽窈 窗窕　　 　　　　 
+JIPSE 62F0: 祕祓祺祿 禊禝禧齋 禪禮　　 　　　　 
+JIPSE 6340: 　　　　 　　　　 　　籐筮 篌筥筰筺 
+JIPSE 6350: 筅　　　 　　　籬 　籵籟籘 筧筴篁籤 
+JIPSE 6360: 筬箝粃粐 粤粭粢粫 粡粨糶筱 筌籖箴篆 
+JIPSE 6370: 粳粲粱粮 粹粽糀糅 糂籥篋筍 篝筵篏笄 
+JIPSE 6380: 糘　　　 　　　　 　　　糒 　　　　 
+JIPSE 6390: 　　　　 　　　　 　　　糜 糢　　　 
+JIPSE 63A0: 鬻紆　　 　　　　 　　　糯 　　　　 
+JIPSE 63B0: 糲　　　 　　　　 　　　　 　　　　 
+JIPSE 63C0: 糴篩簑簔 篦篥篭簀 簇簓　　 　　　　 
+JIPSE 63D0: 糺篳篷簗 簍篶簣簧 簪簟　　 　　　　 
+JIPSE 63E0: 笋　簷簫 簽籌籃籔 籏籀　　 　　　　 
+JIPSE 63F0: 箘箟箍箜 箚箋箒箏 筝箙　　 　　　　 
+JIPSE 6440: 　　　　 　　　　 　　縻絎 綣紲絆紂 
+JIPSE 6450: 絋　　　 　　　縺 　繧縹縵 紵紿綮繃 
+JIPSE 6460: 絖絲繝繖 繞繙繚繹 繪繩纜絳 絅縷緇綽 
+JIPSE 6470: 繼繻纃緕 繽辮繿纈 纉縲綺紕 綫紮綵紜 
+JIPSE 6480: 續　　　 　　　　 　　　纒 　　　　 
+JIPSE 6490: 　　　　 　　　　 　　　纐 纓　　　 
+JIPSE 64A0: 纔缺　　 　　　　 　　　纖 　　　　 
+JIPSE 64B0: 纎　　　 　　　　 　　　　 　　　　 
+JIPSE 64C0: 纛總綢綯 緜綸綟綰 緘緝　　 　　　　 
+JIPSE 64D0: 缸緤緞緻 緲緡縅縊 縣縡　　 　　　　 
+JIPSE 64E0: 紊　縒縱 縟縉縋縢 繆繦　　 　　　　 
+JIPSE 64F0: 絨絮絏絣 經綉絛綏 絽綛　　 　　　　 
+JIPSE 6540: 　　　　 　　　　 　　聘罧 羲罔罠罅 
+JIPSE 6550: 网　　　 　　　聲 　聰聟聚 罟罘羯聢 
+JIPSE 6560: 罩罸聶聹 聽聿肄肆 肅肛脣罨 罐聨羮羶 
+JIPSE 6570: 肓肚肭冐 肬胛胥胙 胝聳羣罍 羸罕羹罌 
+JIPSE 6580: 胄　　　 　　　　 　　　胚 　　　　 
+JIPSE 6590: 　　　　 　　　　 　　　胖 脉　　　 
+JIPSE 65A0: 胯腋　　 　　　　 　　　胱 　　　　 
+JIPSE 65B0: 脛　　　 　　　　 　　　　 　　　　 
+JIPSE 65C0: 脩譱翅翆 翊翕翔翡 翦翩　　 　　　　 
+JIPSE 65D0: 脯翳翹飜 耆耄耋耒 耘耙　　 　　　　 
+JIPSE 65E0: 罎　耜耡 耨耿耻聊 聆聒　　 　　　　 
+JIPSE 65F0: 羂羆羃羈 羇羌羔羞 羝羚　　 　　　　 
+JIPSE 6640: 　　　　 　　　　 　　艘膊 膽腮腴隋 
+JIPSE 6650: 胼　　　 　　　艨 　艪艚艝 腦腥膸艟 
+JIPSE 6660: 膈膀艫舮 艱艷艸艾 芍芒苜膃 腑艤臂膺 
+JIPSE 6670: 芫芟芻芬 苡苣苟苒 苴艢膾脾 臉腱臀腆 
+JIPSE 6680: 苳　　　 　　　　 　　　苺 　　　　 
+JIPSE 6690: 　　　　 　　　　 　　　莓 范　　　 
+JIPSE 66A0: 苻苙　　 　　　　 　　　苹 　　　　 
+JIPSE 66B0: 苞　　　 　　　　 　　　　 　　　　 
+JIPSE 66C0: 茆臍臑臙 臘臈臚臟 臠臧　　 　　　　 
+JIPSE 66D0: 茉臺臻臾 舁舂舅與 舊舍　　 　　　　 
+JIPSE 66E0: 腓　舐舖 舩舫舸舳 艀艙　　 　　　　 
+JIPSE 66F0: 膂膠膕膤 膣腟膓膩 膰膵　　 　　　　 
+JIPSE 6740: 　　　　 　　　　 　　葮莅 莠荐茫茵 
+JIPSE 6750: 荀　　　 　　　葹 　萵葩蒂 茯荅荵葆 
+JIPSE 6760: 茘莚蓊葢 蒹蒿蒟蓙 蓍蒻蕣茗 茱萬莨菴 
+JIPSE 6770: 蓚蓐蓁蓆 蓖蒡蔡蓿 蓴葯荳茖 萓茹莉茴 
+JIPSE 6780: 蔗　　　 　　　　 　　　蔘 　　　　 
+JIPSE 6790: 　　　　 　　　　 　　　蔬 蔟　　　 
+JIPSE 67A0: 蔕蕈　　 　　　　 　　　蔔 　　　　 
+JIPSE 67B0: 蓼　　　 　　　　 　　　　 　　　　 
+JIPSE 67C0: 蕀菫菎菽 萃菘萋菁 菷萇　　 　　　　 
+JIPSE 67D0: 蕘菠菲萍 萢萠莽萸 蔆菻　　 　　　　 
+JIPSE 67E0: 茲　葭萪 萼蕚蒄葷 葫蒭　　 　　　　 
+JIPSE 67F0: 莪莟莢莖 茣莎莇莊 荼莵　　 　　　　 
+JIPSE 6840: 　　　　 　　　　 　　蚫薮 藜薑蕭蕁 
+JIPSE 6850: 薤　　　 　　　蛛 　蛯蛞蛔 薨薊藥蛩 
+JIPSE 6860: 薛薇蜒蜆 蜈蜀蜃蛻 蜑蜉蝨薔 薀蛬蘊蘓 
+JIPSE 6870: 蜍蛹蜊蜴 蜿蜷蜻蜥 蜩蛟藝蕋 蘋薈藹蕊 
+JIPSE 6880: 蜚　　　 　　　　 　　　蝠 　　　　 
+JIPSE 6890: 　　　　 　　　　 　　　蝟 蝸　　　 
+JIPSE 68A0: 蝌蝙　　 　　　　 　　　蝎 　　　　 
+JIPSE 68B0: 蝴　　　 　　　　 　　　　 　　　　 
+JIPSE 68C0: 蝗藾藺蘆 蘢蘚蘰蘿 虍乕　　 　　　　 
+JIPSE 68D0: 蝮虔號虧 虱蚓蚣蚩 蚪蚋　　 　　　　 
+JIPSE 68E0: 蕕　蚌蚶 蚯蛄蛆蚰 蛉蛎　　 　　　　 
+JIPSE 68F0: 薜蕷蕾薐 藉薺藏薹 藐藕　　 　　　　 
+JIPSE 6940: 　　　　 　　　　 　　袢螫 蠎螯蟀蝓 
+JIPSE 6950: 螟　　　 　　　裃 　裄袤袍 螽蟋蟷袰 
+JIPSE 6960: 雖蟄裔裘 裙裝裹褂 裼裴褝蟐 螢袿蠑蠖 
+JIPSE 6970: 裨裲褄褌 褊褓襃褞 褥袱蟶蝪 蠕螂蟒蝣 
+JIPSE 6980: 褪　　　 　　　　 　　　褫 　　　　 
+JIPSE 6990: 　　　　 　　　　 　　　襁 襄　　　 
+JIPSE 69A0: 褻襞　　 　　　　 　　　褶 　　　　 
+JIPSE 69B0: 褸　　　 　　　　 　　　　 　　　　 
+JIPSE 69C0: 襌蠢蠡蠱 蠶蠹蠧蠻 衄衂　　 　　　　 
+JIPSE 69D0: 襠衒衙衞 衢衫袁衾 袞衵　　 　　　　 
+JIPSE 69E0: 蝿　衽袵 衲袂袗袒 袮袙　　 　　　　 
+JIPSE 69F0: 螳蟇蟆螻 蟯蟲蟠蠏 蠍蟾　　 　　　　 
+JIPSE 6A40: 　　　　 　　　　 　　鱁邾 鎣𨏍邗豨 
+JIPSE 6A50: 䡄　　　 　　　鶬 　鶼鱥鱐 邕逈鎛鵣 
+JIPSE 6A60: 邛郄𪆐鷧 鸇鸕麞麯 齗龗仈邙 𨉷鶊閟閦 
+JIPSE 6A70: 姸𠂉丒丩 乀乇么𠂢 乑鷀鍪踽 閶輶鑣踣 
+JIPSE 6A80: 㐆　　　 　　　　 　　　𠂤 　　　　 
+JIPSE 6A90: 　　　　 　　　　 　　　乚 乩　　　 
+JIPSE 6AA0: 亝仚　　 　　　　 　　　㐬 　　　　 
+JIPSE 6AB0: 亼　　　 　　　　 　　　　 　　　　 
+JIPSE 6AC0: 仃闓䦰闚 闞隤雒靮 鞕鞮　　 　　　　 
+JIPSE 6AD0: 仫韉韛韴 顖飧騭骶 髁髃　　 　　　　 
+JIPSE 6AE0: 蹰　髎髖 髹鬠鮊鮧 鯸鯽　　 　　　　 
+JIPSE 6AF0: 郗鄔鄢鄣 鄽酈醃鋂 鋋鍥　　 　　　　 
+JIPSE 6B40: 　　　　 　　　　 　　┷　 ┘　　　 
+JIPSE 6B50: │　　　 　　　　 　　　┸ 　　┗　 
+JIPSE 6B60: 　　┿　 　╂　　 　　　　 ━┻　┛ 
+JIPSE 6B70: 　　　　 ╋　　　 　┼　　 ├┃　　 
+JIPSE 6BC0: 　┝　　 ┠　　┣ ┤┥　　 　　　　 
+JIPSE 6BD0: 　　　┨ 　　┫┬ 　　　　 　　　　 
+JIPSE 6BE0: ─　┯┰ 　　┳┴ 　　　　 　　　　 
+JIPSE 6BF0: ┌　　┏ ┐　　┓ └　　　 　　　　 
+JIPSE 6C40: 　　　　 　　　　 　　ホギ ゼエカァ 
+JIPSE 6C50: ウ　　　 　　　メ 　モポボ オォセマ 
+JIPSE 6C60: キクャヤ ュユョヨ ラリ　ガ ゥミゾタ 
+JIPSE 6C70: ルレロヮ ワヰヱヲ ンムズィ ダェソア 
+JIPSE 6C80: ヴ　　　 　　　　 　　　ヵ 　　　　 
+JIPSE 6C90: 　　　　 　　　　 　　　ヶ 　　　　 
+JIPSE 6CC0: 　チヂッ ツヅテデ トド　　 　　　　 
+JIPSE 6CD0: 　ナニヌ ネノハバ パヒ　　 　　　　 
+JIPSE 6CE0: イ　ビピ フブプヘ ベペ　　 　　　　 
+JIPSE 6CF0: グケゲコ ゴサザシ ジス　　 　　　　 
+JIPSE 6D40: 　　　　 　　　　 　　炳潼 濕澀濳漾 
+JIPSE 6D50: 潸　　　 　　　焉 　烽烟炮 潛潯濟烋 
+JIPSE 6D60: 澂潘焜焙 煥煕熈煦 煢煌燧潭 潺烝濔濘 
+JIPSE 6D70: 煖煬熏燻 熄熕熨熬 燗烙澪滷 濱澁濬漓 
+JIPSE 6D80: 熹　　　 　　　　 　　　熾 　　　　 
+JIPSE 6D90: 　　　　 　　　　 　　　燒 燉　　　 
+JIPSE 6DA0: 燔燼　　 　　　　 　　　燎 　　　　 
+JIPSE 6DB0: 燠　　　 　　　　 　　　　 　　　　 
+JIPSE 6DC0: 燬濮濛瀉 瀋濺瀑瀁 瀏濾　　 　　　　 
+JIPSE 6DD0: 燵瀛瀚潴 瀝瀘瀟瀰 瀾瀲　　 　　　　 
+JIPSE 6DE0: 澆　灑灣 炙炒炯烱 炬炸　　 　　　　 
+JIPSE 6DF0: 澎澑濂潦 澳澣澡澤 澹濆　　 　　　　 
+JIPSE 6E40: 　　　　 　　　　 　　詔小 昭嘗娼勝 
+JIPSE 6E50: 商　　　 　　　鍾 　鐘象詳 妾奨昌賞 
+JIPSE 6E60: 将少障鞘 上丈丞乗 冗剰嘱宵 哨醬松梢 
+JIPSE 6E70: 城場壌嬢 常情擾条 杖鉦昇升 樟唱晶匠 
+JIPSE 6E80: 浄　　　 　　　　 　　　状 　　　　 
+JIPSE 6E90: 　　　　 　　　　 　　　畳 穣　　　 
+JIPSE 6EA0: 蒸飾　　 　　　　 　　　譲 　　　　 
+JIPSE 6EB0: 醸　　　 　　　　 　　　　 　　　　 
+JIPSE 6EC0: 錠樵沼消 渉湘焼焦 照症　　 　　　　 
+JIPSE 6ED0: 埴省硝礁 祥称章笑 粧紹　　 　　　　 
+JIPSE 6EE0: 召　肖菖 蔣蕉衝裳 訟証　　 　　　　 
+JIPSE 6EF0: 尚庄床廠 彰承抄招 掌捷　　 　　　　 
+JIPSE 6F40: 　　　　 　　　　 　　諏信 深触辱拭 
+JIPSE 6F50: 職　　　 　　　吹 　垂酢須 蝕食浸図 
+JIPSE 6F60: 伸侵帥推 水炊睡粋 翠衰頗尻 織厨疹真 
+JIPSE 6F70: 遂酔錐錘 随瑞髄崇 嵩逗榛殖 神色申植 
+JIPSE 6F80: 数　　　 　　　　 　　　枢 　　　　 
+JIPSE 6F90: 　　　　 　　　　 　　　趨 雛　　　 
+JIPSE 6FA0: 据裾　　 　　　　 　　　杉 　　　　 
+JIPSE 6FB0: 椙　　　 　　　　 　　　　 　　　　 
+JIPSE 6FC0: 菅秦紳臣 芯薪親診 身辛　　 　　　　 
+JIPSE 6FD0: 雀進針震 人仁刃塵 壬尋　　 　　　　 
+JIPSE 6FE0: 燭　甚尽 腎訊迅陣 靱笥　　 　　　　 
+JIPSE 6FF0: 唇娠寝審 心慎振新 晋森　　 　　　　 
+JIPSE 7040: 　　　　 　　　　 　　諂覡 觴襾覊襦 
+JIPSE 7050: 襴　　　 　　　諱 　謔諌諚 覈覃觧諳 
+JIPSE 7060: 覘覩諠諢 諷諞諛謌 謇謚譛覓 襯諧訃訖 
+JIPSE 7070: 諡謖謐謗 謠謳鞫謦 謫諤觝襭 訐襷觸襤 
+JIPSE 7080: 謾　　　 　　　　 　　　謨 　　　　 
+JIPSE 7090: 　　　　 　　　　 　　　譁 譌　　　 
+JIPSE 70A0: 譏譫　　 　　　　 　　　譎 　　　　 
+JIPSE 70B0: 證　　　 　　　　 　　　　 　　　　 
+JIPSE 70C0: 譖訌訛訝 訥訶詁詛 詒詆　　 　　　　 
+JIPSE 70D0: 譚詈詼詭 詬詢誅誂 誄誨　　 　　　　 
+JIPSE 70E0: 襪　誡誑 誥誦誚誣 諄諍　　 　　　　 
+JIPSE 70F0: 覦覬覯覲 覺覽覿觀 觚觜　　 　　　　 
+JIPSE 7140: 　　　　 　　　　 　　贓谺 貅讎讖譟 
+JIPSE 7150: 讀　　　 　　　赱 　赳贔賍 讓讒貉贖 
+JIPSE 7160: 讚豁趁趙 跂趾趺跏 跚跖踰讙 譽赧貍貎 
+JIPSE 7170: 跌跛跋跪 跫跟跣跼 踈赭貂譯 貔讌貊譬 
+JIPSE 7180: 踉　　　 　　　　 　　　跿 　　　　 
+JIPSE 7190: 　　　　 　　　　 　　　踝 踞　　　 
+JIPSE 71A0: 踐蹊　　 　　　　 　　　踟 　　　　 
+JIPSE 71B0: 蹂　　　 　　　　 　　　　 　　　　 
+JIPSE 71C0: 踵豼貘戝 貭貪貽貲 貳貮　　 　　　　 
+JIPSE 71D0: 踴貶賈賁 賎賣賚賽 賺賻　　 　　　　 
+JIPSE 71E0: 譴　贄贅 贊贇贏贍 贐齎　　 　　　　 
+JIPSE 71F0: 谿豈豌豎 豐豕豢豬 豸豺　　 　　　　 
+JIPSE 7240: 　　　　 　　　　 　　轉蹼 躰蹠蹕蹇 
+JIPSE 7250: 蹙　　　 　　　轣 　轤轎轆 蹣踪躬轗 
+JIPSE 7260: 蹲躁辜辟 辣辭辯辷 迚迥逵蹶 蹈轜躱躾 
+JIPSE 7270: 迢迪迯迩 迴逅迹迺 逑轢躡蹌 軅蹤軆蹉 
+JIPSE 7280: 逕　　　 　　　　 　　　逡 　　　　 
+JIPSE 7290: 　　　　 　　　　 　　　逍 逞　　　 
+JIPSE 72A0: 逖迸　　 　　　　 　　　逋 　　　　 
+JIPSE 72B0: 逧　　　 　　　　 　　　　 　　　　 
+JIPSE 72C0: 逶軈軋軛 軣軼軻軫 軾輊　　 　　　　 
+JIPSE 72D0: 逹輅輕輒 輙輓輜輟 輛輌　　 　　　　 
+JIPSE 72E0: 蹐　輦輳 輻輹轅轂 輾轌　　 　　　　 
+JIPSE 72F0: 躇躅躄躋 躊躓躑躔 躙躪　　 　　　　 
+JIPSE 7340: 　　　　 　　　　 　　釖隨 郤遖遨遏 
+JIPSE 7350: 遉　　　 　　　釶 　鈞釡釟 遞遘郢釛 
+JIPSE 7360: 遶遲釿鈔 鈬鈕鈑鉞 鉗鉅鋺遯 逎釼郛鄂 
+JIPSE 7370: 鉉鉤鉈銕 鈿鉋鉐銜 銖釵邵遑 鄒逾扈遐 
+JIPSE 7380: 銓　　　 　　　　 　　　銛 　　　　 
+JIPSE 7390: 　　　　 　　　　 　　　鉚 鋏　　　 
+JIPSE 73A0: 銹錮　　 　　　　 　　　銷 　　　　 
+JIPSE 73B0: 鋩　　　 　　　　 　　　　 　　　　 
+JIPSE 73C0: 錏鄙鄲鄰 酊酖酘酣 酥酩　　 　　　　 
+JIPSE 73D0: 鍄酳酲醋 醉醂醢醫 醯醪　　 　　　　 
+JIPSE 73E0: 遒　醵醴 醺釀釁釉 釋釐　　 　　　　 
+JIPSE 73F0: 邂遽邁邀 邊邉邏邨 邯邱　　 　　　　 
+JIPSE 7440: 　　　　 　　　　 　　閊鎬 鐚鍜鍮錙 
+JIPSE 7450: 錵　　　 　　　閨 　閧閖閔 鍼鍠鏤閘 
+JIPSE 7460: 鎰鎭閭閼 閻閹閾闊 濶闃陷鍖 錺閙鐓鐃 
+JIPSE 7470: 闍闌闕闔 闖關闡闥 闢閠鏈錚 鐇錻鐔錢 
+JIPSE 7480: 阡　　　 　　　　 　　　阨 　　　　 
+JIPSE 7490: 　　　　 　　　　 　　　阮 阯　　　 
+JIPSE 74A0: 陂陞　　 　　　　 　　　陌 　　　　 
+JIPSE 74B0: 陏　　　 　　　　 　　　　 　　　　 
+JIPSE 74C0: 陋鐐鐶鐫 鐵鐡鐺鑁 鑒鑄　　 　　　　 
+JIPSE 74D0: 陜鑛鑠鑢 鑞鑪鈩鑰 鑵鑷　　 　　　　 
+JIPSE 74E0: 錣　鑽鑚 鑼鑾钁鑿 閂閇　　 　　　　 
+JIPSE 74F0: 鎔鎹鏖鏗 鏨鏥鏘鏃 鏝鏐　　 　　　　 
+JIPSE 7540: 　　　　 　　　　 　　鞁隰 霄隕隧陝 
+JIPSE 7550: 隍　　　 　　　鞜 　鞨鞆靺 險隗雹鞋 
+JIPSE 7560: 隲隴鞦鞣 鞳鞴韃韆 韈韋顫隱 陬鞏霈霓 
+JIPSE 7570: 韜韭齏韲 竟韶韵頏 頌鞐雕陦 霎隘霆陟 
+JIPSE 7580: 頚　　　 　　　　 　　　頤 　　　　 
+JIPSE 7590: 　　　　 　　　　 　　　頡 頷　　　 
+JIPSE 75A0: 頽顰　　 　　　　 　　　顆 　　　　 
+JIPSE 75B0: 顏　　　 　　　　 　　　　 　　　　 
+JIPSE 75C0: 顋霑霏霖 霙霤霪霰 霹霽　　 　　　　 
+JIPSE 75D0: 顯霾靄靆 靈靂靉靜 靠靤　　 　　　　 
+JIPSE 75E0: 陲　靦靨 勒靫靭靹 鞅靼　　 　　　　 
+JIPSE 75F0: 隶隸隹雎 雋雉雍襍 雜霍　　 　　　　 
+JIPSE 7640: 　　　　 　　　　 　　騷餉 饉飄飩顱 
+JIPSE 7650: 颱　　　 　　　驕 　驍驂驅 飆飃饂驀 
+JIPSE 7660: 餃餒驛驗 驟驢驥驤 驩驫髴飫 颯驃饐饋 
+JIPSE 7670: 驪骭骰骼 髀髏髑髓 體騾餾顳 饑颶饅顴 
+JIPSE 7680: 髞　　　 　　　　 　　　髟 　　　　 
+JIPSE 7690: 　　　　 　　　　 　　　髢 髣　　　 
+JIPSE 76A0: 髦髷　　 　　　　 　　　髯 　　　　 
+JIPSE 76B0: 髫　　　 　　　　 　　　　 　　　　 
+JIPSE 76C0: 髮饒饌饕 馗馘馥馭 馮馼　　 　　　　 
+JIPSE 76D0: 髱駟駛駝 駘駑駭駮 駱駲　　 　　　　 
+JIPSE 76E0: 颪　駻駸 騁騏騅駢 騙騫　　 　　　　 
+JIPSE 76F0: 餔餘餡餝 餞餤餠餬 餮餽　　 　　　　 
+JIPSE 7740: 　　　　 　　　　 　　鰮鬯 鮗鬥鬩髻 
+JIPSE 7750: 鬢　　　 　　　鱇 　鰲鰥鰛 鬨鬧鮖鰤 
+JIPSE 7760: 鬮鬲鱆鰾 鱚鱠鱧鱶 鱸鳧鴾鬪 鬟鰡鮠鮨 
+JIPSE 7770: 鳬鳰鴉鴈 鳫鴃鴆鴪 鴦鰰鮑鬘 鮴鬣鮟鬆 
+JIPSE 7780: 鴬　　　 　　　　 　　　鴣 　　　　 
+JIPSE 7790: 　　　　 　　　　 　　　鴟 鵄　　　 
+JIPSE 77A0: 鴕鵈　　 　　　　 　　　鴒 　　　　 
+JIPSE 77B0: 鵁　　　 　　　　 　　　　 　　　　 
+JIPSE 77C0: 鴿鯀鯊鮹 鯆鯏鯑鯒 鯣鯢　　 　　　　 
+JIPSE 77D0: 鵆鯤鯔鯡 鯵鯲鯱鯰 鰕鰔　　 　　　　 
+JIPSE 77E0: 鬚　鰉鰓 鰌鰆鰈鰒 鰊鰄　　 　　　　 
+JIPSE 77F0: 魄魃魏魍 魎魑魘魴 鮓鮃　　 　　　　 
+JIPSE 7840: 　　　　 　　　　 　　黝鶤 鷦鶉鵯鵝 
+JIPSE 7850: 鵙　　　 　　　黶 　黷黥黠 鶫鶇鷸黨 
+JIPSE 7860: 鶚鶩黹黻 黼黽鼇鼈 皷鼕龕鵺 鵐黯鷯鷽 
+JIPSE 7870: 鼡鼬鼾齊 齒齔齣齟 齠黴鷓鵤 鸚鵲鷭鵞 
+JIPSE 7880: 齡　　　 　　　　 　　　齦 　　　　 
+JIPSE 7890: 　　　　 　　　　 　　　齧 齬　　　 
+JIPSE 78A0: 齪龠　　 　　　　 　　　齷 　　　　 
+JIPSE 78B0: 齲　　　 　　　　 　　　　 　　　　 
+JIPSE 78C0: 齶鸛鸞鹵 鹹鹽麁麈 麋麌　　 　　　　 
+JIPSE 78D0: 龜麒麕麑 麝麥麩麸 麪麭　　 　　　　 
+JIPSE 78E0: 鵑　靡黌 黎黏黐黔 黜點　　 　　　　 
+JIPSE 78F0: 鶲鷄鷁鶻 鶸鶺鷆鷏 鷂鷙　　 　　　　 
+JIPSE 7940: 　　　　 　　　　 　　獻牀 犲爬爻燹 
+JIPSE 7950: 爨　　　 　　　珀 　珥珈獺 爲爰犹玳 
+JIPSE 7960: 爿牆珮珞 璢琅瑯琥 珸琲瓏爼 爛珎狆狄 
+JIPSE 7970: 琺瑕琿瑟 瑙瑁瑜瑩 瑰玻犧爍 狎爭狃燿 
+JIPSE 7980: 瑣　　　 　　　　 　　　瑪 　　　　 
+JIPSE 7990: 　　　　 　　　　 　　　瑤 瑾　　　 
+JIPSE 79A0: 璋珱　　 　　　　 　　　璞 　　　　 
+JIPSE 79B0: 璧　　　 　　　　 　　　　 　　　　 
+JIPSE 79C0: 瓊狒狢狠 狡狹狷倏 猗猊　　 　　　　 
+JIPSE 79D0: 瓔猜猖猝 猴猯猩猥 猾獎　　 　　　　 
+JIPSE 79E0: 爐　獏默 獗獪獨獰 獸獵　　 　　　　 
+JIPSE 79F0: 牋牘牴牾 犂犁犇犒 犖犢　　 　　　　 
+JIPSE 7A40: 　　　　 　　　　 　　裁混 瑳恨昆此 
+JIPSE 7A50: 墾　　　 　　　罪 　財際載 昏懇沙剤 
+JIPSE 7A60: 梱痕冴坂 阪堺榊肴 咲崎匙根 坤在詐鎖 
+JIPSE 7A70: 埼碕鷺作 削咋搾昨 朔材査今 裟婚砂頃 
+JIPSE 7A80: 柵　　　 　　　　 　　　窄 　　　　 
+JIPSE 7A90: 　　　　 　　　　 　　　策 索　　　 
+JIPSE 7AA0: 錯刷　　 　　　　 　　　桜 　　　　 
+JIPSE 7AB0: 鮭　　　 　　　　 　　　　 　　　　 
+JIPSE 7AC0: 笹坐座挫 債催再最 哉塞　　 　　　　 
+JIPSE 7AD0: 冊妻宰彩 才採栽歳 済災　　 　　　　 
+JIPSE 7AE0: 困　采犀 砕砦祭斎 細菜　　 　　　　 
+JIPSE 7AF0: 紺艮魂些 佐叉唆嵯 左差　　 　　　　 
+JIPSE 7B50: 　　　　 　　　ａ 　ｂ　　 　　　　 
+JIPSE 7B60: 　　ｃｄ ｅｆｇｈ ｉｊ　　 　　　　 
+JIPSE 7B70: ｋｌｍｎ ｏｐｑｒ ｓ　　　 　　　　 
+JIPSE 7B80: ｔ　　　 　　　　 　　　ｕ 　　　　 
+JIPSE 7B90: 　　　　 　　　　 　　　ｖ ｗ　　　 
+JIPSE 7BA0: ｘ　　　 　　　　 　　　ｙ 　　　　 
+JIPSE 7BB0: ｚ　　　 　　　　 　　　　 　　　　 
+JIPSE 7BC0: 　ＡＢＣ ＤＥＦＧ ＨＩ　　 　　　　 
+JIPSE 7BD0: 　ＪＫＬ ＭＮＯＰ ＱＲ　　 　　　　 
+JIPSE 7BE0: 　　ＳＴ ＵＶＷＸ ＹＺ　　 　　　　 
+JIPSE 7BF0: ０１２３ ４５６７ ８９　　 　　　　 
+JIPSE 7C40: 　　　　 　　　　 　　拙成 声凄姓澄 
+JIPSE 7C50: 畝　　　 　　　節 　説摂接 勢制聖折 
+JIPSE 7C60: 性政雪絶 舌蟬仙先 千占穿征 瀬設西誠 
+JIPSE 7C70: 宣専尖川 戦扇撰栓 栴窃精寸 誓是製摺 
+JIPSE 7C80: 泉　　　 　　　　 　　　浅 　　　　 
+JIPSE 7C90: 　　　　 　　　　 　　　洗 染　　　 
+JIPSE 7CA0: 潜線　　 　　　　 　　　煎 　　　　 
+JIPSE 7CB0: 煽　　　 　　　　 　　　　 　　　　 
+JIPSE 7CC0: 旋請逝醒 青静斉税 脆隻　　 　　　　 
+JIPSE 7CD0: 箭席惜戚 斥昔析石 積籍　　 　　　　 
+JIPSE 7CE0: 世　績脊 責赤跡蹟 碩切　　 　　　　 
+JIPSE 7CF0: 整星晴棲 栖正清牲 生盛　　 　　　　 
+JIPSE 7D40: 　　　　 　　　　 　　йМ ЪЖЙА 
+JIPSE 7D50: Е　　　 　　　п 　рлк ИЗЩм 
+JIPSE 7D60: ЛНст уфхц чш　К ДнЬЭ 
+JIPSE 7D70: щъыь эюя　 　оШВ ЮЁЫБ 
+JIPSE 7DC0: 　Я　　 　　　　 　　　　 　　　　 
+JIPSE 7DD0: 　　　　 　　　　 аб　　 　　　　 
+JIPSE 7DE0: Г　вг деёж зи　　 　　　　 
+JIPSE 7DF0: ОПРС ТУФХ ЦЧ　　 　　　　 
+JIPSE 7E40: 　　　　 　　　　 　　循舟 充秀繡宗 
+JIPSE 7E50: 拾　　　 　　　潤 　盾楯旬 終秋住殉 
+JIPSE 7E60: 臭蒐純巡 遵醇順処 初所除習 愁淳従戎 
+JIPSE 7E70: 暑曙渚庶 緒署書薯 藷準什州 柔洲十就 
+JIPSE 7E80: 諸　　　 　　　　 　　　助 　　　　 
+JIPSE 7E90: 　　　　 　　　　 　　　叙 女　　　 
+JIPSE 7EA0: 序償　　 　　　　 　　　徐 　　　　 
+JIPSE 7EB0: 恕　　　 　　　　 　　　　 　　　　 
+JIPSE 7EC0: 鋤汁渋獣 縦重銃叔 夙宿　　 　　　　 
+JIPSE 7ED0: 傷淑祝縮 粛塾熟出 術述　　 　　　　 
+JIPSE 7EE0: 修　俊峻 春瞬竣舜 駿准　　 　　　　 
+JIPSE 7EF0: 衆襲讐蹴 輯週酋酬 集醜　　 　　　　 
+JIPSE 7F40: 　　　　 　　　　 　　　〓 　※←◆ 
+JIPSE 7F50: ▽　　　 　　　　 　　　　 →〒　　 
+JIPSE 7F60: ↓　　　 　　　　 　　　↑ ▲　　　 
+JIPSE 7F70: 　　　　 　　　　 　　　■ 　▼　□ 
+JIPSE 7FE0: △　　　 　　　　 　　　　 　　　　 
+JIPSE 8040: 　　　　 　　　　 　　ゖ⊄ 〖〴〼￢ 
+JIPSE 8050: £　　　 　　　カ゚ 　キ゚き゚か゚ 〻〵〙く゚ 
+JIPSE 8060: ゟ⊅ク゚ケ゚ コ゚セ゚ツ゚ト゚ ♤♢☀ヿ ¢け゚≅≈ 
+JIPSE 8070: ♡♧ς⓵ ⓶⓷⓸⓹ ⓺こ゚〘‖ ♮〳〗— 
+JIPSE 8080: ⓻　　　 　　　　 　　　⓼ 　　　　 
+JIPSE 8090: 　　　　 　　　　 　　　⓽ ⓾　　　 
+JIPSE 80A0: ☖☂　　 　　　　 　　　☗ 　　　　 
+JIPSE 80B0: 〠　　　 　　　　 　　　　 　　　　 
+JIPSE 80C0: ☎♫♬♩ ⇨⇦⇧⇩ ⤴⤵　　 　　　　 
+JIPSE 80D0: ☁⦿◉〽 ﹆﹅◦• ℵℏ　　 　　　　 
+JIPSE 80E0: −　ℓ℧ ゠–⧺⧻ ゔゕ　　 　　　　 
+JIPSE 80F0: ⊊⊋∉∅ ⌅⌆¬∦ ｟｠　　 　　　　 
+JIPSE 8240: 　丂　𠀋 丏　　弎 㐂　　　 　　　　 
+JIPSE 8250: 　　丨丫 丰　丮　 　　　　 　　　　 
+JIPSE 8280: 　　　　 亍开　　 　　　　 亹　亻𠆢 
+JIPSE 8290: 仐　㠯仡 　　　伋 　仿　　 　　　仱 
+JIPSE 82A0: 　　伀伃 　份　仵 仼佔伾　 佖佈　　 
+JIPSE 82B0: 　　侗侔 侠　佽　 　侊　伹 　　佾　 
+JIPSE 82C0: 　　　　 　　　　 　　　佸 侒佪　侮 
+JIPSE 82D0: 　　　　 　　　　 　　俅　 矦俏俋俦 
+JIPSE 82E0: 　　　　 　　　　 　　侾俍 俉　　侲 
+JIPSE 82F0: 　　　　 　　　　 　　　　 倂　倘　 
+JIPSE 8340: 　倢倓倀 倜倮倞俲 　㑪　　 　　　　 
+JIPSE 8350: 　　倧　 　　倎　 　　　　 　　　　 
+JIPSE 8380: 　　偀俿 　偪　　 　　偗　 　偣　　 
+JIPSE 8390: 偦偆　　 偰偂　傔 　　　　 　　　　 
+JIPSE 83A0: 　　僄　 僌僧僩僴 僦　僘　 　僲僐僙 
+JIPSE 83B0: 　　　儃 　儞　　 　𠑊儆　 　　　　 
+JIPSE 83C0: 　　　　 　　　　 　　兊　 免炗兕　 
+JIPSE 83D0: 　　　　 　　　　 　　　兠 兤　　㒵 
+JIPSE 83E0: 　　　　 　　　　 　　　　 　冝　　 
+JIPSE 83F0: 　　　　 　　　　 　　　　 㓇　　　 
+JIPSE 8440: 　冼冾　 　凃　　 凜　　　 　　　　 
+JIPSE 8450: 　凞凮凴 刂刁㓛　 　　　　 　　　　 
+JIPSE 8480: 　刓　刖 刕　　　 　剉剗　 　剥　　 
+JIPSE 8490: 　　劜　 劦　　　 劯　　　 　　　勈 
+JIPSE 84A0: 　　勉　 　勀勑㔟 　　恿　 　　勛勤 
+JIPSE 84B0: 　　　　 辦　　　 　勻　　 　　　　 
+JIPSE 84C0: 　　　　 　　　　 　　匀　 　　匇匊 
+JIPSE 84D0: 　　　　 　　　　 　　　匤 　滙　卂 
+JIPSE 84E0: 　　　　 　　　　 　　　　 　卑　桌 
+JIPSE 8540: 　　　卡 卣　卬卲 　卽　　 　　　　 
+JIPSE 8550: 　　　　 厓　庬　 厝　　　 　　　　 
+JIPSE 8580: 　厲　　 　　　　 　㕝叕　 叚叝冣﨎 
+JIPSE 8590: 爕𠮟　　 　　　呕 　　　　 　呍　呿 
+JIPSE 85A0: 　　　呦 咊　　咖 咜　　　 　　咿哆 
+JIPSE 85B0: 　　哿唁 　唎　悊 　　咡　 咩　　唉 
+JIPSE 85C0: 　　　　 　　　　 　　啇啠 啐啡啊喝 
+JIPSE 85D0: 　　　　 　　　　 　　喆　 喭　喑　 
+JIPSE 85E0: 　　　　 　　　　 　　　䑓 　　　　 
+JIPSE 85F0: 　　　　 　　　　 　　嗎嗩 　嘆　　 
+JIPSE 8640: 　　嘎　 嘐嘈　　 憘嘻　　 　　　　 
+JIPSE 8650: 　噓　嘽 噉嘿　　 　　　　 　　　　 
+JIPSE 8680: 　器噯噦 噲　　　 　　　　 嚞譆嚬嚭 
+JIPSE 8690: 　龢囍　 　　囶圊 　　　　 　　圡圯 
+JIPSE 86A0: 　　　　 圳圴　阬 坌　　　 坙𡉴　坻 
+JIPSE 86B0: 　　垚　 　垬𡋤埈 埇﨏尭　 　　坥　 
+JIPSE 86C0: 　　　　 　　　　 　　　埸 埶埵埤堉 
+JIPSE 86D0: 　　　　 　　　　 　　埞𡍄 𡌶　堠堞 
+JIPSE 86E0: 　　　　 　　　　 　　隄塚 　　堹　 
+JIPSE 86F0: 　　　　 　　　　 　　塤　 　墐塼　 
+JIPSE 8740: 　墊　墉 　　墏塀 增墨　　 　　　　 
+JIPSE 8750: 　　墩　 　墲墱　 　　　　 　　　　 
+JIPSE 8780: 　　壎壔 壚壠壩夆 夋　夌　 复　　　 
+JIPSE 8790: 　　　　 　夤　　 　　㚙　 　　奓耎 
+JIPSE 87A0: 　　　奝 奛奟　𣇃 奣　　　 　奭奵奼 
+JIPSE 87B0: 　　　　 　姒妺姃 姈　　妤 妒　妋妟 
+JIPSE 87C0: 　　　　 　　　　 　　姣姤 姮姝姞　 
+JIPSE 87D0: 　　　　 　　　　 　　娣娓 　婭婥婕 
+JIPSE 87E0: 　　　　 　　　　 　　　　 　媟婾媢 
+JIPSE 87F0: 　　　　 　　　　 　　　媞 媄婷媜　 
+JIPSE 8840: 　　嫄媵 媺　　　 　嫰　　 　　　　 
+JIPSE 8850: 　嫚　嬈 嫵嬴　　 嬙　　　 　　　　 
+JIPSE 8880: 　　　孌 孖　　　 　孽斅　 　孿宁　 
+JIPSE 8890: 　宓　　 宬　　　 　　　　 　寀　甯 
+JIPSE 88A0: 　　寘　 　　寖　 　寬　　 　　　　 
+JIPSE 88B0: 　　　　 　尞尣尩 㞍屏　　 　　　　 
+JIPSE 88C0: 　　　　 　　　　 　　屡　 層屰屺屼 
+JIPSE 88D0: 　　　　 　　　　 　　　　 　　岏　 
+JIPSE 88E0: 　　　　 　　　　 　　　岵 岧岪　岺 
+JIPSE 88F0: 　　　　 　　　　 　　岭岦 㟁　岟　 
+JIPSE 8940: 　𡶜𡶡　 峒峉峐　 　峵　　 　　　　 
+JIPSE 8950: 　　峴　 　𡶷崐　 　　　　 　　　　 
+JIPSE 8980: 　崧𡸴崠 崆崫　㟢 　　﨑　 嵇　嵂　 
+JIPSE 8990: 　嵭嵡　 㠀　　嶈 　㟽　　 　　　　 
+JIPSE 89A0: 　　嶠嶔 　嶒　嶧 嶸豳嶹　 𡽶　　　 
+JIPSE 89B0: 　　　　 　帀　　 　帕巐巑 巗巠　卺 
+JIPSE 89C0: 　　　　 　　　　 　　帘帒 　帮　　 
+JIPSE 89D0: 　　　　 　　　　 　　　　 幘幞　　 
+JIPSE 89E0: 　　　　 　　　　 　　　颿 　　秊幷 
+JIPSE 89F0: 　　　　 　　　　 　　榦　 麽　　　 
+JIPSE 8A40: 　　　　 　　　庾 　廊　　 　　　　 
+JIPSE 8A50: 　廋　　 　　　　 　　　　 　　　　 
+JIPSE 8A80: 　龐　　 　廹廽　 挊弈弇　 挵揜　弜 
+JIPSE 8A90: 弡　弴弶 　　弽彀 彅　　　 　　　　 
+JIPSE 8AA0: 　　彤彣 　　彧　 　　　　 　　　彽 
+JIPSE 8AB0: 　　　　 　　傜　 　徤侚　 徉　徜　 
+JIPSE 8AC0: 　　　　 　　　　 　　徯　 　徵德　 
+JIPSE 8AD0: 　　　　 　　　　 　　忄㣺 忉忔　忒 
+JIPSE 8AE0: 　　　　 　　　　 　　忮忡 　忯忢　 
+JIPSE 8AF0: 　　　　 　　　　 　　　　 　　忞　 
+JIPSE 8B40: 　　　　 　　　　 　　㉝ㇷ゚ ⏅ㇴㇷ☃ 
+JIPSE 8B50: ㇲ　　　 　　　㊴ 　㊵㉟㉞ ㇶㇵ⏄㊱ 
+JIPSE 8B60: ㇹㇺ㊶㊷ ㊸㊹㊺㊻ ㊼㊽Ǒㇸ ㇱ㊲⏇⏈ 
+JIPSE 8B70: ㊾㊿◐◑ ◒◓‼⁇ ⁈㊳⏃▱ ⏉ㇳ⏆♨ 
+JIPSE 8B80: ⁉　　　 　　　　 　　　Ǎ 　　　　 
+JIPSE 8B90: 　　　　 　　　　 　　　ǎ ǐ　　　 
+JIPSE 8BA0: Ḿǔ　　 　　　　 　　　ḿ 　　　　 
+JIPSE 8BB0: Ǹ　　　 　　　　 　　　　 　　　　 
+JIPSE 8BC0: ǹ⏊⏋⏌ ヷヸヹヺ ⋚⋛　　 　　　　 
+JIPSE 8BD0: ǒ⅕✓⌘ ␣⏎㉑㉒ ㉓㉔　　 　　　　 
+JIPSE 8BE0: ㇰ　㉕㉖ ㉗㉘㉙㉚ ㉛㉜　　 　　　　 
+JIPSE 8BF0: ㇻㇼㇽㇾ ㇿ⎾⎿⏀ ⏁⏂　　 　　　　 
+JIPSE 8C40: 　忩怳怍 怗　怔㤗 　恝　　 　　　　 
+JIPSE 8C50: 　恇　　 　　　　 悔　　　 　　　　 
+JIPSE 8C80: 　悅悝悞 　　　　 　　　　 悾　惕悱 
+JIPSE 8C90: 　惝　悰 　惞　　 　　愠　 　愜愒愓 
+JIPSE 8CA0: 　　愞惲 　　　　 　愑　　 愷　愰　 
+JIPSE 8CB0: 　　　　 　　慨憎 憨憗愫　 　　　慼 
+JIPSE 8CC0: 　　　　 　　　　 　　憭憓 憍　　　 
+JIPSE 8CD0: 　　　　 　　　　 　　憼　 懕懟懲　 
+JIPSE 8CE0: 　　　　 　　　　 　　　　 　　　戓 
+JIPSE 8CF0: 　　　　 　　　　 　　　戢 　戩　　 
+JIPSE 8D40: 　　戾扃 　扌扑　 扖　　　 　　　　 
+JIPSE 8D50: 　扚抅拕 拖拄　　 　　　　 　　　　 
+JIPSE 8D80: 　抦　　 挘　　　 拼捄捃　 　　捎挹 
+JIPSE 8D90: 　　挼　 　掄　　 　捥毮　 　　揭揵 
+JIPSE 8DA0: 　　　揥 揫　𢰤　 搉　搥　 　　摳摠 
+JIPSE 8DB0: 　　撾擗 撿擄　　 　擤　撝 擎　擊擐 
+JIPSE 8DC0: 　　　　 　　　　 　　攄攅 攔攩　攲 
+JIPSE 8DD0: 　　　　 　　　　 　　　敏 敎　　　 
+JIPSE 8DE0: 　　　　 　　　　 　　敧　 　　　斁 
+JIPSE 8E50: 　斿　旂 　既　　 㫖　　　 　　　　 
+JIPSE 8E80: 　　　旲 　昕昂昉 旹昄　　 昈　昀𠦝 
+JIPSE 8E90: 昱炤　昮 昰昞昺昡 昤昢昫　 　晌㫪　 
+JIPSE 8EA0: 　　晅晑 　曻曺　 　　　　 晥　晣晡 
+JIPSE 8EB0: 　　晗　 　晷晴　 晳　晚朙 　晛晙𣇄 
+JIPSE 8EC0: 　　　　 　　　　 　　　晪 晫　　　 
+JIPSE 8ED0: 　　　　 　　　　 　　　晸 暑暒暍煊 
+JIPSE 8EE0: 　　　　 　　　　 　　　　 　暙　　 
+JIPSE 8EF0: 　　　　 　　　　 　　　　 　　暱　 
+JIPSE 8F40: 　　　暵 　暲㬜曆 　　　　 　　　　 
+JIPSE 8F50: 　曈暻暿 㬚　㬢　 　　　　 　　　　 
+JIPSE 8F80: 　　　曨 　曬　拽 　朅　　 　朎朓朗 
+JIPSE 8F90: 　朳　杇 杌杈　　 杝杦　　 　极　枓 
+JIPSE 8FA0: 　　杻　 枘　　　 　枛　　 　杶柗枻 
+JIPSE 8FB0: 　　柷　 栁　　桒 　　　柙 　柹　　 
+JIPSE 8FC0: 　　　　 　　　　 　　柀　 栝臬　栻 
+JIPSE 8FD0: 　　　　 　　　　 　　　　 桄栱　桉 
+JIPSE 8FE0: 　　　　 　　　　 　　　　 　　梅梲 
+JIPSE 8FF0: 　　　　 　　　　 　　巢梖 　　　　 
+JIPSE 9040: 　梥　梪 　梚　　 桵棨　　 　　　　 
+JIPSE 9050: 　棬棰棖 棐棼　　 棱　　　 　　　　 
+JIPSE 9080: 　棙　棭 㮈　　棈 　　棏　 椊﨓　楗 
+JIPSE 9090: 楂楨楣　 椵榀椻𣗄 𣖔　　　 　榷槀榖 
+JIPSE 90A0: 　　　槙 　　　槖 　　　　 榒﨔　槪 
+JIPSE 90B0: 　　樏　 　𣘸槢樰 橫橛槩槳 𣘺　槶樑 
+JIPSE 90C0: 　　　　 　　　　 　　樲橤 橐　橆　 
+JIPSE 90D0: 　　　　 　　　　 　　　橅 橳　檟檞 
+JIPSE 90E0: 　　　　 　　　　 　　檉　 　　橾　 
+JIPSE 90F0: 　　　　 　　　　 　　檑罇 　櫔　　 
+JIPSE 9140: 　　　櫝 　櫤　櫐 櫢櫱　　 　　　　 
+JIPSE 9150: 　櫧櫬　 㰏　欄　 　　　　 　　　　 
+JIPSE 9180: 　欑欐欛 　欯欵　 　　歆　 歊　　歘 
+JIPSE 9190: 歖　步　 　歷歺殂 　　殭　 　殺殾　 
+JIPSE 91A0: 　　每毗 毖　　毧 　氐氳　 氵氺　氿 
+JIPSE 91B0: 　　　　 　沄沅沆 汭沉𣱿　 汙汍汜　 
+JIPSE 91C0: 　　　　 　　　　 　　汶汴 沔汯　沜 
+JIPSE 91D0: 　　　　 　　　　 　　㳃　 沗泆泔泫 
+JIPSE 91E0: 　　　　 　　　　 　　泚　 　泮泠泻 
+JIPSE 91F0: 　　　　 　　　　 　　泩泖 　　　　 
+JIPSE 9240: 　　泬　 　　　洄 洎洊　　 　　　　 
+JIPSE 9250: 　洮洼　 洹洧　　 　　　　 　　　　 
+JIPSE 9280: 　𣳾洀　 　海涇涔 　涊涂　 　　浥　 
+JIPSE 9290: 涖涉　　 涁浰　　 浯埿淚　 　涬淈淄 
+JIPSE 92A0: 　　淸涿 淟淖淼洴 淩　　　 　　　淏 
+JIPSE 92B0: 　　　渶 　渚渴　 湣　　淎 　　　淲 
+JIPSE 92C0: 　　　　 　　　　 　　湑湄 湓　㴞溌 
+JIPSE 92D0: 　　　　 　　　　 　　　湗 渼湞　湜 
+JIPSE 92E0: 　　　　 　　　　 　　渧　 　　　　 
+JIPSE 92F0: 　　　　 　　　　 　　　渹 　溫滃　 
+JIPSE 9340: 　溱滇溓 　　　　 溿　　　 　　　　 
+JIPSE 9350: 　　　　 　　　　 頖　　　 　　　　 
+JIPSE 9380: 　蒞漢漪 漚　滹漼 　　漥　 漳　　　 
+JIPSE 9390: 　　　　 澐澔　　 潢澌澍　 　　　　 
+JIPSE 93A0: 　　　澈 潾澖潙　 　潽　　 潚澘　　 
+JIPSE 93B0: 　　澯潞 　　濵濰 　　　澧 　　　澵 
+JIPSE 93C0: 　　　　 　　　　 　　濚　 濹　　　 
+JIPSE 93D0: 　　　　 　　　　 　　瀇瀅 　瀨　　 
+JIPSE 93E0: 　　　　 　　　　 　　瀼灝 灤灬灮　 
+JIPSE 93F0: 　　　　 　　　　 　　炕炅 炫炷炻　 
+JIPSE 9440: 　烜烘烓 烔烤焄　 焏　　　 　　　　 
+JIPSE 9450: 　　㷀焇 焮焱焞　 粦　　　 　　　　 
+JIPSE 9480: 　　焯　 　　煮煒 煜煆熙　 　煇　煨 
+JIPSE 9490: 㷔　煠　 　　熖熅 熒熀　　 　熠　　 
+JIPSE 94A0: 　　熳凞 　燁燄　 　　燾　 爀　爫爫 
+JIPSE 94B0: 　　牖　 　牣牸牿 犛犭爸爹 　丬　　 
+JIPSE 94C0: 　　　　 　　　　 　　犮犰 　犱狀　 
+JIPSE 94D0: 　　　　 　　　　 　　犾狌 狻　倐猙 
+JIPSE 94E0: 　　　　 　　　　 　　　　 　　猪猱 
+JIPSE 94F0: 　　　　 　　　　 　　猨猤 猽　　　 
+JIPSE 9540: 　　貓　 獫獷獼玁 玅　　　 　　　　 
+JIPSE 9550: 　　玊　 　玕　　 玘　　　 　　　　 
+JIPSE 9580: 　玟玞玜 玨　　　 珉珋玽　 玹珏珅　 
+JIPSE 9590: 珙珩珖珣 　珹　珒 琇琢　　 　珺珵　 
+JIPSE 95A0: 　　琁琓 　　琯琦 琪琹琨　 琤琮　琛 
+JIPSE 95B0: 　　　　 　瑗　瑋 瑆瑒　琩 琫琚　　 
+JIPSE 95C0: 　　　　 　　　　 　　瑶　 　瑱　瑢 
+JIPSE 95D0: 　　　　 　　　　 　　　　 璆　璇璉 
+JIPSE 95E0: 　　　　 　　　　 　　　　 　　璣璜 
+JIPSE 95F0: 　　　　 　　　　 　　璙璟 璨璫　　 
+JIPSE 9640: 　璦璐　 璿璹瓉　 瓈瓚　　 　　　　 
+JIPSE 9650: 　　　甁 　　畀　 畐　　　 　　　　 
+JIPSE 9680: 　　　畱 畯畬　畹 畾疁𤴔　 　　疒　 
+JIPSE 9690: 痀　　痤 　　痹瘀 瘓瘖瘥　 　瘙瘳瘭 
+JIPSE 96A0: 　　　　 癥癭癱　 皂晈　　 　　暠皜 
+JIPSE 96B0: 　　皧皪 　　　益 盎盌皞皛 皡　　皦 
+JIPSE 96C0: 　　　　 　　　　 　　盔簋 簠盱　窅 
+JIPSE 96D0: 　　　　 　　　　 　　眙　 眶　睆睍 
+JIPSE 96E0: 　　　　 　　　　 　　　睪 睟睜　　 
+JIPSE 96F0: 　　　　 　　　　 　　　睲 　瞢瞚　 
+JIPSE 9740: 　　瞪　 瞩矞　矤 　䂓　　 　　　　 
+JIPSE 9750: 　榘矴矻 　砆砭　 　　　　 　　　　 
+JIPSE 9780: 　砡　硏 硃硎　嵓 确　硨　 　　硤　 
+JIPSE 9790: 碑　　　 　硺碤碞 碭　磈　 　墝　磡 
+JIPSE 97A0: 　　　　 磠磻磷　 礀　　　 　　礮礱 
+JIPSE 97B0: 　　社　 　祈祉　 　祛礰礴 礻礼　　 
+JIPSE 97C0: 　　　　 　　　　 　　祜　 祝神祖祐 
+JIPSE 97E0: 　　　　 　　　　 　　　　 　祥祧䄅 
+JIPSE 97F0: 　　　　 　　　　 　　祲祷 　　　　 
+JIPSE 9840: 　　　禔 禎禖福　 　　　　 　　　　 
+JIPSE 9850: 　禛　　 　　　　 　　　　 　　　　 
+JIPSE 9880: 　　禸秂 　　秈　 　秌秖　 秫　　　 
+JIPSE 9890: 　　　　 䅈稊　　 稃　稛　 　稑稞　 
+JIPSE 98A0: 　　　　 穀　稹稸 　　　　 穌穝　　 
+JIPSE 98B0: 　　灶　 突窊　窠 　　　穟 　　穪　 
+JIPSE 98C0: 　　　　 　　　　 　　窬𥧄 牕窳窻䆴 
+JIPSE 98D0: 　　　　 　　　　 　　窼　 　竎竑　 
+JIPSE 98E0: 　　　　 　　　　 　　　竧 　靖竫　 
+JIPSE 98F0: 　　　　 　　　　 　　　　 　　竽　 
+JIPSE 9940: 　觔　　 笱笮笭笻 　笽　　 　　　　 
+JIPSE 9950: 　筇　䇮 　筠筩　 筭　　　 　　　　 
+JIPSE 9980: 　筲筿　 筤筦　筯 　箑　　 箞箛　𥮲 
+JIPSE 9990: 節　　　 䈎　　箼 　篙篚　 　　篗　 
+JIPSE 99A0: 　　篔𥱋 簏　篰　 　簱䉤　 𥶡　　籙 
+JIPSE 99B0: 　　粔　 　　　粠 　　　　 籭籮秔籹 
+JIPSE 99C0: 　　　　 　　　　 　　精粷 　　糈　 
+JIPSE 99D0: 　　　　 　　　　 　　　　 糝糙𥼣　 
+JIPSE 99E0: 　　　　 　　　　 　　𥽜　 紈紃紉紝 
+JIPSE 99F0: 　　　　 　　　　 　　　紓 紣　　　 
+JIPSE 9A40: 　䋆　絇 絁紾紱絈 　　　　 　　　　 
+JIPSE 9A50: 　絪絓絜 　綌綆　 綈　　　 　　　　 
+JIPSE 9A80: 　綋綦　 　緂綠　 　綷　　 　褲緖練 
+JIPSE 9A90: 緣緗　緱 縕縈縑縠 　縝　　 　　　　 
+JIPSE 9AA0: 　　縧繁 　　繇　 繍　繒　 　繾纊纆 
+JIPSE 9AB0: 　　　　 㓁罒　𦉰 　罡䌫纑 匋　罃罄 
+JIPSE 9AC0: 　　　　 　　　　 　　罣　 署覉　羑 
+JIPSE 9AD0: 　　　　 　　　　 　　　羗 牂养羡　 
+JIPSE 9AE0: 　　　　 　　　　 　　羭　 羽羿翏翎 
+JIPSE 9AF0: 　　　　 　　　　 　　　翟 　翬翥　 
+JIPSE 9B40: 　　　　 　　　　 　　ā® Ã¤ªǖ 
+JIPSE 9B50:  　　　 　　　˘ 　Łūī ©¦Àē 
+JIPSE 9B60: ­¯ĽŚ ŠŞŤŹ ŽŻČ« €ōÅÆ 
+JIPSE 9B70: ą˛łľ śˇšş ťĄ¿ǚ È¡Äǘ 
+JIPSE 9B80: ź　　　 　　　　 　　　˝ 　　　　 
+JIPSE 9B90: 　　　　 　　　　 　　　ž ż　　　 
+JIPSE 9BA0: ŔĚ　　 　　　　 　　　Ă 　　　　 
+JIPSE 9BB0: Ĺ　　　 　　　　 　　　　 　　　　 
+JIPSE 9BC0: ĆËÌÐ ÒÕØÙ ÝÞ　　 　　　　 
+JIPSE 9BD0: Ęßãå æìïð òõ　　 　　　　 
+JIPSE 9BE0: ǜ　øý þĀĪŪ ĒŌ　　 　　　　 
+JIPSE 9BF0: ²³·¸ ¹º»¼ ½¾　　 　　　　 
+JIPSE 9C40: 　　　　 　　　　 　　ŋę ĤŢĺĎ 
+JIPSE 9C50: Ů　　　 　　　ɦ 　ʘʁɰ ăŕĜħ 
+JIPSE 9C60: čěǂɓ ɗʄɠƓ ɨʉɕć ŘʕŜŬ 
+JIPSE 9C70: ɘɵəɜ ɞɐɯʊ ɤʔĈŇ ĉŰĴŃ 
+JIPSE 9C80: ʌ　　　 　　　　 　　　ɔ 　　　　 
+JIPSE 9C90: 　　　　 　　　　 　　　ɑ ɒ　　　 
+JIPSE 9CA0: ʍɺ　　 　　　　 　　　ɥ 　　　　 
+JIPSE 9CB0: ʢ　　　 　　　　 　　　　 　　　　 
+JIPSE 9CC0: ʡĝĥĵ ŝŭɱʋ ɾʃ　　 　　　　 
+JIPSE 9CD0: ʑʒɬɮ ɹʈɖɳ ɽʂ　　 　　　　 
+JIPSE 9CE0: Ő　ʐɻ ɭɟɲʝ ʎɡ　　 　　　　 
+JIPSE 9CF0: ďđńň őřůű ţ˙　　 　　　　 
+JIPSE 9D40: 　翯翺耂 者耊耔　 耤　　　 　　　　 
+JIPSE 9D50: 　耦　　 　　　　 聵　　　 　　　　 
+JIPSE 9D80: 　　　　 　胠𦙾胘 　䏮　　 胵　　　 
+JIPSE 9D90: 脘脖　　 腊　　　 　　　　 　　　　 
+JIPSE 9DA0: 　　卧臤 臭　　　 　𦥑舄　 　　䑛　 
+JIPSE 9DB0: 　　艉　 䑺艗艴豔 艹　舡舢 　舴　艆 
+JIPSE 9DC0: 　　　　 　　　　 　　艿　 　　　　 
+JIPSE 9DD0: 　　　　 　　　　 　　芎　 　　芨　 
+JIPSE 9DE0: 　　　　 　　　　 　　　　 芮　　　 
+JIPSE 9DF0: 　　　　 　　　　 　　　苆 　　　　 
+JIPSE 9E40: 　　　　 　芩芷　 芺　　　 　　　　 
+JIPSE 9E50: 　　茈茇 　　　　 　　　　 　　　　 
+JIPSE 9E80: 　　　　 茁苾　　 荇茭　　 荃　　荑 
+JIPSE 9E90: 荔茢荗　 　茰　　 茛　　　 　　　　 
+JIPSE 9EA0: 　　䒳荕 茝　　　 荢荿　　 莒莝莘莩 
+JIPSE 9EB0: 　　　莧 莛莱莍菡 萁　　　 　　　䓔 
+JIPSE 9EE0: 　　　　 　　　　 　　　　 　菶菀萑 
+JIPSE 9EF0: 　　　　 　　　　 　　　莿 菪　　　 
+JIPSE 9F40: 　菇　葳 葸　　　 　　　　 　　　　 
+JIPSE 9F50: 　　　葟 　　　　 　　　　 　　　　 
+JIPSE 9F80: 　著葈　 葊　葏葚 　　　　 　蓀蓂蓏 
+JIPSE 9F90: 　　　蒯 蒴　　　 蒋䔈蒦　 　蓜　　 
+JIPSE 9FA0: 　　　　 蓧　　　 䔥　　　 　蔴　蓰 
+JIPSE 9FB0: 　　　蕤 䕃　　　 　　蔞　 　　蕑　 
+JIPSE 9FC0: 　　　　 　　　　 　　　蕢 蕙　　蕫 
+JIPSE 9FD0: 　　　　 　　　　 　　蕓　 薆　薝　 
+JIPSE 9FF0: 　　　　 　　　　 　　　　 　﨟薏　 
+JIPSE A040: 　　　　 　　　　 　　̻ɚ́ ̏ɔ́ə̀ɧ 
+JIPSE A050: ά　　　 　　　⓮ 　⓯̃̚ ʌ́ʌ̀̀⓫ 
+JIPSE A060: ɚ̀ὲ⓰⓱ ⓲⓳⓴㋚ ㋛㋜偁ə́ ὰ⓬̂˥ 
+JIPSE A070: ㋝㋞㋟㋡ ㋢⁑⁂❖ ☞⓭̄æ̀ ˦ɔ̀̌ɚ 
+JIPSE A080: 俱　　　 　　　　 　　　丯 　　　　 
+JIPSE A090: 　　　　 　　　　 　　　你 佉　　　 
+JIPSE A0A0: 佟儵　　 　　　　 　　　佬 　　　　 
+JIPSE A0B0: 倁　　　 　　　　 　　　　 　　　　 
+JIPSE A0C0: 倻˧˨˩ ˩˥˥˩̥̬ ̹̜　　 　　　　 
+JIPSE A0D0: 儋̟̠̈ ̩̯̽˞ ̤̰　　 　　　　 
+JIPSE A0E0: ǽ　̴̼ ̝̞̘̙ ̪̺　　 　　　　 
+JIPSE A0F0: έ͡ˈˌ ːˑ̆‿ ̋́　　 　　　　 
+JIPSE A140: 　　　　 　　　　 　　哳剬 匾𠘨𠝏关 
+JIPSE A150: 冭　　　 　　　啤 　𠷡唼唀 划凳匵啁 
+JIPSE A160: 剜剷啽喂 喈㗅嗒𠺕 𠹭喿噭剕 冘㖦厤厴 
+JIPSE A170: 嗉嗌嗑嗝 㗚嗢𠹤嘨 𠽟㖨勷冋 𠫓𠗖𠥼冃 
+JIPSE A180: 嘇　　　 　　　　 　　　嘰 　　　　 
+JIPSE A190: 　　　　 　　　　 　　　嘷 㗴　　　 
+JIPSE A1A0: 噀嚈　　 　　　　 　　　噇 　　　　 
+JIPSE A1B0: 噞　　　 　　　　 　　　　 　　　　 
+JIPSE A1C0: 噠厷叀𠬝 㕞㕣叴叵 吤吨　　 　　　　 
+JIPSE A1D0: 㘅㕮呃呢 呬咍咕咠 咦咭　　 　　　　 
+JIPSE A1E0: 㒼　咮咷 咺哃𠵅哬 哯哱　　 　　　　 
+JIPSE A1F0: 劄劂𠠇劘 𠠺劤劺劻 勊𠢹　　 　　　　 
+JIPSE A240: 　薭　　 　　　　 　薰　　 　　　　 
+JIPSE A250: 　藎　　 　　　　 　　　　 　　　　 
+JIPSE A280: 　　　　 　　　　 　蘐蘒　 　蘩　　 
+JIPSE A290: 蘸　　蘒 　　虓　 虗虖虛　 　虜　虬 
+JIPSE A2A0: 　　虷虺 蚉　　蚱 﨡猬蛼　 蛽　閩蜙 
+JIPSE A2B0: 　　蟖蟵 蠇蠋蠆蠁 蠨蠲蝘　 蝉螠螈　 
+JIPSE A2C0: 　　　　 　　　　 　　　　 　　衤　 
+JIPSE A2D0: 　　　　 　　　　 　　　　 　　袘　 
+JIPSE A2E0: 　　　　 　　　　 　　袪　 　　裀　 
+JIPSE A2F0: 　　　　 　　　　 　　裒　 裊　裎　 
+JIPSE A340: 　裛㐮裱 裵褐褚　 　褜　　 　　　　 
+JIPSE A350: 　　躶褧 褰　𧜎　 　　　　 　　　　 
+JIPSE A380: 　穠䙥　 覀　　　 覔覐　　 視靚　　 
+JIPSE A390: 覰　觥　 　　　　 　　訕　 　訒訑　 
+JIPSE A3A0: 　　　訢 　　詍詎 詘　　　 　詅　詝 
+JIPSE A3B0: 　　　　 誧誾諗　 　　訷詇 　詡詵詹 
+JIPSE A3C0: 　　　　 　　　　 　　　謁 諸諼諟諶 
+JIPSE A3D0: 　　　　 　　　　 　　　　 　　謹　 
+JIPSE A3E0: 　　　　 　　　　 　　　譃 譙譔譓　 
+JIPSE A3F0: 　　　　 　　　　 　　　　 　　譿　 
+JIPSE A440: 　醼讜谹 　豅豇豉 　　　　 　　　　 
+JIPSE A450: 　　　　 　貒　　 　　　　 　　　　 
+JIPSE A480: 　　　　 　賖賓　 賡賙　　 賴賰賱賾 
+JIPSE A490: 　賸贈贒 贛　赶　 﨣趄　　 　　　趯 
+JIPSE A4A0: 　　𧾷　 　跗跑跎 　　　　 踠　踡踔 
+JIPSE A4B0: 　　　　 䡎軺　　 輞　　蹻 躯躳軏軔 
+JIPSE A4C0: 　　　　 　　　　 　　輭　 轀　轔　 
+JIPSE A4D0: 　　　　 　　　　 　　　辶 辶辵　　 
+JIPSE A4E0: 　　　　 　　　　 　　迆　 　　𨑕　 
+JIPSE A4F0: 　　　　 　　　　 　　　迍 　﨤迤　 
+JIPSE A540: 　迮迨　 　　　　 　　　　 　　　　 
+JIPSE A550: 　　　　 　逌　　 　　　　 　　　　 
+JIPSE A580: 　　　逸 逭　　　 　　　　 　　　遄 
+JIPSE A590: 　　徧逸 　遥　　 　　　　 　　　　 
+JIPSE A5A0: 　　遧　 　　　　 　衟　　 　　邈　 
+JIPSE A5B0: 　　阝　 邢　　　 　邰　　 　　　　 
+JIPSE A5C0: 　　　　 　　　　 　　邳郅 郇　郞郝 
+JIPSE A5D0: 　　　　 　　　　 　　　郯 郴郶都鄕 
+JIPSE A5E0: 　　　　 　　　　 　　鄖　 　　鄯鄧 
+JIPSE A5F0: 　　　　 　　　　 　　鄱鄴 酆　酛　 
+JIPSE A640: 　酙　酤 　　酴　 醅　　　 　　　　 
+JIPSE A650: 　　　醗 醞　　　 毉　　　 　　　　 
+JIPSE A680: 　醨　　 　𡌛　釗 釚釞釬　 釭釱釥釤 
+JIPSE A690: 　　釮　 釻鈐鈇鈆 　　鈖　 　　鈊　 
+JIPSE A6A0: 　　　鈁 鈗　鉑鈸 鈹鉏鉃　 鉀鉠鉂鈼 
+JIPSE A6B0: 　　鈳　 鉥　鉧　 鉸　　鉙 鈺鉎　鉊 
+JIPSE A6C0: 　　　　 　　　　 　　　鉼 鉽銉銫銈 
+JIPSE A6D0: 　　　　 　　　　 　　銧鉷 鋗　鋌銿 
+JIPSE A6E0: 　　　　 　　　　 　　鋓　 　鋙　鋧 
+JIPSE A6F0: 　　　　 　　　　 　　鋎　 鋥　鋠　 
+JIPSE A740: 　　　鋕 鋐　﨧錟 錧錡　　 　　　　 
+JIPSE A750: 　錕錞錑 錄　鋻　 　　　　 　　　　 
+JIPSE A780: 　錩錂錝 錥鋿鋹﨨 磺鍈鍊　 鍰鍫鍤　 
+JIPSE A790: 　　　鍇 鍗　鍉　 鍚　　　 　　　鎋 
+JIPSE A7A0: 　　　　 　　鎺鎈 鎤　　　 𨫍𨪙鏟鏜 
+JIPSE A7B0: 　　　　 鐏　　鏻 　鏸鏞　 　鏢鏇鏆 
+JIPSE A7C0: 　　　　 　　　　 　　鐄　 鏽鐻鐲鑊 
+JIPSE A7D0: 　　　　 　　　　 　　鐳　 　　鐱鑅 
+JIPSE A7E0: 　　　　 　　　　 　　鑈　 　鑫鑱鑲 
+JIPSE A7F0: 　　　　 　　　　 　　　　 閒閎　　 
+JIPSE A840: 　閍閫閬 閴　閽闋 　　　　 　　　　 
+JIPSE A850: 　闐　　 　　　　 陘　　　 　　　　 
+JIPSE A880: 　陡　　 　　　　 隂隆　　 　　　　 
+JIPSE A890: 　﨩隝隥 隩隯隺　 嶲　鵰　 　難鶵　 
+JIPSE A8A0: 　　雩　 雯　　　 　霳霻　 靁靃靎靍 
+JIPSE A8B0: 　　靛韌 毱靳　鞚 　韁　靏 靑　靕　 
+JIPSE A8C0: 　　　　 　　　　 　　　　 韙韞　　 
+JIPSE A8D0: 　　　　 　　　　 　　　　 響頎頍頊 
+JIPSE A8E0: 　　　　 　　　　 　　　頞 頫頬頥頲 
+JIPSE A8F0: 　　　　 　　　　 　　顇頻 顒顓類　 
+JIPSE A940: 　顗顙顛 顥顦顬　 凬颭　　 　　　　 
+JIPSE A950: 　颸颺飇 飈飠　　 𩙿　　　 　　　　 
+JIPSE A980: 　飡飪飯 飼　餈餧 館　糦　 饀饎　　 
+JIPSE A990: 饘饜饟　 馞　　　 駃馹　　 　　　騃 
+JIPSE A9A0: 　　騂　 騤　騨騸 騮驊　　 　驎　䯂 
+JIPSE A9B0: 　　　髩 　鬂鬈鬒 　　骯　 髙䯨髜　 
+JIPSE A9C0: 　　　　 　　　　 　　䰗鬭 　魞　　 
+JIPSE A9D0: 　　　　 　　　　 　　魳魲 魵魦魹鮏 
+JIPSE A9E0: 　　　　 　　　　 　　　　 　　鮄　 
+JIPSE A9F0: 　　　　 　　　　 　　鮞鮱 鮲　　　 
+JIPSE AA40: 　鯇鯁　 　鯎　𩸽 鮻鯫　　 　　　　 
+JIPSE AA50: 　鯥　　 鯪　鰀　 　　　　 　　　　 
+JIPSE AA80: 　鯺𩺊鰣 鰩　鰪鰱 鱏鱓　　 鱣鱩鱮鱰 
+JIPSE AA90: 鱷鳦　鴋 鴎鴞鴝𨿸 鴘　　　 　鵇𪀯鵃 
+JIPSE AAA0: 　　雞　 鵢鵒鵷鶍 鵼鵫　　 鶡鶖鷃　 
+JIPSE AAB0: 　　　　 　　麤麬 　　鶴　 鸙鸜　鹸 
+JIPSE AAC0: 　　　　 　　　　 　　黃　 　黑　　 
+JIPSE AAD0: 　　　　 　　　　 　　　鼐 鞺鼙鼷鼹 
+JIPSE AAE0: 　　　　 　　　　 　　　齁 腭　　龔 
+JIPSE AB40: 　　　　 　　　　 　　彘呴 坼勖吒兗 
+JIPSE AB50: 勌　　　 　　　憹 　扯怵怘 匜勰坷惋 
+JIPSE AB60: 呫咈捼搐 搢摹摭擷 擻斝樻吧 劓惔垸埏 
+JIPSE AB70: 昳曛柼栬 桛桲梣楉 楤惸坰凢 埭勐垜凊 
+JIPSE AB80: 榥　　　 　　　　 　　　榭 　　　　 
+JIPSE AB90: 　　　　 　　　　 　　　槏 㮶　　　 
+JIPSE ABA0: 㯃橖　　 　　　　 　　　槵 　　　　 
+JIPSE ABB0: 樕　　　 　　　　 　　　　 　　　　 
+JIPSE ABC0: 𣜿𡑮壒虁 婧媧𡢽嬥 孁尒　　 　　　　 
+JIPSE ABD0: 樾尫屮𡚴 岣峋崍嵆 嵊嶁　　 　　　　 
+JIPSE ABE0: 剡　嶤巋 吞帔异弝 弣彔　　 　　　　 
+JIPSE ABF0: 唫唵喁喎 噶噱嚩嚳 囉𡈽　　 　　　　 
+JIPSE AC40: 　唖　　 　　　　 焔　　　 　　　　 
+JIPSE AC50: 　　　　 　噛　　 　　　　 　　　　 
+JIPSE AC80: 　　　　 　　繋　 　　　　 麹　　　 
+JIPSE AC90: 　　　　 　　　　 　醤　　 　　　　 
+JIPSE ACA0: 　　　　 　　　　 　掻痩　 　　　　 
+JIPSE ACB0: 　　　　 掴　　　 填　　箪 　　　　 
+JIPSE ACC0: 　　　　 　　　　 　　　　 　　涜　 
+JIPSE ACD0: 　　　　 　　　　 　　　　 　　嚢　 
+JIPSE AD40: 　　　　 　　　麺 　　　　 　　　　 
+JIPSE AD80: 　　　蝋 　　　　 　　　　 　　　　 
+JIPSE B040: 　　　　 　　　　 　　瓿洱 濇歧氅𣝣 
+JIPSE B050: 欬　　　 　　　瘕 　瘞㽲甗 毿殩澼痎 
+JIPSE B060: 沘洿瘵癃 癋癤癯皁 皝皶礜沪 欞瘂灊灞 
+JIPSE B070: 盅盦盼眊 眴睎睢睺 瞀瘈澶檝 灎歠濊檔 
+JIPSE B080: 瞔　　　 　　　　 　　　矠 　　　　 
+JIPSE B090: 　　　　 　　　　 　　　𥒎 硑　　　 
+JIPSE B0A0: 碰祆　　 　　　　 　　　𥔎 　　　　 
+JIPSE B0B0: 磤　　　 　　　　 　　　　 　　　　 
+JIPSE B0C0: 磲灵焫焠 煑熇熺㸿 犍𤟱　　 　　　　 
+JIPSE B0D0: 祅猧獐獦 玠玢玦玫 琊琬　　 　　　　 
+JIPSE B0E0: 檥　琰瑄 瑇瑫瑭璘 璩璵　　 　　　　 
+JIPSE B0F0: 浘涪淛淝 滁滎漐漯 潡澠　　 　　　　 
+JIPSE B240: 　嚌嚕嚚 嚝嚨嚲囅 囟囨　　 　　　　 
+JIPSE B250: 　囷𡈁圕 圣𡉕圩　 𡉻　　　 　　　　 
+JIPSE B280: 　坅坆坍 坨坯坳坴 坵𡋗垝　 垞垨埗𡋽 
+JIPSE B290: 埌埦埰㙊 埻埽堄堧 堲𡏄塉　 　塌塧墋 
+JIPSE B2A0: 　　墍墔 墪𡑭壃壍 壢壳壴　 夅夔𡗗㚑 
+JIPSE B2B0: 　　妮妼 姍姧𡜆𡝂 㛏娌夽奆 㚖𦰩𡙇奶 
+JIPSE B2C0: 　　　　 　　　　 　　娍娗 娧娭婺媋 
+JIPSE B2D0: 　　　　 　　　　 　　媠媱 媳媿嫜嫠 
+JIPSE B2E0: 　　　　 　　　　 　　嫥嫮 嬀嬗嬭孒 
+JIPSE B2F0: 　　　　 　　　　 　　孨孯 孼宄𡧃　 
+JIPSE B340: 　幮𢅻庥 庪庹庿廆 廒廙　　 　　　　 
+JIPSE B350: 　𢌞𢎭弞 彇彲彾　 徏　　　 　　　　 
+JIPSE B380: 　徢徸忇 忋忓忳忼 怢怤㤚　 恌悕您𢛳 
+JIPSE B390: 惈惙惛惮 惵愐愙愺 㥯慁慆　 　慠𢡛憒 
+JIPSE B3A0: 　　憥𢢫 懝懵𢦏戕 戣扆扒　 扡扤扻扭 
+JIPSE B3B0: 　　𢭏𢭐 挲挻捁𢭆 捙𢰝扳抙 𢪸挃挍挐 
+JIPSE B3C0: 　　　　 　　　　 　　𢮦捬 掙掔掽揷 
+JIPSE B3D0: 　　　　 　　　　 　　揔揕 揠揬揲搞 
+JIPSE B3E0: 　　　　 　　　　 　　搩搯 摚摛摝摽 
+JIPSE B3F0: 　　　　 　　　　 　　撇撑 撟擋擌　 
+JIPSE B440: 　擕𢷡擥 擿㩮攏攖 㩳攞　　 　　　　 
+JIPSE B450: 　敄敔敫 敺斄斊　 斲　　　 　　　　 
+JIPSE B480: 　斵斸旉 旔旼昪晎 𣇵𣆶晬　 晭晻暀暐 
+JIPSE B490: 㬎暭㫗朁 朒𣍲𣏓𣏒 杍杔𣏐　 　𣏤𣏕杴 
+JIPSE B4A0: 　　𣏚枒 𣏟荣栐枰 枲柃柈　 柒柛柰𣑊 
+JIPSE B4B0: 　　栳栾 桅桕桗㭷 桫桮𣑑𣑋 栘栟栭𣑥 
+JIPSE B4C0: 　　　　 　　　　 　　桺桼 梂梐㭭梘 
+JIPSE B4D0: 　　　　 　　　　 　　梙梜 梫梴梻棻 
+JIPSE B4E0: 　　　　 　　　　 　　𣓤𣕚 棃棅棌棤 
+JIPSE B4F0: 　　　　 　　　　 　　棥棷 椃椇㮇　 
+JIPSE B540: 　㮍楆楩 楬楲楺楿 㮤榰　　 　　　　 
+JIPSE B550: 　榺榼槑 𣘹𣙇槣　 槮　　　 　　　　 
+JIPSE B580: 　槯㯍槴 槾樚樝𣜜 樳樴樿　 橉橺橎橒 
+JIPSE B590: 𣜌檃檋㯰 檡𣝤檫檽 櫆櫜𣟿　 　𣟧櫲櫳 
+JIPSE B5A0: 　　櫽𣠤 欋欏𣠽欗 㰦歬歵　 殁殛殮𣪘 
+JIPSE B5B0: 　　氊氎 氶汛沕沭 泂泐殽毇 毈毚毦氂 
+JIPSE B5C0: 　　　　 　　　　 　　㳒泜 泭𣴀洤洦 
+JIPSE B5D0: 　　　　 　　　　 　　汧洯 浛浞浠涀 
+JIPSE B5E0: 　　　　 　　　　 　　涍涑 涘𣵀渗𣷺 
+JIPSE B5F0: 　　　　 　　　　 　　𣷹𣷓 涫涮涴　 
+JIPSE B640: 　淂淐淶 渞渢㴑渲 湈湉　　 　　　　 
+JIPSE B650: 　湋湌湏 湔溧溴　 滊　　　 　　　　 
+JIPSE B680: 　漵滫滻 漊漌漘漶 𣽾潒潗　 潠潨澾澟 
+JIPSE B690: 澥㵤濈濉 濞濩𤂖濼 瀀瀊瀣　 　𤄃瀹瀺 
+JIPSE B6A0: 　　灃灇 灋㶚灔灥 灩灾炁　 炆𤇆炟炱 
+JIPSE B6B0: 　　焈焌 煐煓煞熛 熢熮𤇾烬 烊烑焃焆 
+JIPSE B6C0: 　　　　 　　　　 　　熯𤎼 燋燓燙燜 
+JIPSE B6D0: 　　　　 　　　　 　　爇㸅 爴牓牗𤘩 
+JIPSE B6E0: 　　　　 　　　　 　　牮牯 犎𤚥狁㹠 
+JIPSE B6F0: 　　　　 　　　　 　　㹦㹨 狳狺猇　 
+JIPSE B740: 　猒猘㺃 猹猳獒㺔 獬𤢖　　 　　　　 
+JIPSE B750: 　獮獯獱 玔玥玵　 玷　　　 　　　　 
+JIPSE B780: 　玼玿珡 珧琱瑓瑀 瑃瑍瑝　 璁璅璈𤩍 
+JIPSE B790: 璒璗璠璡 璥璪璻璺 瓖瓘瓞　 　瓯瓫𤭖 
+JIPSE B7A0: 　　瓺𤭯 甠甤甪㽗 𤰖甽甾　 畈畎畒畲 
+JIPSE B7B0: 　　疰疷 疿痆痏痓 痝痟畺畽 疌㽵疢㽷 
+JIPSE B7C0: 　　　　 　　　　 　　痠痧 痬痮痱瘃 
+JIPSE B7D0: 　　　　 　　　　 　　瘘瘇 瘏㾮𤸎瘛 
+JIPSE B7E0: 　　　　 　　　　 　　瘜𤸷 瘨瘼𤹪㿉 
+JIPSE B7F0: 　　　　 　　　　 　　癁𤺋 癉癕㿗　 
+JIPSE B840: 　癮皕皠 皨皯𥁊盉 𥁕盨　　 　　　　 
+JIPSE B850: 　盬𥄢眗 眚眭眵　 𥆩　　　 　　　　 
+JIPSE B880: 　䀹𥇥𥇍 睘睠𥈞睼 睽𥉌䁘　 瞟瞤矟矪 
+JIPSE B890: 矬矰𥐮砅 砉砍砙砬 硇硪𥓙　 　碊碔碝 
+JIPSE B8A0: 　　碟碻 磌磎磕磦 磹磾𥖧　 礐礛礥祊 
+JIPSE B8B0: 　　秇种 𥞩𥞴䅏稕 䅣稭祘禕 禡禩禴离 
+JIPSE B8C0: 　　　　 　　　　 　　穇穖 穙穜穧穵 
+JIPSE B8D0: 　　　　 　　　　 　　穸窂 窐窣𥧔窹 
+JIPSE B8E0: 　　　　 　　　　 　　窾䆿 竌竨竴𥫤 
+JIPSE B8F0: 　　　　 　　　　 　　𥫣笇 𥫱笧笪　 
+JIPSE B940: 　笯䇦䇳 筁筕筹筳 䈇箐　　 　　　　 
+JIPSE B950: 　箯箵篅 篊𥱤篖　 篪　　　 　　　　 
+JIPSE B980: 　簃簎簦 籅籊籑籗 籞籡籩　 籯籰𥸮𥹖 
+JIPSE B990: 𥹥𥹢粶粿 𥻘糄𥻂糍 𥻨糗糫　 　糵紒紞 
+JIPSE B9A0: 　　𥿠𥿔 紽絀𦀌𥿻 䋖絙絚　 絰䋝絿𦀗 
+JIPSE B9B0: 　　緀緙 緦緹䌂𦃭 縉縐綗𦁠 綝綧綪綶 
+JIPSE B9C0: 　　　　 　　　　 　　縗縬 繅繳繵纇 
+JIPSE B9D0: 　　　　 　　　　 　　纘纚 䍃缼缻缾 
+JIPSE B9E0: 　　　　 　　　　 　　罏𦊆 罤罭罽罾 
+JIPSE B9F0: 　　　　 　　　　 　　𦍌羐 𣴎羖羜　 
+JIPSE C040: 　　　　 　　　　 　　蕺粼 胗笒簳祹 
+JIPSE C050: 秭　　　 　　　蘄 　蘅薢薌 簁筎胊藋 
+JIPSE C060: 粏糕𧃴蘘 虢䖝虵蚘 蚸蛺諴簶 秞藭腠腧 
+JIPSE C070: 蜋蝱螇螬 螭螵䗪蠊 蠐藿耼禘 腨穭胳禍 
+JIPSE C080: 蠔　　　 　　　　 　　　𧚄 　　　　 
+JIPSE C090: 　　　　 　　　　 　　　褘 褙　　　 
+JIPSE C0A0: 褹讝　　 　　　　 　　　襀 　　　　 
+JIPSE C0B0: 觶　　　 　　　　 　　　　 　　　　 
+JIPSE C0C0: 諐膻臊臏 臗艠𦫿芡 芣芤　　 　　　　 
+JIPSE C0D0: 譩芾芿苕 苽茀茺荽 莆菏　　 　　　　 
+JIPSE C0E0: 𥝱　菑萆 葰蒅蒺𦹀 蔲蔯　　 　　　　 
+JIPSE C0F0: 紇絺綃緌 縨纍翛翮 耵耷　　 　　　　 
+JIPSE C140: 　　　　 　　　　 　　想閃 措賤遷繊 
+JIPSE C150: 薦　　　 　　　早 　曹掃捜 選践岨挿 
+JIPSE C160: 銑鮮巣槍 槽漕燥争 瘦相像銭 船搔曽楚 
+JIPSE C170: 窓糟総綜 聡草荘葬 蒼操塑腺 狙詮曾羨 
+JIPSE C180: 藻　　　 　　　　 　　　装 　　　　 
+JIPSE C190: 　　　　 　　　　 　　　走 送　　　 
+JIPSE C1A0: 遭憎　　 　　　　 　　　鎗 　　　　 
+JIPSE C1B0: 霜　　　 　　　　 　　　　 　　　　 
+JIPSE C1C0: 騒疏疎礎 祖租粗素 組蘇　　 　　　　 
+JIPSE C1D0: 増訴阻遡 鼠僧創双 叢倉　　 　　　　 
+JIPSE C1E0: 舛　喪壮 奏爽宋層 匝惣　　 　　　　 
+JIPSE C1F0: 前善漸然 全禅繕膳 糎噌　　 　　　　 
+JIPSE C240: 　　　　 　　　　 　　胎速 村即束臓 
+JIPSE C250: 側　　　 　　　逮 　隊苔腿 捉息損袋 
+JIPSE C260: 足俗黛鯛 代台大第 醍題凧測 促貸他多 
+JIPSE C270: 鷹滝瀧卓 啄宅托択 拓退尊贈 太則遜蔵 
+JIPSE C280: 沢　　　 　　　　 　　　濯 　　　　 
+JIPSE C290: 　　　　 　　　　 　　　琢 託　　　 
+JIPSE C2A0: 鐸只　　 　　　　 　　　濁 　　　　 
+JIPSE C2B0: 諾　　　 　　　　 　　　　 　　　　 
+JIPSE C2C0: 茸汰詑唾 堕妥惰打 柁舵　　 　　　　 
+JIPSE C2D0: 蛸楕陀駄 驒体堆対 耐岱　　 　　　　 
+JIPSE C2E0: 造　帯待 怠態戴替 泰滞　　 　　　　 
+JIPSE C2F0: 属賊族続 卒袖其揃 存孫　　 　　　　 
+JIPSE C340: 　　　　 　　　　 　　築樽 端竪谷叩 
+JIPSE C350: 脱　　　 　　　秩 　窒竹畜 棚辿短筑 
+JIPSE C360: 鱈誰茶嫡 着中仲宙 忠抽凋狸 奪蓄綻耽 
+JIPSE C370: 昼柱注虫 衷註酎鋳 駐逐炭達 胆巽簞但 
+JIPSE C380: 樗　　　 　　　　 　　　瀦 　　　　 
+JIPSE C390: 　　　　 　　　　 　　　猪 苧　　　 
+JIPSE C3A0: 著寵　　 　　　　 　　　貯 　　　　 
+JIPSE C3B0: 丁　　　 　　　　 　　　　 　　　　 
+JIPSE C3C0: 兆蛋誕鍛 団壇弾断 暖檀　　 　　　　 
+JIPSE C3D0: 喋段男談 値知地弛 恥智　　 　　　　 
+JIPSE C3E0: 辰　池痴 稚置致蜘 遅馳　　 　　　　 
+JIPSE C3F0: 丹単嘆坦 担探旦歎 淡湛　　 　　　　 
+JIPSE C440: 　　　　 　　　　 　　壺町 勅懲朝帖 
+JIPSE C450: 彫　　　 　　　鶴 　亭紬嬬 暢挑鳥爪 
+JIPSE C460: 牒眺低停 偵剃貞呈 堤定諦潮 張吊直朕 
+JIPSE C470: 帝底庭廷 弟悌抵挺 提釣頂庁 沈徴捗帳 
+JIPSE C480: 梯　　　 　　　　 　　　汀 　　　　 
+JIPSE C490: 　　　　 　　　　 　　　碇 禎　　　 
+JIPSE C4A0: 程逓　　 　　　　 　　　締 　　　　 
+JIPSE C4B0: 艇　　　 　　　　 　　　　 　　　　 
+JIPSE C4C0: 訂珍賃鎮 陳津墜椎 槌追　　 　　　　 
+JIPSE C4D0: 蹄鎚痛通 塚栂摑槻 佃漬　　 　　　　 
+JIPSE C4E0: 弔　柘辻 蔦綴鍔椿 潰坪　　 　　　　 
+JIPSE C4F0: 聴脹腸蝶 調諜超跳 銚長　　 　　　　 
+JIPSE C540: 　　　　 　　　　 　　奴溺 甜敵笛邸 
+JIPSE C550: 摘　　　 　　　刀 　唐倒怒 的滴纏党 
+JIPSE C560: 鏑哲塔塘 套宕島嶋 悼投糖適 泥冬転顚 
+JIPSE C570: 搭東桃檮 棟盗淘湯 濤凍添釘 点擢貼鄭 
+JIPSE C580: 灯　　　 　　　　 　　　燈 　　　　 
+JIPSE C590: 　　　　 　　　　 　　　当 痘　　　 
+JIPSE C5A0: 禱到　　 　　　　 　　　等 　　　　 
+JIPSE C5B0: 答　　　 　　　　 　　　　 　　　　 
+JIPSE C5C0: 筒伝殿澱 田電兎吐 堵塗　　 　　　　 
+JIPSE C5D0: 統妬屠徒 斗杜渡登 菟賭　　 　　　　 
+JIPSE C5E0: 鼎　途都 鍍砥礪努 度土　　 　　　　 
+JIPSE C5F0: 徹撤轍迭 鉄典塡天 展店　　 　　　　 
+JIPSE C640: 　　　　 　　　　 　　遁闘 銅逃陶董 
+JIPSE C650: 豆　　　 　　　那 　内呑頓 鐙透道曇 
+JIPSE C660: 騰働乍凪 薙謎灘捺 鍋楢日頭 謄鈍鴇匿 
+JIPSE C670: 馴縄畷南 楠軟難汝 二奈萄藤 得踏峠蕩 
+JIPSE C680: 尼　　　 　　　　 　　　弐 　　　　 
+JIPSE C690: 　　　　 　　　　 　　　邇 匂　　　 
+JIPSE C6A0: 賑入　　 　　　　 　　　肉 　　　　 
+JIPSE C6B0: 虹　　　 　　　　 　　　　 　　　　 
+JIPSE C6C0: 廿徳瀆特 督禿篤毒 独読　　 　　　　 
+JIPSE C6D0: 乳栃橡凸 突椴届鳶 苫寅　　 　　　　 
+JIPSE C6E0: 討　酉瀞 噸屯惇敦 沌豚　　 　　　　 
+JIPSE C6F0: 動同堂導 憧撞洞瞳 童胴　　 　　　　 
+JIPSE C740: 　　　　 　　　　 　　配熱 納濡寧如 
+JIPSE C750: 忍　　　 　　　煤 　狽培倍 祢禰濃媒 
+JIPSE C760: 猫年買売 賠陪這蠅 秤矧莫葱 妊梅脳膿 
+JIPSE C770: 萩伯剝博 拍柏泊白 箔楳悩韮 農認能尿 
+JIPSE C780: 粕　　　 　　　　 　　　舶 　　　　 
+JIPSE C790: 　　　　 　　　　 　　　薄 迫　　　 
+JIPSE C7A0: 曝麦　　 　　　　 　　　漠 　　　　 
+JIPSE C7B0: 爆　　　 　　　　 　　　　 　　　　 
+JIPSE C7C0: 縛覗蚤巴 把播覇杷 波派　　 　　　　 
+JIPSE C7D0: 駁琶破婆 罵芭馬俳 廃拝　　 　　　　 
+JIPSE C7E0: 任　排敗 杯盃牌背 肺輩　　 　　　　 
+JIPSE C7F0: 念捻撚燃 粘乃廼之 埜囊　　 　　　　 
+JIPSE C840: 　　　　 　　　　 　　匪潑 伴幡畠函 
+JIPSE C850: 筈　　　 　　　悲 　扉否卑 畑肌隼妃 
+JIPSE C860: 鉢発批披 斐比泌疲 皮碑琵八 肇庇半反 
+JIPSE C870: 秘緋罷肥 被誹費避 非彼蛤硲 叛櫨判箱 
+JIPSE C880: 飛　　　 　　　　 　　　樋 　　　　 
+JIPSE C890: 　　　　 　　　　 　　　簸 備　　　 
+JIPSE C8A0: 尾美　　 　　　　 　　　微 　　　　 
+JIPSE C8B0: 枇　　　 　　　　 　　　　 　　　　 
+JIPSE C8C0: 毘帆搬斑 板氾汎版 犯班　　 　　　　 
+JIPSE C8D0: 眉畔繁般 藩販範釆 煩頒　　 　　　　 
+JIPSE C8E0: 箸　飯挽 晩番盤磐 蕃蛮　　 　　　　 
+JIPSE C8F0: 醱髪伐罰 抜筏閥鳩 噺塙　　 　　　　 
+JIPSE C940: 　　　　 　　　　 　　布筆 票膝弼鼻 
+JIPSE C950: 髭　　　 　　　普 　浮怖府 肘菱瓢扶 
+JIPSE C960: 畢逼父符 腐膚芙譜 負賦復必 疋敷評豹 
+JIPSE C970: 赴阜附侮 撫武舞葡 蕪斧漂稗 廟彦表柊 
+JIPSE C980: 部　　　 　　　　 　　　封 　　　　 
+JIPSE C990: 　　　　 　　　　 　　　楓 風　　　 
+JIPSE C9A0: 葺服　　 　　　　 　　　蕗 　　　　 
+JIPSE C9B0: 伏　　　 　　　　 　　　　 　　　　 
+JIPSE C9C0: 副描病秒 苗錨鋲蒜 蛭鰭　　 　　　　 
+JIPSE C9D0: 幅品彬斌 浜瀕貧賓 頻敏　　 　　　　 
+JIPSE C9E0: 匹　瓶不 付埠夫婦 富冨　　 　　　　 
+JIPSE C9F0: 檜姫媛紐 百謬俵彪 標氷　　 　　　　 
+JIPSE CA40: 　𦐂翃翣 翲耈耑耖 耬耰　　 　　　　 
+JIPSE CA50: 　聃聦聱 聻肙肜　 肤　　　 　　　　 
+JIPSE CA80: 　肧肸胅 胕胦𦚰脍 胻脵脞　 䏰脤脧脬 
+JIPSE CA90: 𦜝脽䐈腩 䐗膁䐜膄 膅䐢膘　 　膲臁臃 
+JIPSE CAA0: 　　臖臛 𦣝𦣪臽臿 𦥯𦧝舙　 𦨞舲舼艅 
+JIPSE CAB0: 　　艣𦪷 艹艹䒑艽 芃芊𦩘艋 䑶艏𦪌艜 
+JIPSE CAC0: 　　　　 　　　　 　　芓芧 芲芴芼苢 
+JIPSE CAD0: 　　　　 　　　　 　　苨苷 茌茼荄䒾 
+JIPSE CAE0: 　　　　 　　　　 　　莔莕 菉菐菔菝 
+JIPSE CAF0: 　　　　 　　　　 　　菥菹 萏萕𦱳　 
+JIPSE CB40: 　萗萹葑 葒葙葜𦳝 葥葶　　 　　　　 
+JIPSE CB50: 　葼蒁䔍 蒗蒾蓎　 蓓　　　 　　　　 
+JIPSE CB80: 　𦹥蓪蓯 蓱蓺蓽蔌 蔛蔤蔥　 蔫蕏蕯蔾 
+JIPSE CB90: 蕞蕡𦾔蕻 蕽蕿薁薓 薟𦿸𦿶　 　𦿷薷薼 
+JIPSE CBA0: 　　藇藊 藘藙藟藡 藦藶蘀　 蘑蘞蘡蘤 
+JIPSE CBB0: 　　虯蚇 蚍蚑蚜蚝 蚨蚳蘧𧄍 蘹蘼𧄹虀 
+JIPSE CBC0: 　　　　 　　　　 　　蛁蛃 蛑蛕蛗蛣 
+JIPSE CBD0: 　　　　 　　　　 　　蛦䖸 蜅蜇蜎蜐 
+JIPSE CBE0: 　　　　 　　　　 　　蜓蜟 蜡蜣蜱蜺 
+JIPSE CBF0: 　　　　 　　　　 　　蜾蝀 蝃蝑蝤　 
+JIPSE CC40: 　蝥蝲蝼 𧏛𧏚螧螉 螋螓　　 　　　　 
+JIPSE CC50: 　𧏾䗥螾 𧐐蟁蟎　 蟟　　　 　　　　 
+JIPSE CC80: 　𧑉蟣蟥 蟦蟪蟫蟭 蠃蠓蠮　 蠼䘏衊衘 
+JIPSE CC90: 𧘕𧘔衩𧘱 衯袠袼袽 袾𧚓裑　 　裓裰䙁 
+JIPSE CCA0: 　　褁褷 𧜣襂襅襉 𧝒襢覟　 覷觖觘觫 
+JIPSE CCB0: 　　訔𧦅 訡訵訾誮 誐誷䚡觱 觳觽觿䚯 
+JIPSE CCC0: 　　　　 　　　　 　　𧪄謊 謅謍謜謟 
+JIPSE CCD0: 　　　　 　　　　 　　謭䜌 譑譞譶讁 
+JIPSE CCE0: 　　　　 　　　　 　　讋讔 讕讞𧮳谽 
+JIPSE CCF0: 　　　　 　　　　 　　𧮾𧯇 豏豗豩　 
+JIPSE CD40: 　豭𧲸貙 䝤貛貤賕 𧶠𧸐　　 　　　　 
+JIPSE CD50: 　贉贎赬 趕趦跆　 跈　　　 　　　　 
+JIPSE CD80: 　跙跬踌 䟽跽踆𨂊 踖踢踧　 𨂻䠖踶踹 
+JIPSE CD90: 蹋蹔蹢蹬 蹭蹯躘躞 躮躵躻　 　𨊂軑軹 
+JIPSE CDA0: 　　𨋳輀 輈輗輫轊 轘𨐌辤　 辴迁迊迓 
+JIPSE CDB0: 　　逷𨕫 遃遝𨗈𨗉 邅邌迕迠 迱迵迻适 
+JIPSE CDC0: 　　　　 　　　　 　　邐邡 䢵邶郃郈 
+JIPSE CDD0: 　　　　 　　　　 　　𨛗郜 郟𨛺郲鄀 
+JIPSE CDE0: 　　　　 　　　　 　　郫郾 郿鄄鄆鄘 
+JIPSE CDF0: 　　　　 　　　　 　　鄜鄞 鄷鄹鄺　 
+JIPSE CE40: 　酇酗酡 酹醎醮醳 醶釃　　 　　　　 
+JIPSE CE50: 　釄𨥉𨥆 𨥫鉇鉖　 鉡　　　 　　　　 
+JIPSE CE80: 　鉨𨦇𨦈 鉿銍銗銙 銟𨦺𨦻　 銲鋀鋆𨨞 
+JIPSE CE90: 𨨩鋷錍𨩱 𨩃鍑鍱鍳 鎡鎏鎞　 　鏵𨫤𨫝 
+JIPSE CEA0: 　　鏱鏁 鏧鐉鐖鐗 鐴𨯁𨯯　 鑭鑯镸镹 
+JIPSE CEB0: 　　𨸟阳 阴𨸶阼陁 𨺉𨻫閆閌 𨴐𨵱闈𨷻 
+JIPSE CEC0: 　　　　 　　　　 　　隚𨼲 䧧隳隽䧺 
+JIPSE CED0: 　　　　 　　　　 　　雘雚 雝䨄霔霣 
+JIPSE CEE0: 　　　　 　　　　 　　䨩霶 靇靗靪𩊠 
+JIPSE CEF0: 　　　　 　　　　 　　𩊱鞖 鞞鞢鞱　 
+JIPSE CF40: 　鞲鞾韑 韔韘韡韱 頄頔　　 　　　　 
+JIPSE CF50: 　䪼𩒐頣 頳颫颰　 𩗏　　　 　　　　 
+JIPSE CF80: 　颷颻颼 飂飋飣飥 飰飱飳　 䬻𩛰餖餗 
+JIPSE CF90: 𩜙餚餛餜 𩝐餱餲餳 餺餻餼　 　饁饆饍 
+JIPSE CFA0: 　　饠馣 馦馽馿駉 駔駙駞　 𩣆駰駹駼 
+JIPSE CFB0: 　　騶驄 驌驘䯊骷 䯒骹騊騑 騖騚騠騱 
+JIPSE CFC0: 　　　　 　　　　 　　𩩲髆 髐髒髕髠 
+JIPSE CFD0: 　　　　 　　　　 　　髥鬃 鬌鬐鬖鬜 
+JIPSE CFE0: 　　　　 　　　　 　　鬫鬳 鬽䰠魋魣 
+JIPSE CFF0: 　　　　 　　　　 　　魥魫 魬魶魷　 
+JIPSE D040: 　　　　 　　　　 　　𡷠傣 僎侂㑨伖 
+JIPSE D050: 佷　　　 　　　崹 　㟨崝𡸳 俒侅𠎁崤 
+JIPSE D060: 偓傈嵪㟴 嵰𡼞嶗嶙 嶰嶴儗偎 𠈓崦僔僡 
+JIPSE D070: 巘𡿺巤巩 㠶㡀帟帾 幉崱僳伷 㒒佺𠍱佤 
+JIPSE D080: 㡜　　　 　　　　 　　　幖 　　　　 
+JIPSE D090: 　　　　 　　　　 　　　㡡 幫　　　 
+JIPSE D0A0: 幬𠔉　　 　　　　 　　　幭 　　　　 
+JIPSE D0B0: 儈　　　 　　　　 　　　　 　　　　 
+JIPSE D0C0: 𠏹宖㝡㝢 寎㝬㝫寱 寽㝵　　 　　　　 
+JIPSE D0D0: 儛尃尰𡱖 屟屣屧屨 屩𡴭　　 　　　　 
+JIPSE D0E0: 佘　𡵅𡵸 𡵢岈岊岠 岢𡶒　　 　　　　 
+JIPSE D0F0: 傒傓傕傖 傪𠌫傱傺 傻僇　　 　　　　 
+JIPSE D140: 　　　　 　　　　 　　弁噴 兵沸鮒福 
+JIPSE D150: 弗　　　 　　　捕 　歩保鞭 物仏併舗 
+JIPSE D160: 吻墳甫補 輔穂募墓 慕戊放分 淵鋪幣平 
+JIPSE D170: 暮母簿菩 倣俸包呆 報圃丙複 弊払塀腹 
+JIPSE D180: 奉　　　 　　　　 　　　宝 　　　　 
+JIPSE D190: 　　　　 　　　　 　　　峰 峯　　　 
+JIPSE D1A0: 崩朋　　 　　　　 　　　庖 　　　　 
+JIPSE D1B0: 抱　　　 　　　　 　　　　 　　　　 
+JIPSE D1C0: 捧柄並蔽 閉陛米頁 僻壁　　 　　　　 
+JIPSE D1D0: 方癖碧別 瞥蔑箆偏 変片　　 　　　　 
+JIPSE D1E0: 覆　篇編 辺返遍便 勉娩　　 　　　　 
+JIPSE D1F0: 憤扮焚奮 粉糞紛雰 文聞　　 　　　　 
+JIPSE D240: 　　　　 　　　　 　　奔邦 房萌褒法 
+JIPSE D250: 胞　　　 　　　磨 　魔翻本 蜂蓬忙凡 
+JIPSE D260: 豊鋒麻埋 妹昧枚毎 哩槇万訪 縫盆望某 
+JIPSE D270: 幕膜枕鮪 柾鱒桝亦 俣摩忘烹 棒芳暴泡 
+JIPSE D280: 又　　　 　　　　 　　　抹 　　　　 
+JIPSE D290: 　　　　 　　　　 　　　末 沫　　　 
+JIPSE D2A0: 迄満　　 　　　　 　　　儘 　　　　 
+JIPSE D2B0: 繭　　　 　　　　 　　　　 　　　　 
+JIPSE D2C0: 麿冒紡肪 膨謀貌貿 鉾防　　 　　　　 
+JIPSE D2D0: 慢吠頰北 僕卜墨撲 朴牧　　 　　　　 
+JIPSE D2E0: 砲　睦穆 釦勃没殆 堀幌　　 　　　　 
+JIPSE D2F0: 飽鳳鵬乏 亡傍剖坊 妨帽　　 　　　　 
+JIPSE D340: 　　　　 　　　　 　　黙脈 娘岬湊漫 
+JIPSE D350: 巳　　　 　　　戻 　籾杢目 蜜密婿勿 
+JIPSE D360: 稔妙貰問 悶紋門匁 也冶愈蓑 魅餅名命 
+JIPSE D370: 夜爺耶野 弥矢厄役 約尤椋味 明箕冥蔓 
+JIPSE D380: 薬　　　 　　　　 　　　訳 　　　　 
+JIPSE D390: 　　　　 　　　　 　　　躍 靖　　　 
+JIPSE D3A0: 柳癒　　 　　　　 　　　藪 　　　　 
+JIPSE D3B0: 鑓　　　 　　　　 　　　　 　　　　 
+JIPSE D3C0: 愉盟迷銘 鳴姪牝滅 免棉　　 　　　　 
+JIPSE D3D0: 油綿緬面 麵摸模茂 妄孟　　 　　　　 
+JIPSE D3E0: 未　毛猛 盲網耗蒙 儲木　　 　　　　 
+JIPSE D3F0: 粍民眠務 夢無牟矛 霧鵡　　 　　　　 
+JIPSE D440: 　　　　 　　　　 　　陽柚 夕宥憂諭 
+JIPSE D450: 勇　　　 　　　浴 　翌慾養 悠幽融抑 
+JIPSE D460: 有湧翼淀 羅螺裸来 萊頼梨揖 優欲余与 
+JIPSE D470: 雷洛絡落 酪乱卵嵐 欄沃雄唯 誉友予輸 
+JIPSE D480: 濫　　　 　　　　 　　　藍 　　　　 
+JIPSE D490: 　　　　 　　　　 　　　蘭 覧　　　 
+JIPSE D4A0: 利璃　　 　　　　 　　　吏 　　　　 
+JIPSE D4B0: 履　　　 　　　　 　　　　 　　　　 
+JIPSE D4C0: 李輿預傭 幼妖容庸 揚揺　　 　　　　 
+JIPSE D4D0: 理擁曜楊 様洋溶熔 用窯　　 　　　　 
+JIPSE D4E0: 佑　羊耀 葉蓉要謡 踊遙　　 　　　　 
+JIPSE D4F0: 涌猶猷由 祐裕誘遊 邑郵　　 　　　　 
+JIPSE D540: 　　　　 　　　　 　　麟流 亮率掠痢 
+JIPSE D550: 陸　　　 　　　令 　伶塁瑠 葎立了涙 
+JIPSE D560: 劉溜例冷 励嶺怜玲 礼苓簾略 離累両凌 
+JIPSE D570: 鈴隷零霊 麗齢暦歴 列類虜裡 寮律僚裏 
+JIPSE D580: 劣　　　 　　　　 　　　烈 　　　　 
+JIPSE D590: 　　　　 　　　　 　　　裂 廉　　　 
+JIPSE D5A0: 恋聯　　 　　　　 　　　憐 　　　　 
+JIPSE D5B0: 漣　　　 　　　　 　　　　 　　　　 
+JIPSE D5C0: 煉料梁涼 猟療瞭稜 糧良　　 　　　　 
+JIPSE D5D0: 練諒遼量 陵領力緑 倫厘　　 　　　　 
+JIPSE D5E0: 里　林淋 燐琳臨輪 隣鱗　　 　　　　 
+JIPSE D5F0: 琉留硫粒 隆竜龍侶 慮旅　　 　　　　 
+JIPSE D640: 　　　　 　　　　 　　　弄 麓賂労蓮 
+JIPSE D650: 櫓　　　 　　　　 　　　　 露路六　 
+JIPSE D660: 廊朗　　 　　　　 　　　婁 魯　肋録 
+JIPSE D670: 　　　　 　　　　 　　郎錬 論炉禄連 
+JIPSE D6C0: 　倭和話 歪賄脇惑 枠鷲　　 　　　　 
+JIPSE D6D0: 　亙亘鰐 詫藁蕨椀 湾碗　　 　　　　 
+JIPSE D6E0: 呂　腕　 　　　　 　　　　 　　　　 
+JIPSE D6F0: 楼榔浪漏 牢狼籠老 聾蠟　　 　　　　 
+JIPSE D740: 　　　　 　　　　 　　俛豫 仄丿乘弌 
+JIPSE D750: 丶　　　 　　　倚 　倨俚俑 乖乂仍俐 
+JIPSE D760: 亅亊倔倪 倥倅伜俶 倡倩傅亂 丱俤仂仗 
+JIPSE D770: 倬俾俯們 倆偃假會 偕俥从丕 仞丼仆丐 
+JIPSE D780: 偐　　　 　　　　 　　　偈 　　　　 
+JIPSE D790: 　　　　 　　　　 　　　做 偖　　　 
+JIPSE D7A0: 偬傲　　 　　　　 　　　偸 　　　　 
+JIPSE D7B0: 傀　　　 　　　　 　　　　 　　　　 
+JIPSE D7C0: 傚仭仟价 伉佚估佛 佝佗　　 　　　　 
+JIPSE D7D0: 傴佇佶侈 侏侘佻佩 佰侑　　 　　　　 
+JIPSE D7E0: 个　佯來 侖侭俔俟 俎俘　　 　　　　 
+JIPSE D7F0: 舒弍于亞 亟亠亢亰 亳亶　　 　　　　 
+JIPSE D840: 　　　　 　　　　 　　凛儁 兌僭價僉 
+JIPSE D850: 僞　　　 　　　凵 　凾處几 僮僣兒凩 
+JIPSE D860: 儉儂刄刋 刔刎刧刪 刮刳劈僵 僖凭兢竸 
+JIPSE D870: 刹剏剄剋 剌剞剔剪 剴凰兀傳 兩僥兔僊 
+JIPSE D880: 剩　　　 　　　　 　　　剳 　　　　 
+JIPSE D890: 　　　　 　　　　 　　　剿 剽　　　 
+JIPSE D8A0: 劍辨　　 　　　　 　　　劔 　　　　 
+JIPSE D8B0: 劒　　　 　　　　 　　　　 　　　　 
+JIPSE D8C0: 剱兪兮冀 冂囘册冉 冏冑　　 　　　　 
+JIPSE D8D0: 劑冓冕冖 冤冦冢冩 冪冫　　 　　　　 
+JIPSE D8E0: 僂　决冱 冲冰况冽 凅凉　　 　　　　 
+JIPSE D8F0: 儖儕儔儚 儡儺儷儼 儻儿　　 　　　　 
+JIPSE D940: 　　　　 　　　　 　　叨勳 匱勗勦辧 
+JIPSE D950: 勁　　　 　　　听 　吭叺叭 勣勞匯吁 
+JIPSE D960: 勠勵吼吮 吶吩吝呎 咏呵哄飭 劵吽匸區 
+JIPSE D970: 咎呟呱呷 呰咒呻咀 呶呀匣劭 卆勍匳劬 
+JIPSE D980: 咄　　　 　　　　 　　　咐 　　　　 
+JIPSE D990: 　　　　 　　　　 　　　咆 哇　　　 
+JIPSE D9A0: 咢咨　　 　　　　 　　　咸 　　　　 
+JIPSE D9B0: 咥　　　 　　　　 　　　　 　　　　 
+JIPSE D9C0: 咬卅丗卉 卍凖卞卩 卮夘　　 　　　　 
+JIPSE D9D0: 哈卻卷厂 厖厠厦厥 厮厰　　 　　　　 
+JIPSE D9E0: 劼　厶參 簒雙叟曼 燮叮　　 　　　　 
+JIPSE D9F0: 勸勹匆匈 甸匍匐匏 匕匚　　 　　　　 
+JIPSE DA40: 　鮦鮬𩷛 鮸鮾鯳鯘 鯝鯧　　 　　　　 
+JIPSE DA50: 　鯯鯮𩸕 鯷𩹉鰖　 鰘　　　 　　　　 
+JIPSE DA80: 　鰙鰚鰝 鰢鰧𩻄鰶 鰷鱅鱜　 𩻩鱉鱊𩻛 
+JIPSE DA90: 鱔鱘鱛鱝 鱟鱪鱫鱭 鱲鱵鱺　 　鳲鴂𩿎 
+JIPSE DAA0: 　　鴑鴗 䳄𪀚鴲䳑 鵂鵊鵟　 𪃹鵩𪂂鵳 
+JIPSE DAB0: 　　鶽鷇 鷉鷖鷚鷟 鷠鷣鵶鵾 鶄鶙鶿鶹 
+JIPSE DAC0: 　　　　 　　　　 　　鷴䴇 鸊鸂鸍鸝 
+JIPSE DAD0: 　　　　 　　　　 　　鹻𢈘 麀麅麛麨 
+JIPSE DAE0: 　　　　 　　　　 　　𪎌𪐷 黟黧黮黿 
+JIPSE DAF0: 　　　　 　　　　 　　鼂䵷 鼃鼗鼯　 
+JIPSE DB40: 　鼺鼽齅 齆齓齕齘 𪗱齝　　 　　　　 
+JIPSE DB50: 　𪘂齩𪘚 齭齰齵　 𪚲　　　 　　　　 
+JIPSE E040: 　　　　 　　　　 　　ほぎ ぜえかぁ 
+JIPSE E050: う　　　 　　　め 　もぽぼ おぉせま 
+JIPSE E060: きくゃや ゅゆょよ らり　が ぅみぞた 
+JIPSE E070: るれろゎ わゐゑを んむずぃ だぇそあ 
+JIPSE E0C0: 　ちぢっ つづてで とど　　 　　　　 
+JIPSE E0D0: 　なにぬ ねのはば ぱひ　　 　　　　 
+JIPSE E0E0: い　びぴ ふぶぷへ べぺ　　 　　　　 
+JIPSE E0F0: ぐけげこ ごさざし じす　　 　　　　 
+JIPSE E240: 　　　　 　　　　 　　營哺 喙哦哽咫 
+JIPSE E250: 哘　　　 　　　噤 　嘯嘶嘴 唔唏啝嘲 
+JIPSE E260: 哭哢噬噪 嚆嚀嚊嚠 嚔嚏囿哮 咼嘸咯喊 
+JIPSE E270: 嚥嚮嚶嚴 囂嚼囁囃 囀噫唳咤 喟哥喀哂 
+JIPSE E280: 囈　　　 　　　　 　　　囎 　　　　 
+JIPSE E290: 　　　　 　　　　 　　　囑 囓　　　 
+JIPSE E2A0: 囗圉　　 　　　　 　　　囮 　　　　 
+JIPSE E2B0: 囹　　　 　　　　 　　　　 　　　　 
+JIPSE E2C0: 圀啻啾喘 喞單啼喃 喩喇　　 　　　　 
+JIPSE E2D0: 圄喨嗚嗅 嗟嗄嗜嗤 嗔嘔　　 　　　　 
+JIPSE E2E0: 咾　嗷嘖 嗾嗽嘛嗹 噎噐　　 　　　　 
+JIPSE E2F0: 唹啀啣啌 售啜啅啖 啗唸　　 　　　　 
+JIPSE E340: 　　　　 　　　　 　　壑址 埃圜圸圈 
+JIPSE E350: 圖　　　 　　　壤 　壟壙壗 圷圦垰壘 
+JIPSE E360: 圻坏壯壷 壹壻壼壽 夂夊奧坎 團壥埔埒 
+JIPSE E370: 夐夛梦夥 夬夭夲夸 夾壜垪圍 埓嗇埆國 
+JIPSE E380: 竒　　　 　　　　 　　　奕 　　　　 
+JIPSE E390: 　　　　 　　　　 　　　奐 奎　　　 
+JIPSE E3A0: 奚奩　　 　　　　 　　　奘 　　　　 
+JIPSE E3B0: 奢　　　 　　　　 　　　　 　　　　 
+JIPSE E3C0: 奠堊埖埣 堋堙堝塲 堡塢　　 　　　　 
+JIPSE E3D0: 奬塋塰毀 塒堽塹墅 墹墟　　 　　　　 
+JIPSE E3E0: 圓　墫墺 壞墻墸墮 壅壓　　 　　　　 
+JIPSE E3F0: 坩埀垈坡 坿垉垓垠 垳垤　　 　　　　 
+JIPSE E440: 　　　　 　　　　 　　孵娥 媼姆妍奸 
+JIPSE E450: 妣　　　 　　　宦 　宸斈學 姜姨媚孺 
+JIPSE E460: 姚娟寃寇 寉寔寐寤 實寢屆姙 侫宀嫋嫂 
+JIPSE E470: 寞寥寫寰 寶寳尅將 專它婪妝 媽妲媾妁 
+JIPSE E480: 對　　　 　　　　 　　　尓 　　　　 
+JIPSE E490: 　　　　 　　　　 　　　尠 尢　　　 
+JIPSE E4A0: 尨屓　　 　　　　 　　　尸 　　　　 
+JIPSE E4B0: 尹　　　 　　　　 　　　　 　　　　 
+JIPSE E4C0: 屁嫣嫗嫦 嫩嫖嫺嫻 嬌嬋　　 　　　　 
+JIPSE E4D0: 屎嬖嬲嫐 嬪嬶嬾孃 孅孀　　 　　　　 
+JIPSE E4E0: 佞　孑孕 孚孛孥孩 孰孳　　 　　　　 
+JIPSE E4F0: 娑娜娉娚 婀婬婉娵 娶婢　　 　　　　 
+JIPSE E540: 　　　　 　　　　 　　巍岻 崋屹岔屐 
+JIPSE E550: 乢　　　 　　　已 　巵巒巓 岑岌峪巖 
+JIPSE E560: 岫岶帋帚 帙帑帛帶 帷幄廈妛 屮巛崗嵜 
+JIPSE E570: 幃幀幎幗 幔幟幢幤 幇巫嶌孱 崟屶崕屛 
+JIPSE E580: 幵　　　 　　　　 　　　并 　　　　 
+JIPSE E590: 　　　　 　　　　 　　　幺 麼　　　 
+JIPSE E5A0: 广廏　　 　　　　 　　　庠 　　　　 
+JIPSE E5B0: 廁　　　 　　　　 　　　　 　　　　 
+JIPSE E5C0: 廂崛崑崔 崢崚崙崘 嵌嵒　　 　　　　 
+JIPSE E5D0: 廐嵎嵋嵬 嵳嵶嶇嶄 嶂嶢　　 　　　　 
+JIPSE E5E0: 屬　嶝嶬 嶮嶽嶐嶷 嶼巉　　 　　　　 
+JIPSE E5F0: 岼岷峅岾 峇峙峩峽 峺峭　　 　　　　 
+JIPSE E640: 　　　　 　　　　 　　忝廴 彈廨廱廖 
+JIPSE E650: 廢　　　 　　　怐 　怩忿悳 廬廩彁怡 
+JIPSE E660: 廰廸怎怱 怛怕怫怦 怏怺惧廳 廛恠彎弯 
+JIPSE E670: 恚恁恪恷 恟恊恆恍 恣怙弸廝 彑廡彌廣 
+JIPSE E680: 恃　　　 　　　　 　　　恤 　　　　 
+JIPSE E690: 　　　　 　　　　 　　　恂 恬　　　 
+JIPSE E6A0: 恫悚　　 　　　　 　　　恙 　　　　 
+JIPSE E6B0: 悁　　　 　　　　 　　　　 　　　　 
+JIPSE E6C0: 悍彖彗彙 彡彭彳彷 徃徂　　 　　　　 
+JIPSE E6D0: 悃彿徊很 徑徇從徙 徘徠　　 　　　　 
+JIPSE E6E0: 廚　徨徭 徼忖忻忤 忸忱　　 　　　　 
+JIPSE E6F0: 廾弃弉彝 彜弋弑弖 弩弭　　 　　　　 
+JIPSE E740: 　　　　 　　　　 　　憖悽 惻惡惓悄 
+JIPSE E750: 悧　　　 　　　憑 　憫憬憇 惠悸愡憔 
+JIPSE E760: 忰惆憮懌 懊應懷懈 懃懆戌悴 悒憚愍愎 
+JIPSE E770: 憺懋罹懍 懦懣懶懺 懴憊愃悖 慇悋惱悛 
+JIPSE E780: 懿　　　 　　　　 　　　懽 　　　　 
+JIPSE E790: 　　　　 　　　　 　　　懼 懾　　　 
+JIPSE E7A0: 戀戛　　 　　　　 　　　戈 　　　　 
+JIPSE E7B0: 戉　　　 　　　　 　　　　 　　　　 
+JIPSE E7C0: 戍愾愨愧 慊愿愼愬 愴愽　　 　　　　 
+JIPSE E7D0: 戔慂慄慳 慷慘慙慚 慫慴　　 　　　　 
+JIPSE E7E0: 悗　慯慥 慱慟慝慓 慵憙　　 　　　　 
+JIPSE E7F0: 悵惘慍愕 愆惶惷愀 惴惺　　 　　　　 
+JIPSE E840: 　　　　 　　　　 　　掏扨 拏扁扣戞 
+JIPSE E850: 戲　　　 　　　掾 　揩掟掉 扞扎抻掵 
+JIPSE E860: 扠扼揀揆 揣揉插揶 揄搖撩扛 戰捫拆擔 
+JIPSE E870: 搴搆搓搦 搶攝搗搨 搏捩拑截 拈戳拿戡 
+JIPSE E880: 摧　　　 　　　　 　　　摯 　　　　 
+JIPSE E890: 　　　　 　　　　 　　　摶 摎　　　 
+JIPSE E8A0: 撹撼　　 　　　　 　　　撕 　　　　 
+JIPSE E8B0: 撓　　　 　　　　 　　　　 　　　　 
+JIPSE E8C0: 撥拜拌拊 拂拇抛拉 挌拮　　 　　　　 
+JIPSE E8D0: 撈拱挧挂 挈拯拵捐 挾捍　　 　　　　 
+JIPSE E8E0: 戮　搜捏 掖掎掀掫 捶掣　　 　　　　 
+JIPSE E8F0: 抂抉找抒 抓抖拔抃 抔拗　　 　　　　 
+JIPSE E940: 　　　　 　　　　 　　无擣 攫擱擠據 
+JIPSE E950: 擘　　　 　　　旻 　杳旱旡 舉擧攣杲 
+JIPSE E960: 抬擯昵昶 昴昜晏晄 晉晁曉擡 撻昊攵攷 
+JIPSE E970: 晞晝晤晧 晨晟晢晰 暃昃攤擅 收擂攴擒 
+JIPSE E980: 暈　　　 　　　　 　　　暎 　　　　 
+JIPSE E990: 　　　　 　　　　 　　　暉 暄　　　 
+JIPSE E9A0: 暘暼　　 　　　　 　　　暝 　　　　 
+JIPSE E9B0: 曁　　　 　　　　 　　　　 　　　　 
+JIPSE E9C0: 暹攸畋效 敖敕敍敘 敞敝　　 　　　　 
+JIPSE E9D0: 暾敲數斂 斃變斛斟 斫斷　　 　　　　 
+JIPSE E9E0: 擇　旃旆 旁旄旌旒 旛旙　　 　　　　 
+JIPSE E9F0: 攬擶擴擲 擺攀擽攘 攜攢　　 　　　　 
+JIPSE F040: 　　　　 　　　　 　　異握 絢姶茜亜 
+JIPSE F050: 愛　　　 　　　衣 　謂維移 葵逢飴緯 
+JIPSE F060: 悪渥違遺 医井亥域 育郁淫穐 哀胃鮎或 
+JIPSE F070: 磯一壱溢 逸稲茨芋 鰯萎虻娃 粟挨綾啞 
+JIPSE F080: 允　　　 　　　　 　　　印 　　　　 
+JIPSE F090: 　　　　 　　　　 　　　咽 員　　　 
+JIPSE F0A0: 因蔭　　 　　　　 　　　姻 　　　　 
+JIPSE F0B0: 引　　　 　　　　 　　　　 　　　　 
+JIPSE F0C0: 飲袷安庵 按暗案闇 鞍杏　　 　　　　 
+JIPSE F0D0: 胤以伊位 依偉囲夷 委威　　 　　　　 
+JIPSE F0E0: 阿　尉惟 意慰易椅 為畏　　 　　　　 
+JIPSE F0F0: 旭葦芦鰺 梓圧斡扱 宛姐　　 　　　　 
+JIPSE F140: 　　　　 　　　　 　　越窺 閏烏雨院 
+JIPSE F150: 右　　　 　　　堰 　奄榎閲 迂羽瓜厭 
+JIPSE F160: 鵜丑宴延 怨掩援沿 演炎奥卯 吋円云運 
+JIPSE F170: 焰煙燕猿 縁艶苑薗 遠園浦隠 雲宇噂陰 
+JIPSE F180: 鉛　　　 　　　　 　　　鴛 　　　　 
+JIPSE F190: 　　　　 　　　　 　　　塩 於　　　 
+JIPSE F1A0: 汚応　　 　　　　 　　　甥 　　　　 
+JIPSE F1B0: 凹　　　 　　　　 　　　　 　　　　 
+JIPSE F1C0: 央荏餌叡 営嬰影映 曳栄　　 　　　　 
+JIPSE F1D0: 往永泳洩 瑛盈穎頴 英衛　　 　　　　 
+JIPSE F1E0: 韻　詠鋭 液疫益駅 悦謁　　 　　　　 
+JIPSE F1F0: 碓臼渦嘘 唄欝蔚鰻 姥厩　　 　　　　 
+JIPSE F240: 　　　　 　　　　 　　菓荻 下襖黄押 
+JIPSE F250: 王　　　 　　　過 　霞課蝦 鷗鶯音嘩 
+JIPSE F260: 沖億蚊俄 峨我牙画 臥芽戒岡 殴貨仮何 
+JIPSE F270: 蛾賀雅餓 駕介会解 回迦穏横 伽翁化旺 
+JIPSE F280: 塊　　　 　　　　 　　　壊 　　　　 
+JIPSE F290: 　　　　 　　　　 　　　廻 快　　　 
+JIPSE F2A0: 怪改　　 　　　　 　　　悔 　　　　 
+JIPSE F2B0: 恢　　　 　　　　 　　　　 　　　　 
+JIPSE F2C0: 懐価佳加 可嘉夏嫁 家寡　　 　　　　 
+JIPSE F2D0: 拐科暇果 架歌河火 珂禍　　 　　　　 
+JIPSE F2E0: 欧　禾稼 箇花苛茄 荷華　　 　　　　 
+JIPSE F2F0: 屋憶臆桶 牡乙俺卸 恩温　　 　　　　 
+JIPSE F340: 　　　　 　　　　 　　額凱 骸絵開魁 
+JIPSE F350: 界　　　 　　　梶 　鰍掛顎 蟹芥鎧笠 
+JIPSE F360: 貝劾潟割 喝恰括活 渇滑栢階 灰樫馨蛙 
+JIPSE F370: 葛褐轄且 鰹叶椛樺 鞄橿該械 垣皆浬晦 
+JIPSE F380: 株　　　 　　　　 　　　兜 　　　　 
+JIPSE F390: 　　　　 　　　　 　　　竈 蒲　　　 
+JIPSE F3A0: 釜萱　　 　　　　 　　　鎌 　　　　 
+JIPSE F3B0: 嚙　　　 　　　　 　　　　 　　　　 
+JIPSE F3C0: 鴨柿蠣鈎 劃嚇各廓 拡攪　　 　　　　 
+JIPSE F3D0: 茅格核殻 獲確穫覚 角赫　　 　　　　 
+JIPSE F3E0: 海　較郭 閣隔革学 岳楽　　 　　　　 
+JIPSE F3F0: 外咳害崖 慨概涯碍 蓋街　　 　　　　 
+JIPSE F440: 　　　　 　　　　 　　館堪 桓寒勧粥 
+JIPSE F450: 侃　　　 　　　玩 　癌丸舘 勘刊柑含 
+JIPSE F460: 喚姦眼岩 翫贋雁頑 顔願期巻 乾岸款歓 
+JIPSE F470: 企伎危喜 器基奇嬉 寄巌敢苅 汗冠棺刈 
+JIPSE F480: 岐　　　 　　　　 　　　希 　　　　 
+JIPSE F490: 　　　　 　　　　 　　　幾 忌　　　 
+JIPSE F4A0: 揮棄　　 　　　　 　　　机 　　　　 
+JIPSE F4B0: 旗　　　 　　　　 　　　　 　　　　 
+JIPSE F4C0: 既漢澗灌 環甘監看 竿管　　 　　　　 
+JIPSE F4D0: 棋簡緩缶 翰肝艦莞 観諫　　 　　　　 
+JIPSE F4E0: 瓦　貫還 鑑間閑関 陥韓　　 　　　　 
+JIPSE F4F0: 完官寛干 幹患感慣 憾換　　 　　　　 
+JIPSE F540: 　　　　 　　　　 　　吸貴 擬季徽機 
+JIPSE F550: 畿　　　 　　　求 　汲弓宮 紀稀技急 
+JIPSE F560: 記起泣灸 球究窮笈 級糾亨規 汽救犠疑 
+JIPSE F570: 給旧牛去 居巨拒拠 挙朽戯毅 祇祈欺帰 
+JIPSE F580: 渠　　　 　　　　 　　　虚 　　　　 
+JIPSE F590: 　　　　 　　　　 　　　許 距　　　 
+JIPSE F5A0: 鋸京　　 　　　　 　　　漁 　　　　 
+JIPSE F5B0: 禦　　　 　　　　 　　　　 　　　　 
+JIPSE F5C0: 魚義蟻誼 議掬菊鞠 吉吃　　 　　　　 
+JIPSE F5D0: 享喫桔橘 詰砧杵黍 却客　　 　　　　 
+JIPSE F5E0: 気　脚虐 逆丘久仇 休及　　 　　　　 
+JIPSE F5F0: 軌輝飢騎 鬼亀偽儀 妓宜　　 　　　　 
+JIPSE F640: 　　　　 　　　　 　　緊峡 脅協叫供 
+JIPSE F650: 共　　　 　　　近 　金菌芹 卿匡胸衿 
+JIPSE F660: 境強吟銀 九倶句区 狗玖釧喬 競襟蕎郷 
+JIPSE F670: 矩苦軀駆 駈駒具愚 虞謹矯僑 鏡凶興俠 
+JIPSE F680: 喰　　　 　　　　 　　　空 　　　　 
+JIPSE F690: 　　　　 　　　　 　　　偶 寓　　　 
+JIPSE F6A0: 遇屈　　 　　　　 　　　隅 　　　　 
+JIPSE F6B0: 串　　　 　　　　 　　　　 　　　　 
+JIPSE F6C0: 櫛響饗驚 仰凝堯暁 業局　　 　　　　 
+JIPSE F6D0: 屑曲極玉 桐粁僅勤 均巾　　 　　　　 
+JIPSE F6E0: 兇　錦斤 欣欽琴禁 禽筋　　 　　　　 
+JIPSE F6F0: 彊怯恐恭 挟教橋況 狂狭　　 　　　　 
+JIPSE F740: 　　　　 　　　　 　　頸勲 啓隈繰掘 
+JIPSE F750: 窪　　　 　　　戟 　撃芸鶏 栗粂兄迎 
+JIPSE F760: 鍬君激隙 桁傑欠決 潔穴懸桑 轡鯨珪型 
+JIPSE F770: 結血訣月 件倹倦健 兼劇刑沓 契熊圭窟 
+JIPSE F780: 券　　　 　　　　 　　　剣 　　　　 
+JIPSE F790: 　　　　 　　　　 　　　喧 圏　　　 
+JIPSE F7A0: 堅捲　　 　　　　 　　　嫌 　　　　 
+JIPSE F7B0: 建　　　 　　　　 　　　　 　　　　 
+JIPSE F7C0: 憲形径恵 慶慧憩掲 携敬　　 　　　　 
+JIPSE F7D0: 拳景桂渓 畦稽系経 継繫　　 　　　　 
+JIPSE F7E0: 靴　罫茎 荊蛍計詣 警軽　　 　　　　 
+JIPSE F7F0: 薫訓群軍 郡卦袈祁 係傾　　 　　　　 
+JIPSE F840: 　　　　 　　　　 　　雇軒 玄絹見検 
+JIPSE F850: 研　　　 　　　午 　呉鼓顧 肩県源五 
+JIPSE F860: 賢遣吾娯 後御悟梧 檎瑚厚謙 献互絃舷 
+JIPSE F870: 碁語誤護 醐乞鯉交 佼伍減牽 言硯現権 
+JIPSE F880: 侯　　　 　　　　 　　　候 　　　　 
+JIPSE F890: 　　　　 　　　　 　　　倖 光　　　 
+JIPSE F8A0: 公向　　 　　　　 　　　功 　　　　 
+JIPSE F8B0: 効　　　 　　　　 　　　　 　　　　 
+JIPSE F8C0: 勾諺限乎 個古呼固 姑孤　　 　　　　 
+JIPSE F8D0: 口己庫弧 戸故枯湖 狐糊　　 　　　　 
+JIPSE F8E0: 犬　袴股 胡菰虎誇 跨鈷　　 　　　　 
+JIPSE F8F0: 鍵険顕験 鹼元原厳 幻弦　　 　　　　 
+JIPSE F940: 　　　　 　　　　 　　鉱庚 梗宏巷后 
+JIPSE F950: 孔　　　 　　　香 　高鋼礦 巧工校閤 
+JIPSE F960: 広康鴻剛 劫号合壕 拷濠骨幸 好降江洪 
+JIPSE F970: 豪轟麴克 刻告国穀 酷項杭坑 浩孝構喉 
+JIPSE F980: 鵠　　　 　　　　 　　　黒 　　　　 
+JIPSE F990: 　　　　 　　　　 　　　獄 漉　　　 
+JIPSE F9A0: 腰込　　 　　　　 　　　甑 　　　　 
+JIPSE F9B0: 忽　　　 　　　　 　　　　 　　　　 
+JIPSE F9C0: 惚港溝甲 皇硬稿糠 紅紘　　 　　　　 
+JIPSE F9D0: 狛絞綱耕 考肯肱腔 膏航　　 　　　　 
+JIPSE F9E0: 垢　荒行 衡講貢購 郊酵　　 　　　　 
+JIPSE F9F0: 弘恒慌抗 拘控攻昻 晃更　　 　　　　 

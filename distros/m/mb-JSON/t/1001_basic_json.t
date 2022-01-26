@@ -2,7 +2,7 @@
 #
 # 1001_basic_json.t
 #
-# Copyright (c) 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2021, 2022 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 # This file is encoded in UTF-8.
@@ -17,9 +17,9 @@ use vars qw(@test);
 
 @test = (
 # 1
-    sub {             my $got=mb::JSON::parse('null');  not defined($got) },
-    sub { my $want=1; my $got=mb::JSON::parse('true');  $got eq $want     },
-    sub { my $want=0; my $got=mb::JSON::parse('false'); $got eq $want     },
+    sub {               my $got=mb::JSON::parse('null');  not defined($got) },
+    sub { my $want=!!1; my $got=mb::JSON::parse('true');  $got eq $want     },
+    sub { my $want=!!0; my $got=mb::JSON::parse('false'); $got eq $want     },
     sub {1},
     sub {1},
     sub {1},

@@ -3,63 +3,59 @@ package Data::ULID;
 use strict;
 use warnings;
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.1.2';
 
 use base qw(Exporter);
 our @EXPORT_OK = qw/ulid binary_ulid ulid_date ulid_to_uuid uuid_to_ulid/;
 our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 
 use Time::HiRes qw/time/;
-use Math::BigInt lib => 'GMP', upgrade => 'Math::BigFloat';
-use Math::BigFloat;
-use Math::Random::Secure qw/irand/;
-use Encode::Base32::GMP qw/encode_base32 decode_base32/;
+use Math::BigInt 1.999808 try => 'GMP,LTM';
+use Crypt::PRNG qw/random_bytes/;
 use DateTime;
 
-# The first two of these should only be necessary on 32-bit systems.
-use constant BI_2_32 => Math::BigInt->new('4294967296');
-use constant BI_2_48 => Math::BigInt->new('281474976710656');
-use constant BI_2_64 => Math::BigInt->new('18446744073709551616');
+use Config;
+our $CAN_SKIP_BIGINTS = $Config{ivsize} >= 8;
 
+### EXPORTED ULID FUNCTIONS
 
 sub ulid {
-    my ($ts, $rand) = _ulid(shift);
-    return sprintf('%010s%016s', encode_base32(''.$ts), encode_base32(''.$rand));
+    return _encode(_ulid(shift));
 }
 
 sub binary_ulid {
-    my ($ts, $rand) = _ulid(shift);
-    return _pack($ts, $rand);
+    return _pack(_ulid(shift));
 }
 
 sub ulid_date {
     my $ulid = shift;
     die "ulid_date() needs a normal or binary ULID as parameter" unless $ulid;
     my ($ts, $rand) = _ulid($ulid);
-    $ts = _bint($ts);
-    return DateTime->from_epoch(epoch=>$ts / 1000);
+
+    return DateTime->from_epoch(epoch => _unfix_ts($ts));
 }
 
 sub ulid_to_uuid {
     my $ulid = shift or die "Need ULID to convert";
-    my ($ts, $rand) = _ulid($ulid);
-    my $bin = _pack($ts, $rand);
+    my $bin = _pack(_ulid($ulid));
     return _uuid_bin2str($bin)
 }
 
 sub uuid_to_ulid {
     my $uuid = shift or die "Need UUID to convert";
     my $bin_uuid = _uuid_str2bin($uuid);
-    my ($ts, $rand) = _ulid($bin_uuid);
-    return sprintf('%010s%016s', encode_base32(''.$ts), encode_base32(''.$rand));
+    return _encode(_ulid($bin_uuid));
 }
+
+### HELPER FUNCTIONS
 
 sub _uuid_bin2str {
     my $uuid = shift;
-    use bytes;
+
     return $uuid if length($uuid) == 36;
     die "Invalid uuid" unless length $uuid == 16;
     my @offsets = (4, 2, 2, 2, 6);
+
     return join(
         '-',
         map { unpack 'H*', $_ }
@@ -69,66 +65,123 @@ sub _uuid_bin2str {
 
 sub _uuid_str2bin {
     my $uuid = shift;
-    use bytes;
+
     return $uuid if length $uuid == 16;
     $uuid =~ s/-//g;
+
     return pack 'H*', $uuid;
 }
 
 sub _ulid {
     my $arg = shift;
     my $ts;
-    if ($arg && ref $arg && $arg->isa('DateTime')) {
-        $ts = int($arg->hires_epoch * 1000);
-    }
-    elsif ($arg && length($arg) == 16) {
-        return _unpack($arg);
-    }
-    elsif ($arg) {
-        $arg = _normalize($arg);
-        die "Invalid ULID supplied: wrong length" unless length($arg) == 26;
-        my ($ts_part, $rand_part) = ($arg =~ /^(.{10})(.{16})$/);
-        return (decode_base32($ts_part), decode_base32($rand_part));
-    }
-    $ts ||= int(time() * 1000);
-    my $rand = _bigrand();
-    return ($ts, $rand);
-}
 
-sub _normalize {
-    my $s = shift;
-    $s = uc($s);
-    $s =~ s/[^0123456789ABCDEFGHJKMNPQRSTVWXYZ]//g;
-    return $s;
+    if ($arg) {
+        if (ref $arg && $arg->isa('DateTime')) {
+            $ts = $arg->hires_epoch;
+        }
+        elsif (length($arg) == 16) {
+            return _unpack($arg);
+        }
+        else {
+            $arg = _normalize($arg);
+            die "Invalid ULID supplied: wrong length" unless length($arg) == 26;
+            return _decode($arg);
+        }
+    }
+
+    return (_fix_ts($ts || time()), random_bytes(10));
 }
 
 sub _pack {
     my ($ts, $rand) = @_;
-    $rand = _bint($rand) unless ref $rand && $rand->isa('Math::BigInt');
-    my $t1 = int($ts / 2**16);
-    my $t2 = $ts % 2**16;
-    my $r1 = $rand >> 64;
-    my $r2 = ($rand % BI_2_64) >> 32;
-    my $r3 = $rand % BI_2_32;
-    return pack('NnnNN', $t1, $t2, $r1, $r2, $r3);
+    return _zero_pad($ts, 6, "\x00") . _zero_pad($rand, 10, "\x00");
 }
 
 sub _unpack {
-    my ($t1, $t2, $r1, $r2, $r3) = unpack('NnnNN', shift);
-    my $ts = _bint($t1) * 2**16 + $t2;
-    my $rand = _bint($r1) * BI_2_64 + _bint($r2) * BI_2_32 + _bint($r3);
+    my ($ts, $rand) = unpack 'a6a10', shift;
     return ($ts, $rand);
 }
 
-sub _bint { Math::BigInt->new('' . shift) }
+sub _fix_ts {
+    my $ts = shift;
 
-sub _bigrand {
-    # 80-bit random bigint.
-    # Note that irand() is not reliable for bounds above 2**32.
-    my $r1 = _bint(irand(2**32));
-    my $r2 = _bint(irand(2**32));
-    my $r3 = _bint(irand(2**16));
-    return ($r1 * BI_2_48) + ($r2 * 2**16) + $r3;
+    if ($CAN_SKIP_BIGINTS) {
+        $ts *= 1000;
+        return pack 'Nn', int($ts / (2 << 15)), $ts % (2 << 15);
+    } else {
+        $ts .= '000';
+        $ts =~ s/\.(\d{3}).*$/$1/;
+        return Math::BigInt->new($ts)->to_bytes;
+    }
+}
+
+sub _unfix_ts {
+    my $ts = shift;
+
+    if ($CAN_SKIP_BIGINTS) {
+        my ($high, $low) = unpack 'Nn', $ts;
+        return ($high * (2 << 15) + $low) / 1000;
+    } else {
+        $ts = Math::BigInt->from_bytes($ts);
+        $ts =~ s/(\d{3})$/.$1/;
+        return $ts;
+    }
+}
+
+sub _encode {
+    my ($ts, $rand) = @_;
+    return sprintf('%010s%016s', _encode_b32($ts), _encode_b32($rand));
+}
+
+sub _decode {
+    my ($ts, $rand) = map { _decode_b32($_) } unpack 'A10A16', shift;
+    return ($ts, $rand);
+}
+
+sub _zero_pad {
+    my ($value, $mul, $char) = @_;
+    $char ||= '0';
+
+    while ($char eq substr $value, 0, 1) { substr $value, 0, 1, '' }
+
+    my $left = $mul - length($value) % $mul;
+    return $char x ($left % $mul) . $value;
+}
+
+### BASE32 ENCODER / DECODER
+
+my $ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
+
+my %ALPHABET_MAP = do {
+    my $num = 0;
+    map { $_ => substr sprintf('0000%b', $num++), -5 } split //, $ALPHABET;
+};
+
+my %ALPHABET_MAP_REVERSE = map { $ALPHABET_MAP{$_} => $_ } keys %ALPHABET_MAP;
+
+sub _normalize {
+    my $s = uc(shift);
+    my $re = "[^$ALPHABET]";
+
+    $s =~ s/$re//g;
+    return $s;
+}
+
+sub _encode_b32 {
+    my $bits = unpack 'B*', shift;
+    $bits = _zero_pad($bits, 5);
+
+    my $result = '';
+    for (my $i = 0; $i < length $bits; $i += 5) {
+        $result .= $ALPHABET_MAP_REVERSE{substr $bits, $i, 5};
+    }
+    return $result;
+}
+
+sub _decode_b32 {
+    my $encoded = join '', map { $ALPHABET_MAP{uc $_} } split //, shift;
+    return pack 'B*', _zero_pad($encoded, 8);
 }
 
 1;
@@ -322,5 +375,9 @@ same terms as Perl itself.
  0.4   - Bugfix: 'Invalid argument supplied to Math::GMPz::overload_mod' for
          older versions of Math::GMPz on Windows and FreeBSD. Podfix.
  1.0.0 - UUID conversion support; semantic versioning.
+ 1.1.0 - Speedups courtesy of Bartosz Jarzyna (brtastic on CPAN, bbrtj on
+         Github). Use Crypt::PRNG for random number generation.
+ 1.1.1 - Fix module version number.
+ 1.1.2 - Fix POD (version history).
 
 =cut

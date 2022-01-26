@@ -23,12 +23,14 @@ t/mock_stat.t
 t/open-noclose.t
 t/open.t
 t/opendir.t
+t/path.t
 t/pod-coverage.t
 t/pod.t
 t/readline.t
 t/readlink.t
 t/rmdir.t
 t/runtime-bareword-filehandles.t
+t/stat-x.t
 t/sysopen.t
 t/Test-MockFile_file.t
 t/touch.t

@@ -18,7 +18,7 @@ my $s = $driver->session;
 # functionality. If the behaviour of such functionality changes, we
 # want it to be a conscious decision, hence we test for it.
 
-use Test::More 0.96 tests => 13 + 3;
+use Test::More 0.96 tests => 15 + 3;
 use Test::Exception;
 use Test::Warnings qw(warning warnings);
 my $transaction = $driver->session->begin_transaction;
@@ -289,6 +289,31 @@ END
 };
 
 
+subtest 'config tls options' => sub {
+	plan tests => 3 + 3*2 + 5;
+	my $ca_file = '/dev/null';
+	my ($d1, $d2, $d3);
+	lives_ok { $d1 = Neo4j::Driver->new(); } 'new driver tls';
+	lives_ok { $d2 = Neo4j::Driver->new(); } 'new driver tls_ca';
+	lives_ok { $d3 = Neo4j::Driver->new(); } 'new driver ca_file';
+	lives_ok { $w = ''; $w = warning { $d1->config(tls => 7) }; } 'set config tls';
+	is_deeply $w, [], 'tls not deprecated'
+		or diag 'got warning(s): ', explain $w;
+	lives_ok { $w = ''; $w = warning { $d2->config(tls_ca => $ca_file) }; } 'set config tls_ca';
+	is_deeply $w, [], 'tls_ca not deprecated'
+		or diag 'got warning(s): ', explain $w;
+	lives_ok { $w = ''; $w = warning { $d3->config(ca_file => $ca_file) }; } 'set config ca_file';
+	like $w, qr/\bca_file\b.*\bdeprecated\b/i, 'ca_file is deprecated'
+		or diag 'got warning(s): ', explain $w;
+	no warnings 'deprecated';  # there may or may not be warnings for the getters
+	lives_and { is $d1->config('tls'), 7; } 'get tls';
+	lives_and { is $d2->config('tls_ca'), $ca_file; } 'get tls_ca';
+	lives_and { is $d2->config('trust_ca'), $ca_file; } 'get tls_ca trust_ca';
+	lives_and { is $d3->config('ca_file'), $ca_file; } 'get ca_file';
+	lives_and { is $d3->config('trust_ca'), $ca_file; } 'get ca_file trust_ca';
+};
+
+
 subtest 'custom cypher types' => sub {
 	plan tests => 5 + 5;
 	# fully test nodes
@@ -327,6 +352,41 @@ END
 	lives_and { is ref($e->_private->{_meta}), 'HASH' } 'rel _private access';
 	lives_ok { $r->get('p')->_private->{__foo} = 42; } 'path _private set';
 	lives_and { is $r->get('p')->_private->{__foo}, 42 } 'path _private get';
+};
+
+
+subtest 'graph queries' => sub {
+	plan skip_all => "graph response not implemented for Bolt" if $Neo4j_Test::bolt;
+	plan tests => 10;
+	my $s_json = $driver->session;
+	$s_json->{net}->{want_jolt} = 0;
+	my $t = $s_json->begin_transaction;
+	$t->{return_graph} = 1;
+	$q = <<END;
+CREATE ({name:'Alice'})-[k:KNOWS{since:1978}]->({name:'Bob'}) RETURN id(k)
+END
+	lives_ok { $w = ''; $w = warning { $r = $t->run($q)->single->get(0) }; } 'create graph';
+	like $w, qr/\breturn_graph\b.*\bdeprecated\b/i, 'return_graph is deprecated'
+		or diag 'got warning(s): ', explain $w;
+	$q = <<END;
+MATCH (a)-[b:KNOWS]->(c) WHERE id(b) = {id} RETURN a, b, c LIMIT 1
+END
+	lives_and { $w = ''; $w = warning { $r = $t->run($q, id => $r) }; ok $r; } 'match graph';
+	like $w, qr/\breturn_graph\b.*\bdeprecated\b/i, 'return_graph is deprecated'
+		or diag 'got warning(s): ', explain $w;
+	lives_ok { $r = $r->single; } 'single';
+	my ($n, $e);
+	lives_ok { $n = $r->{graph}->{nodes}; } 'got nodes';
+	lives_ok { $e = $r->{graph}->{relationships}; } 'got rels';
+	lives_and {
+		ok grep {$_->{properties}->{name} eq $r->get('a')->get('name')} @$n;
+	} 'node a found';
+	lives_and {
+		is $e->[0]->{properties}->{since}, $r->get('b')->get('since');
+	} 'rel b found';
+	lives_and {
+		ok grep {$_->{properties}->{name} eq $r->get('c')->get('name')} @$n;
+	} 'node c found';
 };
 
 

@@ -1,3 +1,35 @@
+0.011   2022-01-26  Released-By: PERLANCAR; Urgency: medium
+
+        - Fixes.
+
+
+0.010   2022-01-26  Released-By: PERLANCAR; Urgency: medium
+
+        - Adjust with BorderStyle 2.0.8.
+
+
+0.009   2022-01-24  Released-By: PERLANCAR; Urgency: medium
+
+        - Revert previous commit of making
+          {ASCII,UTF8}/SingleLineDoubleAfterHeader dynamic, because
+          per-char args passing is complex for Text::Table::More.
+
+
+0.008   2022-01-24  Released-By: PERLANCAR; Urgency: medium
+
+        [border style ASCII::SingleLineDoubleAfterHeader]
+
+        - Make dynamic and support argument 'header_row_count'.
+
+        - UPDATE: this is reverted in 0.009.
+
+        [border style UTF8::SingleLineDoubleAfterHeader]
+
+        - Make dynamic and support argument 'header_row_count'.
+
+        - UPDATE: this is reverted in 0.009.
+
+
 0.007   2021-05-12  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

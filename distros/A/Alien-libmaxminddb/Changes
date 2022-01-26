@@ -1,5 +1,13 @@
 Revision history for Alien::libmaxminddb
 
+1.003  2022-01-25 14:09:56 CET
+
+  - Windows is no longer supported
+
+1.002  2022-01-12 07:38:49 CET
+
+  - Further documentation changes
+
 1.001  2022-01-10 15:34:11 CET
 
   - Minor documentation changes

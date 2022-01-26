@@ -1,5 +1,14 @@
 Revision history for Perl extension DateTime::Format::Natural.
 
+1.13  2022-01-23  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+1.12_01  2022-01-20  <schubiger@cpan.org>
+
+ - Fix demand_future not working for method count_weekday.
+   [github #16 - joernclausen]
+
 1.12  2021-03-19  <schubiger@cpan.org>
 
  - Merged development version to stable.

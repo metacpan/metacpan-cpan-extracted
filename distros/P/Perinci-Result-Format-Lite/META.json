@@ -38,16 +38,16 @@
             "JSON::Tiny::Subclassable" : "0",
             "Number::Format::BigFloat" : "0",
             "Sort::ByExample" : "0",
-            "Text::Table::Any" : "0.096"
+            "Text::Table::Any" : "0.105"
          },
          "requires" : {
             "Data::Check::Structure" : "0.050",
             "Data::Dumper" : "0",
             "Exporter" : "5.57",
             "JSON::PP" : "0",
-            "List::Util" : "1.45",
+            "List::Util" : "1.54",
             "Sort::BySpec" : "0.03",
-            "Text::Table::Sprintf" : "0",
+            "Text::Table::Sprintf" : "0.006",
             "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
@@ -63,6 +63,12 @@
          }
       }
    },
+   "provides" : {
+      "Perinci::Result::Format::Lite" : {
+         "file" : "lib/Perinci/Result/Format/Lite.pm",
+         "version" : "0.283"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
@@ -75,7 +81,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-Result-Format-Lite"
       }
    },
-   "version" : "0.281",
+   "version" : "0.283",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -175,7 +181,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.604"
+            "version" : "0.606"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -240,7 +246,7 @@
          {
             "class" : "Dist::Zilla::Plugin::CopyrightYearFromGit",
             "name" : "@Author::PERLANCAR/CopyrightYearFromGit",
-            "version" : "0.006"
+            "version" : "0.009"
          },
          {
             "class" : "Dist::Zilla::Plugin::IfBuilt",
@@ -256,6 +262,33 @@
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@Author::PERLANCAR/MetaConfig",
             "version" : "6.023"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
+            "config" : {
+               "Dist::Zilla::Plugin::MetaProvides::Package" : {
+                  "finder_objects" : [
+                     {
+                        "class" : "Dist::Zilla::Plugin::FinderCode",
+                        "name" : "@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+                        "version" : "6.023"
+                     }
+                  ],
+                  "include_underscores" : 0
+               },
+               "Dist::Zilla::Role::MetaProvider::Provider" : {
+                  "$Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.002004",
+                  "inherit_missing" : 1,
+                  "inherit_version" : 1,
+                  "meta_noindex" : 1
+               },
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000037",
+                  "version" : "0.006"
+               }
+            },
+            "name" : "@Author::PERLANCAR/MetaProvides::Package",
+            "version" : "2.004003"
          },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::Authority",
@@ -392,6 +425,11 @@
                         "version" : "0.009"
                      },
                      {
+                        "class" : "Pod::Weaver::Section::PERLANCAR::Contributing",
+                        "name" : "@Author::PERLANCAR/PERLANCAR/Contributing",
+                        "version" : "0.292"
+                     },
+                     {
                         "class" : "Pod::Weaver::Section::Legal",
                         "name" : "@Author::PERLANCAR/Legal",
                         "version" : "4.018"
@@ -492,7 +530,7 @@
                }
             },
             "name" : "@Author::PERLANCAR/Test::Perl::Critic::Subset",
-            "version" : "3.001.005"
+            "version" : "3.001.006"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Rinci",
@@ -616,6 +654,11 @@
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
+            "version" : "6.023"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : "@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
             "version" : "6.023"
          }
       ],

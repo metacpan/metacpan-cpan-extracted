@@ -1,7 +1,7 @@
 #!perl
 
 our $DATE = '2021-08-13'; # DATE
-our $VERSION = '1.052'; # VERSION
+our $VERSION = '1.056'; # VERSION
 
 use 5.010001;
 use strict;
@@ -54,7 +54,7 @@ bencher-fmt - Format bencher result
 
 =head1 VERSION
 
-This document describes version 1.052 of bencher-fmt (from Perl distribution Bencher), released on 2021-08-13.
+This document describes version 1.056 of bencher-fmt (from Perl distribution Bencher), released on 2021-08-13.
 
 =head1 SYNOPSIS
 

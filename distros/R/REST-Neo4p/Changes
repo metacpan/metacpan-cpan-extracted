@@ -1,4 +1,6 @@
 Revision history for Perl module REST::Neo4p
+0.4003 2022-01-22
+    - Arne fix / Neo4j::Driver usage
 0.4001 2021-01-10
     - nudge version
 0.4000 2020-11-14 

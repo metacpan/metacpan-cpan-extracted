@@ -58,14 +58,13 @@ sub test_unitTest_2 : Test(4) {
             my ($row,$i) = @_;
             return (undef,$row->a,$row->b);
         },
-        instantiate => 1,
     );
 
     my $html = $e->html($h);
     $self->like($html,qr|<table class="compac.*id="myTable" cellspacing="0">|);
     $self->like($html,qr|\Q<th>A</th>|);
     $self->like($html,qr|\Q<td>1</td>|);
-    $self->like($html,qr|\QjQuery('#myTable').DataTable(|);
+    $self->like($html,qr|\Q$('#myTable').DataTable(|);
 }
 
 # -----------------------------------------------------------------------------

@@ -7,7 +7,8 @@ use 5.014;
 
 use File::Basename qw( basename );
 
-use DBI qw();
+use DBD::mysql 4.041 qw();  # mysql_enable_utf8mb4 requires 4.041 or greater
+use DBI              qw();
 
 use App::DBBrowser::Credentials;
 use App::DBBrowser::Opt::DBGet;

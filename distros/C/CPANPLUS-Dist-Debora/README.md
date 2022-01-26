@@ -16,9 +16,7 @@ The created packages can be installed with CPANPLUS, dpkg or rpm.
 
 ## INSTALLATION
 
-The [Open Build Service](https://build.opensuse.org/package/show/home:voegelas/perl-CPANPLUS-Dist-Debora) provides binary and source packages.
-
-Run the following commands to install the software manually:
+Run the following commands to install the software:
 
     perl Makefile.PL
     make

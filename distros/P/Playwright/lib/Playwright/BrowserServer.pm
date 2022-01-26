@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::BrowserServer;
-$Playwright::BrowserServer::VERSION = '0.017';
+$Playwright::BrowserServer::VERSION = '0.018';
 use parent 'Playwright::Base';
 
 sub new {
@@ -20,6 +20,16 @@ sub new {
 
 sub spec {
     return $Playwright::spec->{'BrowserServer'}{members};
+}
+
+sub wsEndpoint {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'wsEndpoint',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
 }
 
 sub kill {
@@ -47,16 +57,6 @@ sub process {
     return $self->_api_request(
         args    => [@_],
         command => 'process',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
-sub wsEndpoint {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'wsEndpoint',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -106,7 +106,7 @@ Playwright::BrowserServer - Automatically generated class for Playwright::Browse
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 CONSTRUCTOR
 
@@ -116,6 +116,12 @@ You shouldn't have to call this directly.
 Instead it should be returned to you as the result of calls on Playwright objects, or objects it returns.
 
 =head1 METHODS
+
+=head2 wsEndpoint(@args)
+
+Execute the BrowserServer::wsEndpoint playwright routine.
+
+See L<https://playwright.dev/api/class-BrowserServer#BrowserServer-wsEndpoint> for more information.
 
 =head2 kill(@args)
 
@@ -134,12 +140,6 @@ See L<https://playwright.dev/api/class-BrowserServer#BrowserServer-close> for mo
 Execute the BrowserServer::process playwright routine.
 
 See L<https://playwright.dev/api/class-BrowserServer#BrowserServer-process> for more information.
-
-=head2 wsEndpoint(@args)
-
-Execute the BrowserServer::wsEndpoint playwright routine.
-
-See L<https://playwright.dev/api/class-BrowserServer#BrowserServer-wsEndpoint> for more information.
 
 =head2 on(@args)
 

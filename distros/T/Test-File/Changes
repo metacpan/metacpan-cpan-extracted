@@ -1,5 +1,11 @@
 Revision history for Perl module Test::File
 
+1.991 2022-01-21T01:37:36Z
+	* Enforce text files in some functions, as warned in #18.
+	* Change up some diag messages: 1) lowercase first letter 2) not ! at
+	end, and 3) use "file" instead of "filename". If you were matching on
+	those, you may need to update your patterns.
+
 1.448 2021-03-05T15:01:18Z
 	* Promote to a user release
 

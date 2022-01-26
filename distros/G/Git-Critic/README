@@ -1,0 +1,91 @@
+NAME
+    Git::Critic - Only run Perl::Critic on lines changed in the current
+    branch
+
+VERSION
+    version 0.4
+
+SYNOPSIS
+        my $critic = Git::Critic->new( primary_target => 'main' );
+        my @critiques = $critic->run;
+        say foreach @critiques;
+
+DESCRIPTION
+    Running Perl::Critic <https://metacpan.org/pod/Perl::Critic> on legacy
+    code is often useless. You're flooded with tons of critiques, even if
+    you use the gentlest critique level. This module lets you only report
+    "Perl::Critic" errors on lines you've changed in your current branch.
+
+COMMAND LINE
+    We include a "git-perl-critic" command line tool to make this easier.
+    You probably want to check those docs instead.
+
+CONSTRUCTOR ARGUMENTS
+  "primary_target"
+    This is the only required argument.
+
+    This is the branch or commit SHA-1 you will diff against. Usually it's
+    "main", "master", "development", and so on, but you may specify another
+    branch name if you prefer.
+
+  "current_target"
+    Optional.
+
+    This is the branch or commit SHA-1 you wish to critique. Defaults to the
+    currently checked out branch.
+
+  "max_file_size"
+    Optional.
+
+    Positive integer representing the max file size of file you wish to
+    critique. "Perl::Critic" can be slow on large files, so this can speed
+    things up by passing a value, but at the cost of ignoring some
+    "Perl::Critic" failures.
+
+  "severity"
+    Optional.
+
+    This is the "Perl::Critic" severity level. You may pass a string or an
+    integer. If omitted, the default severity level is "gentle" (5).
+
+        SEVERITY NAME   ...is equivalent to...   SEVERITY NUMBER
+        --------------------------------------------------------
+        -severity => 'gentle'                     -severity => 5
+        -severity => 'stern'                      -severity => 4
+        -severity => 'harsh'                      -severity => 3
+        -severity => 'cruel'                      -severity => 2
+        -severity => 'brutal'                     -severity => 1
+
+  "verbose"
+    Optional.
+
+    If passed a true value, will print messages to "STDERR" explaining
+    various things the module is doing. Useful for debugging.
+
+METHODS
+  "run"
+        my $critic = Git::Critic->new(
+            primary_target => 'main' 
+            current_target => 'my-development-branch',
+            severity       => 'harsh',
+            max_file_size  => 20_000,
+        );
+        my @critiques = $critic->run;
+        say foreach @critiques;
+
+    Returns a list of all "Perl::Critic" failures in changed lines in the
+    current branch.
+
+    If the current branch and the primary branch are the same, returns
+    nothing. This may change in the future.
+
+AUTHOR
+    Curtis "Ovid" Poe <curtis.poe@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2022 by Curtis "Ovid" Poe.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

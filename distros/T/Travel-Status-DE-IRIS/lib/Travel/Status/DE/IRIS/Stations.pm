@@ -18,7 +18,7 @@ use Text::LevenshteinXS qw(distance);
 
 # TODO switch to Text::Levenshtein::XS once AUR/Debian packages become available
 
-our $VERSION = '1.62';
+our $VERSION = '1.63';
 
 # Automatically generated, see share/stations.json
 my @stations = (
@@ -339,6 +339,7 @@ my @stations = (
 ['FKNZA','Auestadion, Kassel',714006,9.481279,51.299057],
 ['TAUF','Aufhausen(Württ)',8000655,10.317193,48.85613],
 ['MAFE','Aufhausen(b Erding)',8000653,11.894375,48.274365],
+['PQKAG','Augartenstraße, Karlsruhe',150074,8.40384,48.99874],
 ['RAUG','Auggen',8000657,7.586788,47.789949],
 ['MAHA','Augsburg Haunstetterstraße',8000658,10.900985,48.355285],
 ['MA','Augsburg Hbf',8000013,10.88557,48.365441],
@@ -1478,7 +1479,6 @@ my @stations = (
 ['ECME','Castrop-Rauxel-Merklinde',8001329,7.324314,51.527932],
 ['XFCAV','Cavaillon(Avignon)',8700888,5.043872,43.834753],
 ['HC','Celle',8000064,10.062706,52.621175],
-['XICTL','Centallo',8300375,7.591296,44.496372],
 ['XLCS','Cents-Hamm',8270280,6.164679,49.614622],
 ['XFCE','Cerbère',8700147,3.163183,42.44166],
 ['XTCKA','Ceska Kamenice',5400271,14.414167,50.795882],
@@ -1962,6 +1962,7 @@ my @stations = (
 ['MDUH','Durach',8001614,10.343797,47.696452],
 ['RKDUH','Durlach Hubstraße, Karlsruhe',724002,8.472393,49.007212],
 ['RKDUU','Durlach Untermühlstraße, Karlsruhe',721456,8.454308,49.002171],
+['PQKTR','Durlacher Tor/KIT-Campus Süd (U), Karlsruhe',501001,8.41826,49.00877],
 ['RKDTD','Durlacher Tor/KIT-Campus Süd, Karlsruhe',377903,8.418562,49.009485],
 ['RDRM','Durmersheim',8001616,8.272631,48.928904],
 ['RDUN','Durmersheim Nord',8070170,8.280581,48.937796],
@@ -2344,6 +2345,7 @@ my @stations = (
 ['NET','Etterzhausen',8001925,11.978031,49.030609],
 ['RETT','Ettlingen Stadt',8007007,8.409106,48.938617],
 ['RETL','Ettlingen West',8001926,8.387878,48.947182],
+['RKME','Ettlinger Tor/Staatstheater (U), Karlsruhe',901012,8.40345,49.00544],
 ['EEZB','Etzbach',8001928,7.690264,50.781282],
 ['NEW','Etzelwang',8001929,11.586408,49.525525],
 ['REZB','Etzenbach',8007334,7.748889,47.86677],
@@ -2355,6 +2357,7 @@ my @stations = (
 ['NEU','Euerdorf',8001935,10.027633,50.149535],
 ['XBEP','Eupen',8800110,6.037155,50.635364],
 ['RKSEP','Europaplatz/Postgal. (Kaiser), Karlsruhe',721358,8.393553,49.010104],
+['PQKEU','Europaplatz/Postgalerie (U), Karlsruhe',501004,8.39432,49.00997],
 ['KEU','Euskirchen',8000100,6.792193,50.65776],
 ['KZU','Euskirchen Zuckerfabrik',8006673,6.813256,50.65687],
 ['KGBU','Euskirchen-Großbüllesheim',8002402,6.816188,50.686747],
@@ -2484,7 +2487,6 @@ my @stations = (
 ['MFOS','Forsting',8002028,12.091448,48.081864],
 ['XIFF','Fortezza/Franzensfeste',8300089,11.610083,46.788721],
 ['NFH','Forth',8002029,11.221457,49.591698],
-['XIF','Fossano',8300020,7.717916,44.550582],
 ['XFFLT','Fourchambault',8703343,3.087368,47.018969],
 ['NFHB','Frahelsbruck',8007344,13.027454,49.191145],
 ['XBFR','Fraipont',8800266,5.724186,50.565059],
@@ -3276,7 +3278,6 @@ my @stations = (
 ['NHGO','Hammelburg Ost',8002568,9.902111,50.115889],
 ['WHAM','Hammelspring',8011815,13.435744,53.070228],
 ['MHAU','Hammerau',8002570,12.946134,47.795883],
-['MHMB','Hammersbach Zugspitzbahn, Grainau',966904,11.046595,47.466024],
 ['RHST','Hammerstein',8070419,7.644148,47.690295],
 ['DHUW','Hammerunterwiesenthal',8011817,13.008722,50.441091],
 ['EHK','Hamminkeln',8002571,6.601745,51.735104],
@@ -3538,7 +3539,6 @@ my @stations = (
 ['THE','Herrenberg',8002785,8.862662,48.593991],
 ['TZWE','Herrenberg Zwerchweg',8002786,8.867661,48.584969],
 ['BHE','Herrensee',8011863,13.886577,52.529928],
-['RKMH','Herrenstraße, Karlsruhe',721376,8.400056,49.009815],
 ['THL','Herrlingen',8002789,9.89773,48.417731],
 ['XFHH','Herrlisheim près Colmar',8701281,7.32066,48.016667],
 ['THH','Herrlishöfen',8079099,9.808465,48.13944],
@@ -4246,6 +4246,7 @@ my @stations = (
 ['RKLR','Kollmarsreute',8003398,7.887074,48.098271],
 ['RKNA','Kollnau',8003399,7.973842,48.101151],
 ['XMKO','Komarom',5500012,18.114153,47.749688],
+['RKMK','Kongresszentrum (U), Karlsruhe',901013,8.40307,49.00249],
 ['PQKVS','Kongresszentrum, Karlsruhe',367072,8.404054,49.003793],
 ['XPKN','Konin',5100026,18.253336,52.231397],
 ['RKO','Konstanz',8003400,9.177312,47.658754],
@@ -4307,8 +4308,6 @@ my @stations = (
 ['SKK','Kreuz Konz',8003434,6.576866,49.703798],
 ['KKUZ','Kreuzau Bahnhof',8007820,6.488409,50.75075],
 ['KKUZE','Kreuzau-Eifelstraße',8007830,6.49194,50.742798],
-['KKRZ','Kreuzberg(Ahr)',8003436,6.978557,50.506442],
-['MKZB','Kreuzeck/Alpspitzbahn Bahnhof, Garmisch-Partenkirc',966903,11.062936,47.472102],
 ['XSKR','Kreuzlingen',8506131,9.16906514322919,47.6525540443623],
 ['XSKRB','Kreuzlingen Bernrain',8506197,9.16318719460646,47.6421167081071],
 ['XSKL','Kreuzlingen Hafen',8506128,9.18196081638044,47.6491676497374],
@@ -4384,7 +4383,6 @@ my @stations = (
 ['KKHR','Köln Hansaring',8003392,6.952565,50.949131],
 ['KK','Köln Hbf',8000207,6.958729,50.94303],
 ['KKDZ','Köln Messe/Deutz',8003368,6.975001,50.940874],
-['KKDZB','Köln Messe/Deutz Gl. 9-10',8083368,6.974641,50.941299],
 ['KKDT','Köln Messe/Deutz Gl.11-12',8073368,6.974067,50.941721],
 ['KSTP','Köln Steinstraße',8003379,7.057173,50.895558],
 ['KKS','Köln Süd',8003361,6.938059,50.9273],
@@ -5077,7 +5075,8 @@ my @stations = (
 ['NMH','Marktleuthen',8003884,12.01317,50.130803],
 ['MMO','Marktoberdorf',8003885,10.61423,47.779215],
 ['MMOS','Marktoberdorf Schule',8003877,10.609997,47.774099],
-['PQKMP','Marktplatz, Karlsruhe',371861,8.405563,49.009485],
+['PQKMU','Marktplatz (Kaiserstraße U), Karlsruhe',401003,8.40206,49.00956],
+['PQKPZ','Marktplatz (Pyramide U), Karlsruhe',151011,8.40376,49.00896],
 ['NMR','Marktredwitz',8000247,12.082583,50.004596],
 ['NMSG','Marktschorgast',8003887,11.65353,50.090794],
 ['XTMVE','Markvartice',5401928,14.346349,50.772316],
@@ -5289,7 +5288,6 @@ my @stations = (
 ['KMO','Moers',8000644,6.641535,51.451147],
 ['WMOI','Moidentin',8012384,11.481918,53.806071],
 ['XBML','Mol',8800124,5.115104,51.190772],
-['XSMOS','Mols',8509415,9.27680343664119,47.112987492662],
 ['PQKSK','Moltkestraße/Städt. Klinikum, Karlsruhe',723630,8.375209,49.015707],
 ['XFMH','Mommenheim',8700395,7.641459,48.755848],
 ['XFMC','Monaco-Monte-Carlo',8700174,7.419602,43.738212],
@@ -5818,7 +5816,6 @@ my @stations = (
 ['FERW','Nistertal-Bad Marienberg',8001819,7.90058,50.632114],
 ['SNI','Nittel',8004438,6.440942,49.654264],
 ['XDNN','Noerre Nebel st',8601692,8.290385,55.777294],
-['XDNP','Noerreport st',8601699,12.571867,55.683522],
 ['XLNZ','Noertzange',8270800,6.050831,49.508101],
 ['XFNR','Nogent-le-Rotrou',8701673,0.810116,48.325837],
 ['SNON','Nohen',8004444,7.242085,49.639648],
@@ -6023,14 +6020,12 @@ my @stations = (
 ['DOE','Oelsnitz(Erzgeb)',8012553,12.693933,50.734178],
 ['DOV','Oelsnitz(Vogtl)',8012554,12.159,50.41323],
 ['AOE','Oerel',8007810,9.03247,53.494156],
-['XDKHO','Oerestad st',8601560,12.579355,55.6290128],
 ['NOER','Oerlenbach',8004629,10.130921,50.143278],
 ['EOER','Oerlinghausen',8004630,8.666016,51.978774],
 ['XFOE','Oermingen',8701714,7.131803,49.00031],
 ['WOE','Oertzenhof',8012555,13.573119,53.518083],
 ['EOES','Oese',8004631,7.788853,51.402051],
 ['HOES','Oesede',8004628,8.064317,52.208729],
-['XDOP','Oesterport st',8601878,12.587615,55.692708],
 ['FOE','Oestrich-Winkel',8004635,8.0189,50.002659],
 ['XLOE','Oetrange',8270830,6.25814,49.602607],
 ['MOET','Oettingen(Bay)',8070508,10.600122,48.94505],
@@ -6502,7 +6497,6 @@ my @stations = (
 ['XIREC','Re(I)',8302806,8.539104,46.127306],
 ['MRH','Rebdorf-Hofmühle',8004966,11.169457,48.892215],
 ['XSRM','Rebstein-Marbach',8506318,9.58675061708481,47.3926373927342],
-['KREC','Rech',8004967,7.036514,50.515427],
 ['DRBG','Rechenberg',8012727,13.559902,50.733931],
 ['DRBS','Rechenberg Schule',8017220,13.543867,50.7371],
 ['TRC','Rechtenstein',8004968,9.550904,48.239993],
@@ -6652,7 +6646,6 @@ my @stations = (
 ['TRH','Rietheim(Württ)',8005097,8.782636,48.039008],
 ['BRI','Rietschen',8012767,14.783887,51.398624],
 ['XARZ','Rietz in Tirol',8101457,11.023813,47.291922],
-['MRFR','Riffelriß, Grainau',966907,10.987337,47.43554],
 ['ONRIS','Rijssen',8400538,6.5202779769897,52.3122215271],
 ['ONRIW','Rijswijk',8400505,4.3191666603088,52.039722442627],
 ['ONRIB','Rilland-Bath',8400521,4.1611108779907,51.422779083252],
@@ -7848,6 +7841,7 @@ my @stations = (
 ['TTRS','Trossingen Stadt',8007646,8.631547,48.074037],
 ['MTSB','Trostberg',8005912,12.555646,48.024737],
 ['XATS','Tschagguns',8100118,9.904905,47.079154],
+['RKTU','Tullastraße/Alter Schlachthof, Karlsruhe',723632,8.431264,49.006769],
 ['MTUL','Tulling',8005924,12.060049,48.082865],
 ['XATU','Tulln a.d.Donau',8100203,16.064725,48.327509],
 ['XATD','Tullnerfeld',8102059,15.996536,48.295235],
@@ -7863,7 +7857,6 @@ my @stations = (
 ['PNAAV','Twello',8400037,4.7005553245544,52.237777709961],
 ['FTW','Twiste',8005928,8.964011,51.33626],
 ['HT','Twistringen',8005929,8.644832,52.79188],
-['XPTY','Tychy',5100260,18.964092,50.136194],
 ['MTG','Töging(Inn)',8005883,12.59487,48.259015],
 ['ATG','Tönning',8005885,8.937601,54.314139],
 ['UTP','Töppeln',8013129,12.006161,50.890855],
@@ -8959,7 +8952,7 @@ Travel::Status::DE::IRIS::Stations - Station name to station code mapping
 
 =head1 VERSION
 
-version 1.62
+version 1.63
 
 =head1 DESCRIPTION
 

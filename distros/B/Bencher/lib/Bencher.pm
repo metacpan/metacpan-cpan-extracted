@@ -3,7 +3,7 @@ package Bencher;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-08-13'; # DATE
 our $DIST = 'Bencher'; # DIST
-our $VERSION = '1.052'; # VERSION
+our $VERSION = '1.056'; # VERSION
 
 1;
 # ABSTRACT: A benchmark framework
@@ -20,7 +20,7 @@ Bencher - A benchmark framework
 
 =head1 VERSION
 
-This document describes version 1.052 of Bencher (from Perl distribution Bencher), released on 2021-08-13.
+This document describes version 1.056 of Bencher (from Perl distribution Bencher), released on 2021-08-13.
 
 =head1 SYNOPSIS
 

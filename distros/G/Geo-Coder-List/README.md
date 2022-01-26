@@ -8,7 +8,7 @@ Geo::Coder::List - Call many Geo-Coders
 
 # VERSION
 
-Version 0.27
+Version 0.29
 
 # SYNOPSIS
 
@@ -83,8 +83,8 @@ return value, if the value was retrieved from the cache the value will be undefi
 
 ## ua
 
-Accessor method to set the UserAgent object used internally by each of the Geo-Coders. You
-can call _env\_proxy_ for example, to get the proxy information from
+Accessor method to set the UserAgent object used internally by each of the Geo-Coders.
+You can call _env\_proxy_ for example, to get the proxy information from
 environment variables:
 
     my $geocoder_list = Geo::Coder::List->new();
@@ -154,6 +154,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2016-2020 Nigel Horne.
+Copyright 2016-2022 Nigel Horne.
 
 This program is released under the following licence: GPL2

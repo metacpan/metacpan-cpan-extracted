@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2021-07-27'; # DATE
-our $VERSION = '0.478'; # VERSION
+our $DATE = '2021-07-29'; # DATE
+our $VERSION = '0.479'; # VERSION
 
 use 5.010;
 use strict;
@@ -249,7 +249,7 @@ format-with-sah - Format data
 
 =head1 VERSION
 
-This document describes version 0.478 of format-with-sah (from Perl distribution App-SahUtils), released on 2021-07-27.
+This document describes version 0.479 of format-with-sah (from Perl distribution App-SahUtils), released on 2021-07-29.
 
 =head1 SYNOPSIS
 

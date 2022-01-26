@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Type::Relationship;
 # ABSTRACT: Describes a relationship from a Neo4j graph
-$Neo4j::Driver::Type::Relationship::VERSION = '0.27';
+$Neo4j::Driver::Type::Relationship::VERSION = '0.28';
 
 use parent 'Neo4j::Types::Relationship';
 use overload '%{}' => \&_hash, fallback => 1;
@@ -94,7 +94,7 @@ Neo4j::Driver::Type::Relationship - Describes a relationship from a Neo4j graph
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 SYNOPSIS
 
@@ -195,7 +195,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2021 by Arne Johannessen.
+This software is Copyright (c) 2016-2022 by Arne Johannessen.
 
 This is free software, licensed under:
 

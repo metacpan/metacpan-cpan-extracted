@@ -64,7 +64,7 @@ sub _UTF8_by_Unicode {
         #       110x xxxx 10xx xxxx
 
         $utf8 = join('', map { bin2hex($_) }
-            join('', '110',@b[    5]), join('', @b[ 6, 7, 8, 9]),
+            join('', '110',$b[    5]), join('', @b[ 6, 7, 8, 9]),
             join('', '10', @b[10,11]), join('', @b[12,13,14,15]),
         );
     }

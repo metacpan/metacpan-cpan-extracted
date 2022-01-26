@@ -1,0 +1,89 @@
+{
+   "abstract" : "Handle the Italian CBI fixed length file format.",
+   "author" : [
+      "Samuele Bonino <samuele.bonino at resbinaria.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.14",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "CBI-Wrapper",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Encode" : "0",
+            "Scalar::Util" : "1.47",
+            "Text::Unidecode" : "1.30",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "CBI::Wrapper" : {
+         "file" : "lib/CBI/Wrapper.pm",
+         "version" : "0.02"
+      },
+      "CBI::Wrapper::Disposal" : {
+         "file" : "lib/CBI/Wrapper/Disposal.pm"
+      },
+      "CBI::Wrapper::Field" : {
+         "file" : "lib/CBI/Wrapper/Field.pm"
+      },
+      "CBI::Wrapper::Flow" : {
+         "file" : "lib/CBI/Wrapper/Flow.pm"
+      },
+      "CBI::Wrapper::RIBA" : {
+         "file" : "lib/CBI/Wrapper/RIBA.pm"
+      },
+      "CBI::Wrapper::Record" : {
+         "file" : "lib/CBI/Wrapper/Record.pm"
+      },
+      "CBI::Wrapper::RecordMapping" : {
+         "file" : "lib/CBI/Wrapper/RecordMapping.pm"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.02",
+   "x_contributors" : [
+      "Samuele Bonino <samuele.bonino@resbinaria.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_static_install" : 1
+}

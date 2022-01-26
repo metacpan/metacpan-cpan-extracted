@@ -1,3 +1,12 @@
+1.056   2021-08-13  Released-By: PERLANCAR; Urgency: low
+
+        - No spec changes.
+
+        - Synchronie version with Bencher::Backend.
+
+        - [doc] Rename Cookbook to HowTo, add howto item: picking a runner.
+
+
 1.052   2021-08-13  Released-By: PERLANCAR; Urgency: low
 
 	- No spec changes.

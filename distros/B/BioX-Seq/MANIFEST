@@ -31,6 +31,7 @@ t/test_data/test2.fa.gz.fai.cmp
 t/test_data/test2.fa.zst
 t/test_data/test2.fq.dsrc
 t/test_data/test2.fq.fqz
+t/test_data/test2.fa.xz
 t/test_data/test3.2bit
 t/test_data/test4.fa
 t/test_data/test_bad.fa

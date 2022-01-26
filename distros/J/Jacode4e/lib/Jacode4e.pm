@@ -1,10 +1,15 @@
 package Jacode4e;
-$VERSION = '2.13.6.18';
-######################################################################
+$VERSION = '2.13.6.19';
+# 如果您可以阅读此字符，则可以通过选择所有内容并将其保存为文件名“Jacode4e.pm”来将其用作模块。
+# 如果您可以閱讀此字符，則可以通過選擇所有內容並將其保存為文件名“Jacode4e.pm”來將其用作模塊。
+# この文字が読める場合は、内容を全て選択してファイル名を "Jacode4e.pm" にして保存すればそのままモジュールとして利用することができます。
+# 이 문자를 읽을 수 있는 경우는, 내용을 모두 선택해 파일명을 "Jacode4e.pm" 로 해 보존하면 그대로 모듈로서 이용할 수가 있습니다.
+# But that is very far into the future isn't it?
+####################################################################
 #
 # Jacode4e - jacode.pl-like program for enterprise
 #
-# Copyright (c) 2018, 2019, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2019, 2021, 2022 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 #
 # ** ATTENTION **
@@ -85,7 +90,7 @@ $VERSION = '2.13.6.18';
 #   use FindBin;
 #   use lib "$FindBin::Bin/lib";
 #   use Jacode4e;
-#   Jacode4e::VERSION('2.13.6.18');
+#   Jacode4e::VERSION('2.13.6.19');
 #
 #   while (<>) {
 #       $return =
@@ -1089,12 +1094,15 @@ Jacode4e - jacode.pl-like program for enterprise
                         (CAUTION! override also SPACE option)
       -----------------------------------------------------------------------
 
+    If you need round-trip conversion, you had better use Jacode4e::RoundTrip
+    module.
+
 =head1 SAMPLES
 
   use FindBin;
   use lib "$FindBin::Bin/lib";
   use Jacode4e;
-  Jacode4e::VERSION('2.13.6.18');
+  Jacode4e::VERSION('2.13.6.19');
   
   while (<>) {
       $return =

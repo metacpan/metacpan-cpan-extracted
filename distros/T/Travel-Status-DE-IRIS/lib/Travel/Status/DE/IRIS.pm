@@ -6,7 +6,7 @@ use 5.014;
 
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
-our $VERSION = '1.62';
+our $VERSION = '1.63';
 
 use Carp qw(confess cluck);
 use DateTime;
@@ -45,7 +45,7 @@ sub new {
 		iris_base      => $opt{iris_base}
 		  // 'https://iris.noncd.db.de/iris-tts/timetable',
 		keep_transfers  => $opt{keep_transfers},
-		lookahead       => $opt{lookahead} // ( 2 * 60 ),
+		lookahead       => $opt{lookahead}  // ( 2 * 60 ),
 		lookbehind      => $opt{lookbehind} // ( 0 * 60 ),
 		main_cache      => $opt{main_cache},
 		rt_cache        => $opt{realtime_cache},
@@ -90,6 +90,7 @@ sub new {
 		my $ref_status = Travel::Status::DE::IRIS->new(
 			datetime       => $self->{datetime},
 			developer_mode => $self->{developer_mode},
+			iris_base      => $self->{iris_base},
 			keep_transfers => $self->{keep_transfers},
 			lookahead      => $self->{lookahead},
 			lookbehind     => $self->{lookbehind},
@@ -643,7 +644,7 @@ Travel::Status::DE::IRIS - Interface to IRIS based web departure monitors.
 
 =head1 VERSION
 
-version 1.62
+version 1.63
 
 =head1 DESCRIPTION
 

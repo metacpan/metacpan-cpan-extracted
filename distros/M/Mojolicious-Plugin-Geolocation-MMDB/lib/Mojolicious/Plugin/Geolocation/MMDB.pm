@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 # SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later
 
-our $VERSION = 0.001;
+our $VERSION = 0.002;
 
 use Carp qw(croak);
 use IP::Geolocation::MMDB;
@@ -44,7 +44,7 @@ Mojolicious::Plugin::Geolocation::MMDB - Look up location information by IP addr
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -76,7 +76,7 @@ to location information such as country and city names.
 If no IP address is given, the location of the current transaction's remote
 address is looked up.  Otherwise, the specified IP address is looked up.
 Returns the undefined value if no location information is available for the IP
-address.
+address.  Dies if the address is not a valid IP address.
 
 =head1 SUBROUTINES/METHODS
 

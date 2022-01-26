@@ -21,7 +21,7 @@ has missing_after                  => 1800;
 has [qw(remove_after stuck_after)] => 172800;
 has tasks                          => sub { {} };
 
-our $VERSION = '10.22';
+our $VERSION = '10.23';
 
 sub add_task {
   my ($self, $name, $task) = @_;
@@ -777,6 +777,18 @@ These options are currently available:
 
 =over 2
 
+=item id
+
+  id => '10023'
+
+Dequeue a specific job.
+
+=item min_priority
+
+  min_priority => 3
+
+Do not dequeue jobs with a lower priority.
+
 =item queues
 
   queues => ['important']
@@ -784,6 +796,13 @@ These options are currently available:
 One or more queues to dequeue jobs from, defaults to C<default>.
 
 =back
+
+=head2 perform_jobs_in_foreground
+
+  $minion->perform_jobs_in_foreground;
+  $minion->perform_jobs_in_foreground({queues => ['important']});
+
+Same as L</"perform_jobs">, but all jobs are performed in the current process, without spawning new processes.
 
 =head2 repair
 
@@ -814,13 +833,6 @@ Reset everything.
 Reset only locks.
 
 =back
-
-=head2 perform_jobs_in_foreground
-
-  $minion->perform_jobs_in_foreground;
-  $minion->perform_jobs_in_foreground({queues => ['important']});
-
-Same as L</"perform_jobs">, but all jobs are performed in the current process, without spawning new processes.
 
 =head2 result_p
 
@@ -1122,12 +1134,6 @@ L<http://scripts.sil.org/OFL>.
 
 Licensed under the MIT License, L<http://creativecommons.org/licenses/MIT>.
 
-=head2 popper.js
-
-  Copyright (C) Federico Zivolo 2017.
-
-Licensed under the MIT License, L<http://creativecommons.org/licenses/MIT>.
-
 =head1 AUTHORS
 
 =head2 Project Founder
@@ -1160,7 +1166,7 @@ Stefan Adams
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2021, Sebastian Riedel and others.
+Copyright (C) 2014-2022, Sebastian Riedel and others.
 
 This program is free software, you can redistribute it and/or modify it under the terms of the Artistic License version
 2.0.

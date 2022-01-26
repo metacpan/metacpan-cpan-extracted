@@ -37,7 +37,7 @@ subtest file_modes => sub {
 	foreach my $sub ( @subs ) {
 		no strict 'refs';
 
-		test_out("ok 1 # skip $sub doesn't work on Windows!");
+		test_out("ok 1 # skip $sub doesn't work on Windows");
 		&{$sub}();
 		test_test();
 		}

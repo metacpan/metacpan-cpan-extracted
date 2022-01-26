@@ -2,13 +2,14 @@ NAME
     Log::ger::Output::Screen - Output log to screen
 
 VERSION
-    version 0.017
+    version 0.018
 
 SYNOPSIS
      use Log::ger::Output Screen => (
          # stderr      => 1,    # set to 0 to print to stdout instead of stderr
          # use_color   => 0,    # set to 1/0 to force usage of color, default is from NO_COLOR/COLOR or (-t STDOUT)
          # color_depth => 16,   # if unset will guess from heuristic
+         # colorize_tags => 0,  # if set to true, will colorize "[...]" prefix in log message to unique colors
          # formatter   => sub { ... },
      );
      use Log::ger;
@@ -16,6 +17,12 @@ SYNOPSIS
      log_warn "blah...";
 
 DESCRIPTION
+    This Log::ger plugin outputs log messages as lines to screen (STDERR by
+    default), coloring them according to the log messages' levels. There are
+    different color schemes available, see
+    "Log::ger::Screen::ColorScheme::*" modules like
+    Log::ger::Screen::ColorScheme::Unlike.
+
 CONFIGURATION
   stderr
     Bool, default 1. Whether to print to STDERR (the default) or STDOUT.
@@ -33,6 +40,19 @@ CONFIGURATION
     16777216. Otherwise, check if TERM environment variable contains the
     string "256color"; if yes then 256. Otherwise 16.
 
+  colorize_tags
+    Bool, default false. Experimental. If set to true, will colorize "[...]"
+    tag prefixes in log message with unique RGB color. Will only do this if
+    color is enabled, obviously.
+
+    For example, if log message is something like one of the following:
+
+     [pericmd][plugin Foo::Bar] skip foobar-ing the program because of qux
+     my-prog: [pericmd] [plugin Foo::Bar] skip foobar-ing the program because of qux
+
+    Then the "[pericmd]" and "[plugin Foo::Bar]" will be given a unique RGB
+    color each.
+
   formatter
     Coderef. When defined, will pass the formatted message (but being
     applied with colors) to this custom formatter.
@@ -49,15 +69,18 @@ ENVIRONMENT
     Can be set to disable/enable color by default, if "/use_color" is not
     set.
 
+HISTORY
+    Originally modelled after Log::Any::Adapter::Screen.
+
 SEE ALSO
-    Modelled after Log::Any::Adapter::Screen.
+    Log::ger
 
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020, 2018, 2017 by
-    perlancar@cpan.org.
+    This software is copyright (c) 2022, 2021, 2020, 2018, 2017 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

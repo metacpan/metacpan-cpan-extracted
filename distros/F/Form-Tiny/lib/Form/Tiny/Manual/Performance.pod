@@ -6,7 +6,7 @@ Form::Tiny::Manual::Performance - validation performance tips
 
 =head1 DESCRIPTION
 
-Form::Tiny is a pretty fast validation framework (L<benchmark|https://brtastic.xyz/blog/article/validation-frameworks-benchmark>), but when the need arise, certain steps can be taken to improve it even further.
+Form::Tiny is a pretty fast validation framework (L<benchmark|https://bbrtj.eu/blog/article/validation-frameworks-benchmark>), but when the need arise, certain steps can be taken to improve it even further.
 
 =head1 THINGS THAT SLOW THE MODULE DOWN
 
@@ -34,3 +34,4 @@ While it may come useful, it is often unnecessary. The module already does not c
 =head2 Type::Tiny::XS
 
 Form::Tiny uses a lot of Type::Tiny type constraints, both internally and in its form classes. Installing L<Type::Tiny::XS> should give them some XS boost, although it may be hard to measure exactly what kind of performance boost it gives.
+

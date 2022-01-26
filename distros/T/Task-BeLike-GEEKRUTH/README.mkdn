@@ -1,0 +1,171 @@
+# NAME
+
+Task::BeLike::GEEKRUTH - TIMTOWTDI, but this works for GeekRuthie
+
+# VERSION
+
+version 1.0000
+
+# NAME
+
+Task::BeLike::GEEKRUTH - TIMTOWTDI, but this works for GeekRuthie
+
+# VERSION
+
+version 1.0000
+
+# TASK CONTENTS
+
+## Infrastructure
+
+### [App::cpanminus](https://metacpan.org/pod/App%3A%3Acpanminus)
+
+### [App::perlbrew](https://metacpan.org/pod/App%3A%3Aperlbrew)
+
+### [Code::TidyAll](https://metacpan.org/pod/Code%3A%3ATidyAll)
+
+### [Code::TidyAll::Plugin::Test::Vars](https://metacpan.org/pod/Code%3A%3ATidyAll%3A%3APlugin%3A%3ATest%3A%3AVars)
+
+### [Devel::Local](https://metacpan.org/pod/Devel%3A%3ALocal)
+
+### [Dist::Zilla](https://metacpan.org/pod/Dist%3A%3AZilla)
+
+### [Dist::Zilla::App::Command::cover](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3AApp%3A%3ACommand%3A%3Acover)
+
+### [Dist::Zilla::App::Command::critic](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3AApp%3A%3ACommand%3A%3Acritic)
+
+### [Dist::Zilla::App::Command::dumpphases](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3AApp%3A%3ACommand%3A%3Adumpphases)
+
+### [Dist::Zilla::App::Command::lsplugins](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3AApp%3A%3ACommand%3A%3Alsplugins)
+
+### [Dist::Zilla::PluginBundle::Author::GEEKRUTH](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APluginBundle%3A%3AAuthor%3A%3AGEEKRUTH)
+
+### [OrePAN2](https://metacpan.org/pod/OrePAN2)
+
+### [Perl::Critic](https://metacpan.org/pod/Perl%3A%3ACritic)
+
+### [Perl::Critic::Bangs](https://metacpan.org/pod/Perl%3A%3ACritic%3A%3ABangs)
+
+### [Perl::Critic::Community](https://metacpan.org/pod/Perl%3A%3ACritic%3A%3ACommunity)
+
+### [Perl::Critic::Dancer2](https://metacpan.org/pod/Perl%3A%3ACritic%3A%3ADancer2)
+
+### [Perl::Critic::StricterSubs](https://metacpan.org/pod/Perl%3A%3ACritic%3A%3AStricterSubs)
+
+### [Perl::Critic::TooMuchCode](https://metacpan.org/pod/Perl%3A%3ACritic%3A%3ATooMuchCode)
+
+### [Perl::Tidy](https://metacpan.org/pod/Perl%3A%3ATidy)
+
+### [PLS](https://metacpan.org/pod/PLS)
+
+### [Pod::Coverage::TrustPod](https://metacpan.org/pod/Pod%3A%3ACoverage%3A%3ATrustPod)
+
+## Database Wrangling
+
+### [DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass)
+
+### [DBIx::Class::Schema::ResultSetNames](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3ASchema%3A%3AResultSetNames)
+
+### [DBIx::Class::Helpers](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3AHelpers)
+
+## Building Cool Stuff
+
+### [autodie](https://metacpan.org/pod/autodie)
+
+### [Cpanel::JSON::XS](https://metacpan.org/pod/Cpanel%3A%3AJSON%3A%3AXS)
+
+### [Dancer2](https://metacpan.org/pod/Dancer2)
+
+### [Dancer2::Plugin::Ajax](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3AAjax)
+
+### [Dancer2::Plugin::Auth::Extensible](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3AAuth%3A%3AExtensible)
+
+### [Dancer2::Plugin::Auth::Extensible::Provider::DBIC](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3AAuth%3A%3AExtensible%3A%3AProvider%3A%3ADBIC)
+
+### [Dancer2::Plugin::Auth::Extensible::Provider::DBIx::Class](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3AAuth%3A%3AExtensible%3A%3AProvider%3A%3ADBIx%3A%3AClass)
+
+### [Dancer2::Plugin::Cache::CHI](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3ACache%3A%3ACHI)
+
+### [Dancer2::Plugin::DBIC](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3ADBIC)
+
+### [Dancer2::Plugin::DBIx::Class](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3ADBIx%3A%3AClass)
+
+### [Dancer2::Plugin::Growler](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3AGrowler)
+
+### [Dancer2::Plugin::Minify](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3AMinify)
+
+### [Dancer2::Plugin::REST](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3AREST)
+
+### [Dancer2::Template::Handlebars](https://metacpan.org/pod/Dancer2%3A%3ATemplate%3A%3AHandlebars)
+
+### [File::Path](https://metacpan.org/pod/File%3A%3APath)
+
+### [Modern::Perl](https://metacpan.org/pod/Modern%3A%3APerl)
+
+### [Moo](https://metacpan.org/pod/Moo)
+
+### [Try::Tiny](https://metacpan.org/pod/Try%3A%3ATiny)
+
+### [YAML::Tiny](https://metacpan.org/pod/YAML%3A%3ATiny)
+
+# INTRODUCTION
+
+I write Perl for a living, and fully expect to do so for the rest of my career, and well into
+what passes for "retirement" for a workaholic nerd like me. This
+[Dist::Zilla::Plugin::TaskWeaver](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3ATaskWeaver) module gathers together the things I use frequently.
+
+# TASK CONTENTS
+
+# AUTHOR
+
+D Ruth Holloway <ruth@hiruthie.me>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022 by D Ruth Holloway.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+# AUTHOR
+
+D Ruth Holloway <ruth@hiruthie.me>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022 by D Ruth Holloway.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+# POD ERRORS
+
+Hey! **The above document had some coding errors, which are explained below:**
+
+- Around line 123:
+
+    Unknown directive: =pkggoup
+
+- Around line 125:
+
+    Unknown directive: =pkg
+
+- Around line 127:
+
+    Unknown directive: =pkg
+
+- Around line 129:
+
+    Unknown directive: =pkg
+
+- Around line 131:
+
+    Unknown directive: =pkg
+
+- Around line 133:
+
+    Unknown directive: =pkg
+
+- Around line 135:
+
+    Unknown directive: =pkg

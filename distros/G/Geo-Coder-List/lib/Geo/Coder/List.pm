@@ -19,11 +19,11 @@ Geo::Coder::List - Call many Geo-Coders
 
 =head1 VERSION
 
-Version 0.27
+Version 0.29
 
 =cut
 
-our $VERSION = '0.27';
+our $VERSION = '0.29';
 our %locations;	# L1 cache, always used
 
 =head1 SYNOPSIS
@@ -147,7 +147,7 @@ sub geocode {
 	print "location: $location\n" if($self->{'debug'});
 	if((!wantarray) && (my $rc = $self->_cache($location))) {
 		if(ref($rc) eq 'ARRAY') {
-			$rc = @{$rc}[0];
+			$rc = $rc->[0];
 		}
 		if(ref($rc) eq 'HASH') {
 			delete $rc->{'geocoder'};
@@ -159,7 +159,7 @@ sub geocode {
 				result => $rc
 			};
 			CORE::push @{$self->{'log'}}, $log;
-			print "cached\n" if($self->{'debug'});
+			print __PACKAGE__, ': ', __LINE__,  ": cached\n" if($self->{'debug'});
 			return $rc;
 		}
 	}
@@ -187,7 +187,7 @@ sub geocode {
 				result => \@rc
 			};
 			CORE::push @{$self->{'log'}}, $log;
-			print "cached\n" if($self->{'debug'});
+			print __PACKAGE__, ': ', __LINE__,  ": cached\n" if($self->{'debug'});
 			if($allempty) {
 				return;
 			}
@@ -229,13 +229,12 @@ sub geocode {
 				@rc = $geocoder->geocode(%params);
 			}
 		};
-		$timetaken = Time::HiRes::time() - $timetaken;
 		if($@) {
 			my $log = {
 				line => $call_details[2],
 				location => $location,
 				geocoder => ref($geocoder),
-				timetaken => $timetaken,
+				timetaken => Time::HiRes::time() - $timetaken,
 				wantarray => wantarray,
 				error => $@
 			};
@@ -244,7 +243,10 @@ sub geocode {
 			$error = $@;
 			next ENCODER;
 		}
-		if(scalar(@rc) == 0) {
+		$timetaken = Time::HiRes::time() - $timetaken;
+		if((scalar(@rc) == 0) ||
+		   ((ref($rc[0]) eq 'HASH') && (scalar(keys %{$rc[0]}) == 0)) ||
+		   ((ref($rc[0]) eq 'ARRAY') && (scalar(keys %{$rc[0][0]}) == 0))) {
 			my $log = {
 				line => $call_details[2],
 				location => $location,
@@ -292,53 +294,72 @@ sub geocode {
 			} else {
 				# Try to create a common interface, helps with HTML::GoogleMaps::V3
 				if(!defined($l->{geometry}{location}{lat})) {
+					my ($lat, $long);
 					if($l->{lat} && defined($l->{lon})) {
 						# OSM/RandMcNalley
-						$l->{geometry}{location}{lat} = $l->{lat};
-						$l->{geometry}{location}{lng} = $l->{lon};
+						# This would have been nice, but it doesn't compile
+						# ($lat, $long) = $l->{'lat', 'lon'};
+						$lat = $l->{lat};
+						$long = $l->{lon};
 					} elsif($l->{BestLocation}) {
 						# Bing
-						$l->{geometry}{location}{lat} = $l->{BestLocation}->{Coordinates}->{Latitude};
-						$l->{geometry}{location}{lng} = $l->{BestLocation}->{Coordinates}->{Longitude};
+						$lat = $l->{BestLocation}->{Coordinates}->{Latitude};
+						$long = $l->{BestLocation}->{Coordinates}->{Longitude};
 					} elsif($l->{point}) {
 						# Bing
-						$l->{geometry}{location}{lat} = $l->{point}->{coordinates}[0];
-						$l->{geometry}{location}{lng} = $l->{point}->{coordinates}[1];
+						$lat = $l->{point}->{coordinates}[0];
+						$long = $l->{point}->{coordinates}[1];
 					} elsif($l->{latt}) {
 						# geocoder.ca
-						$l->{geometry}{location}{lat} = $l->{latt};
-						$l->{geometry}{location}{lng} = $l->{longt};
+						$lat = $l->{latt};
+						$long = $l->{longt};
 					} elsif($l->{latitude}) {
 						# postcodes.io
 						# Geo::Coder::Free
-						$l->{geometry}{location}{lat} = $l->{latitude};
-						$l->{geometry}{location}{lng} = $l->{longitude};
+						$lat = $l->{latitude};
+						$long = $l->{longitude};
+						if(my $type = $l->{'local_type'}) {
+							$l->{'type'} = lcfirst($type);	# e.g. village
+						}
 					} elsif($l->{'properties'}{'geoLatitude'}) {
 						# ovi
-						$l->{geometry}{location}{lat} = $l->{properties}{geoLatitude};
-						$l->{geometry}{location}{lng} = $l->{properties}{geoLongitude};
+						$lat = $l->{properties}{geoLatitude};
+						$long = $l->{properties}{geoLongitude};
 					} elsif($l->{'results'}[0]->{'geometry'}) {
 						if($l->{'results'}[0]->{'geometry'}->{'location'}) {
 							# DataScienceToolkit
-							$l->{'geometry'}{'location'}{'lat'} = $l->{'results'}[0]->{'geometry'}->{'location'}->{'lat'};
-							$l->{'geometry'}{'location'}{'lng'} = $l->{'results'}[0]->{'geometry'}->{'location'}->{'lng'};
+							$lat = $l->{'results'}[0]->{'geometry'}->{'location'}->{'lat'};
+							$long = $l->{'results'}[0]->{'geometry'}->{'location'}->{'lng'};
 						} else {
 							# OpenCage
-							$l->{'geometry'}{'location'}{'lat'} = $l->{'results'}[0]->{'geometry'}->{'lat'};
-							$l->{'geometry'}{'location'}{'lng'} = $l->{'results'}[0]->{'geometry'}->{'lng'};
+							$lat = $l->{'results'}[0]->{'geometry'}->{'lat'};
+							$long = $l->{'results'}[0]->{'geometry'}->{'lng'};
 						}
 					} elsif($l->{'RESULTS'}) {
 						# GeoCodeFarm
-						$l->{geometry}{location}{lat} = $l->{'RESULTS'}[0]{'COORDINATES'}{'latitude'};
-						$l->{geometry}{location}{lng} = $l->{'RESULTS'}[0]{'COORDINATES'}{'longitude'};
+						$lat = $l->{'RESULTS'}[0]{'COORDINATES'}{'latitude'};
+						$long = $l->{'RESULTS'}[0]{'COORDINATES'}{'longitude'};
 					} elsif(defined($l->{result}{addressMatches}[0]->{coordinates}{y})) {
 						# US Census
-						$l->{geometry}{location}{lat} = $l->{result}{addressMatches}[0]->{coordinates}{y};
-						$l->{geometry}{location}{lng} = $l->{result}{addressMatches}[0]->{coordinates}{x};
+						# This would have been nice, but it doesn't compile
+						# ($lat, $long) = $l->{result}{addressMatches}[0]->{coordinates}{y, x};
+						$lat = $l->{result}{addressMatches}[0]->{coordinates}{y};
+						$long = $l->{result}{addressMatches}[0]->{coordinates}{x};
 					} elsif($l->{lat}) {
 						# Geo::GeoNames
-						$l->{geometry}{location}{lat} = $l->{lat};
-						$l->{geometry}{location}{lng} = $l->{lng};
+						$lat = $l->{lat};
+						$long = $l->{lng};
+					} elsif($l->{features}) {
+						# Geo::Coder::Mapbox
+						$lat = $l->{features}[0]->{center}[1];
+						$long = $l->{features}[0]->{center}[0];
+					}
+
+					if(defined($lat) && defined($long)) {
+						$l->{geometry}{location}{lat} = $lat;
+						$l->{geometry}{location}{lng} = $long;
+					} else {
+						delete $l->{'geometry'};
 					}
 
 					if($l->{'standard'}{'countryname'}) {
@@ -349,6 +370,8 @@ sub geocode {
 				if(defined($l->{geometry}{location}{lat})) {
 					print $l->{geometry}{location}{lat}, '/', $l->{geometry}{location}{lng}, "\n" if($self->{'debug'});
 					$l->{geocoder} = $geocoder;
+					$l->{'lat'} //= $l->{geometry}{location}{lat};
+					$l->{'lng'} //= $l->{geometry}{location}{lng};
 					my $log = {
 						line => $call_details[2],
 						location => $location,
@@ -380,6 +403,7 @@ sub geocode {
 	# if($error) {
 		# return { error => $error };
 	# }
+	print "No matches" if($self->{'debug'});
 	if(wantarray) {
 		$self->_cache($location, ());
 		return ();
@@ -389,8 +413,8 @@ sub geocode {
 
 =head2 ua
 
-Accessor method to set the UserAgent object used internally by each of the Geo-Coders. You
-can call I<env_proxy> for example, to get the proxy information from
+Accessor method to set the UserAgent object used internally by each of the Geo-Coders.
+You can call I<env_proxy> for example, to get the proxy information from
 environment variables:
 
     my $geocoder_list = Geo::Coder::List->new();
@@ -604,17 +628,19 @@ sub _cache {
 	my $key = shift;
 
 	if(my $value = shift) {
-		# Put somthing into the cache
+		# Put something into the cache
 		$locations{$key} = $value;
+		my $rc = $value;
 		if($self->{'cache'}) {
 			my $duration;
-			my $rc = $value;
 			if(ref($value) eq 'ARRAY') {
 				foreach my $item(@{$value}) {
 					if(ref($item) eq 'HASH') {
-						# foreach my $key(keys(%{$item})) {
-						while(my($key, $value) = each %{$item}) {
-							delete $item->{$key} unless($key eq 'geometry');
+						$item->{'geocoder'} = ref($item->{'geocoder'});	# It's an object, not the name
+						if(!$self->{'debug'}) {
+							while(my($k, $v) = each %{$item}) {
+								delete $item->{$k} unless($k eq 'geometry');
+							}
 						}
 						if(!defined($item->{geometry}{location}{lat})) {
 							if(defined($item->{geometry})) {
@@ -634,9 +660,11 @@ sub _cache {
 					$duration = '1 month';
 				}
 			} elsif(ref($value) eq 'HASH') {
-				# foreach my $key(keys(%{$value})) {
-				while(my($key, $value) = each %{$value}) {
-					delete $value->{$key} unless ($key eq 'geometry');
+				$value->{'geocoder'} = ref($value->{'geocoder'});	# It's an object, not the name
+				if(!$self->{'debug'}) {
+					while(my($k, $v) = each %{$value}) {
+						delete $value->{$k} unless ($k eq 'geometry');
+					}
 				}
 				if(defined($value->{geometry}{location}{lat})) {
 					$duration = '1 month';	# It won't move :-)
@@ -653,22 +681,27 @@ sub _cache {
 			} else {
 				$duration = '1 month';
 			}
-			$self->{'cache'}->set($key, $value, '1 month');
+			print Data::Dumper->new([$value])->Dump() if($self->{'debug'});
+			$self->{'cache'}->set($key, $value, $duration);
 		}
-		return $value;
+		return $rc;
 	}
 
 	# Retrieve from the cache
-	if(my $rc = $locations{$key}) {
-		return $rc;
+	my $rc = $locations{$key};	# In the L1 cache?
+	if((!defined($rc)) && $self->{'cache'}) {	# In the L2 cache?
+		$rc = $self->{'cache'}->get($key);
 	}
-	if($self->{'cache'}) {
-		my $rc = $self->{'cache'}->get($key);
-		if((ref($rc) eq 'HASH') && !defined($rc->{geometry}{location}{lat})) {
-			return;
+	if(defined($rc)) {
+		if(ref($rc) eq 'HASH') {	# else - it will be an array of hashes
+			if(!defined($rc->{geometry}{location}{lat})) {
+				return;
+			}
+			$rc->{'lat'} //= $rc->{geometry}{location}{lat};
+			$rc->{'lng'} //= $rc->{geometry}{location}{lng};
 		}
-		return $rc;
 	}
+	return $rc;
 }
 
 =head1 AUTHOR
@@ -718,7 +751,7 @@ L<https://metacpan.org/release/Geo-Coder-List>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016-2020 Nigel Horne.
+Copyright 2016-2022 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

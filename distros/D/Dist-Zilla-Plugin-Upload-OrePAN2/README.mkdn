@@ -1,0 +1,62 @@
+# NAME
+
+Dist::Zilla::Plugin::Upload::OrePAN2 - Dist::Zilla release plugin to inject into a local OrePAN2 repository
+
+# VERSION
+
+version 0.0001
+
+# SYNOPSIS
+
+    [Upload::OrePAN2]
+    directory = /home/geekruthie/path/to/my/orepan2     # mandatory; must be absolute!
+    username = GEEKRUTH                                 # default: DUMMY
+
+# DESCRIPTION
+
+This [Dist::Zilla](https://metacpan.org/pod/Dist%3A%3AZilla) plugin lets you inject a completed release into an [OrePAN2](https://metacpan.org/pod/OrePAN2) repository.
+
+# ATTRIBUTES
+
+- `clobber`
+
+    If this attribute is set to true, it will allow the releaser to overwrite the file if it already
+    exists. The default is false.
+
+- `directory`
+
+    This mandatory attribute must be the absolute path to your OrePAN2 repository.
+
+- `username`
+
+    Use this attribute to set the CPAN-like username that is used in the OrePAN2 repository. It is
+    optional; the default is `DUMMY`, which, while it may or may not be descriptive, might also be
+    good enough for a small, private OrePAN2 repo.
+
+# DIAGNOSTICS
+
+If the file already exists and `clobber` is not set to true, or if the file cannot properly be
+injected into the repository, the release will halt at that point.
+
+# BUGS AND LIMITATIONS
+
+I'm not at all certain what this will do if you're on Windows; I don't have a Windows machine handy
+to test on, so if someone would let me know, that'd be great. I'd like to enhance this later to
+install to an [OrePAN2::Server](https://metacpan.org/pod/OrePAN2%3A%3AServer) instance using POST requests, but it cannot do that...yet.
+
+# SEE ALSO
+
+- [Dist::Zilla](https://metacpan.org/pod/Dist%3A%3AZilla)
+- [OrePAN2](https://metacpan.org/pod/OrePAN2)
+- [OrePAN2::Server](https://metacpan.org/pod/OrePAN2%3A%3AServer)
+
+# AUTHOR
+
+D Ruth Holloway <ruth@hiruthie.me>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022 by D Ruth Holloway.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

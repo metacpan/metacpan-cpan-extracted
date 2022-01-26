@@ -1,3 +1,9 @@
+0.010  2022-01-21 20:27:52 CET
+   - Fix typo bugs
+   - Small fix in example
+   - Added example of to-do program split into multiple files (mudu)
+   - Added tutorials and more docs
+
 0.008  2021-12-17 18:35:03 CET
    - Release after 112 PASSes on CPAN Testers (thanks!)
 

@@ -1,13 +1,16 @@
 package Perinci::CmdLine::Dump;
 
-our $DATE = '2018-11-22'; # DATE
-our $VERSION = '0.120'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
 use Exporter qw(import);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-01-16'; # DATE
+our $DIST = 'Perinci-CmdLine-Dump'; # DIST
+our $VERSION = '0.121'; # VERSION
+
 our @EXPORT_OK = qw(
                        dump_pericmd_script
                        dump_perinci_cmdline_script
@@ -124,7 +127,7 @@ sub dump_pericmd_script {
         sub {
             my $meth = $args{method} // 'self-dump';
             if ($meth eq 'self-dump') {
-                local $ENV{PERINCI_CMDLINE_DUMP} = $tag;
+                local $ENV{PERINCI_CMDLINE_DUMP_OBJECT} = $tag;
                 system $^X, (map {"-I$_"} @$libs), $filename;
             } else {
                 my @cmd = (
@@ -139,7 +142,7 @@ sub dump_pericmd_script {
 
     my $cli;
     if ($stdout =~ /^# BEGIN DUMP $tag\s+(.*)^# END DUMP $tag/ms) {
-        $cli = eval $1;
+        $cli = eval $1; ## no critic: BuiltinFunctions::ProhibitStringyEval
         if ($@) {
             return [500, "Script '$filename' detected as using ".
                         "Perinci::CmdLine, but error in eval-ing captured ".
@@ -172,7 +175,8 @@ sub dump_pericmd_script {
                     local $ENV{PERINCI_CMDLINE_DUMP} = $tag;
                     do $filename;
                 } else {
-                    eval q{
+                    eval ## no critic: BuiltinFunctions::ProhibitStringyEval
+                        q{
 package main;
 use Perinci::CmdLine::Base::Patch::DumpAndExit -tag=>'$tag',-exit_method=>'die';
 do "$filename";
@@ -188,7 +192,7 @@ do "$filename";
 }
 
 {
-    no strict 'refs';
+    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
     no warnings 'once';
     # old name, deprecated
     *dump_perinci_cmdline_script = \&dump_pericmd_script;
@@ -209,7 +213,7 @@ Perinci::CmdLine::Dump - Run a Perinci::CmdLine-based script but only to dump th
 
 =head1 VERSION
 
-This document describes version 0.120 of Perinci::CmdLine::Dump (from Perl distribution Perinci-CmdLine-Dump), released on 2018-11-22.
+This document describes version 0.121 of Perinci::CmdLine::Dump (from Perl distribution Perinci-CmdLine-Dump), released on 2022-01-16.
 
 =for Pod::Coverage ^(dump_perinci_cmdline_script)$
 
@@ -220,7 +224,7 @@ This document describes version 0.120 of Perinci::CmdLine::Dump (from Perl distr
 
 Usage:
 
- dump_pericmd_script(%args) -> [status, msg, payload, meta]
+ dump_pericmd_script(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Run a Perinci::CmdLine-based script but only to dump the object.
 
@@ -271,16 +275,17 @@ The default is to use C<self-dump>, but C<patch> for /main/.
 
 =item * B<skip_detect> => I<bool>
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -292,6 +297,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Cm
 
 Source repository is at L<https://github.com/perlancar/perl-Perinci-CmdLine-Dump>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Dump>
@@ -299,16 +332,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

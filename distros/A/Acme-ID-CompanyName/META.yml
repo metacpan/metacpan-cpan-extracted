@@ -26,7 +26,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-ID-CompanyName
   homepage: https://metacpan.org/release/Acme-ID-CompanyName
   repository: git://github.com/perlancar/perl-Acme-ID-CompanyName.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

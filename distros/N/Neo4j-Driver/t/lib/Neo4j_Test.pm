@@ -7,6 +7,9 @@ use Neo4j::Driver;
 use Neo4j_Test::Sim;
 
 
+our $user = $ENV{TEST_NEO4J_USERNAME} // 'neo4j';
+our $pass = $ENV{TEST_NEO4J_PASSWORD} // '';
+our $server = $ENV{TEST_NEO4J_SERVER} // '';
 our $error = '';
 
 # may be used for conditional testing
@@ -20,12 +23,10 @@ sub driver_maybe {
 	my $driver;
 	eval {
 		# a default URI (localhost) is built into the driver
-		$driver = Neo4j::Driver->new( $ENV{TEST_NEO4J_SERVER} );
+		$driver = Neo4j::Driver->new( $server );
 	};
 	return unless $driver;
 	
-	my $user = $ENV{TEST_NEO4J_USERNAME} // 'neo4j';
-	my $pass = $ENV{TEST_NEO4J_PASSWORD} // '';
 	$driver->basic_auth($user, $pass);
 	$driver->config(timeout => 2);  # 2 seconds timeout may speed up testing
 	$driver->config(cypher_params => v2);

@@ -1,0 +1,51 @@
+NAME
+    ArrayDataRole::BinarySearch::LinesInHandle - Provide has_item() that
+    uses binary search
+
+VERSION
+    This document describes version 0.002 of
+    ArrayDataRole::BinarySearch::LinesInHandle (from Perl distribution
+    ArrayDataRole-BinarySearch-LinesInHandle), released on 2021-05-07.
+
+SYNOPSIS
+    For example, to use with classes that use ArrayDataRole::Spec::Basic and
+    support "apply_roles()":
+
+     my $obj = ArrayData::Word::ID::KBBI->new;
+     $obj->has_item('kuda'); # uses linear search by iterating
+
+     $obj = ArrayData::Word::ID::KBBI->new->apply_roles('BinarySearch::LinesInHandle');
+     $obj->has_item('kuda'); # now uses binary search
+
+DESCRIPTION
+    This is an alias for Role::TinyCommons::BinarySearch::LinesInHandle.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/ArrayDataRole-BinarySearch-LinesInHandle>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-ArrayDataRole-BinarySearch-LinesInHan
+    dle>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-ArrayDataRole-BinarySearch-LinesInHan
+    dle/issues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Role::TinyCommons::BinarySearch::LinesInHandle
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

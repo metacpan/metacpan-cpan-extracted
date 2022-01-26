@@ -5,6 +5,20 @@
 
 REVISION HISTORY - Set::Object
 
+=head1 1.42, 2022-01-21
+
+=over
+
+=item *
+
+Fix C<%h={}> warning, by Pauwel Coppieters
+
+=item *
+
+add F<examples/slow-sort.pl>. see RT #90070
+
+=back
+
 =head1 1.41, 2021-01-17
 
 =over

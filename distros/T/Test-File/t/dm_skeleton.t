@@ -35,7 +35,7 @@ subtest fake_non_multi_user_missing_file => sub {
 
 	test_out( "not ok 1" );
 	test_diag(
-		"File [$not_there] does not exist!\n" .
+		"file [$not_there] does not exist\n" .
 		"    #   Failed test at $0 line " . line_num(+4) . "."
 		);
 	Test::File::_dm_skeleton( $not_there );
@@ -49,7 +49,7 @@ subtest fake_non_multi_user_empty => sub {
 
 	test_out( "not ok 1" );
 	test_diag(
-		"File name not specified!\n" .
+		"file name not specified\n" .
 		"    #   Failed test at $0 line " . line_num(+4) . "."
 		);
 	Test::File::_dm_skeleton();

@@ -1,5 +1,10 @@
 Revision history for FCGI-Buffer
 
+0.17	Thu Jan 20 11:00:19 EST 2022
+	save_to: support '/' in an argument
+	Fix where ETags were not being added with HTTP/2.0
+	Fix installation as root
+
 0.16	Wed Jun  2 09:05:38 EDT 2021
 	Try harder to mkdir the save_to directory
 	Fixed handling when save_to->ttl is not given

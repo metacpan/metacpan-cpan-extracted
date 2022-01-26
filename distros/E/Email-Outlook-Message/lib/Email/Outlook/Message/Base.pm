@@ -43,7 +43,7 @@ use POSIX;
 use Carp;
 use OLE::Storage_Lite;
 use vars qw($VERSION);
-$VERSION = "0.920";
+$VERSION = "0.921";
 
 my $DIR_TYPE = 1;
 my $FILE_TYPE = 2;
@@ -391,6 +391,7 @@ sub _use_property {
   my ($self, $key, $property) = @_;
   my ($encoding, $data) = @{$self->get_mapi_property($property)};
   $self->{$key} = $self->_decode_mapi_property($encoding, $data);
+  $self->{"${key}_ENCODING"} = $encoding;
 
   $self->{VERBOSE}
     and $self->_log_property("Using   ", $property, $key);

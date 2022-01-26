@@ -10,7 +10,7 @@ use Expect;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-09-13'; # DATE
 our $DIST = 'App-SQLiteUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 our %SPEC;
 
@@ -115,6 +115,13 @@ number, `t` prefix will be added. If table already exists, a suffix of `_2`,
     ./2.csv               t2
     report 2021.csv       report_2021
     report 2021.rev1.csv  report_2021
+
+Note that the **sqlite3** CLI client can be used non-interactively as well. You
+can pipe the commands to its stdin, e.g.:
+
+    % echo -e ".mode csv\n.import /PATH/TO/FILE.CSV TABLENAME" | sqlite3 DB_FILE
+
+But this utility gives you convenience of picking a table name automatically.
 
 _
     args => {
@@ -289,7 +296,7 @@ App::SQLiteUtils - Utilities related to SQLite
 
 =head1 VERSION
 
-This document describes version 0.004 of App::SQLiteUtils (from Perl distribution App-SQLiteUtils), released on 2021-09-13.
+This document describes version 0.005 of App::SQLiteUtils (from Perl distribution App-SQLiteUtils), released on 2021-09-13.
 
 =head1 DESCRIPTION
 
@@ -342,6 +349,13 @@ C<_3>, and so on will be added. Some examples:
  ./2.csv               t2
  report 2021.csv       report_2021
  report 2021.rev1.csv  report_2021
+
+Note that the B<sqlite3> CLI client can be used non-interactively as well. You
+can pipe the commands to its stdin, e.g.:
+
+ % echo -e ".mode csv\n.import /PATH/TO/FILE.CSV TABLENAME" | sqlite3 DB_FILE
+
+But this utility gives you convenience of picking a table name automatically.
 
 This function is not exported.
 

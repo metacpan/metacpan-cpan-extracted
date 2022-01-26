@@ -47,6 +47,9 @@ my @simple = (
 );
 
 my @combined = (
+    { '4th thursday'                   => '21.12.2006 00:00:00'     },
+    { '4th friday'                     => '24.11.2006 00:00:00'     },
+    { '4th saturday'                   => '25.11.2006 00:00:00'     },
     { '4th february'                   => '04.02.2007 00:00:00'     },
     { 'november 3rd'                   => '03.11.2007 00:00:00'     },
     { 'sunday {at} 11:00{sec}'         => '26.11.2006 11:00:{sec}'  },
@@ -74,7 +77,7 @@ my @formatted = (
     { '12/24' => '24.12.2006 00:00:00' },
 );
 
-_run_tests(172, [ [ \@simple ], [ \@combined ], [ \@formatted ] ], \&compare);
+_run_tests(175, [ [ \@simple ], [ \@combined ], [ \@formatted ] ], \&compare);
 
 sub compare
 {

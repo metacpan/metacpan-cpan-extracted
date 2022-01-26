@@ -79,6 +79,12 @@ like( warnings {
 
    ok( defined $future->elapsed, '$future has ->elapsed time' );
    ok( $future->elapsed >= 0, '$future elapsed time >= 0' );
+
+   my $imm = Future->done;
+
+   ok( defined $imm->rtime, 'Immediate future has rtime' );
+   ok( defined $imm->elapsed, 'Immediate future has ->elapsed time' );
+   ok( $imm->elapsed >= 0, 'Immediate future elapsed time >= 0' );
 }
 
 done_testing;

@@ -1,7 +1,7 @@
 package App::ModuleVersionDiffUtils;
 
-our $DATE = '2018-04-26'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2021-05-25'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -186,7 +186,7 @@ App::ModuleVersionDiffUtils - Utilities to diff stuffs from two different versio
 
 =head1 VERSION
 
-This document describes version 0.001 of App::ModuleVersionDiffUtils (from Perl distribution App-ModuleVersionDiffUtils), released on 2018-04-26.
+This document describes version 0.003 of App::ModuleVersionDiffUtils (from Perl distribution App-ModuleVersionDiffUtils), released on 2021-05-25.
 
 =head1 DESCRIPTION
 
@@ -205,7 +205,7 @@ This distributions provides the following command-line utilities:
 
 Usage:
 
- diff_two_module_version_hash(%args) -> [status, msg, result, meta]
+ diff_two_module_version_hash(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Examples:
 
@@ -239,15 +239,16 @@ Module will be searched in the C<@INC> (you can specify C<-I> to add more
 directories to search). There needs to be at least two locations of the module.
 Otherwise, the application will croak.
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
+($reason) is a string containing error message, or "OK" if status is
+200. Third element ($payload) is optional, the actual result. Fourth
+element (%result_meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
@@ -276,7 +277,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

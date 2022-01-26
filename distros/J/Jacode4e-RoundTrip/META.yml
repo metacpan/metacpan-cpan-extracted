@@ -3,7 +3,7 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: Jacode4e-RoundTrip
-version: 2.13.81.11
+version: 2.13.81.12
 abstract: Jacode4e for round-trip conversion in JIS X 0213
 author:
   - ina <ina@cpan.org>
@@ -17,8 +17,9 @@ requires:
   FindBin: 1.42
   Socket: 0
   lib: 0
-  perl: 5.005_03
+  perl: 5.00503
   strict: 1.01
+  vars: 0
 build_requires:
   Test: 1.122
 resources:

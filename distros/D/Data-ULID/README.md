@@ -147,3 +147,7 @@ same terms as Perl itself.
     0.4   - Bugfix: 'Invalid argument supplied to Math::GMPz::overload_mod' for
             older versions of Math::GMPz on Windows and FreeBSD. Podfix.
     1.0.0 - UUID conversion support; semantic versioning.
+    1.1.0 - Speedups courtesy of Bartosz Jarzyna (brtastic on CPAN, bbrtj on
+            Github). Use Crypt::PRNG for random number generation.
+    1.1.1 - Fix module version number.
+    1.1.2 - Fix POD (version history).

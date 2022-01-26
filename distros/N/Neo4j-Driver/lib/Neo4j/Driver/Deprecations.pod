@@ -13,7 +13,7 @@ Neo4j::Driver::Deprecations - Explains features that have been deprecated, but n
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 OVERVIEW
 
@@ -27,7 +27,7 @@ alternatives where possible.
 The intention is that most deprecated features will be removed with
 the next major update to L<Neo4j::Driver>. There is no schedule for
 the release of that update S<(version 1.00),> but there is a decent
-chance that it will happen in the year 2021.
+chance that it will happen in the year 2022.
 
 =head1 Neo4j::Driver
 
@@ -41,6 +41,23 @@ Originally added in 0.02 as an experimental feature.>
 All resources opened by the Perl driver are closed automatically once
 they are no longer required. Explicit calls to C<close()> are neither
 required nor useful.
+
+=head2 Config option C<ca_file>
+
+I<Deprecated in version 0.15 and to be removed in 1.00.
+Originally added in 0.13 as an experimental feature.>
+
+ $driver->config(ca_file => 'neo4j/certificates/neo4j.cert');
+
+Specifies the location of a local copy of the server certificate
+for the then-experimental HTTPS self-signed certificate support.
+The driver config option C<ca_file> corresponded to C<SSL_ca_file>
+in L<LWP::UserAgent> and L<IO::Socket::SSL>.
+
+This option was renamed C<tls_ca> in S<version 0.15> to be more
+consistent with the C<tls> option, then later renamed C<trust_ca>
+in S<version 0.27> to be more consistent with the Neo4j Driver API.
+See L<Neo4j::Driver/"trust_ca">.
 
 =head2 Mutable auth credentials
 
@@ -438,6 +455,62 @@ If you need this feature, you should consider using the
 private C<_run_multiple()> method instead; see
 L<Neo4j::Driver::Transaction/"Execute multiple statements at once">.
 
+=head2 Disable obtaining query statistics
+
+I<Deprecated in version 0.28 and now an internal API.
+Originally added in 0.02 / 0.13 as an experimental feature.>
+
+ $transaction = $session->begin_transaction;
+ $transaction->{return_stats} = 0;
+ $result = $transaction->run('...');
+
+The experimental C<{return_stats}> feature for requesting query
+statistics from the Neo4j server was first added to the driver
+in S<version 0.02.> Starting with version 0.13, stats are enabled
+by default. When using HTTP, this feature allowed disabling them.
+Doing so might provide a very minor performance increase.
+
+As of version 0.28, allowing stats to be disabled is considered
+to be a failed experiment. The performance impact is too minor
+to matter; on the other hand, the advantages of a common API
+between Bolt and HTTP connections are very clear. The driver
+currently uses C<{return_stats} = 0> internally, so this feature
+will likely not be removed soon, but going forward, it will be
+treated as an internal API. There will be no deprecation warning.
+See L<Neo4j::Driver::Net/"USE OF INTERNAL APIS">.
+
+To disable query stats in future, use a custom networking module
+to modify C<includeStats> in the server request.
+
+=head2 Return results in graph format
+
+I<Deprecated in version 0.28 and to be removed in 1.00.
+Originally added in 0.01 as an experimental feature.>
+
+ $session = $driver->config( jolt => 0 )->session;
+ $transaction = $session->begin_transaction;
+ $transaction->{return_graph} = 1;
+ $records = $transaction->run('...')->list;
+ for $record ( @$records ) {
+   $graph_data = $record->{graph};
+   ...
+ }
+
+The Neo4j HTTP JSON API supports a
+L<"graph" results data format|https://neo4j.com/docs/http-api/4.4/actions/return-results-in-graph-format/>.
+This feature is only available when Jolt is disabled, which is
+not recommended.
+
+To request graph format in future, use a custom networking module
+to disable Jolt and modify the C<resultDataContents> in the server
+request. Note that C<< $record->{graph} >> is an internal API that
+may or may not be available in future versions.
+See L<Neo4j::Driver::Net/"USE OF INTERNAL APIS">.
+
+If there is demand for the graph format, equivalent functionality
+might be added to a future version of the driver itself.
+This would then also be available for Bolt and Jolt connections.
+
 =head1 Neo4j::Driver::Type::Node, Neo4j::Driver::Type::Relationship
 
 =head2 Deletion indicator
@@ -493,9 +566,6 @@ plural, implying the return of a list. This was inconsistent.
 Additionally, the C<path()> method led to awkward expressions such
 as C<< $path->path >>, which are needlessly difficult to comprehend.
 
-This experimental feature was added in version 0.13 and
-deprecated in 0.18. It will be removed in 1.00.
-
 Use L<C<elements()>|Neo4j::Types::Path/"elements"> instead.
 
  $array = [ $path->elements ];
@@ -506,7 +576,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2021 by Arne Johannessen.
+This software is Copyright (c) 2016-2022 by Arne Johannessen.
 
 This is free software, licensed under:
 

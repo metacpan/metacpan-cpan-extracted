@@ -1,7 +1,7 @@
 {
    "abstract" : "Input validator implementation centered around Type::Tiny",
    "author" : [
-      "Bartosz Jarzyna <brtastic@gmail.com>"
+      "Bartosz Jarzyna <bbrtj.pro@gmail.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
@@ -48,18 +48,18 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/brtastic/perl-form-tiny/issues"
+         "web" : "https://github.com/bbrtj/perl-form-tiny/issues"
       },
-      "homepage" : "https://brtastic.xyz/project/form-tiny",
+      "homepage" : "https://bbrtj.eu/project/form-tiny",
       "license" : [
          "https://dev.perl.org/licenses"
       ],
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/brtastic/perl-form-tiny.git",
-         "web" : "https://github.com/brtastic/perl-form-tiny"
+         "url" : "https://github.com/bbrtj/perl-form-tiny.git",
+         "web" : "https://github.com/bbrtj/perl-form-tiny"
       }
    },
-   "version" : "2.03",
+   "version" : "2.04",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

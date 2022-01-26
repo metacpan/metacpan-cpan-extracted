@@ -22,9 +22,11 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Device::Chip::Adapter" => 0,
-    "Device::SMBus" => 0,
+    "Fcntl" => 0,
+    "IO::File" => 0,
     "XSLoader" => 0,
     "base" => 0,
+    "constant" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -33,7 +35,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.00005",
+  "VERSION" => "0.00006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,12 +49,14 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "Device::Chip::Adapter" => 0,
-  "Device::SMBus" => 0,
   "ExtUtils::MakeMaker" => 0,
+  "Fcntl" => 0,
   "File::Spec" => 0,
+  "IO::File" => 0,
   "Test::More" => 0,
   "XSLoader" => 0,
   "base" => 0,
+  "constant" => 0,
   "strict" => 0,
   "warnings" => 0
 );

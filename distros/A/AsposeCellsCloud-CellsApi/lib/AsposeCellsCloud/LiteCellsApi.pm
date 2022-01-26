@@ -43,7 +43,7 @@ __PACKAGE__->mk_classdata('method_documentation' => {});
 sub new {
     my $class = shift;
     my $api_client;
-
+    warnings::warnif("deprecated", "open is deprecated, use LightCellsApi instead");
     if ($_[0] && ref $_[0] && ref $_[0] eq 'AsposeCellsCloud::ApiClient' ) {
         $api_client = $_[0];
     } else {

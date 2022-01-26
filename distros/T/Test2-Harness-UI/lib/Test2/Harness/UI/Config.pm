@@ -2,7 +2,7 @@ package Test2::Harness::UI::Config;
 use strict;
 use warnings;
 
-our $VERSION = '0.000101';
+our $VERSION = '0.000104';
 
 use Test2::Util qw/get_tid pkg_to_file/;
 
@@ -40,6 +40,11 @@ sub guess_db_driver {
     return 'MySQL' if $self->{+DBI_DSN} =~ m/(mysql|maria|percona)/i;
     return 'PostgreSQL' if $self->{+DBI_DSN} =~ m/(pg|postgre)/i;
     return 'PostgreSQL'; # Default
+}
+
+sub db_driver {
+    my $self = shift;
+    return $ENV{YATH_UI_SCHEMA} //= $self->guess_db_driver;
 }
 
 sub schema {

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Net::HTTP;
 # ABSTRACT: Networking delegate for Neo4j HTTP
-$Neo4j::Driver::Net::HTTP::VERSION = '0.27';
+$Neo4j::Driver::Net::HTTP::VERSION = '0.28';
 
 # This package is not part of the public Neo4j::Driver API.
 
@@ -41,6 +41,7 @@ sub new {
 	my $self = bless {
 		die_on_error => $driver->{die_on_error},
 		cypher_types => $driver->{cypher_types},
+		server_info => $driver->{server_info},
 		http_agent => $net_module->new($driver),
 		want_jolt => $driver->{jolt},
 		active_tx => {},
@@ -54,8 +55,6 @@ sub new {
 # transaction endpoint templates.
 sub _server {
 	my ($self) = @_;
-	
-	return $self->{server_info} if exists $self->{server_info};
 	
 	my ($neo4j_version, $tx_endpoint);
 	my @discovery_queue = ($DISCOVERY_ENDPOINT);
@@ -84,12 +83,8 @@ sub _server {
 		version => "Neo4j/$neo4j_version",
 		protocol_string => $self->{http_agent}->can('protocol') ? $self->{http_agent}->protocol : undef,
 		time_diff => Time::Piece->new - $date,
+		tx_endpoint => $tx_endpoint,
 	});
-	
-	$self->{endpoints} = {
-		new_transaction => "$tx_endpoint",
-		new_commit => "$tx_endpoint/$COMMIT_ENDPOINT",
-	} if $tx_endpoint;
 	
 	return $self->{server_info};
 }
@@ -98,6 +93,12 @@ sub _server {
 # Update requested database name based on transaction endpoint templates.
 sub _set_database {
 	my ($self, $database) = @_;
+	
+	my $tx_endpoint = $self->{server_info}->{tx_endpoint};
+	$self->{endpoints} = {
+		new_transaction => "$tx_endpoint",
+		new_commit => "$tx_endpoint/$COMMIT_ENDPOINT",
+	} if $tx_endpoint;
 	
 	return unless defined $database;
 	$database = URI::Escape::uri_escape_utf8 $database;

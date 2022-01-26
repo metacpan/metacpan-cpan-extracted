@@ -12,9 +12,55 @@ use SPVM::Builder::CC;
 # because SPVM::Builder XS method is loaded when SPVM is loaded
 use SPVM();
 
-# Accessors
-sub build_dir { shift->{build_dir} }
-sub module_dirs { shift->{module_dirs} }
+sub build {
+  my ($self, $class_name, $file, $line) = @_;
+  
+  # Add class informations
+  if (defined $class_name) {
+
+    # Compile SPVM source code and create runtime env
+    my $compile_success = $self->compile_spvm($class_name, $file, $line);
+    
+    unless ($compile_success) {
+      return 0;
+    }
+    
+    my $added_class_names = $self->get_added_class_names;
+    for my $added_class_name (@$added_class_names) {
+      
+      # Build Precompile classs - Compile C source codes and link them to SPVM precompile method
+      $self->build_and_bind_shared_lib($added_class_name, 'precompile');
+
+      # Build native classs - Compile C source codes and link them to SPVM native method
+      $self->build_and_bind_shared_lib($added_class_name, 'native');
+    }
+  }
+  
+  return 1;
+}
+
+# Fields
+sub module_dirs {
+  my $self = shift;
+  if (@_) {
+    $self->{module_dirs} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{module_dirs};
+  }
+}
+
+sub build_dir {
+  my $self = shift;
+  if (@_) {
+    $self->{build_dir} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{build_dir};
+  }
+}
 
 sub new {
   my $class = shift;

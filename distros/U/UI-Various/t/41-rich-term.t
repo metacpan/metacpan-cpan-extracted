@@ -38,7 +38,7 @@ BEGIN {
     chomp $tty;
     -c $tty  and  -w $tty
 	or  plan skip_all => 'required TTY (' . $tty . ') not available';
-    plan tests => 35;
+    plan tests => 41;
 
     # define fixed environment for unit tests:
     delete $ENV{DISPLAY};
@@ -97,6 +97,8 @@ ok(m/^Term::ReadLine::Gnu: \d{2,}x\d{2,}/,
 ####################################
 # test standard behaviour - elements:
 
+my %D = %UI::Various::RichTerm::base::D; # simple short-cut
+
 my $main = UI::Various::Main->new();
 is(ref($main), 'UI::Various::RichTerm::Main',
    '$main is UI::Various::RichTerm::Main');
@@ -105,52 +107,52 @@ my $text1 = UI::Various::Text->new(text => 'Hello World!', height => 3);
 is(ref($text1), 'UI::Various::RichTerm::Text',
    'type UI::Various::RichTerm::Text is correct');
 my ($w, $h) = $text1->_prepare(10);
-is($w, 6, 'UI::Various::RichTerm::Text::_prepare returns correct width');
-is($h, 3, 'UI::Various::RichTerm::Text::_prepare returns correct height');
+is($w, 6, '_prepare returns correct width');
+is($h, 3, '_prepare returns correct height');
 $_ = $text1->_show('=> ', $w, $h);
 is($_,
    #___123456  ___123456  ___123456
    "=> Hello \n   World!\n         ",
-   'UI::Various::RichTerm::Text::_show (6,3) returns correct output');
+   '_show (6,3) returns correct output');
 $_ = $text1->_show('   ', 12, 2);
 is($_,
    #___123456789012  ___123456789012
    "   Hello World!\n               ",
-   'UI::Various::RichTerm::Text::_show (12,2) returns correct output');
+   '_show (12,2) returns correct output');
 
 $_ = UI::Various::Text->new(text => '1234567 123'); # long / short
 ($w, $h) = $_->_prepare(10);
-is($w, 7, 'UI::Various::RichTerm::Text::_prepare L/S returns correct width');
-is($h, 2, 'UI::Various::RichTerm::Text::_prepare L/S returns correct height');
+is($w, 7, '_prepare L/S returns correct width');
+is($h, 2, '_prepare L/S returns correct height');
 $_ = $_->_show('', $w, $h);
 is($_, "1234567\n123    ",
-   'UI::Various::RichTerm::Text::_show (7,2) returns correct output');
+   '_show (7,2) returns correct output');
 
 my $button1 = UI::Various::Button->new(text => 'OK', height => 2,
 				      code => sub { print "OK!\n"; });
 is(ref($button1), 'UI::Various::RichTerm::Button',
    'type UI::Various::RichTerm::Button is correct');
 ($w, $h) = $button1->_prepare(10);
-is($w, 4, 'UI::Various::RichTerm::Button::_prepare returns correct width');
-is($h, 2, 'UI::Various::RichTerm::Button::_prepare returns correct height');
+is($w, 4, '_prepare returns correct width');
+is($h, 2, '_prepare returns correct height');
 $_ = $button1->_show('<1> ', $w, $h);
 is($_,
    #____1234  ____1234
    "<1> [OK]\n        ",
-   'UI::Various::RichTerm::Button::_show returns correct output');
+   '_show returns correct output');
 
 my $var = 'initial value';
 my $input = UI::Various::Input->new(textvar => \$var,);
 is(ref($input), 'UI::Various::RichTerm::Input',
    'type UI::Various::RichTerm::Input is correct');
 ($w, $h) = $input->_prepare(10);
-is($w, 7, 'UI::Various::RichTerm::Input::_prepare returns correct width');
-is($h, 2, 'UI::Various::RichTerm::Input::_prepare returns correct height');
+is($w, 7, '_prepare returns correct width');
+is($h, 2, '_prepare returns correct height');
 $_ = $input->_show('<1> ', $w, $h);
 is($_,
    #____1234  ____1234
-   "<1> initial\n    value  ",
-   'UI::Various::RichTerm::Input::_show returns correct output');
+   "<1> $D{UL1}initial$D{UL0}\n    $D{UL1}value$D{UL0}  ",
+   '_show returns correct output');
 $main->add($input);
 stdout_is
 {   _call_with_stdin("something new\n", sub { $input->_process(); });   }
@@ -158,6 +160,33 @@ stdout_is
     '_process prints correct test';
 is($var, 'something new', 'input variable has correct new value');
 $main->remove($input);
+
+$var = 0;
+my $check = UI::Various::Check->new(text => 'on or off', var => \$var);
+is(ref($check), 'UI::Various::RichTerm::Check',
+   'type UI::Various::RichTerm::Check is correct');
+($w, $h) = $check->_prepare(8);
+is($w, 5, '_prepare returns correct width');
+is($h, 2, '_prepare returns correct height');
+$_ = $check->_show('<1> ', $w, $h);
+is($_,
+   #________12345  ________12345
+   "<1> [ ] on or\n        off  ",
+   '_show returns correct output');
+$main->add($check);
+$check->_process();
+$_ = $check->_show('<1> ', $w, $h);
+is($_,
+   #________12345  ________12345
+   "<1> [X] on or\n        off  ",
+   '_process inverts variable correctly to 1');
+$check->_process();
+$_ = $check->_show('<1> ', $w, $h);
+is($_,
+   #________12345  ________12345
+   "<1> [ ] on or\n        off  ",
+   '_process inverts variable correctly back to 0');
+$main->remove($check);
 
 ####################################
 # test standard behaviour - window:
@@ -170,14 +199,14 @@ stdout_is(sub {   $win1->_show();   },
 	  '#= hello ==#'."\n".'"    Hello "'."\n".'"    World!"'."\n".
 	  '"          "'."\n".'"<1> [OK]  "'."\n".'"          "'."\n".
 	  '#==========#'."\n",
-	  'UI::Various::RichTerm::Window::_show 1 prints correct text');
+	  '_show 1 prints correct text');
 $win1->width(14);
 stdout_is(sub {   $win1->_show();   },
 	  #_____12345678_        _____12345678_        _____12345678_
 	  '#= hello =<0>#'."\n".'"    Hello   "'."\n".'"    World!  "'."\n".
 	  '"            "'."\n".'"<1> [OK]    "'."\n".'"            "'."\n".
 	  '#============#'."\n",
-	  'UI::Various::RichTerm::Window::_show 2 prints correct text');
+	  '_show 2 prints correct text');
 $win1->width(18);
 stdout_is(sub {   $win1->_show();   },
 	  #_____123456789012_        _____123456789012_
@@ -185,14 +214,14 @@ stdout_is(sub {   $win1->_show();   },
 	  '"                "'."\n".'"                "'."\n".
 	  '"<1> [OK]        "'."\n".'"                "'."\n".
 	  '#================#'."\n",
-	  'UI::Various::RichTerm::Window::_show 3 prints correct text');
+	  '_show 3 prints correct text');
 $win1->width(11);
 stdout_is(sub {   $win1->_show();   },
 	  #_____12345_        _____12345_        _____12345_v- too long
 	  '#= hello =#'."\n".'"    Hello"'."\n".'"    World!"'."\n".
 	  '"         "'."\n".'"<1> [OK] "'."\n".'"         "'."\n".
 	  '#=========#'."\n",
-	  'UI::Various::RichTerm::Window::_show 4 prints correct (longer) text');
+	  '_show 4 prints correct (longer) text');
 
 ####################################
 # test standard behaviour - program:
@@ -215,7 +244,7 @@ my $output1 =
     '#=======<0>#'."\n".'"    Hello "'."\n".'"    World!"'."\n".
     '"<1> [OK]  "'."\n".'#==========#'."\n";
 stdout_is(sub {   $win1->_show();   }, $output1,
-	  'UI::Various::RichTerm::Window::_show 5 prints correct text');
+	  '_show 5 prints correct text');
 
 my $output2 =
     #_____123456_        _____123456_        _____123456_
@@ -231,7 +260,7 @@ my $button2 = UI::Various::Button->new(text => 'Quit', width => 4, height => 1,
 $win2 = $main->window({title => 'goodbye', width => 12},
 		      $text2, $button2);
 stdout_is(sub {   $win2->_show();   }, $output2,
-	  'UI::Various::RichTerm::Window::_show 6 prints correct text');
+	  '_show 6 prints correct text');
 
 # Remove ReadLine's escape sequences to allow exact comparison.  (Note that
 # direct testing and ./Build test use Term::ReadLine::Stub from
@@ -279,12 +308,12 @@ stdout_is
 {   $win1->_show();   }
     "#= hello #\n\"HI!     \"\n\"BYE!    \"\n" . ("\"        \"\n" x 6) .
     "#========#\n",
-    'UI::Various::RichTerm::Window::_show 7 prints correct text';
+    '_show 7 prints correct text';
 $win1->title('');
 stdout_is
 {   $win1->_show();   }
     "#====#\n\"HI! \"\n\"BYE!\"\n" . ("\"    \"\n" x 6) . "#====#\n",
-    'UI::Various::RichTerm::Window::_show 8 prints correct text';
+    '_show 8 prints correct text';
 
 $main->remove($win1);
 
@@ -301,7 +330,7 @@ stdout_is
     "\"< 4> [OK]\"\n" . "\"< 5> [OK]\"\n" . "\"< 6> [OK]\"\n" .
     "\"< 7> [OK]\"\n" . "\"< 8> [OK]\"\n" . "\"< 9> [OK]\"\n" .
     "\"<10> [OK]\"\n" . "#=========#\n",
-    'UI::Various::RichTerm::Window::_show 9 prints correct text';
+    '_show 9 prints correct text';
 
 $main->remove($win1);
 

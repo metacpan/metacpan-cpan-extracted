@@ -1,6 +1,6 @@
 Neo4j::Driver
 
-version 0.27
+version 0.28
 
 INSTALLATION
 
@@ -21,7 +21,7 @@ Should you wish to install this module manually, the procedure is
 
 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2021 by Arne Johannessen.
+This software is Copyright (c) 2016-2022 by Arne Johannessen.
 
 This is free software, licensed under:
 

@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 package Playwright::Mouse;
-$Playwright::Mouse::VERSION = '0.017';
+$Playwright::Mouse::VERSION = '0.018';
 use parent 'Playwright::Base';
 
 sub new {
@@ -62,21 +62,21 @@ sub click {
     );
 }
 
-sub move {
-    my $self = shift;
-    return $self->_api_request(
-        args    => [@_],
-        command => 'move',
-        object  => $self->{guid},
-        type    => $self->{type}
-    );
-}
-
 sub down {
     my $self = shift;
     return $self->_api_request(
         args    => [@_],
         command => 'down',
+        object  => $self->{guid},
+        type    => $self->{type}
+    );
+}
+
+sub move {
+    my $self = shift;
+    return $self->_api_request(
+        args    => [@_],
+        command => 'move',
         object  => $self->{guid},
         type    => $self->{type}
     );
@@ -126,7 +126,7 @@ Playwright::Mouse - Automatically generated class for Playwright::Mouse
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 CONSTRUCTOR
 
@@ -161,17 +161,17 @@ Execute the Mouse::click playwright routine.
 
 See L<https://playwright.dev/api/class-Mouse#Mouse-click> for more information.
 
-=head2 move(@args)
-
-Execute the Mouse::move playwright routine.
-
-See L<https://playwright.dev/api/class-Mouse#Mouse-move> for more information.
-
 =head2 down(@args)
 
 Execute the Mouse::down playwright routine.
 
 See L<https://playwright.dev/api/class-Mouse#Mouse-down> for more information.
+
+=head2 move(@args)
+
+Execute the Mouse::move playwright routine.
+
+See L<https://playwright.dev/api/class-Mouse#Mouse-move> for more information.
 
 =head2 on(@args)
 

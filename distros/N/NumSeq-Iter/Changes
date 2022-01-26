@@ -1,0 +1,29 @@
+0.005   2022-01-21  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Fix/tweak examples in Synopsis.
+
+
+0.004   2021-08-01  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc][ux] Mention more related modules (as well as an unrelated
+	  one).
+
+
+0.003   2021-07-17  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Remove file+line number information from parse error
+	  message.
+
+
+0.002   2021-07-17  Released-By: PERLANCAR; Urgency: medium
+
+	- Add function: numseq_parse().
+
+
+0.001    2021-07-17  Released-By: PERLANCAR
+
+         - First release.

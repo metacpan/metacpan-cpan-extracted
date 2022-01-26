@@ -12,6 +12,7 @@ bin/opmbuild
 cpanfile
 dist.ini
 lib/OPM/Maker.pm
+lib/OPM/Maker/Command/bashcompletion.pm
 lib/OPM/Maker/Command/build.pm
 lib/OPM/Maker/Command/dbtest.pm
 lib/OPM/Maker/Command/dependencies.pm

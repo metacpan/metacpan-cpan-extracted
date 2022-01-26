@@ -22,13 +22,13 @@ name: Overload-FileCheck
 provides:
   Overload::FileCheck:
     file: lib/Overload/FileCheck.pm
-    version: '0.011'
+    version: '0.012'
 requires:
   perl: '5.010'
 resources:
   bugtracker: https://github.com/CpanelInc/Overload-FileCheck/issues
   repository: https://github.com/CpanelInc/Overload-FileCheck.git
-version: '0.011'
+version: '0.012'
 x_Dist_Zilla:
   perl:
     version: '5.032000'
@@ -279,7 +279,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.011
+          tag: v0.012
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

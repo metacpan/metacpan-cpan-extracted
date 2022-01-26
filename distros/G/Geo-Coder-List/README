@@ -1,4 +1,4 @@
-Geo-Coder-List Version 0.27
+Geo-Coder-List Version 0.29
 
 INSTALLATION
 
@@ -27,9 +27,8 @@ You can also look for information at:
     MetaCPAN
         https://metacpan.org/release/Geo-Coder-List
 
-
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016-2020 Nigel Horne
+Copyright (C) 2016-2022 Nigel Horne
 
 This program is released under the following licence: GPL2

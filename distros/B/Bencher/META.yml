@@ -19,7 +19,7 @@ name: Bencher
 provides:
   Bencher:
     file: lib/Bencher.pm
-    version: '1.052'
+    version: '1.056'
 requires:
   Bencher::Backend: '1.057'
   Data::Sah::Coerce::perl::To_array::From_str::comma_sep: '0'
@@ -40,6 +40,7 @@ requires:
   Sah::Schema::dirname: '0'
   Sah::Schema::filename: '0'
   Sah::Schema::perl::modname: '0.035'
+  Sah::Schema::true: '0'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -47,7 +48,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher
   homepage: https://metacpan.org/release/Bencher
   repository: git://github.com/perlancar/perl-Bencher.git
-version: '1.052'
+version: '1.056'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

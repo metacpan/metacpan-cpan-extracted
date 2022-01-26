@@ -1,5 +1,11 @@
 Revision history for this software.
 
+2.13.81.12 2022-01-27 00:00:00
+  - fixed some erratas of mapping
+  - added many code to mapping
+  - add lib/Jacode4e/RoundTrip.pm-*.txt files
+  - created by INABA Hitoshi
+
 2.13.81.11 2021-02-11 00:00:00
   - rewrote global "%_" to "my %x"
   - created by INABA Hitoshi

@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use UI::Various::core;
 use UI::Various::Input;
@@ -69,7 +69,7 @@ our @EXPORT_OK = qw();
 
 Prepare output of the UI element by determining and returning the space it
 wants or needs.  I<The method should only be called from
-C<UI::Various::Curses> container elements!>
+C<UI::Various::RichTerm> container elements!>
 
 =head3 returns:
 
@@ -125,7 +125,8 @@ sub _show($$$$)
 {
     my ($self, $prefix, $width, $height) = @_;
     # Note that the accessor automatically dereferences the SCALAR here:
-    return $self->_format($prefix, '', $self->textvar, '', $width, $height);
+    return $self->_format($prefix, '', $D{UL1}, $self->textvar, $D{UL0}, '',
+			  $width, $height);
 }
 
 #########################################################################

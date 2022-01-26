@@ -1,5 +1,5 @@
 package Unknown::Values::Instance::Object;
-$Unknown::Values::Instance::Object::VERSION = '0.101';
+$Unknown::Values::Instance::Object::VERSION = '0.102';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Unknown::Values::Instance::Object - Internal null value object for the "Unknown:
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SYNOPSIS
 

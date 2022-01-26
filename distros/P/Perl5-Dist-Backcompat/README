@@ -1,0 +1,96 @@
+NAME
+    README for Perl library Perl5-Dist-Backcompat
+
+USAGE
+    Use perldoc to read documentation for module Perl5::Dist::Backcompat and
+    executable program p5-dist-backcompat.
+
+DESCRIPTION
+    As of January 2022, there are 41 distributions (hereinafter,
+    *"distros"*) underneath dist/ in the Perl 5 core distribution. By
+    definition, all of these are maintained by Perl 5 Porters in core but
+    are potentially releasable to CPAN so that they may be installed against
+    older perl releases. (To date, all but one of those 41 distros has had
+    at least one CPAN release in the past.)
+
+    But if were to release the code in a given dist/ distro to CPAN *today*,
+    would it build and test correctly against older perls? *Which* older
+    perls? More to the point, suppose that we've made changes to the code in
+    these distros in core since the last production release of perl? If we
+    were to release *that* code to CPAN, would that code fail against older
+    versions of perl?
+
+    This program, p5-dist-backcompat, tries to answer those questions. It
+    aims to be a P5P core development tool which, when run in advance of a
+    development, production or maintenance release of perl, can alert a
+    release manager or core developer to potential problems as described
+    above.
+
+  Terminology
+    Every one of the dist/ distros has its own history, quirks and coding
+    challenges. So within this program we will use certain terminology to
+    group distros that share certain characteristics.
+
+   Distribution/Distro
+    These terms will be used in two senses:
+
+    *   In Perl 5 Core Distribution
+
+        A directory tree underneath dist/ in the Perl 5 core distribution.
+        If the directory has a multipart name, it is spelled Some-Distro (as
+        distinct from the Some::Distro spelling used for packages or modules
+        within that distribution.
+
+    *   CPAN Release
+
+        A release to CPAN of code from a given distro within the core
+        distribution.
+
+   CPAN Viability
+    Setting aside metadata files like META.json, META.yml and Changes, if we
+    were to take the code for a given dist/ distro as it stands today, added
+    a Makefile.PL as needed (see next section), rolled it up into a tarball
+    and uploaded that tarball to CPAN, how would that CPAN release fare on
+    CPANtesters <https://www.cpantesters.org> against older versions of
+    perl?
+
+    If such a release required a lot of fine-tuning in order to get "PASS"es
+    on CPANtesters, then we would say it has *low* direct CPAN viability.
+
+    If such a release required little fine-tuning to get those "PASS"es,
+    then we would say it has *high* direct CPAN viability.
+
+    The CPAN release version of a distro may need fine-tuning for reasons
+    such as:
+
+    *   To work with changes in Perl syntax over the years.
+
+    *   To install prerequisites not available in older versions of perl.
+
+    *   To hold test files not needed within the core distribution, such as
+        author-only tests to be run by the person doing the CPAN release.
+
+   Makefile.PL Status
+    When any of these dist/ distros gets a CPAN release, it needs to have a
+    Makefile.PL so that ExtUtils::MakeMaker can generated a Makefile. The
+    Makefile is in turn run by make. But that doesn't mean that a given
+    dist/ distro has a Makefile.PL of its own within the core distribution.
+    As of today we can classify these distros according to the following
+    statuses:
+
+    *   "unreleased"
+
+        This kind of dist/ distro has apparently never had a CPAN release,
+        so it has never needed a Makefile.PL for that purpose and doesn't
+        have one in core. p5-dist-backcompat ignores such distros; as of
+        date there is only 1 such distro.
+
+    *   "cpan"
+
+        This kind of dist/ distro may or may not have a Makefile.PL of its
+        own in the core distribution -- neither "native" nor "generated".
+        Hence, when released to CPAN, the CPAN maintainer has to provide an
+        appropriately coded Makefile.PL as part of the tarball. The current
+        version of this program, p5-dist-backcompat, always uses the CPAN
+        version of a distro's Makefile.PL.
+

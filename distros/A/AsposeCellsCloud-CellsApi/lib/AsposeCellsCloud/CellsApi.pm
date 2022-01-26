@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2021 Aspose.Cells Cloud
+Copyright (c) 2022 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23200,6 +23200,7 @@ sub cells_ranges_put_worksheet_cells_range {
 # @param boolean $is_auto_fit_columns Autofit columns. (optional, default to false)
 # @param string $folder The document folder. (optional)
 # @param string $storage_name storage name. (optional)
+# @param string $out_storage_name output storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -23235,6 +23236,11 @@ sub cells_ranges_put_worksheet_cells_range {
     'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
+        required => '0',
+    },
+    'out_storage_name' => {
+        data_type => 'string',
+        description => 'output storage name.',
         required => '0',
     },
     };
@@ -23292,6 +23298,11 @@ sub cells_save_as_post_document_save_as {
     # query params
     if ( exists $args{'storage_name'}) {
         $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
+    }
+
+    # query params
+    if ( exists $args{'out_storage_name'}) {
+        $query_params->{'outStorageName'} = $self->{api_client}->to_query_value($args{'out_storage_name'});
     }
 
     # path params
@@ -25904,6 +25915,7 @@ sub cells_workbook_get_page_count {
 # @param string $folder The document folder. (optional)
 # @param string $storage_name storage name. (optional)
 # @param string $out_path The document output folder. (optional)
+# @param string $out_storage_name output storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -25944,6 +25956,11 @@ sub cells_workbook_get_page_count {
     'out_path' => {
         data_type => 'string',
         description => 'The document output folder.',
+        required => '0',
+    },
+    'out_storage_name' => {
+        data_type => 'string',
+        description => 'output storage name.',
         required => '0',
     },
     };
@@ -26011,6 +26028,11 @@ sub cells_workbook_get_workbook {
     # query params
     if ( exists $args{'out_path'}) {
         $query_params->{'outPath'} = $self->{api_client}->to_query_value($args{'out_path'});
+    }
+
+    # query params
+    if ( exists $args{'out_storage_name'}) {
+        $query_params->{'outStorageName'} = $self->{api_client}->to_query_value($args{'out_storage_name'});
     }
 
     # path params
@@ -27299,6 +27321,7 @@ sub cells_workbook_post_workbook_calculate_formula {
 # @param string $folder The workbook folder full path. (optional)
 # @param string $storage_name storage name. (optional)
 # @param string $out_path Path to save result (optional)
+# @param string $out_storage_name output storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -27324,6 +27347,11 @@ sub cells_workbook_post_workbook_calculate_formula {
     'out_path' => {
         data_type => 'string',
         description => 'Path to save result',
+        required => '0',
+    },
+    'out_storage_name' => {
+        data_type => 'string',
+        description => 'output storage name.',
         required => '0',
     },
     };
@@ -27376,6 +27404,11 @@ sub cells_workbook_post_workbook_get_smart_marker_result {
     # query params
     if ( exists $args{'out_path'}) {
         $query_params->{'outPath'} = $self->{api_client}->to_query_value($args{'out_path'});
+    }
+
+    # query params
+    if ( exists $args{'out_storage_name'}) {
+        $query_params->{'outStorageName'} = $self->{api_client}->to_query_value($args{'out_storage_name'});
     }
 
     # path params
@@ -27516,6 +27549,7 @@ sub cells_workbook_post_workbook_settings {
 # @param string $folder The workbook folder. (optional)
 # @param string $out_folder out Folder. (optional)
 # @param string $storage_name storage name. (optional)
+# @param string $out_storage_name output storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -27561,6 +27595,11 @@ sub cells_workbook_post_workbook_settings {
     'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
+        required => '0',
+    },
+    'out_storage_name' => {
+        data_type => 'string',
+        description => 'output storage name.',
         required => '0',
     },
     };
@@ -27635,6 +27674,11 @@ sub cells_workbook_post_workbook_split {
         $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
     }
 
+    # query params
+    if ( exists $args{'out_storage_name'}) {
+        $query_params->{'outStorageName'} = $self->{api_client}->to_query_value($args{'out_storage_name'});
+    }
+
     # path params
     if ( exists $args{'name'}) {
         my $_base_variable = "{" . "name" . "}";
@@ -27667,6 +27711,7 @@ sub cells_workbook_post_workbook_split {
 # @param string $merge_with The workbook to merge with. (required)
 # @param string $folder Source workbook folder. (optional)
 # @param string $storage_name storage name. (optional)
+# @param string $merged_storage_name merged file storage name. (optional)
 {
     my $params = {
     'name' => {
@@ -27687,6 +27732,11 @@ sub cells_workbook_post_workbook_split {
     'storage_name' => {
         data_type => 'string',
         description => 'storage name.',
+        required => '0',
+    },
+    'merged_storage_name' => {
+        data_type => 'string',
+        description => 'merged file storage name.',
         required => '0',
     },
     };
@@ -27739,6 +27789,11 @@ sub cells_workbook_post_workbooks_merge {
     # query params
     if ( exists $args{'storage_name'}) {
         $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
+    }
+
+    # query params
+    if ( exists $args{'merged_storage_name'}) {
+        $query_params->{'mergedStorageName'} = $self->{api_client}->to_query_value($args{'merged_storage_name'});
     }
 
     # path params

@@ -1,3 +1,8 @@
+0.021   2022-01-26  Released-By: PERLANCAR; Urgency: medium
+
+        - Add multirow header support (RT#).
+
+
 0.020   2021-08-28  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

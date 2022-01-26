@@ -19,7 +19,7 @@ name: App-SQLiteUtils
 provides:
   App::SQLiteUtils:
     file: lib/App/SQLiteUtils.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   DBI: '0'
   DBIx::Util::Schema: '0'
@@ -41,7 +41,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-SQLiteUtils
   homepage: https://metacpan.org/release/App-SQLiteUtils
   repository: git://github.com/perlancar/perl-App-SQLiteUtils.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

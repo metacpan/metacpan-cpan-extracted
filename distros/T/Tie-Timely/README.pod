@@ -2,11 +2,11 @@
 
 =encoding utf8
 
-=for HTML <a href="../../actions?query=workflow%3Amacos"><img src="../../workflows/macos/badge.svg"></a>
+=for HTML <a href="https://www.github.com/briandfoy/tie-timely/actions?query=workflow%3Amacos"><img src="https://www.github.com/briandfoy/tie-timely/workflows/macos/badge.svg"></a>
 
-=for HTML <a href="../../actions?query=workflow%3Aubuntu"><img src="../../workflows/ubuntu/badge.svg"></a>
+=for HTML <a href="https://www.github.com/briandfoy/tie-timely/actions?query=workflow%3Aubuntu"><img src="https://www.github.com/briandfoy/tie-timely/workflows/ubuntu/badge.svg"></a>
 
-=for HTML <a href="../../actions?query=workflow%3Awindows"><img src="../../workflows/windows/badge.svg"></a>
+=for HTML <a href="https://www.github.com/briandfoy/tie-timely/actions?query=workflow%3Awindows"><img src="https://www.github.com/briandfoy/tie-timely/workflows/windows/badge.svg"></a>
 
 =for HTML <a href='https://ci.appveyor.com/project/briandfoy/tie-timely'><img src='https://ci.appveyor.com/api/projects/status/l3vut7yd738o90gj' /></a>
 

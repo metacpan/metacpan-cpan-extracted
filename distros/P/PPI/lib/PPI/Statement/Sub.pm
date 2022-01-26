@@ -35,7 +35,7 @@ use List::Util     ();
 use Params::Util   qw{_INSTANCE};
 use PPI::Statement ();
 
-our $VERSION = '1.270'; # VERSION
+our $VERSION = '1.271'; # VERSION
 
 our @ISA = "PPI::Statement";
 
@@ -75,7 +75,8 @@ sub name {
 	my ($self) = @_;
 
 	# Usually the second token is the name.
-	my $token = $self->schild(1);
+	# The third token is the name if this is a lexical subroutine.
+	my $token = $self->schild(defined $self->type ? 2 : 1);
 	return $token->content
 	  if defined $token and $token->isa('PPI::Token::Word');
 

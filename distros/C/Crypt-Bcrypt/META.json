@@ -14,6 +14,11 @@
    },
    "name" : "Crypt-Bcrypt",
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::ParseXS" : "2.21"
+         }
+      },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
@@ -45,7 +50,7 @@
    "provides" : {
       "Crypt::Bcrypt" : {
          "file" : "lib/Crypt/Bcrypt.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -59,7 +64,7 @@
          "web" : "https://github.com/Leont/crypt-bcrypt"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_generated_by_perl" : "v5.32.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

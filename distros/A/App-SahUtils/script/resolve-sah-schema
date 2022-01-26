@@ -1,7 +1,9 @@
 #!perl
 
-our $DATE = '2021-07-27'; # DATE
-our $VERSION = '0.478'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-07-29'; # DATE
+our $DIST = 'App-SahUtils'; # DIST
+our $VERSION = '0.479'; # VERSION
 
 use 5.010001;
 use strict;
@@ -21,8 +23,12 @@ $SPEC{resolve_sah_schema} = {
             pos => 0,
         },
         merge_clause_sets => {
-            schema => 'bool',
+            schema => 'bool*',
             default => 1,
+        },
+        allow_base_with_no_additional_clauses => {
+            schema => 'bool*',
+            default => 0,
         },
     },
 };
@@ -42,7 +48,7 @@ sub resolve_sah_schema {
 
     my $nsch = Data::Sah::Resolve::resolve_schema(
         {
-            merge_clause_sets    => $args{merge_clause_sets},
+            merge_clause_sets        => $args{merge_clause_sets},
         },
         $sch);
 
@@ -70,21 +76,11 @@ resolve-sah-schema - Resolve Sah schema
 
 =head1 VERSION
 
-This document describes version 0.478 of resolve-sah-schema (from Perl distribution App-SahUtils), released on 2021-07-27.
+This document describes version 0.479 of resolve-sah-schema (from Perl distribution App-SahUtils), released on 2021-07-29.
 
 =head1 SYNOPSIS
 
- % resolve-sah-schema '"int"'
- ["int", []]
-
- % resolve-sah-schema '"posint"' ; # will look Sah::Schema::posint up
- ["int", {min=>1}]
-
- % resolve-sah-schema '["posint", div_by=>2]'
- ["int", {min=>1}, {div_by=>2}]
-
- % resolve-sah-schema '["posint", "merge.delete.min"=>undef, div_by=>2]'
- ["int", {div_by=>2}]
+ % resolve-sah-schema '"posint"'
 
 =head1 DESCRIPTION
 
@@ -98,6 +94,8 @@ C<*> marks required options.
 =head2 Main options
 
 =over
+
+=item B<--allow-base-with-no-additional-clauses>
 
 =item B<--no-merge-clause-sets>
 
@@ -263,6 +261,7 @@ which is equivalent to setting C<< -plugins=-DumpArgs@before_validate_args@99,-F
 
 List of available configuration parameters:
 
+ allow_base_with_no_additional_clauses (see --allow-base-with-no-additional-clauses)
  format (see --format)
  merge_clause_sets (see --no-merge-clause-sets)
  naked_res (see --naked-res)

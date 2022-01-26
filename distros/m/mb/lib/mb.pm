@@ -12,7 +12,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.37';
+$VERSION = '0.38';
 $VERSION = $VERSION;
 
 # internal use
@@ -5317,30 +5317,6 @@ mb - run Perl script in MBCS encoding (not only CJK ;-)
 
   supported perl versions:
     perl version 5.005_03 to newest perl
-
-=head1 EASY INSTALL (Paste and Run)
-
-  1. Open URL https://metacpan.org/pod/mb
-  
-  2. Click ...
-  ----------------------------------
-  Source (raw) <--- This ***raw***
-  Browse (raw)
-  Changes
-  How to Contribute
-  Clone repository
-  Issues
-  Testers (NNN / NNN / NNN)
-  Kwalitee
-  Bus factor: 1
-  NN.NN% Coverage
-  License: perl_5
-  Perl: v5.5.30
-  ----------------------------------
-  
-  3. Select All Text of Page
-  
-  4. Save Text as "lib/mb.pm"
 
 =head1 INSTALLATION BY MAKE
 

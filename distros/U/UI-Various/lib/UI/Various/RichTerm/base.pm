@@ -43,7 +43,7 @@ use Text::Wrap;
 $Text::Wrap::huge = 'overflow';
 $Text::Wrap::unexpand = 0;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use UI::Various::core;
 
@@ -69,7 +69,8 @@ use constant DECO_ASCII => (W7 => '#', W8 => '=', W9 => '#',
 			    B1 => '+', B2 => '-', B3 => '+',
 			    BL => '[', BR => ']',
 			    CL => '[', CR => ']',
-			    RL => '(', RR => ')');
+			    RL => '(', RR => ')',
+			    UL1 => "\e[4m", UL0 => "\e[24m");
 
 # not yet supported:
 use constant DECO_UTF8 => (W7 => "\x{2554}", W8 => "\x{2550}", W9 => "\x{2557}",
@@ -80,7 +81,8 @@ use constant DECO_UTF8 => (W7 => "\x{2554}", W8 => "\x{2550}", W9 => "\x{2557}",
 			   B1 => "\x{2514}", B2 => "\x{2500}", B3 => "\x{2518}",
 			   BL => "\x{2503}", BR => "\x{2503}",
 			   CL => '[', CR => ']',
-			   RL => '(', RR => ')');
+			   RL => '(', RR => ')',
+			   UL1 => "\e[4m", UL0 => "\e[24m");
 
 our %D = DECO_ASCII;
 
@@ -166,23 +168,27 @@ sub _size($$$)
 
 =head2 B<_format> - format text according to given options
 
-    $string = $ui_element->_format($prefix, $decoration_before, $text,
-                                   $decoration_after, $width, $height);
+    $string = $ui_element->_format($prefix, $decoration_before, $effect_before,
+                                   $text, $effect_after, $decoration_after,
+                                   $width, $height);
         or
 
-    $string = $ui_element->_format($prefix, $decoration_before, \@text,
-                                   $decoration_after, $width, $height);
+    $string = $ui_element->_format($prefix, $decoration_before, $effect_before,
+                                   \@text, $effect_after, $decoration_after,
+                                   $width, $height);
 
 =head3 example:
 
     my ($w, $h) = $self->_size($self->text, $content_width);
-    $string = $self->_format('(1) ', '[ ', $self->text, ' ]', $w, $h);
+    $string = $self->_format('(1) ', '', '[ ', $self->text, ' ]', '', $w, $h);
 
 =head3 parameters:
 
     $prefix             text in front of first line
     $decoration_before  decoration before content of each line
+    $effect_before      effect before content of each line
     $text               string to be wrapped or reference to wrapped text lines
+    $effect_after       end of effect after content of each line
     $decoration_after   decoration after content of each line
     $width              the width returned by _size above
     $height             the height returned by _size above
@@ -202,6 +208,8 @@ formatting.
 
 The decorations and prefix will cause the resulting text box to be wider
 than the given width, which only describes the width of the text itself.
+The effect is sort of a zero-width decoration (applied to the text without
+padding), usually an ANSI escape sequence.
 
 And as already described under C<L<_size|/_size - determine size of UI
 element>> above, the layout will be broken if it can't fit.  The display of
@@ -215,9 +223,10 @@ the rectangular text box for the given string
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-sub _format($$$$$$$)
+sub _format($$$$$$$$$)
 {
-    my ($self, $prefix, $deco_before, $text, $deco_after, $w, $h) = @_;
+    my ($self, $prefix, $deco_before, $effect_before, $text,
+	$effect_after, $deco_after, $w, $h) = @_;
     my $alignment = 7; # TODO L8R: $self->alignment;
 
     my $len_p = length($prefix);
@@ -239,7 +248,10 @@ sub _format($$$$$$$)
     }
     foreach (0..$#text)
     {
-	my $l = length($text[$_]);
+	my $text_no_ansi = $text[$_];
+	$text_no_ansi =~ s/\e[[0-9;]*m//g;
+	my $l = length($text_no_ansi);
+	$text[$_] = $effect_before . $text[$_] . $effect_after;
 	if ($l < $w)
 	{
 	    # TODO: this is only the code for the alignments 1/4/7:

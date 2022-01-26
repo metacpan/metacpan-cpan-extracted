@@ -10,31 +10,132 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: BorderStyles-Standard
+provides:
+  BorderStyle::ASCII::None:
+    file: lib/BorderStyle/ASCII/None.pm
+    version: '0.011'
+  BorderStyle::ASCII::SingleLine:
+    file: lib/BorderStyle/ASCII/SingleLine.pm
+    version: '0.011'
+  BorderStyle::ASCII::SingleLineDoubleAfterHeader:
+    file: lib/BorderStyle/ASCII/SingleLineDoubleAfterHeader.pm
+    version: '0.011'
+  BorderStyle::ASCII::SingleLineHorizontalOnly:
+    file: lib/BorderStyle/ASCII/SingleLineHorizontalOnly.pm
+    version: '0.011'
+  BorderStyle::ASCII::SingleLineInnerOnly:
+    file: lib/BorderStyle/ASCII/SingleLineInnerOnly.pm
+    version: '0.011'
+  BorderStyle::ASCII::SingleLineOuterOnly:
+    file: lib/BorderStyle/ASCII/SingleLineOuterOnly.pm
+    version: '0.011'
+  BorderStyle::ASCII::SingleLineVerticalOnly:
+    file: lib/BorderStyle/ASCII/SingleLineVerticalOnly.pm
+    version: '0.011'
+  BorderStyle::ASCII::Space:
+    file: lib/BorderStyle/ASCII/Space.pm
+    version: '0.011'
+  BorderStyle::ASCII::SpaceInnerOnly:
+    file: lib/BorderStyle/ASCII/SpaceInnerOnly.pm
+    version: '0.011'
+  BorderStyle::BoxChar::None:
+    file: lib/BorderStyle/BoxChar/None.pm
+    version: '0.011'
+  BorderStyle::BoxChar::SingleLine:
+    file: lib/BorderStyle/BoxChar/SingleLine.pm
+    version: '0.011'
+  BorderStyle::BoxChar::SingleLineHorizontalOnly:
+    file: lib/BorderStyle/BoxChar/SingleLineHorizontalOnly.pm
+    version: '0.011'
+  BorderStyle::BoxChar::SingleLineInnerOnly:
+    file: lib/BorderStyle/BoxChar/SingleLineInnerOnly.pm
+    version: '0.011'
+  BorderStyle::BoxChar::SingleLineOuterOnly:
+    file: lib/BorderStyle/BoxChar/SingleLineOuterOnly.pm
+    version: '0.011'
+  BorderStyle::BoxChar::SingleLineVerticalOnly:
+    file: lib/BorderStyle/BoxChar/SingleLineVerticalOnly.pm
+    version: '0.011'
+  BorderStyle::BoxChar::Space:
+    file: lib/BorderStyle/BoxChar/Space.pm
+    version: '0.011'
+  BorderStyle::BoxChar::SpaceInnerOnly:
+    file: lib/BorderStyle/BoxChar/SpaceInnerOnly.pm
+    version: '0.011'
+  BorderStyle::UTF8::Brick:
+    file: lib/BorderStyle/UTF8/Brick.pm
+    version: '0.011'
+  BorderStyle::UTF8::BrickOuterOnly:
+    file: lib/BorderStyle/UTF8/BrickOuterOnly.pm
+    version: '0.011'
+  BorderStyle::UTF8::DoubleLine:
+    file: lib/BorderStyle/UTF8/DoubleLine.pm
+    version: '0.011'
+  BorderStyle::UTF8::None:
+    file: lib/BorderStyle/UTF8/None.pm
+    version: '0.011'
+  BorderStyle::UTF8::SingleLine:
+    file: lib/BorderStyle/UTF8/SingleLine.pm
+    version: '0.011'
+  BorderStyle::UTF8::SingleLineBold:
+    file: lib/BorderStyle/UTF8/SingleLineBold.pm
+    version: '0.011'
+  BorderStyle::UTF8::SingleLineBoldHeader:
+    file: lib/BorderStyle/UTF8/SingleLineBoldHeader.pm
+    version: '0.011'
+  BorderStyle::UTF8::SingleLineCurved:
+    file: lib/BorderStyle/UTF8/SingleLineCurved.pm
+    version: '0.011'
+  BorderStyle::UTF8::SingleLineDoubleAfterHeader:
+    file: lib/BorderStyle/UTF8/SingleLineDoubleAfterHeader.pm
+    version: '0.011'
+  BorderStyle::UTF8::SingleLineHorizontalOnly:
+    file: lib/BorderStyle/UTF8/SingleLineHorizontalOnly.pm
+    version: '0.011'
+  BorderStyle::UTF8::SingleLineInnerOnly:
+    file: lib/BorderStyle/UTF8/SingleLineInnerOnly.pm
+    version: '0.011'
+  BorderStyle::UTF8::SingleLineOuterOnly:
+    file: lib/BorderStyle/UTF8/SingleLineOuterOnly.pm
+    version: '0.011'
+  BorderStyle::UTF8::SingleLineVerticalOnly:
+    file: lib/BorderStyle/UTF8/SingleLineVerticalOnly.pm
+    version: '0.011'
+  BorderStyle::UTF8::Space:
+    file: lib/BorderStyle/UTF8/Space.pm
+    version: '0.011'
+  BorderStyle::UTF8::SpaceInnerOnly:
+    file: lib/BorderStyle/UTF8/SpaceInnerOnly.pm
+    version: '0.011'
+  BorderStyles::Standard:
+    file: lib/BorderStyles/Standard.pm
+    version: '0.011'
 requires:
-  BorderStyleBase: '0'
+  BorderStyleBase: '0.009'
   parent: '0'
   strict: '0'
   utf8: '0'
+  warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=BorderStyles-Standard
   homepage: https://metacpan.org/release/BorderStyles-Standard
   repository: git://github.com/perlancar/perl-BorderStyles-Standard.git
-version: '0.007'
+version: '0.011'
 x_Dist_Zilla:
   perl:
-    version: '5.030002'
+    version: '5.034000'
   plugins:
     -
       class: Dist::Zilla::Plugin::BorderStyle
       config:
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000036'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: BorderStyle
       version: '0.001'
@@ -54,66 +155,66 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@Author::PERLANCAR/@Filter/GatherDir'
-      version: '6.014'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Author::PERLANCAR/@Filter/PruneCruft'
-      version: '6.014'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::PERLANCAR/@Filter/ManifestSkip'
-      version: '6.014'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::PERLANCAR/@Filter/MetaYAML'
-      version: '6.014'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Author::PERLANCAR/@Filter/License'
-      version: '6.014'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: '@Author::PERLANCAR/@Filter/PodCoverageTests'
-      version: '6.014'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::PERLANCAR/@Filter/PodSyntaxTests'
-      version: '6.014'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@Author::PERLANCAR/@Filter/ExtraTests'
-      version: '6.014'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR/@Filter/ExecDir'
-      version: '6.014'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Author::PERLANCAR/@Filter/ShareDir'
-      version: '6.014'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Author::PERLANCAR/@Filter/MakeMaker'
-      version: '6.014'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::PERLANCAR/@Filter/Manifest'
-      version: '6.014'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::PERLANCAR/@Filter/ConfirmRelease'
-      version: '6.014'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR/ExecDir script'
-      version: '6.014'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.603'
+      version: '0.606'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -145,26 +246,57 @@ x_Dist_Zilla:
           finder:
             - ':InstallModules'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000036'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: '@Author::PERLANCAR/CheckSelfDependency'
       version: '0.011'
     -
+      class: Dist::Zilla::Plugin::Git::Contributors
+      config:
+        Dist::Zilla::Plugin::Git::Contributors:
+          git_version: 2.25.1
+          include_authors: 0
+          include_releaser: 1
+          order_by: name
+          paths: []
+      name: '@Author::PERLANCAR/Git::Contributors'
+      version: '0.036'
+    -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
-      version: '0.006'
+      version: '0.009'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
-      version: '0.03'
+      version: '0.02'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::PERLANCAR/MetaJSON'
-      version: '6.014'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::PERLANCAR/MetaConfig'
-      version: '6.014'
+      version: '6.024'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: '@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+              version: '6.024'
+          include_underscores: 0
+        Dist::Zilla::Role::MetaProvider::Provider:
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
+          inherit_missing: '1'
+          inherit_version: '1'
+          meta_noindex: '1'
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
+      name: '@Author::PERLANCAR/MetaProvides::Package'
+      version: '2.004003'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::Authority
       name: '@Author::PERLANCAR/PERLANCAR::Authority'
@@ -192,55 +324,55 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@CorePrep/EnsurePod5'
-              version: '4.015'
+              version: '4.017'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.015'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Name
               name: '@Author::PERLANCAR/Name'
-              version: '4.015'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Version
               name: '@Author::PERLANCAR/Version'
-              version: '4.015'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Region
               name: '@Author::PERLANCAR/prelude'
-              version: '4.015'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Generic
               name: SYNOPSIS
-              version: '4.015'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Generic
               name: DESCRIPTION
-              version: '4.015'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Generic
               name: OVERVIEW
-              version: '4.015'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Collect
               name: ATTRIBUTES
-              version: '4.015'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Collect
               name: METHODS
-              version: '4.015'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Collect
               name: FUNCTIONS
-              version: '4.015'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Leftovers
               name: '@Author::PERLANCAR/Leftovers'
-              version: '4.015'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Region
               name: '@Author::PERLANCAR/postlude'
-              version: '4.015'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Completion::GetoptLongComplete
               name: '@Author::PERLANCAR/Completion::GetoptLongComplete'
@@ -268,11 +400,19 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Authors
               name: '@Author::PERLANCAR/Authors'
-              version: '4.015'
+              version: '4.017'
+            -
+              class: Pod::Weaver::Section::Contributors
+              name: '@Author::PERLANCAR/Contributors'
+              version: '0.009'
+            -
+              class: Pod::Weaver::Section::PERLANCAR::Contributing
+              name: '@Author::PERLANCAR/PERLANCAR/Contributing'
+              version: '0.292'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'
-              version: '4.015'
+              version: '4.017'
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
@@ -288,7 +428,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::SingleEncoding
               name: '@Author::PERLANCAR/SingleEncoding'
-              version: '4.015'
+              version: '4.017'
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
@@ -302,7 +442,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PruneFiles
       name: '@Author::PERLANCAR/PruneFiles'
-      version: '6.014'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Pod2Readme
       name: '@Author::PERLANCAR/Pod2Readme'
@@ -350,7 +490,7 @@ x_Dist_Zilla:
             - ':InstallModules'
             - ':TestFiles'
       name: '@Author::PERLANCAR/Test::Perl::Critic::Subset'
-      version: 3.001.005
+      version: 3.001.006
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'
@@ -390,7 +530,7 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '6.014'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -398,7 +538,7 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: TestRequires
-      version: '6.014'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -406,54 +546,58 @@ x_Dist_Zilla:
           phase: develop
           type: x_spec
       name: DevelopX_spec
-      version: '6.014'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.014'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.014'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.014'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.014'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.014'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.014'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.014'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.014'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.014'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.014'
+      version: '6.024'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: '@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+      version: '6.024'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.014'
+    version: '6.024'
 x_authority: cpan:PERLANCAR
-x_generated_by_perl: v5.30.2
+x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

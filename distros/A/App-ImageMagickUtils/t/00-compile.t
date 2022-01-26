@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/ImageMagickUtils.pm'
@@ -17,7 +17,8 @@ my @scripts = (
     'script/convert-image-to',
     'script/convert-image-to-pdf',
     'script/downsize-image',
-    'script/image-resize-notation-to-human'
+    'script/image-resize-notation-to-human',
+    'script/img2pdf'
 );
 
 # no fake home requested

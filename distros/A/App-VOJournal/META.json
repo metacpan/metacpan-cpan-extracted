@@ -35,11 +35,11 @@
    "provides" : {
       "App::VOJournal" : {
          "file" : "lib/App/VOJournal.pm",
-         "version" : "v0.4.6"
+         "version" : "v0.4.8"
       },
       "App::VOJournal::VOTL" : {
          "file" : "lib/App/VOJournal/VOTL.pm",
-         "version" : "v0.4.6"
+         "version" : "v0.4.8"
       }
    },
    "release_status" : "stable",
@@ -54,6 +54,6 @@
          "url" : "https://github.com/matwei-perl/App-VOJournal"
       }
    },
-   "version" : "v0.4.6",
+   "version" : "v0.4.8",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -17,7 +17,7 @@ if($@) {
 	CARP: {
 		# test save_to is not writable
 		SKIP: {
-			if($^O ne 'MSWin32') {
+			unless(-w '/') {
 				sub test1 {
 					my $b = new_ok('FCGI::Buffer');
 					$b->init(save_to => { directory => '/' });
@@ -34,7 +34,8 @@ if($@) {
 
 				does_carp_that_matches(\&test1, qr/isn't writeable/);
 			} else {
-				skip("It's tricky finding a directory that isn't writeable on Windows", 3);
+				# happens on Win32 or when running as root
+                                skip('Root directory is writable', 3);
 			}
 		}
 

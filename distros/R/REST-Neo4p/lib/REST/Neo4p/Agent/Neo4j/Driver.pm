@@ -2,7 +2,7 @@ package REST::Neo4p::Agent::Neo4j::Driver;
 use v5.10;
 use lib '../../../../../lib'; # testing
 use base qw/REST::Neo4p::Agent/;
-use Neo4j::Driver;
+use Neo4j::Driver 0.1803;
 use JSON::ize;
 use REST::Neo4p::Agent::Neo4j::DriverActions;
 use REST::Neo4p::Exceptions;
@@ -14,12 +14,27 @@ use HTTP::Response;
 use strict;
 use warnings;
 BEGIN {
-  $REST::Neo4p::Agent::Neo4j::Driver::VERSION = '0.4001';
+  $REST::Neo4p::Agent::Neo4j::Driver::VERSION = '0.4003';
 }
 my $WARN_ON_ERROR;
 
 BEGIN {
 }
+
+my %REST_ACTIONS = (
+  all_relationships            => 'relationships/all',
+  all_typed_relationships      => 'relationships/all/{-list|&|types}',
+  create_relationship          => 'relationships',
+  incoming_relationships       => 'relationships/in',
+  incoming_typed_relationships => 'relationships/in/{-list|&|types}',
+  labels                       => 'labels',
+  outgoing_relationships       => 'relationships/out',
+  outgoing_typed_relationships => 'relationships/out/{-list|&|types}',
+  paged_traverse               => 'paged/traverse/{returnType}{?pageSize,leaseTime}',
+  properties                   => 'properties',
+  property                     => 'properties/{key}',
+  traverse                     => 'traverse/{returnType}',
+);
 
 sub new {
   my ($class, @args) = @_;
@@ -177,21 +192,7 @@ sub connect {
     last if $f;
   }
   # set actions
-  try {
-    my $tx = $self->session->begin_transaction;
-    my $n = $tx->run('create (n) return n')->single;
-    my $actions = $n->{rest}[0];
-    $tx->rollback;
-    foreach (keys %$actions) {
-      next if /^extensions|metadata|self$/;
-      # strip any trailing slash
-      $actions->{$_} =~ s|/+$||;
-      my ($suffix) = $actions->{$_} =~ m|.*node/[0-9]+/(.*)|;
-      $self->{_actions}{$_} = $suffix;
-    }
-  } catch {
-    REST::Neo4p::LocalException->throw("While determining actions: $_");
-  };
+  $self->{_actions}{$_} = $REST_ACTIONS{$_} for keys %REST_ACTIONS;
   return 1;
 }
 
@@ -202,7 +203,7 @@ sub session {
   }
   my $session = $self->driver->session( $self->database ? (database => $self->database) : () );
   if ($self->server_uri->scheme =~ /^http/) {
-    if (my $client = $session->{transport}{client}) {
+    if (my $client = $session->{net}{http_agent}{client}) {
       $client->setTimeout($self->timeout);
       $client->setCa($self->tls_ca);
       if ($self->{_ssl_opts}) {

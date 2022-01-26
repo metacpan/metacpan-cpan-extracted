@@ -1,0 +1,18 @@
+# This CITATION.cff file was generated with /Users/brian/bin/bmt
+# Tue Jan 25 20:44:04 2022
+
+abstract: ReturnValue - A structured return value for failure or success
+authors:
+- family-names: foy
+  given-names: brian d
+  orcid: 0000-0002-0283-8283
+cff-version: 1.2.0
+date-released: 2022-01-07
+license: Artistic-2.0
+license-url: https://github.com/perlreview/returnvalue/LICENSE
+message: The GitHub page for this module provides formatted citations
+repository-code: https://github.com/perlreview/returnvalue
+title: The ReturnValue Perl module
+type: software
+version: '0.902'
+doi: 10.5281/zenodo.5904392

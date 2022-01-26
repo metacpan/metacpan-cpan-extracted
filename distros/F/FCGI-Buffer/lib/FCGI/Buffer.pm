@@ -21,11 +21,11 @@ FCGI::Buffer - Verify, Cache and Optimise FCGI Output
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =cut
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 =head1 SYNOPSIS
 
@@ -126,7 +126,7 @@ sub new {
 	# $rc->{o} = ();
 
 	if($ENV{'SERVER_PROTOCOL'} &&
-	  ($ENV{'SERVER_PROTOCOL'} eq 'HTTP/1.1')) {
+	  (($ENV{'SERVER_PROTOCOL'} eq 'HTTP/1.1') || ($ENV{'SERVER_PROTOCOL'} eq 'HTTP/2.0'))) {
 		$rc->{generate_etag} = 1;
 	} else {
 		$rc->{generate_etag} = 0;
@@ -331,12 +331,10 @@ sub DESTROY {
 	# includes the mtime field which changes thus causing a different
 	# Etag to be generated
 	if($ENV{'SERVER_PROTOCOL'} &&
-	  ($ENV{'SERVER_PROTOCOL'} eq 'HTTP/1.1') &&
+	  (($ENV{'SERVER_PROTOCOL'} eq 'HTTP/1.1') || ($ENV{'SERVER_PROTOCOL'} eq 'HTTP/2.0')) &&
 	  $self->{generate_etag} && defined($self->{body})) {
-		# encode to avoid "Wide character in subroutine entry"
-		require Encode;
-		$self->{_encode_loaded} = 1;
-		$self->{etag} = '"' . Digest::MD5->new->add(Encode::encode_utf8($self->{body}))->hexdigest() . '"';
+	  	$self->_generate_etag();
+
 		if($ENV{'HTTP_IF_NONE_MATCH'} && $self->{generate_304} && ($self->{status} == 200)) {
 			$self->_check_if_none_match();
 		}
@@ -415,7 +413,7 @@ sub DESTROY {
 			# Nothing has been output yet, so we can check if it's
 			# OK to send 304 if possible
 			if($self->{send_body} && $ENV{'SERVER_PROTOCOL'} &&
-			  ($ENV{'SERVER_PROTOCOL'} eq 'HTTP/1.1') &&
+			  (($ENV{'SERVER_PROTOCOL'} eq 'HTTP/1.1') || ($ENV{'SERVER_PROTOCOL'} eq 'HTTP/2.0')) &&
 			  $self->{generate_304} && ($self->{status} == 200)) {
 				if($ENV{'HTTP_IF_MODIFIED_SINCE'}) {
 					$self->_check_modified_since({
@@ -472,28 +470,24 @@ sub DESTROY {
 				}
 			}
 			if($self->{send_body} && $ENV{'SERVER_PROTOCOL'} &&
-			  ($ENV{'SERVER_PROTOCOL'} eq 'HTTP/1.1') &&
+			  (($ENV{'SERVER_PROTOCOL'} eq 'HTTP/1.1') || ($ENV{'SERVER_PROTOCOL'} eq 'HTTP/2.0')) &&
 			  ($self->{status} == 200)) {
 				if($ENV{'HTTP_IF_NONE_MATCH'} && $self->{generate_etag}) {
 					if(!defined($self->{etag})) {
-						unless($self->{_encode_loaded}) {
-							require Encode;
-							$self->{_encode_loaded} = 1;
-						}
-						$self->{etag} = '"' . Digest::MD5->new->add(Encode::encode_utf8($self->{body}))->hexdigest() . '"';
+						$self->_generate_etag();
 					}
 					$self->_check_if_none_match();
 				}
 			}
 			if($self->{status} == 200) {
-				$encoding = $self->_should_gzip();
-				if($self->{send_body}) {
-					if($self->{generate_etag} && !defined($self->{etag}) && ((!defined($headers)) || ($headers !~ /^ETag: /m))) {
-						$self->{etag} = '"' . Digest::MD5->new->add(Encode::encode_utf8($self->{body}))->hexdigest() . '"';
-					}
-					$self->_compress({ encoding => $encoding });
-				}
-			}
+                                $encoding = $self->_should_gzip();
+                                if($self->{send_body}) {
+                                        if($self->{generate_etag} && !defined($self->{etag}) && ((!defined($headers)) || ($headers !~ /^ETag: /m))) {
+                                                $self->_generate_etag();
+                                        }
+                                        $self->_compress({ encoding => $encoding });
+                                }
+                        }
 			my $cannot_304 = !$self->{generate_304};
 			unless($self->{etag}) {
 				if(defined($headers) && ($headers =~ /^ETag: "([a-z0-9]{32})"/m)) {
@@ -559,7 +553,10 @@ sub DESTROY {
 						$cache_hash->{'headers'} = $headers;
 					}
 				}
-				if($self->{generate_etag} && defined($self->{etag})) {
+				if($self->{generate_etag}) {
+					if(!defined($self->{etag})) {
+						$self->_generate_etag();
+					}
 					$cache_hash->{'etag'} = $self->{etag};
 				}
 				# TODO: Support the Expires header
@@ -606,7 +603,9 @@ sub DESTROY {
 							$self->{logger}->debug("Create paths to $sdir");
 						}
 						File::Path::make_path($sdir);
-						my $path = File::Spec->catfile($sdir, $self->{info}->as_string() . '.html');
+						my $file = $self->{info}->as_string();
+						$file =~ tr/\//_/;
+						my $path = File::Spec->catfile($sdir, "$file.html");
 						if($path =~ /^(.+)$/) {
 							$path = $1; # Untaint
 							$path =~ tr/[\|;]/_/;
@@ -698,23 +697,63 @@ sub DESTROY {
 		push @{$self->{o}}, ('X-Cache: MISS', 'X-Cache-Lookup: MISS');
 	}
 
+	# if($self->{generate_etag} && ((!defined($headers)) || ($headers !~ /^ETag: /m))) {
+                # if((!defined($self->{etag})) &&
+                   # (($self->{status} == 200) || $self->{status} == 304) &&
+                   # $self->{body} && (!$ENV{'NO_CACHE'}) &&
+                   # !$self->is_cached()) {
+                        # unless($self->{_encode_loaded}) {
+                                # require Encode;
+                                # $self->{_encode_loaded} = 1;
+                        # }
+                        # $self->{etag} = '"' . Digest::MD5->new->add(Encode::encode_utf8($unzipped_body))->hexdigest() . '"';
+                # }
+                # if(defined($self->{etag})) {
+                        # push @{$self->{o}}, "ETag: $self->{etag}";
+                        # if($self->{logger}) {
+                                # $self->{logger}->debug("Set ETag to $self->{etag}");
+                        # }
+                # } else {
+                        # open(my $fout, '>>', '/tmp/FCGI-bug');
+                        # print $fout "BUG: ETag not generated, status $self->{status}:\n",
+                                # "$headers\n",
+                                # 'x' x 40, "\n",
+                                # # defined($self->{body}) ? $self->{body} : "body is empty\n",
+                                # defined($unzipped_body) ? "$unzipped_body\n" : "body is empty\n",
+                                # 'x' x 40,
+                                # "\n";
+			# print $fout "ENV:\n";
+                        # while(my ($key, $value) = each %ENV) {
+                                # print $fout "$key = $value\n";
+                        # }
+                        # close $fout;
+                        # $self->{logger}->warn("BUG: ETag not generated, status $self->{status}");
+                # }
+        # }
 	if($self->{generate_etag} && ((!defined($headers)) || ($headers !~ /^ETag: /m))) {
-		if(defined($self->{etag})) {
-			push @{$self->{o}}, "ETag: $self->{etag}";
-			if($self->{logger}) {
-				$self->{logger}->debug("Set ETag to $self->{etag}");
-			}
-		} elsif($self->{logger} && (($self->{status} == 200) || $self->{status} == 304) && $self->{body} && (!$ENV{'NO_CACHE'}) && !$self->is_cached()) {
-			# open(my $fout, '>>', '/tmp/FCGI-bug');
-			# print $fout "BUG: ETag not generated, status $self->{status}:\n",
-				# $headers,
-				# 'x' x 40,
-				# defined($self->{body}) ? $self->{body} : "body is empty\n",
-				# 'x' x 40,
-				# "\n";
-			$self->{logger}->warn("BUG: ETag not generated, status $self->{status}");
-		}
-	}
+                if(defined($self->{etag})) {
+                        push @{$self->{o}}, "ETag: $self->{etag}";
+                        if($self->{logger}) {
+                                $self->{logger}->debug("Set ETag to $self->{etag}");
+                        }
+                } elsif($self->{logger} && (($self->{status} == 200) || $self->{status} == 304) && $self->{body} && (!$ENV{'NO_CACHE'}) && !$self->is_cached()) {
+                        # $self->{logger}->warn("BUG: ETag not generated, status $self->{status}");
+                        # open(my $fout, '>>', '/tmp/FCGI-bug');
+                        # print $fout "BUG: ETag not generated, status $self->{status}:\n",
+                                # $headers,
+                                # 'x' x 40,
+                                # defined($self->{body}) ? $self->{body} : "body is empty\n",
+                                # 'x' x 40,
+                                # "\n";
+			# print $fout "ENV:\n";
+			# while(my ($key, $value) = each %ENV) {
+				# print $fout "$key = $value\n;
+			# }
+			# print $fout 'x' x 40, "\n";
+                        # close $fout;
+                        # $self->{logger}->warn("BUG: ETag not generated, status $self->{status}");
+                }
+        }
 
 	my $body_length;
 	if(defined($self->{body})) {
@@ -788,6 +827,22 @@ sub DESTROY {
 
 	if((!$self->{send_body}) || !defined($self->{body})) {
 		print "\r\n\r\n";
+	}
+}
+
+sub _generate_etag {
+	my $self = shift;
+
+	return if defined($self->{'etag'});
+
+	if(!defined($self->{_encode_loaded})) {
+		# encode to avoid "Wide character in subroutine entry"
+		require Encode;
+		$self->{_encode_loaded} = 1;
+	}
+	$self->{etag} = '"' . Digest::MD5->new->add(Encode::encode_utf8($self->{body}))->hexdigest() . '"';
+	if($self->{'logger'}) {
+		$self->{'logger'}->debug('Etag = ', $self->{'etag'});
 	}
 }
 
@@ -1676,7 +1731,7 @@ The licence for cgi_buffer is:
 
     This software is provided 'as is' without warranty of any kind."
 
-The rest of the program is Copyright 2015-2021 Nigel Horne,
+The rest of the program is Copyright 2015-2022 Nigel Horne,
 and is released under the following licence: GPL2
 
 =cut

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver;
 # ABSTRACT: Neo4j community graph database driver for Bolt and HTTP
-$Neo4j::Driver::VERSION = '0.27';
+$Neo4j::Driver::VERSION = '0.28';
 
 use Carp qw(croak);
 
@@ -60,6 +60,7 @@ sub new {
 	
 	croak __PACKAGE__ . "->new() with multiple arguments unsupported" if @extra;
 	$config = { uri => $config } if ref $config ne 'HASH';
+	$config->{uri} //= '';  # force config() to call _check_uri()
 	return $self->config($config);
 }
 
@@ -100,7 +101,7 @@ sub _check_uri {
 sub basic_auth {
 	my ($self, $username, $password) = @_;
 	
-	warnings::warnif deprecated => "Deprecated sequence: call basic_auth() before session()" if $self->{session};
+	warnings::warnif deprecated => "Deprecated sequence: call basic_auth() before session()" if $self->{server_info};
 	
 	$self->{auth} = {
 		scheme => 'basic',
@@ -125,7 +126,7 @@ sub config {
 		return $self->{$OPTIONS{$key}};
 	}
 	
-	croak "Unsupported sequence: call config() before session()" if $self->{session};
+	croak "Unsupported sequence: call config() before session()" if $self->{server_info};
 	my %options = $self->_parse_options('config', [keys %OPTIONS], @options);
 	
 	# set config option
@@ -146,8 +147,6 @@ sub session {
 	@options = %{$options[0]} if @options == 1 && ref $options[0] eq 'HASH';
 	my %options = $self->_parse_options('session', ['database'], @options);
 	
-	$self->{session} = 1;
-	
 	my $session = Neo4j::Driver::Session->new($self);
 	return $session->_connect($options{database});
 }
@@ -159,6 +158,7 @@ sub _parse_options {
 	croak "Odd number of elements in $context options hash" if @options & 1;
 	my %options = @options;
 	
+	warnings::warnif deprecated => "Config option ca_file is deprecated; use trust_ca" if $options{ca_file};
 	warnings::warnif deprecated => "Config option cypher_types is deprecated" if $options{cypher_types};
 	if ($options{cypher_params}) {
 		croak "Unimplemented cypher params filter '$options{cypher_params}'" if $options{cypher_params} ne v2;
@@ -180,6 +180,7 @@ sub _parse_options {
 
 
 sub close {
+	# uncoverable pod (see Deprecations.pod)
 	warnings::warnif deprecated => __PACKAGE__ . "->close() is deprecated";
 }
 
@@ -209,7 +210,7 @@ Neo4j::Driver - Neo4j community graph database driver for Bolt and HTTP
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 SYNOPSIS
 
@@ -605,7 +606,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2021 by Arne Johannessen.
+This software is Copyright (c) 2016-2022 by Arne Johannessen.
 
 This is free software, licensed under:
 

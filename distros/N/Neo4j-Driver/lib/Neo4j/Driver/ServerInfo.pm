@@ -5,8 +5,10 @@ use utf8;
 
 package Neo4j::Driver::ServerInfo;
 # ABSTRACT: Provides Neo4j server address and version
-$Neo4j::Driver::ServerInfo::VERSION = '0.27';
+$Neo4j::Driver::ServerInfo::VERSION = '0.28';
 
+use Carp qw(croak);
+our @CARP_NOT = qw(Neo4j::Driver::Session);
 use URI 1.25;
 
 
@@ -43,6 +45,25 @@ sub protocol {
 }
 
 
+# discover default database on Neo4j >= 4 using the given driver config
+sub _default_database {
+	my ($self, $driver) = @_;
+	
+	my $database = $self->{default_database};
+	return $database if defined $database;
+	
+	return if $self->{version} =~ m{^Neo4j/[123]\.};
+	eval {
+		my $sys = $driver->session(database => 'system');
+		$database = $sys->run('SHOW DEFAULT DATABASE')->single->get('name');
+	};
+	croak $@ . "Session creation failed because the default "
+	         . "database of $self->{version} at $self->{uri} "
+	         . "could not be determined" unless defined $database;
+	return $self->{default_database} = $database;
+}
+
+
 1;
 
 __END__
@@ -57,7 +78,7 @@ Neo4j::Driver::ServerInfo - Provides Neo4j server address and version
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 SYNOPSIS
 
@@ -137,7 +158,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2021 by Arne Johannessen.
+This software is Copyright (c) 2016-2022 by Arne Johannessen.
 
 This is free software, licensed under:
 

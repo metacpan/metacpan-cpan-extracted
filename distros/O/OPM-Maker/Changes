@@ -1,6 +1,10 @@
 Changes file for OPM::Maker
 ===========================
 
+1.16 2022-01-26 15:23:00
+
+  + add new command to build bash completion script (opmbuild bashcompletion)
+
 1.15 2022-01-19 07:04:00
 
   + add new parameter to set basedir on build command (thanks to kjagosz)

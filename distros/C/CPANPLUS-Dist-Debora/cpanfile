@@ -51,6 +51,7 @@ on 'configure' => sub {
 on 'develop' => sub {
   requires "Dist::Zilla" => "0";
   requires "Dist::Zilla::Plugin::CopyFilesFromBuild" => "0";
+  requires "Dist::Zilla::Plugin::MakeMaker::Awesome" => "0.26";
   requires "Dist::Zilla::Plugin::MetaProvides::Package" => "0";
   requires "Dist::Zilla::Plugin::Test::Kwalitee" => "0";
   requires "Pod::Coverage::TrustPod" => "0";

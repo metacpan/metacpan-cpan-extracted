@@ -12,6 +12,8 @@ require '../lib/Jacode4e.pm';
 require 'EBCDIC/EBCDIC_NEC_by_JIS8.pl';
 require 'UTF8/UTF8_by_Unicode.pl';
 
+$SIG{__WARN__} = sub { die @_ };
+
 binmode(STDOUT);
 
 my @char_utf8jp = ();

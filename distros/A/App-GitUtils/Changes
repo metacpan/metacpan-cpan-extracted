@@ -1,3 +1,10 @@
+0.081   2021-07-14  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix bug in searching .git dir.
+
+	- Add logging statement which is enabled by GITUTILS_TRACE.
+
+
 0.080   2020-05-19  Released-By: PERLANCAR; Urgency: medium
 
 	- Accept --dir option.

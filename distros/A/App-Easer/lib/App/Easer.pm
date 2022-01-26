@@ -3,7 +3,7 @@ use v5.24;
 use warnings;
 use experimental qw< signatures >;
 no warnings qw< experimental::signatures >;
-{ our $VERSION = '0.008' }
+{ our $VERSION = '0.010' }
 
 use Exporter 'import';
 our @EXPORT_OK = qw< d run >;
@@ -168,9 +168,11 @@ sub d (@stuff) {
    warn Data::Dumper::Dumper(@stuff % 2 ? \@stuff : {@stuff});
 } ## end sub d (@stuff)
 
-sub default_getopt_config ($has_children) {
+sub default_getopt_config ($self, $spec) {
    my @r = qw< gnu_getopt >;
-   push @r, qw< require_order pass_through > if $has_children;
+   push @r, qw< require_order pass_through >
+      if scalar get_children($self, $spec);
+   push @r, qw< pass_through > if  $spec->{'allow-residual-options'};
    return \@r;
 }
 
@@ -525,8 +527,8 @@ sub sources ($self, $spec, $args) {
 
 sub stock_CmdLine ($self, $spec, $args) {
    my @args = $args->@*;
-   my $goc  = $spec->{getopt_config}
-     // default_getopt_config(scalar(get_children($self, $spec)));
+   my $goc  = $spec->{'getopt-config'}
+     // default_getopt_config($self, $spec);
    require Getopt::Long;
    Getopt::Long::Configure('default', $goc->@*);
 
@@ -542,7 +544,7 @@ sub stock_CmdLine ($self, $spec, $args) {
      or die "bailing out\n";
 
    # Check if we want to forbid the residual @args to start with a '-'
-   my $strict = !$spec->{'allow-residual-optionss'};
+   my $strict = !$spec->{'allow-residual-options'};
    if ($strict && @args && $args[0] =~ m{\A -}mxs) {
       Getopt::Long::Configure('default', 'gnu_getopt');
       Getopt::Long::GetOptionsFromArray(\@args, {});

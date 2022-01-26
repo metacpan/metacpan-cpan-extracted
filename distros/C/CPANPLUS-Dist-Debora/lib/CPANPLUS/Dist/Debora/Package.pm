@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 use Carp qw(croak);
 use Config;
@@ -1207,7 +1207,7 @@ CPANPLUS::Dist::Debora::Package - Base class for package formats
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

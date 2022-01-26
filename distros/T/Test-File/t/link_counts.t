@@ -58,7 +58,7 @@ subtest should_work => sub {
 subtest bad_count => sub {
 	test_out( "not ok 1 - $test_name" );
 	test_diag(
-		"File [$readable] points has [1] links: expected [100]!\n" .
+		"file [$readable] points has [1] links: expected [100]\n" .
 		"    #   Failed test '$test_name'\n" .
 		"    #   at $0 line " . line_num(+5) . "."
 		);
@@ -67,7 +67,7 @@ subtest bad_count => sub {
 
 	test_out( "not ok 1 - $test_name" );
 	test_diag(
-		"File [$readable] points has [1] links: expected less than [0]!\n" .
+		"file [$readable] points has [1] links: expected less than [0]\n" .
 		"    #   Failed test '$test_name'\n" .
 		"    #   at $0 line " . line_num(+5) . "."
 		);
@@ -76,7 +76,7 @@ subtest bad_count => sub {
 
 	test_out( "not ok 1 - $test_name" );
 	test_diag(
-		"File [readable] points has [1] links: expected more than [100]!\n" .
+		"file [readable] points has [1] links: expected more than [100]\n" .
 		"    #   Failed test '$test_name'\n" .
 		"    #   at $0 line " . line_num(+5) . "."
 		);

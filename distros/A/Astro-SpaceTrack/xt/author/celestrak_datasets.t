@@ -126,9 +126,9 @@ foreach ( @{ $names } ) {
 }
 
 foreach my $key ( keys %got ) {
-    if ( $got{$key}{name} =~ m/ \b pre-launch \b /smxi ) {
+    if ( $got{$key}{name} =~ m/ \b ( pre-launch | post-deployment ) \b /smxi ) {
+	$expect{$key}{note} = "\u$1 data sets are temporary";
 	$expect{$key}{name} ||= $got{$key}{name};
-	$expect{$key}{note} = 'Pre-launch data sets are temporary';
 	$expect{$key}{ignore} = 1;
     }
 }

@@ -1,5 +1,39 @@
 Revision history for MIDI-Bassline-Walk
 
+0.0309 2022-01-26 13:01:40
+    - Something is wrong and the distribution is not on CPAN?
+
+0.0308 2022-01-26 10:56:19
+    - Fix the description of the tonic attribute.
+    - Whoops - Incremented the version number twice. :\
+
+0.0306 2022-01-26 07:47:22
+    - I *think* that voice->context takes an arrayref, but I'm not sure. thrig?
+    - If tonic is set, replace the first note with the I, III, or V notes.
+
+0.0305 2022-01-25 12:23:59
+    - Modularize verbose note output.
+    - Clean-up code a bit.
+
+0.0304 2022-01-25 11:32:51
+    - Reinstate context() if the tonic attribute is set.
+    - Choose the closest pitch, if given a next-chord intersection.
+
+0.0303 2022-01-25 01:55:15
+    - Clean-up code ever-so-slightly.
+
+0.0302 2022-01-25 01:36:42
+    - Improve intersection logic.
+    - Add a tonic attribute.
+    - Improve the eg/walking program.
+
+0.0301 2022-01-24 16:21:53
+    - Remove debugging code.
+    - Do not have a next_scale without a next_chord.
+
+0.0300 2022-01-24 16:14:16
+    - If given a "next chord" in generate() use note intersection.
+
 0.0207 2021-05-31 01:03:17
     - Improve documentation slightly.
     - Add the eg/walking program to illustrate usage.

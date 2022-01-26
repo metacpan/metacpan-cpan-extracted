@@ -9,7 +9,7 @@ use parent qw(Hash::AsObject);
 
 use Carp;
 
-our $VERSION = '0.902';
+our $VERSION = '0.903';
 
 =encoding utf8
 

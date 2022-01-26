@@ -19,7 +19,7 @@ use Math::BLAS::Enum;
 
 BEGIN
 {
-  our $VERSION = '1.01';
+  our $VERSION = '1.02';
   our @EXPORT = qw(dot_d
 		   norm_d
 		   sum_d

@@ -8,9 +8,10 @@ use warnings;
 use 5.016;
 use ExtUtils::MakeMaker;
 
-die "OS unsupported\n" if $^O eq 'MSWin32' && !eval { require Alien::MSYS };
+die "OS unsupported\n" if $^O eq 'MSWin32';
 use Config;
 use Alien::libmaxminddb;
+die "OS unsupported\n" if Alien::libmaxminddb->version =~ m{^(0|1\.[01])\.};
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Read MaxMind DB files",
@@ -24,7 +25,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.016",
   "NAME" => "IP::Geolocation::MMDB",
   "PREREQ_PM" => {
-    "Math::BigInt" => "1.999811",
+    "Math::BigInt" => "1.999806",
     "XSLoader" => 0,
     "utf8" => 0,
     "warnings" => 0
@@ -33,7 +34,7 @@ my %WriteMakefileArgs = (
     "File::Spec::Functions" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.009",
+  "VERSION" => "1.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,7 +48,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "File::Spec::Functions" => 0,
-  "Math::BigInt" => "1.999811",
+  "Math::BigInt" => "1.999806",
   "Test::More" => 0,
   "XSLoader" => 0,
   "utf8" => 0,

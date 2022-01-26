@@ -11,7 +11,7 @@ use Form::Tiny::Hook;
 use Form::Tiny::Filter;
 use Moo::Role;
 
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 
 requires qw(setup);
 
@@ -24,20 +24,24 @@ has "filters" => (
 	default => sub { [] },
 );
 
+sub _create_filter
+{
+	my ($self, $filter, $code) = @_;
+
+	return $filter
+		if defined blessed $filter && $filter->isa('Form::Tiny::Filter');
+
+	return Form::Tiny::Filter->new(
+		type => $filter,
+		code => $code
+	);
+}
+
 sub add_filter
 {
 	my ($self, $filter, $code) = @_;
 
-	if (defined blessed $filter && $filter->isa('Form::Tiny::Filter')) {
-		push @{$self->filters}, $filter;
-	}
-	else {
-		push @{$self->filters}, Form::Tiny::Filter->new(
-			type => $filter,
-			code => $code
-		);
-	}
-
+	push @{$self->filters}, $self->_create_filter($filter, $code);
 	return $self;
 }
 
@@ -45,27 +49,7 @@ sub add_field_filter
 {
 	my ($self, $field, $filter, $code) = @_;
 
-	if (defined blessed $field) {
-		if ($field->isa('Form::Tiny::Filter')) {
-			carp 'passing field filter as a sole argument without context for field_filter is deprecated';
-			push @{$self->filters}, $field;
-		}
-		elsif ($field->isa('Form::Tiny::FieldDefinition') || $field->isa('Form::Tiny::FieldDefinitionBuilder')) {
-			push @{$field->addons->{filters}}, Form::Tiny::Filter->new(
-				type => $filter,
-				code => $code
-			);
-		}
-	}
-	else {
-		carp 'passing context explicitly for field_filter is deprecated';
-		push @{$self->filters}, Form::Tiny::Filter->new(
-			field => $field,
-			type => $filter,
-			code => $code
-		);
-	}
-
+	push @{$field->addons->{filters}}, $self->_create_filter($filter, $code);
 	return $self;
 }
 
@@ -73,18 +57,12 @@ sub _apply_filters
 {
 	my ($self, $obj, $def, $value) = @_;
 
-	my @params;
-	unshift @params, $obj
-		if $self->consistent_api;
-
-	my $name = $def->name;
 	for my $filter (@{$self->filters}) {
-		$value = $filter->filter($value, @params)
-			if $filter->check_field($name);
+		$value = $filter->filter($obj, $value);
 	}
 
 	for my $filter (@{$def->addons->{filters}}) {
-		$value = $filter->filter($value, @params);
+		$value = $filter->filter($obj, $value);
 	}
 
 	return $value;

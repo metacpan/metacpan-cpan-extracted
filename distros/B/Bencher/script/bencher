@@ -1,7 +1,7 @@
 #!perl
 
 our $DATE = '2021-08-13'; # DATE
-our $VERSION = '1.052'; # VERSION
+our $VERSION = '1.056'; # VERSION
 
 use 5.010001;
 use strict;
@@ -32,7 +32,7 @@ bencher - A benchmark framework (CLI)
 
 =head1 VERSION
 
-This document describes version 1.052 of bencher (from Perl distribution Bencher), released on 2021-08-13.
+This document describes version 1.056 of bencher (from Perl distribution Bencher), released on 2021-08-13.
 
 =head1 SYNOPSIS
 
@@ -1067,6 +1067,10 @@ When action=show-items-result, will print result as-is instead of dumping as
 Perl.
 
 
+=item B<--render-as-benchmark-pm>
+
+Format result like Benchmark.pm.
+
 =item B<--result-dir>=I<s>
 
 Directory to use when saving benchmark result.
@@ -1376,6 +1380,7 @@ List of available configuration parameters:
  precision (see --precision)
  precision_limit (see --precision-limit)
  raw (see --raw)
+ render_as_benchmark_pm (see --render-as-benchmark-pm)
  result_dir (see --result-dir)
  result_filename (see --result-filename)
  return_meta (see --return-meta)

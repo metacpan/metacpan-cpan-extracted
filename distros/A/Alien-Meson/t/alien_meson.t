@@ -4,6 +4,7 @@ use Test::Alien::Diag;
 use Alien::Meson;
 
 alien_diag 'Alien::Meson';
+diag "Alien::Meson {style} : ", Alien::Meson->runtime_prop->{'style'};
 alien_ok 'Alien::Meson';
 
 run_ok([ Alien::Meson->exe, qw(--version) ])

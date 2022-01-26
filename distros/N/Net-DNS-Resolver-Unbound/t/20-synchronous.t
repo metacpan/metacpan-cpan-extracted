@@ -3,16 +3,9 @@
 
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More tests => 7;
 
 use Net::DNS::Resolver::Unbound;
-
-BEGIN {
-	local @INC = ( @INC, qw(t) );
-	require NonFatal;
-}
-
-NonFatalBegin();
 
 
 my $resolver = Net::DNS::Resolver::Unbound->new(
@@ -26,13 +19,14 @@ ok( $resolver, 'create new resolver instance' );
 
 
 ok( $resolver->send('ns.net-dns.org.'), '$resolver->send(ns.net-dns.org.)' );
+is( $resolver->errorstring, '', 'empty $resolver->errorstring' );
 
 ok( $resolver->query('ns'), '$resolver->query(ns)' );
+is( $resolver->errorstring, '', 'empty $resolver->errorstring' );
 
 ok( $resolver->search('ns'), '$resolver->search(ns)' );
+is( $resolver->errorstring, '', 'empty $resolver->errorstring' );
 
-
-NonFatalEnd();
 
 exit;
 

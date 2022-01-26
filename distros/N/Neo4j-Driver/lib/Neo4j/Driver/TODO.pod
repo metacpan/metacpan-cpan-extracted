@@ -16,8 +16,12 @@ See L<https://github.com/johannessen/neo4j-driver-perl/issues>.
 =item * Implement spatial and temporal types.
 
 =item * Add timers to L<Neo4j::Driver::ResultSummary> (see C<Neo4j::Bolt>).
+Method names should be C<result_available_after> and C<result_consumed_after>,
+both returning milliseconds with a default of C<-1> when unavailable (HTTP).
 
 =item * C<croak()> error objects (e. g. L<Exception::Class>) instead of strings.
+(However, this may be difficult to do, see L<Carp/"BUGS">.
+Also, p5p has plans to add real error objects to a future version of Perl.)
 It seems there are about four types that would need to be distinguished: illegal
 usage errors, internal driver errors, Network errors, and Neo4j server errors.
 See also L<#7|https://github.com/johannessen/neo4j-driver-perl/issues/7>.
@@ -34,8 +38,8 @@ See also L<#7|https://github.com/johannessen/neo4j-driver-perl/issues/7>.
 not until at least part of the C<result_handlers> API has been specified
 
 =item * L<Neo4j::Driver::Result/"Control result stream attachment">:
-make C<detach()> stable (it's only needed I<very> rarely, but when it is,
-there may be no good alternative); deprecate C<attached()>
+deprecate, as it really doesn't seem to be needed (also, this feature used
+to be available in I<one> of the official drivers, but it no longer is now)
 
 =item * L<Neo4j::Driver::Result/"Look ahead in the result stream">:
 make C<peek()> stable once C<fetch()> reliably buffers two records
@@ -44,16 +48,6 @@ make C<peek()> stable once C<fetch()> reliably buffers two records
 for both nested explicit and nested autocommit transactions (for
 consistency with Bolt), but provide a driver config option (e. g.
 C<< nested_transactions => 1 >>) that lifts this restriction for HTTP
-
-=item * L<Neo4j::Driver::Result/"Disable obtaining query statistics">:
-Deprecate in favour of modifying the JSON in a custom net module.
-Clarify that this is already now an internal API in the deprecation
-explanation, so that it can be dropped from the module pod.
-
-=item * L<Neo4j::Driver::Transaction/"Return results in graph format">:
-Deprecate in favour of modifying the JSON in a custom net module. Clarify that
-this and L<Neo4j::Driver::Record/"graph"> are already now internal APIs in the
-deprecation explanation, so that both can be dropped from the module pod.
 
 =item * Calling list methods in scalar context
 (L<in Node|Neo4j::Driver::Type::Node/"Calling in scalar context">,
@@ -102,6 +96,11 @@ could filter out.
 The internals test "transaction: REST 404 error handling" should run a distinct
 statement.
 
+=item * Consider migrating the LWP tests away from L<Mock::Quick> to reduce
+the dependency chain (L<Mock::MonkeyPatch> and L<Mock::Sub> look extremely
+light-weight, alternatives might I<perhaps> be L<Test::MockObject::Extends>
+or L<Test::LWP::UserAgent>).
+
 =item * Verify that L<Neo4j::Driver::Type::Node/"get"> and
 L<Neo4j::Driver::Type::Relationship/"get"> really do return undef
 (as documented), even when called in list context.
@@ -149,13 +148,6 @@ only, this should not be a breaking change.
 =head2 L<Neo4j::Driver::Session>
 
 =over
-
-=item * Once a session is created, the driver object becomes immutable. It
-should therefore be possible to store the ServerInfo in the driver object
-once it is obtained. If the default database is added as well, the Discovery
-API doesn't need to be used again for a new session. This change would keep
-down network utilisation in scenarios where many sessions are created (such
-as running the driver's test suite).
 
 =item * Add
 L<transaction functions|https://neo4j.com/docs/driver-manual/4.1/session-api/simple/#driver-simple-transaction-fn>.
@@ -252,6 +244,8 @@ perhaps have to be requested explicitly by clients (rather than being
 obtained by default, as with 0.13 and higher). However, using Bolt always
 provides stats, and different APIs for HTTP and Bolt seem like a bad idea.
 
+=item * Recent Neo4j versions have added C<database>.
+
 =back
 
 =head2 L<Neo4j::Driver::SummaryCounters>
@@ -261,6 +255,9 @@ provides stats, and different APIs for HTTP and Bolt seem like a bad idea.
 =item * C<use Class::Accessor::Fast 0.34;>
 
 =item * It seems Neo4j 4 added new counters for system updates.
+These are C<contains_system_updates> and C<system_updates>, the latter
+returning the number of system updates. Neither is available in
+L<Neo4j::Bolt> 0.4201 according to the docs; need to check source.
 
 =back
 
@@ -281,11 +278,17 @@ Problem is, "agent" is already an overloaded term.
 
 =item Should "net module" be renamed to "net plugin"?
 
-Currently we include a net module with the distribution, so that's not really
-a plugin. However, we could simply describe that as the "default plugin". Also,
-perhaps the LWP module should be externalised anyway, to ease future expansion.
+The primary problem would seem to be that usually zero or multiple plugins
+are supported, but we require exactly one plugin here. Also, currently we
+I<include> a net module with the distribution, so that's not really a plugin;
+however, we could probably just describe that as the "default plugin".
 
 =back
+
+=item * As a micro-optimisation for the HTTP net_module API, it could be
+guaranteed for the C<http_header()> method that the returned hashref will not
+be used by the driver/controller after the next call to C<request()>, so that
+the underlying hash may be reused by the net module.
 
 =back
 
@@ -305,6 +308,14 @@ Not sure if these occur in practice, but we should probably
 be able to handle them correctly anyway.
 (See also L<neo4j#12651|https://github.com/neo4j/neo4j/issues/12651>.)
 
+=item * C<new()> shouldn't swallow the exception if loading
+L<Neo4j::Bolt>> fails; see
+L<https://www.nntp.perl.org/group/perl.perl5.porters/2021/07/msg260971.html>
+
+=item * The next major version should require a suitably new version
+of L<Neo4j::Bolt> (using C<< ->VERSION(...) >>; see
+L<https://github.com/libwww-perl/libwww-perl/pull/253#issuecomment-295838118>)
+
 =back
 
 =head2 L<Neo4j::Driver::Net::HTTP>
@@ -318,6 +329,17 @@ i. e. the resource has been created at the default transaction endpoint.
 That should never happen; in fact, it should only ever happen for a PUT
 request, but we don't use those here. So ignoring this is probably the right
 choice. But it may still be useful to revisit this logic later on.
+
+=back
+
+=head2 L<Neo4j::Driver::Net::HTTP::LWP>
+
+=over
+
+=item * Consider externalsing this as a distribution of its own now rather than
+later. Eventually we might get rid of this new dependency by including an all-new
+adapter for L<HTTP::Tiny>. Even before then, this new structure will make more
+clear that the driver in principle supports other backends besides just L<LWP>.
 
 =back
 

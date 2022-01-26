@@ -2,7 +2,7 @@
 
 A Perl module for the [Exim](https://www.exim.org/) mailer that checks email
 attachments for blocked filenames.  Common executable, macro-enabled and
-archive file formats can be rejected.
+archive file formats are identified.
 
     acl_check_mime:
 
@@ -28,10 +28,7 @@ distributed with Perl.
 
 ## INSTALLATION
 
-The [Open Build Service](https://build.opensuse.org/package/show/home:voegelas/perl-Mail-Exim-ACL-Attachments)
-provides binary and source packages.
-
-Run the following commands to install the software manually:
+Run the following commands to install the software:
 
     perl Makefile.PL
     make

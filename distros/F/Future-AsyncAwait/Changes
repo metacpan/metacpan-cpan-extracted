@@ -1,5 +1,11 @@
 Revision history for Future-AsyncAwait
 
+0.56    2022-01-26
+        [CHANGES]
+         * Updated Awaitable API definition for AWAIT_ON_CANCEL
+         * Actually use AWAIT_ON_CANCEL properly (RT137723)
+         * Document the interaction of `multi async sub`
+
 0.55    2021-12-16
         [CHANGES]
          * Updated for XS::Parse::Keyword 0.15

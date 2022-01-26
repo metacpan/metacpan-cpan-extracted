@@ -5,13 +5,13 @@ package mb::JSON;
 #
 # http://search.cpan.org/dist/mb-JSON/
 #
-# Copyright (c) 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2021, 2022 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.02';
+$VERSION = '0.03';
 $VERSION = $VERSION;
 
 use strict;
@@ -170,12 +170,12 @@ END
 
         # JSON's boolean "true" --> Perl's "1"
         elsif (/\G true \b/xmsgc) {
-            $parsed .= '1';
+            $parsed .= '!!1';
         }
 
         # JSON's boolean "false" --> Perl's "0"
         elsif (/\G false \b/xmsgc) {
-            $parsed .= '0';
+            $parsed .= '!!0';
         }
 
         # other all UTF-8 codepoints

@@ -17,7 +17,7 @@ subtest file_does_not_exist => sub {
 	my $name = "$file is not empty";
 	test_out( "not ok 1 - $name");
 	test_diag(
-		"File [$file] does not exist!\n" .
+		"file [$file] does not exist\n" .
 		"    #   Failed test '$name'\n".
 		"    #   at $0 line " . line_num(+5) . "."
 		);
@@ -47,7 +47,7 @@ subtest file_exists_zero_size => sub {
 	my $name = "$file is not empty";
 	test_out( "not ok 1 - $name");
 	test_diag(
-		"File [$file] exists with zero size!\n" .
+		"file [$file] exists with zero size\n" .
 		"    #   Failed test '$name'\n".
 		"    #   at $0 line " . line_num(+5) . "."
 		);

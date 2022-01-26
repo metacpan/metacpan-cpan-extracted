@@ -334,33 +334,27 @@ use PDL::Transform;
 
 package PDL::Transform::Color;
 
-use PDL::Core ':Internal';  # load "topdl" (internal routine)
-
-@ISA = ( 'Exporter', 'PDL::Transform' );
-our $VERSION = '1.005';
-$VERSION = eval $VERSION;
-
-BEGIN {
-    package PDL::Transform::Color;
-    use base 'Exporter';
-    @EXPORT_OK = qw/ t_gamma t_brgb t_srgb t_shift_illuminant t_shift_rgb t_cmyk t_rgi t_cieXYZ t_xyz t_xyY t_xyy t_lab t_xyz2lab t_hsl t_hsv t_pc t_pcp/;
-    @EXPORT = @EXPORT_OK;
-    %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
-};
-
 use strict;
-use PDL;
+use warnings;
+use base 'Exporter';
+use PDL::LiteF;
 use PDL::Transform;
 use PDL::MatrixOps;
+use PDL::Math;
 use PDL::Options;
-use PDL::NiceSlice;
-
 use Carp;
 
-our $PI = $PDL::Transform::PI;
+our @ISA = ( 'Exporter', 'PDL::Transform' );
+our $VERSION = '1.006';
+$VERSION = eval $VERSION;
+
+our @EXPORT_OK = qw/ t_gamma t_brgb t_srgb t_shift_illuminant t_shift_rgb t_cmyk t_rgi t_cieXYZ t_xyz t_xyY t_xyy t_lab t_xyz2lab t_hsl t_hsv t_pc t_pcp/;
+our @EXPORT = @EXPORT_OK;
+our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
+
+our $PI = 3.141592653589793238462643383279502;
 our $DEG2RAD = $PDL::Transform::DEG2RAD;
 our $RAD2DEG = $PDL::Transform::RAD2DEG;
-
 
 # Some matrix values of use in RGB conversions...
 
@@ -885,9 +879,8 @@ The full "color wheel", including the controversial magenta-to-red segment
 ## split    This is the "zero point" on [0-1] of the color map.  Default is 0.  Useful
 ##            for gamma scaling etc; primarily used by doppler and other signed tables.
 ##            (Note that it's the user's responsibility to make sure the irange places
-##            the zero here, since the subs accept pre-scaled input on [0,1]    
+##            the zero here, since the subs accept pre-scaled input on [0,1]
 
-our $PI = 3.141592653589793238462643383279502;
 our $pc_tab = {
     gray       => { type=>'rgb', subs=> [ sub{$_[0]},       sub{$_[0]},        sub{$_[0]}       ],
 		  doc=>"greyscale", phot=>1 },
@@ -984,7 +977,7 @@ our $pc_tab_abbrevs = {};
 	    if($pc_tab_foo->{$s} and length($s)<length($k)) {
 		# collision with earlier string -- if that's a real abbreviation, zap it.
 		delete($pc_tab_abbrevs->{$s})
-		   unless( length($pc_tab_abbrevs->{$s}) == length($s) );
+		   unless( length($pc_tab_abbrevs->{$s}||'') == length($s) );
 	    } else {
 		# no collision -- figure it's a valid abbreviation.
 		$pc_tab_abbrevs->{$s} = $k;
@@ -1200,9 +1193,9 @@ sub t_pc {
 
 	## These are the actual transforms.  They're figured by the constructor,
 	## which does any combinatorics in setting up the subs.
-	$out->((0)) .= &{$opt->{subs}->[0]}($in2)->clip(0,1);
-	$out->((1)) .= &{$opt->{subs}->[1]}($in2)->clip(0,1);
-	$out->((2)) .= &{$opt->{subs}->[2]}($in2)->clip(0,1);
+	$out->slice('(0)') .= $opt->{subs}->[0]->($in2)->clip(0,1);
+	$out->slice('(1)') .= $opt->{subs}->[1]->($in2)->clip(0,1);
+	$out->slice('(2)') .= $opt->{subs}->[2]->($in2)->clip(0,1);
 
 	if(defined($opt->{lut}->{ogamma})) {
 	    $out *= ($out->abs) ** ($opt->{lut}->{ogamma}-1);
@@ -1297,9 +1290,9 @@ sub t_xyz {
     } else {
 	my $rgb = get_rgb($me->{params}->{rgb_system});
 
-	my ($xr,$yr) = ($rgb->{r}->((0)),$rgb->{r}->((1)));
-	my ($xg,$yg) = ($rgb->{g}->((0)),$rgb->{g}->((1)));
-	my ($xb,$yb) = ($rgb->{b}->((0)),$rgb->{b}->((1)));
+	my ($xr,$yr) = ($rgb->{r}->slice('(0)'),$rgb->{r}->slice('(1)'));
+	my ($xg,$yg) = ($rgb->{g}->slice('(0)'),$rgb->{g}->slice('(1)'));
+	my ($xb,$yb) = ($rgb->{b}->slice('(0)'),$rgb->{b}->slice('(1)'));
 	
 	my $Xr = $xr / ($yr + ($yr==0));
 	my $Yr = 1;
@@ -1314,12 +1307,12 @@ sub t_xyz {
 	my $M = pdl( [ $Xr, $Xg, $Xb ], [$Yr, $Yg, $Yb], [$Zr, $Zg, $Zb] );
 	my $Minv = $M->inv;
 
-	my ($xw, $yw, $Yw) = ($rgb->{w}->((0)),$rgb->{w}->((1)),$rgb->{w}->((2)));
+	my ($xw, $yw, $Yw) = ($rgb->{w}->slice('(0)'),$rgb->{w}->slice('(1)'),$rgb->{w}->slice('(2)'));
 	my $Xw = $xw * $Yw / ($yw + ($yw==0));
 	my $Zw = (1 - $xw - $yw)*$Yw / ($yw+($yw==0));
 	my $XYZw = pdl($Xw,$Yw,$Zw);
 
-	my $Srgb = ($Minv x $XYZw->(*1))->((0)); # row vector
+	my $Srgb = ($Minv x $XYZw->slice('*1'))->slice('(0)'); # row vector
 	$M *= $Srgb;
 	$me->{params}->{mat} = $M;
 	$me->{params}->{inv} = $M->inv;
@@ -1333,7 +1326,7 @@ sub t_xyz {
     $me->{func} = sub {
 	my($in, $opt) = @_;
 
-	my $out = ( $opt->{mat} x $in->(*1) )->((0))->sever;
+	my $out = ( $opt->{mat} x $in->slice('*1') )->slice('(0)')->sever;
 	
 	if($in->is_inplace) {
 	    $in .= $out;
@@ -1344,7 +1337,7 @@ sub t_xyz {
 
     $me->{inv} = sub {
 	my($in, $opt) = @_;
-	my $out = ( $opt->{inv} x $in->(*1) )->((0))->sever;
+	my $out = ( $opt->{inv} x $in->slice('*1') )->slice('(0)')->sever;
 
 	if($in->is_inplace) {
 	    $in .= $out;
@@ -1377,10 +1370,10 @@ sub t_rgi {
 
     $me->{func} = sub {
 	my($in,$opt) = @_;
-	my $i = $in->sumover->(*1);
+	my $i = $in->sumover->slice('*1');
 	my $out = zeroes($in);
-	$out->(0:1) .= $in(0:1) / ($i+($i==0));
-	$out->(2) .= $i/3;
+	$out->slice('0:1') .= $in->slice('0:1') / ($i+($i==0));
+	$out->slice('2') .= $i/3;
 	if($in->is_inplace) {
 	    $in .= $out;
 	    return $in;
@@ -1390,9 +1383,9 @@ sub t_rgi {
     $me->{inv} = sub {
 	my($in,$opt) = @_;
 	my $out = zeroes($in);
-	$out->(0:1) .= $in(0:1);
-	$out->((2)) .= 1 - $in(0:1)->sumover;
-	$out *= $in->(2) * 3;
+	$out->slice('0:1') .= $in->slice('0:1');
+	$out->slice('(2)') .= 1 - $in->slice('0:1')->sumover;
+	$out *= $in->slice('2') * 3;
 	if($in->is_inplace) {
 	    $in .= $out;
 	    return $in;
@@ -1435,8 +1428,8 @@ sub t_xyy {
 
     $me->{func} = sub {
 	my($XYZ, $opt) = @_;
-	my $out = $XYZ/$XYZ->sumover->(*1);
-	$out->((2)) .= $XYZ->((1));
+	my $out = $XYZ/$XYZ->sumover->slice('*1');
+	$out->slice('(2)') .= $XYZ->slice('(1)');
 	if($XYZ->is_inplace) {
 	    $XYZ .= $out;
 	    $out = $XYZ;
@@ -1450,10 +1443,10 @@ sub t_xyy {
 	my $XYZ = zeroes($in);
 
 	# stuff X and Z in there.
-	my $in1 = $in->((1))+($in->((1))==0);
-	$XYZ->((0)) .= $in->((0)) * $in->((2)) / $in1;
-	$XYZ->((1)) .= $in->((2));
-	$XYZ->((2)) .= $in->((2)) * (1 - $in->((0)) - $in->((1))) / $in1;
+	my $in1 = $in->slice('(1)')+($in->slice('(1)')==0);
+	$XYZ->slice('(0)') .= $in->slice('(0)') * $in->slice('(2)') / $in1;
+	$XYZ->slice('(1)') .= $in->slice('(2)');
+	$XYZ->slice('(2)') .= $in->slice('(2)') * (1 - $in->slice('(0)') - $in->slice('(1)')) / $in1;
 	
 	if($in->is_inplace) {
 	    $in .= $XYZ;
@@ -1539,10 +1532,8 @@ sub t_xyz2lab {
     # get and store illuminant XYZ
     my $wp_xyy = xyy_from_illuminant($me->{params}->{white});
     $me->{params}->{wp_xyz} = $wp_xyy->copy;
-    $me->{params}->{wp_xyz}->(2) .= 1 - $wp_xyy->(0) - $wp_xyy->(1);
-    $me->{params}->{wp_xyz} *= $wp_xyy->(2);
-    
-
+    $me->{params}->{wp_xyz}->slice('2') .= 1 - $wp_xyy->slice('0') - $wp_xyy->slice('1');
+    $me->{params}->{wp_xyz} *= $wp_xyy->slice('2') / $wp_xyy->slice('1');
     # input is XYZ by the time it gets here
     $me->{func} = sub {
 	my($in,$opt) = @_;
@@ -1550,11 +1541,11 @@ sub t_xyz2lab {
 
 	my $wp = $opt->{wp_xyz} + ($opt->{wp_xyz}==0);
 	
-	my $FYp = f_lab(  $in->((1)) / $wp->((1))  );
+	my $FYp = f_lab(  $in->slice('(1)') / $wp->slice('(1)')  );
 	    
-	$out->((0)) .= 116 * $FYp - 16;
-	$out->((1)) .= 500 * ( f_lab( $in->((0)) / $wp->((0)) ) - $FYp   );
-	$out->((2)) .= 200 * ( $FYp - f_lab( $in->((2)) / $wp->((2)) ) );
+	$out->slice('(0)') .= 116 * $FYp - 16;
+	$out->slice('(1)') .= 500 * ( f_lab( $in->slice('(0)') / $wp->slice('(0)') ) - $FYp   );
+	$out->slice('(2)') .= 200 * ( $FYp - f_lab( $in->slice('(2)') / $wp->slice('(2)') ) );
 
 	if($in->is_inplace) {
 	    $in .= $out;
@@ -1567,11 +1558,11 @@ sub t_xyz2lab {
 	my($in,$opt) = @_;
 	my($out) = zeroes($in);
 
-	my $Lterm = ($in->((0))+16)/116;
+	my $Lterm = ($in->slice('(0)')+16)/116;
 	
-	$out->((0)) .= $opt->{wp_xyz}->((0)) * f_lab_inv( $Lterm + $in->((1))/500 );
-	$out->((1)) .= $opt->{wp_xyz}->((1)) * f_lab_inv( $Lterm );
-	$out->((2)) .= $opt->{wp_xyz}->((2)) * f_lab_inv( $Lterm - $in->((2))/200 );
+	$out->slice('(0)') .= $opt->{wp_xyz}->slice('(0)') * f_lab_inv( $Lterm + $in->slice('(1)')/500 );
+	$out->slice('(1)') .= $opt->{wp_xyz}->slice('(1)') * f_lab_inv( $Lterm );
+	$out->slice('(2)') .= $opt->{wp_xyz}->slice('(2)') * f_lab_inv( $Lterm - $in->slice('(2)')/200 );
 
 	if($in->is_inplace) {
 	    $in .= $out;
@@ -1648,13 +1639,13 @@ sub t_cmyk {
 
     $me->{func} = sub {
 	my($in,$opt) = @_;
-	my $out = zeroes( 4, $in->((0))->dims );
+	my $out = zeroes( 4, $in->slice('(0)')->dims );
 	
-	my $Kp = $in->maximum->(*1);
-	(my $K = $out->(3)) .= 1 - $Kp;
-	$out->(0:2) .= ($Kp - $in->(0:2)) / $Kp;
-	$out->((3))->where($Kp==0) .= 1;
-	$out->(0:2)->mv(0,-1)->where($Kp==0) .= 0;
+	my $Kp = $in->maximum->slice('*1');
+	(my $K = $out->slice('3')) .= 1 - $Kp;
+	$out->slice('0:2') .= ($Kp - $in->slice('0:2')) / $Kp;
+	$out->slice('(3)')->where($Kp==0) .= 1;
+	$out->slice('0:2')->mv(0,-1)->where($Kp==0) .= 0;
 
 	if(defined($opt->{htgamma}) && $opt->{htgamma} != 1) {
 	    $out *= ($out->abs) ** ($opt->{htgamma} - 1);
@@ -1672,7 +1663,7 @@ sub t_cmyk {
 
     $me->{inv} = sub {
 	my($in,$opt) = @_;
-	my $out = zeroes( 3, $in->((0))->dims );
+	my $out = zeroes( 3, $in->slice('(0)')->dims );
 
 	$in = $in->new_or_inplace;
 	
@@ -1683,8 +1674,8 @@ sub t_cmyk {
 	if(defined($opt->{htgamma}) && $opt->{htgamma} != 1) {
 	    $in *= ($in->abs) ** (1.0/$opt->{htgamma} - 1);
 	}
-	my $Kp = 1.0 - $in->(3);
-	$out .= $Kp * ( 1 - $in->(0:2) );
+	my $Kp = 1.0 - $in->slice('3');
+	$out .= $Kp * ( 1 - $in->slice('0:2') );
 	return $out;
     };
 
@@ -1781,25 +1772,25 @@ sub t_hsl {
 	
 	my $Cmax = $in->maximum;
 	my $Cmin = $in->minimum;
-	my $maxdex = $in->qsorti->((2))->sever;
+	my $maxdex = $in->qsorti->slice('(2)')->sever;
 	my $Delta = ( $Cmax - $Cmin );
 
-	my $dexes = ($maxdex->(*1) + pdl(0,1,2)) % 3;
+	my $dexes = ($maxdex->slice('*1') + pdl(0,1,2)) % 3;
 
-	my $H = $out->((0));
+	my $H = $out->slice('(0)');
 
 	if($opt->{hue_linear}) {
 	    ## Old linear method
 	 $H .= ( 
-	    (($in->index1d($dexes->(1)) - $in->index1d($dexes->(2)))->((0))/($Delta+($Delta==0)))
-		+ 2 * $dexes->((0))  ) ;
+	    (($in->index1d($dexes->slice('1')) - $in->index1d($dexes->slice('2')))->slice('(0)')/($Delta+($Delta==0)))
+		+ 2 * $dexes->slice('(0)')  ) ;
 	
 	 $H += 6*($H<0);
 	 $H /= 6;
 	} else {
 	    ## New hotness: smooth transitions at corners
-	    my $Hint = 2*$dexes->((0));
-	    my $Hfrac = (($in->index1d($dexes->(1)) - $in->index1d($dexes->(2)))->((0))/($Delta+($Delta==0)));
+	    my $Hint = 2*$dexes->slice('(0)');
+	    my $Hfrac = (($in->index1d($dexes->slice('1')) - $in->index1d($dexes->slice('2')))->slice('(0)')/($Delta+($Delta==0)));
 	    my $Hfs = -1*($Hfrac<0) + ($Hfrac >= 0);
 	    $Hfrac .= $Hfs * (    asin(  ($Hfrac->abs) ** 0.25  ) * 2/$PI    );
 	    $H .= $Hint + $Hfrac;
@@ -1809,13 +1800,13 @@ sub t_hsl {
 	$H += ($H<0);
 	    
 	# Lightness and Saturation
-	my $L = $out->((2));
+	my $L = $out->slice('(2)');
 	if($opt->{hsv}) {
 	    $L .= $Cmax;
-	    $out->((1)) .= $Delta / ($L + ($L==0));
+	    $out->slice('(1)') .= $Delta / ($L + ($L==0));
 	} else {
 	    $L .= ($Cmax + $Cmin)/2;
-	    $out->((1)) .= $Delta / (1 - (2*$L-1)->abs + ($L==0 | $L==1));
+	    $out->slice('(1)') .= $Delta / (1 - (2*$L-1)->abs + (($L==0) | ($L==1)));
 	}
 	
 
@@ -1833,16 +1824,16 @@ sub t_hsl {
     $me->{inv} = sub {
 	my($in,$opt) = @_;
 
-	my $H = $in->((0))*6;
-	my $S = $in->((1));
-	my $L = $in->((2));
+	my $H = $in->slice('(0)')*6;
+	my $S = $in->slice('(1)');
+	my $L = $in->slice('(2)');
 
 	if($opt->{lgamma} != 1) {
 	    $L = $L * (($L->abs + ($L==0)) ** ($opt->{lgamma}-1));
 	}
 	
 	my $ZCX = zeroes($in);
-	my $C = $ZCX->((1));
+	my $C = $ZCX->slice('(1)');
 	my $m;
 	if($opt->{hsv}) {
 	    $C .= $L * $S;
@@ -1854,15 +1845,15 @@ sub t_hsl {
 
 	if($opt->{hue_linear}){
 	    ## Old linear method
-	    $ZCX->((2)) .= $C * (1 - ($H % 2 - 1)->abs);
+	    $ZCX->slice('(2)') .= $C * (1 - ($H % 2 - 1)->abs);
 	} else {
 	    ## New hotness: smooth transitions at corners.
-	    $ZCX->((2)) .= $C * sin($PI/2 * (1 - ($H % 2 - 1)->abs))**4;
+	    $ZCX->slice('(2)') .= $C * sin($PI/2 * (1 - ($H % 2 - 1)->abs))**4;
 	}
 	
 	my $dexes = pdl( [1,2,0], [2,1,0], [0,1,2], [0,2,1], [2,0,1], [1,0,2] )->mv(1,0)->sever;
-	my $dex = $dexes->index1d($H->floor->(*1,*1) % 6)->((0))->sever; # 3x(threads)
-	my $out = $ZCX->index1d($dex)->sever + $m->(*1);
+	my $dex = $dexes->index1d($H->floor->slice('*1,*1') % 6)->slice('(0)')->sever; # 3x(threads)
+	my $out = $ZCX->index1d($dex)->sever + $m->slice('*1');
 
 	if($in->is_inplace) {
 	    $in .= $out;
@@ -1980,28 +1971,28 @@ sub t_shift_illuminant {
 
     $me->{func} = sub {
 	my($in, $opt) = @_;
-	my $rhgabe_fr = ( $opt->{Ma} x $opt->{from}->(*1) )->((0))->sever;
-	my $rhgabe_to = ( $opt->{Ma} x $opt->{to}  ->(*1) )->((0))->sever;
-	my $M = $opt->{Ma_inv} x ( ( $rhgabe_to / $rhgabe_fr )->(*1) * $opt->{Ma} );
+	my $rhgabe_fr = ( $opt->{Ma} x $opt->{from}->slice('*1') )->slice('(0)')->sever;
+	my $rhgabe_to = ( $opt->{Ma} x $opt->{to}  ->slice('*1') )->slice('(0)')->sever;
+	my $M = $opt->{Ma_inv} x ( ( $rhgabe_to / $rhgabe_fr )->slice('*1') * $opt->{Ma} );
 
 	if($opt->{basis} =~ m/^X/i) {
-	    return  ((  $M x $in->(*1) )->((0))->sever);
+	    return  ((  $M x $in->slice('*1') )->slice('(0)')->sever);
 	} else {
-	    return  ((  ( $srgb2cxyz_inv x $M x $srgb2cxyz_mat ) x $in->(*1)  )->((0))->sever);
+	    return  ((  ( $srgb2cxyz_inv x $M x $srgb2cxyz_mat ) x $in->slice('*1')  )->slice('(0)')->sever);
 	}
 	
     };
 
     $me->{inv} = sub {
 	my($in, $opt) = @_;
-	my $rhgabe_fr = ( $opt->{Ma} x $opt->{from}->(*1) )->((0))->sever;
-	my $rhgabe_to = ( $opt->{Ma} x $opt->{to}  ->(*1) )->((0))->sever;
-	my $M = $opt->{Ma_inv} x ( ( $rhgabe_fr / $rhgabe_to )->(*1) * $opt->{Ma} );
+	my $rhgabe_fr = ( $opt->{Ma} x $opt->{from}->slice('*1') )->slice('(0)')->sever;
+	my $rhgabe_to = ( $opt->{Ma} x $opt->{to}  ->slice('*1') )->slice('(0)')->sever;
+	my $M = $opt->{Ma_inv} x ( ( $rhgabe_fr / $rhgabe_to )->slice('*1') * $opt->{Ma} );
 
 	if($opt->{basis} =~ m/^X/i) {
-	    return (( $M x $in->(*1)  )->((0))->sever);
+	    return (( $M x $in->slice('*1')  )->slice('(0)')->sever);
 	} else {
-	    return (( ( $srgb2cxyz_inv x $M x $srgb2cxyz_mat ) x $in->(*1)  )->((0))->sever);
+	    return (( ( $srgb2cxyz_inv x $M x $srgb2cxyz_mat ) x $in->slice('*1')  )->slice('(0)')->sever);
 	}
     };
 
@@ -2155,7 +2146,7 @@ sub xyy_from_D {
 	$u_opt);
 
     die "cie_xy_from_D: D must be between 40 and 250" if(any($D< 40) || any($D > 250));
-    my $T = $D*100;
+    my $T = $D*100 * 1.4388/1.438; # adjust for 6504K not 6500K
 
     my $Xd;
     $Xd = ($D<=70) * ( 0.244063 + 0.09911e3/$T + 2.9678e6/$T/$T - 4.6070e9/$T/$T/$T ) +
@@ -2477,8 +2468,5 @@ sub get_rgb {
     }
     return $new_rgb;
 }
-
-
-
 
 1;

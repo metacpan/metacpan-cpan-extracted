@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Type::Path;
 # ABSTRACT: Directed sequence of relationships between two nodes
-$Neo4j::Driver::Type::Path::VERSION = '0.27';
+$Neo4j::Driver::Type::Path::VERSION = '0.28';
 
 use parent 'Neo4j::Types::Path';
 use overload '@{}' => \&_array, fallback => 1;
@@ -37,6 +37,7 @@ sub elements {
 
 
 sub path {
+	# uncoverable pod (see Deprecations.pod)
 	my ($self) = @_;
 	
 	warnings::warnif deprecated => __PACKAGE__ . "->path() is deprecated; use elements()";
@@ -75,7 +76,7 @@ Neo4j::Driver::Type::Path - Directed sequence of relationships between two nodes
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 SYNOPSIS
 
@@ -162,7 +163,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2021 by Arne Johannessen.
+This software is Copyright (c) 2016-2022 by Arne Johannessen.
 
 This is free software, licensed under:
 

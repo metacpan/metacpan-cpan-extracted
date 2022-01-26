@@ -1,4 +1,5 @@
 Changes.pod
+examples/slow-sort.pl
 INSTALL.SKIP
 LICENSE
 lib/Set/Object.pm
@@ -62,5 +63,6 @@ t/scalar/storable.t
 t/scalar/symmdiff.t
 t/scalar/union.t
 t/scalar/unique.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
 SIGNATURE                                Public-key signature (added by MakeMaker)
-META.yml                                 Module meta-data (added by MakeMaker)

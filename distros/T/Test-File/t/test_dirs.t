@@ -18,13 +18,13 @@ dir_exists_ok( 'sub_dir', 'sub_dir really is a directory' );
 test_test();
 
 test_out( 'not ok 1 - bmoogle is a directory' );
-test_diag( 'Directory [bmoogle] does not exist!' );
+test_diag( 'directory [bmoogle] does not exist' );
 test_fail(+1);
 dir_exists_ok( 'bmoogle' );
 test_test();
 
 test_out( 'not ok 1 - readable is a directory' );
-test_diag( 'File [readable] exists but is not a directory!' );
+test_diag( 'file [readable] exists but is not a directory' );
 test_fail(+1);
 dir_exists_ok( 'readable' );
 test_test();
@@ -36,13 +36,13 @@ dir_contains_ok( 'sub_dir', 'subdir_file', 'directory sub_dir really contains fi
 test_test();
 
 test_out( 'not ok 1 - directory bmoogle contains file subdir_file' );
-test_diag( 'Directory [bmoogle] does not exist!' );
+test_diag( 'directory [bmoogle] does not exist' );
 test_fail(+1);
 dir_contains_ok( 'bmoogle', 'subdir_file' );
 test_test();
 
 test_out( 'not ok 1 - directory sub_dir contains file bmoogle' );
-test_diag( 'File [bmoogle] does not exist in directory sub_dir!' );
+test_diag( 'file [bmoogle] does not exist in directory sub_dir' );
 test_fail(+1);
 dir_contains_ok( 'sub_dir', 'bmoogle' );
 test_test();

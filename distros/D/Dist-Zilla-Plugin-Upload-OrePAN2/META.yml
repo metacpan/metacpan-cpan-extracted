@@ -1,0 +1,131 @@
+---
+abstract: 'Dist::Zilla release plugin to inject into a local OrePAN2 repository'
+author:
+  - 'D Ruth Holloway <ruth@hiruthie.me>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: '0'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-Upload-OrePAN2
+provides:
+  Dist::Zilla::Plugin::Upload::OrePAN2:
+    file: lib/Dist/Zilla/Plugin/Upload/OrePAN2.pm
+    version: '0.0001'
+requires:
+  Carp: '0'
+  Dist::Zilla::Role::Releaser: '0'
+  Modern::Perl: '0'
+  Moose: '0'
+  MooseX::Types::Moose: '0'
+  MooseX::Types::Path::Tiny: '0'
+  OrePAN2: '0'
+  OrePAN2::CLI::Indexer: '0'
+  OrePAN2::Injector: '0'
+  Path::Tiny: '0'
+  namespace::autoclean: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://gitlab.com/GeekRuthie/Dist-Zilla-Plugin-Upload-OrePAN2/-/issues
+  homepage: https://p3rl.org/Dist::Zilla::Plugin::Upload::OrePAN2
+  repository: https://gitlab.com/GeekRuthie/Dist-Zilla-Plugin-Upload-OrePAN2.git
+version: '0.0001'
+x_BuiltWith:
+  failures:
+    OrePAN2::CLI::Indexer: 'Module::MetaData could not parse a version from /home/geekruthie/perl5/perlbrew/perls/perl-5.34.0/lib/site_perl/5.34.0/OrePAN2/CLI/Indexer.pm'
+    OrePAN2::Injector: 'Module::MetaData could not parse a version from /home/geekruthie/perl5/perlbrew/perls/perl-5.34.0/lib/site_perl/5.34.0/OrePAN2/Injector.pm'
+  modules:
+    CPAN::Meta: '2.150010'
+    Carp: '1.52'
+    Dist::Zilla: '6.024'
+    Dist::Zilla::Plugin::Authority: '1.009'
+    Dist::Zilla::Plugin::AutoPrereqs: '6.024'
+    Dist::Zilla::Plugin::CPANFile: '6.024'
+    Dist::Zilla::Plugin::ChangeStats::Git: 0.6.0
+    Dist::Zilla::Plugin::CheckChangesHasContent: '0.011'
+    Dist::Zilla::Plugin::CoalescePod: 0.3.0
+    Dist::Zilla::Plugin::ConfirmRelease: '6.024'
+    Dist::Zilla::Plugin::ContributorCovenant: '2.000000'
+    Dist::Zilla::Plugin::ContributorsFile: 0.3.0
+    Dist::Zilla::Plugin::CopyFilesFromBuild: '0.170880'
+    Dist::Zilla::Plugin::CopyrightYearFromGit: '0.009'
+    Dist::Zilla::Plugin::Covenant: 0.1.2
+    Dist::Zilla::Plugin::ExecDir: '6.024'
+    Dist::Zilla::Plugin::Git::Check: '2.048'
+    Dist::Zilla::Plugin::Git::Commit: '2.048'
+    Dist::Zilla::Plugin::Git::CommitBuild: '2.048'
+    Dist::Zilla::Plugin::Git::Contributors: '0.036'
+    Dist::Zilla::Plugin::Git::GatherDir: '2.048'
+    Dist::Zilla::Plugin::Git::Push: '2.048'
+    Dist::Zilla::Plugin::Git::Tag: '2.048'
+    Dist::Zilla::Plugin::GitLab::Meta: '1.0002'
+    Dist::Zilla::Plugin::GitLab::Update: '1.0002'
+    Dist::Zilla::Plugin::INI::Baked: '0.002002'
+    Dist::Zilla::Plugin::InstallGuide: '1.200014'
+    Dist::Zilla::Plugin::InstallRelease: '0.008'
+    Dist::Zilla::Plugin::License: '6.024'
+    Dist::Zilla::Plugin::MakeMaker: '6.024'
+    Dist::Zilla::Plugin::Manifest: '6.024'
+    Dist::Zilla::Plugin::ManifestSkip: '6.024'
+    Dist::Zilla::Plugin::MetaData::BuiltWith: '1.004005'
+    Dist::Zilla::Plugin::MetaJSON: '6.024'
+    Dist::Zilla::Plugin::MetaProvides::Package: '2.004003'
+    Dist::Zilla::Plugin::MetaYAML: '6.024'
+    Dist::Zilla::Plugin::MinimumPerl: '1.006'
+    Dist::Zilla::Plugin::NextRelease: '6.024'
+    Dist::Zilla::Plugin::NextVersion::Semantic: 0.2.6
+    Dist::Zilla::Plugin::OurPkgVersion: '0.21'
+    Dist::Zilla::Plugin::PodWeaver: '4.009'
+    Dist::Zilla::Plugin::Prereqs::Plugins: '1.003003'
+    Dist::Zilla::Plugin::PreviousVersion::Changelog: 0.2.6
+    Dist::Zilla::Plugin::ReadmeMarkdownFromPod: '0.141140'
+    Dist::Zilla::Plugin::RunExtraTests: '0.029'
+    Dist::Zilla::Plugin::SchwartzRatio: 0.3.4
+    Dist::Zilla::Plugin::Test::Compile: '2.058'
+    Dist::Zilla::Plugin::Test::ReportPrereqs: '0.028'
+    Dist::Zilla::Plugin::TestRelease: '6.024'
+    Dist::Zilla::Plugin::UploadToCPAN: '6.024'
+    Dist::Zilla::Role::Releaser: '6.024'
+    ExtUtils::MakeMaker: '7.62'
+    File::Spec: '3.80'
+    IO::Handle: '1.46'
+    IPC::Open3: '1.21'
+    Modern::Perl: '1.20200211'
+    Moose: '2.2201'
+    MooseX::Types::Moose: '0.50'
+    MooseX::Types::Path::Tiny: '0.012'
+    OrePAN2: '0.48'
+    Path::Tiny: '0.120'
+    Test::More: '1.302183'
+    namespace::autoclean: '0.29'
+    strict: '1.12'
+    warnings: '1.51'
+  perl:
+    original: v5.34.0
+    qv: 1
+    version:
+      - 5
+      - 34
+      - 0
+  platform: linux
+x_author_pledge:
+  version: '1'
+x_authority: cpan:GEEKRUTH
+x_contributor_covenant:
+  version: '0.02'
+x_generated_by_perl: v5.34.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -1,4 +1,18 @@
 lib/Jacode4e/RoundTrip.pm
+lib/Jacode4e/RoundTrip.pm-2.13.81.12.TABLE.CP00930.txt
+lib/Jacode4e/RoundTrip.pm-2.13.81.12.TABLE.CP932.txt
+lib/Jacode4e/RoundTrip.pm-2.13.81.12.TABLE.CP932IBM.txt
+lib/Jacode4e/RoundTrip.pm-2.13.81.12.TABLE.CP932NEC.txt
+lib/Jacode4e/RoundTrip.pm-2.13.81.12.TABLE.CP932X.txt
+lib/Jacode4e/RoundTrip.pm-2.13.81.12.TABLE.JEF.txt
+lib/Jacode4e/RoundTrip.pm-2.13.81.12.TABLE.JEF9P.txt
+lib/Jacode4e/RoundTrip.pm-2.13.81.12.TABLE.JIPSE.txt
+lib/Jacode4e/RoundTrip.pm-2.13.81.12.TABLE.JIPSJ.txt
+lib/Jacode4e/RoundTrip.pm-2.13.81.12.TABLE.KEIS78.txt
+lib/Jacode4e/RoundTrip.pm-2.13.81.12.TABLE.KEIS83.txt
+lib/Jacode4e/RoundTrip.pm-2.13.81.12.TABLE.KEIS90.txt
+lib/Jacode4e/RoundTrip.pm-2.13.81.12.TABLE.LETSJ.txt
+lib/Jacode4e/RoundTrip.pm-2.13.81.12.TABLE.SJIS2004.txt
 BOOKLIST
 CONTRIBUTING
 Changes
@@ -110,4 +124,5 @@ t/0203_KEIS83_EBCDIK.t
 t/0204_KEIS90_EBCDIK.t
 t/0205_JEF_EBCDIC.t
 t/0206_JIPSE_EBCDIC.t
+t/0301_fullmatrix.t
 t/2001_podtest.t

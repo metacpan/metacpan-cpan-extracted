@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{Jacode4e},
-    'VERSION'   => q{2.13.6.18},
+    'VERSION'   => q{2.13.6.19},
     'ABSTRACT'  => q{jacode.pl-like program for enterprise},
     'PREREQ_PM' => {
         'ExtUtils::MakeMaker' => '5.4302',

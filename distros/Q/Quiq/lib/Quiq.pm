@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.197';
+our $VERSION = '1.198';
 
 =encoding utf8
 
@@ -397,6 +397,10 @@ L<Quiq::Html::Producer> - Generierung von HTML-Code
 =item *
 
 L<Quiq::Html::Pygments> - Syntax Highlighting in HTML
+
+=item *
+
+L<Quiq::Html::Resources> - CSS- und JavaScript-Resourcen einer Webapplikation
 
 =item *
 
@@ -918,7 +922,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.197
+1.198
 
 =head1 AUTHOR
 
@@ -926,7 +930,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2021 Frank Seitz
+Copyright (C) 2022 Frank Seitz
 
 =head1 LICENSE
 

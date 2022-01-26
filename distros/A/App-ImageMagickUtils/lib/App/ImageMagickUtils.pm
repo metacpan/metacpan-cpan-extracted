@@ -8,9 +8,9 @@ use Log::ger;
 use Perinci::Exporter;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-12'; # DATE
+our $DATE = '2022-01-16'; # DATE
 our $DIST = 'App-ImageMagickUtils'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our %SPEC;
 
@@ -303,7 +303,7 @@ App::ImageMagickUtils - Utilities related to ImageMagick
 
 =head1 VERSION
 
-This document describes version 0.008 of App::ImageMagickUtils (from Perl distribution App-ImageMagickUtils), released on 2021-10-12.
+This document describes version 0.009 of App::ImageMagickUtils (from Perl distribution App-ImageMagickUtils), released on 2022-01-16.
 
 =head1 DESCRIPTION
 
@@ -320,6 +320,8 @@ This distribution includes the following CLI utilities related to ImageMagick:
 =item * L<downsize-image>
 
 =item * L<image-resize-notation-to-human>
+
+=item * L<img2pdf>
 
 =back
 
@@ -514,7 +516,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

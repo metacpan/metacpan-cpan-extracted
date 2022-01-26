@@ -85,10 +85,12 @@ my $table = $w->Scrolled('HMListbox'
 
 =head1 STANDARD OPTIONS
 
-B<-background> B<-foreground> B<-relief> B<-takefocus> B<-borderwidth>   B<-heigh>
-B<-selectbackground> B<-cursor> B<-highlightbackground> B<-selectborderwidth>
-B<-xscrollcommand> B<-exportselection> B<-highlightcolor> B<-selectforeground>
-B<-yscrollcommand> B<-font> B<-highlightthickness> B<-setgrid>
+B<-background> B<-borderwidth> B<-cursor> B<-disabledforeground> 
+B<-exportselection> B<-font> B<-foreground> B<-height> 
+B<-highlightbackground> B<-highlightcolor> B<-highlightthickness> 
+B<-relief> B<-selectbackground> B<-selectborderwidth> 
+B<-selectforeground> B<-setgrid> B<-state> B<-takefocus> B<-width> 
+B<-xscrollcommand> B<-yscrollcommand>
 
 =head1 WIDGET SPECIFIC OPTIONS
 
@@ -240,6 +242,26 @@ Default:  B<1>.
 
 Note that you can also specify B<-sortable> on a column
 by column basis. See I<COLUMNS> below.
+
+=item B<-state>
+
+Specifies one of two states for the listbox: B<normal> or B<disabled>.
+If the listbox is disabled then user can interact with the widget in a very 
+limited (read-only) way.  Items may not be selected, but currently, the 
+list can be resorted or the columns potentially expanded for easier viewing.  
+Items are drawn in the B<-disabledforeground> color, and selection
+cannot be modified and is not shown (though selection information is
+retained).
+
+=item B<-takefocus> => I<number>
+
+There are actually three different focusing options:  Specify B<1> to both 
+allow the widget to take keyboard focus itself and to enable grabbing the 
+keyboard focus when a user clicks on a row in the listbox.  Specify B<''> 
+to allow the widget to take focus (via the <TAB> circulate order) but do 
+not grab the focus when a user clicks on (selects) a row.  This is the 
+default focusing model.  Specify B<0> to not allow the widget to receive 
+the keyboard focus.
 
 =item B<-tpadx> => I<number>
 
@@ -756,11 +778,11 @@ L<Tk::SMListbox> L<Tk::MListbox> L<Tk::HListbox>
 ## 
 ## Please post feedback to comp.lang.perl.tk or email to RobSeegel@aol.com
 ##
-## This module contains four classes. Of the four MListbox is
+## This module contains four classes. Of the four, HMListbox is
 ## is the only one intended for standalone use, the other three:
 ## HMCListbox, HMLColumn, HMButton are accessible as Subwidgets, but
 ## not intended to be used in any other way other than as 
-## components of MListbox
+## components of HMListbox.
 ##
 ##############################################################################
 ## HMCListbox is similar to an ordinary listbox, but with the following 
@@ -891,6 +913,7 @@ L<Tk::SMListbox> L<Tk::MListbox> L<Tk::HListbox>
 		$w->SUPER::Populate($args);
 		my $hdrBG = $args->{'-headerbackground'} || $args->{'-background'} || undef;
 		my $hdrFG = $args->{'-headerforeground'} || $args->{'-foreground'} || undef;
+		my $disableFG = $args->{'-disabledforeground'} || $Tk::DISABLED_FG;
 
 		## HMLColumn Components
 		## $sep - separator - Frame
@@ -900,7 +923,8 @@ L<Tk::SMListbox> L<Tk::MListbox> L<Tk::HListbox>
 
 		my $sep = $w->Component(
 				Frame   => 'separator',
-				-height => 1
+				-height => 1,
+				-takefocus => 0,
 		)->pack(qw/-side right -fill y -anchor w/);
 
 		$sep->bind( "<B1-Motion>", 
@@ -909,7 +933,8 @@ L<Tk::SMListbox> L<Tk::MListbox> L<Tk::HListbox>
 		[$w=>'Callback','-configurecommand']);
 
 		my $f = $w->Component(
-				Frame => "frame"
+				Frame => "frame",
+				-takefocus => 0,
 		)->pack(qw/-side left -anchor n -fill both -expand 1/);
 
 		my $hdr;
@@ -949,6 +974,11 @@ END_STR
 				$dynamic .= " $padarg => $args->{$padarg},"  if (defined($args->{$padarg}) && $args->{$padarg} =~ /\d/o);
 			}
 			$dynamic .= "-showcursoralways => 1,"  if ($Tk::HListbox::VERSION >= 2.4);
+			if ($Tk::HListbox::VERSION >= 2.42) {
+				$dynamic .= "-state => '".$args->{'-state'}."',";
+				$dynamic .= "-disabledforeground => '".$args->{'-disabledforeground'}."',"
+						if (defined $args->{'-disabledforeground'});
+			}
 		} else {
 			foreach my $padarg (qw/-tpady -tpadx -ipady -ipadx/) {
 				delete $args->{$padarg}  if (defined $args->{$padarg});
@@ -976,10 +1006,11 @@ END_STR
 						qw/foreground Foreground/, $Tk::NORMAL_FG],
 				-headerbackground => [qw/PASSIVE headerBackground HeaderBackground/, $hdrBG],
 				-headerforeground => [qw/PASSIVE headerForeground HeaderForeground/, $hdrFG],
+				-disabledforeground => [qw/PASSIVE disabledForeground DisabledForeground/, $disableFG],
 				-separatorwidth => [{-width => $sep}, 
 						qw/separatorWidth Separator 1/],
 				-separatorcolor => [{-background => $sep}, 
-						qw/sepaatorColor Separator black/],
+						qw/separatorColor Separator black/],
 				-resizeable     => [qw/METHOD resizeable Resizeable 1/],
 				-sortable       => [qw/PASSIVE sortable Sortable 1/],
 				-text           => [$hdr],
@@ -987,6 +1018,7 @@ END_STR
 				-updatecommand  => [$lb],
 				-textwidth      => [{-width => [$lb, $hdr]}],
 				-reversearrow   => [qw/PASSIVE reversearrow reversearrow 0/],
+				-state          => ['METHOD', 'state',  'State',   'normal'],
 				-ipadx          => [qw/PASSIVE/],
 				-ipady          => [qw/PASSIVE/],
 				-tpadx          => [qw/PASSIVE/],
@@ -1008,8 +1040,8 @@ END_STR
 
 	sub resizeable {
 		my ($w, $value) = @_;
-		return $w->{Configure}{-resizeable} unless
-		defined $value;
+		return $w->{Configure}{-resizeable}  unless (defined $value);
+
 		$w->Subwidget("separator")->configure(
 				-cursor => ($value ? 'sb_h_double_arrow' : 'xterm')
 		);
@@ -1025,8 +1057,7 @@ END_STR
 	sub setWidth {
 		my ($w, $pixels) = @_;
 		$pixels -= $w->Subwidget("separator")->width;
-		return 
-		unless $pixels >= 0;
+		return  unless ($pixels >= 0);
 
 		$w->Subwidget("listbox")->GeometryRequest(
 		$pixels,$w->Subwidget("listbox")->height);
@@ -1045,8 +1076,24 @@ END_STR
 
 ## Adjust size of column.
 	sub adjustMotion {
-		my ($w) = @_;    
-		$w->setWidth($w->pointerx - $w->rootx);
+		my ($w) = @_;
+		return  if ($w->getState() =~ /d/o);
+
+		$w->setWidth($w->pointerx - $w->rootx)  if ($w->resizeable);
+	}
+
+	sub state {
+		my $w = shift;
+		my $state = shift;
+#FOOBARS FOCUS?!		return $w->{Configure}{'-state'} || undef  unless (defined($state) && $state);
+
+		$w->Subwidget("listbox")->configure('-state' => $state, -takefocus => 0);
+		$w->Subwidget("heading")->configure('-state' => $state, -takefocus => 0);
+		$w->{'_hlistboxstate'} = $state;
+	}
+
+	sub getState {
+		return shift->{'_hlistboxstate'};
 	}
 
 } ## END PRELOADING OF HMLColumn
@@ -1064,7 +1111,7 @@ package Tk::HMListbox;
 use strict;
 use Carp;
 use vars qw($VERSION);
-$VERSION = '3.21';
+$VERSION = '4';
 
 use Tk;
 
@@ -1086,8 +1133,8 @@ sub Tk::Widget::Scrolled {
 	my $name = delete $args{'Name'};
 	push(@args,'Name' => $name) if (defined $name);
 	my $cw = $parent->Frame(@args);
-	$cw->bind('<FocusIn>', sub { $cw->focusNext; Tk->break;});
 	@args = ();
+	my $scrollbarfocus = (defined $args{'-scrollbarfocus'}) ? delete($args{'-scrollbarfocus'}) : undef;
 
 	## Now remove any args that Frame can handle
 	foreach my $k ('-scrollbars',map($_->[0],$cw->configure)) {
@@ -1095,23 +1142,35 @@ sub Tk::Widget::Scrolled {
 	}
 	## Anything else must be for target widget - pass at widget create time
 	my $w  = $cw->$kind(%args);
-
+	$cw->{'__HMListbox__'} = $w  if ($w =~ /HMListbox/o);  #JWT:SAVE ME FOR USE IN THE LEFT-TAB BIND ABOVE!
 	## Now re-set %args to be ones Frame can handle
 	## RCS NOTE: I've also slightly modified the ConfigSpecs
 	%args = @args;
+	$args{'-scrollbarfocus'} = $scrollbarfocus  if (defined($scrollbarfocus) && $scrollbarfocus =~ /[xy01]/);
 	$cw->ConfigSpecs(
 			'-scrollbars' => [qw/METHOD   scrollbars Scrollbars se/],
 			'-background' => [$w, qw/background Background/, undef],
 			'-foreground' => [$w, qw/foreground Foreground/, undef],
+			'-scrollbarfocus' => ['METHOD', 'scrollbarfocus', 'Focus', ''],
 	);
 	$cw->AddScrollbars($w);
 	$cw->Default("\L$kind" => $w);
 	$cw->Delegates('bind' => $w, 'bindtags' => $w, 'menu' => $w);
 	$cw->ConfigDefault(\%args);
+	delete($args{'-scrollbarfocus'})  if (defined $args{'-scrollbarfocus'});  #DELETE IT AGAIN SO THIS ONE WON'T BITCH!
 	$cw->configure(%args);
+	$args{'-scrollbarfocus'} = $scrollbarfocus  if (defined($scrollbarfocus) && $scrollbarfocus =~ /[xy01]/);
 	$cw->configure(-columns => $colAR) if $colAR;
+	$w->scrollbarfocus($scrollbarfocus)  if ($scrollbarfocus =~ /[xy01]/);
+
+	#JWT:FOR SOME STUPID REASON THIS 1 DIRECTIONAL BINDING REQUIRES A SLIGHT FRACTION ABOVE ZERO?!
+	#(THE OTHER 3 WORK FINE AUTOMATICALLY!) :-/
+	$w->parent->Subwidget('yscrollbar')->bind('<Home>', sub {
+		$cw->{'__HMListbox__'}->_chgView('yview','moveto',0.0001)  if (defined $cw->{'__HMListbox__'});
+	});
 	return $cw;
 }
+
 use warnings;
 
 require Tk::Pane;
@@ -1136,14 +1195,14 @@ sub ClassInit {
 	$mw->bind($class,'<FocusIn>','focus');
 	$mw->bind($class,'<FocusOut>','unfocus');
 	$mw->bind($class,'<Escape>', '_Cancel'); 
-	$mw->bind($class, '<Home>',  ['_chgView','xview','moveto',0]);
+	$mw->bind($class, '<Home>',  ['_chgView','xview','moveto',0.001]);
 	$mw->bind($class, '<End>',   ['_chgView','xview','moveto',1]);
 	$mw->bind($class, '<Prior>',  ['_chgView','yview','scroll',-1,'pages']);
 	$mw->bind($class, '<Next>',   ['_chgView','yview','scroll',1,'pages']);
 	$mw->bind($class, '<Control-Prior>', ['CtrlPriorNext',-1]);
 	$mw->bind($class, '<Control-Next>', ['CtrlPriorNext',1]);
- $mw->bind($class,'<space>',['SpaceSelect',Ev('index','active')]);
- $mw->bind($class,'<Select>',['SpaceSelect',Ev('index','active')]);
+	$mw->bind($class,'<space>',['SpaceSelect',Ev('index','active')]);
+	$mw->bind($class,'<Select>',['SpaceSelect',Ev('index','active')]);
 
 	my $downArrowBits = pack("b10"x10,
 			"..........",
@@ -1194,19 +1253,6 @@ sub ClassInit {
 ## after this method finishes. ALso, if Scrolled is called, then
 ## the -columns option will never make it down to this level so 
 
-sub InitObject {
-	my ($w, $args) = @_;
-
-	my $colAR = delete $args->{'-columns'};
-	$w->Populate($args);
-	$w->ConfigDefault($args);
-	if ($colAR) {
-		$w->configure(%$args);
-		$w->configure(-columns => $colAR);
-		%$args = ();
-	}
-}
-
 sub Populate {
 	my ($w, $args) = @_;
 
@@ -1219,12 +1265,13 @@ sub Populate {
 	$w->{'_sort_descending'} = 0;   ## Flag for ascending/desc. sort order
 	$w->{'_top'} = 0;
 	$w->{'_bottom'} = 0;
-	$w->{'_lastactive'} = undef;
+	$w->{'_lastactive'} = 0;
 	$w->{'_hasfocus'} = 0;
 
 	my $pane = $w->Component(
 			Pane => "pane",
-			-sticky => 'nsew'
+			-sticky => 'nsew',
+			-takefocus => 0,
 	)->pack(-expand=>1,-fill=>'both');
 
 	my $font;
@@ -1242,14 +1289,15 @@ sub Populate {
 			-configurecommand  => [qw/CALLBACK/],
 			-font              => [qw/METHOD font Font/, $font],
 			-foreground        => [qw/METHOD foreground Foreground/, $Tk::NORMAL_FG ],
-			-headerbackground  => [qw/METHOD background Background/, $Tk::NORMAL_BG ],
-			-headerforeground  => [qw/METHOD foreground Foreground/, $Tk::NORMAL_FG ],
+			-headerbackground  => [qw/METHOD headerbackground headerBackground/, $Tk::NORMAL_BG ],
+			-headerforeground  => [qw/METHOD headerforeground headerForeground/, $Tk::NORMAL_FG ],
 			-height            => [qw/METHOD height Height 10/],
 			-moveable          => [qw/PASSIVE moveable Moveable 1/],
 			-resizeable        => [qw/METHOD resizeable Resizeable 1/],
 			-selectbackground  => [qw/METHOD selectBackground Background/, $Tk::SELECT_BG],
 			-selectborderwidth => [qw/METHOD selectBorderwidth Borderwidth 1/],
 			-selectforeground  => [qw/METHOD selectForeground Foreground/, $Tk::SELECT_FG],
+			-disabledforeground => [qw/PASSIVE disabledForeground DisabledForeground/, $Tk::DISABLED_FG],
 			-selectmode        => [qw/METHOD selectMode Mode browse/],
 			-compound          => [qw/METHOD compound compound right/],
 			-showallsortcolumns      => [qw/METHOD showallsortcolumns showallsortcolumns 0/],
@@ -1257,11 +1305,11 @@ sub Populate {
 			-fillcolumn        => [qw/PASSIVE fillcolumn fillColumn -1/],
 			-focuscolumn       => [qw/PASSIVE focuscolumn focusColumn -1/],
 			-nocolumnfocus     => [qw/PASSIVE nocolumnfocus nocolumnfocus 0/],
-			-separatorcolor    => [qw/METHOD separatorColor Separator black/],
-			-separatorwidth    => [qw/METHOD separatorWidth Separator 1/], 
+			-separatorcolor    => [qw/METHOD separatorColor Foreground black/],
+			-separatorwidth    => [qw/METHOD separatorWidth SeparatorWidth 1/], 
 			-sortable          => [qw/METHOD sortable Sortable 1/],
 			-itemtype          => [qw/PASSIVE itemtype Itemtype text/],
-			-takefocus         => [qw/PASSIVE takeFocus Focus 1/],
+			-takefocus         => ['METHOD', 'takeFocus', 'TakeFocus', ''],
 			-textwidth         => [qw/METHOD textWidth Width 10/],
 			-width             => [qw/METHOD width Width/, undef],
 			-xscrollcommand    => [$pane],
@@ -1271,6 +1319,7 @@ sub Populate {
 			-tpadx             => [qw/PASSIVE/],
 			-tpady             => [qw/PASSIVE/],
 			-showcursoralways  => [qw/PASSIVE showcursoralways showcursoralways 0/],
+			-state             => ['METHOD',  'state',         'State',   'normal'],
 	);
 
 	$w->ConfigAlias(
@@ -1280,6 +1329,68 @@ sub Populate {
 			-sepcolor => "-separatorcolor",
 			-sepwidth => "-separatorwidth",
 	);
+	#JWT:HAD TO DO THESE THIS WAY INSTEAD OF IN THE CLASS, ELSE THEY DON'T WORK!:
+	$w->bindRows('<Home>',  ['_chgView', 'xview','moveto',0.001]);
+	$w->bindRows('<End>',   ['_chgView', 'xview','moveto',1]);
+	$w->bindRows('<Control-ButtonPress-1>', ['CtrlButtonPress', Ev('index',Ev('@'))]);
+
+	$w->bindRows('<ButtonPress-1>', [sub {
+		my $w = shift;
+		my $clickedon = $_[0];
+
+		if (Tk::Exists($w)) {
+			return  if ($w->{Configure}{'-state'} =~ /d/o);
+			$w->focus  if (!$w->{'_hasfocus'} && $w->{'_ourtakefocus'});
+		}
+	}, Ev('index',Ev('@'))]
+	);
+
+	$w->bindRows('<Alt-ButtonPress-1>', [sub {
+		my $w = shift;
+		my $clickedon = $_[0];
+
+		if (Tk::Exists($w)) {
+			return  if ($w->{Configure}{'-state'} =~ /d/o);
+			my $index = $w->_firstVisible->index('anchor');
+			$w->focus  if (!$w->{'_hasfocus'} && $w->{'_ourtakefocus'});
+			$w->activate($index);
+		}
+	}, Ev('index',Ev('@'))]
+	);
+}
+
+sub CtrlButtonPress {
+	my $w = shift;
+	return  unless (defined $w->_firstVisible);
+
+	my $clickedon = $w->_firstVisible->index('active');
+	my @cursel = $w->_firstVisible->curselection;
+	if (Tk::Exists($w)) {
+		return  if ($w->{Configure}{'-state'} =~ /d/o);
+		$w->activate($w->_firstVisible->index('anchor'));
+	}
+}
+
+sub scrollbarfocus { #JWT:  ALLOW THEM TO SPECIFY WHICH, IF ANY SCROLLBARS TAKE FOCUS:
+	my $w = shift;
+	my $focusopt = shift;
+	return $w->{Configure}{'-scrollbarfocus'} || undef  unless (defined($focusopt));
+
+	if ($focusopt eq '0') {
+		$w->parent->Subwidget('xscrollbar')->configure(-takefocus => 0);
+		$w->parent->Subwidget('yscrollbar')->configure(-takefocus => 0);
+	} elsif (! $focusopt) {
+		return;
+	} elsif ($focusopt eq '1' || ($focusopt =~ /x/o && $focusopt =~ /y/o)) {
+		$w->parent->Subwidget('xscrollbar')->configure(-takefocus => 1);
+		$w->parent->Subwidget('yscrollbar')->configure(-takefocus => 1);
+	} elsif ($focusopt =~ /x/o) {
+		$w->parent->Subwidget('xscrollbar')->configure(-takefocus => 1);
+		$w->parent->Subwidget('yscrollbar')->configure(-takefocus => 0);
+	} elsif ($focusopt =~ /y/o || $focusopt !~ /x/o) {
+		$w->parent->Subwidget('yscrollbar')->configure(-takefocus => 1);
+		$w->parent->Subwidget('xscrollbar')->configure(-takefocus => 0);
+	}
 }
 
 sub getSortOrder {   #JWT:  ADDED THIS METHOD TO FETCH HOW THE LIST IS SORTED!
@@ -1340,6 +1451,7 @@ sub font              { shift->_configureColumns('-font', @_) }
 sub foreground        { shift->_configureColumns('-foreground', @_) }
 sub headerbackground  { shift->_configureColumns('-headerbackground', @_);  }
 sub headerforeground  { shift->_configureColumns('-headerforeground', @_);  }
+sub disabledforeground { shift->_configureColumns('-disabledforeground', @_);  }
 sub height            { shift->_configureColumns('-height', @_) }
 sub resizeable        { shift->_configureColumns('-resizeable', @_) }
 sub selectbackground  { shift->_configureColumns('-selectbackground', @_) }
@@ -1389,6 +1501,15 @@ sub separatorwidth    { shift->_configureColumns('-separatorwidth', @_ ) }
 sub sortable          { shift->_configureColumns('-sortable', @_) }
 sub itemtype          { shift->_configureColumns('-itemtype', @_) }
 sub textwidth         { shift->_configureColumns('-textwidth', @_) }
+
+sub takefocus {
+	my ($w, $val) = @_;
+	return $w->{Configure}{'-takefocus'}  unless (defined($val) && $val);
+
+	#JWT:NEEDS TO BE '' INSTEAD OF 1 FOR Tk (SO WE KEEP IT IN OUR OWN VARIABLE FOR OUR USE)!:
+	$w->{'_ourtakefocus'} = $val;
+	$w->{Configure}{'-takefocus'} = ($val =~ /0/o) ? 0 : '';
+}
 
 sub width {
 	my ($w, $v) = @_;
@@ -1473,7 +1594,7 @@ sub _bindSubwidgets {
 
 sub _configureColumns {
 	my ($w, $option, $value) = @_;
-	return $w->{Configure}{$option}  unless $value;
+	return $w->{Configure}{$option}  unless (defined $value);
 
 	foreach (@{$w->{'_columns'}}) {
 		$_->configure("$option" => $value);
@@ -1486,6 +1607,8 @@ sub _cntrlHome { shift->_firstVisible->Cntrl_Home; }
 
 sub _chgView { 
 	my ($w, $fn, @args) = @_;
+
+	$fn = shift(@args)  if ($fn =~ /HASH/o);
 	my $code = "\$w->$fn('".join("','",@args)."')";
 	eval $code;
 }
@@ -1516,16 +1639,13 @@ sub _deselectAll {
 
 ## implements sorting and dragging & drop of a column
 sub _dragOrSort {
-	my ($w, $c, $sortAnyway) = @_;	if (defined($sortAnyway) && $sortAnyway) { 
-	
-		if ($c->cget('-sortable')) {
-			$w->sort (undef, $c);
-		}
-		return;
-	}
-	unless ($w->cget('-moveable')) {
-		if ($c->cget('-sortable')) {
-			$w->sort (undef, $c);
+	my ($w, $c, $sortAnyway) = @_;
+
+	return  if ($w->state() =~ /disable/o);  #DON'T ALLOW SORTING OR DRAGGING IF DISABLED!
+
+	if (!$w->cget('-moveable') || (defined($sortAnyway) && $sortAnyway)) {
+		if ($c->cget('-sortable') && $w->{Configure}{-sortable}) {
+			$w->sort(undef, $c);
 		}
 		return;
 	}
@@ -1568,14 +1688,17 @@ sub _dragOrSort {
 		});
 
 	$h->bind("<ButtonRelease-1>", sub {
-		my $rootx = $tl->rootx;
+		my $rootx;
+		eval {$rootx = $tl->rootx;};
+		return  unless (defined $rootx);  #ASSUME WE'RE DISABLED.
+
 		my $x = $rootx + ($tl->width/2);
 		$tl->destroy;    # Don't need this anymore...
 		$h->bind("<Motion>",'');  # Cancel binding
 
 		if ($h->rootx == $rootx) {    
 			# Button NOT moved, sort the column....
-			if ($c->cget('-sortable')) {
+			if ($c->cget('-sortable') && $w->{Configure}{-sortable}) {
 				$w->sort(undef, $c);
 			}
 			return;
@@ -1724,8 +1847,11 @@ sub _yscrollCallback  {
 sub activate {
 	my $w = shift;
 
-	if ($w->{'-showcursoralways'} || $w->{'_hasfocus'}) {
-		$w->_firstVisible->activate(@_)   #DOES NOT APPEAR TO EVER GET CALLED.
+	return  unless (defined $w->_firstVisible);
+
+	if ($w->{Configure}{'-state'} !~ /d/o
+			&& ($w->{'-showcursoralways'} || ($w->focusCurrent && $w->{'_hasfocus'}))) {
+		$w->_firstVisible->activate(@_);
 	} else {
 		$w->{'_lastactive'} = $_[0];
 		$w->_firstVisible->activate(undef);
@@ -1733,51 +1859,58 @@ sub activate {
 	}
 }
 
+#JWT: NOTE:FOCUSING IS VERY TRICKY AND REQUIRED MUCH EXPERIMATION AND HACKS TO GET WORKING PROPERLY:
+#    THE MAIN ISSUE HS LEFT-TABBING AND THE INABILITY TO TELL HOW FOCUS ARRIVED.  IN Tk WHEN FOCUS LANDS
+#    ON A DISABLED WIDGET, A "focusNext" IS DONE TO MOVE FOCUS TO THE NEXT WIDGET AUTOMATICALLY.  THIS
+#    WORKS IN ALL CASES *EXCEPT* IF FOCUS ARRIVED FROM A LEFT-TAB, IN WHICH CASE, A "focusPrev" SHOULD
+#    BE EXECUTED INSTEAD.  FORTUNATELY, IN OUR CASE, THE "SCROLLED" FRAME THAT SURROUNDS OUR WIDGET
+#    ALSO HAS A SECOND WIDGET-FRAME FOR THE SCROLLBARS (WHETHER DISPLAYED OR NOT) THAT'S "NEXT" IN THE
+#    TAB-CIRCULATE ORDER FROM OUR WIDGET.  BY BINDING LEFT-TAB TO THE "SCROLLED" FRAME, WE ARE ABLE TO
+#    KNOW THAT ANY FOCUS COMING TO OUR WIDGET FIRST COMES THROUGH THE SCROLLBARS (EVEN IF NONE, ONE, OR
+#    BOTH ARE VISIBLE AND TAKE FOCUS OR NOT.  ARMED WITH THAT INFORMATION, WE CAN THEN DETERMINE WHETHER
+#    A focusPrev OR focusNext SHOULD BE DONE TO PASS ON THE FOCUS WHEN OUR WIDGET IS DISABLED!
+
 sub focus
 {
 	my $w = shift;
-
-	unless ($w->focusCurrent) {  #UNLESS THE MAIN WINDOW'S NOT FOCUSED (ie. Ctrl-Mouse), GIVE IT RIGHT BACK!:
-		$w->unfocus();
+	if ($w->{Configure}{'-state'} =~ /d/o) {
+		$w->focusNext;
 		return;
 	}
 
-	if (!$w->cget('-takefocus')) { 
-		$w->focusNext;
-	} else {
-		$w->{'_hasfocus'} = 1;
-		my $c = (defined($w->{Configure}{'-focuscolumn'}) && $w->{Configure}{'-focuscolumn'} >= 0)
-				? $w->columnGet($w->{Configure}{'-focuscolumn'})  #User specified which one to get focus.
-				: $w->_firstVisible; 
-                  #Default to 1st one visible if user did not pick one.
-		if (defined($c) && $w->cget('-nocolumnfocus') != 1) {
-			$c->Subwidget("listbox")->focus(@_);
-			$c->Subwidget("listbox")->bind('<<LeftTab>>', sub {
-				$w->focusPrev;
-				$w->focusCurrent->focusPrev;
-				Tk->break;
-			});
-		} else {
-			$w->Tk::focus(@_);
-			$w->bind('<<LeftTab>>', sub {
-				$w->focusPrev;
-				$w->focusCurrent->focusPrev;
-				Tk->break;
-			});
-		}
-		#RESTORE CURSOR WHEN FOCUS IS GAINED:
-		$w->activate($w->index('active') || $w->{'_lastactive'}); #  if (defined($w->{'_lastactive'}) && $w->{'_lastactive'} >= 0);
+	$w->Tk::focus;
+	$w->{'_hasfocus'} = 1;
+	my $c = (defined($w->{Configure}{'-focuscolumn'}) && $w->{Configure}{'-focuscolumn'} >= 0)
+			? $w->columnGet($w->{Configure}{'-focuscolumn'})  #User specified which one to get focus.
+			: $w->_firstVisible; 
+              #Default to 1st one visible if user did not pick one.
+	if (defined($c) && $w->cget('-nocolumnfocus') != 1) {
+		$c->Subwidget("listbox")->focus(@_);
+		$c->Subwidget("listbox")->bind('<<LeftTab>>', sub {
+			$w->focusPrev;
+			Tk->break;
+		});
 	}
+	return  if ($w->{'-showcursoralways'});
+
+	#RESTORE CURSOR WHEN FOCUS IS GAINED:
+	my $indx = $w->index('active');
+	$indx = $w->{'_lastactive'}  unless (defined($indx) && $indx =~ /\d/);
+	$indx = 0  unless (defined($indx) && $indx =~ /\d/);
+	$w->activate($indx)  if ($w->index('end') >= 0);
 }
 
 sub unfocus
 {
 	my $w = shift;
+	if ($w->{'-showcursoralways'}) {
+		$w->{'_hasfocus'} = 0;
+		return;
+	}
 
 	$w->{'_lastactive'} = $w->index('active');
 	$w->{'_hasfocus'} = 0;
-	#EMULATE SMListbox & MListbox BY REMOVING CURSOR WHEN FOCUS IS LOST:
-	$w->activate($w->{'_lastactive'});
+	$w->activate($w->{'_lastactive'})  if ($w->index('end') >= 0);
 }
 
 sub bindColumns    {  shift->_bindSubwidgets('heading',@_) }
@@ -1881,10 +2014,10 @@ sub columnInsert {
 	my %opts = ();
 
 	## Copy these options from the megawidget.
-	foreach (qw/-background -foreground -headerbackground -headerforeground -font -height 
-			-resizeable -selectbackground -selectforeground 
-			-selectborderwidth -selectmode -separatorcolor 
-			-separatorwidth -sortable -itemtype -textwidth -reversearrow/) 
+	foreach (qw/-background -foreground -headerbackground -headerforeground -font -height
+			-resizeable -selectbackground -selectforeground -disabledforeground
+			-selectborderwidth -selectmode -separatorcolor
+			-separatorwidth -sortable -itemtype -textwidth -reversearrow -state/) 
 	{
 		$opts{$_} = $w->cget($_) if defined $w->cget($_);
 	}
@@ -1914,6 +2047,7 @@ no warnings;
 use warnings;
 		$w->{Configure}{'-jwtlistboxhack'} = $@ ? 0 : 1;  #eval succeeds if using JWT's hacked listbox!
 	}
+	$c->{'__HMListbox__'} = $w;   #JWT:SAVE ME FOR FUTURE REFERENCES.
 	## RCS: Review this later - questionable implementation
 	## Fill the new column with empty values, making sure all columns have
 	## the same number of rows.
@@ -1922,7 +2056,7 @@ use warnings;
 			$c->insert('end','');
 		}
 	}  
-	$c->Subwidget("heading")->bind("<Button-1>", [ $w => '_dragOrSort', $c]);
+	$c->Subwidget("heading")->bind("<ButtonPress-1>", [ $w => '_dragOrSort', $c]);
 	$c->Subwidget("heading")->configure(-compound => $w->{'-compound'})  if ($w->{'-compound'});
 	my @bindTags = $w->bindtags;	
 	if (defined($hotchar) && $hotchar =~ /\S/o)   { #JWT:Set up Alt-<hotkey> bindings if we have a hotkey character defined:
@@ -2043,9 +2177,10 @@ sub getRow {
 sub index {
 	my $w = shift;
 	
-	return undef  unless (defined $_[0]);
-	return $w->_firstVisible->index(@_)  if ($w->{'-showcursoralways'});
-	return (!$w->{'_hasfocus'} && $_[0] =~ /^active/o) ? $w->{'_lastactive'} : $w->_firstVisible->index(@_);
+	return undef  unless (defined($_[0]) && defined($w->_firstVisible));
+	my $ret = ($w->{'-showcursoralways'} || ($w->{'_hasfocus'} && $w->focusCurrent) || $_[0] !~ /^active/o)
+			? $w->_firstVisible->index(@_) : $w->{'_lastactive'};
+	return $ret;
 }
 
 sub insert {
@@ -2200,6 +2335,39 @@ sub sort {
 			$w->{'_columns'}->[$indexes[0]]->Subwidget("heading")->configure(-bitmap => ($w->{'_sort_descending'} ? 'downarrow' : 'uparrow'));
 		}
 	}
+}
+
+sub state {
+	my ($w, $val) = @_;
+
+	return $w->{Configure}{'-state'} || undef  unless (defined($val) && $val);
+	return  if (defined($w->{'_prevstate'}) && $val eq $w->{'_prevstate'});  #DON'T DO TWICE IN A ROW!
+
+	$w->{'_statechg'} = 1;
+	if ($val =~ /d/o) {              #WE'RE DISABLING (SAVE CURRENT ENABLED STATUS STUFF, THEN DISABLE USER-INTERACTION):
+		$w->{Configure}{'-state'} = 'normal';
+		$w->{'_saveactive'} = $w->index('active') || 0;
+		$w->{'_foreground'} = $w->cget('-foreground');  #SAVE CURRENT (ENABLED) FG COLOR!
+		$w->{Configure}{'-state'} = $val;
+		foreach my $i (0..$#{$w->{'_columns'}}) {
+			$w->{'_columns'}->[$i]->state($val);
+		}
+		$w->activate($w->{'_saveactive'})  unless ($w->{'_hasfocus'});
+#?		$w->focusNext  if ($w->{'_hasfocus'});  #MOVE FOCUS OFF WIDGET IF IT HAS IT.
+	} elsif ($w->{'_prevstate'}) {   #WE'RE ENABLING (RESTORE PREV. ENABLED STUFF AND REALLOW USER-INTERACTION):
+		my $fg = $w->{'_foreground'};
+		$w->{Configure}{'-state'} = $val;
+		foreach my $i (0..$#{$w->{'_columns'}}) {
+			$w->{'_columns'}->[$i]->state($val);
+		}
+		if (defined $w->_firstVisible) {   #RESTORE SELECTED LIST AND ACTIVE CURSOR:
+			my @selected = $w->_firstVisible->curselection;
+			$w->selectionSet(shift @selected)  while (@selected);
+			$w->activate($w->{'_saveactive'});
+		}
+	}
+	$w->{'_prevstate'} = $w->{Configure}{'-state'};
+	$w->{'_statechg'} = 0;
 }
 
 # Implements horizontal scanning. 

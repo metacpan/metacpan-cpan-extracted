@@ -6,7 +6,7 @@ use warnings;
 use base qw( Device::Chip::Adapter );
 use Carp qw/croak/;
 
-our $VERSION = '0.00005';
+our $VERSION = '0.00006';
 
 require XSLoader;
 XSLoader::load();

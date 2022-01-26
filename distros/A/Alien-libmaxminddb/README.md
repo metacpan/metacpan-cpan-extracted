@@ -1,25 +1,23 @@
 # Alien::libmaxminddb
 
-[DP-IP.com](https://db-ip.com/) and [MaxMind](https://www.maxmind.com/) provide
-geolocation databases in the MaxMind DB file format format.  This Perl module
-finds or downloads and installs the C library
-[libmaxminddb](https://github.com/maxmind/libmaxminddb), which can read MaxMind
-DB files.
+[MaxMind](https://www.maxmind.com/) and [DP-IP.com](https://db-ip.com/)
+provide geolocation databases in the MaxMind DB file format format.  This Perl
+module finds or downloads and installs the C library
+[libmaxminddb](https://github.com/maxmind/libmaxminddb), which can read
+MaxMind DB files.
 
 ## DEPENDENCIES
 
-Requires Alien::Build from CPAN.  On Windows, Alien::MSYS needs to be
-installed.
+Requires Alien::Build from CPAN.
 
 Install the package libmaxminddb-devel or libmaxminddb-dev if you would like to
 use your operating system's libmaxminddb library.
 
+Windows is not supported.  Please do not ask for Windows support.
+
 ## INSTALLATION
 
-The [Open Build Service](https://build.opensuse.org/package/show/home:voegelas/perl-Alien-libmaxminddb)
-provides binary and source packages.
-
-Run the following commands to install the software manually:
+Run the following commands to install the software:
 
     perl Makefile.PL
     make

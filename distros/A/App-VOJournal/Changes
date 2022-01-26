@@ -1,9 +1,19 @@
 Revision history for App-VOJournal
 
+v0.4.8 Wed Jan 26 20:25:14 CET 2022
+	- call File::Find::find() with 'no_chdir => 1'
+	  to avoid problems with taint mode on mswin32
+
+v0.4.7 Tue Jan 25 11:05:31 CET 2022
+	- optimize _find_last_file() to easily cope
+	  with thousands of unrelated files below --basedir
+	- make note in Perl POD about symlinks
+	  (File::Find::find() won't follow symbolic links)
+
 v0.4.6 Tue Dec 14 11:55:00 CET 2021
 	- move on GitHub
 
-v0.4.6  2016-05-16/16:03
+v0.4.5  2016-05-16/16:03
 	- fixed version strings
 
 v0.4.4  2016-05-16/04:03

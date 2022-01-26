@@ -97,13 +97,17 @@ subtest 'Unknown::Values null objects should behave like `unknown`' => sub {
       '... but the sort to the front in reverse';
 };
 
-package Unknown::Person {
+{
+
+    package Unknown::Person;
     use parent 'Unknown::Values::Instance::Object';
 
     sub name { return '<unknown>' }
 }
 
-package Person {
+{
+
+    package Person;
 
     sub new {
         my ( $class, $name, $age ) = @_;

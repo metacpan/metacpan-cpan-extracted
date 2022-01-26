@@ -26,7 +26,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.197';
+our $VERSION = '1.198';
 
 use Quiq::Gnuplot::Plot;
 use Quiq::FileHandle;
@@ -336,7 +336,7 @@ sub print {
 
 =head1 VERSION
 
-1.197
+1.198
 
 =head1 AUTHOR
 
@@ -344,7 +344,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2021 Frank Seitz
+Copyright (C) 2022 Frank Seitz
 
 =head1 LICENSE
 

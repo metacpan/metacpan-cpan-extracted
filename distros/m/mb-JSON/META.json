@@ -1,6 +1,6 @@
 {
     "name" : "mb-JSON",
-    "version" : "0.02",
+    "version" : "0.03",
     "abstract" : "a simple JSON parser for multibyte string",
     "author" : [
         "ina <ina@cpan.org>"

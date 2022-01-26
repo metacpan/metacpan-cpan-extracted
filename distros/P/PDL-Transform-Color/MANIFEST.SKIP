@@ -28,7 +28,6 @@ RCS
 \.patch$
 \.so$
 \.tar\.gz$
-\.travis\.yml$
 /core$
 \b_eumm/
 ^\.\#.*
@@ -47,7 +46,4 @@ RCS
 ^podsel$
 ~$
 ^xt/
-
-.travis.yml
-appveyor.yml
 README.md

@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Curses::UI;
 
@@ -87,7 +87,7 @@ sub _init($)
     $self->{_cui} = Curses::UI->new(-clear_on_exit => 1);
     $self->{max_height} = $self->{_cui}->height;
     $self->{max_width} = $self->{_cui}->width;
-    # internal flag if Tk's mainloop is currently running:
+    # internal flag if Curses::UI's mainloop is currently running:
     $self->{_running} = 0;
 }
 
@@ -133,9 +133,9 @@ sub mainloop($)
 
 =head2 B<window> - and new window to application
 
-C<Tk>'s overload of L<UI::Various::Main::window|UI::Various::Main/window -
-and new window to application>.  If the C<Mainloop> of L<Tk> is running, we
-need to directly prepare and show the window / dialogue.
+C<Curses>'s overload of L<UI::Various::Main::window|UI::Various::Main/window
+- and new window to application>.  If the C<Mainloop> of L<Curses::UI> is
+running, we need to directly prepare and show the window / dialogue.
 
 =cut
 

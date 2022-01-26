@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2022 -- leonerd@leonerd.org.uk
 
-package Future::AsyncAwait::Awaitable 0.55;
+package Future::AsyncAwait::Awaitable 0.56;
 
 use v5.14;
 use warnings;
@@ -172,8 +172,9 @@ that name will be repurposed for attaching code blocks in a later version.
 
 =head2 AWAIT_ON_CANCEL
 
-A later version of this specification will repurpose this method name, but for
-now it performs the L</AWAIT_CHAIN_CANCEL> behaviour.
+Attach a new CODE reference to be invoked when the future is cancelled.
+
+   $f->AWAIT_ON_CANCEL( $code )
 
 An implementation that does not support cancellation can simply ignore this
 method.

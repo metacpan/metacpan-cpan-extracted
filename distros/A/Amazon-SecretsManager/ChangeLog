@@ -1,0 +1,22 @@
+Sun Jan 23 19:15:53 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[first check-in]:
+	* .gitignore: new
+	* AUTHORS: new
+	* Makefile.am: new
+	* README.md: new
+	* VERSION: new
+	* bootstrap: new
+	* buildspec.yml: new
+	* configure.ac: new
+	* cpan/Makefile.am: new
+	* cpan/buildspec.yml: new
+	* cpan/extra-files: new
+	* cpan/upload-instructions: new
+	* perl-Amazon-SecretsManager.spec.in: new
+	* src/Makefile.am: new
+	* src/main/Makefile.am: new
+	* src/main/perl/Makefile.am: new
+	* src/main/perl/lib/Amazon/SecretsManager.pm.in: new
+	* src/main/perl/lib/Makefile.am: new
+	* target-repo: new

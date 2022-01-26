@@ -37,7 +37,7 @@ use warnings 'once';
 use Carp;
 use Storable ();
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use UI::Various::language::en;
 
@@ -68,7 +68,7 @@ our @EXPORT = qw(language logging stderr using
 
 use constant _ROOT_PACKAGE_ => substr(__PACKAGE__, 0, rindex(__PACKAGE__, "::"));
 
-use constant UI_ELEMENTS => qw(Button Input Main Text Window);
+use constant UI_ELEMENTS => qw(Button Check Input Main Text Window);
 
 our @CARP_NOT =
     (	_ROOT_PACKAGE_,

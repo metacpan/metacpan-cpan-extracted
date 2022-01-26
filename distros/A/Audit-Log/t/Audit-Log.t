@@ -8,7 +8,7 @@ use Test::Deep;
 use Audit::Log;
 use List::Util 1.45 qw{uniq};
 
-my $parser = Audit::Log->new('t/audit.log','name','type','nametype','line','timestamp');
+my $parser = Audit::Log->new('t/audit.log','name','type','nametype','line','timestamp', 'cwd', 'exe', 'comm');
 my $rows = $parser->search( type => qr/path/i, nametype => qr/create|delete/i, name => qr/^backups\/[^\.]/, key => qr/backupwatch/, older => 1642448670, newer => 1642441403 );
 
 my $expected = [
@@ -17,14 +17,20 @@ my $expected = [
     'timestamp' => '1642441406.575',
     'type' => 'PATH',
     'nametype' => 'CREATE',
-    'name' => 'backups/test.txt'
+    'name' => 'backups/test.txt',
+    'cwd'  => '/testpath',
+    'exe'  => '/usr/bin/touch',
+    'comm' => 'touch',
   },
   {
     'type' => 'PATH',
     'timestamp' => '1642441412.975',
     'line' => 8,
     'name' => 'backups/testme.txt',
-    'nametype' => 'DELETE'
+    'nametype' => 'DELETE',
+    'cwd'      => '/testpath',
+    'exe'      => '/usr/bin/rm',
+    'comm'     => 'rm',
   }
 ];
 

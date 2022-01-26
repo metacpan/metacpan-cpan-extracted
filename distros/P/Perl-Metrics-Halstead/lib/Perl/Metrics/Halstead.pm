@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Compute Halstead complexity metrics
 
-our $VERSION = '0.0613';
+our $VERSION = '0.0614';
 
 use PPI::Document;
 use PPI::Dumper;
@@ -232,7 +232,7 @@ Perl::Metrics::Halstead - Compute Halstead complexity metrics
 
 =head1 VERSION
 
-version 0.0613
+version 0.0614
 
 =head1 SYNOPSIS
 
@@ -242,7 +242,7 @@ version 0.0613
 
   my $metrics = $halstead->dump;
 
-  $halstead->report;
+  $halstead->report; # Print to STDOUT
 
 =head1 DESCRIPTION
 
@@ -252,7 +252,7 @@ Please see the explanatory links in the L</"SEE ALSO"> section for descriptions
 of what these attributes mean and how they are computed.
 
 My write-up about this technique is at
-L<http://techn.ology.net/halstead-software-complexity-of-perl-code/>
+L<https://ology.github.io/2019/03/19/halstead-software-complexity-of-perl-code/>
 
 The installed program for computing this is called L<halstead>.
 
@@ -394,7 +394,7 @@ L<PPI::Dumper>
 
 L<https://en.wikipedia.org/wiki/Halstead_complexity_measures>
 
-L<http://techn.ology.net/halstead-software-complexity-of-perl-code/>
+L<https://ology.github.io/2019/03/19/halstead-software-complexity-of-perl-code/>
 
 L<https://www.verifysoft.com/en_halstead_metrics.html>
 
@@ -408,7 +408,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Gene Boggs.
+This software is copyright (c) 2022 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

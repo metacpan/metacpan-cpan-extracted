@@ -1,3 +1,11 @@
+0.005   2021-09-13  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [cli import-csv-to-sqlite3] Mention how sqlite3 cli can also be
+	  used non-interactively.
+
+
 0.004   2021-09-13  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

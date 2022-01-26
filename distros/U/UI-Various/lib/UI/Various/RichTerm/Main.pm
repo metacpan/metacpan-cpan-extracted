@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Term::ReadLine;
 
@@ -68,7 +68,7 @@ our @EXPORT_OK = qw();
 =head3 description:
 
 Set-up the rich terminal UI.  (It's under L<FUNCTIONS|/FUNCTIONS> as it's
-called before the object is re-blessed as C<UI::Various::PoorTerm::Main>.)
+called before the object is re-blessed as C<UI::Various::RichTerm::Main>.)
 
 =cut
 
@@ -115,7 +115,7 @@ sub _init($)
 
 =head2 B<mainloop> - main event loop of an application
 
-C<PoorTerm>'s concrete implementation of
+C<RichTerm>'s concrete implementation of
 L<UI::Various::Main::mainloop|UI::Various::Main/mainloop - main event loop
 of an application>
 

@@ -32,30 +32,6 @@ DESCRIPTION
   This software escapes DAMEMOJI in your script, generate a new script and
   run it.
 
-EASY INSTALL (Paste and Run)
-
-  1. Open URL https://metacpan.org/pod/mb
-  
-  2. Click ...
-  ----------------------------------
-  Source (raw) <--- This ***raw***
-  Browse (raw)
-  Changes
-  How to Contribute
-  Clone repository
-  Issues
-  Testers (NNN / NNN / NNN)
-  Kwalitee
-  Bus factor: 1
-  NN.NN% Coverage
-  License: perl_5
-  Perl: v5.5.30
-  ----------------------------------
-  
-  3. Select All Text of Page
-  
-  4. Save Text as "lib/mb.pm"
-
 SUPPORTED PERL VERSIONS
 
   perl version 5.005_03 to newest perl

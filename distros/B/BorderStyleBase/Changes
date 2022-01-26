@@ -1,3 +1,8 @@
+0.010   2022-01-24  Released-By: PERLANCAR; Urgency: medium
+
+        - Update to BorderStyle 2.0.7 (support multiple header rows).
+
+
 0.009   2021-02-06  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Forgot to 'use utf8' in BorderStyle::Test::Labeled now

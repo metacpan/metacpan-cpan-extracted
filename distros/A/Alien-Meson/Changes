@@ -1,4 +1,25 @@
 Revision history for Alien-Meson
 
+0.02      2022-01-20 20:21:33-05:00 America/New_York
+  - No change from v0.01_03.
+
+0.01_03   2022-01-18 21:31:28-05:00 America/New_York (TRIAL RELEASE)
+  - Add ALIEN_MESON_SHARE_PREFER environment variable to control what kind of
+    release to use (source/binary).
+    See <https://github.com/PerlAlien/Alien-Meson/issues/5>,
+    <https://github.com/PerlAlien/Alien-Meson/pull/7>.
+  - Add support for macOS .pkg binary release.
+    See <https://github.com/PerlAlien/Alien-Meson/issues/6>,
+    <https://github.com/PerlAlien/Alien-Meson/pull/8>.
+
+0.01_02   2022-01-06 15:16:33-05:00 America/New_York (TRIAL RELEASE)
+  - Use pre-built .msi on MSWin32 if possible.
+    See <https://github.com/PerlAlien/Alien-Meson/issues/2>,
+    <https://github.com/PerlAlien/Alien-Meson/pull/4>.
+
+0.01_01   2021-12-23 19:58:50-05:00 America/New_York (TRIAL RELEASE)
+  - Look for Python 3 to run Meson script.
+    See <https://github.com/PerlAlien/Alien-Meson/pull/3>.
+
 0.01      2021-11-27 21:33:35-05:00 America/New_York
   - initial version

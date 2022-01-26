@@ -4,7 +4,7 @@ use warnings;
 # ABSTRACT: Use 'unknown' values instead of undef ones
 
 package Unknown::Values;
-$Unknown::Values::VERSION = '0.101';
+$Unknown::Values::VERSION = '0.102';
 use 5.01000;
 use Unknown::Values::Instance;
 use Unknown::Values::Instance::Fatal;
@@ -59,7 +59,7 @@ Unknown::Values - Use 'unknown' values instead of undef ones
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SYNOPSIS
 

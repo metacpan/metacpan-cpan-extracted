@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = 1.000;
+our $VERSION = 1.001;
 
 use Exporter qw(import);
 use IO::Uncompress::Unzip;
@@ -281,7 +281,7 @@ Mail::Exim::ACL::Attachments - Reject email attachments
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 SYNOPSIS
 
@@ -306,7 +306,7 @@ version 1.000
 
 A Perl module for the L<Exim|https://www.exim.org/> mailer that checks email
 attachments for blocked filenames.  Common executable, macro-enabled and
-archive file formats can be rejected.
+archive file formats are identified.
 
 The list of blocked filename extensions is built from information published by
 Microsoft and Wikipedia.

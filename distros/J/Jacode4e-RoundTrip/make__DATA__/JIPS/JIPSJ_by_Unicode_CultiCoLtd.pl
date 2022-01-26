@@ -2,7 +2,7 @@
 #
 # JIPSJ_by_Unicode_CultiCoLtd.pl
 #
-# Copyright (c) 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 # JIPS code book, Culti Co.,Ltd.
@@ -41,6 +41,21 @@ while (<DATA>) {
     $Unicode_by_JIPSJ_CultiCoLtd{$jipsj}   = $unicode;
 }
 
+# fixed mapping
+# Jacode4e 2.13.6.18 or newer
+# Jacode4e::RoundTrip 2.13.81.12 or newer
+
+my %fix_mapping = (
+    '00DD' => '', # Ý  OLD:A5B1
+    '8030' => '', # 耰 OLD:CAAB
+);
+
+for my $unicode (sort keys %fix_mapping) {
+    my $jipsj = $fix_mapping{$unicode};
+    $JIPSJ_by_Unicode_CultiCoLtd{$unicode} = $jipsj;
+    $Unicode_by_JIPSJ_CultiCoLtd{$jipsj}   = $unicode;
+}
+
 sub JIPSJ_by_Unicode_CultiCoLtd {
     my($unicode) = @_;
     return $JIPSJ_by_Unicode_CultiCoLtd{$unicode};
@@ -56,7 +71,7 @@ sub values_of_JIPSJ_by_Unicode_CultiCoLtd {
 
 1;
 
-# Unicode	JIS	SJIS	��_	JIPS
+# Unicode	JIS	SJIS	区点	JIPS
 __DATA__
 3000	2121	8140	00101	2121
 3001	2122	8141	00102	2122

@@ -1,5 +1,5 @@
 package OPM::Maker::Command::build;
-$OPM::Maker::Command::build::VERSION = '1.15';
+$OPM::Maker::Command::build::VERSION = '1.16';
 use strict;
 use warnings;
 
@@ -138,7 +138,7 @@ OPM::Maker::Command::build - Build OPM packages
 
 =head1 VERSION
 
-version 1.15
+version 1.16
 
 =head1 AUTHOR
 

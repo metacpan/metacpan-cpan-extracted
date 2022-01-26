@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use UI::Various::core;
 use UI::Various::Text;
@@ -92,8 +92,8 @@ sub _prepare($$$)
 	return 1;
     }
     $self->_tk(	$_->_tk
-		->Label(ref($self->{text}) eq 'SCALAR' ? '-textvariable' : '-text'
-			=> $self->{text})
+		->Label(ref($self->{text}) eq 'SCALAR'
+			? '-textvariable' : '-text' => $self->{text})
 		->grid(-row => $row, -column => $column));
     return 0;
 }

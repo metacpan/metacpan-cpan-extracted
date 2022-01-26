@@ -34,6 +34,7 @@
          "requires" : {
             "Carp" : "1.1",
             "DynaLoader" : "1.04",
+            "Net::DNS" : "1.18",
             "perl" : "5.008009"
          }
       },
@@ -43,12 +44,11 @@
             "File::Find" : "1.05",
             "File::Spec" : "0.86",
             "IO::File" : "1.08",
-            "Net::DNS" : "1.18",
             "Test::More" : "0.47"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.01",
+   "version" : "1.04",
    "x_serialization_backend" : "JSON::PP version 2.27200"
 }

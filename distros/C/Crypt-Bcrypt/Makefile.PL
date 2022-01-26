@@ -10,6 +10,9 @@ use ExtUtils::MakeMaker;
 my %WriteMakefileArgs = (
   "ABSTRACT" => "A modern bcrypt implementation",
   "AUTHOR" => "Leon Timmermans <leont\@cpan.org>",
+  "BUILD_REQUIRES" => {
+    "ExtUtils::ParseXS" => "2.21"
+  },
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -26,7 +29,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,6 +42,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Exporter" => "5.57",
+  "ExtUtils::ParseXS" => "2.21",
   "MIME::Base64" => "2.21",
   "Test::More" => 0,
   "XSLoader" => 0,

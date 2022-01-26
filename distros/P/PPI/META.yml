@@ -13,7 +13,7 @@ build_requires:
   File::Spec::Unix: '0'
   File::Temp: '0'
   Test::Deep: '0'
-  Test::More: '0.88'
+  Test::More: '0.96'
   Test::NoWarnings: '0'
   Test::Object: '0.07'
   Test::SubCalls: '1.07'
@@ -24,7 +24,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,277 +33,277 @@ name: PPI
 provides:
   PPI:
     file: lib/PPI.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Cache:
     file: lib/PPI/Cache.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Document:
     file: lib/PPI/Document.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Document::File:
     file: lib/PPI/Document/File.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Document::Fragment:
     file: lib/PPI/Document/Fragment.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Document::Normalized:
     file: lib/PPI/Document/Normalized.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Dumper:
     file: lib/PPI/Dumper.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Element:
     file: lib/PPI/Element.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Exception:
     file: lib/PPI/Exception.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Exception::ParserRejection:
     file: lib/PPI/Exception/ParserRejection.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Find:
     file: lib/PPI/Find.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Lexer:
     file: lib/PPI/Lexer.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Node:
     file: lib/PPI/Node.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Normal:
     file: lib/PPI/Normal.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Normal::Standard:
     file: lib/PPI/Normal/Standard.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Singletons:
     file: lib/PPI/Singletons.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Statement:
     file: lib/PPI/Statement.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Statement::Break:
     file: lib/PPI/Statement/Break.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Statement::Compound:
     file: lib/PPI/Statement/Compound.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Statement::Data:
     file: lib/PPI/Statement/Data.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Statement::End:
     file: lib/PPI/Statement/End.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Statement::Expression:
     file: lib/PPI/Statement/Expression.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Statement::Given:
     file: lib/PPI/Statement/Given.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Statement::Include:
     file: lib/PPI/Statement/Include.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Statement::Include::Perl6:
     file: lib/PPI/Statement/Include/Perl6.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Statement::Null:
     file: lib/PPI/Statement/Null.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Statement::Package:
     file: lib/PPI/Statement/Package.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Statement::Scheduled:
     file: lib/PPI/Statement/Scheduled.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Statement::Sub:
     file: lib/PPI/Statement/Sub.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Statement::Unknown:
     file: lib/PPI/Statement/Unknown.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Statement::UnmatchedBrace:
     file: lib/PPI/Statement/UnmatchedBrace.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Statement::Variable:
     file: lib/PPI/Statement/Variable.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Statement::When:
     file: lib/PPI/Statement/When.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Structure:
     file: lib/PPI/Structure.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Structure::Block:
     file: lib/PPI/Structure/Block.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Structure::Condition:
     file: lib/PPI/Structure/Condition.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Structure::Constructor:
     file: lib/PPI/Structure/Constructor.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Structure::For:
     file: lib/PPI/Structure/For.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Structure::Given:
     file: lib/PPI/Structure/Given.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Structure::List:
     file: lib/PPI/Structure/List.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Structure::Subscript:
     file: lib/PPI/Structure/Subscript.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Structure::Unknown:
     file: lib/PPI/Structure/Unknown.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Structure::When:
     file: lib/PPI/Structure/When.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token:
     file: lib/PPI/Token.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::ArrayIndex:
     file: lib/PPI/Token/ArrayIndex.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::Attribute:
     file: lib/PPI/Token/Attribute.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::BOM:
     file: lib/PPI/Token/BOM.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::Cast:
     file: lib/PPI/Token/Cast.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::Comment:
     file: lib/PPI/Token/Comment.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::DashedWord:
     file: lib/PPI/Token/DashedWord.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::Data:
     file: lib/PPI/Token/Data.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::End:
     file: lib/PPI/Token/End.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::HereDoc:
     file: lib/PPI/Token/HereDoc.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::Label:
     file: lib/PPI/Token/Label.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::Magic:
     file: lib/PPI/Token/Magic.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::Number:
     file: lib/PPI/Token/Number.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::Number::Binary:
     file: lib/PPI/Token/Number/Binary.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::Number::Exp:
     file: lib/PPI/Token/Number/Exp.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::Number::Float:
     file: lib/PPI/Token/Number/Float.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::Number::Hex:
     file: lib/PPI/Token/Number/Hex.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::Number::Octal:
     file: lib/PPI/Token/Number/Octal.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::Number::Version:
     file: lib/PPI/Token/Number/Version.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::Operator:
     file: lib/PPI/Token/Operator.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::Pod:
     file: lib/PPI/Token/Pod.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::Prototype:
     file: lib/PPI/Token/Prototype.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::Quote:
     file: lib/PPI/Token/Quote.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::Quote::Double:
     file: lib/PPI/Token/Quote/Double.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::Quote::Interpolate:
     file: lib/PPI/Token/Quote/Interpolate.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::Quote::Literal:
     file: lib/PPI/Token/Quote/Literal.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::Quote::Single:
     file: lib/PPI/Token/Quote/Single.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::QuoteLike:
     file: lib/PPI/Token/QuoteLike.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::QuoteLike::Backtick:
     file: lib/PPI/Token/QuoteLike/Backtick.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::QuoteLike::Command:
     file: lib/PPI/Token/QuoteLike/Command.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::QuoteLike::Readline:
     file: lib/PPI/Token/QuoteLike/Readline.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::QuoteLike::Regexp:
     file: lib/PPI/Token/QuoteLike/Regexp.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::QuoteLike::Words:
     file: lib/PPI/Token/QuoteLike/Words.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::Regexp:
     file: lib/PPI/Token/Regexp.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::Regexp::Match:
     file: lib/PPI/Token/Regexp/Match.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::Regexp::Substitute:
     file: lib/PPI/Token/Regexp/Substitute.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::Regexp::Transliterate:
     file: lib/PPI/Token/Regexp/Transliterate.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::Separator:
     file: lib/PPI/Token/Separator.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::Structure:
     file: lib/PPI/Token/Structure.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::Symbol:
     file: lib/PPI/Token/Symbol.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::Unknown:
     file: lib/PPI/Token/Unknown.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::Whitespace:
     file: lib/PPI/Token/Whitespace.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Token::Word:
     file: lib/PPI/Token/Word.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Tokenizer:
     file: lib/PPI/Tokenizer.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Transform:
     file: lib/PPI/Transform.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Transform::UpdateCopyright:
     file: lib/PPI/Transform/UpdateCopyright.pm
-    version: '1.270'
+    version: '1.271'
   PPI::Util:
     file: lib/PPI/Util.pm
-    version: '1.270'
+    version: '1.271'
   PPI::XSAccessor:
     file: lib/PPI/XSAccessor.pm
-    version: '1.270'
+    version: '1.271'
 requires:
   Carp: '0'
   Clone: '0.30'
@@ -322,26 +322,26 @@ requires:
   perl: '5.006'
   strict: '0'
 resources:
-  bugtracker: https://github.com/adamkennedy/PPI/issues
-  homepage: https://github.com/adamkennedy/PPI
-  repository: https://github.com/adamkennedy/PPI
-version: '1.270'
+  bugtracker: https://github.com/Perl-Critic/PPI/issues
+  homepage: https://github.com/Perl-Critic/PPI
+  repository: https://github.com/Perl-Critic/PPI
+version: '1.271'
 x_Dist_Zilla:
   perl:
-    version: '5.028000'
+    version: '5.030002'
   plugins:
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: MetaResources
-      version: '6.012'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Encoding
       name: Encoding
-      version: '6.012'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: AutoPrereqs
-      version: '6.012'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -349,15 +349,23 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '6.012'
+      version: '6.024'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: TestRequires
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::DynamicPrereqs
       config:
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: DynamicPrereqs
-      version: '0.034'
+      version: '0.039'
     -
       class: Dist::Zilla::Plugin::Git::NextVersion
       config:
@@ -366,14 +374,14 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^u:^v([\d._]+)(-TRIAL)?$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.22.0.windows.1
+          git_version: 2.34.1
           repo_root: .
       name: Git::NextVersion
-      version: '2.046'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::OurPkgVersion
       name: OurPkgVersion
-      version: '0.12'
+      version: '0.21'
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
@@ -389,34 +397,34 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: Git::GatherDir
-      version: '2.046'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: MetaYAML
-      version: '6.012'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: MetaJSON
-      version: '6.012'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Readme
       name: Readme
-      version: '6.012'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: Manifest
-      version: '6.012'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::License
       name: License
-      version: '6.012'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
-          default_jobs: 1
+          default_jobs: '1'
       name: MakeMaker
-      version: '6.012'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
@@ -438,7 +446,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaTests
       name: MetaTests
-      version: '6.012'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Test::ChangesHasContent
       name: Test::ChangesHasContent
@@ -446,7 +454,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: PodSyntaxTests
-      version: '6.012'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Test::Pod::No404s
       name: Test::Pod::No404s
@@ -466,7 +474,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: Test::ReportPrereqs
-      version: '0.027'
+      version: '0.028'
     -
       class: Dist::Zilla::Plugin::Test::Portability
       config:
@@ -482,7 +490,7 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: MetaProvides::Package/AUTOVIV/:InstallModulesPM
-              version: '6.012'
+              version: '6.024'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
@@ -490,14 +498,14 @@ x_Dist_Zilla:
           inherit_version: '1'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: MetaProvides::Package
       version: '2.004003'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: MetaConfig
-      version: '6.012'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Keywords
       config:
@@ -509,18 +517,18 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.22.0.windows.1
+          git_version: 2.34.1
           include_authors: 0
           include_releaser: 1
           order_by: name
           paths: []
       name: Git::Contributors
-      version: '0.035'
+      version: '0.036'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
         Dist::Zilla::Role::TestRunner:
-          default_jobs: 1
+          default_jobs: '1'
       name: RunExtraTests
       version: '0.029'
     -
@@ -535,15 +543,15 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.22.0.windows.1
+          git_version: 2.34.1
           repo_root: .
       name: 'initial check'
-      version: '2.046'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.22.0.windows.1
+          git_version: 2.34.1
           repo_root: .
       name: Git::CheckFor::MergeConflicts
       version: '0.014'
@@ -551,18 +559,18 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.22.0.windows.1
+          git_version: 2.34.1
           repo_root: .
       name: Git::CheckFor::CorrectBranch
       version: '0.014'
     -
       class: Dist::Zilla::Plugin::CheckPrereqsIndexed
       name: CheckPrereqsIndexed
-      version: '0.020'
+      version: '0.021'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: TestRelease
-      version: '6.012'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -575,14 +583,14 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.22.0.windows.1
+          git_version: 2.34.1
           repo_root: .
       name: 'after tests'
-      version: '2.046'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: UploadToCPAN
-      version: '6.012'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromRelease
       config:
@@ -591,7 +599,7 @@ x_Dist_Zilla:
             - Changes
           match: []
       name: CopyFilesFromRelease
-      version: '0.006'
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
@@ -602,7 +610,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: NextRelease
-      version: '6.012'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -610,6 +618,7 @@ x_Dist_Zilla:
           add_files_in:
             - .
           commit_msg: '%N-%v%t%n%n%c'
+          signoff: 0
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Changes
@@ -617,12 +626,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.22.0.windows.1
+          git_version: 2.34.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: 'release snapshot'
-      version: '2.046'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -630,16 +639,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.270
+          tag: v1.271
           tag_format: v%v
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.22.0.windows.1
+          git_version: 2.34.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: Git::Tag
-      version: '2.046'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -648,63 +657,63 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.22.0.windows.1
+          git_version: 2.34.1
           repo_root: .
       name: Git::Push
-      version: '2.046'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: ConfirmRelease
-      version: '6.012'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.012'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.012'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.012'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.012'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.012'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.012'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.012'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.012'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.012'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.012'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: MetaProvides::Package/AUTOVIV/:InstallModulesPM
-      version: '6.012'
+      version: '6.024'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.012'
+    version: '6.024'
 x_contributors:
   - 'Adam Kennedy <adam@ali.as>'
   - 'Arnout Pierre <pierre.arnout@fraudbuster.mobi>'
@@ -723,6 +732,7 @@ x_contributors:
   - 'Gabor Szabo <szabgab@gmail.com>'
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Guillaume Aubert <aubertg@cpan.org>'
+  - 'James E Keenan <jkeenan@cpan.org>'
   - 'Joel Maslak <jmaslak@antelope.net>'
   - 'Julian Fondren <ayrnieu@gmail.com>'
   - 'Karen Etheridge <ether@cpan.org>'
@@ -730,9 +740,11 @@ x_contributors:
   - 'Lance Wicks <l.wicks@cv-library.co.uk>'
   - 'Matt Church <m.church@cv-library.co.uk>'
   - 'Matthew Horsfall <WolfSage@gmail.com>'
-  - 'Mike <moregan@stresscafe.com>'
+  - "Mike O'Regan <moregan@stresscafe.com>"
   - 'Milos Kukla <m.kukla@cv-library.co.uk>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'nanto_vi <nanto@moon.email.ne.jp>'
+  - 'Olaf Alders <olaf@wundersolutions.com>'
   - 'Olivier Mengué <dolmen@cpan.org>'
   - 'Philippe Bruhat (BooK) <book@cpan.org>'
   - 'Randy Lauen <randy.lauen@gmail.com>'
@@ -745,5 +757,6 @@ x_contributors:
   - 'Tom Wyant <wyant@cpan.org>'
   - 'Van de Bugger <van.de.bugger@gmail.com>'
   - 'Will Braswell <william.braswell@autoparallel.com>'
-x_generated_by_perl: v5.28.0
+x_generated_by_perl: v5.30.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

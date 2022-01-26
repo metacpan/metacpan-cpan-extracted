@@ -132,6 +132,7 @@ my @files = (
     't/results/draft7-additional-tests.txt',
     't/serialization.t',
     't/specification_version.t',
+    't/strict.t',
     't/traverse.t',
     't/type.t',
     't/unsupported-keywords.t',

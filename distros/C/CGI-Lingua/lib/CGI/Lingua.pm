@@ -6,7 +6,7 @@ use Storable; # RT117983
 use Class::Autouse qw{Carp Locale::Language Locale::Object::Country Locale::Object::DB I18N::AcceptLanguage I18N::LangTags::Detect};
 
 use vars qw($VERSION);
-our $VERSION = '0.63';
+our $VERSION = '0.64';
 
 =head1 NAME
 
@@ -14,7 +14,7 @@ CGI::Lingua - Create a multilingual web page
 
 =head1 VERSION
 
-Version 0.63
+Version 0.64
 
 =cut
 
@@ -70,7 +70,7 @@ For a list of primary-codes refer to ISO-639 (e.g. 'en' for English).
 For a list of country-codes refer to ISO-3166 (e.g. 'gb' for United Kingdom).
 
     # We support English, French, British and American English, in that order
-    my $l = CGI::Lingua(supported => ['en', 'fr', 'en-gb', 'en-us']);
+    my $l = CGI::Lingua->new(supported => ['en', 'fr', 'en-gb', 'en-us']);
 
 Takes optional parameter cache, an object which is used to cache country
 lookups.
@@ -145,6 +145,9 @@ sub new {
 			$rc->{_cache} = $cache;
 			$rc->{_supported} = $params{supported};
 			$rc->{_info} = $info;
+			$rc->{_have_ipcountry} = -1;
+			$rc->{_have_geoip} = -1;
+			$rc->{_have_geoipfree} = -1;
 
 			if(($rc->{_what_language} || $rc->{_rlanguage}) && $info && $info->lang()) {
 				delete $rc->{_what_language};
@@ -282,6 +285,7 @@ language() returns 'Unknown'.
 
 If the script is not being run in a CGI environment, perhaps to debug it, the
 locale is used via the LANG environment variable.
+
 =cut
 
 sub language {
@@ -532,7 +536,7 @@ sub _find_language {
 				if($accepts) {
 					$http_accept_language =~ /(.{2})-(..)/;
 					$variety = lc($2);
-					# Ignore en-029 etc (Carribean English)
+					# Ignore en-029 etc (Caribbean English)
 					if(($variety =~ /[a-z]{2,3}/) && !defined($self->{_sublanguage})) {
 						$self->_get_closest($alpha2, $alpha2);
 						if($self->{_logger}) {
@@ -920,26 +924,17 @@ sub country {
 	}
 	unless(defined($self->{_country})) {
 		if($self->{_have_geoip} == -1) {
-			if(($^O eq 'MSWin32') || (-r '/usr/local/share/GeoIP/GeoIP.dat')) {
-				if(eval { require Geo::IP; }) {
-					Geo::IP->import();
-					$self->{_have_geoip} = 1;
-					# GEOIP_STANDARD = 0, can't use that because you'll
-					# get a syntax error
-					$self->{_geoip} = Geo::IP->new(0);
-				} else {
-					$self->{_have_geoip} = 0;
-				}
-			} else {
-				$self->{_have_geoip} = 0;
-			}
+			$self->_load_geoip();
 		}
 		if($self->{_have_geoip} == 1) {
 			$self->{_country} = $self->{_geoip}->country_code_by_addr($ip);
 		}
 		unless(defined($self->{_country})) {
 			if($self->{_have_geoipfree} == -1) {
-				if(eval { require Geo::IPfree; }) {
+				# Don't use 'eval { use ... ' as recommended by Perlcritic
+				# See https://www.cpantesters.org/cpan/report/6db47260-389e-11ec-bc66-57723b537541
+				eval 'require Geo::IPfree';
+				unless($@) {
 					Geo::IPfree::IP->import();
 					$self->{_have_geoipfree} = 1;
 					$self->{_geoipfree} = Geo::IPfree->new();
@@ -994,7 +989,7 @@ sub country {
 				if($self->{_country} eq 'EU') {
 					delete($self->{_country});
 				} elsif(($self->{_country} eq 'US') && ($whois->{'StateProv'} eq 'PR')) {
-					# RT#131347: Inspite of what Whois thinks, Puerto Rico isn't in the US
+					# RT#131347: Despite what Whois thinks, Puerto Rico isn't in the US
 					$self->{_country} = 'pr';
 				}
 			}
@@ -1065,6 +1060,32 @@ sub country {
 	}
 
 	return $self->{_country};
+}
+
+sub _load_geoip
+{
+	my $self = shift;
+
+	if(($^O eq 'MSWin32') || (-r '/usr/local/share/GeoIP/GeoIP.dat') || (-r '/usr/share/GeoIP/GeoIP.dat')) {
+		# Don't use 'eval { use ... ' as recommended by Perlcritic
+		# See https://www.cpantesters.org/cpan/report/6db47260-389e-11ec-bc66-57723b537541
+		eval 'require Geo::IP';
+		unless($@) {
+			Geo::IP->import();
+			$self->{_have_geoip} = 1;
+			# GEOIP_STANDARD = 0, can't use that because you'll
+			# get a syntax error
+			if(-r '/usr/share/GeoIP/GeoIP.dat') {
+				$self->{_geoip} = Geo::IP->open('/usr/share/GeoIP/GeoIP.dat', 0);
+			} else {
+				$self->{_geoip} = Geo::IP->new(0);
+			}
+		} else {
+			$self->{_have_geoip} = 0;
+		}
+	} else {
+		$self->{_have_geoip} = 0;
+	}
 }
 
 =head2 locale
@@ -1179,19 +1200,7 @@ sub time_zone {
 	}
 
 	if($self->{_have_geoip} == -1) {
-		if(($^O eq 'MSWin32') || (-r '/usr/local/share/GeoIP/GeoIP.dat')) {
-			if(eval { require Geo::IP; }) {
-				Geo::IP->import();
-				$self->{_have_geoip} = 1;
-				# GEOIP_STANDARD = 0, can't use that because you'll
-				# get a syntax error
-				$self->{_geoip} = Geo::IP->new(0);
-			} else {
-				$self->{_have_geoip} = 0;
-			}
-		} else {
-			$self->{_have_geoip} = 0;
-		}
+		$self->_load_geoip();
 	}
 	if(my $ip = $ENV{'REMOTE_ADDR'}) {
 		if($self->{_have_geoip} == 1) {
@@ -1256,7 +1265,7 @@ sub _code2language
 	return $self->{_cache}->set("code2language/$code", Locale::Language::code2language($code), '1 month');
 }
 
-# Wrapper to Locale::Object::Country allowing for persistance to be added
+# Wrapper to Locale::Object::Country allowing for persistence to be added
 sub _code2country
 {
 	my ($self, $code) = @_;
@@ -1371,7 +1380,7 @@ L<http://deps.cpantesters.org/?module=CGI::Lingua>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2021 Nigel Horne.
+Copyright 2010-2022 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

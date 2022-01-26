@@ -31,364 +31,8 @@ YAML
 my $doc_uri = Mojo::URL->new('openapi.yaml');
 my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
 
-subtest 'validation errors, paths' => sub {
-  my $request = GET 'http://example.com/foo/bar';
+subtest 'validation errors, request uri paths' => sub {
   my $openapi = OpenAPI::Modern->new(
-    openapi_uri => 'openapi.yaml',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
-paths:
-  /foo/{foo_id}:
-    post:
-      operationId: my-post-path
-  /foo/bar:
-    get:
-      operationId: my-get-path
-webhooks:
-  my_hook:
-    description: I like webhooks
-    post:
-      operationId: hooky
-YAML
-
-  cmp_deeply(
-    (my $result = $openapi->validate_request($request, { path_template => '/foo/baz', path_captures => {} }))->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request',
-          keywordLocation => '/paths',
-          absoluteKeywordLocation => $doc_uri->clone->fragment('/paths')->to_string,
-          error => 'missing path-item "/foo/baz"',
-        },
-      ],
-    },
-    'path template does not exist under /paths',
-  );
-
-  cmp_deeply(
-    ($result = $openapi->validate_request($request, { operation_id => 'bloop', path_captures => {} }))->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request',
-          keywordLocation => jsonp('/paths'),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths'))->to_string,
-          error => 'unknown operation_id "bloop"',
-        },
-      ],
-    },
-    'path template does not exist under /paths',
-  );
-
-  cmp_deeply(
-    ($result = $openapi->validate_request($request, { operation_id => 'hooky', path_captures => {} }))->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request',
-          keywordLocation => '/webhooks/my_hook/post/operationId',
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/webhooks/my_hook/post/operationId'))->to_string,
-          error => 'operation id does not have an associated path',
-        },
-      ],
-    },
-    'path template does not exist under /paths',
-  );
-
-
-  cmp_deeply(
-    ($result = $openapi->validate_request(POST('http://example.com/foo/bar'),
-      { path_template => '/foo/{foo_id}', operation_id => 'my-get-path', path_captures => {} }))->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request',
-          keywordLocation => '/paths/~1foo~1bar',
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths', qw(/foo/bar)))->to_string,
-          error => 'operation does not match provided path_template',
-        },
-      ],
-    },
-    'path_template and operation_id are inconsistent',
-  );
-
-
-  cmp_deeply(
-    ($result = $openapi->validate_request(POST('http://example.com/foo/bar'),
-      { operation_id => 'my-get-path', path_captures => {} }))->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request',
-          keywordLocation => '/paths/~1foo~1bar/get',
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths', qw(/foo/bar get)))->to_string,
-          error => 'wrong HTTP method POST',
-        },
-      ],
-    },
-    'request HTTP method does not match operation',
-  );
-
-  cmp_deeply(
-    ($result = $openapi->validate_request(POST('http://example.com/foo/bar'),
-        { path_template => '/foo/{foo_id}', path_captures => {} }))->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request',
-          keywordLocation => '/paths/~1foo~1{foo_id}',
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id})))->to_string,
-          error => 'provided path_captures names do not match path template "/foo/{foo_id}"',
-        },
-      ],
-    },
-    'path template does not match path captures',
-  );
-
-  cmp_deeply(
-    ($result = $openapi->validate_request(GET('http://example.com/foo/bar'),
-      { path_template => '/foo/bar', operation_id => 'my-get-path', path_captures => {} }))->TO_JSON,
-    { valid => true },
-    'path_template and operation_id can both be passed, if consistent',
-  );
-
-  cmp_deeply(
-    ($result = $openapi->validate_request(GET('http://example.com/something/else'),
-      { path_template => '/foo/bar', path_captures => {} }))->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request',
-          keywordLocation => jsonp(qw(/paths /foo/bar)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/bar)))->to_string,
-          error => 'provided path_template does not match request URI',
-        },
-      ],
-    },
-    'path_template is not consistent with request URI, with no captures',
-  );
-
-  cmp_deeply(
-    ($result = $openapi->validate_request(POST('http://example.com/something/else'),
-      { path_template => '/foo/{foo_id}', path_captures => { foo_id => 123 } }))->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request',
-          keywordLocation => jsonp(qw(/paths /foo/{foo_id})),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id})))->to_string,
-          error => 'provided path_template does not match request URI',
-        },
-      ],
-    },
-    'path_template is not consistent with request URI, with captures',
-  );
-
-  cmp_deeply(
-    ($result = $openapi->validate_request(POST('http://example.com/something/else'),
-      { path_template => '/foo/{foo_id}' }))->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request',
-          keywordLocation => jsonp(qw(/paths /foo/{foo_id})),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id})))->to_string,
-          error => 'provided path_template does not match request URI',
-        },
-      ],
-    },
-    'path_template is not consistent with request URI, captures not provided',
-  );
-
-  cmp_deeply(
-    ($result = $openapi->validate_request(GET('http://example.com/something/else'),
-      { operation_id => 'my-get-path', path_captures => {} }))->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request',
-          keywordLocation => jsonp(qw(/paths /foo/bar)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/bar)))->to_string,
-          error => 'provided operation_id does not match request URI',
-        },
-      ],
-    },
-    'operation_id is not consistent with request URI',
-  );
-
-  cmp_deeply(
-    ($result = $openapi->validate_request(POST('http://example.com/foo/hello'),
-      { operation_id => 'my-post-path', path_captures => { foo_id => 'goodbye' } }))->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request',
-          keywordLocation => jsonp(qw(/paths /foo/{foo_id})),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id})))->to_string,
-          error => 'provided path_captures values do not match request URI',
-        },
-      ],
-    },
-    'path_captures values are not consistent with request URI',
-  );
-
-  $openapi = OpenAPI::Modern->new(
-    openapi_uri => 'openapi.yaml',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
-paths:
-  /foo: {}
-YAML
-
-  cmp_deeply(
-    ($result = $openapi->validate_request(POST('http://example.com/foo/bar'),
-      { path_template => '/foo', path_captures => {} }))->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request',
-          keywordLocation => jsonp(qw(/paths /foo post)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post)))->to_string,
-          error => 'missing entry for HTTP method "post"',
-        },
-      ],
-    },
-    'operation does not exist under /paths/<path-template>',
-  );
-
-
-  $openapi = OpenAPI::Modern->new(
-    openapi_uri => 'openapi.yaml',
-    openapi_schema => $yamlpp->load_string(<<YAML));
-$openapi_preamble
-paths:
-  /foo/{foo_id}:
-    parameters:
-    - name: foo_id
-      in: path
-      required: true
-      schema:
-        pattern: ^[0-9]+\$
-    get:
-      operationId: my-get-path
-YAML
-
-  cmp_deeply(
-    ($result = $openapi->validate_request(GET('http://example.com/foo/hi'),
-      { path_template => '/foo/{foo_id}' }))->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request/path/foo_id',
-          keywordLocation => jsonp(qw(/paths /foo/{foo_id} parameters 0 schema pattern)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} parameters 0 schema pattern)))->to_string,
-          error => 'pattern does not match',
-        },
-      ],
-    },
-    'path capture values are extracted from the path template and request uri',
-  );
-
-  cmp_deeply(
-    ($result = $openapi->validate_request(GET('http://example.com/foo/hi'),
-      { operation_id => 'my-get-path' }))->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request/path/foo_id',
-          keywordLocation => jsonp(qw(/paths /foo/{foo_id} parameters 0 schema pattern)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} parameters 0 schema pattern)))->to_string,
-          error => 'pattern does not match',
-        },
-      ],
-    },
-    'path capture values are extracted from the operation id and request uri',
-  );
-
-  cmp_deeply(
-    ($result = $openapi->validate_request(GET('http://example.com/foo/hi')))->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request/path/foo_id',
-          keywordLocation => jsonp(qw(/paths /foo/{foo_id} parameters 0 schema pattern)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} parameters 0 schema pattern)))->to_string,
-          error => 'pattern does not match',
-        },
-      ],
-    },
-    'path template and capture values are extracted from the request uri',
-  );
-
-  cmp_deeply(
-    ($result = $openapi->validate_request(GET('http://example.com/bloop/blah')))->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request/path',
-          keywordLocation => jsonp('/paths'),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths'))->to_string,
-          error => 'no match found for URI path "/bloop/blah"',
-        },
-      ],
-    },
-    'failure to extract path template and capture values from the request uri',
-  );
-
-  my $uri = URI->new('http://example.com');
-  $uri->path_segments('', 'foo', 'hello // there ಠ_ಠ!');
-  cmp_deeply(
-    ($result = $openapi->validate_request(GET($uri),
-      { path_template => '/foo/{foo_id}', path_captures => { foo_id => 'hello // there ಠ_ಠ!' } }))->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request/path/foo_id',
-          keywordLocation => jsonp(qw(/paths /foo/{foo_id} parameters 0 schema pattern)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} parameters 0 schema pattern)))->to_string,
-          error => 'pattern does not match',
-        },
-      ],
-    },
-    'path capture variables are found to be consistent with the URI when some values are url-escaped',
-  );
-
-  cmp_deeply(
-    ($result = $openapi->validate_request(GET($uri)))->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request/path/foo_id',
-          keywordLocation => jsonp(qw(/paths /foo/{foo_id} parameters 0 schema pattern)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} parameters 0 schema pattern)))->to_string,
-          error => 'pattern does not match',
-        },
-      ],
-    },
-    'path captures can be properly extracted from the URI when some values are url-escaped',
-  );
-
-
-  $openapi = OpenAPI::Modern->new(
     openapi_uri => 'openapi.yaml',
     openapi_schema => $yamlpp->load_string(<<YAML));
 $openapi_preamble
@@ -404,12 +48,12 @@ paths:
 YAML
 
   cmp_deeply(
-    ($result = $openapi->validate_request(GET('http://example.com/foo'), { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    (my $result = $openapi->validate_request(GET('http://example.com/foo'), { path_template => '/foo', path_captures => {} }))->TO_JSON,
     {
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/path/foo_id',
+          instanceLocation => '/request/uri/path/foo_id',
           keywordLocation => jsonp(qw(/paths /foo get parameters 0 required)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get parameters 0 required)))->to_string,
           error => 'missing path parameter: foo_id',
@@ -435,12 +79,12 @@ paths:
 YAML
 
   cmp_deeply(
-    ($result = $openapi->validate_request($request, { path_template => '/foo/{foo_id}', path_captures => { foo_id => 'bar' } }))->TO_JSON,
+    ($result = $openapi->validate_request(GET('http://example.com/foo/bar'), { path_template => '/foo/{foo_id}', path_captures => { foo_id => 'bar' } }))->TO_JSON,
     {
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/path/foo_id',
+          instanceLocation => '/request/uri/path/foo_id',
           keywordLocation => jsonp(qw(/paths /foo/{foo_id} get parameters 0 schema pattern)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} get parameters 0 schema pattern)))->to_string,
           error => 'pattern does not match',
@@ -474,7 +118,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/path/foo_id',
+          instanceLocation => '/request/uri/path/foo_id',
           keywordLocation => jsonp(qw(/paths /foo/{foo_id} get parameters 0 content application/json)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} get parameters 0 content application/json)))->to_string,
           error => re(qr/^could not decode content as application\/json: malformed JSON string/),
@@ -491,7 +135,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/path/foo_id',
+          instanceLocation => '/request/uri/path/foo_id',
           keywordLocation => jsonp(qw(/paths /foo/{foo_id} get parameters 0 content application/json schema required)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} get parameters 0 content application/json schema required)))->to_string,
           error => 'missing property: key',
@@ -532,7 +176,7 @@ paths:
           maxLength: 1
 YAML
 
-  $request = GET 'http://example.com/foo/foo/bar/bar';
+  my $request = GET 'http://example.com/foo/foo/bar/bar';
   cmp_deeply(
     ($result = $openapi->validate_request($request,
       { path_template => '/foo/{foo_id}/bar/{bar_id}', path_captures => { foo_id => 'foo', bar_id => 'bar' } }))->TO_JSON,
@@ -540,13 +184,13 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/path/foo_id',
+          instanceLocation => '/request/uri/path/foo_id',
           keywordLocation => jsonp('/paths', '/foo/{foo_id}/bar/{bar_id}', qw(get parameters 0 schema maxLength)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths', '/foo/{foo_id}/bar/{bar_id}', qw(get parameters 0 schema maxLength)))->to_string,
           error => 'length is greater than 1',
         },
         {
-          instanceLocation => '/request/path/bar_id',
+          instanceLocation => '/request/uri/path/bar_id',
           keywordLocation => jsonp('/paths', '/foo/{foo_id}/bar/{bar_id}', qw(parameters 1 schema pattern)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths', '/foo/{foo_id}/bar/{bar_id}', qw(parameters 1 schema pattern)))->to_string,
           error => 'pattern does not match',
@@ -576,7 +220,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request',
+          instanceLocation => '/request/uri/path/foo_id',
           keywordLocation => jsonp(qw(/paths /foo/{foo_id})),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id})))->to_string,
           error => 'missing path parameter specification for "foo_id"',
@@ -587,7 +231,7 @@ YAML
   );
 };
 
-subtest 'validation errors, everything else' => sub {
+subtest 'validation errors in requests' => sub {
   my $request = POST 'http://example.com/foo';
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => 'openapi.yaml',
@@ -786,7 +430,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/query/alpha',
+          instanceLocation => '/request/uri/query/alpha',
           keywordLocation => jsonp(qw(/paths /foo post parameters 0 required)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post parameters 0 required)))->to_string,
           error => 'missing query parameter: alpha',
@@ -810,7 +454,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/query/delta',
+          instanceLocation => '/request/uri/query/delta',
           keywordLocation => jsonp(qw(/paths /foo post parameters 4 content unknown/encodingtype)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post parameters 4 content unknown/encodingtype)))->to_string,
           error => 'EXCEPTION: unsupported media type "unknown/encodingtype": add support with $openapi->add_media_type(...)',
@@ -828,7 +472,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/query/delta',
+          instanceLocation => '/request/uri/query/delta',
           keywordLocation => jsonp(qw(/paths /foo post parameters 4 content unknown/encodingtype schema)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post parameters 4 content unknown/encodingtype schema)))->to_string,
           error => 'subschema is false',
@@ -846,7 +490,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/query/epsilon',
+          instanceLocation => '/request/uri/query/epsilon',
           keywordLocation => jsonp(qw(/paths /foo post parameters 5 content apPlicATion/jsON schema)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post parameters 5 content apPlicATion/jsON schema)))->to_string,
           error => 'subschema is false',
@@ -866,7 +510,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/query/zeta',
+          instanceLocation => '/request/uri/query/zeta',
           keywordLocation => jsonp(qw(/paths /foo post parameters 6 content iMAgE/* schema)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post parameters 6 content iMAgE/* schema)))->to_string,
           error => 'subschema is false',
@@ -885,7 +529,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/query/alpha',
+          instanceLocation => '/request/uri/query/alpha',
           keywordLocation => jsonp(qw(/paths /foo post parameters 0 schema pattern)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post parameters 0 schema pattern)))->to_string,
           error => 'pattern does not match',
@@ -897,7 +541,7 @@ YAML
           error => 'pattern does not match',
         },
         {
-          instanceLocation => '/request/query/beta',
+          instanceLocation => '/request/uri/query/beta',
           keywordLocation => jsonp(qw(/paths /foo post parameters 2 schema)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post parameters 2 schema)))->to_string,
           error => 'subschema is false',
@@ -940,7 +584,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/query/query1',
+          instanceLocation => '/request/uri/query/query1',
           keywordLocation => jsonp(qw(/paths /foo get parameters 0 content application/json)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get parameters 0 content application/json)))->to_string,
           error => re(qr/^could not decode content as application\/json: \'"\' expected, at character offset 1/),
@@ -964,7 +608,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/query/query1',
+          instanceLocation => '/request/uri/query/query1',
           keywordLocation => jsonp(qw(/paths /foo get parameters 0 content application/json schema required)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get parameters 0 content application/json schema required)))->to_string,
           error => 'missing property: key',
@@ -1029,7 +673,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/query/alpha',
+          instanceLocation => '/request/uri/query/alpha',
           keywordLocation => jsonp(qw(/paths /foo get parameters 0 schema maxLength)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get parameters 0 schema maxLength)))->to_string,
           error => 'length is greater than 1',
@@ -1041,7 +685,7 @@ YAML
           error => 'length is greater than 1',
         },
         {
-          instanceLocation => '/request/query/beta',
+          instanceLocation => '/request/uri/query/beta',
           keywordLocation => jsonp(qw(/paths /foo parameters 1 schema pattern)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo parameters 1 schema pattern)))->to_string,
           error => 'pattern does not match',
@@ -1491,7 +1135,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/query/bar',
+          instanceLocation => '/request/uri/query/bar',
           keywordLocation => jsonp('/paths', '/foo/{foo_id}', qw(post parameters 0 schema pattern)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths', '/foo/{foo_id}', qw(post parameters 0 schema pattern)))->to_string,
           error => 'pattern does not match',
@@ -1503,7 +1147,7 @@ YAML
           error => 'pattern does not match',
         },
         {
-          instanceLocation => '/request/path/foo_id',
+          instanceLocation => '/request/uri/path/foo_id',
           keywordLocation => jsonp('/paths', '/foo/{foo_id}', qw(parameters 0 schema pattern)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths', '/foo/{foo_id}', qw(parameters 0 schema pattern)))->to_string,
           error => 'pattern does not match',
@@ -1563,7 +1207,7 @@ YAML
       valid => false,
       errors => [
         {
-          instanceLocation => '/request/query/bar',
+          instanceLocation => '/request/uri/query/bar',
           keywordLocation => jsonp('/paths', '/foo/{foo_id}', qw(post parameters 0 schema maximum)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths', '/foo/{foo_id}', qw(post parameters 0 schema maximum)))->to_string,
           error => 'value is larger than 10',
@@ -1575,7 +1219,7 @@ YAML
           error => 'value is larger than 10',
         },
         {
-          instanceLocation => '/request/path/foo_id',
+          instanceLocation => '/request/uri/path/foo_id',
           keywordLocation => jsonp('/paths', '/foo/{foo_id}', qw(parameters 0 schema maximum)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp('/paths', '/foo/{foo_id}', qw(parameters 0 schema maximum)))->to_string,
           error => 'value is larger than 10',

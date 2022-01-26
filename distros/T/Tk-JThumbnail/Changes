@@ -17,7 +17,7 @@ Revision history for Perl extension Tk::JThumbnail.
 	  like <Button-1> and <Shift-Button-1>.
 	- Add selectionIncludes() and selectionAnchor() functions to match
 	  those found in Tk::*MListbox widgets.
-2.2
+2.2   Mon Mar 23 2020
 	- Add Balloon option (-iballoons => 1|0) to specify show popup balloons
 	  showing the file-name when mousing over an image.
 	- Add -iborder, -ihighlightthickness, -irelief, -iactiverelief, and
@@ -45,9 +45,24 @@ Revision history for Perl extension Tk::JThumbnail.
 	- Make the "default" (-command => undef) mouse-button down function
 	  work more user-friendly when selecting/deselecting.
 	- Misc. code cleanups.
-2.3
+2.3   Thu Jan 06 2022
 	- Fix index() function not accepting integer values, namely zero (0) 
 	  (like *Listbox modules) as raw zero-based indices into the list.
 	- Also added decimal numbers to allow for specifying specific zero-based 
 	  row.column indices, which will return the equivalent raw index# for a 
 	  specific item.  Bounds checking is done in both cases.
+2.4   Fri Jan 21 2022
+	- Add new -state option to configure as "normal" or "disabled", like many
+	  other Tk widgets.  "disabled" prevents user-interaction with the widget, 
+	  but NOTE that does not prevent applications from updateing it.
+	- Remove the special "-focus" option and get the traditional "-takefocus" 
+	  option working properly.  There are 3 valid state values:  "", 0, and 1.
+	  "" is the default and allows focus via tabbing, but the widget does not 
+	  take focus when clicked on.  "1" allows both, "0" does not allow the 
+	  widget to gain the keyboard focus.  This is consistant with other Tk 
+	  widgets.
+	  NOTE:  The old "-focus" option is DEPRECIATED & has been REMOVED
+	  (change your code)!
+	- Add new color options:  -selectforeground, -activeforeground, and
+	  -disabledforeground.
+	- Various minor bug-fixes and tweaks.

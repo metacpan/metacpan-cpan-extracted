@@ -1,0 +1,52 @@
+---
+abstract: 'Handle the Italian CBI fixed length file format.'
+author:
+  - 'Samuele Bonino <samuele.bonino at resbinaria.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.14, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CBI-Wrapper
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  CBI::Wrapper:
+    file: lib/CBI/Wrapper.pm
+    version: '0.02'
+  CBI::Wrapper::Disposal:
+    file: lib/CBI/Wrapper/Disposal.pm
+  CBI::Wrapper::Field:
+    file: lib/CBI/Wrapper/Field.pm
+  CBI::Wrapper::Flow:
+    file: lib/CBI/Wrapper/Flow.pm
+  CBI::Wrapper::RIBA:
+    file: lib/CBI/Wrapper/RIBA.pm
+  CBI::Wrapper::Record:
+    file: lib/CBI/Wrapper/Record.pm
+  CBI::Wrapper::RecordMapping:
+    file: lib/CBI/Wrapper/RecordMapping.pm
+requires:
+  Carp: '0'
+  Encode: '0'
+  Scalar::Util: '1.47'
+  Text::Unidecode: '1.30'
+  perl: '5.008001'
+version: '0.02'
+x_contributors:
+  - 'Samuele Bonino <samuele.bonino@resbinaria.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

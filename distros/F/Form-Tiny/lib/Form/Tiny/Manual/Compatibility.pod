@@ -10,6 +10,87 @@ This documentation page is listing all non-backward compatible changes in usage 
 
 =head1 CHANGES
 
+=head2 Subroutine call parameters got standarized
+
+I<Changed in 2.04>
+
+Many parts of the system can be customized with code references (anonymous subroutines). The problem is they were designed in isolation, per feature and not as a whole.
+
+Because of this, parameters they get passed tended to vary. For example the C<default> sub used to get passed a single parameter, which is a form instance, while form validator would not get passed a form instance, making it hard or impossible to make use of instance data in certain places.
+
+To combat this, all listed places now consistently get passed the form instance as their first parameter, followed by their former parameters:
+
+	form_field -> adjust
+	form_field -> coerce
+	form_validator
+	form_filter
+	field_filter
+
+For example:
+
+	form_field 'field' => (
+		# before
+		adjust => sub { shift() + 1 },
+		# after
+		adjust => sub { $_[1] + 1 },
+	);
+
+Or with signatures:
+
+	form_field 'field' => (
+		# before
+		adjust => sub ($value) { $value + 1 },
+		# after
+		adjust => sub ($self, $value) { $value + 1 },
+	);
+
+=head2 Form::Tiny::Error::DoesNotExist was removed
+
+I<Changed in 2.04>
+
+Use Form::Tiny::Error::Required instead.
+
+=head2 Using three-argument field_filter (passing context explicitly)
+
+I<Changed in 2.04>
+
+	# Old form
+	field_filter 'field_name', Type, sub { ... };
+
+	# New form - use context instead
+	form_field 'field_name';
+	field_filter Type, sub { ... };
+
+=head2 Using Form::Tiny::Filter 'field' property
+
+I<Changed in 2.04>
+
+	# Old form
+	field_filter Form::Tiny::Filter->new(
+		field => 'field_name',
+		type => Type,
+		code => sub { ... },
+	);
+
+	# New form - use context instead
+	form_field 'field_name';
+	field_filter Form::Tiny::Filter->new(
+		type => Type,
+		code => sub { ... },
+	);
+
+=head2 Input data is no longer deep cloned before validation
+
+I<Changed in 2.01 - considered bugfix>
+
+In previous versions, the validation process started off by deep cloning the input by calling C<Storable::dclone> on it. It was unnecessary and had the potential to lead to subtle bugs.
+
+The validation process is cloning most of the input by itself by mangling fields and then putting them back in the result hashref, much alike the input one, but completely separate. However, if you specify that a field should be an object of certain type, that will not get cloned. Same for explicit array and hash references (not those specified as a path, like C<key1.key2>). Removing deep cloning fixed that, as those would get cloned anyway.
+
+So now, if you specify your field to contain something that is not a reference, it will get cloned. If you specify something that is a reference, it will not get cloned, and changing it will also change that single key in the input hash. You have all the power to decide.
+
+If you still want to deep clone your input data you can use the C<reformat> hook for that. See L<Form::Tiny::Manual/"Hooks">.
+
 =head2 Filtered forms no longer trim strings by default
 
 I<Changed in 2.00>
@@ -112,90 +193,13 @@ In the past, it was possible to define a form by defining three methods in the p
 
 If you happened to use the module during its early days, you must adjust your code to the new DSL style. It should not require drastic changes, but rather moving declarations out from class methods to DSL keywords. Refer to L<Form::Tiny/"Form domain-specific language"> for details.
 
-=head2 Input data is no longer deep cloned before validation
-
-I<Changed in 2.01 - considered bugfix>
-
-In previous versions, the validation process started off by deep cloning the input by calling C<Storable::dclone> on it. It was unnecessary and had the potential to lead to subtle bugs.
-
-The validation process is cloning most of the input by itself by mangling fields and then putting them back in the result hashref, much alike the input one, but completely separate. However, if you specify that a field should be an object of certain type, that will not get cloned. Same for explicit array and hash references (not those specified as a path, like C<key1.key2>). Removing deep cloning fixed that, as those would get cloned anyway.
-
-So now, if you specify your field to contain something that is not a reference, it will get cloned. If you specify something that is a reference, it will not get cloned, and changing it will also change that single key in the input hash. You have all the power to decide.
-
-If you still want to deep clone your input data you can use the C<reformat> hook for that. See L<Form::Tiny::Manual/"Hooks">.
-
 =head1 FUTURE COMPATIBILITY
 
 Starting from version I<2.00>, any backward incompatible changes will only be introduced to the module after a 3 month deprecation period. This does not cover bug fixes and changes to internal methods not meant to be used or depended on.
 
 =head2 Current deprecations
 
-=head3 Using three-argument field_filter (passing context explicitly)
-
-	# DEPRECATED
-	field_filter 'field_name', Type, sub { ... };
-
-	# OK - use context instead
-	form_field 'field_name';
-	field_filter Type, sub { ... };
-
-=head3 Using Form::Tiny::Filter 'field' property
-
-	# DEPRECATED
-	field_filter Form::Tiny::Filter->new(
-		field => 'field_name',
-		type => Type,
-		code => sub { ... },
-	);
-
-	# OK - use context instead
-	form_field 'field_name';
-	field_filter Form::Tiny::Filter->new(
-		type => Type,
-		code => sub { ... },
-	);
-
-=head3 Form::Tiny::Error::DoesNotExist is deprecated
-
-Use Form::Tiny::Error::Required instead.
-
-=head3 Subroutine call parameters are getting standarized
-
-Many parts of the system can be customized with code references (anonymous subroutines). The problem is they were designed in isolation, per feature and not as a whole.
-
-Because of this, parameters they get passed tend to vary. For example the C<default> sub will get passed a single parameter, which is a form instance, while form validator will not get passed a form instance, making it hard or impossible to make use of instance data in certain places.
-
-To combat this, in the future release all listed places will consistently get passed the form instance as their first parameter, followed by their current parameters:
-
-	form_field -> adjust
-	form_field -> coerce
-	form_validator
-	form_filter
-	field_filter
-
-For example:
-
-	form_field 'field' => (
-		# before
-		adjust => sub { shift() + 1 },
-		# after
-		adjust => sub { $_[1] + 1 },
-	);
-
-Or with signatures:
-
-	form_field 'field' => (
-		# before
-		adjust => sub ($value) { $value + 1 },
-		# after
-		adjust => sub ($self, $value) { $value + 1 },
-	);
-
-Starting with I<2.03>, a new import flag C<-consistent> will be added, which enables the new parameter lists:
-
-	use Form::Tiny -consistent;
-
-A warning will be raised if Form::Tiny is imported without this flag. After the deprecation period and removal of old syntax, the flag will be made redundant.
+None at this time.
 
 =head1 SEE ALSO
 

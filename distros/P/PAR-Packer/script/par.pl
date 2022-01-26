@@ -205,8 +205,9 @@ rm '$filename'
 } }
 
 BEGIN {
-    Internals::PAR::BOOT() if defined &Internals::PAR::BOOT;
     $PAR_MAGIC = "\nPAR.pm\n";
+
+    Internals::PAR::BOOT() if defined &Internals::PAR::BOOT;
 
     eval {
 
@@ -215,38 +216,35 @@ _par_init_env();
 my $quiet = !$ENV{PAR_DEBUG};
 
 # fix $progname if invoked from PATH
-my %Config = (
+my %sys = (
     path_sep    => ($^O =~ /^MSWin/ ? ';' : ':'),
     _exe        => ($^O =~ /^(?:MSWin|OS2|cygwin)/ ? '.exe' : ''),
     _delim      => ($^O =~ /^MSWin|OS2/ ? '\\' : '/'),
 );
 
 _set_progname();
+outs(qq[\$progname = "$progname"]);
+
 _set_par_temp();
+outs(qq[\$ENV{PAR_TEMP} = "$ENV{PAR_TEMP}"]);
 
 # Magic string checking and extracting bundled modules {{{
 my ($start_pos, $data_pos);
-{
+MAGIC: {
     local $SIG{__WARN__} = sub {};
 
     # Check file type, get start of data section {{{
-    open _FH, '<:raw', $progname or last;
+    unless (open _FH, '<:raw', $progname) {
+        outs(qq[Can't read from file "$progname"]);  # don't use $! here as it requires Errno.pm
+        last MAGIC;
+    }
 
     # Search for the "\nPAR.pm\n signature backward from the end of the file
-    my $buf;
-    my $size = -s $progname;
     my $chunk_size = 64 * 1024;
-    my $magic_pos;
+    my $buf;
+    my $size = -s _FH;
 
-    if ($size <= $chunk_size) {
-        $magic_pos = 0;
-    } elsif ((my $m = $size % $chunk_size) > 0) {
-        $magic_pos = $size - $m;
-    } else {
-        $magic_pos = $size - $chunk_size;
-    }
-    # in any case, $magic_pos is a multiple of $chunk_size
-
+    my $magic_pos = $size - $size % $chunk_size; # NOTE: $magic_pos is a multiple of $chunk_size
     while ($magic_pos >= 0) {
         seek _FH, $magic_pos, 0;
         read _FH, $buf, $chunk_size + length($PAR_MAGIC);
@@ -256,7 +254,10 @@ my ($start_pos, $data_pos);
         }
         $magic_pos -= $chunk_size;
     }
-    last if $magic_pos < 0;
+    if ($magic_pos < 0) {
+        outs(qq[Can't find magic string "$PAR_MAGIC" in file "$progname"]);
+        last MAGIC;
+    }
 
     # Seek 4 bytes backward from the signature to get the offset of the
     # first embedded FILE, then seek to it
@@ -292,12 +293,12 @@ my ($start_pos, $data_pos);
             outs("SHLIB: $filename\n");
         }
         else {
-            $require_list{$fullname} =
             $ModuleCache{$fullname} = {
                 buf => $buf,
                 crc => $crc,
                 name => $fullname,
             };
+            $require_list{$fullname}++;
         }
         read _FH, $buf, 4;
     }
@@ -308,7 +309,10 @@ my ($start_pos, $data_pos);
 
         return if ref $module or !$module;
 
-        my $info = delete $require_list{$module} or return;
+        my $info = $ModuleCache{$module};
+        return unless $info;
+
+        delete $require_list{$module};
 
         $INC{$module} = "/loader/$info/$module";
 
@@ -321,6 +325,7 @@ my ($start_pos, $data_pos);
         }
         else {
             my $filename = _save_as("$info->{crc}.pm", $info->{buf});
+            $info->{file} = $filename;
 
             open my $fh, '<:raw', $filename or die qq[Can't read "$filename": $!];
             return $fh;
@@ -359,7 +364,11 @@ my ($start_pos, $data_pos);
 
     # }}}
 
-    last unless $buf eq "PK\003\004";
+    unless ($buf eq "PK\003\004") {
+        outs(qq[No zip found after FILE section in file "$progname"]);
+        last MAGIC ;
+    }
+
     $start_pos = (tell _FH) - 4;                # start of zip
 }
 # }}}
@@ -527,6 +536,7 @@ if ($out) {
 
         require_modules();
 
+        # NOTE: use $Config::Config{...} since we only "require" (*not* "use") it - no import
         my @inc = grep { !/BSDPAN/ }
                        grep {
                            ($bundle ne 'site') or
@@ -662,7 +672,6 @@ if ($out) {
     $PAR::LibCache{$progname} = $zip;
 
     $quiet = !$ENV{PAR_DEBUG};
-    outs(qq[\$ENV{PAR_TEMP} = "$ENV{PAR_TEMP}"]);
 
     if (defined $ENV{PAR_TEMP}) { # should be set at this point!
         foreach my $member ( $zip->members ) {
@@ -779,7 +788,7 @@ sub _set_par_temp {
         }
         $username =~ s/\W/_/g;
 
-        my $stmpdir = "$path$Config{_delim}par-".unpack("H*", $username);
+        my $stmpdir = "$path$sys{_delim}par-".unpack("H*", $username);
         mkdir $stmpdir, 0755;
         if (!$ENV{PAR_CLEAN} and my $mtime = (stat($progname))[9]) {
             open my $fh, "<:raw", $progname or die qq[Can't read "$progname": $!];
@@ -790,7 +799,7 @@ sub _set_par_temp {
                 seek $fh, -58, 2;
                 read $fh, $buf, 41;
                 $buf =~ s/\0//g;
-                $stmpdir .= "$Config{_delim}cache-$buf";
+                $stmpdir .= "$sys{_delim}cache-$buf";
             }
             else {
                 my $digest = eval
@@ -803,13 +812,13 @@ sub _set_par_temp {
                     $ctx->hexdigest;
                 } || $mtime;
 
-                $stmpdir .= "$Config{_delim}cache-$digest";
+                $stmpdir .= "$sys{_delim}cache-$digest";
             }
             close($fh);
         }
         else {
             $ENV{PAR_CLEAN} = 1;
-            $stmpdir .= "$Config{_delim}temp-$$";
+            $stmpdir .= "$sys{_delim}temp-$$";
         }
 
         $ENV{PAR_TEMP} = $stmpdir;
@@ -857,40 +866,40 @@ sub _set_progname {
     $progname ||= $0;
 
     if ($ENV{PAR_TEMP} and index($progname, $ENV{PAR_TEMP}) >= 0) {
-        $progname = substr($progname, rindex($progname, $Config{_delim}) + 1);
+        $progname = substr($progname, rindex($progname, $sys{_delim}) + 1);
     }
 
-    if (!$ENV{PAR_PROGNAME} or index($progname, $Config{_delim}) >= 0) {
+    if (!$ENV{PAR_PROGNAME} or index($progname, $sys{_delim}) >= 0) {
         if (open my $fh, '<', $progname) {
             return if -s $fh;
         }
-        if (-s "$progname$Config{_exe}") {
-            $progname .= $Config{_exe};
+        if (-s "$progname$sys{_exe}") {
+            $progname .= $sys{_exe};
             return;
         }
     }
 
-    foreach my $dir (split /\Q$Config{path_sep}\E/, $ENV{PATH}) {
+    foreach my $dir (split /\Q$sys{path_sep}\E/, $ENV{PATH}) {
         next if exists $ENV{PAR_TEMP} and $dir eq $ENV{PAR_TEMP};
-        $dir =~ s/\Q$Config{_delim}\E$//;
-        (($progname = "$dir$Config{_delim}$progname$Config{_exe}"), last)
-            if -s "$dir$Config{_delim}$progname$Config{_exe}";
-        (($progname = "$dir$Config{_delim}$progname"), last)
-            if -s "$dir$Config{_delim}$progname";
+        $dir =~ s/\Q$sys{_delim}\E$//;
+        (($progname = "$dir$sys{_delim}$progname$sys{_exe}"), last)
+            if -s "$dir$sys{_delim}$progname$sys{_exe}";
+        (($progname = "$dir$sys{_delim}$progname"), last)
+            if -s "$dir$sys{_delim}$progname";
     }
 }
 
 sub _fix_progname {
     $0 = $progname ||= $ENV{PAR_PROGNAME};
-    if (index($progname, $Config{_delim}) < 0) {
-        $progname = ".$Config{_delim}$progname";
+    if (index($progname, $sys{_delim}) < 0) {
+        $progname = ".$sys{_delim}$progname";
     }
 
     # XXX - hack to make PWD work
     my $pwd = (defined &Cwd::getcwd) ? Cwd::getcwd()
                 : ((defined &Win32::GetCwd) ? Win32::GetCwd() : `pwd`);
     chomp($pwd);
-    $progname =~ s/^(?=\.\.?\Q$Config{_delim}\E)/$pwd$Config{_delim}/;
+    $progname =~ s/^(?=\.\.?\Q$sys{_delim}\E)/$pwd$sys{_delim}/;
 
     $ENV{PAR_PROGNAME} = $progname;
 }
@@ -932,6 +941,7 @@ sub outs {
 
 sub init_inc {
     require Config;
+    # NOTE: use $Config::Config{...} since we only "require" (*not* "use") it - no import
     push @INC, grep defined, map $Config::Config{$_}, qw(
         archlibexp privlibexp sitearchexp sitelibexp
         vendorarchexp vendorlibexp

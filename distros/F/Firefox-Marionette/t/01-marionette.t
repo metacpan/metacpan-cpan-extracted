@@ -28,7 +28,6 @@ if (defined $ENV{WATERFOX}) {
 	$class->import(qw(:all));
 }
 if ($ENV{FIREFOX_ALARM}) {
-	$SIG{ALRM} = sub { die "Alarm at time exceeded" };
 	alarm 900; # ten minutes is heaps for bulk testing
 }
 
@@ -641,7 +640,7 @@ SKIP: {
 						if ($key =~ /^(elevation_failure|unsupported|is_complete_update)$/smx) {
 							ok((($update->$key() == 1) || ($update->$key() == 0)), "\$update->$key() produces a boolean:" . $update->$key());
 						} elsif ($key eq 'type') {
-							ok($update->$key() =~ /^(partial|minor|complete)$/smx, "\$update->$key() produces an allowed type:" . $update->$key());
+							ok($update->$key() =~ /^(major|partial|minor|complete)$/smx, "\$update->$key() produces an allowed type:" . $update->$key());
 						} else {
 							ok(1, "\$update->$key() produces a result:" . $update->$key());
 						}
@@ -650,6 +649,10 @@ SKIP: {
 					}
 				}
 				$update = $firefox->update();
+				if (defined $update->app_version()) {
+					diag("New Browser version is " . $update->app_version());
+					($major_version, $minor_version, $patch_version) = split /[.]/smx, $update->app_version();
+				}
 			}
 		} elsif (defined $update->number_of_updates()) {
 			ok(1, "Firefox was NOT updated");
@@ -1004,13 +1007,27 @@ SKIP: {
 			skip("\$capabilities->proxy is not supported for " . $capabilities->browser_version(), 1);
 		} elsif ((exists $Config::Config{'d_fork'}) && (defined $Config::Config{'d_fork'}) && ($Config::Config{'d_fork'} eq 'define')) {
 			if ($ENV{RELEASE_TESTING}) {
+				my $handle = File::Temp->new( TEMPLATE => File::Spec->catfile( File::Spec->tmpdir(), 'firefox_test_proxy_XXXXXXXXXXX')) or Firefox::Marionette::Exception->throw( "Failed to open temporary file for writing:$!");
+				fcntl $handle, Fcntl::F_SETFD(), 0 or Carp::croak("Can't clear close-on-exec flag on temporary file:$!");
 				if (my $pid = fork) {
-					$firefox->go('http://wtf.example.org');
+					my $url = 'http://wtf.example.org';
+					my $favicon_url = 'http://wtf.example.org/favicon.ico';
+					$firefox->go($url);
 					ok($firefox->html() =~ /success/smx, "Correctly accessed the Proxy");
 					diag($firefox->html());
 					while(kill $signals_by_name{TERM}, $pid) {
 						waitpid $pid, POSIX::WNOHANG();
 						sleep 1;
+					}
+					$handle->seek(0,0) or die "Failed to seek to start of temporary file for proxy check:$!";
+					my $quoted_url = quotemeta $url;
+					my $quoted_favicon_url = quotemeta $favicon_url;
+					while(my $line = <$handle>) {
+						chomp $line;
+						if ($line =~ /^$favicon_url$/smx) {
+						} elsif ($line !~ /^$quoted_url\/?$/smx) {
+							die "Firefox is requesting this $line without any reason";
+						}
 					}
 				} elsif (defined $pid) {
 					eval {
@@ -1026,6 +1043,7 @@ SKIP: {
 									alarm 5;
 									while (my $request = $connection->get_request()) {
 										diag("Got request for " . $request->uri());
+										$handle->print($request->uri() . "\n");
 										my $response = HTTP::Response->new(200, "OK", undef, "success");
 										$connection->send_response($response);
 									}
@@ -1112,7 +1130,7 @@ SKIP: {
 }
 
 SKIP: {
-	diag("Starting new firefox for testing PDFs");
+	diag("Starting new firefox for testing PDFs and script elements");
 	($skip_message, $firefox) = start_firefox(0, capabilities => Firefox::Marionette::Capabilities->new(accept_insecure_certs => 1, moz_headless => 1));
 	if (!$skip_message) {
 		$at_least_one_success = 1;
@@ -1124,6 +1142,73 @@ SKIP: {
 		skip("TLS test infrastructure seems compromised", 6);
 	}
 	ok($firefox, "Firefox has started in Marionette mode with definable capabilities set to known values");
+	my $shadow_root;
+	my $path = File::Spec->catfile(Cwd::cwd(), qw(t data elements.html));
+	$firefox->go("file://$path");
+	$firefox->find_class('add')->click();
+	my $span = $firefox->has_tag('span');
+	{
+		my $count = 0;
+		my $element = $firefox->script('return arguments[0].children[0]', args => [ $span ]);
+		ok(ref $element eq 'Firefox::Marionette::Element' && $element->tag_name() eq 'button', "\$firefox->has_tag('span') has children and the first child is an Firefox::Marionette::Element with a tag_name of 'button'");
+	}
+	my $custom_square;
+	TODO: {
+		local $TODO = $major_version < 63 ? "Firefox cannot create elements from a shadow root for versions less than 63" : undef;
+		$custom_square = $firefox->has_tag('custom-square');
+		ok(ref $custom_square eq 'Firefox::Marionette::Element', "\$firefox->has_tag('custom-square') returns a Firefox::Marionette::Element");
+		if (ref $custom_square eq 'Firefox::Marionette::Element') {
+			my $element = $firefox->script('return arguments[0].shadowRoot.children[0]', args => [ $custom_square ]);
+			ok(!$span->shadowy(), "\$span->shadowy() returns false");
+			ok($custom_square->shadowy(), "\$custom_square->shadowy() returns true");
+			ok($element->tag_name() eq 'style', "First element from scripted shadowRoot is a style tag");
+		}
+	}
+	if ($major_version >= 96) {
+		$shadow_root = $custom_square->shadow_root();
+		ok(ref $shadow_root eq 'Firefox::Marionette::ShadowRoot', "\$firefox->has_tag('custom-square')->shadow_root() returns a Firefox::Marionette::ShadowRoot");
+		my $count = 0;
+		foreach my $element (@{$firefox->script('return arguments[0].children', args => [ $shadow_root ])}) {
+			if ($count == 0) {
+				ok($element->tag_name() eq 'style', "First element from ShadowRoot via script is a style tag");
+			} else {
+				ok($element->tag_name() eq 'div', "Second element from ShadowRoot via script is a div tag");
+			}
+			$count += 1;
+		}
+		ok($count == 2, "\$firefox->has_tag('custom-square')->shadow_root() has 2 children");
+		ok(ref $shadow_root eq 'Firefox::Marionette::ShadowRoot', "\$firefox->has_tag('custom-square')->shadow_root() returns a Firefox::Marionette::ShadowRoot");
+		{
+			my $element = $firefox->script('return arguments[0].children[0]', args => [ $shadow_root ]);
+			ok($element->tag_name() eq 'style', "Element returned from ShadowRoot via script is a style tag");
+		}
+		$count = 0;
+		foreach my $element (@{$firefox->script('return [ 2, arguments[0].children[0] ]', args => [ $shadow_root ])}) {
+			if ($count == 0) {
+				ok($element == 2, "First element is the numeric 2");
+			} else {
+				ok($element->tag_name() eq 'style', "Second element from ShadowRoot via script is a style tag");
+			}
+			$count += 1;
+		}
+		ok($count == 2, "\$firefox->script() correctly returns an array with 2 elements");
+	}
+	{
+		my $value = $firefox->script('return [2,1]', args => [ $span ]);
+		ok($value->[0] == 2, "Value returned from script is the numeric 2 in an array");
+	}
+	{
+		my $value = $firefox->script('return [2,arguments[0]]', args => [ $span ]);
+		ok(ref $value->[1] eq 'Firefox::Marionette::Element' && $value->[1]->tag_name() eq 'span', "Value returned from script is a Firefox::Mariontte::Element for a 'span' in an array");
+	}
+	{
+		my $value = $firefox->script('return 2', args => [ $span ]);
+		ok($value == 2, "Value returned from script is the numeric 2");
+	}
+	{
+		my $hash = $firefox->script('return { value: 2 }', args => [ $span ]);
+		ok($hash->{value} == 2, "Value returned from script is the numeric 2 in a hash");
+	}
 	my $capabilities = $firefox->capabilities();
 	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
 	if (!grep /^accept_insecure_certs$/, $capabilities->enumerate()) {
@@ -1173,7 +1258,7 @@ SKIP: {
 		ok(((centimetres_to_points(7) == $urx) || (centimetres_to_points(7) == $urx - 1)) &&
 			 ((centimetres_to_points(12) == $ury) || (centimetres_to_points(12) == $ury - 1)),
 				"Correct page height of " . centimetres_to_points(12) . " (was actually $ury) and width " . centimetres_to_points(7) . " (was actually $urx)");
-		$raw_pdf = $firefox->pdf(raw => 1, shrinkToFit => 1, landscape => 1, page => { width => 7, height => 12 });
+		$raw_pdf = $firefox->pdf(raw => 1, shrinkToFit => 1, pageRanges => [0], landscape => 1, page => { width => 7, height => 12 });
 		$pdf = PDF::API2->open_scalar($raw_pdf);
 		$page = $pdf->openpage(0);
 		($llx, $lly, $urx, $ury) = $page->mediabox();
@@ -1183,7 +1268,7 @@ SKIP: {
 			 ((centimetres_to_points(7) == $ury) || (centimetres_to_points(7) == $ury - 1)),
 				"Correct page height of " . centimetres_to_points(7) . " (was actually $ury) and width " . centimetres_to_points(12) . " (was actually $urx)");
 		foreach my $paper_size ($firefox->paper_sizes()) {
-			$raw_pdf = $firefox->pdf(raw => 1, size => $paper_size, print_background => 1, shrink_to_fit => 1);
+			$raw_pdf = $firefox->pdf(raw => 1, size => $paper_size, page_ranges => [], print_background => 1, shrink_to_fit => 1);
 			$pdf = PDF::API2->open_scalar($raw_pdf);
 			$page = $pdf->openpage(0);
 			($llx, $lly, $urx, $ury) = $page->mediabox();
@@ -1466,6 +1551,48 @@ SKIP: {
 			ok($login->times_used() == 50, "\$login->times_used() is the assigned number");
 		}
 		ok($firefox->delete_login($login), "\$firefox->delete_login() removes the form based login passed directly");
+	}
+	ok(scalar $firefox->logins() == 0, "\$firefox->logins() shows the correct number (0) of records");
+	foreach my $path (qw(t/data/1Passwordv7.csv t/data/bitwarden_export_org.csv t/data/keepass.csv t/data/last_pass_example.csv)) {
+		my $handle = FileHandle->new($path, Fcntl::O_RDONLY()) or die "Failed to open $path:$!";
+		my @logins;
+		foreach my $login (Firefox::Marionette->logins_from_csv($handle)) {
+			ok($login->host() =~ /^https?:\/\/(?:[a-z]+[.])?[a-z]+[.](?:com|net|org)$/smx, "Firefox::Marionette::Login->host() from Firefox::Marionette->logins_from_csv('$path') looks correct:" . Encode::encode('UTF-8', $login->host(), 1));
+			ok($login->user(), "Firefox::Marionette::Login->user() from Firefox::Marionette->logins_from_csv('$path') looks correct:" . Encode::encode('UTF-8', $login->user(), 1));
+			ok($firefox->add_login($login), "\$firefox->add_login() copes with a login from Firefox::Marionette->logins_from_csv('$path') passed directly to it");
+			push @logins, $login;
+		}
+		ok(scalar @logins, "$path produces Firefox::Marionette::Login records:" . scalar @logins);
+		my %existing;
+		foreach my $login ($firefox->logins()) {
+			$existing{$login->host()}{$login->user()} = $login;
+		}
+		$handle = FileHandle->new($path, Fcntl::O_RDONLY()) or die "Failed to open $path:$!";
+		foreach my $login (Firefox::Marionette->logins_from_csv($handle)) {
+			ok(exists $existing{$login->host()}{$login->user()} && $existing{$login->host()}{$login->user()}->password() eq $login->password(), "\$firefox->logins() produces a matching login after adding record from Firefox::Marionette->logins_from_csv('$path')");
+			ok($firefox->delete_login($login), "\$firefox->delete_login() copes with a login from Firefox::Marionette->logins_from_csv('$path') passed directly to it");
+		}
+	}
+	ok(scalar $firefox->logins() == 0, "\$firefox->logins() shows the correct number (0) of records");
+	foreach my $path (qw(t/data/1Passwordv8.1pux)) {
+		my $handle = FileHandle->new($path, Fcntl::O_RDONLY()) or die "Failed to open $path:$!";
+		my @logins;
+		foreach my $login (Firefox::Marionette->logins_from_zip($handle)) {
+			ok($login->host() =~ /^https?:\/\/(?:[a-z]+[.])?[a-z]+[.](?:com|net|org)$/smx, "Firefox::Marionette::Login->host() from Firefox::Marionette->logins_from_zip('$path') looks correct:" . Encode::encode('UTF-8', $login->host(), 1));
+			ok($login->user(), "Firefox::Marionette::Login->user() from Firefox::Marionette->logins_from_zip('$path') looks correct:" . Encode::encode('UTF-8', $login->user(), 1));
+			ok($firefox->add_login($login), "\$firefox->add_login() copes with a login from Firefox::Marionette->logins_from_zip('$path') passed directly to it");
+			push @logins, $login;
+		}
+		ok(scalar @logins, "$path produces Firefox::Marionette::Login records:" . scalar @logins);
+		my %existing;
+		foreach my $login ($firefox->logins()) {
+			$existing{$login->host()}{$login->user()} = $login;
+		}
+		$handle = FileHandle->new($path, Fcntl::O_RDONLY()) or die "Failed to open $path:$!";
+		foreach my $login (Firefox::Marionette->logins_from_zip($handle)) {
+			ok(exists $existing{$login->host()}{$login->user()} && $existing{$login->host()}{$login->user()}->password() eq $login->password(), "\$firefox->logins() produces a matching login after adding record from Firefox::Marionette->logins_from_zip('$path')");
+			ok($firefox->delete_login($login), "\$firefox->delete_login() copes with a login from Firefox::Marionette->logins_from_zip('$path') passed directly to it");
+		}
 	}
 	ok(scalar $firefox->logins() == 0, "\$firefox->logins() shows the correct number (0) of records");
 	ok($firefox->quit() == $correct_exit_status, "Firefox has closed with an exit status of $correct_exit_status:" . $firefox->child_error());
@@ -3291,6 +3418,7 @@ SKIP: {
 	my $capabilities = $firefox->capabilities();
 	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
 	ok(!$capabilities->moz_headless(), "\$capabilities->moz_headless() is set to false");
+	diag("Final Browser version is " . $capabilities->browser_version());
 	SKIP: {
 		if (!$capabilities->proxy()) {
 			diag("\$capabilities->proxy is not supported for " . $capabilities->browser_version());

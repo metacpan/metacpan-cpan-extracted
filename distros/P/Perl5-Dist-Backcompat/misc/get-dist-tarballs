@@ -1,0 +1,64 @@
+#!/usr/bin/env perl
+use 5.14.0;
+use warnings;
+#use Data::Dumper;$Data::Dumper::Indent=1;
+use Data::Dump ( qw| dd pp| );
+use Carp;
+use Cwd;
+use File::Find;
+use File::Spec;
+use CPAN::DistnameInfo;
+
+
+# Run from the top level of a git checkout of this distribution
+my @expected_subdirs = qw( lib scripts t etc );
+my @found_subdirs = ();
+for my $dir (@expected_subdirs) {
+    push @found_subdirs, $dir if -d $dir;
+}
+croak "Did not find 4 expected subdirs" unless scalar(@found_subdirs) == 4;
+my $currdir = cwd();
+
+my $tarball_list = File::Spec->catfile($currdir, 'etc', 'cpan-tarballs-for-dist-distros.txt');
+croak "Could not locate $tarball_list" unless -f $tarball_list;
+
+# On command-line, provide user-specified location to store tarballs -- on
+# disk but not in this repo.
+# thisperl misc/get-dist-tarballs /home/jkeenan/learn/perl/p5p/dist-backcompat/tarballs/authors/id/
+
+my $tarball_dir = shift(@ARGV);
+croak "Must specify directory for downloading tarballs on command line"
+    unless $tarball_dir;
+croak "Cannot locate $tarball_dir" unless -d $tarball_dir;
+
+# Parse $tarball_list
+my @tarballs = ();
+open my $IN, '<', $tarball_list or croak "Could not open $tarball_list for reading";
+while (my $l = <$IN>) {
+    chomp $l;
+    my @columns = split /\s+/, $l;
+    push @tarballs, $columns[2];
+}
+close $IN or croak "Could not close $tarball_list after reading";
+#dd \@tarballs;
+say scalar @tarballs, " tarballs listed";
+
+chdir $tarball_dir or croak "Unable to change to $tarball_dir";
+
+for my $tb (@tarballs) {
+    my $pathname = "authors/id/$tb";
+    my $url = "https://cpan.metacpan.org/$pathname";
+    my $d = CPAN::DistnameInfo->new($pathname);
+    my $dist = $d->dist;
+    say "$dist\t$url";
+    # We don't need to download the core distro for a distro which is not
+    # released to CPAN
+    unless ($dist eq 'perl') {
+        system(qq| wget $url |)
+            and croak "Unable to download $url";
+    }
+}
+
+chdir $currdir or croak "Unable to change to $currdir";
+
+say "\nFinished!";

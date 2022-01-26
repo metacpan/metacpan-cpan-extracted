@@ -18,6 +18,7 @@ our $BZIP_BIN = can_run('pbzip2') // can_run('bzip2');
 our $ZSTD_BIN = can_run('pzstd')  // can_run('zstd');
 our $DSRC_BIN = can_run('dsrc2')  // can_run('dsrc');
 our $FQZC_BIN = can_run('fqz_comp');
+our $XZ_BIN   = can_run('xz');
 
 use constant MAGIC_GZIP => pack('C3', 0x1f, 0x8b, 0x08);
 use constant MAGIC_DSRC => pack('C2', 0xaa, 0x02);
@@ -26,6 +27,7 @@ use constant MAGIC_FQZC => '.fqz';
 use constant MAGIC_BAM  => pack('C4', 0x42, 0x41, 0x4d, 0x01);
 use constant MAGIC_2BIT => pack('C4', 0x1a, 0x41, 0x27, 0x43);
 use constant MAGIC_ZSTD => pack('C4', 0x28, 0xB5, 0x2F, 0xFD);
+use constant MAGIC_XZ   => pack('C6', 0xfd, 0x37, 0x7a, 0x58, 0x5a, 0x00);
 
 sub new {
 
@@ -46,12 +48,12 @@ sub new {
             #if passed a filename, try to determine if compressed
             open $fh, '<', $fn or die "Error opening $fn for reading\n";
 
-            #read first four bytes as raw
+            #read first six bytes as raw
             #this causes a memory leak as opened filehandles are not properly
             #closed again. Should work without setting binary mode anyway.
             #my $old_layers = join '', map {":$_"} PerlIO::get_layers($fh);
             #binmode($fh);
-            read( $fh, my $magic, 4 );
+            read( $fh, my $magic, 6 );
             #binmode($fh, $old_layers); 
 
             #check for compression and open stream if found
@@ -96,6 +98,12 @@ sub new {
                 close $fh;
                 open $fh, '-|', "$FQZC_BIN -d $fn"
                     or die "Error opening fqz_comp stream: $!\n";
+            }
+            elsif (substr($magic,0,6) eq MAGIC_XZ) {
+                die "no xz backend found\n" if (! defined $XZ_BIN);
+                close $fh;
+                open $fh, '-|', "$XZ_BIN -dc $fn"
+                    or die "Error opening xz stream: $!\n";
             }
             else {
                 seek($fh,0,0);

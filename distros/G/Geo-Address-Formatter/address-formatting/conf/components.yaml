@@ -2,6 +2,7 @@
 name: house_number
 aliases:
     - street_number
+    - housenumber
 ---
 name: house
 aliases:
@@ -68,6 +69,7 @@ name: state_district
 ---
 name: postcode
 aliases:
+    - postal_code
     - partial_postcode
 ---
 name: state

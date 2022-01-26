@@ -69,6 +69,17 @@ sub debug {
   }
 }
 
+sub global_ccflags {
+  my $self = shift;
+  if (@_) {
+    $self->{global_ccflags} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{global_ccflags};
+  }
+}
+
 sub new {
   my $class = shift;
   
@@ -80,6 +91,10 @@ sub new {
   
   if ($ENV{SPVM_CC_FORCE}) {
     $self->{force} = 1;
+  }
+  
+  unless (defined $self->{global_ccflags}) {
+    $self->{global_ccflags} = [];
   }
   
   return bless $self, $class;
@@ -450,57 +465,23 @@ sub compile {
     }
     
     # Do compile. This is same as make command
-    my $need_compile;
-    if ($self->force) {
-      $need_compile = 1;
+    my $need_generate;
+    my $input_files = [$config_file, $src_file, @include_file_names];
+    unless ($is_native_src) {
+      my $module_file = $src_file;
+      $module_file =~ s/\.[^\/\\]+$//;
+      $module_file .= '.spvm';
+      
+      push @$input_files, $module_file;
     }
-    else {
-      if ($config->force) {
-        $need_compile = 1;
-      }
-      else {
-        if (!-f $object_file) {
-          $need_compile = 1;
-        }
-        else {
-          my $mod_time_object_file = (stat($object_file))[9];
-          
-          # Need the compilation if the config file is newer than the object file.
-          if ($mod_time_config_file > $mod_time_object_file) {
-            $need_compile = 1;
-          }
-          else {
-            # Need the compilation if one of the header files is newer than the object file.
-            if ($mod_time_header_files_max > $mod_time_object_file) {
-              $need_compile = 1;
-            }
-            else {
-              # Need the compilation if the source files is newer than the object file.
-              my $mod_time_src_file = (stat($src_file))[9];
-              if ($mod_time_src_file > $mod_time_object_file) {
-                $need_compile = 1;
-              }
-              else {
-                # Need the compilation if the module file is newer than the object file.
-                unless ($is_native_src) {
-                  my $module_file = $src_file;
-                  $module_file =~ s/\.[^\/\\]+$//;
-                  $module_file .= '.spvm';
-                  
-                  if (-f $module_file) {
-                    my $mod_time_module_file = (stat($module_file))[9];
-                    if ($mod_time_module_file > $mod_time_object_file) {
-                      $need_compile = 1;
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }    
-    if ($need_compile) {
+    $need_generate = SPVM::Builder::Util::need_generate({
+      global_force => $self->force,
+      config_force => $config->force,
+      output_file => $object_file,
+      input_files => $input_files,
+    });
+    
+    if ($need_generate) {
       my $class_rel_dir = SPVM::Builder::Util::convert_class_name_to_rel_dir($class_name);
       my $work_object_dir = "$object_dir/$class_rel_dir";
       mkpath dirname $object_file;
@@ -540,7 +521,10 @@ sub create_compile_command {
   }
   
   my $cflags = '';
-
+  
+  my $global_ccflags = $self->global_ccflags;
+  $cflags .= join(' ', @$global_ccflags);
+  
   my $include_dirs = $config->include_dirs;
   my $inc = join(' ', map { "-I$_" } @$include_dirs);
   $cflags .= " $inc";
@@ -795,53 +779,14 @@ sub link {
   # Move temporary shared library file to blib directory
   mkpath dirname $shared_lib_file;
 
-  my $mod_time_config_file;
-  if (-f $config_file) {
-     $mod_time_config_file = (stat($config_file))[9];
-  }
-  else {
-    $mod_time_config_file = 0;
-  }
-  my $mod_time_object_files_max = 0;
-  for my $object_file (@$object_files) {
-    my $mod_time_object_file = (stat($object_file))[9];
-    if ($mod_time_object_file > $mod_time_object_files_max) {
-      $mod_time_object_files_max = $mod_time_object_file;
-    }
-  }
+  my $need_generate = SPVM::Builder::Util::need_generate({
+    global_force => $self->force,
+    config_force => $config->force,
+    output_file => $shared_lib_file,
+    input_files => [$config_file, @$object_files],
+  });
 
-  # Need link
-  my $need_link;
-  if ($self->force) {
-    $need_link = 1;
-  }
-  else {
-    if ($config->force) {
-      $need_link = 1;
-    }
-    else {
-      if (!-f $shared_lib_file) {
-        $need_link = 1;
-      }
-      else {
-        
-        my $mod_shared_lib_file = (stat($shared_lib_file))[9];
-        
-        # Need the compilation if the config file is newer than the object file.
-        if ($mod_time_config_file > $mod_shared_lib_file) {
-          $need_link = 1;
-        }
-        else {
-          # Need the compilation if one of the header files is newer than the object file.
-          if ($mod_time_object_files_max > $mod_shared_lib_file) {
-            $need_link = 1;
-          }
-        }
-      }
-    }
-  }
-  
-  if ($need_link) {
+  if ($need_generate) {
     # Create shared library
     my (undef, @tmp_files) = $cbuilder->link(
       lib_file => $shared_lib_file,
@@ -905,40 +850,30 @@ sub create_precompile_csource {
   my $src_dir = $opt->{src_dir};
   mkpath $src_dir;
   
+  # Module file - Input
   my $module_file = $self->builder->get_module_file($class_name);
   
+  # Precompile source file - Output
   my $class_rel_file_without_ext = SPVM::Builder::Util::convert_class_name_to_rel_file($class_name);
   my $class_rel_dir = SPVM::Builder::Util::convert_class_name_to_rel_dir($class_name);
   my $source_file = "$src_dir/$class_rel_file_without_ext.precompile.c";
 
-  my $need_create;
-  if ($self->force) {
-    $need_create = 1;
-  }
-  else {
-    if (!-f $source_file) {
-      $need_create = 1;
-    }
-    else {
-      my $mtime_module_file = (stat($module_file))[9];
-      my $mtime_source_file = (stat($source_file))[9];
-      if ($mtime_module_file > $mtime_source_file) {
-        $need_create = 1;
-      }
-    }
-  }
+  my $need_generate = SPVM::Builder::Util::need_generate({
+    global_force => $self->force,
+    config_force => 0,
+    output_file => $source_file,
+    input_files => [$module_file],
+  });
   
-  if ($need_create) {
+  if ($need_generate) {
     my $source_dir = "$src_dir/$class_rel_dir";
     mkpath $source_dir;
     
     my $class_csource = $self->build_class_csource_precompile($class_name);
-    if ($need_create) {
-      open my $fh, '>', $source_file
-        or die "Can't create $source_file";
-      print $fh $class_csource;
-      close $fh;
-    }
+    open my $fh, '>', $source_file
+      or die "Can't create $source_file";
+    print $fh $class_csource;
+    close $fh;
   }
 }
 

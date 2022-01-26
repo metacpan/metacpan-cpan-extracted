@@ -1,0 +1,217 @@
+#!/usr/bin/env perl
+
+# ABSTRACT: Command-line interface for Perl Git::Critic module
+# PODNAME: git-perl-critic
+
+use v5.10.0;
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+my %opt_for;
+GetOptions(
+    \%opt_for,
+    "verbose",            # show verbose information about what's happening
+    "against=s",          # branch you're critiquing against
+    "critique=s",         # non-primary branch to critique
+    "severity=s",         # Perl::Critic severity (default: 5, gentle)
+    "max_file_size=i",    # maximum file size of Perl modules to parse
+    "help|?",             # show brief help
+    "man",                # show full help
+) || pod2usage( -verbose => 0 );
+
+if ( my $against = $opt_for{against} ) {
+    push @ARGV => $against;
+}
+
+if ( !@ARGV ) {
+    pod2usage(
+        {
+            -message =>
+"\nYou must supply the name of the branch you're diffing against\n",
+            -exitval => 1,
+            -verbose => 1
+        }
+    );
+}
+if ( @ARGV > 1 ) {
+    pod2usage(
+        {
+            -message => "\nOnly one branch name must be supplied\n",
+            -exitval => 2,
+            -verbose => 1
+        }
+    );
+}
+my $primary = shift @ARGV;
+
+# munge options
+$opt_for{severity} ||= 5;
+$opt_for{verbose}  ||= 0;
+
+pod2usage( -verbose => 1 ) if ( $opt_for{help} );
+pod2usage( -verbose => 2 ) if ( $opt_for{man} );
+
+our $VERSION = '0.4';
+use Git::Critic;
+my $critic = Git::Critic->new(
+    primary_target => $primary,
+    current_target => $opt_for{critique},
+    max_file_size  => $opt_for{max_file_size},
+    verbose        => $opt_for{verbose},
+    severity       => $opt_for{severity},
+);
+say STDERR $_ foreach $critic->run;
+
+# vim: filetype=perl
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+git-perl-critic - Command-line interface for Perl Git::Critic module
+
+=head1 VERSION
+
+version 0.4
+
+=head1 SYNOPSIS
+
+    git-perl-critic main
+
+=head1 DESCRIPTION
+
+This is a command line interface to C<Git::Critic>.  We only report
+L<Perl::Critic|https://metacpan.org/pod/Perl::Critic> failures on lines
+changed.
+
+Note that this means you're diffing two branches. The branch you're diffing
+I<against> is usually your company's primary branch. Typical names are
+C<main>, C<master>, C<dev>, and so on. However, you can pick any branch to be the
+primary branch you're diffing against.
+
+So, if your primary branch is C<main>, you should C<cd> into your repository
+and run:
+
+    git-perl-critic main
+
+If you prefer a more "fluent" interface:
+
+    git-perl-critic --against main
+
+If your git repository is currently not checked out into the branch you wish to diff,
+pass the C<--critique> option to specify the name of the branch you wish to critique.
+
+    git-perl-critic main --critique my-development-branch
+
+But maybe you have created a branch off of C<my-development-branch>:
+
+    git checkout my-development-branch
+    git checkout -b my-spike-branch
+    # hack, hack, hack
+    git-perl-critique my-development-branch
+
+To be fully verbose:
+
+    git-perl-critic --critique my-spike-branch --against my-development-branch
+
+If you prefer, you can target particular commits:
+
+    git-perl-critic --critique 747ba0e --against 15616b5
+
+Or mix them:
+
+    git-perl-critic --critique 747ba0e --against main
+
+If you're on an entirely unrelated branch, you can specify the branch you want
+to use as your primary branch and the branch you want to critique:
+
+    git-perl-critic my-development-branch --critique my-spike-branch # same thing
+    git-perl-critic --against my-development-branch --critique my-spike-branch # same thing
+
+=head2 Option Explanations
+
+All options are optional.
+
+=head3 C<--against $branch_name>
+
+The name of the branch you will critique against. If you don't pass this argument, you
+must pass the branch name directly. The following two are equivalent:
+
+    git-perl-critic --against main
+    git-perl-critic main
+
+=head3 C<--critique $branch_name>
+
+This must be the name of the branch you wish to critique.
+
+=head3 C<--severity $number_or_name>
+
+This is the C<Perl::Critic> severity level. You may pass a string or an integer. If omitted, the
+default severity level is "gentle" (5).
+
+    SEVERITY NAME   ...is equivalent to...   SEVERITY NUMBER
+    --------------------------------------------------------
+    -severity => 'gentle'                     -severity => 5
+    -severity => 'stern'                      -severity => 4
+    -severity => 'harsh'                      -severity => 3
+    -severity => 'cruel'                      -severity => 2
+    -severity => 'brutal'                     -severity => 1
+
+=head3 C<--max_file_size $bytes>
+
+C<Perl::Critic> can be very, very slow on large files. Pass a positive integer
+to this option to skip files over a certain number of bytes.
+
+=head3 C<--verbose>
+
+This is a debugging tool to show some useful information while running this script.
+
+=head3 C<--man,--help>
+
+Various ways of displaying this documentation.
+
+=head1 OPTIONS
+
+Options:
+
+    Option           Argument type   Description
+    --against,a      Str             Git branch to critique against
+    --critique,-c    Str             Git branch to critique (default is current branch)
+    --severity,s     Str|Int         Perl::Critic severity level
+    --max_file_size  Bytes           Maximum file size in bytes to check
+
+Debugging options:
+
+    --help,-h,-?                   Show brief help
+    --man                          Show full help
+    --verbose                      Show internal Git::Critic commands
+
+=head1 SEE ALSO
+
+L<https://metacpan.org/pod/Test::Perl::Critic::Progressive>
+
+=head1 SPONSOR
+
+This work is sponsored by L<All Around the World|https://allaroundtheworld.fr>.
+Contact them if you need expert help in software development. We work with many
+different languages. Not just Perl.
+
+=head1 AUTHOR
+
+Curtis "Ovid" Poe <curtis.poe@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2022 by Curtis "Ovid" Poe.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

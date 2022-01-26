@@ -5,7 +5,6 @@ use utf8;
 use Test::Builder::Tester;
 use Test::More 1;
 use Test::File;
-use Test::utf8;
 
 # Hello world! I am a string. Russian, courtesy of Google Translate
 my $string1 = 'Привет мир!';

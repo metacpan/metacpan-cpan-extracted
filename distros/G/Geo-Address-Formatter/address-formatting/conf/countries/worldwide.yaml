@@ -207,7 +207,7 @@ fallback1: &fallback1 |
         {{{road}}} {{{house_number}}}
         {{#first}} {{{suburb}}} || {{{city_district}}} || {{{neighbourhood}}} || {{{island}}} {{/first}}
         {{#first}} {{{city}}} || {{{town}}} || {{{village}}} || {{{hamlet}}} || {{{municipality}}} {{/first}}
-        {{#first}} {{{county}}} || {{{state_district}}} || {{{state}}} || {{{region}}} {{/first}}
+        {{#first}} {{{county}}} || {{{state_district}}} || {{{state}}} || {{{region}}} || {{{island}}}, {{{archipelago}}} {{/first}}
         {{{country}}}
 
 fallback2: &fallback2 |
@@ -233,7 +233,7 @@ fallback4: &fallback4 |
         {{{house}}}
         {{{road}}} {{{house_number}}}
         {{{suburb}}}
-        {{#first}} {{{city}}} || {{{town}}} || {{{village}}} || {{{hamlet}}} || {{{municipality}}} {{/first}}
+        {{#first}} {{{city}}} || {{{town}}} || {{{village}}} || {{{hamlet}}} || {{{municipality}}} || {{{county}}} {{/first}}
         {{#first}} {{{state}}} || {{{county}}} {{/first}}
         {{{country}}}
 
@@ -490,7 +490,7 @@ CA:
         {{{attention}}}
         {{{house}}}
         {{#first}} {{{house_number}}} {{{road}}} || {{{suburb}}} {{/first}}
-        {{#first}} {{{city}}} || {{{town}}} || {{{village}}} || {{{hamlet}}} || {{{state_district}}} {{/first}}, {{#first}} {{{state_code}}} || {{{state}}} {{/first}} {{{postcode}}}
+        {{#first}} {{{city}}} || {{{town}}} || {{{village}}} || {{{hamlet}}} || {{{county}}} || {{{state_district}}} {{/first}}, {{#first}} {{{state_code}}} || {{{state}}} {{/first}} {{{postcode}}}
         {{{country}}}
     fallback_template: |
         {{{attention}}}
@@ -523,6 +523,9 @@ CG:
 # Switzerland
 CH: 
     address_template: *generic1
+    postformat_replace:
+        - ["Verwaltungskreis",""]
+        - [" administrative district",""]
 
 # Côte d'Ivoire
 CI: 
@@ -675,6 +678,8 @@ DJ:
 # Denmark
 DK:
     address_template: *generic1
+    replace:
+        - ["^Capital Region of ",""]
 
 # Dominica
 DM:
@@ -736,6 +741,11 @@ ER:
 ES:
     address_template: *generic15
     fallback_template: *fallback4
+
+    replace:
+        - ["Autonomous Community of the",""]
+        - ["Autonomous Community of",""]
+        - ["^Community of ",""]
 
 # Ethiopia
 ET:
@@ -1030,7 +1040,7 @@ IR:
         {{#first}} {{{suburb}}} || {{{city_district}}} || {{{neighbourhood}}} {{/first}}
         {{{road}}}
         {{{house_number}}}
-        {{#first}} {{{province}}} || {{{state}}} {{/first}}
+        {{#first}}{{{province}}} || {{{state}}} || {{{state_district}}}{{/first}}
         {{{postcode}}}
         {{{country}}}
 
@@ -1042,13 +1052,15 @@ IR_en:
         {{#first}} {{{suburb}}} || {{{city_district}}} || {{{neighbourhood}}} {{/first}}
         {{{road}}}
         {{{house_number}}}
-        {{#first}} {{{province}}} || {{{state}}} {{/first}}
+        {{#first}}{{{state}}} || {{{state_district}}}{{/first}}
         {{{postcode}}}
         {{{country}}}
 
 IR_fa:
     address_template: |
         {{{country}}}
+        {{{state}}}
+        {{{state_district}}}
         {{#first}} {{{state}}} || {{{province}}} {{/first}}
         {{#first}} {{{city}}} || {{{town}}} || {{{village}}} || {{{hamlet}}} {{/first}}
         {{#first}} {{{suburb}}} || {{{city_district}}} || {{{neighbourhood}}} {{/first}}
@@ -1705,8 +1717,8 @@ SG:
         {{{attention}}}
         {{#first}} {{{house}}}, {{{quarter}}} || {{{house}}} {{/first}}
         {{{house_number}}} {{{road}}}, {{{residential}}}
-        {{#first}} {{{village}}} || {{{town}}} || {{{city}}} || {{{municipality}}} || {{{hamlet}}} || {{{country}}} || {{{county}}} {{/first}} {{{postcode}}}
-        {{#first}} {{{country}}} || {{{state}}} {{/first}}
+        {{#first}} {{{country}}} || {{{town}}} || {{{city}}} || {{{municipality}}} || {{{hamlet}}} || {{{village}}} || {{{county}}} {{/first}} {{{postcode}}}
+        {{#first}} {{{country}}} {{/first}}
 
 # Saint Helena, Ascension and Tristan da Cunha - same as UK
 SH:
@@ -1724,9 +1736,18 @@ SJ:
 
 # Slovakia
 SK: 
-    address_template: *generic1
+    address_template: |
+        {{{attention}}}
+        {{{house}}}
+        {{{road}}} {{{house_number}}}
+        {{{postcode}}} {{#first}} {{{postal_city}}} || {{{city}}} || {{{town}}} || {{{village}}} || {{{municipality}}} || {{{city_district}}} || {{{hamlet}}} || {{{county}}} || {{{state}}} {{/first}}
+        {{{country}}}
     replace:
         - ["^District of ",""]
+        - ["^Region of ",""]
+    postformat_replace:        
+        # fix the postcode to make it \d\d\d \d\d
+        - ["\n(\\d{3})(\\d{2}) ","\n$1 $2 "]
 
 # Sierra Leone
 SL:
@@ -1930,6 +1951,8 @@ US:
         - ["\nUS$","\nUnited States of America"]
         - ["\nUSA$","\nUnited States of America"]
         - ["\nUnited States$","\nUnited States of America"]
+        - ["Town of ",""]
+        - ["Township of ",""]
 
 # Uzbekistan
 UZ:

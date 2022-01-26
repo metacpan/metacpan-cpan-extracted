@@ -1,0 +1,79 @@
+{
+   "abstract" : "Repeatable autcomplete value-builder for Koha",
+   "author" : [
+      "Thomas Klausner <domm@plix.at>",
+      "Mark Hofstetter <cpan@trust-box.at>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Koha-Contrib-ValueBuilder-RepeatableAutocomplete",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "JSON" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Koha::Contrib::ValueBuilder::RepeatableAutocomplete" : {
+         "file" : "lib/Koha/Contrib/ValueBuilder/RepeatableAutocomplete.pm",
+         "version" : "1.002"
+      },
+      "Koha::Contrib::ValueBuilder::RepeatableAutocomplete::RDA" : {
+         "file" : "lib/Koha/Contrib/ValueBuilder/RepeatableAutocomplete/RDA.pm",
+         "version" : "1.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/HKS3/Koha-Contrib-ValueBuilder-RepeatableAutocomplete/issues"
+      },
+      "homepage" : "https://github.com/HKS3/Koha-Contrib-ValueBuilder-RepeatableAutocomplete",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/HKS3/Koha-Contrib-ValueBuilder-RepeatableAutocomplete.git",
+         "web" : "https://github.com/HKS3/Koha-Contrib-ValueBuilder-RepeatableAutocomplete"
+      }
+   },
+   "version" : "1.002",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

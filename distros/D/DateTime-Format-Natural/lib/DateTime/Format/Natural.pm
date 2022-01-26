@@ -23,7 +23,7 @@ use Storable qw(dclone);
 
 use DateTime::Format::Natural::Utils qw(trim);
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 validation_options(
     on_fail => sub
@@ -577,6 +577,8 @@ sub _advance_future
 
     my $day_of_week = sub { $_[0]->_Day_of_Week(map $_[0]->{datetime}->$_, qw(year month day)) };
 
+    my $skip_weekdays = false;
+
     if ((all { /^(?:second|minute|hour)$/ } keys %modified)
         && (exists $self->{modified}{hour} && $self->{modified}{hour} == 1)
         && (($self->{Prefer_future} && $self->{datetime} <  $now)
@@ -584,7 +586,23 @@ sub _advance_future
     ) {
         $self->{postprocess}{day} = 1;
     }
-    elsif ($token_contains->('weekdays_all')
+    elsif (sub {
+        return false unless @{$self->{tokens}} == 2;
+        my ($day, $weekday) = map $self->{data}->__RE($_), qw(day weekday);
+        if ($self->{tokens}->[0] =~ $day
+         && $self->{tokens}->[1] =~ $weekday) {
+            $skip_weekdays = true;
+            return true;
+        }
+        return false;
+    }->()
+        && (all { /^(?:day|month|year)$/ } keys %modified)
+        && (($self->{Prefer_future} && $self->{datetime}->day <  $now->day)
+         || ($self->{Demand_future} && $self->{datetime}->day <= $now->day))
+    ) {
+        $self->{postprocess}{week} = 4;
+    }
+    elsif (($token_contains->('weekdays_all') && !$skip_weekdays)
         && (exists $self->{modified}{day} && $self->{modified}{day} == 1)
         && (($self->{Prefer_future} && $day_of_week->($self) <  $now->wday)
          || ($self->{Demand_future} && $day_of_week->($self) <= $now->wday))
@@ -924,6 +942,7 @@ valuable suggestions and patches:
  Tim Bunce
  Ricardo Signes
  Felix Ostmann
+ Jörn Clausen
 
 =head1 SEE ALSO
 

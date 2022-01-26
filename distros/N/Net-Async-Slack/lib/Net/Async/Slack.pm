@@ -4,7 +4,7 @@ package Net::Async::Slack;
 use strict;
 use warnings;
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 use parent qw(IO::Async::Notifier Net::Async::Slack::Commands);
 
@@ -450,23 +450,27 @@ sub http_post {
 
 async sub socket {
     my ($self) = @_;
-    my $uri = $self->endpoint(
-        'apps_connections_open',
-    ) or die 'no endpoint';
-    my $res = await $self->http_post(
-        $uri,
-        [ ],
-        headers => {
-            Authorization => 'Bearer ' . $self->app_token
-        }
-    );
-    die 'failed to obtain socket-mode URL' unless $res->{ok};
-    return URI->new($res->{url});
+    my $target_uri = do {
+        my $uri = $self->endpoint(
+            'apps_connections_open',
+        ) or die 'no endpoint';
+        my $res = await $self->http_post(
+            $uri,
+            [ ],
+            headers => {
+                Authorization => 'Bearer ' . $self->app_token
+            }
+        );
+        die 'failed to obtain socket-mode URL' unless $res->{ok};
+        URI->new($res->{url});
+    };
+    $target_uri->query_param(debug_reconnects => 'true') if $self->{debug};
+    return $target_uri;
 }
 
 sub configure {
     my ($self, %args) = @_;
-    for my $k (qw(client_id token app_token slack_host)) {
+    for my $k (qw(client_id token app_token slack_host debug)) {
         $self->{$k} = delete $args{$k} if exists $args{$k};
     }
     $self->next::method(%args);
@@ -496,5 +500,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2016-2021. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2016-2022. Licensed under the same terms as Perl itself.
 

@@ -15,6 +15,7 @@ my @files = (
     't/00-report-prereqs.t',
     't/document-schemas.t',
     't/document-toplevel.t',
+    't/find_path.t',
     't/oas-vocabulary.t',
     't/oas-vocabulary/discriminator.json',
     't/oas-vocabulary/formats.json',

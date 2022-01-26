@@ -48,8 +48,8 @@
             "Data::Sah::Format" : "0",
             "Data::Sah::FormatJS" : "0",
             "Data::Sah::JS" : "0.47",
-            "Data::Sah::Normalize" : "0.050_001",
-            "Data::Sah::Resolve" : "0.009",
+            "Data::Sah::Normalize" : "0.051",
+            "Data::Sah::Resolve" : "0.010",
             "Data::Sah::Util::Type" : "0.45",
             "File::Slurper" : "0",
             "JSON::MaybeXS" : "0",
@@ -87,7 +87,7 @@
          "web" : "https://github.com/perlancar/perl-App-SahUtils"
       }
    },
-   "version" : "0.478",
+   "version" : "0.479",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

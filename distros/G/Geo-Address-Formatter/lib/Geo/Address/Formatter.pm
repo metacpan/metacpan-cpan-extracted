@@ -1,7 +1,7 @@
+package Geo::Address::Formatter;
+$Geo::Address::Formatter::VERSION = '1.98';
 # ABSTRACT: take structured address data and format it according to the various global/country rules
 
-package Geo::Address::Formatter;
-$Geo::Address::Formatter::VERSION = '1.96';
 use strict;
 use warnings;
 use feature qw(say);
@@ -70,7 +70,7 @@ sub _read_configuration {
     try {
         say STDERR "loading components" if ($debug);
         my @c = LoadFile($path . '/components.yaml');
-        #say STDERR Dumper \@c;
+        # say STDERR Dumper \@c;
 
         foreach my $rh_c (@c) {
             if (defined($rh_c->{aliases})) {
@@ -87,7 +87,7 @@ sub _read_configuration {
                 }
             }
         }
-        #say Dumper $self->{ordered_components};
+        #say Dumper $self->{ordered_components};            
     } catch {
         warn "error parsing component configuration: $_";
     };
@@ -161,6 +161,7 @@ sub format_address {
 
     if ($cc) {
         $rh_components->{country_code} = $cc;
+        $self->_set_district_alias($cc);
     }
 
     # 2b. should we abbreviate?
@@ -170,6 +171,7 @@ sub format_address {
         say STDERR "component_aliases";
         say STDERR Dumper $self->{component_aliases};
     }
+    
     # set the aliases, unless this would overwrite something
     foreach my $alias (sort keys %{$self->{component_aliases}}){
         if (defined($rh_components->{$alias})
@@ -762,17 +764,42 @@ sub _select_first {
     return scalar(@a_parts) ? $a_parts[0] : '';
 }
 
+my %small_district = (
+    'br' => 1,
+    'cr' => 1,
+    'es' => 1,
+    'ni' => 1,
+    'py' => 1,
+    'ro' => 1,
+    'tg' => 1,
+    'tm' => 1,
+    'xk' => 1,
+);
 
-# note: unsorted list because $cs is a hash!
+# correct the alias for "district"
+# in OSM some countries use district to mean "city_district"
+# others to mean "state_district"
+sub _set_district_alias {
+    my $self = shift;
+    my $cc = shift;
+    $self->{component_aliases}{district} = 'neighbourhood';
+    if (! defined($small_district{$cc})){
+        $self->{component_aliases}{district} = 'state_district';        
+    }
+    return;
+}  
+
+
 # returns []
 sub _find_unknown_components {
     my $self       = shift;
-    my $components = shift;
+    my $rh_components = shift;
 
     my %h_known   = map  { $_ => 1 } @{$self->{ordered_components}};
-    my @a_unknown = grep { !exists($h_known{$_}) } sort keys %$components;
+    my @a_unknown = grep { !exists($h_known{$_}) } sort keys %$rh_components;
+#    my @a_unknown = grep { !exists($self->{all_components}{$_}) } 
+#                    sort keys %$rh_components;
 
-    #warn Dumper \@a_unknown;
     return \@a_unknown;
 }
 
@@ -790,7 +817,7 @@ Geo::Address::Formatter - take structured address data and format it according t
 
 =head1 VERSION
 
-version 1.96
+version 1.98
 
 =head1 SYNOPSIS
 
@@ -876,7 +903,7 @@ Ed Freyfogle
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Opencage GmbH.
+This software is copyright (c) 2022 by Opencage GmbH.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -3,36 +3,41 @@ package Firefox::Marionette::Element;
 use strict;
 use warnings;
 
-our $VERSION = '1.17';
+our $VERSION = '1.20';
+
+sub IDENTIFIER { return 'element-6066-11e4-a52e-4f735466cecf' }
 
 sub new {
     my ( $class, $browser, %parameters ) = @_;
+    if ( !defined $parameters{ IDENTIFIER() } ) {
+        $parameters{ IDENTIFIER() } = delete $parameters{ELEMENT};
+        $parameters{_old_protocols_key} = 'ELEMENT';
+    }
+    else {
+        delete $parameters{ELEMENT};
+    }
     my $element = bless {
         browser => $browser,
         %parameters
     }, $class;
-    foreach my $key ( sort { $a cmp $b } keys %parameters ) {
-        if ( $key =~ /^element/smx ) {
-            $element->{ELEMENT} = $parameters{$key};
-        }
-    }
     return $element;
 }
 
 sub TO_JSON {
     my ($self) = @_;
     my $json = {};
-    foreach my $key ( sort { $a cmp $b } keys %{$self} ) {
-        if ( $key ne 'browser' ) {
-            $json->{$key} = $self->{$key};
-        }
+    if ( $self->{_old_protocols_key} ) {
+        $json->{ $self->{_old_protocols_key} } = $self->uuid();
+    }
+    else {
+        $json->{ IDENTIFIER() } = $self->uuid();
     }
     return $json;
 }
 
 sub uuid {
     my ($self) = @_;
-    return $self->{ELEMENT};
+    return $self->{ IDENTIFIER() };
 }
 
 sub browser {
@@ -95,6 +100,16 @@ sub css {
 sub switch_to_frame {
     my ($self) = @_;
     return $self->browser()->switch_to_frame($self);
+}
+
+sub shadow_root {
+    my ($self) = @_;
+    return $self->browser()->shadow_root($self);
+}
+
+sub shadowy {
+    my ($self) = @_;
+    return $self->browser()->shadowy($self);
 }
 
 sub switch_to_shadow_root {
@@ -330,7 +345,7 @@ Firefox::Marionette::Element - Represents a Firefox element retrieved using the 
 
 =head1 VERSION
 
-Version 1.17
+Version 1.20
 
 =head1 SYNOPSIS
 
@@ -339,7 +354,7 @@ Version 1.17
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
-    my $element = $firefox->find('//input[@id="search-input"]');
+    my $element = $firefox->find('//input[@id="metacpan_search-input"]');
 
     $element->type('Test::More');
 
@@ -391,12 +406,12 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
     my $div = $firefox->find_class('main-content');
-    $div->find('//input[@id="search-input"]')->type('Test::More');
+    $div->find('//input[@id="metacpan_search-input"]')->type('Test::More');
 
     # OR in list context
 
     my $div = $firefox->find_class('main-content');
-    foreach my $element ($div->find('//input[@id="search-input"]')) {
+    foreach my $element ($div->find('//input[@id="metacpan_search-input"]')) {
         $element->type('Test::More');
     }
 
@@ -414,12 +429,12 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
     my $div = $firefox->find_class('main-content');
-    $div->find_id('search-input')->type('Test::More');
+    $div->find_id('metacpan_search-input')->type('Test::More');
 
     # OR in list context
 
     my $div = $firefox->find_class('main-content');
-    foreach my $element ($div->find_id('search-input')) {
+    foreach my $element ($div->find_id('metacpan_search-input')) {
         $element->type('Test::More');
     }
 
@@ -460,12 +475,12 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
     my $div = $firefox->find_class('main-content');
-    $div->find_class('form-control home-search-input')->type('Test::More');
+    $div->find_class('form-control home-metacpan_search-input')->type('Test::More');
 
     # OR in list context
 
     my $div = $firefox->find_class('main-content');
-    foreach my $element ($div->find_class('form-control home-search-input')) {
+    foreach my $element ($div->find_class('form-control home-metacpan_search-input')) {
         $element->type('Test::More');
     }
 
@@ -483,12 +498,12 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
     my $div = $firefox->find_class('main-content');
-    $div->find_selector('input.home-search-input')->type('Test::More');
+    $div->find_selector('input.home-metacpan_search-input')->type('Test::More');
 
     # OR in list context
 
     my $div = $firefox->find_class('main-content');
-    foreach my $element ($div->find_selector('input.home-search-input')) {
+    foreach my $element ($div->find_selector('input.home-metacpan_search-input')) {
         $element->type('Test::More');
     }
 
@@ -574,7 +589,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
     my $div = $firefox->find_class('main-content');
-    if (my $element = $div->has('//input[@id="search-input"]')) {
+    if (my $element = $div->has('//input[@id="metacpan_search-input"]')) {
         $element->type('Test::More');
     }
 
@@ -591,7 +606,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
     my $div = $firefox->find_class('main-content');
-    if (my $element = $div->has_id('search-input')) {
+    if (my $element = $div->has_id('metacpan_search-input')) {
         $element->type('Test::More');
     }
 
@@ -625,7 +640,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
     my $div = $firefox->find_class('main-content');
-    if (my $element = $div->has_class('form-control home-search-input')) {
+    if (my $element = $div->has_class('form-control home-metacpan_search-input')) {
         $element->type('Test::More');
     }
 
@@ -642,7 +657,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
     my $div = $firefox->find_class('main-content');
-    if (my $element = $div->has_selector('input.home-search-input')) {
+    if (my $element = $div->has_selector('input.home-metacpan_search-input')) {
         $element->type('Test::More');
     }
 
@@ -699,6 +714,10 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
 
 If no elements are found, this method will return undef.  For the same functionality that throws a L<not found|Firefox::Marionette::Exception::NotFound> exception, see the L<find_partial|Firefox::Marionette::Element#find_partial> method.
 
+=head2 IDENTIFIER
+
+returns the L<web element identifier|https://www.w3.org/TR/webdriver/#elements>
+
 =head2 is_enabled
 
 returns true or false if the element is enabled.
@@ -745,13 +764,43 @@ accepts the following optional parameters as a hash;
 
 =back
 
+=head2 shadow_root
+
+returns the L<element|Firefox::Marionette::Element>'s L<ShadowRoot|https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot> as a L<shadow root|Firefox::Marionette::ShadowRoot> object or throws an exception.
+
+    use Firefox::Marionette();
+    use Cwd();
+
+    my $firefox = Firefox::Marionette->new()->go('file://' . Cwd::cwd() . '/t/data/elements.html');
+
+    $firefox->find_class('add')->click();
+    my $shadow_root = $firefox->find_tag('custom-square')->shadow_root();
+
+    foreach my $element (@{$firefox->script('return arguments[0].children', args => [ $shadow_root ])}) {
+        warn $element->tag_name();
+    }
+
+=head2 shadowy
+
+returns true if the L<element|Firefox::Marionette::Element> has a L<ShadowRoot|https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot> or false otherwise.
+
+    use Firefox::Marionette();
+    use Cwd();
+
+    my $firefox = Firefox::Marionette->new()->go('file://' . Cwd::cwd() . '/t/data/elements.html');
+
+    $firefox->find_class('add')->click();
+    if ($firefox->find_tag('custom-square')->shadowy()) {
+        my $shadow_root = $firefox->find_tag('custom-square')->shadow_root();
+        warn $firefox->script('return arguments[0].innerHTML', args => [ $shadow_root ]);
+        ...
+    }
+
+This function will probably be used to see if the L<shadow_root|Firefox::Marionette::Element#shadow_root> method can be called on this element without raising an exception.
+
 =head2 switch_to_frame
 
 switches to this frame within the current window.
-
-=head2 switch_to_shadow_root
-
-switches to this element's L<shadow root|https://www.w3.org/TR/shadow-dom/>
 
 =head2 tag_name
 

@@ -1,0 +1,9 @@
+0.002   2021-05-07  Released-By: PERLANCAR; Urgency: medium
+
+	- [refactoring] Move implementation to
+	  Role::TinyCommons::BinarySearch::LinesInHandle.
+
+
+0.001   2021-05-07  Released-By: PERLANCAR
+
+        - First release.

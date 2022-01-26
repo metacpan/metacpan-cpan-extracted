@@ -1,5 +1,13 @@
 Revision history for Neo4j::Driver
 
+0.28  2022-01-25
+
+ - Deprecate experimental return of results in JSON "graph" format
+ - Deprecate experimental query statistics flag return_stats
+ - Add deprecation warning for experimental config option ca_file
+ - Fix constructor fallback to default uri (issue #14)
+ - Improve session creation performance
+
 0.27  2021-08-28
 
  - Add config options for auth and uri

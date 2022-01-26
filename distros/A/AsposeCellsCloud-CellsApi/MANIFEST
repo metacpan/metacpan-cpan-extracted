@@ -16,6 +16,7 @@ docs/CellArea.md
 docs/CellResponse.md
 docs/Cells.md
 docs/CellsApi.md
+docs/LightCellsApi.md
 docs/CellsCloudResponse.md
 docs/CellsColor.md
 docs/CellsDocumentProperties.md
@@ -250,6 +251,8 @@ docs/XpsSaveOptions.md
 lib/AsposeCellsCloud/ApiClient.pm
 lib/AsposeCellsCloud/ApiFactory.pm
 lib/AsposeCellsCloud/CellsApi.pm
+lib/AsposeCellsCloud/LightCellsApi.pm
+lib/AsposeCellsCloud/LiteCellsApi.pm
 lib/AsposeCellsCloud/Configuration.pm
 lib/AsposeCellsCloud/Object/AboveAverage.pm
 lib/AsposeCellsCloud/Object/AccessTokenResponse.pm

@@ -1,0 +1,68 @@
+# dist-backcompat-distro-metadata.txt
+
+# This file holds configuration data for Porting/dist-backcompat.pl.  Blank or
+# all-whitespace lines are ignored.  Lines starting with a '#' are comments
+# and are also ignored.
+
+# There should be one entry in this file for each distribution ("distro")
+# underneath 'dist/' in the Perl 5 core distribution which has had a separate
+# release to CPAN.*
+
+# *In terms of the categorization employed within Porting/dist-backcompat.pl,
+# those are distributions which are categorized as 'native', 'generated' or
+# 'cpan' and excludes those categorized as 'unreleased'.  As of Jan 10 2022,
+# there are 40 released distros and 1 unreleased distro.  Those numbers may of
+# course change in the future.
+
+# Each entry consists of a pipe-delimited string of 1 or more columns.
+# Column 1: The distribution's name (in "Some-Module" format)
+# Column 2: The minimum Perl version required for that distribution, if
+# explicitly specified or otherwise determined.  Should be specified in
+# "5.mmmppp" format, e.g., 5.008001 for perl-5.8.1.
+# Column 3: No need to run unless we're using a threaded build for older
+# executable.
+# Column 4: Needs a 'ppport.h' copied from distro's CPAN tarball.
+
+# Additional columns to be added as needed.
+
+# name|minimum_perl_version|needs_threaded_perl|needs_ppport_h|needs_threads_h|needs_shared_h
+Attribute-Handlers
+Carp
+Data-Dumper|||1
+Devel-PPPort
+Devel-SelfStubber|5.008009
+Dumpvalue|5.008008
+Env|5.008008
+Exporter
+ExtUtils-CBuilder|5.010000
+ExtUtils-ParseXS|5.008000
+Filter-Simple
+FindBin
+I18N-Collate|5.008000
+IO|5.008001
+Locale-Maketext|5.008009
+Module-CoreList|5.014000
+Net-Ping|5.018000
+PathTools|||1
+Safe|5.022000
+Search-Dict
+SelfLoader|5.008000
+Storable|5.008009||1
+Term-Complete|5.008008
+Term-ReadLine|5.008008
+Test
+Text-Abbrev|5.008008
+Thread-Queue|5.008000|1
+Thread-Semaphore|5.008000|1
+Tie-File
+Time-HiRes|||1
+Unicode-Normalize
+XSLoader|5.008000
+autouse|5.018004
+base|5.008000
+constant
+encoding-warnings
+if
+lib
+threads|5.014000|1|1|1|0
+threads-shared|5.014000|1|1|0|1

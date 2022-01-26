@@ -764,7 +764,7 @@ EOF
 
 	#..........................................
 	# Check handling of more complex tables
-	$ENV{'SERVER_PROTOCOL'} = 'HTTP/1.1';
+	$ENV{'SERVER_PROTOCOL'} = 'HTTP/2.0';
 	delete $ENV{'HTTP_ACCEPT_ENCODING'};
 
 	sub test19 {
@@ -821,7 +821,7 @@ EOF
 
 	ok($stderr eq '');
 	ok(defined($stdout));
-	ok($stdout !~ /ETag: "([A-Za-z0-F0-f]{32})"/m);
+	ok($stdout !~ /ETag: /m);
 	ok($stdout !~ /^Status: 304 Not Modified/mi);
 
 	($headers, $body) = split /\r?\n\r?\n/, $stdout, 2;
@@ -840,6 +840,7 @@ EOF
 	#..........................................
 	# Check removal of </center><center>
 
+	$ENV{'SERVER_PROTOCOL'} = 'HTTP/1.1';
 	sub test21 {
 		local $ENV{'SCRIPT_FILENAME'} = '/';
 

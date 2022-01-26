@@ -6,9 +6,9 @@ use warnings;
 #use utf8;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-28'; # DATE
+our $DATE = '2022-01-26'; # DATE
 our $DIST = 'Text-Table-More'; # DIST
-our $VERSION = '0.020'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 # see Module::Features for more details on this
 our %FEATURES = (
@@ -82,6 +82,8 @@ sub IDX_EXPTABLE_CELL_HEIGHT()          {3} # visual height. this does not inclu
 sub IDX_EXPTABLE_CELL_ORIG()            {4} # str/hash
 sub IDX_EXPTABLE_CELL_IS_ROWSPAN_TAIL() {5} # whether this cell is tail of a rowspan
 sub IDX_EXPTABLE_CELL_IS_COLSPAN_TAIL() {6} # whether this cell is tail of a colspan
+sub IDX_EXPTABLE_CELL_ORIG_ROWNUM()     {7} #
+sub IDX_EXPTABLE_CELL_ORIG_COLNUM()     {8} #
 
 # whether an exptable cell is the head (1st cell) or tail (the rest) of a
 # rowspan/colspan. these should be macros if possible, for speed.
@@ -284,6 +286,13 @@ sub generate_table {
         for my $row (@$rows) {
             $rownum++;
             my $colnum = -1;
+            my $separator_type = do {
+                my $cmp = ($args{header_row}//0)-1 <=> $rownum;
+                # 0=none, 2=separator between header/data, 4=separator between
+                # data rows, 8=separator between header rows. this is from
+                # BorderStyle standard.
+                $cmp==0 ? 2 : $cmp==1 ? 8 : 4;
+            };
             $exptable->[$rownum] //= [];
             push @{ $exptable->[$rownum] }, undef
                 if (@{ $exptable->[$rownum] } == 0 ||
@@ -292,7 +301,7 @@ sub generate_table {
             my $exptable_colnum = firstidx {!defined} @{ $exptable->[$rownum] };
             #say "D:rownum=$rownum, exptable_colnum=$exptable_colnum";
             if ($exptable_colnum == -1) { $exptable_colnum = 0 }
-            $exptable_bottom_borders->[$rownum] //= $args{separate_rows} ? 1:0;
+            $exptable_bottom_borders->[$rownum] //= $args{separate_rows} ? $separator_type : 0;
 
             for my $cell (@$row) {
                 $colnum++;
@@ -321,6 +330,9 @@ sub generate_table {
                         my $exptable_cell;
                         $exptable->[$rownum+$ir-1][$exptable_colnum+$ic-1] = $exptable_cell = [];
 
+                        $exptable_cell->[IDX_EXPTABLE_CELL_ORIG_ROWNUM] = $rownum;
+                        $exptable_cell->[IDX_EXPTABLE_CELL_ORIG_COLNUM] = $colnum;
+
                         if ($ir == 1 && $ic == 1) {
                             $exptable_cell->[IDX_EXPTABLE_CELL_ROWSPAN]     = $rowspan;
                             $exptable_cell->[IDX_EXPTABLE_CELL_COLSPAN]     = $colspan;
@@ -333,14 +345,14 @@ sub generate_table {
                     }
 
                     # determine whether we should draw bottom border of each row
-                    if ($rownum+$ir-1 == 0 && $args{header_row}) {
-                        $exptable_bottom_borders->[0] = 1
+                    if ($rownum+$ir-1 == 0 && ($args{header_row}//0) > 0) {
+                        $exptable_bottom_borders->[0] = $separator_type;
                     } else {
                         my $val;
-                        $val = _get_attr('bottom_border', $rownum+$ir-1, 0, $cell, \%args);     $exptable_bottom_borders->[$rownum+$ir-1] = $val if $val;
-                        $val = _get_attr('top_border'   , $rownum+$ir-1, 0, $cell, \%args);     $exptable_bottom_borders->[$rownum+$ir-2] = $val if $val;
-                        $val = _get_attr('bottom_border', $rownum+$ir-1, undef, undef, \%args); $exptable_bottom_borders->[$rownum+$ir-1] = $val if $val;
-                        $val = _get_attr('top_border'   , $rownum+$ir-1, undef, undef, \%args); $exptable_bottom_borders->[$rownum+$ir-2] = $val if $val;
+                        $val = _get_attr('bottom_border', $rownum+$ir-1, 0, $cell, \%args);     $exptable_bottom_borders->[$rownum+$ir-1] = $separator_type if $val;
+                        $val = _get_attr('top_border'   , $rownum+$ir-1, 0, $cell, \%args);     $exptable_bottom_borders->[$rownum+$ir-2] = $separator_type if $val;
+                        $val = _get_attr('bottom_border', $rownum+$ir-1, undef, undef, \%args); $exptable_bottom_borders->[$rownum+$ir-1] = $separator_type if $val;
+                        $val = _get_attr('top_border'   , $rownum+$ir-1, undef, undef, \%args); $exptable_bottom_borders->[$rownum+$ir-2] = $separator_type if $val;
                     }
 
                     $M = $rownum+$ir if $M < $rownum+$ir;
@@ -437,11 +449,10 @@ sub generate_table {
         my $y = 0;
 
         for my $ir (0..$M-1) {
-
           DRAW_TOP_BORDER:
             {
                 last unless $ir == 0;
-                my $b_y = $args{header_row} ? 0 : 6;
+                my $b_y = ($args{header_row}//0) > 0 ? 0 : 6;
                 my $b_topleft    = $bs_obj->get_border_char($b_y, 0);
                 my $b_topline    = $bs_obj->get_border_char($b_y, 1);
                 my $b_topbetwcol = $bs_obj->get_border_char($b_y, 2);
@@ -500,7 +511,7 @@ sub generate_table {
             {
                 last unless $ir < $M-1;
                 last unless $exptable_bottom_borders->[$ir];
-                my $b_y = $ir == 0 && $args{header_row} ? 2 : 4;
+                my $b_y = $exptable_bottom_borders->[$ir];
                 my $b_betwrowleft    = $bs_obj->get_border_char($b_y, 0);
                 my $b_betwrowline    = $bs_obj->get_border_char($b_y, 1);
                 my $b_betwrowbetwcol = $bs_obj->get_border_char($b_y, 2);
@@ -510,19 +521,18 @@ sub generate_table {
                 my $b_betwrowbetwcol_nobot = $bs_obj->get_border_char($b_y, 5);
                 my $b_betwrowbetwcol_noleft  = $bs_obj->get_border_char($b_y, 6);
                 my $b_betwrowbetwcol_noright = $bs_obj->get_border_char($b_y, 7);
-                my $b_yd = $ir == 0 && $args{header_row} ? 2 : 3;
-                my $b_datarowleft    = $bs_obj->get_border_char($b_yd, 0);
-                my $b_datarowbetwcol = $bs_obj->get_border_char($b_yd, 1);
-                my $b_datarowright   = $bs_obj->get_border_char($b_yd, 2);
+                my $b_ydataorheader = $args{header_row} == $ir+1 ? 2 : $args{header_row} < $ir+1 ? 3 : 1;
+                my $b_dataorheaderrowleft    = $bs_obj->get_border_char($b_ydataorheader, 0, 1);
+                my $b_dataorheaderrowbetwcol = $bs_obj->get_border_char($b_ydataorheader, 1, 1);
+                my $b_dataorheaderrowright   = $bs_obj->get_border_char($b_ydataorheader, 2, 1);
                 for my $ic (0..$N-1) {
-                    my $cell             = $exptable->[$ir][$ic];
                     my $cell_right       = $ic < $N-1 ? $exptable->[$ir][$ic+1] : undef;
                     my $cell_bottom      = $ir < $M-1 ? $exptable->[$ir+1][$ic] : undef;
                     my $cell_rightbottom = $ir < $M-1 && $ic < $N-1 ? $exptable->[$ir+1][$ic+1] : undef;
 
                     # leftmost border
                     if ($ic == 0) {
-                        $buf[$y][0] = _exptable_cell_is_rowspan_tail($cell_bottom) ? $b_datarowleft : $b_betwrowleft;
+                        $buf[$y][0] = _exptable_cell_is_rowspan_tail($cell_bottom) ? $b_dataorheaderrowleft : $b_betwrowleft;
                     }
 
                     # along the width of cell content
@@ -534,7 +544,7 @@ sub generate_table {
                     if ($ic == $N-1) {
                         # rightmost
                         if (_exptable_cell_is_rowspan_tail($cell_bottom)) {
-                            $char = $b_datarowright;
+                            $char = $b_dataorheaderrowright;
                         } else {
                             $char = $b_betwrowright;
                         }
@@ -556,7 +566,7 @@ sub generate_table {
                             } else {
                                 if (_exptable_cell_is_rowspan_tail($cell_bottom)) {
                                     if (_exptable_cell_is_rowspan_tail($cell_rightbottom)) {
-                                        $char = $b_datarowbetwcol;
+                                        $char = $b_dataorheaderrowbetwcol;
                                     } else {
                                         $char = $b_betwrowbetwcol_noleft;
                                     }
@@ -621,7 +631,7 @@ Text::Table::More - Generate text table with simple interface and many options
 
 =head1 VERSION
 
-This document describes version 0.020 of Text::Table::More (from Perl distribution Text-Table-More), released on 2021-08-28.
+This document describes version 0.021 of Text::Table::More (from Perl distribution Text-Table-More), released on 2022-01-26.
 
 =head1 SYNOPSIS
 
@@ -1074,8 +1084,9 @@ argument.
 
 =item * header_row
 
-Boolean. Optional. Default 0. Whether to treat the first row as the header row,
-which means draw a separator line between it and the rest.
+Int. Optional. Default 0. Number of rows that are header. Note that in
+Text::Table::Tiny, this option is a boolean. We use integer to support multirow
+header.
 
 =item * border_style
 
@@ -1138,6 +1149,13 @@ prereq L<Text::ANSI::Util> or L<Text::ANSI::WideUtil>.
 
 =back
 
+=head1 FAQ
+
+=head2 Can I have multiple header rows?
+
+Yes, by setting L</header_row> option to 2 or whatever number of header rows you
+have. See example script F<multirow-header.pl> in this distribution.
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Text-Table-More>.
@@ -1184,7 +1202,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

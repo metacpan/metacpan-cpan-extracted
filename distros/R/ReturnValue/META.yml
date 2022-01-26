@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,8 +22,17 @@ requires:
   Hash::AsObject: '0'
   perl: '5.014'
 resources:
+  X_authors:
+    -
+      email: bdfoy@cpan.org
+      github: https://github.com/briandfoy
+      linkedin: https://www.linkedin.com/in/briandfoy/
+      name: 'brian d foy'
+      orc_id: 0000-0002-0283-8283
+      twitter: https://twitter.com/briandfoy_perl
+  X_doi: 10.5281/zenodo.5904392
   bugtracker: https://github.com/perlreview/returnvalue/issues
   homepage: https://github.com/perlreview/returnvalue
   repository: https://github.com/perlreview/returnvalue.git
-version: '0.902'
+version: '0.903'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

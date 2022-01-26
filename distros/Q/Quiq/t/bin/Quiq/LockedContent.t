@@ -7,8 +7,6 @@ use v5.10;
 use strict;
 use warnings;
 
-use Quiq::Path;
-
 # -----------------------------------------------------------------------------
 
 sub test_loadClass : Init(1) {
@@ -20,9 +18,8 @@ sub test_loadClass : Init(1) {
 sub test_unitTest_root: Test(4) {
     my $self = shift;
 
-    my $p = Quiq::Path->new;
+    my $file = "/tmp/test_counter$$";
 
-    my $file = $p->tempFile;
     my $obj = Quiq::LockedContent->new($file);
     $self->is(ref($obj),'Quiq::LockedContent');
 

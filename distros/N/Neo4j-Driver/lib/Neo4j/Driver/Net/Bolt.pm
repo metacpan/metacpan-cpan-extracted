@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Net::Bolt;
 # ABSTRACT: Networking delegate for Neo4j Bolt
-$Neo4j::Driver::Net::Bolt::VERSION = '0.27';
+$Neo4j::Driver::Net::Bolt::VERSION = '0.28';
 
 # This package is not part of the public Neo4j::Driver API.
 
@@ -65,12 +65,9 @@ sub new {
 	return bless {
 		net_module => $net_module,
 		connection => $cxn,
+		uri => $uri,
 		result_module => $net_module->can('result_handlers') ? ($net_module->result_handlers)[0] : $RESULT_MODULE,
-		server_info => Neo4j::Driver::ServerInfo->new({
-			uri => $uri,
-			version => $cxn->server_id,
-			protocol => $cxn->can('protocol_version') ? $cxn->protocol_version : "",
-		}),
+		server_info => $driver->{server_info},
 		cypher_types => $driver->{cypher_types},
 		active_tx => 0,
 	}, $class;
@@ -92,7 +89,13 @@ sub _bolt_error {
 
 sub _server {
 	my ($self) = @_;
-	return $self->{server_info};
+	
+	my $cxn = $self->{connection};
+	return $self->{server_info} = Neo4j::Driver::ServerInfo->new({
+		uri => $self->{uri},
+		version => $cxn->server_id,
+		protocol => $cxn->can('protocol_version') ? $cxn->protocol_version : '',
+	});
 }
 
 

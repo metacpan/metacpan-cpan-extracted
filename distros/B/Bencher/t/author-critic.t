@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Bencher.pm','lib/Bencher/Manual/Cookbook.pod','lib/Bencher/Manual/FAQ.pod','script/bencher','script/bencher-fmt'];
+my $filenames = ['lib/Bencher.pm','lib/Bencher/Manual/FAQ.pod','lib/Bencher/Manual/HowTo.pod','script/bencher','script/bencher-fmt'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

@@ -20,7 +20,14 @@ use SPVM::Builder::Util;
   # SPVM only support 64bit integer Perl
   my $ivsize = $Config{ivsize};
   if ($ivsize < 8) {
-    warn "SPVM don't support the Perl which \"ivsize\" is lower than 8\n";
+    warn "SPVM doesn't support the Perl which \"ivsize\" is lower than 8\n";
+    die "OS unsupported\n";
+  }
+  
+  # Currently SPVM doesn't support Alpine Linux
+  my $myuname = $Config{myuname};
+  if ($myuname =~ /\balpine\b/i) {
+    warn "Currently SPVM doesn't support Alpine Linux because segmentation fault occurs due to incompatibility with glibc. If you want to use SPVM on Alpine Linux, please join SVPM project to fix the problems\n";
     die "OS unsupported\n";
   }
 }
@@ -152,7 +159,7 @@ WriteMakefile(
             },
         },
     },
-    EXE_FILES => ['script/spvmcc'],
+    EXE_FILES => ['script/spvmcc', 'script/spvmgenlib'],
     PREREQ_PM => {
         'ExtUtils::CBuilder' => '0.2602',
     },
@@ -168,28 +175,25 @@ sub MY::postamble {
   my $make_rule = '';
   
   # Compile native and precompile codes of standard modules
-  unless (grep { $_ eq '-DSPVM_DONT_COMPILE_CORE_MODULES' } @defines) {
-    # Native compile make rule
-    $make_rule .= SPVM::Builder::Util::create_make_rule_native('Fn');
-    $make_rule .= SPVM::Builder::Util::create_make_rule_native('Hash');
-    $make_rule .= SPVM::Builder::Util::create_make_rule_native('Time');
-    $make_rule .= SPVM::Builder::Util::create_make_rule_native('Unicode');
-    
-    # Precompile make rule
-    $make_rule .= SPVM::Builder::Util::create_make_rule_precompile('Fn');
-    $make_rule .= SPVM::Builder::Util::create_make_rule_precompile('List');
-    $make_rule .= SPVM::Builder::Util::create_make_rule_precompile('ByteList');
-    $make_rule .= SPVM::Builder::Util::create_make_rule_precompile('ShortList');
-    $make_rule .= SPVM::Builder::Util::create_make_rule_precompile('IntList');
-    $make_rule .= SPVM::Builder::Util::create_make_rule_precompile('LongList');
-    $make_rule .= SPVM::Builder::Util::create_make_rule_precompile('FloatList');
-    $make_rule .= SPVM::Builder::Util::create_make_rule_precompile('DoubleList');
-    $make_rule .= SPVM::Builder::Util::create_make_rule_precompile('StringList');
-    $make_rule .= SPVM::Builder::Util::create_make_rule_precompile('StringBuffer');
-    $make_rule .= SPVM::Builder::Util::create_make_rule_precompile('Hash');
-    $make_rule .= SPVM::Builder::Util::create_make_rule_precompile('Unicode');
-    $make_rule .= SPVM::Builder::Util::create_make_rule_precompile('Regex');
-  }
+  $make_rule .= SPVM::Builder::Util::create_make_rule_native('Fn');
+  $make_rule .= SPVM::Builder::Util::create_make_rule_native('Hash');
+  $make_rule .= SPVM::Builder::Util::create_make_rule_native('Time');
+  $make_rule .= SPVM::Builder::Util::create_make_rule_native('Unicode');
+  
+  # Precompile make rule
+  $make_rule .= SPVM::Builder::Util::create_make_rule_precompile('Fn');
+  $make_rule .= SPVM::Builder::Util::create_make_rule_precompile('List');
+  $make_rule .= SPVM::Builder::Util::create_make_rule_precompile('ByteList');
+  $make_rule .= SPVM::Builder::Util::create_make_rule_precompile('ShortList');
+  $make_rule .= SPVM::Builder::Util::create_make_rule_precompile('IntList');
+  $make_rule .= SPVM::Builder::Util::create_make_rule_precompile('LongList');
+  $make_rule .= SPVM::Builder::Util::create_make_rule_precompile('FloatList');
+  $make_rule .= SPVM::Builder::Util::create_make_rule_precompile('DoubleList');
+  $make_rule .= SPVM::Builder::Util::create_make_rule_precompile('StringList');
+  $make_rule .= SPVM::Builder::Util::create_make_rule_precompile('StringBuffer');
+  $make_rule .= SPVM::Builder::Util::create_make_rule_precompile('Hash');
+  $make_rule .= SPVM::Builder::Util::create_make_rule_precompile('Unicode');
+  $make_rule .= SPVM::Builder::Util::create_make_rule_precompile('Regex');
   
   # Create precompile tests
   {

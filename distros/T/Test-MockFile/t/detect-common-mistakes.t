@@ -18,7 +18,7 @@ subtest(
         );
 
         isa_ok( $dir0, 'Test::MockFile' );
-        is( $dir0->filename, '/foo', 'Trailing / is removed' );
+        is( $dir0->path(), '/foo', 'Trailing / is removed' );
     }
 );
 

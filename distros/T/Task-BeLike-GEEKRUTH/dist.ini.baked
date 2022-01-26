@@ -1,0 +1,122 @@
+; This file is generated from dist.ini.baked ( in the source repository ) by Dist::Zilla::Plugin::INI::Baked.
+; It exists for your convenience for development if you need it.
+; You should edit dist.ini.baked in the source repository for any long term changes
+name = Task-BeLike-GEEKRUTH
+author = D Ruth Holloway <ruth@hiruthie.me>
+license = Perl_5
+
+[TaskWeaver]
+
+[MakeMaker / Dist::Zilla::PluginBundle::Author::GEEKRUTH/MakeMaker]
+
+[Git::Contributors / Dist::Zilla::PluginBundle::Author::GEEKRUTH/Git::Contributors]
+
+[ContributorsFile / Dist::Zilla::PluginBundle::Author::GEEKRUTH/ContributorsFile]
+
+[Test::Compile / Dist::Zilla::PluginBundle::Author::GEEKRUTH/Test::Compile]
+
+[CoalescePod / Dist::Zilla::PluginBundle::Author::GEEKRUTH/CoalescePod]
+
+[InstallGuide / Dist::Zilla::PluginBundle::Author::GEEKRUTH/InstallGuide]
+
+[Covenant / Dist::Zilla::PluginBundle::Author::GEEKRUTH/Covenant]
+
+[ContributorCovenant / Dist::Zilla::PluginBundle::Author::GEEKRUTH/ContributorCovenant]
+
+[GitLab::Update / Dist::Zilla::PluginBundle::Author::GEEKRUTH/GitLab::Update]
+
+[GitLab::Meta / Dist::Zilla::PluginBundle::Author::GEEKRUTH/GitLab::Meta]
+metacpan = 0
+p3rl = 1
+remote = origin
+
+[MetaYAML / Dist::Zilla::PluginBundle::Author::GEEKRUTH/MetaYAML]
+
+[MetaJSON / Dist::Zilla::PluginBundle::Author::GEEKRUTH/MetaJSON]
+
+[PodWeaver / Dist::Zilla::PluginBundle::Author::GEEKRUTH/PodWeaver]
+
+[License / Dist::Zilla::PluginBundle::Author::GEEKRUTH/License]
+
+[NextRelease / Dist::Zilla::PluginBundle::Author::GEEKRUTH/NextRelease]
+time_zone = America/New_York
+
+[MetaProvides::Package / Dist::Zilla::PluginBundle::Author::GEEKRUTH/MetaProvides::Package]
+
+[MetaData::BuiltWith / Dist::Zilla::PluginBundle::Author::GEEKRUTH/MetaData::BuiltWith]
+
+[Manifest / Dist::Zilla::PluginBundle::Author::GEEKRUTH/Manifest]
+
+[ManifestSkip / Dist::Zilla::PluginBundle::Author::GEEKRUTH/ManifestSkip]
+
+[Git::GatherDir / Dist::Zilla::PluginBundle::Author::GEEKRUTH/Git::GatherDir]
+
+[CopyFilesFromBuild / Dist::Zilla::PluginBundle::Author::GEEKRUTH/CopyFilesFromBuild]
+
+[ExecDir / Dist::Zilla::PluginBundle::Author::GEEKRUTH/ExecDir]
+
+[OurPkgVersion / Dist::Zilla::PluginBundle::Author::GEEKRUTH/OurPkgVersion]
+
+[INI::Baked / Dist::Zilla::PluginBundle::Author::GEEKRUTH/INI::Baked]
+
+[Authority / Dist::Zilla::PluginBundle::Author::GEEKRUTH/Authority]
+authority = cpan:GEEKRUTH
+locate_comment = 1
+
+[Test::ReportPrereqs / Dist::Zilla::PluginBundle::Author::GEEKRUTH/Test::ReportPrereqs]
+
+[AutoPrereqs / Dist::Zilla::PluginBundle::Author::GEEKRUTH/AutoPrereqs]
+
+[Prereqs::Plugins / Dist::Zilla::PluginBundle::Author::GEEKRUTH/Prereqs::Plugins]
+
+[CheckChangesHasContent / Dist::Zilla::PluginBundle::Author::GEEKRUTH/CheckChangesHasContent]
+
+[ReadmeMarkdownFromPod / Dist::Zilla::PluginBundle::Author::GEEKRUTH/ReadmeMarkdownFromPod]
+
+[TestRelease / Dist::Zilla::PluginBundle::Author::GEEKRUTH/TestRelease]
+
+[ConfirmRelease / Dist::Zilla::PluginBundle::Author::GEEKRUTH/ConfirmRelease]
+
+[Git::Check / Dist::Zilla::PluginBundle::Author::GEEKRUTH/Git::Check]
+
+[CopyrightYearFromGit / Dist::Zilla::PluginBundle::Author::GEEKRUTH/CopyrightYearFromGit]
+
+[Git::CommitBuild / Dist::Zilla::PluginBundle::Author::GEEKRUTH/Git::CommitBuild]
+multiple_inheritance = 1
+release_branch = releases
+
+[Git::Tag / Dist::Zilla::PluginBundle::Author::GEEKRUTH/Git::Tag]
+branch = releases
+tag_format = v%v
+
+[PreviousVersion::Changelog / Dist::Zilla::PluginBundle::Author::GEEKRUTH/PreviousVersion::Changelog]
+
+[NextVersion::Semantic / Dist::Zilla::PluginBundle::Author::GEEKRUTH/NextVersion::Semantic]
+format = %d.%02d%02d
+major = MAJOR, API CHANGES
+minor = MINOR, NEW FEATURES, ENHANCEMENTS
+revision = REVISION, BUG FIXES, DOCUMENTATION, STATISTICS
+
+[ChangeStats::Git / Dist::Zilla::PluginBundle::Author::GEEKRUTH/ChangeStats::Git]
+develop_branch = main
+group = STATISTICS
+release_branch = releases
+
+[Git::Commit / Dist::Zilla::PluginBundle::Author::GEEKRUTH/Git::Commit]
+
+[Git::Push / Dist::Zilla::PluginBundle::Author::GEEKRUTH/Git::Push]
+push_to = origin main releases
+
+[UploadToCPAN / Dist::Zilla::PluginBundle::Author::GEEKRUTH/UploadToCPAN]
+
+[InstallRelease / Dist::Zilla::PluginBundle::Author::GEEKRUTH/InstallRelease]
+install_command = cpanm .
+
+[SchwartzRatio / Dist::Zilla::PluginBundle::Author::GEEKRUTH/SchwartzRatio]
+
+[RunExtraTests / Dist::Zilla::PluginBundle::Author::GEEKRUTH/RunExtraTests]
+
+[CPANFile / Dist::Zilla::PluginBundle::Author::GEEKRUTH/CPANFile]
+
+[MinimumPerl / Dist::Zilla::PluginBundle::Author::GEEKRUTH/MinimumPerl]
+default_version = 5.012

@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Extract::DeclaredMinimumPerl
 
+1.024 2022-01-21T05:03:13Z
+	* Fixing truncated LICENSE. No code changes.
+
 1.023 2021-01-20T09:15:39Z
 	* Freshen distro, remove Travis CI, add Github Actions
 

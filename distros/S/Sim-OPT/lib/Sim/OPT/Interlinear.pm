@@ -31,7 +31,7 @@ use Sim::OPT::Parcoord3d;
 
 our @ISA = qw( Exporter );
 our @EXPORT = qw( interlinear, interstart prepfactlev tellstepsize );
-$VERSION = '0.183';
+$VERSION = '0.189';
 $ABSTRACT = 'Interlinear is a program for building metamodels from incomplete, multivariate, discrete dataseries on the basis of nearest-neighbouring gradients weighted by distance.';
 
 #######################################################################
@@ -746,55 +746,37 @@ sub wei
 
     my @neighbours;
     my %bank;
+
+    my @newneighbours;
+    if ( "flat" ~~ @modality )
+    {
+      foreach my $e ( @arra )
+      {
+        push ( @newneighbours, $e->[0] );
+      }
+    }
+
     foreach my $el ( @arr )
     {
       if ( ( $el->[2] ne "" ) and ( $el->[3] >= $minimumcertain ) )
       {
-        if ( not ( ( "wai" ~~ @modality ) or ( "wooi" ~~ @modality ) ) )
+        unless ( "bankflat" ~~ @modality )
         {
+          if ( scalar( @{ $nears{$el->[0]}{neighbours} } ) == 0 )
           {
-            if ( scalar( @{ $nears{$el->[0]}{neighbours} } ) == 0 )
-            {
-              @neighbours = @{ isnear( $el->[0], $first0, $last0 ) };
-              $nears{$el->[0]}{neighbours} = [ @neighbours ];
-            }
-            else
-            {
-              @neighbours = @{ $nears{$el->[0]}{neighbours} };
-            }
+            @neighbours = @{ isnear( $el->[0], $first0, $last0 ) };
+            $nears{$el->[0]}{neighbours} = [ @neighbours ];
+          }
+          else
+          {
+            @neighbours = @{ $nears{$el->[0]}{neighbours} };
           }
         }
-        elsif ( "wai" ~~ @modality )
+        else
         {
-          {
-            if ( scalar( @{ $nears{$el->[0]}{neighbours} } ) == 0 )
-            {
-              @neighbours = @{ isstar( $el->[0], $first0, $last0 ) };
-              $nears{$el->[0]}{neighbours} = [ @neighbours ];
-            }
-            else
-            {
-              @neighbours = @{ $nears{$el->[0]}{neighbours} };
-            }
-          }
+          @neighbours = @newneighbours;
         }
-        elsif ( "wooi" ~~ @modality )
-        {
-          {
-            if ( scalar( @{ $nears{$el->[0]}{neighbours} } ) == 0 )
-            {
-              @neighbours = @{ isnear( $el->[0], $first0, $last0 ) };
-              my @otherneighbours = @{ isstar( $el->[0], $first0, $last0 ) };
-              push ( @neighbours, @otherneighbours );
-              @neighbours = uniq( @neighbours );
-              $nears{$el->[0]}{neighbours} = [ @neighbours ];
-            }
-            else
-            {
-              @neighbours = @{ $nears{$el->[0]}{neighbours} };
-            }
-          }
-        }
+
 
         #foreach my $elt ( @arra )
         foreach my $it ( @neighbours )
@@ -1307,15 +1289,144 @@ sub wei
       }
     }
     return( \%wand, \%nears );
-  }
+  }#END SUB CYCLEARR
 
   my ( %wand, @limb0 );
 
   say $tee "GOING TO CREATE NEW POINTS.";
 
+  sub cyclearr_ancient
+  {
+    my %wand;
+    my $coun = 0;
+    foreach my $el ( @arr )
+    {
+      my $key =  $el->[0] ;
+      if ( $el->[2] eq "" )
+      {
+        foreach my $elt ( @arr )
+        {
+          if ( ( $elt->[2] ne "" ) and ( $el->[3] >= $minreq_forinclusion ) )
+          {
+            my @diff1 = diff( \@{ $el->[1] }, \@{ $elt->[1] } );
 
-  my ( $wand_ref, $nears_ref ) = cyclearr( \@arr__, $minreq_forinclusion, $minreq_forgrad, \%bank, \%factlevels, $nfiltergrads,
-    \@arrb, $first0, $last0, \%nears, $limitgrads, $limitpoints, \@modality );
+            if ( ( scalar( @diff1 ) > 0 ) and ( scalar( @diff1 ) <= $minreq_forgrad->[2] ) )
+            {
+              my @diff2 = diff( \@{ $elt->[1] } , \@{ $el->[1] } );
+              my %h1 = map { split( /-/ , $_ ) } @diff1;
+              my @da1 = keys %h1;
+              my @da1par = values %h1;
+              my %h2 = map { split( /-/ , $_ ) } @diff2;
+              my @da2 = keys %h2;
+              my @da2par = values %h2;
+
+              my $soughtval;
+              my $count = 0;
+              foreach my $d10 ( @da1 )
+              {
+                my $d11 = $da1par[$count];
+                my $co = 0;
+                foreach my $d20 ( @da2 )
+                {
+                  if ( $d20 ne "" )
+                  {
+                    my $d20 = $da2[$co];
+                    my $d21 = $da2par[$co];
+                    if ( ( $d10 eq $d20 ) )
+                    {
+                      my $newpair = join( "-", ( $d11, $d21 ) );
+
+                      my $newtrio = join( "-", $d10, $newpair );
+
+                      my ( @boxgrads, @boxdists, @boxors );
+                      my $cn = 0;
+                      foreach my $grad ( @{ $bank{$newtrio}{grads} } )
+                      {
+                        if ( $grad ne "" )
+                        {
+                          push ( @boxgrads, $grad );
+                          my $ordist = $bank{$newtrio}{ordists}[$cn];
+                          push ( @boxdists, $ordist );
+                          my $origin = $bank{$newtrio}{origins}[$cn];
+                          push ( @boxors, $origin );
+                        }
+                        $cn++;
+                      }
+
+                      my ( @factbag, @levbag, @stepbag );
+                      my $c = 0;
+                      foreach my $e ( @da1par )
+                      {
+                        if ( $e ne "" )
+                        {
+                          my $fact = $da1[$c];
+
+                          my $i = 0;
+                          foreach my $ei ( @da2par )
+                          {
+                            if ( $da1[$c] == $da2[$i] )
+                            {
+                              my $diffpar = abs( $e - $ei );
+                              if ( ( $diffpar <= $minreq_forgrad->[1] ) and ( $diffpar > 0 ) ) ############################à
+                              {
+                                push ( @factbag, $fact );
+                                push ( @levbag, $diffpar );
+                                push ( @stepbag, $factlevels{stepsizes}{$fact} );
+                              }
+                            }
+                            $i++;
+                          }
+                        }
+                        $c++;
+                      }
+
+                      my ( $soughtinc, $totdist, $totstrength );
+
+                      unless ( ( scalar( @boxgrads ) == 0 ) and ( scalar( @boxdists ) == 0 ) and ( scalar( @boxors ) == 0 ) )
+                      {
+                        ( $soughtinc, $totdist, $totstrength ) = weightvals1( $elt->[1], \@boxgrads, \@boxdists, \@boxors, $minreq_forcalc, \@factbag, \@levbag, \@stepbag, $elt->[2], \%factlevels, $maxdist, $elt->[3], $condweight );
+
+                        unless ( ( $soughtinc eq "" ) or ( $totdist eq "" ) )
+                        {
+                          my $soughtval = ( $elt->[2] + $soughtinc );
+                          push ( @{ $wand{$key}{vals} }, $soughtval );
+                          push ( @{ $wand{$key}{dists} }, $totdist );
+
+                          push ( @{ $wand{$key}{strength} }, $totstrength );
+                          push ( @{ $wand{$key}{origin} }, $elt->[0] );
+                          $wand{$key}{name} = $key;
+                          $wand{$key}{bulk} = [ @{ $elt->[1] } ] ;
+                        }
+                      }
+                    }
+                  }
+                  $co++
+                }
+                $count++;
+              }
+            }
+          }
+        }
+      }
+    }
+    return( \%wand );
+  }
+
+
+  my $wand_ref = cyclearr;
+  my %wand = %{ $wand_ref };
+
+  my ( $wand_ref, $nears_ref );
+
+  if ( not ( "simple" ~~ @modality ) )
+  {
+    ( $wand_ref, $nears_ref ) = cyclearr( \@arr__, $minreq_forinclusion, $minreq_forgrad, \%bank, \%factlevels, $nfiltergrads,
+      \@arrb, $first0, $last0, \%nears, $limitgrads, $limitpoints, \@modality );
+  }
+  else
+  {
+    $wand_ref = cyclearr_ancient;
+  }
 
   %wand = %{ $wand_ref };
   say $tee "\nDONE.";
@@ -2024,7 +2135,6 @@ sub interlinear
 
     if ( ( $mode__ eq "wei" ) or ( $mode__ eq "mix" ) )
     {
-      say $tee "MODALITY! " . dump( @modality );
       my ( $limbo_wei_ref, $bank_ref, $nears_ref ) = wei( \@arr, $relaxmethod, $overweightnearest, $parconcurrencies, $instconcurrencies,
       $count, \%factlev, $minreq_forgrad, $minreq_forinclusion, $minreq_forcalc, $minreq_formerge, $maxdist, $nfiltergrads,
       $limit_checkdistgrads, $limit_checkdistpoints, \%bank, $fulldo, $first0, $last0, \%nears, $checkstop, \@weldsprepared,
@@ -2204,20 +2314,20 @@ Sim::OPT::Interlinear
 =head1 DESCRIPTION
 
 
-Interlinear is a program for computing the missing values in multivariate datasieries through a strategy entailing distance-weighting the nearest-neihbouring gradients between points in an n-dimensional space.
-The program adopts a distance-weighted gradient-based strategy. The strategy weights the known gradients in a manner inversely proportional to the distance of their pivot points from the pivot points of the missing nearest-neighbouring gradients, then utilizes recursively the gradients neighbouring near each unknown point to define it, weighting the candidates by distance. In this strategy, the curvatures in the space are reconstructed by exploiting the fact that in this calculation a local sample of the near-neighbouring gradients is used, which vary for each point. The strategy in question is adopted in Interlinear since version 0.103 and it has been presented in the following publication: http://doi.org/10.1080/19401493.2019.1707875. Before that version, the gradients were calculated on a global basis.
-Besides the described strategy, a), the following metamodelling strategies are utilized by Interlinear:
+Interlinear is a program for metamodelling the missing instance values in n-dimensional multivariate datasieries by distance-weighting the nearest-neihbouring gradients between points.
+The strategy weights the known gradients in a manner inversely proportional to the positional distance between the points they are taken from to the missing nearest-neighbouring points they are going to be used for. It is a zero-order instance-based method. In this scheme, the curvatures in the space are reconstructed by exploiting the fact that in this calculation a local sample of the near-neighbouring gradients is used, which vary for each point. The method in question has been presented in the following publication: http://doi.org/10.1080/19401493.2019.1707875. In this publication, this metamodelling method has been proven capable of outperforming the Kriging method, the MARS method, and polynomial methods.
+This procedure (a1) is active by default when calling Intelinear. Another version of the procedure (a2), in which the derived points are calculated on a global rather than a local basis, allowing faster computations, but entailing less accurate results, can be activated by setting @modality = ( "simple" ) in the configuration file.
+Besides strategies a1) and a2), two alternative metamodelling strategies can be utilized in Interlinear:
 
-b) pure linear interpolation (one may want to use this in some occasions: for example, on factorials);
+b) pure linear interpolation (one may want to use this just in some occasions: for example, on factorials);
 
-c) pure nearest neighbour (a strategy of last resort. One may want to use it to unlock a computation which is based on data which are too sparse to proceed, or when nothing else works).
+c) pure nearest neighbour (a strategy of last resort. One may want to use a pass of it to unlock a computation which is based on data which are too sparse to proceed, or when nothing else works).
 
-Strategy a) works for cases which are adjacent in the design space. For example, it cannot work with the gradient between a certain iteration 1 and the corresponding iteration 3. It can only work with the gradient between iterations 1 and 2, or 2 and 3.
-For that reason, it does not work well with data evenly distributed in the design space, like those deriving from latin hypercube sampling, or a random sampling; and works well with data clustered in small patches, like those deriving from star (coordinate descent) sampling strategies.
-To work well with a latin hypercube sampling, it is usually necessary to include a pass of strategy b) before calling strategy a). Then strategy a) will charge itself of reducing the gradient errors created by the initial pass of strategy b).
+Strategies a1 and a2) work preferentially on the basis of group of samples that are adjacent in the design space. For example, it does not like to work with only the gradients between a certain iteration 1 and the corresponding iteration 3. It likes to work with the gradient between iterations 1 and 2, or 2 and 3. For that reason, it does not work well with data evenly distributed in the design space, like those deriving from latin hypercube sampling, or a random sampling; and works well with data clustered in small patches, like those deriving from star sampling strategies, or from coordinate descent, or block coordinate descent, or overlapping block coordinate descent.
+To work well with a latin hypercube sampling, it may be necessary to include a pass of strategy b) or c) before calling strategy a). Then strategy a) will charge itself of reducing the errors created by that initial pass. As an alternative, in strategy a1), the third element of the variable $minreq_forgrad in the configuration file (which is, by default, "confinterlinear.pl") may be set to more than 1: for example $minreq_forgrad = [1, 1, 2]. This makes not only the nearest-neighbouring samples be taken into account in the calculations, but also the 2nd-nearest, or the nth-nearest.
 
 A configuration file should be prepared following the example in the "examples" folder in this distribution.
-If the configuration file is incomplete or missing, the program will adopt its own defaults, exploiting the distance-weighted gradient-based strategy.
+If the configuration file is incomplete or missing, the program will adopt its own defaults, exploiting the distance-weighted gradient-based strategy a1.
 The only variable that must mandatorily be specified in a configuration file is $sourcefile: the Unix path to the source file containining the dataseries. The source file has to be prepared by listing in each column the values (levels) of the parameters (factors, variables), putting the objective function valuesin the last column in the last column, at the rows in which they are present.
 
 The parameter number is given by the position of the column (i.e. column 4 host parameter 4).
@@ -2280,13 +2390,13 @@ The program converts this format into the one preferred by Sim::OPTS, which is t
 
 1-3_2-2_3-2,0.670
 
-However, involving Sim::OPT is more complicated that utilizing Interlinear alone. How to do that is treated at the end of this document.)))
+How to involve Sim::OPT is dealt with at the end of this document.)))
 
 
 After some computations, Interlinear will output a new dataseries with the missing values filled in.
 This dataseries can be used by OPT for the optimization of one or more blocks. This can be useful, for example, to save computations in searches involving simulations, especially when the time required by each simulations is long, like it may happen with CFD simulations in building design.
 
-The number of computations required for the creation of a metamodel in OPT increases exponentially with the number of instances in the metamodel. To reduce the exponential, a limit has to be set for the size of the net of instances taken into account in the computations for gradients and for points. The variables in the configuration files controlling those limits are "$nfiltergrads", a limit with adaptive effects, and "$limit_checkdistgrads". By default they are unspecified. If they are unspecified (i.e. a null value ("") is specified for them), no limit is assumed. "$nfiltergrads" may be set to the double of the square root of the number of instances of a problem space. "$limit_checkdistgrads" may be set to a part of the total number of instances, for example that number divided by 1/5, or 1/10. An example of configuration file with more information in the comments is embedded in this source code, where it sets the defaults.
+The number of computations required for the creation of a metamodel in OPT increases exponentially with the number of instances in the metamodel. To reduce the exponential, a limit has to be set for the size of the net of instances taken into account in the computations for gradients and for points. The variables in the configuration files controlling those limits are "$nfiltergrads", a limit with adaptive effects (putting a ceiling to the number of originary gradients utilized to derive the points), as well as "$limit_checkdistgrads" and "$limit_checkdistpoints" (putting a limit to the number of derived gradients and points from which the calculations are further propagated at each computation pass). By default they are unspecified. If they are unspecified (i.e. a null value ("") is specified for them), no limit is assumed. "$nfiltergrads" may be set to the double of the square root of the number of instances of a problem space. "$limit_checkdistgrads" and "$limit_checkdistpoints" may be set to a part of the total number of instances, for example that number divided by 1/5, or 1/10. "$limit_checkdistgrads" and "$limit_checkdistpoints" may be given the same value. An example of configuration file with more information in the comments is embedded in this source code, where it sets the defaults.
 
 By utilizing the metamodelling procedure at point (a), Interlinear can also weld two related problem space models together, provided that they share the same parametric structure. This welding is not a mere merge. It is a neighbour-by-neighbour action, much wholler and, yes, cooler. The procedure has been presented in the following publication: http://doi.org/10.1080/19401493.2020.1712477. The action of procedure is controlled by the following settings in the configuration file:
 1) @weldsprepared = ( "/home/luca/ffexpexps_full/minmissionsprep.csv" ); #The path to the second dataseries.

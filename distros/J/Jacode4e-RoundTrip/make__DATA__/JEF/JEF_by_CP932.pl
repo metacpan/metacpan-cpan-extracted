@@ -2,7 +2,7 @@
 #
 # JEF_by_CP932.pl
 #
-# Copyright (c) 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 # Linkexpress operation manual J2X1-5930-03Z2(00) FUJITSU LIMITED
@@ -10,9 +10,6 @@
 # http://software.fujitsu.com/jp/manual/manualfiles/M070086/J2X15930/01Z200/unyo05/unyo0416.html
 # http://software.fujitsu.com/jp/manual/manualfiles/M070086/J2X15930/01Z200/unyo05/unyo0420.html
 # http://software.fujitsu.com/jp/manual/manualfiles/M070086/J2X15930/01Z200/unyo05/unyo0421.html
-# http://software.fujitsu.com/jp/manual/manualfiles/m120010/b1fw5691/05z200/index.html
-# http://software.fujitsu.com/jp/manual/manualfiles/m120010/b1fw5691/05z200/index.html
-# http://software.fujitsu.com/jp/manual/manualfiles/m120010/b1fw5691/05z200/index.html
 # http://software.fujitsu.com/jp/manual/manualfiles/m120010/b1fw5691/05z200/index.html
 # http://software.fujitsu.com/jp/manual/manualfiles/m120010/b1fw5691/05z200/b5691-g-00-00.html
 
@@ -288,7 +285,7 @@ my @JEF_by_CP932_a = map { @_=split(/ /); ((@_==6) && ($_[2] ne $_[5])) ? die : 
 ûU FB55 57F1 
 ûV FB56 57EB 
 ûW FB57 57EC 
-ûX FB58 70E3 
+ûX FB58 70E3 By Linkexpress Operation Guide: "https://software.fujitsu.com/jp/manual/manualfiles/M070086/J2X15930/01Z200/unyo05/unyo0420.html", but maybe 70E2 is better
 ûY FB59 57F6 
 ûZ FB5A 58A9 
 û[ FB5B 58FA 
@@ -734,7 +731,7 @@ my @JEF_by_CP932_b = map { @_=split(/ /); ((@_==6) && ($_[2] ne $_[5])) ? die : 
 ûU FB55 57F1 
 ûV FB56 57EB 
 ûW FB57 57EC 
-ûX FB58 70E3 
+ûX FB58 70E3 By Linkexpress Operation Guide: "https://software.fujitsu.com/jp/manual/manualfiles/M070086/J2X15930/01Z200/unyo05/unyo0420.html", but maybe 70E2 is better
 ûY FB59 57F6 
 ûZ FB5A 58A9 
 û[ FB5B 58FA 

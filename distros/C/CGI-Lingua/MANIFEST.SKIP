@@ -63,5 +63,5 @@
 \.appveyor\.yml
 \.releaserc
 \.lwpcookies
-HTML-.*
+CGI-.*
 t/online.enabled

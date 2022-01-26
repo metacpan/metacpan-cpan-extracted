@@ -8,7 +8,7 @@ use Types::Standard qw(Enum CodeRef Bool);
 
 use namespace::clean;
 
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 
 use constant {
 	HOOK_REFORMAT => 'reformat',
@@ -102,3 +102,4 @@ A boolean - whether the hook should be inherited to child forms. True by default
 =head2 is_modifying
 
 Given a hook object, this method will return a boolean value which indicates whether the hook is meant to be modifying the passed in value. If false, we should discard the return value of that hook's code reference.
+

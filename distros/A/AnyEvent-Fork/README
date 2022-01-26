@@ -461,7 +461,7 @@ THE "AnyEvent::Fork" CLASS
         that looks as if it were the perl interpreter. Failing this, the
         module falls back to using $Config::Config{perlpath}.
 
-        The path to perl can also be overriden by setting the global
+        The path to perl can also be overridden by setting the global
         variable $AnyEvent::Fork::PERL - it's value will be used for all
         subsequent invocations.
 
@@ -480,7 +480,9 @@ THE "AnyEvent::Fork" CLASS
 
     $proc = $proc->eval ($perlcode, @args)
         Evaluates the given $perlcode as ... Perl code, while setting @_ to
-        the strings specified by @args, in the "main" package.
+        the strings specified by @args, in the "main" package (so you can
+        access the args using $_[0] and so on, but not using implicit "shit"
+        as the latter works on @ARGV).
 
         This call is meant to do any custom initialisation that might be
         required (for example, the "require" method uses it). It's not

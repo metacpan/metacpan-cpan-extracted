@@ -15,14 +15,15 @@ SPVM::Builder::Util::getopt
   'I|module-dir=s' => \my @module_dirs,
   'q|quiet'   => \my $quiet,
   'O|optimize=s' => \my $optimize,
-  '-f|force' => \my $force,
+  'f|force' => \my $force,
+  'c|config=s' => \my $config_file,
 ;
 
 if ($help) {
   die SPVM::Builder::Util::extract_usage;
 }
 elsif ($show_version) {
-  my $version_string = 'spvmcc v$SPVM::VERSION';
+  my $version_string = "spvmcc v$SPVM::VERSION";
   print "$version_string\n";
 }
 else {
@@ -31,8 +32,8 @@ else {
     die SPVM::Builder::Util::extract_usage;
   }
   
-  push @module_dirs, @INC;
-
+  push @module_dirs, map { "$_/SPVM" } @INC;
+  
   my $build_exe = SPVM::Builder::Exe->new(
     module_dirs => \@module_dirs,
     output_file => $output_file,
@@ -40,6 +41,7 @@ else {
     quiet => $quiet,
     optimize => $optimize,
     force => $force,
+    config_file => $config_file,
   );
   $build_exe->build_exe_file;
 }
@@ -53,10 +55,10 @@ spvmcc - SPVM compiler to create exe file
 
 =head1 SYNOPSIS
 
-  Usage: spvmcc [OPTIONS] [MODULE_NAME]
+  Usage: spvmcc [OPTIONS] [CLASS_NAME]
     
     # lib/SPVM/Myapp.spvm
-    spvmcc -I lib -o myapp Myapp
+    spvmcc -I lib/SPVM -o myapp Myapp
 
   Options:
     -h, --help                     Show this message
@@ -67,6 +69,7 @@ spvmcc - SPVM compiler to create exe file
     -q, --quiet                    Quiet output
     -O, --optimize <level>         Optimaization level
     -f, --force                    Force compile and link
+    -c, --config                   Config file
     
 =head1 DESCRIPTION
 

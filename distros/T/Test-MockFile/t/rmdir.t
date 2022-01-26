@@ -101,6 +101,22 @@ subtest "rmdir when nothing is there." => sub {
     is( $! + 0,        ENOENT, ' - $! is ENOENT.' ) or diag "$!";
 };
 
+subtest(
+    'rmdir non-empty directory fails' => sub {
+        my $foo = Test::MockFile->dir('/foo');
+        my $bar = Test::MockFile->file( '/foo/bar', 'content' );
+
+        $! = 0;
+
+        ok( -e ('/foo/bar'), 'File exists' );
+        ok( -d ('/foo'),     'Directory exists' );
+
+        is( $! + 0, 0, 'No errors yet' );
+        ok( !rmdir('/foo'), 'rmdir failed because directory has files' );
+        is( $! + 0, 39, '$! is set to correct perror (39)' );
+    }
+);
+
 done_testing();
 
 sub touch {

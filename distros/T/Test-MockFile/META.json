@@ -26,8 +26,7 @@
             "Test2::Bundle::Extended" : "0.000084",
             "Test2::Plugin::NoWarnings" : "0",
             "Test2::Tools::Explain" : "0",
-            "Test::More" : "1.302133",
-            "Text::Glob" : "0"
+            "Test::More" : "1.302133"
          }
       },
       "configure" : {
@@ -37,7 +36,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Overload::FileCheck" : "0.007",
+            "Overload::FileCheck" : "0.012",
+            "Text::Glob" : "0",
             "perl" : "5.006"
          }
       }
@@ -54,6 +54,6 @@
          "url" : "https://github.com/cpanelinc/Test-MockFile"
       }
    },
-   "version" : "0.023",
+   "version" : "0.025",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

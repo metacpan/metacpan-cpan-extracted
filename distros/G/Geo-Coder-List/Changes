@@ -1,5 +1,14 @@
 Revision history for Geo-Coder-List
 
+0.29	Sun Jan 23 08:17:25 EST 2022
+	Disable t/geofarm.t on smokers
+
+0.28	Sat Jan 22 12:05:07 EST 2022
+	Don't delete hashes when debugging
+	Start to popluate the 'type' member of the returned hash
+	Added support for Geo::Coder::Mapbox
+	Temporarily invalid locations were being cached too long
+
 0.27	Sat Jun 20 18:48:02 EDT 2020
 	Added debug option to the constructor
 	Be more intelligent in how long to keep a location in the cache

@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Result;
 # ABSTRACT: Result of running a Cypher statement (a stream of records)
-$Neo4j::Driver::Result::VERSION = '0.27';
+$Neo4j::Driver::Result::VERSION = '0.28';
 
 use parent 'Neo4j::Driver::StatementResult';
 
@@ -20,6 +20,7 @@ our $fake_attached = 0;  # 1: simulate an attached stream (only used in testing)
 
 
 sub new {
+	# uncoverable pod (private method)
 	my ($class) = @_;
 	
 	return bless { buffer => [] }, $class;
@@ -135,6 +136,7 @@ sub fetch {
 
 
 sub peek {
+	# uncoverable pod (experimental feature)
 	my ($self) = @_;
 	
 	croak "iterator is exhausted" if $self->{exhausted};
@@ -153,6 +155,7 @@ sub has_next {
 
 
 sub attached {
+	# uncoverable pod (experimental feature)
 	my ($self) = @_;
 	
 	return $self->{attached};
@@ -160,6 +163,7 @@ sub attached {
 
 
 sub detach {
+	# uncoverable pod (experimental feature)
 	my ($self) = @_;
 	
 	return $self->_fill_buffer;
@@ -167,6 +171,7 @@ sub detach {
 
 
 sub consume {
+	# uncoverable pod (experimental feature)
 	my ($self) = @_;
 	
 	# Neo4j::Bolt doesn't offer direct access to neo4j_close_results()
@@ -182,11 +187,12 @@ sub summary {
 	
 	$self->{summary} //= Neo4j::Driver::ResultSummary->new( $self->{result}, $self->{notifications}, $self->{statement}, $self->{server_info} );
 	
-	return $self->{summary}->init;
+	return $self->{summary}->_init;
 }
 
 
 sub stats {
+	# uncoverable pod (see Deprecations.pod)
 	my ($self) = @_;
 	warnings::warnif deprecated => __PACKAGE__ . "->stats is deprecated; use summary instead";
 	
@@ -209,7 +215,7 @@ Neo4j::Driver::Result - Result of running a Cypher statement (a stream of record
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 SYNOPSIS
 
@@ -421,7 +427,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2021 by Arne Johannessen.
+This software is Copyright (c) 2016-2022 by Arne Johannessen.
 
 This is free software, licensed under:
 

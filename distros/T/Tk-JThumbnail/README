@@ -47,7 +47,7 @@ EXAMPLE
                             -width => 500,
                             -scrollbars => 'osoe',
                             -highlightthickness => 1,
-                            -focus => 2,
+                            -takefocus => 1,
                             -nodirs => 1,
             )->pack(-side => 'top', -expand => 1, -fill => 'both');
 
@@ -215,20 +215,20 @@ DESCRIPTION
         Special keys are: '' for files with no or unrecognized extension,
         and 'dir' for directories.
 
+    -activeforeground
+        JThumbnail-added feature: Specify a custom foreground color for the
+        image text label of the "active" item (the one with the keyboard
+        cursor (when the widget is in "normal" (not disabled) state.
+        Default: the palette's "*foreground*" color.
+
+    -disabledforeground
+        JThumbnail-added feature: Specify a custom foreground color for the
+        image text labels when the widget is in "disabled" state. Default:
+        the palette's "*diabledForeground*" color (usually a grayish color).
+
     -focus
-        JThumbnail-added feature: Specify the focusing model. Valid values
-        are:
-
-        0: Never take keyboard focus (and skip in the main window's
-        tab-focusing order).
-
-        1: Take focus when tabbed to from the main window (normal
-        "-takefocus => 1" action for Tk widgets).
-
-        2: Also take keyboard focus whenever an icon in the widget or the
-        widget itself is clicked on.
-
-        Default: *1*.
+        DEPRECIATED - see (options are different) and use *-takefocus*
+        instead!
 
     -font
         The default font is the Perl/Tk default label font (something like
@@ -333,18 +333,40 @@ DESCRIPTION
 
         All images beyond the fifth will not be selected.
 
+    -showcursoralways
+        Starting with version 2.4, Tk::JThumbnail no longer displays the
+        keyboard cursor (active element) when the JThumbnail widget does not
+        have the keyboard focus, in order to be consistent with the
+        behaviour of Tk::HMListbox. This option, when set to 1 (or a "true"
+        value) restores the pre-v2.4 behaviour of always showing the
+        keyboard cursor. Default *0* (False).
+
     -state
         JThumbnail-added feature: Specifies one of two states for the
         widget: *normal*, or *disabled*. In normal state the label is
         displayed using the foreground and background options. In the
         disabled state the disabledForeground option determines how the
         widget is displayed, and the user can not interact with the widget
-        (or the icon buttons) with the keyboard or mouse. Default:
-        *"normal"*.
+        (or the icon buttons) with the keyboard or mouse. However,
+        application programs can still update the widget's contents.
+
+        Default: *"normal"*.
 
     -takefocus
-        NOTE: DO NOT USE (it doesn't work properly)! Instead use the -focus
-        option, see above:
+        Specify the focusing model. Valid values are:
+
+        "": (default) Take focus when tabbed to from the main window
+        (default action for Tk widgets). (Replaces the old
+        JThumbnail-specific "-focus => 1" option).
+
+        0: Never take keyboard focus (and skip in the main window's
+        tab-focusing order).
+
+        1: Also take keyboard focus whenever an icon in the widget or the
+        widget itself is clicked on in addition to when tabbed to. (Replaces
+        the old JThumbnail-specific"-focus => 2" option).
+
+        Default: *""*.
 
     -width
         Specifies the default width of the main image window in pixels

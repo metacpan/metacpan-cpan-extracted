@@ -4,7 +4,7 @@ use warnings;
 # ABSTRACT: Internal value object for the "Unknown::Values" distribution
 
 package Unknown::Values::Instance;
-$Unknown::Values::Instance::VERSION = '0.101';
+$Unknown::Values::Instance::VERSION = '0.102';
 use Carp 'confess';
 
 use 5.01000;
@@ -98,7 +98,7 @@ Unknown::Values::Instance - Internal value object for the "Unknown::Values" dist
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 DESCRIPTION
 

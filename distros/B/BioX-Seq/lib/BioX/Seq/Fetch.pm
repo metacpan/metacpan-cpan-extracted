@@ -5,6 +5,7 @@ use strict;
 use warnings;
 
 use BioX::Seq;
+use File::stat;
 
 use constant MAGIC_GZIP => pack('C3', (0x1f, 0x8b, 0x08));
 
@@ -146,6 +147,17 @@ sub _load_faidx {
 
     my $fn_idx  = $self->{fn} . '.fai';
     $self->write_index if (! -e $fn_idx);
+
+    # make sure FASTA file is not newer than its index; otherwise index file
+    # may be out of date and cause silent corruption downstream
+    my $mtime_fas = stat($self->{fn})->mtime;
+    my $mtime_idx = stat($fn_idx)->mtime;
+    if ($mtime_fas > $mtime_idx) {
+        die "Index file exists but is older than FASTA file and probably out"
+            . " of date. Refresh or remove the existing index before"
+            . " proceeding.\n"
+    }
+
     my @ids;
 
     open my $in, '<', $fn_idx

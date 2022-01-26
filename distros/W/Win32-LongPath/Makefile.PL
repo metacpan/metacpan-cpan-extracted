@@ -28,10 +28,9 @@ use_ppport 3.19;
 cc_define       "-DWINVER=$WinVer -D_WIN32_WINNT=$WinVer";
 cc_warnings;
 cc_src_paths    'xs';
-makemaker_args
-  (
+makemaker_args (
   LDDLFLAGS => "$Config{lddlflags} -static-libgcc -static-libstdc++"
-  );
+);
 
 # tests
 tests           't/*.t';

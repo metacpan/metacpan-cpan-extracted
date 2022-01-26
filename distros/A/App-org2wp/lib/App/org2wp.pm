@@ -1,10 +1,5 @@
 package App::org2wp;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-09-18'; # DATE
-our $DIST = 'App-org2wp'; # DIST
-our $VERSION = '0.010'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -12,6 +7,11 @@ use Log::ger;
 
 use Perinci::Object qw(envresmulti);
 use POSIX qw(strftime);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-01-21'; # DATE
+our $DIST = 'App-org2wp'; # DIST
+our $VERSION = '0.011'; # VERSION
 
 our %SPEC;
 
@@ -272,7 +272,8 @@ sub org2wp {
     my @posts_srcs;   # ("org1", "org2", ...)
     my @posts_htmls;  # ("html1", "html2", ...)
     my @posts_titles; # ("title1", "title2", ...)
-    my @posts_ids;    # (101,     undef,   ...)
+    my @orig_posts_ids;# (101,     undef,   ...)
+    my @new_posts_ids;
     my @posts_tags;   # ([tag1_for_post1,tag2_for_post1], [tag1_for_post2,...], ...)
     my @posts_cats;   # ([cat1_for_post1,cat2_for_post1], [cat1_for_post2,...], ...)
     my @posts_times;  # ("[2020-09-17 Thu 01:55]", ...)
@@ -303,7 +304,7 @@ sub org2wp {
                     });
                 my $properties = $properties_drawer ? $properties_drawer->properties : {};
 
-                push @posts_ids, $properties->{POSTID};
+                push @orig_posts_ids, $properties->{POSTID};
 
                 push @posts_tags, [$headline->get_tags];
 
@@ -335,7 +336,7 @@ sub org2wp {
                     pop @posts_srcs;
                     log_info "Excluded blog post in heading, title=%s, ID=%d, tags=%s, cats=%s (reason=%s)",
                         pop(@posts_titles),
-                        pop(@posts_ids),
+                        pop(@orig_posts_ids),
                         pop(@posts_tags),
                         pop(@posts_cats),
                         $exclude_reason;
@@ -343,7 +344,7 @@ sub org2wp {
                     log_info "Found blog post[%d] in heading, title=%s, ID=%d, tags=%s, cats=%s",
                         scalar(@posts_srcs),
                         $posts_titles[-1],
-                        $posts_ids[-1],
+                        $orig_posts_ids[-1],
                         $posts_tags[-1],
                         $posts_cats[-1];
                 }
@@ -384,7 +385,7 @@ sub org2wp {
                 $post_id = $1;
                 log_trace("Org document already has post ID: %s", $post_id);
             }
-            push @posts_ids, $post_id;
+            push @orig_posts_ids, $post_id;
         }
     } # L1_COLLECT_POSTS_INFORMATION
 
@@ -496,7 +497,7 @@ sub org2wp {
     for my $post_idx (0..$#posts_srcs) {
         my $post_html  = $posts_htmls [$post_idx];
         my $post_title = $posts_titles[$post_idx];
-        my $post_id    = $posts_ids   [$post_idx];
+        my $post_id    = $orig_posts_ids[$post_idx];
         my $post_tags  = $posts_tags  [$post_idx];
         my $post_cats  = $posts_cats  [$post_idx];
 
@@ -549,7 +550,7 @@ sub org2wp {
         if ($dry_run) {
             log_info("(DRY_RUN) [api] Create/edit post, content: %s", $content);
             $posts_times[$post_idx] = _fmt_timestamp_org(time());
-            $posts_ids  [$post_idx] = 9_999_000 + $post_idx;
+            $new_posts_ids[$post_idx] = 9_999_000 + $post_idx;
             next L5_CREATE_OR_EDIT_POSTS;
         }
 
@@ -560,7 +561,7 @@ sub org2wp {
             if $call->fault && $call->fault->{faultCode};
 
         $posts_times[$post_idx] = _fmt_timestamp_org(time());
-        $posts_ids  [$post_idx] //= $call->result;
+        $new_posts_ids[$post_idx] //= $call->result;
     } # L5_CREATE_OR_EDIT_POSTS
 
     # 6. insert #+POSTID/:POSTID: and #+POSTTIME/:POSTTIME: to Org
@@ -583,8 +584,8 @@ sub org2wp {
                     $raw_content =~ s/^:POSTTIME:.*/:POSTTIME: $posts_times[$post_idx]/m
                         or $raw_content =~ s/^/:POSTTIME: $posts_times[$post_idx]\n/;
                     log_info("Inserting/updating :POSTID: to post[%d] ...", $post_idx);
-                    $raw_content =~ s/^:POSTID:.*/:POSTID: $posts_ids[$post_idx]/m
-                        or $raw_content =~ s/^/:POSTID: $posts_ids[$post_idx]\n/;
+                    $raw_content =~ s/^:POSTID:.*/:POSTID: $orig_posts_ids[$post_idx]/m
+                        or $raw_content =~ s/^/:POSTID: $new_posts_ids[$post_idx]\n/;
                     $properties_drawer->children([]);
                     $properties_drawer->document->_add_text($raw_content, $properties_drawer, 2);
                     $properties_drawer->_parse_properties($raw_content);
@@ -594,7 +595,7 @@ sub org2wp {
                     # XXX need to fix Org::Parser API, this is ugly
                     my $raw_content = "";
                     log_info("Inserting :POSTTIME: & :POSTID: to post[%d] ...", $post_idx);
-                    $raw_content .= ":POSTID: $posts_ids[$post_idx]\n";
+                    $raw_content .= ":POSTID: ".($orig_posts_ids[$post_idx] // $new_posts_ids[$post_idx])."\n";
                     $raw_content .= ":POSTTIME: $posts_times[$post_idx]\n";
                     $properties_drawer = Org::Element::Drawer->new(
                         document => $post_headline->document,
@@ -623,11 +624,11 @@ sub org2wp {
             $file_content =~ s/^#\+POSTTIME:.*/#+POSTTIME: $posts_times[0]/m or
                 $file_content =~ s/^/#+POSTTIME: $posts_times[0]\n/;
 
-            my $post_id = $posts_ids[0];
-            unless ($post_id) {
-                $post_id = $call->result;
-                log_info("Inserting #+POSTID (%d) ...", $post_id);
-                $file_content =~ s/^/#+POSTID: $post_id\n/;
+            my $orig_post_id = $orig_posts_ids[0];
+            unless ($orig_post_id) {
+                my $new_post_id = $call->result;
+                log_info("Inserting #+POSTID (%d) ...", $new_post_id);
+                $file_content =~ s/^/#+POSTID: $new_post_id\n/;
             }
         }
 
@@ -662,7 +663,7 @@ App::org2wp - Publish Org document (or heading) to WordPress as blog post
 
 =head1 VERSION
 
-This document describes version 0.010 of App::org2wp (from Perl distribution App-org2wp), released on 2020-09-18.
+This document describes version 0.011 of App::org2wp (from Perl distribution App-org2wp), released on 2022-01-21.
 
 =head1 FUNCTIONS
 
@@ -671,7 +672,7 @@ This document describes version 0.010 of App::org2wp (from Perl distribution App
 
 Usage:
 
- org2wp(%args) -> [status, msg, payload, meta]
+ org2wp(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Publish Org document (or heading) to WordPress as blog post.
 
@@ -868,12 +869,12 @@ Pass -dry_run=E<gt>1 to enable simulation mode.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -885,6 +886,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-org2wp
 
 Source repository is at L<https://github.com/perlancar/perl-App-org2wp>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2020, 2019, 2017, 2016 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-org2wp>
@@ -892,16 +921,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020, 2019, 2017, 2016 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

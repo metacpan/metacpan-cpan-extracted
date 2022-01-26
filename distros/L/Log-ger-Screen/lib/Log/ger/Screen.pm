@@ -1,17 +1,15 @@
 package Log::ger::Screen;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-10'; # DATE
-our $DIST = 'Log-ger-Screen'; # DIST
-our $VERSION = '0.002'; # VERSION
-
-# IFUNBUILT
-# use strict;
-# use warnings;
-# END IFUNBUILT
+use strict;
+use warnings;
 
 use Log::ger::Level::FromEnv;
-use Log::ger::Output 'Screen';
+use Log::ger::Output 'Screen' => (colorize_tags=>1);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-01-16'; # DATE
+our $DIST = 'Log-ger-Screen'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 sub import {
     my ($package, %per_target_conf) = @_;
@@ -36,7 +34,7 @@ Log::ger::Screen - Convenient packaging of Log::ger + Log::ger::Output::Screen +
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -75,7 +73,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

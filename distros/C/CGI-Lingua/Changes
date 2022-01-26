@@ -1,5 +1,11 @@
 Revision history for CGI-Lingua
 
+0.64	Tue Jan 25 10:08:06 EST 2022
+	Fix uninitialized value when loading from cache
+	Look harder for GeoIP.dat
+	Make LWP::Simple::WithCache a test_prereq when testing online
+	Fix prereqs for t/time_zone.t
+
 0.63	Sat Mar 13 10:12:46 EST 2021
 	time_zone now supports local connections
 	Use LWP::Simple::WithCache instead of LWP::Simple

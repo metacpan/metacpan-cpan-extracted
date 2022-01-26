@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Transaction;
 # ABSTRACT: Logical container for an atomic unit of work
-$Neo4j::Driver::Transaction::VERSION = '0.27';
+$Neo4j::Driver::Transaction::VERSION = '0.28';
 
 use Carp qw(croak);
 our @CARP_NOT = qw(
@@ -20,6 +20,7 @@ use Neo4j::Driver::Result;
 
 
 sub new {
+	# uncoverable pod (private method)
 	my ($class, $session) = @_;
 	
 	my $transaction = {
@@ -39,6 +40,8 @@ sub run {
 	my ($self, $query, @parameters) = @_;
 	
 	croak 'Transaction already closed' unless $self->is_open;
+	
+	warnings::warnif deprecated => __PACKAGE__ . "->{return_graph} is deprecated" if $self->{return_graph};
 	
 	my @statements;
 	if (ref $query eq 'ARRAY') {
@@ -280,7 +283,7 @@ Neo4j::Driver::Transaction - Logical container for an atomic unit of work
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 SYNOPSIS
 
@@ -472,36 +475,6 @@ which makes using this feature explicit is expected to remain
 available at least until that time. See also
 L<Neo4j::Driver::Net/"USE OF INTERNAL APIS">.
 
-=head2 Disable obtaining query statistics
-
- $transaction = $session->begin_transaction;
- $transaction->{return_stats} = 0;
- $result = $transaction->run('...');
-
-Since version 0.13, this driver requests query statistics from the
-Neo4j server by default. When using HTTP, this behaviour can be
-disabled. Doing so might provide a very minor performance increase.
-
-The ability to disable the statistics may be removed in future.
-
-=head2 Return results in graph format
-
- $session = $driver->config( jolt => 0 )->session;
- $transaction = $session->begin_transaction;
- $transaction->{return_graph} = 1;
- $records = $transaction->run('...')->list;
- for $record ( @$records ) {
-   $graph_data = $record->{graph};
-   ...
- }
-
-The Neo4j HTTP JSON API supports a "graph" results data format.
-This feature is only available when Jolt is disabled, which is
-not recommended. The C<return_graph> option will most likely be
-removed entirely in future versions, as requesting the "graph"
-result is also possible by using a custom networking module;
-see L<Neo4j::Driver::Net>.
-
 =head1 SEE ALSO
 
 =over
@@ -526,7 +499,7 @@ Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016-2021 by Arne Johannessen.
+This software is Copyright (c) 2016-2022 by Arne Johannessen.
 
 This is free software, licensed under:
 

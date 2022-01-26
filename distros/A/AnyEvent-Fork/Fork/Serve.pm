@@ -21,8 +21,6 @@ sub serve {
 
    my ($cmd, $fd);
 
-   local $SIG{CHLD} = 'IGNORE';
-
    my $error = sub {
       warn "[$0] ERROR: $_[0]\n";
       last;
@@ -34,6 +32,10 @@ sub serve {
    };
 
    while () {
+      # we manually reap child processes before we sleep, as local $SIG...
+      # will destroy existing child handlers instead of restoring them.
+      1 while 0 < waitpid -1, 1; # WNOHANG is portably 1. prove me wrong.
+
       # we must not ever read "too much" data, as we might accidentally read
       # an IO::FDPass::send request.
 

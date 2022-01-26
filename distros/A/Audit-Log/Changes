@@ -1,5 +1,9 @@
 Revision history for Audit-Log
 
+0.003 2022-01-24 TEODESIAN
+    - Add ability to return cwd, comm and exe parms for records
+    - Add documentation suggestions as to how you can improve usage of this with ausearch
+
 0.002 2022-01-19 TEODESIAN
     - Fix cpantesters failures related to ancient versions of List::Util
 

@@ -1,7 +1,7 @@
 {
    "abstract" : "unknown",
    "author" : [
-      "pc <pc@>"
+      "Rajkumar Reddy"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
@@ -39,6 +39,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.33",
+   "version" : "1.007",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

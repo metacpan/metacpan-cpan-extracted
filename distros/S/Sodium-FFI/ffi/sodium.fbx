@@ -1,0 +1,10 @@
+use strict;
+use warnings;
+
+our $DIR;
+
+{
+  verbose => 1,
+  alien  => 'Alien::Sodium',
+  source => ["$DIR/*.c"],
+}

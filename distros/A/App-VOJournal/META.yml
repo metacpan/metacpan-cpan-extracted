@@ -16,10 +16,10 @@ name: App-VOJournal
 provides:
   App::VOJournal:
     file: lib/App/VOJournal.pm
-    version: v0.4.6
+    version: v0.4.8
   App::VOJournal::VOTL:
     file: lib/App/VOJournal/VOTL.pm
-    version: v0.4.6
+    version: v0.4.8
 requires:
   Getopt::Long: '2.38'
   perl: v5.10.1
@@ -28,5 +28,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-VOJournal
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/matwei-perl/App-VOJournal
-version: v0.4.6
+version: v0.4.8
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

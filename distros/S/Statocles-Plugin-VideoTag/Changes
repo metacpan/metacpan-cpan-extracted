@@ -1,5 +1,8 @@
 Revision history for Statocles-Plugin-VideoTag
 
+0.0400 2022-01-20 13:41:57
+    - Do not replace *all* youtube links!
+
 0.0301 2021-03-19 18:59:02
     - Improve documentation.
 

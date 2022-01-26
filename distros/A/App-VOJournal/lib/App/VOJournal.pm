@@ -17,11 +17,11 @@ App::VOJournal - call Vimoutline on a journal file.
 
 =head1 VERSION
 
-Version v0.4.6
+Version v0.4.8
 
 =cut
 
-use version; our $VERSION = qv('v0.4.6');
+use version; our $VERSION = qv('v0.4.8');
 
 =head1 SYNOPSIS
 
@@ -47,6 +47,12 @@ vimoutliner with the journal file for that date.
     use App::VOJournal;
 
     App::VOJournal->run;
+
+B<Note:> App::VOJournal uses L<File::Find>
+to search for the last journal file
+below the directory given with option C<--basedir>
+(default: C<$ENV{HOME}/journal>) and does not follow symbolic links.
+Please make sure that this path points to a real directory and no symbolic link.
 
 =cut
 
@@ -149,18 +155,72 @@ sub _find_files_with_pattern {
     return @files;
 } # _find_files_with_pattern
 
+# _find_last_file($basedir, $next_file, $f)
+#
+# Find the last journal file that can be used as a template for the next
+# file.
+#
+# $basedir - the start directory
+# $next_file - the name of the file we want to use next
+# $f - optional, a hash with function references to aid testing/debugging
+#
 sub _find_last_file {
-    my ($basedir,$next_file) = @_;
+    my ($basedir,$next_file,$f) = @_;
     my $last_file = '';
+    my $got_it = 0;
     my $wanted = sub {
         my $this_file = $File::Find::name;
+
+        return if ($got_it);
+        #
+        # We get the files in reverse order, therefore the first matching
+        # file is already the one we are looking for.
+        #
+        # If we got the file we signal this with $got_it.
+        #
         if ($this_file =~ qr|^$basedir/\d{4}/\d{2}/\d{8}[.]otl$|
             && 0 < ($this_file cmp $last_file)
             && 0 >= ($this_file cmp $next_file)) {
             $last_file = $this_file;
+            $got_it = 1;
+        }
+        #
+        # The following is only to aid in testing or debugging.
+        #
+        if ($f->{wanted}) {
+            $f->{wanted}->($this_file,$last_file,$next_file,$got_it);
         }
     };
-    find($wanted,$basedir);
+    #
+    # Concentrate on the files whose path matches the pattern of journal
+    # files and ignore the rest with this preprocess function for
+    # File::Find::find().
+    #
+    # Sort the filenames reverse and ignore all following directory listings
+    # if we have already found the last file;
+    #
+    my $preprocess = sub {
+        my @files = ();
+
+        if ($got_it) {
+            # leave it empty
+        }
+        elsif ($File::Find::dir =~ /^$basedir$/) {
+            @files = grep { /^\d{4}$/ } @_;
+        }
+        elsif ($File::Find::dir =~ m|^$basedir/\d{4}$|) {
+            @files = grep { /^\d{2}$/ } @_;
+        }
+        elsif ($File::Find::dir =~ m|^$basedir/\d{4}/\d{2}$|) {
+            @files = grep { /^\d{8}\.otl$/ } @_;
+        }
+        return sort {$b cmp $a} @files;
+    };
+    find({wanted => $wanted,
+          preprocess => $preprocess,
+          untaint => 1,                 # needed when running in taint mode
+          no_chdir => 1,                # we don't need to chdir
+         },$basedir);
     return $last_file;
 } # _find_last_file()
 

@@ -1,5 +1,8 @@
 Revision history for Perl module Time::Timely
 
+1.024 2022-01-21T02:01:23Z
+	* The LICENSE file had been truncated. 
+
 1.023 2021-01-14T08:52:31Z
 	* Freshen distro, remove Travis CI, add Github actions
 

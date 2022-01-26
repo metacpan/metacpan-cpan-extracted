@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2022 -- leonerd@leonerd.org.uk
 
 package Future;
 
@@ -10,7 +10,7 @@ use strict;
 use warnings;
 no warnings 'recursion'; # Disable the "deep recursion" warning
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 use Carp qw(); # don't import croak
 use Scalar::Util qw( weaken blessed reftype );
@@ -629,6 +629,9 @@ sub done
       $self->{ready} = 1;
       $self->{ready_at} = _shortmess "done" if DEBUG;
       $self->{result} = [ @_ ];
+      if( $TIMES ) {
+         $self->{rtime} = [ gettimeofday ];
+      }
    }
 
    return $self;
@@ -691,6 +694,9 @@ sub fail
       $self->{ready} = 1;
       $self->{ready_at} = _shortmess "failed" if DEBUG;
       $self->{failure} = [ $exception, @more ];
+      if( $TIMES ) {
+         $self->{rtime} = [ gettimeofday ];
+      }
    }
 
    return $self;
@@ -774,6 +780,14 @@ sub on_cancel
 sub AWAIT_ON_CANCEL
 {
    my $self = shift;
+   my ( $code ) = @_;
+
+   push @{ $self->{on_cancel} }, $code;
+}
+
+sub AWAIT_CHAIN_CANCEL
+{
+   my $self = shift;
    my ( $f2 ) = @_;
 
    push @{ $self->{on_cancel} }, $f2;
@@ -781,9 +795,6 @@ sub AWAIT_ON_CANCEL
    weaken( $r->[0] );
    weaken( $r->[1] );
 }
-
-# New name for it
-*AWAIT_CHAIN_CANCEL = \&AWAIT_ON_CANCEL;
 
 sub _revoke_on_cancel
 {

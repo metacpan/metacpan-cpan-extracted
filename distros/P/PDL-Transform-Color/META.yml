@@ -4,10 +4,11 @@ author:
   - 'Craig DeForest <craig@deforest.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '6.48'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,11 +22,10 @@ requires:
   PDL: '0'
   PDL::MatrixOps: '0'
   PDL::Transform: '0'
-  Safe::Isa: '0'
   perl: '5.006'
 resources:
-  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=PDL-Transform-Color
-  homepage: http://github.com/drzowie/PDL-Transform-Color
-  repository: git://github.com/drzowie/PDL-Transform-Color.git
-version: '1.005'
+  bugtracker: http://github.com/PDLPorters/PDL-Transform-Color/issues
+  homepage: http://github.com/PDLPorters/PDL-Transform-Color
+  repository: git://github.com/PDLPorters/PDL-Transform-Color.git
+version: '1.006'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

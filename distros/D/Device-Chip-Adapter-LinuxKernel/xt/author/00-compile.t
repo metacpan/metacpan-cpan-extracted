@@ -6,10 +6,11 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4;
+plan tests => 5;
 
 my @module_files = (
     'Device/Chip/Adapter/LinuxKernel.pm',
+    'Device/Chip/Adapter/LinuxKernel/_I2C.pm',
     'Device/Chip/Adapter/LinuxKernel/_SPI.pm',
     'Device/Chip/Adapter/LinuxKernel/_base.pm'
 );

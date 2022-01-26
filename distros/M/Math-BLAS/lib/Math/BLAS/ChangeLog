@@ -1,3 +1,9 @@
+2022-01-23  Ralph Schleicher  <rs@ralph-schleicher.de>
+
+	* Enum.pm ($VERSION): Version 1.02.
+	* Legacy.pm ($VERSION): Version 1.02.
+	* PP.pm ($VERSION): Version 1.02.
+
 2011-04-16  Ralph Schleicher  <rs@ralph-schleicher.de>
 
 	* Legacy.pm (blas_nrm2): Rename to blas_dnrm2 (fix typo).

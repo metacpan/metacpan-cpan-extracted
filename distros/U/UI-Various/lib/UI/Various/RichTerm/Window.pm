@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use UI::Various::core;
 use UI::Various::Window;
@@ -129,7 +129,8 @@ sub _show($)
     $_ = $my_width - $title_len;
     print $D{W8} x ($_ > 3 ? $_ - 3 : $_), ($_ > 3 ? '<0>' : '');
     print $D{W9}, "\n";
-    print $self->_format('', $D{W4}, \@output, $D{W6}, $my_width, 0), "\n";
+    print($self->_format('', $D{W4}, '', \@output, '', $D{W6}, $my_width, 0),
+	  "\n");
     my $h = $self->height;
     defined $h  or  $h = 0;
     $h < $self->max_height  or  $h = $self->max_height;

@@ -31,7 +31,7 @@ subtest dont_work_with_symlinks => sub {
 		{
 		no strict 'refs';
 
-		test_out("ok 1 # skip $sub doesn't work on systems without symlinks!");
+		test_out("ok 1 # skip $sub doesn't work on systems without symlinks");
 		&{$sub}();
 		test_test();
 		}
@@ -46,7 +46,7 @@ my $not_there     = 'not_there';
 my $dangle_sym    = 'dangle_sym';
 
 my $s = ! $can_symlink
-	? "# skip file_is_symlink_ok doesn't work on systems without symlinks!"
+	? "# skip file_is_symlink_ok doesn't work on systems without symlinks"
 	: "- $readable_sym is a symlink";
 
 subtest should_work => sub {
@@ -102,7 +102,7 @@ subtest should_work => sub {
 
 	test_out( "not ok 1 - $test_name" );
 	test_diag(
-		"File [$readable] is not a symlink!\n" .
+		"file [$readable] is not a symlink\n" .
 		"    #   Failed test '$test_name'\n" .
 		"    #   at $0 line " . line_num(+5) . "."
 		);
@@ -111,7 +111,7 @@ subtest should_work => sub {
 
 	test_out( "not ok 1 - $test_name" );
 	test_diag(
-		"File [$not_there] is not a symlink!\n" .
+		"file [$not_there] is not a symlink\n" .
 		"    #   Failed test '$test_name'\n" .
 		"    #   at $0 line " . line_num(+5) . "."
 		);
@@ -120,7 +120,7 @@ subtest should_work => sub {
 
 	test_out( "not ok 1 - $test_name" );
 	test_diag(
-		"File [$not_there] is not a symlink!\n" .
+		"file [$not_there] is not a symlink\n" .
 		"    #   Failed test '$test_name'\n" .
 		"    #   at $0 line " . line_num(+5) . "."
 		);
@@ -129,7 +129,7 @@ subtest should_work => sub {
 
 	test_out( "not ok 1 - $test_name" );
 	test_diag(
-		"File [$readable] is not a symlink!\n" .
+		"file [$readable] is not a symlink\n" .
 		"    #   Failed test '$test_name'\n" .
 		"    #   at $0 line " . line_num(+5) . "."
 		);
@@ -138,7 +138,7 @@ subtest should_work => sub {
 
 	test_out( "not ok 1 - $readable is a symlink" );
 	test_diag(
-		"File [$readable] is not a symlink!\n" .
+		"file [$readable] is not a symlink\n" .
 		"    #   Failed test '$readable is a symlink'\n" .
 		"    #   at $0 line " . line_num(+5) . "."
 		);
@@ -150,7 +150,7 @@ subtest should_work => sub {
 subtest bad_target_does_not_exist => sub {
 	test_out( "not ok 1 $s" );
 	test_diag(
-		"Symlink [$readable_sym] points to non-existent target [$not_there]!\n" .
+		"symlink [$readable_sym] points to non-existent target [$not_there]\n" .
 		"    #   Failed test '$readable_sym is a symlink'\n" .
 		"    #   at $0 line " . line_num(+5) . "."
 		);
@@ -172,7 +172,7 @@ subtest bad_target_does_not_exist => sub {
 subtest bad_target_does_exists => sub {
 	test_out( "not ok 1 $s" );
 	test_diag(
-		"Symlink [readable_sym] points to\n" .
+		"symlink [readable_sym] points to\n" .
 		"    #          got: readable\n" .
 		"    #     expected: writable\n" .
 		"    #   Failed test 'readable_sym is a symlink'\n" .
@@ -187,12 +187,12 @@ subtest dangling_exists => sub {
 	test_out( "not ok 1 - $test_name" );
 	test_out( "not ok 2 - readable_sym is a symlink" );
 	test_diag(
-		"Symlink [$readable_sym] points to existing file [$readable] but shouldn't!\n" .
+		"symlink [$readable_sym] points to existing file [$readable] but shouldn't\n" .
 		"    #   Failed test '$test_name'\n" .
 		"    #   at $0 line " . line_num(+10) . "."
 		);
 	test_diag(
-		"Symlink [$readable_sym] points to existing file [$readable] but shouldn't!\n" .
+		"symlink [$readable_sym] points to existing file [$readable] but shouldn't\n" .
 		"    #   Failed test 'readable_sym is a symlink'\n" .
 		"    #   at $0 line " . line_num(+6) . "."
 		);

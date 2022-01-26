@@ -1,6 +1,11 @@
 History of user-visible changes for Math::BLAS.  -*- text -*-
 
 
+Version 1.02
+
+* Add blas_scale function.
+
+
 Version 1.01
 
 * Document Math::BLAS::PP.

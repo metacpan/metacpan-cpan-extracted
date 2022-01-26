@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = 1.001;
+our $VERSION = 1.003;
 
 use parent qw(Alien::Base);
 
@@ -21,7 +21,7 @@ Alien::libmaxminddb - Find or download and install libmaxminddb
 
 =head1 VERSION
 
-version 1.001
+version 1.003
 
 =head1 SYNOPSIS
 
@@ -46,7 +46,7 @@ Add the library to your F<dist.ini> if you use Dist::Zilla.
 
 =head1 DESCRIPTION
 
-L<DP-IP.com|https://db-ip.com/> and L<MaxMind|https://www.maxmind.com/>
+L<MaxMind|https://www.maxmind.com/> and L<DP-IP.com|https://db-ip.com/>
 provide geolocation databases in the MaxMind DB file format format.  This Perl
 module finds or downloads and installs the C library
 L<libmaxminddb|https://github.com/maxmind/libmaxminddb>, which can read
@@ -66,11 +66,12 @@ None.
 
 =head1 DEPENDENCIES
 
-Requires L<Alien::Build> from CPAN.  On Windows, L<Alien::MSYS> needs to be
-installed.
+Requires L<Alien::Build> from CPAN.
 
 Install the package C<libmaxminddb-devel> or C<libmaxminddb-dev> if you would
 like to use your operating system's libmaxminddb library.
+
+Windows is not supported.  Please do not ask for Windows support.
 
 =head1 INCOMPATIBILITIES
 
@@ -78,7 +79,7 @@ None.
 
 =head1 SEE ALSO
 
-L<Alien::Base>
+L<Alien::Base>, L<IP::Geolocation::MMDB>
 
 =head1 AUTHOR
 

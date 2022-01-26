@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{mb::JSON},
-    'VERSION'   => q{0.02},
+    'VERSION'   => q{0.03},
     'ABSTRACT'  => q{a simple JSON parser for multibyte string},
     'PREREQ_PM' => {
         'ExtUtils::MakeMaker' => '5.4302',

@@ -80,6 +80,15 @@ my %WriteMakefile = (
 				web    => "$github/issues",
 				},
 			homepage => $github,
+			doi => '10.5281/zenodo.5904392',
+			authors => [{
+				name     => 'brian d foy',
+				email    => 'bdfoy@cpan.org',
+				github   => 'https://github.com/briandfoy',
+				twitter  => 'https://twitter.com/briandfoy_perl',
+				linkedin => 'https://www.linkedin.com/in/briandfoy/',
+				orc_id   => '0000-0002-0283-8283',
+				}],
 			},
 		},
 

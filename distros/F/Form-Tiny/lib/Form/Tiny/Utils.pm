@@ -6,11 +6,12 @@ use warnings;
 use Exporter qw(import);
 use Carp qw(croak);
 
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 our @EXPORT;
 our @EXPORT_OK = qw(
 	try
 	trim
+	uniq
 	create_anon_form_meta
 	create_form_meta
 	get_package_form_meta
@@ -54,6 +55,12 @@ sub trim
 	return $value;
 }
 
+sub uniq
+{
+	my %seen;
+	return grep { !$seen{$_}++ } @_;
+}
+
 # FORM METADATA
 my $meta_class = 'Form::Tiny::Meta';
 my %meta;
@@ -63,11 +70,7 @@ sub create_anon_form_meta
 	my (@roles) = @_;
 	require Form::Tiny::Meta;
 	my $meta = $meta_class->new;
-
-	require Moo::Role;
-	Moo::Role->apply_roles_to_object(
-		$meta, @roles
-	) if scalar @roles;
+	$meta->set_meta_roles([@roles]);
 
 	return $meta;
 }
@@ -80,6 +83,7 @@ sub create_form_meta
 		if exists $meta{$package};
 
 	$meta{$package} = create_anon_form_meta(@roles);
+	$meta{$package}->set_package($package);
 
 	return $meta{$package};
 }
@@ -101,10 +105,14 @@ sub get_package_form_meta
 			@{"${package_name}::ISA"};
 		};
 
-		foreach my $parent (@parents) {
-			$form_meta->inherit_from($parent->form_meta)
-				if $parent->DOES('Form::Tiny::Form');
-		}
+		my @real_parents = grep { $_->DOES('Form::Tiny::Form') } @parents;
+
+		croak 'Form::Tiny does not support multiple inheritance'
+			if @real_parents > 1;
+
+		my ($parent) = @real_parents;
+		$form_meta->inherit_roles_from($parent ? $parent->form_meta : undef);
+		$form_meta->inherit_from($parent->form_meta) if $parent;
 		$form_meta->setup;
 	}
 

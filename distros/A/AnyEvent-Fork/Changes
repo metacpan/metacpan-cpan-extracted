@@ -4,6 +4,14 @@ TODO: many forks in a row fail to fork all
 TODO: $AnyEvent::Fork::Template vs. $TEMPLATE
 TODO: $AnyEvent::Fork::Serve::OWNER expose somehow?
 
+1.32 Wed 26 Jan 2022 17:42:30 CET
+	- new strategy for reaping children: as local $SIG{CHLD} will
+          reset rather than restore signal handlers, we try to reap
+          children manually in the fork server. This might cause zombies
+          to stay around for a long time in case there is a race and
+          no further activity, but perls signal handling is just too
+          broken to have other options.
+
 1.31 Thu Nov 10 17:30:45 CET 2016
 	- new child API function, AnyEvent::Fork::Serve::run_args.
 	- put pid first in child names.

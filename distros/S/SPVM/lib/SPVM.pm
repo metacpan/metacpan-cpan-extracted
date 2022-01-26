@@ -18,7 +18,7 @@ use SPVM::ExchangeAPI;
 
 use Carp 'confess';
 
-our $VERSION = '0.9125';
+our $VERSION = '0.9129';
 
 my $SPVM_INITED;
 my $BUILDER;
@@ -30,39 +30,27 @@ my $loaded_spvm_modules = {};
 
 sub import {
   my ($class, $class_name) = @_;
+  
+  unless (defined $class_name) {
+    return;
+  }
+  
+  my ($file, $line) = (caller)[1, 2];
 
   unless ($BUILDER) {
     my $build_dir = $ENV{SPVM_BUILD_DIR};
     $BUILDER = SPVM::Builder->new(build_dir => $build_dir, include_dirs => [@INC]);
   }
 
-  # Add class informations
-  if (defined $class_name) {
-    $class_name =~ s/^SPVM:://;
-    
-    my ($file, $line) = (caller)[1, 2];
-
-    # Compile SPVM source code and create runtime env
-    my $compile_success = $BUILDER->compile_spvm($class_name, $file, $line);
-    
-    unless ($compile_success) {
-      exit(255);
-    }
-    if ($compile_success) {
-      my $added_class_names = $BUILDER->get_added_class_names;
-      for my $added_class_name (@$added_class_names) {
-        
-        # Build Precompile classs - Compile C source codes and link them to SPVM precompile method
-        $BUILDER->build_and_bind_shared_lib($added_class_name, 'precompile');
-
-        # Build native classs - Compile C source codes and link them to SPVM native method
-        $BUILDER->build_and_bind_shared_lib($added_class_name, 'native');
-      }
-
-      # Bind SPVM method to Perl
-      bind_to_perl($BUILDER, $added_class_names);
-    }
+  my $build_success = $BUILDER->build($class_name, $file, $line);
+  unless ($build_success) {
+    exit(255);
   }
+
+  my $added_class_names = $BUILDER->get_added_class_names;
+
+  # Bind SPVM method to Perl
+  bind_to_perl($BUILDER, $added_class_names);
 }
 
 sub init {
@@ -294,7 +282,7 @@ SPVM - Static Perl Virtual Machine. Fast Calculation, Fast Array Operation, and 
 
 =head1 CAUTHION
 
-B<L<SPVM> is yet before 1.0 released. L<SPVM> is changed without warnings. There will be quite a lot of changes until I feel enough good.>
+B<L<SPVM> is not yet 1.0. Please note L<SPVM> can change without warnings. There can be a lot of changes until I feel good enough.>
 
 =head1 SYNOPSIS
 
@@ -313,7 +301,7 @@ SPVM Module:
     }
   }
 
-Call SPVM method from Perl
+Call SPVM method from Perl:
 
   # spvm.pl
   use strict;
@@ -352,13 +340,13 @@ Precompiled SPVM Method. This code is converted to C language and then converted
 
 =head1 DESCRIPTION
 
-SPVM is Static Perl Virtual Machine. SPVM is a programming language which has Perlish syntax. SPVM provides fast Calculation & easy C/C++ Binding.
+SPVM is a Static Perl Virtual Machine. SPVM is a programming language which has Perlish syntax. SPVM provides fast Calculation & easy C/C++ Binding.
 
 =head1 FEATURES
 
 =over 4
 
-=item * Fast culcuration, Fast array operation
+=item * Fast calculation, Fast array operation
 
 =item * Precompile Method, Easy way to C/C++ binding, C99 math functions
 
@@ -406,7 +394,7 @@ SPVM Standard Functions
 
 =head2 Standard Modules
 
-SPVM Starndard Modules.
+SPVM Standard Modules.
 
 =over 2
 
@@ -424,9 +412,9 @@ SPVM Performance Benchmark.
 
 =back
 
-=head2 Exchagne API
+=head2 Exchange API
 
-SPVM Exchange API is APIs which convert Perl data structures to SPVM data structures, and the reverse.
+SPVM Exchange API converts Perl data structures to SPVM data structures, and vice versa.
 
 =over 2
 
@@ -436,7 +424,7 @@ SPVM Exchange API is APIs which convert Perl data structures to SPVM data struct
 
 =head2 Native API
 
-SPVM Native APIs is C APIs used in SPVM native method.
+SPVM Native API is C API used in SPVM native method.
 
 =over 2
 
@@ -476,7 +464,7 @@ Force L<SVPM::Builder::CC> compile and link.
 
 =head1 CAUTION
 
-This release is beta release before SPVM 1.0. The features is changed without warnings.
+This release is a beta release before SPVM 1.0. The features can change without notice. Use at your own risk.
 
 =head1 REPOSITORY
 
@@ -498,7 +486,7 @@ Yuki Kimoto E<lt>kimoto.yuki@gmail.comE<gt>
 
 motiE<lt>motohiko.ave@gmail.comE<gt>
 
-=head1 CONTRIBUTERS
+=head1 CONTRIBUTORS
 
 =over 2
 

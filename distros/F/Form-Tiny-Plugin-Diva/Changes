@@ -1,0 +1,8 @@
+Revision history for Perl extension Form::Tiny::Plugin::Diva.
+
+1.01 Sun Jan 23 2022
+	- fix "t" as a shortcut for "type" in field data
+
+1.00 Sat Jan 22 2022
+	- initial version
+

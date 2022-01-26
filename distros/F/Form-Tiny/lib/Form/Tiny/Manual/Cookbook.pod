@@ -91,3 +91,33 @@ For a bit more roboust solution, you can include untranslated strings in C<messa
 
 This will also translate any error you add manually in other hooks.
 
+=head2 Creating a role plugin
+
+It is possible to create a single package plugin that will mix in a role into the form class:
+
+	package Form::Tiny::Plugin::MyRolePlugin;
+
+	use strict;
+	use warnings;
+
+	use parent 'Form::Tiny::Plugin';
+
+	sub plugin
+	{
+		my ($self, $caller, $context) = @_;
+
+		return {
+			roles => [__PACKAGE__],
+		}
+	}
+
+	use Moo::Role;
+
+	sub some_method
+	{
+		...
+	}
+
+	1;
+
+The late import of L<Moo::Role> prevents the C<plugin> method from being mixed in along with C<some_method>.

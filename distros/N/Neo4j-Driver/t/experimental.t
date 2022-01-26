@@ -20,7 +20,7 @@ my $s = $driver->session;
 # those features or moved elsewhere once the features are documented
 # and thus officially supported.
 
-use Test::More 0.96 tests => 13 + 1;
+use Test::More 0.96 tests => 12 + 1;
 use Test::Exception;
 use Test::Warnings qw(warnings);
 
@@ -338,37 +338,6 @@ END
 	warnings { is $r->get_bool(6), undef, 'get_bool false'; };
 	warnings { ok $r->get_bool(5), 'get_bool true'; };
 	warnings { is $r->get_bool(3), 0, 'get_bool 0'; };
-};
-
-
-subtest 'graph queries' => sub {
-	plan tests => 8;
-	TODO: { local $TODO = 'graph response not yet implemented for Bolt' if $Neo4j_Test::bolt;
-	my $t = $driver->session->begin_transaction;
-	$t->{return_graph} = 1;
-	$q = <<END;
-CREATE ({name:'Alice'})-[k:KNOWS{since:1978}]->({name:'Bob'}) RETURN id(k)
-END
-	lives_ok { $r = $t->run($q)->single->get(0); } 'create graph';
-	$q = <<END;
-MATCH (a)-[b:KNOWS]->(c) WHERE id(b) = {id} RETURN a, b, c LIMIT 1
-END
-	lives_and { ok $r = $t->run($q, id => $r); } 'match graph';
-	local $TODO = 'graph response not yet implemented for Jolt' if ref $r eq 'Neo4j::Driver::Result::Jolt';
-	lives_ok { $r = $r->single; } 'single';
-	my ($n, $e);
-	lives_ok { $n = $r->{graph}->{nodes}; } 'got nodes';
-	lives_ok { $e = $r->{graph}->{relationships}; } 'got rels';
-	lives_and {
-		ok grep {$_->{properties}->{name} eq $r->get('a')->get('name')} @$n;
-	} 'node a found';
-	lives_and {
-		is $e->[0]->{properties}->{since}, $r->get('b')->get('since');
-	} 'rel b found';
-	lives_and {
-		ok grep {$_->{properties}->{name} eq $r->get('c')->get('name')} @$n;
-	} 'node c found';
-	}
 };
 
 

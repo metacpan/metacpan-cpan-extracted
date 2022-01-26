@@ -1,6 +1,8 @@
 ^\.travis\.yml
 ^\.appveyor\.yml
+^\.github/workflows/testsuite\.yml
 ^\.config
+^\.gdbinit
 \bGD-\d+
 \bGD\.c$
 ^MYMETA\.yml$

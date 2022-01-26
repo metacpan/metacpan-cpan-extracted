@@ -1,0 +1,120 @@
+; This file is generated from dist.ini.baked ( in the source repository ) by Dist::Zilla::Plugin::INI::Baked.
+; It exists for your convenience for development if you need it.
+; You should edit dist.ini.baked in the source repository for any long term changes
+name = Dist-Zilla-PluginBundle-Author-GEEKRUTH
+author = D Ruth Holloway <ruth@hiruthie.me>
+license = Perl_5
+
+[Git::Contributors]
+
+[ContributorsFile]
+
+[Test::Compile]
+
+[CoalescePod]
+
+[MakeMaker]
+
+[InstallGuide]
+
+[Covenant]
+
+[ContributorCovenant]
+
+[GitLab::Update]
+
+[GitLab::Meta]
+p3rl = 1
+metacpan = 0
+
+[MetaYAML]
+
+[MetaJSON]
+
+[PodWeaver]
+
+[License]
+
+[NextRelease]
+time_zone = America/New_York
+
+[MetaProvides::Package]
+
+[MetaData::BuiltWith]
+
+[Manifest]
+
+[ManifestSkip]
+
+[Git::GatherDir]
+
+[CopyFilesFromBuild]
+
+[ExecDir]
+
+[OurPkgVersion]
+
+[INI::Baked]
+
+[Authority]
+locate_comment = 1
+
+[Test::ReportPrereqs]
+
+[TidyAll]
+
+[CheckChangesHasContent]
+
+[ReadmeMarkdownFromPod]
+
+[TestRelease]
+
+[ConfirmRelease]
+
+[Git::Check]
+
+[CopyrightYearFromGit]
+
+[PreviousVersion::Changelog]
+
+[NextVersion::Semantic]
+major = MAJOR, API CHANGE
+minor = MINOR, ENHANCEMENTS
+revision = REVISION, BUG FIXES
+format = %d.%02d%02d
+
+[ChangeStats::Git]
+group = STATISTICS
+develop_branch = main
+
+[Git::CommitBuild]
+release_branch = releases
+multiple_inheritance = 1
+
+[Git::Tag]
+tag_format = v%v
+branch = releases
+
+[Git::Commit]
+
+[UploadToCPAN]
+
+[Git::Push]
+push_to = origin main releases
+
+[InstallRelease]
+install_command = cpanm .
+
+[SchwartzRatio]
+
+[RunExtraTests]
+
+[Test::UnusedVars]
+
+[CPANFile]
+
+[MinimumPerl]
+
+[AutoPrereqs]
+
+[Prereqs::Plugins]

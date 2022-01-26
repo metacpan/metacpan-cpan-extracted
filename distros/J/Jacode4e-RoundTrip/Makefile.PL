@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{Jacode4e::RoundTrip},
-    'VERSION'   => q{2.13.81.11},
+    'VERSION'   => q{2.13.81.12},
     'ABSTRACT'  => q{Jacode4e for round-trip conversion in JIS X 0213},
     'PREREQ_PM' => {
         'ExtUtils::MakeMaker' => '5.4302',
@@ -14,8 +14,9 @@ WriteMakefile(
         'FindBin' => '1.42',
         'Socket' => '0',
         'lib' => '0',
-        'perl' => '5.005_03',
+        'perl' => '5.00503',
         'strict' => '1.01',
+        'vars' => '0',
     },
     'AUTHOR'    => q{ina <ina@cpan.org>},
 );

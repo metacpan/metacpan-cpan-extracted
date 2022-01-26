@@ -1,3 +1,8 @@
+0.003   2022-01-16  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Enable Screen 0.018's colorize_tags option.
+
+
 0.002    2020-03-10  Released-By: PERLANCAR; Urgency: low
 
          - No functional changes.

@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 use parent qw(Pod::Simple);
 
@@ -302,7 +302,7 @@ CPANPLUS::Dist::Debora::Pod - Parse Pod documents
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

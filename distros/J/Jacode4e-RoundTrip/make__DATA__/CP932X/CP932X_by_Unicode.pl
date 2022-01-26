@@ -35,7 +35,7 @@ printf DUMP "%-8s %-9s %-8s %-4s %-8s \n", $CP932X_by_Unicode{$unicode}, $unicod
         $done{$CP932X_by_Unicode{$unicode} = CP932_by_Unicode($unicode)} = 1;
 printf DUMP "%-8s %-9s %-8s %-4s %-8s \n", $CP932X_by_Unicode{$unicode}, $unicode, '----', $CP932X_by_Unicode{$unicode}, '----';
     }
-    elsif ((ShiftJIS2004_by_Unicode($unicode) ne '') and not $done{ShiftJIS2004_by_Unicode($unicode)}) {
+    elsif ((ShiftJIS2004_by_Unicode($unicode) ne '') and not $done{'9C5A' . ShiftJIS2004_by_Unicode($unicode)}) {
         $done{$CP932X_by_Unicode{$unicode} = '9C5A' . ShiftJIS2004_by_Unicode($unicode)} = 1;
 printf DUMP "%-8s %-9s %-8s %-4s %-8s \n", $CP932X_by_Unicode{$unicode}, $unicode, '----', '----', $CP932X_by_Unicode{$unicode};
     }

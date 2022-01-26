@@ -8,18 +8,15 @@ my $online_tests;
 
 if($ENV{AUTHOR_TESTING}) {
 	$online_tests = are_online();
-} elsif($ENV{AUTOMATED_TESTING} || $ENV{NO_NETWORK_TESTING} || (!-t STDIN)) {
-	$online_tests = 0;
 } else {
 	Getopt::Long::GetOptions('online-tests!' => \$online_tests);
 
 	if(!defined($online_tests)) {
-		if($ENV{AUTHOR_TESTING}) {
-			$online_tests = are_online();
-		} else {
-			print "On-line tests have been disabled\n";
-			$online_tests = 0;
-		}
+		$online_tests = are_online();
+	}
+	if(!$online_tests) {
+		print "On-line tests have been disabled\n";
+		$online_tests = 0;
 	}
 }
 
@@ -35,6 +32,7 @@ if($online_tests) {
 	# $test_requires->{'Geo::Coder::Google::V3'} = 0.10;
 	$test_requires->{'Geo::Coder::OSM'} = 0;
 	$test_requires->{'Geo::Coder::CA'} = 0;
+	$test_requires->{'Geo::Coder::DataScienceToolkit'} = 0;
 	$test_requires->{'Geo::Coder::OpenCage'} = 0;
 	$test_requires->{'Geo::Coder::GeocodeFarm'} = 0;
 	$test_requires->{'Geo::Coder::Ovi'} = 0;
@@ -74,8 +72,7 @@ WriteMakefile(
 			type => 'git',
 			url => 'git://github.com/nigelhorne/Geo-Coder-List.git',
 			web => 'https://github.com/nigelhorne/Geo-Coder-List',
-    		},
-		bugtracker => {
+    		}, bugtracker => {
 			web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-List',
 			mailto => 'bug-Geo-Coder-List@rt.cpan.org'
 		}
@@ -86,11 +83,19 @@ WriteMakefile(
 
 sub are_online
 {
+	return 0 if($ENV{'NO_NETWORK_TESTING'});
+	return 0 if(!-t STDIN);
+
 	my $s = IO::Socket::INET->new(
 		PeerAddr => 'openstreetmap.org:443',
 		Timeout => 10
 	);
 	if($s) {
+		if($ENV{'PERL_MM_USE_DEFAULT'} || $ENV{'AUTOMATED_TESTING'}) {
+			close($s);
+			return 1;
+		}
+
 		print <<EOF;
 
 You appear to be directly connected to the Internet.  I have some tests
@@ -112,8 +117,7 @@ EOF
 			return 1;	# The default is 'y'
 		}
 		return $rc;
-	} else {
-		print "On-line tests disabled because I couldn't detect an Internet connexion\n";
-		return 0;
 	}
+	print "On-line tests disabled because I couldn't detect an Internet connexion\n";
+	return 0;
 }

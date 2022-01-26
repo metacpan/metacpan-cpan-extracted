@@ -29,7 +29,7 @@ use strict;
 use GD;
 use Symbol 'gensym','qualify_to_ref';
 use vars '$VERSION';
-$VERSION = '2.73';
+$VERSION = '2.75';
 
 =head1 NAME
 
@@ -40,6 +40,47 @@ GD::Image - Image class for the GD image library
 See L<GD>
 
 =head1 DESCRIPTION
+
+Supported Image formats:
+
+=over 4
+
+!NO!SUBS!
+
+print OUT "=item Png\n\n" if $DEFINES =~ /HAVE_PNG/;
+print OUT "=item Gif\n\n" if $DEFINES =~ /HAVE_GIF/;
+print OUT "=item Gd\n\n=item Gd2\n\n" if $DEFINES =~ /HAVE_GD2/;
+print OUT "=item Jpeg\n\n" if $DEFINES =~ /HAVE_JPEG/;
+print OUT "=item Tiff\n\n" if $DEFINES =~ /HAVE_TIFF/;
+print OUT "=item Xpm\n\n" if $DEFINES =~ /HAVE_XPM/;
+print OUT "=item WBMP\n\n" if 1 or $DEFINES =~ /HAVE_WBMP/;
+print OUT "=item GifAnim\n\n" if $DEFINES =~ /HAVE_ANIMGIF/;
+print OUT "=item Webp\n\n" if $DEFINES =~ /HAVE_WEBP/;
+print OUT "=item Heif\n\n" if $DEFINES =~ /HAVE_HEIF/;
+print OUT "=item Avif\n\n" if $DEFINES =~ /HAVE_AVIF/;
+
+print OUT << '!NO!SUBS!';
+=back
+
+Unsupported Image formats:
+
+=over 4
+
+!NO!SUBS!
+
+print OUT "=item Png\n\n" if $DEFINES !~ /HAVE_PNG/;
+print OUT "=item Gif\n\n" if $DEFINES !~ /HAVE_GIF/;
+print OUT "=item Gd\n\n=item Gd2\n\n" if $DEFINES !~ /HAVE_GD2/;
+print OUT "=item Jpeg\n\n" if $DEFINES !~ /HAVE_JPEG/;
+print OUT "=item Tiff\n\n" if $DEFINES !~ /HAVE_TIFF/;
+print OUT "=item Xpm\n\n" if $DEFINES !~ /HAVE_XPM/;
+print OUT "=item GifAnim\n\n" if $DEFINES !~ /HAVE_ANIMGIF/;
+print OUT "=item Webp\n\n" if $DEFINES !~ /HAVE_WEBP/;
+print OUT "=item Heif\n\n" if $DEFINES !~ /HAVE_HEIF/;
+print OUT "=item Avif\n\n" if $DEFINES !~ /HAVE_AVIF/;
+
+print OUT << '!NO!SUBS!';
+=back
 
 See L<GD>
 
@@ -120,30 +161,6 @@ sub newPalette {
   return $pack->_new(@_, 0);
 }
 
-sub newFromGd {
-    croak("Usage: newFromGd(class,filehandle)") unless @_==2;
-    my($class,$f) = @_;
-    my $fh = $class->_make_filehandle($f);
-    binmode($fh);
-    $class->_newFromGd($fh);
-}
-
-sub newFromGd2 {
-    croak("Usage: newFromGd2(class,filehandle)") unless @_==2;
-    my($class,$f) = @_;
-    my $fh = $class->_make_filehandle($f);
-    binmode($fh);
-    $class->_newFromGd2($fh);
-}
-
-sub newFromGd2Part {
-    croak("Usage: newFromGd2(class,filehandle,srcX,srcY,width,height)") unless @_==6;
-    my($class,$f) = splice(@_,0,2);
-    my $fh = $class->_make_filehandle($f);
-    binmode($fh);
-    $class->_newFromGd2Part($fh,@_);
-}
-
 sub ellipse ($$$$$) {
   my ($self,$cx,$cy,$width,$height,$color) = @_;
   $self->arc($cx,$cy,$width,$height,0,360,$color);
@@ -179,6 +196,15 @@ sub _image_type {
   return 'Gif'  if $magic eq "GIF8";
   return 'Gd2'  if $magic eq "gd2\000";
   return 'Xpm'  if substr($data,0,9) eq "/* XPM */";
+  return 'Webp' if substr($data,0,12) eq "RIFF2\0\0\0WEBP";
+  return 'Heif' if $magic eq '\000\000\000\030'
+                and substr($data,4,4) eq "ftyp"
+                and (substr($data,8,4) eq "heic"
+                  or substr($data,8,4) eq "heix");
+  return 'Avif' if $magic eq '\000\000\000\030'
+                and substr($data,4,4) eq "ftyp"
+                and (substr($data,8,4) eq "avif"
+                  or substr($data,8,4) eq "mif1");
   return;
 }
 
@@ -209,6 +235,34 @@ sub newFromPng {
 !NO!SUBS!
 }
 
+if ($DEFINES =~ /HAVE_GD2/) {
+  print OUT <<'!NO!SUBS!'
+sub newFromGd {
+    croak("Usage: newFromGd(class,filehandle)") unless @_==2;
+    my($class,$f) = @_;
+    my $fh = $class->_make_filehandle($f);
+    binmode($fh);
+    $class->_newFromGd($fh);
+}
+
+sub newFromGd2 {
+    croak("Usage: newFromGd2(class,filehandle)") unless @_==2;
+    my($class,$f) = @_;
+    my $fh = $class->_make_filehandle($f);
+    binmode($fh);
+    $class->_newFromGd2($fh);
+}
+
+sub newFromGd2Part {
+    croak("Usage: newFromGd2(class,filehandle,srcX,srcY,width,height)") unless @_==6;
+    my($class,$f) = splice(@_,0,2);
+    my $fh = $class->_make_filehandle($f);
+    binmode($fh);
+    $class->_newFromGd2Part($fh,@_);
+}
+!NO!SUBS!
+}
+
 if ($DEFINES =~ /HAVE_JPEG/) {
   print OUT <<'!NO!SUBS!'
 sub newFromJpeg {
@@ -226,12 +280,25 @@ sub newFromJpeg {
 if ($DEFINES =~ /HAVE_GIF/) {
   print OUT <<'!NO!SUBS!'
 sub newFromGif {
-    croak("Usage: newFromGif(class,filehandle,[truecolor])") unless @_>=2;
+    croak("Usage: newFromGif(class,filehandle)") unless @_==2;
     my($class) = shift;
     my($f)     = shift;
     my $fh = $class->_make_filehandle($f);
     binmode($fh);
     $class->_newFromGif($fh,@_);
+}
+
+!NO!SUBS!
+}
+
+if ($DEFINES =~ /HAVE_TIFF/) {
+  print OUT <<'!NO!SUBS!'
+sub newFromTiff {
+    croak("Usage: newFromTiff(class,filehandle)") unless @_==2;
+    my($class,$f) = @_;
+    my $fh = $class->_make_filehandle($f);
+    binmode($fh);
+    $class->_newFromTiff($fh);
 }
 
 !NO!SUBS!
@@ -250,9 +317,62 @@ sub newFromXbm {
 !NO!SUBS!
 }
 
-print OUT <<'!NO!SUBS!';
+if ($DEFINES =~ /HAVE_TIFF/) {
+  print OUT <<'!NO!SUBS!'
+sub newFromXbm {
+    croak("Usage: newFromTiff(class,filehandle)") unless @_==2;
+    my($class,$f) = @_;
+    my $fh = $class->_make_filehandle($f);
+    binmode($fh);
+    $class->_newFromTiff($fh);
+}
+
+!NO!SUBS!
+}
+
+if ($DEFINES =~ /HAVE_WEBP/) {
+  print OUT <<'!NO!SUBS!'
+sub newFromWebp {
+    croak("Usage: newFromWebp(class,filehandle)") unless @_==2;
+    my($class,$f) = @_;
+    my $fh = $class->_make_filehandle($f);
+    binmode($fh);
+    $class->_newFromWebp($fh);
+}
+
+!NO!SUBS!
+}
+
+if ($DEFINES =~ /HAVE_HEIF/) {
+  print OUT <<'!NO!SUBS!'
+sub newFromHeif {
+    croak("Usage: newFromHeif(class,filehandle)") unless @_==2;
+    my($class,$f) = @_;
+    my $fh = $class->_make_filehandle($f);
+    binmode($fh);
+    $class->_newFromHeif($fh);
+}
+
+!NO!SUBS!
+}
+
+if ($DEFINES =~ /HAVE_AVIF/) {
+  print OUT <<'!NO!SUBS!'
+sub newFromHeif {
+    croak("Usage: newFromAvif(class,filehandle)") unless @_==2;
+    my($class,$f) = @_;
+    my $fh = $class->_make_filehandle($f);
+    binmode($fh);
+    $class->_newFromAvif($fh);
+}
+
+!NO!SUBS!
+}
+
+if (1 or $DEFINES =~ /HAVE_WBMP/) {
+  print OUT <<'!NO!SUBS!';
 sub newFromWBMP {
-    croak("Usage: newFromWBMP(class,filehandle,[truecolor])") unless @_>=2;
+    croak("Usage: newFromWBMP(class,filehandle)") unless @_==2;
     my($class) = shift;
     my($f)     = shift;
     my $fh = $class->_make_filehandle($f);
@@ -261,6 +381,7 @@ sub newFromWBMP {
 }
 
 !NO!SUBS!
+}
 
 print OUT <<'!NO!SUBS!';
 # Autoload methods go after __END__, and are processed by the autosplit program.

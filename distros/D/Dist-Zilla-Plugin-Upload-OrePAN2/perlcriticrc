@@ -1,0 +1,59 @@
+severity = 3
+verbose = 11
+program-extensions = pl psgi t pm
+
+#
+# Configure these behaviors
+#
+[CognitiveComplexity::ProhibitExcessCognitiveComplexity]
+info_level = 15
+warn_level = 25
+
+[InputOutput::RequireCheckedSyscalls]
+functions = :builtins
+exclude_functions = sleep print close
+
+[RegularExpressions::ProhibitComplexRegexes]
+max_characters = 200
+
+[Subroutines::ProhibitExcessComplexity]
+max_mccabe = 25
+
+[TestingAndDebugging::ProhibitNoStrict]
+allow = refs
+
+[TestingAndDebugging::ProhibitNoWarnings]
+allow = redefine
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Modern::Perl
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = Modern::Perl
+
+[ValuesAndExpressions::ProhibitInterpolationOfLiterals]
+allow_if_string_contains_single_quote = 1
+
+[Variables::ProhibitPackageVars]
+add_packages = Carp Test::Builder
+
+#
+# Turn these off!
+#
+
+# This incorrectly thinks signatures are prototypes.
+[-Subroutines::ProhibitSubroutinePrototypes]
+
+# No need for /xsm everywhere
+[-RegularExpressions::RequireDotMatchAnything]
+[-RegularExpressions::RequireExtendedFormatting]
+[-RegularExpressions::RequireLineBoundaryMatching]
+
+# http://stackoverflow.com/questions/2275317/why-does-perlcritic-dislike-using-shift-to-populate-subroutine-variables
+[-Subroutines::RequireArgUnpacking]
+
+# Explicitly returning undef is a _good_ thing in many cases, since it
+# prevents very common errors when using a sub in list context to construct a
+# hash and ending up with a missing value or key.
+[-Subroutines::ProhibitExplicitReturnUndef]
+

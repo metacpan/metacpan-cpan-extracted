@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2021 Aspose.Cells Cloud
+Copyright (c) 2022 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -134,6 +134,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'source_storage' => {
+    	datatype => 'string',
+    	base_name => 'SourceStorage',
+    	description => '',
+    	format => '',
+    	read_only => '',
+    		},
     'match_condition' => {
     	datatype => 'MatchConditionRequest',
     	base_name => 'MatchCondition',
@@ -155,6 +162,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'out_storage' => {
+    	datatype => 'string',
+    	base_name => 'OutStorage',
+    	description => '',
+    	format => '',
+    	read_only => '',
+    		},
     'save_options' => {
     	datatype => 'SaveOptions',
     	base_name => 'SaveOptions',
@@ -166,17 +180,21 @@ __PACKAGE__->method_documentation({
 
 __PACKAGE__->swagger_types( {
     'source_folder' => 'string',
+    'source_storage' => 'string',
     'match_condition' => 'MatchConditionRequest',
     'format' => 'string',
     'out_folder' => 'string',
+    'out_storage' => 'string',
     'save_options' => 'SaveOptions'
 } );
 
 __PACKAGE__->attribute_map( {
     'source_folder' => 'SourceFolder',
+    'source_storage' => 'SourceStorage',
     'match_condition' => 'MatchCondition',
     'format' => 'Format',
     'out_folder' => 'OutFolder',
+    'out_storage' => 'OutStorage',
     'save_options' => 'SaveOptions'
 } );
 

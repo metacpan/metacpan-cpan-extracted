@@ -132,7 +132,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.148';
+our $VERSION = '0.149';
 our @EXPORT_OK = qw{
     shell
 
@@ -305,6 +305,10 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	oneweb		=> { name => 'OneWeb TLEs',	rms => 1 },
 	planet		=> {
 	    name	=> 'Planet TLEs (no, not Mercury etc)',
+	    rms		=> 1,
+	},
+	iridium		=> {
+	    name	=> 'Iridium Next',
 	    rms		=> 1,
 	},
 	# Project Kuiper Internet
@@ -6793,7 +6797,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2005-2021 by Thomas R. Wyant, III (F<wyant at cpan dot org>).
+Copyright 2005-2022 by Thomas R. Wyant, III (F<wyant at cpan dot org>).
 
 =head1 LICENSE
 

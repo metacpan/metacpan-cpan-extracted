@@ -1,6 +1,6 @@
 =begin comment
 
-Copyright (c) 2021 Aspose.Cells Cloud
+Copyright (c) 2022 Aspose.Cells Cloud
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -66,7 +66,7 @@ has version_info => ( is => 'ro',
                       isa => 'HashRef',
                       default => sub { {
                           app_name => 'Aspose.Cells Cloud SDK APIs.',
-                          app_version => '21.12',
+                          app_version => '22.1',
                           generator_class => 'io.swagger.codegen.languages.PerlClientCodegen',
                       } },
                       documentation => 'Information about the application version and the codegen codebase version'
@@ -124,7 +124,7 @@ sub _build_af {
 
 AsposeCellsCloud::Role - a Moose role for the Aspose.Cells Cloud SDK APIs.
 
-=head2 Aspose.Cells Cloud SDK APIs. version: 21.12
+=head2 Aspose.Cells Cloud SDK APIs. version: 22.1
 
 =head1 VERSION
 

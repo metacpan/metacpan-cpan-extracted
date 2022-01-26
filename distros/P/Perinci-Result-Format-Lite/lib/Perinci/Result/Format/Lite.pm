@@ -1,19 +1,20 @@
+## no critic: Subroutines::ProhibitSubroutinePrototypes
 package Perinci::Result::Format::Lite;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-01'; # DATE
-our $DIST = 'Perinci-Result-Format-Lite'; # DIST
-our $VERSION = '0.281'; # VERSION
-
 use 5.010001;
+use strict;
 #IFUNBUILT
-# use strict;
 # use warnings;
 #END IFUNBUILT
 
+use Exporter qw(import);
 use List::Util qw(first max);
 
-use Exporter qw(import);
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-01-21'; # DATE
+our $DIST = 'Perinci-Result-Format-Lite'; # DIST
+our $VERSION = '0.283'; # VERSION
+
 our @EXPORT_OK = qw(format);
 
 # copy-pasted from List::MoreUtils::PP
@@ -230,6 +231,8 @@ sub __gen_table {
     if ($format eq 'text-pretty') {
       ALIGN_COLUMNS:
         {
+            # note: the logic of this block of code now also put in Number::Pad
+
             # XXX we just want to turn off 'uninitialized' and 'negative repeat
             # count does nothing' from the operator x
             no warnings;
@@ -349,7 +352,12 @@ sub __gen_table {
         $backend //= "Text::Table::Org" if $ENV{INSIDE_EMACS};
         if ($backend) {
             require Text::Table::Any;
-            $fres = Text::Table::Any::table(rows=>$data, header_row=>$header_row, backend=>$backend);
+            $fres = Text::Table::Any::table(
+                rows => $data,
+                header_row => $header_row,
+                backend => $backend,
+                (title => $resmeta->{title}) x !!defined($resmeta->{title}),
+            );
         } else {
             require Text::Table::Sprintf;
             $fres = Text::Table::Sprintf::table(rows=>$data, header_row=>$header_row);
@@ -371,6 +379,12 @@ sub __gen_table {
                     } @$row)."\n";
             } @$data
         );
+    } elsif ($format eq 'tsv') {
+        no warnings 'uninitialized';
+        join("", map { my $row = $_; join("\t", @$row)."\n" } @$data);
+    } elsif ($format eq 'ltsv') {
+        no warnings 'uninitialized';
+        join("", map { my $row = $_; join("\t", map { "$columns[$_]:$row->[$_]" } 0 .. $#{$row})."\n" } @$data);
     } elsif ($format eq 'html') {
         no warnings 'uninitialized';
         require HTML::Entities;
@@ -417,7 +431,7 @@ sub __gen_table {
 sub format {
     my ($res, $format, $is_naked, $cleanse) = @_;
 
-    if ($format =~ /\A(text|text-simple|text-pretty|csv|html)\z/) {
+    if ($format =~ /\A(text|text-simple|text-pretty|csv|tsv|ltsv|html)\z/) {
         $format = $format eq 'text' ?
             ((-t STDOUT) ? 'text-pretty' : 'text-simple') : $format;
         no warnings 'uninitialized';
@@ -537,7 +551,7 @@ Perinci::Result::Format::Lite - Format enveloped result
 
 =head1 VERSION
 
-This document describes version 0.281 of Perinci::Result::Format::Lite (from Perl distribution Perinci-Result-Format-Lite), released on 2021-08-01.
+This document describes version 0.283 of Perinci::Result::Format::Lite (from Perl distribution Perinci-Result-Format-Lite), released on 2022-01-21.
 
 =head1 SYNOPSIS
 
@@ -581,14 +595,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Re
 
 Source repository is at L<https://github.com/perlancar/perl-Perinci-Result-Format-Lite>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Result-Format-Lite>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Perinci::Result::Format>, a more heavyweight version of this module.
@@ -599,11 +605,36 @@ L<Perinci::CmdLine::Lite> uses this module to format enveloped result.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2021, 2020, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Result-Format-Lite>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

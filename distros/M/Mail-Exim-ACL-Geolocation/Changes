@@ -1,5 +1,9 @@
 Revision history for Mail::Exim::ACL::Geolocation
 
+1.001  2022-01-25 17:28:55 CET
+
+  - Die with "OS unsupported" in Makefile.PL on Windows
+
 1.000  2022-01-09 15:23:05 CET
 
   - First version

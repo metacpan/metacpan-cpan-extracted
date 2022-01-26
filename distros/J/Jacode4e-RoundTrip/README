@@ -4,52 +4,80 @@ NAME
 
 SYNOPSIS
 
+    *** CAUTION ********************************
+      MUST USE SAME VERSION OF THIS SOFTWARE
+      BOTH CONVERTING "A to B" AND "B to A"
+      TO HAVE ROUND-TRIP CONVERSION.
+    ********************************************
+
     use FindBin;
     use lib "$FindBin::Bin/lib";
     use Jacode4e::RoundTrip;
+
     $return =
     Jacode4e::RoundTrip::convert(\$line, $OUTPUT_encoding, $INPUT_encoding [, { %option }]);
 
-RAISON D'ETRE
+    $return
+      Number of characters in $line
+ 
+    $line
+      String variable to convert
+      After conversion, this variable is overwritten
+ 
+    $OUTPUT_encoding, and $INPUT_encoding
+      To convert, you must specify both $OUTPUT_encoding and $INPUT_encoding.
+      The encodings you can specify are as follows:
+ 
+      mnemonic      means
+      -----------------------------------------------------------------------
+      cp932x        CP932X, Extended CP932 to JIS X 0213 using 0x9C5A as single shift
+      cp00930       IBM CP00930(CP00290+CP00300), CCSID 5026 katakana
+      keis78        HITACHI KEIS78
+      keis83        HITACHI KEIS83
+      keis90        HITACHI KEIS90
+      jef           FUJITSU JEF (12 point size for printing with option OUTPUT_SHIFTING)
+      jef9p         FUJITSU JEF ( 9 point size for printing with option OUTPUT_SHIFTING)
+      jipsj         NEC JIPS(J)
+      jipse         NEC JIPS(E)
+      letsj         UNISYS LetsJ
+      utf8          UTF-8.0 (aka UTF-8)
+      utf8.1        UTF-8.1
+      utf8jp        UTF-8-SPUA-JP, JIS X 0213 on SPUA ordered by JIS level, plane, row, cell
+      -----------------------------------------------------------------------
+ 
+      Round-trip conversion impossible, only for reference
+ 
+      mnemonic      means
+      -----------------------------------------------------------------------
+      cp932         Microsoft CP932, IANA Windows-31J
+      cp932ibm      IBM CP932
+      cp932nec      NEC CP932
+      sjis2004      JISC Shift_JIS-2004
+      -----------------------------------------------------------------------
+ 
+    %option
+      The options you can specify are as follows:
+ 
+      key mnemonic      value means
+      -----------------------------------------------------------------------
+      INPUT_LAYOUT      input record layout by 'S' and 'D' sequence
+                        'S' means one char as SBCS, 'D' means one char as DBCS
+                        each letter may optionally be followed by a number
+                        indicating the repeat count, see samples
+      OUTPUT_SHIFTING   true means use output shift code, false means not use
+                        default is false
+      SPACE             output space code in DBCS/MBCS
+      GETA              output geta code in DBCS/MBCS
+      OVERRIDE_MAPPING  hash reference of FROM => TO override mapping
+                        { "\x12\x34"=>"\x56\x78", "\x9A\xBC"=>"\xDE\xFE", }
+                        (CAUTION! override also SPACE option)
+      -----------------------------------------------------------------------
 
-    This software has been developed for use promotion of JIS X 0213.
-
-    Jacode4e::RoundTrip module can round-trip convert JIS X 0213 characters
-    in Japanese main-frames or enterprise servers each other, using its
-    user-defined area.
-
-    The encodings that can be round-trip converted are cp932x, cp00930,
-    keis78, keis83, keis90, jef, jef9p, jipsj, jipse, letsj, utf8, utf8.1,
-    and utf8jp.
-
-    This table shows shortage to support JIS X 0213 in each encoding
-    ---------------------------------------------------------------------
-                           Jacode4e  short-  user-def.  unused    free
-    mnemonic              supported     age       area    area    area
-    ---------------------------------------------------------------------
-    cp932x                   11,285       0         --      --      --
-    cp00930                  11,257      28      1,880      --   1,880
-    keis78, keis83, keis90    8,268   3,017      2,914     188   3,102
-    jef, jef9p                8,814   2,471      3,102      --   3,102
-    jipsj, jipse              8,637   2,648      3,948      --   3,948
-    letsj                     9,876   1,409      2,632      --   2,632
-    utf8, utf8.1             11,220      65      6,400      --   6,400
-    utf8jp                   11,285       0         --      --      --
-    ---------------------------------------------------------------------
-
-    cp00930 use 28 code points from its user-defined area. Similarly, keis78,
-    keis83, and keis90 use 3,017, jef and jef9p use 2,471, jipsj and jipse
-    use 2,648, letsj use 1,409, utf8 and utf8.1 use 65. In case of KEIS, user-
-    defined area is not enough to support JIS X 0213. So I decided to use
-    unused area.
-
-    Yes, you cannot use your gaiji on Jacode4e::RoundTrip module, you see.
-
-    Jacode4e::RoundTrip module doesn't work as Jacode4e. And Jacode4e module
-    doesn't work as Jacode4e::RoundTrip, too.
-
-    This software is useful for processing your JIS X 0213 data by other
-    system, and importing it again into your system.
+    *** CAUTION ********************************
+      MUST USE SAME VERSION OF THIS SOFTWARE
+      BOTH CONVERTING "A to B" AND "B to A"
+      TO HAVE ROUND-TRIP CONVERSION.
+    ********************************************
 
 WHAT IS "CP932X"?
 
@@ -68,32 +96,5 @@ WHAT IS "CP932X"?
 
 SUPPORTED PERL VERSIONS
 
-  perl version 5.005_03 to newest perl
-
-SEE ALSO
-
-    jcode.pl: Perl library for Japanese character code conversion, Kazumasa Utashiro
-    ftp://ftp.iij.ad.jp/pub/IIJ/dist/utashiro/perl/
-    http://web.archive.org/web/20090608090304/http://srekcah.org/jcode/
-    ftp://ftp.oreilly.co.jp/pcjp98/utashiro/
-    http://mail.pm.org/pipermail/tokyo-pm/2002-March/001319.html
-    https://twitter.com/uta46/status/11578906320
-
-    jacode - Perl program for Japanese character code conversion
-    https://metacpan.org/release/Jacode
-
-    Jacode4e - jacode.pl-like program for enterprise
-    https://metacpan.org/release/Jacode4e
-
-    Jacode4e::RoundTrip - Jacode4e for round-trip conversion in JIS X 0213
-    https://metacpan.org/release/Jacode4e-RoundTrip
-
-    mb - run Perl script in MBCS encoding (not only CJK ;-)
-    https://metacpan.org/release/mb
-
-    UTF8::R2 - makes UTF-8 scripting easy for enterprise use or LTS
-    https://metacpan.org/release/UTF8-R2
-
-    Perl7::Handy - Handy Perl7 scripting environment on Perl5
-    https://metacpan.org/release/Perl7-Handy
+    perl version 5.005_03 to newest perl
 

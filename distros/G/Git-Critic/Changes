@@ -1,0 +1,22 @@
+Revision history for Git-Critic
+
+0.4       2022-01-23 11:56:48 CET
+
+          - Bugfix: use `git show $target:$file` to get file contents to write to a
+            temp file.
+
+0.3       2022-01-23 11:27:53 CET
+
+          - Rename primary_branch and current_branch to primary_target and
+            current_target
+          - Document that you can target particular commits using the SHA-1
+          - Bugfix: push corrent critique onto reporting list, not entire
+            critique
+          - Add mention for Test::Perl::Critic::Progressive
+
+0.2       2022-01-22 15:51:53 CET
+          - Add sponsor information
+          - Add CONTRIBUTING.md document
+
+0.1       2022-01-22 15:29:56 CET
+          - Only critique lines changed in current branch

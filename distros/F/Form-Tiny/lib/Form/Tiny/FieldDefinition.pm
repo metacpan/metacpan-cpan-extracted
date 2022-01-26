@@ -17,7 +17,7 @@ use Form::Tiny::PathValue;
 
 use namespace::clean;
 
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 
 has "name" => (
 	is => "ro",
@@ -131,11 +131,7 @@ sub get_coerced
 
 	my $error = try sub {
 		if (ref $coerce eq "CODE") {
-			my @params = ($value);
-			unshift @params, $form
-				if $form->form_meta->consistent_api;
-
-			$coerced = $coerce->(@params);
+			$coerced = $coerce->($form, $value);
 		}
 		elsif ($coerce) {
 			$coerced = $self->type->coerce($value);
@@ -161,11 +157,7 @@ sub get_adjusted
 	my ($self, $form, $value) = @_;
 
 	if ($self->is_adjusted) {
-		my @params = ($value);
-		unshift @params, $form
-			if $form->form_meta->consistent_api;
-
-		return $self->adjust->(@params);
+		return $self->adjust->($form, $value);
 	}
 	return $value;
 }
@@ -210,14 +202,11 @@ sub validate
 
 	if (@errors == 0) {
 		my $validators = $self->addons->{validators} // [];
-		my @params = ($value);
-		unshift @params, $form
-			if $form->form_meta->consistent_api;
 
 		for my $validator (@{$validators}) {
 			my ($message, $code) = @{$validator};
 
-			if (!$code->(@params)) {
+			if (!$code->($form, $value)) {
 				push @errors, $message;
 			}
 		}
@@ -381,3 +370,4 @@ Checks if the field is hard-required (any of the two values which are allowed fo
 =head2 validate
 
 Validates a scalar value. Arguments are C<$parent_form, $field_value>. Returns a boolean, whether the validation passed.
+

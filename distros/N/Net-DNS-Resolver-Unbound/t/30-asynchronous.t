@@ -3,16 +3,9 @@
 
 use strict;
 use warnings;
-use Test::More tests => 3;
+use Test::More tests => 4;
 
 use Net::DNS::Resolver::Unbound;
-
-BEGIN {
-	local @INC = ( @INC, qw(t) );
-	require NonFatal;
-}
-
-NonFatalBegin();
 
 
 my $resolver = Net::DNS::Resolver::Unbound->new( debug_level => 0 );
@@ -26,9 +19,8 @@ sleep 1 if $resolver->bgbusy($handle);
 
 my $reply = $resolver->bgread($handle);
 ok( $reply, '$reselver->bgread($handle)' );
+is( $resolver->errorstring, '', 'empty $resolver->errorstring' );
 
-
-NonFatalEnd();
 
 exit;
 

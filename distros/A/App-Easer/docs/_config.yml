@@ -1,0 +1,27 @@
+title: 'App::Easer Tutorials'
+email: polettix@cpan.org
+description: 'Some tutorials for App::Easer.'
+baseurl: '/App-Easer'
+url: ''
+lang: en
+
+remote_theme: rundocs/jekyll-rtd-theme
+
+readme_index:
+  with_frontmatter: true
+
+additional:
+   metacpan_url: 'https://metacpan.org/pod/App::Easer'
+   license:
+      name: 'Apache 2.0'
+      url: https://github.com/polettix/App-Easer/blob/main/LICENSE
+
+exclude:
+  - Makefile
+  - Gemfile
+  - Gemfile.lock
+
+plugins:
+  - jemoji
+  - jekyll-avatar
+  - jekyll-mentions

@@ -106,6 +106,7 @@ t/summary.t
 t/transaction.t
 t/types.t
 xt/author/compatibility.t
+xt/author/cpan-distros.t
 xt/author/critic.t
 xt/author/internals.t
 xt/author/minimum-version.t

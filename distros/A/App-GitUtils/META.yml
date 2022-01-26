@@ -18,11 +18,12 @@ meta-spec:
 name: App-GitUtils
 requires:
   Cwd: '0'
-  Data::Sah::Compiler::perl::TH::str: '0'
+  Data::Sah::Compiler::perl::TH::str: '0.907'
   Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix: '0'
   Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix: '0'
   File::chdir: '0'
-  IPC::System::Options: '0.335'
+  IPC::System::Options: '0.339'
+  Log::ger: '0.038'
   Perinci::CmdLine::Any: '0.09'
   Sah::Schema::dirname: '0'
   perl: '5.010001'
@@ -32,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-GitUtils
   homepage: https://metacpan.org/release/App-GitUtils
   repository: git://github.com/perlancar/perl-App-GitUtils.git
-version: '0.080'
+version: '0.081'
 x_Dist_Zilla:
   perl:
     version: '5.030002'
@@ -40,11 +41,15 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::InsertBlock::FromModule
       name: InsertBlock::FromModule
-      version: '0.100'
+      version: '0.102'
     -
       class: Dist::Zilla::Plugin::InsertExecsList
       name: InsertExecsList
       version: '0.02'
+    -
+      class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
+      name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
@@ -116,7 +121,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.600'
+      version: '0.604'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -128,11 +133,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
-      version: '0.060'
+      version: '0.062'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
-      version: '0.040'
+      version: '0.043'
     -
       class: Dist::Zilla::Plugin::CheckChangeLog
       name: '@Author::PERLANCAR/CheckChangeLog'
@@ -153,6 +158,17 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/CheckSelfDependency'
       version: '0.011'
     -
+      class: Dist::Zilla::Plugin::Git::Contributors
+      config:
+        Dist::Zilla::Plugin::Git::Contributors:
+          git_version: 2.17.1
+          include_authors: 0
+          include_releaser: 1
+          order_by: name
+          paths: []
+      name: '@Author::PERLANCAR/Git::Contributors'
+      version: '0.036'
+    -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
       version: '0.006'
@@ -169,9 +185,9 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/MetaConfig'
       version: '6.014'
     -
-      class: Dist::Zilla::Plugin::Authority
-      name: '@Author::PERLANCAR/Authority'
-      version: '1.009'
+      class: Dist::Zilla::Plugin::PERLANCAR::Authority
+      name: '@Author::PERLANCAR/PERLANCAR::Authority'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::OurDate
       name: '@Author::PERLANCAR/OurDate'
@@ -273,6 +289,10 @@ x_Dist_Zilla:
               name: '@Author::PERLANCAR/Authors'
               version: '4.015'
             -
+              class: Pod::Weaver::Section::Contributors
+              name: '@Author::PERLANCAR/Contributors'
+              version: '0.009'
+            -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'
               version: '4.015'
@@ -309,7 +329,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Author::PERLANCAR/Rinci::AddPrereqs'
-      version: '0.144'
+      version: '0.145'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'
@@ -317,7 +337,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::EmbedValidator
       name: '@Author::PERLANCAR/Rinci::EmbedValidator'
-      version: '0.250'
+      version: '0.251'
     -
       class: Dist::Zilla::Plugin::SetScriptShebang
       name: '@Author::PERLANCAR/SetScriptShebang'
@@ -377,7 +397,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Prereqs::CheckCircular
       name: '@Author::PERLANCAR/Prereqs::CheckCircular'
-      version: '0.006'
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple
       name: '@Author::PERLANCAR/UploadToCPAN::WWWPAUSESimple'
@@ -444,6 +464,8 @@ x_Dist_Zilla:
       is_trial: '0'
     version: '6.014'
 x_authority: cpan:PERLANCAR
+x_contributors:
+  - 'Steven Haryanto <sharyanto@cpan.org>'
 x_generated_by_perl: v5.30.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

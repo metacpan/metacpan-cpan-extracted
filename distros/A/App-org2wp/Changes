@@ -1,3 +1,8 @@
+0.011   2022-01-21  Released-By: PERLANCAR; Urgency: high
+
+	- [bugfix] Fix inserting/updating post ID.
+
+
 0.010   2020-09-18  Released-By: PERLANCAR; Urgency: medium
 
 	- Add options: --post-password, --include-heading-tag,

@@ -1,5 +1,13 @@
 Revision history for this software.
 
+2.13.4.26 2022-01-25 00:00:00
+  - remove some documents
+  - created by INABA Hitoshi
+
+2.13.4.25 2022-01-22 00:00:00
+  - add some documents
+  - created by INABA Hitoshi
+
 2.13.4.24 2020-10-30 00:00:00
   - jacode.pl supports use strict; (if running on Perl5 or later)
   - jacode.pl supports use warnings; (if running on Perl5.6 or later)

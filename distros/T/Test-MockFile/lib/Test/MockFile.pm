@@ -19,7 +19,7 @@ use constant BROKEN_SYMLINK   => bless {}, "A::BROKEN::SYMLINK";
 use constant CIRCULAR_SYMLINK => bless {}, "A::CIRCULAR::SYMLINK";
 
 # we're going to use carp but the errors should come from outside of our package.
-use Carp ();
+use Carp qw(carp confess);
 $Carp::Internal{__PACKAGE__}++;
 $Carp::Internal{'Overload::FileCheck'}++;
 
@@ -44,11 +44,11 @@ Test::MockFile - Allows tests to validate code that can interact with files with
 
 =head1 VERSION
 
-Version 0.023
+Version 0.025
 
 =cut
 
-our $VERSION = '0.023';
+our $VERSION = '0.025';
 
 our %files_being_mocked;
 
@@ -139,7 +139,7 @@ Relative paths are not supported:
     $file = Test::MockFile->file( '/bar',        '...' ); # ok     - absolute path
     $file = Test::MockFile->file( 'bar', '...' );         # ok     - current dir
 
-And if you have multiple forward slashes, it will croak as well:
+And if you have multiple forward slashes, it will confess as well:
 
     use Test::MockFile;
     $file = Test::MockFile->file( '//bar', '...' );
@@ -208,7 +208,7 @@ sub _strict_mode_violation {
       : $command eq 'lstat'   ? 0
       : $command eq 'chown'   ? 2
       : $command eq 'chmod'   ? 2
-      :                         Carp::croak("Unknown strict mode violation for $command");
+      :                         confess("Unknown strict mode violation for $command");
 
     my @stack;
     foreach my $stack_level ( 1 .. 100 ) {
@@ -235,7 +235,7 @@ sub _strict_mode_violation {
     # Ignore stats on STDIN, STDOUT, STDERR
     return if $filename =~ m/^\*?(?:main::)?[<*&+>]*STD(?:OUT|IN|ERR)$/;
 
-    Carp::confess("Use of $command to access unmocked file or directory '$filename' in strict mode at $stack[1] line $stack[2]");
+    confess("Use of $command to access unmocked file or directory '$filename' in strict mode at $stack[1] line $stack[2]");
 }
 
 sub import {
@@ -272,23 +272,25 @@ See L<Mock Stats> for what goes into the stats hashref.
 sub file {
     my ( $class, $file, $contents, @stats ) = @_;
 
-    ( defined $file && length $file ) or die("No file provided to instantiate $class");
-    _get_file_object($file) and die("It looks like $file is already being mocked. We don't support double mocking yet.");
+    ( defined $file && length $file ) or confess("No file provided to instantiate $class");
+    _get_file_object($file) and confess("It looks like $file is already being mocked. We don't support double mocking yet.");
 
     _validate_path($file);
 
     if ( @stats > 1 ) {
-        die sprintf 'Unkownn arguments (%s) passed to file() as stats',
-          join ', ', @stats;
+        confess(
+            sprintf 'Unkownn arguments (%s) passed to file() as stats',
+            join ', ', @stats
+        );
     }
 
     !defined $contents && @stats
-      and die "You cannot set stats for non-existent file '$file'";
+      and confess("You cannot set stats for non-existent file '$file'");
 
     my %stats;
     if (@stats) {
         ref $stats[0] eq 'HASH'
-          or die '->file( FILE_NAME, FILE_CONTENT, { STAT_INFORMATION } )';
+          or confess('->file( FILE_NAME, FILE_CONTENT, { STAT_INFORMATION } )');
 
         %stats = %{ $stats[0] };
     }
@@ -306,8 +308,8 @@ sub file {
 
     return $class->new(
         {
-            'file_name' => $file,
-            'contents'  => $contents,
+            'path'     => $file,
+            'contents' => $contents,
             %stats
         }
     );
@@ -332,7 +334,7 @@ sub file_from_disk {
     local $!;
     if ( !CORE::open( $fh, '<', $file_on_disk ) ) {
         $file_on_disk //= '<no file specified>';
-        die("Sorry, I cannot read from $file_on_disk to mock $file. It doesn't appear to be present ($!)");
+        confess("Sorry, I cannot read from $file_on_disk to mock $file. It doesn't appear to be present ($!)");
     }
 
     local $/;
@@ -359,17 +361,17 @@ Stats are not able to be specified on instantiation but can in theory be altered
 sub symlink {
     my ( $class, $readlink, $file ) = @_;
 
-    ( defined $file && length $file )          or die("No file provided to instantiate $class");
-    ( !defined $readlink || length $readlink ) or die("No file provided for $file to point to in $class");
+    ( defined $file && length $file )          or confess("No file provided to instantiate $class");
+    ( !defined $readlink || length $readlink ) or confess("No file provided for $file to point to in $class");
 
-    _get_file_object($file) and die("It looks like $file is already being mocked. We don't support double mocking yet.");
+    _get_file_object($file) and confess("It looks like $file is already being mocked. We don't support double mocking yet.");
 
     return $class->new(
         {
-            'file_name' => $file,
-            'contents'  => undef,
-            'readlink'  => $readlink,
-            'mode'      => 07777 | S_IFLNK,
+            'path'     => $file,
+            'contents' => undef,
+            'readlink' => $readlink,
+            'mode'     => 07777 | S_IFLNK,
         }
     );
 }
@@ -379,13 +381,13 @@ sub _validate_path {
 
     # Multiple forward slashes
     if ( $path =~ m[/{2,}] ) {
-        die 'Repeated forward slashes in path';
+        confess('Repeated forward slashes in path');
     }
 
     # Reject the following:
     # ./ ../ /. /.. /./ /../
     if ( $path =~ m{ ( ^ | / ) \.{1,2} ( / | $ ) }xms ) {
-        die 'Relative paths are not supported';
+        confess('Relative paths are not supported');
     }
 }
 
@@ -398,7 +400,7 @@ This will cause $dir to be mocked in all file checks, and C<opendir> interaction
 The directory name is normalized so any trailing slash is removed.
 
     $dir = Test::MockFile->dir( 'mydir/', ... ); # ok
-    $dir->filename();                            # mydir
+    $dir->path();                                # mydir
 
 If there were previously mocked files (within the same scope), the directory will
 exist. Otherwise, the directory will be nonexistent.
@@ -448,9 +450,9 @@ in the future.)
 sub dir {
     my ( $class, $dir_name ) = @_;
 
-    ( defined $dir_name && length $dir_name ) or die("No directory name provided to instantiate $class");
+    ( defined $dir_name && length $dir_name ) or confess("No directory name provided to instantiate $class");
     _get_file_object($dir_name)
-      and die "It looks like $dir_name is already being mocked. We don't support double mocking yet.";
+      and confess("It looks like $dir_name is already being mocked. We don't support double mocking yet.");
 
     _validate_path($dir_name);
 
@@ -458,7 +460,7 @@ sub dir {
     $dir_name =~ s{[/\\]$}{}xmsg;
 
     @_ > 2
-      and die "You cannot set stats for nonexistent dir '$dir_name'";
+      and confess("You cannot set stats for nonexistent dir '$dir_name'");
 
     my $perms = S_IFPERMS & 0777;
     my %stats = ( 'mode' => ( $perms ^ umask ) | S_IFDIR );
@@ -469,7 +471,7 @@ sub dir {
     my $has_content = grep m{^\Q$dir_name/\E}xms, %files_being_mocked;
     return $class->new(
         {
-            'file_name'   => $dir_name,
+            'path'        => $dir_name,
             'has_content' => $has_content,
             %stats
         }
@@ -518,16 +520,16 @@ sub new {
         %opts = %{ $_[0] };
     }
     elsif ( scalar @_ % 2 ) {
-        die sprintf( "Unknown args (%d) passed to new", scalar @_ );
+        confess( sprintf( "Unknown args (%d) passed to new", scalar @_ ) );
     }
     else {
         %opts = @_;
     }
 
-    my $file_name = $opts{'file_name'} or die("Mock file created without a file name!");
+    my $path = $opts{'path'} or confess("Mock file created without a path (filename or dirname)!");
 
-    if ( $file_name !~ m{^/} ) {
-        $file_name = $opts{'file_name'} = _abs_path_to_file($file_name);
+    if ( $path !~ m{^/} ) {
+        $path = $opts{'path'} = _abs_path_to_file($path);
     }
 
     my $now = time;
@@ -549,7 +551,7 @@ sub new {
         'fileno'      => undef,     # fileno()
         'tty'         => 0,         # possibly this is already provided in mode?
         'readlink'    => '',        # what the symlink points to.
-        'file_name'   => undef,
+        'path'        => undef,
         'contents'    => undef,
         'has_content' => undef,
     }, $class;
@@ -565,8 +567,8 @@ sub new {
 
     $self->{'fileno'} //= _unused_fileno();
 
-    $files_being_mocked{$file_name} = $self;
-    Scalar::Util::weaken( $files_being_mocked{$file_name} );
+    $files_being_mocked{$path} = $self;
+    Scalar::Util::weaken( $files_being_mocked{$path} );
 
     return $self;
 }
@@ -575,12 +577,12 @@ sub new {
 sub _mock_stat {
     my ( $type, $file_or_fh ) = @_;
 
-    $type or die("_mock_stat called without a stat type");
+    $type or confess("_mock_stat called without a stat type");
 
     my $follow_link =
         $type eq 'stat'  ? 1
       : $type eq 'lstat' ? 0
-      :                    die("Unexpected stat type '$type'");
+      :                    confess("Unexpected stat type '$type'");
 
     # Overload::FileCheck should always send 2 args.
     if ( scalar @_ != 2 ) {
@@ -671,13 +673,13 @@ sub _fh_to_file {
     return unless defined $fh && length $fh;
 
     # See if $fh is a file handle. It might be a path.
-    foreach my $file_name ( sort keys %files_being_mocked ) {
-        my $mock_fh = $files_being_mocked{$file_name}->{'fh'};
+    foreach my $path ( sort keys %files_being_mocked ) {
+        my $mock_fh = $files_being_mocked{$path}->{'fh'};
 
         next unless $mock_fh;               # File isn't open.
         next unless "$mock_fh" eq "$fh";    # This mock doesn't have this file handle open.
 
-        return $file_name;
+        return $path;
     }
 
     return;
@@ -707,18 +709,18 @@ sub DESTROY {
     ref $self or return;
 
     # This is just a safety. It doesn't make much sense if we get here but
-    # $self doesn't have a file_name. Either way we can't delete it.
-    my $file_name = $self->{'file_name'};
-    defined $file_name or return;
+    # $self doesn't have a path. Either way we can't delete it.
+    my $path = $self->{'path'};
+    defined $path or return;
 
     # If the object survives into global destruction, the object which is
-    # the value of $files_being_mocked{$file_name} might destroy early.
+    # the value of $files_being_mocked{$path} might destroy early.
     # As a result, don't worry about the self == check just delete the key.
-    if ( defined $files_being_mocked{$file_name} ) {
-        $self == $files_being_mocked{$file_name} or die("Tried to destroy object for $file_name ($self) but something else is mocking it?");
+    if ( defined $files_being_mocked{$path} ) {
+        $self == $files_being_mocked{$path} or confess("Tried to destroy object for $path ($self) but something else is mocking it?");
     }
 
-    delete $files_being_mocked{$file_name};
+    delete $files_being_mocked{$path};
 }
 
 =head2 contents
@@ -736,24 +738,24 @@ Symlinks have no contents.
 
 sub contents {
     my ( $self, $new_contents ) = @_;
-    $self or die;
+    $self or confess;
 
     $self->is_link
-      and Carp::confess("checking or setting contents on a symlink is not supported");
+      and confess("checking or setting contents on a symlink is not supported");
 
     # handle directories
     if ( $self->is_dir() ) {
         $new_contents
-          and die 'To change the contents of the dir, you must work on its files';
+          and confess('To change the contents of the dir, you must work on its files');
 
         $self->{'has_content'}
           or return;
 
         # TODO: Quick and dirty, but works (maybe provide a ->basename()?)
         # Retrieve the files in this directory and removes prefix
-        my $dirname        = $self->filename();
+        my $dirname        = $self->path();
         my @existing_files = sort map {
-            ( my $basename = $_->filename() ) =~ s{^\Q$dirname/\E}{}xms;
+            ( my $basename = $_->path() ) =~ s{^\Q$dirname/\E}{}xms;
             defined $_->{'contents'} ? ($basename) : ();
         } _files_in_dir($dirname);
 
@@ -764,7 +766,7 @@ sub contents {
     if ( $self->is_file() ) {
         if ( defined $new_contents ) {
             ref $new_contents
-              and die 'File contents must be a simple string';
+              and confess('File contents must be a simple string');
 
             # XXX Why use $_[1] directly?
             $self->{'contents'} = $_[1];
@@ -773,20 +775,32 @@ sub contents {
         return $self->{'contents'};
     }
 
-    Carp::croak('This seems to be neither a file nor a dir - what is it?');
+    confess('This seems to be neither a file nor a dir - what is it?');
 }
 
 =head2 filename
 
-The name of the file this mock object is controlling.
+Deprecated. Same as C<path>.
 
 =cut
 
 sub filename {
-    my ($self) = @_;
-    $self or die("filename is a method");
+    warn 'filename() is deprecated, use path() instead';
+    goto &path;
+}
 
-    return $self->{'file_name'};
+=head2 path
+
+The path (filename or dirname) of the file or directory this mock object is
+controlling.
+
+=cut
+
+sub path {
+    my ($self) = @_;
+    $self or confess("path is a method");
+
+    return $self->{'path'};
 }
 
 =head2 unlink
@@ -797,7 +811,7 @@ Makes the virtual file go away. NOTE: This also works for directories.
 
 sub unlink {
     my ($self) = @_;
-    $self or die("unlink is a method");
+    $self or confess("unlink is a method");
 
     if ( !$self->exists ) {
         $! = ENOENT;
@@ -836,10 +850,10 @@ If no arguments are passed, $epoch_time is set to time(). If the file does not e
 
 sub touch {
     my ( $self, $now ) = @_;
-    $self or die("touch is a method");
+    $self or confess("touch is a method");
     $now //= time;
 
-    $self->is_file or die("touch only supports files");
+    $self->is_file or confess("touch only supports files");
 
     my $pre_size = $self->size();
 
@@ -897,11 +911,11 @@ Returns the stat of a mocked file (does not follow symlinks.) You can also use t
 sub readlink {
     my ( $self, $readlink ) = @_;
 
-    $self->is_link or die("readlink is only supported for symlinks");
+    $self->is_link or confess("readlink is only supported for symlinks");
 
     if ( scalar @_ == 2 ) {
         if ( defined $readlink && ref $readlink ) {
-            die("readlink can only be set to simple strings.");
+            confess("readlink can only be set to simple strings.");
         }
 
         $self->{'readlink'} = $readlink;
@@ -1109,7 +1123,7 @@ my @file_access_hooks;
 sub add_file_access_hook {
     my ($code_ref) = @_;
 
-    ( $code_ref && ref $code_ref eq 'CODE' ) or die("add_file_access_hook needs to be passed a code reference.");
+    ( $code_ref && ref $code_ref eq 'CODE' ) or confess("add_file_access_hook needs to be passed a code reference.");
     push @file_access_hooks, $code_ref;
 
     return 1;
@@ -1256,8 +1270,8 @@ BEGIN {
         }
 
         my $abs_path = _find_file_or_fh( $_[2], 1 );    # Follow the link.
-        die if ( !$abs_path );
-        die if $abs_path eq BROKEN_SYMLINK;
+        confess() if !$abs_path;
+        confess() if $abs_path eq BROKEN_SYMLINK;
         my $mock_file = _get_file_object($abs_path);
 
         my $mode = $_[1];
@@ -1353,7 +1367,7 @@ BEGIN {
 
         # Not supported by my linux vendor: O_EXLOCK | O_SHLOCK
         if ( ( $sysopen_mode & SUPPORTED_SYSOPEN_MODES ) != $sysopen_mode ) {
-            die( sprintf( "Sorry, can't open %s with 0x%x permissions. Some of your permissions are not yet supported by %s", $_[1], $sysopen_mode, __PACKAGE__ ) );
+            confess( sprintf( "Sorry, can't open %s with 0x%x permissions. Some of your permissions are not yet supported by %s", $_[1], $sysopen_mode, __PACKAGE__ ) );
         }
 
         # O_NOFOLLOW
@@ -1384,7 +1398,7 @@ BEGIN {
             $rd_wr_mode == O_RDONLY ? 'r'
           : $rd_wr_mode == O_WRONLY ? 'w'
           : $rd_wr_mode == O_RDWR   ? 'rw'
-          :                           die("Unexpected sysopen read/write mode ($rd_wr_mode)");    # O_WRONLY| O_RDWR mode makes no sense and we should die.
+          :                           confess("Unexpected sysopen read/write mode ($rd_wr_mode)");    # O_WRONLY| O_RDWR mode makes no sense and we should die.
 
         # If contents is undef, we act like the file isn't there.
         if ( !defined $mock_file->{'contents'} && $rd_wr_mode == O_RDONLY ) {
@@ -1392,7 +1406,7 @@ BEGIN {
             return;
         }
 
-        my $abs_path = $mock_file->{'file_name'};
+        my $abs_path = $mock_file->{'path'};
 
         $_[0] = IO::File->new;
         tie *{ $_[0] }, 'Test::MockFile::FileHandle', $abs_path, $rw;
@@ -1455,7 +1469,7 @@ BEGIN {
         }
 
         # This is how we tell if the file is open by something.
-        my $abs_path = $mock_dir->{'file_name'};
+        my $abs_path = $mock_dir->{'path'};
         $mock_dir->{'obj'} = Test::MockFile::DirHandle->new( $abs_path, $mock_dir->contents() );
         $mock_dir->{'fh'}  = "$_[0]";
 
@@ -1477,15 +1491,15 @@ BEGIN {
 
         my $obj = $mocked_dir->{'obj'};
         if ( !$obj ) {
-            die("Read on a closed handle");
+            confess("Read on a closed handle");
         }
 
         if ( !defined $obj->{'files_in_readdir'} ) {
-            die("Did a readdir on an empty dir. This shouldn't have been able to have been opened!");
+            confess("Did a readdir on an empty dir. This shouldn't have been able to have been opened!");
         }
 
         if ( !defined $obj->{'tell'} ) {
-            die("readdir called on a closed dirhandle");
+            confess("readdir called on a closed dirhandle");
         }
 
         # At EOF for the dir handle.
@@ -1519,11 +1533,11 @@ BEGIN {
         my $obj = $mocked_dir->{'obj'};
 
         if ( !defined $obj->{'files_in_readdir'} ) {
-            die("Did a telldir on an empty dir. This shouldn't have been able to have been opened!");
+            confess("Did a telldir on an empty dir. This shouldn't have been able to have been opened!");
         }
 
         if ( !defined $obj->{'tell'} ) {
-            die("telldir called on a closed dirhandle");
+            confess("telldir called on a closed dirhandle");
         }
 
         return $obj->{'tell'};
@@ -1545,11 +1559,11 @@ BEGIN {
         my $obj = $mocked_dir->{'obj'};
 
         if ( !defined $obj->{'files_in_readdir'} ) {
-            die("Did a rewinddir on an empty dir. This shouldn't have been able to have been opened!");
+            confess("Did a rewinddir on an empty dir. This shouldn't have been able to have been opened!");
         }
 
         if ( !defined $obj->{'tell'} ) {
-            die("rewinddir called on a closed dirhandle");
+            confess("rewinddir called on a closed dirhandle");
         }
 
         $obj->{'tell'} = 0;
@@ -1572,11 +1586,11 @@ BEGIN {
         my $obj = $mocked_dir->{'obj'};
 
         if ( !defined $obj->{'files_in_readdir'} ) {
-            die("Did a seekdir on an empty dir. This shouldn't have been able to have been opened!");
+            confess("Did a seekdir on an empty dir. This shouldn't have been able to have been opened!");
         }
 
         if ( !defined $obj->{'tell'} ) {
-            die("seekdir called on a closed dirhandle");
+            confess("seekdir called on a closed dirhandle");
         }
 
         return $obj->{'tell'} = $goto;
@@ -1652,7 +1666,7 @@ BEGIN {
         if ( !defined $file ) {
 
             # mkdir warns if $file is undef
-            Carp::carp("Use of uninitialized value in mkdir");
+            carp("Use of uninitialized value in mkdir");
             $! = ENOENT;
             return 0;
         }
@@ -1689,7 +1703,7 @@ BEGIN {
         # detect when they didn't pass an arg like core can.
         # Core sometimes warns: 'Use of uninitialized value $_ in rmdir'
         if ( !defined $file ) {
-            Carp::carp('Use of uninitialized value in rmdir');
+            carp('Use of uninitialized value in rmdir');
             return 0;
         }
 
@@ -1719,6 +1733,11 @@ BEGIN {
             return 0;
         }
 
+        if ( _files_in_dir($file) ) {
+            $! = 39;
+            return 0;
+        }
+
         $mock->{'has_content'} = undef;
         return 1;
     };
@@ -1727,55 +1746,68 @@ BEGIN {
         my ( $uid, $gid, @files ) = @_;
 
         $^O eq 'MSWin32'
-            and return 0; # does nothing on Windows
+          and return 0;    # does nothing on Windows
 
         # Not an error, report we changed zero files
         @files
-            or return 0;
+          or return 0;
 
         my %mocked_files   = map +( $_ => _get_file_object($_) ), @files;
         my @unmocked_files = grep !$mocked_files{$_}, @files;
-        my @mocked_files   = map ref $_ ? $_->{'file_name'} : (), values %mocked_files;
+        my @mocked_files   = map ref $_ ? $_->{'path'} : (), values %mocked_files;
 
         # The idea is that if some are mocked and some are not,
         # it's probably a mistake
-        if ( @mocked_files != @files ) {
-            Carp::croak(
+        if ( @mocked_files && @mocked_files != @files ) {
+            confess(
                 sprintf 'You called chown() on a mix of mocked (%s) and unmocked files (%s) ' . ' - this is very likely a bug on your side',
-                ( join ', ', @mocked_files   ),
+                ( join ', ', @mocked_files ),
                 ( join ', ', @unmocked_files ),
             );
         }
-
-        $! = 0;
 
         # -1 means "keep as is"
         $uid == -1 and $uid = $>;
         $gid == -1 and $gid = $);
 
-        # Check if $gid is within "$)"
-        # If so, it will be an error no matter what
-        # so there's no point in even looking at files or even sending to CORE::chown
-        if ( $> != $uid || !grep /(^ | \s ) \Q$gid\E ( \s | $ )/xms, $) ) {
-            $! = EPERM;
+        my $is_root     = $> == 0 || $) =~ /( ^ | \s ) 0 ( \s | $)/xms;
+        my $is_in_group = grep /(^ | \s ) \Q$gid\E ( \s | $ )/xms, $);
 
-            # Forget going over files, this is over
-            @files = ();
-        }
+        # TODO: Perl has an odd behavior that -1, -1 on a file that isn't owned by you still works
+        # Not sure how to write a test for it though...
 
+        my $set_error;
         my $num_changed = 0;
-        foreach my $file (@files){
+        foreach my $file (@files) {
             my $mock = $mocked_files{$file};
 
+            # If this file is not mocked, none of the files are
+            # which means we can send them all and let the CORE function handle it
             if ( !$mock ) {
                 _real_file_access_hook( 'chown', \@_ );
                 goto \&CORE::chown if _goto_is_available();
                 return CORE::chown(@files);
             }
 
+            # Even if you're root, nonexistent file is nonexistent
             if ( !$mock->exists() ) {
-                $! ||= ENOENT;
+
+                # Only set the error once
+                $set_error
+                  or $! = ENOENT;
+
                 next;
+            }
+
+            # root can do anything, but you can't
+            # and if we are here, no point in keep trying
+            if ( !$is_root ) {
+                if ( $> != $uid || !$is_in_group ) {
+                    $set_error
+                      or $! = EPERM;
+
+                    last;
+                }
             }
 
             $mock->{'uid'} = $uid;
@@ -1792,39 +1824,39 @@ BEGIN {
 
         # Not an error, report we changed zero files
         @files
-            or return 0;
+          or return 0;
 
         # Grab numbers - nothing means "0" (which is the behavior of CORE::chmod)
         # (This will issue a warning, that's also the expected behavior)
         {
             no warnings;
             $mode =~ /^[0-9]+/xms
-                or warn "Argument \"$mode\" isn't numeric in chmod";
+              or warn "Argument \"$mode\" isn't numeric in chmod";
             $mode = int $mode;
         }
 
-        my %mocked_files = map +( $_ => _get_file_object($_) ), @files;
+        my %mocked_files   = map +( $_ => _get_file_object($_) ), @files;
         my @unmocked_files = grep !$mocked_files{$_}, @files;
-        my @mocked_files   = map ref $_ ? $_->{'file_name'} : (), values %mocked_files;
+        my @mocked_files   = map ref $_ ? $_->{'path'} : (), values %mocked_files;
 
         # The idea is that if some are mocked and some are not,
         # it's probably a mistake
-        if ( @mocked_files != @files ) {
-            Carp::croak(
+        if ( @mocked_files && @mocked_files != @files ) {
+            confess(
                 sprintf 'You called chmod() on a mix of mocked (%s) and unmocked files (%s) ' . ' - this is very likely a bug on your side',
-                ( join ', ', @mocked_files   ),
+                ( join ', ', @mocked_files ),
                 ( join ', ', @unmocked_files ),
             );
         }
 
         my $num_changed = 0;
-        foreach my $file (@files){
+        foreach my $file (@files) {
             my $mock = $mocked_files{$file};
 
             if ( !$mock ) {
                 _real_file_access_hook( 'chmod', \@_ );
-                goto \&CORE::chown if _goto_is_available();
-                return CORE::chown(@files);
+                goto \&CORE::chmod if _goto_is_available();
+                return CORE::chmod(@files);
             }
 
             # chmod is less specific in such errors

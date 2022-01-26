@@ -18,6 +18,8 @@ Net::Async::Slack::Socket - socket-mode notifications for L<https://slack.com>
 
 This is a basic wrapper for Slack's socket-mode features.
 
+See L<https://api.slack.com/apis/connections/socket> for some background on using this feature.
+
 This provides an event stream using websockets.
 
 For a full list of events, see L<https://api.slack.com/events>.
@@ -36,6 +38,46 @@ Example usage:
      ->say
      ->await;
 
+=head2 handle_unfurl_domain
+
+Registers a handler for URLs.
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<domain> - which host/domain to respond to, e.g. C<google.com> for L<https://google.com>
+
+=item * C<handler> - a callback, expected to take a L<URI> instance and return a L<Future> with a Slack message
+
+=back
+
+Example usage:
+
+ $sock->handle_unfurl_domain(
+     domain => 'service.local',
+     handler => async sub ($uri) {
+         my ($id) = $uri->path =~ m{/id/([0-9]+)}
+             or return undef;
+         return +{
+             blocks => [ {
+                 "type" => "section",
+                 "text" => {
+                     "type" => "mrkdwn",
+                     "text" => "Request with ID `$id`",
+                 },
+             } ]
+         };
+     }
+ );
+
+Returns the L<Net::Async::Slack::Socket> instance to allow chaining.
+
+=head2 last_frame_epoch
+
+Returns the floating-point timestamp for the last frame we received. Will be
+C<undef> if we have no frames yet.
+
 =head1 METHODS - Internal
 
 You may not need to call these directly. If I'm wrong and you find yourself having
@@ -44,8 +86,6 @@ to do that, please complain via the usual channels.
 =head2 connect
 
 Establishes the connection. Called by the top-level L<Net::Async::Slack> instance.
-
-=head2 handle_unfurl_domain
 
 =head1 INHERITED METHODS
 
@@ -63,5 +103,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2016-2021. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2016-2022. Licensed under the same terms as Perl itself.
 

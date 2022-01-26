@@ -1,5 +1,14 @@
 Revision history for Perl extension Form::Tiny.
 
+2.04 Sat Jan 22 20:00:00 2022
+	- added plugins system: standarized way of extending the module
+	- new import parameter: plugins => []
+	- subroutine parameters are now consistent by default
+	- -consistent import flag is now a no-op
+	- resolve the rest of pending deprecations
+	- all symbols imported by Form::Tiny or before it is imported are now cleaned from the namespace
+	- form inheritance now properly transfers meta roles (still experimental though)
+
 2.03 Sat Oct 23 02:00:00 2021
 	- new import flag: -consistent
 	- subroutine parameters are now consistent across the system with -consistent flag

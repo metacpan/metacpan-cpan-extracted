@@ -25,7 +25,7 @@ my $TEST_SERVER = $build ? $build->notes('test_server') : $ENV{REST_NEO4P_TEST_S
 my ($maj, @others);
 
 eval {
-    ($maj, @others) = REST::Neo4p::get_neo4j_version($TEST_SERVER);
+    ($maj, @others) = REST::Neo4p::get_neo4j_version($TEST_SERVER, $user, $pass);
 };
 
 SKIP : {

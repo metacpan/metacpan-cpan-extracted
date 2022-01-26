@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern::Document::OpenAPI; # git description: v0.017-3-g4f61a45
+package JSON::Schema::Modern::Document::OpenAPI; # git description: v0.018-9-g27f7e33
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.018';
+our $VERSION = '0.019';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -235,7 +235,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 

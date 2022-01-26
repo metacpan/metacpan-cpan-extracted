@@ -196,7 +196,7 @@ call_spvm_method(...)
   
   // Env
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
-  
+
   // Runtime
   SPVM_COMPILER* compiler = (SPVM_COMPILER*)env->compiler;
   
@@ -205,7 +205,7 @@ call_spvm_method(...)
   
   // Method name
   const char* method_name = SvPV_nolen(sv_method_name);
-
+  
   // Basic type
   SPVM_BASIC_TYPE* basic_type = SPVM_API_get_basic_type(env, class_name);
   
@@ -661,6 +661,7 @@ call_spvm_method(...)
                 }
                 // Argument: Perl array referecne to SPVM string array
                 case SPVM_BASIC_TYPE_C_ID_STRING: {
+                  
                   void* array = env->new_object_array(env, SPVM_BASIC_TYPE_C_ID_STRING, length);
                   for (int32_t i = 0; i < length; i++) {
                     SV** sv_elem_ptr = av_fetch(av_elems, i, 0);
@@ -689,7 +690,7 @@ call_spvm_method(...)
                   }
                   SV* sv_array = SPVM_XS_UTIL_new_sv_object(env, array, "SPVM::BlessedObject::Array");
                   sv_value = sv_array;
-                  
+
                   break;
                 }
                 case SPVM_BASIC_TYPE_C_ID_ANY_OBJECT:
@@ -3832,7 +3833,7 @@ get_module_source(...)
 
   // Copy class load path to builder
   SV* sv_module_source;
-  const char* module_source = SPVM_HASH_fetch(compiler->embedded_module_source_symtable, class_name, strlen(class_name));
+  const char* module_source = SPVM_HASH_fetch(compiler->module_source_symtable, class_name, strlen(class_name));
   if (module_source) {
     sv_module_source = sv_2mortal(newSVpv(module_source, 0));
   }
@@ -3841,39 +3842,6 @@ get_module_source(...)
   }
 
   XPUSHs(sv_module_source);
-  XSRETURN(1);
-}
-
-SV*
-get_loaded_module_file(...)
-  PPCODE:
-{
-  (void)RETVAL;
-  
-  SV* sv_self = ST(0);
-  SV* sv_class_name = ST(1);
-
-  HV* hv_self = (HV*)SvRV(sv_self);
-  
-  // Name
-  const char* class_name = SvPV_nolen(sv_class_name);
-
-  SPVM_COMPILER* compiler;
-  SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
-  SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
-  compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
-
-  // Copy class load path to builder
-  SV* sv_loaded_module_file;
-  const char* loaded_module_file = SPVM_HASH_fetch(compiler->loaded_module_file_symtable, class_name, strlen(class_name));
-  if (loaded_module_file) {
-    sv_loaded_module_file = sv_2mortal(newSVpv(loaded_module_file, 0));
-  }
-  else {
-    sv_loaded_module_file = &PL_sv_undef;
-  }
-
-  XPUSHs(sv_loaded_module_file);
   XSRETURN(1);
 }
 
