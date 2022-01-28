@@ -1,5 +1,5 @@
 package OPM::Maker::Command::sopmtest;
-$OPM::Maker::Command::sopmtest::VERSION = '1.16';
+$OPM::Maker::Command::sopmtest::VERSION = '1.17';
 # ABSTRACT: Check if sopm is valid
 
 use strict;
@@ -68,7 +68,7 @@ OPM::Maker::Command::sopmtest - Check if sopm is valid
 
 =head1 VERSION
 
-version 1.16
+version 1.17
 
 =head1 AUTHOR
 

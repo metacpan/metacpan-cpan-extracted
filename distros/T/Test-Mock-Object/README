@@ -2,7 +2,7 @@ NAME
     Test::Mock::Object - Dead-simple mocking
 
 VERSION
-    version 0.1
+    version 0.2
 
 SYNOPSIS
       use Test::Mock::Object qw(create_mock read_only);
@@ -257,9 +257,9 @@ Unknown methods
 
 BEST PRACTICES
   Don't Use Mock Objects
-    See "Interface Changes". However, if you're relying on sometthing you
+    See "Interface Changes". However, if you're relying on something you
     don't control, such as an object that requires a database connection or
-    an internet connection, a mock might be acceptable.
+    an internet connection, a mock might be useful.
 
   Only Mock the Methods You Use
     You might be tempted to mock every single method in an interface. Don't
@@ -352,7 +352,7 @@ SEE ALSO
 
         I used this years ago when chromatic first wrote it for the company
         we worked at. I've used it off and on over the years and I *never*
-        remember its interace.
+        remember its interface.
 
     *   Mock::Quick
 

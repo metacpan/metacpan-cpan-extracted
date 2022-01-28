@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 our $VERSION;
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 =head1 NAME
 
@@ -251,6 +251,39 @@ sub set_stub {
 }
 
 
+=head2 resolvconf
+
+    $resolver->resolvconf( 'filename' );
+
+Extract nameserver list from resolv.conf(5) format configuration file.
+Any domain, searchlist, ndots or other settings are ignored.
+Note that Net::DNS builds its own nameserver list using /etc/resolv.conf
+or other platform-specific sources.
+
+=cut
+
+sub resolvconf {
+	my ( $self, $filename ) = @_;
+	my $ctx = $self->{ub_ctx};
+	return Net::DNS::Resolver::libunbound::ub_ctx_resolvconf( $ctx, $filename );
+}
+
+=head2 hosts
+
+    $resolver->hosts( 'filename' );
+
+Read list of hosts from the filename given, usually "/etc/hosts".
+These addresses are not flagged as DNSSEC secure when queried.
+
+=cut
+
+sub hosts {
+	my ( $self, $filename ) = @_;
+	my $ctx = $self->{ub_ctx};
+	return Net::DNS::Resolver::libunbound::ub_ctx_hosts( $ctx, $filename );
+}
+
+
 =head2 add_ta
 
     $resolver->add_ta( 'trust anchor' );
@@ -261,12 +294,11 @@ in RFC1035 zonefile format.
 =cut
 
 sub add_ta {
-	my ( $self, $trust_anchor ) = @_;
-	my $ctx = $self->{ub_ctx};
-	my $ta	= Net::DNS::RR->new($trust_anchor);
+	my $self = shift;
+	my $ta	 = Net::DNS::RR->new(@_);
+	my $ctx  = $self->{ub_ctx};
 	return Net::DNS::Resolver::libunbound::ub_ctx_add_ta( $ctx, $ta->plain );
 }
-
 
 =head2 add_ta_file
 
@@ -283,6 +315,22 @@ sub add_ta_file {
 	return Net::DNS::Resolver::libunbound::ub_ctx_add_ta_file( $ctx, $filename );
 }
 
+=head2 add_ta_autr
+
+    $resolver->add_ta_autr( 'filename' );
+
+Add trust anchor to the given context that is tracked with RFC5011
+automated trust anchor maintenance.  The file is written when the
+trust anchor is changed.
+
+=cut
+
+sub add_ta_autr {
+	my ( $self, $filename ) = @_;
+	my $ctx = $self->{ub_ctx};
+	return Net::DNS::Resolver::libunbound::ub_ctx_add_ta_autr( $ctx, $filename );
+}
+
 =head2 trustedkeys
 
     $resolver->trustedkeys( 'filename' );
@@ -297,6 +345,21 @@ sub trustedkeys {
 	return Net::DNS::Resolver::libunbound::ub_ctx_trustedkeys( $ctx, $filename );
 }
 
+
+=head2 debugout
+
+    $resolver->debugout( out );
+
+Send debug output (and error output) to the specified stream.
+Pass a null argument to disable. Default is stderr.
+
+=cut
+
+sub debugout {
+	my ( $self, $out ) = @_;
+	my $ctx = $self->{ub_ctx};
+	return Net::DNS::Resolver::libunbound::ub_ctx_debugout( $ctx, $out );
+}
 
 =head2 debug_level
 

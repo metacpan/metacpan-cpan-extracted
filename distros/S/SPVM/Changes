@@ -1,5 +1,70 @@
 Revision history for SPVM
 
+0.9132  2021-01-28
+        [CHANGE]
+        * SPVM::Builder::Config::Exe default ldflags become empty list.
+        [FIX BAG]
+        * Fix the bug that spvmcc doesn't use libs, ldflags, lib_dirs fields.
+        * Fix the bug that spvmcc doesn't cache the executable file.
+        [FIX DOCUMENT BAG]
+        * Fix SPVM::Document::NativeAPI.
+          Fix from call_spvm_method_by_name to call_class_method_by_name
+          Fix from call_callback_method_by_name to call_instance_method_by_name
+
+0.9131  2021-01-27
+        [CHANGE]
+        * Add build_shared_lib_dist_precompile to SPVM::Builder::API
+        * Add build_shared_lib_dist_native to SPVM::Builder::API
+        * Add build_dir option to new method of SPVM::Builder::API.
+
+        [BAG FIX]
+        * Fix the bug that build_shared_lib_dist of SPVM::Builder don't output the compilation error messages.
+        * Fix the bug that SPVM compilation error raise unexpected exception.
+        
+        [NON BACKWORD COMPATIBLE CHANGES]
+        * create_make_rule_native of SPVM::Builder::Util::API doesn't use private API.
+        * create_make_rule_precompile of SPVM::Builder::Util::API doesn't use private API.
+
+0.9130  2021-01-27
+        [CHANGE]
+        * Compilation error messages is saved as strings.
+        * Add SPVM::Builder::Util::API module for the public APIs of SPVM::Builder::Util.
+          SPVM::Builder::Util become a private module of SPVM. Please rewrite the codes.
+          [Before]
+          SPVM::Builder::Util::create_make_rule_native('Foo');
+          SPVM::Builder::Util::create_make_rule_precompile('Foo');
+          
+          [After]
+          SPVM::Builder::Util::API::create_make_rule_native('Foo');
+          SPVM::Builder::Util::API::create_make_rule_precompile('Foo');
+        * Add SPVM::Builder::API module for the public APIs of SPVM::Builder.
+        * Add optimize_each field to SPVM::Builder::Config
+        * Add global_cc_each field to SPVM::Builder::Config::Exe
+        * Add global_ccflags_each field to SPVM::Builder::Config::Exe
+        * Add global_optimize_each field to SPVM::Builder::Config::Exe
+        * Add global_cc_each field to SPVM::Builder::CC
+        * Add global_ccflags_each field to SPVM::Builder::CC
+        * Add global_optimize_each field to SPVM::Builder::CC
+        * SPVM::Builder::CC uses global_cc_each, global_ccflags_each, global_optimize_each field.
+        * Add is_exe method to SPVM::Builder::Config and SPVM::Builder::Config::Exe.
+        * Add before_link field to SPVM::Builder::Config
+        * Execute a before_link field callback before the link in SPVM::Bulder::CC link method.
+        * Execute a before_link field callback before the link in SPVM::Bulder::Exe link method.
+        * Add SPVM::Builder::ObjectFileInfo module
+        [BAG FIX]
+        * Fix the bug that SPVM::Builder::Config::Exe return SPVM::Builder::Config object and SPVM::Builder::Config doesn't support inheritance.
+        
+        [NON BACKWORD COMPATIBLE CHANGES]
+        * Change cc_each second argument of SPVM::Builder::Config from each source file to optional argument as hash reference
+          - source_file
+          - class_name
+        * Change ccflags_each second argument of SPVM::Builder::Config from each source file to optional argument as hash reference
+          - source_file
+          - class_name
+          - cc
+        * Remove global_ccflags fields of SPVM::Builder::Config::Exe. Please use global_ccflags_each instead.
+        * Remove add_global_ccflas method of SPVM::Builder::Config::Exe. Please use global_ccflags_each instead.
+        
 0.9129  2021-01-25
         [CHANGE]
         * Improve the error messages of character literals.

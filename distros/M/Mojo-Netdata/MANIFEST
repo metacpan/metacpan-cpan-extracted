@@ -1,0 +1,21 @@
+.pls_cache/index
+Changes
+cpanfile
+lib/Mojo/Netdata.pm
+lib/Mojo/Netdata/Chart.pm
+lib/Mojo/Netdata/Collector.pm
+lib/Mojo/Netdata/Collector/HTTP.pm
+lib/Mojo/Netdata/Util.pm
+Makefile.PL
+MANIFEST			This list of files
+script/mojo-netdata
+t/00-basic.t
+t/chart.t
+t/collector-http.t
+t/collector.t
+t/etc/netdata-test-config/mojo.conf.pl
+t/etc/netdata/mojo.conf.pl
+t/netdata.t
+t/util.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

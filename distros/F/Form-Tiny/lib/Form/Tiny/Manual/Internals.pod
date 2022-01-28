@@ -29,28 +29,7 @@ The I<1.00> series of the module did not implement a meta object, and in turn im
 
 It is entirely possible, although a bit tedious, to use the module without importing L<Form::Tiny> package. The following example declares a form with a single field taken from the example above.
 
-	package MyForm;
-
-	# Moo for easy role mixing and a constructor
-	use Moo;
-
-	# gives us create_form_meta function
-	use Form::Tiny::Utils qw(:meta_handlers);
-
-	# we need this role mixed in
-	with qw(Form::Tiny::Form);
-
-	# meta roles go into the qw()
-	create_form_meta(__PACKAGE__, qw());
-
-	# add a requried field
-	__PACKAGE__->form_meta->add_field('field-name' => (
-		required => 1,
-	));
-
-	1;
-
-The code above should result in a form that has the same capabilities as the one below:
+The code present in C<metaobject.pl> example should result in a form that has the same capabilities as the one below:
 
 	package MyForm;
 
@@ -61,6 +40,12 @@ The code above should result in a form that has the same capabilities as the one
 	);
 
 	1;
+
+B<Notice:> building your form like this should be done only for educational purposes. Changes in import procedure are not covered by the 3 month deprecation period policy.
+
+=head2 Finalizing the meta
+
+After creating the meta object with C<create_form_meta> function, the object exists in an incomplete state. It is so that superclasses can be applied before finalizing the metaobject and applying inheritance. Calling C<get_package_form_meta> will apply all changes needed to achieve complete state.
 
 =head1 SEE ALSO
 

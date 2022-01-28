@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.51;
 
-package Tangence::Registry 0.27;
+package Tangence::Registry 0.28;
 class Tangence::Registry isa Tangence::Object;
 
 use Carp;

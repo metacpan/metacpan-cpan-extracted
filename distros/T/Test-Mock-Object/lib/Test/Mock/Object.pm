@@ -14,7 +14,7 @@ use Scalar::Util 'blessed';
 use Test::Mock::Object::Chain 'create_method_chain';
 use Exporter 'import';
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 our @EXPORT_OK = qw(
   create_mock
@@ -232,7 +232,7 @@ Test::Mock::Object - Dead-simple mocking
 
 =head1 VERSION
 
-version 0.1
+version 0.2
 
 =head1 SYNOPSIS
 
@@ -503,9 +503,9 @@ unknown methods will be a fatal error.
 
 =head2 Don't Use Mock Objects
 
-See L</Interface Changes>. However, if you're relying on sometthing you don't
+See L</Interface Changes>. However, if you're relying on something you don't
 control, such as an object that requires a database connection or an internet
-connection, a mock might be acceptable.
+connection, a mock might be useful.
 
 =head2 Only Mock the Methods You Use
 
@@ -607,7 +607,7 @@ practice.
 
 I used this years ago when chromatic first wrote it for the company we worked
 at. I've used it off and on over the years and I I<never> remember its
-interace.
+interface.
 
 =item * L<Mock::Quick>
 

@@ -11,15 +11,15 @@ use Form::Tiny::Hook;
 use Form::Tiny::Filter;
 use Moo::Role;
 
-our $VERSION = '2.04';
+our $VERSION = '2.06';
 
 requires qw(setup);
 
-has "filters" => (
-	is => "ro",
+has 'filters' => (
+	is => 'ro',
 	writer => 'set_filters',
 	isa => ArrayRef [
-		InstanceOf ["Form::Tiny::Filter"]
+		InstanceOf ['Form::Tiny::Filter']
 	],
 	default => sub { [] },
 );

@@ -1,0 +1,61 @@
+2. Data Model
+-------------
+
+Whenever a value is sent across the connection between the server and a
+client, that value has a fixed type. The underlying streaming layer
+recognises the following fundamental types of values. Each type has a
+string to identify call it, called the signature. These are used by
+introspection data; see later.
+
+ * Booleans
+
+   Uses the type signature "bool".
+
+ * Integers, both signed and unsigned, in 8, 16, 32 and 64bit lengths
+
+   An integer of unspecified size uses the type signature "int".
+   Specific sized integers use the type signatures
+     "s8", "s16", "s32", "s64", "u8", "u16", "u32", "u64"
+
+ * Floating-point numbers, in 16, 32 and 64bit lengths
+
+   A float of unspecified size uses the type signature "float".
+   Specific sized floats use the type signatures
+     "float16", "float32", "float64"
+
+   Note that the Intel-specific 80bit "extended double" format is not
+   supported
+
+ * Unicode strings
+
+   Uses the type signature "str".
+
+ * References to Tangence objects
+
+   Uses the type signature "obj".
+
+ * Lists of values
+
+   Uses the type signature "list(T)" where T is the type signature of its
+   element type.
+
+ * Dictionaries of (string) named keys to values
+
+   Uses the type signature "dict(T)" where T is the type signature of its
+   element type.
+
+ * Structured records of values
+
+   Uses a type signature giving the name of the structure type.
+
+ * For type signatures, there is also the type of "any", which allows any
+   type.
+
+As Tangence is primarily an interprocess-communication layer, its main
+focus is that of communication. The Data Model applies transiently, to
+data as it is in transit between the server and a client. A consequence
+here is that it only considers the surface value of the types of data,
+rather than any deeper significance. It does not preserve self-referential
+data, nor can it cope with cyclic structures. More complex shaped data
+should be represented by real Tangence objects.
+

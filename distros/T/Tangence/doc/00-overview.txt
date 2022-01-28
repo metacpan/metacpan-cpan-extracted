@@ -1,0 +1,23 @@
+An overview of Tangence
+=======================
+
+Tangence is all of the following:
+
+ 1. A single server/multiple client protocol for sharing information
+    about objects.
+
+ 2. A data model - it defines the types of values that are transmitted
+    between the server and clients.
+
+ 3. An object model - it defines the abstract look-and-feel of objects 
+    that are visible in the server end, and the proxies to them that
+    exist in the client ends.
+
+ 4. A wire protocol - it defines the bits down the wire of some stream.
+
+ 5. A collection of Perl modules (a Perl distribution) which implements
+    all of the above.
+
+These writings may sometimes suffer the "Java problem"; the problem of
+the same name being applied to too many different concepts. I'll try to
+make the context or wording clear to minimise confusions.

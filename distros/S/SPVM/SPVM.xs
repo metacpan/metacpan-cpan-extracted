@@ -3619,6 +3619,51 @@ get_method_names(...)
 }
 
 SV*
+get_method_signature(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_self = ST(0);
+  SV* sv_class_name = ST(1);
+  SV* sv_method_name = ST(2);
+
+  HV* hv_self = (HV*)SvRV(sv_self);
+
+  // Name
+  const char* class_name = SvPV_nolen(sv_class_name);
+  const char* method_name = SvPV_nolen(sv_method_name);
+
+  SPVM_COMPILER* compiler;
+  SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
+  SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
+  compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
+
+  SV* sv_method_signature;
+
+  // Copy class load path to builder
+  SPVM_CLASS* class = SPVM_HASH_fetch(compiler->class_symtable, class_name, strlen(class_name));
+  if (class) {
+    SPVM_METHOD* method = SPVM_HASH_fetch(class->method_symtable, method_name, strlen(method_name));
+    
+    if (method) {
+      const char* method_signature = method->signature;
+      sv_method_signature = sv_2mortal(newSVpv(method_signature, 0));
+    }
+    else {
+      sv_method_signature = &PL_sv_undef;
+    }
+  }
+  else {
+    sv_method_signature = &PL_sv_undef;
+  }
+  
+  XPUSHs(sv_method_signature);
+  
+  XSRETURN(1);
+}
+
+SV*
 get_anon_class_names_by_parent_class_name(...)
   PPCODE:
 {
@@ -3687,6 +3732,34 @@ get_class_names(...)
   }
   
   XPUSHs(sv_class_names);
+  XSRETURN(1);
+}
+
+SV*
+get_error_messages(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_self = ST(0);
+
+  HV* hv_self = (HV*)SvRV(sv_self);
+
+  SPVM_COMPILER* compiler;
+  SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
+  SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
+  compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
+
+  AV* av_error_messages = (AV*)sv_2mortal((SV*)newAV());
+  SV* sv_error_messages = sv_2mortal(newRV_inc((SV*)av_error_messages));
+  
+  for (int32_t i = 0; i < compiler->error_messages->length; i++) {
+    const char* error_message = (const char*)SPVM_LIST_fetch(compiler->error_messages, i);
+    SV* sv_error_message = sv_2mortal(newSVpv(error_message, 0));
+    av_push(av_error_messages, SvREFCNT_inc(sv_error_message));
+  }
+  
+  XPUSHs(sv_error_messages);
   XSRETURN(1);
 }
 

@@ -13,7 +13,7 @@ sub register ($self, $app, $conf) {
 
   $app->hook(
     around_action => sub ($next, $c, $action, $last) {
-      return unless $last;
+      return $next->() unless $last;
 
       my $req = $c->req;
 

@@ -10,37 +10,37 @@ use Carp qw(confess);
 
 use namespace::clean;
 
-our $VERSION = '2.04';
+our $VERSION = '2.06';
 
 use overload
-	q{""} => "as_string",
+	q{""} => 'as_string',
 	fallback => 1;
 
-has "field" => (
-	is => "ro",
+has 'field' => (
+	is => 'ro',
 	isa => Maybe [Str],
-	writer => "set_field",
+	writer => 'set_field',
 	default => sub { undef },
 );
 
-has "error" => (
-	is => "ro",
+has 'error' => (
+	is => 'ro',
 	isa => StringLike,
 	writer => 'set_error',
-	builder => "default_error",
+	builder => 'default_error',
 );
 
 sub default_error
 {
-	confess "no error message supplied";
-	return "Unknown error";
+	confess 'no error message supplied';
+	return 'Unknown error';
 }
 
 sub as_string
 {
 	my ($self) = @_;
 
-	my $field = $self->field // "general";
+	my $field = $self->field // 'general';
 	my $error = $self->error;
 	return "$field - $error";
 }
@@ -50,51 +50,51 @@ sub as_string
 
 	# Internal use only
 	package Form::Tiny::Error::NestedFormError;
-	use parent -norequire, "Form::Tiny::Error";
+	use parent -norequire, 'Form::Tiny::Error';
 
 }
 
 {
 
 	package Form::Tiny::Error::InvalidFormat;
-	use parent -norequire, "Form::Tiny::Error";
+	use parent -norequire, 'Form::Tiny::Error';
 
 	sub default_error
 	{
-		return "input data format is invalid";
+		return 'input data format is invalid';
 	}
 }
 
 {
 
 	package Form::Tiny::Error::Required;
-	use parent -norequire, "Form::Tiny::Error";
+	use parent -norequire, 'Form::Tiny::Error';
 
 	sub default_error
 	{
-		return "field is required";
+		return 'field is required';
 	}
 }
 
 {
 
 	package Form::Tiny::Error::IsntStrict;
-	use parent -norequire, "Form::Tiny::Error";
+	use parent -norequire, 'Form::Tiny::Error';
 
 	sub default_error
 	{
-		return "input data has unexpected fields";
+		return 'input data has unexpected fields';
 	}
 }
 
 {
 
 	package Form::Tiny::Error::DoesNotValidate;
-	use parent -norequire, "Form::Tiny::Error";
+	use parent -norequire, 'Form::Tiny::Error';
 
 	sub default_error
 	{
-		return "data validation failed";
+		return 'data validation failed';
 	}
 }
 
@@ -109,8 +109,8 @@ Form::Tiny::Error - form error wrapper
 =head1 SYNOPSIS
 
 	my $error = Form::Tiny::Error::DoesNotValidate->new(
-		field => "some_field",
-		error => "some message"
+		field => 'some_field',
+		error => 'some message'
 	);
 
 	my $field = $error->field; # field name or undef

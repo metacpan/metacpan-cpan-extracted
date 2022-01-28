@@ -1,0 +1,30 @@
+---
+abstract: 'https://netdata.cloud plugin for Perl'
+author:
+  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
+build_requires:
+  Test2::V0: '0.000144'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-Netdata
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: '8.71'
+  perl: v5.22.0
+resources:
+  bugtracker: https://github.com/jhthorsen/mojo-netdata/issues
+  homepage: https://github.com/jhthorsen/mojo-netdata
+  repository: https://github.com/jhthorsen/mojo-netdata.git
+version: '0.01'
+x_contributors:
+  - 'Jan Henning Thorsen'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

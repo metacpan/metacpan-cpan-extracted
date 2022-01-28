@@ -15,7 +15,7 @@ sub _should_print ($self, $context) {
 
 sub _print ($self, $message, $context, $error = 0) {
   return unless $self->_should_print($context);
-  print { $error ? *STDOUT : *STDERR } qq{[$context] $message\n};
+  print { $error ? *STDERR : *STDOUT } qq{[$context] $message\n};
 }
 
 sub log ($self, $message, $context = $self->context) {

@@ -3,7 +3,7 @@ use Mojo::Base -strict;
 use Test::Spec;
 use Sentry::DSN;
 
-describe 'Sentry' => sub {
+describe 'Sentry::DSN' => sub {
   my $dsn;
 
   before each => sub {

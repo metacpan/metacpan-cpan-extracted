@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
 use Object::Pad 0.41;
 
-package Tangence::Type 0.27;
+package Tangence::Type 0.28;
 class Tangence::Type isa Tangence::Meta::Type;
 
 =head1 NAME
@@ -565,7 +565,8 @@ class Tangence::Type::Primitive::any isa Tangence::Type
 
    use Syntax::Keyword::Match;
 
-   use constant HAVE_ISBOOL => defined eval { Scalar::Util->import( 'isbool' ) };
+   no if $] >= 5.035008, warnings => "experimental::builtin";
+   use constant HAVE_ISBOOL => defined &builtin::isbool;
 
    my $TYPE_BOOL  = Tangence::Type->make( 'bool' );
    my $TYPE_INT   = Tangence::Type->make( 'int' );
@@ -596,7 +597,7 @@ class Tangence::Type::Primitive::any isa Tangence::Type
             $tmp =~ m/^[[:ascii:]]+$/ and ( $value ^ $value ) eq "0"
          };
 
-         if( HAVE_ISBOOL && Scalar::Util::isbool($value) ) {
+         if( HAVE_ISBOOL && builtin::isbool($value) ) {
             $TYPE_BOOL->pack_value( $message, $value );
          }
          # test for integers, but exclude NaN

@@ -39,6 +39,15 @@ sub build {
   return 1;
 }
 
+sub print_error_messages {
+  my ($self, $fh) = @_;
+
+  my $error_messages = $self->get_error_messages;
+  for my $error_message (@$error_messages) {
+    printf $fh "[CompileError]$error_message\n";
+  }
+}
+
 # Fields
 sub module_dirs {
   my $self = shift;
@@ -140,6 +149,7 @@ sub build_shared_lib_dist {
 
   my $compile_success = $self->compile_spvm($class_name, '(build_shared_lib_dist)', 0);
   unless ($compile_success) {
+    $self->print_error_messages(*STDERR);
     exit(255);
   }
 

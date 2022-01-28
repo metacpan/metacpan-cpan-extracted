@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.44;
 
-package Tangence::Meta::Property 0.27;
+package Tangence::Meta::Property 0.28;
 class Tangence::Meta::Property :strict(params);
 
 use Syntax::Keyword::Match;

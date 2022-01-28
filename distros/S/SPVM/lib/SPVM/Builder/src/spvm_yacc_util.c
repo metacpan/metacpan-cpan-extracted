@@ -13,12 +13,11 @@
 #include "spvm_op.h"
 #include "spvm_type.h"
 #include "spvm_basic_type.h"
+#include "spvm_list.h"
 
 // Print error
-void SPVM_yyerror(SPVM_COMPILER* compiler, const char* message) {
+void SPVM_yyerror(SPVM_COMPILER* compiler, const char* message_not_used) {
   (void)compiler;
-  
-  compiler->error_count++;
   
   // Current token
   int32_t length = 0;
@@ -39,22 +38,21 @@ void SPVM_yyerror(SPVM_COMPILER* compiler, const char* message) {
   token[length] = '\0';
   
   int32_t char_pos = (int32_t)(compiler->befbufptr + empty_count + 1 - compiler->line_start_ptr);
-  
-  fprintf(stderr, "[CompileError]Unexpected token \"%s\" at %s line %d:%d\n", token, compiler->cur_file, compiler->cur_line, char_pos);
+
+  SPVM_COMPILER_error(compiler, "Unexpected token \"%s\" at %s line %d:%d", token, compiler->cur_file, compiler->cur_line, char_pos);
+
   SPVM_ALLOCATOR_free_block_compile_tmp(compiler, token);
 }
 
-// Print token value for debug
+// Print the token value in yacc/bison debug mode
 void SPVM_yyprint (FILE *file, int type, YYSTYPE yylval) {
   
   switch(type) {
-    case NAME: {
-      fprintf(file, "%s", yylval.opval->uv.name);
-      break;
-    }
-    case VAR_NAME: {
-      const char* var_name = yylval.opval->uv.name;
-      fprintf(file, "%s", var_name);
+    case NAME:
+    case VAR_NAME:
+    {
+      const char* name = yylval.opval->uv.name;
+      fprintf(file, "%s", name);
       break;
     }
   }

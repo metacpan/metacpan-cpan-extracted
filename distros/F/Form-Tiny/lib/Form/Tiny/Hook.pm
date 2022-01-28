@@ -8,7 +8,7 @@ use Types::Standard qw(Enum CodeRef Bool);
 
 use namespace::clean;
 
-our $VERSION = '2.04';
+our $VERSION = '2.06';
 
 use constant {
 	HOOK_REFORMAT => 'reformat',
@@ -28,14 +28,14 @@ my @hooks = (
 	HOOK_AFTER_ERROR,
 );
 
-has "hook" => (
-	is => "ro",
+has 'hook' => (
+	is => 'ro',
 	isa => Enum [@hooks],
 	required => 1,
 );
 
-has "code" => (
-	is => "ro",
+has 'code' => (
+	is => 'ro',
 	isa => CodeRef,
 	required => 1,
 );

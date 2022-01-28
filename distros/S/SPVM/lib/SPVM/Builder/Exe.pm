@@ -9,7 +9,7 @@ use Config;
 use SPVM::Builder;
 use SPVM::Builder::CC;
 use SPVM::Builder::Util;
-use SPVM::Builder::Config;
+use SPVM::Builder::Config::Exe;
 use File::Spec;
 use File::Find 'find';
 
@@ -155,7 +155,7 @@ sub new {
   }
   
   # Quiet output
-  unless (exists $self->{quiet}) {
+  unless (defined $self->{quiet}) {
     $self->{quiet} = 0;
   }
   
@@ -184,9 +184,12 @@ sub new {
   my $config;
   if (defined $config_file) {
     $config = SPVM::Builder::Util::load_config($config_file);
+    unless ($config->is_exe) {
+      confess "Config file \"$config_file\" is not the config to create the executable file";
+    }
   }
   else {
-    $config = SPVM::Builder::Config->new_gnu99;
+    $config = SPVM::Builder::Config::Exe->new_gnu99;
   }
   $self->{config} = $config;
   
@@ -215,6 +218,7 @@ sub build_exe_file {
   # Compile SPVM
   my $compile_success = $builder->compile_spvm($class_name, __FILE__, __LINE__);
   unless ($compile_success) {
+    $builder->print_error_messages(*STDERR);
     exit(255);
   }
   
@@ -301,16 +305,31 @@ sub compile_source_file {
     input_files => [$source_file],
   });
 
-  if ($need_generate) {
-    # Compile command
-    my $builder_cc = SPVM::Builder::CC->new;
-    my $cc_cmd = $builder_cc->create_compile_command({config => $config, output_file => $output_file, source_file => $source_file});
+  # Compile command
+  my $builder_cc = SPVM::Builder::CC->new;
 
+  my $compile_info = $builder_cc->create_compile_command_info({config => $config, output_file => $output_file, source_file => $source_file});
+  my $cc_cmd = $builder_cc->create_compile_command($compile_info);
+
+  my $compile_info_cc = $compile_info->{cc};
+  my $compile_info_ccflags = $compile_info->{ccflags};
+
+  if ($need_generate) {
     # Execute compile command
     my $cbuilder = ExtUtils::CBuilder->new;
     $cbuilder->do_system(@$cc_cmd)
       or confess "Can't compile $source_file: @$cc_cmd";
   }
+  
+  my $object_file_info = SPVM::Builder::ObjectFileInfo->new(
+    object_file => $output_file,
+    source_file => $source_file,
+    cc => $compile_info_cc,
+    ccflags => $compile_info_ccflags,
+    is_exe_config => $config->is_exe,
+  );
+  
+  return $object_file_info;
 }
 
 sub create_bootstrap_source {
@@ -439,7 +458,8 @@ EOS
 
   SPVM_COMPILER_compile(compiler);
 
-  if (compiler->error_count > 0) {
+  if (SPVM_COMPILER_get_error_count(compiler) > 0) {
+    SPVM_COMPILER_print_error_messages(compiler, stderr);
     exit(1);
   }
 EOS
@@ -586,9 +606,9 @@ sub compile_bootstrap_source {
   mkdir dirname $object_file;
   
   # Compile
-  $self->compile_source_file({source_file => $source_file, output_file => $object_file});
+  my $object_file_info = $self->compile_source_file({source_file => $source_file, output_file => $object_file});
   
-  return $object_file;
+  return $object_file_info;
 }
 
 sub compile_spvm_core_sources {
@@ -652,18 +672,18 @@ sub compile_spvm_core_sources {
   mkpath $object_dir;
   
   # Compile source files
-  my $object_files = [];
+  my $object_file_infos = [];
   for my $src_file (@spvm_core_source_files) {
     # Object file
     my $object_file = "$object_dir/" . basename($src_file);
     $object_file =~ s/\.c$//;
     $object_file .= '.o';
     
-    $self->compile_source_file({source_file => $src_file, output_file => $object_file});
-    push @$object_files, $object_file;
+    my $object_file_info = $self->compile_source_file({source_file => $src_file, output_file => $object_file});
+    push @$object_file_infos, $object_file_info;
   }
   
-  return $object_files;
+  return $object_file_infos;
 }
 
 sub create_spvm_module_sources {
@@ -731,7 +751,7 @@ sub compile_spvm_module_sources {
   
   # Compile module source files
   my $class_names = $builder->get_class_names;
-  my $object_files = [];
+  my $object_file_infos = [];
   for my $class_name (@$class_names) {
     my $perl_class_name = "SPVM::$class_name";
     
@@ -750,11 +770,11 @@ sub compile_spvm_module_sources {
     mkpath dirname $object_file;
     
     # Compile
-    $self->compile_source_file({source_file => $source_file, output_file => $object_file});
-    push @$object_files, $object_file;
+    my $object_file_info = $self->compile_source_file({source_file => $source_file, output_file => $object_file});
+    push @$object_file_infos, $object_file_info;
   }
   
-  return $object_files;
+  return $object_file_infos;
 }
 
 sub create_precompile_csources {
@@ -887,18 +907,27 @@ sub compile_native_csources {
 }
 
 sub link {
-  my ($self, $object_files) = @_;
-  
+  my ($self, $object_file_infos) = @_;
+
   my $class_name = $self->class_name;
   
   my $config = $self->config;
+
+  my $before_link = $config->before_link;
+  if ($before_link) {
+    $object_file_infos = $before_link->($config, $object_file_infos);
+  }
   
   # CBuilder configs
   my $output_file = $self->{output_file};
-
-  my $lib_dirs_str = join(' ', map { "-L$_" } @{$config->lib_dirs});
-  $config->add_ldflags("$lib_dirs_str");
   
+  # Add output file extension
+  my $output_file_base = basename $output_file;
+  unless ($output_file_base =~ /\./) {
+    my $exe_ext = $Config{exe_ext};
+    $output_file .= $exe_ext;
+  }
+
   # Linker
   my $ld = $config->ld;
   
@@ -911,10 +940,22 @@ sub link {
   my $ld_optimize = $config->ld_optimize;
   $ldflags_str .= " $ld_optimize";
   
+  # Library directory
+  my $lib_dirs = $config->lib_dirs;
+  for my $lib_dir (@$lib_dirs) {
+    if (-d $lib_dir) {
+      $ldflags_str .= " -L$lib_dir";
+    }
+  }
+  
+  # Libraries
+  my $libs = $config->libs;
+  $ldflags_str .= " " . join(' ', map { "-l$_" } @$libs);
+  
   # ExeUtils::CBuilder config
   my $cbuilder_config = {
     ld => $ld,
-    lddlflags => $ldflags_str,
+    ldflags => '',
     shrpenv => '',
     perllibs => '',
     libpth => '',
@@ -924,16 +965,19 @@ sub link {
     global_force => $self->force,
     config_force => $config->force,
     output_file => $output_file,
-    input_files => $object_files,
+    input_files => $object_file_infos,
   });
   
   if ($need_generate) {
+    my $object_files = [map { $_->to_string } @$object_file_infos];
+    
     # Create the executable file
     my $cbuilder = ExtUtils::CBuilder->new(quiet => $self->quiet, config => $cbuilder_config);
     $cbuilder->link_executable(
       objects => $object_files,
       module_name => $class_name,
       exe_file => $output_file,
+      extra_linker_flags => $ldflags_str,
     );
   }
   

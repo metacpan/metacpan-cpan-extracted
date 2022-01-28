@@ -12,10 +12,10 @@ use Form::Tiny::FieldDefinition;
 
 use namespace::clean;
 
-our $VERSION = '2.04';
+our $VERSION = '2.06';
 
-has "data" => (
-	is => "ro",
+has 'data' => (
+	is => 'ro',
 	required => 1,
 );
 
@@ -48,7 +48,7 @@ sub build
 		$definition = Form::Tiny::FieldDefinition->new($data);
 	}
 	else {
-		croak sprintf 'Invalid form field "%s" data: must be hashref or instance of Form::Tiny::FieldDefinition',
+		croak sprintf q{Invalid form field '%s' data: must be hashref or instance of Form::Tiny::FieldDefinition},
 			$self->name;
 	}
 

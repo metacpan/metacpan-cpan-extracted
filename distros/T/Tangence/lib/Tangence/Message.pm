@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.41;
 
-package Tangence::Message 0.27;
+package Tangence::Message 0.28;
 class Tangence::Message;
 
 use Carp;

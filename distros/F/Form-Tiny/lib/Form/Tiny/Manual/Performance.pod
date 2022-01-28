@@ -31,6 +31,10 @@ While it may come useful, it is often unnecessary. The module already does not c
 
 =head1 THINGS THAT SPEED THE MODULE UP
 
+=head2 Flat forms
+
+Form::Tiny has a built in condition that allows it to optimize form validation when the form is "flat": no fields are nested or dynamic. If you can avoid having nested fields (fields with a dot, like C<hashref.key> or C<arrayref.*>) or dynamic fields (fields which are constructed by a sub) in you form, validation speed will be increased by up to 70%. The module can then completely skip searching for the field in the input structure and simply use its name as a key in the input hash reference.
+
 =head2 Type::Tiny::XS
 
 Form::Tiny uses a lot of Type::Tiny type constraints, both internally and in its form classes. Installing L<Type::Tiny::XS> should give them some XS boost, although it may be hard to measure exactly what kind of performance boost it gives.

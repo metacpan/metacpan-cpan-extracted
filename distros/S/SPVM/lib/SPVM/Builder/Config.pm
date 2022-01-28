@@ -84,6 +84,17 @@ sub optimize {
   }
 }
 
+sub optimize_each {
+  my $self = shift;
+  if (@_) {
+    $self->{optimize_each} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{optimize_each};
+  }
+}
+
 sub ld_optimize {
   my $self = shift;
   if (@_) {
@@ -183,13 +194,26 @@ sub force {
   }
 }
 
+sub before_link {
+  my $self = shift;
+  if (@_) {
+    $self->{before_link} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{before_link};
+  }
+}
+
+sub is_exe { 0 }
+
 # Methods
 sub new {
   my $class = shift;
   
   my $self = {@_};
 
-  bless $self, $class;
+  bless $self, ref $class || $class;
   
   # quiet
   unless (defined $self->{quiet}) {
@@ -299,7 +323,7 @@ sub new {
 sub new_c {
   my $class = shift;
   
-  my $self = SPVM::Builder::Config->new(@_);
+  my $self = $class->new(@_);
   
   # NativeAPI
   $self->ext('c');
@@ -310,7 +334,7 @@ sub new_c {
 sub new_c99 {
   my $class = shift;
   
-  my $self = SPVM::Builder::Config->new_c(@_);
+  my $self = $class->new_c(@_);
   
   # C99
   $self->set_std('c99');
@@ -321,7 +345,7 @@ sub new_c99 {
 sub new_gnu99 {
   my $class = shift;
   
-  my $self = SPVM::Builder::Config->new_c(@_);
+  my $self = $class->new_c(@_);
   
   # C99
   $self->set_std('gnu99');
@@ -332,7 +356,7 @@ sub new_gnu99 {
 sub new_cpp {
   my $class = shift;
   
-  my $self = SPVM::Builder::Config->new(@_);
+  my $self = $class->new(@_);
   
   # The compiler
   # [Memo]Free BSD don't have g++ in the environment clang++ exists.
@@ -356,7 +380,7 @@ sub new_cpp {
 sub new_cpp11 {
   my $class = shift;
   
-  my $self = SPVM::Builder::Config->new_cpp(@_);
+  my $self = $class->new_cpp(@_);
   
   # C++11
   $self->set_std('c++11');
@@ -574,14 +598,34 @@ B<Examples:>
   my $cc_each = $config->cc_each;
   $config->cc_each($cc_each);
 
-Get and set a callback that returns the compiler name for each source file. The call back receives L<SPVM::Bulder::Config> object and each source file.
+Get and set a callback that returns the compiler name for each source file. The call back receives L<SPVM::Bulder::Config> object and optional arguments as a hash reference.
 
-C<cc_each> takes precedence over C<cc>.
+B<Optional Arguments:>
+
+=over 2
+
+=item * source_file
+
+Each source file.
+
+=item * class_name
+
+The class name
+
+=back
+
+If C<cc_each> is defined, the compiler use the return value of C<cc_each> as the compiler name instead of C<cc>.
 
 B<Examples:>
   
   $config->cc_each(sub {
-    my ($config, $source_file) = @_;
+    my ($config, $args) = @_;
+    
+    # Source file
+    my $source_file = $args->{source_file};
+    
+    # Class name
+    my $class_name = $args->{class_name}
     
     my $cc;
     # C source file
@@ -627,15 +671,43 @@ B<Default:>
   my $ccflags_each = $config->ccflags_each;
   $config->ccflags_each($ccflags_each);
 
-Get and set a callback that returns the compiler flags for each source file. The call back receives L<SPVM::Bulder::Config> object and each source file.
+Get and set a callback that returns the compiler flags for each source file. The call back receives L<SPVM::Bulder::Config> object and optional arguments as a hash reference.
 
-C<ccflags_each> takes precedence over C<ccflags>.
+B<Optional Arguments:>
+
+=over 2
+
+=item * source_file
+
+Each source file.
+
+=item * class_name
+
+The class name
+
+=item * cc
+
+The compiler name that is the value after the process of the process of L<cc> or L<cc_each>.
+
+=back
+
+If C<ccflags_each> is defined, the compiler use the return value of C<ccflags_each> as the compiler flags instead of C<ccflags>.
 
 B<Examples:>
   
   $config->ccflags_each(sub {
     my ($config, $source_file) = @_;
+
+    # Source file
+    my $source_file = $args->{source_file};
     
+    # Class name
+    my $class_name = $args->{class_name}
+
+    # The compiler name
+    my $cc = $args->{cc};
+    
+    # ccflags
     my $config_ccflags = $config->ccflags;
     
     my $ccflags = [];
@@ -651,8 +723,6 @@ B<Examples:>
     return $ccflags;
   });
 
-C<cc_each> takes precedence over C<cc>.
-
 =head2 optimize
 
   my $optimize = $config->optimize;
@@ -667,6 +737,63 @@ B<Examples:>
   $config->optimize('-O3');
   $config->optimize('-O2');
   $config->optimize('-g3 -O0');
+
+=head2 optimize_each
+
+  my $optimize_each = $config->optimize_each;
+  $config->optimize_each($optimize_each);
+
+Get and set a callback that returns the value of optimize for each source file. The callback receives L<SPVM::Bulder::Config> object and optional arguments as a hash reference.
+
+B<Optional Arguments:>
+
+=over 2
+
+=item * source_file
+
+Each source file.
+
+=item * class_name
+
+The class name
+
+=item * cc
+
+The compiler name that is the value after the process of the process of L<cc> or L<cc_each>.
+
+=back
+
+If C<optimize_each> is defined, the compiler use the return value of C<optimize_each> as the compiler flags instead of C<optimize>.
+
+B<Examples:>
+  
+  $config->optimize_each(sub {
+    my ($config, $source_file) = @_;
+
+    # Source file
+    my $source_file = $args->{source_file};
+    
+    # Class name
+    my $class_name = $args->{class_name}
+
+    # The compiler name
+    my $cc = $args->{cc};
+    
+    # optimize
+    my $config_optimize = $config->optimize;
+    
+    my $optimize = [];
+    # C source file
+    if ($source_file =~ /\.c$/) {
+      $optimize = '-O3';
+    }
+    # C++ source file
+    elsif ($source_file =~ /\.cpp$/) {
+      $optimize = '-O3';
+    }
+    
+    return $optimize;
+  });
 
 =head2 source_files
 
@@ -769,6 +896,25 @@ The default is C<-O2>.
   $config->force($force);
 
 Get and set the flag to force compiles and links without caching.
+
+=head2 before_link
+
+  my $before_link = $config->before_link;
+  $config->before_link($before_link);
+
+Get and set the callback that is executed before the link. The callback receives L<SPVM::Builder::Config> object and the array reference of L<SPVM::Builder::ObjectFileInfo> objects.
+
+This callback must be return the array reference of L<SPVM::Builder::ObjectFileInfo> objects that is used by the linker.
+
+B<Examples:>
+
+  $config->before_link(sub {
+    my ($config, $object_infos) = @_;
+    
+    # Do something
+
+    return $object_infos;
+  });
 
 =head2 quiet
 
@@ -954,3 +1100,9 @@ Get the source directory from the config file name.
   my $lib_dir = $config->get_lib_dir(__FILE__);
 
 Get the library directory from the config file name.
+
+=head2 is_exe
+
+  my $is_exe = $config->is_exe;
+
+Check this config is used for creating executalbe file. Always 0.

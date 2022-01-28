@@ -1,5 +1,5 @@
 package OPM::Maker::Command::bashcompletion;
-$OPM::Maker::Command::bashcompletion::VERSION = '1.16';
+$OPM::Maker::Command::bashcompletion::VERSION = '1.17';
 use strict;
 use warnings;
 
@@ -116,9 +116,14 @@ _opmbuild()
     opts="%s"
 
     case "${prev}" in
+        opmbuild)
+            ;;
 %s
         *)
-        ;;
+            compopt -o nospace
+            COMPREPLY=( $( compgen -d -f -- $cur ) )
+            return 0
+            ;;
     esac
 
     COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
@@ -146,7 +151,7 @@ OPM::Maker::Command::bashcompletion - build bash completion script
 
 =head1 VERSION
 
-version 1.16
+version 1.17
 
 =head1 DESCRIPTION
 

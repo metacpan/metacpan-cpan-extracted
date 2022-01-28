@@ -2,8 +2,8 @@ NAME
     App::BorderStyleUtils - CLI utilities related to border styles
 
 VERSION
-    This document describes version 0.012 of App::BorderStyleUtils (from
-    Perl distribution App-BorderStyleUtils), released on 2021-04-24.
+    This document describes version 0.015 of App::BorderStyleUtils (from
+    Perl distribution App-BorderStyleUtils), released on 2022-01-27.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
@@ -16,7 +16,7 @@ FUNCTIONS
   list_border_style_modules
     Usage:
 
-     list_border_style_modules(%args) -> [status, msg, payload, meta]
+     list_border_style_modules(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     List BorderStyle modules.
 
@@ -52,6 +52,35 @@ FUNCTIONS
              "Test::CustomChar",
              "Test::Labeled",
              "Test::Random",
+             "Text::ANSITable::OldCompat::Default::bold",
+             "Text::ANSITable::OldCompat::Default::brick",
+             "Text::ANSITable::OldCompat::Default::bricko",
+             "Text::ANSITable::OldCompat::Default::csingle",
+             "Text::ANSITable::OldCompat::Default::double",
+             "Text::ANSITable::OldCompat::Default::none_ascii",
+             "Text::ANSITable::OldCompat::Default::none_boxchar",
+             "Text::ANSITable::OldCompat::Default::none_utf8",
+             "Text::ANSITable::OldCompat::Default::single_ascii",
+             "Text::ANSITable::OldCompat::Default::single_boxchar",
+             "Text::ANSITable::OldCompat::Default::single_utf8",
+             "Text::ANSITable::OldCompat::Default::singleh_ascii",
+             "Text::ANSITable::OldCompat::Default::singleh_boxchar",
+             "Text::ANSITable::OldCompat::Default::singleh_utf8",
+             "Text::ANSITable::OldCompat::Default::singlei_ascii",
+             "Text::ANSITable::OldCompat::Default::singlei_boxchar",
+             "Text::ANSITable::OldCompat::Default::singlei_utf8",
+             "Text::ANSITable::OldCompat::Default::singleo_ascii",
+             "Text::ANSITable::OldCompat::Default::singleo_boxchar",
+             "Text::ANSITable::OldCompat::Default::singleo_utf8",
+             "Text::ANSITable::OldCompat::Default::singlev_ascii",
+             "Text::ANSITable::OldCompat::Default::singlev_boxchar",
+             "Text::ANSITable::OldCompat::Default::singlev_utf8",
+             "Text::ANSITable::OldCompat::Default::space_ascii",
+             "Text::ANSITable::OldCompat::Default::space_boxchar",
+             "Text::ANSITable::OldCompat::Default::space_utf8",
+             "Text::ANSITable::OldCompat::Default::spacei_ascii",
+             "Text::ANSITable::OldCompat::Default::spacei_boxchar",
+             "Text::ANSITable::OldCompat::Default::spacei_utf8",
              "UTF8::Brick",
              "UTF8::BrickOuterOnly",
              "UTF8::DoubleLine",
@@ -81,19 +110,22 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
   show_border_style
     Usage:
 
-     show_border_style(%args) -> [status, msg, payload, meta]
+     show_border_style(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Show example table with specified border style.
 
@@ -109,7 +141,7 @@ FUNCTIONS
          [
            200,
            "OK",
-           "# Positions for border character\n\n ---------------------------------------------\n y\\x  0    1    2    3    4    5    6    7\n  0  '.'  '-'  '+'  '.'                              <--- top border\n  1  '|'  '|'  '|'                                   <--- header row\n  2  '+'  '='  '+'  '+'  '+'  '+'                    <--- separator between header & data row\n  3  '|'  '|'  '|'                                   <--- data row\n  4  '+'  '-'  '+'  '+'  '+'  '+'  '+'  '+'          <--- separator between data rows\n  5  '`'  '-'  '+'  '''                              <--- bottom border\n\n  6  ''  ''  ''  ''                              <--- top border (for case when there is no header row)\n  7  ''  ''  ''  ''                              <--- bottom border (for case when there is header row but no data row)\n ---------------------------------------------\n\n.--------+--------.     #\n| header | header |     #\n+========+========+     #\n| cell   | cell   |     # Table with header row, without row/column spans\n+--------+--------+     #\n| cell   | cell   |     #\n`--------+--------'     #\n\n     #\n| cell   | cell   |     # Table without header row, with data rows\n+--------+--------+     #\n| cell   | cell   |     #\n`--------+--------'     #\n\n.--------+--------.     #\n| header | header |     # Table with header row, but without any data row\n     #\n\n.-----------+-----+-----.     #\n| header    | hea | hea |     #\n+=====+=====+=====+=====+     #\n| cel | cel | cell      |     #\n+-----+-----+-----+-----+     #\n| cell      | cel | cel |     #\n+-----------+-----+-----+     # Table with row/column spans\n| cell      | cell      |     #\n|           +-----------+     #\n|           | cell      |     #\n+-----------+           |     #\n| cell      |           |     #\n`-----------+-----------'     #\n",
+           "# Positions for border character\n\n ---------------------------------------------\n y\\x  0    1    2    3    4    5    6    7\n  0  '.'  '-'  '+'  '.'                              <--- top border\n  1  '|'  '|'  '|'                                   <--- header row\n  2  '+'  '='  '+'  '+'  '+'  '+'                    <--- separator between header & data row\n  3  '|'  '|'  '|'                                   <--- data row\n  4  '+'  '-'  '+'  '+'  '+'  '+'  '+'  '+'          <--- separator between data rows\n  5  '`'  '-'  '+'  '''                              <--- bottom border\n\n  6  '.'  '-'  '+'  '.'                              <--- top border (for case when there is no header row)\n  7  '`'  '-'  '+'  '''                              <--- bottom border (for case when there is header row but no data row)\n  8  '+'  '-'  '+'  '+'  '+'  '+'  '+'  '+'          <--- separator between header rows\n ---------------------------------------------\n\n.--------+--------.     #\n| header | header |     #\n+========+========+     # <--- separator between header & data row\n| cell   | cell   |     # Table with header row, without row/column spans\n+--------+--------+     # <--- separator between data rows\n| cell   | cell   |     #\n`--------+--------'     #\n\n.--------+--------.     #\n| cell   | cell   |     # Table without header row, with data rows\n+--------+--------+     # <--- separator between header & data row\n| cell   | cell   |     #\n`--------+--------'     #\n\n.--------+--------.     #\n| header | header |     # Table with header row, but without any data row\n`--------+--------'     #\n\n.-----------+--------+--------.     #\n| header    | header | header |     #\n+=====+=====+========+========+     # <--- separator between header & data row\n| cel | cel | cell            |     #\n+-----+-----+--------+--------+     # <--- separator between data rows\n| cell      | cell   | cell   |     # Table with row/column spans\n+-----------+--------+--------+     # <--- separator between data rows\n| cell      | cell            |     #\n|           +-----------------+     # <--- separator between data rows\n|           | cell            |     #\n+-----------+                 |     # <--- separator between data rows\n| cell      |                 |     #\n`-----------+-----------------'     #\n\n.-------------+---------+---------.     #\n| header      | header  | header  |     #\n+-------------+---------+---------+     # <--- separator between header rows\n| header      | header  | header  |     #\n+-------------+---------+---------+     # <--- separator between header rows\n|             | header            |     #\n| header      +-------------------+     # <--- separator between header rows\n|             |                   |     #\n+-------------+ header            |     # <--- separator between header rows\n| header      |                   |     #\n+======+======+===================+     # Table with multirow header\n| cell | cell | cell              |     #\n+------+------+---------+---------+     # <--- separator between data rows\n| cell        | cell    | cell    |     #\n+-------------+---------+---------+     # <--- separator between data rows\n|             | cell              |     #\n| cell        +-------------------+     # <--- separator between data rows\n|             |                   |     #\n+-------------+ cell              |     # <--- separator between data rows\n| cell        |                   |     #\n`-------------+-------------------'     #\n\n.---------+---------------------+---------.     #\n| header  |       header        | header  |     #\n|         +==========+==========+         |     # <--- separator between header & data row\n|         | header   | header   |         |     # Table with multirow header (separator line cut by rowspan)\n+---------+----------+----------+---------+     # <--- separator between data rows\n| header  | header   | header   | header  |     #\n`---------+----------+----------+---------'     #\n",
            {},
          ]
 
@@ -121,12 +153,15 @@ FUNCTIONS
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
@@ -138,22 +173,39 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-App-BorderStyleUtils>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-BorderStyleUtils>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
     BorderStyle
 
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
+    This software is copyright (c) 2022, 2021 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-BorderStyleUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

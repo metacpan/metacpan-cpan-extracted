@@ -1,9 +1,9 @@
 package App::FileRenameUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-22'; # DATE
+our $DATE = '2021-08-02'; # DATE
 our $DIST = 'App-FileRenameUtils'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -47,7 +47,7 @@ App::FileRenameUtils - Utilities related to renaming/moving files
 
 =head1 VERSION
 
-This document describes version 0.006 of App::FileRenameUtils (from Perl distribution App-FileRenameUtils), released on 2020-08-22.
+This document describes version 0.007 of App::FileRenameUtils (from Perl distribution App-FileRenameUtils), released on 2021-08-02.
 
 =head1 DESCRIPTION
 
@@ -114,13 +114,16 @@ L<perlmv> from L<App::perlmv>
 
 L<renwd> from L<App::renwd>
 
+Other similar distributions: L<App::FileModifyUtils>,
+L<App::FileRemoveUtilities>.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

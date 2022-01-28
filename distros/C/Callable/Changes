@@ -1,0 +1,10 @@
+Revision history for Perl extension Callable
+
+0.02 2022-01-27T08:14:51Z
+
+    - add classes autoload
+
+0.01 2022-01-26T23:00:55Z
+
+    - original version
+

@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.41;
 
-package Tangence::Compiler::Parser 0.27;
+package Tangence::Compiler::Parser 0.28;
 class Tangence::Compiler::Parser isa Parser::MGC;
 
 use Syntax::Keyword::Dynamically;

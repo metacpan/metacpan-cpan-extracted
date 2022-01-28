@@ -6,12 +6,14 @@ use warnings;
 use Carp qw(croak carp);
 use Types::Standard qw(Str);
 use Import::Into;
+use Scalar::Util qw(blessed);
 
 use Form::Tiny::Form;
 use Form::Tiny::Utils qw(trim :meta_handlers);
 require Moo;
+require Moo::Role;
 
-our $VERSION = '2.04';
+our $VERSION = '2.06';
 
 sub import
 {
@@ -23,22 +25,19 @@ sub import
 	@wanted = (-base, grep { $_ ne -base } @wanted);
 
 	# very special case - do something UNLESS -nomoo was passed
-	unless (_get_flag(\@wanted, -nomoo)) {
+	unless ($package->_get_flag(\@wanted, -nomoo)) {
 		Moo->import::into($caller);
 	}
 
-	ft_install($caller, @wanted);
-	namespace::clean->import(
-		-cleanee => $caller,
-		-except => 'form_meta'
-	);
+	$package->ft_install($caller, @wanted);
 
+	Moo::Role->apply_roles_to_package($caller, __PACKAGE__);
 	return;
 }
 
 sub ft_install
 {
-	my ($caller, @import_flags) = @_;
+	my ($self, $caller, @import_flags) = @_;
 
 	my $context;
 	my $wanted = {
@@ -47,9 +46,12 @@ sub ft_install
 		meta_roles => [],
 	};
 
-	my $plugins = _get_flag(\@import_flags, 'plugins', 1);
+	my $plugins = $self->_get_flag(\@import_flags, 'plugins', 1);
 
-	_select_behaviors($wanted, \@import_flags, _get_behaviors(_generate_helpers($caller, \$context)));
+	$self->_select_behaviors(
+		$wanted, \@import_flags,
+		$self->_get_behaviors($self->_generate_helpers($caller, \$context))
+	);
 
 	foreach my $plugin (@$plugins) {
 		$plugin = "Form::Tiny::Plugin::$plugin";
@@ -61,7 +63,7 @@ sub ft_install
 		croak "$plugin is not a Form::Tiny::Plugin"
 			unless $plugin->isa('Form::Tiny::Plugin');
 
-		_select_behaviors($wanted, [$plugin], {$plugin => $plugin->plugin($caller, \$context)});
+		$self->_select_behaviors($wanted, [$plugin], {$plugin => $plugin->plugin($caller, \$context)});
 	}
 
 	# create metapackage with roles
@@ -75,9 +77,6 @@ sub ft_install
 
 		*{"${caller}::$_"} = $wanted->{subs}{$_}
 			foreach keys %{$wanted->{subs}};
-		*{"${caller}::form_meta"} = sub {
-			return get_package_form_meta($caller);
-		};
 	}
 
 	return \$context;
@@ -85,7 +84,7 @@ sub ft_install
 
 sub _generate_helpers
 {
-	my ($caller, $field_context) = @_;
+	my ($self, $caller, $field_context) = @_;
 
 	my $use_context = sub {
 		croak 'context using DSL keyword called without context'
@@ -132,7 +131,7 @@ sub _generate_helpers
 
 sub _get_behaviors
 {
-	my ($subs) = @_;
+	my ($self, $subs) = @_;
 
 	return {
 		-base => {
@@ -167,7 +166,7 @@ sub _get_behaviors
 
 sub _select_behaviors
 {
-	my ($wanted, $types, $behaviors) = @_;
+	my ($self, $wanted, $types, $behaviors) = @_;
 
 	foreach my $type (@$types) {
 		croak "no Form::Tiny import behavior for: $type"
@@ -181,7 +180,7 @@ sub _select_behaviors
 
 sub _get_flag
 {
-	my ($flags, $wanted, $with_param) = @_;
+	my ($self, $flags, $wanted, $with_param) = @_;
 	$with_param //= 0;
 
 	for my $n (0 .. $#$flags) {
@@ -200,6 +199,19 @@ sub _get_flag
 
 	return;
 }
+
+# role to add form_meta method
+
+use Moo::Role;
+
+sub form_meta
+{
+	my ($self) = @_;
+	my $package = defined blessed $self ? blessed $self : $self;
+
+	return get_package_form_meta($package);
+}
+
 
 1;
 

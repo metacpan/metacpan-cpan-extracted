@@ -8,16 +8,16 @@ use Types::Standard qw(HasMethods CodeRef);
 
 use namespace::clean;
 
-our $VERSION = '2.04';
+our $VERSION = '2.06';
 
-has "type" => (
-	is => "ro",
-	isa => HasMethods ["check"],
+has 'type' => (
+	is => 'ro',
+	isa => HasMethods ['check'],
 	required => 1,
 );
 
-has "code" => (
-	is => "ro",
+has 'code' => (
+	is => 'ro',
 	isa => CodeRef,
 	required => 1,
 );

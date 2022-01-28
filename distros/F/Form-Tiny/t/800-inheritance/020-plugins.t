@@ -9,7 +9,7 @@ use lib 't/lib';
 	package PluginInheritanceParentForm;
 
 	use Form::Tiny plugins => ['MyRolePlugin', 'MyMetaRolePlugin'];
-	form_meta;
+	__PACKAGE__->form_meta;
 }
 
 {
@@ -18,7 +18,7 @@ use lib 't/lib';
 
 	use Form::Tiny;
 	extends 'PluginInheritanceParentForm';
-	form_meta;
+	__PACKAGE__->form_meta;
 }
 
 {
@@ -27,7 +27,7 @@ use lib 't/lib';
 
 	use Form::Tiny -filtered;
 	extends 'PluginInheritanceChildForm';
-	form_meta;
+	__PACKAGE__->form_meta;
 }
 
 subtest 'test child plugin class' => sub {

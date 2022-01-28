@@ -1,9 +1,9 @@
 package App::grep::url;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-11'; # DATE
+our $DATE = '2021-08-01'; # DATE
 our $DIST = 'App-grep-url'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -135,6 +135,10 @@ _
                 'test' => 0,
                 'x.doc.show_result' => 0,
             },
+        ];
+
+        $meta->{links} = [
+            {url=>'prog:grep-email'},
         ];
     },
     output_code => sub {
@@ -342,13 +346,7 @@ App::grep::url - Print lines having URL(s) (optionally of certain criteria) in t
 
 =head1 VERSION
 
-This document describes version 0.003 of App::grep::url (from Perl distribution App-grep-url), released on 2021-07-11.
-
-=head1 CONTRIBUTOR
-
-=for stopwords perlancar (on netbook-dell-xps13)
-
-perlancar (on netbook-dell-xps13) <perlancar@gmail.com>
+This document describes version 0.004 of App::grep::url (from Perl distribution App-grep-url), released on 2021-08-01.
 
 =head1 FUNCTIONS
 

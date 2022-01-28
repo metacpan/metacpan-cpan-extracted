@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.51;
 
-package Tangence::Meta::Event 0.27;
+package Tangence::Meta::Event 0.28;
 class Tangence::Meta::Event :strict(params);
 
 =head1 NAME

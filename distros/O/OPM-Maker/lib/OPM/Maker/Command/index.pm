@@ -1,5 +1,5 @@
 package OPM::Maker::Command::index;
-$OPM::Maker::Command::index::VERSION = '1.16';
+$OPM::Maker::Command::index::VERSION = '1.17';
 use strict;
 use warnings;
 
@@ -168,7 +168,7 @@ OPM::Maker::Command::index - Build index for an OPM repository
 
 =head1 VERSION
 
-version 1.16
+version 1.17
 
 =head1 AUTHOR
 

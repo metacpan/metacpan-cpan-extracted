@@ -3,8 +3,8 @@ NAME
     options
 
 VERSION
-    This document describes version 0.021 of Text::Table::More (from Perl
-    distribution Text-Table-More), released on 2022-01-26.
+    This document describes version 0.022 of Text::Table::More (from Perl
+    distribution Text-Table-More), released on 2022-01-27.
 
 SYNOPSIS
      #!perl

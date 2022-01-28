@@ -1,6 +1,10 @@
 Revision history for Perl extension Net::DNS::Resolver::Unbound.
 
 
+**** 1.05  Jan 28, 2022
+	Add further Unbound configuration methods.
+
+
 **** 1.04  Jan 26, 2022
 	Integrate fully into Net::DNS as an alternative resolver.
 

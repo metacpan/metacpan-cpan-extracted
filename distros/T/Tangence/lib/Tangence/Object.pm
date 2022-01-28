@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2010-2021 -- leonerd@leonerd.org.uk
 
-package Tangence::Object 0.27;
+package Tangence::Object 0.28;
 
 use v5.26;
 use warnings;

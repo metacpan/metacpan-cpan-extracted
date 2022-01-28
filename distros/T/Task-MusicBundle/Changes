@@ -1,5 +1,16 @@
 Revision history for Task-MusicBundle
 
+0.1908 2022-01-27 14:47:14
+    - Whoa. Music::Note has been missing this whole time!
+    - Remove analysis modules
+
+0.1907 2022-01-27 13:14:48
+    - Fix-up the description again.
+    - Improve the module ABSTRACT.
+
+0.1906 2022-01-27 13:07:41
+    - Enhance the module description.
+
 0.1905 2022-01-19 18:05:10
     - Remove MIDI::Tab as it is about notation, not creation.
 

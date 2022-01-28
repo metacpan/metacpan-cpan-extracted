@@ -1,3 +1,10 @@
+0.007   2021-08-02  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention some related modules.
+
+
 0.006   2020-08-22  Released-By: PERLANCAR; Urgency: medium
 
 	- Add script: rename-add-prefix.

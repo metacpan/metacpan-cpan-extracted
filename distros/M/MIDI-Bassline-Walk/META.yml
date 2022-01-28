@@ -38,7 +38,7 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-Bassline-Walk
   repository: https://github.com/ology/MIDI-Bassline-Walk.git
-version: '0.0309'
+version: '0.0311'
 x_Dist_Zilla:
   perl:
     version: '5.032001'

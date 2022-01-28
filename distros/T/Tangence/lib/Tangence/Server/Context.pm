@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.41;
 
-package Tangence::Server::Context 0.27;
+package Tangence::Server::Context 0.28;
 class Tangence::Server::Context;
 
 use Carp;

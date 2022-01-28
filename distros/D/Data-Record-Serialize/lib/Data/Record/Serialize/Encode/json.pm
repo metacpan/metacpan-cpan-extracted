@@ -9,13 +9,21 @@ use Data::Record::Serialize::Error { errors => [ 'json_backend' ] }, -all;
 
 use Moo::Role;
 
-our $VERSION = '0.32';
+our $VERSION = '0.34';
 
 
 BEGIN {
     my $Cpanel_JSON_XS_VERSION = 3.0236;
 
-    if ( eval { require Cpanel::JSON::XS; Cpanel::JSON::XS->VERSION( $Cpanel_JSON_XS_VERSION ); 1;  } ) {
+    # Module::Version doesn't load the code, so avoids loading
+    # Cpanel::JSON::XS's version of JSON::PP::Boolean which prevents
+    # loading the version provided by JSON::PP if Cpanel::JSON::XS is
+    # too old. Symbol::delete_package could be used to remove
+    # Cpanel::JSON::XS's version, but it's better not to load it in
+    # the first place.
+    require Module::Version;
+    if ( Module::Version::get_version( 'Cpanel::JSON::XS' ) >= $Cpanel_JSON_XS_VERSION ) {
+        require  Cpanel::JSON::XS;
         *encode_json = \&Cpanel::JSON::XS::encode_json;
     }
     elsif ( eval { require JSON::PP } ) {
@@ -76,7 +84,7 @@ Data::Record::Serialize::Encode::json - encoded a record as JSON
 
 =head1 VERSION
 
-version 0.32
+version 0.34
 
 =head1 SYNOPSIS
 

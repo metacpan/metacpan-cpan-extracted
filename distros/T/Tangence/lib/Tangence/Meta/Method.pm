@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.51;
 
-package Tangence::Meta::Method 0.27;
+package Tangence::Meta::Method 0.28;
 class Tangence::Meta::Method :strict(params);
 
 =head1 NAME

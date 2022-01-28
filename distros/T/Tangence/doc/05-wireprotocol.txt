@@ -1,0 +1,50 @@
+5. Wire Protocol
+----------------
+
+The wire protocol used by Tangence operates over a reliable stream. This
+stream may be provided by a TCP socket, UNIX local socket, or even the
+STDIN/STDOUT pipe pair of an SSH connection.
+
+The following message descriptions all use the symbolic constant names
+from the Tangence::Constants perl module, to be more readable.
+
+5.1. Messages
+
+At its lowest level, the wire protocol consists of a pair of endpoints to
+the stream, each sending and receiving messages to its peer. The protocol
+at this level is symmetric between the client and the server. It consists
+of messages that are either reqests or responses. 
+
+An endpoint sends a request, which the peer must then respond to. Each
+request has exactly one response. The requests and responses are paired
+sequentially in a pipeline fashion.
+
+The two endpoints are distinct from each other, in that there is no
+requirement for a peer to respond to an outstanding request it has
+received before sending a new request of its own. There is also no
+requirement to wait on the response to a request it has sent, before
+sending another.
+
+The basic message format is a binary exchange of messages in the following
+format:
+
+ Code:    1 byte  integer
+ Length:  4 bytes integer, big-endian
+ Payload: n bytes
+
+The code is a single byte which defines the message type. The collection 
+of message types is given below. The length is a big-endian 4 byte integer
+which gives the size of the message payload, excluding this header. Thus,
+the length of the entire message will always be 5 bytes more. The data
+payload of the message is encoded in the data serialisation scheme given
+below. Each argument to the message is encoded as a single serialisation
+item. For message types with a variable number of arguments, the length of
+the message itself defines the number of arguments given.
+
+The stream protocol is designed to be used in situations where the CPU
+power of each endpoint is high, but the connection in between may have
+high latency, or low bandwidth. It is therefore optimised in favour of
+roundtrips and byte count overhead, at the expense of processing power
+needed to encode or decode it. One consequence here is that no attempt is
+made to align multi-byte values.
+

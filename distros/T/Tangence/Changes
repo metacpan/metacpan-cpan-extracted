@@ -1,6 +1,12 @@
 Revision history for Tangence
 
-0.27    2021-10-18:
+0.28    2022-01-27
+        [CHANGES]
+         * Look for the `isbool` function in perl core's `builtin::`
+           namespace, rather than the short-lived and now removed Scalar::Util
+           version
+
+0.27    2021-10-18
         [CHANGES]
          * General code modernisation:
             + Use signatures from perl v5.26

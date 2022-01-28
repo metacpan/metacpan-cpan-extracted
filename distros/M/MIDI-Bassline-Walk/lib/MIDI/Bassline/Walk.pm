@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Generate walking basslines
 
-our $VERSION = '0.0309';
+our $VERSION = '0.0311';
 
 use Data::Dumper::Compact qw(ddc);
 use Carp qw(croak);
@@ -155,8 +155,8 @@ sub generate {
         intervals => $self->intervals,
     );
 
-    # Try to start the phrase at the beginning of the scale
-    $voice->context([$fixed[0]]) if $self->tonic;
+    # Try to start the phrase in the middle of the scale
+    $voice->context($fixed[int @fixed / 2]);
 
     # Get a passage of quasi-random pitches
     my @chosen = map { $voice->rand } 1 .. $num;
@@ -178,7 +178,9 @@ sub generate {
         _verbose_notes('INTERSECT', @intersect) if $self->verbose;
         # Anticipate the next chord
         if (@intersect) {
-            $chosen[-1] = _closest($chosen[-2], \@intersect);
+            if (my $closest = _closest($chosen[-2], \@intersect)) {
+                $chosen[-1] = $closest;
+            }
         }
     }
 
@@ -198,14 +200,19 @@ sub _verbose_notes {
 # Find the closest absolute difference to the key, in the list
 sub _closest {
     my ($key, $list) = @_;
+    # Remove the key from the list
     $list = [ grep { $_ != $key } @$list ];
+    return undef unless @$list;
+    # Find the absolute difference
     my @diff = map { abs($key - $_) } @$list;
     my $min = min @diff;
     my @closest;
+    # Get all the minimum elements of list
     for my $n (0 .. $#diff) {
         next if $diff[$n] != $min;
         push @closest, $list->[$n];
     }
+    # Return a random minimum
     return $closest[int rand @closest];
 }
 
@@ -223,7 +230,7 @@ MIDI::Bassline::Walk - Generate walking basslines
 
 =head1 VERSION
 
-version 0.0309
+version 0.0311
 
 =head1 SYNOPSIS
 
@@ -241,8 +248,8 @@ version 0.0309
 C<MIDI::Bassline::Walk> generates randomized, walking basslines.
 
 The "formula" implemented by this module is basically, "play any notes
-of the chord-root scale, plus the notes of the chord that may differ,
-minus the notes those replaced."
+of the chord, or chord-root scale, plus the notes of the chord that
+may differ, minus the notes those replaced."
 
 The logic (and music theory) implemented here, can generate some sour
 notes.  This is an approximate composition tool, and not a drop-in
@@ -335,6 +342,7 @@ Create a new C<MIDI::Bassline::Walk> object.
 =head2 generate
 
   $notes = $bassline->generate;
+  $notes = $bassline->generate($chord);
   $notes = $bassline->generate($chord, $n);
   $notes = $bassline->generate($chord, $n, $next_chord);
 

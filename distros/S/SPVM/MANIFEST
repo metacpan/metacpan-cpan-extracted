@@ -356,6 +356,7 @@ lib/SPVM/BlessedObject/Class.pm
 lib/SPVM/BlessedObject/String.pm
 lib/SPVM/Bool.pm
 lib/SPVM/Builder.pm
+lib/SPVM/Builder/API.pm
 lib/SPVM/Builder/CC.pm
 lib/SPVM/Builder/Config.pm
 lib/SPVM/Builder/Config/Exe.pm
@@ -405,6 +406,7 @@ lib/SPVM/Builder/include/spvm_var.h
 lib/SPVM/Builder/include/spvm_weaken_backref.h
 lib/SPVM/Builder/include/spvm_yacc.h
 lib/SPVM/Builder/include/spvm_yacc_util.h
+lib/SPVM/Builder/ObjectFileInfo.pm
 lib/SPVM/Builder/src/spvm_allocator.c
 lib/SPVM/Builder/src/spvm_allow.c
 lib/SPVM/Builder/src/spvm_api.c
@@ -443,6 +445,7 @@ lib/SPVM/Builder/src/spvm_var.c
 lib/SPVM/Builder/src/spvm_yacc.c
 lib/SPVM/Builder/src/spvm_yacc_util.c
 lib/SPVM/Builder/Util.pm
+lib/SPVM/Builder/Util/API.pm
 lib/SPVM/Byte.pm
 lib/SPVM/ByteList.pm
 lib/SPVM/ByteList.spvm
@@ -601,7 +604,9 @@ t/default/callback.t
 t/default/class_var.t
 t/default/comment.t
 t/default/comparison_operator.t
+t/default/compile_error.pl
 t/default/compile_error.t
+t/default/compile_error_dist.pl
 t/default/compile_native_api.pl
 t/default/concat.t
 t/default/constant.t
@@ -697,6 +702,7 @@ t/default/lib/SPVM/TestCase/CompileError/Enum/PrivateAccess.spvm
 t/default/lib/SPVM/TestCase/CompileError/Field/HasFieldNameContainsUnderScoreTwice.spvm
 t/default/lib/SPVM/TestCase/CompileError/Field/HasFieldNameStartDigit.spvm
 t/default/lib/SPVM/TestCase/CompileError/Field/Private.spvm
+t/default/lib/SPVM/TestCase/CompileError/ForTest.spvm
 t/default/lib/SPVM/TestCase/CompileError/InvalidType.spvm
 t/default/lib/SPVM/TestCase/CompileError/Isa/LeftIsNotObject.spvm
 t/default/lib/SPVM/TestCase/CompileError/LexVar/LexVarNameColon2Twice.spvm
@@ -706,6 +712,9 @@ t/default/lib/SPVM/TestCase/CompileError/LexVar/LexVarNameInvalidColon.spvm
 t/default/lib/SPVM/TestCase/CompileError/LexVar/LexVarNameStartDigit.spvm
 t/default/lib/SPVM/TestCase/CompileError/Literal/Character/InvalidCharacterLiteral.spvm
 t/default/lib/SPVM/TestCase/CompileError/Literal/Character/InvalidCharacterLiteralEmpty.spvm
+t/default/lib/SPVM/TestCase/CompileError/Literal/Character/InvalidHexAscii1.spvm
+t/default/lib/SPVM/TestCase/CompileError/Literal/Character/InvalidHexAscii2.spvm
+t/default/lib/SPVM/TestCase/CompileError/Literal/Character/NotEnd.spvm
 t/default/lib/SPVM/TestCase/CompileError/Literal/Integer/IntOutOfRange.spvm
 t/default/lib/SPVM/TestCase/CompileError/LogicalOperator/AndNotExpression.spvm
 t/default/lib/SPVM/TestCase/CompileError/LogicalOperator/NotNotExpression.spvm
@@ -942,10 +951,12 @@ t/exe/lib/SPVM/TestCase/NativeAPI2.spvm
 t/exe/myexe.config
 t/exe/myexe.pl
 t/exe/spvmcc.t
+t/exe/spvmgenlib.t
 t/get_native_api_indexes.pl
 t/lib/TestAuto.pm
 t/lib/TestFile.pm
 t/memory.t
+t/object_file_info.t
 t/sort_method_name_native.pl
 t/sort_method_name_pod.pl
 t/sort_method_name_spvm.pl

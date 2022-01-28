@@ -1,3 +1,8 @@
+2.0.9   2022-01-27  Released-By: PERLANCAR; Urgency: medium
+
+        - Fix some border characters in demo table.
+
+
 2.0.8   2022-01-26  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfix] Missing a couple of characters in header-data separator

@@ -9,25 +9,23 @@ use Types::Standard qw(ArrayRef);
 
 use namespace::clean;
 
-our $VERSION = '2.04';
+our $VERSION = '2.06';
 
 our $nesting_separator = q{.};
 our $array_marker = q{*};
 our $escape_character = q{\\};
 
-has "path" => (
-	is => "ro",
+has 'path' => (
+	is => 'ro',
 	isa => ArrayRef,
-	writer => "_set_path",
-	coerce => 1,
+	writer => '_set_path',
 	required => 1,
 );
 
-has "meta" => (
-	is => "ro",
+has 'meta' => (
+	is => 'ro',
 	isa => ArrayRef,
-	writer => "_set_meta",
-	lazy => 1,
+	writer => '_set_meta',
 	required => 1,
 );
 

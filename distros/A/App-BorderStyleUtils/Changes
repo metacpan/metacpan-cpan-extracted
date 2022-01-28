@@ -1,3 +1,28 @@
+0.015   2022-01-27  Released-By: PERLANCAR; Urgency: medium
+
+        - [cli show-border-style] A couple more bugfixes.
+
+
+0.014   2022-01-27  Released-By: PERLANCAR; Urgency: high
+
+        - Merge releases 0.012 and 0.012.1.
+
+        - [cli show-border-style] More bugfixes and output tweaks.
+
+
+0.013   2022-01-26  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Didn't substitute border characters 'c' and 'd'.
+
+
+0.012.1 2022-01-26  Released-By: PERLANCAR; Urgency: medium
+
+        - Update to BorderStyle 2.0.8.
+
+        - UPDATE 2022-01-27: Rename version from 0.012 to 0.012.1 due to
+          conflict.
+
+
 0.012   2021-04-24  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

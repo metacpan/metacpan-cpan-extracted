@@ -7,7 +7,7 @@ use Sentry::Client;
 use Sentry::Hub;
 use Sentry::Logger 'logger';
 
-our $VERSION = version->declare('v1.0.10');
+our $VERSION = version->declare('v1.0.11');
 
 sub _call_on_hub ($method, @args) {
   my $hub = Sentry::Hub->get_current_hub();
@@ -55,7 +55,7 @@ sub capture_message ($self, $message, $capture_context = undef) {
 }
 
 sub capture_event ($package, $event) {
-  _call_on_hub('capture_exception', $event);
+  _call_on_hub('capture_event', $event);
 }
 
 sub capture_exception ($package, $exception, $capture_context = undef) {

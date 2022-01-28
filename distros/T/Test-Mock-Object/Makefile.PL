@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.022000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,14 +14,26 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Test-Mock-Object",
   "LICENSE" => "artistic_2",
+  "MIN_PERL_VERSION" => "5.022000",
   "NAME" => "Test::Mock::Object",
-  "PREREQ_PM" => {},
+  "PREREQ_PM" => {
+    "Carp" => 0,
+    "Exporter" => 0,
+    "Scalar::Util" => 0,
+    "Sub::Identify" => 0,
+    "Sub::Name" => 0,
+    "strict" => 0,
+    "warnings" => 0
+  },
   "TEST_REQUIRES" => {
+    "Apache2::RequestRec" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
-    "Test::More" => 0
+    "Test::LeakTrace" => 0,
+    "Test::More" => 0,
+    "Test::Most" => 0
   },
-  "VERSION" => "0.1",
+  "VERSION" => "0.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -29,9 +41,19 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Apache2::RequestRec" => 0,
+  "Carp" => 0,
+  "Exporter" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
-  "Test::More" => 0
+  "Scalar::Util" => 0,
+  "Sub::Identify" => 0,
+  "Sub::Name" => 0,
+  "Test::LeakTrace" => 0,
+  "Test::More" => 0,
+  "Test::Most" => 0,
+  "strict" => 0,
+  "warnings" => 0
 );
 
 

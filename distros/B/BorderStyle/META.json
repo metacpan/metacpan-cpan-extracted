@@ -39,7 +39,7 @@
    "provides" : {
       "BorderStyle" : {
          "file" : "lib/BorderStyle.pm",
-         "version" : "v2.0.8"
+         "version" : "v2.0.9"
       }
    },
    "release_status" : "stable",
@@ -54,7 +54,7 @@
          "web" : "https://github.com/perlancar/perl-BorderStyle"
       }
    },
-   "version" : "2.0.8",
+   "version" : "2.0.9",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

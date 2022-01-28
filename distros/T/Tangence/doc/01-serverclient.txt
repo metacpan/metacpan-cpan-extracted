@@ -1,0 +1,19 @@
+1. Server/Client
+----------------
+
+In a Tangence system, one program is distinct in being the server. It is
+the program that hosts the actual objects being considered. It is also
+the program that holds the networking socket to which the clients
+connect.
+
+The other programs are all clients, which connect to the server. While
+each client is notionally distinct, they all share access to the same
+objects within the server. The clients are not directly aware of each
+other's existence, though each one's effects on the system may be
+visible to the others as a result of calling methods or altering
+properties on the objects. Internally, the clients will use proxy objects
+through which to access the objects in the server. There will be a
+one-to-one correspondance between server objects and client proxies. Not
+every server object needs to have a corresponding proxy in every client -
+proxies are created lazily when they are required.
+

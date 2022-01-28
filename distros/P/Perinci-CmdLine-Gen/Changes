@@ -1,3 +1,9 @@
+0.501   2022-01-16  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump generated prereq versions: Perinci::CmdLine::{Base,Lite}
+	  1.905 -> 1.915.
+
+
 0.500   2021-08-26  Released-By: PERLANCAR; Urgency: medium
 
 	- Reorder generated '# AUTHORITY', et al to after strict/warnings to

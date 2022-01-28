@@ -3,9 +3,9 @@
 package BorderStyle;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-26'; # DATE
+our $DATE = '2022-01-27'; # DATE
 our $DIST = 'BorderStyle'; # DIST
-our $VERSION = '2.0.8'; # VERSION
+our $VERSION = '2.0.9'; # VERSION
 
 1;
 # ABSTRACT: Border styles
@@ -26,7 +26,7 @@ BorderStyle - Border styles
 
 =head1 VERSION
 
-This document describes version 2.0.8 of BorderStyle (from Perl distribution BorderStyle), released on 2022-01-26.
+This document describes version 2.0.9 of BorderStyle (from Perl distribution BorderStyle), released on 2022-01-27.
 
 =head1 DESCRIPTION
 
@@ -191,11 +191,11 @@ used:
 In table with column and row spans (demonstrates characters C<a>, C<b>, C<e>,
 C<f>, C<g>, C<h>):
 
- ABBBCBBBCBBBCBBBD  ^
+ ABBBBBBBCBBBCBBBD  ^
  E       F   F   G  |
- ȮṖṖṖḟṖṖṖꝘṖṖṖėṖṖṖṘ  |      # ė=no top line, ḟ=no bottom line
+ ȮṖṖṖṖṖṖṖꝘṖṖṖėṖṖṖṘ  |      # ė=no top line, ḟ=no bottom line
  E       F   F   G  |
- ȮṖṖṖṖṖṖṖꝘṖṖṖeṖṖṖṘ  +------> header area
+ ȮṖṖṖṖṖṖṖꝘṖṖṖḟṖṖṖṘ  +------> header area
  E       F       G  |
  E       ġṖṖṖṖṖṖṖṘ  |      # ġ=no left line
  E       F       G  |
@@ -216,13 +216,15 @@ C<f>, C<g>, C<h>):
 In the case of a header-data separator line also having been cut by a multirow
 cell (note the C<c> and C<d> border character):
 
- ABBBBBBBBBCBBBBBBBBBBBBBBBBBBBBBCBBBBBBBBBD
- F header1 F       header2       F header3 G
- H         cIIIIIIIIIIaIIIIIIIIIId         J
- L         M header2a M header2b F         N
- OPPPPPPPPPQPPPPPPPPPPQPPPPPPPPPPQPPPPPPPPPR
- M data1a  M data1b   M data1c   M data1d  N
- STTTTTTTTTUTTTTTTTTTTUTTTTTTTTTTUTTTTTTTTTV
+ ABBBBBBBBBCBBBBBBBBBBBBBBBBBBBBBCBBBBBBBBBD  ^
+ F         F                     F         G  |
+ F         cIIIIIIIIIIaIIIIIIIIIId         G  +-------> header area
+ L         M          M          F         N  |
+ OPPPPPPPPPQPPPPPPPPPPQPPPPPPPPPPQPPPPPPPPPR  v  ^
+ M         M          M          M         N     |
+ M         M          M          M         N     +----> data area
+ M         M          M          M         N     |
+ STTTTTTTTTUTTTTTTTTTTUTTTTTTTTTTUTTTTTTTTTV     v
 
 A character can also be a coderef that will be called with C<< ($self, $y, $x,
 $n, \%args) >>. See L</Border style character>.

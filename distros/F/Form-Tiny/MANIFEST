@@ -54,6 +54,7 @@ t/190-hooks.t
 t/200-data.t
 t/210-helpers.t
 t/220-default.t
+t/221-default-flat.t
 t/230-nesting-escape.t
 t/240-context.t
 t/250-messages.t
@@ -76,8 +77,10 @@ t/lib/Form/Tiny/Plugin/MyRolePlugin.pm
 t/lib/GrandparentForm.pm
 t/lib/ParentForm.pm
 t/lib/TestForm.pm
+t/lib/TestFormFlat.pm
 t/lib/TestInnerForm.pm
 xt/01-object-pad.t
 xt/02-bless.t
+xt/03-autoclean.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

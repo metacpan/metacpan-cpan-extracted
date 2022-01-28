@@ -1,12 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/BorderStyleUtils/list_border_style_modules
-# and generated automatically using Perinci::CmdLine::Gen version 0.497
-
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-24'; # DATE
-our $DIST = 'App-BorderStyleUtils'; # DIST
-our $VERSION = '0.012'; # VERSION
+# and generated automatically using Perinci::CmdLine::Gen version 0.501
 
 use 5.010001;
 use strict;
@@ -14,6 +9,11 @@ use warnings;
 use Log::ger;
 
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-01-27'; # DATE
+our $DIST = 'App-BorderStyleUtils'; # DIST
+our $VERSION = '0.015'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/BorderStyleUtils/list_border_style_modules",
@@ -40,57 +40,13 @@ list-border-style-modules - List BorderStyle modules
 
 =head1 VERSION
 
-This document describes version 0.012 of list-border-style-modules (from Perl distribution App-BorderStyleUtils), released on 2021-04-24.
+This document describes version 0.015 of list-border-style-modules (from Perl distribution App-BorderStyleUtils), released on 2022-01-27.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % list-border-style-modules [--debug] [--detail] [--format=name] [--json]
-     [-l] [--log-level=level] [--(no)naked-res] [--no-detail] [--nodetail]
-     [--page-result[=program]] [--quiet] [--trace] [--verbose]
-     [--view-result[=program]]
-
-Examples:
-
-List style names:
-
- % list-border-style-modules
- ASCII::None
- ASCII::SingleLine
- ASCII::SingleLineDoubleAfterHeader
- ASCII::SingleLineHorizontalOnly
- ASCII::SingleLineInnerOnly
- ASCII::SingleLineOuterOnly
- ASCII::SingleLineVerticalOnly
- ASCII::Space
- ASCII::SpaceInnerOnly
- BoxChar::None
- BoxChar::SingleLine
- BoxChar::SingleLineHorizontalOnly
- BoxChar::SingleLineInnerOnly
- BoxChar::SingleLineOuterOnly
- BoxChar::SingleLineVerticalOnly
- BoxChar::Space
- BoxChar::SpaceInnerOnly
- Test::CustomChar
- Test::Labeled
- Test::Random
- UTF8::Brick
- UTF8::BrickOuterOnly
- UTF8::DoubleLine
- UTF8::None
- UTF8::SingleLine
- UTF8::SingleLineBold
- UTF8::SingleLineBoldHeader
- UTF8::SingleLineCurved
- UTF8::SingleLineDoubleAfterHeader
- UTF8::SingleLineHorizontalOnly
- UTF8::SingleLineInnerOnly
- UTF8::SingleLineOuterOnly
- UTF8::SingleLineVerticalOnly
- UTF8::Space
- UTF8::SpaceInnerOnly
+% B<list-border-style-modules> [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--detail>|B<-l>|B<--no-detail>|B<--nodetail>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]]
 
 =head1 OPTIONS
 
@@ -227,6 +183,76 @@ It is also recommended to install L<shcompgen> (see above).
 
 For fish and zsh, install L<shcompgen> as described above.
 
+=head1 EXAMPLES
+
+List style names:
+
+ % list-border-style-modules
+ ASCII::None
+ ASCII::SingleLine
+ ASCII::SingleLineDoubleAfterHeader
+ ASCII::SingleLineHorizontalOnly
+ ASCII::SingleLineInnerOnly
+ ASCII::SingleLineOuterOnly
+ ASCII::SingleLineVerticalOnly
+ ASCII::Space
+ ASCII::SpaceInnerOnly
+ BoxChar::None
+ BoxChar::SingleLine
+ BoxChar::SingleLineHorizontalOnly
+ BoxChar::SingleLineInnerOnly
+ BoxChar::SingleLineOuterOnly
+ BoxChar::SingleLineVerticalOnly
+ BoxChar::Space
+ BoxChar::SpaceInnerOnly
+ Test::CustomChar
+ Test::Labeled
+ Test::Random
+ Text::ANSITable::OldCompat::Default::bold
+ Text::ANSITable::OldCompat::Default::brick
+ Text::ANSITable::OldCompat::Default::bricko
+ Text::ANSITable::OldCompat::Default::csingle
+ Text::ANSITable::OldCompat::Default::double
+ Text::ANSITable::OldCompat::Default::none_ascii
+ Text::ANSITable::OldCompat::Default::none_boxchar
+ Text::ANSITable::OldCompat::Default::none_utf8
+ Text::ANSITable::OldCompat::Default::single_ascii
+ Text::ANSITable::OldCompat::Default::single_boxchar
+ Text::ANSITable::OldCompat::Default::single_utf8
+ Text::ANSITable::OldCompat::Default::singleh_ascii
+ Text::ANSITable::OldCompat::Default::singleh_boxchar
+ Text::ANSITable::OldCompat::Default::singleh_utf8
+ Text::ANSITable::OldCompat::Default::singlei_ascii
+ Text::ANSITable::OldCompat::Default::singlei_boxchar
+ Text::ANSITable::OldCompat::Default::singlei_utf8
+ Text::ANSITable::OldCompat::Default::singleo_ascii
+ Text::ANSITable::OldCompat::Default::singleo_boxchar
+ Text::ANSITable::OldCompat::Default::singleo_utf8
+ Text::ANSITable::OldCompat::Default::singlev_ascii
+ Text::ANSITable::OldCompat::Default::singlev_boxchar
+ Text::ANSITable::OldCompat::Default::singlev_utf8
+ Text::ANSITable::OldCompat::Default::space_ascii
+ Text::ANSITable::OldCompat::Default::space_boxchar
+ Text::ANSITable::OldCompat::Default::space_utf8
+ Text::ANSITable::OldCompat::Default::spacei_ascii
+ Text::ANSITable::OldCompat::Default::spacei_boxchar
+ Text::ANSITable::OldCompat::Default::spacei_utf8
+ UTF8::Brick
+ UTF8::BrickOuterOnly
+ UTF8::DoubleLine
+ UTF8::None
+ UTF8::SingleLine
+ UTF8::SingleLineBold
+ UTF8::SingleLineBoldHeader
+ UTF8::SingleLineCurved
+ UTF8::SingleLineDoubleAfterHeader
+ UTF8::SingleLineHorizontalOnly
+ UTF8::SingleLineInnerOnly
+ UTF8::SingleLineOuterOnly
+ UTF8::SingleLineVerticalOnly
+ UTF8::Space
+ UTF8::SpaceInnerOnly
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-BorderStyleUtils>.
@@ -235,6 +261,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Border
 
 Source repository is at L<https://github.com/perlancar/perl-App-BorderStyleUtils>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-BorderStyleUtils>
@@ -242,16 +296,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

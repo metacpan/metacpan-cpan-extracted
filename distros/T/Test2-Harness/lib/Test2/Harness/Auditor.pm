@@ -2,7 +2,7 @@ package Test2::Harness::Auditor;
 use strict;
 use warnings;
 
-our $VERSION = '1.000095';
+our $VERSION = '1.000099';
 
 use File::Spec;
 use Time::HiRes qw/time/;
@@ -97,7 +97,7 @@ sub finish {
         my $file = File::Spec->abs2rel($self->{+QUEUED}->{$job_id}->{file});
 
         if (@$watchers) {
-            push @{$final_data->{failed}} => [$job_id, $file] if $watchers->[-1]->fail;
+            push @{$final_data->{failed}} => [$job_id, $file, $watchers->[-1]->failed_subtest_tree] if $watchers->[-1]->fail;
             push @{$final_data->{retried}} => [$job_id, scalar(@$watchers), $file, $watchers->[-1]->pass ? 'YES' : 'NO'] if @$watchers > 1;
 
             if (my $halt = $watchers->[-1]->halt) {

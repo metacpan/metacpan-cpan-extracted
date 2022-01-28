@@ -29,5 +29,5 @@ resources:
   homepage: https://bbrtj.eu/project/form-tiny
   license: https://dev.perl.org/licenses
   repository: https://github.com/bbrtj/perl-form-tiny.git
-version: '2.04'
+version: '2.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

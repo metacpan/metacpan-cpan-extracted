@@ -1,3 +1,8 @@
+0.022   2022-01-27  Released-By: PERLANCAR; Urgency: medium
+
+        - Bump prereq versions to fix test failures (RT#140878).
+
+
 0.021   2022-01-26  Released-By: PERLANCAR; Urgency: medium
 
         - Add multirow header support (RT#).

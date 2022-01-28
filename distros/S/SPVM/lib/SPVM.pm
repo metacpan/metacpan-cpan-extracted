@@ -18,7 +18,7 @@ use SPVM::ExchangeAPI;
 
 use Carp 'confess';
 
-our $VERSION = '0.9129';
+our $VERSION = '0.9132';
 
 my $SPVM_INITED;
 my $BUILDER;
@@ -44,6 +44,7 @@ sub import {
 
   my $build_success = $BUILDER->build($class_name, $file, $line);
   unless ($build_success) {
+    $BUILDER->print_error_messages(*STDERR);
     exit(255);
   }
 

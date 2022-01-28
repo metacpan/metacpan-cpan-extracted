@@ -1,0 +1,129 @@
+3. Object Model
+---------------
+
+In Tangence, the primary item of interaction is an object. Tangence
+objects exist in the server, most likely bearing at least some
+relationship to some native objects in the server implementation (though
+if and when the occasion ever arises that a C program can host a Tangence
+server, obviously this association will be somewhat looser).
+
+In the server, two special objects exist - one is the Root object, the
+other is the Repository. These are the only two well-known objects that
+the client knows always exist. All the other objects are initially
+accessed via these.
+
+The client(s) interact with the server almost entirely by performing
+operations on objects. When the client connects to the server, two special
+object proxies are constructed in the client, to represent the Root and
+Repository objects. These are the base through which all the other
+interactions are performed. Other object proxies may only be obtained by
+the return values of methods on existing objects, arguments passed in
+events from them, or retrieved as the value of properties on objects.
+
+Each object is an instance of some particular class. The class provides
+all of the typing information for that instance. Principly, that class
+defines a name, and the collection of methods, events, and properties that
+exist on instances of that class. Each class may also name other classes
+as parents; recursively merging the interface of all those named.
+
+Tangence concerns itself with the interface of and ways to interact with
+the objects in the server, and not with any ways in which the objects
+themselves are actually implemented. The class inheritance therefore only
+applies to the interface, and does not directly relate to any
+implementation behaviour the server might implement.
+
+3.1. Methods
+
+Each object class may define named methods that clients can invoke on
+objects in the server. Each method has:
+
+    + a name
+    + argument types
+    + a return type
+
+The arguments to a method are positional. The return is a single value
+(not a list of values, such as Perl could represent).
+
+Methods on objects in the server may be invoked by clients. Once a
+method is invoked by a client, the client must wait until it returns
+before it can send any other request to the server.
+
+3.2 Events
+
+Each object class may define named events that objects may emit. Each
+method has:
+
+    + a name
+    + argument types
+
+Like methods, the arguments to an event are positional.
+
+Events do not have return types, as they are simple notifications from the
+server to the client, to inform them that some event happened. Clients are
+not automatically informed of every event on every object. Instead, the
+client must specifically register interest in specific events on specific
+objects.
+
+3.3 Properties
+
+Each object class may define named properties that the object has. Each
+object in the class will have a value for the property. Each property has:
+
+    + a name
+    + a dimension - scalar, queue, array, hash or object set
+    + a type
+    + a boolean indicating if it is "smashed"
+
+Properties do not have arguments. A client can request the current value
+of a property on an object, or set a new value. It can also register an
+interest in the property, where the server will inform the client of
+changes to the value.
+
+Each property has a dimension; one of scalar, queue, array, hash, or object
+set. The behaviour of each type of property is:
+
+3.3.1 Scalar Properties
+
+The property is a single atomic scalar. It is set atomically by the
+server, and may be queried.
+
+3.3.2 Queue and Array Properties
+
+The property is a contiguous array of individual elements. Each element is
+indexed by a non-negative integer. The property type gives the type of each
+element in the array. These properties differ in the types of operations they
+can support. Queues do not support splice or move operations, arrays do.
+
+3.3.3 Hash Properties
+
+The property is an association between string and values. Each element is
+uniquely indexed by a null-terminated string. The property type gives the
+type of each element in the hash.  The elements do not have an inherent
+ordering and are indexed by unique strings.
+
+3.3.4 Object Set Properties
+
+The property is an unordered collection of Tangence objects.
+
+Scalar properties have a single atomic value. If it changes, the client is
+informed of the entire new value, even if its type indicates it to be a
+list or dictionary type. For non-scalar properties, the value of each
+element in the collection is set individually by the server. Elements can
+be changed, added or removed. Changes to individual elements can be sent
+to the clients independently of the others.
+
+Certain properties may be deemed by the application to be important enough
+for all clients to be aware of all of the time (such as a name or other
+key item of information). These properties are called "smashed
+properties". When the server first sends a new object to a client, the
+object construction message will also contain initial values of these
+properties. The client will be automatically informed of any changes to
+these properties when they change, as if the client had specifically
+requested to be informed.  When the object is sent to a new client, it is
+said to be "smashed"; the initial values of these automatic properties are
+called "smash values".
+
+[There are issues here that need resolving to move Tangence out from
+being Perl-specific into a more general-purpose layer - more on this in
+a later email].
+

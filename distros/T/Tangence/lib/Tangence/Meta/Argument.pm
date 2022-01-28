@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.43;
 
-package Tangence::Meta::Argument 0.27;
+package Tangence::Meta::Argument 0.28;
 class Tangence::Meta::Argument :strict(params);
 
 =head1 NAME

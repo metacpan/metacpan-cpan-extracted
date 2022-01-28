@@ -1,0 +1,23 @@
+{
+  '_metadata' => {
+    'sdk' => {
+      'name' => 'sentry.perl',
+      'packages' => [],
+      'version' => bless( {
+        'original' => 'v1.1.1',
+        'qv' => 1,
+        'version' => [
+          1,
+          1,
+          1
+        ]
+      }, 'version' )
+    }
+  },
+  'debug' => 1,
+  'default_integrations' => [],
+  'dsn' => 'abc',
+  'environment' => 'my env',
+  'release' => 'my release',
+  'traces_sample_rate' => '0.5'
+}

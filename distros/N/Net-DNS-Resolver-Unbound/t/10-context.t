@@ -12,15 +12,15 @@ ok( Net::DNS::Resolver::Unbound->string(), 'default configuration' );
 
 my $resolver = Net::DNS::Resolver::Unbound->new(
 	async_thread => 1,
-	option	     => ['serve-expired-ttl', '86400'] );
+	option	     => ['verbosity', '1'] );
 
 ok( $resolver, 'create new resolver instance' );
 
 ok( $resolver->print(), '$resolver->print' );
 
 
-my $option = 'serve-expired-ttl';
-my $value  = '43200';
+my $option = 'verbosity';
+my $value  = '0';
 my $return = $resolver->option( $option, $value );
 is( $return, undef, "resolver->option( $option, $value )" );
 
@@ -51,9 +51,13 @@ ok( $reject_option, "unknown Unbound option\t[$reject_option]" );
 eval { $resolver->set_fwd('127.0.0.53') };
 eval { $resolver->set_tls(0) };
 eval { $resolver->set_stub( 'zone', '10.1.2.3', 0 ) };
+eval { $resolver->resolvconf('filename') };
+eval { $resolver->hosts('filename') };
 eval { $resolver->add_ta('zone DS') };
 eval { $resolver->add_ta_file('filename') };
+eval { $resolver->add_ta_autr('filename') };
 eval { $resolver->trustedkeys('filename') };
+eval { $resolver->debugout('filename') };
 
 
 exit;

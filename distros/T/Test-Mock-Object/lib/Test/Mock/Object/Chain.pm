@@ -9,7 +9,7 @@ use Scalar::Util 'blessed';
 use Exporter 'import';
 our @EXPORT_OK = qw(create_method_chain);
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 sub create_method_chain {
     my ($chain) = @_;
@@ -75,7 +75,7 @@ Test::Mock::Object::Chain - Create mocked method chains.
 
 =head1 VERSION
 
-version 0.1
+version 0.2
 
 =head1 SYNOPSIS
 

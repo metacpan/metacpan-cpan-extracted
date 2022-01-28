@@ -206,6 +206,16 @@ ub_ctx_set_stub(struct ub_ctx* ctx, const char* zone, const char* addr, int ispr
 	checkerr( ub_ctx_set_stub(ctx, zone, addr, isprime) );
 
 void
+ub_ctx_resolvconf(struct ub_ctx* ctx, const char* fname)
+    CODE:
+	checkerr( ub_ctx_resolvconf(ctx, fname) );
+
+void
+ub_ctx_hosts(struct ub_ctx* ctx, const char* fname)
+    CODE:
+	checkerr( ub_ctx_hosts(ctx, fname) );
+
+void
 ub_ctx_add_ta(struct ub_ctx* ctx, const char* ta)
     CODE:
 	checkerr( ub_ctx_add_ta(ctx, ta) );
@@ -216,9 +226,19 @@ ub_ctx_add_ta_file(struct ub_ctx* ctx, const char* fname)
 	checkerr( ub_ctx_add_ta_file(ctx, fname) );
 
 void
+ub_ctx_add_ta_autr(struct ub_ctx* ctx, const char* fname)
+    CODE:
+	checkerr( ub_ctx_add_ta_autr(ctx, fname) );
+
+void
 ub_ctx_trustedkeys(struct ub_ctx* ctx, const char* fname)
     CODE:
 	checkerr( ub_ctx_trustedkeys(ctx, fname) );
+
+void
+ub_ctx_debugout(struct ub_ctx* ctx, const char* out)
+    CODE:
+	checkerr( ub_ctx_debugout(ctx, (void*) out) );
 
 void
 ub_ctx_debuglevel(struct ub_ctx* ctx, int d)

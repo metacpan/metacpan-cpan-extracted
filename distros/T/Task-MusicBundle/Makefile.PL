@@ -7,7 +7,7 @@ use 5.006;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "A bundle of MIDI and music modules",
+  "ABSTRACT" => "MIDI and music creation modules",
   "AUTHOR" => "Gene Boggs <gene\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -45,12 +45,11 @@ my %WriteMakefileArgs = (
     "Music::Gestalt" => 0,
     "Music::Guidonian" => 0,
     "Music::Harmonics" => 0,
-    "Music::Interval::Barycentric" => 0,
-    "Music::Intervals" => 0,
     "Music::MelodicDevice::Inversion" => 0,
     "Music::MelodicDevice::Ornamentation" => 0,
     "Music::MelodicDevice::Transposition" => 0,
     "Music::NeoRiemannianTonnetz" => 0,
+    "Music::Note" => 0,
     "Music::Note::Frequency" => 0,
     "Music::Note::Role::Operators" => 0,
     "Music::PitchNum" => 0,
@@ -73,7 +72,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.1905",
+  "VERSION" => "0.1908",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -112,12 +111,11 @@ my %FallbackPrereqs = (
   "Music::Gestalt" => 0,
   "Music::Guidonian" => 0,
   "Music::Harmonics" => 0,
-  "Music::Interval::Barycentric" => 0,
-  "Music::Intervals" => 0,
   "Music::MelodicDevice::Inversion" => 0,
   "Music::MelodicDevice::Ornamentation" => 0,
   "Music::MelodicDevice::Transposition" => 0,
   "Music::NeoRiemannianTonnetz" => 0,
+  "Music::Note" => 0,
   "Music::Note::Frequency" => 0,
   "Music::Note::Role::Operators" => 0,
   "Music::PitchNum" => 0,

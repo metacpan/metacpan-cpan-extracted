@@ -1,5 +1,5 @@
 package OPM::Maker::Command::build;
-$OPM::Maker::Command::build::VERSION = '1.16';
+$OPM::Maker::Command::build::VERSION = '1.17';
 use strict;
 use warnings;
 
@@ -25,7 +25,7 @@ sub usage_desc {
 sub opt_spec {
     return (
         [ "output=s",  "Output path for OPM file" ],
-        [ "basedir=s",  "Base directory of SOPM files" ],
+        [ "basedir=s", "Base directory of SOPM files" ],
         [ "version=s", "Version to be used (override the one from the sopm file)" ],
     );
 }
@@ -138,7 +138,7 @@ OPM::Maker::Command::build - Build OPM packages
 
 =head1 VERSION
 
-version 1.16
+version 1.17
 
 =head1 AUTHOR
 

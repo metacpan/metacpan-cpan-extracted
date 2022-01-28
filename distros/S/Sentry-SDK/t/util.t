@@ -49,7 +49,7 @@ subtest 'around()' => sub {
   $object->increment();
 
   is($object->counter, 2);
-  ok($called, 1);
+  ok($called);
 };
 
 done_testing;

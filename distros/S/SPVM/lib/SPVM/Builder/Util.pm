@@ -279,7 +279,7 @@ sub create_class_make_rule {
   
   # Get source files
   $make_rule .= "$shared_lib_file :: @deps\n";
-  $make_rule .= "\t$^X -Mblib -MSPVM::Builder -e \"SPVM::Builder->new(build_dir => '.spvm_build')->build_shared_lib_dist('$class_name', '$category')\"\n\n";
+  $make_rule .= "\t$^X -Mblib -MSPVM::Builder::API -e \"SPVM::Builder::API->new(build_dir => '.spvm_build')->build_shared_lib_dist_$category('$class_name')\"\n\n";
   
   return $make_rule;
 }
@@ -293,39 +293,3 @@ SPVM::Builder::Util - Build Utilities
 =head1 DESCRIPTION
 
 SPVM::Builder::Util is building utilities.
-
-=head1 FUNCTIONS
-
-=head2 create_make_rule_native
-
-Create native compile make rule.
-
-This is used in Makefile.PL of your distributed module.
-  
-  # Makefile.PL
-  static method MY::postamble {
-
-    my $make_rule = '';
-    
-    # Native compile make rule
-    $make_rule .= SPVM::Builder::Util::create_make_rule_native('Foo');
-    
-    return $make_rule;
-  }
-
-=head2 create_make_rule_precompile
-
-Create precompile make rule.
-
-This is used in Makefile.PL of your distributed module.
-
-  static method MY::postamble {
-
-    my $make_rule = '';
-    
-    # Precompile make rule
-    $make_rule .= SPVM::Builder::Util::create_make_rule_precompile('Foo');
-    
-    return $make_rule;
-  }
-

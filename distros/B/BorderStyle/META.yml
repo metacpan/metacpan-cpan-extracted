@@ -19,12 +19,12 @@ name: BorderStyle
 provides:
   BorderStyle:
     file: lib/BorderStyle.pm
-    version: v2.0.8
+    version: v2.0.9
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=BorderStyle
   homepage: https://metacpan.org/release/BorderStyle
   repository: git://github.com/perlancar/perl-BorderStyle.git
-version: 2.0.8
+version: 2.0.9
 x_Dist_Zilla:
   perl:
     version: '5.034000'

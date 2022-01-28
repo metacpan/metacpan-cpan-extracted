@@ -21,14 +21,14 @@ name: Text-Table-More
 provides:
   Text::Table::More:
     file: lib/Text/Table/More.pm
-    version: '0.021'
+    version: '0.022'
 recommends:
   Text::ANSI::Util: '0.22'
   Text::ANSI::WideUtil: '0'
   Text::WideChar::Util: '0'
 requires:
-  BorderStyle::ASCII::SingleLineDoubleAfterHeader: '0'
-  BorderStyleBase: '0.009'
+  BorderStyle::ASCII::SingleLineDoubleAfterHeader: '0.011'
+  BorderStyleBase: '0.011'
   Exporter: '5.57'
   List::AllUtils: '0'
   Module::Load::Util: '0.004'
@@ -41,7 +41,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Table-More
   homepage: https://metacpan.org/release/Text-Table-More
   repository: git://github.com/perlancar/perl-Text-Table-More.git
-version: '0.021'
+version: '0.022'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.499
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-11'; # DATE
+our $DATE = '2021-08-01'; # DATE
 our $DIST = 'App-grep-url'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -42,7 +42,7 @@ grep-url - Print lines having URL(s) (optionally of certain criteria) in them
 
 =head1 VERSION
 
-This document describes version 0.003 of grep-url (from Perl distribution App-grep-url), released on 2021-07-11.
+This document describes version 0.004 of grep-url (from Perl distribution App-grep-url), released on 2021-08-01.
 
 =head1 SYNOPSIS
 
@@ -346,6 +346,10 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
+
+=head1 SEE ALSO
+
+L<grep-email>.
 
 =head1 AUTHOR
 

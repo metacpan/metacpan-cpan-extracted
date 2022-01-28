@@ -1,3 +1,21 @@
+1.000099  2022-01-27 10:20:38-08:00 America/Los_Angeles
+
+    - Add options to exclude some chnaged files when running coverage tests
+
+1.000098  2022-01-27 09:36:24-08:00 America/Los_Angeles
+
+    - Fix bugs in 'failed' command after adding subtests
+
+1.000097  2022-01-27 08:31:46-08:00 America/Los_Angeles
+
+    - Show subtest failures in 'failed' command
+
+1.000096  2022-01-26 14:42:43-08:00 America/Los_Angeles
+
+    - Show failed subtests in final summary
+    - Fix bug where env vars get removed when we preload Test2::API too early (#241)
+    - Fix bug where replay with test filename has uninitialized warnings (#242)
+
 1.000095  2022-01-07 14:35:25-08:00 America/Los_Angeles
 
     - Fix bug where syntax errors prevented reloading of effected files

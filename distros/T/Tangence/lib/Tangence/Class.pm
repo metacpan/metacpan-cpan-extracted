@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.41;
 
-package Tangence::Class 0.27;
+package Tangence::Class 0.28;
 class Tangence::Class isa Tangence::Meta::Class;
 
 use Tangence::Constants;

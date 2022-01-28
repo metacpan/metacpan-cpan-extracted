@@ -2,7 +2,7 @@ package App::Yath::Options::Finder;
 use strict;
 use warnings;
 
-our $VERSION = '1.000095';
+our $VERSION = '1.000099';
 
 use Test2::Harness::Util qw/mod2file/;
 
@@ -57,6 +57,20 @@ option_group {prefix => 'finder', category => "Finder Options", builds => 'Test2
         type => 'm',
         description => "Specify one or more files as having been changed.",
         long_examples => [' path/to/file'],
+        applicable => \&changes_applicable,
+    );
+
+    option changes_exclude_file => (
+        type => 'm',
+        description => 'Specify one or more files to ignore when looking at changes',
+        long_examples => [' path/to/file'],
+        applicable => \&changes_applicable,
+    );
+
+    option changes_exclude_pattern => (
+        type => 'm',
+        description => 'Ignore files matching this pattern when looking for changes. Your pattern will be inserted unmodified into a `$file =~ m/$pattern/` check.',
+        long_examples => [" '(apple|pear|orange)'"],
         applicable => \&changes_applicable,
     );
 
@@ -279,6 +293,24 @@ Only search for tests for changed files (Requires a coverage data source, also r
 =item --no-changes-diff
 
 Path to a diff file that should be used to find changed files for use with --changed-only. This must be in the same format as `git diff -W --minimal -U1000000`
+
+
+=item --changes-exclude-file path/to/file
+
+=item --no-changes-exclude-file
+
+Specify one or more files to ignore when looking at changes
+
+Can be specified multiple times
+
+
+=item --changes-exclude-pattern '(apple|pear|orange)'
+
+=item --no-changes-exclude-pattern
+
+Ignore files matching this pattern when looking for changes. Your pattern will be inserted unmodified into a `$file =~ m/$pattern/` check.
+
+Can be specified multiple times
 
 
 =item --changes-filter-file path/to/file

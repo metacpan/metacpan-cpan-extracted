@@ -6,9 +6,9 @@ use warnings;
 #use utf8;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-26'; # DATE
+our $DATE = '2022-01-27'; # DATE
 our $DIST = 'Text-Table-More'; # DIST
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 # see Module::Features for more details on this
 our %FEATURES = (
@@ -631,7 +631,7 @@ Text::Table::More - Generate text table with simple interface and many options
 
 =head1 VERSION
 
-This document describes version 0.021 of Text::Table::More (from Perl distribution Text-Table-More), released on 2022-01-26.
+This document describes version 0.022 of Text::Table::More (from Perl distribution Text-Table-More), released on 2022-01-27.
 
 =head1 SYNOPSIS
 

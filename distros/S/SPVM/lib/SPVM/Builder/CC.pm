@@ -13,6 +13,7 @@ use File::Basename 'dirname', 'basename';
 
 use SPVM::Builder::Util;
 use SPVM::Builder::Config;
+use SPVM::Builder::ObjectFileInfo;
 
 sub category {
   my $self = shift;
@@ -69,14 +70,36 @@ sub debug {
   }
 }
 
-sub global_ccflags {
+sub global_cc_each {
   my $self = shift;
   if (@_) {
-    $self->{global_ccflags} = $_[0];
+    $self->{global_cc_each} = $_[0];
     return $self;
   }
   else {
-    return $self->{global_ccflags};
+    return $self->{global_cc_each};
+  }
+}
+
+sub global_ccflags_each {
+  my $self = shift;
+  if (@_) {
+    $self->{global_ccflags_each} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{global_ccflags_each};
+  }
+}
+
+sub global_optimize_each {
+  my $self = shift;
+  if (@_) {
+    $self->{global_optimize_each} = $_[0];
+    return $self;
+  }
+  else {
+    return $self->{global_optimize_each};
   }
 }
 
@@ -91,10 +114,6 @@ sub new {
   
   if ($ENV{SPVM_CC_FORCE}) {
     $self->{force} = 1;
-  }
-  
-  unless (defined $self->{global_ccflags}) {
-    $self->{global_ccflags} = [];
   }
   
   return bless $self, $class;
@@ -422,8 +441,6 @@ sub compile {
     );
   }
   
-  my $cbuilder = ExtUtils::CBuilder->new(quiet => $quiet);
-
   my $mod_time_config_file;
   if (-f $config_file) {
      $mod_time_config_file = (stat($config_file))[9];
@@ -440,15 +457,15 @@ sub compile {
   }
 
   # Compile source files
-  my $object_files = [];
+  my $object_file_infos = [];
   my $is_native_src;
-  for my $src_file ($spvm_method_src_file, @$native_src_files) {
+  for my $source_file ($spvm_method_src_file, @$native_src_files) {
     my $object_file;
     # Native object file name
     if ($is_native_src) {
       my $object_rel_file = SPVM::Builder::Util::convert_class_name_to_category_rel_file($class_name, $category, 'native');
       
-      my $object_file_base = $src_file;
+      my $object_file_base = $source_file;
       $object_file_base =~ s/^\Q$native_src_dir//;
       $object_file_base =~ s/^[\\\/]//;
       
@@ -466,9 +483,9 @@ sub compile {
     
     # Do compile. This is same as make command
     my $need_generate;
-    my $input_files = [$config_file, $src_file, @include_file_names];
+    my $input_files = [$config_file, $source_file, @include_file_names];
     unless ($is_native_src) {
-      my $module_file = $src_file;
+      my $module_file = $source_file;
       $module_file =~ s/\.[^\/\\]+$//;
       $module_file .= '.spvm';
       
@@ -480,32 +497,66 @@ sub compile {
       output_file => $object_file,
       input_files => $input_files,
     });
+
+    my $compile_info = $self->create_compile_command_info({class_name => $class_name, config => $config, output_file => $object_file, source_file => $source_file});
+
+    my $cc_cmd = $self->create_compile_command($compile_info);
+    
+    my $compile_info_cc = $compile_info->{cc};
+    my $compile_info_ccflags = $compile_info->{ccflags};
     
     if ($need_generate) {
       my $class_rel_dir = SPVM::Builder::Util::convert_class_name_to_rel_dir($class_name);
       my $work_object_dir = "$object_dir/$class_rel_dir";
       mkpath dirname $object_file;
       
-      my $cc_cmd = $self->create_compile_command({config => $config, output_file => $object_file, source_file => $src_file});
-      
       # Execute compile command
+      my $cbuilder = ExtUtils::CBuilder->new(quiet => 1);
       $cbuilder->do_system(@$cc_cmd)
-        or confess "Can't compile $src_file: @$cc_cmd";
+        or confess "Can't compile $source_file: @$cc_cmd";
+      unless ($quiet) {
+        print "@$cc_cmd\n";
+      }
     }
-    push @$object_files, $object_file;
+    
+    my $object_file_info = SPVM::Builder::ObjectFileInfo->new(
+      object_file => $object_file,
+      class_name => $class_name,
+      source_file => $source_file,
+      cc => $compile_info_cc,
+      ccflags => $compile_info_ccflags,
+      is_exe_config => $config->is_exe,
+    );
+    
+    push @$object_file_infos, $object_file_info;
     
     $is_native_src = 1;
   }
   
-  return $object_files;
+  return $object_file_infos;
 }
 
 sub create_compile_command {
+  my ($self, $compile_info) = @_;
+
+  my $cc = $compile_info->{cc};
+  my $ccflags = $compile_info->{ccflags};
+  my $object_file = $compile_info->{object_file};
+  my $source_file = $compile_info->{source_file};
+  
+  my $cc_cmd = [$cc, '-c', @$ccflags, '-o', $object_file, $source_file];
+  
+  return $cc_cmd;
+}
+
+sub create_compile_command_info {
   my ($self, $options) = @_;
 
   unless ($options) {
     $options = {};
   }
+  
+  my $class_name = $options->{class_name};
   
   my $config = $options->{config};
   my $output_file = $options->{output_file};
@@ -514,16 +565,17 @@ sub create_compile_command {
   my $cc_each = $config->cc_each;
   my $cc;
   if ($cc_each) {
-    $cc = $config->cc_each($config, $source_file);
+    $cc = $cc_each->($config, {class_name => $class_name, source_file => $source_file});
   }
   else {
     $cc = $config->cc;
   }
+  my $global_cc_each = $self->global_cc_each;
+  if ($global_cc_each) {
+    $cc = $global_cc_each->($config, {class_name => $class_name, source_file => $source_file, cc => $cc});
+  }
   
   my $cflags = '';
-  
-  my $global_ccflags = $self->global_ccflags;
-  $cflags .= join(' ', @$global_ccflags);
   
   my $include_dirs = $config->include_dirs;
   my $inc = join(' ', map { "-I$_" } @$include_dirs);
@@ -532,21 +584,36 @@ sub create_compile_command {
   my $ccflags_each = $config->ccflags_each;
   my $ccflags;
   if ($ccflags_each) {
-    $ccflags = $config->ccflags_each($config, $source_file);
+    $ccflags = $ccflags_each->($config, {cc => $cc, class_name => $class_name, source_file => $source_file});
   }
   else {
     $ccflags = $config->ccflags;
   }
+  my $global_ccflags_each = $self->global_ccflags_each;
+  if ($global_ccflags_each) {
+    $ccflags = $global_ccflags_each->($config, {cc => $cc, class_name => $class_name, source_file => $source_file, ccflags => $ccflags});
+  }
   $cflags .= " " . join(' ', @$ccflags);
   
-  my $optimize = $config->optimize;
+  my $optimize_each = $config->optimize_each;
+  my $optimize;
+  if ($optimize_each) {
+    $optimize = $optimize_each->($config, {cc => $cc, class_name => $class_name, source_file => $source_file});
+  }
+  else {
+    $optimize = $config->optimize;
+  }
+  my $global_optimize_each = $self->global_optimize_each;
+  if ($global_optimize_each) {
+    $optimize = $global_optimize_each->($config, {cc => $cc, class_name => $class_name, source_file => $source_file, optimize => $optimize});
+  }
   $cflags .= " $optimize";
   
   my @cflags = ExtUtils::CBuilder->new->split_like_shell($cflags);
   
-  my $cc_cmd = [$cc, '-c', @cflags, '-o', $output_file, $source_file];
+  my $compile_info = {cc => $cc, ccflags => \@cflags, object_file => $output_file, source_file => $source_file};
   
-  return $cc_cmd;
+  return $compile_info;
 }
 
 sub _error_message_find_config {
@@ -570,8 +637,8 @@ EOS
 }
 
 sub link {
-  my ($self, $class_name, $object_files, $opt) = @_;
-
+  my ($self, $class_name, $object_file_infos, $opt) = @_;
+  
   # Category
   my $category = $self->category;
 
@@ -584,12 +651,6 @@ sub link {
     confess "SPVM_BUILD_DIR environment variable must be set for link";
   }
 
-  # Object directory
-  my $object_dir = $opt->{object_dir};
-  unless (defined $object_dir && -d $object_dir) {
-    confess "Object directory must be specified for link";
-  }
-  
   # Shared library directory
   my $lib_dir = $opt->{lib_dir};
   unless (defined $lib_dir && -d $lib_dir) {
@@ -625,7 +686,7 @@ sub link {
     $config = SPVM::Builder::Config->new_gnu99;
   }
   else { confess 'Unexpected Error' }
-
+  
   # Quiet output
   my $quiet = $config->quiet;
 
@@ -697,13 +758,28 @@ sub link {
             }
           }
         }
-        push @$object_files, $static_lib_file;
+        my $object_file_info = SPVM::Builder::ObjectFileInfo->new(
+          object_file => $static_lib_file,
+          class_name => $resource,
+          is_exe_config => 0,
+          is_resource => 1,
+        );
+        
+        push @$object_file_infos, $object_file_info;
       }
       else {
         confess "Can't find resource static library file \"$static_lib_file\"";
       }
     }
   }
+
+  # Execute the callback before this link
+  my $before_link = $config->before_link;
+  if ($before_link) {
+    $object_file_infos = $before_link->($config, $object_file_infos);
+  }
+
+  my $object_files = [map { $_->to_string } @$object_file_infos];
 
   # Libraries
   # Libraries is linked using absolute path because the linked libraries must be known at runtime.
@@ -761,7 +837,7 @@ sub link {
 
   my $cbuilder_config = {
     ld => $ld,
-    lddlflags => $ldflags_str,
+    lddlflags => '',
     shrpenv => '',
     libpth => '',
     libperl => '',
@@ -793,6 +869,7 @@ sub link {
       objects => $object_files,
       module_name => $class_name,
       dl_func_list => $dl_func_list,
+      extra_linker_flags => $ldflags_str,
     );
 
     if ($self->debug) {
@@ -813,11 +890,11 @@ sub link {
         }
         if (defined $def_file && -f $def_file) {
           my $def_content = SPVM::Builder::Util::slurp_binary($def_file);
-          warn "[$def_file]\n$def_content\n";
+          print "[$def_file]\n$def_content\n";
         }
         if (defined $lds_file && -f $lds_file) {
           my $lds_content = SPVM::Builder::Util::slurp_binary($lds_file);
-          warn "[$lds_file]\n$lds_content\n";
+          print "[$lds_file]\n$lds_content\n";
         }
       }
     }

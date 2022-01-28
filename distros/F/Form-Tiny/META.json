@@ -60,6 +60,6 @@
          "web" : "https://github.com/bbrtj/perl-form-tiny"
       }
    },
-   "version" : "2.04",
+   "version" : "2.06",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

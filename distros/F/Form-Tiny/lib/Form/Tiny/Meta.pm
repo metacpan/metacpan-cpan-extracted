@@ -16,7 +16,7 @@ require Moo::Role;
 
 use namespace::clean;
 
-our $VERSION = '2.04';
+our $VERSION = '2.06';
 
 # more clear error messages in some crucial cases
 our @CARP_NOT = qw(Form::Tiny Form::Tiny::Form);
@@ -35,6 +35,12 @@ has 'fields' => (
 		InstanceOf ['Form::Tiny::FieldDefinitionBuilder'] | InstanceOf ['Form::Tiny::FieldDefinition']
 	],
 	default => sub { [] },
+);
+
+has 'is_flat' => (
+	is => 'ro',
+	writer => 'set_flat',
+	default => sub { 1 },
 );
 
 has 'hooks' => (
@@ -103,6 +109,26 @@ sub run_hooks_for
 	return $data[-1];
 }
 
+sub _inline_hook
+{
+	my ($self, $stage) = @_;
+
+	my @hooks = @{$self->hooks->{$stage} // []};
+
+	return if @hooks == 0;
+	return sub {
+		my @data = @_;
+
+		for my $hook (@hooks) {
+			my $ret = $hook->code->(@data);
+			splice @data, -1, 1, $ret
+				if $hook->is_modifying;
+		}
+
+		return $data[-1];
+	};
+}
+
 sub setup
 {
 	my ($self) = @_;
@@ -143,6 +169,11 @@ sub add_field
 
 	my $builder = Form::Tiny::FieldDefinitionBuilder->new(data => $scalar_param)->build;
 	push @{$self->fields}, $builder;
+
+	if ($self->is_flat && ($builder->isa('Form::Tiny::FieldDefinitionBuilder') || @{$builder->get_name_path->path} > 1))
+	{
+		$self->set_flat(0);
+	}
 
 	return $builder;
 }
@@ -237,6 +268,8 @@ sub inherit_from
 			keys %hooks
 		}
 	);
+
+	$self->set_flat($parent->is_flat);
 
 	return $self;
 }

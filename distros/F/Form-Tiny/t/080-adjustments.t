@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use lib 't/lib';
-use TestForm;
+use TestFormFlat;
 use Data::Dumper;
 
 my @data = (
@@ -16,7 +16,7 @@ my @data = (
 
 for my $aref (@data) {
 	my ($result, $input, $expected) = @$aref;
-	my $form = TestForm->new(input => $input);
+	my $form = TestFormFlat->new(input => $input);
 	is !!$form->valid, !!$result, "validation output ok";
 	if ($form->valid && $expected) {
 		is_deeply $form->fields, $expected, "result values ok";

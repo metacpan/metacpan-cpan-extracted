@@ -17,7 +17,7 @@ use lib ".";
 use t::Colourable;
 
 use Scalar::Util ();
-use constant HAVE_ISBOOL => defined eval { Scalar::Util->import( 'isbool' ) };
+use constant HAVE_ISBOOL => defined &builtin::isbool;
 
 my $VERSION_MINOR = Tangence::Constants->VERSION_MINOR;
 

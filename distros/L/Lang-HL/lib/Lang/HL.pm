@@ -5,7 +5,7 @@ use warnings;
 use utf8;
 use Regexp::Grammars;
 
-our $VERSION = '1.007';
+our $VERSION = '1.013';
 
 sub new {
 	my ($class) = @_;
@@ -16,9 +16,8 @@ sub PT::Lang::X {
     my ($class) = @_;
 
     my $code = 'use strict;
-use warnings;
-use utf8;
-    ';
+		use warnings;
+		use utf8;';
 
     for my $element ( @{ $class->{Class}} ) {
         $code .= $element->X();
@@ -85,10 +84,10 @@ sub PT::ClassGroups::X {
 sub PT::Group::X {
     my ($class, $className) = @_;
 
-    return (       $class->{Comment}
-                || $class->{Function}
-                || $class->{Parent}
-				|| $class->{Packages} )->X($className);
+    return (	   $class->{Comment}
+		|| $class->{Function}
+		|| $class->{Parent}
+		|| $class->{Packages} )->X($className);
 }
 
 sub PT::Packages::X {
@@ -113,8 +112,8 @@ sub PT::PackageList::X {
 sub PT::Package::X {
 	my ($class, $className) = @_;
 
-	return (	   $class->{PackageWithConstructor}
-            	|| $class->{PackageWithoutConstructor} )->X($className);
+	return (	$class->{PackageWithConstructor}
+            	     || $class->{PackageWithoutConstructor} )->X($className);
 }
 
 sub PT::PackageWithConstructor::X {
@@ -129,14 +128,14 @@ sub PT::PackageWithConstructor::X {
 		my $parameters = join(",", @parameters);
 
 		my $packageWithConstructor = "use " . $packageName . ";\n"
-									  . "my \$" . $object . " = " . $packageName . "->"
-									  . $constructor . "(" . $parameters . ");\n";
+			                     . "my \$" . $object . " = " . $packageName . "->"
+					     . $constructor . "(" . $parameters . ");\n";
 		return $packageWithConstructor;
 	}
 
 	my $packageWithConstructor = "use " . $packageName . ";\n"
-								 . "my \$" . $object . " = " . $packageName
-								 . "->" . $constructor . "();\n";
+				     . "my \$" . $object . " = " . $packageName
+				     . "->" . $constructor . "();\n";
 	return $packageWithConstructor;
 }
 
@@ -356,9 +355,12 @@ sub PT::ForRange::X {
 sub PT::LowerRange::X {
     my ($class, $className) = @_;
     my $number = (     $class->{Number}
-                    || $class->{VariableName}
-                    || $class->{ArrayElement}
-                    || $class->{HashElement} )->X($className);
+		    || $class->{VariableName}
+		    || $class->{ArrayElement}
+		    || $class->{HashElement}
+		    || $class->{ClassAccessor}
+		    || $class->{ClassFunctionReturn}
+		    || $class->{FunctionReturn} )->X($className);
 
     return $number;
 }
@@ -366,9 +368,12 @@ sub PT::LowerRange::X {
 sub PT::UpperRange::X {
     my ($class, $className) = @_;
     my $number = (     $class->{Number}
-                    || $class->{VariableName}
-                    || $class->{ArrayElement}
-                    || $class->{HashElement} )->X($className);
+		    || $class->{VariableName}
+		    || $class->{ArrayElement}
+		    || $class->{HashElement}
+		    || $class->{ClassAccessor}
+		    || $class->{ClassFunctionReturn}
+		    || $class->{FunctionReturn} )->X($className);
 
     return $number;
 }
@@ -531,7 +536,7 @@ sub PT::Statement::X {
                 || $class->{Return}
                 || $class->{Last}
                 || $class->{Next}
-				|| $class->{ObjectCall} )->X($className);
+                || $class->{ObjectCall} )->X($className);
 }
 
 sub PT::ObjectCall::X {
@@ -813,11 +818,11 @@ sub PT::ObjectFunctionCall::X {
 
 	my $objectFunctionCall;
 	if(exists $class->{Parameters}) {
-		my @parameters = $class->{Parameters}->X($className);
-		my $parameters = join(",", @parameters);
-		$objectFunctionCall = "\$" . $object . "->" . $functionName . "(" . $parameters . ")";
+	    my @parameters = $class->{Parameters}->X($className);
+	    my $parameters = join(",", @parameters);
+	    $objectFunctionCall = "\$" . $object . "->" . $functionName . "(" . $parameters . ")";
 	} else {
-		$objectFunctionCall = "\$" . $object . "->" . $functionName . "()";
+	    $objectFunctionCall = "\$" . $object . "->" . $functionName . "()";
 	}
 
 	return $objectFunctionCall;
@@ -1012,7 +1017,8 @@ sub PT::CalcOperands::X {
     return (       $class->{RealNumber}
                 || $class->{ScalarVariable}
                 || $class->{ArrayElement}
-                || $class->{HashElement} )->X($className);
+                || $class->{HashElement}
+			 	|| $class->{ClassAccessor} )->X($className);
 }
 
 sub PT::CalcOperator::X {
@@ -1130,7 +1136,7 @@ sub PT::LogicalOr::X {
 
 my $parser = qr {
     <nocontext:>
-	<debug: off>
+    <debug: off>
 
     <Lang>
     <objrule:  PT::Lang>                       <[Class]>+
@@ -1148,13 +1154,13 @@ my $parser = qr {
     <objrule:  PT::Parent>                     <TokenParent> <LParen> <ClassNames> <RParen> <SemiColon>
     <objrule:  PT::ClassNames>                 <[ClassName]>+ % <Comma>
 
-	<objrule:  PT::Packages>				   <LParen> <PackageList> <RParen> <SemiColon>
-	<objrule:  PT::PackageList>			       <[Package]>+ % <Comma>
-	<objrule:  PT::Package>					   <PackageWithConstructor> | <PackageWithoutConstructor>
+    <objrule:  PT::Packages>			<LParen> <PackageList> <RParen> <SemiColon>
+    <objrule:  PT::PackageList>		<[Package]>+ % <Comma>
+    <objrule:  PT::Package>			<PackageWithConstructor> | <PackageWithoutConstructor>
     <objrule:  PT::PackageWithConstructor>     [!] <Object> <Equal> <PackageName> <Dot> <Constructor> <LParen> <Parameters>? <RParen>
-	<objrule:  PT::PackageName>				   <[PackageDir]>+ % (::)
+    <objrule:  PT::PackageName>		<[PackageDir]>+ % (::)
     <objrule:  PT::PackageWithoutConstructor>  <PackageName>
-	<objrule:  PT::Constructor>                [a-zA-Z]+?
+    <objrule:  PT::Constructor>                [a-zA-Z]+?
     <objrule:  PT::Object>                     [a-zA-Z]+?
     <objrule:  PT::PackageDir>                 [a-zA-Z]+?
 
@@ -1178,16 +1184,20 @@ my $parser = qr {
     <objrule:  PT::For>                        <TokenFor> <Var> <VariableName> <LParen> <ForRange> <RParen> <CodeBlock>
     <objrule:  PT::ForRange>                   <LowerRange> <Dot><Dot><Dot> <UpperRange>
     <objrule:  PT::LowerRange>                 <Number> | <VariableName> | <ArrayElement> | <HashElement>
+						| <ClassAccessor> | <ClassFunctionReturn> | <FunctionReturn>
     <objrule:  PT::UpperRange>                 <Number> | <VariableName> | <ArrayElement> | <HashElement>
+						| <ClassAccessor> | <ClassFunctionReturn> | <FunctionReturn>
 
     <objrule:  PT::IfElse>                     <If> <ElsIf>? <Else>?
     <objrule:  PT::If>                         <TokenIf> <LParen> <BoolExpression> <RParen> <CodeBlock>
+    
     <objrule:  PT::BoolExpression>             <BoolOperands> <BoolOperatorExpression>?
     <objrule:  PT::BoolOperatorExpression>     <BoolOperator> <BoolOperands>
     <objrule:  PT::BoolOperands>               <RealNumber> | <String> | <ScalarVariable> | <ArrayElement> | <HashElement>
-											   | <ClassAccessor> | <ClassFunctionReturn> | <FunctionReturn>
+						| <ClassAccessor> | <ClassFunctionReturn> | <FunctionReturn>
     <objrule:  PT::BoolOperator>               <GreaterThan> | <LessThan> | <Equals> | <GreaterThanEquals> | <LessThanEquals>
                                                | <StringEquals> | <StringNotEquals> | <NotEqulas> | <LogicalAnd> | <LogicalOr>
+                                               
     <objrule:  PT::ElsIf>                      <[ElsIfChain]>+
     <objrule:  PT::ElsIfChain>                 <TokenElsIf> <LParen> <BoolExpression> <RParen> <CodeBlock>
     <objrule:  PT::Else>                       <TokenElse> <CodeBlock>
@@ -1196,7 +1206,7 @@ my $parser = qr {
                                                | <ObjectCall> | <Assignment> | <Return> | <Last> | <Next>
     <objrule:  PT::ClassFunctionCall>          <TokenClass> <Dot> <FunctionName> <LParen> <Parameters>? <RParen> <SemiColon>
 
-	<objrule:  PT::ObjectCall>				    <ObjectFunctionCall> <SemiColon>
+    <objrule:  PT::ObjectCall>			<ObjectFunctionCall> <SemiColon>
 
     <objrule:  PT::VariableDeclaration>        <ArrayDeclaration> | <HashDeclaration> | <ScalarDeclaration>
 
@@ -1216,7 +1226,7 @@ my $parser = qr {
     <objrule:  PT::ArrayList>                  <LBracket> <ListElements> <RBracket>
     <objrule:  PT::ListElements>               .{0} | <[ListElement]>+ % <Comma>
     <objrule:  PT::ListElement>                <RealNumber> | <String> | <ClassFunctionReturn> | <FunctionReturn>
-											   | <ArrayElement> | <HashElement> | <ArrayList> | <HashRef> | <VariableName>
+						| <ArrayElement> | <HashElement> | <ArrayList> | <HashRef> | <VariableName>
 
     <objrule:  PT::HashDeclaration>            <Var> <VariableName> <Equal> <HashRef> <SemiColon>
     <objrule:  PT::HashRef>                    <LBrace> <KeyValuePairs> <RBrace>
@@ -1224,7 +1234,7 @@ my $parser = qr {
     <objrule:  PT::KeyValue>                   <PairKey> <Colon> <PairValue>
     <objrule:  PT::PairKey>                    <Number> | <String>
     <objrule:  PT::PairValue>                  <RealNumber> | <String> | <ClassFunctionReturn> | <FunctionReturn>
-											   | <ArrayElement> | <HashElement> | <ArrayList> | <HashRef> | <VariableName>
+						| <ArrayElement> | <HashElement> | <ArrayList> | <HashRef> | <VariableName>
 
     <objrule:  PT::FunctionCall>               <FunctionName> <LParen> <Parameters>? <RParen> <SemiColon>
     <objrule:  PT::Parameters>                 <[Param]>+ % <Comma>
@@ -1234,13 +1244,17 @@ my $parser = qr {
 
     <objrule:  PT::ScalarAssignment>           <ScalarVariable> <Equal> <RHS> <SemiColon>
     <objtoken: PT::ScalarVariable>             [a-zA-Z]+
+    
     <objrule:  PT::RHS>                        <RealNumber> | <FunctionReturn> | <ArrayElement> | <HashElement>
                                                | <ScalarVariable> | <Calc> | <ArrayList> | <HashRef> | <ClassAccessor>
                                                | <ClassFunctionReturn> | <String> | <STDIN> | <ObjectFunctionCall>
+                                               
     <objrule:  PT::FunctionReturn>             <FunctionName> <LParen> <Parameters>? <RParen>
+    
     <objrule:  PT::ArrayElement>               <ArrayName> <[ArrayAccess]>+
     <objrule:  PT::ArrayAccess>                <LBracket> <Number> <RBracket>
     <objrule:  PT::ArrayName>                  [a-zA-Z]+?
+    
     <objrule:  PT::HashElement>                <HashName> <[HashAccess]>+
     <objrule:  PT::HashAccess>                 <LBrace> <HashKey> <RBrace>
     <objtoken: PT::HashName>                   [a-zA-Z]+?
@@ -1260,7 +1274,7 @@ my $parser = qr {
 
     <objrule:  PT::Calc>                       <CalcExpression>
     <objrule:  PT::CalcExpression>             <[CalcOperands]>+ % <[CalcOperator]>
-    <objrule:  PT::CalcOperands>               <RealNumber> | <ScalarVariable> | <ArrayElement> | <HashElement>
+    <objrule:  PT::CalcOperands>               <RealNumber> | <ScalarVariable> | <ArrayElement> | <HashElement> | <ClassAccessor>
     <objtoken: PT::CalcOperator>               <Plus> | <Minus> | <Multiply> | <Divide>
 
     <objrule:  PT::Return>                     <TokenReturn> <RHS>? <SemiColon>
@@ -1282,7 +1296,7 @@ my $parser = qr {
 
     <objtoken: PT::TokenSTDIN>                 STDIN
 
-	<objrule:  PT::ObjectFunctionCall>		   [!] <Object> <Dot> <FunctionName> <LParen> <Parameters>? <RParen>
+    <objrule:  PT::ObjectFunctionCall>		[!] <Object> <Dot> <FunctionName> <LParen> <Parameters>? <RParen>
 
     <objtoken: PT::LogicalAnd>                 \&\&
     <objtoken: PT::LogicalOr>                  \|\|
@@ -1363,11 +1377,9 @@ HL is a programming language.
 			var number = {};
 
 			if(class.counter < 10) {
-				var counter = class.counter;
-				counter = counter + 1;
-				class.counter = counter;
+				class.counter = class.counter + 1;
 
-				number = {"number" : class.returnNumber()};
+				number = { "number" : class.returnNumber() };
 				return number;
 			}
 

@@ -68,7 +68,7 @@ struct spvm_compiler {
   SPVM_OP* op_grammar;
   
   // Syntax error count
-  int32_t error_count;
+  SPVM_LIST* error_messages;
   
   // Module searching directories
   SPVM_LIST* module_dirs;
@@ -124,8 +124,6 @@ struct spvm_compiler {
   // Field ops
   SPVM_LIST* fields;
   
-  int8_t cur_src_need_free;
-  
   char* next_double_quote_start_bufptr;
 };
 
@@ -136,8 +134,12 @@ void SPVM_COMPILER_add_basic_types(SPVM_COMPILER* compiler);
 SPVM_RUNTIME* SPVM_COMPILER_new_runtime(SPVM_COMPILER* compiler);
 void SPVM_COMPILER_error(SPVM_COMPILER* compiler, const char* message, ...);
 
+void SPVM_COMPILER_print_error_messages(SPVM_COMPILER* compiler, FILE* fh);
+
 const char* SPVM_COMPILER_create_method_signature(SPVM_COMPILER* compiler, SPVM_METHOD* method);
 const char* SPVM_COMPILER_create_field_signature(SPVM_COMPILER* compiler, SPVM_FIELD* field);
 const char* SPVM_COMPILER_create_class_var_signature(SPVM_COMPILER* compiler, SPVM_CLASS_VAR* class_var);
+
+int32_t SPVM_COMPILER_get_error_count(SPVM_COMPILER* compiler);
 
 #endif

@@ -1,0 +1,530 @@
+4. Serialisation
+----------------
+
+4.1. Value serialisation
+
+The data serialisation format applies recursively down a data structure
+tree. Each node in structure is either a string, an object reference, or
+a list or dictionary of other values. The serialised bytes encode the tree
+structure recursively. Other types of entry also exist in the serialised
+stream, which carry metadata about the types, such as object classes and
+instances.
+
+The encoding of each node in the data structure consists of a type, a
+size, and the actual data payload. The type and size of a node are encoded
+in its leader byte (or bytes). The top three bits of the first byte
+determines the type:
+
+ Type           Bits                    Description
+
+ DATA_NUMBER    0 0 0 t t t t t         numeric
+        where 'ttttt' gives the number subtype
+
+ DATA_STRING    0 0 1 s s s s s         string
+ DATA_LIST      0 1 0 s s s s s         list of values
+ DATA_DICT      0 1 1 s s s s s         dictionary of string->value
+ DATA_OBJECT    1 0 0 s s s s s         Tangence object reference
+ DATA_RECORD    1 0 1 s s s s s         structured record
+        where 'sssss' gives the size
+
+ DATA_META      1 1 1 n n n n n
+        where 'nnnnn' gives the metadata type
+
+For numbers, the lower five bits encode the numeric type, which defines
+how many more bytes will be used
+
+ Subtype                Subtype bits    Extra bytes     Description
+
+ DATANUM_BOOLFALSE      0 0 0 0 0       0               Boolean false
+ DATANUM_BOOLTRUE       0 0 0 0 1       0               Boolean true
+ DATANUM_UINT8          0 0 0 1 0       1               Unsigned 8bit
+ DATANUM_SINT8          0 0 0 1 1       1               Signed 8bit
+ DATANUM_UINT16         0 0 1 0 0       2               Unsigned 16bit
+ DATANUM_SINT16         0 0 1 0 1       2               Signed 16bit
+ DATANUM_UINT32         0 0 1 1 0       4               Unsigned 32bit
+ DATANUM_SINT32         0 0 1 1 1       4               Signed 32bit
+ DATANUM_UINT64         0 1 0 0 0       8               Unsigned 64bit
+ DATANUM_SINT64         0 1 0 0 1       8               Signed 64bit
+ DATANUM_FLOAT16        1 0 0 0 0       2               Floating 16bit
+ DATANUM_FLOAT32        1 0 0 0 1       4               Floating 32bit
+ DATANUM_FLOAT64        1 0 0 1 0       8               Floating 64bit
+
+All multi-byte integers are always stored in big-endian form.
+
+Floating-point values are stored in IEEE 754 form, as three bitfields
+containing sign, exponent and mantissa. The sign always has one bit, clear for
+positive, set for negative. The exponent and mantissa have the following sizes
+and bias.
+
+ Subtype               Exponent   Bias    Mantissa
+
+ DATANUM_FLOAT16       5 bits     +15     10 bits
+ DATANUM_FLOAT32       8 bits     +127    23 bits
+ DATANUM_FLOAT64       11 bits    +1023   52 bits
+
+Infinities and Not-a-Number values are represented by the exponent having its
+maximum allowed value. If the mantissa is zero this represents an infinity of
+the given sign, and if the mantissa is non-zero, it is a not-a-number value.
+For canonical identity, the non-zero mantissa should have only its top bit
+set, and the sign bit should be clear.
+
+ Subtype              Exponent   Mantissa
+
+ DATANUM_FLOAT16      31         0           Inf
+ DATANUM_FLOAT16      31         1 << 9      NaN
+
+ DATANUM_FLOAT32      255        0           Inf
+ DATANUM_FLOAT32      255        1 << 22     NaN
+
+ DATANUM_FLOAT64      1023       0           Inf
+ DATANUM_FLOAT64      1023       1 << 51     NaN
+
+For string, list, dict and object types, the lower five bits give a
+number, 0 to 31, which helps encode the size. For items of size 30 or
+below, this size is encoded directly. Where the size is 31 or more, the
+number 31 is encoded, and the actual size follows this leading byte. For
+sizes 31 to 127, the next byte encodes it. For sizes 128 or above, the
+next 4 bytes encode it in big-endian format, with the top bit set. Sizes
+above 2^31 cannot be encoded.
+
+Following the leader are bytes encoding the data. The exact meaning of the
+size depends on the type of the node.
+
+For strings, the size gives the number of bytes in the string. These
+bytes then follow the leader.
+
+For lists, the size gives the number of elements in the list. Following
+the leader will be this number of data serialisations, one per list
+element.
+
+For dictionaries, this size gives the number of key/value pairs. Following
+the leader will be this number of key/value pairs. Each pair consists of a
+string for the key name, then a data serialisation for the value.
+
+For objects, the size gives the number of bytes in the object's ID number,
+followed by a big-endian encoding of the object's ID number. Currently,
+this will always be a 4 byte number.
+
+For structured records, the size gives the count of serialied data members for
+the record. Following the leader will be the ID number of the structure type
+as an int, followed by the given number of data members, in the order that the
+structure type declares. The field names are not serialised, as they can be
+inferred from the structure type's definition.
+
+Meta-data items may be embedded within a data stream in order to create
+the object classes and instances which it contains. These metadata items
+do not count towards the overall size of a collection value.
+
+Meta-data operations encode a subtype number, rather than a size, in the
+bottom five bits.
+
+ Metadata type          Bits                    Description
+
+ DATAMETA_CONSTRUCT     1 1 1 0 0 0 0 1         Construct an object
+ DATAMETA_CLASS         1 1 1 0 0 0 1 0         Create a new object class
+ DATAMETA_STRUCT        1 1 1 0 0 0 1 1         Create a new record struct type
+
+Following each metadata item is an encoding of its arguments.
+
+DATAMETA_CONSTRUCT:
+  Object ID:    int
+  Class ID:     int
+  Smash values: 0 or more bytes, encoded per type (in a list container)
+
+  If the object class defines smash properties, the construct message will
+  also contain the values for the smash properties. These will be sent in
+  a list, one value per property, in the same order as the object class's
+  schema defines the smash keys. Each will be encoded as per its declared
+  type.
+
+DATAMETA_CLASS:
+  Class name:   string
+  Class ID:     int
+  Class:        struct of type Tangence.Class
+  Smash keys:   data encoded (list)
+
+  The class definition itself will be encoded as a Tangence.Class structure,
+  containing nested Tangence.Method, Tangence.Event and Tangence.Property
+  elements. If the class declares any superclasses, these will be sent in
+  other DATAMETA_CLASS metadata items before this one.
+
+  The smash keys will be encoded as a possibly-empty list of strings.
+
+DATAMETA_STRUCT:
+  Struct name:   string
+  Struct ID:     int
+  Field names:   list of strings
+  Field types:   list of strings
+
+4.2. Message Types
+
+Each of the messages defines the layout of its data payload. Some messages
+pass a fixed number of items, some have a variable number of items in the
+last position. For these messages, no explicit encoding of the size is
+given. Instead, the data payload area is packed with as many data
+encodings as are required. The receiver should use the size of the
+containing message to know when all the items have been unpacked.
+
+The following request types are defined. Any message may be responded to
+by MSG_ERROR in case of an error, so this response type is not listed.
+Some of these messages are sent from the client to the server (C->S),
+others are sent from the server to client (S->C)
+
+MSG_CALL (C->S) (0x01)
+  INT           object ID
+  STRING        method name
+  data...       arguments
+
+  Responses: MSG_RESULT
+
+  Calls the named method on the given object.
+
+MSG_SUBSCRIBE (C->S) (0x02)
+  INT           object ID
+  STRING        event name
+
+  Responses: MSG_SUBSCRIBED
+
+  Subscribes the client to be informed of the event on given object.
+
+MSG_UNSUBSCRIBE (C->S) (0x03)
+  INT           object ID
+  STRING        event name
+
+  Responses: MSG_OK
+
+  Cancels an event subscription.
+
+MSG_EVENT (S->C) (0x04)
+  INT           object ID
+  STRING        event name
+  data...       arguments
+
+  Responses: MSG_OK
+
+  Informs the client that the event has occured.
+
+MSG_GETPROP (C->S) (0x05)
+  INT           object ID
+  STRING        property name
+
+  Responses: MSG_RESULT
+
+  Requests the current value of the property
+
+MSG_SETPROP (C->S) (0x06)
+  INT           object ID
+  STRING        property name
+  data          new value
+
+  Responses: MSG_OK
+
+  Sets the new value of the property
+
+MSG_WATCH (C->S) (0x07)
+  INT           object ID
+  STRING        property name
+  BOOL          want initial?
+
+  Responses: MSG_WATCHING
+
+  Requests to be informed of changes to the property value. If the
+  boolean 'want initial' value is true, the client will be sent an
+  initial MSG_CHANGE message for the current value of the property.
+
+MSG_UNWATCH (C->S) (0x08)
+  INT           object ID
+  STRING        property name
+
+  Responses: MSG_OK
+
+  Cancels a request to watch a property
+
+MSG_UPDATE (S->C) (0x09)
+  INT           object ID
+  STRING        property name
+  U8            change type
+  data...       change value
+
+  Responses: MSG_OK
+
+  Informs the client that the property value has now changed. The
+  type of change is given by the change type argument, and defines the
+  data layout in the value arguments. The exact meaning of the operation
+  depends on the dimension of the property it acts on.
+
+  For DIM_SCALAR:
+
+    CHANGE_SET:
+      data      new value
+
+      Sets the new value of the property.
+
+  For DIM_HASH:
+    CHANGE_SET:
+      DICT      new value
+
+      Sets the new value of the property.
+
+    CHANGE_ADD:
+      STRING    key
+      data      value
+
+      Adds a new element to the hash.
+
+    CHANGE_DEL:
+      STRING    key
+
+      Deletes an element from the hash.
+
+  For DIM_QUEUE:
+    CHANGE_SET:
+      LIST      new value
+
+      Sets the new value of the property.
+
+    CHANGE_PUSH:
+      data...   additional values
+
+      Appends the additional values to the end of the queue.
+
+    CHANGE_SHIFT:
+      INT       number of elements
+
+      Removes a number of leading elements from the beginning of the
+      queue.
+
+  For DIM_ARRAY:
+    CHANGE_SET:
+      LIST      new value
+
+      Sets the new value of the property.
+
+    CHANGE_PUSH:
+      data...   additional values
+
+      Appends the additional values to the end of the array.
+
+    CHANGE_SHIFT:
+      INT       number of elements
+
+      Removes a number of leading elements from the beginning of the
+      array.
+
+    CHANGE_SPLICE:
+      INT       start
+      INT       count
+      data...   new elements
+
+      Replaces the given range of the array with the new elements given.
+      The new list of values may be a different length to the replaced
+      section - in this case, subsequent elements will be shifted up or
+      down accordingly.
+
+    CHANGE_MOVE:
+      INT       index
+      INT       delta
+
+      Moves the item currently at the index forward a (signed) delta amount,
+      such that its new index becomes index+delta. The items inbetween the old
+      and new index will be moved up or down as appropriate.
+
+  For DIM_OBJSET:
+    CHANGE_SET:
+      LIST      objects
+
+      Sets the new value for the property. Will be given a list of
+      Tangence object references.
+
+    CHANGE_ADD:
+      OBJECT    new object
+
+      Adds the given object to the set
+
+    CHANGE_DEL:
+      STRING    object ID
+
+      Removes the object of the given ID from the set.
+
+MSG_DESTROY (S->C) (0x0a)
+  INT           object ID
+
+  Responses: MSG_OK
+
+  Informs the client that the object is due for destruction in
+  the server. Upon receipt of this message the client should destroy
+  any remaining references it has to the object. After it has sent the
+  MSG_OK response, it will not be allowed to invoke any methods,
+  subscribe to any events, nor interact with any properties on
+  the object. Any existing event subscriptions or property
+  watches will have been removed by the server before this message is
+  sent.
+
+MSG_GETPROPELEM (C->S) (0x0b)
+  INT           object ID
+  STRING        property name
+  INT|STRING    element index or key
+
+  Responses: MSG_RESULT
+
+  Requests the current value of a single element in a queue or array
+  (by element index), or hash (by key name). Cannot be applied to
+  scalar or objset properties.
+
+MSG_WATCH_CUSR (C->S) (0x0c)
+  INT           object ID
+  STRING        property name
+  INT           from
+
+  Responses: MSG_WATCHING_CUSR
+
+  Similar to MSG_WATCH, requests to be informed of changes to the
+  property value, which must be a queue property. Creates a new
+  cursor for the property, beginning at the first index (if
+  from == 1) or the last (if from == 2).
+
+MSG_CUSR_NEXT (C->S) (0x0d)
+  INT           cursor ID
+  INT           direction
+  INT           count
+
+  Responses: MSG_CUSR_RESULT
+
+  Requests the next few items from a property cursor. It will yield a
+  MSG_RESULT message containing up to the given number of items, by
+  moving forwards (if direction == 1) or backwards (if direction == 2).
+  If the cursor is already at the edge of the queue then the MSG_RESULT
+  will contain no extra items.
+
+MSG_CUSR_DESTROY (C->S) (0x0e)
+  INT           cursor ID
+
+  Informs the server that the client has finished using the cursor, and it
+  can release any resources attached to it.
+
+MSG_GETROOT (C->S) (0x40)
+  data          identity
+
+  Responses: MSG_RESULT
+
+  Initial message to be sent by the client to obtain the root object. The
+  identity may be used to identify this particular client, as part of its
+  login procedure. The result will contain a single object reference,
+  being the root object.
+
+MSG_GETREGISTRY (C->S) (0x41)
+  [no arguments]
+
+  Responses: MSG_RESULT
+
+  Requests the registry object from the server. The result will contain a
+  single object reference, being the registry object.
+
+MSG_INIT (C->S) (0x7f)
+  INT            major version
+  INT            maximal minor version
+  INT            minimal minor version
+
+  Responses: MSG_INITED
+
+  Requests the start of the Tangence stream. This must be the first message
+  sent by the client. If the server is unwilling to provide a suitable version
+  it can return MSG_ERROR. Otherwise, the accepted minor is returned in the
+  MSG_INITED message.
+
+  The version specified by this document is major 0, minor 4.
+
+The following responses may be sent to a request:
+
+MSG_OK (0x80)
+  [no arguments]
+
+  A simple OK message, informing the requester that the operation was
+  successful, an no error occured.
+
+MSG_ERROR (0x81)
+  STRING        error message
+
+  An error occured; the text of the message is included.
+
+MSG_RESULT (0x82)
+  data...       values
+
+  Contains the return value from a method call, a property value, or the
+  initial root or registry object.
+
+MSG_SUBSCRIBED (0x83)
+  [no arguments]
+
+  Informs the client that a MSG_SUBSCRIBE was successful.
+
+MSG_WATCHING (0x84)
+  [no arguments]
+
+  Informs the client that a MSG_WATCH was successful.
+
+MSG_WATCHING_CUSR (0x85)
+  INT            cursor ID
+  INT            first index (inclusive)
+  INT            last index (inclusive)
+
+  Informs the client that a MSG_WATCH_CUSR was successful, and returns
+  the new cursor ID and the first and last indices inclusive of the queue
+  it will iterate over.
+  
+  ((The reason for using first and last indices inclusively, rather
+  than yielding the total size of the queue, is that this makes it
+  easier to support iterating over hashes in a future version))
+
+MSG_CUSR_RESULT (0x86)
+  INT            first item index
+  data...        values
+
+  Contains the return value from a MSG_CUSR_NEXT call. Gives the index
+  of the first item in the returned result, and the requested items.
+  There may fewer items than requested, if the edge of the property
+  value was reached.
+
+MSG_INITED (0xff)
+  INT            major version
+  INT            minor version
+
+  Informs the client that the initial MSG_INIT was successful, and what
+  minor version was accepted.
+
+4.3 Built-in Structure Types
+
+The following structure types are built-in, with the given structure ID
+numbers. They can be assumed pre-knowledge by both ends of the stream and do
+not need serialising by DATAMETA_STRUCT records.
+
+4.3.1 Tangence.Class
+
+  Structure ID:     1
+  Fields:
+    methods       : dict(any)
+    events        : dict(any)
+    properties    : dict(any)
+    superclasses  : list(str)
+
+4.3.2 Tangence.Method
+
+  Structure ID:     2
+  Fields:
+    arguments     : list(str)
+    returns       : str
+
+4.3.3 Tangence.Event
+
+  Structure ID:     3
+  Fields:
+    arguments     : list(str)
+
+4.3.4 Tangence.Property
+
+  Structure ID:     4
+  Fields:
+    dimension     : int
+    type          : str
+    smashed       : bool
+

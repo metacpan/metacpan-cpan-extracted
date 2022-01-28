@@ -1,6 +1,12 @@
 Changes file for OPM::Maker
 ===========================
 
+1.17 2022-01-27 12:24:00
+
+  + improve bash completion script:
+    list directories and files if no other option matches.
+    This is needed to have dir/file completion for options like --output
+
 1.16 2022-01-26 15:23:00
 
   + add new command to build bash completion script (opmbuild bashcompletion)

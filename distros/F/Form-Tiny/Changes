@@ -1,5 +1,15 @@
 Revision history for Perl extension Form::Tiny.
 
+2.06 Thu Jan 27 20:00:00 2022
+	- Form::Tiny package is now a role providing form_meta method
+	- form_meta method is now namespace::autoclean resistant
+	- Form::Tiny no longer automatically cleans up all previously defined symbols (revoke change made in 2.04)
+
+2.05 Wed Jan 26 22:30:00 2022
+	- Module optimization
+	- forms now keep track of whether they are flat (to apply optimizations)
+	- style changes
+
 2.04 Sat Jan 22 20:00:00 2022
 	- added plugins system: standarized way of extending the module
 	- new import parameter: plugins => []

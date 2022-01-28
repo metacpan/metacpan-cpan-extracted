@@ -1,0 +1,8 @@
+#!/usr/bin/env perl
+use Mojo::Base -strict;
+use if -r 'lib/Mojo/Netdata.pm', qw(lib lib);
+use Mojo::Netdata;
+use Mojo::Netdata::Util qw(logf);
+
+my $netdata = Mojo::Netdata->new;
+$netdata->start ? Mojo::IOLoop->start : logf(info => 'No collectors set up.');
