@@ -2,7 +2,7 @@ NAME
     File::Slurper::Shortcuts - Some convenience additions for File::Slurper
 
 VERSION
-    This document describes version 0.004 of File::Slurper::Shortcuts (from
+    This document describes version 0.005 of File::Slurper::Shortcuts (from
     Perl distribution File-Slurper-Shortcuts), released on 2021-08-02.
 
 SYNOPSIS
@@ -53,6 +53,8 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    File::Slurper::Temp also provides "modify_text" and "modify_binary".
+
     File::Slurper
 
 AUTHOR

@@ -151,7 +151,7 @@ use Mojo::IOLoop;
 use Mojo::Log;
 use utf8;
 
-our $VERSION = 4.04;
+our $VERSION = 4.05;
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -314,13 +314,13 @@ sub save_page {
   my $host = shift;
   my $space = shift;
   my $id = shift;
-  my $type = shift;
+  my $type = shift || "text/plain";
   my $data = shift;
   my $length = shift;
   # If the operation succeeds, we can close the stream; if the operation fails,
   # we can close the stream; but if the operation was rescheduled, we must not
   # close the stream!
-  if ($type ne "text/plain") {
+  if ($type ne "text/plain" and $type ne "text/gemini") {
     if ($length == 0) {
       with_lock($stream, $host, $space,
 		sub {
@@ -2022,7 +2022,7 @@ sub is_upload {
     my $host = $1;
     my($scheme, $authority, $path, $query, $fragment) =
 	$request =~ m|(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?|;
-    if ($path =~ m!^(?:/($spaces_regex))?(?:/raw|/page)?/([^/;=&]+(?:;\w+=[^;=&]+)+)!) {
+    if ($path =~ m!^(?:/($spaces_regex))?(?:/raw|/page|/file)?/([^/;=&]+(?:;\w+=[^;=&]+)+)!) {
       my $space = $1;
       my ($id, @params) = split(/[;=&]/, $2);
       my $params = { map {decode_utf8(uri_unescape($_))} @params };
@@ -2107,13 +2107,20 @@ sub valid_mime_type {
   my $space = shift;
   my $id = shift;
   my $params = shift;
-  my $type = $params->{mime};
+  my $type = $params->{mime} || "text/plain";
   my ($main_type) = split(/\//, $type, 1);
   my @types = @{$server->{wiki_mime_type}};
-  @types = ("text/plain") unless @types;
-  if ($type ne "text/plain" and not grep(/^$type$/, @types) and not grep(/^$main_type$/, @types)) {
-    $log->debug("This wiki does not allow $type (@types)");
-    result($stream, "59", "This wiki does not allow $type");
+  # the wiki always allows text/plain or text/gemini
+  if ($type eq "text/plain" or $type eq "text/gemini") {
+    return 1;
+  } elsif (not @types) {
+    $log->debug("This wiki does not allow file uploads");
+    result($stream, "59", "This wiki does not allow file uploads");
+    $stream->close_gracefully();
+    return;
+  } elsif (not grep(/^$type$/, @types) and not grep(/^$main_type$/, @types)) {
+    $log->debug("This wiki does not allow $type");
+    result($stream, "59", "This wiki does not allow $type, only @types");
     $stream->close_gracefully();
     return;
   }

@@ -21,7 +21,7 @@ use DynaLoader;
 
 
 
-#line 5 "slatec.pd"
+#line 6 "slatec.pd"
 use strict;
 use warnings;
 
@@ -107,7 +107,7 @@ data using L</chcm>.
 
 
 
-#line 91 "slatec.pd"
+#line 92 "slatec.pd"
 =head2 eigsys
 
 =for ref
@@ -284,7 +284,7 @@ L</PDL::Slatec::fft>.
 
 
 
-#line 484 "slatec.pd"
+#line 424 "slatec.pd"
 
 use PDL::Core;
 use PDL::Basic;
@@ -300,10 +300,10 @@ sub PDL::eigsys {
 	my($h) = @_;
 	$h = float($h);
 	rs($h, 
-		(my $eigval=PDL->null),
-		(long (pdl (1))),(my $eigmat=PDL->null),
-		(my $fvone = PDL->null),(my $fvtwo = PDL->null),
-		(my $errflag=PDL->null)
+		my $eigval=PDL->null,
+		1,my $eigmat=PDL->null,
+		my $fvone = PDL->null,my $fvtwo = PDL->null,
+		my $errflag=PDL->null
 	);
 #	print $covar,$eigval,$eigmat,$fvone,$fvtwo,$errflag;
 	if(sum($errflag) > 0) {
@@ -327,7 +327,7 @@ sub PDL::matinv {
 	if(sum($info) > 0) {
 		barf("Uninvertible matrix given to inv: $m\n");
 	}
-	gedi($m,$ipvt,(pdl 0,0),(null),(long( pdl (1))));
+	gedi($m,$ipvt,pdl(0,0),null,1);
 	$m;
 }
 
@@ -339,7 +339,7 @@ sub PDL::detslatec {
 	if(sum($info) > 0) {
 		barf("Uninvertible matrix given to inv: $m\n");
 	}
-	gedi($m,$ipvt,(my $det=null),(null),(long( pdl (10))));
+	gedi($m,$ipvt,my $det=null,null,10);
 	return $det->slice('(0)')*10**$det->slice('(1)');
 }
 
@@ -388,8 +388,8 @@ sub PDL::polyfit {
   # A array needs some work space
   my $sz = ((3 * $x_in->getdim(0)) + (3*$maxdeg_in) + 3); # Buffer size called for by Slatec
   my @otherdims = $_[0]->dims; shift @otherdims;          # Thread dims
-  my $a1 =      PDL::new_from_specification('PDL',$x_in->type,$sz,@otherdims);
-  my $coeffs = PDL::new_from_specification('PDL',$x_in->type, $maxdeg_in + 1, @otherdims);
+  my $a1 =      PDL->new_from_specification($x_in->type,$sz,@otherdims);
+  my $coeffs = PDL->new_from_specification($x_in->type, $maxdeg_in + 1, @otherdims);
 
   my $ierr = PDL->null;
   my $ndeg = PDL->null;
@@ -466,7 +466,7 @@ sub PDL::polyvalue {
 
 =for sig
 
-  Signature: (x(n,p);[o]s(p);[o]e(p);[o]u(n,p);[o]v(p,p);[o]work(n);int job();int [o]info())
+  Signature: (x(n,p);[o]s(p);[o]e(p);[o]u(n,p);[o]v(p,p);[o]work(n);longlong job();longlong [o]info())
 
 =for ref
 
@@ -496,7 +496,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n,n);rcond();[o]z(n);int [o]info())
+  Signature: (a(n,n);rcond();[o]z(n);longlong [o]info())
 
 Factor a real symmetric positive definite matrix
 and estimate the condition number of the matrix.
@@ -525,7 +525,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n,n);int [o]ipvt(n);[o]rcond();[o]z(n))
+  Signature: (a(n,n);longlong [o]ipvt(n);[o]rcond();[o]z(n))
 
 Factor a matrix using Gaussian elimination and estimate
 the condition number of the matrix.
@@ -554,7 +554,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n,n);int [o]ipvt(n);int [o]info())
+  Signature: (a(n,n);longlong [o]ipvt(n);longlong [o]info())
 
 =for ref
 
@@ -584,7 +584,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n,n);[o]det(two=2);int job())
+  Signature: (a(n,n);[o]det(two=2);longlong job())
 
 Compute the determinant and inverse of a certain real
 symmetric positive definite matrix using the factors
@@ -614,7 +614,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n,n);int [o]ipvt(n);[o]det(two=2);[o]work(n);int job())
+  Signature: (a(n,n);longlong [o]ipvt(n);[o]det(two=2);[o]work(n);longlong job())
 
 Compute the determinant and inverse of a matrix using the
 factors computed by L</geco> or L</gefa>.
@@ -643,7 +643,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(lda,n);int ipvt(n);b(n);int job())
+  Signature: (a(lda,n);longlong ipvt(n);b(n);longlong job())
 
 Solve the real system C<A*X=B> or C<TRANS(A)*X=B> using the
 factors computed by L</geco> or L</gefa>.
@@ -672,7 +672,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n,n);[o]w(n);int matz();[o]z(n,n);[t]fvone(n);[t]fvtwo(n);int [o]ierr())
+  Signature: (a(n,n);[o]w(n);longlong matz();[o]z(n,n);[t]fvone(n);[t]fvtwo(n);longlong [o]ierr())
 
 This subroutine calls the recommended sequence of
 subroutines from the eigensystem subroutine package (EISPACK)
@@ -703,7 +703,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int n();[o]wsave(foo))
+  Signature: (longlong n();[o]wsave(foo))
 
 Subroutine ezffti initializes the work array C<wsave()>
 which is used in both L</ezfftf> and 
@@ -796,7 +796,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int l();c();[o]tc(bar);a(foo))
+  Signature: (longlong l();c();[o]tc(bar);a(foo))
 
 Convert the C<polfit> coefficients to Taylor series form.
 C<c> and C<a()> must be of the same type.
@@ -825,7 +825,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int l();x();[o]yfit();[o]yp(nder);a(foo))
+  Signature: (longlong l();x();[o]yfit();[o]yp(nder);a(foo))
 
 Use the coefficients generated by C<polfit> to evaluate the
 polynomial fit of degree C<l>, along with the first C<nder> of
@@ -856,7 +856,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(n);f(n);[o]d(n);int [o]ierr())
+  Signature: (x(n);f(n);[o]d(n);longlong [o]ierr())
 
 
 =for ref
@@ -924,7 +924,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int ic(two=2);vc(two=2);mflag();x(n);f(n);[o]d(n);wk(nwk);int [o]ierr())
+  Signature: (longlong ic(two=2);vc(two=2);mflag();x(n);f(n);[o]d(n);wk(nwk);longlong [o]ierr())
 
 
 =for ref
@@ -1068,7 +1068,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int ic(two=2);vc(two=2);x(n);f(n);[o]d(n);wk(nwk);int [o]ierr())
+  Signature: (longlong ic(two=2);vc(two=2);x(n);f(n);[o]d(n);wk(nwk);longlong [o]ierr())
 
 
 =for ref
@@ -1189,7 +1189,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(n);f(n);d(n);int check();xe(ne);[o]fe(ne);[o]de(ne);int [o]ierr())
+  Signature: (x(n);f(n);d(n);longlong check();xe(ne);[o]fe(ne);[o]de(ne);longlong [o]ierr())
 
 
 =for ref
@@ -1260,7 +1260,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(n);f(n);d(n);int check();xe(ne);[o]fe(ne);int [o]ierr())
+  Signature: (x(n);f(n);d(n);longlong check();xe(ne);[o]fe(ne);longlong [o]ierr())
 
 
 =for ref
@@ -1326,14 +1326,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(n);f(n);d(n);int check();la();lb();[o]ans();int [o]ierr())
+  Signature: (x(n);f(n);d(n);longlong check();la();lb();[o]ans();longlong [o]ierr())
 
 
 =for ref
 
 Integrate (x,f(x)) over arbitrary limits.
 
-Evaluate the definite integral of a a piecewise
+Evaluate the definite integral of a piecewise
 cubic Hermite function over an arbitrary interval,
 given by C<[$la,$lb]>. C<$d> should contain the derivative values, computed by L</chim>.
 See L</chid> if the integration limits are
@@ -1405,7 +1405,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(n);f(n);d(n);int check();int ia();int ib();[o]ans();int [o]ierr())
+  Signature: (x(n);f(n);d(n);longlong check();longlong ia();longlong ib();[o]ans();longlong [o]ierr())
 
 
 =for ref
@@ -1472,7 +1472,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(n);f(n);d(n);int check();int [o]ismon(n);int [o]ierr())
+  Signature: (x(n);f(n);d(n);longlong check();longlong [o]ismon(n);longlong [o]ierr())
 
 
 =for ref
@@ -1567,7 +1567,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(n);f(n);d(n);int knotyp();int nknots();t(tsize);[o]bcoef(bsize);int [o]ndim();int [o]kord();int [o]ierr())
+  Signature: (x(n);f(n);d(n);longlong knotyp();longlong nknots();t(tsize);[o]bcoef(bsize);longlong [o]ndim();longlong [o]kord();longlong [o]ierr())
 
 
 =for ref
@@ -1669,7 +1669,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(n); y(n); w(n); int maxdeg(); int [o]ndeg(); [o]eps(); [o]r(n); int [o]ierr(); [o]a(foo); [o]coeffs(bar);[t]xtmp(n);[t]ytmp(n);[t]wtmp(n);[t]rtmp(n))
+  Signature: (x(n); y(n); w(n); longlong maxdeg(); longlong [o]ndeg(); [o]eps(); [o]r(n); longlong [o]ierr(); [o]a(foo); [o]coeffs(bar);[t]xtmp(n);[t]ytmp(n);[t]wtmp(n);[t]rtmp(n))
 
 Fit discrete data in a least squares sense by polynomials
           in one variable. C<x()>, C<y()> and C<w()> must be of the same type.
@@ -1692,7 +1692,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1676 "slatec.pd"
+#line 1606 "slatec.pd"
 
 =head1 AUTHOR
 

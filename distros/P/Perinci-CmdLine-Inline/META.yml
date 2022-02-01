@@ -8,7 +8,7 @@ build_requires:
   IPC::Open3: '0'
   JSON::PP: '0'
   Log::ger::Output::Composite: '0.009'
-  Log::ger::Output::Screen: '0.015'
+  Log::ger::Output::Screen: '0.018'
   Log::ger::Output::SimpleFile: '0'
   Perinci::Examples: '0.821'
   Test::More: '0.98'
@@ -16,7 +16,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,7 +25,7 @@ name: Perinci-CmdLine-Inline
 provides:
   Perinci::CmdLine::Inline:
     file: lib/Perinci/CmdLine/Inline.pm
-    version: '0.553'
+    version: '0.554'
 requires:
   Class::GenSource: '0'
   Complete::Bash: '0.333'
@@ -34,14 +34,14 @@ requires:
   Data::Check::Structure: '0.050'
   Data::Clean::JSON: '0.390'
   Data::Dmp: '0.241'
-  Data::Sah: '0.910'
+  Data::Sah: '0.911'
   Data::Sah::Coerce::perl::To_obj::From_str::url: '0'
-  Data::Sah::Compiler::perl::TH::any: '0.910'
-  Data::Sah::Compiler::perl::TH::array: '0.910'
-  Data::Sah::Compiler::perl::TH::bool: '0.910'
-  Data::Sah::Compiler::perl::TH::hash: '0.910'
-  Data::Sah::Compiler::perl::TH::obj: '0.910'
-  Data::Sah::Compiler::perl::TH::str: '0.910'
+  Data::Sah::Compiler::perl::TH::any: '0.911'
+  Data::Sah::Compiler::perl::TH::array: '0.911'
+  Data::Sah::Compiler::perl::TH::bool: '0.911'
+  Data::Sah::Compiler::perl::TH::hash: '0.911'
+  Data::Sah::Compiler::perl::TH::obj: '0.911'
+  Data::Sah::Compiler::perl::TH::str: '0.911'
   Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix: '0'
   Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix: '0'
   Data::Sah::Filter::perl::Perl::normalize_perl_modname: '0'
@@ -56,12 +56,12 @@ requires:
   Module::CoreList::More: '0'
   Module::DataPack: '0.21'
   Module::Path::More: '0.32'
-  Perinci::CmdLine::Base: '1.816'
+  Perinci::CmdLine::Base: '1.915'
   Perinci::CmdLine::Help: '0.172'
-  Perinci::CmdLine::Lite: '1.905'
+  Perinci::CmdLine::Lite: '1.915'
   Perinci::CmdLine::POD: '0.023'
   Perinci::CmdLine::Util::Config: '1.724'
-  Perinci::Result::Format::Lite: '0.280'
+  Perinci::Result::Format::Lite: '0.282'
   Perinci::Sub::GetArgs::Argv: '0.845'
   Perinci::Sub::Normalize: '0.201'
   Perinci::Sub::Util: '0.470'
@@ -79,7 +79,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Inline
   homepage: https://metacpan.org/release/Perinci-CmdLine-Inline
   repository: git://github.com/perlancar/perl-Perinci-CmdLine-Inline.git
-version: '0.553'
+version: '0.554'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -108,66 +108,66 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@Author::PERLANCAR/@Filter/GatherDir'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Author::PERLANCAR/@Filter/PruneCruft'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::PERLANCAR/@Filter/ManifestSkip'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::PERLANCAR/@Filter/MetaYAML'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Author::PERLANCAR/@Filter/License'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: '@Author::PERLANCAR/@Filter/PodCoverageTests'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::PERLANCAR/@Filter/PodSyntaxTests'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@Author::PERLANCAR/@Filter/ExtraTests'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR/@Filter/ExecDir'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Author::PERLANCAR/@Filter/ShareDir'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Author::PERLANCAR/@Filter/MakeMaker'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::PERLANCAR/@Filter/Manifest'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::PERLANCAR/@Filter/ConfirmRelease'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR/ExecDir script'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.605'
+      version: '0.606'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -225,11 +225,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::PERLANCAR/MetaJSON'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::PERLANCAR/MetaConfig'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -238,7 +238,7 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: '@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '6.017'
+              version: '6.024'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
@@ -391,7 +391,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PruneFiles
       name: '@Author::PERLANCAR/PruneFiles'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Pod2Readme
       name: '@Author::PERLANCAR/Pod2Readme'
@@ -479,7 +479,7 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: TestRequires
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -487,7 +487,7 @@ x_Dist_Zilla:
           phase: runtime
           type: recommends
       name: RuntimeRecommends
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -495,7 +495,7 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -503,56 +503,56 @@ x_Dist_Zilla:
           phase: develop
           type: x_spec
       name: DevelopX_spec
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.017'
+      version: '6.024'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: '@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '6.017'
+      version: '6.024'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.017'
+    version: '6.024'
 x_authority: cpan:PERLANCAR
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

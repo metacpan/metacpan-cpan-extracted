@@ -8,7 +8,7 @@ set serializer => 'JSON';
 
 use Music::Intervals;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 DESCRIPTION
 
@@ -64,20 +64,10 @@ sub _instantiate {
     $size ||= 3;
 
     my $m = Music::Intervals->new(
-      notes    => $notes,
-      size     => $size,
-      chords   => 1,
-      justin   => 1,
-      equalt   => 1,
-      freqs    => 1,
-      interval => 1,
-      cents    => 1,
-      prime    => 1,
-      integer  => 1,
+      notes => $notes,
+      size  => $size,
     );
      
-    $m->process;
-
     return $m;
 };
 

@@ -20,7 +20,7 @@ await $max->mount(
    Device::Chip::Adapter->new_from_description( $ADAPTER )
 );
 
-await $max->protocol->power(1);
+await $max->protocol->power(1) if $max->protocol->can( "power" );
 END {
    $max and $max->adapter->shutdown;
 }

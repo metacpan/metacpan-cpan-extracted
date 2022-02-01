@@ -1,5 +1,38 @@
 Revision history for Perl application 'greple'.
 
+8.5501 2022-01-31T00:48:06Z
+
+    - Fix --all option bug.
+    - Make -o does not affect to --block/--border behavior.
+
+8.55 2022-01-29T23:36:00Z
+
+    - Make --block option works with --all and -o option.
+
+8.54 2022-01-29T04:26:00Z
+
+    - Make --blockend option to specify string w/o newline.
+    - Accept file "-" as a STDIN.
+    - Make --face not to change colorspec if already effective.
+
+8.53 2021-12-13T13:12:47Z
+
+    - Functional --cm sub{...} works even if --nocolor option given.
+
+8.5205 2021-12-12T23:48:57Z
+
+    - Make t/11_block.t not to fail by TODO guard.
+    - Simplify handling shorter block algorithm.
+
+8.5204 2021-12-10T03:40:49Z
+
+    - Additional fix for shorter block.
+
+8.5203 2021-12-10T00:18:07Z
+
+    - Update --le pattern option handling to keep order.
+    - Fix bug with shorter block and add test code.
+
 8.5202 2021-12-09T02:09:44Z
 
     - Enable m-modifier for --border pattern.

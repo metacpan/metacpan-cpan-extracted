@@ -1,0 +1,20 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+# http://www.huygens-fokker.org/docs/scales.zip
+
+use Data::Dumper::Compact qw(ddc);
+use Music::Scala ();
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(Music-Intervals);
+use Music::Intervals::Numeric;
+
+my $m = Music::Intervals::Numeric->new;
+
+my $scala = Music::Scala->new(file => "$ENV{HOME}/Music/scl/werck1.scl");
+
+print $scala->get_description, "\n";
+
+for my $interval ($scala->get_notes) {
+    print "\t$interval: ", $m->ratios->{$interval}, "\n";
+}

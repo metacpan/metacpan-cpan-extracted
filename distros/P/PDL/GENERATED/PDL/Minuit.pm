@@ -110,7 +110,7 @@ sub mn_init{
 
 =for sig
 
-  Signature: (int a();int b(); int c())
+  Signature: (longlong a();longlong b(); longlong c())
 
 
 =for ref
@@ -142,7 +142,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int l(); char* nombre; char* mode)
+  Signature: (longlong l(); char* nombre; char* mode)
 
 
 =for ref
@@ -174,7 +174,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int l())
+  Signature: (longlong l())
 
 
 =for ref
@@ -199,7 +199,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 109 "minuit.pd"
+#line 108 "minuit.pd"
 
 sub mn_def_pars{
   my $pars  = shift;
@@ -239,7 +239,7 @@ sub mn_def_pars{
 		       $lo_bounds->slice("($i)"),
 		       $up_bounds->slice("($i)"),
 		       $names[$i]);
-     barf "Problem initializing parameter $i in Minuit " unless ($iflag == 0);
+     barf "Problem initializing parameter $i in Minuit, got $iflag" unless ($iflag == 0);
   }
   
   if (defined (my $logfile = $mn_options->{Log})){
@@ -257,7 +257,7 @@ sub mn_def_pars{
 
 =for sig
 
-  Signature: (int a(); double b(); double c(); double d(); double e(); int [o] ia(); char* str)
+  Signature: (longlong a(); double b(); double c(); double d(); double e(); longlong [o] ia(); char* str)
 
 
 =for ref
@@ -282,7 +282,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 165 "minuit.pd"
+#line 164 "minuit.pd"
 
 sub mn_excm{
   my $command = shift;
@@ -322,7 +322,7 @@ sub mn_excm{
 
 =for sig
 
-  Signature: (double a(n); int ia(); int [o] ib(); char* str; SV* function; int numelem)
+  Signature: (double a(n); longlong ia(); longlong [o] ib(); char* str; SV* function; IV numelem)
 
 
 =for ref
@@ -347,7 +347,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 206 "minuit.pd"
+#line 205 "minuit.pd"
 
   sub mn_pout{
     barf "Usage: mn_pout(par_number)" unless ($#_ == 0);
@@ -384,7 +384,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int ia(); double [o] a(); double [o] b(); double [o] c(); double [o] d();int [o] ib(); SV* str)
+  Signature: (longlong ia(); double [o] a(); double [o] b(); double [o] c(); double [o] d();longlong [o] ib(); SV* str)
 
 
 =for ref
@@ -409,7 +409,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 243 "minuit.pd"
+#line 242 "minuit.pd"
 
   sub mn_stat{
      if (defined (my $logfile = $mn_options->{Log})){
@@ -436,7 +436,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double [o] a(); double [o] b(); double [o] c(); int [o] ia(); int [o] ib(); int [o] ic())
+  Signature: (double [o] a(); double [o] b(); double [o] c(); longlong [o] ia(); longlong [o] ib(); longlong [o] ic())
 
 
 =for ref
@@ -461,7 +461,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 265 "minuit.pd"
+#line 264 "minuit.pd"
 
   sub mn_emat{
    
@@ -518,7 +518,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 293 "minuit.pd"
+#line 292 "minuit.pd"
 
   sub mn_err{
 
@@ -551,7 +551,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int ia(); double [o] a(); double [o] b(); double [o] c(); double [o] d())
+  Signature: (longlong ia(); double [o] a(); double [o] b(); double [o] c(); double [o] d())
 
 
 =for ref
@@ -576,7 +576,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 321 "minuit.pd"
+#line 320 "minuit.pd"
 
   sub mn_contour{
     barf "Usage: mn_contour(par_number_1,par_number_2,npt)" unless ($#_ == 2);
@@ -614,7 +614,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int ia(); int ib(); int ic(); double [o] a(n); double [o] b(n); int [o] id(); SV* function; int numelem)
+  Signature: (longlong ia(); longlong ib(); longlong ic(); double [o] a(n); double [o] b(n); longlong [o] id(); SV* function; IV numelem)
 
 
 =for ref
@@ -639,7 +639,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 359 "minuit.pd"
+#line 358 "minuit.pd"
 
 =head2 mn_init()
 

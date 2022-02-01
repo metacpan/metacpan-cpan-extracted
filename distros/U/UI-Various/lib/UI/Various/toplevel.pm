@@ -38,7 +38,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use UI::Various::core;
 use UI::Various::container;
@@ -94,9 +94,9 @@ sub max_width($;$)
 
 =item width [rw]
 
-preferred (maximum) width of an application window in (approximately)
-characters, may not exceed L<max_width of main "Window Manager"
-|UI::Various::Main/max_width ro>
+preferred (maximum) width of an application window / dialogue in
+(approximately) characters, may not exceed L<max_width of main "Window
+Manager" |UI::Various::Main/max_width ro>
 
 =cut
 

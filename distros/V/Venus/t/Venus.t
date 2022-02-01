@@ -22,7 +22,7 @@ $test->for('name');
 
 =version
 
-0.01
+0.02
 
 =cut
 
@@ -1000,7 +1000,9 @@ $test->for('feature', 'exception-handling');
 
   my $myapp = MyApp->new;
 
-  $myapp->catch('execute'); # catch MyApp::Error
+  my $error = $myapp->catch('execute');
+
+  # $error->isa('MyApp::Error');
 
 =cut
 
@@ -1035,7 +1037,9 @@ $test->for('feature', 'composable-standards');
 
   $myapp->stash(greeting => 'hello world');
 
-  $myapp->dump('stash'); # '{"greeting" => "hello world"}'
+  $myapp->dump('stash');
+
+  # '{"greeting" => "hello world"}'
 
 =cut
 
@@ -1089,6 +1093,39 @@ $test->for('example', 1, 'pluggable-library', sub {
   $result
 });
 
+=feature template-system
+
+This library provides a minimalistic templating system.
+
+=cut
+
+$test->for('feature', 'template-system');
+
+=example-1 template-system
+
+  package main;
+
+  use Venus::Template;
+
+  my $template = Venus::Template->new(q(
+    {{ if user.name }}
+    Welcome, {{ user.name }}!
+    {{ else user.name }}
+    Welcome, friend!
+    {{ end user.name }}
+  ));
+
+  $template->render;
+
+=cut
+
+$test->for('example', 1, 'template-system', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+
+  $result
+});
+
 =license
 
 Copyright (C) 2021, Cpanery
@@ -1114,13 +1151,6 @@ L<https://github.com/cpanery/venus/issues>
 L<https://cpanery.com>
 
 =cut
-
-subtest version => sub {
-  use_ok 'Venus';
-  my $version = do './VERSION' || do '../../VERSION';
-  is +Venus->VERSION, $version, "Venus.pm ($version)";
-  is +$test->data('version'), $version, "Venus.t ($version)";
-};
 
 # END
 

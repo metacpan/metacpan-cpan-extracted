@@ -1,3 +1,10 @@
+0.006   2021-08-02  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [doc] Mention App::FileRenameUtils & App::FileModifyUtils.
+
+
 0.005   2020-06-03  Released-By: PERLANCAR; Urgency: medium
 
 	- Add list_all_empty_dirs().

@@ -2,7 +2,7 @@ package Neo4j::Bolt;
 use Cwd qw/realpath getcwd/;
 
 BEGIN {
-  our $VERSION = "0.4201";
+  our $VERSION = "0.4203";
   require Neo4j::Bolt::Cxn;
   require Neo4j::Bolt::Txn;
   require Neo4j::Bolt::ResultStream;

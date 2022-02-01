@@ -1,4 +1,9 @@
-${NEXTVER}
+0.00008 - Jan 30 2022
+  * Just realized PEVANS didn't add himself to the list
+
+0.00007 - Jan 30 2022
+  * Bring in some fixes from LeoNerd that make spi work for non-default (e.g. spi1) devices, and likely other bugfixes too
+  * Bring in a fix or two from Stephen's i2c work too
 
 0.00006 - Jan 23 2022
   * Take in Stephen's i2c rewrite that gets rid of the SMBus dependency

@@ -10,10 +10,11 @@ use OAuth::Cmdline::MicrosoftOnline;
 use OAuth::Cmdline::Mojo;
 
 my $oauth = OAuth::Cmdline::MicrosoftOnline->new(
-    client_id     => "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    client_id     => "<app-uuid>",
     client_secret => "YYYYYYYYYYYYYYYYYYYYYYYY",
-    login_uri     => "https://login.microsoftonline.com/common/oauth2/authorize",
-    token_uri     => "https://login.microsoftonline.com/common/oauth2/token",
+    login_uri     => "https://<app-specific-auth-uri-ending-in>/oauth2/authorize",
+    token_uri     => "https://<app-specific-auth-uri-ending-in>/oauth2/token",
+    resource	  => "https://graph.microsoft.com"
 );
 
 my $app = OAuth::Cmdline::Mojo->new(

@@ -38,7 +38,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use UI::Various::core;
 use UI::Various::widget;
@@ -50,7 +50,7 @@ our @EXPORT_OK = qw();
 
 #########################################################################
 
-=item code [rw]
+=item code [rw, recommended]
 
 the command invoked by the button
 
@@ -70,7 +70,7 @@ sub code($;$)
 		  @_);
 }
 
-=item text [rw]
+=item text [rw, recommended]
 
 the text of the button as string or variable reference
 

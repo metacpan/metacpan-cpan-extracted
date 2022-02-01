@@ -156,10 +156,7 @@ sub prepare {
     ## Setup BLOCKS
     ##
     my $bp = $self->{BLOCKS} = [ do {
-	if ($self->{all} or $self->{only}) {	# --all, --only-matching
-	    ( [ 0, length ] );
-	}
-	elsif (@{$self->{block}}) {		# --block
+	if (@{$self->{block}}) {		# --block
 	    my $text = \$_;
 	    merge_regions { nojoin => 1, destructive => 1 }, map {
 		grep { $_->[0] != $_->[1] }
@@ -258,6 +255,9 @@ sub compose {
 	$self->{MATCHED} += @matched;
 	if ($self->{only}) {
 	    push @list, map({ [ $_, $_ ] } @matched);
+	} elsif ($self->{all}) {
+	    push @list, [ [ 0, length ] ] if @list == 0;
+	    push @{$list[0]}, @matched;
 	} else {
 	    push @list, [ $bp->[$bi], @matched ];
 	}

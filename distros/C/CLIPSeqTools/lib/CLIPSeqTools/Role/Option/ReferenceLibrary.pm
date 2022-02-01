@@ -43,7 +43,7 @@ Role to enable reading reference libraries with reads from the command line
 
 
 package CLIPSeqTools::Role::Option::ReferenceLibrary;
-$CLIPSeqTools::Role::Option::ReferenceLibrary::VERSION = '0.1.10';
+$CLIPSeqTools::Role::Option::ReferenceLibrary::VERSION = '1.0.0';
 
 #######################################################################
 #######################   Load External modules   #####################

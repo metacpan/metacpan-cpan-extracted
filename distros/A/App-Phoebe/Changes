@@ -1,3 +1,14 @@
+4.05
+
+- Uploading of text/gemini is now treated like text/plain, resulting
+  in a page (instead of an attempted file upload).
+
+- Uploading "to the /files folder" is now allowed.
+
+- Document how to build and run a docker image.
+
+- MIME type is optional.
+
 4.04
 
 - App::Phoebe::Oracle is new.

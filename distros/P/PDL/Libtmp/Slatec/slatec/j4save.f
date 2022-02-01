@@ -1,5 +1,5 @@
 *DECK J4SAVE
-      FUNCTION J4SAVE (IWHICH, IVALUE, ISET)
+      integer*4 FUNCTION J4SAVE (IWHICH, IVALUE, ISET)
 C***BEGIN PROLOGUE  J4SAVE
 C***SUBSIDIARY
 C***PURPOSE  Save or recall global variables needed by error
@@ -52,8 +52,10 @@ C   900402  Added TYPE section.  (WRB)
 C   910411  Added KEYWORDS section.  (WRB)
 C   920501  Reformatted the REFERENCES section.  (WRB)
 C***END PROLOGUE  J4SAVE
+      implicit integer*8(i-n)
+      integer*4 IWHICH, IVALUE
       LOGICAL ISET
-      INTEGER IPARAM(9)
+      INTEGER*8 IPARAM(9)
       SAVE IPARAM
       DATA IPARAM(1),IPARAM(2),IPARAM(3),IPARAM(4)/0,2,0,10/
       DATA IPARAM(5)/1/

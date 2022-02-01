@@ -4,10 +4,9 @@ use Mojo::Netdata::Chart;
 subtest 'basics' => sub {
   my $chart = Mojo::Netdata::Chart->new;
 
-  is $chart->chart_type,     'line',    'chart_type';
-  is $chart->context,        'default', 'context';
+  is $chart->chart_type,     'line', 'chart_type';
   is $chart->dimensions, {}, 'dimensions';
-  is $chart->module,         '',     'module';
+  is $chart->module,         'mojo', 'module';
   is $chart->name,           '',     'name';
   is $chart->options,        '',     'options';
   is $chart->plugin,         'mojo', 'plugin';
@@ -15,23 +14,22 @@ subtest 'basics' => sub {
   is $chart->units,          '#',    'units';
   is $chart->update_every,   1,      'update_every';
 
-  eval { $chart->family };
-  like $@, qr{"id" cannot}, 'family';
+  for my $attr (qw(family id title)) {
+    eval { $chart->$attr };
+    like $@, qr{"id" cannot}, 'family';
+  }
 
-  eval { $chart->id };
-  like $@, qr{"id" cannot}, 'id';
-
-  eval { $chart->title };
-  like $@, qr{"id" cannot}, 'title';
-
-  eval { $chart->type };
-  like $@, qr{"type" cannot}, 'type';
+  for my $attr (qw(context type)) {
+    eval { $chart->$attr };
+    like $@, qr{"type" cannot}, 'type';
+  }
 
   $chart->id('foo')->type('bar');
-  is $chart->family, 'foo', 'family';
-  is $chart->id,     'foo', 'id';
-  is $chart->title,  'foo', 'title';
-  is $chart->type,   'bar', 'type';
+  is $chart->context, 'mojo.bar', 'context';
+  is $chart->family,  'foo',      'family';
+  is $chart->id,      'foo',      'id';
+  is $chart->title,   'foo',      'title';
+  is $chart->type,    'bar',      'type';
 };
 
 subtest 'to_string' => sub {
@@ -43,7 +41,7 @@ subtest 'to_string' => sub {
     b => {algorithm => 'incremental', name => 'B', divisor => 2, multiplier => 3, options => 'x y'}
   });
   is $chart->to_string, <<'HERE', 'with dimensions';
-CHART bar.f_o_o '' 'f o o' '#' 'f o o' default line 10000 1 '' 'mojo' 'm1'
+CHART bar.f_o_o '' 'f o o' '#' 'f o o' m1.bar line 10000 1 '' 'mojo' 'm1'
 DIMENSION a 'a' absolute 1 1 ''
 DIMENSION b 'B' incremental 3 2 'x y'
 HERE

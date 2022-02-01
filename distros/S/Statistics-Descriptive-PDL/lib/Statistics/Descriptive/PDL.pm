@@ -19,7 +19,7 @@ my $has_PDL_stats_basic = $@ ? undef : 1;
 #  to hide the piddle from the caller to avoid arbitrary changes
 #  being applied to it.
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 our $Tolerance = 0.0;  #  for compatibility with Stats::Descr, but not used here
 

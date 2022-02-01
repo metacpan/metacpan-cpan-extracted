@@ -21,7 +21,8 @@ my %WriteMakefileArgs = (
     "File::Find" => 0,
     "List::Util" => "1.450",
     "Moo" => 0,
-    "Net::SSLeay" => "1.43"
+    "Net::SSLeay" => "1.43",
+    "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
@@ -29,7 +30,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.089",
+  "VERSION" => "0.091",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,7 +46,8 @@ my %FallbackPrereqs = (
   "List::Util" => "1.450",
   "Moo" => 0,
   "Net::SSLeay" => "1.43",
-  "Test::More" => 0
+  "Test::More" => 0,
+  "namespace::autoclean" => 0
 );
 
 

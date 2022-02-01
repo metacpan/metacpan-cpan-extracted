@@ -1,0 +1,3 @@
+6d7fce9fee471194aa8b5b6e47267f03  data/3
+26ab0db90d72e28ad0ba1e22ee510510  data/subdir2/subsubdir/2
+b026324c6904b2a9cb4b88d6d61c81d1  data/subdir1/1

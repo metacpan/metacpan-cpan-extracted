@@ -13,7 +13,8 @@ use JSON qw( from_json );
 use MIME::Base64;
 use Moo;
 
-our $VERSION = "0.06";
+our $VERSION = '0.07'; # VERSION
+# ABSTRACT: OAuth2 for command line applications using web services
 
 has client_id     => ( is => "rw" );
 has client_secret => ( is => "rw" );
@@ -141,12 +142,22 @@ sub token_refresh {
         $cache->{ access_token } = $data->{ access_token };
         $cache->{ expires }      = $data->{ expires_in } + time();
 
+    ($cache, $data) = $self->update_refresh_token($cache, $data);
+
         $self->cache_write( $cache );
         return 1;
     }
 
     ERROR "Token refresh failed: ", $resp->status_line();
     return undef;
+}
+
+###########################################
+sub update_refresh_token {
+###########################################
+    my( $self, $cache, $data ) = @_;
+    
+    return ($cache, $data);
 }
 
 ###########################################
@@ -210,19 +221,27 @@ sub cache_write {
 }
 
 ###########################################
+sub tokens_get_additional_params {
+###########################################
+    my( $self, $params ) = @_;
+
+    return $params;
+}
+
+###########################################
 sub tokens_get {
 ###########################################
     my( $self, $code ) = @_;
 
     my $req = &HTTP::Request::Common::POST(
-        $self->token_uri,
+        $self->token_uri, $self->tokens_get_additional_params(
         [
             code          => $code,
             client_id     => $self->client_id,
             client_secret => $self->client_secret,
             redirect_uri  => $self->redirect_uri,
             grant_type    => 'authorization_code',
-        ]
+        ])
     );
 
     my $ua = LWP::UserAgent->new();
@@ -230,7 +249,7 @@ sub tokens_get {
 
     if( $resp->is_success() ) {
         my $json = $resp->content();
-        DEBUG "Received: [$json]", 
+        DEBUG "Received: [$json]";
         my $data = from_json( $json );
 
         return ( $data->{ access_token }, 
@@ -238,7 +257,19 @@ sub tokens_get {
             $data->{ expires_in } );
     }
 
-    LOGDIE $resp->status_line();
+    my $error;
+    eval {
+        my $json = $resp->content();
+        DEBUG "Received: [$json]",
+        my $data = from_json( $json );
+        $error = $data->{'error'};
+    };
+    # An exception will be thrown if the content is not JSON
+    if ($@) {
+        $error = $resp->content();
+    }
+
+    LOGDIE $resp->status_line() . ' - ' . $error . "\n";
     return undef;
 }
 
@@ -314,9 +345,17 @@ sub client_init_conf_check {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 OAuth::Cmdline - OAuth2 for command line applications using web services
+
+=head1 VERSION
+
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -345,7 +384,7 @@ following services, shown below with their subclasses:
 =item B<OAuth::Cmdline::Spotify>
 - Spotify
 
-=item B<OAuth::CmdLine::MicrosoftOnline>
+=item B<OAuth::Cmdline::MicrosoftOnline>
 - Azure AD and other OAuth2-authenticated services that use the Microsoft
 Online common authentication endpoint (tested with Azure AD via the Graph
 API)
@@ -360,10 +399,6 @@ API)
 - Smartthings API
 
 =back
-
-But stay tuned, I'll refactor the site-specific parts of the
-code soon, so that it'll work with Evernote, Tumblr and others as 
-well. Hey, or send me a pull request if you want to beat me to it! :)
 
 If you want to use this module for a different service, go ahead and try
 it, it might just as well work. In this case, specify the C<site> parameter,
@@ -389,8 +424,8 @@ Then, run the following script (the example uses the Spotify web service)
     my $oauth = OAuth::Cmdline::GoogleDrive->new(
         client_id     => "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
         client_secret => "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY",
-	login_uri     => "https://accounts.google.com/o/oauth2/auth",
-	token_uri     => "https://accounts.google.com/o/oauth2/token",
+        login_uri     => "https://accounts.google.com/o/oauth2/auth",
+        token_uri     => "https://accounts.google.com/o/oauth2/token",
         scope         => "user-read-private",
     );
     
@@ -457,12 +492,15 @@ obtains a new one.
 
 =back
 
-=head1 LEGALESE
-
-Copyright 2014 by Mike Schilli, all rights reserved.
-This program is free software, you can redistribute it and/or
-modify it under the same terms as Perl itself.
-
 =head1 AUTHOR
 
-2014, Mike Schilli <cpan@perlmeister.com>
+Mike Schilli <cpan@perlmeister.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022 by Mike Schilli.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

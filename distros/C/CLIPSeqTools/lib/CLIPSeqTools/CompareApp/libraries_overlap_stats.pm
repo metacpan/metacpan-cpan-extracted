@@ -59,7 +59,7 @@ Count reads of library A that overlap reads in reference library B.
 =cut
 
 package CLIPSeqTools::CompareApp::libraries_overlap_stats;
-$CLIPSeqTools::CompareApp::libraries_overlap_stats::VERSION = '0.1.10';
+$CLIPSeqTools::CompareApp::libraries_overlap_stats::VERSION = '1.0.0';
 
 # Make it an app command
 use MooseX::App::Command;

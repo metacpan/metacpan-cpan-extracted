@@ -47,7 +47,7 @@ Specifically it will:
 =cut
 
 package CLIPSeqTools::PreprocessApp::all;
-$CLIPSeqTools::PreprocessApp::all::VERSION = '0.1.10';
+$CLIPSeqTools::PreprocessApp::all::VERSION = '1.0.0';
 
 # Make it an app command
 use MooseX::App::Command;

@@ -15,7 +15,7 @@ BEGIN {
 THROTTLE: {
 	SKIP: {
 		my $s = IO::Socket::INET->new(
-			PeerAddr => 'search.cpan.org:80',
+			PeerAddr => 'example.com:80',
 			Timeout => 2	# Set low to try to catch slow machines
 		);
 		skip 'Responsive machine and an Internet connection are required for testing', 12 unless($s);
@@ -36,15 +36,16 @@ THROTTLE: {
 
 		$ua->timeout(15);
 		$ua->env_proxy(1);
+		$ua->max_redirect(0);
 
-		ok($ua->throttle('search.cpan.org') == 0);
-		$ua->throttle({ 'search.cpan.org' => 10 });
-		ok($ua->throttle('search.cpan.org') == 10);
-		ok($ua->throttle('perl.org') == 0);
+		cmp_ok($ua->throttle('example.com'), '==', 0, 'Thottle value initialises to 0');
+		$ua->throttle({ 'example.com' => 10 });
+		cmp_ok($ua->throttle('example.com'), '==', 10, 'Can set throttle value');
+		cmp_ok($ua->throttle('perl.org'), '==', 0, 'Thottle does not affect unrequested site');
 
 		my $response;
 		# Will fail on slow machines
-		time_atmost(sub { $response = $ua->get('http://search.cpan.org/'); }, 8, 'should not be throttled');
+		time_atmost(sub { $response = $ua->get('https://example.com/'); }, 8, 'should not be throttled');
 		ok($response->is_success());
 
 		$ua->ssl_opts(verify_hostname => 0);
@@ -60,12 +61,12 @@ THROTTLE: {
 		SKIP: {
 			if($timetaken >= 9) {
 				diag("timetaken = $timetaken. Not testing throttling");
-				skip "The system is too slow to run timing tests (timer = $timetaken)", 4;
+				skip("The system is too slow to run timing tests (timer = $timetaken)", 4);
 			}
-			time_between(sub { $response = $ua->get('http://search.cpan.org/'); }, 1, 6, 'should be throttled to 2 seconds, not 10');
+			time_between(sub { $response = $ua->get('http://example.com/'); }, 1, 6, 'should be throttled to 2 seconds, not 10');
 			ok($response->is_success());
 
-			time_atleast(sub { $response = $ua->get('http://search.cpan.org/'); }, 9, 'should be fully throttled');
+			time_atleast(sub { $response = $ua->get('http://example.com/'); }, 9, 'should be fully throttled');
 			ok($response->is_success());
 		}
 	}

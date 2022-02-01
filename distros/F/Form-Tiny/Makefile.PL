@@ -17,6 +17,7 @@ WriteMakefile(
 		"Type::Tiny" => "1.004000",
 		"Import::Into" => "0",
 		"namespace::clean" => "0",
+		"Sub::Util" => "0",
 	},
 
 	META_MERGE => {

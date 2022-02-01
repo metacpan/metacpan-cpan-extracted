@@ -1,3 +1,8 @@
+0.019   2022-01-16  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Fix a couple of bugs in colorize_tags output.
+
+
 0.018   2022-01-16  Released-By: PERLANCAR; Urgency: medium
 
 	- [experimental] Add configuration: colorize_tags.

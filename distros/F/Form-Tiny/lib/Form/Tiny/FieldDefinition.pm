@@ -10,14 +10,13 @@ use Types::TypeTiny qw(StringLike);
 use Carp qw(croak);
 use Scalar::Util qw(blessed);
 
-use Form::Tiny::Utils qw(try);
+use Form::Tiny::Utils qw(try has_form_meta);
 use Form::Tiny::Error;
 use Form::Tiny::Path;
-use Form::Tiny::PathValue;
 
 use namespace::clean;
 
-our $VERSION = '2.06';
+our $VERSION = '2.08';
 
 has 'name' => (
 	is => 'ro',
@@ -43,7 +42,7 @@ has 'required' => (
 has 'type' => (
 	is => 'ro',
 	isa => HasMethods ['validate', 'check'],
-	predicate => 1,
+	predicate => 'has_type',
 );
 
 has 'addons' => (
@@ -68,19 +67,19 @@ has 'adjust' => (
 has 'default' => (
 	is => 'ro',
 	isa => CodeRef,
-	predicate => 1,
+	predicate => 'has_default',
 );
 
 has 'message' => (
 	is => 'ro',
 	isa => StringLike,
-	predicate => 1,
+	predicate => 'has_message',
 );
 
 has 'data' => (
 	is => 'ro',
 	writer => 'set_data',
-	predicate => 1,
+	predicate => 'has_data',
 );
 
 sub BUILD
@@ -112,7 +111,7 @@ sub is_subform
 {
 	my ($self) = @_;
 
-	return $self->has_type && $self->type->DOES('Form::Tiny::Form');
+	return $self->has_type && has_form_meta($self->type);
 }
 
 sub hard_required
@@ -154,28 +153,26 @@ sub get_coerced
 
 sub get_adjusted
 {
-	my ($self, $form, $value) = @_;
+	my $self = shift;
 
-	if ($self->is_adjusted) {
-		return $self->adjust->($form, $value);
-	}
-	return $value;
+	return pop() unless $self->is_adjusted;
+
+	return $self->adjust->(@_);
 }
 
 sub get_default
 {
 	my ($self, $form) = @_;
 
-	if ($self->has_default) {
-		my $default = $self->default->($form);
-		if (!$self->has_type || $self->type->check($default)) {
-			return $default;
-		}
+	croak 'no default value set but was requested'
+		unless $self->has_default;
 
-		croak 'invalid default value was set';
+	my $default = $self->default->($form);
+	if (!$self->has_type || $self->type->check($default)) {
+		return $default;
 	}
 
-	croak 'no default value set but was requested';
+	croak 'invalid default value was set';
 }
 
 sub validate
@@ -190,17 +187,12 @@ sub validate
 				if !$self->type->check($value);
 		}
 		else {
-			my $error = $self->type->validate($value);
-			if (defined $error) {
-				push @errors, $error;
-			}
+			push @errors, $self->type->validate($value) // ();
 		}
 	}
 
 	if (@errors == 0) {
-		my $validators = $self->addons->{validators} // [];
-
-		for my $validator (@{$validators}) {
+		for my $validator (@{$self->addons->{validators} // []}) {
 			my ($message, $code) = @{$validator};
 
 			if (!$code->($form, $value)) {
@@ -210,7 +202,7 @@ sub validate
 	}
 
 	for my $error (@errors) {
-		if ($self->is_subform && ref $error eq 'ARRAY') {
+		if (ref $error eq 'ARRAY' && $self->is_subform) {
 			foreach my $exception (@$error) {
 				if (defined blessed $exception && $exception->isa('Form::Tiny::Error')) {
 					my $path = $self->get_name_path;

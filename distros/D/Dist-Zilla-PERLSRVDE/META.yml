@@ -1,0 +1,52 @@
+---
+abstract: 'A dummy module for this namespace'
+author:
+  - 'Renee Baecker <reneeb@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-PERLSRVDE
+provides:
+  Dist::Zilla::PERLSRVDE:
+    file: lib/Dist/Zilla/PERLSRVDE.pm
+    version: v0.0.2
+  Dist::Zilla::PluginBundle::PERLSRVDE:
+    file: lib/Dist/Zilla/PluginBundle/PERLSRVDE.pm
+    version: v0.0.2
+requires:
+  Dist::Zilla: '0'
+  Dist::Zilla::Plugin::CheckChangesHasContent: '0'
+  Dist::Zilla::Plugin::ContributorsFile: '0'
+  Dist::Zilla::Plugin::ExecDir: '0'
+  Dist::Zilla::Plugin::Git::Contributors: '0'
+  Dist::Zilla::Plugin::GitHubREADME::Badge: '0'
+  Dist::Zilla::Plugin::MetaJSON: '0'
+  Dist::Zilla::Plugin::MetaProvides::Package: '0'
+  Dist::Zilla::Plugin::MetaResources: '0'
+  Dist::Zilla::Plugin::NextRelease: '0'
+  Dist::Zilla::Plugin::OurPkgVersion: '0'
+  Dist::Zilla::Plugin::PodCoverageTests: '0'
+  Dist::Zilla::Plugin::PodSyntaxTests: '0'
+  Dist::Zilla::Plugin::PodWeaver: '0'
+  Dist::Zilla::Plugin::ReadmeAddDevInfo: '0'
+  Dist::Zilla::Plugin::ReadmeAnyFromPod: '0'
+  Dist::Zilla::Plugin::SyncCPANfile: '0'
+  Dist::Zilla::Plugin::Test::NoBOM: '0'
+  Dist::Zilla::Plugin::Test::NoTabs: '0'
+  Dist::Zilla::Plugin::Test::Perl::Critic: '0'
+  Dist::Zilla::PluginBundle::Git: '0'
+  perl: '5.020'
+resources:
+  homepage: https://github.com/perlservices/Dist-Zilla-PERLSRVDE
+  repository: https://github.com/perlservices/Dist-Zilla-PERLSRVDE/issues
+version: 0.0.2
+x_contributors:
+  - 'reneeb <info@perl-services.de>'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

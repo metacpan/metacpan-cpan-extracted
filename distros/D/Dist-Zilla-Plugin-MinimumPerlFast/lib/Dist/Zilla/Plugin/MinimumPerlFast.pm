@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::MinimumPerlFast;
-$Dist::Zilla::Plugin::MinimumPerlFast::VERSION = '0.004';
+$Dist::Zilla::Plugin::MinimumPerlFast::VERSION = '0.005';
 use strict;
 use warnings;
 
@@ -45,7 +45,7 @@ has default_version => (
 
 sub _build_version {
 	my $self = shift;
-	my @files = @{ $self->found_runtime }, @{ $self->found_configure }, grep { /\.(t|pm)$/ } @{ $self->found_tests };
+	my @files = ( @{ $self->found_runtime }, @{ $self->found_configure }, grep { /\.(t|pm)$/ } @{ $self->found_tests } );
 	return max($self->default_version, map { Perl::MinimumVersion::Fast->new(\$_->content)->minimum_version->numify } @files);
 }
 
@@ -73,7 +73,7 @@ Dist::Zilla::Plugin::MinimumPerlFast - Quickly detects the minimum version of Pe
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 

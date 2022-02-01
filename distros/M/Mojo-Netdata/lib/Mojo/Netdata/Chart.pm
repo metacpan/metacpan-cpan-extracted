@@ -4,12 +4,16 @@ use Mojo::Base -base, -signatures;
 use Carp qw(croak);
 use Mojo::Netdata::Util qw(safe_id);
 
-has chart_type   => 'line';
-has context      => 'default';
+has chart_type => 'line';
+
+has context => sub ($self) {
+  return join '.', map { safe_id $self->$_ } qw(module type);
+};
+
 has dimensions   => sub ($self) { +{} };
 has family       => sub ($self) { $self->id };
 has id           => sub ($self) { croak '"id" cannot be built' };
-has module       => '';
+has module       => 'mojo';
 has name         => '';
 has options      => '';                                               # "detail hidden obsolete"
 has plugin       => 'mojo';

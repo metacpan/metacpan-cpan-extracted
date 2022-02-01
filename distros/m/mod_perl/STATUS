@@ -1,8 +1,9 @@
 mod_perl 2.0 STATUS:                                       -*-text-*-
-   Last modified at [$Date: 2016-10-27 22:49:40 +0100 (Thu, 27 Oct 2016) $]
+   Last modified at [$Date: 2019-10-05 13:03:20 +0100 (Sat, 05 Oct 2019) $]
 
 Release:
 --------
+   2.000.11   : Released Oct 05, 2019
    2.000.10   : Released Oct 27, 2016
    2.000.09   : Released Jun 18, 2015
    2.000.08   : Released Apr 17, 2013

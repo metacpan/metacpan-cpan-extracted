@@ -1,0 +1,57 @@
+{
+   "abstract" : "Library of bindings to use the RESTful API of Podman.",
+   "author" : [
+      "Tobias Schaefer <github@blackox.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Podman",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "9.22",
+            "Moose" : "2.2014",
+            "Path::Tiny" : "0.114",
+            "Readonly" : "2.05",
+            "Test::Exception" : "0.43",
+            "Test::Moose::More" : "0.050",
+            "Try::Tiny" : "0.31"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/tschaefer/podman-perl",
+      "license" : [
+         "http://dev.perl.org/licenses"
+      ],
+      "repository" : {
+         "url" : "https://github.com/tschaefer/podman-perl.git"
+      }
+   },
+   "version" : "20220129.0",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

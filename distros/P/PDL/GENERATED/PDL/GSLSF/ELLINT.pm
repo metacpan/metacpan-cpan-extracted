@@ -21,7 +21,7 @@ use DynaLoader;
 
 
 
-#line 5 "gsl_sf_ellint.pd"
+#line 6 "gsl_sf_ellint.pd"
 use strict;
 use warnings;
 
@@ -352,7 +352,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 171 "gsl_sf_ellint.pd"
+#line 172 "gsl_sf_ellint.pd"
 =head1 AUTHOR
 
 This file copyright (C) 1999 Christian Pellegrin <chri@infis.univ.trieste.it>,

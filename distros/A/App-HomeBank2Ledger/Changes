@@ -1,5 +1,9 @@
 Revision history for App-HomeBank2Ledger.
 
+0.010     2022-01-29 20:55:19-07:00 America/Denver
+  * Set code from the transaction info if transaction type is check.
+  * Fix formatter error for symbols that have special characters.
+
 0.009     2022-01-15 16:40:58-07:00 America/Denver
   * Use posting dates for internal transfers where the transactions have
     different dates.

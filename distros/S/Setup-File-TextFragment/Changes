@@ -1,4 +1,11 @@
-0.06    2017-07-10 (PERLANCAR)
+0.070   2021-08-02  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [doc] Mention Setup::File::Line, Setup::File::Edit.
+
+
+0.06    2017-07-10  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.
 
@@ -7,7 +14,7 @@
 	- Replace File::Slurp::Tiny with File::Slurper.
 
 
-0.05    2015-09-04 (PERLANCAR)
+0.05    2015-09-04  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.
 
@@ -16,26 +23,26 @@
 	  requirement.
 
 
-0.04    2015-08-18 (PERLANCAR)
+0.04    2015-08-18  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.
 
 	- Switch from Log::Any to Log::Any::IfLOG.
 
 
-0.03    2014-05-17 (SHARYANTO)
+0.03    2014-05-17  Released-By: SHARYANTO; Urgency: low
 
         - No functional changes.
 
         - Replace File::Slurp with File::Slurp::Tiny.
 
 
-0.02    2013-04-25 (SHARYANTO)
+0.02    2013-04-25  Released-By: SHARYANTO
 
-        - No functional changes. Fix bug: forgot to export.
+        - Fix bug: forgot to export.
 
 
-0.01    2012-09-12 (SHARYANTO)
+0.01    2012-09-12  Released-By: SHARYANTO
 
         - First release. Previous incarnation is Setup-Text-Snippet. Renamed to
           Setup-File-TextFragment and split the text fragment routines to

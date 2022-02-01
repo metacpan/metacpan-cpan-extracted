@@ -1,23 +1,18 @@
 # this file tests how bag information could be accessed
 BEGIN { chdir 't' if -d 't' }
-
+use strict;
 use warnings;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
-use Test::More tests => 71;
-use Test::File;
-use Test::Warnings;
-use strict;
-
-
-use lib '../lib';
-
 use File::Spec;
-use Data::Printer;
 use File::Path;
 use File::Copy;
 use File::Temp qw(tempdir);
 use File::Slurp qw( read_file write_file);
+use Test::More tests => 71;
+use Test::File;
+use Test::Warnings;
+use lib '../lib';
 
 my $special = '#--Ä--ä--Ö--ö--Ü--ü--ß--.[{!}].--$';
 my $special_re = qr|#--Ä--ä--Ö--ö--Ü--ü--ß--\.\[\{!\}\]\.--\$|;

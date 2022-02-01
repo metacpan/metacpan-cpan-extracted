@@ -51,7 +51,7 @@ Run all clipseqtools analyses.
 =cut
 
 package CLIPSeqTools::App::all;
-$CLIPSeqTools::App::all::VERSION = '0.1.10';
+$CLIPSeqTools::App::all::VERSION = '1.0.0';
 
 # Make it an app command
 use MooseX::App::Command;

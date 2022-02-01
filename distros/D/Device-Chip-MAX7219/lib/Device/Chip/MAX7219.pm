@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2021 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.19;
+use Object::Pad 0.57;
 
-package Device::Chip::MAX7219 0.05;
+package Device::Chip::MAX7219 0.06;
 class Device::Chip::MAX7219
-   extends Device::Chip;
+   :isa(Device::Chip);
 
 use Carp;
 use Future::AsyncAwait;
@@ -45,6 +45,10 @@ This L<Device::Chip> subclass provides specific communication to a
 F<Maxim Integrated> F<MAX7219> chip attached to a computer via an SPI adapter.
 As the F<MAX7221> chip operates virtually identically, this chip will work
 too.
+
+This module drives a single F<MAX7219> chip. For situations involving multiple
+chips daisy-chained together (such as on popular LED matrix display board
+modules) see instead L<Device::Chip::MAX7219Panel>.
 
 The reader is presumed to be familiar with the general operation of this chip;
 the documentation here will not attempt to explain or define chip-specific

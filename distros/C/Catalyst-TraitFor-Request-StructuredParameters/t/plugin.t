@@ -71,9 +71,25 @@ BEGIN {
     $c->res->body($dumped);
   }
 
+  #  'person.person_roles[1].role_id' => '1',
+  #  'person.person_roles[2].role_id' => '2',
+  #  'person.person_roles[].role_id' => '3',
+  #  'person.person_roles[].role_id' => '4',
+
   sub select :Local {
     my ($self, $c) = @_;
     my %clean = $c->structured_body(['person'], +{ 'person_roles' => [ 'role_id' ] } )->to_hash;
+    my $dumped = Dumper(\%clean);
+    $c->res->body($dumped);
+  }
+
+  # 'person.roles[].id[]' => '',
+  # 'person.roles[].id[]' => '1',
+  # 'person.roles[].id[]' => '2',
+
+  sub select3 :Local {
+    my ($self, $c) = @_;
+    my %clean = $c->structured_body(['person'], +{ 'roles' => [ 'id' ] }  )->to_hash;
     my $dumped = Dumper(\%clean);
     $c->res->body($dumped);
   }
@@ -375,4 +391,32 @@ SKIP: {
     };
   };
 }
+
+{
+  ok my $body_parameters = [
+    'person.roles[].id' => '',
+    'person.roles[].id' => '1',
+    'person.roles[].id' => '2',
+  ];
+
+  ok my $res = request POST '/root/select3', $body_parameters;
+  ok my $data = eval $res->content;
+
+    is_deeply $data, +{
+      roles => [
+        {
+          id => "",
+        },
+        {
+          id => 1,
+        },
+        {
+          id => 2,
+        },
+      ],
+    };
+
+}
+
+
 done_testing;

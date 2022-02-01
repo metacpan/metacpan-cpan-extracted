@@ -28,7 +28,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=File-Slurper-Shortcuts
   homepage: https://metacpan.org/release/File-Slurper-Shortcuts
   repository: git://github.com/perlancar/perl-File-Slurper-Shortcuts.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

@@ -1,5 +1,32 @@
 Revision history for Music-Intervals
 
+0.0707 2022-01-30 17:28:08
+    - Make the ratios attribute not-private!
+    - Add the eg/scala example program.
+
+0.0706 2022-01-30 16:48:46
+    Modernize the Numeric module, too.
+
+0.0705 2022-01-28 20:12:40
+    - Improve documentation.
+    - Add a test!
+    - Get frequency with a handy module, instead of ugly math!
+
+0.0704 2022-01-28 19:43:12
+    - Hide attributes that shouldn't be fooled-with anyway.
+
+0.0703 2022-01-28 15:48:42
+    - Improve documentation.
+
+0.0702 2022-01-28 15:26:51
+    - Improve documentation.
+
+0.0701 2022-01-28 12:45:56
+    - Fix-up the eg/* programs.
+
+0.0700 2022-01-28 11:06:13
+    - Completely refactor the interface and performance penalties.
+
 0.0603 2021-04-11 15:45:10
     - Clean-up code a bit.
     - Improve the numeric test slightly.

@@ -47,9 +47,9 @@ _i2cdev_read(fd, addr, rxlen)
 
     if (ret < 1)
         RETVAL = &PL_sv_undef;
-
-    // put the received data in a scalar and return it
-    RETVAL = newSVpvn(rxdata_buf, rxlen);
+    else
+        // put the received data in a scalar and return it
+        RETVAL = newSVpvn(rxdata_buf, rxlen);
     free(rxdata_buf);
   OUTPUT:
     RETVAL
@@ -78,8 +78,6 @@ int _i2cdev_write(fd, addr, txdata)
     // run the i2c transaction
     RETVAL = ioctl(fd, I2C_RDWR, &rdwr_data);
 
-    // clean up
-    free(txdata_buf);
   OUTPUT:
     RETVAL
 
@@ -125,7 +123,6 @@ SV* _i2cdev_write_read(fd, addr, txdata, rxlen)
         RETVAL = newSVpvn(rxdata_buf, rxlen);
 
     // clean up
-    free(txdata_buf);
     free(rxdata_buf);
   OUTPUT:
     RETVAL

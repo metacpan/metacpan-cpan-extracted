@@ -1,0 +1,25 @@
+---
+abstract: 'Public key cryptography based on EC with Schnorr signatures'
+author:
+  - 'Pavel Gulchuk <gul@gul.kiev.ua>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Crypt-PK-ECC-Schnorr
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Crypt::PK::ECC: '0'
+  Digest::SHA: '0'
+  Math::GMPz: '0'
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -12,7 +12,7 @@ my %args = (
     NAME		=> 'DateTime::Calendar::Julian',
     VERSION_FROM	=> 'lib/DateTime/Calendar/Julian.pm',
     PREREQ_PM		=> {
-	DateTime	=> 0.08,
+	DateTime	=> 1.48,	# For is_last_day_of_{quarter,year}
 	strict		=> 0,
 	vars		=> 0,
 	warnings	=> 0,
@@ -58,7 +58,7 @@ if ( $mmv >= 6.4501 ) {
 }
 
 $mmv >= 6.4701
-    and $args{MIN_PERL_VERSION} = 5.006002;
+    and $args{MIN_PERL_VERSION} = 5.008004;
 
 $mmv >= 6.5702
     or $args{AUTHOR} = join ', ', @{ $args{AUTHOR} };

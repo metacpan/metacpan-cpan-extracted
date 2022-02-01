@@ -33,7 +33,7 @@ WriteMakefile(
     'Net::IDN::Encode' => 0,
     'IRI' => 0,                   # for script/gemini
     'Text::Wrapper' => 0,         # Gopher.pm
-    'File::MimeInfo' => 0,        # Iapetus.pm
+    'File::MimeInfo' => 0,        # Iapetus.pm, Capsules.pm
     'File::MimeInfo::Magic' => 0, # WebDAV.pm
     'IO::Scalar' => 0,            # WebDAV.pm
     'HTTP::Date' => 0,            # WebDAV.pm

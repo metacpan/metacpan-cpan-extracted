@@ -1,6 +1,13 @@
 Revision history for Perl extension UI-Various
 
-0.15 2022-01-25T10:09:39Z
+0.16 2022-01-31T08:28:16Z
+
+0.16 2022-01-31T08:26:44Z
+
+    - added Radio(button) widget
+    - improved switches for DoD checks
+    - refactored handling of variable references
+    - minor improvments in documentation
 
 0.15 2022-01-25T10:09:13Z
 

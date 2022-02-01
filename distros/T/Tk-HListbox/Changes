@@ -74,3 +74,17 @@ Revision history for Perl extension Tk::HListbox.
 	- Oops - Correct major error in Pod/Docs.
 2.42   Thu Jan 07, 2022
 	- Fix bug introduced in v2.4 that prevented selecting by mouse-dragging.
+2.5    Fri Jan 21, 2022
+	- Add ability to set state to "disabled" (like other Tk widgets).
+	- Add a "-disabledForeground" (color) option to override the default 
+	  text foreground color used when the HListbox widget is set to disabled.
+	- Fix "-listvariable" tiein to work properly with initial values specified 
+	  in the tied array preinitialized with values when the HListbox is 
+	  created (as Listbox works).
+	- Fix some minor focus-traversal issues (when state is set to disabled).
+	- Overhaul, check, & fix several minor inconsistancies between 
+	  Tk::HListbox and Tk::Listbox.
+2.51   Sat Jan 29, 2022
+	- Fix cursor not being hidden when clicking on an HListbox that does not 
+	  have the keyboard focus and -takefocus is set to '' instead of 1. (in 
+	  which case the HListbox remains unfocused).

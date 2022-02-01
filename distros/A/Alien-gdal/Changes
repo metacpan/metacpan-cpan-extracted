@@ -1,5 +1,10 @@
 Revision history for Alien::gdal
 
+1.27 2022-01-31
+    - Fix shared builds when spatialite is enabled
+    - Add Geos lib dir to $ENV{LD_LIBRARY_PATH} on any non-windows system,
+      not just bsd.
+
 1.26 2021-09-15
     - alienfile: Add Geos lib dir to $ENV{LD_LIBRARY_PATH} to allow configure to pass
       on non-Windows OSes for GDAL >=3.3.

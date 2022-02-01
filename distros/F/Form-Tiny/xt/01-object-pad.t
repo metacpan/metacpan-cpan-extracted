@@ -26,7 +26,7 @@ $form->set_input({
 });
 
 ok $form->valid;
-ok $form->DOES('Form::Tiny::Form');
+can_ok $form, 'form_meta';
 is $form->fields->{f1}, 'field f1';
 is $form->fields->{f2}, 'field f2';
 

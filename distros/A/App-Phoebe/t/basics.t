@@ -63,15 +63,28 @@ like($page, qr/^30 $base\/page\/Haiku\r$/, "Titan Haiku");
 $page = query_gemini("$base/page/Haiku");
 like($page, qr/^20 text\/gemini; charset=UTF-8\r\n# Haiku\n$haiku/, "Haiku saved");
 
+# no MIME type
+
+$haiku = <<EOT;
+The warm oven hums
+The fresh bread too hot to touch
+The smell is heaven
+EOT
+
 # plain text
 
-$page = query_gemini("$base\/raw\/Haiku");
-like($page, qr/$haiku/m, "Raw text");
+$page = query_gemini("$titan/raw/Bread;size=72;token=hello", $haiku);
+like($page, qr/^30 $base\/page\/Bread\r$/, "Bread haiku without MIME type");
+
+$page = query_gemini("$base/page/Bread");
+like($page, qr/^20 text\/gemini; charset=UTF-8\r\n# Bread\n$haiku/, "Bread haiku saved");
 
 # upload image
 
 my $data = read_binary("t/alex.jpg");
 my $size = length($data);
+$page = query_gemini("$titan/raw/Alex;size=$size;token=hello", $data);
+like($page, qr/^59 The text is invalid UTF-8/, "Upload image without MIME type");
 $page = query_gemini("$titan/raw/Alex;size=$size;mime=image/png;token=hello", $data);
 like($page, qr/^59 This wiki does not allow image\/png/, "Upload image with wrong MIME type");
 $page = query_gemini("$base/page/Alex");

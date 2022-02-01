@@ -1,6 +1,6 @@
 NAME
     Tk::HListbox - Tk Listbox widget supporting images and text entries,
-    Tk::HList based drop-in replacement for Tk::Listbox.
+    Tk::HList-based drop-in replacement for Tk::Listbox.
 
 SYNOPSIS
     *$listbox* = *$parent*->HListbox(?*options*?);
@@ -9,8 +9,8 @@ STANDARD OPTIONS
     -background -borderwidth -cursor -disabledforeground -exportselection
     -font -foreground -height -highlightbackground -highlightcolor
     -highlightthickness -offset -relief -selectbackground -selectborderwidth
-    -selectforeground -setgrid -state -takefocus -tile -width
-    -xscrollcommand -yscrollcommand
+    -selectforeground -setgrid -state -takefocus -width -xscrollcommand
+    -yscrollcommand
 
     See Tk::options for details of the standard options.
 
@@ -182,7 +182,9 @@ WIDGET-SPECIFIC OPTIONS
         expect it to be either single, browse, multiple, extended or
         dragdrop; the default value is browse.
 
-    Name: -showcursoralways => *boolean*
+    Name: -showcursoralways
+    Class: -showcursoralways
+    Switch: -showcursoralways
         Starting with version 2.4, Tk::HListbox no longer displays the
         keyboard cursor (active element) when the HListbox widget does not
         have the keyboard focus, in order to be consistent with the
@@ -198,6 +200,17 @@ WIDGET-SPECIFIC OPTIONS
         items are drawn in the -disabledforeground color, and selection
         cannot be modified and is not shown (though selection information is
         retained).
+
+    Name: takeFocus
+    Class: TakeFocus
+    Switch: -takefocus
+        There are actually three different focusing options: Specify 1 to
+        both allow the widget to take keyboard focus itself and to enable
+        grabbing the keyboard focus when a user clicks on a row in the
+        listbox. Specify '' to allow the widget to take focus (via the <TAB>
+        circulate order) but do not grab the focus when a user clicks on
+        (selects) a row. This is the default focusing model. Specify 0 to
+        not allow the widget to receive the keyboard focus.
 
     Name: -tpadx => *number*
         Specify horizontal padding style in pixels around the text for the

@@ -1,3 +1,12 @@
+0.657   2022-01-16  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Update CLI to enable Log::ger::Output::Screen 0.018's
+          colorize_tags option.
+
+        - [internal] Allow to be generate CLI with packed dependencies (to be
+          used by App-pause-Packed).
+
+
 0.656   2021-08-26  Released-By: PERLANCAR; Urgency: medium
 
 	- Update to WWW::PAUSE::Simple 0.452 (change log access category

@@ -34,6 +34,7 @@
          "requires" : {
             "Import::Into" : "0",
             "Moo" : "2.000000",
+            "Sub::Util" : "0",
             "Type::Tiny" : "1.004000",
             "namespace::clean" : "0",
             "perl" : "5.010001"
@@ -60,6 +61,6 @@
          "web" : "https://github.com/bbrtj/perl-form-tiny"
       }
    },
-   "version" : "2.06",
+   "version" : "2.08",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

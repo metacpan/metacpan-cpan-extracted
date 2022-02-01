@@ -4,11 +4,11 @@
 #  (C) Paul Evans, 2015-2021 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.19;
+use Object::Pad 0.57;
 
-package Device::Chip::MCP23x17 0.04;
+package Device::Chip::MCP23x17 0.05;
 class Device::Chip::MCP23x17
-   extends Device::Chip;
+   :isa(Device::Chip);
 
 use Future::AsyncAwait;
 
@@ -54,7 +54,7 @@ configuration.
 
 =cut
 
-BUILD
+ADJUST
 {
    $self->reset;
 }
@@ -74,7 +74,7 @@ async method mount ( $adapter, %params )
 {
    $_resetpin = delete $params{reset};
 
-   return await $self->SUPER::mount( @_ );
+   return await $self->SUPER::mount( $adapter, %params );
 }
 
 use constant {

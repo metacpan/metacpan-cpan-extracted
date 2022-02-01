@@ -12,7 +12,7 @@ with 'Net::SAML2::Role::ProtocolMessage';
 
 # ABSTRACT: SAML2 AuthnRequest object
 
-our $VERSION = '0.49';
+our $VERSION = '0.52';
 
 
 
@@ -229,7 +229,7 @@ Net::SAML2::Protocol::AuthnRequest - SAML2 AuthnRequest object
 
 =head1 VERSION
 
-version 0.49
+version 0.52
 
 =head1 SYNOPSIS
 
@@ -302,7 +302,7 @@ Chris Andrews  <chrisa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Chris Andrews and Others, see the git log.
+This software is copyright (c) 2022 by Chris Andrews and Others, see the git log.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

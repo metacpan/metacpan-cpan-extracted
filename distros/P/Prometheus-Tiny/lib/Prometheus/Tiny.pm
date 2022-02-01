@@ -1,11 +1,12 @@
 package Prometheus::Tiny;
-$Prometheus::Tiny::VERSION = '0.009';
+$Prometheus::Tiny::VERSION = '0.010';
 # ABSTRACT: A tiny Prometheus client
 
 use warnings;
 use strict;
 
-use Carp qw(croak);
+use Carp qw(croak carp);
+use Scalar::Util qw(looks_like_number);
 
 my $DEFAULT_BUCKETS = [
                0.005,
@@ -43,6 +44,10 @@ sub _format_labels {
 
 sub set {
   my ($self, $name, $value, $labels, $timestamp) = @_;
+  unless (looks_like_number $value) {
+    carp "setting '$name' to non-numeric value, using 0 instead";
+    $value = 0;
+  }
   my $f_label = $self->_format_labels($labels);
   $self->{metrics}{$name}{$f_label} = [ $value, $timestamp ];
   return;
@@ -50,6 +55,10 @@ sub set {
 
 sub add {
   my ($self, $name, $value, $labels) = @_;
+  unless (looks_like_number $value) {
+    carp "adjusting '$name' by non-numeric value, adding 0 instead";
+    $value = 0;
+  }
   $self->{metrics}{$name}{$self->_format_labels($labels)}->[0] += $value;
   return;
 }
@@ -245,11 +254,15 @@ included in every metric created on this object.
 
 Set the value for the named metric. The labels hashref is optional. The timestamp (milliseconds since epoch) is optional, but requires labels to be provided to use. An empty hashref will work in the case of no labels.
 
+Trying to set a metric to a non-numeric value will emit a warning and the metric will be set to zero.
+
 =head2 add
 
     $prom->add($name, $amount, { labels })
 
 Add the given amount to the already-stored value (or 0 if it doesn't exist). The labels hashref is optional.
+
+Trying to add a non-numeric value to a metric will emit a warning and 0 will be added instead (this will still create the metric if it didn't exist, and will update timestamps etc).
 
 =head2 inc
 

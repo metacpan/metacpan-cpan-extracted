@@ -19,7 +19,7 @@ Contains tools to do the alignment, adaptor trimming, and other common tasks on 
 
 
 package CLIPSeqTools::PreprocessApp;
-$CLIPSeqTools::PreprocessApp::VERSION = '0.1.10';
+$CLIPSeqTools::PreprocessApp::VERSION = '1.0.0';
 
 # Make it an App and load plugins
 use Moose;

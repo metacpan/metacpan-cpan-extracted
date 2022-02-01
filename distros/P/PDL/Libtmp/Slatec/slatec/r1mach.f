@@ -68,11 +68,13 @@ C           (BKS, WRB)
 C   930201  Added DEC Alpha and SGI constants.  (RWC and WRB)
 C***END PROLOGUE  R1MACH
 C
-      INTEGER SMALL(2)
-      INTEGER LARGE(2)
-      INTEGER RIGHT(2)
-      INTEGER DIVER(2)
-      INTEGER LOG10(2)
+      implicit integer*8(i-n)
+      integer*4 I
+      INTEGER*8 SMALL(2)
+      INTEGER*8 LARGE(2)
+      INTEGER*8 RIGHT(2)
+      INTEGER*8 DIVER(2)
+      INTEGER*8 LOG10(2)
 C
       REAL RMACH(5)
       SAVE RMACH
@@ -411,7 +413,7 @@ C     DATA LOG10(1), LOG10(2) /  8347,  32538/
 C
 C***FIRST EXECUTABLE STATEMENT  R1MACH
       IF (I .LT. 1 .OR. I .GT. 5) CALL XERMSG ('SLATEC', 'R1MACH',
-     +   'I OUT OF BOUNDS', 1, 2)
+     +   'I OUT OF BOUNDS', 1_8, 2)
 C
       R1MACH = RMACH(I)
       RETURN

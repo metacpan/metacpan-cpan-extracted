@@ -1,5 +1,8 @@
 Revision history for Prometheus-Tiny
 
+0.010     2022-02-01 08:25:56+11:00 Australia/Melbourne
+- Warn and handle attempts to set or add non-numbers
+
 0.009     2021-12-07 16:46:15+11:00 Australia/Melbourne
 - Add default_labels parameter (thanks, Michael McClimon!)
 

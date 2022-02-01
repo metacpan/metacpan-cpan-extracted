@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
+plan skip_all => "These tests are for authors only!" unless  $ENV{AUTHOR_TESTING} or $ENV{RELEASE_TESTING};
 # Ensure a recent version of Test::Pod::Coverage
 my $min_tpc = 1.08;
 eval "use Test::Pod::Coverage $min_tpc";
@@ -14,10 +15,6 @@ my $min_pc = 0.18;
 eval "use Pod::Coverage $min_pc";
 plan skip_all => "Pod::Coverage $min_pc required for testing POD coverage"
     if $@;
-plan tests => 3;
+plan tests => 2;
 pod_coverage_ok("Archive::BagIt", { also_private =>[ qw( BUILD BUILDARGS has_forced_fixity_algorithm) ]});
 pod_coverage_ok("Archive::BagIt::Base");
-SKIP: {
-    skip "IO::AIO required for testing Archive::BagIt::Fast", 1 unless eval "use IO::AIO; 1";
-    pod_coverage_ok("Archive::BagIt::Fast");
-}

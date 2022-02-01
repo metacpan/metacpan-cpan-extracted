@@ -2,7 +2,7 @@ NAME
     Log::ger::Output::Screen - Output log to screen
 
 VERSION
-    version 0.018
+    version 0.019
 
 SYNOPSIS
      use Log::ger::Output Screen => (
@@ -43,7 +43,8 @@ CONFIGURATION
   colorize_tags
     Bool, default false. Experimental. If set to true, will colorize "[...]"
     tag prefixes in log message with unique RGB color. Will only do this if
-    color is enabled, obviously.
+    color is enabled, obviously. This option is inspired by Dist::Zilla
+    terminal output.
 
     For example, if log message is something like one of the following:
 

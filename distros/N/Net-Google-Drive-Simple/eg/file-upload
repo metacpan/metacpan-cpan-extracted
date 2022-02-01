@@ -5,33 +5,33 @@ use Net::Google::Drive::Simple;
 use Log::Log4perl qw(:easy);
 use Pod::Usage;
 
-my( $file, $dir ) = @ARGV;
+my ( $file, $dir ) = @ARGV;
 
-if( ! $file ) {
-    pod2usage( "No file given for upload." );
+if ( !$file ) {
+    pod2usage("No file given for upload.");
 }
 
-if( ! -f $file ) {
-    pod2usage( "No such file: $file" );
+if ( !-f $file ) {
+    pod2usage("No such file: $file");
 }
 
-if( ! defined $dir ) {
-    pod2usage( "No Google Drive destination directory given." );
+if ( !defined $dir ) {
+    pod2usage("No Google Drive destination directory given.");
 }
 
-Log::Log4perl->easy_init( $DEBUG );
+Log::Log4perl->easy_init($DEBUG);
 
 my $gd = Net::Google::Drive::Simple->new();
 
-my( $children, $parent ) = 
-    $gd->children( $dir, { maxResults => 1 } );
+my ( $children, $parent ) =
+  $gd->children( $dir, { maxResults => 1 } );
 
-if( !$parent ) {
+if ( !$parent ) {
     LOGDIE "Can't find remote directory $dir. Does it exist?";
 }
 
-$gd->file_upload( $file, $parent ) or
-    LOGDIE "Upload failed: $!";
+$gd->file_upload( $file, $parent )
+  or LOGDIE "Upload failed: $!";
 
 __END__
 

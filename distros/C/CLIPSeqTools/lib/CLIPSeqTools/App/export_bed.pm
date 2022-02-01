@@ -47,7 +47,7 @@ the BED file will be 5.
 
 
 package CLIPSeqTools::App::export_bed;
-$CLIPSeqTools::App::export_bed::VERSION = '0.1.10';
+$CLIPSeqTools::App::export_bed::VERSION = '1.0.0';
 
 # Make it an app command
 use MooseX::App::Command;

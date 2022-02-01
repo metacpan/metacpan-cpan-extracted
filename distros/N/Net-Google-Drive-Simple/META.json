@@ -4,7 +4,7 @@
       "Mike Schilli <cpan@perlmeister.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -50,16 +50,16 @@
       },
       "runtime" : {
          "requires" : {
-            "Crypt::SSLeay" : "0",
-            "File::MMagic" : "0",
-            "JSON" : "0",
-            "LWP::Protocol::https" : "0",
-            "LWP::UserAgent" : "0",
-            "Log::Log4perl" : "0",
-            "Mojolicious" : "0",
-            "OAuth::Cmdline" : "0",
-            "Pod::Usage" : "0",
-            "Sysadm::Install" : "0",
+            "Crypt::SSLeay" : "0.72",
+            "File::MMagic" : "1.29",
+            "JSON" : "2.53",
+            "LWP::Protocol::https" : "6.04",
+            "LWP::UserAgent" : "6.02",
+            "Log::Log4perl" : "1",
+            "Mojolicious" : "4.13",
+            "OAuth::Cmdline" : "0.07",
+            "Pod::Usage" : "1.36",
+            "Sysadm::Install" : "0.43",
             "YAML" : "0.71",
             "perl" : "5.016"
          }
@@ -84,11 +84,11 @@
    "provides" : {
       "Net::Google::Drive::Simple" : {
          "file" : "lib/Net/Google/Drive/Simple.pm",
-         "version" : "0.19"
+         "version" : "0.21"
       },
       "Net::Google::Drive::Simple::Item" : {
          "file" : "lib/Net/Google/Drive/Simple/Item.pm",
-         "version" : "0.19"
+         "version" : "0.21"
       }
    },
    "release_status" : "stable",
@@ -103,27 +103,25 @@
          "web" : "https://github.com/mschilli/net-google-drive-simple"
       }
    },
-   "version" : "0.19",
+   "version" : "0.21",
    "x_contributors" : [
       "Andy Baugh <thomas.baugh@cpanel.net>",
       "Andy Bircumshaw <github.com@networkned.co.uk>",
       "Arnaud (Arhuman) ASSAD <arhuman@gmail.com>",
       "Emmanuel Rodriguez <emmanuel.rodriguez@gmail.com>",
+      "H\u00e5kon H\u00e6gland <hakon.hagland@gmail.com>",
       "Matthias Bloch <matthias.bloch@puffin.ch>",
       "Max Maischein <corion@corion.net>",
-      "Mike Schilli <github@perlmeister.com>",
       "Mike Schilli <m@perlmeister.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Nicolas R <atoomic@cpan.org>",
-      "Nicolas R <cpan@atoomic.org>",
-      "\u2115icolas \u211d <nicolas@atoomic.org>",
-      "Nicolas Rochelemagne <rochelemagne@cpanel.net>",
       "Peter Scott <peter@computerpros.com.au>",
       "Tim Mullin <tim@cpanel.net>",
       "Todd Rinaldo <toddr@cpan.org>",
       "Yxes <wells@cedarnet.org>"
    ],
-   "x_generated_by_perl" : "v5.30.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.18"
+   "x_generated_by_perl" : "v5.32.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

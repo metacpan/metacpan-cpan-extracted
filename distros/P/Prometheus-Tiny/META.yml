@@ -7,6 +7,7 @@ build_requires:
   Plack::Test: '0'
   Test::Exception: '0'
   Test::More: '0'
+  Test::Warn: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -18,13 +19,14 @@ meta-spec:
 name: Prometheus-Tiny
 requires:
   Carp: '0'
+  Scalar::Util: '0'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/robn/Prometheus-Tiny/issues
   homepage: https://github.com/robn/Prometheus-Tiny
   repository: https://github.com/robn/Prometheus-Tiny.git
-version: '0.009'
+version: '0.010'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -168,7 +170,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.009'
+          tag: '0.010'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

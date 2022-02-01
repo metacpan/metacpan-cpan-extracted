@@ -19,7 +19,8 @@ no multidimensional;
 
 use Cwd 'abs_path';
 
-use Test::More tests => 88;
+use Test::More tests => 94;
+use Test::Output;
 use Test::Warn;
 
 # define fixed environment for unit tests:
@@ -443,6 +444,9 @@ is($_->attr1(), 94, 'variable reference in getter is returned correctly');
 $var = 42;
 is($_->attr1(), 42, 'referenced variable can be changed correctly');
 
+#####################################
+# specific variable reference tests:
+
 my $ref1 = UI::Various::core::dummy_varref();
 my $ref2 = UI::Various::core::dummy_varref();
 is($$ref1, '', 'dummy reference 1 is empty');
@@ -452,3 +456,47 @@ $$ref1 = 42;
 $$ref2 = 47;
 is($$ref1, 42, 'dummy reference 1 is now 42');
 is($$ref2, 47, 'dummy reference 2 is now 47');
+
+package UI::Various::PoorTerm::Class5
+{
+    use UI::Various::core;
+    require Exporter;
+    our @ISA = qw(Exporter);
+    sub attr($)
+    {   return access_varref('attr', @_);  }
+    sub new($;\[@$])
+    {	return construct({ attr => dummy_varref() }, '^attr$', @_);   }
+    sub _reference($$) {}	# dummy for code coverage
+};
+package UI::Various::PoorTerm::Class6
+{
+    use UI::Various::core;
+    require Exporter;
+    our @ISA = qw(Exporter);
+    sub attr($)			# "public" getter
+    {   return get('attr', @_);   }
+    sub _attr($$)		# "private" setter
+    {   return set('attr', undef, @_);   }
+    sub new($;\[@$])
+    {	return construct({ attr => dummy_varref() }, '^attr$', @_);   }
+    sub _reference($$) {}	# dummy for code coverage
+};
+
+eval {   UI::Various::PoorTerm::Class5::attr('Broken1');   };
+like($@,
+     qr/^invalid object \(\) in call to .*::Class5::attr$re_msg_tail/,
+    'bad call to access_varref causes error');
+
+stderr_like
+{   $_ = UI::Various::PoorTerm::Class5->new({attr => 1});   }
+    qr/^'attr' attribute must be a SCALAR reference$re_msg_tail/,
+    'not-SCALAR in access_varref causes error';
+
+$_ = UI::Various::PoorTerm::Class5->new();
+is($_->attr(), '', 'default constructor creates empty dummy SCALAR reference');
+$_ = UI::Various::PoorTerm::Class5->new();
+is($_->attr(\$var), 42, 'created dummy SCALAR reference can be changed');
+is($_->attr(), 42, 'changed SCALAR reference has correct value');
+
+$_ = UI::Various::PoorTerm::Class6->new({ attr => \$var });
+is($_->attr(), 42, 'constructor creates SCALAR correct reference');

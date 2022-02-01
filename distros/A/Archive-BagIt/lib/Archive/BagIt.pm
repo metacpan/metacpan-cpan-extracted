@@ -11,7 +11,7 @@ use POSIX qw( strftime );
 use Moo;
 with "Archive::BagIt::Role::Portability";
 
-our $VERSION = '0.089'; # VERSION
+our $VERSION = '0.091'; # VERSION
 
 # ABSTRACT: The main module to handle bags.
 
@@ -992,7 +992,7 @@ Archive::BagIt - The main module to handle bags.
 
 =head1 VERSION
 
-version 0.089
+version 0.091
 
 =head1 NAME
 
@@ -1374,7 +1374,7 @@ Triggers loading of an existing bag
 A method to verify a bag deeply. If C<$opts> is set with C<{return_all_errors}> all fixity errors are reported.
 The default ist to croak with error message if any error is detected.
 
-HINT: You might also want to check Archive::BagIt::Fast to see a more direct way of accessing files (and thus faster).
+HINT: You might also want to check L<Archive::BagIt::Fast> to see a more direct way of accessing files (and thus faster).
 
 =head2 calc_payload_oxum()
 

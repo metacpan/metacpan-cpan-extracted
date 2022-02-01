@@ -3,14 +3,17 @@ NAME
     undo support)
 
 VERSION
-    This document describes version 0.06 of Setup::File::TextFragment (from
-    Perl distribution Setup-File-TextFragment), released on 2017-07-10.
+    This document describes version 0.070 of Setup::File::TextFragment (from
+    Perl distribution Setup-File-TextFragment), released on 2021-08-02.
+
+CONTRIBUTOR
+    Steven Haryanto <sharyanto@cpan.org>
 
 FUNCTIONS
   setup_text_fragment
     Usage:
 
-     setup_text_fragment(%args) -> [status, msg, result, meta]
+     setup_text_fragment(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     Insert/delete text fragment in a file (with undo support).
 
@@ -81,32 +84,35 @@ FUNCTIONS
 
     *   -tx_action => *str*
 
-        For more information on transaction, see Rinci::Transaction.
+        For more information on transaction, see L<Rinci::Transaction>.
 
     *   -tx_action_id => *str*
 
-        For more information on transaction, see Rinci::Transaction.
+        For more information on transaction, see L<Rinci::Transaction>.
 
     *   -tx_recovery => *str*
 
-        For more information on transaction, see Rinci::Transaction.
+        For more information on transaction, see L<Rinci::Transaction>.
 
     *   -tx_rollback => *str*
 
-        For more information on transaction, see Rinci::Transaction.
+        For more information on transaction, see L<Rinci::Transaction>.
 
     *   -tx_v => *str*
 
-        For more information on transaction, see Rinci::Transaction.
+        For more information on transaction, see L<Rinci::Transaction>.
 
     Returns an enveloped result (an array).
 
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
 
     Return value: (any)
 
@@ -127,15 +133,19 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    Text::Fragment
+    A more general version of this: Setup::File::Edit.
 
-    Setup
+    A variation that adds/removes line to file: Setup::File::Line.
+
+    Backend for this module: Text::Fragment
+
+    The Setup framework: Setup
 
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2015, 2014, 2013, 2012 by
+    This software is copyright (c) 2021, 2017, 2015, 2014, 2013, 2012 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

@@ -23,7 +23,7 @@ CLIPSeqTools output files.
 
 
 package CLIPSeqTools::PlotApp;
-$CLIPSeqTools::PlotApp::VERSION = '0.1.10';
+$CLIPSeqTools::PlotApp::VERSION = '1.0.0';
 
 # Make it an App and load plugins
 use Moose;

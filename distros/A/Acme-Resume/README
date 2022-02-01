@@ -1,9 +1,9 @@
 This archive contains the distribution Acme-Resume,
-version 0.0108:
+version 0.0109:
 
   Write a human-readable resume in Perl
 
-This software is copyright (c) 2021 by Erik Carlsson.
+This software is copyright (c) 2022 by Erik Carlsson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

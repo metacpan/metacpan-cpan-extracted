@@ -39,7 +39,8 @@ C   861211  REVISION DATE from Version 3.2
 C   891214  Prologue converted to Version 4.0 format.  (BAB)
 C   920501  Reformatted the REFERENCES section.  (WRB)
 C***END PROLOGUE  XGETUA
-      DIMENSION IUNITA(5)
+      implicit integer*8(i-n)
+      integer*4 N, INDEX, IUNITA(5), J4SAVE
 C***FIRST EXECUTABLE STATEMENT  XGETUA
       N = J4SAVE(5,0,.FALSE.)
       DO 30 I=1,N

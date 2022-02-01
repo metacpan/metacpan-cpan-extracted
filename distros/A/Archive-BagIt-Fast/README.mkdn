@@ -1,0 +1,53 @@
+# NAME
+
+Archive::BagIt::Fast - A module to use [IO::AIO](https://metacpan.org/pod/IO%3A%3AAIO) to get better performance
+
+# VERSION
+
+version 0.090
+
+# NAME
+
+Archive::BagIt::Fast - For people who are willing to rely on some other modules in order to get better performance
+
+# HINTs
+
+Use this module only if you have \*measured\* that your environment has a benefit. The results vary highly depending on
+typical file size, filesystem and storage systems.
+
+# METHODS
+
+- digest\_callback()
+
+    register a callback function with method to calculate and return all digests for a a list of files using a Digest-object. This method implements fast
+    file access using memory mapped I/O by [IO::AIO](https://metacpan.org/pod/IO%3A%3AAIO).
+
+- mmap\_based\_digest($digestobj, $fh, $filesize)
+
+    internal funtion which uses mmap to calculate digest. Called by `digest_callback`
+
+- sysread\_based\_digest($digestobj, $fh, $filesize)
+
+    internal function which uses sysread to calculate digest. Called by `digest_callback`
+
+# AVAILABILITY
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit [http://www.perl.com/CPAN/](http://www.perl.com/CPAN/) to find a CPAN
+site near you, or see [https://metacpan.org/module/Archive::BagIt::Fast/](https://metacpan.org/module/Archive::BagIt::Fast/).
+
+# BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at [http://rt.cpan.org](http://rt.cpan.org).
+
+# AUTHOR
+
+Andreas Romeyke <cpan@andreas.romeyke.de>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022 by Rob Schmidt <rjeschmi@gmail.com>, William Wueppelmann and Andreas Romeyke.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

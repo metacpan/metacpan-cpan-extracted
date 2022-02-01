@@ -44,7 +44,7 @@ sub slurp {
       system($build_cmd) == 0
         or die "Can't execute command $build_cmd:$!";
     }
-    
+
     my $index_file = "$home_dir/public/index.html";
     my @blog_files = glob "$home_dir/public/blog/*";
     is(scalar @blog_files, 9);
@@ -61,13 +61,14 @@ sub slurp {
     like($index_content, qr/&gt;/);
     like($index_content, qr/&lt;/);
     like($index_content, qr/&amp;/);
-    like($index_content, qr|<title>mysite😄</title>|);
+    like($index_content, qr|<title>mysiteあい</title>|);
     like($index_content, qr|<h1>\s*<a href="/">Giblog Web Site</a>\s*</h1>|);
-    like($index_content, qr|<h2><a href="/">How to use Giblog😁</a></h2>|);
+    like($index_content, qr|<h2><a href="/">How to use Giblogうえ</a></h2>|);
     like($index_content, qr|\Qside_list|);
     like($index_content, qr|\Q<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0">|);
     like($index_content, qr|\Q<meta name="description" content="How to use Giblog.">|);
     like($index_content, qr|\Q<link rel="stylesheet" type="text/css" href="/css/common.css">|);
+    like($index_content, qr|<p>Giblog Test Variable</p><p>Giblog Test Variable</p>|);
     like($blog_content, qr/header/);
     like($blog_content, qr/footer/);
     like($blog_content, qr/top/);

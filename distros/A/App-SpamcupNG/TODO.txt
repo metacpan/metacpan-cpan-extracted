@@ -1,5 +1,4 @@
-- Capture all e-mail address will be used to received the SPAM report.
-- Capture how old is the SPAM.
-- Capture TRACKING URL info.
-- Capture X-Mailer info.
 - Save all captured data to SQLite database.
+- Redact authentication credentials when running in DEBUG level.
+- Reuse user agent cookies if possible before repeating authentication step.
+

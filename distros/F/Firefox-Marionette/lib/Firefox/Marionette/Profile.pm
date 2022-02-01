@@ -13,7 +13,7 @@ BEGIN {
         require Win32;
     }
 }
-our $VERSION = '1.20';
+our $VERSION = '1.22';
 
 sub ANY_PORT            { return 0 }
 sub _GETPWUID_DIR_INDEX { return 7 }
@@ -235,7 +235,7 @@ sub new {
             'false', 0 );
         $profile->set_value(
 'browser.newtabpage.activity-stream.feeds.section.topstories.options',
-            q[], 1
+            q[{}], 1
         );
         $profile->set_value(
             'browser.newtabpage.activity-stream.feeds.snippets',
@@ -472,7 +472,7 @@ Firefox::Marionette::Profile - Represents a prefs.js Firefox Profile
 
 =head1 VERSION
 
-Version 1.20
+Version 1.22
 
 =head1 SYNOPSIS
 

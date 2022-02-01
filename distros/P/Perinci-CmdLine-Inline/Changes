@@ -1,3 +1,9 @@
+0.554   2022-01-16  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Enable Log::ger::Output::Screen 0.018's colorize_tags option
+          in generated code.
+
+
 0.553   2021-10-21  Released-By: PERLANCAR; Urgency: medium
 
 	- Re-pass standard perlcritic tests (2nd attempt).

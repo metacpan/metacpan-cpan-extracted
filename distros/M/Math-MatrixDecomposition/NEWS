@@ -1,6 +1,19 @@
 History of user-visible changes for Math::MatrixDecomposition.  -*- text -*-
 
 
+Version 1.06
+
+* This is a maintenance release without user-visible changes.
+
+
+Version 1.05
+
+* Fixed a bug in the eigenvectors calculation procedure for
+  non-symmetric matrices.  Results are different.  Also use the
+  LAPACK procedure ‘gebal’ to balance a matrix.  This results in
+  more accurate eigenvectors for ill-conditioned matrices.
+
+
 Version 1.04
 
 * This is a maintenance release without user-visible changes.

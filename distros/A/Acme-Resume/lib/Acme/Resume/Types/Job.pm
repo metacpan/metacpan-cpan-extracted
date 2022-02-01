@@ -4,7 +4,7 @@ use warnings;
 
 # ABSTRACT: Defines a Job
 # PODNAME: Acme::Resume::Types::Job
-our $VERSION = '0.0108';
+our $VERSION = '0.0109';
 
 class Acme::Resume::Types::Job :rw {
 
@@ -58,7 +58,7 @@ Acme::Resume::Types::Job - Defines a Job
 
 =head1 VERSION
 
-Version 0.0108, released 2021-12-22.
+Version 0.0109, released 2022-01-30.
 
 =head1 SOURCE
 
@@ -74,7 +74,7 @@ Erik Carlsson <info@code301.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Erik Carlsson.
+This software is copyright (c) 2022 by Erik Carlsson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

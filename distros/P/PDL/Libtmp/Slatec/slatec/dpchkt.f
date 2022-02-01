@@ -45,12 +45,13 @@ C**End
 C
 C  Declare arguments.
 C
-      INTEGER  N, KNOTYP
+      implicit integer*8(i-n)
+      INTEGER*8  N, KNOTYP
       DOUBLE PRECISION  X(*), T(*)
 C
 C  Declare local variables.
 C
-      INTEGER  J, K, NDIM
+      INTEGER*8  J, K, NDIM
       DOUBLE PRECISION  HBEG, HEND
 C***FIRST EXECUTABLE STATEMENT  DPCHKT
 C

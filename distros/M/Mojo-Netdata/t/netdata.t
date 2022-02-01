@@ -38,10 +38,28 @@ subtest 'env' => sub {
   is $netdata->web_dir,          4, 'web_dir';
 };
 
-subtest 'config' => sub {
+subtest 'mojo.conf.d' => sub {
+  local $ENV{NETDATA_USER_CONFIG_DIR} = curfile->sibling('etc/netdata')->to_string;
+  my $netdata = Mojo::Netdata->new;
+  is(
+    $netdata->config,
+    {
+      'main.conf.pl' => 1,
+      'mojo.conf.pl' => 1,
+      collectors     => [{
+        collector    => 'Mojo::Netdata::Collector::HTTP',
+        jobs         => ['https://example.com'],
+        update_every => 30,
+      }]
+    },
+    'read'
+  );
+};
+
+subtest 'no config' => sub {
   local $ENV{NETDATA_USER_CONFIG_DIR} = curfile->sibling('etc/netdata-test-config')->to_string;
   my $netdata = Mojo::Netdata->new;
-  is $netdata->config, {collectors => []}, 'read';
+  is $netdata->config, {}, 'read';
 };
 
 done_testing;

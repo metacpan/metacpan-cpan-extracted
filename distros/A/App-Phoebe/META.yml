@@ -38,5 +38,5 @@ requires:
   perl: '5.026000'
 resources:
   repository: https://alexschroeder.ch/cgit/phoebe
-version: 4.04
+version: 4.05
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

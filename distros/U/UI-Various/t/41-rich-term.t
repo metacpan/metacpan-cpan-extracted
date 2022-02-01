@@ -24,8 +24,11 @@ use Test::Output;
 my $tty;
 BEGIN {
     # Use simple ReadLine without ornaments (aka ANSI escape sequences) for
-    # unit tests to allow exact comparison:
-    $ENV{PERL_RL} = 'Stub o=0';
+    # unit tests to allow exact comparison.  (Note that direct testing and
+    # ./Build test use Term::ReadLine::Stub from Term/ReadLine.pm while
+    # testing with coverage, e.g. ./Build testcover, runs with
+    # Term::ReadLine::Gnu):
+    $ENV{PERL_RL} = 'Stub ornaments=0';
     unless (defined $DB::{single})
     {
 	# This check confuses the Perl debugger, so we wont run it while
@@ -38,7 +41,7 @@ BEGIN {
     chomp $tty;
     -c $tty  and  -w $tty
 	or  plan skip_all => 'required TTY (' . $tty . ') not available';
-    plan tests => 41;
+    plan tests => 53;
 
     # define fixed environment for unit tests:
     delete $ENV{DISPLAY};
@@ -104,8 +107,7 @@ is(ref($main), 'UI::Various::RichTerm::Main',
    '$main is UI::Various::RichTerm::Main');
 
 my $text1 = UI::Various::Text->new(text => 'Hello World!', height => 3);
-is(ref($text1), 'UI::Various::RichTerm::Text',
-   'type UI::Various::RichTerm::Text is correct');
+is(ref($text1), 'UI::Various::RichTerm::Text', 'Text is concrete class');
 my ($w, $h) = $text1->_prepare(10);
 is($w, 6, '_prepare returns correct width');
 is($h, 3, '_prepare returns correct height');
@@ -130,8 +132,7 @@ is($_, "1234567\n123    ",
 
 my $button1 = UI::Various::Button->new(text => 'OK', height => 2,
 				      code => sub { print "OK!\n"; });
-is(ref($button1), 'UI::Various::RichTerm::Button',
-   'type UI::Various::RichTerm::Button is correct');
+is(ref($button1), 'UI::Various::RichTerm::Button', 'Button is concrete class');
 ($w, $h) = $button1->_prepare(10);
 is($w, 4, '_prepare returns correct width');
 is($h, 2, '_prepare returns correct height');
@@ -143,8 +144,7 @@ is($_,
 
 my $var = 'initial value';
 my $input = UI::Various::Input->new(textvar => \$var,);
-is(ref($input), 'UI::Various::RichTerm::Input',
-   'type UI::Various::RichTerm::Input is correct');
+is(ref($input), 'UI::Various::RichTerm::Input', 'Input is concrete class');
 ($w, $h) = $input->_prepare(10);
 is($w, 7, '_prepare returns correct width');
 is($h, 2, '_prepare returns correct height');
@@ -163,11 +163,10 @@ $main->remove($input);
 
 $var = 0;
 my $check = UI::Various::Check->new(text => 'on or off', var => \$var);
-is(ref($check), 'UI::Various::RichTerm::Check',
-   'type UI::Various::RichTerm::Check is correct');
+is(ref($check), 'UI::Various::RichTerm::Check', 'Check is concrete class');
 ($w, $h) = $check->_prepare(8);
-is($w, 5, '_prepare returns correct width');
-is($h, 2, '_prepare returns correct height');
+is($w, 5, '_prepare (Check) returns correct width');
+is($h, 2, '_prepare (Check) returns correct height');
 $_ = $check->_show('<1> ', $w, $h);
 is($_,
    #________12345  ________12345
@@ -187,6 +186,64 @@ is($_,
    "<1> [ ] on or\n        off  ",
    '_process inverts variable correctly back to 0');
 $main->remove($check);
+
+$var = 'c';
+my $radio =
+    UI::Various::Radio->new(buttons => [a => 'Roses are red',
+					b => 'green',
+					c => 'blue'],
+			    var => \$var);
+is(ref($radio), 'UI::Various::RichTerm::Radio', 'Radio is concrete class');
+($w, $h) = $radio->_prepare(8);
+is($w, 7, '_prepare (Radio 1) returns correct width');
+is($h, 2, '_prepare (Radio 1) returns correct height');
+$_ = $radio->_show('<1> ', $w, $h);
+is($_,
+   #________1234567  ________1234567  ________1234567  ________1234567
+   "<1> ( ) Roses  \n        are red\n    ( ) green  \n    (o) blue   ",
+   '_show (Radio 1) returns correct output');
+
+$var = 'x';
+$radio =
+    UI::Various::Radio->new(buttons => [a => 'red', b => 'green', c => 'blue'],
+			    var => \$var);
+($w, $h) = $radio->_prepare(8);
+is($w, 5, '_prepare (Radio 2) returns correct width');
+is($h, 1, '_prepare (Radio 2) returns correct height');
+$_ = $radio->_show('<1> ', $w, $h);
+is($_,
+   #________12345  ________12345  ________12345
+   "<1> ( ) red  \n    ( ) green\n    ( ) blue ",
+   '_show (Radio 2a) returns correct output');
+$main->add($radio);
+my $selection = "x\n9\n2\n";
+my $prompt = "<1> red\n<2> green\n<3> blue\nenter selection (0 to cancel): ";
+my $error = "invalid selection\n";
+combined_is
+{   _call_with_stdin($selection, sub { $radio->_process(); });   }
+    $prompt . $error .
+    $prompt . $error .
+    $prompt,
+    '_process of Radio produces correct output';
+is($var, 'b', 'variable has correct value');
+$_ = $radio->_show('<1> ', $w, $h);
+is($_,
+   #________12345  ________12345  ________12345
+   "<1> ( ) red  \n    (o) green\n    ( ) blue ",
+   '_show (Radio 2b) returns correct output');
+$main->remove($radio);
+
+$radio =
+    UI::Various::Radio->new(buttons => [a => 'red', b => 'green', c => 'blue'],
+			    var => \$var);
+$main->add($radio);
+combined_is
+{   _call_with_stdin("0\n", sub { $radio->_process(); });   }
+    $prompt,
+    '_process of Radio produces correct output';
+is($var, 'b', 'variable still has correct value');
+
+$main->remove($radio);
 
 ####################################
 # test standard behaviour - window:
@@ -262,14 +319,8 @@ $win2 = $main->window({title => 'goodbye', width => 12},
 stdout_is(sub {   $win2->_show();   }, $output2,
 	  '_show 6 prints correct text');
 
-# Remove ReadLine's escape sequences to allow exact comparison.  (Note that
-# direct testing and ./Build test use Term::ReadLine::Stub from
-# Term/ReadLine.pm while testing with coverage, e.g. ./Build testcover, runs
-# with Term::ReadLine::Gnu):
-
 $main->add($win1);
-my $prompt = "enter selection: ";
-my $error = "invalid selection\n";
+$prompt = "enter selection: ";
 
 combined_is			# 2nd window is displayed 1st!
 {   _call_with_stdin("-\n1\nx\n2\n+\n0\n-\n1\n", sub { $main->mainloop; });   }

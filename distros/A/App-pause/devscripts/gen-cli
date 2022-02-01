@@ -10,14 +10,23 @@ use File::Slurper qw(read_text write_text);
 use App::pause;
 use Perinci::CmdLine::Inline qw(gen_inline_pericmd_script);
 
+my $pack_deps = ($0 =~ /gen-cli-packed/ ? 1:0);
+
 my $res = gen_inline_pericmd_script(
     shebang => "#!perl",
     pod => 0,
-    pack_deps => 0,
+    pack_deps => $pack_deps,
     script_name => 'pause',
     script_version_from_main_version => 1,
     use_cleanser => 0,
     code_before_enable_logging => 'require Log::ger::Layout::JSON;',
+    include => $pack_deps ? [
+        # TODO: automatic tracing
+        'Log::ger::Layout::JSON',
+        'Log::ger::Layout::LTSV',
+        'Devel::Caller::Util',
+    ] : [],
+    log => 1,
     code_add_extra_log_outputs => join(
         "",
         '$_pci_log_outputs->{Screen}{category_level}{_access} = "off"; ',

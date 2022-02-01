@@ -12,16 +12,17 @@ use warnings;
 	# gives us create_form_meta function
 	use Form::Tiny::Utils qw(:meta_handlers);
 
-	# mixing in Form::Tiny early will give us form_meta method
-	# proper form_meta will setup the metamodel for a form
-	with 'Form::Tiny';
-
 	# meta roles go into the qw()
 	# class roles goes into set_form_roles method call
-	create_form_meta(__PACKAGE__, qw())
+	my $meta = create_form_meta(__PACKAGE__, qw())
 		->set_form_roles(['Form::Tiny::Form']);
 
-	# add a requried field
+	# if you would like to add superclasses, this is the place to do so
+	# extends '...';
+
+	# you could use $meta directly, but you would first have to call ->bootstrap on it
+	# the from_meta method will automatically find the proper meta for this package and
+	# call that method
 	__PACKAGE__->form_meta->add_field(
 		'field-name' => (
 			required => 1,

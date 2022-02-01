@@ -43,7 +43,7 @@ Measure size distribution of aligned reads.
 =cut
 
 package CLIPSeqTools::App::size_distribution;
-$CLIPSeqTools::App::size_distribution::VERSION = '0.1.10';
+$CLIPSeqTools::App::size_distribution::VERSION = '1.0.0';
 
 # Make it an app command
 use MooseX::App::Command;

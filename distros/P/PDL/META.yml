@@ -36,6 +36,7 @@ recommends:
   Inline::C: '0.62'
   OpenGL: '0.70'
   OpenGL::GLUT: '0.72'
+  Term::ReadKey: '2.34'
 requires:
   Data::Dumper: '2.121'
   File::Map: '0.57'
@@ -48,7 +49,6 @@ requires:
   Pod::Select: '0'
   Scalar::Util: '0'
   Storable: '1.03'
-  Term::ReadKey: '2.34'
   Text::Balanced: '1.89'
   perl: '5.010'
 resources:
@@ -56,5 +56,5 @@ resources:
   bugtracker: https://github.com/PDLPorters/pdl/issues
   homepage: http://pdl.perl.org/
   repository: git://github.com/PDLPorters/pdl.git
-version: '2.068'
+version: '2.072'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

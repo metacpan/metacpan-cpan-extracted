@@ -184,6 +184,9 @@ C           LEVEL=-1 logic, changed calls to XERSAV to XERSVE, and
 C           XERCTL to XERCNT.  (RWC)
 C   920501  Reformatted the REFERENCES section.  (WRB)
 C***END PROLOGUE  XERMSG
+      implicit integer*8(i-n)
+      integer*4 LEVEL, LKNTRL, LLEVEL, LERR, MAXMES, I, J4SAVE
+      integer*4 KDUMMY, KOUNT
       CHARACTER*(*) LIBRAR, SUBROU, MESSG
       CHARACTER*8 XLIBR, XSUBR
       CHARACTER*72  TEMP
@@ -212,8 +215,8 @@ C
 C
 C       RECORD THE MESSAGE.
 C
-      I = J4SAVE (1, NERR, .TRUE.)
-      CALL XERSVE (LIBRAR, SUBROU, MESSG, 1, NERR, LEVEL, KOUNT)
+      I = J4SAVE (1, INT(NERR), .TRUE.)
+      CALL XERSVE (LIBRAR, SUBROU, MESSG, 1, INT(NERR), LEVEL, KOUNT)
 C
 C       HANDLE PRINT-ONCE WARNING MESSAGES.
 C

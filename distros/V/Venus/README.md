@@ -8,7 +8,7 @@ OO Standard Library for Perl 5
 
 # VERSION
 
-0.01
+0.02
 
 # SYNOPSIS
 
@@ -48,7 +48,7 @@ handling, "true" and "false" keywords, package introspection, command-line
 options parsing, and more. This package will always automatically exports
 `true` and `false` keyword functions (unless existing routines of the same
 name already exist in the calling package), otherwise exports keyword functions
-as requested at import.
+as requested at import. This library requires Perl `5.18+`.
 
 # FUNCTIONS
 
@@ -512,7 +512,9 @@ This package provides the following features:
 
         my $myapp = MyApp->new;
 
-        $myapp->catch('execute'); # catch MyApp::Error
+        my $error = $myapp->catch('execute');
+
+        # $error->isa('MyApp::Error');
 
 - composable-standards
 
@@ -534,7 +536,9 @@ This package provides the following features:
 
         $myapp->stash(greeting => 'hello world');
 
-        $myapp->dump('stash'); # '{"greeting" => "hello world"}'
+        $myapp->dump('stash');
+
+        # '{"greeting" => "hello world"}'
 
 - pluggable-library
 
@@ -565,6 +569,26 @@ This package provides the following features:
         my $string = Venus::String->new('hello, world');
 
         $string->base64;
+
+- template-system
+
+    This library provides a minimalistic templating system.
+
+    **example 1**
+
+        package main;
+
+        use Venus::Template;
+
+        my $template = Venus::Template->new(q(
+          {{ if user.name }}
+          Welcome, {{ user.name }}!
+          {{ else user.name }}
+          Welcome, friend!
+          {{ end user.name }}
+        ));
+
+        $template->render;
 
 # AUTHORS
 

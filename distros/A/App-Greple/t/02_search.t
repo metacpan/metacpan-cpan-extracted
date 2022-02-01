@@ -8,28 +8,59 @@ use open IO => ':utf8';
 use lib '.';
 use t::Util;
 
-like(greple('-e "fox" t/SAMPLE.txt')->stdout,
-     qr/\A(.*\n){1}\z/, "simple");
+like(run('-e "fox" t/SAMPLE.txt')->stdout,
+     line(1), "simple");
 
-like(greple('-e "fox\\\\n" t/SAMPLE.txt')->stdout,
-     qr/\A(.*\n){1}\z/, "end with newline");
+like(run('-e "fox\\\\n" t/SAMPLE.txt')->stdout,
+     line(1), "end with newline");
 
-like(greple('--re "^The.*\\\\n\\\\Kjumps" t/SAMPLE.txt')->stdout,
-     qr/\A(.*\n){1}\z/, "\\K");
+like(run('--re "^The.*\\\\n\\\\Kjumps" t/SAMPLE.txt')->stdout,
+     line(1), "\\K");
 
-like(greple('-e "fox jumps" t/SAMPLE.txt')->stdout,
-     qr/\A(.*\n){2}\z/, "multi-line");
+like(run('-e "fox jumps" t/SAMPLE.txt')->stdout,
+     line(2), "multi-line");
 
-like(greple('-e ^ t/SAMPLE.txt')->stdout,
-     qr/\A(.*\n){28}\z/, "-e ^");
+like(run('-e ^ t/SAMPLE.txt')->stdout,
+     line(28), "-e ^");
 
-is(greple('-e "^" /dev/null')->stdout,
+is(run('-e "^" /dev/null')->stdout,
      '', "-e ^ /dev/null");
 
-is(greple('-e "\\\\z" t/SAMPLE.txt')->stdout,
+is(run('-e "\\\\z" t/SAMPLE.txt')->stdout,
      '', "-e \\z");
 
-is(greple('-e ^ --color=never t/SAMPLE.txt')->stdout,
+is(run('-e ^ --color=never t/SAMPLE.txt')->stdout,
      `cat t/SAMPLE.txt`, "-e ^ --color=never");
+
+# --or
+
+like(run('--or dog --or fox t/SAMPLE.txt')->stdout,
+     line(2), "--or");
+
+# --and
+
+like(run('-i --and the --and fox t/SAMPLE.txt')->stdout,
+     line(1), "--and");
+
+# --must
+
+like(run('-i --must the --and fox t/SAMPLE.txt')->stdout,
+     line(2), "--must");
+
+# -o / --all
+
+like(run('--and fox --and dog t/SAMPLE.txt')->stdout,
+     line(0), "fox and dog");
+
+# -o does not change matching behabior
+like(run('--and fox --and dog -o t/SAMPLE.txt')->stdout,
+     line(0), "fox and dog with -o");
+
+# --all does not change matching behabior
+like(run('--and fox --and dog --all t/SAMPLE.txt')->stdout,
+     line(0), "fox and dog with --all");
+
+like(run('--and fox --and dog --border "\A" -o t/SAMPLE.txt')->stdout,
+     line(2), "fox and dog with --border \"\\A\" -o");
 
 done_testing;

@@ -20,4 +20,5 @@ t/22-declare-unique.t
 t/30-psgi.t
 t/40-histogram.t
 t/41-enum.t
+t/50-warn-undef.t
 t/900-regression.t

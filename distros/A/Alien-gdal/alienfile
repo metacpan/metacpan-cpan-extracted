@@ -32,7 +32,7 @@ my $have_spatialite = eval 'require
   Alien::spatialite';
 if ($have_spatialite && Alien::spatialite->version ge 5) {
   log "Prepending Alien::spatialite bin dir to path";
-  unshift @PATH, $have_spatialite->bin_dir;
+  unshift @PATH, Alien::spatialite->bin_dir;
   push @aliens_l_and_I, $have_spatialite;
 }
 else {

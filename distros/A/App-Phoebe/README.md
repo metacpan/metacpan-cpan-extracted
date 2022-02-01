@@ -13,7 +13,7 @@ Optionally, people can also access it using a regular web browser.
 
 Gemini itself is very simple network protocol, like Gopher or Finger, but with
 TLS. Gemtext is a very simple markup language, a bit like Markdown, but line
-oriented.
+oriented. See ["GEMTEXT"](#gemtext).
 
 To take a look for yourself, check out the test wiki via the web or via the web.
 
@@ -34,6 +34,47 @@ Other clients can be found here:
 
 See [App::Phoebe::Web](https://metacpan.org/pod/App%3A%3APhoebe%3A%3AWeb) to
 enable reading via the web.
+
+## Gemtext
+
+Pages are written in gemtext, a lightweight hypertext format. You can use your
+favourite text editor to write them.
+
+A text line is a paragraph of text.
+
+    This is a paragraph.
+    This is another paragraph.
+
+A link line starts with "=>", a space, a URL, optionally followed by whitespace
+and some text; the URL can be absolute or relative.
+
+    => http://transjovian.org/ The Transjovian Council on the web
+    => Welcome                 Welcome to The Transjovian Council
+
+A line starting with "```" toggles preformatting on and off.
+
+    Here is an example:
+    ```
+    The tapping calms me:
+    Constant mindless murmuring
+    Rain drops against glass
+    ```
+
+A line starting with "#", "##", or "###", followed by a space and some text is a
+heading.
+
+    ## License
+    The GNU Affero General Public License.
+
+A line starting with "*", followed by a space and some text is a list item.
+
+    * one item
+    * another item
+
+A line starting with ">", followed by a space and some text is a quote.
+
+    The monologue at the end is fantastic, with the city lights and the rain.
+    > I have seen things you people would not believe.
 
 ## Editing the wiki
 
@@ -93,6 +134,13 @@ I'm going to be using `curl` and `openssl` in the Quickstart section of
 `phoebe`, so you'll need those tools as well. And finally, when people download
 their data, the code calls `tar` (available from packages with the same name on
 Debian derived systems).
+
+## Installing Perl
+
+If you are on GNU/Linx or macOS, I recommend installing from
+[Perlbrew](https://perlbrew.pl/). Each Perl installation comes with its own
+library directories, so if you switch Perl version, you need to reinstall Phoebe
+for that Perl version.
 
 ## See also
 

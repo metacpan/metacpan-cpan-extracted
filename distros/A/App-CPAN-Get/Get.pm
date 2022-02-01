@@ -3,6 +3,7 @@ package App::CPAN::Get;
 use strict;
 use warnings;
 
+use App::CPAN::Get::Utils qw(process_module_name_and_version);
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use Getopt::Std;
@@ -11,7 +12,7 @@ use LWP::UserAgent;
 use Menlo::Index::MetaCPAN;
 use URI::cpan;
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -62,7 +63,8 @@ sub run {
 	$self->{'_module_name_and_version'} = shift @ARGV;
 
 	# Parse module name and version.
-	$self->_process_module_name_and_version;
+	($self->{'_module_name'}, $self->{'_module_version_range'})
+		= process_module_name_and_version($self->{'_module_name_and_version'});
 
 	# Get meta information for module name.
 	# XXX Why not small dist?.
@@ -98,29 +100,7 @@ sub run {
 	return 0;
 }
 
-# Code from Menlo::CLI::Compat
-sub _process_module_name_and_version {
-	my $self = shift;
-
-	my $module = $self->{'_module_name_and_version'};
-
-	# Plack@1.2 -> Plack~"==1.2"
-	# BUT don't expand @ in git URLs
-	$module =~ s/^([A-Za-z0-9_:]+)@([v\d\._]+)$/$1~== $2/;
-
-	# Plack~1.20, DBI~"> 1.0, <= 2.0"
-	if ($module =~ /\~[v\d\._,\!<>= ]+$/) {
-		($self->{'_module_name'}, $self->{'_module_version_range'})
-			= split '~', $module, 2;
-	} else {
-		$self->{'_module_name'} = $module;
-	}
-
-	return;
-}
-
 1;
-
 
 __END__
 
@@ -214,6 +194,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

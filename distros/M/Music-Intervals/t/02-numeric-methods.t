@@ -10,14 +10,8 @@ my $obj = new_ok 'Music::Intervals::Numeric';
 
 my $chord = '1/1 5/4 3/2';
 $obj = new_ok 'Music::Intervals::Numeric' => [
-    freq => 1,
-    interval => 1,
-    cent => 1,
-    prime => 1,
     notes => [qw( 1/1 5/4 3/2 )],
 ];
-
-is scalar(keys %{ $obj->ratios}), 447, 'ratios';
 
 is_deeply $obj->frequencies,
     { "1/1 5/4 3/2" => { "1/1" => "unison, perfect prime, tonic", "3/2" => "perfect fifth", "5/4" => "major third" } },

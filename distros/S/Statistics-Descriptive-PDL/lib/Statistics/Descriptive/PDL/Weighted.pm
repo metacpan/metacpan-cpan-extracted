@@ -6,11 +6,6 @@ use warnings;
 
 #  avoid loading too much, especially into our name space
 use PDL::Lite '2.012';
-#use PDL;
-use PDL::NiceSlice;
-
-#  this is otherwise not loaded due to oddities with multiple loading of PDL::Lite
-#*pdl = \&PDL::Core::pdl;
 
 #  We could inherit from PDL::Objects, but in this case we want
 #  to hide the piddle from the caller to avoid arbitrary changes
@@ -18,7 +13,7 @@ use PDL::NiceSlice;
 
 ## no critic (ProhibitExplicitReturnUndef)
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use parent 'Statistics::Descriptive::PDL';
 
@@ -220,7 +215,7 @@ sub _median {
     #  vsearch should be faster since it uses a binary search
     my $idx = PDL->pdl($target_wt)->vsearch_insert_leftmost($cumsum->reshape);
 
-    return $data($idx);
+    return $data->at($idx);
 }
 
 sub _sort_piddle {
@@ -233,8 +228,8 @@ sub _sort_piddle {
 
     my $wts = $self->_get_weights_piddle;
     my $s = $data->qsorti->reshape;
-    my $sorted_data = $data($s);
-    my $sorted_wts  = $wts($s);
+    my $sorted_data = $data->slice($s);
+    my $sorted_wts  = $wts->slice($s);
     
     $self->_set_piddle($sorted_data);
     $self->_set_weights_piddle($sorted_wts);

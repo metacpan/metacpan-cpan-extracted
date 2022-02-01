@@ -43,7 +43,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use UI::Various::core;
 use UI::Various::widget;
@@ -55,7 +55,7 @@ our @EXPORT_OK = qw();
 
 #########################################################################
 
-=item textvar [rw]
+=item textvar [rw, recommended]
 
 a variable reference for the input field
 
@@ -66,16 +66,7 @@ the input field.
 
 sub textvar($;$)
 {
-    defined $_[1]  or  return get('textvar', @_);
-    # explicit check for SCALAR reference when used as setter (needed here
-    # as SCALAR references are treated special in set/access):
-    unless (ref($_[1]) eq 'SCALAR')
-    {
-	error('_1_attribute_must_be_a_2_reference',
-	      'textvar', 'SCALAR');
-	return undef;
-    }
-    return set('textvar', undef, @_);
+    return access_varref('textvar', @_);
 }
 
 #########################################################################
@@ -84,8 +75,7 @@ sub textvar($;$)
 
 use constant ALLOWED_PARAMETERS =>
     (UI::Various::widget::COMMON_PARAMETERS, qw(textvar));
-use constant DEFAULT_ATTRIBUTES =>
-    (textvar => UI::Various::core::dummy_varref());
+use constant DEFAULT_ATTRIBUTES => (textvar => dummy_varref());
 
 #########################################################################
 #########################################################################

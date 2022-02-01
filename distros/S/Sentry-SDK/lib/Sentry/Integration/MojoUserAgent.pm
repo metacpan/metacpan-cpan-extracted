@@ -28,10 +28,8 @@ sub setup_once ($self, $add_global_event_processor, $get_current_hub) {
           op          => 'http',
           name        => 'My Transaction',
           description => $tx->req->method . ' ' . $tx->req->url->to_string,
-          data        => {
-            url         => $tx->req->url->to_string,
-            method      => $tx->req->method,
-          },
+          data        =>
+            { url => $tx->req->url->to_string, method => $tx->req->method, },
         });
 
       }

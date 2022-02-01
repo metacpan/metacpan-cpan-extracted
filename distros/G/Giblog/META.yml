@@ -1,5 +1,5 @@
 ---
-abstract: 'Web site and Blog builders you can manage with Git'
+abstract: 'Create Websites and Blogs that can be managed with Git'
 author:
   - 'Yuki Kimoto <kimoto.yuki@gmail.com>'
 build_requires:
@@ -22,5 +22,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/yuki-kimoto/giblog.git
-version: '2.0'
+version: '3.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

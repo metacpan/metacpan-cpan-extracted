@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 42;
+use Test::More tests => 43;
 BEGIN { use_ok('DateTime::Calendar::Julian') };
 
 #########################
@@ -75,3 +75,5 @@ SKIP: {
 $d = DateTime::Calendar::Julian->new( year => 1900, month => 10, day => 1, time_zone => 'floating');
 $d->add( years => 1 );
 is($d->ymd, '1901-10-01', 'adding a year');
+
+is( $d->calendar_name, 'Julian', 'Calendar name' );

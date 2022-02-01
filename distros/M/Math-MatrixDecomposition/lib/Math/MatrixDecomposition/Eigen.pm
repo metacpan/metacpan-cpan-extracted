@@ -18,6 +18,7 @@ use strict;
 use warnings;
 use Carp;
 use Exporter qw(import);
+use POSIX qw(:float_h);
 use Math::Complex qw();
 use Scalar::Util qw(looks_like_number);
 
@@ -26,7 +27,7 @@ use Math::MatrixDecomposition::Util qw(:all);
 
 BEGIN
 {
-  our $VERSION = '1.04';
+  our $VERSION = '1.06';
   our @EXPORT_OK = qw(eig);
 }
 
@@ -99,10 +100,11 @@ sub decompose
   splice (@$d, $n)
     if @$d > $n;
 
-  # Eigenvectors (an array of vectors).
+  # Eigenvectors (an array of column vectors).
   $$self{vector} //= [];
 
-  # Matrix $Z contains the eigenvectors.
+  # Matrix $Z contains the eigenvectors, please note
+  # that $$Z[$j][$i] denotes matrix element Z(i,j).
   my $Z = $$self{vector};
 
   splice (@$Z, $n)
@@ -397,16 +399,9 @@ sub decompose
     }
   else
     {
-      # Hessenberg matrix (an array of row vectors).
-      my @H = map ([], 0 .. $end);
-
-      for my $i (0 .. $end)
-	{
-	  for my $j (0 .. $end)
-	    {
-	      $H[$i][$j] = $$a[$i * $n + $j];
-	    }
-	}
+      # Hessenberg matrix.
+      my @H = @$a;
+      my $N = $n;
 
       # Row and column indices of the beginning and end
       # of the principal sub-matrix.
@@ -420,168 +415,12 @@ sub decompose
       my @scale = ();
 
       # Balance a real matrix and isolate eigenvalues whenever possible.
-      #
-      # See EiSPACK procedure 'balanc' and LAPACK procedure 'dgebal'.
       if ($prop{balance})
 	{
-	  @perm = (0 .. $end);
-	  @scale = map (1, 0 .. $end);
+	  my ($p, $s) = gebal ($N, \@H, low => \$lo, high => \$hi);
 
-	  # Work variables.
-	  my ($i, $j, $k, $l,
-	      $b, $b2, $c, $f, $g, $r, $s, $no_conv);
-
-	  # Scale factors are powers of two.
-	  $b = 2;
-	  $b2 = $b ** 2;
-
-	  $k = 0;
-	  $l = $end;
-
-	  if ($l > 0)
-	    {
-	      # Search for rows isolating an eigenvalue
-	      # and push them down.
-	    L:
-	      {
-		for $j (reverse (0 .. $l))
-		  {
-		    $r = 0;
-
-		    for $i (0 .. $l)
-		      {
-			$r = 1 if $i != $j && $H[$j][$i] != 0;
-		      }
-
-		    next if $r != 0;
-
-		    if ($j != $l)
-		      {
-			# Exchange row and column.
-			@perm[$j, $l] = @perm[$l, $j];
-
-			for $i (0 .. $l)
-			  {
-			    ($H[$i][$j], $H[$i][$l])
-			      = ($H[$i][$l], $H[$i][$j]);
-			  }
-
-			for $i ($k .. $end)
-			  {
-			    ($H[$j][$i], $H[$l][$i])
-			      = ($H[$l][$i], $H[$j][$i]);
-			  }
-		      }
-
-		    $l -= 1;
-		    next L;
-		  }
-	      }
-
-	      # Search for columns isolating an eigenvalue
-	      # and push them left.
-	    K:
-	      {
-		for $j ($k .. $l)
-		  {
-		    $c = 0;
-
-		    for $i ($k .. $l)
-		      {
-			$c = 1 if $i != $j && $H[$i][$j] != 0;
-		      }
-
-		    next if $c != 0;
-
-		    if ($j != $k)
-		      {
-			# Exchange row and column.
-			@perm[$j, $k] = @perm[$k, $j];
-
-			for $i (0 .. $l)
-			  {
-			    ($H[$i][$j], $H[$i][$k])
-			      = ($H[$i][$k], $H[$i][$j]);
-			  }
-
-			for $i ($k .. $end)
-			  {
-			    ($H[$j][$i], $H[$k][$i])
-			      = ($H[$k][$i], $H[$j][$i]);
-			  }
-		      }
-
-		    $k += 1;
-		    next K;
-		  }
-	      }
-
-	      ## Now balance the sub-matrix in rows k to l.
-
-	      # Iterative loop for norm reduction.
-	      while (1)
-		{
-		  $no_conv = 0;
-
-		  for $i ($k .. $l)
-		    {
-		      $c = 0;
-		      $r = 0;
-
-		      for $j ($k .. $l)
-			{
-			  next if $j == $i;
-
-			  $c += abs ($H[$j][$i]);
-			  $r += abs ($H[$i][$j]);
-			}
-
-		      # Guard against zero c or r due to underflow.
-		      next if $c == 0 || $r == 0;
-
-		      $s = $c + $r;
-		      $f = 1;
-
-		      $g = $r / $b;
-		      while ($c < $g)
-			{
-			  $f *= $b;
-			  $c *= $b2;
-			}
-
-		      $g = $r * $b;
-		      while ($c >= $g)
-			{
-			  $f /= $b;
-			  $c /= $b2;
-			}
-
-		      # Now balance.
-		      if (($c + $r) / $f < 0.95 * $s)
-			{
-			  $g = 1 / $f;
-
-			  for $j ($k .. $end)
-			    {
-			      $H[$i][$j] *= $g;
-			    }
-
-			  for $j (0 .. $l)
-			    {
-			      $H[$j][$i] *= $f;
-			    }
-
-			  $scale[$i] *= $f;
-			  $no_conv = 1;
-			}
-		    }
-
-		  last unless $no_conv;
-		}
-	    }
-
-	  $lo = $k;
-	  $hi = $l;
+	  @perm = @$p;
+	  @scale = @$s;
 	}
 
       # Reduce matrix to upper Hessenberg form by orthogonal similarity
@@ -601,7 +440,7 @@ sub decompose
 
 	      for $i ($m .. $hi)
 		{
-		  $scale += abs ($H[$i][$m - 1]);
+		  $scale += abs ($H[$i * $N + ($m - 1)]);
 		}
 
 	      next if $scale == 0;
@@ -610,7 +449,7 @@ sub decompose
 
 	      for $i (reverse ($m .. $hi))
 		{
-		  $ort[$i] = $H[$i][$m - 1] / $scale;
+		  $ort[$i] = $H[$i * $N + ($m - 1)] / $scale;
 		  $h += $ort[$i] ** 2;
 		}
 
@@ -624,14 +463,14 @@ sub decompose
 
 		  for $i (reverse ($m .. $hi))
 		    {
-		      $f += $ort[$i] * $H[$i][$j];
+		      $f += $ort[$i] * $H[$i * $N + $j];
 		    }
 
 		  $f /= $h;
 
 		  for $i ($m .. $hi)
 		    {
-		      $H[$i][$j] -= $f * $ort[$i];
+		      $H[$i * $N + $j] -= $f * $ort[$i];
 		    }
 		}
 
@@ -641,19 +480,19 @@ sub decompose
 
 		  for $j (reverse ($m .. $hi))
 		    {
-		      $f += $ort[$j] * $H[$i][$j];
+		      $f += $ort[$j] * $H[$i * $N + $j];
 		    }
 
 		  $f /= $h;
 
 		  for $j ($m .. $hi)
 		    {
-		      $H[$i][$j] -= $f * $ort[$j];
+		      $H[$i * $N + $j] -= $f * $ort[$j];
 		    }
 		}
 
 	      $ort[$m] *= $scale;
-	      $H[$m][$m - 1] = $scale * $g;
+	      $H[$m * $N + ($m - 1)] = $scale * $g;
 	    }
 	}
 
@@ -677,11 +516,11 @@ sub decompose
 
 	  for $m (reverse ($lo + 1 .. $hi - 1))
 	    {
-	      next if $H[$m][$m - 1] == 0;
+	      next if $H[$m * $N + ($m - 1)] == 0;
 
 	      for $i ($m + 1 .. $hi)
 		{
-		  $ort[$i] = $H[$i][$m - 1];
+		  $ort[$i] = $H[$i * $N + ($m - 1)];
 		}
 
 	      for $j ($m .. $hi)
@@ -693,7 +532,7 @@ sub decompose
 		      $g += $ort[$i] * $$Z[$j][$i];
 		    }
 
-		  $g = ($g / $ort[$m]) / $H[$m][$m - 1];
+		  $g = ($g / $ort[$m]) / $H[$m * $N + ($m - 1)];
 
 		  for $i ($m .. $hi)
 		    {
@@ -720,7 +559,7 @@ sub decompose
 	    {
 	      if ($i < $lo || $i > $hi)
 		{
-		  $$d[$i] = $H[$i][$i];
+		  $$d[$i] = $H[$i * $N + $i];
 		  $$e[$i] = 0;
 		}
 	    }
@@ -732,7 +571,7 @@ sub decompose
 	    {
 	      for $j ($i .. $end)
 		{
-		  $norm += abs ($H[$i][$j]);
+		  $norm += abs ($H[$i * $N + $j]);
 		}
 	    }
 
@@ -744,21 +583,21 @@ sub decompose
 	      # Look for single small sub-diagonal element.
 	      for ($l = $n; $l > $lo; --$l)
 		{
-		  $s = abs ($H[$l - 1][$l - 1]) + abs ($H[$l][$l]);
+		  $s = abs ($H[($l - 1) * $N + ($l - 1)]) + abs ($H[$l * $N + $l]);
 		  $s = $norm
 		    if $s == 0;
 
-		  last if abs ($H[$l][$l - 1]) < eps * $s;
+		  last if abs ($H[$l * $N + ($l - 1)]) < eps * $s;
 		}
 
-	      $x = $H[$n][$n];
+	      $x = $H[$n * $N + $n];
 
 	      if ($l == $n)
 		{
 		  # One root found,
-		  $H[$n][$n] = $x + $t;
+		  $H[$n * $N + $n] = $x + $t;
 
-		  $$d[$n] = $H[$n][$n];
+		  $$d[$n] = $H[$n * $N + $n];
 		  $$e[$n] = 0;
 
 		  $n -= 1;
@@ -767,16 +606,16 @@ sub decompose
 	      elsif ($l == $n - 1)
 		{
 		  # Two roots found.
-		  $y = $H[$n - 1][$n - 1];
-		  $w = $H[$n][$n - 1] * $H[$n - 1][$n];
+		  $y = $H[($n - 1) * $N + ($n - 1)];
+		  $w = $H[$n * $N + ($n - 1)] * $H[($n - 1) * $N + $n];
 
 		  $p = ($y - $x) / 2;
 		  $q = $p * $p + $w;
 		  $z = sqrt (abs ($q));
 
-		  $H[$n][$n] = $x + $t;
-		  $H[$n - 1][$n - 1] = $y + $t;
-		  $x = $H[$n][$n];
+		  $H[$n * $N + $n] = $x + $t;
+		  $H[($n - 1) * $N + ($n - 1)] = $y + $t;
+		  $x = $H[$n * $N + $n];
 
 		  if ($q >= 0)
 		    {
@@ -791,7 +630,7 @@ sub decompose
 		      $$e[$n - 1] = 0;
 		      $$e[$n] = 0;
 
-		      $x = $H[$n][$n - 1];
+		      $x = $H[$n * $N + ($n - 1)];
 		      $s = abs ($x) + abs ($z);
 		      $p = $x / $s;
 		      $q = $z / $s;
@@ -802,17 +641,17 @@ sub decompose
 		      # Row modification.
 		      for $j ($n - 1 .. $end)
 			{
-			  $z = $H[$n - 1][$j];
-			  $H[$n - 1][$j] = $q * $z + $p * $H[$n][$j];
-			  $H[$n][$j] = $q * $H[$n][$j] - $p * $z;
+			  $z = $H[($n - 1) * $N + $j];
+			  $H[($n - 1) * $N + $j] = $q * $z + $p * $H[$n * $N + $j];
+			  $H[$n * $N + $j] = $q * $H[$n * $N + $j] - $p * $z;
 			}
 
 		      # Column modification.
 		      for $i (0 .. $n)
 			{
-			  $z = $H[$i][$n - 1];
-			  $H[$i][$n - 1] = $q * $z + $p * $H[$i][$n];
-			  $H[$i][$n] = $q * $H[$i][$n] - $p * $z;
+			  $z = $H[$i * $N + ($n - 1)];
+			  $H[$i * $N + ($n - 1)] = $q * $z + $p * $H[$i * $N + $n];
+			  $H[$i * $N + $n] = $q * $H[$i * $N + $n] - $p * $z;
 			}
 
 		      # Accumulate transformations.
@@ -838,8 +677,8 @@ sub decompose
 	      else
 		{
 		  # Form shift.
-		  $y = $H[$n - 1][$n - 1];
-		  $w = $H[$n][$n - 1] * $H[$n - 1][$n];
+		  $y = $H[($n - 1) * $N + ($n - 1)];
+		  $w = $H[$n * $N + ($n - 1)] * $H[($n - 1) * $N + $n];
 
 		  # Wilkinson's original ad hoc shift.
 		  if ($iter == 10 || $iter == 20)
@@ -848,10 +687,10 @@ sub decompose
 
 		      for $i ($lo .. $n)
 			{
-			  $H[$i][$i] -= $x;
+			  $H[$i * $N + $i] -= $x;
 			}
 
-		      $s = abs ($H[$n][$n - 1]) + abs ($H[$n - 1][$n - 2]);
+		      $s = abs ($H[$n * $N + ($n - 1)]) + abs ($H[($n - 1) * $N + ($n - 2)]);
 		      $x = 0.75 * $s;
 		      $y = $x;
 		      $w = -0.4375 * $s * $s;
@@ -870,7 +709,7 @@ sub decompose
 
 			  for $i ($lo .. $n)
 			    {
-			      $H[$i][$i] -= $s;
+			      $H[$i * $N + $i] -= $s;
 			    }
 
 			  $t += $s;
@@ -884,25 +723,25 @@ sub decompose
 		  # Look for two consecutive small sub-diagonal elements.
 		  for ($m = $n - 2; $m >= $l; --$m)
 		    {
-		      $z = $H[$m][$m];
+		      $z = $H[$m * $N + $m];
 		      $r = $x - $z;
 		      $s = $y - $z;
-		      $p = ($r * $s - $w) / $H[$m + 1][$m] + $H[$m][$m + 1];
-		      $q = $H[$m + 1][$m + 1] - $z - $r - $s;
-		      $r = $H[$m + 2][$m + 1];
+		      $p = ($r * $s - $w) / $H[($m + 1) * $N + $m] + $H[$m * $N + ($m + 1)];
+		      $q = $H[($m + 1) * $N + ($m + 1)] - $z - $r - $s;
+		      $r = $H[($m + 2) * $N + ($m + 1)];
 		      $s = abs ($p) + abs ($q) + abs ($r);
 		      $p = $p / $s;
 		      $q = $q / $s;
 		      $r = $r / $s;
 
 		      last if $m == $l;
-		      last if abs ($H[$m][$m - 1]) * (abs ($q) + abs ($r)) < eps * (abs ($p) * (abs ($H[$m - 1][$m - 1]) + abs ($z) + abs ($H[$m + 1][$m + 1])));
+		      last if abs ($H[$m * $N + ($m - 1)]) * (abs ($q) + abs ($r)) < eps * (abs ($p) * (abs ($H[($m - 1) * $N + ($m - 1)]) + abs ($z) + abs ($H[($m + 1) * $N + ($m + 1)])));
 		    }
 
 		  for $i ($m + 2 .. $n)
 		    {
-		      $H[$i][$i - 2] = 0;
-		      $H[$i][$i - 3] = 0
+		      $H[$i * $N + ($i - 2)] = 0;
+		      $H[$i * $N + ($i - 3)] = 0
 			if $i > $m + 2;
 		    }
 
@@ -913,9 +752,9 @@ sub decompose
 
 		      if ($k != $m)
 			{
-			  $p = $H[$k][$k - 1];
-			  $q = $H[$k + 1][$k - 1];
-			  $r = $not_last ? $H[$k + 2][$k - 1] : 0;
+			  $p = $H[$k * $N + ($k - 1)];
+			  $q = $H[($k + 1) * $N + ($k - 1)];
+			  $r = $not_last ? $H[($k + 2) * $N + ($k - 1)] : 0;
 			  $x = abs ($p) + abs ($q) + abs ($r);
 
 			  next if $x == 0;
@@ -930,11 +769,11 @@ sub decompose
 			{
 			  if ($k != $m)
 			    {
-			      $H[$k][$k - 1] = 0 - $s * $x;
+			      $H[$k * $N + ($k - 1)] = 0 - $s * $x;
 			    }
 			  elsif ($l != $m)
 			    {
-			      $H[$k][$k - 1] = - $H[$k][$k - 1];
+			      $H[$k * $N + ($k - 1)] = - $H[$k * $N + ($k - 1)];
 			    }
 
 			  $p = $p + $s;
@@ -949,21 +788,21 @@ sub decompose
 			      # Row modification.
 			      for $j ($k .. $end)
 				{
-				  $p = $H[$k][$j] + $q * $H[$k + 1][$j] + $r * $H[$k + 2][$j];
+				  $p = $H[$k * $N + $j] + $q * $H[($k + 1) * $N + $j] + $r * $H[($k + 2) * $N + $j];
 
-				  $H[$k][$j] -= $p * $x;
-				  $H[$k + 1][$j] -= $p * $y;
-				  $H[$k + 2][$j] -= $p * $z;
+				  $H[$k * $N + $j] -= $p * $x;
+				  $H[($k + 1) * $N + $j] -= $p * $y;
+				  $H[($k + 2) * $N + $j] -= $p * $z;
 				}
 
 			      # Column modification.
 			      for $i (0 .. min ($n, $k + 3))
 				{
-				  $p = $x * $H[$i][$k] + $y * $H[$i][$k + 1] + $z * $H[$i][$k + 2];
+				  $p = $x * $H[$i * $N + $k] + $y * $H[$i * $N + ($k + 1)] + $z * $H[$i * $N + ($k + 2)];
 
-				  $H[$i][$k] -= $p;
-				  $H[$i][$k + 1] -= $p * $q;
-				  $H[$i][$k + 2] -= $p * $r;
+				  $H[$i * $N + $k] -= $p;
+				  $H[$i * $N + ($k + 1)] -= $p * $q;
+				  $H[$i * $N + ($k + 2)] -= $p * $r;
 				}
 
 			      # Accumulate transformations.
@@ -981,19 +820,19 @@ sub decompose
 			      # Row modification.
 			      for $j ($k .. $end)
 				{
-				  $p = $H[$k][$j] + $q * $H[$k + 1][$j];
+				  $p = $H[$k * $N + $j] + $q * $H[($k + 1) * $N + $j];
 
-				  $H[$k][$j] -= $p * $x;
-				  $H[$k + 1][$j] -= $p * $y;
+				  $H[$k * $N + $j] -= $p * $x;
+				  $H[($k + 1) * $N + $j] -= $p * $y;
 				}
 
 			      # Column modification.
 			      for $i (0 .. min ($n, $k + 3))
 				{
-				  $p = $x * $H[$i][$k] + $y * $H[$i][$k + 1];
+				  $p = $x * $H[$i * $N + $k] + $y * $H[$i * $N + ($k + 1)];
 
-				  $H[$i][$k] -= $p;
-				  $H[$i][$k + 1] -= $p * $q;
+				  $H[$i * $N + $k] -= $p;
+				  $H[$i * $N + ($k + 1)] -= $p * $q;
 				}
 
 			      # Accumulate transformations.
@@ -1022,16 +861,16 @@ sub decompose
 		{
 		  # Real vector.
 		  $m = $n;
-		  $H[$n][$n] = 1;
+		  $H[$n * $N + $n] = 1;
 
 		  for $i (reverse (0 .. $n - 1))
 		    {
-		      $w = $H[$i][$i] - $p;
+		      $w = $H[$i * $N + $i] - $p;
 		      $r = 0;
 
 		      for $j ($m .. $n)
 			{
-			  $r += $H[$i][$j] * $H[$j][$n];
+			  $r += $H[$i * $N + $j] * $H[$j * $N + $n];
 			}
 
 		      if ($$e[$i] < 0)
@@ -1045,31 +884,31 @@ sub decompose
 
 			  if ($$e[$i] == 0)
 			    {
-			      $H[$i][$n] = ($w != 0 ?
-					    0 - $r / $w :
-					    0 - $r / (eps * $norm));
+			      $H[$i * $N + $n] = ($w != 0 ?
+						  0 - $r / $w :
+						  0 - $r / (eps * $norm));
 			    }
 			  else
 			    {
 			      # Solve real equations.
-			      $x = $H[$i][$i + 1];
-			      $y = $H[$i + 1][$i];
+			      $x = $H[$i * $N + ($i + 1)];
+			      $y = $H[($i + 1) * $N + $i];
 			      $q = ($$d[$i] - $p) ** 2 + $$e[$i] ** 2;
 			      $t = ($x * $s - $z * $r) / $q;
 
-			      $H[$i][$n] = $t;
-			      $H[$i + 1][$n] = (abs ($x) > abs ($z) ?
+			      $H[$i * $N + $n] = $t;
+			      $H[($i + 1) * $N + $n] = (abs ($x) > abs ($z) ?
 						(0 - $r - $w * $t) / $x :
 						(0 - $s - $y * $t) / $z);
 			    }
 
 			  # Overflow control.
-			  $t = abs ($H[$i][$n]);
+			  $t = abs ($H[$i * $N + $n]);
 			  if ((eps * $t) * $t > 1)
 			    {
 			      for $j ($i .. $n)
 				{
-				  $H[$j][$n] /= $t;
+				  $H[$j * $N + $n] /= $t;
 				}
 			    }
 			}
@@ -1082,32 +921,32 @@ sub decompose
 
 		  # Last vector component chosen imaginary so that
 		  # eigenvector matrix is triangular.
-		  if (abs ($H[$n][$n - 1]) > abs ($H[$n - 1][$n]))
+		  if (abs ($H[$n * $N + ($n - 1)]) > abs ($H[($n - 1) * $N + $n]))
 		    {
-		      $H[$n - 1][$n - 1] = $q / $H[$n][$n - 1];
-		      $H[$n - 1][$n] = ($p - $H[$n][$n]) / $H[$n][$n - 1];
+		      $H[($n - 1) * $N + ($n - 1)] = $q / $H[$n * $N + ($n - 1)];
+		      $H[($n - 1) * $N + $n] = ($p - $H[$n * $N + $n]) / $H[$n * $N + ($n - 1)];
 		    }
 		  else
 		    {
-		      ($H[$n - 1][$n - 1], $H[$n - 1][$n])
-			= cdiv (0, - $H[$n - 1][$n],
-				$H[$n - 1][$n - 1] - $p, $q);
+		      ($H[($n - 1) * $N + ($n - 1)], $H[($n - 1) * $N + $n])
+			= cdiv (0, - $H[($n - 1) * $N + $n],
+				$H[($n - 1) * $N + ($n - 1)] - $p, $q);
 		    }
 
-		  $H[$n][$n - 1] = 0;
-		  $H[$n][$n] = 1;
+		  $H[$n * $N + ($n - 1)] = 0;
+		  $H[$n * $N + $n] = 1;
 
 		  for $i (reverse (0 .. $n - 2))
 		    {
-		      $w = $H[$i][$i] - $p;
+		      $w = $H[$i * $N + $i] - $p;
 
 		      $ra = 0;
 		      $sa = 0;
 
 		      for $j ($m .. $n)
 			{
-			  $ra += $H[$i][$j] * $H[$j][$n - 1];
-			  $sa += $H[$i][$j] * $H[$j][$n];
+			  $ra += $H[$i * $N + $j] * $H[$j * $N + ($n - 1)];
+			  $sa += $H[$i * $N + $j] * $H[$j * $N + $n];
 			}
 
 		      if ($$e[$i] < 0)
@@ -1122,14 +961,14 @@ sub decompose
 
 			  if ($$e[$i] == 0)
 			    {
-			      ($H[$i][$n - 1], $H[$i][$n])
+			      ($H[$i * $N + ($n - 1)], $H[$i * $N + $n])
 				= cdiv (- $ra, - $sa, $w, $q);
 			    }
 			  else
 			    {
 			      # Solve complex equations.
-			      $x = $H[$i][$i + 1];
-			      $y = $H[$i + 1][$i];
+			      $x = $H[$i * $N + ($i + 1)];
+			      $y = $H[($i + 1) * $N + $i];
 
 			      $vr = ($$d[$i] - $p) ** 2 + $$e[$i] ** 2 - $q ** 2;
 			      $vi = ($$d[$i] - $p) * 2 * $q;
@@ -1139,7 +978,7 @@ sub decompose
 				  $vr = eps * $norm * (abs ($w) + abs ($q) + abs ($x) + abs ($y) + abs ($z));
 				}
 
-			      ($H[$i][$n - 1], $H[$i][$n])
+			      ($H[$i * $N + ($n - 1)], $H[$i * $N + $n])
 				= cdiv ($x * $r - $z * $ra + $q * $sa,
 					$x * $s - $z * $sa - $q * $ra,
 					$vr,
@@ -1147,27 +986,27 @@ sub decompose
 
 			      if (abs ($x) > (abs ($z) + abs ($q)))
 				{
-				  $H[$i + 1][$n - 1] = (0 - $ra - $w * $H[$i][$n - 1] + $q * $H[$i][$n]) / $x;
-				  $H[$i + 1][$n] = (0 - $sa - $w * $H[$i][$n] - $q * $H[$i][$n - 1]) / $x;
+				  $H[($i + 1) * $N + ($n - 1)] = (0 - $ra - $w * $H[$i * $N + ($n - 1)] + $q * $H[$i * $N + $n]) / $x;
+				  $H[($i + 1) * $N + $n] = (0 - $sa - $w * $H[$i * $N + $n] - $q * $H[$i * $N + ($n - 1)]) / $x;
 				}
 			      else
 				{
-				  ($H[$i + 1][$n - 1], $H[$i + 1][$n])
-				    = cdiv (0 - $r - $y * $H[$i][$n - 1],
-					    0 - $s - $y * $H[$i][$n],
+				  ($H[($i + 1) * $N + ($n - 1)], $H[($i + 1) * $N + $n])
+				    = cdiv (0 - $r - $y * $H[$i * $N + ($n - 1)],
+					    0 - $s - $y * $H[$i * $N + $n],
 					    $z,
 					    $q);
 				}
 			    }
 
 			  # Overflow control.
-			  $t = max (abs ($H[$i][$n - 1]), abs ($H[$i][$n]));
+			  $t = max (abs ($H[$i * $N + ($n - 1)]), abs ($H[$i * $N + $n]));
 			  if ((eps * $t) * $t > 1)
 			    {
 			      for $j ($i .. $n)
 				{
-				  $H[$j][$n - 1] /= $t;
-				  $H[$j][$n] /= $t;
+				  $H[$j * $N + ($n - 1)] /= $t;
+				  $H[$j * $N + $n] /= $t;
 				}
 			    }
 			}
@@ -1182,7 +1021,7 @@ sub decompose
 		{
 		  for $j ($i .. $end)
 		    {
-		      $$Z[$j][$i] = $H[$i][$j];
+		      $$Z[$j][$i] = $H[$i * $N + $j];
 		    }
 		}
 	    }
@@ -1199,7 +1038,7 @@ sub decompose
 
 		  for $k ($lo .. $m)
 		    {
-		      $z += $$Z[$k][$i] * $H[$k][$j];
+		      $z += $$Z[$k][$i] * $H[$k * $N + $j];
 		    }
 
 		  $$Z[$j][$i] = $z;
@@ -1215,6 +1054,17 @@ sub decompose
       if ($prop{balance})
 	{
 	  my ($i, $j, $k);
+
+	  # Undo scaling.
+	  for $i ($lo .. $hi)
+	    {
+	      my $s = $scale[$i];
+
+	      for $j (0 .. $end)
+		{
+		  $$Z[$j][$i] *= $s;
+		}
+	    }
 
 	  # Undo permutations.
 	  for $i (reverse (0 .. $lo - 1))
@@ -1282,6 +1132,227 @@ sub decompose
 
   # Return object.
   $self;
+}
+
+# Balance a real matrix.
+#
+# See LAPACK procedure 'dgebal'.
+sub gebal ($$%)
+{
+  # Arguments.
+  my ($n, $a, %opt) = @_;
+
+  # Default options.
+  $opt{permute} //= 1;
+  $opt{scale} //= 1;
+  $opt{low} //= undef;
+  $opt{high} //= undef;
+
+  # Index of last row/column.
+  my $end = $n - 1;
+
+  # Row and column indices of the beginning and end
+  # of the principal sub-matrix.
+  my $k = 0;
+  my $l = $end;
+
+  # Permutation vector.
+  my @perm = (0 .. $end);
+
+  # Scaling vector.
+  my @scale = map (1, 0 .. $end);
+
+  if ($n > 1)
+    {
+      # Isolate eigenvalues.
+      if ($opt{permute})
+	{
+	  # Search for rows isolating an eigenvalue
+	  # and push them down.
+	L:
+	  {
+	    for my $j (reverse (0 .. $l))
+	      {
+		my $swap = 1;
+
+		for my $i (0 .. $l)
+		  {
+		    $swap = 0 if $i != $j && $$a[$j * $n + $i] != 0;
+		  }
+
+		next unless $swap;
+
+		if ($j != $l)
+		  {
+		    # Exchange row and column.
+		    @perm[$j, $l] = @perm[$l, $j];
+
+		    blas_swap ($l + 1, $a, $a,
+			       x_ind => $j,
+			       x_incr => $n,
+			       y_ind => $l,
+			       y_incr => $n);
+		    blas_swap ($n - $k, $a, $a,
+			       x_ind => $j * $n + $k,
+			       x_incr => 1,
+			       y_ind => $l * $n + $k,
+			       y_incr => 1);
+		  }
+
+		$l -= 1;
+		next L;
+	      }
+	  }
+
+	  # Search for columns isolating an eigenvalue
+	  # and push them left.
+	K:
+	  {
+	    for my $j ($k .. $l)
+	      {
+		my $swap = 1;
+
+		for my $i ($k .. $l)
+		  {
+		    $swap = 0 if $i != $j && $$a[$i * $n + $j] != 0;
+		  }
+
+		next unless $swap;
+
+		if ($j != $k)
+		  {
+		    # Exchange row and column.
+		    @perm[$j, $k] = @perm[$k, $j];
+
+		    blas_swap ($l + 1, $a, $a,
+			       x_ind => $j,
+			       x_incr => $n,
+			       y_ind => $k,
+			       y_incr => $n);
+		    blas_swap ($n - $k, $a, $a,
+			       x_ind => $j * $n + $k,
+			       x_incr => 1,
+			       y_ind => $k * $n + $k,
+			       y_incr => 1);
+		  }
+
+		$k += 1;
+		next K;
+	      }
+	  }
+	}
+
+      # Balance the sub-matrix in rows k to l.
+      if ($opt{scale})
+	{
+	  my ($b, $c, $ca, $f, $g, $r, $ra, $s, $no_conv,
+	      $sfmin1, $sfmax1, $sfmin2, $sfmax2);
+
+	  # Scale factors are powers of two.
+	  $b = 2;
+
+	  if (1)
+	    {
+	      my $base = 2;
+	      my $eps = DBL_EPSILON;
+	      my $small = 1 / DBL_MAX;
+	      # Safe minimum, such that 1/sfmin does not overflow.
+	      my $sfmin = ($small >= DBL_MIN ? $small * (1 + $eps) : DBL_MIN);
+
+	      $sfmin1 = $sfmin / ($eps * $base);
+	      $sfmax1 = 1 / $sfmin1;
+	      $sfmin2 = $sfmin1 * $b;
+	      $sfmax2 = 1 / $sfmin2;
+	    }
+
+	  # Iterative loop for norm reduction.
+	  while (1)
+	    {
+	      $no_conv = 0;
+
+	      for my $i ($k .. $l)
+		{
+		  $c = blas_norm ($l - $k + 1, $a,
+				  norm => BLAS_TWO_NORM,
+				  x_ind => $k * $n + $i,
+				  x_incr => $n);
+		  $r = blas_norm ($l - $k + 1, $a,
+				  norm => BLAS_TWO_NORM,
+				  x_ind => $i * $n + $k,
+				  x_incr => 1);
+		  (undef, $ca) = blas_amax_val ($l + 1, $a,
+						x_ind => $i,
+						x_incr => $n);
+		  (undef, $ra) = blas_amax_val ($n - $k, $a,
+						x_ind => $i * $n + $k,
+						x_incr => 1);
+
+		  # Guard against zero c or r due to underflow.
+		  next if $c == 0 || $r == 0;
+
+		  $s = $c + $r;
+		  $f = 1;
+
+		  $g = $r / $b;
+		  while ($c < $g
+			 && max ($f, max ($c, $ca)) < $sfmax2
+			 && min ($g, min ($r, $ra)) > $sfmin2)
+		    {
+		      croak ('Infinite loop')
+			if isnan ($f + $c + $ca + $g + $r + $ra);
+
+		      $f *= $b;
+		      $c *= $b;
+		      $ca *= $b;
+		      $g /= $b;
+		      $r /= $b;
+		      $ra /= $b;
+		    }
+
+		  $g = $c / $b;
+		  while ($g >= $r
+			 && max ($r, $ra) < $sfmax2
+			 && min ($g, min ($f, min ($c, $ca))) > $sfmin2)
+		    {
+		      $f /= $b;
+		      $c /= $b;
+		      $ca /= $b;
+		      $g /= $b;
+		      $r *= $b;
+		      $ra *= $b;
+		    }
+
+		  # Now balance.
+		  if (! (($c + $r) >= 0.95 * $s
+			 || ($f < 1 && $scale[$i] < 1 && $f * $scale[$i] <= $sfmin1)
+			 || ($f > 1 && $scale[$i] > 1 && $scale[$i] >= $sfmax1 / $f)))
+		    {
+		      blas_rscale ($n - $k, $a,
+				   alpha => $f,
+				   x_ind => $i * $n + $k,
+				   x_incr => 1);
+		      blas_scale ($l + 1, $a,
+				  alpha => $f,
+				  x_ind => $i,
+				  x_incr => $n);
+
+		      $scale[$i] *= $f;
+		      $no_conv = 1;
+		    }
+		}
+
+	      last unless $no_conv;
+	    }
+	}
+    }
+
+  ${$opt{low}} = $k
+    if ref ($opt{low});
+
+  ${$opt{high}} = $l
+    if ref ($opt{high});
+
+  return (\@perm, \@scale);
 }
 
 # Normalize eigenvectors.

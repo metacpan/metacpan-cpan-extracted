@@ -8,7 +8,7 @@ use Carp qw/croak/;
 use IO::File;
 use Fcntl;
 
-our $VERSION = '0.00006';
+our $VERSION = '0.00008';
 
 use constant I2C_SLAVE => 0x0703;
 

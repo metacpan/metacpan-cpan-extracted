@@ -8,7 +8,7 @@ use XML::LibXML;
 use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS $DEBUG);
 
 $DEBUG = 0;
-our $VERSION = '0.49';
+our $VERSION = '0.52';
 
 # We are exporting functions
 use base qw/Exporter/;
@@ -51,7 +51,7 @@ Net::SAML2::XML::Util - Net::SAML2::XML::Util - XML Util class
 
 =head1 VERSION
 
-version 0.49
+version 0.52
 
 =head1 SYNOPSIS
 
@@ -76,7 +76,7 @@ Chris Andrews  <chrisa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Chris Andrews and Others, see the git log.
+This software is copyright (c) 2022 by Chris Andrews and Others, see the git log.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

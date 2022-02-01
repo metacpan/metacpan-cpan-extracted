@@ -21,6 +21,18 @@ sub giblog { shift->{giblog} }
 
 sub config { shift->giblog->config }
 
+sub get_vars {
+  my ($self) = @_;
+
+  my $config = $self->giblog->config;
+  
+  return unless defined $config;
+  
+  my $vars = $config->{vars};
+  
+  return $vars;
+}
+
 sub home_dir { shift->giblog->home_dir };
 
 sub read_config {
@@ -234,13 +246,37 @@ sub copy_static_files_to_public {
     my $static_file = $self->rel_file("templates/static/$static_rel_file");
     my $public_file = $self->rel_file("public/$static_rel_file");
     
-    next unless -f $static_file;
+    # Check if the file is needed to be copied
+    my $do_copy;
+    # Don't copy directries. Copy only normal files.
+    if (-f $static_file) {
+      if (-f $public_file) {
+        # Don't copy files if file is latest
+        if (-s $static_file == -s $public_file && -M $static_file == -M $public_file) {
+          $do_copy = 0;
+        }
+        else {
+          $do_copy = 1;
+        }
+      }
+      else {
+        $do_copy = 1;
+      }
+    }
+    else {
+      $do_copy = 0;
+    }
+    next unless $do_copy;
 
     my $public_dir = dirname $public_file;
     mkpath $public_dir;
     
     copy $static_file, $public_file
       or confess "Can't copy $static_file to $public_file: $!";
+    
+    my $static_file_last_updated_time = (stat($static_file))[9];
+    utime $static_file_last_updated_time, $static_file_last_updated_time, $public_file;
+    
     my @stat = stat $static_file;
     my $permission = substr((sprintf "%03o", $stat[2]), -3);
     chmod oct($permission), $public_file
@@ -299,7 +335,7 @@ sub get_content {
   $data->{content} = $content;
 }
 
-my $inline_elements_re = qr/^<(span|em|strong|abbr|acronym|dfn|q|cite|sup|sub|code|var|kbd|samp|bdo|font|big|small|b|i|s|strike|u|tt|a|label|object|applet|iframe|button|textarea|select|basefont|img|br|input|map)\b/;
+my $inline_elements_re = qr/^<(span|em|strong|abbr|acronym|dfn|q|cite|sup|sub|code|var|kbd|samp|bdo|font|big|small|b|i|s|strike|u|tt|a|label|object|applet|iframe|button|textarea|select|basefont|img|br|input|map)\b/i;
 
 sub parse_giblog_syntax {
   my ($self, $data) = @_;
@@ -320,7 +356,7 @@ sub parse_giblog_syntax {
     my $original_line = $line;
     
     # Pre end
-    if ($line =~ m|^</pre\b|) {
+    if ($line =~ m|^</pre\b|i) {
       $pre_start = 0;
     }
     
@@ -349,7 +385,7 @@ sub parse_giblog_syntax {
     }
 
     # Pre start
-    if ($original_line =~ m|^<pre\b|) {
+    if ($original_line =~ m|^<pre\b|i) {
       $pre_start = 1
     }
   }
@@ -364,7 +400,7 @@ sub parse_title {
 
   my $content = $data->{content};
   
-  if ($content =~ m|class="title"[^>]*?>([^<]*?)<|) {
+  if ($content =~ m|class\s*=\s*"title"[^>]*?>([^<]*?)<|) {
     my $title = $1;
     $data->{title} = $title;
   }
@@ -399,7 +435,7 @@ sub add_base_path_to_content {
       my $original_line = $line;
       
       # Pre end
-      if ($line =~ m|^</pre\b|) {
+      if ($line =~ m|^</pre\b|i) {
         $pre_start = 0;
       }
       
@@ -419,7 +455,7 @@ sub add_base_path_to_content {
       }
       
       # Pre start
-      if ($original_line =~ m|^<pre\b|) {
+      if ($original_line =~ m|^<pre\b|i) {
         $pre_start = 1
       }
     }
@@ -499,7 +535,7 @@ sub parse_title_from_first_h_tag {
 
   my $content = $data->{content};
   
-  if ($content =~ m|<\s*h[1-6]\b[^>]*?>([^<]*?)<|) {
+  if ($content =~ m|<\s*h[1-6]\b[^>]*?>([^<]*?)<|i) {
     my $title = $1;
     $data->{title} = $title;
   }
@@ -563,9 +599,63 @@ sub add_page_link_to_first_h_tag {
     $path = "/$file";
   }
   
-  $content =~ s|(<\s*h[1-6]\b[^>]*?>)([^<]*?)<|$1<a href="$path">$2</a><|;
+  $content =~ s|(<\s*h[1-6]\b[^>]*?>)([^<]*?)<|$1<a href="$path">$2</a><|i;
 
   $data->{'content'} = $content;
+}
+
+sub add_content_after_first_p_tag {
+  my ($self, $data, $opt) = @_;
+  
+  $opt ||= {};
+  
+  my $content = $data->{content};
+  
+  my $added_content = $opt->{content};
+  
+  unless (defined $added_content) {
+    confess "\"content\" option is needed";
+  }
+  
+  # Add contents after first h1-6 tag
+  $data->{content} =~ s|</p>|</p>\n$added_content|i;
+}
+
+sub add_content_after_first_h_tag {
+  my ($self, $data, $opt) = @_;
+  
+  $opt ||= {};
+  
+  my $content = $data->{content};
+  
+  my $added_content = $opt->{content};
+  
+  unless (defined $added_content) {
+    confess "\"content\" option is needed";
+  }
+  
+  # Add contents after first h1-6 tag
+  $data->{content} =~ s|</h([1-6])>|</h$1>\n$added_content|i;
+}
+
+sub replace_vars {
+  my ($self, $data, $opt) = @_;
+  
+  $opt ||= {};
+
+  my $vars = $self->get_vars;
+  if ($vars) {
+    my @var_names = keys %$vars;
+    for my $var_name (@var_names) {
+      unless ($var_name =~ /^[a-zA-Z]\w*/a) {
+        confess "Variable name \"$var_name\" must be valid variable name";
+      }
+      
+      my $value = $vars->{$var_name};
+      
+      $data->{content} =~ s/\<\%\= *\$\Q$var_name\E *\%\>/$value/g;
+    }
+  }
 }
 
 sub parse_description {
@@ -597,7 +687,7 @@ sub parse_description_from_first_p_tag {
   my $content = $data->{content};
   
   # Create description from first p tag
-  if ($content =~ m|<\s?p\b[^>]*?>(.*?)<\s?/\s?p\s?>|s) {
+  if ($content =~ m|<\s?p\b[^>]*?>(.*?)<\s?/\s?p\s?>|si) {
     my $description = $1;
     
     # remove tag
@@ -839,6 +929,38 @@ Get Giblog config. This is hash reference.
 Config is loaded by C<read_config> method.
 
 If config is not loaded, this method return undef.
+
+=head2 get_vars
+
+  my $vars = $api->get_vars;
+
+Get a Giblog variables that are defined in C<giblog.conf>. This is hash reference.
+  
+  # giblog.conf
+  use strict;
+  use warnings;
+  use utf8;
+
+  {
+    site_title => 'mysite・',
+    site_url => 'http://somesite.example',
+    # Variables
+    vars => {
+      '$giblog_test_variable' => 'Giblog Test Variable',
+    },
+  }
+
+Before using this method, C<read_config> method must be called.
+
+If config is not loaded, this method return undef.
+
+If C<vars> option is not defined, this method return undef.
+
+B<Examples:>
+  
+  # Get a Giblog variable
+  my $vars = $api->get_vars;
+  my $giblog_test_variable = $vars->{'$giblog_test_variable'};
 
 =head2 home_dir
 
@@ -1220,6 +1342,127 @@ B<Example: root>
 Content is changed to
 
   <h1><a href="/">Perl Tutorial</a></h1>
+
+=head2 add_content_after_first_p_tag
+
+  $api->add_content_after_first_p_tag($data, $opt);
+
+Add contents after the first C<p> tag.
+
+B<INPUT:>
+
+  $data->{content}
+  $opt->{content}
+
+B<OUTPUT:>
+
+  $data->{content}
+
+$data->{content} is the current content. $opt->{content} is the added content.
+
+B<Example:>
+  
+  # Add contents after the first p tag.
+  $data->{content} = <<'EOS';
+  <h2>Perl Tutorial</h2>
+  <p>
+    Foo
+  </p>
+  <p>
+    Bar
+  </p>
+  EOS
+  $api->add_content_after_first_p_tag($data, {content => "<div>Added Contents</div>");
+  my $content = $data->{content};
+
+Content is changed to
+
+  <h2>Perl Tutorial</h2>
+  <p>
+    Foo
+  </p>
+  <div>Added Contents</div>
+  <p>
+    Bar
+  </p>
+
+=head2 add_content_after_first_h_tag
+
+  $api->add_content_after_first_h_tag($data, $opt);
+
+Add contents after the first C<h1>, C<h2>, C<h3>, C<h4>, C<h5>, C<h6> tag.
+
+B<INPUT:>
+
+  $data->{content}
+  $opt->{content}
+
+B<OUTPUT:>
+
+  $data->{content}
+
+$data->{content} is the current content. $opt->{content} is the added content.
+
+B<Example:>
+  
+  # Add contents after the first p tag.
+  $data->{content} = <<'EOS';
+  <h2>Perl Tutorial</h2>
+  <h3>Perl Tutorial</h3>
+  EOS
+  $api->add_content_after_first_h_tag($data, {content => "<div>Added Contents</div>");
+  my $content = $data->{content};
+
+Content is changed to
+
+  <h2>Perl Tutorial</h2>
+  <div>Added Contents</div>
+  <h3>Perl Tutorial</h3>
+
+=head2 replace_vars
+
+  $api->replace_vars($data);
+
+Replace a Giblog variables in the content with the values of C<vars> options that are defined in C<giblog.conf>.
+  
+  # giblog.conf
+  use strict;
+  use warnings;
+  use utf8;
+
+  {
+    site_title => 'mysite・',
+    site_url => 'http://somesite.example',
+    # Variables
+    vars => {
+      '$giblog_test_variable' => 'Giblog Test Variable',
+    },
+  }
+
+B<INPUT:>
+
+  $data->{content}
+
+B<OUTPUT:>
+
+  $data->{content}
+
+$data->{content} is the current content.
+
+B<Example:>
+  
+  # Replace a Giblog variables
+  $data->{content} = <<'EOS';
+  <p><%= $giblog_test_variable %></p>
+  <p><%= $giblog_test_variable %></p>
+  EOS
+  $api->replace_vars($data);
+  my $content = $data->{content};
+
+Content is changed to
+
+  <p>Giblog Test Variable</p>
+  <p>Giblog Test Variable</p>
 
 =head2 parse_description
 

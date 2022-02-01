@@ -16,8 +16,8 @@ use POSIX qw(fmod);
 
 BEGIN
 {
-  our $VERSION = '1.04';
-  our @EXPORT_OK = qw(eps mod min max sign hypot cdiv);
+  our $VERSION = '1.06';
+  our @EXPORT_OK = qw(eps isnan mod min max sign hypot cdiv);
   our %EXPORT_TAGS = (all => [@EXPORT_OK]);
 }
 
@@ -36,6 +36,14 @@ INIT
       last if $tem == 1.0;
       $epsilon /= 2.0;
     }
+}
+
+# Not-a-number.
+sub isnan ($)
+{
+  my $x = shift;
+
+  $x != $x;
 }
 
 # Remainder of floating-point division.
@@ -144,6 +152,11 @@ Nothing is exported by default.
 =item C<eps>
 
 Return the machine precision.
+
+
+=item C<isnan> (I<x>)
+
+Return true if I<x> is not-a-number.
 
 
 =item C<mod> (I<num>, I<den>)

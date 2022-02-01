@@ -61,7 +61,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '1.20';
+our $VERSION = '1.22';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -104,6 +104,10 @@ sub _PALEMOON_VERSION_EQUIV         { return 52 }            # very approx guess
 sub _MAX_VERSION_FOR_FTP_PROXY      { return 89 }
 sub _DEFAULT_UPDATE_TIMEOUT         { return 300 }           # 5 minutes
 sub _MIN_VERSION_NO_CHROME_CALLS    { return 94 }
+sub _MIN_VERSION_FOR_SCRIPT_SCRIPT  { return 31 }
+sub _MIN_VERSION_FOR_SCRIPT_WO_ARGS { return 60 }
+
+# sub _MAGIC_NUMBER_MOZL4Z            { return "mozLz40\0" }
 
 sub _WATERFOX_CURRENT_VERSION_EQUIV {
     return 68;
@@ -1003,6 +1007,7 @@ sub _import_profile_paths {
             my $read_handle = FileHandle->new( $path, Fcntl::O_RDONLY() )
               or Firefox::Marionette::Exception->throw(
                 "Failed to open '$path' for reading:$EXTENDED_OS_ERROR");
+            binmode $read_handle;
             if ( $self->_ssh() ) {
                 $self->_put_file_via_scp(
                     $read_handle,
@@ -1023,6 +1028,7 @@ sub _import_profile_paths {
                   or Firefox::Marionette::Exception->throw(
 "Failed to open '$write_path' for writing:$EXTENDED_OS_ERROR"
                   );
+                binmode $write_handle;
                 my $result;
                 while ( $result =
                     $read_handle->read( my $buffer, _LOCAL_READ_BUFFER_SIZE() )
@@ -1268,9 +1274,17 @@ sub _get_extra_parameters {
         {
             escape_char         => q[\\],
             allow_loose_escapes => 1,
-            eol                 => ",$INPUT_RECORD_SEPARATOR"
+            eol                 => ",$INPUT_RECORD_SEPARATOR",
         },                                                     # 1Password v7
     );
+    if ( $OSNAME eq 'MSWin32' or $OSNAME eq 'cygwin' ) {
+        push @extra_parameter_sets,
+          {
+            escape_char         => q[\\],
+            allow_loose_escapes => 1,
+            eol                 => ",\r\n",
+          }                                                    # 1Password v7
+    }
     my $extra_parameters = {};
   SET: foreach my $parameter_set (@extra_parameter_sets) {
         seek $import_handle, Fcntl::SEEK_SET(), 0
@@ -1433,6 +1447,10 @@ sub _binary_directory {
 
             }
             elsif ( $self->_remote_uname() eq 'cygwin' ) {
+                my ( $volume, $directories ) =
+                  File::Spec::Unix->splitpath($binary);
+                $binary_directory =
+                  File::Spec::Unix->catdir( $volume, $directories );
             }
             else {
                 my $remote_path_to_binary =
@@ -1463,6 +1481,11 @@ sub _binary_directory {
                     }
                 }
             }
+        }
+        elsif ( $OSNAME eq 'cygwin' ) {
+            my ( $volume, $directories ) = File::Spec::Unix->splitpath($binary);
+            $binary_directory =
+              File::Spec::Unix->catdir( $volume, $directories );
         }
         else {
             my ( $volume, $directories ) = File::Spec->splitpath($binary);
@@ -2295,11 +2318,13 @@ sub _setup_arguments {
     push @arguments, $self->_check_addons(%parameters);
     push @arguments, $self->_check_visible(%parameters);
     if ( $parameters{restart} ) {
+        my $profile_directory = $self->{_profile_directory};
+        if ( $OSNAME eq 'cygwin' ) {
+            $profile_directory =
+              $self->execute( 'cygpath', '-s', '-m', $profile_directory );
+        }
         push @arguments,
-          (
-            '-profile',    $self->{_profile_directory},
-            '--no-remote', '--new-instance'
-          );
+          ( '-profile', $profile_directory, '--no-remote', '--new-instance' );
     }
     elsif ( $parameters{profile_name} ) {
         $self->{profile_name} = $parameters{profile_name};
@@ -2324,39 +2349,7 @@ sub _setup_arguments {
             $profile_directory =
               $self->execute( 'cygpath', '-s', '-m', $profile_directory );
         }
-        my $mime_types_content = <<'_RDF_';
-<?xml version="1.0"?>
-<RDF:RDF xmlns:NC="http://home.netscape.com/NC-rdf#"
-         xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-  <RDF:Seq RDF:about="urn:mimetypes:root">
-_RDF_
-        foreach my $mime_type ( @{ $self->{mime_types} } ) {
-            $mime_types_content .= <<'_RDF_';
-    <RDF:li RDF:resource="urn:mimetype:$mime_type"/>
-_RDF_
-        }
-        $mime_types_content .= <<'_RDF_';
-  </RDF:Seq>
-  <RDF:Description RDF:about="urn:root"
-                   NC:en-US_defaultHandlersVersion="4" />
-  <RDF:Description RDF:about="urn:mimetypes">
-    <NC:MIME-types RDF:resource="urn:mimetypes:root"/>
-  </RDF:Description>
-_RDF_
-        foreach my $mime_type ( @{ $self->{mime_types} } ) {
-            $mime_types_content .= <<'_RDF_';
-  <RDF:Description RDF:about="urn:mimetype:handler:$mime_type"
-                   NC:saveToDisk="true"
-                   NC:alwaysAsk="false" />
-  <RDF:Description RDF:about="urn:mimetype:$mime_type"
-                   NC:value="$mime_type">
-    <NC:handlerProp RDF:resource="urn:mimetype:handler:$mime_type"/>
-  </RDF:Description>
-_RDF_
-        }
-        $mime_types_content .= <<'_RDF_';
-</RDF:RDF>
-_RDF_
+        my $mime_types_content = $self->_mime_types_content();
         if ( $self->_ssh() ) {
             $self->_write_mime_types_via_ssh($mime_types_content);
         }
@@ -2387,6 +2380,44 @@ _RDF_
         push @arguments, '--kiosk';
     }
     return @arguments;
+}
+
+sub _mime_types_content {
+    my ($self) = @_;
+    my $mime_types_content = <<'_RDF_';
+<?xml version="1.0"?>
+<RDF:RDF xmlns:NC="http://home.netscape.com/NC-rdf#"
+         xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <RDF:Seq RDF:about="urn:mimetypes:root">
+_RDF_
+    foreach my $mime_type ( @{ $self->{mime_types} } ) {
+        $mime_types_content .= <<'_RDF_';
+    <RDF:li RDF:resource="urn:mimetype:$mime_type"/>
+_RDF_
+    }
+    $mime_types_content .= <<'_RDF_';
+  </RDF:Seq>
+  <RDF:Description RDF:about="urn:root"
+                   NC:en-US_defaultHandlersVersion="4" />
+  <RDF:Description RDF:about="urn:mimetypes">
+    <NC:MIME-types RDF:resource="urn:mimetypes:root"/>
+  </RDF:Description>
+_RDF_
+    foreach my $mime_type ( @{ $self->{mime_types} } ) {
+        $mime_types_content .= <<'_RDF_';
+  <RDF:Description RDF:about="urn:mimetype:handler:$mime_type"
+                   NC:saveToDisk="true"
+                   NC:alwaysAsk="false" />
+  <RDF:Description RDF:about="urn:mimetype:$mime_type"
+                   NC:value="$mime_type">
+    <NC:handlerProp RDF:resource="urn:mimetype:handler:$mime_type"/>
+  </RDF:Description>
+_RDF_
+    }
+    $mime_types_content .= <<'_RDF_';
+</RDF:RDF>
+_RDF_
+    return $mime_types_content;
 }
 
 sub _write_mime_types_via_ssh {
@@ -2433,6 +2464,36 @@ sub _is_firefox_major_version_at_least {
 sub _is_xvfb_okay {
     my ($self) = @_;
     if ( $self->_is_firefox_major_version_at_least( _MIN_VERSION_FOR_XVFB() ) )
+    {
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
+
+sub _is_script_missing_args_okay {
+    my ($self) = @_;
+    if (
+        $self->_is_firefox_major_version_at_least(
+            _MIN_VERSION_FOR_SCRIPT_WO_ARGS()
+        )
+      )
+    {
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
+
+sub _is_script_script_parameter_okay {
+    my ($self) = @_;
+    if (
+        $self->_is_firefox_major_version_at_least(
+            _MIN_VERSION_FOR_SCRIPT_SCRIPT()
+        )
+      )
     {
         return 1;
     }
@@ -3063,6 +3124,7 @@ sub _launch {
     foreach my $argument (@arguments) {
         push @{ $self->{_initial_arguments} }, $argument;
     }
+    local $ENV{XPCSHELL_TEST_PROFILE_DIR} = 1;
     if ( $self->_ssh() ) {
         $self->{_local_ssh_pid} = $self->_launch_via_ssh(@arguments);
         $self->_wait_for_updating_to_finish();
@@ -3941,7 +4003,7 @@ sub _get_local_binary {
     elsif ( $OSNAME eq 'cygwin' ) {
         my $cygwin_binary = $self->_get_binary_from_cygwin_registry();
         if ( defined $cygwin_binary ) {
-            $binary = $self->execute( 'cygpath', '-s', '-m', $cygwin_binary );
+            $binary = $self->execute( 'cygpath', '-u', $cygwin_binary );
         }
     }
     return $binary;
@@ -4747,6 +4809,8 @@ sub _setup_new_profile {
             $profile = Firefox::Marionette::Profile->new(%profile_parameters);
         }
         my $download_directory = $self->{_download_directory};
+        my $bookmarks_path     = $self->_setup_empty_bookmarks();
+        $self->_setup_search_json_mozlz4();
         if (   ( $self->_remote_uname() )
             && ( $self->_remote_uname() eq 'cygwin' ) )
         {
@@ -4754,9 +4818,12 @@ sub _setup_new_profile {
               $self->_execute_via_ssh( {}, 'cygpath', '-s', '-w',
                 $download_directory );
             chomp $download_directory;
+            $bookmarks_path =
+              $self->_execute_via_ssh( {}, 'cygpath', '-s', '-w',
+                $bookmarks_path );
+            chomp $bookmarks_path;
         }
         $profile->download_directory($download_directory);
-        my $bookmarks_path = $self->_setup_empty_bookmarks();
         $profile->set_value( 'browser.bookmarks.file', $bookmarks_path, 1 );
         if (
             !$self->_is_firefox_major_version_at_least(
@@ -4787,7 +4854,7 @@ sub _setup_new_profile {
             $profile->set_value( 'dom.push.serverURL',
                 q[http://localhost:] . $port, 1 );
             $profile->set_value( 'services.settings.server',
-                q[http://localhost:] . $port, 1 );
+                q[http://localhost:] . $port . q[/v1/], 1 );
             $profile->set_value( 'browser.safebrowsing.gethashURL',
                 q[http://localhost:] . $port, 1 );
             $profile->set_value( 'browser.safebrowsing.keyURL',
@@ -4861,11 +4928,26 @@ sub _get_local_port_for_profile_urls {
     return $port;
 }
 
-sub _setup_empty_bookmarks {
+sub _setup_search_json_mozlz4 {
     my ($self)            = @_;
-    my $now               = time;
     my $profile_directory = $self->{_profile_directory};
-    my $content           = <<"_HTML_";
+    my $uncompressed      = <<"_JSON_";
+{"version":6,"engines":[{"_name":"DuckDuckGo","_isAppProvided":true,"_metaData":{}}],"metaData":{"useSavedOrder":false}}
+_JSON_
+    chomp $uncompressed;
+
+#   my $content = _MAGIC_NUMBER_MOZL4Z() . Compress::LZ4::compress($uncompressed);
+    my $content = MIME::Base64::decode_base64(
+'bW96THo0MAB4AAAA8Bd7InZlcnNpb24iOjYsImVuZ2luZXMiOlt7Il9uYW1lIjoiRHVjawQA9x1HbyIsIl9pc0FwcFByb3ZpZGVkIjp0cnVlLCJfbWV0YURhdGEiOnt9fV0sIhAA8AgidXNlU2F2ZWRPcmRlciI6ZmFsc2V9fQ=='
+    );
+    return $self->_copy_content_to_profile_directory( $content,
+        'search.json.mozlz4' );
+}
+
+sub _setup_empty_bookmarks {
+    my ($self)  = @_;
+    my $now     = time;
+    my $content = <<"_HTML_";
 <!DOCTYPE NETSCAPE-Bookmark-file-1>
 <!-- This is an automatically generated file.
      It will be read and overwritten.
@@ -4883,6 +4965,13 @@ sub _setup_empty_bookmarks {
     </DL><p>
 </DL>
 _HTML_
+    return $self->_copy_content_to_profile_directory( $content,
+        'bookmarks.html' );
+}
+
+sub _copy_content_to_profile_directory {
+    my ( $self, $content, $name ) = @_;
+    my $profile_directory = $self->{_profile_directory};
     my $path;
     if ( $self->_ssh() ) {
         my $handle = File::Temp::tempfile(
@@ -4899,15 +4988,15 @@ _HTML_
         seek $handle, 0, Fcntl::SEEK_SET()
           or Firefox::Marionette::Exception->throw(
             "Failed to seek to start of temporary file:$EXTENDED_OS_ERROR");
-        $path = $self->_remote_catfile( $profile_directory, 'bookmarks.html' );
-        $self->_put_file_via_scp( $handle, $path, 'bookmarks.html' );
+        $path = $self->_remote_catfile( $profile_directory, $name );
+        $self->_put_file_via_scp( $handle, $path, $name );
         if ( $self->_remote_uname() eq 'cygwin' ) {
             $path = $self->_execute_via_ssh( {}, 'cygpath', '-l', '-w', $path );
             chomp $path;
         }
     }
     else {
-        $path = File::Spec->catfile( $profile_directory, 'bookmarks.html' );
+        $path = File::Spec->catfile( $profile_directory, $name );
         my $handle =
           FileHandle->new( $path,
             Fcntl::O_CREAT() | Fcntl::O_EXCL() | Fcntl::O_WRONLY() )
@@ -4919,6 +5008,10 @@ _HTML_
         $handle->close()
           or Firefox::Marionette::Exception->throw(
             "Failed to close '$path':$EXTENDED_OS_ERROR");
+        if ( $OSNAME eq 'cygwin' ) {
+            $path = $self->execute( 'cygpath', '-s', '-w', $path );
+            chomp $path;
+        }
     }
     return $path;
 }
@@ -8057,14 +8150,12 @@ sub accept_connections {
 
 sub async_script {
     my ( $self, $script, %parameters ) = @_;
-    delete $parameters{script};
-    $parameters{args} ||= [];
+    %parameters = $self->_script_parameters( %parameters, script => $script );
     my $message_id = $self->_new_message_id();
     $self->_send_request(
         [
             _COMMAND(), $message_id,
-            $self->_command('WebDriver:ExecuteAsyncScript'),
-            { script => $script, %parameters }
+            $self->_command('WebDriver:ExecuteAsyncScript'), {%parameters}
         ]
     );
     return $self;
@@ -8091,9 +8182,11 @@ sub loaded {
 
 sub _script_parameters {
     my ( $self, %parameters ) = @_;
-    delete $parameters{script};
-    $parameters{args} ||= [];
-    if ( ( !ref $parameters{args} ) or ( ref $parameters{args} ne 'ARRAY' ) ) {
+    my $script = delete $parameters{script};
+    if ( !$self->_is_script_missing_args_okay() ) {
+        $parameters{args} ||= [];
+    }
+    if ( ( $parameters{args} ) && ( ref $parameters{args} ne 'ARRAY' ) ) {
         $parameters{args} = [ $parameters{args} ];
     }
     my %mapping = (
@@ -8117,18 +8210,23 @@ sub _script_parameters {
             $parameters{$key} = $parameters{$key} ? \1 : \0;
         }
     }
+    $parameters{script} = $script;
+    if ( $self->_is_script_script_parameter_okay() ) {
+    }
+    else {
+        $parameters{value} = $parameters{script};
+    }
     return %parameters;
 }
 
 sub script {
     my ( $self, $script, %parameters ) = @_;
-    %parameters = $self->_script_parameters(%parameters);
+    %parameters = $self->_script_parameters( %parameters, script => $script );
     my $message_id = $self->_new_message_id();
     $self->_send_request(
         [
             _COMMAND(), $message_id,
-            $self->_command('WebDriver:ExecuteScript'),
-            { script => $script, value => $script, %parameters }
+            $self->_command('WebDriver:ExecuteScript'), {%parameters}
         ]
     );
     my $response = $self->_get_response($message_id);
@@ -8169,6 +8267,18 @@ sub _get_any_class_from_variable {
             && ( defined $class ) )
         {
             return $class;
+        }
+        else {
+            foreach my $key ( sort { $a cmp $b } keys %{$object} ) {
+                $object->{$key} = $self->_check_for_and_translate_into_objects(
+                    $object->{$key} );
+            }
+        }
+    }
+    else {
+        foreach my $key ( sort { $a cmp $b } keys %{$object} ) {
+            $object->{$key} =
+              $self->_check_for_and_translate_into_objects( $object->{$key} );
         }
     }
     return;
@@ -8685,8 +8795,11 @@ sub _send_request {
     my ( $self, $object ) = @_;
     $object = $self->_convert_request_to_old_protocols($object);
     my $encoder = JSON->new()->convert_blessed()->ascii();
-    my $json    = $encoder->encode($object);
-    my $length  = length $json;
+    if ( $self->debug() ) {
+        $encoder->canonical(1);
+    }
+    my $json   = $encoder->encode($object);
+    my $length = length $json;
     if ( $self->debug() ) {
         warn ">> $length:$json\n";
     }
@@ -8870,7 +8983,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 1.20
+Version 1.22
 
 =head1 SYNOPSIS
 

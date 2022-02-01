@@ -1,5 +1,16 @@
 Revision history for Sentry-SDK
 
+
+v1.0.13  2022-01-31 14:35:09 CET
+
+  - Fixed several runtime errors.
+  - The plugins for `Mojolicious` and `CGI::Application` have been fixed to correctly include the following request information in the Sentry event: URL, method, query parameters, header and environment variables.
+  - Support the `$SENTRY_DEBUG` environment variable
+
+v1.0.12  2022-01-31 10:25:48 CET
+
+  - Fix: do not send send events w/ no DSN
+
 v1.0.11  2022-01-28 09:50:38 CET
 
   - Fixed bugs in the `Mojolicious::Plugin::SentrySDK` integration

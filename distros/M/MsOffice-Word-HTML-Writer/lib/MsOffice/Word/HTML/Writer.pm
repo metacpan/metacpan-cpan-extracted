@@ -10,7 +10,7 @@ use Carp;
 use Params::Validate  qw/validate SCALAR HASHREF/;
 use Scalar::Util      qw/looks_like_number/;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 sub new {
   my $class = shift;
@@ -189,7 +189,7 @@ sub content {
     }
     else {
       $encoding = 'base64';
-      $encoded  = encode_base64(encode_utf8($content));
+      $encoded  = encode_base64($content);
     }
 
     $mime .= qq{--$boundary\n}

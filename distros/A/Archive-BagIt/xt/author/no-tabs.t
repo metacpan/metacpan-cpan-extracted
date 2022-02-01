@@ -9,7 +9,6 @@ use Test::NoTabs;
 my @files = (
     'lib/Archive/BagIt.pm',
     'lib/Archive/BagIt/Base.pm',
-    'lib/Archive/BagIt/Fast.pm',
     'lib/Archive/BagIt/Plugin/Algorithm/MD5.pm',
     'lib/Archive/BagIt/Plugin/Algorithm/SHA512.pm',
     'lib/Archive/BagIt/Plugin/Manifest/MD5.pm',
@@ -25,7 +24,6 @@ my @files = (
     't/00-load.t',
     't/access_bag.t',
     't/base.t',
-    't/fast.t',
     't/internal.t',
     't/manifest.t',
     't/payload_files.t',

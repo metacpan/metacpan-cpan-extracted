@@ -10,7 +10,7 @@ use Pod::Usage 'pod2usage';
 use List::Util 'min';
 use File::Spec;
 
-our $VERSION = '2.0';
+our $VERSION = '3.00';
 
 sub new {
   my $class = shift;
@@ -45,10 +45,10 @@ sub run_command {
 
   # Command line option
   local @ARGV = @argv;
-  my $getopt_option_save = Getopt::Long::Configure(qw(default no_auto_abbrev no_ignore_case));
+  my $getopt_option_save = Getopt::Long::Configure(qw(default no_auto_abbrev no_ignore_case pass_through));
   GetOptions(
     "h|help" => \my $help,
-    "H|home=s" => \my $home_dir,
+    "H|C|home=s" => \my $home_dir,
   );
   Getopt::Long::Configure($getopt_option_save);
 
@@ -150,7 +150,7 @@ sub serve {
 
 =head1 NAME
 
-Giblog - Web site and Blog builders you can manage with Git
+Giblog - Create Websites and Blogs that can be managed with Git
 
 =begin html
 
@@ -161,7 +161,7 @@ Giblog - Web site and Blog builders you can manage with Git
   <a href="https://new-website-example.giblog.net/"><img src="https://github.com/yuki-kimoto/giblog/raw/master/images/giblog-website.png"></a>
 </p>
 <p>
-  <a href="https://new-website-example.giblog.net/">Website Example</a>
+  <a href="https://new-website-example.giblog.net/">A Website Example</a>
 </p>
 <p>
   <b>Blog</b>
@@ -170,24 +170,24 @@ Giblog - Web site and Blog builders you can manage with Git
   <a href="https://new-blog-example.giblog.net/"><img src="https://github.com/yuki-kimoto/giblog/raw/master/images/giblog-blog.png"></a>
 </p>
 <p>
-  <a href="https://new-blog-example.giblog.net/">Blog Example</a>
+  <a href="https://new-blog-example.giblog.net/">A Blog Example</a>
 </p>
 
 =end html
 
 =head1 DESCRIPTION
 
-Giblog is a utility to create your web site or blog.
-You can create your web site or blog using C<giblog> command.
-All created files is static files, so you can manage them using B<git>.
-You can freely customize your website by editting the C<build> command.
+Giblog is a utility to create websites or blogs.
+You can create websites or blogs using C<giblog> command.
+All created files is static files. You can manage them using B<git>.
+You can customize websites using C<Perl>.
 
 =head1 SYNOPSYS
   
-  # New empty web site
+  # New empty website
   $ giblog new mysite
 
-  # New web site
+  # New website
   $ giblog new_website mysite
 
   # New blog
@@ -199,20 +199,29 @@ You can freely customize your website by editting the C<build> command.
   # Add new entry
   $ giblog add
 
-  # Build web site
+  # Add new entry with home directory
+  $ giblog add -C /home/perlclub/mysite
+
+  # Build website
   $ giblog build
   
-  # Serve a web site
+  # Build website with home directory
+  $ giblog build -C /home/perlclub/mysite
+
+  # Serve a website
   $ giblog serve
 
-  # Publish web site
+  # Save a website
+  $ giblog save -m "Commit Messages" origin main
+
+  # Publish website
   $ giblog publish origin main
 
-  # Add new entry with home directory
-  $ giblog add --home /home/kimoto/mysite
-
-  # Build web site with home directory
-  $ giblog build --home /home/kimoto/mysite
+  # Deploy a website
+  $ giblog deploy
+  
+  # Do "giblog build", "giblog save", "giblog publish", "giblog deploy" at once
+  $ giblog all -m "Commit Messages" origin main
 
 =head1 FEATURES
 
@@ -220,19 +229,19 @@ Giblog have the following features.
 
 =over 4
 
-=item * Build Website and Blog.
+=item * Build websites and blogs.
 
-=item * Git mangement. All created files is Static. you can manage files by git.
+=item * All created files is static files. You can manage files using git.
 
-=item * Linux, macOS, Windows Support. (In Windows, recommend installation of msys2)
+=item * Linux, macOS, Windows Support. (Windows needs msys2 or WSL2)
 
-=item * Provide default CSS for Smart phone site.
+=item * CSS supports smart phone.
 
-=item * Header, Hooter and Side bar support
+=item * Header, hooter and side bar support
 
-=item * You can customize Top and Bottom section of content.
+=item * Customize top and bottom section of content.
 
-=item * You can customize HTML head.
+=item * Customize HTML head.
 
 =item * Automatical Line break. p tag is automatically added.
 
@@ -242,9 +251,9 @@ Giblog have the following features.
 
 =item * Description meta tag is automatically added from first p tag.
 
-=item * You can customize your web site by Perl.
+=item * You can customize your website by Perl.
 
-=item * You can serve your web site in local environment. Contents changes is detected and build automatically(need L<Mojolicious>).
+=item * You can serve your website in local environment. Contents changes is detected and build automatically(need L<Mojolicious>).
 
 =item * Fast. Build 645 pages by 0.78 seconds in starndard linux environment.
 
@@ -254,20 +263,20 @@ Giblog have the following features.
 
 =head1 TUTORIAL
 
-=head2 Create web site
+=head2 Create Websites
 
-B<1. Create Empty website>
+=head3 Create a Empty website
 
-"new" command create empty website. "mysite" is a name of your web site.
+L<giblog new|Giblog::Command::new> command create empty website. "mysite" is a name of your website.
 
   giblog new mysite
 
 If you want to create empty site, choice this command.
 Templates and CSS is empty and provide minimal site building process.
 
-B<2. Create Website>
+=head3 Create a Website
 
-"new_website" command create simple website.  "mysite" is a name of your web site.
+L<giblog new_website|Giblog::Command::new_website> command create simple website.  "mysite" is a name of your website.
 
   giblog new_website mysite
 
@@ -277,9 +286,9 @@ List page "templates/list.html" is created, which is prepare to create blog entr
 
 CSS is responsive design and supports smart phone and provide basic site building process.
 
-B<3. Create Blog>
+=head3 Create a Blog
 
-"new_blog" command create empty website.  "mysite" is a name of your web site.
+L<giblog new_blog|Giblog::Command::new_blog> command create empty website.  "mysite" is a name of your website.
 
   giblog new_blog mysite
 
@@ -289,15 +298,13 @@ List page "templates/list.html" is created, which show all entries links.
 
 CSS is responsive design and supports smart phone and provide basic blog building process.
 
-=head2 Add blog entry page
+=head2 Add a Blog Page
 
-You need to change directory to "mysite" before run "add" command if you are in other directory.
-
-  cd mysite
-
-"add" command add entry page.
+L<giblog add|Giblog::Command::add> command add entry page.
 
   giblog add
+
+You need to change the directory created by L<giblog new|Giblog::Command::new>, L<giblog new_website|Giblog::Command::new_website>, or L<giblog new_blog|Giblog::Command::new_blog> before
 
 Created file name is, for example,
 
@@ -313,7 +320,7 @@ To write new entry, You open it, write h2 head and content.
 
 Other parts wrapping content like Header and footer is automatically added in building process.
 
-=head2 Add content page
+=head2 Add a Content Page
 
 If you want to create content page, put file into "templates" directory.
 
@@ -339,7 +346,7 @@ Don't push content page files into these directories.
   templates/static
   templates/common
 
-=head2 Add static page
+=head2 Add Satic files
 
 If you want to add static files like css, images, JavaScript, You put these file into "templates/static" directory.
 
@@ -349,7 +356,7 @@ Files in "templates/static" directory is only copied to public files by build pr
   templates/static/images/logo.png
   templates/static/css/more.css
 
-=head2 Customize header or footer, side bar, top of content, bottom of content
+=head2 Customize Header or Footer, Side bar, Top of Content, Bottom of Content
 
 You can customize header, footer, side bar, top of content, bottom of content.
 
@@ -375,7 +382,7 @@ If you want to edit these section, you edit these files.
   templates/common/bottom.html     Bottom of content
   templates/common/footer.html     Footer
 
-=head2 Customize HTML header
+=head2 Customize HTML Header
 
 You can customize HTML header.
 
@@ -392,23 +399,90 @@ If you want to edit HTML header, you edit the following file.
 
   templates/common/meta.html
 
-=head2 Build web site
+=head2 Giblog Variables
 
-You need to change directory to "mysite" before run "build" command if you are in other directory.
+Explains Giblog variables.
 
-  cd mysite
+=head3 Define Giblog Variables
 
-"build" command build web site.
+You can define Giblog variable in C<giblog.conf>.
+
+  # giblog.conf
+  use strict;
+  use warnings;
+  use utf8;
+
+  {
+    site_title => 'mysite',
+    site_url => 'http://somesite.example',
+    
+    # Variables
+    vars => {
+      giblog_test_variable => 'Giblog Test Variable',
+    },
+  }
+
+C<vars> defines Giblog variables in C<giblog.conf>.
+
+=head3 Use Giblog Variables
+
+Use Giblog variables in templtes files.
+
+  <%= $GIBLOG_VARIABLE_NAME %>
+
+B<Examples:>
+
+C<giblog.conf>
+
+  # giblog.conf
+  use strict;
+  use warnings;
+  use utf8;
+
+  {
+    site_title => 'mysite',
+    site_url => 'http://somesite.example',
+    
+    # Variables
+    vars => {
+      giblog_test_variable => 'Giblog Test Variable',
+      google_analytics_id => 'G-EIFHDUGHF45',
+    },
+  }
+
+C<templates/common/meta.html>
+ 
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0">
+  <link rel="shortcut icon" href="/images/logo.png">
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=<%= $google_analytics_id %>"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', '<%= $google_analytics_id %>');
+  </script>
+
+=head2 Build a Website
+
+Build a website using L<giblog build|Giblog::Command::build> command.
 
   giblog build
 
-What is build process?
+You need to change the directory created by L<giblog new|Giblog::Command::new>, L<giblog new_website|Giblog::Command::new_website>, or L<giblog new_blog|Giblog::Command::new_blog> before executing "giblog build" command.
 
-build process is writen in "lib/Giblog/Command/build.pm".
+L<giblog build|Giblog::Command::build> command execute C<run> method of C<Giblog::Command::build> module.
 
-"build" command only execute "run" method in "Giblog::Command::build.pm" .
+C<Giblog::Command::build> module exists in C<lib/Giblog/Command/build.pm>.
 
-  # "lib/Giblog/Command/build.pm" in web site created by "new_blog" command
+C<Giblog::Command::build> module is automatically created.
+
+See C<Giblog::Command::build> module.
+
+  # "lib/Giblog/Command/build.pm" in website created by "new_blog" command
   package Giblog::Command::build;
 
   use base 'Giblog::Command';
@@ -433,6 +507,9 @@ build process is writen in "lib/Giblog/Command/build.pm".
     # Get files in templates directory
     my $files = $api->get_templates_files;
 
+    # Add base path to public css files
+    $api->add_base_path_to_public_css_files;
+
     for my $file (@$files) {
       # Data
       my $data = {file => $file};
@@ -448,7 +525,7 @@ build process is writen in "lib/Giblog/Command/build.pm".
 
       # Edit title
       my $site_title = $config->{site_title};
-      if ($data->{file} eq 'index.html') {
+      if ($data->{file} eq 'index.html' || !defined $data->{title}) {
         $data->{title} = $site_title;
       }
       else {
@@ -476,6 +553,12 @@ build process is writen in "lib/Giblog/Command/build.pm".
       # Build whole html
       $api->build_html($data);
 
+      # Replace Giblog variables
+      $api->replace_vars($data);
+      
+      # Add base path to content
+      $api->add_base_path_to_content($data);
+
       # Write to public file
       $api->write_to_public_file($data);
     }
@@ -487,45 +570,111 @@ build process is writen in "lib/Giblog/Command/build.pm".
     $self->create_list;
   }
 
-You can customize build process if you need.
+You can customize build process using L<Giblog::API> and any Perl programs.
 
-If you need to know Giblog API, see L<Giblog::API>.
+L<Giblog::API> is a usuful APIs to customize websites.
 
-=head2 Serve web site
+=head2 Serve a Website
 
-You can serve web site by C<serve> command.
+You can serve a website by L<giblog serve|Giblog::Command::serve> command.
 
-   # Serve web site
+   # Serve website
    giblog serve
 
 You see the following message.
 
    Web application available at http://127.0.0.1:3000
 
-This command is same as the following code. L<morbo> command of L<Mojolicious> start up C<serve.pl>.
+L<giblog serve|Giblog::Command::serve> means the following command. L<morbo> is a command to serve a L<Mojolicious> app in development mode.
 
    # Same as the following
    morbo -w giblog.conf -w lib -w templates serve.pl
 
-If C<giblog.conf>, files in C<templates> or C<lib> directory is changed, Web site is automatically rebuild.
+If C<giblog.conf>, files in C<templates> or C<lib> directories are changed, the website is automatically rebuild.
 
-If you use before Giblog 2.0, you can serve a web site by the following way.
+B<Giblog 1.0:>
 
-   # Old style before Giblog 2.0
-   morbo serve.pl
+If you use Giblog 1, you can serve your website by the following way.
 
-=head2 Publish web site
+   # Giblog 1.0
+   morbo -w giblog.conf -w lib -w templates serve.pl
 
-You can publish the web site by C<publish> command.
+=head2 Save a Website
 
-   # Publish the web site
+Save Websites using L<giblog save|Giblog::Command::save>.
+
+  giblog save -m "Commit Messages" origin main
+
+L<giblog save|Giblog::Command::save> means the following git commands.
+
+  git add --all
+  git commit -m "Commit Messages"
+  git push origin main
+
+=head2 Publish a Website
+
+Publish the website using L<giblog publish|Giblog::Command::publish> command.
+
+   # Publish the website
    giblog publish origin main
 
 This is the same as the following command. In this example, the repository name is origin and the branch name is main. YY-mm-dd HH:MM:SS is current date and time.
 
   git -C public add --all
   git -C public commit -m "Published by Giblog at YY-mm-dd HH:MM:SS"
-  git -C public push origin main
+  git -C public push -f origin main
+
+=head2 Deploy a Website
+
+Deploy websites using L<giblog deploy|Giblog::Command::deploy>.
+  
+  # Deploy websites
+  giblog deploy
+
+L<giblog save|Giblog::Command::save> means the following command.
+
+  perl deploy.pl
+
+You can write any program for the deployment in C<deploy.pl>.
+
+  use strict;
+  use warnings;
+
+  my @args = @ARGV;
+
+  my $deploy_cmd = q(ssh prod_perl_club_sites 'git -C ~/www/en_perlzemi-public fetch && git -C ~/www/en_perlzemi-public reset --hard origin/main');
+
+  system($deploy_cmd) == 0
+    or die "Can't execute deploy command: $deploy_cmd:$!";
+
+=head2 Execute All Commands at Once
+
+Do all Publish the website using L<giblog build|Giblog::Command::build>, L<giblog save|Giblog::Command::save>, L<giblog publish|Giblog::Command::publish>, L<giblog deploy|Giblog::Command::deploy> command.
+
+  giblog all -m "Commit Messages" origin main
+
+This means the following commands
+
+  giblog build
+  giblog save -m "Hello" origin main
+  giblog publish origin main
+  giblog deploy
+
+If C<--no-build> option is specified, "giblog build" is not executed.
+
+  giblog all --no-build -m "Commit Messages" origin main
+
+If C<--no-save> option is specified, "giblog save" is not executed.
+
+  giblog all --no-save -m "Commit Messages" origin main
+
+If C<--no-publish> option is specified, "giblog publish" is not executed.
+
+  giblog all --no-publish -m "Commit Messages" origin main
+
+If C<--no-deploy> option is specified, "giblog deploy" is not executed.
+
+  giblog all --no-deploy -m "Commit Messages" origin main
 
 =head1 CONFIG FILE
 
@@ -623,19 +772,23 @@ Get home directory.
 
 =item * L<Giblog::Command>
 
-=item * L<Giblog::Command::new>
-
-=item * L<Giblog::Command::new_website>
-
-=item * L<Giblog::Command::new_blog>
-
 =item * L<Giblog::Command::add>
 
 =item * L<Giblog::Command::build>
 
-=item * L<Giblog::Command::serve>
+=item * L<Giblog::Command::deploy>
+
+=item * L<Giblog::Command::new>
+
+=item * L<Giblog::Command::new_blog>
+
+=item * L<Giblog::Command::new_website>
 
 =item * L<Giblog::Command::publish>
+
+=item * L<Giblog::Command::save>
+
+=item * L<Giblog::Command::serve>
 
 =back
 
@@ -643,27 +796,31 @@ Get home directory.
 
 =head2 Dose Giblog support Windows?
 
-Giblog does'nt support Native Windows(Strawberry Perl, or Active Perl) because Giblog depends on Git and Mojolicious.
+Giblog doesn't support native Windows(Strawberry Perl, or Active Perl) because Giblog depends on L<Git|https://git-scm.com/> and L<Mojolicious>.
 
-If you use Giblog in Windows, you can use WSL2.
+If you use Giblog in Windows, you can use L<msys2|https://www.msys2.org/> or WSL2.
 
 =head2 What is the lowest version of Perl supported by Giblog?
 
-Since Giblog depends on L<Mojolicious>, it is the lowest version of Perl required by Mojolicious. Current is Perl 5.16+.
+The lowest version of Perl is the same version as L<Mojolicious> because Giblog depends on L<Mojolicious>. The current version is Perl 5.16+.
 
-=head2 What is the minimum version of Git required by Giblog?
+=head2 What is the lowest version of Git required by Giblog?
 
-This is Git 1.8.5+.
+Git 1.8.5+.
 
-=head2 What are the precautions when upgrading from Giblog 1 to Giblog 2?
+=head2 What to consider when upgrading from Giblog 2 to Giblog 3?
 
-From Giblog 2.0 the lowest version of Perl depends on Mojolicious, so use the newest Perl possible.
+Giblog 3.0 is compatible with Giblog 2.0. You can upgrade from Giblog 2.0 to Giblog 3.0 naturally.
 
-Git 1.8.5+ is needed.
+=head2 What to consider when upgrading from Giblog 1 to Giblog 2?
 
-=head1 Giblog Official Site
+From Giblog 2.0 the lowest version of Perl depends on L<Mojolicious>, so use the latest Perl as possible.
 
-L<Giblog Official Site|https://jp.giblog.net/>
+Git 1.8.5+ is required.
+
+=head1 OFFICEAL SITE
+
+L<Giblog Official Site|https://en.giblog.perlzemi.com/>
 
 =head1 AUTHOR
 

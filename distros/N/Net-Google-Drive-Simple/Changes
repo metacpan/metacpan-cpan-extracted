@@ -1,15 +1,25 @@
 ######################################################################
 Revision history for Perl extension Net::Google::Drive::Simple
 
+0.21      2022-01-29
+
+        * Adjust dependencies version requirement
+
+0.20      2022-01-28
+
+        * Allow setting custom destination filename (Tim Mullin)
+        * Fix file_upload to set proper content (Håkon Hægland)
+        * perltidy codebase
+
 0.19      2021-01-28
 
-- Don't use HTTP::Request::Common directly (Andy Baugh)
+        * Don't use HTTP::Request::Common directly (Andy Baugh)
 
 0.18      2020-10-16
 
-- Escape single quotes in file and folder names
-- Bump min Perl version to 5.016 (Mojolicious requirement)
-- Switch distro to Dist::Zilla
+        * Escape single quotes in file and folder names
+        * Bump min Perl version to 5.016 (Mojolicious requirement)
+        * Switch distro to Dist::Zilla
 
 0.17 (2020/01/31)
         * Add 'rename' support to rename files or folder

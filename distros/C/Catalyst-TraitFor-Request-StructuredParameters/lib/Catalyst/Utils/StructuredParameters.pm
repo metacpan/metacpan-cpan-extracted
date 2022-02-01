@@ -108,8 +108,6 @@ sub _parse {
 sub _parse_formlike {
   my ($self, $context, $ns, $rules) = @_;
 
-  use Devel::Dwarn;
-  
   my $current = +{};
   while(@{$rules}) {
     my $rule = shift @{$rules};

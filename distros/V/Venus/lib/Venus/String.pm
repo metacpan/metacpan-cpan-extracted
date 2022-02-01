@@ -178,9 +178,9 @@ sub render {
   $tokens ||= {};
 
   while (my($key, $value) = each(%$tokens)) {
-    my $token = quotemeta "{$key}";
+    my $token = quotemeta $key;
 
-    $data =~ s/$token/$value/g;
+    $data =~ s/\{\{\s*$token\s*\}\}/$value/g;
   }
 
   return $data;
@@ -376,9 +376,6 @@ This package provides the following methods:
   append(Str @parts) (Str)
 
 The append method appends arugments to the string using spaces.
-
-
-
 
 I<Since C<0.01>>
 
@@ -836,7 +833,7 @@ I<Since C<0.01>>
 
   use Venus::String;
 
-  my $string = Venus::String->new('Hi, {name}!');
+  my $string = Venus::String->new('Hi, {{name}}!');
 
   my $render = $string->render({name => 'Friend'});
 

@@ -1,20 +1,15 @@
 # this file tests how bag information could be accessed
 BEGIN { chdir 't' if -d 't' }
-
+use strict;
 use warnings;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
-use Test::More tests => 35;
-use Test::Exception;
-use strict;
-
-
 use lib '../lib';
-
 use File::Spec;
-use Data::Printer;
 use File::Path;
 use File::Copy;
+use Test::More tests => 35;
+use Test::Exception;
 
 my $Class = 'Archive::BagIt';
 use_ok($Class);
@@ -22,7 +17,6 @@ use_ok($Class);
 my @ROOT = grep {length} 'src';
 
 #warn "what is this: ".Dumper(@ROOT);
-
 
 my $SRC_BAG = File::Spec->catdir( @ROOT, 'src_bag');
 my $SRC_FILES = File::Spec->catdir( @ROOT, 'src_files');
@@ -50,8 +44,6 @@ my $bag = $Class->new({bag_path=>$SRC_BAG});
   );
   is_deeply( \@sorted, \@expected, "__sort_bag_info");
 }
-
-
 
 is($bag->bag_version(), "0.96", "has expected bag version");
 

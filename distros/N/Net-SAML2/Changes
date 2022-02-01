@@ -1,11 +1,42 @@
 Revision history for Perl extension Net::SAML2.
 
+0.52 -- Sun Jan 30 23:17:19 AST 2022
+
+  [Significant Changes since 0.49]
+
+  - Document IdP and SP initiated LogoutRequest handling
+  - Fix issue if multiple X509Certificate tags are found in metadata
+
+  - 5d70bac Update for official release
+  - b753644 Update Makefile.PL and README
+
+0.51 -- Sun Jan 30 14:15:43 AST 2022
+
+  - d4153b5 v0.51
+  - a9f5ca5 Fix the Commit ids - forgot to rebase before push
+
+0.50 -- Sun Jan 30 13:59:48 AST 2022
+
+  - 8cc6d8e v0.50
+  - af1deee Add additional deveeloper files to .gitignore
+  - 8223e85 Remove eol spaces
+  - 3eb54d3 Create a pid file for lighttpd
+  - 89393ab Merge pull request #55 from timlegge/master
+  - 237ef74 NameId Format is optional in the LogoutRequest
+  - a8ee006 Fix an un reported issue validating URL with extra parameters
+  - b096862 Fixes issue in Discusion #54 when there are multiple
+        X509Certificate tags in the metadata
+  - 11ba7f4 Add information related to the LogoutRequest and
+        LogoutResponse that can be either SP of IdP initiated
+  - 5780c6c Move from File::Slurp to File::Slurper
+
 0.49 -- Tue Dec 07 21:22:58 AST 2021
 
   [Significant Changes since 0.46]
   - Net::SAML2::XML::Sig is now a subclass of XML::Sig
   - XML::Sig 0.52 is now a dependency
 
+  - 064f718 v0.49
   - 6e76482 Simplify dist.ini and add SignReleaseNotes
   - e96982c Bump Version
   - 3fc63f5 v0.48

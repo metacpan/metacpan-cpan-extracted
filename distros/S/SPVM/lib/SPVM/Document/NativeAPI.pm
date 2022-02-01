@@ -4,35 +4,39 @@ SPVM::Document::NativeAPI - SPVM Native APIs
 
 =head1 DESCRIPTION
 
-SPVM Native APIs is C APIs used in SPVM native method. This document describes the way to define native methods, and shows the all of SPVM Native APIs. If you want to know the list of Native APIs, see L<List of Native APIs|/"List-of-Native-APIs">.
+B<SPVM Native APIs> are public APIs that are used in native modules. SPVM Native APIs are writen in C language.
 
-Native method can be written by C language or C++, If the code is compatible with C language or C++(for example, CUDA/nvcc), it can be compiled into native method. If you see examples of SPVM Native APIs, see L<Examples using SPVM Native APIs|https://github.com/yuki-kimoto/SPVM/tree/master/examples/native>. This contains the examples of C language, C++ and CUDA/nvcc.
+This document describes L<the usage of SPVM Native APIs|/"List-of-Native-APIs">, and also the way to write native methods and native modules.
 
-=head1 Defintion of SPVM Native Method
+Native methods can be written by C language or C++. If the rule of the function call is same as C, you can use any language, for example, CUDA/nvcc.
 
-=head2 Native Method Declaration
+=head1 Native Methods
 
-Native Method Declaration is written using Method Descriptor "native" in SPVM module file. SPVM Native Method Declaration ends with a semicolon without Sobroutine Block.
+=head2 Native Method Declarations
+
+A native method declaration are written using the method descriptor "native" in a SPVM module file. The method can't have the block. it ends with a semicolon.
 
   # SPVM/Foo/Bar.spvm
   class Foo::Bar {
     native static method sum : int ($num1 : int, $num2 : int);
   }
 
-=head2 SPVM Native Config File
+=head2 Native Config Files
 
-SPVM Native Config File must be created for SPVM Native Method. The base name without the extension of native config file must be same as SPVM module file and the extension must be ".config".
+A native config file is needed for the native module. The extension is C<config>. Put the config file in the same directory as the SPVM module.
 
   # Native configuration file for Foo::Bar module
   SPVM/Foo/Bar.config
 
-If native configuration file does not exist, an exception occurs.
+If the native config file does not exist, an exception occurs.
 
-Native Config File is Perl source code. Native Config File must return properly L<Builder::Config|SPVM::Builder::Config> object, otherwise an exception occurs.
+Native config files are writen by Perl. It must return L<Builder::Config|SPVM::Builder::Config> object, otherwise an exception occurs.
 
-=head3 C99 Config File Example
+I show some examples of native config files.
 
-  # C99 Config File
+=head3 GNU99 Config Files
+
+  # GNU99 Config File
   use strict;
   use warnings;
 
@@ -41,7 +45,18 @@ Native Config File is Perl source code. Native Config File must return properly 
 
   $config;
 
-=head3 C11 Config File Example
+=head3 C99 Config Files
+
+  # C99 Config File
+  use strict;
+  use warnings;
+
+  use SPVM::Builder::Config;
+  my $config = SPVM::Builder::Config->new_c99;
+
+  $config;
+
+=head3 C11 Config Files
 
   # C11 Config File
   use strict;
@@ -54,7 +69,7 @@ Native Config File is Perl source code. Native Config File must return properly 
 
   $config;
 
-=head3 C++ Config File Example
+=head3 C++ Config Files
 
   # C++ Config File
   use strict;
@@ -65,7 +80,7 @@ Native Config File is Perl source code. Native Config File must return properly 
 
   $config;
 
-=head3 C++11 Config File Example
+=head3 C++11 Config Files
 
   # C++11 Config File
   use strict;
@@ -78,7 +93,7 @@ Native Config File is Perl source code. Native Config File must return properly 
 
   $config;
 
-=head3 CUDA/nvcc Config File Example
+=head3 CUDA/nvcc Config Files
 
   use strict;
   use warnings;
@@ -86,34 +101,35 @@ Native Config File is Perl source code. Native Config File must return properly 
   my $config = SPVM::Builder::Config->new;
 
   # Compiler and Linker common
-  $config->set_cccdlflags(q(--compiler-options '-fPIC'));
+  my @ccldflags = qw(--compiler-options '-fPIC');
 
   # Compiler
   $config->cc('nvcc');
-  $config->ccflags('');
+  $config->add_ccflags(@ccldflags);
   $config->ext('cu');
 
   # Linker
   $config->ld('nvcc');
-  $config->ldflags('-shared');
+  $config->add_ldflags('-shared', @ccldflags);
 
   $config;
 
-=head3 Show the compile commands
+=head3 The Options of Config Files
 
-  # C99 Config File
+B<Output the commands of the compililation and the link:>
+
   use strict;
   use warnings;
 
   use SPVM::Builder::Config;
   my $config = SPVM::Builder::Config->new_gnu99;
 
-  # Show the compile commands
+  # Output the commands of the compililation and link
   $config->quiet(0);
 
   $config;
 
-=head3 Force the compiles
+B<Force the compilation and the link:>
 
   use strict;
   use warnings;
@@ -121,19 +137,27 @@ Native Config File is Perl source code. Native Config File must return properly 
   use SPVM::Builder::Config;
   my $config = SPVM::Builder::Config->new_gnu99;
 
-  # Show the compile commands
+  # Force the compilation and the link
   $config->force(1);
 
   $config;
 
-=head2 Native Method Definition
+=head2 Native Method Definitions
 
-Native Method Definition is written in native source file. Native source file is basically C language source file which extension is ".c". This extension can be changed to ".cpp" for C++ source file, or ".cu" for CUDA source file, etc.
+A native method definition is written in the native module file. Native module files are writen C, C++, or the language that the rule of function call is same as C. 
 
-  # Native source file for Foo::Bar module
+The extension is defined L<ext|SPVM::Builder::Config/"ext"> method in L<the config file|"Native-Config-Files">.
+
+  $config->ext('cpp');
+
+Generally the extension of C is C<c>, C++ is C<cpp>, CUDA/nvcc is C<cu>.
+
+Put the config file in the same directory as the SPVM module.
+
+  # Native module file for Foo::Bar module
   SPVM/Foo/Bar.c
 
-The following is natvie source file example written by C language.
+This is an example of SPVM natvie module. The config file is L<GNU99|/"GNU99 Config Files">.
 
   #include "spvm_native.h"
 
@@ -149,44 +173,43 @@ The following is natvie source file example written by C language.
     return 0;
   }
 
-=head3 Include spvm_native.h
+=head3 The header of Native APIs
 
-Include "spvm_native.h" at the beginning of the native source file. This header file defines SPVM Native APIs and data structures for Native APIs.
+Include C<spvm_native.h> at the beginning of the natvie module. C<spvm_native.h> is the header of Native APIs. It defines L<the native APIs||/"List-of-Native-APIs"> and the data structures, such as C<SPVM_ENV>, C<SPVM_VALUE>.
 
-spvm_native.h include the following types.
+=head3 Native Function Names
 
-  SPVM_ENV
-  SPVM_VALUE
+A SPVM native method have a native function.
 
-See L<List of Native APIs|/"List-of-Native-APIs"> about included SPVM Native APIs.
-
-=head3 Return Value
-
-The return type is "int32_t" type. If the method raises an exception, "1" is returned. If the method is succeed "0" is returned.
-
-=head3 Function Name
-
-Native Method Definition is a simple C language function such as
+Native funtions have the rule of the names. For example, the name is C<SPVM__Foo__Bar__sum>.
 
   SPVM__Foo__Bar__sum
 
+This name is write by the following rules.
+
 The function name starts with "SPVM__".
 
-Followed by class name "Foo__Bar", which is replaced "::" in Foo::Bar.
+Followed by the class name "Foo__Bar", that is replaced "::" with "__".
 
 Followed by "__".
 
-Followed by method name "sum".
+Followed by the method name "sum".
 
-If Native Method Name is invalid, a compile error will occur.
+If the name is invalid, a compilation error occurs.
 
-There are two arguments, the first argument is "SPVM_ENV* env" which has the information of the execution environment, and the second argument is "SPVM_VALUE* stack" which is used for the argument and return value.
+=head3 Native Function Arguments
+
+A native function has two arguments.
+
+The first argument is C<env> that type is C<SPVM_ENV*>. This has the information of the runtime environment.
+
+The second argument is C<stack> that type is C<SPVM_VALUE*>. This is used for getting the values of the arguments and setting the return value.
 
   int32_t SPVM__Foo__Bar__sum(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   }
 
-In the above sample, it takes two int type arguments of SPVM, calculates the sum, and returns the return value.
+In the above example, SPVM native method takes two arguments that type is C<int>. It calculates the sum of the tow values, and returns the total value.
 
   #include "spvm_native.h"
 
@@ -201,6 +224,12 @@ In the above sample, it takes two int type arguments of SPVM, calculates the sum
 
     return 0;
   }
+
+=head3 Native Function Return Value
+
+The type of return value of native function is C<int32_t>. If the method succeeds, the method must return C<1>.  If the method fails, the method must return C<0>.
+
+Note that this is B<not> the return value of the SPVM native method, such as the total value in the above example.
 
 =head2 Compile Native Method
 
@@ -513,7 +542,7 @@ Next is the definition on the C language side.
 
   # SPVM/MyTimeInfo.c
 
-  int32_t SPVM__SPVM__MyTimeInfo__new(SPVM_ENV* env, SPVM_VALUE* stack) {
+  int32_t SPVM__MyTimeInfo__new(SPVM_ENV* env, SPVM_VALUE* stack) {
 
     // Alloc strcut tm
     void* tm_ptr = env->alloc_memory_block_zero (sizeof (struct tm));
@@ -526,7 +555,7 @@ Next is the definition on the C language side.
     return 0;
   }
 
-  int32_t SPVM__SPVM__MyTimeInfo__sec(SPVM_ENV* env, SPVM_VALUE* stack) {
+  int32_t SPVM__MyTimeInfo__sec(SPVM_ENV* env, SPVM_VALUE* stack) {
     void* tm_obj = stack[0].oval;
 
     strcut tm* tm_ptr = (struct tm*) env->get_pointer(env, tm_obj);
@@ -536,7 +565,7 @@ Next is the definition on the C language side.
     return 0;
   }
 
-  int32_t SPVM__SPVM__MyTimeInfo__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
+  int32_t SPVM__MyTimeInfo__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
 
     void* tm_obj = stack[0].oval;
     strcut tm* tm_ptr = (struct tm*) env->get_pointer(env, tm_obj);
@@ -572,7 +601,7 @@ Next, let's get the value of tm_sec. sec method. The get_pointer function can be
 
 The last is the destructor. Be sure to define a destructor, as the allocated memory will not be released automatically.
 
-  int32_t SPVM__SPVM__MyTimeInfo__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
+  int32_t SPVM__MyTimeInfo__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
 
     void* tm_obj = stack[0].oval;
 
@@ -591,7 +620,176 @@ Native API can be called from "SPVM_ENV* env" passed as an argument. Note that y
 
   int32_t basic_type_id = env->get_basic_type_id(env, "Int");
 
+=head1 IDs of Native API
+
+Native APIs of L<SPVM> have the IDs that is corresponding to the names. These IDs are permanently same for the binary compatibility in the future release. When a new Native API is added, it will be added after the end of IDs.
+
+  0 class_vars_heap
+  1 object_header_byte_size
+  2 object_weaken_backref_head_offset
+  3 object_ref_count_offset
+  4 object_basic_type_id_offset
+  5 object_type_dimension_offset
+  6 object_type_category_offset
+  7 object_flag_offset
+  8 object_length_offset
+  9 byte_object_basic_type_id
+  10 short_object_basic_type_id
+  11 int_object_basic_type_id
+  12 long_object_basic_type_id
+  13 float_object_basic_type_id
+  14 double_object_basic_type_id
+  15 compiler
+  16 exception_object
+  17 native_mortal_stack
+  18 native_mortal_stack_top
+  19 native_mortal_stack_capacity
+  20 get_basic_type_id
+  21 get_field_id
+  22 get_field_offset
+  23 get_class_var_id
+  24 get_class_method_id
+  25 get_instance_method_id
+  26 new_object_raw
+  27 new_object
+  28 new_byte_array_raw
+  29 new_byte_array
+  30 new_short_array_raw
+  31 new_short_array
+  32 new_int_array_raw
+  33 new_int_array
+  34 new_long_array_raw
+  35 new_long_array
+  36 new_float_array_raw
+  37 new_float_array
+  38 new_double_array_raw
+  39 new_double_array
+  40 new_object_array_raw
+  41 new_object_array
+  42 new_muldim_array_raw
+  43 new_muldim_array
+  44 new_mulnum_array_raw
+  45 new_mulnum_array
+  46 new_string_nolen_raw
+  47 new_string_nolen
+  48 new_string_raw
+  49 new_string
+  50 new_pointer_raw
+  51 new_pointer
+  52 concat_raw
+  53 concat
+  54 new_stack_trace_raw
+  55 new_stack_trace
+  56 length
+  57 get_elems_byte
+  58 get_elems_short
+  59 get_elems_int
+  60 get_elems_long
+  61 get_elems_float
+  62 get_elems_double
+  63 get_elem_object
+  64 set_elem_object
+  65 get_field_byte
+  66 get_field_short
+  67 get_field_int
+  68 get_field_long
+  69 get_field_float
+  70 get_field_double
+  71 get_field_object
+  72 set_field_byte
+  73 set_field_short
+  74 set_field_int
+  75 set_field_long
+  76 set_field_float
+  77 set_field_double
+  78 set_field_object
+  79 get_class_var_byte
+  80 get_class_var_short
+  81 get_class_var_int
+  82 get_class_var_long
+  83 get_class_var_float
+  84 get_class_var_double
+  85 get_class_var_object
+  86 set_class_var_byte
+  87 set_class_var_short
+  88 set_class_var_int
+  89 set_class_var_long
+  90 set_class_var_float
+  91 set_class_var_double
+  92 set_class_var_object
+  93 get_pointer
+  94 set_pointer
+  95 call_spvm_method
+  96 get_exception
+  97 set_exception
+  98 get_ref_count
+  99 inc_ref_count
+  100 dec_ref_count
+  101 enter_scope
+  102 push_mortal
+  103 leave_scope
+  104 remove_mortal
+  105 is_type
+  106 has_callback
+  107 get_object_basic_type_id
+  108 get_object_type_dimension
+  109 weaken
+  110 isweak
+  111 unweaken
+  112 alloc_memory_block_zero
+  113 free_memory_block
+  114 get_memory_blocks_count
+  115 get_type_name_raw
+  116 get_type_name
+  117 new_env
+  118 free_env
+  119 memory_blocks_count
+  120 get_chars
+  121 die
+  122 new_object_by_name
+  123 new_pointer_by_name
+  124 set_field_byte_by_name
+  125 set_field_short_by_name
+  126 set_field_int_by_name
+  127 set_field_long_by_name
+  128 set_field_float_by_name
+  129 set_field_double_by_name
+  130 set_field_object_by_name
+  131 get_field_byte_by_name
+  132 get_field_short_by_name
+  133 get_field_int_by_name
+  134 get_field_long_by_name
+  135 get_field_float_by_name
+  136 get_field_double_by_name
+  137 get_field_object_by_name
+  138 set_class_var_byte_by_name
+  139 set_class_var_short_by_name
+  140 set_class_var_int_by_name
+  141 set_class_var_long_by_name
+  142 set_class_var_float_by_name
+  143 set_class_var_double_by_name
+  144 set_class_var_object_by_name
+  145 get_class_var_byte_by_name
+  146 get_class_var_short_by_name
+  147 get_class_var_int_by_name
+  148 get_class_var_long_by_name
+  149 get_class_var_float_by_name
+  150 get_class_var_double_by_name
+  151 get_class_var_object_by_name
+  152 call_class_method_by_name
+  153 call_instance_method_by_name
+  154 get_field_string_chars_by_name
+  155 any_object_basic_type_id
+  156 dump_raw
+  157 dump
+  158 call_class_method
+  159 call_instance_method
+  160 get_instance_method_id_static
+  161 get_bool_object_value
+
 =head1 List of Native APIs
+
+List of Native APIs of L<SPVM>.
 
 =head2 class_vars_heap
 
@@ -719,7 +917,7 @@ The amount of mortal stack used for native calls. This is used internally.
 
 Get the ID of the base type given the name of the base type. If it does not exist, a value less than 0 is returned.
 
-Example:
+B<Examples:>
 
   int32_t basic_type_id = env->get_basic_type_id(env, "Int");
 
@@ -731,7 +929,7 @@ Get the ID of the field given the class name, field name, and signature. If the 
 
 The signature is the same as the field type name.
 
-Example:
+B<Examples:>
 
   int32_t field_id = env->get_field_id(env, "Foo", "x", "int");
 
@@ -749,7 +947,7 @@ Get the class variable ID given the class name, class variable name and signatur
 
 The signature is the same as the class variable type name.
 
-Example:
+B<Examples:>
 
   int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "int");
 
@@ -765,7 +963,7 @@ The method signature has the following format.
 
   ReturnValueType(ArgumentType1,ArgumentType2,...)
 
-Example:
+B<Examples:>
 
   int32_t method_id = env->get_class_method_id(env, "Foo", "get", "int(long,string)");
 
@@ -781,7 +979,7 @@ The method signature has the following format,
 
   ReturnValueType(ArgumentType1,ArgumentType2,...)
 
-Example:
+B<Examples:>
 
   int32_t method_id = env->get_instance_method_id(env, object, "get", "int(long,string)");
 
@@ -797,7 +995,7 @@ Create a new object with a basic type ID. The basic type ID must be the correct 
 
 Do the same as C<new_object_raw>, and add the created object to the mortal stack of the environment. Use this function in normal use instead of C<new_object_raw>.
 
-Example:
+B<Examples:>
 
   int32_t basic_type_id = env->get_basic_type_id(env, "Int");
   void* object = env->new_object(env, basic_type_id);
@@ -814,7 +1012,7 @@ Create a new byte[] type array by specifying the length.
 
 Do the same as C<new_byte_array_raw>, and add the created array to the mortal stack of the environment. Use this function in normal use instead of C<new_byte_array_raw>.
 
-Example:
+B<Examples:>
 
   void* byte_array = env->new_byte_array(env, 100);
 
@@ -830,7 +1028,7 @@ Create a new short[] type array by specifying the length.
 
 Do the same as C<new_short_array_raw>, and add the created array to the mortal stack of the environment. Use this function in normal use instead of C<new_short_array_raw>.
 
-Example:
+B<Examples:>
 
   void* short_array = env->new_short_array(env, 100);
 
@@ -846,7 +1044,7 @@ Create a new int[] type array by specifying the length.
 
 Do the same as C<new_int_array_raw>, and add the created array to the mortal stack of the environment. Use this function in normal use instead of C<new_int_array_raw>.
 
-Example:
+B<Examples:>
 
   void* int_array = env->new_int_array(env, 100);
 
@@ -862,7 +1060,7 @@ Create a new long[] type array by specifying the length.
 
 Do the same as C<new_long_array_raw>, and add the created array to the mortal stack of the environment. Use this function in normal use instead of C<new_long_array_raw>.
 
-Example:
+B<Examples:>
 
   void* long_array = env->new_long_array(env, 100);
 
@@ -878,7 +1076,7 @@ Create a new float[] type array by specifying the length.
 
 Do the same as C<new_float_array_raw>, and add the created array to the mortal stack of the environment. Use this function in normal use instead of C<new_float_array_raw>.
 
-Example:
+B<Examples:>
 
   void* float_array = env->new_float_array(env, 100);
 
@@ -894,7 +1092,7 @@ Create a new double[] type array by specifying the length.
 
 Do the same as C<new_double_array_raw>, and add the created array to the mortal stack of the environment. Use this function in normal use instead of C<new_double_array_raw>.
 
-Example:
+B<Examples:>
 
   void* double_array = env->new_double_array(env, 100);
 
@@ -910,7 +1108,7 @@ Create a new object type array by specifying the basic type ID and the array len
 
 Do the same as C<new_object_array_raw>, and add the created array to the mortal stack of the environment. Use this function in normal use instead of C<new_object_array_raw>.
 
-Example:
+B<Examples:>
 
   int32_t basic_type_id = env->get_basic_type_id(env, "Int");
   void* object_array = env->new_object_array(env, basic_type_id, 100);
@@ -927,7 +1125,7 @@ Create a new multi dimension array by specifying the basic type ID, the type dim
 
 Do the same as C<new_muldim_array_raw>, and add the created array to the mortal stack of the environment. Use this function in normal use instead of C<new_muldim_array_raw>.
 
-Example:
+B<Examples:>
 
   // new Int[][][100]
   int32_t basic_type_id = env->get_basic_type_id(env, "Int");
@@ -945,7 +1143,7 @@ Create a new multi-numeric array by specifying the basic type ID and the array l
 
 Do the same as C<new_mulnum_array_raw>, and add the created array to the mortal stack of the environment. Use this function in normal use instead of C<new_mulnum_array_raw>.
 
-Example:
+B<Examples:>
 
   int32_t basic_type_id = env->get_basic_type_id(env, "Complex_2d");
   void* value_array = env->new_mulnum_array(env, basic_type_id, 100);
@@ -962,7 +1160,7 @@ Create a new string object by specifying C language char* type value. this value
 
 Do the same as C<new_string_nolen_raw>, and add the created string object to the mortal stack of the environment. Use this function in normal use instead of C<new_string_nolen_raw>.
 
-Example:
+B<Examples:>
 
   void* str_obj = env->new_string_nolen(env, "Hello World");
 
@@ -978,7 +1176,7 @@ Create a new string object by specifying C language char* type value and the len
 
 Do the same as C<new_string_raw>, and add the created string object to the mortal stack of the environment. Use this function in normal use instead of C<new_string_raw>.
 
-Example:
+B<Examples:>
 
   void* str_obj = env->new_string(env, "Hello \0World", 11);
 
@@ -994,7 +1192,7 @@ Create a pointer type object by specifying a basic type ID and a C language poin
 
 Do the same as C<new_pointer_raw>, and add the created string object to the mortal stack of the environment. Use this function in normal use instead of C<new_pointer_raw>.
 
-Example:
+B<Examples:>
 
   int32_t basic_type_id = env->get_basic_type_id(env, "MyTime");
   void* pointer = malloc(sizeof (struct tm));
@@ -1032,7 +1230,7 @@ When a byte[] type exception message and a class name, method name, file name an
 
 If you specify an array, the length of the array is returned.
 
-Example:
+B<Examples:>
 
   int32_t length = env->length(env, array);
 
@@ -1042,7 +1240,7 @@ Example:
 
 If you specify a byte[] type array, the pointer at the beginning of the internally stored C language int8_t[] type array is returned.  
 
-Example:
+B<Examples:>
 
   int8_t* values = env->get_elems_byte(env, array);
   values[3] = 5;
@@ -1053,7 +1251,7 @@ Example:
 
 If a short[] type array is specified, the pointer at the beginning of the internally stored C language int16_t[] type array is returned.
 
-Example:
+B<Examples:>
 
   int16_t* values = env->get_elems_short(env, array);
   values[3] = 5;
@@ -1064,7 +1262,7 @@ Example:
 
 When an int[] type array is specified, the pointer at the beginning of the internally stored C language int32_t[] type array is returned.
 
-Example:
+B<Examples:>
 
   int32_t* values = env->get_elems_int(env, array);
   values[3] = 5;
@@ -1075,7 +1273,7 @@ Example:
 
 When a long[] type array is specified, the pointer at the beginning of the internally stored C language int64_t[] type array is returned.
 
-Example:
+B<Examples:>
 
   int64_t* values = env->get_elems_long(env, array);
   values[3] = 5;
@@ -1086,7 +1284,7 @@ Example:
 
 When a float[] type array is specified, the pointer at the beginning of the C language float[] type array internally held is returned.
 
-Example:
+B<Examples:>
 
   float* values = env->get_elems_float(env, array);
   values[3] = 1.5f;
@@ -1097,7 +1295,7 @@ Example:
 
 If a double[] type array is specified, the pointer at the beginning of the internally stored C double[] type array is returned.
 
-Example:
+B<Examples:>
 
   double* values = env->get_elems_double(env, array);
   values[3] = 1.5;
@@ -1108,7 +1306,7 @@ Example:
 
 Gets an object of an element given an array of object types and a methodscript. If the element is a weak reference, the weak reference is removed.
 
-Example:
+B<Examples:>
 
   void* object = env->get_elem_object(env, array, 3);
 
@@ -1118,7 +1316,7 @@ Example:
 
 If you specify an array of object type and methodscript and element objects, the element object is assigned to the corresponding methodscript position. If the element's object has a weak reference, the weak reference is removed. The reference count of the originally assigned object is decremented by 1.
 
-Example:
+B<Examples:>
 
   env->get_elem_object(env, array, 3, object);
 
@@ -1128,7 +1326,7 @@ Example:
 
 If an object and field ID are specified, the byte field value will be returned as a C language int8_t type value. The field ID must be a valid field ID obtained with the field_id function.
 
-Example:
+B<Examples:>
 
   int32_t field_id = env->get_field_id(env, "Foo", "x", "byte");
   int8_t field_value = env->get_field_byte(env, object, field_id);
@@ -1139,7 +1337,7 @@ Example:
 
 If you specify the object and field ID, the value of the short type field will be returned as the int16_t type value of C language. The field ID must be a valid field ID obtained with the field_id function.
 
-Example:
+B<Examples:>
 
   int32_t field_id = env->get_field_id(env, "Foo", "x", "short");
   int16_t field_value = env->get_field_short(env, object, field_id);
@@ -1150,7 +1348,7 @@ Example:
 
 If an object and a field ID are specified, the value of the int type field will be returned as a C language int32_t type value. The field ID must be a valid field ID obtained with the field_id function.
 
-Example:
+B<Examples:>
 
   int32_t field_id = env->get_field_id(env, "Foo", "x", "int");
   int32_t field_value = env->get_field_int(env, object, field_id);
@@ -1161,7 +1359,7 @@ Example:
 
 If you specify the object and field ID, the value of the long type field will be returned as the value of int64_t type of C language. The field ID must be a valid field ID obtained with the field_id function.
 
-Example:
+B<Examples:>
 
   int32_t field_id = env->get_field_id(env, "Foo", "x", "long");
   int64_t field_value = env->get_field_long(env, object, field_id);
@@ -1172,7 +1370,7 @@ Example:
 
 If you specify the object and field ID, the value of the float type field will be returned as a C language float type value. The field ID must be a valid field ID obtained with the field_id function.
 
-Example:
+B<Examples:>
 
   int32_t field_id = env->get_field_id(env, "Foo", "x", "float");
   float field_value = env->get_field_float(env, object, field_id);
@@ -1183,7 +1381,7 @@ Example:
 
 If you specify the object and field ID, the value of the double type field will be returned as a double type value in C language. The field ID must be a valid field ID obtained with the field_id function.
 
-Example:
+B<Examples:>
 
   int32_t field_id = env->get_field_id(env, "Foo", "x", "double");
   double field_value = env->get_field_double(env, object, field_id);
@@ -1203,7 +1401,7 @@ If you specify the object and field ID, the value of the object type field is re
 
 If you specify the object and field ID and the value of the field, the value is set to the byte type field. The field ID must be a valid field ID obtained with the field_id function.
 
-Example:
+B<Examples:>
 
   int32_t field_id = env->get_field_id(env, "Foo", "x", "byte");
   int8_t field_value = 5;
@@ -1215,7 +1413,7 @@ Example:
 
 If you specify the object and field ID and the value of the field, the value is set to the short type field. The field ID must be a valid field ID obtained with the field_id function.
 
-Example:
+B<Examples:>
 
   int32_t field_id = env->get_field_id(env, "Foo", "x", "short");
   int16_t field_value = 5;
@@ -1227,7 +1425,7 @@ Example:
 
 If you specify the object and field ID and the value of the field, the value is set to the int type field. The field ID must be a valid field ID obtained with the field_id function.
 
-Example:
+B<Examples:>
 
   int32_t field_id = env->get_field_id(env, "Foo", "x", "int");
   int32_t field_value = 5;
@@ -1239,7 +1437,7 @@ Example:
 
 If you specify the object and field ID and the value of the field, the value is set to the long type field. The field ID must be a valid field ID obtained with the field_id function.
 
-Example:
+B<Examples:>
 
   int32_t field_id = env->get_field_id(env, "Foo", "x", "long");
   int64_t field_value = 5;
@@ -1251,7 +1449,7 @@ Example:
 
 If you specify the object and field ID and the value of the field, the value is set to the float type field. The field ID must be a valid field ID obtained with the field_id function.
 
-Example:
+B<Examples:>
 
   int32_t field_id = env->get_field_id(env, "Foo", "x", "float");
   float field_value = 1.5f;
@@ -1263,7 +1461,7 @@ Example:
 
 If you specify the object and field ID and the value of the field, the value is set to the double type field. The field ID must be a valid field ID obtained with the field_id function.
 
-Example:
+B<Examples:>
 
   int32_t field_id = env->get_field_id(env, "Foo", "x", "double");
   double field_value = 1.55;
@@ -1275,7 +1473,7 @@ Example:
 
 Object and field Specify the ID and the value of the field and set the value to the object type field. The field ID must be a valid field ID obtained with the field_id function. After setting, the reference count is incremented by 1. The original value has the reference count decremented by 1.
 
-Example:
+B<Examples:>
 
   int32_t field_id = env->get_field_id(env, "Foo", "x", "Int");
   int32_t basic_type_id = env->get_basic_type_id(env, "Int");
@@ -1288,7 +1486,7 @@ Example:
 
 If an object and a class variable ID are specified, the value of the byte type class variable is returned as a C language int8_t type value. The class variable ID must be a valid class variable ID obtained with the field_id function.
 
-Example:
+B<Examples:>
 
   int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "byte");
   int8_t pkgvar_value = env->get_class_var_byte(env, object, pkgvar_id);
@@ -1299,7 +1497,7 @@ Example:
 
 If an object and a class variable ID are specified, the value of the short type class variable will be returned as a C language int16_t type value. The class variable ID must be a valid class variable ID obtained with the field_id function.
 
-Example:
+B<Examples:>
 
   int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "short");
   int16_t pkgvar_value = env->get_class_var_short(env, object, pkgvar_id);
@@ -1310,7 +1508,7 @@ Example:
 
 If an object and a class variable ID are specified, the value of the int type class variable will be returned as a C language int32_t type value. The class variable ID must be a valid class variable ID obtained with the field_id function.
 
-Example:
+B<Examples:>
 
   int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "int");
   int32_t pkgvar_value = env->get_class_var_int(env, object, pkgvar_id);
@@ -1321,7 +1519,7 @@ Example:
 
 If an object and a class variable ID are specified, the value of the long type class variable will be returned as a C language int64_t type value. The class variable ID must be a valid class variable ID obtained with the field_id function.
 
-Example:
+B<Examples:>
 
   int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "long");
   int64_t pkgvar_value = env->get_class_var_long(env, object, pkgvar_id);
@@ -1332,7 +1530,7 @@ Example:
 
 If an object and a class variable ID are specified, the value of the float type class variable will be returned as a C language float type value. The class variable ID must be a valid class variable ID obtained with the field_id function.
 
-Example:
+B<Examples:>
 
   int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "float");
   float pkgvar_value = env->get_class_var_float(env, object, pkgvar_id);
@@ -1343,7 +1541,7 @@ Example:
 
 If you specify an object and a class variable ID, the value of the double type class variable is returned as a C type double type value. The class variable ID must be a valid class variable ID obtained with the field_id function.
 
-Example:
+B<Examples:>
 
   int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "double");
   double pkgvar_value = env->get_class_var_double(env, object, pkgvar_id);
@@ -1354,7 +1552,7 @@ Example:
 
 When an object and a class variable ID are specified, the value of the object type class variable is returned as a C language void* type value. The class variable ID must be a valid class variable ID obtained with the field_id function.
 
-Example:
+B<Examples:>
 
   int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "Int");
   void* pkgvar_value = env->get_class_var_byte(env, object, pkgvar_id);
@@ -1365,7 +1563,7 @@ Example:
 
 If you specify the object and field ID and the value of the field, the value is set to the byte type field. The field ID must be a valid field ID obtained with the field_id function.
 
-Example:
+B<Examples:>
 
   int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "byte");
   int8_t pkgvar_value = 5;
@@ -1377,7 +1575,7 @@ Example:
 
 If you specify the object and field ID and the value of the field, the value is set to the short type field. The field ID must be a valid field ID obtained with the field_id function.
 
-Example:
+B<Examples:>
 
   int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "short");
   int16_t pkgvar_value = 5;
@@ -1389,7 +1587,7 @@ Example:
 
 If you specify the object and field ID and the value of the field, the value is set to the int type field. The field ID must be a valid field ID obtained with the field_id function.
 
-Example:
+B<Examples:>
 
   int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "int");
   int32_t pkgvar_value = 5;
@@ -1401,7 +1599,7 @@ Example:
 
 If you specify the object and field ID and the value of the field, the value is set to the long type field. The field ID must be a valid field ID obtained with the field_id function.
 
-Example:
+B<Examples:>
 
   int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "long");
   int64_t pkgvar_value = 5;
@@ -1413,7 +1611,7 @@ Example:
 
 If you specify the object and field ID and the value of the field, the value is set to the float type field. The field ID must be a valid field ID obtained with the field_id function.
 
-Example:
+B<Examples:>
 
   int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "float");
   float pkgvar_value = 5;
@@ -1425,7 +1623,7 @@ Example:
 
 If you specify the object and field ID and the value of the field, the value is set to the double type field. The field ID must be a valid field ID obtained with the field_id function.
 
-Example:
+B<Examples:>
 
   int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "double");
   double pkgvar_value = 5;
@@ -1437,7 +1635,7 @@ Example:
 
 Object and field Specify the ID and the value of the field and set the value to the object type field. The field ID must be a valid field ID obtained with the field_id function. After setting, the reference count is incremented by 1. The original value has the reference count decremented by 1.
 
-Example:
+B<Examples:>
 
   int32_t pkgvar_id = env->get_class_var_id(env, "Foo", "$VAR", "Int");
   int32_t basic_type_id = env->get_basic_type_id(env, "Int");
@@ -1450,7 +1648,7 @@ Example:
 
 Specify a pointer type object and return the C language pointer stored inside the object.
 
-Example:
+B<Examples:>
 
   strcut tm* tm_ptr = (struct tm*) env->get_pointer(env, tm_obj);
 
@@ -1654,7 +1852,7 @@ Memory blocks count. This is used internally.
 
 Get characters pointer in the string object.
 
-Example:
+B<Examples:>
 
   const char* bytes = env->get_chars(env, string_object);
 
@@ -1668,7 +1866,7 @@ Last two arguments are file name and line number.
 
 Return value is always 1;
 
-Example:
+B<Examples:>
 
   return env->die(env, "Value must be %d", 3, __FILE__, __LINE__);
 
@@ -1680,7 +1878,7 @@ This is same as C<new_object> function, but you can specify class name directry.
 
 If function is succeeded, C<exception_flag> is set to 0. If a exception occurs, C<exception_flag> is set to 1. 
 
-Example:
+B<Examples:>
 
   int32_t e;
   void* minimal = env->new_object_by_name(env, "TestCase::Minimal", &e, __FILE__, __LINE__);
@@ -1708,7 +1906,7 @@ This is same as C<set_field_byte> function, but you can specify class name and f
 
 If function is succeeded, C<exception_flag> is set to 0. If a exception occurs, C<exception_flag> is set to 1. 
 
-Example:
+B<Examples:>
 
   int32_t e;
   env->set_field_byte_by_name(env, object, "TestCase::Simple", "byte_value", 13, &e, __FILE__, __LINE__);
@@ -1724,7 +1922,7 @@ This is same as C<set_field_short> function, but you can specify class name and 
 
 If function is succeeded, C<exception_flag> is set to 0. If a exception occurs, C<exception_flag> is set to 1. 
 
-Example:
+B<Examples:>
 
   int32_t e;
   env->set_field_short_by_name(env, object, "TestCase::Simple", "short_value", 13, &e, __FILE__, __LINE__);
@@ -1740,7 +1938,7 @@ This is same as C<set_field_int> function, but you can specify class name and fi
 
 If function is succeeded, C<exception_flag> is set to 0. If a exception occurs, C<exception_flag> is set to 1. 
 
-Example:
+B<Examples:>
 
   int32_t e;
   env->set_field_int_by_name(env, object, "TestCase::Simple", "int_value", 13, &e, __FILE__, __LINE__);
@@ -1756,7 +1954,7 @@ This is same as C<set_field_long> function, but you can specify class name and f
 
 If function is succeeded, C<exception_flag> is set to 0. If a exception occurs, C<exception_flag> is set to 1. 
 
-Example:
+B<Examples:>
 
   int32_t e;
   env->set_field_long_by_name(env, object, "TestCase::Simple", "long_value", 13, &e, __FILE__, __LINE__);
@@ -1772,7 +1970,7 @@ This is same as C<set_field_float> function, but you can specify class name and 
 
 If function is succeeded, C<exception_flag> is set to 0. If a exception occurs, C<exception_flag> is set to 1. 
 
-Example:
+B<Examples:>
 
   int32_t e;
   env->set_field_float_by_name(env, object, "TestCase::Simple", "float_value", 13, &e, __FILE__, __LINE__);
@@ -1788,7 +1986,7 @@ This is same as C<set_field_double> function, but you can specify class name and
 
 If function is succeeded, C<exception_flag> is set to 0. If a exception occurs, C<exception_flag> is set to 1. 
 
-Example:
+B<Examples:>
 
   int32_t e;
   env->set_field_double_by_name(env, object, "TestCase::Simple", "double_value", 13, &e, __FILE__, __LINE__);
@@ -1804,7 +2002,7 @@ This is same as C<set_field_object> function, but you can specify class name and
 
 If function is succeeded, C<exception_flag> is set to 0. If a exception occurs, C<exception_flag> is set to 1. 
 
-Example:
+B<Examples:>
 
   int32_t e;
   env->set_field_object_by_name(env, object_simple, "TestCase::Simple", "object_value", "TestCase::Minimal", object_minimal, &e, __FILE__, __LINE__);
@@ -1820,7 +2018,7 @@ This is same as C<get_field_byte> function, but you can specify class name and f
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
-Example:
+B<Examples:>
 
   int32_t e;
   int8_t byte_value = env->get_field_byte_by_name(env, object, "TestCase::Simple", "byte_value", &e, __FILE__, __LINE__);
@@ -1836,7 +2034,7 @@ This is same as C<get_field_short> function, but you can specify class name and 
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
-Example:
+B<Examples:>
 
   int32_t e;
   int8_t short_value = env->get_field_short_by_name(env, object, "TestCase::Simple", "short_value", &e, __FILE__, __LINE__);
@@ -1852,7 +2050,7 @@ This is same as C<get_field_int> function, but you can specify class name and fi
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
-Example:
+B<Examples:>
 
   int32_t e;
   int8_t int_value = env->get_field_int_by_name(env, object, "TestCase::Simple", "int_value", &e, __FILE__, __LINE__);
@@ -1868,7 +2066,7 @@ This is same as C<get_field_long> function, but you can specify class name and f
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
-Example:
+B<Examples:>
 
   int32_t e;
   int8_t long_value = env->get_field_long_by_name(env, object, "TestCase::Simple", "long_value", &e, __FILE__, __LINE__);
@@ -1884,7 +2082,7 @@ This is same as C<get_field_float> function, but you can specify class name and 
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
-Example:
+B<Examples:>
 
   int32_t e;
   int8_t float_value = env->get_field_float_by_name(env, object, "TestCase::Simple", "float_value", &e, __FILE__, __LINE__);
@@ -1900,7 +2098,7 @@ This is same as C<get_field_double> function, but you can specify class name and
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
-Example:
+B<Examples:>
 
   int32_t e;
   int8_t double_value = env->get_field_double_by_name(env, object, "TestCase::Simple", "double_value", &e, __FILE__, __LINE__);
@@ -1916,7 +2114,7 @@ This is same as C<get_field_object> function, but you can specify class name and
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
-Example:
+B<Examples:>
 
   int32_t e;
   void* object_minimal = env->get_field_object_by_name(env, object_simple, "TestCase::Simple", "object_value", "TestCase::Minimal", &e, __FILE__, __LINE__);
@@ -1932,7 +2130,7 @@ This is same as C<set_class_var_byte> function, but you can specify the class na
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
-Example:
+B<Examples:>
 
   int32_t e;
   env->set_class_var_byte_by_name(env, "TestCase::NativeAPI", "$BYTE_VALUE", 15, &e, __FILE__, __LINE__);
@@ -1948,7 +2146,7 @@ This is same as C<set_class_var_short> function, but you can specify the class n
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
-Example:
+B<Examples:>
 
   int32_t e;
   env->set_class_var_short_by_name(env, "TestCase::NativeAPI", "$SHORT_VALUE", 15, &e, __FILE__, __LINE__);
@@ -1964,7 +2162,7 @@ This is same as C<set_class_var_int> function, but you can specify the class nam
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
-Example:
+B<Examples:>
 
   int32_t e;
   env->set_class_var_int_by_name(env, "TestCase::NativeAPI", "$INT_VALUE", 15, &e, __FILE__, __LINE__);
@@ -1980,7 +2178,7 @@ This is same as C<set_class_var_long> function, but you can specify the class na
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
-Example:
+B<Examples:>
 
   int32_t e;
   env->set_class_var_long_by_name(env, "TestCase::NativeAPI", "$LONG_VALUE", 15, &e, __FILE__, __LINE__);
@@ -1996,7 +2194,7 @@ This is same as C<set_class_var_float> function, but you can specify the class n
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
-Example:
+B<Examples:>
 
   int32_t e;
   env->set_class_var_float_by_name(env, "TestCase::NativeAPI", "$FLOAT_VALUE", 15, &e, __FILE__, __LINE__);
@@ -2012,7 +2210,7 @@ This is same as C<set_class_var_double> function, but you can specify the class 
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
-Example:
+B<Examples:>
 
   int32_t e;
   env->set_class_var_double_by_name(env, "TestCase::NativeAPI", "$DOUBLE_VALUE", 15, &e, __FILE__, __LINE__);
@@ -2028,7 +2226,7 @@ This is same as C<set_class_var_object> function, but you can specify the class 
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
-Example:
+B<Examples:>
 
   int32_t e;
   env->set_class_var_object_by_name(env, "TestCase::NativeAPI", "$MINIMAL_VALUE", "TestCase::Minimal", minimal, &e, __FILE__, __LINE__);
@@ -2044,7 +2242,7 @@ This is same as C<get_class_var_byte> function, but you can specify the class na
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
-Example:
+B<Examples:>
 
   int32_t e;
   int8_t value = env->get_class_var_byte_by_name(env, "TestCase::NativeAPI", "$BYTE_VALUE", &e, __FILE__, __LINE__);
@@ -2060,7 +2258,7 @@ This is same as C<get_class_var_short> function, but you can specify the class n
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
-Example:
+B<Examples:>
 
   int32_t e;
   int16_t value = env->get_class_var_short_by_name(env, "TestCase::NativeAPI", "$SHORT_VALUE", &e, __FILE__, __LINE__);
@@ -2076,7 +2274,7 @@ This is same as C<get_class_var_int> function, but you can specify the class nam
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
-Example:
+B<Examples:>
 
   int32_t e;
   int8_t value = env->get_class_var_byte_by_name(env, "TestCase::NativeAPI", "$BYTE_VALUE", &e, __FILE__, __LINE__);
@@ -2092,7 +2290,7 @@ This is same as C<get_class_var_long> function, but you can specify the class na
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
-Example:
+B<Examples:>
 
   int32_t e;
   int64_t value = env->get_class_var_long_by_name(env, "TestCase::NativeAPI", "$LONG_VALUE", &e, __FILE__, __LINE__);
@@ -2108,7 +2306,7 @@ This is same as C<get_class_var_float> function, but you can specify the class n
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
-Example:
+B<Examples:>
 
   int32_t e;
   float value = env->get_class_var_float_by_name(env, "TestCase::NativeAPI", "$FLOAT_VALUE", &e, __FILE__, __LINE__);
@@ -2124,7 +2322,7 @@ This is same as C<get_class_var_double> function, but you can specify the class 
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
-Example:
+B<Examples:>
 
   int32_t e;
   double value = env->get_class_var_double_by_name(env, "TestCase::NativeAPI", "$DOUBLE_VALUE", &e, __FILE__, __LINE__);
@@ -2140,7 +2338,7 @@ This is same as C<get_class_var_object> function, but you can specify the class 
 
 If function is succeeded, C<exception_flag> is get to 0. If a exception occurs, C<exception_flag> is get to 1. 
 
-Example:
+B<Examples:>
   
   int32_t e;
   void* value = env->get_class_var_object_by_name(env, "TestCase::NativeAPI", "$MINIMAL_VALUE", "TestCase::Minimal", &e, __FILE__, __LINE__);
@@ -2154,7 +2352,7 @@ Example:
 
 This is same as C<call_spvm_method> function, but you can specify the class name and sub name directry.
 
-Example:
+B<Examples:>
 
   int32_t output;
   {
@@ -2172,7 +2370,7 @@ Example:
     const char* method_name, const char* signature, SPVM_VALUE* stack,
     const char* file, int32_t line);
 
-Example:
+B<Examples:>
 
 =head2 get_field_string_chars_by_name
 
@@ -2180,7 +2378,7 @@ Example:
     const char* class_name, const char* field_name,
     int32_t* exception_flag, const char* file, int32_t line);
 
-Example:
+B<Examples:>
 
 =head2 any_object_basic_type_id
 
@@ -2220,175 +2418,33 @@ The method signature has the following format.
 
   ReturnValueType(ArgumentType1,ArgumentType2,...)
 
-Example:
+B<Examples:>
 
   int32_t method_id = env->get_instance_method_id_static(env, "Foo", "get", "int(long,string)");
 
-=head1 Native API indexes
+=head2 get_bool_object_value
 
-Native APIs have indexes which correspond to the names. These indexes are permanently same for the binary compatibility. When a new Native API is added, it will be added to the end.
+  int32_t (*get_bool_object_value)(SPVM_ENV* env, void* bool_object);
 
-  0 class_vars_heap
-  1 object_header_byte_size
-  2 object_weaken_backref_head_offset
-  3 object_ref_count_offset
-  4 object_basic_type_id_offset
-  5 object_type_dimension_offset
-  6 object_type_category_offset
-  7 object_flag_offset
-  8 object_length_offset
-  9 byte_object_basic_type_id
-  10 short_object_basic_type_id
-  11 int_object_basic_type_id
-  12 long_object_basic_type_id
-  13 float_object_basic_type_id
-  14 double_object_basic_type_id
-  15 compiler
-  16 exception_object
-  17 native_mortal_stack
-  18 native_mortal_stack_top
-  19 native_mortal_stack_capacity
-  20 get_basic_type_id
-  21 get_field_id
-  22 get_field_offset
-  23 get_class_var_id
-  24 get_class_method_id
-  25 get_instance_method_id
-  26 new_object_raw
-  27 new_object
-  28 new_byte_array_raw
-  29 new_byte_array
-  30 new_short_array_raw
-  31 new_short_array
-  32 new_int_array_raw
-  33 new_int_array
-  34 new_long_array_raw
-  35 new_long_array
-  36 new_float_array_raw
-  37 new_float_array
-  38 new_double_array_raw
-  39 new_double_array
-  40 new_object_array_raw
-  41 new_object_array
-  42 new_muldim_array_raw
-  43 new_muldim_array
-  44 new_mulnum_array_raw
-  45 new_mulnum_array
-  46 new_string_nolen_raw
-  47 new_string_nolen
-  48 new_string_raw
-  49 new_string
-  50 new_pointer_raw
-  51 new_pointer
-  52 concat_raw
-  53 concat
-  54 new_stack_trace_raw
-  55 new_stack_trace
-  56 length
-  57 get_elems_byte
-  58 get_elems_short
-  59 get_elems_int
-  60 get_elems_long
-  61 get_elems_float
-  62 get_elems_double
-  63 get_elem_object
-  64 set_elem_object
-  65 get_field_byte
-  66 get_field_short
-  67 get_field_int
-  68 get_field_long
-  69 get_field_float
-  70 get_field_double
-  71 get_field_object
-  72 set_field_byte
-  73 set_field_short
-  74 set_field_int
-  75 set_field_long
-  76 set_field_float
-  77 set_field_double
-  78 set_field_object
-  79 get_class_var_byte
-  80 get_class_var_short
-  81 get_class_var_int
-  82 get_class_var_long
-  83 get_class_var_float
-  84 get_class_var_double
-  85 get_class_var_object
-  86 set_class_var_byte
-  87 set_class_var_short
-  88 set_class_var_int
-  89 set_class_var_long
-  90 set_class_var_float
-  91 set_class_var_double
-  92 set_class_var_object
-  93 get_pointer
-  94 set_pointer
-  95 call_spvm_method
-  96 get_exception
-  97 set_exception
-  98 get_ref_count
-  99 inc_ref_count
-  100 dec_ref_count
-  101 enter_scope
-  102 push_mortal
-  103 leave_scope
-  104 remove_mortal
-  105 is_type
-  106 has_callback
-  107 get_object_basic_type_id
-  108 get_object_type_dimension
-  109 weaken
-  110 isweak
-  111 unweaken
-  112 alloc_memory_block_zero
-  113 free_memory_block
-  114 get_memory_blocks_count
-  115 get_type_name_raw
-  116 get_type_name
-  117 new_env
-  118 free_env
-  119 memory_blocks_count
-  120 get_chars
-  121 die
-  122 new_object_by_name
-  123 new_pointer_by_name
-  124 set_field_byte_by_name
-  125 set_field_short_by_name
-  126 set_field_int_by_name
-  127 set_field_long_by_name
-  128 set_field_float_by_name
-  129 set_field_double_by_name
-  130 set_field_object_by_name
-  131 get_field_byte_by_name
-  132 get_field_short_by_name
-  133 get_field_int_by_name
-  134 get_field_long_by_name
-  135 get_field_float_by_name
-  136 get_field_double_by_name
-  137 get_field_object_by_name
-  138 set_class_var_byte_by_name
-  139 set_class_var_short_by_name
-  140 set_class_var_int_by_name
-  141 set_class_var_long_by_name
-  142 set_class_var_float_by_name
-  143 set_class_var_double_by_name
-  144 set_class_var_object_by_name
-  145 get_class_var_byte_by_name
-  146 get_class_var_short_by_name
-  147 get_class_var_int_by_name
-  148 get_class_var_long_by_name
-  149 get_class_var_float_by_name
-  150 get_class_var_double_by_name
-  151 get_class_var_object_by_name
-  152 call_class_method_by_name
-  153 call_instance_method_by_name
-  154 get_field_string_chars_by_name
-  155 any_object_basic_type_id
-  156 dump_raw
-  157 dump
-  158 call_class_method
-  159 call_instance_method
-  160 get_instance_method_id_static
+Get the value of a L<Bool|SPVM::Bool> object. If the Bool object is true, return 1, otherwise return 0.
+
+B<Examples:>
+
+  int32_t bool_value = env->get_bool_object_value(env, bool_object);
+
+=head1 Utilities
+
+Utilities.
+
+=head2 spvmgenlib
+
+If you want to create SPVM module that have the native module, L<spvmgenlib> is useful.
+
+=over 2
+
+=item * L<spvmgenlib>
+
+=back
 
 =head1 Examples
 

@@ -1,4 +1,5 @@
 Build.PL
+examples/show-glyph
 lib/Font/PCF.pm
 MANIFEST			This list of files
 t/00use.t

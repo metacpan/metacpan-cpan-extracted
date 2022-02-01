@@ -176,6 +176,7 @@ int32_t SPVM__TestCase__NativeAPI__check_native_api_indexes(SPVM_ENV* env, SPVM_
   if ((void*)&env->call_class_method != &env_array[158]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->call_instance_method != &env_array[159]) { stack[0].ival = 0; return 0; }
   if ((void*)&env->get_instance_method_id_static != &env_array[160]) { stack[0].ival = 0; return 0; }
+  if ((void*)&env->get_bool_object_value != &env_array[161]) { stack[0].ival = 0; return 0; }
 
   stack[0].ival = 1;
 
@@ -1708,6 +1709,52 @@ int32_t SPVM__TestCase__NativeAPI__native_call_class_method_by_name_exception(SP
   return 0;
 }
 
+int32_t SPVM__TestCase__NativeAPI__call_instance_method_by_name_native(SPVM_ENV* env, SPVM_VALUE* stack) {
+  (void)env;
+  (void)stack;
+  
+  int32_t e;
+  
+  void* minimal = stack[0].oval;
+  
+  int32_t output;
+  {
+    stack[0].oval = minimal;
+    int32_t exception_flag = env->call_instance_method_by_name(env, minimal, "x", "int(self)", stack, MFILE, __LINE__);
+    if (e) { return e; }
+    output = stack[0].ival;
+  }
+  
+  stack[0].ival = output;
+  
+  return 0;
+}
+
+int32_t SPVM__TestCase__NativeAPI__call_instance_method_by_name_exception_native(SPVM_ENV* env, SPVM_VALUE* stack) {
+  (void)env;
+  (void)stack;
+  
+  int32_t e;
+
+  void* minimal = stack[0].oval;
+  
+  int32_t output;
+  {
+    stack[0].oval = minimal;
+    e = env->call_instance_method_by_name(env, minimal, "not_found", "int(self)", stack, MFILE, __LINE__);
+    if (e) { return e; };
+    output = stack[0].ival;
+  }
+  
+  stack[0].ival = 0;
+  
+  if (output == 5) {
+    stack[0].ival = 1;
+  }
+  
+  return 0;
+}
+
 int32_t SPVM__TestCase__NativeAPI__push_mortal_multi(SPVM_ENV* env, SPVM_VALUE* stack) {
   (void)env;
   (void)stack;
@@ -1717,5 +1764,43 @@ int32_t SPVM__TestCase__NativeAPI__push_mortal_multi(SPVM_ENV* env, SPVM_VALUE* 
   env->push_mortal(env, iarray);
   env->push_mortal(env, iarray);
   
+  return 0;
+}
+
+int32_t SPVM__TestCase__NativeAPI__get_instance_method_id_static_native(SPVM_ENV* env, SPVM_VALUE* stack) {
+  (void)env;
+  (void)stack;
+  
+  int32_t e;
+  
+  void* minimal = stack[0].oval;
+  
+  int32_t method_id = env->get_instance_method_id_static(env, "TestCase::Minimal", "x", "int(self)");
+  if (method_id < 0) { return 0; }
+  
+  int32_t ret;
+  {
+    env->call_spvm_method(env, method_id, stack);
+    if (e) { return e; }
+    ret = stack[0].ival;
+  }
+  
+  stack[0].ival = ret;
+
+  return 0;
+}
+
+int32_t SPVM__TestCase__NativeAPI__get_bool_object_value_native(SPVM_ENV* env, SPVM_VALUE* stack) {
+  (void)env;
+  (void)stack;
+  
+  int32_t e;
+  
+  void* bool_object = stack[0].oval;
+  
+  int32_t value = env->get_bool_object_value(env, bool_object);
+  
+  stack[0].ival = value;
+
   return 0;
 }

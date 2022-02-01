@@ -198,7 +198,7 @@ sub start_transaction ($self, $context, $custom_sampling_context = {}) {
     $transaction,
     {
       parent_sampled => $context->{parent_sampled},
-      $custom_sampling_context->%*,
+      ($custom_sampling_context // {})->%*,
     }
   );
 }

@@ -3,17 +3,13 @@ package
 
 use strict;
 use warnings;
-use base qw( Device::Chip::Adapter );
+use base qw( Device::Chip::Adapter::LinuxKernel::_base );
 use Carp qw/croak/;
 
-our $VERSION = '0.00006';
+our $VERSION = '0.00008';
 
 require XSLoader;
 XSLoader::load();
-
-use Device::Chip::Adapter::LinuxKernel::_base;
-use base qw( Device::Chip::Adapter::LinuxKernel::_base );
-use Carp qw/croak/;
 
 sub configure {
     my $self = shift;
@@ -24,7 +20,10 @@ sub configure {
         _spidev_close($self->{spidev});
     }
 
-    $self->{spidev} = Device::Chip::Adapter::LinuxKernel::_SPI::_spidev_open("/dev/".$self->{spi_bus});
+    my $devpath = "/dev/$self->{spi_bus}";
+    ( $self->{spidev} = Device::Chip::Adapter::LinuxKernel::_SPI::_spidev_open($devpath) ) > -1 or
+	croak "Unable to open $devpath - $!";
+
     Device::Chip::Adapter::LinuxKernel::_SPI::_spidev_set_mode($self->{spidev}, $args{mode})
 	if defined $args{mode};
     Device::Chip::Adapter::LinuxKernel::_SPI::_spidev_set_speed($self->{spidev}, $args{max_bitrate})

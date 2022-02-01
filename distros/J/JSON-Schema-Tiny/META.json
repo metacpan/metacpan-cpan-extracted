@@ -197,7 +197,7 @@
    "provides" : {
       "JSON::Schema::Tiny" : {
          "file" : "lib/JSON/Schema/Tiny.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       }
    },
    "release_status" : "stable",
@@ -212,10 +212,10 @@
          "web" : "https://github.com/karenetheridge/JSON-Schema-Tiny"
       }
    },
-   "version" : "0.014",
+   "version" : "0.015",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.035007"
+         "version" : "5.035008"
       },
       "plugins" : [
          {
@@ -260,7 +260,8 @@
                      "INSTALL",
                      "LICENCE",
                      "README.pod",
-                     "TODO"
+                     "TODO",
+                     "pull_request_template.md"
                   ],
                   "exclude_match" : [],
                   "follow_symlinks" : 0,
@@ -893,7 +894,7 @@
             "class" : "Dist::Zilla::Plugin::EnsureLatestPerl",
             "config" : {
                "Dist::Zilla::Plugin::EnsureLatestPerl" : {
-                  "Module::CoreList" : "5.20211220"
+                  "Module::CoreList" : "5.20220120"
                }
             },
             "name" : "@Author::ETHER/EnsureLatestPerl",
@@ -1111,7 +1112,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.014",
+                  "tag" : "v0.015",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
@@ -1361,7 +1362,7 @@
    "x_contributors" : [
       "Matt S Trout <mst@shadowcat.co.uk>"
    ],
-   "x_generated_by_perl" : "v5.35.7",
+   "x_generated_by_perl" : "v5.35.8",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1,

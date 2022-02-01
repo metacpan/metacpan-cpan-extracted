@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use UI::Various::core;
 use UI::Various::Text;
@@ -116,10 +116,9 @@ Update the UI element after an external change of its SCALAR reference.
 sub _update($)
 {
     my ($self) = @_;
-    if (defined $self->_cui)
-    {
-	$self->_cui->text($self->text);
-    }
+    debug(4, __PACKAGE__, '::_update ', $self->_cid,
+	  ' with', (defined $self->_cui ? '' : 'out'), ' _cui');
+    defined $self->_cui  and  $self->_cui->text($self->text);
 }
 
 1;

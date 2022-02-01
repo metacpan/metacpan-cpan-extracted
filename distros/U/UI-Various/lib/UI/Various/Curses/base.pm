@@ -40,7 +40,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use UI::Various::core;
 
@@ -142,27 +142,34 @@ sub _cleanup($)
 
 =head2 B<_reference> - remember SCALAR referenece
 
-    $self->_reference($scalar);
+    $self->_reference($scalar, $update);
 
 =head3 parameters:
 
+    $self               reference to derived object
     $scalar             reference to SCALAR
+    $update             flag to initiate update of objects using same SCALAR
 
 =head3 description:
 
 This method stores all SCALAR references for later updates when the content
-of a SCALAR is changes.
+of a SCALAR is changes.  If the optional update flag is set (to any true
+value) all other references are updated (by calling their C<_update>
+method).
 
 =cut
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-sub _reference($$)
+sub _reference($$;$)
 {
-    my ($self, $scalar) = @_;
+    my ($self, $scalar, $update) = @_;
+    debug(4, __PACKAGE__, '::_reference ', $self->_cid, ' (', $scalar, ')',
+	  ($update ? ' for updating' : ''));
     defined $references{$scalar}
 	or  $references{$scalar} = {};
     defined $references{$scalar}{$self}
 	or  $references{$scalar}{$self} = $self;
+    $update  or  return;
     local $_;
     foreach (keys %{$references{$scalar}})
     {

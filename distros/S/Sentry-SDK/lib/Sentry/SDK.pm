@@ -7,7 +7,7 @@ use Sentry::Client;
 use Sentry::Hub;
 use Sentry::Logger 'logger';
 
-our $VERSION = version->declare('v1.0.11');
+our $VERSION = version->declare('v1.0.13');
 
 sub _call_on_hub ($method, @args) {
   my $hub = Sentry::Hub->get_current_hub();
@@ -36,7 +36,7 @@ sub init ($package, $options = {}) {
   $options->{_metadata}{sdk}
     = { name => 'sentry.perl', packages => [], version => $VERSION };
 
-  logger->active_contexts(['.*']) if $options->{debug};
+  logger->active_contexts(['.*']) if $options->{debug} // $ENV{SENTRY_DEBUG};
 
   _init_and_bind($options);
 }

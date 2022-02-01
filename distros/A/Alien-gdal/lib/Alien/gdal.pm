@@ -10,7 +10,7 @@ use Capture::Tiny qw /:all/;
 use Path::Tiny qw /path/;
 use Alien::proj;
 
-our $VERSION = '1.26';
+our $VERSION = '1.27';
 
 my ($have_geos, $have_proj, $have_spatialite);
 my @have_aliens;
@@ -54,7 +54,7 @@ BEGIN {
         }
     }
     if ($have_geos
-        && $^O =~ /bsd/
+        && not $^O =~ /win/
         && Alien::geos::af->install_type eq 'share'
         ) {
         #  underhanded, but we are getting failures if this is not set

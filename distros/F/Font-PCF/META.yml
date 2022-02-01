@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,13 +16,16 @@ name: Font-PCF
 provides:
   Font::PCF:
     file: lib/Font/PCF.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   IO::Handle::Packable: '0'
-  List::Util: '0'
+  List::Util: '1.33'
+  Object::Pad: '0.57'
+  Object::Pad::ClassAttr::Struct: '0'
   PerlIO::gzip: '0'
-  Struct::Dumb: '0'
+  Syntax::Keyword::Match: '0'
+  perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

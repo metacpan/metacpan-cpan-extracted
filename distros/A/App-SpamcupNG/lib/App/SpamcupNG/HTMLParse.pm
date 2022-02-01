@@ -11,23 +11,25 @@ use App::SpamcupNG::Warning::Factory qw(create_warning);
 our @EXPORT_OK = (
     'find_next_id',       'find_errors',
     'find_warnings',      'find_spam_header',
-    'find_best_contacts', 'find_receivers'
-    );
+    'find_best_contacts', 'find_receivers',
+    'find_message_age',   'find_header_info'
+);
 
 my %regexes = (
-    next_id    => qr#^/sc\?id=(\w+)#
-    );
+    next_id     => qr#^/sc\?id=(\w+)#,
+    message_age => qr/^Message\sis\s(\d+)\s(\w+)\sold/
+);
 
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 =head1 NAME
 
-App::SpamcupNG::HTMLParse - function to extract information from Spamcop.net
+App::SpamcupNG::HTMLParse - functions to extract information from Spamcop.net
 web pages
 
 =head1 SYNOPSIS
 
-    use App::SpamcupNG::HTMLParse qw(find_next_id find_errors find_warnings find_spam_header);
+    use App::SpamcupNG::HTMLParse qw(find_next_id find_errors find_warnings find_spam_header find_message_age find_header_info);
 
 =head1 DESCRIPTION
 
@@ -35,6 +37,120 @@ This package export functions that uses XPath to extract specific information
 from the spamcop.net HTML pages.
 
 =head1 EXPORTS
+
+Following are all exported functions by this package.
+
+=head2 find_header_info
+
+Finds information from the e-mail header of the received SPAM and returns it.
+
+Returns a hash reference with the following keys:
+
+=over
+
+=item mailer: the X-Mailer header, if available
+
+=item content_type: the Content-Type, if available
+
+=back
+
+There is an attempt to normalize the C<Content-Type> header, by removing extra
+spaces and using just the first two entries, also making everything as lower
+case.
+
+=cut
+
+sub find_header_info {
+    my $content_ref = shift;
+    croak "Must receive an scalar reference as parameter"
+        unless ( ref($content_ref) eq 'SCALAR' );
+    my $tree = HTML::TreeBuilder::XPath->new;
+    $tree->parse_content($$content_ref);
+    my @nodes = $tree->findnodes('/html/body/div[@id="content"]/pre');
+    my %info  = (
+        mailer       => undef,
+        content_type => undef
+    );
+    my $mailer_regex       = qr/^X-Mailer:/;
+    my $content_type_regex = qr/^Content-Type:/;
+
+    foreach my $node (@nodes) {
+
+        foreach my $content ( split( "\n", $node->as_text() ) ) {
+            $content =~ s/^\s+//;
+            $content =~ s/\s+$//;
+            next if ( $content eq '' );
+
+            if ( $content =~ $mailer_regex ) {
+                my $wanted = ( split( ':', $content ) )[1];
+                $wanted =~ s/^\s+//;
+                $info{mailer} = $wanted;
+                next;
+            }
+
+            if ( $content =~ $content_type_regex ) {
+                my $wanted = ( split( ':', $content ) )[1];
+                $wanted =~ s/^\s+//;
+                my @wanted = split( ';', $wanted );
+
+                if ( scalar(@wanted) > 1 ) {
+                    my $encoding = lc( $wanted[0] );
+                    my $charset  = lc( $wanted[1] );
+                    $charset =~ s/^\s+//;
+                    $info{content_type} = join( ';', $encoding, $charset );
+                }
+                else {
+                    chop $wanted if ( substr( $wanted, -1 ) eq ';' );
+                    $info{content_type} = $wanted;
+                }
+
+                next;
+            }
+
+            last if ( $info{mailer} and $info{content_type} );
+        }
+    }
+
+    return \%info;
+
+}
+
+=head2 find_message_age
+
+Find and return the SPAM message age information.
+
+Returns an array reference, with the zero index as an integer with the age, and
+the index 1 as the age unit (possibly "hour");
+
+If nothing is found, returns C<undef>;
+
+=cut
+
+sub find_message_age {
+    my $content_ref = shift;
+    croak "Must receive an scalar reference as parameter"
+        unless ( ref($content_ref) eq 'SCALAR' );
+    my $tree = HTML::TreeBuilder::XPath->new;
+    $tree->parse_content($$content_ref);
+    my @nodes = $tree->findnodes('/html/body/child::div[@id="content"]');
+
+    foreach my $node (@nodes) {
+        foreach my $content ( $node->content_refs_list ) {
+            next unless ( ref($content) eq 'SCALAR' );
+            $$content =~ s/^\s+//;
+            $$content =~ s/\s+$//;
+            next if ( $$content eq '' );
+
+            if ( $$content =~ $regexes{message_age} ) {
+                my ( $age, $unit ) = ( $1, $2 );
+                chop $unit if ( substr( $unit, -1 ) eq 's' );
+                return [ $age, $unit ];
+            }
+        }
+    }
+
+    return undef;
+}
 
 =head2 find_next_id
 
@@ -52,18 +168,19 @@ sub find_next_id {
         unless ( ref($content_ref) eq 'SCALAR' );
     my $tree = HTML::TreeBuilder::XPath->new;
     $tree->parse_content($$content_ref);
-    my @nodes
-        = $tree->findnodes('//strong/a');
+    my @nodes = $tree->findnodes('//strong/a');
     my $next_id;
 
-    foreach my $element(@nodes) {
-        if ($element->as_trimmed_text eq 'Report Now') {
+    foreach my $element (@nodes) {
+        if ( $element->as_trimmed_text eq 'Report Now' ) {
 
             if ( $element->attr('href') =~ $regexes{next_id} ) {
                 $next_id = $1;
-                my $length = length($next_id);
+                my $length   = length($next_id);
                 my $expected = 45;
-                warn "Unexpected length for SPAM ID: got $length, expected $expected" unless ($length == $expected);
+                warn
+                    "Unexpected length for SPAM ID: got $length, expected $expected"
+                    unless ( $length == $expected );
                 last;
             }
         }
@@ -306,6 +423,8 @@ sub find_receivers {
     $tree->parse_content($content_ref);
     my @nodes = $tree->findnodes('//*[@id="content"]');
     my @receivers;
+    my $devnull     = q{/dev/null'ing};
+    my $report_sent = 'Spam report id';
 
     foreach my $node (@nodes) {
         foreach my $inner ( $node->content_list() ) {
@@ -314,7 +433,26 @@ sub find_receivers {
             next if ( ref($inner) );
             $inner =~ s/^\s+//;
             $inner =~ s/\s+$//;
-            push( @receivers, $inner );
+
+            my $result_ref;
+            my @parts = split( /\s/, $inner );
+
+  # /dev/null\'ing report for google-abuse-bounces-reports@devnull.spamcop.net
+            if ( substr( $inner, 0, length($devnull) ) eq $devnull ) {
+                $result_ref = [ ( split( '@', $parts[-1] ) )[0], undef ];
+            }
+
+          # Spam report id 7151980235 sent to: dl_security_whois@navercorp.com
+            elsif (
+                substr( $inner, 0, length($report_sent) ) eq $report_sent )
+            {
+                $result_ref = [$parts[6], $parts[3]];
+            }
+            else {
+                warn "Unexpected receiver format: $inner";
+            }
+
+            push( @receivers, $result_ref );
         }
     }
 

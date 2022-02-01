@@ -1,21 +1,25 @@
 package Mojo::Netdata::Util;
 use Mojo::Base -strict, -signatures;
 
+use overload ();
 use Exporter qw(import);
 use Mojo::File;
+use Mojo::JSON qw(encode_json);
 
 our @EXPORT_OK = qw(logf safe_id);
+our $STDERR    = \*STDERR;           # useful for testing
 
 sub logf ($level, $format, @args) {
   return 1 if $ENV{HARNESS_ACTIVE} and !$ENV{HARNESS_IS_VERBOSE};
-  return 1 if $level eq 'debug'    and !$ENV{NETDATA_DEBUG_FLAGS};
+  return 1 if $level eq 'debug' and !$ENV{HARNESS_IS_VERBOSE} and !$ENV{NETDATA_DEBUG_FLAGS};
 
   my $module_name = caller;
   my ($s, $m, $h, $day, $month, $year) = localtime time;
 
   state $program_name = Mojo::File->new($0)->basename;
-  printf STDERR "%s-%02s-%02s %02s:%02s:%02s: %s: %s: %s: $format\n", $year + 1900, $month + 1,
-    $day, $h, $m, $s, $program_name, uc $level, $module_name, @args;
+  printf {$STDERR} "%s-%02s-%02s %02s:%02s:%02s: %s: %s: %s: $format\n", $year + 1900, $month + 1,
+    $day, $h, $m, $s, $program_name, uc $level, $module_name,
+    map { overload::Method($_, q("")) ? "$_" : !defined $_ || ref $_ ? encode_json $_ : $_ } @args;
   return 1;
 }
 
@@ -51,7 +55,8 @@ L<Mojo::Netdata::Collector> classes.
   logf $level, $format, @args;
 
 Used to log messages to STDERR. C<$level> can be "debug", "info", "warnings",
-"error", "fatal".
+"error", "fatal". Any references and undefined values in C<@args> will be
+serialized using L<Mojo::JSON/encode_json>.
 
 =head2 safe_id
 

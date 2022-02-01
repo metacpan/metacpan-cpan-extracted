@@ -1,5 +1,12 @@
 Revision history for Device-Chip-SSD1306
 
+0.11    2022-01-31
+        [CHANGES]
+         * Updated for Object::Pad 0.57
+            + Use :isa attribute instead of `extends` keyword
+         * Updated for bleadperl
+            + Avoid use of @_ within signatured method
+
 0.10    2021-10-22
         [CHANGES]
          * Use :param and ADJUSTPARAMS from Object::Pad 0.51

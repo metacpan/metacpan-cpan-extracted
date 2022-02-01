@@ -811,7 +811,7 @@ sub map {
     push(@odims, splice(@idims,scalar(@odims)));
   }
 
-  $out = PDL::new_from_specification('PDL',$in->type,@odims);
+  $out = PDL->new_from_specification($in->type,@odims);
   $out->sethdr($ohdr) if defined($ohdr);
 
   # set badflag on output all the time if possible, to account for boundary violations

@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/FileRemoveUtils/delete_all_empty_dirs
-# and generated automatically using Perinci::CmdLine::Gen version 0.496
+# and generated automatically using Perinci::CmdLine::Gen version 0.499
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-03'; # DATE
+our $DATE = '2021-08-02'; # DATE
 our $DIST = 'App-FileRemoveUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -41,15 +41,13 @@ delete-all-empty-dirs - Delete all empty (zero-sized) subdirectories recursively
 
 =head1 VERSION
 
-This document describes version 0.005 of delete-all-empty-dirs (from Perl distribution App-FileRemoveUtils), released on 2020-06-03.
+This document describes version 0.006 of delete-all-empty-dirs (from Perl distribution App-FileRemoveUtils), released on 2021-08-02.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % delete-all-empty-dirs [--debug] [--(no)dry-run] [--format=name] [--json]
-     [--log-level=level] [--(no)naked-res] [--page-result[=program]]
-     [--quiet] [--trace] [--verbose] [--view-result[=program]]
+% B<delete-all-empty-dirs> [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--no-dry-run>|B<-N>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]]
 
 Examples:
 
@@ -146,7 +144,7 @@ View output using a viewer.
 
 Display help message and exit.
 
-=item B<--no-dry-run>
+=item B<--no-dry-run>, B<-N>
 
 Disable simulation mode (also via DRY_RUN=0).
 
@@ -212,7 +210,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

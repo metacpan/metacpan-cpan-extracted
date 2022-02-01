@@ -29,6 +29,10 @@ DESCRIPTION
     the MAX7221 chip operates virtually identically, this chip will work
     too.
 
+    This module drives a single MAX7219 chip. For situations involving
+    multiple chips daisy-chained together (such as on popular LED matrix
+    display board modules) see instead Device::Chip::MAX7219Panel.
+
     The reader is presumed to be familiar with the general operation of
     this chip; the documentation here will not attempt to explain or define
     chip-specific concepts or features, only the use of this module to

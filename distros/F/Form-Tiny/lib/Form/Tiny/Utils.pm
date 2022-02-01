@@ -6,7 +6,7 @@ use warnings;
 use Exporter qw(import);
 use Carp qw(croak);
 
-our $VERSION = '2.06';
+our $VERSION = '2.08';
 our @EXPORT;
 our @EXPORT_OK = qw(
 	try
@@ -16,6 +16,7 @@ our @EXPORT_OK = qw(
 	create_form_meta
 	get_package_form_meta
 	set_form_meta_class
+	has_form_meta
 );
 
 our %EXPORT_TAGS = (
@@ -25,6 +26,7 @@ our %EXPORT_TAGS = (
 			create_form_meta
 			get_package_form_meta
 			set_form_meta_class
+			has_form_meta
 		)
 	],
 );
@@ -88,6 +90,11 @@ sub create_form_meta
 	return $meta{$package};
 }
 
+sub has_form_meta
+{
+	return exists $meta{ref $_[0] || $_[0]};
+}
+
 sub get_package_form_meta
 {
 	my ($package_name) = @_;
@@ -97,25 +104,7 @@ sub get_package_form_meta
 
 	my $form_meta = $meta{$package_name};
 
-	if (!$form_meta->complete) {
-
-		# when this breaks, mst gets to point and laugh at me
-		my @parents = do {
-			no strict 'refs';
-			@{"${package_name}::ISA"};
-		};
-
-		my @real_parents = grep { $_->DOES('Form::Tiny::Form') } @parents;
-
-		croak 'Form::Tiny does not support multiple inheritance'
-			if @real_parents > 1;
-
-		my ($parent) = @real_parents;
-		$form_meta->inherit_roles_from($parent ? $parent->form_meta : undef);
-		$form_meta->inherit_from($parent->form_meta) if $parent;
-		$form_meta->setup;
-	}
-
+	$form_meta->bootstrap;
 	return $form_meta;
 }
 

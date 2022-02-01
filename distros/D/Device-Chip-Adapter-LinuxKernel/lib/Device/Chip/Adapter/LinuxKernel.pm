@@ -7,7 +7,7 @@ use Carp qw/croak/;
 use Device::Chip::Adapter::LinuxKernel::_SPI;
 use Device::Chip::Adapter::LinuxKernel::_I2C;
 
-our $VERSION = '0.00006';
+our $VERSION = '0.00008';
 
 our $__TESTDIR=""; # blank unless we're being pointed at a test setup
 
@@ -63,19 +63,17 @@ I'll also be working to add "interrupt" support for the GPIO so that you can use
 sub new {
    my $class = shift;
    my %args = @_;
-   my $i2c_bus = delete $args{i2c_bus};
 
-   # TODO not sure what I'll need to take here yet
-   
-   return bless({args => \%args, i2c_bus => $i2c_bus}, $class);
+   my $self = bless({}, $class);
+
+   defined $args{$_} and $self->{$_} = $args{$_} for qw( i2c_bus spi_bus );
+
+   return $self;
 }
 
 sub new_from_description {
    my $class = shift;
-   my %args = @_;
-
-   # TODO what does this do?
-   return bless({}, $class);
+   return $class->new(@_);
 }
 
 
@@ -292,6 +290,7 @@ Ryan Voots <ryan@voots.org>
 
 Stephen Cavilia <sac+cpan@atomicradi.us>
 
+Paul "LeoNerd" Evans <pevans@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

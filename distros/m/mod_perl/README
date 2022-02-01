@@ -3,8 +3,8 @@ This is mod_perl version 2.0
 *** Prerequisites ***
 
 Apache:
-  Dynamic mod_perl (DSO):    Apache 2.0.47 - 2.4.41.
-  Static mod_perl:           Apache 2.0.51 - 2.4.41.
+  Dynamic mod_perl (DSO):    Apache 2.0.47 - 2.4.51.
+  Static mod_perl:           Apache 2.0.51 - 2.4.51.
 
   Newer Apache versions may work with this version of mod_perl.  If
   not, the svn version likely will, which can be obtained from:
@@ -61,6 +61,13 @@ that's going to be supported by 2.0. More API will be supported post
 
 For comments, questions, bug-reports, etc., join the mod_perl users
 list by sending mail to modperl-subscribe@perl.apache.org.
+
+Bugs can also be reported at:
+https://rt.cpan.org/Dist/Display.html?Name=mod_perl
+which can be accessed from the "Issues" link in the left-hand menu on
+the metacpan.org page, https://metacpan.org/pod/mod_perl2 .
+(Note: You will need to log in to https://rt.cpan.org in order to get
+the "Report a new bug" button on the bug tracker page.)
 
 When reporting bugs please follow the instructions at:
 http://perl.apache.org/docs/2.0/user/help/help.html#Reporting_Problems

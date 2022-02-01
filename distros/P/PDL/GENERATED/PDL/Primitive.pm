@@ -846,7 +846,7 @@ sub PDL::uniqind {
   # Different from uniq we sort and store the result in an intermediary
   my $aflat = $arr->flat;
   my $nanind = which($aflat!=$aflat);                        # NaN indexes
-  my $good = $aflat->sequence->long->where($aflat==$aflat);  # good indexes
+  my $good = PDL->sequence(indx, $aflat->dims)->where($aflat==$aflat);  # good indexes
   my $i_srt = $aflat->where($aflat==$aflat)->qsorti;         # no BAD or NaN values for qsorti
   my $srt = $aflat->where($aflat==$aflat)->index($i_srt);
   my $uniqind;
@@ -2803,11 +2803,7 @@ sub PDL::interpND {
   my($opt) = (defined $options) ? $options : {};
 
   my($method)   = $opt->{m} || $opt->{meth} || $opt->{method} || $opt->{Method};
-  if(!defined $method) {
-	$method = ($source->type <= zeroes(long,1)->type) ?
-	   	   'sample' :
-	           'linear';
-  }
+  $method //= $source->type->integer ? 'sample' : 'linear';
 
   my($boundary) = $opt->{b} || $opt->{boundary} || $opt->{Boundary} || $opt->{bound} || $opt->{Bound} || 'extend';
   my($bad) = $opt->{bad} || $opt->{Bad} || 0.0;
@@ -2944,11 +2940,11 @@ sub PDL::interpND {
      barf("interpND: unknown method '$method'; valid ones are 'linear' and 'sample'.\n");
  }
 }
-#line 2948 "Primitive.pm"
+#line 2944 "Primitive.pm"
 
 
 
-#line 2929 "primitive.pd"
+#line 2925 "primitive.pd"
 =head2 one2nd
 
 =for ref
@@ -2995,7 +2991,7 @@ sub PDL::one2nd {
   }
   return @index;
 }
-#line 2999 "Primitive.pm"
+#line 2995 "Primitive.pm"
 
 
 
@@ -3057,7 +3053,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3061 "Primitive.pm"
+#line 3057 "Primitive.pm"
 
 
 
@@ -3069,13 +3065,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 		return $out;
    }
    *PDL::which = \&which;
-#line 3073 "Primitive.pm"
+#line 3069 "Primitive.pm"
 
 
 
 #line 1061 "../../blib/lib/PDL/PP.pm"
 *which = \&PDL::which;
-#line 3079 "Primitive.pm"
+#line 3075 "Primitive.pm"
 
 
 
@@ -3117,7 +3113,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 3121 "Primitive.pm"
+#line 3117 "Primitive.pm"
 
 
 
@@ -3130,17 +3126,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 		return wantarray ? ($outi,$outni) : $outi;
    }
    *PDL::which_both = \&which_both;
-#line 3134 "Primitive.pm"
+#line 3130 "Primitive.pm"
 
 
 
 #line 1061 "../../blib/lib/PDL/PP.pm"
 *which_both = \&PDL::which_both;
-#line 3140 "Primitive.pm"
+#line 3136 "Primitive.pm"
 
 
 
-#line 3133 "primitive.pd"
+#line 3129 "primitive.pd"
 =head2 where
 
 =for ref
@@ -3205,11 +3201,11 @@ sub PDL::where {
     }
 }
 *where = \&PDL::where;
-#line 3209 "Primitive.pm"
+#line 3205 "Primitive.pm"
 
 
 
-#line 3203 "primitive.pd"
+#line 3199 "primitive.pd"
 =head2 whereND
 
 =for ref
@@ -3295,11 +3291,11 @@ sub PDL::whereND :lvalue {
    return (@to_return == 1) ? $to_return[0] : @to_return;
 }
 *whereND = \&PDL::whereND;
-#line 3299 "Primitive.pm"
+#line 3295 "Primitive.pm"
 
 
 
-#line 3294 "primitive.pd"
+#line 3290 "primitive.pd"
 =head2 whichND
 
 =for ref
@@ -3363,8 +3359,7 @@ L<PDL::Slices/indexND> can be fed the coordinates to return the values.
 
 *whichND = \&PDL::whichND;
 sub PDL::whichND {
-  my $mask = shift;
-  $mask = PDL::pdl('PDL',$mask) unless(UNIVERSAL::isa($mask,'PDL'));
+  my $mask = PDL->topdl(shift);
 
   # List context: generate a perl list by dimension
   if(wantarray) {
@@ -3379,22 +3374,15 @@ sub PDL::whichND {
   }
 
   # Scalar context: generate an N-D index ndarray
-
-  unless($mask->nelem) {
-      return PDL::new_from_specification('PDL',indx,$mask->ndims,0);
-  }
-
-  unless($mask->getndims) {
-    return $mask ? pdl(indx,0) : PDL::new_from_specification('PDL',indx,0);
-  }
+  return PDL->new_from_specification(indx,$mask->ndims,0) if !$mask->nelem;
+  return $mask ? pdl(indx,0) : PDL->new_from_specification(indx,0)
+    if !$mask->getndims;
 
   my $ind = $mask->flat->which->dummy(0,$mask->getndims)->make_physical;
-  if($ind->nelem==0) {
-      # In the empty case, explicitly return the correct type of structured empty
-      return PDL::new_from_specification('PDL',indx,$mask->ndims, 0);
-  }
+  # In the empty case, explicitly return the correct type of structured empty
+  return PDL->new_from_specification(indx,$mask->ndims, 0) if !$ind->nelem;
 
-  my $mult = ones($mask->getndims)->long;
+  my $mult = ones(indx, $mask->getndims);
   my @mdims = $mask->dims;
 
   for my $i (0..$#mdims-1) {
@@ -3410,11 +3398,11 @@ sub PDL::whichND {
 
   return $ind;
 }
-#line 3414 "Primitive.pm"
+#line 3402 "Primitive.pm"
 
 
 
-#line 3415 "primitive.pd"
+#line 3403 "primitive.pd"
 =head2 setops
 
 =for ref
@@ -3594,11 +3582,11 @@ sub PDL::setops {
   }
 
 }
-#line 3598 "Primitive.pm"
+#line 3586 "Primitive.pm"
 
 
 
-#line 3599 "primitive.pd"
+#line 3587 "primitive.pd"
 =head2 intersect
 
 =for ref
@@ -3632,13 +3620,13 @@ sub PDL::intersect {
    return setops($_[0], 'AND', $_[1]);
 
 }
-#line 3636 "Primitive.pm"
+#line 3624 "Primitive.pm"
 
 
 
 
 
-#line 3638 "primitive.pd"
+#line 3626 "primitive.pd"
 
 =head1 AUTHOR
 
@@ -3655,7 +3643,7 @@ the copyright notice should be included in the file.
 Updated for CPAN viewing compatibility by David Mertens.
 
 =cut
-#line 3659 "Primitive.pm"
+#line 3647 "Primitive.pm"
 
 
 

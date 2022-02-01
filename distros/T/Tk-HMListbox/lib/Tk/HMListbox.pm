@@ -253,7 +253,7 @@ Items are drawn in the B<-disabledforeground> color, and selection
 cannot be modified and is not shown (though selection information is
 retained).
 
-=item B<-takefocus> => I<number>
+=item B<-takefocus>
 
 There are actually three different focusing options:  Specify B<1> to both 
 allow the widget to take keyboard focus itself and to enable grabbing the 
@@ -1111,7 +1111,7 @@ package Tk::HMListbox;
 use strict;
 use Carp;
 use vars qw($VERSION);
-$VERSION = '4';
+$VERSION = '4.01';
 
 use Tk;
 
@@ -1340,7 +1340,21 @@ sub Populate {
 
 		if (Tk::Exists($w)) {
 			return  if ($w->{Configure}{'-state'} =~ /d/o);
+
 			$w->focus  if (!$w->{'_hasfocus'} && $w->{'_ourtakefocus'});
+		}
+	}, Ev('index',Ev('@'))]
+	);
+
+	$w->bindRows('<ButtonRelease-1>', [sub {
+		my $w = shift;
+		my $clickedon = $_[0];
+
+		if (Tk::Exists($w)) {
+			return  if ($w->{Configure}{'-state'} =~ /d/o);
+
+			my $index = $w->_firstVisible->index('active');
+			$w->activate($index, 1);
 		}
 	}, Ev('index',Ev('@'))]
 	);
@@ -1351,6 +1365,7 @@ sub Populate {
 
 		if (Tk::Exists($w)) {
 			return  if ($w->{Configure}{'-state'} =~ /d/o);
+
 			my $index = $w->_firstVisible->index('anchor');
 			$w->focus  if (!$w->{'_hasfocus'} && $w->{'_ourtakefocus'});
 			$w->activate($index);
@@ -1367,6 +1382,7 @@ sub CtrlButtonPress {
 	my @cursel = $w->_firstVisible->curselection;
 	if (Tk::Exists($w)) {
 		return  if ($w->{Configure}{'-state'} =~ /d/o);
+
 		$w->activate($w->_firstVisible->index('anchor'));
 	}
 }
@@ -1849,13 +1865,14 @@ sub activate {
 
 	return  unless (defined $w->_firstVisible);
 
+	my $showcursor = $w->{'-showcursoralways'} || ((defined($_[1]) && $_[1] == 1) ? 0 : $w->{'-showcursoralways'});
 	if ($w->{Configure}{'-state'} !~ /d/o
-			&& ($w->{'-showcursoralways'} || ($w->focusCurrent && $w->{'_hasfocus'}))) {
-		$w->_firstVisible->activate(@_);
+			&& ($showcursor || ($w->focusCurrent && $w->{'_hasfocus'}))) {
+		$w->_firstVisible->activate($_[0]);   #THIS SHOWS CURSOR.
 	} else {
-		$w->{'_lastactive'} = $_[0];
+		$w->{'_lastactive'} = $_[0];          #THIS HIDES CURSOR.
 		$w->_firstVisible->activate(undef);
-		$w->_firstVisible->anchorSet(@_);
+		$w->_firstVisible->anchorSet($_[0]);
 	}
 }
 
@@ -1903,12 +1920,8 @@ sub focus
 sub unfocus
 {
 	my $w = shift;
-	if ($w->{'-showcursoralways'}) {
-		$w->{'_hasfocus'} = 0;
-		return;
-	}
 
-	$w->{'_lastactive'} = $w->index('active');
+	$w->{'_lastactive'} = $w->index('active') || 0;
 	$w->{'_hasfocus'} = 0;
 	$w->activate($w->{'_lastactive'})  if ($w->index('end') >= 0);
 }
@@ -2178,9 +2191,8 @@ sub index {
 	my $w = shift;
 	
 	return undef  unless (defined($_[0]) && defined($w->_firstVisible));
-	my $ret = ($w->{'-showcursoralways'} || ($w->{'_hasfocus'} && $w->focusCurrent) || $_[0] !~ /^active/o)
-			? $w->_firstVisible->index(@_) : $w->{'_lastactive'};
-	return $ret;
+	return $w->_firstVisible->index('active')  if ($_[0] =~ /^active/o);
+	return $w->_firstVisible->index(@_);
 }
 
 sub insert {

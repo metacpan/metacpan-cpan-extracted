@@ -1,6 +1,6 @@
 =head1 NAME
 
-Tk::HListbox - Tk Listbox widget supporting images and text entries, Tk::HList based drop-in replacement for Tk::Listbox.
+Tk::HListbox - Tk Listbox widget supporting images and text entries, Tk::HList-based drop-in replacement for Tk::Listbox.
 
 =for category  Tk Widget Classes
 
@@ -14,7 +14,7 @@ B<-background> B<-borderwidth> B<-cursor> B<-disabledforeground>
 B<-exportselection> B<-font> B<-foreground> B<-height>
 B<-highlightbackground> B<-highlightcolor> B<-highlightthickness>
 B<-offset> B<-relief> B<-selectbackground> B<-selectborderwidth>
-B<-selectforeground> B<-setgrid> B<-state> B<-takefocus> B<-tile>
+B<-selectforeground> B<-setgrid> B<-state> B<-takefocus>
 B<-width> B<-xscrollcommand> B<-yscrollcommand>
 
 See L<Tk::options> for details of the standard options.
@@ -223,7 +223,11 @@ The value of the option may be arbitrary, but the default bindings
 expect it to be either B<single>, B<browse>, B<multiple>, 
 B<extended> or B<dragdrop>;  the default value is B<browse>.
 
-=item Name: B<-showcursoralways> => I<boolean>
+=item Name: B<-showcursoralways>
+
+=item Class: B<-showcursoralways>
+
+=item Switch: B<-showcursoralways>
 
 Starting with version 2.4, Tk::HListbox no longer displays the keyboard 
 cursor (active element) when the HListbox widget does not have the 
@@ -243,6 +247,20 @@ If the listbox is disabled then items may not be inserted or deleted,
 items are drawn in the B<-disabledforeground> color, and selection
 cannot be modified and is not shown (though selection information is
 retained).
+
+=item Name:	B<takeFocus>
+
+=item Class:	B<TakeFocus>
+
+=item Switch: B<-takefocus>
+
+There are actually three different focusing options:  Specify B<1> to both 
+allow the widget to take keyboard focus itself and to enable grabbing the 
+keyboard focus when a user clicks on a row in the listbox.  Specify B<''> 
+to allow the widget to take focus (via the <TAB> circulate order) but do 
+not grab the focus when a user clicks on (selects) a row.  This is the 
+default focusing model.  Specify B<0> to not allow the widget to receive 
+the keyboard focus.
 
 =item Name: B<-tpadx> => I<number>
 
@@ -1178,7 +1196,7 @@ use Tk;
 use Tk::ItemStyle;
 use base qw(Tk::Derived Tk::HList);
 use vars qw($VERSION @Selection $Prev $tixIndicatorArmed);
-$VERSION = '2.42';
+$VERSION = '2.51';
 
 Tk::Widget->Construct('HListbox');
 
@@ -1190,37 +1208,23 @@ sub ClassInit
 
 	$class->SUPER::ClassInit($mw);
  # Standard Motif bindings:
- $mw->bind($class,'<1>',[sub {
-		my $w = shift;
-		if (Tk::Exists($w)) {
-			$tixIndicatorArmed = -1;
-			$w->BeginSelect(@_);
-		}
- }, Ev('index',Ev('@'))]);
+
 # $mw->bind($class, '<Double-1>' => \&Tk::NoOp);
- $mw->bind($class,'<Double-1>' => ['DoubleButton1',Ev('index',Ev('@'))]);
- $mw->bind($class,'<B1-Motion>',['Motion',Ev('index',Ev('@'))]);
+	$mw->bind($class,'<Double-1>' => ['DoubleButton1',Ev('index',Ev('@'))]);
+	$mw->bind($class,'<B1-Motion>',['Motion',Ev('index',Ev('@'))]);
 # $mw->bind($class,'<B1-Motion>',['Button1Motion']);
- $mw->bind($class,'<ButtonRelease-1>','ButtonRelease_1');
- $mw->bind($class,'<Shift-1>',['BeginExtend',Ev('index',Ev('@'))]);  #JWT:ADDED 20091020!
- $mw->bind($class,'<Control-1>',['BeginToggle',Ev('index',Ev('@'))]);
- $mw->bind($class,'<B1-Leave>',['AutoScan',Ev('x'),Ev('y')]);
- $mw->bind($class,'<B1-Enter>','CancelRepeat');
- $mw->bind($class,'<Up>',['UpDown',-1]);
- $mw->bind($class,'<Shift-Up>',['ShiftUpDown',-1]);
- $mw->bind($class,'<Down>',['UpDown',1]);
- $mw->bind($class,'<Shift-Down>',['ShiftUpDown',1]);
- $mw->XscrollBind($class);
- $mw->bind($class,'<Prior>', sub {
-		my $w = shift;
-		$w->yview('scroll',-1,'pages');
-		$w->activate('@0,0');
- });
- $mw->bind($class,'<Next>',  sub {
-		my $w = shift;
-		$w->yview('scroll',1,'pages');
-		$w->activate('@0,0');
- });
+	$mw->bind($class,'<ButtonRelease-1>','ButtonRelease_1');
+	$mw->bind($class,'<Shift-1>',['BeginExtend',Ev('index',Ev('@'))]);  #JWT:ADDED 20091020!
+	$mw->bind($class,'<Control-ButtonPress-1>',['BeginToggle',Ev('index',Ev('@'))]);
+	$mw->bind($class,'<Alt-ButtonPress-1>',['AltButtonPress_1', Ev('index',Ev('@'))]);
+	$mw->bind($class,'<ButtonPress-1>',['ButtonPress_1', Ev('index',Ev('@'))]);
+	$mw->bind($class,'<B1-Leave>',['AutoScan',Ev('x'),Ev('y')]);
+	$mw->bind($class,'<B1-Enter>','CancelRepeat');
+	$mw->bind($class,'<Up>',['UpDown',-1]);
+	$mw->bind($class,'<Shift-Up>',['ShiftUpDown',-1]);
+	$mw->bind($class,'<Down>',['UpDown',1]);
+	$mw->bind($class,'<Shift-Down>',['ShiftUpDown',1]);
+	$mw->XscrollBind($class);
 	$mw->bind($class, '<Control-Prior>', ['CtrlPriorNext',-1]);  #JWT:DIFFERENT FROM Listbox!:
 	$mw->bind($class, '<Control-Next>', ['CtrlPriorNext',1]);
  # <Home> and <End> defined in XscrollBind
@@ -1231,12 +1235,12 @@ sub ClassInit
 	$mw->bind($class,'<space>',['SpaceSelect',Ev('index','active')]);
 	$mw->bind($class,'<Select>',['BeginSelect',Ev('index','active')]);
 
+ # Additional Tk bindings that aren't part of the Motif look and feel:
 	$mw->bind($class,'<Shift-space>',['ShiftSpace',Ev('index','active')]);  #JWT:ADDED 20091020!
 	$mw->bind($class,'<Shift-Select>',['BeginExtend',Ev('index','active')]);  #JWT:ADDED 20091020!
 	$mw->bind($class, '<Escape>', 'Cancel');
 	$mw->bind($class, '<Control-slash>','SelectAll');
 	$mw->bind($class, '<Control-backslash>','Cntrl_backslash');
- # Additional Tk bindings that aren't part of the Motif look and feel:
 	$mw->bind($class,'<2>',['scan','mark',Ev('x'),Ev('y')]);
 	$mw->bind($class,'<B2-Motion>',['scan','dragto',Ev('x'),Ev('y')]);
 	$mw->bind($class,'<Return>', ['InvokeCommand']);
@@ -1255,12 +1259,14 @@ sub Populate {
 	$w->{Configure}{'-font'} = $args->{'-font'}   #MUST ACTUALLY SET THE HList "DEFAULT" FONT FOR BOTH PLATFORMS!:
 			|| ($bummer ? "{MS Sans Serif} 8" : "Helvetica -12 bold");
 	$w->{'-showcursoralways'} = delete($args->{'-showcursoralways'})  if (defined $args->{'-showcursoralways'});
+	$w->takefocus($args->{'-takefocus'})  if (defined $args->{'-takefocus'});
 	$w->SUPER::Populate($args);
 	$w->ConfigSpecs(
 			-background    => [qw/METHOD background Background/, $Tk::NORMAL_BG],
 			-foreground    => [qw/METHOD foreground Foreground/, $Tk::NORMAL_FG],
 			-activeforeground => [qw/METHOD activeForeground ActiveForeground/, $Tk::NORMAL_FG],
 			-selectforeground => [qw/METHOD selectForeground SelectForeground/, $Tk::NORMAL_FG],
+			-disabledforeground => [qw/PASSIVE disabledForeground DisabledForeground/, $Tk::DISABLED_FG],
 			-updatecommand => ['CALLBACK'],
 			-xscancommand  => ['CALLBACK'],
 			-parent        => [qw/SELF parent parent/, undef],
@@ -1272,15 +1278,11 @@ sub Populate {
 			-indicatorcmd  => ['CALLBACK'],
 			-activestyle   => [qw/PASSIVE activeStyle ActiveStyle underline/],  #CURRENTLY IGNORED.
 			-listvariable  => [qw/PASSIVE listVariable Variable undef/],
-			-state         => [qw/METHOD state   State normal/],
+			-state         => ['METHOD',  'state', 				'State', 'normal'],
 			-font          => [qw/METHOD font    Font/],
-			-showcursoralways    => [qw/PASSIVE/],
+			-showcursoralways => [qw/PASSIVE showcursoralways showcursoralways 0/],
+			-takefocus     => ['METHOD', 'takeFocus', 'TakeFocus', ''],  #JWT:MUST BE METHOD SINCE SCROLLED EATS IT OTHERWISE!
 	);
-
-	#EMULATE "-listvariable" USING THE TIE FEATURE:
-	if (defined($args->{-listvariable}) && ref($args->{-listvariable})) {
-		tie @{$args->{-listvariable}}, 'Tk::HListbox', $w, (ReturnType => 'index');
-	}
 
 	my $Palette = $w->Palette;
 	foreach my $tp (qw/text image imagetext/) {   #CREATE "DEFAULT" STYLES FOR EACH itemtype:
@@ -1298,8 +1300,19 @@ sub Populate {
 	}
 	$w->configure('-activeforeground' => $args->{'-activeforeground'})  if ($args->{'-activeforeground'});
 	$w->configure('-selectforeground' => $args->{'-selectforeground'})  if ($args->{'-selectforeground'});
-	$w->{'_lastactive'} = undef;
+	$w->{'_lastactive'} = 0;
 	$w->{'_hasfocus'} = 0;
+
+	#EMULATE "-listvariable" USING THE TIE FEATURE:
+	if (defined($args->{-listvariable}) && ref($args->{-listvariable})) {
+		#MUST INITIALIZE MANUALLY IF WE ALREADY HAVE ELEMENTS (B/C Tk::Listbox DOES!):
+		my @initlist = @{$args->{-listvariable}};
+		#JWT:THE ONLY WAY WE CAN HANDLE ANY INITIAL VALUES (BEFORE TYING) IS TO SAVE THEM, EMPTY THE ARRAY
+		#TO BE TIED, TIE IT, *THEN* RESET IT TO THE INITIAL VALUES, OTHERWISE, THEY DON'T GET ADDED:
+		@{$args->{-listvariable}} = ()  if ($#initlist >= 0);
+		tie @{$args->{-listvariable}}, 'Tk::HListbox', $w, (ReturnType => 'index');
+		@{$args->{-listvariable}} = @initlist  if ($#initlist >= 0);
+	}
 }
 
 sub fixPalette {     #WITH OUR setPalette, WE CAN CATCH PALETTE CHANGES AND ADJUST EVERYTHING ACCORDINGLY!:
@@ -1342,24 +1355,33 @@ sub foreground {   #THIS CODE IS UGLY AS CRAP, BUT NECESSARY TO ACTUALLY WORK:
 	my $force = shift || 0;
 	#ALLOW FOREGROUND CHANGE IF FORCE OR VALUE APPEARS TO BE USER-SET:
 	my $palettechg = ($val =~ /^${dfltFG}$/i) ? 1 : 0;
+#print "--FG:PALETTECHG=$palettechg= VAL=$val= DFLT=$dfltFG= PALFG=".$w->toplevel->Palette->{ foreground }."=\n";
 	my $disabled = ($w->{Configure}{'-state'} =~ /d/o) ? 1 : 0;
 	my $allowed = 0;
-	if ($force || $w->{'_statechg'}) {
-		$allowed = 1;   #IF FORCE OR WE'RE CHANGING "STATE":
-	} elsif ($w->{'_foregroundset'}) {
-		$allowed = 1  unless ($palettechg);  #FROZEN, ALLOW USER, BUT NOT setPalette TO CHANGE:
-	} elsif (!$disabled || !$palettechg) {
-		$allowed = 1    #NOT FROZEN, ALLOW setPalette IF ENABLED:
+	if ($force || $w->{'_statechg'}) {  #ALWAYS ALLOW FORCE OR STATE-CHANGE TO SET FG:
+		$allowed = 1;   #IF FORCE OR WE'RE CHANGING "STATE" (ie. "normal" to "disabled"):
+	} elsif ($w->{'_foregroundset'}) {  #USER SPECIFIED A SPECIFIC FG COLOR.
+		$allowed = 1  unless ($palettechg);  #FROZEN, ALLOW USER BUT NOT setPalette TO CHANGE:
+	} elsif ($disabled) {
+		$allowed = 1    #NOT FROZEN, ALLOW setPalette OR DISABLED STATE TO SET FG:
+	} elsif (!$w->{'_foregroundset'}) {  #ALLOW CHANGE SINCE USER HASN'T SPECIFIED A COLOR:
+		$allowed = 1
 	}
+#print "--FOREGROUND: val=$val= force=$force= statechg=".$w->{'_statechg'}."= fgset=".$w->{'_foregroundset'}."= allowed=$allowed= disabled=$disabled=\n";
 	## Ensure that the base Frame, pane and columns (if any) get set
 	if ($allowed) {   #FG ALLOWED TO BE CHANGED:
 		if ($disabled) {  #FORCE TO DISABLED FG, IF DISABLED:
 			my $Palette = $w->Palette;
-			unless ($w->{'_foreground'} || $w->{'_statechg'}) {
-				$w->{'_foreground'} = $val;  #NEED TO GET HERE, SINCE STARTED DISABLED & WE DIDN'T HAVE IT YET!
-				$w->{'_foregroundset'} = $val;
+			if ($w->{'_statechg'} eq '0') {  #STATE CHANGED TO DIABLED BEFORE INITIALIZATION, SO SAVE SAVE USER-SPECIFIED ("normal") COLOR:
+#print "-!!!- STATE CHANGED BEFORE INITIALIZATION! SEL=".$w->cget('-selectforeground')."= PSEL=".$Palette->{'selectForeground'}."=\n";
+#print "--FG0: SAVED FG:=".$w->{'_foreground'}."=\n";
+				$w->{'_foreground'} = $val;
 			}
-			$val = $Palette->{'disabledForeground'};
+			unless ($w->{'_foreground'}) {  #NO "normal" COLOR SAVED YET, SAVE USER'S FG IF SPECIFIED, OR THE PALETTE'S COLOR:
+				$w->{'_foreground'} = $w->{'_foregroundset'} || $Palette->{'foreground'};  #NEED TO GET IT HERE, SINCE STARTED DISABLED & WE DIDN'T HAVE IT YET!
+#print "--FG1: SAVED FG:=".$w->{'_foreground'}."=\n";
+			}
+			$val = $w->cget('-disabledforeground') || $Palette->{'disabledForeground'};  #NOW SWITCH TO THE PALETTE'S "DISABLED" FG COLOR.
 		}
 		Tk::configure($w, "-foreground", $val);
 		$w->{Configure}{'-foreground'} = $val;
@@ -1368,18 +1390,24 @@ sub foreground {   #THIS CODE IS UGLY AS CRAP, BUT NECESSARY TO ACTUALLY WORK:
 		}
 		#WE MUST CONSIDER UPDATING ACTIVE AND SELECT FOREGROUND IF CHANGING STATES OR PALETTES:
 		$w->{'_propogateFG'} = 1;
+#print "--propogate activeFG($val)\n"  if ($w->{'_statechg'} || !$w->{'_activeforegroundset'});
 		$w->configure('-activeforeground' => $val)  if ($w->{'_statechg'} || !$w->{'_activeforegroundset'});
-		$w->configure('-selectforeground' => $val)  unless ($w->{'_statechg'});
+#print "--propogate selectFG($val)\n"  if ($w->{'_statechg'} || !$w->{'_selectforegroundset'});
+#?		$w->configure('-selectforeground' => $val)  unless ($w->{'_statechg'});
+#UNCOMMENT TO USE USER-S FOREGROUND COLOR FOR SELECT FG TOO:		$w->configure('-selectforeground' => $val)  if ($w->{'_statechg'} || !$w->{'_selectforegroundset'});
 		$w->{'_propogateFG'} = 0;
 
-		#FREEZE THE FG (IF ENABLED AND NOT SET BY PALETTE & NOT CHANGING "STATE":
+		#FREEZE (SAVE) THE FG (IF ENABLED AND SET BY USER, NOT PALETTE & NOT CHANGING "STATE"):
 		$w->{'_foregroundset'} = $val  if (!$disabled && !$palettechg && !$w->{'_statechg'});
+#print "-!!!- FG FROZEN TO ($val)!!!\n"  if (!$disabled && !$palettechg && !$w->{'_statechg'});
 	} else {   #NOT ALLOWED TO BE CHANGED: MUST RESET TO "FROZEN" FG, SINCE TK'S ALREADY "CHANGED" IT INTERNALLY:
 		if ($w->{'_foregroundset'}) {
 			Tk::configure($w, "-foreground", $w->{'_foregroundset'});
+#print "--RESET FG:=".$w->{'_foregroundset'}."=\n";
 			$w->{Configure}{'-foreground'} = $w->{'_foregroundset'};
 		} elsif ($palettechg && $disabled) {  #IF WE'RE NOT "FROZEN" AND WE'RE DISABLED, SAVE NEW PALLETTE-SET FG FOR RESTORATION WHEN ENABLED:
 			$w->{'_foreground'} = $val;
+#print "--FG2: SAVED FG:=".$w->{'_foreground'}."=\n";
 		}
 	}
 }
@@ -1388,6 +1416,7 @@ sub selectforeground {
 	my ($w, $val) = @_;
 	return $w->{Configure}{'-selectforeground'}  unless (defined($val) && $val);
 
+#print "--selectforeground:=($val)\n";
 	my $dfltFG = $w->toplevel->cget('-foreground');
 	my $palettechg = ($val =~ /^${dfltFG}$/i) ? 1 : 0;
 	my $disabled = ($w->{Configure}{'-state'} =~ /d/o) ? 1 : 0;
@@ -1413,27 +1442,41 @@ sub selectforeground {
 	}
 }
 
+sub takefocus {
+	my ($w, $val) = @_;
+	return $w->{Configure}{'-takefocus'}  unless (defined $val);
+
+	#JWT:NEEDS TO BE '' INSTEAD OF 1 FOR Tk (SO WE KEEP IT IN OUR OWN VARIABLE FOR OUR USE)!:
+	$w->{'_ourtakefocus'} = $val;
+	$w->{Configure}{'-takefocus'} = ($val =~ /0/o) ? 0 : '';
+}
+
 sub activeforeground {
 	my ($w, $val) = @_;
 	return $w->{Configure}{'-activeforeground'}  unless (defined($val) && $val);
 
-	#RESTORE PREV. "NORMAL" A-FG IF SAVED && EITHER STATE OR PALETTE IS CHANGIN' && STATE IS NORMAL:
-	$val = $w->{'_activeforeground'}  if ($w->{'_activeforeground'} 
-			&& ($w->{'_statechg'}) && $w->{Configure}{'-state'} !~ /d/o);
-
 	my $dfltFG = $w->toplevel->cget('-foreground');
-	#SAVE THE NEW "NORMAL" VALUE UNLESS WE'RE DISABLED OR USER PREV. SET OR B|W (WE THINK setPalette SET IT:
-	$w->{'_activeforeground'} = $val  unless ($w->{Configure}{'-state'} =~ /d/o
-			|| $w->{'_activeforegroundset'} || $val =~ /^${dfltFG}$/i);
-
-	$w->{Configure}{'-activeforeground'} = $val;
-	foreach my $tp (qw/text imagetext/) {
-		$w->{"_style$tp"}->configure('-activeforeground' => $val);  #UPDATE ALL ENTRIES TO MATCH:
+	my $palettechg = ($val =~ /^${dfltFG}$/i) ? 1 : 0;
+	my $disabled = ($w->{Configure}{'-state'} =~ /d/o) ? 1 : 0;
+	my $allowed = 0;
+	if ($w->{'_activeforegroundset'}) {
+		$allowed = 1  unless ($w->{'_propogateFG'} || $palettechg);  #FROZEN, ALLOW USER, BUT NOT setPalette TO CHANGE:
+	} else {
+		$allowed = 1;    #NOT FROZEN, ALLOW setPalette IF ENABLED:
 	}
-
-	#FREEZE THE CURRENT A-FG IF WE'RE NOT JUST CHANGING STATES AND WE'RE NOT DISABLED AND  IT'S NOT B|W MEANING setPalette'S CHANGIN IT AND WE'RE NOT THE INITIAL SETTING:
-	$w->{'_activeforegroundset'} = 1  unless ($w->{Configure}{'-state'} =~ /d/o
-			|| $val =~ /^${dfltFG}$/i || $w->{'_statechg'} || $w->{'_propogateFG'});
+	if ($allowed) {
+		$w->{Configure}{'-activeforeground'} = $val;
+		foreach my $tp (qw/text image imagetext/) {
+			$w->{"_style$tp"}->configure('-activeforeground' => $val);
+		}
+		$w->{'_activeforegroundset'} = $val  unless ($disabled || $palettechg
+				|| $w->{'_statechg'} || $w->{'_propogateFG'});
+	} else {   #NOT ALLOWED TO BE CHANGED: MUST RESET TO "FROZEN" FG, SINCE TK'S ALREADY "CHANGED" IT INTERNALLY:
+		if ($w->{'_activeforegroundset'}) {
+			eval { Tk::configure($w, "-activeforeground", $w->{'_activeforegroundset'}); };
+			$w->{Configure}{'-activeforeground'} = $w->{'_activeforegroundset'};
+		}
+	}
 }
 
 sub font {  #SINCE WE CREATE "DEFAULT" STYLES FOR FG/BG PURPOSES, WE MUST SET THE FONT THERE TOO!:
@@ -1461,20 +1504,24 @@ sub state {  #SINCE HList DOESN'T SUPPORT STATES (NORMAL, DISABLED), WE MUST HAN
 		my $Palette = $w->Palette;
 
 		$w->{Configure}{'-state'} = 'normal';
+		$w->{'_saveactive'} = $w->index('active');
 		@{$w->{'_savesel'}} = $w->curselection;   #SAVE & CLEAR THE CURRENT SELECTION, FOCUS STATUS & COLORS:
 		eval { $w->selectionClear(0, 'end'); };
-		$w->{'_takesfocus'} = $w->cget('-takefocus');
-		$w->{'_foreground'} = $w->cget('-foreground');  #SAVE CURRENT (ENABLED) FG COLOR!
+		$w->{'_foreground'} = $w->foreground;
 		$w->{Configure}{'-state'} = $val;
-		$w->configure('-foreground' => $Palette->{'disabledForeground'});  #SET FG TO DISABLEDFG.
-		$w->configure('-takefocus' => 0);
+		$w->foreground($w->cget('-disabledforeground') || $Palette->{'disabledForeground'});
+		$w->focusNext  if ($w->{'_hasfocus'});  #MOVE FOCUS OFF WIDGET IF IT HAS IT.
 	} elsif ($w->{'_prevstate'}) {    #WE'RE ENABLING (RESTORE PREV. ENABLED STUFF AND REALLOW USER-INTERACTION):
 		$w->{Configure}{'-state'} = $val;
-		$w->selectionSet(@{$w->{'_savesel'}})  if (ref $w->{'_savesel'});  #RESTORE SELECTED LIST.
+		if (ref $w->{'_savesel'}) {   #RESTORE SELECTED LIST.
+			$w->selectionSet(shift @{$w->{'_savesel'}})  while (@{$w->{'_savesel'}});
+		}
+		$w->activate($w->{'_saveactive'});
+		my $colr = 'foreground';
+		(my $colr_ = $colr) =~ tr/A-Z/a-z/;
 		my $fg = $w->{'_foreground'};
-		$fg ||= $w->toplevel->cget('-foreground');
+		$fg ||= $w->toplevel->cget('-foreground') || $w->toplevel->Palette->{'foreground'};
 		$w->configure('-foreground' => $fg)  if ($fg);  #RESTORE FG COLOR.
-		$w->configure('-takefocus' => ($w->{'_takesfocus'} =~ /\d/o) ? $w->{'_takesfocus'} : 1);
 	}
 	$w->{'_prevstate'} = $w->{Configure}{'-state'};
 	$w->{'_statechg'} = 0;
@@ -1494,7 +1541,7 @@ sub selection {
 sub selectionSet {   #THIS SHOULD TAKE HList "ENTRIES":
 	my ($w) = shift;
 
-	return  if ($w->{Configure}{'-state'} =~ /d/o);
+#?	return  if ($w->{Configure}{'-state'} =~ /d/o);
 	return  unless (defined($_[0]) && $_[0] =~ /\S/o);
 	my @args = @_;
 	for (my $i=0;$i<=$#args;$i++) {
@@ -1523,13 +1570,13 @@ sub selectionSet {   #THIS SHOULD TAKE HList "ENTRIES":
 
 sub selectionClear {
 	my ($w) = shift;
-	return  if ($w->{Configure}{'-state'} =~ /d/o);
+#?	return  if ($w->{Configure}{'-state'} =~ /d/o);
 
 	my $active = $w->index('active');
 	my @range = $w->getEntryList(@_);
 
 	$w->Tk::HList::selectionClear(@range);
-	$w->activate($active);
+#	$w->activate($active);
 }
 
 sub anchorSet {  #HList's "anchor" is it's (active) cursor, so we use a "virtual anchor" for ours.
@@ -1552,23 +1599,29 @@ sub selectionAnchor {  #SET THE SELECTION ANCHOR (Listbox's version of HList's "
 	$_[0]->anchorSet($_[1]);
 }
 
+#NOTE:  Tk::HList::anchorClear(*) disappears the cursor, BUT sets the "active" index to ZERO (which IS
+#a LEGITIMATE ENTRY!!!  THEREFORE WHENEVER WE "activate" AN ENTRY, WE MUST SAVE IT AS "$w->{'_lastactive'}"!:
 sub activate {    #HListbox "anchor" == Listbox "active"!
 	my ($w) = shift;
-	return  if ($w->{Configure}{'-state'} =~ /d/o);
-
 	my @v = @_;
 	return  unless (defined($v[0]) || $w->{'-showcursoralways'});
+
 	my $ent = $w->getEntry($v[0]);
+	return  unless (defined($ent) && $ent =~ /\S/o);
+
 	unless ($w->entrycget($ent, '-state') eq 'disabled' || $w->info('hidden', $ent)) {
 		if (defined($v[0]) && defined($ent)) {
-			if ($w->{'-showcursoralways'} || $w->{'_hasfocus'}) {
-				$w->Tk::HList::anchorSet($ent);
+			my $showcursor = $w->{'-showcursoralways'} || 0;
+			$showcursor = 0  if ($showcursor < 0 && defined($v[1]) && $v[1] == 1);
+			if ($showcursor || ($w->{'_hasfocus'} && $w->focusCurrent)) {
+				$w->Tk::HList::anchorSet($ent);    #THIS SHOWS THE CURSOR
 			} else {
-				$w->Tk::HList::anchorClear($ent);
-				$w->{'_lastactive'} = $w->indexOf($ent);
+				$w->Tk::HList::anchorClear($ent);  #THIS HIDES THE CURSOR
 			}
+			$w->{'_lastactive'} = $w->indexOf($ent);
 		} else {
-			$w->Tk::HList::anchorClear();
+			$w->{'_lastactive'} = $w->index('active');
+			$w->Tk::HList::anchorClear($w->{'_lastactive'});
 		}
 	}
 }
@@ -1664,7 +1717,7 @@ sub get {
 
 sub insert {     #INSERT ONE OR MORE ITEMS TO THE LIST:
 	my ($c, $index, @data) = @_;
-	return ''  if ($c->{Configure}{'-state'} =~ /d/o);
+#?	return ''  if ($c->{Configure}{'-state'} =~ /d/o);
 
 	# The listbox might get resized after insert/delete, which is a 
 	# behaviour we don't like....
@@ -1743,7 +1796,7 @@ sub insert {     #INSERT ONE OR MORE ITEMS TO THE LIST:
 
 sub delete {        #DELETE ONE OR MORE ITEMS FROM THE LIST:
 	my $w = shift;
-	return  if ($w->{Configure}{'-state'} =~ /d/o);
+#?	return  if ($w->{Configure}{'-state'} =~ /d/o);
 
 	my $first = $_[0];
 	my $last = defined($_[1]) ? $_[1] : $first;
@@ -1823,7 +1876,7 @@ sub getEntryList {    #CONVERT A LIST OF INDICIES TO HList "ENTRIES":
 
 sub indexOf {  #GIVEN A VALID HList "ENTRY", RETURN IT'S RELATIVE (TO ZERO=1ST) Listbox "INDEX":
 	my $next = $_[0]->getFirstEntry;
-	my $indx = '0';
+	my $indx = 0;
 	while (defined($next) && $next =~ /\S/o) {
 		return $indx  if (!defined($_[1]) || $next == $_[1]);
 		$next = $_[0]->info('next', $next);
@@ -1834,16 +1887,16 @@ sub indexOf {  #GIVEN A VALID HList "ENTRY", RETURN IT'S RELATIVE (TO ZERO=1ST) 
 
 sub index {    #GIVEN A VALUE "LISTBOX INDEX", RETURN A ZERO-BASED "INDEX" (CONVERTS STUFF LIKE "@x,y", "end". etc:
 	my $w = $_[0];
+	return 0  unless (defined($_[1]) && $_[1]);
+
 	if ($_[1] =~ /^\d+$/o) {
 		return $_[1];
-	} elsif (!$_[1]) {
-		return '0';
 	} elsif ($_[1] =~ /^end/io) {
 		return $_[0]->size-1;
 	} elsif ($_[1] =~ /^anchor/o) {
 		return $_[0]->{'_vanchor'};
 	} elsif ($_[1] =~ /^active/o) {
-		return ($w->{'-showcursoralways'} || $w->{'_hasfocus'}) ? $_[0]->indexOf($_[0]->info('anchor')) : $w->{'_lastactive'};
+		return $w->{'_lastactive'};  #ALWAYS RETURN *OUR* ACTIVE, SEE NOTE ABOVE activate() FUNCTION!
 	} elsif ($_[1] =~ /^\@\d+\,(\d+)/o) {
 		return $_[0]->indexOf($_[0]->nearest($1));
 	}
@@ -1901,7 +1954,7 @@ sub DataExtend {    #USER PRESSED Shift-Ctrl-Home/End, SELECT FROM ANCHOR TO TOP
 
 sub SelectAll {
 	my $w = shift;
-	return  if ($w->{Configure}{'-state'} =~ /d/o);
+#?	return  if ($w->{Configure}{'-state'} =~ /d/o);
 
 	if ($w->cget('-selectmode') =~ /^(?:single|browse)/) { 
 		$w->selectionClear(0,'end');
@@ -1923,12 +1976,6 @@ sub Cntrl_backslash {
 	$w->selectionClear(0,'end');
 	$w->eventGenerate("<<ListboxSelect>>");
 	$w->Callback(-browsecmd);
-}
-
-sub Button1    #USER PRESSED LEFT MOUSE-BUTTON or SPACEBAR
-{
-	return  if ($_[0]->{Configure}{'-state'} =~ /d/o);
-	$_[0]->BeginSelect(@_);	
 }
 
 sub DoubleButton1    #USER DOUBLE-CLICKED LEFT MOUSE-BUTTON (has already done a single click)
@@ -2123,7 +2170,8 @@ sub UpDown   #USER PRESSED AN UP OR DOWN ARROW KEY:
 }
 
 sub selectionIncludes {
-	return 0 unless ($_[0]->index($_[1]) =~ /\d/o);
+#	return 0  unless ($_[0]->index($_[1]) =~ /\d/o);
+	return 0  unless (defined($_[0]) && $_[0] =~ /\S/o);
 
 	my $res = 0;
 	eval { $res = $_[0]->Tk::HList::selectionIncludes($_[0]->getEntry($_[1])); };
@@ -2175,9 +2223,11 @@ sub BeginSelect   #Mouse button-press (button 1)
 	my $w = shift;
 	my $el = shift;
 
+	return  if ($w->{Configure}{'-state'} =~ /d/o);
+
 	#HANDLE THIS SILLY "TIX" STUFF:
 	my $Ev = $w->XEvent;
-	my @info = $w->info('item',$Ev->x, $Ev->y);
+	my @info = $w->info('item',$Ev->x, $Ev->y)  if (defined $Ev);
 	if (defined($info[1]) && $info[1] eq 'indicator') { 
 		$w->{tixindicator} = $el;
 		$w->Callback(-indicatorcmd => $el, '<Arm>');
@@ -2185,19 +2235,21 @@ sub BeginSelect   #Mouse button-press (button 1)
 	}
 
 	#TOGGLE SELECTION STATUS, SET ANCHOR IF "extended":
-	if ($w->cget('-selectmode') =~ /^(?:multiple|extended)/o) {
-		if ($w->selectionIncludes($el)) {  #TOGGLE SELECT-STATUS OF ENTRY CLICKED ON:
-			$w->selectionClear($el);
-		} else {
-			$w->selectionSet($el);
-		}
-		$w->selectionAnchor($el);
-	} elsif ($ENV{'jwtlistboxhack'}) {  #WE ALLOW SELECTION TO BE EMPTY IN SINGLE/BROWSE MODES!:
-		if ($w->selectionIncludes($el)) {  #TOGGLE SELECT-STATUS OF ENTRY CLICKED ON:
-			$w->selectionClear(0,'end');
-		} else {
-			$w->selectionClear(0,'end');
-			$w->selectionSet($el);
+	if ($ENV{'jwtlistboxhack'}) {
+		if ($w->cget('-selectmode') =~ /^(?:multiple|extended)/o) {
+			if ($w->selectionIncludes($el)) {  #TOGGLE SELECT-STATUS OF ENTRY CLICKED ON:
+				$w->selectionClear($el);
+			} else {
+				$w->selectionSet($el);
+			}
+			$w->selectionAnchor($el);
+		} else {  #WE ALLOW SELECTION TO BE EMPTY IN SINGLE/BROWSE MODES!:
+			if ($w->selectionIncludes($el)) {  #TOGGLE SELECT-STATUS OF ENTRY CLICKED ON:
+				$w->selectionClear(0,'end');
+			} else {
+				$w->selectionClear(0,'end');
+				$w->selectionSet($el);
+			}
 		}
 	} else {
 		$w->selectionClear(0,'end');
@@ -2360,19 +2412,20 @@ sub STORE {
      # check size of current contents list
      my $sizeof = $self->size();
 
-#THIS SOMETIMES FAILS CAUSING THE FIRST ELEMENT TO NOT BE ADDED?!     if ( $index <= $sizeof ) {
-#        # Change a current listbox entry
-#        $self->delete($index);
-#        $self->insert($index, $value);
-#     } else {
+#THIS SOMETIMES FAILS CAUSING THE FIRST ELEMENT TO NOT BE ADDED?!
+     if ( $index <= $sizeof ) {
+        # Change a current listbox entry
+        $self->delete($index);
+        $self->insert($index, $value);
+     } else {
         # Add a new value
-#        if ( defined $index ) {
-#           $self->insert($index, $value);
-#        } else {
+        if ( defined $index ) {
+           $self->insert($index, $value);
+        } else {
            $self->insert("end", $value);
-#        }
-#     }
-     $self->activate('end')  unless ($self->index('active') =~ /\d/o); #MAKE SURE SOMETHING'S ACTIVE.
+        }
+     }
+	 $self->activate($self->{'_lastactive'});
    }
 }
 
@@ -2536,6 +2589,36 @@ sub SPLICE {
    }
 }
 
+sub ButtonPress_1
+{
+	my $w = shift;
+	my $clickedon = $_[0];
+
+	if (Tk::Exists($w)) {
+		$tixIndicatorArmed = -1;
+		return  if ($w->{Configure}{'-state'} =~ /d/o);
+
+		$w->focus  if (!$w->{'_hasfocus'} && $w->{'_ourtakefocus'});
+		$w->BeginSelect(@_);
+	}
+}
+
+sub AltButtonPress_1
+{
+	my $w = shift;
+	my $clickedon = $_[0];
+
+	if (Tk::Exists($w)) {
+		$tixIndicatorArmed = -1;
+		return  if ($w->{Configure}{'-state'} =~ /d/o);
+
+		$w->Tk::HList::anchorSet($w->getEntry($clickedon));
+		$w->focus  if (!$w->{'_hasfocus'} && $w->{'_ourtakefocus'});
+		#WE'LL LET ButtonRelease1 ACTIVATE.
+		$w->BeginSelect(@_);
+	}
+}
+
 sub ButtonRelease_1
 {
 	my $w = shift;
@@ -2545,7 +2628,9 @@ sub ButtonRelease_1
 	$w->CancelRepeat  if($mode !~ /^dragdrop/o);
 	my $ent = $w->indexOf($w->GetNearest($Ev->y));
 
-	return unless (defined($ent) and length($ent));  #BUTTON RELEASED OUTSIDE OF WIDGET? (PUNT)
+	return  if ($w->{Configure}{'-state'} =~ /d/o);
+	return  unless (defined($ent) and length($ent));  #BUTTON RELEASED OUTSIDE OF WIDGET? (PUNT)
+
 	if (exists $w->{tixindicator}) {  #HANDLE THIS SILLY "TIX" STUFF:
 		my @info = $w->info('item',$Ev->x,$Ev->y);
 
@@ -2558,7 +2643,7 @@ sub ButtonRelease_1
 		delete $w->{tixindicator};
 		return;
 	}
-	$w->activate($Ev->xy);
+	$w->activate($ent, 1);
 	if ($mode =~ /^(?:multiple|extended)/o) {
 		$w->Callback(-browsecmd);
 	} else {
@@ -2584,6 +2669,7 @@ sub Motion
 	my $Ev = $w->XEvent;
 	my @info = $w->info('item',$Ev->x, $Ev->y);
 
+	return  if ($w->{Configure}{'-state'} =~ /d/o);
 	return  if (exists($w->{tixindicator}));
 	return  unless (defined $el);
 	return  if (defined($Prev) && $el == $Prev);
@@ -2724,25 +2810,25 @@ sub ShiftSpace  #Shift-spacebar pressed:  Select from anchor to active inclusive
 # one under the pointer). Must be in numerical form.
 sub BeginToggle
 {
- my $w = shift;
- my $el = shift;
- if ($w->cget('-selectmode') =~ /^extended/o)
-  {
-   @Selection = $w->curselection();
-   $Prev = $el;
-   $w->selectionAnchor($el);
-   $w->activate($el);  #FOR SOME REASON, Listbox ALWAYS ACTIVATES W/O CALLING THIS HERE?
-   if ($w->selectionIncludes($el))
-    {
-     $w->selectionClear($el)
-    }
-   else
-    {
-     $w->selectionSet($el)
-    }
-   $w->eventGenerate("<<ListboxSelect>>");
-  }
+	my $w = shift;
+	my $el = shift;
+
+	return  if ($w->{Configure}{'-state'} =~ /d/o);
+
+	if ($w->cget('-selectmode') =~ /^extended/o) {
+		@Selection = $w->curselection();
+		$Prev = $el;
+		$w->selectionAnchor($el);
+		if ($w->selectionIncludes($el)) {
+	 		$w->selectionClear($el)
+		} else {
+			$w->selectionSet($el)
+		}
+		$w->eventGenerate("<<ListboxSelect>>");
+	}
+	$w->activate($w->index('anchor'));
 }
+
 # AutoScan --
 # This procedure is invoked when the mouse leaves an entry window
 # with button 1 down. It scrolls the window up, down, left, or
@@ -2849,18 +2935,26 @@ sub bbox
 sub focus
 {
 	my $w = shift;
+	if ($w->{Configure}{'-state'} =~ /d/o) {
+		$w->focusNext;
+		return;
+	}
+
 	$w->Tk::focus;
+	$w->{'_hasfocus'} = 1;
 	return  if ($w->{'-showcursoralways'});
 
-	$w->{'_hasfocus'} = 1;
 	#RESTORE CURSOR WHEN FOCUS IS GAINED:
-	$w->activate($w->index('active') || $w->{'_lastactive'}); #  if (defined($w->{'_lastactive'}) && $w->{'_lastactive'} >= 0);
+	$w->activate($w->{'_lastactive'});
 }
 
 sub unfocus
 {
-	return  if ($w->{'-showcursoralways'});
 	my $w = shift;
+	if ($w->{'-showcursoralways'}) {
+		$w->{'_hasfocus'} = 0;
+		return;
+	}
 
 	$w->{'_lastactive'} = $w->index('active');
 	$w->{'_hasfocus'} = 0;

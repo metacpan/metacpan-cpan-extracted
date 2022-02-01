@@ -66,7 +66,7 @@ if ($example) {
       last;
     }
   }
-  ok($found, "$0 found");
+  die "Did not find the sources for $0\n" unless $found;
   # test $example at the end
 }
 write_text("$dir/config", $config . "\n1;\n") if $config;
@@ -183,7 +183,9 @@ my $ok = 0;
 # What I'm seeing is that $@ is the empty string and $! is "Connection refused"
 # even though I thought $@ would be set. Oh well.
 say "This is the Phoebe client waiting for the server to start on port $port...";
-for (qw(1 1 1 1 1)) {
+# In order to avoid "skipped: Giving up after 5s" by CPAN tester gregor herrmann,
+# make sure to wait more than that!
+for (qw(1 1 1 1 1 2 3 5)) {
   if (not $total or $!) {
     $total += $_;
     sleep $_;

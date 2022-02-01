@@ -17,7 +17,7 @@ Role to enable reading a GTF file with genes/transcripts from the command line
 
 
 package CLIPSeqTools::Role::Option::Genes;
-$CLIPSeqTools::Role::Option::Genes::VERSION = '0.1.10';
+$CLIPSeqTools::Role::Option::Genes::VERSION = '1.0.0';
 
 #######################################################################
 #######################   Load External modules   #####################

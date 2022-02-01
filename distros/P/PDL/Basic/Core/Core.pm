@@ -16,6 +16,12 @@ use Config;
 use List::Util qw(max);
 use Scalar::Util 'blessed';
 
+# If quad (q/Q) is available for pack().
+our $CAN_PACK_QUAD = !! eval { my $packed = pack "Q", 0; 1 };
+
+# If "D" is available for pack().
+our $CAN_PACK_D = !! eval { my $packed = pack "D", 0; 1 };
+
 our @EXPORT = qw( piddle pdl null barf ); # Only stuff always exported!
 my @convertfuncs = map $_->convertfunc, PDL::Types::types();
 my @exports_internal = qw(howbig threadids topdl);
@@ -452,10 +458,6 @@ a single Empty PDL, you get back the Empty PDL (no padding).
 
 =cut
 
-sub pdl {PDL->pdl(@_)}
-
-sub piddle {PDL->pdl(@_)}
-
 =head2 null
 
 =for ref
@@ -791,7 +793,8 @@ sub PDL::threadids {  # Return dimensions as @list
 
 ################# Creation/copying functions #######################
 
-
+sub piddle {PDL->pdl(@_)}
+sub pdl {PDL->pdl(@_)}
 sub PDL::pdl { my $x = shift; return $x->new(@_) }
 
 =head2 doflow
@@ -1200,16 +1203,21 @@ sub PDL::new {
          # new was passed a string argument that doesn't look like a number
          # so we can process as a Matlab-style data entry format.
 		return PDL::Core::new_pdl_from_string($new,$value,$this,$type);
-      } elsif ($Config{ivsize} < 8 && $pack[$new->get_datatype] eq 'q*') {
+      } elsif (! $CAN_PACK_QUAD && $pack[$new->get_datatype] =~ /^q\*$/i ) {
          # special case when running on a perl without 64bit int support
          # we have to avoid pack("q", ...) in this case
          # because it dies with error: "Invalid type 'q' in pack"
          $new->setdims([]);
          set_c($new, [0], $value);
+      } elsif (! $CAN_PACK_D && $pack[$new->get_datatype] =~ /^(\QD*\E|\Q(DD)*\E)$/ ) {
+         # if "D" is not available for pack(),
+         # it dies with error: "Invalid type 'D' in pack".
+         $new->setdims([]);
+         set_c($new, [0], $value);
       } else {
          $new->setdims([]);
          ${$new->get_dataref}     = pack( $pack[$new->get_datatype], $value );
-         $new->upd_data();
+         $new->upd_data;
       }
    }
    elsif (blessed($value)) { # Object
@@ -2132,7 +2140,8 @@ Return back either the argument pdl or a copy of it depending on whether
 it be flagged in-place or no.  Handy for building inplace-aware functions.
 
 If you specify a preferred type (must be one of the usual PDL type strings,
-a list ref containing several of them, or a string containing several of them),
+a list ref containing several of them, or a comma-separated string
+containing several of them),
 then the copy is coerced into the first preferred type listed if it is not
 already one of the preferred types.
 
@@ -2143,28 +2152,17 @@ a preferred type.
 
 sub new_or_inplace {
 	my $pdl = shift;
-	my $preferred = shift;
 	if(blessed($pdl) && $pdl->is_inplace) {
 		$pdl->set_inplace(0);
 		return $pdl;
-	} else {
-	    unless(defined($preferred)) {
-		return blessed($pdl) ? $pdl->copy : null();
-	    } else {
-		$preferred = join(",",@$preferred) if(ref($preferred) eq 'ARRAY');
-		my $s = "".$pdl->type;
-		if($preferred =~ m/(^|\,)$s(\,|$)/i) {
-		    # Got a match - the PDL is one of the preferred types.
-		    return $pdl->copy();
-		} else {
-		    # No match - promote it to the first in the list.
-		    $preferred =~ s/\,.*//;
-		    my $out = PDL->new_from_specification(PDL::Type->new($preferred),$pdl->dims);
-		    $out .= $pdl;
-		    return $out;
-		}
-	    }
 	}
+	my $preferred = shift;
+	return blessed($pdl) ? $pdl->copy : null() if !defined $preferred;
+	$preferred = [split ",",$preferred] if ref $preferred ne 'ARRAY';
+	my $s = "".$pdl->type;
+	return $pdl->copy if grep $_ eq $s, @$preferred; # the PDL is one of the preferred types.
+	# No match - promote it to the first in the list.
+	return $pdl->convert(PDL::Type->new($preferred->[0]));
 }
 *PDL::new_or_inplace = \&new_or_inplace;
 
@@ -2571,8 +2569,8 @@ sub PDL::reshape{
     my @dims = grep defined, @_[1..$#_];
     for my $dim(@dims) { barf "reshape: invalid dim size '$dim'" if $dim < 0 }
     @dims = grep($_ != 1, $pdl->dims) if @dims == 0; # get rid of dims of size 1
-    $pdl->setdims([@dims]);
-    $pdl->upd_data;
+    $pdl->setdims(\@dims);
+    $pdl->make_physical;
     if ($pdl->nelem > $nelem) {
 	my $tmp=$pdl->clump(-1)->slice("$nelem:-1");
 	$tmp .= 0;

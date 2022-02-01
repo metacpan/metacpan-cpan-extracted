@@ -6,10 +6,14 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Font::PCF',
    requires => {
+      'perl' => '5.026',
+      'Object::Pad' => '0.57',
+      'Object::Pad::ClassAttr::Struct' => 0,
+      'Syntax::Keyword::Match' => 0,
+
       'IO::Handle::Packable' => 0,
-      'List::Util' => 0,
+      'List::Util' => '1.33',
       'PerlIO::gzip' => 0,
-      'Struct::Dumb' => 0,
    },
    test_requires => {
       'Test::More' => '0.88', # done_testing

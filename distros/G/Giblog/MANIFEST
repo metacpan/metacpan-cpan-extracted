@@ -6,9 +6,12 @@ lib/Giblog.pm
 lib/Giblog/API.pm
 lib/Giblog/Command.pm
 lib/Giblog/Command/add.pm
+lib/Giblog/Command/all.pm
 lib/Giblog/Command/build.pm
+lib/Giblog/Command/deploy.pm
 lib/Giblog/Command/new.pm
 lib/Giblog/Command/new/proto/.gitignore
+lib/Giblog/Command/new/proto/deploy.pl
 lib/Giblog/Command/new/proto/giblog.conf
 lib/Giblog/Command/new/proto/lib/Giblog/Command/build.pm
 lib/Giblog/Command/new/proto/public/.gitkeep
@@ -29,6 +32,7 @@ lib/Giblog/Command/new/proto/templates/static/js/.gitkeep
 lib/Giblog/Command/new/proto/templates/static/test.cgi
 lib/Giblog/Command/new_blog.pm
 lib/Giblog/Command/new_blog/proto/.gitignore
+lib/Giblog/Command/new_blog/proto/deploy.pl
 lib/Giblog/Command/new_blog/proto/giblog.conf
 lib/Giblog/Command/new_blog/proto/lib/Giblog/Command/build.pm
 lib/Giblog/Command/new_blog/proto/public/.gitkeep
@@ -51,12 +55,14 @@ lib/Giblog/Command/new_blog/proto/templates/common/side.html
 lib/Giblog/Command/new_blog/proto/templates/common/top.html
 lib/Giblog/Command/new_blog/proto/templates/static/blog/.gitkeep
 lib/Giblog/Command/new_blog/proto/templates/static/css/common.css
+lib/Giblog/Command/new_blog/proto/templates/static/css/variables.css
 lib/Giblog/Command/new_blog/proto/templates/static/images/.gitkeep
-lib/Giblog/Command/new_blog/proto/templates/static/images/giblog-logo.png
+lib/Giblog/Command/new_blog/proto/templates/static/images/logo.png
 lib/Giblog/Command/new_blog/proto/templates/static/js/.gitkeep
 lib/Giblog/Command/new_blog/proto/templates/static/test.cgi
 lib/Giblog/Command/new_website.pm
 lib/Giblog/Command/new_website/proto/.gitignore
+lib/Giblog/Command/new_website/proto/deploy.pl
 lib/Giblog/Command/new_website/proto/giblog.conf
 lib/Giblog/Command/new_website/proto/lib/Giblog/Command/build.pm
 lib/Giblog/Command/new_website/proto/public/.gitkeep
@@ -80,11 +86,13 @@ lib/Giblog/Command/new_website/proto/templates/common/top.html
 lib/Giblog/Command/new_website/proto/templates/index.html
 lib/Giblog/Command/new_website/proto/templates/static/blog/.gitkeep
 lib/Giblog/Command/new_website/proto/templates/static/css/common.css
+lib/Giblog/Command/new_website/proto/templates/static/css/variables.css
 lib/Giblog/Command/new_website/proto/templates/static/images/.gitkeep
-lib/Giblog/Command/new_website/proto/templates/static/images/giblog-logo.png
+lib/Giblog/Command/new_website/proto/templates/static/images/logo.png
 lib/Giblog/Command/new_website/proto/templates/static/js/.gitkeep
 lib/Giblog/Command/new_website/proto/templates/static/test.cgi
 lib/Giblog/Command/publish.pm
+lib/Giblog/Command/save.pm
 lib/Giblog/Command/serve.pm
 Makefile.PL
 MANIFEST			This list of files

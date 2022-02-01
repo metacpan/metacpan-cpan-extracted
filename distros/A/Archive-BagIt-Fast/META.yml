@@ -1,0 +1,43 @@
+---
+abstract: 'A module to use L<IO::AIO> to get better performance'
+author:
+  - 'Andreas Romeyke <cpan@andreas.romeyke.de>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Archive-BagIt-Fast
+no_index:
+  directory:
+    - corpus
+    - examples
+    - inc
+provides:
+  Archive::BagIt::Fast:
+    file: lib/Archive/BagIt/Fast.pm
+    version: '0.090'
+requires:
+  Archive::BagIt: '0.09'
+  IO::AIO: '0'
+  Moo: '0'
+  Net::SSLeay: '1.43'
+  perl: '5.010'
+resources:
+  repository: https://git.fsfe.org/art1pirat/Archive-BagIt-Fast.git
+version: '0.090'
+x_contributors:
+  - 'Andreas Romeyke <art1@andreas-romeyke.de>'
+x_generated_by_perl: v5.32.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

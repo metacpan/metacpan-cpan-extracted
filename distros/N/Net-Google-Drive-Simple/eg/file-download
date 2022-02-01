@@ -14,10 +14,10 @@ my $gd = Net::Google::Drive::Simple->new();
 
 my $files = $gd->files( { maxResults => 20 }, { page => 0 } );
 
-for my $file ( @$files ) {
+for my $file (@$files) {
     my $name = $file->originalFilename();
-    my $q = "$name ([y]/n)";
-    my $yes = ask $q, "y";
+    my $q    = "$name ([y]/n)";
+    my $yes  = ask $q, "y";
     next if $yes ne "y";
     print "Downloading $name\n";
     my $c = $gd->download( $file, $name );

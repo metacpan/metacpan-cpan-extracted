@@ -1,0 +1,32 @@
+NAME
+
+    Dist::Zilla::PERLSRVDE - A dummy module for this namespace
+
+VERSION
+
+    version 0.0.2
+
+DESCRIPTION
+
+    This is a collection of Dist::Zilla related modules used at
+    https://perl-services.de|Perl-Services.de.
+
+MODULES
+
+ Dist::Zilla::PluginBundle::PERLSRVDE
+
+    This is the Dist::Zilla::PluginBundle::PERLSRVDE to include the Plugins
+    we usually use.
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2022 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

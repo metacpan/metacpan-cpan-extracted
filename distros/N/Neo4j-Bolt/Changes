@@ -1,4 +1,8 @@
 Revision history for Perl module Neo4j::Bolt
+0.4203 2021-09-09
+    - Fix support for Perl v5.16, v5.14, v5.12 (#44)
+0.4202 2021-02-24
+    - Fix rare string encoding issues (#38, #39)
 0.4201 2021-01-20
     - Common types for Neo4j objects between Bolt and Driver (Arne)
     - Update (c)

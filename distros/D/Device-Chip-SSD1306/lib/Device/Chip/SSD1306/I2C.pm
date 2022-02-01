@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.19;
+use Object::Pad 0.57;
 
-package Device::Chip::SSD1306::I2C 0.10;
+package Device::Chip::SSD1306::I2C 0.11;
 class Device::Chip::SSD1306::I2C
-   extends Device::Chip::SSD1306;
+   :isa(Device::Chip::SSD1306);
 
 use constant PROTOCOL => "I2C";
 
@@ -45,7 +45,7 @@ method I2C_options
 }
 
 # passthrough
-method power { $self->protocol->power( $_[0] ) }
+method power ( $on ) { $self->protocol->power( $on ) }
 
 method send_cmd ( @vals )
 {
@@ -57,7 +57,7 @@ method send_cmd ( @vals )
 
 method send_data ( $bytes )
 {
-   $self->protocol->write( "\x40" . $_[0] )
+   $self->protocol->write( "\x40" . $bytes )
 }
 
 =head1 AUTHOR

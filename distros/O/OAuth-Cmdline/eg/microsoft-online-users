@@ -12,17 +12,13 @@ use open qw/:std :utf8/;			# Enable UTF-8 output
 use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($DEBUG);
 
-my $domain = "";				# The domain you have hosted in Office 365
-
-die("Variable \$domain has not been set. Edit this script before running it\n") unless (length($domain) > 3);
-
-my $oauth = OAuth::Cmdline::MicrosoftOnline->new( );
+my $oauth = OAuth::Cmdline::MicrosoftOnline->new(resource => "https://graph.microsoft.com");
 
 my $ua = LWP::UserAgent->new();
 $ua->default_header( 
     $oauth->authorization_headers );
 
-my $resp = $ua->get( "https://graph.windows.net/$domain/users?api-version=1.6&\$top=999" );
+my $resp = $ua->get( "https://graph.microsoft.com/v1.0/users?\$top=999" );
 
 if( $resp->is_error ) {
     die "Error: ", $resp->message();

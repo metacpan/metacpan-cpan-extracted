@@ -66,7 +66,7 @@
    "provides" : {
       "Devel::Cover::Report::Coveralls" : {
          "file" : "lib/Devel/Cover/Report/Coveralls.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       }
    },
    "release_status" : "stable",
@@ -80,7 +80,7 @@
          "web" : "https://github.com/kan/coveralls-perl"
       }
    },
-   "version" : "0.30",
+   "version" : "0.31",
    "x_contributors" : [
       "David Steinbrunner <dsteinbrunner@pobox.com>",
       "Ed J <mohawk2@users.noreply.github.com>",

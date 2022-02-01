@@ -48,7 +48,7 @@ Output: Distribution of cluster size (cluster_size_distribution.tab). Distributi
 =cut
 
 package CLIPSeqTools::App::cluster_size_and_score_distribution;
-$CLIPSeqTools::App::cluster_size_and_score_distribution::VERSION = '0.1.10';
+$CLIPSeqTools::App::cluster_size_and_score_distribution::VERSION = '1.0.0';
 
 # Make it an app command
 use MooseX::App::Command;
@@ -126,6 +126,7 @@ sub run {
 	my $assembled_cluster;
 	my %cluster_size_count;
 	my %cluster_score_count;
+	my @assembled_clusters;
 	$reads_collection->foreach_record_sorted_by_location_do( sub {
 		my ($rec) = @_;
 		
@@ -149,6 +150,7 @@ sub run {
 			$cluster_size_count{$assembled_cluster->length}++;
 			$cluster_score_count{$assembled_cluster->copy_number}++;
 			$assembled_cluster = $self->_create_new_cluster_from_record($rec);
+			push @assembled_clusters, $assembled_cluster;
 		}
 		
 		return 0;
@@ -168,6 +170,12 @@ sub run {
 	say $OUT2 join("\t", 'cluster_score', 'count');
 	say $OUT2 join("\t", $_, $cluster_score_count{$_}) for sort {$a <=> $b} keys %cluster_score_count;
 	close $OUT2;
+
+	warn "Printing results for cluster coordinates\n" if $self->verbose;
+	open (my $OUT3, '>', $self->o_prefix.'clusters.bed');
+	say $OUT3 join("\t", $_->rname, $_->start, $_->stop+1, $_->location,
+		$_->copy_number, $_->strand_symbol) for @assembled_clusters;
+	close $OUT3;
 	
 	if ($self->plot) {
 		warn "Creating plot\n" if $self->verbose;

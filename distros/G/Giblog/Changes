@@ -1,3 +1,34 @@
+3.0 2022-02-01
+  - Dropped IE support in default CSS.
+  - Improve default CSS designs of new_website and new_blog command
+    side width become 320px. This is for Google Adsence banner size.
+    main width become 1030px.
+    use flex layout instead of float layout.
+    use CSS properties(CSS variables) for theme colors and add a variables.css file.
+    h3 boder-top color become the theme color.
+  - giblog publish command become push fource
+    Before
+      git -C public add --all
+      git -C public commit -m "Published by Giblog at YY-mm-dd HH:MM:SS"
+      git -C public push origin main
+    After
+      git -C public add --all
+      git -C public commit -m "Published by Giblog at YY-mm-dd HH:MM:SS"
+      git -C public push -f origin main
+    This is because other managers can publish web sites certainly.
+  - fix upper case tag can't be parsed correctly as Giblog syntax.
+  - The modified time of static files are copied to the modified time of public files
+  - add -C to the option of giblog command. This is alias for -H and --home option.
+  - enable -C option of giblog publish command
+  - add giblog save command
+  - Add "giblog deploy" command and add "deploy.pl" program in the home directory.
+  - add add_content_after_first_h_tag method to Giblog::API
+  - add add_content_after_first_p_tag method to Giblog::API
+  - add replace_vars method to Giblog::API
+  - add the call of replace_vars method in proto templates in new, new_website, new_blog commands.
+  - add --build option to "giblog publish" command
+  - add --deploy option to "giblog publish" command
+  - add giblog all command
 2.0 2021-07-19
   - add serve command
     

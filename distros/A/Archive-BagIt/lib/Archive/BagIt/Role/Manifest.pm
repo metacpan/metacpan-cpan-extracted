@@ -8,7 +8,7 @@ use Moo::Role;
 with 'Archive::BagIt::Role::Plugin';
 with 'Archive::BagIt::Role::Portability';
 # ABSTRACT: A role that handles all manifest files for a specific Algorithm
-our $VERSION = '0.089'; # VERSION
+our $VERSION = '0.091'; # VERSION
 
 has 'algorithm' => (
     is => 'rw',
@@ -353,7 +353,7 @@ Archive::BagIt::Role::Manifest - A role that handles all manifest files for a sp
 
 =head1 VERSION
 
-version 0.089
+version 0.091
 
 =head2 manifest_entries()
 
@@ -369,7 +369,7 @@ returns the tagmanifest_entries() for the current digest algorithm, the result i
 
 =head2 calc_digests($bagit, $filenames_ref, $opts)
 
-Method to calculate and return all digests for a a list of files. This method will be overwritten by C<Archive::BagIt::Fast>.
+Method to calculate and return all digests for a a list of files. This method will be overwritten by L<Archive::BagIt::Fast>.
 
 =head2 verify_manifest($payload_files, $return_all_errors)
 

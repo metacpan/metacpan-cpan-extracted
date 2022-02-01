@@ -226,7 +226,7 @@ WIDGET SPECIFIC OPTIONS
         -disabledforeground color, and selection cannot be modified and is
         not shown (though selection information is retained).
 
-    -takefocus => *number*
+    -takefocus
         There are actually three different focusing options: Specify 1 to
         both allow the widget to take keyboard focus itself and to enable
         grabbing the keyboard focus when a user clicks on a row in the

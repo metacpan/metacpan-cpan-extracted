@@ -26,7 +26,7 @@ no_index:
 provides:
   Device::Chip::Adapter::LinuxKernel:
     file: lib/Device/Chip/Adapter/LinuxKernel.pm
-    version: '0.00006'
+    version: '0.00008'
 requires:
   Carp: '0'
   Device::Chip::Adapter: '0'
@@ -40,7 +40,7 @@ requires:
 resources:
   bugtracker: https://github.com/simcop2387/device-chip-adapter-linuxkernel/issues
   repository: git://github.com/simcop2387/device-chip-adapter-linuxkernel.git
-version: '0.00006'
+version: '0.00008'
 x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

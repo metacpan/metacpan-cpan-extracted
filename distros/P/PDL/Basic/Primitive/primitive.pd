@@ -887,7 +887,7 @@ sub PDL::uniqind {
   # Different from uniq we sort and store the result in an intermediary
   my $aflat = $arr->flat;
   my $nanind = which($aflat!=$aflat);                        # NaN indexes
-  my $good = $aflat->sequence->long->where($aflat==$aflat);  # good indexes
+  my $good = PDL->sequence(indx, $aflat->dims)->where($aflat==$aflat);  # good indexes
   my $i_srt = $aflat->where($aflat==$aflat)->qsorti;         # no BAD or NaN values for qsorti
   my $srt = $aflat->where($aflat==$aflat)->index($i_srt);
   my $uniqind;
@@ -2776,11 +2776,7 @@ sub PDL::interpND {
   my($opt) = (defined $options) ? $options : {};
 
   my($method)   = $opt->{m} || $opt->{meth} || $opt->{method} || $opt->{Method};
-  if(!defined $method) {
-	$method = ($source->type <= zeroes(long,1)->type) ?
-	   	   'sample' :
-	           'linear';
-  }
+  $method //= $source->type->integer ? 'sample' : 'linear';
 
   my($boundary) = $opt->{b} || $opt->{boundary} || $opt->{Boundary} || $opt->{bound} || $opt->{Bound} || 'extend';
   my($bad) = $opt->{bad} || $opt->{Bad} || 0.0;
@@ -3354,8 +3350,7 @@ L<PDL::Slices/indexND> can be fed the coordinates to return the values.
 
 *whichND = \&PDL::whichND;
 sub PDL::whichND {
-  my $mask = shift;
-  $mask = PDL::pdl('PDL',$mask) unless(UNIVERSAL::isa($mask,'PDL'));
+  my $mask = PDL->topdl(shift);
 
   # List context: generate a perl list by dimension
   if(wantarray) {
@@ -3370,22 +3365,15 @@ sub PDL::whichND {
   }
 
   # Scalar context: generate an N-D index ndarray
-
-  unless($mask->nelem) {
-      return PDL::new_from_specification('PDL',indx,$mask->ndims,0);
-  }
-
-  unless($mask->getndims) {
-    return $mask ? pdl(indx,0) : PDL::new_from_specification('PDL',indx,0);
-  }
+  return PDL->new_from_specification(indx,$mask->ndims,0) if !$mask->nelem;
+  return $mask ? pdl(indx,0) : PDL->new_from_specification(indx,0)
+    if !$mask->getndims;
 
   my $ind = $mask->flat->which->dummy(0,$mask->getndims)->make_physical;
-  if($ind->nelem==0) {
-      # In the empty case, explicitly return the correct type of structured empty
-      return PDL::new_from_specification('PDL',indx,$mask->ndims, 0);
-  }
+  # In the empty case, explicitly return the correct type of structured empty
+  return PDL->new_from_specification(indx,$mask->ndims, 0) if !$ind->nelem;
 
-  my $mult = ones($mask->getndims)->long;
+  my $mult = ones(indx, $mask->getndims);
   my @mdims = $mask->dims;
 
   for my $i (0..$#mdims-1) {

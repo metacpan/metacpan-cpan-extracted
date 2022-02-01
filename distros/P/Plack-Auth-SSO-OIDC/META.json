@@ -1,0 +1,79 @@
+{
+   "abstract" : "implementation of OpenID Connect for Plack::Auth::SSO",
+   "author" : [
+      "Nicolas Franck, C<< <nicolas.franck at ugent.be> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Plack-Auth-SSO-OIDC",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.17",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Crypt::JWT" : "0",
+            "Data::UUID" : "0",
+            "Data::Util" : "0",
+            "Digest::SHA" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "MIME::Base64" : "0",
+            "Moo" : "0",
+            "Plack" : "0",
+            "Plack::Auth::SSO" : "0",
+            "Try::Tiny" : "0",
+            "URI" : "0",
+            "perl" : "v5.10.1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/LibreCat/Plack-Auth-SSO-OIDC/issues"
+      },
+      "homepage" : "https://github.com/LibreCat/Plack-Auth-SSO-OIDC",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/LibreCat/Plack-Auth-SSO-OIDC.git",
+         "web" : "https://github.com/LibreCat/Plack-Auth-SSO-OIDC"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "Nicolas Franck <nicolas.franck@ugent.be>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27"
+}
+

@@ -22,11 +22,12 @@ my $gd = Net::Google::Drive::Simple->new();
 ok 1, "loaded ok";
 
 SKIP: {
-    if( !$ENV{ LIVE_TEST } ) {
+    if ( !$ENV{LIVE_TEST} ) {
         skip "LIVE_TEST not set, skipping live tests", $nof_live_tests;
     }
 
-    my( $files, $parent ) = $gd->children( "/this-path-does-not-exist",
+    my ( $files, $parent ) = $gd->children(
+        "/this-path-does-not-exist",
         { maxResults => 3 }, { page => 0 },
     );
 
@@ -35,29 +36,30 @@ SKIP: {
       "Child this-path-does-not-exist not found",
       "error message";
 
-    ( $files, $parent ) = $gd->children( "/",
+    ( $files, $parent ) = $gd->children(
+        "/",
         { maxResults => 3 }, { page => 0 },
     );
     is ref($files), "ARRAY", "children returned ok";
 
     # upload a test file
     my $testfile = "$Bin/data/testfile";
-    my $file_id = $gd->file_upload( $testfile, $parent );
+    my $file_id  = $gd->file_upload( $testfile, $parent );
     ok defined $file_id, "upload ok";
-    my $metadata = $gd->file_metadata( $file_id );
-    ok (((defined $metadata) && ($metadata->{title} eq 'testfile')), "metadata ok");
+    my $metadata = $gd->file_metadata($file_id);
+    ok( ( ( defined $metadata ) && ( $metadata->{title} eq 'testfile' ) ), "metadata ok" );
 
     # Search for the file as both children method
     # and the 'files' method (direct api access)
     ( $files, $parent ) = $gd->children( "/", {}, { title => 'testfile' } );
     ok( ref($files) eq "ARRAY" && scalar(@$files), "file founds via children()" );
-    is( $files->[0]->originalFilename(), "testfile", "Got the file, original filename looks right (via children())");
+    is( $files->[0]->originalFilename(), "testfile", "Got the file, original filename looks right (via children())" );
     $files = $gd->files( {}, { title => 'testfile' } );
     ok( ref($files) eq "ARRAY" && scalar(@$files), "files found via files()" );
-    is( $files->[0]->originalFilename(), "testfile", "Got the file, original filename looks right (via files())");
+    is( $files->[0]->originalFilename(), "testfile", "Got the file, original filename looks right (via files())" );
 
     # Delete the file
-    ok $gd->file_delete( $file_id ), "delete ok";
+    ok $gd->file_delete($file_id), "delete ok";
 
     ( $files, $parent ) = $gd->children( "/", {}, { title => 'testfile' } );
     ok( ref($files) eq "ARRAY" && !scalar(@$files), "Can no longer find deleted file (via children())" );

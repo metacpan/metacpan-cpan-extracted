@@ -4,7 +4,7 @@ package Net::SAML2::IdP;
 use Moose;
 use MooseX::Types::URI qw/ Uri /;
 
-our $VERSION = '0.49';
+our $VERSION = '0.52';
 
 # ABSTRACT: Net::SAML2::IdP - SAML Identity Provider object
 
@@ -120,10 +120,10 @@ sub new_from_xml {
     {
         my $use = $key->getAttribute('use') || 'signing';
 
-        # We can't select by ds:KeyInfo/ds:X509Data/ds:X509Certificate
-        # because of https://rt.cpan.org/Public/Bug/Display.html?id=8784
+        $key->setNamespace('http://www.w3.org/2000/09/xmldsig#', 'ds');
+
         my ($text)
-            = $key->findvalue("//*[local-name()='X509Certificate']")
+            = $key->findvalue("ds:KeyInfo/ds:X509Data/ds:X509Certificate", $key)
             =~ /^\s*(.+?)\s*$/s;
 
         # rewrap the base64 data from the metadata; it may not
@@ -246,7 +246,7 @@ Net::SAML2::IdP - Net::SAML2::IdP - SAML Identity Provider object
 
 =head1 VERSION
 
-version 0.49
+version 0.52
 
 =head1 SYNOPSIS
 
@@ -344,7 +344,7 @@ Chris Andrews  <chrisa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Chris Andrews and Others, see the git log.
+This software is copyright (c) 2022 by Chris Andrews and Others, see the git log.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

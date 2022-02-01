@@ -8,8 +8,8 @@ UI::Various - graphical/non-graphical user interface without external programs
 
 # ABSTRACT
 
-**Currently this module is WORK IN PROGRESS and of very limited usage!** It
-is mainly uploaded to see how the tests run (or fail) on the various
+**Currently this module is WORK IN PROGRESS and of limited usage!** It is
+updated and uploaded often to get the results of the tests on the various
 different CPAN test platforms.
 
 Did you ever need to decide if a graphical or text based user interface is
@@ -30,7 +30,7 @@ environment variable `UI`.
 
 Of course this variability does not come without some simplifications:
 
-At any time there can be only one active window and one (modal) dialog "in
+At any time there can be only one active window and one (modal) dialogue "in
 front" of that window.  See ["LIMITS"](#limits) for more details.  All graphics,
 pictures or icons (unless the later are part of the character set used) need
 alternative descriptions for the text based interfaces, which can make a big
@@ -76,11 +76,15 @@ over the list in the `use` statement.
 As it is quite difficult to (as a developer) implement and/or (as a user)
 understand a terminal based UI with multiple parallel windows to interact
 with, only one window may be active at any time.  For simple modal queries
-this window may open a dialog window blocking itself until the dialog
+this window may open a dialogue window blocking itself until the dialogue
 returns.  However, it is possible to have a list of multiple windows and
 switch between them: One is active and the others are inactive, waiting to
 be activated again.  See `examples/hello-two-windows.pl` and
 `examples/hello-variable-content.pl`.
+
+Check buttons may not have variable texts.
+
+Radio buttons can only be arranged vertically.
 
 # KNOWN BUGS
 
@@ -129,7 +133,7 @@ this list.
 #### `language`
 
 configures the initial language used by the package itself, both for
-debugging and the UI elements.  Currently 2 languages are supported:
+messages and the UI elements.  Currently 2 languages are supported:
 
 - de
 - en (default)

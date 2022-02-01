@@ -33,7 +33,7 @@ my $re_msg_tail = qr/ at $0 line \d{2,}\.?$/;
 warning_like
 {   $_ = UI::Various::Check->new(var => '');   }
 {   carped => qr/^'var' attribute must be a SCALAR reference$re_msg_tail/  },
-     'bad var parameter fails';
+    'bad var parameter fails';
 
 my $main = UI::Various::Main->new(width => 20);
 

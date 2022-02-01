@@ -2,7 +2,7 @@ package Neo4j::Bolt::Cxn;
 use Carp qw/croak/;
 
 BEGIN {
-  our $VERSION = "0.4201";
+  our $VERSION = "0.4203";
   require Neo4j::Bolt::CTypeHandlers;
   require Neo4j::Bolt::ResultStream;
   require XSLoader;
@@ -27,6 +27,7 @@ sub run_query {
     croak "Arg 2 should be a hashref of { param => $value, ... }";
   }
   croak "No connection" unless $self->connected;
+  utf8::upgrade($query);
   return $self->run_query_($query, $parms // {}, 0, $db // default_db);
 }
 
@@ -40,6 +41,7 @@ sub send_query {
     croak "Arg 2 should be a hashref of { param => $value, ... }";
   }
   croak "No connection" unless $self->connected;
+  utf8::upgrade($query);
   return $self->run_query_($query, $parms ? $parms : {}, 1, $db // default_db );
 }
 

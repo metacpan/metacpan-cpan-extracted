@@ -10,5 +10,5 @@ WriteMakefile (NAME => 'Math::MatrixDecomposition',
 	       MIN_PERL_VERSION => '5.010',
 	       PREREQ_PM =>
 	       {
-		"Math::BLAS" => 0,
+		"Math::BLAS" => 1.02,
 	       });

@@ -1,0 +1,23 @@
+# Changelog
+
+## 20220120.0
+
+* Initial version.
+
+## 20220122.0
+
+* [Fix] Remove recursive dependency.
+* [Fix] Add trailing slash to request base url.
+* Improve handle response.
+* Set default API client in all classes.
+* Add Podman::Client to container, image constructor.
+
+## 20220124.0
+
+* Use Mojo::UserAgent and tools as API client.
+
+## 20220129.0
+
+* Create exception message by API code.
+* Create unit tests.
+* Simplify library interface.

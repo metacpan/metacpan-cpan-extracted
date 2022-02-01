@@ -57,6 +57,7 @@ has sampled => undef;
 
 has spans       => sub { [] };
 has transaction => undef;
+has request     => undef;
 
 sub start_child ($self, $span_context = {}) {
   my $child_span = Sentry::Tracing::Span->new({

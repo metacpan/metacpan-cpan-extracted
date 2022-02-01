@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use Curses::UI;
 
@@ -174,7 +174,7 @@ Change the focus to previous (C<-1>), next (C<+1>) or newest (C<0>)
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-sub _focus($$$;$)
+sub _focus($$)
 {
     my ($self, $index) = @_;
     local $_ = $self->children - 1; # maximum index

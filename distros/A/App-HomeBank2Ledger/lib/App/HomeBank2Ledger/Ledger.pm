@@ -5,7 +5,7 @@ package App::HomeBank2Ledger::Ledger;
 use warnings;
 use strict;
 
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 
 sub new {
@@ -63,7 +63,7 @@ App::HomeBank2Ledger::Ledger - Ledger data representation
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

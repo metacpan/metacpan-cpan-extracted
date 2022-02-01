@@ -6,6 +6,19 @@ Changes - Apache::Test change logfile
 
 =over 3
 
+=item 1.43 Nov 7 2021
+
+Our implementation of "which" should not search
+for a program in the elements of PATH when program
+already contains a path. [rjung]
+
+Fix hash generation when the openssl command
+was overwritten with the environment variable
+"APACHE_TEST_OPENSSL_CMD". [rjung]
+
+Add new config option limitrequestline needed
+when the local directory paths are long. [rjung]
+
 =item 1.42 Aug 28 2019
 
 Fix loading apache_test_config.pm for recent perls in which '.' is

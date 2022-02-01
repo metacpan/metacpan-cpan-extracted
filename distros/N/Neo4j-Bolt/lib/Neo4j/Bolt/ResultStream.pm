@@ -2,7 +2,7 @@ package Neo4j::Bolt::ResultStream;
 # use Neo4j::Client;
 
 BEGIN {
-  our $VERSION = "0.4201";
+  our $VERSION = "0.4203";
   require Neo4j::Bolt::Cxn;
   require Neo4j::Bolt::CResultStream;
   require XSLoader;
@@ -138,6 +138,14 @@ provide the stream, and consumed_after() is the time it took the
 client (you) to pull them all.
 
 =back
+
+=head1 LIMITATIONS
+
+The results of Cypher C<EXPLAIN> or C<PROFILE> queries are
+currently unsupported. If you need to access such results,
+consider using L<Neo4j::Driver> or the interactive
+L<Neo4j Browser|https://neo4j.com/docs/browser-manual/current/>
+instead of this module.
 
 =head1 SEE ALSO
 

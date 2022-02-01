@@ -52,7 +52,7 @@
    "provides" : {
       "Log::ger::Output::Screen" : {
          "file" : "lib/Log/ger/Output/Screen.pm",
-         "version" : "0.018"
+         "version" : "0.019"
       }
    },
    "release_status" : "stable",
@@ -67,7 +67,7 @@
          "web" : "https://github.com/perlancar/perl-Log-ger-Output-Screen"
       }
    },
-   "version" : "0.018",
+   "version" : "0.019",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

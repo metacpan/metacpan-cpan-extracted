@@ -37,7 +37,7 @@ use warnings 'once';
 use Carp;
 use Storable ();
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use UI::Various::language::en;
 
@@ -60,7 +60,7 @@ our @ISA = qw(Exporter);
 # 2nd/3rd row: internal functions of the package UI::Various
 our @EXPORT = qw(language logging stderr using
 		 fatal error warning info debug msg
-		 construct access set get);
+		 construct access set get access_varref dummy_varref);
 
 #########################################################################
 #
@@ -68,7 +68,7 @@ our @EXPORT = qw(language logging stderr using
 
 use constant _ROOT_PACKAGE_ => substr(__PACKAGE__, 0, rindex(__PACKAGE__, "::"));
 
-use constant UI_ELEMENTS => qw(Button Check Input Main Text Window);
+use constant UI_ELEMENTS => qw(Button Check Input Main Radio Text Window);
 
 our @CARP_NOT =
     (	_ROOT_PACKAGE_,
@@ -98,7 +98,8 @@ use constant UNIT_TEST_PACKAGE => '_Zz_Unit_Test'; # only used in test regexp;
 use constant LANGUAGES => qw(en de);
 
 # logging levels (with 2 aliases):
-use constant LOG_LEVELS => qw(FATAL ERROR WARN INFO DEBUG_1 DEBUG_2 DEBUG_3);
+use constant LOG_LEVELS =>
+    qw(FATAL ERROR WARN INFO DEBUG_1 DEBUG_2 DEBUG_3 DEBUG_4);
 
 # which package identifier must checked with which Perl module:
 use constant PACKAGE_MAP =>
@@ -399,6 +400,9 @@ get or set currently used handling of output>
 	}
 	return $UI->{stderr};
     }
+}
+END {
+    stderr(0);
 }
 
 #########################################################################
@@ -983,6 +987,77 @@ sub get($@)		      # not $$, that may put $self in wrong context!
     return (ref($self->{$attribute}) eq 'SCALAR'
 	    ? ${$self->{$attribute}}
 	    :   $self->{$attribute});
+}
+
+#########################################################################
+
+=head2 B<access_varref> - special accessor for UI elements needing SCALAR ref.
+
+    $value = $ui_element->attribute();
+    $ui_element->attribute(\$variable);
+
+=head3 parameters:
+
+    $variable           optional SCALAR reference to be set
+
+=head3 description:
+
+This function contains a variant of the common accessor L<access|/access -
+common accessor for UI elements> that is used by attributes needing a SCALAR
+reference to a variable.  Those still always return the current value of the
+variable when used as getter, but the setter directly uses the SCALAR
+reference.
+
+The internal implementation has the following interface (note the missing
+subroutine):
+
+    $value = access_varref($attribute, $self, $new_value);
+
+It is used like this:
+
+    sub attribute($;$)
+    {
+        return access_varref('attribute', @_);
+    }
+
+The additional parameters are:
+
+    $attribute            name of the attribute
+    $self                 reference to the class object
+    $r_variable           the optional SCALAR reference
+
+=head3 returns:
+
+the current value of the attribute (the SCALAR reference is dereferenced)
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+sub access_varref($@)	# not $$$;@, that may put $self in wrong context!
+{
+    my $attribute = shift;
+    my $self = shift;
+
+    # sanity checks:
+    $self->isa((caller(0))[0])
+	or  fatal('invalid_object__1_in_call_to__2',
+		  ref($self), (caller(1))[3]);
+
+    # handle setter part, if applicable:
+    if (exists $_[0])
+    {
+	unless (ref($_[0]) eq 'SCALAR')
+	{
+	    error('_1_attribute_must_be_a_2_reference',
+		  $attribute, 'SCALAR');
+	    return undef;
+	}
+	my $varref = shift;
+	$self->{$attribute} = $varref;
+	# Curses needs to keep track of the references:
+	$self->can('_reference')  and  $self->_reference($varref);
+    }
+    return ${$self->{$attribute}};
 }
 
 #########################################################################

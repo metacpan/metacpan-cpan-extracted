@@ -4,7 +4,7 @@
       "Tokuhiro Matsuno < tokuhirom@gmail.com >"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.13",
+   "generated_by" : "Minilla/v3.1.14",
    "license" : [
       "perl_5"
    ],
@@ -104,7 +104,7 @@
    "provides" : {
       "Minilla" : {
          "file" : "lib/Minilla.pm",
-         "version" : "v3.1.14"
+         "version" : "v3.1.15"
       },
       "Minilla::CLI" : {
          "file" : "lib/Minilla/CLI.pm"
@@ -261,11 +261,12 @@
       },
       "homepage" : "https://github.com/tokuhirom/Minilla",
       "repository" : {
-         "url" : "git://github.com/tokuhirom/Minilla.git",
+         "type" : "git",
+         "url" : "https://github.com/tokuhirom/Minilla.git",
          "web" : "https://github.com/tokuhirom/Minilla"
       }
    },
-   "version" : "v3.1.14",
+   "version" : "v3.1.15",
    "x_authority" : "cpan:TOKUHIROM",
    "x_contributors" : [
       "Alex Kapranoff <alex@kapranoff.ru>",

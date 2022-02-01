@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use PDL::Types;
 
 pp_addpm({At=>'Top'},<<'EOD');
 use strict;
@@ -265,39 +266,15 @@ END
 
 use strict;
 
-# for MDim, ld[str] is interpreted as "leading dimension of ..."
-
-# Making the BAD BAD BAD assumption that PDL_Long == int 
-# in fortran. BAD BAD BAD XXX (I'm going to regret this)
-
-my %ftypes = (S => 'F', D => 'D');
-
 sub firstpar {
 	$_[0] =~ /^\(([^),]+)[),]/ or die "Can't find first par from $_[0]";
 	$1
 }
-
-# used in defslatec()
-#my %ignore_ppar = ( Incfd => 1, CheckFlag => 1 );
-my %ignore_ppar = ( Incfd => 1 );
-my %prototype = ( F => "float", D => "double" );
-
-# an alternative is to declare the function in the Code section
-# of pp_def(), using something like:
-#
-#    my $codeproto = "\$T".(join '',map {$_->[0]} @talts)."(".
-#      (join ',',map qq{PDL_FORTRAN($_->[1])}, @talts).") ();";
-#    if ( defined $fpar ) { 
-#      $codeproto = "\$T".(join '',map {$_->[0]} @talts)."(float,double) $codeproto";
-#    }
-#    $codeproto = "extern $codeproto";
-#
-# and then add `$codeproto . "\n" .' to the beginning of the Code
-# section.
-#
-# this then gets rid of the need of the prototype file. 
-#
-open( PROTOS, "> SlatecProtos.h" );
+sub intcopy {
+  my ($cvarname, $rvalue) = @_; # closures
+  (sub {"&".$cvarname->(@_)}, sub {"PDL_LongLong *"},
+    sub {"PDL_LongLong ".$cvarname->(@_)." = ".$rvalue->(@_).";"});
+}
 
 # defslatec( $pdlname, $funcnames, $argstr, $docstring, $funcref )
 #
@@ -318,8 +295,8 @@ open( PROTOS, "> SlatecProtos.h" );
 #       (this allows the PCHIP routines to use 2D data, but as it's
 #        done in FORTRAN array order, and PDL has a much richer way
 #        of accessing parts of an array we force the data to be 1D).
-#   CheckFlag
-#     - the PCHIP routined may change the value from 0 to 1 if an
+#   IntCopy
+#     - the PCHIP routines may change the value from 0 to 1 if an
 #       error occurs but the checks were successful. As this complicates
 #       things we copy the user value to a temporary variable,
 #       so that the sent in value is not changed.
@@ -327,6 +304,7 @@ open( PROTOS, "> SlatecProtos.h" );
 #     - pchid()/dpchid() require FORTRAN array indices, so 
 #       this type flags that we should add 1 onto the input values
 #       before sending to the slatec function
+# for MDim, ld[str] is interpreted as "leading dimension of ..."
 #
 # $docstring gives the text to be used as the function documentation
 #
@@ -335,12 +313,26 @@ open( PROTOS, "> SlatecProtos.h" );
 # text within $docstring. This string gets printed out
 # in the perldl or pdl2 shell after a '?? string' command
 #
+my %KIND2I = (
+  Mat => ['', sub{"\$P($_[0][2])"}, sub {PDL::Type->new($_[0])->ctype." *"}],
+  FuncRet => ['', sub {()}, sub {()}],
+    # convert from C to F77 index so add 1
+  FortranIndex => ['longlong ', intcopy(sub {$_[0][2]}, sub {"\$$_[0][2]() + 1"})],
+  Integer => ['longlong ', sub{"\$P($_[0][2])"}, sub {"PDL_LongLong *"}],
+  IntCopy => ['longlong ', intcopy(sub {$_[0][2]}, sub {"\$$_[0][2]()"})],
+  Dim => [undef, intcopy(sub {"dim_$_[0][2]"}, sub {"\$SIZE($_[0][2])"})],
+  MDim => [undef, intcopy(sub {$_[0][2]}, sub {$_[1]{$_[0][2]}})],
+  Incfd => [undef, intcopy(sub {$_[0][2]}, sub {1})],
+);
+my %ignore_ppar = map +($_=>1), qw(Incfd Dim MDim);
+my %prototype = ( F => "float", D => "double" );
+my %ftypes = (S => 'F', D => 'D');
 sub defslatec {
 
     my $debug = 0;  # print out calls to pp_def
 
     my($pname,$fnames,$argstr,$docstring,$funcref) = @_;
-    my @args = map {/^\s*$/ ? () : $_} split ';', $argstr;
+    my @args = grep /\S/, split ';', $argstr;
     my @args2 = map {
 		/^\s*([a-zA-Z]+)\s+ 	# "Type name"
 		  ((?:\[[^]]*\])?)\s* 	# Options
@@ -351,83 +343,31 @@ sub defslatec {
 
     # is this for a function (Type name eq "FuncRet")
     # or a subroutine?
-    my $fpar;
-    foreach ( @args2 ) { 
-      next unless $_->[0] eq "FuncRet";
-      die "Only one FuncRet allowed in pars list.\n" if defined $fpar;
-      $fpar = "\$$_->[2]()";
-    }
+    die "Only one FuncRet allowed in pars list.\n"
+      if (my @funcret = grep $_->[0] eq "FuncRet", @args2) > 1;
+    my $fpar = @funcret ? "\$$funcret[0]->[2]()" : undef;
 
-    my @ppars = map {
-      if($_->[0] =~ /^M?Dim$/ or defined $ignore_ppar{$_->[0]} ) {
-	  ()
-      } else {
-	  (($_->[0] eq "Mat" or $_->[0] eq "FuncRet")
-           and join '',@{$_}[1,2,3]) or
-	  (($_->[0] eq "IntFlag" or $_->[0] eq "FortranIndex" or $_->[0] eq "CheckFlag")
-           and "int ".join '',@{$_}[1,2,3]) or
-	  die "Invalid ppars ",(join ',',@$_),"\n";
-      }
-    } @args2;
+    my $pars = join ';', map
+      +($KIND2I{$_->[0]}[0] // die "Invalid ppars ",join(',',@$_),"\n") . join('', @$_[1..3]),
+      grep !$ignore_ppar{$_->[0]}, @args2;
 
-    # uncomment the following line to see what perl thinks the input pars are
-    ##print "Pars: ",(join ';',@ppars),"\n";
-	
-    my @talts = map { 
-          defined $ftypes{$_} or die "FTYPE $_ NOT THERE\n";
-          [$ftypes{$_},$fnames->{$_}] 
-    } sort keys %$fnames;
+    my @talts = map
+      [$ftypes{$_} // die("FTYPE $_ NOT THERE\n"),$fnames->{$_}],
+      sort keys %$fnames;
 
-    my $func = "PDL_FORTRAN(\$T".(join '',map {$_->[0]} @talts) . "(" .
-      (join ',',map qq{$_->[1]}, @talts)."))";
+    my $func = "PDL_FORTRAN(\$T".join('',map {$_->[0]} @talts) . "(" .
+      join(',',map qq{$_->[1]}, @talts)."))";
     if ( defined $fpar ) { $func = "$fpar = $func"; }
 
-    my %lds = map {
-          ($_->[0] eq "Mat" and $_->[3] ne "()") ? 
-          ("ld".$_->[2] => "&\$SIZE(".firstpar($_->[3]).")")
-	  : ()
-    } @args2;
+    my %lds = map +("ld".$_->[2] => "\$SIZE(".firstpar($_->[3]).")"),
+      grep $_->[0] eq "Mat" && $_->[3] ne "()", @args2;
+    my $funcargs = join ',', map $KIND2I{$_->[0]}[1]->($_, \%lds), @args2;
 
-    my @funcpars;
-    foreach ( @args2 ) {
-      next if $_->[0] eq "FuncRet";
-      if ( $_->[0] eq "Mat" or $_->[0] eq "IntFlag" ) {
-	  push @funcpars, "\$P($_->[2])";
-      } elsif ( $_->[0] eq "Dim" ) {
-	  push @funcpars, "&\$SIZE($_->[2])";
-      } elsif ( $_->[0] eq "MDim" ) {
-	  push @funcpars, $lds{$_->[2]};
-      } elsif ( $_->[0] eq "Incfd" or $_->[0] eq "CheckFlag" ) {
-	  push @funcpars, "&_" . lc($_->[0]);
-      } elsif ( $_->[0] eq "FortranIndex" ) {
-	  push @funcpars, "&_$_->[2]"; 
-      } else {
-	  die "Invalid args2";
-      }
-    }
-
-    # _incfd     = 1 makes sure PCHIP code treats ndarray as 1D
-    # _checkflag - copy input data to a temporary variable, in case
-    #              the PCHIP routine decides to change it
-    #
-    my @ifincode;
-    foreach ( @args2 ) {
-      if ( $_->[0] eq "Incfd" ) {
-	  push @ifincode, "int _" . lc($_->[0]) . " = 1;";
-      } elsif ( $_->[0] eq "CheckFlag" ) {
-	  push @ifincode, "int _" . lc($_->[0]) . " = \$$_->[2]();";
-      } elsif ( $_->[0] eq "FortranIndex" ) {
-	  # convert from C to F77 index
-	  push @ifincode, "int _$_->[2] = \$$_->[2]() + 1;"
-      }
-    }
-
-    foreach ( @talts ) {
-	my $codeproto = "extern ";
-	if ( defined $fpar ) { $codeproto .= "$prototype{$_->[0]} "; }
-	else { $codeproto .= "int "; }
-	$codeproto .= "PDL_FORTRAN($_->[1]) ();";
-	print PROTOS $codeproto . "\n";
+    my @protos = map $KIND2I{$_->[0]}[2], @args2;
+    foreach my $t ( @talts ) {
+	pp_addhdr((defined $fpar ? "$prototype{$t->[0]} " : "PDL_LongLong ")
+	  . "PDL_FORTRAN($t->[1])(" .
+	  join(',', map $_->($t->[0]), @protos) . ");\n");
     }
 
     # add on the function reference, if supplied, to the start of
@@ -438,42 +378,42 @@ sub defslatec {
       $docstring = '';
     }
 
-    # If debug flag set, then print out pp_def call for each call to defslatec
-    if ($debug) {
-      my $pars = (join ';',@ppars);
-      my $code = (join '',@ifincode) . "\n " . $func . "  (". (join ',',@funcpars) . ");\n";
-      my $generictypes = "[" . join (", ", map {$_->[0]} @talts) . "],\n";
-      print <<"ENDDBG";
-pp_def($pname,
-  Pars => $pars,
-  OtherPars => '',
-  Code => $code,
-  GenericTypes => $generictypes,
-  Doc => $docstring
+    # _incfd     = 1 makes sure PCHIP code treats ndarray as 1D
+    # _checkflag - copy input data to a temporary variable, in case
+    #              the PCHIP routine decides to change it
+    my @ifincode = map +($KIND2I{$_->[0]}[3]||sub{})->($_, \%lds), @args2;
+    my $code = join("\n", @ifincode, "$func($funcargs);");
+    print <<"ENDDBG" if $debug;
+pp_def('$pname',
+  Pars => '$pars',
+  Code => '$code',
+  GenericTypes => [@{[join ", ", map $_->[0], @talts]}],
+  Doc => '$docstring',
 );
 ENDDBG
-}
-
     pp_def($pname,
-      Pars => (join ';',@ppars),
-      OtherPars => '',
-      Code => (join '',@ifincode) . "\n " .
-               $func . "  (". (join ',',@funcpars) . ");\n",
-#              . (join '',@ifoutcode),
-      GenericTypes => [map {$_->[0]} @talts],
-      Doc => $docstring
-#      %$opts,
+      Pars => $pars,
+      Code => $code,
+      GenericTypes => [map $_->[0], @talts],
+      Doc => $docstring,
     );
 } # sub: defslatec()
 
 pp_addhdr(qq|
-#include "SlatecProtos.h"
-
 static void MAIN__ () {
    /* Cheat to define MAIN__ symbol */                                          
    croak("This should never happen");                                           
-}                                                                               
+}
 
+/* these two need to be done manually because we don't use defslatec for them */
+void PDL_FORTRAN(polfit)(
+  PDL_LongLong *N, PDL_Float *X, PDL_Float *Y, PDL_Float *W, PDL_LongLong *MAXDEG,
+  PDL_LongLong *NDEG, PDL_Float *EPS, PDL_Float *R, PDL_LongLong *IERR, PDL_Float *A
+);
+void PDL_FORTRAN(dpolft)(
+  PDL_LongLong *N, PDL_Double *X, PDL_Double *Y, PDL_Double *W, PDL_LongLong *MAXDEG,
+  PDL_LongLong *NDEG, PDL_Double *EPS, PDL_Double *R, PDL_LongLong *IERR, PDL_Double *A
+);
 void PDL_FORTRAN(slatecbarf)();
 
 |);
@@ -496,10 +436,10 @@ sub PDL::eigsys {
 	my($h) = @_;
 	$h = float($h);
 	rs($h, 
-		(my $eigval=PDL->null),
-		(long (pdl (1))),(my $eigmat=PDL->null),
-		(my $fvone = PDL->null),(my $fvtwo = PDL->null),
-		(my $errflag=PDL->null)
+		my $eigval=PDL->null,
+		1,my $eigmat=PDL->null,
+		my $fvone = PDL->null,my $fvtwo = PDL->null,
+		my $errflag=PDL->null
 	);
 #	print $covar,$eigval,$eigmat,$fvone,$fvtwo,$errflag;
 	if(sum($errflag) > 0) {
@@ -523,7 +463,7 @@ sub PDL::matinv {
 	if(sum($info) > 0) {
 		barf("Uninvertible matrix given to inv: $m\n");
 	}
-	gedi($m,$ipvt,(pdl 0,0),(null),(long( pdl (1))));
+	gedi($m,$ipvt,pdl(0,0),null,1);
 	$m;
 }
 
@@ -535,7 +475,7 @@ sub PDL::detslatec {
 	if(sum($info) > 0) {
 		barf("Uninvertible matrix given to inv: $m\n");
 	}
-	gedi($m,$ipvt,(my $det=null),(null),(long( pdl (10))));
+	gedi($m,$ipvt,my $det=null,null,10);
 	return $det->slice('(0)')*10**$det->slice('(1)');
 }
 
@@ -584,8 +524,8 @@ sub PDL::polyfit {
   # A array needs some work space
   my $sz = ((3 * $x_in->getdim(0)) + (3*$maxdeg_in) + 3); # Buffer size called for by Slatec
   my @otherdims = $_[0]->dims; shift @otherdims;          # Thread dims
-  my $a1 =      PDL::new_from_specification('PDL',$x_in->type,$sz,@otherdims);
-  my $coeffs = PDL::new_from_specification('PDL',$x_in->type, $maxdeg_in + 1, @otherdims);
+  my $a1 =      PDL->new_from_specification($x_in->type,$sz,@otherdims);
+  my $coeffs = PDL->new_from_specification($x_in->type, $maxdeg_in + 1, @otherdims);
 
   my $ierr = PDL->null;
   my $ndeg = PDL->null;
@@ -666,8 +606,8 @@ defslatec(
 	 Mat 	[o] 	v	(p,p);
 	 MDim 		ldv;
 	 Mat 	[o] 	work	(n);
-	 IntFlag   	job	();
-	 IntFlag [o]	info	();
+	 Integer   	job	();
+	 Integer [o]	info	();
 	',
 'singular value decomposition of a matrix'
 );
@@ -679,7 +619,7 @@ defslatec(
 	 Dim		n;
 	 Mat 		rcond	();
 	 Mat	[o]	z	(n);
-	 IntFlag [o]	info	();
+	 Integer [o]	info	();
 	',
 'Factor a real symmetric positive definite matrix
 and estimate the condition number of the matrix.'
@@ -690,7 +630,7 @@ defslatec(
 	'Mat		a	(n,n);
 	 MDim		lda;
 	 Dim		n;
-	 IntFlag [o]	ipvt	(n);
+	 Integer [o]	ipvt	(n);
 	 Mat	 [o]	rcond	();
 	 Mat	 [o]	z	(n);
 	',
@@ -703,8 +643,8 @@ defslatec(
 	'Mat		a	(n,n);
 	 MDim		lda;
 	 Dim		n;
-	 IntFlag [o]	ipvt	(n);
-	 IntFlag [o]	info	();
+	 Integer [o]	ipvt	(n);
+	 Integer [o]	info	();
 	',
 'Factor a matrix using Gaussian elimination.'
 );
@@ -719,7 +659,7 @@ defslatec(
 	 MDim		lda;
 	 Dim		n;
 	 Mat	[o]	det	(two=2);
-	 IntFlag	job	();
+	 Integer	job	();
 	',
 'Compute the determinant and inverse of a certain real
 symmetric positive definite matrix using the factors
@@ -731,10 +671,10 @@ defslatec(
 	'Mat		a	(n,n);
 	 MDim		lda;
 	 Dim		n;
-	 IntFlag [o]	ipvt	(n);
+	 Integer [o]	ipvt	(n);
 	 Mat	 [o]	det	(two=2);
 	 Mat	 [o]	work	(n);
-	 IntFlag	job	();
+	 Integer	job	();
 	',
 'Compute the determinant and inverse of a matrix using the
 factors computed by L</geco> or L</gefa>.'
@@ -746,9 +686,9 @@ defslatec(
 	'Mat		a	(lda,n);
 	 MDim		lda;
 	 Dim		n;
-	 IntFlag	ipvt	(n);
+	 Integer	ipvt	(n);
 	 Mat		b	(n);
-	 IntFlag	job	();
+	 Integer	job	();
 	',
 'Solve the real system C<A*X=B> or C<TRANS(A)*X=B> using the
 factors computed by L</geco> or L</gefa>.'
@@ -760,11 +700,11 @@ defslatec(
 	 Dim		n;
 	 Mat		a	(n,n);
 	 Mat	[o]	w	(n);
-	 IntFlag	matz	();
+	 Integer	matz	();
 	 Mat	[o]	z	(n,n);
 	 Mat	[t]	fvone	(n);
 	 Mat	[t]	fvtwo	(n);
-	 IntFlag [o]	ierr	();
+	 Integer [o]	ierr	();
 	',
 'This subroutine calls the recommended sequence of
 subroutines from the eigensystem subroutine package (EISPACK)
@@ -776,7 +716,7 @@ of a REAL SYMMETRIC matrix.'
 # XXX wsave : at least 3n+15
 defslatec(
 	'ezffti', {S => 'ezffti'},
-	'IntFlag	n	();
+	'Integer	n	();
 	 Mat [o]	wsave(foo);
 	',
 'Subroutine ezffti initializes the work array C<wsave()>
@@ -817,7 +757,7 @@ defslatec(
 defslatec(
       'pcoef', {S => 'pcoef', D => 'dpcoef'},
       '
-      IntFlag  l ();
+      Integer   l ();
       Mat      c ();
       Mat [o]  tc (bar);
       Mat      a (foo);
@@ -829,7 +769,7 @@ C<c> and C<a()> must be of the same type.'
 defslatec(
       'pvalue', {S => 'pvalue', D => 'dp1vlu'},
       '
-      IntFlag  l ();
+      Integer  l ();
       Dim      nder;
       Mat      x    ();
       Mat [o]  yfit ();
@@ -853,8 +793,8 @@ defslatec(
            Mat          x       (n);
            Mat          f       (n);
            Mat     [o]  d       (n);
-           Incfd        dummy;
-           IntFlag [o]  ierr    ();
+           Incfd        incfd;
+           Integer [o]  ierr    ();
           ',
 'Calculate the derivatives at the given set of points (C<$x,$f>,
 where C<$x> is strictly increasing).
@@ -907,17 +847,17 @@ monotonicity (data still valid).
 #
 defslatec(
 	  'chic', {S => 'pchic', D => 'dpchic'},
-	  'IntFlag      ic      (two=2);
+	  'Integer      ic      (two=2);
            Mat          vc      (two=2);
            Mat          mflag   ();
            Dim          n;
            Mat          x       (n);
            Mat          f       (n);
            Mat     [o]  d       (n);
-           Incfd        dummy;
+           Incfd        incfd;
            Mat          wk      (nwk);
            Dim          nwk;
-           IntFlag [o]  ierr    ();
+           Integer [o]  ierr    ();
           ',
 'Calculate the derivatives at the given points (C<$x,$f>,
 where C<$x> is strictly increasing).
@@ -1039,16 +979,16 @@ for monotonicity.
 # as above, have made wk an actual ndarray, rather than a [t]
 defslatec(
 	  'chsp', {S => 'pchsp', D => 'dpchsp'},
-	  'IntFlag      ic      (two=2);
+	  'Integer      ic      (two=2);
            Mat          vc      (two=2);
            Dim          n;
            Mat          x       (n);
            Mat          f       (n);
            Mat     [o]  d       (n);
-           Incfd        dummy;
+           Incfd        incfd;
            Mat          wk      (nwk);
            Dim          nwk;
-           IntFlag [o]  ierr    ();
+           Integer [o]  ierr    ();
           ',
 'Calculate the derivatives, using cubic spline interpolation,
 at the given points (C<$x,$f>), with the specified
@@ -1150,13 +1090,13 @@ defslatec(
            Mat          x       (n);
            Mat          f       (n);
            Mat          d       (n);
-           Incfd        dummy;
-           CheckFlag    check   ();
+           Incfd        incfd;
+           IntCopy      check   ();
            Dim          ne;
            Mat          xe      (ne);
            Mat     [o]  fe      (ne);
            Mat     [o]  de      (ne);
-           IntFlag [o]  ierr    ();
+           Integer [o]  ierr    ();
           ',
 'Given a piecewise cubic Hermite function - such as from
 L</chim> - evaluate the function (C<$fe>) and 
@@ -1208,12 +1148,12 @@ defslatec(
            Mat          x       (n);
            Mat          f       (n);
            Mat          d       (n);
-           Incfd        dummy;
-           CheckFlag    check    ();
+           Incfd        incfd;
+           IntCopy      check    ();
            Dim          ne;
            Mat          xe      (ne);
            Mat     [o]  fe      (ne);
-           IntFlag [o]  ierr    ();
+           Integer [o]  ierr    ();
           ',
 'Given a piecewise cubic Hermite function - such as from
 L</chim> - evaluate the function (C<$fe>) at
@@ -1260,14 +1200,14 @@ defslatec(
            Mat          x       (n);
            Mat          f       (n);
            Mat          d       (n);
-           Incfd        dummy;
-           CheckFlag    check    ();
+           Incfd        incfd;
+           IntCopy      check    ();
            Mat          la    ();
            Mat          lb    ();
            FuncRet [o]  ans     ();
-           IntFlag [o]  ierr    ();
+           Integer [o]  ierr    ();
           ',
-'Evaluate the definite integral of a a piecewise
+'Evaluate the definite integral of a piecewise
 cubic Hermite function over an arbitrary interval,
 given by C<[$la,$lb]>. C<$d> should contain the derivative values, computed by L</chim>.
 See L</chid> if the integration limits are
@@ -1325,12 +1265,12 @@ defslatec(
            Mat          x       (n);
            Mat          f       (n);
            Mat          d       (n);
-           Incfd        dummy;
-           CheckFlag    check    ();
+           Incfd        incfd;
+           IntCopy      check    ();
            FortranIndex ia      ();
            FortranIndex ib      ();
            FuncRet [o]  ans     ();
-           IntFlag [o]  ierr    ();
+           Integer [o]  ierr    ();
           ',
 'Evaluate the definite integral of a a piecewise
 cubic Hermite function between C<x($ia)> and
@@ -1378,10 +1318,10 @@ defslatec(
            Mat          x       (n);
            Mat          f       (n);
            Mat          d       (n);
-           Incfd        dummy;
-           CheckFlag    check    ();
-           IntFlag [o]  ismon   (n);
-           IntFlag [o]  ierr    ();
+           Incfd        incfd;
+           IntCopy      check    ();
+           Integer [o]  ismon   (n);
+           Integer [o]  ierr    ();
           ',
 'The outout ndarray C<$ismon> indicates over
 which intervals the function is monotonic.
@@ -1471,14 +1411,14 @@ defslatec(
            Mat          x       (n);
            Mat          f       (n);
            Mat          d       (n);
-           Incfd        dummy;
-           IntFlag      knotyp  ();
-           IntFlag      nknots  ();
+           Incfd        incfd;
+           Integer      knotyp  ();
+           Integer      nknots  ();
            Mat          t       (tsize);
            Mat     [o]  bcoef   (bsize);
-           IntFlag [o]  ndim    ();
-           IntFlag [o]  kord    ();
-           IntFlag [o]  ierr    ();
+           Integer [o]  ndim    ();
+           Integer [o]  kord    ();
+           Integer [o]  ierr    ();
           ',
 'The resulting B-spline representation of the data
 (i.e. C<nknots>, C<t>, C<bcoeff>, C<ndim>, and
@@ -1569,15 +1509,13 @@ Error status returned by C<$ierr>:
 #  bar runs across polynomial coefficients.
 #
 pp_def('polfit',
-  Pars => 'x(n); y(n); w(n); int maxdeg(); int [o]ndeg(); [o]eps(); [o]r(n); int [o]ierr(); [o]a(foo); [o]coeffs(bar);[t]xtmp(n);[t]ytmp(n);[t]wtmp(n);[t]rtmp(n)',
+  Pars => 'x(n); y(n); w(n); longlong maxdeg(); longlong [o]ndeg(); [o]eps(); [o]r(n); longlong [o]ierr(); [o]a(foo); [o]coeffs(bar);[t]xtmp(n);[t]ytmp(n);[t]wtmp(n);[t]rtmp(n)',
   OtherPars => '',
   Code => '
-           int maxord;
-           int ord;
-           int k;
+           PDL_LongLong maxord, ord, k, ns = $SIZE(n);
            $GENERIC() zero = 0;
 
-           PDL_FORTRAN($TFD(polfit,dpolft))(&$SIZE(n),$P(x),$P(y),$P(w),$P(maxdeg),$P(ndeg),$P(eps),$P(r),$P(ierr),$P(a));
+           PDL_FORTRAN($TFD(polfit,dpolft))(&ns,$P(x),$P(y),$P(w),$P(maxdeg),$P(ndeg),$P(eps),$P(r),$P(ierr),$P(a));
 	   maxord = ($P(a))[0]+0.5;
 	   ord = ($P(a))[maxord * 3  +  2];
 	   if(ord >= $maxdeg()) {
@@ -1590,12 +1528,9 @@ pp_def('polfit',
   GenericTypes => ['F','D'],
   HandleBad => 1, 
   NoBadifNaN => 1,
-  BadCode => 'int ns = $SIZE(n);
-              int i;
-	      int j = 0; 
-              if($SIZE(n)<$maxdeg()) {
-                $CROAK("polfit: Must have at least <n> points to fit <n> coefficients");
-              }
+  BadCode => 'PDL_LongLong ns = $SIZE(n), i, j = 0;
+              if(ns<$maxdeg())
+                $CROAK("Must have at least <n> points to fit <n> coefficients");
 
               for (i=0;i<ns;i++) {   /* get rid of bad values.  Call polfit with [xyw]tmp instead of [xyz]. */
                 if ($ISGOOD(y(n=>i)) && $ISGOOD(x(n=>i)) && $ISGOOD(w(n=>i))) {
@@ -1613,9 +1548,9 @@ pp_def('polfit',
                 $ierr() = 2;
               } else {
                   /* Found enough good datapoints for a fit -- do the fit */
-		  int k;
-		  int ord;
-		  int maxord;
+		  PDL_LongLong k;
+		  PDL_LongLong ord;
+		  PDL_LongLong maxord;
                   $GENERIC() zero = 0;
 
                 /* Do the fit */
@@ -1628,7 +1563,7 @@ pp_def('polfit',
 		  ord = $maxdeg();
 		}
 		/* Extract the polynomial coefficients into coeffs -- used for bad values */
-                PDL_FORTRAN($TFD(p,dp)coef)( &(ord), &(zero), $P(coeffs), $P(a));
+                PDL_FORTRAN($TFD(,d)pcoef)(&(ord), &(zero), $P(coeffs), $P(a));
                 for(k=ord+1; k<=$maxdeg(); k++)
                    ($P(coeffs))[k] = 0;
                 j=0;
@@ -1643,7 +1578,7 @@ pp_def('polfit',
                      /* The number in ord is not the number of coefficients in the polynomial, it is the highest */
                      /* order coefficient -- so 3 for a cubic, which has 4 coefficients. */
 	             /* --CED */
-		     int ii;
+		     PDL_LongLong ii;
                      $GENERIC() acc = 0;
                      for( ii=ord; ii>0; ii-- ) {
                         acc += $coeffs(bar=>ii);
@@ -1663,11 +1598,6 @@ pp_def('polfit',
           in one variable. C<x()>, C<y()> and C<w()> must be of the same type.
 	  This version handles bad values appropriately',
 );
-
-#these two need to be done manually because we don't use defslatec for them
-print PROTOS "extern int PDL_FORTRAN(polfit) ();\nextern int PDL_FORTRAN(dpolft) ();\n";
-
-close( PROTOS );
 
 ##################################################################
 ##################################################################

@@ -14,24 +14,18 @@ do { my $x = {
                                       'Test::Kwalitee' => '1.21',
                                       'Test::More' => '0.88',
                                       'Test::Pod' => '1.41',
-                                      'lib' => '0',
                                       'perl' => '5.006'
                                     }
                     },
        'runtime' => {
                       'requires' => {
-                                      'Carp' => '0',
-                                      'File::Spec' => '0',
-                                      'Getopt::Std' => '0',
+                                      'Class::Accessor' => '0.51',
                                       'HTML::Form' => '6.07',
-                                      'HTML::Form::FileInput' => '6.07',
                                       'HTML::TreeBuilder::XPath' => '0.14',
                                       'HTTP::Cookies' => '6.01',
-                                      'Hash::Util' => '0',
                                       'LWP::UserAgent' => '6.05',
                                       'Log::Log4perl' => '1.48',
                                       'YAML::XS' => '0.62',
-                                      'parent' => '0',
                                       'perl' => '5.014004'
                                     }
                     },
@@ -42,11 +36,11 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
+                                   'HTTP::Request' => '0',
                                    'Perl::Tidy::Sweetened' => '1.18',
                                    'Pod::Tidy' => '0.10',
                                    'Test::Exception' => '0',
-                                   'Test::More' => '0',
-                                   'lib' => '0'
+                                   'Test::More' => '0'
                                  }
                  }
      };

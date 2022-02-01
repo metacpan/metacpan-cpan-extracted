@@ -1,7 +1,9 @@
 package File::Slurper::Shortcuts;
 
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-08-02'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DIST = 'File-Slurper-Shortcuts'; # DIST
+our $VERSION = '0.005'; # VERSION
 
 use strict 'subs', 'vars';
 use warnings;
@@ -56,7 +58,7 @@ File::Slurper::Shortcuts - Some convenience additions for File::Slurper
 
 =head1 VERSION
 
-This document describes version 0.004 of File::Slurper::Shortcuts (from Perl distribution File-Slurper-Shortcuts), released on 2021-08-02.
+This document describes version 0.005 of File::Slurper::Shortcuts (from Perl distribution File-Slurper-Shortcuts), released on 2021-08-02.
 
 =head1 SYNOPSIS
 
@@ -113,6 +115,8 @@ patch to an existing test-file that illustrates the bug or desired
 feature.
 
 =head1 SEE ALSO
+
+L<File::Slurper::Temp> also provides C<modify_text> and C<modify_binary>.
 
 L<File::Slurper>
 

@@ -1,13 +1,18 @@
 Build.PL
 Changes
 examples/clock.pl
+examples/scroller.pl
 lib/Device/Chip/MAX7219.pm
+lib/Device/Chip/MAX7219Panel.pm
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 t/00use.t
 t/01digits.t
 t/02settings.t
+t/10panel.t
+t/11panel-draw.t
+t/12panel-geom.t
 t/99pod.t
-README
-LICENSE
-META.yml
-META.json

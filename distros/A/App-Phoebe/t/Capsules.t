@@ -167,10 +167,10 @@ like($page, qr/On the red sofa/, "Backup page");
 $page = query_gemini("$titan/$name;size=69;mime=text/plain", $haiku);
 like($page, qr/^59 The titan URL is missing the file name/, "Missing file name");
 
-# upload the wrong MIME type
+# Missing extension
 
 $page = query_gemini("$titan/$name/no-extension;size=69;mime=text/plain", $haiku);
-like($page, qr/^59 The MIME type provided/, "Wrong file extension");
+like($page, qr/^59 This wiki does not allow application\/octet-stream/, "Missing file extension");
 
 # delete file
 

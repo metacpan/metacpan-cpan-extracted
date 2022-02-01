@@ -1,5 +1,5 @@
 ---
-abstract: 'Tk Listbox widget supporting images and text entries, Tk::HList based drop-in replacement for Tk::Listbox.'
+abstract: 'Tk Listbox widget supporting images and text entries, Tk::HList-based drop-in replacement for Tk::Listbox.'
 author:
   - 'Jim Turner'
 build_requires:
@@ -20,5 +20,5 @@ no_index:
 requires:
   Test::More: '0'
   Tk: '0'
-version: '2.42'
+version: '2.51'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

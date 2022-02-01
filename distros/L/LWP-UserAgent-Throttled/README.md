@@ -11,7 +11,7 @@ LWP::UserAgent::Throttled - Throttle requests to a site
 
 # VERSION
 
-Version 0.08
+Version 0.09
 
 # SYNOPSIS
 
@@ -64,6 +64,8 @@ or through the web interface at
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
+Redirects to other domains can confuse it, so you need to program those manually.
+
 # SEE ALSO
 
 [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent)
@@ -102,6 +104,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2017-2021 Nigel Horne.
+Copyright 2017-2022 Nigel Horne.
 
 This program is released under the following licence: GPL2

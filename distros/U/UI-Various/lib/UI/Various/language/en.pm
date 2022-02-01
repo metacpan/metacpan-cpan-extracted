@@ -74,7 +74,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 #########################################################################
 
@@ -99,8 +99,12 @@ our %T =
      => "'%s' attribute must be a %s reference",
      _1_element_must_be_accompanied_by_parent
      => '%s element must be accompanied by parent',
+     _1_may_not_be_empty
+     => "'%s' may not be empty",
      _1_may_only_be_called_from_itself
      => '%s may only be called from itself',
+     _1_to_cancel
+     => '%s to cancel',
      bad_debug_level__1
      => "bad debug-level '%s'",
      bad_usage_of__1_as__2
@@ -135,6 +139,8 @@ our %T =
      => "invalid selection\n",
      leave_window
      => 'leave window',
+     mandatory_parameter__1_is_missing
+     => "mandatory parameter '%s' is missing",
      message__1_missing_in__2
      => "message '%s' missing in '%s'",
      new_value

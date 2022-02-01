@@ -1,10 +1,138 @@
 ==================================================
-Changes from 2021-01-10 00:00:00 +0000 to present.
+Changes from 2021-01-28 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.009 at 2022-01-10 14:57:45 +0000
+version 0.010 at 2022-01-28 23:56:52 +0000
 ------------------------------------------
+
+  Change: e067435f8868ad3b04a658b196e59eac3e30eaf8
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-01-28 20:55:52 +0000
+
+    Merge pull request #4 from glasswalk3r/feature/capture-data
+
+    Feature/capture data 
+
+  Change: bfc29dc2568679346328a22d0020f14e8afcb62c
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-01-26 22:13:48 +0000
+
+    refactor: DRY for receiver logging 
+
+  Change: a59abd3ef7af4cd41b9da480f6b84219c0bd8867
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-01-26 22:06:02 +0000
+
+    refactor: receivers handling 
+
+  Change: 52742bcecbb85d82e1990d03c4ba449e2ed11520
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-01-25 22:08:41 +0000
+
+    fix: missing setting summary 
+
+  Change: e9742d969a18884fb03ca0435177a4c44a9737cf
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-01-25 21:51:24 +0000
+
+    fix: wrong method call 
+
+  Change: d3ffe9e3df3c37da9e6b3ef38152ad38e7f7d69c
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-01-25 21:50:42 +0000
+
+    refactor: better name 
+
+  Change: ec993137e01d09cda4c82efc20d20794d049718d
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-01-25 21:42:20 +0000
+
+    fix: properly handling receivers 
+
+  Change: a9080057e6fce9019be0fac09ad45882341355d7
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-01-25 20:17:02 +0000
+
+    refactor: accepting multiple receivers 
+
+  Change: 55b0ef9eeca619cb8fc8546590e77370e6ef61f5
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-01-25 18:55:21 +0000
+
+    feat: tracking_url method 
+
+  Change: 7302aff42b2d8cc1ad4ad639c2550ecd69b225c9
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-01-21 22:29:54 +0000
+
+    feat: redact authorization request 
+
+  Change: d652588c85503e7798fde1fbb9577429f511f265
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-01-21 21:45:19 +0000
+
+    fix: properly processing Summary 
+
+  Change: c0dcf0e8caa51217a9d40b15fe719422f886f432
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-01-21 21:38:18 +0000
+
+    chore: finishing Summary 
+
+  Change: 01cd3cd0c7612790648600f6347134ac35ed39a4
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-01-21 20:20:20 +0000
+
+    fix: rolling back version bump 
+
+  Change: e90710e75ae390fc425d5c95734470e168ce2ff4
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-01-21 20:19:00 +0000
+
+    feat: summary class 
+
+  Change: 889a87c1433aa1fc186a66078fd4c018ff4df05f
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-01-21 19:37:09 +0000
+
+    doc: required updates 
+
+  Change: a58e98279a73c7a3fd7ccffccf8a5c95fcaad565
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-01-21 19:29:43 +0000
+
+    feat: find_header_info 
+
+  Change: e3d1649189fb43649b5af9c4d877bb230ebf2116
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-01-21 18:25:18 +0000
+
+    refactor: unit in singular 
+
+  Change: 55d033581b462b7219f4d51efcca83cedadc1744
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-01-21 18:17:13 +0000
+
+    chore: renamed testing files 
+
+  Change: caafe677a8dd9b10c62f62859919c6ae59b5509c
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-01-21 18:15:04 +0000
+
+    feat: applied find_message_age 
+
+  Change: 223debf80579c9c318452678d438c003a76d2f53
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-01-21 18:03:56 +0000
+
+    feat: find_message_age 
+
+  Change: fdf3376f5ae4aeafd4236b3db24abccf8a100416
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-01-11 10:37:10 +0000
+
+    fix: dependencies declaration 
 
   Change: 00a0f1b8517298179dcc787f4bf2a3dd7106f887
   Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>

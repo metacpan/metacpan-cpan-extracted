@@ -82,6 +82,8 @@ C   891214  Prologue converted to Version 4.0 format.  (BAB)
 C   900131  Routine changed from subsidiary to user-callable.  (WRB)
 C   920501  Reformatted the REFERENCES section.  (WRB)
 C***END PROLOGUE  RFFTB1
+      implicit integer*8(i-n)
+      integer*4 IFAC
       DIMENSION CH(*), C(*), WA(*), IFAC(*)
 C***FIRST EXECUTABLE STATEMENT  RFFTB1
       NF = IFAC(2)

@@ -26,7 +26,7 @@ Create plots for script conservation_distribution.
 =cut
 
 package CLIPSeqTools::PlotApp::conservation_distribution;
-$CLIPSeqTools::PlotApp::conservation_distribution::VERSION = '0.1.10';
+$CLIPSeqTools::PlotApp::conservation_distribution::VERSION = '1.0.0';
 
 # Make it an app command
 use MooseX::App::Command;

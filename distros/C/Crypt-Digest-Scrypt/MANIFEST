@@ -1,0 +1,9 @@
+Changes
+Scrypt.xs
+Makefile.PL
+MANIFEST
+README
+t/Crypt-Digest-Scrypt.t
+lib/Crypt/Digest/Scrypt.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

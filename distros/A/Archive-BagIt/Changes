@@ -1,10 +1,67 @@
 ==================================================
-Changes from 2021-01-04 00:00:00 +0000 to present.
+Changes from 2021-01-31 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.089 at 2022-01-04 13:54:03 +0000
+version 0.091 at 2022-01-31 07:49:08 +0000
 ------------------------------------------
+
+  Change: ba5d493f8ec88c7ed6ea73f1cbfd2bd784e2fda5
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2022-01-31 08:48:47 +0000
+
+    - added missed dependency 
+
+  Change: d8e993cff00ba31383eb1bcaea4f53a53d023318
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2022-01-31 08:48:32 +0000
+
+    - fixed dependency - added autor test guard 
+
+------------------------------------------
+version 0.090 at 2022-01-28 16:54:50 +0000
+------------------------------------------
+
+  Change: 77d509e0aa67f3520077a1e051c9381ade880ea4
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2022-01-28 17:54:50 +0000
+
+    Released 0.090 
+
+  Change: a079dc5655072d21f981b057fe8e0dc9c95ca815
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2022-01-28 17:53:49 +0000
+
+    - removed unused module - minor fix order of modules 
+
+  Change: 5c340b9d336583225430bddc2af3dd7141bd1717
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2022-01-28 17:53:05 +0000
+
+    - fixed POD reference to Archive::BagIt::Fast 
+
+  Change: 5fd13258c672e7df97aedeae5e72a185c2907813
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2022-01-28 17:52:29 +0000
+
+    - fixed dependencies 
+
+  Change: 0c110951a3cfa155923923d81bf848f0cd4b4fff
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2022-01-28 17:52:04 +0000
+
+    - extracted Archive::BagIt::Fast from this distribution (in own
+    distribution) to minimize dependencies 
+
+------------------------------------------
+version 0.089 at 2022-01-04 13:54:16 +0000
+------------------------------------------
+
+  Change: 13456f3815d4b656f0cad81844c50994261b0b16
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2022-01-04 14:54:16 +0000
+
+    Released 0.089 
 
   Change: 5412326d30139c5c9871bb72cac56c0663c9cc70
   Author: Andreas Romeyke <art1@andreas-romeyke.de>
@@ -599,108 +656,6 @@ version 0.073 at 2021-04-23 09:52:34 +0000
 
     instead 134s (with Digest::) on my system 
 
-------------------------------------------
-version 0.072 at 2021-01-26 08:46:15 +0000
-------------------------------------------
-
-  Change: fc3392e338c8712d6a56b39a76dbc2309653176d
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2021-01-26 09:46:15 +0000
-
-    Released 0.072 
-
-  Change: af0350517a9c7b98fc546e43140ed0a3aaeb9125
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2021-01-26 09:44:33 +0000
-
-    - added warnings() - bugfix in verify_baginfo(), because Payload-Oxum
-    is recommended, but not required by RFC8493 
-
-------------------------------------------
-version 0.071 at 2021-01-14 14:10:38 +0000
-------------------------------------------
-
-  Change: db75e0e9fdfb74304216deed5b66d419085fa9fc
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2021-01-14 15:10:38 +0000
-
-    Released 0.071 
-
-  Change: 9bbadc5fecc04ff09dc0de084b5ce71a589f737a
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2021-01-14 15:04:42 +0000
-
-    - refactoring, extracted __handle_nonportable_local_entry() from
-    __file_find() 
-
-  Change: ef518a167a1b70558ec7b2765f23d2f0456f243d
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2021-01-14 12:16:18 +0000
-
-    - refactored, using Archive::BagIt instead Archive::BagIt::Base 
-
-  Change: 102d47a9baff0a411f499d975904ecbae3b79780
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2021-01-14 12:05:04 +0000
-
-    - fixed broken test bag 
-
-  Change: 702efc1c1bf15b8513662f02995e5593456230e0
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2021-01-14 12:04:47 +0000
-
-    - fixed tc access to private routine 
-
-  Change: f2827d9a70466656412dcd920d14e1406a756aeb
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2021-01-14 12:04:11 +0000
-
-    - removed, because Archive::BagIt::DotBagIt removed 
-
-  Change: be36b96ac8c01ff746ed2a2ba06f9de7c8556a80
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2021-01-14 11:50:18 +0000
-
-    - refactoring, replaced Archive::BagIt by Archive::BagIt::Base -
-    added dummy for Archive::BagIt::Base for backwards compatibility 
-
-  Change: e1dcd82f379b62835d51973e548aef25de412cd7
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2021-01-14 11:49:27 +0000
-
-    - removed DotBagIt 
-
-  Change: 90733792184aa5187e8a966aa3f52c7c65cea181
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2021-01-03 14:20:20 +0000
-
-    Released 0.070 
-
-  Change: 331ea58f0c7cb18009d53800f8f791f9ba550521
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2021-01-03 14:18:12 +0000
-
-    - minor improvement 
-
-  Change: 597b0582a2ab33d4eab000644895cff6780da2df
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2021-01-03 14:17:47 +0000
-
-    - minor improvements 
-
-  Change: f55e74712070326091194922a82b93e210a3298b
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2021-01-03 14:16:18 +0000
-
-    - enhanced Pod::Coverage for Archive::BagIt::Base and
-    Archive::BagIt::Fast 
-
-  Change: e00c4fe82fe3bce904eb4179d90d0d9788e45c5c
-  Author: Andreas Romeyke <art1@andreas-romeyke.de>
-  Date : 2021-01-03 14:15:43 +0000
-
-    - enhanced tests for Archive::BagIt::Fast 
-
 =================================================
-Plus 24 releases after 2021-01-04 00:00:00 +0000.
+Plus 26 releases after 2021-01-31 00:00:00 +0000.
 =================================================

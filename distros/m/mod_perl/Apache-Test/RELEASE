@@ -15,7 +15,7 @@ Instructions for Apache-Test Release Manager
        tags, so keep that in mind.
 
   b. commit Changes
-     % svn ci -m "1.42 rc1" Changes
+     % svn ci -m "1.43 rc1" Changes
 
   c. nuke any preinstalled Apache-Test libs and run 'make test'
 
@@ -37,7 +37,7 @@ Instructions for Apache-Test Release Manager
    (or maybe longer to give most people a chance to catch up). no need
    to tag this package
 
-   Subject: [RELEASE CANDIDATE] Apache-Test-1.42 RC\d+
+   Subject: [RELEASE CANDIDATE] Apache-Test-1.43 RC\d+
 
   a. if problems are detected during stage 2, repeat stages 1 and 2.
 
@@ -54,7 +54,7 @@ Instructions for Apache-Test Release Manager
      % make -n tag
 
   c. commit Changes
-     % svn ci -m "1.42 release" Changes
+     % svn ci -m "1.43 release" Changes
 
   d. tag
      % make tag
@@ -74,7 +74,7 @@ Instructions for Apache-Test Release Manager
      o dev/perl.apache.org
      o modperl/perl.apache.org
 
-   Subject: [ANNOUNCE] Apache-Test-1.42
+   Subject: [ANNOUNCE] Apache-Test-1.43
 
      include:
      - MD5 sig (as it comes from CPAN upload announce).
@@ -87,11 +87,11 @@ Instructions for Apache-Test Release Manager
   b. edit ./Changes:
      - start a new item with incremented version + '-dev'
 
-     =item 1.43-dev
+     =item 1.44-dev
 
   c. bump up version numbers in this file to make it easier to do the
      next release.
      % perl -pi.bak -e 's/(\d+)\.(\d+)/join(".", $1, $2+1)/eg' RELEASE
 
   d. commit Changes
-     % svn ci -m "start 1.42-dev cycle" Changes RELEASE lib/Apache/Test.pm
+     % svn ci -m "start 1.43-dev cycle" Changes RELEASE lib/Apache/Test.pm

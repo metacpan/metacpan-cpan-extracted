@@ -5,30 +5,44 @@ package Net::Google::Drive::Simple;
 use strict;
 use warnings;
 
-use LWP::UserAgent;
-use HTTP::Request;
-use HTTP::Headers;
+use LWP::UserAgent ();
+use HTTP::Request  ();
+
+use File::MMagic ();
+use IO::File     ();
+
+use OAuth::Cmdline::CustomFile  ();
+use OAuth::Cmdline::GoogleDrive ();
+
+use Net::Google::Drive::Simple::Item ();
+
 use File::Basename;
+
 use YAML qw( LoadFile DumpFile );
 use JSON qw( from_json to_json );
 use Log::Log4perl qw(:easy);
-use File::MMagic;
-use OAuth::Cmdline::GoogleDrive;
 
-use Net::Google::Drive::Simple::Item;
-
-our $VERSION = '0.19';
+our $VERSION = '0.21';
 
 ###########################################
 sub new {
 ###########################################
     my ( $class, %options ) = @_;
 
+    my $oauth;
+
+    if ( exists $options{custom_file} ) {
+        $oauth = OAuth::Cmdline::CustomFile->new( custom_file => $options{custom_file} );
+    }
+    else {
+        $oauth = OAuth::Cmdline::GoogleDrive->new();
+    }
+
     my $self = {
         init_done      => undef,
         api_file_url   => "https://www.googleapis.com/drive/v2/files",
         api_upload_url => "https://www.googleapis.com/upload/drive/v2/files",
-        oauth          => OAuth::Cmdline::GoogleDrive->new(),
+        oauth          => $oauth,
         error          => undef,
         %options,
     };
@@ -202,7 +216,9 @@ sub file_create {
 ###########################################
 sub file_upload {
 ###########################################
-    my ( $self, $file, $parent_id, $file_id ) = @_;
+    my ( $self, $file, $parent_id, $file_id, $opts ) = @_;
+
+    $opts = {} if !defined $opts;
 
     # Since a file upload can take a long time, refresh the token
     # just in case.
@@ -222,9 +238,10 @@ sub file_upload {
         my $data = $self->http_json(
             $url,
             {
-                mimeType => $mime_type,
-                parents  => [ { id => $parent_id } ],
-                title    => $title,
+                mimeType    => $mime_type,
+                parents     => [ { id => $parent_id } ],
+                title       => $opts->{title} ? $opts->{title} : $title,
+                description => $opts->{description},
             }
         );
 
@@ -237,7 +254,7 @@ sub file_upload {
     $url->query_form( uploadType => "media" );
 
     my $file_length = -s $file;
-    my $file_data = _content_sub($file);
+    my $file_data   = _content_sub($file);
 
     if (
         $self->http_put(
@@ -279,15 +296,19 @@ sub rename {
 ###########################################
 sub http_put {
 ###########################################
-    my ( $self, $url, $body ) = @_;
+    my ( $self, $url, $params ) = @_;
 
-    my $req = HTTP::Request->new(
-		'PUT',
+    my $content = delete $params->{Content};
+    my $req     = HTTP::Request->new(
+        'PUT',
         $url->as_string,
-        [ $self->{oauth}->authorization_headers() ],
-        %$body,
+        [ $self->{oauth}->authorization_headers(), %$params ],
     );
 
+    # $content can be a string or a CODE ref. For example rename() calls us with a string, but
+    #  file_upload() calls us with a CODE ref. The HTTP::Request::new() only accepts a string,
+    #  so we set the content of the request after calling the constructor.
+    $req->content($content);
     my $resp = $self->http_loop($req);
 
     if ( $resp->is_error ) {
@@ -442,8 +463,8 @@ sub children_by_folder_id {
 
     $self->init();
 
-    $search_opts = {} unless defined $search_opts;
-    $search_opts->{page} = 1 unless exists $search_opts->{page};
+    $search_opts         = {} unless defined $search_opts;
+    $search_opts->{page} = 1  unless exists $search_opts->{page};
 
     if ( !defined $opts ) {
         $opts = {
@@ -640,7 +661,7 @@ sub http_json {
     my ( $self, $url, $post_data ) = @_;
 
     my @headers = ( $self->{'oauth'}->authorization_headers() );
-    my $verb = 'GET';
+    my $verb    = 'GET';
     my $content;
     if ($post_data) {
         $verb = 'POST';
@@ -730,9 +751,9 @@ sub _content_sub {
 
     die "$filename not a readable file with fixed size"
       unless -r $filename
-          and $remaining;
+      and $remaining;
 
-    my $fh = IO::File->new($filename, 'r')
+    my $fh = IO::File->new( $filename, 'r' )
       or die "Could not open $filename: $!";
     $fh->binmode;
 
@@ -740,21 +761,19 @@ sub _content_sub {
         my $buffer;
 
         # upon retries the file is closed and we must reopen it
-        unless ($fh->opened) {
-            $fh = IO::File->new($filename, 'r')
+        unless ( $fh->opened ) {
+            $fh = IO::File->new( $filename, 'r' )
               or die "Could not open $filename: $!";
             $fh->binmode;
             $remaining = $stat[7];
         }
 
-        unless (my $read = $fh->read($buffer, $blksize)) {
-            die
-              "Error while reading upload content $filename ($remaining remaining) $!"
+        unless ( my $read = $fh->read( $buffer, $blksize ) ) {
+            die "Error while reading upload content $filename ($remaining remaining) $!"
               if $! and $remaining;
             $fh->close    # otherwise, we found EOF
               or die "close of upload content $filename failed: $!";
-            $buffer
-              ||= '';  # LWP expects an empty string on finish, read returns 0
+            $buffer ||= '';    # LWP expects an empty string on finish, read returns 0
         }
         $remaining -= length($buffer);
         return $buffer;

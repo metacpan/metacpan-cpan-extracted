@@ -1,5 +1,11 @@
 Revision history for Device-Chip-MAX7219
 
+0.06    2022-01-31
+        [CHANGES]
+         * Added Device::Chip::MAX7219Panel module for driving a whole matrix
+           display panel comprised of multiple chips
+         * Updated for Object::Pad 0.57
+
 0.05    2020-12-06
         [CHANGES]
          * Updated to Object::Pad + Future::AsyncAwait

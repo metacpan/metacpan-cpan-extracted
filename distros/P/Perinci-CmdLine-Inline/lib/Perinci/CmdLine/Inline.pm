@@ -24,9 +24,9 @@ use Exporter qw(import);
 our @EXPORT_OK = qw(gen_inline_pericmd_script);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-21'; # DATE
+our $DATE = '2022-01-16'; # DATE
 our $DIST = 'Perinci-CmdLine-Inline'; # DIST
-our $VERSION = '0.553'; # VERSION
+our $VERSION = '0.554'; # VERSION
 
 our %SPEC;
 
@@ -116,7 +116,7 @@ sub _gen_enable_log {
     push @l, "### end code_before_enable_logging\n";
 
     push @l, "### enable logging\n";
-    push @l, '$_pci_log_outputs->{Screen} = { conf => { formatter => sub { '.dmp("$cd->{script_name}: ").' . $_[0] } } };', "\n";
+    push @l, '$_pci_log_outputs->{Screen} = { conf => { colorize_tags => 1, formatter => sub { '.dmp("$cd->{script_name}: ").' . $_[0] } } };', "\n";
 
     push @l, "#### begin code_add_extra_log_outputs\n";
     push @l, $cd->{gen_args}{code_add_extra_log_outputs}, "\n" if defined $cd->{gen_args}{code_add_extra_log_outputs};
@@ -1669,7 +1669,7 @@ Perinci::CmdLine::Inline - Generate inline Perinci::CmdLine CLI script
 
 =head1 VERSION
 
-This document describes version 0.553 of Perinci::CmdLine::Inline (from Perl distribution Perinci-CmdLine-Inline), released on 2021-10-21.
+This document describes version 0.554 of Perinci::CmdLine::Inline (from Perl distribution Perinci-CmdLine-Inline), released on 2022-01-16.
 
 =head1 SYNOPSIS
 
@@ -2033,7 +2033,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

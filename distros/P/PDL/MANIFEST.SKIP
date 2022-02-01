@@ -200,8 +200,6 @@ RCS
 ^cygwin/max_memory.c
 ^cygwin/rtool.txt
 ^cygwin/tmalloc.pl
-^debian/filter-test.pl
-^debian/patched/
 ^gsl.pl
 ^inv-data.pl
 ^patch
@@ -240,6 +238,7 @@ subdirs
 ^Example/Benchmark/\.git
 
 ^cover_db/
+^nytprof(/|\.out)
 \.gc(ov|no|da)$
 pp-\w*\.c$
 ^debian/

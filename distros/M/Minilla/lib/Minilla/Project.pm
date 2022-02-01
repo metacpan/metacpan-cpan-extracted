@@ -537,7 +537,7 @@ sub extract_git_info {
                 (.+?)(?:\.git)?
                 $
             }ix;
-            my $git_url = "git://$git_service/$user/$repo.git";
+            my $git_url = "https://$git_service/$user/$repo.git";
             my $http_url = "https://$git_service/$user/$repo";
             unless ($self->config->{no_github_issues}) {
                 $bugtracker = +{
@@ -545,6 +545,7 @@ sub extract_git_info {
                 };
             }
             $repository = +{
+                type => "git",
                 url => $git_url,
                 web => $http_url,
             };
@@ -568,6 +569,7 @@ sub extract_git_info {
             # normal repository
             if ($registered_url !~ m{^file://}) {
                 $repository = +{
+                    type => "git",
                     url => $registered_url,
                 };
             }

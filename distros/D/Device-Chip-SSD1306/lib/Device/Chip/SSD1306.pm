@@ -4,11 +4,11 @@
 #  (C) Paul Evans, 2015-2021 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.51;  # ADJUSTPARAMS
+use Object::Pad 0.57;
 
-package Device::Chip::SSD1306 0.10;
+package Device::Chip::SSD1306 0.11;
 class Device::Chip::SSD1306
-   extends Device::Chip
+   :isa(Device::Chip)
    :strict(params);
 
 use Carp;
@@ -78,6 +78,12 @@ An F<SH1106> driving a display with 128 columns and 64 rows. This is the chip
 that's usually found in the larger display modules, such as 1.3 and 1.6 inch.
 
 =back
+
+The overall API shape of this module is similar to that of
+L<Device::Chip::MAX7219Panel>, supporting the same set of drawing methods. A
+future version of both of these modules may extend the concept into providing
+access via an interface helper instance, if some standard API shape is defined
+for driving these kinds of 1bpp pixel displays.
 
 =cut
 

@@ -3,9 +3,8 @@ use Mojo::Netdata::Collector;
 
 subtest 'basics' => sub {
   my $collector = Mojo::Netdata::Collector->new;
-  is $collector->charts, {},   'charts';
-  is $collector->context,      'default', 'context';
-  is $collector->update_every, 1,         'update_every';
+  is $collector->charts, {}, 'charts';
+  is $collector->update_every, 1, 'update_every';
 
   eval { $collector->type };
   like $@, qr{"type" cannot}, 'type';

@@ -42,6 +42,7 @@ has _sentry_url => sub ($self) {
 has dsn => undef;
 
 sub send ($self, $payload) {
+  return unless $self->dsn;
   my $is_transaction = ($payload->{type} // '') eq 'transaction';
   my $endpoint       = $is_transaction ? 'envelope' : 'store';
   my $tx;

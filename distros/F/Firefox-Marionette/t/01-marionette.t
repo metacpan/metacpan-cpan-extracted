@@ -504,23 +504,32 @@ if (
 	!IO::Socket::SSL->new(
 	PeerAddr => 'missing.example.org:443',
 	SSL_verify_mode => IO::Socket::SSL::SSL_VERIFY_NONE(),
-		) &&
-	IO::Socket::SSL->new(
+		) ) {
+	if ( IO::Socket::SSL->new(
 	PeerAddr => 'untrusted-root.badssl.com:443',
 	SSL_verify_mode => IO::Socket::SSL::SSL_VERIFY_NONE(),
-		) &&
-	!IO::Socket::SSL->new(
+		) ) {
+	if ( !IO::Socket::SSL->new(
 	PeerAddr => 'untrusted-root.badssl.com:443',
 	SSL_verify_mode => IO::Socket::SSL::SSL_VERIFY_PEER(),
-		) &&
-	IO::Socket::SSL->new(
+		) ) {
+	if ( IO::Socket::SSL->new(
 	PeerAddr => 'metacpan.org:443',
 	SSL_verify_mode => IO::Socket::SSL::SSL_VERIFY_PEER(),
-		)) {
-	diag("TLS/Network seem okay");
-	$tls_tests_ok = 1;
+		) ) {
+		diag("TLS/Network seem okay");
+		$tls_tests_ok = 1;
+	} else {
+		diag("TLS/Network are NOT okay:Failed to connect to metacpan.org:$IO::Socket::SSL::SSL_ERROR");
+	}
+	} else {
+		diag("TLS/Network are NOT okay:Successfully connected to untrusted-root.badssl.com");
+	}
+	} else {
+		diag("TLS/Network are NOT okay:Failed to connect to untrusted-root.badssl.com:$IO::Socket::SSL::SSL_ERROR");
+	}
 } else {
-	diag("TLS/Network are NOT okay");
+	diag("TLS/Network are NOT okay:Successfully connected to missing.example.org");
 }
 my $skip_message;
 SKIP: {
@@ -1144,6 +1153,9 @@ SKIP: {
 	ok($firefox, "Firefox has started in Marionette mode with definable capabilities set to known values");
 	my $shadow_root;
 	my $path = File::Spec->catfile(Cwd::cwd(), qw(t data elements.html));
+	if ($^O eq 'cygwin') {
+		$path = $firefox->execute( 'cygpath', '-s', '-m', $path );
+	}
 	$firefox->go("file://$path");
 	$firefox->find_class('add')->click();
 	my $span = $firefox->has_tag('span');
@@ -1200,6 +1212,10 @@ SKIP: {
 	{
 		my $value = $firefox->script('return [2,arguments[0]]', args => [ $span ]);
 		ok(ref $value->[1] eq 'Firefox::Marionette::Element' && $value->[1]->tag_name() eq 'span', "Value returned from script is a Firefox::Mariontte::Element for a 'span' in an array");
+	}
+	{
+		my $value = $firefox->script('return arguments[0]', args => { elem => $span });
+		ok(ref $value->{elem} eq 'Firefox::Marionette::Element' && $value->{elem}->tag_name() eq 'span', "Value returned from script is a Firefox::Mariontte::Element for a 'span' in a hash");
 	}
 	{
 		my $value = $firefox->script('return 2', args => [ $span ]);
@@ -1646,7 +1662,8 @@ SKIP: {
 		}
 		my $correct = 0;
 		my $number_of_entries = 0;
-		while($number_of_entries == 0) {
+		my $count = 0;
+		GET_HAR: while($number_of_entries == 0) {
 			my $har = $firefox->har();
 			ok($har->{log}->{creator}->{name} eq ucfirst $firefox->capabilities()->browser_name(), "\$firefox->har() gives a data structure with the correct creator name");
 			$number_of_entries = 0;
@@ -1688,14 +1705,27 @@ SKIP: {
 					}
 				}
 			}
+			sleep 1;
+			$count += 1;
+			if ($count > 20) {
+				diag("Unable to find any HAR entries for 20 seconds");
+				last GET_HAR;
+			}
 		}
-		ok($correct == 4, "Correct headers have been set");
+		if ($^O eq 'cygwin') {
+			TODO: {
+				local $TODO = "cygwin can fail this test";
+				ok($correct == 4, "Correct headers have been set");
+			}
+		} else {
+			ok($correct == 4, "Correct headers have been set");
+		}
 	}
 }
 
 my $bad_network_behaviour;
 SKIP: {
-	diag("Starting new firefox for testing metacpan and w3schools, with find, downloads, extensions and actions");
+	diag("Starting new firefox for testing metacpan and iframe, with find, downloads, extensions and actions");
 	($skip_message, $firefox) = start_firefox(0, debug => 0, page_load => 600000, script => 5432, profile => $profile, capabilities => Firefox::Marionette::Capabilities->new(accept_insecure_certs => 1, page_load_strategy => 'eager'));
 	if (!$skip_message) {
 		$at_least_one_success = 1;
@@ -1704,9 +1734,13 @@ SKIP: {
 		skip($skip_message, 247);
 	}
 	ok($firefox, "Firefox has started in Marionette mode without defined capabilities, but with a defined profile and debug turned off");
-	my $frame_url = 'https://www.w3schools.com/html/tryit.asp?filename=tryhtml_iframe_height_width';
-	my $frame_element = '//iframe[@name="iframeResult"]';
-	ok($firefox->go(URI->new($frame_url)), "$frame_url has been loaded");
+	my $path = File::Spec->catfile(Cwd::cwd(), qw(t data elements.html));
+	if ($^O eq 'cygwin') {
+		$path = $firefox->execute( 'cygpath', '-s', '-m', $path );
+	}
+	my $frame_url = "file://$path";
+	my $frame_element = '//iframe[@name="iframe"]';
+	ok($firefox->go($frame_url), "$frame_url has been loaded");
 	if (out_of_time()) {
 		skip("Running out of time.  Trying to shutdown tests as fast as possible", 246);
 	}

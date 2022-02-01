@@ -85,6 +85,8 @@ L<Venus::Role::Boxable>
 
 L<Venus::Role::Catchable>
 
+L<Venus::Role::Digestable>
+
 L<Venus::Role::Doable>
 
 L<Venus::Role::Dumpable>

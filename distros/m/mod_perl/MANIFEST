@@ -108,6 +108,7 @@ Apache-Test/t/response/TestMore/testmorepm.pm
 Apache-Test/t/response/TestMore/testpm.pm
 Apache-Test/t/sok.t
 BRANCHING
+CONTRIBUTING.md
 Changes
 INSTALL
 LICENSE

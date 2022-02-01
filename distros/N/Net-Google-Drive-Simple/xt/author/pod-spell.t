@@ -22,6 +22,8 @@ CPAN
 Drive
 Emmanuel
 Google
+Håkon
+Hægland
 Item
 Maischein
 Matthias
@@ -33,7 +35,6 @@ Net
 Nicolas
 Peter
 Rinaldo
-Rochelemagne
 Rodriguez
 Schilli
 Scott
@@ -47,15 +48,13 @@ corion
 cpan
 emmanuel
 github
+hakon
 lib
 matthias
 mohammad
-nicolas
 perlmeister
 peter
-rochelemagne
 thomas
 tim
 toddr
 wells
-ℕicolas

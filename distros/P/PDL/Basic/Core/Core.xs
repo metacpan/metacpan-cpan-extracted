@@ -105,6 +105,14 @@ set_donttouchdata(it,size)
       OUTPUT:
             RETVAL
 
+IV
+nbytes(self)
+  pdl *self;
+  CODE:
+    RETVAL = self->nbytes;
+  OUTPUT:
+    RETVAL
+
 # Free the datasv if possible
 void
 freedata(it)
@@ -602,7 +610,7 @@ initialize(class)
           ? SvSTASH(SvRV(class)) /* a reference to a class */
           : gv_stashsv(class, 0); /* a class name */
         RETVAL = newSV(0);
-        pdl *n = pdl_null();
+        pdl *n = pdl_pdlnew();
         if (!n) pdl_pdl_barf("Error making null pdl");
         pdl_SetSV_PDL(RETVAL,n);   /* set a null PDL to this SV * */
         RETVAL = sv_bless(RETVAL, bless_stash); /* bless appropriately  */
@@ -616,8 +624,10 @@ get_dataref(self)
 	if(self->state & PDL_DONTTOUCHDATA)
 	  croak("Trying to get dataref to magical (mmaped?) pdl");
 	pdl_barf_if_error(pdl_make_physical(self)); /* XXX IS THIS MEMLEAK WITHOUT MORTAL? */
-	if (!self->datasv)
-	  pdl_pdl_barf("Tried to get_dataref but datasv NULL after make_physical");
+	if (!self->datasv) {
+	  self->datasv = newSVpvn("", 0);
+	  (void)SvGROW((SV *)self->datasv, self->nbytes);
+	}
 	RETVAL = newRV(self->datasv);
 	OUTPUT:
 	RETVAL
@@ -903,7 +913,7 @@ threadover(...)
 	/* need to make sure we get the vaffine (grand)parent */
 	if (PDL_VAFFOK(pdls[i]))
 	   pdls[i] = pdls[i]->vafftrans->from;
-	child[i]=pdl_null();
+	child[i]=pdl_pdlnew();
 	if (!child[i]) pdl_pdl_barf("Error making null pdl");
 	/*  instead of pdls[i] its vaffine parent !!!XXX */
 	pdl_barf_if_error(pdl_affine_new(pdls[i],child[i],pdl_thr.offs[i],

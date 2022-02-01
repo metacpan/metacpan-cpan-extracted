@@ -1,11 +1,11 @@
 package Prometheus::Tiny::Shared;
-$Prometheus::Tiny::Shared::VERSION = '0.025';
+$Prometheus::Tiny::Shared::VERSION = '0.026';
 # ABSTRACT: A tiny Prometheus client with a shared database behind it
 
 use warnings;
 use strict;
 
-use Prometheus::Tiny 0.009;
+use Prometheus::Tiny 0.010;
 use parent 'Prometheus::Tiny';
 
 use Hash::SharedMem qw(shash_open shash_get shash_set shash_cset shash_keys_array shash_group_get_hash);

@@ -51,6 +51,12 @@ DEVICE MODELS
       chip that's usually found in the larger display modules, such as 1.3
       and 1.6 inch.
 
+    The overall API shape of this module is similar to that of
+    Device::Chip::MAX7219Panel, supporting the same set of drawing methods.
+    A future version of both of these modules may extend the concept into
+    providing access via an interface helper instance, if some standard API
+    shape is defined for driving these kinds of 1bpp pixel displays.
+
 CONSTRUCTOR
 
  new

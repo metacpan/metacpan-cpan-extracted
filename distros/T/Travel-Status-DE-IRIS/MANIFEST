@@ -20,9 +20,11 @@ share/enhance
 share/find-missing
 share/json2csv
 share/json2json
+share/meta.json
 share/stations.csv
 share/stations.json
 share/xml2json
+share/xml2meta
 t/20-iris-class.t
 t/21-iris-stations.t
 t/30-iris-const.t

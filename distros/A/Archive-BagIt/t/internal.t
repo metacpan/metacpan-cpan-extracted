@@ -1,20 +1,15 @@
 # this file tests how bag information could be accessed
 BEGIN { chdir 't' if -d 't' }
-
+use strict;
 use warnings;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
-use Test::More tests => 49;
-use Test::Exception;
-use strict;
-
-
-use lib '../lib';
-
 use File::Spec;
-use Data::Printer;
 use File::Path;
 use File::Copy;
+use Test::More tests => 49;
+use Test::Exception;
+use lib '../lib';
 
 use_ok('Archive::BagIt::Role::Portability');
 is(Archive::BagIt::Role::Portability::normalize_payload_filepath(''), '', 'normalize_payload_filepath, empty');

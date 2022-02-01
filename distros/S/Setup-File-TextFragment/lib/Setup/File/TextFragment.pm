@@ -1,7 +1,7 @@
 package Setup::File::TextFragment;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.06'; # VERSION
+our $DATE = '2021-08-02'; # DATE
+our $VERSION = '0.070'; # VERSION
 
 use 5.010001;
 use strict;
@@ -193,7 +193,13 @@ Setup::File::TextFragment - Insert/delete text fragment in a file (with undo sup
 
 =head1 VERSION
 
-This document describes version 0.06 of Setup::File::TextFragment (from Perl distribution Setup-File-TextFragment), released on 2017-07-10.
+This document describes version 0.070 of Setup::File::TextFragment (from Perl distribution Setup-File-TextFragment), released on 2021-08-02.
+
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <sharyanto@cpan.org>
 
 =head1 FUNCTIONS
 
@@ -202,9 +208,9 @@ This document describes version 0.06 of Setup::File::TextFragment (from Perl dis
 
 Usage:
 
- setup_text_fragment(%args) -> [status, msg, result, meta]
+ setup_text_fragment(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Insert/delete text fragment in a file (with undo support).
+InsertE<sol>delete text fragment in a file (with undo support).
 
 On do, will insert fragment to file (or delete, if C<should_exist> is set to
 false). On undo, will restore old file.
@@ -269,6 +275,7 @@ Whether fragment should exist.
 
 Will be passed to Text::Fragment.
 
+
 =back
 
 Special arguments:
@@ -277,34 +284,34 @@ Special arguments:
 
 =item * B<-tx_action> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_action_id> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_recovery> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_rollback> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_v> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -326,9 +333,13 @@ feature.
 
 =head1 SEE ALSO
 
-L<Text::Fragment>
+A more general version of this: L<Setup::File::Edit>.
 
-L<Setup>
+A variation that adds/removes line to file: L<Setup::File::Line>.
+
+Backend for this module: L<Text::Fragment>
+
+The Setup framework: L<Setup>
 
 =head1 AUTHOR
 
@@ -336,7 +347,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2017, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

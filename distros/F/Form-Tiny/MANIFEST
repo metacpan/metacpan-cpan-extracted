@@ -19,7 +19,6 @@ lib/Form/Tiny/Meta.pm
 lib/Form/Tiny/Meta/Filtered.pm
 lib/Form/Tiny/Meta/Strict.pm
 lib/Form/Tiny/Path.pm
-lib/Form/Tiny/PathValue.pm
 lib/Form/Tiny/Plugin.pm
 lib/Form/Tiny/Utils.pm
 Makefile.PL

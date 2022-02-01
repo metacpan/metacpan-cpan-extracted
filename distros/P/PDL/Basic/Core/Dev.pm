@@ -79,7 +79,7 @@ sub PDL_BOOT {
    if (!($symname = INT2PTR(Core*,SvIV( CoreSV )))) /* Core* value */
      Perl_croak(aTHX_ "Got NULL pointer for $symname");
    if ($symname->Version != PDL_CORE_VERSION)
-     Perl_croak(aTHX_ "[$symname->Version: \%d PDL_CORE_VERSION: \%d XS_VERSION: \%s] $module needs to be recompiled against the newly installed PDL", $symname->Version, PDL_CORE_VERSION, XS_VERSION);
+     Perl_croak(aTHX_ "[$symname->Version: \%ld PDL_CORE_VERSION: \%ld XS_VERSION: \%s] $module needs to be recompiled against the newly installed PDL", (long int)$symname->Version, (long int)PDL_CORE_VERSION, XS_VERSION);
 
 EOR
 }
@@ -522,7 +522,9 @@ EOF
 
 For a given function appearing in C99's C<complex.h>, will return a
 boolean of whether the system being compiled on has the complex version
-of that. E.g. for C<sin>, will test whether C<csin> exists.
+of that. E.g. for C<sin>, will test whether C<csinl> exists (before 2.069,
+would only check for C<csin>, causing build failures on non-C99 compliant
+C<libc> which mandates long-double versions).
 
 =cut
 
@@ -535,7 +537,7 @@ sub got_complex_version {
         ($Config{gccversion} ? (ccflags => '-O0') : ()), # stop GCC optimising test code away
         lib => 'm',
         header => 'complex.h',
-        function => sprintf('double num; num = creal(c%s(%s)); return 0;', $name, $args),
+        function => sprintf('double num; num = creal(c%sl(%s)); return 0;', $name, $args),
     );
 }
 

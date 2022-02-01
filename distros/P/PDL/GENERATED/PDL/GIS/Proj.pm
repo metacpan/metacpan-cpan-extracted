@@ -3,7 +3,7 @@
 #
 package PDL::GIS::Proj;
 
-our @EXPORT_OK = qw( get_proj_info  fwd_transform inv_transform  load_projection_descriptions   load_projection_information  );
+our @EXPORT_OK = qw( get_proj_info  fwd_transform inv_transform  load_projection_descriptions proj_version   load_projection_information  );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -148,7 +148,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 213 "Proj.pd"
+#line 221 "Proj.pd"
+
+=head2 proj_version
+
+Returns a 3-element list with PROJ major, minor, patch version-numbers.
+
+=cut
 
 my %SKIP = map +($_=>1), qw(
   and or Special for Madagascar
@@ -199,7 +205,7 @@ sub load_projection_information
     $info->{nzmg}{CATEGORIES} = [ 'fixed Earth' ];
     return $info;
 } # End of load_projection_information()...
-#line 203 "Proj.pm"
+#line 209 "Proj.pm"
 
 
 
@@ -222,7 +228,7 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 =cut
-#line 226 "Proj.pm"
+#line 232 "Proj.pm"
 
 
 

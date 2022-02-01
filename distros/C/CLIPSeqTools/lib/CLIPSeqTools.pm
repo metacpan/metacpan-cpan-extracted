@@ -24,7 +24,7 @@ Bugs:        Please open issues in the GitHub repository L<https://github.com/pa
 
 
 package CLIPSeqTools;
-$CLIPSeqTools::VERSION = '0.1.10';
+$CLIPSeqTools::VERSION = '1.0.0';
 use Modern::Perl;
 
 1;

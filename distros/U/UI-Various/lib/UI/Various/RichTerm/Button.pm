@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use UI::Various::core;
 use UI::Various::Button;
@@ -53,11 +53,11 @@ our @EXPORT_OK = qw();
 
 =head2 B<_prepare> - prepare UI element
 
-    ($width, $height, $active) = $ui_element->_prepare($content_width);
+    ($width, $height) = $ui_element->_prepare($content_width);
 
 =head3 example:
 
-    my ($w, $h, $active) = $_->_prepare($content_width);
+    my ($w, $h) = $_->_prepare($content_width);
     $width < $w  and  $width = $w;
     $height += $h;
 
@@ -91,14 +91,13 @@ sub _prepare($$)
 
 =head2 B<_show> - return formatted UI element
 
-    $string = $ui_element->_show($prefix, $width, $height,
-                                 $full_width, $full_height);
+    $string = $ui_element->_show($prefix, $width, $height);
 
 =head3 example:
 
     my ($w, $h) = $_->_prepare($content_width);
     ...
-    $_->_show('    ', $w, $h, $my_width, 0);
+    $_->_show('(1) ', $w, $h);
 
 =head3 parameters:
 

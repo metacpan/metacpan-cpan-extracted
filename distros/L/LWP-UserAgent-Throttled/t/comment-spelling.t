@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Test::Most;
- 
+
 if($ENV{AUTHOR_TESTING} ) {
 	eval 'use Test::Spelling::Comment 0.002';
 	if($@) {
@@ -15,6 +15,6 @@ if($ENV{AUTHOR_TESTING} ) {
 } else {
 	plan(skip_all => 'Author tests not required for installation');
 }
- 
+
 __DATA__
 TODO

@@ -51,7 +51,7 @@ my %WriteMakefileArgs = (
     "autodie" => 0,
     "namespace::autoclean" => 0
   },
-  "VERSION" => "0.1.10",
+  "VERSION" => "1.0.0",
   "test" => {
     "TESTS" => ""
   }

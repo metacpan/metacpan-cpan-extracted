@@ -9,7 +9,8 @@ dod-check.pl - check Definition of Done
 =head1 SYNOPSIS
 
     dod-check.pl
-    dod-check.pl 1 2 3 4 5 8 9
+    dod-check.pl 1 2 3 4 5 8 9  # only run checks 1 to 9
+    dod-check.pl -11 -12        # run all checks except 11 and 12
 
 =head1 ABSTRACT
 
@@ -110,12 +111,16 @@ my $tests;
 BEGIN  {  $tests = 19;  }
 use Test::More tests => $tests;
 
-my $test_default = 0 == @ARGV ? 1 : 0;
+my $test_default = 0 < @ARGV && $ARGV[0] =~ m/^\d+$/ ? 0 : 1;
 my %test = map { ($_ => $test_default) } 1..$tests;
 foreach (@ARGV)
 {
-    m/^\d+$/  or  die "bad non-numeric argument '$_', use 0 for list of steps\n";
-    $_  and  $test{$_} = 1;
+    m/^-?\d+$/
+	or  die "bad non-numeric argument '$_', use 0 for list of steps\n";
+    if ($_ > 0)
+    {   $test{$_} = 1;   }
+    elsif ($_ < 0)
+    {   $test{-$_} = 0;   }
 }
 my $n = 0;
 

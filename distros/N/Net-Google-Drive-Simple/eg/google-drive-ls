@@ -8,10 +8,12 @@ use File::Basename;
 use Getopt::Std;
 use Pod::Usage;
 
-Log::Log4perl->easy_init( { 
-    level => $DEBUG,
-    layout => "%d %F{1}:%L> %m%n"
-} );
+Log::Log4perl->easy_init(
+    {
+        level  => $DEBUG,
+        layout => "%d %F{1}:%L> %m%n"
+    }
+);
 
 my $gd = Net::Google::Drive::Simple->new();
 
@@ -20,10 +22,10 @@ $gd_dir = q[/] unless defined $gd_dir;
 
 INFO "Listing $gd_dir on Google Drive";
 
-my( $entries_gd, $parent ) = $gd->children( $gd_dir );
+my ( $entries_gd, $parent ) = $gd->children($gd_dir);
 
-for my $entry ( @$entries_gd ) {
-    if( $entry->kind() ne 'drive#file' ) {
+for my $entry (@$entries_gd) {
+    if ( $entry->kind() ne 'drive#file' ) {
         DEBUG "Ignoring ", $entry->title();
         next;
     }
@@ -32,9 +34,9 @@ for my $entry ( @$entries_gd ) {
 
     my $labels = $entry->labels();
 
-    if( $labels->{ trashed } ) {
-        INFO "Ignoring trashed file $title", 
-        next;
+    if ( $labels->{trashed} ) {
+        INFO "Ignoring trashed file $title",
+          next;
     }
 
     print $entry->title(), "\n";

@@ -12,6 +12,10 @@ sub tapprox ($$) {
     return $d <= 0.0001;
 }
 
+for my $type (PDL::Types::types()) {
+   ok defined pdl($type, 0), "constructing PDL of type $type";
+}
+
 my $a_long = sequence long, 10;
 my $a_dbl  = sequence 10;
 
@@ -246,11 +250,11 @@ ok(all($y==$x),"new_or_inplace returns the original thing if inplace is set");
 ok(!($y->is_inplace),"new_or_inplace clears the inplace flag");
 
 # check reshape and dims.  While we're at it, check null & empty creation too.
-my $null = null;
 my $empty = zeroes(0);
 ok($empty->nelem==0,"you can make an empty PDL with zeroes(0)");
 ok("$empty" =~ m/Empty/, "an empty PDL prints 'Empty'");
 
+my $null = null;
 is $null->info, 'PDL->null', "null ndarray's info is 'PDL->null'";
 my $mt_info = $empty->info;
 $mt_info =~m/\[([\d,]+)\]/;

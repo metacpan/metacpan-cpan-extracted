@@ -14,6 +14,7 @@ WriteMakefile(
 	PL_FILES	=> {},
 	TEST_REQUIRES => {
 		'LWP::Protocol::https' => 0,
+		'Test::Exception' => 0.42,	# http://www.cpantesters.org/cpan/report/91a6ac80-6bf9-1014-b7eb-bb2be30b7e63
 		'Test::Most' => 0,
 		'Test::NoWarnings' => 0,
 		'Test::URI' => 0,

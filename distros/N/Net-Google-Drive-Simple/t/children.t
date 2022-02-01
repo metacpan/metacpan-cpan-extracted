@@ -40,8 +40,8 @@ isa_ok $first_file,  'Net::Google::Drive::Simple::Item';
 isa_ok $second_file, 'Net::Google::Drive::Simple::Item';
 
 is $first_file->id, "0B6rF1m0B6rF1m0B6rF1m0B6rF1m0B6rF1m0B6rF1m", 'id';
-is $first_file->Id, $first_file->id, 'Id eq id';
-is $first_file->Id, $first_file->id, 'ID eq id';
+is $first_file->Id, $first_file->id,                              'Id eq id';
+is $first_file->Id, $first_file->id,                              'ID eq id';
 
 is $first_file->labels => {
     'hidden'     => D(),
@@ -59,7 +59,7 @@ is $first_file->originalFilename, "sample.vcf",   "originalFilename";
 is $first_file->mimeType,         "text/x-vcard", "mimeType";
 
 ok !$first_file->is_folder, "not a folder";
-ok $first_file->is_file, "first file is a file";
+ok $first_file->is_file,    "first file is a file";
 
 is $second_file->title, "second file title", "title for the second_file";
 

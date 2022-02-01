@@ -5,6 +5,9 @@ use strict;
 use warnings;
 use Mojo::Base 'Mojolicious';
 
+our $VERSION = '0.07'; # VERSION
+# ABSTRACT: Run a standalone token collector
+
 ###########################################
 sub startup {
 ###########################################
@@ -65,27 +68,38 @@ sub callback {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
-OAuth::Cmdline::Mojolicious - Run a standalone token collector
+OAuth::Cmdline::Mojo - Run a standalone token collector
+
+=head1 VERSION
+
+version 0.07
 
 =head1 SYNOPSIS
 
-    use OAuth::Cmdline::Mojolicious;
+    use OAuth::Cmdline::Mojo;
     app->start();
 
 =head1 DESCRIPTION
 
-OAuth::Cmdline::Mojolicious starts a web server, to which you should
+OAuth::Cmdline::Mojo starts a web server, to which you should
 point your browser, in order to go through the OAuth rigamarole and
 collect the tokens for later use in command line scripts.
 
-=head1 LEGALESE
-
-Copyright 2014 by Mike Schilli, all rights reserved.
-This program is free software, you can redistribute it and/or
-modify it under the same terms as Perl itself.
-
 =head1 AUTHOR
 
-2014, Mike Schilli <cpan@perlmeister.com>
+Mike Schilli <cpan@perlmeister.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022 by Mike Schilli.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

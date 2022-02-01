@@ -6,7 +6,7 @@ use 5.014;
 
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
-our $VERSION = '1.63';
+our $VERSION = '1.64';
 
 use Carp qw(confess cluck);
 use DateTime;
@@ -29,6 +29,139 @@ sub try_load_xml {
 		return ( undef, $@ );
 	}
 	return ( $tree, undef );
+}
+
+# "station" parameter must be an EVA or DS100 ID.
+sub new_p {
+	my ( $class, %opt ) = @_;
+	my $promise = $opt{promise}->new;
+
+	if ( not $opt{station} ) {
+		return $promise->reject('station flag must be passed');
+	}
+
+	my $self = $class->new( %opt, async => 1 );
+	$self->{promise} = $opt{promise};
+
+	my $lookahead_steps = int( $self->{lookahead} / 60 );
+	if ( ( 60 - $self->{datetime}->minute ) < ( $self->{lookahead} % 60 ) ) {
+		$lookahead_steps++;
+	}
+	my $lookbehind_steps = int( $self->{lookbehind} / 60 );
+	if ( $self->{datetime}->minute < ( $self->{lookbehind} % 60 ) ) {
+		$lookbehind_steps++;
+	}
+
+	my @candidates = $opt{get_station}( $opt{station} );
+
+	if ( @candidates == 0 ) {
+		return $promise->reject('station not found');
+	}
+	if ( @candidates >= 2 ) {
+		return $promise->reject('station identifier is ambiguous');
+	}
+
+	$self->{station} = {
+		ds100 => $candidates[0][0],
+		name  => $candidates[0][1],
+		uic   => $candidates[0][2],
+	};
+	$self->{related_stations} = [];
+
+	my @queue = ( $self->{station}{uic} );
+	my @related_reqs;
+	my @related_stations;
+	my %seen       = ( $self->{station}{uic} => 1 );
+	my $iter_depth = 0;
+
+	while ( @queue and $iter_depth < 12 and $opt{with_related} ) {
+		my $eva = shift(@queue);
+		$iter_depth++;
+		for my $ref ( @{ $opt{meta}{$eva} // [] } ) {
+			if ( not $seen{$ref} ) {
+				push( @related_stations, $ref );
+				$seen{$ref} = 1;
+				push( @queue, $ref );
+			}
+		}
+	}
+
+	for my $eva (@related_stations) {
+		@candidates = $opt{get_station}( $opt{station} );
+
+		if ( @candidates == 1 ) {
+			push(
+				@{ $self->{related_stations} },
+				{
+					ds100 => $candidates[0][0],
+					name  => $candidates[0][1],
+					uic   => $candidates[0][2],
+				}
+			);
+		}
+	}
+
+	my $dt_req = $self->{datetime}->clone;
+	my @timetable_reqs
+	  = ( $self->get_timetable_p( $self->{station}{uic}, $dt_req ) );
+
+	for my $eva (@related_stations) {
+		push( @timetable_reqs, $self->get_timetable_p( $eva, $dt_req ) );
+	}
+
+	for ( 1 .. $lookahead_steps ) {
+		$dt_req->add( hours => 1 );
+		push( @timetable_reqs,
+			$self->get_timetable_p( $self->{station}{uic}, $dt_req ) );
+		for my $eva (@related_stations) {
+			push( @timetable_reqs, $self->get_timetable_p( $eva, $dt_req ) );
+		}
+	}
+
+	$dt_req = $self->{datetime}->clone;
+	for ( 1 .. $lookbehind_steps ) {
+		$dt_req->subtract( hours => 1 );
+		push( @timetable_reqs,
+			$self->get_timetable_p( $self->{station}{uic}, $dt_req ) );
+		for my $eva (@related_stations) {
+			push( @timetable_reqs, $self->get_timetable_p( $eva, $dt_req ) );
+		}
+	}
+
+	$self->{promise}->all(@timetable_reqs)->then(
+		sub {
+			my @realtime_reqs
+			  = ( $self->get_realtime_p( $self->{station}{uic} ) );
+			for my $eva (@related_stations) {
+				push( @realtime_reqs, $self->get_realtime_p( $eva, $dt_req ) );
+			}
+			return $self->{promise}->all_settled(@realtime_reqs);
+		}
+	)->then(
+		sub {
+			my @realtime_results = @_;
+
+			for my $realtime_result (@realtime_results) {
+				if ( $realtime_result->{status} eq 'rejected' ) {
+					$self->{warnstr} //= q{};
+					$self->{warnstr}
+					  .= "Realtime data request failed: $realtime_result->{reason}. ";
+				}
+			}
+
+			$self->postprocess_results;
+			$promise->resolve($self);
+			return;
+		}
+	)->catch(
+		sub {
+			my ($err) = @_;
+			$promise->reject($err);
+			return;
+		}
+	)->wait;
+
+	return $promise;
 }
 
 sub new {
@@ -65,6 +198,19 @@ sub new {
 
 	bless( $self, $class );
 
+	my $lookahead_steps = int( $self->{lookahead} / 60 );
+	if ( ( 60 - $self->{datetime}->minute ) < ( $self->{lookahead} % 60 ) ) {
+		$lookahead_steps++;
+	}
+	my $lookbehind_steps = int( $self->{lookbehind} / 60 );
+	if ( $self->{datetime}->minute < ( $self->{lookbehind} % 60 ) ) {
+		$lookbehind_steps++;
+	}
+
+	if ( $opt{async} ) {
+		return $self;
+	}
+
 	if ( not $self->{user_agent} ) {
 		my %lwp_options = %{ $opt{lwp_options} // { timeout => 10 } };
 		$self->{user_agent} = LWP::UserAgent->new(%lwp_options);
@@ -91,7 +237,6 @@ sub new {
 			datetime       => $self->{datetime},
 			developer_mode => $self->{developer_mode},
 			iris_base      => $self->{iris_base},
-			keep_transfers => $self->{keep_transfers},
 			lookahead      => $self->{lookahead},
 			lookbehind     => $self->{lookbehind},
 			station        => $ref->{uic},
@@ -111,15 +256,6 @@ sub new {
 		return $self;
 	}
 
-	my $lookahead_steps = int( $self->{lookahead} / 60 );
-	if ( ( 60 - $self->{datetime}->minute ) < ( $self->{lookahead} % 60 ) ) {
-		$lookahead_steps++;
-	}
-	my $lookbehind_steps = int( $self->{lookbehind} / 60 );
-	if ( $self->{datetime}->minute < ( $self->{lookbehind} % 60 ) ) {
-		$lookbehind_steps++;
-	}
-
 	my $dt_req = $self->{datetime}->clone;
 	$self->get_timetable( $self->{station}{uic}, $dt_req );
 	for ( 1 .. $lookahead_steps ) {
@@ -134,6 +270,13 @@ sub new {
 
 	$self->get_realtime;
 
+	$self->postprocess_results;
+
+	return $self;
+}
+
+sub postprocess_results {
+	my ($self) = @_;
 	if ( not $self->{keep_transfers} ) {
 
 		# tra (transfer?) indicates a train changing its ID, so there are two
@@ -174,8 +317,55 @@ sub new {
 
 	# same goes for replacement refs (the <ref> tag in the fchg document)
 	$self->create_replacement_refs;
+}
 
-	return $self;
+sub get_with_cache_p {
+	my ( $self, $cache, $url ) = @_;
+
+	if ( $self->{developer_mode} ) {
+		say "GET $url";
+	}
+
+	my $promise = $self->{promise}->new;
+
+	if ($cache) {
+		my $content = $cache->thaw($url);
+		if ($content) {
+			if ( $self->{developer_mode} ) {
+				say '  cache hit';
+			}
+			return $promise->resolve($content);
+		}
+	}
+
+	if ( $self->{developer_mode} ) {
+		say '  cache miss';
+	}
+
+	my $res = $self->{user_agent}->get_p($url)->then(
+		sub {
+			my ($tx) = @_;
+			if ( my $err = $tx->error ) {
+				$promise->reject(
+					"GET $url returned HTTP $err->{code} $err->{message}");
+				return;
+			}
+			my $content = $tx->res->body;
+			if ($cache) {
+				$cache->freeze( $url, \$content );
+			}
+			$promise->resolve($content);
+			return;
+		}
+	)->catch(
+		sub {
+			my ($err) = @_;
+			$promise->reject($err);
+			return;
+		}
+	)->wait;
+
+	return $promise;
 }
 
 sub get_with_cache {
@@ -212,6 +402,48 @@ sub get_with_cache {
 	}
 
 	return ( $content, undef );
+}
+
+sub get_station_p {
+	my ( $self, %opt ) = @_;
+
+	my $promise = $self->{promise}->new;
+	my $station = $opt{name};
+
+	$self->get_with_cache_p( $self->{main_cache},
+		$self->{iris_base} . '/station/' . $station )->then(
+		sub {
+			my ($raw) = @_;
+			my ( $xml_st, $xml_err ) = try_load_xml($raw);
+			if ($xml_err) {
+				$promise->reject('Failed to parse station data: Invalid XML');
+				return;
+			}
+			my $station_node = ( $xml_st->findnodes('//station') )[0];
+
+			if ( not $station_node ) {
+				$promise->reject(
+					"Station '$station' has no associated timetable");
+				return;
+			}
+			$promise->resolve(
+				{
+					uic   => $station_node->getAttribute('eva'),
+					name  => $station_node->getAttribute('name'),
+					ds100 => $station_node->getAttribute('ds100'),
+				}
+			);
+			return;
+		}
+	)->catch(
+		sub {
+			my ($err) = @_;
+			$promise->reject($err);
+			return;
+		}
+	)->wait;
+
+	return $promise;
 }
 
 sub get_station {
@@ -389,6 +621,41 @@ sub add_result {
 	return $result;
 }
 
+sub get_timetable_p {
+	my ( $self, $eva, $dt ) = @_;
+
+	my $promise = $self->{promise}->new;
+
+	$self->get_with_cache_p( $self->{main_cache},
+		$dt->strftime( $self->{iris_base} . "/plan/${eva}/%y%m%d/%H" ) )->then(
+		sub {
+			my ($raw) = @_;
+			my ( $xml, $xml_err ) = try_load_xml($raw);
+			if ($xml_err) {
+				$promise->reject(
+					'Failed to parse a schedule part: Invalid XML');
+				return;
+			}
+			my $station
+			  = ( $xml->findnodes('/timetable') )[0]->getAttribute('station');
+
+			for my $s ( $xml->findnodes('/timetable/s') ) {
+
+				$self->add_result( $station, $eva, $s );
+			}
+			$promise->resolve;
+			return;
+		}
+	)->catch(
+		sub {
+			my ($err) = @_;
+			$promise->reject($err);
+			return;
+		}
+	)->wait;
+	return $promise;
+}
+
 sub get_timetable {
 	my ( $self, $eva, $dt ) = @_;
 
@@ -418,6 +685,35 @@ sub get_timetable {
 	return $self;
 }
 
+sub get_realtime_p {
+	my ( $self, $eva ) = @_;
+
+	my $promise = $self->{promise}->new;
+
+	$self->get_with_cache_p( $self->{rt_cache},
+		$self->{iris_base} . "/fchg/${eva}" )->then(
+		sub {
+			my ($raw) = @_;
+			my ( $xml, $xml_err ) = try_load_xml($raw);
+			if ($xml_err) {
+				$promise->reject(
+					'Failed to parse a schedule part: Invalid XML');
+				return;
+			}
+			$self->parse_realtime( $eva, $xml );
+			$promise->resolve;
+			return;
+		}
+	)->catch(
+		sub {
+			my ($err) = @_;
+			$promise->reject("Failed to fetch realtime data: $err");
+			return;
+		}
+	)->wait;
+	return $promise;
+}
+
 sub get_realtime {
 	my ($self) = @_;
 
@@ -439,6 +735,11 @@ sub get_realtime {
 		return $self;
 	}
 
+	$self->parse_realtime( $eva, $xml );
+}
+
+sub parse_realtime {
+	my ( $self, $eva, $xml ) = @_;
 	my $station = ( $xml->findnodes('/timetable') )[0]->getAttribute('station');
 
 	for my $s ( $xml->findnodes('/timetable/s') ) {
@@ -627,14 +928,11 @@ Travel::Status::DE::IRIS - Interface to IRIS based web departure monitors.
 
 =head1 SYNOPSIS
 
-    use Travel::Status::DE::IRIS;
-    use Travel::Status::DE::IRIS::Stations;
+Blocking variant:
 
-    # Get station code for "Essen Hbf" (-> "EE")
-    my $station = (Travel::Status::DE::IRIS::Stations::get_station_by_name(
-        'Essen Hbf'))[0][0];
+    use Travel::Status::DE::IRIS;
     
-    my $status = Travel::Status::DE::IRIS->new(station => $station);
+    my $status = Travel::Status::DE::IRIS->new(station => "Essen Hbf");
     for my $r ($status->results) {
         printf(
             "%s %s +%-3d %10s -> %s\n",
@@ -642,9 +940,29 @@ Travel::Status::DE::IRIS - Interface to IRIS based web departure monitors.
         );
     }
 
+Non-blocking variant (EXPERIMENTAL):
+
+    use Mojo::Promise;
+    use Mojo::UserAgent;
+    use Travel::Status::DE::IRIS;
+    use Travel::Status::DE::IRIS::Stations;
+    
+    Travel::Status::DE::IRIS->new_p(station => "Essen Hbf",
+            promise => 'Mojo::Promise', user_agent => Mojo::UserAgent->new,
+            get_station => \&Travel::Status::DE::IRIS::Stations::get_station,
+            meta => Travel::Status::DE::IRIS::Stations::get_meta())->then(sub {
+        my ($status) = @_;
+        for my $r ($status->results) {
+            printf(
+                "%s %s +%-3d %10s -> %s\n",
+                $r->date, $r->time, $r->delay || 0, $r->line, $r->destination
+            );
+        }
+    })->wait;
+
 =head1 VERSION
 
-version 1.63
+version 1.64
 
 =head1 DESCRIPTION
 
@@ -751,6 +1069,38 @@ Messe/Deutz (tief)" (KKDT).
 By default, Travel::Status::DE::IRIS only returns departures for the specified
 station. When this option is set to a true value, it will also return
 departures for all related stations.
+
+=back
+
+=item my $promise = Travel::Status::DE::IRIS->new_p(I<%opt>) (B<EXPERIMENTAL>)
+
+Return a promise yielding a Travel::Status::DE::IRIS instance (C<< $status >>)
+on success, or an error message (same as C<< $status->errstr >>) on failure.
+This function is experimental and may be changed or remove without warning.
+
+In addition to the arguments of B<new>, the following mandatory arguments must
+be set:
+
+=over
+
+=item B<promise> => I<promises module>
+
+Promises implementation to use for internal promises as well as B<new_p> return
+value. Recommended: Mojo::Promise(3pm).
+
+=item B<get_station> => I<get_station ref>
+
+Reference to Travel::Status::DE::IRIS::Stations::get_station().
+
+=item B<meta> => I<meta dict>
+
+The dictionary returned by Travel::Status::DE::IRIS::Stations::get_meta().
+
+=item B<user_agent> => I<user agent>
+
+User agent instance to use for asynchronous requests. The object must support
+promises (i.e., it must implement a C<< get_p >> function). Recommended:
+Mojo::UserAgent(3pm).
 
 =back
 

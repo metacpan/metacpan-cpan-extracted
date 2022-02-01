@@ -1,20 +1,14 @@
-
 BEGIN { chdir 't' if -d 't' }
-
+use strict;
 use warnings;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
-use Test::More 'no_plan';
-use Test::Warnings;
-use strict;
-
-
-use lib '../lib';
-
 use File::Spec;
-use Data::Printer;
 use File::Path;
 use File::Copy;
+use Test::More 'no_plan';
+use Test::Warnings;
+use lib '../lib';
 
 my $Class = 'Archive::BagIt';
 use_ok($Class);
@@ -23,12 +17,9 @@ my @ROOT = grep {length} 'src';
 
 #warn "what is this: ".Dumper(@ROOT);
 
-
 my $SRC_BAG = File::Spec->catdir( @ROOT, 'src_bag');
 my $SRC_FILES = File::Spec->catdir( @ROOT, 'src_files');
 my $DST_BAG = File::Spec->catdir(@ROOT, 'dst_bag');
-
-
 
 #validate tests
 

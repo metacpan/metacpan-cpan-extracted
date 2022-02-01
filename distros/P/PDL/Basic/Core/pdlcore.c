@@ -40,6 +40,7 @@ pdl_error pdl_makescratchhash(pdl *ret, PDL_Anyval data) {
   PDL_RETERROR(PDL_err, pdl_allocdata(ret));
   ret->ndims = 1; ret->dims[0] = 0; pdl_resize_defaultincs(ret);
   ret->state &= ~PDL_ALLOCATED;
+  PDLDEBUG_f(printf("pdl_makescratchhash after alloc: "); pdl_dump(ret););
   /* Refcnt should be 1 already... */
   /* Make the whole pdl mortal so destruction happens at the right time.
    * If there are dangling references, pdlapi.c knows not to actually
@@ -805,7 +806,7 @@ PDL_Indx pdl_setav_ ## ppsym_out(ctype_out* dest_data, AV* av, \
   if(level==0 && undef_count) { \
     if(SvTRUE(get_sv("PDL::debug",0))) { \
       fflush(stdout); \
-      fprintf(stderr,"Warning: pdl_setav_" #ppsym_out " converted undef to $PDL::undefval (%g) %ld time%s\\n",(double)undefval,undef_count,undef_count==1?"":"s"); \
+      fprintf(stderr,"Warning: pdl_setav_" #ppsym_out " converted undef to $PDL::undefval (%g) %"IND_FLAG" time%s\\n",(double)undefval,undef_count,undef_count==1?"":"s"); \
       fflush(stderr); \
     } \
   } \

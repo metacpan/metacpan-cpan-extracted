@@ -88,27 +88,42 @@ A line starting with ">", followed by a space and some text is a quote.
     The monologue at the end is fantastic, with the city lights and the rain.
     > I have seen things you people would not believe.
 
-=head1 QUICKSTART
+=head1 SECURITY
 
-I'm going to assume that you're going to create a new user just to be safe.
+It might be best if you had a separate user for Phoebe:
 
     sudo adduser --disabled-login --disabled-password phoebe
     sudo su phoebe --shell=/bin/bash
     cd
 
-Now you're in your home directory, F</home/phoebe>. We're going to install
-things right here.
+Now you're in the new home directory, F</home/phoebe>. If you start C<phoebe>
+here, your wiki directory will be F</home/phoebe/wiki>. If you haven't installed
+L<App::Phoebe> for all your users, you will have to install it again.
 
     cpan App::Phoebe
 
-Start Phoebe. It's going to prompt you for a hostname and create certificates
-for you. If in doubt, answer C<localhost>. The certificate and a private key are
-stored in the F<cert.pem> and F<key.pem> files, using elliptic curves, valid for
-five years, without password protection.
+The Perl files are stored in F</home/phoebe/perl5>.
 
-Time to start phoebe, in the foreground:
+=head1 QUICKSTART
+
+Start Phoebe.
 
     phoebe
+
+When you run it for the first time, Phoebe is going to prompt you for a hostname
+and create certificates for you. If in doubt, answer C<localhost>. The
+certificate and a private key are stored in the F<cert.pem> and F<key.pem>
+files, using elliptic curves, valid for five years, without password protection.
+
+    Do you want to create them right now?
+    The certificate uses eliptic curves and is valid for five years.
+    If so, please provide your hostname (e.g. localhost).
+    If not, just press Enter.
+    localhost
+    openssl req -new -x509 -newkey ec -subj "/CN=localhost" -pkeyopt ec_paramgen_curve:prime256v1 -days 1825 -nodes -out cert.pem -keyout key.pem
+    Generating an EC private key
+    writing new private key to 'key.pem'
+    -----
 
 If it aborts, see the L</Troubleshooting> section below. If it runs, open a
 second terminal and test it:
@@ -128,11 +143,11 @@ Let's create a new page using the Titan protocol, from the command line:
     echo "Please be kind." >> test.txt
     titan --url=titan://localhost/raw/Welcome --token=hello test.txt
 
-You should get a nice redirect message, with an appropriate date.
+You should get a nice redirect message.
 
     30 gemini://localhost:1965/page/Welcome
 
-You can check the page, now (replacing the appropriate date):
+You can check the page:
 
     gemini gemini://localhost:1965/page/Welcome
 
@@ -246,7 +261,8 @@ Systemd is going to handle daemonisation for us. There's more documentation
 available online.
 L<https://www.freedesktop.org/software/systemd/man/systemd.service.html>.
 
-Basically, this is the template for our service:
+Basically, this is the template for our service, assuming that you created a
+separate user for Phoebe:
 
     [Unit]
     Description=Phoebe

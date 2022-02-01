@@ -1,0 +1,7 @@
+.git/*
+.gitignore
+Makefile$
+MYMETA.*
+bin/wsgetmail
+blib/*
+pm_to_blib

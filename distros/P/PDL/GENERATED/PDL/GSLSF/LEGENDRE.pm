@@ -21,7 +21,7 @@ use DynaLoader;
 
 
 
-#line 5 "gsl_sf_legendre.pd"
+#line 6 "gsl_sf_legendre.pd"
 use strict;
 use warnings;
 
@@ -532,7 +532,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 344 "gsl_sf_legendre.pd"
+#line 345 "gsl_sf_legendre.pd"
 
 =head1 AUTHOR
 

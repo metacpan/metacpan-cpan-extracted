@@ -1,3 +1,6 @@
+/* Variables */
+  @import 'variables.css';
+
 /* Default settings */
   
   /* all */
@@ -38,21 +41,17 @@
   
   /* main */
   .main {
-    max-width:960px;
+    max-width:1030px;
     width:100%;
     margin: 0 auto;
     padding:0 5px;
+    display:flex;
+    flex-wrap:wrap;
   }
-  .main:after {
-    content:"";
-    display:block;
-    clear:both;
-  }
-  
+
   /* content */
   .content {
-    float:left;
-    width:calc(100% - 280px - 30px);
+    width:calc(100% - 320px - 30px);
   }
   
   /* entry */
@@ -67,19 +66,18 @@
   
   /* side */
   .side {
-    float:left;
-    width:280px;
+    width:320px;
     margin-left:30px;
     padding-top:16px;
   }
   
   /* tags */
   h1 {
-    max-width:1020px;
+    max-width:1030px;
     width:100%;
     font-size:28px;
     padding:19px 10px 15px 73px;
-    background:url(/images/giblog-logo.png) no-repeat 10px 15px;
+    background:url(/images/logo.png) no-repeat 10px 15px;
     background-size:48px;
   }
   h1 a, h1 a:visited {
@@ -92,7 +90,7 @@
     margin:10px 0;
     padding-left:20px;
     letter-spacing:0.5px;
-    border-left:8px solid #00A78C;
+    border-left:8px solid var(--theme_color);
   }
   h2 a, h2 a:visited {
     text-decoration:none;
@@ -100,7 +98,7 @@
   }
   h3 {
     font-size:20px;
-    border-top:4px solid #ddd;
+    border-top:4px solid var(--theme_color);
     padding:16px 0px 15px 18px;
     letter-spacing:0.5px;
     margin:15px 0 10px 0;
@@ -170,7 +168,7 @@
     margin-bottom:30px;
   }
   .side_list_title {
-    background:#009D82;
+    background:var(--theme_color);
     color:white;
     font-weight:bold;
     padding: 12px 0px 10px 0px;
@@ -191,15 +189,13 @@
   }
 
 /* Tablet and Smart phone */
-@media only screen and (max-width:960px) {
+@media only screen and (max-width:1030px) {
   .content {
-    float:none;
     width:97%;
     margin:0 auto;
     margin-bottom:15px;
   }
   .side {
-    float:none;
     width:97%;
     margin:0 auto;
   }

@@ -31,10 +31,12 @@ no_index:
 requires:
   Class::Utils: 0
   Error::Pure: 0
+  Exporter: 0
   Getopt::Std: 0
   IO::Barf: 0
   LWP::UserAgent: 0
   Menlo::Index::MetaCPAN: 0
+  Readonly: 0
   URI::cpan: 0
   perl: 5.6.0
 resources:
@@ -42,4 +44,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/App-CPAN-Get
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-CPAN-Get
-version: '0.05'
+version: '0.06'

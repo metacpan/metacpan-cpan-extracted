@@ -11,7 +11,7 @@ use File::HomeBank;
 use Getopt::Long 2.38 qw(GetOptionsFromArray);
 use Pod::Usage;
 
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 my %ACCOUNT_TYPES = (   # map HomeBank account types to Ledger accounts
     bank        => 'Assets:Bank',
@@ -265,6 +265,8 @@ sub convert_homebank_to_ledger {
         my $payee   = $homebank->find_payee_by_key($transaction->{payee});
         my $tags    = _split_tags($transaction->{tags});
         my $date    = $transaction->{date};
+        my $code    = $transaction->{paymode} =~ /^(?:check|epayment)$/ ? $transaction->{info}
+                                                                        : undef;
 
         my @postings;
 
@@ -362,6 +364,7 @@ sub convert_homebank_to_ledger {
         $ledger->add_transactions({
             date        => $date,
             payee       => $payee->{name},
+            code        => $code,
             memo        => $memo,
             postings    => \@postings,
         });
@@ -449,7 +452,7 @@ App::HomeBank2Ledger - A tool to convert HomeBank files to Ledger format
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

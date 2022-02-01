@@ -14,7 +14,7 @@ has project_id => sub ($self) { $self->_parse_project_id($self->_url->path) };
 has host_port  => sub ($self) { $self->_url->host_port };
 
 sub parse ($package, $url) {
-  return Sentry::DSN->new(_url => Mojo::URL->new($url));
+  return $url && Sentry::DSN->new(_url => Mojo::URL->new($url));
 }
 
 sub _parse_user ($self, $auth) {

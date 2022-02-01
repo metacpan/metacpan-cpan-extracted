@@ -26,12 +26,12 @@ requires:
   Neo4j::Client: '0.46'
   Neo4j::Types: '1.00'
   URI: '0'
-  parent: '0'
-  perl: '5.010'
+  XSLoader: '0.14'
+  perl: '5.012'
 resources:
   bugtracker: https://github.com/majensen/perlbolt/issues
   repository: https://github.com/majensen/perlbolt.git
-version: '0.4201'
+version: '0.4203'
 x_contributors:
   - 'Mark A. Jensen <majensen@cpan.org>'
   - 'Arne Johannessen <ajnn@cpan.org>'

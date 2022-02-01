@@ -32,7 +32,7 @@ BEGIN {
     $ENV{DISPLAY}  or  plan skip_all => 'DISPLAY not found';
     eval { require Tk; };
     $@  and  plan skip_all => 'Perl/Tk not found';
-    plan tests => 16;
+    plan tests => 18;
 
     # define fixed environment for unit tests:
     delete $ENV{UI};
@@ -93,6 +93,10 @@ is(ref($check), 'UI::Various::Tk::Check',
 my $text2 = UI::Various::Text->new(text => \$ivar);
 is(ref($text2), 'UI::Various::Tk::Text',
    'type UI::Various::Tk::Text is correct again');
+my $rvar = 'r';
+my $radio =
+    UI::Various::Radio->new(buttons => [r => 'red', g => 'green', b => 'blue'],
+			    var => \$rvar);
 
 stderr_like
 {   $text1->_prepare(0, 0);   }
@@ -110,10 +114,15 @@ stderr_like
 {   $check->_prepare(0, 0);   }
     qr/^UI::.*::Tk::Check element must be accompanied by parent$re_msg_tail/,
     'orphaned Check causes error';
+stderr_like
+{   $radio->_prepare(0, 0);   }
+    qr/^UI::.*::Tk::Radio element must be accompanied by parent$re_msg_tail/,
+    'orphaned Check causes error';
 
 my $button2 = UI::Various::Button->new(text => 'Quit');
 my $w = $main->window({title => 'Hello', height => 12, width => 42},
-		      $text1, $button1, $input, $check, $text2, $button2);
+		      $text1, $button1, $input, $check, $text2, $radio,
+		      $button2);
 is(ref($w), 'UI::Various::Tk::Window',
    'type UI::Various::Tk::Window is correct');
 $button2->code(sub { $w->destroy(); });
@@ -124,6 +133,7 @@ combined_is
     $button1->_tk()->invoke;
     $input->_tk()->insert(0, 'some');
     $check->_tk()->invoke;
+    $radio->_tk()->[2]->invoke;
     $button2->_tk()->invoke;
     $main->_mainloop_run;
 }
@@ -132,3 +142,4 @@ combined_is
 is(@{$main->{children}}, 0, 'main no longer has children');
 is($ivar, 'something', 'input variable has correct new value');
 is($cvar, 1, 'checkbox variable has correct new value of 1');
+is($rvar, 'b', 'radio button variable has correct new value of "b"(lue)');

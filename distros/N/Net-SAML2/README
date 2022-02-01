@@ -2,7 +2,7 @@ NAME
     Net::SAML2 - SAML2 bindings and protocol implementation
 
 VERSION
-    version 0.49
+    version 0.52
 
 SYNOPSIS
       See TUTORIAL.md for implementation documentation and
@@ -114,7 +114,7 @@ AUTHOR
     Chris Andrews <chrisa@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021 by Chris Andrews and Others, see the
+    This software is copyright (c) 2022 by Chris Andrews and Others, see the
     git log.
 
     This is free software; you can redistribute it and/or modify it under

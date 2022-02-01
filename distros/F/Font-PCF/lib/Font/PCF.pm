@@ -1,20 +1,21 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2022 -- leonerd@leonerd.org.uk
 
-package Font::PCF;
+use v5.26;
+use Object::Pad 0.57;
+use Syntax::Keyword::Match;
 
-use strict;
-use warnings;
-use base qw( IO::Handle::Packable );
+package Font::PCF 0.02;
+class Font::PCF;
 
-our $VERSION = '0.01';
-
-use List::Util qw( any first );
+use List::Util 1.33 qw( any first );
 use PerlIO::gzip;
 
-use Struct::Dumb;
+use IO::Handle::Packable;
+
+use Object::Pad::ClassAttr::Struct;
 
 =head1 NAME
 
@@ -54,9 +55,23 @@ useful for other use-cases as well, but may required more methods adding.
 #   http://fileformats.archiveteam.org/wiki/PCF
 #   https://fontforge.github.io/en-US/documentation/reference/pcf-format/
 
-struct Table => [qw( type format size offset )];
+class Font::PCF::_Table :Struct {
+   has $type;
+   has $format;
+   has $size;
+   has $offset;
+}
 
-struct Glyph => [qw( bitmap left_side_bearing right_side_bearing width ascent descent attrs name )];
+class Font::PCF::_Glyph :Struct {
+   has $bitmap               { [] };
+   has $left_side_bearing  = undef;
+   has $right_side_bearing = undef;
+   has $width              = undef;
+   has $ascent             = undef;
+   has $descent            = undef;
+   has $attrs              = undef;
+   has $name               = undef;
+}
 
 use constant {
    # Table types
@@ -98,84 +113,85 @@ the data from it. Throws an exception if an error occurs.
 
 =cut
 
-sub open
+# class method
+sub open ( $class, $path, %opts )
 {
-   my $class = shift;
-   my ( $path, %opts ) = @_;
-
    $opts{gzip} = 1 if $path =~ m/\.gz$/;
 
-   open my $self, $opts{gzip} ? "<:gzip" : "<", $path or
+   open my $fh, $opts{gzip} ? "<:gzip" : "<", $path or
       die "Cannot open font at $path - $!";
+   bless $fh, "IO::Handle::Packable";
 
-   bless $self, $class;
+   my $self = $class->new( fh => $fh );
 
    $self->read_data;
 
    return $self;
 }
 
+has $_fh :param;
+
 =head1 METHODS
 
 =cut
 
-sub read_data
+method read_data ()
 {
-   my $self = shift;
-
-   my ( $signature, $table_count ) = $self->unpack( "a4 i<" );
+   my ( $signature, $table_count ) = $_fh->unpack( "a4 i<" );
    $signature eq "\x01fcp" or die "Invalid signature";
 
    my @tables = map {
-      Table( $self->unpack( "i< i< i< i<" ) )
+      my @v = $_fh->unpack( "i< i< i< i<" );
+      Font::PCF::_Table->new(
+         type => $v[0], format => $v[1], size => $v[2], offset => $v[3],
+      )
    } 1 .. $table_count;
 
    foreach my $table ( @tables ) {
       my $type = $table->type;
-      if( $type == PCF_METRICS ) {
-         $self->read_metrics_table( $table );
-      }
-      elsif( $type == PCF_BITMAPS ) {
-         $self->read_bitmaps_table( $table );
-      }
-      elsif( $type == PCF_BDF_ENCODINGS ) {
-         $self->read_encodings_table( $table );
-      }
-      elsif( $type == PCF_GLYPH_NAMES ) {
-         $self->read_glyph_names_table( $table );
-      }
-      else {
-         my $size = 4 * int( ( $table->size + 3 ) / 4 );
-         print STDERR "TODO: Skipping table type $type of $size bytes\n" unless
-            any { $type == $_ } PCF_PROPERTIES, PCF_ACCELERATORS, PCF_INK_METRICS,
-              PCF_SWIDTHS, PCF_BDF_ACCELERATORS;
-         $self->read( my $tmp, $table->size );
+      match ( $type : == ) {
+         case( PCF_METRICS ) {
+            $self->read_metrics_table( $table );
+         }
+         case( PCF_BITMAPS ) {
+            $self->read_bitmaps_table( $table );
+         }
+         case( PCF_BDF_ENCODINGS ) {
+            $self->read_encodings_table( $table );
+         }
+         case( PCF_GLYPH_NAMES ) {
+            $self->read_glyph_names_table( $table );
+         }
+         default {
+            my $size = 4 * int( ( $table->size + 3 ) / 4 );
+            print STDERR "TODO: Skipping table type $type of $size bytes\n" unless
+               any { $type == $_ } PCF_PROPERTIES, PCF_ACCELERATORS, PCF_INK_METRICS,
+                 PCF_SWIDTHS, PCF_BDF_ACCELERATORS;
+            $_fh->read( my $tmp, $table->size );
+         }
       }
    }
 }
 
-sub read_metrics_table
+method read_metrics_table ( $table )
 {
-   my $self = shift;
-   my ( $table ) = @_;
-
-   my ( $format ) = $self->unpack( "i<" );
+   my ( $format ) = $_fh->unpack( "i<" );
    $format == $table->format or die "Expected format repeated\n";
 
    my $end = $table->format & PCF_BYTE_MASK ? ">" : "<";
    my $compressed = ( $format & PCF_COMPRESSED_METRICS );
 
-   my $count = $self->unpack( $compressed ? "s${end}" : "i${end}" );
+   my $count = $_fh->unpack( $compressed ? "s${end}" : "i${end}" );
 
    foreach my $index ( 0 .. $count-1 ) {
       my @fields;
       if( $compressed ) {
-         @fields = $self->unpack( "C5" );
+         @fields = $_fh->unpack( "C5" );
          $_ -= 0x80 for @fields;
          push @fields, 0;
       }
       else {
-         @fields = $self->unpack( "s${end}5 S${end}" );
+         @fields = $_fh->unpack( "s${end}5 S${end}" );
       }
 
       my $glyph = $self->get_glyph( $index );
@@ -190,25 +206,22 @@ sub read_metrics_table
 
    # Pad to a multiple of 4 bytes
    my $total = $compressed ? 2 + $count * 5 : 4 + $count * 10;
-   $self->read( my $tmp, 4 - ( $total % 4 ) ) if $total % 4;
+   $_fh->read( my $tmp, 4 - ( $total % 4 ) ) if $total % 4;
 }
 
-sub read_bitmaps_table
+method read_bitmaps_table ( $table )
 {
-   my $self = shift;
-   my ( $table ) = @_;
-
    ( $table->format & PCF_FORMAT_MASK ) == PCF_DEFAULT_FORMAT or
       die "Expected PCF_BITMAPS to be in PCF_DEFAULT_FORMAT\n";
 
    my $end = $table->format & PCF_BYTE_MASK ? ">" : "<";
 
-   my ( $format, $glyph_count ) = $self->unpack( "i< i${end}");
+   my ( $format, $glyph_count ) = $_fh->unpack( "i< i${end}");
    $format == $table->format or die "Expected format repeated\n";
    # offsets
-   my @offsets = $self->unpack( "i${end}${glyph_count}" );
+   my @offsets = $_fh->unpack( "i${end}${glyph_count}" );
 
-   my @sizes = $self->unpack( "i${end}4" );
+   my @sizes = $_fh->unpack( "i${end}4" );
    my $size = $sizes[ $table->format & PCF_GLYPH_PAD_MASK ];
 
    my $scanunits = ( $table->format & PCF_SCAN_UNIT_MASK ) >> 4;
@@ -225,55 +238,51 @@ sub read_bitmaps_table
          shift @offsets;
       }
 
-      push @$bitmap, $self->unpack( "I${end}" );
+      push @$bitmap, $_fh->unpack( "I${end}" );
       $offset += 4;
    }
 }
 
-sub read_encodings_table
-{
-   my $self = shift;
-   my ( $table ) = @_;
+has @_encoding_to_glyph;
 
+method read_encodings_table ( $table )
+{
    ( $table->format & PCF_FORMAT_MASK ) == PCF_DEFAULT_FORMAT or
       die "Expected PCF_BITMAPS to be in PCF_DEFAULT_FORMAT\n";
 
    my $end = $table->format & PCF_BYTE_MASK ? ">" : "<";
 
    my ( $format, $min2, $max2, $min1, $max1, $default ) =
-      $self->unpack( "i< s$end s$end s$end s$end s$end" );
+      $_fh->unpack( "i< s$end s$end s$end s$end s$end" );
    $format == $table->format or die "Expected format repeated\n";
 
    my $indices_count = ( $max2 - $min2 + 1 ) * ( $max1 - $min1 + 1 );
 
-   my @indices = $self->unpack( "s${end}${indices_count}" );
+   my @indices = $_fh->unpack( "s${end}${indices_count}" );
 
-   ${*$self}{encoding_to_glyph} = \@indices;
+   @_encoding_to_glyph = @indices;
 
    # Pad to a multiple of 4 bytes
    # Header was 2 bytes over so we're 2 off if even number of indices
-   $self->read( my $tmp, 2 ) if ( $indices_count % 2 ) == 0;
+   $_fh->read( my $tmp, 2 ) if ( $indices_count % 2 ) == 0;
 }
 
-sub read_glyph_names_table
+method read_glyph_names_table ( $table )
 {
-   my $self = shift;
-   my ( $table ) = @_;
-
    ( $table->format & PCF_FORMAT_MASK ) == PCF_DEFAULT_FORMAT or
       die "Expected PCF_BITMAPS to be in PCF_DEFAULT_FORMAT\n";
 
    my $end = $table->format & PCF_BYTE_MASK ? ">" : "<";
 
-   my ( $format, $glyph_count ) = $self->unpack( "i< i${end}");
+   my ( $format, $glyph_count ) = $_fh->unpack( "i< i${end}");
    $format == $table->format or die "Expected format repeated\n";
 
-   my @offsets = $self->unpack( "i${end}${glyph_count}" );
+   my @offsets = $_fh->unpack( "i${end}${glyph_count}" );
 
-   my $strlen = $self->unpack( "i${end}" );
+   my $strlen = $_fh->unpack( "i${end}" );
 
    # Read this as one big string and cut it by @offsets
-   $self->read( my $names, $strlen );
+   $_fh->read( my $names, $strlen );
 
    foreach my $index ( 0 .. $#offsets ) {
       my $offset      = $offsets[$index];
@@ -285,7 +294,7 @@ sub read_glyph_names_table
    }
 
    # Pad to a multiple of 4 bytes
-   $self->read( my $tmp, 4 - ( $strlen % 4 ) ) if $strlen % 4;
+   $_fh->read( my $tmp, 4 - ( $strlen % 4 ) ) if $strlen % 4;
 }
 
 =head2 get_glyph_for_char
@@ -297,24 +306,20 @@ character string.
 
 =cut
 
-sub get_glyph_for_char
+method get_glyph_for_char ( $char )
 {
-   my $self = shift;
-   my ( $char ) = @_;
-
-   my $index = ${*$self}{encoding_to_glyph}[ ord $char ];
+   my $index = $_encoding_to_glyph[ ord $char ];
    $index == -1 and
       die "Unmapped character\n";
 
    return $self->get_glyph( $index );
 }
 
-sub get_glyph
-{
-   my $self = shift;
-   my ( $index ) = @_;
+has @_glyphs;
 
-   return ${*$self}{glyphs}[$index] //= Glyph( [], (undef) x 7 );
+method get_glyph ( $index )
+{
+   return $_glyphs[$index] //= Font::PCF::_Glyph->new;
 }
 
 =head1 GLYPH STRUCTURE

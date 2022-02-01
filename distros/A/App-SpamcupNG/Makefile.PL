@@ -20,29 +20,24 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.014004",
   "NAME" => "App::SpamcupNG",
   "PREREQ_PM" => {
-    "Carp" => 0,
-    "File::Spec" => 0,
-    "Getopt::Std" => 0,
+    "Class::Accessor" => "0.51",
     "HTML::Form" => "6.07",
-    "HTML::Form::FileInput" => "6.07",
     "HTML::TreeBuilder::XPath" => "0.14",
     "HTTP::Cookies" => "6.01",
-    "Hash::Util" => 0,
     "LWP::UserAgent" => "6.05",
     "Log::Log4perl" => "1.48",
-    "YAML::XS" => "0.62",
-    "parent" => 0
+    "YAML::XS" => "0.62"
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
+    "HTTP::Request" => 0,
     "Perl::Tidy::Sweetened" => "1.18",
     "Pod::Tidy" => "0.10",
     "Test::Exception" => 0,
-    "Test::More" => 0,
-    "lib" => 0
+    "Test::More" => 0
   },
-  "VERSION" => "0.009",
+  "VERSION" => "0.010",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,24 +45,20 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Carp" => 0,
+  "Class::Accessor" => "0.51",
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
-  "Getopt::Std" => 0,
   "HTML::Form" => "6.07",
-  "HTML::Form::FileInput" => "6.07",
   "HTML::TreeBuilder::XPath" => "0.14",
   "HTTP::Cookies" => "6.01",
-  "Hash::Util" => 0,
+  "HTTP::Request" => 0,
   "LWP::UserAgent" => "6.05",
   "Log::Log4perl" => "1.48",
   "Perl::Tidy::Sweetened" => "1.18",
   "Pod::Tidy" => "0.10",
   "Test::Exception" => 0,
   "Test::More" => 0,
-  "YAML::XS" => "0.62",
-  "lib" => 0,
-  "parent" => 0
+  "YAML::XS" => "0.62"
 );
 
 

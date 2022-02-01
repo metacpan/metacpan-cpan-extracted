@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Perinci/CmdLine/Inline/gen_inline_pericmd_script
-# and generated automatically using Perinci::CmdLine::Gen version 0.500
+# and generated automatically using Perinci::CmdLine::Gen version 0.501
 
 use 5.010001;
 use strict;
@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Lite;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-21'; # DATE
+our $DATE = '2022-01-16'; # DATE
 our $DIST = 'Perinci-CmdLine-Inline'; # DIST
-our $VERSION = '0.553'; # VERSION
+our $VERSION = '0.554'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Lite->new(
     url => "/Perinci/CmdLine/Inline/gen_inline_pericmd_script",
@@ -38,7 +38,7 @@ gen-inline-pericmd-script - Generate inline Perinci::CmdLine CLI script
 
 =head1 VERSION
 
-This document describes version 0.553 of gen-inline-pericmd-script (from Perl distribution Perinci-CmdLine-Inline), released on 2021-10-21.
+This document describes version 0.554 of gen-inline-pericmd-script (from Perl distribution Perinci-CmdLine-Inline), released on 2022-01-16.
 
 =head1 SYNOPSIS
 
@@ -584,7 +584,7 @@ For fish and zsh, install L<shcompgen> as described above.
 
 This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
 
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/gen-inline-pericmd-script.conf>, F<~/gen-inline-pericmd-script.conf>, or F</etc/gen-inline-pericmd-script.conf>.
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/gen-inline-pericmd-script.conf>, F</home/u1/gen-inline-pericmd-script.conf>, or F</etc/gen-inline-pericmd-script.conf>.
 
 All found files will be read and merged.
 
@@ -674,9 +674,9 @@ Specify additional command-line options.
 
 =head1 FILES
 
-F<~/.config/gen-inline-pericmd-script.conf>
+F</home/u1/.config/gen-inline-pericmd-script.conf>
 
-F<~/gen-inline-pericmd-script.conf>
+F</home/u1/gen-inline-pericmd-script.conf>
 
 F</etc/gen-inline-pericmd-script.conf>
 
@@ -711,7 +711,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

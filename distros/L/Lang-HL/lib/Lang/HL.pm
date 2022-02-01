@@ -5,19 +5,19 @@ use warnings;
 use utf8;
 use Regexp::Grammars;
 
-our $VERSION = '1.013';
+our $VERSION = '2.111';
 
 sub new {
-	my ($class) = @_;
-	return bless {}, $class;
+        my ($class) = @_;
+        return bless {}, $class;
 }
 
 sub PT::Lang::X {
     my ($class) = @_;
 
     my $code = 'use strict;
-		use warnings;
-		use utf8;';
+                use warnings;
+                use utf8;';
 
     for my $element ( @{ $class->{Class}} ) {
         $code .= $element->X();
@@ -41,7 +41,7 @@ sub PT::Class::X {
         use Lang::HL::Export;
         use feature qw(signatures);
         no warnings "experimental::signatures";
-	use Data::Printer;
+        use Data::Printer;
     ';
 
     $classCode .= $classBlock . "\n1;";
@@ -84,100 +84,153 @@ sub PT::ClassGroups::X {
 sub PT::Group::X {
     my ($class, $className) = @_;
 
-    return (	   $class->{Comment}
-		|| $class->{Function}
-		|| $class->{Parent}
-		|| $class->{Packages} )->X($className);
+    return (       $class->{Comment}
+                || $class->{Function}
+                || $class->{Parent}
+                || $class->{Packages} )->X($className);
 }
 
 sub PT::Packages::X {
-	my ($class, $className) = @_;
+        my ($class, $className) = @_;
 
-	my @packageList = ($class->{PackageList})->X($className);
-	my $packages = join("\n", @packageList);
-	return $packages;
+        my @packageList = ($class->{PackageList})->X($className);
+        my $packages = join("\n", @packageList);
+        return $packages;
 }
 
 sub PT::PackageList::X {
-	my ($class, $className) = @_;
+        my ($class, $className) = @_;
 
-	my @packageList;
-	for my $element ( @{$class->{Package}} ) {
-		push @packageList, $element->X($className);
-	}
+        my @packageList;
+        for my $element ( @{$class->{Package}} ) {
+                push @packageList, $element->X($className);
+        }
 
-	return @packageList;
+        return @packageList;
 }
 
 sub PT::Package::X {
-	my ($class, $className) = @_;
+        my ($class, $className) = @_;
 
-	return (	$class->{PackageWithConstructor}
-            	     || $class->{PackageWithoutConstructor} )->X($className);
+        return (        $class->{PackageWithConstructor}
+                     || $class->{PackageWithoutConstructor} )->X($className);
 }
 
 sub PT::PackageWithConstructor::X {
-	my ($class, $className) = @_;
+        my ($class, $className) = @_;
 
-	my $object = $class->{Object}->X();
-	my $packageName = $class->{PackageName}->X();
-	my $constructor = $class->{Constructor}->X();
+        my $object = $class->{Object}->X();
+        my $packageName = $class->{PackageName}->X();
+        my $constructor = $class->{Constructor}->X();
 
-	if(exists $class->{Parameters}) {
-		my @parameters = $class->{Parameters}->X($className);
-		my $parameters = join(",", @parameters);
+        if(exists $class->{ObjectParameters}) {
+                my $objectParameters = $class->{ObjectParameters}->X($className);
+                my $parameters;
 
-		my $packageWithConstructor = "use " . $packageName . ";\n"
-			                     . "my \$" . $object . " = " . $packageName . "->"
-					     . $constructor . "(" . $parameters . ");\n";
-		return $packageWithConstructor;
-	}
+                if(ref($objectParameters)) {
+                    $parameters = join(",", @{$objectParameters});
+                } else {
+                    $parameters = $objectParameters;
+                }
 
-	my $packageWithConstructor = "use " . $packageName . ";\n"
-				     . "my \$" . $object . " = " . $packageName
-				     . "->" . $constructor . "();\n";
-	return $packageWithConstructor;
+                my $packageWithConstructor = "use " . $packageName . ";\n"
+                                             . "my \$" . $object . " = " . $packageName . "->"
+                                             . $constructor . "(" . $parameters . ");\n";
+                return $packageWithConstructor;
+        }
+
+        my $packageWithConstructor = "use " . $packageName . ";\n"
+                                     . "my \$" . $object . " = " . $packageName
+                                     . "->" . $constructor . "();\n";
+        return $packageWithConstructor;
+}
+
+sub PT::ObjectParameters::X {
+    my ($class, $className) = @_;
+
+    return (       $class->{PackageParams}
+                || $class->{Parameters} )->X();
+}
+
+sub PT::PackageParams::X {
+    my ($class, $className) = @_;
+    my @keyValuePairs;
+
+    my $keyValuePairs = "";
+    for my $element ( @{ $class->{KeyValue}} ) {
+        @keyValuePairs = ();
+        push @keyValuePairs, $element->X($className);
+        $keyValuePairs .= $keyValuePairs[0] . " => " . $keyValuePairs[1] . ", ";
+    }
+
+    return $keyValuePairs;
 }
 
 sub PT::PackageName::X {
-	my ($class, $className) = @_;
+        my ($class, $className) = @_;
 
-	my @packageDir;
-	for my $element ( @{ $class->{PackageDir}} ) {
-		push @packageDir, $element->X($className);
-	}
+        my @packageDir;
+        for my $element ( @{ $class->{PackageDir}} ) {
+                push @packageDir, $element->X($className);
+        }
 
-	my $packageName = join("::", @packageDir);
-	return $packageName;
+        my $packageName = join("::", @packageDir);
+        return $packageName;
 }
 
 sub PT::PackageWithoutConstructor::X {
-	my ($class, $className) = @_;
+        my ($class, $className) = @_;
 
-	my $packageName = $class->{PackageName}->X($className);
-	my $packageWithoutConstructor = "use " . $packageName . ";\n";
-	return $packageWithoutConstructor;
+        my $packageName = $class->{PackageName}->X($className);
+        if(exists $class->{QW}) {
+            my $qw = $class->{QW}->X($className);
+
+            my $packageWithoutConstructor = "use " . $packageName . $qw . ";\n";
+            return $packageWithoutConstructor;
+        }
+        my $packageWithoutConstructor = "use " . $packageName . ";\n";
+        return $packageWithoutConstructor;
+}
+
+sub PT::QW::X {
+    my ($class, $className) = @_;
+
+    my @functionList = $class->{FunctionList}->X($className);
+    my $qw = " qw(";
+    my $funcitonList = join(" ", @functionList);
+    $qw .= $funcitonList . ")";
+}
+
+sub PT::FunctionList::X {
+    my ($class, $className) = @_;
+
+    my @functionList;
+    for my $element ( @{ $class->{FunctionName}} ) {
+        push @functionList, $element->X($className);
+    }
+
+    return @functionList;
 }
 
 sub PT::Constructor::X {
-	my ($class, $className) = @_;
+        my ($class, $className) = @_;
 
-	my $constructor = $class->{''};
-	return $constructor;
+        my $constructor = $class->{''};
+        return $constructor;
 }
 
 sub PT::Object::X {
-	my ($class, $className) = @_;
+        my ($class, $className) = @_;
 
-	my $object = $class->{''};
-	return $object;
+        my $object = $class->{''};
+        return $object;
 }
 
 sub PT::PackageDir::X {
-	my ($class, $className) = @_;
+        my ($class, $className) = @_;
 
-	my $packageDir = $class->{''};
-	return $packageDir;
+        my $packageDir = $class->{''};
+        return $packageDir;
 }
 
 sub PT::Parent::X {
@@ -355,12 +408,12 @@ sub PT::ForRange::X {
 sub PT::LowerRange::X {
     my ($class, $className) = @_;
     my $number = (     $class->{Number}
-		    || $class->{VariableName}
-		    || $class->{ArrayElement}
-		    || $class->{HashElement}
-		    || $class->{ClassAccessor}
-		    || $class->{ClassFunctionReturn}
-		    || $class->{FunctionReturn} )->X($className);
+                    || $class->{VariableName}
+                    || $class->{ArrayElement}
+                    || $class->{HashElement}
+                    || $class->{ClassAccessor}
+                    || $class->{ClassFunctionReturn}
+                    || $class->{FunctionReturn} )->X($className);
 
     return $number;
 }
@@ -368,12 +421,12 @@ sub PT::LowerRange::X {
 sub PT::UpperRange::X {
     my ($class, $className) = @_;
     my $number = (     $class->{Number}
-		    || $class->{VariableName}
-		    || $class->{ArrayElement}
-		    || $class->{HashElement}
-		    || $class->{ClassAccessor}
-		    || $class->{ClassFunctionReturn}
-		    || $class->{FunctionReturn} )->X($className);
+                    || $class->{VariableName}
+                    || $class->{ArrayElement}
+                    || $class->{HashElement}
+                    || $class->{ClassAccessor}
+                    || $class->{ClassFunctionReturn}
+                    || $class->{FunctionReturn} )->X($className);
 
     return $number;
 }
@@ -470,28 +523,28 @@ sub PT::BoolOperatorExpression::X {
 
 sub PT::BoolOperator::X {
     my ($class, $className) = @_;
-    return (	   $class->{GreaterThan}
-		|| $class->{LessThan}
-		|| $class->{Equals}
-		|| $class->{GreaterThanEquals}
-		|| $class->{LessThanEquals}
-		|| $class->{StringEquals}
-		|| $class->{StringNotEquals}
-		|| $class->{NotEqulas}
-		|| $class->{LogicalAnd}
-		|| $class->{LogicalOr} )->X($className);
+    return (       $class->{GreaterThan}
+                || $class->{LessThan}
+                || $class->{Equals}
+                || $class->{GreaterThanEquals}
+                || $class->{LessThanEquals}
+                || $class->{StringEquals}
+                || $class->{StringNotEquals}
+                || $class->{NotEqulas}
+                || $class->{LogicalAnd}
+                || $class->{LogicalOr} )->X($className);
 }
 
 sub PT::BoolOperands::X {
     my ($class, $className) = @_;
-    return (	   $class->{RealNumber}
-		|| $class->{String}
-		|| $class->{ScalarVariable}
-		|| $class->{ArrayElement}
-		|| $class->{HashElement}
-		|| $class->{ClassAccessor}
-		|| $class->{ClassFunctionReturn}
-		|| $class->{FunctionReturn} )->X($className);
+    return (       $class->{RealNumber}
+                || $class->{String}
+                || $class->{ScalarVariable}
+                || $class->{ArrayElement}
+                || $class->{HashElement}
+                || $class->{ClassAccessor}
+                || $class->{ClassFunctionReturn}
+                || $class->{FunctionReturn} )->X($className);
 }
 
 sub PT::ElsIf::X {
@@ -540,13 +593,13 @@ sub PT::Statement::X {
 }
 
 sub PT::ObjectCall::X {
-	my ($class, $className) = @_;
-	my $objectCall = "";
+        my ($class, $className) = @_;
+        my $objectCall = "";
 
-	$objectCall .= $class->{ObjectFunctionCall}->X($className);
-	$objectCall .= ";\n";
+        $objectCall .= $class->{ObjectFunctionCall}->X($className);
+        $objectCall .= ";\n";
 
-	return $objectCall;
+        return $objectCall;
 }
 
 sub PT::VariableDeclaration::X {
@@ -638,15 +691,15 @@ sub PT::ListElements::X {
 
 sub PT::ListElement::X {
     my ($class, $className) = @_;
-    return (	   $class->{RealNumber}
-		|| $class->{String}
-		|| $class->{ArrayList}
-		|| $class->{HashRef}
-		|| $class->{ClassFunctionReturn}
-		|| $class->{FunctionReturn}
-		|| $class->{ArrayElement}
-		|| $class->{HashElement}
-		|| $class->{VariableName} )->X($className);
+    return (       $class->{RealNumber}
+                || $class->{String}
+                || $class->{ArrayList}
+                || $class->{HashRef}
+                || $class->{ClassFunctionReturn}
+                || $class->{FunctionReturn}
+                || $class->{ArrayElement}
+                || $class->{HashElement}
+                || $class->{VariableName} )->X($className);
 }
 
 sub PT::HashDeclaration::X {
@@ -697,15 +750,15 @@ sub PT::PairKey::X {
 
 sub PT::PairValue::X {
     my ($class, $className) = @_;
-    return (	   $class->{RealNumber}
-		|| $class->{String}
-		|| $class->{ArrayList}
-		|| $class->{HashRef}
-		|| $class->{VariableName}
-		|| $class->{ArrayElement}
-		|| $class->{HashElement}
-		|| $class->{ClassFunctionReturn}
-		|| $class->{FunctionReturn} )->X($className);
+    return (       $class->{RealNumber}
+                || $class->{String}
+                || $class->{ArrayList}
+                || $class->{HashRef}
+                || $class->{VariableName}
+                || $class->{ArrayElement}
+                || $class->{HashElement}
+                || $class->{ClassFunctionReturn}
+                || $class->{FunctionReturn} )->X($className);
 }
 
 sub PT::FunctionCall::X {
@@ -715,7 +768,7 @@ sub PT::FunctionCall::X {
     my $functionCall = $functionName . "(" ;
 
     if(exists $class->{Parameters}) {
-        my @parameters = $class->{Parameters}->X($className);
+        my @parameters = @{$class->{Parameters}->X($className)};
         $functionCall .= join(",", @parameters);
     }
 
@@ -731,7 +784,7 @@ sub PT::Parameters::X {
         push @parameters, $element->X($className);
     }
 
-    return @parameters;
+    return \@parameters;
 }
 
 sub PT::Param::X {
@@ -741,7 +794,7 @@ sub PT::Param::X {
                 || $class->{VariableName}
                 || $class->{ArrayElement}
                 || $class->{HashElement}
-				|| $class->{HashRef} )->X($className);
+                                || $class->{HashRef} )->X($className);
 }
 
 sub PT::Assignment::X {
@@ -801,7 +854,7 @@ sub PT::RHS::X {
                 || $class->{ClassFunctionReturn}
                 || $class->{String}
                 || $class->{STDIN}
-				|| $class->{ObjectFunctionCall} )->X($className);
+                                || $class->{ObjectFunctionCall} )->X($className);
 }
 
 sub PT::STDIN::X {
@@ -811,21 +864,21 @@ sub PT::STDIN::X {
 }
 
 sub PT::ObjectFunctionCall::X {
-	my ($class, $className) = @_;
+        my ($class, $className) = @_;
 
-	my $object = $class->{Object}->X($className);
-	my $functionName = $class->{FunctionName}->X($className);
+        my $object = $class->{Object}->X($className);
+        my $functionName = $class->{FunctionName}->X($className);
 
-	my $objectFunctionCall;
-	if(exists $class->{Parameters}) {
-	    my @parameters = $class->{Parameters}->X($className);
-	    my $parameters = join(",", @parameters);
-	    $objectFunctionCall = "\$" . $object . "->" . $functionName . "(" . $parameters . ")";
-	} else {
-	    $objectFunctionCall = "\$" . $object . "->" . $functionName . "()";
-	}
+        my $objectFunctionCall;
+        if(exists $class->{Parameters}) {
+            my @parameters = @{$class->{Parameters}->X($className)};
+            my $parameters = join(",", @parameters);
+            $objectFunctionCall = "\$" . $object . "->" . $functionName . "(" . $parameters . ")";
+        } else {
+            $objectFunctionCall = "\$" . $object . "->" . $functionName . "()";
+        }
 
-	return $objectFunctionCall;
+        return $objectFunctionCall;
 }
 
 sub PT::ClassAccessor::X {
@@ -842,7 +895,7 @@ sub PT::ClassFunctionCall::X {
     my @parameters;
     my $parameters = "";
     if(exists $class->{Parameters}) {
-        @parameters = $class->{Parameters}->X($className);
+        @parameters = @{$class->{Parameters}->X($className)};
         $parameters = join(",", @parameters);
     }
 
@@ -857,7 +910,7 @@ sub PT::ClassFunctionReturn::X {
     my $parameters = "";
 
     if(exists $class->{Parameters}) {
-        @parameters = $class->{Parameters}->X($className);
+        @parameters = @{$class->{Parameters}->X($className)};
         $parameters = join(",", @parameters);
     }
 
@@ -872,7 +925,7 @@ sub PT::FunctionReturn::X {
     my $functionReturn = $functionName . "(" ;
 
     if(exists $class->{Parameters}) {
-        my @parameters = $class->{Parameters}->X($className);
+        my @parameters = @{$class->{Parameters}->X($className)};
         my $parameters = join(",", @parameters);
         $functionReturn .= $parameters;
     }
@@ -1018,7 +1071,7 @@ sub PT::CalcOperands::X {
                 || $class->{ScalarVariable}
                 || $class->{ArrayElement}
                 || $class->{HashElement}
-			 	|| $class->{ClassAccessor} )->X($className);
+                                || $class->{ClassAccessor} )->X($className);
 }
 
 sub PT::CalcOperator::X {
@@ -1034,7 +1087,7 @@ sub PT::Return::X {
     if(exists $class->{RHS}) {
         my $rhs = $class->{RHS}->X($className);
         my $return = "return " . $rhs . ";\n";
-	return $return;
+        return $return;
     } else {
         return "return;";
     }
@@ -1154,12 +1207,16 @@ my $parser = qr {
     <objrule:  PT::Parent>                     <TokenParent> <LParen> <ClassNames> <RParen> <SemiColon>
     <objrule:  PT::ClassNames>                 <[ClassName]>+ % <Comma>
 
-    <objrule:  PT::Packages>			<LParen> <PackageList> <RParen> <SemiColon>
-    <objrule:  PT::PackageList>		<[Package]>+ % <Comma>
-    <objrule:  PT::Package>			<PackageWithConstructor> | <PackageWithoutConstructor>
-    <objrule:  PT::PackageWithConstructor>     [!] <Object> <Equal> <PackageName> <Dot> <Constructor> <LParen> <Parameters>? <RParen>
-    <objrule:  PT::PackageName>		<[PackageDir]>+ % (::)
-    <objrule:  PT::PackageWithoutConstructor>  <PackageName>
+    <objrule:  PT::Packages>                   <LParen> <PackageList> <RParen> <SemiColon>
+    <objrule:  PT::PackageList>                <[Package]>+ % <Comma>
+    <objrule:  PT::Package>                    <PackageWithConstructor> | <PackageWithoutConstructor>
+    <objrule:  PT::PackageWithConstructor>     [!] <Object> <Equal> <PackageName> <Dot> <Constructor> <LParen> <ObjectParameters>? <RParen>
+    <objrule:  PT::ObjectParameters>           <PackageParams> | <Parameters>
+    <objrule:  PT::PackageParams>              <[KeyValue]>+ % <Comma>
+    <objrule:  PT::PackageName>                <[PackageDir]>+ % (::)
+    <objrule:  PT::PackageWithoutConstructor>  <PackageName> <QW>?
+    <objrule:  PT::QW>                         <Dot> <LParen> <FunctionList> <RParen>
+    <objrule:  PT::FunctionList>               <[FunctionName]>+ % <Comma>
     <objrule:  PT::Constructor>                [a-zA-Z]+?
     <objrule:  PT::Object>                     [a-zA-Z]+?
     <objrule:  PT::PackageDir>                 [a-zA-Z]+?
@@ -1184,20 +1241,20 @@ my $parser = qr {
     <objrule:  PT::For>                        <TokenFor> <Var> <VariableName> <LParen> <ForRange> <RParen> <CodeBlock>
     <objrule:  PT::ForRange>                   <LowerRange> <Dot><Dot><Dot> <UpperRange>
     <objrule:  PT::LowerRange>                 <Number> | <VariableName> | <ArrayElement> | <HashElement>
-						| <ClassAccessor> | <ClassFunctionReturn> | <FunctionReturn>
+                                                | <ClassAccessor> | <ClassFunctionReturn> | <FunctionReturn>
     <objrule:  PT::UpperRange>                 <Number> | <VariableName> | <ArrayElement> | <HashElement>
-						| <ClassAccessor> | <ClassFunctionReturn> | <FunctionReturn>
+                                                | <ClassAccessor> | <ClassFunctionReturn> | <FunctionReturn>
 
     <objrule:  PT::IfElse>                     <If> <ElsIf>? <Else>?
     <objrule:  PT::If>                         <TokenIf> <LParen> <BoolExpression> <RParen> <CodeBlock>
-    
+
     <objrule:  PT::BoolExpression>             <BoolOperands> <BoolOperatorExpression>?
     <objrule:  PT::BoolOperatorExpression>     <BoolOperator> <BoolOperands>
     <objrule:  PT::BoolOperands>               <RealNumber> | <String> | <ScalarVariable> | <ArrayElement> | <HashElement>
-						| <ClassAccessor> | <ClassFunctionReturn> | <FunctionReturn>
+                                               | <ClassAccessor> | <ClassFunctionReturn> | <FunctionReturn>
     <objrule:  PT::BoolOperator>               <GreaterThan> | <LessThan> | <Equals> | <GreaterThanEquals> | <LessThanEquals>
                                                | <StringEquals> | <StringNotEquals> | <NotEqulas> | <LogicalAnd> | <LogicalOr>
-                                               
+
     <objrule:  PT::ElsIf>                      <[ElsIfChain]>+
     <objrule:  PT::ElsIfChain>                 <TokenElsIf> <LParen> <BoolExpression> <RParen> <CodeBlock>
     <objrule:  PT::Else>                       <TokenElse> <CodeBlock>
@@ -1206,7 +1263,7 @@ my $parser = qr {
                                                | <ObjectCall> | <Assignment> | <Return> | <Last> | <Next>
     <objrule:  PT::ClassFunctionCall>          <TokenClass> <Dot> <FunctionName> <LParen> <Parameters>? <RParen> <SemiColon>
 
-    <objrule:  PT::ObjectCall>			<ObjectFunctionCall> <SemiColon>
+    <objrule:  PT::ObjectCall>                 <ObjectFunctionCall> <SemiColon>
 
     <objrule:  PT::VariableDeclaration>        <ArrayDeclaration> | <HashDeclaration> | <ScalarDeclaration>
 
@@ -1226,7 +1283,7 @@ my $parser = qr {
     <objrule:  PT::ArrayList>                  <LBracket> <ListElements> <RBracket>
     <objrule:  PT::ListElements>               .{0} | <[ListElement]>+ % <Comma>
     <objrule:  PT::ListElement>                <RealNumber> | <String> | <ClassFunctionReturn> | <FunctionReturn>
-						| <ArrayElement> | <HashElement> | <ArrayList> | <HashRef> | <VariableName>
+                                                | <ArrayElement> | <HashElement> | <ArrayList> | <HashRef> | <VariableName>
 
     <objrule:  PT::HashDeclaration>            <Var> <VariableName> <Equal> <HashRef> <SemiColon>
     <objrule:  PT::HashRef>                    <LBrace> <KeyValuePairs> <RBrace>
@@ -1234,7 +1291,7 @@ my $parser = qr {
     <objrule:  PT::KeyValue>                   <PairKey> <Colon> <PairValue>
     <objrule:  PT::PairKey>                    <Number> | <String>
     <objrule:  PT::PairValue>                  <RealNumber> | <String> | <ClassFunctionReturn> | <FunctionReturn>
-						| <ArrayElement> | <HashElement> | <ArrayList> | <HashRef> | <VariableName>
+                                                | <ArrayElement> | <HashElement> | <ArrayList> | <HashRef> | <VariableName>
 
     <objrule:  PT::FunctionCall>               <FunctionName> <LParen> <Parameters>? <RParen> <SemiColon>
     <objrule:  PT::Parameters>                 <[Param]>+ % <Comma>
@@ -1244,17 +1301,17 @@ my $parser = qr {
 
     <objrule:  PT::ScalarAssignment>           <ScalarVariable> <Equal> <RHS> <SemiColon>
     <objtoken: PT::ScalarVariable>             [a-zA-Z]+
-    
+
     <objrule:  PT::RHS>                        <RealNumber> | <FunctionReturn> | <ArrayElement> | <HashElement>
                                                | <ScalarVariable> | <Calc> | <ArrayList> | <HashRef> | <ClassAccessor>
                                                | <ClassFunctionReturn> | <String> | <STDIN> | <ObjectFunctionCall>
-                                               
+
     <objrule:  PT::FunctionReturn>             <FunctionName> <LParen> <Parameters>? <RParen>
-    
+
     <objrule:  PT::ArrayElement>               <ArrayName> <[ArrayAccess]>+
     <objrule:  PT::ArrayAccess>                <LBracket> <Number> <RBracket>
     <objrule:  PT::ArrayName>                  [a-zA-Z]+?
-    
+
     <objrule:  PT::HashElement>                <HashName> <[HashAccess]>+
     <objrule:  PT::HashAccess>                 <LBrace> <HashKey> <RBrace>
     <objtoken: PT::HashName>                   [a-zA-Z]+?
@@ -1296,7 +1353,7 @@ my $parser = qr {
 
     <objtoken: PT::TokenSTDIN>                 STDIN
 
-    <objrule:  PT::ObjectFunctionCall>		[!] <Object> <Dot> <FunctionName> <LParen> <Parameters>? <RParen>
+    <objrule:  PT::ObjectFunctionCall>         [!] <Object> <Dot> <FunctionName> <LParen> <Parameters>? <RParen>
 
     <objtoken: PT::LogicalAnd>                 \&\&
     <objtoken: PT::LogicalOr>                  \|\|
@@ -1333,7 +1390,7 @@ sub parse {
         return $code;
     } else {
         my $notMatch = "print 'Error';";
-	return $notMatch;
+        return $notMatch;
     }
 }
 
@@ -1356,36 +1413,36 @@ HL is a programming language.
 
 =head1 EXAMPLE
 
-	class Main {
-		(JSON,
-		 !mechanize = WWW::Mechanize.new());
+    class Main {
+    	(JSON,
+    	 !mechanize = WWW::Mechanize.new());
 
-		function main() {
-			class.counter = 0;
+    	function main() {
+    		class.counter = 0;
 
-			var hash = class.returnNumber();
-			var json = encode_json(hash);
-			print(json, "\n");
+    		var hash = class.returnNumber();
+    		var json = encode_json(hash);
+    		print(json, "\n");
 
-			var url = "https://metacpan.org/pod/WWW::Mechanize";
-			!mechanize.get(url);
-			var page = !mechanize.text();
-			print(page, "\n");
-		}
+    		var url = "https://metacpan.org/pod/WWW::Mechanize";
+    		!mechanize.get(url);
+    		var page = !mechanize.text();
+    		print(page, "\n");
+    	}
 
-		function returnNumber() {
-			var number = {};
+    	function returnNumber() {
+    		var number = {};
 
-			if(class.counter < 10) {
-				class.counter = class.counter + 1;
+    		if(class.counter < 10) {
+    			class.counter = class.counter + 1;
 
-				number = { "number" : class.returnNumber() };
-				return number;
-			}
+    			number = { "number" : class.returnNumber() };
+    			return number;
+    		}
 
-			return class.counter;
-		}
-	}
+    		return class.counter;
+    	}
+    }
 
 =head1 AUTHOR
 

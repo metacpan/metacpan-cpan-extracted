@@ -37,7 +37,7 @@
    "provides" : {
       "MsOffice::Word::HTML::Writer" : {
          "file" : "lib/MsOffice/Word/HTML/Writer.pm",
-         "version" : "1.05"
+         "version" : "1.06"
       }
    },
    "release_status" : "stable",
@@ -46,6 +46,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "1.05",
+   "version" : "1.06",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

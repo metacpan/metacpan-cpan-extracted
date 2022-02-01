@@ -121,6 +121,7 @@ C   900315  CALLs to XERROR changed to CALLs to XERMSG.  (THJ)
 C   920501  Reformatted the REFERENCES section.  (WRB)
 C   920527  Corrected erroneous statements in DESCRIPTION.  (WRB)
 C***END PROLOGUE  POLFIT
+      implicit integer*8(i-n)
       DOUBLE PRECISION TEMD1,TEMD2
       DIMENSION X(*), Y(*), W(*), R(*), A(*)
       DIMENSION CO(4,3)
@@ -326,7 +327,7 @@ C
       SIG = SIGPAS
       GO TO 33
  30   IERR = 2
-      CALL XERMSG ('SLATEC', 'POLFIT', 'INVALID INPUT PARAMETER.', 2,
+      CALL XERMSG ('SLATEC', 'POLFIT', 'INVALID INPUT PARAMETER.', 2_8,
      +   1)
       GO TO 37
  31   IERR = 3

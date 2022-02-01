@@ -28,16 +28,16 @@ no_index:
 provides:
   Acme::Resume:
     file: lib/Acme/Resume.pm
-    version: '0.0108'
+    version: '0.0109'
   Acme::Resume::Internal:
     file: lib/Acme/Resume/Internal.pm
-    version: '0.0108'
+    version: '0.0109'
   Acme::Resume::MoopsParserTrait:
     file: lib/Acme/Resume/MoopsParserTrait.pm
-    version: '0.0108'
+    version: '0.0109'
   Acme::Resume::Moose:
     file: lib/Acme/Resume/Moose.pm
-    version: '0.0108'
+    version: '0.0109'
 requires:
   Module::Runtime: '0'
   Moo::Role: '0'

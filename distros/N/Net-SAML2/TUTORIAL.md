@@ -358,7 +358,7 @@ For the $saml_request_id you need to retrieve it from wherever it was stored dur
 
 The call to $assertion->valid validates the following for the assertion:
 
-1. That the $issuer configure in your application is the $audience of the assertion
+1. That the $issuer configured in your application is the $audience of the assertion
 2. That the $saml_request_id is the InResponseTo of the assertion
 3. That the current time is within the NotBefore and NotAfter datetimes of the assertion
 
@@ -401,7 +401,160 @@ As a developer you need to review what is returned in the SAML2 Assertion from t
 
 Regardless, the attributes of the assertion will contain those values,  It is up to your application to use or ignore them as you see fit.
 
-## Step 3: Generating the Service Provider (SP) Metadata (Optional)
+## Step 3: Service Provider initiated LogoutRequest (Optional)
+
+The Service Provider (SP) can initiate a LogoutRequest to the Identity Provider (IdP).  This is optional and the IdP can support Single Logout (SLO) which will initiate a process to logout all IdP logins sharing the session.
+
+The process begins with the creation of the LogoutRequest XML with the correct values and then it is sent to the IdP via a Browser Redirect.
+
+The following is from Foswiki's SamlLoginContrib function:
+```
+
+    # Foswiki's SamlLoginContrib stores the Assertions session_index
+    my $sessionindex = $this->getSessionValue('saml_session_index');
+
+    my $idp = Net::SAML2::IdP->new_from_url(
+￼        url     => $this->{Saml}{ metadata},
+￼        cacert  => $this->{Saml}{ cacert },
+￼    );
+￼
+    my $logoutrequest = Net::SAML2::Protocol::LogoutRequest->new(
+￼        issuer        => $this->{Saml}{ issuer },
+￼        nameid_format => 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
+￼        destination   => $idp->slo_url('urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'),
+￼        nameid      => $session->{users}->getLoginName($session->{user}),
+￼        session     => $sessionindex,
+￼    );
+￼
+￼    my $logoutreq = $logoutrequest->as_xml;
+￼
+￼    my $redirect = Net::SAML2::Binding::Redirect->new(
+￼              key => $this->{Saml}{ sp_signing_key },
+￼              cert => $this->{Saml}{ sp_signing_cert },
+￼              destination   => $idp->slo_url('urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'),
+￼              param => 'SAMLRequest',
+￼              url   => $idp->slo_url('urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'),
+￼    );
+￼    my $url = $redirect->sign($logoutreq);
+
+     # The $url is then sent to the browser as a redirect to initiate the logout.
+
+```
+The IdP will respond with a LogoutResponse that is sent to the browser via a HTTP-POST or an HTTP-Redirect depending on the SP's configuration at the IdP (the SP metadata would specify the slo_url that is supported).
+
+The SP would process the LogoutResponse and if it was a sucessful response invalidate the user's session at the SP.
+
+The following is from Foswiki's SamlLoginContrib function:
+```
+    # Foswiki's SamlLoginContrib stores the Assertions session_index
+    # my $sessionindex = $this->getAndClearSessionValue('saml_session_index');
+￼
+￼    my $idp = Net::SAML2::IdP->new_from_url(
+￼        url     => $this->{Saml}{metadata},
+￼        cacert  => $this->{Saml}{cacert},
+￼        sls_force_lcase_url_encoding => $this->{Saml}{sls_force_lcase_url_encoding},
+￼        sls_double_encoded_response => $this->{Saml}{sls_double_encoded_response}
+￼    );
+
+    my $redirect = Net::SAML2::Binding::Redirect->new(
+        url   => $idp->slo_url('urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'),
+        key => $this->{Saml}{sp_signing_key},
+        cert => $idp->cert('signing'),
+        param => 'SAMLResponse',
+        sls_force_lcase_url_encoding => $this->{Saml}{sls_force_lcase_url_encoding},
+        sls_double_encoded_response => $this->{Saml}{sls_double_encoded_response}
+    );
+
+    my ($response, $relaystate) = $redirect->verify($uri);
+￼
+    if ($response) {
+￼        my $logout = Net::SAML2::Protocol::LogoutResponse->new_from_xml(
+￼                        xml => $response
+￼        );
+￼
+￼        if ($logout->status eq 'urn:oasis:names:tc:SAML:2.0:status:Success') {
+￼            deleteSession(...)
+￼        }
+￼    }
+
+```
+
+### Creating the LogoutRequest
+
+## Step 4: IdP initiated LogoutRequest (Optional)
+
+The Identity Provider (IdP) can intiate a LogoutRequest to the Service Provider (SP).  There is no guarantee that this IdP initiated message will even get received by the SP as it requires the IdP to send a HTTP-GET request directly to the SP.  It works outside the typical browser interaction for SAML.  Indeed for many internal applications there is no direct internet access allowed to the SP application.
+
+The process begins when the SP receives an unsolicated HTTP-GET request from the IdP.  The SP must decode that LogoutRequest and process it to logout the user locally.
+
+### Handling the LogoutRequest
+
+The SP needs to create the Net::SAML2::IdP object as is done above (in this case using new_from_xml but could be new_from_url).
+
+```
+    my $idp = Net::SAML2::IdP->new_from_xml(
+            xml    => $metadata,  # URL where the xml is located
+            cacert => $cacert2,   # Filename of the Identity Providers CACert
+    );
+
+```
+Create the Net::SAML2::Binding::Redirect object.  Note the sls_force_lcase_url_encoding is used if the IdP sends a URL that has meen URL encoded with lower case characters %2f instead of %2F.
+
+```
+    my $redirect = Net::SAML2::Binding::Redirect->new(
+        key => 't/sign-nopw-cert.pem',
+        cert => $idp->cert('signing'),
+        sig_hash => 'sha256',
+        param => 'SAMLRequest',
+        # The ssl_url destination for redirect
+        url => $idp->sso_url('urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'),
+        #sls_force_lcase_url_encoding => 1,
+    );
+```
+Verify signature on the URL, decode the request and retrieve the XML request and RelayState.
+
+```
+    my ($request, $relaystate) = $redirect->verify($get_request);
+
+```
+Create the LogoutRequest object from the decoded XML request.
+
+```
+    my $logoutrequest = Net::SAML2::Protocol::LogoutRequest->new_from_xml(xml => $request);
+
+```
+
+The data that the SP requires is in the resulting Net::SAML2::Protocol::LogoutRequest object.  The SP should perform a local logout of the nameid specified in the LogoutRequest.  The session *should* be the session that the IdP sent in the Assertion (need to review).  In general however the user associated with the nameid should have their session invalidated and the should be user forced to login again on next access.
+
+```
+    $VAR1 = \bless( {
+        'id' => '_754753ec-5845-4d3f-bc06-84dbebf64c38',
+        'nameid' => 'timlegge@cpan.org',
+        'destination' => 'https://net-saml2.local/logout',
+        'issue_instant' => '2022-01-29T00:32:40Z',
+        'issuer' => bless( do{\(my $o = 'http://keycloak.local/')}, 'URI::http' ),
+        'session' => '_4f6b29af-0e3c-4970-4f40-9609-fe9843ca1dc0'
+    }, 'Net::SAML2::Protocol::LogoutRequest' );
+
+```
+The logout response should be sent to the IdP by the SP after the local user's session has been invalidated.  The LogoutResponse is created by creating the Net::SAML2::Protocol::LogoutResponse object with the correct values.  The response_to is the id from the LogoutRequest.  It is the LogoutRequest to which the LogoutRespones is related.  Below shows the issue and the destination as the opposite of the same values from the LogoutRequest.  The issuer in the request is likely where the LogoutResponse should be sent (the destination).  More properly the issuer should be the $sp->{issuer} and the destination the $idp->{slo_url}->{urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect}.
+
+```
+    my $logoutresponse = Net::SAML2::Protocol::LogoutResponse->new(
+        issuer      => $logoutrequest->{destination},
+        destination => $logoutrequest->{issuer},
+        status      => "urn:oasis:names:tc:SAML:2.0:status:Success",
+        response_to => $logoutrequest->{id},
+    );
+```
+
+Once you have created the LogoutResponse you sign the XML version of the LogoutResponse using the Net::SAML2::Binding::Redirect.  This results in a URL that the SP must use in a GET request to inform the IdP that the session was properly invalidated by the SP.
+
+```
+    my $logoutrequestsigned = $redirect->sign($logoutresponse->as_xml);
+```
+
+## Step 5: Generating the Service Provider (SP) Metadata (Optional)
 
 Some Identity Providers allow you to import a XML file that has the Service Provider settings.  This allows you to ensure that the settings defined in your application are the same as those configured as the Service Provider settings in Identity Provider.
 

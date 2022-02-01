@@ -21,10 +21,12 @@ readme_from 'bin/cpan-get';
 recursive_author_tests('xt');
 requires 'Class::Utils' => 0;
 requires 'Error::Pure' => 0;
+requires 'Exporter' => 0;
 requires 'Getopt::Std' => 0;
 requires 'IO::Barf' => 0;
 requires 'LWP::UserAgent' => 0;
 requires 'Menlo::Index::MetaCPAN' => 0;
+requires 'Readonly' => 0;
 requires 'URI::cpan' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/App-CPAN-Get/issues',
 resources 'homepage' => 'https://github.com/michal-josef-spacek/App-CPAN-Get';
@@ -38,7 +40,7 @@ test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Output' => 0;
 tests_recursive;
-version '0.05';
+version '0.06';
 
 # Run.
 WriteAll();

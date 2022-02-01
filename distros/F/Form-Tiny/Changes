@@ -1,16 +1,26 @@
 Revision history for Perl extension Form::Tiny.
 
-2.06 Thu Jan 27 20:00:00 2022
+2.08 Sat Jan 29 2022
+	- cleanup and further optimization
+
+2.07 Fri Jan 28 2022
+	- Form::Tiny package is no longer a role (revert change made in 2.06)
+	- form_meta method is now installed by a metaclass upon setting the package name
+	- Form::Tiny::Meta can now properly finalize itself with ->bootstrap method
+	- inheritance candidates are now chosen based on their meta classes
+	- add Sub::Util dependency and use it to prevent namespace::autoclean from removing form_meta method
+
+2.06 Thu Jan 27 2022
 	- Form::Tiny package is now a role providing form_meta method
 	- form_meta method is now namespace::autoclean resistant
 	- Form::Tiny no longer automatically cleans up all previously defined symbols (revoke change made in 2.04)
 
-2.05 Wed Jan 26 22:30:00 2022
+2.05 Wed Jan 26 2022
 	- Module optimization
 	- forms now keep track of whether they are flat (to apply optimizations)
 	- style changes
 
-2.04 Sat Jan 22 20:00:00 2022
+2.04 Sat Jan 22 2022
 	- added plugins system: standarized way of extending the module
 	- new import parameter: plugins => []
 	- subroutine parameters are now consistent by default
@@ -19,7 +29,7 @@ Revision history for Perl extension Form::Tiny.
 	- all symbols imported by Form::Tiny or before it is imported are now cleaned from the namespace
 	- form inheritance now properly transfers meta roles (still experimental though)
 
-2.03 Sat Oct 23 02:00:00 2021
+2.03 Sat Oct 23 2021
 	- new import flag: -consistent
 	- subroutine parameters are now consistent across the system with -consistent flag
 	- deprecate forms without -consistent flag (transition period)
@@ -32,48 +42,48 @@ Revision history for Perl extension Form::Tiny.
 	- new documentation: Manual::Cookbook
 	- new documentation: Manual::Performance
 
-2.02 Sat Sep 18 16:00:00 2021
+2.02 Sat Sep 18 2021
 	- new feature: additional field validators
 	- deprecate three parameter field filter
 	- deprecate Form::Tiny::Filter 'field' property
 	- fix and document Corinna compatibility
 
-2.01 Fri May 28 18:00:00 2021
+2.01 Fri May 28 2021
 	- new feature: field filters
 	- new feature: after_error hook
 	- bugfix: remove dclone on input - see Form::Tiny::Manual::Compatibility
 	- minor bugfixes
 	- improved documentation, examples and test cases
 
-2.00  Sun May 23 23:00:00 2021
+2.00  Sun May 23 2021
 	- module rewrite to form metaobject model
 	- see Form::Tiny::Manual::Compatibility for a list of incompatible changes
 
-1.14  Wed May 19 21:00:00 2021
+1.14  Wed May 19 2021
 	- add module rewrite alert: see Form::Tiny documentation
 
-1.13  Sat May 15 23:00:00 2021
+1.13  Sat May 15 2021
 	- improve documentation
 	- move documentation on bare-bones to Manual::Internals
 	- fix distribution metadata
 
-1.12  Wed Jan 6 20:00:00 2021
+1.12  Wed Jan 6 2021
 	- form_field now accepts coderefs
 	- add default value configuration for form fields
 	- field coercions now eval errors and add them as form errors
 	- build_fields sub is now optional
 
-1.11  Tue Jan 5 14:00:00 2021
+1.11  Tue Jan 5 2021
 	- fix broken release
 
-1.10  Tue Jan 5 13:00:00 2021
+1.10  Tue Jan 5 2021
 	- add syntactic sugar mode with -flag import
 	- improve documentation
 
-1.01  Mon Sep 28 19:00:00 2020
+1.01  Mon Sep 28 2020
 	- fix Type::Tiny dependency minimum version
 	- fix and improve documentation
 
-1.00  Sun Sep 27 22:00:00 2020
+1.00  Sun Sep 27 2020
 	- first version
 

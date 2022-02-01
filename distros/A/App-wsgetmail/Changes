@@ -1,0 +1,24 @@
+Revision history for App-wsgetmail
+
+0.05    24/1/22
+        Major documentation overhaul:
+        * The script pod provides full details about all available
+          configuration options, and refers to Microsoft documentation about
+          how to set up the client application
+        * Library pod documents attributes and methods of all classes
+        Add missing dependencies to Makefile.PL
+        Add MANIFEST.SKIP to support release tests
+        Provide interpreter substitution for the wsgetmail script
+
+0.04    18/8/20
+        Documentation improvements
+
+0.03    4/8/20
+        Improved debugging
+
+0.02    17/07/20
+        Reworked mail delivery
+
+0.01    20/05/20
+        Initial Implementation
+

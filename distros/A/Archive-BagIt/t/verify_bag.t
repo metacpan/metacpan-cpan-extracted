@@ -5,10 +5,9 @@ use warnings;
 use utf8;
 use lib '../lib';
 use open ':std', ':encoding(UTF-8)';
-use Test::More tests => 155;
+use Test::More tests => 122;
 use Test::Exception;
 use File::Spec;
-use Data::Printer;
 use File::Path;
 use File::Copy;
 use File::Temp qw(tempdir);
@@ -70,42 +69,6 @@ foreach my $prefix (@prefix_manifestfiles) {
             }, qr{digest \($alg\) calculated=.*, but expected=}, "check if bag fails verification of broken $prefix-$alg.txt (first error, standard)");
     }
 }
-######## Fast
-
-note "fast tests";
-SKIP: {
-    skip "IO::AIO required for testing Archive::BagIt::Fast", 33 unless eval "use IO::AIO; 1";
-    my $Class_fast = 'Archive::BagIt::Fast';
-    use_ok($Class_fast);
-    foreach my $prefix (@prefix_manifestfiles) {
-        foreach my $alg (@alg) {
-            # preparation tests
-            my $bag_dir = File::Temp::tempdir(CLEANUP => 1);
-            _prepare_bag($bag_dir);
-            my $bag_ok = Archive::BagIt->make_bag($bag_dir);
-            isa_ok($bag_ok, 'Archive::BagIt', "create new valid IE bagit");
-            ok($bag_ok->verify_bag(), "check if bag is verified correctly");
-            my $bag_ok2 = Archive::BagIt->make_bag("$bag_dir/"); #add slash at end of $bag_dir
-            isa_ok($bag_ok2, 'Archive::BagIt', "create new valid IE bagit (with slash)");
-            ok($bag_ok2->verify_bag(), "check if bag is verified correctly (with slash)");
-            _modify_bag("$bag_dir/$prefix-$alg.txt");
-            # real tests
-            my $bag_invalid1 = new_ok("Archive::BagIt::Fast" => [ bag_path => $bag_dir ]);
-            throws_ok(
-                sub {
-                    $bag_invalid1->verify_bag(
-                        { return_all_errors => 1 }
-                    )
-                }, qr{bag verify for bagit version '1.0' failed with invalid files}, "check if bag fails verification of broken $prefix-$alg.txt (all errors, fast)");
-            my $bag_invalid2 = new_ok("Archive::BagIt::Fast" => [ bag_path => $bag_dir ]);
-            throws_ok(
-                sub {
-                    $bag_invalid2->verify_bag()
-                }, qr{digest \($alg\) calculated=.*, but expected=}, "check if bag fails verification of broken $prefix-$alg.txt (first error, fast)");
-        }
-    }
-}  # end SKIP
-
 
 # special test to ensure that return_all_errors work as expected
 note "return_all_errors tests";

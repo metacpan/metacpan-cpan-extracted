@@ -14,11 +14,11 @@ LWP::UserAgent::Throttled - Throttle requests to a site
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 SYNOPSIS
 
@@ -43,8 +43,9 @@ See L<LWP::UserAgent>.
 =cut
 
 sub send_request {
-	my $self = shift;
 	# my ($request, $arg, $size) = @_;
+
+	my $self = shift;
 	my $request = $_[0];
 	my $host = $request->uri()->host();
 
@@ -132,6 +133,8 @@ L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=LWP-UserAgent-Throttled>.
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
+Redirects to other domains can confuse it, so you need to program those manually.
+
 =head1 SEE ALSO
 
 L<LWP::UserAgent>
@@ -174,7 +177,7 @@ L<http://deps.cpantesters.org/?module=LWP::UserAgent::Throttled>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2021 Nigel Horne.
+Copyright 2017-2022 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

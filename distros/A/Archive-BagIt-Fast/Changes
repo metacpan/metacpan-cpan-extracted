@@ -1,0 +1,54 @@
+==================================================
+Changes from 2021-01-28 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.090 at 2022-01-28 17:35:28 +0000
+------------------------------------------
+
+  Change: b5bc284b7aed4053e3efe128eb0e0202629717b7
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2022-01-28 18:35:17 +0000
+
+    - init 
+
+  Change: f672e582bd4c16e5c64ec9a68e2858b924550dc2
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2022-01-28 18:33:29 +0000
+
+    - removed to avoid dzil conflicts 
+
+  Change: 5f8aa339e4aaa60f257ba66f7d76b5d2a81539f5
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2022-01-28 18:29:31 +0000
+
+    - fixed testcases 
+
+  Change: cece26efdbbf6f3b9cee2b560dabf0a51bc45f4a
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2022-01-28 18:28:55 +0000
+
+    - fixed dependencies 
+
+  Change: 4ebe32eed1d9a0eb8056d1a2c34a15f1a088379a
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2022-01-28 18:28:41 +0000
+
+    - deleted, because part of dzil's run 
+
+  Change: 49839c1a45ba7983e01d61f0db1430309c087bb3
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2022-01-28 18:08:20 +0000
+
+    - extracted this distribution from Archive::BagIt to minimize
+    dependencies 
+
+  Change: a2a2102a5c2697f1bd69cd128791163325115419
+  Author: art1pirat <art1pirat@fsfe.org>
+  Date : 2022-01-28 17:02:59 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

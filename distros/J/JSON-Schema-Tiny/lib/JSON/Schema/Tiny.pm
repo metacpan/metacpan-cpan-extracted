@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Tiny; # git description: v0.013-5-gb4e2ba8
+package JSON::Schema::Tiny; # git description: v0.014-6-g7d8d955
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema, minimally
 # KEYWORDS: JSON Schema data validation structure specification tiny
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 use 5.020;  # for unicode_strings, signatures, postderef features
 use experimental qw(signatures postderef);
@@ -1083,7 +1083,7 @@ sub get_type ($value) {
     if !($flags & B::SVf_POK) && ($flags & (B::SVf_IOK | B::SVf_NOK));
 
   croak sprintf('ambiguous type for %s',
-    JSON::MaybeXS->new(allow_nonref => 1, canonical => 1, utf8 => 0, allow_bignum => 1, allow_blessed => 1)->encode($value));
+    JSON::MaybeXS->new(allow_nonref => 1, canonical => 1, utf8 => 0)->encode($value));
 }
 
 # compares two arbitrary data payloads for equality, as per
@@ -1270,7 +1270,7 @@ JSON::Schema::Tiny - Validate data against a schema, minimally
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 
@@ -1506,14 +1506,14 @@ L<Understanding JSON Schema|https://json-schema.org/understanding-json-schema>: 
 
 =for stopwords OpenAPI
 
-You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI Slack
-server|https://open-api.slack.com>, which are also great resources for finding help.
-
 =head1 SUPPORT
 
 Bugs may be submitted through L<https://github.com/karenetheridge/JSON-Schema-Tiny/issues>.
 
 I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
+
+You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI Slack
+server|https://open-api.slack.com>, which are also great resources for finding help.
 
 =head1 AUTHOR
 

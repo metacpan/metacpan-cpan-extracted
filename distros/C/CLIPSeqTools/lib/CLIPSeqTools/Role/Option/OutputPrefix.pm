@@ -16,7 +16,7 @@ Role to enable output prefix as command line option.
 
 
 package CLIPSeqTools::Role::Option::OutputPrefix;
-$CLIPSeqTools::Role::Option::OutputPrefix::VERSION = '0.1.10';
+$CLIPSeqTools::Role::Option::OutputPrefix::VERSION = '1.0.0';
 
 #######################################################################
 #######################   Load External modules   #####################

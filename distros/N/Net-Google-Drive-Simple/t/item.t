@@ -39,8 +39,8 @@ is $item->FRUIT, 'apple', 'FRUIT';
 
 is $item->size, 42, 'size';
 
-is $item->color, 'red', 'color is red';
-is $item->list, [ 1 .. 3 ], 'a list';
+is $item->color,            'red',      'color is red';
+is $item->list,             [ 1 .. 3 ], 'a list';
 is $item->hash, { 1 .. 4 }, 'one hash';
 
 like(

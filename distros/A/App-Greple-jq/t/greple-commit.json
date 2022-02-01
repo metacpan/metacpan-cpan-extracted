@@ -1,0 +1,2372 @@
+[
+  {
+    "sha": "1d1a1d10b5a30d479b4e4f6888b9b138b4406fb7",
+    "node_id": "C_kwDOAN0ALNoAKDFkMWExZDEwYjVhMzBkNDc5YjRlNGY2ODg4YjliMTM4YjQ0MDZmYjc",
+    "commit": {
+      "author": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2022-01-29T04:26:32Z"
+      },
+      "committer": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2022-01-29T04:26:32Z"
+      },
+      "message": "Checking in changes prior to tagging of version 8.54.\n\nChangelog diff is:\n\ndiff --git a/Changes b/Changes\nindex fd183b3..ddc6866 100644\n--- a/Changes\n+++ b/Changes\n@@ -2,6 +2,12 @@ Revision history for Perl application 'greple'.\n \n {{$NEXT}}\n \n+8.54 2022-01-29T04:26:00Z\n+\n+    - Make --blockend option to specify string w/o newline.\n+    - Accept file \"-\" as a STDIN.\n+    - Make --face not to change colorspec if already effective.\n+\n 8.53 2021-12-13T13:12:47Z\n \n     - Functional --cm sub{...} works even if --nocolor option given.",
+      "tree": {
+        "sha": "7c884f980593d13a19137277de1455a44a5deb09",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/git/trees/7c884f980593d13a19137277de1455a44a5deb09"
+      },
+      "url": "https://api.github.com/repos/kaz-utashiro/greple/git/commits/1d1a1d10b5a30d479b4e4f6888b9b138b4406fb7",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null
+      }
+    },
+    "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/1d1a1d10b5a30d479b4e4f6888b9b138b4406fb7",
+    "html_url": "https://github.com/kaz-utashiro/greple/commit/1d1a1d10b5a30d479b4e4f6888b9b138b4406fb7",
+    "comments_url": "https://api.github.com/repos/kaz-utashiro/greple/commits/1d1a1d10b5a30d479b4e4f6888b9b138b4406fb7/comments",
+    "author": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "62723649fe2a8a69745c03a18ed5887aa42fdd47",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/62723649fe2a8a69745c03a18ed5887aa42fdd47",
+        "html_url": "https://github.com/kaz-utashiro/greple/commit/62723649fe2a8a69745c03a18ed5887aa42fdd47"
+      }
+    ]
+  },
+  {
+    "sha": "62723649fe2a8a69745c03a18ed5887aa42fdd47",
+    "node_id": "C_kwDOAN0ALNoAKDYyNzIzNjQ5ZmUyYThhNjk3NDVjMDNhMThlZDU4ODdhYTQyZmRkNDc",
+    "commit": {
+      "author": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2022-01-29T04:23:44Z"
+      },
+      "committer": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2022-01-29T04:23:44Z"
+      },
+      "message": "Update copyright year.",
+      "tree": {
+        "sha": "d8505e925cbc307844396e45fa70116ca0fbd1d5",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/git/trees/d8505e925cbc307844396e45fa70116ca0fbd1d5"
+      },
+      "url": "https://api.github.com/repos/kaz-utashiro/greple/git/commits/62723649fe2a8a69745c03a18ed5887aa42fdd47",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null
+      }
+    },
+    "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/62723649fe2a8a69745c03a18ed5887aa42fdd47",
+    "html_url": "https://github.com/kaz-utashiro/greple/commit/62723649fe2a8a69745c03a18ed5887aa42fdd47",
+    "comments_url": "https://api.github.com/repos/kaz-utashiro/greple/commits/62723649fe2a8a69745c03a18ed5887aa42fdd47/comments",
+    "author": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "a6dd9abe5da9dc5b2ae1e64b07840f7d611b4abc",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/a6dd9abe5da9dc5b2ae1e64b07840f7d611b4abc",
+        "html_url": "https://github.com/kaz-utashiro/greple/commit/a6dd9abe5da9dc5b2ae1e64b07840f7d611b4abc"
+      }
+    ]
+  },
+  {
+    "sha": "a6dd9abe5da9dc5b2ae1e64b07840f7d611b4abc",
+    "node_id": "C_kwDOAN0ALNoAKGE2ZGQ5YWJlNWRhOWRjNWIyYWUxZTY0YjA3ODQwZjdkNjExYjRhYmM",
+    "commit": {
+      "author": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2022-01-29T04:13:20Z"
+      },
+      "committer": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2022-01-29T04:13:20Z"
+      },
+      "message": "Make --face not to change colorspec if already effective.",
+      "tree": {
+        "sha": "afb1c1718d75cbdec7ce071e6749484c7b693c44",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/git/trees/afb1c1718d75cbdec7ce071e6749484c7b693c44"
+      },
+      "url": "https://api.github.com/repos/kaz-utashiro/greple/git/commits/a6dd9abe5da9dc5b2ae1e64b07840f7d611b4abc",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null
+      }
+    },
+    "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/a6dd9abe5da9dc5b2ae1e64b07840f7d611b4abc",
+    "html_url": "https://github.com/kaz-utashiro/greple/commit/a6dd9abe5da9dc5b2ae1e64b07840f7d611b4abc",
+    "comments_url": "https://api.github.com/repos/kaz-utashiro/greple/commits/a6dd9abe5da9dc5b2ae1e64b07840f7d611b4abc/comments",
+    "author": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "0fdd63e1cc31eb2fc05b34f68403af42f7d522cd",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/0fdd63e1cc31eb2fc05b34f68403af42f7d522cd",
+        "html_url": "https://github.com/kaz-utashiro/greple/commit/0fdd63e1cc31eb2fc05b34f68403af42f7d522cd"
+      }
+    ]
+  },
+  {
+    "sha": "0fdd63e1cc31eb2fc05b34f68403af42f7d522cd",
+    "node_id": "C_kwDOAN0ALNoAKDBmZGQ2M2UxY2MzMWViMmZjMDViMzRmNjg0MDNhZjQyZjdkNTIyY2Q",
+    "commit": {
+      "author": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-29T04:51:28Z"
+      },
+      "committer": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-29T04:51:28Z"
+      },
+      "message": "Accept file \"-\" as a STDIN.",
+      "tree": {
+        "sha": "8419c59580ffc2bf7383b331a7811d6918028bf7",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/git/trees/8419c59580ffc2bf7383b331a7811d6918028bf7"
+      },
+      "url": "https://api.github.com/repos/kaz-utashiro/greple/git/commits/0fdd63e1cc31eb2fc05b34f68403af42f7d522cd",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null
+      }
+    },
+    "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/0fdd63e1cc31eb2fc05b34f68403af42f7d522cd",
+    "html_url": "https://github.com/kaz-utashiro/greple/commit/0fdd63e1cc31eb2fc05b34f68403af42f7d522cd",
+    "comments_url": "https://api.github.com/repos/kaz-utashiro/greple/commits/0fdd63e1cc31eb2fc05b34f68403af42f7d522cd/comments",
+    "author": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "b0318bbf035a2087fe18ca5fe1b7ff7b5e9a45ca",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/b0318bbf035a2087fe18ca5fe1b7ff7b5e9a45ca",
+        "html_url": "https://github.com/kaz-utashiro/greple/commit/b0318bbf035a2087fe18ca5fe1b7ff7b5e9a45ca"
+      }
+    ]
+  },
+  {
+    "sha": "b0318bbf035a2087fe18ca5fe1b7ff7b5e9a45ca",
+    "node_id": "C_kwDOAN0ALNoAKGIwMzE4YmJmMDM1YTIwODdmZTE4Y2E1ZmUxYjdmZjdiNWU5YTQ1Y2E",
+    "commit": {
+      "author": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-29T03:32:30Z"
+      },
+      "committer": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-29T03:32:30Z"
+      },
+      "message": "Rename submodule.",
+      "tree": {
+        "sha": "95ed465dcfef2ccd5cb32979e09b883dd040062f",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/git/trees/95ed465dcfef2ccd5cb32979e09b883dd040062f"
+      },
+      "url": "https://api.github.com/repos/kaz-utashiro/greple/git/commits/b0318bbf035a2087fe18ca5fe1b7ff7b5e9a45ca",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null
+      }
+    },
+    "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/b0318bbf035a2087fe18ca5fe1b7ff7b5e9a45ca",
+    "html_url": "https://github.com/kaz-utashiro/greple/commit/b0318bbf035a2087fe18ca5fe1b7ff7b5e9a45ca",
+    "comments_url": "https://api.github.com/repos/kaz-utashiro/greple/commits/b0318bbf035a2087fe18ca5fe1b7ff7b5e9a45ca/comments",
+    "author": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "fd146023747808ae5bc697004e13e98eef21e73f",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/fd146023747808ae5bc697004e13e98eef21e73f",
+        "html_url": "https://github.com/kaz-utashiro/greple/commit/fd146023747808ae5bc697004e13e98eef21e73f"
+      }
+    ]
+  },
+  {
+    "sha": "fd146023747808ae5bc697004e13e98eef21e73f",
+    "node_id": "C_kwDOAN0ALNoAKGZkMTQ2MDIzNzQ3ODA4YWU1YmM2OTcwMDRlMTNlOThlZWYyMWU3M2Y",
+    "commit": {
+      "author": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-29T02:33:59Z"
+      },
+      "committer": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-29T02:33:59Z"
+      },
+      "message": "Update runner submodule.",
+      "tree": {
+        "sha": "9f82929abc1908c671fbd38bdbfa6fa145b4eddd",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/git/trees/9f82929abc1908c671fbd38bdbfa6fa145b4eddd"
+      },
+      "url": "https://api.github.com/repos/kaz-utashiro/greple/git/commits/fd146023747808ae5bc697004e13e98eef21e73f",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null
+      }
+    },
+    "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/fd146023747808ae5bc697004e13e98eef21e73f",
+    "html_url": "https://github.com/kaz-utashiro/greple/commit/fd146023747808ae5bc697004e13e98eef21e73f",
+    "comments_url": "https://api.github.com/repos/kaz-utashiro/greple/commits/fd146023747808ae5bc697004e13e98eef21e73f/comments",
+    "author": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "9750dce8905123a0e7527e1af50a6ff575f4b1aa",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/9750dce8905123a0e7527e1af50a6ff575f4b1aa",
+        "html_url": "https://github.com/kaz-utashiro/greple/commit/9750dce8905123a0e7527e1af50a6ff575f4b1aa"
+      }
+    ]
+  },
+  {
+    "sha": "9750dce8905123a0e7527e1af50a6ff575f4b1aa",
+    "node_id": "C_kwDOAN0ALNoAKDk3NTBkY2U4OTA1MTIzYTBlNzUyN2UxYWY1MGE2ZmY1NzVmNGIxYWE",
+    "commit": {
+      "author": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-29T02:27:30Z"
+      },
+      "committer": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-29T02:27:30Z"
+      },
+      "message": "Do not use runner/Greple.pm.",
+      "tree": {
+        "sha": "9da53c0e310584b964e0d6f3d403211e3cdd4dbf",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/git/trees/9da53c0e310584b964e0d6f3d403211e3cdd4dbf"
+      },
+      "url": "https://api.github.com/repos/kaz-utashiro/greple/git/commits/9750dce8905123a0e7527e1af50a6ff575f4b1aa",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null
+      }
+    },
+    "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/9750dce8905123a0e7527e1af50a6ff575f4b1aa",
+    "html_url": "https://github.com/kaz-utashiro/greple/commit/9750dce8905123a0e7527e1af50a6ff575f4b1aa",
+    "comments_url": "https://api.github.com/repos/kaz-utashiro/greple/commits/9750dce8905123a0e7527e1af50a6ff575f4b1aa/comments",
+    "author": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "ff111a50dff63a276c08f6b99dbce8e582fbabc6",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/ff111a50dff63a276c08f6b99dbce8e582fbabc6",
+        "html_url": "https://github.com/kaz-utashiro/greple/commit/ff111a50dff63a276c08f6b99dbce8e582fbabc6"
+      }
+    ]
+  },
+  {
+    "sha": "ff111a50dff63a276c08f6b99dbce8e582fbabc6",
+    "node_id": "C_kwDOAN0ALNoAKGZmMTExYTUwZGZmNjNhMjc2YzA4ZjZiOTlkYmNlOGU1ODJmYmFiYzY",
+    "commit": {
+      "author": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-29T01:58:32Z"
+      },
+      "committer": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-29T01:58:32Z"
+      },
+      "message": "Make --blockend option to specify string w/o newline.",
+      "tree": {
+        "sha": "84744a824a7e27b26312e9a4dfc182746c33f3e7",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/git/trees/84744a824a7e27b26312e9a4dfc182746c33f3e7"
+      },
+      "url": "https://api.github.com/repos/kaz-utashiro/greple/git/commits/ff111a50dff63a276c08f6b99dbce8e582fbabc6",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null
+      }
+    },
+    "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/ff111a50dff63a276c08f6b99dbce8e582fbabc6",
+    "html_url": "https://github.com/kaz-utashiro/greple/commit/ff111a50dff63a276c08f6b99dbce8e582fbabc6",
+    "comments_url": "https://api.github.com/repos/kaz-utashiro/greple/commits/ff111a50dff63a276c08f6b99dbce8e582fbabc6/comments",
+    "author": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "58c6f99b03e3244ac40d423bd56feb08e87a9f0c",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/58c6f99b03e3244ac40d423bd56feb08e87a9f0c",
+        "html_url": "https://github.com/kaz-utashiro/greple/commit/58c6f99b03e3244ac40d423bd56feb08e87a9f0c"
+      }
+    ]
+  },
+  {
+    "sha": "58c6f99b03e3244ac40d423bd56feb08e87a9f0c",
+    "node_id": "C_kwDOAN0ALNoAKDU4YzZmOTliMDNlMzI0NGFjNDBkNDIzYmQ1NmZlYjA4ZTg3YTlmMGM",
+    "commit": {
+      "author": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-26T03:19:13Z"
+      },
+      "committer": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-26T03:19:13Z"
+      },
+      "message": "update variable name",
+      "tree": {
+        "sha": "d2dd622ed720e568b946ee023cff42a5ed0f01d2",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/git/trees/d2dd622ed720e568b946ee023cff42a5ed0f01d2"
+      },
+      "url": "https://api.github.com/repos/kaz-utashiro/greple/git/commits/58c6f99b03e3244ac40d423bd56feb08e87a9f0c",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null
+      }
+    },
+    "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/58c6f99b03e3244ac40d423bd56feb08e87a9f0c",
+    "html_url": "https://github.com/kaz-utashiro/greple/commit/58c6f99b03e3244ac40d423bd56feb08e87a9f0c",
+    "comments_url": "https://api.github.com/repos/kaz-utashiro/greple/commits/58c6f99b03e3244ac40d423bd56feb08e87a9f0c/comments",
+    "author": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "e24e8d326e30533c817fceb2507027c9d190e24c",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/e24e8d326e30533c817fceb2507027c9d190e24c",
+        "html_url": "https://github.com/kaz-utashiro/greple/commit/e24e8d326e30533c817fceb2507027c9d190e24c"
+      }
+    ]
+  },
+  {
+    "sha": "e24e8d326e30533c817fceb2507027c9d190e24c",
+    "node_id": "C_kwDOAN0ALNoAKGUyNGU4ZDMyNmUzMDUzM2M4MTdmY2ViMjUwNzAyN2M5ZDE5MGUyNGM",
+    "commit": {
+      "author": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-26T03:12:59Z"
+      },
+      "committer": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-26T03:12:59Z"
+      },
+      "message": "Easy fix for perlctiric.",
+      "tree": {
+        "sha": "a58b5920e1c7922eb51db79feee9bb830985a2c8",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/git/trees/a58b5920e1c7922eb51db79feee9bb830985a2c8"
+      },
+      "url": "https://api.github.com/repos/kaz-utashiro/greple/git/commits/e24e8d326e30533c817fceb2507027c9d190e24c",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null
+      }
+    },
+    "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/e24e8d326e30533c817fceb2507027c9d190e24c",
+    "html_url": "https://github.com/kaz-utashiro/greple/commit/e24e8d326e30533c817fceb2507027c9d190e24c",
+    "comments_url": "https://api.github.com/repos/kaz-utashiro/greple/commits/e24e8d326e30533c817fceb2507027c9d190e24c/comments",
+    "author": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "061551224b533bceff73ffb7512a16919e654c78",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/061551224b533bceff73ffb7512a16919e654c78",
+        "html_url": "https://github.com/kaz-utashiro/greple/commit/061551224b533bceff73ffb7512a16919e654c78"
+      }
+    ]
+  },
+  {
+    "sha": "061551224b533bceff73ffb7512a16919e654c78",
+    "node_id": "C_kwDOAN0ALNoAKDA2MTU1MTIyNGI1MzNiY2VmZjczZmZiNzUxMmExNjkxOWU2NTRjNzg",
+    "commit": {
+      "author": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-23T06:58:01Z"
+      },
+      "committer": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-23T06:58:01Z"
+      },
+      "message": "Use __PACKAGE__.",
+      "tree": {
+        "sha": "2aa7790e45a3116f4f563b471132cb5360053f3c",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/git/trees/2aa7790e45a3116f4f563b471132cb5360053f3c"
+      },
+      "url": "https://api.github.com/repos/kaz-utashiro/greple/git/commits/061551224b533bceff73ffb7512a16919e654c78",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null
+      }
+    },
+    "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/061551224b533bceff73ffb7512a16919e654c78",
+    "html_url": "https://github.com/kaz-utashiro/greple/commit/061551224b533bceff73ffb7512a16919e654c78",
+    "comments_url": "https://api.github.com/repos/kaz-utashiro/greple/commits/061551224b533bceff73ffb7512a16919e654c78/comments",
+    "author": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "474e93e1c637dd0e8ecbaa512cdf493cde162673",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/474e93e1c637dd0e8ecbaa512cdf493cde162673",
+        "html_url": "https://github.com/kaz-utashiro/greple/commit/474e93e1c637dd0e8ecbaa512cdf493cde162673"
+      }
+    ]
+  },
+  {
+    "sha": "474e93e1c637dd0e8ecbaa512cdf493cde162673",
+    "node_id": "C_kwDOAN0ALNoAKDQ3NGU5M2UxYzYzN2RkMGU4ZWNiYWE1MTJjZGY0OTNjZGUxNjI2NzM",
+    "commit": {
+      "author": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-18T06:30:16Z"
+      },
+      "committer": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-18T06:30:16Z"
+      },
+      "message": "Doument correction.",
+      "tree": {
+        "sha": "2291d9858fb70e38afe8396e8e6d5ef1e0edea6f",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/git/trees/2291d9858fb70e38afe8396e8e6d5ef1e0edea6f"
+      },
+      "url": "https://api.github.com/repos/kaz-utashiro/greple/git/commits/474e93e1c637dd0e8ecbaa512cdf493cde162673",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null
+      }
+    },
+    "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/474e93e1c637dd0e8ecbaa512cdf493cde162673",
+    "html_url": "https://github.com/kaz-utashiro/greple/commit/474e93e1c637dd0e8ecbaa512cdf493cde162673",
+    "comments_url": "https://api.github.com/repos/kaz-utashiro/greple/commits/474e93e1c637dd0e8ecbaa512cdf493cde162673/comments",
+    "author": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "54990381ef4311b49b11b1b59918042210043c47",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/54990381ef4311b49b11b1b59918042210043c47",
+        "html_url": "https://github.com/kaz-utashiro/greple/commit/54990381ef4311b49b11b1b59918042210043c47"
+      }
+    ]
+  },
+  {
+    "sha": "54990381ef4311b49b11b1b59918042210043c47",
+    "node_id": "C_kwDOAN0ALNoAKDU0OTkwMzgxZWY0MzExYjQ5YjExYjFiNTk5MTgwNDIyMTAwNDNjNDc",
+    "commit": {
+      "author": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-17T03:17:02Z"
+      },
+      "committer": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-17T06:37:12Z"
+      },
+      "message": "Update test.",
+      "tree": {
+        "sha": "bc251aff78ad14d21d3a2e0828b9e2d1eb9ba3fc",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/git/trees/bc251aff78ad14d21d3a2e0828b9e2d1eb9ba3fc"
+      },
+      "url": "https://api.github.com/repos/kaz-utashiro/greple/git/commits/54990381ef4311b49b11b1b59918042210043c47",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null
+      }
+    },
+    "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/54990381ef4311b49b11b1b59918042210043c47",
+    "html_url": "https://github.com/kaz-utashiro/greple/commit/54990381ef4311b49b11b1b59918042210043c47",
+    "comments_url": "https://api.github.com/repos/kaz-utashiro/greple/commits/54990381ef4311b49b11b1b59918042210043c47/comments",
+    "author": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "3ebf41eb737e0bb80908d7a545d9262aad713ac2",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/3ebf41eb737e0bb80908d7a545d9262aad713ac2",
+        "html_url": "https://github.com/kaz-utashiro/greple/commit/3ebf41eb737e0bb80908d7a545d9262aad713ac2"
+      }
+    ]
+  },
+  {
+    "sha": "3ebf41eb737e0bb80908d7a545d9262aad713ac2",
+    "node_id": "C_kwDOAN0ALNoAKDNlYmY0MWViNzM3ZTBiYjgwOTA4ZDdhNTQ1ZDkyNjJhYWQ3MTNhYzI",
+    "commit": {
+      "author": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-17T03:16:36Z"
+      },
+      "committer": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-17T06:37:12Z"
+      },
+      "message": "Update pattern option handling.",
+      "tree": {
+        "sha": "3d3b2bba818a4e267b4eb8196b9467c5d1c6f6b2",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/git/trees/3d3b2bba818a4e267b4eb8196b9467c5d1c6f6b2"
+      },
+      "url": "https://api.github.com/repos/kaz-utashiro/greple/git/commits/3ebf41eb737e0bb80908d7a545d9262aad713ac2",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null
+      }
+    },
+    "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/3ebf41eb737e0bb80908d7a545d9262aad713ac2",
+    "html_url": "https://github.com/kaz-utashiro/greple/commit/3ebf41eb737e0bb80908d7a545d9262aad713ac2",
+    "comments_url": "https://api.github.com/repos/kaz-utashiro/greple/commits/3ebf41eb737e0bb80908d7a545d9262aad713ac2/comments",
+    "author": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "838fd56a85f26ba2d33b72141575f7971d140124",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/838fd56a85f26ba2d33b72141575f7971d140124",
+        "html_url": "https://github.com/kaz-utashiro/greple/commit/838fd56a85f26ba2d33b72141575f7971d140124"
+      }
+    ]
+  },
+  {
+    "sha": "838fd56a85f26ba2d33b72141575f7971d140124",
+    "node_id": "C_kwDOAN0ALNoAKDgzOGZkNTZhODVmMjZiYTJkMzNiNzIxNDE1NzVmNzk3MWQxNDAxMjQ",
+    "commit": {
+      "author": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-16T11:37:59Z"
+      },
+      "committer": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-16T11:37:59Z"
+      },
+      "message": "Update docs/.",
+      "tree": {
+        "sha": "7f5daf5fed00650b1c11441ddfc9b490e601dc98",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/git/trees/7f5daf5fed00650b1c11441ddfc9b490e601dc98"
+      },
+      "url": "https://api.github.com/repos/kaz-utashiro/greple/git/commits/838fd56a85f26ba2d33b72141575f7971d140124",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null
+      }
+    },
+    "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/838fd56a85f26ba2d33b72141575f7971d140124",
+    "html_url": "https://github.com/kaz-utashiro/greple/commit/838fd56a85f26ba2d33b72141575f7971d140124",
+    "comments_url": "https://api.github.com/repos/kaz-utashiro/greple/commits/838fd56a85f26ba2d33b72141575f7971d140124/comments",
+    "author": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "cb2d53a9c1861bc8d940f53c2a44767756d2e694",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/cb2d53a9c1861bc8d940f53c2a44767756d2e694",
+        "html_url": "https://github.com/kaz-utashiro/greple/commit/cb2d53a9c1861bc8d940f53c2a44767756d2e694"
+      }
+    ]
+  },
+  {
+    "sha": "cb2d53a9c1861bc8d940f53c2a44767756d2e694",
+    "node_id": "C_kwDOAN0ALNoAKGNiMmQ1M2E5YzE4NjFiYzhkOTQwZjUzYzJhNDQ3Njc3NTZkMmU2OTQ",
+    "commit": {
+      "author": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-16T08:57:53Z"
+      },
+      "committer": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-16T09:08:25Z"
+      },
+      "message": "Use greple-runner submodule for test.",
+      "tree": {
+        "sha": "44cf5de090d5d72c560c6feb9d4fdc239c78ecf1",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/git/trees/44cf5de090d5d72c560c6feb9d4fdc239c78ecf1"
+      },
+      "url": "https://api.github.com/repos/kaz-utashiro/greple/git/commits/cb2d53a9c1861bc8d940f53c2a44767756d2e694",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null
+      }
+    },
+    "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/cb2d53a9c1861bc8d940f53c2a44767756d2e694",
+    "html_url": "https://github.com/kaz-utashiro/greple/commit/cb2d53a9c1861bc8d940f53c2a44767756d2e694",
+    "comments_url": "https://api.github.com/repos/kaz-utashiro/greple/commits/cb2d53a9c1861bc8d940f53c2a44767756d2e694/comments",
+    "author": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "dec40d42f1a957f8ef25daf3969c4dc768906c86",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/dec40d42f1a957f8ef25daf3969c4dc768906c86",
+        "html_url": "https://github.com/kaz-utashiro/greple/commit/dec40d42f1a957f8ef25daf3969c4dc768906c86"
+      }
+    ]
+  },
+  {
+    "sha": "dec40d42f1a957f8ef25daf3969c4dc768906c86",
+    "node_id": "C_kwDOAN0ALNoAKGRlYzQwZDQyZjFhOTU3ZjhlZjI1ZGFmMzk2OWM0ZGM3Njg5MDZjODY",
+    "commit": {
+      "author": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-14T23:55:51Z"
+      },
+      "committer": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-14T23:55:51Z"
+      },
+      "message": "Use skip() to skip non-tty case.",
+      "tree": {
+        "sha": "7dc1e27122bb691fbce7abf50a6fb059123644cc",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/git/trees/7dc1e27122bb691fbce7abf50a6fb059123644cc"
+      },
+      "url": "https://api.github.com/repos/kaz-utashiro/greple/git/commits/dec40d42f1a957f8ef25daf3969c4dc768906c86",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null
+      }
+    },
+    "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/dec40d42f1a957f8ef25daf3969c4dc768906c86",
+    "html_url": "https://github.com/kaz-utashiro/greple/commit/dec40d42f1a957f8ef25daf3969c4dc768906c86",
+    "comments_url": "https://api.github.com/repos/kaz-utashiro/greple/commits/dec40d42f1a957f8ef25daf3969c4dc768906c86/comments",
+    "author": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "8c3b57aca5dfb53cab8f2cf20476bb7a358dd5d7",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/8c3b57aca5dfb53cab8f2cf20476bb7a358dd5d7",
+        "html_url": "https://github.com/kaz-utashiro/greple/commit/8c3b57aca5dfb53cab8f2cf20476bb7a358dd5d7"
+      }
+    ]
+  },
+  {
+    "sha": "8c3b57aca5dfb53cab8f2cf20476bb7a358dd5d7",
+    "node_id": "C_kwDOAN0ALNoAKDhjM2I1N2FjYTVkZmI1M2NhYjhmMmNmMjA0NzZiYjdhMzU4ZGQ1ZDc",
+    "commit": {
+      "author": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-13T13:13:31Z"
+      },
+      "committer": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-13T13:13:31Z"
+      },
+      "message": "Checking in changes prior to tagging of version 8.53.\n\nChangelog diff is:\n\ndiff --git a/Changes b/Changes\nindex ff6d44d..fd183b3 100644\n--- a/Changes\n+++ b/Changes\n@@ -2,6 +2,10 @@ Revision history for Perl application 'greple'.\n \n {{$NEXT}}\n \n+8.53 2021-12-13T13:12:47Z\n+\n+    - Functional --cm sub{...} works even if --nocolor option given.\n+\n 8.5205 2021-12-12T23:48:57Z\n \n     - Make t/11_block.t not to fail by TODO guard.",
+      "tree": {
+        "sha": "9cadb5bee2d93ee0ed0f6d4088fa0b4f77f5a2a3",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/git/trees/9cadb5bee2d93ee0ed0f6d4088fa0b4f77f5a2a3"
+      },
+      "url": "https://api.github.com/repos/kaz-utashiro/greple/git/commits/8c3b57aca5dfb53cab8f2cf20476bb7a358dd5d7",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null
+      }
+    },
+    "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/8c3b57aca5dfb53cab8f2cf20476bb7a358dd5d7",
+    "html_url": "https://github.com/kaz-utashiro/greple/commit/8c3b57aca5dfb53cab8f2cf20476bb7a358dd5d7",
+    "comments_url": "https://api.github.com/repos/kaz-utashiro/greple/commits/8c3b57aca5dfb53cab8f2cf20476bb7a358dd5d7/comments",
+    "author": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "04a735d9579962df14e17c734f40d31bdc9fb6ce",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/04a735d9579962df14e17c734f40d31bdc9fb6ce",
+        "html_url": "https://github.com/kaz-utashiro/greple/commit/04a735d9579962df14e17c734f40d31bdc9fb6ce"
+      }
+    ]
+  },
+  {
+    "sha": "04a735d9579962df14e17c734f40d31bdc9fb6ce",
+    "node_id": "C_kwDOAN0ALNoAKDA0YTczNWQ5NTc5OTYyZGYxNGUxN2M3MzRmNDBkMzFiZGM5ZmI2Y2U",
+    "commit": {
+      "author": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-13T12:50:28Z"
+      },
+      "committer": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-13T13:02:18Z"
+      },
+      "message": "Modify test code to check if stdout is a tty.",
+      "tree": {
+        "sha": "6149df3e97a6f6381d554a669e7c534c1710b20e",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/git/trees/6149df3e97a6f6381d554a669e7c534c1710b20e"
+      },
+      "url": "https://api.github.com/repos/kaz-utashiro/greple/git/commits/04a735d9579962df14e17c734f40d31bdc9fb6ce",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null
+      }
+    },
+    "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/04a735d9579962df14e17c734f40d31bdc9fb6ce",
+    "html_url": "https://github.com/kaz-utashiro/greple/commit/04a735d9579962df14e17c734f40d31bdc9fb6ce",
+    "comments_url": "https://api.github.com/repos/kaz-utashiro/greple/commits/04a735d9579962df14e17c734f40d31bdc9fb6ce/comments",
+    "author": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "08eefba68b6b161e130749ea3fd1f0cd8a454b6f",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/08eefba68b6b161e130749ea3fd1f0cd8a454b6f",
+        "html_url": "https://github.com/kaz-utashiro/greple/commit/08eefba68b6b161e130749ea3fd1f0cd8a454b6f"
+      }
+    ]
+  },
+  {
+    "sha": "08eefba68b6b161e130749ea3fd1f0cd8a454b6f",
+    "node_id": "C_kwDOAN0ALNoAKDA4ZWVmYmE2OGI2YjE2MWUxMzA3NDllYTNmZDFmMGNkOGE0NTRiNmY",
+    "commit": {
+      "author": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-13T12:23:20Z"
+      },
+      "committer": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-13T12:23:20Z"
+      },
+      "message": "Use $Getopt::EX::Colomap::NO_COLOR to disable color output.",
+      "tree": {
+        "sha": "397b8407579e02e93cd7c63bc7b088f5450ca6ba",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/git/trees/397b8407579e02e93cd7c63bc7b088f5450ca6ba"
+      },
+      "url": "https://api.github.com/repos/kaz-utashiro/greple/git/commits/08eefba68b6b161e130749ea3fd1f0cd8a454b6f",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null
+      }
+    },
+    "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/08eefba68b6b161e130749ea3fd1f0cd8a454b6f",
+    "html_url": "https://github.com/kaz-utashiro/greple/commit/08eefba68b6b161e130749ea3fd1f0cd8a454b6f",
+    "comments_url": "https://api.github.com/repos/kaz-utashiro/greple/commits/08eefba68b6b161e130749ea3fd1f0cd8a454b6f/comments",
+    "author": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "223fb36efbb46069ca0952a134715542accd297c",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/223fb36efbb46069ca0952a134715542accd297c",
+        "html_url": "https://github.com/kaz-utashiro/greple/commit/223fb36efbb46069ca0952a134715542accd297c"
+      }
+    ]
+  },
+  {
+    "sha": "223fb36efbb46069ca0952a134715542accd297c",
+    "node_id": "C_kwDOAN0ALNoAKDIyM2ZiMzZlZmJiNDYwNjljYTA5NTJhMTM0NzE1NTQyYWNjZDI5N2M",
+    "commit": {
+      "author": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-13T09:14:35Z"
+      },
+      "committer": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-13T09:14:35Z"
+      },
+      "message": "Remove unnecessary TODO from t/11.",
+      "tree": {
+        "sha": "9a1b51c7397239eb7a1706c9c59ff1a5b8956bf9",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/git/trees/9a1b51c7397239eb7a1706c9c59ff1a5b8956bf9"
+      },
+      "url": "https://api.github.com/repos/kaz-utashiro/greple/git/commits/223fb36efbb46069ca0952a134715542accd297c",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null
+      }
+    },
+    "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/223fb36efbb46069ca0952a134715542accd297c",
+    "html_url": "https://github.com/kaz-utashiro/greple/commit/223fb36efbb46069ca0952a134715542accd297c",
+    "comments_url": "https://api.github.com/repos/kaz-utashiro/greple/commits/223fb36efbb46069ca0952a134715542accd297c/comments",
+    "author": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "5a945c3ee3bf0228289cbfa84170cdaf7b63fe96",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/5a945c3ee3bf0228289cbfa84170cdaf7b63fe96",
+        "html_url": "https://github.com/kaz-utashiro/greple/commit/5a945c3ee3bf0228289cbfa84170cdaf7b63fe96"
+      }
+    ]
+  },
+  {
+    "sha": "5a945c3ee3bf0228289cbfa84170cdaf7b63fe96",
+    "node_id": "C_kwDOAN0ALNoAKDVhOTQ1YzNlZTNiZjAyMjgyODljYmZhODQxNzBjZGFmN2I2M2ZlOTY",
+    "commit": {
+      "author": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-12T23:55:23Z"
+      },
+      "committer": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-12T23:55:23Z"
+      },
+      "message": "Use --color=always in t/11_block.t.",
+      "tree": {
+        "sha": "9db2ebfdb376a95406d285728e0a59fd7eeaa5e9",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/git/trees/9db2ebfdb376a95406d285728e0a59fd7eeaa5e9"
+      },
+      "url": "https://api.github.com/repos/kaz-utashiro/greple/git/commits/5a945c3ee3bf0228289cbfa84170cdaf7b63fe96",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null
+      }
+    },
+    "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/5a945c3ee3bf0228289cbfa84170cdaf7b63fe96",
+    "html_url": "https://github.com/kaz-utashiro/greple/commit/5a945c3ee3bf0228289cbfa84170cdaf7b63fe96",
+    "comments_url": "https://api.github.com/repos/kaz-utashiro/greple/commits/5a945c3ee3bf0228289cbfa84170cdaf7b63fe96/comments",
+    "author": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "663031dfb629a1f5d24349ac670c6ce5d871a710",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/663031dfb629a1f5d24349ac670c6ce5d871a710",
+        "html_url": "https://github.com/kaz-utashiro/greple/commit/663031dfb629a1f5d24349ac670c6ce5d871a710"
+      }
+    ]
+  },
+  {
+    "sha": "663031dfb629a1f5d24349ac670c6ce5d871a710",
+    "node_id": "C_kwDOAN0ALNoAKDY2MzAzMWRmYjYyOWExZjVkMjQzNDlhYzY3MGM2Y2U1ZDg3MWE3MTA",
+    "commit": {
+      "author": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-12T23:49:48Z"
+      },
+      "committer": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-12T23:49:48Z"
+      },
+      "message": "Checking in changes prior to tagging of version 8.5205.\n\nChangelog diff is:\n\ndiff --git a/Changes b/Changes\nindex eb3c200..ff6d44d 100644\n--- a/Changes\n+++ b/Changes\n@@ -2,6 +2,11 @@ Revision history for Perl application 'greple'.\n \n {{$NEXT}}\n \n+8.5205 2021-12-12T23:48:57Z\n+\n+    - Make t/11_block.t not to fail by TODO guard.\n+    - Simplify handling shorter block algorithm.\n+\n 8.5204 2021-12-10T03:40:49Z\n \n     - Additional fix for shorter block.",
+      "tree": {
+        "sha": "96c4dbc91749604a4793ab4cc7e8707223fc964c",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/git/trees/96c4dbc91749604a4793ab4cc7e8707223fc964c"
+      },
+      "url": "https://api.github.com/repos/kaz-utashiro/greple/git/commits/663031dfb629a1f5d24349ac670c6ce5d871a710",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null
+      }
+    },
+    "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/663031dfb629a1f5d24349ac670c6ce5d871a710",
+    "html_url": "https://github.com/kaz-utashiro/greple/commit/663031dfb629a1f5d24349ac670c6ce5d871a710",
+    "comments_url": "https://api.github.com/repos/kaz-utashiro/greple/commits/663031dfb629a1f5d24349ac670c6ce5d871a710/comments",
+    "author": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "2550b122f17c18fdf8a634c646962aadeedf49e0",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/2550b122f17c18fdf8a634c646962aadeedf49e0",
+        "html_url": "https://github.com/kaz-utashiro/greple/commit/2550b122f17c18fdf8a634c646962aadeedf49e0"
+      }
+    ]
+  },
+  {
+    "sha": "2550b122f17c18fdf8a634c646962aadeedf49e0",
+    "node_id": "C_kwDOAN0ALNoAKDI1NTBiMTIyZjE3YzE4ZmRmOGE2MzRjNjQ2OTYyYWFkZWVkZjQ5ZTA",
+    "commit": {
+      "author": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-12T23:41:32Z"
+      },
+      "committer": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-12T23:41:32Z"
+      },
+      "message": "Simplify handling shorter block algorithm.",
+      "tree": {
+        "sha": "96181b59ec5bce5b4a32612003b71b96b5cccc89",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/git/trees/96181b59ec5bce5b4a32612003b71b96b5cccc89"
+      },
+      "url": "https://api.github.com/repos/kaz-utashiro/greple/git/commits/2550b122f17c18fdf8a634c646962aadeedf49e0",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null
+      }
+    },
+    "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/2550b122f17c18fdf8a634c646962aadeedf49e0",
+    "html_url": "https://github.com/kaz-utashiro/greple/commit/2550b122f17c18fdf8a634c646962aadeedf49e0",
+    "comments_url": "https://api.github.com/repos/kaz-utashiro/greple/commits/2550b122f17c18fdf8a634c646962aadeedf49e0/comments",
+    "author": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "de5649d8829b99208f0aff42d13822e666225a06",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/de5649d8829b99208f0aff42d13822e666225a06",
+        "html_url": "https://github.com/kaz-utashiro/greple/commit/de5649d8829b99208f0aff42d13822e666225a06"
+      }
+    ]
+  },
+  {
+    "sha": "de5649d8829b99208f0aff42d13822e666225a06",
+    "node_id": "C_kwDOAN0ALNoAKGRlNTY0OWQ4ODI5Yjk5MjA4ZjBhZmY0MmQxMzgyMmU2NjYyMjVhMDY",
+    "commit": {
+      "author": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-12T23:41:13Z"
+      },
+      "committer": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-12T23:41:13Z"
+      },
+      "message": "Make t/11_block.t not to fail by TODO guard.",
+      "tree": {
+        "sha": "99385d460d98699b3401344b999db0fef7dd6df8",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/git/trees/99385d460d98699b3401344b999db0fef7dd6df8"
+      },
+      "url": "https://api.github.com/repos/kaz-utashiro/greple/git/commits/de5649d8829b99208f0aff42d13822e666225a06",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null
+      }
+    },
+    "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/de5649d8829b99208f0aff42d13822e666225a06",
+    "html_url": "https://github.com/kaz-utashiro/greple/commit/de5649d8829b99208f0aff42d13822e666225a06",
+    "comments_url": "https://api.github.com/repos/kaz-utashiro/greple/commits/de5649d8829b99208f0aff42d13822e666225a06/comments",
+    "author": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "5658b085db3e6fbbf5a0760ef0c091d7573700d8",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/5658b085db3e6fbbf5a0760ef0c091d7573700d8",
+        "html_url": "https://github.com/kaz-utashiro/greple/commit/5658b085db3e6fbbf5a0760ef0c091d7573700d8"
+      }
+    ]
+  },
+  {
+    "sha": "5658b085db3e6fbbf5a0760ef0c091d7573700d8",
+    "node_id": "C_kwDOAN0ALNoAKDU2NThiMDg1ZGIzZTZmYmJmNWEwNzYwZWYwYzA5MWQ3NTczNzAwZDg",
+    "commit": {
+      "author": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-10T03:41:26Z"
+      },
+      "committer": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-10T03:41:26Z"
+      },
+      "message": "Checking in changes prior to tagging of version 8.5204.\n\nChangelog diff is:\n\ndiff --git a/Changes b/Changes\nindex 08847a7..eb3c200 100644\n--- a/Changes\n+++ b/Changes\n@@ -2,6 +2,10 @@ Revision history for Perl application 'greple'.\n \n {{$NEXT}}\n \n+8.5204 2021-12-10T03:40:49Z\n+\n+    - Additional fix for shorter block.\n+\n 8.5203 2021-12-10T00:18:07Z\n \n     - Update --le pattern option handling to keep order.",
+      "tree": {
+        "sha": "a7d513745b01845c70087b535a82a2d735a25597",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/git/trees/a7d513745b01845c70087b535a82a2d735a25597"
+      },
+      "url": "https://api.github.com/repos/kaz-utashiro/greple/git/commits/5658b085db3e6fbbf5a0760ef0c091d7573700d8",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null
+      }
+    },
+    "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/5658b085db3e6fbbf5a0760ef0c091d7573700d8",
+    "html_url": "https://github.com/kaz-utashiro/greple/commit/5658b085db3e6fbbf5a0760ef0c091d7573700d8",
+    "comments_url": "https://api.github.com/repos/kaz-utashiro/greple/commits/5658b085db3e6fbbf5a0760ef0c091d7573700d8/comments",
+    "author": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "aaa3d1991e4d610fb85f1d7f8f94d1a9e7343ba5",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/aaa3d1991e4d610fb85f1d7f8f94d1a9e7343ba5",
+        "html_url": "https://github.com/kaz-utashiro/greple/commit/aaa3d1991e4d610fb85f1d7f8f94d1a9e7343ba5"
+      }
+    ]
+  },
+  {
+    "sha": "aaa3d1991e4d610fb85f1d7f8f94d1a9e7343ba5",
+    "node_id": "C_kwDOAN0ALNoAKGFhYTNkMTk5MWU0ZDYxMGZiODVmMWQ3ZjhmOTRkMWE5ZTczNDNiYTU",
+    "commit": {
+      "author": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-10T03:32:14Z"
+      },
+      "committer": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-10T03:32:14Z"
+      },
+      "message": "Fix bug when matched pattern is longer than block.",
+      "tree": {
+        "sha": "954d3427af4e4800a7fae25afdf69e2393c604d1",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/git/trees/954d3427af4e4800a7fae25afdf69e2393c604d1"
+      },
+      "url": "https://api.github.com/repos/kaz-utashiro/greple/git/commits/aaa3d1991e4d610fb85f1d7f8f94d1a9e7343ba5",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null
+      }
+    },
+    "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/aaa3d1991e4d610fb85f1d7f8f94d1a9e7343ba5",
+    "html_url": "https://github.com/kaz-utashiro/greple/commit/aaa3d1991e4d610fb85f1d7f8f94d1a9e7343ba5",
+    "comments_url": "https://api.github.com/repos/kaz-utashiro/greple/commits/aaa3d1991e4d610fb85f1d7f8f94d1a9e7343ba5/comments",
+    "author": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "087de232cf10a63d69b8b30d98ed8e8f5e17438f",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/087de232cf10a63d69b8b30d98ed8e8f5e17438f",
+        "html_url": "https://github.com/kaz-utashiro/greple/commit/087de232cf10a63d69b8b30d98ed8e8f5e17438f"
+      }
+    ]
+  },
+  {
+    "sha": "087de232cf10a63d69b8b30d98ed8e8f5e17438f",
+    "node_id": "C_kwDOAN0ALNoAKDA4N2RlMjMyY2YxMGE2M2Q2OWI4YjMwZDk4ZWQ4ZThmNWUxNzQzOGY",
+    "commit": {
+      "author": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-10T02:28:48Z"
+      },
+      "committer": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-10T02:28:48Z"
+      },
+      "message": "Checking in changes prior to tagging of version 8.5203.\n\nChangelog diff is:\n\ndiff --git a/Changes b/Changes\nindex 33546bd..08847a7 100644\n--- a/Changes\n+++ b/Changes\n@@ -2,6 +2,11 @@ Revision history for Perl application 'greple'.\n \n {{$NEXT}}\n \n+8.5203 2021-12-10T00:18:07Z\n+\n+    - Update --le pattern option handling to keep order.\n+    - Fix bug with shorter block and add test code.\n+\n 8.5202 2021-12-09T02:09:44Z\n \n     - Enable m-modifier for --border pattern.",
+      "tree": {
+        "sha": "6e80580fa30da5eb6e9f7de070ee50eb290afec0",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/git/trees/6e80580fa30da5eb6e9f7de070ee50eb290afec0"
+      },
+      "url": "https://api.github.com/repos/kaz-utashiro/greple/git/commits/087de232cf10a63d69b8b30d98ed8e8f5e17438f",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null
+      }
+    },
+    "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/087de232cf10a63d69b8b30d98ed8e8f5e17438f",
+    "html_url": "https://github.com/kaz-utashiro/greple/commit/087de232cf10a63d69b8b30d98ed8e8f5e17438f",
+    "comments_url": "https://api.github.com/repos/kaz-utashiro/greple/commits/087de232cf10a63d69b8b30d98ed8e8f5e17438f/comments",
+    "author": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "dcf688eb6b73af63f5af16646a6bc37c372a1df6",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/dcf688eb6b73af63f5af16646a6bc37c372a1df6",
+        "html_url": "https://github.com/kaz-utashiro/greple/commit/dcf688eb6b73af63f5af16646a6bc37c372a1df6"
+      }
+    ]
+  },
+  {
+    "sha": "dcf688eb6b73af63f5af16646a6bc37c372a1df6",
+    "node_id": "C_kwDOAN0ALNoAKGRjZjY4OGViNmI3M2FmNjNmNWFmMTY2NDZhNmJjMzdjMzcyYTFkZjY",
+    "commit": {
+      "author": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-10T00:15:03Z"
+      },
+      "committer": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-10T00:15:03Z"
+      },
+      "message": "Fix bug in the case block is shorter than matched pattern.",
+      "tree": {
+        "sha": "0409b58877f3187e94b9623be53b7bf98f93ef23",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/git/trees/0409b58877f3187e94b9623be53b7bf98f93ef23"
+      },
+      "url": "https://api.github.com/repos/kaz-utashiro/greple/git/commits/dcf688eb6b73af63f5af16646a6bc37c372a1df6",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null
+      }
+    },
+    "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/dcf688eb6b73af63f5af16646a6bc37c372a1df6",
+    "html_url": "https://github.com/kaz-utashiro/greple/commit/dcf688eb6b73af63f5af16646a6bc37c372a1df6",
+    "comments_url": "https://api.github.com/repos/kaz-utashiro/greple/commits/dcf688eb6b73af63f5af16646a6bc37c372a1df6/comments",
+    "author": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "af8ef8f07b21a0c02a66d7a86bb14195217763fa",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/af8ef8f07b21a0c02a66d7a86bb14195217763fa",
+        "html_url": "https://github.com/kaz-utashiro/greple/commit/af8ef8f07b21a0c02a66d7a86bb14195217763fa"
+      }
+    ]
+  },
+  {
+    "sha": "af8ef8f07b21a0c02a66d7a86bb14195217763fa",
+    "node_id": "C_kwDOAN0ALNoAKGFmOGVmOGYwN2IyMWEwYzAyYTY2ZDdhODZiYjE0MTk1MjE3NzYzZmE",
+    "commit": {
+      "author": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-09T08:06:34Z"
+      },
+      "committer": {
+        "name": "Kazumasa Utashiro",
+        "email": "kaz@utashiro.com",
+        "date": "2021-12-09T08:06:34Z"
+      },
+      "message": "Update --le pattern option handling to keep order.",
+      "tree": {
+        "sha": "2cc6e225758892206c3892f8e47a3524b79a6ffe",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/git/trees/2cc6e225758892206c3892f8e47a3524b79a6ffe"
+      },
+      "url": "https://api.github.com/repos/kaz-utashiro/greple/git/commits/af8ef8f07b21a0c02a66d7a86bb14195217763fa",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null
+      }
+    },
+    "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/af8ef8f07b21a0c02a66d7a86bb14195217763fa",
+    "html_url": "https://github.com/kaz-utashiro/greple/commit/af8ef8f07b21a0c02a66d7a86bb14195217763fa",
+    "comments_url": "https://api.github.com/repos/kaz-utashiro/greple/commits/af8ef8f07b21a0c02a66d7a86bb14195217763fa/comments",
+    "author": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "kaz-utashiro",
+      "id": 869167,
+      "node_id": "MDQ6VXNlcjg2OTE2Nw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/869167?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kaz-utashiro",
+      "html_url": "https://github.com/kaz-utashiro",
+      "followers_url": "https://api.github.com/users/kaz-utashiro/followers",
+      "following_url": "https://api.github.com/users/kaz-utashiro/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kaz-utashiro/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kaz-utashiro/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kaz-utashiro/subscriptions",
+      "organizations_url": "https://api.github.com/users/kaz-utashiro/orgs",
+      "repos_url": "https://api.github.com/users/kaz-utashiro/repos",
+      "events_url": "https://api.github.com/users/kaz-utashiro/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kaz-utashiro/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "5653e92209ece673f606fa71dbbdecfcdbb11690",
+        "url": "https://api.github.com/repos/kaz-utashiro/greple/commits/5653e92209ece673f606fa71dbbdecfcdbb11690",
+        "html_url": "https://github.com/kaz-utashiro/greple/commit/5653e92209ece673f606fa71dbbdecfcdbb11690"
+      }
+    ]
+  }
+]

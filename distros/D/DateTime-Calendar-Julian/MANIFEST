@@ -9,6 +9,7 @@ README
 t/1.t
 t/4doy.t
 t/5week.t
+t/6quarter.t
 xt/author/basic.t
 xt/author/changes.t
 xt/author/critic.t

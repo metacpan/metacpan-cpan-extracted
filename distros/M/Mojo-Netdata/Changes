@@ -1,4 +1,25 @@
 Revision history for perl distribution Mojo-Netdata
 
+0.03 2022-01-31T11:34:51+0900
+ - Add support for custom "user_agent" name
+ - Add support for "via" in the HTTP collector config
+ - Logging more details on failed HTTP request
+ - Changed logf() to serialize references
+
+0.02 2022-01-30T17:56:13+0900
+ - Add support for reading config from /etc/netdata/mojo.conf.d/
+ - Renamed "class" key with "collector"
+ - Rewrote the HTTP collector
+   * Add support for custom "dimension" name
+   * Changed "jobs" into an array-ref
+   * Removed support for "direct_ip"
+   * The "Host" header can be used as default "family"
+ - Improved default context() for Mojo::Netdata::Chart
+   to make it easier to define alarms using "template"
+ - Removed context() from Mojo::Netdata::Collector
+
 0.01 2022-01-27T11:30:42+0900
- - Started project
+ - Add Mojo::Netdata
+ - Add Mojo::Netdata::Chart
+ - Add Mojo::Netdata::Collector
+ - Add Mojo::Netdata::Collector::HTTP

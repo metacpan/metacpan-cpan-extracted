@@ -6,7 +6,7 @@ use warnings;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-01-16'; # DATE
 our $DIST = 'Log-ger-Output-Screen'; # DIST
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 if ($^O eq 'MSWin32') {
     eval { require Win32::Console::ANSI };
@@ -129,7 +129,6 @@ sub get_hooks {
                         my $line_color = _pick_color($level, $color_depth);
 
                         if ($plugin_conf{colorize_tags}) {
-
                             my $prog_prefix;
                             if ($msg =~ s/\A([\w-]+:?\s*)//) {
                                 $prog_prefix = $1;
@@ -142,15 +141,17 @@ sub get_hooks {
                             #use DD; dd {msg=>$msg, tags=>\@tags, prog_prefix=>$prog_prefix};
                             print $handle $line_color, $prog_prefix, "\e[0m" if defined $prog_prefix;
                             for my $i (0 .. $#tags) {
-                                print $handle $line_color, "[", "\e[0m";
                                 # XXX force ansifg() to use the same color depth as us
-                                print $handle Color::ANSI::Util::ansifg( Color::RGB::Util::assign_rgb_light_color($tags[$i]) ), $tags[$i], "\e[0m", $line_color, "[", $seps[$i];
+                                print $handle (
+                                    $line_color, "[", "\e[0m",
+                                    Color::ANSI::Util::ansifg( Color::RGB::Util::assign_rgb_light_color($tags[$i]) ), $tags[$i], "\e[0m",
+                                    $line_color, "]", $seps[$i], "\e[0m",
+                                );
                             }
-                            print $handle $line_color, $msg, "\e[0m";
-
-                        } else {
-                            print $handle $line_color, $msg, "\e[0m";
                         }
+
+                        print $handle $line_color, $msg, "\e[0m";
+
                     } else {
                         print $handle $msg;
                     }
@@ -176,7 +177,7 @@ Log::ger::Output::Screen - Output log to screen
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -224,7 +225,7 @@ environment variable contains the string C<256color>; if yes then 256. Otherwise
 
 Bool, default false. Experimental. If set to true, will colorize "[...]" tag
 prefixes in log message with unique RGB color. Will only do this if color is
-enabled, obviously.
+enabled, obviously. This option is inspired by Dist::Zilla terminal output.
 
 For example, if log message is something like one of the following:
 

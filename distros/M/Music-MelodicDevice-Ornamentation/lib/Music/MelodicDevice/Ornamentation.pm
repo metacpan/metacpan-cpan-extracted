@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Chromatic and diatonic melodic ornamentation
 
-our $VERSION = '0.0602';
+our $VERSION = '0.0603';
 
 use Carp qw(croak);
 use Data::Dumper::Compact qw(ddc);
@@ -224,7 +224,7 @@ Music::MelodicDevice::Ornamentation - Chromatic and diatonic melodic ornamentati
 
 =head1 VERSION
 
-version 0.0602
+version 0.0603
 
 =head1 SYNOPSIS
 
@@ -235,7 +235,7 @@ version 0.0602
   $md = Music::MelodicDevice::Ornamentation->new( # diatonic
     scale_note => 'C',
     scale_name => 'major',
-    verbose => 1,
+    verbose    => 1,
   );
 
   my $spec = $md->grace_note('qn', 'D5', -1);
@@ -250,18 +250,15 @@ C<Music::MelodicDevice::Ornamentation> provides chromatic and diatonic
 musical melodic ornamentation methods.
 
 Each returns a note-set specification.  This specification is a list
-of two part array-references: a B<duration> and a B<pitch>.  The list
-B<duration> component is a division of the given duration argument,
-and is based on the arithmetic of each ornament.  The list B<pitch>
-can vary around the given pitch argument by the given offset, and also
-depends on the particular ornament re-phrasing.
+of two part array-references: a B<duration> and a B<pitch>.
 
 Since the point is likely to use MIDI-Perl to render these ornaments,
 to audio, it is handy to know that the pitches in these specifications
-can be translated to a readable format like this:
+can be translated with the L<MIDI::Util> C<midi_format> function:
 
-  $spec = [ map { [ MIDI::Util::midi_format(@$_) ] } @$spec ];
-  $score->n(@$_) for @$spec;
+  my @spec = ([qw(en C4)], [qw(sn C#4)], [qw(qn D4)], ...);
+  @spec = map { [ MIDI::Util::midi_format(@$_) ] } @spec;
+  $score->n(@$_) for @spec;
 
 =head1 ATTRIBUTES
 
@@ -292,7 +289,7 @@ Show the progress of the methods.
   $x = Music::MelodicDevice::Ornamentation->new(
     scale_note => $scale_note,
     scale_name => $scale_name,
-    verbose => $verbose,
+    verbose    => $verbose,
   );
 
 Create a new C<Music::MelodicDevice::Ornamentation> object.
@@ -303,8 +300,8 @@ Create a new C<Music::MelodicDevice::Ornamentation> object.
 
 Default offset: C<1>
 
-I believe that "appoggiatura" means emphasis on the grace note, and
-"acciaccatura" means emphasis on the principle note.  This module
+NB: I believe that "appoggiatura" means emphasis on the grace note,
+and "acciaccatura" means emphasis on the principle note.  This module
 doesn't accent notes.  You'll have to do that bit.
 
 =head2 turn
@@ -314,8 +311,12 @@ doesn't accent notes.  You'll have to do that bit.
 The note C<Above>, the C<Principle> note (the B<pitch>), the note
 C<Below>, followed by the C<Principle> note again.
 
-The default B<offset> is C<1>, but if given as C<-1>, the turn is
-"inverted" and goes: C<Below>, C<Principle>, C<Above>, C<Principle>.
+For example: C<D4 C4 B3 C4> (where C<C4> is the Principle note)
+
+Default offset: C<1>
+
+But if the offset is given as C<-1>, the turn is "inverted" and goes:
+C<Below>, C<Principle>, C<Above>, C<Principle>.
 
 =head2 trill
 
@@ -336,8 +337,10 @@ Default offset: C<1>
 "A rapid alternation between an indicated note [the B<pitch>], the
 note above or below, and the indicated note again."
 
-An B<offset> of C<1> (the default) returns an upper mordent one pitch
-away.  An B<offset> of C<-1> returns a lower mordent.
+Default offset: C<1>
+
+An B<offset> of C<1> returns an upper mordent one pitch away.  An
+B<offset> of C<-1> returns a lower mordent.
 
 So if the B<pitch> is C<D5>, a diatonic upper mordent, in say C major,
 would be C<D5 E5 D5>.  A chromatic lower mordent would be C<D5 C#5 D5>.
@@ -380,7 +383,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Gene Boggs.
+This software is copyright (c) 2022 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

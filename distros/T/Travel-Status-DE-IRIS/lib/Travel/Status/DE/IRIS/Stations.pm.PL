@@ -10,6 +10,9 @@ use JSON;
 my $json_str = read_file('share/stations.json');
 my $stations = JSON->new->utf8->decode($json_str);
 
+my $meta_str = read_file('share/meta.json');
+my $meta     = JSON->new->utf8->decode($meta_str);
+
 my $buf = <<'EOF';
 package Travel::Status::DE::IRIS::Stations;
 
@@ -40,7 +43,7 @@ use Text::LevenshteinXS qw(distance);
 
 # TODO switch to Text::Levenshtein::XS once AUR/Debian packages become available
 
-our $VERSION = '1.63';
+our $VERSION = '1.64';
 
 # Automatically generated, see share/stations.json
 my @stations = (
@@ -64,8 +67,26 @@ for my $station ( @{$stations} ) {
 $buf .= <<'EOF';
 );
 
+# Automatically generated, see share/meta.json
+my $meta = {
+EOF
+
+for my $eva (keys %{$meta}) {
+	$buf .= sprintf("%s => [%s],\n",
+		$eva,
+		join(q{,}, @{$meta->{$eva}})
+	);
+}
+
+$buf .= <<'EOF';
+};
+
 sub get_stations {
 	return @stations;
+}
+
+sub get_meta {
+	return $meta;
 }
 
 sub normalize {
@@ -214,7 +235,7 @@ Travel::Status::DE::IRIS::Stations - Station name to station code mapping
 
 =head1 VERSION
 
-version 1.63
+version 1.64
 
 =head1 DESCRIPTION
 

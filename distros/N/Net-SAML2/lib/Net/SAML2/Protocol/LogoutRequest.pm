@@ -11,12 +11,12 @@ with 'Net::SAML2::Role::ProtocolMessage';
 
 # ABSTRACT: SAML2 LogoutRequest Protocol object
 
-our $VERSION = '0.49';
+our $VERSION = '0.52';
 
 
 has 'session'       => (isa => NonEmptySimpleStr, is => 'ro', required => 1);
 has 'nameid'        => (isa => NonEmptySimpleStr, is => 'ro', required => 1);
-has 'nameid_format' => (isa => NonEmptySimpleStr, is => 'ro', required => 1);
+has 'nameid_format' => (isa => NonEmptySimpleStr, is => 'ro', required => 0);
 has 'destination'   => (isa => NonEmptySimpleStr, is => 'ro', required => 0);
 
 
@@ -29,13 +29,19 @@ sub new_from_xml {
     $xpath->registerNs('saml', 'urn:oasis:names:tc:SAML:2.0:assertion');
     $xpath->registerNs('samlp', 'urn:oasis:names:tc:SAML:2.0:protocol');
 
-    my $self = $class->new(
+    my %params = (
         id            => $xpath->findvalue('/samlp:LogoutRequest/@ID'),
         session       => $xpath->findvalue('/samlp:LogoutRequest/samlp:SessionIndex'),
         issuer        => $xpath->findvalue('/samlp:LogoutRequest/saml:Issuer'),
         nameid        => $xpath->findvalue('/samlp:LogoutRequest/saml:NameID'),
-        nameid_format => $xpath->findvalue('/samlp:LogoutRequest/saml:NameID/@Format'),
-        destination   => $xpath->findvalue('/samlp:LogoutRequest/saml:NameID/@NameQualifier'),
+        destination   => $xpath->findvalue('/samlp:LogoutRequest/@Destination'),
+    );
+
+    my $nameid_format = $xpath->findvalue('/samlp:LogoutRequest/saml:NameID/@Format');
+    if ( $nameid_format ne '' ) { $params{nameid_format} = $nameid_format; }
+
+    my $self = $class->new(
+        %params
     );
 
     return $self;
@@ -89,7 +95,7 @@ Net::SAML2::Protocol::LogoutRequest - SAML2 LogoutRequest Protocol object
 
 =head1 VERSION
 
-version 0.49
+version 0.52
 
 =head1 SYNOPSIS
 
@@ -161,7 +167,7 @@ Chris Andrews  <chrisa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Chris Andrews and Others, see the git log.
+This software is copyright (c) 2022 by Chris Andrews and Others, see the git log.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

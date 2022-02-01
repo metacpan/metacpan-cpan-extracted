@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use UI::Various::core;
 use UI::Various::Check;
@@ -102,7 +102,7 @@ sub _prepare($$$)
 			  # no automatic dereference:
 			  local $_ = $self->{var};
 			  $$_ = $self->_cui->get;
-			  $self->_reference($_);
+			  $self->_reference($_, 1);
 		      }));
     return 0;
 }
@@ -124,6 +124,8 @@ Update the UI element after an external change of its SCALAR reference.
 sub _update($)
 {
     my ($self) = @_;
+    debug(4, __PACKAGE__, '::_update ', $self->_cid,
+	  ' with', (defined $self->_cui ? '' : 'out'), ' _cui');
     $self->_cui  and  $self->_cui->toggle;
 }
 

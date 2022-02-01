@@ -24,6 +24,7 @@ sub finish ($self) {
     tags            => $self->tags,
     timestamp       => $self->timestamp,
     transaction     => $self->name,
+    request         => $self->request,
     type            => 'transaction',
   );
 

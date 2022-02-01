@@ -20,6 +20,7 @@ t/022-declare-unique.t
 t/030-psgi.t
 t/040-histogram.t
 t/041-enum.t
+t/050-warn-undef.t
 t/100-shared.t
 t/110-store-stress.t
 t/150-init-file.pl

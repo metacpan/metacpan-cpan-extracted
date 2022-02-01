@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-MinimumPerlFast
 
+0.005     2022-01-29 00:21:37+01:00 Europe/Amsterdam
+          - Fix bug in minimum perl detection in build/test files
+
 0.004     2021-01-24 11:55:58+01:00 Europe/Amsterdam
           - Skip non-perl files in t/
           - Add config-finder argument

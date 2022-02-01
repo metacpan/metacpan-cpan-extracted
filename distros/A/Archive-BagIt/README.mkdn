@@ -4,7 +4,7 @@ Archive::BagIt - The main module to handle bags.
 
 # VERSION
 
-version 0.089
+version 0.091
 
 # NAME
 
@@ -356,7 +356,7 @@ Triggers loading of an existing bag
 A method to verify a bag deeply. If `$opts` is set with `{return_all_errors}` all fixity errors are reported.
 The default ist to croak with error message if any error is detected.
 
-HINT: You might also want to check Archive::BagIt::Fast to see a more direct way of accessing files (and thus faster).
+HINT: You might also want to check [Archive::BagIt::Fast](https://metacpan.org/pod/Archive%3A%3ABagIt%3A%3AFast) to see a more direct way of accessing files (and thus faster).
 
 ## calc\_payload\_oxum()
 

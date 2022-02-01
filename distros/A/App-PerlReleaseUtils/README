@@ -1,0 +1,108 @@
+NAME
+    App::PerlReleaseUtils - Collection of utilities related to Perl
+    distribution releases
+
+VERSION
+    This document describes version 0.001 of App::PerlReleaseUtils (from
+    Perl distribution App-PerlReleaseUtils), released on 2021-07-27.
+
+SYNOPSIS
+    This distribution provides the following command-line utilities related
+    to Perl distribution releases:
+
+    *   grep-perl-release
+
+FUNCTIONS
+  grep_perl_release
+    Usage:
+
+     grep_perl_release(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   exclude_latest_versions => *posint*
+
+        Exclude latest N version(s) of each dist.
+
+    *   include_dev_release => *bool* (default: 1)
+
+    *   include_latest_versions => *posint*
+
+        Only include latest N version(s) of each dist.
+
+    *   include_nondev_release => *bool* (default: 1)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+FAQ
+  What is the purpose of this distribution? Haven't other similar utilities existed?
+    For example, mpath from Module::Path distribution is similar to pmpath
+    in App::PMUtils, and mversion from Module::Version distribution is
+    similar to pmversion from App::PMUtils distribution, and so on.
+
+    True. The main point of these utilities is shell tab completion, to save
+    typing.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-PerlReleaseUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-PerlReleaseUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-PerlReleaseUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Below is the list of distributions that provide CLI utilities for
+    various purposes, with the focus on providing shell tab completion
+    feature.
+
+    App::DistUtils, utilities related to Perl distributions.
+
+    App::DzilUtils, utilities related to Dist::Zilla.
+
+    App::GitUtils, utilities related to git.
+
+    App::IODUtils, utilities related to IOD configuration files.
+
+    App::LedgerUtils, utilities related to Ledger CLI files.
+
+    App::PerlReleaseUtils, utilities related to Perl distribution releases.
+
+    App::PlUtils, utilities related to Perl scripts.
+
+    App::PMUtils, utilities related to Perl modules.
+
+    App::ProgUtils, utilities related to programs.
+
+    App::WeaverUtils, utilities related to Pod::Weaver.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

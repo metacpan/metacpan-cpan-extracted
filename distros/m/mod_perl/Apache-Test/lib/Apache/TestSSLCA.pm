@@ -423,7 +423,7 @@ sub hash_certs {
 
     for my $file ($dh->read) {
         next unless $file =~ /\.cr[tl]$/;
-        chomp(my $hash = `openssl $type -noout -hash < $file`);
+        chomp(my $hash = `$openssl $type -noout -hash < $file`);
         next unless $hash;
         my $symlink = "$hash.r$n";
         $n++;

@@ -1,3 +1,9 @@
+0.180   2022-01-16  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] [cli testcomp] Enable Log::ger::Output::Screen's
+          colorize_tags option.
+
+
 0.17    2020-04-16  Released-By: PERLANCAR; Urgency: medium
 
 	- testcomp: Avoid quoting '--foo=bar' so Complete::Bash's breaking

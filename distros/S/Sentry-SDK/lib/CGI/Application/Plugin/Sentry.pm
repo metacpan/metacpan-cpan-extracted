@@ -44,8 +44,9 @@ CGI::Application->add_callback(
 
     my $method      = $c->query->request_method;
     my $transaction = Sentry::SDK->start_transaction(
-      { name => "$method $rm", op => 'http.server', },
       {
+        name    => "$method $rm",
+        op      => 'http.server',
         request => {
           url     => $request_uri,
           method  => $method,
@@ -53,7 +54,7 @@ CGI::Application->add_callback(
           headers => { map { $_ => $c->query->http($_) } $c->query->http },
           env     => \%ENV,
         }
-      }
+      },
     );
 
     $c->param('__sentry__transaction', $transaction);

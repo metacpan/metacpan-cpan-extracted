@@ -40,7 +40,6 @@ t/13_max.t
 t/14_no_color.t
 t/Checker.pm
 t/JA.txt
-t/Runner.pm
 t/SAMPLE.txt
 t/Util.pm
 t/line/00_load.t
@@ -49,5 +48,7 @@ t/pod-coverage.t
 t/pod.t
 t/select/00_load.t
 t/select/01_select.t
+t/runner/README.md
+t/runner/Runner.pm
 META.yml
 MANIFEST

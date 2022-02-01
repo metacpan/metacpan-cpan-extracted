@@ -1,0 +1,98 @@
+{
+    "value": [
+        { 
+            "from": {
+                "emailAddress": {
+                    "address": "at@example.tlf",
+                    "name": "Aaron Testing"
+                }
+            },
+            "bodyPreview": "this is yet another test ticket again",
+            "flag": {
+                "flagStatus": "notFlagged"
+            },
+            "categories": [],
+            "replyTo": [],
+            "conversationIndex": "xxxxxx==",
+            "subject": "yet another test ticket again",
+            "conversationId": "xxxxxxxxxxxxxx=",
+            "ccRecipients": [],
+            "toRecipients": [
+                {
+                    "emailAddress": {
+                        "address": "rtdev@example.tld",
+                        "name": "rt dev"
+                    }
+                }
+            ],
+            "@odata.etag": "W/xxxx",
+            "receivedDateTime": "2020-06-01T15:10:57Z",
+            "id": "xxxxxxxxabc1",
+            "webLink": "https://outlook.office365.com/owa/?ItemID=zzzzzzzz&exvsurl=1&viewmodel=ReadMessageItem",
+            "sentDateTime": "2020-06-01T15:10:52Z",
+            "inferenceClassification": "focused",
+            "sender": {
+                "emailAddress": {
+                    "address": "at@example.tlf",
+                    "name": "Aaron Testing"
+                }
+            },
+            "body": {
+                "contentType": "text",
+                "content": "this is yet another test ticket again"
+            },
+
+            "createdDateTime": "2020-06-01T15:10:57Z",
+            "importance": "normal",
+            "lastModifiedDateTime": "2020-06-02T14:58:25Z",
+            "parentFolderId": "xxxxxxxxxx",
+            "bccRecipients": []
+        },
+        {
+            "bodyPreview": "this is a test ticket to test pagination",
+            "flag": {
+                "flagStatus": "notFlagged"
+            },
+            "from": {
+                "emailAddress": {
+                    "address": "at@example.tlf",
+                    "name": "Aaron Testing"
+                }
+            },
+            "conversationId": "xxxxxxxxxxxxxxxxxxxxxxxxxx=",
+            "categories": [],
+            "replyTo": [],
+            "conversationIndex": "xxxxxxxxxxxxxxxxx==",
+            "subject": "a test ticket",
+            "sentDateTime": "2020-06-01T15:10:27Z",
+            "inferenceClassification": "focused",
+            "receivedDateTime": "2020-06-01T15:10:33Z",
+            "id": "xxxxxxxxxxxxxxxxxxxxabc2=",
+            "toRecipients": [
+                {
+                    "emailAddress": {
+                        "name": "rt dev",
+                        "address": "rtdev@example.tld"
+                    }
+                }
+            ],
+            "@odata.etag": "W/xxxxxxxxxxxxxxxxxx",
+            "ccRecipients": [],
+            "bccRecipients": [],
+            "parentFolderId": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=",
+            "importance": "normal",
+            "lastModifiedDateTime": "2020-06-01T15:10:33Z",
+            "createdDateTime": "2020-06-01T15:10:33Z",
+            "sender": {
+                "emailAddress": {
+                    "address": "at@example.tlf",
+                    "name": "Aaron Testing"
+                }
+            },
+            "body": {
+                "content": "this is a test ticket to test pagination",
+                "contentType": "text"
+            }
+        }
+    ]
+}

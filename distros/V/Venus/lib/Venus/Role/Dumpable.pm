@@ -123,7 +123,9 @@ This package provides the following methods:
 
   dump(Str | CodeRef $method, Any @args) (Str)
 
-The dump method returns a string representation of the underlying data.
+The dump method returns a string representation of the underlying data. This
+method supports dispatching, i.e. providing a method name and arguments whose
+return value will be acted on by this method.
 
 I<Since C<0.01>>
 
@@ -148,7 +150,9 @@ I<Since C<0.01>>
   dump_pretty(Str | CodeRef $method, Any @args) (Str)
 
 The dump_pretty method returns a string representation of the underlying data
-that is human-readable and useful for debugging.
+that is human-readable and useful for debugging. This method supports
+dispatching, i.e. providing a method name and arguments whose return value will
+be acted on by this method.
 
 I<Since C<0.01>>
 

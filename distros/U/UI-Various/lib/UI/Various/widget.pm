@@ -33,6 +33,9 @@ B<ro> attributes can only be read and not modified.
 
 B<optional> attributes may be empty or C<undef>.
 
+B<recommended> attributes may be empty or C<undef>, but it is advisable to
+give them a proper value.
+
 B<inherited> attributes may be undefined, but if they are read, a possible
 value will be searched for all the hierarchy up to either the L<main "Window
 Manager"|UI::Various::Main> object or the top-level
@@ -51,7 +54,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use UI::Various::core;
 
@@ -66,6 +69,10 @@ our @EXPORT_OK = qw();
 preferred (maximum) height of a UI element in (approximately) characters,
 should not exceed L<max_height of main "Window Manager"
 |UI::Various::Main/max_height ro>
+
+Be careful with small height values as this could lead to undisplayed or
+even discarded UI elements in some of the possible UIs.  If this is the main
+window, the application could be immediately exited!
 
 =cut
 

@@ -137,15 +137,16 @@ C        c. Change the real declarations to double precision.
 C
 C  DECLARE ARGUMENTS.
 C
-      INTEGER  N, INCFD, ISMON(N), IERR
+      implicit integer*8(i-n)
+      INTEGER*8  N, INCFD, ISMON(N), IERR
       REAL  X(N), F(INCFD,N), D(INCFD,N)
       LOGICAL  SKIP
 C
 C  DECLARE LOCAL VARIABLES.
 C
-      INTEGER  I, NSEG
+      INTEGER*8  I, NSEG
       REAL  DELTA
-      INTEGER  CHFCM
+      INTEGER*8  CHFCM
 C
 C  VALIDITY-CHECK ARGUMENTS.
 C
@@ -199,7 +200,11 @@ C                 This interval has opposite sense from curve so far.
                ELSE
 C                 At this point, both are nonzero with same sign, and
 C                 we have already eliminated case both +-1.
-                  ISMON(N) = ISIGN (3, ISMON(N))
+                  IF ( ISMON(N).LT.0 ) THEN
+                      ISMON(N) = -3
+                  ELSE
+                      ISMON(N) = 3
+                  END IF
                ENDIF
             ENDIF
          ENDIF

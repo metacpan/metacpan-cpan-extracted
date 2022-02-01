@@ -3,10 +3,9 @@ package
 
 use strict;
 use warnings;
-use base qw( Device::Chip::Adapter );
 use Carp qw/croak/;
 
-our $VERSION = '0.00006';
+our $VERSION = '0.00008';
 
 use Carp;
 

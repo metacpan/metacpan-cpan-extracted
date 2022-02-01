@@ -6,8 +6,6 @@ use warnings;
 
 #  avoid loading too much, especially into our name space
 use PDL::Lite '2.012';
-#use PDL;
-use PDL::NiceSlice;
 
 #  this is otherwise not loaded due to oddities with multiple loading of PDL::Lite
 #*pdl = \&PDL::Core::pdl;
@@ -18,7 +16,7 @@ use PDL::NiceSlice;
 
 ## no critic (ProhibitExplicitReturnUndef)
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use parent 'Statistics::Descriptive::PDL::Weighted';
 
@@ -63,8 +61,8 @@ sub _median {
     #  two values then we need to interpolate
     my $median
       = $target_wt == $cumsum->at($idx)
-      ? ($piddle($idx) + $piddle($idx+1)) / 2
-      : $piddle($idx);
+      ? ($piddle->at($idx) + $piddle->at($idx+1)) / 2
+      : $piddle->at($idx);
 
     return $median;
 }

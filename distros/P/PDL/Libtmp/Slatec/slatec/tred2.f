@@ -64,7 +64,8 @@ C   891214  Prologue converted to Version 4.0 format.  (BAB)
 C   920501  Reformatted the REFERENCES section.  (WRB)
 C***END PROLOGUE  TRED2
 C
-      INTEGER I,J,K,L,N,II,NM,JP1
+      implicit integer*8(i-n)
+      INTEGER*8 I,J,K,L,N,II,NM,JP1
       REAL A(NM,*),D(*),E(*),Z(NM,*)
       REAL F,G,H,HH,SCALE
 C

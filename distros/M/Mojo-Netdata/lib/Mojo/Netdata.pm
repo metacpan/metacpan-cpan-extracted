@@ -5,7 +5,7 @@ use IO::Handle;
 use Mojo::File qw(path);
 use Mojo::Netdata::Util qw(logf);
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 has collectors       => sub ($self) { $self->_build_collectors };
 has config           => sub ($self) { $self->_build_config };
@@ -27,19 +27,30 @@ sub start ($self) {
 }
 
 sub _build_config ($self) {
+  my $config = {};
+
   my $file = path($self->user_config_dir, 'mojo.conf.pl')->to_abs;
-  unless (-r $file) {
-    logf(warnings => 'Config file "%s" could not be read.', $file);
-    return {};
+  if (-r $file) {
+    logf(debug => 'Loading config file %s into config().', $file);
+    $config = _eval_file($file);
   }
 
-  local $@;
-  my $config
-    = eval 'package Mojo::Netdata::Config; no warnings; use Mojo::Base -strict;' . $file->slurp;
-  return $config if $config;
+  my $conf_d = path($self->user_config_dir, 'mojo.conf.d')->to_abs->list->sort;
+  for my $file ($conf_d->each) {
+    next unless $file->basename =~ m!\.conf\.pl$!;
+    next unless my $d = _eval_file($file);
 
-  logf(error => 'Config file "%s" is invalid: %s', $file, $@);
-  return {};
+    if ($d->{collector}) {
+      logf(debug => 'Adding config file %s to "collectors".', $file);
+      push @{$config->{collectors}}, $d;
+    }
+    else {
+      logf(debug => 'Merging config file %s into config().', $file);
+      @$config{keys(%$d)} = values %$d;
+    }
+  }
+
+  return $config;
 }
 
 sub _build_collectors ($self) {
@@ -49,7 +60,7 @@ sub _build_collectors ($self) {
   local $@;
   my @collectors;
   for my $collector_config (@{$self->config->{collectors} || []}) {
-    my $collector_class = $collector_config->{class};
+    my $collector_class = $collector_config->{collector};
 
     unless ($collector_class and $collector_class =~ m!^[\w:]+$!) {
       logf(error => 'Invalid collector_class %s', $collector_class || 'missing');
@@ -62,11 +73,19 @@ sub _build_collectors ($self) {
 
     next unless my $collector = $collector_class->new->register($collector_config, $self);
     $collector->on(stdout => sub ($collector, $str) { $fh->print($str) });
-    logf(info => 'Loaded and set up %s', $collector_class);
+    logf(debug => 'Loaded and set up %s', $collector_class);
     push @collectors, $collector;
   }
 
   return \@collectors;
+}
+
+sub _eval_file ($file) {
+  local $@;
+  my $prefix = 'package Mojo::Netdata::Config; no warnings; use Mojo::Base -strict;';
+  my $config = eval $prefix . $file->slurp;
+  logf(error => 'Config file "%s" is invalid: %s', $file, $@) if $@;
+  return $config;
 }
 
 1;
@@ -89,20 +108,29 @@ Mojo::Netdata - https://netdata.cloud plugin for Perl
   # See "Config file" below for information on what to place inside mojo.conf.pl
   $EDITOR /etc/netdata/mojo.conf.pl
 
-=head2 Config file
+=head2 Config files
 
-The config file is by default located in C</etc/netdata/mojo.conf.pl>. It is a
-plain Perl file, which means you can define variables and call functions. The
-only important part is that the last statement in the file I<must> be a
-hash-ref that looks like this:
+The config files are located in C</etc/netdata/mojo.conf.d>. The files are
+plain Perl files, which means you can define variables and call functions. The
+only important part is that the last statement in the file is a hash-ref.
+
+Any hash-refs that has the "collector" key will be placed into L</collectors>,
+while everything else will be merged into L</config>. Example:
+
+  # /etc/netdata/mojo.conf.d/foo.conf.pl
+  {foo => 42, bar => 100}
+
+  # /etc/netdata/mojo.conf.d/bar.conf.pl
+  {collector => 'Mojo::Netdata::Collector::HTTP', jobs => []}
+
+The two config files above will result in this L</config>:
 
   {
+    foo => 42,
+    bar => 100,
     collectors => [
-      {
-        class => '...',
-        ...
-      }
-    ],
+      {collector => 'Mojo::Netdata::Collector::HTTP', jobs => []},
+    },
   }
 
 See L<Mojo::Netdata::Collector::HTTP/SYNOPSIS> for an example config file.
@@ -114,10 +142,9 @@ C</var/log/netdata/error.log>.
 
 =head1 DESCRIPTION
 
-L<Mojo::Netdata> is a plugin for
-L<Netdata|https://learn.netdata.cloud/docs/agent/collectors/plugins.d>. It can
-load custom L<Mojo::Netdata::Collector> classes and write data back to Netdata
-on a given interval.
+L<Mojo::Netdata> is a plugin for L<Netdata|https://netdata.cloud>. It can load
+custom L<Mojo::Netdata::Collector> classes and write data back to Netdata on a
+given interval.
 
 This module is currently EXPERIMENTAL, and the API might change without
 warning.

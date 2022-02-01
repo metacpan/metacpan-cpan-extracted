@@ -1,9 +1,9 @@
 package App::FileRemoveUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-03'; # DATE
+our $DATE = '2021-08-02'; # DATE
 our $DIST = 'App-FileRemoveUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -192,7 +192,7 @@ App::FileRemoveUtils - Utilities related to removing/deleting files
 
 =head1 VERSION
 
-This document describes version 0.005 of App::FileRemoveUtils (from Perl distribution App-FileRemoveUtils), released on 2020-06-03.
+This document describes version 0.006 of App::FileRemoveUtils (from Perl distribution App-FileRemoveUtils), released on 2021-08-02.
 
 =head1 DESCRIPTION
 
@@ -217,7 +217,7 @@ This distribution provides the following command-line utilities:
 
 Usage:
 
- delete_all_empty_dirs() -> [status, msg, payload, meta]
+ delete_all_empty_dirs() -> [$status_code, $reason, $payload, \%result_meta]
 
 Delete all empty (zero-sized) subdirectories recursively.
 
@@ -240,12 +240,12 @@ Pass -dry_run=E<gt>1 to enable simulation mode.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -255,7 +255,7 @@ Return value:  (any)
 
 Usage:
 
- delete_all_empty_files() -> [status, msg, payload, meta]
+ delete_all_empty_files() -> [$status_code, $reason, $payload, \%result_meta]
 
 Delete all empty (zero-sized) files recursively.
 
@@ -278,12 +278,12 @@ Pass -dry_run=E<gt>1 to enable simulation mode.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -348,13 +348,16 @@ feature.
 
 L<rmhere> from L<App::rmhere>
 
+Other similar distributions: L<App::FileModifyUtils>,
+L<App::FileRenameUtilities>.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

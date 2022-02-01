@@ -53,7 +53,7 @@ if ($neo_info) {
 WriteMakefile(
   NAME => 'Neo4j::Bolt',
   VERSION_FROM => 'lib/Neo4j/Bolt.pm',
-  MIN_PERL_VERSION => '5.010',
+  MIN_PERL_VERSION => '5.012',
   CONFIGURE_REQUIRES => {
     'Alien::OpenSSL' => 0,
     'ExtUtils::MakeMaker' => '7.12',
@@ -67,9 +67,9 @@ WriteMakefile(
     'Alien::OpenSSL' => 0,
     'Neo4j::Client' => '0.46',
     'Neo4j::Types' => '1.00',
-    'parent' => 0,  # parent was first released with perl v5.10.1
     'JSON::PP' => 0,
     'URI' => 0,
+    'XSLoader' => '0.14',  # XSLoader::load()
   },
   TEST_REQUIRES => {
     'Test::Exception' => 0,

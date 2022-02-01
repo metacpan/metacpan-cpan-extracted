@@ -19,7 +19,7 @@ use Carp;
 use utf8;
 use Encode;
 use Encode::Guess;
-use open IO => ':utf8', ':std';
+use open IO => ':encoding(utf8)', ':std';
 
 use Data::Dumper;
 {
@@ -60,7 +60,7 @@ greple - extensible grep with lexical expression and region control
 =head1 VERSION
 
 
-Version 8.5202
+Version 8.5501
 
 
 =head1 SYNOPSIS
@@ -90,6 +90,7 @@ B<greple> [B<-M>I<module>] [ B<-options> ] pattern [ file... ]
     -n                   print line number
     -H, -h               do or do not display filenames
     -o                   print only the matching part
+    --all                print entire data
     -m, --max=n[,m]      max count of blocks to be shown
     -A,-B,-C [n]         after/before/both match context
     --join               delete newline in the matched part
@@ -118,10 +119,9 @@ B<greple> [B<-M>I<module>] [ B<-options> ] pattern [ file... ]
     --face               set/unset visual effects
   BLOCK
     -p, --paragraph      paragraph mode
-    --all                print whole data
     --border=pattern     border pattern
     --block=pattern      block of records
-    --blockend=s         block end mark (Default: "--\n")
+    --blockend=s         block end mark (Default: "--")
   REGION
     --inside=pattern     select matches inside of pattern
     --outside=pattern    select matches outside of pattern
@@ -236,16 +236,20 @@ my $opt_C = 0;
 my $opt_H;
 #my $opt_M;
 
+sub opt_pattern {
+    push @opt_pattern, [ map "$_", @_ ];
+    $opt_pattern[-1];
+}
+
 my @optargs = (
-    'and|e=s'            => sub { push @opt_pattern, [ "$_[0]" => $_[1] ] },
-    'must|r=s'           => sub { push @opt_pattern, [ "$_[0]" => $_[1] ] },
-    'not|v=s'            => sub { push @opt_pattern, [ "$_[0]" => $_[1] ] },
-    'le|x=s'             => sub { push @opt_pattern, [ "$_[0]" => $_[1] ] },
-    're=s'               => sub { push @opt_pattern, [ "$_[0]" => $_[1] ] },
-    'fe=s'               => sub { push @opt_pattern, [ "$_[0]" => $_[1] ] },
+    'and|e=s'            => \&opt_pattern,
+    'must|r=s'           => \&opt_pattern,
+    'not|v=s'            => \&opt_pattern,
+    'le|x=s'             => \&opt_pattern,
+    're=s'               => \&opt_pattern,
+    'fe=s'               => \&opt_pattern,
     'or=s'               => sub {
-	state $or;
-	push @opt_pattern, $or = [ 'or' ] if not defined $or;
+	state $or = opt_pattern('or');
 	push @$or, $_[1];
     },
     'need=s'             => \@opt_need,
@@ -259,7 +263,7 @@ my @optargs = (
     'H'                  => \$opt_H,
     'filestyle|fs=s'     => \$opt_filestyle,
     'linestyle|ls=s'     => \$opt_linestyle,
-    'separate',          => sub {
+    'separate'           => sub {
 	$opt_filestyle = $opt_linestyle = $_[0]
     },
     'o|only-matching!'   => \$opt_o,
@@ -398,7 +402,7 @@ configure_getopt qw(debug) if $ENV{DEBUG_GETOPT};
 $Getopt::EX::Loader::debug = 1 if $ENV{DEBUG_GETOPTEX};
 
 ## decode
-map { $_ = decode 'utf8', $_ unless utf8::is_utf8($_) } @ARGV;
+@ARGV = map { utf8::is_utf8($_) ? $_ : decode('utf8', $_) } @ARGV;
 
 ## ~/.greplerc
 unless ((@ARGV and $ARGV[0] eq "--norc" and shift)
@@ -609,7 +613,7 @@ my $count_allow = 0;
 ## --matchcount
 ##
 my $count_match_sub = sub {
-    local $_ = shift or return undef;
+    local $_ = shift or return;
     /[^\d,]/ and die "$_ is not valid count.\n";
     my @c = map { $_ eq '' ? 0 : int } split(/,/, $_, -1);
     if (@c == 1) {
@@ -718,7 +722,8 @@ if (@opt_face) {
 		if ($+{rm}) {
 		    $c =~ s/[\Q$+{s}\E]//g;
 		} else {
-		    $c .= '^' . $+{s};
+		    my $spec = $+{s} =~ s/[\Q$c\E]//gr;
+		    $c .= '^' . ${spec} if $spec;
 		}
 	    }
 	}
@@ -728,24 +733,18 @@ if (@opt_face) {
 my $need_color = (($opt_color eq 'always')
 		  or (($opt_color eq 'auto') and (!$opt_o and -t STDOUT)));
 
+if (!$need_color) {
+    $Getopt::EX::Colormap::NO_COLOR = 1;
+}
+
 for (values %opt_format) {
     s{\\(.)}{ { t => "\t", n => "\n" }->{$1} // $1 }egx;
 }
 
-my($_file, $_line, $_text, $_blockend) = do {
-    if ($need_color) {
-	sub { $color_handler->color('FILE'    , sprintf($opt_format{FILE}, $_[0])) },
-	sub { $color_handler->color('LINE'    , sprintf($opt_format{LINE}, $_[0])) },
-	sub { $color_handler->color('TEXT'    , $_[0]) },
-	sub { $color_handler->color('BLOCKEND', $_[0]) }
-    }
-    else {
-	( sub { sprintf($opt_format{FILE}, $_[0]) },
-	  sub { sprintf($opt_format{LINE}, $_[0]) },
-	  sub { $_[0] },
-	  sub { $_[0] } )
-    }
-};
+my $_file     = sub { $color_handler->color('FILE'    , sprintf($opt_format{FILE}, $_[0])) };
+my $_line     = sub { $color_handler->color('LINE'    , sprintf($opt_format{LINE}, $_[0])) };
+my $_text     = sub { $color_handler->color('TEXT'    , $_[0]) };
+my $_blockend = sub { $color_handler->color('BLOCKEND', $_[0]) };
 
 sub index_color {
     $color_handler->index_color(@_);
@@ -815,9 +814,9 @@ my $border_re = do {
     }
 };
 
-my $blockend = "--\n";
+my $blockend = "--";
 if (defined $opt_blockend) {
-    ($blockend = $opt_blockend) =~ s/(?<=.)$/\n/;
+    $blockend = $opt_blockend =~ s/\\n/\n/gr;
 }
 if ($opt_C) {
     $opt_A ||= $opt_C;
@@ -1139,8 +1138,11 @@ sub open_nextfile {
 	elsif ($file =~ /^https?:\/\//) {
 	    open(STDIN, '-|') || exec("w3m -dump $file") || die "w3m: $!\n";
 	}
+	elsif ($file eq '-') {
+	    # nothing to do
+	}
 	else {
-	    open(STDIN, $file) or do {
+	    open(STDIN, '<', $file) or do {
 		warn "$file: $!\n" unless -l $file;
 		next;
 	    };
@@ -1336,10 +1338,8 @@ sub display_result {
 		}
 	    }
 
-	    if ($need_color) {
-		$pi = $uniq_color->index($b) if $opt_uniqcolor;
-		$b = index_color($pi, $b);
-	    }
+	    $pi = $uniq_color->index($b) if $opt_uniqcolor;
+	    $b = index_color($pi, $b);
 	}
 
 	$block = join '', @blocks;
@@ -1369,7 +1369,7 @@ sub display_result {
 
 	print $block;
 	print "\n" if $opt_newline and not $block =~ /\n\z/;
-	print $_blockend->($blockend) if $need_blockend;
+	print $_blockend->($blockend), "\n" if $need_blockend;
     }
 }
 
@@ -1378,10 +1378,14 @@ sub display_result {
 ##
 sub unpack_template {
     my($matched, $offset) = @_;
-    my @length = map {
-	($_->[0] - $offset, ($offset = $_->[1]) - $_->[0]);
-    } @$matched;
-    join '', map "a$_", @length, '*';
+    my @len;
+    for (@$matched) {
+	my($s, $e) = @$_;
+	$s = $offset if $s < $offset;
+	push @len, $s - $offset, $e - $s;
+	$offset = $e;
+    }
+    join '', map "a$_", @len, '*';
 }
 
 __END__
@@ -1463,15 +1467,10 @@ whole paragraph which contains the word `foo', `bar' and `baz'.
 
     greple -p 'foo bar baz'
 
-Option B<--all> takes whole file as a single block.  So next command
-find files which contains these strings, and print the all contents.
+Block also can be defined by pattern.  Next command treat the data as
+a series of 10-line unit.
 
-    greple --all 'foo bar baz'
-
-Block also can be defined as a pattern.  Next command search and print
-mail header, ignoring mail body text.
-
-    greple --block '\A(.+\n)+'
+    greple -n --border='(.*\n){1,10}'
 
 You can also define arbitrary complex blocks by writing script.
 
@@ -1855,6 +1854,11 @@ Print matched string only.  Newline character is printed after matched
 string if it does not end with newline.  Use B<--no-newline> option if
 you don't need extra newline.
 
+=item B<--all>
+
+Print entire file.  This option does not affect to seach behavior or
+block treatment.  Just print all contents.
+
 =item B<-m> I<n>[,I<m>], B<--max-count>=I<n>[,I<m>]
 
 Set the maximum count of blocks to be shown to I<n>.
@@ -2032,6 +2036,9 @@ given, not otherwise.  Option value `always' and `never' will work as
 expected.
 
 Option B<--nocolor> is alias for B<--color>=I<never>.
+
+When color output is disabled, ANSI terminal sequence is not produced,
+but functional colormap, such as C<--cm sub{...}>, still works.
 
 =item B<--colormap>=I<spec>
 
@@ -2279,10 +2286,10 @@ color for each entire line by their commit ids.
 
 =item B<--face>=[-+]I<effect>
 
-Set or unset specified I<effect> for all color specs.  Use `+'
+Set or unset specified I<effect> for all indexed color specs.  Use `+'
 (optional) to set, and `-' to unset.  Effect is a single character
-expressing: S (Stand-out), U (Underline), D (Double-struck), F (Flash)
-or E (Erase Line).
+expressing S (Stand-out), U (Underline), D (Double-struck), F (Flash)
+and such.
 
 Next example remove D (double-struck) effect.
 
@@ -2291,11 +2298,6 @@ Next example remove D (double-struck) effect.
 Multiple effects can be set/unset at once.
 
     greple --face SF-D
-
-Use `/' to set effect to background.  Only `E' makes sense to use in
-background, though.
-
-    greple --face /E
 
 =back
 
@@ -2323,13 +2325,6 @@ paragraph, while B<-pC1> will print with just surrounding spaces.
 
 You can create original paragraph pattern by B<--border> option.
 
-=item B<--all>
-
-Treat entire file contents as a single block.  This is almost
-identical to following command.
-
-    greple --block='(?s).*'
-
 =item B<--border>=I<pattern>
 
 Specify record block border pattern.  Pattern match is done in the
@@ -2347,6 +2342,13 @@ Next command treat the data as a series of 10-line unit.
 
 Contrary to the next B<--block> option, B<--border> never produce
 disjoint records.
+
+If you want to treat entire file as a single block, setting border to
+start or end of whole data is efficient way.  Next commands works
+same.
+
+    greple --border '\A'    # beginning of file
+    greple --border '\z'    # end of file
 
 =item B<--block>=I<pattern>
 
@@ -2366,7 +2368,7 @@ because it finds all blocks before processing.
 =item B<--blockend>=I<string>
 
 Change the end mark displayed after B<-pABC> or B<--block> options.
-Default value is "--\n".
+Default value is "--".
 
 =back
 
@@ -3143,7 +3145,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 1991-2021 Kazumasa Utashiro
+Copyright 1991-2022 Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -6,22 +6,22 @@ use Pod::Usage;
 use Data::Dumper::Concise;
 use Net::Google::Drive::Simple;
 
-my( $file_id, $new_name ) = @ARGV;
+my ( $file_id, $new_name ) = @ARGV;
 
-if( ! defined $file_id ) {
-    pod2usage( "No Google Drive file ID given." );
+if ( !defined $file_id ) {
+    pod2usage("No Google Drive file ID given.");
 }
 
-if( ! $new_name ) {
-    pod2usage( "What name should the file or folder be renamed to?" );
+if ( !$new_name ) {
+    pod2usage("What name should the file or folder be renamed to?");
 }
 
-Log::Log4perl->easy_init( $INFO );
+Log::Log4perl->easy_init($INFO);
 
 my $gd = Net::Google::Drive::Simple->new();
 
-$gd->rename ( $file_id, $new_name ) or
-    LOGDIE "Rename failed.\n";
+$gd->rename( $file_id, $new_name )
+  or LOGDIE "Rename failed.\n";
 
 __END__
 

@@ -6,5 +6,6 @@ use warnings;
 use Test::More;
 
 use_ok( 'Device::Chip::MAX7219' );
+use_ok( 'Device::Chip::MAX7219Panel' );
 
 done_testing;

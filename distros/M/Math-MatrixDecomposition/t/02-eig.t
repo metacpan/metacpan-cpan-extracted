@@ -13,7 +13,7 @@ use strict;
 use warnings;
 use POSIX qw(:float_h);
 
-use Test::Simple tests => 8;
+use Test::Simple tests => 15;
 
 BEGIN
 {
@@ -116,6 +116,80 @@ if (1)
 	"eig/v(2)");
   }
 
+if (1)
+  {
+    my ($A, @e, $v);
+
+    # A (2, 2) non-symmetric matrix.
+    $A = [ 3,  1,
+           0,  4];
+
+    $eigen->decompose ($A)->sort ("asc");
+
+    # >> [v, e] = eig([3, 1; 0, 4])
+    @e = $eigen->values;
+    ok (approx (\@e, [ 3,
+		       4],
+		5E-14),
+	"eig/e");
+
+    $v = $eigen->vector (0);
+    ok (approx ($v, [ 1,
+		      0],
+		5E-14),
+	"eig/v(0)");
+
+    # First non-zero element is a positive value.
+    $v = $eigen->vector (1);
+    ok (approx ($v, [sqrt (0.5),
+		     sqrt (0.5)],
+		5E-14),
+	"eig/v(1)");
+  }
+
+if (1)
+  {
+    my ($A, @e, $v);
+
+    # An ill-conditioned non-symmetric matrix.
+    $A = [ -64,   82,   21,
+	   144, -178,  -46,
+	  -771,  962,  248];
+
+    $eigen->decompose ($A)->sort ("asc");
+
+    @e = $eigen->values;
+    ok (approx (\@e, [1,
+		      2,
+		      3],
+		5E-12),
+	"eig/e");
+
+    $v = $eigen->vector (0);
+    map { $_ /= @$v[2] } @$v;
+    ok (approx ($v, [ 13 / 173,
+		     -34 / 173,
+		     173 / 173],
+		5E-12),
+	"eig/v(0)");
+
+    $v = $eigen->vector (1);
+    map { $_ /= @$v[2] } @$v;
+    ok (approx ($v, [ 2 / 18,
+		     -3 / 18,
+		     18 / 18],
+		5E-12),
+	"eig/v(1)");
+
+    $v = $eigen->vector (2);
+    map { $_ /= @$v[2] } @$v;
+    ok (approx ($v, [ 1 / 11,
+		     -2 / 11,
+		     11 / 11],
+		5E-12),
+	"eig/v(2)");
+  }
+
 sub approx
 {
   my ($val, $ref, $tol, $err) = @_;
@@ -134,4 +208,4 @@ sub approx
   1;
 }
 
-## 02-eig.t ends herearmin
+## 02-eig.t ends here

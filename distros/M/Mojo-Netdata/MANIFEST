@@ -1,4 +1,3 @@
-.pls_cache/index
 Changes
 cpanfile
 lib/Mojo/Netdata.pm
@@ -13,7 +12,9 @@ t/00-basic.t
 t/chart.t
 t/collector-http.t
 t/collector.t
-t/etc/netdata-test-config/mojo.conf.pl
+t/etc/netdata/mojo.conf.d/http.conf.pl
+t/etc/netdata/mojo.conf.d/ignored
+t/etc/netdata/mojo.conf.d/main.conf.pl
 t/etc/netdata/mojo.conf.pl
 t/netdata.t
 t/util.t

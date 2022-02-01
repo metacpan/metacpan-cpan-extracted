@@ -44,7 +44,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use UI::Various::core;
 use UI::Various::widget;
@@ -56,7 +56,7 @@ our @EXPORT_OK = qw();
 
 #########################################################################
 
-=item text [rw]
+=item text [rw, recommended]
 
 the text as string or variable reference
 
@@ -70,7 +70,7 @@ sub text($;$)
     return access('text', undef, @_);
 }
 
-=item var [rw]
+=item var [rw, recommended]
 
 a variable reference for the checkbox
 
@@ -80,17 +80,9 @@ The variable will switched on (C<1>) and off (C<0>) by the checkbox.
 
 sub var($;$)
 {
-    defined $_[1]  or  return get('var', @_);
-    # explicit check for SCALAR reference when used as setter (needed here
-    # as SCALAR references are treated special in set/access):
-    unless (ref($_[1]) eq 'SCALAR')
-    {
-	error('_1_attribute_must_be_a_2_reference',
-	      'var', 'SCALAR');
-	return undef;
-    }
-    ${$_[1]} = ${$_[1]} ? 1 : 0;
-    return set('var', undef, @_);
+    local $_ = access_varref('var', @_);
+    defined $_[1]  and  ref($_[1]) eq 'SCALAR'  and  ${$_[1]} = ${$_[1]} ? 1 : 0;
+    return $_;
 }
 
 #########################################################################
@@ -99,8 +91,7 @@ sub var($;$)
 
 use constant ALLOWED_PARAMETERS =>
     (UI::Various::widget::COMMON_PARAMETERS, qw(text var));
-use constant DEFAULT_ATTRIBUTES =>
-    (text => '', var => UI::Various::core::dummy_varref());
+use constant DEFAULT_ATTRIBUTES => (text => '', var => dummy_varref());
 
 #########################################################################
 #########################################################################

@@ -1,7 +1,9 @@
 package App::FileDeleteUtils;
 
-our $DATE = '2020-06-03'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-08-02'; # DATE
+our $DIST = 'App-FileRemoveUtils'; # DIST
+our $VERSION = '0.006'; # VERSION
 
 1;
 # ABSTRACT: Utilities related to removing/deleting files
@@ -18,7 +20,7 @@ App::FileDeleteUtils - Utilities related to removing/deleting files
 
 =head1 VERSION
 
-This document describes version 0.005 of App::FileDeleteUtils (from Perl distribution App-FileRemoveUtils), released on 2020-06-03.
+This document describes version 0.006 of App::FileDeleteUtils (from Perl distribution App-FileRemoveUtils), released on 2021-08-02.
 
 =head1 DESCRIPTION
 
@@ -46,7 +48,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

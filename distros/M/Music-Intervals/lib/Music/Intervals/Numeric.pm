@@ -1,5 +1,5 @@
 package Music::Intervals::Numeric;
-$Music::Intervals::Numeric::VERSION = '0.0603';
+$Music::Intervals::Numeric::VERSION = '0.0707';
 our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Breakdown of numeric musical intervals
@@ -16,23 +16,13 @@ use strictures 2;
 use namespace::clean;
 
 
-has notes     => ( is => 'ro', default => sub { [] } );
-has cent     => ( is => 'ro', default => sub { 0 } );
-has freq     => ( is => 'ro', default => sub { 0 } );
-has interval  => ( is => 'ro', default => sub { 0 } );
-has prime     => ( is => 'ro', default => sub { 0 } );
-has size      => ( is => 'ro', default => sub { 3 } );
-has semitones => ( is => 'ro', default => sub { 12 } );
-has temper    => ( is => 'ro', lazy => 1, default => sub { my $self = shift;
-    $self->semitones * 100 / log(2) },
+has notes => ( is => 'ro', default => sub { [] } );
+has size  => ( is => 'ro', default => sub { 3 } );
+
+has ratios => (
+    is      => 'ro',
+    builder => 1,
 );
-
-has frequencies => ( is => 'rw', default => sub { {} } );
-has intervals => ( is => 'rw', default => sub { {} } );
-has cent_vals => ( is => 'rw', default => sub { {} } );
-has prime_factor => ( is => 'rw', default => sub { {} } );
-has ratios => ( is => 'rw', lazy => 1, builder => 1 );
-
 sub _build_ratios {
   my ($self) = @_;
   no warnings 'once';
@@ -42,51 +32,88 @@ sub _build_ratios {
   return $ratios;
 }
 
+has _semitones => ( is => 'ro', default => sub { 12 } );
+has _temper    => ( is => 'ro', lazy => 1, default => sub { my $self = shift;
+    $self->_semitones * 100 / log(2) },
+);
 
-sub process {}
 
-sub BUILD {
-    my $self = shift;
+sub frequencies {
+    my ($self) = @_;
 
-    return unless @{ $self->notes };
-
-    my %x;
+    my $frequencies = {};
 
     my $iter = combinations( $self->notes, $self->size );
+
+    while (my $c = $iter->next) {
+        $frequencies->{"@$c"} = { map { $_ => $self->ratios->{$_} } @$c };
+    }
+
+    return $frequencies;
+}
+
+sub intervals {
+    my ($self) = @_;
+
+    my $intervals = {};
+
+    my $iter = combinations( $self->notes, $self->size );
+
     while (my $c = $iter->next) {
         my %dyads = $self->dyads($c);
 
-        if ( $self->freq ) {
-            $self->frequencies->{"@$c"} =
-                { map { $_ => $self->ratios->{$_} } @$c };
-        }
-        if ( $self->interval ) {
-            $self->intervals->{"@$c"} = {
-                map {
-                    $_ => {
-                        $dyads{$_} => $self->ratios->{ $dyads{$_} }
-                    }
-                } keys %dyads
-            };
+        $intervals->{"@$c"} = {
+            map {
+                $_ => {
+                    $dyads{$_} => $self->ratios->{ $dyads{$_} }
+                }
+            } keys %dyads
+        };
+    } 
 
-        }
-        if ( $self->cent ) {
-            $self->cent_vals->{"@$c"} = {
-                map {
-                    $_ => log( eval $dyads{$_} ) * $self->temper
-                } keys %dyads };
+    return $intervals;
+}
 
-        }
-        if ( $self->prime ) {
-            $self->prime_factor->{"@$c"} = {
-                map {
-                    $_ => {
-                        $dyads{$_} => scalar ratio_factorize( $dyads{$_} )
-                    }
-                } keys %dyads
-            };
-        }
+sub cent_vals {
+    my ($self) = @_;
+
+    my $cent_vals = {};
+
+    my $iter = combinations( $self->notes, $self->size );
+
+    while (my $c = $iter->next) {
+        my %dyads = $self->dyads($c);
+
+        $cent_vals->{"@$c"} = {
+            map {
+                $_ => log( eval $dyads{$_} ) * $self->_temper
+            } keys %dyads
+        };
     }
+            
+    return $cent_vals;
+}
+
+sub prime_factor {
+    my ($self) = @_;
+
+    my $prime_factor = {};
+
+    my $iter = combinations( $self->notes, $self->size );
+
+    while (my $c = $iter->next) {
+        my %dyads = $self->dyads($c);
+
+        $prime_factor->{"@$c"} = {
+            map {
+                $_ => {
+                    $dyads{$_} => scalar ratio_factorize( $dyads{$_} )
+                }
+            } keys %dyads
+        };
+    }
+
+    return $prime_factor;
 }
 
 
@@ -139,7 +166,7 @@ Music::Intervals::Numeric - Breakdown of numeric musical intervals
 
 =head1 VERSION
 
-version 0.0603
+version 0.0707
 
 =head1 SYNOPSIS
 
@@ -148,10 +175,6 @@ version 0.0603
   my $m = Music::Intervals::Numeric->new(
     notes => [qw( 1/1 5/4 3/2 15/8 )],
     size => 3,
-    freq => 1,
-    interval => 1,
-    cent => 1,
-    prime => 1,
   );
 
   print Dumper(
@@ -161,58 +184,14 @@ version 0.0603
     $m->prime_factor,
   );
 
+  my interval = $m->ratios->{'5/4'};
+
 =head1 DESCRIPTION
 
 A C<Music::Intervals> object shows the mathematical break-down of musical
-intervals and chords.
-
-This module reveals the "guts" of chords within a given tonality.  By guts I
-mean, the measurements of the notes and the intervals between them, in just
-intonation.
+intervals and chords given as integer ratios.
 
 =head1 ATTRIBUTES
-
-=head2 cent
-
-Show divisions of the octave
-
-Default: 0
-
-=head2 freq
-
-Show frequencies
-
-Default: 0
-
-=head2 interval
-
-Show note intervals
-
-Default: 0
-
-=head2 prime
-
-Show prime factorization
-
-Default: 0
-
-=head2 size
-
-Chord size
-
-Default: 3
-
-=head2 semitones
-
-Number of notes in the scale
-
-Default: 12
-
-=head2 temper
-
-Physical distance between notes
-
-Default: semitones * 100 / log(2)
 
 =head2 notes
 
@@ -224,25 +203,15 @@ The list of notes may be any of the keys in the L<Music::Intervals::Ratio>
 C<ratio> hashref.  This is very very long and contains useful intervals such as
 those of the common scale and even the Pythagorean intervals, too.
 
-=head2 cent_vals
+=head2 size
 
-Computed hashref
+Chord size
 
-=head2 frequencies
-
-Computed hashref
-
-=head2 intervals
-
-Computed hashref
-
-=head2 prime_factor
-
-Computed hashref
+Default: 3
 
 =head2 ratios
 
-Computed hashref
+Musical ratios keyed by interval fractions.
 
 =head1 METHODS
 
@@ -252,9 +221,21 @@ Computed hashref
 
 Create a new C<Music::Intervals> object.
 
-=for Pod::Coverage process
+=head2 cent_vals
 
-=for Pod::Coverage BUILD
+Show cents.
+
+=head2 frequencies
+
+Show frequencies.
+
+=head2 intervals
+
+Show intervals.
+
+=head2 prime_factor
+
+Show the prime factorization.
 
 =head2 dyads
 
@@ -266,16 +247,7 @@ Return the dyadic fraction as a prime factored expression.
 
 =head1 SEE ALSO
 
-For the time being, you will need to look at the source of
-C<Music::Intervals::Ratio> for the note and interval names.
-
-L<https://github.com/ology/Music/blob/master/intervals>
-
-L<http://en.wikipedia.org/wiki/List_of_musical_intervals>
-
-L<http://en.wikipedia.org/wiki/Equal_temperament>
-
-L<http://en.wikipedia.org/wiki/Just_intonation>
+L<Music::Intervals>
 
 =head1 AUTHOR
 
@@ -283,7 +255,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Gene Boggs.
+This software is copyright (c) 2022 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,36 @@
+Changes
+MANIFEST
+Makefile.PL
+README.md
+README
+lib/Podman.pm
+lib/Podman.pod
+lib/Podman/Client.pm
+lib/Podman/Client.pod
+lib/Podman/Container.pm
+lib/Podman/Container.pod
+lib/Podman/Containers.pm
+lib/Podman/Containers.pod
+lib/Podman/Exception.pm
+lib/Podman/Exception.pod
+lib/Podman/Image.pm
+lib/Podman/Image.pod
+lib/Podman/Images.pm
+lib/Podman/Images.pod
+lib/Podman/System.pm
+lib/Podman/System.pod
+t/base.t
+t/client.t
+t/container.t
+t/containers.t
+t/data/goodbye/Dockerfile
+t/data/goodbye/goodbye
+t/data/goodbye/goodbye.c
+t/exception.t
+t/image.t
+t/images.t
+t/lib/Mock/Podman/Service.pm
+t/lib/Mock/Podman/Service/Routes.pm
+t/system.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

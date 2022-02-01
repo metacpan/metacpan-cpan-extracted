@@ -24,6 +24,7 @@ lib/UI/Various/Curses/Button.pm
 lib/UI/Various/Curses/Check.pm
 lib/UI/Various/Curses/Input.pm
 lib/UI/Various/Curses/Main.pm
+lib/UI/Various/Curses/Radio.pm
 lib/UI/Various/Curses/Text.pm
 lib/UI/Various/Curses/Window.pm
 lib/UI/Various/Curses/base.pm
@@ -33,14 +34,17 @@ lib/UI/Various/PoorTerm/Button.pm
 lib/UI/Various/PoorTerm/Check.pm
 lib/UI/Various/PoorTerm/Input.pm
 lib/UI/Various/PoorTerm/Main.pm
+lib/UI/Various/PoorTerm/Radio.pm
 lib/UI/Various/PoorTerm/Text.pm
 lib/UI/Various/PoorTerm/Window.pm
 lib/UI/Various/PoorTerm/base.pm
 lib/UI/Various/PoorTerm/container.pm
+lib/UI/Various/Radio.pm
 lib/UI/Various/RichTerm/Button.pm
 lib/UI/Various/RichTerm/Check.pm
 lib/UI/Various/RichTerm/Input.pm
 lib/UI/Various/RichTerm/Main.pm
+lib/UI/Various/RichTerm/Radio.pm
 lib/UI/Various/RichTerm/Text.pm
 lib/UI/Various/RichTerm/Window.pm
 lib/UI/Various/RichTerm/base.pm
@@ -50,6 +54,7 @@ lib/UI/Various/Tk/Button.pm
 lib/UI/Various/Tk/Check.pm
 lib/UI/Various/Tk/Input.pm
 lib/UI/Various/Tk/Main.pm
+lib/UI/Various/Tk/Radio.pm
 lib/UI/Various/Tk/Text.pm
 lib/UI/Various/Tk/Window.pm
 lib/UI/Various/Tk/base.pm
@@ -74,6 +79,7 @@ t/13-button.t
 t/14-window.t
 t/15-input.t
 t/16-check.t
+t/17-radio.t
 t/21-tk-1.t
 t/22-tk-2.t
 t/31-curses.t

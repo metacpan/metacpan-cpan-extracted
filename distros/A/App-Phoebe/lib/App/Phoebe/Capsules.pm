@@ -40,6 +40,11 @@ You can provide a link with some documentation, if you want:
 
     our $capsule_help = '//transjovian.org/phoebe/page/Capsules';
 
+=head1 NO MIME TYPES
+
+When uploading to a capsule, the MIME type is ignored. Instead, it is determined
+from the filename extension.
+
 =head1 TROUBLESHOOTING
 
 🔥 In the wiki directory, you can have a file called F<fingerprint_equivalents>.
@@ -85,6 +90,7 @@ use App::Phoebe qw($server $log @extensions @request_handlers host_regex port su
 use File::Slurper qw(read_dir read_binary write_binary);
 use Net::IDN::Encode qw(domain_to_ascii);
 use Encode qw(encode_utf8 decode_utf8);
+use File::MimeInfo qw(globs);
 use List::Util qw(sum first);
 use Modern::Perl;
 use URI::Escape;
@@ -420,6 +426,9 @@ sub capsule_name {
 
 sub mime_type {
   $_ = shift;
+  my $mime = globs($_);
+  return $mime if $mime;
+  # fallback
   return 'text/gemini' if /\.gmi$/i;
   return 'text/plain' if /\.te?xt$/i;
   return 'text/markdown' if /\.md$/i;
@@ -480,6 +489,7 @@ sub is_upload {
       }
     }
     # valid_params printed a response and closed the stream
+    return;
   }
   $log->debug("Capsule upload with malformed titan URL");
   if ($request =~ m!^titan://($hosts)(?::$port)?/$capsule_space/([^/?#;]+)/([^/?#;]+);([^?#]*)[?#]!) {
@@ -509,24 +519,9 @@ sub valid_params {
   my $params = shift;
   return unless valid_id($stream, $host, $space, $id, $params);
   # return unless valid_token($stream, $host, $space, $id, $params);
+  $params->{mime} = mime_type($id);
   return unless valid_mime_type($stream, $host, $space, $id, $params);
-  return unless valid_extension($stream, $host, $space, $id, $params);
   return unless valid_size($stream, $host, $space, $id, $params);
-  return 1;
-}
-
-sub valid_extension {
-  my ($stream, $host, $space, $id, $params) = @_;
-  my $type = mime_type($id);
-  if ($params->{mime} eq "text/plain" and $type eq "text/gemini") {
-    # special case
-    return 1;
-  } elsif ($type ne $params->{mime}) {
-    $log->debug("MIME type mismatch");
-    result($stream, "59", "The MIME type provided ($params->{mime}) conflicts with the MIME type detected ($type)");
-    $stream->close_gracefully();
-    return;
-  }
   return 1;
 }
 

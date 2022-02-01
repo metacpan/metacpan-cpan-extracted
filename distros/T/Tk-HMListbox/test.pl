@@ -105,7 +105,7 @@ $ml->bindRows("<Double-Button-1>", \&openFileOrDir);
 $ml->bindColumns("<Button-3>", [\&columnPopup]);
 
 
-$ml->bindRows('<ButtonRelease-1>',  
+$ml->bindRows('<ButtonPress-1>',  
     sub {
         my ($w, $infoHR) = @_;
         print "You selected row: " . $infoHR->{-row} .

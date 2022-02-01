@@ -53,7 +53,7 @@ sub run_write_test {
                                 $received += length $chunk;
                             });
 
-            ok t_cmp($length, $received, 'bytes in body');
+            ok t_cmp($received, $length, 'bytes in body');
         }
     }
 }

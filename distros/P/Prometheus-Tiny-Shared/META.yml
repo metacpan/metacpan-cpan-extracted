@@ -10,6 +10,7 @@ build_requires:
   Test::Differences: '0'
   Test::Exception: '0'
   Test::More: '0'
+  Test::Warn: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -25,7 +26,7 @@ requires:
   File::Temp: '0'
   Hash::SharedMem: '0'
   JSON::XS: '0'
-  Prometheus::Tiny: '0.009'
+  Prometheus::Tiny: '0.010'
   parent: '0'
   strict: '0'
   warnings: '0'
@@ -33,7 +34,7 @@ resources:
   bugtracker: https://github.com/robn/Prometheus-Tiny-Shared/issues
   homepage: https://github.com/robn/Prometheus-Tiny-Shared
   repository: https://github.com/robn/Prometheus-Tiny-Shared.git
-version: '0.025'
+version: '0.026'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -177,7 +178,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.025'
+          tag: '0.026'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

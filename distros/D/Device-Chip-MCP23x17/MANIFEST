@@ -4,7 +4,11 @@ examples/mcp23x17.pl
 lib/Device/Chip/MCP23S17.pm
 lib/Device/Chip/MCP23x17.pm
 lib/Device/Chip/MCP23x17/Adapter.pm
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 t/00use.t
 t/01reg-spi.t
 t/10write-gpio.t
@@ -12,7 +16,3 @@ t/11read-gpio.t
 t/12settings.t
 t/20adapter.t
 t/99pod.t
-README
-LICENSE
-META.yml
-META.json

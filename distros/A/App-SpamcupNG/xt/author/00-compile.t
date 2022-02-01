@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 11;
+plan tests => 13;
 
 my @module_files = (
     'App/SpamcupNG.pm',
@@ -15,6 +15,8 @@ my @module_files = (
     'App/SpamcupNG/Error/Factory.pm',
     'App/SpamcupNG/Error/Mailhost.pm',
     'App/SpamcupNG/HTMLParse.pm',
+    'App/SpamcupNG/Summary.pm',
+    'App/SpamcupNG/Summary/Receiver.pm',
     'App/SpamcupNG/Warning.pm',
     'App/SpamcupNG/Warning/Factory.pm',
     'App/SpamcupNG/Warning/Yum.pm'

@@ -52,29 +52,27 @@ $hash{OBJECT} .= join ' ', '', 'barf$(OBJ_EXT)', @slatecobj;
 
 if($Config{cc} eq 'cl') {
 # Link to MinGW's libg2c.a and libgcc.a, if appropriate
-# First check that ExtUtils::F77 is available
-  eval{require ExtUtils::F77};
-  unless($@) {
-    my @f = ();
-
-    my $drive = (split /:/, `gcc -v 2>&1`)[0];
-    $drive = substr($drive, -1, 1);
-
-    for(shellwords ExtUtils::F77->runtime) {
-       if($_ =~ /^\-L/) {
-         $_ =~ s#^\-L##;
-         unless($_ =~ /:/) {$_ = $drive . ':' . $_}
-         if(-e $_ . '/libg2c.a') {push @f, $_ . '/libg2c.a'}
-         if(-e $_ . '/libgcc.a') {push @f, $_ . '/libgcc.a'}
-       }
-    }
-    $hash{LDFROM} = $hash{OBJECT};
-    for(@f) {$hash{LDFROM} .= ' ' . $_}
+  my @f = ();
+  my $drive = (split /:/, `gcc -v 2>&1`)[0];
+  $drive = substr($drive, -1, 1);
+  for(grep /^-L/, shellwords $f77->runtime) {
+     $_ =~ s#^-L##;
+     unless($_ =~ /:/) {$_ = $drive . ':' . $_}
+     if(-e $_ . '/libg2c.a') {push @f, $_ . '/libg2c.a'}
+     if(-e $_ . '/libgcc.a') {push @f, $_ . '/libgcc.a'}
   }
+  $hash{LDFROM} = join ' ', $hash{OBJECT}, @f;
 }
 
-$hash{LIBS}[0] .= $f77->runtime ;
-$hash{clean}{FILES} .= " SlatecProtos.h " . join ' ', @slatecobj;
+my $fortran_libs = $f77->runtime;
+if ($fortran_libs =~ /quadmath.*gfortran/) { # wrong order, thanks EUMM
+  my @words = shellwords $fortran_libs;
+  my @other = grep !/quadmath/, @words;
+  my @quadmath = grep /quadmath/, @words;
+  $fortran_libs = join ' ', map /\s/ ? qq{"$_"} : $_, @other, @quadmath;
+}
+$hash{LIBS}[0] .= $fortran_libs;
+$hash{clean}{FILES} .= join ' ', '', @slatecobj;
 
 $hash{DEFINE} .= qq{ "-DPDL_FORTRAN(x)=x}.($f77->trail_ ? '\#\#_' : '').qq{"};
 
@@ -83,13 +81,11 @@ undef &MY::postamble; # suppress warning
         my $mycompiler     = $f77->compiler();
         my $mycflags       = $f77->cflags();
 	my $orig = pdlpp_postamble_int(@pack);
-	my $hack_64bit = ($Config{archname}=~m/x86_64/ ?" -fPIC " : "");
+	my $hack_64bit = $Config{archname}=~m/x86_64|i686/ ?" -fPIC " : "";
 	$orig =~ s/:\s*slatec\.pd/: slatec.pd/;
-	$orig .join "\n",map "
-
-$_\$(OBJ_EXT): $_.f
-	$mycompiler -c $hack_64bit -o $_\$(OBJ_EXT) $mycflags $_.f
-", @slatecfiles;
+	$orig .= "FFLAGS = $hack_64bit $mycflags \$(OPTIMIZE)\n";
+	join "\n", $orig, map "$_\$(OBJ_EXT): $_.f
+	$mycompiler -c \$(FFLAGS) -o $_\$(OBJ_EXT) $_.f", @slatecfiles;
 };
 
 # Remove i386 option for OS X recent versions for better build, dual arch does not work anyway

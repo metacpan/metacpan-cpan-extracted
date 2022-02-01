@@ -1,0 +1,14 @@
+Revision history for Perl extension App-Greple-jq
+
+0.03 2022-01-31T14:45:54Z
+
+    - fixed bug of commit.name matches commit.author.name
+
+0.02 2022-01-31T05:55:42Z
+
+    - cpan release
+
+0.01 2022-01-29T22:29:42Z
+
+    - original version
+

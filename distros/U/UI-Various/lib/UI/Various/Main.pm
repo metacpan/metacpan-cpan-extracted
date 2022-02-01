@@ -17,7 +17,7 @@ UI::Various::Main - general main "Window Manager" class of L<UI::Various>
 
 This module defines the general main "Window Manager" class of an
 application using L<UI::Various>.  It keeps track of active / inactive
-windows and / or the active dialog.  In addition it manages global
+windows and / or the active dialogue.  In addition it manages global
 attributes of the current UI, e.g. size of the display.
 
 =head1 DESCRIPTION
@@ -48,7 +48,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use UI::Various::core;
 use UI::Various::container;

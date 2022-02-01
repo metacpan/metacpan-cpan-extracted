@@ -65,3 +65,8 @@ Revision history for Perl extension Tk::HMListbox.
 	  Tk::HListbox.
 	- Make sure to upgrade Tk::HListbox to it's latest version for best 
 	  results, as most of these improvements depend on recent changes there!
+4.01  Sat Jan 29, 2022
+	- Fix cursor not always being hidden when it should be, including when 
+	  clicking on an HMListbox that does not have the keyboard focus and 
+	  -takefocus is set to '' instead of 1. (in which case the HMListbox 
+	  remains unfocused).

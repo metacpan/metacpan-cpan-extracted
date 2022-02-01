@@ -94,6 +94,14 @@ of the response as Perl arrays (not arrayrefs).
     provide the stream, and consumed\_after() is the time it took the 
     client (you) to pull them all.
 
+# LIMITATIONS
+
+The results of Cypher `EXPLAIN` or `PROFILE` queries are currently
+unsupported. If you need to access such results, consider using
+[Neo4j::Driver](https://metacpan.org/pod/Neo4j::Driver) or the interactive
+[Neo4j Browser](https://neo4j.com/docs/browser-manual/current/)
+instead of this module.
+
 # SEE ALSO
 
 [Neo4j::Bolt](/lib/Neo4j/Bolt.md), [Neo4j::Bolt::Cxn](/lib/Neo4j/Bolt/Cxn.md).
