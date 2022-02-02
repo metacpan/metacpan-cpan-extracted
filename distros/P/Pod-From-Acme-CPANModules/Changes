@@ -1,3 +1,8 @@
+0.012   2022-01-15  Released-By: PERLANCAR; Urgency: medium; Unreleased: yes
+
+	- Add argument: additional_props.
+
+
 0.011   2021-07-26  Released-By: PERLANCAR; Urgency: medium
 
 	- Linkify entry heading.

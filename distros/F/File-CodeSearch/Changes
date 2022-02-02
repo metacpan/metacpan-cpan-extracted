@@ -1,5 +1,14 @@
 Revision history for File-CodeSearch
 
+0.7.6   2022-02-01
+        Updating for release of version 0.7.6
+        Updating travis config (Ivan Wills)
+        Updated date (Ivan Wills)
+        Changing minimum version of File::TypeCategories (Ivan Wills)
+        Fixing doc spacing (Ivan Wills)
+        Minor improvements to make docs and code match (Ivan Wills)
+        Updating minimum perl version (Ivan Wills)
+
 0.7.5   2017-10-25
         Updating for release of version 0.7.5
         Fixes to work with Perl 5.26 and newwer (Ivan Wills)

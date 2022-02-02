@@ -28,12 +28,13 @@ Mnet::Expect::Cli - Expect sessions to command line interfaces
 
 =head1 DESCRIPTION
 
-Mnet::Expect::Cli can be used to spawn L<Expect> processes, which can be
-used to programmatically control command line sessions to devices, with
-support for L<Mnet> options, logging, caching, and testing.
+Mnet::Expect::Cli can be used to spawn L<Expect> processes, which can be used
+to programmatically control command line sessions to devices, with support
+for L<Mnet> options, logging, caching, and testing.
 
-Refer to the perl L<Expect> module for more information. Also refer to the
-L<Mnet::Expect> and L<Mnet::Expect::Cli::Ios> modules.
+Refer to the L<Mnet::Expect> module, whose methods are inherited by objects
+created with this module. Also refer to L<Mnet::Expect::Cli::Ios>, which
+builds on this module,
 
 =head1 METHODS
 
@@ -78,7 +79,7 @@ in the L<Mnet::Expect> module new method:
     username        set to username for spawned command, if needed
     username_re     undef to skip login/user/username promt detection
 
-    An error is issued if there are login problems.
+An error is issued if there are login problems.
 
 For example, the following call will start an ssh expect session to a device
 with host key checking disabled:
@@ -100,7 +101,8 @@ the command method to detect the end of command output.
 
 By default prompts ending with $ % # : > are detected, this can be changed by
 setting prompt_re to a different regex string when calling the new method, or
-disabled by setting to undef:
+disabled by setting to undef, note that prompt_re needs to match the entire
+prompt line, not just the ending:
 
     (^|\r|\n)\S.*(\$|\%|#|:|>) ?(\r|\n|$)
 
@@ -123,47 +125,36 @@ Refer to the L<Mnet::Expect> module for more information.
     # create hash that will become new object from input opts hash
     my $self = $opts;
 
-    # note default options for this class
+    # note default options for this class, refer also to Mnet::Expect defaults
     #   includes recognized cli opts and opts for this object
-    #       failed_re default undef to be safe, refer to perldoc for more info
-    #           junos telnet =~ /^Login incorrent/m
-    #       password_re default based on educated guess, specifics noted below:
-    #           junos telnet =~ /^Password:$/m
-    #       prompt_re default based on educated guess, specifics noted below:
-    #           junos telnet =~ /^\S+> $/mi
-    #       username_re default based on educated guess, specifics noted below:
-    #           junos telnet =~ /^login: $/m
-    #   following keys starting with underscore are used internally:
-    #       _command_cache_content => hash ref, refer to _command_cache_clear
-    #       _command_cache_counter => integer, refer to _command_cache_clear
-    #       _password_ => causes password value to be hidden in opts debug
     #   update perldoc for this sub with changes
-    #   refer also to Mnet::Expect defaults
     my $defaults = {
-        _command_cache_content => {},
-        _command_cache_counter => 0,
+        _command_cache_content => {}, # internal, see _command_cache_clear
+        _command_cache_counter => 0,  # internal, see _command_cache_clear
         delay       => 250,
         eol_unix    => 1,
+        # failed_re default undef to be safe, refer to perldoc for more info
+        #   junos telnet =~ /^Login incorrent/m
         failed_re   => undef,
         log_login   => undef,
         paging_key  => ' ',
         paging_re   => '(--more--|---\(more( \d\d?%)?\)---)',
         password    => undef,
-        _password_  => undef,
         password_in => undef,
+        # password_re default based on educated guess, specifics noted below:
+        #   junos telnet =~ /^Password:$/m
         password_re => '(?i)pass(code|phrase|word):?\s*(\r|\n)?$',
-        prompt_re   => undef, # see below
+        # prompt_re default based on educated guess, specifics noted below:
+        #   junos telnet =~ /^\S+> $/mi
+        prompt_re   => '(^|\r|\n)\S.*(\$|\%|#|:|>) ?(\r|\n|$)',
         record      => undef,
         replay      => undef,
         timeout     => 30,
         username    => undef,
+        # username_re default based on educated guess, specifics noted below:
+        #   junos telnet =~ /^login: $/m
         username_re => '(?i)(login|user(name)?):?\s*(\r|\n)?$',
     };
-
-    # prompt_re default based on educated guess, specifics noted below:
-    #   junos telnet =~ /^\S+> $/mi
-    #   update perldoc for this sub with new default, if changed below
-    $defaults->{prompt_re} = '(^|\r|\n)\S.*(\$|\%|#|:|>) ?(\r|\n|$)';
 
     # update future object $self hash with default opts
     foreach my $opt (sort keys %$defaults) {
@@ -290,6 +281,7 @@ sub _login {
     #   clear _log_filter, which may have been set when password was sent
     #   clear expect buffer before sending cr, to flush out banner text, etc
     #   set prompt_re to detected command prompt when finished
+    #   prompt_truncate in Mnet::Expect::Cli::Ios must match prompt_re changes
     #   reset log_expect level back to it's prior value before returning
     my ($prompt1, $prompt2, $attempts) = ("", "", 3);
     foreach my $attempt (1.. $attempts) {
@@ -754,23 +746,23 @@ sub prompt_re {
 
 This method can be used to get and/or set the prompt_re regex string for an
 existing object, which is used by the command method to detect the end of
-output for a sent command. The prompt_re regex string should be specific enough
-to detect the cli prompt without matching any other command outputs.
+output for a sent command. The prompt_re regex string should be specific
+enough to detect the cli prompt without matching any other command outputs.
 
-By default the new method set prompt_re for the rest of the session to the
-first prompt detected after login, confirmed by sending a carraige return and
-getting the same specifc prompt again. This prompt detection can be adjusted or
-disabled, refer to the new method for more info.
+By default the new method sets a device specific prompt_re for the rest of
+the session from the first prompt detected after login, confirmed by sending
+a carraige return and getting the same specifc prompt back again. This prompt
+detection can be adjusted or disabled, refer to the new method for more info.
 
-Note that normally prompt_re should start with a regex caret symbol and end
-with a regex dollar sign, so that all characters in the command prompt line are
-matched, and avoid spurrious matches in command outputs. Be aware of any spaces
-that at the end of a prompt, as in the example below:
+Note that normally prompt_re should start with a regex caret symbol, and end
+with a regex dollar sign, so that all characters in the command prompt line
+are matched, and to avoid spurrious matches in command outputs. Be aware of
+any spaces that at the end of a prompt, as in the example below:
 
     $expect->prompt_re('^st-city-dev> $');
 
 Also note that the /Q and /E escape sequences do not appear to be recognized by
-expect, they should be avoided.
+expect, and they should not be used in prompt_re.
 
 =cut
 

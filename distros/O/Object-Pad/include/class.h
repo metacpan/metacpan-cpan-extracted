@@ -19,8 +19,8 @@ struct ClassMeta {
   unsigned int has_adjustparams : 1; /* has at least one ADJUSTPARAMS block */
   unsigned int has_superclass : 1;
 
-  SLOTOFFSET start_slotix; /* first slot index of this partial within its instance */
-  SLOTOFFSET next_slotix;  /* 1 + final slot index of this partial within its instance; includes slots in roles */
+  FIELDOFFSET start_fieldix; /* first field index of this partial within its instance */
+  FIELDOFFSET next_fieldix;  /* 1 + final field index of this partial within its instance; includes fields in roles */
 
   /* In the following, "MERGED" means the item includes elements merged from a
    * superclass if present, and any applied roles
@@ -31,21 +31,21 @@ struct ClassMeta {
   HV *stash;
   AV *pending_submeta; /* NULL, or AV containing raw ClassMeta pointers to subclasses pending seal */
   AV *hooks;           /* NULL, or AV of raw pointers directly to ClassHook structs */
-  AV *direct_slots;    /* each elem is a raw pointer directly to a SlotMeta */
+  AV *direct_fields;   /* each elem is a raw pointer directly to a FieldMeta */
   AV *direct_methods;  /* each elem is a raw pointer directly to a MethodMeta */
   HV *parammap;        /* NULL, or each elem is a raw pointer directly at a ParamMeta (MERGED) */
   AV *requiremethods;  /* each elem is an SVt_PV giving a name */
-  CV *initslots;       /* the INITSLOTS method body */
+  CV *initfields;      /* the INITFIELDS method body */
   AV *buildblocks;     /* the BUILD {} phaser blocks; each elem is a CV* directly (MERGED) */
   AV *adjustblocks;    /* the ADJUST {} phaser blocks; each elem is a AdjustBlock* (MERGED) */
 
-  AV *slothooks_postslots; /* NULL, or AV of struct SlotHook, all of whose ->funcs->post_initslot exist (MERGED) */
-  AV *slothooks_construct; /* NULL, or AV of struct SlotHook, all of whose ->funcs->post_construct exist (MERGED) */
+  AV *fieldhooks_initfield; /* NULL, or AV of struct FieldHook, all of whose ->funcs->post_initfield exist (MERGED) */
+  AV *fieldhooks_construct; /* NULL, or AV of struct FieldHook, all of whose ->funcs->post_construct exist (MERGED) */
 
   COP *tmpcop;         /* a COP to use during generated constructor */
   CV *methodscope;     /* a temporary CV used just during compilation of a `method` */
 
-  SuspendedCompCVBuffer initslots_compcv; /* temporary PL_compcv + associated state during initslots */
+  SuspendedCompCVBuffer initfields_compcv; /* temporary PL_compcv + associated state during initfields */
 
   union {
     /* Things that only true classes have */
@@ -82,8 +82,8 @@ struct MethodMeta {
 
 typedef struct ParamMeta {
   SV *name;
-  SlotMeta *slot;
-  SLOTOFFSET slotix;
+  FieldMeta *field;
+  FIELDOFFSET fieldix;
 } ParamMeta;
 
 #define MOP_CLASS_RUN_HOOKS(classmeta, func, ...)                                         \

@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.59;
+package Object::Pad 0.60;
 
 use v5.14;
 use warnings;
@@ -30,7 +30,7 @@ require Object::Pad::MOP::Class;
 
 =head1 NAME
 
-C<Object::Pad> - a simple syntax for lexical slot-based objects
+C<Object::Pad> - a simple syntax for lexical field-based objects
 
 =head1 SYNOPSIS
 
@@ -97,7 +97,7 @@ hopefully eventual stability of the design. See the L</FEEDBACK> section.
 
 Classes are automatically provided with a constructor method, called C<new>,
 which helps create the object instances. This may respond to passed arguments,
-automatically assigning values of slots, and invoking other blocks of code
+automatically assigning values of fields, and invoking other blocks of code
 provided by the class. It proceeds in the following stages:
 
 =head3 The BUILDARGS phase
@@ -109,16 +109,16 @@ should perform any C<SUPER> chaining as may be required.
 
    @args = $class->BUILDARGS( @_ )
 
-=head3 Slot assignment
+=head3 Field assignment
 
-If any slot in the class has the C<:param> attribute, then the constructor
+If any field in the class has the C<:param> attribute, then the constructor
 will expect to receive its argmuents in an even-sized list of name/value
-pairs. This applies even to slots inherited from the parent class or applied
+pairs. This applies even to fields inherited from the parent class or applied
 roles. It is therefore a good idea to shape the parameters to the constructor
 in this way in roles, and in classes if you intend your class to be extended.
 
 The constructor will also check for required parameters (these are all the
-parameters for slots that do not have default initialisation expressions). If
+parameters for fields that do not have default initialisation expressions). If
 any of these are missing an exception is thrown.
 
 =head3 The BUILD phase
@@ -131,7 +131,7 @@ not need to chain to the C<SUPER> class first; this is handled automatically.
 =head3 The ADJUST phase
 
 Next, the C<ADJUST> and C<ADJUSTPARAMS> block of every component class is
-invoked. This happens after the slots are assigned their initial values and
+invoked. This happens after the fields are assigned their initial values and
 the C<BUILD> blocks have been run.
 
 Note also that both C<ADJUST> and C<ADJUSTPARAMS> blocks happen at the same
@@ -142,7 +142,7 @@ separate phase.
 
 Finally, before the object is returned, if the L</:strict(params)> class
 attribute is present, then the constructor will throw an exception if there
-are any remaining named arguments left over after assigning them to slots as
+are any remaining named arguments left over after assigning them to fields as
 per C<:param> declarations, and running any C<ADJUSTPARAMS> blocks.
 
 =head1 KEYWORDS
@@ -204,7 +204,7 @@ because it follows a more standard grammar without this special-case.
 An optional list of attributes may be supplied in similar syntax as for subs
 or lexical variables. (These are annotations about the class itself; the
 concept should not be confused with per-object-instance data, which here is
-called "slots").
+called "fields").
 
 Whitespace is permitted within the value and is automatically trimmed, but as
 standard Perl parsing rules, no space is permitted between the attribute's
@@ -315,8 +315,8 @@ I<Since version 0.43.>
 
 Can only be applied to classes that contain no C<BUILD> blocks. If set, then
 the constructor will complain about any unrecognised named arguments passed to
-it (i.e. names that do not correspond to the C<:param> of any defined slot and
-left unconsumed by any C<ADJUSTPARAMS> block).
+it (i.e. names that do not correspond to the C<:param> of any defined field
+and left unconsumed by any C<ADJUSTPARAMS> block).
 
 Since C<BUILD> blocks can inspect the arguments arbitrarily, the presence of
 any such block means the constructor cannot determine which named arguments
@@ -357,17 +357,17 @@ implements the role.
       requires METHOD;
    }
 
-A role can provide instance slots. These are visible to any C<BUILD> blocks or
-methods provided by that role.
+A role can provide instance fields. These are visible to any C<BUILD> blocks
+or methods provided by that role.
 
 I<Since version 0.33.>
 
    role Name {
-      has $slot;
+      has $field;
 
-      BUILD { $slot = "a value" }
+      BUILD { $field = "a value" }
 
-      method slot { return $slot }
+      method field { return $field }
    }
 
 I<Since version 0.57> a role can declare that it provides another role:
@@ -400,7 +400,7 @@ allows the creation of a role that can still provide code for existing classes
 written in classical Perl that has not yet been rewritten to use
 C<Object::Pad>.
 
-The tradeoff is that a C<:compat(invokable)> role may not create slot data
+The tradeoff is that a C<:compat(invokable)> role may not create field data
 using the L</has> keyword. Whatever behaviours the role wishes to perform
 must be provided only by calling other methods on C<$self>, or perhaps by
 making assumptions about the representation type of instances.
@@ -423,8 +423,8 @@ the role.
    has $var { BLOCK };
 
 Declares that the instances of the class or role have a member field of the
-given name. This member field (called a "slot") will be accessible as a
-lexical variable within any C<method> declarations in the class.
+given name. This member field will be accessible as a lexical variable within
+any C<method> declarations in the class.
 
 Array and hash members are permitted and behave as expected; you do not need
 to store references to anonymous arrays or hashes.
@@ -435,55 +435,55 @@ to. In order to provide access to them a class may wish to use L</method> to
 create an accessor, or use the attributes such as L</:reader> to get one
 generated.
 
-A scalar slot may provide a expression that gives an initialisation value,
-which will be assigned into the slot of every instance during the constructor
+A scalar field may provide a expression that gives an initialisation value,
+which will be assigned into the field of every instance during the constructor
 before the C<BUILD> blocks are invoked. I<Since version 0.29> this expression
 does not have to be a compiletime constant, though it is evaluated exactly
 once, at runtime, after the class definition has been parsed. It is not
 evaluated individually for every object instance of that class. I<Since
-version 0.54> this is also permitted on array and hash slots.
+version 0.54> this is also permitted on array and hash fields.
 
-=head3 Slot Initialiser Blocks
+=head3 Field Initialiser Blocks
 
 I<Since version 0.54> a deferred statement block is also permitted, on any
-slot variable type. This is an B<experimental> feature that permits code to be
-executed as part of the instance constructor, rather than running just once
-when the class is set up. Code in a slot initialisation block is roughly
-equivalent to being placed in a C<BUILD> or C<ADJUST> block.
+field variable type. This is an B<experimental> feature that permits code to
+be executed as part of the instance constructor, rather than running just
+once when the class is set up. Code in a field initialisation block is
+roughly equivalent to being placed in a C<BUILD> or C<ADJUST> block.
 
-Control flow that attempts to leave a slot initialiser block is not permitted.
-This includes any C<return> expression, any C<next/last/redo> outside of a
-loop, with a dynamically-calculated label expression, or with a label that it
-doesn't appear in. C<goto> statements are also currently forbidden, though
-known-safe ones may be permitted in future.
+Control flow that attempts to leave a field initialiser block is not
+permitted. This includes any C<return> expression, any C<next/last/redo>
+outside of a loop, with a dynamically-calculated label expression, or with a
+label that it doesn't appear in. C<goto> statements are also currently
+forbidden, though known-safe ones may be permitted in future.
 
 Loop control expressions that are known at compiletime to affect a loop that
 they appear within are permitted.
 
-   has $slot { foreach(@list) { next; } }       # this is fine
+   has $field { foreach(@list) { next; } }       # this is fine
 
-   has $slot { LOOP: while(1) { last LOOP; } }  # this is fine too
+   has $field { LOOP: while(1) { last LOOP; } }  # this is fine too
 
-The following slot attributes are supported:
+The following field attributes are supported:
 
 =head3 :reader, :reader(NAME)
 
 I<Since version 0.27.>
 
-Generates a reader method to return the current value of the slot. If no name
-is given, the name of the slot is used. A single prefix character C<_> will be
-removed if present.
+Generates a reader method to return the current value of the field. If no name
+is given, the name of the field is used. A single prefix character C<_> will
+be removed if present.
 
-   has $slot :reader;
+   has $field :reader;
 
    # equivalent to
-   has $slot;  method slot { return $slot }
+   has $field;  method field { return $field }
 
-I<Since version 0.55> these are permitted on any slot type, but prior versions
-only allowed them on scalar slots. The reader method behaves identically to
-how a lexical variable would behave in the same context; namely returning a
-list of values from an array or key/value pairs from a hash when in list
-context, or the number of items or keys when in scalar context.
+I<Since version 0.55> these are permitted on any field type, but prior
+versions only allowed them on scalar fields. The reader method behaves
+identically to how a lexical variable would behave in the same context; namely
+returning a list of values from an array or key/value pairs from a hash when
+in list context, or the number of items or keys when in scalar context.
 
    has @items :reader;
 
@@ -495,14 +495,14 @@ context, or the number of items or keys when in scalar context.
 
 I<Since version 0.27.>
 
-Generates a writer method to set a new value of the slot from its arguments.
-If no name is given, the name of the slot is used prefixed by C<set_>. A
+Generates a writer method to set a new value of the field from its arguments.
+If no name is given, the name of the field is used prefixed by C<set_>. A
 single prefix character C<_> will be removed if present.
 
-   has $slot :writer;
+   has $field :writer;
 
    # equivalent to
-   has $slot;  method set_slot { $slot = shift; return $self }
+   has $field;  method set_field { $field = shift; return $self }
 
 I<Since version 0.28> a generated writer method will return the object
 invocant itself, allowing a chaining style.
@@ -511,23 +511,23 @@ invocant itself, allowing a chaining style.
       ->set_y("y")
       ->set_z("z");
 
-I<Since version 0.55> these are permitted on any slot type, but prior versions
-only allowed them on scalar slots. On arrays or hashes, the writer method takes
-a list of values to be assigned into the slot, completely replacing any values
-previously there.
+I<Since version 0.55> these are permitted on any field type, but prior
+versions only allowed them on scalar fields. On arrays or hashes, the writer
+method takes a list of values to be assigned into the field, completely
+replacing any values previously there.
 
 =head3 :mutator, :mutator(NAME)
 
 I<Since version 0.27.>
 
-Generates an lvalue mutator method to return or set the value of the slot.
-These are only permitted for scalar slots. If no name is given, the name of
-the slot is used. A single prefix character C<_> will be removed if present.
+Generates an lvalue mutator method to return or set the value of the field.
+These are only permitted for scalar fields. If no name is given, the name of
+the field is used. A single prefix character C<_> will be removed if present.
 
-   has $slot :mutator;
+   has $field :mutator;
 
    # equivalent to
-   has $slot;  method slot :lvalue { $slot }
+   has $field;  method field :lvalue { $field }
 
 I<Since version 0.28> all of these generated accessor methods will include
 argument checking similar to that used by subroutine signatures, to ensure the
@@ -539,45 +539,46 @@ case of a C<:writer> method.
 I<Since version 0.53.>
 
 Generates a combined reader-writer accessor method to set or return the value
-of the slot. These are only permitted for scalar slots. If no name is given,
-the name of the slot is used. A prefix character C<_> will be removed if
+of the field. These are only permitted for scalar fields. If no name is given,
+the name of the field is used. A prefix character C<_> will be removed if
 present.
 
 This method takes either zero or one additional arguments. If an argument is
-passed, the value of the slot is set from this argument (even if it is
-C<undef>). If no argument is passed (i.e. C<scalar @_> is false) then the slot
-is not modified. In either case, the value of the slot is then returned.
+passed, the value of the field is set from this argument (even if it is
+C<undef>). If no argument is passed (i.e. C<scalar @_> is false) then the
+field is not modified. In either case, the value of the field is then
+returned.
 
-   has $slot :accessor;
+   has $field :accessor;
 
    # equivalent to
-   has $slot;
+   has $field;
 
-   method slot {
-      $slot = shift if @_;
-      return $slot;
+   method field {
+      $field = shift if @_;
+      return $field;
    }
 
 =head3 :weak
 
 I<Since version 0.44.>
 
-Generated code which sets the value of this slot will weaken it if it contains
-a reference. This applies to within the constructor if C<:param> is given, and
-to a C<:writer> accessor method. Note that this I<only> applies to
+Generated code which sets the value of this field will weaken it if it
+contains a reference. This applies to within the constructor if C<:param> is
+given, and to a C<:writer> accessor method. Note that this I<only> applies to
 automatically generated code; not normal code written in regular method
-bodies. If you assign into the slot variable you must remember to call
+bodies. If you assign into the field variable you must remember to call
 C<Scalar::Util::weaken> yourself.
 
 =head3 :param, :param(NAME)
 
 I<Since version 0.41.>
 
-Sets this slot to be initialised automatically in the generated constructor.
-This is only permitted on scalar slots. If no name is given, the name of the
-slot is used. A single prefix character C<_> will be removed if present.
+Sets this field to be initialised automatically in the generated constructor.
+This is only permitted on scalar fields. If no name is given, the name of the
+field is used. A single prefix character C<_> will be removed if present.
 
-Any slot that has C<:param> but does not have a default initialisation
+Any field that has C<:param> but does not have a default initialisation
 expression or block becomes a required argument to the constructor. Attempting
 to invoke the constructor without a named argument for this will throw an
 exception. In order to make a parameter optional, make sure to give it a
@@ -586,12 +587,12 @@ default expression - even if that expression is C<undef>:
    has $x :param;          # this is required
    has $z :param = undef;  # this is optional
 
-Any slot that has a C<:param> and an initialisation block will only run the
+Any field that has a C<:param> and an initialisation block will only run the
 code in the block if required by the constructor. If a named parameter is
-passed to the constructor for this slot, then its code block will not be
+passed to the constructor for this field, then its code block will not be
 executed.
 
-Values for slots are assigned by the constructor before any C<BUILD> blocks
+Values for fields are assigned by the constructor before any C<BUILD> blocks
 are invoked.
 
 =head2 method
@@ -609,10 +610,10 @@ are invoked.
    }
 
 Declares a new named method. This behaves similarly to the C<sub> keyword,
-except that within the body of the method all of the member fields ("slots")
-are also accessible. In addition, the method body will have a lexical called
-C<$self> which contains the invocant object directly; it will already have
-been shifted from the C<@_> array.
+except that within the body of the method all of the member fields are also
+accessible. In addition, the method body will have a lexical called C<$self>
+which contains the invocant object directly; it will already have been shifted
+from the C<@_> array.
 
 The C<signatures> feature is automatically enabled for method declarations. In
 this case the signature does not have to account for the invocant instance; 
@@ -626,8 +627,8 @@ that is handled directly.
    $obj->m(1, 2);
 
 A list of attributes may be supplied as for C<sub>. The most useful of these
-is C<:lvalue>, allowing easy creation of read-write accessors for slots (but
-see also the C<:reader>, C<:writer> and C<:mutator> slot attributes).
+is C<:lvalue>, allowing easy creation of read-write accessors for fields (but
+see also the C<:reader>, C<:writer> and C<:mutator> field attributes).
 
    class Counter {
       has $count;
@@ -669,7 +670,7 @@ method call syntax.
    class WithPrivate {
       has $var;
 
-      # Lexical methods can still see instance slots as normal
+      # Lexical methods can still see instance fields as normal
       method $inc_var { $var++; say "Var was incremented"; }
       method $dec_var { $var--; say "Var was decremented"; }
 
@@ -724,9 +725,9 @@ will fail with a compiletime error, to avoid this confusion.
 I<Since version 0.43.>
 
 Declares an adjust block for this component class. This block of code runs
-within the constructor, after any C<BUILD> blocks and automatic slot value
+within the constructor, after any C<BUILD> blocks and automatic field value
 assignment. It can make any final adjustments to the instance (such as
-initialising slots from calculated values). No additional parameters are
+initialising fields from calculated values). No additional parameters are
 passed.
 
 An adjust block is not a subroutine and thus is not permitted to use
@@ -751,7 +752,7 @@ hash reference. This block of code runs within the constructor at the same
 time as L</ADJUST> blocks, but receives in addition a reference to the hash
 containing the current constructor parameters. This hash will not contain any
 constructor parameters already consumed by L</:param> declarations on any
-slots, but only the leftovers once those are processed.
+fields, but only the leftovers once those are processed.
 
 The code in the block should C<delete> from this hash any parameters it wishes
 to consume. Once all the C<ADJUSTPARAMS> blocks have run, any remaining keys
@@ -815,7 +816,7 @@ It is common in classic Perl OO style to invoke methods on C<$self> during
 the constructor. This is supported here since C<Object::Pad> version 0.19.
 Note however that any methods invoked by the superclass constructor may not
 see the object in a fully consistent state. (This fact is not specific to
-using C<Object::Pad> and would happen in classic Perl OO as well). The slot
+using C<Object::Pad> and would happen in classic Perl OO as well). The field
 initialisers will have been invoked but the C<BUILD> blocks will not.
 
 For example; in the following
@@ -841,7 +842,7 @@ For example; in the following
    say "Value seen by user is ", $obj->get_value;
 
 Until the C<ClassicPerlBaseClass::new> superconstructor has returned the
-C<BUILD> block will not have been invoked. The C<$_value> slot will still
+C<BUILD> block will not have been invoked. The C<$_value> field will still
 exist, but its value will be C<B> during the superconstructor. After the
 superconstructor, the C<BUILD> blocks are invoked before the completed object
 is returned to the user. The result will therefore be:
@@ -901,9 +902,9 @@ be implied by the C<class> keyword.
 
    # has, methods, etc.. can go here
 
-=head2 Slot Names
+=head2 Field Names
 
-Slot names should follow similar rules to regular lexical variables in code -
+Field names should follow similar rules to regular lexical variables in code -
 lowercase, name components separated by underscores. For tiny examples such as
 "dumb record" structures this may be sufficient.
 
@@ -913,10 +914,10 @@ lowercase, name components separated by underscores. For tiny examples such as
    }
 
 In larger examples with lots of non-trivial method bodies, it can get
-confusing to remember where the slot variables come from (because we no longer
-have the C<< $self->{ ... } >> visual clue). In these cases it is suggested to
-prefix the slot names with a leading underscore, to make them more visually
-distinct.
+confusing to remember where the field variables come from (because we no
+longer have the C<< $self->{ ... } >> visual clue). In these cases it is
+suggested to prefix the field names with a leading underscore, to make them
+more visually distinct.
 
    class Spudger {
       has $_grapefruit;
@@ -924,7 +925,7 @@ distinct.
       ...
 
       method mangle {
-         $_grapefruit->peel; # The leading underscore reminds us this is a slot
+         $_grapefruit->peel; # The leading underscore reminds us this is a field
       }
    }
 
@@ -969,12 +970,20 @@ sub Object::Pad::UNIVERSAL::BUILDARGS
    return @_;
 }
 
+# Back-compat wrapper
+sub Object::Pad::MOP::SlotAttr::register
+{
+   shift; # $class
+   carp "Object::Pad::MOP::SlotAttr->register is now deprecated; use Object::Pad::MOP::FieldAttr->register instead";
+   return Object::Pad::MOP::FieldAttr->register( @_ );
+}
+
 =head1 WITH OTHER MODULES
 
 =head2 Syntax::Keyword::Dynamically
 
 A cross-module integration test asserts that C<dynamically> works correctly
-on object instance slots:
+on object instance fields:
 
    use Object::Pad;
    use Syntax::Keyword::Dynamically;
@@ -1010,12 +1019,12 @@ async subs which await expressions:
    }
 
 These three modules combine; there is additionally a cross-module test to
-ensure that object instance slots can be C<dynamically> set during a suspended
-C<async method>.
+ensure that object instance fields can be C<dynamically> set during a
+suspended C<async method>.
 
 =head1 DESIGN TODOs
 
-The following points are details about the design of pad slot-based object
+The following points are details about the design of pad field-based object
 systems in general:
 
 =over 4
@@ -1023,12 +1032,12 @@ systems in general:
 =item *
 
 Is multiple inheritence actually required, if role composition is implemented
-including giving roles the ability to use private slots?
+including giving roles the ability to use private fields?
 
 =item *
 
-Consider the visibility of superclass slots to subclasses. Do subclasses even
-need to be able to see their superclass's slots, or are accessor methods
+Consider the visibility of superclass fields to subclasses. Do subclasses
+even need to be able to see their superclass's fields, or are accessor methods
 always appropriate?
 
 Concrete example: The C<< $self->{split_at} >> access that
@@ -1060,7 +1069,7 @@ Work out why we don't get a C<Subroutine new redefined at ...> warning if we
 
 =item *
 
-The C<local> modifier does not work on slot variables, because they appear to
+The C<local> modifier does not work on field variables, because they appear to
 be regular lexicals to the parser at that point. A workaround is to use
 L<Syntax::Keyword::Dynamically> instead:
 

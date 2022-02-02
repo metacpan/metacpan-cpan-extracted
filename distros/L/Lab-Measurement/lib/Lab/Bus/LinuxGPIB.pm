@@ -1,6 +1,6 @@
 package Lab::Bus::LinuxGPIB;
 #ABSTRACT: LinuxGPIB bus
-$Lab::Bus::LinuxGPIB::VERSION = '3.802';
+$Lab::Bus::LinuxGPIB::VERSION = '3.803';
 use v5.20;
 
 use strict;
@@ -492,7 +492,7 @@ Lab::Bus::LinuxGPIB - LinuxGPIB bus
 
 =head1 VERSION
 
-version 3.802
+version 3.803
 
 =head1 SYNOPSIS
 
@@ -624,7 +624,7 @@ and many more...
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2022 by the Lab::Measurement team; in detail:
 
   Copyright 2011       Andreas K. Huettel, Florian Olbrich
             2012       Florian Olbrich, Hermann Kraus, Stefan Geissler

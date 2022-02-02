@@ -56,7 +56,7 @@ C<Devel::PPPort> contains two functions, C<WriteFile> and C<GetFileContents>.
 C<WriteFile>'s only purpose is to write the F<ppport.h> C header file.
 This file contains a series of macros and, if explicitly requested, functions
 that allow XS modules to be built using older versions of Perl. Currently,
-Perl versions from 5.003_07 to 5.35.1 are supported.
+Perl versions from 5.003_07 to 5.35.9 are supported.
 
 C<GetFileContents> can be used to retrieve the file contents rather than
 writing it out.
@@ -127,7 +127,7 @@ of the would-be file rather than writing it out.
 
 =head1 COMPATIBILITY
 
-F<ppport.h> supports Perl versions from 5.003_07 to 5.35.1
+F<ppport.h> supports Perl versions from 5.003_07 to 5.35.9
 in threaded and non-threaded configurations.
 
 =head2 Provided Perl compatibility API
@@ -877,6 +877,51 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
 
 =over 4
 
+=item perl 5.35.9
+
+  NV_ZERO_IS_ALLBITS_ZERO
+  PERL_INC_VERSION_LIST
+  sv_numeq
+  sv_numeq_flags
+  sv_streq
+  sv_streq_flags
+  USE_C_BACKTRACE
+  WARN_EXPERIMENTAL__ARGS_ARRAY_WITH_SIGNATURES
+  WARN_EXPERIMENTAL__BUILTIN
+
+=item perl 5.35.8
+
+  op_wrap_finally  (marked experimental)
+
+=item perl 5.35.7
+
+  phase_name
+
+=item perl 5.35.6
+
+  CopFILEAVn
+  sv_setpvn_fresh
+
+=item perl 5.35.5
+
+  SAVESTRLEN
+  WARN_EXPERIMENTAL__FOR_LIST
+
+=item perl 5.35.4
+
+  newDEFEROP  (marked experimental)
+  PERL_THREAD_LOCAL
+  ST_DEV_SIGN
+  ST_DEV_SIZE
+  SvIsBOOL
+  sv_setbool
+  sv_setbool_mg
+  sv_setrv_inc
+  sv_setrv_inc_mg
+  sv_setrv_noinc
+  sv_setrv_noinc_mg
+  WARN_EXPERIMENTAL__DEFER
+
 =item perl 5.35.1
 
   av_new_alloc
@@ -887,9 +932,6 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   HAS_STRXFRM_L
   newAV_alloc_x
   newAV_alloc_xz
-  NV_ZERO_IS_ALLBITS_ZERO
-  PERL_INC_VERSION_LIST
-  USE_C_BACKTRACE
 
 =item perl 5.33.8
 
@@ -910,6 +952,11 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
 =item perl 5.33.5
 
   GETENV_PRESERVES_OTHER_THREAD
+  pad_compname_type  (DEPRECATED)
+
+=item perl 5.33.2
+
+  pack_cat  (DEPRECATED)
 
 =item perl 5.32.1
 
@@ -958,10 +1005,11 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
 
 =item perl 5.31.4
 
+  cop_fetch_label  (marked experimental)
+  cop_store_label  (marked experimental)
   sv_2pvbyte_flags  (undocumented)
   sv_2pvutf8_flags  (undocumented)
-  SvAMAGIC_off  (undocumented)
-  SvAMAGIC_on  (undocumented)
+  sv_nolocking  (DEPRECATED)
   SvPVbyte_nomg
   SvPVbyte_or_null
   SvPVbyte_or_null_nomg
@@ -1180,7 +1228,7 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   HAS_SIGINFO_SI_UID
   HAS_SIGINFO_SI_VALUE
   leave_adjust_stacks  (marked experimental)  (undocumented)
-  savetmps  (marked experimental)  (undocumented)
+  Perl_savetmps  (undocumented)
 
 =item perl 5.23.6
 
@@ -1206,6 +1254,7 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   I_SYS_STATVFS
   I_SYS_VFS
   I_USTAT
+  sv_ref
 
 =item perl 5.23.2
 
@@ -1266,6 +1315,8 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
 
 =item perl 5.21.6
 
+  block_end
+  block_start
   DOUBLE_IS_IEEE_754_128_BIT_BIG_ENDIAN
   DOUBLE_IS_IEEE_754_128_BIT_LITTLE_ENDIAN
   DOUBLE_IS_IEEE_754_32_BIT_BIG_ENDIAN
@@ -1311,6 +1362,7 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   HAS_SCALBN
   HAS_TGAMMA
   HAS_TRUNC
+  intro_my
   newDEFSVOP
   op_convert_list
   WARN_LOCALE
@@ -1384,7 +1436,6 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   HAS_WCSXFRM
   I_EXECINFO
   markstack_grow  (undocumented)
-  WARN_EXPERIMENTAL__WIN32_PERLIO
 
 =item perl 5.19.10
 
@@ -1421,9 +1472,12 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
 =item perl 5.19.1
 
   toFOLD
+  toFOLD_A
   toLOWER_A
   toLOWER_L1
   toTITLE
+  toTITLE_A
+  toUPPER_A
 
 =item perl 5.18.0
 
@@ -1542,7 +1596,6 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   sv_does_pv
   sv_does_pvn
   sv_does_sv
-  sv_ref
   whichsig_pv
   whichsig_pvn
   whichsig_sv
@@ -1564,16 +1617,19 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
 
 =item perl 5.15.1
 
-  cop_fetch_label  (marked experimental)
-  cop_store_label  (marked experimental)
+  cv_clone
+  pad_add_anon
   pad_add_name_pv
   pad_add_name_pvn
   pad_add_name_pvs
   pad_add_name_sv
+  pad_alloc  (marked experimental)
   pad_findmy_pv
   pad_findmy_pvn
   pad_findmy_pvs
   pad_findmy_sv
+  pad_new
+  pad_tidy  (marked experimental)
 
 =item perl 5.13.10
 
@@ -1589,6 +1645,8 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   UNICODE_DISALLOW_NONCHAR
   UNICODE_DISALLOW_SUPER
   UNICODE_DISALLOW_SURROGATE
+  UNICODE_IS_NONCHAR
+  UNICODE_IS_SUPER
   UNICODE_WARN_ILLEGAL_INTERCHANGE
   UNICODE_WARN_NONCHAR
   UNICODE_WARN_SUPER
@@ -1635,9 +1693,9 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   cop_hints_fetch_pvn
   cop_hints_fetch_pvs
   cop_hints_fetch_sv
-  custom_op_register
   dirp_dup  (undocumented)
   HvENAME
+  lex_start  (marked experimental)
   newFOROP
   newWHILEOP
   OP_CLASS
@@ -1647,6 +1705,7 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   parse_block  (marked experimental)
   parse_label  (marked experimental)
   PARSE_OPTIONAL
+  Perl_custom_op_register  (undocumented)
   PL_phase
   XopDISABLE
   XopENABLE
@@ -1665,6 +1724,7 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   gv_fetchpvn
   lex_stuff_pv  (marked experimental)
   LINKLIST
+  load_module_nocontext
   mg_free_type
   newSVpv_share
   op_append_elem
@@ -1677,6 +1737,8 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   rv2cv_op_cv
   RV2CVOPCV_MARK_EARLY
   RV2CVOPCV_RETURN_NAME_GV
+  save_pushi32ptr  (undocumented)
+  save_pushptrptr  (undocumented)
   savesharedpvs
   savesharedsvpv
   sv_catpv_flags
@@ -1693,9 +1755,11 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
 
 =item perl 5.13.5
 
+  hv_copy_hints_hv
   lex_stuff_pvs  (marked experimental)
   parse_fullstmt  (marked experimental)
   PL_rpeepp
+  save_hints  (undocumented)
 
 =item perl 5.13.4
 
@@ -1705,16 +1769,16 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
 
 =item perl 5.13.3
 
-  blockhook_register  (marked experimental)
+  Perl_blockhook_register  (undocumented)
 
 =item perl 5.13.2
 
-  clone_params_del  (undocumented)
-  clone_params_new  (undocumented)
   find_rundefsv
   foldEQ
   foldEQ_locale
-  hv_fill
+  Perl_clone_params_del  (undocumented)
+  Perl_clone_params_new  (undocumented)
+  Perl_hv_fill  (undocumented)
   sv_dec_nomg
   sv_dup_inc  (undocumented)
   sv_inc_nomg
@@ -1772,6 +1836,7 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   save_aelem_flags  (undocumented)
   save_hdelete  (undocumented)
   save_helem_flags  (undocumented)
+  setdefout
   SV_FORCE_UTF8_UPGRADE
   SvOOK_offset
   SVt_REGEXP
@@ -1793,20 +1858,17 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   I_SYS_POLL
   LOCALTIME_MAX
   LOCALTIME_MIN
-  mro_get_from_name  (undocumented)
   MRO_GET_PRIVATE_DATA
-  mro_register
-  mro_set_mro  (undocumented)
-  mro_set_private_data
   NV_OVERFLOWS_INTEGERS_AT
+  Perl_mro_get_from_name  (undocumented)
+  Perl_mro_register  (undocumented)
+  Perl_mro_set_mro  (undocumented)
+  Perl_mro_set_private_data  (undocumented)
   PERL_USE_DEVEL
   SAVEFREEOP
-  save_hints  (undocumented)
   save_op  (undocumented)
   save_padsv_and_mortalize  (undocumented)
-  save_pushi32ptr  (undocumented)
   save_pushptr  (undocumented)
-  save_pushptrptr  (undocumented)
   sv_insert_flags
 
 =item perl 5.10.0
@@ -1857,22 +1919,21 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
 
 =item perl 5.9.5
 
-  av_create_and_push  (marked experimental)
-  av_create_and_unshift_one  (marked experimental)
   CopLABEL
+  find_runcv
   gv_fetchfile_flags
   HAS_CTERMID
   HAS_PTHREAD_YIELD
   HAS_SIGNBIT
-  lex_start  (marked experimental)
   L_R_TZSET
   mro_get_linear_isa
   mro_method_changed_in
   my_dirfd  (undocumented)
+  Perl_av_create_and_push  (undocumented)
+  Perl_av_create_and_unshift_one  (undocumented)
   Perl_signbit  (marked experimental)
   pregcomp
   PRINTF_FORMAT_NULL_OK
-  ptr_table_clear  (DEPRECATED)  (undocumented)
   ptr_table_fetch  (undocumented)
   ptr_table_free  (undocumented)
   ptr_table_new  (undocumented)
@@ -1889,13 +1950,13 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   GV_NOTQUAL
   HAS_BUILTIN_CHOOSE_EXPR
   HAS_C99_VARIADIC_MACROS
-  hv_copy_hints_hv
   my_vsnprintf
   newXS_flags  (marked experimental)  (undocumented)
-  PerlIO_context_layers  (undocumented)
   PERL_MAGIC_hints
   PERL_MAGIC_hintselem
+  Perl_PerlIO_context_layers  (undocumented)
   sv_does
+  sv_nounlocking  (DEPRECATED)
   sv_usepvn_flags
 
 =item perl 5.9.3
@@ -1918,25 +1979,26 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   HAS_SNPRINTF
   HAS_UNSETENV
   HAS_VSNPRINTF
-  hv_eiter_p  (undocumented)
-  hv_eiter_set  (undocumented)
   hv_name_set  (undocumented)
-  hv_placeholders_get  (undocumented)
-  hv_placeholders_set  (undocumented)
-  hv_riter_p  (undocumented)
-  hv_riter_set  (undocumented)
   is_utf8_string_loclen
   LIBM_LIB_VERSION
   MULTICALL
   newGIVENOP
   newSVhek
-  pad_compname_type  (DEPRECATED)
+  Perl_hv_eiter_p  (undocumented)
+  Perl_hv_eiter_set  (undocumented)
+  Perl_hv_placeholders_get  (undocumented)
+  Perl_hv_placeholders_set  (undocumented)
+  Perl_hv_riter_p  (undocumented)
+  Perl_hv_riter_set  (undocumented)
   PERLIO_FUNCS_DECL  (undocumented)
   PERL_MAGIC_arylen_p
   PERL_MAGIC_rhash
   PERL_MAGIC_symtab
   POP_MULTICALL
   savepvs
+  seed  (undocumented)
+  share_hek  (undocumented)
   sortsv_flags
   SvPVbytex_nolen
   SvPV_free
@@ -1973,9 +2035,9 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   MY_CXT
   MY_CXT_CLONE
   MY_CXT_INIT
-  my_cxt_init  (undocumented)
   new_version
   parser_dup  (undocumented)
+  Perl_my_cxt_init  (undocumented)
   _pMY_CXT
   pMY_CXT
   pMY_CXT_
@@ -1987,11 +2049,12 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
 
 =item perl 5.8.9
 
-  hv_assert
+  Perl_hv_assert  (undocumented)
 
 =item perl 5.8.8
 
   __ASSERT_
+  rvpv_dup  (undocumented)
 
 =item perl 5.8.3
 
@@ -2001,7 +2064,6 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
 =item perl 5.8.1
 
   CvPADLIST  (marked experimental)
-  find_runcv
   HAS_COPYSIGNL
   HAS_FAST_STDIO
   HAS_ILOGBL
@@ -2011,13 +2073,9 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   IN_PERL_RUNTIME
   is_utf8_string_loc
   packlist
-  pad_add_anon
-  pad_new
-  pad_tidy  (marked experimental)
   PL_comppad  (marked experimental)
   SAVEBOOL
   savestack_grow_cnt  (undocumented)
-  seed  (undocumented)
   sv_cat_decode
   sv_setpviv  (DEPRECATED)
   sv_setpviv_mg  (DEPRECATED)
@@ -2085,10 +2143,10 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
 
 =item perl 5.7.3
 
+  atfork_lock  (undocumented)
+  atfork_unlock  (undocumented)
   custom_op_desc  (DEPRECATED)
   custom_op_name  (DEPRECATED)
-  deb  (undocumented)
-  deb_nocontext  (undocumented)
   debstack  (undocumented)
   debstackptrs  (undocumented)
   foldEQ_utf8
@@ -2107,7 +2165,8 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   my_socketpair  (undocumented)
   OP_DESC
   OP_NAME
-  pack_cat  (DEPRECATED)
+  Perl_deb  (undocumented)
+  Perl_deb_nocontext  (undocumented)
   perl_destruct
   PERL_EXIT_DESTRUCT_END
   PerlIO_clearerr
@@ -2115,7 +2174,6 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   PerlIO_eof
   PerlIO_error
   PerlIO_fileno
-  PerlIO_fill  (undocumented)
   PerlIO_flush
   PerlIO_get_base
   PerlIO_get_bufsiz
@@ -2138,7 +2196,6 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   PL_peepp
   PROCSELFEXE_PATH
   pv_uni_display
-  rvpv_dup  (undocumented)
   savesharedpv
   save_shared_pvref  (undocumented)
   si_dup  (undocumented)
@@ -2148,9 +2205,7 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   sv_dup  (undocumented)
   SvLOCK
   sv_magicext
-  sv_nolocking  (DEPRECATED)
   sv_nosharing
-  sv_nounlocking  (DEPRECATED)
   sv_recode_to_utf8
   SvSHARE
   sv_uni_display
@@ -2165,9 +2220,6 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
 
 =item perl 5.7.2
 
-  atfork_lock  (undocumented)
-  atfork_unlock  (undocumented)
-  calloc
   DB_VERSION_MAJOR_CFG
   DB_VERSION_MINOR_CFG
   DB_VERSION_PATCH_CFG
@@ -2181,19 +2233,21 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   HAS_USLEEP_PROTO
   I_LANGINFO
   init_tm  (undocumented)
-  malloc
-  mfree  (undocumented)
   mini_mktime
-  my_strftime
   op_null
   OSVERS
+  Perl_calloc  (undocumented)
+  Perl_malloc  (undocumented)
+  Perl_mfree  (undocumented)
+  Perl_my_strftime  (undocumented)
+  Perl_realloc  (undocumented)
   PERL_TARGETARCH
-  realloc
   sv_catpvn_flags
   sv_catsv_flags
   sv_utf8_upgrade_flags
   sv_utf8_upgrade_nomg
   U_32
+  UNICODE_IS_REPLACEMENT
 
 =item perl 5.7.1
 
@@ -2253,8 +2307,8 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   PERLIO_K_CANCRLF
   PERLIO_K_FASTGETS
   PERLIO_K_RAW
+  Perl_printf_nocontext  (undocumented)
   POPpbytex
-  printf_nocontext  (DEPRECATED)  (undocumented)
   SAVEMORTALIZESV
   SIG_SIZE
   STDIO_PTR_LVAL_SETS_CNT
@@ -2263,6 +2317,7 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   sv_unref_flags
   sv_utf8_upgrade
   U32_ALIGNMENT_REQUIRED
+  UNICODE_IS_SURROGATE
   USE_PERLIO
   UTF8_CHECK_ONLY
   utf8_length
@@ -2276,6 +2331,7 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   FILE_bufsiz
   FILE_cnt
   FILE_ptr
+  PerlIO_fill  (undocumented)
 
 =item perl 5.6.1
 
@@ -2543,7 +2599,6 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   UTF8SKIP
   vcroak
   vform
-  vwarn
 
 =item perl 5.005_03
 
@@ -2642,14 +2697,9 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
 
   ARCHNAME
   BIN_EXP
-  block_end
   block_gimme  (undocumented)
-  block_start
   call_list  (undocumented)
-  ck_warner
-  ck_warner_d
   delimcpy
-  form
   GIMME_V
   gv_autoload4
   gv_fetchmethod_autoload
@@ -2668,7 +2718,6 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   IN_LOCALE
   IN_LOCALE_COMPILETIME
   IN_LOCALE_RUNTIME
-  intro_my
   isALNUM_LC
   isALPHA_LC
   isALPHANUMERIC_LC
@@ -2681,10 +2730,18 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   isUPPER_LC
   isWORDCHAR_LC
   JMPENV_JUMP
-  mess
   mess_sv
   my_failure_exit  (undocumented)
-  newSVpvf
+  Perl_ck_warner  (undocumented)
+  Perl_ck_warner_d  (undocumented)
+  Perl_form  (undocumented)
+  Perl_mess  (undocumented)
+  Perl_newSVpvf  (undocumented)
+  Perl_sv_catpvf  (undocumented)
+  Perl_sv_catpvf_mg  (undocumented)
+  Perl_sv_setpvf  (undocumented)
+  Perl_sv_setpvf_mg  (undocumented)
+  Perl_warner  (undocumented)
   Perl_warner_nocontext  (undocumented)
   PL_mess_sv  (undocumented)
   POPu
@@ -2693,17 +2750,12 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   save_gp
   SAVEI16
   SAVESTACK_POS
-  share_hek  (undocumented)
   SHORTSIZE
-  sv_catpvf
-  sv_catpvf_mg
   sv_cmp_locale
   sv_derived_from
   sv_magic_portable  (undocumented)
   SvSetMagicSV
   SvSetMagicSV_nosteal
-  sv_setpvf
-  sv_setpvf_mg
   SvSetSV_nosteal
   SvTAINTED
   SvTAINTED_off
@@ -2719,7 +2771,6 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   vmess
   vnewSVpvf
   vwarner
-  warner
 
 =item perl 5.003_07 (or maybe earlier)
 
@@ -2787,12 +2838,10 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   CPERLscope  (DEPRECATED)
   CPPMINUS
   CPPSTDIN
-  croak
   croak_no_modify
   croak_sv
   croak_xs_usage
   CSH
-  cv_clone
   cv_const_sv
   CvDEPTH  (undocumented)
   CvGV
@@ -2804,7 +2853,6 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   DB_Prefix_t
   DEFSV
   DEFSV_set
-  die
   die_sv
   Direntry_t
   dITEMS
@@ -3181,7 +3229,6 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   my_pclose  (undocumented)
   my_popen  (undocumented)
   my_setenv
-  my_snprintf
   my_sprintf  (DEPRECATED)
   my_strlcat
   my_strlcpy
@@ -3271,11 +3318,12 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   packWARN2
   packWARN3
   packWARN4
-  pad_alloc  (marked experimental)
   PERL_ABS
   perl_alloc
   PERL_BCDVERSION  (undocumented)
   perl_construct
+  Perl_croak  (undocumented)
+  Perl_die  (undocumented)
   Perl_eval_pv  (undocumented)
   Perl_eval_sv  (undocumented)
   perl_free
@@ -3347,6 +3395,7 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   PERL_MAGIC_uvar_elem
   PERL_MAGIC_vec
   PERL_MAGIC_vstring
+  Perl_my_snprintf  (undocumented)
   PERL_PV_ESCAPE_ALL
   PERL_PV_ESCAPE_FIRSTCHAR
   PERL_PV_ESCAPE_NOBACKSLASH
@@ -3392,6 +3441,7 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   PERL_VERSION_GT
   PERL_VERSION_LE
   PERL_VERSION_LT
+  Perl_warn  (undocumented)
   PL_bufend  (undocumented)
   PL_bufptr  (undocumented)
   PL_compiling  (undocumented)
@@ -3504,7 +3554,6 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   scan_hex
   scan_oct
   Select_fd_set_t
-  setdefout
   Shmat_t
   SH_PATH
   Sigjmp_buf
@@ -3543,6 +3592,8 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   sv_2io
   sv_2mortal
   sv_2pvbyte
+  SvAMAGIC_off  (undocumented)
+  SvAMAGIC_on  (undocumented)
   sv_backoff
   sv_bless
   sv_catpv
@@ -3773,7 +3824,7 @@ backported, first send mail to L<mailto:perl5-porters@perl.org>.
   VAL_EAGAIN
   VAL_O_NONBLOCK
   vload_module
-  warn
+  vwarn
   WARN_ALL
   WARN_AMBIGUOUS
   WARN_ASSERTIONS  (undocumented)
@@ -3927,7 +3978,7 @@ package Devel::PPPort;
 use strict;
 use vars qw($VERSION $data);
 
-$VERSION = '3.63';
+$VERSION = '3.64';
 
 sub _init_data
 {
@@ -4021,7 +4072,7 @@ SKIP
 |>=head1 COMPATIBILITY
 |>
 |>This version of F<ppport.h> is designed to support operation with Perl
-|>installations back to 5.003_07, and has been tested up to 5.35.1.
+|>installations back to 5.003_07, and has been tested up to 5.35.9.
 |>
 |>=head1 OPTIONS
 |>
@@ -4648,8 +4699,10 @@ abort|5.005000||Viu
 abort_execution|5.025010||Viu
 accept|5.005000||Viu
 ACCEPT|5.009005||Viu
+ACCEPT_t8|5.035004||Viu
 ACCEPT_t8_p8|5.033003||Viu
 ACCEPT_t8_pb|5.033003||Viu
+ACCEPT_tb|5.035004||Viu
 ACCEPT_tb_p8|5.033003||Viu
 ACCEPT_tb_pb|5.033003||Viu
 access|5.005000||Viu
@@ -4665,12 +4718,16 @@ advance_one_SB|5.021009||Viu
 advance_one_WB|5.021009||Viu
 AHOCORASICK|5.009005||Viu
 AHOCORASICKC|5.009005||Viu
+AHOCORASICKC_t8|5.035004||Viu
 AHOCORASICKC_t8_p8|5.033003||Viu
 AHOCORASICKC_t8_pb|5.033003||Viu
+AHOCORASICKC_tb|5.035004||Viu
 AHOCORASICKC_tb_p8|5.033003||Viu
 AHOCORASICKC_tb_pb|5.033003||Viu
+AHOCORASICK_t8|5.035004||Viu
 AHOCORASICK_t8_p8|5.033003||Viu
 AHOCORASICK_t8_pb|5.033003||Viu
+AHOCORASICK_tb|5.035004||Viu
 AHOCORASICK_tb_p8|5.033003||Viu
 AHOCORASICK_tb_pb|5.033003||Viu
 alloccopstash|5.017001|5.017001|x
@@ -4741,8 +4798,10 @@ ANYOF_CNTRL|5.006000||Viu
 ANYOF_COMMON_FLAGS|5.019008||Viu
 ANYOFD|5.023003||Viu
 ANYOF_DIGIT|5.006000||Viu
+ANYOFD_t8|5.035004||Viu
 ANYOFD_t8_p8|5.033003||Viu
 ANYOFD_t8_pb|5.033003||Viu
+ANYOFD_tb|5.035004||Viu
 ANYOFD_tb_p8|5.033003||Viu
 ANYOFD_tb_pb|5.033003||Viu
 ANYOF_FLAGS|5.006000||Viu
@@ -4750,23 +4809,31 @@ ANYOF_FLAGS_ALL|5.006000||Viu
 ANYOF_GRAPH|5.006000||Viu
 ANYOFH|5.029007||Viu
 ANYOFHb|5.031001||Viu
+ANYOFHb_t8|5.035004||Viu
 ANYOFHb_t8_p8|5.033003||Viu
 ANYOFHb_t8_pb|5.033003||Viu
+ANYOFHb_tb|5.035004||Viu
 ANYOFHb_tb_p8|5.033003||Viu
 ANYOFHb_tb_pb|5.033003||Viu
 ANYOF_HORIZWS|5.009005||Viu
 ANYOFHr|5.031002||Viu
+ANYOFHr_t8|5.035004||Viu
 ANYOFHr_t8_p8|5.033003||Viu
 ANYOFHr_t8_pb|5.033003||Viu
+ANYOFHr_tb|5.035004||Viu
 ANYOFHr_tb_p8|5.033003||Viu
 ANYOFHr_tb_pb|5.033003||Viu
 ANYOFHs|5.031007||Viu
+ANYOFHs_t8|5.035004||Viu
 ANYOFHs_t8_p8|5.033003||Viu
 ANYOFHs_t8_pb|5.033003||Viu
+ANYOFHs_tb|5.035004||Viu
 ANYOFHs_tb_p8|5.033003||Viu
 ANYOFHs_tb_pb|5.033003||Viu
+ANYOFH_t8|5.035004||Viu
 ANYOFH_t8_p8|5.033003||Viu
 ANYOFH_t8_pb|5.033003||Viu
+ANYOFH_tb|5.035004||Viu
 ANYOFH_tb_p8|5.033003||Viu
 ANYOFH_tb_pb|5.033003||Viu
 ANYOF_INVERT|5.004000||Viu
@@ -4776,8 +4843,10 @@ ANYOF_LOCALE_FLAGS|5.019005||Viu
 ANYOF_LOWER|5.006000||Viu
 ANYOFL_SHARED_UTF8_LOCALE_fold_HAS_MATCHES_nonfold_REQD|5.023007||Viu
 ANYOFL_SOME_FOLDS_ONLY_IN_UTF8_LOCALE|5.023007||Viu
+ANYOFL_t8|5.035004||Viu
 ANYOFL_t8_p8|5.033003||Viu
 ANYOFL_t8_pb|5.033003||Viu
+ANYOFL_tb|5.035004||Viu
 ANYOFL_tb_p8|5.033003||Viu
 ANYOFL_tb_pb|5.033003||Viu
 ANYOFL_UTF8_LOCALE_REQD|5.023007||Viu
@@ -4785,8 +4854,10 @@ ANYOFM|5.027009||Viu
 ANYOF_MATCHES_ALL_ABOVE_BITMAP|5.021004||Viu
 ANYOF_MATCHES_POSIXL|5.021004||Viu
 ANYOF_MAX|5.006000||Viu
+ANYOFM_t8|5.035004||Viu
 ANYOFM_t8_p8|5.033003||Viu
 ANYOFM_t8_pb|5.033003||Viu
+ANYOFM_tb|5.035004||Viu
 ANYOFM_tb_p8|5.033003||Viu
 ANYOFM_tb_pb|5.033003||Viu
 ANYOF_NALNUM|5.006000||Viu
@@ -4812,6 +4883,7 @@ ANYOF_NXDIGIT|5.006000||Viu
 ANYOF_ONLY_HAS_BITMAP|5.021004||Viu
 ANYOFPOSIXL|5.029004||Viu
 ANYOF_POSIXL_AND|5.019005||Viu
+ANYOF_POSIXL_BITMAP|5.035003||Viu
 ANYOF_POSIXL_CLEAR|5.019005||Viu
 ANYOF_POSIXL_MAX|5.019005||Viu
 ANYOF_POSIXL_OR|5.019005||Viu
@@ -4820,8 +4892,10 @@ ANYOF_POSIXL_SETALL|5.019005||Viu
 ANYOF_POSIXL_SET_TO_BITMAP|5.029004||Viu
 ANYOF_POSIXL_SSC_TEST_ALL_SET|5.019009||Viu
 ANYOF_POSIXL_SSC_TEST_ANY_SET|5.019009||Viu
+ANYOFPOSIXL_t8|5.035004||Viu
 ANYOFPOSIXL_t8_p8|5.033003||Viu
 ANYOFPOSIXL_t8_pb|5.033003||Viu
+ANYOFPOSIXL_tb|5.035004||Viu
 ANYOFPOSIXL_tb_p8|5.033003||Viu
 ANYOFPOSIXL_tb_pb|5.033003||Viu
 ANYOF_POSIXL_TEST|5.019005||Viu
@@ -4834,21 +4908,27 @@ ANYOFR|5.031007||Viu
 ANYOFRb|5.031007||Viu
 ANYOFRbase|5.031007||Viu
 ANYOFR_BASE_BITS|5.031007||Viu
+ANYOFRb_t8|5.035004||Viu
 ANYOFRb_t8_p8|5.033003||Viu
 ANYOFRb_t8_pb|5.033003||Viu
+ANYOFRb_tb|5.035004||Viu
 ANYOFRb_tb_p8|5.033003||Viu
 ANYOFRb_tb_pb|5.033003||Viu
 ANYOFRdelta|5.031007||Viu
+ANYOFR_t8|5.035004||Viu
 ANYOFR_t8_p8|5.033003||Viu
 ANYOFR_t8_pb|5.033003||Viu
+ANYOFR_tb|5.035004||Viu
 ANYOFR_tb_p8|5.033003||Viu
 ANYOFR_tb_pb|5.033003||Viu
 ANYOF_SHARED_d_MATCHES_ALL_NON_UTF8_NON_ASCII_non_d_WARN_SUPER|5.023003||Viu
 ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP|5.023006||Viu
 ANYOF_SPACE|5.006000||Viu
 ANYOF_SPACEL|5.004000||Viu
+ANYOF_t8|5.035004||Viu
 ANYOF_t8_p8|5.033003||Viu
 ANYOF_t8_pb|5.033003||Viu
+ANYOF_tb|5.035004||Viu
 ANYOF_tb_p8|5.033003||Viu
 ANYOF_tb_pb|5.033003||Viu
 ANYOF_UNIPROP|5.017006||Viu
@@ -4887,6 +4967,7 @@ ARG_VALUE|5.005000||Viu
 argvout_final|5.029006||Viu
 ASCIIish|5.005003||Viu
 ASCII_MORE_RESTRICT_PAT_MODS|5.013010||Viu
+ASCII_PLATFORM_UTF8_MAXBYTES|5.035004||Viu
 ASCII_RESTRICT_PAT_MOD|5.013009||Viu
 ASCII_RESTRICT_PAT_MODS|5.013009||Viu
 ASCII_TO_NATIVE|5.007001||Viu
@@ -4898,12 +4979,13 @@ __ASSERT_|5.019007|5.008008|p
 ASSERT_CURPAD_ACTIVE|5.008001||Viu
 ASSERT_CURPAD_LEGAL|5.008001||Viu
 assert_not_glob|5.009004||Viu
+ASSERT_NOT_PTR|5.035004||Viu
 assert_not_ROK|5.008001||Viu
 assert_uft8_cache_coherent|5.013003||Viu
 assignment_type|5.021005||Viu
 ASSUME|5.019006|5.003007|p
-atfork_lock|5.007002|5.007002|nu
-atfork_unlock|5.007002|5.007002|nu
+atfork_lock|5.007003|5.007003|nu
+atfork_unlock|5.007003|5.007003|nu
 aTHX|5.006000|5.003007|p
 aTHX_|5.006000|5.003007|p
 aTHXa|5.017006||Viu
@@ -4921,13 +5003,14 @@ AvARYLEN|5.003007||Viu
 av_arylen_p|||cu
 av_clear|5.003007|5.003007|
 av_count|5.033001|5.003007|p
-av_create_and_push|5.009005|5.009005|x
-av_create_and_unshift_one|5.009005|5.009005|x
+av_create_and_push|||
+av_create_and_unshift_one|||
 av_delete|5.006000|5.006000|
 av_exists|5.006000|5.006000|
 av_extend|5.003007|5.003007|
 av_extend_guts|5.017004||Viu
 av_fetch|5.003007|5.003007|
+av_fetch_simple|5.035002||cV
 av_fill|5.003007|5.003007|
 AvFILL|5.003007|5.003007|
 AvFILLp|5.004005||pcV
@@ -4951,6 +5034,7 @@ AvREIFY_on|5.003007||Viu
 AvREIFY_only|5.009003||Viu
 av_shift|5.003007|5.003007|
 av_store|5.003007|5.003007|
+av_store_simple|5.035002||cV
 av_tindex|5.017009|5.003007|p
 av_tindex_skip_len_mg|5.025010||Viu
 av_top_index|5.017009|5.003007|p
@@ -4997,17 +5081,19 @@ blk_oldsp|5.003007||Viu
 blk_old_tmpsfloor|5.023008||Viu
 blk_sub|5.003007||Viu
 blk_u16|5.011000||Viu
-block_end|5.004000|5.004000|
+block_end|5.021006|5.021006|
 block_gimme|5.004000|5.004000|u
-blockhook_register|5.013003|5.013003|x
-block_start|5.004000|5.004000|
+blockhook_register|||x
+block_start|5.021006|5.021006|
 BmFLAGS|5.009005||Viu
 BmPREVIOUS|5.003007||Viu
 BmRARE|5.003007||Viu
 BmUSEFUL|5.003007||Viu
 BOL|5.003007||Viu
+BOL_t8|5.035004||Viu
 BOL_t8_p8|5.033003||Viu
 BOL_t8_pb|5.033003||Viu
+BOL_tb|5.035004||Viu
 BOL_tb_p8|5.033003||Viu
 BOL_tb_pb|5.033003||Viu
 BOM_UTF8|5.025005|5.003007|p
@@ -5015,47 +5101,64 @@ BOM_UTF8_FIRST_BYTE|5.019004||Viu
 BOM_UTF8_TAIL|5.019004||Viu
 bool|5.003007||Viu
 boolSV|5.004000|5.003007|p
+boot_core_builtin|5.035007||Viu
 boot_core_mro|5.009005||Viu
 boot_core_PerlIO|5.007002||Viu
 boot_core_UNIVERSAL|5.003007||Viu
 BOUND|5.003007||Viu
 BOUNDA|5.013009||Viu
+BOUNDA_t8|5.035004||Viu
 BOUNDA_t8_p8|5.033003||Viu
 BOUNDA_t8_pb|5.033003||Viu
+BOUNDA_tb|5.035004||Viu
 BOUNDA_tb_p8|5.033003||Viu
 BOUNDA_tb_pb|5.033003||Viu
 BOUNDL|5.004000||Viu
+BOUNDL_t8|5.035004||Viu
 BOUNDL_t8_p8|5.033003||Viu
 BOUNDL_t8_pb|5.033003||Viu
+BOUNDL_tb|5.035004||Viu
 BOUNDL_tb_p8|5.033003||Viu
 BOUNDL_tb_pb|5.033003||Viu
+BOUND_t8|5.035004||Viu
 BOUND_t8_p8|5.033003||Viu
 BOUND_t8_pb|5.033003||Viu
+BOUND_tb|5.035004||Viu
 BOUND_tb_p8|5.033003||Viu
 BOUND_tb_pb|5.033003||Viu
 BOUNDU|5.013009||Viu
+BOUNDU_t8|5.035004||Viu
 BOUNDU_t8_p8|5.033003||Viu
 BOUNDU_t8_pb|5.033003||Viu
+BOUNDU_tb|5.035004||Viu
 BOUNDU_tb_p8|5.033003||Viu
 BOUNDU_tb_pb|5.033003||Viu
 BRANCH|5.003007||Viu
 BRANCHJ|5.005000||Viu
+BRANCHJ_t8|5.035004||Viu
 BRANCHJ_t8_p8|5.033003||Viu
 BRANCHJ_t8_pb|5.033003||Viu
+BRANCHJ_tb|5.035004||Viu
 BRANCHJ_tb_p8|5.033003||Viu
 BRANCHJ_tb_pb|5.033003||Viu
 BRANCH_next|5.009005||Viu
 BRANCH_next_fail|5.009005||Viu
+BRANCH_next_fail_t8|5.035004||Viu
 BRANCH_next_fail_t8_p8|5.033003||Viu
 BRANCH_next_fail_t8_pb|5.033003||Viu
+BRANCH_next_fail_tb|5.035004||Viu
 BRANCH_next_fail_tb_p8|5.033003||Viu
 BRANCH_next_fail_tb_pb|5.033003||Viu
+BRANCH_next_t8|5.035004||Viu
 BRANCH_next_t8_p8|5.033003||Viu
 BRANCH_next_t8_pb|5.033003||Viu
+BRANCH_next_tb|5.035004||Viu
 BRANCH_next_tb_p8|5.033003||Viu
 BRANCH_next_tb_pb|5.033003||Viu
+BRANCH_t8|5.035004||Viu
 BRANCH_t8_p8|5.033003||Viu
 BRANCH_t8_pb|5.033003||Viu
+BRANCH_tb|5.035004||Viu
 BRANCH_tb_p8|5.033003||Viu
 BRANCH_tb_pb|5.033003||Viu
 BSD_GETPGRP|5.003007||Viu
@@ -5076,7 +5179,7 @@ caller_cx|5.013005|5.006000|p
 CALL_FPTR|5.006000||Viu
 call_list|5.004000|5.004000|u
 call_method|5.006000|5.003007|p
-calloc|5.007002|5.007002|n
+calloc|5.029005||Vn
 call_pv|5.006000|5.003007|p
 CALLREGCOMP|5.005000||Viu
 CALLREGCOMP_ENG|5.009005||Viu
@@ -5424,8 +5527,8 @@ ckwarn_common|5.011001||Viu
 ckwarn|||cu
 ckWARN_d|5.006000|5.003007|p
 ckwarn_d|||cu
-ck_warner|5.011001|5.004000|pv
-ck_warner_d|5.011001|5.004000|pv
+ck_warner|5.011001||pvV
+ck_warner_d|5.011001||pvV
 CLANG_DIAG_IGNORE|5.023006||Viu
 CLANG_DIAG_IGNORE_DECL|5.027007||Viu
 CLANG_DIAG_IGNORE_STMT|5.027007||Viu
@@ -5451,8 +5554,8 @@ CLONEf_CLONE_HOST|5.007002||Viu
 CLONEf_COPY_STACKS|5.007001||Viu
 CLONEf_JOIN_IN|5.008001||Viu
 CLONEf_KEEP_PTR_TABLE|5.007001||Viu
-clone_params_del|5.013002|5.013002|nu
-clone_params_new|5.013002|5.013002|nu
+clone_params_del|||nu
+clone_params_new|||nu
 cLOOP|5.003007||Viu
 cLOOPo|5.004005||Viu
 cLOOPx|5.006000||Viu
@@ -5460,15 +5563,19 @@ CLOSE|5.003007||Viu
 close|5.005000||Viu
 closedir|5.005000||Viu
 closest_cop|5.007002||Viu
+CLOSE_t8|5.035004||Viu
 CLOSE_t8_p8|5.033003||Viu
 CLOSE_t8_pb|5.033003||Viu
+CLOSE_tb|5.035004||Viu
 CLOSE_tb_p8|5.033003||Viu
 CLOSE_tb_pb|5.033003||Viu
 CLUMP_2IV|5.006000||Viu
 CLUMP_2UV|5.006000||Viu
 CLUMP|5.006000||Viu
+CLUMP_t8|5.035004||Viu
 CLUMP_t8_p8|5.033003||Viu
 CLUMP_t8_pb|5.033003||Viu
+CLUMP_tb|5.035004||Viu
 CLUMP_tb_p8|5.033003||Viu
 CLUMP_tb_pb|5.033003||Viu
 cMETHOPx|5.021005||Viu
@@ -5486,16 +5593,22 @@ COMBINING_GRAVE_ACCENT_UTF8|5.017004||Viu
 COMMIT|5.009005||Viu
 COMMIT_next|5.009005||Viu
 COMMIT_next_fail|5.009005||Viu
+COMMIT_next_fail_t8|5.035004||Viu
 COMMIT_next_fail_t8_p8|5.033003||Viu
 COMMIT_next_fail_t8_pb|5.033003||Viu
+COMMIT_next_fail_tb|5.035004||Viu
 COMMIT_next_fail_tb_p8|5.033003||Viu
 COMMIT_next_fail_tb_pb|5.033003||Viu
+COMMIT_next_t8|5.035004||Viu
 COMMIT_next_t8_p8|5.033003||Viu
 COMMIT_next_t8_pb|5.033003||Viu
+COMMIT_next_tb|5.035004||Viu
 COMMIT_next_tb_p8|5.033003||Viu
 COMMIT_next_tb_pb|5.033003||Viu
+COMMIT_t8|5.035004||Viu
 COMMIT_t8_p8|5.033003||Viu
 COMMIT_t8_pb|5.033003||Viu
+COMMIT_tb|5.035004||Viu
 COMMIT_tb_p8|5.033003||Viu
 COMMIT_tb_pb|5.033003||Viu
 compile_wildcard|5.031010||Viu
@@ -5508,9 +5621,11 @@ COND_WAIT|5.005000||Viu
 connect|5.005000||Viu
 construct_ahocorasick_from_trie|5.021001||Viu
 CONTINUE_PAT_MOD|5.009005||Viu
-cop_fetch_label|5.015001|5.015001|x
+cop_fetch_label|5.031004|5.031004|x
 CopFILE|5.006000|5.003007|p
 CopFILEAV|5.006000|5.003007|p
+CopFILEAVn|5.035006|5.035006|
+cop_file_avn|5.035006||cVu
 CopFILEAVx|5.009003||Viu
 CopFILE_free|5.007003||Viu
 CopFILEGV|5.006000|5.003007|p
@@ -5571,7 +5686,7 @@ CopSTASH_ne|5.006000||Viu
 CopSTASHPV|5.006000|5.003007|p
 CopSTASHPV_set|5.017001|5.017001|p
 CopSTASH_set|5.006000|5.003007|p
-cop_store_label|5.015001|5.015001|x
+cop_store_label|5.031004|5.031004|x
 Copy|5.003007|5.003007|
 CopyD|5.009002|5.003007|p
 core_prototype|5.015002||Vi
@@ -5595,7 +5710,7 @@ cPVOPx|5.006000||Viu
 create_eval_scope|5.009004||xViu
 CR_NATIVE|5.019004||Viu
 CRNCYSTR|5.027010||Viu
-croak|5.006000|5.003007|v
+croak|5.003007||vV
 croak_caller|5.025004||vVniu
 croak_memory_wrap|5.019003||pcVnu
 croak_nocontext|5.006000||pvVn
@@ -5633,71 +5748,99 @@ cUNOPx|5.006000||Viu
 CURLY|5.003007||Viu
 CURLY_B_max|5.009005||Viu
 CURLY_B_max_fail|5.009005||Viu
+CURLY_B_max_fail_t8|5.035004||Viu
 CURLY_B_max_fail_t8_p8|5.033003||Viu
 CURLY_B_max_fail_t8_pb|5.033003||Viu
+CURLY_B_max_fail_tb|5.035004||Viu
 CURLY_B_max_fail_tb_p8|5.033003||Viu
 CURLY_B_max_fail_tb_pb|5.033003||Viu
+CURLY_B_max_t8|5.035004||Viu
 CURLY_B_max_t8_p8|5.033003||Viu
 CURLY_B_max_t8_pb|5.033003||Viu
+CURLY_B_max_tb|5.035004||Viu
 CURLY_B_max_tb_p8|5.033003||Viu
 CURLY_B_max_tb_pb|5.033003||Viu
 CURLY_B_min|5.009005||Viu
 CURLY_B_min_fail|5.009005||Viu
+CURLY_B_min_fail_t8|5.035004||Viu
 CURLY_B_min_fail_t8_p8|5.033003||Viu
 CURLY_B_min_fail_t8_pb|5.033003||Viu
+CURLY_B_min_fail_tb|5.035004||Viu
 CURLY_B_min_fail_tb_p8|5.033003||Viu
 CURLY_B_min_fail_tb_pb|5.033003||Viu
+CURLY_B_min_t8|5.035004||Viu
 CURLY_B_min_t8_p8|5.033003||Viu
 CURLY_B_min_t8_pb|5.033003||Viu
+CURLY_B_min_tb|5.035004||Viu
 CURLY_B_min_tb_p8|5.033003||Viu
 CURLY_B_min_tb_pb|5.033003||Viu
 CURLYM|5.005000||Viu
 CURLYM_A|5.009005||Viu
 CURLYM_A_fail|5.009005||Viu
+CURLYM_A_fail_t8|5.035004||Viu
 CURLYM_A_fail_t8_p8|5.033003||Viu
 CURLYM_A_fail_t8_pb|5.033003||Viu
+CURLYM_A_fail_tb|5.035004||Viu
 CURLYM_A_fail_tb_p8|5.033003||Viu
 CURLYM_A_fail_tb_pb|5.033003||Viu
+CURLYM_A_t8|5.035004||Viu
 CURLYM_A_t8_p8|5.033003||Viu
 CURLYM_A_t8_pb|5.033003||Viu
+CURLYM_A_tb|5.035004||Viu
 CURLYM_A_tb_p8|5.033003||Viu
 CURLYM_A_tb_pb|5.033003||Viu
 CURLYM_B|5.009005||Viu
 CURLYM_B_fail|5.009005||Viu
+CURLYM_B_fail_t8|5.035004||Viu
 CURLYM_B_fail_t8_p8|5.033003||Viu
 CURLYM_B_fail_t8_pb|5.033003||Viu
+CURLYM_B_fail_tb|5.035004||Viu
 CURLYM_B_fail_tb_p8|5.033003||Viu
 CURLYM_B_fail_tb_pb|5.033003||Viu
+CURLYM_B_t8|5.035004||Viu
 CURLYM_B_t8_p8|5.033003||Viu
 CURLYM_B_t8_pb|5.033003||Viu
+CURLYM_B_tb|5.035004||Viu
 CURLYM_B_tb_p8|5.033003||Viu
 CURLYM_B_tb_pb|5.033003||Viu
+CURLYM_t8|5.035004||Viu
 CURLYM_t8_p8|5.033003||Viu
 CURLYM_t8_pb|5.033003||Viu
+CURLYM_tb|5.035004||Viu
 CURLYM_tb_p8|5.033003||Viu
 CURLYM_tb_pb|5.033003||Viu
 CURLYN|5.005000||Viu
+CURLYN_t8|5.035004||Viu
 CURLYN_t8_p8|5.033003||Viu
 CURLYN_t8_pb|5.033003||Viu
+CURLYN_tb|5.035004||Viu
 CURLYN_tb_p8|5.033003||Viu
 CURLYN_tb_pb|5.033003||Viu
+CURLY_t8|5.035004||Viu
 CURLY_t8_p8|5.033003||Viu
 CURLY_t8_pb|5.033003||Viu
+CURLY_tb|5.035004||Viu
 CURLY_tb_p8|5.033003||Viu
 CURLY_tb_pb|5.033003||Viu
 CURLYX|5.003007||Viu
 CURLYX_end|5.009005||Viu
 CURLYX_end_fail|5.009005||Viu
+CURLYX_end_fail_t8|5.035004||Viu
 CURLYX_end_fail_t8_p8|5.033003||Viu
 CURLYX_end_fail_t8_pb|5.033003||Viu
+CURLYX_end_fail_tb|5.035004||Viu
 CURLYX_end_fail_tb_p8|5.033003||Viu
 CURLYX_end_fail_tb_pb|5.033003||Viu
+CURLYX_end_t8|5.035004||Viu
 CURLYX_end_t8_p8|5.033003||Viu
 CURLYX_end_t8_pb|5.033003||Viu
+CURLYX_end_tb|5.035004||Viu
 CURLYX_end_tb_p8|5.033003||Viu
 CURLYX_end_tb_pb|5.033003||Viu
+CURLYX_t8|5.035004||Viu
 CURLYX_t8_p8|5.033003||Viu
 CURLYX_t8_pb|5.033003||Viu
+CURLYX_tb|5.035004||Viu
 CURLYX_tb_p8|5.033003||Viu
 CURLYX_tb_pb|5.033003||Viu
 CURRENT_FEATURE_BUNDLE|5.015007||Viu
@@ -5707,20 +5850,26 @@ curse|5.013009||Viu
 custom_op_desc|5.007003|5.007003|d
 custom_op_get_field|5.019006||cViu
 custom_op_name|5.007003|5.007003|d
-custom_op_register|5.013007|5.013007|
+custom_op_register|||
 CUTGROUP|5.009005||Viu
 CUTGROUP_next|5.009005||Viu
 CUTGROUP_next_fail|5.009005||Viu
+CUTGROUP_next_fail_t8|5.035004||Viu
 CUTGROUP_next_fail_t8_p8|5.033003||Viu
 CUTGROUP_next_fail_t8_pb|5.033003||Viu
+CUTGROUP_next_fail_tb|5.035004||Viu
 CUTGROUP_next_fail_tb_p8|5.033003||Viu
 CUTGROUP_next_fail_tb_pb|5.033003||Viu
+CUTGROUP_next_t8|5.035004||Viu
 CUTGROUP_next_t8_p8|5.033003||Viu
 CUTGROUP_next_t8_pb|5.033003||Viu
+CUTGROUP_next_tb|5.035004||Viu
 CUTGROUP_next_tb_p8|5.033003||Viu
 CUTGROUP_next_tb_pb|5.033003||Viu
+CUTGROUP_t8|5.035004||Viu
 CUTGROUP_t8_p8|5.033003||Viu
 CUTGROUP_t8_pb|5.033003||Viu
+CUTGROUP_tb|5.035004||Viu
 CUTGROUP_tb_p8|5.033003||Viu
 CUTGROUP_tb_pb|5.033003||Viu
 CvANON|5.003007||Viu
@@ -5734,8 +5883,8 @@ CvAUTOLOAD_off|5.015004||Viu
 CvAUTOLOAD_on|5.015004||Viu
 cv_ckproto|5.009004||Viu
 cv_ckproto_len_flags|5.015004||xcViu
-cv_clone|5.003007|5.003007|
 CvCLONE|5.003007||Viu
+cv_clone|5.015001|5.015001|
 CvCLONED|5.003007||Viu
 CvCLONED_off|5.003007||Viu
 CvCLONED_on|5.003007||Viu
@@ -5780,6 +5929,7 @@ CVf_METHOD|5.005000||Viu
 CVf_NAMED|5.017004||Viu
 CVf_NODEBUG|5.004000||Viu
 cv_forget_slab|5.017002||Vi
+CVf_SIGNATURE|5.035009||Viu
 CVf_SLABBED|5.017002||Viu
 CVf_UNIQUE|5.004000||Viu
 CVf_WEAKOUTSIDE|5.008001||Viu
@@ -5824,6 +5974,9 @@ CvPROTOLEN|5.015004||Viu
 CvROOT|5.003007||Viu
 cv_set_call_checker|5.013006|5.013006|
 cv_set_call_checker_flags|5.021004|5.021004|
+CvSIGNATURE|5.035009||Viu
+CvSIGNATURE_off|5.035009||Viu
+CvSIGNATURE_on|5.035009||Viu
 CvSLABBED|5.017002||Viu
 CvSLABBED_off|5.017002||Viu
 CvSLABBED_on|5.017002||Viu
@@ -5869,6 +6022,7 @@ CxOLD_OP_TYPE|5.010001||Viu
 CxONCE|5.010001||Viu
 CxPADLOOP|5.006000||Viu
 CXp_EVALBLOCK|5.033007||Viu
+CXp_FINALLY|5.035008||Viu
 CXp_FOR_DEF|5.027008||Viu
 CXp_FOR_GV|5.023008||Viu
 CXp_FOR_LVREF|5.021005||Viu
@@ -5909,6 +6063,7 @@ cxstack|5.005000||Viu
 cxstack_ix|5.005000||Viu
 cxstack_max|5.005000||Viu
 CXt_BLOCK|5.003007||Viu
+CXt_DEFER|5.035004||Viu
 CXt_EVAL|5.003007||Viu
 CXt_FORMAT|5.006000||Viu
 CXt_GIVEN|5.027008||Viu
@@ -5949,9 +6104,9 @@ DBVARMG_TRACE|5.021005||Viu
 DB_VERSION_MAJOR_CFG|5.007002|5.007002|Vn
 DB_VERSION_MINOR_CFG|5.007002|5.007002|Vn
 DB_VERSION_PATCH_CFG|5.007002|5.007002|Vn
-deb|5.007003|5.007003|vu
+deb|5.003007||vVu
 deb_curcv|5.007002||Viu
-deb_nocontext|5.007003|5.007003|vnu
+deb_nocontext|5.006000||vVnu
 debop|5.005000|5.005000|u
 debprof|5.005000||Viu
 debprofdump|5.005000|5.005000|u
@@ -6093,8 +6248,10 @@ DEFAULT_PAT_MOD|5.013006||Viu
 defelem_target|5.019002||Viu
 DEFINE_INC_MACROS|5.027006||Viu
 DEFINEP|5.009005||Viu
+DEFINEP_t8|5.035004||Viu
 DEFINEP_t8_p8|5.033003||Viu
 DEFINEP_t8_pb|5.033003||Viu
+DEFINEP_tb|5.035004||Viu
 DEFINEP_tb_p8|5.033003||Viu
 DEFINEP_tb_pb|5.033003||Viu
 DEFSV|5.004005|5.003007|p
@@ -6114,9 +6271,12 @@ destroy_matcher|5.027008||Viu
 DETACH|5.005000||Viu
 dEXT|5.003007||Viu
 dEXTCONST|5.004000||Viu
+DFA_RETURN_FAILURE|5.035004||Viu
+DFA_RETURN_SUCCESS|5.035004||Viu
+DFA_TEASE_APART_FF|5.035004||Viu
 D_FMT|5.027010||Viu
 DIE|5.003007||Viu
-die|5.006000|5.003007|v
+die|5.003007||vV
 die_nocontext|5.006000||vVn
 die_sv|5.013001|5.003007|p
 die_unwind|5.013001||Viu
@@ -6342,8 +6502,10 @@ ENDGRENT_R_PROTO|5.008000|5.008000|Vn
 endhostent|5.005000||Viu
 ENDHOSTENT_R_PROTO|5.008000|5.008000|Vn
 ENDLIKE|5.009005||Viu
+ENDLIKE_t8|5.035004||Viu
 ENDLIKE_t8_p8|5.033003||Viu
 ENDLIKE_t8_pb|5.033003||Viu
+ENDLIKE_tb|5.035004||Viu
 ENDLIKE_tb_p8|5.033003||Viu
 ENDLIKE_tb_pb|5.033003||Viu
 endnetent|5.005000||Viu
@@ -6355,8 +6517,10 @@ ENDPWENT_R_HAS_FPTR|5.008000||Viu
 ENDPWENT_R_PROTO|5.008000|5.008000|Vn
 endservent|5.005000||Viu
 ENDSERVENT_R_PROTO|5.008000|5.008000|Vn
+END_t8|5.035004||Viu
 END_t8_p8|5.033003||Viu
 END_t8_pb|5.033003||Viu
+END_tb|5.035004||Viu
 END_tb_p8|5.033003||Viu
 END_tb_pb|5.033003||Viu
 ENTER|5.003007|5.003007|
@@ -6375,13 +6539,17 @@ ENV_UNLOCK|5.031011||Viu
 EOF|5.003007||Viu
 EOF_NONBLOCK|5.003007|5.003007|Vn
 EOL|5.003007||Viu
+EOL_t8|5.035004||Viu
 EOL_t8_p8|5.033003||Viu
 EOL_t8_pb|5.033003||Viu
+EOL_tb|5.035004||Viu
 EOL_tb_p8|5.033003||Viu
 EOL_tb_pb|5.033003||Viu
 EOS|5.005000||Viu
+EOS_t8|5.035004||Viu
 EOS_t8_p8|5.033003||Viu
 EOS_t8_pb|5.033003||Viu
+EOS_tb|5.035004||Viu
 EOS_tb_p8|5.033003||Viu
 EOS_tb_pb|5.033003||Viu
 ERA|5.027010||Viu
@@ -6393,12 +6561,16 @@ ESC_NATIVE|5.021004||Viu
 EVAL|5.005000||Viu
 EVAL_B|5.025010||Viu
 EVAL_B_fail|5.025010||Viu
+EVAL_B_fail_t8|5.035004||Viu
 EVAL_B_fail_t8_p8|5.033003||Viu
 EVAL_B_fail_t8_pb|5.033003||Viu
+EVAL_B_fail_tb|5.035004||Viu
 EVAL_B_fail_tb_p8|5.033003||Viu
 EVAL_B_fail_tb_pb|5.033003||Viu
+EVAL_B_t8|5.035004||Viu
 EVAL_B_t8_p8|5.033003||Viu
 EVAL_B_t8_pb|5.033003||Viu
+EVAL_B_tb|5.035004||Viu
 EVAL_B_tb_p8|5.033003||Viu
 EVAL_B_tb_pb|5.033003||Viu
 EVAL_INEVAL|5.006000||Viu
@@ -6407,19 +6579,25 @@ EVAL_KEEPERR|5.006000||Viu
 EVAL_NULL|5.006000||Viu
 EVAL_postponed_AB|5.025010||Viu
 EVAL_postponed_AB_fail|5.025010||Viu
+EVAL_postponed_AB_fail_t8|5.035004||Viu
 EVAL_postponed_AB_fail_t8_p8|5.033003||Viu
 EVAL_postponed_AB_fail_t8_pb|5.033003||Viu
+EVAL_postponed_AB_fail_tb|5.035004||Viu
 EVAL_postponed_AB_fail_tb_p8|5.033003||Viu
 EVAL_postponed_AB_fail_tb_pb|5.033003||Viu
+EVAL_postponed_AB_t8|5.035004||Viu
 EVAL_postponed_AB_t8_p8|5.033003||Viu
 EVAL_postponed_AB_t8_pb|5.033003||Viu
+EVAL_postponed_AB_tb|5.035004||Viu
 EVAL_postponed_AB_tb_p8|5.033003||Viu
 EVAL_postponed_AB_tb_pb|5.033003||Viu
 eval_pv|5.006000|5.003007|p
 EVAL_RE_REPARSING|5.017011||Viu
 eval_sv|5.006000|5.003007|p
+EVAL_t8|5.035004||Viu
 EVAL_t8_p8|5.033003||Viu
 EVAL_t8_pb|5.033003||Viu
+EVAL_tb|5.035004||Viu
 EVAL_tb_p8|5.033003||Viu
 EVAL_tb_pb|5.033003||Viu
 EVAL_WARNONLY|5.006000||Viu
@@ -6427,60 +6605,84 @@ EXACT|5.004000||Viu
 EXACTF|5.004000||Viu
 EXACTFAA|5.027009||Viu
 EXACTFAA_NO_TRIE|5.027009||Viu
+EXACTFAA_NO_TRIE_t8|5.035004||Viu
 EXACTFAA_NO_TRIE_t8_p8|5.033003||Viu
 EXACTFAA_NO_TRIE_t8_pb|5.033003||Viu
+EXACTFAA_NO_TRIE_tb|5.035004||Viu
 EXACTFAA_NO_TRIE_tb_p8|5.033003||Viu
 EXACTFAA_NO_TRIE_tb_pb|5.033003||Viu
+EXACTFAA_t8|5.035004||Viu
 EXACTFAA_t8_p8|5.033003||Viu
 EXACTFAA_t8_pb|5.033003||Viu
+EXACTFAA_tb|5.035004||Viu
 EXACTFAA_tb_p8|5.033003||Viu
 EXACTFAA_tb_pb|5.033003||Viu
 EXACTFL|5.004000||Viu
+EXACTFL_t8|5.035004||Viu
 EXACTFL_t8_p8|5.033003||Viu
 EXACTFL_t8_pb|5.033003||Viu
+EXACTFL_tb|5.035004||Viu
 EXACTFL_tb_p8|5.033003||Viu
 EXACTFL_tb_pb|5.033003||Viu
 EXACTFLU8|5.021008||Viu
+EXACTFLU8_t8|5.035004||Viu
 EXACTFLU8_t8_p8|5.033003||Viu
 EXACTFLU8_t8_pb|5.033003||Viu
+EXACTFLU8_tb|5.035004||Viu
 EXACTFLU8_tb_p8|5.033003||Viu
 EXACTFLU8_tb_pb|5.033003||Viu
+EXACTF_t8|5.035004||Viu
 EXACTF_t8_p8|5.033003||Viu
 EXACTF_t8_pb|5.033003||Viu
+EXACTF_tb|5.035004||Viu
 EXACTF_tb_p8|5.033003||Viu
 EXACTF_tb_pb|5.033003||Viu
 EXACTFU|5.013008||Viu
 EXACTFUP|5.029007||Viu
+EXACTFUP_t8|5.035004||Viu
 EXACTFUP_t8_p8|5.033003||Viu
 EXACTFUP_t8_pb|5.033003||Viu
+EXACTFUP_tb|5.035004||Viu
 EXACTFUP_tb_p8|5.033003||Viu
 EXACTFUP_tb_pb|5.033003||Viu
 EXACTFU_REQ8|5.031006||Viu
+EXACTFU_REQ8_t8|5.035004||Viu
 EXACTFU_REQ8_t8_p8|5.033003||Viu
 EXACTFU_REQ8_t8_pb|5.033003||Viu
+EXACTFU_REQ8_tb|5.035004||Viu
 EXACTFU_REQ8_tb_p8|5.033003||Viu
 EXACTFU_REQ8_tb_pb|5.033003||Viu
 EXACTFU_S_EDGE|5.029007||Viu
+EXACTFU_S_EDGE_t8|5.035004||Viu
 EXACTFU_S_EDGE_t8_p8|5.033003||Viu
 EXACTFU_S_EDGE_t8_pb|5.033003||Viu
+EXACTFU_S_EDGE_tb|5.035004||Viu
 EXACTFU_S_EDGE_tb_p8|5.033003||Viu
 EXACTFU_S_EDGE_tb_pb|5.033003||Viu
+EXACTFU_t8|5.035004||Viu
 EXACTFU_t8_p8|5.033003||Viu
 EXACTFU_t8_pb|5.033003||Viu
+EXACTFU_tb|5.035004||Viu
 EXACTFU_tb_p8|5.033003||Viu
 EXACTFU_tb_pb|5.033003||Viu
 EXACTL|5.021008||Viu
+EXACTL_t8|5.035004||Viu
 EXACTL_t8_p8|5.033003||Viu
 EXACTL_t8_pb|5.033003||Viu
+EXACTL_tb|5.035004||Viu
 EXACTL_tb_p8|5.033003||Viu
 EXACTL_tb_pb|5.033003||Viu
 EXACT_REQ8|5.031006||Viu
+EXACT_REQ8_t8|5.035004||Viu
 EXACT_REQ8_t8_p8|5.033003||Viu
 EXACT_REQ8_t8_pb|5.033003||Viu
+EXACT_REQ8_tb|5.035004||Viu
 EXACT_REQ8_tb_p8|5.033003||Viu
 EXACT_REQ8_tb_pb|5.033003||Viu
+EXACT_t8|5.035004||Viu
 EXACT_t8_p8|5.033003||Viu
 EXACT_t8_pb|5.033003||Viu
+EXACT_tb|5.035004||Viu
 EXACT_tb_p8|5.033003||Viu
 EXACT_tb_pb|5.033003||Viu
 EXEC_ARGV_CAST|5.007001||Viu
@@ -6539,8 +6741,11 @@ FEATURE_BUNDLE_511|5.015007||Viu
 FEATURE_BUNDLE_515|5.015007||Viu
 FEATURE_BUNDLE_523|5.023001||Viu
 FEATURE_BUNDLE_527|5.027008||Viu
+FEATURE_BUNDLE_535|5.035003||Viu
 FEATURE_BUNDLE_CUSTOM|5.015007||Viu
 FEATURE_BUNDLE_DEFAULT|5.015007||Viu
+FEATURE_DEFER_BIT|5.035004||Viu
+FEATURE_DEFER_IS_ENABLED|5.035004||Viu
 FEATURE_EVALBYTES_BIT|5.031006||Viu
 FEATURE_EVALBYTES_IS_ENABLED|5.015007||Viu
 FEATURE_FC_BIT|5.031006||Viu
@@ -6632,7 +6837,7 @@ find_hash_subscript|5.009004||Viu
 find_in_my_stash|5.006001||Viu
 find_lexical_cv|5.019001||Viu
 find_next_masked|5.027009||Vniu
-find_runcv|5.008001|5.008001|
+find_runcv|5.009005|5.009005|
 FIND_RUNCV_level_eq|5.017002||Viu
 FIND_RUNCV_padid_eq|5.017004||Viu
 find_runcv_where|5.017002||Viu
@@ -6684,7 +6889,7 @@ force_strict_version|5.011004||Viu
 force_version|5.005000||Viu
 force_word|5.003007||Viu
 forget_pmop|5.017007||Viu
-form|5.006000|5.004000|v
+form|5.004000||vV
 form_alien_digit_msg|5.031009||cViu
 form_cp_too_large_msg|5.031009||cViu
 form_nocontext|5.006000||vVn
@@ -6909,15 +7114,19 @@ GMTIME_R_PROTO|5.008000|5.008000|Vn
 G_NOARGS|5.003007|5.003007|
 G_NODEBUG|5.004005||Viu
 GOSUB|5.009005||Viu
+GOSUB_t8|5.035004||Viu
 GOSUB_t8_p8|5.033003||Viu
 GOSUB_t8_pb|5.033003||Viu
+GOSUB_tb|5.035004||Viu
 GOSUB_tb_p8|5.033003||Viu
 GOSUB_tb_pb|5.033003||Viu
 gp_dup|5.007003|5.007003|u
 gp_free|5.003007|5.003007|u
 GPOS|5.004000||Viu
+GPOS_t8|5.035004||Viu
 GPOS_t8_p8|5.033003||Viu
 GPOS_t8_pb|5.033003||Viu
+GPOS_tb|5.035004||Viu
 GPOS_tb_p8|5.033003||Viu
 GPOS_tb_pb|5.033003||Viu
 gp_ref|5.003007|5.003007|u
@@ -6942,12 +7151,16 @@ grok_oct|5.007003|5.003007|p
 group_end|5.007003||Viu
 GROUPP|5.005000||Viu
 GROUPPN|5.031001||Viu
+GROUPPN_t8|5.035004||Viu
 GROUPPN_t8_p8|5.033003||Viu
 GROUPPN_t8_pb|5.033003||Viu
+GROUPPN_tb|5.035004||Viu
 GROUPPN_tb_p8|5.033003||Viu
 GROUPPN_tb_pb|5.033003||Viu
+GROUPP_t8|5.035004||Viu
 GROUPP_t8_p8|5.033003||Viu
 GROUPP_t8_pb|5.033003||Viu
+GROUPP_tb|5.035004||Viu
 GROUPP_tb_p8|5.033003||Viu
 GROUPP_tb_pb|5.033003||Viu
 Groups_t|5.003007|5.003007|Vn
@@ -7028,6 +7241,7 @@ GVf_IMPORTED_SV|5.003007||Viu
 GVf_INTRO|5.003007||Viu
 GvFLAGS|5.003007||Viu
 GVf_MULTI|5.003007||Viu
+GVF_NOADD|5.035006||Viu
 GvFORM|5.003007||Viu
 gv_fullname3|5.003007|5.003007|u
 gv_fullname4|5.006001|5.006001|u
@@ -7181,6 +7395,7 @@ HAS_ERF|5.021006|5.021006|Vn
 HAS_ERFC|5.021006|5.021006|Vn
 HAS_EXP2|5.021006|5.021006|Vn
 HAS_EXPM1|5.021006|5.021006|Vn
+HAS_EXTRA_LONG_UTF8|5.035004||Viu
 HAS_FAST_STDIO|5.008001|5.008001|Vn
 HAS_FCHDIR|5.007002|5.007002|Vn
 HAS_FCHMOD|5.003007|5.003007|Vn
@@ -7522,6 +7737,7 @@ HAS_WCSTOMBS|5.003007|5.003007|Vn
 HAS_WCSXFRM|5.021001|5.021001|Vn
 HAS_WCTOMB|5.003007|5.003007|Vn
 HAS_WRITEV|5.007001|5.007001|Vn
+HE_ARENA_ROOT_IX|5.035005||Viu
 he_dup|5.007003|5.007003|u
 HEf_SVKEY|5.003007|5.003007|p
 HeHASH|5.003007|5.003007|
@@ -7553,7 +7769,6 @@ HePV|5.004000|5.004000|
 HeSVKEY|5.003007|5.003007|
 HeSVKEY_force|5.003007|5.003007|
 HeSVKEY_set|5.004000|5.004000|
-HE_SVSLOT|5.009003||Viu
 HeUTF8|5.010001|5.008000|p
 HeVAL|5.003007|5.003007|
 hfree_next_entry|||iu
@@ -7584,8 +7799,6 @@ HINT_RE_EVAL|5.005000||Viu
 HINT_RE_FLAGS|5.013007||Viu
 HINT_RE_TAINT|5.004005||Viu
 HINTS_DEFAULT|5.033002||Viu
-HINT_SORT_STABLE|5.007003||Viu
-HINT_SORT_UNSTABLE|5.027004||Viu
 HINTS_REFCNT_INIT|5.009004||Viu
 HINTS_REFCNT_LOCK|5.009004||Viu
 HINTS_REFCNT_TERM|5.009004||Viu
@@ -7622,19 +7835,20 @@ HvAMAGIC|5.017000||Viu
 HvAMAGIC_off|5.017000||Viu
 HvAMAGIC_on|5.017000||Viu
 HvARRAY|5.003007||Viu
-hv_assert|5.008009|5.008009|
+hv_assert|||
 HvAUX|5.009003||Viu
+hv_auxalloc|||iu
+HVAUX_ARENA_ROOT_IX|5.035005||Viu
 HvAUXf_NO_DEREF|5.019010||Viu
 HvAUXf_SCAN_STASH|5.019010||Viu
 hv_auxinit|5.009003||Viu
-hv_auxinit_internal|5.019010||Vniu
 hv_backreferences_p|||xiu
 hv_bucket_ratio|5.025003|5.025003|x
 hv_clear|5.003007|5.003007|
 hv_clear_placeholders|5.009001|5.009001|
 hv_common|5.010000||cVu
 hv_common_key_len|5.010000||cVu
-hv_copy_hints_hv|5.009004|5.009004|
+hv_copy_hints_hv|5.013005|5.013005|
 hv_delayfree_ent|5.004000|5.004000|u
 hv_delete|5.003007|5.003007|
 HV_DELETE|5.009005||Viu
@@ -7645,9 +7859,9 @@ hv_deletes|5.025006||Viu
 HV_DISABLE_UVAR_XKEY|5.010000||Viu
 HvEITER|5.003007||Viu
 HvEITER_get|5.009003||Viu
-hv_eiter_p|5.009003|5.009003|u
-hv_eiter_set|5.009003|5.009003|u
+hv_eiter_p|||u
 HvEITER_set|5.009003||Viu
+hv_eiter_set|||u
 HvENAME|5.013007|5.013007|
 hv_ename_add|5.013007||Vi
 hv_ename_delete|5.013007||Vi
@@ -7659,6 +7873,7 @@ HvENAMELEN_get|5.013007||Viu
 HvENAMEUTF8|5.015004|5.015004|
 hv_exists|5.003007|5.003007|
 hv_exists_ent|5.003007|5.003007|
+hv_existshek|5.035003||Viu
 hv_existss|5.025006||Viu
 hv_fetch|5.003007|5.003007|
 HV_FETCH_EMPTY_HE|5.013007||Viu
@@ -7669,8 +7884,8 @@ HV_FETCH_ISSTORE|5.009005||Viu
 HV_FETCH_JUST_SV|5.009005||Viu
 HV_FETCH_LVALUE|5.009005||Viu
 hv_fetchs|5.009003|5.003007|p
+hv_fill|||
 HvFILL|5.003007|5.003007|
-hv_fill|5.013002|5.013002|
 hv_free_ent|5.004000|5.004000|u
 hv_free_ent_ret|5.015000||Viu
 hv_free_entries|5.027002||Viu
@@ -7716,11 +7931,11 @@ hv_name_sets|5.025006||Viu
 HvNAMEUTF8|5.015004|5.015004|
 hv_notallowed|5.008000||Viu
 HvPLACEHOLDERS|5.007003||Viu
-hv_placeholders_get|5.009003|5.009003|u
 HvPLACEHOLDERS_get|5.009003||Viu
+hv_placeholders_get|||u
 hv_placeholders_p|||ciu
-hv_placeholders_set|5.009003|5.009003|u
 HvPLACEHOLDERS_set|5.009003||Viu
+hv_placeholders_set|||u
 hv_pushkv|5.027003||Viu
 HvRAND_get|5.017011||Viu
 hv_rand_set|5.018000|5.018000|u
@@ -7733,9 +7948,9 @@ HVrhek_undef|5.009004||Viu
 HVrhek_UV|5.009004||Viu
 HvRITER|5.003007||Viu
 HvRITER_get|5.009003||Viu
-hv_riter_p|5.009003|5.009003|u
-hv_riter_set|5.009003|5.009003|u
+hv_riter_p|||u
 HvRITER_set|5.009003||Viu
+hv_riter_set|||u
 hv_scalar|5.009001|5.009001|
 HvSHAREKEYS|5.003007||Viu
 HvSHAREKEYS_off|5.003007||Viu
@@ -7779,21 +7994,29 @@ I_FENV|5.021004|5.021004|Vn
 IFMATCH|5.003007||Viu
 IFMATCH_A|5.009005||Viu
 IFMATCH_A_fail|5.009005||Viu
+IFMATCH_A_fail_t8|5.035004||Viu
 IFMATCH_A_fail_t8_p8|5.033003||Viu
 IFMATCH_A_fail_t8_pb|5.033003||Viu
+IFMATCH_A_fail_tb|5.035004||Viu
 IFMATCH_A_fail_tb_p8|5.033003||Viu
 IFMATCH_A_fail_tb_pb|5.033003||Viu
+IFMATCH_A_t8|5.035004||Viu
 IFMATCH_A_t8_p8|5.033003||Viu
 IFMATCH_A_t8_pb|5.033003||Viu
+IFMATCH_A_tb|5.035004||Viu
 IFMATCH_A_tb_p8|5.033003||Viu
 IFMATCH_A_tb_pb|5.033003||Viu
+IFMATCH_t8|5.035004||Viu
 IFMATCH_t8_p8|5.033003||Viu
 IFMATCH_t8_pb|5.033003||Viu
+IFMATCH_tb|5.035004||Viu
 IFMATCH_tb_p8|5.033003||Viu
 IFMATCH_tb_pb|5.033003||Viu
 IFTHEN|5.005000||Viu
+IFTHEN_t8|5.035004||Viu
 IFTHEN_t8_p8|5.033003||Viu
 IFTHEN_t8_pb|5.033003||Viu
+IFTHEN_tb|5.035004||Viu
 IFTHEN_tb_p8|5.033003||Viu
 IFTHEN_tb_pb|5.033003||Viu
 I_GDBM|5.021007|5.021007|Vn
@@ -7876,8 +8099,10 @@ IN_SOME_LOCALE_FORM_COMPILETIME|5.015008||Viu
 IN_SOME_LOCALE_FORM_RUNTIME|5.015008||Viu
 instr|5.003007|5.003007|n
 INSUBP|5.009005||Viu
+INSUBP_t8|5.035004||Viu
 INSUBP_t8_p8|5.033003||Viu
 INSUBP_t8_pb|5.033003||Viu
+INSUBP_tb|5.035004||Viu
 INSUBP_tb_p8|5.033003||Viu
 INSUBP_tb_pb|5.033003||Viu
 INT16_C|5.003007|5.003007|
@@ -7889,7 +8114,7 @@ INT64_MIN|5.007002||Viu
 INT_64_T|5.011000||Viu
 INTMAX_C|5.003007|5.003007|
 INT_PAT_MODS|5.009005||Viu
-intro_my|5.004000|5.004000|
+intro_my|5.021006|5.021006|
 INTSIZE|5.003007|5.003007|Vn
 intuit_method|5.005000||Viu
 intuit_more|5.003007||Viu
@@ -8043,9 +8268,6 @@ isBLANK_utf8|5.031005|5.031005|
 isBLANK_utf8_safe|5.025009|5.006000|p
 isBLANK_uvchr|5.023009|5.006000|p
 isC9_STRICT_UTF8_CHAR|5.025005|5.025005|n
-is_C9_STRICT_UTF8_CHAR_utf8_no_length_checks|5.025005||Viu
-is_C9_STRICT_UTF8_CHAR_utf8_no_length_checks_part0|5.025008||Viu
-is_C9_STRICT_UTF8_CHAR_utf8_no_length_checks_part1|5.025008||Viu
 is_c9strict_utf8_string|5.025006|5.025006|n
 is_c9strict_utf8_string_loc|5.025006|5.025006|n
 is_c9strict_utf8_string_loclen|5.025006|5.025006|n
@@ -8076,7 +8298,7 @@ isDIGIT_utf8_safe|5.025009|5.006000|p
 isDIGIT_uvchr|5.023009|5.006000|p
 isEXACTFish|5.033003||Viu
 isEXACT_REQ8|5.033003||Viu
-isFF_OVERLONG|5.025007||Vniu
+isFF_overlong|5.035004||Vniu
 is_FOLDS_TO_MULTI_utf8|5.019009||Viu
 isFOO_lc|5.017007||Viu
 isFOO_utf8_lc|5.017008||Viu
@@ -8132,6 +8354,7 @@ _is_in_locale_category|5.021001||cViu
 IS_IN_SOME_FOLD_L1|5.033005||Viu
 is_invariant_string|5.021007|5.011000|pn
 is_invlist|5.029002||Vniu
+is_LARGER_NON_CHARS_utf8|5.035003||Viu
 is_LAX_VERSION|5.011004||Viu
 isLB|5.023007||Viu
 isLEXWARN_off|5.006000||Viu
@@ -8214,14 +8437,13 @@ isPUNCT_utf8|5.031005|5.031005|
 isPUNCT_utf8_safe|5.025009|5.006000|p
 isPUNCT_uvchr|5.023009|5.006000|p
 is_QUOTEMETA_high|5.017004||Viu
-is_QUOTEMETA_high_part0|5.021001||Viu
-is_QUOTEMETA_high_part1|5.021001||Viu
 isREGEXP|5.017006||Viu
 IS_SAFE_PATHNAME|5.019004||Viu
 IS_SAFE_SYSCALL|5.019004|5.019004|
 is_safe_syscall|5.019004|5.019004|
 isSB|5.021009||Viu
 isSCRIPT_RUN|5.027008||cVi
+is_SHORTER_NON_CHARS_utf8|5.035003||Viu
 isSPACE|5.003007|5.003007|p
 isSPACE_A|5.013006|5.003007|p
 isSPACE_L1|5.013006|5.003007|p
@@ -8235,15 +8457,11 @@ isSPACE_utf8_safe|5.025009|5.006000|p
 isSPACE_uvchr|5.023009|5.006000|p
 is_ssc_worth_it|5.021005||Vniu
 isSTRICT_UTF8_CHAR|5.025005|5.025005|n
-is_STRICT_UTF8_CHAR_utf8_no_length_checks|5.025005||Viu
-is_STRICT_UTF8_CHAR_utf8_no_length_checks_part0|5.025005||Viu
-is_STRICT_UTF8_CHAR_utf8_no_length_checks_part1|5.025005||Viu
-is_STRICT_UTF8_CHAR_utf8_no_length_checks_part2|5.025008||Viu
-is_STRICT_UTF8_CHAR_utf8_no_length_checks_part3|5.025008||Viu
 is_strict_utf8_string|5.025006|5.025006|n
 is_strict_utf8_string_loc|5.025006|5.025006|n
 is_strict_utf8_string_loclen|5.025006|5.025006|n
 is_STRICT_VERSION|5.011004||Viu
+is_SURROGATE_utf8|5.035004||Viu
 is_SURROGATE_utf8_safe|5.025005||Viu
 I_STDARG|5.003007||Viu
 I_STDBOOL|5.015003|5.015003|Vn
@@ -8253,6 +8471,7 @@ is_THREE_CHAR_FOLD_HEAD_utf8_safe|5.031007||Viu
 is_THREE_CHAR_FOLD_latin1_safe|5.031007||Viu
 is_THREE_CHAR_FOLD_utf8_safe|5.031007||Viu
 IS_TRIE_AC|5.009005||Viu
+isUNICODE_POSSIBLY_PROBLEMATIC|5.035004||Viu
 _is_uni_FOO|5.017008||cVu
 _is_uni_perl_idcont|5.017008||cVu
 _is_uni_perl_idstart|5.017007||cVu
@@ -8271,11 +8490,10 @@ is_utf8_char|5.006000|5.006000|dn
 IS_UTF8_CHAR|5.009003||Viu
 isUTF8_CHAR|5.021001|5.006001|pn
 is_utf8_char_buf|5.015008|5.015008|n
-isUTF8_CHAR_flags|5.025005|5.025005|
-is_utf8_char_helper|5.031004||cVnu
-is_UTF8_CHAR_utf8_no_length_checks|5.021001||Viu
+isUTF8_CHAR_flags|5.025005|5.025005|n
+is_utf8_char_helper_|5.035004||cVnu
 is_utf8_common|5.009003||Viu
-is_utf8_cp_above_31_bits|5.025005||Vniu
+is_utf8_FF_helper_|5.035004||cVnu
 is_utf8_fixed_width_buf_flags|5.025006|5.025006|n
 is_utf8_fixed_width_buf_loc_flags|5.025006|5.025006|n
 is_utf8_fixed_width_buf_loclen_flags|5.025006|5.025006|n
@@ -8283,7 +8501,7 @@ _is_utf8_FOO|5.031006||cVu
 is_utf8_invariant_string|5.025005|5.011000|pn
 is_utf8_invariant_string_loc|5.027001|5.027001|n
 is_utf8_non_invariant_string|5.027007||cVni
-is_utf8_overlong_given_start_byte_ok|5.025006||Vniu
+is_utf8_overlong|5.035004||Vniu
 _is_utf8_perl_idcont|5.031006||cVu
 _is_utf8_perl_idstart|5.031006||cVu
 isUTF8_POSSIBLY_PROBLEMATIC|5.023003||Viu
@@ -8388,16 +8606,22 @@ KEEPCOPY_PAT_MODS|5.009005||Viu
 KEEPS|5.009005||Viu
 KEEPS_next|5.009005||Viu
 KEEPS_next_fail|5.009005||Viu
+KEEPS_next_fail_t8|5.035004||Viu
 KEEPS_next_fail_t8_p8|5.033003||Viu
 KEEPS_next_fail_t8_pb|5.033003||Viu
+KEEPS_next_fail_tb|5.035004||Viu
 KEEPS_next_fail_tb_p8|5.033003||Viu
 KEEPS_next_fail_tb_pb|5.033003||Viu
+KEEPS_next_t8|5.035004||Viu
 KEEPS_next_t8_p8|5.033003||Viu
 KEEPS_next_t8_pb|5.033003||Viu
+KEEPS_next_tb|5.035004||Viu
 KEEPS_next_tb_p8|5.033003||Viu
 KEEPS_next_tb_pb|5.033003||Viu
+KEEPS_t8|5.035004||Viu
 KEEPS_t8_p8|5.033003||Viu
 KEEPS_t8_pb|5.033003||Viu
+KEEPS_tb|5.035004||Viu
 KEEPS_tb_p8|5.033003||Viu
 KEEPS_tb_pb|5.033003||Viu
 KELVIN_SIGN|5.017003||Viu
@@ -8434,6 +8658,7 @@ KEY___DATA|5.003007||Viu
 KEY_dbmclose|5.003007||Viu
 KEY_dbmopen|5.003007||Viu
 KEY_default|5.027008||Viu
+KEY_defer|5.035004||Viu
 KEY_defined|5.003007||Viu
 KEY_delete|5.003007||Viu
 KEY_DESTROY|5.003007||Viu
@@ -8463,6 +8688,7 @@ KEY_fc|5.015008||Viu
 KEY_fcntl|5.003007||Viu
 KEY___FILE|5.003007||Viu
 KEY_fileno|5.003007||Viu
+KEY_finally|5.035008||Viu
 KEY_flock|5.003007||Viu
 KEY_for|5.003007||Viu
 KEY_foreach|5.003007||Viu
@@ -8727,12 +8953,16 @@ LEAVE_SCOPE|5.003007||Viu
 LEAVE_with_name|5.011002|5.011002|
 LEXACT|5.031005||Viu
 LEXACT_REQ8|5.031006||Viu
+LEXACT_REQ8_t8|5.035004||Viu
 LEXACT_REQ8_t8_p8|5.033003||Viu
 LEXACT_REQ8_t8_pb|5.033003||Viu
+LEXACT_REQ8_tb|5.035004||Viu
 LEXACT_REQ8_tb_p8|5.033003||Viu
 LEXACT_REQ8_tb_pb|5.033003||Viu
+LEXACT_t8|5.035004||Viu
 LEXACT_t8_p8|5.033003||Viu
 LEXACT_t8_pb|5.033003||Viu
+LEXACT_tb|5.035004||Viu
 LEXACT_tb_p8|5.033003||Viu
 LEXACT_tb_pb|5.033003||Viu
 lex_bufutf8|5.011002|5.011002|x
@@ -8748,7 +8978,7 @@ lex_peek_unichar|5.011002|5.011002|x
 lex_read_space|5.011002|5.011002|x
 lex_read_to|5.011002|5.011002|x
 lex_read_unichar|5.011002|5.011002|x
-lex_start|5.009005|5.009005|x
+lex_start|5.013007|5.013007|x
 LEX_START_COPIED|5.015005||Viu
 LEX_START_FLAGS|5.015005||Viu
 LEX_START_SAME_FILTER|5.014000||Viu
@@ -8768,13 +8998,15 @@ list|5.003007||Viu
 listen|5.005000||Viu
 listkids|5.003007||Viu
 LNBREAK|5.009005||Viu
+LNBREAK_t8|5.035004||Viu
 LNBREAK_t8_p8|5.033003||Viu
 LNBREAK_t8_pb|5.033003||Viu
+LNBREAK_tb|5.035004||Viu
 LNBREAK_tb_p8|5.033003||Viu
 LNBREAK_tb_pb|5.033003||Viu
 load_charnames|5.031010||cViu
 load_module|5.006000|5.003007|pv
-load_module_nocontext|5.006000||vVn
+load_module_nocontext|5.013006|5.013006|vn
 LOCALECONV_LOCK|5.033005||Viu
 LOCALECONV_UNLOCK|5.033005||Viu
 LOCALE_INIT|5.024000||Viu
@@ -8801,8 +9033,10 @@ LOCK_LC_NUMERIC_STANDARD|5.021010||poVnu
 LOCK_NUMERIC_STANDARD|||piu
 LOC_SED|5.003007|5.003007|Vn
 LOGICAL|5.005000||Viu
+LOGICAL_t8|5.035004||Viu
 LOGICAL_t8_p8|5.033003||Viu
 LOGICAL_t8_pb|5.033003||Viu
+LOGICAL_tb|5.035004||Viu
 LOGICAL_tb_p8|5.033003||Viu
 LOGICAL_tb_pb|5.033003||Viu
 LONGDBLINFBYTES|5.023000|5.023000|Vn
@@ -8834,8 +9068,10 @@ LONGDOUBLE_VAX_ENDIAN|5.025004||Viu
 LONGDOUBLE_X86_80_BIT|5.021009||Viu
 LONGJMP|5.005000||Viu
 longjmp|5.005000||Viu
+LONGJMP_t8|5.035004||Viu
 LONGJMP_t8_p8|5.033003||Viu
 LONGJMP_t8_pb|5.033003||Viu
+LONGJMP_tb|5.035004||Viu
 LONGJMP_tb_p8|5.033003||Viu
 LONGJMP_tb_pb|5.033003||Viu
 LONGLONGSIZE|5.005000|5.005000|Vn
@@ -8847,6 +9083,10 @@ lop|5.005000||Viu
 lossless_NV_to_IV|5.031001||Vniu
 LOWEST_ANYOF_HRx_BYTE|5.031002||Viu
 L_R_TZSET|5.009005|5.009005|Vn
+lsbit_pos32|5.035003||cVnu
+lsbit_pos|5.035004||Viu
+lsbit_pos64|5.035003||cVnu
+lsbit_pos_uintmax|5.035003||Viu
 lseek|5.005000||Viu
 LSEEKSIZE|5.006000|5.006000|Vn
 lstat|5.005000||Viu
@@ -8860,6 +9100,7 @@ LvTARG|5.003007||Viu
 LvTARGLEN|5.003007||Viu
 LvTARGOFF|5.003007||Viu
 LvTYPE|5.003007||Viu
+LZC_TO_MSBIT_POS|5.035003||Viu
 magic_clear_all_env|5.004001||Viu
 magic_cleararylen_p|5.017002||Viu
 magic_clearenv|5.003007||Viu
@@ -8927,7 +9168,7 @@ magic_wipepack|5.003007||Viu
 make_exactf_invlist|5.031006||Viu
 make_matcher|5.027008||Viu
 make_trie|5.009002||Viu
-malloc|5.007002|5.007002|n
+malloc|5.003007||Vn
 MALLOC_CHECK_TAINT2|5.008001||Viu
 MALLOC_CHECK_TAINT|5.008001||Viu
 malloced_size|5.005000||Vniu
@@ -8941,16 +9182,22 @@ MARK|5.003007|5.003007|
 MARKPOINT|5.009005||Viu
 MARKPOINT_next|5.009005||Viu
 MARKPOINT_next_fail|5.009005||Viu
+MARKPOINT_next_fail_t8|5.035004||Viu
 MARKPOINT_next_fail_t8_p8|5.033003||Viu
 MARKPOINT_next_fail_t8_pb|5.033003||Viu
+MARKPOINT_next_fail_tb|5.035004||Viu
 MARKPOINT_next_fail_tb_p8|5.033003||Viu
 MARKPOINT_next_fail_tb_pb|5.033003||Viu
+MARKPOINT_next_t8|5.035004||Viu
 MARKPOINT_next_t8_p8|5.033003||Viu
 MARKPOINT_next_t8_pb|5.033003||Viu
+MARKPOINT_next_tb|5.035004||Viu
 MARKPOINT_next_tb_p8|5.033003||Viu
 MARKPOINT_next_tb_pb|5.033003||Viu
+MARKPOINT_t8|5.035004||Viu
 MARKPOINT_t8_p8|5.033003||Viu
 MARKPOINT_t8_pb|5.033003||Viu
+MARKPOINT_tb|5.035004||Viu
 MARKPOINT_tb_p8|5.033003||Viu
 MARKPOINT_tb_pb|5.033003||Viu
 markstack_grow|5.021001|5.021001|u
@@ -8980,8 +9227,10 @@ mayberelocate|5.015006||Viu
 MBLEN_LOCK|5.033005||Viu
 MBLEN_UNLOCK|5.033005||Viu
 MBOL|5.003007||Viu
+MBOL_t8|5.035004||Viu
 MBOL_t8_p8|5.033003||Viu
 MBOL_t8_pb|5.033003||Viu
+MBOL_tb|5.035004||Viu
 MBOL_tb_p8|5.033003||Viu
 MBOL_tb_pb|5.033003||Viu
 MBTOWC_LOCK|5.033005||Viu
@@ -9040,16 +9289,18 @@ MEM_WRAP_CHECK|5.009002||Viu
 MEM_WRAP_CHECK_s|5.027010||Viu
 memzero|5.003007|5.003007|
 MEOL|5.003007||Viu
+MEOL_t8|5.035004||Viu
 MEOL_t8_p8|5.033003||Viu
 MEOL_t8_pb|5.033003||Viu
+MEOL_tb|5.035004||Viu
 MEOL_tb_p8|5.033003||Viu
 MEOL_tb_pb|5.033003||Viu
-mess|5.006000|5.004000|pv
+mess|5.003007||pvV
 mess_alloc|5.005000||Viu
 mess_nocontext|5.006000||pvVn
 mess_sv|5.013001|5.004000|p
 MEXTEND|5.003007||Viu
-mfree|5.007002|5.007002|nu
+mfree|||nu
 MgBYTEPOS|5.019004||Viu
 MgBYTEPOS_set|5.019004||Viu
 mg_clear|5.003007|5.003007|
@@ -9090,8 +9341,10 @@ MICRO_SIGN_UTF8|5.033003||Viu
 MIN|5.025006||Viu
 mini_mktime|5.007002|5.007002|n
 MINMOD|5.003007||Viu
+MINMOD_t8|5.035004||Viu
 MINMOD_t8_p8|5.033003||Viu
 MINMOD_t8_pb|5.033003||Viu
+MINMOD_tb|5.035004||Viu
 MINMOD_tb_p8|5.033003||Viu
 MINMOD_tb_pb|5.033003||Viu
 minus_v|5.015006||Viu
@@ -9134,7 +9387,7 @@ mPUSHs|5.010001|5.003007|p
 mPUSHu|5.009002|5.003007|p
 mro_clean_isarev|5.013007||Viu
 mro_gather_and_rename|5.013007||Viu
-mro_get_from_name|5.010001|5.010001|u
+mro_get_from_name|||u
 mro_get_linear_isa|5.009005|5.009005|
 mro_get_linear_isa_c3|||i
 mro_get_linear_isa_dfs|5.009005||Vi
@@ -9145,9 +9398,13 @@ mro_meta_dup|5.009005||Viu
 mro_meta_init|||ciu
 mro_method_changed_in|5.009005|5.009005|
 mro_package_moved|5.013006||Vi
-mro_register|5.010001|5.010001|
-mro_set_mro|5.010001|5.010001|u
-mro_set_private_data|5.010001|5.010001|
+mro_register|||
+mro_set_mro|||u
+mro_set_private_data|||
+msbit_pos32|5.035003||cVnu
+msbit_pos|5.035004||Viu
+msbit_pos64|5.035003||cVnu
+msbit_pos_uintmax|5.035003||Viu
 MSPAGAIN|5.003007||Viu
 MSVC_DIAG_IGNORE|5.029010||Viu
 MSVC_DIAG_IGNORE_DECL|5.029010||Viu
@@ -9191,9 +9448,9 @@ MY_CXT|5.009000|5.009000|p
 MY_CXT_CLONE|5.009002|5.009000|p
 MY_CXT_INDEX|5.009005||Viu
 MY_CXT_INIT|5.009000|5.009000|p
-my_cxt_init|5.009000|5.009000|u
 MY_CXT_INIT_ARG|5.013005||Viu
 MY_CXT_INIT_INTERP|5.009003||Viu
+my_cxt_init|||u
 my_dirfd|5.009005|5.009005|nu
 my_exit|5.003007|5.003007|
 my_exit_jump|5.005000||Viu
@@ -9213,13 +9470,13 @@ my_pclose|5.003007|5.003007|u
 my_popen|5.003007|5.003007|u
 my_popen_list|5.007001|5.007001|u
 my_setenv|5.003007|5.003007|
-my_snprintf|5.009004|5.003007|pvn
+my_snprintf|5.009004||pvVn
 my_socketpair|5.007003|5.007003|nu
 my_sprintf|5.009003|5.003007|pdn
 my_stat|5.013003||Viu
 my_stat_flags|5.013003||cViu
 my_strerror|5.021001||Viu
-my_strftime|5.007002|5.007002|
+my_strftime|5.007002||V
 my_strlcat|5.009004|5.003007|pn
 my_strlcpy|5.009004|5.003007|pn
 my_strnlen|5.027006|5.003007|pn
@@ -9240,8 +9497,10 @@ N8|5.029001||Viu
 N9|5.029001||Viu
 NAN_COMPARE_BROKEN|5.021005||Viu
 NANYOFM|5.029005||Viu
+NANYOFM_t8|5.035004||Viu
 NANYOFM_t8_p8|5.033003||Viu
 NANYOFM_t8_pb|5.033003||Viu
+NANYOFM_tb|5.035004||Viu
 NANYOFM_tb_p8|5.033003||Viu
 NANYOFM_tb_pb|5.033003||Viu
 NATIVE8_TO_UNI|5.011000||Viu
@@ -9258,29 +9517,36 @@ nBIT_MASK|5.033001||Viu
 nBIT_UMAX|5.033001||Viu
 NBOUND|5.003007||Viu
 NBOUNDA|5.013009||Viu
+NBOUNDA_t8|5.035004||Viu
 NBOUNDA_t8_p8|5.033003||Viu
 NBOUNDA_t8_pb|5.033003||Viu
+NBOUNDA_tb|5.035004||Viu
 NBOUNDA_tb_p8|5.033003||Viu
 NBOUNDA_tb_pb|5.033003||Viu
 NBOUNDL|5.004000||Viu
+NBOUNDL_t8|5.035004||Viu
 NBOUNDL_t8_p8|5.033003||Viu
 NBOUNDL_t8_pb|5.033003||Viu
+NBOUNDL_tb|5.035004||Viu
 NBOUNDL_tb_p8|5.033003||Viu
 NBOUNDL_tb_pb|5.033003||Viu
+NBOUND_t8|5.035004||Viu
 NBOUND_t8_p8|5.033003||Viu
 NBOUND_t8_pb|5.033003||Viu
+NBOUND_tb|5.035004||Viu
 NBOUND_tb_p8|5.033003||Viu
 NBOUND_tb_pb|5.033003||Viu
 NBOUNDU|5.013009||Viu
+NBOUNDU_t8|5.035004||Viu
 NBOUNDU_t8_p8|5.033003||Viu
 NBOUNDU_t8_pb|5.033003||Viu
+NBOUNDU_tb|5.035004||Viu
 NBOUNDU_tb_p8|5.033003||Viu
 NBOUNDU_tb_pb|5.033003||Viu
 NBSP_NATIVE|5.021001||Viu
 NBSP_UTF8|5.021001||Viu
 NDBM_H_USES_PROTOTYPES|5.032001|5.032001|Vn
 NDEBUG|5.021007||Viu
-NEED_PTHREAD_INIT|5.005000||Viu
 need_utf8|5.009003||Vniu
 NEED_VA_COPY|5.007001|5.007001|Vn
 NEGATIVE_INDICES_VAR|5.008001||Viu
@@ -9310,6 +9576,7 @@ newCONSTSUB|5.004005|5.003007|p
 newCONSTSUB_flags|5.015006|5.015006|
 new_ctype|5.006000||Viu
 newCVREF|5.003007|5.003007|u
+newDEFEROP|5.035004|5.035004|x
 newDEFSVOP|5.021006|5.021006|
 newFORM|5.003007|5.003007|u
 newFOROP|5.013007|5.013007|
@@ -9366,7 +9633,7 @@ newSVnv|5.006000|5.003007|
 newSVOP|5.003007|5.003007|
 newSVpadname|5.017004|5.017004|x
 newSVpv|5.003007|5.003007|
-newSVpvf|5.006000|5.004000|v
+newSVpvf|5.004000||vV
 newSVpvf_nocontext|5.006000||vVn
 newSVpvn|5.004005|5.003007|p
 newSVpvn_flags|5.010001|5.003007|p
@@ -9423,7 +9690,6 @@ NofAMmeth|5.003007||Viu
 no_fh_allowed|5.003007||Viu
 NOLINE|5.003007||Viu
 NO_LOCALE|5.007000||Viu
-NO_LOCALECONV_MON_THOUSANDS_SEP|5.005000||Viu
 NONDESTRUCT_PAT_MOD|5.013002||Viu
 NONDESTRUCT_PAT_MODS|5.013002||Viu
 NON_OTHER_COUNT|5.033005||Viu
@@ -9437,8 +9703,10 @@ NO_TAINT_SUPPORT|5.017006||Viu
 not_a_number|5.005000||Viu
 NOTE3|5.027001||Viu
 NOTHING|5.003007||Viu
+NOTHING_t8|5.035004||Viu
 NOTHING_t8_p8|5.033003||Viu
 NOTHING_t8_pb|5.033003||Viu
+NOTHING_tb|5.035004||Viu
 NOTHING_tb_p8|5.033003||Viu
 NOTHING_tb_pb|5.033003||Viu
 nothreadhook|5.008000|5.008000|
@@ -9447,23 +9715,31 @@ not_incrementable|5.021002||Viu
 NOT_IN_PAD|5.005000||Viu
 NOT_REACHED|5.019006|5.003007|poVnu
 NPOSIXA|5.017003||Viu
+NPOSIXA_t8|5.035004||Viu
 NPOSIXA_t8_p8|5.033003||Viu
 NPOSIXA_t8_pb|5.033003||Viu
+NPOSIXA_tb|5.035004||Viu
 NPOSIXA_tb_p8|5.033003||Viu
 NPOSIXA_tb_pb|5.033003||Viu
 NPOSIXD|5.017003||Viu
+NPOSIXD_t8|5.035004||Viu
 NPOSIXD_t8_p8|5.033003||Viu
 NPOSIXD_t8_pb|5.033003||Viu
+NPOSIXD_tb|5.035004||Viu
 NPOSIXD_tb_p8|5.033003||Viu
 NPOSIXD_tb_pb|5.033003||Viu
 NPOSIXL|5.017003||Viu
+NPOSIXL_t8|5.035004||Viu
 NPOSIXL_t8_p8|5.033003||Viu
 NPOSIXL_t8_pb|5.033003||Viu
+NPOSIXL_tb|5.035004||Viu
 NPOSIXL_tb_p8|5.033003||Viu
 NPOSIXL_tb_pb|5.033003||Viu
 NPOSIXU|5.017003||Viu
+NPOSIXU_t8|5.035004||Viu
 NPOSIXU_t8_p8|5.033003||Viu
 NPOSIXU_t8_pb|5.033003||Viu
+NPOSIXU_tb|5.035004||Viu
 NPOSIXU_tb_p8|5.033003||Viu
 NPOSIXU_tb_pb|5.033003||Viu
 NSIG|5.009003||Viu
@@ -9541,7 +9817,7 @@ NV_VAX_ENDIAN|5.025003||Viu
 NV_WITHIN_IV|5.006000||Viu
 NV_WITHIN_UV|5.006000||Viu
 NV_X86_80_BIT|5.025004||Viu
-NV_ZERO_IS_ALLBITS_ZERO|5.035001|5.035001|Vn
+NV_ZERO_IS_ALLBITS_ZERO|5.035009|5.035009|Vn
 OA_AVREF|5.003007||Viu
 OA_BASEOP|5.005000||Viu
 OA_BASEOP_OR_UNOP|5.005000||Viu
@@ -9584,15 +9860,16 @@ Off_t|5.003007|5.003007|Vn
 Off_t_size|5.006000|5.006000|Vn
 OFFUNI_IS_INVARIANT|5.023003||Viu
 OFFUNISKIP|5.019004||Viu
+OFFUNISKIP_helper|5.035004||Viu
 ONCE_PAT_MOD|5.009005||Viu
 ONCE_PAT_MODS|5.009005||Viu
+ONE_IF_EBCDIC_ZERO_IF_NOT|5.035004||Viu
 oopsAV|5.003007||Viu
 oopsHV|5.003007||Viu
 OP|5.003007||Viu
 op_append_elem|5.013006|5.013006|
 op_append_list|5.013006|5.013006|
 opASSIGN|5.003007||Viu
-OP_BINARY|5.004000||Viu
 OP_CHECK_MUTEX_INIT|5.015008||Viu
 OP_CHECK_MUTEX_LOCK|5.015008||Viu
 OP_CHECK_MUTEX_TERM|5.015008||Viu
@@ -9611,16 +9888,20 @@ opendir|5.005000||Viu
 openn_cleanup|5.019010||Viu
 openn_setup|5.019010||Viu
 open_script|5.005000||Viu
+OPEN_t8|5.035004||Viu
 OPEN_t8_p8|5.033003||Viu
 OPEN_t8_pb|5.033003||Viu
+OPEN_tb|5.035004||Viu
 OPEN_tb_p8|5.033003||Viu
 OPEN_tb_pb|5.033003||Viu
 OPERAND|5.003007||Viu
 OPERANDl|5.031005||Viu
 OPERANDs|5.031005||Viu
 OPFAIL|5.009005||Viu
+OPFAIL_t8|5.035004||Viu
 OPFAIL_t8_p8|5.033003||Viu
 OPFAIL_t8_pb|5.033003||Viu
+OPFAIL_tb|5.035004||Viu
 OPFAIL_tb_p8|5.033003||Viu
 OPFAIL_tb_pb|5.033003||Viu
 OPf_FOLDED|5.021007||Viu
@@ -9686,6 +9967,7 @@ OPpCOREARGS_DEREF1|5.015003||Viu
 OPpCOREARGS_DEREF2|5.015003||Viu
 OPpCOREARGS_PUSHMARK|5.015003||Viu
 OPpCOREARGS_SCALARMOD|5.015003||Viu
+OPpDEFER_FINALLY|5.035008||Viu
 OPpDEREF|5.004000||Viu
 OPpDEREF_AV|5.003007||Viu
 OPpDEREF_HV|5.003007||Viu
@@ -9757,8 +10039,6 @@ OPpSORT_INPLACE|5.009001||Viu
 OPpSORT_INTEGER|5.006000||Viu
 OPpSORT_NUMERIC|5.006000||Viu
 OPpSORT_REVERSE|5.006000||Viu
-OPpSORT_STABLE|5.009003||Viu
-OPpSORT_UNSTABLE|5.027004||Viu
 OPpSPLIT_ASSIGN|5.025006||Viu
 OPpSPLIT_IMPLIM|5.019002||Viu
 OPpSPLIT_LEX|5.025006||Viu
@@ -9775,6 +10055,7 @@ OPpTRANS_SQUASH|5.003007||Viu
 OPpTRANS_TO_UTF|5.006000||Viu
 OPpTRANS_USE_SVOP|5.031006||Viu
 OPpTRUEBOOL|5.017004||Viu
+OPpUSEINT|5.035005||Viu
 OpREFCNT_dec|5.006000||Viu
 op_refcnt_dec|||xiu
 OpREFCNT_inc|5.006000||Viu
@@ -9802,8 +10083,10 @@ OPSLOT_HEADER|5.017002||Viu
 OpSLOToff|5.033001||Viu
 op_std_init|5.015003||Viu
 OPTIMIZED|5.005000||Viu
+OPTIMIZED_t8|5.035004||Viu
 OPTIMIZED_t8_p8|5.033003||Viu
 OPTIMIZED_t8_pb|5.033003||Viu
+OPTIMIZED_tb|5.035004||Viu
 OPTIMIZED_tb_p8|5.033003||Viu
 OPTIMIZED_tb_pb|5.033003||Viu
 optimize_op|5.027006||Viu
@@ -9818,6 +10101,7 @@ OP_TYPE_ISNT_NN|5.019010||Viu
 OP_TYPE_IS_OR_WAS|5.019010|5.019010|
 OP_TYPE_IS_OR_WAS_NN|5.019010||Viu
 op_unscope|5.017003||xViu
+op_wrap_finally|5.035008|5.035008|x
 O_RDONLY|5.006000||Viu
 O_RDWR|5.006000||Viu
 ORIGMARK|5.003007|5.003007|
@@ -9831,14 +10115,14 @@ O_VMS_DELETEONCLOSE|5.031002||Viu
 O_WRONLY|5.006000||Viu
 package|5.003007||Viu
 package_version|5.011001||Viu
-pack_cat|5.007003|5.007003|d
+pack_cat|5.033002|5.033002|d
 packlist|5.008001|5.008001|
 pack_rec|5.008001||Viu
 packWARN2|5.007003|5.003007|p
 packWARN3|5.007003|5.003007|p
 packWARN4|5.007003|5.003007|p
 packWARN|5.007003|5.003007|p
-pad_add_anon|5.008001|5.008001|
+pad_add_anon|5.015001|5.015001|
 pad_add_name_pv|5.015001|5.015001|
 pad_add_name_pvn|5.015001|5.015001|
 pad_add_name_pvs|5.015001|5.015001|
@@ -9848,7 +10132,7 @@ padadd_OUR|5.011002||Viu
 padadd_STALEOK|5.017003||Viu
 padadd_STATE|5.011002||Viu
 pad_add_weakref|5.021007||Viu
-pad_alloc|5.003007|5.003007|x
+pad_alloc|5.015001|5.015001|x
 pad_alloc_name|5.015001||Vi
 PadARRAY|5.017004|5.017004|x
 PAD_BASE_SV|5.008001||Vi
@@ -9864,7 +10148,7 @@ PAD_COMPNAME_OURSTASH|5.008001||Vi
 PAD_COMPNAME_PV|5.008001||Vi
 PAD_COMPNAME_SV|5.009005||Viu
 PAD_COMPNAME_TYPE|5.008001||Vi
-pad_compname_type|5.009003|5.009003|d
+pad_compname_type|5.033005|5.033005|d
 PAD_FAKELEX_ANON|5.009005||Viu
 PAD_FAKELEX_MULTI|5.009005||Viu
 pad_findlex|5.005000||Vi
@@ -9920,7 +10204,7 @@ PADNAMEt_TYPED|5.021007||Viu
 PadnameTYPE|5.017004||Vi
 PadnameTYPE_set|5.021007||Viu
 PadnameUTF8|5.017004|5.017004|x
-pad_new|5.008001|5.008001|
+pad_new|5.015001|5.015001|
 padnew_CLONE|5.008001||Viu
 padnew_SAVE|5.008001||Viu
 padnew_SAVESUB|5.008001||Viu
@@ -9938,7 +10222,7 @@ pad_sv|5.003007||cV
 PAD_SV|5.003007||Vi
 PAD_SVl|5.008001||Vi
 pad_swipe|5.003007||Vi
-pad_tidy|5.008001|5.008001|x
+pad_tidy|5.015001|5.015001|x
 panic_write2|5.008001||Viu
 PARENT_FAKELEX_FLAGS|5.009005||Viu
 PARENT_PAD_INDEX|5.009005||Viu
@@ -9997,17 +10281,20 @@ PERL_BITFIELD32|5.010001||Viu
 PERL_BITFIELD8|5.010001||Viu
 PERL_CALLCONV|5.005002||Viu
 PERL_CALLCONV_NO_RET|5.017002||Viu
-Perl_calloc|5.006000||Viu
 Perl_ceil|5.009001|5.009001|n
 PERL_CKDEF|5.006000||Viu
 perl_clone|5.006000||Vn
 perl_clone_using|5.006000||Vnu
+PERL_CLZ_32|5.035003||Viu
+PERL_CLZ_64|5.035003||Viu
 perl_construct|5.003007|5.003007|n
 PERL_COP_SEQMAX|5.013010||Viu
 PERL_COPY_ON_WRITE|5.023001||Viu
 Perl_cos|5.006000|5.006000|n
 Perl_cosh|5.021004|5.021004|n
 PERL_COUNT_MULTIPLIER|5.027007||Viu
+PERL_CTZ_32|5.035003||Viu
+PERL_CTZ_64|5.035003||Viu
 Perl_custom_op_xop|5.019006||V
 PERLDB_ALL|5.004002||Viu
 PERLDBf_GOTO|5.004005||Viu
@@ -10039,6 +10326,10 @@ PERLDB_SUBLINE|5.004002||Viu
 PERLDB_SUB_NN|5.004005||Viu
 PERL_DEB2|5.021007||Viu
 PERL_DEB|5.008001||Viu
+PERL_deBruijnMagic32|5.035003||Viu
+PERL_deBruijnMagic64|5.035003||Viu
+PERL_deBruijnShift32|5.035003||Viu
+PERL_deBruijnShift64|5.035003||Viu
 PERL_DEBUG|5.008001||Viu
 Perl_debug_log|5.003007||Viu
 PERL_DEBUG_PAD|5.007003||Viu
@@ -10096,6 +10387,7 @@ PERL_EXIT_DESTRUCT_END|5.007003|5.007003|
 PERL_EXIT_EXPECTED|5.006000|5.006000|
 PERL_EXIT_WARN|5.019003|5.019003|
 Perl_exp|5.006000|5.006000|n
+Perl_fabs|5.035005||Viu
 PERL_FEATURE_H|5.029006||Viu
 PERL_FILE_IS_ABSOLUTE|5.006000||Viu
 PERL_FILTER_EXISTS|5.009005||Viu
@@ -10127,12 +10419,20 @@ Perl_frexp|5.006000|5.006000|n
 PERL_FS_VER_FMT|5.006000||Viu
 PERL_FS_VERSION|5.010001||Viu
 PERL_GCC_BRACE_GROUPS_FORBIDDEN|5.008001||Viu
+PERL_GCC_VERSION_GE|5.035003||Viu
+PERL_GCC_VERSION_GT|5.035003||Viu
+PERL_GCC_VERSION_LE|5.035003||Viu
+PERL_GCC_VERSION_LT|5.035003||Viu
 PERL_GET_CONTEXT|5.006000||Viu
 PERL_GET_INTERP|5.006000||Viu
 PERL_GET_THX|5.006000||Viu
 PERL_GIT_UNPUSHED_COMMITS|5.010001||Viu
 PERL_GPROF_MONCONTROL|5.007002||Viu
 PERL_HANDY_H|5.027001||Viu
+PERL_HAS_FAST_GET_LSB_POS32|5.035003||Viu
+PERL_HAS_FAST_GET_LSB_POS64|5.035003||Viu
+PERL_HAS_FAST_GET_MSB_POS32|5.035003||Viu
+PERL_HAS_FAST_GET_MSB_POS64|5.035003||Viu
 PERL_HASH|5.003007|5.003007|p
 PERL_HASH_DEFAULT_HvMAX|5.017011||Viu
 PERL_HASH_FUNC|5.017006||Viu
@@ -10150,11 +10450,10 @@ PERL_HASH_STATE_WORDS|5.033007||Viu
 PERL_HASH_USE_SBOX32_ALSO|5.027001||Viu
 PERL_HASH_WITH_SEED|5.021001||Viu
 PERL_HASH_WITH_STATE|5.027001||Viu
-PERL_HV_ALLOC_AUX_SIZE|5.019010||Viu
 PERL_HV_ARRAY_ALLOC_BYTES|5.006000||Viu
 PERL___I|5.009005||Viu
 PERL_IMPLICIT_CONTEXT|5.006000||Viu
-PERL_INC_VERSION_LIST|5.035001|5.035001|Vn
+PERL_INC_VERSION_LIST|5.035009|5.035009|Vn
 Perl_internal_drand48|5.027004||Viu
 PERL_INTERPRETER_SIZE_UPTO_MEMBER|5.010000||Viu
 PERL_INT_MAX|5.003007|5.003007|p
@@ -10169,7 +10468,7 @@ PERLIOBUF_DEFAULT_BUFSIZ|5.013007||Viu
 PerlIO_canset_cnt|5.003007|5.003007|n
 PerlIO_clearerr|5.007003|5.007003|
 PerlIO_close|5.007003|5.007003|
-PerlIO_context_layers|5.009004|5.009004|u
+PerlIO_context_layers|||u
 PerlIO_debug|5.007001|5.007001|
 PERLIO_DUP_CLONE|5.007003||Viu
 PERLIO_DUP_FD|5.007003||Viu
@@ -10187,7 +10486,7 @@ PERLIO_F_EOF|5.007001|5.007001|
 PERLIO_F_ERROR|5.007001|5.007001|
 PERLIO_F_FASTGETS|5.007001|5.007001|
 PerlIO_fileno|5.007003|5.007003|
-PerlIO_fill|5.007003|5.007003|u
+PerlIO_fill|5.007000|5.007000|u
 PerlIO_findFILE|5.003007|5.003007|n
 PERLIO_F_LINEBUF|5.007001|5.007001|
 PerlIO_flush|5.007003|5.007003|
@@ -10260,6 +10559,7 @@ PERL_IS_GCC|5.032001||Viu
 Perl_isinf|5.007003|5.007003|n
 Perl_isnan|5.006001|5.006001|n
 PERL_IS_SUBWORD_ADDR|5.027007||Viu
+PERL_IS_UTF8_CHAR_DFA|5.035004||Viu
 PERL_JNP_TO_DECIMAL|5.033001||Viu
 Perl_langinfo|5.027004|5.027004|n
 PERL_LANGINFO_H|5.027004||Viu
@@ -10358,7 +10658,6 @@ PERL_MAGIC_VALUE_MAGIC|5.015000||Viu
 PERL_MAGIC_vec|5.007002|5.003007|p
 PERL_MAGIC_vstring|5.008001|5.003007|p
 PERL_MAGIC_VTABLE_MASK|5.015000||Viu
-Perl_malloc|5.006000||Viu
 PERL_MALLOC_CTL_H|5.027001||Viu
 Perl_malloc_good_size|5.010001||Viu
 PERL_MALLOC_WRAP|5.009002|5.009002|Vn
@@ -10384,7 +10683,6 @@ PerlMemShared_get_lock|5.006000||Viu
 PerlMemShared_is_locked|5.006000||Viu
 PerlMemShared_malloc|5.006000||Viu
 PerlMemShared_realloc|5.006000||Viu
-Perl_mfree|5.006000||Viu
 PERL_MG_UFUNC|5.007001||Viu
 Perl_modf|5.006000|5.006000|n
 PERL_MULTICONCAT_HEADER_SIZE|5.027006||Viu
@@ -10402,6 +10700,7 @@ PERL_MY_SNPRINTF_POST_GUARD|5.021002||Viu
 PERL_MY_VSNPRINTF_GUARDED|5.009004||Viu
 PERL_MY_VSNPRINTF_POST_GUARD|5.021002||Viu
 PERL_NO_DEV_RANDOM|5.009004||Viu
+PERL_NON_CORE_CHECK_EMPTY|5.035004||Viu
 PERL_OBJECT_THIS|5.005000||Viu
 PERL_OP_PARENT|5.025001||Viu
 PERL_PADNAME_MINIMAL|5.021007||Viu
@@ -10589,7 +10888,6 @@ PERL_QUAD_MAX|5.003007|5.003007|p
 PERL_QUAD_MIN|5.003007|5.003007|p
 PERL_READ_LOCK|5.033005||Viu
 PERL_READ_UNLOCK|5.033005||Viu
-Perl_realloc|5.006000||Viu
 PERL_REENTR_API|5.009005||Viu
 PERL_REENTR_H|5.027001||Viu
 PERL_REENTR_USING_ASCTIME_R|5.031011||Viu
@@ -10728,7 +11026,6 @@ PERLSI_SORT|5.005000||Viu
 PERLSI_UNDEF|5.005000||Viu
 PERLSI_UNKNOWN|5.005000||Viu
 PERLSI_WARNHOOK|5.005000||Viu
-PERL_SMALL_MACRO_BUFFER|5.023008||Viu
 PERL_SNPRINTF_CHECK|5.021002||Viu
 PerlSock_accept|5.005000||Viu
 PerlSock_accept_cloexec|5.027008||Viu
@@ -10801,6 +11098,7 @@ PERL_SYS_TERM_BODY|5.010000||Viu
 Perl_tan|5.021004|5.021004|n
 Perl_tanh|5.021004|5.021004|n
 PERL_TARGETARCH|5.007002|5.007002|Vn
+PERL_THREAD_LOCAL|5.035004|5.035004|Vn
 PERL_TIME64_CONFIG_H|5.027001||Viu
 PERL_TIME64_H|5.027001||Viu
 PERL_TRACK_MEMPOOL|5.009003||Viu
@@ -10857,6 +11155,7 @@ PERL_UQUAD_MIN|5.003007|5.003007|p
 PERL_USE_DEVEL|5.010001|5.010001|Vn
 PERL_USE_GCC_BRACE_GROUPS|5.009004|5.003007|pV
 PERL_USES_PL_PIDSTATUS|5.009003||Viu
+PERL_USE_THREAD_LOCAL|5.035004||Viu
 PERL_USHORT_MAX|5.003007|5.003007|p
 PERL_USHORT_MIN|5.003007|5.003007|p
 PERL_UTF8_H|5.027001||Viu
@@ -10890,6 +11189,7 @@ PERL_WRITE_MSG_TO_CONSOLE|5.007003||Viu
 PERL_WRITE_UNLOCK|5.033005||Viu
 PERL_XSUB_H|5.027001||Viu
 perly_sighandler|5.031007||cVnu
+phase_name|5.035007|5.035007|
 PHOSTNAME|5.006000|5.006000|Vn
 pidgone|5.003007||Viu
 Pid_t|5.005000|5.005000|Vn
@@ -11232,8 +11532,10 @@ PL_unlockhook|5.007003||Viu
 PL_unsafe|5.005000||Viu
 PL_UpperLatin1|5.019005||Viu
 PLUS|5.003007||Viu
+PLUS_t8|5.035004||Viu
 PLUS_t8_p8|5.033003||Viu
 PLUS_t8_pb|5.033003||Viu
+PLUS_tb|5.035004||Viu
 PLUS_tb_p8|5.033003||Viu
 PLUS_tb_pb|5.033003||Viu
 PL_utf8cache|5.009004||Viu
@@ -11363,28 +11665,36 @@ POPul|5.006000|5.006000|
 populate_ANYOF_from_invlist|5.019005||Viu
 populate_isa|||viu
 POSIXA|5.017003||Viu
+POSIXA_t8|5.035004||Viu
 POSIXA_t8_p8|5.033003||Viu
 POSIXA_t8_pb|5.033003||Viu
+POSIXA_tb|5.035004||Viu
 POSIXA_tb_p8|5.033003||Viu
 POSIXA_tb_pb|5.033003||Viu
 POSIX_CC_COUNT|5.017008||Viu
 POSIXD|5.017003||Viu
+POSIXD_t8|5.035004||Viu
 POSIXD_t8_p8|5.033003||Viu
 POSIXD_t8_pb|5.033003||Viu
+POSIXD_tb|5.035004||Viu
 POSIXD_tb_p8|5.033003||Viu
 POSIXD_tb_pb|5.033003||Viu
 POSIXL|5.017003||Viu
 POSIXL_CLEAR|5.029004||Viu
 POSIXL_SET|5.029004||Viu
+POSIXL_t8|5.035004||Viu
 POSIXL_t8_p8|5.033003||Viu
 POSIXL_t8_pb|5.033003||Viu
+POSIXL_tb|5.035004||Viu
 POSIXL_tb_p8|5.033003||Viu
 POSIXL_tb_pb|5.033003||Viu
 POSIXL_TEST|5.029004||Viu
 POSIXL_ZERO|5.029004||Viu
 POSIXU|5.017003||Viu
+POSIXU_t8|5.035004||Viu
 POSIXU_t8_p8|5.033003||Viu
 POSIXU_t8_pb|5.033003||Viu
+POSIXU_tb|5.035004||Viu
 POSIXU_tb_p8|5.033003||Viu
 POSIXU_tb_pb|5.033003||Viu
 PP|5.003007||Viu
@@ -11416,20 +11726,24 @@ print_bytes_for_locale|5.027002||Viu
 print_collxfrm_input_and_return|5.025004||Viu
 printf|5.003007||Viu
 PRINTF_FORMAT_NULL_OK|5.009005|5.009005|Vn
-printf_nocontext|5.007001|5.007001|vdnu
+printf_nocontext|5.007001||vdVnu
 PRIVLIB|5.003007|5.003007|Vn
 PRIVLIB_EXP|5.003007|5.003007|Vn
 PRIVSHIFT|5.003007||Viu
 process_special_blocks|5.009005||Viu
 PROCSELFEXE_PATH|5.007003|5.007003|Vn
 PRUNE|5.009005||Viu
+PRUNE_t8|5.035004||Viu
 PRUNE_t8_p8|5.033003||Viu
 PRUNE_t8_pb|5.033003||Viu
+PRUNE_tb|5.035004||Viu
 PRUNE_tb_p8|5.033003||Viu
 PRUNE_tb_pb|5.033003||Viu
 PSEUDO|5.009004||Viu
+PSEUDO_t8|5.035004||Viu
 PSEUDO_t8_p8|5.033003||Viu
 PSEUDO_t8_pb|5.033003||Viu
+PSEUDO_tb|5.035004||Viu
 PSEUDO_tb_p8|5.033003||Viu
 PSEUDO_tb_pb|5.033003||Viu
 pthread_addr_t|5.005000||Viu
@@ -11473,7 +11787,6 @@ PTR2UV|5.006000|5.003007|p
 Ptrdiff_t|5.029003||Viu
 ptr_hash|5.017010||Vniu
 PTRSIZE|5.005000|5.005000|Vn
-ptr_table_clear|5.009005|5.009005|du
 ptr_table_fetch|5.009005|5.009005|u
 ptr_table_find|5.009004||Vniu
 ptr_table_free|5.009005|5.009005|u
@@ -11539,7 +11852,7 @@ readdir64|5.009000||Viu
 READDIR64_R_PROTO|5.008000|5.008000|Vn
 READDIR_R_PROTO|5.008000|5.008000|Vn
 READ_XDIGIT|5.017006|5.017006|
-realloc|5.007002|5.007002|n
+realloc|5.003007||Vn
 ReANY|5.017006||cVnu
 re_compile|5.009005|5.009005|u
 RE_COMPILE_RECURSION_INIT|5.029009||Viu
@@ -11671,52 +11984,72 @@ refcounted_he_value|5.009004||Viu
 REFF|5.004001||Viu
 REFFA|5.013010||Viu
 REFFAN|5.031001||Viu
+REFFAN_t8|5.035004||Viu
 REFFAN_t8_p8|5.033003||Viu
 REFFAN_t8_pb|5.033003||Viu
+REFFAN_tb|5.035004||Viu
 REFFAN_tb_p8|5.033003||Viu
 REFFAN_tb_pb|5.033003||Viu
+REFFA_t8|5.035004||Viu
 REFFA_t8_p8|5.033003||Viu
 REFFA_t8_pb|5.033003||Viu
+REFFA_tb|5.035004||Viu
 REFFA_tb_p8|5.033003||Viu
 REFFA_tb_pb|5.033003||Viu
 REFFL|5.004001||Viu
 REFFLN|5.031001||Viu
+REFFLN_t8|5.035004||Viu
 REFFLN_t8_p8|5.033003||Viu
 REFFLN_t8_pb|5.033003||Viu
+REFFLN_tb|5.035004||Viu
 REFFLN_tb_p8|5.033003||Viu
 REFFLN_tb_pb|5.033003||Viu
+REFFL_t8|5.035004||Viu
 REFFL_t8_p8|5.033003||Viu
 REFFL_t8_pb|5.033003||Viu
+REFFL_tb|5.035004||Viu
 REFFL_tb_p8|5.033003||Viu
 REFFL_tb_pb|5.033003||Viu
 REFFN|5.031001||Viu
+REFFN_t8|5.035004||Viu
 REFFN_t8_p8|5.033003||Viu
 REFFN_t8_pb|5.033003||Viu
+REFFN_tb|5.035004||Viu
 REFFN_tb_p8|5.033003||Viu
 REFFN_tb_pb|5.033003||Viu
+REFF_t8|5.035004||Viu
 REFF_t8_p8|5.033003||Viu
 REFF_t8_pb|5.033003||Viu
+REFF_tb|5.035004||Viu
 REFF_tb_p8|5.033003||Viu
 REFF_tb_pb|5.033003||Viu
 REFFU|5.013008||Viu
 REFFUN|5.031001||Viu
+REFFUN_t8|5.035004||Viu
 REFFUN_t8_p8|5.033003||Viu
 REFFUN_t8_pb|5.033003||Viu
+REFFUN_tb|5.035004||Viu
 REFFUN_tb_p8|5.033003||Viu
 REFFUN_tb_pb|5.033003||Viu
+REFFU_t8|5.035004||Viu
 REFFU_t8_p8|5.033003||Viu
 REFFU_t8_pb|5.033003||Viu
+REFFU_tb|5.035004||Viu
 REFFU_tb_p8|5.033003||Viu
 REFFU_tb_pb|5.033003||Viu
 REF_HE_KEY|5.009005||Viu
 refkids|5.003007||Viu
 REFN|5.031001||Viu
+REFN_t8|5.035004||Viu
 REFN_t8_p8|5.033003||Viu
 REFN_t8_pb|5.033003||Viu
+REFN_tb|5.035004||Viu
 REFN_tb_p8|5.033003||Viu
 REFN_tb_pb|5.033003||Viu
+REF_t8|5.035004||Viu
 REF_t8_p8|5.033003||Viu
 REF_t8_pb|5.033003||Viu
+REF_tb|5.035004||Viu
 REF_tb_p8|5.033003||Viu
 REF_tb_pb|5.033003||Viu
 refto|5.005000||Viu
@@ -11724,8 +12057,10 @@ reg2Lanode|5.021005||Viu
 reg|5.005000||Viu
 reganode|5.005000||Viu
 REG_ANY|5.006000||Viu
+REG_ANY_t8|5.035004||Viu
 REG_ANY_t8_p8|5.033003||Viu
 REG_ANY_t8_pb|5.033003||Viu
+REG_ANY_tb|5.035004||Viu
 REG_ANY_tb_p8|5.033003||Viu
 REG_ANY_tb_pb|5.033003||Viu
 regatom|5.005000||Viu
@@ -11744,8 +12079,10 @@ regdupe_internal|5.009005||cVu
 regexec_flags|5.005000||cVu
 REGEX_SET|5.031010||Viu
 regex_set_precedence|5.021010||Vniu
+REGEX_SET_t8|5.035004||Viu
 REGEX_SET_t8_p8|5.033003||Viu
 REGEX_SET_t8_pb|5.033003||Viu
+REGEX_SET_tb|5.035004||Viu
 REGEX_SET_tb_p8|5.033003||Viu
 REGEX_SET_tb_pb|5.033003||Viu
 REG_EXTFLAGS_NAME_SIZE|5.020000||Viu
@@ -11806,8 +12143,10 @@ rename|5.005000||Viu
 Renew|5.003007|5.003007|
 Renewc|5.003007|5.003007|
 RENUM|5.005000||Viu
+RENUM_t8|5.035004||Viu
 RENUM_t8_p8|5.033003||Viu
 RENUM_t8_pb|5.033003||Viu
+RENUM_tb|5.035004||Viu
 RENUM_tb_p8|5.033003||Viu
 RENUM_tb_pb|5.033003||Viu
 re_op_compile|5.017001||Viu
@@ -11890,7 +12229,7 @@ RV2CVOPCV_MARK_EARLY|5.013006|5.013006|
 RV2CVOPCV_MAYBE_NAME_GV|5.021004||Viu
 RV2CVOPCV_RETURN_NAME_GV|5.013006|5.013006|
 RV2CVOPCV_RETURN_STUB|5.021004||Viu
-rvpv_dup|5.007003|5.007003|u
+rvpv_dup|5.008008|5.008008|u
 RX_ANCHORED_SUBSTR|5.010001||Viu
 RX_ANCHORED_UTF8|5.010001||Viu
 RXapif_ALL|5.009005||Viu
@@ -12034,8 +12373,10 @@ SAFE_TRIE_NODENUM|5.009002||Viu
 same_dirent|5.003007||Viu
 SANE_ERRSV|5.031003|5.031003|
 SANY|5.003007||Viu
+SANY_t8|5.035004||Viu
 SANY_t8_p8|5.033003||Viu
 SANY_t8_pb|5.033003||Viu
+SANY_tb|5.035004||Viu
 SANY_tb_p8|5.033003||Viu
 SANY_tb_pb|5.033003||Viu
 save_adelete|5.011000|5.011000|u
@@ -12086,7 +12427,7 @@ save_hek_flags|5.008000||Vniu
 save_helem|5.004005|5.004005|u
 save_helem_flags|5.011000|5.011000|u
 SAVEHINTS|5.005000||Viu
-save_hints|5.010001|5.010001|u
+save_hints|5.013005|5.013005|u
 save_hptr|5.003007|5.003007|
 SAVEI16|5.004000|5.004000|
 save_I16|5.004000||cVu
@@ -12116,10 +12457,10 @@ SAVEPADSV|||i
 SAVEPARSER|5.009005||Viu
 SAVEPPTR|5.003007|5.003007|
 save_pptr|5.003007||cVu
-save_pushi32ptr|5.010001|5.010001|u
+save_pushi32ptr|5.013006|5.013006|u
 save_pushptr|5.010001|5.010001|u
 save_pushptri32ptr|5.010001||Viu
-save_pushptrptr|5.010001|5.010001|u
+save_pushptrptr|5.013006|5.013006|u
 savepv|5.003007|5.003007|
 savepvn|5.003007|5.003007|
 savepvs|5.009003|5.009003|
@@ -12140,6 +12481,7 @@ savestack_grow|5.003007|5.003007|u
 savestack_grow_cnt|5.008001|5.008001|u
 SAVESTACK_POS|5.004000|5.004000|
 save_strlen|5.019004||cViu
+SAVESTRLEN|5.035005|5.035005|
 savesvpv|5.009002|5.009002|
 save_svref|5.003007|5.003007|
 SAVESWITCHSTACK|5.009002||Viu
@@ -12183,7 +12525,7 @@ SAVEt_IV|5.003007||Viu
 SAVEt_LONG|5.003007||Viu
 SAVEt_MORTALIZESV|5.007001||Viu
 SAVETMPS|5.003007|5.003007|
-savetmps|5.023008|5.023008|xu
+savetmps|||xu
 SAVEt_NSTAB|5.003007||Viu
 save_to_buffer|5.027004||Vniu
 SAVEt_OP|5.005000||Viu
@@ -12214,8 +12556,10 @@ sb_iters|5.003007||Viu
 sb_m|5.003007||Viu
 sb_maxiters|5.003007||Viu
 SBOL|5.003007||Viu
+SBOL_t8|5.035004||Viu
 SBOL_t8_p8|5.033003||Viu
 SBOL_t8_pb|5.033003||Viu
+SBOL_tb|5.035004||Viu
 SBOL_tb_p8|5.033003||Viu
 SBOL_tb_pb|5.033003||Viu
 sb_orig|5.003007||Viu
@@ -12270,7 +12614,7 @@ scan_word|5.003007||xcViu
 SCHED_YIELD|5.006000|5.006000|Vn
 SCOPE_SAVES_SIGNAL_MASK|5.007001||Viu
 search_const|5.010001||Viu
-seed|5.008001|5.008001|u
+seed|5.009003|5.009003|u
 seedDrand01|5.006000|5.006000|
 SEEK_CUR|5.003007||Viu
 seekdir|5.005000||Viu
@@ -12284,8 +12628,10 @@ semun|5.006000||Viu
 send|5.005000||Viu
 sendto|5.005000||Viu
 SEOL|5.003007||Viu
+SEOL_t8|5.035004||Viu
 SEOL_t8_p8|5.033003||Viu
 SEOL_t8_pb|5.033003||Viu
+SEOL_tb|5.035004||Viu
 SEOL_tb_p8|5.033003||Viu
 SEOL_tb_pb|5.033003||Viu
 sequence_num|5.009003||Viu
@@ -12294,7 +12640,7 @@ set_ANYOF_SYNTHETIC|5.019009||Viu
 setbuf|5.003007||Viu
 set_caret_X|5.019006||Viu
 set_context|5.006000|5.006000|nu
-setdefout|5.003007|5.003007|
+setdefout|5.011000|5.011000|
 SETERRNO|5.003007||Vi
 setfd_cloexec|5.027008||Vniu
 setfd_cloexec_for_nonsysfd|5.027008||Viu
@@ -12349,7 +12695,7 @@ SETu|5.004000||Viu
 setuid|5.005000||Viu
 _setup_canned_invlist|5.019008||cViu
 setvbuf|5.003007||Viu
-share_hek|5.004000|5.004000|u
+share_hek|5.009003|5.009003|u
 share_hek_flags|5.008000||Viu
 share_hek_hek|5.009003||Viu
 sharepvn|5.005000||Viu
@@ -12378,6 +12724,8 @@ SIG_NUM|5.003007|5.003007|Vn
 Sigsetjmp|5.003007|5.003007|
 SIG_SIZE|5.007001|5.007001|Vn
 simplify_sort|5.006000||Viu
+single_1bit_pos32|5.035003||cVnu
+single_1bit_pos64|5.035003||cVnu
 SINGLE_PAT_MOD|5.009005||Viu
 SIPHASH_SEED_STATE|5.027001||Viu
 SIPROUND|5.017006||Viu
@@ -12416,17 +12764,23 @@ Size_t_size|5.006000|5.006000|Vn
 SKIP|5.009005||Viu
 SKIP_next|5.009005||Viu
 SKIP_next_fail|5.009005||Viu
+SKIP_next_fail_t8|5.035004||Viu
 SKIP_next_fail_t8_p8|5.033003||Viu
 SKIP_next_fail_t8_pb|5.033003||Viu
+SKIP_next_fail_tb|5.035004||Viu
 SKIP_next_fail_tb_p8|5.033003||Viu
 SKIP_next_fail_tb_pb|5.033003||Viu
+SKIP_next_t8|5.035004||Viu
 SKIP_next_t8_p8|5.033003||Viu
 SKIP_next_t8_pb|5.033003||Viu
+SKIP_next_tb|5.035004||Viu
 SKIP_next_tb_p8|5.033003||Viu
 SKIP_next_tb_pb|5.033003||Viu
 skipspace_flags|5.019002||xcViu
+SKIP_t8|5.035004||Viu
 SKIP_t8_p8|5.033003||Viu
 SKIP_t8_pb|5.033003||Viu
+SKIP_tb|5.035004||Viu
 SKIP_tb_p8|5.033003||Viu
 SKIP_tb_pb|5.033003||Viu
 skip_to_be_ignored_text|5.023004||Viu
@@ -12455,13 +12809,17 @@ specialWARN|5.006000||Viu
 SRAND48_R_PROTO|5.008000|5.008000|Vn
 SRANDOM_R_PROTO|5.008000|5.008000|Vn
 SRCLOSE|5.027008||Viu
+SRCLOSE_t8|5.035004||Viu
 SRCLOSE_t8_p8|5.033003||Viu
 SRCLOSE_t8_pb|5.033003||Viu
+SRCLOSE_tb|5.035004||Viu
 SRCLOSE_tb_p8|5.033003||Viu
 SRCLOSE_tb_pb|5.033003||Viu
 SROPEN|5.027008||Viu
+SROPEN_t8|5.035004||Viu
 SROPEN_t8_p8|5.033003||Viu
 SROPEN_t8_pb|5.033003||Viu
+SROPEN_tb|5.035004||Viu
 SROPEN_tb_p8|5.033003||Viu
 SROPEN_tb_pb|5.033003||Viu
 SS_ACCVIO|5.008001||Viu
@@ -12524,8 +12882,10 @@ ST|5.003007|5.003007|
 stack_grow|5.003007||cVu
 STANDARD_C|5.003007||Viu
 STAR|5.003007||Viu
+STAR_t8|5.035004||Viu
 STAR_t8_p8|5.033003||Viu
 STAR_t8_pb|5.033003||Viu
+STAR_tb|5.035004||Viu
 STAR_tb_p8|5.033003||Viu
 STAR_tb_pb|5.033003||Viu
 START_EXTERN_C|5.005000|5.003007|pV
@@ -12554,6 +12914,8 @@ STATUS_UNIX_EXIT_SET|5.009003||Viu
 STATUS_UNIX_SET|5.009003||Viu
 STDCHAR|5.003007|5.003007|Vn
 stderr|5.003007||Viu
+ST_DEV_SIGN|5.035004|5.035004|Vn
+ST_DEV_SIZE|5.035004|5.035004|Vn
 stdin|5.003007||Viu
 STDIO_PTR_LVAL_SETS_CNT|5.007001|5.007001|Vn
 STDIO_PTR_LVALUE|5.006000|5.006000|Vn
@@ -12617,13 +12979,17 @@ SUBST_TAINT_RETAINT|5.013010||Viu
 SUBST_TAINT_STR|5.013010||Viu
 SUBVERSION|5.003007||Viu
 SUCCEED|5.003007||Viu
+SUCCEED_t8|5.035004||Viu
 SUCCEED_t8_p8|5.033003||Viu
 SUCCEED_t8_pb|5.033003||Viu
+SUCCEED_tb|5.035004||Viu
 SUCCEED_tb_p8|5.033003||Viu
 SUCCEED_tb_pb|5.033003||Viu
 SUSPEND|5.005000||Viu
+SUSPEND_t8|5.035004||Viu
 SUSPEND_t8_p8|5.033003||Viu
 SUSPEND_t8_pb|5.033003||Viu
+SUSPEND_tb|5.035004||Viu
 SUSPEND_tb_p8|5.033003||Viu
 SUSPEND_tb_pb|5.033003||Viu
 sv_2bool|5.013006||cV
@@ -12654,8 +13020,8 @@ sv_2uv_flags|5.009001|5.009001|
 sv_add_arena|5.003007||Vi
 sv_add_backref|||iu
 SvAMAGIC|5.003007||Viu
-SvAMAGIC_off|5.031004|5.031004|nu
-SvAMAGIC_on|5.031004|5.031004|nu
+SvAMAGIC_off|5.003007|5.003007|nu
+SvAMAGIC_on|5.003007|5.003007|nu
 SvANY|5.003007||Viu
 sv_backoff|5.003007|5.003007|n
 sv_bless|5.003007|5.003007|
@@ -12667,9 +13033,9 @@ SV_CATBYTES|5.021005|5.021005|
 sv_cat_decode|5.008001|5.008001|
 sv_cathek|5.021004||Viu
 sv_catpv|5.003007|5.003007|
-sv_catpvf|5.006000|5.004000|v
+sv_catpvf|5.004000||vV
 sv_catpv_flags|5.013006|5.013006|
-sv_catpvf_mg|5.006000|5.004000|pv
+sv_catpvf_mg|5.004005||pvV
 sv_catpvf_mg_nocontext|5.006000||pvVn
 sv_catpvf_nocontext|5.006000||vVn
 sv_catpv_mg|5.004005|5.003007|p
@@ -12820,6 +13186,7 @@ SvGMAGICAL_on|5.003007||Viu
 SvGROW|5.003007|5.003007|
 sv_grow|5.003007||cV
 Sv_Grow|5.003007||Viu
+sv_grow_fresh|5.035006||cV
 SvGROW_mutable|5.009003||Viu
 SV_HAS_TRAILING_NUL|5.009004|5.003007|p
 SV_IMMEDIATE_UNREF|5.007001|5.003007|p
@@ -12845,6 +13212,7 @@ SvIOKp_on|5.003007||Viu
 SvIOK_UV|5.006000|5.006000|
 sv_isa|5.003007|5.003007|
 sv_isa_sv|5.031007|5.031007|x
+SvIsBOOL|5.035004|5.035004|
 SvIsCOW|5.008003|5.008003|
 SvIsCOW_shared_hash|5.008003|5.008003|
 SvIS_FREED|5.009003||Viu
@@ -12876,7 +13244,7 @@ sv_magicext_mglob|5.019002||cViu
 sv_magic_portable||5.004000|pou
 SvMAGIC_set|5.009003|5.003007|p
 sv_mortalcopy|5.003007|5.003007|
-sv_mortalcopy_flags|5.017005|5.003007|p
+sv_mortalcopy_flags|5.031001|5.003007|p
 SV_MUTABLE_RETURN|5.009003|5.003007|poVnu
 sv_ncmp|5.009003||Viu
 sv_ncmp_desc|5.031011||Viu
@@ -12895,10 +13263,12 @@ SvNOK_on|5.003007|5.003007|
 SvNOK_only|5.003007|5.003007|
 SvNOKp|5.003007|5.003007|
 SvNOKp_on|5.003007||Viu
-sv_nolocking|5.007003|5.007003|d
+sv_nolocking|5.031004|5.031004|d
 sv_nosharing|5.007003|5.007003|
 SV_NOSTEAL|5.009002|5.003007|p
-sv_nounlocking|5.007003|5.007003|d
+sv_nounlocking|5.009004|5.009004|d
+sv_numeq|5.035009|5.035009|
+sv_numeq_flags|5.035009|5.035009|
 sv_nv|5.005000||dcV
 SvNV|5.006000|5.003007|
 SvNV_nomg|5.013002|5.003007|p
@@ -12978,6 +13348,7 @@ sv_pos_u2b_flags|5.011005|5.011005|
 sv_pos_u2b_forwards|5.009004||Vniu
 sv_pos_u2b_midway|5.009004||Vniu
 SVp_POK|5.003007||Viu
+SVppv_STATIC|5.035004||Viu
 SVprv_PCS_IMPORTED|5.009005||Viu
 SVprv_WEAKREF|5.006000||Viu
 SVp_SCREAM|5.003007||Viu
@@ -13050,7 +13421,7 @@ SvREADONLY|5.003007|5.003007|
 SvREADONLY_off|5.003007|5.003007|
 SvREADONLY_on|5.003007|5.003007|
 sv_recode_to_utf8|5.007003|5.007003|
-sv_ref|5.015004|5.015004|
+sv_ref|5.023005|5.023005|
 SvREFCNT|5.003007|5.003007|
 SvREFCNT_dec|5.003007|5.003007|
 SvREFCNT_dec_NN|5.017007|5.017007|
@@ -13086,6 +13457,8 @@ SV_SAVED_COPY|5.009005||Viu
 SvSCREAM|5.003007||Viu
 SvSCREAM_off|5.003007||Viu
 SvSCREAM_on|5.003007||Viu
+sv_setbool|5.035004|5.035004|
+sv_setbool_mg|5.035004|5.035004|
 sv_setgid|5.019001||Viu
 sv_sethek|5.015004||cViu
 sv_setiv|5.003007|5.003007|
@@ -13097,14 +13470,15 @@ sv_setnv|5.006000|5.003007|
 sv_setnv_mg|5.006000|5.003007|p
 sv_setpv|5.003007|5.003007|
 sv_setpv_bufsize|5.025006|5.025006|
-sv_setpvf|5.006000|5.004000|v
-sv_setpvf_mg|5.006000|5.004000|pv
+sv_setpvf|5.004000||vV
+sv_setpvf_mg|5.004005||pvV
 sv_setpvf_mg_nocontext|5.006000||pvVn
 sv_setpvf_nocontext|5.006000||vVn
 sv_setpviv|5.008001|5.008001|d
 sv_setpviv_mg|5.008001|5.008001|d
 sv_setpv_mg|5.004005|5.003007|p
 sv_setpvn|5.003007|5.003007|
+sv_setpvn_fresh|5.035006|5.035006|
 sv_setpvn_mg|5.004005|5.003007|p
 sv_setpvs|5.009004|5.003007|p
 sv_setpvs_mg|5.013006|5.013006|
@@ -13114,6 +13488,10 @@ sv_setref_pv|5.003007|5.003007|
 sv_setref_pvn|5.003007|5.003007|
 sv_setref_pvs|5.013006|5.013006|
 sv_setref_uv|5.007001|5.007001|
+sv_setrv_inc|5.035004|5.035004|
+sv_setrv_inc_mg|5.035004|5.035004|
+sv_setrv_noinc|5.035004|5.035004|
+sv_setrv_noinc_mg|5.035004|5.035004|
 sv_setsv|5.003007|5.003007|
 SvSetSV|5.003007|5.003007|
 sv_setsv_cow|5.009000||xcViu
@@ -13143,6 +13521,8 @@ SVs_SMG|5.003007||Viu
 SvSTASH|5.003007|5.003007|
 SvSTASH_set|5.009003|5.003007|p
 SVs_TEMP|5.003007|5.003007|
+sv_streq|5.035009|5.035009|
+sv_streq_flags|5.035009|5.035009|
 sv_string_from_errnum|5.027003|5.027003|
 SvTAIL|5.003007||Viu
 SvTAINT|5.003007|5.003007|
@@ -13254,8 +13634,10 @@ SYSTEM_LOCALTIME_MAX|5.011000||Viu
 SYSTEM_LOCALTIME_MIN|5.011000||Viu
 sys_term|||cnu
 TAIL|5.005000||Viu
+TAIL_t8|5.035004||Viu
 TAIL_t8_p8|5.033003||Viu
 TAIL_t8_pb|5.033003||Viu
+TAIL_tb|5.035004||Viu
 TAIL_tb_p8|5.033003||Viu
 TAIL_tb_pb|5.033003||Viu
 TAINT|5.004000||Viu
@@ -13298,9 +13680,10 @@ tmpnam|5.005000||Viu
 TMPNAM_R_PROTO|5.008000|5.008000|Vn
 tmps_grow_p|5.021005||cViu
 to_byte_substr|5.008000||Viu
+to_case_cp_list|5.035004||Viu
 toCTRL|5.004000||Viu
 toFOLD|5.019001|5.019001|
-toFOLD_A|5.019001||Viu
+toFOLD_A|5.019001|5.019001|
 _to_fold_latin1|5.015005||cVniu
 toFOLD_LC|5.019001||Viu
 toFOLD_uni|5.007003||Viu
@@ -13336,7 +13719,7 @@ TOPs|5.003007||Viu
 TOPu|5.004000||Viu
 TOPul|5.006000||Viu
 toTITLE|5.019001|5.019001|
-toTITLE_A|5.019001||Viu
+toTITLE_A|5.019001|5.019001|
 toTITLE_uni|5.006000||Viu
 toTITLE_utf8|5.031005|5.031005|
 toTITLE_utf8_safe|5.025009|5.006000|p
@@ -13347,7 +13730,7 @@ to_uni_lower|5.006000||cVu
 to_uni_title|5.006000||cVu
 to_uni_upper|5.006000||cVu
 toUPPER|5.003007|5.003007|
-toUPPER_A|5.019001||Viu
+toUPPER_A|5.019001|5.019001|
 toUPPER_LATIN1_MOD|5.011002||Viu
 toUPPER_LC|5.004000||Viu
 _to_upper_title_latin1|5.015005||Viu
@@ -13372,24 +13755,32 @@ TRIE_BITMAP_SET|5.009004||Viu
 TRIE_BITMAP_TEST|5.009004||Viu
 TRIEC|5.009004||Viu
 TRIE_CHARCOUNT|5.009004||Viu
+TRIEC_t8|5.035004||Viu
 TRIEC_t8_p8|5.033003||Viu
 TRIEC_t8_pb|5.033003||Viu
+TRIEC_tb|5.035004||Viu
 TRIEC_tb_p8|5.033003||Viu
 TRIEC_tb_pb|5.033003||Viu
 TRIE_next|5.009005||Viu
 TRIE_next_fail|5.009005||Viu
+TRIE_next_fail_t8|5.035004||Viu
 TRIE_next_fail_t8_p8|5.033003||Viu
 TRIE_next_fail_t8_pb|5.033003||Viu
+TRIE_next_fail_tb|5.035004||Viu
 TRIE_next_fail_tb_p8|5.033003||Viu
 TRIE_next_fail_tb_pb|5.033003||Viu
+TRIE_next_t8|5.035004||Viu
 TRIE_next_t8_p8|5.033003||Viu
 TRIE_next_t8_pb|5.033003||Viu
+TRIE_next_tb|5.035004||Viu
 TRIE_next_tb_p8|5.033003||Viu
 TRIE_next_tb_pb|5.033003||Viu
 TRIE_NODEIDX|5.009002||Viu
 TRIE_NODENUM|5.009002||Viu
+TRIE_t8|5.035004||Viu
 TRIE_t8_p8|5.033003||Viu
 TRIE_t8_pb|5.033003||Viu
+TRIE_tb|5.035004||Viu
 TRIE_tb_p8|5.033003||Viu
 TRIE_tb_pb|5.033003||Viu
 TRIE_WORDS_OFFSET|5.009005||Viu
@@ -13506,11 +13897,11 @@ UNICODE_GREEK_SMALL_LETTER_SIGMA|5.007003||Viu
 UNICODE_IS_32_CONTIGUOUS_NONCHARS|5.023006||Viu
 UNICODE_IS_BYTE_ORDER_MARK|5.007001||Viu
 UNICODE_IS_END_PLANE_NONCHAR_GIVEN_NOT_SUPER|5.023006||Viu
-UNICODE_IS_NONCHAR|5.013009||Viu
+UNICODE_IS_NONCHAR|5.013009|5.013009|
 UNICODE_IS_PERL_EXTENDED|5.027002||Viu
-UNICODE_IS_REPLACEMENT|5.007001||Viu
-UNICODE_IS_SUPER|5.013009||Viu
-UNICODE_IS_SURROGATE|5.007001||Viu
+UNICODE_IS_REPLACEMENT|5.007002|5.007002|
+UNICODE_IS_SUPER|5.013009|5.013009|
+UNICODE_IS_SURROGATE|5.007001|5.007001|
 UNICODE_MAJOR_VERSION|5.023002||Viu
 UNICODE_PAT_MOD|5.013006||Viu
 UNICODE_PAT_MODS|5.013006||Viu
@@ -13613,6 +14004,7 @@ UNI_sc_values_index|5.029009||Viu
 UNI_scx_values_index|5.029009||Viu
 UNI_sd_values_index|5.029009||Viu
 UNISKIP|5.007001||Viu
+UNISKIP_BY_MSB|5.035004||Viu
 UNI_SPACE|5.029002||Viu
 UNI_SPACEPERL|5.029002||Viu
 UNI_sterm_values_index|5.029009||Viu
@@ -13637,8 +14029,10 @@ UNI_xids_values_index|5.029009||Viu
 UNI_XPERLSPACE|5.029002||Viu
 UNKNOWN_ERRNO_MSG|5.019007||Viu
 UNLESSM|5.003007||Viu
+UNLESSM_t8|5.035004||Viu
 UNLESSM_t8_p8|5.033003||Viu
 UNLESSM_t8_pb|5.033003||Viu
+UNLESSM_tb|5.035004||Viu
 UNLESSM_tb_p8|5.033003||Viu
 UNLESSM_tb_pb|5.033003||Viu
 UNLIKELY|5.009004|5.003007|p
@@ -13672,7 +14066,7 @@ USE_64_BIT_INT|5.006000|5.006000|Vn
 USE_64_BIT_RAWIO|5.006000||Viu
 USE_64_BIT_STDIO|5.006000||Viu
 USE_BSDPGRP|5.003007||Viu
-USE_C_BACKTRACE|5.035001|5.035001|Vn
+USE_C_BACKTRACE|5.035009|5.035009|Vn
 USE_DYNAMIC_LOADING|5.003007|5.003007|Vn
 USE_ENVIRON_ARRAY|5.007001||Viu
 USE_GRENT_BUFFER|5.008000||Viu
@@ -13735,8 +14129,9 @@ USE_THREAD_SAFE_LOCALE|5.025004||Viu
 USE_TM64|5.011000||Viu
 USE_UTF8_IN_NAMES|5.007003||Viu
 utf16_textfilter|5.011001||Viu
-utf16_to_utf8|5.006000||cViu
-utf16_to_utf8_reversed|5.006000||cViu
+utf16_to_utf8_base|5.035004||cViu
+utf16_to_utf8|||ciu
+utf16_to_utf8_reversed|||ciu
 UTF8_ACCUMULATE|5.007001||Viu
 UTF8_ALLOW_ANY|5.007001||Viu
 UTF8_ALLOW_ANYUV|5.007001||Viu
@@ -13790,7 +14185,8 @@ UTF8_IS_INVARIANT|5.007001|5.003007|p
 UTF8_IS_NEXT_CHAR_DOWNGRADEABLE|5.017006||Viu
 UTF8_IS_NONCHAR|5.023002|5.023002|
 UTF8_IS_NONCHAR_GIVEN_THAT_NON_SUPER_AND_GE_PROBLEMATIC|5.013009||Viu
-UTF8_IS_REPLACEMENT|5.017000||Viu
+UTF8_IS_PERL_EXTENDED|5.035004||Viu
+UTF8_IS_REPLACEMENT|||
 UTF8_IS_START|5.007001||Viu
 UTF8_IS_START_base|5.031007||Viu
 UTF8_IS_SUPER|5.023002|5.023002|
@@ -13811,6 +14207,9 @@ UTF8_SAFE_SKIP|5.029009|5.006000|p
 UTF8SKIP|5.006000|5.006000|
 UTF8_SKIP|5.023002|5.006000|p
 utf8_to_bytes|5.006001|5.006001|x
+utf8_to_utf16|5.035004||Viu
+utf8_to_utf16_base|5.035004||xcViu
+utf8_to_utf16_reversed|5.035004||Viu
 utf8_to_uvchr|5.007001|5.006001|pd
 utf8_to_uvchr_buf|5.015009|5.006001|p
 utf8_to_uvchr_buf_helper|5.031004||cVu
@@ -13829,11 +14228,18 @@ UTF8_WARN_PERL_EXTENDED|5.027002|5.027002|
 UTF8_WARN_SUPER|5.013009|5.013009|
 UTF8_WARN_SURROGATE|5.013009|5.013009|
 UTF_ACCUMULATION_SHIFT|5.007001||Viu
+UTF_CONTINUATION_BYTE_INFO_BITS|5.035004||Viu
 UTF_CONTINUATION_MARK|5.007001||Viu
 UTF_CONTINUATION_MASK|5.007001||Viu
+UTF_EBCDIC_CONTINUATION_BYTE_INFO_BITS|5.035004||Viu
+UTF_FIRST_CONT_BYTE_110000|5.035004||Viu
+UTF_FIRST_CONT_BYTE|5.035004||Viu
 UTF_IS_CONTINUATION_MASK|5.023006||Viu
 UTF_MIN_ABOVE_LATIN1_BYTE|5.031006||Viu
+UTF_MIN_CONTINUATION_BYTE|5.035004||Viu
 UTF_MIN_START_BYTE|5.031006||Viu
+UTF_START_BYTE_110000|5.035004||Viu
+UTF_START_BYTE|5.035004||Viu
 UTF_START_MARK|5.007001||Viu
 UTF_START_MASK|5.007001||Viu
 UTF_TO_NATIVE|5.007001||Viu
@@ -13876,8 +14282,10 @@ VCMP|5.019008||Viu
 vcroak|5.006000|5.006000|
 vdeb|5.007003|5.007003|u
 VERB|5.009005||Viu
+VERB_t8|5.035004||Viu
 VERB_t8_p8|5.033003||Viu
 VERB_t8_pb|5.033003||Viu
+VERB_tb|5.035004||Viu
 VERB_tb_p8|5.033003||Viu
 VERB_tb_pb|5.033003||Viu
 vform|5.006000|5.006000|
@@ -13892,7 +14300,7 @@ vnormal|5.009002|5.009002|
 VNORMAL|5.019008||Viu
 vnumify|5.009000|5.009000|
 VNUMIFY|5.019008||Viu
-voidnonfinal|||iu
+voidnonfinal|5.035002||Viu
 VOL|5.003007||Viu
 vstringify|5.009000|5.009000|
 VSTRINGIFY|5.019008||Viu
@@ -13930,13 +14338,13 @@ vtohs|5.003007||Viu
 VUTIL_REPLACE_CORE|5.019008||Viu
 vverify|5.009003|5.009003|
 VVERIFY|5.019008||Viu
-vwarn|5.006000|5.006000|
+vwarn|5.006000|5.003007|
 vwarner|5.006000|5.004000|p
 wait4pid|5.003007||Viu
 wait|5.005000||Viu
 want_vtbl_bm|5.015000||Viu
 want_vtbl_fm|5.015000||Viu
-warn|5.006000|5.003007|v
+warn|5.003007||vV
 WARN_ALL|5.006000|5.003007|p
 WARN_ALLstring|5.006000||Viu
 WARN_AMBIGUOUS|5.006000|5.003007|p
@@ -13947,15 +14355,19 @@ WARN_CLOSURE|5.006000|5.003007|p
 WARN_DEBUGGING|5.006000|5.003007|p
 WARN_DEPRECATED|5.006000|5.003007|p
 WARN_DIGIT|5.006000|5.003007|p
-warner|5.006000|5.004000|pv
+warner|5.006000||pvV
 warner_nocontext|5.006000||vVn
 WARN_EXEC|5.006000|5.003007|p
 WARN_EXITING|5.006000|5.003007|p
 WARN_EXPERIMENTAL|5.017004|5.017004|
 WARN_EXPERIMENTAL__ALPHA_ASSERTIONS|5.027009|5.027009|
+WARN_EXPERIMENTAL__ARGS_ARRAY_WITH_SIGNATURES|5.035009|5.035009|
 WARN_EXPERIMENTAL__BITWISE|5.021009|5.021009|
+WARN_EXPERIMENTAL__BUILTIN|5.035009|5.035009|
 WARN_EXPERIMENTAL__CONST_ATTR|5.021008|5.021008|
 WARN_EXPERIMENTAL__DECLARED_REFS|5.025003|5.025003|
+WARN_EXPERIMENTAL__DEFER|5.035004|5.035004|
+WARN_EXPERIMENTAL__FOR_LIST|5.035005|5.035005|
 WARN_EXPERIMENTAL__ISA|5.031007|5.031007|
 WARN_EXPERIMENTAL__LEXICAL_SUBS|5.017005|5.017005|
 WARN_EXPERIMENTAL__POSTDEREF|5.019005|5.019005|
@@ -13969,7 +14381,6 @@ WARN_EXPERIMENTAL__SMARTMATCH|5.017011|5.017011|
 WARN_EXPERIMENTAL__TRY|5.033007|5.033007|
 WARN_EXPERIMENTAL__UNIPROP_WILDCARDS|5.029009|5.029009|
 WARN_EXPERIMENTAL__VLB|5.029009|5.029009|
-WARN_EXPERIMENTAL__WIN32_PERLIO|5.021001|5.021001|
 WARN_GLOB|5.006000|5.003007|p
 WARN_ILLEGALPROTO|5.011004|5.011004|
 WARN_IMPRECISION|5.011000|5.011000|
@@ -14038,7 +14449,6 @@ WB_NU_then_MB_or_MN_or_SQ|5.023008||Viu
 WB_RI_then_RI|5.025003||Viu
 WCTOMB_LOCK|5.033005||Viu
 WCTOMB_UNLOCK|5.033005||Viu
-WEXITSTATUS|5.008001||Viu
 what_MULTI_CHAR_FOLD_latin1_safe|5.033005||Viu
 what_MULTI_CHAR_FOLD_utf8_safe|5.033005||Viu
 what_MULTI_CHAR_FOLD_utf8_safe_part0|5.033005||Viu
@@ -14056,62 +14466,81 @@ whichsig_sv|5.015004|5.015004|
 WHILEM|5.003007||Viu
 WHILEM_A_max|5.009005||Viu
 WHILEM_A_max_fail|5.009005||Viu
+WHILEM_A_max_fail_t8|5.035004||Viu
 WHILEM_A_max_fail_t8_p8|5.033003||Viu
 WHILEM_A_max_fail_t8_pb|5.033003||Viu
+WHILEM_A_max_fail_tb|5.035004||Viu
 WHILEM_A_max_fail_tb_p8|5.033003||Viu
 WHILEM_A_max_fail_tb_pb|5.033003||Viu
+WHILEM_A_max_t8|5.035004||Viu
 WHILEM_A_max_t8_p8|5.033003||Viu
 WHILEM_A_max_t8_pb|5.033003||Viu
+WHILEM_A_max_tb|5.035004||Viu
 WHILEM_A_max_tb_p8|5.033003||Viu
 WHILEM_A_max_tb_pb|5.033003||Viu
 WHILEM_A_min|5.009005||Viu
 WHILEM_A_min_fail|5.009005||Viu
+WHILEM_A_min_fail_t8|5.035004||Viu
 WHILEM_A_min_fail_t8_p8|5.033003||Viu
 WHILEM_A_min_fail_t8_pb|5.033003||Viu
+WHILEM_A_min_fail_tb|5.035004||Viu
 WHILEM_A_min_fail_tb_p8|5.033003||Viu
 WHILEM_A_min_fail_tb_pb|5.033003||Viu
+WHILEM_A_min_t8|5.035004||Viu
 WHILEM_A_min_t8_p8|5.033003||Viu
 WHILEM_A_min_t8_pb|5.033003||Viu
+WHILEM_A_min_tb|5.035004||Viu
 WHILEM_A_min_tb_p8|5.033003||Viu
 WHILEM_A_min_tb_pb|5.033003||Viu
 WHILEM_A_pre|5.009005||Viu
 WHILEM_A_pre_fail|5.009005||Viu
+WHILEM_A_pre_fail_t8|5.035004||Viu
 WHILEM_A_pre_fail_t8_p8|5.033003||Viu
 WHILEM_A_pre_fail_t8_pb|5.033003||Viu
+WHILEM_A_pre_fail_tb|5.035004||Viu
 WHILEM_A_pre_fail_tb_p8|5.033003||Viu
 WHILEM_A_pre_fail_tb_pb|5.033003||Viu
+WHILEM_A_pre_t8|5.035004||Viu
 WHILEM_A_pre_t8_p8|5.033003||Viu
 WHILEM_A_pre_t8_pb|5.033003||Viu
+WHILEM_A_pre_tb|5.035004||Viu
 WHILEM_A_pre_tb_p8|5.033003||Viu
 WHILEM_A_pre_tb_pb|5.033003||Viu
 WHILEM_B_max|5.009005||Viu
 WHILEM_B_max_fail|5.009005||Viu
+WHILEM_B_max_fail_t8|5.035004||Viu
 WHILEM_B_max_fail_t8_p8|5.033003||Viu
 WHILEM_B_max_fail_t8_pb|5.033003||Viu
+WHILEM_B_max_fail_tb|5.035004||Viu
 WHILEM_B_max_fail_tb_p8|5.033003||Viu
 WHILEM_B_max_fail_tb_pb|5.033003||Viu
+WHILEM_B_max_t8|5.035004||Viu
 WHILEM_B_max_t8_p8|5.033003||Viu
 WHILEM_B_max_t8_pb|5.033003||Viu
+WHILEM_B_max_tb|5.035004||Viu
 WHILEM_B_max_tb_p8|5.033003||Viu
 WHILEM_B_max_tb_pb|5.033003||Viu
 WHILEM_B_min|5.009005||Viu
 WHILEM_B_min_fail|5.009005||Viu
+WHILEM_B_min_fail_t8|5.035004||Viu
 WHILEM_B_min_fail_t8_p8|5.033003||Viu
 WHILEM_B_min_fail_t8_pb|5.033003||Viu
+WHILEM_B_min_fail_tb|5.035004||Viu
 WHILEM_B_min_fail_tb_p8|5.033003||Viu
 WHILEM_B_min_fail_tb_pb|5.033003||Viu
+WHILEM_B_min_t8|5.035004||Viu
 WHILEM_B_min_t8_p8|5.033003||Viu
 WHILEM_B_min_t8_pb|5.033003||Viu
+WHILEM_B_min_tb|5.035004||Viu
 WHILEM_B_min_tb_p8|5.033003||Viu
 WHILEM_B_min_tb_pb|5.033003||Viu
+WHILEM_t8|5.035004||Viu
 WHILEM_t8_p8|5.033003||Viu
 WHILEM_t8_pb|5.033003||Viu
+WHILEM_tb|5.035004||Viu
 WHILEM_tb_p8|5.033003||Viu
 WHILEM_tb_pb|5.033003||Viu
 WIDEST_UTYPE|5.015004|5.003007|poVnu
-WIFEXITED|5.008001||Viu
-WIFSIGNALED|5.008001||Viu
-WIFSTOPPED|5.008001||Viu
 win32_croak_not_implemented|5.017006||Vniu
 WIN32SCK_IS_STDSCK|5.007001||Viu
 win32_setlocale|5.027006||Viu
@@ -14121,20 +14550,16 @@ WITH_LC_NUMERIC_SET_TO_NEEDED|5.031003|5.031003|
 WITH_LC_NUMERIC_SET_TO_NEEDED_IN|5.031003|5.031003|
 with_queued_errors|5.013001||Viu
 with_tp_UTF8ness|5.033003||Viu
-WNOHANG|5.008001||Viu
+with_t_UTF8ness|5.035004||Viu
 wrap_keyword_plugin|5.027006|5.027006|x
 wrap_op_checker|5.015008|5.015008|
 write|5.005000||Viu
 write_to_stderr|5.008001||Viu
-WSTOPSIG|5.008001||Viu
-WTERMSIG|5.008001||Viu
-WUNTRACED|5.008001||Viu
 XCPT_CATCH|5.009002|5.003007|p
 XCPT_RETHROW|5.009002|5.003007|p
 XCPT_TRY_END|5.009002|5.003007|p
 XCPT_TRY_START|5.009002|5.003007|p
 XDIGIT_VALUE|5.019008||Viu
-XHvTOTALKEYS|5.007003||Viu
 xio_any|5.006001||Viu
 xio_dirp|5.006001||Viu
 xiv_iv|5.009003||Viu
@@ -15123,7 +15548,7 @@ __DATA__
 #define DPPP_CAT2(x,y) CAT2(x,y)
 #define DPPP_(name) DPPP_CAT2(DPPP_NAMESPACE, name)
 
-#define D_PPP_RELEASE_DATE 1625616000 /* 2021-07-07 */
+#define D_PPP_RELEASE_DATE 1643673600 /* 2022-02-01 */
 
 #if ! defined(PERL_REVISION) && ! defined(PERL_VERSION_MAJOR)
 #  if   !   defined(__PATCHLEVEL_H_INCLUDED__)                                  \
@@ -16360,7 +16785,7 @@ typedef NVTYPE NV;
 
 #undef STMT_START
 #undef STMT_END
-#ifdef PERL_USE_GCC_BRACE_GROUPS
+#if defined(VOIDFLAGS) && defined(PERL_USE_GCC_BRACE_GROUPS)
 #  define STMT_START    (void)( /* gcc supports ``({ STATEMENTS; })'' */
 #  define STMT_END      )
 #else

@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::HP34420A;
-$Lab::Moose::Instrument::HP34420A::VERSION = '3.802';
+$Lab::Moose::Instrument::HP34420A::VERSION = '3.803';
 #ABSTRACT: HP 34420A nanovolt meter.
 
 use v5.20;
@@ -89,7 +89,7 @@ Lab::Moose::Instrument::HP34420A - HP 34420A nanovolt meter.
 
 =head1 VERSION
 
-version 3.802
+version 3.803
 
 =head1 SYNOPSIS
 
@@ -142,7 +142,7 @@ Enable/Disable input filter. Allowed values: C<0>, C<1>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2022 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Simon Reinhardt
             2020       Andreas K. Huettel, Simon Reinhardt

@@ -1,0 +1,24 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Benchmark;
+use Music::Intervals;
+use Music::Note::Frequency;
+
+my $i = 1_000_000;
+
+timethese($i, {
+    Frequency => \&sub_freqs,
+    Intervals => \&sub_ints,
+});
+
+sub sub_freqs {
+    my $note = Music::Note::Frequency->new('C4', 'ISO');
+    my $freq = $note->frequency;
+}
+
+sub sub_ints {
+    my $note = Music::Intervals->new(notes => ['C'], size => 1);
+    my $freq = $note->eq_tempered_frequencies->{C}{C};
+}

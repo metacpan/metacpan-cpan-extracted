@@ -1,5 +1,17 @@
 Revision history for Object-Pad
 
+0.60    2022-02-01
+        [CHANGES]
+         * The Great Slot/Field Rename:
+            + "slot" is now called "field"; all perl-visible and XS API has
+              been renamed. Various back-compatibility redirections exist for
+              most of the parts used by other distributions.
+         * Print a deprecation warning on the legacy 'implements' and
+           'extends' keywords
+         * No longer supports the hooks API from pre-v57
+         * Perform unit testing using Data::Dumper instead of Data::Dump to
+           reduce non-core test_requires dependencies
+
 0.59    2021-12-15
         [CHANGES]
          * Support lexical methods, stored in lexical variables

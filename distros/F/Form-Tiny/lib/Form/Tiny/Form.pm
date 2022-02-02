@@ -6,12 +6,13 @@ use warnings;
 use Types::Standard qw(Maybe ArrayRef InstanceOf HashRef Bool);
 use Carp qw(croak);
 use Scalar::Util qw(blessed);
+use List::Util qw(first);
 
 use Form::Tiny::Error;
 use Form::Tiny::Utils qw(try);
 use Moo::Role;
 
-our $VERSION = '2.08';
+our $VERSION = '2.09';
 
 has 'field_defs' => (
 	is => 'ro',
@@ -20,17 +21,6 @@ has 'field_defs' => (
 	default => sub {
 		my ($self) = shift;
 		return $self->form_meta->resolved_fields($self);
-	},
-	lazy => 1,
-	init_arg => undef,
-);
-
-has '_ft_field_cache' => (
-	is => 'ro',
-	isa => HashRef [InstanceOf ['Form::Tiny::FieldDefinition']],
-	clearer => '_ft_clear_field_cache',
-	default => sub {
-		return {map { $_->name => $_ } @{shift()->field_defs}};
 	},
 	lazy => 1,
 	init_arg => undef,
@@ -50,21 +40,12 @@ has 'fields' => (
 	init_arg => undef,
 );
 
-has 'valid' => (
-	is => 'ro',
-	isa => Bool,
-	lazy => 1,
-	builder => '_ft_validate',
-	clearer => 'clear_valid',
-	predicate => 'is_validated',
-	init_arg => undef,
-);
-
 has 'errors' => (
 	is => 'ro',
 	isa => ArrayRef [InstanceOf ['Form::Tiny::Error']],
 	lazy => 1,
 	default => sub { [] },
+	clearer => '_ft_clear_errors',
 	init_arg => undef,
 );
 
@@ -73,9 +54,7 @@ sub _ft_clear_form
 	my ($self) = @_;
 
 	$self->_ft_clear_field_defs;
-	$self->_ft_clear_field_cache;
 	$self->_ft_clear_fields;
-	$self->clear_valid;
 	$self->_ft_clear_errors;
 }
 
@@ -197,10 +176,9 @@ sub _ft_assign_field
 
 sub _ft_validate_flat
 {
-	my ($self, $fields, $dirty) = @_;
+	my ($self, $fields, $dirty, $inline_hook) = @_;
 	my $meta = $self->form_meta;
 
-	my $inline_hook = $meta->_inline_hook('before_mangle');
 	foreach my $validator (@{$self->field_defs}) {
 		my $curr_f = $validator->name;
 
@@ -228,10 +206,9 @@ sub _ft_validate_flat
 
 sub _ft_validate_nested
 {
-	my ($self, $fields, $dirty) = @_;
+	my ($self, $fields, $dirty, $inline_hook) = @_;
 	my $meta = $self->form_meta;
 
-	my $inline_hook = $meta->_inline_hook('before_mangle');
 	foreach my $validator (@{$self->field_defs}) {
 		my $curr_f = $validator->name;
 
@@ -275,41 +252,54 @@ sub _ft_validate_nested
 	}
 }
 
-sub _ft_validate
+sub valid
 {
 	my ($self) = @_;
 	my $meta = $self->form_meta;
 	$self->_ft_clear_errors;
 
+	my %hooks = %{$meta->inline_hooks};
 	my $fields = $self->input;
-	my $err = try sub {
-		$fields = $meta->run_hooks_for('reformat', $self, $fields);
-	};
-
 	my $dirty = {};
-	if (!$err && ref $fields eq 'HASH') {
-		$meta->run_hooks_for('before_validate', $self, $fields);
+	if (
+		(!$hooks{reformat} || !try sub { $fields = $hooks{reformat}->($self, $fields) })
+		&& ref $fields eq 'HASH'
+		)
+	{
+		$hooks{before_validate}->($self, $fields)
+			if $hooks{before_validate};
 
-		if ($meta->is_flat) {
-			$self->_ft_validate_flat($fields, $dirty);
-		}
-		else {
-			$self->_ft_validate_nested($fields, $dirty);
-		}
+		$meta->is_flat
+			? $self->_ft_validate_flat($fields, $dirty, $hooks{before_mangle})
+			: $self->_ft_validate_nested($fields, $dirty, $hooks{before_mangle})
+			;
+
+		$hooks{after_validate}->($self, $dirty)
+			if $hooks{after_validate};
 	}
 	else {
 		$self->add_error($meta->build_error(InvalidFormat =>));
 	}
 
-	$meta->run_hooks_for('after_validate', $self, $dirty);
-
-	$meta->run_hooks_for('cleanup', $self, $dirty)
-		if !$self->has_errors;
+	$hooks{cleanup}->($self, $dirty)
+		if $hooks{cleanup} && !$self->has_errors;
 
 	my $form_valid = !$self->has_errors;
 	$self->_ft_set_fields($form_valid ? $dirty : undef);
 
 	return $form_valid;
+}
+
+sub is_validated
+{
+	warn '$form->is_validated is deprecated';
+	return 0;
+}
+
+sub clear_valid
+{
+	warn '$form->clear_valid is deprecated';
+	return;
 }
 
 sub check
@@ -354,9 +344,10 @@ sub add_error
 	}
 
 	# check if the field exists
-	for ($error->field) {
-		croak "form does not contain a field definition for $_"
-			if defined $_ && !exists $self->_ft_field_cache->{$_};
+	for my $name ($error->field) {
+		croak "form does not contain a field definition for $name"
+			if defined $name && !defined first { $_->name eq $name }
+			@{$self->field_defs};
 	}
 
 	# unwrap nested form errors
@@ -384,14 +375,6 @@ sub has_errors
 {
 	my ($self) = @_;
 	return @{$self->errors} > 0;
-}
-
-sub _ft_clear_errors
-{
-	my ($self) = @_;
-
-	@{$self->errors} = ();
-	return;
 }
 
 1;
@@ -432,14 +415,6 @@ Contains the validated and cleaned fields set after the validation is complete. 
 
 Contains an array reference of L<Form::Tiny::FieldDefinition> instances fetched from the metaclass with context of current instance. Rebuilds everytime new input data is set.
 
-=head3 valid
-
-Contains the result of the validation - a boolean value. Gets produced lazily upon accessing it, so calling C<< $form->valid; >> validates the form automatically.
-
-B<clearer:> I<clear_valid>
-
-B<predicate:> I<is_validated>
-
 =head3 errors
 
 Contains an array reference of form errors which were detected by the last performed validation. Each error is an instance of L<Form::Tiny::Error>.
@@ -457,6 +432,12 @@ Returns the form metaobject, an instance of L<Form::Tiny::Meta>.
 =head3 new
 
 This is a Moose-flavored constructor for the class. It accepts a hash or hash reference of parameters, which are the attributes specified above.
+
+=head3 valid
+
+Performs the validation and returns a boolean which indicates whether the form is valid or not.
+
+Accepts no arguments. Input must be set before calling this method.
 
 =head3 check
 

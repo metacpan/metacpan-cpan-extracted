@@ -427,7 +427,7 @@ sub _fork_ok_idle {
     my ($cpu_idle, $cpu_ticks) = ($4, $1 + $2 + $3 + $4);
 
     # note last idle and total cpu ticks, from prior sample
-    #   we end up returning our first time trhough when these are not yet set
+    #   we return later on our first time through when these are not yet set
     my $last_idle = $fork_data->{last_idle};
     my $last_ticks = $fork_data->{last_ticks};
 
@@ -451,6 +451,8 @@ sub _fork_ok_idle {
     my $pct_avail = $pct_idle - $fork_data->{idle_target};
 
     # compute cpu utilization percentage used by each child process
+    #   return on zero child_count, maybe happened due to race with $SIG{CHLD}
+    return if not $fork_data->{child_count};
     my $pct_child = (100 - $pct_idle) / $fork_data->{child_count};
 
     # adjust child_min using percentage of available idle cpu utilization

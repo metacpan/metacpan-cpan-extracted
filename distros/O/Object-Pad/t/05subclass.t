@@ -49,7 +49,7 @@ EOPERL
 # Extend before base class is sealed (RT133190)
 {
    class BaseClass {
-      has $_aslot;
+      has $_afield;
 
       class SubClass :isa(BaseClass) {
          method one { 1 }

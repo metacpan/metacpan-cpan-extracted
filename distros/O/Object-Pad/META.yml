@@ -1,9 +1,8 @@
 ---
-abstract: 'a simple syntax for lexical slot-based objects'
+abstract: 'a simple syntax for lexical field-based objects'
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
-  Data::Dump: '0'
   ExtUtils::CBuilder: '0'
   Test::Fatal: '0'
   Test::More: '0.88'
@@ -22,27 +21,27 @@ name: Object-Pad
 provides:
   Object::Pad:
     file: lib/Object/Pad.pm
-    version: '0.59'
+    version: '0.60'
   Object::Pad::ExtensionBuilder:
     file: lib/Object/Pad/ExtensionBuilder.pm
-    version: '0.59'
+    version: '0.60'
   Object::Pad::MOP::Class:
     file: lib/Object/Pad/MOP/Class.pm
-    version: '0.59'
+    version: '0.60'
+  Object::Pad::MOP::Field:
+    file: lib/Object/Pad/MOP/Field.pm
+    version: '0.60'
+  Object::Pad::MOP::FieldAttr:
+    file: lib/Object/Pad/MOP/FieldAttr.pm
+    version: '0.60'
   Object::Pad::MOP::Method:
     file: lib/Object/Pad/MOP/Method.pm
-    version: '0.59'
-  Object::Pad::MOP::Slot:
-    file: lib/Object/Pad/MOP/Slot.pm
-    version: '0.59'
-  Object::Pad::MOP::SlotAttr:
-    file: lib/Object/Pad/MOP/SlotAttr.pm
-    version: '0.59'
+    version: '0.60'
 requires:
   XS::Parse::Keyword: '0.19'
   XS::Parse::Sublike: '0.15'
   perl: '5.018'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.59'
+version: '0.60'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

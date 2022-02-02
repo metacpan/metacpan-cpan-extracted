@@ -26,11 +26,12 @@ Mnet::Expect::Cli::Ios - Expect sessions to cisco ios devices
 =head1 DESCRIPTION
 
 Mnet::Expect::Cli::Ios can be used to spawn L<Expect> processes which can be
-used to programmatically control ssh or telnet command line sessions to cisco
-ios devices, with support for L<Mnet> options, logging, caching, and testing.
+used to programmatically control ssh or telnet command line user, enable, and
+config sessions to cisco ios and similar devices, with support for L<Mnet>
+options, logging, caching, and testing.
 
-Refer to the perl L<Expect> module for more information. Also refer to the
-L<Mnet::Expect> and L<Mnet::Expect::Cli> modules.
+Refer also to the L<Mnet::Expect> and L<Mnet::Expect::Cli> modules. The
+methods in those modules are inherited by objects created with this module.
 
 =head1 METHODS
 
@@ -65,7 +66,7 @@ the L<Mnet::Expect::Cli> and L<Mnet::Expect> modules:
     failed_re       default recognizes lines starting w/ios % error char
     paging_key      default space key to send for ios pagination prompts
     paging_re       default recognizes ios pagination prompt --more--
-    prompt_re       defaults to ios user or enable mode prompts
+    prompt_re       defaults for ios user or enable prompts, see below
 
 An error is issued if there are login problems.
 
@@ -81,6 +82,17 @@ Set failed_re to detect failed logins faster, as long as there's no conflict
 with text that appears in login banners. For example:
 
     (?i)(^\s*%|closed|error|denied|fail|incorrect|invalid|refused|sorry)
+
+A default prompt_re regex string for ios devices is used by this method to
+detect normal user and enable mode command prompts:
+
+    (^|\r|\n)\S+(>|#) ?(\r|\n|$)
+
+The default ios prompt_re will be adjusted after login to work in various
+configuration modes where the prompt may be truncated with various suffixes
+applied. This adjustment is disabled if prompt_re exists as an input option
+to this function. Refer also to the L<Mnet::Expect::Cli> module new method
+for more information on prompt_re.
 
 Refer to the L<Mnet::Expect::Cli> and L<Mnet::Expect> modules for more
 information.
@@ -102,22 +114,23 @@ information.
     # note default options for this class
     #   refer also to Mnet::Expect::Cli defaults, these are overlaid on top
     #   includes recognized cli opts and opts for this object
-    #       failed_re default undef to be safe, refer to perldoc for more info
-    #           add ios err /^\s*%/ to failed_re values in Mnet::Expect::Cli
-    #           failed_re also used in the enable method in this module
-    #   following keys starting with underscore are used internally:
-    #       _enable_ => causes enable password value to be hidden in opts debug
     #   update perldoc for this sub with changes
     my $defaults = {
         enable      => undef,
-        _enable_    => undef,
         enable_in   => undef,
         enable_user => undef,
+        # failed_re default undef to be safe, refer to perldoc for more info
+        #   add ios err /^\s*%/ to failed_re values in Mnet::Expect::Cli
+        #   failed_re also used in the enable method in this module
         failed_re   => undef,
         paging_key  => ' ',
         paging_re   => '--(M|m)ore--',
-        prompt_re   => '(^|\r|\n)\S+(>|#) (\r|\n|$)',
+        prompt_re   => '(^|\r|\n)\S+(>|#) ?(\r|\n|$)',  # ios user/enable modes
     };
+
+    # set prompt_truncate flag only if prompt_re was not set by caller
+    my $prompt_truncate = undef;
+    $prompt_truncate = 1 if not exists $opts->{prompt_re};
 
     # update future object $self hash with default opts
     foreach my $opt (sort keys %$defaults) {
@@ -142,10 +155,26 @@ information.
         return undef;
     }
 
+    # change detected prompt for configuration modes
+    #   prompt_truncate is set only if prompt_re was not set by caller
+    #   note that this cannot be done reliably with user supplied prompt_re
+    #   regex here needs to match prompt_re changes in Mnet::Expect::Cli->new
+    #   refer also to perldoc for this sub
+    if ($prompt_truncate) {
+        $log->debug("new prompt_truncate adjusting default ios prompt");
+        my $prompt_re = $self->prompt_re;
+        if ($self->prompt_re =~ /^(\([^\)]+\))(\S+)((>|#)\s?\\r\?\$)$/) {
+            my ($beginning, $middle, $end) = ($1, $2, $3);
+            $middle = substr($middle, 0, 5).'\S+' if length($middle) > 5;
+            my $prompt_new = $beginning . $middle . $end;
+            $self->prompt_re($prompt_new);
+        }
+    }
+
     # change detected prompt to ensure it works in different ios modes
     #   need to work in user, enable, config, interface config, etc
     #   also needs to work if long hostname in prompt gets truncated
-    $self->debug("new checking prompt for enable and user mode");
+    $self->debug("new updateing prompt for both enable and user modes");
     my $prompt_re = $self->prompt_re;
     $prompt_re =~ s/(>|#)/(>|#)/;
     $self->prompt_re($prompt_re);

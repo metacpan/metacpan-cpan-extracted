@@ -3,7 +3,7 @@ package Net::Async::Redis::Commands;
 use strict;
 use warnings;
 
-our $VERSION = '3.017'; # VERSION
+our $VERSION = '3.018'; # VERSION
 
 =head1 NAME
 
@@ -36,10 +36,10 @@ our %KEY_FINDER = (
     'BLMPOP' => 3,
     'BLPOP' => 1,
     'BRPOP' => 1,
+    'BZMPOP' => 3,
     'BZPOPMAX' => 1,
     'BZPOPMIN' => 1,
     'CLUSTER KEYSLOT' => 2,
-    'DEBUG OBJECT' => 2,
     'DECR' => 1,
     'DECRBY' => 1,
     'DEL' => 1,
@@ -52,12 +52,16 @@ our %KEY_FINDER = (
     'EXPIRE' => 1,
     'EXPIREAT' => 1,
     'EXPIRETIME' => 1,
+    'FCALL' => 3,
+    'FCALL_RO' => 3,
     'GEOADD' => 1,
     'GEODIST' => 1,
     'GEOHASH' => 1,
     'GEOPOS' => 1,
     'GEORADIUS' => 1,
+    'GEORADIUS_RO' => 1,
     'GEORADIUSBYMEMBER' => 1,
+    'GEORADIUSBYMEMBER_RO' => 1,
     'GEOSEARCH' => 1,
     'GET' => 1,
     'GETBIT' => 1,
@@ -102,6 +106,10 @@ our %KEY_FINDER = (
     'MOVE' => 1,
     'MSET' => 1,
     'MSETNX' => 1,
+    'OBJECT ENCODING' => 2,
+    'OBJECT FREQ' => 2,
+    'OBJECT IDLETIME' => 2,
+    'OBJECT REFCOUNT' => 2,
     'PERSIST' => 1,
     'PEXPIRE' => 1,
     'PEXPIREAT' => 1,
@@ -128,7 +136,7 @@ our %KEY_FINDER = (
     'SETNX' => 1,
     'SETRANGE' => 1,
     'SINTER' => 1,
-    'SINTERCARD' => 1,
+    'SINTERCARD' => 2,
     'SINTERSTORE' => 2,
     'SISMEMBER' => 1,
     'SMEMBERS' => 1,
@@ -141,6 +149,7 @@ our %KEY_FINDER = (
     'SSCAN' => 1,
     'STRLEN' => 1,
     'SUBSCRIBE' => 1,
+    'SUBSTR' => 1,
     'SUNION' => 1,
     'SUNIONSTORE' => 2,
     'TOUCH' => 1,
@@ -154,13 +163,22 @@ our %KEY_FINDER = (
     'XCLAIM' => 1,
     'XDEL' => 1,
     'XGROUP' => 2,
+    'XGROUP CREATE' => 2,
+    'XGROUP CREATECONSUMER' => 2,
+    'XGROUP DELCONSUMER' => 2,
+    'XGROUP DESTROY' => 2,
+    'XGROUP SETID' => 2,
     'XINFO' => 2,
+    'XINFO CONSUMERS' => 2,
+    'XINFO GROUPS' => 2,
+    'XINFO STREAM' => 2,
     'XLEN' => 1,
     'XPENDING' => 1,
     'XRANGE' => 1,
-    'XREAD' => 4,
-    'XREADGROUP' => 6,
+    'XREAD' => 3,
+    'XREADGROUP' => 5,
     'XREVRANGE' => 1,
+    'XSETID' => 1,
     'XTRIM' => 1,
     'ZADD' => 1,
     'ZCARD' => 1,
@@ -172,6 +190,7 @@ our %KEY_FINDER = (
     'ZINTERCARD' => 2,
     'ZINTERSTORE' => 3,
     'ZLEXCOUNT' => 1,
+    'ZMPOP' => 2,
     'ZMSCORE' => 1,
     'ZPOPMAX' => 1,
     'ZPOPMIN' => 1,
@@ -204,7 +223,7 @@ Count set bits in a string.
 
 =item * key
 
-=item * [start end]
+=item * [start end [BYTE|BIT]]
 
 =back
 
@@ -225,11 +244,11 @@ Perform arbitrary bitfield integer operations on strings.
 
 =item * key
 
-=item * [GET type offset]
+=item * [GET encoding offset]
 
-=item * [SET type offset value]
+=item * [SET encoding offset value]
 
-=item * [INCRBY type offset increment]
+=item * [INCRBY encoding offset increment]
 
 =item * [OVERFLOW WRAP|SAT|FAIL]
 
@@ -252,7 +271,7 @@ Perform arbitrary bitfield integer operations on strings. Read-only variant of B
 
 =item * key
 
-=item * GET type offset
+=item * GET encoding offset
 
 =back
 
@@ -298,7 +317,7 @@ Find first bit set or clear in a string.
 
 =item * bit
 
-=item * [start [end]]
+=item * [start [end [BYTE|BIT]]]
 
 =back
 
@@ -389,6 +408,25 @@ sub cluster_addslots : method {
     $self->execute_command(qw(CLUSTER ADDSLOTS) => @args)
 }
 
+=head2 cluster_addslotsrange
+
+Assign new hash slots to receiving node.
+
+=over 4
+
+=item * start-slot end-slot [start-slot end-slot ...]
+
+=back
+
+L<https://redis.io/commands/cluster-addslotsrange>
+
+=cut
+
+sub cluster_addslotsrange : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(CLUSTER ADDSLOTSRANGE) => @args)
+}
+
 =head2 cluster_bumpepoch
 
 Advance the cluster config epoch.
@@ -457,6 +495,25 @@ L<https://redis.io/commands/cluster-delslots>
 sub cluster_delslots : method {
     my ($self, @args) = @_;
     $self->execute_command(qw(CLUSTER DELSLOTS) => @args)
+}
+
+=head2 cluster_delslotsrange
+
+Set hash slots as unbound in receiving node.
+
+=over 4
+
+=item * start-slot end-slot [start-slot end-slot ...]
+
+=back
+
+L<https://redis.io/commands/cluster-delslotsrange>
+
+=cut
+
+sub cluster_delslotsrange : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(CLUSTER DELSLOTSRANGE) => @args)
 }
 
 =head2 cluster_failover
@@ -561,6 +618,19 @@ L<https://redis.io/commands/cluster-keyslot>
 sub cluster_keyslot : method {
     my ($self, @args) = @_;
     $self->execute_command(qw(CLUSTER KEYSLOT) => @args)
+}
+
+=head2 cluster_links
+
+Returns a list of all TCP links to and from peer nodes in cluster.
+
+L<https://redis.io/commands/cluster-links>
+
+=cut
+
+sub cluster_links : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(CLUSTER LINKS) => @args)
 }
 
 =head2 cluster_meet
@@ -707,9 +777,7 @@ Bind a hash slot to a specific node.
 
 =item * slot
 
-=item * IMPORTING|MIGRATING|STABLE|NODE
-
-=item * [node-id]
+=item * IMPORTING node-id|MIGRATING node-id|NODE node-id|STABLE
 
 =back
 
@@ -884,7 +952,7 @@ Kill the connection of a client.
 
 =item * [ID client-id]
 
-=item * [TYPE normal|master|slave|pubsub]
+=item * [TYPE NORMAL|MASTER|SLAVE|REPLICA|PUBSUB]
 
 =item * [USER username]
 
@@ -911,7 +979,7 @@ Get the list of client connections.
 
 =over 4
 
-=item * [TYPE normal|master|replica|pubsub]
+=item * [TYPE NORMAL|MASTER|REPLICA|PUBSUB]
 
 =item * [ID client-id [client-id ...]]
 
@@ -1299,7 +1367,7 @@ Set the expiration for a key as a UNIX timestamp.
 
 =item * key
 
-=item * timestamp
+=item * unix-time-seconds
 
 =item * [NX|XX|GT|LT]
 
@@ -1410,25 +1478,80 @@ sub move : method {
     $self->execute_command(qw(MOVE) => @args)
 }
 
-=head2 object
+=head2 object_encoding
 
-Inspect the internals of Redis objects.
+Inspect the internal encoding of a Redis object.
 
 =over 4
 
-=item * subcommand
-
-=item * [arguments [arguments ...]]
+=item * key
 
 =back
 
-L<https://redis.io/commands/object>
+L<https://redis.io/commands/object-encoding>
 
 =cut
 
-sub object : method {
+sub object_encoding : method {
     my ($self, @args) = @_;
-    $self->execute_command(qw(OBJECT) => @args)
+    $self->execute_command(qw(OBJECT ENCODING) => @args)
+}
+
+=head2 object_freq
+
+Get the logarithmic access frequency counter of a Redis object.
+
+=over 4
+
+=item * key
+
+=back
+
+L<https://redis.io/commands/object-freq>
+
+=cut
+
+sub object_freq : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(OBJECT FREQ) => @args)
+}
+
+=head2 object_idletime
+
+Get the time since a Redis object was last accessed.
+
+=over 4
+
+=item * key
+
+=back
+
+L<https://redis.io/commands/object-idletime>
+
+=cut
+
+sub object_idletime : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(OBJECT IDLETIME) => @args)
+}
+
+=head2 object_refcount
+
+Get the number of references to the value of the key.
+
+=over 4
+
+=item * key
+
+=back
+
+L<https://redis.io/commands/object-refcount>
+
+=cut
+
+sub object_refcount : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(OBJECT REFCOUNT) => @args)
 }
 
 =head2 persist
@@ -1481,7 +1604,7 @@ Set the expiration for a key as a UNIX timestamp specified in milliseconds.
 
 =item * key
 
-=item * milliseconds-timestamp
+=item * unix-time-milliseconds
 
 =item * [NX|XX|GT|LT]
 
@@ -1841,7 +1964,7 @@ Returns the distance between two members of a geospatial index.
 
 =item * member2
 
-=item * [m|km|ft|mi]
+=item * [M|KM|FT|MI]
 
 =back
 
@@ -1910,7 +2033,7 @@ Query a sorted set representing a geospatial index to fetch members matching a g
 
 =item * radius
 
-=item * m|km|ft|mi
+=item * M|KM|FT|MI
 
 =item * [WITHCOORD]
 
@@ -1937,6 +2060,43 @@ sub georadius : method {
     $self->execute_command(qw(GEORADIUS) => @args)
 }
 
+=head2 georadius_ro
+
+A read-only variant for GEORADIUS.
+
+=over 4
+
+=item * key
+
+=item * longitude
+
+=item * latitude
+
+=item * radius
+
+=item * M|KM|FT|MI
+
+=item * [WITHCOORD]
+
+=item * [WITHDIST]
+
+=item * [WITHHASH]
+
+=item * [COUNT count [ANY]]
+
+=item * [ASC|DESC]
+
+=back
+
+L<https://redis.io/commands/georadius-ro>
+
+=cut
+
+sub georadius_ro : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(GEORADIUS_RO) => @args)
+}
+
 =head2 georadiusbymember
 
 Query a sorted set representing a geospatial index to fetch members matching a given maximum distance from a member.
@@ -1949,7 +2109,7 @@ Query a sorted set representing a geospatial index to fetch members matching a g
 
 =item * radius
 
-=item * m|km|ft|mi
+=item * M|KM|FT|MI
 
 =item * [WITHCOORD]
 
@@ -1976,6 +2136,41 @@ sub georadiusbymember : method {
     $self->execute_command(qw(GEORADIUSBYMEMBER) => @args)
 }
 
+=head2 georadiusbymember_ro
+
+A read-only variant for GEORADIUSBYMEMBER.
+
+=over 4
+
+=item * key
+
+=item * member
+
+=item * radius
+
+=item * M|KM|FT|MI
+
+=item * [WITHCOORD]
+
+=item * [WITHDIST]
+
+=item * [WITHHASH]
+
+=item * [COUNT count [ANY]]
+
+=item * [ASC|DESC]
+
+=back
+
+L<https://redis.io/commands/georadiusbymember-ro>
+
+=cut
+
+sub georadiusbymember_ro : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(GEORADIUSBYMEMBER_RO) => @args)
+}
+
 =head2 geosearch
 
 Query a sorted set representing a geospatial index to fetch members inside an area of a box or a circle.
@@ -1988,9 +2183,9 @@ Query a sorted set representing a geospatial index to fetch members inside an ar
 
 =item * [FROMLONLAT longitude latitude]
 
-=item * [BYRADIUS radius m|km|ft|mi]
+=item * [BYRADIUS radius M|KM|FT|MI]
 
-=item * [BYBOX width height m|km|ft|mi]
+=item * [BYBOX width height M|KM|FT|MI]
 
 =item * [ASC|DESC]
 
@@ -2027,9 +2222,9 @@ Query a sorted set representing a geospatial index to fetch members inside an ar
 
 =item * [FROMLONLAT longitude latitude]
 
-=item * [BYRADIUS radius m|km|ft|mi]
+=item * [BYRADIUS radius M|KM|FT|MI]
 
-=item * [BYBOX width height m|km|ft|mi]
+=item * [BYBOX width height M|KM|FT|MI]
 
 =item * [ASC|DESC]
 
@@ -2430,6 +2625,19 @@ sub pfcount : method {
     $self->execute_command(qw(PFCOUNT) => @args)
 }
 
+=head2 pfdebug
+
+Internal commands for debugging HyperLogLog values.
+
+L<https://redis.io/commands/pfdebug>
+
+=cut
+
+sub pfdebug : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(PFDEBUG) => @args)
+}
+
 =head2 pfmerge
 
 Merge N different HyperLogLogs into a single one.
@@ -2449,6 +2657,19 @@ L<https://redis.io/commands/pfmerge>
 sub pfmerge : method {
     my ($self, @args) = @_;
     $self->execute_command(qw(PFMERGE) => @args)
+}
+
+=head2 pfselftest
+
+An internal command for testing HyperLogLog values.
+
+L<https://redis.io/commands/pfselftest>
+
+=cut
+
+sub pfselftest : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(PFSELFTEST) => @args)
 }
 
 =head1 METHODS - List
@@ -2490,7 +2711,7 @@ Pop elements from a list, or block until one is available.
 
 =item * numkeys
 
-=item * [key [key ...]]
+=item * key [key ...]
 
 =item * LEFT|RIGHT
 
@@ -2670,7 +2891,7 @@ Pop elements from a list.
 
 =item * numkeys
 
-=item * [key [key ...]]
+=item * key [key ...]
 
 =item * LEFT|RIGHT
 
@@ -2995,25 +3216,74 @@ sub publish : method {
     $self->execute_command(qw(PUBLISH) => @args)
 }
 
-=head2 pubsub
+=head2 pubsub_channels
 
-Inspect the state of the Pub/Sub subsystem.
+List active channels.
 
 =over 4
 
-=item * subcommand
-
-=item * [argument [argument ...]]
+=item * [pattern]
 
 =back
 
-L<https://redis.io/commands/pubsub>
+L<https://redis.io/commands/pubsub-channels>
 
 =cut
 
-sub pubsub : method {
+sub pubsub_channels : method {
     my ($self, @args) = @_;
-    $self->execute_command(qw(PUBSUB) => @args)
+    $self->execute_command(qw(PUBSUB CHANNELS) => @args)
+}
+
+=head2 pubsub_numpat
+
+Get the count of unique patterns pattern subscriptions.
+
+L<https://redis.io/commands/pubsub-numpat>
+
+=cut
+
+sub pubsub_numpat : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(PUBSUB NUMPAT) => @args)
+}
+
+=head2 pubsub_numsub
+
+Get the count of subscribers for channels.
+
+=over 4
+
+=item * [channel [channel ...]]
+
+=back
+
+L<https://redis.io/commands/pubsub-numsub>
+
+=cut
+
+sub pubsub_numsub : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(PUBSUB NUMSUB) => @args)
+}
+
+=head2 pubsub_shardchannels
+
+List active shard channels.
+
+=over 4
+
+=item * [pattern]
+
+=back
+
+L<https://redis.io/commands/pubsub-shardchannels>
+
+=cut
+
+sub pubsub_shardchannels : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(PUBSUB SHARDCHANNELS) => @args)
 }
 
 =head2 punsubscribe
@@ -3035,6 +3305,46 @@ sub punsubscribe : method {
     $self->execute_command(qw(PUNSUBSCRIBE) => @args)
 }
 
+=head2 spublish
+
+Post a message to a shard channel.
+
+=over 4
+
+=item * channel
+
+=item * message
+
+=back
+
+L<https://redis.io/commands/spublish>
+
+=cut
+
+sub spublish : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(SPUBLISH) => @args)
+}
+
+=head2 ssubscribe
+
+Listen for messages published to the given shard channels.
+
+=over 4
+
+=item * channel [channel ...]
+
+=back
+
+L<https://redis.io/commands/ssubscribe>
+
+=cut
+
+sub ssubscribe : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(SSUBSCRIBE) => @args)
+}
+
 =head2 subscribe
 
 Listen for messages published to the given channels.
@@ -3052,6 +3362,25 @@ L<https://redis.io/commands/subscribe>
 sub subscribe : method {
     my ($self, @args) = @_;
     $self->execute_command(qw(SUBSCRIBE) => @args)
+}
+
+=head2 sunsubscribe
+
+Stop listening for messages posted to the given shard channels.
+
+=over 4
+
+=item * [channel [channel ...]]
+
+=back
+
+L<https://redis.io/commands/sunsubscribe>
+
+=cut
+
+sub sunsubscribe : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(SUNSUBSCRIBE) => @args)
 }
 
 =head2 unsubscribe
@@ -3173,6 +3502,202 @@ L<https://redis.io/commands/evalsha-ro>
 sub evalsha_ro : method {
     my ($self, @args) = @_;
     $self->execute_command(qw(EVALSHA_RO) => @args)
+}
+
+=head2 fcall
+
+PATCH__TBD__38__.
+
+=over 4
+
+=item * function
+
+=item * numkeys
+
+=item * key [key ...]
+
+=item * arg [arg ...]
+
+=back
+
+L<https://redis.io/commands/fcall>
+
+=cut
+
+sub fcall : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(FCALL) => @args)
+}
+
+=head2 fcall_ro
+
+PATCH__TBD__7__.
+
+=over 4
+
+=item * function
+
+=item * numkeys
+
+=item * key [key ...]
+
+=item * arg [arg ...]
+
+=back
+
+L<https://redis.io/commands/fcall-ro>
+
+=cut
+
+sub fcall_ro : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(FCALL_RO) => @args)
+}
+
+=head2 function_delete
+
+Delete a function by name.
+
+=over 4
+
+=item * function-name
+
+=back
+
+L<https://redis.io/commands/function-delete>
+
+=cut
+
+sub function_delete : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(FUNCTION DELETE) => @args)
+}
+
+=head2 function_dump
+
+Dump all functions into a serialized binary payload.
+
+L<https://redis.io/commands/function-dump>
+
+=cut
+
+sub function_dump : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(FUNCTION DUMP) => @args)
+}
+
+=head2 function_flush
+
+Deleting all functions.
+
+=over 4
+
+=item * [ASYNC|SYNC]
+
+=back
+
+L<https://redis.io/commands/function-flush>
+
+=cut
+
+sub function_flush : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(FUNCTION FLUSH) => @args)
+}
+
+=head2 function_kill
+
+Kill the function currently in execution.
+
+L<https://redis.io/commands/function-kill>
+
+=cut
+
+sub function_kill : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(FUNCTION KILL) => @args)
+}
+
+=head2 function_list
+
+List information about all the functions.
+
+=over 4
+
+=item * [LIBRARYNAME library-name-pattern]
+
+=item * [WITHCODE]
+
+=back
+
+L<https://redis.io/commands/function-list>
+
+=cut
+
+sub function_list : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(FUNCTION LIST) => @args)
+}
+
+=head2 function_load
+
+Create a function with the given arguments (name, code, description).
+
+=over 4
+
+=item * engine-name
+
+=item * library-name
+
+=item * [REPLACE]
+
+=item * [DESC library-description]
+
+=item * function-code
+
+=back
+
+L<https://redis.io/commands/function-load>
+
+=cut
+
+sub function_load : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(FUNCTION LOAD) => @args)
+}
+
+=head2 function_restore
+
+Restore all the functions on the given payload.
+
+=over 4
+
+=item * serialized-value
+
+=item * [FLUSH|APPEND|REPLACE]
+
+=back
+
+L<https://redis.io/commands/function-restore>
+
+=cut
+
+sub function_restore : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(FUNCTION RESTORE) => @args)
+}
+
+=head2 function_stats
+
+Return information about the function currently running (name, description, duration).
+
+L<https://redis.io/commands/function-stats>
+
+=cut
+
+sub function_stats : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(FUNCTION STATS) => @args)
 }
 
 =head2 script_debug
@@ -3304,6 +3829,29 @@ sub acl_deluser : method {
     $self->execute_command(qw(ACL DELUSER) => @args)
 }
 
+=head2 acl_dryrun
+
+Returns whether the user can execute the given command without executing the command.
+
+=over 4
+
+=item * username
+
+=item * command
+
+=item * [arg [arg ...]]
+
+=back
+
+L<https://redis.io/commands/acl-dryrun>
+
+=cut
+
+sub acl_dryrun : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(ACL DRYRUN) => @args)
+}
+
 =head2 acl_genpass
 
 Generate a pseudorandom secure password to use for ACL users.
@@ -3342,19 +3890,6 @@ sub acl_getuser : method {
     $self->execute_command(qw(ACL GETUSER) => @args)
 }
 
-=head2 acl_help
-
-Show helpful text about the different subcommands.
-
-L<https://redis.io/commands/acl-help>
-
-=cut
-
-sub acl_help : method {
-    my ($self, @args) = @_;
-    $self->execute_command(qw(ACL HELP) => @args)
-}
-
 =head2 acl_list
 
 List the current ACL rules in ACL config file format.
@@ -3387,7 +3922,7 @@ List latest events denied because of ACLs in place.
 
 =over 4
 
-=item * [count or RESET]
+=item * [count|RESET]
 
 =back
 
@@ -3518,6 +4053,25 @@ sub command_count : method {
     $self->execute_command(qw(COMMAND COUNT) => @args)
 }
 
+=head2 command_docs
+
+Get array of specific Redis command documentation.
+
+=over 4
+
+=item * [command-name [command-name ...]]
+
+=back
+
+L<https://redis.io/commands/command-docs>
+
+=cut
+
+sub command_docs : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(COMMAND DOCS) => @args)
+}
+
 =head2 command_getkeys
 
 Extract keys given a full Redis command.
@@ -3533,11 +4087,11 @@ sub command_getkeys : method {
 
 =head2 command_info
 
-Get array of specific Redis command details.
+Get array of specific Redis command details, or all when no argument is given.
 
 =over 4
 
-=item * command-name [command-name ...]
+=item * [command-name [command-name ...]]
 
 =back
 
@@ -3550,13 +4104,32 @@ sub command_info : method {
     $self->execute_command(qw(COMMAND INFO) => @args)
 }
 
-=head2 config_get
+=head2 command_list
 
-Get the value of a configuration parameter.
+Get an array of Redis command names.
 
 =over 4
 
-=item * parameter
+=item * [FILTERBY MODULE module-name|ACLCAT category|PATTERN pattern]
+
+=back
+
+L<https://redis.io/commands/command-list>
+
+=cut
+
+sub command_list : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(COMMAND LIST) => @args)
+}
+
+=head2 config_get
+
+Get the values of configuration parameters.
+
+=over 4
+
+=item * parameter [parameter ...]
 
 =back
 
@@ -3597,13 +4170,11 @@ sub config_rewrite : method {
 
 =head2 config_set
 
-Set a configuration parameter to the given value.
+Set configuration parameters to the given values.
 
 =over 4
 
-=item * parameter
-
-=item * value
+=item * parameter value [parameter value ...]
 
 =back
 
@@ -3627,38 +4198,6 @@ L<https://redis.io/commands/dbsize>
 sub dbsize : method {
     my ($self, @args) = @_;
     $self->execute_command(qw(DBSIZE) => @args)
-}
-
-=head2 debug_object
-
-Get debugging information about a key.
-
-=over 4
-
-=item * key
-
-=back
-
-L<https://redis.io/commands/debug-object>
-
-=cut
-
-sub debug_object : method {
-    my ($self, @args) = @_;
-    $self->execute_command(qw(DEBUG OBJECT) => @args)
-}
-
-=head2 debug_segfault
-
-Make the server crash.
-
-L<https://redis.io/commands/debug-segfault>
-
-=cut
-
-sub debug_segfault : method {
-    my ($self, @args) = @_;
-    $self->execute_command(qw(DEBUG SEGFAULT) => @args)
 }
 
 =head2 failover
@@ -3786,17 +4325,23 @@ sub latency_graph : method {
     $self->execute_command(qw(LATENCY GRAPH) => @args)
 }
 
-=head2 latency_help
+=head2 latency_histogram
 
-Show helpful text about the different subcommands.
+Return the cumulative distribution of latencies of a subset of commands or all.
 
-L<https://redis.io/commands/latency-help>
+=over 4
+
+=item * [command [command ...]]
+
+=back
+
+L<https://redis.io/commands/latency-histogram>
 
 =cut
 
-sub latency_help : method {
+sub latency_histogram : method {
     my ($self, @args) = @_;
-    $self->execute_command(qw(LATENCY HELP) => @args)
+    $self->execute_command(qw(LATENCY HISTOGRAM) => @args)
 }
 
 =head2 latency_history
@@ -3882,19 +4427,6 @@ sub memory_doctor : method {
     $self->execute_command(qw(MEMORY DOCTOR) => @args)
 }
 
-=head2 memory_help
-
-Show helpful text about the different subcommands.
-
-L<https://redis.io/commands/memory-help>
-
-=cut
-
-sub memory_help : method {
-    my ($self, @args) = @_;
-    $self->execute_command(qw(MEMORY HELP) => @args)
-}
-
 =head2 memory_malloc_stats
 
 Show allocator internal stats.
@@ -3976,7 +4508,7 @@ Load a module.
 
 =item * path
 
-=item * [ arg [arg ...]]
+=item * [arg [arg ...]]
 
 =back
 
@@ -4042,6 +4574,19 @@ sub psync : method {
     $self->execute_command(qw(PSYNC) => @args)
 }
 
+=head2 replconf
+
+An internal command for configuring the replication stream.
+
+L<https://redis.io/commands/replconf>
+
+=cut
+
+sub replconf : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(REPLCONF) => @args)
+}
+
 =head2 replicaof
 
 Make the server a replica of another instance, or promote it as master.
@@ -4061,6 +4606,19 @@ L<https://redis.io/commands/replicaof>
 sub replicaof : method {
     my ($self, @args) = @_;
     $self->execute_command(qw(REPLICAOF) => @args)
+}
+
+=head2 restore_asking
+
+An internal command for migrating keys in a cluster.
+
+L<https://redis.io/commands/restore-asking>
+
+=cut
+
+sub restore_asking : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(RESTORE-ASKING) => @args)
 }
 
 =head2 role
@@ -4097,6 +4655,12 @@ Synchronously save the dataset to disk and then shut down the server.
 
 =item * [NOSAVE|SAVE]
 
+=item * [NOW]
+
+=item * [FORCE]
+
+=item * [ABORT]
+
 =back
 
 L<https://redis.io/commands/shutdown>
@@ -4129,25 +4693,49 @@ sub slaveof : method {
     $self->execute_command(qw(SLAVEOF) => @args)
 }
 
-=head2 slowlog
+=head2 slowlog_get
 
-Manages the Redis slow queries log.
+Get the slow log's entries.
 
 =over 4
 
-=item * subcommand
-
-=item * [argument]
+=item * [count]
 
 =back
 
-L<https://redis.io/commands/slowlog>
+L<https://redis.io/commands/slowlog-get>
 
 =cut
 
-sub slowlog : method {
+sub slowlog_get : method {
     my ($self, @args) = @_;
-    $self->execute_command(qw(SLOWLOG) => @args)
+    $self->execute_command(qw(SLOWLOG GET) => @args)
+}
+
+=head2 slowlog_len
+
+Get the slow log's length.
+
+L<https://redis.io/commands/slowlog-len>
+
+=cut
+
+sub slowlog_len : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(SLOWLOG LEN) => @args)
+}
+
+=head2 slowlog_reset
+
+Clear all entries from the slow log.
+
+L<https://redis.io/commands/slowlog-reset>
+
+=cut
+
+sub slowlog_reset : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(SLOWLOG RESET) => @args)
 }
 
 =head2 swapdb
@@ -4304,7 +4892,11 @@ Intersect multiple sets and return the cardinality of the result.
 
 =over 4
 
+=item * numkeys
+
 =item * key [key ...]
+
+=item * [LIMIT limit]
 
 =back
 
@@ -4550,7 +5142,34 @@ sub sunionstore : method {
     $self->execute_command(qw(SUNIONSTORE) => @args)
 }
 
-=head1 METHODS - Sorted_set
+=head1 METHODS - Sorted-set
+
+=head2 bzmpop
+
+Remove and return members with scores in a sorted set or block until one is available.
+
+=over 4
+
+=item * timeout
+
+=item * numkeys
+
+=item * key [key ...]
+
+=item * MIN|MAX
+
+=item * [COUNT count]
+
+=back
+
+L<https://redis.io/commands/bzmpop>
+
+=cut
+
+sub bzmpop : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(BZMPOP) => @args)
+}
 
 =head2 bzpopmax
 
@@ -4771,6 +5390,8 @@ Intersect multiple sorted sets and return the cardinality of the result.
 
 =item * key [key ...]
 
+=item * [LIMIT limit]
+
 =back
 
 L<https://redis.io/commands/zintercard>
@@ -4830,6 +5451,31 @@ L<https://redis.io/commands/zlexcount>
 sub zlexcount : method {
     my ($self, @args) = @_;
     $self->execute_command(qw(ZLEXCOUNT) => @args)
+}
+
+=head2 zmpop
+
+Remove and return members with scores in a sorted set.
+
+=over 4
+
+=item * numkeys
+
+=item * key [key ...]
+
+=item * MIN|MAX
+
+=item * [COUNT count]
+
+=back
+
+L<https://redis.io/commands/zmpop>
+
+=cut
+
+sub zmpop : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(ZMPOP) => @args)
 }
 
 =head2 zmscore
@@ -5351,7 +5997,7 @@ Marks a pending message as correctly processed, effectively removing it from the
 
 =item * group
 
-=item * ID [ID ...]
+=item * id [id ...]
 
 =back
 
@@ -5376,7 +6022,7 @@ Appends a new entry to a stream.
 
 =item * [MAXLEN|MINID [=|~] threshold [LIMIT count]]
 
-=item * *|ID
+=item * *|id
 
 =item * field value [field value ...]
 
@@ -5436,11 +6082,11 @@ Changes (or acquires) ownership of a message in a consumer group, as if the mess
 
 =item * min-idle-time
 
-=item * ID [ID ...]
+=item * id [id ...]
 
 =item * [IDLE ms]
 
-=item * [TIME ms-unix-time]
+=item * [TIME unix-time-milliseconds]
 
 =item * [RETRYCOUNT count]
 
@@ -5467,7 +6113,7 @@ Removes the specified entries from the stream. Returns the number of items actua
 
 =item * key
 
-=item * ID [ID ...]
+=item * id [id ...]
 
 =back
 
@@ -5480,56 +6126,180 @@ sub xdel : method {
     $self->execute_command(qw(XDEL) => @args)
 }
 
-=head2 xgroup
+=head2 xgroup_create
 
-Create, destroy, and manage consumer groups.
+Create a consumer group.
 
 =over 4
 
-=item * [CREATE key groupname ID|$ [MKSTREAM]]
+=item * key
 
-=item * [SETID key groupname ID|$]
+=item * groupname
 
-=item * [DESTROY key groupname]
+=item * id|$
 
-=item * [CREATECONSUMER key groupname consumername]
-
-=item * [DELCONSUMER key groupname consumername]
+=item * [MKSTREAM]
 
 =back
 
-L<https://redis.io/commands/xgroup>
+L<https://redis.io/commands/xgroup-create>
 
 =cut
 
-sub xgroup : method {
+sub xgroup_create : method {
     my ($self, @args) = @_;
-    $self->execute_command(qw(XGROUP) => @args)
+    $self->execute_command(qw(XGROUP CREATE) => @args)
 }
 
-=head2 xinfo
+=head2 xgroup_createconsumer
 
-Get information on streams and consumer groups.
+Create a consumer in a consumer group.
 
 =over 4
 
-=item * [CONSUMERS key groupname]
+=item * key
 
-=item * [GROUPS key]
+=item * groupname
 
-=item * [STREAM key]
-
-=item * [HELP]
+=item * consumername
 
 =back
 
-L<https://redis.io/commands/xinfo>
+L<https://redis.io/commands/xgroup-createconsumer>
 
 =cut
 
-sub xinfo : method {
+sub xgroup_createconsumer : method {
     my ($self, @args) = @_;
-    $self->execute_command(qw(XINFO) => @args)
+    $self->execute_command(qw(XGROUP CREATECONSUMER) => @args)
+}
+
+=head2 xgroup_delconsumer
+
+Delete a consumer from a consumer group.
+
+=over 4
+
+=item * key
+
+=item * groupname
+
+=item * consumername
+
+=back
+
+L<https://redis.io/commands/xgroup-delconsumer>
+
+=cut
+
+sub xgroup_delconsumer : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(XGROUP DELCONSUMER) => @args)
+}
+
+=head2 xgroup_destroy
+
+Destroy a consumer group.
+
+=over 4
+
+=item * key
+
+=item * groupname
+
+=back
+
+L<https://redis.io/commands/xgroup-destroy>
+
+=cut
+
+sub xgroup_destroy : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(XGROUP DESTROY) => @args)
+}
+
+=head2 xgroup_setid
+
+Set a consumer group to an arbitrary last delivered ID value.
+
+=over 4
+
+=item * key
+
+=item * groupname
+
+=item * id|$
+
+=back
+
+L<https://redis.io/commands/xgroup-setid>
+
+=cut
+
+sub xgroup_setid : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(XGROUP SETID) => @args)
+}
+
+=head2 xinfo_consumers
+
+List the consumers in a consumer group.
+
+=over 4
+
+=item * key
+
+=item * groupname
+
+=back
+
+L<https://redis.io/commands/xinfo-consumers>
+
+=cut
+
+sub xinfo_consumers : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(XINFO CONSUMERS) => @args)
+}
+
+=head2 xinfo_groups
+
+List the consumer groups of a stream.
+
+=over 4
+
+=item * key
+
+=back
+
+L<https://redis.io/commands/xinfo-groups>
+
+=cut
+
+sub xinfo_groups : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(XINFO GROUPS) => @args)
+}
+
+=head2 xinfo_stream
+
+Get information about a stream.
+
+=over 4
+
+=item * key
+
+=item * [FULL [COUNT count]]
+
+=back
+
+L<https://redis.io/commands/xinfo-stream>
+
+=cut
+
+sub xinfo_stream : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(XINFO STREAM) => @args)
 }
 
 =head2 xlen
@@ -5609,11 +6379,7 @@ Return never seen elements in multiple streams, with IDs greater than the ones r
 
 =item * [BLOCK milliseconds]
 
-=item * STREAMS
-
-=item * key [key ...]
-
-=item * ID [ID ...]
+=item * STREAMS key [key ...] id [id ...]
 
 =back
 
@@ -5640,11 +6406,7 @@ Return new entries from a stream using a consumer group, or access the history o
 
 =item * [NOACK]
 
-=item * STREAMS
-
-=item * key [key ...]
-
-=item * ID [ID ...]
+=item * STREAMS key [key ...] id [id ...]
 
 =back
 
@@ -5680,6 +6442,27 @@ L<https://redis.io/commands/xrevrange>
 sub xrevrange : method {
     my ($self, @args) = @_;
     $self->execute_command(qw(XREVRANGE) => @args)
+}
+
+=head2 xsetid
+
+An internal command for replicating stream values.
+
+=over 4
+
+=item * key
+
+=item * last-id
+
+=back
+
+L<https://redis.io/commands/xsetid>
+
+=cut
+
+sub xsetid : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(XSETID) => @args)
 }
 
 =head2 xtrim
@@ -5812,7 +6595,7 @@ Get the value of a key and optionally set its expiration.
 
 =item * key
 
-=item * [EX seconds|PX milliseconds|EXAT timestamp|PXAT milliseconds-timestamp|PERSIST]
+=item * [EX seconds|PX milliseconds|EXAT unix-time-seconds|PXAT unix-time-milliseconds|PERSIST]
 
 =back
 
@@ -5930,6 +6713,35 @@ sub incrbyfloat : method {
     $self->execute_command(qw(INCRBYFLOAT) => @args)
 }
 
+=head2 lcs
+
+Find longest common substring.
+
+=over 4
+
+=item * key1
+
+=item * key2
+
+=item * [LEN]
+
+=item * [IDX]
+
+=item * [MINMATCHLEN len]
+
+=item * [WITHMATCHLEN]
+
+=back
+
+L<https://redis.io/commands/lcs>
+
+=cut
+
+sub lcs : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(LCS) => @args)
+}
+
 =head2 mget
 
 Get the values of all the given keys.
@@ -6020,7 +6832,7 @@ Set the string value of a key.
 
 =item * value
 
-=item * [EX seconds|PX milliseconds|EXAT timestamp|PXAT milliseconds-timestamp|KEEPTTL]
+=item * [EX seconds|PX milliseconds|EXAT unix-time-seconds|PXAT unix-time-milliseconds|KEEPTTL]
 
 =item * [NX|XX]
 
@@ -6104,27 +6916,6 @@ sub setrange : method {
     $self->execute_command(qw(SETRANGE) => @args)
 }
 
-=head2 stralgo
-
-Run algorithms (currently LCS) against strings.
-
-=over 4
-
-=item * LCS
-
-=item * algo-specific-argument [algo-specific-argument ...]
-
-=back
-
-L<https://redis.io/commands/stralgo>
-
-=cut
-
-sub stralgo : method {
-    my ($self, @args) = @_;
-    $self->execute_command(qw(STRALGO) => @args)
-}
-
 =head2 strlen
 
 Get the length of the value stored in a key.
@@ -6142,6 +6933,29 @@ L<https://redis.io/commands/strlen>
 sub strlen : method {
     my ($self, @args) = @_;
     $self->execute_command(qw(STRLEN) => @args)
+}
+
+=head2 substr
+
+Get a substring of the string stored at a key.
+
+=over 4
+
+=item * key
+
+=item * start
+
+=item * end
+
+=back
+
+L<https://redis.io/commands/substr>
+
+=cut
+
+sub substr : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(SUBSTR) => @args)
 }
 
 =head1 METHODS - Transactions

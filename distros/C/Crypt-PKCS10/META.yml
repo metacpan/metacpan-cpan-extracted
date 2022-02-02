@@ -26,7 +26,7 @@ no_index:
 provides:
   Crypt::PKCS10:
     file: lib/Crypt/PKCS10.pm
-    version: '2.002'
+    version: '2.003'
 requires:
   Convert::ASN1: '0'
   Encode: '0'
@@ -37,8 +37,9 @@ resources:
   bugtracker: https://github.com/openxpki/Crypt-PKCS10/issues
   homepage: https://github.com/openxpki/Crypt-PKCS10
   repository: git://github.com/openxpki/Crypt-PKCS10.git
-version: '2.002'
+version: '2.003'
 x_contributors:
+  - 'Daniel Hoffend <dh@dotlan.net>'
   - 'Gideon Knocke <gideonknocke@googlemail.com>'
   - 'Gideon Knocke <root@develop.localdomain>'
   - 'Martin Bartosch <m.bartosch@cynops.de>'

@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::ABB_TRMC2;
-$Lab::Moose::Instrument::ABB_TRMC2::VERSION = '3.802';
+$Lab::Moose::Instrument::ABB_TRMC2::VERSION = '3.803';
 #ABSTRACT: ABB TRMC2 temperature controller
 
 use v5.20;
@@ -391,7 +391,7 @@ Lab::Moose::Instrument::ABB_TRMC2 - ABB TRMC2 temperature controller
 
 =head1 VERSION
 
-version 3.802
+version 3.803
 
 =head1 SYNOPSIS
 
@@ -572,7 +572,7 @@ This driver consumes no roles.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2022 by the Lab::Measurement team; in detail:
 
   Copyright 2011       Andreas K. Huettel, Florian Olbrich
             2012       Alois Dirnaichner, Andreas K. Huettel

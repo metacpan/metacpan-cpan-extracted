@@ -166,7 +166,6 @@ sub _image_type {
     ord(substr($data,3,1)) >= 0xc0);
   return 'Gif'  if $magic eq "GIF8";
   return 'Gd2'  if $magic eq "gd2\000";
-  return 'Xpm'  if substr($data,0,9) eq "/* XPM */";
   return 'Tiff' if $magic eq "\x4d\x4d\x00\x2a" or
     $magic eq "\x49\x49\x2a\x00" or
     $magic eq "IIN1";
@@ -179,6 +178,8 @@ sub _image_type {
                 and substr($data,4,4) eq "ftyp"
                 and (substr($data,8,4) eq "avif"
                   or substr($data,8,4) eq "mif1");
+  return 'Xpm'  if substr($data,0,9) eq "/* XPM */" or $magic eq '/* X';
+  return 'Xbm'  if substr($data,0,8) eq "#define " or $magic eq "#def";
   return;
 }
 
@@ -229,11 +230,11 @@ sub newFromTiff {
 }
 
 sub newFromXbm {
-    croak("Usage: newFromTiff(class,filehandle)") unless @_==2;
+    croak("Usage: newFromXbm(class,filehandle)") unless @_==2;
     my($class,$f) = @_;
     my $fh = $class->_make_filehandle($f);
     binmode($fh);
-    $class->_newFromTiff($fh);
+    $class->_newFromXbm($fh);
 }
 
 sub newFromWebp {
@@ -252,7 +253,7 @@ sub newFromHeif {
     $class->_newFromHeif($fh);
 }
 
-sub newFromHeif {
+sub newFromAvif {
     croak("Usage: newFromAvif(class,filehandle)") unless @_==2;
     my($class,$f) = @_;
     my $fh = $class->_make_filehandle($f);

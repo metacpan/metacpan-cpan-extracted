@@ -1,5 +1,8 @@
 Revision history for Music-MelodicDevice-Ornamentation
 
+0.0700 2022-01-31 16:29:53
+    - Make things handle numeric pitches! Duuh!
+
 0.0603 2022-01-31 11:30:22
     - Improve documentation.
 

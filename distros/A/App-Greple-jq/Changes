@@ -1,5 +1,10 @@
 Revision history for Perl extension App-Greple-jq
 
+0.04 2022-02-01T10:19:43Z
+
+    - introduce --NOT and --MUST option
+    - treat search pattern as an independent regex
+
 0.03 2022-01-31T14:45:54Z
 
     - fixed bug of commit.name matches commit.author.name

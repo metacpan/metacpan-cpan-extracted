@@ -141,13 +141,13 @@ class WithBuildargs {
 # Create a base class with HASH representation
 {
    class NativelyHash :repr(HASH) {
-      has $slot = "value";
-      method slot { $slot }
+      has $field = "value";
+      method field { $field }
    }
 
    my $o = NativelyHash->new;
    is( reftype $o, "HASH", 'NativelyHash is natively a HASH reference' );
-   is( $o->slot, "value", 'native HASH objects still support slots' );
+   is( $o->field, "value", 'native HASH objects still support fields' );
 }
 
 # Subclasses without BUILD shouldn't double-invoke superclass

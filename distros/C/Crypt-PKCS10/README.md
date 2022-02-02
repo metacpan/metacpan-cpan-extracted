@@ -566,6 +566,7 @@ Unknown OIDs are returned in numeric form, or can be registered with
     1.2.840.113549.1.1.5       sha1WithRSAEncryption      (SHA1 with RSA encryption)
     1.2.840.113549.1.1.6       rsaOAEPEncryptionSET
     1.2.840.113549.1.1.7       RSAES-OAEP
+    1.2.840.113549.1.1.10      rsassaPss
     1.2.840.113549.1.1.11      sha256WithRSAEncryption    (SHA-256 with RSA encryption)
     1.2.840.113549.1.1.12      sha384WithRSAEncryption
     1.2.840.113549.1.1.13      sha512WithRSAEncryption    (SHA-512 with RSA encryption)
@@ -573,6 +574,7 @@ Unknown OIDs are returned in numeric form, or can be registered with
     1.2.840.113549.1.9.1       emailAddress
     1.2.840.113549.1.9.2       unstructuredName
     1.2.840.113549.1.9.7       challengePassword
+    1.2.840.113549.1.9.8       unstructuredAddress
     1.2.840.113549.1.9.14      extensionRequest
     1.2.840.113549.1.9.15      smimeCapabilities          (SMIMECapabilities)
     1.3.6.1.4.1.311.2.1.14     CERT_EXTENSIONS

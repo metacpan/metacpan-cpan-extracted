@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Apply chromatic and diatonic transposition to notes
 
-our $VERSION = '0.0400';
+our $VERSION = '0.0501';
 
 use Data::Dumper::Compact qw(ddc);
 use List::SomeUtils qw(first_index);
@@ -54,13 +54,23 @@ has verbose => (
 sub transpose {
     my ($self, $offset, $notes) = @_;
 
+    my $named = $notes->[0] =~ /[A-G]/ ? 1 : 0;
+
     my @transposed;
 
     for my $n (@$notes) {
         my ($i, $pitch) = $self->_find_pitch($n);
-        push @transposed, $i == -1
-            ? undef
-            : Music::Note->new($self->_scale->[ $i + $offset ], 'midinum')->format('ISO');
+        if ($i == -1) {
+            push @transposed, undef;
+        }
+        else {
+            if ($named) {
+                push @transposed, Music::Note->new($self->_scale->[ $i + $offset ], 'midinum')->format('ISO');
+            }
+            else {
+                push @transposed, $self->_scale->[ $i + $offset ];
+            }
+        }
     }
     print 'Transposed: ', ddc(\@transposed) if $self->verbose;
 
@@ -70,7 +80,8 @@ sub transpose {
 sub _find_pitch {
     my ($self, $pitch) = @_;
 
-    $pitch = Music::Note->new($pitch, 'ISO')->format('midinum');
+    $pitch = Music::Note->new($pitch, 'ISO')->format('midinum')
+        if $pitch =~ /[A-G]/;
 
     my $i = first_index { $_ == $pitch } @{ $self->_scale };
 
@@ -91,18 +102,18 @@ Music::MelodicDevice::Transposition - Apply chromatic and diatonic transposition
 
 =head1 VERSION
 
-version 0.0400
+version 0.0501
 
 =head1 SYNOPSIS
 
   use Music::MelodicDevice::Transposition;
 
-  my @notes = qw(C4 E4 D4 G4 C5);
+  my @notes = qw(C4 E4 D4 G4 C5); # either named notes or midinums
 
   # Chromatic
   my $md = Music::MelodicDevice::Transposition->new;
   my $transposed = $md->transpose(2, \@notes); # [D4, F#4, E4, A4, D5]
-  $transposed = $md->transpose(4, \@notes); # [E4, G#4, F#4, B4, E5]
+  $transposed = $md->transpose(4, \@notes);    # [E4, G#4, F#4, B4, E5]
 
   # Diatonic
   $md = Music::MelodicDevice::Transposition->new(scale_name => 'major');
@@ -112,7 +123,8 @@ version 0.0400
 =head1 DESCRIPTION
 
 C<Music::MelodicDevice::Transposition> applies transposition, both
-chromatic or diatonic, to a series of ISO formatted notes.
+chromatic or diatonic, to a series of ISO  or "midinum" formatted
+notes.
 
 While there are modules on CPAN that do chromatic transposition,
 none appear to apply diatonic transposition to an arbitrary series of
@@ -145,7 +157,7 @@ Default: C<0>
   $md = Music::MelodicDevice::Transposition->new(
     scale_note => $scale_note,
     scale_name => $scale_name,
-    verbose => $verbose,
+    verbose    => $verbose,
   );
 
 Create a new C<Music::MelodicDevice::Transposition> object.
@@ -159,7 +171,7 @@ appropriately based on the number of notes in the chosen scale.
 
 =head1 SEE ALSO
 
-The F<t/01-methods.t> test file
+The F<t/01-methods.t> test and the F<eg/*> example files
 
 L<Data::Dumper::Compact>
 
@@ -177,7 +189,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gene Boggs.
+This software is copyright (c) 2022 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

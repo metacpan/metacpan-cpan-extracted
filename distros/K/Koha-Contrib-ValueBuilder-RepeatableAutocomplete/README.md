@@ -4,7 +4,7 @@ Koha::Contrib::ValueBuilder::RepeatableAutocomplete - Repeatable autcomplete val
 
 # VERSION
 
-version 1.002
+version 1.003
 
 # SYNOPSIS
 
@@ -47,8 +47,8 @@ inferred from the form element the value\_builder is bound to.
 
     build_builder_inline(
           {   target    => '4',
+              data      => [ { label=>"Foo", value=>'foo' }, ... ],
               minlength => 3.
-              data      => [ { label=>"Foo", value=>'foo', ... } ],
           }
       );
 
@@ -68,11 +68,69 @@ Parameters:
 
     Input length that will trigger the autocomplete.
 
+### build\_builder\_inline\_multiple
+
+Build JS to handle a short inline autocomplete lookup (data is
+provided to the function, not loaded via AJAX etc). The selected value
+will be inserted into multiple subfields. The field will be inferred
+from the form element the value\_builder is bound to.
+
+    build_builder_inline(
+          {   target_map => [
+                  { subfield=>'b', type=>'selected', key=>'value' },
+                  { subfield=>'a', type=>'selected', key=>'other' },
+                  { subfield=>'2', type=>'literal',  literal=>'rdacontent' }
+              ],
+              data      => [ { label=>"Foo", value=>'foo', other=>'FOO', }, ... ],
+              minlength => 3.
+          }
+      );
+
+Parameters:
+
+- `target_map`: required
+
+    A list of subfields and how to fill them with data based on the selected value.
+
+    - subfield: the subfield to fill
+    - type: how to fill the subfield. Currently we have two types:
+    `selected` and `literal`
+    - selected: If type is `selected`, fill the subfield with the
+    value of the selected data mapped to the key specified here
+
+        \-item \* literal: If type is `literal`, fill the subfield with this literal value
+
+- `data`: required
+
+    An ARRAY of HASHes, each hash has to contain a key `label` (which
+    will be what the users enter) and some more keys which can be mapped
+    to subfields using `target_map` entries of type `selected`.
+
+    Given this `target_map`
+
+        [
+           { subfield=>'b', type=>'selected', key=>'value' },
+           { subfield=>'a', type=>'selected', key=>'other' },
+           { subfield=>'2', type=>'literal',  literal=>'rdacontent' }
+        ],
+
+    And this `data`
+
+        { label=>"Foo", value=>'foo', other=>'FOO' }
+
+    Selecting "Foo" will store `value` ("foo">) into subfield `b`,
+    `other` ("FOO">) into subfield `a` and the literal value
+    "rdacontent" into `2`.
+
+- `minlength`; optional, defaults to 3
+
+    Input length that will trigger the autocomplete.
+
 ## Usage in Koha
 
 You will need to write a `value_builder` Perl script and put it into
 `/usr/share/koha/intranet/cgi-bin/cataloguing/value_builder`. You can
-find some example value-builder scripts in ["" in example](https://metacpan.org/pod/example). The should
+find some example value-builder scripts in `example/`. The should
 look something like this:
 
     #!/usr/bin/perl

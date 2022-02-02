@@ -1,5 +1,7 @@
 Revision history for SPVM::Math
 
+0.06  2021-02-01
+        * SPVM::Math needs SPVM 0.9500+
 0.05  2021-12-24
         [CHANGES]
         * Fix only document.

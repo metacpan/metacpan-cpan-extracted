@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::DummySource;
-$Lab::Moose::Instrument::DummySource::VERSION = '3.802';
+$Lab::Moose::Instrument::DummySource::VERSION = '3.803';
 #ABSTRACT: Dummy YokogawaGS200 source for use with 'Debug' connection
 
 use v5.20;
@@ -214,7 +214,7 @@ Lab::Moose::Instrument::DummySource - Dummy YokogawaGS200 source for use with 'D
 
 =head1 VERSION
 
-version 3.802
+version 3.803
 
 =head1 SYNOPSIS
 
@@ -241,7 +241,7 @@ version 3.802
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2022 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Simon Reinhardt
             2020       Andreas K. Huettel, Simon Reinhardt

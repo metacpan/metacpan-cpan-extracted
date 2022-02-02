@@ -4,10 +4,10 @@ use warnings;
 
 use Data::Dumper::Compact 'ddc';
 use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util);
-use MIDI::Util;
+use MIDI::Util qw(midi_format setup_score);
 use Music::MelodicDevice::Inversion;
 
-my $score = MIDI::Util::setup_score();
+my $score = setup_score();
 
 my $md = Music::MelodicDevice::Inversion->new(
     scale_note => 'C',
@@ -36,7 +36,7 @@ for my $phrase (
     $retrograde,
     $retro_inv,
 ) {
-    @$phrase = MIDI::Util::midi_format(@$phrase);
+    @$phrase = midi_format(@$phrase);
     print ddc($phrase);
     for my $n (0 .. $#$phrase) {
         $score->n($motif->[$n], $phrase->[$n]);

@@ -1,5 +1,13 @@
 Revision history for Test::PDL
 
+0.19      2022-02-02
+
+ - actually check if either value is empty
+
+0.18      2022-02-02
+
+ - more detailed checks if either value is null
+
 0.17      2021-12-07
 
  - test updates

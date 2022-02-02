@@ -1,0 +1,60 @@
+NAME
+    isbn-format - Script to format ISBN.
+
+SYNOPSIS
+     isbn-format [-h] [--version] isbn_string
+
+DESCRIPTION
+    Vision of this module is:
+
+     * Support ISBN 13 and ISBN 10 formats.
+     * Detect if ISBN is valid.
+     * Convert ISBN to pretty print value.
+
+ARGUMENTS
+    *       "-h"
+
+            Print help.
+
+    *       "--version"
+
+            Print version of script.
+
+    *       "isbn_string"
+
+            ISBN number string.
+
+EXAMPLE1
+     isbn-format 9788025343364
+
+     # Output:
+     # 9788025343364 -> 978-80-253-4336-4
+
+EXAMPLE2
+     isbn-format 9788025343363
+
+     # Output:
+     # 9788025343364 -> 978-80-253-4336-4
+
+EXAMPLE3
+     isbn-format 978802534336
+
+     # Output:
+     # ISBN '978802534336' is bad.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/App-ISBN-Format>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2022 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

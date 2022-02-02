@@ -24,19 +24,19 @@ package Base::Class {
 
 my $opcount;
 class Derived::Class :isa(Base::Class) {
-   has $slot;
+   has $field;
    BUILD {
       my ( $args ) = @_;
       Test::More::is_deeply( $args, { arg => "value" }, '@_ to Derived::Class BUILD' );
-      $slot = 345;
+      $field = 345;
       $opcount++;
    }
-   method slot { $slot }
+   method field { $field }
 }
 
 {
    my $obj = Derived::Class->new( arg => "value" );
-   is( $obj->slot, 345, 'slot value' );
+   is( $obj->field, 345, 'field value' );
 }
 
 # Ensure the BUILD blocks don't collide with Moo's BUILD methods

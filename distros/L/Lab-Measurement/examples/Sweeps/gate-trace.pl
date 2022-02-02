@@ -109,11 +109,11 @@ gate-trace.pl - Measure a gate trace
 
 =head1 VERSION
 
-version 3.802
+version 3.803
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2022 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Andreas K. Huettel
 

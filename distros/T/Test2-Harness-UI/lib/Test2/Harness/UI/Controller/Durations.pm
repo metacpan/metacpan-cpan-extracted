@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::Durations;
 use strict;
 use warnings;
 
-our $VERSION = '0.000104';
+our $VERSION = '0.000105';
 
 use Data::GUID;
 use Test2::Harness::UI::Response qw/resp error/;
@@ -28,6 +28,7 @@ sub handle {
     my $short        = $route->{short} || 15;
     my $medium       = $route->{medium} || 30;
     my $median       = $route->{median} || 0;
+    my $username     = $route->{user};
 
     my $schema  = $self->{+CONFIG}->schema;
     my $project = $schema->resultset('Project')->find({name => $project_name});
@@ -38,6 +39,7 @@ sub handle {
             short  => $short,
             medium => $medium,
             median => $median,
+            user   => $username,
         );
     }
 

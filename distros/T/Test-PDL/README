@@ -1,9 +1,9 @@
 This archive contains the distribution Test-PDL,
-version 0.17:
+version 0.19:
 
   Test Perl Data Language arrays (a.k.a. ndarrays) for equality
 
-This software is copyright (c) 2021 by Edward Baudrez.
+This software is copyright (c) 2022 by Edward Baudrez.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

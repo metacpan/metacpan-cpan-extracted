@@ -13,7 +13,6 @@ HACKERS
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-META_new.json
 mktests.PL
 module2.c
 module3.c
@@ -224,7 +223,6 @@ parts/base/5031008
 parts/base/5031009
 parts/base/5031010
 parts/base/5031011
-parts/base/5031012
 parts/base/5032000
 parts/base/5032001
 parts/base/5033000
@@ -240,6 +238,14 @@ parts/base/5033009
 parts/base/5034000
 parts/base/5035001
 parts/base/5035002
+parts/base/5035003
+parts/base/5035004
+parts/base/5035005
+parts/base/5035006
+parts/base/5035007
+parts/base/5035008
+parts/base/5035009
+parts/base/5035010
 parts/embed.fnc
 parts/inc/01_test
 parts/inc/call
@@ -506,6 +512,14 @@ parts/todo/5033009
 parts/todo/5034000
 parts/todo/5035001
 parts/todo/5035002
+parts/todo/5035003
+parts/todo/5035004
+parts/todo/5035005
+parts/todo/5035006
+parts/todo/5035007
+parts/todo/5035008
+parts/todo/5035009
+parts/todo/5035010
 PPPort.pm
 PPPort.xs
 ppport_h.PL

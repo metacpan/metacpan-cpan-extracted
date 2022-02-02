@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::OI_ITC503;
-$Lab::Moose::Instrument::OI_ITC503::VERSION = '3.802';
+$Lab::Moose::Instrument::OI_ITC503::VERSION = '3.803';
 #ABSTRACT: Oxford Instruments ITC503 Intelligent Temperature Control
 
 use v5.20;
@@ -246,7 +246,7 @@ sub itc_set_PID {
 sub itc_set_proportional_value {
     my ( $self, $value, %args ) = validated_setter(
         \@_,
-        value => { isa => 'Lab::Moose::PosInt' }
+        value => { isa => 'Lab::Moose::PosNum' }
     );
     $self->itc_set_PID_auto( value => 0 );
     return $self->query( command => "P$value\r", %args );
@@ -255,7 +255,7 @@ sub itc_set_proportional_value {
 sub itc_set_integral_value {
     my ( $self, $value, %args ) = validated_setter(
         \@_,
-        value => { isa => 'Lab::Moose::PosInt' }
+        value => { isa => 'Lab::Moose::PosNum' }
     );
     $self->itc_set_PID_auto( value => 0 );
     return $self->query( command => "I$value\r", %args );
@@ -264,7 +264,7 @@ sub itc_set_integral_value {
 sub itc_set_derivative_value {
     my ( $self, $value, %args ) = validated_setter(
         \@_,
-        value => { isa => 'Lab::Moose::PosInt' }
+        value => { isa => 'Lab::Moose::PosNum' }
     );
     $self->itc_set_PID_auto( value => 0 );
     return $self->query( command => "D$value\r", %args );
@@ -463,7 +463,7 @@ Lab::Moose::Instrument::OI_ITC503 - Oxford Instruments ITC503 Intelligent Temper
 
 =head1 VERSION
 
-version 3.802
+version 3.803
 
 =head1 SYNOPSIS
 
@@ -610,10 +610,11 @@ This driver consumes the following roles:
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2022 by the Lab::Measurement team; in detail:
 
   Copyright 2019       Simon Reinhardt
             2020       Andreas K. Huettel
+            2022       Mia Schambeck
 
 
 This is free software; you can redistribute it and/or modify it under

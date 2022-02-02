@@ -5,7 +5,7 @@ use JSON qw(to_json);
 
 # ABSTRACT: Repeatable autcomplete value-builder for Koha
 
-our $VERSION = '1.002'; # VERSION
+our $VERSION = '1.003'; # VERSION
 
 sub build_builder_inline {
     my $class = shift;
@@ -18,7 +18,7 @@ sub build_builder_inline {
             function_name => $params->{id},
             data          => to_json( $args->{data} ),
             target        => $args->{target},
-            minlength     => $args->{minlength} || 3,
+            minlength     => $args->{minlength} // 3,
         };
 
         my $res = <<'EOJS';
@@ -55,11 +55,82 @@ function Focus[% function_name %](event) {
 }
 </script>
 EOJS
-        $res =~ s/\[%\s?(.*?)\s?%\]/$val->{$1} || ''/eg;
+        $res =~ s{\[%\s?(.*?)\s?%\]}{$val->{$1} // ''}eg;
         return $res;
     };
-    return { builder => $builder, };
+    return { builder => $builder };
 }
+
+sub build_builder_inline_multiple {
+    my $class = shift;
+    my $args  = shift;
+
+    my $builder = sub {
+        my ($params) = @_;
+
+        my $val = {
+            function_name => $params->{id},
+            data          => to_json( $args->{data} ),
+            target_map    => to_json( $args->{target_map}),
+            minlength     => $args->{minlength} // 3,
+        };
+
+        my $res = <<'EOJS';
+<script>
+function Focus[% function_name %](event) {
+    var dropdown  = [% data %];
+    var targetMap = [% target_map %];
+
+    var inputField = $(event.target);
+    var currentVal = inputField.val();
+    var field      = inputField.attr('id').replace(/_subfield_.*$/,'');
+
+    inputField.autocomplete({
+        source: dropdown,
+        minLength: [% minlength %],
+        select: function( event, ui ) {
+            event.preventDefault();
+            inputField.val( ui.item.label );
+
+            targetMap.forEach( function(element) {
+                var target = $(inputField.closest('ul').find('input[id^="' + field + '_subfield_' + element.subfield + '"]')[0]);
+                switch (element.type) {
+                    case 'selected':
+                        target.val( ui.item[element.key] );
+                        break;
+                    case 'literal':
+                        target.val(element.literal);
+                        break;
+                }
+            });
+
+            inputField.autocomplete('destroy');
+            inputField.blur();
+        },
+        change: function (event, ui) {
+            if(currentVal != inputField.val() && !ui.item){
+                inputField.val('');
+                targetMap.forEach( function(element) {
+                    var target = $(inputField.closest('ul').find('input[id^="' + field + '_subfield_' + element.subfield + '"]')[0]);
+                    target.val('');
+                });
+            }
+            inputField.autocomplete('destroy');
+            inputField.blur();
+        },
+    });
+
+    return 1;
+}
+</script>
+EOJS
+        $res =~ s{\[%\s?(.*?)\s?%\]}{$val->{$1} // ''}eg;
+        return $res;
+    };
+    return { builder => $builder };
+}
+
+
 
 q{ listening to: Fatima Spar & JOV: The Voice Within };
 
@@ -75,7 +146,7 @@ Koha::Contrib::ValueBuilder::RepeatableAutocomplete - Repeatable autcomplete val
 
 =head1 VERSION
 
-version 1.002
+version 1.003
 
 =head1 SYNOPSIS
 
@@ -122,8 +193,8 @@ inferred from the form element the value_builder is bound to.
 
   build_builder_inline(
         {   target    => '4',
+            data      => [ { label=>"Foo", value=>'foo' }, ... ],
             minlength => 3.
-            data      => [ { label=>"Foo", value=>'foo', ... } ],
         }
     );
 
@@ -147,11 +218,79 @@ Input length that will trigger the autocomplete.
 
 =back
 
+=head3 build_builder_inline_multiple
+
+Build JS to handle a short inline autocomplete lookup (data is
+provided to the function, not loaded via AJAX etc). The selected value
+will be inserted into multiple subfields. The field will be inferred
+from the form element the value_builder is bound to.
+
+  build_builder_inline(
+        {   target_map => [
+                { subfield=>'b', type=>'selected', key=>'value' },
+                { subfield=>'a', type=>'selected', key=>'other' },
+                { subfield=>'2', type=>'literal',  literal=>'rdacontent' }
+            ],
+            data      => [ { label=>"Foo", value=>'foo', other=>'FOO', }, ... ],
+            minlength => 3.
+        }
+    );
+
+Parameters:
+
+=over
+
+=item * C<target_map>: required
+
+A list of subfields and how to fill them with data based on the selected value.
+
+=over
+
+=item * subfield: the subfield to fill
+
+=item * type: how to fill the subfield. Currently we have two types:
+C<selected> and C<literal>
+
+=item * selected: If type is C<selected>, fill the subfield with the
+value of the selected data mapped to the key specified here
+
+-item * literal: If type is C<literal>, fill the subfield with this literal value
+
+=back
+
+=item * C<data>: required
+
+An ARRAY of HASHes, each hash has to contain a key C<label> (which
+will be what the users enter) and some more keys which can be mapped
+to subfields using C<target_map> entries of type C<selected>.
+
+Given this C<target_map>
+
+  [
+     { subfield=>'b', type=>'selected', key=>'value' },
+     { subfield=>'a', type=>'selected', key=>'other' },
+     { subfield=>'2', type=>'literal',  literal=>'rdacontent' }
+  ],
+
+And this C<data>
+
+ { label=>"Foo", value=>'foo', other=>'FOO' }
+
+Selecting "Foo" will store C<value> ("foo">) into subfield C<b>,
+C<other> ("FOO">) into subfield C<a> and the literal value
+"rdacontent" into C<2>.
+
+=item * C<minlength>; optional, defaults to 3
+
+Input length that will trigger the autocomplete.
+
+=back
+
 =head2 Usage in Koha
 
 You will need to write a C<value_builder> Perl script and put it into
 F</usr/share/koha/intranet/cgi-bin/cataloguing/value_builder>. You can
-find some example value-builder scripts in L<example/>. The should
+find some example value-builder scripts in F<example/>. The should
 look something like this:
 
   #!/usr/bin/perl

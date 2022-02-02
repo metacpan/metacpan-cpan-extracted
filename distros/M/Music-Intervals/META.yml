@@ -6,6 +6,7 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Test::Exception: '0'
   Test::More: '0'
   perl: '5.006'
 configure_requires:
@@ -34,7 +35,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-Intervals
   repository: https://github.com/ology/Music-Intervals.git
-version: '0.0707'
+version: '0.0711'
 x_Dist_Zilla:
   perl:
     version: '5.032001'

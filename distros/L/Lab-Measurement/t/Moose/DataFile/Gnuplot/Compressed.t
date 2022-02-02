@@ -39,7 +39,7 @@ my $expected = <<"EOF";
 # A\tB\tC
 0.7\t2\t3
 
-# YOLO
+#YOLO
 2\t3\t4
 EOF
 

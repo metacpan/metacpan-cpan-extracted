@@ -38,15 +38,15 @@ is( $classmeta->name, "Sandviĉon", '$classmeta->name' );
    is( $methodmeta->name, "manĝu", '$methodmeta->name' );
 }
 
-# slots
+# fields
 {
    # accessors
    $s->set_tranĉaĵoj( 3 );
-   is( $s->tranĉaĵoj, 3, 'Can obtain value from slot via accessor' );
+   is( $s->tranĉaĵoj, 3, 'Can obtain value from field via accessor' );
 
-   my $slotmeta = $classmeta->get_slot( '$tranĉaĵoj' );
-   ok( $slotmeta, 'Can obtain slotmeta for UTF-8 slot name' );
-   is( $slotmeta->name, '$tranĉaĵoj', '$slotmeta->name' );
+   my $fieldmeta = $classmeta->get_field( '$tranĉaĵoj' );
+   ok( $fieldmeta, 'Can obtain fieldmeta for UTF-8 field name' );
+   is( $fieldmeta->name, '$tranĉaĵoj', '$fieldmeta->name' );
 
    # params
    is( Sandviĉon->new( tranĉaĵoj => 2 )->tranĉaĵoj, 2,

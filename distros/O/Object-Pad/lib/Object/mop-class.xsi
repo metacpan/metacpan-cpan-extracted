@@ -292,16 +292,16 @@ direct_methods(self)
     XSRETURN(retcount);
 
 SV *
-add_slot(self, slotname, ...)
+add_field(self, fieldname, ...)
     SV *self
-    SV *slotname
+    SV *fieldname
   CODE:
   {
     dKWARG(2);
 
     ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
 
-    SlotMeta *slotmeta = mop_class_add_slot(meta, sv_mortalcopy(slotname));
+    FieldMeta *fieldmeta = mop_class_add_field(meta, sv_mortalcopy(fieldname));
 
     static const char *args[] = {
       "default",
@@ -316,88 +316,88 @@ add_slot(self, slotname, ...)
     while(KWARG_NEXT(args)) {
       switch(kwarg) {
         case 0: /* default */
-          if(slotmeta->defaultsv)
-            SvREFCNT_dec(slotmeta->defaultsv);
-          slotmeta->defaultsv = newSVsv(kwval);
+          if(fieldmeta->defaultsv)
+            SvREFCNT_dec(fieldmeta->defaultsv);
+          fieldmeta->defaultsv = newSVsv(kwval);
           break;
 
         case 1: /* param */
-          mop_slot_apply_attribute(slotmeta, "param", kwval);
+          mop_field_apply_attribute(fieldmeta, "param", kwval);
           break;
 
         case 2: /* reader */
-          mop_slot_apply_attribute(slotmeta, "reader", kwval);
+          mop_field_apply_attribute(fieldmeta, "reader", kwval);
           break;
 
         case 3: /* writer */
-          mop_slot_apply_attribute(slotmeta, "writer", kwval);
+          mop_field_apply_attribute(fieldmeta, "writer", kwval);
           break;
 
         case 4: /* mutator */
-          mop_slot_apply_attribute(slotmeta, "mutator", kwval);
+          mop_field_apply_attribute(fieldmeta, "mutator", kwval);
           break;
 
         case 5: /* accessor */
-          mop_slot_apply_attribute(slotmeta, "accessor", kwval);
+          mop_field_apply_attribute(fieldmeta, "accessor", kwval);
           break;
 
         case 6: /* weak */
-          mop_slot_apply_attribute(slotmeta, "weak", NULL);
+          mop_field_apply_attribute(fieldmeta, "weak", NULL);
           break;
       }
     }
 
-    mop_slot_seal(slotmeta);
+    mop_field_seal(fieldmeta);
 
     RETVAL = newSV(0);
-    sv_setref_uv(RETVAL, "Object::Pad::MOP::Slot", PTR2UV(slotmeta));
+    sv_setref_uv(RETVAL, "Object::Pad::MOP::Field", PTR2UV(fieldmeta));
   }
   OUTPUT:
     RETVAL
 
 void
-get_slot(self, slotname)
+get_field(self, fieldname)
     SV *self
-    SV *slotname
+    SV *fieldname
   PPCODE:
   {
     ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
 
-    AV *slots = meta->direct_slots;
-    U32 nslots = av_count(slots);
+    AV *fields = meta->direct_fields;
+    U32 nfields = av_count(fields);
 
-    SLOTOFFSET i;
-    for(i = 0; i < nslots; i++) {
-      SlotMeta *slotmeta = (SlotMeta *)AvARRAY(slots)[i];
+    FIELDOFFSET i;
+    for(i = 0; i < nfields; i++) {
+      FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
 
-      if(!sv_eq(slotmeta->name, slotname))
+      if(!sv_eq(fieldmeta->name, fieldname))
         continue;
 
       ST(0) = sv_newmortal();
-      sv_setref_iv(ST(0), "Object::Pad::MOP::Slot", PTR2UV(slotmeta));
+      sv_setref_iv(ST(0), "Object::Pad::MOP::Field", PTR2UV(fieldmeta));
       XSRETURN(1);
     }
 
-    croak("Class %" SVf " does not have a slot called '%" SVf "'",
-      meta->name, slotname);
+    croak("Class %" SVf " does not have a field called '%" SVf "'",
+      meta->name, fieldname);
   }
 
 void
-slots(self)
+fields(self)
     SV *self
   PPCODE:
     ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
 
-    AV *slots = meta->direct_slots;
-    U32 nslots = av_count(slots);
+    AV *fields = meta->direct_fields;
+    U32 nfields = av_count(fields);
 
-    EXTEND(SP, nslots);
+    EXTEND(SP, nfields);
 
-    SLOTOFFSET i;
-    for(i = 0; i < nslots; i++) {
-      SlotMeta *slotmeta = (SlotMeta *)AvARRAY(slots)[i];
+    FIELDOFFSET i;
+    for(i = 0; i < nfields; i++) {
+      FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
 
       ST(i) = sv_newmortal();
-      sv_setref_iv(ST(i), "Object::Pad::MOP::Slot", PTR2UV(slotmeta));
+      sv_setref_iv(ST(i), "Object::Pad::MOP::Field", PTR2UV(fieldmeta));
     }
-    XSRETURN(nslots);
+    XSRETURN(nfields);

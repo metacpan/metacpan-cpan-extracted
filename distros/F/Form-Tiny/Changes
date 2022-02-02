@@ -1,5 +1,10 @@
 Revision history for Perl extension Form::Tiny.
 
+2.09 Tue Feb 1 2022
+	- is_validated and clear_valid methods are deprecated: see Manual::Compatibility
+	- bugfix: only run after_validate hook if the validation occured at all
+	- hook calls during validation have been inlined (optimization)
+
 2.08 Sat Jan 29 2022
 	- cleanup and further optimization
 

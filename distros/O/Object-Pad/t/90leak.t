@@ -27,7 +27,7 @@ use Object::Pad;
 }
 
 {
-   class WithContainerSlots {
+   class WithContainerFields {
       has @array;
       has %hash;
 
@@ -37,7 +37,7 @@ use Object::Pad;
       }
    }
 
-   no_growth { WithContainerSlots->new };
+   no_growth { WithContainerFields->new };
 }
 
 done_testing;

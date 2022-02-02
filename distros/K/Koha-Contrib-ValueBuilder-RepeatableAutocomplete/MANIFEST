@@ -10,6 +10,7 @@ cpanfile
 dist.ini
 example/autocomplete_rda_creator.pl
 example/autocomplete_rda_other_agent.pl
+example/autocomplete_set_multiple_subfields.pl
 lib/Koha/Contrib/ValueBuilder/RepeatableAutocomplete.pm
 lib/Koha/Contrib/ValueBuilder/RepeatableAutocomplete/RDA.pm
 t/00-compile.t

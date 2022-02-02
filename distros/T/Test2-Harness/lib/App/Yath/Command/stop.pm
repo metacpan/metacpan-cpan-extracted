@@ -2,7 +2,7 @@ package App::Yath::Command::stop;
 use strict;
 use warnings;
 
-our $VERSION = '1.000099';
+our $VERSION = '1.000100';
 
 use Time::HiRes qw/sleep/;
 
@@ -552,6 +552,19 @@ Can be specified multiple times
 =item --no-durations
 
 Point at a json file or url which has a hash of relative test filenames as keys, and 'SHORT', 'MEDIUM', or 'LONG' as values. This will override durations listed in the file headers. An exception will be thrown if the durations file or url does not work.
+
+
+=item --durations-threshold ARG
+
+=item --durations-threshold=ARG
+
+=item --Dt ARG
+
+=item --Dt=ARG
+
+=item --no-durations-threshold
+
+Only fetch duration data if running at least this number of tests. Default (-j value + 1)
 
 
 =item --exclude-file t/nope.t

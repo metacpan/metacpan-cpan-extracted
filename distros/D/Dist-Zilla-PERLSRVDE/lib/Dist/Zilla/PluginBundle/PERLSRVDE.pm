@@ -7,7 +7,7 @@ use v5.24;
 use strict;
 use warnings;
 
-our $VERSION = '0.0.2'; # VERSION
+our $VERSION = '0.0.3'; # VERSION
 
 use namespace::autoclean;
 
@@ -299,7 +299,7 @@ Dist::Zilla::PluginBundle::PERLSRVDE - The plugin bundle we use at Perl-Services
 
 =head1 VERSION
 
-version 0.0.2
+version 0.0.3
 
 =head1 SYNOPSIS
 

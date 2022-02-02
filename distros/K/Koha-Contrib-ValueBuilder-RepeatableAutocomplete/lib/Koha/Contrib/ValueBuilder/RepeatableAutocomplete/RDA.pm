@@ -5,7 +5,7 @@ use utf8;
 
 # ABSTRACT: Values for MARC21 based on RDA
 
-our $VERSION = '1.002'; # VERSION
+our $VERSION = '1.003'; # VERSION
 
 use Koha::Contrib::ValueBuilder::RepeatableAutocomplete;
 use Exporter 'import';
@@ -214,7 +214,7 @@ Koha::Contrib::ValueBuilder::RepeatableAutocomplete::RDA - Values for MARC21 bas
 
 =head1 VERSION
 
-version 1.002
+version 1.003
 
 =head1 SYNOPSIS
 

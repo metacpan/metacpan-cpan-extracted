@@ -1,5 +1,10 @@
 Changes for Koha::Contrib::ValueBuilder::RepeatableAutocomplete
 
+1.003     2022-02-01 16:54:31+01:00
+    - add build_builder_inline_multiple to set multiple subfields
+    - use defined-or so we can have a minLength of 0
+
+
 1.002     2022-01-26 22:07:46+01:00
     - fix botched export list
 

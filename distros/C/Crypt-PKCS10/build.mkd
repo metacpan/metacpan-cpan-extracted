@@ -1,0 +1,38 @@
+# To build a release:
+
+Note: Replace '0.10' in the examples below with the current version.
+
+* Switch to develop branch and update it with latest commits
+
+* Start release branch
+
+    # Set the modver to the new version number
+    modver=0.10
+    git flow release start $modver develop
+
+* Make any last-minute fixes
+
+* Run unit tests
+
+    minil test
+
+* Bump version number in lib/Crypt/X509.pm
+
+    perl -i -pe "s{^our \\\$VERSION.+}{our \\\$VERSION = '$modver';};" lib/Crypt/PKCS10.pm
+    perl -i -pe "s{^version: .+}{version:            '$modver';};" META.json
+    git add lib/Crypt/PKCS10.pm META.json
+    git commit -m "bump version to $modver"
+
+* Finalize release (write the version number in the TAG\_MSG)
+
+    git flow release finish "$modver" && \
+    git push origin develop master "$modver"
+
+* Build tarball
+
+    minil dist
+
+* Upload tarball to https://pause.perl.org
+
+    minil release
+

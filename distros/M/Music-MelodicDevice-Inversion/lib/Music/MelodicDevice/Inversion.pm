@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Apply melodic inversion to a series of notes
 
-our $VERSION = '0.0400';
+our $VERSION = '0.0501';
 
 use Data::Dumper::Compact qw(ddc);
 use List::SomeUtils qw(first_index);
@@ -80,6 +80,8 @@ sub intervals {
 sub invert {
     my ($self, $note, $notes) = @_;
 
+    my $named = $note =~ /[A-G]/ ? 1 : 0;
+
     my @inverted = ($note);
 
     my $intervals = $self->intervals($notes);
@@ -89,7 +91,9 @@ sub invert {
         (my $i, $note) = $self->_find_pitch($note);
         my $pitch = $self->_scale->[ $i - $interval ];
 
-        $note = Music::Note->new($pitch, 'midinum')->format('ISO');
+        $note = $named
+            ? Music::Note->new($pitch, 'midinum')->format('ISO')
+            : $pitch;
 
         push @inverted, $note;
     }
@@ -101,8 +105,12 @@ sub invert {
 
 sub _find_pitch {
     my ($self, $pitch) = @_;
-    $pitch = Music::Note->new($pitch, 'ISO')->format('midinum');
+
+    $pitch = Music::Note->new($pitch, 'ISO')->format('midinum')
+        if $pitch =~ /[A-G]/;
+
     my $i = first_index { $_ eq $pitch } @{ $self->_scale };
+
     return $i, $pitch;
 }
 
@@ -120,30 +128,30 @@ Music::MelodicDevice::Inversion - Apply melodic inversion to a series of notes
 
 =head1 VERSION
 
-version 0.0400
+version 0.0501
 
 =head1 SYNOPSIS
 
   use Music::MelodicDevice::Inversion;
 
-  my @notes = qw(C4 E4 D4 G4 C5);
+  my @notes = qw(C4 E4 D4 G4 C5); # either named notes or midinums
 
   # Chromatic
   my $md = Music::MelodicDevice::Inversion->new;
-  my $intervals = $md->intervals(\@notes); # [4, -2, 5, 5]
+  my $intervals = $md->intervals(\@notes);   # [4, -2, 5, 5]
   my $inverted = $md->invert('C4', \@notes); # [C4, G#3, A#3, F3, C3]
 
   # Diatonic
   $md = Music::MelodicDevice::Inversion->new(scale_name => 'major');
-  $intervals = $md->intervals(\@notes); # [2, -1, 3, 3]
+  $intervals = $md->intervals(\@notes);   # [2, -1, 3, 3]
   $inverted = $md->invert('C4', \@notes); # [C4, A3, B3, F3, C3]
 
 =head1 DESCRIPTION
 
 C<Music::MelodicDevice::Inversion> applies intervallic melodic
 inversions, both chromatic or diatonic, to a series of ISO formatted
-notes.  Basically, this flips a melody upside-down given a starting
-note.
+or "midinum" notes.  Basically, this flips a melody upside-down given
+a starting note.
 
 While there are a couple modules on CPAN that do various versions of
 melodic inversion, none appear to apply to an arbitrary series of
@@ -176,7 +184,7 @@ Default: C<0>
   $md = Music::MelodicDevice::Inversion->new(
     scale_note => $scale_note,
     scale_name => $scale_name,
-    verbose => $verbose,
+    verbose    => $verbose,
   );
 
 Create a new C<Music::MelodicDevice::Inversion> object.
@@ -221,7 +229,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gene Boggs.
+This software is copyright (c) 2022 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

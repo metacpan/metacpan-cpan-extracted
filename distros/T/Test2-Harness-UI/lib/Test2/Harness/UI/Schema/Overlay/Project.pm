@@ -9,7 +9,7 @@ use Carp qw/confess/;
 confess "You must first load a Test2::Harness::UI::Schema::NAME module"
     unless $Test2::Harness::UI::Schema::LOADED;
 
-our $VERSION = '0.000104';
+our $VERSION = '0.000105';
 
 sub last_covered_run {
     my $self = shift;
@@ -49,17 +49,25 @@ sub durations {
     my $schema = $self->result_source->schema;
     my $dbh = $schema->storage->dbh;
 
-    my $sth = $dbh->prepare(<<"    EOT");
+    my $query = <<"    EOT";
         SELECT test_files.filename, jobs.duration
           FROM jobs
           JOIN runs USING(run_id)
           JOIN test_files USING(test_file_id)
+          JOIN users USING(user_id)
          WHERE runs.project_id = ?
            AND jobs.duration IS NOT NULL
            AND test_files.filename IS NOT NULL
     EOT
+    my @vals = ($self->project_id);
 
-    $sth->execute($self->project_id) or die $sth->errstr;
+    if (my $username = $params{user}) {
+        $query .= "AND users.username = ?";
+        push @vals => $username;
+    }
+
+    my $sth = $dbh->prepare($query);
+    $sth->execute(@vals) or die $sth->errstr;
     my $rows = $sth->fetchall_arrayref;
 
     my $data = {};

@@ -1,6 +1,6 @@
 package SPVM::Math;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 1;
 
@@ -14,17 +14,17 @@ B<L<SPVM> is yet before 1.0 released. L<SPVM> is changed without warnings. There
 
 =head1 SYNOPSYS
 
-=head2 Perl
-  
-  use SPVM 'Math';
-  
-  my $sin = SPVM::Math->sin(SPVM::Math->PI / 4);
-
 =head2 SPVM
 
   use Math;
   
   my $sin = Math->sin(Math->PI / 4);
+
+=head2 Perl
+  
+  use SPVM 'Math';
+  
+  my $sin = SPVM::Math->sin(SPVM::Math->PI / 4);
 
 =head1 DESCRIPTION
 

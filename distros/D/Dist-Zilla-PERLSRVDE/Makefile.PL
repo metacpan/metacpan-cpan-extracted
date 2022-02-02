@@ -37,9 +37,12 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Plugin::Test::NoBOM" => 0,
     "Dist::Zilla::Plugin::Test::NoTabs" => 0,
     "Dist::Zilla::Plugin::Test::Perl::Critic" => 0,
-    "Dist::Zilla::PluginBundle::Git" => 0
+    "Dist::Zilla::PluginBundle::Git" => 0,
+    "Dist::Zilla::Role::PluginBundle::Config::Slicer" => 0,
+    "Dist::Zilla::Role::PluginBundle::Easy" => 0,
+    "Dist::Zilla::Role::PluginBundle::PluginRemover" => 0
   },
-  "VERSION" => "0.0.2",
+  "VERSION" => "0.0.3",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -67,7 +70,10 @@ my %FallbackPrereqs = (
   "Dist::Zilla::Plugin::Test::NoBOM" => 0,
   "Dist::Zilla::Plugin::Test::NoTabs" => 0,
   "Dist::Zilla::Plugin::Test::Perl::Critic" => 0,
-  "Dist::Zilla::PluginBundle::Git" => 0
+  "Dist::Zilla::PluginBundle::Git" => 0,
+  "Dist::Zilla::Role::PluginBundle::Config::Slicer" => 0,
+  "Dist::Zilla::Role::PluginBundle::Easy" => 0,
+  "Dist::Zilla::Role::PluginBundle::PluginRemover" => 0
 );
 
 

@@ -9,7 +9,7 @@ use Object::Pad;
 
 {
    ok( !eval <<'EOPERL',
-      has $slot;
+      has $field;
 EOPERL
       'has outside class fails' );
    like( $@, qr/^Cannot 'has' outside of 'class' at /,
@@ -20,7 +20,7 @@ EOPERL
 {
    ok( !eval <<'EOPERL',
       class AClass { }
-      has $slot;
+      has $field;
 EOPERL
       'has after closed class block fails' );
    like( $@, qr/^Cannot 'has' outside of 'class' at /);

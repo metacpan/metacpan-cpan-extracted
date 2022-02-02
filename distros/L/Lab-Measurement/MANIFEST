@@ -166,6 +166,7 @@ lib/Lab/Moose/Instrument/KeysightB2901A.pm
 lib/Lab/Moose/Instrument/KeysightDSOS604A.pm
 lib/Lab/Moose/Instrument/KeysightE3633E.pm
 lib/Lab/Moose/Instrument/Lakeshore340.pm
+lib/Lab/Moose/Instrument/Lakeshore340/Helium3.pm
 lib/Lab/Moose/Instrument/Lakeshore372.pm
 lib/Lab/Moose/Instrument/LinearStepSweep.pm
 lib/Lab/Moose/Instrument/Log.pm

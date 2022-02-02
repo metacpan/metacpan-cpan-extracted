@@ -1,5 +1,5 @@
 {
-   "abstract" : "a simple syntax for lexical slot-based objects",
+   "abstract" : "a simple syntax for lexical field-based objects",
    "author" : [
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
@@ -35,7 +35,6 @@
       },
       "test" : {
          "requires" : {
-            "Data::Dump" : "0",
             "Test::Fatal" : "0",
             "Test::More" : "0.88",
             "Test::Refcount" : "0"
@@ -45,27 +44,27 @@
    "provides" : {
       "Object::Pad" : {
          "file" : "lib/Object/Pad.pm",
-         "version" : "0.59"
+         "version" : "0.60"
       },
       "Object::Pad::ExtensionBuilder" : {
          "file" : "lib/Object/Pad/ExtensionBuilder.pm",
-         "version" : "0.59"
+         "version" : "0.60"
       },
       "Object::Pad::MOP::Class" : {
          "file" : "lib/Object/Pad/MOP/Class.pm",
-         "version" : "0.59"
+         "version" : "0.60"
+      },
+      "Object::Pad::MOP::Field" : {
+         "file" : "lib/Object/Pad/MOP/Field.pm",
+         "version" : "0.60"
+      },
+      "Object::Pad::MOP::FieldAttr" : {
+         "file" : "lib/Object/Pad/MOP/FieldAttr.pm",
+         "version" : "0.60"
       },
       "Object::Pad::MOP::Method" : {
          "file" : "lib/Object/Pad/MOP/Method.pm",
-         "version" : "0.59"
-      },
-      "Object::Pad::MOP::Slot" : {
-         "file" : "lib/Object/Pad/MOP/Slot.pm",
-         "version" : "0.59"
-      },
-      "Object::Pad::MOP::SlotAttr" : {
-         "file" : "lib/Object/Pad/MOP/SlotAttr.pm",
-         "version" : "0.59"
+         "version" : "0.60"
       }
    },
    "release_status" : "stable",
@@ -74,6 +73,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.59",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.60",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

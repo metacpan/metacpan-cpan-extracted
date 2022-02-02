@@ -1,6 +1,6 @@
 NAME
 
-    Object::Pad - a simple syntax for lexical slot-based objects
+    Object::Pad - a simple syntax for lexical field-based objects
 
 SYNOPSIS
 
@@ -69,8 +69,8 @@ DESCRIPTION
 
     Classes are automatically provided with a constructor method, called
     new, which helps create the object instances. This may respond to
-    passed arguments, automatically assigning values of slots, and invoking
-    other blocks of code provided by the class. It proceeds in the
+    passed arguments, automatically assigning values of fields, and
+    invoking other blocks of code provided by the class. It proceeds in the
     following stages:
 
   The BUILDARGS phase
@@ -82,17 +82,17 @@ DESCRIPTION
 
        @args = $class->BUILDARGS( @_ )
 
-  Slot assignment
+  Field assignment
 
-    If any slot in the class has the :param attribute, then the constructor
-    will expect to receive its argmuents in an even-sized list of
-    name/value pairs. This applies even to slots inherited from the parent
-    class or applied roles. It is therefore a good idea to shape the
+    If any field in the class has the :param attribute, then the
+    constructor will expect to receive its argmuents in an even-sized list
+    of name/value pairs. This applies even to fields inherited from the
+    parent class or applied roles. It is therefore a good idea to shape the
     parameters to the constructor in this way in roles, and in classes if
     you intend your class to be extended.
 
     The constructor will also check for required parameters (these are all
-    the parameters for slots that do not have default initialisation
+    the parameters for fields that do not have default initialisation
     expressions). If any of these are missing an exception is thrown.
 
   The BUILD phase
@@ -106,8 +106,8 @@ DESCRIPTION
   The ADJUST phase
 
     Next, the ADJUST and ADJUSTPARAMS block of every component class is
-    invoked. This happens after the slots are assigned their initial values
-    and the BUILD blocks have been run.
+    invoked. This happens after the fields are assigned their initial
+    values and the BUILD blocks have been run.
 
     Note also that both ADJUST and ADJUSTPARAMS blocks happen at the same
     time, in declaration order. The ADJUSTPARAMS blocks do not form their
@@ -118,7 +118,7 @@ DESCRIPTION
     Finally, before the object is returned, if the ":strict(params)" class
     attribute is present, then the constructor will throw an exception if
     there are any remaining named arguments left over after assigning them
-    to slots as per :param declarations, and running any ADJUSTPARAMS
+    to fields as per :param declarations, and running any ADJUSTPARAMS
     blocks.
 
 KEYWORDS
@@ -182,7 +182,7 @@ KEYWORDS
     An optional list of attributes may be supplied in similar syntax as for
     subs or lexical variables. (These are annotations about the class
     itself; the concept should not be confused with per-object-instance
-    data, which here is called "slots").
+    data, which here is called "fields").
 
     Whitespace is permitted within the value and is automatically trimmed,
     but as standard Perl parsing rules, no space is permitted between the
@@ -298,7 +298,7 @@ KEYWORDS
     Can only be applied to classes that contain no BUILD blocks. If set,
     then the constructor will complain about any unrecognised named
     arguments passed to it (i.e. names that do not correspond to the :param
-    of any defined slot and left unconsumed by any ADJUSTPARAMS block).
+    of any defined field and left unconsumed by any ADJUSTPARAMS block).
 
     Since BUILD blocks can inspect the arguments arbitrarily, the presence
     of any such block means the constructor cannot determine which named
@@ -340,17 +340,17 @@ KEYWORDS
           requires METHOD;
        }
 
-    A role can provide instance slots. These are visible to any BUILD
+    A role can provide instance fields. These are visible to any BUILD
     blocks or methods provided by that role.
 
     Since version 0.33.
 
        role Name {
-          has $slot;
+          has $field;
     
-          BUILD { $slot = "a value" }
+          BUILD { $field = "a value" }
     
-          method slot { return $slot }
+          method field { return $field }
        }
 
     Since version 0.57 a role can declare that it provides another role:
@@ -383,10 +383,11 @@ KEYWORDS
     still provide code for existing classes written in classical Perl that
     has not yet been rewritten to use Object::Pad.
 
-    The tradeoff is that a :compat(invokable) role may not create slot data
-    using the "has" keyword. Whatever behaviours the role wishes to perform
-    must be provided only by calling other methods on $self, or perhaps by
-    making assumptions about the representation type of instances.
+    The tradeoff is that a :compat(invokable) role may not create field
+    data using the "has" keyword. Whatever behaviours the role wishes to
+    perform must be provided only by calling other methods on $self, or
+    perhaps by making assumptions about the representation type of
+    instances.
 
     It should be stressed again: This option is only intended for gradual
     upgrade of existing classical Perl code into using Object::Pad. When
@@ -406,8 +407,8 @@ KEYWORDS
        has $var { BLOCK };
 
     Declares that the instances of the class or role have a member field of
-    the given name. This member field (called a "slot") will be accessible
-    as a lexical variable within any method declarations in the class.
+    the given name. This member field will be accessible as a lexical
+    variable within any method declarations in the class.
 
     Array and hash members are permitted and behave as expected; you do not
     need to store references to anonymous arrays or hashes.
@@ -418,24 +419,24 @@ KEYWORDS
     to use "method" to create an accessor, or use the attributes such as
     ":reader" to get one generated.
 
-    A scalar slot may provide a expression that gives an initialisation
-    value, which will be assigned into the slot of every instance during
+    A scalar field may provide a expression that gives an initialisation
+    value, which will be assigned into the field of every instance during
     the constructor before the BUILD blocks are invoked. Since version 0.29
     this expression does not have to be a compiletime constant, though it
     is evaluated exactly once, at runtime, after the class definition has
     been parsed. It is not evaluated individually for every object instance
     of that class. Since version 0.54 this is also permitted on array and
-    hash slots.
+    hash fields.
 
-  Slot Initialiser Blocks
+  Field Initialiser Blocks
 
     Since version 0.54 a deferred statement block is also permitted, on any
-    slot variable type. This is an experimental feature that permits code
+    field variable type. This is an experimental feature that permits code
     to be executed as part of the instance constructor, rather than running
-    just once when the class is set up. Code in a slot initialisation block
-    is roughly equivalent to being placed in a BUILD or ADJUST block.
+    just once when the class is set up. Code in a field initialisation
+    block is roughly equivalent to being placed in a BUILD or ADJUST block.
 
-    Control flow that attempts to leave a slot initialiser block is not
+    Control flow that attempts to leave a field initialiser block is not
     permitted. This includes any return expression, any next/last/redo
     outside of a loop, with a dynamically-calculated label expression, or
     with a label that it doesn't appear in. goto statements are also
@@ -444,27 +445,27 @@ KEYWORDS
     Loop control expressions that are known at compiletime to affect a loop
     that they appear within are permitted.
 
-       has $slot { foreach(@list) { next; } }       # this is fine
+       has $field { foreach(@list) { next; } }       # this is fine
     
-       has $slot { LOOP: while(1) { last LOOP; } }  # this is fine too
+       has $field { LOOP: while(1) { last LOOP; } }  # this is fine too
 
-    The following slot attributes are supported:
+    The following field attributes are supported:
 
   :reader, :reader(NAME)
 
     Since version 0.27.
 
-    Generates a reader method to return the current value of the slot. If
-    no name is given, the name of the slot is used. A single prefix
+    Generates a reader method to return the current value of the field. If
+    no name is given, the name of the field is used. A single prefix
     character _ will be removed if present.
 
-       has $slot :reader;
+       has $field :reader;
     
        # equivalent to
-       has $slot;  method slot { return $slot }
+       has $field;  method field { return $field }
 
-    Since version 0.55 these are permitted on any slot type, but prior
-    versions only allowed them on scalar slots. The reader method behaves
+    Since version 0.55 these are permitted on any field type, but prior
+    versions only allowed them on scalar fields. The reader method behaves
     identically to how a lexical variable would behave in the same context;
     namely returning a list of values from an array or key/value pairs from
     a hash when in list context, or the number of items or keys when in
@@ -480,14 +481,14 @@ KEYWORDS
 
     Since version 0.27.
 
-    Generates a writer method to set a new value of the slot from its
-    arguments. If no name is given, the name of the slot is used prefixed
+    Generates a writer method to set a new value of the field from its
+    arguments. If no name is given, the name of the field is used prefixed
     by set_. A single prefix character _ will be removed if present.
 
-       has $slot :writer;
+       has $field :writer;
     
        # equivalent to
-       has $slot;  method set_slot { $slot = shift; return $self }
+       has $field;  method set_field { $field = shift; return $self }
 
     Since version 0.28 a generated writer method will return the object
     invocant itself, allowing a chaining style.
@@ -496,9 +497,9 @@ KEYWORDS
           ->set_y("y")
           ->set_z("z");
 
-    Since version 0.55 these are permitted on any slot type, but prior
-    versions only allowed them on scalar slots. On arrays or hashes, the
-    writer method takes a list of values to be assigned into the slot,
+    Since version 0.55 these are permitted on any field type, but prior
+    versions only allowed them on scalar fields. On arrays or hashes, the
+    writer method takes a list of values to be assigned into the field,
     completely replacing any values previously there.
 
   :mutator, :mutator(NAME)
@@ -506,14 +507,14 @@ KEYWORDS
     Since version 0.27.
 
     Generates an lvalue mutator method to return or set the value of the
-    slot. These are only permitted for scalar slots. If no name is given,
-    the name of the slot is used. A single prefix character _ will be
+    field. These are only permitted for scalar fields. If no name is given,
+    the name of the field is used. A single prefix character _ will be
     removed if present.
 
-       has $slot :mutator;
+       has $field :mutator;
     
        # equivalent to
-       has $slot;  method slot :lvalue { $slot }
+       has $field;  method field :lvalue { $field }
 
     Since version 0.28 all of these generated accessor methods will include
     argument checking similar to that used by subroutine signatures, to
@@ -525,47 +526,47 @@ KEYWORDS
     Since version 0.53.
 
     Generates a combined reader-writer accessor method to set or return the
-    value of the slot. These are only permitted for scalar slots. If no
-    name is given, the name of the slot is used. A prefix character _ will
+    value of the field. These are only permitted for scalar fields. If no
+    name is given, the name of the field is used. A prefix character _ will
     be removed if present.
 
     This method takes either zero or one additional arguments. If an
-    argument is passed, the value of the slot is set from this argument
+    argument is passed, the value of the field is set from this argument
     (even if it is undef). If no argument is passed (i.e. scalar @_ is
-    false) then the slot is not modified. In either case, the value of the
-    slot is then returned.
+    false) then the field is not modified. In either case, the value of the
+    field is then returned.
 
-       has $slot :accessor;
+       has $field :accessor;
     
        # equivalent to
-       has $slot;
+       has $field;
     
-       method slot {
-          $slot = shift if @_;
-          return $slot;
+       method field {
+          $field = shift if @_;
+          return $field;
        }
 
   :weak
 
     Since version 0.44.
 
-    Generated code which sets the value of this slot will weaken it if it
+    Generated code which sets the value of this field will weaken it if it
     contains a reference. This applies to within the constructor if :param
     is given, and to a :writer accessor method. Note that this only applies
     to automatically generated code; not normal code written in regular
-    method bodies. If you assign into the slot variable you must remember
+    method bodies. If you assign into the field variable you must remember
     to call Scalar::Util::weaken yourself.
 
   :param, :param(NAME)
 
     Since version 0.41.
 
-    Sets this slot to be initialised automatically in the generated
-    constructor. This is only permitted on scalar slots. If no name is
-    given, the name of the slot is used. A single prefix character _ will
+    Sets this field to be initialised automatically in the generated
+    constructor. This is only permitted on scalar fields. If no name is
+    given, the name of the field is used. A single prefix character _ will
     be removed if present.
 
-    Any slot that has :param but does not have a default initialisation
+    Any field that has :param but does not have a default initialisation
     expression or block becomes a required argument to the constructor.
     Attempting to invoke the constructor without a named argument for this
     will throw an exception. In order to make a parameter optional, make
@@ -575,12 +576,12 @@ KEYWORDS
        has $x :param;          # this is required
        has $z :param = undef;  # this is optional
 
-    Any slot that has a :param and an initialisation block will only run
+    Any field that has a :param and an initialisation block will only run
     the code in the block if required by the constructor. If a named
-    parameter is passed to the constructor for this slot, then its code
+    parameter is passed to the constructor for this field, then its code
     block will not be executed.
 
-    Values for slots are assigned by the constructor before any BUILD
+    Values for fields are assigned by the constructor before any BUILD
     blocks are invoked.
 
  method
@@ -598,10 +599,10 @@ KEYWORDS
        }
 
     Declares a new named method. This behaves similarly to the sub keyword,
-    except that within the body of the method all of the member fields
-    ("slots") are also accessible. In addition, the method body will have a
-    lexical called $self which contains the invocant object directly; it
-    will already have been shifted from the @_ array.
+    except that within the body of the method all of the member fields are
+    also accessible. In addition, the method body will have a lexical
+    called $self which contains the invocant object directly; it will
+    already have been shifted from the @_ array.
 
     The signatures feature is automatically enabled for method
     declarations. In this case the signature does not have to account for
@@ -616,7 +617,8 @@ KEYWORDS
 
     A list of attributes may be supplied as for sub. The most useful of
     these is :lvalue, allowing easy creation of read-write accessors for
-    slots (but see also the :reader, :writer and :mutator slot attributes).
+    fields (but see also the :reader, :writer and :mutator field
+    attributes).
 
        class Counter {
           has $count;
@@ -659,7 +661,7 @@ KEYWORDS
        class WithPrivate {
           has $var;
     
-          # Lexical methods can still see instance slots as normal
+          # Lexical methods can still see instance fields as normal
           method $inc_var { $var++; say "Var was incremented"; }
           method $dec_var { $var--; say "Var was decremented"; }
     
@@ -715,9 +717,9 @@ KEYWORDS
     Since version 0.43.
 
     Declares an adjust block for this component class. This block of code
-    runs within the constructor, after any BUILD blocks and automatic slot
+    runs within the constructor, after any BUILD blocks and automatic field
     value assignment. It can make any final adjustments to the instance
-    (such as initialising slots from calculated values). No additional
+    (such as initialising fields from calculated values). No additional
     parameters are passed.
 
     An adjust block is not a subroutine and thus is not permitted to use
@@ -742,7 +744,7 @@ KEYWORDS
     constructor at the same time as "ADJUST" blocks, but receives in
     addition a reference to the hash containing the current constructor
     parameters. This hash will not contain any constructor parameters
-    already consumed by ":param" declarations on any slots, but only the
+    already consumed by ":param" declarations on any fields, but only the
     leftovers once those are processed.
 
     The code in the block should delete from this hash any parameters it
@@ -810,7 +812,7 @@ SUBCLASSING CLASSIC PERL CLASSES
     Note however that any methods invoked by the superclass constructor may
     not see the object in a fully consistent state. (This fact is not
     specific to using Object::Pad and would happen in classic Perl OO as
-    well). The slot initialisers will have been invoked but the BUILD
+    well). The field initialisers will have been invoked but the BUILD
     blocks will not.
 
     For example; in the following
@@ -836,7 +838,7 @@ SUBCLASSING CLASSIC PERL CLASSES
        say "Value seen by user is ", $obj->get_value;
 
     Until the ClassicPerlBaseClass::new superconstructor has returned the
-    BUILD block will not have been invoked. The $_value slot will still
+    BUILD block will not have been invoked. The $_value field will still
     exist, but its value will be B during the superconstructor. After the
     superconstructor, the BUILD blocks are invoked before the completed
     object is returned to the user. The result will therefore be:
@@ -890,9 +892,9 @@ STYLE SUGGESTIONS
     
        # has, methods, etc.. can go here
 
- Slot Names
+ Field Names
 
-    Slot names should follow similar rules to regular lexical variables in
+    Field names should follow similar rules to regular lexical variables in
     code - lowercase, name components separated by underscores. For tiny
     examples such as "dumb record" structures this may be sufficient.
 
@@ -902,9 +904,9 @@ STYLE SUGGESTIONS
        }
 
     In larger examples with lots of non-trivial method bodies, it can get
-    confusing to remember where the slot variables come from (because we no
-    longer have the $self->{ ... } visual clue). In these cases it is
-    suggested to prefix the slot names with a leading underscore, to make
+    confusing to remember where the field variables come from (because we
+    no longer have the $self->{ ... } visual clue). In these cases it is
+    suggested to prefix the field names with a leading underscore, to make
     them more visually distinct.
 
        class Spudger {
@@ -913,7 +915,7 @@ STYLE SUGGESTIONS
           ...
     
           method mangle {
-             $_grapefruit->peel; # The leading underscore reminds us this is a slot
+             $_grapefruit->peel; # The leading underscore reminds us this is a field
           }
        }
 
@@ -922,7 +924,7 @@ WITH OTHER MODULES
  Syntax::Keyword::Dynamically
 
     A cross-module integration test asserts that dynamically works
-    correctly on object instance slots:
+    correctly on object instance fields:
 
        use Object::Pad;
        use Syntax::Keyword::Dynamically;
@@ -958,19 +960,19 @@ WITH OTHER MODULES
        }
 
     These three modules combine; there is additionally a cross-module test
-    to ensure that object instance slots can be dynamically set during a
+    to ensure that object instance fields can be dynamically set during a
     suspended async method.
 
 DESIGN TODOs
 
-    The following points are details about the design of pad slot-based
+    The following points are details about the design of pad field-based
     object systems in general:
 
       * Is multiple inheritence actually required, if role composition is
-      implemented including giving roles the ability to use private slots?
+      implemented including giving roles the ability to use private fields?
 
-      * Consider the visibility of superclass slots to subclasses. Do
-      subclasses even need to be able to see their superclass's slots, or
+      * Consider the visibility of superclass fields to subclasses. Do
+      subclasses even need to be able to see their superclass's fields, or
       are accessor methods always appropriate?
 
       Concrete example: The $self->{split_at} access that
@@ -992,7 +994,7 @@ IMPLEMENTATION TODOs
 
         sub new { ... }
 
-      * The local modifier does not work on slot variables, because they
+      * The local modifier does not work on field variables, because they
       appear to be regular lexicals to the parser at that point. A
       workaround is to use Syntax::Keyword::Dynamically instead:
 

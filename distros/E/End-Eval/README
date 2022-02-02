@@ -2,7 +2,7 @@ NAME
     End::Eval - Take code from import arguments, then eval it in END block
 
 VERSION
-    This document describes version 0.001 of End::Eval (from Perl
+    This document describes version 0.002 of End::Eval (from Perl
     distribution End-Eval), released on 2021-08-06.
 
 SYNOPSIS
@@ -33,7 +33,8 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    Other "End::Eval::*" (like End::Eval::FirstArg) and "End::*" modules.
+    Other "End::Eval::*" (like End::Eval::FirstArg and End::Eval::Env) and
+    "End::*" modules.
 
     Other "Devel::End::*" modules (but this namespace is deprecated in favor
     of "End").

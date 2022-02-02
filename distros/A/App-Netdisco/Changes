@@ -1,3 +1,13 @@
+2.052001 - 01-02-2022
+
+  [ENHANCEMENTS]
+
+  * Do not macsuck suspended VLANs
+
+  [BUG FIXES]
+
+  * #852 NXOS SSHCollector should not fail on invalid IP string (@njohnsn)
+
 2.052000 - 2021-11-30
 
   [NEW FEATURES]

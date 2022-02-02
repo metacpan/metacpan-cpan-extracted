@@ -3,7 +3,7 @@ package End::Eval;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-08-06'; # DATE
 our $DIST = 'End-Eval'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use warnings;
@@ -36,7 +36,7 @@ End::Eval - Take code from import arguments, then eval it in END block
 
 =head1 VERSION
 
-This document describes version 0.001 of End::Eval (from Perl distribution End-Eval), released on 2021-08-06.
+This document describes version 0.002 of End::Eval (from Perl distribution End-Eval), released on 2021-08-06.
 
 =head1 SYNOPSIS
 
@@ -72,7 +72,8 @@ feature.
 
 =head1 SEE ALSO
 
-Other C<End::Eval::*> (like L<End::Eval::FirstArg>) and C<End::*> modules.
+Other C<End::Eval::*> (like L<End::Eval::FirstArg> and L<End::Eval::Env>) and
+C<End::*> modules.
 
 Other C<Devel::End::*> modules (but this namespace is deprecated in favor of
 C<End>).

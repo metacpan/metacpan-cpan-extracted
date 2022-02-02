@@ -1,6 +1,6 @@
 package Lab::Instrument::U2000;
 #ABSTRACT: Agilent U2000 series USB Power Sensor
-$Lab::Instrument::U2000::VERSION = '3.802';
+$Lab::Instrument::U2000::VERSION = '3.803';
 use v5.20;
 
 use strict;
@@ -251,7 +251,7 @@ Lab::Instrument::U2000 - Agilent U2000 series USB Power Sensor
 
 =head1 VERSION
 
-version 3.802
+version 3.803
 
 =head1 DESCRIPTION
 
@@ -304,7 +304,7 @@ Error reporting from the kernel driver is bad.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2022 by the Lab::Measurement team; in detail:
 
   Copyright 2012       Hermann Kraus
             2016       Simon Reinhardt

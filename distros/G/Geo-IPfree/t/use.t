@@ -3,4 +3,4 @@ use warnings;
 
 use Test::More tests => 1;
 
-use_ok( 'Geo::IPfree' );
+use_ok('Geo::IPfree');

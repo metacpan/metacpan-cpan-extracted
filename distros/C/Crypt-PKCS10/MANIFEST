@@ -6,6 +6,7 @@ MANIFEST
 META.json
 README
 README.md
+build.mkd
 cpanfile
 examples/dump_csr
 examples/verify_csr
@@ -25,6 +26,7 @@ t/csr5.pem
 t/csr6.pem
 t/csr7.pem
 t/csr8.pem
+t/csr9.pem
 weaver.ini
 xt/01_Kwalitee.t
 META.yml

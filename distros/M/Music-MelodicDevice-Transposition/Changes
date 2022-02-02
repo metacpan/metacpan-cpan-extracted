@@ -1,5 +1,12 @@
 Revision history for Music-MelodicDevice-Transposition
 
+0.0501 2022-01-31 19:13:05
+    - Improve documentation.
+
+0.0500 2022-01-31 18:58:11
+    - Use integer pitches as well as named notes.
+    - Update the eg/modulate program.
+
 0.0400 2020-12-28 09:57:25
     - Use a midinum scale & convert with Music::Note.
 

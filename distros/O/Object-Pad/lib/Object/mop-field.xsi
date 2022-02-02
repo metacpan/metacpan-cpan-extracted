@@ -1,0 +1,120 @@
+
+SV *
+name(self)
+    SV *self
+  ALIAS:
+    name  = 0
+    sigil = 1
+    class = 2
+  CODE:
+  {
+    FieldMeta *meta = NUM2PTR(FieldMeta *, SvUV(SvRV(self)));
+    switch(ix) {
+      case 0:
+        RETVAL = SvREFCNT_inc(meta->name);
+        break;
+      case 1:
+        RETVAL = newSVpvn(SvPVX(meta->name), 1);
+        break;
+      case 2:
+        RETVAL = newSV(0);
+        sv_setref_uv(RETVAL, "Object::Pad::MOP::Class", PTR2UV(meta->class));
+        break;
+
+      default: RETVAL = NULL;
+    }
+  }
+  OUTPUT:
+    RETVAL
+
+void
+value(self, obj)
+    SV *self
+    SV *obj
+  PPCODE:
+  {
+    FieldMeta *meta = NUM2PTR(FieldMeta *, SvUV(SvRV(self)));
+    ClassMeta *classmeta = meta->class;
+    SV *objrv;
+
+    if(!SvROK(obj) || !SvOBJECT(objrv = SvRV(obj)))
+      croak("Cannot fetch field value of a non-instance");
+
+    AV *backingav;
+    FIELDOFFSET fieldix;
+
+    if(classmeta->type == METATYPE_ROLE) {
+      HV *objstash = SvSTASH(objrv);
+      const char *key = HvNAME(objstash);
+      STRLEN klen = HvNAMELEN(objstash);
+      if(HvNAMEUTF8(objstash))
+        klen = -klen;
+
+      assert(key);
+      SV **svp = hv_fetch(classmeta->role.applied_classes, key, klen, 0);
+      if(!svp)
+        croak("Cannot fetch role field value from a non-applied instance");
+
+      RoleEmbedding *embedding = (RoleEmbedding *)*svp;
+
+      backingav = (AV *)get_obj_backingav(obj, embedding->classmeta->repr, true);
+      fieldix = meta->fieldix + embedding->offset;
+    }
+    else {
+      const char *stashname = HvNAME(classmeta->stash);
+
+      if(!stashname || !sv_derived_from(obj, stashname))
+        croak("Cannot fetch field value from a non-derived instance");
+
+      backingav = (AV *)get_obj_backingav(obj, classmeta->repr, true);
+      fieldix = meta->fieldix;
+    }
+
+    if(fieldix > av_top_index(backingav))
+      croak("ARGH: instance does not have a field at index %ld", (long int)fieldix);
+
+    SV *value = AvARRAY(backingav)[fieldix];
+
+    /* We must prevent caller from assigning to non-scalar fields, in case
+     * they break the SvTYPE of the value. We can't cancel the CvLVALUE but we
+     * can yield a READONLY value in this case */
+    if(SvPV_nolen(meta->name)[0] != '$') {
+      value = sv_mortalcopy(value);
+      SvREADONLY_on(value);
+    }
+
+    /* stack does not contribute SvREFCNT */
+    ST(0) = value;
+    XSRETURN(1);
+  }
+
+bool
+has_attribute(self, name)
+    SV *self
+    SV *name
+  CODE:
+  {
+    FieldMeta *meta = NUM2PTR(FieldMeta *, SvUV(SvRV(self)));
+
+    const struct FieldHook *hook = mop_field_get_attribute(meta, SvPV_nolen(name));
+    RETVAL = !!hook;
+  }
+  OUTPUT:
+    RETVAL
+
+SV *
+get_attribute_value(self, name)
+    SV *self
+    SV *name
+  CODE:
+  {
+    FieldMeta *meta = NUM2PTR(FieldMeta *, SvUV(SvRV(self)));
+
+    const struct FieldHook *hook = mop_field_get_attribute(meta, SvPV_nolen(name));
+    if(!hook)
+      croak("Field does not have an attribute called %" SVf, SVfARG(name));
+
+    RETVAL = newSVsv(hook->hookdata);
+  }
+  OUTPUT:
+    RETVAL

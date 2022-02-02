@@ -1,5 +1,5 @@
 package Net::Fortinet::FortiManager;
-$Net::Fortinet::FortiManager::VERSION = '0.001000';
+$Net::Fortinet::FortiManager::VERSION = '0.001001';
 # ABSTRACT: Fortinet FortiManager REST API client library
 
 use 5.024;
@@ -617,7 +617,7 @@ Net::Fortinet::FortiManager - Fortinet FortiManager REST API client library
 
 =head1 VERSION
 
-version 0.001000
+version 0.001001
 
 =head1 SYNOPSIS
 

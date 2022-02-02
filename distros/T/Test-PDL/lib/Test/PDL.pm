@@ -1,5 +1,5 @@
 package Test::PDL;
-$Test::PDL::VERSION = '0.17';
+$Test::PDL::VERSION = '0.19';
 # ABSTRACT: Test Perl Data Language arrays (a.k.a. ndarrays) for equality
 
 
@@ -65,6 +65,10 @@ sub _comparison_fails
 		not eval { PDL::all( PDL::isbad($got) == PDL::isbad($expected) ) } ) {
 		return 'bad value patterns do not match';
 	}
+	return 'values do not match'
+		if ( $got->isempty and !$expected->isempty)
+		or (!$got->isempty and  $expected->isempty);
+	return 0 if $got->isempty and $expected->isempty;
 	# if we get here, bad value patterns are sure to match
 	if( $got->type < PDL::float && $expected->type < PDL::float ) {
 		if( not eval { PDL::all( $got == $expected ) } ) {
@@ -183,7 +187,7 @@ Test::PDL - Test Perl Data Language arrays (a.k.a. ndarrays) for equality
 
 =head1 VERSION
 
-version 0.17
+version 0.19
 
 =head1 SYNOPSIS
 
@@ -480,6 +484,7 @@ above example.
 
 =for Pod::Coverage test_anyval test_byte test_short test_ushort test_long
 test_indx test_longlong test_float test_double test_cfloat test_cdouble
+test_cldouble test_ldouble test_sbyte test_ulong test_ulonglong
 
 =head2 set_options
 
@@ -520,7 +525,7 @@ Edward Baudrez <ebaudrez@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Edward Baudrez.
+This software is copyright (c) 2022 by Edward Baudrez.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

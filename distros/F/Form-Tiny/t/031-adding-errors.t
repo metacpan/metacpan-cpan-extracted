@@ -2,6 +2,7 @@ use v5.10;
 use strict;
 use warnings;
 use Test::More;
+use Test::Exception;
 
 {
 
@@ -26,5 +27,9 @@ is $form->errors->[0]->error, 'error 1';
 is $form->errors->[1]->field, 'field';
 is $form->errors->[1]->error, 'error 2';
 is $form->errors->[2]->error, 'error 3';
+
+dies_ok {
+	$form->add_error(does_not_exist => 'error');
+};
 
 done_testing;

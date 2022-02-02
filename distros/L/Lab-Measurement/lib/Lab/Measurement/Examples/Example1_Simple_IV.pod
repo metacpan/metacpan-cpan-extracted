@@ -13,7 +13,7 @@ Lab::Measurement::Examples::Example1_Simple_IV - Lab::Measurement for DUMMIES - 
 
 =head1 VERSION
 
-version 3.802
+version 3.803
 
 =head1 Abstract
 
@@ -291,7 +291,7 @@ And that's it!
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2022 by the Lab::Measurement team; in detail:
 
   Copyright 2013       Christian Butschkow, Stefan Geissler
             2014       Christian Butschkow

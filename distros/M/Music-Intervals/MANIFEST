@@ -9,6 +9,7 @@ README
 README.md
 dist.ini
 eg/Dancer-App.pm
+eg/benchmark
 eg/intervals
 eg/mojo-intervals.pl
 eg/scala

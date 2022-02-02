@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Rigol_DG5000;
-$Lab::Moose::Instrument::Rigol_DG5000::VERSION = '3.802';
+$Lab::Moose::Instrument::Rigol_DG5000::VERSION = '3.803';
 #ABSTRACT: Rigol DG5000 series Function/Arbitrary Waveform Generator
 
 use v5.20;
@@ -743,7 +743,7 @@ Lab::Moose::Instrument::Rigol_DG5000 - Rigol DG5000 series Function/Arbitrary Wa
 
 =head1 VERSION
 
-version 3.802
+version 3.803
 
 =head1 SYNOPSIS
 
@@ -1071,7 +1071,7 @@ interpolate.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2022 by the Lab::Measurement team; in detail:
 
   Copyright 2020       Simon Reinhardt
             2021       Andreas K. Huettel, Fabian Weinelt, Simon Reinhardt

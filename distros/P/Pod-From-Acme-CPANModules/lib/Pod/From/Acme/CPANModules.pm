@@ -1,16 +1,17 @@
 package Pod::From::Acme::CPANModules;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-26'; # DATE
-our $DIST = 'Pod-From-Acme-CPANModules'; # DIST
-our $VERSION = '0.011'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
 
 use Exporter qw(import);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-01-15'; # DATE
+our $DIST = 'Pod-From-Acme-CPANModules'; # DIST
+our $VERSION = '0.012'; # VERSION
+
 our @EXPORT_OK = qw(gen_pod_from_acme_cpanmodules);
 
 our %SPEC;
@@ -49,6 +50,61 @@ _
         },
         entry_description_code => {
             schema => 'code*',
+            description => <<'_',
+
+This lets you completely customize the description POD for each entry, using Perl
+code. The Perl code will receive the entry hashref as its argument and is expected to produce
+a POD string.
+
+See also the `additional_props` option.
+
+_
+        },
+        additional_props => {
+            schema => ['array*', of=>'str*'],
+            description => <<'_',
+
+This lets you include additional properties (or attributes) from the entry
+defhash to the POD. This option will not be used if you completely customize the
+entry POD output using the `entry_description_code` option. This option is an
+alternative when you want to display some additional properties/attributes in
+the entry as POD but does not want to completely customize the POD yourself.
+
+The element of this option is property/attribute name, optionally followed by
+":..." suffix to set the caption to show it with, then optionally followed by
+formatting suffix:
+
+- ":url" to render it as a link (`L<...>`)
+- ":mono" suffix to render it in monospace characters (`C<...>`)
+- ":quoted" (the default) to render it normally but quote it first using
+  <pm:String::PodQuote>
+- ":perl:..." to let a Perl code format it.
+
+Example:
+
+    # option
+    additional_props => [
+        q(ruby_package:Ruby project's gem:perl:"https://rubygems.org/gems/$_[0]"),
+        "ruby_website_url:Ruby project's website:url",
+    ],
+
+with this entry:
+
+    {
+        module => "Valiant",
+        ruby_package => "rails",
+        ruby_website_url => "https://rubyonrails.org",
+    }
+
+the additional POD produced will be something like:
+
+    Ruby project's gem: L<https://rubygems.org/gems/rails>
+
+    Ruby project's website: L<https://rubyonrails.org>
+
+See also the `entry_description_code` option.
+
+_
         },
     },
     result_naked => 1,
@@ -59,14 +115,14 @@ sub gen_pod_from_acme_cpanmodules {
     my $res = {};
     if ($args{entry_description_code}) {
         if (ref $args{entry_description_code} ne 'CODE') {
-            $args{entry_description_code} = eval "sub { $args{entry_description_code} }";
+            $args{entry_description_code} = eval "sub { $args{entry_description_code} }"; ## no critic: BuiltinFunctions::ProhibitStringyEval
             die "Can't compile Perl code in entry_description_code argument: $@" if $@;
         }
     }
 
     my $list = $args{list};
     if (my $mod = $args{module}) {
-        no strict 'refs';
+        no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
         my $mod_pm = $mod; $mod_pm =~ s!::!/!g; $mod_pm .= ".pm";
         require $mod_pm;
         $list = ${"$mod\::LIST"};
@@ -112,9 +168,13 @@ sub gen_pod_from_acme_cpanmodules {
         }
 
         {
+            require String::PodQuote;
+
             my $pod = '';
             $pod .= "=over\n\n";
+            my $i = -1;
             for my $ent (@{ $list->{entries} }) {
+                $i++;
                 my $summary = $ent->{summary} //
                     (defined $mod_abstracts{$ent->{module}} ?
                      #"$mod_abstracts{$ent->{module}} (from module's Abstract)" :
@@ -122,7 +182,6 @@ sub gen_pod_from_acme_cpanmodules {
                      undef);
                 $pod .= "=item L<$ent->{module}>\n\n";
                 if (defined $ent->{summary}) {
-                    require String::PodQuote;
                     $pod .= String::PodQuote::pod_quote($ent->{summary}) . ".\n\n";
                 }
                 if ($args{entry_description_code}) {
@@ -153,6 +212,41 @@ sub gen_pod_from_acme_cpanmodules {
                     if (@scripts) {
                         $pod .= "Script".(@scripts > 1 ? "s":"").": ".join(", ", map {"L<$_>"} @scripts)."\n\n";
                     }
+
+                    if ($args{additional_props}) {
+                      PROP:
+                        for my $prop0 (@{ $args{additional_props} }) {
+                            my $prop = $prop0;
+                            my $title;
+                            $prop =~ s/\A(.+?)\:([^:]*)/$1/ and $title = $2;
+                            $title //= $prop;
+                            my $format;
+                            $prop =~ s/\:(.+)\z// and $format = $1;
+                            $format //= "quoted";
+                            unless (exists $ent->{$prop}) {
+                                log_trace "Entry does not have '%s' property/attribute, not adding it to POD output";
+                                next PROP;
+                            }
+                            $pod .= "$title: ";
+                            if ($format eq 'quoted') {
+                                $pod .= String::PodQuote::pod_quote($ent->{$prop});
+                            } elsif ($format eq 'url') {
+                                $pod .= "L<$ent->{$prop}>";
+                            } elsif ($format eq 'mono') {
+                                $pod .= "C<$ent->{$prop}>";
+                            } elsif ($format =~ /\Aperl:(.+)/) {
+                                # XXX perl code is re-eval()-ed for each entry
+                                my $code0 = "package main; no strict; no warnings; sub { $1 }";
+                                my $code = eval $code0; ## no critic: BuiltinFunctions::ProhibitStringyEval
+                                die "Cannot eval '$code0' for property '$prop' in entry[$i] (module $ent->{module}): $@" if $@;
+                                $pod .= $code->($ent->{$prop});
+                            } else {
+                                die "Unknown format '$format' for property '$prop' in entry[$i] (module $ent->{module})";
+                            }
+                            $pod .= "\n\n";
+                        }
+                    }
+
                 }
             }
             $pod .= "=back\n\n";
@@ -186,7 +280,7 @@ Pod::From::Acme::CPANModules - Generate POD from an Acme::CPANModules::* module
 
 =head1 VERSION
 
-This document describes version 0.011 of Pod::From::Acme::CPANModules (from Perl distribution Pod-From-Acme-CPANModules), released on 2021-07-26.
+This document describes version 0.012 of Pod::From::Acme::CPANModules (from Perl distribution Pod-From-Acme-CPANModules), released on 2022-01-15.
 
 =head1 SYNOPSIS
 
@@ -223,7 +317,62 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<additional_props> => I<array[str]>
+
+This lets you include additional properties (or attributes) from the entry
+defhash to the POD. This option will not be used if you completely customize the
+entry POD output using the C<entry_description_code> option. This option is an
+alternative when you want to display some additional properties/attributes in
+the entry as POD but does not want to completely customize the POD yourself.
+
+The element of this option is property/attribute name, optionally followed by
+":..." suffix to set the caption to show it with, then optionally followed by
+formatting suffix:
+
+=over
+
+=item * ":url" to render it as a link (C<< LE<lt>...E<gt> >>)
+
+=item * ":mono" suffix to render it in monospace characters (C<< CE<lt>...E<gt> >>)
+
+=item * ":quoted" (the default) to render it normally but quote it first using
+L<String::PodQuote>
+
+=item * ":perl:..." to let a Perl code format it.
+
+=back
+
+Example:
+
+ # option
+ additional_props => [
+     q(ruby_package:Ruby project's gem:perl:"https://rubygems.org/gems/$_[0]"),
+     "ruby_website_url:Ruby project's website:url",
+ ],
+
+with this entry:
+
+ {
+     module => "Valiant",
+     ruby_package => "rails",
+     ruby_website_url => "https://rubyonrails.org",
+ }
+
+the additional POD produced will be something like:
+
+ Ruby project's gem: LL<https://rubygems.org/gems/rails>
+ 
+ Ruby project's website: LL<https://rubyonrails.org>
+
+See also the C<entry_description_code> option.
+
 =item * B<entry_description_code> => I<code>
+
+This lets you completely customize the description POD for each entry, using Perl
+code. The Perl code will receive the entry hashref as its argument and is expected to produce
+a POD string.
+
+See also the C<additional_props> option.
 
 =item * B<list> => I<hash>
 
@@ -244,6 +393,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/Pod-From-A
 
 Source repository is at L<https://github.com/perlancar/perl-Pod-From-Acme-CPANModules>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2021, 2020, 2019, 2018 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-From-Acme-CPANModules>
@@ -251,16 +428,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020, 2019, 2018 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

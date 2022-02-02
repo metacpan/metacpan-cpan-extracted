@@ -1,5 +1,5 @@
 package Lab::Moose::DataFile::Gnuplot;
-$Lab::Moose::DataFile::Gnuplot::VERSION = '3.802';
+$Lab::Moose::DataFile::Gnuplot::VERSION = '3.803';
 #ABSTRACT: Text based data file ('Gnuplot style')
 
 use v5.20;
@@ -54,13 +54,19 @@ has plots => (
     init_arg => undef
 );
 
+has comment_string => (
+    is      => 'rw',
+    isa     => 'Str',
+    default => ' ',
+);
+
 sub BUILD {
     my $self    = shift;
     my @columns = @{ $self->columns() };
     if ( @columns == 0 ) {
         croak "need at least one column";
     }
-    $self->log_comment( comment => join( "\t", @columns ) );
+    $self->log_comment( comment => $self->comment_string().join( "\t", @columns ) );
 }
 
 
@@ -197,7 +203,7 @@ sub log_comment {
     my @lines = split( "\n", $comment );
     my $fh = $self->filehandle();
     for my $line (@lines) {
-        print {$fh} "# $line\n";
+        print {$fh} "#$line\n";
     }
 }
 
@@ -626,7 +632,7 @@ Lab::Moose::DataFile::Gnuplot - Text based data file ('Gnuplot style')
 
 =head1 VERSION
 
-version 3.802
+version 3.803
 
 =head1 SYNOPSIS
 
@@ -863,13 +869,14 @@ If the C<handle> argument is not given, refresh all plots.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2022 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
             2018-2019  Simon Reinhardt
             2020       Andreas K. Huettel
             2021       Simon Reinhardt
+            2022       Mia Schambeck
 
 
 This is free software; you can redistribute it and/or modify it under

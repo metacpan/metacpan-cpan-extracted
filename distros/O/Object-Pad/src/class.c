@@ -7,7 +7,7 @@
 
 #include "object_pad.h"
 #include "class.h"
-#include "slot.h"
+#include "field.h"
 
 #undef register_class_attribute
 
@@ -27,8 +27,8 @@
 #  define DEBUG_SET_CURCOP_LINE(line)
 #endif
 
-/* Empty MGVTBL simply for locating instance slots AV */
-static MGVTBL vtbl_slotsav = {};
+/* Empty MGVTBL simply for locating instance backing AV */
+static MGVTBL vtbl_backingav = {};
 
 typedef struct ClassAttributeRegistration ClassAttributeRegistration;
 
@@ -62,32 +62,10 @@ static void register_class_attribute(const char *name, const struct ClassHookFun
   classattrs = reg;
 }
 
-struct ClassHookFuncs_v51 {
-  U32 ver;
-  U32 flags;
-  const char *permit_hintkey;
-
-  /* At ABIVERSION 51, callback funcs did not take a 'funcdata' parameter */
-  bool (*apply)(pTHX_ ClassMeta *classmeta, SV *value, SV **hookdata_ptr);
-  void (*post_add_slot)(pTHX_ ClassMeta *classmeta, SV *hookdata, SlotMeta *slotmeta);
-};
-
-static bool classhook_compat_apply_v51(pTHX_ ClassMeta *classmeta, SV *value, SV **hookdata_ptr, void *_funcdata)
-{
-  struct ClassHookFuncs_v51 *funcdata = _funcdata;
-  return (*funcdata->apply)(aTHX_ classmeta, value, hookdata_ptr);
-}
-
-static void classhook_compat_post_add_slot_v51(pTHX_ ClassMeta *classmeta, SV *hookdata, void *_funcdata, SlotMeta *slotmeta)
-{
-  struct ClassHookFuncs_v51 *funcdata = _funcdata;
-  (*funcdata->post_add_slot)(aTHX_ classmeta, hookdata, slotmeta);
-}
-
 void ObjectPad_register_class_attribute(pTHX_ const char *name, const struct ClassHookFuncs *funcs, void *funcdata)
 {
-  if(funcs->ver < 51)
-    croak("Mismatch in third-party class attribute ABI version field: module wants %d, we require >= 51\n",
+  if(funcs->ver < 57)
+    croak("Mismatch in third-party class attribute ABI version field: module wants %d, we require >= 57\n",
         funcs->ver);
   if(funcs->ver > OBJECTPAD_ABIVERSION)
     croak("Mismatch in third-party class attribute ABI version field: attribute supplies %d, module wants %d\n",
@@ -98,24 +76,6 @@ void ObjectPad_register_class_attribute(pTHX_ const char *name, const struct Cla
 
   if(!funcs->permit_hintkey)
     croak("Third-party class attributes require a permit hinthash key");
-
-  if(funcs->ver < 57) {
-    funcdata = (void *)funcs;
-
-    struct ClassHookFuncs *compatfuncs;
-    Newxz(compatfuncs, 1, struct ClassHookFuncs);
-
-    compatfuncs->ver            = OBJECTPAD_ABIVERSION;
-    compatfuncs->flags          = funcs->flags;
-    compatfuncs->permit_hintkey = funcs->permit_hintkey;
-
-    if(funcs->apply)
-      compatfuncs->apply = &classhook_compat_apply_v51;
-    if(funcs->post_add_slot)
-      compatfuncs->post_add_slot = &classhook_compat_post_add_slot_v51;
-
-    funcs = (const struct ClassHookFuncs *)compatfuncs;
-  }
 
   register_class_attribute(name, funcs, funcdata);
 }
@@ -182,42 +142,42 @@ static ClassMeta *S_get_classmeta_for(pTHX_ SV *self)
   return NUM2PTR(ClassMeta *, SvUV(SvRV(GvSV(*gvp))));
 }
 
-#define make_instance_slots(classmeta, slotsav, roleoffset)  S_make_instance_slots(aTHX_ classmeta, slotsav, roleoffset)
-static void S_make_instance_slots(pTHX_ const ClassMeta *classmeta, AV *slotsav, SLOTOFFSET roleoffset)
+#define make_instance_fields(classmeta, backingav, roleoffset)  S_make_instance_fields(aTHX_ classmeta, backingav, roleoffset)
+static void S_make_instance_fields(pTHX_ const ClassMeta *classmeta, AV *backingav, FIELDOFFSET roleoffset)
 {
   assert(classmeta->type == METATYPE_ROLE || roleoffset == 0);
 
-  if(classmeta->start_slotix) {
-    /* Superclass actually has some slots */
+  if(classmeta->start_fieldix) {
+    /* Superclass actually has some fields */
     assert(classmeta->type == METATYPE_CLASS);
     assert(classmeta->cls.supermeta->sealed);
 
-    make_instance_slots(classmeta->cls.supermeta, slotsav, 0);
+    make_instance_fields(classmeta->cls.supermeta, backingav, 0);
   }
 
-  AV *slots = classmeta->direct_slots;
-  I32 nslots = av_count(slots);
+  AV *fields = classmeta->direct_fields;
+  I32 nfields = av_count(fields);
 
-  av_extend(slotsav, classmeta->next_slotix - 1 + roleoffset);
+  av_extend(backingav, classmeta->next_fieldix - 1 + roleoffset);
 
   I32 i;
-  for(i = 0; i < nslots; i++) {
-    SlotMeta *slotmeta = (SlotMeta *)AvARRAY(slots)[i];
-    char sigil = SvPV_nolen(slotmeta->name)[0];
+  for(i = 0; i < nfields; i++) {
+    FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
+    char sigil = SvPV_nolen(fieldmeta->name)[0];
 
-    assert(av_count(slotsav) == slotmeta->slotix + roleoffset);
+    assert(av_count(backingav) == fieldmeta->fieldix + roleoffset);
 
     switch(sigil) {
       case '$':
-        av_push(slotsav, newSV(0));
+        av_push(backingav, newSV(0));
         break;
 
       case '@':
-        av_push(slotsav, newRV_noinc((SV *)newAV()));
+        av_push(backingav, newRV_noinc((SV *)newAV()));
         break;
 
       case '%':
-        av_push(slotsav, newRV_noinc((SV *)newHV()));
+        av_push(backingav, newRV_noinc((SV *)newHV()));
         break;
 
       default:
@@ -237,12 +197,12 @@ static void S_make_instance_slots(pTHX_ const ClassMeta *classmeta, AV *slotsav,
 
       assert(rolemeta->sealed);
 
-      make_instance_slots(rolemeta, slotsav, embedding->offset);
+      make_instance_fields(rolemeta, backingav, embedding->offset);
     }
   }
 }
 
-SV *ObjectPad_get_obj_slotsav(pTHX_ SV *self, enum ReprType repr, bool create)
+SV *ObjectPad_get_obj_backingav(pTHX_ SV *self, enum ReprType repr, bool create)
 {
   SV *rv = SvRV(self);
 
@@ -258,37 +218,37 @@ SV *ObjectPad_get_obj_slotsav(pTHX_ SV *self, enum ReprType repr, bool create)
     {
       if(SvTYPE(rv) != SVt_PVHV)
         croak("Not a HASH reference");
-      SV **slotssvp = hv_fetchs((HV *)rv, "Object::Pad/slots", create);
-      if(create && !SvOK(*slotssvp))
-        sv_setrv_noinc(*slotssvp, (SV *)newAV());
+      SV **backingsvp = hv_fetchs((HV *)rv, "Object::Pad/slots", create);
+      if(create && !SvOK(*backingsvp))
+        sv_setrv_noinc(*backingsvp, (SV *)newAV());
 
       /* A method invoked during a superclass constructor of a classic perl
-       * class might encounter $self without slots. If this is the case we'll
-       * have to create the slots now
+       * class might encounter $self without fields. If this is the case we'll
+       * have to create the fields now
        *   https://rt.cpan.org/Ticket/Display.html?id=132263
        */
-      if(!slotssvp) {
+      if(!backingsvp) {
         struct ClassMeta *classmeta = get_classmeta_for(self);
-        AV *slotsav = newAV();
+        AV *backingav = newAV();
 
-        make_instance_slots(classmeta, slotsav, 0);
+        make_instance_fields(classmeta, backingav, 0);
 
-        slotssvp = hv_fetchs((HV *)rv, "Object::Pad/slots", TRUE);
-        sv_setrv_noinc(*slotssvp, (SV *)slotsav);
+        backingsvp = hv_fetchs((HV *)rv, "Object::Pad/slots", TRUE);
+        sv_setrv_noinc(*backingsvp, (SV *)backingav);
       }
-      if(!SvROK(*slotssvp) || SvTYPE(SvRV(*slotssvp)) != SVt_PVAV)
+      if(!SvROK(*backingsvp) || SvTYPE(SvRV(*backingsvp)) != SVt_PVAV)
         croak("Expected $self->{\"Object::Pad/slots\"} to be an ARRAY reference");
-      return SvRV(*slotssvp);
+      return SvRV(*backingsvp);
     }
 
     case REPR_MAGIC:
     case_REPR_MAGIC:
     {
-      MAGIC *mg = mg_findext(rv, PERL_MAGIC_ext, &vtbl_slotsav);
+      MAGIC *mg = mg_findext(rv, PERL_MAGIC_ext, &vtbl_backingav);
       if(!mg && create)
-        mg = sv_magicext(rv, (SV *)newAV(), PERL_MAGIC_ext, &vtbl_slotsav, NULL, 0);
+        mg = sv_magicext(rv, (SV *)newAV(), PERL_MAGIC_ext, &vtbl_backingav, NULL, 0);
       if(!mg)
-        croak("Expected to find slots AV magic extension");
+        croak("Expected to find backing AV magic extension");
       return mg->mg_obj;
     }
 
@@ -368,46 +328,46 @@ MethodMeta *ObjectPad_mop_class_add_method(pTHX_ ClassMeta *meta, SV *methodname
   return methodmeta;
 }
 
-SlotMeta *ObjectPad_mop_class_add_slot(pTHX_ ClassMeta *meta, SV *slotname)
+FieldMeta *ObjectPad_mop_class_add_field(pTHX_ ClassMeta *meta, SV *fieldname)
 {
-  AV *slots = meta->direct_slots;
+  AV *fields = meta->direct_fields;
 
-  if(meta->next_slotix == -1)
-    croak("Cannot add a new slot to a class that is not yet begun");
+  if(meta->next_fieldix == -1)
+    croak("Cannot add a new field to a class that is not yet begun");
   if(meta->sealed)
-    croak("Cannot add a new slot to an already-sealed class");
+    croak("Cannot add a new field to an already-sealed class");
 
-  if(!slotname || !SvOK(slotname) || !SvCUR(slotname))
-    croak("slotname must not be undefined or empty");
+  if(!fieldname || !SvOK(fieldname) || !SvCUR(fieldname))
+    croak("fieldname must not be undefined or empty");
 
-  switch(SvPV_nolen(slotname)[0]) {
+  switch(SvPV_nolen(fieldname)[0]) {
     case '$':
     case '@':
     case '%':
       break;
 
     default:
-      croak("slotname must begin with a sigil");
+      croak("fieldname must begin with a sigil");
   }
 
   U32 i;
-  for(i = 0; i < av_count(slots); i++) {
-    SlotMeta *slotmeta = (SlotMeta *)AvARRAY(slots)[i];
-    if(SvCUR(slotmeta->name) < 2)
+  for(i = 0; i < av_count(fields); i++) {
+    FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
+    if(SvCUR(fieldmeta->name) < 2)
       continue;
 
-    if(sv_eq(slotmeta->name, slotname))
-      croak("Cannot add another slot named %" SVf, slotname);
+    if(sv_eq(fieldmeta->name, fieldname))
+      croak("Cannot add another field named %" SVf, fieldname);
   }
 
-  SlotMeta *slotmeta = mop_create_slot(slotname, meta);
+  FieldMeta *fieldmeta = mop_create_field(fieldname, meta);
 
-  av_push(slots, (SV *)slotmeta);
-  meta->next_slotix++;
+  av_push(fields, (SV *)fieldmeta);
+  meta->next_fieldix++;
 
-  MOP_CLASS_RUN_HOOKS(meta, post_add_slot, slotmeta);
+  MOP_CLASS_RUN_HOOKS(meta, post_add_field, fieldmeta);
 
-  return slotmeta;
+  return fieldmeta;
 }
 
 void ObjectPad_mop_class_add_BUILD(pTHX_ ClassMeta *meta, CV *cv)
@@ -636,16 +596,16 @@ void ObjectPad_mop_class_load_and_add_role(pTHX_ ClassMeta *meta, SV *rolename, 
   mop_class_add_role(meta, rolemeta);
 }
 
-#define embed_slothook(roleh, offset)  S_embed_slothook(aTHX_ roleh, offset)
-static struct SlotHook *S_embed_slothook(pTHX_ struct SlotHook *roleh, SLOTOFFSET offset)
+#define embed_fieldhook(roleh, offset)  S_embed_fieldhook(aTHX_ roleh, offset)
+static struct FieldHook *S_embed_fieldhook(pTHX_ struct FieldHook *roleh, FIELDOFFSET offset)
 {
-  struct SlotHook *classh;
-  Newx(classh, 1, struct SlotHook);
+  struct FieldHook *classh;
+  Newx(classh, 1, struct FieldHook);
 
-  classh->slotix   = roleh->slotix + offset;
-  classh->slotmeta = roleh->slotmeta;
-  classh->funcs    = roleh->funcs;
-  classh->hookdata = roleh->hookdata;
+  classh->fieldix   = roleh->fieldix + offset;
+  classh->fieldmeta = roleh->fieldmeta;
+  classh->funcs     = roleh->funcs;
+  classh->hookdata  = roleh->hookdata;
 
   return classh;
 }
@@ -662,7 +622,7 @@ static void S_mop_class_apply_role(pTHX_ RoleEmbedding *embedding)
     croak("Can only apply a role to a class");
 
   assert(embedding->offset == -1);
-  embedding->offset = classmeta->next_slotix;
+  embedding->offset = classmeta->next_fieldix;
 
   if(rolemeta->parammap) {
     HV *src = rolemeta->parammap;
@@ -688,8 +648,8 @@ static void S_mop_class_apply_role(pTHX_ RoleEmbedding *embedding)
       ParamMeta *classparammeta;
       Newx(classparammeta, 1, struct ParamMeta);
 
-      classparammeta->slot = roleparammeta->slot;
-      classparammeta->slotix = roleparammeta->slotix + embedding->offset;
+      classparammeta->field   = roleparammeta->field;
+      classparammeta->fieldix = roleparammeta->fieldix + embedding->offset;
 
       if(klen < 0)
         hv_store_ent(dst, HeSVKEY(iter), (SV *)classparammeta, HeHASH(iter));
@@ -698,29 +658,29 @@ static void S_mop_class_apply_role(pTHX_ RoleEmbedding *embedding)
     }
   }
 
-  if(rolemeta->slothooks_postslots) {
-    if(!classmeta->slothooks_postslots)
-      classmeta->slothooks_postslots = newAV();
+  if(rolemeta->fieldhooks_initfield) {
+    if(!classmeta->fieldhooks_initfield)
+      classmeta->fieldhooks_initfield = newAV();
 
     U32 i;
-    for(i = 0; i < av_count(rolemeta->slothooks_postslots); i++) {
-      struct SlotHook *roleh = (struct SlotHook *)AvARRAY(rolemeta->slothooks_postslots)[i];
-      av_push(classmeta->slothooks_postslots, (SV *)embed_slothook(roleh, embedding->offset));
+    for(i = 0; i < av_count(rolemeta->fieldhooks_initfield); i++) {
+      struct FieldHook *roleh = (struct FieldHook *)AvARRAY(rolemeta->fieldhooks_initfield)[i];
+      av_push(classmeta->fieldhooks_initfield, (SV *)embed_fieldhook(roleh, embedding->offset));
     }
   }
 
-  if(rolemeta->slothooks_construct) {
-    if(!classmeta->slothooks_construct)
-      classmeta->slothooks_construct = newAV();
+  if(rolemeta->fieldhooks_construct) {
+    if(!classmeta->fieldhooks_construct)
+      classmeta->fieldhooks_construct = newAV();
 
     U32 i;
-    for(i = 0; i < av_count(rolemeta->slothooks_construct); i++) {
-      struct SlotHook *roleh = (struct SlotHook *)AvARRAY(rolemeta->slothooks_construct)[i];
-      av_push(classmeta->slothooks_construct, (SV *)embed_slothook(roleh, embedding->offset));
+    for(i = 0; i < av_count(rolemeta->fieldhooks_construct); i++) {
+      struct FieldHook *roleh = (struct FieldHook *)AvARRAY(rolemeta->fieldhooks_construct)[i];
+      av_push(classmeta->fieldhooks_construct, (SV *)embed_fieldhook(roleh, embedding->offset));
     }
   }
 
-  classmeta->next_slotix += av_count(rolemeta->direct_slots);
+  classmeta->next_fieldix += av_count(rolemeta->direct_fields);
 
   /* TODO: Run an APPLY block if the role has one */
 }
@@ -738,7 +698,7 @@ static void S_apply_roles(pTHX_ ClassMeta *dstmeta, ClassMeta *srcmeta)
 static OP *pp_alias_params(pTHX)
 {
   dSP;
-  PADOFFSET padix = PADIX_INITSLOTS_PARAMS;
+  PADOFFSET padix = PADIX_INITFIELDS_PARAMS;
 
   SV *params = POPs;
 
@@ -773,7 +733,7 @@ static OP *pp_croak_from_constructor(pTHX)
   croak_sv(POPs);
 }
 
-static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
+static void S_generate_initfields_method(pTHX_ ClassMeta *meta)
 {
   OP *ops = NULL;
   int i;
@@ -785,7 +745,7 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
     SAVEI32(PL_subline);
     save_item(PL_subname);
 
-    resume_compcv(&meta->initslots_compcv);
+    resume_compcv(&meta->initfields_compcv);
   }
 
   SAVEFREESV(PL_compcv);
@@ -818,40 +778,40 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
     newUNOP_CUSTOM(&pp_alias_params, 0,
       newOP(OP_SHIFT, OPf_SPECIAL)));
 
-  /* TODO: Icky horrible implementation; if our slotoffset > 0 then
+  /* TODO: Icky horrible implementation; if our fieldoffset > 0 then
    * we must be a subclass
    */
-  if(meta->start_slotix) {
+  if(meta->start_fieldix) {
     struct ClassMeta *supermeta = meta->cls.supermeta;
 
     assert(supermeta->sealed);
-    assert(supermeta->initslots);
+    assert(supermeta->initfields);
 
     DEBUG_SET_CURCOP_LINE(__LINE__);
 
     ops = op_append_list(OP_LINESEQ, ops,
       newSTATEOP(0, NULL, NULL));
 
-    /* Build an OP_ENTERSUB for supermeta's initslots */
+    /* Build an OP_ENTERSUB for supermeta's initfields */
     OP *op = NULL;
     op = op_append_list(OP_LIST, op,
       newPADxVOP(OP_PADSV, 0, PADIX_SELF));
     op = op_append_list(OP_LIST, op,
-      newPADxVOP(OP_PADHV, OPf_REF, PADIX_INITSLOTS_PARAMS));
+      newPADxVOP(OP_PADHV, OPf_REF, PADIX_INITFIELDS_PARAMS));
     op = op_append_list(OP_LIST, op,
-      newSVOP(OP_CONST, 0, (SV *)supermeta->initslots));
+      newSVOP(OP_CONST, 0, (SV *)supermeta->initfields));
 
     ops = op_append_list(OP_LINESEQ, ops,
       op_convert_list(OP_ENTERSUB, OPf_WANT_VOID|OPf_STACKED, op));
   }
 
-  AV *slots = meta->direct_slots;
-  I32 nslots = av_count(slots);
+  AV *fields = meta->direct_fields;
+  I32 nfields = av_count(fields);
 
   {
-    for(i = 0; i < nslots; i++) {
-      SlotMeta *slotmeta = (SlotMeta *)AvARRAY(slots)[i];
-      char sigil = SvPV_nolen(slotmeta->name)[0];
+    for(i = 0; i < nfields; i++) {
+      FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
+      char sigil = SvPV_nolen(fieldmeta->name)[0];
       OP *op = NULL;
       SV *defaultsv;
 
@@ -862,10 +822,10 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
 
           OP *valueop = NULL;
 
-          if(slotmeta->defaultexpr) {
-            valueop = slotmeta->defaultexpr;
+          if(fieldmeta->defaultexpr) {
+            valueop = fieldmeta->defaultexpr;
           }
-          else if((defaultsv = mop_slot_get_default_sv(slotmeta))) {
+          else if((defaultsv = mop_field_get_default_sv(fieldmeta))) {
             /* An OP_CONST whose op_type is OP_CUSTOM.
              * This way we avoid the opchecker and finalizer doing bad things
              * to our defaultsv SV by setting it SvREADONLY_on()
@@ -873,8 +833,8 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
             valueop = newSVOP_CUSTOM(PL_ppaddr[OP_CONST], 0, defaultsv);
           }
 
-          if(slotmeta->paramname) {
-            SV *paramname = slotmeta->paramname;
+          if(fieldmeta->paramname) {
+            SV *paramname = fieldmeta->paramname;
 
             if(!valueop)
               valueop = newUNOP_CUSTOM(&pp_croak_from_constructor, 0,
@@ -886,13 +846,13 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
               /* exists $params{$paramname} */
               newUNOP(OP_EXISTS, 0,
                 newBINOP(OP_HELEM, 0,
-                  newPADxVOP(OP_PADHV, OPf_REF, PADIX_INITSLOTS_PARAMS),
+                  newPADxVOP(OP_PADHV, OPf_REF, PADIX_INITFIELDS_PARAMS),
                   newSVOP(OP_CONST, 0, SvREFCNT_inc(paramname)))),
 
               /* ? delete $params{$paramname} */
               newUNOP(OP_DELETE, 0,
                 newBINOP(OP_HELEM, 0,
-                  newPADxVOP(OP_PADHV, OPf_REF, PADIX_INITSLOTS_PARAMS),
+                  newPADxVOP(OP_PADHV, OPf_REF, PADIX_INITFIELDS_PARAMS),
                   newSVOP(OP_CONST, 0, SvREFCNT_inc(paramname)))),
 
               /* : valueop or die */
@@ -902,10 +862,10 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
           if(valueop)
             op = newBINOP(OP_SASSIGN, 0,
               valueop,
-              /* $slots[$idx] */
+              /* $fields[$idx] */
               newAELEMOP(OPf_MOD,
                 newPADxVOP(OP_PADAV, OPf_MOD|OPf_REF, PADIX_SLOTS),
-                slotmeta->slotix));
+                fieldmeta->fieldix));
           break;
         }
         case '@':
@@ -916,20 +876,20 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
           OP *valueop = NULL;
           U16 coerceop = (sigil == '%') ? OP_RV2HV : OP_RV2AV;
 
-          if(slotmeta->defaultexpr) {
-            valueop = slotmeta->defaultexpr;
+          if(fieldmeta->defaultexpr) {
+            valueop = fieldmeta->defaultexpr;
           }
-          else if((defaultsv = mop_slot_get_default_sv(slotmeta))) {
+          else if((defaultsv = mop_field_get_default_sv(fieldmeta))) {
             valueop = newUNOP(coerceop, 0,
                 newSVOP_CUSTOM(PL_ppaddr[OP_CONST], 0, defaultsv));
           }
 
           if(valueop) {
-            /* $slots[$idx]->@* or ->%* */
+            /* $fields[$idx]->@* or ->%* */
             OP *lhs = force_list_keeping_pushmark(newUNOP(coerceop, OPf_MOD|OPf_REF,
                         newAELEMOP(0,
                           newPADxVOP(OP_PADAV, OPf_MOD|OPf_REF, PADIX_SLOTS),
-                          slotmeta->slotix)));
+                          fieldmeta->fieldix)));
 
             op = newBINOP(OP_AASSIGN, 0,
                 force_list_keeping_pushmark(valueop),
@@ -939,7 +899,7 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
         }
 
         default:
-          croak("ARGH: not sure how to handle a slot sigil %c\n", sigil);
+          croak("ARGH: not sure how to handle a field sigil %c\n", sigil);
       }
 
       if(!op)
@@ -965,7 +925,7 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
         mop_class_seal(rolemeta);
 
       assert(rolemeta->sealed);
-      assert(rolemeta->initslots);
+      assert(rolemeta->initfields);
 
       DEBUG_SET_CURCOP_LINE(__LINE__);
 
@@ -976,9 +936,9 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
       op = op_append_list(OP_LIST, op,
         newPADxVOP(OP_PADSV, 0, PADIX_SELF));
       op = op_append_list(OP_LIST, op,
-        newPADxVOP(OP_PADHV, OPf_REF, PADIX_INITSLOTS_PARAMS));
+        newPADxVOP(OP_PADHV, OPf_REF, PADIX_INITFIELDS_PARAMS));
       op = op_append_list(OP_LIST, op,
-        newSVOP(OP_CONST, 0, (SV *)embed_cv(rolemeta->initslots, embedding)));
+        newSVOP(OP_CONST, 0, (SV *)embed_cv(rolemeta->initfields, embedding)));
 
       ops = op_append_list(OP_LINESEQ, ops,
         op_convert_list(OP_ENTERSUB, OPf_WANT_VOID|OPf_STACKED, op));
@@ -992,10 +952,10 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
   SAVESPTR(PL_curstash);
   PL_curstash = meta->stash;
 
-  meta->initslots = newATTRSUB(floor_ix, NULL, NULL, NULL, ops);
+  meta->initfields = newATTRSUB(floor_ix, NULL, NULL, NULL, ops);
 
-  assert(meta->initslots);
-  assert(CvOUTSIDE(meta->initslots));
+  assert(meta->initfields);
+  assert(CvOUTSIDE(meta->initfields));
 
   LEAVE;
 }
@@ -1041,49 +1001,49 @@ void ObjectPad_mop_class_seal(pTHX_ ClassMeta *meta)
 
   {
     U32 i;
-    for(i = 0; i < av_count(meta->direct_slots); i++) {
-      SlotMeta *slotmeta = (SlotMeta *)AvARRAY(meta->direct_slots)[i];
+    for(i = 0; i < av_count(meta->direct_fields); i++) {
+      FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(meta->direct_fields)[i];
 
       U32 hooki;
-      for(hooki = 0; slotmeta->hooks && hooki < av_count(slotmeta->hooks); hooki++) {
-        struct SlotHook *h = (struct SlotHook *)AvARRAY(slotmeta->hooks)[hooki];
+      for(hooki = 0; fieldmeta->hooks && hooki < av_count(fieldmeta->hooks); hooki++) {
+        struct FieldHook *h = (struct FieldHook *)AvARRAY(fieldmeta->hooks)[hooki];
 
-        if(*h->funcs->post_initslot) {
-          if(!meta->slothooks_postslots)
-            meta->slothooks_postslots = newAV();
+        if(*h->funcs->post_initfield) {
+          if(!meta->fieldhooks_initfield)
+            meta->fieldhooks_initfield = newAV();
 
-          struct SlotHook *fasth;
-          Newx(fasth, 1, struct SlotHook);
+          struct FieldHook *fasth;
+          Newx(fasth, 1, struct FieldHook);
 
-          fasth->slotix   = slotmeta->slotix;
-          fasth->slotmeta = slotmeta;
-          fasth->funcs    = h->funcs;
-          fasth->funcdata = h->funcdata;
-          fasth->hookdata = h->hookdata;
+          fasth->fieldix   = fieldmeta->fieldix;
+          fasth->fieldmeta = fieldmeta;
+          fasth->funcs     = h->funcs;
+          fasth->funcdata  = h->funcdata;
+          fasth->hookdata  = h->hookdata;
 
-          av_push(meta->slothooks_postslots, (SV *)fasth);
+          av_push(meta->fieldhooks_initfield, (SV *)fasth);
         }
 
         if(*h->funcs->post_construct) {
-          if(!meta->slothooks_construct)
-            meta->slothooks_construct = newAV();
+          if(!meta->fieldhooks_construct)
+            meta->fieldhooks_construct = newAV();
 
-          struct SlotHook *fasth;
-          Newx(fasth, 1, struct SlotHook);
+          struct FieldHook *fasth;
+          Newx(fasth, 1, struct FieldHook);
 
-          fasth->slotix   = slotmeta->slotix;
-          fasth->slotmeta = slotmeta;
-          fasth->funcs    = h->funcs;
-          fasth->funcdata = h->funcdata;
-          fasth->hookdata = h->hookdata;
+          fasth->fieldix   = fieldmeta->fieldix;
+          fasth->fieldmeta = fieldmeta;
+          fasth->funcs     = h->funcs;
+          fasth->funcdata  = h->funcdata;
+          fasth->hookdata  = h->hookdata;
 
-          av_push(meta->slothooks_construct, (SV *)fasth);
+          av_push(meta->fieldhooks_construct, (SV *)fasth);
         }
       }
     }
   }
 
-  S_generate_initslots_method(aTHX_ meta);
+  S_generate_initfields_method(aTHX_ meta);
 
   meta->sealed = true;
 
@@ -1162,7 +1122,7 @@ XS_INTERNAL(injected_constructor)
     LEAVE;
   }
 
-  bool need_makeslots = true;
+  bool need_makefields = true;
 
   if(!meta->cls.foreign_new) {
     HV *stash = gv_stashsv(class, 0);
@@ -1230,8 +1190,8 @@ XS_INTERNAL(injected_constructor)
     SV *rv = SvRV(self);
 
     /* It's possible a foreign superclass constructor invoked a `method` and
-     * thus initslots has already been called. Check here and set
-     * need_makeslots false if so.
+     * thus initfields has already been called. Check here and set
+     * need_makefields false if so.
      */
 
     switch(meta->repr) {
@@ -1247,14 +1207,14 @@ XS_INTERNAL(injected_constructor)
           croak("Expected %" SVf "->SUPER::new to return a blessed HASH reference", class);
         }
 
-        need_makeslots = !hv_exists(MUTABLE_HV(rv), "Object::Pad/slots", 17);
+        need_makefields = !hv_exists(MUTABLE_HV(rv), "Object::Pad/slots", 17);
         break;
 
       case REPR_MAGIC:
       case_REPR_MAGIC:
         /* Anything goes */
 
-        need_makeslots = !mg_findext(rv, PERL_MAGIC_ext, &vtbl_slotsav);
+        need_makefields = !mg_findext(rv, PERL_MAGIC_ext, &vtbl_backingav);
         break;
 
       case REPR_AUTOSELECT:
@@ -1266,19 +1226,19 @@ XS_INTERNAL(injected_constructor)
     sv_2mortal(self);
   }
 
-  AV *slotsav;
+  AV *backingav;
 
-  if(need_makeslots) {
-    slotsav = (AV *)get_obj_slotsav(self, meta->repr, TRUE);
-    make_instance_slots(meta, slotsav, 0);
+  if(need_makefields) {
+    backingav = (AV *)get_obj_backingav(self, meta->repr, TRUE);
+    make_instance_fields(meta, backingav, 0);
   }
   else {
-    slotsav = (AV *)get_obj_slotsav(self, meta->repr, FALSE);
+    backingav = (AV *)get_obj_backingav(self, meta->repr, FALSE);
   }
 
-  SV **slotsv = AvARRAY(slotsav);
+  SV **fieldsvs = AvARRAY(backingav);
 
-  if(meta->slothooks_postslots || meta->slothooks_construct) {
+  if(meta->fieldhooks_initfield || meta->fieldhooks_construct) {
     /* We need to set up a fake pad so these hooks can still get PADIX_SELF / PADIX_SLOTS */
 
     /* This MVP is just sufficient enough to let PAD_SVl(PADIX_SELF) work */
@@ -1287,20 +1247,20 @@ XS_INTERNAL(injected_constructor)
     SAVEFREEPV(PL_curpad);
 
     PAD_SVl(PADIX_SELF)  = self;
-    PAD_SVl(PADIX_SLOTS) = (SV *)slotsav;
+    PAD_SVl(PADIX_SLOTS) = (SV *)backingav;
   }
 
-  if(meta->slothooks_postslots) {
+  if(meta->fieldhooks_initfield) {
     DEBUG_SET_CURCOP_LINE(__LINE__);
 
-    AV *slothooks = meta->slothooks_postslots;
+    AV *fieldhooks = meta->fieldhooks_initfield;
 
     U32 i;
-    for(i = 0; i < av_count(slothooks); i++) {
-      struct SlotHook *h = (struct SlotHook *)AvARRAY(slothooks)[i];
-      SLOTOFFSET slotix = h->slotix;
+    for(i = 0; i < av_count(fieldhooks); i++) {
+      struct FieldHook *h = (struct FieldHook *)AvARRAY(fieldhooks)[i];
+      FIELDOFFSET fieldix = h->fieldix;
 
-      (*h->funcs->post_initslot)(aTHX_ h->slotmeta, h->hookdata, h->funcdata, slotsv[slotix]);
+      (*h->funcs->post_initfield)(aTHX_ h->fieldmeta, h->hookdata, h->funcdata, fieldsvs[fieldix]);
     }
   }
 
@@ -1325,7 +1285,7 @@ XS_INTERNAL(injected_constructor)
   }
 
   {
-    /* Run initslots */
+    /* Run initfields */
     ENTER;
 #ifdef DEBUG_OVERRIDE_PLCURCOP
     SAVEVPTR(PL_curcop);
@@ -1341,8 +1301,8 @@ XS_INTERNAL(injected_constructor)
       PUSHs(&PL_sv_undef);
     PUTBACK;
 
-    assert(meta->initslots);
-    call_sv((SV *)meta->initslots, G_VOID);
+    assert(meta->initfields);
+    call_sv((SV *)meta->initfields, G_VOID);
 
     LEAVE;
   }
@@ -1426,17 +1386,17 @@ XS_INTERNAL(injected_constructor)
       SVfARG(meta->name), SVfARG(params));
   }
 
-  if(meta->slothooks_construct) {
+  if(meta->fieldhooks_construct) {
     DEBUG_SET_CURCOP_LINE(__LINE__);
 
-    AV *slothooks = meta->slothooks_construct;
+    AV *fieldhooks = meta->fieldhooks_construct;
 
     U32 i;
-    for(i = 0; i < av_count(slothooks); i++) {
-      struct SlotHook *h = (struct SlotHook *)AvARRAY(slothooks)[i];
-      SLOTOFFSET slotix = h->slotix;
+    for(i = 0; i < av_count(fieldhooks); i++) {
+      struct FieldHook *h = (struct FieldHook *)AvARRAY(fieldhooks)[i];
+      FIELDOFFSET fieldix = h->fieldix;
 
-      (*h->funcs->post_construct)(aTHX_ h->slotmeta, h->hookdata, h->funcdata, slotsv[slotix]);
+      (*h->funcs->post_construct)(aTHX_ h->fieldmeta, h->hookdata, h->funcdata, fieldsvs[fieldix]);
     }
   }
 
@@ -1534,10 +1494,10 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name)
   meta->strict_params = false;
   meta->has_adjustparams = false;
   meta->has_superclass = false;
-  meta->start_slotix = 0;
-  meta->next_slotix = -1;
+  meta->start_fieldix = 0;
+  meta->next_fieldix = -1;
   meta->hooks   = NULL;
-  meta->direct_slots = newAV();
+  meta->direct_fields = newAV();
   meta->direct_methods = newAV();
   meta->parammap = NULL;
   meta->requiremethods = newAV();
@@ -1545,10 +1505,10 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name)
   meta->pending_submeta = NULL;
   meta->buildblocks = NULL;
   meta->adjustblocks = NULL;
-  meta->initslots = NULL;
+  meta->initfields = NULL;
 
-  meta->slothooks_postslots = NULL;
-  meta->slothooks_construct = NULL;
+  meta->fieldhooks_initfield = NULL;
+  meta->fieldhooks_construct = NULL;
 
   switch(type) {
     case METATYPE_CLASS:
@@ -1579,11 +1539,11 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name)
 #endif
   }
 
-  /* Prepare meta->initslots for containing a CV parsing operation */
+  /* Prepare meta->initfields for containing a CV parsing operation */
   {
     if(!PL_compcv) {
-      /* We require the initslots CV to have a CvOUTSIDE, or else cv_clone()
-       * will segv when we compose role slots. Any class dynamically generated
+      /* We require the initfields CV to have a CvOUTSIDE, or else cv_clone()
+       * will segv when we compose role fields. Any class dynamically generated
        * by string eval() will likely not get one, because it won't inherit a
        * PL_compcv here. We'll fake it up
        *   See also  https://rt.cpan.org/Ticket/Display.html?id=137952
@@ -1603,12 +1563,12 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name)
       pad_add_name_pvs("", 0, NULL, NULL);
 
     PADOFFSET padix = pad_add_name_pvs("%params", 0, NULL, NULL);
-    if(padix != PADIX_INITSLOTS_PARAMS)
+    if(padix != PADIX_INITFIELDS_PARAMS)
       croak("ARGH: Expected that padix[%%params] = 4");
 
     intro_my();
 
-    suspend_compcv(&meta->initslots_compcv);
+    suspend_compcv(&meta->initfields_compcv);
 
     LEAVE_SCOPE(floor_ix);
   }
@@ -1684,7 +1644,7 @@ void ObjectPad_mop_class_set_superclass(pTHX_ ClassMeta *meta, SV *superclassnam
     if(!supermeta->sealed)
       mop_class_seal(supermeta);
 
-    meta->start_slotix = supermeta->next_slotix;
+    meta->start_fieldix = supermeta->next_fieldix;
     meta->repr = supermeta->repr;
     meta->cls.foreign_new = supermeta->cls.foreign_new;
 
@@ -1702,18 +1662,18 @@ void ObjectPad_mop_class_set_superclass(pTHX_ ClassMeta *meta, SV *superclassnam
       av_push_from_av_noinc(meta->adjustblocks, supermeta->adjustblocks);
     }
 
-    if(supermeta->slothooks_postslots) {
-      if(!meta->slothooks_postslots)
-        meta->slothooks_postslots = newAV();
+    if(supermeta->fieldhooks_initfield) {
+      if(!meta->fieldhooks_initfield)
+        meta->fieldhooks_initfield = newAV();
 
-      av_push_from_av_noinc(meta->slothooks_postslots, supermeta->slothooks_postslots);
+      av_push_from_av_noinc(meta->fieldhooks_initfield, supermeta->fieldhooks_initfield);
     }
 
-    if(supermeta->slothooks_construct) {
-      if(!meta->slothooks_construct)
-        meta->slothooks_construct = newAV();
+    if(supermeta->fieldhooks_construct) {
+      if(!meta->fieldhooks_construct)
+        meta->fieldhooks_construct = newAV();
 
-      av_push_from_av_noinc(meta->slothooks_construct, supermeta->slothooks_construct);
+      av_push_from_av_noinc(meta->fieldhooks_construct, supermeta->fieldhooks_construct);
     }
 
     if(supermeta->parammap) {
@@ -1780,7 +1740,7 @@ void ObjectPad_mop_class_begin(pTHX_ ClassMeta *meta)
       meta->repr == REPR_AUTOSELECT && !meta->cls.foreign_new)
     meta->repr = REPR_NATIVE;
 
-  meta->next_slotix = meta->start_slotix;
+  meta->next_fieldix = meta->start_fieldix;
 }
 
 /*******************
@@ -1972,4 +1932,16 @@ void ObjectPad__boot_classes(void)
   register_class_attribute("repr",   &classhooks_repr,   NULL);
   register_class_attribute("compat", &classhooks_compat, NULL);
   register_class_attribute("strict", &classhooks_strict, NULL);
+}
+
+
+/* back-compat */
+SV *ObjectPad_get_obj_slotsav(pTHX_ SV *self, enum ReprType repr, bool create)
+{
+  return ObjectPad_get_obj_backingav(aTHX_ self, repr, create);
+}
+
+FieldMeta *ObjectPad_mop_class_add_slot(pTHX_ ClassMeta *meta, SV *fieldname)
+{
+  return ObjectPad_mop_class_add_field(aTHX_ meta, fieldname);
 }

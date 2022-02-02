@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Lakeshore340;
-$Lab::Moose::Instrument::Lakeshore340::VERSION = '3.802';
+$Lab::Moose::Instrument::Lakeshore340::VERSION = '3.803';
 #ABSTRACT: Lakeshore Model 340 Temperature Controller
 
 use v5.20;
@@ -128,6 +128,26 @@ sub get_control_mode {
     );
     my $loop = delete $args{loop} // $self->default_loop;
     return $self->query( command => "CMODE? $loop", %args );
+}
+
+
+sub set_mout {
+    my ( $self, $value, %args ) = validated_setter(
+        \@_,
+        value => { isa => 'Num' },
+        %loop_arg
+    );
+    my $loop = delete $args{loop} // $self->default_loop;
+    return $self->write( command => "MOUT $loop,$value", %args );
+}
+
+sub get_mout {
+    my ( $self, %args ) = validated_getter(
+        \@_,
+        %loop_arg
+    );
+    my $loop = delete $args{loop} // $self->default_loop;
+    return $self->query( command => "MOUT? $loop", %args );
 }
 
 
@@ -275,7 +295,7 @@ sub set_analog_out {
     my ( $self, %args ) = validated_getter(
         \@_,
         output         => { isa => enum( [ 1, 2 ] ) },
-        bipolar_enable => { isa => enum( [ 0, 1 ] ) },
+        bipolar_enable => { isa => enum( [ 0, 1 ] ), default => 0 },
         mode           => { isa => enum( [ 0, 1, 2, 3 ] ) },
         input => { isa => enum( [qw/A B C D/] ), default => '' },
         source => { isa => enum( [ 1, 2, 3, 4 ] ), default => '' },
@@ -332,7 +352,7 @@ Lab::Moose::Instrument::Lakeshore340 - Lakeshore Model 340 Temperature Controlle
 
 =head1 VERSION
 
-version 3.802
+version 3.803
 
 =head1 SYNOPSIS
 
@@ -395,6 +415,15 @@ Specifies the control mode. Valid entries: 1 = Manual PID, 2 = Zone,
  # Set loop 1 to manual PID
  $lakeshore->set_control_mode(value => 1, loop => 1);
  my $cmode = $lakeshore->get_control_mode(loop => 1);
+
+=head2 set_mout/get_mout
+ $lakeshore->set_mout(
+    loop => 1,
+    value => 22.45, # percent of range
+ );
+ my $mout = $lakeshore->get_mout(loop => 1);
+
+In open loop mode: Set/get manual output.
 
 =head2 set_control_parameters/get_control_parameters
 
@@ -463,11 +492,11 @@ This driver consumes the following roles:
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2022 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Simon Reinhardt
             2020       Andreas K. Huettel, Simon Reinhardt
-            2021       Simon Reinhardt
+            2021-2022  Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

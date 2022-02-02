@@ -3,6 +3,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::Exception;
 
 use_ok 'Music::Intervals::Numeric';
 
@@ -25,5 +26,14 @@ is sprintf('%.3f', $obj->cent_vals->{$chord}{'5/4 3/2'}), '315.641', 'cent_vals 
 is_deeply $obj->prime_factor,
     { "1/1 5/4 3/2" => { "1/1 3/2" => { "3/2" => "(3) / (2)" }, "1/1 5/4" => { "5/4" => "(5) / (2*2)" }, "5/4 3/2" => { "6/5" => "(2*3) / (5)" } } },
     'prime_factor';
+
+$obj = new_ok 'Music::Intervals::Numeric' => [
+    notes => ['1/1'],
+    size  => 1,
+];
+lives_ok { $obj->frequencies } 'frequencies';
+lives_ok { $obj->intervals } 'intervals';
+lives_ok { $obj->cent_vals } 'cent_vals';
+lives_ok { $obj->prime_factor } 'prime_factor';
 
 done_testing();

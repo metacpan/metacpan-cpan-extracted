@@ -3,7 +3,7 @@ package Net::Async::Redis::Protocol;
 use strict;
 use warnings;
 
-our $VERSION = '3.017'; # VERSION
+our $VERSION = '3.018'; # VERSION
 
 =head1 NAME
 
@@ -225,5 +225,5 @@ L<Net::Async::Redis/CONTRIBUTORS>.
 
 =head1 LICENSE
 
-Copyright Tom Molesworth and others 2015-2021. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth and others 2015-2022. Licensed under the same terms as Perl itself.
 

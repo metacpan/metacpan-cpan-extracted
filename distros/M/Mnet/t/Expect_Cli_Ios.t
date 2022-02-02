@@ -6,7 +6,7 @@ use warnings;
 use strict;
 use File::Temp;
 use Mnet::T;
-use Test::More tests => 8;
+use Test::More tests => 9;
 
 # init perl code for these tests
 my $perl = <<'perl-eof';
@@ -37,6 +37,27 @@ my $perl = <<'perl-eof';
     }
     $expect->close;
 perl-eof
+
+# prompt truncate
+Mnet::T::test_perl({
+    name    => 'prompt truncate',
+    pre     => <<'    pre-eof',
+        export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
+            echo -n "prompt> ";   read INPUT
+            echo -n "prompt> ";   read INPUT
+            echo -n "prompt> ";   read INPUT
+        ' >$EXPECT
+    pre-eof
+    perl    => $perl,
+    args    => '--noquiet --debug',
+    filter  => 'grep -e "Cli prompt_re set" -e "Log fin"',
+    expect  => <<'    expect-eof',
+        dbg - Mnet::Expect::Cli prompt_re set = (^|\r|\n)promp\S+> \r?$
+        dbg - Mnet::Expect::Cli prompt_re set = (^|\r|\n)promp\S+(>|#) \r?$
+        --- - Mnet::Log finished, no errors
+    expect-eof
+    debug   => '--debug',
+});
 
 # enable when already in enable
 Mnet::T::test_perl({
@@ -155,35 +176,6 @@ Mnet::T::test_perl({
     expect-eof
     debug   => '--debug',
 });
-
-# config interface mode prompt
-#? add test for user/enable/config/int modes to check prompts
-#   also ensure that truncated prompts work
-#       will ios prompt handling need to be modified?
-#   maybe create a sub for bulk testing prompts from here?
-#       or would/should this go into Expect::Cli?
-#INIT { our $mnet_test_perl = 'config interface mode prompt' }
-#Mnet::T::test_perl({
-#    name    => 'config interface mode prompt',
-#    pre     => <<'    pre-eof',
-#        export EXPECT=$(mktemp); chmod 700 $EXPECT; echo '
-#            echo -n "very-long-hostname> ";         read INPUT
-#            echo -n "very-long-hostname> ";         read INPUT
-#            echo -n "very-long-hostname# ";         read INPUT
-#            echo -n "very-long-host(config)# ";     read INPUT
-#            echo -n "very-long-ho(config-if)# ";    read INPUT
-#            echo -n "very-long-host(config)# ";     read INPUT
-#            echo -n "very-long-hostname# ";         read INPUT
-#        ' >$EXPECT
-#    pre-eof
-#    perl    => $perl,
-#    args    => '--noquiet --debug --enable --config',
-#    filter  => 'grep -e "Ios enable" -e "Log fin"',
-#    expect  => <<'    expect-eof',
-#        --- - Mnet::Log finished, no errors
-#    expect-eof
-#    debug   => '--debug',
-#});
 
 # close with changing prompt
 Mnet::T::test_perl({

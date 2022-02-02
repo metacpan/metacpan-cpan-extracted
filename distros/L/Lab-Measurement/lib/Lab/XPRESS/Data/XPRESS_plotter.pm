@@ -1,6 +1,6 @@
 package Lab::XPRESS::Data::XPRESS_plotter;
 #ABSTRACT: XPRESS plotting module
-$Lab::XPRESS::Data::XPRESS_plotter::VERSION = '3.802';
+$Lab::XPRESS::Data::XPRESS_plotter::VERSION = '3.803';
 use v5.20;
 
 use strict;
@@ -1386,11 +1386,11 @@ Lab::XPRESS::Data::XPRESS_plotter - XPRESS plotting module
 
 =head1 VERSION
 
-version 3.802
+version 3.803
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2022 by the Lab::Measurement team; in detail:
 
   Copyright 2012       Stefan Geissler
             2013       Andreas K. Huettel, Christian Butschkow, Stefan Geissler

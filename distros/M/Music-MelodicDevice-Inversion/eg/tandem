@@ -8,7 +8,7 @@ use warnings;
 
 use Data::Dumper::Compact 'ddc';
 use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util);
-use MIDI::Util;
+use MIDI::Util qw(midi_format setup_score);
 use Music::MelodicDevice::Inversion;
 use Music::Scales qw(get_scale_notes);
 
@@ -16,7 +16,7 @@ my $max = 12;
 my $scale_note = 'C';
 my $scale_name = 'chromatic';
 
-my $score = MIDI::Util::setup_score();
+my $score = setup_score();
 
 my $md = Music::MelodicDevice::Inversion->new(
     scale_note => $scale_note,
@@ -46,7 +46,7 @@ my $inverted = $md->invert($notes->[0], $notes);
 my $retro_inv = [ reverse @$inverted ];
 
 for my $phrase ($notes, $retrograde, $inverted, $retro_inv) {
-    @$phrase = MIDI::Util::midi_format(@$phrase);
+    @$phrase = midi_format(@$phrase);
     print ddc($phrase);
 }
 

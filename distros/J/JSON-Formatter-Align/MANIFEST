@@ -1,0 +1,8 @@
+Changes
+lib/JSON/Formatter/Align.pm
+Makefile.PL
+MANIFEST
+README
+t/JSON-Formatter-Align.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

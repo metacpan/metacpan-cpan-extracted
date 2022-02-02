@@ -2,16 +2,25 @@
 
 =head1 NAME
 
-greple -Mjq - greple module for jq frontend
+greple -Mjq - greple module to search JSON data with jq
 
 =head1 SYNOPSIS
 
 greple -Mjq --glob JSON-DATA --IN label pattern
 
+=head1 VERSION
+
+Version 0.04
+
 =head1 DESCRIPTION
 
-This is an experimental module for L<App::Greple> command to provide
-interface for L<jq(1)> command.
+This is an experimental module for L<App::Greple> to search JSON
+formatted text using L<jq(1)> as a backend.
+
+Search top level json object which includes both C<Marvin> and
+C<Zaphod> somewhare in its text representation.
+
+    greple -Mjq 'Marvin Zaphod'
 
 You can search object C<.commit.author.name> includes C<Marvin> like this:
 
@@ -25,6 +34,10 @@ Search any C<author.name> field including C<Marvin>:
 
     greple -Mjq --IN author.name Marvin
 
+Search C<name> is C<Marvin> and C<type> is C<Robot> or C<Android>:
+
+    greple -Mjq --IN name Marvin --IN type 'Robot|Android'
+
 Please be aware that this is just a text matching tool for indented
 result of L<jq(1)> command.  So, for example, C<.commit.author>
 includes everything under it and it maches C<committer> field name.
@@ -33,7 +46,7 @@ Use L<jq(1)> filter for more complex and precise operation.
 =head1 CAUTION
 
 L<greple(1)> commands read entire input before processing.  So it
-should not be used for large amount of data or inifinite stream.
+should not be used for gigantic data or inifinite stream.
 
 =head1 INSTALL
 
@@ -65,6 +78,16 @@ C<process> hash.
 
 If labels are separated by two or more dots (C<..>), they don't have
 to have direct relationship.
+
+=item B<--NOT> I<label> I<pattern>
+
+Specify negative condition.
+
+=item B<--MUST> I<label> I<pattern>
+
+Specify required condition.  If there is one or more required
+condition, all other positive rules move to optional.  They are not
+required but highliged if exist.
 
 =back
 
@@ -114,28 +137,38 @@ Any labels include C<path>.
 
 Search from any C<name> labels.
 
-    greple -Mjq --glob procmon.json --IN name _mina
+    greple -Mjq --IN name _mina
 
 Search from C<.process.name> label.
 
-    greple -Mjq --glob procmon.json --IN .process.name _mina
+    greple -Mjq --IN .process.name _mina
 
 Object C<.process.name> contains C<_mina> and C<.event> contains
-C<FORK>.
+C<EXEC>.
 
-    greple -Mjq --glob procmon.json --IN .process.name _mina --IN .event FORK
+    greple -Mjq --IN .process.name _mina --IN .event EXEC
 
-Object C<ancestors> contains C<339> and C<.event> contains C<FORK>.
+Object C<ppid> is 803 and C<.event> contains C<FORK> or C<EXEC>.
 
-    greple -Mjq --glob procmon.json --IN ancestors 339 --IN event FORK
+    greple -Mjq --IN ppid 803 --IN event 'FORK|EXEC'
 
-Object C<*pid> labels contains 803.
+Object C<name> is C<_mina> and C<.event> contains C<CREATE>.
 
-    greple -Mjq --glob procmon.json --IN %pid 803
+    greple -Mjq --IN name _mina --IN event 'CREATE'
 
-Object any <path> contains C<_mira> under C<.file> and C<.event> contains C<WRITE>.
+Object C<ancestors> contains C<1132> and C<.event> contains C<EXEC>
+with C<arguments> highlighted.
 
-    greple -Mjq --glob filemon.json --IN .file..path _mina --IN .event WRITE
+   greple -Mjq --IN ancestors 1132 --IN event EXEC --IN arguments .
+
+Object C<*pid> label contains 803.
+
+    greple -Mjq --IN %pid 803
+
+Object any <path> contains C<_mira> under C<.file> and C<.event>
+contains C<WRITE>.
+
+    greple -Mjq --IN .file..path _mina --IN .event WRITE
 
 =head1 TIPS
 
@@ -144,13 +177,21 @@ Use C<--all> option to show entire data.
 Use C<--nocolor> option or set C<NO_COLOR=1> to disable colored
 output.
 
-Use C<--blockend=> option to cancel showing block separator.
-
 Use C<-o> option to show only matched part.
+
+Use C<--blockend=> option to cancel showing block separator.
 
 Sine this module implements original search funciton, L<greple(1)>
 B<-i> does not take effect.  Set modifier in regex like
 C<(?i)pattern> if you want case-insensitive match.
+
+Use C<-Mjq::debug=> to see actual regex.
+
+Use C<--color=always> and set C<LESSANSIENDCHARS=mK> if you want to
+see the output using L<less(1)>.  Put next line in your F<~/.greplerc>
+to enable colored output always.
+
+    option default --color=always
 
 =head1 SEE ALSO
 
@@ -178,7 +219,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 use Exporter 'import';
 our @EXPORT = qw(&jq_filter);
@@ -193,28 +234,42 @@ sub debug { $debug ^= 1 }
 my $indent = '  ';
 my $indent_re = qr/$indent/;
 
-sub leader_regex {
-    my $leader = shift;
+sub re {
+    my $pattern = shift;
+    my $re = eval { qr/$pattern/ };
+    if ($@) {
+	die sprintf("$pattern: pattern error - %s\n",
+		    $@ =~ /(.*?(?=;|$))/);
+    }
+    return $re;
+}
 
-    my @lead_re;
-    while ($leader =~ s/^([^.\n]*?)(\.+)//) {
-	my($lead, $dot) = ($1, $2);
-	$lead =~ s/%/.*/g;
-	my $start_with = length($dot) > 1 ? '' : qr/(?=\S)/;
-	my $lead_re = do {
-	    if ($lead eq '') {
+sub prefix_regex {
+    my $path = shift;
+    my @prefix_re;
+    my $level = '';
+    while ($path =~ s/^([^.\n]*?)(\.+)//) {
+	my($label, $dot) = ($1, $2);
+	$label =~ s/%/.*/g;
+	my $label_re = re($label);
+	my $start_with = '';
+	my $prefix_re = do {
+	    if ($label eq '') {
 		length($dot) > 1 ? '' : qr{ ^ (?= $indent_re \S) }xm;
 	    } else {
-		##
-		## Make capture group <level> if it is required.
-		##
-		my $level = ($leader eq '' and length($dot) == 1) ? '?<level>' : '';
+		if (length($dot) == 1) {
+		    ## using same capture group name is not a good idea
+		    ## so make sure to put just for the one
+		    $level      = '?<level>' if $path eq '';
+		    $start_with = qr/(?=\S)/;
+		}
 		qr{
-		    ^ (${level} $indent_re*) "$lead": .* \n
+		    ^ (${level} $indent_re*) "$label_re": .* \n
 		    (?:
+			## single line key-value pair
 			\g{-1} $indent_re $start_with .++ \n
 		    |
-			# indented array/hash
+			## indented array/hash
 			\g{-1} $indent_re \S .* [\[\{] \n
 			(?: \g{-1} $indent_re \s .*+ \n) *+
 			\g{-1} $indent_re [\]\}] ,? \n
@@ -222,34 +277,34 @@ sub leader_regex {
 		}xm;
 	    }
 	};
-	push @lead_re, $lead_re if $lead_re;
+	push @prefix_re, $prefix_re if $prefix_re;
     }
-    unless (grep /\(\?<level>/, @lead_re) {
-	push @lead_re, qr/(?<level>(?!))?/; # just to fail
+    if ($level eq '') {
+	## refering named capture group causes error if it is not used
+	## so put dummy expression just to fail
+	push @prefix_re, qr/(?<level>(?!))?/;
     }
-    @lead_re
+    @prefix_re
 }
 
 sub IN {
     my %opt = @_;
     my $target = delete $opt{&FILELABEL} or die;
     my($label, $pattern) = @opt{qw(label pattern)};
-    my $lead_re = '';
     my $indent_re = qr/  /;
-    my @lead_re = $label =~ s/^((?:.*\.)?)// && leader_regex($1);
+    my @prefix_re = $label =~ s/^((?:.*\.)?)// && prefix_regex($1);
     $label =~ s/%/.*/g;
+    my($label_re, $pattern_re) = map re($_), $label, $pattern;
     my $re = qr{
-	@lead_re \K
+	@prefix_re \K
 	^
 	(?(<level>) (?= \g{level} $indent_re \S ) )	# required level
-	(?<in> [ ]*) "$label": [ ]*+
-	(?: . | \n\g{in} \s++ ) *
-	$pattern
-	(?: . | \n\g{in} (?: \s++ | [\]\}] ) ) *
+	(?<in> [ ]*) "$label_re": [ ]*+			# find given label
+	(?: . | \n\g{in} \s++ ) *			# and look for ...
+	$pattern_re					# pattern
+	(?: . | \n\g{in} (?: \s++ | [\]\}] ) ) *	# and take the rest
     }xm;
-
-    warn Dumper $re if $debug;
-
+    warn "$re\n" if $debug;
     match_regions pattern => $re;
 }
 
@@ -269,3 +324,12 @@ option --json-block --block JSON-OBJECTS
 option --IN \
 	--face +E \
 	--le &__PACKAGE__::IN(label=$<shift>,pattern=$<shift>)
+
+option --AND --IN
+
+option --MUST \
+	--face +E \
+	--le +&__PACKAGE__::IN(label=$<shift>,pattern=$<shift>)
+
+option --NOT \
+	--le -&__PACKAGE__::IN(label=$<shift>,pattern=$<shift>)

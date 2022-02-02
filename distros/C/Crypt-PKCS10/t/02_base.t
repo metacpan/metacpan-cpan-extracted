@@ -30,7 +30,7 @@ my @dirpath = (File::Spec->splitpath( $0 ))[0,1];
 
 my $decoded;
 
-plan  tests => 11;
+plan  tests => 12;
 
 # Basic functions test requires RSA
 
@@ -776,6 +776,25 @@ subtest 'DSA requests' => sub {
         skip( "Crypt::PK::DSA is not installed", 1 ) unless( eval { require Crypt::PK::DSA; } );
 
         ok( $decoded->checkSignature, "verify DSA signature" );
+    }
+};
+
+subtest 'PSS Padding' => sub {
+    plan tests => 4;
+
+    $decoded = Crypt::PKCS10->new( File::Spec->catpath( @dirpath, 'csr9.pem' ),
+                                   verifySignature => 0,
+                                   readFile =>1, escapeStrings => 1 );
+
+    isnt( $decoded, undef, 'load PEM from filename' ) or BAIL_OUT( Crypt::PKCS10->error );
+
+    is( $decoded->signatureAlgorithm, 'rsassaPss', 'RSA_PSS signature' );
+
+    is( $decoded->signature(2), undef, 'signature decoding' );
+  SKIP: {
+        skip( "Crypt::PK::RSA is not installed", 1 ) unless( eval { require Crypt::PK::RSA; } );
+
+        ok( $decoded->checkSignature, "verify RSA PSS signature" );
     }
 };
 

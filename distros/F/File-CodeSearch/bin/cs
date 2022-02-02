@@ -25,7 +25,7 @@ use File::CodeSearch::Replacer;
 use File::TypeCategories;
 use IO::Prompt qw/prompt/;
 
-our $VERSION = version->new('0.7.5');
+our $VERSION = version->new('0.7.6');
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 my $REVERSE  = REVERSE;
 my $RESET    = RESET;
@@ -35,6 +35,7 @@ my $ON_RED   = ON_RED;
 my $ON_GREEN = ON_GREEN;
 
 my %option = (
+    ignore => ['ignore'],
     verbose => 0,
     man     => 0,
     help    => 0,
@@ -63,7 +64,7 @@ sub main {
         'sre_smart|smart|m',
         'replace|r=s',
         'path|p=s@',
-        'file_symlinks|links|l',
+        'file_symlinks|links|l!',
         'file_recurse|R!',
         'file_contains=s',
         'file_not_contains=s',
@@ -71,9 +72,9 @@ sub main {
         'file_include_type|include_type|int|N=s@',
         'file_exclude|exclude|x=s@',
         'file_exclude_type|exclude_type|ext|X=s@',
-        'file_ignore=s',
-        'file_ignore_add|d=s',
-        'file_ignore_remove|I=s',
+        'file_ignore|ignore=s@',
+        'file_ignore_add|ignore-add|d=s@',
+        'file_ignore_remove|ignore-remove|I=s@',
         'out_suround|suround|context|C=n',
         'out_suround_before|before|B=n',
         'out_suround_after|after|A=n',
@@ -136,6 +137,17 @@ sub main {
                 $option{ignore} = 1;
             }
         }
+    }
+
+    if ($option{file_ignore_add}) {
+        push @{$option{file_ignore}}, @{$option{file_ignore_add}};
+        delete $option{file_ignore_add};
+    }
+    if ($option{file_ignore_remove}) {
+        for my $remove (@{ $option{file_ignore_remove} }) {
+            @{$option{file_ignore}} = grep {$_ ne $remove} @{$option{file_ignore}};
+        }
+        delete $option{file_ignore_remove};
     }
 
     warn Dumper { params('file', %option) } if $option{verbose};
@@ -418,7 +430,7 @@ cs - Search and/or replace text (with some intelligence)
 
 =head1 VERSION
 
-This documentation refers to cs version 0.7.5.
+This documentation refers to cs version 0.7.6.
 
 =head1 SYNOPSIS
 
@@ -478,12 +490,12 @@ This documentation refers to cs version 0.7.5.
       --exclude-type[=]string
                  Don't include files the specified type (Mulitple)
                  see perldoc File::TypeCategories available types
-      --file-ignore[=]string
-                 Replace the default ignore regex
-   -d --file-ignore-add[=]string
-                 Add this regex to the list of ignored files
-   -r --file-ignore-remove[=]string
-                 Remove this regex to the list of ignored files
+       --ignore[=]type
+                 Add type to the types to be ignored (multiples ok, overwrites default types)
+    -d --ignore_add[=]type
+                 Add extra type to default types (multiples ok)
+    -I --ignore_remove[=]type
+                 Remove type from default types (multiples ok)
   Output:
    -C --context[=]int
                  Show int lines of context before and after a match
@@ -512,7 +524,7 @@ This documentation refers to cs version 0.7.5.
                  deafult ~/.cs
 
    -v --verbose  Show more detailed option
-      --version  Prints the version information
+      --VERSION  Prints the version information
       --help     Prints this help information
       --man      Prints the full documentation for cs with example usage
 

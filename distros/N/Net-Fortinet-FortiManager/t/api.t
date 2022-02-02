@@ -3,8 +3,6 @@ use Test2::Tools::Compare qw( array bag hash all_items all_values );
 use Test2::Tools::Subtest qw( subtest_buffered );
 use Net::Fortinet::FortiManager;
 
-use DDP;
-
 skip_all "environment variables not set"
     unless (exists $ENV{NET_FORTINET_FORTIMANAGER_HOSTNAME}
         && exists $ENV{NET_FORTINET_FORTIMANAGER_USERNAME}

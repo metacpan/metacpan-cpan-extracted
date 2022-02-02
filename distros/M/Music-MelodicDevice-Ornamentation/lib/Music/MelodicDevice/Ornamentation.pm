@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Chromatic and diatonic melodic ornamentation
 
-our $VERSION = '0.0603';
+our $VERSION = '0.0700';
 
 use Carp qw(croak);
 use Data::Dumper::Compact qw(ddc);
@@ -61,11 +61,15 @@ sub grace_note {
 
     $offset //= 1; # Default one note above
 
+    my $named = $pitch =~ /[A-G]/ ? 1 : 0;
+
     (my $i, $pitch) = $self->_find_pitch($pitch);
     my $grace_note = $self->_scale->[ $i + $offset ];
 
-    $pitch = Music::Note->new($pitch, 'midinum')->format('ISO');
-    $grace_note = Music::Note->new($grace_note, 'midinum')->format('ISO');
+    if ($named) {
+        $pitch = Music::Note->new($pitch, 'midinum')->format('ISO');
+        $grace_note = Music::Note->new($grace_note, 'midinum')->format('ISO');
+    }
 
     # Compute the ornament durations
     my $x = $MIDI::Simple::Length{$duration} * TICKS;
@@ -88,13 +92,17 @@ sub turn {
     my $number = 4; # Number of notes in the ornament
     $offset //= 1; # Default one note above
 
+    my $named = $pitch =~ /[A-G]/ ? 1 : 0;
+
     (my $i, $pitch) = $self->_find_pitch($pitch);
     my $above = $self->_scale->[ $i + $offset ];
     my $below = $self->_scale->[ $i - $offset ];
 
-    $pitch = Music::Note->new($pitch, 'midinum')->format('ISO');
-    $above = Music::Note->new($above, 'midinum')->format('ISO');
-    $below = Music::Note->new($below, 'midinum')->format('ISO');
+    if ($named) {
+        $pitch = Music::Note->new($pitch, 'midinum')->format('ISO');
+        $above = Music::Note->new($above, 'midinum')->format('ISO');
+        $below = Music::Note->new($below, 'midinum')->format('ISO');
+    }
 
     # Compute the ornament durations
     my $x = $MIDI::Simple::Length{$duration} * TICKS;
@@ -115,11 +123,15 @@ sub trill {
     $number ||= 2; # Number of notes in the ornament
     $offset //= 1; # Default one note above
 
+    my $named = $pitch =~ /[A-G]/ ? 1 : 0;
+
     (my $i, $pitch) = $self->_find_pitch($pitch);
     my $alt = $self->_scale->[ $i + $offset ];
 
-    $pitch = Music::Note->new($pitch, 'midinum')->format('ISO');
-    $alt = Music::Note->new($alt, 'midinum')->format('ISO');
+    if ($named) {
+        $pitch = Music::Note->new($pitch, 'midinum')->format('ISO');
+        $alt = Music::Note->new($alt, 'midinum')->format('ISO');
+    }
 
     # Compute the ornament durations
     my $x = $MIDI::Simple::Length{$duration} * TICKS;
@@ -142,11 +154,15 @@ sub mordent {
     my $number = 4; # Finest division needed
     $offset //= 1; # Default one note above
 
+    my $named = $pitch =~ /[A-G]/ ? 1 : 0;
+
     (my $i, $pitch) = $self->_find_pitch($pitch);
     my $alt = $self->_scale->[ $i + $offset ];
 
-    $pitch = Music::Note->new($pitch, 'midinum')->format('ISO');
-    $alt = Music::Note->new($alt, 'midinum')->format('ISO');
+    if ($named) {
+        $pitch = Music::Note->new($pitch, 'midinum')->format('ISO');
+        $alt = Music::Note->new($alt, 'midinum')->format('ISO');
+    }
 
     # Compute the ornament durations
     my $x = $MIDI::Simple::Length{$duration} * TICKS;
@@ -170,6 +186,8 @@ sub slide {
 
     my @scale = map { get_scale_MIDI($self->scale_note, $_, 'chromatic') } -1 .. OCTAVES - 1;
 
+    my $named = $from =~ /[A-G]/ ? 1 : 0;
+
     (my $i, $from) = $self->_find_pitch($from, \@scale);
     (my $j, $to) = $self->_find_pitch($to, \@scale);
 
@@ -190,7 +208,13 @@ sub slide {
     print "Durations: $x, $y, $z\n" if $self->verbose;
     $z = 'd' . $z;
 
-    my @slide = map { [ $z, Music::Note->new($scale[$_], 'midinum')->format('ISO') ] } $start .. $end;
+    my @slide;
+    if ($named) {
+        @slide = map { [ $z, Music::Note->new($scale[$_], 'midinum')->format('ISO') ] } $start .. $end;
+    }
+    else {
+        @slide = map { [ $z, $scale[$_] ] } $start .. $end;
+    }
     @slide = reverse @slide if $j < $i;
     print 'Slide: ', ddc(\@slide) if $self->verbose;
 
@@ -202,7 +226,8 @@ sub _find_pitch {
 
     $scale //= $self->_scale;
 
-    $pitch = Music::Note->new($pitch, 'ISO')->format('midinum');
+    $pitch = Music::Note->new($pitch, 'ISO')->format('midinum')
+        if $pitch =~ /[A-G]/;
 
     my $i = first_index { $_ eq $pitch } @$scale;
     croak "Unknown pitch: $pitch" if $i < 0;
@@ -224,7 +249,7 @@ Music::MelodicDevice::Ornamentation - Chromatic and diatonic melodic ornamentati
 
 =head1 VERSION
 
-version 0.0603
+version 0.0700
 
 =head1 SYNOPSIS
 
@@ -238,11 +263,19 @@ version 0.0603
     verbose    => 1,
   );
 
+  # With named notes
   my $spec = $md->grace_note('qn', 'D5', -1);
   $spec = $md->turn('qn', 'D5', 1);
   $spec = $md->trill('qn', 'D5', 2, 1);
   $spec = $md->mordent('qn', 'D5', 1);
   $spec = $md->slide('qn', 'D5', 'F5');
+
+  # With integer pitches
+  $spec = $md->grace_note('qn', 74, -1);
+  $spec = $md->turn('qn', 74, 1);
+  $spec = $md->trill('qn', 74, 2, 1);
+  $spec = $md->mordent('qn', 74, 1);
+  $spec = $md->slide('qn', 74, 77);
 
 =head1 DESCRIPTION
 
@@ -252,9 +285,13 @@ musical melodic ornamentation methods.
 Each returns a note-set specification.  This specification is a list
 of two part array-references: a B<duration> and a B<pitch>.
 
+If the B<pitch> is given as an integer, then specs with integers
+are returned.
+
 Since the point is likely to use MIDI-Perl to render these ornaments,
-to audio, it is handy to know that the pitches in these specifications
-can be translated with the L<MIDI::Util> C<midi_format> function:
+to audio, it is handy to know that named pitches in these
+specifications can be translated with the L<MIDI::Util>
+C<midi_format> function:
 
   my @spec = ([qw(en C4)], [qw(sn C#4)], [qw(qn D4)], ...);
   @spec = map { [ MIDI::Util::midi_format(@$_) ] } @spec;

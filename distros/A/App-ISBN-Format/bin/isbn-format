@@ -1,0 +1,100 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use App::ISBN::Format;
+
+our $VERSION = 0.01;
+
+# Run.
+exit App::ISBN::Format->new->run;
+
+# Print version.
+sub VERSION_MESSAGE {
+	print $VERSION."\n";
+	exit 0;
+}
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+isbn-format - Script to format ISBN.
+
+=head1 SYNOPSIS
+
+ isbn-format [-h] [--version] isbn_string
+
+=head1 DESCRIPTION
+
+Vision of this module is:
+
+ * Support ISBN 13 and ISBN 10 formats.
+ * Detect if ISBN is valid.
+ * Convert ISBN to pretty print value.
+
+=head1 ARGUMENTS
+
+=over 8
+
+=item * C<-h>
+
+Print help.
+
+=item * C<--version>
+
+Print version of script.
+
+=item * C<isbn_string>
+
+ISBN number string.
+
+=back
+
+=head1 EXAMPLE1
+
+ isbn-format 9788025343364
+
+ # Output:
+ # 9788025343364 -> 978-80-253-4336-4
+
+=head1 EXAMPLE2
+
+ isbn-format 9788025343363
+
+ # Output:
+ # 9788025343364 -> 978-80-253-4336-4
+
+=head1 EXAMPLE3
+
+ isbn-format 978802534336
+
+ # Output:
+ # ISBN '978802534336' is bad.
+
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/App-ISBN-Format>
+
+=head1 AUTHOR
+
+Michal Josef Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+© 2022 Michal Josef Špaček
+
+BSD 2-Clause License
+
+=head1 VERSION
+
+0.01
+
+=cut

@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 use strict;
 use warnings;
 
-use SPVM::Builder::Util;
+use SPVM::Builder::Util::API;
 
 WriteMakefile(
     NAME              => 'SPVM::Math',
@@ -27,7 +27,7 @@ WriteMakefile(
         },
     },
     PREREQ_PM => {
-        'SPVM'              => '0.9021',
+        'SPVM'              => '0.9500',
     },
 );
 
@@ -37,10 +37,10 @@ sub MY::postamble {
   my $make_rule = '';
   
   # Native compile make rule
-  $make_rule .= SPVM::Builder::Util::create_make_rule_native('Math');
+  $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Math');
 
   # Native compile make rule
-  $make_rule .= SPVM::Builder::Util::create_make_rule_precompile('Math');
+  $make_rule .= SPVM::Builder::Util::API::create_make_rule_precompile('Math');
   
   return $make_rule;
 }

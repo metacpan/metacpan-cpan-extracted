@@ -6,7 +6,7 @@ use warnings;
 use strict;
 use JSON;
 use Mnet::T;
-use Test::More tests => 13;
+use Test::More tests => 15;
 
 # init perl used for tests
 my $perl = <<'perl-eof';
@@ -140,6 +140,24 @@ Mnet::T::test_perl({
     perl    => $perl,
     args    => '--quiet sql',
     expect  => 'INSERT INTO "table" ("test") '. "VALUES ('value');",
+    debug   => '--debug --noquiet',
+});
+
+# tsv output to named file
+Mnet::T::test_perl({
+    name    => 'csv output to named file',
+    perl    => $perl,
+    args    => '--quiet tsv:/dev/stdout',
+    expect  => 'test' . "\n" . 'value',
+    debug   => '--debug --noquiet',
+});
+
+# tsv output to default stdout
+Mnet::T::test_perl({
+    name    => 'tsv output to default stdout',
+    perl    => $perl,
+    args    => '--quiet tsv',
+    expect  => 'test' . "\n" . 'value',
     debug   => '--debug --noquiet',
 });
 

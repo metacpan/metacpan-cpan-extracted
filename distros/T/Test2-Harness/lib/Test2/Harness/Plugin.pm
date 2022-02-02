@@ -2,7 +2,7 @@ package Test2::Harness::Plugin;
 use strict;
 use warnings;
 
-our $VERSION = '1.000099';
+our $VERSION = '1.000100';
 
 # Document, but do not implement
 #sub changed_files {}
@@ -141,7 +141,7 @@ This is an opportunity for your plugin to modify the data for any test file
 that will be run. The first argument is an arrayref of
 L<Test2::Harness::TestFile> objects.
 
-=item $hashref = $plugin->duration_data()
+=item $hashref = $plugin->duration_data($settings, $test_names)
 
 If defined, this can return a hashref of duration data. This should return
 undef if no duration data is provided. The first plugin listed that provides

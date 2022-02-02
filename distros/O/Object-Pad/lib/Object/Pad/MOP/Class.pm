@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::Class 0.59;
+package Object::Pad::MOP::Class 0.60;
 
 use v5.14;
 use warnings;
+use Carp;
 
 # This is an XS-implemented object type provided by Object::Pad itself
 require Object::Pad;
@@ -225,11 +226,13 @@ Returns a list of L<Object::Pad::MOP::Method> instances to represent all the
 methods of the class, including those inherited from superclasses. This list
 may be empty.
 
-=head2 add_slot
+=head2 add_field
 
-   $metaslot = $metaclass->add_slot( $name, %args )
+   $metafield = $metaclass->add_field( $name, %args )
 
-Adds a new slot to the class, using the given name (which must begin with the
+I<since version 0.60.>
+
+Adds a new field to the class, using the given name (which must begin with the
 sigil character C<$>, C<@> or C<%>).
 
 Recognises the following additional named arguments:
@@ -240,9 +243,9 @@ Recognises the following additional named arguments:
 
 I<Since version 0.43.>
 
-Provides a default value for the slot; similar to using the syntax
+Provides a default value for the field; similar to using the syntax
 
-   has $slot = SCALAR;
+   has $field = SCALAR;
 
 This value may be C<undef>, to set the value as being optional if it
 additionally has a parameter name.
@@ -251,7 +254,7 @@ additionally has a parameter name.
 
 I<Since version 0.43.>
 
-Provides a parameter name for the slot; similar to setting it using the
+Provides a parameter name for the field; similar to setting it using the
 C<:param> attribute. This parameter will be required unless a default value is
 set (such value may still be C<undef>).
 
@@ -275,30 +278,81 @@ C<:writer>, C<:mutator> or C<:accessor> attributes.
 
 I<Since version 0.46.>
 
-If true, reference values assigned into the slot by the constructor or
+If true, reference values assigned into the field by the constructor or
 accessor methods will be weakened, similar to setting the C<:weak> attribute.
 
 =back
 
-Returns an instance of L<Object::Pad::MOP::Slot> to represent it.
+Returns an instance of L<Object::Pad::MOP::Field> to represent it.
+
+=head2 add_slot
+
+   $metafield = $metaclass->add_slot( $name, %args )
+
+I<Now deprecated.>
+
+Back-compatibility alias for C<add_field>.
+
+=cut
+
+sub add_slot
+{
+   my $self = shift;
+   carp "->add_slot is now deprecated; use ->add_field instead";
+   return $self->add_field( @_ );
+}
+
+=head2 get_field
+
+   $metafield = $metaclass->get_field( $name )
+
+I<Since version 0.60.>
+
+Returns an instance of L<Object::Pad::MOP::Field> to represent the field of
+the given name, if one exists. If not an exception is thrown.
 
 =head2 get_slot
 
-   $metaslot = $metaclass->get_slot( $name )
+   $metafield = $metaclass->get_slot( $name )
 
-Returns an instance of L<Object::Pad::MOP::Slot> to represent the slot of the
-given name, if one exists. If not an exception is thrown.
+I<Now deprecated.>
+
+Back-compatibility alias for C<get_field>.
+
+=cut
+
+sub get_slot
+{
+   my $self = shift;
+   carp "->get_slot is now deprecated; use ->get_field instead";
+   return $self->get_field( @_ );
+}
+
+=head2 fields
+
+   @metafields = $metaclass->fields
+
+I<Since version 0.60.>
+
+Returns a list of L<Object::Pad::MOP::Field> instances to represent all the
+fields of the class. This list may be empty.
 
 =head2 slots
 
-   @metaslots = $metaclass->slots
+   @metafields = $metaclass->slots
 
-I<Since version 0.42.>
+I<Since version 0.42; now deprecated.>
 
-Returns a list of L<Object::Pad::MOP::Slot> instances to represent all the
-slots of the class. This list may be empty.
+Back-compatibility alias for C<fields>.
 
 =cut
+
+sub slots
+{
+   my $self = shift;
+   carp "->slots is now deprecated; use ->fields instead";
+   return $self->fields;
+}
 
 *roles = \&direct_roles;
 

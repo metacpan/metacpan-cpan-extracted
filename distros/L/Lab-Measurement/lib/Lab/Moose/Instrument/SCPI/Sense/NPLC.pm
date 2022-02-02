@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Sense::NPLC;
-$Lab::Moose::Instrument::SCPI::Sense::NPLC::VERSION = '3.802';
+$Lab::Moose::Instrument::SCPI::Sense::NPLC::VERSION = '3.803';
 #ABSTRACT: Role for the SCPI SENSe:$function:NPLC subsystem
 
 use v5.20;
@@ -51,7 +51,7 @@ Lab::Moose::Instrument::SCPI::Sense::NPLC - Role for the SCPI SENSe:$function:NP
 
 =head1 VERSION
 
-version 3.802
+version 3.803
 
 =head1 METHODS
 
@@ -65,7 +65,7 @@ Query/Set the input nplc.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2022 by the Lab::Measurement team; in detail:
 
   Copyright 2017-2018  Simon Reinhardt
             2020       Andreas K. Huettel

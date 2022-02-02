@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.38'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,16 +18,16 @@ name: File-CodeSearch
 provides:
   File::CodeSearch:
     file: lib/File/CodeSearch.pm
-    version: v0.7.5
+    version: v0.7.6
   File::CodeSearch::Highlighter:
     file: lib/File/CodeSearch/Highlighter.pm
-    version: v0.7.5
+    version: v0.7.6
   File::CodeSearch::RegexBuilder:
     file: lib/File/CodeSearch/RegexBuilder.pm
-    version: v0.7.5
+    version: v0.7.6
   File::CodeSearch::Replacer:
     file: lib/File/CodeSearch/Replacer.pm
-    version: v0.7.5
+    version: v0.7.6
 requires:
   Carp: '0'
   Clone: '0'
@@ -35,7 +35,7 @@ requires:
   File::Basename: '0'
   File::Slurp: '0'
   File::Spec: '0'
-  File::TypeCategories: '0.01'
+  File::TypeCategories: v0.8.1
   File::chdir: '0'
   IO::Handle: '0'
   IO::Prompt: '0'
@@ -49,12 +49,12 @@ requires:
   Term::ANSIColor: '0'
   Term::Size::Any: '0'
   autodie: '0'
-  perl: '5.006'
+  perl: '5.01'
   version: '0'
   warnings: '0'
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-CodeSearch
   license: http://dev.perl.org/licenses/
   repository: http://github.com/ivanwills/File-CodeSearch
-version: v0.7.5
+version: v0.7.6
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

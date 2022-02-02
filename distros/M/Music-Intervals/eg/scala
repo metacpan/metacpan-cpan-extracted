@@ -6,15 +6,20 @@ use warnings;
 
 use Data::Dumper::Compact qw(ddc);
 use Music::Scala ();
-use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(Music-Intervals);
 use Music::Intervals::Numeric;
+
+my $file = shift || "$ENV{HOME}/Music/scl/werck1.scl";
 
 my $m = Music::Intervals::Numeric->new;
 
-my $scala = Music::Scala->new(file => "$ENV{HOME}/Music/scl/werck1.scl");
+my $scala = Music::Scala->new(file => $file);
 
 print $scala->get_description, "\n";
 
+my $i = 0;
+
 for my $interval ($scala->get_notes) {
-    print "\t$interval: ", $m->ratios->{$interval}, "\n";
+    $i++;
+    my $name = $m->ratios->{$interval} || '?';
+    print "\t$i. $interval: $name\n";
 }

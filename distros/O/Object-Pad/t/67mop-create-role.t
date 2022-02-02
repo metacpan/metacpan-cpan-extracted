@@ -14,9 +14,9 @@ use Object::Pad;
 
          my $rolemeta = Object::Pad::MOP::Class->begin_role( "ARole" );
 
-         $rolemeta->add_slot( '$slot',
-            param => "role_slot",
-            reader => "get_role_slot",
+         $rolemeta->add_field( '$field',
+            param => "role_field",
+            reader => "get_role_field",
          );
       }
    }
@@ -25,8 +25,8 @@ use Object::Pad;
 {
    class AClass :does(ARole) {}
 
-   my $obj = AClass->new( role_slot => "the slot value" );
-   is( $obj->get_role_slot, "the slot value", 'instance slot accessible via role' );
+   my $obj = AClass->new( role_field => "the field value" );
+   is( $obj->get_role_field, "the field value", 'instance field accessible via role' );
 }
 
 done_testing;

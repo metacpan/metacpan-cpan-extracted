@@ -39,11 +39,11 @@ EOPERL
 
 {
    ok( !eval <<'EOPERL',
-      role CRole :compat(invokable) { has $slot; }
+      role CRole :compat(invokable) { has $field; }
 EOPERL
-      'invokable role with slot fails' );
-   like( $@, qr/^Cannot add slot data to an invokable role /,
-      'message from failure of invokable role with slot' );
+      'invokable role with field fails' );
+   like( $@, qr/^Cannot add field data to an invokable role /,
+      'message from failure of invokable role with field' );
 }
 
 done_testing;

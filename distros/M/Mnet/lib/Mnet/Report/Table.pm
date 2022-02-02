@@ -8,13 +8,13 @@ Mnet::Report::Table - Output rows of report data
 
     # create an example new table object, with csv file output
     my $table = Mnet::Report::Table->new({
-        output  => "csv:file.csv",
         columns => [
             device  => "string",
             time    => "time",
-            data    => "Integer",
-            error   => "error"
+            data    => "integer",
+            error   => "error",
         ],
+        output  => "csv:file.csv",
     });
 
     # output error row if script aborts with unreported errors
@@ -461,6 +461,12 @@ sub _output {
             $output = $self->_output_sql($row, $3 // $4 // "table");
             $file = $6 // "/dev/stdout";
 
+        # handle csv output, refer to sub _output_tsv
+        } elsif ($self->{output} =~ /^tsv(:(.+))?$/) {
+            $self->debug("_output calling _output_tsv");
+            $output = $self->_output_tsv($row);
+            $file = $2 // "/dev/stdout";
+
         # error on invalid output option
         } else {
             $self->fatal("invalid output option $self->{output}");
@@ -508,13 +514,15 @@ sub _output_csv {
     csv
     csv:$file
 
-The csv output option can be used to output a csv file, /dev/stdout by default.
+The csv output option can be used to output a csv file, /dev/stdout by default,
+where all values are enclosed in double quotes and separated by commas.
 
-All csv outputs are doule quoted. Double quotes in the outut data are escaped
-with an extra double quote.
+All csv outputs are doule quoted. Any double quote character in the outut data
+will be escaped with an extra double quote character
 
-All end of line carraige return and linefeed characters are replaced with
-spaces in the csv output. Multiline csv output data is not supported.
+All end of line carraige return and linefeed characters in the output data
+are replaced with spaces in the csv output. Multiline csv output data is not
+supported.
 
 The output csv file will be created with a heading row when the new method is
 called unless the append option was set when the new method was called.
@@ -532,7 +540,7 @@ Refer to the OUTPUT OPTIONS section of this module for more info.
     my $output = undef;
 
     # declare sub to quote and escape csv value
-    #   eol chars removed so concurrent batch outputs klines don't intermix
+    #   eol chars removed so concurrent batch outputs lines don't intermix
     #   double quotes are escaped with an extra double quote
     #   value is prefixed and suffixed with double quotes
     sub _output_csv_escaped {
@@ -851,6 +859,88 @@ sub _output_test {
     # finished _output_test method
     $self->debug("_output_test finished");
     return;
+}
+
+
+
+sub _output_tsv {
+
+# $output = $self->_output_tsv($row)
+# purpose: return output row data in tsv format, or heading row
+# \%row: row data, undef for heading row which returns heading row
+# $output: single line of row output, or heading row if input row was undef
+
+=head2 output tsv
+
+    tsv
+    tsv:$file
+
+The tsv output option can be used to output a tsv file, /dev/stdout by default,
+where all values are separated by tab characters.
+
+All end of line carraige return, linefeeds, and tab characters in the output
+data are replaced with spaces in the tsv output. Multiline tsv output data is
+not supported.
+
+The output tsv file will be created with a heading row when the new method is
+called unless the append option was set when the new method was called.
+
+Refer to the OUTPUT OPTIONS section of this module for more info.
+
+=cut
+
+    # read input object and row data hash reference
+    my $self = shift // die "missing self arg";
+    my $row = shift;
+    $self->debug("_output_tsv starting");
+
+    # init tsv row output sting, will be heading row if input row is undef
+    my $output = undef;
+
+    # declare sub to quote and escape tsv value
+    #   eol chars removed so concurrent batch outputs lines don't intermix
+    #   tab chars removed to avoid conflicting with tsv column separator
+    sub _output_tsv_escaped {
+        my $value = shift // "";
+        $value =~ s/(\r|\n|\t)/ /g;
+        return $value;
+    }
+
+    # determine if headings row is needed
+    #   headings are needed if current script is not a batch script
+    #   headings are needed for parent process of batch executions
+    #   headings are not needed if the append option is set for table
+    my $headings_needed = 0;
+    if (not $INC{"Mnet/Batch.pm"} or not $MNet::Batch::fork_called) {
+        if (not $self->{append}) {
+            $headings_needed = 1 if not defined $row;
+        }
+    }
+
+    # output heading row, if needed
+    if ($headings_needed) {
+        $self->debug("_output_tsv generating heading row");
+        my @headings = ();
+        foreach my $column (@{$self->{_column_order}}) {
+            push @headings, _output_tsv_escaped($column);
+        }
+        $output = join("\t", @headings);
+    }
+
+    # output data row, if defined
+    if (defined $row) {
+        my @data = ();
+        foreach my $column (@{$self->{_column_order}}) {
+            my $column_data = $row->{$column};
+            $column_data = ${$row->{$column}} if ref $row->{$column};
+            push @data, _output_tsv_escaped($column_data);
+        }
+        $output = join("\t", @data);
+    }
+
+    # finished _output_tsv method, return output line
+    $self->debug("_output_tsv finished");
+    return $output;
 }
 
 

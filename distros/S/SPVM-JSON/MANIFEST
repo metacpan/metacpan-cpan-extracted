@@ -1,0 +1,10 @@
+Changes
+lib/SPVM/JSON.pm
+lib/SPVM/JSON.spvm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/basic.t
+t/lib/SPVM/TestCase/JSON.spvm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

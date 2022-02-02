@@ -42,7 +42,7 @@ class Greeter {
    my $g = Greeter->new(who => "unit test");
 
    is( $g->greet, "Hello, unit test",
-      'subroutine signature default exprs can see instance slots'
+      'subroutine signature default exprs can see instance fields'
    );
 }
 

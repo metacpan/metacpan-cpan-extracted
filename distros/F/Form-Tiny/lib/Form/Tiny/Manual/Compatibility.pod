@@ -199,7 +199,9 @@ Starting from version I<2.00>, any backward incompatible changes will only be in
 
 =head2 Current deprecations
 
-None at this time.
+=head3 is_validated and clear_valid methods are deprecated
+
+Forms no longer store their validation state in a dedicated field. These methods do nothing starting with version 2.09, but will be removed at some point in the future.
 
 =head1 SEE ALSO
 

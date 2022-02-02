@@ -1,6 +1,6 @@
 package Lab::Instrument::ProStep4;
 #ABSTRACT: ProStep4 step motor
-$Lab::Instrument::ProStep4::VERSION = '3.802';
+$Lab::Instrument::ProStep4::VERSION = '3.803';
 use v5.20;
 
 use strict;
@@ -598,11 +598,11 @@ Lab::Instrument::ProStep4 - ProStep4 step motor
 
 =head1 VERSION
 
-version 3.802
+version 3.803
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2022 by the Lab::Measurement team; in detail:
 
   Copyright 2013       Christian Butschkow, Stefan Geissler
             2014-2015  Christian Butschkow

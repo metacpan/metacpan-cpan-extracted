@@ -51,6 +51,7 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "Test::Exception" : "0",
             "Test::More" : "0",
             "perl" : "5.006"
          }
@@ -65,7 +66,7 @@
          "web" : "https://github.com/ology/Music-Intervals"
       }
    },
-   "version" : "0.0707",
+   "version" : "0.0711",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032001"

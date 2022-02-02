@@ -25,7 +25,8 @@ to programmatically control interactive terminal sessions, with support for
 L<Mnet> options and logging.
 
 Refer to the perl L<Expect> module for more information. Also refer to the
-L<Mnet::Expect::Cli> and L<Mnet::Expect::Cli::Ios> modules.
+L<Mnet::Expect::Cli> and L<Mnet::Expect::Cli::Ios> modules, both of which
+build on this module.
 
 =head1 METHODS
 
@@ -389,8 +390,8 @@ sub log_expect {
 
     $prior = $expect->log_expect($level)
 
-Use this method to set a new log_expect level for expect session traffic. The
-prior log_expect value will be returned.
+Use this method to set a new log_expect level for data received in the expect
+session. The prior log_expect value will be returned.
 
 The new log_expect level can be set to debug, info, or undefined. An undefined
 log_expect disables the logging of expect session traffic, which might be

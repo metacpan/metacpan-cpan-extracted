@@ -14,6 +14,7 @@ use File::Basename 'dirname', 'basename';
 use SPVM::Builder::Util;
 use SPVM::Builder::Config;
 use SPVM::Builder::ObjectFileInfo;
+use SPVM::Builder::LinkInfo;
 
 sub category {
   my $self = shift;
@@ -458,11 +459,11 @@ sub compile {
 
   # Compile source files
   my $object_file_infos = [];
-  my $is_native_src;
+  my $is_native_source = 0;
   for my $source_file ($spvm_method_src_file, @$native_src_files) {
     my $object_file;
     # Native object file name
-    if ($is_native_src) {
+    if ($is_native_source) {
       my $object_rel_file = SPVM::Builder::Util::convert_class_name_to_category_rel_file($class_name, $category, 'native');
       
       my $object_file_base = $source_file;
@@ -484,7 +485,7 @@ sub compile {
     # Do compile. This is same as make command
     my $need_generate;
     my $input_files = [$config_file, $source_file, @include_file_names];
-    unless ($is_native_src) {
+    unless ($is_native_source) {
       my $module_file = $source_file;
       $module_file =~ s/\.[^\/\\]+$//;
       $module_file .= '.spvm';
@@ -526,11 +527,12 @@ sub compile {
       cc => $compile_info_cc,
       ccflags => $compile_info_ccflags,
       is_exe_config => $config->is_exe,
+      is_native_source => $is_native_source,
     );
     
     push @$object_file_infos, $object_file_info;
     
-    $is_native_src = 1;
+    $is_native_source = 1;
   }
   
   return $object_file_infos;
@@ -639,6 +641,9 @@ EOS
 sub link {
   my ($self, $class_name, $object_file_infos, $opt) = @_;
   
+  # All object file infos
+  my $all_object_file_infos = [@$object_file_infos];
+  
   # Category
   my $category = $self->category;
 
@@ -726,15 +731,17 @@ sub link {
 
   # Linker
   my $ld = $config->ld;
-  
+
+  # All linker flags
+  my @all_ldflags;
+
   # Linker flags
   my $ldflags = $config->ldflags;
-  my $ldflags_str = join(' ', @{$config->ldflags});
-  $ldflags_str = "$ldflags_str";
+  push @all_ldflags, @{$config->ldflags};
   
   # Optimize
   my $ld_optimize = $config->ld_optimize;
-  $ldflags_str .= " $ld_optimize";
+  push @all_ldflags, $ld_optimize;
 
   # Add resource lib directories
   if ($category eq 'native') {
@@ -763,23 +770,16 @@ sub link {
           class_name => $resource,
           is_exe_config => 0,
           is_resource => 1,
+          is_lib_file => 1,
         );
         
-        push @$object_file_infos, $object_file_info;
+        push @$all_object_file_infos, $object_file_info;
       }
       else {
         confess "Can't find resource static library file \"$static_lib_file\"";
       }
     }
   }
-
-  # Execute the callback before this link
-  my $before_link = $config->before_link;
-  if ($before_link) {
-    $object_file_infos = $before_link->($config, $object_file_infos);
-  }
-
-  my $object_files = [map { $_->to_string } @$object_file_infos];
 
   # Libraries
   # Libraries is linked using absolute path because the linked libraries must be known at runtime.
@@ -799,6 +799,7 @@ sub link {
         $type = 'dynamic,static';
       }
       
+      my $found_lib_file;
       for my $lib_dir (@$lib_dirs) {
         $lib_dir =~ s|[\\/]$||;
 
@@ -810,30 +811,43 @@ sub link {
         
         if ($type eq 'dynamic,static') {
           if (-f $dynamic_lib_file) {
-            push @lib_files, $dynamic_lib_file;
+            $found_lib_file = $dynamic_lib_file;
             last;
           }
           elsif (-f $static_lib_file) {
-            push @lib_files, $static_lib_file;
+            $found_lib_file = $static_lib_file;
             last;
           }
         }
         elsif ($type eq 'dynamic') {
           if (-f $dynamic_lib_file) {
-            push @lib_files, $dynamic_lib_file;
+            $found_lib_file = $dynamic_lib_file;
             last;
           }
         }
         elsif ($type eq 'static') {
           if (-f $static_lib_file) {
-            push @lib_files, $static_lib_file;
+            $found_lib_file = $static_lib_file;
             last;
           }
         }
       }
+      
+      if (defined $found_lib_file) {
+        push @lib_files, $found_lib_file;
+        
+        my $object_file_info = SPVM::Builder::ObjectFileInfo->new(
+          object_file => $found_lib_file,
+          class_name => $class_name,
+          is_exe_config => 0,
+          is_lib_file => 1,
+        );
+        push @$all_object_file_infos, $object_file_info;
+      }
     }
   }
-  push @$object_files, @lib_files;
+
+  my $all_object_files = [map { $_->to_string } @$all_object_file_infos];
 
   my $cbuilder_config = {
     ld => $ld,
@@ -859,17 +873,39 @@ sub link {
     global_force => $self->force,
     config_force => $config->force,
     output_file => $shared_lib_file,
-    input_files => [$config_file, @$object_files],
+    input_files => [$config_file, @$all_object_files],
   });
 
+  my $link_info = SPVM::Builder::LinkInfo->new(
+    class_name => $class_name,
+    object_file_infos => $all_object_file_infos,
+    ld => $ld,
+    ldflags => \@all_ldflags,
+    output_file => $shared_lib_file,
+  );
+
+  # Execute the callback before this link
+  my $before_link = $config->before_link;
+  if ($before_link) {
+    $before_link->($config, $link_info);
+  }
+
   if ($need_generate) {
+    my $link_info_ld = $link_info->ld;
+    my $link_info_ldflags = $link_info->ldflags;
+    my $link_info_class_name = $link_info->class_name;
+    my $link_info_output_file = $link_info->output_file;
+    my $link_info_object_file_infos = $link_info->object_file_infos;
+    my $link_info_object_files = [map { $_->to_string } @$link_info_object_file_infos];
+    my $link_info_ldflags_str = join(' ', @$link_info_ldflags);
+
     # Create shared library
     my (undef, @tmp_files) = $cbuilder->link(
-      lib_file => $shared_lib_file,
-      objects => $object_files,
-      module_name => $class_name,
+      lib_file => $link_info_output_file,
+      objects => $link_info_object_files,
+      module_name => $link_info_class_name,
+      extra_linker_flags => $link_info_ldflags_str,
       dl_func_list => $dl_func_list,
-      extra_linker_flags => $ldflags_str,
     );
 
     if ($self->debug) {
@@ -899,20 +935,21 @@ sub link {
       }
     }
 
+    # Create a resource.
+    # This is a static library. 
+    # This contains the object files that is compiled from native source files.
     if ($category eq 'native') {
-      # Create static library for resource system
-      my $ar_rel_file = SPVM::Builder::Util::convert_class_name_to_category_rel_file($class_name, $category, 'a');
-      my $ar_file = "$lib_dir/$ar_rel_file";
-      if (-f $ar_file) {
-        unlink $ar_file
-          or confess "Can't delete file \"$ar_file\":$!";
+      my $resource_static_lib_rel_file = SPVM::Builder::Util::convert_class_name_to_category_rel_file($class_name, $category, 'a');
+      my $resource_static_lib_file = "$lib_dir/$resource_static_lib_rel_file";
+      if (-f $resource_static_lib_file) {
+        unlink $resource_static_lib_file
+          or confess "Can't delete file \"$resource_static_lib_file\":$!";
       }
-      my @object_files_no_static_libs = grep { $_ !~ /\.a$/ } @$object_files;
-      my $spvm_object_rel_file = SPVM::Builder::Util::convert_class_name_to_rel_file($class_name);
-      $spvm_object_rel_file .= '.o';
-      @object_files_no_static_libs = grep { $_ !~ m|\Q$spvm_object_rel_file\E$| } @object_files_no_static_libs;
-      if (@object_files_no_static_libs) {
-        my @ar_cmd = ('ar', 'rc', $ar_file, @object_files_no_static_libs);
+      my @native_source_object_file_infos = grep { $_->is_native_source } @$all_object_file_infos;
+      
+      if (@native_source_object_file_infos) {
+        my @native_source_object_files = map { "$_" } @native_source_object_file_infos;
+        my @ar_cmd = ('ar', 'rc', $resource_static_lib_file, @native_source_object_files);
         $cbuilder->do_system(@ar_cmd);
       }
     }

@@ -49,11 +49,13 @@ class Derived::Class :isa(Base::Class) {
 
    # We don't mind what the output here is but it should be well-behaved
    # and not crash the dumper
-   use Data::Dump 'pp';
+   use Data::Dumper;
 
-   is( pp($obj),
-      q(bless({ "base_field" => 123, "Object::Pad/slots" => [456] }, "Derived::Class")),
-      'pp($obj) of Object::Pad-extended foreign HASH class' );
+   local $Data::Dumper::Sortkeys = 1;
+
+   is( Dumper($obj) =~ s/\s+//gr,
+      q($VAR1=bless({'Object::Pad/slots'=>[456],'base_field'=>123},'Derived::Class');),
+      'Dumper($obj) of Object::Pad-extended foreign HASH class' );
 }
 
 @BUILDS_INVOKED = ();
@@ -87,7 +89,7 @@ class Derived::Class :isa(Base::Class) {
    }
 }
 
-# Test case one - no slot access in example_method
+# Test case one - no field access in example_method
 {
    class RT132263::Child1 :isa(RT132263::Parent) {
       method example_method { 1 }
@@ -99,7 +101,7 @@ class Derived::Class :isa(Base::Class) {
       diag( "Exception was $e" );
 }
 
-# Test case two - read from an initialised slot
+# Test case two - read from an initialised field
 {
    class RT132263::Child2 :isa(RT132263::Parent) {
       has $value = 456;
@@ -113,7 +115,7 @@ class Derived::Class :isa(Base::Class) {
       diag( "Exception was $e" );
 
    {
-      local our $TODO = "slot initialisers no longer run during foreign superconstructor";
+      local our $TODO = "field initialisers no longer run during foreign superconstructor";
 
       $obj and is( $obj->{result}, 456, '$obj->{result} has correct value' );
    }

@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Lakeshore372;
-$Lab::Moose::Instrument::Lakeshore372::VERSION = '3.802';
+$Lab::Moose::Instrument::Lakeshore372::VERSION = '3.803';
 #ABSTRACT: Lakeshore Model 372 Temperature Controller
 
 use v5.20;
@@ -318,6 +318,20 @@ sub get_freq {
 }
 
 
+sub set_common_mode_reduction {
+    my ( $self, $value, %args ) = validated_setter(
+        \@_,
+        value => { isa => enum( [ 0, 1 ] ) },
+    );
+    $self->write( command => "CMR $value", %args );
+}
+
+sub get_common_mode_reduction {
+    my ( $self, %args ) = validated_getter( \@_ );
+    return $self->query( command => "CMR?", %args );
+}
+
+
 __PACKAGE__->meta()->make_immutable();
 
 1;
@@ -334,7 +348,7 @@ Lab::Moose::Instrument::Lakeshore372 - Lakeshore Model 372 Temperature Controlle
 
 =head1 VERSION
 
-version 3.802
+version 3.803
 
 =head1 SYNOPSIS
 
@@ -357,9 +371,9 @@ version 3.802
 
 =head2 get_T
 
-my $temp = $lakeshore->get_T(channel => $channel);
+ my $temp = $lakeshore->get_T(channel => $channel);
 
- C<$channel> needs to be one of 'A', 1, ..., 16.
+C<$channel> needs to be one of 'A', 1, ..., 16.
 
 =head2 get_value
 
@@ -462,6 +476,13 @@ Valid entries: 0 = local, 1 = remote, 2 = remote with local lockout.
 Allowed channels: 0 (measurement input), 'A' (control input).
 Allowed values: 1 = 9.8 Hz, 2 = 13.7 Hz, 3 = 16.2 Hz, 4 = 11.6 Hz, 5 = 18.2 Hz.
 
+=head2 set_common_mode_reduction/get_common_mode_reduction
+
+ $lakeshore->set_common_mode_reduction(value => 1);
+ my $cmr = $lakeshore->get_common_mode_reduction();
+
+Allowed values: 0 and 1.
+
 =head2 Consumed Roles
 
 This driver consumes the following roles:
@@ -474,11 +495,11 @@ This driver consumes the following roles:
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2022 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Simon Reinhardt
             2020       Andreas K. Huettel, Simon Reinhardt
-            2021       Simon Reinhardt
+            2021-2022  Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

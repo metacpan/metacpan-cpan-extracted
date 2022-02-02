@@ -3,7 +3,7 @@ package Mnet;
 # version number used by Makefile.PL
 #   these should be set to "dev", expect when creating a new release
 #   refer to developer build notes in Makefile.PL for more info
-our $VERSION = " 5.22";
+our $VERSION = "5.23";
 
 =head1 NAME
 
@@ -15,9 +15,10 @@ Mnet - Testable network automation and reporting
     #
     #   demonstrates typical use of all major Mnet modules
     #
-    #   --help to list all options, or --help <option>
+    #   --help to list all options, also --help <option>
     #   --device <address> to connect to device with logging
     #   --username and --password should be set if necessary
+    #   --debug to generate extra detailed logging outputs
     #   --batch <file.batch> to process multiple --device lines
     #   --report csv:<file.csv> to create an output csv file
     #   --record <file.test> to create replayable test file
@@ -25,7 +26,7 @@ Mnet - Testable network automation and reporting
     #
     #   refer to various Mnet modules' perldoc for more info
 
-    # load modules
+    # load needed modules
     use warnings;
     use strict;
     use Mnet::Batch;
@@ -75,12 +76,18 @@ Mnet - Testable network automation and reporting
     my $log = Mnet::Log->new({ log_id => $cli->device });
     $log->info("processing device");
 
+    # uncomment the push commands below to skip ssh host key checks
+    #   ideally host keys are already accepted, perhaps via manual ssh
+    my @ssh = qw(ssh);
+    #push @ssh, qw(-o StrictHostKeyChecking=no);
+    #push @ssh, qw(-o UserKnownHostsFile=/dev/null);
+
     # create an expect ssh session to current --device
     #   log ssh login/auth prompts as info, instead of default debug
     #   password_in set to prompt for password if --password opt not set
-    #   ssh host/key checks can be skipped, refer to Mnet::Expect::Cli
+    #   for non-ios devices refer to perldoc Mnet::Expect::Cli
     my $ssh = Mnet::Expect::Cli::Ios->new({
-        spawn       => [ "ssh", "$cli->{username}\@$cli->{device}" ],
+        spawn       => [ @ssh, "$cli->{username}\@$cli->{device}" ],
         log_id      => $cli->{device},
         log_login   => "info",
         password    => $cli->password,
@@ -130,12 +137,12 @@ authentication and command prompt handling.
 =item *
 
 L<Mnet::Stanza> module for templated config parsing and generation on cisco ios
-devices and other similar indented stanza text files.
+devices and other similar indented stanza text data.
 
 =item *
 
 L<Mnet::Batch> can run automation scripts in batch mode to concurrently process
-a list of devices, using a simple command line argument and a device list file.
+a list of devices, using command line arguments and a device list file.
 
 =item *
 
@@ -189,7 +196,7 @@ at <mmenza@cpan.org> with any comments or questions.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2006, 2013-2020 Michael J. Menza Jr.
+Copyright 2006, 2013-2022 Michael J. Menza Jr.
 
 L<Mnet> is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software

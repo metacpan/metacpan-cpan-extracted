@@ -44,11 +44,13 @@ class Derived::Class :isa(Base::Class) {
 
    # We don't mind what the output here is but it should be well-behaved
    # and not crash the dumper
-   use Data::Dump 'pp';
+   use Data::Dumper;
 
-   is( pp($obj),
-      q(bless([123], "Derived::Class")),
-      'pp($obj) of Object::Pad-extended blessed ARRAY class' );
+   local $Data::Dumper::Sortkeys = 1;
+
+   is( Dumper($obj) =~ s/\s+//gr,
+      q($VAR1=bless([123],'Derived::Class');),
+      'Dumper($obj) of Object::Pad-extended blessed ARRAY class' );
 }
 
 done_testing;

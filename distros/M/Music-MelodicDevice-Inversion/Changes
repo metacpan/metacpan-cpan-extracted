@@ -1,5 +1,12 @@
 Revision history for Music-MelodicDevice-Inversion
 
+0.0501 2022-01-31 20:16:04
+    - Improve documentation.
+
+0.0500 2022-01-31 20:02:23
+    - Allow inversion of integer pitches.
+    - Update eg/ programs.
+
 0.0400 2020-12-28 13:20:48
     - Use a midinum scale internally and convert with Music::Note.
 

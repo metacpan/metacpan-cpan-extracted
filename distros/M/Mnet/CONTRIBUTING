@@ -16,7 +16,7 @@ will run all of the tests and cleanup afterwards:
     make test realclean
 
 Individual tests can be run after adding the cloned Mnet lib directory to your
-perl library environment variable, as follows:
+perl library environment variable in the current shell session, as follows:
 
     export PERL5LIB=$HOME/Mnet/lib
     perl t/Log.t

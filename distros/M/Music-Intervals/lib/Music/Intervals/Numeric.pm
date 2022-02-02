@@ -1,5 +1,5 @@
 package Music::Intervals::Numeric;
-$Music::Intervals::Numeric::VERSION = '0.0707';
+$Music::Intervals::Numeric::VERSION = '0.0711';
 our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Breakdown of numeric musical intervals
@@ -121,6 +121,8 @@ sub dyads {
     my $self = shift;
     my ($c) = @_;
 
+    return () if @$c <= 1;
+
     my @pairs = combinations( $c, 2 );
 
     my %dyads;
@@ -166,7 +168,7 @@ Music::Intervals::Numeric - Breakdown of numeric musical intervals
 
 =head1 VERSION
 
-version 0.0707
+version 0.0711
 
 =head1 SYNOPSIS
 
@@ -184,7 +186,7 @@ version 0.0707
     $m->prime_factor,
   );
 
-  my interval = $m->ratios->{'5/4'};
+  my $interval = $m->ratios->{'5/4'};
 
 =head1 DESCRIPTION
 
@@ -197,7 +199,7 @@ intervals and chords given as integer ratios.
 
 The actual notes to use in the computation
 
-Default: [ 1/1 5/4 3/2 ]  (C E G)
+Default: C<[ 1/1 5/4 3/2 ]>  (C E G)
 
 The list of notes may be any of the keys in the L<Music::Intervals::Ratio>
 C<ratio> hashref.  This is very very long and contains useful intervals such as
@@ -207,11 +209,12 @@ those of the common scale and even the Pythagorean intervals, too.
 
 Chord size
 
-Default: 3
+Default: C<3>
 
 =head2 ratios
 
-Musical ratios keyed by interval fractions.
+Musical ratios keyed by interval fractions. Computed attribute if not
+given.
 
 =head1 METHODS
 

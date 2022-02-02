@@ -6,11 +6,13 @@
 
 #define OBJECTPAD_ABIVERSION  ((OBJECTPAD_ABIVERSION_MAJOR << 16) | (OBJECTPAD_ABIVERSION_MINOR))
 
-/* A SLOTOFFSET is an offset within the AV of an object instance */
-typedef IV SLOTOFFSET;
+/* A FIELDOFFSET is an offset within the AV of an object instance */
+typedef IV FIELDOFFSET;
+typedef IV SLOTOFFSET; /* back-compat */
 
 typedef struct ClassMeta ClassMeta;
-typedef struct SlotMeta SlotMeta;
+typedef struct FieldMeta FieldMeta;
+typedef struct FieldMeta SlotMeta; /* back-compat */
 typedef struct MethodMeta MethodMeta;
 
 enum AccessorType {
@@ -41,8 +43,11 @@ struct ClassHookFuncs {
   /* called immediately at apply time; return FALSE means it did its thing immediately, so don't store it */
   bool (*apply)(pTHX_ ClassMeta *classmeta, SV *value, SV **hookdata_ptr, void *funcdata);
 
-  /* called by mop_class_add_slot() */
-  void (*post_add_slot)(pTHX_ ClassMeta *classmeta, SV *hookdata, void *funcdata, SlotMeta *slotmeta);
+  /* called by mop_class_add_field() */
+  union {
+    void (*post_add_field)(pTHX_ ClassMeta *classmeta, SV *hookdata, void *funcdata, FieldMeta *fieldmeta);
+    void (*post_add_slot)(pTHX_ ClassMeta *classmeta, SV *hookdata, void *funcdata, FieldMeta *fieldmeta); /* back-compat */
+  };
 };
 
 struct ClassHook {
@@ -51,30 +56,30 @@ struct ClassHook {
   SV *hookdata;
 };
 
-struct SlotHookFuncs {
+struct FieldHookFuncs {
   U32 ver;   /* caller must initialise to OBJECTPAD_VERSION */
   U32 flags;
   const char *permit_hintkey;
 
   /* called immediately at apply time; return FALSE means it did its thing immediately, so don't store it */
-  bool (*apply)(pTHX_ SlotMeta *slotmeta, SV *value, SV **hookdata_ptr, void *funcdata);
+  bool (*apply)(pTHX_ FieldMeta *fieldmeta, SV *value, SV **hookdata_ptr, void *funcdata);
 
   /* called at the end of `has` statement compiletime */
-  void (*seal_slot)(pTHX_ SlotMeta *slotmeta, SV *hookdata, void *funcdata);
+  void (*seal)(pTHX_ FieldMeta *fieldmeta, SV *hookdata, void *funcdata);
 
   /* called as part of accessor generation */
-  void (*gen_accessor_ops)(pTHX_ SlotMeta *slotmeta, SV *hookdata, void *funcdata,
+  void (*gen_accessor_ops)(pTHX_ FieldMeta *fieldmeta, SV *hookdata, void *funcdata,
           enum AccessorType type, struct AccessorGenerationCtx *ctx);
 
   /* called by constructor */
-  void (*post_initslot)(pTHX_ SlotMeta *slotmeta, SV *hookdata, void *funcdata, SV *slot);
-  void (*post_construct)(pTHX_ SlotMeta *slotmeta, SV *hookdata, void *funcdata, SV *slot);
+  void (*post_initfield)(pTHX_ FieldMeta *fieldmeta, SV *hookdata, void *funcdata, SV *field);
+  void (*post_construct)(pTHX_ FieldMeta *fieldmeta, SV *hookdata, void *funcdata, SV *field);
 };
 
-struct SlotHook {
-  SLOTOFFSET slotix; /* unused when in SlotMeta->hooks; used by ClassMeta->slothooks_* */
-  SlotMeta *slotmeta;
-  const struct SlotHookFuncs *funcs;
+struct FieldHook {
+  FIELDOFFSET fieldix; /* unused when in FieldMeta->hooks; used by ClassMeta->fieldhooks_* */
+  FieldMeta *fieldmeta;
+  const struct FieldHookFuncs *funcs;
   void *funcdata;
   SV *hookdata;
 };
@@ -85,9 +90,9 @@ enum MetaType {
 };
 
 enum ReprType {
-  REPR_NATIVE,       /* instances are in native format - blessed AV as slots */
-  REPR_HASH,         /* instances are blessed HASHes; our slots live in $self->{"Object::Pad/slots"} */
-  REPR_MAGIC,        /* instances store slot AV via magic; superconstructor must be foreign */
+  REPR_NATIVE,       /* instances are in native format - blessed AV as backing */
+  REPR_HASH,         /* instances are blessed HASHes; our backing lives in $self->{"Object::Pad/slots"} */
+  REPR_MAGIC,        /* instances store backing AV via magic; superconstructor must be foreign */
 
   REPR_AUTOSELECT,   /* pick one of the above depending on foreign_new and SvTYPE()==SVt_PVHV */
 };
@@ -100,8 +105,8 @@ enum {
   /* for role methods */
   PADIX_EMBEDDING = 3,
 
-  /* during initslots */
-  PADIX_INITSLOTS_PARAMS = 4,
+  /* during initfields */
+  PADIX_INITFIELDS_PARAMS = 4,
 };
 
 /* Function prototypes */
@@ -112,18 +117,18 @@ void ObjectPad_extend_pad_vars(pTHX_ const ClassMeta *meta);
 #define newMETHSTARTOP(flags)  ObjectPad_newMETHSTARTOP(aTHX_ flags)
 OP *ObjectPad_newMETHSTARTOP(pTHX_ U32 flags);
 
-/* op_private flags on SLOTPAD ops */
+/* op_private flags on FIELDPAD ops */
 enum {
-  OPpSLOTPAD_SV,  /* has $x */
-  OPpSLOTPAD_AV,  /* has @y */
-  OPpSLOTPAD_HV,  /* has %z */
+  OPpFIELDPAD_SV,  /* has $x */
+  OPpFIELDPAD_AV,  /* has @y */
+  OPpFIELDPAD_HV,  /* has %z */
 };
 
-#define newSLOTPADOP(flags, padix, slotix)  ObjectPad_newSLOTPADOP(aTHX_ flags, padix, slotix)
-OP *ObjectPad_newSLOTPADOP(pTHX_ U32 flags, PADOFFSET padix, SLOTOFFSET slotix);
+#define newFIELDPADOP(flags, padix, fieldix)  ObjectPad_newFIELDPADOP(aTHX_ flags, padix, fieldix)
+OP *ObjectPad_newFIELDPADOP(pTHX_ U32 flags, PADOFFSET padix, FIELDOFFSET fieldix);
 
-#define get_obj_slotsav(self, repr, create)  ObjectPad_get_obj_slotsav(aTHX_ self, repr, create)
-SV *ObjectPad_get_obj_slotsav(pTHX_ SV *self, enum ReprType repr, bool create);
+#define get_obj_backingav(self, repr, create)  ObjectPad_get_obj_backingav(aTHX_ self, repr, create)
+SV *ObjectPad_get_obj_backingav(pTHX_ SV *self, enum ReprType repr, bool create);
 
 /* Class API */
 #define mop_create_class(type, name)  ObjectPad_mop_create_class(aTHX_ type, name)
@@ -147,8 +152,8 @@ void ObjectPad_mop_class_add_role(pTHX_ ClassMeta *class, ClassMeta *role);
 #define mop_class_add_method(class, methodname)  ObjectPad_mop_class_add_method(aTHX_ class, methodname)
 MethodMeta *ObjectPad_mop_class_add_method(pTHX_ ClassMeta *meta, SV *methodname);
 
-#define mop_class_add_slot(class, slotname)  ObjectPad_mop_class_add_slot(aTHX_ class, slotname)
-SlotMeta *ObjectPad_mop_class_add_slot(pTHX_ ClassMeta *meta, SV *slotname);
+#define mop_class_add_field(class, fieldname)  ObjectPad_mop_class_add_field(aTHX_ class, fieldname)
+FieldMeta *ObjectPad_mop_class_add_field(pTHX_ ClassMeta *meta, SV *fieldname);
 
 #define mop_class_add_BUILD(class, cv)  ObjectPad_mop_class_add_BUILD(aTHX_ class, cv)
 void ObjectPad_mop_class_add_BUILD(pTHX_ ClassMeta *meta, CV *cv);
@@ -165,31 +170,63 @@ void ObjectPad_mop_class_apply_attribute(pTHX_ ClassMeta *classmeta, const char 
 #define register_class_attribute(name, funcs, funcdata)  ObjectPad_register_class_attribute(aTHX_ name, funcs, funcdata)
 void ObjectPad_register_class_attribute(pTHX_ const char *name, const struct ClassHookFuncs *funcs, void *funcdata);
 
-/* Slot API */
-#define mop_create_slot(slotname, classmeta)  ObjectPad_mop_create_slot(aTHX_ slotname, classmeta)
-SlotMeta *ObjectPad_mop_create_slot(pTHX_ SV *slotname, ClassMeta *classmeta);
+/* Field API */
+#define mop_create_field(fieldname, classmeta)  ObjectPad_mop_create_field(aTHX_ fieldname, classmeta)
+FieldMeta *ObjectPad_mop_create_field(pTHX_ SV *fieldname, ClassMeta *classmeta);
 
-#define mop_slot_seal(slotmeta)  ObjectPad_mop_slot_seal(aTHX_ slotmeta)
-void ObjectPad_mop_slot_seal(pTHX_ SlotMeta *slotmeta);
+#define mop_field_seal(fieldmeta)  ObjectPad_mop_field_seal(aTHX_ fieldmeta)
+void ObjectPad_mop_field_seal(pTHX_ FieldMeta *fieldmeta);
 
-#define mop_slot_get_name(slotmeta)  ObjectPad_mop_slot_get_name(aTHX_ slotmeta)
-SV *ObjectPad_mop_slot_get_name(pTHX_ SlotMeta *slotmeta);
+#define mop_field_get_name(fieldmeta)  ObjectPad_mop_field_get_name(aTHX_ fieldmeta)
+SV *ObjectPad_mop_field_get_name(pTHX_ FieldMeta *fieldmeta);
 
-#define mop_slot_get_sigil(slotmeta)  ObjectPad_mop_slot_get_sigil(aTHX_ slotmeta)
-char ObjectPad_mop_slot_get_sigil(pTHX_ SlotMeta *slotmeta);
+#define mop_field_get_sigil(fieldmeta)  ObjectPad_mop_field_get_sigil(aTHX_ fieldmeta)
+char ObjectPad_mop_field_get_sigil(pTHX_ FieldMeta *fieldmeta);
 
-#define mop_slot_apply_attribute(slotmeta, name, value)  ObjectPad_mop_slot_apply_attribute(aTHX_ slotmeta, name, value)
-void ObjectPad_mop_slot_apply_attribute(pTHX_ SlotMeta *slotmeta, const char *name, SV *value);
+#define mop_field_apply_attribute(fieldmeta, name, value)  ObjectPad_mop_field_apply_attribute(aTHX_ fieldmeta, name, value)
+void ObjectPad_mop_field_apply_attribute(pTHX_ FieldMeta *fieldmeta, const char *name, SV *value);
 
-#define mop_slot_get_attribute(slotmeta, name)  ObjectPad_mop_slot_get_attribute(aTHX_ slotmeta, name)
-struct SlotHook *ObjectPad_mop_slot_get_attribute(pTHX_ SlotMeta *slotmeta, const char *name);
+#define mop_field_get_attribute(fieldmeta, name)  ObjectPad_mop_field_get_attribute(aTHX_ fieldmeta, name)
+struct FieldHook *ObjectPad_mop_field_get_attribute(pTHX_ FieldMeta *fieldmeta, const char *name);
 
-#define mop_slot_get_default_sv(slotmeta)  ObjectPad_mop_slot_get_default_sv(aTHX_ slotmeta)
-SV *ObjectPad_mop_slot_get_default_sv(pTHX_ SlotMeta *slotmeta);
+#define mop_field_get_default_sv(fieldmeta)  ObjectPad_mop_field_get_default_sv(aTHX_ fieldmeta)
+SV *ObjectPad_mop_field_get_default_sv(pTHX_ FieldMeta *fieldmeta);
 
-#define mop_slot_set_default_sv(slotmeta, sv)  ObjectPad_mop_slot_set_default_sv(aTHX_ slotmeta, sv)
-void ObjectPad_mop_slot_set_default_sv(pTHX_ SlotMeta *slotmeta, SV *sv);
+#define mop_field_set_default_sv(fieldmeta, sv)  ObjectPad_mop_field_set_default_sv(aTHX_ fieldmeta, sv)
+void ObjectPad_mop_field_set_default_sv(pTHX_ FieldMeta *fieldmeta, SV *sv);
 
+#define register_field_attribute(name, funcs, funcdata)  ObjectPad_register_field_attribute(aTHX_ name, funcs, funcdata)
+void ObjectPad_register_field_attribute(pTHX_ const char *name, const struct FieldHookFuncs *funcs, void *funcdata);
+
+
+/* back-compat */
+
+struct SlotHookFuncs {
+  U32 ver;
+  U32 flags;
+  const char *permit_hintkey;
+  bool (*apply)(pTHX_ FieldMeta *fieldmeta, SV *value, SV **hookdata_ptr, void *funcdata);
+  void (*seal_slot)(pTHX_ FieldMeta *fieldmeta, SV *hookdata, void *funcdata);
+  void (*gen_accessor_ops)(pTHX_ FieldMeta *fieldmeta, SV *hookdata, void *funcdata,
+          enum AccessorType type, struct AccessorGenerationCtx *ctx);
+  void (*post_initslot)(pTHX_ FieldMeta *fieldmeta, SV *hookdata, void *funcdata, SV *slot);
+  void (*post_construct)(pTHX_ FieldMeta *fieldmeta, SV *hookdata, void *funcdata, SV *slot);
+};
+
+#define get_obj_slotsav           get_obj_backingav
+
+#define mop_class_add_slot        mop_class_add_field
+#define mop_create_slot           mop_create_field
+#define mop_slot_seal             mop_field_seal
+#define mop_slot_get_name         mop_field_get_name
+#define mop_slot_get_sigil        mop_field_get_sigil
+#define mop_slot_apply_attribute  mop_field_apply_attribute
+#define mop_slot_get_attribute    mop_field_get_attribute
+#define mop_slot_get_default_sv   mop_field_get_default_sv
+#define mop_slot_set_default_sv   mop_field_set_default_sv
+/* Don't redirect this one to register_field_attribute, so we still get the
+ * deprecation warning on newly-compiled code
+ */
 #define register_slot_attribute(name, funcs, funcdata)  ObjectPad_register_slot_attribute(aTHX_ name, funcs, funcdata)
 void ObjectPad_register_slot_attribute(pTHX_ const char *name, const struct SlotHookFuncs *funcs, void *funcdata);
 

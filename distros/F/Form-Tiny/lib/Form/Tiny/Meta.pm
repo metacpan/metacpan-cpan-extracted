@@ -17,7 +17,7 @@ require Moo::Role;
 
 use namespace::clean;
 
-our $VERSION = '2.08';
+our $VERSION = '2.09';
 
 # more clear error messages in some crucial cases
 our @CARP_NOT = qw(Form::Tiny Form::Tiny::Form);
@@ -127,24 +127,31 @@ sub run_hooks_for
 	return $data[-1];
 }
 
-sub _inline_hook
+sub inline_hooks
 {
-	my ($self, $stage) = @_;
+	my ($self) = @_;
 
-	my @hooks = @{$self->hooks->{$stage} // []};
+	$self->{_cache}{inline_hooks} //= do {
+		my %inlined;
+		for my $stage (keys %{$self->hooks}) {
+			my @hooks = @{$self->hooks->{$stage}};
+			$inlined{$stage} = sub {
+				my @data = @_;
 
-	return undef if @hooks == 0;
-	return sub {
-		my @data = @_;
+				for my $hook (@hooks) {
+					my $ret = $hook->code->(@data);
+					splice @data, -1, 1, $ret
+						if $hook->is_modifying;
+				}
 
-		for my $hook (@hooks) {
-			my $ret = $hook->code->(@data);
-			splice @data, -1, 1, $ret
-				if $hook->is_modifying;
+				return $data[-1];
+			};
 		}
 
-		return $data[-1];
+		\%inlined;
 	};
+
+	return $self->{_cache}{inline_hooks};
 }
 
 sub bootstrap
@@ -206,6 +213,7 @@ sub resolved_fields
 sub add_field
 {
 	my ($self, @parameters) = @_;
+	delete $self->{_cache};
 
 	croak 'adding a form field requires at least one parameter'
 		unless scalar @parameters;
@@ -229,6 +237,7 @@ sub add_field
 sub add_field_validator
 {
 	my ($self, $field, $message, $code) = @_;
+	delete $self->{_cache};
 
 	push @{$field->addons->{validators}}, [$message, $code];
 	return $self;
@@ -237,6 +246,7 @@ sub add_field_validator
 sub add_hook
 {
 	my ($self, $hook, $code) = @_;
+	delete $self->{_cache};
 
 	if (defined blessed $hook && $hook->isa('Form::Tiny::Hook')) {
 		push @{$self->hooks->{$hook->hook}}, $hook;

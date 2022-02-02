@@ -58,7 +58,7 @@
    "provides" : {
       "Crypt::PKCS10" : {
          "file" : "lib/Crypt/PKCS10.pm",
-         "version" : "2.002"
+         "version" : "2.003"
       }
    },
    "release_status" : "stable",
@@ -72,8 +72,9 @@
          "web" : "https://github.com/openxpki/Crypt-PKCS10"
       }
    },
-   "version" : "2.002",
+   "version" : "2.003",
    "x_contributors" : [
+      "Daniel Hoffend <dh@dotlan.net>",
       "Gideon Knocke <gideonknocke@googlemail.com>",
       "Gideon Knocke <root@develop.localdomain>",
       "Martin Bartosch <m.bartosch@cynops.de>",

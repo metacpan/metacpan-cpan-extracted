@@ -84,6 +84,10 @@ $expected = null;
 $got = null;
 ok eq_pdl( $got, $expected ), 'null == null';
 
+$got = zeroes(0);
+$expected = null;
+ok eq_pdl( $got, $expected ), 'null == empty';
+
 $expected = null;
 $got = pdl( 1,2,3 );
 ok !eq_pdl( $got, $expected ), 'pdl( ... ) != null';

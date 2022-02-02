@@ -37,7 +37,7 @@
 
 #include "object_pad.h"
 #include "class.h"
-#include "slot.h"
+#include "field.h"
 
 typedef void AttributeHandler(pTHX_ void *target, const char *value, void *data);
 
@@ -48,9 +48,9 @@ struct AttributeDefinition {
   void *applydata;
 };
 
-/*********************************
- * Class and Slot Implementation *
- *********************************/
+/**********************************
+ * Class and Field Implementation *
+ **********************************/
 
 /* Empty role embedding that is applied to all invokable role methods */
 static RoleEmbedding embedding_standalone = {};
@@ -76,10 +76,10 @@ void ObjectPad_extend_pad_vars(pTHX_ const ClassMeta *meta)
   }
 }
 
-#define find_padix_for_slot(slotmeta)  S_find_padix_for_slot(aTHX_ slotmeta)
-static PADOFFSET S_find_padix_for_slot(pTHX_ SlotMeta *slotmeta)
+#define find_padix_for_field(fieldmeta)  S_find_padix_for_field(aTHX_ fieldmeta)
+static PADOFFSET S_find_padix_for_field(pTHX_ FieldMeta *fieldmeta)
 {
-  const char *slotname = SvPVX(slotmeta->name);
+  const char *fieldname = SvPVX(fieldmeta->name);
 #if HAVE_PERL_VERSION(5, 20, 0)
   const PADNAMELIST *nl = PadlistNAMES(CvPADLIST(PL_compcv));
   PADNAME **names = PadnamelistARRAY(nl);
@@ -95,13 +95,13 @@ static PADOFFSET S_find_padix_for_slot(pTHX_ SlotMeta *slotmeta)
     if(!pv)
       continue;
 
-    /* slot names are all OUTER vars. This is necessary so we don't get
+    /* field names are all OUTER vars. This is necessary so we don't get
      * confused by signatures params of the same name
      *   https://rt.cpan.org/Ticket/Display.html?id=134456
      */
     if(!PadnameOUTER(name))
       continue;
-    if(!strEQ(pv, slotname))
+    if(!strEQ(pv, fieldname))
       continue;
 
     /* TODO: for extra robustness we could compare the SV * in the pad itself */
@@ -115,7 +115,7 @@ static PADOFFSET S_find_padix_for_slot(pTHX_ SlotMeta *slotmeta)
    * It won't get confused about signatures params because these perls are too
    * old for signatures anyway
    */
-  return pad_findmy_pv(slotname, 0);
+  return pad_findmy_pv(fieldname, 0);
 #endif
 }
 
@@ -130,7 +130,7 @@ static OP *pp_methstart(pTHX)
     croak("Cannot invoke method on a non-instance");
 
   HV *classstash;
-  SLOTOFFSET offset;
+  FIELDOFFSET offset;
   RoleEmbedding *embedding = NULL;
 
   if(is_role) {
@@ -167,38 +167,38 @@ static OP *pp_methstart(pTHX)
   save_clearsv(&PAD_SVl(PADIX_SELF));
   sv_setsv(PAD_SVl(PADIX_SELF), self);
 
-  SV *slotsav;
+  SV *backingav;
 
   if(is_role) {
     if(embedding == &embedding_standalone) {
-      slotsav = NULL;
+      backingav = NULL;
     }
     else {
-      SV *instancedata = get_obj_slotsav(self, embedding->classmeta->repr, create);
+      SV *instancedata = get_obj_backingav(self, embedding->classmeta->repr, create);
 
       if(create) {
-        slotsav = instancedata;
-        SvREFCNT_inc(slotsav);
+        backingav = instancedata;
+        SvREFCNT_inc(backingav);
       }
       else {
-        slotsav = (SV *)newAV();
+        backingav = (SV *)newAV();
         /* MASSIVE CHEAT */
-        AvARRAY(slotsav) = AvARRAY(instancedata) + offset;
-        AvFILLp(slotsav) = AvFILLp(instancedata) - offset;
-        AvREAL_off(slotsav);
+        AvARRAY(backingav) = AvARRAY(instancedata) + offset;
+        AvFILLp(backingav) = AvFILLp(instancedata) - offset;
+        AvREAL_off(backingav);
       }
     }
   }
   else {
-    /* op_private contains the repr type so we can extract slots */
-    slotsav = get_obj_slotsav(self, PL_op->op_private, create);
-    SvREFCNT_inc(slotsav);
+    /* op_private contains the repr type so we can extract backing */
+    backingav = get_obj_backingav(self, PL_op->op_private, create);
+    SvREFCNT_inc(backingav);
   }
 
-  if(slotsav) {
+  if(backingav) {
     SAVESPTR(PAD_SVl(PADIX_SLOTS));
-    PAD_SVl(PADIX_SLOTS) = slotsav;
-    save_freesv(slotsav);
+    PAD_SVl(PADIX_SLOTS) = backingav;
+    save_freesv(backingav);
   }
 
   return PL_op->op_next;
@@ -211,44 +211,44 @@ OP *ObjectPad_newMETHSTARTOP(pTHX_ U32 flags)
   return op;
 }
 
-static XOP xop_slotpad;
-static OP *pp_slotpad(pTHX)
+static XOP xop_fieldpad;
+static OP *pp_fieldpad(pTHX)
 {
 #ifdef HAVE_UNOP_AUX
-  SLOTOFFSET slotix = PTR2IV(cUNOP_AUX->op_aux);
+  FIELDOFFSET fieldix = PTR2IV(cUNOP_AUX->op_aux);
 #else
   UNOP_with_IV *op = (UNOP_with_IV *)PL_op;
-  SLOTOFFSET slotix = op->iv;
+  FIELDOFFSET fieldix = op->iv;
 #endif
   PADOFFSET targ = PL_op->op_targ;
 
   if(SvTYPE(PAD_SV(PADIX_SLOTS)) != SVt_PVAV)
     croak("ARGH: expected ARRAY of slots at PADIX_SLOTS");
 
-  AV *slotsav = (AV *)PAD_SV(PADIX_SLOTS);
+  AV *backingav = (AV *)PAD_SV(PADIX_SLOTS);
 
-  if(slotix > av_top_index(slotsav))
-    croak("ARGH: instance does not have a slot at index %ld", (long int)slotix);
+  if(fieldix > av_top_index(backingav))
+    croak("ARGH: instance does not have a field at index %ld", (long int)fieldix);
 
-  SV **slots = AvARRAY(slotsav);
+  SV **fieldsvs = AvARRAY(backingav);
 
-  SV *slot = slots[slotix];
+  SV *sv = fieldsvs[fieldix];
 
   SV *val;
   switch(PL_op->op_private) {
-    case OPpSLOTPAD_SV:
-      val = slot;
+    case OPpFIELDPAD_SV:
+      val = sv;
       break;
-    case OPpSLOTPAD_AV:
-      if(!SvROK(slot) || SvTYPE(val = SvRV(slot)) != SVt_PVAV)
-        croak("ARGH: expected to find an ARRAY reference at slot index %ld", (long int)slotix);
+    case OPpFIELDPAD_AV:
+      if(!SvROK(sv) || SvTYPE(val = SvRV(sv)) != SVt_PVAV)
+        croak("ARGH: expected to find an ARRAY reference at field index %ld", (long int)fieldix);
       break;
-    case OPpSLOTPAD_HV:
-      if(!SvROK(slot) || SvTYPE(val = SvRV(slot)) != SVt_PVHV)
-        croak("ARGH: expected to find a HASH reference at slot index %ld", (long int)slotix);
+    case OPpFIELDPAD_HV:
+      if(!SvROK(sv) || SvTYPE(val = SvRV(sv)) != SVt_PVHV)
+        croak("ARGH: expected to find a HASH reference at field index %ld", (long int)fieldix);
       break;
     default:
-      croak("ARGH: unsure what to do with this slot type");
+      croak("ARGH: unsure what to do with this field type");
   }
 
   SAVESPTR(PAD_SVl(targ));
@@ -258,16 +258,16 @@ static OP *pp_slotpad(pTHX)
   return PL_op->op_next;
 }
 
-OP *ObjectPad_newSLOTPADOP(pTHX_ U32 flags, PADOFFSET padix, SLOTOFFSET slotix)
+OP *ObjectPad_newFIELDPADOP(pTHX_ U32 flags, PADOFFSET padix, FIELDOFFSET fieldix)
 {
 #ifdef HAVE_UNOP_AUX
-  OP *op = newUNOP_AUX(OP_CUSTOM, flags, NULL, NUM2PTR(UNOP_AUX_item *, slotix));
+  OP *op = newUNOP_AUX(OP_CUSTOM, flags, NULL, NUM2PTR(UNOP_AUX_item *, fieldix));
 #else
-  OP *op = newUNOP_with_IV(OP_CUSTOM, flags, NULL, slotix);
+  OP *op = newUNOP_with_IV(OP_CUSTOM, flags, NULL, fieldix);
 #endif
   op->op_targ = padix;
   op->op_private = (U8)(flags >> 8);
-  op->op_ppaddr = &pp_slotpad;
+  op->op_ppaddr = &pp_fieldpad;
 
   return op;
 }
@@ -407,6 +407,9 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
 
   if(args[argi++]->i) {
     /* extends */
+    if(!args[argi]->i) {
+      warn("'extends' is deprecated; use :isa instead");
+    }
     argi++; /* ignore the XPK_CHOICE() integer; `extends` and `isa` are synonyms */
     if(type != METATYPE_CLASS)
       croak("Only a class may extend another");
@@ -444,6 +447,9 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
   if(nimplements) {
     int i;
     for(i = 0; i < nimplements; i++) {
+      if(!args[argi]->i) {
+        warn("'implements' is deprecated; use :does instead");
+      }
       argi++; /* ignore the XPK_CHOICE() integer; `implements` and `does` are synonyms */
       int nroles = args[argi++]->i;
       while(nroles--) {
@@ -593,7 +599,7 @@ static void check_has(pTHX_ void *hookdata)
     croak("Cannot 'has' outside of 'class'");
 
   if(compclassmeta->role_is_invokable)
-    croak("Cannot add slot data to an invokable role");
+    croak("Cannot add field data to an invokable role");
 }
 
 static int build_has(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata)
@@ -603,14 +609,14 @@ static int build_has(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, 
   SV *name = args[argi++]->sv;
   char sigil = SvPV_nolen(name)[0];
 
-  SlotMeta *slotmeta = mop_class_add_slot(compclassmeta, name);
+  FieldMeta *fieldmeta = mop_class_add_field(compclassmeta, name);
   SvREFCNT_dec(name);
 
   int nattrs = args[argi++]->i;
   if(nattrs) {
-    SV *slotmetasv = newSV(0);
-    sv_setref_uv(slotmetasv, "Object::Pad::MOP::Slot", PTR2UV(slotmeta));
-    SAVEFREESV(slotmetasv);
+    SV *fieldmetasv = newSV(0);
+    sv_setref_uv(fieldmetasv, "Object::Pad::MOP::Field", PTR2UV(fieldmeta));
+    SAVEFREESV(fieldmetasv);
 
     while(argi < (nattrs+2)) {
       SV *attrname = args[argi]->attr.name;
@@ -618,7 +624,7 @@ static int build_has(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, 
 
       inplace_trim_whitespace(attrval);
 
-      mop_slot_apply_attribute(slotmeta, SvPVX(attrname), attrval);
+      mop_field_apply_attribute(fieldmeta, SvPVX(attrname), attrval);
 
       if(attrval)
         SvREFCNT_dec(attrval);
@@ -627,7 +633,7 @@ static int build_has(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, 
     }
   }
 
-  /* It would be nice to just yield some OP to represent the has slot here
+  /* It would be nice to just yield some OP to represent the has field here
    * and let normal parsing of normal scalar assignment accept it. But we can't
    * because scalar assignment tries to peephole far too deply into us and
    * everything breaks... :/
@@ -642,32 +648,32 @@ static int build_has(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, 
       OP *op = args[argi++]->op;
 
       SV *defaultsv = newSV(0);
-      mop_slot_set_default_sv(slotmeta, defaultsv);
+      mop_field_set_default_sv(fieldmeta, defaultsv);
 
       /* An OP_CONST whose op_type is OP_CUSTOM.
        * This way we avoid the opchecker and finalizer doing bad things to our
        * defaultsv SV by setting it SvREADONLY_on().
        */
-      OP *slotop = newSVOP_CUSTOM(PL_ppaddr[OP_CONST], 0, SvREFCNT_inc(defaultsv));
+      OP *fieldop = newSVOP_CUSTOM(PL_ppaddr[OP_CONST], 0, SvREFCNT_inc(defaultsv));
 
       OP *lhs, *rhs;
 
       switch(sigil) {
         case '$':
-          *out = newBINOP(OP_SASSIGN, 0, op_contextualize(op, G_SCALAR), slotop);
+          *out = newBINOP(OP_SASSIGN, 0, op_contextualize(op, G_SCALAR), fieldop);
           break;
 
         case '@':
           sv_setrv_noinc(defaultsv, (SV *)newAV());
-          lhs = newUNOP(OP_RV2AV, OPf_MOD|OPf_REF, slotop);
-          goto slot_array_hash_common;
+          lhs = newUNOP(OP_RV2AV, OPf_MOD|OPf_REF, fieldop);
+          goto field_array_hash_common;
 
         case '%':
           sv_setrv_noinc(defaultsv, (SV *)newHV());
-          lhs = newUNOP(OP_RV2HV, OPf_MOD|OPf_REF, slotop);
-          goto slot_array_hash_common;
+          lhs = newUNOP(OP_RV2HV, OPf_MOD|OPf_REF, fieldop);
+          goto field_array_hash_common;
 
-slot_array_hash_common:
+field_array_hash_common:
           rhs = op_contextualize(op, G_LIST);
           *out = newBINOP(OP_AASSIGN, 0,
             force_list_keeping_pushmark(rhs),
@@ -682,7 +688,7 @@ slot_array_hash_common:
       OP *op = args[argi++]->op;
       U8 want = 0;
 
-      forbid_outofblock_ops(op, "a slot initialiser block");
+      forbid_outofblock_ops(op, "a field initialiser block");
 
       switch(sigil) {
         case '$':
@@ -694,12 +700,12 @@ slot_array_hash_common:
           break;
       }
 
-      slotmeta->defaultexpr = op_contextualize(op_scope(op), want);
+      fieldmeta->defaultexpr = op_contextualize(op_scope(op), want);
     }
     break;
   }
 
-  mop_slot_seal(slotmeta);
+  mop_field_seal(fieldmeta);
 
   return KEYWORD_PLUGIN_STMT;
 }
@@ -708,7 +714,7 @@ static void setup_parse_has_initexpr(pTHX_ void *hookdata)
 {
   CV *was_compcv = PL_compcv;
 
-  resume_compcv_and_save(&compclassmeta->initslots_compcv);
+  resume_compcv_and_save(&compclassmeta->initfields_compcv);
 
   /* Set up this new block as if the current compiler context were its scope */
 
@@ -768,8 +774,8 @@ static void parse_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, void *ho
 {
   enum PhaserType type = PTR2UV(hookdata);
   U32 i;
-  AV *slots = compclassmeta->direct_slots;
-  U32 nslots = av_count(slots);
+  AV *fields = compclassmeta->direct_fields;
+  U32 nfields = av_count(fields);
 
   /* XS::Parse::Sublike doesn't support lexical `method $foo`, but we can hack
    * it up here
@@ -827,16 +833,16 @@ static void parse_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, void *ho
   PL_comppad_name = PadlistNAMES(CvPADLIST(methodscope));
   PL_curpad  = AvARRAY(PL_comppad);
 
-  for(i = 0; i < nslots; i++) {
-    SlotMeta *slotmeta = (SlotMeta *)AvARRAY(slots)[i];
+  for(i = 0; i < nfields; i++) {
+    FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
 
     /* Skip the anonymous ones */
-    if(SvCUR(slotmeta->name) < 2)
+    if(SvCUR(fieldmeta->name) < 2)
       continue;
 
     /* Claim these are all STATE variables just to quiet the "will not stay
      * shared" warning */
-    pad_add_name_sv(slotmeta->name, padadd_STATE, NULL, NULL);
+    pad_add_name_sv(fieldmeta->name, padadd_STATE, NULL, NULL);
   }
 
   intro_my();
@@ -864,7 +870,7 @@ static bool parse_filter_attr(pTHX_ struct XSParseSublikeContext *ctx, SV *attr,
 
 static void parse_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
 {
-  /* Splice in the slot scope CV in */
+  /* Splice in the field scope CV in */
   CV *methodscope = compclassmeta->methodscope;
 
   if(CvANON(PL_compcv))
@@ -897,11 +903,11 @@ static void parse_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx, void 
 static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
 {
   enum PhaserType type = PTR2UV(hookdata);
-  PADNAMELIST *slotnames = PadlistNAMES(CvPADLIST(compclassmeta->methodscope));
-  I32 nslots = av_count(compclassmeta->direct_slots);
-  PADNAME **snames = PadnamelistARRAY(slotnames);
+  PADNAMELIST *fieldnames = PadlistNAMES(CvPADLIST(compclassmeta->methodscope));
+  I32 nfields = av_count(compclassmeta->direct_fields);
+  PADNAME **snames = PadnamelistARRAY(fieldnames);
   PADNAME **padnames = PadnamelistARRAY(PadlistNAMES(CvPADLIST(PL_compcv)));
-  OP *slotops = NULL;
+  OP *fieldops = NULL;
 
 #if HAVE_PERL_VERSION(5, 22, 0)
   U32 cop_seq_low = COP_SEQ_RANGE_LOW(padnames[PADIX_SELF]);
@@ -934,48 +940,48 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *ho
     LEAVE;
   }
 
-  slotops = op_append_list(OP_LINESEQ, slotops,
+  fieldops = op_append_list(OP_LINESEQ, fieldops,
     newSTATEOP(0, NULL, NULL));
-  slotops = op_append_list(OP_LINESEQ, slotops,
+  fieldops = op_append_list(OP_LINESEQ, fieldops,
     newMETHSTARTOP(0 |
       (compclassmeta->type == METATYPE_ROLE ? OPf_SPECIAL : 0) |
       (compclassmeta->repr << 8)));
 
   int i;
-  for(i = 0; i < nslots; i++) {
-    SlotMeta *slotmeta = (SlotMeta *)AvARRAY(compclassmeta->direct_slots)[i];
-    PADNAME *slotname = snames[i + 1];
+  for(i = 0; i < nfields; i++) {
+    FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(compclassmeta->direct_fields)[i];
+    PADNAME *fieldname = snames[i + 1];
 
-    if(!slotname
+    if(!fieldname
 #if HAVE_PERL_VERSION(5, 22, 0)
       /* On perl 5.22 and above we can use PadnameREFCNT to detect which pad
        * slots are actually being used
        */
-       || PadnameREFCNT(slotname) < 2
+       || PadnameREFCNT(fieldname) < 2
 #endif
       )
         continue;
 
-    SLOTOFFSET slotix = slotmeta->slotix;
-    PADOFFSET padix = find_padix_for_slot(slotmeta);
+    FIELDOFFSET fieldix = fieldmeta->fieldix;
+    PADOFFSET padix = find_padix_for_field(fieldmeta);
 
     if(padix == NOT_IN_PAD)
       continue;
 
     U8 private = 0;
-    switch(SvPV_nolen(slotmeta->name)[0]) {
-      case '$': private = OPpSLOTPAD_SV; break;
-      case '@': private = OPpSLOTPAD_AV; break;
-      case '%': private = OPpSLOTPAD_HV; break;
+    switch(SvPV_nolen(fieldmeta->name)[0]) {
+      case '$': private = OPpFIELDPAD_SV; break;
+      case '@': private = OPpFIELDPAD_AV; break;
+      case '%': private = OPpFIELDPAD_HV; break;
     }
 
-    slotops = op_append_list(OP_LINESEQ, slotops,
-      /* alias the padix from the slot */
-      newSLOTPADOP(private << 8, padix, slotix));
+    fieldops = op_append_list(OP_LINESEQ, fieldops,
+      /* alias the padix from the field */
+      newFIELDPADOP(private << 8, padix, fieldix));
 
 #if HAVE_PERL_VERSION(5, 22, 0)
-    /* Unshare the padname so the one in the scopeslot returns to refcount 1 */
-    PADNAME *newpadname = newPADNAMEpvn(PadnamePV(slotname), PadnameLEN(slotname));
+    /* Unshare the padname so the one in the methodscope pad returns to refcount 1 */
+    PADNAME *newpadname = newPADNAMEpvn(PadnamePV(fieldname), PadnameLEN(fieldname));
     PadnameREFCNT_dec(padnames[padix]);
     padnames[padix] = newpadname;
 
@@ -987,7 +993,7 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *ho
 #endif
   }
 
-  ctx->body = op_append_list(OP_LINESEQ, slotops, ctx->body);
+  ctx->body = op_append_list(OP_LINESEQ, fieldops, ctx->body);
 
   compclassmeta->methodscope = NULL;
 
@@ -1143,19 +1149,19 @@ static const struct XSParseKeywordHooks kwhooks_requires = {
 };
 
 #ifdef HAVE_DMD_HELPER
-static int dump_slotmeta(pTHX_ const SV *sv, SlotMeta *slotmeta)
+static int dump_fieldmeta(pTHX_ const SV *sv, FieldMeta *fieldmeta)
 {
   int ret = 0;
 
   /* Some trickery to generate dynamic labels */
-  const char *name = SvPVX(slotmeta->name);
+  const char *name = SvPVX(fieldmeta->name);
   SV *label = newSV(0);
 
-  sv_setpvf(label, "the Object::Pad slot %s name", name);
-  ret += DMD_ANNOTATE_SV(sv, slotmeta->name, SvPVX(label));
+  sv_setpvf(label, "the Object::Pad field %s name", name);
+  ret += DMD_ANNOTATE_SV(sv, fieldmeta->name, SvPVX(label));
 
-  sv_setpvf(label, "the Object::Pad slot %s default value", name);
-  ret += DMD_ANNOTATE_SV(sv, mop_slot_get_default_sv(slotmeta), SvPVX(label));
+  sv_setpvf(label, "the Object::Pad field %s default value", name);
+  ret += DMD_ANNOTATE_SV(sv, mop_field_get_default_sv(fieldmeta), SvPVX(label));
 
   SvREFCNT_dec(label);
 
@@ -1173,10 +1179,10 @@ static int dumppackage_class(pTHX_ const SV *sv)
     ret += DMD_ANNOTATE_SV(sv, (SV *)meta->pending_submeta, "the Object::Pad pending submeta AV");
 
   I32 i;
-  for(i = 0; i < av_count(meta->direct_slots); i++)
-    ret += dump_slotmeta(aTHX_ sv, (SlotMeta *)AvARRAY(meta->direct_slots)[i]);
+  for(i = 0; i < av_count(meta->direct_fields); i++)
+    ret += dump_fieldmeta(aTHX_ sv, (FieldMeta *)AvARRAY(meta->direct_fields)[i]);
 
-  ret += DMD_ANNOTATE_SV(sv, (SV *)meta->initslots, "the Object::Pad initslots CV");
+  ret += DMD_ANNOTATE_SV(sv, (SV *)meta->initfields, "the Object::Pad initfields CV");
 
   ret += DMD_ANNOTATE_SV(sv, (SV *)meta->buildblocks, "the Object::Pad BUILD blocks AV");
 
@@ -1201,18 +1207,18 @@ static int dumppackage_class(pTHX_ const SV *sv)
 }
 #endif
 
-/********************
- * Custom SlotHooks *
- ********************/
+/*********************
+ * Custom FieldHooks *
+ *********************/
 
-struct CustomSlotHookData
+struct CustomFieldHookData
 {
   SV *apply_cb;
 };
 
-static bool slothook_custom_apply(pTHX_ SlotMeta *slotmeta, SV *value, SV **hookdata_ptr, void *_funcdata)
+static bool fieldhook_custom_apply(pTHX_ FieldMeta *fieldmeta, SV *value, SV **hookdata_ptr, void *_funcdata)
 {
-  struct CustomSlotHookData *funcdata = _funcdata;
+  struct CustomFieldHookData *funcdata = _funcdata;
 
   SV *cb;
   if((cb = funcdata->apply_cb)) {
@@ -1220,12 +1226,12 @@ static bool slothook_custom_apply(pTHX_ SlotMeta *slotmeta, SV *value, SV **hook
     ENTER;
     SAVETMPS;
 
-    SV *slotmetasv = sv_newmortal();
-    sv_setref_uv(slotmetasv, "Object::Pad::MOP::Slot", PTR2UV(slotmeta));
+    SV *fieldmetasv = sv_newmortal();
+    sv_setref_uv(fieldmetasv, "Object::Pad::MOP::Field", PTR2UV(fieldmeta));
 
     PUSHMARK(SP);
     EXTEND(SP, 2);
-    PUSHs(slotmetasv);
+    PUSHs(fieldmetasv);
     PUSHs(value);
     PUTBACK;
 
@@ -1250,11 +1256,11 @@ MODULE = Object::Pad    PACKAGE = Object::Pad::MOP::Method
 
 INCLUDE: mop-method.xsi
 
-MODULE = Object::Pad    PACKAGE = Object::Pad::MOP::Slot
+MODULE = Object::Pad    PACKAGE = Object::Pad::MOP::Field
 
-INCLUDE: mop-slot.xsi
+INCLUDE: mop-field.xsi
 
-MODULE = Object::Pad    PACKAGE = Object::Pad::MOP::SlotAttr
+MODULE = Object::Pad    PACKAGE = Object::Pad::MOP::FieldAttr
 
 void
 register(class, name, ...)
@@ -1265,15 +1271,15 @@ register(class, name, ...)
     PERL_UNUSED_VAR(class);
     dKWARG(2);
 
-    struct SlotHookFuncs *funcs;
-    Newxz(funcs, 1, struct SlotHookFuncs);
+    struct FieldHookFuncs *funcs;
+    Newxz(funcs, 1, struct FieldHookFuncs);
 
-    struct CustomSlotHookData *funcdata;
-    Newxz(funcdata, 1, struct CustomSlotHookData);
+    struct CustomFieldHookData *funcdata;
+    Newxz(funcdata, 1, struct CustomFieldHookData);
 
     funcs->ver = OBJECTPAD_ABIVERSION;
 
-    funcs->apply = &slothook_custom_apply;
+    funcs->apply = &fieldhook_custom_apply;
 
     static const char *args[] = {
       "permit_hintkey",
@@ -1292,7 +1298,7 @@ register(class, name, ...)
       }
     }
 
-    register_slot_attribute(savepv(SvPV_nolen(name)), funcs, funcdata);
+    register_field_attribute(savepv(SvPV_nolen(name)), funcs, funcdata);
   }
 
 BOOT:
@@ -1301,16 +1307,16 @@ BOOT:
   XopENTRY_set(&xop_methstart, xop_class, OA_BASEOP);
   Perl_custom_op_register(aTHX_ &pp_methstart, &xop_methstart);
 
-  XopENTRY_set(&xop_slotpad, xop_name, "slotpad");
-  XopENTRY_set(&xop_slotpad, xop_desc, "slotpad()");
+  XopENTRY_set(&xop_fieldpad, xop_name, "fieldpad");
+  XopENTRY_set(&xop_fieldpad, xop_desc, "fieldpad()");
 #ifdef HAVE_UNOP_AUX
-  XopENTRY_set(&xop_slotpad, xop_class, OA_UNOP_AUX);
+  XopENTRY_set(&xop_fieldpad, xop_class, OA_UNOP_AUX);
 #else
-  XopENTRY_set(&xop_slotpad, xop_class, OA_UNOP); /* technically a lie */
+  XopENTRY_set(&xop_fieldpad, xop_class, OA_UNOP); /* technically a lie */
 #endif
-  Perl_custom_op_register(aTHX_ &pp_slotpad, &xop_slotpad);
+  Perl_custom_op_register(aTHX_ &pp_fieldpad, &xop_fieldpad);
 
-  CvLVALUE_on(get_cv("Object::Pad::MOP::Slot::value", 0));
+  CvLVALUE_on(get_cv("Object::Pad::MOP::Field::value", 0));
 #ifdef HAVE_DMD_HELPER
   DMD_SET_PACKAGE_HELPER("Object::Pad::MOP::Class", &dumppackage_class);
 #endif
@@ -1333,4 +1339,4 @@ BOOT:
   register_xs_parse_sublike("method", &parse_method_hooks, (void *)PHASER_NONE);
 
   ObjectPad__boot_classes();
-  ObjectPad__boot_slots(aTHX);
+  ObjectPad__boot_fields(aTHX);

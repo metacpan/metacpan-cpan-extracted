@@ -10,6 +10,8 @@ use SPVM::Builder;
 use SPVM::Builder::CC;
 use SPVM::Builder::Util;
 use SPVM::Builder::Config::Exe;
+use SPVM::Builder::LinkInfo;
+
 use File::Spec;
 use File::Find 'find';
 
@@ -913,11 +915,6 @@ sub link {
   
   my $config = $self->config;
 
-  my $before_link = $config->before_link;
-  if ($before_link) {
-    $object_file_infos = $before_link->($config, $object_file_infos);
-  }
-  
   # CBuilder configs
   my $output_file = $self->{output_file};
   
@@ -931,26 +928,28 @@ sub link {
   # Linker
   my $ld = $config->ld;
   
+  # All linker flags
+  my @all_ldflags;
+  
   # Linker flags
   my $ldflags = $config->ldflags;
-  my $ldflags_str = join(' ', @{$config->ldflags});
-  $ldflags_str = "$ldflags_str";
+  push @all_ldflags, @{$config->ldflags};
   
   # Linker optimize
   my $ld_optimize = $config->ld_optimize;
-  $ldflags_str .= " $ld_optimize";
+  push @all_ldflags, $ld_optimize;
   
   # Library directory
   my $lib_dirs = $config->lib_dirs;
   for my $lib_dir (@$lib_dirs) {
     if (-d $lib_dir) {
-      $ldflags_str .= " -L$lib_dir";
+      push @all_ldflags, "-L$lib_dir";
     }
   }
   
   # Libraries
   my $libs = $config->libs;
-  $ldflags_str .= " " . join(' ', map { "-l$_" } @$libs);
+  push @all_ldflags, map { "-l$_" } @$libs;
   
   # ExeUtils::CBuilder config
   my $cbuilder_config = {
@@ -967,17 +966,37 @@ sub link {
     output_file => $output_file,
     input_files => $object_file_infos,
   });
+
+  my $link_info = SPVM::Builder::LinkInfo->new(
+    class_name => $class_name,
+    object_file_infos => $object_file_infos,
+    ld => $ld,
+    ldflags => \@all_ldflags,
+    is_exe => 1,
+    output_file => $output_file,
+  );
+
+  my $before_link = $config->before_link;
+  if ($before_link) {
+    $before_link->($config, $link_info);
+  }
   
   if ($need_generate) {
-    my $object_files = [map { $_->to_string } @$object_file_infos];
+    my $link_info_ld = $link_info->ld;
+    my $link_info_ldflags = $link_info->ldflags;
+    my $link_info_class_name = $link_info->class_name;
+    my $link_info_output_file = $link_info->output_file;
+    my $link_info_object_file_infos = $link_info->object_file_infos;
+    my $link_info_object_files = [map { $_->to_string } @$link_info_object_file_infos];
+    my $link_info_ldflags_str = join(' ', @$link_info_ldflags);
     
     # Create the executable file
     my $cbuilder = ExtUtils::CBuilder->new(quiet => $self->quiet, config => $cbuilder_config);
     $cbuilder->link_executable(
-      objects => $object_files,
-      module_name => $class_name,
-      exe_file => $output_file,
-      extra_linker_flags => $ldflags_str,
+      objects => $link_info_object_files,
+      module_name => $link_info_class_name,
+      exe_file => $link_info_output_file,
+      extra_linker_flags => $link_info_ldflags_str,
     );
   }
   

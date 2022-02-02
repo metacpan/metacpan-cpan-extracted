@@ -1,5 +1,18 @@
 Revision history for Music-Intervals
 
+0.0711 2022-02-01 12:47:49
+    - Add the eg/benchmark program, just because I was curious.
+    - Remove the method names from the keys.
+
+0.0710 2022-02-01 12:08:22
+    - Improve documentation.
+
+0.0709 2022-02-01 12:02:03
+    - And update the *::Numeric side too!
+
+0.0708 2022-02-01 11:47:34
+    - Allow single notes too!
+
 0.0707 2022-01-30 17:28:08
     - Make the ratios attribute not-private!
     - Add the eg/scala example program.
