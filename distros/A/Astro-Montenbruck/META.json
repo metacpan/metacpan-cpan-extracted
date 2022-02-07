@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Astro-Montenbruck",
    "prereqs" : {
@@ -21,7 +21,6 @@
             "Test::CheckManifest" : "0.9",
             "Test::Harness" : "3.38",
             "Test::More" : "1.30",
-            "Test::Number::Delta" : "1.06",
             "Test::Pod::Coverage" : "1.08",
             "Test::Simple" : "1.30"
          }
@@ -38,14 +37,15 @@
             "List::MoreUtils" : "0.43",
             "Memoize" : "1.03",
             "Readonly" : "2.05",
-            "Term::ANSIColor" : "1.00"
+            "Term::ANSIColor" : "1.00",
+            "Test::Number::Delta" : "1.06"
          }
       }
    },
    "provides" : {
       "Astro::Montenbruck" : {
          "file" : "lib/Astro/Montenbruck.pm",
-         "version" : "1.2"
+         "version" : "1.26"
       },
       "Astro::Montenbruck::CoCo" : {
          "file" : "lib/Astro/Montenbruck/CoCo.pm",
@@ -105,11 +105,7 @@
       },
       "Astro::Montenbruck::Lunation" : {
          "file" : "lib/Astro/Montenbruck/Lunation.pm",
-         "version" : "0.03"
-      },
-      "Astro::Montenbruck::Lunation::Quarter" : {
-         "file" : "lib/Astro/Montenbruck/Lunation/Quarter.pm",
-         "version" : "0.01"
+         "version" : "1"
       },
       "Astro::Montenbruck::MathUtils" : {
          "file" : "lib/Astro/Montenbruck/MathUtils.pm",
@@ -153,7 +149,7 @@
       },
       "Astro::Montenbruck::Utils::Helpers" : {
          "file" : "lib/Astro/Montenbruck/Utils/Helpers.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Astro::Montenbruck::Utils::Theme" : {
          "file" : "lib/Astro/Montenbruck/Utils/Theme.pm",
@@ -173,6 +169,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.2",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "1.26",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

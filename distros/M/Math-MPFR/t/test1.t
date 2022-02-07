@@ -809,7 +809,13 @@ if($s + $t < 1.00000000001 &&
 else {print "not ok 70\n"}
 
 Rmpfr_set_d($s, 175.92186044416, GMP_RNDN);
-Rmpfr_root($s, $s, 11, GMP_RNDN);
+
+if(MPFR_VERSION_MAJOR > 3) {
+  Rmpfr_rootn_ui($s, $s, 11, GMP_RNDN);
+}
+else {
+  Rmpfr_root($s, $s, 11, GMP_RNDN);
+}
 
 if($s - 1.6 < 0.0000000001 &&
    $s - 1.6 > -0.0000000001) {print "ok 71\n"}

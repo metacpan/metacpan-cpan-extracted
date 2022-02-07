@@ -111,6 +111,9 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
   int32_t state_var_expansion = compiler->state_var_expansion;
   compiler->state_var_expansion = SPVM_TOKE_C_STATE_VAR_EXPANSION_DEFAULT;
 
+  int32_t parse_start = compiler->parse_start;
+  compiler->parse_start = 0;
+
   while(1) {
 
     if (compiler->bufptr == NULL) {
@@ -139,6 +142,14 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
 
     // '\0' means end of file, so try to read next module source
     if (ch == '\0') {
+      
+      if (!parse_start) {
+        compiler->parse_start = 1;
+        SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_END_OF_FILE);
+        yylvalp->opval = op;
+        return END_OF_FILE;
+      }
+      
       compiler->cur_file = NULL;
       compiler->cur_src = NULL;
       compiler->bufptr = NULL;
@@ -1912,13 +1923,6 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 }
                 break;
               }
-              case 'I' : {
-                if (strcmp(keyword, "INIT") == 0) {
-                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_INIT);
-                  return INIT;
-                }
-                break;
-              }
               case 'l' : {
                 if (strcmp(keyword, "last") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_LAST);
@@ -1964,6 +1968,10 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   compiler->expect_method_name = 1;
 
                   return METHOD;
+                }
+                else if (strcmp(keyword, "mutable") == 0) {
+                  SPVM_OP* op_mutable = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_MUTABLE);
+                  return MUTABLE;
                 }
                 break;
               }
@@ -2136,6 +2144,13 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   SPVM_OP* op_descriptor = SPVM_OP_new_op_descriptor(compiler, SPVM_DESCRIPTOR_C_ID_WO, compiler->cur_file, compiler->cur_line);
                   yylvalp->opval = op_descriptor;
                   return DESCRIPTOR;
+                }
+                break;
+              }
+              case 'I' : {
+                if (strcmp(keyword, "INIT") == 0) {
+                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_INIT);
+                  return INIT;
                 }
                 break;
               }

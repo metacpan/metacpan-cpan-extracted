@@ -1,6 +1,6 @@
 package PDL::NDBin::Action::Avg;
 # ABSTRACT: Action for PDL::NDBin that computes average
-$PDL::NDBin::Action::Avg::VERSION = '0.021';
+$PDL::NDBin::Action::Avg::VERSION = '0.024';
 
 use strict;
 use warnings;
@@ -26,7 +26,10 @@ sub process
 	my $iter = shift;
 	$self->{out} = PDL->zeroes( $self->{type}, $self->{N} ) unless defined $self->{out};
 	$self->{count} = PDL->zeroes( defined(&PDL::indx) ? PDL::indx() : PDL::long, $self->{N} ) unless defined $self->{count};
-	PDL::NDBin::Actions_PP::_iavg_loop( $iter->data, $iter->idx, $self->{out}, $self->{count}, $self->{N} );
+	my $data = $iter->data;
+	my $idx = $iter->idx;
+	$_ = PDL->zeroes( 0 ) for grep $_->isnull, $data, $idx;
+	PDL::NDBin::Actions_PP::_iavg_loop( $data, $idx, $self->{out}, $self->{count}, $self->{N} );
 	# as the plugin processes all bins at once, every variable
 	# needs to be visited only once
 	$iter->var_active( 0 );
@@ -55,7 +58,7 @@ PDL::NDBin::Action::Avg - Action for PDL::NDBin that computes average
 
 =head1 VERSION
 
-version 0.021
+version 0.024
 
 =head1 DESCRIPTION
 
@@ -93,7 +96,7 @@ Edward Baudrez <ebaudrez@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Edward Baudrez.
+This software is copyright (c) 2022 by Edward Baudrez.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -13,14 +13,16 @@ tldr - a perl tldr client
 
 =head1 SYNOPSIS
 
-  $ tldr command
+  Usage: tldr [command]
 
   Options:
-   -o, --os=OS     os (osx, sunos or linux)
-   -h, --help      show this help
-   -v, --version   show version
-       --pager     specify pager command
-       --no-pager  turn off paging
+   -o, --os=OS       os (osx, sunos or linux)
+   -h, --help        show this help
+   -v, --version     show version
+       --pager=CMD   specify pager command
+       --no-pager    turn off paging
+       --unicode     use fancy unicode characters (defaults to true if LANG =~ /UTF-8/)
+       --no-unicode  do not use unicode characters
 
   Environment variables:
    * TLDR_REPOSITORY=/path/to/tldr-pages/tldr

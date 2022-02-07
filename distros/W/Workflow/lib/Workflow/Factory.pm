@@ -8,7 +8,7 @@ use Log::Log4perl qw( get_logger );
 use Workflow::Exception qw( configuration_error workflow_error );
 use Carp qw(croak);
 use English qw( -no_match_vars );
-$Workflow::Factory::VERSION = '1.57';
+$Workflow::Factory::VERSION = '1.59';
 
 # Extra action attribute validation is off by default for compatibility.
 our $VALIDATE_ACTION_CONFIG = 0;
@@ -23,14 +23,17 @@ sub import {
     my $log = get_logger(__PACKAGE__);
     if ( defined $_[0] && $_[0] eq 'FACTORY' ) {
         shift;
-        my $instance = _initialize_instance($class);
+        my $instance;
 
         my $import_target = $package . '::FACTORY';
         no strict 'refs';
         unless ( defined &{$import_target} ) {
-            *{$import_target} = sub { return $instance };
+            *{$import_target} = sub {
+                return $instance if $instance;
+                $instance = _initialize_instance($class);
+                return $instance;
+            };
         }
-        return $instance;
     }
     $class->SUPER::import(@_);
 }
@@ -383,7 +386,8 @@ sub fetch_workflow {
     my $wf_info   = $persister->fetch_workflow($wf_id);
     $wf_class     = $wf_config->{class} || 'Workflow' unless ($wf_class);
 
-    return undef unless ($wf_info);
+    return unless ($wf_info);
+
     $wf_info->{last_update} ||= '';
     $self->log->debug(
         "Fetched data for workflow '$wf_id' ok: ",
@@ -793,11 +797,11 @@ sub get_validators {
     return @validators;
 }
 
-1;
-
 sub _validate_action_config {
     return $VALIDATE_ACTION_CONFIG;
 }
+
+1;
 
 __END__
 
@@ -809,7 +813,7 @@ Workflow::Factory - Generates new workflow and supporting objects
 
 =head1 VERSION
 
-This documentation describes version 1.57 of this package
+This documentation describes version 1.59 of this package
 
 =head1 SYNOPSIS
 
@@ -1216,7 +1220,7 @@ of L<Workflow::Action> configs.  See L<Workflow::Action> for details.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2003-2021 Chris Winters. All rights reserved.
+Copyright (c) 2003-2022 Chris Winters. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

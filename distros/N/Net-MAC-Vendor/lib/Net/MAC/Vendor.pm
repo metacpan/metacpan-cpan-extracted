@@ -1,10 +1,11 @@
-package Net::MAC::Vendor; # git description: v1.264-2-gda20c47
+package Net::MAC::Vendor; # git description: v1.267-2-g8373c47
 # ABSTRACT: Look up the vendor for a MAC
 
 use strict;
 use warnings;
 use 5.010;
 
+use IO::Socket::SSL ();
 use Net::SSLeay;
 
 #pod =head1 SYNOPSIS
@@ -75,7 +76,7 @@ use Carp ();
 use Mojo::URL;
 use Mojo::UserAgent;
 
-our $VERSION = '1.265';
+our $VERSION = '1.268';
 
 #pod =item run( @macs )
 #pod
@@ -473,7 +474,7 @@ sub load_cache {
 				return;
 				}
 
-			do { local( @ARGV, $/ ) = $source; <> }
+			do { local( *ARGV, $/ ); @ARGV = $source; <> }
 			}
 		else {
 			#say time . " Fetching URL";
@@ -617,7 +618,7 @@ Net::MAC::Vendor - Look up the vendor for a MAC
 
 =head1 VERSION
 
-version 1.265
+version 1.268
 
 =head1 SYNOPSIS
 
@@ -871,7 +872,7 @@ L<Net::MacMap>
 Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Net-MAC-Vendor>
 (or L<bug-Net-MAC-Vendor@rt.cpan.org|mailto:bug-Net-MAC-Vendor@rt.cpan.org>).
 
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
 
 =head1 AUTHOR
 
@@ -879,7 +880,7 @@ brian d foy <bdfoy@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords brian d foy Karen Etheridge Frank Maas openstrike Dean Hamstead
+=for stopwords brian d foy Karen Etheridge Frank Maas openstrike Christopher Layne Dean Hamstead
 
 =over 4
 
@@ -898,6 +899,10 @@ Frank Maas <maas.frank@gmail.com>
 =item *
 
 openstrike <git@openstrike.co.uk>
+
+=item *
+
+Christopher Layne <clayne@anodized.com>
 
 =item *
 

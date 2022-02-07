@@ -1,10 +1,15 @@
 package Data::Gimei;
 
-use version; our $VERSION = version->declare("v0.0.4");
+use version; our $VERSION = version->declare("v0.0.5");
 
 use Data::Gimei::Name;
 use Data::Gimei::Address;
 use Data::Gimei::Word;
+
+use strict;
+use warnings;
+use feature ':5.12';
+use utf8;
 
 my $seed = srand();
 
@@ -33,13 +38,13 @@ sub sample {
 
 =head1 NAME
 
-Data::Gimei - a Perl port of Ruby's gimei.
+Data::Gimei - a Perl port of Ruby's gimei generates fake data in Japanese.
 
 =head1 SYNOPSIS
 
   use utf8;
   binmode STDOUT, ":utf8";
-  use feature ':5.30';
+  use feature ':5.12';
 
   use Data::Gimei;
   my $name = Data::Gimei::Name->new();
@@ -105,10 +110,10 @@ output of repeated method calls.
 
 =head1 INSTALL
 
-This module is not available at CPAN yet.  You can install this module
+This module is available on CPAN.  You can install this module
 by following the step below.
 
-  $ cpanm Data-Gimei-v0.0.2.tar.gz
+  $ cpanm Data::Gimei
 
 =head1 LICENSE
 
@@ -118,6 +123,6 @@ Dictionary YAML file is generated from naist-jdic.
 
 =head1 AUTHOR
 
-NAKAJIMA Yusaku E<lt> example@example.com E<gt>
+NAKAJIMA Yusaku E<lt> youpong@cpan.org E<gt>
 
 =cut

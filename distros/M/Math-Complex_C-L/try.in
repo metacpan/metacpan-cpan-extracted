@@ -25,6 +25,9 @@ int main(int argc, char *argv[]) {
  rop = catanhl(op);
  printf("%Le %Le\n", __real__ rop, __imag__ rop);
 
+ rop = ccosl(op);
+ printf("%Le %Le\n", __real__ rop, __imag__ rop);
+
  return 0;
 
 }

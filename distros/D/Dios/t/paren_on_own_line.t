@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Dios;
-use Test::More 'no_plan';
+use Test::More;
 
 method foo(
     $arg
@@ -15,3 +15,6 @@ method foo(
 
 is $@, '';
 is( Foo->foo(42), 42 );
+
+done_testing;
+

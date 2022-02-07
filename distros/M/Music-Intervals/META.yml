@@ -24,8 +24,6 @@ requires:
   MIDI::Pitch: '0'
   Math::Factor::XS: '0'
   Moo: '2'
-  Music::Chord::Namer: '0'
-  Music::Scales: '0'
   Number::Fraction: '0'
   namespace::clean: '0'
   perl: '5.006'
@@ -35,7 +33,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-Intervals
   repository: https://github.com/ology/Music-Intervals.git
-version: '0.0711'
+version: '0.0804'
 x_Dist_Zilla:
   perl:
     version: '5.032001'

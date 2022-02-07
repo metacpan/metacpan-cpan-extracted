@@ -2,6 +2,7 @@ MANIFEST
 CHANGES
 README
 Decimal64.pm
+Decimal64.pod
 Decimal64.xs
 Makefile.PL
 math_decimal64_include.h
@@ -23,6 +24,7 @@ t/overload_cmp.t
 t/overload_cmp_reversal.t
 t/overload_int.t
 t/overload_spaceship.t
+t/overload_switch.t
 t/pod.t
 t/reassign.t
 t/strtod64.t

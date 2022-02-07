@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.57;
 
-package Tickit::Widget::Menu::Item 0.14;
+package Tickit::Widget::Menu::Item 0.15;
 class Tickit::Widget::Menu::Item
    :does(Tickit::Widget::Menu::itembase);
 

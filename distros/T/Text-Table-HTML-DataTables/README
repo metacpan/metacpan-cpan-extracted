@@ -3,9 +3,9 @@ NAME
     DataTables plugin
 
 VERSION
-    This document describes version 0.009 of Text::Table::HTML::DataTables
+    This document describes version 0.010 of Text::Table::HTML::DataTables
     (from Perl distribution Text-Table-HTML-DataTables), released on
-    2021-12-09.
+    2022-01-23.
 
 SYNOPSIS
      use Text::Table::HTML::DataTables;
@@ -67,11 +67,11 @@ FUNCTIONS
         Takes an array reference which should contain one or more rows of
         data, where each row is an array reference.
 
-    *   title
+    *   caption
 
         Optional. Str. If set, will output a HTML "<title>" element in the
         HTML head as well as table "<caption>" element in the HTML body
-        containing the given title. The title will be HTML-encoded.
+        containing the provided caption. The caption will be HTML-encoded.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -108,7 +108,7 @@ CONTRIBUTING
     me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020, 2016 by perlancar
+    This software is copyright (c) 2022, 2020, 2016 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

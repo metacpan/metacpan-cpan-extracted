@@ -10,14 +10,14 @@
 #define mp_bitcnt_t unsigned long int
 #endif
 
+/*
 #ifdef _MSC_VER
 #pragma warning(disable:4700 4715 4716)
 #endif
+*/
 
 #if defined MATH_GMPZ_NEED_LONG_LONG_INT
-#ifndef _MSC_VER
 #include <inttypes.h>
-#endif
 #endif
 
 #ifdef OLDPERL
@@ -30,6 +30,20 @@
 
 #ifndef Newxz
 #  define Newxz(v,n,t) Newz(0,v,n,t)
+#endif
+
+/* A perl bug in perl-5.20 onwards can break &PL_sv_yes and  *
+ * &PL_sv_no. In the overload subs we therefore instead      *
+ * use  SvTRUE_nomg_NN where possible, which is available    *
+ * beginning with perl-5.18.0.                               *
+ * Otherwise we continue using &PL_sv_yes as original        *
+ * (&PL_sv_no is not used by this module.)                   *
+ * See See https://github.com/sisyphus/math-decimal64/pull/1 */
+
+#if defined SvTRUE_nomg_NN
+#define SWITCH_ARGS SvTRUE_nomg_NN(third)
+#else
+#define SWITCH_ARGS third==&PL_sv_yes
 #endif
 
 #define SV_IS_IOK(x) \

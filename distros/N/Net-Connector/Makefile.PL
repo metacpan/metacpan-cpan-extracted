@@ -16,13 +16,10 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Net::Connector",
   "PREREQ_PM" => {
-    "Data::Dumper" => "2.183",
-    "Data::Printer" => "1.000004",
     "Expect" => "1.35",
-    "Mojolicious" => "9.22",
     "Moose" => "2.2201"
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.009",
   "test" => {
     "TESTS" => ""
   }
@@ -30,10 +27,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Data::Dumper" => "2.183",
-  "Data::Printer" => "1.000004",
   "Expect" => "1.35",
-  "Mojolicious" => "9.22",
   "Moose" => "2.2201"
 );
 

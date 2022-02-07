@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.58;
 
-package Tickit::Widget::Tabbed::Ribbon 0.025;
+package Tickit::Widget::Tabbed::Ribbon 0.026;
 class Tickit::Widget::Tabbed::Ribbon
         :isa(Tickit::Widget);
 

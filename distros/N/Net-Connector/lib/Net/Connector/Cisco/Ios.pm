@@ -47,6 +47,7 @@ sub _buildErrorCode {
     'Invalid input detected|Type help or ',
     'Line has invalid autocommand',
     'Invalid input detected|Incomplete command',
+    'Invalid |\%Error ',
   ];
   return $codes;
 }
@@ -59,8 +60,10 @@ sub _buildBufferCode {
   my %mapping = (
     more     => '--More--',
     interact => {
-      '\[startup-config\]\?'   => ' ',
-      'overwrite\?\s*\[Y\/N\]' => 'Y',
+      '\[startup-config\]\?'              => ' ',
+      'Address or name of remote host \[' => "\r",
+      'Destination filename \['           => "\r",
+      'overwrite\?\s*\[Y\/N\]'            => 'Y',
     }
   );
 
@@ -85,6 +88,42 @@ sub runCommands {
 
   # 执行调度，配置批量下发
   $self->execCommands( $self->commands->@* );
+}
+
+# generate tftp config variables
+sub generate_tftp_cmd {
+
+  # load modules
+  use Carp;
+  use POSIX qw/strftime/;
+
+  my ( $self, $ip, $hostname ) = @_;
+  $hostname = $ip unless defined $hostname;
+  confess "must provide ip and hostname" if not defined $ip or $ip eq "";
+
+  my $tftp_server = $self->tftp_server;
+
+  # init variables
+  my $dir  = strftime( "%Y-%m",  localtime );
+  my $time = strftime( "%Y%m%d", localtime );
+
+  # generate tftp path
+  my $tftp_destination = $tftp_server . "$dir/$time/$ip-$hostname.config";
+
+  # generate tftp_destination
+  return "copy running-config $tftp_destination";
+}
+
+# 支持 tftp 保存运行配置
+sub copy_config_by_tftp {
+  my ( $self, $ip, $hostname ) = @_;
+
+  # 生成命令
+  my $cmd = $self->generate_tftp_cmd( $ip, $hostname );
+
+  # 执行脚本
+  return $self->execCommands($cmd);
+
 }
 __PACKAGE__->meta->make_immutable;
 1;

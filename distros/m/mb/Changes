@@ -1,5 +1,10 @@
 Revision history for this software.
 
+0.39  2022-02-05 00:00:00
+  - supports try/catch syntax and defer add document
+  - add and DAMEMOJI samples
+  - created by INABA Hitoshi
+
 0.38  2022-01-25 00:00:00
   - remove some documents
   - created by INABA Hitoshi

@@ -70,5 +70,34 @@ closedir($dir_fh);
 is( opendir( my $still_notdir_fh, $temp_notdir ), undef,   "opendir on a mocked file returns false" );
 is( $! + 0,                                       ENOTDIR, '$! numeric is right.' );
 
+# Check symlinks appear in readdir
+my $dir_for_symlink = Test::MockFile->dir('/foo');
+my $dir_in_dir      = Test::MockFile->dir('/foo/infoo');
+my $symlink_dest    = Test::MockFile->file( '/foo/dest', '' );
+my $symlink         = Test::MockFile->symlink( '/foo/dest', '/foo/source' );
+
+opendir my $sdh, '/foo' or die $!;
+my @contents = readdir $sdh;
+closedir $sdh or die $!;
+is(
+    [ sort @contents ],
+    [ qw< . .. dest infoo source > ],
+    'Symlink and directories appears in directory content'
+);
+
+{
+    my $d1 = Test::MockFile->dir('/foo2/bar');
+    my $d2 = Test::MockFile->dir('/foo2');
+    mkdir $d1->path();
+    mkdir $d2->path();
+
+    my $f = Test::MockFile->file( '/foo2/bar/baz', '' );
+
+    opendir my $dh, '/foo2' or die $!;
+    my @content = readdir $dh;
+    closedir $dh or die $!;
+    is( \@content, [ qw< . .. bar > ], 'Did not get confused by internal files' );
+}
+
 done_testing();
 exit;

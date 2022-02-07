@@ -36,4 +36,121 @@ subtest 'search_event' => sub {
     done_testing();
 };
 
+subtest 'lunar_phase' => sub {
+    my @cases = (
+        {
+            date  => '2021-01-01',
+            sun   => 281.16,
+            moon  => 127.64,
+            phase => $FULL_MOON,
+            age   => 206.48
+        },
+        {
+            date  => '2021-01-08',
+            sun   => 288.29,
+            moon  => 224.31,
+            phase => $LAST_QUARTER,
+            age   => 296.01
+        },
+        {
+            date  => '2021-01-15',
+            sun   => 295.43,
+            moon  => 322.7,
+            phase => $NEW_MOON,
+            age   => 27.27
+        },
+        {
+            date  => '2021-01-22',
+            sun   => 302.56,
+            moon  => 48.75,
+            phase => $FIRST_QUARTER,
+            age   => 106.19
+        },        
+        {
+            date  => '2021-01-29',
+            sun   => 309.67,
+            moon  => 136.82,
+            phase => $FULL_MOON,
+            age   => 187.14
+        }, 
+        {
+            date  => '2021-02-05',
+            sun   => 316.77,
+            moon  => 235.14,
+            phase => $LAST_QUARTER,
+            age   => 278.37
+        },                      
+        {
+            date  => '2021-02-12',
+            sun   => 323.86,
+            moon  => 330.87,
+            phase => $NEW_MOON,
+            age   => 7.0
+        },          
+        {
+            date  => '2021-02-19',
+            sun   => 330.93,
+            moon  => 56.51,
+            phase => $WAXING_CRESCENT,
+            age   => 85.58
+        },             
+        {
+            date  => '2021-02-26',
+            sun   => 337.98,
+            moon  => 145.25,
+            phase => $WAXING_GIBBOUS,
+            age   => 167.27
+        },               
+        {
+            date  => '2021-03-05',
+            sun   => 345.0,
+            moon  => 246.05,
+            phase => $WANING_GIBBOUS,
+            age   => 261.04
+        },             
+        {
+            date  => '2021-03-12',
+            sun   => 352.0,
+            moon  => 339.73,
+            phase => $WANING_CRESCENT,
+            age   => 347.72
+        },           
+        {
+            date  => '2021-03-19',
+            sun   => 358.98,
+            moon  => 64.52,
+            phase => $WAXING_CRESCENT,
+            age   => 65.54
+        },   
+        {
+            date  => '2021-03-26',
+            sun   => 5.92,
+            moon  => 153.25,
+            phase => $WAXING_GIBBOUS,
+            age   => 147.38
+        },            
+        {
+            date  => '2021-04-02',
+            sun   => 12.84,
+            moon  => 256.3,
+            phase => $WANING_GIBBOUS,
+            age   => 243.46
+        },            
+        {
+            date  => '2021-04-09',
+            sun   => 19.73,
+            moon  => 349.09,
+            phase => $WANING_CRESCENT,
+            age   => 329.36
+        },                 
+    );
+
+    for my $case(@cases) {
+        my ($phase, $age, $days) = moon_phase(moon => $case->{moon}, sun => $case->{sun});
+        delta_within($age, $case->{age}, 0.1, sprintf('%6.2f on %s', $case->{age}, $case->{date}));
+        ok($phase eq $case->{phase}, sprintf('%s on %s', $case->{phase}, $case->{date}));
+    }
+};
+
+
 done_testing();

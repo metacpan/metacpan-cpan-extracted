@@ -21,6 +21,6 @@ no_index:
     - inc
 requires:
   Test::More: '0'
-  WWW::WebKit2: '0.12'
-version: '0.111'
+  WWW::WebKit2: '0.126'
+version: '0.112'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -45,7 +45,7 @@ use strict;
 use Clone      ();
 use PPI::Token ();
 
-our $VERSION = '1.271'; # VERSION
+our $VERSION = '1.272';
 
 our @ISA = "PPI::Token";
 

@@ -9,10 +9,10 @@ perl Makefile.PL
 make test
 make install
 
-Note that this module has bugs on perls built with a Microsoft compiler (eg  ActivePerl) - even if the
-binaries installed onto the MSVC-built perl were built using MinGW on a MinGW-built perl such as Strawberry
+Note that this module has bugs on perls built with a Microsoft compiler - even if the binaries
+installed onto the MSVC-built perl were built using MinGW on a MinGW-built perl such as Strawberry
 Perl (where no such problem exists).
-By some means that is still unclear, in this situation the 'long double' precision is usually (apparently)
-reduced to 'double' precision whenever a Math::LongDouble object is raised to a power (or a square root
-taken) on MSVC-built perls.
+By some means that is still unclear to me, in this situation the 'long double' precision is usually
+(apparently) reduced to 'double' precision whenever a Math::LongDouble object is raised to a power
+(or a square root taken) on MSVC-built perls.
 This bug manifests itself in causing test failures in t/cmp.t and t/pow.t.

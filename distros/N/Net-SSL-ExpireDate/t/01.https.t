@@ -37,7 +37,10 @@ our %NOT_AFTER  = (
 
 run {
     my $block = shift;
-    my $ed = Net::SSL::ExpireDate->new( https => $block->input );
+    my $ed = Net::SSL::ExpireDate->new(
+        https => $block->input,
+        ($block->name eq 'SNI' ? (sni => $block->sni ) : ()),
+    );
 
     my $expire_date  = $ed->expire_date;
     is $expire_date->iso8601,  $block->expire_date->iso8601, 'expire_date';
@@ -65,6 +68,20 @@ run {
 __END__
 === badssl.com
 --- input: badssl.com
+--- expire_date
+DateTime->new(%main::NOT_AFTER);
+--- begin_date
+DateTime->new(%main::NOT_BEFORE);
+--- not_after
+DateTime->new(%main::NOT_AFTER);
+--- not_before
+DateTime->new(%main::NOT_BEFORE);
+--- is_expired: undef
+--- will_expired: 1
+
+=== SNI
+--- input: blah-blah-blah.badssl.com
+--- sni: badssl.com
 --- expire_date
 DateTime->new(%main::NOT_AFTER);
 --- begin_date

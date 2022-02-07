@@ -1,5 +1,15 @@
 Revision history for Perl module Net::MAC::Vendor
 
+1.268     2022-02-07 05:12:00Z
+        * gracefully fail a test if a server couldn't be contacted
+
+1.267     2022-02-06 05:08:22Z
+        * add IO::Socket::SSL to prereqs
+
+1.266     2022-02-05 21:34:12Z
+        * Fix issue where load_cache causes problems with <> afterwards (PR
+          #2, thanks Christopher Layne!)
+
 1.265     2019-04-12 23:55:27Z
         * properly remove Compress::* from list of mandatory prereqs
 

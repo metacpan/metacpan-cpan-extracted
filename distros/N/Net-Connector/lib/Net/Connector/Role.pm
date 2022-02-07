@@ -37,6 +37,11 @@ has host => (
   required => 1,
 );
 
+has tftp_server => (
+  is      => 'ro',
+  default => 'tftp://192.168.8.160/',
+);
+
 has username => (
   is       => 'ro',
   required => 0,
@@ -278,7 +283,8 @@ sub connect {
           $exp->send("$password\n");
         }
         else {
-          confess __PACKAGE__ . " case1) connect | Login ($self->{host}) failed, please provide the correct account password;";
+          confess __PACKAGE__
+            . " case1) connect | Login ($self->{host}) failed, please provide the correct account password;";
         }
         exp_continue();
       }
@@ -529,7 +535,8 @@ sub enable {
 
   # 异常回显信号捕捉
   if ( defined $ret[1] ) {
-    confess __PACKAGE__ . " case6) enable | during interactive authenticate enable password, got errors：$ret[3] . $ret[1]";
+    confess __PACKAGE__
+      . " case6) enable | during interactive authenticate enable password, got errors：$ret[3] . $ret[1]";
   }
 }
 
@@ -550,4 +557,44 @@ sub deploy {
   # 遍历已有的 commands
   return $self->execCommands( $self->commands->@* );
 }
+
+#------------------------------------------------------------------------------
+# 定义 generate_vendor_connector 根据厂商自动生成连接器
+#------------------------------------------------------------------------------
+sub generate_vendor_connector {
+  my ( $self, $vendor ) = @_;
+  no warnings 'experimental';
+  $vendor //= "comware";
+
+  given ($vendor) {
+    when (/ios|cisco/i) {
+      return "Net::Connector::Cisco::Ios";
+    }
+    when (/h3c|comware/i) {
+      return "Net::Connector::H3c::Comware";
+    }
+    when (/juniper|junos/i) {
+      return "Net::Connector::Juniper::Srx";
+    }
+    when (/paloalto|panos/i) {
+      return "Net::Connector::Paloalto::Firewall";
+    }
+    when (/hillstone|stoneos/i) {
+      return "Net::Connector::Hillstone::Firewall";
+    }
+    when (/radware|stoneos/i) {
+      return "Net::Connector::Radware::LoadBalance";
+    }
+    when (/nxos|nx-os/i) {
+      return "Net::Connector::Cisco::Nxos";
+    }
+    when (/wlc/i) {
+      return "Net::Connector::Cisco::Wlc";
+    }
+    default {
+      return "Net::Connector::H3c::Comware";
+    }
+  }
+}
+
 1;

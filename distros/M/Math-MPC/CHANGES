@@ -1,6 +1,10 @@
+1.14
+ - Fix https://github.com/sisyphus/math-decimal64/pull/1 (also aplies to Math::MPC)
+   Thanks to @hiratara
+
 1.13
-- Fix handling of perls whose ivsize == 4 && nvtype eq '__float128' in t/mpc_64.t
-- Refactor IV/UV/NV/PV handling inside overload subs.
+ - Fix handling of perls whose ivsize == 4 && nvtype eq '__float128' in t/mpc_64.t
+ - Refactor IV/UV/NV/PV handling inside overload subs.
 
 1.12
  - Fix failure in t/out_str2.t

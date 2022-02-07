@@ -32,7 +32,7 @@ in the various types that Perl supports.
 use strict;
 use PPI::Token ();
 
-our $VERSION = '1.271'; # VERSION
+our $VERSION = '1.272';
 
 our @ISA = "PPI::Token";
 

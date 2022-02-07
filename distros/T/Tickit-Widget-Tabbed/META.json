@@ -53,14 +53,14 @@
    "provides" : {
       "Tickit::Widget::Tabbed" : {
          "file" : "lib/Tickit/Widget/Tabbed.pm",
-         "version" : "0.025"
+         "version" : "0.026"
       },
       "Tickit::Widget::Tabbed::Ribbon" : {
          "file" : "lib/Tickit/Widget/Tabbed/Ribbon.pm",
-         "version" : "0.025"
+         "version" : "0.026"
       }
    },
    "release_status" : "stable",
-   "version" : "0.025",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.026",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

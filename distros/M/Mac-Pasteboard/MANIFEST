@@ -32,6 +32,7 @@ t/misc.tx
 t/paste.tx
 t/pasteboard.t
 t/synch.tx
+tools/Constant.PL
 xt/author/changes.t
 xt/author/critic.t
 xt/author/executable.t

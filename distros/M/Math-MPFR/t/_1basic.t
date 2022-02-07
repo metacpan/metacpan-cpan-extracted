@@ -4,7 +4,7 @@ use Config;
 use Math::MPFR qw(:mpfr);
 use Math::MPFR::V;
 
-print "1..9\n";
+print "1..10\n";
 
 warn "\n# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 warn "# MPFR_VERSION is ", MPFR_VERSION, "\n";
@@ -65,10 +65,10 @@ if(!$@) {
             : warn "# mpfr library thresholds file: $evaluate\n";
 }
 
-if($Math::MPFR::VERSION eq '4.18') {print "ok 1\n"}
+if($Math::MPFR::VERSION eq '4.19') {print "ok 1\n"}
 else {print "not ok 1 $Math::MPFR::VERSION\n"}
 
-if(Math::MPFR::_get_xs_version() eq '4.18') {print "ok 2\n"}
+if(Math::MPFR::_get_xs_version() eq '4.19') {print "ok 2\n"}
 else {
   warn "Module version: $Math::MPFR::VERSION\nXS version: ", Math::MPFR::_get_xs_version(), "\n";
   print "not ok 2\n";
@@ -130,6 +130,16 @@ if(Math::MPFR::Random::_MPFR_VERSION() == Math::MPFR::_MPFR_VERSION()) {print "o
 else {
   warn Math::MPFR::Random::_MPFR_VERSION(), " != ", Math::MPFR::_MPFR_VERSION(), "\n";
   print "not ok 9\n";
+}
+
+my $v = Math::MPFR::_sis_perl_version;
+my $v_check = $];
+$v_check =~ s/\.//;
+
+if($v eq $v_check) { print "ok 10\n" }
+else {
+   warn "$v ne $v_check\n";
+   print "not ok 10\n";
 }
 
 

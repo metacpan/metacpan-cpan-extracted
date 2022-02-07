@@ -1,8 +1,8 @@
 package App::Utils;
 # App::Utils - some useful command-line utilities
-# 2020 Vlado Keselj vlado@dnlp.ca http://vlado.ca
+# 2020-2022 Vlado Keselj vlado@dnlp.ca http://vlado.ca
 
-our $VERSION = 0.054;
+our $VERSION = 0.055;
 
 =head1 NAME
 
@@ -17,6 +17,8 @@ the programs.
 F<date-tag> - print a date-time tag in form C<YYYY-MM-DD-hhmmss>
 
 F<date-tag-file> - pre-tag filename with timestamp of last modification
+
+F<move-merge> - merges directories into one target directory
 
 F<remove-empty-dirs> - remove recursively empty directories
 

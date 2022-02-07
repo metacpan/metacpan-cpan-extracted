@@ -35,11 +35,11 @@
       "runtime" : {
          "requires" : {
             "Test::More" : "0",
-            "WWW::WebKit2" : "0.12"
+            "WWW::WebKit2" : "0.126"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.111",
+   "version" : "0.112",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

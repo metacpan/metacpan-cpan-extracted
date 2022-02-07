@@ -40,7 +40,9 @@ sub lmst {
     my $ut = ($mjd - $mj0) * 24; 
     my $t = ($mj0 - 51544.5) / 36525.0;
     my $gmst = 6.697374558 + 1.0027379093 * $ut + (8640184.812866 + (0.093104 - 6.2E-6 * $t) * $t) * $t / 3600.0;
-    24.0 * frac( ($gmst - $lambda / 15.0) / 24.0 );   
+    my $lmst = 24.0 * frac( ($gmst - $lambda / 15.0) / 24.0 );
+    $lmst += 24.0 if $lmst < 0;
+    $lmst
 }
 
 
@@ -96,7 +98,7 @@ Local Mean Sidereal Time
 
 =over
 
-=item * B<$jd> — Modified Julian Date.
+=item * B<$mjd> — Modified Julian Date.
 
 =item * B<$lambda> — geographic longitude in degrees, negative for East
 

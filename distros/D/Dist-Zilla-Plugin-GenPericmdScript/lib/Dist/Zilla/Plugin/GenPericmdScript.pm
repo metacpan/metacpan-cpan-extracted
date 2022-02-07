@@ -1,10 +1,5 @@
 package Dist::Zilla::Plugin::GenPericmdScript;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-07-31'; # DATE
-our $DIST = 'Dist-Zilla-Plugin-GenPericmdScript'; # DIST
-our $VERSION = '0.423'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -23,6 +18,11 @@ use namespace::autoclean;
 
 use Perinci::CmdLine::Gen qw(gen_pericmd_script);
 use Module::Load;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-01-22'; # DATE
+our $DIST = 'Dist-Zilla-Plugin-GenPericmdScript'; # DIST
+our $VERSION = '0.424'; # VERSION
 
 has allow_prereq => (is=>'rw');
 has allow_unknown_opts => (is=>'rw');
@@ -278,7 +278,7 @@ Dist::Zilla::Plugin::GenPericmdScript - Generate Perinci::CmdLine script
 
 =head1 VERSION
 
-This document describes version 0.423 of Dist::Zilla::Plugin::GenPericmdScript (from Perl distribution Dist-Zilla-Plugin-GenPericmdScript), released on 2020-07-31.
+This document describes version 0.424 of Dist::Zilla::Plugin::GenPericmdScript (from Perl distribution Dist-Zilla-Plugin-GenPericmdScript), released on 2022-01-22.
 
 =head1 SYNOPSIS
 
@@ -521,6 +521,49 @@ Please visit the project's homepage at L<https://metacpan.org/release/Dist-Zilla
 
 Source repository is at L<https://github.com/perlancar/perl-Dist-Zilla-Plugin-GenPericmdScript>.
 
+=head1 SEE ALSO
+
+L<Perinci::CmdLine>, the kind of CLI script this plugin is generating.
+
+L<Perinci> and L<Rinci>, for the background information.
+
+L<Dist::Zilla::Plugin::Perinci::CmdLine>, if you are building
+C<Perinci::CmdLine::*> distribution.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2020, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-GenPericmdScript>
@@ -528,25 +571,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 SEE ALSO
-
-L<Rinci>
-
-L<Pod::Weaver::Plugin::Rinci> to fill more stuffs to the POD of the generated
-script.
-
-C<Dist::Zilla::Plugin::Rinci::*> for plugins that utilize Rinci metadata.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020, 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

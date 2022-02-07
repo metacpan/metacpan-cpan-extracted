@@ -1,0 +1,43 @@
+#!perl
+
+use strict;
+use warnings;
+use utf8;
+use Lang::HL;
+use File::Find;
+
+sub readFile {
+    my ($fileName) = @_;
+    my $fileContent;
+    open(my $fh, '<:encoding(UTF-8)', $fileName) or die "Cannot open the program file";
+    {
+        local $/;
+        $fileContent = <$fh>;
+    }
+    close($fh);
+    return $fileContent;
+}
+
+my $dirName = $ARGV[0];
+
+if(! defined $dirName ) {
+    die("give a directory path");
+}
+
+my $code = "";
+find({ wanted => \&process_file, no_chdir => 1 }, @ARGV);
+
+sub process_file {
+    if (-f $_) {
+        $code .= readFile($_);
+    }
+}
+
+$code =~ s/[\t\r\n\f]+//g;
+
+my $hlObject = Lang::HL::Syntax->new();
+my $generatedCode = $hlObject->syntax($code);
+
+if($generatedCode) {
+    print "syntax passed", "\n";
+}

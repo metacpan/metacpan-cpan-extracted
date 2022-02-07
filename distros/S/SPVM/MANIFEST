@@ -586,6 +586,9 @@ t/builder_config/zlib.def
 t/builder_config_exe.t
 t/builder_link_info.pl
 t/builder_object_file_info.t
+t/compile_error.pl
+t/compile_error.t
+t/compile_error_dist.pl
 t/copy_default_to_precompile.pl
 t/default/000_use_spvm.t
 t/default/001_use_empty_class.t
@@ -607,9 +610,6 @@ t/default/callback.t
 t/default/class_var.t
 t/default/comment.t
 t/default/comparison_operator.t
-t/default/compile_error.pl
-t/default/compile_error.t
-t/default/compile_error_dist.pl
 t/default/compile_native_api.pl
 t/default/concat.t
 t/default/constant.t
@@ -623,6 +623,7 @@ t/default/exception.t
 t/default/exchange_api.t
 t/default/exchange_api_call_method.t
 t/default/fat_camma.t
+t/default/field.t
 t/default/for.t
 t/default/if.t
 t/default/if_require.t
@@ -675,6 +676,7 @@ t/default/lib/SPVM/TestCase/CompileError/CallMethod/ClassNotFound.spvm
 t/default/lib/SPVM/TestCase/CompileError/CallMethod/NotFound.spvm
 t/default/lib/SPVM/TestCase/CompileError/Class/ClassNameDifferntFromModuleName.spvm
 t/default/lib/SPVM/TestCase/CompileError/Class/classPartNameStartWithLowerCase.spvm
+t/default/lib/SPVM/TestCase/CompileError/Class/NotClosed.spvm
 t/default/lib/SPVM/TestCase/CompileError/ClassVar/OurClassVarNameColon2Twice.spvm
 t/default/lib/SPVM/TestCase/CompileError/ClassVar/OurClassVarNameContainsUnderScoreTwice.spvm
 t/default/lib/SPVM/TestCase/CompileError/ClassVar/OurClassVarNameEndColon2.spvm
@@ -725,9 +727,6 @@ t/default/lib/SPVM/TestCase/CompileError/LogicalOperator/OrNotExpression.spvm
 t/default/lib/SPVM/TestCase/CompileError/Method/Begin.spvm
 t/default/lib/SPVM/TestCase/CompileError/Method/MethodNameContainsUnderScoreTwice.spvm
 t/default/lib/SPVM/TestCase/CompileError/Method/MethodNameStartDigit.spvm
-t/default/lib/SPVM/TestCase/CompileError/Method/Sub/Begin.spvm
-t/default/lib/SPVM/TestCase/CompileError/Method/Sub/SubNameContainsUnderScoreTwice.spvm
-t/default/lib/SPVM/TestCase/CompileError/Method/Sub/SubNameStartDigit.spvm
 t/default/lib/SPVM/TestCase/CompileError/Multiply/LeftIsNotNumeric.spvm
 t/default/lib/SPVM/TestCase/CompileError/Multiply/RightIsNotNumeric.spvm
 t/default/lib/SPVM/TestCase/CompileError/New/Private.spvm
@@ -735,6 +734,7 @@ t/default/lib/SPVM/TestCase/CompileError/OArray/AssignNumeric.spvm
 t/default/lib/SPVM/TestCase/CompileError/OArray/AssignNumericArray.spvm
 t/default/lib/SPVM/TestCase/CompileError/Remainder/LeftIsNotIntegral.spvm
 t/default/lib/SPVM/TestCase/CompileError/Remainder/RightIsNotIntegral.spvm
+t/default/lib/SPVM/TestCase/CompileError/String/AssignNonMutableToMutable.spvm
 t/default/lib/SPVM/TestCase/CompileError/String/CharacterAssign.spvm
 t/default/lib/SPVM/TestCase/CompileError/Sub/Begin.spvm
 t/default/lib/SPVM/TestCase/CompileError/Sub/SubNameContainsUnderScoreTwice.spvm
@@ -742,6 +742,8 @@ t/default/lib/SPVM/TestCase/CompileError/Sub/SubNameStartDigit.spvm
 t/default/lib/SPVM/TestCase/CompileError/Subtract/LeftIsNotNumeric.spvm
 t/default/lib/SPVM/TestCase/CompileError/Subtract/RightIsNotNumeric.spvm
 t/default/lib/SPVM/TestCase/CompileError/Switch/NoLastBreak.spvm
+t/default/lib/SPVM/TestCase/CompileError/Type/MutableNoStringCaseInt.spvm
+t/default/lib/SPVM/TestCase/CompileError/Type/MutableNoStringCaseStringArray.spvm
 t/default/lib/SPVM/TestCase/CompileError/TypeCantBeDetectedUndef.spvm
 t/default/lib/SPVM/TestCase/CompileError/TypeCantBeDetectedUndefDefault.spvm
 t/default/lib/SPVM/TestCase/CompileError/UnaryMinus/NotNumeric.spvm
@@ -768,6 +770,7 @@ t/default/lib/SPVM/TestCase/Examples.spvm
 t/default/lib/SPVM/TestCase/Exception.spvm
 t/default/lib/SPVM/TestCase/ExchangeAPI.spvm
 t/default/lib/SPVM/TestCase/FatCamma.spvm
+t/default/lib/SPVM/TestCase/Field.spvm
 t/default/lib/SPVM/TestCase/FILE.spvm
 t/default/lib/SPVM/TestCase/For.spvm
 t/default/lib/SPVM/TestCase/If.spvm
@@ -953,6 +956,7 @@ t/exe/lib/SPVM/TestCase/NativeAPI2.native/src/noneed.txt
 t/exe/lib/SPVM/TestCase/NativeAPI2.spvm
 t/exe/myexe.config
 t/exe/myexe.pl
+t/exe/SPVM_Builder_Exe.t
 t/exe/spvmcc.t
 t/exe/spvmgenlib.t
 t/get_native_api_indexes.pl

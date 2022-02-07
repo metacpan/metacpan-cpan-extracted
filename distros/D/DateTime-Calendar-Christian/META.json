@@ -9,7 +9,7 @@
       }
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -44,7 +44,7 @@
             "DateTime::Calendar::Julian" : "0.04",
             "constant" : "0",
             "overload" : "0",
-            "perl" : "5.006002",
+            "perl" : "5.008004",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -53,7 +53,7 @@
    "provides" : {
       "DateTime::Calendar::Christian" : {
          "file" : "lib/DateTime/Calendar/Christian.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       }
    },
    "release_status" : "stable",
@@ -71,6 +71,6 @@
          "web" : "https://github.com/trwyant/perl-DateTime-Calendar-Christian"
       }
    },
-   "version" : "0.12",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.13",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

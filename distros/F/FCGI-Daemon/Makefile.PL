@@ -14,8 +14,8 @@ WriteMakefile(
     PREREQ_PM => {
         'Test::More' => 0,
         'BSD::Resource' => 0,
-        'FCGI::ProcManager' => 0.18,
-        'FCGI' => 0.71,
+        'FCGI::ProcManager' => 0.28,
+        'FCGI' => 0.82,
         'IO::Select' => 0,
         'Getopt::Std' => 0,
     },

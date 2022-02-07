@@ -23,5 +23,5 @@ requires:
   DBD::SQLite: '0'
   DBI: '0'
   POSIX: '0'
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

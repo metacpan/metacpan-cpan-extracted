@@ -22,7 +22,7 @@
 
 =head1 SYNOPSIS
 
-   use Math::GMPz qw(:mpz :primes :supp);
+   use Math::GMPz qw(:mpz);
 
    my $string = 'fa9eeeeeeeeeeeeea1234dcbaef1';
    my $base = 16;
@@ -673,7 +673,7 @@
     abs(1st arg) < abs(2nd arg).
 
    $si = Rmpz_sgn($op);
-    Return +1 if $op > 0, 0 if $opP = 0, and -1 if $op < 0.
+    Return +1 if $op > 0, 0 if $op == 0, and -1 if $op < 0.
 
    ##############################
 

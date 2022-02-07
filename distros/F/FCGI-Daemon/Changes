@@ -1,6 +1,13 @@
 Changelog for FCGI-Daemon
 #########################
 
+2022-02-06 Pavel Kuptsov <poizon_here@mail.ru>  
+  * Added support for PUT method
+  * Updated version in POD 
+  * Applied patch to fix incorrectly privileges drop (Thanks to <kb@open.ch>)
+  * Fixed unlink w/o checks
+  * Updated requirement for module versions (FCGI to 0.82 and FCGI::ProcManager to 0.28)
+
 2015-12-26 Dmitry Smirnov <onlyjob@cpan.org>  
 
   Maintenance release:

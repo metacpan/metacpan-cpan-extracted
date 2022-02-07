@@ -7,6 +7,7 @@ use Test::Differences;
 use HealthCheck::Diagnostic::SFTP;
 
 # Mock the SFTP module so that we can pretend to have good and bad hosts.
+my $last_sftp;
 my $mock = Test::MockModule->new( 'Net::SFTP' );
 $mock->mock( new => sub {
     my ( $class, $host, %params ) = @_;
@@ -15,7 +16,8 @@ $mock->mock( new => sub {
     die "Net::SSH: Bad host name: $host"
         if $host eq 'inaccessible-host';
 
-    return bless( \%params, 'Net::SFTP' );
+    $last_sftp = bless( \%params, 'Net::SFTP' );
+    return $last_sftp;
 } );
 
 # Check that we can use HealthCheck as a class.
@@ -171,6 +173,60 @@ my $run_check_or_error = sub {
     like $result->[1],
         qr/Error in running callback for good-host SFTP: Nice try!/,
         'Return error in info message for an error produced in callback.';
+}
+
+# Test the timeout attribute gets passed to Net::SFTP properly.
+{
+    my $diagnostic = HealthCheck::Diagnostic::SFTP->new(
+        host => 'host-with-default-timeout-and-no-ssh-args',
+    );
+    $diagnostic->check;
+    eq_or_diff $last_sftp->{ssh_args}, { options => [ 'ConnectTimeout 3' ] },
+        'Set default ConnectTimeout value with no other options.';
+
+    $diagnostic = HealthCheck::Diagnostic::SFTP->new(
+        host     => 'host-with-default-timeout-and-ssh-args',
+        ssh_args => {
+            some_net_ssh_perl_option => 'foo',
+            options                  => ['UserKnownHostsFile /tmp'],
+        },
+    );
+    $diagnostic->check;
+    eq_or_diff $last_sftp->{ssh_args}, {
+        some_net_ssh_perl_option => 'foo',
+        options                  => [
+            'UserKnownHostsFile /tmp',
+            'ConnectTimeout 3',
+        ],
+    }, 'Set custom ConnectTimeout value with existing options.';
+
+    $diagnostic = HealthCheck::Diagnostic::SFTP->new(
+        host     => 'host-with-existing-timeout',
+        timeout  => 55,
+        ssh_args => {
+            some_net_ssh_perl_option => 'foo',
+            options                  => [
+                'UserKnownHostsFile /tmp',
+                'ConnectTimeout 42',
+            ]
+        },
+    );
+    $diagnostic->check;
+    eq_or_diff $last_sftp->{ssh_args}, {
+        some_net_ssh_perl_option => 'foo',
+        options                  => [
+            'UserKnownHostsFile /tmp',
+            'ConnectTimeout 42',
+        ],
+    }, 'Ignored custom ConnectTimeout value with existing value set.';
+
+    $diagnostic = HealthCheck::Diagnostic::SFTP->new(
+        host    => 'host-with-custom-timeout-and-no-ssh-args',
+        timeout => 42,
+    );
+    $diagnostic->check;
+    eq_or_diff $last_sftp->{ssh_args}, { options => [ 'ConnectTimeout 42' ] },
+        'Set custom ConnectTimeout value with no other options.';
 }
 
 done_testing;

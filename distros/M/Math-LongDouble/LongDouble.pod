@@ -58,10 +58,16 @@ Math::LongDouble - perl interface to C's long double operations
     += -= *= /= **=
     != == <= >= <=> < >
     ++ --
-    =
-    abs bool ! int print
+    ""
+    abs bool ! int
     sqrt log exp
     sin cos atan2
+    =
+
+    NOTE: Making use of the '=' overloading is not recommended unless
+          you understand its caveats. See 'perldoc overload' and
+          read it thoroughly, including the documentation regarding
+          'copy constructors'.
 
     In those situations where the overload subroutine operates on 2
     perl variables, then obviously one of those perl variables is

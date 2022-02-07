@@ -1,7 +1,9 @@
-use ExtUtils::MakeMaker;
+use strict;
+use warnings;
 use Config;
+use ExtUtils::MakeMaker;
 
-$defines = $] < 5.008 ? "-DOLDPERL" : "-DNEWPERL";
+my $defines = $] < 5.008 ? "-DOLDPERL" : "-DNEWPERL";
 
 # Try to detect the presence/absence of a common gcc bug in ctanq() and ctanhq().
 # We test only for the ctanq() bug, as either both functions are buggy or
@@ -19,7 +21,7 @@ unless(defined($cc)) {
 }
 
 my $out = `$cc -o try.exe -x c try.in -lquadmath 2>&1`;
-$diag = $^O =~ /mswin32/i ? `try.exe 2>&1` : `./try.exe 2>&1`;
+my $diag = $^O =~ /mswin32/i ? `try.exe 2>&1` : `./try.exe 2>&1`;
 
 print "\ndiag: $diag\n" if -e 'try.exe';
 

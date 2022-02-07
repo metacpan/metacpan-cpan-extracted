@@ -15,6 +15,7 @@ on 'test' => sub {
     requires 'List::Util';
     requires 'Test::More', '1.3';
     requires 'Test::AllModules', '0.17';
+    requires 'HTTP::Headers';
     # for CLI
     requires 'Capture::Tiny';
 };

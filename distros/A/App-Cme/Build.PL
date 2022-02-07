@@ -27,7 +27,7 @@ my %module_build_args = (
     "Dominique Dumont"
   ],
   "dist_name" => "App-Cme",
-  "dist_version" => "1.036",
+  "dist_version" => "1.037",
   "license" => "lgpl",
   "module_name" => "App::Cme",
   "recommends" => {
@@ -53,7 +53,7 @@ my %module_build_args = (
     "Pod::POM::View::Text" => 0,
     "Scalar::Util" => 0,
     "Tie::Hash" => 0,
-    "YAML" => 0,
+    "YAML::PP" => 0,
     "perl" => "5.020"
   },
   "script_files" => [
@@ -68,8 +68,7 @@ my %module_build_args = (
     "Test::File::Contents" => 0,
     "Test::More" => 0,
     "Test::Perl::Critic" => 0,
-    "Test::Pod" => "1.00",
-    "XXX" => 0
+    "Test::Pod" => "1.00"
   }
 );
 
@@ -84,8 +83,7 @@ my %fallback_build_requires = (
   "Test::File::Contents" => 0,
   "Test::More" => 0,
   "Test::Perl::Critic" => 0,
-  "Test::Pod" => "1.00",
-  "XXX" => 0
+  "Test::Pod" => "1.00"
 );
 
 

@@ -4,11 +4,11 @@ use warnings;
 use strict;
 use base qw( Workflow::Action );
 
-$Workflow::Action::Null::VERSION = '1.57';
+$Workflow::Action::Null::VERSION = '1.59';
 
 sub execute {
     my ($self) = @_;
-    return undef;
+    return;
 }
 
 1;
@@ -23,7 +23,7 @@ Workflow::Action::Null - Workflow action for the terminally lazy
 
 =head1 VERSION
 
-This documentation describes version 1.57 of this package
+This documentation describes version 1.59 of this package
 
 =head1 SYNOPSIS
 
@@ -60,7 +60,7 @@ it by returning C<undef>.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2003-2021 Chris Winters. All rights reserved.
+Copyright (c) 2003-2022 Chris Winters. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

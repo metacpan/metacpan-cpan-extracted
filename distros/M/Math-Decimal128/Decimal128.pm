@@ -10,7 +10,7 @@ require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
 
-$Math::Decimal128::VERSION = '0.10';
+$Math::Decimal128::VERSION = '0.11';
 
 use subs qw(DEC128_MAX DEC128_MIN);
 
@@ -41,7 +41,7 @@ use overload
   'neg'   => \&_overload_neg,
 ;
 
-DynaLoader::bootstrap Math::Decimal128 $Math::Decimal128::VERSION;
+Math::Decimal128->DynaLoader::bootstrap($Math::Decimal128::VERSION);
 
 @Math::Decimal128::EXPORT = ();
 @Math::Decimal128::EXPORT_OK = qw(

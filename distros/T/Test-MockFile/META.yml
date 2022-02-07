@@ -29,5 +29,5 @@ resources:
   bugtracker: https://github.com/cpanelinc/Test-MockFile/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/cpanelinc/Test-MockFile
-version: '0.025'
+version: '0.026'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

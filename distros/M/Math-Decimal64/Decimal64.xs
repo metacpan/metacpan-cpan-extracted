@@ -138,20 +138,16 @@ SV *  _is_inf_NV(pTHX_ SV * x) {
 }
 
 SV *  _is_neg_zero_NV(pTHX_ SV * x) {
-      char * buffer;
+      char buffer[3];
 
       if(SvNV(x) != 0.0) return newSViv(0);
-
-      Newx(buffer, 2, char);
 
       sprintf(buffer, "%.0f", (double)SvNV(x));
 
       if(strcmp(buffer, "-0")) {
-        Safefree(buffer);
         return newSViv(0);
       }
 
-      Safefree(buffer);
       return newSViv(1);
 }
 
@@ -830,19 +826,19 @@ SV * _overload_sub(pTHX_ SV * a, SV * b, SV * third) {
      SvREADONLY_on(obj);
 
     if(SvUOK(b)) {
-      if(third == &PL_sv_yes) *d64 = (D64)SvUVX(b) - *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a))));
+      if(SWITCH_ARGS) *d64 = (D64)SvUVX(b) - *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a))));
       else *d64 = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) - (D64)SvUVX(b);
       return obj_ref;
     }
 
     if(SvIOK(b)) {
-      if(third == &PL_sv_yes) *d64 = (D64)SvIVX(b) - *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a))));
+      if(SWITCH_ARGS) *d64 = (D64)SvIVX(b) - *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a))));
       else *d64 = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) - (D64)SvIVX(b);
       return obj_ref;
     }
 
     if(SvPOK(b) && !SvNOK(b)) {
-      if(third == &PL_sv_yes) *d64 = _atodecimal(aTHX_ SvPV_nolen(b)) - *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a))));
+      if(SWITCH_ARGS) *d64 = _atodecimal(aTHX_ SvPV_nolen(b)) - *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a))));
       else *d64 = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) - _atodecimal(aTHX_ SvPV_nolen(b));
       return obj_ref;
     }
@@ -856,7 +852,7 @@ SV * _overload_sub(pTHX_ SV * a, SV * b, SV * third) {
       croak("Invalid object supplied to Math::Decimal64::_overload_sub function");
     }
     /* replaced by _overload_neg
-    if(third == &PL_sv_yes) {
+    if(SWITCH_ARGS) {
       *d64 = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) * -1.0DD;
       return obj_ref;
     }
@@ -897,19 +893,19 @@ SV * _overload_div(pTHX_ SV * a, SV * b, SV * third) {
      SvREADONLY_on(obj);
 
     if(SvUOK(b)) {
-      if(third == &PL_sv_yes) *d64 = (D64)SvUVX(b) / *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a))));
+      if(SWITCH_ARGS) *d64 = (D64)SvUVX(b) / *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a))));
       else *d64 = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) / (D64)SvUVX(b);
       return obj_ref;
     }
 
     if(SvIOK(b)) {
-      if(third == &PL_sv_yes) *d64 = (D64)SvIVX(b) / *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a))));
+      if(SWITCH_ARGS) *d64 = (D64)SvIVX(b) / *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a))));
       else *d64 = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) / (D64)SvIVX(b);
       return obj_ref;
     }
 
     if(SvPOK(b) && !SvNOK(b)) {
-      if(third == &PL_sv_yes) *d64 = _atodecimal(aTHX_ SvPV_nolen(b)) / *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a))));
+      if(SWITCH_ARGS) *d64 = _atodecimal(aTHX_ SvPV_nolen(b)) / *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a))));
       else *d64 = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) / _atodecimal(aTHX_ SvPV_nolen(b));
       return obj_ref;
     }
@@ -1102,7 +1098,7 @@ SV * _overload_not_equiv(pTHX_ SV * a, SV * b, SV * third) {
 SV * _overload_lt(pTHX_ SV * a, SV * b, SV * third) {
 
      if(SvUOK(b)) {
-       if(third == &PL_sv_yes) {
+       if(SWITCH_ARGS) {
          if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) > (D64)SvUVX(b)) return newSViv(1);
          return newSViv(0);
        }
@@ -1111,7 +1107,7 @@ SV * _overload_lt(pTHX_ SV * a, SV * b, SV * third) {
      }
 
      if(SvIOK(b)) {
-       if(third == &PL_sv_yes) {
+       if(SWITCH_ARGS) {
          if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) > (D64)SvIVX(b)) return newSViv(1);
          return newSViv(0);
        }
@@ -1120,7 +1116,7 @@ SV * _overload_lt(pTHX_ SV * a, SV * b, SV * third) {
      }
 
      if(SvPOK(b) && !SvNOK(b)) {
-       if(third == &PL_sv_yes) {
+       if(SWITCH_ARGS) {
          if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) > _atodecimal(aTHX_ SvPV_nolen(b))) return newSViv(1);
          return newSViv(0);
        }
@@ -1142,7 +1138,7 @@ SV * _overload_lt(pTHX_ SV * a, SV * b, SV * third) {
 SV * _overload_gt(pTHX_ SV * a, SV * b, SV * third) {
 
     if(SvUOK(b)) {
-      if(third == &PL_sv_yes) {
+      if(SWITCH_ARGS) {
         if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) < (D64)SvUVX(b)) return newSViv(1);
         return newSViv(0);
       }
@@ -1151,7 +1147,7 @@ SV * _overload_gt(pTHX_ SV * a, SV * b, SV * third) {
     }
 
     if(SvIOK(b)) {
-      if(third == &PL_sv_yes) {
+      if(SWITCH_ARGS) {
         if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) < (D64)SvIVX(b)) return newSViv(1);
         return newSViv(0);
       }
@@ -1160,7 +1156,7 @@ SV * _overload_gt(pTHX_ SV * a, SV * b, SV * third) {
     }
 
     if(SvPOK(b) && !SvNOK(b)) {
-      if(third == &PL_sv_yes) {
+      if(SWITCH_ARGS) {
         if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) < _atodecimal(aTHX_ SvPV_nolen(b))) return newSViv(1);
         return newSViv(0);
       }
@@ -1182,7 +1178,7 @@ SV * _overload_gt(pTHX_ SV * a, SV * b, SV * third) {
 SV * _overload_lte(pTHX_ SV * a, SV * b, SV * third) {
 
      if(SvUOK(b)) {
-       if(third == &PL_sv_yes) {
+       if(SWITCH_ARGS) {
          if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) >= (D64)SvUVX(b)) return newSViv(1);
          return newSViv(0);
        }
@@ -1191,7 +1187,7 @@ SV * _overload_lte(pTHX_ SV * a, SV * b, SV * third) {
      }
 
      if(SvIOK(b)) {
-       if(third == &PL_sv_yes) {
+       if(SWITCH_ARGS) {
          if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) >= (D64)SvIVX(b)) return newSViv(1);
          return newSViv(0);
        }
@@ -1200,7 +1196,7 @@ SV * _overload_lte(pTHX_ SV * a, SV * b, SV * third) {
      }
 
      if(SvPOK(b) && !SvNOK(b)) {
-       if(third == &PL_sv_yes) {
+       if(SWITCH_ARGS) {
          if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) >= _atodecimal(aTHX_ SvPV_nolen(b))) return newSViv(1);
          return newSViv(0);
        }
@@ -1222,7 +1218,7 @@ SV * _overload_lte(pTHX_ SV * a, SV * b, SV * third) {
 SV * _overload_gte(pTHX_ SV * a, SV * b, SV * third) {
 
      if(SvUOK(b)) {
-       if(third == &PL_sv_yes) {
+       if(SWITCH_ARGS) {
          if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) <= (D64)SvUVX(b)) return newSViv(1);
          return newSViv(0);
        }
@@ -1231,7 +1227,7 @@ SV * _overload_gte(pTHX_ SV * a, SV * b, SV * third) {
      }
 
      if(SvIOK(b)) {
-       if(third == &PL_sv_yes) {
+       if(SWITCH_ARGS) {
          if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) <= (D64)SvIVX(b)) return newSViv(1);
          return newSViv(0);
        }
@@ -1240,7 +1236,7 @@ SV * _overload_gte(pTHX_ SV * a, SV * b, SV * third) {
      }
 
      if(SvPOK(b) && !SvNOK(b)) {
-       if(third == &PL_sv_yes) {
+       if(SWITCH_ARGS) {
          if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) <= _atodecimal(aTHX_ SvPV_nolen(b))) return newSViv(1);
          return newSViv(0);
        }
@@ -1261,7 +1257,7 @@ SV * _overload_gte(pTHX_ SV * a, SV * b, SV * third) {
 
 SV * _overload_spaceship(pTHX_ SV * a, SV * b, SV * third) {
     int reversal = 1;
-    if(third == &PL_sv_yes) reversal = -1;
+    if(SWITCH_ARGS) reversal = -1;
 
     if(SvUOK(b)) {
       if(*(INT2PTR(_Decimal64 *, SvIVX(SvRV(a)))) > (D64)SvUVX(b)) return newSViv(1 * reversal);
@@ -1423,91 +1419,6 @@ SV * is_ZeroD64(pTHX_ SV * b) {
      croak("Invalid argument supplied to Math::Decimal64::is_ZeroD64 function");
 }
 
-/* No longer used - made use of strtold(), which is less than desirable
-void _D64toME(SV * a) {
-     dXSARGS;
-     _Decimal64 t;
-     char * buffer;
-     int count = 0;
-     char * fmt = "%.15Le";
-
-     if(sv_isobject(a)) {
-       const char *h = HvNAME(SvSTASH(SvRV(a)));
-       if(strEQ(h, "Math::Decimal64")) {
-          t = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a))));
-          if(_is_nan(t) || _is_inf(t) || t == 0.0DD) {
-            EXTEND(SP, 2);
-            ST(0) = sv_2mortal(newSVnv(t));
-            ST(1) = sv_2mortal(newSViv(0));
-            XSRETURN(2);
-          }
-
-          *//* At this stage we know the arg is not a _Decimal64 infinity/0, but on powerpc it might be a
-             long double that's outside the allowable range *//*
-#if defined(__powerpc__) || defined(_ARCH_PPC) || defined(_M_PPC) || defined(__PPCGECKO__) || defined(__PPCBROADWAY__)
-          if((long double)t > LDBL_MAX ||
-             (long double)t < -LDBL_MAX) {
-            count = 150;
-            t *= 1e-150DD; *//* (long double)t should now be in range *//*
-          }
-
-          if((long double)t <  LDBL_MIN * 128.0L &&
-             (long double)t > -LDBL_MIN * 128.0L) {
-            count = -150;
-            t *= 1e150DD; *//* (long double)t should now be in range *//*
-          }
-#endif
-          Newx(buffer, 32, char);
-          if(buffer == NULL)croak("Couldn't allocate memory in _D64toME");
-#if defined(__powerpc__)
-          *//* Formatting bug (in C compiler/libc) wrt (+-)897e-292, (+-)78284e-294 *//*
-          if(t == 897e-292DD   || t == -897e-292DD ||
-             t == 78284e-294DD || t == -78284e-294DD) fmt = "%.14Le";
-#endif
-          sprintf(buffer, fmt, (long double)t);
-          EXTEND(SP, 3);
-          ST(0) = sv_2mortal(newSVpv(buffer, 0));
-          ST(1) = &PL_sv_undef;
-          ST(2) = sv_2mortal(newSViv(count)); *//* count will be added to the exponent in D64toME() perl sub. *//*
-          Safefree(buffer);
-          XSRETURN(3);
-       }
-       else croak("Invalid object supplied to Math::Decimal64::D64toME function");
-     }
-     else croak("Invalid argument supplied to Math::Decimal64::D64toME function");
-}
-/*
-/* Replaced by newer rendition (above) that caters for the case that the long double
-   has the same exponent range as the double - eg. powerpc "double-double arithmetic".
-void _D64toME_deprecated(SV * a) {
-     dXSARGS;
-     _Decimal64 t;
-     char * buffer;
-
-     if(sv_isobject(a)) {
-       const char *h = HvNAME(SvSTASH(SvRV(a)));
-       if(strEQ(h, "Math::Decimal64")) {
-          EXTEND(SP, 2);
-          t = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(a))));
-          if(_is_nan(t) || _is_inf(t) || t == 0.0DD) {
-            ST(0) = sv_2mortal(newSVnv(t));
-            ST(1) = sv_2mortal(newSViv(0));
-            XSRETURN(2);
-          }
-
-          Newx(buffer, 32, char);
-          sprintf(buffer, "%.15Le", (long double)t);
-          ST(0) = sv_2mortal(newSVpv(buffer, 0));
-          ST(1) = &PL_sv_undef;
-          Safefree(buffer);
-          XSRETURN(2);
-       }
-       else croak("Invalid object supplied to Math::Decimal64::D64toME function");
-     }
-     else croak("Invalid argument supplied to Math::Decimal64::D64toME function");
-}
-*/
-
 SV * _wrap_count(pTHX) {
      return newSVuv(PL_sv_count);
 }
@@ -1520,11 +1431,8 @@ void _d64_bytes(pTHX_ SV * sv) {
   dXSARGS;
   _Decimal64 d64 = *(INT2PTR(_Decimal64 *, SvIVX(SvRV(sv))));
   int i, n = sizeof(_Decimal64);
-  char * buff;
+  char buff[4];
   void * p = &d64;
-
-  Newx(buff, 4, char);
-  if(buff == NULL) croak("Failed to allocate memory in _d64_bytes function");
 
   sp = mark;
 
@@ -1538,19 +1446,15 @@ void _d64_bytes(pTHX_ SV * sv) {
     XPUSHs(sv_2mortal(newSVpv(buff, 0)));
   }
   PUTBACK;
-  Safefree(buff);
   XSRETURN(n);
 }
 
 void _bid_mant(pTHX_ SV * bin) {
   dXSARGS;
   int i, imax = av_len((AV*)SvRV(bin));
-  char * buf;
+  char buf[21];
   long long val = 0ll;
   extern long long add_on[54];
-
-  Newx(buf, 20, char);
-  if(buf == NULL) croak("Failed to allocate memory in bir_mant function");
 
   for(i = 0; i <= imax; i++)
     if(SvIV(*(av_fetch((AV*)SvRV(bin), i, 0)))) val += add_on[i];
@@ -1559,7 +1463,6 @@ void _bid_mant(pTHX_ SV * bin) {
   else sprintf(buf, "%lld", val);
 
   ST(0) = sv_2mortal(newSVpv(buf, 0));
-  Safefree(buf);
   XSRETURN(1);
 
 }

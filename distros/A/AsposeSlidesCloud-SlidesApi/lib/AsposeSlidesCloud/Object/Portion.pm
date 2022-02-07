@@ -39,7 +39,9 @@ use DateTime;
 
 use AsposeSlidesCloud::Object::EffectFormat;
 use AsposeSlidesCloud::Object::FillFormat;
+use AsposeSlidesCloud::Object::Hyperlink;
 use AsposeSlidesCloud::Object::LineFormat;
+use AsposeSlidesCloud::Object::MathParagraph;
 use AsposeSlidesCloud::Object::ResourceBase;
 use AsposeSlidesCloud::Object::ResourceUri;
 
@@ -186,6 +188,13 @@ __PACKAGE__->method_documentation({
     	datatype => 'string',
     	base_name => 'Text',
     	description => 'Text.',
+    	format => '',
+    	read_only => '',
+    		},
+    'math_paragraph' => {
+    	datatype => 'MathParagraph',
+    	base_name => 'MathParagraph',
+    	description => 'Math paragraph.',
     	format => '',
     	read_only => '',
     		},
@@ -357,12 +366,27 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'hyperlink_click' => {
+    	datatype => 'Hyperlink',
+    	base_name => 'HyperlinkClick',
+    	description => 'Hyperlink defined for mouse click.',
+    	format => '',
+    	read_only => '',
+    		},
+    'hyperlink_mouse_over' => {
+    	datatype => 'Hyperlink',
+    	base_name => 'HyperlinkMouseOver',
+    	description => 'Hyperlink defined for mouse over.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
     'self_uri' => 'ResourceUri',
     'alternate_links' => 'ARRAY[ResourceUri]',
     'text' => 'string',
+    'math_paragraph' => 'MathParagraph',
     'font_bold' => 'string',
     'font_italic' => 'string',
     'font_underline' => 'string',
@@ -386,13 +410,16 @@ __PACKAGE__->swagger_types( {
     'effect_format' => 'EffectFormat',
     'line_format' => 'LineFormat',
     'underline_fill_format' => 'FillFormat',
-    'underline_line_format' => 'LineFormat'
+    'underline_line_format' => 'LineFormat',
+    'hyperlink_click' => 'Hyperlink',
+    'hyperlink_mouse_over' => 'Hyperlink'
 } );
 
 __PACKAGE__->attribute_map( {
     'self_uri' => 'SelfUri',
     'alternate_links' => 'AlternateLinks',
     'text' => 'Text',
+    'math_paragraph' => 'MathParagraph',
     'font_bold' => 'FontBold',
     'font_italic' => 'FontItalic',
     'font_underline' => 'FontUnderline',
@@ -416,7 +443,9 @@ __PACKAGE__->attribute_map( {
     'effect_format' => 'EffectFormat',
     'line_format' => 'LineFormat',
     'underline_fill_format' => 'UnderlineFillFormat',
-    'underline_line_format' => 'UnderlineLineFormat'
+    'underline_line_format' => 'UnderlineLineFormat',
+    'hyperlink_click' => 'HyperlinkClick',
+    'hyperlink_mouse_over' => 'HyperlinkMouseOver'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

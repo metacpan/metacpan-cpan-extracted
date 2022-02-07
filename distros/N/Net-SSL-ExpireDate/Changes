@@ -1,5 +1,9 @@
 Revision history for Net-SSL-ExpireDate
 
+1.23 2022-02-02
+  * Adding support for SNI
+    ref: #13
+
 1.22 2021-10-11
   * Update expire date in test cases
     ref: #12

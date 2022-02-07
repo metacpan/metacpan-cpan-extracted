@@ -10,7 +10,7 @@
 # ABSTRACT: Migrate the configuration of an application
 
 package App::Cme::Command::migrate ;
-$App::Cme::Command::migrate::VERSION = '1.036';
+$App::Cme::Command::migrate::VERSION = '1.037';
 use strict;
 use warnings;
 use 5.10.1;
@@ -72,7 +72,7 @@ App::Cme::Command::migrate - Migrate the configuration of an application
 
 =head1 VERSION
 
-version 1.036
+version 1.037
 
 =head1 SYNOPSIS
 

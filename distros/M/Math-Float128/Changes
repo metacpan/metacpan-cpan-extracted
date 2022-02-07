@@ -1,8 +1,15 @@
+0.14
+ - Fix https://github.com/sisyphus/math-decimal64/pull/1 (also aplies to Math::Float128)
+   Thanks to @hiratara
+ - tweak the alignment conditions in math_float128_include.h to exclude
+   alignment directives for 32-bit mingw-w64 compilers
+
 0.13
  - Prototype subroutines listed in 'use subs()'.
  - Move pod from Float128.pm to (newly created) Float128.pod.
  - Add fromSTR(), fromNV(), fromIV() and fromUV().
  - corrections to t/03arith.t and t/13constants.t.
+   ( See https://rt.cpan.org/Ticket/Display.html?id=132376 )
 
 0.12
  - Fix typo ("Reinsterting") in Makefile.PL

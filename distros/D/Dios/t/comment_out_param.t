@@ -22,7 +22,7 @@ class Test1 {
 class Test2 {
     has $.foo;
     submethod BUILD (
-        :foo($new_foo)
+        :bar($new_bar)
     )
     { 42 }
 }

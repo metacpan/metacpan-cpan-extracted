@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use base qw( Class::Accessor );
 use Log::Log4perl;
-$Workflow::Base::VERSION = '1.57';
+$Workflow::Base::VERSION = '1.59';
 
 sub new {
     my ( $class, @params ) = @_;
@@ -45,7 +45,7 @@ sub param {
         if ( exists $self->{PARAMS}{$name} ) {
             return $self->{PARAMS}{$name};
         }
-        return undef;
+        return;
     }
     return $self->{PARAMS}{$name} = $value;
 }
@@ -53,8 +53,7 @@ sub param {
 sub delete_param {
     my ( $self, $name ) = @_;
     unless ( defined $name ) {
-        ## this is an error - perhaps an exception is too radical
-        return undef;
+        return;
     }
 
     # Allow multiple parameters to be deleted at once...
@@ -74,9 +73,7 @@ sub delete_param {
         delete $self->{PARAMS}{$name};
         return $value;
     }
-
-    ## this is an error - perhaps an exception is too radical
-    return undef;
+    return;
 }
 
 sub clear_params {
@@ -102,7 +99,7 @@ Workflow::Base - Base class with constructor
 
 =head1 VERSION
 
-This documentation describes version 1.57 of this package
+This documentation describes version 1.59 of this package
 
 =head1 SYNOPSIS
 
@@ -202,7 +199,7 @@ it in a list. If given neither return an empty list.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2003-2021 Chris Winters. All rights reserved.
+Copyright (c) 2003-2022 Chris Winters. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

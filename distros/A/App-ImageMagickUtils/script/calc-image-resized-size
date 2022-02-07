@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-16'; # DATE
+our $DATE = '2022-01-22'; # DATE
 our $DIST = 'App-ImageMagickUtils'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Math/Image/CalcResized/calc_image_resized_size",
@@ -38,7 +38,7 @@ calc-image-resized-size - Given size of an image (in WxH, e.g. "2592x1944") and 
 
 =head1 VERSION
 
-This document describes version 0.009 of calc-image-resized-size (from Perl distribution App-ImageMagickUtils), released on 2022-01-16.
+This document describes version 0.010 of calc-image-resized-size (from Perl distribution App-ImageMagickUtils), released on 2022-01-22.
 
 =head1 SYNOPSIS
 

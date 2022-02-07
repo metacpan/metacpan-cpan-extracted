@@ -2,7 +2,9 @@
 
 use strict;
 use warnings;
-use feature ':5.30';
+use feature ':5.12';
+use utf8;
+
 use Test::More;
 use Data::Gimei;
 

@@ -68,7 +68,7 @@
    "provides" : {
       "App::ImageMagickUtils" : {
          "file" : "lib/App/ImageMagickUtils.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       }
    },
    "release_status" : "stable",
@@ -83,7 +83,7 @@
          "web" : "https://github.com/perlancar/perl-App-ImageMagickUtils"
       }
    },
-   "version" : "0.009",
+   "version" : "0.010",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -92,32 +92,32 @@
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript convert-image-to",
-            "version" : "0.423"
+            "version" : "0.424"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript convert-image-to-pdf",
-            "version" : "0.423"
+            "version" : "0.424"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript downsize-image",
-            "version" : "0.423"
+            "version" : "0.424"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript calc-image-resized-size",
-            "version" : "0.423"
+            "version" : "0.424"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript image-resize-notation-to-human",
-            "version" : "0.423"
+            "version" : "0.424"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript img2pdf",
-            "version" : "0.423"
+            "version" : "0.424"
          },
          {
             "class" : "Dist::Zilla::Plugin::InsertExecsList",

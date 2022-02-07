@@ -47,18 +47,19 @@ t/fdiv.t
 t/io_raw.t
 t/IV_UV_NV.t
 t/longdouble.t
+t/new.t
 t/NOK_and_POK.t
+t/not_zero.t
+t/pod.t
 t/NV_overloading.t
 t/out_str.t
 t/overload.t
 t/overload_cross_class.t
+t/overload_switch.t
 t/printf.t
 t/set_uj_sj.t
-t/use64bitint.t
-t/new.t
-t/not_zero.t
 t/TRmpz_out_str.t
-t/pod.t
+t/use64bitint.t
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

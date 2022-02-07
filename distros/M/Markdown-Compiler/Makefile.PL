@@ -41,9 +41,9 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Data::Section::Simple" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.003",
   "test" => {
-    "TESTS" => "t/*.t t/01_paragraph/*.t t/02_codeblock/*.t t/04_list/*.t t/05_blockquote/*.t t/06_table/*.t"
+    "TESTS" => "t/01_paragraph/*.t t/02_codeblock/*.t t/03_metadata/*.t t/04_list/*.t t/05_blockquote/*.t t/06_table/*.t"
   }
 );
 

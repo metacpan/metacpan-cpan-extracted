@@ -11,12 +11,18 @@ use Runner qw(get_path);
 
 my $greple_path = get_path('greple', 'App::Greple') or die Dumper \%INC;
 
+sub has_jq {
+    !! grep { -x "$_/jq" } split /:+/, $ENV{PATH};
+}
+
+my $module = has_jq() ? 'jq' : 'jq::set(noif)';
+
 sub greple {
     Runner->new($greple_path, @_);
 }
 
 sub jq {
-    greple '-Mjq', @_;
+    greple "-M$module", @_;
 }
 
 sub run {

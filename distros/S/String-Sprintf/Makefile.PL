@@ -1,26 +1,125 @@
+package String::Sprintf;
+use strict;
+use warnings;
+
+=encoding utf8
+
+=head1 The build file for String::Sprintf
+
+This build file is a modulino; it works as both a build script and
+a module.
+
+To build the distribution, run this file normally:
+
+	% perl Makefile.PL
+
+But, it's more interesting than that. You can load it with C<require>
+and call C<arguments> to get the data structure it passes to
+C<WriteMakefile>:
+
+	my $package = require '/path/to/Makefile.PL';
+	my $arguments = $package->arguments;
+
+Note that C<require>-ing a file makes an entry in C<%INC> for exactly
+that name. If you try to C<require> another file with the same name,
+even from a different path, C<require> thinks it has already loaded
+the file. As such, I recommend you always require the full path to the
+file.
+
+The return value of the C<require> is a package name (in this case,
+the name of the main module. Use that to call the C<arguments> method.
+
+Even if this distribution needs a higher version of Perl, this bit
+only needs v5.8. You can play with the data structure with a primitive
+Perl.
+
+=cut
+
+use File::Spec::Functions qw(catfile);
+
+my $module    = __PACKAGE__;
+( my $dist = $module ) =~ s/::/-/g;
+
+my $github    = 'https://github.com/briandfoy/string-sprintf';
+my $main_file = catfile( 'lib', split /::/, "$module.pm" );
+
+my %WriteMakefile = (
+	'MIN_PERL_VERSION' => '5.008',
+
+	'NAME'	        => $module,
+	'ABSTRACT_FROM' => $main_file,
+	'VERSION_FROM'  => $main_file,
+	'LICENSE'       => 'perl_5',
+	'AUTHOR'        => 'Bart Lateur (bart.lateur@pandora.be)',
+
+	'CONFIGURE_REQUIRES' => {
+		'ExtUtils::MakeMaker'   => '6.64',
+		'File::Spec::Functions' => '0',
+		},
+
+	'BUILD_REQUIRES' => {
+		},
+
+	'TEST_REQUIRES' => {
+		'Test::More' => '1',
+		},
+
+	'PREREQ_PM'     => {
+		},
+
+	'META_MERGE' => {
+		'meta-spec' => { version => 2 },
+		resources => {
+			repository => {
+				type => 'git',
+				url  => "$github.git",
+				web  => $github,
+				},
+			bugtracker => {
+				web    => "$github/issues",
+				},
+			homepage => $github,
+			doi => '10.5281/zenodo.5912465',
+			authors => [
+				{
+				name     => 'Bart Lateur',
+				email    => 'bart.lateur@pandora.be',
+				},
+				{
+				name     => 'brian d foy',
+				email    => 'bdfoy@cpan.org',
+				github   => 'https://github.com/briandfoy',
+				twitter  => 'https://twitter.com/briandfoy_perl',
+				linkedin => 'https://www.linkedin.com/in/briandfoy/',
+				orc_id   => '0000-0002-0283-8283',
+				}],
+			},
+		},
+
+	clean => { FILES => "$dist-*" },
+	);
+
+sub arguments { \%WriteMakefile }
+
+do_it() unless caller;
+sub do_it {
+	require File::Spec;
+	my $MM ='ExtUtils::MakeMaker';
+	my $MM_version =
+		eval{ "$MM " . $WriteMakefile{'CONFIGURE_REQUIRES'}{'ExtUtils::MakeMaker'} }
+			||
+		"$MM 6.64";
+	eval "use $MM_version; 1" or die "Could not load $MM_version: $@";
+	eval "use Test::Manifest 1.21"
+		if -e File::Spec->catfile( qw(t test_manifest) );
+
+	my $arguments = arguments();
+	my $minimum_perl = $arguments->{MIN_PERL_VERSION} || '5.008';
+	eval "require $minimum_perl;" or die $@;
+
+	WriteMakefile( %$arguments );
+	}
 
 
-use ExtUtils::MakeMaker;
-# See lib/ExtUtils/MakeMaker.pm for details of how to influence
-# the contents of the Makefile that is written.
-WriteMakefile(
-    NAME         => 'String::Sprintf',
-    VERSION_FROM => 'lib/String/Sprintf.pm', # finds \$VERSION
-    AUTHOR       => 'Bart Lateur (bart.lateur@pandora.be)',
-    ABSTRACT     => 'Custom overloading of sprintf',
-    LICENSE      => 'perl_5',
-    PREREQ_PM    => {
-                     'Test::Simple' => 0.44,
-                    },
-    (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
-        'meta-spec' => { version => 2 },
-        resources => {
-            repository => {
-                type => 'git',
-                url  => 'https://github.com/briandfoy/string-sprintf.git',
-                web  => 'https://github.com/briandfoy/string-sprintf',
-            },
-        }})
-     : ()
-    ),
-);
+no warnings;
+__PACKAGE__;

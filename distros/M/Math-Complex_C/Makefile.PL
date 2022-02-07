@@ -1,9 +1,11 @@
+use strict;
+use warnings;
+use Config;
 use ExtUtils::MakeMaker;
 
-use Config;
 require 5.006;
 
-$defines = $] < 5.008 ? "-DOLDPERL" : "-DNEWPERL";
+my $defines = $] < 5.008 ? "-DOLDPERL" : "-DNEWPERL";
 
 ###############################################
 

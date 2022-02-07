@@ -11,21 +11,8 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#include <quadmath.h>
-#include <stdlib.h>
-#include <float.h>
 
-#ifdef OLDPERL
-#define SvUOK SvIsUV
-#endif
-
-#ifndef Newx
-#  define Newx(v,n,t) New(0,v,n,t)
-#endif
-
-#ifndef Newxz
-#  define Newxz(v,n,t) Newz(0,v,n,t)
-#endif
+#include "math_complex_c_q_include.h"
 
 int _MATH_COMPLEX_C_Q_DIGITS = 36;
 
@@ -801,31 +788,52 @@ SV * _overload_pow(pTHX_ SV * a, SV * b, SV * third) {
 
      sv_setiv(obj, INT2PTR(IV,pc));
      SvREADONLY_on(obj);
+
      if(SvUOK(b)) {
        __real__ t = (float128)SvUVX(b);
        __imag__ t = 0.0Q;
+       if(SWITCH_ARGS) {
+         *pc = cpowq( t, *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))) );
+         return obj_ref;
+       }
        *pc = cpowq(*(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))), t);
        return obj_ref;
      }
+
      if(SvIOK(b)) {
        __real__ t = (float128)SvIVX(b);
        __imag__ t = 0.0Q;
+       if(SWITCH_ARGS) {
+         *pc = cpowq( t, *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))) );
+         return obj_ref;
+       }
        *pc = cpowq(*(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))), t);
        return obj_ref;
      }
+
      if(SvNOK(b)) {
        __real__ t = (float128)SvNVX(b);
        __imag__ t = 0.0Q;
+       if(SWITCH_ARGS) {
+         *pc = cpowq( t, *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))) );
+         return obj_ref;
+       }
        *pc = cpowq(*(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))), t);
        return obj_ref;
      }
+
      if(SvPOK(b)) {
        if(!looks_like_number(b)) nnum++;
        __real__ t = strtoflt128(SvPV_nolen(b), NULL);
        __imag__ t = 0.0Q;
+       if(SWITCH_ARGS) {
+         *pc = cpowq( t, *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))) );
+         return obj_ref;
+       }
        *pc = cpowq(*(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))), t);
        return obj_ref;
      }
+
      else if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
        if(strEQ(h, "Math::Complex_C::Q")) {
@@ -937,25 +945,25 @@ SV * _overload_div(pTHX_ SV * a, SV * b, SV * third) {
      SvREADONLY_on(obj);
 
      if(SvUOK(b)) {
-       if(third == &PL_sv_yes) *pc = (float128)SvUVX(b) / *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a))));
+       if(SWITCH_ARGS) *pc = (float128)SvUVX(b) / *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a))));
        else *pc = *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))) / (float128)SvUVX(b);
        return obj_ref;
      }
 
      if(SvIOK(b)) {
-       if(third == &PL_sv_yes) *pc = (float128)SvIVX(b) / *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a))));
+       if(SWITCH_ARGS) *pc = (float128)SvIVX(b) / *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a))));
        else *pc = *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))) / (float128)SvIVX(b);
        return obj_ref;
      }
 
      if(SvNOK(b)) {
-       if(third == &PL_sv_yes) *pc = (float128)SvNVX(b) / *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a))));
+       if(SWITCH_ARGS) *pc = (float128)SvNVX(b) / *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a))));
        else *pc = *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))) / (float128)SvNVX(b);
        return obj_ref;
      }
      if(SvPOK(b)) {
        if(!looks_like_number(b)) nnum++;
-       if(third == &PL_sv_yes) *pc = strtoflt128(SvPV_nolen(b), NULL) / *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a))));
+       if(SWITCH_ARGS) *pc = strtoflt128(SvPV_nolen(b), NULL) / *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a))));
        else *pc = *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))) / strtoflt128(SvPV_nolen(b), NULL);
        return obj_ref;
      }
@@ -984,25 +992,25 @@ SV * _overload_sub(pTHX_ SV * a, SV * b, SV * third) {
      SvREADONLY_on(obj);
 
      if(SvUOK(b)) {
-       if(third == &PL_sv_yes) *pc = (float128)SvUVX(b) - *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a))));
+       if(SWITCH_ARGS) *pc = (float128)SvUVX(b) - *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a))));
        else *pc = *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))) - (float128)SvUVX(b);
        return obj_ref;
      }
 
      if(SvIOK(b)) {
-       if(third == &PL_sv_yes) *pc = (float128)SvIVX(b) - *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a))));
+       if(SWITCH_ARGS) *pc = (float128)SvIVX(b) - *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a))));
        else *pc = *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))) - (float128)SvIVX(b);
        return obj_ref;
      }
 
      if(SvNOK(b)) {
-       if(third == &PL_sv_yes) *pc = (float128)SvNVX(b) - *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a))));
+       if(SWITCH_ARGS) *pc = (float128)SvNVX(b) - *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a))));
        else *pc = *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))) - (float128)SvNVX(b);
        return obj_ref;
      }
      if(SvPOK(b)) {
        if(!looks_like_number(b)) nnum++;
-       if(third == &PL_sv_yes) *pc = strtoflt128(SvPV_nolen(b), NULL) - *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a))));
+       if(SWITCH_ARGS) *pc = strtoflt128(SvPV_nolen(b), NULL) - *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a))));
        else *pc = *(INT2PTR(MATH_COMPLEX *, SvIVX(SvRV(a)))) - strtoflt128(SvPV_nolen(b), NULL);
        return obj_ref;
      }

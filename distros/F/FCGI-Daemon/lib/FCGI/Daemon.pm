@@ -4,12 +4,12 @@ use strict;
 #use diagnostics -verbose;
 ## no critic (TestingAndDebugging::RequireUseWarnings)
 package FCGI::Daemon;
-our $VERSION = '0.20151226';
+our $VERSION = '0.20220206';
 use 5.14.2;
 use English '-no_match_vars';
 use BSD::Resource;                      # on Debian available as libbsd-resource-perl
-use FCGI 0.71;                          # on Debian available as libfcgi-perl
-use FCGI::ProcManager 0.18;             # on Debian available as libfcgi-procmanager-perl
+use FCGI 0.82;                          # on Debian available as libfcgi-perl
+use FCGI::ProcManager 0.28;             # on Debian available as libfcgi-procmanager-perl
 use Getopt::Std;
 use autouse 'Pod::Usage'=>qw(pod2usage);
 
@@ -19,7 +19,7 @@ FCGI::Daemon - Perl-aware Fast CGI daemon for use with nginx web server.
 
 =head1 VERSION
 
-Version 0.20111121
+Version 0.20220206
 
 =begin comment
 =cut
@@ -39,7 +39,9 @@ sub help { pod2usage(-verbose=>$ARG[0],-noperldoc=>1) and exit; }       ## no cr
 sub dieif {
     if($ARG[0]){
         my $err=$ARG[1];
-        unlink @o{'pidfile','sockfile'};
+        for my $f ( @o{'pidfile','sockfile'} ) {
+            unlink $f if -f $f; 
+        }        
         print "Error - $err:\n",$ARG[0],"\n";
         exit 1;
     }
@@ -70,7 +72,9 @@ sub run {
     local $SIG{INT}= local $SIG{TERM}= sub{
         # actually FCGI::ProcManager override our TERM handler so .sock and .pid files will be removed only by sysv script... :(
         $o{fcgi_pm}->pm_remove_pid_file() if $o{fcgi_pm};
-        unlink @o{'sockfile','pidfile'};
+        for my $f ( @o{'pidfile','sockfile'} ) {
+            unlink $f if -f $f; 
+        }    
         $o{fcgi_pm}->pm_die() if $o{fcgi_pm};   #pm_die() does not return
         exit 0;
     };
@@ -108,10 +112,16 @@ sub run {
 
     # drop privileges if run as root
     if(defined $o{gid_num} and defined $o{uid_num}){
-        local $REAL_GROUP_ID= local $EFFECTIVE_GROUP_ID= getgrnam($o{gid});
-            dieif($OS_ERROR,'Unable to change group_id to '.$o{gid});
-        local $REAL_USER_ID= local $EFFECTIVE_USER_ID= getpwnam($o{uid});
-            dieif($OS_ERROR,'Unable to change user_id to '.$o{uid});
+       my $gid = getgrnam($o{gid});
+       $EFFECTIVE_GROUP_ID = "$gid $gid";
+       dieif($OS_ERROR,'Unable to effective group_id to '.$o{gid});
+       $REAL_GROUP_ID = $gid;
+       dieif($OS_ERROR,'Unable to change real group_id to '.$o{gid});
+       my $uid = getpwnam($o{uid});
+       $EFFECTIVE_USER_ID = $uid;
+       dieif($OS_ERROR,'Unable to change effective user_id to '.$o{uid});
+       $REAL_USER_ID  = $uid;
+       dieif($OS_ERROR,'Unable to change real user_id to '.$o{uid});
     }
 
     ## set rlimit(s)
@@ -216,7 +226,7 @@ sub run {
             ## send STDIN to child
             my $buffer;
             #print {$PIN} $buffer while (read *STDIN,$buffer,$ENV{'CONTENT_LENGTH'});   ## longer version below may be safer for very long input.
-            if($req_env{'REQUEST_METHOD'} eq 'POST' and $req_env{'CONTENT_LENGTH'}!=0){
+            if($req_env{'REQUEST_METHOD'} =~ /(?:POST|PUT)/ and $req_env{'CONTENT_LENGTH'}!=0){
                 my $bytes=0;
                 while ($bytes<$req_env{'CONTENT_LENGTH'}){
                         $bytes+=read *STDIN,$buffer,($req_env{'CONTENT_LENGTH'}-$bytes);

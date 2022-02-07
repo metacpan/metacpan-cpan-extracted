@@ -17,10 +17,7 @@ EOS
 
 my %user_args = (fooname => 'foo');
 
-my @app_args ;
-
-use XXX;
-my $data = App::Cme::Command::run::parse_script('test', $content, \%user_args, \@app_args);
+my $data = App::Cme::Command::run::parse_script('test', $content, \%user_args);
 
 is($data->{load}[0], '! MY_HOSTID=~" s/^(a)a+/  $1.\"foo\" x2 /xe"', "test parsed script");
 

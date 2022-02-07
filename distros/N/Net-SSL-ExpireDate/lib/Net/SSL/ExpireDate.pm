@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '1.22';
+our $VERSION = '1.23';
 
 use base qw(Class::Accessor);
 use Crypt::OpenSSL::X509 qw(FORMAT_ASN1);
@@ -79,6 +79,9 @@ sub new {
     if ($opt{timeout}) {
         $self->{timeout} = $opt{timeout};
     }
+    if ($opt{sni}) {
+        $self->{sni} = $opt{sni};
+    }
 
     return $self;
 }
@@ -92,7 +95,7 @@ sub expire_date {
             $port ||= 443;
             ### $host
             ### $port
-            my $cert = eval { _peer_certificate($host, $port, $self->{timeout}); };
+            my $cert = eval { _peer_certificate($host, $port, $self->{timeout}, $self->{sni}); };
             warn $@ if $@;
             return unless $cert;
             my $x509 = Crypt::OpenSSL::X509->new_from_string($cert, FORMAT_ASN1);
@@ -146,7 +149,7 @@ sub is_expired {
 }
 
 sub _peer_certificate {
-    my($host, $port, $timeout) = @_;
+    my($host, $port, $timeout, $sni) = @_;
 
     my $cert;
 
@@ -179,7 +182,9 @@ sub _peer_certificate {
     $sock = $Socket->new( %$sock ) or croak "cannot create socket: $!";
 
     my $servername;
-    if ($host !~ /^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/) {
+    if ($sni) {
+      $servername = $sni;
+    } elsif ($host !~ /^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/) {
         $servername = $host;
     }
     _send_client_hello($sock, $servername);
@@ -555,6 +560,7 @@ returns it. %option is to specify certificate.
   https   (same as above ssl)
   file    "path/to/certificate"
   timeout "Timeout in seconds"
+  sni     "Server Name Indicator"
 
 =head2 expire_date
 

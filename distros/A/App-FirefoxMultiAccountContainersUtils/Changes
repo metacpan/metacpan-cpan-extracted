@@ -1,3 +1,11 @@
+0.012   2022-01-20  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [doc] Update the fact that the add-on now provides UI to reorder;
+	  give example.
+
+
 0.011   2020-11-02  Released-By: PERLANCAR; Urgency: medium
 
 	- Support sorting default containers like Personal, Work, ...

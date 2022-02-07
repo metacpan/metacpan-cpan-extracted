@@ -5,7 +5,7 @@ use warnings;
 use utf8;
 use Exporter;
 
-our $VERSION = "0.01";
+our $VERSION = "0.04";
 our @ISA = qw(Exporter);
 our @EXPORT = ();
 our @EXPORT_OK = ();
@@ -15,8 +15,9 @@ our $OPTS        = { banner => 1 };
 sub _die_to_stdout {
     my ($exception) = @_;
     my ( $package, $filename, $lineno ) = caller;
-
+    
     #<<< START: do not let perltidy touch this
+    $exception =(defined $exception) ? $exception : '<UNDEF>';
     if ( $OPTS->{banner} ) {
         print '+-- DIED --------------------'   . "\n";
         print '| Package  : ' . $package        . "\n";
@@ -29,8 +30,11 @@ sub _die_to_stdout {
         print "$exception\n";
     }
     #>>> END: do not let perltidy touch this
-
-    CORE::die(@_);
+    if (@_) {
+        CORE::die(@_);
+    } else {
+        CORE::die;
+    }
 }
 
 sub import {

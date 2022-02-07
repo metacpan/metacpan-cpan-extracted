@@ -1,0 +1,15 @@
+Revision history for Object-Pad-FieldAttr-Isa
+
+0.03    2022-02-01
+        [CHANGES]
+         * Renamed from Object-Pad-SlotAttr-Isa
+         * Updated for Object::Pad 0.60
+
+Revision history for Object-Pad-SlotAttr-Isa
+
+0.02    2021-11-18
+        [CHANGES]
+         * Updated for Object::Pad 0.57
+
+0.01    2021-08-10
+        First version, released on an unsuspecting world.

@@ -16,10 +16,8 @@ my $Connection =
 my $Service = Mock::Podman::Service->new( Listen => $Connection );
 $Service->Start();
 
-my $Client = Podman::Client->new( Connection => $Connection );
-
-my $Client = Podman::Client->new( Connection => $Connection );
-my $Images = Podman::Images->new( Client     => $Client );
+my $Client = Podman::Client->new( ConnectionURI => $Connection );
+my $Images = Podman::Images->new( Client        => $Client );
 ok( $Images, 'Object ok.' );
 
 subtest 'Get list of images.' => sub {

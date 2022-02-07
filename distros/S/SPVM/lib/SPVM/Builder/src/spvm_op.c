@@ -186,6 +186,8 @@ const char* const* SPVM_OP_C_ID_NAMES(void) {
     "FALSE",
     "CURRENT_CLASS",
     "AS",
+    "MUTABLE",
+    "END_OF_FILE",
   };
   
   return id_names;
@@ -1171,7 +1173,7 @@ SPVM_OP* SPVM_OP_build_array_init(SPVM_COMPILER* compiler, SPVM_OP* op_array_ini
           SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_term_element);
           SPVM_OP* op_convert = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_CONVERT, op_term_element->file, op_term_element->line);
           SPVM_OP* op_dist_type = SPVM_OP_new_op_any_object_type(compiler, op_term_element->file, op_term_element->line);
-          SPVM_OP_build_convert(compiler, op_convert, op_dist_type, op_term_element);
+          SPVM_OP_build_convert(compiler, op_convert, op_dist_type, op_term_element, NULL);
           SPVM_OP_replace_op(compiler, op_stab, op_convert);
         }
         element_index++;
@@ -1618,14 +1620,14 @@ SPVM_OP* SPVM_OP_build_isweak_field(SPVM_COMPILER* compiler, SPVM_OP* op_isweak,
   return op_assign;
 }
 
-SPVM_OP* SPVM_OP_build_convert(SPVM_COMPILER* compiler, SPVM_OP* op_convert, SPVM_OP* op_type, SPVM_OP* op_term) {
+SPVM_OP* SPVM_OP_build_convert(SPVM_COMPILER* compiler, SPVM_OP* op_convert, SPVM_OP* op_type, SPVM_OP* op_term, SPVM_OP* op_descriptors) {
   
   SPVM_OP_insert_child(compiler, op_convert, op_convert->last, op_term);
   SPVM_OP_insert_child(compiler, op_convert, op_convert->last, op_type);
   
   op_convert->file = op_type->file;
   op_convert->line = op_type->line;
-  
+
   return op_convert;
 }
 
@@ -1879,7 +1881,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
           SPVM_OP* op_type_value = SPVM_OP_new_op_type(compiler, arg_multi_numeric_type, op_decl->file, op_decl->line);
           SPVM_OP* op_var_value_name = SPVM_OP_new_op_name(compiler, class_var->name, op_decl->file, op_decl->line);
           SPVM_OP* op_var_value = SPVM_OP_new_op_var(compiler, op_var_value_name);
-          SPVM_OP* op_arg_value = SPVM_OP_build_arg(compiler, op_var_value, op_type_value);
+          SPVM_OP* op_arg_value = SPVM_OP_build_arg(compiler, op_var_value, op_type_value, NULL);
 
           SPVM_OP_insert_child(compiler, op_args, op_args->last, op_arg_value);
           
@@ -1978,7 +1980,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
           SPVM_OP* op_type_value = SPVM_OP_new_op_type(compiler, arg_multi_numeric_type, op_decl->file, op_decl->line);
           SPVM_OP* op_var_value_name = SPVM_OP_new_op_name(compiler, field->name, op_decl->file, op_decl->line);
           SPVM_OP* op_var_value = SPVM_OP_new_op_var(compiler, op_var_value_name);
-          SPVM_OP* op_arg_value = SPVM_OP_build_arg(compiler, op_var_value, op_type_value);
+          SPVM_OP* op_arg_value = SPVM_OP_build_arg(compiler, op_var_value, op_type_value, NULL);
 
           SPVM_OP_insert_child(compiler, op_args, op_args->last, op_arg_value);
           
@@ -2059,7 +2061,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
       SPVM_FIELD* found_field = SPVM_HASH_fetch(class->field_symtable, field_name, strlen(field_name));
       
       if (found_field) {
-        SPVM_COMPILER_error(compiler, "Redeclaration of field \"%s->%s\" at %s line %d", class_name, field_name, field->op_field->file, field->op_field->line);
+        SPVM_COMPILER_error(compiler, "Redeclaration of field \"%s->{%s}\" at %s line %d", class_name, field_name, field->op_field->file, field->op_field->line);
       }
       else {
         field->id = compiler->fields->length;
@@ -2081,7 +2083,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
         SPVM_CLASS_VAR* found_class_var = SPVM_HASH_fetch(class->class_var_symtable, class_var_name, strlen(class_var_name));
         
         if (found_class_var) {
-          SPVM_COMPILER_error(compiler, "Redeclaration of class variable \"%s::%s\" at %s line %d", class_name, class_var_name, class_var->op_class_var->file, class_var->op_class_var->line);
+          SPVM_COMPILER_error(compiler, "Redeclaration of class variable \"$%s::%s\" at %s line %d", class_name, class_var_name + 1, class_var->op_class_var->file, class_var->op_class_var->line);
         }
         else {
           class_var->id = compiler->class_vars->length;
@@ -2477,7 +2479,7 @@ SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_
     SPVM_TYPE* self_type = SPVM_TYPE_new(compiler);
     self_type->is_self = 1;
     SPVM_OP* op_self_type = SPVM_OP_new_op_type(compiler, self_type, op_method->file, op_method->line);
-    SPVM_OP* op_arg_self = SPVM_OP_build_arg(compiler, op_arg_var_self, op_self_type);
+    SPVM_OP* op_arg_self = SPVM_OP_build_arg(compiler, op_arg_var_self, op_self_type, NULL);
     SPVM_OP_insert_child(compiler, op_args, op_args->first, op_arg_self);
   }
 
@@ -2548,7 +2550,7 @@ SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_
       SPVM_MY* my = SPVM_MY_new(compiler);
       SPVM_OP* op_my = SPVM_OP_new_op_my(compiler, my, op_list_statement->file, op_list_statement->last->line + 1);
       SPVM_OP* op_type = SPVM_OP_new_op_int_type(compiler, op_list_statement->file, op_list_statement->line);
-      op_var = SPVM_OP_build_my(compiler, op_my, op_var, op_type);
+      op_var = SPVM_OP_build_my(compiler, op_my, op_var, op_type, NULL);
       SPVM_OP_insert_child(compiler, op_list_statement, op_list_statement->first, op_var);
       method->op_my_condition_flag = op_my;
     }
@@ -2577,7 +2579,7 @@ SPVM_OP* SPVM_OP_build_method(SPVM_COMPILER* compiler, SPVM_OP* op_method, SPVM_
         SPVM_MY* my = SPVM_MY_new(compiler);
         SPVM_OP* op_my = SPVM_OP_new_op_my(compiler, my, op_list_statement->file, op_list_statement->last->line + 1);
         SPVM_OP* op_type = SPVM_OP_new_op_type(compiler, return_type, op_list_statement->file, op_list_statement->last->line + 1);
-        op_var = SPVM_OP_build_my(compiler, op_my, op_var, op_type);
+        op_var = SPVM_OP_build_my(compiler, op_my, op_var, op_type, NULL);
         SPVM_OP_insert_child(compiler, op_return, op_return->last, op_var);
         SPVM_OP_insert_child(compiler, op_list_statement, op_list_statement->last, op_return);
       }
@@ -2697,19 +2699,19 @@ SPVM_OP* SPVM_OP_build_enumeration(SPVM_COMPILER* compiler, SPVM_OP* op_enumerat
   return op_enumeration;
 }
 
-SPVM_OP* SPVM_OP_build_arg(SPVM_COMPILER* compiler, SPVM_OP* op_var, SPVM_OP* op_type) {
+SPVM_OP* SPVM_OP_build_arg(SPVM_COMPILER* compiler, SPVM_OP* op_var, SPVM_OP* op_type, SPVM_OP* op_descriptors) {
   
   SPVM_MY* my = SPVM_MY_new(compiler);
   SPVM_OP* op_my = SPVM_OP_new_op_my(compiler, my, op_var->file, op_var->line);
   
-  op_var = SPVM_OP_build_my(compiler, op_my, op_var, op_type);
+  op_var = SPVM_OP_build_my(compiler, op_my, op_var, op_type, op_descriptors);
   
   op_var->uv.var->is_arg = 1;
   
   return op_var;
 }
 
-SPVM_OP* SPVM_OP_build_my(SPVM_COMPILER* compiler, SPVM_OP* op_my, SPVM_OP* op_var, SPVM_OP* op_type) {
+SPVM_OP* SPVM_OP_build_my(SPVM_COMPILER* compiler, SPVM_OP* op_my, SPVM_OP* op_var, SPVM_OP* op_type, SPVM_OP* op_descriptors) {
   
   // Declaration
   op_var->uv.var->is_declaration = 1;
@@ -2724,7 +2726,7 @@ SPVM_OP* SPVM_OP_build_my(SPVM_COMPILER* compiler, SPVM_OP* op_my, SPVM_OP* op_v
   SPVM_OP* op_name = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NAME, op_var->file, op_var->line);
   op_name->uv.name = op_var->uv.var->op_name->uv.name;
   my->op_name = op_name;
-  
+
   op_var->uv.var->my = my;
 
   return op_var;

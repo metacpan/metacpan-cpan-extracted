@@ -9,9 +9,11 @@ my $schema = {
             number => {
                 validator => sub {
                     my $value = shift;
-                    return $value =~ /^[0-5]$/ ? undef : 'number from 0-5 expected';
+                    $value++;
+                    return $value =~ /^[0-8]$/ ? undef : 'number from 0-8 expected';
                 },
-                description => 'number from 0-5',
+                description => 'number from 0-8',
+                transformer => sub { shift },
             },
         },
     },
@@ -21,8 +23,30 @@ my $schema_2 = {
     number => {
         validator => sub {
             my $value = shift;
-            return $value =~ /^\d$/ ? undef : 'number from 0-9 expected';
+            return $value =~ /^[0-5]$/ ? undef : 'number from 0-5 expected';
         },
+    },
+};
+
+my $schema_validate_ok = {
+    number => {
+        validator => $schema->{merge}->{members}->{number}->{validator},
+    },
+};
+
+my $schema_validate_2 = {
+    number => {
+        validator => sub {
+            my $value = shift;
+            $value++;
+            return undef;
+        },
+    },
+};
+
+my $schema_transform_ok = {
+    number => {
+        transformer => $schema->{merge}->{members}->{number}->{transformer},
     },
 };
 
@@ -40,21 +64,41 @@ my $schema_desc_mismatch = {
 
 my $data = {
     merge => {
-        number => 8,
+        number => 7,
     }
 };
 
 my $p = Data::Processor->new($schema);
 
-my $error_collection = $p->merge_schema($schema_2, [ qw(merge members) ]);
+my $error_collection = $p->merge_schema($schema_validate_ok, [ qw(merge members) ]);
 
 ok ($error_collection->count == 0, '0 errors detected');
 
-$error_collection = $p->validate($data, verbose=>0);
+$error_collection = $p->validate($data, verbose => 0);
+
+ok ($error_collection->count == 0, '0 error detected');
+
+$error_collection = $p->merge_schema($schema_2, [ qw(merge members) ]);
+
+ok ($error_collection->count == 0, '0 errors detected');
+
+$error_collection = $p->validate($data, verbose => 0);
 
 ok ($error_collection->count == 1, '1 error detected');
 
-eval { $error_collection = $p->merge_schema($schema_transform,  [ qw(merge members) ]) };
+$error_collection = $p->merge_schema($schema_transform_ok, [ qw(merge members) ]);
+
+ok ($error_collection->count == 0, '0 errors detected');
+
+$error_collection = $p->merge_schema($schema_validate_2, [ qw(merge members) ]);
+
+ok ($error_collection->count == 0, '0 errors detected');
+
+$error_collection = $p->validate($data, verbose => 0);
+
+ok ($error_collection->count == 1, '1 error detected');
+
+eval { $error_collection = $p->merge_schema($schema_transform, [ qw(merge members) ]) };
 
 like ($@, qr/transformer/, 'found transformer not a valid merge');
 

@@ -553,8 +553,7 @@ Three y-values:
 Sergey Krushinsky, C<< <krushi at cpan.org> >>
 
 =head1 COPYRIGHT & LICENSE
-
-Copyright 2009-2021 Sergey Krushinsky.
+Copyright (C) 2009-2022 by Sergey Krushinsky
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -10,7 +10,7 @@
 # ABSTRACT: Dump the configuration of an application
 
 package App::Cme::Command::dump ;
-$App::Cme::Command::dump::VERSION = '1.036';
+$App::Cme::Command::dump::VERSION = '1.037';
 use strict;
 use warnings;
 use 5.10.1;
@@ -20,7 +20,7 @@ use App::Cme -command ;
 use base qw/App::Cme::Common/;
 
 use Config::Model::ObjTreeScanner;
-use YAML;
+use YAML::PP qw/Dump/;
 use JSON;
 use Data::Dumper;
 
@@ -106,7 +106,7 @@ App::Cme::Command::dump - Dump the configuration of an application
 
 =head1 VERSION
 
-version 1.036
+version 1.037
 
 =head1 SYNOPSIS
 

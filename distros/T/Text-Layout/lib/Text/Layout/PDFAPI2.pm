@@ -43,17 +43,16 @@ sub _hb_init {
 # Verify if a font needs shaping, and we can do that.
 sub _hb_font_check {
     my ( $f ) = @_;
-    return if $f->{_hb_checked}++;
-#    use DDumper; DDumper($f);
+    return $f->{_hb_checked} if defined $f->{_hb_checked};
+
     if ( $f->get_shaping ) {
 	my $fn = $f->to_string;
 	if ( $f->{font}->can("fontfilename") ) {
 	    if ( _hb_init() ) {
 		# warn("Font $fn will use shaping.\n");
+		return $f->{_hb_checked} = 1;
 	    }
-	    else {
-		carp("Font $fn: Requires shaping but HarfBuzz cannot be loaded.");
-	    }
+	    carp("Font $fn: Requires shaping but HarfBuzz cannot be loaded.");
 	}
 	else {
 	    carp("Font $fn: Shaping not supported");
@@ -62,6 +61,7 @@ sub _hb_font_check {
     else {
 	# warn("Font ", $f->to_string, " does not need shaping.\n");
     }
+    return $f->{_hb_checked} = 0;
 }
 
 #### API
@@ -72,20 +72,23 @@ sub render {
     $self->{_lasty} = $y;
 
     my @bb = $self->get_pixel_bbox;
-    my $bl = $bb[3];
-    if ( $self->{_width} && $self->{_alignment} ) {
-	my $w = $bb[2];
+    my $bl = $bb[0];
+    my $align = $self->{_alignment} // 0;
+    if ( $self->{_width} ) {
+	my $w = $bb[3];
 	if ( $w < $self->{_width} ) {
-	    if ( $self->{_alignment} eq "right" ) {
+	    if ( $align eq "right" ) {
 		$x += $self->{_width} - $w;
 	    }
-	    elsif ( $self->{_alignment} eq "center" ) {
+	    elsif ( $align eq "center" ) {
 		$x += ( $self->{_width} - $w ) / 2;
+	    }
+	    else {
+		$x += $bb[1];
 	    }
 	}
     }
 
-    # $text->save;		# doesn't do anything
     foreach my $fragment ( @{ $self->{_content} } ) {
 	next unless length($fragment->{text});
 	my $x0 = $x;
@@ -101,18 +104,19 @@ sub render {
 	$text->fillcolor( $fragment->{color} );
 	$text->font( $font, $fragment->{size} || $self->{_currentsize} );
 
-	_hb_font_check($f);
-	if ( $hb && $font->can("fontfilename") ) {
+	if ( _hb_font_check($f) ) {
 	    $hb->set_font( $font->fontfilename );
 	    $hb->set_size( $fragment->{size} || $self->{_currentsize} );
 	    $hb->set_text( $fragment->{text} );
+	    $hb->set_direction( $f->{direction} ) if $f->{direction};
+	    $hb->set_language( $f->{language} ) if $f->{language};
 	    my $info = $hb->shaper($fp);
 	    my $y = $y - $fragment->{base} - $bl;
 	    foreach my $g ( @$info ) {
 		$text->translate( $x + $g->{dx}, $y - $g->{dy} );
 		$text->glyph_by_CId( $g->{g} );
 		$x += $g->{ax};
-		$y -= $g->{ay};
+		$y += $g->{ay};
 	    }
 	}
 	else {
@@ -216,8 +220,13 @@ sub render {
 
 #### API
 sub bbox {
-    my ( $self ) = @_;
-    my ( $x, $w, $d, $a ) = (0) x 4;
+    my ( $self, $all ) = @_;
+
+    my ( $bl, $x, $y, $w, $h ) = (0) x 4;
+    my ( $d, $a ) = (0) x 2;
+    my ( $xMin, $xMax, $yMin, $yMax );
+    my $dir;
+
     foreach ( @{ $self->{_content} } ) {
 	my $f = $_->{font};
 	my $font = $f->get_font($self);
@@ -229,21 +238,71 @@ sub bbox {
 	my $upem = 1000;	# as delivered by PDF::API2
 	my $size = $_->{size};
 	my $base = $_->{base};
+	my $mydir = $f->{direction} || 'ltr';
 
-	_hb_font_check( $f );
-	if ( $hb && $font->can("fontfilename") ) {
+	# Width and inkbox, if requested.
+	if ( _hb_font_check( $f ) ) {
 	    $hb->set_font( $font->fontfilename );
 	    $hb->set_size($size);
+	    $hb->set_language( $f->{language} ) if $f->{language};
+	    $hb->set_direction( $f->{direction} ) if $f->{direction};
 	    $hb->set_text( $_->{text} );
 	    my $info = $hb->shaper;
-	    foreach my $g ( @$info ) {
-		$w += $g->{ax};
+	    $mydir = $hb->get_direction;
+	    # warn("mydir $mydir\n");
+
+	    if ( $all ) {
+		my $ext = $hb->get_extents;
+		foreach my $g ( @$info ) {
+		    my $e = shift(@$ext);
+		    printf STDERR ( "G  %3d  %6.2f  %6.2f  %6.2f  %6.2f  %6.2f\n",
+				    $g->{g}, $g->{ax},
+				    @$e{ qw( x_bearing y_bearing width height ) } ) if 0;
+		    # It is easier to work with the baseline oriented box.
+		    $e->{xMin} = $e->{x_bearing};
+		    $e->{yMin} = $e->{y_bearing} + $e->{height} - $base;
+		    $e->{xMax} = $e->{x_bearing} + $e->{width};
+		    $e->{yMax} = $e->{y_bearing} - $base;
+
+		    $xMin //= $w + $e->{xMin} if $e->{width};
+		    $yMin = $e->{yMin}
+		      if !defined($yMin) || $e->{yMin} < $yMin;
+		    $yMax = $e->{yMax}
+		      if !defined($yMax) || $e->{yMax} > $yMax;
+		    $xMax = $w + $e->{xMax};
+		    $w += $g->{ax};
+		}
+	    }
+	    else {
+		foreach my $g ( @$info ) {
+		    $w += $g->{ax};
+		}
+	    }
+	}
+	elsif ( $all && $font->can("extents") ) {
+	    my $e = $font->extents( $_->{text}, $size );
+	    printf STDERR ("(%.2f,%.2f)(%.2f,%.2f) -> ",
+			   $xMin//0, $yMin//0, $xMax//0, $yMax//0 ) if 0&&$all;
+	    $xMax = $w + $e->{xMax} if $all;
+	    $w += $e->{wx};
+#	    warn("W \"", $_->{text}, "\" $w, ", $e->{width}, "\n");
+	    if ( $all ) {
+		$_ -= $base for $e->{yMin}, $e->{yMax};
+		# Baseline oriented box.
+		$xMin //= $e->{xMin};
+		$yMin = $e->{yMin}
+		  if !defined($yMin) || $e->{yMin} < $yMin;
+		$yMax = $e->{yMax}
+		  if !defined($yMax) || $e->{yMax} > $yMax;
+		printf STDERR ("(%.2f,%.2f)(%.2f,%.2f)\n",
+			       $xMin//0, $yMin//0, $xMax//0, $yMax//0 ) if 0;
 	    }
 	}
 	else {
 	    $w += $font->width( $_->{text} ) * $size;
 	}
 
+	# We have width. Now the rest of the layoutbox.
 	my ( $d0, $a0 );
 	if ( !$f->get_interline ) {
 	    # Use descender/ascender.
@@ -259,20 +318,43 @@ sub bbox {
 	    $d0 = $bb[1] - $base;
 	    $a0 = $bb[3] - $base;
 	}
+	# Keep track of biggest decender/ascender.
 	$d = $d0 if $d0 < $d;
 	$a = $a0 if $a0 > $a;
+
+	# Direction.
+	$dir //= $mydir;
+	$dir = 0 unless $dir eq $mydir; # mix
+    }
+    $bl = $a;
+    $h = $a - $d;
+
+    my $align = $self->{_alignment};
+    # warn("ALIGN: ", $align//"<unset>","\n");
+    if ( $self->{_width} && $dir && $w < $self->{_width} ) {
+	if ( $dir eq 'rtl' && (!$align || $align eq "left") ) {
+	    $align = "right";
+	    # warn("ALIGN: set to $align\n");
+	}
+    }
+    if ( $self->{_width} && $align && $w < $self->{_width} ) {
+	# warn("ALIGNING...\n");
+	if ( $align eq "right" ) {
+	    # warn("ALIGNING: to $align\n");
+	    $x += my $d = $self->{_width} - $w;
+	    $xMin += $d if defined $xMin;
+	    $xMax += $d if defined $xMax;
+	}
+	elsif ( $align eq "center" ) {
+	    # warn("ALIGNING: to $align\n");
+	    $x += my $d = ( $self->{_width} - $w ) / 2;
+	    $xMin += $d if defined $xMin;
+	    $xMax += $d if defined $xMax;
+	}
     }
 
-    if ( $self->{_width} && $self->{_alignment} && $w < $self->{_width} ) {
-	if ( $self->{_alignment} eq "right" ) {
-	    $x += $self->{_width} - $w;
-	}
-	elsif ( $self->{_alignment} eq "center" ) {
-	    $x += ( $self->{_width} - $w ) / 2;
-	}
-    }
-
-    [ $x, $d, $w, $a ];
+    [ $bl, $x, $y-$h, $w, $h,
+      defined $xMin ? ( $xMin, $yMin-$bl, $xMax-$xMin, $yMax-$yMin ) : ()];
 }
 
 #### API
@@ -326,6 +408,83 @@ sub PDF::API2::Resource::CIDFont::TrueType::fontfilename {
     $self->fontfile->{' font'}->{' fname'};
 }
 
+# Add extents calculation for CIDfonts.
+# Note: Origin is x=0 at the baseline.
+sub PDF::API2::Resource::CIDFont::extents {
+    my ( $self, $text, $size ) = @_;
+    $size //= 1;
+    my $e = $self->extents_cid( $self->cidsByStr($text), $size );
+    return $e;
+}
+
+sub PDF::API2::Resource::CIDFont::extents_cid {
+    my ( $self, $text, $size ) = @_;
+    my $width = 0;
+    my ( $xMin, $xMax, $yMin, $yMax, $bl );
+
+    my $upem = $self->data->{upem};
+    my $glyphs = $self->fontobj->{loca}->read->{glyphs};
+    $bl = $self->ascender;
+    my $lastglyph = 0;
+    my $lastwidth;
+
+    # Fun ahead! Widths are in 1000 and xMin and such in upem.
+    # Scale to 1000ths.
+    my $scale = 1000 / $upem;
+
+    foreach my $n (unpack('n*', $text)) {
+        $width += $lastwidth = $self->wxByCId($n);
+        if ($self->{'-dokern'} and $self->haveKernPairs()) {
+            if ($self->kernPairCid($lastglyph, $n)) {
+                $width -= $self->kernPairCid($lastglyph, $n);
+            }
+        }
+        $lastglyph = $n;
+	my $ex = $glyphs->[$n];
+	unless ( defined $ex && %$ex ) {
+	    # warn("Missing glyph: $n\n");
+	    next;
+	}
+	$ex->read;
+
+	my $e;
+	# Copy while scaling.
+	$e->{$_} = $ex->{$_} * $scale for qw( xMin yMin xMax yMax );
+
+	printf STDERR ( "G  %3d  %6.2f  %6.2f  %6.2f  %6.2f  %6.2f\n",
+			$n, $lastwidth,
+			@$e{ qw( xMin yMin xMax yMax ) } ) if 0;
+
+	$xMin //= ($width - $lastwidth) + $e->{xMin};
+	$yMin = $e->{yMin} if !defined($yMin) || $e->{yMin} < $yMin;
+	$yMax = $e->{yMax} if !defined($yMax) || $e->{yMax} > $yMax;
+	$xMax = ($width - $lastwidth) + $e->{xMax};
+    }
+
+    if ( defined $lastwidth ) {
+#	$xMax += ($width - $lastwidth);
+    }
+    else {
+	$xMin = $yMin = $xMax = $yMax = 0;
+	$width = $self->missingwidth;
+    }
+    $_ = ($_//0)*$size/1000 for $xMin, $xMax, $yMin, $yMax, $bl;
+    $_ = ($_//0)*$size/1000 for $width;
+
+    return { x	     => $xMin,
+	     y	     => $yMin,
+	     width   => $xMax - $xMin,
+	     height  => $yMax - $yMin,
+	     # These are for convenience
+	     xMin    => $xMin,
+	     yMin    => $yMin,
+	     xMax    => $xMax,
+	     yMax    => $yMax,
+	     wx	     => $width,
+	     bl      => $bl,
+	   };
+}
+
 ################ Extensions to PDF::Builder ################
 
 sub PDF::Builder::Content::glyph_by_CId {
@@ -350,9 +509,13 @@ sub showbb {
     $y //= $self->{_lasty};
     $col ||= "magenta";
 
+    my ( $ink, $bb ) = $self->get_pixel_extents;
+    my $bl = $bb->{bl};
     # Bounding box, top-left coordinates.
-    my %e = %{($self->get_pixel_extents)[1]};
-    printf( "EXT: %.2f %.2f %.2f %.2f\n", @e{qw( x y width height )} );
+    printf( "Ink:    %6.2f %6.2f %6.2f %6.2f\n",
+	    @$ink{qw( x y width height )} ) if 0;
+    printf( "Layout: %6.2f %6.2f %6.2f %6.2f  BL %.2f\n",
+	    @$bb{qw( x y width height )}, $bl ) if 0;
 
     # NOTE: Some fonts include natural spacing in the bounding box.
     # NOTE: Some fonts exclude accents on capitals from the bounding box.
@@ -364,16 +527,29 @@ sub showbb {
     _showloc($gfx);
 
     # Show baseline.
-    _line( $gfx,
-	   $e{x}, -$self->get_pixel_bbox->[3],
-	   $e{width}-$e{x}, 0, $col );
+    _line( $gfx, $bb->{x}, -$bl, $bb->{width}, 0, $col );
+    $gfx->restore;
 
-    # Show bounding box.
+    # Show layout box.
+    $gfx->save;
     $gfx->linewidth( 0.25 );
     $gfx->strokecolor($col);
-    $e{height} = -$e{height};		# PDF coordinates
-    $gfx->rectxy( $e{x}, $e{y}, $e{x} + $e{width}, $e{height} );;
-    $gfx->stroke;
+    $gfx->translate( $x, $y );
+    for my $e ( $bb ) {
+	$gfx->rect( @$e{ qw( x y width height ) } );
+	$gfx->stroke;
+    }
+    $gfx->restore;
+
+    # Show ink box.
+    $gfx->save;
+    $gfx->linewidth( 0.25 );
+    $gfx->strokecolor("cyan");
+    $gfx->translate( $x, $y );
+    for my $e ( $ink ) {
+	$gfx->rect( @$e{ qw( x y width height ) } );
+	$gfx->stroke;
+    }
     $gfx->restore;
 }
 

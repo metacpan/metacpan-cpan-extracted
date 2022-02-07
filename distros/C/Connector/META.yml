@@ -39,7 +39,7 @@ no_index:
 provides:
   Connector:
     file: lib/Connector.pm
-    version: '1.43'
+    version: '1.44'
   Connector::Builtin:
     file: lib/Connector/Builtin.pm
   Connector::Builtin::Authentication::LDAP:
@@ -131,7 +131,7 @@ resources:
   bugtracker: https://github.com/mrscotty/connector/issues
   homepage: https://github.com/mrscotty/connector
   repository: git://github.com/mrscotty/connector.git
-version: '1.43'
+version: '1.44'
 x_contributors:
   - 'Martin Bartosch <m.bartosch@cynops.de>'
   - 'Martin Bartosch <mbartosch@whiterabbitsecurity.com>'

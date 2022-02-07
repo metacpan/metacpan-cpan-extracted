@@ -1,6 +1,6 @@
 package PDL::NDBin;
 # ABSTRACT: Multidimensional binning & histogramming
-$PDL::NDBin::VERSION = '0.021';
+$PDL::NDBin::VERSION = '0.024';
 use strict;
 use warnings;
 use Exporter;
@@ -8,6 +8,7 @@ use List::Util qw( reduce );
 use List::MoreUtils qw( pairwise );
 use Math::Round qw( nlowmult nhimult );
 use PDL::Lite;		# do not import any functions into this namespace
+require PDL::Types;
 use PDL::NDBin::Iterator;
 use PDL::NDBin::Actions_PP;
 use PDL::NDBin::Utils_PP;
@@ -203,7 +204,7 @@ sub _check_pdl_length
 	# only be done here (in a loop), and not in autoscale_axis()
 	my $length;
 	for my $v ( $self->axes, $self->vars ) {
-		$length = $v->{pdl}->nelem unless defined $length;
+		$length //= $v->{pdl}->nelem;
 		# variables don't always need a pdl, or may be happy with a
 		# null pdl; let the action figure it out.
 		# note that the test isempty() is not a good test for null
@@ -248,10 +249,10 @@ sub autoscale_axis
 	}
 
 
-	$axis->{min} = $axis->{pdl}->min unless defined $axis->{min};
+	$axis->{min} = $axis->{pdl}->min->sclr unless defined $axis->{min};
 
 
-	$axis->{max} = $axis->{pdl}->max unless defined $axis->{max};
+	$axis->{max} = $axis->{pdl}->max->sclr unless defined $axis->{max};
 	if( defined $axis->{round} and $axis->{round} > 0 ) {
 		$axis->{min} = nlowmult( $axis->{round}, $axis->{min} );
 		$axis->{max} = nhimult(  $axis->{round}, $axis->{max} );
@@ -385,6 +386,7 @@ sub process
 		}
 		croak( 'I cannot bin unless n > 0' ) unless $axis->{n} > 0;
 		unshift @n, $axis->{n};			# remember that we are working backwards!
+		$axis->{pdl} .= PDL->zeroes(PDL::Type->new('byte'), 1) if $axis->{pdl}->isnull; # a quasi-null
 		if ( defined $axis->{grid} ) {
 		    $idx = $axis->{pdl}->_flatten_into_grid( $idx, $axis->{grid} );
 		}
@@ -397,7 +399,7 @@ sub process
 
 	my $N = reduce { $a * $b } @n; # total number of bins
 	croak( 'I need at least one bin' ) unless $N;
-	my @vars = map $_->{pdl}, $self->vars;
+	my @vars = map $_->{pdl} // $PDL::undefval, $self->vars;
 	$self->{instances} ||= [ map { _make_instance( N => $N, action => $_->{action} ) } $self->vars ];
 
 	#
@@ -502,7 +504,7 @@ sub ndbinning
 	# leading arguments are axes and axis specifications
 	#
 	# PDL overloads the `eq' and `ne' operators; by checking for a PDL
-	# first, we avoid (invalid) comparisons between piddles and strings in
+	# first, we avoid (invalid) comparisons between ndarrays and strings in
 	# the `grep'
 	my @leading = _consume { eval { $_->isa('PDL') } || ! $valid_key{ $_ } } @_;
 
@@ -553,7 +555,7 @@ sub ndbin
 	# leading arguments are axes and axis specifications
 	#
 	# PDL overloads the `eq' and `ne' operators; by checking for a PDL
-	# first, we avoid (invalid) comparisons between piddles and strings in
+	# first, we avoid (invalid) comparisons between ndarrays and strings in
 	# the `grep'
 	if( my @leading = _consume { eval { $_->isa('PDL') } || ! $valid_key{ $_ } } @_ ) {
 		my @axes = _expand_axes( @leading );
@@ -603,7 +605,7 @@ PDL::NDBin - Multidimensional binning & histogramming
 
 =head1 VERSION
 
-version 0.021
+version 0.024
 
 =head1 SYNOPSIS
 
@@ -822,7 +824,7 @@ Round I<min> and I<max> to the nearest multiple of this value.
 
 =item grid
 
-Either a piddle or a reference to an array containing the values of the
+Either an ndarray or a reference to an array containing the values of the
 bin I<boundaries>.  The first and lest elements specify the minimum
 and maximum bin values, while the intermediate elements specify the common
 boundaries.  A bin is I<inclusive> of its lower bound
@@ -961,14 +963,14 @@ in scalar context.
 
 =head2 feed()
 
-Set the piddles that will eventually be used for the axes and variables.
+Set the ndarrays that will eventually be used for the axes and variables.
 Arguments must be specified as key-value pairs, the keys being the name, and
-the values being the piddle for every piddle that is to be set.
+the values being the ndarray for every ndarray that is to be set.
 
 	$binner->feed( latitude => $latitude, longitude => $longitude );
 
-Note that not all piddles need be set in one call. This function can be called
-repeatedly to set all piddles. This can be very useful when data must be read
+Note that not all ndarrays need be set in one call. This function can be called
+repeatedly to set all ndarrays. This can be very useful when data must be read
 from disk, as in the following example (assuming $nc is an object that reads
 data from disk):
 
@@ -981,7 +983,7 @@ data from disk):
 Determine the following parameters for one axis automatically, if they have not
 been supplied by the user: the step size, the lowest bin, and the number of
 bins. Use whatever combination is needed of the specifications that have been
-supplied by the user, and the data itself. Obviously, the piddles containing
+supplied by the user, and the data itself. Obviously, the ndarrays containing
 the data must have been set before calling this subroutine. Details of the
 automatic parameter calculation are given in the section on L<IMPLEMENTATION
 NOTES> below.
@@ -1015,14 +1017,14 @@ by autoscale().
 Determine the following parameters for all axes automatically, if they have not
 been supplied by the user: the step size, the lowest bin, and the number of
 bins. It will use whatever combination is needed of the specifications that
-have been supplied by the user, and the data itself. Obviously, the piddles
+have been supplied by the user, and the data itself. Obviously, the ndarrays
 containing the data must have been set before calling this subroutine. For more
 details on the autoscaling, consult autoscale_axis().
 
 	$binner->autoscale( x => $x, y => $y, z => $z );
 
 autoscale() accepts, but does not require, arguments. They must be key-value
-pairs as for feed(), and indicate piddle data that must be fed into the object
+pairs as for feed(), and indicate ndarray data that must be fed into the object
 prior to autoscaling. Note that the autoscaling applies to all axes, and not
 only supplied as arguments.
 
@@ -1035,12 +1037,12 @@ Return the labels for the bins as a list of lists of ranges.
 
 =head2 process()
 
-The core method. The actual piddles to be used for the axes and variables can
+The core method. The actual ndarrays to be used for the axes and variables can
 be supplied to this function, although the argument list can be empty if all
-piddles have already been supplied. The argument list is the same as the one of
-feed(), i.e., a list of key-value pairs specifying name and piddle.
+ndarrays have already been supplied. The argument list is the same as the one of
+feed(), i.e., a list of key-value pairs specifying name and ndarray.
 
-	# if all piddles have already been set with feed()
+	# if all ndarrays have already been set with feed()
 	$binner->process();
 
 process() returns $self for chained method calls.
@@ -1061,7 +1063,7 @@ hash with a single key called I<histogram> is returned.
 	print $result->{average};
 
 Note that it is not possible to call process() after having called output(),
-because the piddle data may have been reshaped.
+because the ndarray data may have been reshaped.
 
 =head2 _consume()
 
@@ -1091,12 +1093,12 @@ interface may be required.
 
 =head2 ndbinning()
 
-Calculate an I<n>-dimensional histogram from one or more piddles. The
+Calculate an I<n>-dimensional histogram from one or more ndarrays. The
 arguments must be specified (almost) like in histogram() and histogram2d().
 That is, each axis must be followed by its three specifications I<step>, I<min>
 and I<n>, being the step size, the minimum value, and the number of bins,
 respectively. The difference with histogram2d() is that the axis specifications
-follow the piddle immediately, instead of coming at the end.
+follow the ndarray immediately, instead of coming at the end.
 
 	my $hist = ndbinning( $pdl1, $step1, $min1, $n1,
 	                      $pdl2, $step2, $min2, $n2,
@@ -1118,16 +1120,16 @@ of type I<indx> (or I<long> if your PDL doesn't have 64-bit support), in
 contrast with histogram() and histogram2d(). The histogramming is achieved by
 passing an action which simply counts the number of elements in the bin.
 
-Unlike the output of output(), the resulting piddles are output as an array
+Unlike the output of output(), the resulting ndarrays are output as an array
 reference, in the same order as the variables passed in. There are as many
-output piddles as variables, and exactly one output piddle if no variables have
-been supplied. The output piddles take the type of the variables. All values in
-the output piddles are initialized to the bad value, so missing bins can be
+output ndarrays as variables, and exactly one output ndarray if no variables have
+been supplied. The output ndarrays take the type of the variables. All values in
+the output ndarrays are initialized to the bad value, so missing bins can be
 distinguished from zero.
 
 =head2 ndbin()
 
-Calculate an I<n>-dimensional histogram from one or more piddles. The
+Calculate an I<n>-dimensional histogram from one or more ndarrays. The
 arguments must be specified like in hist(). That is, each axis may be followed
 by at most three specifications I<min>, I<max>, and I<step>, being the the
 minimum value, maximum value, and the step size, respectively.
@@ -1153,11 +1155,11 @@ returned histogram is of type I<indx> (or I<long> if your PDL doesn't have
 64-bit support), in contrast with hist(). The histogramming is achieved by
 passing an action which simply counts the number of elements in the bin.
 
-Unlike the output of output(), the resulting piddles are output as an array
+Unlike the output of output(), the resulting ndarrays are output as an array
 reference, in the same order as the variables passed in. There are as many
-output piddles as variables, and exactly one output piddle if no variables have
-been supplied. The output piddles take the type of the variables. All values in
-the output piddles are initialized to the bad value, so missing bins can be
+output ndarrays as variables, and exactly one output ndarray if no variables have
+been supplied. The output ndarrays take the type of the variables. All values in
+the output ndarrays are initialized to the bad value, so missing bins can be
 distinguished from zero.
 
 =head1 EXAMPLES
@@ -1496,7 +1498,7 @@ is almost the same as
 
 	variable => 'Avg',
 
-but with the type of the output piddle set to I<float>. This specification will
+but with the type of the output ndarray set to I<float>. This specification will
 be translated to the following constructor call:
 
 	PDL::NDBin::Action::Avg->new( N => $N, type => float )
@@ -1513,7 +1515,7 @@ protects you from typos inside the action:
 	);
 
 In this example, average() is misspelled. If the action were executed in an
-C<eval> block, the typo would go unnoticed, and all values of the output piddle
+C<eval> block, the typo would go unnoticed, and all values of the output ndarray
 would be undefined. If you want to trap exceptions in actions, use a wrapper
 action defined as follows:
 
@@ -1524,8 +1526,8 @@ action defined as follows:
 
 =head2 Iteration strategy
 
-By default, ndbin() will loop over all bins, and create a piddle per bin
-holding only the values in that bin. This piddle is accessible to your actions
+By default, ndbin() will loop over all bins, and create an ndarray per bin
+holding only the values in that bin. This ndarray is accessible to your actions
 via the iterator object. This ensures that every action will only see the data
 in one bin at a time. You need to do this when, e.g., you are taking the
 average of the values in a bin with the standard PDL function avg(). However,
@@ -1533,10 +1535,10 @@ the selection and extraction of the data is time-consuming. If you have an
 action that knows how to deal with indirection, you can do away with the
 selection and extraction. Examples of such actions are:
 PDL::NDBin::Action::Count, PDL::NDBin::Action::Sum, etc. They take the original
-data and the flattened bin numbers and produce an output piddle in one step.
+data and the flattened bin numbers and produce an output ndarray in one step.
 
 Note that empty bins are not skipped. If you want to use an action that cannot
-handle empty piddles (e.g., PDL method min()), you can wrap the action as
+handle empty ndarrays (e.g., PDL method min()), you can wrap the action as
 follows to skip empty bins:
 
 	variable => sub {
@@ -1918,9 +1920,9 @@ Math::Histogram and Math::SimpleHisto::XS accept Perl arrays filled with values
 large amounts of data in an array is generally more efficient than passing the
 data points one by one as scalars.
 
-PDL and PDL::NDBin operate on piddles only, which are memory-efficient, packed
+PDL and PDL::NDBin operate on ndarrays only, which are memory-efficient, packed
 data arrays. This could be considered both an advantage and a disadvantage. The
-advantage is that the piddles can be operated on very efficiently in C. The
+advantage is that the ndarrays can be operated on very efficiently in C. The
 disadvantage is that PDL is required!
 
 =item Performance
@@ -1940,7 +1942,7 @@ In PDL, threading is a technique to automatically loop certain operations over
 an arbitrary number of dimensions. An example is the sumover() operation, which
 calculates the row sum. It is defined over the first dimension only (i.e., the
 rows in PDL), but it will be looped automatically over all remaining
-dimensions. If the piddle is three-dimensional, for instance, sumover() will
+dimensions. If the ndarray is three-dimensional, for instance, sumover() will
 calculate the sum in every row of every matrix.
 
 Threading is supported by the PDL functions histogram(), whistogram(), and
@@ -1954,7 +1956,7 @@ equal. This feature can be useful, for example, to construct bins on a
 logarithmic scale. Math::GSL, Math::Histogram, and Math::SimpleHisto::XS
 support variable-width bins; PDL does not, and is limited to fixed-width bins.
 
-Since version 0.017, PDL::NDBin supports variable-width bins if a piddle or
+Since version 0.017, PDL::NDBin supports variable-width bins if an ndarray or
 Perl array containing the bin boundaries is passed in via the I<grid> parameter
 to axis specifications.
 
@@ -2025,10 +2027,10 @@ memory-efficient.
 
 =back
 
-Note that, in the tests, various data conversions between piddles and ordinary
+Note that, in the tests, various data conversions between ndarrays and ordinary
 Perl arrays were required. The timings exclude these conversions, and count
 only the time required to produce a histogram from the "natural" data
-structure, i.e. piddles for PDL-based modules, and ordinary Perl arrays for the
+structure, i.e. ndarrays for PDL-based modules, and ordinary Perl arrays for the
 other modules.
 
 Note also that the histograms produced by the different methods were verified
@@ -2201,7 +2203,7 @@ PDL::NDBin can be improved. In particular:
 =item *
 
 PDL:NDBin does not currently have a way to collect and return the values in a
-bin as a list or piddle; this would be very useful for plotting or output.
+bin as a list or ndarray; this would be very useful for plotting or output.
 
 =item *
 
@@ -2225,7 +2227,7 @@ methods such as labels(), n(), step(), etc.
 =item *
 
 Diab Jerius <djerius@cfa.harvard.edu> implemented support for passing in a
-user-defined piddle or array containing bin boundaries, effectively allowing
+user-defined ndarray or array containing bin boundaries, effectively allowing
 variable-width bins. Thanks Diab!
 
 =back
@@ -2236,7 +2238,7 @@ Edward Baudrez <ebaudrez@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Edward Baudrez.
+This software is copyright (c) 2022 by Edward Baudrez.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

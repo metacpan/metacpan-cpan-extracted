@@ -7,7 +7,6 @@ lib/Tickit/Widget/Menu/Item.pm
 lib/Tickit/Widget/Menu/itembase.pm
 lib/Tickit/Widget/MenuBar.pm
 LICENSE
-Makefile.PL
 MANIFEST			This list of files
 META.json
 META.yml

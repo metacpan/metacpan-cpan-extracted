@@ -68,7 +68,7 @@
             "Test2" : "1.302164",
             "Test2::API" : "1.302166",
             "Test2::Formatter::Test2::Composer" : "0",
-            "Test2::Harness" : "1.000100",
+            "Test2::Harness" : "1.000104",
             "Test2::Harness::Util::HashBase" : "0",
             "Test2::Harness::Util::JSON" : "0",
             "Test2::Harness::Util::UUID" : "0",
@@ -108,7 +108,7 @@
          "url" : "https://github.com/Test-More/Test2-Harness-UI/"
       }
    },
-   "version" : "0.000105",
+   "version" : "0.000107",
    "x_generated_by_perl" : "v5.32.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

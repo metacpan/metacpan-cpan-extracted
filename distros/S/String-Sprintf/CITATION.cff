@@ -1,0 +1,28 @@
+# This CITATION.cff file was generated with /Users/brian/bin/bmt
+# Fri Jan 28 01:19:39 2022
+
+abstract: String::Sprintf - Custom overloading of sprintf
+authors:
+- alias: briandfoy
+  family-names: foy
+  given-names: brian d
+  orcid: 0000-0002-0283-8283
+  email: brian.d.foy@gmail.com
+- family-names: Lateur
+  given-names: Bart
+  email: bart.lateur@pandora.be
+preferred-citation:
+   type: software
+   title: The String::Sprintf Perl module
+   authors:
+   - family-names: Lateur
+     given-names: Bart
+cff-version: 1.2.0
+date-released: 2022-01-27
+license: perl_5
+license-url: https://github.com/briandfoy/string-sprintf/LICENSE
+message: The GitHub page for this module provides formatted citations
+repository-code: https://github.com/briandfoy/string-sprintf
+title: The String::Sprintf Perl module
+type: software
+version: dev-1

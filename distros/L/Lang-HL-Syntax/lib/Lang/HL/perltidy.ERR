@@ -1,0 +1,6 @@
+Perltidy version is 20200907
+
+<stdin>: Begin Error Output Stream
+1086: already saw definition of 'sub PackageWithConstructor' in package 'Parser' at line 948
+3958: already saw definition of 'sub TokenClass' in package 'Parser' at line 643
+4252: already saw definition of 'sub SemiColon' in package 'Parser' at line 4238

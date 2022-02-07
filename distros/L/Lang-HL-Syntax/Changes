@@ -1,0 +1,6 @@
+Revision history for Perl extension Lang::HL::Syntax.
+
+0.01  Sat Feb  5 12:37:23 2022
+	- original version; created by h2xs 1.23 with options
+		-AXn Lang::HL::Syntax
+

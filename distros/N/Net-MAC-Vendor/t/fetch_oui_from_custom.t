@@ -20,6 +20,8 @@ subtest fetch => sub {
 
 		my $array = Net::MAC::Vendor::fetch_oui_from_ieee( '14:10:9F' );
 
+		skip "Couldn't fetch data, which happens, so no big whoop", 2
+			unless defined $array;
 		isa_ok( $array, ref [], "Got back array reference" );
 		my $html = join "\n", @$array;
 		like( $html, qr/Apple, Inc\./, "Fetched Apple's OUI entry" );

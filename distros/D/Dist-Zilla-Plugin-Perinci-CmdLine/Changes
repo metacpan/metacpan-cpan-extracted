@@ -1,3 +1,11 @@
+0.002   2022-01-22  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention tangentially related module:
+          Dist::Zilla::Plugin::GenPericmdScript.
+
+
 0.001   2021-10-06  Released-By: PERLANCAR
 
         - First release.

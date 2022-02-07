@@ -85,8 +85,8 @@ sub render {
     );
   }
 
-  $content =~ s/^\n//;
-  $content =~ s/\n\ *$//;
+  $content =~ s/^\r?\n//;
+  $content =~ s/\r?\n\ *$//;
 
   $content = $self->render_blocks($content, $variables);
 
@@ -250,7 +250,7 @@ sub render_tokens {
   $content =~ s{
     $regexp
   }{
-    scalar($variables->path($1)) || ''
+    scalar($variables->path($1)) // ''
   }gsex;
 
   return $content;

@@ -20,11 +20,11 @@ no warnings "experimental::signatures";
 
 =head1 VERSION
 
-Version v1.4.2
+Version v1.4.3
 
 =cut
 
-our $VERSION = "v1.4.2";
+our $VERSION = "v1.4.3";
 
 use constant {
 	abstract   => q[bootstrap system image from abstract node],

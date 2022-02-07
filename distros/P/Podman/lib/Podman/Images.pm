@@ -1,23 +1,16 @@
 package Podman::Images;
 
-##! Provides the operations against images for a Podman service.
-##!
-##!     # Display names and Ids of available images.
-##!     for my $Image (@{ Podman::Images->new->List() }) {
-##!         my $Info = $Image->Inspect();
-##!         printf "%s: %s\n", $Image->Id, $Info->{RepoTags}->[0];
-##!     }
-
 use strict;
 use warnings;
 use utf8;
 
 use Moose;
 
+use Scalar::Util;
+
 use Podman::Client;
 use Podman::Image;
 
-### [Podman::Client](Client.html) API connector.
 has 'Client' => (
     is      => 'ro',
     isa     => 'Podman::Client',
@@ -25,22 +18,10 @@ has 'Client' => (
     default => sub { return Podman::Client->new() },
 );
 
-### List all local stored images.
-### ```
-###     use Podman::Client;
-###
-###     my $Images = Podman::Images->new(Client => Podman::Client->new());
-###
-###     my $List = $Images->List();
-###     is(ref $List, 'ARRAY', 'Images list ok.');
-###
-###     if ($List) {
-###         is(ref $List->[0], 'Podman::Image', 'Images list items ok.');
-###     }
-###
-### ```
 sub List {
     my $Self = shift;
+
+    $Self = __PACKAGE__->new() if !Scalar::Util::blessed($Self);
 
     my $List = $Self->Client->Get(
         'images/json',
@@ -62,6 +43,79 @@ sub List {
     return \@List;
 }
 
+sub Prune {
+    my $Self = shift;
+
+    $Self = __PACKAGE__->new() if !Scalar::Util::blessed($Self);
+
+    $Self->Client->Post('images/prune');
+
+    return 1; 
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
+
+=encoding utf8
+
+=head1 NAME
+
+Podman::Images - Manage images.
+
+=head1 SYNOPSIS
+
+    # Create and use containers controller
+    my $Images = Podman::Images->new();
+    $Images->List();
+
+    # List local stored images
+    my $List = Podman::Images->List();
+
+    # Prune unused images
+    Podman::Images->Prune;
+
+=head1 DESCRIPTION
+
+L<Podman::Images> lists images and prunes unused ones.
+
+=head1 ATTRIBUTES
+
+=head2 Client
+
+    my $Client = Podman::Client->new(
+        Connection => 'http+unix:///var/cache/podman.sock' );
+    my $Images = Podman::Images->new( Client => $Client );
+
+Optional L<Podman::Client> object.
+
+=head1 METHODS
+
+=head2 List
+
+    my $List = Podman::Images->List();
+
+Returns a list of L<Podman::Image> of stored images.
+
+=head2 Prune
+
+    Podman::Images->Prune();
+
+Prune all unused stored images.
+
+=head1 AUTHORS
+
+=over 2
+
+Tobias Schäfer, <tschaefer@blackox.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2022-2022, Tobias Schäfer.
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Artistic License version 2.0.
+
+=cut

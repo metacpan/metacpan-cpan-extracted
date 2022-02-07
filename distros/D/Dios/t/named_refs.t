@@ -5,10 +5,6 @@ use lib 't/lib';
 
 use Test::More;
 
-BEGIN {
-    plan 'no_plan';
-}
-
 # Test a basic alias.
 {
     package Foo;
@@ -77,4 +73,5 @@ BEGIN {
     ::is_deeply [$closure2->()], [4,5,6];
 }
 
+done_testing;
 

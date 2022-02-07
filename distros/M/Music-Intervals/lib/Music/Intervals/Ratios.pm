@@ -1,5 +1,5 @@
 package Music::Intervals::Ratios;
-$Music::Intervals::Ratios::VERSION = '0.0711';
+$Music::Intervals::Ratios::VERSION = '0.0804';
 our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Musical ratios
@@ -1167,7 +1167,7 @@ our $ratio = {
     },
     sk => {
         ratio => '225/224',
-        name => q|septimal kleisma|,
+        name => q|septimal kleisma, marvel comma|,
     },
     '54t' => {
         ratio => '231/200',
@@ -1447,7 +1447,7 @@ our $ratio = {
     },
     br => {
         ratio => '2401/2400',
-        name => q|Breedsma|,
+        name => q|breedsma|,
     },
     gm3 => {
         ratio => '2560/2187',
@@ -1821,7 +1821,7 @@ Music::Intervals::Ratios - Musical ratios
 
 =head1 VERSION
 
-version 0.0711
+version 0.0804
 
 =head1 AUTHOR
 

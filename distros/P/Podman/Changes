@@ -21,3 +21,7 @@
 * Create exception message by API code.
 * Create unit tests.
 * Simplify library interface.
+
+## 20220203.0
+
+* Use in module embedded POD.

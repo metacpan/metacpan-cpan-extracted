@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More 'no_plan';
+use Test::More;
 
 {
     package Stuff;
@@ -19,3 +19,6 @@ use Test::More 'no_plan';
 
     is( Stuff->$method("foo"), "foo" );
 }
+
+done_testing;
+

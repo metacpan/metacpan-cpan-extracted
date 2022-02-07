@@ -1,7 +1,8 @@
 use strict;
 use warnings;
 use utf8;
-use feature ':5.30';
+use feature ':5.12';
+
 use Test::More tests => 8;
 
 use Data::Gimei;

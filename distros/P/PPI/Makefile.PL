@@ -23,13 +23,13 @@ my %WriteMakefileArgs = (
     "Exporter" => 0,
     "File::Path" => 0,
     "File::Spec" => 0,
-    "IO::String" => "1.07",
     "List::Util" => "1.33",
     "Params::Util" => "1.00",
     "Scalar::Util" => 0,
     "Storable" => "2.17",
     "Task::Weaken" => 0,
     "constant" => 0,
+    "if" => 0,
     "overload" => 0,
     "strict" => 0
   },
@@ -48,12 +48,11 @@ my %WriteMakefileArgs = (
     "Test::NoWarnings" => 0,
     "Test::Object" => "0.07",
     "Test::SubCalls" => "1.07",
-    "if" => 0,
     "lib" => 0,
     "utf8" => 0,
     "warnings" => 0
   },
-  "VERSION" => "1.271",
+  "VERSION" => "1.272",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -75,7 +74,6 @@ my %FallbackPrereqs = (
   "File::Spec::Functions" => 0,
   "File::Spec::Unix" => 0,
   "File::Temp" => 0,
-  "IO::String" => "1.07",
   "List::Util" => "1.33",
   "Params::Util" => "1.00",
   "Scalar::Util" => 0,
@@ -97,6 +95,7 @@ my %FallbackPrereqs = (
 
 # inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.039
 requires('File::Spec', is_os('MSWin32') ? '3.2701' : '0.84');
+requires('IO::String') if $] < '5.008000';
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

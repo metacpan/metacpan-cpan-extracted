@@ -34,7 +34,7 @@ subtest 'without options' => sub {
 	);
 	$log->category_contains_ok(
 		'Boxer::Task::Bootstrap',
-		qr/^Bootstrap with mmdebstrap .*--include(?!.*--exclude).*buster[^,]+$/,
+		qr/^Bootstrap with mmdebstrap .*--include(?!.*--exclude).*bullseye[^,]+$/,
 		'command logged'
 	);
 	$log->category_contains_ok(
@@ -57,7 +57,7 @@ subtest 'with "--helper debootstrap"' => sub {
 	$log->contains_ok( qr/^No tweaks /,          'lack of tweaks logged' );
 	$log->category_contains_ok(
 		'Boxer::Task::Bootstrap',
-		qr/^Bootstrap with debootstrap .*--exclude.*buster[^,]+$/,
+		qr/^Bootstrap with debootstrap .*--exclude.*bullseye[^,]+$/,
 		'command logged'
 	);
 	$log->category_contains_ok(

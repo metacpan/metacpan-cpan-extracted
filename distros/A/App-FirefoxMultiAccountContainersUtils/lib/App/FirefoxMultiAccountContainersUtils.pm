@@ -1,16 +1,16 @@
 package App::FirefoxMultiAccountContainersUtils;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-11-02'; # DATE
-our $DIST = 'App-FirefoxMultiAccountContainersUtils'; # DIST
-our $VERSION = '0.011'; # VERSION
-
 use 5.010001;
 use strict 'subs', 'vars';
 use warnings;
 use Log::ger;
 
 use Sort::Sub ();
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-01-21'; # DATE
+our $DIST = 'App-FirefoxMultiAccountContainersUtils'; # DIST
+our $VERSION = '0.012'; # VERSION
 
 $Sort::Sub::argsopt_sortsub{sort_sub}{cmdline_aliases} = {S=>{}};
 $Sort::Sub::argsopt_sortsub{sort_args}{cmdline_aliases} = {A=>{}};
@@ -192,7 +192,7 @@ sub firefox_mua_modify_containers {
     my $code = $args{code};
     unless (ref $code eq 'CODE') {
         $code = "no strict; no warnings; package main; sub { $code }";
-        $code = eval $code;
+        $code = eval $code; ## no critic: BuiltinFunctions::ProhibitStringyEval
         return [400, "Cannot compile string code: $@"] if $@;
     }
 
@@ -234,8 +234,20 @@ $SPEC{firefox_mua_sort_containers} = {
     summary => "Sort Firefox Multi-Account Containers add-on's containers",
     description => <<'_',
 
-At the time of this writing, the UI of the Firefox Multi-Account Containers
-add-on does not provide a way to sort the containers. Thus this utility.
+This utility was written when the Firefox Multi-Account Containers add-on does
+not provide a way to reorder the containers. Now it does; you can click Manage
+Containers then use the hamburger button to drag the containers up and down to
+reorder.
+
+However, this utility is still useful particularly when you have lots of
+containers and want to sort it in some way. This utility provides a flexible
+sorting mechanism via using <pm:Sort:Sub> modules. For example:
+
+    % firefox-mua-sort-containers MYPROFILE
+    % firefox-mua-sort-containers MYPROFILE -S by_example -A example=foo,bar,baz,qux
+
+will first sort your containers asciibetically, then put specific containers
+that you use often (`foo`, `bar`, `baz`, `qux`) at the top.
 
 _
     args => {
@@ -376,7 +388,7 @@ App::FirefoxMultiAccountContainersUtils - Utilities related to Firefox Multi-Acc
 
 =head1 VERSION
 
-This document describes version 0.011 of App::FirefoxMultiAccountContainersUtils (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2020-11-02.
+This document describes version 0.012 of App::FirefoxMultiAccountContainersUtils (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2022-01-21.
 
 =head1 SYNOPSIS
 
@@ -407,7 +419,7 @@ About the add-on: L<https://addons.mozilla.org/en-US/firefox/addon/multi-account
 
 Usage:
 
- firefox_container(%args) -> [status, msg, payload, meta]
+ firefox_container(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 CLI to open URL in a new Firefox tab, in a specific multi-account container.
 
@@ -424,7 +436,7 @@ Examples:
 
 =item * If URL is not specified, will open a blank tab:
 
- firefox_container( container => "mycontainer");
+ firefox_container(container => "mycontainer");
 
 =back
 
@@ -459,12 +471,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -474,7 +486,7 @@ Return value:  (any)
 
 Usage:
 
- firefox_mua_list_containers(%args) -> [status, msg, payload, meta]
+ firefox_mua_list_containers(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List Firefox Multi-Account Containers add-on's containers.
 
@@ -491,12 +503,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -506,7 +518,7 @@ Return value:  (any)
 
 Usage:
 
- firefox_mua_modify_containers(%args) -> [status, msg, payload, meta]
+ firefox_mua_modify_containers(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Modify (and delete) Firefox Multi-Account Containers add-on's containers with Perl code.
 
@@ -523,7 +535,7 @@ Examples:
 
 =item * Delete all containers (remove -n to actually delete it):
 
- firefox_mua_modify_containers( profile => "myprofile", code => 0);
+ firefox_mua_modify_containers(profile => "myprofile", code => 0);
 
 =item * Change all icons to "dollar" and all colors to "red":
 
@@ -567,12 +579,12 @@ Pass -dry_run=E<gt>1 to enable simulation mode.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -582,12 +594,24 @@ Return value:  (any)
 
 Usage:
 
- firefox_mua_sort_containers(%args) -> [status, msg, payload, meta]
+ firefox_mua_sort_containers(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Sort Firefox Multi-Account Containers add-on's containers.
 
-At the time of this writing, the UI of the Firefox Multi-Account Containers
-add-on does not provide a way to sort the containers. Thus this utility.
+This utility was written when the Firefox Multi-Account Containers add-on does
+not provide a way to reorder the containers. Now it does; you can click Manage
+Containers then use the hamburger button to drag the containers up and down to
+reorder.
+
+However, this utility is still useful particularly when you have lots of
+containers and want to sort it in some way. This utility provides a flexible
+sorting mechanism via using <pm:Sort:Sub> modules. For example:
+
+ % firefox-mua-sort-containers MYPROFILE
+ % firefox-mua-sort-containers MYPROFILE -S by_example -A example=foo,bar,baz,qux
+
+will first sort your containers asciibetically, then put specific containers
+that you use often (C<foo>, C<bar>, C<baz>, C<qux>) at the top.
 
 This function is not exported.
 
@@ -623,12 +647,12 @@ Pass -dry_run=E<gt>1 to enable simulation mode.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -639,14 +663,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Firefo
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-App-FirefoxMultiAccountContainersUtils>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-FirefoxMultiAccountContainersUtils>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -665,11 +681,36 @@ L<App::DumpFirefoxHistory>.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-FirefoxMultiAccountContainersUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

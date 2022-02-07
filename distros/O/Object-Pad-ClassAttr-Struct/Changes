@@ -1,5 +1,9 @@
 Revision history for Object-Pad-ClassAttr-Struct
 
+0.03    2022-02-01
+        [CHANGES]
+         * Updated for Object::Pad 0.60
+
 0.02    2021-11-18
         [CHANGES]
          * Also apply :strict(params) to the class itself

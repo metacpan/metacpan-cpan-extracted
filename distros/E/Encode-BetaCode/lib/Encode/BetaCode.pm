@@ -26,13 +26,13 @@ Encode::BetaCode - Perl module for converting to and from Beta Code
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =encoding utf8
 
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
 =head1 SYNOPSIS
 
@@ -92,7 +92,7 @@ sub beta_decode
         $input =~ s/[*][(]=a/Ἇ/gi;
         $input =~ s/[*][)]a[|]/ᾈ/gi;
         $input =~ s/[*][(]a[|]/ᾉ/gi;
-        $input =~ s/[*][)]a/Ἁ/gi;
+        $input =~ s/[*][)]a/Ἀ/gi;
         $input =~ s/[*][(]a/Ἁ/gi;
         $input =~ s/[*]\\a/Ὰ/gi;
         $input =~ s/[*]\/a/Ά/gi;
@@ -255,7 +255,7 @@ sub beta_decode
         $input =~ s/o\\/ὸ/gi;
         $input =~ s/o\//ό/gi;
         $input =~ s/r[)]/ῤ/gi;
-        $input =~ s/r[(]/ῤ/gi;
+        $input =~ s/r[(]/ῥ/gi;
         $input =~ s/u&/ῡ/gi;
         $input =~ s/u'/ῠ/gi;
         $input =~ s/u[+]\\/ῢ/gi;
@@ -754,7 +754,7 @@ member of the Ubuntu-gr community (L<http://ubuntu-gr.org/>).
 Her contribution to defining and testing the conversion rules was more than significant.
 
 Valuable contributions in form of bug reports have been also provided by 
-B<Philipp Steinkrüger>, and B<Juan Miguel Corral Cano>.
+B<Philipp Steinkrüger>, B<Juan Miguel Corral Cano>, and B<JPapir>.
 
 =head1 SEE ALSO
 
@@ -766,7 +766,7 @@ L<http://en.wikipedia.org/wiki/Beta_code>
 
 =head1 COPYRIGHT
 
-Copyright 2012-16 Dimitrios - Georgios Kontopoulos.
+Copyright 2012-22 Dimitrios - Georgios Kontopoulos.
 
 =head1 LICENSE
 

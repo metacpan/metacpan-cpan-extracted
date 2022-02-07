@@ -1,55 +1,60 @@
-==================================================
-Changes from 2019-04-04 00:00:00 +0000 to present.
-==================================================
+Changelog for HealthCheck-Diagnostic-SFTP
 
--------------------------------------------
-version v1.2.2 at 2020-04-03 15:53:48 +0000
--------------------------------------------
+v1.4.0 2022-02-04T21:09:35
+ - Update README (Andrew Hewus Fresh)
+ - Pull request #3: SM-3507 (Mitch McCracken)
+ - Fix default timeout in POD (Andrew Fresh)
+ - Add tests for timeout / ConnectTimeout option (Mitch McCracken)
+ - Make POD for timeout use semantic line breaks (Mitch McCracken)
+ - Lower default timeout from 10 to 3 seconds. (Mitch McCracken)
+ - Allow setting timeout / ConnectTimeout value (Mitch McCracken)
 
-  Change: bc0fc96ee62b6653e5296aee1441ac1c87bf7ee2
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2020-04-02 17:22:30 +0000
+v1.2.2 2020-04-03T15:50:25
+ - Update names in examples (Andrew Hewus Fresh)
+ - Note why Net::SSH::Perl::Buffer is in the cpanfile (Andrew Hewus Fresh)
+ - Convert to Dist::Zilla::PluginBundle::Author::GSG (Andrew Hewus Fresh)
 
-    Update names in examples
+v1.2.1 2019-11-05T22:35:51
+ - Merge remote-tracking branch 'origin/stage' into prod (Brandon Messineo)
+ - Merge remote-tracking branch 'origin/test' into stage (Brandon Messineo)
+ - Merge remote-tracking branch 'origin/master' into test (Brandon
+   Messineo)
 
-    To be more generic 
+v1.2.0.1 2019-10-18T19:55:55
+ - Create distribution files (Andrew Hewus Fresh)
+ - Convert to Bitbucket workflow (Andrew Hewus Fresh)
+ - Remove gitc metadata (Andrew Hewus Fresh)
 
-  Change: 8c2b5873227cf4f7affb3f1846c6b154cb10b2c3
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2020-04-02 17:11:48 +0000
+v1.2.0.0 2018-12-04T17:02:02
+ - Add a SYNOPSIS (Brandon Messineo)
+ - Allow for a `callback` sub (Brandon Messineo)
+ - Actually start using Net::SFTP (Brandon Messineo)
+ - Add in a user option, along with a display name (Brandon Messineo)
+ - Allow check values to override the instance values (Brandon Messineo)
+ - Require a `host` parameter for the diagnostic (Brandon Messineo)
+ - Create the constructor method (Brandon Messineo)
 
-    Note why Net::SSH::Perl::Buffer is in the cpanfile 
+v1.1.0 2018-12-04T18:08:24
+ - Merge remote-tracking branch 'origin/test' into stage (Brandon Messineo)
 
-  Change: 9c403ba1fbe0ab2488f6a1c34995378f474f3c53
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2020-04-02 17:11:48 +0000
+v1.1.0.0 2018-11-06T20:11:38
+ - No changes found
 
-    Convert to Dist::Zilla::PluginBundle::Author::GSG
+v1.0.0 2018-11-06T20:11:23
+ - Merge remote-tracking branch 'origin/test' into stage (Brandon Messineo)
 
-    To support GitHub/CPAN releases 
+v0.0.1 2018-11-06T20:09:55
+ - No changes found
 
----------------------------------------------
-version v1.2.0.1 at 2019-10-18 19:55:55 +0000
----------------------------------------------
-
-  Change: 233426a37ae1ffb99a93e5baedc42fe45c58cbf5
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-10-18 15:55:55 +0000
-
-    Create distribution files 
-
-  Change: f0f3002e3e2973a6ca97a8331f4f7c49eb2fe0c5
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-10-18 15:47:14 +0000
-
-    Convert to Bitbucket workflow 
-
-  Change: ec93fc41aa6cb580615dd9205f8e736386257838
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-10-18 15:47:14 +0000
-
-    Remove gitc metadata 
-
-=================================================
-Plus 10 releases after 2019-04-04 00:00:00 +0000.
-=================================================
+v0.0.0 2018-12-04T17:02:02
+ - Add a SYNOPSIS (Brandon Messineo)
+ - Allow for a `callback` sub (Brandon Messineo)
+ - Actually start using Net::SFTP (Brandon Messineo)
+ - Add in a user option, along with a display name (Brandon Messineo)
+ - Allow check values to override the instance values (Brandon Messineo)
+ - Require a `host` parameter for the diagnostic (Brandon Messineo)
+ - Create the constructor method (Brandon Messineo)
+ - Merge remote-tracking branch 'origin/master' into test (Brandon
+   Messineo)
+ - Add basic boilerplate (Brandon Messineo)
+ - repository initialized by gitc initialize-repo (Brandon Messineo)

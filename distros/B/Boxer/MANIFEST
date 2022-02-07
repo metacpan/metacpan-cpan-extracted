@@ -13,7 +13,8 @@ TODO
 bin/boxer
 dist.ini
 doap.ttl
-doc/boxer.svg
+doc/features.svg
+doc/projects.svg
 examples/classes/Admin/apt/auto/all.yml
 examples/classes/Admin/apt/auto/core.yml
 examples/classes/Admin/apt/auto/functions.yml

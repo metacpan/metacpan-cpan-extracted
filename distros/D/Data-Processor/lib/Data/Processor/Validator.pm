@@ -177,9 +177,9 @@ sub _add_defaults_and_transform {
     my $self = shift;
 
     for my $key (keys %{$self->{schema}}){
-        next unless $self->{schema}->{$key}->{default};
+        next unless defined $self->{schema}->{$key}->{default};
         $self->{data}->{$key} = $self->{schema}->{$key}->{default}
-            unless $self->{data}->{$key};
+            unless defined $self->{data}->{$key};
     }
 
     for my $key (keys %{$self->{data}}){

@@ -1,18 +1,19 @@
 # dist-backcompat-distro-metadata.txt
 
-# This file holds configuration data for Porting/dist-backcompat.pl.  Blank or
+# This file holds configuration data for front-end program
+# 'p5-dist-backcompat' and module Perl5::Dist::Backcompat. Blank or
 # all-whitespace lines are ignored.  Lines starting with a '#' are comments
 # and are also ignored.
 
 # There should be one entry in this file for each distribution ("distro")
 # underneath 'dist/' in the Perl 5 core distribution which has had a separate
-# release to CPAN.*
+# release to CPAN.
 
-# *In terms of the categorization employed within Porting/dist-backcompat.pl,
-# those are distributions which are categorized as 'native', 'generated' or
-# 'cpan' and excludes those categorized as 'unreleased'.  As of Jan 10 2022,
-# there are 40 released distros and 1 unreleased distro.  Those numbers may of
-# course change in the future.
+# In terms of the categorization employed within the front-end program and the
+# module, these are distributions which are categorized as 'cpan', 'native',
+# or 'generated'.  We exclude distros categorized as 'unreleased'.  As of Jan
+# 10 2022, there are 40 released distros and 1 unreleased distro.  Those
+# numbers may of course change in the future.
 
 # Each entry consists of a pipe-delimited string of 1 or more columns.
 # Column 1: The distribution's name (in "Some-Module" format)

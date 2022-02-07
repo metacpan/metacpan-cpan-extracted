@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 # save - save this version of the file in saved.d directory
-# Vlado Keselj <vlado@dnlp.ca> 2020
-# 2020 Vlado Keselj http://web.cs.dal.ca/~vlado
+# Vlado Keselj <vlado@dnlp.ca> 2020-2022
+# 2020-2022 Vlado Keselj http://web.cs.dal.ca/~vlado
 if ($#ARGV<0) { die "Usage: $0 files..."; }
 
 use POSIX;

@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
  */
 #define PERL_NO_GET_CONTEXT
 
@@ -17,13 +17,13 @@ static bool struct_apply(pTHX_ ClassMeta *classmeta, SV *hookdata, SV **hookdata
   return TRUE;
 }
 
-static void struct_post_add_slot(pTHX_ ClassMeta *classmeta, SV *hookdata, void *_funcdata, SlotMeta *slotmeta)
+static void struct_post_add_field(pTHX_ ClassMeta *classmeta, SV *hookdata, void *_funcdata, FieldMeta *fieldmeta)
 {
-  if(mop_slot_get_sigil(slotmeta) != '$')
+  if(mop_field_get_sigil(fieldmeta) != '$')
     return;
 
-  mop_slot_apply_attribute(slotmeta, "param", NULL);
-  mop_slot_apply_attribute(slotmeta, "mutator", NULL);
+  mop_field_apply_attribute(fieldmeta, "param", NULL);
+  mop_field_apply_attribute(fieldmeta, "mutator", NULL);
 }
 
 static const struct ClassHookFuncs struct_hooks = {
@@ -31,8 +31,8 @@ static const struct ClassHookFuncs struct_hooks = {
   .flags = OBJECTPAD_FLAG_ATTR_NO_VALUE,
   .permit_hintkey = "Object::Pad::ClassAttr::Struct/Struct",
 
-  .apply         = &struct_apply,
-  .post_add_slot = &struct_post_add_slot,
+  .apply          = &struct_apply,
+  .post_add_field = &struct_post_add_field,
 };
 
 MODULE = Object::Pad::ClassAttr::Struct    PACKAGE = Object::Pad::ClassAttr::Struct

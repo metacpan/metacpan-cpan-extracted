@@ -65,7 +65,7 @@ while( $iter->advance ) {
 	last if $k-- == 0; # prevent endless loops
 };
 ok $k == 0 && $iter->done, 'number of iterations';
-cmp_deeply \@got, \@expected, 'data(), idx()';
+cmp_deeply \@got, \@expected, 'data(), idx()' or diag "got:\n", explain \@got;
 
 #
 @bins = ( 3, 2 );

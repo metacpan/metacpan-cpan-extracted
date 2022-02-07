@@ -44,18 +44,50 @@ I am contactable by email at sisyphus at(@) cpan dot (.) org.
 MAC OS X
 ==========
 
+I don't test on Macs ... and I don't know if the following advice is
+still relevant:
+
 If you have MacPorts installed, you may need to install gmp +universal
 for the bindings to work. After installing you'll need to run:
 
 perl Makefile.PL INC="-I/opt/local/include" LIBS="-L/opt/local/lib -lgmp"
 
-==========
-MS WINDOWS
-==========
-If building with an MSVC++ compiler against a MinGW-built gmp lib, you'll
-need to additionally link to MinGW's libgcc.a and libcoldname.a. First,
-create copies of the 3 '.a' files (named libgmp.lib, libgcc.lib, and
-libcoldname.lib) and then run:
+===============================
+MS WINDOWS (Visual Studio 2019)
+===============================
 
-perl Makefile.PL INC="-IC:/path/to/gmp_include" LIBS="-LC:/path/to/gcc_lib -lgcc -LC:/path/to/coldname_lib -lcoldname -LC:/path/to/gmp_lib -lgmp"
+I don't know how to build the gmp library using Visual Studio 2019, so
+when building this module with Visual Studio 2019 I build against a
+gmp library that was built using MinGW-w64.
+
+Building with Visual Studio 2019 against a *dynamic* gmp library that was
+built using a MinGW-w64 compiler is not recommended, as strange results
+can then arise when calling gmp functions that take a FILE* argument.
+
+If building with Visual Studio 2019 against a static gmp library that was
+built using a MinGW-w64 compiler I first make a copy of the gmp library
+(libgmp.a) along with copies of the following MinGW-w64 library files:
+libgcc.a
+libmingwex.a
+libmingw32.a
+
+For each of the 4 copied files, I leave the filename unchanged (though the
+"lib" at the begining of the name is optional), and change the file
+extension to ".lib".
+In making those copies, I've left them in the same directory as the
+original, but I assume (untested) that the copies could be moved to any
+location of your choice.
+
+Then build this module by cd'ing to the top level Math::GMPz source folder
+and running:
+
+perl Makefile.PL INC="-IC:/path/to/gmp_header" LIBS="-LC:/path/to/libgcc -lgcc -LC:/path/to/standard_libs -lmingwex -lmingw32 -LC:/path/to/libgmp -lgmp"
+nmake test
+nmake install
+
+NOTES:
+1) The given example "perl Makefile.PL ..." command assumes that libmingwex
+   and libmingw32 libraries are in the same location;
+2) The same method can be used to build Math::GMP using VS 2019.
+
 

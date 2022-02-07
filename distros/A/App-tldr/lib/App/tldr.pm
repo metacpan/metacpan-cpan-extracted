@@ -8,16 +8,16 @@ use Getopt::Long qw(:config no_auto_abbrev no_ignore_case bundling);
 use HTTP::Tiny;
 use IO::Handle;
 use IO::Socket::SSL;
-use Pod::Usage 'pod2usage';
+use Pod::Usage 1.33 ();
 use Term::ReadKey ();
 use Text::Fold ();
 
 use constant DEBUG => $ENV{TLDR_DEBUG};
 use constant REPOSITORY => $ENV{TLDR_REPOSITORY};
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
-my $URL = "https://raw.githubusercontent.com/tldr-pages/tldr/master/pages/%s/%s.md";
+my $URL = "https://raw.githubusercontent.com/tldr-pages/tldr/main/pages/%s/%s.md";
 
 sub new {
     my ($class, %option) = @_;
@@ -29,12 +29,15 @@ sub parse_options {
     my ($self, @argv) = @_;
     local @ARGV = @argv;
     $self->{platform} = [];
+
+    $self->{unicode} = ($ENV{LANG} || "") =~ /UTF-8/i ? 1 : 0;
     GetOptions
-        "h|help"    => sub { $self->_help },
+        "h|help"    => sub { print $self->_help; exit },
         "o|os=s@"   => \($self->{platform}),
         "v|version" => sub { printf "%s %s\n", ref $self, $self->VERSION; exit },
         "pager=s"   => \my $pager,
         "no-pager"  => \my $no_pager,
+        "unicode!" => \$self->{unicode},
     or exit(2);
     $self->{argv} = \@ARGV;
     if (!$no_pager and -t STDOUT and my $guess = $self->_guess_pager($pager)) {
@@ -59,7 +62,18 @@ sub _guess_pager {
 
 sub _help {
     my ($self, $exit) = @_;
-    pod2usage( $exit || 0 );
+    open my $fh, '>', \my $out;
+    Pod::Usage::pod2usage
+        exitval => 'noexit',
+        input => $0,
+        output => $fh,
+        sections => 'SYNOPSIS',
+        verbose => 99,
+    ;
+    $out =~ s/^Usage:\n//;
+    $out =~ s/^[ ]{6}//mg;
+    $out =~ s/\n$//;
+    $out;
 }
 
 
@@ -124,7 +138,9 @@ my $SUSHI = "\N{U+1F363}";
 sub _render {
     my ($self, $content, $query) = @_;
 
-    my ($width) = Term::ReadKey::GetTerminalSize();
+    my ($check, $prompt) = $self->{unicode} ? ($CHECK, $SUSHI) : ('*', '$');
+
+    my $width = $ENV{COLUMNS} || (Term::ReadKey::GetTerminalSize())[0];
     $width -= 4;
 
     my @line = split /\n/, $content;
@@ -160,7 +176,7 @@ sub _render {
         } elsif ($line =~ s/^[*-]\s*//) {
             my $fold = Text::Fold::fold_text($line, $width - 2);
             my ($first, @rest) = split /\n/, $fold;
-            $out->print("  \e[1m$CHECK \e[4m$first\e[m\n");
+            $out->print("  \e[1m$check \e[4m$first\e[m\n");
             $out->print("    \e[1m\e[4m$_\e[m\n") for @rest;
             $out->print("\n");
         } elsif ($line =~ /`([^`]+)`/) {
@@ -168,7 +184,7 @@ sub _render {
             $code =~ s/\b$query\b/
               "\e[32m$query\e[m"
             /eg;
-            $out->print("    $SUSHI  $code\n\n");
+            $out->print("    $prompt $code\n\n");
         }
     }
 }
@@ -180,7 +196,7 @@ __END__
 
 =head1 NAME
 
-App::tldr - a perl client for http://tldr-pages.github.io/
+App::tldr - a perl client for https://tldr.sh/
 
 =head1 SYNOPSIS
 
@@ -188,7 +204,7 @@ App::tldr - a perl client for http://tldr-pages.github.io/
 
 =head1 DESCRIPTION
 
-App::tldr is a client for L<http://tldr-pages.github.io/>.
+App::tldr is a client for L<https://tldr.sh/>.
 
 =head1 SEE ALSO
 

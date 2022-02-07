@@ -1,11 +1,12 @@
+
+use strict;
+use warnings;
 use ExtUtils::MakeMaker;
 use Config;
 
-
-eval {require ActivePerl::DocTools;};
-unless($@) {
-  warn "\n  WARNING: The sqrt and ** (pow) overloading is buggy\n",
-       "           on ActivePerl. (See the README file.)\n\n";
+if($Config{cc} eq 'cl') {
+  warn "\n  WARNING: The sqrt and ** (pow) overloading can be buggy\n",
+       "             on MSVC-built perls. (See the README file.)\n\n";
 }
 
 my $defines = '';
@@ -82,7 +83,7 @@ else {
 # Try to detect whether nanl() is available and
 # implement a workaround if it's not.
 
-my $out = `$cc $opt -o try3.exe -x c try3.in -lm 2>&1`;
+$out = `$cc $opt -o try3.exe -x c try3.in -lm 2>&1`;
 
 print WR "build output (nanl check): $out\n" if $open;
 
@@ -112,7 +113,7 @@ sleep 1;
 
 print WR "build output (nan**0 check):\n$out\n" if $open;
 
-$diag = $^O =~ /mswin32/i ? `try2.exe nan 0 2>&1` : `./try2.exe nan 0 2>&1`;
+my $diag = $^O =~ /mswin32/i ? `try2.exe nan 0 2>&1` : `./try2.exe nan 0 2>&1`;
 
 print WR "nan**0 check diagnostic: $diag\n" if ($open && defined $diag);
 
@@ -123,7 +124,7 @@ $defines .= ' -DNAN_POW_BUG' if $diag =~ /^NaN/i;
 # Try to detect whether signbitl() is available and
 # implement a workaround if it's not.
 
-my $out = `$cc $opt -o try4.exe -x c try4.in -lm 2>&1`;
+$out = `$cc $opt -o try4.exe -x c try4.in -lm 2>&1`;
 
 print WR "build output (signbitl check): $out\n" if $open;
 
@@ -146,7 +147,7 @@ else {
 # Try to detect the absence of sincosl and implement
 # workaround (-DSINCOSL_IS_UNAVAILABLE) when absence is detected.
 
-my $out = `$cc $opt -o try5.exe -x c try5.in -lm 2>&1`;
+$out = `$cc $opt -o try5.exe -x c try5.in -lm 2>&1`;
 
 print WR "build output (sincosl check): $out\n" if $open;
 

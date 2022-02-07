@@ -9,7 +9,7 @@ use strict;
 use warnings;
 package Net::SAML2::XML::Sig; use base qw(XML::Sig); 1;
 
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 # ABSTRACT: Net::SAML2 subclass of XML::Sig
 
@@ -25,7 +25,7 @@ Net::SAML2::XML::Sig - Net::SAML2 subclass of XML::Sig
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 AUTHOR
 

@@ -1,6 +1,6 @@
 package PDL::NDBin::Action::Sum;
 # ABSTRACT: Action for PDL::NDBin that computes sum
-$PDL::NDBin::Action::Sum::VERSION = '0.021';
+$PDL::NDBin::Action::Sum::VERSION = '0.024';
 
 use strict;
 use warnings;
@@ -32,7 +32,10 @@ sub process
 		$self->{out} = PDL->zeroes( $type, $self->{N} );
 	}
 	$self->{count} = PDL->zeroes( defined(&PDL::indx) ? PDL::indx() : PDL::long, $self->{N} ) unless defined $self->{count};
-	PDL::NDBin::Actions_PP::_isum_loop( $iter->data, $iter->idx, $self->{out}, $self->{count}, $self->{N} );
+	my $data = $iter->data;
+	my $idx = $iter->idx;
+	$_ = PDL->zeroes( 0 ) for grep !defined || $_->isnull, $data, $idx;
+	PDL::NDBin::Actions_PP::_isum_loop( $data, $idx, $self->{out}, $self->{count}, $self->{N} );
 	# as the plugin processes all bins at once, every variable
 	# needs to be visited only once
 	$iter->var_active( 0 );
@@ -61,7 +64,7 @@ PDL::NDBin::Action::Sum - Action for PDL::NDBin that computes sum
 
 =head1 VERSION
 
-version 0.021
+version 0.024
 
 =head1 DESCRIPTION
 
@@ -77,7 +80,7 @@ This class implements an action for PDL::NDBin.
 	);
 
 Construct an instance for this action. Requires the number of bins $N as input.
-Optionally allows the type of the output piddle to be set (defaults to the type
+Optionally allows the type of the output ndarray to be set (defaults to the type
 of the variable this instance is associated with, or at least I<long>).
 
 =head2 process()
@@ -99,7 +102,7 @@ Edward Baudrez <ebaudrez@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Edward Baudrez.
+This software is copyright (c) 2022 by Edward Baudrez.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

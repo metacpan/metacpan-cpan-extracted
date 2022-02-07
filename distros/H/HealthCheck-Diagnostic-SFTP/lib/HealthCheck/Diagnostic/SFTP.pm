@@ -3,7 +3,7 @@ use parent 'HealthCheck::Diagnostic';
 
 # ABSTRACT: Check for SFTP access and operations in a HealthCheck
 use version;
-our $VERSION = 'v1.2.2'; # VERSION
+our $VERSION = 'v1.4.0'; # VERSION
 
 use strict;
 use warnings;
@@ -51,14 +51,25 @@ sub run {
     # Get our description of the connection.
     my $user        = $params{user};
     my $name        = $params{name};
+    my $timeout     = $params{timeout} // 3;
     my $target      = ( $user ? $user.'@' : '' ).$host;
     my $description = $name ? "$name ($target) SFTP" : "$target SFTP";
+
+    my $ssh_args = $params{ssh_args}    // {};
+    my $options  = $ssh_args->{options} // [];
+
+    unless ( grep { $_ =~ /^ConnectTimeout / } @$options ) {
+        push @$options, "ConnectTimeout $timeout";
+        $ssh_args->{options} = $options;
+    }
 
     # Try to connect to the host.
     my $sftp;
     my %args = map { $_ => $params{$_} }
         grep { exists $params{$_} }
-        qw( user password debug warn ssh_args );
+        qw( user password debug warn );
+    $args{ssh_args} = $ssh_args;
+
     local $@;
     eval {
         local $SIG{__DIE__};
@@ -108,7 +119,7 @@ HealthCheck::Diagnostic::SFTP - Check for SFTP access and operations in a Health
 
 =head1 VERSION
 
-version v1.2.2
+version v1.4.0
 
 =head1 SYNOPSIS
 
@@ -116,8 +127,9 @@ version v1.2.2
 
     # Just check that we can connect to a host.
     HealthCheck::Diagnostic::SFTP->check(
-        host => 'sftp.example.com',
-        user => 'auser',
+        host    => 'sftp.example.com',
+        user    => 'auser',
+        timeout => 3, # default
     );
 
     # Check that the './history' file exists on the host.
@@ -184,6 +196,13 @@ An anonymous sub that gets called when warnings are generated.
 Optional argument that can get passed into the L<Net::SFTP> constructor.
 Additional SSH connection arguments.
 
+=head2 timeout
+
+Set for the C<ConnectTimeout> value passed to the C<ssh_args> C<options> setting
+in L<Net::SSH::Perl>.
+Will not be set if an existing C<ConnectTimeout> value has been set.
+Defaults to 3.
+
 =head1 DEPENDENCIES
 
 L<Net::SFTP>
@@ -199,7 +218,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 - 2020 by Grant Street Group.
+This software is Copyright (c) 2018 - 2022 by Grant Street Group.
 
 This is free software, licensed under:
 

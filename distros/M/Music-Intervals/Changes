@@ -1,5 +1,26 @@
 Revision history for Music-Intervals
 
+0.0804 2022-02-07 07:32:27
+    - Fix the notes attribute default.
+
+0.0803 2022-02-06 04:50:06
+    - Copy the just-intonation scala file to eg/.
+    - Improve documentation.
+
+0.0802 2022-02-05 07:52:01
+    - Fix the eg/* programs a bit more.
+
+0.0801 2022-02-05 07:03:16
+    - Fix the eg/* programs.
+    - Improve documentation.
+
+0.0800 2022-02-04 19:46:46
+    * This is a fundamental change to the output.
+    - Remove the chord aspect and just focus on intervals.
+    - Improve documentation.
+    - Improve the eg/intervals program.
+    - Add the eg/intervals-numeric program.
+
 0.0711 2022-02-01 12:47:49
     - Add the eg/benchmark program, just because I was curious.
     - Remove the method names from the keys.

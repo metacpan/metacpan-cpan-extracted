@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-16'; # DATE
+our $DATE = '2022-01-22'; # DATE
 our $DIST = 'App-ImageMagickUtils'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Math/Image/CalcResized/image_resize_notation_to_human",
@@ -38,7 +38,7 @@ image-resize-notation-to-human - Translate ImageMagick-like resize notation (e.g
 
 =head1 VERSION
 
-This document describes version 0.009 of image-resize-notation-to-human (from Perl distribution App-ImageMagickUtils), released on 2022-01-16.
+This document describes version 0.010 of image-resize-notation-to-human (from Perl distribution App-ImageMagickUtils), released on 2022-01-22.
 
 =head1 SYNOPSIS
 

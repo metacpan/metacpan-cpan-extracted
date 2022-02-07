@@ -1,5 +1,15 @@
 Revision history for Test-MockFile
 
+0.026   2/3/2022
+- Fix support for mocking the top-level directory.
+- Symlinks should appear in readdir
+- Fix directory instantiation when creating a symlink.
+- GH #105: Show directories in readdir
+- Improve relative path management
+- Don't let stat() get confused with trailing forward slash
+- GH #118: Do not get confused by inner directory files.
+- GH #85: Do not corrupt blessed handles.
+
 0.025   1/26/2022
 - Fix typo in chmod mock. Was accidentally calling chown.
 - Fix dependency on Text::Glob. It is now a runtime requirement.

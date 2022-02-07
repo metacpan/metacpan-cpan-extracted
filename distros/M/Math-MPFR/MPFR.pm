@@ -181,7 +181,7 @@ fr_cmp_q_rounded mpfr_max_orig_len mpfr_min_inter_prec mpfrtoa numtoa nvtoa prec
 q_add_fr q_cmp_fr q_div_fr q_mul_fr q_sub_fr rndna
 );
 
-    our $VERSION = '4.18';
+    our $VERSION = '4.19';
     #$VERSION = eval $VERSION;
 
     Math::MPFR->DynaLoader::bootstrap($VERSION);
@@ -588,6 +588,8 @@ sub GMP_NAIL_BITS           () {return _GMP_NAIL_BITS()}
 
 sub atonum {
     if(MPFR_3_1_6_OR_LATER) {
+      return atonv($_[0])
+        if $_[0] =~ /^[\-\+]?inf|^[\-\+]?nan/i; # buggy perls can numify infnan strings to 0.
       my $copy = $_[0];               # Don't mess with $_[0] flags
       my $ret = "$copy" + 0;
       return $ret if _itsa($ret) < 3; # IV

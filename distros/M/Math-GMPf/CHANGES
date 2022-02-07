@@ -1,3 +1,8 @@
+0.46
+ - Fix https://github.com/sisyphus/math-decimal64/pull/1 (also aplies to Math::GMPf)
+   Thanks to @hiratara
+ - Remove all references to _MSC_VER.
+
 0.45
  - Simplify Makefile.PL.
  - Replace XS defines NV_IS_FLOAT128 and NV_IS_LONG_DOUBLE with

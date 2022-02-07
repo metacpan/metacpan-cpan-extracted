@@ -1,19 +1,39 @@
 use strict;
 use warnings;
 package CDS::C;
-our $VERSION = '0.23';
+our $VERSION = '0.25';
 use Exporter 'import';
 our @EXPORT = qw();
 use CDS::C::Inline C => <<ENDOFCODE;
+#include <stdlib.h>
+#include <stdint.h>
+
 
 #line 1 "Condensation/../../c/configuration/default.inc.h"
 typedef uint32_t cdsLength;
 #define CDS_MAX_RECORD_DEPTH 64
 
-#line 1 "Condensation/C.inc.c"
+#line 4 "Condensation/C.inc.c"
+
+#line 1 "Condensation/../../c/random/multi-os.inc.c"
+#if defined(WIN32) || defined(_WIN32)
+
+#line 1 "Condensation/../../c/random/windows.inc.c"
+#define _CRT_RAND_S
+#include <stdlib.h>
+
+static void fillRandom(uint8_t * buffer, uint32_t length) {
+	unsigned int value;
+	for (uint32_t i = 0; i < length; i++) {
+		rand_s(&value);
+		buffer[i] = value & 0xff;
+	}
+}
+
+#line 2 "Condensation/../../c/random/multi-os.inc.c"
+#else
 
 #line 1 "Condensation/../../c/random/dev-urandom.inc.c"
-
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -32,7 +52,10 @@ static void fillRandom(uint8_t * buffer, uint32_t length) {
 	close(fh);
 }
 
-#line 2 "Condensation/C.inc.c"
+#line 4 "Condensation/../../c/random/multi-os.inc.c"
+#endif
+
+#line 5 "Condensation/C.inc.c"
 
 #line 1 "Condensation/../../c/Condensation/littleEndian.inc.c"
 static void copyReversed4(uint8_t * destination, const uint8_t * source) {
@@ -137,7 +160,7 @@ double cdsGetFloat64BE(const uint8_t * bytes) {
 #error "This library was prepared for little-endian processor architectures. Your compiler indicates that you are compiling for a big-endian architecture."
 #endif
 
-#line 3 "Condensation/C.inc.c"
+#line 6 "Condensation/C.inc.c"
 
 #line 1 "Condensation/../../c/Condensation/all.inc.h"
 #include <stdint.h>
@@ -288,7 +311,7 @@ struct cdsRecord {
 
 #line 8 "Condensation/../../c/Condensation/all.inc.h"
 
-#line 4 "Condensation/C.inc.c"
+#line 7 "Condensation/C.inc.c"
 
 #line 1 "Condensation/../../c/Condensation/all.inc.c"
 #include <stdio.h>
@@ -553,16 +576,16 @@ struct cdsBytes cdsCrypt(const struct cdsAES256 * aes, const struct cdsBytes byt
 	memcpy(counter, startCtr.data, 16);
 	uint8_t encryptedCounter[16];
 
-	uint i = 0;
+	cdsLength i = 0;
 	for (; i + 16 < bytes.length; i += 16) {
 		memcpy(encryptedCounter, counter, 16);
 		cdsEncryptAES256Block(aes, encryptedCounter);
-		for (uint n = 0; n < 16; n++) buffer[i + n] = bytes.data[i + n] ^ encryptedCounter[n];
+		for (cdsLength n = 0; n < 16; n++) buffer[i + n] = bytes.data[i + n] ^ encryptedCounter[n];
 		cdsIncrementCtr(counter);
 	}
 
 	cdsEncryptAES256Block(aes, counter);
-	for (uint n = 0; n < bytes.length - i; n++) buffer[i + n] = bytes.data[i + n] ^ counter[n];
+	for (cdsLength n = 0; n < bytes.length - i; n++) buffer[i + n] = bytes.data[i + n] ^ counter[n];
 
 	return cdsBytes(buffer, bytes.length);
 }
@@ -735,7 +758,7 @@ static void setUint32(struct cdsBigInteger * x, uint32_t value) {
 static void setRandom(struct cdsBigInteger * x, int n) {
 	assert(n >= 0);
 	assert(n <= CDS_BIG_INTEGER_SIZE);
-	cdsRandomBytes((uint8_t *) x->values, (uint) n * 4);
+	cdsRandomBytes((uint8_t *) x->values, n * 4);
 	x->length = n;
 }
 
@@ -790,7 +813,7 @@ void cdsBigIntegerFromBytes(struct cdsBigInteger * x, struct cdsBytes bytes) {
 }
 
 struct cdsBytes cdsBytesFromBigInteger(struct cdsMutableBytes bytes, const struct cdsBigInteger * x) {
-	uint n = bytes.length;
+	uint32_t n = bytes.length;
 	for (int r = 0; r < x->length; r++) {
 		n -= 1;
 		bytes.data[n] = X(r) & 0xff;
@@ -1449,7 +1472,7 @@ static void gcd(struct cdsBigInteger * x, struct cdsBigInteger * y) {
 	}
 }
 
-static void markInSieve(uint8_t * sieve, uint s, uint interval) {
+static void markInSieve(uint8_t * sieve, uint16_t s, uint16_t interval) {
 	for (; s < 4096; s += interval) sieve[s] = 1;
 }
 
@@ -1464,7 +1487,7 @@ static void randomPrime1024(struct cdsBigInteger * x, struct cdsBigInteger * e, 
 		KEY_GENERATION_RESET_WATCHDOG();
 		memset(sieve, 0, 4096);
 
-		for (uint n = 0; n < 4096; n += 2) {
+		for (uint16_t n = 0; n < 4096; n += 2) {
 			if (sieve[n]) continue;
 
 			setUint32(x, n);
@@ -2451,15 +2474,15 @@ static void generateKey(struct cdsRSAPrivateKey * this, struct cdsRSAModPowBig *
 #line 1 "Condensation/../../c/Condensation/RSA64/Encoding.inc.c"
 #include <string.h>
 
-static const uint emLength = 256;    // = 2048 / 8
-static const uint hashLength = 32;
+static const uint16_t emLength = 256;    // = 2048 / 8
+static const uint16_t hashLength = 32;
 static const uint8_t OAEPZeroLabelHash[] = {0xe3, 0xb0, 0xc4, 0x42, 0x98, 0xfc, 0x1c, 0x14, 0x9a, 0xfb, 0xf4, 0xc8, 0x99, 0x6f, 0xb9, 0x24, 0x27, 0xae, 0x41, 0xe4, 0x64, 0x9b, 0x93, 0x4c, 0xa4, 0x95, 0x99, 0x1b, 0x78, 0x52, 0xb8, 0x55};
 
 static void maskGenerationFunction1(struct cdsBytes seed, struct cdsMutableBytes mask) {
 	struct cdsSHA256 sha256;
 	uint8_t counter[4] = {0, 0, 0, 0};
-	uint blocks = mask.length / 32;
-	for (uint i = 0; i < blocks; i++) {
+	cdsLength blocks = mask.length / 32;
+	for (cdsLength i = 0; i < blocks; i++) {
 		counter[3] = i;
 		cdsInitializeSHA256(&sha256);
 		cdsAddBytesToSHA256(&sha256, seed);
@@ -2470,7 +2493,7 @@ static void maskGenerationFunction1(struct cdsBytes seed, struct cdsMutableBytes
 
 static void pssHash(struct cdsBytes digest, struct cdsBytes salt, uint8_t * h) {
 	uint8_t sequence[8 + 256 + 222];
-	uint sequenceLength = 8 + digest.length + salt.length;
+	cdsLength sequenceLength = 8 + digest.length + salt.length;
 	memset(sequence, 0, 8);
 	memcpy(sequence + 8, digest.data, digest.length);
 	memcpy(sequence + 8 + digest.length, salt.data, salt.length);
@@ -2484,15 +2507,15 @@ static bool verifyPSS(struct cdsBytes digest, struct cdsBytes pss) {
 
 	if (em[emLength - 1] != 0xbc) return false;
 
-	uint dbLength = emLength - hashLength - 1;	// 223
+	uint16_t dbLength = emLength - hashLength - 1;	// 223
 	uint8_t mask[224];	// rounded up to the next multiple of 32
 	maskGenerationFunction1(cdsBytes(em + (emLength - hashLength - 1), hashLength), cdsMutableBytes(mask, 224));
 	uint8_t unmasked[224];
-	for (uint i = 0; i < dbLength; i++) unmasked[i] = em[i] ^ mask[i];
+	for (uint16_t i = 0; i < dbLength; i++) unmasked[i] = em[i] ^ mask[i];
 
 	unmasked[0] &= 0x7f;
 
-	uint n = 0;
+	uint16_t n = 0;
 	while (unmasked[n] == 0 && n < dbLength) n++;
 
 	if (unmasked[n] != 0x01) return false;
@@ -2503,7 +2526,7 @@ static bool verifyPSS(struct cdsBytes digest, struct cdsBytes pss) {
 	uint8_t h[hashLength];
 	pssHash(digest, salt, h);
 
-	for (uint i = 0; i < 32; i++)
+	for (uint16_t i = 0; i < 32; i++)
 		if (h[i] != em[dbLength + i]) return false;
 
 	return true;
@@ -2511,7 +2534,7 @@ static bool verifyPSS(struct cdsBytes digest, struct cdsBytes pss) {
 
 static struct cdsBytes generatePSS(struct cdsBytes digest, uint8_t * em) {
 	assert(digest.length <= 256);
-	uint dbLength = emLength - hashLength - 1;	// 223
+	uint16_t dbLength = emLength - hashLength - 1;	// 223
 
 	uint8_t saltBuffer[32];
 	struct cdsBytes salt = cdsRandomBytes(saltBuffer, 32);
@@ -2522,14 +2545,14 @@ static struct cdsBytes generatePSS(struct cdsBytes digest, uint8_t * em) {
 	uint8_t mask[224];
 	maskGenerationFunction1(cdsBytes(em + dbLength, hashLength), cdsMutableBytes(mask, 224));
 
-	uint n = 0;
+	uint16_t n = 0;
 	for (; n < dbLength - salt.length - 1; n++)
 		em[n] = mask[n];
 
 	em[n] = 0x01 ^ mask[n];
 	n++;
 
-	for (uint i = 0; i < salt.length; i++, n++)
+	for (uint16_t i = 0; i < salt.length; i++, n++)
 		em[n] = salt.data[i] ^ mask[n];
 
 	em[0] &= 0x7f;
@@ -2538,7 +2561,7 @@ static struct cdsBytes generatePSS(struct cdsBytes digest, uint8_t * em) {
 }
 
 static struct cdsBytes encodeOAEP(struct cdsBytes message, uint8_t * em) {
-	uint dbLength = emLength - hashLength - 1;	// 223
+	uint16_t dbLength = emLength - hashLength - 1;	// 223
 	uint8_t db[dbLength];
 	memcpy(db, OAEPZeroLabelHash, 32);
 	memset(db + 32, 0, dbLength - 32 - message.length - 1);
@@ -2550,15 +2573,15 @@ static struct cdsBytes encodeOAEP(struct cdsBytes message, uint8_t * em) {
 
 	uint8_t dbMask[224];
 	maskGenerationFunction1(seed, cdsMutableBytes(dbMask, 224));
-	uint n = hashLength + 1;
-	for (uint i = 0; i < dbLength; i++, n++)
+	uint16_t n = hashLength + 1;
+	for (uint16_t i = 0; i < dbLength; i++, n++)
 		em[n] = db[i] ^ dbMask[i];
 
 	uint8_t seedMask[hashLength];
 	maskGenerationFunction1(cdsBytes(em + hashLength + 1, dbLength), cdsMutableBytes(seedMask, hashLength));
 	em[0] = 0;
 	n = 1;
-	for (uint i = 0; i < hashLength; i++, n++)
+	for (uint16_t i = 0; i < hashLength; i++, n++)
 		em[n] = seed.data[i] ^ seedMask[i];
 
 	return cdsBytes(em, emLength);
@@ -2568,12 +2591,12 @@ static struct cdsBytes decodeOAEP(struct cdsBytes oaep, uint8_t * message) {
 	assert(oaep.length == 256);
 	const uint8_t * em = oaep.data;
 
-	uint dbLength = emLength - hashLength - 1;	// 223
+	uint16_t dbLength = emLength - hashLength - 1;	// 223
 	uint8_t seedMask[hashLength];
 	maskGenerationFunction1(cdsBytes(em + hashLength + 1, dbLength), cdsMutableBytes(seedMask, hashLength));
 	uint8_t seed[hashLength];
-	uint n = 1;
-	for (uint i = 0; i < hashLength; i++, n++)
+	uint16_t n = 1;
+	for (uint16_t i = 0; i < hashLength; i++, n++)
 		seed[i] = em[n] ^ seedMask[i];
 
 	uint8_t dbMask[224];
@@ -2581,7 +2604,7 @@ static struct cdsBytes decodeOAEP(struct cdsBytes oaep, uint8_t * message) {
 
 	bool correct = true;
 
-	uint i = 0;
+	uint16_t i = 0;
 	for (; i < 32; n++, i++) {
 		if (OAEPZeroLabelHash[i] != (em[n] ^ dbMask[i])) correct = false;
 	}
@@ -2592,8 +2615,8 @@ static struct cdsBytes decodeOAEP(struct cdsBytes oaep, uint8_t * message) {
 	n++;
 	i++;
 
-	uint messageLength = emLength - n;
-	for (uint k = 0; n < emLength; n++, i++, k++)
+	uint16_t messageLength = emLength - n;
+	for (uint16_t k = 0; n < emLength; n++, i++, k++)
 		message[k] = em[n] ^ dbMask[i];
 
 	return correct ? cdsBytes(message, messageLength) : cdsEmpty;
@@ -2909,7 +2932,7 @@ void withObjectHashes(const struct cdsObject * this, cdsHashCallback hashCallbac
 #line 22 "Condensation/../../c/Condensation/all.inc.c"
 
 #line 1 "Condensation/../../c/Condensation/Serialization/Record.inc.c"
-struct cdsRecord cdsEmptyRecord = {cdsEmpty, NULL, NULL, NULL};
+struct cdsRecord cdsEmptyRecord = {{NULL, 0}, NULL, NULL, NULL};
 
 struct cdsRecord * cdsChild(struct cdsRecord * this, struct cdsBytes bytes) {
 	struct cdsRecord * child = this->firstChild;
@@ -3458,9 +3481,7 @@ struct cdsBytes cdsSerializePublicKey(struct cdsRSAPublicKey * this, struct cdsM
 
 #line 28 "Condensation/../../c/Condensation/all.inc.c"
 
-#line 5 "Condensation/C.inc.c"
-#include <stdlib.h>
-#include <stdint.h>
+#line 8 "Condensation/C.inc.c"
 
 static struct cdsBytes bytesFromSV(SV * sv) {
 	if (! SvPOK(sv)) return cdsEmpty;
@@ -3672,7 +3693,7 @@ SV * publicKeyEncrypt(SV * svThis, SV * svMessage) {
 
 SV * performanceStart() {
 	struct timespec ts;
-	clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+	clock_gettime(CLOCK_MONOTONIC, &ts);
 	SV * obj = newSVpvn((char *) &ts, sizeof(struct timespec));
 	SvREADONLY_on(obj);
 	return obj;
@@ -3690,7 +3711,7 @@ SV * performanceElapsed(SV * svThis) {
 	if (this == NULL) return &PL_sv_undef;
 
 	struct timespec ts;
-	clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+	clock_gettime(CLOCK_MONOTONIC, &ts);
 	time_t dsec = ts.tv_sec - this->tv_sec;
 	long dnano = ts.tv_nsec - this->tv_nsec;
 

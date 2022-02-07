@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Duadua::Parser;
 
-our $VERSION = '0.25';
+our $VERSION = '0.27';
 
 my @PARSER_PROC_LIST = qw/
     Duadua::Parser::Browser::MicrosoftEdge
@@ -66,6 +66,7 @@ my @PARSER_PROC_LIST = qw/
     Duadua::Parser::Bot::Feedspot
     Duadua::Parser::Bot::OldReader
     Duadua::Parser::Bot::Flipboard
+    Duadua::Parser::Bot::Skype
 
     Duadua::Parser::Browser::Xiaomi
     Duadua::Parser::FeaturePhone::FeaturePhone
@@ -87,15 +88,8 @@ sub new {
     my $ua    = shift;
     my $opt   = shift || {};
 
-    if (!defined $ua) {
-        $ua = '';
-        if (exists $ENV{HTTP_USER_AGENT} && defined $ENV{HTTP_USER_AGENT}) {
-            $ua = $ENV{HTTP_USER_AGENT};
-        }
-    }
-
     bless {
-        _ua          => $ua,
+        _ua          => $class->_get_ua_string($ua),
         _parsed      => 0,
         _result      => {},
         _parsers     => $class->_build_parsers($opt),
@@ -127,14 +121,7 @@ sub ua { shift->{_ua} }
 sub reparse {
     my ($self, $ua) = @_;
 
-    if (!defined $ua) {
-        $ua = '';
-        if (exists $ENV{HTTP_USER_AGENT} && defined $ENV{HTTP_USER_AGENT}) {
-            $ua = $ENV{HTTP_USER_AGENT};
-        }
-    }
-
-    $self->{_ua}     = $ua;
+    $self->{_ua}     = $self->_get_ua_string($ua);
     $self->{_result} = {};
 
     return $self->_parse;
@@ -178,6 +165,20 @@ sub _parse {
     $self->{_parsed} = 1;
 
     return $self;
+}
+
+sub _get_ua_string {
+    my ($self, $ua_raw) = @_;
+
+    if (!defined $ua_raw) {
+        return exists $ENV{HTTP_USER_AGENT} && defined $ENV{HTTP_USER_AGENT} ? $ENV{HTTP_USER_AGENT} : '';
+    }
+
+    if (ref($ua_raw) =~ m!^HTTP::Headers!) {
+        return $ua_raw->header('User-Agent');
+    }
+
+    return $ua_raw;
 }
 
 sub name {
@@ -238,6 +239,21 @@ Or call as a function to parse immediately
     my $d = Duadua->parse($ua);
     $d->is_bot
         and say $d->name; # Googlebot
+
+And it's able to accept an object like L<HTTP::Headers> instead of user-agent string.
+
+    use HTTP::Headers;
+    use Duadua;
+
+    my $headers = HTTP::Headers->new(
+        'User_Agent' => 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
+    );
+
+    my $d = Duadua->new($headers);
+    $d->is_bot
+        and say $d->name; # Googlebot
+
+B<NOTE> that an object class should be HTTP::Headers[::*], and it should have a method `header` to get specific HTTP-Header.
 
 If you would like to parse many times, then you can use C<reparse> method. It's fast.
 
@@ -346,7 +362,7 @@ The list of User Agent Parser
 
 =begin html
 
-<a href="https://github.com/bayashi/Duadua/blob/main/lib/Duadua.pm"><img src="https://img.shields.io/badge/Version-0.25-green?style=flat"></a> <a href="https://github.com/bayashi/Duadua/blob/main/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png?style=flat"></a> <a href="https://github.com/bayashi/Duadua/actions"><img src="https://github.com/bayashi/Duadua/workflows/main/badge.svg?_t=1640378500"/></a> <a href="https://coveralls.io/r/bayashi/Duadua"><img src="https://coveralls.io/repos/bayashi/Duadua/badge.png?_t=1640378500&branch=main"/></a>
+<a href="https://github.com/bayashi/Duadua/blob/main/lib/Duadua.pm"><img src="https://img.shields.io/badge/Version-0.27-green?style=flat"></a> <a href="https://github.com/bayashi/Duadua/blob/main/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png?style=flat"></a> <a href="https://github.com/bayashi/Duadua/actions"><img src="https://github.com/bayashi/Duadua/workflows/main/badge.svg?_t=1644130637"/></a> <a href="https://coveralls.io/r/bayashi/Duadua"><img src="https://coveralls.io/repos/bayashi/Duadua/badge.png?_t=1644130637&branch=main"/></a>
 
 =end html
 

@@ -15,7 +15,7 @@ my %Messages = (
     666 => 'Unknown error.',
 );
 
-while( my ($Code, $Message) = each %Messages ) {
+while ( my ( $Code, $Message ) = each %Messages ) {
     try {
         Podman::Exception->new( Code => $Code )->throw();
     }

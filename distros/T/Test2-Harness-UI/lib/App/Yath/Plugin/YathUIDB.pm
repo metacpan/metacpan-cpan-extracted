@@ -173,6 +173,13 @@ option_group {prefix => 'yathui-db', category => "YathUI Options"} => sub {
 sub get_coverage_searches {
     my ($plugin, $settings, $changes) = @_;
 
+    my ($changes_exclude_loads, $changes_exclude_opens);
+    if ($settings->check_prefix('finder')) {
+        my $finder = $settings->finder;
+        $changes_exclude_loads = $finder->changes_exclude_loads;
+        $changes_exclude_opens = $finder->changes_exclude_opens;
+    }
+
     my @searches;
     for my $source_file (keys %$changes) {
         my $changed_sub_map = $changes->{$source_file};
@@ -181,7 +188,12 @@ sub get_coverage_searches {
         my $search = {'source_file.filename' => $source_file};
         unless ($changed_sub_map->{'*'} || !@changed_subs) {
             my %seen;
-            $search->{'source_sub.subname'} = {'IN' => [grep { !$seen{$_}++} '*', '<>', @changed_subs]};
+
+            my @inject;
+            push @inject => '*'  unless $changes_exclude_loads;
+            push @inject => '<>' unless $changes_exclude_opens;
+
+            $search->{'source_sub.subname'} = {'IN' => [grep { !$seen{$_}++} @inject, @changed_subs]};
         }
 
         push @searches => $search;
@@ -250,11 +262,11 @@ sub get_coverage_tests {
 
     my $tests = $plugin->test_map_from_coverage_rows($coverages);
 
-    return $plugin->search_entries_from_test_map($tests, $changes);
+    return $plugin->search_entries_from_test_map($tests, $changes, $settings);
 }
 
 sub search_entries_from_test_map {
-    my ($plugin, $tests, $changes) = @_;
+    my ($plugin, $tests, $changes, $settings) = @_;
 
     my @out;
     for my $test (keys %$tests) {
@@ -266,7 +278,7 @@ sub search_entries_from_test_map {
             next;
         }
 
-        unless (eval { push @out => [ $test, $manager->test_parameters($test, $meta, $changes) ]; 1 }) {
+        unless (eval { push @out => [ $test, $manager->test_parameters($test, $meta, $changes, undef, $settings) ]; 1 }) {
             warn "Error processing coverage data for '$test' using manager '$manager'. Running entire test to be safe.\nError:\n====\n$@\n====\n";
             push @out => $test;
         }

@@ -1,0 +1,53 @@
+NAME
+
+    Object::Pad::FieldAttr::Trigger - invoke an instance method after a
+    :writer accessor
+
+SYNOPSIS
+
+       use Object::Pad;
+       use Object::Pad::FieldAttr::Trigger;
+    
+       class Label {
+          has $title :param :reader :writer :Trigger(redraw);
+    
+          method redraw {
+             ...
+          }
+       }
+    
+       my $label = Label->new( text => "Something" );
+    
+       $label->set_label( "New text here" );
+       # $label->redraw is automatically invoked
+
+DESCRIPTION
+
+    This module provides a third-party field attribute for
+    Object::Pad-based classes, which declares that a named instance method
+    shall be invoked after a generated :writer accessor method is called.
+
+    WARNING The ability for Object::Pad to take third-party field
+    attributes is still new and highly experimental, and subject to much
+    API change in future. As a result, this module should be considered
+    equally experimental.
+
+FIELD ATTRIBUTES
+
+ :Trigger
+
+       has $field :writer :Trigger(NAME) ...;
+
+    Declares that the accessor method generated for the field by the
+    :writer attribute will invoke the method named by the :Trigger
+    attribute, after the new value has been stored into the field itself.
+    This method is invoked with no additional arguments, in void context.
+
+    Note that this only applies to the generated accessor method. It does
+    not apply to direct modifications of the field variable by method code
+    within the class itself.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

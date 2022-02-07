@@ -1,10 +1,9 @@
-
 #!/usr/bin/env perl -w
 
 use strict;
 use warnings;
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 use FindBin qw/$Bin/;
 use lib "$Bin/../lib";
@@ -14,7 +13,7 @@ use Math::Trig qw/deg2rad/;
 use Astro::Montenbruck::MathUtils qw/dms ddd frac/;
 use Astro::Montenbruck::Ephemeris::Planet qw/:ids/;
 use Astro::Montenbruck::RiseSet;
-use Data::Dumper;
+
 BEGIN {
     use_ok( 'Astro::Montenbruck::RiseSet::Constants', qw/:events :states :altitudes/ );
     use_ok( 'Astro::Montenbruck::RiseSet::Sunset', qw/riseset_func/ );
@@ -183,7 +182,6 @@ subtest 'Moon rise on 1989-03-28' => sub {
             else {
                 delta_ok($jd, 2447613.79840355);
             }
-            diag "$evt UT: $ut";
         },
         on_noevent => sub { fail("Event expected") }
     );    

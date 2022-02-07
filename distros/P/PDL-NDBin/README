@@ -1,9 +1,9 @@
 This archive contains the distribution PDL-NDBin,
-version 0.021:
+version 0.024:
 
   Multidimensional binning & histogramming
 
-This software is copyright (c) 2021 by Edward Baudrez.
+This software is copyright (c) 2022 by Edward Baudrez.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

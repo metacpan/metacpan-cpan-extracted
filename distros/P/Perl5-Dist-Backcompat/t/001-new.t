@@ -2,13 +2,13 @@
 # t/001-new.t
 use strict;
 use warnings;
-
-use Test::More tests => 10;
+use File::Spec;
+use Test::More tests => 12;
 
 BEGIN { use_ok( 'Perl5::Dist::Backcompat' ); }
 
 SKIP: {
-    skip "author testing only", 9 unless $ENV{PERL_AUTHOR_TESTING};
+    skip "author testing only", 11 unless $ENV{PERL_AUTHOR_TESTING};
 
     my $self = Perl5::Dist::Backcompat->new( { perl_workdir => '/path/to/checkout' } );
     isa_ok($self, 'Perl5::Dist::Backcompat');
@@ -49,6 +49,12 @@ SKIP: {
     } );
     is($self->{host}, 'dromedary.p5h.org', "Got default value for 'host'");
     is($self->{path_to_perls}, '/media/Tux/perls-t/bin', "Got default value for 'path_to_perls'");
+    is($self->{older_perls_file},
+        File::Spec->catfile('.', 'etc', 'dist-backcompat-older-perls.txt'),
+        "Got default value for 'older_perls_file'");
+    is($self->{distro_metadata_file},
+        File::Spec->catfile('.', 'etc', 'dist-backcompat-distro-metadata.txt'),
+        "Got default value for 'distro_metadata_file'");
     ok($self->{verbose}, 'Selection for verbosity verified');
 
     {

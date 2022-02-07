@@ -1,3 +1,4 @@
+requires 'perl'             => '5.022001';
 requires 'File::Share';
 requires 'Moo';
 requires 'YAML::XS';

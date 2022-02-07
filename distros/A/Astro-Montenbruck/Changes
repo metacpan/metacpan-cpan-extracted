@@ -34,3 +34,11 @@ Revision history for AstroScript
 2021-03-08 - Bug fix in Rise/Set routines. On rare occasions hourly iteration could
              cross midnight and set time was missed. Documentation texts corrected, 
              thanks to Tom Browdy.  
+2021-05-08 - Sidereal time: result reduced to proper range
+2022-01-31 - Fixed a serious bug in lunar phases calculations. The module was totally 
+             rewritten. Now it uses a simpler but more reliable algorithm from 
+             "Astronomy with Your PC" by Peter Duffett-Smith.
+2022-02-05 - New function for calculating lunar phase in Lunar module. Example script
+             "moon_almanac.pl". List of lunar phases constants extended with 
+             intermediate phases, like "Waxing Gibbous" and "Wanning Crescent".
+

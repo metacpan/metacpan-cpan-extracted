@@ -20,11 +20,11 @@ no warnings "experimental::signatures";
 
 =head1 VERSION
 
-Version v1.4.2
+Version v1.4.3
 
 =cut
 
-our $VERSION = "v1.4.2";
+our $VERSION = "v1.4.3";
 
 =head1 SYNOPSIS
 
@@ -38,11 +38,11 @@ our $VERSION = "v1.4.2";
 
     $ boxer install
     [...]
-    Done: Installed "Debian GNU/Linux 10 (buster)" to /media/boxer
+    Done: Installed "Debian GNU/Linux 11 (bullseye)" to /media/boxer
 
     $ boxer install --arch armhf --classes swedish kde webdesign
     [...]
-    Done: Installed "Debian GNU/Linux 10 (buster)" to /media/boxer
+    Done: Installed "Debian GNU/Linux 11 (bullseye)" to /media/boxer
 
     $ boxer detect
     Analyzing current system...

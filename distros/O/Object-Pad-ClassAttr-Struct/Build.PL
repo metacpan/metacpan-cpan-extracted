@@ -17,7 +17,7 @@ if( $Config{ccname} eq "gcc" ) {
 my $build = Module::Build->new(
    module_name => 'Object::Pad::ClassAttr::Struct',
    requires => {
-      'Object::Pad' => '0.57',
+      'Object::Pad' => '0.60',
    },
    test_requires => {
       'Test::More' => '0.88', # done_testing

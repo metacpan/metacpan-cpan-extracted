@@ -22,7 +22,7 @@ Rmpfr_randseed_ui($state3, 12345678909);
 my $ok = '';
 
 
-if((MPFR_VERSION_MAJOR == 3 && MPFR_VERSION_MINOR >= 1) || MPFR_VERSION_MAJOR > 3) {
+if(MPFR_VERSION_MAJOR == 3 && MPFR_VERSION_MINOR >= 1) {
   Rmpfr_grandom($rop1, $rop2, $state1, GMP_RNDN);
   if($rop1 && $rop2 && $rop1 != $rop2
      && !Rmpfr_nan_p($rop1) && !Rmpfr_nan_p($rop2)) {$ok .= 'a'}
@@ -55,9 +55,18 @@ if((MPFR_VERSION_MAJOR == 3 && MPFR_VERSION_MINOR >= 1) || MPFR_VERSION_MAJOR > 
 }
 else {
   eval{Rmpfr_grandom($rop1, $rop2, $state1, GMP_RNDN);};
-  if($@ =~ /Rmpfr_grandom not implemented/) {print "ok 1\n"}
+  if(MPFR_VERSION_MAJOR > 3) {
+    if($@ =~ /Rmpfr_grandom is deprecated/) {print "ok 1\n"}
+    else {
+      warn "\$\@: $@";
+      print "not ok 1\n";
+    }
+  }
   else {
-    warn "\$\@: $@";
-    print "not ok 1\n";
+    if($@ =~ /Rmpfr_grandom was not introduced/) {print "ok 1\n"}
+    else {
+      warn "\$\@: $@";
+      print "not ok 1\n";
+    }
   }
 }

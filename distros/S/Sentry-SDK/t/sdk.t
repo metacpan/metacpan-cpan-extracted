@@ -1,7 +1,11 @@
 use Mojo::Base -strict, -signatures;
 
-use Mojo::File 'curfile';
-use lib curfile->sibling('lib')->to_string;
+use Mojo::File;
+# curfile missing in Mojolicious@^8. The dependency shall not be updated for
+# the time being. For this reason `curfile` is duplicated for now.
+# use lib curfile->sibling('lib')->to_string;
+# See https://github.com/mojolicious/mojo/blob/4093223cae00eb516e38f2226749d2963597cca3/lib/Mojo/File.pm#L36
+use lib Mojo::File->new(Cwd::realpath((caller)[1]))->sibling('lib')->to_string;
 
 use Mock::Sentry::Client;
 use Mojo::Exception;

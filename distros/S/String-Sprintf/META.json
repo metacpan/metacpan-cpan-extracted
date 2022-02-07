@@ -4,7 +4,7 @@
       "Bart Lateur (bart.lateur@pandora.be)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -21,29 +21,52 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Spec::Functions" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "Test::Simple" : "0.44"
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "X_authors" : [
+         {
+            "email" : "bart.lateur@pandora.be",
+            "name" : "Bart Lateur"
+         },
+         {
+            "email" : "bdfoy@cpan.org",
+            "github" : "https://github.com/briandfoy",
+            "linkedin" : "https://www.linkedin.com/in/briandfoy/",
+            "name" : "brian d foy",
+            "orc_id" : "0000-0002-0283-8283",
+            "twitter" : "https://twitter.com/briandfoy_perl"
+         }
+      ],
+      "X_doi" : "10.5281/zenodo.5912465",
+      "bugtracker" : {
+         "web" : "https://github.com/briandfoy/string-sprintf/issues"
+      },
+      "homepage" : "https://github.com/briandfoy/string-sprintf",
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/briandfoy/string-sprintf.git",
          "web" : "https://github.com/briandfoy/string-sprintf"
       }
    },
-   "version" : "1.001",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "1.002",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

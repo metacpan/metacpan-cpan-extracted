@@ -32,9 +32,9 @@ use overload
     'atan2' => \&_overload_atan2,
 ;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
-DynaLoader::bootstrap Math::Complex_C::Q $VERSION;
+Math::Complex_C::Q->DynaLoader::bootstrap($VERSION);
 
 @Math::Complex_C::Q::EXPORT = ();
 @Math::Complex_C::Q::EXPORT_OK = qw(
@@ -480,15 +480,23 @@ Math::Complex_C::Q - perl interface to C's __complex128 (quadmath) operations.
     *=, +=, /=, -=, **=,
     !, bool,
     ==, !=,
-    =, "",
-    abs, exp, log, cos, sin, atan2, sqrt
+    "",
+    abs, exp, log, cos, sin, atan2, sqrt,
+    =
+
+    NOTE: Making use of the '=' overloading is not recommended unless
+          you understand its caveats. See 'perldoc overload' and
+          read it thoroughly, including the documentation regarding
+          'copy constructors'.
 
     Note: abs() returns an NV, not a Math::Complex_C::Q object. If your NV-type
-    is not __float128 then you should probably call abs_cq2F() or abs_cq2str()
-    instead. Check the documentation (above) of those two alternatives.
+          is not __float128 then you should probably call abs_cq2F() or
+          abs_cq2str() instead. Check the documentation (above) of those two
+          alternatives.
 
     Note: With mingw-w64 compilers exp, log, sin, cos, ** and **= overloading
-    is not provided because calling the underlying C functions crashes perl.
+          is not provided because calling the underlying C functions crashes
+          perl.  (TODO: This may no longer be the case.)
 
     Overloaded arithmetic operations are provided the following types:
      IV, UV, NV, PV, Math::Complex_C::Q object.
@@ -525,7 +533,7 @@ Math::Complex_C::Q - perl interface to C's __complex128 (quadmath) operations.
 
    This module is free software; you may redistribute it and/or
    modify it under the same terms as Perl itself.
-   Copyright 2014-16, Sisyphus.
+   Copyright 2014-17, Sisyphus.
 
 =head1 AUTHOR
 

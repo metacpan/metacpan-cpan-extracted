@@ -21,5 +21,5 @@ requires:
   Data::Printer: '0'
   Lang::HL::Export: '0'
   Regexp::Grammars: '0'
-version: '2.111'
+version: '5.001'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

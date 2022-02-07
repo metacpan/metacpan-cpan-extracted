@@ -10,7 +10,7 @@
 # ABSTRACT: List applications handled by cme
 
 package App::Cme::Command::list ;
-$App::Cme::Command::list::VERSION = '1.036';
+$App::Cme::Command::list::VERSION = '1.037';
 use strict;
 use warnings;
 use 5.10.1;
@@ -67,7 +67,7 @@ App::Cme::Command::list - List applications handled by cme
 
 =head1 VERSION
 
-version 1.036
+version 1.037
 
 =head1 SYNOPSIS
 

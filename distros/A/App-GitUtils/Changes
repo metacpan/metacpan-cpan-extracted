@@ -1,3 +1,15 @@
+0.083   2021-08-14  Released-By: PERLANCAR; Urgency: medium
+
+	- Add script: this-repo.
+
+
+0.082   2021-08-14  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention App::GitHubUtils.
+
+
 0.081   2021-07-14  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfix] Fix bug in searching .git dir.

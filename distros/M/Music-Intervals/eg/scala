@@ -8,18 +8,21 @@ use Data::Dumper::Compact qw(ddc);
 use Music::Scala ();
 use Music::Intervals::Numeric;
 
-my $file = shift || "$ENV{HOME}/Music/scl/werck1.scl";
-
-my $m = Music::Intervals::Numeric->new;
+my $file = shift || 'eg/werck1.scl';
+die "File: $file does not exist\n" unless -e $file;
 
 my $scala = Music::Scala->new(file => $file);
-
 print $scala->get_description, "\n";
+
+my $m = Music::Intervals::Numeric->new(notes => [$scala->get_notes]);
 
 my $i = 0;
 
-for my $interval ($scala->get_notes) {
+for my $note ($scala->get_notes) {
     $i++;
-    my $name = $m->ratios->{$interval} || '?';
-    print "\t$i. $interval: $name\n";
+    my $approx = eval $note;
+    my $name = $m->ratios->{$note} || '?';
+    printf "\t%d. %s (%.4f) %s\n", $i, $note, $approx, $name;
 }
+
+print 'Intervals: ', ddc $m->intervals, { max_width => 256 };

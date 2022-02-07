@@ -8,9 +8,9 @@ use Moose;
 use namespace::autoclean;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-06'; # DATE
+our $DATE = '2022-01-22'; # DATE
 our $DIST = 'Dist-Zilla-Plugin-Perinci-CmdLine'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 with (
     'Dist::Zilla::Role::BeforeBuild',
@@ -148,7 +148,7 @@ Dist::Zilla::Plugin::Perinci::CmdLine - Plugin to use when building Perinci::Cmd
 
 =head1 VERSION
 
-This document describes version 0.001 of Dist::Zilla::Plugin::Perinci::CmdLine (from Perl distribution Dist-Zilla-Plugin-Perinci-CmdLine), released on 2021-10-06.
+This document describes version 0.002 of Dist::Zilla::Plugin::Perinci::CmdLine (from Perl distribution Dist-Zilla-Plugin-Perinci-CmdLine), released on 2022-01-22.
 
 =head1 SYNOPSIS
 
@@ -185,6 +185,9 @@ L<Perinci::CmdLine>
 
 L<Pod::Weaver::Plugin::Perinci::CmdLine>
 
+L<Dist::Zilla::Plugin::GenPericmdScript>, if you want to generate a
+Perinci::CmdLine-based CLI script in your distribution.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
@@ -208,7 +211,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

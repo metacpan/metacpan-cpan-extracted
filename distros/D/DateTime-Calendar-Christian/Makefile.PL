@@ -56,7 +56,7 @@ if ( $mmv >= 6.4501 ) {
 }
 
 $mmv >= 6.4701
-    and $args{MIN_PERL_VERSION} = 5.006002;
+    and $args{MIN_PERL_VERSION} = 5.008004;
 
 $mmv >= 6.5702
     or $args{AUTHOR} = join ', ', @{ $args{AUTHOR} };

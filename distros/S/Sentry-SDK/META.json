@@ -59,6 +59,7 @@
          "requires" : {
             "LWP::UserAgent" : "0",
             "Perl::Critic" : "0",
+            "Test::Exception" : "0",
             "Test::Pod" : "0",
             "Test::Pod::Coverage" : "0",
             "Test::Snapshot" : "0",
@@ -78,7 +79,7 @@
          "web" : "https://github.com/heiseonline/perl-sentry-sdk"
       }
    },
-   "version" : "v1.0.13",
+   "version" : "v1.0.15",
    "x_contributors" : [
       "bsd <bsd@heise.de>",
       "pmb0 <2140915+pmb0@users.noreply.github.com>",

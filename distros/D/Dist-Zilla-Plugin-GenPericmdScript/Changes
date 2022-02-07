@@ -1,3 +1,10 @@
+0.424   2022-01-22  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Tweak See Also section.
+
+
 0.423   2020-07-31  Released-By: PERLANCAR; Urgency: medium
 
 	- Add configurations: copt_naked_res_{default,enable,getopt}.

@@ -1,5 +1,10 @@
 Revision history for Tickit-Widget-Menu
 
+0.15    2022-02-07
+        [CHANGES]
+         * Updated for perl 5.35.9:
+            + Avoid use of @_ in signatured methods
+
 0.14    2021-11-20
         [CHANGES]
          * Updates for Object::Pad 0.57

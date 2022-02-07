@@ -17,7 +17,7 @@ my $Connection =
 my $Service = Mock::Podman::Service->new( Listen => $Connection );
 $Service->Start();
 
-my $Client     = Podman::Client->new( Connection => $Connection );
+my $Client     = Podman::Client->new( ConnectionURI => $Connection );
 my $Containers = Podman::Containers->new( Client => $Client );
 ok( $Containers, 'Containers ok.' );
 

@@ -39,9 +39,8 @@
             "File::Spec::Functions" : "0",
             "File::Temp" : "0",
             "HTTP::Date" : "0",
+            "HTTP::Tinyish" : "0",
             "JSON::PP" : "0",
-            "LWP" : "0",
-            "LWP::Protocol::https" : "0",
             "Term::ANSIColor" : "0",
             "URI" : "0",
             "perl" : "5.012"
@@ -56,6 +55,6 @@
          "web" : "https://github.com/kiamazi/kateb"
       }
    },
-   "version" : "v01.00.28",
+   "version" : "v01.00.29",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

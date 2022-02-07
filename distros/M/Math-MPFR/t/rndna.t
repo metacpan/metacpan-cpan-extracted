@@ -1596,7 +1596,12 @@ else {
   print "not ok 119\n";
 }
 
-$inex = rndna(\&Rmpfr_root, $prop, Math::MPFR->new(2025), 2);
+if(MPFR_VERSION_MAJOR > 3) {
+  $inex = rndna(\&Rmpfr_rootn_ui, $prop, Math::MPFR->new(2025), 2);
+}
+else {
+  $inex = rndna(\&Rmpfr_root, $prop, Math::MPFR->new(2025), 2);
+}
 
 if($inex > 0 && $prop == 46) {print "ok 120\n"}
 else {

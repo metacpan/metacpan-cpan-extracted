@@ -1,6 +1,7 @@
 Changes
 Makefile.PL
 MANIFEST
+math_complex_c_l_include.h
 README
 try.in
 try2.in
@@ -17,6 +18,7 @@ t/new.t
 t/new_LD.t
 t/nnum.t
 t/overload_string.t
+t/overload_switch.t
 t/overload_xtra.t
 t/pow.t
 t/prec.t

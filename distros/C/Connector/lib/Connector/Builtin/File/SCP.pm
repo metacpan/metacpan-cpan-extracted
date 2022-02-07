@@ -279,7 +279,7 @@ sub _sanitize_path {
         return $host;
     }
 
-    if (!$self->path() && !$self->file())        
+    if (!$self->path() && !$self->file()) {
         $self->log()->error('Neither target pattern nor noargs set');
         die "You must set either file or path or use the noargs option.";
     }

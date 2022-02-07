@@ -3,6 +3,7 @@ Makefile.PL
 LongDouble.pm
 LongDouble.pod
 LongDouble.xs
+math_longdouble_include.h
 README
 Changes
 try.in
@@ -34,6 +35,7 @@ t/signbit.t
 t/stringification.t
 t/trig.t
 t/overload_cmp_reversal.t
+t/overload_switch.t
 typemap
 
 

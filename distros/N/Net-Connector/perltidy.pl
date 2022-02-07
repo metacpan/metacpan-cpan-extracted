@@ -3,8 +3,8 @@ use strict;
 use warnings;
 
 # define vars
-my $parentDir = '/home/careline/Codes/Net-Connector';
-my $partInfo  = '.+\.pm$|.+\.pl$|.+\.t$';            #正则表达
+my $parentDir = '/home/careline/Codes/perl/Net-Connector';
+my $partInfo  = '.+\.pm$|.+\.pl$|.+\.t$';                    #正则表达
 
 # define function
 sub search_file {
@@ -12,7 +12,7 @@ sub search_file {
 
   #print $partInfo, "\n";
   opendir my $dh, $dir or die "Cannot open dir $dir\n";
-  my @files = readdir $dh; #标量上下文和列表上下文
+  my @files = readdir $dh;    #标量上下文和列表上下文
   foreach my $file (@files) {
     my $filePath = "$dir/$file";
     if (
@@ -28,7 +28,7 @@ sub search_file {
     if (  ( -d $filePath )
       and ( $file ne '.' )
       and ( $file !~ '.vs' )
-      and ( $file ne '..' ) ) #-d判断是否是目录
+      and ( $file ne '..' ) )    #-d判断是否是目录
     {
       &search_file( $filePath, $partInfo );
     }

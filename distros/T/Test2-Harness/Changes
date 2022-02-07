@@ -1,3 +1,23 @@
+1.000104  2022-02-04 11:00:29-08:00 America/Los_Angeles
+
+    - Add settings ot paremeter list for coverage managers
+
+1.000103  2022-02-04 10:20:32-08:00 America/Los_Angeles
+
+    - Add options to for whitespace and non-subs in change data
+        --changes-include-whitespace - Include whitespace lines for change data
+        --changes-exclude-nonsub     - Do not include non-sub changes in perl files
+        --changes-exclude-opens      - Do not include tests that only open() changed files
+        --changes-exclude-loads      - Do not include tests that only load changed files without running subs
+
+1.000102  2022-02-03 15:28:54-08:00 America/Los_Angeles
+
+    - Remove warning that can trigger in valid (not warn-worthy) cases.
+
+1.000101  2022-02-02 13:26:35-08:00 America/Los_Angeles
+
+    - Fix 'replay' output of subtests
+
 1.000100  2022-02-01 09:49:52-08:00 America/Los_Angeles
 
     - Mark reload_syntax_error.t as AUTHOR_TESTING only (#243)

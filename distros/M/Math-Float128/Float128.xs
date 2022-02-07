@@ -581,13 +581,13 @@ SV * _overload_sub(pTHX_ SV * a, SV * b, SV * third) {
      SvREADONLY_on(obj);
 
     if(SvUOK(b)) {
-       if(third == &PL_sv_yes) *ld = (float128)SvUVX(b) - *(INT2PTR(float128 *, SvIVX(SvRV(a))));
+       if(SWITCH_ARGS) *ld = (float128)SvUVX(b) - *(INT2PTR(float128 *, SvIVX(SvRV(a))));
        else *ld = *(INT2PTR(float128 *, SvIVX(SvRV(a)))) - (float128)SvUVX(b);
        return obj_ref;
     }
 
     if(SvIOK(b)) {
-       if(third == &PL_sv_yes) *ld = (float128)SvIVX(b) - *(INT2PTR(float128 *, SvIVX(SvRV(a))));
+       if(SWITCH_ARGS) *ld = (float128)SvIVX(b) - *(INT2PTR(float128 *, SvIVX(SvRV(a))));
        else *ld = *(INT2PTR(float128 *, SvIVX(SvRV(a)))) - (float128)SvIVX(b);
        return obj_ref;
     }
@@ -604,17 +604,17 @@ SV * _overload_sub(pTHX_ SV * a, SV * b, SV * third) {
        if(inf_or_nan) {
          if(inf_or_nan == 2) *ld = _get_nan();
          else {
-           if(third == &PL_sv_yes) *ld = _get_inf(inf_or_nan) - *(INT2PTR(float128 *, SvIVX(SvRV(a))));
+           if(SWITCH_ARGS) *ld = _get_inf(inf_or_nan) - *(INT2PTR(float128 *, SvIVX(SvRV(a))));
            else *ld = *(INT2PTR(float128 *, SvIVX(SvRV(a)))) - _get_inf(inf_or_nan);
          }
        }
        else {
-         if(third == &PL_sv_yes) *ld = strtoflt128(SvPV_nolen(b), &p) - *(INT2PTR(float128 *, SvIVX(SvRV(a))));
+         if(SWITCH_ARGS) *ld = strtoflt128(SvPV_nolen(b), &p) - *(INT2PTR(float128 *, SvIVX(SvRV(a))));
          else *ld = *(INT2PTR(float128 *, SvIVX(SvRV(a)))) - strtoflt128(SvPV_nolen(b), &p);
          _nnum_inc(p);
        }
 #else
-       if(third == &PL_sv_yes) *ld = strtoflt128(SvPV_nolen(b), &p) - *(INT2PTR(float128 *, SvIVX(SvRV(a))));
+       if(SWITCH_ARGS) *ld = strtoflt128(SvPV_nolen(b), &p) - *(INT2PTR(float128 *, SvIVX(SvRV(a))));
        else *ld = *(INT2PTR(float128 *, SvIVX(SvRV(a)))) - strtoflt128(SvPV_nolen(b), &p);
        _nnum_inc(p);
 #endif
@@ -624,12 +624,12 @@ SV * _overload_sub(pTHX_ SV * a, SV * b, SV * third) {
     if(SvNOK(b)) {
 #if defined(AVOID_INF_CAST)
        if(SvNVX(b) != 0.0L && SvNVX(b) == SvNVX(b) && SvNVX(b) / SvNVX(b) != SvNVX(b) / SvNVX(b)) {
-         if(third == &PL_sv_yes) *ld = _get_inf(SvNVX(b) > 0 ? 1 : -1) - *(INT2PTR(float128 *, SvIVX(SvRV(a))));
+         if(SWITCH_ARGS) *ld = _get_inf(SvNVX(b) > 0 ? 1 : -1) - *(INT2PTR(float128 *, SvIVX(SvRV(a))));
          else *ld = *(INT2PTR(float128 *, SvIVX(SvRV(a)))) - _get_inf(SvNVX(b) > 0 ? 1 : -1);
          return obj_ref;
        }
 #endif
-       if(third == &PL_sv_yes) *ld = (float128)SvNVX(b) - *(INT2PTR(float128 *, SvIVX(SvRV(a))));
+       if(SWITCH_ARGS) *ld = (float128)SvNVX(b) - *(INT2PTR(float128 *, SvIVX(SvRV(a))));
        else *ld = *(INT2PTR(float128 *, SvIVX(SvRV(a)))) - (float128)SvNVX(b);
        return obj_ref;
     }
@@ -645,7 +645,7 @@ SV * _overload_sub(pTHX_ SV * a, SV * b, SV * third) {
 
     /*
     else {
-      if(third == &PL_sv_yes) {
+      if(SWITCH_ARGS) {
         *ld = *(INT2PTR(float128 *, SvIVX(SvRV(a)))) * -1.0L;
         return obj_ref;
       }
@@ -670,13 +670,13 @@ SV * _overload_div(pTHX_ SV * a, SV * b, SV * third) {
      SvREADONLY_on(obj);
 
     if(SvUOK(b)) {
-       if(third == &PL_sv_yes) *ld = (float128)SvUVX(b) / *(INT2PTR(float128 *, SvIVX(SvRV(a))));
+       if(SWITCH_ARGS) *ld = (float128)SvUVX(b) / *(INT2PTR(float128 *, SvIVX(SvRV(a))));
        else *ld = *(INT2PTR(float128 *, SvIVX(SvRV(a)))) / (float128)SvUVX(b);
        return obj_ref;
     }
 
     if(SvIOK(b)) {
-       if(third == &PL_sv_yes) *ld = (float128)SvIVX(b) / *(INT2PTR(float128 *, SvIVX(SvRV(a))));
+       if(SWITCH_ARGS) *ld = (float128)SvIVX(b) / *(INT2PTR(float128 *, SvIVX(SvRV(a))));
        else *ld = *(INT2PTR(float128 *, SvIVX(SvRV(a)))) / (float128)SvIVX(b);
        return obj_ref;
     }
@@ -693,17 +693,17 @@ SV * _overload_div(pTHX_ SV * a, SV * b, SV * third) {
        if(inf_or_nan) {
          if(inf_or_nan == 2) *ld = _get_nan();
          else {
-           if(third == &PL_sv_yes) *ld = _get_inf(inf_or_nan) / *(INT2PTR(float128 *, SvIVX(SvRV(a))));
+           if(SWITCH_ARGS) *ld = _get_inf(inf_or_nan) / *(INT2PTR(float128 *, SvIVX(SvRV(a))));
            else *ld = *(INT2PTR(float128 *, SvIVX(SvRV(a)))) / _get_inf(inf_or_nan);
          }
        }
        else {
-         if(third == &PL_sv_yes) *ld = strtoflt128(SvPV_nolen(b), &p) / *(INT2PTR(float128 *, SvIVX(SvRV(a))));
+         if(SWITCH_ARGS) *ld = strtoflt128(SvPV_nolen(b), &p) / *(INT2PTR(float128 *, SvIVX(SvRV(a))));
          else *ld = *(INT2PTR(float128 *, SvIVX(SvRV(a)))) / strtoflt128(SvPV_nolen(b), &p);
          _nnum_inc(p);
        }
 #else
-       if(third == &PL_sv_yes) *ld = strtoflt128(SvPV_nolen(b), &p) / *(INT2PTR(float128 *, SvIVX(SvRV(a))));
+       if(SWITCH_ARGS) *ld = strtoflt128(SvPV_nolen(b), &p) / *(INT2PTR(float128 *, SvIVX(SvRV(a))));
        else *ld = *(INT2PTR(float128 *, SvIVX(SvRV(a)))) / strtoflt128(SvPV_nolen(b), &p);
        _nnum_inc(p);
 #endif
@@ -713,12 +713,12 @@ SV * _overload_div(pTHX_ SV * a, SV * b, SV * third) {
     if(SvNOK(b)) {
 #if defined(AVOID_INF_CAST)
        if(SvNVX(b) != 0.0L && SvNVX(b) == SvNVX(b) && SvNVX(b) / SvNVX(b) != SvNVX(b) / SvNVX(b)) {
-         if(third == &PL_sv_yes) *ld = _get_inf(SvNVX(b) > 0 ? 1 : -1) / *(INT2PTR(float128 *, SvIVX(SvRV(a))));
+         if(SWITCH_ARGS) *ld = _get_inf(SvNVX(b) > 0 ? 1 : -1) / *(INT2PTR(float128 *, SvIVX(SvRV(a))));
          else *ld = *(INT2PTR(float128 *, SvIVX(SvRV(a)))) / _get_inf(SvNVX(b) > 0 ? 1 : -1);
          return obj_ref;
        }
 #endif
-       if(third == &PL_sv_yes) *ld = (float128)SvNVX(b) / *(INT2PTR(float128 *, SvIVX(SvRV(a))));
+       if(SWITCH_ARGS) *ld = (float128)SvNVX(b) / *(INT2PTR(float128 *, SvIVX(SvRV(a))));
        else *ld = *(INT2PTR(float128 *, SvIVX(SvRV(a)))) / (float128)SvNVX(b);
        return obj_ref;
     }
@@ -1166,7 +1166,7 @@ SV * _overload_div_eq(pTHX_ SV * a, SV * b, SV * third) {
 SV * _overload_lt(pTHX_ SV * a, SV * b, SV * third) {
 
     if(SvUOK(b)) {
-      if(third == &PL_sv_yes) {
+      if(SWITCH_ARGS) {
         if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) > (float128)SvUVX(b)) return newSViv(1);
         return newSViv(0);
       }
@@ -1175,7 +1175,7 @@ SV * _overload_lt(pTHX_ SV * a, SV * b, SV * third) {
     }
 
     if(SvIOK(b)) {
-      if(third == &PL_sv_yes) {
+      if(SWITCH_ARGS) {
         if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) > (float128)SvIVX(b)) return newSViv(1);
         return newSViv(0);
       }
@@ -1194,14 +1194,14 @@ SV * _overload_lt(pTHX_ SV * a, SV * b, SV * third) {
 #ifdef _WIN32_BIZARRE_INFNAN
       if(inf_or_nan) {
         if(inf_or_nan == 2) return newSViv(0);
-        if(third == &PL_sv_yes) {
+        if(SWITCH_ARGS) {
           if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) > _get_inf(inf_or_nan)) return newSViv(1);
           return newSViv(0);
         }
         if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) < _get_inf(inf_or_nan)) return newSViv(1);
         return newSViv(0);
       }
-      if(third == &PL_sv_yes) {
+      if(SWITCH_ARGS) {
         if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) > strtoflt128(SvPV_nolen(b), &p)) {
           _nnum_inc(p);
           return newSViv(1);
@@ -1218,7 +1218,7 @@ SV * _overload_lt(pTHX_ SV * a, SV * b, SV * third) {
       return newSViv(0);
 #else
 
-      if(third == &PL_sv_yes) {
+      if(SWITCH_ARGS) {
         if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) > strtoflt128(SvPV_nolen(b), &p)) {
           _nnum_inc(p);
           return newSViv(1);
@@ -1239,7 +1239,7 @@ SV * _overload_lt(pTHX_ SV * a, SV * b, SV * third) {
     if(SvNOK(b)) {
 #if defined(AVOID_INF_CAST)
        if(SvNVX(b) != 0.0L && SvNVX(b) == SvNVX(b) && SvNVX(b) / SvNVX(b) != SvNVX(b) / SvNVX(b)) {
-         if(third == &PL_sv_yes) {
+         if(SWITCH_ARGS) {
            if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) > _get_inf(SvNVX(b) > 0 ? 1 : -1))
              return newSViv(1);
            return newSViv(0);
@@ -1249,7 +1249,7 @@ SV * _overload_lt(pTHX_ SV * a, SV * b, SV * third) {
          return newSViv(0);
        }
 #endif
-      if(third == &PL_sv_yes) {
+      if(SWITCH_ARGS) {
         if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) > (float128)SvNVX(b)) return newSViv(1);
         return newSViv(0);
       }
@@ -1271,7 +1271,7 @@ SV * _overload_lt(pTHX_ SV * a, SV * b, SV * third) {
 SV * _overload_gt(pTHX_ SV * a, SV * b, SV * third) {
 
     if(SvUOK(b)) {
-      if(third == &PL_sv_yes) {
+      if(SWITCH_ARGS) {
         if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) < (float128)SvUVX(b)) return newSViv(1);
         return newSViv(0);
       }
@@ -1280,7 +1280,7 @@ SV * _overload_gt(pTHX_ SV * a, SV * b, SV * third) {
     }
 
     if(SvIOK(b)) {
-      if(third == &PL_sv_yes) {
+      if(SWITCH_ARGS) {
         if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) < (float128)SvIVX(b)) return newSViv(1);
         return newSViv(0);
       }
@@ -1299,14 +1299,14 @@ SV * _overload_gt(pTHX_ SV * a, SV * b, SV * third) {
 #ifdef _WIN32_BIZARRE_INFNAN
       if(inf_or_nan) {
         if(inf_or_nan == 2) return newSViv(0);
-        if(third == &PL_sv_yes) {
+        if(SWITCH_ARGS) {
           if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) < _get_inf(inf_or_nan)) return newSViv(1);
           return newSViv(0);
         }
         if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) > _get_inf(inf_or_nan)) return newSViv(1);
         return newSViv(0);
       }
-      if(third == &PL_sv_yes) {
+      if(SWITCH_ARGS) {
         if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) < strtoflt128(SvPV_nolen(b), &p)) {
           _nnum_inc(p);
           return newSViv(1);
@@ -1322,7 +1322,7 @@ SV * _overload_gt(pTHX_ SV * a, SV * b, SV * third) {
       _nnum_inc(p);
       return newSViv(0);
 #else
-      if(third == &PL_sv_yes) {
+      if(SWITCH_ARGS) {
         if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) < strtoflt128(SvPV_nolen(b), &p)) {
           _nnum_inc(p);
           return newSViv(1);
@@ -1343,7 +1343,7 @@ SV * _overload_gt(pTHX_ SV * a, SV * b, SV * third) {
     if(SvNOK(b)) {
 #if defined(AVOID_INF_CAST)
        if(SvNVX(b) != 0.0L && SvNVX(b) == SvNVX(b) && SvNVX(b) / SvNVX(b) != SvNVX(b) / SvNVX(b)) {
-         if(third == &PL_sv_yes) {
+         if(SWITCH_ARGS) {
            if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) < _get_inf(SvNVX(b) > 0 ? 1 : -1))
              return newSViv(1);
            return newSViv(0);
@@ -1353,7 +1353,7 @@ SV * _overload_gt(pTHX_ SV * a, SV * b, SV * third) {
          return newSViv(0);
        }
 #endif
-      if(third == &PL_sv_yes) {
+      if(SWITCH_ARGS) {
         if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) < (float128)SvNVX(b)) return newSViv(1);
         return newSViv(0);
       }
@@ -1375,7 +1375,7 @@ SV * _overload_gt(pTHX_ SV * a, SV * b, SV * third) {
 SV * _overload_lte(pTHX_ SV * a, SV * b, SV * third) {
 
     if(SvUOK(b)) {
-      if(third == &PL_sv_yes) {
+      if(SWITCH_ARGS) {
         if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) >= (float128)SvUVX(b)) return newSViv(1);
         return newSViv(0);
       }
@@ -1384,7 +1384,7 @@ SV * _overload_lte(pTHX_ SV * a, SV * b, SV * third) {
     }
 
     if(SvIOK(b)) {
-      if(third == &PL_sv_yes) {
+      if(SWITCH_ARGS) {
         if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) >= (float128)SvIVX(b)) return newSViv(1);
         return newSViv(0);
       }
@@ -1403,14 +1403,14 @@ SV * _overload_lte(pTHX_ SV * a, SV * b, SV * third) {
 #ifdef _WIN32_BIZARRE_INFNAN
       if(inf_or_nan) {
         if(inf_or_nan == 2) return newSViv(0);
-        if(third == &PL_sv_yes) {
+        if(SWITCH_ARGS) {
           if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) >= _get_inf(inf_or_nan)) return newSViv(1);
           return newSViv(0);
         }
         if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) <= _get_inf(inf_or_nan)) return newSViv(1);
         return newSViv(0);
       }
-      if(third == &PL_sv_yes) {
+      if(SWITCH_ARGS) {
         if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) >= strtoflt128(SvPV_nolen(b), &p)) {
           _nnum_inc(p);
           return newSViv(1);
@@ -1426,7 +1426,7 @@ SV * _overload_lte(pTHX_ SV * a, SV * b, SV * third) {
       _nnum_inc(p);
       return newSViv(0);
 #else
-      if(third == &PL_sv_yes) {
+      if(SWITCH_ARGS) {
         if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) >= strtoflt128(SvPV_nolen(b), &p)) {
           _nnum_inc(p);
           return newSViv(1);
@@ -1446,7 +1446,7 @@ SV * _overload_lte(pTHX_ SV * a, SV * b, SV * third) {
     if(SvNOK(b)) {
 #if defined(AVOID_INF_CAST)
        if(SvNVX(b) != 0.0L && SvNVX(b) == SvNVX(b) && SvNVX(b) / SvNVX(b) != SvNVX(b) / SvNVX(b)) {
-         if(third == &PL_sv_yes) {
+         if(SWITCH_ARGS) {
            if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) >= _get_inf(SvNVX(b) > 0 ? 1 : -1))
              return newSViv(1);
            return newSViv(0);
@@ -1456,7 +1456,7 @@ SV * _overload_lte(pTHX_ SV * a, SV * b, SV * third) {
          return newSViv(0);
        }
 #endif
-      if(third == &PL_sv_yes) {
+      if(SWITCH_ARGS) {
         if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) >= (float128)SvNVX(b)) return newSViv(1);
         return newSViv(0);
       }
@@ -1478,7 +1478,7 @@ SV * _overload_lte(pTHX_ SV * a, SV * b, SV * third) {
 SV * _overload_gte(pTHX_ SV * a, SV * b, SV * third) {
 
     if(SvUOK(b)) {
-      if(third == &PL_sv_yes) {
+      if(SWITCH_ARGS) {
         if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) <= (float128)SvUVX(b)) return newSViv(1);
         return newSViv(0);
       }
@@ -1487,7 +1487,7 @@ SV * _overload_gte(pTHX_ SV * a, SV * b, SV * third) {
     }
 
     if(SvIOK(b)) {
-      if(third == &PL_sv_yes) {
+      if(SWITCH_ARGS) {
         if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) <= (float128)SvIVX(b)) return newSViv(1);
         return newSViv(0);
       }
@@ -1506,14 +1506,14 @@ SV * _overload_gte(pTHX_ SV * a, SV * b, SV * third) {
 #ifdef _WIN32_BIZARRE_INFNAN
       if(inf_or_nan) {
         if(inf_or_nan == 2) return newSViv(0);
-        if(third == &PL_sv_yes) {
+        if(SWITCH_ARGS) {
           if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) <= _get_inf(inf_or_nan)) return newSViv(1);
           return newSViv(0);
         }
         if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) >= _get_inf(inf_or_nan)) return newSViv(1);
         return newSViv(0);
       }
-      if(third == &PL_sv_yes) {
+      if(SWITCH_ARGS) {
         if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) <= strtoflt128(SvPV_nolen(b), &p)) {
           _nnum_inc(p);
           return newSViv(1);
@@ -1530,7 +1530,7 @@ SV * _overload_gte(pTHX_ SV * a, SV * b, SV * third) {
       return newSViv(0);
 #else
 
-      if(third == &PL_sv_yes) {
+      if(SWITCH_ARGS) {
         if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) <= strtoflt128(SvPV_nolen(b), &p)) {
           _nnum_inc(p);
           return newSViv(1);
@@ -1552,7 +1552,7 @@ SV * _overload_gte(pTHX_ SV * a, SV * b, SV * third) {
     if(SvNOK(b)) {
 #if defined(AVOID_INF_CAST)
        if(SvNVX(b) != 0.0L && SvNVX(b) == SvNVX(b) && SvNVX(b) / SvNVX(b) != SvNVX(b) / SvNVX(b)) {
-         if(third == &PL_sv_yes) {
+         if(SWITCH_ARGS) {
            if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) <= _get_inf(SvNVX(b) > 0 ? 1 : -1))
              return newSViv(1);
            return newSViv(0);
@@ -1562,7 +1562,7 @@ SV * _overload_gte(pTHX_ SV * a, SV * b, SV * third) {
          return newSViv(0);
        }
 #endif
-      if(third == &PL_sv_yes) {
+      if(SWITCH_ARGS) {
         if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) <= (float128)SvNVX(b)) return newSViv(1);
         return newSViv(0);
       }
@@ -1583,7 +1583,7 @@ SV * _overload_gte(pTHX_ SV * a, SV * b, SV * third) {
 
 SV * _overload_spaceship(pTHX_ SV * a, SV * b, SV * third) {
     int reversal = 1;
-    if(third == &PL_sv_yes) reversal = -1;
+    if(SWITCH_ARGS) reversal = -1;
 
     if(SvUOK(b)) {
        if(*(INT2PTR(float128 *, SvIVX(SvRV(a)))) == (float128)SvUVX(b)) return newSViv( 0 * reversal);
@@ -1889,14 +1889,14 @@ SV * _overload_atan2(pTHX_ SV * a, SV * b, SV * third) {
      SvREADONLY_on(obj);
 
      if(SvUOK(b)) {
-       if(third == &PL_sv_yes)
+       if(SWITCH_ARGS)
             *f = atan2q((float128)SvUVX(b), *(INT2PTR(float128 *, SvIVX(SvRV(a)))));
        else *f = atan2q(*(INT2PTR(float128 *, SvIVX(SvRV(a)))), (float128)SvUVX(b));
        return obj_ref;
      }
 
      if(SvIOK(b)) {
-       if(third == &PL_sv_yes)
+       if(SWITCH_ARGS)
             *f = atan2q((float128)SvIVX(b), *(INT2PTR(float128 *, SvIVX(SvRV(a)))));
        else *f = atan2q(*(INT2PTR(float128 *, SvIVX(SvRV(a)))), (float128)SvIVX(b));
        return obj_ref;
@@ -1914,25 +1914,25 @@ SV * _overload_atan2(pTHX_ SV * a, SV * b, SV * third) {
 
        if(inf_or_nan) {
          if(inf_or_nan == 2) {
-           if(third == &PL_sv_yes)
+           if(SWITCH_ARGS)
                 *f = atan2q(_get_nan(), *(INT2PTR(float128 *, SvIVX(SvRV(a)))));
            else *f = atan2q(*(INT2PTR(float128 *, SvIVX(SvRV(a)))), _get_nan());
          }
          else {
-           if(third == &PL_sv_yes)
+           if(SWITCH_ARGS)
                 *f = atan2q(_get_inf(inf_or_nan), *(INT2PTR(float128 *, SvIVX(SvRV(a)))));
            else *f = atan2q(*(INT2PTR(float128 *, SvIVX(SvRV(a)))), _get_inf(inf_or_nan));
          }
        }
        else {
-         if(third == &PL_sv_yes)
+         if(SWITCH_ARGS)
               *f = atan2q(strtoflt128(SvPV_nolen(b), &p), *(INT2PTR(float128 *, SvIVX(SvRV(a)))));
          else *f = atan2q(*(INT2PTR(float128 *, SvIVX(SvRV(a)))), strtoflt128(SvPV_nolen(b), &p));
          _nnum_inc(p);
          return obj_ref;
        }
 #else
-       if(third == &PL_sv_yes)
+       if(SWITCH_ARGS)
             *f = atan2q(strtoflt128(SvPV_nolen(b), &p), *(INT2PTR(float128 *, SvIVX(SvRV(a)))));
        else *f = atan2q(*(INT2PTR(float128 *, SvIVX(SvRV(a)))), strtoflt128(SvPV_nolen(b), &p));
        _nnum_inc(p);
@@ -1943,13 +1943,13 @@ SV * _overload_atan2(pTHX_ SV * a, SV * b, SV * third) {
      if(SvNOK(b)) {
 #if defined(AVOID_INF_CAST)
        if(SvNVX(b) != 0.0L && SvNVX(b) == SvNVX(b) && SvNVX(b) / SvNVX(b) != SvNVX(b) / SvNVX(b)) {
-         if(third == &PL_sv_yes)
+         if(SWITCH_ARGS)
               *f = atan2q(_get_inf(SvNVX(b) > 0 ? 1 : -1), *(INT2PTR(float128 *, SvIVX(SvRV(a)))));
          else *f = atan2q(*(INT2PTR(float128 *, SvIVX(SvRV(a)))), _get_inf(SvNVX(b) > 0 ? 1 : -1));
          return obj_ref;
        }
 #endif
-       if(third == &PL_sv_yes)
+       if(SWITCH_ARGS)
             *f = atan2q((float128)SvNVX(b), *(INT2PTR(float128 *, SvIVX(SvRV(a)))));
        else *f = atan2q(*(INT2PTR(float128 *, SvIVX(SvRV(a)))), (float128)SvNVX(b));
        return obj_ref;
@@ -1998,14 +1998,14 @@ SV * _overload_pow(pTHX_ SV * a, SV * b, SV * third) {
      SvREADONLY_on(obj);
 
      if(SvUOK(b)) {
-       if(third == &PL_sv_yes)
+       if(SWITCH_ARGS)
             *f = powq((float128)SvUVX(b), *(INT2PTR(float128 *, SvIVX(SvRV(a)))));
        else *f = powq(*(INT2PTR(float128 *, SvIVX(SvRV(a)))), (float128)SvUVX(b));
        return obj_ref;
      }
 
      if(SvIOK(b)) {
-       if(third == &PL_sv_yes)
+       if(SWITCH_ARGS)
             *f = powq((float128)SvIVX(b), *(INT2PTR(float128 *, SvIVX(SvRV(a)))));
        else *f = powq(*(INT2PTR(float128 *, SvIVX(SvRV(a)))), (float128)SvIVX(b));
        return obj_ref;
@@ -2022,24 +2022,24 @@ SV * _overload_pow(pTHX_ SV * a, SV * b, SV * third) {
 #ifdef _WIN32_BIZARRE_INFNAN
        if(inf_or_nan) {
          if(inf_or_nan == 2) {
-           if(third == &PL_sv_yes)
+           if(SWITCH_ARGS)
                 *f = powq(_get_nan(), *(INT2PTR(float128 *, SvIVX(SvRV(a)))));
            else *f = powq(*(INT2PTR(float128 *, SvIVX(SvRV(a)))), _get_nan());
          }
          else {
-           if(third == &PL_sv_yes)
+           if(SWITCH_ARGS)
                 *f = powq(_get_inf(inf_or_nan), *(INT2PTR(float128 *, SvIVX(SvRV(a)))));
            else *f = powq(*(INT2PTR(float128 *, SvIVX(SvRV(a)))), _get_inf(inf_or_nan));
          }
        }
        else {
-         if(third == &PL_sv_yes)
+         if(SWITCH_ARGS)
               *f = powq(strtoflt128(SvPV_nolen(b), &p), *(INT2PTR(float128 *, SvIVX(SvRV(a)))));
          else *f = powq(*(INT2PTR(float128 *, SvIVX(SvRV(a)))), strtoflt128(SvPV_nolen(b), &p));
          _nnum_inc(p);
        }
 #else
-       if(third == &PL_sv_yes)
+       if(SWITCH_ARGS)
             *f = powq(strtoflt128(SvPV_nolen(b), &p), *(INT2PTR(float128 *, SvIVX(SvRV(a)))));
        else *f = powq(*(INT2PTR(float128 *, SvIVX(SvRV(a)))), strtoflt128(SvPV_nolen(b), &p));
        _nnum_inc(p);
@@ -2050,13 +2050,13 @@ SV * _overload_pow(pTHX_ SV * a, SV * b, SV * third) {
      if(SvNOK(b)) {
 #if defined(AVOID_INF_CAST)
        if(SvNVX(b) != 0.0L && SvNVX(b) == SvNVX(b) && SvNVX(b) / SvNVX(b) != SvNVX(b) / SvNVX(b)) {
-         if(third == &PL_sv_yes)
+         if(SWITCH_ARGS)
               *f = powq(_get_inf(SvNVX(b) > 0 ? 1 : -1), *(INT2PTR(float128 *, SvIVX(SvRV(a)))));
          else *f = powq(*(INT2PTR(float128 *, SvIVX(SvRV(a)))), _get_inf(SvNVX(b) > 0 ? 1 : -1));
          return obj_ref;
        }
 #endif
-       if(third == &PL_sv_yes)
+       if(SWITCH_ARGS)
             *f = powq((float128)SvNVX(b), *(INT2PTR(float128 *, SvIVX(SvRV(a)))));
        else *f = powq(*(INT2PTR(float128 *, SvIVX(SvRV(a)))), (float128)SvNVX(b));
        return obj_ref;

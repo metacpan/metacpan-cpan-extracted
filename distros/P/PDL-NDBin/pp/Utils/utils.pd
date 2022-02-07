@@ -41,18 +41,18 @@ This function throws an exception if a grid is not monotonically increasing or d
 		  for ( idx = 0 ; idx < n - 1; idx++ ) {
 		      PDL_Indx idx1 = idx + 1;
 		      if ( $grid(n => idx ) >= $grid( n => idx1 ) )
-		        barf( "grid is not monotonically increasing\n" );
+		        $CROAK( "grid is not monotonically increasing\n" );
 		  }
 		}
 	        else if ( $grid(n => 0 ) > $grid(n => nm1) ) {
 		  for ( idx = 0 ; idx < n - 1; idx++ ) {
 		      PDL_Indx idx1 = idx + 1;
 		      if ( $grid(n => idx ) <= $grid( n => idx1 ) )
-		        barf( "grid is not monotonically decreasing\n" );
+		        $CROAK( "grid is not monotonically decreasing\n" );
 		  }
 		}
 		else {
-	          barf( "grid is not monotonically increasing or decreasing\n" );
+	          $CROAK( "grid is not monotonically increasing or decreasing\n" );
 		}
 	',
 );

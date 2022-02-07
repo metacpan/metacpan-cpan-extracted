@@ -1,3 +1,13 @@
+0.15
+ - Fix typo in Complex_C.xs that prevents this module from building on case-sensitive
+   filesystems. ("C" ne "c".)
+
+0.14
+ - Fix https://github.com/sisyphus/math-decimal64/pull/1 (also aplies to Math::Complex_C)
+   Thanks to @hiratara
+ - Fix overload_pow() for the case that the third argument is true
+ - Replace SvIV/SvUV/SvNV with SvIVX/SvUVx/SvNVX where appropriate.
+
 0.13
  - Add nnumflag(), set_nnum() and clear_nnum() functions. Also start using the perl
    API function looks_like_number() to detect non-numeric strings.

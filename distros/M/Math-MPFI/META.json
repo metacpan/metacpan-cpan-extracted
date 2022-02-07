@@ -32,7 +32,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Math::MPFR" : "3.23"
+            "Math::MPFR" : "3.23",
+            "Test::More" : "0.88"
          }
       }
    },
@@ -44,6 +45,6 @@
          "web" : "https://github.com/sisyphus/math-mpfi"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 2.27203"
 }

@@ -1,0 +1,26 @@
+#!/usr/bin/perl
+use Mojo::Base -strict;
+
+use Mojolicious::Commands;
+use lib qw(.);
+Mojolicious::Commands->start_app('Telebot::HelloTelegram');
+
+=encoding utf8
+
+=head1 NAME
+
+telebot - The Telebot command system
+
+=head1 SYNOPSIS
+
+  $ telebot --help
+
+=head1 DESCRIPTION
+
+List and run L<Telebot> commands as described in L<Mojolicious::Commands>.
+
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
+
+=cut

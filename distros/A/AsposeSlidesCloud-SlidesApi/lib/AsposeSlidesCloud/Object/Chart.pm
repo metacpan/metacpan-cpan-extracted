@@ -43,6 +43,7 @@ use AsposeSlidesCloud::Object::ChartTitle;
 use AsposeSlidesCloud::Object::ChartWall;
 use AsposeSlidesCloud::Object::EffectFormat;
 use AsposeSlidesCloud::Object::FillFormat;
+use AsposeSlidesCloud::Object::Hyperlink;
 use AsposeSlidesCloud::Object::Legend;
 use AsposeSlidesCloud::Object::LineFormat;
 use AsposeSlidesCloud::Object::PlotArea;
@@ -289,6 +290,20 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'hyperlink_click' => {
+    	datatype => 'Hyperlink',
+    	base_name => 'HyperlinkClick',
+    	description => 'Hyperlink defined for mouse click.',
+    	format => '',
+    	read_only => '',
+    		},
+    'hyperlink_mouse_over' => {
+    	datatype => 'Hyperlink',
+    	base_name => 'HyperlinkMouseOver',
+    	description => 'Hyperlink defined for mouse over.',
+    	format => '',
+    	read_only => '',
+    		},
     'type' => {
     	datatype => 'string',
     	base_name => 'Type',
@@ -392,6 +407,8 @@ __PACKAGE__->swagger_types( {
     'effect_format' => 'EffectFormat',
     'three_d_format' => 'ThreeDFormat',
     'line_format' => 'LineFormat',
+    'hyperlink_click' => 'Hyperlink',
+    'hyperlink_mouse_over' => 'Hyperlink',
     'type' => 'string',
     'chart_type' => 'string',
     'show_data_labels_over_maximum' => 'boolean',
@@ -423,6 +440,8 @@ __PACKAGE__->attribute_map( {
     'effect_format' => 'EffectFormat',
     'three_d_format' => 'ThreeDFormat',
     'line_format' => 'LineFormat',
+    'hyperlink_click' => 'HyperlinkClick',
+    'hyperlink_mouse_over' => 'HyperlinkMouseOver',
     'type' => 'Type',
     'chart_type' => 'ChartType',
     'show_data_labels_over_maximum' => 'ShowDataLabelsOverMaximum',

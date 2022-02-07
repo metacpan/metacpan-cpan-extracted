@@ -17,6 +17,7 @@ suggests 'Role::Tiny';
 on 'test' => sub {
   requires 'LWP::UserAgent';
   requires 'Perl::Critic';
+  requires 'Test::Exception';
   requires 'Test::Pod::Coverage';
   requires 'Test::Pod';
   requires 'Test::Snapshot';
@@ -24,5 +25,6 @@ on 'test' => sub {
 };
 
 on develop => sub {
-    requires 'Dist::Milla';
+  requires 'Dist::Milla';
 };
+

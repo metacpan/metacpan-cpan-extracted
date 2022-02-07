@@ -106,7 +106,7 @@ $expected = [ { name => 'x', pdl => test_pdl($x), min => -65, max => 69, n => 4,
 $binner = PDL::NDBin->new( axes => [[ 'x' ]] );
 $binner->autoscale( x => $x );
 $got = $binner->axes;
-cmp_deeply $got, $expected, 'autoscale() with auto parameters';
+cmp_deeply $got, $expected, 'autoscale() with auto parameters' or diag "got: ", explain $got;
 $expected = [ { name => 'x', pdl => test_pdl($x), min => -70, max => 70, n => 7, step => 20 } ];
 $binner = PDL::NDBin->new( axes => [[ x => (min => -70, max => 70, step => 20) ]] );
 $binner->autoscale( x => $x );
@@ -180,8 +180,8 @@ note 'BASIC FUNCTIONALITY';
 
 # the example from PDL::histogram
 $x = pdl( 1,1,2 );
-# by default histogram() returns a piddle of the same type as the axis,
-# but output() returns a piddle of type I<indx> when histogramming
+# by default histogram() returns an ndarray of the same type as the axis,
+# but output() returns an ndarray of type I<indx> when histogramming
 $expected = { histogram => test_indx( 0,2,1 ) };
 $binner = PDL::NDBin->new( axes => [ [ 'x', step=>1, min=>0, n=>3 ] ] );
 $binner->process( x => $x );
@@ -345,7 +345,7 @@ for my $class ( __PACKAGE__->actions ) {
 	$binner->feed( x => random(100), y => random(100), u => random(100) );
 	$binner->process;
 	my $got1 = $binner->output;
-	# we need to convert the piddles in $got1 to 'expected piddles', hence
+	# we need to convert the ndarrays in $got1 to 'expected ndarrays', hence
 	# this dirty hack
 	$got1->{u} = test_pdl $got1->{u};
 	my $got2 = $binner->output;

@@ -1,6 +1,6 @@
 package Chemistry::File::MDLMol;
 
-our $VERSION = '0.23'; # VERSION
+our $VERSION = '0.24'; # VERSION
 # $Id$
 
 use base "Chemistry::File";
@@ -61,7 +61,7 @@ This module is part of the PerlMol project, L<https://github.com/perlmol>.
 The MDL molfile format supports query properties such as atom lists, and
 special bond types such as "single or double", "single or aromatic", "double or
 aromatic", "ring bond", or "any". These properties are supported by this module
-in conjunction with L<Chemistry::Pattern>. However, support for query properies
+in conjunction with L<Chemistry::Pattern>. However, support for query properties
 is currently read-only, and the other properties listed in the specification
 are not supported yet.
 
@@ -81,7 +81,7 @@ To be able to search for aromatic substructures are represented by Kekule
 structures, molfiles that are read as patterns (with
 C<Chemistry::Pattern->read) are aromatized automatically by using the
 L<Chemistry::Ring> module. The default bond test from Chemistry::Pattern::Bond
-is overriden by one that checks the aromaticity in addition to the bond order.
+is overridden by one that checks the aromaticity in addition to the bond order.
 The test is,
 
     $patt->aromatic ?  $bond->aromatic 
@@ -142,7 +142,9 @@ sub read_mol {
 
     # counts line
     defined ($_ = <$fh>) or croak "unexpected end of file";
-    my ($na, $nb) = unpack("A3A3", $_);
+    my ($na, $nb, undef, undef, $is_chiral) = unpack("A3A3A3A3A3", $_);
+
+    $mol->attr("mdlmol/chiral", int $is_chiral);
 
     my %old_charges;
     my %old_radicals;
@@ -410,8 +412,11 @@ L<https://github.com/perlmol/Chemistry-File-MDLMol>
 L<Chemistry::Mol>
 
 The MDL file format specification.
-L<http://www.mdl.com/downloads/public/ctfile/ctfile.pdf> or
-Arthur Dalby et al., J. Chem. Inf. Comput. Sci, 1992, 32, 244-255.
+L<https://discover.3ds.com/ctfile-documentation-request-form#_ga=2.229779804.1581205944.1643725102-a2d5f010-6f4c-11ec-a2da-e3641d195888>,
+L<https://discover.3ds.com/sites/default/files/2020-08/biovia_ctfileformats_2020.pdf>,
+L<https://web.archive.org/web/20070927033700/http://www.mdl.com/downloads/public/ctfile/ctfile.pdf>,
+or Arthur Dalby et al., J. Chem. Inf. Comput. Sci, 1992, 32, 244-255.
+L<https://doi.org/10.1021/ci00007a012>.
 
 =head1 AUTHOR
 

@@ -4,7 +4,7 @@
       "Ivan Tubert-Brohman <itub@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -44,8 +44,7 @@
          "web" : "https://github.com/perlmol/chemistry-file-mdlmol"
       }
    },
-   "version" : "0.23",
-   "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
+   "version" : "0.24",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

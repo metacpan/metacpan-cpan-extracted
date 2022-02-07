@@ -1,5 +1,9 @@
 Revision history for Perl extension Die-To-Stdout
 
+0.04 2022-02-03T11:31:16Z
+
+	- do not warn if died without given any exception
+
 0.01 2020-08-24T13:29:10Z
 
     - original version

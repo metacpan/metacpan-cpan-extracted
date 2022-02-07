@@ -3,7 +3,7 @@ use Math::MPFR qw(:mpfr);
 use warnings;
 use strict;
 
-print "1..4\n";
+print "1..8\n";
 
 Rmpfr_set_default_prec(150);
 
@@ -29,7 +29,8 @@ if(!$@) {
 }
 if($have_mpz) {
   my $state = Math::GMPz::zgmp_randinit_lc_2exp
-               (Math::GMPz->new("98765" * 10), int(rand(123) + 100), int(rand(30) + 40));
+               (Math::GMPz->new("98765"), int(rand(123) + 100), int(rand(30) + 40));
+
   Rmpfi_urandom($mpfr, $mpfi, $state);
 
   if(Rmpfi_is_inside_fr($mpfr, $mpfi)) {
@@ -54,6 +55,7 @@ if(!$@) {
 }
 if($have_mpq) {
   my $state = Math::GMPq::qgmp_randinit_mt();
+
   Rmpfi_urandom($mpfr, $mpfi, $state);
 
   if(Rmpfi_is_inside_fr($mpfr, $mpfi)) {
@@ -76,6 +78,7 @@ if(!$@) {
 }
 if($have_mpf) {
   my $state = Math::GMPf::fgmp_randinit_lc_2exp_size(int(rand(108)) + 20);
+
   Rmpfi_urandom($mpfr, $mpfi, $state);
 
   if(Rmpfi_is_inside_fr($mpfr, $mpfi)) {
@@ -102,3 +105,70 @@ else {
   warn "\$alea: $alea\n\$mpfi: $mpfi\n";
   print "not ok 4\n";
 }
+
+##############################
+my $state = Rmpfr_randinit_lc_2exp
+             ("98765", int(rand(123) + 100), int(rand(30) + 40));
+
+Rmpfi_urandom($mpfr, $mpfi, $state);
+
+if(Rmpfi_is_inside_fr($mpfr, $mpfi)) {
+  #warn "$mpfr\n";
+  print "ok 5\n";
+}
+else {
+  warn "\$mpfr: $mpfr\n\$mpfi: $mpfi\n";
+  print "not ok 5\n";
+}
+##############################
+
+undef $state;
+
+##############################
+$state = Rmpfr_randinit_mt();
+
+Rmpfi_urandom($mpfr, $mpfi, $state);
+
+if(Rmpfi_is_inside_fr($mpfr, $mpfi)) {
+  #warn "$mpfr\n";
+  print "ok 6\n";
+}
+else {
+  warn "\$mpfr: $mpfr\n\$mpfi: $mpfi\n";
+  print "not ok 6\n";
+}
+##############################
+
+undef $state;
+
+##############################
+$state = Rmpfr_randinit_lc_2exp_size(int(rand(108)) + 20);
+
+Rmpfi_urandom($mpfr, $mpfi, $state);
+
+if(Rmpfi_is_inside_fr($mpfr, $mpfi)) {
+  #warn "$mpfr\n";
+  print "ok 7\n";
+}
+else {
+  warn "\$mpfr: $mpfr\n\$mpfi: $mpfi\n";
+  print "not ok 7\n";
+}
+##############################
+
+undef $state;
+
+##############################
+$state = Math::MPFR::Random::Rmpfr_randinit_default();
+
+Rmpfi_urandom($mpfr, $mpfi, $state);
+
+if(Rmpfi_is_inside_fr($mpfr, $mpfi)) {
+  #warn "$mpfr\n";
+  print "ok 8\n";
+}
+else {
+  warn "\$mpfr: $mpfr\n\$mpfi: $mpfi\n";
+  print "not ok 8\n";
+}
+##############################

@@ -10,7 +10,7 @@ greple -Mjq --glob JSON-DATA --IN label pattern
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =head1 DESCRIPTION
 
@@ -18,7 +18,7 @@ This is an experimental module for L<App::Greple> to search JSON
 formatted text using L<jq(1)> as a backend.
 
 Search top level json object which includes both C<Marvin> and
-C<Zaphod> somewhare in its text representation.
+C<Zaphod> somewhere in its text representation.
 
     greple -Mjq 'Marvin Zaphod'
 
@@ -40,13 +40,13 @@ Search C<name> is C<Marvin> and C<type> is C<Robot> or C<Android>:
 
 Please be aware that this is just a text matching tool for indented
 result of L<jq(1)> command.  So, for example, C<.commit.author>
-includes everything under it and it maches C<committer> field name.
+includes everything under it and it matches C<committer> field name.
 Use L<jq(1)> filter for more complex and precise operation.
 
 =head1 CAUTION
 
 L<greple(1)> commands read entire input before processing.  So it
-should not be used for gigantic data or inifinite stream.
+should not be used for gigantic data or infinite stream.
 
 =head1 INSTALL
 
@@ -64,7 +64,7 @@ should not be used for gigantic data or inifinite stream.
 
 Search I<pattern> included in I<label> field.
 
-Chacater C<%> can be used as a wildcard in I<label> string.  So
+Character C<%> can be used as a wildcard in I<label> string.  So
 C<%name> matches labels end with C<name>, and C<name%> matches labels
 start with C<name>.
 
@@ -72,8 +72,8 @@ If the label is simple string like C<name>, it matches any level of
 JSON data.
 
 If the label string contains period (C<.>), it is considered as a
-nested labels.  Name C<.name> maches only C<name> label at the top
-level.  Name C<process.name> maches only C<name> entry of some
+nested labels.  Name C<.name> matches only C<name> label at the top
+level.  Name C<process.name> matches only C<name> entry of some
 C<process> hash.
 
 If labels are separated by two or more dots (C<..>), they don't have
@@ -87,7 +87,7 @@ Specify negative condition.
 
 Specify required condition.  If there is one or more required
 condition, all other positive rules move to optional.  They are not
-required but highliged if exist.
+required but highlighted if exist.
 
 =back
 
@@ -117,7 +117,7 @@ C<file.path> at any level.
 
 =item B<file..path>
 
-Some C<path> in descendatns of some C<file>.
+Some C<path> in descendants of some C<file>.
 
 =item B<%path>
 
@@ -165,7 +165,7 @@ Object C<*pid> label contains 803.
 
     greple -Mjq --IN %pid 803
 
-Object any <path> contains C<_mira> under C<.file> and C<.event>
+Object any <path> contains C<_mina> under C<.file> and C<.event>
 contains C<WRITE>.
 
     greple -Mjq --IN .file..path _mina --IN .event WRITE
@@ -181,11 +181,14 @@ Use C<-o> option to show only matched part.
 
 Use C<--blockend=> option to cancel showing block separator.
 
-Sine this module implements original search funciton, L<greple(1)>
-B<-i> does not take effect.  Set modifier in regex like
-C<(?i)pattern> if you want case-insensitive match.
+Since this module implements original search function, L<greple(1)>
+B<-i> does not take effect.  Set modifier in regex like C<(?i)pattern>
+if you want case-insensitive match.
 
-Use C<-Mjq::debug=> to see actual regex.
+Use C<-Mjq::set=debug> to see actual regex.
+
+Use C<-Mjq::set=noif> if you don't have to use L<jq> as an input
+filter.  Data have to be well-formatted in that case.
 
 Use C<--color=always> and set C<LESSANSIENDCHARS=mK> if you want to
 see the output using L<less(1)>.  Put next line in your F<~/.greplerc>
@@ -219,7 +222,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 use Exporter 'import';
 our @EXPORT = qw(&jq_filter);
@@ -228,11 +231,21 @@ use App::Greple::Common;
 use App::Greple::Regions qw(match_regions merge_regions);
 use Data::Dumper;
 
-our $debug;
-sub debug { $debug ^= 1 }
+my %config;
+sub set {
+    %config = @_;
+}
 
 my $indent = '  ';
 my $indent_re = qr/$indent/;
+
+sub finalize {
+    my($mod, $argv) = @_;
+    if ($config{noif}) {
+	my @default = $mod->default;
+	$mod->setopt(default => grep { $_ ne '--jq-filter' } @default);
+    }
+}
 
 sub re {
     my $pattern = shift;
@@ -259,7 +272,7 @@ sub prefix_regex {
 	    } else {
 		if (length($dot) == 1) {
 		    ## using same capture group name is not a good idea
-		    ## so make sure to put just for the one
+		    ## so make sure to put just for the last one
 		    $level      = '?<level>' if $path eq '';
 		    $start_with = qr/(?=\S)/;
 		}
@@ -291,7 +304,6 @@ sub IN {
     my %opt = @_;
     my $target = delete $opt{&FILELABEL} or die;
     my($label, $pattern) = @opt{qw(label pattern)};
-    my $indent_re = qr/  /;
     my @prefix_re = $label =~ s/^((?:.*\.)?)// && prefix_regex($1);
     $label =~ s/%/.*/g;
     my($label_re, $pattern_re) = map re($_), $label, $pattern;
@@ -304,7 +316,7 @@ sub IN {
 	$pattern_re					# pattern
 	(?: . | \n\g{in} (?: \s++ | [\]\}] ) ) *	# and take the rest
     }xm;
-    warn "$re\n" if $debug;
+    warn "$re\n" if $config{debug};
     match_regions pattern => $re;
 }
 
@@ -333,3 +345,7 @@ option --MUST \
 
 option --NOT \
 	--le -&__PACKAGE__::IN(label=$<shift>,pattern=$<shift>)
+
+#  LocalWords:  JSON jq json Zaphod greple CPANMINUS cpanm
+#  LocalWords:  perl pid regex LESSANSIENDCHARS greplerc Kazumasa Mjq
+#  LocalWords:  Utashiro Android committer mina ppid blockend

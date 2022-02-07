@@ -26,7 +26,7 @@ no_index:
 provides:
   App::Greple::jq:
     file: lib/App/Greple/jq.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   App::Greple: '8.5501'
   perl: '5.014'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/greple-jq/issues
   homepage: https://github.com/kaz-utashiro/greple-jq
   repository: git://github.com/kaz-utashiro/greple-jq.git
-version: '0.04'
+version: '0.05'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

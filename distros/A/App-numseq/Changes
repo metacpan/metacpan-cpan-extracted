@@ -1,0 +1,11 @@
+0.002   2021-08-01  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention (non-)related modules NumSeq::Iter,
+	  App::seq::numseq, Sah::Schemas::NumSeq.
+
+
+0.001   2016-09-28  Released-By: PERLANCAR
+
+        - First release.

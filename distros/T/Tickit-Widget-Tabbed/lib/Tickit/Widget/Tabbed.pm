@@ -7,7 +7,7 @@
 use v5.26;
 use Object::Pad 0.57;
 
-package Tickit::Widget::Tabbed 0.025;
+package Tickit::Widget::Tabbed 0.026;
 class Tickit::Widget::Tabbed
         :isa(Tickit::ContainerWidget);
 
@@ -428,8 +428,8 @@ has $_widget :param :reader;
 has $_label  :param :reader;
 has $_active        = 0;
 
-has $_on_activated;
-has $_on_deactivated;
+has $_on_activated   :writer;
+has $_on_deactivated :writer;
 
 =head2 index
 
@@ -511,7 +511,7 @@ Set a callback or method name to invoke when the tab is activated
 
 =cut
 
-method set_on_activated ($) { $_on_activated = $_[0]; }
+# Generated accessor
 
 =head2 set_on_deactivated
 
@@ -519,7 +519,7 @@ Set a callback or method name to invoke when the tab is deactivated
 
 =cut
 
-method set_on_deactivated ($) { $_on_deactivated = $_[0]; }
+# Generated accessor
 
 =head2 pen
 
@@ -534,8 +534,8 @@ has $_pen :reader;
 
 method _has_pen () { defined $_pen }
 
-method set_pen ($) {
-        $_pen = $_[0];
+method set_pen ( $pen ) {
+        $_pen = $pen;
         $_tabbed->_tabs_changed if $_tabbed;
 }
 

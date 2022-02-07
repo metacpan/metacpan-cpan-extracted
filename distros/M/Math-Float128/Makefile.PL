@@ -1,6 +1,8 @@
+use strict;
+use warnings;
+use Config;
 use ExtUtils::MakeMaker;
 use ExtUtils::Liblist qw();
-use Config;
 
 # Attempt to avoid the incorrect 'FAIL' reports from Chris Williams' broken NetBSD smoker(s).
 # Comment out the 'exit 0;' (26 lines further down) if this causes problems.

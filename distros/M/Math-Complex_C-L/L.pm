@@ -32,9 +32,9 @@ use overload
     'atan2' => \&_overload_atan2,
 ;
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
-DynaLoader::bootstrap Math::Complex_C::L $VERSION;
+Math::Complex_C::L->DynaLoader::bootstrap($VERSION);
 
 @Math::Complex_C::L::EXPORT = ();
 @Math::Complex_C::L::EXPORT_OK = qw(
@@ -476,12 +476,19 @@ Math::Complex_C::L - perl interface to C's long double complex operations.
     *=, +=, /=, -=, **=,
     !, bool,
     ==, !=,
-    =, "",
-    abs, exp, log, cos, sin, atan2, sqrt
+    "",
+    abs, exp, log, cos, sin, atan2, sqrt,
+    =
+
+    NOTE: Making use of the '=' overloading is not recommended unless
+          you understand its caveats. See 'perldoc overload' and
+          read it thoroughly, including the documentation regarding
+          'copy constructors'.
 
     Note: abs() returns an NV, not a Math::Complex_C::L object. If your NV-type
-    is not _long double then you should probably call abs_cl2LD() or abs_cl2str()
-    instead. Check the documentation (above) of those two alternatives.
+          is not _long double then you should probably call abs_cl2LD() or
+          abs_cl2str() instead. Check the documentation (above) of those two
+          alternatives.
 
     Overloaded arithmetic operations are provided the following types:
      IV, UV, NV, PV, Math::Complex_C::L object.

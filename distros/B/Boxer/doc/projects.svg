@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg id="svg2" width="699.54" height="478.69" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs id="defs4">
+  <marker id="TriangleOutL" overflow="visible" orient="auto">
+   <path id="path3992" transform="scale(.8)" d="m5.77 0-8.65 5v-10l8.65 5z" fill-rule="evenodd" stroke="#000" stroke-width="1pt"/>
+  </marker>
+  <marker id="TriangleOutL-2" overflow="visible" orient="auto">
+   <path id="path3992-9" transform="scale(.8)" d="m5.77 0-8.65 5v-10z" fill-rule="evenodd" stroke="#000" stroke-width="1pt"/>
+  </marker>
+  <marker id="TriangleOutL-27" overflow="visible" orient="auto">
+   <path id="path3992-0" transform="scale(.8)" d="m5.77 0-8.65 5v-10z" fill-rule="evenodd" stroke="#000" stroke-width="1pt"/>
+  </marker>
+  <marker id="TriangleOutL-3" overflow="visible" orient="auto">
+   <path id="path3992-6" transform="scale(.8)" d="m5.77 0-8.65 5v-10z" fill-rule="evenodd" stroke="#000" stroke-width="1pt"/>
+  </marker>
+ </defs>
+ <metadata id="metadata7">
+  <rdf:RDF>
+   <cc:Work rdf:about="">
+    <dc:format>image/svg+xml</dc:format>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title/>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <g id="layer1" transform="translate(33.625 -180.32)">
+  <a xlink:href="https://salsa.debian.org/design-team/blends">
+   <g id="debian-design" transform="translate(12,-12)">
+    <rect id="rect5928-0" x="23.661" y="515.45" width="114.93" height="26.551" rx="9.6645" ry="8.0667" color="#000000" fill="#ace"/>
+    <text id="text3759" x="33.705235" y="531.79767" fill="#000000" font-family="Verdana" font-size="13px" letter-spacing="0px" word-spacing="0px" style="line-height:0%" xml:space="preserve"><tspan id="tspan4000" x="33.705235" y="531.79767" style="line-height:1.25">debian design</tspan><tspan id="tspan3998" x="33.705235" y="548.04767" style="line-height:1.25"> </tspan></text>
+   </g>
+  </a>
+  <a xlink:href="https://salsa.debian.org/tinker-team/box">
+   <g id="box">
+    <rect id="rect5928-1" x="248.55" y="505.64" width="79.925" height="26.551" rx="6.7212" ry="8.0667" color="#000000" fill="#ace"/>
+    <text id="text3763" x="281.22864" y="521.98181" fill="#000000" font-family="Verdana" letter-spacing="0px" word-spacing="0px" style="line-height:0%" xml:space="preserve"><tspan id="tspan3765" x="281.22864" y="521.98181" font-size="13px" style="line-height:1.25">box</tspan></text>
+   </g>
+  </a>
+  <a xlink:href="https://salsa.debian.org/boxer-team/boxer-data">
+   <g id="boxer-data">
+    <rect id="rect5928-1-0" x="121.3" y="294.63" width="95.925" height="26.551" rx="8.0667" ry="8.0667" color="#000000" fill="#ace"/>
+    <text id="text3767" x="132.84775" y="310.86667" fill="#000000" font-family="Verdana" letter-spacing="0px" word-spacing="0px" style="line-height:0%" xml:space="preserve"><tspan id="tspan3769" x="132.84775" y="310.86667" font-size="13px" style="line-height:1.25">boxer-data</tspan></text>
+   </g>
+  </a>
+  <path id="path3844-0" d="m208.16 337.17 38.441 36.644" fill="none" marker-end="url(#TriangleOutL)" stroke="#000" stroke-width="1px"/>
+  <path id="path3844-0-4" d="m209.47 445.19-43.505 36.039" fill="none" marker-end="url(#TriangleOutL)" stroke="#000" stroke-width="1px"/>
+  <path id="path3844-0-6" d="m356.61 440.79 32.535 32.916" fill="none" marker-end="url(#TriangleOutL)" stroke="#000" stroke-width="1px"/>
+  <a xlink:href="https://wiki.debian.org/Solidbox">
+   <g id="solidbox">
+    <rect id="rect5928-1-0-6" x="442.77" y="502.08" width="95.925" height="26.551" rx="8.0667" ry="8.0667" color="#000000" fill="#ace"/>
+    <text id="text3083" x="457.73724" y="519.36011" fill="#000000" font-family="Verdana" letter-spacing="0px" word-spacing="0px" style="line-height:0%" xml:space="preserve"><tspan id="tspan3085" x="457.73724" y="519.36011" font-size="13px" style="line-height:1.25">solidbox</tspan></text>
+   </g>
+  </a>
+  <text id="machine" x="266.41187" y="609.79712" fill="#b3b3b3" font-family="Verdana" font-weight="bold" letter-spacing="0px" word-spacing="0px" style="line-height:0%" xml:space="preserve"><tspan id="tspan4055" x="266.41187" y="609.79712" fill="#b3b3b3" font-size="13px" style="line-height:1.25">Machine</tspan></text>
+  <text id="debian" x="279.7655" y="220.78217" fill="#b3b3b3" font-family="Verdana" font-weight="bold" letter-spacing="0px" word-spacing="0px" style="line-height:0%" xml:space="preserve"><tspan id="tspan4059" x="279.7655" y="220.78217" fill="#b3b3b3" font-size="13px" style="line-height:1.25">Debian</tspan></text>
+  <a xlink:href="https://salsa.debian.org/boxer-team/boxer/">
+   <g id="boxer">
+    <rect id="rect5928-1-6" x="248.4" y="391.34" width="79.925" height="26.551" rx="6.7212" ry="8.0667" color="#000000" fill="#ace"/>
+    <text id="text4061" x="268.02866" y="408.87238" fill="#000000" font-family="Verdana" font-weight="bold" letter-spacing="0px" word-spacing="0px" style="line-height:0%" xml:space="preserve"><tspan id="tspan4063" x="268.02866" y="408.87238" font-size="13px" style="line-height:1.25">Boxer</tspan></text>
+   </g>
+  </a>
+  <g id="webpage">
+   <rect id="rect5928-0-3" x="371.48" y="296.73" width="74.925" height="26.551" rx="6.3007" ry="8.0667" color="#000000" fill="#ace"/>
+   <text id="text3759-6" x="381.52795" y="313.08023" fill="#000000" font-family="Verdana" font-size="13px" letter-spacing="0px" word-spacing="0px" style="line-height:0%" xml:space="preserve"><tspan id="tspan4000-7" x="381.52795" y="313.08023" style="line-height:1.25">webpage</tspan><tspan id="tspan3998-5" x="381.52795" y="329.33023" style="line-height:1.25"> </tspan></text>
+  </g>
+  <a xlink:href="https://source.virtual-assembly.org/semantic-markdown/about/">
+   <g id="semantic-markdown">
+    <rect id="rect5928-1-0-6-3" x="413.55" y="386.47" width="137.34" height="26.551" rx="11.549" ry="8.0667" color="#000000" fill="#ace"/>
+    <text id="text3083-5" x="416.93976" y="403.97653" fill="#000000" font-family="Verdana" letter-spacing="0px" word-spacing="0px" style="line-height:0%" xml:space="preserve"><tspan id="tspan3085-6" x="416.93976" y="403.97653" font-size="13px" style="line-height:1.25">semantic markdown</tspan></text>
+   </g>
+  </a>
+  <path id="path3844-0-6-1" d="m459.27 374.23-25.726-38.473" fill="none" marker-end="url(#TriangleOutL-2)" stroke="#000" stroke-width="1px"/>
+  <path id="path3844-0-6-9" d="m361.64 334.43-29.9 35.326" fill="none" marker-end="url(#TriangleOutL-27)" stroke="#000" stroke-width="1px"/>
+  <path id="path3844-0-0" d="m288.08 431.61 0.30986 53.107" fill="none" marker-end="url(#TriangleOutL-3)" stroke="#000" stroke-width="1px"/>
+ </g>
+</svg>

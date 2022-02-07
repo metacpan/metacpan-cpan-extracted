@@ -27,6 +27,8 @@ my %WriteMakefileArgs = (
     "BUILD_REQUIRES" => {
         %common_reqs,
         "File::Find::Rule" => 0,
+        "Path::Tiny" => 0,
+        "Capture::Tiny" => 0,
     },
     "TEST_REQUIRES" => {
         "Test::Alien" => 0,

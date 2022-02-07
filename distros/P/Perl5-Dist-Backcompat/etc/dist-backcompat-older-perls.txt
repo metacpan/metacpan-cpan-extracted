@@ -1,10 +1,11 @@
-# Porting/dist-backcompat-older-perls.txt
+# dist-backcompat-older-perls.txt
 
-# This file holds configuration data for Porting/dist-backcompat.pl.  Blank or
+# This file holds configuration data for front-end program
+# 'p5-dist-backcompat' and module Perl5::Dist::Backcompat. Blank or
 # all-whitespace lines are ignored.  Lines starting with a '#' are comments
 # and are also ignored.
 
-# All remaining lines are labels for older perl executables as built over many
+# All remaining lines are labels for older perl executables compiled over many
 # years by H. Merijn Brand ("Tux") and stored on various iterations of our
 # development server known as Dromedary (currently dromedary.p5h.org).  The
 # labels are spelled with the convention Tux uses, namely, the string 'perl'

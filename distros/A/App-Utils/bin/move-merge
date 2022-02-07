@@ -1,0 +1,136 @@
+#!/usr/bin/perl
+# Copyright 2004-22 Vlado Keselj vlado@dnlp.ca http://vlado.ca
+
+sub help { print <<"#EOT" }
+# move-merge merges directories into one target directory, version $VERSION
+#
+# Move and merge directories into the destination directory, with file
+# renaming.  The script is useful in incremental backups with rsync.
+#
+# Usage: find-equal-files [switches] [destinationdir] [dirs]
+#  -h  Print help and exit.
+#  -v  Print version of the program and exit.
+#
+# An illustrative Scenario:  Assume that we are making regular backups
+# of the directory /home/user into /backup/user while saving the old
+# files into directory /backup/user-old/041201-085451, where
+# 041201-085451 is a time-stamp-named directory with the structure
+# similar to the previous /backup/user directory.  When this is
+# periodically repeated, the directory /backup/user-old/ accumulates a
+# lot of directories and it needs to be cleaned periodically.
+# Before cleaning, it may be useful to merge the tagged directories
+# with:   move-merge m 0*
+#EOT
+
+use strict;
+use vars qw( $VERSION $Dest $Src $Label );
+$VERSION = '1.4';
+
+use Getopt::Std;
+use vars qw($opt_v $opt_h);
+getopts("vh");
+
+if ($opt_v) { print "$VERSION\n"; exit; }
+elsif ($opt_h || $#ARGV < 1) { &help(); exit; }
+
+$Dest = shift;
+if (! -e $Dest ) { mkdir $Dest, 0700 }
+while (@ARGV) {
+    $Label = $Src = shift;
+    $Label =~ s/\/$//;
+    $Label =~ s/\//-/g;
+    die if $Label eq '';
+    &merge($Dest, $Src);
+    rmdir $Src or die;
+}
+
+sub merge {
+    my $dest = shift;
+    my $src = shift;
+
+    if (!-d $dest) { die "Dir does not exist: $dest" }
+    if (!-d $src)  { die "Dir does not exist: $src" }
+
+    local (*DIR); opendir(DIR, $src);
+    foreach (readdir(DIR)) {
+	if ($_ eq '.' or $_ eq '..') { next }
+	elsif ( -d "$src/$_"  && ! -l "$src/$_" ) {
+	    if ( -e "$dest/$_" && !-d "$dest/$_") {
+		my $cnt = 1;
+		while ( -e "$dest/$_-$cnt") { ++$cnt }		
+		rename("$dest/$_", "$dest/$-$cnt");
+	    }
+	    if (!-d "$dest/$_")
+	    { mkdir("$dest/$_", (((stat "$src/$_")[2] |0700)& 0777)) or die}
+	    &merge("$dest/$_", "$src/$_");
+	    rmdir "$src/$_" or die "cannot remove ($src/$_)";
+	}
+	else {
+	    if (-e "$dest/$_" && (! -d "$dest/$_" || -l "$dest/$_")) {
+		my $cnt = 1;
+		while (-e "$dest/$_-$cnt") { ++$cnt }
+		rename("$dest/$_", "$dest/$_-$cnt");
+	    }
+	    if (!-d "$dest/$_")
+	    { mkdir("$dest/$_", (((stat "$src/$_")[2] | 0700 )& 0777)) or die }
+
+	    my $destname = "$dest/$_/$Label";
+	    if (-e $destname) {
+		my $cnt = 1;
+		while ( -e "$destname-$cnt") { ++$cnt }
+		$destname = "$destname-$cnt";
+	    }
+	    rename("$src/$_", $destname);
+	}
+    }
+}
+
+exit 0;
+__END__ # Documentation
+
+=head1 NAME
+
+move-merge - merges directories into one target directory
+
+=head1 SYNOPSIS
+
+ $ move-merge targetdir source-directories...
+
+Merges all source-directories into the target directory, unifying their
+subdirectory structures.  The final files are replaced with the same-named
+directories inside which the files are saved under the names of the source
+directories.
+
+=head1 DESCRIPTION
+
+The command C<move-merge> merges a list of source diretories into the target
+directory, unifying their subdirectory structures.  The final files are replaced
+with the same-named directories inside which the files are saved under the names
+of the source directories.  This is particularly useful in merging together
+backup directories after backups saved with the C<rsync> command.  For example,
+let us assume that we are making regular backups of the directory C</home/user>
+into the directory C</backup/user> while saving the old and deleted files into
+the directory C</backup/user-old/220203-105750>, where C<220203-105750> contains
+the time-stamped version of the old files in the same directory structure as the
+original backup.  After collecting a number of such backups, we can run the
+command C<move-merge m 2*> which will collect and merge all versions into the
+directory C<m>.
+
+=head1 AUTHOR
+
+Vlado Keselj vlado@dnlp.ca http://vlado.ca
+
+=head1 LICENSE
+
+Perl License (perl)
+
+=head1 SCRIPT CATEGORIES
+
+CPAN
+Unix/System_administration
+
+=head1 README
+
+move-merge - merges directories into one target directory
+
+=cut

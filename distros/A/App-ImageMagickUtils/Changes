@@ -1,3 +1,10 @@
+0.010   2022-01-22  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Tweak img2pdf's summary.
+
+
 0.009   2022-01-16  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Add shorter alias for convert-image-to-pdf: img2pdf.

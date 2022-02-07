@@ -6,7 +6,7 @@ use Devel::Peek;
 print "1..4\n";
 
 
-if($Math::Decimal128::VERSION eq '0.10' && Math::Decimal128::_get_xs_version() eq $Math::Decimal128::VERSION) {print "ok 1\n"}
+if($Math::Decimal128::VERSION eq '0.11' && Math::Decimal128::_get_xs_version() eq $Math::Decimal128::VERSION) {print "ok 1\n"}
 else {print "not ok 1 $Math::Decimal128::VERSION ", Math::Decimal128::_get_xs_version(), "\n"}
 
 my $end = Math::Decimal128::_endianness();

@@ -7,6 +7,28 @@ Home page:    <https://metacpan.org/release/Boxer>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Boxer>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v1.4.3	2022-02-05
+
+ [ Bug Fixes ]
+ - fix use signature (not bypass it), to silence a warning
+
+ [ Documentation ]
+ - Fix mirror sketch
+   Siri Reiter++
+ - add projects.svg
+ - fix typo in features.svg
+ - group, improve identifiers, and add links in projects.svg
+ - rename boxer.svg -> features.svg
+ - update TODOs
+
+ [ Test Suite ]
+ - fix wordlist in author test pod-spell
+
+ [ Other ]
+ - check spelling of PODs with tidyall
+ - use bullseye as default suite
+ - work around tidyall string-encoding bug
+
 v1.4.2	2020-04-24
 
  [ Bug Fixes ]

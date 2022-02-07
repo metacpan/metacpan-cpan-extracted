@@ -1,3 +1,12 @@
+1.037 2022-02-05
+
+  New feature:
+    * allow code section in scripts
+    * allow 'run' script in YAML or Perl format
+
+  Misc changes:
+    * remove "use XXX" from test script
+
 1.036 2022-01-12
 
   Bug fix:

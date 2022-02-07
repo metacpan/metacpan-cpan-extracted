@@ -69,26 +69,26 @@ my $meta = {
                             },
                           },
   "provides"           => {
-                            "Boxer"                          => { file => "lib/Boxer.pm", version => "v1.4.2" },
-                            "Boxer::CLI"                     => { file => "lib/Boxer/CLI.pm", version => "v1.4.2" },
-                            "Boxer::CLI::Command"            => { file => "lib/Boxer/CLI/Command.pm", version => "v1.4.2" },
-                            "Boxer::CLI::Command::About"     => { file => "lib/Boxer/CLI/Command/About.pm", version => "v1.4.2" },
-                            "Boxer::CLI::Command::Aliases"   => { file => "lib/Boxer/CLI/Command/Aliases.pm", version => "v1.4.2" },
-                            "Boxer::CLI::Command::Bootstrap" => { file => "lib/Boxer/CLI/Command/Bootstrap.pm", version => "v1.4.2" },
-                            "Boxer::CLI::Command::Commands"  => { file => "lib/Boxer/CLI/Command/Commands.pm", version => "v1.4.2" },
-                            "Boxer::CLI::Command::Compose"   => { file => "lib/Boxer/CLI/Command/Compose.pm", version => "v1.4.2" },
-                            "Boxer::File::WithSkeleton"      => { file => "lib/Boxer/File/WithSkeleton.pm", version => "v1.4.2" },
-                            "Boxer::Part"                    => { file => "lib/Boxer/Part.pm", version => "v1.4.2" },
-                            "Boxer::Part::Reclass"           => { file => "lib/Boxer/Part/Reclass.pm", version => "v1.4.2" },
-                            "Boxer::Role::Interact"          => { file => "lib/Boxer/Role/Interact.pm", version => "v1.4.2" },
-                            "Boxer::Task"                    => { file => "lib/Boxer/Task.pm", version => "v1.4.2" },
-                            "Boxer::Task::Bootstrap"         => { file => "lib/Boxer/Task/Bootstrap.pm", version => "v1.4.2" },
-                            "Boxer::Task::Classify"          => { file => "lib/Boxer/Task/Classify.pm", version => "v1.4.2" },
-                            "Boxer::Task::Serialize"         => { file => "lib/Boxer/Task/Serialize.pm", version => "v1.4.2" },
-                            "Boxer::Types"                   => { file => "lib/Boxer/Types.pm", version => "v1.4.2" },
-                            "Boxer::World"                   => { file => "lib/Boxer/World.pm", version => "v1.4.2" },
-                            "Boxer::World::Flat"             => { file => "lib/Boxer/World/Flat.pm", version => "v1.4.2" },
-                            "Boxer::World::Reclass"          => { file => "lib/Boxer/World/Reclass.pm", version => "v1.4.2" },
+                            "Boxer"                          => { file => "lib/Boxer.pm", version => "v1.4.3" },
+                            "Boxer::CLI"                     => { file => "lib/Boxer/CLI.pm", version => "v1.4.3" },
+                            "Boxer::CLI::Command"            => { file => "lib/Boxer/CLI/Command.pm", version => "v1.4.3" },
+                            "Boxer::CLI::Command::About"     => { file => "lib/Boxer/CLI/Command/About.pm", version => "v1.4.3" },
+                            "Boxer::CLI::Command::Aliases"   => { file => "lib/Boxer/CLI/Command/Aliases.pm", version => "v1.4.3" },
+                            "Boxer::CLI::Command::Bootstrap" => { file => "lib/Boxer/CLI/Command/Bootstrap.pm", version => "v1.4.3" },
+                            "Boxer::CLI::Command::Commands"  => { file => "lib/Boxer/CLI/Command/Commands.pm", version => "v1.4.3" },
+                            "Boxer::CLI::Command::Compose"   => { file => "lib/Boxer/CLI/Command/Compose.pm", version => "v1.4.3" },
+                            "Boxer::File::WithSkeleton"      => { file => "lib/Boxer/File/WithSkeleton.pm", version => "v1.4.3" },
+                            "Boxer::Part"                    => { file => "lib/Boxer/Part.pm", version => "v1.4.3" },
+                            "Boxer::Part::Reclass"           => { file => "lib/Boxer/Part/Reclass.pm", version => "v1.4.3" },
+                            "Boxer::Role::Interact"          => { file => "lib/Boxer/Role/Interact.pm", version => "v1.4.3" },
+                            "Boxer::Task"                    => { file => "lib/Boxer/Task.pm", version => "v1.4.3" },
+                            "Boxer::Task::Bootstrap"         => { file => "lib/Boxer/Task/Bootstrap.pm", version => "v1.4.3" },
+                            "Boxer::Task::Classify"          => { file => "lib/Boxer/Task/Classify.pm", version => "v1.4.3" },
+                            "Boxer::Task::Serialize"         => { file => "lib/Boxer/Task/Serialize.pm", version => "v1.4.3" },
+                            "Boxer::Types"                   => { file => "lib/Boxer/Types.pm", version => "v1.4.3" },
+                            "Boxer::World"                   => { file => "lib/Boxer/World.pm", version => "v1.4.3" },
+                            "Boxer::World::Flat"             => { file => "lib/Boxer/World/Flat.pm", version => "v1.4.3" },
+                            "Boxer::World::Reclass"          => { file => "lib/Boxer/World/Reclass.pm", version => "v1.4.3" },
                           },
   "release_status"     => "stable",
   "resources"          => {
@@ -98,7 +98,7 @@ my $meta = {
                             repository   => { type => "git", web => "https://salsa.debian.org/boxer-team/boxer" },
                             x_identifier => "http://purl.org/NET/cpan-uri/dist/Boxer/project",
                           },
-  "version"            => "v1.4.2",
+  "version"            => "v1.4.3",
   "x_help_wanted"      => ["documenter", "tester"],
   "x_provides_scripts" => { boxer => { file => "bin/boxer" } },
 };
@@ -174,32 +174,12 @@ else
 	}
 }
 
-sub FixMakefile
-{
-	return unless -d 'inc';
-	my $file = shift;
-	
-	local *MAKEFILE;
-	open MAKEFILE, "< $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	my $makefile = do { local $/; <MAKEFILE> };
-	close MAKEFILE or die $!;
-	
-	$makefile =~ s/\b(test_harness\(\$\(TEST_VERBOSE\), )/$1'inc', /;
-	$makefile =~ s/( -I\$\(INST_ARCHLIB\))/ -Iinc$1/g;
-	$makefile =~ s/( "-I\$\(INST_LIB\)")/ "-Iinc"$1/g;
-	$makefile =~ s/^(FULLPERL = .*)/$1 "-Iinc"/m;
-	$makefile =~ s/^(PERL = .*)/$1 "-Iinc"/m;
-	
-	open  MAKEFILE, "> $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	print MAKEFILE $makefile or die $!;
-	close MAKEFILE or die $!;
-}
 
 use File::ShareDir::Install;
 install_share 'share';
 { package MY; use File::ShareDir::Install qw(postamble) };
 
 my $mm = WriteMakefile(%WriteMakefileArgs);
-FixMakefile($mm->{FIRST_MAKEFILE} || 'Makefile');
+
 exit(0);
 

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # remove-empty-dirs - remove recursively empty directories
-# 2002-2020 Vlado Keselj vlado@dnlp.ca http://vlado.ca
+# 2002-2022 Vlado Keselj vlado@dnlp.ca http://vlado.ca
 
 $| = 1;
 &remove_empty_dirs(@ARGV);
@@ -46,15 +46,15 @@ remove-empty-dirs - remove recursively empty directories
 
 =head1 SYNOPSIS
 
- $ remove-empty-dirs .
+ $ remove-empty-dirs directories...
 
-Removes all empty subdirectories recursively of the current directory,
-and any subdirectories.
+Removes all empty subdirectories recursively inside the given directories,
+including directories themselves if they end up to be empty.
 
 =head1 DESCRIPTION
 
 The command C<remove-empty-dirs> recursively visits all subdirectories of
-the directories given in the command line removes all empty directories.
+the directories given in the command line and removes all empty directories.
 It will remove also directories that become empty after recursivelly removing
 their empty subdirectories.
 

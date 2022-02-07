@@ -2,24 +2,19 @@
 use strict;
 use warnings;
 
-use Data::Dumper;
+use Data::Dumper::Compact qw(ddc);
 use Music::Intervals;
 
-my @notes = @ARGV ? @ARGV : qw(C Eb G);
+my @notes = @ARGV ? @ARGV : qw(C D E F G A B);
+#my @notes = @ARGV ? @ARGV : qw(C Db C# D Eb D# E Fb E# F Gb F# G Ab G# A Bb A# B Cb B#);
 
-my $m = Music::Intervals->new(
-    notes => \@notes,
-    size  => 2,
-);
+my $m = Music::Intervals->new(notes => \@notes);
 
-print Dumper
-    $m->chord_names,
-    $m->natural_frequencies,
-    $m->natural_intervals,
-    $m->natural_cents,
-    $m->natural_prime_factors,
-    $m->eq_tempered_frequencies,
-    $m->eq_tempered_intervals,
-    $m->eq_tempered_cents,
-    $m->integer_notation,
-;
+print 'Natural freqs: ',         ddc $m->natural_frequencies;
+print 'Natural intervals: ',     ddc $m->natural_intervals;
+print 'Natural cents: ',         ddc $m->natural_cents;
+print 'Natural prime factors: ', ddc $m->natural_prime_factors;
+print 'EQ Tempered freqs: ',     ddc $m->eq_tempered_frequencies;
+print 'EQ Tempered intervals: ', ddc $m->eq_tempered_intervals;
+print 'EQ Tempered cents: ',     ddc $m->eq_tempered_cents;
+print 'Integer notation: ',      ddc $m->integer_notation;

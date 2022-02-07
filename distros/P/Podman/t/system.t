@@ -19,8 +19,8 @@ my $Connection =
 my $Service = Mock::Podman::Service->new( Listen => $Connection );
 $Service->Start();
 
-my $Client = Podman::Client->new( Connection => $Connection );
-my $System = Podman::System->new( Client     => $Client );
+my $Client = Podman::Client->new( ConnectionURI => $Connection );
+my $System = Podman::System->new( Client        => $Client );
 
 my $ExpectedData = {
     "APIVersion" => "3.0.0",

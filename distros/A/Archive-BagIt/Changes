@@ -1,10 +1,26 @@
 ==================================================
-Changes from 2021-01-31 00:00:00 +0000 to present.
+Changes from 2021-02-03 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.091 at 2022-01-31 07:49:08 +0000
+version 0.092 at 2022-02-03 12:42:41 +0000
 ------------------------------------------
+
+  Change: 6bed7c60d4ba7d13e91768ca17718d6761c79f10
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2022-02-03 13:42:06 +0000
+
+    - added TestRequires section 
+
+------------------------------------------
+version 0.091 at 2022-01-31 07:49:29 +0000
+------------------------------------------
+
+  Change: 813004e2b8f94b6bbe134bf592760074f09e5fcc
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2022-01-31 08:49:29 +0000
+
+    Released 0.091 
 
   Change: ba5d493f8ec88c7ed6ea73f1cbfd2bd784e2fda5
   Author: Andreas Romeyke <art1@andreas-romeyke.de>
@@ -657,5 +673,5 @@ version 0.073 at 2021-04-23 09:52:34 +0000
     instead 134s (with Digest::) on my system 
 
 =================================================
-Plus 26 releases after 2021-01-31 00:00:00 +0000.
+Plus 26 releases after 2021-02-03 00:00:00 +0000.
 =================================================

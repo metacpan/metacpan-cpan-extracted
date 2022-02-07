@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-16'; # DATE
+our $DATE = '2022-01-22'; # DATE
 our $DIST = 'App-ImageMagickUtils'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/ImageMagickUtils/convert_image_to_pdf",
@@ -41,7 +41,7 @@ convert-image-to-pdf - Convert images to PDF using ImageMagick's 'convert' utili
 
 =head1 VERSION
 
-This document describes version 0.009 of convert-image-to-pdf (from Perl distribution App-ImageMagickUtils), released on 2022-01-16.
+This document describes version 0.010 of convert-image-to-pdf (from Perl distribution App-ImageMagickUtils), released on 2022-01-22.
 
 =head1 SYNOPSIS
 

@@ -35,8 +35,9 @@ sub _buildCommands {
 # 具体实现 _buildErrorCode,设置命令下发错误码 -> 用于拦截配置下发
 #------------------------------------------------------------------------------
 sub _buildErrorCode {
-  my $self  = shift;
-  my $codes = [ 'syntax error, expecting', 'missing argument', 'unknown command', 'Invalid input detected', '^Error:', ];
+  my $self = shift;
+  my $codes
+    = [ 'syntax error, expecting', 'missing argument', 'unknown command', 'Invalid input detected', '^Error:', ];
   return $codes;
 }
 

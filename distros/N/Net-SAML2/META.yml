@@ -28,49 +28,49 @@ name: Net-SAML2
 provides:
   Net::SAML2:
     file: lib/Net/SAML2.pm
-    version: '0.52'
+    version: '0.53'
   Net::SAML2::Binding::POST:
     file: lib/Net/SAML2/Binding/POST.pm
-    version: '0.52'
+    version: '0.53'
   Net::SAML2::Binding::Redirect:
     file: lib/Net/SAML2/Binding/Redirect.pm
-    version: '0.52'
+    version: '0.53'
   Net::SAML2::Binding::SOAP:
     file: lib/Net/SAML2/Binding/SOAP.pm
-    version: '0.52'
+    version: '0.53'
   Net::SAML2::IdP:
     file: lib/Net/SAML2/IdP.pm
-    version: '0.52'
+    version: '0.53'
   Net::SAML2::Protocol::ArtifactResolve:
     file: lib/Net/SAML2/Protocol/ArtifactResolve.pm
-    version: '0.52'
+    version: '0.53'
   Net::SAML2::Protocol::Assertion:
     file: lib/Net/SAML2/Protocol/Assertion.pm
-    version: '0.52'
+    version: '0.53'
   Net::SAML2::Protocol::AuthnRequest:
     file: lib/Net/SAML2/Protocol/AuthnRequest.pm
-    version: '0.52'
+    version: '0.53'
   Net::SAML2::Protocol::LogoutRequest:
     file: lib/Net/SAML2/Protocol/LogoutRequest.pm
-    version: '0.52'
+    version: '0.53'
   Net::SAML2::Protocol::LogoutResponse:
     file: lib/Net/SAML2/Protocol/LogoutResponse.pm
-    version: '0.52'
+    version: '0.53'
   Net::SAML2::Role::ProtocolMessage:
     file: lib/Net/SAML2/Role/ProtocolMessage.pm
-    version: '0.52'
+    version: '0.53'
   Net::SAML2::SP:
     file: lib/Net/SAML2/SP.pm
-    version: '0.52'
+    version: '0.53'
   Net::SAML2::Util:
     file: lib/Net/SAML2/Util.pm
-    version: '0.52'
+    version: '0.53'
   Net::SAML2::XML::Sig:
     file: lib/Net/SAML2/XML/Sig.pm
-    version: '0.52'
+    version: '0.53'
   Net::SAML2::XML::Util:
     file: lib/Net/SAML2/XML/Util.pm
-    version: '0.52'
+    version: '0.53'
 requires:
   Crypt::OpenSSL::Bignum: '0'
   Crypt::OpenSSL::RSA: '0'
@@ -110,7 +110,7 @@ requires:
 resources:
   bugtracker: https://github.com/perl-net-saml2/perl-Net-SAML2/issues
   repository: git://github.com/perl-net-saml2/perl-Net-SAML2.git
-version: '0.52'
+version: '0.53'
 x_contributors:
   - 'Chris Andrews <chris@nodnol.org>'
   - 'Oskari Okko Ojala <okko@frantic.com>'

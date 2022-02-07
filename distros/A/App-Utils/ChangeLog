@@ -1,5 +1,10 @@
 Revision history for Perl extension App::Utils
 
+0.055 2022-02-04 11:03:48 AST
+ - documentation improvements
+ - minor code and documentation changes in remove-empty-dirs
+ - added "move-merge" command
+
 0.054 2020-10-14 08:29:35 ADT
  - documentation improvements
  - some documentation changes in remove-empty-dirs

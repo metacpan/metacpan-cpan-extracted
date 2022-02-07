@@ -8,17 +8,33 @@ unless ($ENV{PERL_AUTHOR_TESTING}) {
     plan skip_all => "author testing only";
 }
 else {
-    plan tests => 14;
+    plan tests => 16;
 }
 use Capture::Tiny qw( capture_stdout );
+use Carp;
 use Data::Dump qw( dd pp );
+use File::Copy;
+use File::Spec;
+use File::Temp qw( tempdir );
 
 use_ok( 'Perl5::Dist::Backcompat' );
 
-note("Object to be created with no request for verbosity");
+my $tdir = tempdir( CLEANUP => 1);
+my $older_perls = File::Spec->catfile('.', 'etc', 'dist-backcompat-older-perls.txt');
+my $distro_metadata = File::Spec->catfile('.', 'etc', 'dist-backcompat-distro-metadata.txt');
+ok(-f $older_perls, "Able to locate $older_perls");
+ok(-f $distro_metadata, "Able to locate $distro_metadata");
+my $dbop = File::Spec->catfile($tdir, 'abc.txt');
+my $dbdm = File::Spec->catfile($tdir, 'def.txt');
+copy $older_perls => $dbop or croak "Unable to copy $older_perls";
+copy $distro_metadata => $dbdm or croak "Unable to copy $distro_metadata";
+
+note("Object to be created with no request for verbosity, explicit paths to metadata files");
 my $self = Perl5::Dist::Backcompat->new( {
     perl_workdir => $ENV{PERL_WORKDIR},
     verbose => 0,
+    older_perls_file => $dbop,
+    distro_metadata_file => $dbdm,
 } );
 ok(-d $self->{perl_workdir}, "Located git checkout of perl");
 

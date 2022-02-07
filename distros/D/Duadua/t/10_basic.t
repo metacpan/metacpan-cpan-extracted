@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
+use HTTP::Headers;
 use Duadua;
 
 {
@@ -158,6 +159,23 @@ use Duadua;
     my $d = Duadua->parse('Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)', { version => 1 });
 
     is $d->name, 'Googlebot', 'method call with option';
+    ok $d->is_bot;
+    ok !$d->is_ios;
+    ok !$d->is_android;
+    ok !$d->is_linux;
+    ok !$d->is_windows;
+    ok !$d->is_chromeos;
+    is $d->version, '2.1';
+}
+
+{
+    my $headers = HTTP::Headers->new(
+        User_Agent => 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+    );
+    my $d = Duadua->new($headers, { version => 1 });
+
+    is $d->name, 'Googlebot', 'version';
+    ok $d->opt_version;
     ok $d->is_bot;
     ok !$d->is_ios;
     ok !$d->is_android;

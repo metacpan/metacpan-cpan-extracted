@@ -1,5 +1,5 @@
 use strict;
-use Test::More 'no_plan';
+use Test::More;
 
 {
     package Foo;
@@ -69,3 +69,6 @@ is_deeply [$obj->caller], [__PACKAGE__, $0, __LINE__], 'caller works';
 is $obj->warn, "Testing warn at $0 line 42.\n";
 
 is eval { $obj->strict }, 42;
+
+done_testing;
+

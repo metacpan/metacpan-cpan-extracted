@@ -1,7 +1,5 @@
 package Podman::Image;
 
-##! Provides operations to create (build, pull) a new image and to manage it.
-
 use strict;
 use warnings;
 use utf8;
@@ -17,7 +15,6 @@ use Scalar::Util;
 
 use Podman::Client;
 
-### [Podman::Client](Client.html) API connector.
 has 'Client' => (
     is      => 'ro',
     isa     => 'Podman::Client',
@@ -25,17 +22,12 @@ has 'Client' => (
     default => sub { return Podman::Client->new() },
 );
 
-### Image name.
 has 'Name' => (
     is       => 'ro',
     isa      => 'Str',
     required => 1,
 );
 
-### Build new named image by given OCI file.
-###
-### All files placed in the OCI file directory are packed in a tar archive and
-### attached to the request body.
 sub Build {
     my ( $Package, $Name, $File, $Client ) = @_;
 
@@ -77,7 +69,6 @@ sub Build {
     );
 }
 
-### Pull named image with optional tag (default **latest**) from registry.
 sub Pull {
     my ( $Package, $Name, $Tag, $Client ) = @_;
 
@@ -120,7 +111,6 @@ sub Inspect {
     return \%Inspect;
 }
 
-### Remove image from local store.
 sub Remove {
     my ( $Self, $Force ) = @_;
 
@@ -132,3 +122,87 @@ sub Remove {
 __PACKAGE__->meta->make_immutable;
 
 1;
+
+=encoding utf8
+
+=head1 NAME
+
+Podman::Image - Control image.
+
+=head1 SYNOPSIS
+
+    # Pull image from iregistry
+    my $Image = Podman::Image->Pull('docker.io/library/hello-world');
+
+    # Build new image from File
+    my $Image = Podman::Image->Build('localhost/goodbye', '/tmp/Dockerfile');
+
+    # Retrieve advanced image information
+    my $info = $Image->Inspect();
+
+    # Remove local stored image
+    $Image->Remove();
+
+=head1 DESCRIPTION
+
+L<Podman::Image> provides functionality to control an image.
+
+=head1 ATTRIBUTES
+
+=head2 Name
+
+    my $Image = Podman::Image->new( Name => 'localhost/goodbye' );
+
+Unique image name or other identifier.
+
+=head2 Client
+
+    my $Client = Podman::Client->new(
+        Connection => 'http+unix:///var/cache/podman.sock' );
+    my $Image = Podman::Image->new( Client => $Client );
+
+Optional L<Podman::Client> object.
+
+=head1 METHODS
+
+=head2 Build
+
+    my $Image = Podman::Image->Build('localhost/goodbye', '/tmp/Dockerfile');
+
+Build a named image by a given build file and store it. All further content in
+the build file directory is used as well to create the new image.
+
+=head2 Inspect
+
+    my $Info = $Image->Inspect();
+
+Return advanced image information.
+
+=head2 Pull
+
+    my $Image = Podman::Image->Pull('docker.io/library/hello-world');
+
+Pull named image from registry into store.
+
+=head2 Remove
+
+    $Image->Remove();
+
+Remove image from store.
+
+=head1 AUTHORS
+
+=over 2
+
+Tobias Schäfer, <tschaefer@blackox.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2022-2022, Tobias Schäfer.
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Artistic License version 2.0.
+
+=cut

@@ -45,10 +45,9 @@ sub register ($self, $app, $conf) {
           $c->reply->exception($_)
         } finally {
           my $status = $c->res->code;
-          $transaction->set_http_status() if $status;
+          $transaction->set_http_status($status) if $status;
           $transaction->finish();
-        }
-
+        };
       });
     }
   );

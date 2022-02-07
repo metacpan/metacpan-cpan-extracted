@@ -263,3 +263,10 @@ else {
   warn "\nSkipping test 3 - no Math::GMPq\n";
   print "ok 3\n";
 }
+
+# Check that the &PL_sv_yes bug
+# does not rear its ugly head here
+# See https://github.com/sisyphus/math-decimal64/pull/1
+
+sub hmmmm () {!0}
+sub aaarh () {!1}

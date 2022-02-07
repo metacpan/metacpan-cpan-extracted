@@ -83,7 +83,7 @@
    "provides" : {
       "Connector" : {
          "file" : "lib/Connector.pm",
-         "version" : "1.43"
+         "version" : "1.44"
       },
       "Connector::Builtin" : {
          "file" : "lib/Connector/Builtin.pm"
@@ -202,7 +202,7 @@
          "web" : "https://github.com/mrscotty/connector"
       }
    },
-   "version" : "1.43",
+   "version" : "1.44",
    "x_contributors" : [
       "Martin Bartosch <m.bartosch@cynops.de>",
       "Martin Bartosch <mbartosch@whiterabbitsecurity.com>",

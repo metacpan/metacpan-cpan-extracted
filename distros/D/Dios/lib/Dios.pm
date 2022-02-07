@@ -1,5 +1,5 @@
 package Dios;
-our $VERSION = '0.002011';
+our $VERSION = '0.002012';
 
 use 5.014; use warnings;
 use Dios::Types;
@@ -98,6 +98,7 @@ sub _translate_parameters {
     my $sub_name_tidy = $sub_name;
     $sub_name_tidy =~ s{\A \s*+ (?: \# .*+ \n \s*+ )*+ }{}x;
 
+    my @param_names;
     my $sub_desc = $sub_name ? "$kind $sub_name_tidy" : "anonymous $kind";
     my $invocant_name = $^H{'Dios invocant_name'} // '$self';
 
@@ -114,7 +115,7 @@ sub _translate_parameters {
         my $spec = ( $kind eq 'method' ? q{ {type=>'Any',    where=[]}, } : q{} )
                  . ( $std_slurpy       ? q{ {optional => 1, type=>'Slurpy', where=>[]} } : q{} );
 
-        return { code => $code, spec => $spec };
+        return { code => $code, spec => $spec, names=>\@param_names };
     }
 
     $params =~ s{\A \s*+ \(}{}x;
@@ -198,6 +199,7 @@ sub _translate_parameters {
         _error( qq{Can't declare two parameters named $param->{var}\n in specification of $sub_desc})
             if exists $param_named{ $param->{var} };
         $param_named{ $param->{var} }++;
+        push @param_names, $param->{name} if $param->{name};
 
         # Parameters are lexical, so can't be named @_ or $_ or %_...
         _error(
@@ -294,7 +296,7 @@ sub _translate_parameters {
     if (defined $return_constraint) {
         $return_type .= qq{, sub $return_constraint };
     }
-    return { code => $code, return_type => $return_type, spec => $spec };
+    return { code => $code, return_type => $return_type, spec => $spec, names => \@param_names };
 }
 
 sub _verify_required_named {
@@ -818,6 +820,7 @@ sub _compose_field {
     }
 
     # Update the attribute setting code...
+    $^H{'Dios attrnames'} .= "$name,";
     if ($sigil eq '$') {
         $^H{'Dios attrs'} .= $] < 5.022 ? qq{alias my \$$name =    \$_Dios__attr_${name}[\${\$_[0]}];}
                                         : qq{   \\ my \$$name = \\ \$_Dios__attr_${name}[\${\$_[0]}];};
@@ -1145,14 +1148,25 @@ sub import {
         my $use_aliasing = $] < 5.022 ? q{use Data::Alias} : q{use experimental 'refaliasing'};
         my $attr_binding = $^H{'Dios attrs'} ? "$use_aliasing; $^H{'Dios attrs'}" : q{};
 
+        # Extract attribute names...
+        my %attr_name = map { $_ => 1 } split ',', ($^H{'Dios attrnames'}//q{});
+
+        # Generate the code to unpack and test arguments...
+        my $parameter_spec = _translate_parameters($parameter_list, method => "$sub_name");
+
         # Handle any special submethod names...
         my $init_args = q{};
         if ($sub_name eq 'BUILD') {
             # Extract named args for :InitArgs hash (TODO: this should pull out type/required info too)...
-            my @param_names = $parameter_list =~ m{ : [\$\@%]?+ (\w++) }gxms;
+
+            my $invalid_names
+                = join ', ', map { $attr_name{$_} ? ":$_" : () } @{$parameter_spec->{names}};
+            if (my $invalid_names = join ', ', map { $attr_name{$_} ? ":$_" : () } @{$parameter_spec->{names}} ) {
+                _error("Can't use an attribute name as a parameter name ($invalid_names)\nin submethod BUILD()");
+            }
 
             # Tell OIO about this constructor args...
-            $init_args = qq{ BEGIN{ my %$sub_name :InitArgs = map { \$_ => {} } qw{@param_names}; } };
+            $init_args = qq{ BEGIN{ my %$sub_name :InitArgs = map { \$_ => {} } qw{@{$parameter_spec->{names}}}; } };
 
             # Mark the sub as an initializer
             $attrs .= ' :Private :Init';
@@ -1175,12 +1189,9 @@ sub import {
             $attr_binding = qq{ if ((ref(\$_[0])||\$_[0]) ne __PACKAGE__) { return \$_[0]->SUPER::$sub_name(\@_[1..\$#_]); } } . $attr_binding;
         }
 
-        # Generate the code to unpack and test arguments...
-        $parameter_list = _translate_parameters($parameter_list, method => "$sub_name");
-
         # Assemble and return the method definition...
         ($sub_name ? "sub $sub_name;" : q{} )
-        . qq{$init_args sub $sub_name $attrs { $attr_binding { $parameter_list->{code}; do $block } } };
+        . qq{$init_args sub $sub_name $attrs { $attr_binding { $parameter_spec->{code}; do $block } } };
     }
 
     # Components of variable declaration...
@@ -1260,7 +1271,7 @@ Dios - Declarative Inside-Out Syntax
 
 =head1 VERSION
 
-This document describes Dios version 0.002011
+This document describes Dios version 0.002012
 
 
 =head1 SYNOPSIS
@@ -2583,6 +2594,9 @@ named parameters. Like so:
         }
     }
 
+Note, however, that these named parameters B<cannot> have the same name
+as any class attribute.
+
 When the class constructor is called, and passed a hashref with
 labelled arguments, any arguments matching the named parameters
 of C<BUILD> are passed to that submethod.
@@ -2687,6 +2701,49 @@ and so the corresponding parameter must be declared as an array.
 
 Convert the named slurpy hash or scalar you declared to an array, or
 else declare the hash or scalar as non-slurpy (by removing the C<*>).
+
+
+=item C<< Can't use an attribute name as a parameter name in submethod BUILD() >>
+
+A C<BUILD()> submethod cannot specify named parameters whose names are the
+same as the name of any attribute of the class.
+
+This is because direct attribute initialization supercedes indirect
+initialization via C<BUILD()>. In other words, the constructor argument
+is "stolen" by the attribute before C<BUILD()> is invoked, which means
+that the identically named C<BUILD()> argument has no constructor argument
+remaining with which is could be initialized.
+
+Moreover, even if the parameter could be initialized correctly, it
+would hide the attribute of the same name within the body of the submethod,
+which makes it impossible to directly access that attribute:
+
+    has $.start;
+
+    submethod BUILD (:$start) {
+        $start = max($start, 0);   # This does NOT assign to the attribute
+    }
+
+
+To prevent these subtle initialization behaviours from introducing bugs,
+declaring a named argument with the same name as an existing attribute
+is flagged as a compile-time error:
+
+    has $.start;
+
+    submethod BUILD (:$start) {  # Error here because attr name 'start' reused
+        $start = max($start, 0);
+    }
+
+The workaround is simply to use a different name for the C<BUILD()> parameter,
+passing its corresponding named argument to the constructor by that different name:
+
+    has $.start;
+
+    submethod BUILD (:$begin) {
+        $start = max($begin, 0);
+    }
+
 
 
 =item C<< Invalid parameter specification: %s in %s declaration >>
@@ -2882,6 +2939,11 @@ None reported.
 Shared array or hash attributes that are public cannot be accessed
 correctly if the chosen accessor style is C<'lvalue'>, because lvalue
 subroutines in Perl can only return scalars.
+
+The module relies on the Keyword::Declare module,
+which means that it will not work at all under Perl 5.20
+and that, under Perl 5.14 and 5.16, it specifically
+needs version 0.3 (NOT version 0.4) of the Keyword::Simple module.
 
 No other bugs have been reported.
 

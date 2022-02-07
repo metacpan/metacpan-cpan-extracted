@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.57;
 
-package Tickit::Widget::MenuBar 0.14;
+package Tickit::Widget::MenuBar 0.15;
 class Tickit::Widget::MenuBar
    :isa(Tickit::Widget::Menu::base);
 
@@ -255,15 +255,15 @@ method on_key ( $ )
 }
 
 # MenuBar always expands on highlight
-method key_highlight_next ( $ )
+method key_highlight_next ( $ev )
 {
-   $self->SUPER::key_highlight_next( @_ );
+   $self->SUPER::key_highlight_next( $ev );
    $self->expand_item( $self->_active_idx );
 }
 
-method key_highlight_prev ( $ )
+method key_highlight_prev ( $ev )
 {
-   $self->SUPER::key_highlight_prev( @_ );
+   $self->SUPER::key_highlight_prev( $ev );
    $self->expand_item( $self->_active_idx );
 }
 

@@ -2,9 +2,9 @@ NAME
     Dist::Zilla::Plugin::GenPericmdScript - Generate Perinci::CmdLine script
 
 VERSION
-    This document describes version 0.423 of
+    This document describes version 0.424 of
     Dist::Zilla::Plugin::GenPericmdScript (from Perl distribution
-    Dist-Zilla-Plugin-GenPericmdScript), released on 2020-07-31.
+    Dist-Zilla-Plugin-GenPericmdScript), released on 2022-01-22.
 
 SYNOPSIS
     In dist.ini:
@@ -217,6 +217,43 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Dist-Zilla-Plugin-GenPericmdScript>.
 
+SEE ALSO
+    Perinci::CmdLine, the kind of CLI script this plugin is generating.
+
+    Perinci and Rinci, for the background information.
+
+    Dist::Zilla::Plugin::Perinci::CmdLine, if you are building
+    "Perinci::CmdLine::*" distribution.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
+    steps required beyond that are considered a bug and can be reported to
+    me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2022, 2020, 2018, 2017, 2016, 2015, 2014
+    by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
 BUGS
     Please report any bugs or feature requests on the bugtracker website
     <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Gen
@@ -224,22 +261,4 @@ BUGS
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
-
-SEE ALSO
-    Rinci
-
-    Pod::Weaver::Plugin::Rinci to fill more stuffs to the POD of the
-    generated script.
-
-    "Dist::Zilla::Plugin::Rinci::*" for plugins that utilize Rinci metadata.
-
-AUTHOR
-    perlancar <perlancar@cpan.org>
-
-COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2018, 2017, 2016, 2015, 2014 by
-    perlancar@cpan.org.
-
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
 

@@ -39,3 +39,9 @@ if(!RMPFI_BOTH_ARE_EXACT(RIGHT_ENDPOINT_INEXACT) && !RMPFI_BOTH_ARE_INEXACT(RIGH
    !RMPFI_LEFT_IS_INEXACT(RIGHT_ENDPOINT_INEXACT) && RMPFI_RIGHT_IS_INEXACT(RIGHT_ENDPOINT_INEXACT)) {print "ok 6\n"}
 else {print "not ok 6\n"}
 
+# Check that the &PL_sv_yes bug
+# does not rear its ugly head here
+# See https://github.com/sisyphus/math-decimal64/pull/1
+
+sub hmmmm () {!0}
+sub aaarh () {!1}

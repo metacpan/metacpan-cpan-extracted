@@ -200,6 +200,20 @@ my @script_tests = (
 
     },
     {
+        label => "line ".__LINE__.": modification with a YAML script and a var that uses a default value",
+        script => [
+            "# Format: YAML",
+            "---",
+            "app: popcon",
+            "default: ",
+            "  defname: foobar",
+            'var: "$var{name} = $args{defname}"',
+            'load: "! MY_HOSTID=\\\\$name$name"'
+        ],
+        test => qr/"\$namefoobar"/,
+        stderr => $expect_namefoobar
+    },
+    {
         label => "line ".__LINE__.": quiet modification with a script and var section",
         script => [ "app:  popcon", 'var: $var{name}="foobar2"','load ! MY_HOSTID=\$name$name'],
         test => qr/"\$namefoobar2"/,
@@ -266,6 +280,39 @@ Changes applied to popcon configuration:
 - MY_HOSTID: 'aaaaab' -> 'aaaax4ab'
 ],
     },
+    {
+        label => "line ".__LINE__.": modification with a script with code",
+        script => [
+            "app:  popcon",
+            '---code',
+            q!$root->fetch_element('MY_HOSTID')->store($to_store);!,
+            '---',
+        ],
+        args => [qw/--arg to_store=with_code/],
+        test => qr/MY_HOSTID="with_code"/,
+        stderr => q(
+Changes applied to popcon configuration:
+- MY_HOSTID: 'aaaaaaaaaaaaaaaaaaaa' -> 'with_code'
+)
+    },
+    {
+        label => "line ".__LINE__.": modification with a script with Perl format",
+        script => [
+            <<'EOS'
+# Format: perl
+{
+   app => 'popcon',
+   sub => sub ($root, $arg ) { $root->fetch_element('MY_HOSTID')->store($arg->{to_store});  },
+};
+EOS
+        ],
+        args => [qw/--arg to_store=with_code/],
+        test => qr/MY_HOSTID="with_code"/,
+        stderr => q(
+Changes applied to popcon configuration:
+- MY_HOSTID: 'aaaaaaaaaaaaaaaaaaaa' -> 'with_code'
+)
+    },
 );
 
 
@@ -309,13 +356,23 @@ my @bad_script_tests = (
         error_regexp => qr/use option '-arg name1=xxx -arg name2=xxx'/
     },
     {
-        label => "line ".__LINE__.": modification with a Perl script run by cme run with  missing args in var line",
+        label => "line ".__LINE__.": modification with a Perl script run by cme run with missing args in var line",
         script => [
             "app:  popcon",
             'var: $var{name} = $args{name1}.$args{name2}',
             'load: ! MY_HOSTID=$name'],
         args => [],
         error_regexp => qr/use option '-arg name1=xxx -arg name2=xxx'/
+    },
+    {
+        label => "line ".__LINE__.":  load and code section",
+        script => [
+            "app:  popcon",
+            'load: ! MY_HOSTID=$name',
+            q!code: $root->load("MY_HOSTID=$name")!,
+        ],
+        args => [],
+        error_regexp => qr/Cannot mix code and load section/
     },
 );
 

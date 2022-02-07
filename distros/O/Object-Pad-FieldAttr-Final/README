@@ -1,0 +1,64 @@
+NAME
+
+    Object::Pad::FieldAttr::Final - declare Object::Pad fields readonly
+    after construction
+
+SYNOPSIS
+
+       use Object::Pad;
+       use Object::Pad::FieldAttr::Final;
+    
+       class Rectangle {
+          has $width  :param :reader :Final;
+          has $height :param :reader :Final;
+    
+          has $area :reader :Final;
+    
+          ADJUST {
+             $area = $width * $height;
+          }
+       }
+
+DESCRIPTION
+
+    This module provides a third-party field attribute for
+    Object::Pad-based classes, which declares that the field it is attached
+    to shall be set as readonly when the constructor returns, disallowing
+    further modification to it.
+
+    WARNING The ability for Object::Pad to take third-party field
+    attributes is still new and highly experimental, and subject to much
+    API change in future. As a result, this module should be considered
+    equally experimental.
+
+FIELD ATTRIBUTES
+
+ :Final
+
+       has $field :Final ...;
+       has $field :Final ... = DEFAULT;
+
+    Declares that the field variable will be set readonly at the end of the
+    constructor, after any assignments from :param declarations or ADJUST
+    blocks. At this point, the value cannot otherwise be modified by
+    directly writing into the field variable.
+
+       has $field :Final;
+    
+       ADJUST { $field = 123; }    # this is permitted
+    
+       method m { $field = 456; }  # this will fail
+
+    Note that this is only a shallow readonly setting; if the field
+    variable contains a reference to a data structure, that structure
+    itself remains mutable.
+
+       has $aref :Final;
+       ADJUST { $aref = []; }
+    
+       method more { push @$aref, "another"; }   # this is permitted
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

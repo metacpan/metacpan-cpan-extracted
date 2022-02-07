@@ -64,16 +64,16 @@ subtest(
 
 subtest(
     'Relative paths' => sub {
-        like(
-            dies( sub { Test::MockFile->dir('./bar/'); } ),
-            qr/\QRelative paths are not supported\E/xms,
-            'Failure with ./ for dir',
+        is(
+            lives( sub { Test::MockFile->dir('./bar/'); } ),
+            1,
+            'Success with ./ for dir',
         );
 
-        like(
-            dies( sub { Test::MockFile->file( './bar', [] ); } ),
-            qr/\QRelative paths are not supported\E/xms,
-            'Failure with ./ for file',
+        is(
+            lives( sub { Test::MockFile->file( './bar', [] ); } ),
+            1,
+            'Success with ./ for file',
         );
 
         like(
@@ -94,10 +94,10 @@ subtest(
             'Failure with /../ for dir',
         );
 
-        like(
-            dies( sub { Test::MockFile->file( '/foo/.', [] ); } ),
-            qr/\QRelative paths are not supported\E/xms,
-            'Failure with /. for file',
+        is(
+            lives( sub { Test::MockFile->file( '/foo/.', [] ); } ),
+            1,
+            'Success with /. for file',
         );
 
         like(
@@ -112,16 +112,16 @@ subtest(
             'Failure with /../ for file',
         );
 
-        like(
-            dies( sub { Test::MockFile->dir('/foo/./bar/'); } ),
-            qr/\QRelative paths are not supported\E/xms,
-            'Failure with /./ for dir',
+        is(
+            lives( sub { Test::MockFile->dir('/foo/./bar/'); } ),
+            1,
+            'Success with /./ for dir',
         );
 
-        like(
-            dies( sub { Test::MockFile->file( '/foo/./bar', [] ); } ),
-            qr/\QRelative paths are not supported\E/xms,
-            'Failure with /./ for file',
+        is(
+            lives( sub { Test::MockFile->file( '/foo/./bar', [] ); } ),
+            1,
+            'Success with /./ for file',
         );
 
         is(

@@ -1,5 +1,9 @@
 Revision history for Symlink-DSL
 
+0.4.0       2022-02-06
+
+    - Extracted process_single_record().
+
 0.2.5       2020-04-29
     - Documentation improvements.
         - Thanks to the Mageia Linux packaging process.

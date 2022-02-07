@@ -11,17 +11,8 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#include <stdlib.h>
-#include <float.h>
 
-
-#ifdef OLDPERL
-#define SvUOK SvIsUV
-#endif
-
-#ifndef Newx
-#  define Newx(v,n,t) New(0,v,n,t)
-#endif
+#include "math_longdouble_include.h"
 
 #if defined(LDBL_MANT_DIG)
 #  if LDBL_MANT_DIG == 53
@@ -90,7 +81,7 @@ typedef long double ldbl;
 
 void _print_bytes(const void* p, int n) {
   int i;
-  printf("DEBUG: ");
+
 #ifdef WE_HAVE_BENDIAN /* Big Endian architecture */
   for (i = 0; i < n; i++) {
 #else
@@ -509,26 +500,26 @@ SV * _overload_sub(pTHX_ SV * a, SV * b, SV * third) {
      SvREADONLY_on(obj);
 
     if(SvUOK(b)) {
-       if(third == &PL_sv_yes) *ld = (ldbl)SvUVX(b) - *(INT2PTR(ldbl *, SvIVX(SvRV(a))));
+       if(SWITCH_ARGS) *ld = (ldbl)SvUVX(b) - *(INT2PTR(ldbl *, SvIVX(SvRV(a))));
        else *ld = *(INT2PTR(ldbl *, SvIVX(SvRV(a)))) - (ldbl)SvUVX(b);
        return obj_ref;
     }
 
     if(SvIOK(b)) {
-       if(third == &PL_sv_yes) *ld = (ldbl)SvIVX(b) - *(INT2PTR(ldbl *, SvIVX(SvRV(a))));
+       if(SWITCH_ARGS) *ld = (ldbl)SvIVX(b) - *(INT2PTR(ldbl *, SvIVX(SvRV(a))));
        else *ld = *(INT2PTR(ldbl *, SvIVX(SvRV(a)))) - (ldbl)SvIVX(b);
        return obj_ref;
     }
 
     if(SvNOK(b)) {
-       if(third == &PL_sv_yes) *ld = (ldbl)SvNVX(b) - *(INT2PTR(ldbl *, SvIVX(SvRV(a))));
+       if(SWITCH_ARGS) *ld = (ldbl)SvNVX(b) - *(INT2PTR(ldbl *, SvIVX(SvRV(a))));
        else *ld = *(INT2PTR(ldbl *, SvIVX(SvRV(a)))) - (ldbl)SvNVX(b);
        return obj_ref;
     }
 
     if(SvPOK(b)) {
        char * p;
-       if(third == &PL_sv_yes) *ld = strtold(SvPV_nolen(b), &p) - *(INT2PTR(ldbl *, SvIVX(SvRV(a))));
+       if(SWITCH_ARGS) *ld = strtold(SvPV_nolen(b), &p) - *(INT2PTR(ldbl *, SvIVX(SvRV(a))));
        else *ld = *(INT2PTR(ldbl *, SvIVX(SvRV(a)))) - strtold(SvPV_nolen(b), &p);
        _nnum_inc(p);
        return obj_ref;
@@ -545,7 +536,7 @@ SV * _overload_sub(pTHX_ SV * a, SV * b, SV * third) {
 
     /*
     else {
-      if(third == &PL_sv_yes) {
+      if(SWITCH_ARGS) {
         *ld = *(INT2PTR(long double *, SvIVX(SvRV(a)))) * -1.0L;
         return obj_ref;
       }
@@ -570,26 +561,26 @@ SV * _overload_div(pTHX_ SV * a, SV * b, SV * third) {
      SvREADONLY_on(obj);
 
     if(SvUOK(b)) {
-       if(third == &PL_sv_yes) *ld = (ldbl)SvUVX(b) / *(INT2PTR(ldbl *, SvIVX(SvRV(a))));
+       if(SWITCH_ARGS) *ld = (ldbl)SvUVX(b) / *(INT2PTR(ldbl *, SvIVX(SvRV(a))));
        else *ld = *(INT2PTR(ldbl *, SvIVX(SvRV(a)))) / (ldbl)SvUVX(b);
        return obj_ref;
     }
 
     if(SvIOK(b)) {
-       if(third == &PL_sv_yes) *ld = (ldbl)SvIVX(b) / *(INT2PTR(ldbl *, SvIVX(SvRV(a))));
+       if(SWITCH_ARGS) *ld = (ldbl)SvIVX(b) / *(INT2PTR(ldbl *, SvIVX(SvRV(a))));
        else *ld = *(INT2PTR(ldbl *, SvIVX(SvRV(a)))) / (ldbl)SvIVX(b);
        return obj_ref;
     }
 
     if(SvNOK(b)) {
-       if(third == &PL_sv_yes) *ld = (ldbl)SvNVX(b) / *(INT2PTR(ldbl *, SvIVX(SvRV(a))));
+       if(SWITCH_ARGS) *ld = (ldbl)SvNVX(b) / *(INT2PTR(ldbl *, SvIVX(SvRV(a))));
        else *ld = *(INT2PTR(ldbl *, SvIVX(SvRV(a)))) / (ldbl)SvNVX(b);
        return obj_ref;
     }
 
     if(SvPOK(b)) {
        char * p;
-       if(third == &PL_sv_yes) *ld = strtold(SvPV_nolen(b), &p) / *(INT2PTR(ldbl *, SvIVX(SvRV(a))));
+       if(SWITCH_ARGS) *ld = strtold(SvPV_nolen(b), &p) / *(INT2PTR(ldbl *, SvIVX(SvRV(a))));
        else *ld = *(INT2PTR(ldbl *, SvIVX(SvRV(a)))) / strtold(SvPV_nolen(b), &p);
        _nnum_inc(p);
        return obj_ref;
@@ -854,7 +845,7 @@ SV * _overload_div_eq(pTHX_ SV * a, SV * b, SV * third) {
 SV * _overload_lt(pTHX_ SV * a, SV * b, SV * third) {
     char *p;
     int reversal = 0;
-    if(third == &PL_sv_yes) reversal = 1;
+    if(SWITCH_ARGS) reversal = 1;
 
     if(SvUOK(b)) {
       if(reversal) {
@@ -915,7 +906,7 @@ SV * _overload_lt(pTHX_ SV * a, SV * b, SV * third) {
 SV * _overload_gt(pTHX_ SV * a, SV * b, SV * third) {
     char *p;
     int reversal = 0;
-    if(third == &PL_sv_yes) reversal = 1;
+    if(SWITCH_ARGS) reversal = 1;
 
     if(SvUOK(b)) {
       if(reversal) {
@@ -975,7 +966,7 @@ SV * _overload_gt(pTHX_ SV * a, SV * b, SV * third) {
 SV * _overload_lte(pTHX_ SV * a, SV * b, SV * third) {
     char *p;
     int reversal = 0;
-    if(third == &PL_sv_yes) reversal = 1;
+    if(SWITCH_ARGS) reversal = 1;
 
     if(SvUOK(b)) {
       if(reversal) {
@@ -1035,7 +1026,7 @@ SV * _overload_lte(pTHX_ SV * a, SV * b, SV * third) {
 SV * _overload_gte(pTHX_ SV * a, SV * b, SV * third) {
     char *p;
     int reversal = 0;
-    if(third == &PL_sv_yes) reversal = 1;
+    if(SWITCH_ARGS) reversal = 1;
 
     if(SvUOK(b)) {
       if(reversal) {
@@ -1095,7 +1086,7 @@ SV * _overload_gte(pTHX_ SV * a, SV * b, SV * third) {
 SV * _overload_spaceship(pTHX_ SV * a, SV * b, SV * third) {
     char *p;
     int reversal = 1;
-    if(third == &PL_sv_yes) reversal = -1;
+    if(SWITCH_ARGS) reversal = -1;
 
     if(SvUOK(b)) {
        if(*(INT2PTR(ldbl *, SvIVX(SvRV(a)))) == (ldbl)SvUVX(b)) return newSViv( 0);
@@ -1386,21 +1377,21 @@ SV * _overload_atan2(pTHX_ SV * a, SV * b, SV * third) {
      SvREADONLY_on(obj);
 
      if(SvUOK(b)) {
-       if(third == &PL_sv_yes)
+       if(SWITCH_ARGS)
             *ld = atan2l((ldbl)SvUVX(b), *(INT2PTR(ldbl *, SvIVX(SvRV(a)))));
        else *ld = atan2l(*(INT2PTR(ldbl *, SvIVX(SvRV(a)))), (ldbl)SvUVX(b));
        return obj_ref;
      }
 
      if(SvIOK(b)) {
-       if(third == &PL_sv_yes)
+       if(SWITCH_ARGS)
             *ld = atan2l((ldbl)SvIVX(b), *(INT2PTR(ldbl *, SvIVX(SvRV(a)))));
        else *ld = atan2l(*(INT2PTR(ldbl *, SvIVX(SvRV(a)))), (ldbl)SvIVX(b));
        return obj_ref;
      }
 
      if(SvNOK(b)) {
-       if(third == &PL_sv_yes)
+       if(SWITCH_ARGS)
             *ld = atan2l((ldbl)SvNVX(b), *(INT2PTR(ldbl *, SvIVX(SvRV(a)))));
        else *ld = atan2l(*(INT2PTR(ldbl *, SvIVX(SvRV(a)))), (ldbl)SvNVX(b));
        return obj_ref;
@@ -1408,7 +1399,7 @@ SV * _overload_atan2(pTHX_ SV * a, SV * b, SV * third) {
 
      if(SvPOK(b)) {
        char * p;
-       if(third == &PL_sv_yes)
+       if(SWITCH_ARGS)
             *ld = atan2l(strtold(SvPV_nolen(b), &p), *(INT2PTR(ldbl *, SvIVX(SvRV(a)))));
        else *ld = atan2l(*(INT2PTR(ldbl *, SvIVX(SvRV(a)))), strtold(SvPV_nolen(b), &p));
        _nnum_inc(p);
@@ -1458,14 +1449,14 @@ SV * _overload_pow(pTHX_ SV * a, SV * b, SV * third) {
      SvREADONLY_on(obj);
 
      if(SvUOK(b)) {
-       if(third == &PL_sv_yes)
+       if(SWITCH_ARGS)
             *ld = powl((ldbl)SvUVX(b), *(INT2PTR(ldbl *, SvIVX(SvRV(a)))));
        else *ld = powl(*(INT2PTR(ldbl *, SvIVX(SvRV(a)))), (ldbl)SvUVX(b));
        return obj_ref;
      }
 
      if(SvIOK(b)) {
-       if(third == &PL_sv_yes)
+       if(SWITCH_ARGS)
             *ld = powl((ldbl)SvIVX(b), *(INT2PTR(ldbl *, SvIVX(SvRV(a)))));
        else {
 #ifdef NAN_POW_BUG
@@ -1480,7 +1471,7 @@ SV * _overload_pow(pTHX_ SV * a, SV * b, SV * third) {
 
      if(SvNOK(b)) {
 #ifdef NAN_POW_BUG
-       if(third == &PL_sv_yes) {
+       if(SWITCH_ARGS) {
          if(_is_nan(SvNVX(b)) && *(INT2PTR(ldbl *, SvIVX(SvRV(a)))) == 0) *ld = 1.0L;
          else *ld = powl((ldbl)SvNVX(b), *(INT2PTR(ldbl *, SvIVX(SvRV(a)))));
        }
@@ -1489,7 +1480,7 @@ SV * _overload_pow(pTHX_ SV * a, SV * b, SV * third) {
          else *ld = powl(*(INT2PTR(ldbl *, SvIVX(SvRV(a)))), (ldbl)SvNVX(b));
        }
 #else
-       if(third == &PL_sv_yes)
+       if(SWITCH_ARGS)
             *ld = powl((ldbl)SvNVX(b), *(INT2PTR(ldbl *, SvIVX(SvRV(a)))));
        else *ld = powl(*(INT2PTR(ldbl *, SvIVX(SvRV(a)))), (ldbl)SvNVX(b));
 #endif
@@ -1499,7 +1490,7 @@ SV * _overload_pow(pTHX_ SV * a, SV * b, SV * third) {
      if(SvPOK(b)) {
        char * p;
 #ifdef NAN_POW_BUG
-       if(third == &PL_sv_yes) {
+       if(SWITCH_ARGS) {
          if(_is_nan(strtold(SvPV_nolen(b), &p)) && *(INT2PTR(ldbl *, SvIVX(SvRV(a)))) == 0.0L) *ld = 1.0L;
          else *ld = powl(strtold(SvPV_nolen(b), &p), *(INT2PTR(ldbl *, SvIVX(SvRV(a)))));
        }
@@ -1508,7 +1499,7 @@ SV * _overload_pow(pTHX_ SV * a, SV * b, SV * third) {
          else *ld = powl(*(INT2PTR(ldbl *, SvIVX(SvRV(a)))), strtold(SvPV_nolen(b), &p));
        }
 #else
-       if(third == &PL_sv_yes)
+       if(SWITCH_ARGS)
             *ld = powl(strtold(SvPV_nolen(b), &p), *(INT2PTR(ldbl *, SvIVX(SvRV(a)))));
        else *ld = powl(*(INT2PTR(ldbl *, SvIVX(SvRV(a)))), strtold(SvPV_nolen(b), &p));
 #endif

@@ -1,7 +1,22 @@
 
+# mpfr_root is deprecated in favour of mpfr_rootn_ui in mpfr-4.0.0
+# The 2 variants should produce identical results, except for the
+# nth root of -0 when n is zero.
+
 use strict;
 use warnings;
 use Math::MPFR qw(:mpfr);
+
+my $old = 0;
+
+if(MPFR_VERSION_MAJOR > 3) {
+  *_ROOT = \&Rmpfr_rootn_ui;
+}
+else {
+  *_ROOT = \&Rmpfr_root;
+  $old = 1;
+}
+
 
 print "1..57\n";
 
@@ -55,7 +70,7 @@ else {
 
 $root = 5;
 
-$inex1 = Rmpfr_root    ($rop1, $op, $root, MPFR_RNDN);
+$inex1 = _ROOT         ($rop1, $op, $root, MPFR_RNDN);
 $inex2 = Rmpfr_rec_root($rop2, $op, $root, MPFR_RNDN);
 
 $check = $rop1 * $rop2;
@@ -78,7 +93,7 @@ my $nzero = $pzero * -1;
 
 Rmpfr_clear_divby0();
 
-$inex1 = Rmpfr_root    ($rop1, $pzero, $root, MPFR_RNDN);
+$inex1 = _ROOT         ($rop1, $pzero, $root, MPFR_RNDN);
 $inex2 = Rmpfr_rec_root($rop2, $pzero, $root, MPFR_RNDN);
 
 if($inex1 == $inex2 && Rmpfr_divby0_p()) {print "ok 8\n"}
@@ -96,7 +111,7 @@ else {
   print "not ok 9\n";
 }
 
-$inex1 = Rmpfr_root    ($rop1, $nzero, $root, MPFR_RNDN);
+$inex1 = _ROOT         ($rop1, $nzero, $root, MPFR_RNDN);
 $inex2 = Rmpfr_rec_root($rop2, $nzero, $root, MPFR_RNDN);
 
 if($inex1 == $inex2 && Rmpfr_divby0_p()) {print "ok 10\n"}
@@ -114,7 +129,7 @@ else {
   print "not ok 11\n";
 }
 
-$inex1 = Rmpfr_root    ($rop1, $pzero, $root - 1, MPFR_RNDN);
+$inex1 = _ROOT         ($rop1, $pzero, $root - 1, MPFR_RNDN);
 $inex2 = Rmpfr_rec_root($rop2, $pzero, $root - 1, MPFR_RNDN);
 
 if($inex1 == $inex2 && Rmpfr_divby0_p()) {print "ok 12\n"}
@@ -132,7 +147,7 @@ else {
   print "not ok 13\n";
 }
 
-$inex1 = Rmpfr_root    ($rop1, $nzero, $root - 1, MPFR_RNDN);
+$inex1 = _ROOT         ($rop1, $nzero, $root - 1, MPFR_RNDN);
 $inex2 = Rmpfr_rec_root($rop2, $nzero, $root - 1, MPFR_RNDN);
 
 if($inex1 == $inex2 && Rmpfr_divby0_p()) {print "ok 14\n"}
@@ -143,17 +158,27 @@ else {
 
 Rmpfr_clear_divby0();
 
-if($rop1 == 1 / $rop2 && !Rmpfr_divby0_p() && Rmpfr_signbit($rop1) != Rmpfr_signbit($rop2)) {print "ok 15\n"}
+if($old) {
+  if($rop1 == 1 / $rop2 && !Rmpfr_divby0_p() && Rmpfr_signbit($rop1) != Rmpfr_signbit($rop2)) {print "ok 15\n"}
+  else {
+    warn "\n \$rop1: $rop1\n \$rop2: $rop2\ndivby0: ", Rmpfr_divby0_p(), "\n",
+         "signbits \$rop1: ", Rmpfr_signbit($rop1), " \$rop2: ", Rmpfr_signbit($rop2), "\n";
+    print "not ok 15\n";
+  }
+}
 else {
-  warn "\n \$rop1: $rop1\n \$rop2: $rop2\ndivby0: ", Rmpfr_divby0_p(), "\n",
-       "signbits \$rop1: ", Rmpfr_signbit($rop1), " \$rop2: ", Rmpfr_signbit($rop2), "\n";
-  print "not ok 15\n";
+  if($rop1 == 1 / $rop2 && !Rmpfr_divby0_p() && Rmpfr_signbit($rop1) == Rmpfr_signbit($rop2)) {print "ok 15\n"}
+  else {
+    warn "\n \$rop1: $rop1\n \$rop2: $rop2\ndivby0: ", Rmpfr_divby0_p(), "\n",
+         "signbits \$rop1: ", Rmpfr_signbit($rop1), " \$rop2: ", Rmpfr_signbit($rop2), "\n";
+    print "not ok 15\n";
+  }
 }
 
 Rmpfr_clear_divby0();
 Rmpfr_clear_nanflag();
 
-$inex1 = Rmpfr_root    ($rop1, $pzero, 0, MPFR_RNDN);
+$inex1 = _ROOT($rop1, $pzero, 0, MPFR_RNDN);
 
 if(Rmpfr_nanflag_p() && !Rmpfr_divby0_p()) {print "ok 16\n"}
 else {print "not ok 16\n"}
@@ -221,7 +246,7 @@ else {
 
 $root = 5;
 
-$inex1 = Rmpfr_root    ($rop1, $op, $root, MPFR_RNDN);
+$inex1 = _ROOT         ($rop1, $op, $root, MPFR_RNDN);
 $inex2 = Rmpfr_rec_root($rop2, $op, $root, MPFR_RNDN);
 
 if($inex1 == $inex2) {print "ok 24\n"}
@@ -238,7 +263,7 @@ else {
 
 $op *= -1; # +Inf
 
-$inex1 = Rmpfr_root    ($rop1, $op, $root, MPFR_RNDN);
+$inex1 = _ROOT         ($rop1, $op, $root, MPFR_RNDN);
 $inex2 = Rmpfr_rec_root($rop2, $op, $root, MPFR_RNDN);
 
 if($inex1 == $inex2) {print "ok 26\n"}
@@ -253,7 +278,7 @@ else {
   print "not ok 27\n";
 }
 
-$inex1 = Rmpfr_root    ($rop1, $op, $root - 1, MPFR_RNDN);
+$inex1 = _ROOT         ($rop1, $op, $root - 1, MPFR_RNDN);
 $inex2 = Rmpfr_rec_root($rop2, $op, $root - 1, MPFR_RNDN);
 
 if($inex1 == $inex2) {print "ok 28\n"}
@@ -270,7 +295,7 @@ else {
 
 Rmpfr_clear_nanflag();
 
-$inex1 = Rmpfr_root    ($rop1, $op, 0, MPFR_RNDN);
+$inex1 = _ROOT($rop1, $op, 0, MPFR_RNDN);
 
 if(Rmpfr_nanflag_p()) {print "ok 30\n"}
 else {print "not ok 30\n"}
@@ -298,7 +323,7 @@ $op *= -1; # -Inf
 
 Rmpfr_clear_nanflag();
 
-$inex1 = Rmpfr_root    ($rop1, $op, 0, MPFR_RNDN);
+$inex1 = _ROOT($rop1, $op, 0, MPFR_RNDN);
 
 if(Rmpfr_nanflag_p()) {print "ok 34\n"}
 else {print "not ok 34\n"}
@@ -360,7 +385,7 @@ $root = 5;
 
 Rmpfr_clear_nanflag();
 
-$inex1 = Rmpfr_root($rop1, $op, $root, MPFR_RNDN);
+$inex1 = _ROOT($rop1, $op, $root, MPFR_RNDN);
 
 if(Rmpfr_nanflag_p()) {print "ok 42\n"}
 else {print "not ok 42\n"}
@@ -390,7 +415,7 @@ $root = 0;
 
 Rmpfr_clear_nanflag();
 
-$inex1 = Rmpfr_root($rop1, $op, $root, MPFR_RNDN);
+$inex1 = _ROOT($rop1, $op, $root, MPFR_RNDN);
 
 if(Rmpfr_nanflag_p()) {print "ok 46\n"}
 else {print "not ok 46\n"}
@@ -422,7 +447,7 @@ Rmpfr_set_ui($op, 42, MPFR_RNDN);
 
 Rmpfr_clear_nanflag();
 
-$inex1 = Rmpfr_root    ($rop1, $op, 0, MPFR_RNDN);
+$inex1 = _ROOT($rop1, $op, 0, MPFR_RNDN);
 
 if(Rmpfr_nanflag_p()) {print "ok 50\n"}
 else {print "not ok 50\n"}
@@ -450,7 +475,7 @@ $op *= -1; # -42
 
 Rmpfr_clear_nanflag();
 
-$inex1 = Rmpfr_root    ($rop1, $op, 0, MPFR_RNDN);
+$inex1 = _ROOT($rop1, $op, 0, MPFR_RNDN);
 
 if(Rmpfr_nanflag_p()) {print "ok 54\n"}
 else {print "not ok 54\n"}

@@ -1,6 +1,15 @@
 Revision history for PDL::NDBin
 
-0.021     2021-04-17 23:12:26+01:00 Europe/London
+0.024     2022-02-04 07:07:04+00:00 Europe/London
+
+ - switch barf() to $CROAK() in case that is what caused smoker SEGV
+
+0.023     2022-02-02 02:26:30+00:00 Europe/London
+
+ - allow for PDL 2.056 aggregate functions returning ndarray not Perl value
+ - opt in to PDL 2.058 multi-C for faster builds
+
+0.021 2021-04-17
 
  - updated to work with PDL 2.037
 

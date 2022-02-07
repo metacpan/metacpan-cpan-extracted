@@ -5,7 +5,7 @@ use 5.008004;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use DateTime 0.1402;
 use DateTime::Calendar::Julian 0.04;
@@ -313,33 +313,97 @@ sub subtract_datetime {
 sub add_duration {
     my ($self, $dur) = @_;
 
-    my $start_jul = $self->is_julian;
-
     # According to the papal bull and the English royal decree that
     # introduced the Gregorian calendar, dates should be calculated as
     # if the change did not happen; this makes date math very easy in
     # most cases...
-    $self->{date}->add_duration($dur);
-    $self->_adjust_calendar;
+    # But not all.
 
-    my $dd;
-    if ($start_jul and $self->is_gregorian) {
+    my %deltas = $dur->deltas;
 
-        # The period after reform_date has been calculated in Julian
-        # instead of in Gregorian; this may have introduced extra leap
-        # days; the date should be set back.
-        $dd = $self->gregorian_deviation($self->{date}) -
-              $self->gregorian_deviation($self->{reform_date});
-    } elsif (not $start_jul and $self->is_julian) {
+    # We take the components of DateTime::Duration in the same order
+    # that DateTime itself does.
 
-        # The period before reform_date has been calculated in Gregorian
-        # instead of in Julian; we may have to introduce extra leap
-        # days; the date should be set back
-        $dd = $self->gregorian_deviation($self->{reform_date}) -
-              $self->gregorian_deviation($self->{date});
+    if ( my $days = delete $deltas{days} ) {
+	# Days must not be adjusted further, for sanity's sake. See RT
+	# 140734.
+	$self->{date}->add( days => $days );
+	$self->_adjust_calendar;
     }
 
-    $self->{date}->subtract( days => $dd ) if $dd;
+    if ( my $months = delete $deltas{months} ) {
+	# This must be adjusted to avoid regression.
+	# TODO there are other sane things to do here.
+
+	my $start_jul = $self->is_julian;
+
+	$self->{date}->add( months => $months);
+	$self->_adjust_calendar;
+
+	# The intent of the following code is to implement the usual
+	# conversion, by adding or subtracting the Gregorian deviation
+	# as of the reform date. An example would be that George
+	# Washington was born on February 11 1732 Julian. The reform
+	# took this to February 22 Gregorian, and that is the date
+	# usually given, even though a couple more days' difference has
+	# accumulated since then.
+	#
+	# A straightforward implementation would be to do the change in
+	# two steps: addition would be in Julian to the reform date and
+	# then in Gregorian for the rest of the interval, and vice versa
+	# for subtraction. But that would involve going back and redoing
+	# tha calculation.
+	#
+	# What this implementation does is to recognize that part of the
+	# calculation has been done in the wrong calendar, and correct
+	# for the number of leap year days that did (or did not) occur
+	# under the correct calendar.
+	#
+	# The original implementation nade this correction in all cases.
+	# But as Christian Carey found out, this gives incorrect (or at
+	# least very surprising) results when adding or subtracting
+	# enough days to not only cross the reform date but cross one of
+	# the years affected by the reform. His example was that adding
+	# 43,099 days to 1583-03-01 (Julian) correctly gave 1700-03-11
+	# (Gregorian), but adding 43,100 days also gave 1700-03-11
+	# rather than 1700-03-12. This is described (sketchily) in RT
+	# 140734.
+	#
+	# The solution I have adopted is to pick apart the interval the
+	# same way DateTime does (and is documented to do) and only
+	# apply the correction to the month portion of the interval.
+	# This fixes RT 140734, but preserves the fact that if you
+	# calculate GW's Nth birthday by adding N years to his Julian
+	# birthday, the result is always either February 11 Julian or
+	# February 22 Gregorian, using the UK reform date.
+	#
+	# -- TRW
+
+	my $dd;
+	if ($start_jul and $self->is_gregorian) {
+
+	    # The period after reform_date has been calculated in Julian
+	    # instead of in Gregorian; this may have introduced extra
+	    # leap days; the date should be set back.
+	    $dd = $self->gregorian_deviation($self->{date}) -
+		  $self->gregorian_deviation($self->{reform_date});
+	} elsif (not $start_jul and $self->is_julian) {
+
+	    # The period before reform_date has been calculated in
+	    # Gregorian instead of in Julian; we may have to introduce
+	    # extra leap days; the date should be set back
+	    $dd = $self->gregorian_deviation($self->{reform_date}) -
+		  $self->gregorian_deviation($self->{date});
+	}
+
+	$self->{date}->subtract( days => $dd ) if $dd;
+
+    }
+
+    if ( keys %deltas ) {
+	$self->{date}->add( %deltas );
+	$self->_adjust_calendar;
+    }
 
     return $self;
 }
@@ -351,6 +415,20 @@ sub gregorian_deviation {
 
     $date = DateTime::Calendar::Julian->from_object( object => $date );
     return $date->gregorian_deviation;
+}
+
+sub julian_deviation {
+    my ($class, $date) = @_;
+
+    $date ||= $class;
+
+    $date = DateTime->from_object( object => $date )
+	unless 'DateTime' eq ref $date;
+
+    my $year = $date->{local_c}{year};
+    $year-- if $date->{local_c}{month} <= 2;
+
+    return DateTime::Calendar::Julian::_floor($year/100)-DateTime::Calendar::Julian::_floor($year/400)-2;
 }
 
 sub reform_date { return $_[0]->{reform_date} }
@@ -682,7 +760,8 @@ will be considered Julian. This is a bug.
 
 These methods accept an additional "reform_date" argument. Note that the
 epoch is defined for most (all?) systems as a date in the Gregorian
-calendar.
+calendar. B<But> this module will still represent it as a Julian date if
+the epoch gives a date before the reform date.
 
 =item * reform_date
 
@@ -718,11 +797,42 @@ the actual method called. In the reform year this is the actual number
 of days from January 1 (Julian) to the current date, whether Julian or
 Gregorian.
 
-=item * add_datetime, subtract_datetime
+=item * add, subtract
 
 These are done in terms of duration, so that, for example, subtracting a
 day from the reform date (Gregorian) gets you the day before the reform
 date (Julian).
+
+When months and/or years are involved, the result is modified from a
+straight I<rata die> calculation to add or subtract the number of days
+skipped by the reform. Without this modification, George Washington's
+birthday of February 11 Julian would drift forward in the Gregorian
+calendar as the difference between the two calendars increased. With
+this modification, it is February 22 Gregorian regardless of the actual
+days difference between the two calendars.
+
+B<Note> that in versions C<0.12> and earlier this modification was
+applied to B<all> durations. This produced anomalous (i.e. wrong)
+results when adding or subtracting large numbers of days.
+
+Beginning with version C<0.12_01> the modification is only applied to
+months (and years, since years are folded into months when a
+L<DateTime::Duration|DateTime::Duration> object is created.) The actual
+order of operation is that specified by L<DateTime|DateTime>: the
+C<days> component of the duration is applied first, then C<months> (with
+the above modification), then C<minutes>, C<seconds>, and
+C<nanoseconds>. This can give rise to commutation/round-trip failures,
+and these may be more common under this change, but this appears to be
+the price of fixing the bug described in the previous paragraph.
+
+The L<DateTime|DateTime> documentation notes that this can happen in
+that module even in simple cases, such as adding a month to (say)
+January 31. It also notes that if order of operation is an issue, you
+can force it by doing something like
+
+ $dt->add( months => 3 )->add( days => 5 );
+
+to force months to be done first.
 
 =item * strftime
 
@@ -736,6 +846,21 @@ This method returns the difference in days between the Gregorian and the
 Julian calendar. If the parameter $datetime is given, it will be used to
 calculate the result; in this case this method can be used as a class
 method.
+
+This deviation increments on March 1 (Julian) of any year which is a
+leap year in the Julian calendar but not the Gregorian calendar.
+
+=item * julian_deviation( [$datetime] )
+
+This method was added in version 0.13.
+
+This method returns the difference in days between the Gregorian and the
+Julian calendar. If the parameter $datetime is given, it will be used to
+calculate the result; in this case this method can be used as a class
+method.
+
+This deviation increments on March 1 (Gregorian) of any year which is a
+leap year in the Julian calendar but not the Gregorian calendar.
 
 =item * DefaultReformDate
 
@@ -868,7 +993,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 Copyright (c) 2003 Eugene van der Pijll. All rights reserved.
 
-Copyright (C) 2016-2021 Thomas R. Wyant, III
+Copyright (C) 2016-2022 Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself; either the GNU General Public

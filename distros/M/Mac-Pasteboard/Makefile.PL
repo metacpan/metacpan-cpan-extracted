@@ -123,9 +123,9 @@ pbl : pbl.c pbl.h constant-c.inc constant-h.inc
 Pasteboard.c : Pasteboard.xs constant-xs.inc @{[ $opt{p} ? 'pbl.h constant-h.inc' : '' ]}
 	\$(XSUBPPRUN) \$(XSPROTOARG) \$(XSUBPPARGS) \$(XSUBPP_EXTRA_ARGS) \$*.xs > \$*.xsc
 	\$(MV) \$*.xsc \$*.c
-
-constant-c.inc constant-h.inc constant-xs.inc : Constant.PL
-	\$(PERLRUN) Constant.PL
+#
+#constant-c.inc constant-h.inc constant-xs.inc : tools/Constant.PL
+#	\$(PERLRUN) tools/Constant.PL
 EOD
 }
 

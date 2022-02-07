@@ -1,18 +1,5 @@
 package Podman::Client;
 
-##! API connection client.
-##!
-##!     my $Client = Podman::Client->new(
-##!         Connection => 'http+unix:///run/user/1000/podman/podman.sock',
-##!         Timeout       => 1800,
-##!     );
-##!
-##!     my $Response = $Client->Get(
-##!         'version',
-##!         Parameters => {},
-##!         Headers    => {},
-##!     );
-
 use strict;
 use warnings;
 use utf8;
@@ -34,20 +21,13 @@ Readonly::Scalar my $VERSION => '20220124.0';
 use Podman;
 use Podman::Exception;
 
-### API connection Url. Possible connections are via UNIX socket (default) or
-### tcp connection.
-###
-###     * http+unix
-###     * http
-###     * https
-has 'Connection' => (
+has 'ConnectionURI' => (
     is      => 'rw',
     isa     => 'Str',
     lazy    => 1,
-    builder => '_BuildConnection',
+    builder => '_BuildConnectionURI',
 );
 
-### API connection timeout, default `3600 seconds`.
 has 'Timeout' => (
     is      => 'ro',
     isa     => 'Int',
@@ -55,7 +35,6 @@ has 'Timeout' => (
     default => sub { return 3600 },
 );
 
-### API connection object.
 has 'UserAgent' => (
     is       => 'ro',
     isa      => 'Mojo::UserAgent',
@@ -64,34 +43,44 @@ has 'UserAgent' => (
     init_arg => undef,
 );
 
-### API request Url depends on connection Url and Podman service version.
-has 'RequestBase' => (
+has 'BaseURI' => (
     is       => 'ro',
     isa      => 'Mojo::URL',
-    builder  => '_BuildRequestBase',
+    lazy     => 1,
+    builder  => '_BuildBaseURI',
     init_arg => undef,
 );
 
-sub _BuildConnection {
+sub BUILD {
+    my $Self = shift;
+
+    $Self->ConnectionURI;
+    $Self->UserAgent;
+    $Self->BaseURI;
+
+    return;
+}
+
+sub _BuildConnectionURI {
     my $Self = shift;
 
     return sprintf "http+unix://%s/podman/podman.sock",
       $ENV{XDG_RUNTIME_DIR} ? $ENV{XDG_RUNTIME_DIR} : '/tmp';
 }
 
-sub _BuildRequestBase {
+sub _BuildBaseURI {
     my $Self = shift;
 
-    my $Scheme = Mojo::URL->new( $Self->Connection )->scheme();
+    my $Scheme = Mojo::URL->new( $Self->ConnectionURI )->scheme();
 
-    my $RequestBaseUrl =
-      $Scheme eq 'http+unix' ? 'http://d/' : $Self->Connection;
+    my $BaseURI =
+      $Scheme eq 'http+unix' ? 'http://d/' : $Self->ConnectionURI;
 
     my $Transaction;
     my $Tries = 3;
     while ( $Tries-- ) {
         $Transaction = $Self->UserAgent->get(
-            Mojo::URL->new($RequestBaseUrl)->path('version') );
+            Mojo::URL->new($BaseURI)->path('version') );
         last if $Transaction->res->is_success;
     }
     return Podman::Exception->new( Code => 0, )->throw()
@@ -100,7 +89,7 @@ sub _BuildRequestBase {
     my $JSON = $Transaction->res->json;
     my $Path = sprintf "v%s/libpod/", $JSON->{Version};
 
-    return Mojo::URL->new($RequestBaseUrl)->path($Path);
+    return Mojo::URL->new($BaseURI)->path($Path);
 }
 
 sub _BuildUserAgent {
@@ -113,11 +102,11 @@ sub _BuildUserAgent {
     );
     $UserAgent->transactor->name( sprintf "podman-perl/%s", $Podman::VERSION );
 
-    my $Connection = Mojo::URL->new( $Self->Connection );
-    my $Scheme     = $Connection->scheme();
+    my $ConnectionURI = Mojo::URL->new( $Self->ConnectionURI );
+    my $Scheme     = $ConnectionURI->scheme();
 
     if ( $Scheme eq 'http+unix' ) {
-        my $Path = Mojo::Util::url_escape( $Connection->path() );
+        my $Path = Mojo::Util::url_escape( $ConnectionURI->path() );
         $UserAgent->proxy->http( sprintf "%s://%s", $Scheme, $Path );
     }
 
@@ -127,7 +116,7 @@ sub _BuildUserAgent {
 sub _MakeUrl {
     my ( $Self, $Path, $Parameters ) = @_;
 
-    my $Url = Mojo::URL->new( $Self->RequestBase )->path($Path);
+    my $Url = Mojo::URL->new( $Self->BaseURI )->path($Path);
 
     if ($Parameters) {
         $Url->query($Parameters);
@@ -153,7 +142,6 @@ sub _HandleTransaction {
     return $Content;
 }
 
-### Send API get request to path with optional parameters and headers.
 sub Get {
     my ( $Self, $Path, %Options ) = @_;
 
@@ -166,8 +154,6 @@ sub Get {
     return $Self->_HandleTransaction($Transaction);
 }
 
-### Send API post request to path with optional parameters, headers and
-### data.
 sub Post {
     my ( $Self, $Path, %Options ) = @_;
 
@@ -194,7 +180,6 @@ sub Post {
     return $Self->_HandleTransaction($Transaction);
 }
 
-### Send API delete request to path with optional parameters and headers.
 sub Delete {
     my ( $Self, $Path, %Options ) = @_;
 
@@ -210,3 +195,100 @@ sub Delete {
 __PACKAGE__->meta->make_immutable;
 
 1;
+
+=encoding utf8
+
+=head1 NAME
+
+Podman::Client - API client.
+
+=head1 SYNOPSIS
+
+    # Connect to service
+    my $Client = Podman::Client->new(
+        ConnectionURI => 'http+unix:///run/user/1000/podman/podman.sock',
+        Timeout       => 1800,
+    );
+
+    # Send GET request
+    my $Response = $Client->Get(
+        'version',
+        Parameters => {},
+        Headers    => {},
+    );
+
+=head1 DESCRIPTION
+
+L<Podman::Client> is a HTTP client (user agent) based on L<Mojo::UserAgent>
+with the needed support to connect to and query the L<http://podman.io> API.
+
+=head1 ATTRIBUTES
+
+=head2 ConnectionURI
+
+    my $Client = Podman::Client->new( ConnectionURI => 'https://127.0.0.1:1234' );
+
+URI to L<http://podman.io> API service, defaults to user UNIX domain socket,
+e.g. C<http+unix://run/user/1000/podman/podman.sock>
+
+=head2 Timeout
+
+    my $Client = Podman::Client->new( Timeout => 1800 );
+
+Maximum amount of time in seconds a connection can be inactive before getting
+closed, defaults to C<3600s>. Setting the value to C<0> will allow connections
+to be inactive indefinitely.
+
+=head1 METHODS
+
+L<Podman::Client> provides the valid HTTP requests to query the
+L<Podman::Client> API. All methods take a relative endpoint path and optional
+header parameters and path parameters. if the response has a HTTP code unequal
+C<2xx> a L<Podman::Exception> is raised.
+
+=head2 Get
+
+    my $Response = $Client->Get('version');
+
+Perform C<GET> request and return resulting content (hash, array or binary
+data).
+
+=head2 Delete
+
+    my $Response = $Client->Delete('images/docker.io/library/hello-world');
+
+Perform C<DELETE> request and return resulting content (hash, array).
+
+=head2 Post
+
+    my $Response = $Client->Post(
+        'build',
+        Data       => $FieHandle,
+        Parameters => {
+            'file' => 'Dockerfile',
+            't'    => 'localhost/goodbye',
+        },
+        Headers => {
+            'Content-Type' => 'application/x-tar'
+        },
+    );
+
+Perform C<POST> request and return resulting content (hash, array), takes
+additional optional request data (hash, array or filehandle).
+
+=head1 AUTHORS
+
+=over 2
+
+Tobias Schäfer, <tschaefer@blackox.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2022-2022, Tobias Schäfer.
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Artistic License version 2.0.
+
+=cut

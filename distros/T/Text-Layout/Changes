@@ -1,5 +1,20 @@
 Revision history for Text::Layout
 
+0.028	2022-02-04
+
+	INCOMPATIBLE: In Pango mode, the direction of rise and lower
+	has been reversed and is no longer proportional to the font size.
+	In convenience mode you can use percentages and points..
+
+	INCOMPATIBLE: Extent boxes are now relative to top-left. This
+	is Pango compatible and makes the box fit when drawn at the
+	same coordinates the layout was rendered.
+	
+	(Internal) Add extents method for CID fonts.
+	More Pango compatibility.
+	Add font properties direction and language.
+	Add 'pt' postfix for point sizes in markup.
+
 0.027	2021-12-23
 
 	Pango compatibility (POSSIBLY INCOMPATIBLE):

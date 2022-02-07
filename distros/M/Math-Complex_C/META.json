@@ -39,6 +39,6 @@
          "web" : "https://github.com/sisyphus/math-complex_c"
       }
    },
-   "version" : "0.13",
+   "version" : "0.15",
    "x_serialization_backend" : "JSON::PP version 2.27203"
 }

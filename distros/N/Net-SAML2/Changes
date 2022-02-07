@@ -1,5 +1,20 @@
 Revision history for Perl extension Net::SAML2.
 
+0.53 -- Thu Feb 03 21:02:47 AST 2022
+
+  [Significant Changes since 0.52]
+
+  - Fix bug with Saml LogoutResponse on HTTP-Redirect Binding introduced in 0.52
+  - testapp: simplify testing by allowing easier testing against multiple IdPs
+
+  - 22d2b2a (HEAD -> master) Update version information
+  - 13c18ee Merge pull request #56 from timlegge/testapp-multiple-idp-support
+  - a2ff662 Allow custom config.yml file per Identity Provider
+  - 4bf230a Add support for multiple IdPs to the SamlTest testapp Makes
+            testing against Multiple IdPs much simpler to setup and configure
+  - 905f78a SP initiated SAMLLogout has SAMLResponse on redirect
+  - 378ea9b v0.52
+
 0.52 -- Sun Jan 30 23:17:19 AST 2022
 
   [Significant Changes since 0.49]

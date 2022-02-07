@@ -1,3 +1,8 @@
+0.07
+ - Fix https://github.com/sisyphus/math-decimal64/pull/1 (also aplies to Math::Complex_C::Q)
+   Thanks to @hiratara
+ - Fix overload_pow() for the case that the third argument is true
+
 0.06
  - Replace SvIV/SvUV/SvNV with SvIVX/SvUVX/SvNVX where appropriate.
  - Following typedef, replace "__complex128" with "complex128".

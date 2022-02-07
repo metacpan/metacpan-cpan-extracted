@@ -1,5 +1,17 @@
 Revision history for Perl module Math::Decimal128
 
+0.11
+    - Fix https://github.com/sisyphus/math-decimal64/pull/1 (also aplies to Math::Decimal128)
+      Thanks to @hiratara
+    - Correct typos in Decimal128.pod. In "DESCRIPTION", change:
+        -9.999999999999999999999999999999999e6111
+          to
+        -9999999999999999999999999999999999e6111
+        and change:
+        9.999999999999999999999999999999999e6111
+          to
+        9999999999999999999999999999999999e6111
+
 0.10
     - Alter typedef of _Decimal128 for __MINGW64__ . (This became necessary with perl-5.28.0,
       but I've applied it universally whenever __MINGW64__ is defined.)

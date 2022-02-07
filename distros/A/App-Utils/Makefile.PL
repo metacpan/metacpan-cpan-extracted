@@ -9,7 +9,7 @@ WriteMakefile(
   LICENSE          => 'perl',
   MIN_PERL_VERSION => '5.0008004',
   EXE_FILES        => ['bin/date-tag', 'bin/date-tag-file',
-    'bin/remove-empty-dirs', 'bin/save'],
+    'bin/move-merge', 'bin/remove-empty-dirs', 'bin/save'],
   PREREQ_PM        => {
     'POSIX' => 0,
   },

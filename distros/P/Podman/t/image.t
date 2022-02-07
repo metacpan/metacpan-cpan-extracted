@@ -14,7 +14,7 @@ my $Connection =
 my $Service = Mock::Podman::Service->new( Listen => $Connection );
 $Service->Start();
 
-my $Client = Podman::Client->new( Connection => $Connection );
+my $Client = Podman::Client->new( ConnectionURI => $Connection );
 
 subtest 'Pull image from registry.' => sub {
     my $Image =
@@ -38,8 +38,8 @@ my $Image =
 ok( $Image, 'Object ok.' );
 
 my $ExpectedData = {
-    "Id" => "a76ad2934d4d6b478541c7d7df93c64dc0dcfd780472e85f2b3133fa6ea01ab7",
-    "Tag"     => "latest",
+    "Id"  => "a76ad2934d4d6b478541c7d7df93c64dc0dcfd780472e85f2b3133fa6ea01ab7",
+    "Tag" => "latest",
     "Created" => "2022-01-26T17:25:47.30940821Z",
     "Size"    => 786563,
 };

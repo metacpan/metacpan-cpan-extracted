@@ -1,9 +1,7 @@
 use strict;
 use warnings;
-
-use English;
+use feature ':5.12';
 use utf8;
-use feature ':5.30';
 
 use Test::More;
 

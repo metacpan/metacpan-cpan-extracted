@@ -1,3 +1,14 @@
+4.19
+ - Fix https://github.com/sisyphus/math-decimal64/pull/1 (also aplies to Math::MPFR)
+   Thanks to @hiratara
+ - Deal with deprecations of mpfr_root() and mpfr_grandom(). These 2 functions
+   will now croak() if Math::MPFR has been built against mpfr-4.0.0 or later.
+ - Replace four instances of mpz_cmp_ui(z, 0) with less expensive mpz_sgn(z)
+ - Fix doubletoa() handling of negative zero. (Was hanging.)
+ - Remove references to _MSC_VER
+ - Replace sv_2mortal(newSVpv()) with more efficient newSVpvn_flags() where
+   applicable. This is done via the MORTALIZED_PV() macro in math_mpfr_include.h
+
 4.18
  - Allow anytoa() to (optionally) take just one (Math::MPFR object) arg, instead of
    the two args originally mandated.

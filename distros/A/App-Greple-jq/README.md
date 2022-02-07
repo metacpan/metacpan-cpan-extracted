@@ -9,7 +9,7 @@ greple -Mjq --glob JSON-DATA --IN label pattern
 
 # VERSION
 
-Version 0.04
+Version 0.05
 
 # DESCRIPTION
 
@@ -17,7 +17,7 @@ This is an experimental module for [App::Greple](https://metacpan.org/pod/App::G
 formatted text using [jq(1)](http://man.he.net/man1/jq) as a backend.
 
 Search top level json object which includes both `Marvin` and
-`Zaphod` somewhare in its text representation.
+`Zaphod` somewhere in its text representation.
 
     greple -Mjq 'Marvin Zaphod'
 
@@ -39,13 +39,13 @@ Search `name` is `Marvin` and `type` is `Robot` or `Android`:
 
 Please be aware that this is just a text matching tool for indented
 result of [jq(1)](http://man.he.net/man1/jq) command.  So, for example, `.commit.author`
-includes everything under it and it maches `committer` field name.
+includes everything under it and it matches `committer` field name.
 Use [jq(1)](http://man.he.net/man1/jq) filter for more complex and precise operation.
 
 # CAUTION
 
 [greple(1)](http://man.he.net/man1/greple) commands read entire input before processing.  So it
-should not be used for gigantic data or inifinite stream.
+should not be used for gigantic data or infinite stream.
 
 # INSTALL
 
@@ -61,7 +61,7 @@ should not be used for gigantic data or inifinite stream.
 
     Search _pattern_ included in _label_ field.
 
-    Chacater `%` can be used as a wildcard in _label_ string.  So
+    Character `%` can be used as a wildcard in _label_ string.  So
     `%name` matches labels end with `name`, and `name%` matches labels
     start with `name`.
 
@@ -69,8 +69,8 @@ should not be used for gigantic data or inifinite stream.
     JSON data.
 
     If the label string contains period (`.`), it is considered as a
-    nested labels.  Name `.name` maches only `name` label at the top
-    level.  Name `process.name` maches only `name` entry of some
+    nested labels.  Name `.name` matches only `name` label at the top
+    level.  Name `process.name` matches only `name` entry of some
     `process` hash.
 
     If labels are separated by two or more dots (`..`), they don't have
@@ -84,7 +84,7 @@ should not be used for gigantic data or inifinite stream.
 
     Specify required condition.  If there is one or more required
     condition, all other positive rules move to optional.  They are not
-    required but highliged if exist.
+    required but highlighted if exist.
 
 # LABEL SYNTAX
 
@@ -110,7 +110,7 @@ should not be used for gigantic data or inifinite stream.
 
 - **file..path**
 
-    Some `path` in descendatns of some `file`.
+    Some `path` in descendants of some `file`.
 
 - **%path**
 
@@ -156,7 +156,7 @@ Object `*pid` label contains 803.
 
     greple -Mjq --IN %pid 803
 
-Object any <path> contains `_mira` under `.file` and `.event`
+Object any <path> contains `_mina` under `.file` and `.event`
 contains `WRITE`.
 
     greple -Mjq --IN .file..path _mina --IN .event WRITE
@@ -172,11 +172,14 @@ Use `-o` option to show only matched part.
 
 Use `--blockend=` option to cancel showing block separator.
 
-Sine this module implements original search funciton, [greple(1)](http://man.he.net/man1/greple)
-**-i** does not take effect.  Set modifier in regex like
-`(?i)pattern` if you want case-insensitive match.
+Since this module implements original search function, [greple(1)](http://man.he.net/man1/greple)
+**-i** does not take effect.  Set modifier in regex like `(?i)pattern`
+if you want case-insensitive match.
 
-Use `-Mjq::debug=` to see actual regex.
+Use `-Mjq::set=debug` to see actual regex.
+
+Use `-Mjq::set=noif` if you don't have to use [jq](https://metacpan.org/pod/jq) as an input
+filter.  Data have to be well-formatted in that case.
 
 Use `--color=always` and set `LESSANSIENDCHARS=mK` if you want to
 see the output using [less(1)](http://man.he.net/man1/less).  Put next line in your `~/.greplerc`

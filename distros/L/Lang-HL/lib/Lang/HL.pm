@@ -5,7 +5,7 @@ use warnings;
 use utf8;
 use Regexp::Grammars;
 
-our $VERSION = '2.111';
+our $VERSION = '5.001';
 
 sub new {
         my ($class) = @_;
@@ -87,7 +87,8 @@ sub PT::Group::X {
     return (       $class->{Comment}
                 || $class->{Function}
                 || $class->{Parent}
-                || $class->{Packages} )->X($className);
+                || $class->{Packages}
+                || $class->{EmbedBlock} )->X($className);
 }
 
 sub PT::Packages::X {
@@ -352,9 +353,31 @@ sub PT::Block::X {
                     || $class->{While}
                     || $class->{ForEach}
                     || $class->{For}
+                    || $class->{EmbedBlock}
                     || $class->{Comment}
                     || $class->{Statement} )->X($className);
     return $block;
+}
+
+sub PT::EmbedBlock::X {
+    my ($class, $className) = @_;
+
+    my $embedBlock = $class->{EmbedCodeBlock}->X($className);
+    return $embedBlock;
+}
+
+sub PT::EmbedCodeBlock::X {
+    my ($class, $className) = @_;
+
+    my $embedCode = $class->{EmbeddedCode}->X($className);
+    return $embedCode;
+}
+
+sub PT::EmbeddedCode::X {
+    my ($class, $className) = @_;
+
+    my $embedCode = $class->{''};
+    return $embedCode;
 }
 
 sub PT::While::X {
@@ -498,6 +521,28 @@ sub PT::If::X {
 
 sub PT::BoolExpression::X {
     my ($class, $className) = @_;
+    my @booleanExpressions;
+
+    for my $element ( @{ $class->{BooleanExpression}} ) {
+        push @booleanExpressions, $element->X($className);
+    }
+
+    my @boolOperators;
+
+    for my $element (@{ $class->{BoolOperator} }) {
+        push @boolOperators, $element->X($className);
+    }
+
+    my $boolExpression = $booleanExpressions[0];
+    for my $counter (1 .. $#booleanExpressions) {
+        $boolExpression .= $boolOperators[$counter - 1] . " " . $booleanExpressions[$counter];
+    }
+
+    return $boolExpression;
+}
+
+sub PT::BooleanExpression::X {
+    my ($class, $className) = @_;
     my $boolExpression;
 
     my $boolOperand = $class->{BoolOperands}->X($className);
@@ -532,7 +577,8 @@ sub PT::BoolOperator::X {
                 || $class->{StringNotEquals}
                 || $class->{NotEqulas}
                 || $class->{LogicalAnd}
-                || $class->{LogicalOr} )->X($className);
+                || $class->{LogicalOr}
+                || $class->{EmbedBlock} )->X($className);
 }
 
 sub PT::BoolOperands::X {
@@ -544,7 +590,8 @@ sub PT::BoolOperands::X {
                 || $class->{HashElement}
                 || $class->{ClassAccessor}
                 || $class->{ClassFunctionReturn}
-                || $class->{FunctionReturn} )->X($className);
+                || $class->{FunctionReturn}
+                || $class->{EmbedBlock} )->X($className);
 }
 
 sub PT::ElsIf::X {
@@ -699,7 +746,8 @@ sub PT::ListElement::X {
                 || $class->{FunctionReturn}
                 || $class->{ArrayElement}
                 || $class->{HashElement}
-                || $class->{VariableName} )->X($className);
+                || $class->{VariableName}
+                || $class->{EmbedBlock} )->X($className);
 }
 
 sub PT::HashDeclaration::X {
@@ -745,7 +793,11 @@ sub PT::KeyValue::X {
 sub PT::PairKey::X {
     my ($class, $className) = @_;
     return (       $class->{Number}
-                || $class->{String} )->X($className);
+                || $class->{String}
+                || $class->{ClassFunctionReturn}
+                || $class->{FunctionReturn}
+                || $class->{VariableName}
+                || $class->{EmbedBlock} )->X($className);
 }
 
 sub PT::PairValue::X {
@@ -758,7 +810,8 @@ sub PT::PairValue::X {
                 || $class->{ArrayElement}
                 || $class->{HashElement}
                 || $class->{ClassFunctionReturn}
-                || $class->{FunctionReturn} )->X($className);
+                || $class->{FunctionReturn}
+                || $class->{EmbedBlock} )->X($className);
 }
 
 sub PT::FunctionCall::X {
@@ -794,7 +847,10 @@ sub PT::Param::X {
                 || $class->{VariableName}
                 || $class->{ArrayElement}
                 || $class->{HashElement}
-                                || $class->{HashRef} )->X($className);
+                || $class->{HashRef}
+                || $class->{FunctionReturn}
+                || $class->{ClassFunctionReturn}
+                || $class->{EmbedBlock} )->X($className);
 }
 
 sub PT::Assignment::X {
@@ -854,7 +910,8 @@ sub PT::RHS::X {
                 || $class->{ClassFunctionReturn}
                 || $class->{String}
                 || $class->{STDIN}
-                                || $class->{ObjectFunctionCall} )->X($className);
+                || $class->{ObjectFunctionCall}
+                || $class->{EmbedBlock} )->X($className);
 }
 
 sub PT::STDIN::X {
@@ -1071,7 +1128,10 @@ sub PT::CalcOperands::X {
                 || $class->{ScalarVariable}
                 || $class->{ArrayElement}
                 || $class->{HashElement}
-                                || $class->{ClassAccessor} )->X($className);
+                || $class->{ClassAccessor}
+                || $class->{ClassFunctionReturn}
+                || $class->{FunctionReturn}
+                || $class->{EmbedBlock} )->X($className);
 }
 
 sub PT::CalcOperator::X {
@@ -1079,7 +1139,8 @@ sub PT::CalcOperator::X {
     return (       $class->{Plus}
                 || $class->{Minus}
                 || $class->{Multiply}
-                || $class->{Divide} )->X($className);
+                || $class->{Divide}
+                || $class->{EmbedBlock} )->X($className);
 }
 
 sub PT::Return::X {
@@ -1145,6 +1206,18 @@ sub PT::Divide::X {
     return $divide;
 }
 
+sub PT::Modulus::X {
+    my ($class, $className) = @_;
+    my $divide = $class->{''};
+    return $divide;
+}
+
+sub PT::Exponent::X {
+    my ($class, $className) = @_;
+    my $divide = $class->{''};
+    return $divide;
+}
+
 sub PT::GreaterThanEquals::X {
     my ($class, $className) = @_;
     my $greaterThanEquals = $class->{''};
@@ -1199,7 +1272,7 @@ my $parser = qr {
     <objrule:  PT::ClassBlock>                 <LBrace> <ClassGroups> <RBrace>
     <objrule:  PT::ClassGroups>                <[Group]>+
 
-    <objrule:  PT::Group>                      <ws: (\s++)*> <Comment> | <Function> | <Parent> | <Packages>
+    <objrule:  PT::Group>                      <ws: (\s++)*> <Comment> | <Function> | <Parent> | <Packages> | <EmbedBlock>
 
     <objrule:  PT::Comment>                    [#] <LineComment> @
     <objtoken: PT::LineComment>                .*?
@@ -1232,7 +1305,13 @@ my $parser = qr {
     <objrule:  PT::CodeBlock>                  <LBrace> <Blocks> <RBrace>
     <objrule:  PT::Blocks>                     <[Block]>+
 
-    <objrule:  PT::Block>                      <IfElse> | <While> | <ForEach> | <For> | <Comment> | <Statement>
+    <objrule:  PT::Block>                      <IfElse> | <While> | <ForEach> | <For> | <EmbedBlock> | <Comment> | <Statement>
+
+    <objrule:  PT::EmbedBlock>                 <TokenEmbedBlock> <EmbedCodeBlock>
+    <objrule:  PT::EmbedCodeBlock>             <EmbedBegin> <EmbeddedCode> <EmbedEnd>
+    <objrule:  PT::EmbedBegin>                 <LParen>\?
+    <objrule:  PT::EmbedEnd>                   \?<RParen>
+    <objrule:  PT::EmbeddedCode>               (?<=\(\?)\s*.*?\s*(?=\?\))
 
     <objrule:  PT::While>                      <TokenWhile> <LParen> <BoolExpression> <RParen> <CodeBlock>
     <objrule:  PT::ForEach>                    <TokenForeach> <Var> <ForEachVariableName> <LParen> <VariableName> <RParen> <CodeBlock>
@@ -1248,12 +1327,14 @@ my $parser = qr {
     <objrule:  PT::IfElse>                     <If> <ElsIf>? <Else>?
     <objrule:  PT::If>                         <TokenIf> <LParen> <BoolExpression> <RParen> <CodeBlock>
 
-    <objrule:  PT::BoolExpression>             <BoolOperands> <BoolOperatorExpression>?
+    <objrule:  PT::BoolExpression>             <[BooleanExpression]>+ % <[BoolOperator]>
+    <objrule:  PT::BooleanExpression>          <BoolOperands> <BoolOperatorExpression>?
     <objrule:  PT::BoolOperatorExpression>     <BoolOperator> <BoolOperands>
     <objrule:  PT::BoolOperands>               <RealNumber> | <String> | <ScalarVariable> | <ArrayElement> | <HashElement>
-                                               | <ClassAccessor> | <ClassFunctionReturn> | <FunctionReturn>
+                                               | <ClassAccessor> | <ClassFunctionReturn> | <FunctionReturn> | <EmbedBlock>
     <objrule:  PT::BoolOperator>               <GreaterThan> | <LessThan> | <Equals> | <GreaterThanEquals> | <LessThanEquals>
                                                | <StringEquals> | <StringNotEquals> | <NotEqulas> | <LogicalAnd> | <LogicalOr>
+                                               | <EmbedBlock>
 
     <objrule:  PT::ElsIf>                      <[ElsIfChain]>+
     <objrule:  PT::ElsIfChain>                 <TokenElsIf> <LParen> <BoolExpression> <RParen> <CodeBlock>
@@ -1283,19 +1364,23 @@ my $parser = qr {
     <objrule:  PT::ArrayList>                  <LBracket> <ListElements> <RBracket>
     <objrule:  PT::ListElements>               .{0} | <[ListElement]>+ % <Comma>
     <objrule:  PT::ListElement>                <RealNumber> | <String> | <ClassFunctionReturn> | <FunctionReturn>
-                                                | <ArrayElement> | <HashElement> | <ArrayList> | <HashRef> | <VariableName>
+                                                | <ArrayElement> | <HashElement> | <ArrayList> | <HashRef>
+                                                | <VariableName> | <EmbedBlock>
 
     <objrule:  PT::HashDeclaration>            <Var> <VariableName> <Equal> <HashRef> <SemiColon>
     <objrule:  PT::HashRef>                    <LBrace> <KeyValuePairs> <RBrace>
     <objrule:  PT::KeyValuePairs>              .{0} | <[KeyValue]>+ % <Comma>
     <objrule:  PT::KeyValue>                   <PairKey> <Colon> <PairValue>
-    <objrule:  PT::PairKey>                    <Number> | <String>
+    <objrule:  PT::PairKey>                    <Number> | <String> | <ClassFunctionReturn> | <FunctionReturn>
+                                                | <VariableName> | <EmbedBlock>
     <objrule:  PT::PairValue>                  <RealNumber> | <String> | <ClassFunctionReturn> | <FunctionReturn>
-                                                | <ArrayElement> | <HashElement> | <ArrayList> | <HashRef> | <VariableName>
+                                                | <ArrayElement> | <HashElement> | <ArrayList> | <HashRef>
+                                                | <VariableName> | <EmbedBlock>
 
     <objrule:  PT::FunctionCall>               <FunctionName> <LParen> <Parameters>? <RParen> <SemiColon>
     <objrule:  PT::Parameters>                 <[Param]>+ % <Comma>
-    <objrule:  PT::Param>                      <RealNumber> | <String> | <VariableName> | <ArrayElement> | <HashElement> | <HashRef>
+    <objrule:  PT::Param>                      <RealNumber> | <String> | <VariableName> | <ArrayElement> | <HashElement>
+                                               | <HashRef> | <FunctionReturn> | <ClassFunctionReturn> | <EmbedBlock>
 
     <objrule:  PT::Assignment>                 <ScalarAssignment> | <ArrayAssignment> | <HashAssignment> | <AccessorAssignment>
 
@@ -1305,6 +1390,7 @@ my $parser = qr {
     <objrule:  PT::RHS>                        <RealNumber> | <FunctionReturn> | <ArrayElement> | <HashElement>
                                                | <ScalarVariable> | <Calc> | <ArrayList> | <HashRef> | <ClassAccessor>
                                                | <ClassFunctionReturn> | <String> | <STDIN> | <ObjectFunctionCall>
+                                               | <EmbedBlock>
 
     <objrule:  PT::FunctionReturn>             <FunctionName> <LParen> <Parameters>? <RParen>
 
@@ -1332,7 +1418,8 @@ my $parser = qr {
     <objrule:  PT::Calc>                       <CalcExpression>
     <objrule:  PT::CalcExpression>             <[CalcOperands]>+ % <[CalcOperator]>
     <objrule:  PT::CalcOperands>               <RealNumber> | <ScalarVariable> | <ArrayElement> | <HashElement> | <ClassAccessor>
-    <objtoken: PT::CalcOperator>               <Plus> | <Minus> | <Multiply> | <Divide>
+                                               | <ClassFunctionReturn> | <FunctionReturn> | <EmbedBlock>
+    <objtoken: PT::CalcOperator>               <Plus> | <Minus> | <Multiply> | <Divide> | <Modulus> | <Exponent> | <EmbedBlock>
 
     <objrule:  PT::Return>                     <TokenReturn> <RHS>? <SemiColon>
     <objrule:  PT::Last>                       <TokenLast> <SemiColon>
@@ -1350,11 +1437,14 @@ my $parser = qr {
     <objtoken: PT::TokenFunction>              function
     <objtoken: PT::TokenParent>                parent
     <objtoken: PT::TokenClass>                 class
+    <objtoken: PT::TokenEmbedBlock>            embed
 
     <objtoken: PT::TokenSTDIN>                 STDIN
 
     <objrule:  PT::ObjectFunctionCall>         [!] <Object> <Dot> <FunctionName> <LParen> <Parameters>? <RParen>
 
+    <objtoken: PT::Modulus>                    \%
+    <objtoken: PT::Exponent>                   \*\*
     <objtoken: PT::LogicalAnd>                 \&\&
     <objtoken: PT::LogicalOr>                  \|\|
     <objtoken: PT::NotEqulas>                  \!=

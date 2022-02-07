@@ -18,8 +18,8 @@ sub debug_action
 {
 	my $iter = shift;
 	# Piddle operations can be dangerous: when applying them to the result
-	# of an index operation on an empty piddle, they may throw an
-	# exception. Empty piddles are used, among others, when an ordinary
+	# of an index operation on an empty ndarray, they may throw an
+	# exception. Empty ndarrays are used, among others, when an ordinary
 	# histogram is required. So, just to be safe, we wrap all potentially
 	# dangerous calls in an `eval'.
 	#
@@ -72,8 +72,8 @@ dies_ok { ndbinning( null, 1, 0, 1, null, 1 ) } 'wrong arguments: null, 1, 0, 1,
 
 # the example from PDL::histogram
 $x = pdl( 1,1,2 );
-# by default histogram() returns a piddle of the same type as the axis,
-# but ndbinning() returns a piddle of type I<indx> when histogramming
+# by default histogram() returns an ndarray of the same type as the axis,
+# but ndbinning() returns an ndarray of type I<indx> when histogramming
 $expected = indx( 0,2,1 );
 $got = ndbinning( $x, 1, 0, 3 );
 is_pdl $got, $expected, 'example from PDL::histogram';
@@ -254,9 +254,9 @@ $expected = create_bad long, 3;
 throws_ok { ndbin( $x, vars => [ [ null, sub { die } ] ] ) }
 	qr/^Died at /, 'exceptions in actions passed through';
 lives_ok { ndbin( $x, vars => [ [ null() => sub { shift->want->min } ] ] ) }
-	'want->min on empty piddle does not die';
+	'want->min on empty ndarray does not die';
 throws_ok { ndbin( $x, vars => [ [ null() => sub { shift->selection->min } ] ] ) }
-	qr/^PDL::index: invalid index 0 /, 'selection->min on empty piddle';
+	qr/index:/, 'selection->min on empty ndarray';
 throws_ok { ndbin( $x, vars => [ [ null() => sub { shift->wrong_method } ] ] ) }
 	qr/^Can't locate object method "wrong_method"/, 'call nonexistent method';
 lives_ok { $got = ndbin( $x, vars => [ [ null->long, sub { eval { die } } ] ] ) }

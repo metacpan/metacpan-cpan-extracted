@@ -28,8 +28,11 @@ sub setup_integrations ($self) {
 #  (alternatively normal constructor) This takes typically an object with options + dsn.
 sub from_config ($package, $config) { }
 
-sub event_from_message ($self, $message, $level = Sentry::Severity->Info,
-  $hint = undef) {
+sub event_from_message (
+  $self, $message,
+  $level = Sentry::Severity->Info,
+  $hint = undef
+) {
   my %event = (
     event_id => $hint && $hint->{event_id},
     level    => $level,
@@ -39,8 +42,12 @@ sub event_from_message ($self, $message, $level = Sentry::Severity->Info,
   return \%event;
 }
 
-sub capture_message ($self, $message, $level = undef, $hint = undef,
-  $scope = undef) {
+sub capture_message (
+  $self, $message,
+  $level = undef,
+  $hint  = undef,
+  $scope = undef
+) {
   my $event = $self->event_from_message($message, $level, $hint);
 
   return $self->_capture_event($event, $hint, $scope);

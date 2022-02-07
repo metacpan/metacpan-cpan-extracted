@@ -1,5 +1,10 @@
 Revision history for Net-Fortinet-FortiManager
 
+0.002000  2022-02-02 11:58:54+01:00 Europe/Vienna
+    - fix create methods used the 'set' method instead of 'add'
+      which made them act like create_or_update and overwrite existing objects
+    - add TESTS section to the documentation
+
 0.001001  2022-02-01 08:38:02+01:00 Europe/Vienna
     - fix leftover DDP usage in api.t
 

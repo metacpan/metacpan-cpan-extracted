@@ -3,7 +3,7 @@
 {
     package Foo;
 
-    use Test::More 'no_plan';
+    use Test::More;
 
     use Dios;
 

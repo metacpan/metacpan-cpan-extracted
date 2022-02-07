@@ -32,9 +32,9 @@ use overload
     'atan2' => \&_overload_atan2,
 ;
 
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 
-DynaLoader::bootstrap Math::Complex_C $VERSION;
+Math::Complex_C->DynaLoader::bootstrap($VERSION);
 
 @Math::Complex_C::EXPORT = ();
 @Math::Complex_C::EXPORT_OK = qw(
@@ -412,8 +412,14 @@ Math::Complex_C - perl interface to C's double precision complex operations.
     *=, +=, /=, -=, **=,
     !, bool,
     ==, !=,
-    =, "",
-    abs, exp, log, cos, sin, atan2, sqrt
+    "",
+    abs, exp, log, cos, sin, atan2, sqrt,
+    =
+
+    NOTE: Making use of the '=' overloading is not recommended unless
+          you understand its caveats. See 'perldoc overload' and
+          read it thoroughly, including the documentation regarding
+          'copy constructors'.
 
     Note: abs() returns a (double precision) NV, not a Math::Complex_C object.
 

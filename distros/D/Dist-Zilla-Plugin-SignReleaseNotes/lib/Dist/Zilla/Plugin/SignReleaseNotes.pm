@@ -3,7 +3,7 @@ use warnings;
 
 package Dist::Zilla::Plugin::SignReleaseNotes;
 
-our $VERSION = '0.0003';
+our $VERSION = '0.0006';
 
 # ABSTRACT: Create and signs a 'Release' notes file
 use Moose;
@@ -65,8 +65,8 @@ sub get_git_checksums_and_titles {
     return;
   }
 
-  my $range = "$tags[1]..$tags[0]";
-  my @sha1s_and_titles = $git->RUN('rev-list', '--tags', $range , '--abbrev-commit' , {pretty=>'oneline' }, '--date-order');
+  my $range = "$tags[1]...$tags[0]";
+  my @sha1s_and_titles = $git->RUN('log', {pretty=>'%h %s' }, $range);
 
   return @sha1s_and_titles;
 
@@ -150,7 +150,7 @@ Dist::Zilla::Plugin::SignReleaseNotes - Create and signs a 'Release' notes file
 
 =head1 VERSION
 
-version 0.0003
+version 0.0006
 
 =head1 DESCRIPTION
 
@@ -164,6 +164,45 @@ the file is then signed using Module::Signature.
 The resulting file can be used as the Release information for GitHub or similar.
 
 This plugin should appear after any other AfterBuild plugin in your C<dist.ini> file
+
+=head1 SAMPLE OUTPUT
+
+=over
+
+    -----BEGIN PGP SIGNED MESSAGE-----
+    Hash: RIPEMD160
+
+    Dist::Zilla::Plugin::SignReleaseNotes
+
+    Release 0.0004
+
+    Change Log
+      - 5c4df12 v0.0004
+      - 9000d39 Increment version number
+      - 1835a25 rev-list --tags matching commits that it should not
+
+    SHA256 hash of CPAN release
+
+    0b05776713165ad90d1385669e56dcd9f0abed8701f4e4652f5aa270687a3435 *Dist-Zilla-Plugin-SignReleaseNotes-0.0004.tar.gz
+
+    -----BEGIN PGP SIGNATURE-----
+
+    iQIzBAEBAwAdFiEEMguXHBCUSzAt6mNu1fh7LgYGpfkFAmH91iYACgkQ1fh7LgYG
+    pfmwrg//TXpyu8UeAaotLR0RFuLdmt9IrFmpflJ0SqwyY8MPBJOdb5BiwzSLDthi
+    1BNUtj4P+UsVlWrmXVufUYMEsGPyim6fD656NrUNds+PQQok3bTfR9qf341CY9Cq
+    MoR0an/u5APRaB4SurHs/lA3Nf/TRfAjkwBX4hzaRG1Iw9IcSHi5/gRBMA1E/+zT
+    /1GxkICjo0CrSe7REUiGmVf96TYGi/3D18pP/09Gnc6f1DMuKihiLy8BY57j9MCW
+    g6BWL8aXDpNvJFwwZv2h6OPLKF04xfjnVYzaAloCOaf2vHxb2ocv2KbOas8oWglf
+    BmameSAIHpxRTdV01M40V8eA6IHEDT4pUXGydggb9LQ/2s3X2n0AJN4HDwxtclvI
+    cF85Kfp2e5lqYJwHKN+tmQm3NUEJkvj+yM5tKeSoJWmba87fe7DKfhKHUSL7rqT5
+    PI2aKbs0auR2b5cXegUnNqKAjnF+I4pY/yWkmhUNPqQ+ctE/dy85opI6sQ1nIQ4v
+    Q3oIFhs4y+XkQorsorJJn3MtdrxTow/CoOjQ/Mydd11xpQSlXkTAO3TqxEiXIz0l
+    i4RybXbqlFB9MAbs9dbC96Lq5hxroxeIVxo99r9Q327it1gQWPMCnfUV9LKmzusZ
+    2j18EynyALPs/onwA4VOIi1kC3As8d+1cBfhaFaZf9vgryXQx84=
+    =kzjP
+    -----END PGP SIGNATURE-----
+
+=back
 
 =head1 ATTRIBUTES
 
@@ -236,7 +275,7 @@ Timothy Legge
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Timothy Legge.
+This software is copyright (c) 2022 by Timothy Legge.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.008;
 
 use ExtUtils::MakeMaker;
 
@@ -14,13 +14,17 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Dist-Zilla-Plugin-SignReleaseNotes",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Dist::Zilla::Plugin::SignReleaseNotes",
   "PREREQ_PM" => {
+    "Digest::SHA" => "6.02",
     "Dist::Zilla" => "2.100921",
     "File::chdir" => 0,
-    "Module::Signature" => "0.87"
+    "Git::Wrapper" => "0.48",
+    "Module::Signature" => "0.87",
+    "Moose" => "2.2014"
   },
-  "VERSION" => "0.0003",
+  "VERSION" => "0.0006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -28,9 +32,12 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Digest::SHA" => "6.02",
   "Dist::Zilla" => "2.100921",
   "File::chdir" => 0,
-  "Module::Signature" => "0.87"
+  "Git::Wrapper" => "0.48",
+  "Module::Signature" => "0.87",
+  "Moose" => "2.2014"
 );
 
 

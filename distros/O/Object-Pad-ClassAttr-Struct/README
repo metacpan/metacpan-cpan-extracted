@@ -26,7 +26,7 @@ DESCRIPTION
 
     This module provides a third-party class attribute for
     Object::Pad-based classes, which applies some attributes automatically
-    to every slot added to the class, as a convenient shortcut for making
+    to every field added to the class, as a convenient shortcut for making
     structure-like classes.
 
 CLASS ATTRIBUTES
@@ -35,9 +35,9 @@ CLASS ATTRIBUTES
 
        class Name :Struct ... { ... }
 
-    Automatically applies the :param and :mutator attributes to every slot
+    Automatically applies the :param and :mutator attributes to every field
     defined on the class, meaning the constructor will accept parameters
-    for each slot to initialise the value, and each slot will have an
+    for each field to initialise the value, and each field will have an
     lvalue mutator method.
 
     In addition, the class itself gains the :strict(params) attribute,

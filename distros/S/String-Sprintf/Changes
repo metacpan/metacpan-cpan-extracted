@@ -1,5 +1,15 @@
 Revision history for Perl module String::Sprintf
 
+1.002 2022-02-02T11:03:33Z
+	* Add LICENSE file. It's the perl5 license.
+	* Add CITATION.cff, which GitHub now supports
+	* No code changes, so no need to upgrade if you have this
+
+1.001 2020-01-03T04:01:05Z
+	* Expand the docs a bit
+	* Add an example script for a homemade strftime
+	* Bump to a full on 1.x release
+
 0.02 2015-10-02T15:38:26Z
 	* Note new maintainer - no code changes
 

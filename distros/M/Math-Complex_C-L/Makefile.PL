@@ -1,7 +1,9 @@
-use ExtUtils::MakeMaker;
+use strict;
+use warnings;
 use Config;
+use ExtUtils::MakeMaker;
 
-$defines = $] < 5.008 ? "-DOLDPERL" : "-DNEWPERL";
+my $defines = $] < 5.008 ? "-DOLDPERL" : "-DNEWPERL";
 
 my $log = './myconfig.log';
 my $open = open WR, '>', $log;
@@ -34,15 +36,17 @@ print WR "\nCC = $cc\nOPTIMIZE = $opt\n" if $open;
 
 my $out = `$cc $opt -o try.exe -x c try.in -lm 2>&1`;
 
-print WR "catanhl & powl check: $out\n" if $open;
+print WR "powl & catanhl & ccosl check: $out\n" if $open;
 
 # There's a linking problem if try.exe does not exist.
 unless(-e 'try.exe') {
   if($out =~ /(`|'|"|\s)_?catanhl('|`|"|\s)/ ||
-     $out =~ /(`|'|"|\s)_?cpowl('|`|"|\s)/     ) {
+     $out =~ /(`|'|"|\s)_?ccosl('|`|"|\s)/   ||
+     $out =~ /(`|'|"|\s)_?cpowl('|`|"|\s)/      ) {
     close WR if $open;
     unlink $log if -e $log;
     print "Aborting:\n$out\n";
+    print "Cannot build Math::Complex_C::L on this system\n";
     exit 0; # abort the build
   }
 }
@@ -58,12 +62,12 @@ my $abort = 0;
 if($Config{osname} !~ /k/i && $Config{osname} !~ /open/i &&
    ($Config{osname} =~ /bsd/i || $Config{osname} =~ /dragonfly/i)) {
   if( system './try.exe', '0.25', '0.75') {$abort = 1}
-  else {
-    if($Config{osname} =~ /MSWin32/i) {$out =   `try.exe 0.25 0.75 2>&1`}
-    else                              {$out = `./try.exe 0.25 0.75 2>&1`}
-    print WR $out;
-    print WR "try.exe apparently ran fine\n";
-  }
+}
+else {
+  if($Config{osname} =~ /MSWin32/i) {$out =   `try.exe 0.25 0.75 2>&1`}
+  else                              {$out = `./try.exe 0.25 0.75 2>&1`}
+  print WR $out;
+  print WR "try.exe apparently ran fine\n";
 }
 
 # Remove the test executable
@@ -81,7 +85,7 @@ if($abort) {
 ###############################################
 # Check to see what version of gcc we have and
 # abort if it's less than 4.
-my $out = `$cc $opt -o try2.exe -x c try2.in -lm 2>&1`;
+$out = `$cc $opt -o try2.exe -x c try2.in -lm 2>&1`;
 
 print WR "gcc version check (build): $out\n" if $open;
 

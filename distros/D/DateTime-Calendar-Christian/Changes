@@ -1,3 +1,22 @@
+0.13		2022-02-04	T. R. Wyant
+    Add julian_deviation().  This is like gregorian_deviation(), but
+    increments on March 1 Gregorian rather than March 1 Julian. Thanks
+    to Christian Carey for suggesting this.
+
+    Correct minimum perl to 5.008004 in metadata.  This has always been
+    the minimum functionally because DateTime requires 5.008004, but for
+    some reason the Makefile.PL asked for 5.006002.
+
+    RT 140734 - Adding large durations.  The problem here was that after
+    doing a straight rata die addition, if the new date was on the other
+    side of the reform date from the original date a correction would be
+    applied so that (e.g., using the UK reform date) February 11 Julian
+    would always be February 22 Gregorian, and vice versa. But this
+    makes sense only when adding months or years. When adding days it
+    introduces an error of a day for each year which is a leap year
+    Julian but not Gregorian. The fix applies the adjustment only when
+    adding months or years.  Thanks to Christian Carey for finding this.
+
 0.12		2021-09-25	T. R. Wyant
     Correct repository links in metadata.  Thanks to Keith Thompson for
     finding and reporting this.

@@ -12,7 +12,7 @@ use XML::LibXML;
 
 with 'Net::SAML2::Role::ProtocolMessage';
 
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 # ABSTRACT: Net::SAML2::Protocol::Assertion - SAML2 assertion object
 
@@ -123,7 +123,7 @@ Net::SAML2::Protocol::Assertion - Net::SAML2::Protocol::Assertion - SAML2 assert
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 SYNOPSIS
 

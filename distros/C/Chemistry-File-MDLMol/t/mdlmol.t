@@ -1,4 +1,4 @@
-use Test::More tests => 13;
+use Test::More tests => 14;
 BEGIN { use_ok('Chemistry::File::MDLMol') };
 
 # read a molecule and see if some of the data is ok
@@ -8,6 +8,7 @@ isa_ok($mol, 'Chemistry::Mol', '$mol');
 is($mol->name, "trans-Difluorodiazene", "name");
 is($mol->attr("mdlmol/line2"), "  -ISIS-            3D", "line2");
 is($mol->attr("mdlmol/comment"), "r23 N2F2 FN=NF", "comment");
+is($mol->attr("mdlmol/chiral"), 0, "chiral");
 is($mol->atoms(2)->symbol, "N", "symbol");
 is($mol->atoms(3)->y3, 1.2409, "coords");
 is($mol->bonds(1)->type, 2, "bond type");

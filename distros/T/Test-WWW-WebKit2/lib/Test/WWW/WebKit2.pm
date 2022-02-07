@@ -42,7 +42,7 @@ has 'debug' => (
     default => 0,
 );
 
-our $VERSION = '0.111';
+our $VERSION = '0.112';
 
 sub shout {
     my ($self, $error) = @_;
@@ -100,7 +100,7 @@ sub click_ok {
     $description //= '';
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    $timeout ||= $self->default_timeout;
+    $timeout ||= 0;
 
     my $result = eval { $self->click($locator, $timeout) };
 

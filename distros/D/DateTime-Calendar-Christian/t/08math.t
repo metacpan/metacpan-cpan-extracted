@@ -51,6 +51,7 @@ $d = DateTime::Calendar::Christian->new( year  => 1285,
 
 $d->add( years => 300 );
 is( $d->ymd, '1585-01-11', 'adding centuries around calendar change' );
+
 $d->subtract( years => 300 );
 is( $d->ymd, '1285-01-01', 'subtracting centuries around calendar change' );
 
@@ -64,6 +65,8 @@ isa_ok( $dur, 'DateTime::Duration' );
 is( $dur->delta_days, 19, 'datetime - datetime' );
 
 TODO: {
+    # NOTE not simply local $TODO = ... because this code actually
+    # throws an execption.
     todo_skip 'mixed math (with DateTime objects) not implemented', 2;
     $d = DateTime->new( year => 1582, month => 10, day => 30 );
     $dur = $d2->subtract_datetime($d);
@@ -90,6 +93,9 @@ $d2->add( years => 100 );
 is( $d2->ymd, '1832-02-22', "Washington's 100th birthday" );
 # (This is actually 1832-02-10 Julian!)
 
+$d2 = $d->clone->add( years => 200 );
+is( $d2->ymd, '1932-02-22', "Washington's 200th birthday" );
+
 # George II's birthday (see Ben Franklin's Poor Richard's Almanac for
 # November 1753, http://www.gettysburg.edu/~tshannon/his341/pra53nov.htm)
 
@@ -112,6 +118,27 @@ $d = DateTime::Calendar::Christian->new(
 
 $d2 = $d->add( years => 86 );
 is( $d->ymd, '2003-11-07', 'Russian revolution' );
+
+{
+    note <<'EOD';
+
+RT 140734 - Christian Carey
+EOD
+
+    my $christian = DateTime::Calendar::Christian->new(
+	year	=> 1582,
+	month	=> 3,
+	day	=> 1,
+    )->add( days => 43_100 );
+
+    is $christian->ymd, '1700-03-12',
+	'1582-03-01 (Julian) plus 43,100 days is 1700_03_12 (Gregorian)';
+
+    # Ensure that we round-trip.
+    $christian->subtract( days => 43_100 );
+    is $christian->ymd, '1582-03-01',
+	'1700-03-12 (Gregorian) minus 43,100 days is 1582_03_01 (Julian)';
+}
 
 done_testing;
 

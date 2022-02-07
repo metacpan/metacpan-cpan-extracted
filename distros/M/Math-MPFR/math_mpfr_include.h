@@ -161,9 +161,7 @@ FALLBACK_NOTIFY          : If defined, $Math::MPFR::doubletoa_fallback
 #include <stdio.h>
 
 #if defined(MATH_MPFR_NEED_LONG_LONG_INT)
-#ifndef _MSC_VER
 #include <inttypes.h>
-#endif
 #endif
 
 /*
@@ -199,6 +197,14 @@ typedef _Decimal128 D128 __attribute__ ((aligned(8)));
 #else
 typedef _Decimal128 D128;
 #endif
+#endif
+
+#define SIS_PERL_VERSION PERL_REVISION*1000000+PERL_VERSION*1000+PERL_SUBVERSION
+
+#if SIS_PERL_VERSION >= 5012000   /* perl-5.12.0 and later */
+#  define MORTALIZED_PV(x) newSVpvn_flags(x,strlen(x),SVs_TEMP)
+#else
+#  define MORTALIZED_PV(x) sv_2mortal(newSVpv(x,0))
 #endif
 
 /* Facilitate altering the numeric flags that we *
@@ -339,11 +345,11 @@ typedef _Decimal128 D128;
 #define DEAL_WITH_NANFLAG_BUG_OVERLOADED
 #endif
 
-/* Squash some annoying compiler warnings (Microsoft compilers only). */
-
+/*
 #ifdef _MSC_VER
 #pragma warning(disable:4700 4715 4716)
 #endif
+*/
 
 #ifdef OLDPERL
 #define SvUOK SvIsUV
@@ -355,6 +361,22 @@ typedef _Decimal128 D128;
 
 #ifndef Newxz
 #  define Newxz(v,n,t) Newz(0,v,n,t)
+#endif
+
+/* A perl bug in perl-5.20 onwards can break &PL_sv_yes and  *
+ * &PL_sv_no. In the overload subs we therefore instead      *
+ * use  SvTRUE_nomg_NN where possible, which is available    *
+ * beginning with perl-5.18.0.                               *
+ * Otherwise we continue using &PL_sv_yes as original        *
+ * (&PL_sv_no is not used by this module.)                   *
+ * See See https://github.com/sisyphus/math-decimal64/pull/1 */
+
+#if defined SvTRUE_nomg_NN
+#define SWITCH_ARGS SvTRUE_nomg_NN(third)
+#define NO_SWITCH_ARGS !SvTRUE_nomg_NN(third)
+#else
+#define SWITCH_ARGS third==&PL_sv_yes
+#define NO_SWITCH_ARGS third!=&PL_sv_yes
 #endif
 
 /* May one day be removed from mpfr.h */

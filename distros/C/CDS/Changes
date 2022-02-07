@@ -1,7 +1,10 @@
-Revision history for Perl extension Condensation.
+Revision history:
 
-0.02  2015-02-13
-	Various fixes
+0.25  2022-02-05
+	Fixed C code for Windows
+
+0.24  2022-02-03
+	First public release.
 
 0.01  2015-02-12
-	First release
+	First internal release.

@@ -1,6 +1,6 @@
 package PDL::NDBin::Action::StdDev;
 # ABSTRACT: Action for PDL::NDBin that computes standard deviation
-$PDL::NDBin::Action::StdDev::VERSION = '0.021';
+$PDL::NDBin::Action::StdDev::VERSION = '0.024';
 
 use strict;
 use warnings;
@@ -28,7 +28,10 @@ sub process
 	$self->{count} = PDL->zeroes( defined(&PDL::indx) ? PDL::indx() : PDL::long, $self->{N} ) unless defined $self->{count};
 	# as the internal computations happen in double, the type of 'avg' sticks to double
 	$self->{avg} = PDL->zeroes( PDL::double, $self->{N} ) unless defined $self->{avg};
-	PDL::NDBin::Actions_PP::_istddev_loop( $iter->data, $iter->idx, $self->{out}, $self->{count}, $self->{avg}, $self->{N} );
+	my $data = $iter->data;
+	my $idx = $iter->idx;
+	$_ = PDL->zeroes( 0 ) for grep $_->isnull, $data, $idx;
+	PDL::NDBin::Actions_PP::_istddev_loop( $data, $idx, $self->{out}, $self->{count}, $self->{avg}, $self->{N} );
 	# as the plugin processes all bins at once, every variable
 	# needs to be visited only once
 	$iter->var_active( 0 );
@@ -57,7 +60,7 @@ PDL::NDBin::Action::StdDev - Action for PDL::NDBin that computes standard deviat
 
 =head1 VERSION
 
-version 0.021
+version 0.024
 
 =head1 DESCRIPTION
 
@@ -73,7 +76,7 @@ This class implements an action for PDL::NDBin.
 	);
 
 Construct an instance for this action. Requires the number of bins $N as input.
-Optionally allows the type of the output piddle to be set (defaults to
+Optionally allows the type of the output ndarray to be set (defaults to
 I<double>).
 
 =head2 process()
@@ -95,7 +98,7 @@ Edward Baudrez <ebaudrez@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Edward Baudrez.
+This software is copyright (c) 2022 by Edward Baudrez.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

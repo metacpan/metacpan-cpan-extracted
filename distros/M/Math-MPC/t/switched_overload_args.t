@@ -295,3 +295,9 @@ else {
   print "not ok 30\n";
 }
 
+# These next 2 subs will cause failures here on perl-5.20.0
+# and later if &PL_sv_yes or &PL_sv_no is encountered in the
+# overload sub.
+
+sub foo () {!0} # Breaks PL_sv_yes
+sub bar () {!1} # Breaks PL_sv_no

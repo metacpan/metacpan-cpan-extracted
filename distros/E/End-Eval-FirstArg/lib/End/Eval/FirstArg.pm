@@ -3,7 +3,7 @@ package End::Eval::FirstArg;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-08-06'; # DATE
 our $DIST = 'End-Eval-FirstArg'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use warnings;
@@ -16,6 +16,7 @@ sub import {
 
 END {
     $code = '' unless defined $code;
+    print "DEBUG: eval-ing $code ...\n" if $ENV{DEBUG};
     eval "no strict; no warnings; $code;";
     die if $@;
 }
@@ -35,7 +36,7 @@ End::Eval::FirstArg - Take code from first command-line argument, then eval it i
 
 =head1 VERSION
 
-This document describes version 0.001 of End::Eval::FirstArg (from Perl distribution End-Eval-FirstArg), released on 2021-08-06.
+This document describes version 0.002 of End::Eval::FirstArg (from Perl distribution End-Eval-FirstArg), released on 2021-08-06.
 
 =head1 SYNOPSIS
 
@@ -69,7 +70,7 @@ feature.
 
 =head1 SEE ALSO
 
-Other C<End::Eval::*> (like L<End::Eval> and L<End::Eval>) and C<End::*>
+Other C<End::Eval::*> (like L<End::Eval> and L<End::Eval::Env>) and C<End::*>
 modules.
 
 Other C<Devel::End::*> modules (but this namespace is deprecated in favor of

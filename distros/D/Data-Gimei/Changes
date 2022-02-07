@@ -1,5 +1,9 @@
 Revision history for Perl extension Data-Gimei
 
+v0.0.5 2022-02-04T08:29:01Z
+
+    - change requirements of perl version
+
 v0.0.4 2022-01-11T08:29:51Z
 
     - Introduce Address

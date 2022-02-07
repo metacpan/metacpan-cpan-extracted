@@ -196,31 +196,31 @@ subtest 'mapping' => sub {
 	my $output = $etl->output->get_record( 0 );
 	is $output->{un}, 'Field1', 'Data path';
 
-	my $etl = ETL::Pipeline->new( {
+	$etl = ETL::Pipeline->new( {
 		work_in => 't',
 		input   => 'UnitTest',
 		mapping => {un => qr/1/},
 		output  => 'UnitTest',
 	} )->process;
-	my $output = $etl->output->get_record( 0 );
+	$output = $etl->output->get_record( 0 );
 	is $output->{un}, 'Field1', 'Regular expression';
 
-	my $etl = ETL::Pipeline->new( {
+	$etl = ETL::Pipeline->new( {
 		work_in => 't',
 		input   => 'UnitTest',
 		mapping => {un => 0},
 		output  => 'UnitTest',
 	} )->process;
-	my $output = $etl->output->get_record( 0 );
+	$output = $etl->output->get_record( 0 );
 	is $output->{un}, 'Field1', 'Bare field number';
 
-	my $etl = ETL::Pipeline->new( {
+	$etl = ETL::Pipeline->new( {
 		work_in => 't',
 		input   => 'UnitTest',
 		mapping => {un => 'Header1'},
 		output  => 'UnitTest',
 	} )->process;
-	my $output = $etl->output->get_record( 0 );
+	$output = $etl->output->get_record( 0 );
 	is $output->{un}, 'Field1', 'Bare field name';
 
 	subtest 'Multiple fields' => sub {
@@ -233,13 +233,13 @@ subtest 'mapping' => sub {
 		my $output = $etl->output->get_record( 0 );
 		is $output->{un}, 'Field6; Field7', 'Bare field name';
 
-		my $etl = ETL::Pipeline->new( {
+		$etl = ETL::Pipeline->new( {
 			work_in => 't',
 			input   => 'UnitTest',
 			mapping => {un => qr/der6/},
 			output  => 'UnitTest',
 		} )->process;
-		my $output = $etl->output->get_record( 0 );
+		$output = $etl->output->get_record( 0 );
 		is $output->{un}, 'Field6; Field7', 'Regular expression';
 	};
 
@@ -259,14 +259,58 @@ subtest 'mapping' => sub {
 		is $output->{un}, 'abc', 'Return value';
 	};
 
-	my $etl = ETL::Pipeline->new( {
+	$etl = ETL::Pipeline->new( {
 		work_in => 't',
 		input   => 'UnitTest',
 		mapping => {un => '/invalid'},
 		output  => 'UnitTest',
 	} )->process;
-	my $output = $etl->output->get_record( 0 );
+	$output = $etl->output->get_record( 0 );
 	is $output->{un}, undef, 'Not found';
+
+	subtest 'Custom mapping' => sub {
+		$etl = ETL::Pipeline->new( {
+			work_in => 't',
+			input   => 'UnitTest',
+			mapping => sub { {un => 'string'} },
+			output  => 'UnitTest',
+		} )->process;
+		$output = $etl->output->get_record( 0 );
+		is $output->{un}, 'string', 'Returns HASH reference';
+		
+		$etl = ETL::Pipeline->new( {
+			work_in => 't',
+			input   => 'UnitTest',
+			mapping => sub { undef },
+			output  => 'UnitTest',
+		} )->process;
+		$output = $etl->output->get_record( 0 );
+		is scalar( %$output ), 0, 'Empty record';
+
+		subtest 'With constants' => sub {
+			$etl = ETL::Pipeline->new( {
+				work_in   => 't',
+				input     => 'UnitTest',
+				constants => {deux => 'other'},
+				mapping   => sub { {un => 'string'} },
+				output    => 'UnitTest',
+			} )->process;
+			$output = $etl->output->get_record( 0 );
+			is $output->{un  }, 'string', 'Returns HASH reference';
+			is $output->{deux}, 'other' , 'Constant set';
+
+			$etl = ETL::Pipeline->new( {
+				work_in   => 't',
+				input     => 'UnitTest',
+				constants => {deux => 'other'},
+				mapping   => sub { undef },
+				output    => 'UnitTest',
+			} )->process;
+			$output = $etl->output->get_record( 0 );
+			is $output->{un  }, undef  , 'Empty record';
+			is $output->{deux}, 'other', 'Constant still set';
+		};
+	};
 };
 
 subtest 'on_record' => sub {

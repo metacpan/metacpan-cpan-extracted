@@ -3,7 +3,7 @@ use 5.22.0;
 use strict;
 use warnings;
 
-our $VERSION = 1.24;
+our $VERSION = 1.26;
 
 1;
 __END__
@@ -63,8 +63,16 @@ of the Sun, the Moon, and the planets amount to about 1″-3″."
 
 =back
 
-The project is also hosted on Github. Please, visit L<https://github.com/skrushinsky/astro-montenbruck>
 
+=head1 HOW TO CONTRIBUTE 
+
+The project is also hosted on Github. Please, visit L<https://github.com/skrushinsky/astro-montenbruck>.
+You may contribute to the project by many different ways, starting from refining and correcting its documentation,
+especially if you are a native English speaker, and ending with improving the code base. Any kind of testing and
+suggestions are welcome. 
+
+You may follow the standard Github procedures or, in case you are not comfortable with them, just send your suggestions 
+to the author by email.
 
 =head1 AUTHOR
 
@@ -72,7 +80,7 @@ Sergey Krushinsky, C<< <krushi at cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2021 by Sergey Krushinsky
+Copyright (C) 2010-2022 by Sergey Krushinsky
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

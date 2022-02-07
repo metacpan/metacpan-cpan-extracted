@@ -5,7 +5,6 @@ use warnings;
 use strict;
 use Math::MPFR qw(:mpfr);
 use Config;
-#use Devel::Peek;
 
 print "1..7\n";
 
@@ -31,36 +30,37 @@ if($_64) {
      && $int1 == "-144115188075868217"
     ) {$ok = 'a'}
 
-  if($Config::Config{cc} eq 'cl') {
-    $pp1 = Rmpfr_integer_string($int1, 10, GMP_RNDN);
-  }
-  else {$pp1 = Rmpfr_get_sj($int1, GMP_RNDN)}
+#  if($Config::Config{cc} eq 'cl') {
+#    $pp1 = Rmpfr_integer_string($int1, 10, GMP_RNDN);
+#  }
+#  else {$pp1 = Rmpfr_get_sj($int1, GMP_RNDN)}
+  $pp1 = Rmpfr_get_sj($int1, GMP_RNDN);
   if($pp1 == -144115188075868217) {$ok .= 'b'}
 
   $pp1 += 14;
 
   my $int2 = Rmpfr_init();
-  if($Config::Config{cc} eq 'cl') {
-    Rmpfr_set_str($int2, $pp1, 10, GMP_RNDN);
-  }
-  else {Rmpfr_set_sj($int2, $pp1, GMP_RNDN)}
+#  if($Config::Config{cc} eq 'cl') {
+#    Rmpfr_set_str($int2, $pp1, 10, GMP_RNDN);
+#  }
+#  else {Rmpfr_set_sj($int2, $pp1, GMP_RNDN)}
+  Rmpfr_set_sj($int2, $pp1, GMP_RNDN);
   if($int2 == $pp1
      && $int2 - $int1 - 14 == 0
      && !($int2 - $int1 - 14)
      ) {$ok .= 'c'}
 
-  if($Config::Config{cc} eq 'cl') {
-    eval{Rmpfr_set_sj_2exp($int2, $pp1, 2, GMP_RNDN);};
-    if($@ =~ /not implemented on this build of perl/ && $@ !~ /\- use/) {$ok .= 'd'}
-    else {print $@, "\n"}
-    eval{Rmpfr_set_uj_2exp($int2, $pp1, 2, GMP_RNDN);};
-    if($@ =~ /not implemented on this build of perl/ && $@ !~ /\- use/) {$ok .= 'e'}
-    else {print $@, "\n"}
-  }
-  else {
-    Rmpfr_set_sj_2exp($int2, $pp1, 2, GMP_RNDN);
-    if($int2 == $pp1 * 4) {$ok .= 'de'}
-  }
+#  if($Config::Config{cc} eq 'cl') {
+#    eval{Rmpfr_set_sj_2exp($int2, $pp1, 2, GMP_RNDN);};
+#    if($@ =~ /not implemented on this build of perl/ && $@ !~ /\- use/) {$ok .= 'd'}
+#    else {print $@, "\n"}   eval{Rmpfr_set_uj_2exp($int2, $pp1, 2, GMP_RNDN);};
+#    if($@ =~ /not implemented on this build of perl/ && $@ !~ /\- use/) {$ok .= 'e'}
+#    else {print $@, "\n"}
+#  }
+# else {
+  Rmpfr_set_sj_2exp($int2, $pp1, 2, GMP_RNDN);
+  if($int2 == $pp1 * 4) {$ok .= 'de'}
+#  }
 
   if($ok eq 'abcde') {print "ok 1\n"}
   else {print "not ok 1 $ok\n"}
@@ -76,14 +76,14 @@ if($_64) {
   $pp2 *= -1;
   if(Math::MPFR::_itsa($pp2) == 2) {$ok = 'AB'}
   else {
-    if($Config::Config{cc} eq 'cl') {$ok = 'ab'} # Skip
-    else {
+#    if($Config::Config{cc} eq 'cl') {$ok = 'ab'} # Skip
+#    else {
       Rmpfr_set_sj($int3, ~0, GMP_RNDN);
       if($int3 == -1) {$ok = 'a'}
 
       Rmpfr_set_sj_2exp($int3, ~0, 2, GMP_RNDN);
       if($int3 == -4) {$ok .= 'b'}
-    }
+#    }
   }
 
   if(lc($ok) eq 'ab') {print "ok 2\n"}
@@ -224,24 +224,8 @@ if($_64) {
 $ok = '';
 
 if($_64) {
-  my $int3 = Math::MPFR->new();
-  if($Config::Config{cc} eq 'cl') {
-    eval{Rmpfr_set_sj($int3, ~0, GMP_RNDN);};
-    if($@ =~ /not implemented on this build of perl \- use/) {$ok = 'a'}
-    eval{Rmpfr_set_uj($int3, ~0, GMP_RNDN);};
-    if($@ =~ /not implemented on this build of perl \- use/) {$ok .= 'b'}
-    eval{Rmpfr_get_sj($int3, GMP_RNDN);};
-    if(!$@) {$ok .= 'c'}
-    eval{Rmpfr_get_uj($int3, GMP_RNDN);};
-    if(!$@) {$ok .= 'd'}
-
-    if($ok eq 'abcd') {print "ok 4\n"}
-    else {print "not ok $ok\n"}
-  }
-  else {
-    warn "Skipping test 4 - 'cl' compiler not used\n";
-    print "ok 4\n";
-  }
+  warn "Skipping test 4 - original test is no longer relevant";
+  print "ok 4\n";
 }
 
 $ok = '';

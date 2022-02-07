@@ -1,6 +1,10 @@
 Revision history for Test::WWW::WebKit2
 
+0.112 Fri Feb 04 12:00:00 CET 2022
+
+Remove default timeout for click_ok, we want no timeout here unless explicitely requested
+
 0.111 Thur Oct 29 09:45:00 CET 2020
 
-Increasing the amount of methods that handlee test descriptions
+Increasing the amount of methods that handle test descriptions
 

@@ -453,7 +453,7 @@
 
    $bytes_written = Rmpf_out_str([$prefix,] $op, $base, $digits  [, $suffix]);
     BEST TO USE TRmpf_out_str INSTEAD.
-    Print $op to stream, as a string of digits. Return the number of
+    Print $op to stdout, as a string of digits. Return the number of
     bytes written, or if an error occurred, return 0. The mantissa is
     prefixed with an `0.' and is in the given base, which may vary
     from 2 to 62 or from -2 to -36. An exponent is then printed,

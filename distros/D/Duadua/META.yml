@@ -5,6 +5,7 @@ author:
 build_requires:
   Capture::Tiny: '0'
   File::Basename: '0'
+  HTTP::Headers: '0'
   List::Util: '0'
   Module::Build::Pluggable::CPANfile: '0.05'
   Test::AllModules: '0.17'
@@ -37,5 +38,5 @@ resources:
   bugtracker: http://github.com/bayashi/Duadua/issues
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: http://github.com/bayashi/Duadua
-version: '0.25'
+version: '0.27'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

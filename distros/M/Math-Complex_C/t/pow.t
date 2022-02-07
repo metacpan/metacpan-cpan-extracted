@@ -2,11 +2,11 @@ use warnings;
 use strict;
 use Math::Complex_C qw(:all);
 
+print "1..28\n";
+
 my $op = MCD(5, 4.5);
 my $pow = MCD(2, 2.5);
 my $rop = MCD();
-
-print "1..20\n";
 
 my $eps = 1e-12;
 
@@ -182,9 +182,51 @@ else {
 ##############################
 ##############################
 
+if(approx(real_c(MCD(2.0) ** 5), 32, $eps)) {print "ok 21\n"}
+else {
+  print "not ok 21\n";
+}
+
+if(approx(real_c(5 ** MCD(2.0)), 25, $eps)) {print "ok 22\n"}
+else {
+  print "not ok 22\n";
+}
+
+##############################
+##############################
+
+if(approx(real_c(MCD(9.0) ** 0.5), 3, $eps)) {print "ok 23\n"}
+else {print "not ok 23\n"}
+
+if(approx(real_c(0.5 ** MCD(9.0)), 0.001953125, $eps)) {print "ok 24\n"}
+else {
+  print "not ok 24\n";
+}
+
+##############################
+##############################
+
+if(approx(real_c(MCD(9.0) ** '0.5'), 3, $eps)) {print "ok 25\n"}
+else {print "not ok 25\n"}
+
+if(approx(real_c('0.5' ** MCD(9.0)), 0.001953125, $eps)) {print "ok 26\n"}
+else {
+  print "not ok 26\n";
+}
+
+##############################
+##############################
+
+if(approx(real_c(MCD(9.0) ** MCD(0.5)), 3, $eps)) {print "ok 27\n"}
+else {print "not ok 27\n"}
+
+if(approx(real_c(MCD(0.5) ** MCD(9.0)), 0.001953125, $eps)) {print "ok 28\n"}
+else {
+  print "not ok 28\n";
+}
+
 sub approx {
     if(($_[0] > ($_[1] - $_[2])) && ($_[0] < ($_[1] + $_[2]))) {return 1}
     return 0;
 }
-
 

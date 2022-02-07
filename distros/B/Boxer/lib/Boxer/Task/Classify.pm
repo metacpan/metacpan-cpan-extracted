@@ -28,11 +28,11 @@ no warnings "experimental::signatures";
 
 =head1 VERSION
 
-Version v1.4.2
+Version v1.4.3
 
 =cut
 
-our $VERSION = "v1.4.2";
+our $VERSION = "v1.4.3";
 
 # permit callers to sloppily pass undefined values
 sub BUILDARGS ( $class, %args )
@@ -60,7 +60,7 @@ has suite => (
 	isa      => Suite,
 	required => 1,
 	coerce   => 1,
-	default  => sub {'buster'},
+	default  => sub {'bullseye'},
 );
 
 has classdir => (
@@ -79,7 +79,7 @@ sub _build_classdir ($self)
 	}
 	else {
 		$self->_logger->trace('Resolving classdir from XDG_DATA_DIRS');
-		$dir = scalar data_dirs( 'boxer', $_[0]->suite, 'classes' );
+		$dir = scalar data_dirs( 'boxer', $self->suite, 'classes' );
 	}
 	return $dir;
 }

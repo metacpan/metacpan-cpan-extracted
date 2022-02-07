@@ -40,6 +40,7 @@ use DateTime;
 use AsposeSlidesCloud::Object::EffectFormat;
 use AsposeSlidesCloud::Object::FillFormat;
 use AsposeSlidesCloud::Object::GeometryShape;
+use AsposeSlidesCloud::Object::Hyperlink;
 use AsposeSlidesCloud::Object::LineFormat;
 use AsposeSlidesCloud::Object::ResourceUri;
 use AsposeSlidesCloud::Object::ThreeDFormat;
@@ -282,6 +283,20 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'hyperlink_click' => {
+    	datatype => 'Hyperlink',
+    	base_name => 'HyperlinkClick',
+    	description => 'Hyperlink defined for mouse click.',
+    	format => '',
+    	read_only => '',
+    		},
+    'hyperlink_mouse_over' => {
+    	datatype => 'Hyperlink',
+    	base_name => 'HyperlinkMouseOver',
+    	description => 'Hyperlink defined for mouse over.',
+    	format => '',
+    	read_only => '',
+    		},
     'type' => {
     	datatype => 'string',
     	base_name => 'Type',
@@ -366,6 +381,20 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'play_across_slides' => {
+    	datatype => 'boolean',
+    	base_name => 'PlayAcrossSlides',
+    	description => 'Determines whether an audio is playing across the slides.',
+    	format => '',
+    	read_only => '',
+    		},
+    'rewind_audio' => {
+    	datatype => 'boolean',
+    	base_name => 'RewindAudio',
+    	description => 'Determines whether audio is automatically rewound to start after playing.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -385,6 +414,8 @@ __PACKAGE__->swagger_types( {
     'effect_format' => 'EffectFormat',
     'three_d_format' => 'ThreeDFormat',
     'line_format' => 'LineFormat',
+    'hyperlink_click' => 'Hyperlink',
+    'hyperlink_mouse_over' => 'Hyperlink',
     'type' => 'string',
     'shape_type' => 'string',
     'audio_cd_end_track' => 'int',
@@ -396,7 +427,9 @@ __PACKAGE__->swagger_types( {
     'play_loop_mode' => 'boolean',
     'play_mode' => 'string',
     'volume' => 'string',
-    'base64_data' => 'string'
+    'base64_data' => 'string',
+    'play_across_slides' => 'boolean',
+    'rewind_audio' => 'boolean'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -416,6 +449,8 @@ __PACKAGE__->attribute_map( {
     'effect_format' => 'EffectFormat',
     'three_d_format' => 'ThreeDFormat',
     'line_format' => 'LineFormat',
+    'hyperlink_click' => 'HyperlinkClick',
+    'hyperlink_mouse_over' => 'HyperlinkMouseOver',
     'type' => 'Type',
     'shape_type' => 'ShapeType',
     'audio_cd_end_track' => 'AudioCdEndTrack',
@@ -427,7 +462,9 @@ __PACKAGE__->attribute_map( {
     'play_loop_mode' => 'PlayLoopMode',
     'play_mode' => 'PlayMode',
     'volume' => 'Volume',
-    'base64_data' => 'Base64Data'
+    'base64_data' => 'Base64Data',
+    'play_across_slides' => 'PlayAcrossSlides',
+    'rewind_audio' => 'RewindAudio'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

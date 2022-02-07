@@ -1855,7 +1855,7 @@ SV * overload_sub(pTHX_ mpc_t * a, SV * b, SV * third) {
      if(SvUOK(b)) mpfr_set_uj(t, SvUVX(b), GMP_RNDN);
      else         mpfr_set_sj(t, SvIVX(b), GMP_RNDN);
 #endif
-       if(third == &PL_sv_yes) mpc_fr_sub(*mpc_t_obj, t, *a, DEFAULT_ROUNDING_MODE);
+       if(SWITCH_ARGS) mpc_fr_sub(*mpc_t_obj, t, *a, DEFAULT_ROUNDING_MODE);
        else mpc_sub_fr(*mpc_t_obj, *a, t, DEFAULT_ROUNDING_MODE);
        mpfr_clear(t);
        return obj_ref;
@@ -1865,12 +1865,12 @@ SV * overload_sub(pTHX_ mpc_t * a, SV * b, SV * third) {
 
      if(SV_IS_IOK(b)) {
        if(SvUOK(b)) {
-         if(third == &PL_sv_yes) mpc_ui_sub(*mpc_t_obj, SvUVX(b), *a, DEFAULT_ROUNDING_MODE);
+         if(SWITCH_ARGS) mpc_ui_sub(*mpc_t_obj, SvUVX(b), *a, DEFAULT_ROUNDING_MODE);
          else mpc_sub_ui(*mpc_t_obj, *a, SvUVX(b), DEFAULT_ROUNDING_MODE);
          return obj_ref;
        }
 
-       if(third == &PL_sv_yes) {
+       if(SWITCH_ARGS) {
           if(SvIVX(b) >=0) {
             mpc_ui_sub(*mpc_t_obj, SvUVX(b), *a, DEFAULT_ROUNDING_MODE);
           }
@@ -1915,7 +1915,7 @@ SV * overload_sub(pTHX_ mpc_t * a, SV * b, SV * third) {
        if(mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 0, DEFAULT_ROUNDING_MODE) == -1)
          croak("Invalid string (%s) supplied to Math::MPC::overload_sub", SvPV_nolen(b));
 #endif
-       if(third == &PL_sv_yes) mpc_sub(*mpc_t_obj, *mpc_t_obj, *a, DEFAULT_ROUNDING_MODE);
+       if(SWITCH_ARGS) mpc_sub(*mpc_t_obj, *mpc_t_obj, *a, DEFAULT_ROUNDING_MODE);
        else mpc_sub(*mpc_t_obj, *a, *mpc_t_obj, DEFAULT_ROUNDING_MODE);
        return obj_ref;
      }
@@ -1932,7 +1932,7 @@ SV * overload_sub(pTHX_ mpc_t * a, SV * b, SV * third) {
        mpfr_init2(t, DBL_MANT_DIG);
        mpfr_set_d(t, (double)SvNVX(b), GMP_RNDN);
 #endif
-       if(third == &PL_sv_yes) mpc_fr_sub(*mpc_t_obj, t, *a, DEFAULT_ROUNDING_MODE);
+       if(SWITCH_ARGS) mpc_fr_sub(*mpc_t_obj, t, *a, DEFAULT_ROUNDING_MODE);
        else mpc_sub_fr(*mpc_t_obj, *a, t, DEFAULT_ROUNDING_MODE);
        mpfr_clear(t);
        return obj_ref;
@@ -1975,7 +1975,7 @@ SV * overload_div(pTHX_ mpc_t * a, SV * b, SV * third) {
        if(SvUOK(b)) mpfr_set_uj(t, SvUVX(b), GMP_RNDN);
        else         mpfr_set_sj(t, SvIVX(b), GMP_RNDN);
 #endif
-       if(third == &PL_sv_yes) mpc_fr_div(*mpc_t_obj, t, *a, DEFAULT_ROUNDING_MODE);
+       if(SWITCH_ARGS) mpc_fr_div(*mpc_t_obj, t, *a, DEFAULT_ROUNDING_MODE);
        else mpc_div_fr(*mpc_t_obj, *a, t, DEFAULT_ROUNDING_MODE);
        mpfr_clear(t);
        return obj_ref;
@@ -1985,12 +1985,12 @@ SV * overload_div(pTHX_ mpc_t * a, SV * b, SV * third) {
 
      if(SV_IS_IOK(b)) {
        if(SvUOK(b)) {
-         if(third == &PL_sv_yes) mpc_ui_div(*mpc_t_obj, SvUVX(b), *a, DEFAULT_ROUNDING_MODE);
+         if(SWITCH_ARGS) mpc_ui_div(*mpc_t_obj, SvUVX(b), *a, DEFAULT_ROUNDING_MODE);
          else mpc_div_ui(*mpc_t_obj, *a, SvUVX(b), DEFAULT_ROUNDING_MODE);
          return obj_ref;
        }
 
-       if(third == &PL_sv_yes) {
+       if(SWITCH_ARGS) {
           if(SvIVX(b) >=0) {
             mpc_ui_div(*mpc_t_obj, SvUVX(b), *a, DEFAULT_ROUNDING_MODE);
           }
@@ -2038,7 +2038,7 @@ SV * overload_div(pTHX_ mpc_t * a, SV * b, SV * third) {
        if(mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 0, DEFAULT_ROUNDING_MODE) == -1)
          croak("Invalid string (%s) supplied to Math::MPC::overload_div", SvPV_nolen(b));
 #endif
-       if(third == &PL_sv_yes) mpc_div(*mpc_t_obj, *mpc_t_obj, *a, DEFAULT_ROUNDING_MODE);
+       if(SWITCH_ARGS) mpc_div(*mpc_t_obj, *mpc_t_obj, *a, DEFAULT_ROUNDING_MODE);
        else mpc_div(*mpc_t_obj, *a, *mpc_t_obj, DEFAULT_ROUNDING_MODE);
        return obj_ref;
      }
@@ -2055,7 +2055,7 @@ SV * overload_div(pTHX_ mpc_t * a, SV * b, SV * third) {
        mpfr_init2(t, DBL_MANT_DIG);
        mpfr_set_d(t, (double)SvNVX(b), GMP_RNDN);
 #endif
-       if(third == &PL_sv_yes) mpc_fr_div(*mpc_t_obj, t, *a, DEFAULT_ROUNDING_MODE);
+       if(SWITCH_ARGS) mpc_fr_div(*mpc_t_obj, t, *a, DEFAULT_ROUNDING_MODE);
        else mpc_div_fr(*mpc_t_obj, *a, t, DEFAULT_ROUNDING_MODE);
        mpfr_clear(t);
        return obj_ref;
@@ -2524,7 +2524,7 @@ SV * overload_pow(pTHX_ mpc_t * a, SV * b, SV * third) {
        if(SvUOK(b)) mpc_set_uj(t, SvUVX(b), MPC_RNDNN);
        else         mpc_set_sj(t, SvIV(b), MPC_RNDNN);
 #endif
-       if(third == &PL_sv_yes)
+       if(SWITCH_ARGS)
          mpc_pow(*mpc_t_obj, t, *a, DEFAULT_ROUNDING_MODE);
        else
          mpc_pow(*mpc_t_obj, *a, t, DEFAULT_ROUNDING_MODE);
@@ -2538,7 +2538,7 @@ SV * overload_pow(pTHX_ mpc_t * a, SV * b, SV * third) {
        if(SvUOK(b)) {
          mpc_init2(t, sizeof(UV) * CHAR_BIT);
          mpc_set_ui(t, SvUVX(b), MPC_RNDNN);
-         if(third == &PL_sv_yes)
+         if(SWITCH_ARGS)
            mpc_pow(*mpc_t_obj, t, *a, DEFAULT_ROUNDING_MODE);
          else
            mpc_pow(*mpc_t_obj, *a, t, DEFAULT_ROUNDING_MODE);
@@ -2548,7 +2548,7 @@ SV * overload_pow(pTHX_ mpc_t * a, SV * b, SV * third) {
 
        mpc_init2(t, sizeof(IV) * CHAR_BIT);
        mpc_set_si(t, SvIVX(b), MPC_RNDNN);
-       if(third == &PL_sv_yes)
+       if(SWITCH_ARGS)
          mpc_pow(*mpc_t_obj, t, *a, DEFAULT_ROUNDING_MODE);
        else
          mpc_pow(*mpc_t_obj, *a, t, DEFAULT_ROUNDING_MODE);
@@ -2583,7 +2583,7 @@ SV * overload_pow(pTHX_ mpc_t * a, SV * b, SV * third) {
        if(mpc_set_str(*mpc_t_obj, SvPV_nolen(b), 0, DEFAULT_ROUNDING_MODE) == -1)
          croak("Invalid string (%s) supplied to Math::MPC::overload_pow", SvPV_nolen(b));
 #endif
-       if(third == &PL_sv_yes)
+       if(SWITCH_ARGS)
          mpc_pow(*mpc_t_obj, *mpc_t_obj, *a, DEFAULT_ROUNDING_MODE);
        else
          mpc_pow(*mpc_t_obj, *a, *mpc_t_obj, DEFAULT_ROUNDING_MODE);
@@ -2602,7 +2602,7 @@ SV * overload_pow(pTHX_ mpc_t * a, SV * b, SV * third) {
        mpc_init2(t, DBL_MANT_DIG);
        mpc_set_d(t, (double)SvNVX(b), MPC_RNDNN);
 #endif
-       if(third == &PL_sv_yes)
+       if(SWITCH_ARGS)
          mpc_pow(*mpc_t_obj, t, *a, DEFAULT_ROUNDING_MODE);
        else
          mpc_pow(*mpc_t_obj, *a, t, DEFAULT_ROUNDING_MODE);

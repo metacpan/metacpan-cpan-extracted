@@ -466,6 +466,7 @@ Date Class for Perl 5
   my $date = Venus::Date->new(570672000);
 
   # $date->string;
+
   # '1988-02-01T00:00:00Z'
 
 =cut
@@ -576,7 +577,11 @@ I<Since C<0.01>>
   });
 
   # $date->string; # 1989-03-03T16:17:54Z
+
   # $date->epoch; # 604945074
+
+
+
 
 =back
 
@@ -593,6 +598,7 @@ I<Since C<0.01>>
   });
 
   # $date->string; # 1988-02-01T01:01:01Z
+
   # $date->epoch; # 570675661
 
 =back
@@ -616,6 +622,7 @@ I<Since C<0.01>>
   $date = $date->add_days(1);
 
   # $date->string; # 1988-02-02T00:00:00Z
+
   # $date->epoch; # 570758400
 
 =back
@@ -629,6 +636,7 @@ I<Since C<0.01>>
   $date = $date->add_days(40);
 
   # $date->string; # 1988-03-12T00:00:00Z
+
   # $date->epoch; # 574128000
 
 =back
@@ -642,6 +650,7 @@ I<Since C<0.01>>
   $date = $date->add_days(-1);
 
   # $date->string; # 1988-01-31T00:00:00Z
+
   # $date->epoch; # 570585600
 
 =back
@@ -665,6 +674,7 @@ I<Since C<0.01>>
   $date = $date->add_hms(1, 0, 0);
 
   # $date->string; # 1988-02-01T01:00:00Z
+
   # $date->epoch; # 570675600
 
 =back
@@ -678,6 +688,7 @@ I<Since C<0.01>>
   $date = $date->add_hms(undef, 1, 1);
 
   # $date->string; # 1988-02-01T00:01:01Z
+
   # $date->epoch; # 570672061
 
 =back
@@ -691,6 +702,7 @@ I<Since C<0.01>>
   $date = $date->add_hms(1, 1);
 
   # $date->string; # 1988-02-01T01:01:00Z
+
   # $date->epoch; # 570675660
 
 =back
@@ -714,6 +726,7 @@ I<Since C<0.01>>
   $date = $date->add_hours(1);
 
   # $date->string; # 1988-02-01T01:00:00Z
+
   # $date->epoch; # 570675600
 
 =back
@@ -727,6 +740,7 @@ I<Since C<0.01>>
   $date = $date->add_hours(25);
 
   # $date->string; # 1988-02-02T01:00:00Z
+
   # $date->epoch; # 570762000
 
 =back
@@ -740,6 +754,7 @@ I<Since C<0.01>>
   $date = $date->add_hours(-1);
 
   # $date->string; # 1988-01-31T23:00:00Z
+
   # $date->epoch; # 570668400
 
 =back
@@ -763,6 +778,7 @@ I<Since C<0.01>>
   $date = $date->add_mdy(1, 0, 0);
 
   # $date->string; # 1988-03-02T10:29:04Z
+
   # $date->epoch; # 573301744
 
 =back
@@ -776,6 +792,7 @@ I<Since C<0.01>>
   $date = $date->add_mdy(undef, 1, 1);
 
   # $date->string; # 1989-02-01T05:48:50Z
+
   # $date->epoch; # 602315330
 
 =back
@@ -789,6 +806,7 @@ I<Since C<0.01>>
   $date = $date->add_mdy(1, 1);
 
   # $date->string; # 1988-03-03T10:29:04Z
+
   # $date->epoch; # 573388144
 
 =back
@@ -812,6 +830,7 @@ I<Since C<0.01>>
   $date = $date->add_minutes(1);
 
   # $date->string; # 1988-02-01T00:01:00Z
+
   # $date->epoch; # 570672060
 
 =back
@@ -825,6 +844,7 @@ I<Since C<0.01>>
   $date = $date->add_minutes(61);
 
   # $date->string; # 1988-02-01T01:01:00Z
+
   # $date->epoch; # 570675660
 
 =back
@@ -838,6 +858,7 @@ I<Since C<0.01>>
   $date = $date->add_minutes(-1);
 
   # $date->string; # 1988-01-31T23:59:00Z
+
   # $date->epoch; # 570671940
 
 =back
@@ -861,6 +882,7 @@ I<Since C<0.01>>
   $date = $date->add_months(1);
 
   # $date->string; # 1988-03-02T10:29:04Z
+
   # $date->epoch; # 573301744
 
 =back
@@ -874,6 +896,7 @@ I<Since C<0.01>>
   $date = $date->add_months(13);
 
   # $date->string; # 1989-03-02T16:17:52Z
+
   # $date->epoch; # 604858672
 
 =back
@@ -887,6 +910,7 @@ I<Since C<0.01>>
   $date = $date->add_months(-1);
 
   # $date->string; # 1988-01-01T13:30:56Z
+
   # $date->epoch; # 568042256
 
 =back
@@ -910,6 +934,7 @@ I<Since C<0.01>>
   $date = $date->add_seconds(1);
 
   # $date->string; # 1988-02-01T00:00:01Z
+
   # $date->epoch; # 570672001
 
 =back
@@ -923,6 +948,7 @@ I<Since C<0.01>>
   $date = $date->add_seconds(61);
 
   # $date->string; # 1988-02-01T00:01:01Z
+
   # $date->epoch; # 570672061
 
 =back
@@ -936,6 +962,7 @@ I<Since C<0.01>>
   $date = $date->add_seconds(-1);
 
   # $date->string; # 1988-01-31T23:59:59Z
+
   # $date->epoch; # 570671999
 
 =back
@@ -959,6 +986,7 @@ I<Since C<0.01>>
   $date = $date->add_years(1);
 
   # $date->string; # 1989-01-31T05:48:50Z
+
   # $date->epoch; # 602228930
 
 =back
@@ -972,6 +1000,7 @@ I<Since C<0.01>>
   $date = $date->add_years(50);
 
   # $date->string; # 2038-01-31T02:41:40Z
+
   # $date->epoch; # 2148518500
 
 =back
@@ -985,6 +1014,7 @@ I<Since C<0.01>>
   $date = $date->add_years(-1);
 
   # $date->string; # 1987-01-31T18:11:10Z
+
   # $date->epoch; # 539115070
 
 =back
@@ -1156,6 +1186,7 @@ I<Since C<0.01>>
   $date = $date->parse('Monday, February  1, 1988', '%A, %B %e, %Y');
 
   # $date->string; # 1988-02-01T00:00:00Z
+
   # $date->epoch; # 570672000
 
 =back
@@ -1179,6 +1210,7 @@ I<Since C<0.01>>
   $date = $date->reset(631152000);
 
   # $date->string; # 1990-01-01T00:00:00Z
+
   # $date->epoch; # 631152000
 
 =back
@@ -1203,6 +1235,7 @@ I<Since C<0.01>>
   $date = $date->restart('year');
 
   # $date->string; # 1988-01-01T00:00:00Z
+
   # $date->epoch; # 567993600
 
 =back
@@ -1216,6 +1249,7 @@ I<Since C<0.01>>
   $date = $date->restart('quarter');
 
   # $date->string; # 1988-01-01T00:00:00Z
+
   # $date->epoch; # 567993600
 
 =back
@@ -1229,6 +1263,7 @@ I<Since C<0.01>>
   $date = $date->restart('month');
 
   # $date->string; # 1988-02-01T00:00:00Z
+
   # $date->epoch; # 570672000
 
 =back
@@ -1300,6 +1335,7 @@ I<Since C<0.01>>
   });
 
   # $date->string; # 2000-01-01T00:00:00Z
+
   # $date->epoch; # 946684800
 
 =back
@@ -1316,6 +1352,7 @@ I<Since C<0.01>>
   });
 
   # $date->string; # 1988-12-01T00:00:00Z
+
   # $date->epoch; # 596937600
 
 =back
@@ -1333,6 +1370,7 @@ I<Since C<0.01>>
   });
 
   # $date->string; # 1979-12-01T00:00:00Z
+
   # $date->epoch; # 312854400
 
 =back
@@ -1356,6 +1394,7 @@ I<Since C<0.01>>
   $date = $date->set_hms(1, 0, 0);
 
   # $date->string; # 1988-02-01T01:00:00Z
+
   # $date->epoch; # 570675600
 
 =back
@@ -1369,6 +1408,7 @@ I<Since C<0.01>>
   $date = $date->set_hms(undef, 30, 30);
 
   # $date->string; # 1988-02-01T00:30:30Z
+
   # $date->epoch; # 570673830
 
 =back
@@ -1382,6 +1422,7 @@ I<Since C<0.01>>
   $date = $date->set_hms(0, 59, 59);
 
   # $date->string; # 1988-02-01T00:59:59Z
+
   # $date->epoch; # 570675599
 
 =back
@@ -1408,6 +1449,7 @@ I<Since C<0.01>>
   $date = $date->set_mdy(4, 30, 1990);
 
   # $date->string; # 1990-04-30T00:00:00Z
+
   # $date->epoch; # 641433600
 
 =back
@@ -1421,6 +1463,7 @@ I<Since C<0.01>>
   $date = $date->set_mdy(4, 30, undef);
 
   # $date->string; # 1988-04-30T00:00:00Z
+
   # $date->epoch; # 578361600
 
 =back
@@ -1434,6 +1477,7 @@ I<Since C<0.01>>
   $date = $date->set_mdy(undef, 15, undef);
 
   # $date->string; # 1988-02-15T00:00:00Z
+
   # $date->epoch; # 571881600
 
 =back
@@ -1484,6 +1528,7 @@ I<Since C<0.01>>
   });
 
   # $date->string; # 1986-12-31T07:42:06Z
+
   # $date->epoch; # 536398926
 
 =back
@@ -1501,6 +1546,7 @@ I<Since C<0.01>>
   });
 
   # $date->string; # 1988-01-31T22:58:59Z
+
   # $date->epoch; # 570668339
 
 =back
@@ -1524,6 +1570,7 @@ I<Since C<0.01>>
   $date = $date->sub_days(1);
 
   # $date->string; # 1988-01-31T00:00:00Z
+
   # $date->epoch; # 570585600
 
 =back
@@ -1537,6 +1584,7 @@ I<Since C<0.01>>
   $date = $date->sub_days(32);
 
   # $date->string; # 1987-12-31T00:00:00Z
+
   # $date->epoch; # 567907200
 
 =back
@@ -1550,6 +1598,7 @@ I<Since C<0.01>>
   $date = $date->sub_days(-1);
 
   # $date->string; # 1988-02-02T00:00:00Z
+
   # $date->epoch; # 570758400
 
 =back
@@ -1573,6 +1622,7 @@ I<Since C<0.01>>
   $date = $date->sub_hms(1, 0, 0);
 
   # $date->string; # 1988-01-31T23:00:00Z
+
   # $date->epoch; # 570668400
 
 =back
@@ -1586,6 +1636,7 @@ I<Since C<0.01>>
   $date = $date->sub_hms(undef, 1, 1);
 
   # $date->string; # 1988-01-31T23:58:59Z
+
   # $date->epoch; # 570671939
 
 =back
@@ -1599,6 +1650,7 @@ I<Since C<0.01>>
   $date = $date->sub_hms(1, 1);
 
   # $date->string; # 1988-01-31T22:59:00Z
+
   # $date->epoch; # 570668340
 
 =back
@@ -1622,6 +1674,7 @@ I<Since C<0.01>>
   $date = $date->sub_hours(1);
 
   # $date->string; # 1988-01-31T23:00:00Z
+
   # $date->epoch; # 570668400
 
 =back
@@ -1635,6 +1688,7 @@ I<Since C<0.01>>
   $date = $date->sub_hours(25);
 
   # $date->string; # 1988-01-30T23:00:00Z
+
   # $date->epoch; # 570582000
 
 =back
@@ -1648,6 +1702,7 @@ I<Since C<0.01>>
   $date = $date->sub_hours(-1);
 
   # $date->string; # 1988-02-01T01:00:00Z
+
   # $date->epoch; # 570675600
 
 =back
@@ -1671,6 +1726,7 @@ I<Since C<0.01>>
   $date = $date->sub_mdy(1, 1, 1);
 
   # $date->string; # 1986-12-31T07:42:06Z
+
   # $date->epoch; # 536398926
 
 =back
@@ -1684,6 +1740,7 @@ I<Since C<0.01>>
   $date = $date->sub_mdy(1, 1, undef);
 
   # $date->string; # 1987-12-31T13:30:56Z
+
   # $date->epoch; # 567955856
 
 =back
@@ -1697,6 +1754,7 @@ I<Since C<0.01>>
   $date = $date->sub_mdy(1, 1);
 
   # $date->string; # 1987-12-31T13:30:56Z
+
   # $date->epoch; # 567955856
 
 =back
@@ -1720,6 +1778,7 @@ I<Since C<0.01>>
   $date = $date->sub_minutes(1);
 
   # $date->string; # 1988-01-31T23:59:00Z
+
   # $date->epoch; # 570671940
 
 =back
@@ -1733,6 +1792,7 @@ I<Since C<0.01>>
   $date = $date->sub_minutes(61);
 
   # $date->string; # 1988-01-31T22:59:00Z
+
   # $date->epoch; # 570668340
 
 =back
@@ -1746,6 +1806,7 @@ I<Since C<0.01>>
   $date = $date->sub_minutes(-1);
 
   # $date->string; # 1988-02-01T00:01:00Z
+
   # $date->epoch; # 570672060
 
 =back
@@ -1769,6 +1830,7 @@ I<Since C<0.01>>
   $date = $date->sub_months(1);
 
   # $date->string; # 1988-01-01T13:30:56Z
+
   # $date->epoch; # 568042256
 
 =back
@@ -1782,6 +1844,7 @@ I<Since C<0.01>>
   $date = $date->sub_months(13);
 
   # $date->string; # 1987-01-01T07:42:08Z
+
   # $date->epoch; # 536485328
 
 =back
@@ -1795,6 +1858,7 @@ I<Since C<0.01>>
   $date = $date->sub_months(-1);
 
   # $date->string; # 1988-03-02T10:29:04Z
+
   # $date->epoch; # 573301744
 
 =back
@@ -1818,6 +1882,7 @@ I<Since C<0.01>>
   $date = $date->sub_seconds(1);
 
   # $date->string; # 1988-01-31T23:59:59Z
+
   # $date->epoch; # 570671999
 
 =back
@@ -1831,6 +1896,7 @@ I<Since C<0.01>>
   $date = $date->sub_seconds(61);
 
   # $date->string; # 1988-01-31T23:58:59Z
+
   # $date->epoch; # 570671939
 
 =back
@@ -1844,6 +1910,7 @@ I<Since C<0.01>>
   $date = $date->sub_seconds(-1);
 
   # $date->string; # 1988-02-01T00:00:01Z
+
   # $date->epoch; # 570672001
 
 =back
@@ -1867,6 +1934,7 @@ I<Since C<0.01>>
   $date = $date->sub_years(1);
 
   # $date->string; # 1987-01-31T18:11:10Z
+
   # $date->epoch; # 539115070
 
 =back
@@ -1880,6 +1948,7 @@ I<Since C<0.01>>
   $date = $date->sub_years(25);
 
   # $date->string; # 1963-01-31T22:39:10Z
+
   # $date->epoch; # -218251250
 
 =back
@@ -1893,6 +1962,7 @@ I<Since C<0.01>>
   $date = $date->sub_years(-1);
 
   # $date->string; # 1989-01-31T05:48:50Z
+
   # $date->epoch; # 602228930
 
 =back

@@ -35,24 +35,6 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
   }
 }
 
-# Field
-{
-  ok(SPVM::TestCase::Object->get_field_chain);
-  ok(SPVM::TestCase::Object->core_func_name_field_name());
-  ok(SPVM::TestCase::Object->reserved_word_field_name());
-  ok(SPVM::TestCase::Object->object_field_set_and_get());
-}
-
-# Field
-{
-  ok(SPVM::TestCase::Object->object_field_set_and_get());
-  ok(SPVM::TestCase::Object->object_field_set_and_get_again());
-}
-
-{
-  ok(SPVM::TestCase::Object->object_field_initialized_zero());
-}
-
 # Destructor
 {
   ok(SPVM::TestCase::Object->destructor());

@@ -28,6 +28,7 @@ my %WriteMakefileArgs = (
     "Exception::Class" => "1.10",
     "File::Slurp" => 0,
     "Log::Log4perl" => "0.34",
+    "Readonly" => 0,
     "Safe" => 0,
     "XML::Simple" => "2.00"
   },
@@ -45,7 +46,7 @@ my %WriteMakefileArgs = (
     "Test::Pod" => "1.41",
     "Test::Pod::Coverage" => "1.08"
   },
-  "VERSION" => "1.57",
+  "VERSION" => "1.59",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -71,6 +72,7 @@ my %FallbackPrereqs = (
   "Log::Log4perl" => "0.34",
   "Mock::MonkeyPatch" => 0,
   "Pod::Coverage::TrustPod" => 0,
+  "Readonly" => 0,
   "Safe" => 0,
   "Test::Exception" => 0,
   "Test::Kwalitee" => "1.21",

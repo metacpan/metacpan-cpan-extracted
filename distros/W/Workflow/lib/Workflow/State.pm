@@ -11,7 +11,7 @@ use Exception::Class;
 use Workflow::Factory qw( FACTORY );
 use English qw( -no_match_vars );
 
-$Workflow::State::VERSION = '1.57';
+$Workflow::State::VERSION = '1.59';
 
 my @FIELDS   = qw( state description type );
 my @INTERNAL = qw( _test_condition_count _factory _actions _conditions
@@ -242,7 +242,7 @@ sub _assign_next_state_from_array {
     my @errors        = ();
     my %new_resulting = ();
     foreach my $map ( @{$resulting} ) {
-        if ( !$map->{state} or !defined $map->{return} ) {
+        if ( not $map->{state} or not defined $map->{return} ) {
             push @errors,
                 "Must have both 'state' ($map->{state}) and 'return' "
                 . "($map->{return}) keys defined.";
@@ -353,7 +353,7 @@ Workflow::State - Information about an individual state in a workflow
 
 =head1 VERSION
 
-This documentation describes version 1.57 of this package
+This documentation describes version 1.59 of this package
 
 =head1 SYNOPSIS
 
@@ -503,7 +503,7 @@ Returns name of action to be used for autorunning the state.
 
 =head3 clear_condition_cache ( )
 
-Deprecated, kept for 1.57 compatibility.
+Deprecated, kept for 1.59 compatibility.
 
 Used to empties the condition result cache for a given state.
 
@@ -555,7 +555,7 @@ performing some sanity checks like ensuring every action has a
 
 =head1 COPYRIGHT
 
-Copyright (c) 2003-2021 Chris Winters. All rights reserved.
+Copyright (c) 2003-2022 Chris Winters. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -1,29 +1,59 @@
-Condensation version 0.07
-=========================
+Condensation Data System
+========================
 
 This module implements a single-threaded version of the Condensation
 data system. It comes with backends for local folders and HTTP.
 
+
 INSTALLATION
 
-To install this module type the following:
+To install this module, type the following:
 
    perl Makefile.PL
    make
    make test
-   make install
+   sudo make install
+
+Once the module is installed, you can type
+	cds
+on the command line, or
+	use CDS;
+in your Perl scripts.
+
+More information about the Condensation Data System is available on
+	https://condensation.io
+
 
 DEPENDENCIES
 
-This module requires the following Perl modules:
-    Inline::C (libinline-c-perl)
-    HTTP::Server::Simple (libhttp-server-simple-perl)
-    LWP::UserAgent (libwww-perl)
-    Carp::Always (libcarp-always-perl)
+This module depends on the following Perl modules:
+	Carp::Always
+	Cwd
+	Digest::SHA
+	Encode
+	Fcntl
+	HTTP::Date
+	HTTP::Headers
+	HTTP::Request
+	HTTP::Server::Simple
+	LWP::UserAgent
+	Time::Local
+
+On Debian/Ubuntu systems, you can install the following packages:
+	libcarp-always-perl
+	libdigest-sha-perl
+	libencode-perl
+	libhttp-date-perl
+	libhttp-message-perl
+	libhttp-server-simple-perl
+	libwww-perl
+
+On all other systems, you can install them using CPAN.
+
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2013-2015 by Thomas Lochmatter
+Copyright (C) 2013-2022 by Thomas Lochmatter
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.20.1 or,

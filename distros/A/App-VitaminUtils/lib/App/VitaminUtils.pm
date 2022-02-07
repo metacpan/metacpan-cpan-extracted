@@ -1,9 +1,9 @@
 package App::VitaminUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-03-17'; # DATE
+our $DATE = '2021-08-08'; # DATE
 our $DIST = 'App-VitaminUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -415,7 +415,7 @@ App::VitaminUtils - Utilities related to vitamins
 
 =head1 VERSION
 
-This document describes version 0.003 of App::VitaminUtils (from Perl distribution App-VitaminUtils), released on 2021-03-17.
+This document describes version 0.004 of App::VitaminUtils (from Perl distribution App-VitaminUtils), released on 2021-08-08.
 
 =head1 DESCRIPTION
 
@@ -452,7 +452,7 @@ This distributions provides the following command-line utilities:
 
 Usage:
 
- convert_choline_unit(%args) -> [status, msg, payload, meta]
+ convert_choline_unit(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Convert a choline quantity from one unit to another.
 
@@ -497,12 +497,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -512,7 +512,7 @@ Return value:  (any)
 
 Usage:
 
- convert_vitamin_a_unit(%args) -> [status, msg, payload, meta]
+ convert_vitamin_a_unit(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Convert a vitamin A quantity from one unit to another.
 
@@ -594,12 +594,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -609,7 +609,7 @@ Return value:  (any)
 
 Usage:
 
- convert_vitamin_b12_unit(%args) -> [status, msg, payload, meta]
+ convert_vitamin_b12_unit(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Convert a vitamin B12 (cobalamin) quantity from one unit to another.
 
@@ -654,12 +654,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -669,7 +669,7 @@ Return value:  (any)
 
 Usage:
 
- convert_vitamin_b5_unit(%args) -> [status, msg, payload, meta]
+ convert_vitamin_b5_unit(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Convert a vitamin B5 (pantothenic acid) quantity from one unit to another.
 
@@ -713,12 +713,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -728,7 +728,7 @@ Return value:  (any)
 
 Usage:
 
- convert_vitamin_b6_unit(%args) -> [status, msg, payload, meta]
+ convert_vitamin_b6_unit(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Convert a vitamin B6 (pyridoxine) quantity from one unit to another.
 
@@ -772,12 +772,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -787,7 +787,7 @@ Return value:  (any)
 
 Usage:
 
- convert_vitamin_d_unit(%args) -> [status, msg, payload, meta]
+ convert_vitamin_d_unit(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Convert a vitamin D quantity from one unit to another.
 
@@ -839,12 +839,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -854,7 +854,7 @@ Return value:  (any)
 
 Usage:
 
- convert_vitamin_e_unit(%args) -> [status, msg, payload, meta]
+ convert_vitamin_e_unit(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Convert a vitamin E quantity from one unit to another.
 
@@ -926,12 +926,12 @@ Arguments ('*' denotes required arguments):
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -945,13 +945,15 @@ Source repository is at L<https://github.com/perlancar/perl-App-VitaminUtils>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-VitaminUtils/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-VitaminUtils>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
 =head1 SEE ALSO
+
+L<App::MineralUtils>
 
 L<Physics::Unit>
 
@@ -965,7 +967,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

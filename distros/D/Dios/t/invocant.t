@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Dios;
-use Test::More 'no_plan';
+use Test::More;
 
 class Stuff {
     use Test::More;
@@ -65,3 +65,6 @@ is( $stuff->no_invocant_class_type(Foo::Bar->new),     'Foo::Bar' );
 is( $stuff->no_invocant_named_param(arg => Foo->new),  'Foo' );
 is( $stuff->no_invocant_return(),                      0     );
 is( $stuff->no_invocant_named_return(),                0     );
+
+done_testing;
+

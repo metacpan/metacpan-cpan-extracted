@@ -321,7 +321,7 @@ sub parts {
 }
 
 sub read {
-  my ($self) = @_;
+  my ($self, $binmode) = @_;
 
   my $path = $self->get;
 
@@ -334,19 +334,34 @@ sub read {
     $throw->error;
   };
 
+  CORE::binmode($handle, $binmode) or do {
+    my $throw;
+    my $error = "Can't binmode $path: $!";
+    $throw = $self->throw;
+    $throw->message($error);
+    $throw->stash(binmode => $binmode);
+    $throw->stash(path => $path);
+    $throw->error;
+  }
+  if defined($binmode);
+
   my $result = my $content = '';
 
   while ($result = $handle->sysread(my $buffer, 131072, 0)) {
     $content .= $buffer;
   }
 
-  if (not(defined $result)) {
+  if (not(defined($result))) {
     my $throw;
     my $error = "Can't read from file $path: $!";
     $throw = $self->throw;
     $throw->message($error);
     $throw->stash(path => $path);
     $throw->error;
+  }
+
+  if ($^O =~ /win32/i) {
+    $content =~ s/\015\012/\012/g;
   }
 
   return $content;
@@ -463,7 +478,7 @@ sub unlink {
 }
 
 sub write {
-  my ($self, $data) = @_;
+  my ($self, $data, $binmode) = @_;
 
   my $path = $self->get;
 
@@ -475,6 +490,17 @@ sub write {
     $throw->stash(path => $path);
     $throw->error;
   };
+
+  CORE::binmode($handle, $binmode) or do {
+    my $throw;
+    my $error = "Can't binmode $path: $!";
+    $throw = $self->throw;
+    $throw->message($error);
+    $throw->stash(binmode => $binmode);
+    $throw->stash(path => $path);
+    $throw->error;
+  }
+  if defined($binmode);
 
   (($handle->syswrite($data) // -1) == length($data)) or do {
     my $throw;
@@ -876,7 +902,7 @@ I<Since C<0.01>>
 
   # given: synopsis;
 
-  my $find = $path->find('\/m.*');
+  my $find = $path->find('[:\/\\\.]+m.*');
 
   # [
   #   bless({ value => "t/data/planets/makemake" }, "Venus::Path"),
@@ -1350,7 +1376,7 @@ I<Since C<0.01>>
 
 =head2 read
 
-  read() (Str)
+  read(Str $binmode) (Str)
 
 The read method reads the file and returns its contents.
 
@@ -1635,7 +1661,7 @@ I<Since C<0.01>>
 
 =head2 write
 
-  write(Str $data) (Path)
+  write(Str $data, Str $binmode) (Path)
 
 The write method write the data provided to the file.
 

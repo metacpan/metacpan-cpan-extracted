@@ -21,8 +21,6 @@ my %WriteMakefileArgs = (
     "MIDI::Pitch" => 0,
     "Math::Factor::XS" => 0,
     "Moo" => 2,
-    "Music::Chord::Namer" => 0,
-    "Music::Scales" => 0,
     "Number::Fraction" => 0,
     "namespace::clean" => 0,
     "strict" => 0,
@@ -36,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.0711",
+  "VERSION" => "0.0804",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,8 +49,6 @@ my %FallbackPrereqs = (
   "MIDI::Pitch" => 0,
   "Math::Factor::XS" => 0,
   "Moo" => 2,
-  "Music::Chord::Namer" => 0,
-  "Music::Scales" => 0,
   "Number::Fraction" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,

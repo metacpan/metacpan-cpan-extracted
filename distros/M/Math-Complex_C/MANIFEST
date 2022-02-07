@@ -3,6 +3,7 @@ Complex_C.pm
 Complex_C.xs
 Makefile.PL
 MANIFEST
+math_complex_c_include.h
 README
 try.in
 t/01load.t
@@ -15,6 +16,7 @@ t/nan.t
 t/new.t
 t/nnum.t
 t/overload_string.t
+t/overload_switch.t
 t/overload_xtra.t
 t/pod.t
 t/pow.t

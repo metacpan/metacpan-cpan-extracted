@@ -3,10 +3,12 @@ Makefile.PL
 MANIFEST
 math_mpfi_include.h
 MPFI.pm
+MPFI.pod
 README
 MPFI.xs
 typemap
 ad_hoc/consistency.p
+t/_itsa.t
 t/aaa_compat.t
 t/aab_basic.t
 t/abs.t
@@ -34,6 +36,7 @@ t/overload_add.t
 t/overload_bool.t
 t/overload_cmp.t
 t/overload_mul.t
+t/overload_switch.t
 t/pod.t
 t/pi.t
 t/raise_2exp.t

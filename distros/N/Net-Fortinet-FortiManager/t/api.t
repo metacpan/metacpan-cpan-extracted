@@ -1,6 +1,8 @@
+use 5.024;
 use Test2::V0;
 use Test2::Tools::Compare qw( array bag hash all_items all_values );
 use Test2::Tools::Subtest qw( subtest_buffered );
+use Test2::Plugin::DieOnFail;
 use Net::Fortinet::FortiManager;
 
 skip_all "environment variables not set"
@@ -52,8 +54,46 @@ is($fortimanager->adoms, bag {
     all_items D();
 }, 'adoms returns arrayref of ADOM names');
 
+my %firewall_address;
+my %firewall_address_group;
+my %firewall_ipv6_address;
+my %firewall_ipv6_address_group;
+my %firewall_service;
+my %firewall_service_group;
+my %policy_package;
+
 END {
-    diag('logging out');
+    say 'deleting created objects';
+    for (keys %firewall_address) {
+        say "\t$_";
+        $fortimanager->delete_firewall_address($_);
+    }
+    for (keys %firewall_address_group) {
+        say "\t$_";
+        $fortimanager->delete_firewall_address_group($_);
+    }
+    for (keys %firewall_ipv6_address) {
+        say "\t$_";
+        $fortimanager->delete_firewall_ipv6_address($_);
+    }
+    for (keys %firewall_ipv6_address_group) {
+        say "\t$_";
+        $fortimanager->delete_firewall_ipv6_address_group($_);
+    }
+    for (keys %firewall_service) {
+        say "\t$_";
+        $fortimanager->delete_firewall_service($_);
+    }
+    for (keys %firewall_service_group) {
+        say "\t$_";
+        $fortimanager->delete_firewall_service_group($_);
+    }
+    for (keys %policy_package) {
+        say "\t$_";
+        $fortimanager->delete_policy_package($_);
+    }
+
+    say 'logging out';
     $fortimanager->logout
         if defined $fortimanager;
 }
@@ -177,21 +217,25 @@ subtest_buffered 'IPv4 objects' => sub {
     ok($fortimanager->create_firewall_address('host_test1', {
         subnet => '192.0.2.10/255.255.255.255',
     }), 'create_firewall_address for host ok');
+    $firewall_address{host_test1} = 1;
 
     ok($fortimanager->create_firewall_address('net_test1', {
         subnet => '192.0.2.10/255.255.255.0',
     }), 'create_firewall_address for network ok');
+    $firewall_address{net_test1} = 1;
 
     ok($fortimanager->create_firewall_address('range_test1', {
         'start-ip'  => '192.0.2.10',
         'end-ip'    => '192.0.2.20',
         type        => 'iprange',
     }), 'create_firewall_address for range ok');
+    $firewall_address{range_test1} = 1;
 
     ok($fortimanager->create_firewall_address('fqdn_acme.example.net', {
         fqdn    => 'acme.example.net',
         type    => 'fqdn',
     }), 'create_firewall_address for FQDN ok');
+    $firewall_address{'fqdn_acme.example.net'} = 1;
 
     is($fortimanager->get_firewall_address('fqdn_acme.example.net'),
         hash {
@@ -207,6 +251,7 @@ subtest_buffered 'IPv4 objects' => sub {
 
     ok($fortimanager->delete_firewall_address('range_test1'),
         'delete_firewall_address ok');
+    delete $firewall_address{range_test1};
 };
 
 subtest_buffered 'IPv4 address groups' => sub {
@@ -233,6 +278,7 @@ subtest_buffered 'IPv4 address groups' => sub {
             fqdn_acme.example.net
         )],
     }), 'create_firewall_address_group ok');
+    $firewall_address_group{grp_test1} = 1;
 
     is($fortimanager->get_firewall_address_group('grp_test1'),
         hash {
@@ -258,6 +304,7 @@ subtest_buffered 'IPv4 address groups' => sub {
 
     ok($fortimanager->delete_firewall_address_group('grp_test1'),
         'delete_firewall_address_group ok');
+    delete $firewall_address_group{grp_test1};
 };
 
 subtest_buffered 'IPv6 objects' => sub {
@@ -277,21 +324,25 @@ subtest_buffered 'IPv6 objects' => sub {
     ok($fortimanager->create_firewall_ipv6_address('host_v6_test1', {
         ip6 => '2001:db8::a/128',
     }), 'create_firewall_ipv6_address for host ok');
+    $firewall_ipv6_address{host_v6_test1} = 1;
 
     ok($fortimanager->create_firewall_ipv6_address('net_v6_test1', {
         ip6 => '2001:db8::0/64',
     }), 'create_firewall_ipv6_address for network ok');
+    $firewall_ipv6_address{net_v6_test1} = 1;
 
     ok($fortimanager->create_firewall_ipv6_address('range_v6_test1', {
         'start-ip'  => '2001:db8::a',
         'end-ip'    => '2001:db8::14',
         type        => 'iprange',
     }), 'create_firewall_ipv6_address for range ok');
+    $firewall_ipv6_address{range_v6_test1} = 1;
 
     ok($fortimanager->create_firewall_ipv6_address('fqdn_v6_acme.example.net', {
         fqdn    => 'acme.example.net',
         type    => 'fqdn',
     }), 'create_firewall_ipv6_address for FQDN ok');
+    $firewall_ipv6_address{'fqdn_v6_acme.example.net'} = 1;
 
     is($fortimanager->get_firewall_ipv6_address('fqdn_v6_acme.example.net'),
         hash {
@@ -307,6 +358,7 @@ subtest_buffered 'IPv6 objects' => sub {
 
     ok($fortimanager->delete_firewall_ipv6_address('range_v6_test1'),
         'delete_firewall_ipv6_address ok');
+    delete $firewall_ipv6_address{range_v6_test1};
 };
 
 subtest_buffered 'IPv6 address groups' => sub {
@@ -332,6 +384,7 @@ subtest_buffered 'IPv6 address groups' => sub {
             fqdn_v6_acme.example.net
         )],
     }), 'create_firewall_ipv6_address_group ok');
+    $firewall_ipv6_address_group{grp_v6_test1} = 1;
 
     is(my $rv = $fortimanager->get_firewall_ipv6_address_group('grp_v6_test1'),
         hash {
@@ -356,6 +409,7 @@ subtest_buffered 'IPv6 address groups' => sub {
 
     ok($fortimanager->delete_firewall_ipv6_address_group('grp_v6_test1'),
         'delete_firewall_ipv6_address_group ok');
+    delete $firewall_ipv6_address_group{grp_v6_test1};
 };
 
 subtest_buffered 'service objects' => sub {
@@ -376,16 +430,19 @@ subtest_buffered 'service objects' => sub {
         protocol        => 'TCP/UDP/SCTP',
         'tcp-portrange' => '1234'
     }), 'create_firewall_service for TCP service ok');
+    $firewall_service{test_tcp_1234} = 1;
 
     ok($fortimanager->create_firewall_service('test_udp_1234', {
         protocol        => 'TCP/UDP/SCTP',
         'udp-portrange' => '1234'
     }), 'create_firewall_service for UDP service ok');
+    $firewall_service{test_udp_1234} = 1;
 
     ok($fortimanager->create_firewall_service('test_icmp_echo', {
         protocol        => 'ICMP',
         icmptype        => '8'
     }), 'create_firewall_service for ICMP service ok');
+    $firewall_service{test_icmp_echo} = 1;
 
     is($fortimanager->get_firewall_service('test_tcp_1234'),
         hash {
@@ -405,6 +462,7 @@ subtest_buffered 'service objects' => sub {
 
     ok($fortimanager->delete_firewall_service('test_tcp_1234'),
         'delete_firewall_service ok');
+    delete $firewall_service{test_tcp_1234};
 };
 
 subtest_buffered 'service groups' => sub {
@@ -429,6 +487,7 @@ subtest_buffered 'service groups' => sub {
             test_icmp_echo
         )],
     }), 'create_firewall_service_group ok');
+    $firewall_service_group{grp_test1} = 1;
 
     is($fortimanager->get_firewall_service_group('grp_test1'),
         hash {
@@ -451,6 +510,7 @@ subtest_buffered 'service groups' => sub {
 
     ok($fortimanager->delete_firewall_service_group('grp_test1'),
         'delete_firewall_service_group ok');
+    delete $firewall_service_group{grp_test1};
 };
 
 subtest_buffered 'policy packages' => sub {
@@ -464,6 +524,7 @@ subtest_buffered 'policy packages' => sub {
         },
         type                => 'pkg',
     }), 'create_policy_package ok');
+    $policy_package{$ENV{NET_FORTINET_FORTIMANAGER_POLICY}} = 1;
 
     is($fortimanager->get_policy_package(
         $ENV{NET_FORTINET_FORTIMANAGER_POLICY}),
@@ -848,6 +909,7 @@ subtest_buffered 'policy packages' => sub {
     ok($fortimanager->delete_policy_package(
         $ENV{NET_FORTINET_FORTIMANAGER_POLICY}),
         'delete_policy_package ok');
+    delete $policy_package{$ENV{NET_FORTINET_FORTIMANAGER_POLICY}};
 };
 
 done_testing();

@@ -15,7 +15,6 @@ class Der is Basic {
     }
 }
 
-
 my $der_obj = Der->new;
 my $basic_obj = Basic->new;
 

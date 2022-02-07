@@ -39,6 +39,7 @@ lib/Duadua/Parser/Bot/OracleGrapeshotCrawler.pm
 lib/Duadua/Parser/Bot/QuiteRSS.pm
 lib/Duadua/Parser/Bot/Reeder.pm
 lib/Duadua/Parser/Bot/Sakura.pm
+lib/Duadua/Parser/Bot/Skype.pm
 lib/Duadua/Parser/Bot/Slackbot.pm
 lib/Duadua/Parser/Bot/SMTBot.pm
 lib/Duadua/Parser/Bot/Twitterbot.pm
@@ -111,6 +112,7 @@ t/testset/bot/oracle_grapeshotcrawler.yaml
 t/testset/bot/quiterss.yaml
 t/testset/bot/reeder.yaml
 t/testset/bot/sakura.yaml
+t/testset/bot/skype.yaml
 t/testset/bot/slackbot.yaml
 t/testset/bot/smtbot.yaml
 t/testset/bot/twitterbot.yaml

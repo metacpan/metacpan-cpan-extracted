@@ -38,6 +38,38 @@ $d = DateTime::Calendar::Christian->from_object( object => $greg );
 ok( $d->is_gregorian, '1582-10-15 is gregorian' );
 is( $d->ymd, '1582-10-15', 'conversion succeeded' );
 
+$d = DateTime::Calendar::Christian->new(	# Feb 29 1700 Julian
+    year	=> 1700,
+    month	=> 3,
+    day		=> 11,
+);
+cmp_ok( $d->gregorian_deviation(), '==', 10,
+    "gregorian_deviation() on @{[ $d->ymd ]} is 10 days" );
+
+$d = DateTime::Calendar::Christian->new(	# Mar 1 1700 Julian
+    year	=> 1700,
+    month	=> 3,
+    day		=> 12,
+);
+cmp_ok( $d->gregorian_deviation(), '==', 11,
+    "gregorian_deviation() on @{[ $d->ymd ]} is 11 days" );
+
+$d = DateTime::Calendar::Christian->new(
+    year	=> 1700,
+    month	=> 2,
+    day		=> 28,
+);
+cmp_ok( $d->julian_deviation(), '==', 10,
+    "julian_deviation() on @{[ $d->ymd ]} is 10 days" );
+
+$d = DateTime::Calendar::Christian->new(
+    year	=> 1700,
+    month	=> 3,
+    day		=> 1,
+);
+cmp_ok( $d->julian_deviation(), '==', 11,
+    "julian_deviation() on @{[ $d->ymd ]} is 11 days" );
+
 done_testing;
 
 # ex: set textwidth=72 :

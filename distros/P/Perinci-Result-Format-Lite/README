@@ -2,21 +2,33 @@ NAME
     Perinci::Result::Format::Lite - Format enveloped result
 
 VERSION
-    This document describes version 0.283 of Perinci::Result::Format::Lite
+    This document describes version 0.285 of Perinci::Result::Format::Lite
     (from Perl distribution Perinci-Result-Format-Lite), released on
-    2022-01-21.
+    2022-01-23.
 
 SYNOPSIS
 DESCRIPTION
+    This module formats enveloped result structure to "pretty text" if it
+    can do so, e.g. the structure can be represented as a 2-dimensional
+    table. Otherwise, it falls back to JSON or Perl. The table formats
+    supported include CSV, TSV, LTSV, or HTML. More table formats (e.g. Org,
+    Markdown) are supported via Text::Table::Any when you set
+    "FORMAT_PRETTY_TABLE_BACKEND".
+
+    This module is a more lightweight version of Perinci::Result::Format but
+    the long-term goal is to reunite the two formatting modules back to a
+    modular/pluggable module.
+
 FUNCTIONS
   format($res, $format[ , $is_naked=0, $cleanse=1 ]) => str
 ENVIRONMENT
-  FORMAT_PRETTY_TABLE_BACKEND => str
-    If this is set, will render text table using Text::Table::Any (with
-    "backend" set to the value of this environment variable) instead of the
-    default Text::Table::Sprintf. This is useful if you want to output text
-    table in a different format, for example to generate Org tables (make
-    sure Text::Table::Org backend is already installed):
+  FORMAT_PRETTY_TABLE_BACKEND
+    Str, optional. If this is set, will render text table using
+    Text::Table::Any (with "backend" set to the value of this environment
+    variable) instead of the default Text::Table::Sprintf. This is useful if
+    you want to output text table in a different format, for example to
+    generate Org tables (make sure Text::Table::Org backend is already
+    installed):
 
      % FORMAT_PRETTY_TABLE_BACKEND=Text::Table::Org lcpan rdeps Getopt::Lucid
 

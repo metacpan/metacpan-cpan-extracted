@@ -1,3 +1,6 @@
+  * maybe use apt ^ trick to install tasks
+    <https://askubuntu.com/q/252056>
+
   * Add option --dirty-licensing (and deprecate option --nonfree)
   * Add option --dirty-config (and skip tweaks if unset)
   * Add option --dirty
@@ -34,7 +37,7 @@
     + Deprecate compose formats preseed script.
     + Deprecate skeleton template variable tweaklist.
   * Introduce compose style bootstrap
-    + Include skeleton files for debootstrap, multistrap, and mmdebstrap.
+    + Include skeleton files for debootstrap, multistrap, mmdebstrap, bdebstrap.
 
 Initial release:
 

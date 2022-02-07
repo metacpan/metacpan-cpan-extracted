@@ -10,7 +10,7 @@ use Carp;
 
 
 
-our $VERSION = "0.027";
+our $VERSION = "0.028";
 
 =head1 NAME
 
@@ -145,6 +145,26 @@ sub set_size {
 sub get_size {
     my ( $self ) = @_;
     $self->{size};
+}
+
+=item set_direction
+
+=item get_direction
+
+Sets/gets the direction property of the font.
+
+=back
+
+=cut
+
+sub set_direction {
+    my ( $self, $direction ) = @_;
+    $self->{direction} = $direction;
+}
+
+sub get_direction {
+    my ( $self ) = @_;
+    $self->{direction};
 }
 
 # Not documented -- internal use only.

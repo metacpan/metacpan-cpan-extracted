@@ -8,7 +8,7 @@ use Moo::Role;
 with 'Archive::BagIt::Role::Plugin';
 with 'Archive::BagIt::Role::Portability';
 # ABSTRACT: A role that handles all manifest files for a specific Algorithm
-our $VERSION = '0.091'; # VERSION
+our $VERSION = '0.092'; # VERSION
 
 has 'algorithm' => (
     is => 'rw',
@@ -353,7 +353,7 @@ Archive::BagIt::Role::Manifest - A role that handles all manifest files for a sp
 
 =head1 VERSION
 
-version 0.091
+version 0.092
 
 =head2 manifest_entries()
 

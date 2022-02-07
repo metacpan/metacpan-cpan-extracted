@@ -9,7 +9,7 @@ WriteMakefile(
     VERSION_FROM       => 'lib/Test/WWW/WebKit2.pm', # finds $VERSION
     LICENSE            => 'perl',
     PREREQ_PM          => {
-        'WWW::WebKit2' => 0.12,
+        'WWW::WebKit2' => 0.126,
         'Test::More'   => 0,
     },
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005

@@ -2,7 +2,7 @@ package App::Yath::Command::kill;
 use strict;
 use warnings;
 
-our $VERSION = '1.000100';
+our $VERSION = '1.000104';
 
 use Time::HiRes qw/sleep/;
 use App::Yath::Util qw/find_pfile/;
@@ -487,6 +487,27 @@ Specify one or more files to ignore when looking at changes
 Can be specified multiple times
 
 
+=item --changes-exclude-loads
+
+=item --no-changes-exclude-loads
+
+Exclude coverage tests which only load changed files, but never call code from them. (default: off)
+
+
+=item --changes-exclude-nonsub
+
+=item --no-changes-exclude-nonsub
+
+Exclude changes outside of subroutines (perl files only) (default: off)
+
+
+=item --changes-exclude-opens
+
+=item --no-changes-exclude-opens
+
+Exclude coverage tests which only open() changed files, but never call code from them. (default: off)
+
+
 =item --changes-exclude-pattern '(apple|pear|orange)'
 
 =item --no-changes-exclude-pattern
@@ -512,6 +533,13 @@ Can be specified multiple times
 Specify a pattern for change checking. When only running tests for changed files this will limit which files are checked for changes. Only files that match this pattern will be checked. Your pattern will be inserted unmodified into a `$file =~ m/$pattern/` check.
 
 Can be specified multiple times
+
+
+=item --changes-include-whitespace
+
+=item --no-changes-include-whitespace
+
+Include changed lines that are whitespace only (default: off)
 
 
 =item --changes-plugin Git

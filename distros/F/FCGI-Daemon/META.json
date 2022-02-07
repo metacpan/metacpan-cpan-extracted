@@ -33,8 +33,8 @@
       "runtime" : {
          "requires" : {
             "BSD::Resource" : "0",
-            "FCGI" : "0.71",
-            "FCGI::ProcManager" : "0.18",
+            "FCGI" : "0.82",
+            "FCGI::ProcManager" : "0.28",
             "Getopt::Std" : "0",
             "IO::Select" : "0",
             "Test::More" : "0"
@@ -42,6 +42,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.20151226",
+   "version" : "0.20220206",
    "x_serialization_backend" : "JSON::PP version 2.27203"
 }

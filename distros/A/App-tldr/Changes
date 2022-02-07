@@ -1,5 +1,8 @@
 Revision history for App-tldr
 
+0.11  2022-02-07 20:19:39 JST
+    - Add option to downgrade Unicode characters to ASCII (esabol #4, #6)
+
 0.10  2019-03-25 23:52:57 JST
     - Support pager (cxw42 #1, #2)
 

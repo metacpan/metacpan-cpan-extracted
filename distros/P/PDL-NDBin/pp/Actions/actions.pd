@@ -70,16 +70,9 @@ pp_def( '_flatten_into_grid',
 	Pars => "in(); indx b(); double edge(n); indx [o] idx()",
 	HandleBad => 1,
 	Doc => 'Bin a series of values on a specified grid and flatten into an existing list of indices.',
-	# don't repeat code; PDL_BAD_CODE is available in PDL > 2.007 to
-	# demarcate bad code. make this work for older versions as well
 	( map {
 	        (Code => $_,
-	        BadCode => join( "\n",
-			       '#undef PDL_BAD_CODE',
-			       '#define PDL_BAD_CODE',
-			       $_,
-			       '#undef PDL_BAD_CODE',
-			     )
+	        BadCode => $_,
 		)
 	} '
 	    PDL_Indx n = $SIZE(n);
@@ -154,8 +147,8 @@ pp_def( '_icount_loop',
 	HandleBad => 1,
 	Doc => 'Count the number of elements in each bin.
 
-This function returns a piddle of type I<indx> if you have a 64-bit-capable
-PDL, otherwise it returns a piddle of type I<long>.',
+This function returns an ndarray of type I<indx> if you have a 64-bit-capable
+PDL, otherwise it returns an ndarray of type I<long>.',
 	Code => '
 		loop(n) %{
 			register PDL_Indx j = $idx();
@@ -231,7 +224,7 @@ pp_def( '_isum_loop',
 	HandleBad => 1,
 	Doc => 'Sum the elements in each bin.
 
-This function returns a piddle of type I<int> or higher, to reduce the risk of
+This function returns an ndarray of type I<int> or higher, to reduce the risk of
 overflow when collecting sums.',
 	Code => '
 		loop(n) %{

@@ -19,11 +19,11 @@ no warnings "experimental::signatures";
 
 =head1 VERSION
 
-Version v1.4.2
+Version v1.4.3
 
 =cut
 
-our $VERSION = "v1.4.2";
+our $VERSION = "v1.4.3";
 
 use constant {
 	abstract   => q[compose system recipe from abstract node],
@@ -52,7 +52,7 @@ sub command_names
 sub opt_spec
 {
 	return (
-		[ "suite=s",    "suite of classes to use (buster)" ],
+		[ "suite=s",    "suite of classes to use (bullseye)" ],
 		[ "nodedir=s",  "location of nodes (current dir)" ],
 		[ "classdir=s", "location of classes (XDG datadir + suite/classes)" ],
 		[ "datadir=s",  "location containing nodes and classes" ],

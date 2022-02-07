@@ -6,13 +6,23 @@ my $op = MCQ(5, 4.5);
 my $pow = MCQ(2, 2.5);
 my $rop = MCQ();
 
-print "1..20\n";
+my $mingw_w64_pow_bug = 0;
+$mingw_w64_pow_bug = 1 if Math::Complex_C::Q::_mingw_w64_bug();
+
+if($mingw_w64_pow_bug) {
+  print "1..20\n";
+}
+else {
+  print "1..28\n";
+}
 
 my $eps = 1e-12;
 
-if(Math::Complex_C::Q::_mingw_w64_bug()) {
+if($mingw_w64_pow_bug) {
   eval{pow_cq($rop, $op, $pow);};
-  if($@ =~ /pow_cq not implemented/) {print "ok 1\nok 2\n"}
+  if($@ =~ /pow_cq not implemented/) {
+    print "ok 1\nok 2\n"
+  }
   else {
     warn "\n\$\@: $@\n";
     print "not ok 1\n";
@@ -51,7 +61,7 @@ else {
 ##############################
 ##############################
 
-if(Math::Complex_C::Q::_mingw_w64_bug()) {
+if($mingw_w64_pow_bug) {
   eval{$rop = $op ** $pow;};
   if($@ =~ /\*\* \(pow\) not overloaded/) {print "ok 5\nok 6\n"}
   else {
@@ -92,7 +102,7 @@ else {
 ##############################
 ##############################
 
-if(Math::Complex_C::Q::_mingw_w64_bug()) {
+if($mingw_w64_pow_bug) {
   eval{$rop = $op ** 3;};
   if($@ =~ /\*\* \(pow\) not overloaded/) {print "ok 9\nok 10\n"}
   else {
@@ -119,7 +129,7 @@ else {
 ##############################
 ##############################
 
-if(Math::Complex_C::Q::_mingw_w64_bug()) {
+if($mingw_w64_pow_bug) {
   eval{$rop = $op ** -3;};
   if($@ =~ /\*\* \(pow\) not overloaded/) {print "ok 11\nok 12\n"}
   else {
@@ -146,7 +156,7 @@ else {
 ##############################
 ##############################
 
-if(Math::Complex_C::Q::_mingw_w64_bug()) {
+if($mingw_w64_pow_bug) {
   eval{$rop = $op ** -2.75;};
   if($@ =~ /\*\* \(pow\) not overloaded/) {print "ok 13\nok 14\n"}
   else {
@@ -180,7 +190,7 @@ my $op3 = $op;
 ##############################
 ##############################
 
-if(Math::Complex_C::Q::_mingw_w64_bug()) {
+if($mingw_w64_pow_bug) {
   eval{$op1 **= 3;};
   if($@ =~ /\*\*= \(pow\-equal\) not overloaded/) {print "ok 15\nok 16\n"}
   else {
@@ -207,7 +217,7 @@ else {
 ##############################
 ##############################
 
-if(Math::Complex_C::Q::_mingw_w64_bug()) {
+if($mingw_w64_pow_bug) {
   eval{$op2 **= -3;};
   if($@ =~ /\*\*= \(pow\-equal\) not overloaded/) {print "ok 17\nok 18\n"}
   else {
@@ -234,7 +244,7 @@ else {
 ##############################
 ##############################
 
-if(Math::Complex_C::Q::_mingw_w64_bug()) {
+if($mingw_w64_pow_bug) {
   eval{$op3 **= -2.75;};
   if($@ =~ /\*\*= \(pow\-equal\) not overloaded/) {print "ok 19\nok 20\n"}
   else {
@@ -260,6 +270,51 @@ else {
 
 ##############################
 ##############################
+
+if(!$mingw_w64_pow_bug) {
+  if(approx(real_cq(MCQ(2.0) ** 5), 32, $eps)) {print "ok 21\n"}
+  else {
+    print "not ok 21\n";
+  }
+
+  if(approx(real_cq(5 ** MCQ(2.0)), 25, $eps)) {print "ok 22\n"}
+  else {
+    print "not ok 22\n";
+  }
+
+##############################
+##############################
+
+  if(approx(real_cq(MCQ(9.0) ** 0.5), 3, $eps)) {print "ok 23\n"}
+  else {print "not ok 23\n"}
+
+  if(approx(real_cq(0.5 ** MCQ(9.0)), 0.001953125, $eps)) {print "ok 24\n"}
+  else {
+    print "not ok 24\n";
+  }
+
+##############################
+##############################
+
+  if(approx(real_cq(MCQ(9.0) ** '0.5'), 3, $eps)) {print "ok 25\n"}
+  else {print "not ok 25\n"}
+
+  if(approx(real_cq('0.5' ** MCQ(9.0)), 0.001953125, $eps)) {print "ok 26\n"}
+  else {
+    print "not ok 26\n";
+  }
+
+##############################
+##############################
+
+  if(approx(real_cq(MCQ(9.0) ** MCQ(0.5)), 3, $eps)) {print "ok 27\n"}
+  else {print "not ok 27\n"}
+
+  if(approx(real_cq(MCQ(0.5) ** MCQ(9.0)), 0.001953125, $eps)) {print "ok 28\n"}
+  else {
+    print "not ok 28\n";
+  }
+}
 
 sub approx {
     if(($_[0] > ($_[1] - $_[2])) && ($_[0] < ($_[1] + $_[2]))) {return 1}

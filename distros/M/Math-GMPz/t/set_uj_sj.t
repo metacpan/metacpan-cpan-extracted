@@ -12,7 +12,7 @@ use Test::More;
 
 my $rop = Math::GMPz->new();
 
-if($Config{ivtype} ne 'long long') {
+if($Config{ivtype} ne 'long long' && $Config{ivtype} ne '__int64') {
   eval { Rmpz_set_sj($rop, -11); };
   like($@, qr/Rmpz_set_sj function not implemented/, 'Rmpz_set_sj not implemented');
 

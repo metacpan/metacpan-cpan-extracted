@@ -786,6 +786,7 @@ Native APIs of L<SPVM> have the IDs that is corresponding to the names. These ID
   159 call_instance_method
   160 get_instance_method_id_static
   161 get_bool_object_value
+  162 string_basic_type_id
 
 =head1 List of Native APIs
 
@@ -1168,13 +1169,15 @@ B<Examples:>
 
   void* (*new_string_raw)(SPVM_ENV* env, const char* bytes, int32_t length);
 
-Create a new string object by specifying C language char* type value and the length.
+Create a new string object with the bytes and the length.
+
+If the length of bytes is lower than the specified length or the bytes is NULL, The part that longer than the length of bytes will be filled with C<\0>. 
 
 =head2 new_string
 
   void* (*new_string)(SPVM_ENV* env, const char* bytes, int32_t length);
 
-Do the same as C<new_string_raw>, and add the created string object to the mortal stack of the environment. Use this function in normal use instead of C<new_string_raw>.
+Same as C<new_string_raw>, and add the created string object to the mortal stack of the environment. Usually use this function instead of C<new_string_raw>.
 
 B<Examples:>
 
@@ -2431,6 +2434,12 @@ Get the value of a L<Bool|SPVM::Bool> object. If the Bool object is true, return
 B<Examples:>
 
   int32_t bool_value = env->get_bool_object_value(env, bool_object);
+
+=head2 string_basic_type_id
+
+  void* string_basic_type_id;
+
+Basic type ID of the C<string> type. This is used internally.
 
 =head1 Utilities
 

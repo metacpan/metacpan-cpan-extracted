@@ -6,7 +6,8 @@ Source: https://wiki.debian.org/Boxer
 Files: INSTALL
  LICENSE
  TODO
- doc/boxer.svg
+ doc/features.svg
+ doc/projects.svg
  examples/classes/Admin/apt/auto/all.yml
  examples/classes/Admin/apt/auto/core.yml
  examples/classes/Admin/apt/auto/functions.yml
@@ -225,19 +226,19 @@ Files: Changes
  META.yml
  bin/boxer
  doap.ttl
- t/00_compile.t
- t/00_compile_scripts.t
- t/01_app_help.t
- t/04_boxer.t
- t/05_world-reclass.t
  t/bootstrap.t
  t/classify.t
- t/compose.t
+ t/serialize.t
+Copyright: Copyright 2022 Jonas Smedegaard.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/00_compile.t
+ t/00_compile_scripts.t
+ t/01_app_help.t
  t/fixme.t
  t/minimumversion.t
  t/namespaces_clean.t
  t/pod.t
- t/serialize.t
 Copyright: Copyright 2020 Jonas Smedegaard.
 License: GPL-1.0+ or Artistic-1.0
 
@@ -246,6 +247,12 @@ Files: COPYRIGHT
  SIGNATURE
 Copyright: None
 License: public-domain
+
+Files: t/04_boxer.t
+ t/05_world-reclass.t
+ t/compose.t
+Copyright: Copyright 2021 Jonas Smedegaard.
+License: GPL-1.0+ or Artistic-1.0
 
 Files: lib/Boxer/CLI/Command/Bootstrap.pm
  lib/Boxer/Task/Bootstrap.pm
@@ -256,23 +263,23 @@ Files: lib/Boxer/Part/Reclass.pm
 Copyright: Copyright Â© 2016 Jonas Smedegaard.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: Makefile.PL
+Copyright: Copyright 2020 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: dist.ini
 Copyright: Copyright 2019 Jonas Smedegaard.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: Makefile.PL
-Copyright: Copyright 2013 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 License: Artistic-1.0
- This software is Copyright (c) 2020 by the copyright holder(s).
+ This software is Copyright (c) 2022 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2020 by the copyright holder(s).
+ This software is Copyright (c) 2022 by the copyright holder(s).
  
  This is free software, licensed under:
  

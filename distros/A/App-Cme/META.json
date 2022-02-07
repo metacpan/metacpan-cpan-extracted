@@ -47,7 +47,7 @@
             "Pod::POM::View::Text" : "0",
             "Scalar::Util" : "0",
             "Tie::Hash" : "0",
-            "YAML" : "0",
+            "YAML::PP" : "0",
             "perl" : "5.020"
          },
          "suggests" : {
@@ -64,8 +64,7 @@
             "Test::File::Contents" : "0",
             "Test::More" : "0",
             "Test::Perl::Critic" : "0",
-            "Test::Pod" : "1.00",
-            "XXX" : "0"
+            "Test::Pod" : "1.00"
          }
       }
    },
@@ -82,7 +81,7 @@
          "web" : "http://github.com/dod38fr/cme-perl"
       }
    },
-   "version" : "1.036",
+   "version" : "1.037",
    "x_generated_by_perl" : "v5.32.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "LGPL-2.1"

@@ -1,5 +1,5 @@
 package Music::Intervals::Numeric;
-$Music::Intervals::Numeric::VERSION = '0.0711';
+$Music::Intervals::Numeric::VERSION = '0.0804';
 our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Breakdown of numeric musical intervals
@@ -16,8 +16,11 @@ use strictures 2;
 use namespace::clean;
 
 
-has notes => ( is => 'ro', default => sub { [] } );
-has size  => ( is => 'ro', default => sub { 3 } );
+has notes => (
+    is => 'ro',
+    default => sub { [qw( 1/1 5/4 3/2 )] },
+);
+
 
 has ratios => (
     is      => 'ro',
@@ -32,6 +35,17 @@ sub _build_ratios {
   return $ratios;
 }
 
+has _dyads => (
+    is      => 'ro',
+    lazy    => 1,
+    builder => 1,
+);
+sub _build__dyads {
+    my $self = shift;
+    my %dyads = $self->dyads($self->notes);
+    return \%dyads;
+}
+
 has _semitones => ( is => 'ro', default => sub { 12 } );
 has _temper    => ( is => 'ro', lazy => 1, default => sub { my $self = shift;
     $self->_semitones * 100 / log(2) },
@@ -41,79 +55,49 @@ has _temper    => ( is => 'ro', lazy => 1, default => sub { my $self = shift;
 sub frequencies {
     my ($self) = @_;
 
-    my $frequencies = {};
+    my %frequencies = map { $_ => $self->ratios->{$_} } @{ $self->notes };
 
-    my $iter = combinations( $self->notes, $self->size );
-
-    while (my $c = $iter->next) {
-        $frequencies->{"@$c"} = { map { $_ => $self->ratios->{$_} } @$c };
-    }
-
-    return $frequencies;
+    return \%frequencies;
 }
 
 sub intervals {
     my ($self) = @_;
 
-    my $intervals = {};
+    my %dyads = %{ $self->_dyads };
 
-    my $iter = combinations( $self->notes, $self->size );
+    my %intervals = map {
+        $_ => {
+            $dyads{$_} => $self->ratios->{ $dyads{$_} }
+        }
+    } keys %dyads;
 
-    while (my $c = $iter->next) {
-        my %dyads = $self->dyads($c);
-
-        $intervals->{"@$c"} = {
-            map {
-                $_ => {
-                    $dyads{$_} => $self->ratios->{ $dyads{$_} }
-                }
-            } keys %dyads
-        };
-    } 
-
-    return $intervals;
+    return \%intervals;
 }
 
 sub cent_vals {
     my ($self) = @_;
 
-    my $cent_vals = {};
+    my %dyads = %{ $self->_dyads };
 
-    my $iter = combinations( $self->notes, $self->size );
-
-    while (my $c = $iter->next) {
-        my %dyads = $self->dyads($c);
-
-        $cent_vals->{"@$c"} = {
-            map {
-                $_ => log( eval $dyads{$_} ) * $self->_temper
-            } keys %dyads
-        };
-    }
+    my %cent_vals = map {
+        $_ => log( eval $dyads{$_} ) * $self->_temper
+    } keys %dyads;
             
-    return $cent_vals;
+    return \%cent_vals;
 }
 
 sub prime_factor {
     my ($self) = @_;
 
-    my $prime_factor = {};
+    my %dyads = %{ $self->_dyads };
 
-    my $iter = combinations( $self->notes, $self->size );
+    my %prime_factor = map {
+        $_ => {
+            $dyads{$_} => scalar ratio_factorize( $dyads{$_} )
+        }
+    } keys %dyads;
 
-    while (my $c = $iter->next) {
-        my %dyads = $self->dyads($c);
-
-        $prime_factor->{"@$c"} = {
-            map {
-                $_ => {
-                    $dyads{$_} => scalar ratio_factorize( $dyads{$_} )
-                }
-            } keys %dyads
-        };
-    }
-
-    return $prime_factor;
+    return \%prime_factor;
 }
 
 
@@ -168,7 +152,7 @@ Music::Intervals::Numeric - Breakdown of numeric musical intervals
 
 =head1 VERSION
 
-version 0.0711
+version 0.0804
 
 =head1 SYNOPSIS
 
@@ -176,7 +160,6 @@ version 0.0711
 
   my $m = Music::Intervals::Numeric->new(
     notes => [qw( 1/1 5/4 3/2 15/8 )],
-    size => 3,
   );
 
   print Dumper(
@@ -204,12 +187,6 @@ Default: C<[ 1/1 5/4 3/2 ]>  (C E G)
 The list of notes may be any of the keys in the L<Music::Intervals::Ratio>
 C<ratio> hashref.  This is very very long and contains useful intervals such as
 those of the common scale and even the Pythagorean intervals, too.
-
-=head2 size
-
-Chord size
-
-Default: C<3>
 
 =head2 ratios
 

@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad::ClassAttr::Struct 0.02;
+package Object::Pad::ClassAttr::Struct 0.03;
 
 use v5.14;
 use warnings;
@@ -39,7 +39,7 @@ C<Object::Pad::ClassAttr::Struct> - declare an C<Object::Pad> class to be struct
 =head1 DESCRIPTION
 
 This module provides a third-party class attribute for L<Object::Pad>-based
-classes, which applies some attributes automatically to every slot added to
+classes, which applies some attributes automatically to every field added to
 the class, as a convenient shortcut for making structure-like classes.
 
 =head1 CLASS ATTRIBUTES
@@ -48,9 +48,9 @@ the class, as a convenient shortcut for making structure-like classes.
 
    class Name :Struct ... { ... }
 
-Automatically applies the C<:param> and C<:mutator> attributes to every slot
+Automatically applies the C<:param> and C<:mutator> attributes to every field
 defined on the class, meaning the constructor will accept parameters for each
-slot to initialise the value, and each slot will have an lvalue mutator
+field to initialise the value, and each field will have an lvalue mutator
 method.
 
 In addition, the class itself gains the C<:strict(params)> attribute, meaning

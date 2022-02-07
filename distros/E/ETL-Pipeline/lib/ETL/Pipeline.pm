@@ -14,7 +14,7 @@ ETL::Pipeline - Extract-Transform-Load pattern for data file conversions
     input     => ['Excel', iname => qr/\.xlsx?$/              ],
     mapping   => {Name => 'A', Address => 'B', ID => 'C'      },
     constants => {Type => 1, Information => 'Demographic'     },
-    output    => ['SQL', table => 'NewData'                   ],
+    output    => ['Memory', key => 'ID'                       ],
   } )->process;
 
   # Or using method calls...
@@ -23,14 +23,14 @@ ETL::Pipeline - Extract-Transform-Load pattern for data file conversions
   $etl->input    ( 'Excel', iname => qr/\.xlsx?$/i              );
   $etl->mapping  ( Name => 'A', Address => 'B', ID => 'C'       );
   $etl->constants( Type => 1, Information => 'Demographic'      );
-  $etl->output   ( 'SQL', table => 'NewData'                    );
+  $etl->output   ( 'Memory', key => 'ID'                        );
   $etl->process;
 
 =cut
 
 package ETL::Pipeline;
 
-use 5.014000;
+use 5.021000;	# Required for "no warnings 'redundant'".
 use warnings;
 
 use Carp;
@@ -44,7 +44,7 @@ use Scalar::Util qw/blessed/;
 use String::Util qw/hascontent trim/;
 
 
-our $VERSION = '3.00';
+our $VERSION = '3.10';
 
 
 =head1 DESCRIPTION
@@ -67,8 +67,8 @@ By dividing a conversion into 3 steps, we isolate the input from the output...
 
 B<ETL::Pipeline> takes your data files from extract to load. It reads an input
 source, translates the data, and writes it to an output destination. For
-example, I use these pipelines for reading an Excel spread sheet (input) and
-saving the information in an SQL database (output).
+example, this pipeline reads an Excel spread sheet (input) and saves the 
+information in a Perl hash (output).
 
   use ETL::Pipeline;
   ETL::Pipeline->new( {
@@ -76,7 +76,7 @@ saving the information in an SQL database (output).
     input     => ['Excel', find => qr/\.xlsx?$/],
     mapping   => {Name => 'A', Complaint => 'B', ID => 'C'},
     constants => {Client => 1, Type => 'Complaint'}
-    output    => ['SQL', table => 'NewData']
+    output    => ['Memory', key => 'ID']
   } )->process;
 
 Or like this, calling the methods instead of through the constructor...
@@ -87,7 +87,7 @@ Or like this, calling the methods instead of through the constructor...
   $etl->input    ( 'Excel', find => qr/\.xlsx?$/               );
   $etl->mapping  ( Name => 'A', Complaint => 'B', ID => 'C'    );
   $etl->constants( Client => 1, Type => 'Complaint'            );
-  $etl->output   ( 'SQL', table => 'NewData'                   );
+  $etl->output   ( 'Memory', key => 'ID'                       );
   $etl->process;
 
 These are equivalent. They do exactly the same thing. You can pick whichever
@@ -293,11 +293,11 @@ B<constants> explicitly handles them.
 Hash keys are output field names. The L</output> class defines acceptable
 field names. The hash values are literals.
 
-  # Get the current mapping...
-  my $transformation = $etl->constants;
-
   # Set the output field "Name" to the string "John Doe"...
   $etl->constants( Name => 'John Doe' );
+
+  # Get the current list of constants...
+  my $transformation = $etl->constants;
 
 B<Note:> B<constants> does not accept code references, array references, or hash
 references. It only works with literal values. Use L</mapping> instead for
@@ -308,15 +308,10 @@ in a hash reference, B<constants> replaces the current hash with this new one.
 If you pass in a list of key value pairs, B<constants> adds them to the current
 hash.
 
-=head3 has_constants
-
-Returns a true value if this pipeline has one or more constants defined. A false
-value means no constants.
-
 =cut
 
 has '_constants' => (
-	handles  => {_add_constants => 'set', has_constants => 'count'},
+	handles  => {_add_constants => 'set', _has_constants => 'count'},
 	init_arg => 'constants',
 	is       => 'rw',
 	isa      => 'HashRef[Maybe[Str]]',
@@ -434,19 +429,6 @@ field names. The L</output> class defines acceptable field names. The hash
 values can be anything accepted by the L</get> method. See L</get> for more
 information.
 
-If L</get> returns an ARRAY reference (aka multiple values), they will be
-concatenated in the output with a semi-colon between values - B<; >. You can
-override the seperator by setting the value to an ARRAY reference. The first
-element is a regular field name for L</get>. The second element is a new
-seperator string.
-
-With no parameters, B<mapping> returns the current hash reference. If you pass
-in a hash reference, B<mapping> replaces the current hash with this new one. If
-you pass in a list of key value pairs, B<mapping> adds them to the current hash.
-
-  # Get the current mapping...
-  my $transformation = $etl->mapping;
-
   # Add the output field "Name" with data from input column "A"...
   $etl->mapping( Name => 'A' );
 
@@ -459,6 +441,29 @@ you pass in a list of key value pairs, B<mapping> adds them to the current hash.
     return lc $record{A};
   } );
 
+If L</get> returns an ARRAY reference (aka multiple values), they will be
+concatenated in the output with a semi-colon between values - B<; >. You can
+override the seperator by setting the value to an ARRAY reference. The first
+element is a regular field name for L</get>. The second element is a new
+seperator string.
+
+  # Slashes between multiple names.
+  $etl->mapping( Name => [qr/Name/i, ' / '] );
+  
+  # These will do the same thing - semi-colon between multiple names.
+  $etl->mapping( Name => [qr/Name/i, '; '] );
+  $etl->mapping( Name => qr/Name/i );
+
+With no parameters, B<mapping> returns the current hash reference. If you pass
+in a hash reference, B<mapping> replaces the current hash with this new one. If
+you pass in a list of key value pairs, B<mapping> adds them to the current hash.
+
+  # Get the current mapping...
+  my $transformation = $etl->mapping;
+
+  # Add the output field "Name" with data from input column "A"...
+  $etl->mapping( Name => 'A' );
+
   # Replace the entire mapping so only "Name" is output...
   $etl->mapping( {Name => 'C'} );
 
@@ -469,19 +474,64 @@ Want to save a literal value? Use L</constants> instead.
 B<mapping> only sets scalar values. If the matching fields contain sub-records,
 L</record> throws an error message and sets the output field to C<undef>.
 
-=head3 has_mapping
+=head4 Fully customized mapping
 
-Returns a true value if this pipeline has one or more field mappings defined. A
-false value means no mappings are present.
+B<mapping> accepts a CODE reference in place of the hash. In this case, 
+L</record> executes the code and uses the return value as the record to send
+L</output>. The CODE should return a hash reference for success or C<undef> if
+there is an error.
+
+  # Execute code instead of defining the output fields.
+  $etl->mapping( sub { ... } );
+
+  # These are the same.
+  $etl->mapping( {Name => 'A'} );
+  $etl->mapping( sub {
+    my $etl = shift; 
+    return {Name => $etl->get( 'A' )};
+  } );
+
+C<undef> saves an empty record. To print an error message, have your code call 
+L</status> with a type of B<ERROR>.
+
+  # Return an enpty record.
+  $etl->mapping( sub { undef; } );
+  
+  # Print an error message.
+  $etl->mapping( sub {
+    ...
+    $etl->status( 'ERROR', 'There is no data!' );
+    return undef;
+  });
+
+The results of L</constants> are folded into the resulting hash reference. 
+Fields set by B<mapping> override constants.
+
+  # Output record has two fields - "Extra" and "Name".
+  $etl->constants( Extra => 'ABC' );
+  $etl->mapping( sub { {Name => shift->get( 'A' )} } );
+  
+  # Output record has only one field, with the value from the input record.
+  $etl->constants( Name => 'ABC' );
+  $etl->mapping( sub { {Name => shift->get( 'A' )} } );  
+
+L</record> passes two parameters into the CODE reference - the B<ETL::Pipeline>
+object and L<the raw data record|/this>.
+
+  $etl->mapping( sub {
+    my ($etl, $record) = @_;
+    ...
+  } );
+
+B<WARNING:> This is considered an I<advanced> feature and should be used 
+sparingly. You will find the I<< name => field >> format easier to maintain.
 
 =cut
 
 has '_mapping' => (
-	handles  => {_add_mapping => 'set', has_mapping => 'count'},
 	init_arg => 'mapping',
 	is       => 'rw',
-	isa      => 'HashRef',
-	traits   => [qw/Hash/],
+	isa      => 'HashRef|CodeRef',
 );
 
 
@@ -489,12 +539,14 @@ sub mapping {
 	my $self = shift;
 	my @pairs = @_;
 
-	if (scalar( @pairs ) == 1 && ref( $pairs[0] ) eq 'HASH') {
-		return $self->_mapping( $pairs[0] );
-	} elsif (scalar @pairs) {
-		return $self->_add_mapping( @pairs );
-	} else {
+	if (scalar( @pairs) <= 0) {
 		return $self->_mapping;
+	} elsif (scalar( @pairs ) == 1) {
+		return $self->_mapping( $pairs[0] );
+	} else {
+		$self->_mapping( {} ) if ref( $self->_mapping) ne 'HASH';
+		my $reference = $self->_mapping;
+		$reference = {%$reference, @pairs};
 	}
 }
 
@@ -1075,35 +1127,43 @@ sub record {
 	# The records were overwriting each other. Switched to a hash reference so I
 	# can force Perl to allocate new memory for every record.
 	my $save = {};
-	if ($self->has_constants) {
+	if ($self->_has_constants) {
 		my $constants = $self->_constants;
 		%$save = %$constants;
 	}
 
 	# This is the transform step. It converts the input record into an output
-	# record.
+	# record. The mapping can be either a hash reference of transformations or
+	# a code reference that does all of the transformations.
 	my $mapping = $self->mapping;
-	while (my ($to, $from) = each %$mapping) {
-		my $seperator = '; ';
-		if (ref( $from ) eq 'ARRAY') {
-			$seperator = $from->[1];
-			$from = $from->[0];	# Do this LAST!
-		}
-
-		my $values = $self->get( $from );
-		if    (ref( $values ) eq ''     ) { $save->{$to} = $values; }
-		elsif (ref( $values ) eq 'ARRAY') {
-			my $invalid = first { defined( $_ ) && ref( $_ ) ne '' } @$values;
-			if (defined $invalid) {
-				my $type = ref( $invalid );
-				$self->status( 'ERROR', "Data structure of type $type found by mapping '$from' to '$to'" );
-				$save->{$to} = undef;
-			} else {
-				my @usable = grep { hascontent( $_ ) } @$values;
-				if(scalar @usable) { $save->{$to} = join( $seperator, @usable ); }
-				else               { $save->{$to} = undef;                       }
+	if (ref( $mapping ) eq 'CODE') {
+		my $return = $mapping->( $self, $record );
+		
+		# Merge with constants that might have been set above.
+		$save = {%$save, %$return} if defined $return;
+	} else {
+		while (my ($to, $from) = each %$mapping) {
+			my $seperator = '; ';
+			if (ref( $from ) eq 'ARRAY') {
+				$seperator = $from->[1];
+				$from = $from->[0];	# Do this LAST!
 			}
-		} else { $save->{$to} = undef; }
+	
+			my $values = $self->get( $from );
+			if    (ref( $values ) eq ''     ) { $save->{$to} = $values; }
+			elsif (ref( $values ) eq 'ARRAY') {
+				my $invalid = first { defined( $_ ) && ref( $_ ) ne '' } @$values;
+				if (defined $invalid) {
+					my $type = ref( $invalid );
+					$self->status( 'ERROR', "Data structure of type $type found by mapping '$from' to '$to'" );
+					$save->{$to} = undef;
+				} else {
+					my @usable = grep { hascontent( $_ ) } @$values;
+					if(scalar @usable) { $save->{$to} = join( $seperator, @usable ); }
+					else               { $save->{$to} = undef;                       }
+				}
+			} else { $save->{$to} = undef; }
+		}
 	}
 
 	# We're done with this record. Finish up.
@@ -1760,8 +1820,14 @@ sub is_valid {
 		$error = 'The "input" object was not set';
 	} elsif (!defined $self->_output) {
 		$error = 'The "output" object was not set';
-	} elsif (!$self->has_mapping && !$self->has_constants) {
-		$error = 'The mapping was not set';
+	} else {
+		my $found = $self->_has_constants;
+		
+		my $mapping = $self->_mapping;
+		if    (ref( $mapping ) eq 'CODE'                          ) { $found++; }
+		elsif (ref( $mapping ) eq 'HASH' && scalar( $mapping ) > 0) { $found++; }
+		
+		$error = 'The mapping was not set' unless $found;
 	}
 
 	if (wantarray) {

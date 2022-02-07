@@ -20,7 +20,7 @@ name: Perinci-Result-Format-Lite
 provides:
   Perinci::Result::Format::Lite:
     file: lib/Perinci/Result/Format/Lite.pm
-    version: '0.283'
+    version: '0.285'
 recommends:
   Cpanel::JSON::XS: '0'
   Data::Clean::JSON: '0.38'
@@ -31,7 +31,7 @@ recommends:
   JSON::Tiny::Subclassable: '0'
   Number::Format::BigFloat: '0'
   Sort::ByExample: '0'
-  Text::Table::Any: '0.105'
+  Text::Table::Any: '0.111'
 requires:
   Data::Check::Structure: '0.050'
   Data::Dumper: '0'
@@ -47,7 +47,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Result-Format-Lite
   homepage: https://metacpan.org/release/Perinci-Result-Format-Lite
   repository: git://github.com/perlancar/perl-Perinci-Result-Format-Lite.git
-version: '0.283'
+version: '0.285'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

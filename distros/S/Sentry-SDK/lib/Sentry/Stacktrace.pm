@@ -12,6 +12,10 @@ has frame_filter => sub {
 has frames => sub ($self) { return $self->prepare_frames() };
 
 sub prepare_frames ($self) {
+  if (!$self->exception->can('frames')) {
+    return [];
+  }
+
   my @frames = reverse map { Sentry::Stacktrace::Frame->from_caller($_->@*) }
     $self->exception->frames->@*;
 

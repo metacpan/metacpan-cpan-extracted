@@ -1,5 +1,11 @@
 Revision history for Alien::geos::af
 
+1.009 2022-02-03
+    - share builds:
+      - Modify geos-config to dynamically return paths relative to install directory.
+      - Store alien properties from pkgconfig file instead of geos-config 
+        (earlier geos versions did not have a geos.pc file).
+
 1.008 2021-09-11
     - Switch to cmake.  GEOS 3.10 will remove autotools support.
 

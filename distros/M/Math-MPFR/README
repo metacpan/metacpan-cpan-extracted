@@ -222,3 +222,46 @@ If you wish to ignore such events, simply provide the Makefie.PL
 with the argument FB=0 .
 See the doubletoa() documentation in MPFR.pod.
 
+===============================
+MS WINDOWS (Visual Studio 2019)
+===============================
+
+I don't know how to build the gmp and mpfr libraries using Visual Studio
+2019, so when building this module with Visual Studio 2019 I build
+against gmp and mpfr libraries that were built using MinGW-w64.
+
+Building with Visual Studio 2019 against  *dynamic* gmp/mpfr libraries
+that were built using a MinGW-w64 compiler is not recommended, as strange
+results can then arise when calling mpfr functions that take a FILE*
+argument.
+
+If building with Visual Studio 2019 against static gmp/mpfr libs that were
+built using a MinGW-w64 compiler I first make a copy of the gmp and mpfr
+libraries (libgmp.a and libmpfr.a) along with copies of the following
+MinGW-w64 library files:
+libgcc.a
+libgcc_s.a
+libmingwex.a
+libmingw32.a
+
+For each of the 6 copied files, I leave the filename unchanged (though the
+"lib" at the begining of the name is optional), and change the file
+extension to ".lib".
+In making those copies, I've left them in the same directory as the
+original, but I assume (untested) that the copies could be moved to any
+location of your choice.
+
+Then build this module by cd'ing to the top level Math::MPFR source folder
+and running:
+
+perl Makefile.PL CHECK=0 INC="-IC:/path/to/gmp_header" LIBS="-LC:/path/to/libgcc -lgcc -LC:/path/to/libgcc_s -lgcc_s -LC:/path/to/standard_libs -lmingwex -lmingw32 -LC:/path/to/libgmp -lmpfr -lgmp"
+nmake test
+nmake install
+
+NOTES
+ The given example "perl Makefile.PL ..." command assumes:
+  1) that both mpfr.h and gmp.h are in C:/path/to/gmp_header;
+  2) that libmingwex and libmingw32 libraries are in the same location;
+  3) that libmpfr.lib and libgmp.lib are in C:/path/to/libgmp.
+ Modify as necessary.
+

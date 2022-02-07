@@ -4,7 +4,7 @@
       "Jan Herout <jan.herout@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.10",
+   "generated_by" : "Minilla/v3.1.15",
    "license" : [
       "perl_5"
    ],
@@ -54,7 +54,7 @@
    "provides" : {
       "Die::To::Stdout" : {
          "file" : "lib/Die\\To\\Stdout.pm",
-         "version" : "0.01"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -64,11 +64,15 @@
       },
       "homepage" : "https://gitlab.com/Herout/die-to-stdout",
       "repository" : {
-         "url" : "git://gitlab.com/Herout/die-to-stdout.git",
+         "type" : "git",
+         "url" : "https://gitlab.com/Herout/die-to-stdout.git",
          "web" : "https://gitlab.com/Herout/die-to-stdout"
       }
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 4.02",
+   "version" : "0.04",
+   "x_contributors" : [
+      "Jan Herout <jan.herout@o2.cz>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.06",
    "x_static_install" : 1
 }

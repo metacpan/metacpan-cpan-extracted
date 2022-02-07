@@ -5,7 +5,7 @@ package Net::SAML2::Binding::Redirect;
 use Moose;
 use MooseX::Types::URI qw/ Uri /;
 
-our $VERSION = '0.52';
+our $VERSION = '0.53';
 
 # ABSTRACT: Net::SAML2::Binding::Redirect - HTTP Redirect binding for SAML
 
@@ -93,7 +93,7 @@ sub verify {
     # 'SAMLRequest', 'RelayState', 'Sig', 'SigAlg' the other parameter values are
     # deleted from the URI query that was created from the URL that was passed
     # to the verify function
-    my @signed_params = ('SAMLRequest', 'RelayState', 'Sig', 'SigAlg');
+    my @signed_params = ('SAMLRequest', 'SAMLResponse', 'RelayState', 'Sig', 'SigAlg');
 
     for my $key ($u->query_param) {
         if (grep /$key/, @signed_params ) {
@@ -165,7 +165,7 @@ Net::SAML2::Binding::Redirect - Net::SAML2::Binding::Redirect - HTTP Redirect bi
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 SYNOPSIS
 

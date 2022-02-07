@@ -14,11 +14,11 @@
 
 #include "../math_mpfr_include.h"
 
-/* Squash some annoying compiler warnings (Microsoft compilers only). */
-
+/*
 #ifdef _MSC_VER
 #pragma warning(disable:4700 4715 4716)
 #endif
+*/
 
 #ifdef OLDPERL
 #define SvUOK SvIsUV

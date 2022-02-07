@@ -1,5 +1,5 @@
-Chemistry/File/MDLMol version 0.23
-Chemistry/File/SDF    version 0.23
+Chemistry/File/MDLMol version 0.24
+Chemistry/File/SDF    version 0.24
 ==================================
 
 This modules read MDL mol and SDF (structure data file) files. 
@@ -8,8 +8,10 @@ The MDLmol module automatically registers the 'mdl' format with Chemistry::Mol,
 so that molfiles may be identified and read by Chemistry::Mol::read_mol().
 The SDF module registers the 'sdf' format.
 
-CHANGES SINCE VERSION 0.22
-        - Fixed t/pod.t which no longer found any POD files to check.
+CHANGES SINCE VERSION 0.23
+        - Implemented reading of the chiral flag.
+        - Fixed POD typos. Thanks Florian Schlichting.
+        - Updated MDL file specification links (bug 140933)
 
 INSTALLATION
 

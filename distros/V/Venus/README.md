@@ -8,7 +8,7 @@ OO Standard Library for Perl 5
 
 # VERSION
 
-0.02
+0.04
 
 # SYNOPSIS
 

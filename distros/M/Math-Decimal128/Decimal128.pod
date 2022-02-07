@@ -16,11 +16,11 @@ Math::Decimal128 - perl interface to C's _Decimal128 operations.
    The smallest expressable value is
      -9.999999999999999999999999999999999e6144 which is also
    equivalent to
-     -9.999999999999999999999999999999999e6111.
+     -9999999999999999999999999999999999e6111.
    The largest expressable value is
      9.999999999999999999999999999999999e6144 which is also
    equivalent to
-     9.999999999999999999999999999999999e6111.
+     9999999999999999999999999999999999e6111.
    The closest we can get to zero is (plus or minus) 1e-6176
    (which is also equivalent to
      1000000000000000000000000000000000e-6209).
@@ -50,8 +50,14 @@ Math::Decimal128 - perl interface to C's _Decimal128 operations.
     += -= *= /=
     != == <= >= <=> < >
     ++ --
+    ""
+    abs bool int neg
     =
-    abs bool int print
+
+    NOTE: Making use of the '=' overloading is not recommended unless
+          you understand its caveats. See 'perldoc overload' and
+          read it thoroughly, including the documentation regarding
+          'copy constructors'.
 
     Arguments to the overloaded operations must be Math::Decimal128
     objects or integer (IV/UV) values or string (PV) values.

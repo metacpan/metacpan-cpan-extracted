@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/VitaminUtils/convert_vitamin_b6_unit
-# and generated automatically using Perinci::CmdLine::Gen version 0.498
+# and generated automatically using Perinci::CmdLine::Gen version 0.499
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-03-17'; # DATE
+our $DATE = '2021-08-08'; # DATE
 our $DIST = 'App-VitaminUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,15 +39,13 @@ convert-pyridoxine-unit - Convert a vitamin B6 (pyridoxine) quantity from one un
 
 =head1 VERSION
 
-This document describes version 0.003 of convert-pyridoxine-unit (from Perl distribution App-VitaminUtils), released on 2021-03-17.
+This document describes version 0.004 of convert-pyridoxine-unit (from Perl distribution App-VitaminUtils), released on 2021-08-08.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % convert-pyridoxine-unit [--format=name] [--json] [--(no)naked-res]
-     [--page-result[=program]] [--view-result[=program]] <quantity>
-     [to_unit]
+% B<convert-pyridoxine-unit> [B<--format>=I<name>] [B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]] [B<--view-result>[=I<program>]] -- E<lt>I<quantity>E<gt> [I<to_unit>]
 
 Examples:
 
@@ -76,7 +74,11 @@ C<*> marks required options.
 
 =item B<--quantity>=I<s>*
 
+Can also be specified as the 1st command-line argument.
+
 =item B<--to-unit>=I<s>
+
+Can also be specified as the 2nd command-line argument.
 
 =back
 
@@ -185,7 +187,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-VitaminUtils>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-VitaminUtils/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-VitaminUtils>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -197,7 +199,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

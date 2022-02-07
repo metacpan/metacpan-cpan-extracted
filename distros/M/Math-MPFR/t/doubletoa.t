@@ -29,7 +29,7 @@ elsif(MPFR_VERSION() <= 196869) {
 
 else {
 
-  print "1..9\n";
+  print "1..11\n";
 
   my $ok = 1;
   my $fb = Math::MPFR::_fallback_notify();
@@ -148,4 +148,27 @@ else {
     warn "\nexpected: '9.9999999999999992e+22 or 9.9999999999999992e+022'\ngot     : '", $dtoa, "'\n";
     print "not ok 9\n";
   }
+
+  $dtoa = doubletoa(0.0);
+
+  if($dtoa eq '0.0') { print "ok 10\n" }
+  else {
+    warn "\nexpected: '0.0'\ngot     : '", $dtoa, "'\n";
+    print "not ok 10\n";
+  }
+
+  my $z = Math::MPFR->new(0);
+  Rmpfr_neg($z, $z, MPFR_RNDN); # $z is -0.0
+  my $negzero = Rmpfr_get_NV($z, MPFR_RNDN);
+
+  $dtoa = doubletoa($negzero);
+
+  if($dtoa eq '-0.0') { print "ok 11\n" }
+  else {
+    warn "\nexpected: '-0.0'\ngot     : '", $dtoa, "'\n";
+    print "not ok 11\n";
+  }
 }
+
+
+__END__

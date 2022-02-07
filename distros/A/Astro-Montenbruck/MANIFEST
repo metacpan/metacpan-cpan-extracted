@@ -17,7 +17,6 @@ lib/Astro/Montenbruck/Ephemeris/Planet/Sun.pm
 lib/Astro/Montenbruck/Ephemeris/Planet/Uranus.pm
 lib/Astro/Montenbruck/Ephemeris/Planet/Venus.pm
 lib/Astro/Montenbruck/Lunation.pm
-lib/Astro/Montenbruck/Lunation/Quarter.pm
 lib/Astro/Montenbruck/MathUtils.pm
 lib/Astro/Montenbruck/NutEqu.pm
 lib/Astro/Montenbruck/RiseSet.pm
@@ -35,11 +34,11 @@ lib/Astro/Montenbruck/Utils/Theme/Dark.pm
 lib/Astro/Montenbruck/Utils/Theme/Light.pm
 LICENSE
 MANIFEST			This list of files
-META.json
-META.yml
 README
 README.md
 script/createdocs.pl
+script/mercury.pl
+script/moon_almanac.pl
 script/phases.pl
 script/planpos.pl
 script/riseset.pl
@@ -66,3 +65,5 @@ t/50-lunation.t
 t/60-solequ.t
 t/pod-coverage.t
 t/pod.t
+META.yml
+META.json

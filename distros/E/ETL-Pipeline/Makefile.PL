@@ -36,8 +36,7 @@ auto_install;
 WriteAll;
 
 # Warning when upgrading older versions.
-my $installed = `perl -le 'eval "require $ARGV[0]" and print $ARGV[0]->VERSION' ETL::Pipeline`;
-if ($installed ne '' && $installed < 3) {
+if (eval 'require ETL::Pipeline' && ETL::Pipeline->VERSION < 3) {
 	warn <<WARN;
 You have an older version of this module. You will need to rewrite any custom
 input sources. Version 3.00 introduced an updated input source API that is not

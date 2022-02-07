@@ -1,9 +1,9 @@
 package App::GitUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-14'; # DATE
+our $DATE = '2021-08-14'; # DATE
 our $DIST = 'App-GitUtils'; # DIST
-our $VERSION = '0.081'; # VERSION
+our $VERSION = '0.083'; # VERSION
 
 use 5.010001;
 use strict;
@@ -262,7 +262,7 @@ App::GitUtils - Day-to-day command-line utilities for git
 
 =head1 VERSION
 
-This document describes version 0.081 of App::GitUtils (from Perl distribution App-GitUtils), released on 2021-07-14.
+This document describes version 0.083 of App::GitUtils (from Perl distribution App-GitUtils), released on 2021-08-14.
 
 =head1 SYNOPSIS
 
@@ -272,16 +272,12 @@ This distribution provides the following command-line utilities:
 
 =item * L<gu>
 
+=item * L<this-repo>
+
 =back
 
 These utilities provide some shortcuts and tab completion to make it more
 convenient when working with git con the command-line.
-
-=head1 CONTRIBUTOR
-
-=for stopwords Steven Haryanto
-
-Steven Haryanto <sharyanto@cpan.org>
 
 =head1 FUNCTIONS
 
@@ -557,13 +553,40 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<App::GitHubUtils>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto (on PC, Jakarta)
+
+Steven Haryanto (on PC, Jakarta) <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2018, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2018, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

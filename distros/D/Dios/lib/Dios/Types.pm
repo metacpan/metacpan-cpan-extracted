@@ -200,7 +200,7 @@ my %handler_for = (
             # Does this object convert to a number without complaint???
             my $warned;
             local $SIG{__WARN__} = sub { $warned = 1 };
-            my $value = eval{ $converter->($_[0]) }
+            my $value = eval{ $converter->($_[0],undef,undef) }
                 // return 0;
             return 0 if $warned;
             return $value =~ m{\A \s*+ [+-]?+ (?: \d++ (\.0*+)?+ | inf(?:inity)?+ ) \s*+ \Z}ixms;
@@ -230,14 +230,15 @@ my %handler_for = (
         return 1 if $reftype eq 'HASH'  && !keys %{$value};
 
         # May be an object that overloads stringification...
-        return 1 if $reftype && overload::Method($value, q{""}) && "$value" eq q{};
+        my $converter = $reftype && overload::Method($value, q{""});
+        return 1 if $converter && $converter->($value,undef,undef) eq q{};
 
         # Otherwise, has to be an empty string...
         return $value eq q{};
     },
 
     # A string, or stringifiable object...
-    Str => sub { defined($_[0]) && (ref($_[0]) ? overload::Method(shift,q{""}) : 1) },
+    Str => sub { defined($_[0]) && (ref($_[0]) ? defined overload::Method(shift,q{""}) : 1) },
 
     # A blessed object...
     Obj   => \&blessed,
@@ -1234,7 +1235,7 @@ sub _describe_constraint {
         state $deparser = B::Deparse->new;
         my ($hint_bits, $warning_bits) = (caller 0)[8,9];
         $deparser->ambient_pragmas(
-            hint_bits => $hint_bits, warning_bits => $warning_bits, '$[' => 0 + $[
+            hint_bits => $hint_bits, warning_bits => $warning_bits, # '$[' => 0 + $[
         );
         $constraint_desc = $deparser->coderef2text($constraint);
         $constraint_desc =~ s{\s*+ BEGIN \s*+ \{ (?&CODE) \}

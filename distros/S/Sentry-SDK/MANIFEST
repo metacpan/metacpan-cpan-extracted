@@ -65,4 +65,5 @@ t/sentry-status.t
 t/severity.t
 t/snapshots/sdk_t/client_options
 t/snapshots/sdk_t/client_options_env_
+t/stacktrace.t
 t/util.t

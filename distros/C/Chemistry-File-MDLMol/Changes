@@ -1,5 +1,10 @@
 Revision history for Perl extension Chemistry::File::MDLMol.
 
+0.24  Thu Mar 3
+        - Implemented reading of the chiral flag.
+        - Fixed POD typos. Thanks Florian Schlichting.
+        - Updated MDL file specification links (bug 140933)
+
 0.23  Tue Apr 13 2021
         - Fixed t/pod.t which no longer found any POD files to check.
 

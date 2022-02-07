@@ -1,13 +1,16 @@
-use ExtUtils::MakeMaker;
+use strict;
+use warnings;
 use Config;
+use ExtUtils::MakeMaker;
+
 require 5.006;
 
 warn "\n Version 1.5 (or later) of the mpfi C library\n",
      " (available from https://gforge.inria.fr/projects/mpfi)\n",
      " is needed to build this module\n";
 
-$use_64_bit_int = 0; # Let perl decide whether to include 64-bit 'long long' support
-$use_long_double = 0;# Let perl decide whether to include 'long double' support
+my $use_64_bit_int = 0; # Let perl decide whether to include 64-bit 'long long' support
+my $use_long_double = 0;# Let perl decide whether to include 'long double' support
 
 #$use_64_bit_int = -1; # Force exclusion of 64-bit 'long long' support
 #$use_long_double = -1;# Force exclusion of 'long double' support
@@ -21,7 +24,7 @@ $use_long_double = 0;# Let perl decide whether to include 'long double' support
 # To set $have_float128 to 1, we can either run 'perl Makefile.PL F128=1'
 # or assign the value 1 to $have_float128 in the next line of code.
 
-$have_float128 = 0; # Assign 1 to force inclusion of __float128 support
+my $have_float128 = 0; # Assign 1 to force inclusion of __float128 support
 
 # Logical thing to do is to set $have_float128 if Math::MPFR::_can_pass_float128() was set.
 # So we do this in the following section.
@@ -88,7 +91,7 @@ my %options = (
   AUTHOR => 'Sisyphus (sisyphus at (@) cpan dot (.) org)',
   LIBS => '-lmpfi -lmpfr -lgmp',
   VERSION_FROM => 'MPFI.pm',
-  PREREQ_PM => {'Math::MPFR' => '3.23'},
+  PREREQ_PM => {'Math::MPFR' => '3.23', 'Test::More' => '0.88'},
   LICENSE  => 'perl',
   DEFINE   => $defines,
   clean   => { FILES => 'save_child_setting.txt' },

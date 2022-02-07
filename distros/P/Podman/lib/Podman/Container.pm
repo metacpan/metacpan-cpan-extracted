@@ -11,7 +11,6 @@ use Scalar::Util;
 use Podman::Client;
 use Podman::Image;
 
-### [Podman::Client](Client.html) API connector.
 has 'Client' => (
     is      => 'ro',
     isa     => 'Podman::Client',
@@ -19,14 +18,12 @@ has 'Client' => (
     default => sub { return Podman::Client->new() },
 );
 
-### Image identifier, short identifier or name.
 has 'Name' => (
     is       => 'ro',
     isa      => 'Str',
     required => 1,
 );
 
-### Create new named container of given image with given command.
 sub Create {
     my ( $Package, $Name, $Image, $Client, %Options ) = @_;
 
@@ -54,7 +51,6 @@ sub Create {
     );
 }
 
-### Delete container, optional force deleting if current in use.
 sub Delete {
     my ( $Self, $Force ) = @_;
 
@@ -68,7 +64,6 @@ sub Delete {
     return 1;
 }
 
-### Display container configuration.
 sub Inspect {
     my $Self = shift;
 
@@ -91,9 +86,8 @@ sub Inspect {
     return \%Inspect;
 }
 
-### Kill container.
 sub Kill {
-    my ( $Self, $Signal, $All ) = @_;
+    my ( $Self, $Signal ) = @_;
 
     $Signal //= 'SIGTERM';
 
@@ -101,14 +95,12 @@ sub Kill {
         ( sprintf "containers/%s/kill", $Self->Name ),
         Parameters => {
             signal => $Signal,
-            all    => $All,
         },
     );
 
     return 1;
 }
 
-### Start container.
 sub Start {
     my ( $Self, $Name ) = @_;
 
@@ -117,7 +109,6 @@ sub Start {
     return 1;
 }
 
-### Stop container.
 sub Stop {
     my ( $Self, $Name ) = @_;
 
@@ -129,3 +120,99 @@ sub Stop {
 __PACKAGE__->meta->make_immutable;
 
 1;
+
+=encoding utf8
+
+=head1 NAME
+
+Podman::Container - Contol container.
+
+=head1 SYNOPSIS
+
+    # Create container
+    my $Container = Podman::Container->Create('nginx', 'docker.io/library/nginx');
+
+    # Start container
+    $Container->Start();
+
+    # Stop container
+    $Container->Stop();
+
+    # Kill container
+    $Container->Kill();
+
+=head1 DESCRIPTION
+
+L<Podman::Container> provides functionallity to control a container.
+
+=head1 ATTRIBUTES
+
+=head2 Name
+
+    my $Container = Podman::Image->new( Name => 'my_container' );
+
+Unique image name or other identifier.
+
+=head2 Client
+
+    my $Client = Podman::Client->new(
+        Connection => 'http+unix:///var/cache/podman.sock' );
+    my $Container = Podman::Container->new( Client => $Client );
+
+Optional L<Podman::Client> object.
+
+=head1 METHODS
+
+=head2 Create
+
+    my $Container = Podman::Container->Create(
+        'nginx',
+        'docker.io/library/nginx',
+        undef,
+        tty         => 1,
+        interactive => 1,
+    );
+
+Create named container by given image name. Optional arguments are
+L<Podman::Client> object and further container options.
+
+=head2 Inspect
+
+    my $Info = $Container->Inspect();
+
+Return advanced container information.
+
+=head2 Kill
+
+    $Container->Kill('SIGKILL');
+
+Send signal to container, defaults to 'SIGTERM'.
+
+=head2 Stop
+
+    $Container->Start();
+
+Start stopped container.
+
+=head2 Stop
+
+    $Container->Stop();
+
+Stop running container.
+
+=head1 AUTHORS
+
+=over 2
+
+Tobias Schäfer, <tschaefer@blackox.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2022-2022, Tobias Schäfer.
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Artistic License version 2.0.
+
+=cut

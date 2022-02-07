@@ -1,3 +1,11 @@
+0.17
+ - Fix https://github.com/sisyphus/math-decimal64/pull/1
+   Thanks to @hiratara
+ - "use 5.008;" in Makefile.PL.
+ - In Xs code, replace (where practical) dynamic allocation of string buffers with
+   static allocation.
+ - Prototype subroutines listed in 'use subs()'
+
 0.16
  - Adjust _is_neg_zero() to circumvent gcc optimization bug.
    See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80692

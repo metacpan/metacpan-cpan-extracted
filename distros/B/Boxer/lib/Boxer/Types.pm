@@ -23,11 +23,11 @@ no warnings "experimental::signatures";
 
 =head1 VERSION
 
-Version v1.4.2
+Version v1.4.3
 
 =cut
 
-our $VERSION = "v1.4.2";
+our $VERSION = "v1.4.3";
 
 declare WorldName, as LowerCaseSimpleStr,
 	coercion => 1,
@@ -58,7 +58,7 @@ declare Suite, as LowerCaseSimpleStr,
 	message {'Must be a single lowercase word'};
 
 my $SerializationList = "Type::Tiny"->new(
-	name => 'SerializationList',
+	name   => 'SerializationList',
 	parent =>
 		Tuple [ slurpy ArrayRef [ StrMatch [qr{^(?:preseed|script)$}] ] ],
 );

@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.57;
 
-package Tickit::Widget::Menu 0.14;
+package Tickit::Widget::Menu 0.15;
 class Tickit::Widget::Menu
 # Much of this code actually lives in a class called T:W:Menu::base, which is
 # the base class used by T:W:Menu and T:W:MenuBar

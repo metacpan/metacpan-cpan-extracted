@@ -133,7 +133,7 @@ sub _test_run_result_is {
 sub _test_run_metadata_is {
     my ( $compiler, $name, $file, $line, $match ) = @_;
 
-    cmp_deeply( $compiler->parser->metadata, $match, sprintf( "%s:%d: %s", $file, $line, $name ) );
+    cmp_deeply( $compiler->metadata, $match, sprintf( "%s:%d: %s", $file, $line, $name ) );
 }
 
 

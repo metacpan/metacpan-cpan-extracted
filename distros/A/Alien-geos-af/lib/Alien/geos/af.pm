@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use parent qw( Alien::Base );
 
-our $VERSION = '1.008';
+our $VERSION = '1.009';
 
 #  make sure we find geos and geos_c
 sub dynamic_libs {
@@ -41,6 +41,11 @@ sub dynamic_libs {
         #warn "FOUND LIBS: " . join (':', @libs);
         return wantarray ? @libs : $libs[0];
     }
+}
+
+sub cflags {
+    my ($self) = @_;
+    $self->SUPER::cflags;
 }
 
 1;

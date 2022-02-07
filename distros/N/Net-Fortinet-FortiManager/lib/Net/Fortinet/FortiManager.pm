@@ -1,5 +1,5 @@
 package Net::Fortinet::FortiManager;
-$Net::Fortinet::FortiManager::VERSION = '0.001001';
+$Net::Fortinet::FortiManager::VERSION = '0.002000';
 # ABSTRACT: Fortinet FortiManager REST API client library
 
 use 5.024;
@@ -235,7 +235,7 @@ sub create_firewall_address ($self, $name, $data) {
             name => $name,
         }],
     };
-    $self->exec_method('set', '/pm/config/adom/' . $self->adom .
+    $self->exec_method('add', '/pm/config/adom/' . $self->adom .
         '/obj/firewall/address', $params);
 }
 
@@ -276,7 +276,7 @@ sub create_firewall_address_group ($self, $name, $data) {
             name => $name,
         }],
     };
-    $self->exec_method('set', '/pm/config/adom/' . $self->adom .
+    $self->exec_method('add', '/pm/config/adom/' . $self->adom .
         '/obj/firewall/addrgrp', $params);
 }
 
@@ -317,7 +317,7 @@ sub create_firewall_ipv6_address ($self, $name, $data) {
             name => $name,
         }],
     };
-    $self->exec_method('set', '/pm/config/adom/' . $self->adom .
+    $self->exec_method('add', '/pm/config/adom/' . $self->adom .
         '/obj/firewall/address6', $params);
 }
 
@@ -358,7 +358,7 @@ sub create_firewall_ipv6_address_group ($self, $name, $data) {
             name => $name,
         }],
     };
-    $self->exec_method('set', '/pm/config/adom/' . $self->adom .
+    $self->exec_method('add', '/pm/config/adom/' . $self->adom .
         '/obj/firewall/addrgrp6', $params);
 }
 
@@ -399,7 +399,7 @@ sub create_firewall_service ($self, $name, $data) {
             name => $name,
         }],
     };
-    $self->exec_method('set', '/pm/config/adom/' . $self->adom .
+    $self->exec_method('add', '/pm/config/adom/' . $self->adom .
         '/obj/firewall/service/custom', $params);
 }
 
@@ -440,7 +440,7 @@ sub create_firewall_service_group ($self, $name, $data) {
             name => $name,
         }],
     };
-    $self->exec_method('set', '/pm/config/adom/' . $self->adom .
+    $self->exec_method('add', '/pm/config/adom/' . $self->adom .
         '/obj/firewall/service/group', $params);
 }
 
@@ -603,6 +603,7 @@ sub delete_firewall_security_policy ($self, $pkg, $id) {
         '/pkg/' .  $pkg . '/firewall/security-policy/' . $id);
 }
 
+
 1;
 
 __END__
@@ -617,7 +618,7 @@ Net::Fortinet::FortiManager - Fortinet FortiManager REST API client library
 
 =head1 VERSION
 
-version 0.001001
+version 0.002000
 
 =head1 SYNOPSIS
 
@@ -1046,6 +1047,29 @@ Returns true on success.
 Throws an exception on error.
 
 =for Pod::Coverage has_user has_passwd has_api_key
+
+=head1 TESTS
+
+To run the live API tests the following environment variables need to be set:
+
+=over
+
+=item NET_FORTINET_FORTIMANAGER_HOSTNAME
+
+=item NET_FORTINET_FORTIMANAGER_USERNAME
+
+=item NET_FORTINET_FORTIMANAGER_PASSWORD
+
+=item NET_FORTINET_FORTIMANAGER_POLICY
+
+=back
+
+Several network objects are created as well as a policy package named by the
+NET_FORTINET_FORTIMANAGER_POLICY environment variable.
+
+The test aborts if any of the objects can't be created, most likely if it
+already exists.
+All objects are deleted at the end of the test run, even when it aborts.
 
 =head1 AUTHOR
 

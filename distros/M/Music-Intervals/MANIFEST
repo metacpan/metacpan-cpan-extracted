@@ -11,8 +11,10 @@ dist.ini
 eg/Dancer-App.pm
 eg/benchmark
 eg/intervals
+eg/intervals-numeric
 eg/mojo-intervals.pl
 eg/scala
+eg/werck1.scl
 lib/Music/Intervals.pm
 lib/Music/Intervals/Numeric.pm
 lib/Music/Intervals/Ratios.pm

@@ -39,6 +39,7 @@ use DateTime;
 
 use AsposeSlidesCloud::Object::EffectFormat;
 use AsposeSlidesCloud::Object::FillFormat;
+use AsposeSlidesCloud::Object::Hyperlink;
 use AsposeSlidesCloud::Object::LineFormat;
 use AsposeSlidesCloud::Object::ResourceUri;
 use AsposeSlidesCloud::Object::ShapeBase;
@@ -282,6 +283,20 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'hyperlink_click' => {
+    	datatype => 'Hyperlink',
+    	base_name => 'HyperlinkClick',
+    	description => 'Hyperlink defined for mouse click.',
+    	format => '',
+    	read_only => '',
+    		},
+    'hyperlink_mouse_over' => {
+    	datatype => 'Hyperlink',
+    	base_name => 'HyperlinkMouseOver',
+    	description => 'Hyperlink defined for mouse over.',
+    	format => '',
+    	read_only => '',
+    		},
     'type' => {
     	datatype => 'string',
     	base_name => 'Type',
@@ -308,6 +323,8 @@ __PACKAGE__->swagger_types( {
     'effect_format' => 'EffectFormat',
     'three_d_format' => 'ThreeDFormat',
     'line_format' => 'LineFormat',
+    'hyperlink_click' => 'Hyperlink',
+    'hyperlink_mouse_over' => 'Hyperlink',
     'type' => 'string'
 } );
 
@@ -328,6 +345,8 @@ __PACKAGE__->attribute_map( {
     'effect_format' => 'EffectFormat',
     'three_d_format' => 'ThreeDFormat',
     'line_format' => 'LineFormat',
+    'hyperlink_click' => 'HyperlinkClick',
+    'hyperlink_mouse_over' => 'HyperlinkMouseOver',
     'type' => 'Type'
 } );
 

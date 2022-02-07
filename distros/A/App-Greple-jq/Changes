@@ -1,5 +1,11 @@
 Revision history for Perl extension App-Greple-jq
 
+0.05 2022-02-03T08:34:42Z
+
+    - introduce -Mjq::set=noif control
+    - do not use jq command if not available in test suite
+      (this is ok because test data is well-formatted)
+
 0.04 2022-02-01T10:19:43Z
 
     - introduce --NOT and --MUST option

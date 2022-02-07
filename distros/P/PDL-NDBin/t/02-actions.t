@@ -207,7 +207,7 @@ $got = icount( iter $x, $y, $N );
 is_pdl $got, $expected, "icount, input type short";
 $got = icount( iter $x->float, $y, $N );
 is_pdl $got, $expected, "icount, input type float";
-# the following test should succeed because a piddle without any bad values
+# the following test should succeed because an ndarray without any bad values
 # will be created automatically by _icount_loop() in place of the 'undef'
 $got = icount( iter undef, $y, $N );
 is_pdl $got, $expected, "icount, input undef";

@@ -2582,6 +2582,31 @@ for my ($left, $right, $gripping) (@moties) {1}
 END1
 for my ($left, $right, $gripping) (@moties) {1}
 END2
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 500
+try {1} catch ($e) {1}
+END1
+try {1} catch ($e) {1}
+END2
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 501
+mb::try {1} catch ($e) {1}
+END1
+try {1} catch ($e) {1}
+END2
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 502
+CORE::try {1} catch ($e) {1}
+END1
+CORE::try {1} catch ($e) {1}
+END2
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 503
+try {1} CORE::catch ($e) {1}
+END1
+try {1} CORE::catch ($e) {1}
+END2
+    sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 504
+try {1} mb::catch ($e) {1}
+END1
+try {1} catch ($e) {1}
+END2
 );
 
 $|=1; print "1..",scalar(@test),"\n"; my $testno=1; sub ok { print $_[0]?'ok ':'not ok ',$testno++,$_[1]?" - $_[1]\n":"\n" } ok($_->()) for @test;

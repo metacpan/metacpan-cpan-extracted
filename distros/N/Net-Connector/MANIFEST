@@ -4,7 +4,6 @@ MANIFEST
 META.yml
 Makefile.PL
 README
-_Deparsed_XSubs.pm
 dist.ini
 lib/Net/Connector.pm
 lib/Net/Connector/Cisco/Ios.pm

@@ -18,3 +18,15 @@ Revision history for Perl module Perl5::Dist::Backcompat
 
 0.06 Sat Jan 22 13:38:18 UTC 2022
     - Add --help option to p5-dist-backcompat
+
+0.07 Fri Feb  4 13:27:15 UTC 2022
+    - (Investigation only; not released to CPAN.)
+
+0.08 Fri Feb  4 15:01:11 UTC 2022
+    - (Investigation only; not released to CPAN.)
+
+0.09 Fri Feb  4 17:51:00 UTC 2022
+    - (Investigation only; not released to CPAN.)
+
+0.10 Fri Feb  4 21:12:20 UTC 2022
+    - Resolve problems with installation from CPAN.

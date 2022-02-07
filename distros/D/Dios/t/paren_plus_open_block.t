@@ -3,7 +3,7 @@ use warnings;
 
 package Foo;
 
-use Test::More "no_plan";
+use Test::More;
 use Dios;
 
 method foo(
@@ -14,3 +14,6 @@ method foo(
 }
 
 is( Foo->foo(23), 23 );
+
+done_testing;
+

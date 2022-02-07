@@ -10,20 +10,13 @@ any '/' => sub {
     my $notes = $c->param('notes') || 'C E G';
     $notes = [ split /[\s,]+/, $notes ];
 
-    my $size = $c->param('size') || 3;
-
-    my $m = Music::Intervals->new(
-      notes => $notes,
-      size  => $size,
-    );
+    my $m = Music::Intervals->new(notes => $notes);
 
     # Input form
     $c->stash( notes => join( ' ', @{ $m->notes } ) );
-    $c->stash( size => $m->size() );
 
     # Results
     for my $method (qw/
-        chord_names
         natural_frequencies natural_intervals natural_cents natural_prime_factors
         eq_tempered_frequencies eq_tempered_intervals eq_tempered_cents
         integer_notation
@@ -41,15 +34,9 @@ __DATA__
 <form action="/" method="post">
     <label for="notes">Notes:</label>
     <input type="text" name="notes" id="notes" value="<%= $notes %>">
-    <label for="size">Size:</label>
-    <input type="text" name="size" id="size" value="<%= $size %>" size="3">
     <br>
     <input type="submit" name="submit" id="submit" value="Submit">
 </form>
-
-% if ($chord_names) {
-<pre><%= $chord_names %></pre>
-% }
 
 % if ($natural_frequencies) {
 <pre><%= $natural_frequencies %></pre>

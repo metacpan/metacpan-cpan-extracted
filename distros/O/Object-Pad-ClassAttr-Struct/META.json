@@ -27,7 +27,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Object::Pad" : "0.57"
+            "Object::Pad" : "0.60"
          }
       },
       "test" : {
@@ -39,7 +39,7 @@
    "provides" : {
       "Object::Pad::ClassAttr::Struct" : {
          "file" : "lib/Object/Pad/ClassAttr/Struct.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -48,6 +48,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

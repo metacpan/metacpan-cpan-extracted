@@ -1,21 +1,31 @@
 # ABSTRACT: Perl Markdown Compiler
 package Markdown::Compiler;
 use Moo;
+use Markdown::Compiler::Source;
 use Markdown::Compiler::Lexer;
 use Markdown::Compiler::Parser;
 use Markdown::Compiler::Target::HTML;
 use Module::Runtime qw( use_module );
+use YAML::XS;
 
 has source => (
     is       => 'ro',
     required => 1,
 );
 
+has _source => (
+    is => 'ro',
+    lazy => 1,
+    builder => sub {
+        Markdown::Compiler::Source->new( source => shift->source );
+    }
+);
+
 has lexer => (
     is      => 'ro',
     lazy    => 1,
     builder => sub {
-        Markdown::Compiler::Lexer->new( source => shift->source );
+        Markdown::Compiler::Lexer->new( source => shift->_source->body );
     },
 );
 
@@ -73,7 +83,14 @@ has metadata => (
     is      => 'ro',
     lazy    => 1,
     builder => sub {
-        shift->compiler->metadata;
+        my ( $self ) = @_;
+
+        # Process YAML files with YAML::XS.
+        if ( $self->_source->metatype eq 'YAML' ) {
+            return Load( $self->_source->metadata );
+        }
+
+        return $self->_source->metadata;
     }
 );
 

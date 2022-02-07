@@ -1,0 +1,55 @@
+NAME
+
+    Object::Pad::FieldAttr::Isa - apply class type constraints to
+    Object::Pad fields
+
+SYNOPSIS
+
+       use Object::Pad;
+       use Object::Pad::FieldAttr::Isa;
+    
+       class ListNode {
+          has $next :param :reader :writer :Isa(ListNode) = undef;
+       }
+    
+       my $first = ListNode->new();
+       my $second = ListNode->new(next => $first);
+    
+       # This will fail
+       my $third = ListNode->new(next => "something else");
+    
+       # This will fail
+       $second->set_next("another thing");
+
+DESCRIPTION
+
+    This module provides a third-party field attribute for
+    Object::Pad-based classes, which declares that values assigned to the
+    field must conform to a given object type.
+
+    WARNING The ability for Object::Pad to take third-party field
+    attributes is still new and highly experimental, and subject to much
+    API change in future. As a result, this module should be considered
+    equally experimental.
+
+FIELD ATTRIBUTES
+
+ :Isa
+
+       has $field :Isa(CLASSNAME) ...;
+
+    Declares that any value assigned to the field must be an object
+    reference, and must be derived from the named class. Attempts to assign
+    a non-conforming value, such as a non-reference, or reference to a
+    class not derived from that named, will throw an exception, and the
+    field value will not be modified.
+
+    This type constraint is applied whenever the field itself is assigned
+    to, whether that is from :param initialisation, invoking a :writer or
+    :mutator accessor, or direct assignment into the field variable by
+    method code within the class.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

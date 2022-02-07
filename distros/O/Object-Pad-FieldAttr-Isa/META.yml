@@ -1,0 +1,28 @@
+---
+abstract: 'apply class type constraints to C<Object::Pad> fields'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  ExtUtils::CBuilder: '0'
+  Test::More: '0.88'
+  Test::Refcount: '0'
+configure_requires:
+  Module::Build: '0.4004'
+  Object::Pad::ExtensionBuilder: '0.57'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Object-Pad-FieldAttr-Isa
+provides:
+  Object::Pad::FieldAttr::Isa:
+    file: lib/Object/Pad/FieldAttr/Isa.pm
+    version: '0.03'
+requires:
+  Object::Pad: '0.60'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,11 +1,12 @@
-bin/date-tag
-bin/date-tag-file
-bin/remove-empty-dirs
-bin/save
-lib/App/Utils.pm
+bin/date-tag		Print a date-time tag in form C<YYYY-MM-DD-hhmmss>
+bin/date-tag-file	Pre-tag filename with timestamp of last modification
+bin/move-merge		Merges directories into one target directory
+bin/remove-empty-dirs	Remove recursively empty directories
+bin/save		Save snapshot of given files in C<saved.d> directory
+lib/App/Utils.pm	All command-line utilities packaged in module
 ChangeLog
 LICENSE
-MANIFEST				This list of files
+MANIFEST		This list of files
 Makefile.PL
 README.pod
 META.yml                                 Module YAML meta-data (added by MakeMaker)

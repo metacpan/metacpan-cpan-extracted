@@ -2,7 +2,7 @@ use 5.014;
 use strict;
 use warnings;
 
-use Test::More 'no_plan';
+use Test::More;
 
 use attributes;
 
@@ -49,3 +49,6 @@ use attributes;
     ::ok($cb_called, 'attribute handler got called');
     ::is_deeply($attrs, [qw/Bar Moo(:Ko{oh) Baz(fu{bar:)/], '... with the right attributes');
 }
+
+done_testing;
+

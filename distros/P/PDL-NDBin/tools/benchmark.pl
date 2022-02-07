@@ -241,7 +241,7 @@ if( $opt->output ) {
 	print "\n";
 }
 
-print "Norm of difference between output piddles:\n";
+print "Norm of difference between output ndarrays:\n";
 my $table = Text::TabularDisplay->new( '', keys %output );
 for my $row ( keys %output ) {
 	my @elem = map { my $diff = eval { $output{ $row } - $output{ $_ } };

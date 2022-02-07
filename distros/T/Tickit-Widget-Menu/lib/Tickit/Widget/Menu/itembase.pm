@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.42;
 
-package Tickit::Widget::Menu::itembase 0.14;
+package Tickit::Widget::Menu::itembase 0.15;
 role Tickit::Widget::Menu::itembase;
 
 has $_name :param :reader = undef;

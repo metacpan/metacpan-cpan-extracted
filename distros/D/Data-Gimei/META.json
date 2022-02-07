@@ -1,10 +1,10 @@
 {
-   "abstract" : "a Perl port of Ruby's gimei.",
+   "abstract" : "a Perl port of Ruby's gimei generates fake data in Japanese.",
    "author" : [
-      "NAKAJIMA Yusaku < example@example.com >"
+      "NAKAJIMA Yusaku < youpong@cpan.org >"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.12",
+   "generated_by" : "Minilla/v3.1.14",
    "license" : [
       "mit"
    ],
@@ -49,6 +49,7 @@
             "YAML::XS" : "0",
             "feature" : "0",
             "namespace::clean" : "0",
+            "perl" : "5.022001",
             "version" : "0"
          }
       },
@@ -61,7 +62,7 @@
    "provides" : {
       "Data::Gimei" : {
          "file" : "lib/Data/Gimei.pm",
-         "version" : "v0.0.4"
+         "version" : "v0.0.5"
       },
       "Data::Gimei::Address" : {
          "file" : "lib/Data/Gimei/Address.pm"
@@ -84,7 +85,7 @@
          "web" : "https://github.com/youpong/pl-gimei"
       }
    },
-   "version" : "v0.0.4",
+   "version" : "v0.0.5",
    "x_contributors" : [
       "NAKAJIMA Yusaku <yupong7@gmail.com>",
       "youpong <43817652+youpong@users.noreply.github.com>"

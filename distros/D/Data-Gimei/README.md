@@ -1,13 +1,13 @@
 [![Actions Status](https://github.com/youpong/pl-gimei/workflows/test/badge.svg)](https://github.com/youpong/pl-gimei/actions)
 # NAME
 
-Data::Gimei - a Perl port of Ruby's gimei.
+Data::Gimei - a Perl port of Ruby's gimei generates fake data in Japanese.
 
 # SYNOPSIS
 
     use utf8;
     binmode STDOUT, ":utf8";
-    use feature ':5.30';
+    use feature ':5.12';
 
     use Data::Gimei;
     my $name = Data::Gimei::Name->new();
@@ -73,10 +73,10 @@ output of repeated method calls.
 
 # INSTALL
 
-This module is not available at CPAN yet.  You can install this module
+This module is available on CPAN.  You can install this module
 by following the step below.
 
-    $ cpanm Data-Gimei-v0.0.2.tar.gz
+    $ cpanm Data::Gimei
 
 # LICENSE
 
@@ -86,4 +86,4 @@ Dictionary YAML file is generated from naist-jdic.
 
 # AUTHOR
 
-NAKAJIMA Yusaku < example@example.com >
+NAKAJIMA Yusaku < youpong@cpan.org >

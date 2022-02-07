@@ -66,5 +66,6 @@ t/subtype_in_class.t
 t/has_misc.t
 t/redeclared_attr_name.t
 t/comment_out_param.t
+t/build_with_parameters.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

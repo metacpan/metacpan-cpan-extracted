@@ -1,7 +1,5 @@
 package Podman::System;
 
-##! Provide system level information for the Podman service.
-
 use strict;
 use warnings;
 use utf8;
@@ -9,10 +7,10 @@ use utf8;
 use Moose;
 
 use List::Util ();
+use Scalar::Util ();
 
 use Podman::Client;
 
-### [Podman::Client](Client.html) API connector.
 has 'Client' => (
     is      => 'ro',
     isa     => 'Podman::Client',
@@ -20,26 +18,10 @@ has 'Client' => (
     default => sub { return Podman::Client->new() },
 );
 
-###  Return information about disk usage for containers, images and volumes.
-###
-### ```
-###     use Podman::Client;
-###
-###     my $System = Podman::System->new(Client => Podman::Client->new());
-###
-###     my $DiskUsage = $System->DiskUsage();
-###     is(ref $DiskUsage, 'HASH', 'DiskUsage object ok.');
-###
-###     my @Keys = sort keys %{ $DiskUsage };
-###     my @Expected = (
-###         'Containers',
-###         'Images',
-###         'Volumes',
-###     );
-###     is_deeply(\@Keys, \@Expected, 'DiskUsage object complete.');
-### ```
 sub DiskUsage {
     my $Self = shift;
+
+    $Self = __PACKAGE__->new() if !Scalar::Util::blessed($Self);
 
     my $Data = $Self->Client->Get('system/df');
 
@@ -58,18 +40,11 @@ sub DiskUsage {
     return \%DiskUsage;
 }
 
-### Obtain a dictionary of versions for the Podman components.
-### ```
-###     use Podman::Client;
-###
-###     my $System = Podman::System->new(Client => Podman::Client->new());
-###
-###     my $Version = $System->Version();
-###     is(ref $Version, 'HASH', 'Version object ok.');
-###     is($Version->{Version}, '3.0.1', 'Version number ok.');
-### ```
 sub Version {
     my $Self = shift;
+
+    $Self = __PACKAGE__->new() if !Scalar::Util::blessed($Self);
+
 
     my $Data = $Self->Client->Get('info');
 
@@ -83,3 +58,66 @@ sub Version {
 __PACKAGE__->meta->make_immutable;
 
 1;
+
+=encoding utf8
+
+=head1 NAME
+
+Podman::System - Service information.
+
+=head1 SYNOPSIS
+
+    # Create and use system controller
+    my $System = Podman::System->new();
+    my $Version = $System->Version();
+
+    # Get disk usage info
+    my $Disk = Podman::System->DiskUsage();
+
+    # Get components version
+    Podman::System->Version();
+
+=head1 DESCRIPTION
+
+L<Podman::Service> provides system level information for a Podman service.
+
+=head1 ATTRIBUTES
+
+=head2 Client
+
+    my $Client = Podman::Client->new(
+        Connection => 'http+unix:///var/cache/podman.sock' );
+    my $Images = Podman::Images->new( Client => $Client );
+
+Optional L<Podman::Client> object.
+
+=head1 METHODS
+
+=head2 DiskUsage
+
+    my $DiskUsage = Podman::System->DiskUsage();
+
+Return information about disk usage for containers, images and volumes.
+
+=head2 Version
+
+    my $Version = Podman::System->Version();
+
+Obtain a dictionary of versions for the Podman service components.
+
+=head1 AUTHORS
+
+=over 2
+
+Tobias Schäfer, <tschaefer@blackox.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2022-2022, Tobias Schäfer.
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Artistic License version 2.0.
+
+=cut

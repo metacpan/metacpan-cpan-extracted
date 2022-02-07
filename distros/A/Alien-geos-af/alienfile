@@ -133,13 +133,13 @@ share {
 
 
 gather [
+  \&update_geos_config,
   \&copy_geos_c_dll,
   \&copy_geos_so_on_bsd,
   #\&pause,
   #  get all the geos-config fields
   \&set_runtime_props_from_config,
 ];
-
 
 #  a bit brute force
 sub copy_geos_c_dll {
@@ -231,10 +231,10 @@ sub set_rectangle_intersection {
     }
 }
 
-sub set_runtime_props_from_config {
+sub update_geos_config {
     my ($build) = @_;
-    
-    say 'set_runtime_props_from_config: Currently in ' . getcwd();
+
+    $build->log ('updating geos-config to use dynamic base dir');
     use File::Find::Rule;
     my ($geos_config)
       = $build->install_type eq 'share'
@@ -243,24 +243,80 @@ sub set_runtime_props_from_config {
                 ->name( 'geos-config' )
                 ->in( getcwd() )
           : 'geos-config';
-    
-    my $bin_sh = '';
-    if ($on_windows) {
-        eval 'require Alien::MSYS';
-        #$ENV{PATH} .= ';' . Alien::MSYS->msys_path;
-        #say $ENV{PATH};
-        $bin_sh = Alien::MSYS->msys_path . '/sh';
+
+    open my $fh , '<', $geos_config
+      or die "Could not open $geos_config for reading, $!";
+    my $file_contents;
+
+    while (my $line = <$fh>) {
+        if ($line =~ /^\s*prefix=/) {
+            #  MSYS1 does not have realpath
+            #if (not $^O =~ /bsd/i) {
+                my $part1
+                  = q{BASEPATH=`perl -MCwd -MFile::Basename -e"print File::Basename::dirname(Cwd::abs_path (qq{$0}))"`};
+                #  some variants use an escape function
+                my $part2 = $line =~ /`escape/
+                  ? 'prefix=`escape "${BASEPATH}"`'
+                  : 'prefix="${BASEPATH}"';
+                my $part3 = 'prefix=$(dirname ${prefix})';
+                $line = "$part1\n$part2\n$part3\n";
+            #}
+            #else {
+            #    #my $part1 = q{BASEPATH=$(dirname $(realpath $0))};
+            #    my $part2 = $line =~ /`escape/
+            #      ? 'prefix=`escape "$0"`'
+            #      : 'prefix="$0"';
+            #    my $part3 = 'prefix=$(dirname $(realpath $0))';
+            #    $line = "$part2\n$part3\n";
+            #}
+        }
+        $file_contents .= $line;
     }
-    #else {
-    #    $bin_sh = `which sh`;
-    #}
+    $fh->close;
+    my $permissions = (stat ($geos_config))[2];
+    rename $geos_config, "$geos_config.bak";
+    open my $ofh, '>', $geos_config
+      or die "Could not open $geos_config for writing, $!";
+    print {$ofh} $file_contents;
+    $ofh->close or die $!;
+    #  make sure we get the same permissions
+    chmod $permissions, $geos_config or die $!;
+    return;
+}
+
+sub set_runtime_props_from_config {
+    my ($build) = @_;
+
+    $build->log ('set_runtime_props_from_config: Currently in ' . getcwd());
+
+    $build->log("UPDATING PKG_CONFIG_PATH");
     
-    foreach my $flag (qw /cflags libs
-                          clibs cclibs
-                          ldflags includes
-                          static-clibs static-cclibs/) {
-        say "Calling: $bin_sh $geos_config --$flag";
-        $build->runtime_prop->{$flag} = `$bin_sh $geos_config --$flag`;
+    use Env qw /@PKG_CONFIG_PATH @PATH/;
+    use Capture::Tiny;
+    use Path::Tiny;
+
+    # should use proper Alien::Build methods to get location of file     
+    use File::Find::Rule;
+    my ($pk_config)
+      = $build->install_type eq 'share'
+          ? File::Find::Rule
+                ->file()
+                ->name( 'geos.pc' )
+                ->in( getcwd() )
+          : 'geos.pc';
+    
+    my $pk_path = path($pk_config)->parent->stringify;
+    unshift @PKG_CONFIG_PATH, $pk_path;
+    $build->log("PKG_CONFIG_PATH is $ENV{PKG_CONFIG_PATH}");
+
+    #  should use perl package api?
+    my $pkgconf = File::Which::which ('pkg-config') || File::Which::which ('ppkg-config');
+    foreach my $flag (qw /cflags libs static/) {
+        my @cmd = ($pkgconf, "--$flag", 'geos');
+        $build->log("Calling: " . join ' ', @cmd);
+        my ($stdout, $stderr, @result) = Capture::Tiny::capture {system @cmd};
+        $build->log("ERROR: $stderr") if $stderr;
+        $build->runtime_prop->{$flag} = $stdout;
         $build->runtime_prop->{$flag} =~ s/[\r\n]+$//;  #  generic chomp
         if ($on_windows) {
             #  windowsify the paths
@@ -270,7 +326,7 @@ sub set_runtime_props_from_config {
             #  maybe will help?
             $build->runtime_prop->{$flag} =~ s/-\d+$//;
         }
-        say "Runtime prop $flag is " . $build->runtime_prop->{$flag};
+        $build->log ("Runtime prop $flag is " . $build->runtime_prop->{$flag});
     }
 }
 

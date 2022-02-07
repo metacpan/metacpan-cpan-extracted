@@ -9,6 +9,7 @@ dist.ini
 lib/Markdown/Compiler.pm
 lib/Markdown/Compiler/Lexer.pm
 lib/Markdown/Compiler/Parser.pm
+lib/Markdown/Compiler/Source.pm
 lib/Markdown/Compiler/Target/HTML.pm
 lib/Markdown/Compiler/Target/Plogitty.pm
 lib/Markdown/Compiler/Target/Tree.pm
@@ -23,7 +24,8 @@ t/01_paragraph/06_images.t
 t/01_paragraph/07_inlinecode.t
 t/01_paragraph/08_zero_exists.t
 t/02_codeblock/01_codeblock.t
-t/03_metadata.t
+t/03_metadata/01_yaml_metadata.t
+t/03_metadata/02_json_metadata.t
 t/04_list/01_simple.t
 t/04_list/02_nested.t
 t/04_list/03_numbered.t

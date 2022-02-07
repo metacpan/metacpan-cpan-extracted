@@ -192,3 +192,22 @@ Revision history for Dios
 
         * Fixed initialization of objects with BUILD methods
           (thanks, Felix!)
+
+
+0.002012  Fri Feb  4 00:29:58 2022
+
+        * Fixed internal bug when calling B::Deparse::ambient_pragmas()
+          under Perl 5.30 and later
+
+        * Fixed bug in submethod invocation
+          (did not actually restrict to class)
+
+        * Added compile-time error message when BUILD() methods
+          use a named argument with the same name as an attribute
+          (it already didn't work; now it reports the problem)
+
+        * Fixed internal usage of overload::Method()
+          (thanks, Hugo!)
+
+        * Documented failure under Perl 5.20 and
+          Keyword::Simple 0.3 requirement under Perl 5.14 and 5.16

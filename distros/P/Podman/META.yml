@@ -29,5 +29,5 @@ resources:
   homepage: https://github.com/tschaefer/podman-perl
   license: http://dev.perl.org/licenses
   repository: https://github.com/tschaefer/podman-perl.git
-version: '20220129.0'
+version: '20220203.0'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

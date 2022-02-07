@@ -11,9 +11,9 @@ use Exporter qw(import);
 use List::Util qw(first max);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-21'; # DATE
+our $DATE = '2022-01-23'; # DATE
 our $DIST = 'Perinci-Result-Format-Lite'; # DIST
-our $VERSION = '0.283'; # VERSION
+our $VERSION = '0.285'; # VERSION
 
 our @EXPORT_OK = qw(format);
 
@@ -356,7 +356,7 @@ sub __gen_table {
                 rows => $data,
                 header_row => $header_row,
                 backend => $backend,
-                (title => $resmeta->{title}) x !!defined($resmeta->{title}),
+                (caption => $resmeta->{caption}) x !!defined($resmeta->{caption}),
             );
         } else {
             require Text::Table::Sprintf;
@@ -551,11 +551,22 @@ Perinci::Result::Format::Lite - Format enveloped result
 
 =head1 VERSION
 
-This document describes version 0.283 of Perinci::Result::Format::Lite (from Perl distribution Perinci-Result-Format-Lite), released on 2022-01-21.
+This document describes version 0.285 of Perinci::Result::Format::Lite (from Perl distribution Perinci-Result-Format-Lite), released on 2022-01-23.
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
+
+This module formats L<enveloped result structure|Rinci::function/"Enveloped
+result"> to "pretty text" if it can do so, e.g. the structure can be represented
+as a 2-dimensional table. Otherwise, it falls back to JSON or Perl. The table
+formats supported include CSV, TSV, LTSV, or HTML. More table formats (e.g. Org,
+Markdown) are supported via L<Text::Table::Any> when you set
+L</"FORMAT_PRETTY_TABLE_BACKEND">.
+
+This module is a more lightweight version of L<Perinci::Result::Format> but the
+long-term goal is to reunite the two formatting modules back to a
+modular/pluggable module.
 
 =for Pod::Coverage ^(firstidx)$
 
@@ -565,12 +576,12 @@ This document describes version 0.283 of Perinci::Result::Format::Lite (from Per
 
 =head1 ENVIRONMENT
 
-=head2 FORMAT_PRETTY_TABLE_BACKEND => str
+=head2 FORMAT_PRETTY_TABLE_BACKEND
 
-If this is set, will render text table using L<Text::Table::Any> (with
-C<backend> set to the value of this environment variable) instead of the default
-L<Text::Table::Sprintf>. This is useful if you want to output text table in a
-different format, for example to generate Org tables (make sure
+Str, optional. If this is set, will render text table using L<Text::Table::Any>
+(with C<backend> set to the value of this environment variable) instead of the
+default L<Text::Table::Sprintf>. This is useful if you want to output text table
+in a different format, for example to generate Org tables (make sure
 L<Text::Table::Org> backend is already installed):
 
  % FORMAT_PRETTY_TABLE_BACKEND=Text::Table::Org lcpan rdeps Getopt::Lucid

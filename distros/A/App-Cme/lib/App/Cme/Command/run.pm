@@ -10,7 +10,7 @@
 # ABSTRACT: Run a cme script
 
 package App::Cme::Command::run ;
-$App::Cme::Command::run::VERSION = '1.036';
+$App::Cme::Command::run::VERSION = '1.037';
 use strict;
 use warnings;
 use v5.20;
@@ -18,6 +18,7 @@ use File::HomeDir;
 use Path::Tiny;
 use Config::Model;
 use Log::Log4perl qw(get_logger :levels);
+use YAML::PP;
 
 use Encode qw(decode_utf8);
 
@@ -128,29 +129,20 @@ sub replace_var_in_value ($user_args, $script_var, $default, $missing, $vars) {
     return;
 }
 
-sub parse_script ($script, $content, $user_args, $app_args) {
-    my %var;
-
-    # find if all variables are accounted for
-    my %missing ;
-
+sub parse_script_lines ($script, $lines) {
     # provide default values
     my %default ;
-
-    # %args can be used in var section of a script. A new entry in
-    # added in %missing if the script tries to read an undefined value
-    tie my %args, 'App::Cme::Run::Var', \%missing, \%default;
-    %args = $user_args->%*;
-
-    my @lines =  split /\n/,$content;
     my @load;
     my @doc;
+    my @code;
+    my @var;
     my $commit_msg ;
+    my $app;
     my $line_nb = 0;
 
     # check content, store app
-    while (@lines) {
-        my $line = shift @lines;
+    while ($lines->@*) {
+        my $line = shift $lines->@*;
         $line_nb++;
         $line =~ s/#.*//; # remove comments
         $line =~ s/^\s+//;
@@ -159,9 +151,9 @@ sub parse_script ($script, $content, $user_args, $app_args) {
 
         if ($line =~ /^---\s*(\w+)$/) {
             $key = $1;
-            while ($lines[0] !~ /^---/) {
-                $lines[0] =~ s/#.*//; # remove comments
-                push @value,  shift @lines;
+            while ($lines->[0] !~ /^---/) {
+                $lines->[0] =~ s/#.*//; # remove comments
+                push @value,  shift $lines->@*;
             }
         }
         elsif ($line eq '---') {
@@ -173,26 +165,27 @@ sub parse_script ($script, $content, $user_args, $app_args) {
 
         next unless $key ; # empty line
 
-        replace_var_in_value($user_args, \%var, \%default, \%missing, \@value) unless $key eq 'var';
-
         for ($key) {
             when (/^app/) {
-                unshift @$app_args, @value;
+                $app = $value[0];
             }
             when ('var') {
-                # value comes from system file, not from user data
-                my $res = eval ("@value") ; ## no critic (ProhibitStringyEval)
-                die "Error in var specification line $line_nb: $@\n" if $@;
+                push @var, [ $line_nb, @value ];
             }
             when ('default') {
                 # multi-line default value is not supported
                 my ($dk, $dv) = split /[\s:=]+/, $value[0], 2;
                 $default{$dk} = $dv;
             }
+            when ('code') {
+                die "Error line $line_nb: Cannot mix code and load section\n" if @load;
+                push @code, @value;
+            }
             when ('doc') {
                 push @doc, @value;
             }
             when ('load') {
+                die "Error line $line_nb: Cannot mix code and load section\n" if @code;
                 push @load, @value;
             }
             when ('commit') {
@@ -203,12 +196,90 @@ sub parse_script ($script, $content, $user_args, $app_args) {
             }
         }
     }
+
     return {
+        app => $app,
         doc => \@doc,
+        code => \@code,
         commit_msg => $commit_msg,
-        missing => \%missing,
+        default => \%default,
         load => \@load,
+        var => \@var,
     }
+}
+
+sub process_script_vars ($user_args, $data) {
+    # $var is used in eval'ed strings
+    my %var;
+
+    # find if all variables are accounted for
+    $data->{missing} = {};
+
+    # %args can be used in var section of a script. A new entry in
+    # added in %missing if the script tries to read an undefined value
+    tie my %args, 'App::Cme::Run::Var',$data->{missing}, $data->{default};
+    %args = $user_args->%*;
+
+    my $var = delete $data->{var} // [];
+    foreach my $eval_data ($var->@*) {
+        my ($line_nb, @value);
+        if (ref $eval_data) {
+            # coming from text format
+            ($line_nb, @value) = $eval_data->@*;
+            # eval'ed string comes from system file, not from user data
+            my $res = eval ("@value") ; ## no critic (ProhibitStringyEval)
+            die "Error in var specification line $line_nb: $@\n" if $@;
+        }
+        else {
+            # coming from YAML format
+            my $res = eval ($eval_data) ; ## no critic (ProhibitStringyEval)
+            die "Error in var specification: $@\n" if $@;
+        }
+    }
+
+    replace_var_in_value($user_args, \%var, $data->{default},$data->{missing}, $data->{doc});
+    replace_var_in_value($user_args, \%var, $data->{default},$data->{missing}, $data->{load});
+
+    $data->{values} = {$data->{default}->%*, %var, $user_args->%*};
+
+    return $data;
+}
+
+sub parse_script ($script, $content, $user_args) {
+    my $lines->@* =  split /\n/,$content;
+
+    given ($lines->[0]) {
+        when (/Format: perl/i) {
+            ## no critic (ProhibitStringyEval)
+            my $data = eval($content);
+            die "Error in script $script (Perl format): $@\n" if $@;
+            foreach my $forbidden (qw/load var default/) {
+                die "Unexpected '$forbidden\ section in Perl format script $script\n" if $data->{$forbidden};
+            }
+            die "Unexpected 'code' section in Perl format script $script. Please use a sub section.\n" if $data->{code};
+            return $data;
+        }
+        when (/Format: yaml/i) {
+            my $ypp = YAML::PP->new;
+            my $data = $ypp->load_string($content);
+            foreach my $key (qw/doc code load var/) {
+                next unless defined $data->{$key};
+                next if ref $data->{$key} eq 'ARRAY';
+                $data->{$key} = [ $data->{$key} ]
+            }
+            if ($data->{default} and ref $data->{default} ne 'HASH') {
+                die "default spec must be a hash ref, not a ", ref $data->{default} // 'scalar', "\n";
+            }
+            $data = process_script_vars ($user_args, $data);
+            return $data;
+        }
+        default {
+            my $data = parse_script_lines ($script, $lines);
+            $data = process_script_vars ($user_args, $data);
+            return $data;
+        }
+    }
+
 }
 
 sub execute {
@@ -242,7 +313,7 @@ sub execute {
         return;
     }
 
-    my $script_data = parse_script($script, $content, \%user_args, $app_args);
+    my $script_data = parse_script($script, $content, \%user_args);
     my $commit_msg = $script_data->{commit_msg};
 
     if ($opt->doc) {
@@ -256,7 +327,7 @@ sub execute {
             ."Please use option '".join(' ', map { "-arg $_=xxx"} @missing)."'\n";
     }
 
-    $self->process_args($opt, $app_args);
+    $self->process_args($opt, [ $script_data->{app}, $app_args->@* ]);
 
     # override commit message. may also trigger a commit even if none
     # is specified in script
@@ -276,7 +347,23 @@ sub execute {
 
     # call loads
     my ($model, $inst, $root) = $self->init_cme($opt,$app_args);
-    map { $root->load($_) } $script_data->{load}->@*;
+    foreach my $load_str ($script_data->{load}->@*) {
+        $root->load($load_str);
+    }
+
+    if ($script_data->{code}) {
+        my $to_run = '';
+        while (my ($name, $value) = each $script_data->{values}->%*) {
+            $to_run .= "my \$$name = '$value';\n";
+        }
+        $to_run .= join("\n",$script_data->{code}->@*);
+        my $res = eval($to_run); ## no critic (ProhibitStringyEval)
+        die "Error in code specification: $@\ncode is: \n$to_run\n" if $@;
+    }
+
+    if ($script_data->{sub}) {
+        $script_data->{sub}->($root, \%user_args);
+    }
 
     unless ($inst->needs_save) {
         say "No change were applied";
@@ -294,7 +381,7 @@ sub execute {
 }
 
 package App::Cme::Run::Var; ## no critic (Modules::ProhibitMultiplePackages)
-$App::Cme::Run::Var::VERSION = '1.036';
+$App::Cme::Run::Var::VERSION = '1.037';
 require Tie::Hash;
 
 ## no critic (ClassHierarchies::ProhibitExplicitISA)
@@ -322,7 +409,7 @@ App::Cme::Command::run - Run a cme script
 
 =head1 VERSION
 
-version 1.036
+version 1.037
 
 =head1 SYNOPSIS
 
@@ -361,8 +448,7 @@ version 1.036
 
 =head1 DESCRIPTION
 
-Run a script written with cme DSL (Design specific language) or in
-plain Perl.
+Run a script written for C<cme>
 
 A script passed by name is searched in C<~/.cme/scripts>,
 C</etc/cme/scripts> or C</usr/share/perl5/Config/Model/scripts>.
@@ -373,9 +459,34 @@ C</usr/share/perl5/Config/Model/scripts/foo>
 No search is done if the script is passed with a path
 (e.g. C<cme run ./foo>)
 
+C<cme run> accepts scripts written with different syntaxes:
+
+=over
+
+=item in text
+
+For simple script, this text specifies the target app, the doc,
+optional variables and a load string used by L<Config::Model::Loader> or
+Perl code.
+
+=item YAML
+
+Like text above, but using Yaml syntax.
+
+=item Perl data structure
+
+Writing Perl code in a text file or in a YAML field can be painful as
+Perl syntax is not highlighted. With a Perl data structure, a cme
+script specifies the target app, the doc, optional variables, and a
+perl subroutine (see below).
+
+=item plain Perl script
+
 C<cme run> can also run plain Perl script. This is syntactic sugar to
 avoid polluting global namespace, i.e. there's no need to store a
 script using L<cme function|Config::Model/cme> in C</usr/local/bin/>.
+
+=back
 
 When run, this script:
 
@@ -387,7 +498,7 @@ opens the configuration file of C<app>
 
 =item *
 
-applies the modifications specified with C<load> instructions
+applies the modifications specified with C<load> instructions or the Perl code.
 
 =item *
 
@@ -401,7 +512,7 @@ commits the result if C<commit> is specified (either in script or on command lin
 
 See L<App::Cme::Command::run> for details.
 
-=head1 Syntax
+=head1 Syntax of text format
 
 The script accepts instructions in the form:
 
@@ -424,6 +535,14 @@ The script accepts the following instructions:
 Specify the target application. Must be one of the application listed
 by C<cme list> command. Mandatory. Only one C<app> instruction is
 allowed.
+
+=item default
+
+Specify default values that can be used in C<load> or C<var> sections.
+
+For instance:
+
+ default: name=foobar
 
 =item var
 
@@ -448,6 +567,10 @@ L<Config::Model::Loader>. This string can contain variable
 foo=bar>) or by a variable set in var: line (e.g. C<$var{foo}> as set
 above) or by an environment variable (e.g. C<$ENV{foo}>)
 
+=item code
+
+Specify Perl code to run. See L</code section> for details.
+
 =item commit
 
 Specify that the change must be committed with the passed commit
@@ -471,6 +594,91 @@ transforms the instruction:
 in
 
   load: ! a=foo b=bar
+
+=head2 Example
+
+Here's an example from L<libconfig-model-dpkg-perl scripts|https://salsa.debian.org/perl-team/modules/packages/libconfig-model-dpkg-perl/-/blob/master/lib/Config/Model/scripts/add-me-to-uploaders>:
+
+  doc: add myself to Uploaders
+  app: dpkg-control
+  load: source Uploaders:.insort("$DEBFULLNAME <$DEBEMAIL>")
+  commit: add $DEBEMAIL to Uploaders
+
+=head2 Code section
+
+The code section can contain variable (e.g. C<$foo>) which are replaced by
+command argument (e.g. C<-arg foo=bar>) or by a variable set in var:
+line (e.g. C<$var{foo}> as set above).
+
+When evaluated the following variables are also set:
+
+=over
+
+=item $root
+
+Root node of the configuration (See L<Config::Model::Node>)
+
+=item $inst
+
+Configuration instance (See L<Config::Model::Instance>)
+
+=item $commit_msg
+
+Message used to commit the modification.
+
+=back
+
+Since the code is run in an C<eval>, other variables are available
+(like C<$self>) to shoot yourself in the foot.
+
+For example:
+
+ app:  popcon
+ ---code
+ $root->fetch_element('MY_HOSTID')->store($to_store);
+ ---
+
+=head1 Syntax of YAML format
+
+This format is intented for people not wanting to user the text format
+above. It supoorts the same parameters as the text format.
+
+For instance:
+
+ # Format: YAML
+ ---
+ app: popcon
+ default:
+   defname: foobar
+ var: "$var{name} = $args{defname}"
+ load: "! MY_HOSTID=$name"
+
+=head1 Syntax of Perl format
+
+This format is intended for more complex script where using C<load>
+instructions is not enough.
+
+This script must then begin with C<# Format: perl> and specifies a
+hash. For instance:
+
+ # Format: perl
+ {
+      app => 'popcon', # mandatory
+      doc => "Use --arg to_store=a_value to store a_value in MY_HOSTID',
+      commit => "control: update Vcs-Browser and Vcs-Git"
+      sub => sub ($root, $arg) { $root->fetch_element('MY_HOSTID')->store($arg->{to_store}); }
+ }
+
+C<$root> is the root if the configuration tree (See L<Config::Model::Node>).
+C<$arg> is a hash containing the arguments passed to C<cme run> with C<-arg> options.
+
+The C<sub> parameter value must be a sub ref. Its parameters are
+C<$root> (a L<Config::Model::Node> object containing the root of the
+configuration tree) and C<$arg> (a hash ref containing the keys and
+values passed to C<cme run> wiht C<--arg> options).
+
+Note that this format does not support C<var>, C<default> and C<load>
+parameters as you can easily achieve the same result with Perl code.
 
 =head1 Options
 

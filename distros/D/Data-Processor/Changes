@@ -1,3 +1,10 @@
+1.0.9  2022-02-04 13:59:51 CET
+
+    - (hadfl) Merging schemata where a member has a transformer defined in the "other" schema is not possible. Allow it when both transformers point to the same transformer or just one of them has defined a transformer.
+    - (hadfl) Merging schemata where both members have the same validator for a member leads to running the validator twice.
+    - (hadfl) Default values override values that evaluate to false.
+    Using values as default values that evaluate to false are ignored.
+
 1.0.7  2021-10-27 07:42:33 CEST
        2021-10-27
     - (hadfl) transform sibling values before validating

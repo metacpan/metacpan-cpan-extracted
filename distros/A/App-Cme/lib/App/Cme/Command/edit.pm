@@ -10,7 +10,7 @@
 # ABSTRACT: Edit the configuration of an application
 
 package App::Cme::Command::edit ;
-$App::Cme::Command::edit::VERSION = '1.036';
+$App::Cme::Command::edit::VERSION = '1.037';
 use strict;
 use warnings;
 use 5.10.1;
@@ -124,7 +124,7 @@ App::Cme::Command::edit - Edit the configuration of an application
 
 =head1 VERSION
 
-version 1.036
+version 1.037
 
 =head1 SYNOPSIS
 
