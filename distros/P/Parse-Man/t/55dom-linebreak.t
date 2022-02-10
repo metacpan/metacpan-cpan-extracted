@@ -1,8 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-use strict;
+use v5.14;
+use warnings;
 
-use Test::More tests => 8;
+use Test::More;
 
 use Parse::Man::DOM;
 
@@ -35,3 +36,5 @@ ok( $chunks[1]->is_linebreak,      '$chunks[1] is a linebreak' );
 is( $chunks[2]->text, "bold",      '$chunks[2]' );
 ok( $chunks[3]->is_linebreak,      '$chunks[3] is a linebreak' );
 is( $chunks[4]->text, "text",      '$chunks[4]' );
+
+done_testing;

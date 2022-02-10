@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="Owner" content="Andrey V.Kosteltsev">
+  <meta name="author" content="Andrey V.Kosteltsev">
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <META HTTP-EQUIV="Content-script-type" CONTENT="text/javascript">
+  <META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+  <title>Requires Tree</title>
+
+<!-- styles .css -->
+<style>
+@import url(http://fonts.googleapis.com/css?family=Roboto:400,700italic,700,500italic,500,400italic&subset=cyrillic-ext,latin);
+@import url(http://fonts.googleapis.com/css?family=Cousine:400,400italic,700,700italic&subset=cyrillic-ext,latin);
+</style>
+
+<style>
+body, html {
+  margin: 0 0 0 0;
+}
+
+#front_wrapper {
+  margin: 0 auto;
+  height: 100vh;
+  position: relative;
+  overflow: auto;
+  background-color: #ececec;
+}
+
+#tree_view {
+  overflow-y: hidden;
+  overflow-x: hidden;
+  margin: 0 auto;
+  min-height: 256px;
+  width: 2720px;
+  border: 0px solid #e7e7e7;
+}
+
+.header-wrapper {
+  height: 160px;
+  width: 100%;
+  margin: 0 auto;
+  position: relative;
+  background: transparent;
+}
+
+.content-wrapper {
+  background-color: #ffffff;
+}
+
+.footer-wrapper {
+  background: #ececec;
+}
+
+.content {
+  width: 1018px;
+  min-height: 256px;
+  padding: 18px 3px 12px 3px; /* top, right, bottom, left */
+  margin: 0 auto;
+  background-color: #fdfdfd;
+  position: relative;
+  overflow: hidden;
+  align: center;
+  border: 1px solid #e7e7e7;
+}
+
+.footer {
+  width: 1022px;
+  height: 48px;
+  margin: 0 auto;
+
+  -moz-border-radius-topleft: 0px;
+  -moz-border-radius-topright: 0px;
+  -moz-border-radius-bottomright: 8px;
+  -moz-border-radius-bottomleft: 8px;
+
+  -webkit-border-top-left-radius: 0px;
+  -webkit-border-top-right-radius: 0px;
+  -webkit-border-bottom-left-radius: 8px;
+  -webkit-border-bottom-right-radius: 8px;
+
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+
+  border: 1px solid #000000;
+  background-color: #212121;
+
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#212121), to(#000000));
+  background-image: -webkit-linear-gradient(top, #212121 0%, #000000 100%);
+  background-image:    -moz-linear-gradient(top, #212121 0%, #000000 100%);
+  background-image:      -o-linear-gradient(top, #212121 0%, #000000 100%);
+  background-image:         linear-gradient(to bottom, #212121 0%, #000000 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#212121', endColorstr='#000000', GradientType=0);
+  background-repeat: repeat-x;
+}
+
+.footer-top {
+  margin: 2px auto 1px auto;
+  color: #ffffff;
+  text-align: center;
+}
+
+.footer-bottom {
+  margin: 0 8px 0 8px;
+  min-height: 20px;
+  color: #ffffff;
+  font-size: 10px;
+}
+
+.logo {
+  height: 80px;
+  width: 1024px;
+  margin: 0 auto;
+  background-color: transparent;
+}
+
+.navigator {
+  height: 79px;
+  width: 1024px;
+  margin: 0 auto;
+  padding: 1px 0 0; /* top, right, bottom, left */
+
+  -moz-border-radius-topleft: 8px;
+  -moz-border-radius-topright: 8px;
+  -moz-border-radius-bottomright: 0px;
+  -moz-border-radius-bottomleft: 0px;
+
+  -webkit-border-top-left-radius: 8px;
+  -webkit-border-top-right-radius: 8px;
+  -webkit-border-bottom-left-radius: 0px;
+  -webkit-border-bottom-right-radius: 0px;
+
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+
+  border: 1px solid #000000;
+  background-color: #212121;
+
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#212121), to(#000000));
+  background-image: -webkit-linear-gradient(top, #212121 0%, #000000 100%);
+  background-image:    -moz-linear-gradient(top, #212121 0%, #000000 100%);
+  background-image:      -o-linear-gradient(top, #212121 0%, #000000 100%);
+  background-image:         linear-gradient(to bottom, #212121 0%, #000000 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#212121', endColorstr='#000000', GradientType=0);
+  background-repeat: repeat-x;
+}
+
+.copyright {
+  color: #ffffff;
+  text-decoration: none;
+  font-family: 'Roboto', helvetica, arial, sans-serif;
+  font-weight: normal;
+  font-style: normal;
+  font-size: 11px;
+}
+</style>
+
+
+<style>
+.node {
+  cursor: pointer;
+}
+.node text {
+  font: 14px 'Cousine', monospace;
+}
+/* Requires Tree Styling Examples *
+ **********************************
+.node {
+  cursor: pointer;
+}
+.node circle {
+  fill: #ffffff;
+  stroke: SteelBlue;
+  stroke-width: 1.5px;
+}
+.link {
+  fill: none;
+  stroke: #cccccc;
+  stroke-width: 1.5px;
+}
+.node text {
+  font: 12px sans-serif;
+  font-weight: bold;
+}
+ **********************************/
+
+.tree-tooltip {
+  position: absolute;
+  text-align: left;
+  padding: 15px;
+  font: 11px Cousine,monospace;
+  font-weight: bold;
+  background-color: #fafafa;
+  border: 1px solid #71ad93;
+  border-radius: 8px;
+  pointer-events: none;
+  color: #343434;
+  -webkit-box-shadow: 0 0 5px #aaa;
+  box-shadow: 0 0 5px #aaa;
+}
+</style>
+<!-- End of styles .css -->
+
+<!-- scripts -->
+  <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="http://code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+  <script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+  <script>
+  $(function() {
+    $( "#tree_view" ).draggable();
+  });
+  </script>
+  <script type="text/javascript">
+  function show_link( id )
+  {
+    var label = document.getElementById( id );
+    label.style.textDecoration = "underline";
+  }
+  function hide_link( id )
+  {
+    var label = document.getElementById( id );
+    label.style.textDecoration = "none";
+  }
+  </script>
+<!-- End of scripts -->
+
+</head>
+
+<body>
+
+<div id="front_wrapper">
+  <div class="header-wrapper">
+    <div class="logo">
+    </div> <!-- "logo" -->
+    <div class="navigator">
+      <div style="height: 36px;">
+        <div style="height: 16px; font: 14px 'Roboto', sans-serif; font-weight: bold; color: White;"></div>
+        <div style="height: 20px; float: right; text-align: right; padding-right: 16px; width:512px; font: 14px 'Roboto', sans-serif; font-weight: bold; color: White;">
+        <span style="font: 10px 'Roboto', sans-serif; font-weight: bold;  color: #dcdbdc;">DISTRIBUTION:</span> @DISTRIBUTION@
+        </div>
+      </div>
+      <div style="height: 42px; padding-left: 16px; font: 28px 'Roboto', sans-serif; font-weight: bold; color: White;">
+      <span style="color: #dcdbdc;">@ROOT@</span> - Requires Tree
+      </div>
+    </div> <!-- "navigator" -->
+  </div> <!-- "header_wrapper" -->
+
+  <div class="content-wrapper">
+    <div class="content">
+
+      <div id="tree_view" class="ui-widget-content">
+      </div>
+
+    </div> <!-- "content" -->
+  </div> <!-- "content_wrapper" -->
+
+  <div class="footer-wrapper">
+    <div class="footer">
+
+      <div class="footer-top">
+        <a class="copyright" target="_blank" href="@BUG_URL@"
+          onmouseover="show_link( 'copyright' );"
+          onmouseout="hide_link( 'copyright' );">Bug Report URL</a>
+      </div>
+      <div class="footer-bottom">
+      </div>
+    </div> <!-- "footer" -->
+  </div> <!-- "footer_wrapper" -->
+</div> <!-- "front_wrapper" -->
+
+<script type="text/javascript">
+  var margin = {top: 20, right: 120, bottom: 20, left: 220},
+      width = @SVG_WIDTH@ - margin.right - margin.left,
+      height = @SVG_HEIGHT@ - margin.top - margin.bottom;
+
+  var i = 0,
+      duration = 750,
+      root;
+
+  var tree = d3.layout.tree()
+      .size([height, width]);
+
+  var diagonal = d3.svg.diagonal()
+      .projection(function(d) { return [d.y, d.x]; });
+
+  var svg = d3.select(document.getElementById( 'tree_view' )).append("svg")
+      .attr("width", width + margin.right + margin.left)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  var div = d3.select(document.getElementById( 'front_wrapper' )).append("div")
+      .attr("class", "tree-tooltip")
+      .style("opacity", 0);
+
+  d3.json("@JSON_DATA_FILE@", function(error, requires) {
+    root = requires;
+    root.x0 = height / 2;
+    root.y0 = 0;
+
+    function collapse(d) {
+      if (d.children) {
+        d._children = d.children;
+        d._children.forEach(collapse);
+        d.children = null;
+      }
+    }
+
+    root.children.forEach(collapse);
+    update(root);
+  });
+
+  function update(source) {
+
+    /* Compute the new tree layout. */
+    var nodes = tree.nodes(root).reverse(),
+        links = tree.links(nodes);
+
+    /* Normalize for fixed-depth. */
+    nodes.forEach(function(d) { d.y = d.depth * 180; });
+
+    /* Update the nodes . . . */
+    var node = svg.selectAll("g.node")
+        .data(nodes, function(d) { return d.id || (d.id = ++i); });
+
+    /* Enter any new nodes at the parent's previous position. */
+    var nodeEnter = node.enter().append("g")
+        .attr("class", "node")
+        .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
+        .on("click", click)
+        .on("mouseover", function(d) {
+            div.transition()
+                .duration(200)
+                .style("opacity", .92);
+            if (d.description == undefined) {
+              if (d.name == "void") {
+                div.html('<div style="text-align: left; padding-left: 0.5em; padding-right: 0.5em; font: 11px Cousine,monospace; font-weight: bold; color: DarkRed;">' + "void" + "</div>")
+                    .style("left", (d3.event.pageX + document.getElementById( 'front_wrapper' ).scrollLeft + 12) + "px")
+                    .style("top", (d3.event.pageY + document.getElementById( 'front_wrapper' ).scrollTop + 12) + "px");
+              }
+              else
+              {
+                div.html('<div style="text-align: left; padding-left: 0.5em; padding-right: 0.5em; font: 11px Cousine,monospace; font-weight: bold; color: DarkRed;">' + "not packaged collection" + "</div>")
+                    .style("left", (d3.event.pageX + document.getElementById( 'front_wrapper' ).scrollLeft + 12) + "px")
+                    .style("top", (d3.event.pageY + document.getElementById( 'front_wrapper' ).scrollTop + 12) + "px");
+              }
+            }
+            else
+            {
+              var content = '<div style="text-align: left; font: 14px Roboto,sans-serif; font-weight: bold; color: DarkRed;">' +
+                            d.name + "</div>" +
+                            '<div style="text-align: left; padding-left: 1.5em; padding-top: .5em; font: 14px Roboto,sans-serif; font-weight: bold; font-style: italic; color: #343434;">' +
+                            d.description + "</div><br/>" +
+                            "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;version: " + d.version + "<br/>" +
+                            "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;release: " + d.release + "<br/>" +
+                            "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;arch: " + d.arch + "<br/>";
+                 content += "&nbsp;&nbsp;&nbsp;distribution name: " + root.distro[0] + "<br/>" +
+                            "distribution version: " + root.distro[1] + "<br/>" +
+                            "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;package tarball: " + d.tarball + "<br/>" +
+                            "&nbsp;&nbsp;&nbsp;uncompressed size: " + d.size + "<br/>" +
+                            "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;license: " + d.license;
+
+              div.html( content )
+                  .style("left", (d3.event.pageX + document.getElementById( 'front_wrapper' ).scrollLeft + 12) + "px")
+                  .style("top", (d3.event.pageY + document.getElementById( 'front_wrapper' ).scrollTop + 12) + "px");
+            }
+        })
+        .on("mouseout", function(d) {
+            div.transition()
+                .duration(500)
+                .style("opacity", 0);
+        });
+
+    nodeEnter.append("circle")
+    /* Additional attributes (see the 'style' section) */
+        .attr("stroke", "#5d5d5d")
+        .attr("stroke-width", "1.0")
+    /* End of additional attributes */
+        .attr("r", 1e-6)
+        .style("fill", function(d) { return d._children ? "#abd8d4" : "#fff"; });
+
+    nodeEnter.append("text")
+        .attr("x", function(d) { return d.children || d._children ? -10 : 10; })
+        .attr("dy", "-.35em")
+        .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
+        .text(function(d) { return d.version ? d.name + "-" + d.version : d.name; })
+        .style("fill-opacity", 1e-6);
+
+    /* Transition nodes to their new position. */
+    var nodeUpdate = node.transition()
+        .duration(duration)
+        .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
+
+    nodeUpdate.select("circle")
+        .attr("r", 4.5)
+        .style("fill", function(d) {
+          if( d._children )
+          {
+            return "#abd8d4";
+          }
+          else
+          {
+            if( d.children == undefined )
+            {
+              if( d.name == "void" )
+              {
+                return "#c9c9c9";
+              }
+              else
+              {
+                return "#fff";
+              }
+            }
+            else
+            {
+              return "#d2ebd8";
+            }
+          }
+        });
+
+    nodeUpdate.select("text")
+        .style("fill-opacity", 1);
+
+    /* Transition exiting nodes to the parent's new position. */
+    var nodeExit = node.exit().transition()
+        .duration(duration)
+        .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
+        .remove();
+
+    nodeExit.select("circle")
+        .attr("r", 1e-6);
+
+    nodeExit.select("text")
+        .style("fill-opacity", 1e-6);
+
+    /* Update the links . . . */
+    var link = svg.selectAll("path.link")
+        .data(links, function(d) { return d.target.id; });
+
+    /* Enter any new links at the parent's previous position. */
+    link.enter().insert("path", "g")
+        .attr("class", "link")
+        .attr("d", function(d) {
+          var o = {x: source.x0, y: source.y0};
+          return diagonal({source: o, target: o});
+        });
+
+    /* Transition links to their new position. */
+    link.transition()
+        .duration(duration)
+    /* Additional attributes (see the 'style' section) */
+        .style("fill", "none")
+        .attr("stroke", "DarkGray")
+        .attr("stroke-width", "1.5")
+    /* End of additional attributes */
+        .attr("d", diagonal);
+
+    /* Transition exiting nodes to the parent's new position. */
+    link.exit().transition()
+        .duration(duration)
+        .attr("d", function(d) {
+          var o = {x: source.x, y: source.y};
+          return diagonal({source: o, target: o});
+        })
+        .remove();
+
+    /* Stash the old positions for transition. */
+    nodes.forEach(function(d) {
+      d.x0 = d.x;
+      d.y0 = d.y;
+    });
+  }
+
+  /* Toggle children on click. */
+  function click(d) {
+    if (d.children) {
+      d._children = d.children;
+      d.children = null;
+    } else {
+      d.children = d._children;
+      d._children = null;
+    }
+    update(d);
+  }
+</script>
+
+</body>
+</html>

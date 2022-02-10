@@ -15,8 +15,8 @@ like (
     dies {
         my $fortimanager = Net::Fortinet::FortiManager->new(
             server      => 'https://' . $ENV{NET_FORTINET_FORTIMANAGER_HOSTNAME},
-            user        => 'foo',
-            passwd      => 'bar',
+            user        => 'net-fortinet-fortimanager-test-nonexisting',
+            passwd      => 'invalid',
             clientattrs => {
                 insecure => 1,
             },
@@ -64,33 +64,33 @@ my %policy_package;
 
 END {
     say 'deleting created objects';
-    for (keys %firewall_address) {
+    for (keys %policy_package) {
         say "\t$_";
-        $fortimanager->delete_firewall_address($_);
+        $fortimanager->delete_policy_package($_);
     }
     for (keys %firewall_address_group) {
         say "\t$_";
         $fortimanager->delete_firewall_address_group($_);
     }
-    for (keys %firewall_ipv6_address) {
+    for (keys %firewall_address) {
         say "\t$_";
-        $fortimanager->delete_firewall_ipv6_address($_);
+        $fortimanager->delete_firewall_address($_);
     }
     for (keys %firewall_ipv6_address_group) {
         say "\t$_";
         $fortimanager->delete_firewall_ipv6_address_group($_);
     }
-    for (keys %firewall_service) {
+    for (keys %firewall_ipv6_address) {
         say "\t$_";
-        $fortimanager->delete_firewall_service($_);
+        $fortimanager->delete_firewall_ipv6_address($_);
     }
     for (keys %firewall_service_group) {
         say "\t$_";
         $fortimanager->delete_firewall_service_group($_);
     }
-    for (keys %policy_package) {
+    for (keys %firewall_service) {
         say "\t$_";
-        $fortimanager->delete_policy_package($_);
+        $fortimanager->delete_firewall_service($_);
     }
 
     say 'logging out';
@@ -107,7 +107,7 @@ like (
 );
 
 is($fortimanager->exec_method('get',
-    '/pm/config/adom/root/obj/firewall/address'),
+    '/pm/config/adom/' . $fortimanager->adom . '/obj/firewall/address'),
     bag {
         all_items hash {
             etc();
@@ -115,7 +115,7 @@ is($fortimanager->exec_method('get',
     }, 'exec_method without parameters response ok');
 
 is($fortimanager->exec_method('get',
-    '/pm/config/adom/root/obj/firewall/address',
+    '/pm/config/adom/' . $fortimanager->adom . '/obj/firewall/address',
     {
         fields => [qw( name type )],
     }),
@@ -131,10 +131,12 @@ is($fortimanager->exec_method('get',
 is($fortimanager->exec_method_multi('get',
     [{
         fields  => [qw( name type )],
-        url     => '/pm/config/adom/root/obj/firewall/address',
+        url     => '/pm/config/adom/' . $fortimanager->adom .
+                   '/obj/firewall/address',
     }, {
         fields  => [qw( name protocol )],
-        url     => '/pm/config/adom/root/obj/firewall/service/custom',
+        url     => '/pm/config/adom/' . $fortimanager->adom .
+                   '/obj/firewall/service/custom',
     }]),
     bag {
         all_items hash {
@@ -160,13 +162,15 @@ is($fortimanager->exec_method_multi('get',
         # test if results are returned in request order
 
         item hash {
-            field 'url' => '/pm/config/adom/root/obj/firewall/address';
+            field 'url' => '/pm/config/adom/' . $fortimanager->adom .
+                '/obj/firewall/address';
 
             etc();
         };
 
         item hash {
-            field 'url' =>  '/pm/config/adom/root/obj/firewall/service/custom';
+            field 'url' =>  '/pm/config/adom/' . $fortimanager->adom .
+                '/obj/firewall/service/custom';
 
             etc();
         };
@@ -178,7 +182,8 @@ like (
     dies {
         $fortimanager->exec_method_multi('get',
             [{
-                url => '/pm/config/adom/root/obj/firewall/address',
+                url => '/pm/config/adom/' . $fortimanager->adom .
+                    '/obj/firewall/address',
             }, {
                 url => '/does/not/exist',
             }, {
@@ -220,7 +225,7 @@ subtest_buffered 'IPv4 objects' => sub {
     $firewall_address{host_test1} = 1;
 
     ok($fortimanager->create_firewall_address('net_test1', {
-        subnet => '192.0.2.10/255.255.255.0',
+        subnet => '192.0.2.0/255.255.255.0',
     }), 'create_firewall_address for network ok');
     $firewall_address{net_test1} = 1;
 

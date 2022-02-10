@@ -22,7 +22,6 @@ Boggs
 Bourne
 Craig
 Fs
-Gene
 MIDI
 Praxis
 Variation

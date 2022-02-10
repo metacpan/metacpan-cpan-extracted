@@ -93,6 +93,8 @@ C<$client_stream> is newly created client stream handle object.
 C<$error> is an optional L<XS::ErrorCode> object and may present if there were any errors during physical or logical process of establishing connection.
 In this case C<$client_stream> may or may not be defined depending on state when error occured.
 
+If you need to set earlier callback when physical layer is established, before logical, use C<on_establish()> method overide in C<event_listener()>.
+
 See L<UniEvent/"EVENT CALLBACKS">
 
 
@@ -346,9 +348,32 @@ The only exception is when the only pending request is a connect request. In thi
 NOTE: if you want to immediately disconnect the stream cancelling all pending requests, call L<UniEvent::Handle/"reset()"> or L<UniEvent::Handle/"clear()">
 
 
+
+=head2 sockaddr()
+
+Returns address (as L<Net::SockAddr> object) of the B<local> endpoint if possible.
+
+If stream is not connected or not representable as sockaddr (windows named pipe, tty), undef is returned.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 peeraddr()
+
+Returns address (as L<Net::SockAddr> object) of the B<remote> (peer) endpoint if possible.
+
+If stream is not connected or not representable as sockaddr (windows named pipe, tty), undef is returned.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+
 =head2 event_listener($delegate, [$weak])
 
-Methods C<on_connection>, C<on_connect>, C<on_read>, C<on_write>, C<on_shutdown>, C<on_eof> will be called.
+Methods C<on_establish>, C<on_connection>, C<on_connect>, C<on_read>, C<on_write>, C<on_shutdown>, C<on_eof> will be called.
+
+Event C<on_establish> is present only in event listener, not in event dispatcher version. It will be called (for client and server) when physical
+connection is established (before possible SSL layer and so on).
 
 See L<UniEvent/"EVENT LISTENER">
 

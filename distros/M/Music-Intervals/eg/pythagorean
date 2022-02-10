@@ -1,0 +1,14 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Data::Dumper::Compact qw(ddc);
+use Music::Intervals;
+
+my $string = shift || 'pythagorean';
+
+my $intervals = Music::Intervals->by_description('pythagorean');
+
+my $m = Music::Intervals->new(notes => [keys %$intervals]);
+
+print ddc $m->natural_intervals, {max_width => 256};

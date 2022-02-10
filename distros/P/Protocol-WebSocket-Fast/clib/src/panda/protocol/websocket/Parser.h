@@ -113,11 +113,7 @@ struct Parser : virtual panda::Refcnt {
 
     MessageBuilder message () { return MessageBuilder(*this); }
 
-    string send_control (Opcode opcode) {
-        return Frame::compile(_prepare_control_header(opcode));
-    }
-
-    string send_control (Opcode opcode, string_view payload) {
+    string send_control (Opcode opcode, string_view payload = {}) {
         if (payload.length() > Frame::MAX_CONTROL_PAYLOAD) {
             panda_log_critical("control frame payload is too long");
             payload = payload.substr(0, Frame::MAX_CONTROL_PAYLOAD);
@@ -126,11 +122,9 @@ struct Parser : virtual panda::Refcnt {
         return Frame::compile(header, payload);
     }
 
-    string send_ping  ()                    { return send_control(Opcode::PING); }
-    string send_ping  (string_view payload) { return send_control(Opcode::PING, payload); }
-    string send_pong  ()                    { return send_control(Opcode::PONG); }
-    string send_pong  (string_view payload) { return send_control(Opcode::PONG, payload); }
-    string send_close ()                    { return send_control(Opcode::CLOSE); }
+    string send_ping  (string_view payload = {}) { return send_control(Opcode::PING, payload); }
+    string send_pong  (string_view payload = {}) { return send_control(Opcode::PONG, payload); }
+    string send_close ()                         { return send_control(Opcode::CLOSE); }
 
     string send_close (uint16_t code, string_view close_payload = {}) {
         string payload = FrameHeader::compile_close_payload(code, close_payload);

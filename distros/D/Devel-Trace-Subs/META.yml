@@ -1,5 +1,5 @@
 ---
-abstract: 'Generate, track, store and print code flow and stack traces.'
+abstract: 'Generate, track, store and print code flow and stack traces'
 author:
   - 'Steve Bertrand <steveb@cpan.org>'
 build_requires:
@@ -9,7 +9,7 @@ configure_requires:
   Cwd: '0'
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,7 +20,6 @@ no_index:
     - t
     - inc
 requires:
-  Devel::Examine::Subs: '1.61'
   HTML::Template: '0'
   Symbol: '0'
   Template: '0'
@@ -28,4 +27,5 @@ requires:
 resources:
   bugtracker: https://github.com/stevieb9/devel-trace-subs/issues
   repository: https://github.com/stevieb9/devel-trace-subs.git
-version: '0.22'
+version: '0.24'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

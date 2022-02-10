@@ -119,6 +119,7 @@ clib/src/panda/unievent/Work.h
 clib/tests/async.cc
 clib/tests/async_test.cc
 clib/tests/backend.cc
+clib/tests/bench.cc
 clib/tests/cert/01-alice.csr
 clib/tests/cert/01-alice.key
 clib/tests/cert/01-alice.pem
@@ -141,6 +142,7 @@ clib/tests/pipe.cc
 clib/tests/prepare.cc
 clib/tests/regression.cc
 clib/tests/resolver.cc
+clib/tests/stream/establish.cc
 clib/tests/stream/write.cc
 clib/tests/streamer/basic.cc
 clib/tests/streamer/file.cc
@@ -342,6 +344,7 @@ t/prepare.t
 t/regression.t
 t/resolver.t
 t/signal.t
+t/stream/establish.t
 t/stream/write.t
 t/streamer/basic.t
 t/streamer/file.t

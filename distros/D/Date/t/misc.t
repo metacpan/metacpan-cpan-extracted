@@ -14,6 +14,12 @@ test 'magic string in ctor' => sub {
     is $date, '2013-09-05';
 };
 
+test 'MEIACORE-1795' => sub {
+    my $date = "2021-09-02 14:07:35 +0300";
+    my $dt1 = Date->new(substr($date, 0, 10));
+    is $dt1->epoch, 1630530000;
+};
+
 done_testing();
 
 sub test ($&) {

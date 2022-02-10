@@ -3,7 +3,7 @@ use Test::More;
 use Test::Exception;
 
 use Log::Dispatch;
-use JSON;
+use JSON::MaybeXS;
 
 my $LAST_LOG_MSG;
 

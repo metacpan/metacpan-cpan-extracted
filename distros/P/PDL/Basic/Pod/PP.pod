@@ -557,7 +557,10 @@ can use output auto creation with temporary pdls even when you are using
 explicit threading which is forbidden for normal output pdls flagged with
 C<[o]> (see L<PDL::Indexing>).
 
-Here is an example where we use the [t] qualifier. We define the function
+As of 2.073, the user is unable to pass a C<[t]> parameter, and PDL will
+create and size it to its notional size, times the number of threads.
+
+Here is an example where we use the C<[t]> qualifier. We define the function
 C<callf> that calls a C routine C<f> which needs a temporary array of the
 same size and type as the array C<a> (sorry about the forward reference
 for C<$P>; it's a pointer access, see below) :
@@ -930,7 +933,8 @@ do not have a way of ignoring part of the data.
 
 This causes PDL::PP to write extra code that ensures the BadCode
 section is used, and that the C<$ISBAD()> macro (and its brethren)
-work.
+work. If no C<BadCode> is supplied, the C<Code> section will be used,
+on the assumption it will use C<PDL_IF_BAD> to handle bad values.
 
 =item HandleBad is not given
 
@@ -981,6 +985,7 @@ The C preprocessor symbol C<PDL_BAD_CODE> is defined when the bad code
 is compiled, so that you can reduce the amount of code you write.  The
 BadCode section can use the same macros and looping constructs as the
 Code section.
+As of 2.073, you can also use C<PDL_IF_BAD(iftrue,iffalse)>.
 
 =head2 Other bad-value macros
 
@@ -1065,19 +1070,27 @@ Since this is Perl, TMTOWTDI, so you could also write:
     }',
 
 You can reduce code repetition using the C C<PDL_BAD_CODE> macro,
-using the same code for both of the C<Code> and C<BadCode> sections:
+supplying only the C<Code> section:
 
+ Code => '
     #ifdef PDL_BAD_CODE
     if ( $ISGOOD(a()) && $ISGOOD(b()) ) {
     #endif PDL_BAD_CODE
-
        $c() = $a() + $b();
-
     #ifdef PDL_BAD_CODE
     } else {
        $SETBAD(c());
     }
     #endif PDL_BAD_CODE
+ ',
+
+As of 2.073, you can also use C<PDL_IF_BAD(iftrue,iffalse)>:
+
+ Code => '
+    PDL_IF_BAD(if ( $ISGOOD(a()) && $ISGOOD(b()) ) {,)
+       $c() = $a() + $b();
+    PDL_IF_BAD(} else $SETBAD(c());,)
+ ',
 
 =head2 Interfacing your own/library functions using PP
 
@@ -2109,6 +2122,15 @@ so that different things may be tried.
 your best bet will be to read the source code :-( or ask on the list
 (try the latter first) ]
 
+=head1 C PREPROCESSOR MACROS
+
+As well as the above-mentioned C<PDL_BAD_CODE> and
+C<PDL_IF_BAD(iftrue,iffalse)>, there are also
+C<PDL_IF_GENTYPE_REAL(iftrue,iffalse)>, C<PDL_IF_GENTYPE_UNSIGNED>, and
+C<PDL_IF_GENTYPE_INTEGER>:
+
+  $b() = PDL_IF_GENTYPE_INTEGER(0,NAN);
+
 =head1 Appendix A: Some keys recognised by PDL::PP
 
 Unless otherwise specified, the arguments are strings.
@@ -2140,7 +2162,11 @@ have their bad flag set.
 =head3 BadCode
 
 Give the code to be used if bad values may be present in the input ndarrays.
-Only used if C<HandleBad =E<gt> 1>.
+Only used if C<< HandleBad => 1 >>.
+If C<HandleBad> is true and C<BadCode> is not supplied, the C<Code>
+section will be reused, on the assumption it will use
+C<#ifdef PDL_BAD_CODE> to handle bad values.
+As of 2.073, you can also use C<PDL_IF_BAD(iftrue,iffalse)>.
 
 =head3 GenericTypes
 

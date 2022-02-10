@@ -34,8 +34,8 @@ struct Tcp : virtual Stream, AllocatedObject<Tcp> {
 
     virtual void connect (const TcpConnectRequestSP&);
 
-    excepted<net::SockAddr, ErrorCode> sockaddr () const { return handle_fd_excepted(impl()->sockaddr()); }
-    excepted<net::SockAddr, ErrorCode> peeraddr () const { return handle_fd_excepted(impl()->peeraddr()); }
+    excepted<net::SockAddr, ErrorCode> sockaddr () const override;
+    excepted<net::SockAddr, ErrorCode> peeraddr () const override;
 
     excepted<void, ErrorCode> set_nodelay              (bool enable)                     { return make_excepted(impl()->set_nodelay(enable)); }
     excepted<void, ErrorCode> set_keepalive            (bool enable, unsigned int delay) { return make_excepted(impl()->set_keepalive(enable, delay)); }

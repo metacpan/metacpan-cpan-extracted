@@ -35,7 +35,7 @@ inline bool string_contains_ci (const string& haystack, const string& needle) {
 template <typename T>
 inline bool parse_binary_number (T& num, const char*& src, size_t len) {
     if (!num && len >= sizeof(T)) { // common case - have whole number in src
-        num = *((T*)src);
+        memcpy(&num, src, sizeof(T));
         src += sizeof(T);
         return true;
     }

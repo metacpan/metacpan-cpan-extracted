@@ -1,10 +1,10 @@
 #
-# Copyright (C) 2015-2019 Joelle Maslak
+# Copyright (C) 2015-2022 Joelle Maslak
 # All Rights Reserved - See License
 #
 
 package Crypt::EAMessage;
-$Crypt::EAMessage::VERSION = '1.202120';
+$Crypt::EAMessage::VERSION = '1.220391';
 use v5.22;
 
 # ABSTRACT: Simple-to-use Abstraction of Encrypted Authenticated Messages
@@ -51,7 +51,7 @@ around 'BUILDARGS', sub ( $orig, $class, %args ) {
     $class->$orig(%args);
 };
 
-sub _hex_to_raw($hex) {
+sub _hex_to_raw ($hex) {
     $hex =~ s/^0x//;    # Remove 0x leader if it is present
 
     if ( $hex =~ /[^0-9A-Fa-f]/s ) { die("Non-hex characters present in hex_key"); }
@@ -68,7 +68,7 @@ subtype 'Crypt::EAMessage::Key', as 'Str',
   where { _valid_key($_) },
   message { "AES key lengths must be 16, 24, or 32 bytes long" };
 
-sub _valid_key($key) {
+sub _valid_key ($key) {
     my $l = length($_);
 
     if ( ( $l != 16 ) && ( $l != 24 ) && ( $l != 32 ) ) { return; }
@@ -110,7 +110,7 @@ sub encrypt_auth ( $self, $input ) {
 
 
 sub encrypt_auth_ascii ( $self, $input, $eol = undef ) {
-    my $ct = $self->_encrypt_auth_internal($input);
+    my $ct     = $self->_encrypt_auth_internal($input);
     my $base64 = encode_base64( $ct, $eol );
     return "2$base64";    # Type 2 = Base 64
 }
@@ -167,7 +167,7 @@ sub decrypt_auth ( $self, $ct ) {
     if ( length($ct) < 34 ) { die("Message too short to be valid") }
 
     my $type = substr( $ct, 0, 1 );
-    my $enc = substr( $ct, 1 );
+    my $enc  = substr( $ct, 1 );
 
     if ( $type eq '1' ) {
         return $self->_decrypt_auth_internal($enc);
@@ -216,6 +216,11 @@ sub _decrypt_auth_internal ( $self, $ct, $opts = {} ) {
     }
 }
 
+
+sub generate_key ($self) {
+    return Bytes::Random::Secure::random_bytes_hex(32);
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -232,7 +237,7 @@ Crypt::EAMessage - Simple-to-use Abstraction of Encrypted Authenticated Messages
 
 =head1 VERSION
 
-version 1.202120
+version 1.220391
 
 =head1 SYNOPSIS
 
@@ -363,21 +368,34 @@ Decrypts the cipher text into the object that was frozen during encryption.
 If the authentication or decryption fails, an exception is thrown. Otherwise
 it returns the plaintext/object.
 
+=head2 generate_key
+
+ say "Hex key: " . Crypt::EAMessage->generate_key()
+
+Added in version 1.220390
+
+This is a class method (I.E. you do not need to instantiate the
+C<Crypt::EAMessage> class to use this).
+
+Returns a randomly generated key suitable to use with AES256 as a hex number.
+
 =head1 GENERATING AES256 KEYS
 
 To generate a key, a simple Perl program can accomplish this - note that you
 should NOT use standard C<rand()> to do this.
 
   use feature 'say';
-  use Bytes::Random::Secure qw(random_bytes_hex);
+  use Crypt::EAMessage;
 
-  my $hexkey = random_bytes_hex(32);
+  my $hexkey = Crypt::EAMessage->generate_key()
   say "Key is: $hexkey";
 
-Alternative, you can do this with a one-liner
-to return a hex key:
+Alternative, you can do this with a one-liner to return a hex key, and the
+L<Crypt::EAMessage::Keygen> module:
 
-  perl -MBytes::Random::Secure=random_bytes_hex -E 'say random_bytes_hex(32)'
+  perl -MCrypt::EAMessage::Keygen -e 1
+
+This will output a random key in hex format suitable for use as an AES256 key.
 
 =head1 SECURITY
 
@@ -417,7 +435,7 @@ Joelle Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2020 by Joelle Maslak.
+This software is copyright (c) 2019-2022 by Joelle Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

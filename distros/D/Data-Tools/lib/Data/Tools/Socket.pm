@@ -1,7 +1,7 @@
 ##############################################################################
 #
 #  Data::Tools::Socket perl module
-#  2013-2019 (c) Vladi Belperchinov-Shabanski "Cade"
+#  2013-2022 (c) Vladi Belperchinov-Shabanski "Cade"
 #  http://cade.datamax.bg
 #  <cade@bis.bg> <cade@biscom.net> <cade@datamax.bg> <cade@cpan.org>
 #
@@ -267,9 +267,8 @@ Data::Tools::Socket uses:
 
   Vladi Belperchinov-Shabanski "Cade"
 
-  <cade@biscom.net> <cade@datamax.bg> <cade@cpan.org>
-
-  http://cade.datamax.bg
+        <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
+  http://cade.noxrun.com
 
 
 =cut

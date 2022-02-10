@@ -4,173 +4,210 @@ use 5.010001;
 use strict;
 use warnings;
 
+use Exporter qw(import);
+our @EXPORT_OK = qw(generate_table);
+
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-14'; # DATE
+our $DATE = '2022-01-23'; # DATE
 our $DIST = 'Text-Table-Any'; # DIST
-our $VERSION = '0.109'; # VERSION
+our $VERSION = '0.111'; # VERSION
 
 our %BACKEND_FEATURES = (
     "Term::Table" => {
         rows => 1,
         header_row => 1,
         separate_rows => 0,
-        title => 0,
+        caption => 0,
     },
     "Term::TablePrint" => {
         rows => 1,
         header_row => 1,
         separate_rows => 0,
-        title => 0,
+        caption => 0,
     },
     "Text::ANSITable" => {
         rows => 1,
         header_row => 1,
         separate_rows => 1,
-        title => 0,
+        caption => 0,
     },
     "Text::ASCIITable" => {
         rows => 1,
         header_row => 1,
         separate_rows => 0,
-        title => 0,
+        caption => 0,
     },
     "Text::FormatTable" => {
         rows => 1,
         header_row => 0,
         separate_rows => 0,
-        title => 0,
+        caption => 0,
     },
     "Text::MarkdownTable" => {
         rows => 1,
         header_row => 1,
         separate_rows => 0,
-        title => 0,
+        caption => 0,
     },
     "Text::Table" => {
         rows => 1,
         header_row => 0,
         separate_rows => 0,
-        title => 0,
+        caption => 0,
     },
     "Text::Table::ASV" => {
         rows => 1,
         header_row => 1,
         separate_rows => 0,
-        title => 0,
+        caption => 0,
+        backend_opts => 1,
+        backend_opts_note => "Backend-specific options (backend_opts) will be passed to table() or generate_table() directly",
     },
     "Text::Table::CSV" => {
         rows => 1,
         header_row => 1,
         separate_rows => 0,
-        title => 0,
+        caption => 0,
+        backend_opts => 1,
+        backend_opts_note => "Backend-specific options (backend_opts) will be passed to table() or generate_table() directly",
     },
     "Text::Table::HTML" => {
         rows => 1,
         header_row => 1,
         separate_rows => 0,
-        title => 1,
+        caption => 1,
+        backend_opts => 1,
+        backend_opts_note => "Backend-specific options (backend_opts) will be passed to table() or generate_table() directly",
     },
     "Text::Table::HTML::DataTables" => {
         rows => 1,
         header_row => 1,
         separate_rows => 0,
-        title => 1,
+        caption => 1,
+        backend_opts => 1,
+        backend_opts_note => "Backend-specific options (backend_opts) will be passed to table() or generate_table() directly",
     },
     "Text::Table::LTSV" => {
         rows => 1,
         header_row => 0,
         separate_rows => 0,
-        title => 0,
+        caption => 0,
+        backend_opts => 1,
+        backend_opts_note => "Backend-specific options (backend_opts) will be passed to table() or generate_table() directly",
     },
     "Text::Table::Manifold" => {
         rows => 1,
         header_row => 1,
         separate_rows => 0,
-        title => 0,
+        caption => 0,
     },
     "Text::Table::More" => {
         rows => 1,
         header_row => 1,
         separate_rows => 1,
-        title => 0,
+        caption => 0,
+        backend_opts => 1,
+        backend_opts_note => "Backend-specific options (backend_opts) will be passed to table() or generate_table() directly",
     },
     "Text::Table::Org" => {
         rows => 1,
         header_row => 1,
         separate_rows => 1,
-        title => 0,
+        caption => 0,
+        backend_opts => 1,
+        backend_opts_note => "Backend-specific options (backend_opts) will be passed to table() or generate_table() directly",
     },
     "Text::Table::Paragraph" => {
         rows => 1,
         header_row => 1,
         separate_rows => 0,
-        title => 0,
+        caption => 0,
+        backend_opts => 1,
+        backend_opts_note => "Backend-specific options (backend_opts) will be passed to table() or generate_table() directly",
     },
     "Text::Table::Sprintf" => {
         rows => 1,
         header_row => 1,
         separate_rows => 1,
-        title => 0,
+        caption => 0,
+        backend_opts => 1,
+        backend_opts_note => "Backend-specific options (backend_opts) will be passed to table() or generate_table() directly",
     },
     "Text::Table::TickitWidget" => {
         rows => 1,
         header_row => 1,
         separate_rows => 0,
-        title => 0,
+        caption => 0,
+        backend_opts => 1,
+        backend_opts_note => "Backend-specific options (backend_opts) will be passed to table() or generate_table() directly",
     },
     "Text::Table::Tiny" => {
         rows => 1,
         header_row => 1,
         separate_rows => 1,
-        title => 0,
+        caption => 0,
+        backend_opts => 1,
+        backend_opts_note => "Backend-specific options (backend_opts) will be passed to table() or generate_table() directly",
     },
     "Text::Table::TinyBorderStyle" => {
         rows => 1,
         header_row => 1,
         separate_rows => 1,
-        title => 0,
+        caption => 0,
+        backend_opts => 1,
+        backend_opts_note => "Backend-specific options (backend_opts) will be passed to table() or generate_table() directly",
     },
     "Text::Table::TinyColor" => {
         rows => 1,
         header_row => 1,
         separate_rows => 1,
-        title => 0,
+        caption => 0,
+        backend_opts => 1,
+        backend_opts_note => "Backend-specific options (backend_opts) will be passed to table() or generate_table() directly",
     },
     "Text::Table::TinyColorWide" => {
         rows => 1,
         header_row => 1,
         separate_rows => 1,
-        title => 0,
+        caption => 0,
+        backend_opts => 1,
+        backend_opts_note => "Backend-specific options (backend_opts) will be passed to table() or generate_table() directly",
     },
     "Text::Table::TinyWide" => {
         rows => 1,
         header_row => 1,
         separate_rows => 1,
-        title => 0,
+        caption => 0,
+        backend_opts => 1,
+        backend_opts_note => "Backend-specific options (backend_opts) will be passed to table() or generate_table() directly",
     },
     "Text::Table::TSV" => {
         rows => 1,
         header_row => 0,
         separate_rows => 0,
-        title => 0,
+        caption => 0,
+        backend_opts => 1,
+        backend_opts_note => "Backend-specific options (backend_opts) will be passed to table() or generate_table() directly",
     },
     "Text::Table::XLSX" => {
         rows => 1,
         header_row => 1,
         separate_rows => 0,
-        title => 0,
+        caption => 0,
+        backend_opts => 1,
+        backend_opts_note => "Backend-specific options (backend_opts) will be passed to table() or generate_table() directly",
     },
     "Text::TabularDisplay" => {
         rows => 1,
         header_row => 0,
         separate_rows => 0,
-        title => 0,
+        caption => 0,
     },
     "Text::UnicodeBox::Table" => {
         rows => 1,
         header_row => 1,
         separate_rows => 0,
-        title => 0,
+        caption => 0,
     },
 );
 
@@ -186,7 +223,7 @@ sub backends {
     @BACKENDS;
 }
 
-sub table {
+sub generate_table {
     my %params = @_;
 
     my $rows          = $params{rows} or die "Must provide rows!";
@@ -278,31 +315,36 @@ sub table {
         return Text::Table::ASV::table(
             rows => $rows,
             header_row => $header_row,
+            defined($params{backend_opts}) ? %{$params{backend_opts}} : (),
         );
     } elsif ($backend eq 'Text::Table::CSV') {
         require Text::Table::CSV;
         return Text::Table::CSV::table(
             rows => $rows,
             header_row => $header_row,
+            defined($params{backend_opts}) ? %{$params{backend_opts}} : (),
         );
     } elsif ($backend eq 'Text::Table::HTML') {
         require Text::Table::HTML;
         return Text::Table::HTML::table(
             rows => $rows,
             header_row => $header_row,
-            (title => $params{title}) x !!defined($params{title}),
+            (caption => $params{caption}) x !!defined($params{caption}),
+            defined($params{backend_opts}) ? %{$params{backend_opts}} : (),
         );
     } elsif ($backend eq 'Text::Table::HTML::DataTables') {
         require Text::Table::HTML::DataTables;
         return Text::Table::HTML::DataTables::table(
             rows => $rows,
             header_row => $header_row,
-            (title => $params{title}) x !!defined($params{title}),
+            (caption => $params{caption}) x !!defined($params{caption}),
+            defined($params{backend_opts}) ? %{$params{backend_opts}} : (),
         );
     } elsif ($backend eq 'Text::Table::LTSV') {
         require Text::Table::LTSV;
         return Text::Table::LTSV::table(
             rows => $rows,
+            defined($params{backend_opts}) ? %{$params{backend_opts}} : (),
         );
     } elsif ($backend eq 'Text::Table::Manifold') {
         require Text::Table::Manifold;
@@ -321,6 +363,7 @@ sub table {
             rows => $rows,
             header_row => $header_row,
             separate_rows => $separate_rows,
+            defined($params{backend_opts}) ? %{$params{backend_opts}} : (),
         ) . "\n";
     } elsif ($backend eq 'Text::Table::Org') {
         require Text::Table::Org;
@@ -328,12 +371,15 @@ sub table {
             rows => $rows,
             header_row => $header_row,
             separate_rows => $separate_rows,
+            defined($params{caption}) ? (caption => $params{caption}) : (),
+            defined($params{backend_opts}) ? %{$params{backend_opts}} : (),
         );
     } elsif ($backend eq 'Text::Table::Paragraph') {
         require Text::Table::Paragraph;
         return Text::Table::Paragraph::table(
             rows => $rows,
             header_row => $header_row,
+            defined($params{backend_opts}) ? %{$params{backend_opts}} : (),
         );
     } elsif ($backend eq 'Text::Table::Sprintf') {
         require Text::Table::Sprintf;
@@ -341,12 +387,14 @@ sub table {
             rows => $rows,
             header_row => $header_row,
             separate_rows => $separate_rows,
-        ) . "\n";
+            defined($params{backend_opts}) ? %{$params{backend_opts}} : (),
+        );
     } elsif ($backend eq 'Text::Table::TickitWidget') {
         require Text::Table::TickitWidget;
         return Text::Table::TickitWidget::table(
             rows => $rows,
             header_row => $header_row,
+            defined($params{backend_opts}) ? %{$params{backend_opts}} : (),
         ) . "\n";
     } elsif ($backend eq 'Text::Table::Tiny') {
         require Text::Table::Tiny;
@@ -354,6 +402,7 @@ sub table {
             rows => $rows,
             header_row => $header_row,
             separate_rows => $separate_rows,
+            defined($params{backend_opts}) ? %{$params{backend_opts}} : (),
         ) . "\n";
     } elsif ($backend eq 'Text::Table::TinyBorderStyle') {
         require Text::Table::TinyBorderStyle;
@@ -361,6 +410,7 @@ sub table {
             rows => $rows,
             header_row => $header_row,
             separate_rows => $separate_rows,
+            defined($params{backend_opts}) ? %{$params{backend_opts}} : (),
         ) . "\n";
     } elsif ($backend eq 'Text::Table::TinyColor') {
         require Text::Table::TinyColor;
@@ -368,6 +418,7 @@ sub table {
             rows => $rows,
             header_row => $header_row,
             separate_rows => $separate_rows,
+            defined($params{backend_opts}) ? %{$params{backend_opts}} : (),
         ) . "\n";
     } elsif ($backend eq 'Text::Table::TinyColorWide') {
         require Text::Table::TinyColorWide;
@@ -375,6 +426,7 @@ sub table {
             rows => $rows,
             header_row => $header_row,
             separate_rows => $separate_rows,
+            defined($params{backend_opts}) ? %{$params{backend_opts}} : (),
         ) . "\n";
     } elsif ($backend eq 'Text::Table::TinyWide') {
         require Text::Table::TinyWide;
@@ -382,17 +434,20 @@ sub table {
             rows => $rows,
             header_row => $header_row,
             separate_rows => $separate_rows,
+            defined($params{backend_opts}) ? %{$params{backend_opts}} : (),
         ) . "\n";
     } elsif ($backend eq 'Text::Table::TSV') {
         require Text::Table::TSV;
         return Text::Table::TSV::table(
             rows => $rows,
+            defined($params{backend_opts}) ? %{$params{backend_opts}} : (),
         );
     } elsif ($backend eq 'Text::Table::XLSX') {
         require Text::Table::XLSX;
         return Text::Table::XLSX::table(
             rows => $rows,
             header_row => $header_row,
+            defined($params{backend_opts}) ? %{$params{backend_opts}} : (),
         );
     } elsif ($backend eq 'Text::TabularDisplay') {
         require Text::TabularDisplay;
@@ -415,6 +470,12 @@ sub table {
     }
 }
 
+{
+    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
+    no warnings 'once';
+    *table = \&generate_table;
+}
+
 1;
 # ABSTRACT: Generate text table using one of several backends
 
@@ -430,106 +491,141 @@ Text::Table::Any - Generate text table using one of several backends
 
 =head1 VERSION
 
-This document describes version 0.109 of Text::Table::Any (from Perl distribution Text-Table-Any), released on 2022-01-14.
+This document describes version 0.111 of Text::Table::Any (from Perl distribution Text-Table-Any), released on 2022-01-23.
 
 =head1 SYNOPSIS
 
- use Text::Table::Any;
+ use Text::Table::Any qw/generate_table/;
 
  my $rows = [
-     # header row
-     ['Name', 'Rank', 'Serial'],
-     # rows
-     ['alice', 'pvt', '123456'],
-     ['bob',   'cpl', '98765321'],
-     ['carol', 'brig gen', '8745'],
+     # first element is header row
+     ['Distribution', 'Author', 'First Version', 'Latest Version', 'Abstract'],
+
+     # subsequent elements are data rows
+     ['ACME-Dzil-Test-daemon', 'DAEMON', '0.001', '0.001', 'Module abstract placeholder text'],
+     ['ACME-Dzil-Test-daemon2', 'DAEMON', '0.001', '0.001', 'Module abstract placeholder text'],
+     ['Acme-CPANModules-ShellCompleters', 'PERLANCAR', '0.001', '0.001', 'Modules that provide shell tab completion for other commands/scripts'],
+     ['Acme-CPANModules-WorkingWithURL', 'PERLANCAR', '0.001', '0.001', 'Working with URL'],
  ];
- print Text::Table::Any::table(rows => $rows, header_row => 1,
-                               backend => 'Text::Table::More');
+
+ print generate_table(rows => $rows);
+
+will render the table using the default backend L<Text::Table::Sprintf> and
+print something like:
+
+ +----------------------------------+-----------+---------------+----------------+----------------------------------------------------------------------+
+ | Distribution                     | Author    | First Version | Latest Version | Abstract                                                             |
+ +----------------------------------+-----------+---------------+----------------+----------------------------------------------------------------------+
+ | ACME-Dzil-Test-daemon            | DAEMON    | 0.001         | 0.001          | Module abstract placeholder text                                     |
+ | ACME-Dzil-Test-daemon2           | DAEMON    | 0.001         | 0.001          | Module abstract placeholder text                                     |
+ | Acme-CPANModules-ShellCompleters | PERLANCAR | 0.001         | 0.001          | Modules that provide shell tab completion for other commands/scripts |
+ | Acme-CPANModules-WorkingWithURL  | PERLANCAR | 0.001         | 0.001          | Working with URL                                                     |
+ +----------------------------------+-----------+---------------+----------------+----------------------------------------------------------------------+
+
+To pick another backend:
+
+ print generate_table(
+     rows => $rows,
+     backend => "Text::Table::Org",
+ );
+
+The result is something like:
+
+ | Distribution                     | Author    | First Version | Latest Version | Abstract                                                             |
+ |----------------------------------+-----------+---------------+----------------+----------------------------------------------------------------------|
+ | ACME-Dzil-Test-daemon            | DAEMON    | 0.001         | 0.001          | Module abstract placeholder text                                     |
+ | ACME-Dzil-Test-daemon2           | DAEMON    | 0.001         | 0.001          | Module abstract placeholder text                                     |
+ | Acme-CPANModules-ShellCompleters | PERLANCAR | 0.001         | 0.001          | Modules that provide shell tab completion for other commands/scripts |
+ | Acme-CPANModules-WorkingWithURL  | PERLANCAR | 0.001         | 0.001          | Working with URL                                                     |
+
+To specify some other options:
+
+ print generate_table(
+     rows => $rows,
+     header_row => 0,   # default is true
+     separate_row => 1, # default is false
+     caption => "Some of the new distributions released in Jan 2022",
+     backend => "Text::Table::Org",
+ );
+
+The result is something like:
+
+ #+CAPTION: Some of the new distributions released in Jan 2022
+ | Distribution                     | Author    | First Version | Latest Version | Abstract                                                             |
+ |----------------------------------+-----------+---------------+----------------+----------------------------------------------------------------------|
+ | ACME-Dzil-Test-daemon            | DAEMON    | 0.001         | 0.001          | Module abstract placeholder text                                     |
+ |----------------------------------+-----------+---------------+----------------+----------------------------------------------------------------------|
+ | ACME-Dzil-Test-daemon2           | DAEMON    | 0.001         | 0.001          | Module abstract placeholder text                                     |
+ |----------------------------------+-----------+---------------+----------------+----------------------------------------------------------------------|
+ | Acme-CPANModules-ShellCompleters | PERLANCAR | 0.001         | 0.001          | Modules that provide shell tab completion for other commands/scripts |
+ |----------------------------------+-----------+---------------+----------------+----------------------------------------------------------------------|
+ | Acme-CPANModules-WorkingWithURL  | PERLANCAR | 0.001         | 0.001          | Working with URL                                                     |
+
+To pass backend-specific options:
+
+ print generate_table(
+     rows => $rows,
+     backend => "Text::Table::More",
+     backend_opts => {
+         border_style => 'ASCII::SingleLineDoubleAfterHeader',
+         align => 'right',
+         row_attrs => [
+             [0, {align=>'middle'}],
+         ],
+     },
+ );
+
+The result is something like:
+
+ .----------------------------------+-----------+---------------+----------------+----------------------------------------------------------------------.
+ |           Distribution           |  Author   | First Version | Latest Version |                               Abstract                               |
+ +==================================+===========+===============+================+======================================================================+
+ |            ACME-Dzil-Test-daemon |    DAEMON |         0.001 |          0.001 |                                     Module abstract placeholder text |
+ |           ACME-Dzil-Test-daemon2 |    DAEMON |         0.001 |          0.001 |                                     Module abstract placeholder text |
+ | Acme-CPANModules-ShellCompleters | PERLANCAR |         0.001 |          0.001 | Modules that provide shell tab completion for other commands/scripts |
+ |  Acme-CPANModules-WorkingWithURL | PERLANCAR |         0.001 |          0.001 |                                                     Working with URL |
+ `----------------------------------+-----------+---------------+----------------+----------------------------------------------------------------------'
 
 =head1 DESCRIPTION
 
-This module provides a single function, C<table>, which formats a
+This module provides a single function, C<generate_table>, which formats a
 two-dimensional array of data as text table, using one of several available
-backends. The interface is modelled after L<Text::Table::Tiny> (0.03).
-L<Text::Table::Sprintf> is the default backend.
+backends. The interface is modelled after L<Text::Table::Tiny>, but
+L<Text::Table::Sprintf> is the default backend and although Text::Table::Tiny is
+among the supported backends, it is not required by this module.
 
-The example shown in the SYNOPSIS generates the following table:
+=head1 DIFFERENCES WITH TEXT::TABLE::TINY
 
- +-------+----------+----------+
- | Name  | Rank     | Serial   |
- +-------+----------+----------+
- | alice | pvt      | 123456   |
- | bob   | cpl      | 98765321 |
- | carol | brig gen | 8745     |
- +-------+----------+----------+
+=over
 
-When using C<Text::Table::Org> backend, the result is something like:
+=item * 'top_and_tail' option from Text::Table::Tiny is not supported
 
- | Name  | Rank     | Serial   |
- |-------+----------+----------|
- | alice | pvt      | 123456   |
- | bob   | cpl      | 98765321 |
- | carol | brig gen | 8745     |
+Probably won't be supported. You can pass this option to Text::Table::Tiny
+backend via L</backend_opts> option.
 
-When using C<Text::Table::CSV> backend:
+=item * 'align' option from Text::Table::Tiny is not supported
 
- "Name","Rank","Serial"
- "alice","pvt","123456"
- "bob","cpl","98765321"
- "carol","brig gen","8745"
+Will be supported in the future.
 
-When using C<Text::ANSITable> backend:
+=item * 'style' option from Text::Table::Tiny is not supported
 
- .-------+----------+----------.
- | Name  | Rank     |   Serial |
- +-------+----------+----------+
- | alice | pvt      |   123456 |
- | bob   | cpl      | 98765321 |
- | carol | brig gen |     8745 |
- `-------+----------+----------'
+Won't be supported because this is specific to Text::Table::Tiny. If you want
+custom border styles, here are some alternative backends you can use:
+L<Text::Table::TinyBorderStyle>, L<Text::Table::More>,
+L<Text::UnicodeBox::Table>.
 
-When using C<Text::ASCIITable> backend:
+=item * 'indent' option from Text::Table::Tiny is not supported
 
- .-----------------------------.
- | Name  | Rank     | Serial   |
- +-------+----------+----------+
- | alice | pvt      |   123456 |
- | bob   | cpl      | 98765321 |
- | carol | brig gen |     8745 |
- '-------+----------+----------'
+Probably won't be supported. You can indent a multiline string in Perl using
+something like:
 
-When using C<Text::FormatTable> backend:
+ $rendered_table =~ s/^/  /mg; # indent each line with two spaces
 
- Name |Rank    |Serial
- alice|pvt     |123456
- bob  |cpl     |98765321
- carol|brig gen|8745
+=item * 'compact' option from Text::Table::Tiny is not supported
 
-When using C<Text::MarkdownTable> backend:
+May be supported in the future.
 
- | Name  | Rank     | Serial   |
- |-------|----------|----------|
- | alice | pvt      | 123456   |
- | bob   | cpl      | 98765321 |
- | carol | brig gen | 8745     |
-
-When using C<Text::Table> backend:
-
- Name  Rank     Serial
- alice pvt        123456
- bob   cpl      98765321
- carol brig gen     8745
-
-When using C<Text::TabularDisplay> backend:
-
- +-------+----------+----------+
- | Name  | Rank     | Serial   |
- +-------+----------+----------+
- | alice | pvt      | 123456   |
- | bob   | cpl      | 98765321 |
- | carol | brig gen | 8745     |
- +-------+----------+----------+
+=back
 
 =head1 VARIABLES
 
@@ -547,6 +643,13 @@ support of that feature by that backend.
 =head1 FUNCTIONS
 
 =head2 table
+
+An old name for L</generate_table> function (C<generate_table()> was not
+available in Text::Table::Tiny < 0.04). This name is not available for export.
+
+=head2 generate_table
+
+Exportable.
 
 Usage:
 
@@ -626,37 +729,37 @@ backends:
 
 Support matrix for each backend:
 
- +-------------------------------+------------+------+---------------+-------+
- | backend                       | header_row | rows | separate_rows | title |
- +-------------------------------+------------+------+---------------+-------+
- | Term::Table                   | 1          | 1    | 0             | 0     |
- | Term::TablePrint              | 1          | 1    | 0             | 0     |
- | Text::ANSITable               | 1          | 1    | 1             | 0     |
- | Text::ASCIITable              | 1          | 1    | 0             | 0     |
- | Text::FormatTable             | 0          | 1    | 0             | 0     |
- | Text::MarkdownTable           | 1          | 1    | 0             | 0     |
- | Text::Table                   | 0          | 1    | 0             | 0     |
- | Text::Table::ASV              | 1          | 1    | 0             | 0     |
- | Text::Table::CSV              | 1          | 1    | 0             | 0     |
- | Text::Table::HTML             | 1          | 1    | 0             | 1     |
- | Text::Table::HTML::DataTables | 1          | 1    | 0             | 1     |
- | Text::Table::LTSV             | 0          | 1    | 0             | 0     |
- | Text::Table::Manifold         | 1          | 1    | 0             | 0     |
- | Text::Table::More             | 1          | 1    | 1             | 0     |
- | Text::Table::Org              | 1          | 1    | 1             | 0     |
- | Text::Table::Paragraph        | 1          | 1    | 0             | 0     |
- | Text::Table::Sprintf          | 1          | 1    | 1             | 0     |
- | Text::Table::TSV              | 0          | 1    | 0             | 0     |
- | Text::Table::TickitWidget     | 1          | 1    | 0             | 0     |
- | Text::Table::Tiny             | 1          | 1    | 1             | 0     |
- | Text::Table::TinyBorderStyle  | 1          | 1    | 1             | 0     |
- | Text::Table::TinyColor        | 1          | 1    | 1             | 0     |
- | Text::Table::TinyColorWide    | 1          | 1    | 1             | 0     |
- | Text::Table::TinyWide         | 1          | 1    | 1             | 0     |
- | Text::Table::XLSX             | 1          | 1    | 0             | 0     |
- | Text::TabularDisplay          | 0          | 1    | 0             | 0     |
- | Text::UnicodeBox::Table       | 1          | 1    | 0             | 0     |
- +-------------------------------+------------+------+---------------+-------+
+ +-------------------------------+--------------+------------------------------------------------------------------------------------------------+---------+------------+------+---------------+
+ | backend                       | backend_opts | backend_opts_note                                                                              | caption | header_row | rows | separate_rows |
+ +-------------------------------+--------------+------------------------------------------------------------------------------------------------+---------+------------+------+---------------+
+ | Term::Table                   |              |                                                                                                | 0       | 1          | 1    | 0             |
+ | Term::TablePrint              |              |                                                                                                | 0       | 1          | 1    | 0             |
+ | Text::ANSITable               |              |                                                                                                | 0       | 1          | 1    | 1             |
+ | Text::ASCIITable              |              |                                                                                                | 0       | 1          | 1    | 0             |
+ | Text::FormatTable             |              |                                                                                                | 0       | 0          | 1    | 0             |
+ | Text::MarkdownTable           |              |                                                                                                | 0       | 1          | 1    | 0             |
+ | Text::Table                   |              |                                                                                                | 0       | 0          | 1    | 0             |
+ | Text::Table::ASV              | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 0             |
+ | Text::Table::CSV              | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 0             |
+ | Text::Table::HTML             | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 1       | 1          | 1    | 0             |
+ | Text::Table::HTML::DataTables | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 1       | 1          | 1    | 0             |
+ | Text::Table::LTSV             | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 0          | 1    | 0             |
+ | Text::Table::Manifold         |              |                                                                                                | 0       | 1          | 1    | 0             |
+ | Text::Table::More             | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 1             |
+ | Text::Table::Org              | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 1             |
+ | Text::Table::Paragraph        | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 0             |
+ | Text::Table::Sprintf          | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 1             |
+ | Text::Table::TSV              | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 0          | 1    | 0             |
+ | Text::Table::TickitWidget     | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 0             |
+ | Text::Table::Tiny             | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 1             |
+ | Text::Table::TinyBorderStyle  | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 1             |
+ | Text::Table::TinyColor        | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 1             |
+ | Text::Table::TinyColorWide    | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 1             |
+ | Text::Table::TinyWide         | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 1             |
+ | Text::Table::XLSX             | 1            | Backend-specific options (backend_opts) will be passed to table() or generate_table() directly | 0       | 1          | 1    | 0             |
+ | Text::TabularDisplay          |              |                                                                                                | 0       | 0          | 1    | 0             |
+ | Text::UnicodeBox::Table       |              |                                                                                                | 0       | 1          | 1    | 0             |
+ +-------------------------------+--------------+------------------------------------------------------------------------------------------------+---------+------------+------+---------------+
 
 =item * rows
 
@@ -665,7 +768,7 @@ of data, where each row is an array reference.
 
 =item * header_row
 
-Optional. Bool, default is false. If given a true value, the first row in the
+Optional. Bool, default is true. If given a true value, the first row in the
 data will be interpreted as a header row, and separated visually from the rest
 of the table (e.g. with a ruled line). But some backends won't display
 differently.
@@ -677,12 +780,17 @@ after each data row.
 
 Not all backends support this.
 
-=item * title
+=item * caption
 
-Optional. Str. Title of the table.
+Optional. Str. Caption of the table.
 
-Currently the only backends supporting this are C<Text::Table::HTML> and
-C<Text::Table::HTML::DataTables>.
+=item * backend_opts
+
+Optional. Hashref. Pass backend-specific options to the backend module. Not all
+backend modules support this, but all backend modules that have interface
+following C<Text::Table::Tiny> should support this. Also note that as the list
+of common options is expanded, a previously backend-specific option might be
+available later as a common option.
 
 =back
 
@@ -726,7 +834,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

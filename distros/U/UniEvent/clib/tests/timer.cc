@@ -2,6 +2,7 @@
 #include <chrono>
 #include <panda/unievent/test/AsyncTest.h>
 #include <panda/unievent/Timer.h>
+#include <thread>
 
 using namespace panda;
 using namespace unievent;
@@ -93,5 +94,71 @@ TEST("due_in") {
     }
     SECTION("non armed") {
         CHECK(t->due_in() == 0);
+    }
+}
+
+TEST("pause/resume") {
+    AsyncTest test(1000, 0);
+    TimerSP t = new Timer(test.loop);
+    
+    SECTION("pause") {
+        t->event.add([](auto){ FAIL(); });
+        t->start(1);
+        test.run_nowait();
+        t->pause();
+        test.run();
+        SUCCEED("loop inactive");
+    }
+    SECTION("pause inactive timer") {
+        t->pause();
+        test.run();
+        SUCCEED("ok");
+    }
+    SECTION("resume") {
+        test.set_expected(1);
+        t->event.add([](auto){ FAIL(); });
+        t->start(10);
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        test.run_nowait();
+        SECTION("normal") {
+            t->pause();
+        }
+        SECTION("pause paused timer is no-op") {
+            t->pause();
+            t->pause();
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(6));
+        test.run_nowait();
+        t->resume();
+        CHECK(t->due_in() <= 5);
+        t->event.remove_all();
+        t->event.add([&](auto){ test.happens(); });
+        std::this_thread::sleep_for(std::chrono::milliseconds(6));
+        test.run_nowait();
+    }
+    SECTION("resume non-paused timer") {
+        SECTION("active") {
+            t->start(1);
+            auto res = t->resume();
+            REQUIRE(!res);
+            CHECK(res.error() & std::errc::invalid_argument);
+        }
+                
+        SECTION("stopped") {
+            t->start(1);
+            t->stop();
+            auto res = t->resume();
+            REQUIRE(!res);
+            CHECK(res.error() & std::errc::invalid_argument);
+        }
+        
+        SECTION("paused&stopped") {
+            t->start(1);
+            t->pause();
+            t->stop();
+            auto res = t->resume();
+            REQUIRE(!res);
+            CHECK(res.error() & std::errc::invalid_argument);
+        }
     }
 }

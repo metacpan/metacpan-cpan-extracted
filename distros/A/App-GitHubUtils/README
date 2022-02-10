@@ -2,7 +2,7 @@ NAME
     App::GitHubUtils - Utilities related to GitHub
 
 VERSION
-    This document describes version 0.008 of App::GitHubUtils (from Perl
+    This document describes version 0.009 of App::GitHubUtils (from Perl
     distribution App-GitHubUtils), released on 2021-08-14.
 
 DESCRIPTION
@@ -12,6 +12,8 @@ DESCRIPTION
     *   create-this-repo-on-github
 
     *   git-clone-from-github
+
+    *   this-repo-on-github
 
 FUNCTIONS
   create_this_repo_on_github
@@ -93,6 +95,29 @@ FUNCTIONS
     *   users => *array[str]*
 
         If not specified, will use "login" from "github-cmd.conf" file.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  this_repo_on_github
+    Usage:
+
+     this_repo_on_github() -> [$status_code, $reason, $payload, \%result_meta]
+
+    This function is not exported.
+
+    No arguments.
 
     Returns an enveloped result (an array).
 

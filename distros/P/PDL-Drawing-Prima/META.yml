@@ -8,9 +8,9 @@ build_requires:
 configure_requires:
   Module::Build: '0.28'
   PDL: v2.4.10
-  Prima: '1.33'
+  Prima: '1.57'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,17 +25,17 @@ no_index:
 provides:
   PDL::Drawing::Prima:
     file: lib/PDL/Drawing/Prima.pm.PL
-    version: '0.12'
+    version: '0.13'
   PDL::Drawing::Prima::Utils:
     file: lib/PDL/Drawing/Prima/Utils.pm.PL
-    version: '0.12'
+    version: '0.13'
 requires:
   PDL: v2.4.10
-  Prima: '1.35'
-  perl: v5.8.0
+  Prima: '1.57'
+  perl: v5.10.0
 resources:
   bugtracker: http://github.com/run4flat/PDL-Drawing-Prima/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/run4flat/PDL-Drawing-Prima
-version: '0.12'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: '0.13'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

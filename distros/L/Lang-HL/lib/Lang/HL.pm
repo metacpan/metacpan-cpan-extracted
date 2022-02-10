@@ -5,11 +5,11 @@ use warnings;
 use utf8;
 use Regexp::Grammars;
 
-our $VERSION = '5.001';
+our $VERSION = '5.002';
 
 sub new {
-        my ($class) = @_;
-        return bless {}, $class;
+    my ($class) = @_;
+    return bless {}, $class;
 }
 
 sub PT::Lang::X {
@@ -92,58 +92,57 @@ sub PT::Group::X {
 }
 
 sub PT::Packages::X {
-        my ($class, $className) = @_;
+    my ($class, $className) = @_;
 
-        my @packageList = ($class->{PackageList})->X($className);
-        my $packages = join("\n", @packageList);
-        return $packages;
+    my @packageList = ($class->{PackageList})->X($className);
+    my $packages = join("\n", @packageList);
+    return $packages;
 }
 
 sub PT::PackageList::X {
-        my ($class, $className) = @_;
+    my ($class, $className) = @_;
 
-        my @packageList;
-        for my $element ( @{$class->{Package}} ) {
-                push @packageList, $element->X($className);
-        }
+    my @packageList;
+    for my $element ( @{$class->{Package}} ) {
+        push @packageList, $element->X($className);
+    }
 
-        return @packageList;
+    return @packageList;
 }
 
 sub PT::Package::X {
-        my ($class, $className) = @_;
+    my ($class, $className) = @_;
 
-        return (        $class->{PackageWithConstructor}
-                     || $class->{PackageWithoutConstructor} )->X($className);
+    return (        $class->{PackageWithConstructor}
+                 || $class->{PackageWithoutConstructor} )->X($className);
 }
 
 sub PT::PackageWithConstructor::X {
-        my ($class, $className) = @_;
+    my ($class, $className) = @_;
 
-        my $object = $class->{Object}->X();
-        my $packageName = $class->{PackageName}->X();
-        my $constructor = $class->{Constructor}->X();
+    my $object = $class->{Object}->X();
+    my $packageName = $class->{PackageName}->X();
+    my $constructor = $class->{Constructor}->X();
 
-        if(exists $class->{ObjectParameters}) {
-                my $objectParameters = $class->{ObjectParameters}->X($className);
-                my $parameters;
-
-                if(ref($objectParameters)) {
-                    $parameters = join(",", @{$objectParameters});
-                } else {
-                    $parameters = $objectParameters;
-                }
-
-                my $packageWithConstructor = "use " . $packageName . ";\n"
-                                             . "my \$" . $object . " = " . $packageName . "->"
-                                             . $constructor . "(" . $parameters . ");\n";
-                return $packageWithConstructor;
+    if(exists $class->{ObjectParameters}) {
+        my $objectParameters = $class->{ObjectParameters}->X($className);
+        my $parameters;
+        if(ref($objectParameters)) {
+            $parameters = join(",", @{$objectParameters});
+        } else {
+            $parameters = $objectParameters;
         }
 
         my $packageWithConstructor = "use " . $packageName . ";\n"
-                                     . "my \$" . $object . " = " . $packageName
-                                     . "->" . $constructor . "();\n";
+                                     . "my \$" . $object . " = " . $packageName . "->"
+                                     . $constructor . "(" . $parameters . ");\n";
         return $packageWithConstructor;
+    }
+
+    my $packageWithConstructor = "use " . $packageName . ";\n"
+                                 . "my \$" . $object . " = " . $packageName
+                                 . "->" . $constructor . "();\n";
+    return $packageWithConstructor;
 }
 
 sub PT::ObjectParameters::X {
@@ -168,29 +167,29 @@ sub PT::PackageParams::X {
 }
 
 sub PT::PackageName::X {
-        my ($class, $className) = @_;
+    my ($class, $className) = @_;
 
-        my @packageDir;
-        for my $element ( @{ $class->{PackageDir}} ) {
-                push @packageDir, $element->X($className);
-        }
+    my @packageDir;
+    for my $element ( @{ $class->{PackageDir}} ) {
+        push @packageDir, $element->X($className);
+    }
 
-        my $packageName = join("::", @packageDir);
-        return $packageName;
+    my $packageName = join("::", @packageDir);
+    return $packageName;
 }
 
 sub PT::PackageWithoutConstructor::X {
-        my ($class, $className) = @_;
+    my ($class, $className) = @_;
 
-        my $packageName = $class->{PackageName}->X($className);
-        if(exists $class->{QW}) {
-            my $qw = $class->{QW}->X($className);
+    my $packageName = $class->{PackageName}->X($className);
+    if(exists $class->{QW}) {
+        my $qw = $class->{QW}->X($className);
 
-            my $packageWithoutConstructor = "use " . $packageName . $qw . ";\n";
-            return $packageWithoutConstructor;
-        }
-        my $packageWithoutConstructor = "use " . $packageName . ";\n";
+        my $packageWithoutConstructor = "use " . $packageName . $qw . ";\n";
         return $packageWithoutConstructor;
+    }
+    my $packageWithoutConstructor = "use " . $packageName . ";\n";
+    return $packageWithoutConstructor;
 }
 
 sub PT::QW::X {
@@ -1131,7 +1130,8 @@ sub PT::CalcOperands::X {
                 || $class->{ClassAccessor}
                 || $class->{ClassFunctionReturn}
                 || $class->{FunctionReturn}
-                || $class->{EmbedBlock} )->X($className);
+                || $class->{EmbedBlock}
+                || $class->{ObjectFunctionCall} )->X($className);
 }
 
 sub PT::CalcOperator::X {
@@ -1418,7 +1418,7 @@ my $parser = qr {
     <objrule:  PT::Calc>                       <CalcExpression>
     <objrule:  PT::CalcExpression>             <[CalcOperands]>+ % <[CalcOperator]>
     <objrule:  PT::CalcOperands>               <RealNumber> | <ScalarVariable> | <ArrayElement> | <HashElement> | <ClassAccessor>
-                                               | <ClassFunctionReturn> | <FunctionReturn> | <EmbedBlock>
+                                               | <ClassFunctionReturn> | <FunctionReturn> | <EmbedBlock> | <ObjectFunctionCall>
     <objtoken: PT::CalcOperator>               <Plus> | <Minus> | <Multiply> | <Divide> | <Modulus> | <Exponent> | <EmbedBlock>
 
     <objrule:  PT::Return>                     <TokenReturn> <RHS>? <SemiColon>

@@ -1,5 +1,8 @@
 Revision history for HTTP-Daemon
 
+6.13      2022-02-09 20:39:12Z
+  - Bump minimum IO::Socket::IP version to 0.32 (GH#50) (Olaf Alders)
+
 6.12      2020-06-04 16:01:31Z
   - No changes since TRIAL release 6.11
 

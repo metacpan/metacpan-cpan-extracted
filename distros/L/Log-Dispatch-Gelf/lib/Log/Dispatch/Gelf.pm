@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '1.3.2';
+our $VERSION = '1.4.0';
 
 use base qw(Log::Dispatch::Output);
 use Params::Validate qw(validate SCALAR HASHREF CODEREF BOOLEAN);
@@ -36,6 +36,7 @@ sub _init {
         @_,
         {
             send_sub          => { type => CODEREF, optional => 1 },
+            short_message_sub => { type => CODEREF, optional => 1 },
             additional_fields => { type => HASHREF, optional => 1 },
             host              => { type => SCALAR,  optional => 1 },
             compress          => { type => BOOLEAN, optional => 1 },
@@ -82,6 +83,7 @@ sub _init {
     $self->{host}              = $p{host}              // hostname();
     $self->{additional_fields} = $p{additional_fields} // {};
     $self->{send_sub}          = $p{send_sub};
+    $self->{short_message_sub} = $p{short_message_sub} // sub { $_[0] =~ s/\n.*//sr };
     $self->{gelf_version}      = '1.1';
     $self->{chunked}           = $p{chunked};
 
@@ -119,7 +121,6 @@ sub _create_socket {
 
 sub log_message {
     my ($self, %p) = @_;
-    (my $short_message = $p{message}) =~ s/\n.*//s;
 
     my %additional_fields;
     while (my ($key, $value) = each %{ $self->{additional_fields} }) {
@@ -133,7 +134,7 @@ sub log_message {
     my $log_unit = {
         version       => $self->{gelf_version},
         host          => $self->{host},
-        short_message => $short_message,
+        short_message => $self->{short_message_sub}->($p{message}),
         level         => $p{level},
         full_message  => $p{message},
         %additional_fields,
@@ -174,7 +175,7 @@ Log::Dispatch::Gelf - Log::Dispatch plugin for Graylog's GELF format.
 
     my $sender = ... # e.g. RabbitMQ queue.
     my $log = Log::Dispatch->new(
-        outputs => [ 
+        outputs => [
             #some custom sender
             [
                 'Gelf',
@@ -192,7 +193,15 @@ Log::Dispatch::Gelf - Log::Dispatch plugin for Graylog's GELF format.
                     port     => 21234,
                     protocol => 'tcp',
                 }
-            ]
+            ],
+            # define callback to crop your full message to short in your own way
+            [
+                'Gelf',
+                min_level         => 'debug',
+                additional_fields => { facility => __FILE__ },
+                send_sub          => sub { $sender->send($_[0]) },
+                short_message_sub => sub { substr($_[0], 0, 10) }
+            ],
         ],
     );
     $log->info('It works');
@@ -238,6 +247,11 @@ IO::Compress::Gzip.
 
 mandatory sub for sending the message to graylog. It is triggered after the
 gelf message is generated.
+
+=item short_message_sub
+
+sub for code that will crop your full message to short message. By default
+it deletes everything after first newline character
 
 =item socket
 

@@ -1,6 +1,6 @@
 package PDL::NDBin::Action::Sum;
 # ABSTRACT: Action for PDL::NDBin that computes sum
-$PDL::NDBin::Action::Sum::VERSION = '0.024';
+$PDL::NDBin::Action::Sum::VERSION = '0.025';
 
 use strict;
 use warnings;
@@ -64,7 +64,7 @@ PDL::NDBin::Action::Sum - Action for PDL::NDBin that computes sum
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 DESCRIPTION
 

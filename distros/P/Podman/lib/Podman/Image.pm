@@ -1,192 +1,150 @@
 package Podman::Image;
 
-use strict;
-use warnings;
-use utf8;
-
-use Moose;
+use Mojo::Base 'Podman::Client';
 
 use Archive::Tar;
-use Cwd            ();
-use File::Basename ();
-use File::Temp     ();
-use Path::Tiny;
-use Scalar::Util;
+use Exporter qw(import);
+use Mojo::File qw(path tempfile);
 
-use Podman::Client;
+our @EXPORT_OK = qw(build pull);
 
-has 'Client' => (
-    is      => 'ro',
-    isa     => 'Podman::Client',
-    lazy    => 1,
-    default => sub { return Podman::Client->new() },
-);
+has 'name' => sub { return '' };
 
-has 'Name' => (
-    is       => 'ro',
-    isa      => 'Str',
-    required => 1,
-);
+sub build {
+  my ($name, $file, %options) = @_;
 
-sub Build {
-    my ( $Package, $Name, $File, $Client ) = @_;
+  my $self = __PACKAGE__->new;
 
-    return if Scalar::Util::blessed($Package);
+  my $dir   = path($file)->dirname;
+  my @files = map { $_->basename } @{path($dir)->list({dir => 1})->to_array};
 
-    my $Dir = File::Basename::dirname($File);
+  chdir $dir;
+  my $archive = Archive::Tar->new();
+  $archive->add_files(@files);
 
-    my ( @Files, $DirHandle );
-    chdir $Dir;
-    opendir $DirHandle, Cwd::getcwd();
-    @Files = grep { !m{^\.{1,2}$} } readdir $DirHandle;
-    closedir $DirHandle;
+  my $archive_file = tempfile;
+  $archive->write($archive_file);
 
-    my $Archive = Archive::Tar->new();
-    $Archive->add_files(@Files);
+  $self->post(
+    'build',
+    data       => $archive_file,
+    parameters => {'file'         => path($file)->basename, 't' => $name, %options,},
+    headers    => {'Content-Type' => 'application/x-tar'},
+  );
+  $self->get(sprintf "images/%s/exists", $name);
 
-    my $ArchiveFile = File::Temp->new();
-    $Archive->write( $ArchiveFile->filename );
-
-    $Client //= Podman::Client->new();
-
-    my $Response = $Client->Post(
-        'build',
-        Data       => $ArchiveFile,
-        Parameters => {
-            'file' => File::Basename::basename($File),
-            't'    => $Name,
-        },
-        Headers => {
-            'Content-Type' => 'application/x-tar'
-        },
-    );
-
-    return if !$Response;
-
-    return __PACKAGE__->new(
-        Client => $Client,
-        Name   => $Name,
-    );
+  return $self->name($name);
 }
 
-sub Pull {
-    my ( $Package, $Name, $Tag, $Client ) = @_;
+sub pull {
+  my ($name, $tag, %options) = @_;
 
-    return if Scalar::Util::blessed($Package);
+  my $self = __PACKAGE__->new;
 
-    $Name = sprintf "%s:%s", $Name, $Tag // 'latest';
+  my $reference = sprintf "%s:%s", $name, $tag // 'latest';
 
-    $Client //= Podman::Client->new();
+  $self->post('images/pull', parameters => {reference => $reference, tlsVerify => 1, %options,});
+  $self->get(sprintf "images/%s/exists", $name);
 
-    my $Response = $Client->Post(
-        'images/pull',
-        Parameters => {
-            reference => $Name,
-            tlsVerify => 1,
-        }
-    );
-
-    return if !$Response;
-
-    return __PACKAGE__->new(
-        Client => $Client,
-        Name   => $Name,
-    );
+  return $self->name($name);
 }
 
-sub Inspect {
-    my $Self = shift;
+sub inspect {
+  my $self = shift;
 
-    my $Data = $Self->Client->Get( sprintf "images/%s/json", $Self->Name );
+  my $data = $self->get(sprintf "images/%s/json", $self->name)->json;
 
-    my ($Tag) = $Data->{RepoTags}->[0] =~ m{.+:(.+)};
+  my $tag = (split /:/, $data->{RepoTags}->[0])[1];
 
-    my %Inspect = (
-        Tag     => $Tag,
-        Id      => $Data->{Id},
-        Created => $Data->{Created},
-        Size    => $Data->{Size}
-    );
+  my %inspect = (Tag => $tag, Id => $data->{Id}, Created => $data->{Created}, Size => $data->{Size},);
 
-    return \%Inspect;
+  return \%inspect;
 }
 
-sub Remove {
-    my ( $Self, $Force ) = @_;
+sub remove {
+  my ($self, $force) = @_;
 
-    $Self->Client->Delete( sprintf "images/%s", $Self->Name );
+  $self->delete('images', parameters => {images => $self->name, force => $force // 0,});
 
-    return 1;
+  return 1;
 }
-
-__PACKAGE__->meta->make_immutable;
 
 1;
+
+__END__
 
 =encoding utf8
 
 =head1 NAME
 
-Podman::Image - Control image.
+Podman::Image - Create and control image.
 
 =head1 SYNOPSIS
 
-    # Pull image from iregistry
-    my $Image = Podman::Image->Pull('docker.io/library/hello-world');
+    # Pull image from registry
+    my $image = Podman::Image::pull('docker.io/library/hello-world');
 
     # Build new image from File
-    my $Image = Podman::Image->Build('localhost/goodbye', '/tmp/Dockerfile');
+    my $image = Podman::Image::build('localhost/goodbye', '/tmp/Dockerfile');
 
     # Retrieve advanced image information
-    my $info = $Image->Inspect();
+    my $info = $image->inspect;
 
     # Remove local stored image
-    $Image->Remove();
+    $image->remove();
 
 =head1 DESCRIPTION
 
-L<Podman::Image> provides functionality to control an image.
+=head2 Inheritance
+
+    Podman::Containers
+        isa Podman::Client
+
+L<Podman::Image> provides functionality to create and control an image.
 
 =head1 ATTRIBUTES
 
-=head2 Name
+L<Podman::Image> implements following attributes.
 
-    my $Image = Podman::Image->new( Name => 'localhost/goodbye' );
+=head2 name
+
+    my $image = Podman::Image->new();
+    $image->name('docker.io/library/hello-world');
 
 Unique image name or other identifier.
 
-=head2 Client
+=head1 FUNCTIONS
 
-    my $Client = Podman::Client->new(
-        Connection => 'http+unix:///var/cache/podman.sock' );
-    my $Image = Podman::Image->new( Client => $Client );
+L<Podman::Image> implements the following functions, which can be imported individually.
 
-Optional L<Podman::Client> object.
+=head build
+
+    use Podman::Image qw(build);
+    my $image = build('localhost/goodbye', '/tmp/Dockerfile', %options);
+
+Build and store named image from given build file and additional build options. All further recrusive available files in
+the directory level of the build file are included.
+
+=head2 pull
+
+    use Podman::Image qw(pull);
+    my $image = pull('docker.io/library/hello-world' 'latest', %options);
+
+Pull named image with optional tag, defaults to C<latest> and additional options from registry into store.
 
 =head1 METHODS
 
-=head2 Build
+L<Podman::Image> implements following methods.
 
-    my $Image = Podman::Image->Build('localhost/goodbye', '/tmp/Dockerfile');
+=head2 inspect
 
-Build a named image by a given build file and store it. All further content in
-the build file directory is used as well to create the new image.
-
-=head2 Inspect
-
-    my $Info = $Image->Inspect();
+    my $Info = $image->inspect();
 
 Return advanced image information.
 
-=head2 Pull
+=head2 remove
 
-    my $Image = Podman::Image->Pull('docker.io/library/hello-world');
-
-Pull named image from registry into store.
-
-=head2 Remove
-
-    $Image->Remove();
+    $image->remove();
 
 Remove image from store.
 
@@ -202,7 +160,7 @@ Tobias Schäfer, <tschaefer@blackox.org>
 
 Copyright (C) 2022-2022, Tobias Schäfer.
 
-This program is free software, you can redistribute it and/or modify it under
-the terms of the Artistic License version 2.0.
+This program is free software, you can redistribute it and/or modify it under the terms of the Artistic License version
+2.0.
 
 =cut

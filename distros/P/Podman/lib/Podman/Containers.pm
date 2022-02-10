@@ -1,59 +1,46 @@
 package Podman::Containers;
 
-use strict;
-use warnings;
-use utf8;
+use Mojo::Base 'Podman::Client';
 
-use Moose;
+use Mojo::Collection;
+use Scalar::Util qw(blessed);
 
-use Scalar::Util;
-
-use Podman::Client;
 use Podman::Container;
 
-has 'Client' => (
-    is       => 'ro',
-    isa      => 'Podman::Client',
-    lazy    => 1,
-    default => sub { return Podman::Client->new() },
-);
+has 'names_only' => undef;
 
-sub List {
-    my $Self = shift;
+sub list {
+  my $self = shift;
 
-    $Self = __PACKAGE__->new() if !Scalar::Util::blessed($Self);
+  if (!blessed($self)) {
+    $self = __PACKAGE__->new();
+    my %opts = @_;
+    $self->names_only($opts{names_only});
+  }
 
-    my $List = $Self->Client->Get(
-        'containers/json',
-        Parameters => {
-            all => 1
-        },
-    );
+  my $images = $self->get('containers/json', parameters => {all => 1},)->json;
 
-    my @List = map {
-        Podman::Container->new(
-            Client => $Self->Client,
-            Name   => $_->{Names}->[0],
-        )
-    } @{$List};
+  my @list = map {
+    my $name = $_->{Names}->[0] || 'none';
+    $self->names_only ? $name : Podman::Container->new(name => $name);
+  } @{$images};
 
-    return \@List;
+  return Mojo::Collection->new(@list);
 }
 
-sub Prune {
-    my $Self = shift;
+sub prune {
+  my $self = shift;
 
-    $Self = __PACKAGE__->new() if !Scalar::Util::blessed($Self);
+  $self = __PACKAGE__->new() unless blessed($self);
 
-    $Self->Client->Post('containers/prune');
+  $self->post('containers/prune');
 
-    return 1; 
+  return 1;
 }
-
-
-__PACKAGE__->meta->make_immutable;
 
 1;
+
+__END__
 
 =encoding utf8
 
@@ -63,42 +50,44 @@ Podman::Containers - Manage containers.
 
 =head1 SYNOPSIS
 
-    # Create and use containers controller
-    my $Containers = Podman::Containers->new();
-    $Containers->list();
+    # List available containers sorted by Id
+    my $containers = Podman::Images->new->list->sort(sub { $a->inspect->{Id} cmp $b->inspect->{Id} } );
+    say $_->name for $containers->each;
 
-    # List available containers
-    my $List = Podman::Containers->List();
-
-    # Prune stopped containers
-    Podman::Containers->Prune;
-
+    # Prune unused containers
+    Podman::Containers->prune;
 
 =head1 DESCRIPTION
 
-L<Podman::Images> lists all available containers and prunes stopped ones.
+=head2 Inheritance
+
+    Podman::Containers
+        isa Podman::Client
+
+L<Podman::Containers> lists all available containers and prunes stopped ones.
 
 =head1 ATTRIBUTES
 
-=head2 Client
+L<Podman::Containers> implements following attributes.
 
-    my $Client = Podman::Client->new(
-        Connection => 'http+unix:///var/cache/podman.sock' );
-    my $Images = Podman::Images->new( Client => $Client );
+=head2 names_only
 
-Optional L<Podman::Client> object.
+If C<true>, C<list> returns L<Mojo::Collection> of image names only instead of L<Podman::Image> objects, defaults to
+C<false>.
 
 =head1 METHODS
 
-=head2 List
+L<Podman::Containers> implements following methods, which can be used as object or class methods.
 
-    my $List = Podman::Containers->List();
+=head2 list
 
-Returns a list of L<Podman::Container> available.
+    my $list = Podman::Containers->list;
 
-=head2 Prune
+Returns a L<Mojo::Collection> of L<Podman::Container> objects or container names only of stored images.
 
-    Podman::Containers->->Prune();
+=head2 prune
+
+    Podman::Containers->->prune;
 
 Prune all stopped containers.
 
@@ -114,7 +103,7 @@ Tobias Schäfer, <tschaefer@blackox.org>
 
 Copyright (C) 2022-2022, Tobias Schäfer.
 
-This program is free software, you can redistribute it and/or modify it under
-the terms of the Artistic License version 2.0.
+This program is free software, you can redistribute it and/or modify it under the terms of the Artistic License version
+2.0.
 
 =cut

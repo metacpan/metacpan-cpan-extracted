@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/GitHubUtils.pm'
@@ -14,7 +14,8 @@ my @module_files = (
 
 my @scripts = (
     'script/create-this-repo-on-github',
-    'script/git-clone-from-github'
+    'script/git-clone-from-github',
+    'script/this-repo-on-github'
 );
 
 # no fake home requested

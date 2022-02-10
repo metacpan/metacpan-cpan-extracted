@@ -1,0 +1,117 @@
+=head1 NAME
+
+UniEvent::WebSocket::Client - Asynchronous websocket client
+
+
+
+=head1 SYNOPSIS
+
+    # Client
+    my $client = UniEvent::WebSocket::Client->new;
+    $client->connect("ws://myserver.com:12345");
+    $client->connect_callback(sub {
+        my ($client, $connect_response) = @_;
+        if ($connect_response->error) { ... }
+        $client->send_text("hello");
+    });
+    $client->message_callback(sub {
+        my ($client, $message) = @_;
+        say $message->payload;
+        $client->close(UniEvent::WebSocket::CLOSE_DONE);
+    });
+    $client->peer_close_callback(sub {
+        my ($client, $message) = @_;
+        say $message->close_code;
+        say $message->close_message;
+    });
+    
+    ...
+    UE::Loop->default->run;
+
+
+
+=head1 DESCRIPTION
+
+C<UniEvent::WebSocket::Client> represents a websocket client connection to server. You should use this class to connect to websocket server.
+
+It is inherited from the basic connection class L<UniEvent::WebSocket::Connection>, so the most API documented there.
+
+
+
+=head1 METHODS
+
+=head2 new([\%config = default config], [$loop = default loop])
+
+Create websocket client for a given C<config> and L<UniEvent::Loop>. This client will work when you run specified event loop.
+
+See C<configure()> method for details on what C<config> supports.
+
+
+=head2 configure(\%config)
+
+Configures websocket client with new config. Can be called at any time, even if connection is already established; applied immediately.
+
+C<config> should be a hash reference with the following fields:
+
+=over
+
+=item anything that L<UniEvent::WebSocket::Connection>'s C<configure()> supports.
+
+=item tcp_nodelay [=false]
+
+If true, enables tcp nodelay feature.
+
+=back
+
+    $client->configure({
+        tcp_nodelay    => 1,
+        max_frame_size => 1000,
+    });
+
+
+=head2 connect($request)
+
+Starts connection process to the server.
+
+C<$request> must be an L<UniEvent::WebSocket::ConnectRequest> object or hashref that its constructor supports.
+See L<UniEvent::WebSocket::ConnectRequest> for possible options.
+
+All the needed data for connectig are in the request.
+
+
+=head2 connect($uri)
+
+The same as
+
+    $client->connect({uri => $uri});
+
+
+=head2 connect($host, [$is_secure = false], [$port = 0])
+
+The same as
+
+    $client->connect($uri)
+
+Where C<$uri> is constructed according to C<$host>, C<$is_secure> (result in "ws" or "wss" scheme) and C<$port>.
+
+
+=head2 connect_callback($sub)
+
+=head2 connect_event()
+
+Callbacks set via these methods will be invoked when client establishes connection and completes websocket handshake.
+
+After this moment client object can be used for sending and receiving data.
+
+Callback signature:
+
+    my ($client, $response) = @_;
+    
+Where C<$response> is an L<Protocol::WebSocket::Fast::ConnectResponse> object.
+
+Any error may be read via $response->error() method, see L<Protocol::WebSocket::Fast::ConnectResponse>.
+
+See L<UniEvent/"EVENT CALLBACKS"> for differences between C<_callback> and C<_event> versions of methods.
+
+
+=cut

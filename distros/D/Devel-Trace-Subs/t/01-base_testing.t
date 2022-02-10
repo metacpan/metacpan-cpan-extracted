@@ -16,6 +16,7 @@ use Devel::Trace::Subs qw(trace trace_dump);
 # check/set env
 
 {
+    $ENV{DTS_ENABLE} = 0;
     my $ret = trace();
     is ($ret, undef, "trace() returns if DTS_ENABLE isnt set");
 }

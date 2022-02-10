@@ -1,5 +1,10 @@
 Revision history for MIDI::Praxis::Variation
 
+0.0607 2022-02-08 16:47:43
+    - Update the eg/ programs.
+    - Fixed copyright, to ensure that my inept excisions and insertions
+      are disambiguated from those of the original author.
+
 0.0606 2020-11-26 11:36:29
     - Don't import anything from MIDI::Simple.
 
@@ -24,7 +29,8 @@ Revision history for MIDI::Praxis::Variation
     - Change from Gnu to the Artistic license.
     - Clean up distribution files for dzil.
     - Significantly refactor code.
-    - Modify the raugmentation() and rdiminution() functions to allow note list processing.
+    - Modify the raugmentation() and rdiminution() functions to allow
+      note list processing.
     - Improve documentation.
     - Add tests!
     - Add eg/stretch to illustrate transposition() and augmentation().

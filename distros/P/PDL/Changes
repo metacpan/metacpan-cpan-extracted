@@ -1,3 +1,14 @@
+2.074 2022-02-08
+- fix PDL::Complex->null stringify error
+
+2.073 2022-02-07
+- PDL::Complex no longer undefs PDL::i
+- passing null as input param now an error
+- can now unify Code and BadCode into Code, and use PDL_IF_BAD() or #ifdef PDL_BAD_CODE
+- add macros PDL_IF_GENTYPE_{REAL,INTEGER,UNSIGNED}(iftrue,iffalse) in Code
+- fix IO::IDL (#381) - thanks @YuryPakhomov for report and test data
+- fix [t] Pars with multi-thread; now cannot be passed as params (#382) - thanks @d-lamb for report
+
 2.072 2022-01-30
 - fix bug in qsortveci that broke PDL::VectorValued - thanks @zmughal for report
 

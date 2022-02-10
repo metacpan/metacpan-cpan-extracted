@@ -28,7 +28,7 @@ resources:
   bugtracker: https://github.com/marcusramberg/Mojolicious-Plugin-OAuth2/issues
   homepage: https://github.com/marcusramberg/Mojolicious-Plugin-OAuth2
   repository: https://github.com/marcusramberg/Mojolicious-Plugin-OAuth2.git
-version: '2.01'
+version: '2.02'
 x_contributors:
   - 'Marcus Ramberg <mramberg@cpan.org>'
   - 'Jan Henning Thorsen <jhthorsen@cpan.org>'

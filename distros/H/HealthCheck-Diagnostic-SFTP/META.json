@@ -53,7 +53,7 @@
    "provides" : {
       "HealthCheck::Diagnostic::SFTP" : {
          "file" : "lib/HealthCheck/Diagnostic/SFTP.pm",
-         "version" : "v1.4.0"
+         "version" : "v1.4.1"
       }
    },
    "release_status" : "stable",
@@ -67,7 +67,7 @@
          "web" : "https://github.com/GrantStreetGroup/p5-HealthCheck-Diagnostic-SFTP"
       }
    },
-   "version" : "v1.4.0",
+   "version" : "v1.4.1",
    "x_generated_by_perl" : "v5.34.0",
    "x_serialization_backend" : "JSON::XS version 4.03",
    "x_spdx_expression" : "Artistic-2.0",

@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 
 use Log::Dispatch;
-use JSON;
+use JSON::MaybeXS;
 use Test::Exception;
 use Mock::Quick;
 use IO::Uncompress::Gunzip qw(gunzip $GunzipError);
@@ -185,6 +185,7 @@ $log->log(
 );
 ok(substr($LAST_LOG_MSG, -1) eq "\x00", 'TCP transport ends with a null byte');
 note("formatted message: $LAST_LOG_MSG");
+substr($LAST_LOG_MSG, -1) = '';
 $msg = decode_json($LAST_LOG_MSG);
 is($msg->{level},         6,                         'correct level info');
 is($msg->{short_message}, 'It works',                'short_message correct');

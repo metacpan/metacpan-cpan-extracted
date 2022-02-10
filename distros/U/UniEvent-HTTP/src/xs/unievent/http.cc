@@ -54,13 +54,14 @@ void fill (ServerResponse* res, const Hash& h) {
 
 void fill (Server::Location& loc, const Hash& h) {
     Scalar v;
-    if ((v = h.fetch("host")))       loc.host       = v.as_string();
-    if ((v = h.fetch("port")))       loc.port       = v.number();
-    if ((v = h.fetch("path")))       loc.path       = v.as_string();
-    if ((v = h.fetch("reuse_port"))) loc.reuse_port = v.is_true();
-    if ((v = h.fetch("backlog")))    loc.backlog    = v.number();
-    if ((v = h.fetch("domain")))     loc.domain     = v.number();
-    if ((v = h.fetch("ssl_ctx")))    loc.ssl_ctx    = xs::in<SslContext>(v);
+    if ((v = h.fetch("host")))        loc.host        = v.as_string();
+    if ((v = h.fetch("port")))        loc.port        = v.number();
+    if ((v = h.fetch("path")))        loc.path        = v.as_string();
+    if ((v = h.fetch("reuse_port")))  loc.reuse_port  = v.is_true();
+    if ((v = h.fetch("tcp_nodelay"))) loc.tcp_nodelay = v.is_true();
+    if ((v = h.fetch("backlog")))     loc.backlog     = v.number();
+    if ((v = h.fetch("domain")))      loc.domain      = v.number();
+    if ((v = h.fetch("ssl_ctx")))     loc.ssl_ctx     = xs::in<SslContext>(v);
 
     if ((v = h.fetch("sock"))) {
         auto sock = sv2sock(v);
@@ -69,13 +70,14 @@ void fill (Server::Location& loc, const Hash& h) {
 }
 
 void fill (Hash& h, const Server::Location& loc) {
-    h["host"]       = xs::out<>(loc.host);
-    h["port"]       = xs::out<>(loc.port);
-    h["reuse_port"] = xs::out<>(loc.reuse_port);
-    h["backlog"]    = xs::out<>(loc.backlog);
-    h["domain"]     = xs::out<>(loc.domain);
-    h["ssl_ctx"]    = xs::out<>(loc.ssl_ctx.ctx);
-    h["sock"]       = xs::out<>(loc.sock);
+    h["host"]        = xs::out(loc.host);
+    h["port"]        = xs::out(loc.port);
+    h["reuse_port"]  = xs::out(loc.reuse_port);
+    h["tcp_nodelay"] = xs::out(loc.tcp_nodelay);
+    h["backlog"]     = xs::out(loc.backlog);
+    h["domain"]      = xs::out(loc.domain);
+    h["ssl_ctx"]     = xs::out(loc.ssl_ctx.ctx);
+    h["sock"]        = xs::out(loc.sock);
 }
 
 void fill (Server::Config& cfg, const Hash& h) {
@@ -84,7 +86,6 @@ void fill (Server::Config& cfg, const Hash& h) {
     if ((v = h.fetch("idle_timeout")))           cfg.idle_timeout           = v.as_number<double>() * 1000;
     if ((v = h.fetch("max_headers_size")))       cfg.max_headers_size       = v.number();
     if ((v = h.fetch("max_body_size")))          cfg.max_body_size          = v.number();
-    if ((v = h.fetch("tcp_nodelay")))            cfg.tcp_nodelay            = v.is_true();
     if ((v = h.fetch("max_keepalive_requests"))) cfg.max_keepalive_requests = v.number();
 }
 

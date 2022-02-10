@@ -1,0 +1,12 @@
+MODULE = UniEvent::WebSocket                PACKAGE = UniEvent::WebSocket::ConnectRequest
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash(__PACKAGE__).inherit("Protocol::WebSocket::ConnectRequest");
+}
+
+ClientConnectRequestSP ClientConnectRequest::new (Hash params = Hash()) {
+    RETVAL = new ClientConnectRequest();
+    xs::unievent::websocket::make_request(params, RETVAL);
+}
+

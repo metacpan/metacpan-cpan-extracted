@@ -12,7 +12,7 @@ $inc =~ s/"//g;
 my @incs = ($inc, @{$Prima::Config::Config{incpaths}});
 
 # Explicitly set the version here; all .pm.PL files will use this:
-my $version = '0.12';
+my $version = '0.13';
 
 my $build = Module::Build->new(
 	module_name => 'PDL::Drawing::Prima',
@@ -21,7 +21,7 @@ my $build = Module::Build->new(
 	license  => 'perl',
 	configure_requires => {
 		PDL						=> '2.4.10',
-		Prima					=> '1.33',
+		Prima					=> '1.57',
 		# meta_merge was added in v 0.28:
 		'Module::Build'		=> 0.28,
 	},
@@ -31,10 +31,10 @@ my $build = Module::Build->new(
 		'ExtUtils::ParseXS'	=> '3.0',
 	},
 	requires => {
-		# Due to the use of PerlIO, I need at least 5.8:
-		perl					=> '5.8.0',
-		PDL						=> '2.4.10',
-		Prima					=> '1.35',
+		# Due to the use of Prima, I need at least 5.10:
+		perl					=> '5.10.0',
+		PDL					=> '2.4.10',
+		Prima					=> '1.57',
 	},
 	needs_compiler => 1,
 	include_dirs => \@incs,

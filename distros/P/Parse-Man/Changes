@@ -1,5 +1,16 @@
 Revision history for Parse-Man
 
+0.03    2022-02-10
+        [CHANGES]
+         * Updated to perl v5.14
+         * Parse .SM correctly, handling 1/2/3 argument cases
+         * Parse .EX / .EE
+         * Parse marker and indent specification of .IP paragraphs
+         * Decompress automatically via :gzip IO layer if filename ends .gz
+         * Handle various escapes: \-, \&, named chars
+         * Improved API of indent option
+         * Bugfix to .sp inside .TP
+
 0.02    CHANGES:
          * Nicer method for handling chunks 
             + just provide one chunk method, it takes options

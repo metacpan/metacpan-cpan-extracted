@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.56, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -50,7 +50,8 @@
    "resources" : {
       "bugtracker" : {
          "mailto" : "bug-Geo-Coder-GooglePlaces@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-GooglePlaces"
+         "web" : "https://github.com/nigelhorne/Geo-Coder-GooglePlaces/issues",
+         "x_url" : "https://github.com/nigelhorne/Geo-Coder-GooglePlaces/issues"
       },
       "repository" : {
          "type" : "git",
@@ -59,6 +60,6 @@
          "x_mailto" : "bug-CGI-Info@rt.cpan.org"
       }
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

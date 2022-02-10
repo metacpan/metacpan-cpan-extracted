@@ -3,7 +3,7 @@ use 5.012;
 use Path::Class;
 use Data::Recursive(); # XS code needs xs::merge
 
-our $VERSION = '1.2.2';
+our $VERSION = '1.2.3';
 
 XS::Loader::load();
 
@@ -19,8 +19,10 @@ sub process {
         $nsstash = \%{"NS::"};
     }
 
+    $DB::{disable_profile}() if $DB::{disable_profile} && !$ENV{MP_WRITE_NYTPROF};
     _apply_initial_cfg('', Data::Recursive::clone($initial_cfg)) if $initial_cfg;
     _process_file($file);
+    $DB::{enable_profile}() if $DB::{enable_profile} && !$ENV{MP_WRITE_NYTPROF};
 
     my $ret = {};
 

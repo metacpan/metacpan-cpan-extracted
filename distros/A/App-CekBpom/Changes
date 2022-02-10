@@ -1,3 +1,9 @@
+0.017   2022-01-23  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust with Perinci::Result::Format::Lite 0.285 & Rinci 1.1.100
+          ('title' result metadata property becomes 'caption').
+
+
 0.016   2021-12-09  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Fix showing 'queries' (which is an arrayref not string)

@@ -2,9 +2,8 @@
 
 use warnings;
 use strict;
-use Test::LWP::UserAgent;
 use Test::Number::Delta within => 1e-2;
-use Test::Most tests => 14;
+use Test::Most tests => 16;
 use Test::Carp;
 
 BEGIN {
@@ -13,14 +12,11 @@ BEGIN {
 
 US: {
 	SKIP: {
-		if(!-e 't/online.enabled') {
-			if(!$ENV{AUTHOR_TESTING}) {
-				diag('Author tests not required for installation');
-				skip('Author tests not required for installation', 13);
-			} else {
-				diag('Test requires Internet access');
-				skip('Test requires Internet access', 13);
-			}
+		if(-e 't/online.enabled') {
+			use_ok('Test::LWP::UserAgent');
+		} else {
+			diag('On-line tests have been disabled');
+			skip('On-line tests have been disabled', 15);
 		}
 
 		my $geocoder = new_ok('Geo::Coder::CA');
@@ -32,15 +28,30 @@ US: {
 		delta_ok($location->{latt}, 38.90);
 		delta_ok($location->{longt}, -77.04);
 
-		$location = $geocoder->geocode(location => 'Greene County, Indiana, USA');
-		ok(defined($location));
-		delta_ok($location->{latt}, 39.04);
-		delta_ok($location->{longt}, -86.98);
+		TODO: {
+			# Test counties
+			local $TODO = "geocoder.ca doesn't support counties";
 
-		# $location = $geocoder->geocode(location => 'Greene, Indiana, USA');
-		# ok(defined($location));
-		# delta_ok($location->{latt}, 39.04);
-		# delta_ok($location->{longt}, -86.96);
+			if($location = $geocoder->geocode(location => 'Greene County, Indiana, USA')) {
+				# delta_ok($location->{latt}, 39.04);
+				# delta_ok($location->{longt}, -86.98);
+				pass('Counties unexpectedly pass Lat');
+				pass('Counties unexpectedly pass Long');
+			} else {
+				fail('Counties Lat');
+				fail('Counties Long');
+			}
+
+			if($location = $geocoder->geocode(location => 'Greene, Indiana, USA')) {
+				# delta_ok($location->{latt}, 39.04);
+				# delta_ok($location->{longt}, -86.96);
+				pass('Counties unexpectedly pass Lat');
+				pass('Counties unexpectedly pass Long');
+			} else {
+				fail('Counties Lat');
+				fail('Counties Long');
+			}
+		}
 
 		$location = $geocoder->geocode(location => 'XYZZY');
 		ok(!defined($location));

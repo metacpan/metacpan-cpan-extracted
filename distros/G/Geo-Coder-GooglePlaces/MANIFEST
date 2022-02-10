@@ -10,10 +10,12 @@ t/00-load.t
 t/10-new.t
 t/boiler.t
 t/changes.t
+t/comment-spelling.t
 t/coverage.t
 t/critic.t
 t/cv.t
 t/dist.t
+t/eof.t
 t/eol.t
 t/gv.t
 t/kwalitee.t
@@ -25,12 +27,12 @@ t/namespaces.t
 t/no404s.t
 t/noplan.t
 t/pod-cm.t
+t/pod-spelling.t
 t/pod.t
 t/port.t
 t/prereq.t
 t/rt119288.t
 t/snippets.t
-t/spelling.t
 t/strict.t
 t/unit.t
 t/unused.t

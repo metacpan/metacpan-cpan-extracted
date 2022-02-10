@@ -1,8 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-use strict;
+use v5.14;
+use warnings;
 
-use Test::More tests => 13;
+use Test::More;
 
 my @paras;
 
@@ -72,11 +73,27 @@ is_deeply( \@paras,
 
 undef @paras;
 $parser->from_string( <<'EOMAN' ),
-.SM Small text
+.SM "Small text"
 EOMAN
 is_deeply( \@paras,
    [ "<SMALL>Small text</SMALL>" ],
    '.SM' );
+
+undef @paras;
+$parser->from_string( <<'EOMAN' ),
+.SM Small text
+EOMAN
+is_deeply( \@paras,
+   [ "<SMALL>Small</SMALL>text" ],
+   '.SM joining 2' );
+
+undef @paras;
+$parser->from_string( <<'EOMAN' ),
+.SM Some small text
+EOMAN
+is_deeply( \@paras,
+   [ "Some<SMALL>small</SMALL>text" ],
+   '.SM joining 3' );
 
 undef @paras;
 $parser->from_string( <<'EOMAN' ),
@@ -141,3 +158,5 @@ EOMAN
 is_deeply( \@paras,
    [ "<I>italic</I> roman" ],
    '\f preserves space' );
+
+done_testing;

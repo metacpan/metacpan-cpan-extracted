@@ -1,0 +1,21 @@
+build-profile.pl
+Changes
+cpanfile
+FIT-Profile.csv
+lib/Parser/FIT.pm
+lib/Parser/FIT/Profile.pm
+lib/Parser/FIT/Simple.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/handler-registration.t
+t/happy_path.t
+t/parse_data_header.t
+t/parse_header.t
+t/parse_record_header.t
+t/parser-fit-simple.t
+t/test-files/Activity.fit
+t/test-files/activity_multisport.fit
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

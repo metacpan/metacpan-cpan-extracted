@@ -1,39 +1,33 @@
 ## no critic
 use Test::More;
-use Test::Exception;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
-use Data::Printer;
 use File::Temp ();
-
 use Mock::Podman::Service;
 
-use Podman::Client;
 use Podman::System;
 
-my $Connection =
+local $ENV{PODMAN_CONNECTION_URL} =
   'http+unix://' . File::Temp::tempdir( CLEANUP => 1 ) . '/podman.sock';
 
-my $Service = Mock::Podman::Service->new( Listen => $Connection );
-$Service->Start();
+my $service = Mock::Podman::Service->new();
+my $system  = Podman::System->new();
 
-my $Client = Podman::Client->new( ConnectionURI => $Connection );
-my $System = Podman::System->new( Client        => $Client );
-
-my $ExpectedData = {
+$service->start;
+my $expected_data = {
     "APIVersion" => "3.0.0",
     "Version"    => "3.0.1",
     "GoVersion"  => "go1.15.9",
     "BuiltTime"  => "Thu Jan  1 01:00:00 1970",
     "OsArch"     => "linux/amd64"
 };
-my $ActualData = $System->Version();
-is( ref $ActualData, 'HASH', 'Version ok.' );
-is_deeply( $ActualData, $ExpectedData, 'Version response ok.' );
+my $actual_data = $system->version;
+is( ref $actual_data, 'HASH', 'Version ok.' );
+is_deeply( $actual_data, $expected_data, 'Version response ok.' );
 
-$ExpectedData = {
+$expected_data = {
     "Containers" => {
         "Active" => "0",
         "Size"   => "13256",
@@ -50,10 +44,16 @@ $ExpectedData = {
         "Total"  => "1"
     }
 };
-$ActualData = $System->DiskUsage();
-is( ref $ActualData, 'HASH', 'DiskUsage ok.' );
-is_deeply( $ActualData, $ExpectedData, 'Version response ok.' );
+$actual_data = $system->disk_usage();
+is( ref $actual_data, 'HASH', 'Disk usage ok.' );
+is_deeply( $actual_data, $expected_data, 'Disk usage response ok.' );
 
-$Service->Stop();
+$actual_data = $system->info();
+is( ref $actual_data, 'HASH', 'Info ok.' );
+my @expected_keys = qw(host registries store version);
+my @actual_keys   = sort keys %{$actual_data};
+is_deeply( \@actual_keys, \@expected_keys, 'Info response ok.' );
+
+$service->stop;
 
 done_testing();

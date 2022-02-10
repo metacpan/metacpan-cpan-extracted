@@ -36,7 +36,7 @@ sub import {
 
 use common::sense;
 
-our $VERSION = '2.7191';
+our $VERSION = '2.7193';
 our @EXPORT_OK = qw(filtered_handle);
 
 my %pf2t;

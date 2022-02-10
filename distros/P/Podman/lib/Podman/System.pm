@@ -1,63 +1,64 @@
 package Podman::System;
 
-use strict;
-use warnings;
-use utf8;
+use Mojo::Base 'Podman::Client';
 
-use Moose;
+use List::Util qw(sum);
+use Scalar::Util qw(blessed);
 
-use List::Util ();
-use Scalar::Util ();
+sub disk_usage {
+  my $self = shift;
 
-use Podman::Client;
+  $self = __PACKAGE__->new unless blessed($self);
 
-has 'Client' => (
-    is      => 'ro',
-    isa     => 'Podman::Client',
-    lazy    => 1,
-    default => sub { return Podman::Client->new() },
-);
+  my $data = $self->get('system/df')->json;
 
-sub DiskUsage {
-    my $Self = shift;
+  my %disk_usage;
+  for my $type (qw(Volumes Containers Images)) {
+    my @data  = @{$data->{$type}};
+    my %entry = (
+      Total  => scalar @data,
+      Active => sum(map { $_->{Containers} ? 1 : 0 } @data),
+      Size   => sum(map { $_->{Size} } @data),
+    );
+    $disk_usage{$type} = \%entry;
+  }
 
-    $Self = __PACKAGE__->new() if !Scalar::Util::blessed($Self);
-
-    my $Data = $Self->Client->Get('system/df');
-
-    my %DiskUsage;
-    for my $Type (qw(Volumes Containers Images)) {
-        my @TypeData = @{ $Data->{$Type} };
-        my %Entry    = (
-            Total  => scalar @TypeData,
-            Active =>
-              List::Util::sum( map { $_->{Containers} ? 1 : 0 } @TypeData ),
-            Size => List::Util::sum( map { $_->{Size} } @TypeData ),
-        );
-        $DiskUsage{$Type} = \%Entry;
-    }
-
-    return \%DiskUsage;
+  return \%disk_usage;
 }
 
-sub Version {
-    my $Self = shift;
+sub info {
+  my $self = shift;
 
-    $Self = __PACKAGE__->new() if !Scalar::Util::blessed($Self);
+  $self = __PACKAGE__->new unless blessed($self);
 
-
-    my $Data = $Self->Client->Get('info');
-
-    my $Version = $Data->{version};
-    delete $Version->{GitCommit};
-    delete $Version->{Built};
-
-    return $Version;
+  return $self->get('info')->json;
 }
 
-__PACKAGE__->meta->make_immutable;
+sub version {
+  my $self = shift;
+
+  $self = __PACKAGE__->new unless blessed($self);
+
+  my $data = $self->get('info')->json;
+
+  my $version = $data->{version};
+  delete $version->{GitCommit};
+  delete $version->{Built};
+
+  return $version;
+}
+
+sub prune {
+  my $self = shift;
+
+  $self = __PACKAGE__->new unless blessed($self);
+
+  return $self->post('system/prune')->json;
+}
 
 1;
+
+__END__
 
 =encoding utf8
 
@@ -67,41 +68,49 @@ Podman::System - Service information.
 
 =head1 SYNOPSIS
 
-    # Create and use system controller
-    my $System = Podman::System->new();
-    my $Version = $System->Version();
+    # Object-oriented interface usage
+    my $system  = Podman::System->new;
+    my $version = $system->version;
+    my $report  = $system->prune
 
-    # Get disk usage info
-    my $Disk = Podman::System->DiskUsage();
-
-    # Get components version
-    Podman::System->Version();
+    # Function-oriented interface usage
+    my $disk    = Podman::System->disk_sage;
+    my $version = Podman::System->version;
 
 =head1 DESCRIPTION
 
-L<Podman::Service> provides system level information for a Podman service.
+=head2 Inheritance
 
-=head1 ATTRIBUTES
+    Podman::System
+        isa Podman::Client
 
-=head2 Client
-
-    my $Client = Podman::Client->new(
-        Connection => 'http+unix:///var/cache/podman.sock' );
-    my $Images = Podman::Images->new( Client => $Client );
-
-Optional L<Podman::Client> object.
+L<Podman::Service> provides system level information of the Podman service.
 
 =head1 METHODS
 
-=head2 DiskUsage
+L<Podman::System> implements following methods, which can be used as object or class methods.
 
-    my $DiskUsage = Podman::System->DiskUsage();
+=head2 disk_usage
+
+    my $disk_usage = Podman::System->disk_usage;
 
 Return information about disk usage for containers, images and volumes.
 
-=head2 Version
+=head2 info
 
-    my $Version = Podman::System->Version();
+    my $info = Podman::System->info;
+
+Return information on the system and libpod configuration.
+
+=head2 prune
+
+    my $report = Podman::System->prune;
+
+Prune unused data and return report.
+
+=head2 version
+
+    my $version = Podman::System->version;
 
 Obtain a dictionary of versions for the Podman service components.
 
@@ -117,7 +126,7 @@ Tobias Schäfer, <tschaefer@blackox.org>
 
 Copyright (C) 2022-2022, Tobias Schäfer.
 
-This program is free software, you can redistribute it and/or modify it under
-the terms of the Artistic License version 2.0.
+This program is free software, you can redistribute it and/or modify it under the terms of the Artistic License version
+2.0.
 
 =cut

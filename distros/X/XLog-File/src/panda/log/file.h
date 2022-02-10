@@ -8,7 +8,7 @@ namespace panda { namespace log {
 struct FileLogger : ILogger {
     struct Config {
         string   file;
-        bool     autoflush = true;
+        bool     buffered = false;
         uint32_t check_freq = 1000; // [ms]
     };
 
@@ -16,10 +16,15 @@ struct FileLogger : ILogger {
     ~FileLogger ();
 
     void log (const string&, const Info&) override;
+    void flush(); // flush file if buffered io used, otherwize do nothing
+
+protected:
+    void buffered_log (const string&);
+    void unbuffered_log (const string&);
 
 private:
     string   file;
-    bool     autoflush;
+    bool     buffered;
     FILE*    fh = nullptr;
     uint64_t inode;
     uint32_t check_freq;

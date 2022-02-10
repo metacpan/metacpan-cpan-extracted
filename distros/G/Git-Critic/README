@@ -3,7 +3,7 @@ NAME
     branch
 
 VERSION
-    version 0.4
+    version 0.5
 
 SYNOPSIS
         my $critic = Git::Critic->new( primary_target => 'main' );
@@ -55,6 +55,11 @@ CONSTRUCTOR ARGUMENTS
         -severity => 'harsh'                      -severity => 3
         -severity => 'cruel'                      -severity => 2
         -severity => 'brutal'                     -severity => 1
+
+  "profile"
+    Optional.
+
+    This is a filepath to a "Perl::Critic" configuration file.
 
   "verbose"
     Optional.

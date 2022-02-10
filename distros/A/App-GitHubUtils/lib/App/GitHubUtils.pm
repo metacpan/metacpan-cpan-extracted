@@ -3,7 +3,7 @@ package App::GitHubUtils;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-08-14'; # DATE
 our $DIST = 'App-GitHubUtils'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -209,6 +209,34 @@ sub git_clone_from_github {
     }
 }
 
+$SPEC{this_repo_on_github} = {
+    v => 1.1,
+    args => {},
+    deps => {
+        prog => 'this-repo',
+    },
+    links => [
+        {url=>'prog:this-repo'},
+    ],
+};
+sub this_repo_on_github {
+    require IPC::System::Options;
+    require Browser::Open;
+
+    my $repo = `this-repo`;
+    return [412, "this-repo failed"] unless length $repo;
+    chomp($repo);
+    my $stdout;
+    IPC::System::Options::system(
+        {die=>1, log=>1, capture_stdout=>\$stdout},
+        "git", "config", "-l");
+    say $stdout;
+    $stdout =~ m!.*=.*github\.com:?/?([^/]+)/(.+?)(?:\.git)?$!im
+        or return [412, "Can't find github username and repository name from configuration"];
+    Browser::Open::open_browser("https://github.com/$1/$2");
+    [200];
+}
+
 1;
 # ABSTRACT: Utilities related to GitHub
 
@@ -224,7 +252,7 @@ App::GitHubUtils - Utilities related to GitHub
 
 =head1 VERSION
 
-This document describes version 0.008 of App::GitHubUtils (from Perl distribution App-GitHubUtils), released on 2021-08-14.
+This document describes version 0.009 of App::GitHubUtils (from Perl distribution App-GitHubUtils), released on 2021-08-14.
 
 =head1 DESCRIPTION
 
@@ -236,6 +264,8 @@ GitHub:
 =item * L<create-this-repo-on-github>
 
 =item * L<git-clone-from-github>
+
+=item * L<this-repo-on-github>
 
 =back
 
@@ -332,6 +362,29 @@ If not specified, will use C<login> from C<github-cmd.conf> file.
 
 
 =back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 this_repo_on_github
+
+Usage:
+
+ this_repo_on_github() -> [$status_code, $reason, $payload, \%result_meta]
+
+This function is not exported.
+
+No arguments.
 
 Returns an enveloped result (an array).
 

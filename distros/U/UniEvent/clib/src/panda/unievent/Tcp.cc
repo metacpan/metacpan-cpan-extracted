@@ -113,6 +113,14 @@ void TcpConnectRequest::handle_event (const ErrorCode& err) {
     ConnectRequest::handle_event(err);
 }
 
+excepted<net::SockAddr, ErrorCode> Tcp::sockaddr() const {
+    return handle_fd_excepted(impl()->sockaddr());
+}
+
+excepted<net::SockAddr, ErrorCode> Tcp::peeraddr() const {
+    return handle_fd_excepted(impl()->peeraddr());
+}
+
 excepted<std::pair<TcpSP, TcpSP>, ErrorCode> Tcp::pair (const LoopSP& loop, int type, int protocol) {
     return pair(new Tcp(loop), new Tcp(loop), type, protocol);
 }

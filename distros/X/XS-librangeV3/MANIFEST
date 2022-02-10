@@ -63,6 +63,9 @@ clib/include/range/v3/algorithm/find_end.hpp
 clib/include/range/v3/algorithm/find_first_of.hpp
 clib/include/range/v3/algorithm/find_if.hpp
 clib/include/range/v3/algorithm/find_if_not.hpp
+clib/include/range/v3/algorithm/fold.hpp
+clib/include/range/v3/algorithm/foldl.hpp
+clib/include/range/v3/algorithm/foldr.hpp
 clib/include/range/v3/algorithm/for_each.hpp
 clib/include/range/v3/algorithm/for_each_n.hpp
 clib/include/range/v3/algorithm/generate.hpp
@@ -248,6 +251,7 @@ clib/include/range/v3/view/c_str.hpp
 clib/include/range/v3/view/cache1.hpp
 clib/include/range/v3/view/cartesian_product.hpp
 clib/include/range/v3/view/chunk.hpp
+clib/include/range/v3/view/chunk_by.hpp
 clib/include/range/v3/view/common.hpp
 clib/include/range/v3/view/concat.hpp
 clib/include/range/v3/view/const.hpp

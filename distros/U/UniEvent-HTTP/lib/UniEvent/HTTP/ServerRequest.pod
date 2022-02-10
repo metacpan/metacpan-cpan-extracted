@@ -308,4 +308,41 @@ Will throw if response for the request has already been sent or started.
 Drop the request and make response no longer needed.
 Underlying connection will be closed and C<drop_callback/event> will be called with error C<UniEvent::SystemError::operation_canceled>.
 
+
+=head2 upgrade()
+
+Can only be called on requests with C<Connection: upgrade> header. Detaches underlying connection from http server and returns it as
+L<UniEvent::Stream> object. Server will no longer manage this connection. It's up to you to properly handle further communication.
+Also this stream can be transferred to some framework that manages other protocol (for example, L<UniEvent::WebSocket>) to do all the work for you.
+
+This method L<May return error|UniEvent/"OPTIONAL ERRORS"> in case if request has no C<Connection: upgrade> header
+or connection is broken (can only happen when call to C<upgrade()> is asynchronous, i.e. not in the http request callback).
+
+    $http_server->request_callback(sub {
+        my $req = shift;
+        if ($req->uri eq '/websocket') {
+            my ($stream, $err) = $req->upgrade;
+            if ($err) {
+                $req->respond({code => 400});
+                return;
+            }
+            # answer with correct websocket http response and proceed with $stream as websocket
+        }
+    });
+    
+    P.S. To easily integrate websockets into http server see L<UniEvent::WebSocket>. Example:
+    
+    my $ws_server = UE::WebSocket::Server->new;
+    $ws_server->run;
+
+    $http_server->request_callback(sub {
+        my $req = shift;
+        if ($req->uri eq '/websocket') {
+            $ws_server->upgrade_connection($req); # will do all the work and send websocket handshake response
+            return;
+            # further communication via UniEvent::WebSocket::Server API, see its docs
+        }
+    });
+
+
 =cut

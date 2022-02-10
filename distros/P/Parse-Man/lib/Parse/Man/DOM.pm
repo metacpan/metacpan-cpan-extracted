@@ -1,16 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2012 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2022 -- leonerd@leonerd.org.uk
 
-package Parse::Man::DOM;
+package Parse::Man::DOM 0.03;
 
-use strict;
+use v5.14;
 use warnings;
 
 use base qw( Parse::Man );
-
-our $VERSION = '0.02';
 
 =head1 NAME
 
@@ -90,6 +88,13 @@ sub para_IP
    $self->{current_document}->append_para( $self->_make( para_indent => $opts, $self->_make( chunklist => ) ) );
 }
 
+sub para_EX
+{
+   my $self = shift;
+   my ( $opts ) = @_;
+   $self->{current_document}->append_para( $self->_make( para_example => $opts, $self->_make( chunklist => ) ) );
+}
+
 sub chunk
 {
    my $self = shift;
@@ -123,17 +128,18 @@ sub _make
    return $code->()->new( @_ );
 }
 
-use constant document_class    => "Parse::Man::DOM::Document";
-use constant metadata_class    => "Parse::Man::DOM::Metadata";
-use constant heading_class     => "Parse::Man::DOM::Heading";
-use constant para_plain_class  => "Parse::Man::DOM::Para::Plain";
-use constant para_term_class   => "Parse::Man::DOM::Para::Term";
-use constant para_indent_class => "Parse::Man::DOM::Para::Indent";
-use constant chunklist_class   => "Parse::Man::DOM::Chunklist";
-use constant chunk_class       => "Parse::Man::DOM::Chunk";
-use constant space_class       => "Parse::Man::DOM::Space";
-use constant break_class       => "Parse::Man::DOM::Break";
-use constant linebreak_class   => "Parse::Man::DOM::Linebreak";
+use constant document_class     => "Parse::Man::DOM::Document";
+use constant metadata_class     => "Parse::Man::DOM::Metadata";
+use constant heading_class      => "Parse::Man::DOM::Heading";
+use constant para_plain_class   => "Parse::Man::DOM::Para::Plain";
+use constant para_term_class    => "Parse::Man::DOM::Para::Term";
+use constant para_indent_class  => "Parse::Man::DOM::Para::Indent";
+use constant para_example_class => "Parse::Man::DOM::Para::Example";
+use constant chunklist_class    => "Parse::Man::DOM::Chunklist";
+use constant chunk_class        => "Parse::Man::DOM::Chunk";
+use constant space_class        => "Parse::Man::DOM::Space";
+use constant break_class        => "Parse::Man::DOM::Break";
+use constant linebreak_class    => "Parse::Man::DOM::Linebreak";
 
 package Parse::Man::DOM::Document;
 
@@ -149,7 +155,9 @@ sub new
    return bless { meta => {}, paras => [] }, $class;
 }
 
-=head2 $meta = $document->meta( $key )
+=head2 meta
+
+   $meta = $document->meta( $key )
 
 Returns a C<Parse::Man::DOM::Metadata> object for the named item of metadata.
 
@@ -181,7 +189,9 @@ sub add_meta
    $self->{meta}{ $meta->name } = $meta;
 }
 
-=head2 @paras = $document->paras
+=head2 paras
+
+   @paras = $document->paras
 
 Returns a list of C<Parse::Man::DOM::Heading> or C<Parse::Man::DOM::Para> or 
 subclass objects, containing the actual page content.
@@ -218,11 +228,15 @@ sub new
    return bless [ $_[0] => $_[1] ], $class;
 }
 
-=head2 $name = $metadata->name
+=head2 name
+
+   $name = $metadata->name
 
 The string name of the metadata
 
-=head2 $value = $metadata->value
+=head2 value
+
+   $value = $metadata->value
 
 The string value of the metadata
 
@@ -246,11 +260,15 @@ sub new
    return bless [ $_[0] => $_[1] ], $class;
 }
 
-=head2 $level = $heading->level
+=head2 level
+
+   $level = $heading->level
 
 The heading level number; 1 for C<.SH>, 2 for C<.SS>
 
-=head2 $text = $heading->text
+=head2 text
+
+   $text = $heading->text
 
 The plain text string of the heading title
 
@@ -268,20 +286,31 @@ subclasses.
 
 =cut
 
-=head2 $filling = $para->filling
+=head2 filling
+
+   $filling = $para->filling
 
 Returns true if filling (C<.fi>) is in effect, or false if no-filling (C<.nf>)
 is in effect.
 
-=head2 $chunklist = $para->body
+=head2 body
+
+   $chunklist = $para->body
 
 Returns a C<Parse::Man::DOM::Chunklist> to represent the actual content of the
 paragraph.
+
+=head2 indent
+
+   $indent = $para->indent
+
+Returns the indentation size in column count, if defined.
 
 =cut
 
 sub filling { shift->{filling} }
 sub body    { shift->{body} }
+sub indent  { shift->{indent} }
 
 package Parse::Man::DOM::Para::Plain;
 use base qw( Parse::Man::DOM::Para );
@@ -291,7 +320,9 @@ use constant type => "plain";
 
 Represent a plain (C<.P> or C<.PP>) paragraph.
 
-=head2 $type = $para->type
+=head2 type
+
+   $type = $para->type
 
 Returns C<"plain">.
 
@@ -314,7 +345,9 @@ use constant type => "term";
 
 Represents a term paragraph (C<.TP>).
 
-=head2 $type = $para->type
+=head2 type
+
+   $type = $para->type
 
 Returns C<"term">.
 
@@ -328,11 +361,15 @@ sub new
    return bless { indent => $opts->{indent}, term => $term, definition => $definition }, $class;
 }
 
-=head2 $chunklist = $para->term
+=head2 term
+
+   $chunklist = $para->term
 
 Returns a C<Parse::Man::DOM::Chunklist> for the defined term name.
 
-=head2 $chunklist = $para->definition
+=head2 definition
+
+   $chunklist = $para->definition
 
 Returns a C<Parse::Man::DOM::Chunklist> for the defined term definition.
 
@@ -345,7 +382,8 @@ sub append_chunk
 {
    my $self = shift;
    my ( $chunk ) = @_;
-   if( !$self->{term_done} and $chunk->isa( "Parse::Man::DOM::Linebreak" ) ) {
+
+   if( $chunk->isa( "Parse::Man::DOM::Linebreak" ) ) {
       $self->{term_done} = 1;
    }
    elsif( !$self->{term_done} ) {
@@ -364,9 +402,46 @@ use constant type => "indent";
 
 Represents an indented paragraph (C<.IP>).
 
-=head2 $type = $para->type
+=head2 type
+
+   $type = $para->type
 
 Returns C<"indent">.
+
+=cut
+
+sub new
+{
+   my $class = shift;
+   my ( $opts, $body ) = @_;
+   my $self = $class->SUPER::new( @_ );
+   $self->{marker} = $opts->{marker};
+   return $self;
+}
+
+=head2 marker
+
+   $marker = $para->marker
+
+Returns the indentation marker text, if defined.
+
+=cut
+
+sub marker { shift->{marker} }
+
+package Parse::Man::DOM::Para::Example;
+use base qw( Parse::Man::DOM::Para::Plain );
+use constant type => "example";
+
+=head1 Parse::Man::DOM::Para::Example
+
+Represents an example paragraph (C<.EX> / C<.EE>).
+
+=head2 type
+
+   $type = $para->type
+
+Returns C<"example">.
 
 =cut
 
@@ -385,7 +460,9 @@ sub new
    return bless { chunks => [ @_ ] }, $class;
 }
 
-=head2 @chunks = $chunklist->chunks
+=head2 chunks
+
+   @chunks = $chunklist->chunks
 
 Returns a list of C<Parse::Man::DOM::Chunk> objects.
 
@@ -417,16 +494,22 @@ sub is_linebreak { 0 }
 sub is_space     { 0 }
 sub is_break     { 0 }
 
-=head2 $text = $chunk->text
+=head2 text
+
+   $text = $chunk->text
 
 The plain string value of the text for this chunk.
 
-=head2 $font = $chunk->font
+=head2 font
+
+   $font = $chunk->font
 
 The font name in effect for this chunk. One of C<"R">, C<"B">, C<"I"> or
 C<"SM">.
 
-=head2 $size = $chunk->size
+=head2 size
+
+   $size = $chunk->size
 
 The size of this chunk, relative to the paragraph base of 0.
 

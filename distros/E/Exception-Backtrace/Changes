@@ -1,3 +1,7 @@
+1.1.1   10.12.2021
+    - avoid calling overloaded stringification in the default
+      frame decorator
+
 1.1.0   26.11.2021
     - Introduce agruments decorator to allow custom stringification
       of perl frame arguments

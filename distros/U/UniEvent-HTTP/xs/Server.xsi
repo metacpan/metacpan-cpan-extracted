@@ -1,5 +1,6 @@
 #include <xs/unievent/Tcp.h>
 #include <xs/net/sockaddr.h>
+#include <xs/typemap/expected.h>
 #include <xs/CallbackDispatcher.h>
 
 MODE: INLINE
@@ -39,7 +40,8 @@ LoopSP Server::loop ()
 std::vector<StreamSP> Server::listeners ()
 
 SockAddr Server::sockaddr () {
-    RETVAL = THIS->sockaddr().value();
+    auto res = THIS->sockaddr();
+    XSRETURN_EXPECTED(res);
 }
 
 bool Server::running ()

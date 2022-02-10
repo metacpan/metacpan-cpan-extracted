@@ -9,7 +9,7 @@ my %params = (
     CPLUS         => 14,
     DEFINE        => $ENV{DEBUG} ? '-DDEBUG' : '',
     TEST_REQUIRES => {'Net::SSLeay' => 0, 'Test::Exception' => 0},
-    BIN_DEPS      => ['Net::SockAddr', 'XS::libuv', 'XS::libcares', 'Export::XS'],
+    BIN_DEPS      => ['Net::SockAddr', 'XS::libuv', 'XS::libcares', 'Export::XS', 'XLog'],
     SRC           => 'src xs',
     INC           => '-Isrc',
     CCFLAGS       => '-Wall -Wextra',

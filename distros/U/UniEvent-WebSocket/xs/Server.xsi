@@ -1,0 +1,78 @@
+#include <xs/typemap/expected.h>
+
+MODULE = UniEvent::WebSocket                PACKAGE = UniEvent::WebSocket::Server
+PROTOTYPES: DISABLE
+
+Server* Server::new (Server::Config cfg, LoopSP loop = Loop::default_loop()) {
+    RETVAL = new XSServer(loop);
+    RETVAL->configure(cfg);
+}
+
+void Server::configure(Server::Config cfg)
+
+Loop* Server::loop ()
+
+void Server::run ()
+
+void Server::stop (Sv close_code = {}) {
+    if (close_code) THIS->stop(xs::in<uint16_t>(close_code));
+    else            THIS->stop();
+}
+
+void Server::start_listening ()
+
+void Server::stop_listening ()
+
+Server::handshake_fn Server::handshake_callback(Sv cb = {}) {
+    if (cb) {
+        THIS->handshake_callback = xs::in<Server::handshake_fn>(cb);
+        XSRETURN_UNDEF;
+    }
+    else RETVAL = THIS->handshake_callback;
+}
+
+XSCallbackDispatcher* Server::connection_event () {
+    RETVAL = XSCallbackDispatcher::create(THIS->connection_event);
+}
+
+void Server::connection_callback (Server::connection_fn cb) {
+    THIS->connection_event.remove_all();
+    if (cb) THIS->connection_event.add(cb);
+}
+
+XSCallbackDispatcher* Server::disconnection_event () {
+    RETVAL = XSCallbackDispatcher::create(THIS->disconnection_event);
+}
+
+void Server::disconnection_callback (Server::disconnection_fn cb) {
+    THIS->disconnection_event.remove_all();
+    if (cb) THIS->disconnection_event.add(cb);
+}
+
+size_t Server::connections_count () {
+    RETVAL = THIS->connections().size();
+}
+
+http::Server::Listeners Server::listeners ()
+
+XSConnectionIterator* Server::connections () {
+    RETVAL = new XSConnectionIterator(THIS->connections());
+}
+
+ServerConnection* Server::get_connection (uint64_t id)
+
+void Server::foreach_connection (Sub sub) {
+    for (const auto& p : THIS->connections()) sub(xs::out(p.second));
+}
+
+void Server::upgrade_connection(http::ServerRequestSP req) {
+    auto res = THIS->upgrade_connection(req);
+    XSRETURN_EXPECTED(res);
+}
+
+http::ServerSP Server::http ()
+
+void Server::sockaddr() {
+    auto res = THIS->sockaddr();
+    XSRETURN_EXPECTED(res);
+}

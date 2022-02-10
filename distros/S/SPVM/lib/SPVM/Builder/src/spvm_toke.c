@@ -1837,6 +1837,14 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_DIE);
                   return DIE;
                 }
+                else if (strcmp(keyword, "divui") == 0) {
+                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_DIVIDE_UNSIGNED_INT);
+                  return DIVIDE_UNSIGNED_INT;
+                }
+                else if (strcmp(keyword, "divul") == 0) {
+                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_DIVIDE_UNSIGNED_LONG);
+                  return DIVIDE_UNSIGNED_LONG;
+                }
                 else if (strcmp(keyword, "double") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_DOUBLE);
                   return DOUBLE;
@@ -1994,6 +2002,10 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_NEW);
                   return NEW;
                 }
+                else if (strcmp(keyword, "new_string_len") == 0) {
+                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_NEW_STRING_LEN);
+                  return NEW_STRING_LEN;
+                }
                 break;
               }
               case 'o' : {
@@ -2046,6 +2058,14 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 else if (strcmp(keyword, "refcnt") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_REFCNT);
                   return REFCNT;
+                }
+                else if (strcmp(keyword, "remui") == 0) {
+                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_REMAINDER_UNSIGNED_INT);
+                  return REMAINDER_UNSIGNED_INT;
+                }
+                else if (strcmp(keyword, "remul") == 0) {
+                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_REMAINDER_UNSIGNED_LONG);
+                  return REMAINDER_UNSIGNED_LONG;
                 }
                 else if (strcmp(keyword, "return") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_RETURN);

@@ -1,62 +1,29 @@
 package Podman::Exception;
 
-##! Simple generic exception class.
-##!
-##!     Podman::Exception->new( Code => 404 );
-##!
-##! Exception is thrown on API request failure.
+use Mojo::Base 'Mojo::Exception';
 
-use strict;
-use warnings;
-use utf8;
+use constant MESSAGE => {
+  900 => 'Connection failed.',
+  304 => 'Action already processing.',
+  400 => 'Bad parameter in request.',
+  404 => 'No such item.',
+  405 => 'Bad request.',
+  409 => 'Conflict error in operation.',
+  500 => 'Internal server error.',
+};
 
-use Moose;
-with qw(Throwable);
+has 'code' => -1;
 
-use overload '""' => 'AsString';
+sub new {
+  my ($self, $code) = @_;
 
-### API error description.
-has 'Message' => (
-    is => 'rw',
-    isa => 'Str',
-    default => '',
-);
-
-### API (HTTP) code.
-has 'Code' => (
-    is => 'ro',
-    isa => 'Int',
-    required => 1,
-);
-
-### #[ignore(item)]
-sub BUILD {
-    my $Self = shift;
-
-    my %Messages = (
-        0   => 'Connection failed.',
-        304 => 'Action already processing.',
-        400 => 'Bad parameter in request.',
-        404 => 'No such item.',
-        409 => 'Conflict error in operation.',
-        500 => 'Internal server error.',
-    );
-
-    $Self->Message($Messages{$Self->Code} || 'Unknown error.');
-
-    return;
+  return $self->SUPER::new unless $code;
+  return $self->SUPER::new(MESSAGE->{$code} // 'Unknown error.')->code($code);
 }
-
-### #[ignore(item)]
-sub AsString {
-    my $Self = shift;
-
-    return sprintf "%s (%d)", $Self->Message, $Self->Code;
-}
-
-__PACKAGE__->meta->make_immutable;
 
 1;
+
+__END__
 
 =encoding utf8
 
@@ -67,38 +34,36 @@ Podman::Exception - Simple generic exceptions.
 =head1 SYNOPSIS
 
     eval {
-        Podman::Exception->new( Code => 404 )->throw();
+        Podman::Exception->throw(404);
     };
-    print $@;
+    say $@;
 
 =head1 DESCRIPTION
 
-L<Podman::Exception> is a simple generic exception class. Exception is thrown
-on any API request failure.
+=head2 Inheritance
 
-    0   => 'Connection failed.',
+    Podman::Exception
+        isa Mojo::Exception
+
+L<Podman::Exception> is a simple generic exception. Exceptions are thrown on any Podman service request failure.
+
+    900 => 'Connection failed.',
     304 => 'Action already processing.',
     400 => 'Bad parameter in request.',
     404 => 'No such item.',
+    405 => 'Bad request.',
     409 => 'Conflict error in operation.',
     500 => 'Internal server error.',
 
+The message is determined by the provided C<code>.
+
 =head1 ATTRIBUTES
 
-=head2 Code
+=head2 code
 
-    my $Exception = Podman::Exception->new( Code => 404 );
+    my $exception = Podman::Exception->new( code => 404 );
 
-HTTP code received from API.
-
-=head2 Message
-
-    print $Exception->Message();
-
-Readonly human readable exception message. The message is related to the
-C<Code>.
-
-=head1 METHODS
+HTTP code received from Podman service.
 
 =head1 AUTHORS
 
@@ -112,7 +77,7 @@ Tobias Schäfer, <tschaefer@blackox.org>
 
 Copyright (C) 2022-2022, Tobias Schäfer.
 
-This program is free software, you can redistribute it and/or modify it under
-the terms of the Artistic License version 2.0.
+This program is free software, you can redistribute it and/or modify it under the terms of the Artistic License version
+2.0.
 
 =cut

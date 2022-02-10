@@ -1,3 +1,4 @@
+#include <xs/typemap/expected.h>
 #include <xs/CallbackDispatcher.h>
 
 MODULE = UniEvent::HTTP                PACKAGE = UniEvent::HTTP::ServerRequest
@@ -63,3 +64,7 @@ bool ServerRequest::is_secure ()
 panda::net::SockAddr ServerRequest::sockaddr ()
 
 panda::net::SockAddr ServerRequest::peeraddr ()
+
+void ServerRequest::upgrade () {
+    XSRETURN_EXPECTED(THIS->upgrade());
+}

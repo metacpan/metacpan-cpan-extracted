@@ -118,8 +118,14 @@ void Timer::call_now () {
 
 void Timer::stop ()
 
+void Timer::pause ()
+
 void Timer::again () {
     XSRETURN_EXPECTED(THIS->again());
+}
+
+void Timer::resume () {
+    XSRETURN_EXPECTED(THIS->resume());
 }
 
 double Timer::repeat (double new_repeat = -1) {

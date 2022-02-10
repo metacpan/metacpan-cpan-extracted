@@ -8,13 +8,15 @@ const char* ErrorCategory::name () const throw() { return "unievent-http"; }
 
 std::string ErrorCategory::message (int condition) const throw() {
     switch ((errc)condition) {
-        case errc::connect_error       : return "connect error";
-        case errc::no_redirect_uri     : return "server did not return valid Location header in redirection response";
-        case errc::redirection_limit   : return "redirection limit exceeded";
-        case errc::unexpected_redirect : return "unexpected redirection response";
-        case errc::transfer_aborted    : return "server aborted body transfer by sending final response code";
-        case errc::server_stopping     : return "server is stopping";
-        case errc::pipeline_canceled   : return "pipelined requests were canceled";
+        case errc::connect_error         : return "connect error";
+        case errc::no_redirect_uri       : return "server did not return valid Location header in redirection response";
+        case errc::redirection_limit     : return "redirection limit exceeded";
+        case errc::unexpected_redirect   : return "unexpected redirection response";
+        case errc::transfer_aborted      : return "server aborted body transfer by sending final response code";
+        case errc::server_stopping       : return "server is stopping";
+        case errc::pipeline_canceled     : return "pipelined requests were canceled";
+        case errc::upgrade_in_pipeline   : return "received upgrade request in a pipelined http connection";
+        case errc::upgrade_wrong_request : return "this request can't be upgraded";
     }
     return {};
 }

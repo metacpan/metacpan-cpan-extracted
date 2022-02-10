@@ -1,0 +1,12 @@
+MODULE = UniEvent::WebSocket                PACKAGE = UniEvent::WebSocket::Connection::Statistics
+PROTOTYPES: DISABLE
+
+Connection::Statistics* Connection::Statistics::new() {
+    RETVAL = new Connection::Statistics();
+}
+
+void Connection::Statistics::reset ()
+
+Connection::Statistics Connection::Statistics::normalized (double seconds)
+
+Connection::Statistics Connection::Statistics::fetch (double seconds)

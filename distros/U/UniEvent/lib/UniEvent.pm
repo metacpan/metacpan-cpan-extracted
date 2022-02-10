@@ -8,7 +8,7 @@ use Net::SockAddr();
 use UE;
 BEGIN { *UE:: = *UniEvent:: }
 
-our $VERSION = '1.2.9';
+our $VERSION = '1.2.10';
 
 XS::Loader::load();
 

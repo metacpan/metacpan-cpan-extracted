@@ -5,9 +5,18 @@ use warnings;
 
 use File::Copy;
 
-use Test::More tests => 149;
+use Test::More;
 
 BEGIN {
+    eval {
+        require Devel::Examine::Subs;
+        Devel::Examine::Subs->import();
+    };
+
+    if ($@){
+        plan skip_all => "Devel::Examine::Subs isn't installed. Can't run remove_trace() tests";
+    }
+
     use_ok( 'Devel::Trace::Subs' ) || print "Bail out!\n";
 }
 
@@ -65,7 +74,7 @@ my $dir = 't/ext';
 {
     $ENV{EVAL_TEST} = 1;
     eval { remove_trace(); };
-    like ($@, qr/can't load Devel::Examine::Subs/, "remove_trace() dies if there is an eval error");
+    like ($@, qr/Devel::Examine::Subs isn't installed/, "remove_trace() dies if there is an eval error");
 
     delete $ENV{EVAL_TEST};
 
@@ -83,3 +92,4 @@ for ($default, $pl, $pm){
 eval { rmdir 't/ext' or die "can't remove t/ext test dir!: $!"; };
 is ($@, '', "successfully rmdir t/ext test dir");
 
+done_testing();

@@ -1,8 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-use strict;
+use v5.14;
+use warnings;
 
-use Test::More tests => 4;
+use Test::More;
 
 my @paras;
 
@@ -69,3 +70,5 @@ is_deeply( \@paras,
    [ "{filling=0}: No-filled text",
      "{filling=1}: Filled text" ],
    'Nofill and filled' );
+
+done_testing;

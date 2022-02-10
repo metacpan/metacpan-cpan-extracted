@@ -57,7 +57,7 @@
          "web" : "https://github.com/marcusramberg/Mojolicious-Plugin-OAuth2"
       }
    },
-   "version" : "2.01",
+   "version" : "2.02",
    "x_contributors" : [
       "Marcus Ramberg <mramberg@cpan.org>",
       "Jan Henning Thorsen <jhthorsen@cpan.org>"

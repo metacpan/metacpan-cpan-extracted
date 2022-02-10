@@ -361,7 +361,7 @@ RawResponseSP ServerPair::get_response () {
                     WARN(result.error);
                     throw result.error;
                 }
-                if (result.state != State::done) return;
+                if (result.state != protocol::http::State::done) return;
                 response_queue.push_back(result.response);
             }
             if (response_queue.size()) conn->loop()->stop();

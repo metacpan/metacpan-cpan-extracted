@@ -532,29 +532,25 @@ pp_def('norm',
        GenericTypes => [ppdefs_all],
        Doc => 'Normalises a vector to unit Euclidean length',
        Code =>
-       'double sum=0;
-	loop(n) %{ sum += $vec()*$vec(); %}
-	if (sum > 0) {
-	  sum = sqrt(sum);
-	  loop(n) %{ $norm() = $vec()/sum; %}
-	} else {
-	  loop(n) %{ $norm() = $vec(); %}
-	}',
-       BadCode =>
-       'double sum=0;
+       'long double sum=0;
         int flag = 0;
 	loop(n) %{
-           if ( $ISGOOD(vec()) ) {
-              sum += $vec()*$vec();
-              flag = 1;
-           }
+           PDL_IF_BAD(if ( $ISGOOD(vec()) ) {,)
+              sum +=
+                PDL_IF_GENTYPE_REAL(
+                  $vec()*$vec(),
+                  creall($vec())*creall($vec()) + cimagl($vec())*cimagl($vec())
+                );
+           PDL_IF_BAD(flag = 1; },)
         %}
-        if ( flag ) {
+        PDL_IF_BAD(if ( flag ) {,)
 	   if (sum > 0) {
 	      sum = sqrt(sum);
 	      loop(n) %{
-                 if ( $ISBAD(vec()) ) { $SETBAD(norm()); }
-                 else                 { $norm() = $vec()/sum; }
+                 PDL_IF_BAD(if ( $ISBAD(vec()) ) { $SETBAD(norm()); }
+                            else                 {,)
+                    $norm() = $vec()/sum;
+                 PDL_IF_BAD(},)
               %}
 	   } else {
 	      loop(n) %{
@@ -562,11 +558,12 @@ pp_def('norm',
                  else                 { $norm() = $vec(); }
               %}
            }
-        } else {
+        PDL_IF_BAD(} else {
 	   loop(n) %{
               $SETBAD(norm());
            %}
-	}',
+	},)
+	',
 );
 
 # this one was motivated by the need to compute
@@ -1649,6 +1646,23 @@ pp_def('append',
 # note that ideally we want to say '$SIZE(mn) = $SIZE(m)+$SIZE(n);'
 # but that requires placing RedoDimsParsedCode *after* assignment of
 # childdims to $SIZE(XXX)!!!  XXXXXmake that workXXXXX
+        PMCode => pp_line_numbers(__LINE__-1, '
+sub PDL::append {
+  my ($i1, $i2, $o) = map PDL->topdl($_), @_;
+  if (grep $_->isempty, $i1, $i2) {
+    if (!defined $o) {
+      return $i2->copy if $i1->isempty;
+      return $i1->isnull ? PDL->zeroes(0) : $i1->copy;
+    } else {
+      $o .= $i2->isnull ? PDL->zeroes(0) : $i2, return $o if $i1->isempty;
+      $o .= $i1->isnull ? PDL->zeroes(0) : $i1, return $o;
+    }
+  }
+  $o //= PDL->null;
+  PDL::_append_int($i1, $i2, $o);
+  $o;
+}
+        '),
 	RedoDimsCode => '
 		pdl * dpdla = $PDL(a);
 		pdl * dpdlb = $PDL(b);

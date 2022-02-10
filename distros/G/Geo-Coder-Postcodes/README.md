@@ -10,7 +10,7 @@ Geo::Coder::Postcodes - Provides a geocoding functionality using https://postcod
 
 # VERSION
 
-Version 0.06
+Version 0.07
 
 # SYNOPSIS
 
@@ -66,9 +66,9 @@ may work, but you're best to search only for "Margate".
 
 # AUTHOR
 
-Nigel Horne <njh@bandsman.co.uk>
+Nigel Horne `<njh@bandsman.co.uk>`
 
-Based on [Geo::Coder::Coder::Googleplaces](https://metacpan.org/pod/Geo::Coder::Coder::Googleplaces).
+Based on [Geo::Coder::GooglePlaces](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AGooglePlaces).
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -77,10 +77,10 @@ Lots of thanks to the folks at postcodes.io.
 
 # SEE ALSO
 
-[Geo::Coder::GooglePlaces](https://metacpan.org/pod/Geo::Coder::GooglePlaces), [HTML::GoogleMaps::V3](https://metacpan.org/pod/HTML::GoogleMaps::V3)
+[Geo::Coder::GooglePlaces](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AGooglePlaces), [HTML::GoogleMaps::V3](https://metacpan.org/pod/HTML%3A%3AGoogleMaps%3A%3AV3)
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2017-2019 Nigel Horne.
+Copyright 2017-2022 Nigel Horne.
 
 This program is released under the following licence: GPL2

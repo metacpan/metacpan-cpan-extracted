@@ -1,5 +1,9 @@
 Revision history for Perl extension Geo::H3.
 
+0.07 2022-02-08
+  - Updated lib/Geo/H3.pm - fixed documentation
+  - Dropped README for README.md only
+
 0.06 2021-06-21
   - Updated lib/Geo/H3/Index.pm
     - Dropped struct method as disused

@@ -1,0 +1,305 @@
+=head1 NAME
+
+UniEvent::WebSocket::Connection - Websocket connection base class
+
+
+
+=head1 SYNOPSIS
+
+    $conn->message_callback(sub {
+        my ($conn, $message) = @_;
+        say $message->payload;
+    });
+    
+    $conn->peer_close_callback(sub {
+        my ($conn, $message) = @_;
+        say $message->close_code;
+        say $message->close_message;
+    });
+
+    $conn->send_message($bin);
+    $conn->send_text("hello");
+    $conn->send_ping;
+    
+    $conn->send(
+        payload => $data,
+        opcode  => OPCODE_TEXT,
+        deflate => 1,
+        cb      => sub { log("message sent") },
+    );
+    
+    $conn->close(UniEvent::WebSocket::CLOSE_DONE);
+
+
+
+=head1 DESCRIPTION
+
+C<UniEvent::WebSocket::Connection> represents an abstract websocket connection. It can't be created directly, it is a base class for
+L<UniEvent::WebSocket::Client> and L<UniEvent::WebSocket::ServerConnection>.
+
+
+
+=head1 METHODS
+
+=head2 configure(\%config)
+
+Configures websocket connection with new config. Can be called at any time, even if connection is already established; applied immediately.
+
+C<config> should be a hash reference with the following fields:
+
+=over
+
+=item anything that L<Protocol::WebSocket::Fast::Parser>'s C<configure()> supports.
+
+=item shutdown_timeout [=5]
+
+Maximum amount of time to wait after C<close()> for actual connection shut down.
+
+=back
+
+
+=head2 send(%params)
+
+Sends a websocket message.
+
+C<%params> may include:
+
+=over
+
+=item payload [required]
+
+A string to send
+
+=item opcode [=OPCODE_BINARY]
+
+Message opcode (OPCODE_TEXT or OPCODE_BINARY).
+
+=item deflate [=<default>]
+
+If set to true will compress message. If set to false will not compress message.
+If not specified, it depends on client/server configuration (by default, compression on message size threshold will be used).
+
+=item cb
+
+If set, this callback will be called when the message is fully sent to network layer.
+
+Callback signature:
+
+    my ($connection, $error, $write_request) = @_;
+
+Where C<$connection> is the connection object itself.
+
+C<$error> is an optional L<XS::ErrorCode> object if any error occured during sending.
+
+C<$write_request> is the underlying L<UniEvent::Request::Write> object that was used for sending stream data.
+
+=back
+
+
+=head2 send_ping([$payload])
+
+Send ping control message. C<$payload> is optional and will be sent along with the ping message if specified. Payload must not exceed 125 bytes or it
+will be truncated.
+
+=head2 send_pong([$payload])
+
+Send pong control message. C<$payload> is optional and will be sent along with the pong message if specified. Payload must not exceed 125 bytes or it
+will be truncated.
+
+=head2 send_message($payload)
+
+Same as
+
+    $connection->send(payload => $payload, opcode => OPCODE_BINARY);
+
+
+=head2 send_text($payload)
+
+Same as
+
+    $connection->send(payload => $payload, opcode => OPCODE_TEXT);
+
+
+=head2 close([$close_code = CLOSE_DONE], [$close_message = <default>])
+
+Initiate connection shutdown. Sends websocket close control message to the peer with code C<$close_code>. C<$close_message> can be specified as a
+payload for close message. If not specified, the default message will be used that depends on specified close code.
+Message must not exceed 123 bytes or it will be truncated.
+
+Immediately triggers C<close_event>. When close message from peer will be received (if not yet received), will trigger C<peer_close_event>.
+
+
+=head2 message_callback($sub)
+
+=head2 message_event()
+
+Callbacks set via these methods will be invoked when a message is fully received from peer.
+
+Callback signature:
+
+    my ($connection, $message) = @_;
+    
+Where C<$connection> is the connection object itself.
+
+C<$message> is a L<Protocol::WebSocket::Fast::Message> object.
+
+See L<UniEvent/"EVENT CALLBACKS"> for differences between C<_callback> and C<_event> versions of methods.
+
+
+=head2 error_callback($sub)
+
+=head2 error_event()
+
+Callbacks set via these methods will be invoked on i/o errors occurred in the connection.
+After calling callbacks, connection will be closed automatically (if not yet done by user in callback and if user didn't start new connection).
+
+Callback signature:
+
+    my ($connection, $error) = @_;
+    
+Where C<$connection> is the connection object itself.
+
+C<$error> is an L<XS::ErrorCode> object describing the error stack.
+
+See L<UniEvent/"EVENT CALLBACKS"> for differences between C<_callback> and C<_event> versions of methods.
+
+
+=head2 close_callback($sub)
+
+=head2 close_event()
+
+Callbacks set via these methods will be invoked when connection is closing (either by local user or in response to peer's close message).
+
+Callback signature:
+
+    my ($connection, $close_code, $close_payload) = @_;
+    
+Where C<$connection> is the connection object itself.
+
+C<$close_code> is a close code for close message.
+
+C<$close_payload> is a payload for close message.
+
+These two is what is being sent to the peer, not the ones received from peer.
+
+See L<UniEvent/"EVENT CALLBACKS"> for differences between C<_callback> and C<_event> versions of methods.
+
+
+=head2 peer_close_callback($sub)
+
+=head2 peer_close_event()
+
+Callbacks set via these methods will be invoked when close message from peer is received or connection is lost.
+If you don't C<close()> the connection from your side, it will be closed automatically after callbacks. In this case default close code will be used
+(see L<Protocol::WebSocket::Fast::Parser>, C<suggested_close_code()>) and the same message that peer sent (or default message if no such one).
+
+Callback signature:
+
+    my ($connection, $close_message) = @_;
+    
+Where C<$connection> is the connection object itself.
+
+C<$close_message> is a L<Protocol::WebSocket::Fast::Message> object representing close message from peer. It will be C<undef> if there were no close
+message from peer (i.e. when connection is lost suddenly).
+
+See L<UniEvent/"EVENT CALLBACKS"> for differences between C<_callback> and C<_event> versions of methods.
+
+
+=head2 ping_callback($sub)
+
+=head2 ping_event()
+
+Callbacks set via these methods will be invoked when ping control frame is received from peer.
+
+Callback signature:
+
+    my ($connection, $message) = @_;
+    
+Where C<$connection> is the connection object itself.
+
+C<$message> is a L<Protocol::WebSocket::Fast::Message> object representing ping message.
+
+See L<UniEvent/"EVENT CALLBACKS"> for differences between C<_callback> and C<_event> versions of methods.
+
+
+=head2 pong_callback($sub)
+
+=head2 pong_event()
+
+Callbacks set via these methods will be invoked when pong control frame is received from peer.
+
+Callback signature:
+
+    my ($connection, $message) = @_;
+    
+Where C<$connection> is the connection object itself.
+
+C<$message> is a L<Protocol::WebSocket::Fast::Message> object representing pong message.
+
+See L<UniEvent/"EVENT CALLBACKS"> for differences between C<_callback> and C<_event> versions of methods.
+
+
+=head2 loop()
+
+Returns L<UniEvent::Loop> object in which this connection runs.
+
+
+=head2 stream()
+
+Returns underlying L<UniEvent::Stream> object used for communication. It may be L<UniEvent::Tcp> or L<UniEvent::Pipe>.
+May be C<undef> for clients before C<connect()> is called or when connection is lost.
+
+
+=head2 state()
+
+Returns current state of the connection. It is one of the constants (in C<UniEvent::WebSocket::Connection::*> namespace).
+
+=over
+
+=item STATE_INITIAL
+
+Idling connection
+
+=item STATE_TCP_CONNECTING
+
+Tcp connection is being established (including possible SSL layer)
+
+=item STATE_CONNECTING
+
+Websocket handshake in progress
+
+=item STATE_CONNECTED
+
+Connection is ready
+
+=item STATE_HALT
+
+Connection is halt due to error (only for client connection)
+
+=back
+
+
+=head2 connected()
+
+Returns true if C<state()> is STATE_CONNECTED
+
+
+=head2 connecting()
+
+Returns true if C<state()> is either STATE_TCP_CONNECTING or STATE_CONNECTING
+
+
+=head2 sockaddr()
+
+Returns local sockaddr as L<Net::SockAddr> object. May be C<undef> if no C<stream()>.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 peeraddr()
+
+Returns remote (peer) sockaddr as L<Net::SockAddr> object. May be C<undef> if no C<stream()>.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+=cut

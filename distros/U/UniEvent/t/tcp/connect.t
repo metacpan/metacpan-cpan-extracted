@@ -9,9 +9,9 @@ test_catch '[tcp-connect]';
 my $loop = UniEvent::Loop->default_loop;
 
 subtest 'connect-diconnect' => sub {
-    my $s = new UniEvent::Tcp;
+    my $s = UniEvent::Tcp->new;
     $s->connection_factory(sub {
-        my $client = shift;
+        my $client = UE::Tcp->new;
         XS::Framework::obj2hv($client);
         $client->{my_data} = 'sample data';
         return $client;
@@ -19,7 +19,8 @@ subtest 'connect-diconnect' => sub {
     $s->bind_addr(SOCKADDR_LOOPBACK);
     $s->listen;
     $s->connection_callback(sub {
-        my ($server, $client) = @_;
+        my ($server, $client, $err) = @_;
+        die $err if $err;
         is $client->{my_data}, 'sample data';
     });
     my $sa = $s->sockaddr;

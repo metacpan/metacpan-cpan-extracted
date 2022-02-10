@@ -1,0 +1,10 @@
+Revision history for Parser-FIT
+
+0.02    2022-02-08
+        - Don't skip Makefile.PL
+
+0.01    2022-02-08
+        - First public version for CPAN
+        - Event based api to manage FIT records
+        - Include Parser::FIT::Simple for a flat hash parse result
+

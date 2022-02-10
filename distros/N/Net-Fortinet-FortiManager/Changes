@@ -1,5 +1,25 @@
 Revision history for Net-Fortinet-FortiManager
 
+0.003001  2022-02-08 14:53:25+01:00 Europe/Vienna
+    - make install_policy_package parameters optional
+    - install_policy_package returns the task id
+      instead of a true value
+    - add wait_for_task helper method
+
+0.003000  2022-02-08 07:44:55+01:00 Europe/Vienna
+    - fix docs of list_policy_packages
+    - change list_adoms to return the list of objects
+      to behave like all other list_ methods and make all properties accessible
+    - add list_adoms_by_name
+      as a replacement for the changed list_adoms
+      returns the names sorted for a stable order
+    - login now switches to the first available ADOM
+      if the currently set adom isn't available
+    - use the ADOM login sets for the tests
+      instead of hardcoding 'root'
+    - use a self-documenting username for the failed login test
+      to not trigger alerts for the brave people who watch our logs
+
 0.002000  2022-02-02 11:58:54+01:00 Europe/Vienna
     - fix create methods used the 'set' method instead of 'add'
       which made them act like create_or_update and overwrite existing objects

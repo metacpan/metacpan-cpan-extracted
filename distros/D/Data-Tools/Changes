@@ -1,5 +1,56 @@
 Revision history for Perl extension Data::Tools
 
+1.25 2022-02-08
+
+    - added new ftwalk
+    - fixed str_html_escape (well typo)
+
+1.24 2020-06-22
+
+    - reimplemented str_hex/unhex to use unpack/pack (of course!)
+         thanks to String::HexConvert for reminding me that pack 
+         is always here :)
+
+    - added separate binary and text file load/save api. 
+    
+      new functions:
+      
+          # always binary data load
+          file_bin_load( $file_name )
+
+          # always binary data save
+          file_bin_save( $file_name, @data, $data, 'data', 123 )
+          
+      new functions:
+          
+          # always text data load
+          file_text_load( $file_name )
+
+          # always text data load, returns array ref of read data
+          file_text_load( $file_name )
+
+          # always text data save
+          file_text_save( $file_name, @data, $data, 'data', 123 )
+          
+      the old encoding defaults to file load/save:
+      
+          data_tools_set_file_io_encoding( 'cp1251' );
+          data_tools_set_file_io_encoding( 'UTF-8'  );
+          data_tools_set_file_io_utf8();
+          
+       still works but will only relate to file_text_* functions.
+       
+       NOTE: WARNING!
+       currently old file_load()/file_save() will default to the old
+       behaviour but will be switched to binary only!
+       
+       NOTE: WARNING!
+       file_text_* api will have second optional hashref with operation
+       options. for saving, it is uncommon to provide hashref so it will
+       be used as options if given.
+       
+          
+
 1.20 2019-01-18
 
     - added julian_date_* functions to Data::Tools::Time

@@ -1,3 +1,5 @@
+1.2.3    xx.xx.2022
+          - do not include processed log files to NYTProf output unless MP_WRITE_NYTPROF is set
 1.2.2    10.04.2021
           - fix missing dependency
 1.2.1    08.04.2021

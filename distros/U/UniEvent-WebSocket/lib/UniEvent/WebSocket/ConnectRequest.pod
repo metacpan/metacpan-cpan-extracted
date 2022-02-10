@@ -1,0 +1,80 @@
+=head1 NAME
+
+UniEvent::WebSocket::ConnectRequest - Request for connect for websocket client
+
+
+
+=head1 SYNOPSIS
+
+    my $req = UniEvent::WebSocket::ConnectRequest->new({
+        
+    });
+    
+    my $client = UniEvent::WebSocket::Client->new;
+    $client->connect($req);
+    $client->connect_callback(sub {
+        ...
+    });
+
+    # can also be created indirectly
+    $client->connect({
+        # ... request constructor params
+    });
+
+
+
+=head1 DESCRIPTION
+
+C<UniEvent::WebSocket::ConnectRequest> is used to connect websocket client to server. It's a storage for a variety of websocket connection params.
+It is inherited from L<Protocol::WebSocket::Fast::ConnectRequest> (and therefore from L<Protocol::HTTP::Request>) so their API also applies. You may
+add any http headers and tune other http request params as well.
+
+Most of websocket params are inherited and described in L<Protocol::WebSocket::Fast::ConnectRequest>.
+
+Http params are documented in L<Protocol::HTTP::Request>
+
+
+
+=head1 METHODS
+
+=head2 new(\%params)
+
+Params is a hashref with the following keys:
+
+=over
+
+=item addr_hints
+
+AddrInfo hints for resolving domain names during connection process.
+
+C<addr_hints> should be either a binary string created via C<UniEvent::Resolver::hints()>
+
+    addr_hints => UniEvent::Resolver::hints(AF_INET, SOCK_STREAM, PF_INET),
+    
+    Or a hashref with the corresponding info
+
+    addr_hints => {
+        family   => AF_INET,
+        socktype => SOCK_STREAM,
+        protocol => PF_INET,
+        flags    => 0,
+    },
+    
+See L<UniEvent::Resolver> for more info.
+
+=item cached_resolver [=true]
+
+If true, will use cached resolver for resolving domain names (will use the result of previous resolving process with the same host/port/hints/etc
+and will do real resolving only from time to time).
+
+=item timeout [unlimited]
+
+Timeout for the whole connection process (till the end of websocket handshake) in seconds (may be fractional).
+
+=item Everything that Protocol::WebSocket::Fast::ConnectRequest and Protocol::HTTP::Request supports
+
+See L<Protocol::WebSocket::Fast::ConnectRequest>, L<Protocol::HTTP::Request>
+
+=back
+
+=cut

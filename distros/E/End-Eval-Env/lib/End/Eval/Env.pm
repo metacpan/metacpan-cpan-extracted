@@ -1,9 +1,9 @@
 package End::Eval::Env;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-06'; # DATE
+our $DATE = '2021-08-13'; # DATE
 our $DIST = 'End-Eval-Env'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use warnings;
@@ -39,7 +39,7 @@ End::Eval::Env - Take code from environment variable(s), then eval them in END b
 
 =head1 VERSION
 
-This document describes version 0.002 of End::Eval::Env (from Perl distribution End-Eval-Env), released on 2021-08-06.
+This document describes version 0.003 of End::Eval::Env (from Perl distribution End-Eval-Env), released on 2021-08-13.
 
 =head1 SYNOPSIS
 
@@ -65,7 +65,7 @@ specified, C<PERL_END_EVAL_ENV> is the default.
 
 Bool. Can be turned on to print the code to STDOUT before eval-ing it.
 
-=head2 PERL_END_EVAL_END
+=head2 PERL_END_EVAL_ENV
 
 =head1 HOMEPAGE
 
@@ -95,9 +95,26 @@ C<End>).
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

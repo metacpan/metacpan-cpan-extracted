@@ -193,6 +193,22 @@ subtest 'event listener' => sub {
     is $cnt, 11, "listener&event called";
 };
 
+subtest "pause/resume" => sub {
+    my $t = UE::timer 0.01, sub { die };
+    select undef, undef, undef, 0.005;
+    $l->run_nowait;
+    $t->pause;
+    select undef, undef, undef, 0.006;
+    $l->run_nowait;
+    $t->resume;
+    cmp_ok $t->due_in, '<=', 0.005;
+    my $called;
+    $t->callback(sub { $called = 1 });
+    select undef, undef, undef, 0.006;
+    $l->run_nowait;
+    ok $called;
+};
+
 done_testing();
 
 my $cnt;

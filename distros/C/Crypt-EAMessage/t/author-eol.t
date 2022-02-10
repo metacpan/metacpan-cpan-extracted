@@ -16,6 +16,7 @@ use Test::EOL;
 
 my @files = (
     'lib/Crypt/EAMessage.pm',
+    'lib/Crypt/EAMessage/Keygen.pm',
     't/00-load.t',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
@@ -25,6 +26,7 @@ my @files = (
     't/04-backwards-compatability.t',
     't/05-calling.t',
     't/06-invalid-encodings.t',
+    't/07-keygen.t',
     't/author-critic.t',
     't/author-eol.t',
     't/author-no-tabs.t',

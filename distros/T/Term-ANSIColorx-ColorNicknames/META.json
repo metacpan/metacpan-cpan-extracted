@@ -4,13 +4,13 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Term-ANSIColorx-ColorNicknames",
    "no_index" : {
@@ -27,7 +27,7 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
@@ -52,5 +52,10 @@
          "web" : "https://github.com/jettero/term--ansicolorx"
       }
    },
-   "version" : "2.7191"
+   "version" : "2.7193",
+   "x_authority" : "cpan:JETTERO",
+   "x_contributors" : [
+      "Sergei Zhmylev <zhmylove@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

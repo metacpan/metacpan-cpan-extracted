@@ -403,6 +403,15 @@ By default, for efficiency, objects are created as blessed references to C<undef
 
 
 
+=head1 LOGS
+
+Logs are accessible via L<XLog> framework as "UniEvent::HTTP" module.
+
+    XLog::set_logger(XLog::Console->new);
+    XLog::set_level(XLog::DEBUG, "UniEvent::HTTP");
+
+
+
 =head1 REFERENCE
 
 L<UniEvent::HTTP::Request>

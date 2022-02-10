@@ -147,11 +147,6 @@ void Tcp::set_simultaneous_accepts (bool enable) {
     XSRETURN_EXPECTED(THIS->set_simultaneous_accepts(enable));
 }
 
-void Tcp::sockaddr () : ALIAS(peeraddr=1) {
-    auto res = ix == 0 ? THIS->sockaddr() : THIS->peeraddr();
-    XSRETURN_EXPECTED(res);
-}
-
 #// pair([$loop])
 #// pair({ type => [SOCK_STREAM], protocol => [PF_UNSPEC], handle1 => [], handle2 => [], loop => [default loop]})
 #// returns ($handle1, $handle2)

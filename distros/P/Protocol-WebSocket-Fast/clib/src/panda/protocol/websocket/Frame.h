@@ -49,11 +49,7 @@ struct Frame : virtual panda::Refcnt, AllocatedObject<Frame> {
         payload.clear();
     }
 
-    static string compile (const FrameHeader& header) {
-        return header.compile(0);
-    }
-
-    static string compile (const FrameHeader& header, string_view payload) {
+    static string compile (const FrameHeader& header, string_view payload = {}) {
         size_t plen = payload.length();
         auto ret = header.compile(plen);
         if (!plen) return ret;

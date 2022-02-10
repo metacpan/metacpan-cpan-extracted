@@ -1,0 +1,163 @@
+=head1 NAME
+
+UniEvent::WebSocket - Extremely efficient asynchronous WebSocket Client and Server
+
+
+
+=head1 SYNOPSIS
+
+    # Client
+    my $client = UniEvent::WebSocket::Client->new;
+    $client->connect("ws://myserver.com:12345");
+    $client->connect_callback(sub {
+        my ($client, $connect_response) = @_;
+        if ($connect_response->error) { ... }
+        $client->send_text("hello");
+    });
+    $client->message_callback(sub {
+        my ($client, $message) = @_;
+        say $message->payload;
+        $client->close(UniEvent::WebSocket::CLOSE_DONE);
+    });
+    $client->peer_close_callback(sub {
+        my ($client, $message) = @_;
+        say $message->close_code;
+        say $message->close_message;
+    });
+    
+    ...
+    UE::Loop->default->run;
+
+    # Server
+    my $server = UniEvent::WebSocket::Server->new({
+        locations => [
+            {host => "*", port => 80, reuse_port => 1, backlog => 1024},
+            {host => "*", port => 443, reuse_port => 1, backlog => 1024, ssl_ctx => $ssl_ctx},
+        ],
+        max_frame_size   => 10000,
+        max_message_size => 100000,
+        deflate          => {
+            compression_level     => 3,
+            compression_threshold => 1000,
+        },
+    });
+    
+    $server->connection_callback(sub {
+        my ($server, $client) = @_;
+        $client->message_callback(sub {
+            my ($client, $message) = @_;
+            say $message->payload;
+        })
+        $client->peer_close_callback(sub {
+            my ($client, $message) = @_;
+            say $message->close_code;
+            say $message->close_message;
+        });
+        
+        $client->send_text("hello from server");
+        
+        push @client, $client;
+    });
+    $server->run;
+    ...
+    UE::Loop->default->run;
+
+
+
+=head1 DESCRIPTION
+
+UniEvent::WebSocket is a perl port of C++ panda::unievent::websocket framework. It contains asynchronous websocket client and server framework.
+
+It is built on top of L<Protocol::WebSocket::Fast> websocket protocol implementation and L<UniEvent> event framework.
+This library is an L<UniEvent> user, so you need to run C<UniEvent>'s loop for it to work.
+It is also recommended to read L<Protocol::WebSocket::Fast> docs to understand configuration and the API of messages.
+
+C<UniEvent::WebSocket> supports per-message deflate.
+
+It is built on top of L<UniEvent::HTTP> so C<UniEvent::WebSocket> is a http server as well and can serve http requests also. It can be run as a part
+of complex L<UniEvent::HTTP> server or as standalone websocket server.
+
+You can use L<UniEvent::HTTP::Manager> to run multi-process http/websocket server with process management.
+
+
+
+=head1 CLIENT
+
+Websocket client is implemented in L<UniEvent::WebSocket::Client>, see its docs for API.
+
+
+
+=head1 SERVER
+
+Websocket server is implemented in L<UniEvent::WebSocket::Server>, see its docs for API.
+
+
+
+=head1 LOGS
+
+Logs are accessible via L<XLog> framework as "UniEvent::WebSocket" module.
+
+    XLog::set_logger(XLog::Console->new);
+    XLog::set_level(XLog::DEBUG, "UniEvent::WebSocket");
+
+
+
+=head1 CONSTANTS
+
+These are just an aliases in C<UniEvent::WebSocket::> namespace from L<Protocol::WebSocket::Fast>, see its docs for details.
+
+=over
+
+=item OPCODE_CONTINUE
+
+=item OPCODE_TEXT
+
+=item OPCODE_BINARY
+
+=item OPCODE_CLOSE
+
+=item OPCODE_PING
+
+=item OPCODE_PONG
+
+=back
+
+=over
+
+=item CLOSE_DONE
+
+=item CLOSE_AWAY
+
+=item CLOSE_PROTOCOL_ERROR
+
+=item CLOSE_INVALID_DATA
+
+=item CLOSE_UNKNOWN
+
+=item CLOSE_ABNORMALLY
+
+=item CLOSE_INVALID_TEXT
+
+=item CLOSE_BAD_REQUEST
+
+=item CLOSE_MAX_SIZE
+
+=item CLOSE_EXTENSION_NEEDED
+
+=item CLOSE_INTERNAL_ERROR
+
+=item CLOSE_TLS
+
+=back
+
+
+
+=head1 AUTHOR
+
+Grigory Smorkalov, Pronin Oleg <syber@cpan.org>, Crazy Panda LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

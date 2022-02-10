@@ -1,0 +1,60 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 5df07007198989c622f5d41de8d703e7bef3d0e79d62e24332ee739a452af62a COPYING.LIB
+SHA256 c269f2367ae5e46c77e560dbc9908a8440a7c09ed1bf223ca35fd74e268b4214 Changes
+SHA256 97a608c57481b6db6cc9d85f469547ae20be7f690dc832b8b0e7e028e3dfd06c MANIFEST
+SHA256 b5beb7fd1b09ace01f61f11b7633099fbf5893ee0570e08d88d44797ca43a919 META.json
+SHA256 8def92eba4982784eff02bb4f1da624135c5340544a9824b30e66ad3619ba0ea META.yml
+SHA256 2e8873568a01f863f50022b7db9e24b85078613b55de985d918902e453075339 Makefile.PL
+SHA256 c8e92a447782254f6372e096076c8dfff0d600c14a6f654d0e7ff6aa8dd82a79 README
+SHA256 dc7d443e80bb2dc0b62e660603ef13ec0b51e69c18d45d86a24227c67551d9ce ZBar.pm
+SHA256 800be75189ec4d1b20d6d2edad80c390a9b5f04958c27c369a2c48c4c51f4492 ZBar.xs
+SHA256 94e48281052963b5a4d40d2c136e0b604c464bc0ff3660c2dc72478c049696a7 ZBar/Image.pod
+SHA256 f55b06e95511df94ea31ce0b5a4bc88f8667355657f26546b67753593c6ab837 ZBar/ImageScanner.pod
+SHA256 b1d8d9723e22e7f0dd314ec3c263ae948506fbc39df75b116e96dadc80f1d10a ZBar/Processor.pod
+SHA256 268f1352deb5a89c840828197d3c471535228fb8cc476b01cd89e015e0b90d78 ZBar/Symbol.pod
+SHA256 1eb3024a3d28141c2e9a24be6f86659576eba95840be5b678382f05f34fa8810 examples/paginate.pl
+SHA256 0bc871b088062b7b1e291937802ac1aad91c578ce3a4e6eed2e4647660f19a47 examples/processor.pl
+SHA256 e55b24807712b414f458bf7323981d0a7acdeff6f6d2c25aeb0a5d2ea35ec361 examples/read_one.pl
+SHA256 504555514777ebae9ca774a0c181588725c482d1a967ae46843658c8185590fa examples/scan_image.pl
+SHA256 0f1f33852e47b5d4e938dd8b325b77c4484e761de3e5dc2388b6efe83dbbf2fb inc/Devel/CheckLib.pm
+SHA256 dd4e2fd57e6f4a7f814a600c83b08185ab2644a74da98ea1002a1060151c8c5f ppport.h
+SHA256 aa45276042c71d5e9236a1a3c1acb3f53433cb0726f474ddcd40147036a2fec3 t/Decoder.t
+SHA256 077c8aa54aa80bb5a3fb9dcb58bf7e4a4752b3db20ddfa9ee51a0b9bd13127ce t/Image.t
+SHA256 7297d2490be692d04dcaa145f58a34eaca20ae5bd0b53419639c6f29aa685dee t/Processor.t
+SHA256 4b70ad1c732e98baefd99d5b0e2bf4609c2bc09fd4544f8614dd2cfcd6d292e1 t/Scanner.t
+SHA256 e1330f8c553f9289ef31a87c7b8fb5b6d36b460362936027fc985cb8f8912cd8 t/ZBar.t
+SHA256 6e79e3d0bf12711f3ad43df69f66d845911f14834d00549447491a1c347c0052 t/barcode.png
+SHA256 cdd8dcbd892b6f2a1e83cbbfd3190026d977771c83085c6b97d8d0cafa745c9f t/pod-coverage.t
+SHA256 f05611ce2a22b87766309d137ae4adab7c40e7c455bbaa1dbee6a9216c352bec t/pod.t
+SHA256 8b82105f93ca2b32f077d3af3eab0f2642526f6d840325980fe9ad655396b990 typemap
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEEMguXHBCUSzAt6mNu1fh7LgYGpfkFAmICljQACgkQ1fh7LgYG
+pfkyHBAAq0FdxqBQAQN/HYJsXn+F+lzS2IpH0C6eZuGzIGTDBVLn2vJgCbOg1Xcj
+29U9p7pFOMPDAMpDaN/iuTl9oePUJywTUVkRL6MqVxtBvnR4Ugz5l7dndw9g4Mkq
+VoPgzmSJJm4LJEujO31r29bB3ncM89riIyTPyCkIjJFRHYxWftD6jCkWjX13J7S2
+PkmNqCw03yjHkL82MsBpbpTeA+zgnuZ2yCXQtr4zoDUW5zYkaDAKWFeuxWsuVnrc
+ysNfqYpOjCIyOvrrlkoEXc1dhCwmYcae3htuN5djpfnWwbGkBL3/BSt6WpgTltjA
+C4Qx9q5xk52J8rNytk/b+bJVl1O/boPNQ8KaJL6dmCKZ57zv31cF1JnRLDS6Cir1
+t2lcoTkIQeQ5ha08218qWilmI8VyeRNurXrHs4s/Kv31+CTALLH0/xZ1hVytztHl
+a1tMN3w/JBUsJW48BH28xcRTAuIVuOC/qll672FwcfBTOiJ/h1KCa/+a8yCmVoiK
+2Xx3EmaFJ/S7HYLP2xXT6eCCCHgeAyepITuv2aZV030pxw9bd0rO4hBhDkPPKO2j
+8GjcwjiyA6VmVy/BaD0dGEkG3GAwnoY9jg1grA5hZ6DlZBkNaUaVxPHwmr7dITP6
+/Vav7rnOEnoyJpBi9uNMF1adoPPXfR5GND+iKzaY+rhC/L/CsTs=
+=v2S4
+-----END PGP SIGNATURE-----

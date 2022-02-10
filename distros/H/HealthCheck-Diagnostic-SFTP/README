@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version v1.4.0
+    version v1.4.1
 
 SYNOPSIS
 
@@ -82,9 +82,8 @@ ATTRIBUTES
 
  timeout
 
-    Set for the ConnectTimeout value passed to the ssh_args options setting
-    in Net::SSH::Perl. Will not be set if an existing ConnectTimeout value
-    has been set. Defaults to 3.
+    Sets up an ALRM signal handler used to timeout the initial connection
+    attempt after the number of seconds provided. Defaults to 3.
 
 DEPENDENCIES
 

@@ -3,7 +3,7 @@ package XML::RSSLite;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = 0.15;
+$VERSION = 0.17;
 
 sub import{
   no strict 'refs';
@@ -15,7 +15,7 @@ sub import{
 
 
 sub parseRSS {
-  my ($rr, $cref) = @_;
+  my($rr, $cref, $strip) = @_;
 
   die "$rr is not a hash reference"     unless ref($rr)   eq 'HASH';
   die "$cref is not a scalar reference" unless ref($cref) eq 'SCALAR';
@@ -23,7 +23,7 @@ sub parseRSS {
   # Gotta have some content to parse
   return unless $$cref;
 
-  preprocess($cref);
+  preprocess($cref, $strip);
   {
     _parseRSS($rr, $cref), last if index(${$cref}, '<rss')+1;
     _parseRDF($rr, $cref), last if index(${$cref}, '<rdf:RDF')+1;
@@ -35,12 +35,19 @@ sub parseRSS {
 }
 
 sub preprocess {
-  my $cref = shift;
+  my($cref, $strip) = @_;
   $$cref =~ y/\r\n/\n/s;
-  $$cref =~ y{\n\t ~0-9\-+!@#$%^&*()_=a-zA-Z[]\\;':",./<>?}{ }cs;
+
+  if( ! defined($strip) ){
+    $$cref =~ y{\n\t ~0-9\-+!@#$%^&*()_=a-zA-Z[]\\;':",./<>?}{ }cs;
+  }
+  elsif($strip eq '1' ){
+    $$cref =~ s/[[:^print:]]/ /g;
+  }
+
   #XXX $$cref =~ s/&(?!0[a-zA-Z0-9]+|#\d+);/amp/gs;
   #XXX Do we wish to (re)allow escaped HTML?!
-  $$cref =~ s{(?:<|&lt;)/?(?:b|i|h\d|p|center|quote|strong)(?:>|&gt;)}{}gsi;
+  $$cref =~ s{(?:<|&lt;)/?(?:b|i|h[1-6]|p|center|quote|strong)(?:>|&gt;)}{}gsi;
 }
 
 sub _parseRSS {
@@ -156,8 +163,9 @@ sub postprocess {
       }
     }
     
-    # Clean bogus whitespace
-    $i->{'link'} =~ s/^\s+|\s+$//;
+    # Trim whitespace
+    $i->{'link'} =~ s/\s+$//;
+    $i->{'link'} =~ s/^\s+//;
 
     # Make sure you've got an http/ftp link
     if( exists( $i->{'link'}) && $i->{'link'} !~ m{^(https?|ftp)://}i) {
@@ -227,7 +235,7 @@ sub _parseXML{
   ($begin, $end) = (0, pos(${$xml})||0);
 
   #Match either <foo></foo> or <bar />, optional attributes, stash tag name
-  while( ${$xml} =~ m%<([^\s>]+)(?:\s+[^>]*?)?(?:/|>.*?</\1)>%sg ){	 
+  while( ${$xml} =~ m%<([^\s>]+)(?:\s+[^>]*?)?(?:/|>.*?</\1)>%sg ){
 
     #Save the tag name, we'll need it
     $tag = $1 || $2;
@@ -264,7 +272,7 @@ sub _parseXML{
 	#$str =~ s%(>?)\s*<%$1<%g;
 #XXX    #$str =~ s%(?:^|(?<=>))\s*(?:(?=<)|\z)%%g
 
-	my $qr = qr{@{[join('|', keys %{$inhash})]}};
+	my $qr = qr{@{[join('|', map { quotemeta } keys %{$inhash})]}};
 	$content =~ s%<($qr)\s*(?:[^>]*?)?(?:/|>.*?</\1)>%%sg;
 
 	$inhash->{'<>'} = $content if $content =~ /\S/;
@@ -310,8 +318,6 @@ XML::RSSLite - lightweight, "relaxed" RSS (and XML-ish) parser
 
   use XML::RSSLite;
 
-  . . .
-
   parseRSS(\%result, \$content);
 
   print "=== Channel ===\n",
@@ -319,7 +325,7 @@ XML::RSSLite - lightweight, "relaxed" RSS (and XML-ish) parser
         "Desc:  $result{'description'}\n",
         "Link:  $result{'link'}\n\n";
 
-  foreach $item (@{$result{'item'}}) {
+  foreach $item (@{$result{'items'}}) {
   print "  --- Item ---\n",
         "  Title: $item->{'title'}\n",
         "  Desc:  $item->{'description'}\n",
@@ -345,9 +351,9 @@ output for best results. The munging includes:
 
 =item Remove html tags to leave plain text
 
-=item Remove characters other than 0-9~!@#$%^&*()-+=a-zA-Z[];',.:"<>?\s
-
 =item Remove leading whitespace from URIs
+
+=item By defaul strips characters except 0-9~!@#$%^&*()-+=a-zA-Z[];',.:"<>?\s
 
 =item Use <url> tags when <link> is empty
 
@@ -365,11 +371,37 @@ output for best results. The munging includes:
 
 =over
 
-=item parseRSS($outHashRef, $inScalarRef)
+=item parseRSS($outHashRef, $inScalarRef, [$strip])
 
-I<$inScalarRef> is a reference to a scalar containing the document to be
-parsed, the contents will effectively be destroyed. I<$outHashRef> is a
-reference to the hash within which to store the parsed content.
+=over
+
+=item inScalarRef - required
+
+Reference to a scalar containing the document to be parsed. NOTE: The
+contents will effectively be destroyed. Make a deep copy first if you care.
+
+=item outHashRef - required
+
+Reference to the hash within which to store the parsed content.
+
+=item strip - optional
+
+An expression indicating the level of winnowing to be performed on the
+characters permitted in the results.
+
+=over
+
+=item 1 strip non-printable characters
+
+=item 0 no characters are removed
+
+=item undefined (Default) strip everything but:
+
+0-9~!@#$%^&*()-+= a-zA-Z[];',.:"<>?\t\n
+
+=back
+
+=back
 
 =back
 
@@ -402,6 +434,8 @@ Tag to consider the root node, leaving this undefined is not recommended.
 =item true will not remove comments from parseThis
 
 =item array reference is true, comments are stored here
+
+=back
 
 =back
 

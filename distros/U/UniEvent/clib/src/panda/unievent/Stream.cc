@@ -71,6 +71,9 @@ void Stream::accept (const StreamSP& client) {
         client->set_connecting();
         client->set_established();
     }
+
+    if (_listener) _listener->on_establish(this, client, err);
+
     // filters may delay handle_connection() and make subrequests
     // creating dummy AcceptRequest follows 2 purposes: holding the only client reference and delaying users requests until handle_connection() is done
     AcceptRequestSP areq;
@@ -94,6 +97,13 @@ void Stream::finalize_handle_connection (const StreamSP& client, const ErrorCode
 
     if (req && client) client->queue.done(req, []{});
     StreamSP self = this;
+    
+    // call on client stream as well (may be useful)
+    if (client) {
+        client->connection_event(self, client, err);
+        if (client->_listener) client->_listener->on_connection(self, client, err);
+    }
+        
     connection_event(self, client, err);
     if (_listener) _listener->on_connection(self, client, err);
 }
@@ -104,17 +114,19 @@ void ConnectRequest::exec () {
     handle->set_connecting();
 
     if (timeout) {
-        timer = new Timer(handle->loop());
-        timer->event.add([this](const TimerSP&){ cancel(make_error_code(std::errc::timed_out)); });
-        timer->once(timeout);
+        _timer = new Timer(handle->loop());
+        _timer->event.add([this](const TimerSP&){ cancel(make_error_code(std::errc::timed_out)); });
+        _timer->once(timeout);
     }
 }
 
 void ConnectRequest::handle_event (const ErrorCode& err) {
     panda_log_debug("ConnectRequest::handle_event " << this);
     if (!err) handle->set_established();
-    HOLD_ON(handle);
-    INVOKE(handle, last_filter, handle_connect, finalize_handle_connect, err, this);
+    StreamSP stream = handle;
+    ConnectRequestSP self = this;
+    if (handle->_listener) handle->_listener->on_establish(stream, err, self);
+    INVOKE(stream, last_filter, handle_connect, finalize_handle_connect, err, self);
 }
 
 void ConnectRequest::notify (const ErrorCode& err) { handle->notify_on_connect(err, this); }
@@ -130,8 +142,11 @@ void Stream::finalize_handle_connect (const ErrorCode& connect_err, const Connec
     }
     panda_log_debug("finalize_handle_connect err: " << err << "req: " << req << ", this: " << this);
 
-    req->timer = nullptr;
-
+    if (req->_timer) {
+        req->_timer->pause();
+        req->_timer->event.remove_all();
+    }
+    
     // if we are already canceling queue now, do not start recursive cancel
     if (!err || queue.canceling()) {
         queue.done(req, [=]{ notify_on_connect(err, req); });

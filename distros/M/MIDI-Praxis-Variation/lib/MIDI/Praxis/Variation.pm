@@ -6,7 +6,7 @@ our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
 
-our $VERSION = '0.0606';
+our $VERSION = '0.0607';
 
 use MIDI::Simple ();
 
@@ -131,6 +131,7 @@ sub inversion {
 
     my @transposed = transposition($delta, @notes);
 
+    # XXX WTF?
     my @ret = map { 2 * $center - $_ } @transposed;
 
     return @ret;
@@ -291,7 +292,7 @@ MIDI::Praxis::Variation - Variation techniques used in music composition
 
 =head1 VERSION
 
-version 0.0606
+version 0.0607
 
 =head1 SYNOPSIS
 
@@ -508,7 +509,7 @@ Craig Bourne <cbourne@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gene Boggs.
+This software is copyright (c) 2004 by Craig Bourne.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -13,10 +13,10 @@ use strict;
 use Exporter;
 use Carp;
 use Data::Tools;
-use Date::Calc;
+use Date::Calc qw(:all);
 use Time::JulianDay;
 
-our $VERSION = '1.20';
+our $VERSION = '1.25';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -27,15 +27,46 @@ our @EXPORT = qw(
                 julian_date_diff_in_words
                 julian_date_diff_in_words_relative
 
+                get_local_time_only
+                get_local_julian_day
+                get_local_year
+                get_year_month_days
+
+                julian_date_from_utime
                 julian_date_add_ymd
                 julian_date_to_ymd
                 julian_date_from_ymd
+
                 julian_date_goto_first_dom
                 julian_date_goto_last_dom
                 julian_date_get_dow
                 julian_date_month_days_ym
                 julian_date_month_days
+                julian_date_get_dow
 
+                utime_from_julian_date
+                utime_from_ymdhms
+                utime_to_ymdhms
+                
+                utime_split_to_jdt
+                utime_split_to_utt
+                utime_join_jdt
+                utime_join_utt
+
+                utime_add_ymdhms
+                utime_add_ymd
+                utime_add_hms
+
+                utime_month_days
+
+                utime_goto_midnight
+                utime_goto_first_dom
+                utime_goto_last_dom
+                utime_goto_first_doy
+                utime_goto_last_doy
+                utime_get_dow
+                utime_get_moy
+                
                 );
 
 our %EXPORT_TAGS = (
@@ -104,7 +135,7 @@ sub unix_time_diff_in_words_relative
 
   if( $utd < 0 )
     {
-    return "in $uts";
+    return "after $uts";
     }
   elsif( $utd > 0 )
     {
@@ -170,6 +201,29 @@ sub julian_date_diff_in_words_relative
 
 ##############################################################################
 
+# returns time of the day (in the current day only)
+sub get_local_time_only
+{
+  my ( $s, $m, $h ) = localtime( shift() || time() );
+  return $h*60*60 + $m*60 + $s;
+}
+
+sub get_local_julian_day
+{
+  return local_julian_day( time() );
+}
+
+sub get_local_year
+{
+   my ( $y ) = inverse_julian_day( local_date() );
+   return $y;
+}
+
+sub get_year_month_days
+{
+  return Days_in_Month( @_ );
+}
+
 # return julian date, moved with positive or negative deltas ( y, m, d ) 
 sub julian_date_add_ymd
 {
@@ -180,7 +234,7 @@ sub julian_date_add_ymd
 
   my ( $y, $m, $d ) = inverse_julian_day( $wd );
 
-  ( $y, $m, $d ) = Date::Calc::Add_Delta_YMD( $y, $m, $d, $dy, $dm, $dd );
+  ( $y, $m, $d ) = Add_Delta_YMD( $y, $m, $d, $dy, $dm, $dd );
 
   $wd = julian_day( $y, $m, $d );
 
@@ -223,7 +277,7 @@ sub julian_date_goto_last_dom
   my $wd = shift; # original/work date
 
   my ( $y, $m, $d ) = julian_date_to_ymd( $wd );
-  return julian_date_from_ymd( $y, $m, Date::Calc::Days_in_Month( $y, $m ) );
+  return julian_date_from_ymd( $y, $m, Days_in_Month( $y, $m ) );
 }
 
 # return day of the week, for julian date -- 0 Sun .. 6 Sat
@@ -240,7 +294,7 @@ sub julian_date_month_days_ym
   my $y = shift; # set year
   my $m = shift; # set month
 
-  return Date::Calc::Days_in_Month( $y, $m );
+  return Days_in_Month( $y, $m );
 }
 
 # return month days count for given julian date
@@ -248,7 +302,141 @@ sub julian_date_month_days
 {
   my $d = shift;
 
-  return Date::Calc::Days_in_Month( ( julian_date_to_ymd( $d ) )[0,1] );
+  return Days_in_Month( ( julian_date_to_ymd( $d ) )[0,1] );
+}
+
+##############################################################################
+
+sub utime_from_julian_date
+{
+  my ( $year, $month, $day ) = inverse_julian_day( shift() );
+  return Mktime( $year, $month, $day, 0, 0, 0 );
+}
+
+sub utime_from_ymdhms
+{
+  my @args = ( @_, 0, 0, 0, );
+  return Mktime( @args[ 0 .. 5 ] );
+}
+
+sub utime_to_ymdhms
+{
+  return Localtime(shift());
+}
+
+# returns local julian day and time from unix time
+sub utime_split_to_jdt
+{
+  my ($year,$month,$day,  $hour,$min,$sec,  $doy,$dow,$dst) = Localtime(shift());
+  my $jd = julian_day( $year, $month, $day );
+  my $tt = $hour * 60 * 60 + $min * 60 + $sec;
+  return ( $jd, $tt );
+}
+
+# returns unix time of the 00:00 of the day given as utime and time from unix time
+sub utime_split_to_utt
+{
+  my ($year,$month,$day,  $hour,$min,$sec,  $doy,$dow,$dst) = Localtime(shift());
+  
+  my $ut = Mktime( $year, $month, $day, 0, 0, 0 );
+  my $tt = $hour * 60 * 60 + $min * 60 + $sec;
+  return ( $ut, $tt );
+}
+
+# joins julian date and day time only into unix time
+sub utime_join_jdt
+{
+  my $jd = shift;
+  my $tt = shift;
+  
+  return utime_from_julian_date( $jd ) + $tt;
+}
+
+# joins unix time of the day midnight and day time only into unix time
+# mostly redundant but exists for completeness
+sub utime_join_utt
+{
+  return shift() + shift();
+}
+
+sub utime_add_ymdhms
+{
+  my $tt = shift;
+  my ( $dy, $do, $dd, $dh, $dm, $ds ) = @_;
+  
+  my ( $year, $month, $day, $hour, $min, $sec ) = Localtime( $tt );
+  
+  ( $year, $month, $day, $hour, $min, $sec ) =
+      Add_Delta_YMDHMS( $year, $month, $day, $hour, $min, $sec,
+                        $dy,   $do,    $dd,  $dh,   $dm,  $ds  );
+
+  return Mktime( $year, $month, $day, $hour, $min, $sec );
+}
+
+sub utime_add_ymd
+{
+  my $tt = shift;
+  my ( $dy, $do, $dd ) = @_;
+  return utime_add_ymdhms( $tt, $dy, $do, $dd, 0, 0, 0 );
+}
+
+sub utime_add_hms
+{
+  my $tt = shift;
+  my ( $dh, $dm, $ds ) = @_;
+  return utime_add_ymdhms( $tt, 0, 0, 0, $dh, $dm, $ds );
+}
+
+sub utime_month_days
+{
+  return get_year_month_days( ( utime_to_ymdhms( shift() ) )[ 0, 1 ] );
+}
+
+sub utime_goto_midnight
+{
+  return ( utime_split_to_utt( shift() ) )[0];
+}
+
+sub utime_goto_first_dom
+{
+  my $tt = shift;
+  my ( $year, $month, $day, $hour, $min, $sec ) = Localtime( $tt );
+  return Mktime( $year, $month, 1, 0, 0, 0 );
+}
+
+sub utime_goto_last_dom
+{
+  my $tt = shift;
+  my ( $year, $month, $day, $hour, $min, $sec ) = Localtime( $tt );
+  return Mktime( $year, $month, Days_in_Month( $year, $month ), 0, 0, 0 );
+}
+
+sub utime_goto_first_doy
+{
+  my $tt = shift;
+  my ( $year, $month, $day, $hour, $min, $sec ) = Localtime( $tt );
+  return Mktime( $year, 1, 1, 0, 0, 0 );
+}
+
+sub utime_goto_last_doy
+{
+  my $tt = shift;
+  my ( $year, $month, $day, $hour, $min, $sec ) = Localtime( $tt );
+  return Mktime( $year, 12, 31, 0, 0, 0 );
+}
+
+sub utime_get_dow
+{
+  my $tt = shift;
+  my ( $year, $month, $day, $hour, $min, $sec ) = Localtime( $tt );
+  return Day_of_Week( $year, $month, $day );
+}
+
+sub utime_get_moy
+{
+  my $tt = shift;
+  my ( $year, $month, $day, $hour, $min, $sec ) = Localtime( $tt );
+  return $month;
 }
 
 ##############################################################################
@@ -277,9 +465,20 @@ sub julian_date_month_days
   my $date_diff_str_rel = julian_date_diff_in_words_relative( $date1 - $date2 );
 
   # --------------------------------------------------------------------------
+
+  # return seconds after last midnight, i.e. current day time
+  my $seconds_in_the_current_day = get_local_time_only()
+  
+  # returns current julian day
+  my $jd = get_local_julian_day()
+  
+  # returns current year
+  my $year = get_local_year()
   
   # gets current julian date, needs Time::JulianDay
   my $jd = local_julian_day( time() );
+  # or
+  my $jd = get_local_julian_day();
 
   # move current julian date to year ago, one month ahead and 2 days ahead
   $jd = julian_date_add_ymd( $jd, -1, 1, 2 );

@@ -91,6 +91,30 @@ TEST("idle timeout before any requests") {
     CHECK(time_elapsed() >= 49);
 }
 
+TEST("idle timeout before ssl established") {
+    if (!secure) {
+        SUCCEED("ssl only test");
+        return;
+    }
+    AsyncTest test(1000, 2);
+    Server::Config cfg;
+    cfg.idle_timeout = 30;
+    auto server = make_server(test.loop, cfg);
+    TcpSP client = new Tcp(test.loop);
+    time_mark();
+    client->connect(server->sockaddr().value());
+    client->connect_event.add([&](auto, auto& err, auto) {
+        REQUIRE(!err);
+        test.happens();
+    });
+    client->eof_event.add([&](auto...){
+        test.happens();
+        test.loop->stop();
+    });
+    test.run();
+    CHECK(time_elapsed() >= 29);
+}
+
 TEST("idle timeout during and after request") {
     AsyncTest test(5000);
     Server::Config cfg;

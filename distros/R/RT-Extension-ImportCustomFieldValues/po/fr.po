@@ -1,0 +1,138 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. ($filename)
+#: html/Admin/CustomFields/ImportValues.html:101 html/Admin/CustomFields/ImportValues.html~:101
+msgid "%1: Wrong file format"
+msgstr "%1: mauvais format de fichier"
+
+#: html/Admin/CustomFields/ImportValues.html:48 html/Admin/CustomFields/ImportValues.html~:48
+msgid "- Column \"Name\" is mandatory, other columns may be empty but must exists"
+msgstr "- La colonne «Name» est obligatoire, les autre colonnes peuvent être vides mais doivent exister"
+
+#: html/Admin/CustomFields/ImportValues.html:45 html/Admin/CustomFields/ImportValues.html~:45
+msgid "- Fields separated by \";\""
+msgstr "- Champs séparés par «;»"
+
+#: html/Admin/CustomFields/ImportValues.html:44 html/Admin/CustomFields/ImportValues.html~:44
+msgid "- File encoding: UTF-8"
+msgstr "- Encodage du fichier: UTF-8"
+
+#: html/Admin/CustomFields/ImportValues.html:46 html/Admin/CustomFields/ImportValues.html~:46
+msgid "- No headers"
+msgstr "- Pas de ligne d'en-tête"
+
+#: html/Admin/CustomFields/ImportValues.html:47 html/Admin/CustomFields/ImportValues.html~:47
+msgid "- Using the following columns and order: SortOrder, Name, Description, Category"
+msgstr "- Utiliser les colonnes suivantes, dans l'order: SortOrder, Nom, Description, Catégorie"
+
+#: html/Admin/CustomFields/ImportValues.html:52 html/Admin/CustomFields/ImportValues.html~:52
+msgid "CSV file"
+msgstr "Fichier CSV"
+
+#: html/Admin/CustomFields/ImportValues.html:38 html/Admin/CustomFields/ImportValues.html:66 html/Admin/CustomFields/ImportValues.html~:38 html/Admin/CustomFields/ImportValues.html~:66
+msgid "Cancel"
+msgstr "Annuler"
+
+#: html/Admin/CustomFields/ImportValues.html:22 html/Admin/CustomFields/ImportValues.html~:22
+msgid "Category"
+msgstr "Catégorie"
+
+#: html/Admin/CustomFields/ImportValues.html:40 html/Admin/CustomFields/ImportValues.html~:40
+msgid "Confirm"
+msgstr "Confirmer"
+
+#: html/Admin/CustomFields/ImportValues.html:76
+msgid "CustomField not found"
+msgstr "Champs personalisé non trouvé"
+
+#: html/Admin/CustomFields/ImportValues.html:56 html/Admin/CustomFields/ImportValues.html~:56
+msgid "Default is to add CSV values to existing ones"
+msgstr "Par défaut les valeurs importées sont ajoutées aux valeurs existantes"
+
+#: html/Admin/CustomFields/ImportValues.html:21 html/Admin/CustomFields/ImportValues.html~:21
+msgid "Description"
+msgstr "Description"
+
+#. ($value_id, $msg)
+#: html/Admin/CustomFields/ImportValues.html:159 html/Admin/CustomFields/ImportValues.html~:159
+msgid "Error deleting old value %1: %2"
+msgstr "Erreur lors de la suppression de l'ancienne valeur %1: %2"
+
+#: html/Admin/CustomFields/ImportValues.html:23 html/Admin/CustomFields/ImportValues.html:68 html/Admin/CustomFields/ImportValues.html~:23 html/Admin/CustomFields/ImportValues.html~:68
+msgid "Import"
+msgstr "Importer"
+
+#: html/Callbacks/ImportCustomFieldValues/Elements/Tabs/Privileged:9 html/Callbacks/ImportCustomFieldValues/Elements/Tabs/Privileged~:9
+msgid "Import from CSV"
+msgstr "Importer depuis un CSV"
+
+#. ($CustomField->Name)
+#: html/Admin/CustomFields/ImportValues.html:81 html/Admin/CustomFields/ImportValues.html~:81
+msgid "Importing values for CustomField %1"
+msgstr "Importer des valeus pour le champs personnalisé %1"
+
+#. ($i, loc("SortOrder"))
+#: html/Admin/CustomFields/ImportValues.html:117 html/Admin/CustomFields/ImportValues.html~:117
+msgid "Line %1: \"%2\" must be numerical"
+msgstr "Ligne %1: «%2» doit être numérique"
+
+#. ($i, $msg)
+#: html/Admin/CustomFields/ImportValues.html:168 html/Admin/CustomFields/ImportValues.html~:168
+msgid "Line %1: import error: %2"
+msgstr "Ligne %1: erreur d'importation: %2"
+
+#. ($i, "Name")
+#: html/Admin/CustomFields/ImportValues.html:113 html/Admin/CustomFields/ImportValues.html~:113
+msgid "Line %1: missing \"%2\""
+msgstr "Ligne %1: «%2» manquant"
+
+#. ($i)
+#: html/Admin/CustomFields/ImportValues.html:166 html/Admin/CustomFields/ImportValues.html~:166
+msgid "Line %1: successfully imported"
+msgstr "Ligne %1: importée avec succès"
+
+#: html/Admin/CustomFields/ImportValues.html:20 html/Admin/CustomFields/ImportValues.html~:20
+msgid "Name"
+msgstr "Nom"
+
+#: html/Admin/CustomFields/ImportValues.html:79
+msgid "No permissions to edit this customfield values"
+msgstr "Vous n'avez pas la permission de modifier les valeurs de ce champs personnalisé"
+
+#: html/Admin/CustomFields/ImportValues.html:149 html/Admin/CustomFields/ImportValues.html~:149
+msgid "No values to import"
+msgstr "Aucune valeur à importer"
+
+#. ($value_id)
+#: html/Admin/CustomFields/ImportValues.html:157 html/Admin/CustomFields/ImportValues.html~:157
+msgid "Old value %1 deleted"
+msgstr "Ancienne valeur %1 supprimée"
+
+#: html/Admin/CustomFields/ImportValues.html:42 html/Admin/CustomFields/ImportValues.html~:42
+msgid "Please select a file with needed values using following format:"
+msgstr "Veuillez sélectionner un fichier avec le valeurs souhaitées, en utilisant le format:"
+
+#: html/Admin/CustomFields/ImportValues.html:55 html/Admin/CustomFields/ImportValues.html~:55
+msgid "Replace?"
+msgstr "Remplacer?"
+
+#: html/Admin/CustomFields/ImportValues.html:19 html/Admin/CustomFields/ImportValues.html~:19
+msgid "SortOrder"
+msgstr "Ordre de tri"
+
+#: html/Admin/CustomFields/ImportValues.html:15 html/Admin/CustomFields/ImportValues.html~:15
+msgid "The following values will be added to existing ones:"
+msgstr "Les valeurs suivantes vont être ajoutées aux valeurs existantes:"
+
+#: html/Admin/CustomFields/ImportValues.html:13 html/Admin/CustomFields/ImportValues.html~:13
+msgid "The following values will replace existing ones:"
+msgstr "Les valeurs suivantes vont remplacer les valeurs existantes:"
+
+#: html/Admin/CustomFields/ImportValues.html:128 html/Admin/CustomFields/ImportValues.html~:128
+msgid "Unable to read file"
+msgstr "Impossible de lire le fichier"
+

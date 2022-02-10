@@ -10,7 +10,7 @@ build_requires:
   Test::More: '0'
   Test::Simple: '0.96'
   XS::Framework: v1.5.2
-  XS::libcatch: v3.0.0.3
+  XS::libcatch: v3.0.0.4
   XS::libpanda: v1.5.8
   next::XS: v1.0.7
 configure_requires:
@@ -18,7 +18,7 @@ configure_requires:
   Test::Catch: v2.0.0
   XS::Framework: v1.5.2
   XS::Install: v1.3.5
-  XS::libcatch: v3.0.0.3
+  XS::libcatch: v3.0.0.4
   XS::libpanda: v1.5.8
   next::XS: v1.0.7
 dynamic_config: 1
@@ -38,5 +38,5 @@ requires:
   XS::Install: v1.3.5
   XS::libpanda: v1.5.8
   next::XS: v1.0.7
-version: v5.2.10
+version: v5.2.11
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

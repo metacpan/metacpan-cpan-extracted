@@ -16,6 +16,8 @@ is_deeply $obj->by_ratio('27/25'),
     { symbol => 'Db', name => 'large limma, BP small semitone (minor second), alternate Renaissance half-step' },
     'by_ratio';
 
+is_deeply [sort keys %{ $obj->by_description('limma') }], [qw(Db Mc enlc pm2)], 'by_description';
+
 $obj = new_ok 'Music::Intervals' => [
     notes => [qw( C E G )],
 ];

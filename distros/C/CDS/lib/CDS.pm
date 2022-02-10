@@ -1,10 +1,28 @@
-# This is part of the Condensation Perl Module 0.25 (cli) built on 2022-02-05.
+# This is part of the Condensation Perl Module 0.27 (cli) built on 2022-02-10.
 # See https://condensation.io for information about the Condensation Data System.
 
 use strict;
 use warnings;
 use 5.010000;
 use CDS::C;
+
+=pod
+
+=head1 CDS - Condensation Data System
+
+Condensation is a general-purpose distributed data system with conflict-free synchronization, and inherent end-to-end security.
+
+This is the Perl implementation. It comes with a Perl module:
+
+    use CDS;
+
+and a command line tool:
+
+    cds
+
+More information is available on L<condensation.io|https://condensation.io>.
+
+=cut
 
 use Cwd;
 use Digest::SHA;
@@ -19,9 +37,9 @@ use Time::Local;
 use utf8;
 package CDS;
 
-our $VERSION = '0.25';
+our $VERSION = '0.27';
 our $edition = 'cli';
-our $releaseDate = '2022-02-05';
+our $releaseDate = '2022-02-10';
 
 sub now { time * 1000 }
 
@@ -8653,9 +8671,16 @@ sub register {
 	my $node007 = CDS::Parser::Node->new(0);
 	my $node008 = CDS::Parser::Node->new(0);
 	my $node009 = CDS::Parser::Node->new(0);
-	my $node010 = CDS::Parser::Node->new(1);
+	my $node010 = CDS::Parser::Node->new(0);
 	my $node011 = CDS::Parser::Node->new(0);
-	my $node012 = CDS::Parser::Node->new(1, {constructor => \&new, function => \&transfer});
+	my $node012 = CDS::Parser::Node->new(0);
+	my $node013 = CDS::Parser::Node->new(0);
+	my $node014 = CDS::Parser::Node->new(0);
+	my $node015 = CDS::Parser::Node->new(0);
+	my $node016 = CDS::Parser::Node->new(0);
+	my $node017 = CDS::Parser::Node->new(1);
+	my $node018 = CDS::Parser::Node->new(0);
+	my $node019 = CDS::Parser::Node->new(1, {constructor => \&new, function => \&transfer});
 	$cds->addArrow($node000, 1, 0, 'thoroughly');
 	$cds->addArrow($node001, 0, 0, 'leniently');
 	$cds->addDefault($node003);
@@ -8668,17 +8693,60 @@ sub register {
 	$node004->addDefault($node005);
 	$node004->addDefault($node006);
 	$node004->addDefault($node007);
+	$node004->addDefault($node008);
+	$node004->addArrow($node009, 1, 0, 'message');
+	$node004->addDefault($node010);
+	$node004->addArrow($node011, 1, 0, 'private');
+	$node004->addArrow($node012, 1, 0, 'public');
+	$node004->addArrow($node013, 1, 0, 'all', \&collectAll);
+	$node004->addArrow($node013, 0, 0, 'messages', \&collectMessages);
+	$node004->addArrow($node013, 0, 0, 'private', \&collectPrivate);
+	$node004->addArrow($node013, 0, 0, 'public', \&collectPublic);
 	$node005->addArrow($node005, 1, 0, 'HASH', \&collectHash);
-	$node005->addArrow($node010, 1, 0, 'HASH', \&collectHash);
+	$node005->addArrow($node017, 1, 0, 'HASH', \&collectHash);
 	$node006->addArrow($node006, 1, 0, 'OBJECT', \&collectObject);
-	$node006->addArrow($node010, 1, 0, 'OBJECT', \&collectObject);
-	$node007->addArrow($node007, 1, 0, 'HASH', \&collectHash);
-	$node007->addArrow($node008, 1, 0, 'HASH', \&collectHash);
-	$node008->addArrow($node009, 1, 0, 'from');
-	$node009->addArrow($node010, 1, 0, 'STORE', \&collectStore);
-	$node010->addArrow($node011, 1, 0, 'to');
-	$node011->addArrow($node011, 1, 0, 'STORE', \&collectStore1);
-	$node011->addArrow($node012, 1, 0, 'STORE', \&collectStore1);
+	$node006->addArrow($node017, 1, 0, 'OBJECT', \&collectObject);
+	$node007->addArrow($node007, 1, 0, 'ACCOUNT', \&collectAccount);
+	$node007->addArrow($node017, 1, 0, 'ACCOUNT', \&collectAccount);
+	$node008->addArrow($node008, 1, 0, 'BOX', \&collectBox);
+	$node008->addArrow($node017, 1, 0, 'BOX', \&collectBox);
+	$node009->addArrow($node013, 1, 0, 'box', \&collectMessages);
+	$node010->addArrow($node010, 1, 0, 'HASH', \&collectHash);
+	$node010->addArrow($node015, 1, 0, 'HASH', \&collectHash);
+	$node011->addArrow($node013, 1, 0, 'box', \&collectPrivate);
+	$node012->addArrow($node013, 1, 0, 'box', \&collectPublic);
+	$node013->addArrow($node014, 1, 0, 'of');
+	$node014->addArrow($node014, 1, 0, 'HASH', \&collectHash1);
+	$node014->addArrow($node015, 1, 0, 'HASH', \&collectHash1);
+	$node015->addArrow($node016, 1, 0, 'from');
+	$node016->addArrow($node017, 1, 0, 'STORE', \&collectStore);
+	$node017->addArrow($node018, 1, 0, 'to');
+	$node018->addArrow($node018, 1, 0, 'STORE', \&collectStore1);
+	$node018->addArrow($node019, 1, 0, 'STORE', \&collectStore1);
+}
+
+sub collectAccount {
+	my $o = shift;
+	my $label = shift;
+	my $value = shift;
+
+	push @{$o->{accountTokens}}, $value;
+}
+
+sub collectAll {
+	my $o = shift;
+	my $label = shift;
+	my $value = shift;
+
+	push @{$o->{boxLabels}}, 'public', 'private', 'messages';
+}
+
+sub collectBox {
+	my $o = shift;
+	my $label = shift;
+	my $value = shift;
+
+	push @{$o->{boxTokens}}, $value;
 }
 
 sub collectHash {
@@ -8686,7 +8754,15 @@ sub collectHash {
 	my $label = shift;
 	my $value = shift;
 
-	push @{$o->{hashes}}, $value;
+	push @{$o->{objectHashes}}, $value;
+}
+
+sub collectHash1 {
+	my $o = shift;
+	my $label = shift;
+	my $value = shift;
+
+	push @{$o->{accountHashes}}, $value;
 }
 
 sub collectLeniently {
@@ -8706,12 +8782,36 @@ sub collectLeniently1 {
 	$o->{thoroughly} = 1;
 }
 
+sub collectMessages {
+	my $o = shift;
+	my $label = shift;
+	my $value = shift;
+
+	push @{$o->{boxLabels}}, 'messages';
+}
+
 sub collectObject {
 	my $o = shift;
 	my $label = shift;
 	my $value = shift;
 
 	push @{$o->{objectTokens}}, $value;
+}
+
+sub collectPrivate {
+	my $o = shift;
+	my $label = shift;
+	my $value = shift;
+
+	push @{$o->{boxLabels}}, 'private';
+}
+
+sub collectPublic {
+	my $o = shift;
+	my $label = shift;
+	my $value = shift;
+
+	push @{$o->{boxLabels}}, 'public';
 }
 
 sub collectStore {
@@ -8753,12 +8853,15 @@ sub help {
 
 	my $ui = $o->{ui};
 	$ui->space;
+	$ui->command('cds transfer BOX* to STORE*');
+	$ui->command('cds transfer ACCOUNT* to STORE*');
+	$ui->command('cds transfer all of HASH* from STORE to STORE*');
+	$ui->command('cds transfer BOXLABEL of HASH* from STORE to STORE*');
+	$ui->p('Copies an account (or some of its boxes) including all referenced trees from one store to another. If the source store is omitted, the selected store is used.');
+	$ui->space;
 	$ui->command('cds transfer OBJECT* to STORE*');
 	$ui->command('cds transfer HASH* from STORE to STORE*');
-	$ui->p('Copies a tree from one store to another.');
-	$ui->space;
-	$ui->command('cds transfer HASH* to STORE*');
-	$ui->p('As above, but uses the selected store as source store.');
+	$ui->p('Copies a tree from one store to another. If the source store is omitted, the selected store is used.');
 	$ui->space;
 	$ui->command('cds ', $ui->underlined('leniently'), ' transfer …');
 	$ui->p('Warns about missing objects, but ignores them and proceeds with the rest.');
@@ -8772,14 +8875,45 @@ sub transfer {
 	my $o = shift;
 	my $cmd = shift;
 
+	# Collect the arguments
 	$o->{keyPairToken} = $o->{actor}->preferredKeyPairToken;
+	$o->{accountTokens} = [];
+	$o->{accountHashes} = [];
+	$o->{boxTokens} = [];
+	$o->{boxLabels} = [];
 	$o->{objectTokens} = [];
-	$o->{hashes} = [];
+	$o->{objectHashes} = [];
 	$o->{toStores} = [];
 	$cmd->collect($o);
 
 	# Use the selected store
-	$o->{fromStore} = $o->{actor}->preferredStore if scalar @{$o->{hashes}} && ! $o->{fromStore};
+	$o->{fromStore} = $o->{actor}->preferredStore if (scalar @{$o->{accountHashes}} || scalar @{$o->{objectHashes}}) && ! $o->{fromStore};
+
+	# Prepare the object tokens
+	for my $hash (@{$o->{objectHashes}}) {
+		push @{$o->{objectTokens}}, CDS::ObjectToken->new($o->{fromStore}, $hash);
+	}
+
+	# Prepare the account tokens
+	for my $hash (@{$o->{accountHashes}}) {
+		push @{$o->{accountTokens}}, CDS::AccountToken->new($o->{fromStore}, $hash);
+	}
+
+	# Prepare the box tokens
+	for my $accountToken (@{$o->{accountTokens}}) {
+		for my $boxLabel (@{$o->{boxLabels}}) {
+			push @{$o->{boxTokens}}, CDS::BoxToken->new($accountToken, $boxLabel);
+		}
+	}
+
+	# Copy the public key of every account first
+	my %done;
+	for my $boxToken (@{$o->{boxTokens}}) {
+		my $actorHash = $boxToken->accountToken->actorHash;
+		next if $done{$actorHash->bytes};
+		$done{$actorHash->bytes} = 1;
+		push @{$o->{objectTokens}}, CDS::ObjectToken->new($boxToken->accountToken->cliStore, $actorHash);
+	}
 
 	# Prepare the destination stores
 	my $toStores = [];
@@ -8802,9 +8936,23 @@ sub transfer {
 		$o->{ui}->line($o->{ui}->gray(' │' x $n));
 		$o->process($objectToken->hash, $objectToken->cliStore, $toStores, 1);
 	}
-	for my $hash (@{$o->{hashes}}) {
+
+	# Process all accounts
+	my $keyPair = $o->{keyPairToken}->keyPair;
+	for my $boxToken (@{$o->{boxTokens}}) {
 		$o->{ui}->line($o->{ui}->gray(' │' x $n));
-		$o->process($hash, $o->{fromStore}, $toStores, 1);
+		$o->{ui}->line($o->{ui}->gray(' │' x $n, ' Transferring ', $boxToken->boxLabel, ' box of ', $boxToken->accountToken->actorHash->hex));
+		my ($hashes, $listError) = $boxToken->accountToken->cliStore->list($boxToken->accountToken->actorHash, $boxToken->boxLabel, 0, $keyPair);
+		next if $listError;
+
+		for my $hash (@$hashes) {
+			$o->process($hash, $boxToken->accountToken->cliStore, $toStores, 1) // next;
+
+			for my $toStore (@$toStores) {
+				next if defined $toStore->{storeError};
+				$toStore->{storeError} = $toStore->{store}->add($boxToken->accountToken->actorHash, $boxToken->boxLabel, $hash, $keyPair);
+			}
+		}
 	}
 
 	# Print the stores again, with their errors
@@ -10989,14 +11137,32 @@ sub print_banner {
 sub setup {
 	my $o = shift;
 
-	$o->{request} = CDS::HTTPServer::Request->new($o, @_);
+	my %parameters = @_;
+	$o->{request} = CDS::HTTPServer::Request->new({
+		logger => $o->logger,
+		method => $parameters{method},
+		path => $parameters{path},
+		protocol => $parameters{protocol},
+		queryString => $parameters{query_string},
+		peerAddress => $parameters{peeraddr},
+		peerPort => $parameters{peerport},
+		headers => {},
+		corsAllowEverybody => $o->corsAllowEverybody,
+		});
 }
 
 sub headers {
 	my $o = shift;
 	my $headers = shift;
 
-	$o->{request}->setHeaders($headers);
+	while (scalar @$headers) {
+		my $key = shift @$headers;
+		my $value = shift @$headers;
+		$o->{request}->setHeader($key, $value);
+	}
+
+	# Read the content length
+	$o->{request}->setRemainingData($o->{request}->header('content-length') // 0);
 }
 
 sub handler {
@@ -11123,68 +11289,92 @@ package CDS::HTTPServer::MessageGatewayHandler;
 
 sub new {
 	my $class = shift;
-	my $url = shift;
-	my $identity = shift;
-	my $recipient = shift;
+	my $root = shift;
+	my $actor = shift;
+	my $store = shift;
+	my $recipientHash = shift; die 'wrong type '.ref($recipientHash).' for $recipientHash' if defined $recipientHash && ref $recipientHash ne 'CDS::Hash';
 
-	return bless {url => $url, identity => $identity, recipient => $recipient};
+	return bless {root => $root, actor => $actor, store => $store, recipientHash => $recipientHash};
 }
 
 sub process {
 	my $o = shift;
 	my $request = shift;
 
-	$request->path =~ /^\/data$/ || return;
-	my $store = $request->server->store;
+	my $path = $request->pathAbove($o->{root}) // return;
+	return if $path ne '/';
 
 	# Options
 	return $request->replyOptions('HEAD', 'GET', 'PUT', 'POST', 'DELETE') if $request->method eq 'OPTIONS';
 
 	# Prepare a message
-	my $record = CDS::Record->new;
-	$record->add('time')->addInteger(CDS->now);
-	$record->add('ip')->add($request->peerAddress);
-	$record->add('method')->add($request->method);
-	$record->add('path')->add($request->path);
-	$record->add('query string')->add($request->queryString);
+	my $message = CDS::Record->new;
+	$message->add('time')->addInteger(CDS->now);
+	$message->add('ip')->add($request->peerAddress);
+	$message->add('method')->add($request->method);
+	$message->add('path')->add($request->path);
+	$message->add('query string')->add($request->queryString);
 
-	my $headersRecord = $record->add('headers');
+	my $headersRecord = $message->add('headers');
 	my $headers = $request->headers;
 	for my $key (keys %$headers) {
 		$headersRecord->add($key)->add($headers->{$key});
 	}
 
-	$record->add('data')->add($request->readData) if $request->remainingData;
+	# Prepare a channel
+	my $channel = CDS::MessageChannel->new($o->{actor}, CDS->randomBytes(8), CDS->WEEK);
+	$o->{messageChannel}->setRecipients([$o->{recipientHash}], []);
 
-	# Post it
-	my $success = $o->{identity}->sendMessageRecord($record, undef, [$o->{recipient}]);
-	return $success ? $request->reply200 : $request->reply500('Unable to send the message.');
+	# Add the data
+	if ($request->remainingData > 1024) {
+		# Store the data as a separate object
+		my $object = CDS::Object->create(CDS::Object->emptyHeader, $request->readData);
+		my $key = CDS->randomKey;
+		my $encryptedObject = $object->crypt($key);
+		my $hash = $encryptedObject->calculateHash;
+		$message->add('data')->addHash($hash);
+		$channel->addObject($hash, $encryptedObject);
+	} elsif ($request->remainingData) {
+		$message->add('data')->add($request->readData)
+	}
+
+	# Submit
+	my ($submission, $missingObject) = $channel->submit($message, $o);
+	$o->{actor}->sendMessages;
+
+	return $submission ? $request->reply200 : $request->reply500('Unable to send the message.');
 }
+
+sub onMessageChannelSubmissionCancelled {
+	my $o = shift;
+	 }
+
+sub onMessageChannelSubmissionRecipientDone {
+	my $o = shift;
+	my $recipientActorOnStore = shift; die 'wrong type '.ref($recipientActorOnStore).' for $recipientActorOnStore' if defined $recipientActorOnStore && ref $recipientActorOnStore ne 'CDS::ActorOnStore';
+	 }
+
+sub onMessageChannelSubmissionRecipientFailed {
+	my $o = shift;
+	my $recipientActorOnStore = shift; die 'wrong type '.ref($recipientActorOnStore).' for $recipientActorOnStore' if defined $recipientActorOnStore && ref $recipientActorOnStore ne 'CDS::ActorOnStore';
+	 }
+
+sub onMessageChannelSubmissionDone {
+	my $o = shift;
+	my $succeeded = shift;
+	my $failed = shift;
+	 }
 
 package CDS::HTTPServer::Request;
 
 sub new {
 	my $class = shift;
-	my $server = shift;
+	my $parameters = shift;
 
-	my %parameters = @_;
-	return bless {
-		server => $server,
-		method => $parameters{method},
-		path => $parameters{path},
-		protocol => $parameters{protocol},
-		queryString => $parameters{query_string},
-		localName => $parameters{localname},
-		localPort => $parameters{localport},
-		peerName => $parameters{peername},
-		peerAddress => $parameters{peeraddr},
-		peerPort => $parameters{peerport},
-		headers => {},
-		remainingData => 0,
-		};
+	return bless $parameters;
 }
 
-sub server { shift->{server} }
+sub logger { shift->{logger} }
 sub method { shift->{method} }
 sub path { shift->{path} }
 sub queryString { shift->{queryString} }
@@ -11192,23 +11382,9 @@ sub peerAddress { shift->{peerAddress} }
 sub peerPort { shift->{peerPort} }
 sub headers { shift->{headers} }
 sub remainingData { shift->{remainingData} }
+sub corsAllowEverybody { shift->{corsAllowEverybody} }
 
-# *** Request configuration
-
-sub setHeaders {
-	my $o = shift;
-	my $newHeaders = shift;
-
-	# Set the headers
-	while (scalar @$newHeaders) {
-		my $key = shift @$newHeaders;
-		my $value = shift @$newHeaders;
-		$o->{headers}->{lc($key)} = $value;
-	}
-
-	# Keep track of the data sent along with the request
-	$o->{remainingData} = $o->{headers}->{'content-length'} // 0;
-}
+# *** Path
 
 sub pathAbove {
 	my $o = shift;
@@ -11220,6 +11396,13 @@ sub pathAbove {
 }
 
 # *** Request data
+
+sub setRemainingData {
+	my $o = shift;
+	my $remainingData = shift;
+
+	$o->{remainingData} = $remainingData;
+}
 
 # Reads the request data
 sub readData {
@@ -11258,6 +11441,23 @@ sub dropData {
 	while ($o->{remainingData} > 0) {
 		$o->{remainingData} -= read(STDIN, my $buffer, $o->{remainingData}) || return;
 	}
+}
+
+# *** Headers
+
+sub setHeader {
+	my $o = shift;
+	my $key = shift;
+	my $value = shift;
+
+	$o->{headers}->{lc($key)} = $value;
+}
+
+sub header {
+	my $o = shift;
+	my $key = shift;
+
+	return $o->{headers}->{lc($key)};
 }
 
 # *** Query string
@@ -11304,7 +11504,7 @@ sub checkSignature {
 	# Get and check the actor
 	my $actorHash = CDS::Hash->fromHex($o->{headers}->{'condensation-actor'}) // return;
 	my ($publicKeyObject, $error) = $store->get($actorHash);
-	return if defined $error;
+	return if ! $publicKeyObject;
 	return if ! $publicKeyObject->calculateHash->equals($actorHash);
 	my $publicKey = CDS::PublicKey->fromObject($publicKeyObject) // return;
 
@@ -11351,14 +11551,14 @@ sub replyOptions {
 
 	my $headers = {};
 	$headers->{'Allow'} = join(', ', @_, 'OPTIONS');
-	$headers->{'Access-Control-Allow-Methods'} = join(', ', @_, 'OPTIONS') if $o->{server}->corsAllowEverybody && $o->{headers}->{'origin'};
+	$headers->{'Access-Control-Allow-Methods'} = join(', ', @_, 'OPTIONS') if $o->corsAllowEverybody && $o->{headers}->{'origin'};
 	return $o->reply(200, 'OK', $headers);
 }
 
 sub replyFatalError {
 	my $o = shift;
 
-	$o->{server}->{logger}->onRequestError($o, @_);
+	$o->{logger}->onRequestError($o, @_);
 	return $o->reply500;
 }
 
@@ -11384,7 +11584,7 @@ sub reply {
 	$headers->{'Content-Length'} = length($content);
 
 	# Origin
-	if ($o->{server}->corsAllowEverybody && (my $origin = $o->{headers}->{'origin'})) {
+	if ($o->corsAllowEverybody && (my $origin = $o->{headers}->{'origin'})) {
 		$headers->{'Access-Control-Allow-Origin'} = $origin;
 		$headers->{'Access-Control-Allow-Headers'} = 'Content-Type';
 		$headers->{'Access-Control-Max-Age'} = '86400';
@@ -16190,7 +16390,7 @@ sub toRecord {
 	my $record = CDS::Record->new;
 
 	# Objects
-	my $objectsRecord = $record->add('puts');
+	my $objectsRecord = $record->add('put');
 	for my $entry (values %{$o->{objects}}) {
 		$objectsRecord->add($entry->{hash}->bytes)->add($entry->{object}->bytes);
 	}
@@ -16248,8 +16448,8 @@ sub fromRecord {
 	}
 
 	# Read additions and removals
-	readEntriesFromRecord($modifications->{addition}, $record->child('add')) // return;
-	readEntriesFromRecord($modifications->{removal}, $record->child('remove')) // return;
+	&readEntriesFromRecord($modifications->{additions}, $record->child('add')) // return;
+	&readEntriesFromRecord($modifications->{removals}, $record->child('remove')) // return;
 
 	return $modifications;
 }

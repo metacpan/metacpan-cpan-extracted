@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #
-# Copyright (C) 2018-2019 Joelle Maslak
+# Copyright (C) 2018-2022 Joelle Maslak
 # All Rights Reserved - See License
 #
 
@@ -25,11 +25,12 @@ MAIN: {
     ok( dies( sub { $eamsg->encrypt_auth_urlsafe() } ),  'encrypt_auth_urlsafe no args' );
     ok( dies( sub { $eamsg->encrypt_auth_portable() } ), 'encrypt_auth_portable no args' );
 
-    ok( dies( sub { $eamsg->decrypt_auth( 1, 2 ) } ), 'decrypt_auth two args' );
-    ok( dies( sub { $eamsg->encrypt_auth( 1, 2 ) } ), 'encrypt_auth two args' );
+    ok( dies( sub { $eamsg->decrypt_auth( 1, 2 ) } ),          'decrypt_auth two args' );
+    ok( dies( sub { $eamsg->encrypt_auth( 1, 2 ) } ),          'encrypt_auth two args' );
     ok( dies( sub { $eamsg->encrypt_auth_ascii( 1, 2, 3 ) } ), 'encrypt_auth_ascii three args' );
-    ok( dies( sub { $eamsg->encrypt_auth_urlsafe( 1, 2 ) } ), 'encrypt_auth_urlsafe two args' );
+    ok( dies( sub { $eamsg->encrypt_auth_urlsafe( 1, 2 ) } ),  'encrypt_auth_urlsafe two args' );
     ok( dies( sub { $eamsg->encrypt_auth_portable( 1, 2 ) } ), 'encrypt_auth_portable two args' );
+    ok( dies( sub { Crypt::EAMessage->generate_key(1) } ),     'generate_key one arg' );
 
 }
 

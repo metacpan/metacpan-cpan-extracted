@@ -2,59 +2,52 @@
 abstract: 'parse nroff-formatted manpages'
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
-build_requires: {}
+build_requires:
+  Test::More: '0.88'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.120630'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Parse-Man
 provides:
   Parse::Man:
     file: lib/Parse/Man.pm
-    version: 0.02
+    version: '0.03'
   Parse::Man::DOM:
     file: lib/Parse/Man/DOM.pm
-    version: 0.02
+    version: '0.03'
   Parse::Man::DOM::Break:
     file: lib/Parse/Man/DOM.pm
-    version: 0
   Parse::Man::DOM::Chunk:
     file: lib/Parse/Man/DOM.pm
-    version: 0
   Parse::Man::DOM::Chunklist:
     file: lib/Parse/Man/DOM.pm
-    version: 0
   Parse::Man::DOM::Document:
     file: lib/Parse/Man/DOM.pm
-    version: 0
   Parse::Man::DOM::Heading:
     file: lib/Parse/Man/DOM.pm
-    version: 0
   Parse::Man::DOM::Linebreak:
     file: lib/Parse/Man/DOM.pm
-    version: 0
   Parse::Man::DOM::Metadata:
     file: lib/Parse/Man/DOM.pm
-    version: 0
   Parse::Man::DOM::Para:
     file: lib/Parse/Man/DOM.pm
-    version: 0
+  Parse::Man::DOM::Para::Example:
+    file: lib/Parse/Man/DOM.pm
   Parse::Man::DOM::Para::Indent:
     file: lib/Parse/Man/DOM.pm
-    version: 0
   Parse::Man::DOM::Para::Plain:
     file: lib/Parse/Man/DOM.pm
-    version: 0
   Parse::Man::DOM::Para::Term:
     file: lib/Parse/Man/DOM.pm
-    version: 0
   Parse::Man::DOM::Space:
     file: lib/Parse/Man/DOM.pm
-    version: 0
 requires:
-  Parser::MGC: 0
+  Parser::MGC: '0'
+  perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.02
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

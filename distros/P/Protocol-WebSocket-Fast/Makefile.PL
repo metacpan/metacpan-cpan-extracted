@@ -8,7 +8,7 @@ my %params = (
     NAME          => 'Protocol::WebSocket::Fast',
     CPLUS         => 11,
     TEST_REQUIRES => {'Test::Exception' => 0, 'Test::Warnings' => 0, 'Test::Fatal' => 0},
-    BIN_DEPS      => ['Export::XS', 'URI::XS', 'Encode::Base2N', 'Protocol::HTTP'],
+    BIN_DEPS      => ['Export::XS', 'URI::XS', 'Encode::Base2N', 'Protocol::HTTP', 'XLog'],
     PKG_CONFIG    => $^O eq 'darwin' ? 'libcrypto' : '',
     LINK          => '-lz -lcrypto',
     SRC           => 'src xs',

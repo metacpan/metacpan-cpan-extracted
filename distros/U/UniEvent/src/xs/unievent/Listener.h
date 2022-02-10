@@ -12,12 +12,11 @@ struct XSListener {
     // methname is recommended to be a shared hash string for performance.
     template <class Ctx = void, class...Args>
     Sub::call_t<Ctx> call (const Simple& methname, const Sv& handle, Args&&...args) {
+        Object obj = objref.value<Object>();
         if (self) {
-            Object obj = handle;
             Sub cv = obj.method(methname);
-            if (cv) return cv.call<Ctx>(handle, std::forward<Args>(args)...);
+            if (cv) return cv.call<Ctx>(objref, std::forward<Args>(args)...);
         } else {
-            Object obj = objref.value<Object>();
             if (!obj) _throw_noobj(methname);
             Sub cv = obj.method(methname);
             if (cv) return cv.call<Ctx>(objref, handle, std::forward<Args>(args)...);
@@ -49,11 +48,9 @@ Ref event_listener (HANDLE* handle, Object obj, const Sv& svnewl, bool weak) {
             obj.payload_attach(lst, &event_listener_marker);
         }
         Object objnewl = svnewl;
-        if (objnewl == obj) lst->self = true;
-        else {
-            lst->objref = Ref::create(objnewl);
-            if (weak) sv_rvweaken(lst->objref);
-        }
+        if (objnewl == obj) lst->self = weak = true;
+        lst->objref = Ref::create(objnewl);
+        if (weak) sv_rvweaken(lst->objref);
         return {};
     }
     return lst ? lst->objref : Ref();

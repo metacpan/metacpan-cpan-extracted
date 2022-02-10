@@ -19,7 +19,7 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
 # Spec tests
 {
-  # Divide - Operation
+  # Division operator
   {
     ok(SPVM::TestCase::Divide->divide_byte_byte);
     ok(SPVM::TestCase::Divide->divide_short_short);
@@ -36,18 +36,10 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
     ok(SPVM::TestCase::Divide->divide_double_double_big);
   }
 
-  # Divide - Compile Error
+  # Divide Unsinged operator
   {
-    {
-      my $build = SPVM::Builder->new;
-      my $success = $build->compile_spvm('TestCase::CompileError::Divide::LeftIsNotNumeric', __LINE__, __FILE__);
-      ok($success == 0);
-    }
-    {
-      my $build = SPVM::Builder->new;
-      my $success = $build->compile_spvm('TestCase::CompileError::Divide::RightIsNotNumeric', __LINE__, __FILE__);
-      ok($success == 0);
-    }
+    ok(SPVM::TestCase::Divide->divide_unsigned_int);
+    ok(SPVM::TestCase::Divide->divide_unsigned_long);
   }
 }
 

@@ -94,7 +94,7 @@ Returns in meters the "great circle" or "haversine" distance between pairs of po
 
 sub distance {
   my $a        = shift;
-  my $b        = shift or die("Error: package $PACKAGE method pointDistM requires a distination point");
+  my $b        = shift or die("Error: package $PACKAGE method distance requires a destination point");
   my $distance = $a->ffi->pointDistM($a->struct, $b->struct);
   return $distance;
 }

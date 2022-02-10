@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/avast/log-dispatch-gelf.svg?branch=master)](https://travis-ci.org/avast/log-dispatch-gelf)
+[![Build Status](https://travis-ci.org/JaSei/log-dispatch-gelf.svg?branch=master)](https://travis-ci.org/JaSei/log-dispatch-gelf)
 # NAME
 
 Log::Dispatch::Gelf - Log::Dispatch plugin for Graylog's GELF format.
@@ -9,7 +9,7 @@ Log::Dispatch::Gelf - Log::Dispatch plugin for Graylog's GELF format.
 
     my $sender = ... # e.g. RabbitMQ queue.
     my $log = Log::Dispatch->new(
-        outputs => [ 
+        outputs => [
             #some custom sender
             [
                 'Gelf',
@@ -27,7 +27,15 @@ Log::Dispatch::Gelf - Log::Dispatch plugin for Graylog's GELF format.
                     port     => 21234,
                     protocol => 'tcp',
                 }
-            ]
+            ],
+            # define callback to crop your full message to short in your own way
+            [
+                'Gelf',
+                min_level         => 'debug',
+                additional_fields => { facility => __FILE__ },
+                send_sub          => sub { $sender->send($_[0]) },
+                short_message_sub => sub { substr($_[0], 0, 10) }
+            ],
         ],
     );
     $log->info('It works');
@@ -47,7 +55,7 @@ socket (TCP or UDP) or a user provided sender.
 # CONSTRUCTOR
 
 The constructor takes the following parameters in addition to the standard
-parameters documented in [Log::Dispatch::Output](https://metacpan.org/pod/Log::Dispatch::Output):
+parameters documented in [Log::Dispatch::Output](https://metacpan.org/pod/Log%3A%3ADispatch%3A%3AOutput):
 
 - additional\_fields
 
@@ -72,6 +80,11 @@ parameters documented in [Log::Dispatch::Output](https://metacpan.org/pod/Log::D
     mandatory sub for sending the message to graylog. It is triggered after the
     gelf message is generated.
 
+- short\_message\_sub
+
+    sub for code that will crop your full message to short message. By default
+    it deletes everything after first newline character
+
 - socket
 
     optional hashref create tcp or udp (default behavior) socket and set
@@ -81,7 +94,7 @@ parameters documented in [Log::Dispatch::Output](https://metacpan.org/pod/Log::D
 
 ## $log->log( level => $, message => $, additional\_fields => \\% )
 
-In addition to the corresponding method in [Log::Dispatch::Output](https://metacpan.org/pod/Log::Dispatch::Output) this
+In addition to the corresponding method in [Log::Dispatch::Output](https://metacpan.org/pod/Log%3A%3ADispatch%3A%3AOutput) this
 subclassed method takes an optional hashref of additional\_fields for the
 gelf message. As in the corresponding parameter on the constructor there is
 no need to prefix them with an \_. If the same key appears in both the

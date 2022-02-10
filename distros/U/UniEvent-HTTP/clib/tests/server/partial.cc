@@ -110,8 +110,8 @@ TEST("client disconnects or request error while in partial mode") {
     bool send_junk = false;
     bool partial_response = false;
     SECTION("client disconnects") { }
-    SECTION("parsing error") { send_junk = true; }
     SECTION("partial response") { partial_response = true; }
+    SECTION("parsing error") { send_junk = true; }
 
     p.server->error_event.add(fail_cb);
 

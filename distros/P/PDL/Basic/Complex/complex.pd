@@ -238,7 +238,6 @@ Comparing complex numbers other than for equality is a fatal error.
 
 my $i;
 BEGIN { $i = bless pdl 0,1 }
-undef &PDL::i;
 {
 no warnings 'redefine';
 sub i { $i->copy + (@_ ? $_[0] : 0) };
@@ -1121,7 +1120,7 @@ use overload
    (map _gen_unop($_), qw(sin@Csin cos@Ccos exp@Cexp abs@Cabs log@Clog sqrt@Csqrt)),
    (map +($_ => sub { confess "Can't compare complex numbers" }), qw(< > <= >=)),
    "!=" => sub { !($_[0] == $_[1]) },
-   '""' => sub { $_[0]->as_native->string },
+   '""' => sub { $_[0]->isnull ? "PDL::Complex->null" : $_[0]->as_native->string },
 ;
 
 sub sum {

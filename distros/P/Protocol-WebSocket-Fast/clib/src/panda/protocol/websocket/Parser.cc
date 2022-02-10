@@ -150,6 +150,9 @@ MessageSP Parser::_get_message () {
             _message_frame.reset();
             return cntl_msg;
         }
+        if (_message->frame_count() == 0) {
+            _message->deflated(_message_frame.rsv1());
+        }
 
         bool done = _message->add_frame(_message_frame);
         _message_frame.reset();

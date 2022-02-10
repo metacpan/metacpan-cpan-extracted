@@ -22,6 +22,9 @@ struct Tty : virtual Stream {
 
     fd_t fd () const { return _fd; }
 
+    excepted<net::SockAddr, ErrorCode> sockaddr () const override { return {}; }
+    excepted<net::SockAddr, ErrorCode> peeraddr () const override { return {}; }
+
     virtual excepted<void, ErrorCode>    set_mode(Mode);
     virtual excepted<WinSize, ErrorCode> get_winsize ();
 

@@ -65,6 +65,23 @@ int Pipe::pending_count () const {
     return impl()->pending_count();
 }
 
+static excepted<net::SockAddr, ErrorCode> name2addr (const excepted<string, ErrorCode>& res) {
+    if (!res) return make_unexpected(res.error());
+    #ifdef _WIN32
+        return {};
+    #else
+        return net::SockAddr::Unix(res.value());
+    #endif
+}
+
+excepted<net::SockAddr, ErrorCode> Pipe::sockaddr() const {
+    return name2addr(sockname());
+}
+
+excepted<net::SockAddr, ErrorCode> Pipe::peeraddr() const {
+    return name2addr(peername());
+}
+
 excepted<void, ErrorCode> Pipe::chmod (int mode) {
     return make_excepted(impl()->chmod(mode));
 }

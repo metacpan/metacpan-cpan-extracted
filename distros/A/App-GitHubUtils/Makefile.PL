@@ -15,13 +15,15 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "App-GitHubUtils",
   "EXE_FILES" => [
     "script/create-this-repo-on-github",
-    "script/git-clone-from-github"
+    "script/git-clone-from-github",
+    "script/this-repo-on-github"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::GitHubUtils",
   "PREREQ_PM" => {
     "App::GitUtils" => 0,
+    "Browser::Open" => 0,
     "Cwd" => 0,
     "Data::Sah::Compiler::perl::TH::array" => "0.910",
     "Data::Sah::Compiler::perl::TH::str" => "0.910",
@@ -41,7 +43,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.008",
+  "VERSION" => "0.009",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,6 +52,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "App::GitUtils" => 0,
+  "Browser::Open" => 0,
   "Cwd" => 0,
   "Data::Sah::Compiler::perl::TH::array" => "0.910",
   "Data::Sah::Compiler::perl::TH::str" => "0.910",

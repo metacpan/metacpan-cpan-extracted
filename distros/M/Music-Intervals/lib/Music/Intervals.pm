@@ -6,7 +6,7 @@ our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
 
-our $VERSION = '0.0804';
+our $VERSION = '0.0901';
 
 use Algorithm::Combinatorics qw( combinations );
 use Math::Factor::XS qw( prime_factors );
@@ -261,6 +261,19 @@ sub by_ratio {
     return $self->_ratio_name_index->{$ratio};
 }
 
+
+sub by_description {
+    my ( $self, $string ) = @_;
+    $string = lc $string;
+    my %matches;
+    for my $ratio (keys %$Music::Intervals::Ratios::ratio) {
+        my $found = $Music::Intervals::Ratios::ratio->{$ratio};
+        $matches{$ratio} = $found
+            if lc($found->{name}) =~ /$string/;
+    }
+    return \%matches;
+}
+
 1;
 
 __END__
@@ -275,13 +288,13 @@ Music::Intervals - Breakdown of musical intervals
 
 =head1 VERSION
 
-version 0.0804
+version 0.0901
 
 =head1 SYNOPSIS
 
   use Music::Intervals;
 
-  my $m = Music::Intervals->new(notes => [qw/C E G B/]);
+  my $m = Music::Intervals->new(notes => [qw/C Eb G B/]);
 
   # Then any of:
   print Dumper(
@@ -296,8 +309,9 @@ version 0.0804
   );
 
   # Find known intervals
-  my $name  = $m->by_ratio('6/5');
+  my $name = $m->by_ratio('6/5');
   my $ratio = $m->by_name('Eb');
+  my $intervals = $m->by_description('pythagorean');
 
   perl -Ilib -MMusic::Intervals::Ratios -E'say $Music::Intervals::Ratios::ratio->{C}{name}'
   # unison, perfect prime, tonic
@@ -412,6 +426,12 @@ Return a known ratio or undef.
  # { 'symbol' => 'C', 'name' => 'unison, perfect prime, tonic' }
 
 Return a known ratio name or undef.
+
+=head2 by_description
+
+  $intervals = $m->by_description('pythagorean');
+
+Search the description of every ratio for the given string.
 
 =head1 SEE ALSO
 

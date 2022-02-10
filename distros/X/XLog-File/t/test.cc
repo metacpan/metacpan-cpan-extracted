@@ -1,4 +1,5 @@
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
 #include <sstream>
 #include <iostream>
 #include <panda/log/file.h>
@@ -65,6 +66,7 @@ TEST("log") {
     Ctx c;
     FileLogger::Config cfg;
     cfg.file = c.dir + "/file.log";
+    cfg.buffered = GENERATE(true, false);
     set_logger(new FileLogger(cfg));
     set_formatter("%m");
     set_level(Level::Debug);
@@ -78,37 +80,21 @@ TEST("log") {
     CHECK(c.readfile(cfg.file) == "hello" NL "world" NL);
 }
 
-TEST("autoflush") {
-    Ctx c;
-    FileLogger::Config cfg;
-    cfg.file = c.dir + "/file.log";
-    cfg.autoflush = true;
-    set_logger(new FileLogger(cfg));
-    set_formatter("%m");
-    set_level(Level::Debug);
-
-    panda_log_debug("hello");
-
-    CHECK(c.readfile(cfg.file) == "hello" NL);
-
-    panda_log_debug("world");
-
-    CHECK(c.readfile(cfg.file) == "hello" NL "world" NL);
-}
-
 #ifndef _WIN32 // windows will not allow to change busy file
 TEST("reopen log file if moved/deleted/etc") {
     Ctx c;
     FileLogger::Config cfg;
     cfg.file = c.dir + "/file.log";
-    cfg.autoflush = true;
+    cfg.buffered = GENERATE(true, false);
     cfg.check_freq = 0;
-    set_logger(new FileLogger(cfg));
+    FileLogger* logger = new FileLogger(cfg);
+    set_logger(logger);
     set_formatter("%m");
     set_level(Level::Debug);
 
     panda_log_debug("hello");
 
+    logger->flush();
     CHECK(c.readfile(cfg.file) == "hello" NL);
 
     SECTION("remove") { Fs::remove(cfg.file); }
@@ -116,6 +102,7 @@ TEST("reopen log file if moved/deleted/etc") {
 
     panda_log_debug("world");
 
+    logger->flush();
     CHECK(c.readfile(cfg.file) == "world" NL);
 }
 #endif
@@ -124,7 +111,7 @@ TEST("ignore logging if log file could not be created/written") {
     Ctx c;
     FileLogger::Config cfg;
     cfg.check_freq = 0;
-    cfg.autoflush = true;
+    cfg.buffered = GENERATE(true, false);
 
     string to_delete;
     SECTION("mkpath fails") {
@@ -148,6 +135,7 @@ TEST("ignore logging if log file could not be created/written") {
     panda_log_error("this log should NOT be ignored");
 
     auto fd = Fs::open(cfg.file, Fs::OpenFlags::RDONLY).value();
+    set_logger(nullptr);  // need to close file to flush it
     auto txt = Fs::read(fd, 999).value();
     CHECK(txt == "this log should NOT be ignored" NL);
 }

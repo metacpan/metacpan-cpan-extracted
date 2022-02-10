@@ -1,8 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-use strict;
+use v5.14;
+use warnings;
 
-use Test::More tests => 1;
+use Test::More;
 
 my @paras;
 
@@ -44,3 +45,5 @@ is_deeply( \@paras,
       [ SH => "SEE ALSO" ],
    ],
    'Headers' );
+
+done_testing;

@@ -87,7 +87,7 @@ void parser_config_in (Parser::Config& cfg, const Hash& h) {
     }
 }
 
-Hash parser_config_out (Parser::Config& cfg) {
+Hash parser_config_out (const Parser::Config& cfg) {
     auto ret = Hash {
         {"max_frame_size", xs::out(cfg.max_frame_size)},
         {"max_message_size", xs::out(cfg.max_message_size)},

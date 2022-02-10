@@ -1,4 +1,9 @@
 cmake_minimum_required(VERSION 3.0)
+
+if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    set(IS_SUBPROJECT TRUE)
+endif()
+
 project(panda-date VERSION 2.1.1 LANGUAGES CXX)
 
 set(LIB_TYPE STATIC)
@@ -10,6 +15,7 @@ else()
 endif()
 
 file(GLOB_RECURSE libSource RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/panda/*.cc")
+list(APPEND libSource "src/panda/date/parse-date.cc" "src/panda/date/parse-relative.cc" "src/panda/date/strptime.cc")
 add_library(${PROJECT_NAME} ${LIB_TYPE} ${libSource})
 target_include_directories(${PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
@@ -22,8 +28,13 @@ set_source_files_properties(src/panda/date/parse-date.cc     PROPERTIES COMPILE_
 set_source_files_properties(src/panda/date/parse-relative.cc PROPERTIES COMPILE_FLAGS "-Wno-implicit-fallthrough -Wno-unused-const-variable")
 set_source_files_properties(src/panda/date/strptime.cc       PROPERTIES COMPILE_FLAGS "-Wno-implicit-fallthrough -Wno-unused-const-variable")
 
+set(ZONE_INFO ${CMAKE_INSTALL_PREFIX}/share/zoneinfo)
+if (IS_SUBPROJECT)
+    set(ZONE_INFO ${CMAKE_CURRENT_SOURCE_DIR}/zoneinfo)
+endif()
+
 target_compile_definitions(${PROJECT_NAME} PRIVATE
-    PANDA_DATE_ZONEINFO_DIR="${CMAKE_INSTALL_PREFIX}/share/zoneinfo"
+    PANDA_DATE_ZONEINFO_DIR="${ZONE_INFO}"
 )
 message(STATUS ${CMAKE_SYSTEM_PREFIX_PATH})
 
@@ -61,7 +72,7 @@ target_link_libraries(${PROJECT_NAME}-tests PUBLIC Catch2::Catch2 Threads::Threa
 enable_testing()
 add_executable(${PROJECT_NAME}-runtests ${EXCLUDE_TEST} ${testSource} "tests/main.cc")
 target_link_libraries(${PROJECT_NAME}-runtests ${PROJECT_NAME}-tests Catch2::Catch2WithMain)
-add_test(NAME test-all COMMAND ${PROJECT_NAME}-runtests WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME}-runtests WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 ########################install#####################################
 install(DIRECTORY src/ DESTINATION include FILES_MATCHING PATTERN "*.h")

@@ -7,8 +7,8 @@ sub tapprox ($$) {
     my ( $x, $y ) = @_;
     my $d = abs( $x - $y );
     my $check = ($d <= 0.0001);
-    diag "diff = [$d]\n" unless $check;
-    return $check;
+    diag "diff = [$d]\n" unless my $res = all $check;
+    return $res;
 }
 
 my $p = pdl([]); $p->setdims([1,0]); $p->qsortvec; # shouldn't segfault!
@@ -27,6 +27,12 @@ my $d = sequence(10)->rotate(1);
 my $d_sort = $d->qsort;
 my $e = pdl([[1,2],[0,500],[2,3],[4,2],[3,4],[3,5]]);
 my $e_sort = $e->qsortvec;
+
+eval { sequence(3, 3)->medover(my $o = null, my $t = null); };
+isnt $@, '', 'a [t] Par cannot be passed';
+
+my $med_dim = 1000;
+ok tapprox(sequence(10,$med_dim,$med_dim)->medover, sequence($med_dim,$med_dim)*10+4.5), 'medover';
 
 # Test a range of values
 ok( tapprox($x->pctover(-0.5), $a_sort->at(0)), "pct below 0 for 25-elem pdl" );

@@ -4,7 +4,6 @@ examples/man-to-html.pl
 lib/Parse/Man.pm
 lib/Parse/Man/DOM.pm
 LICENSE
-Makefile.PL
 MANIFEST			This list of files
 META.json
 META.yml
@@ -15,6 +14,8 @@ t/02format.t
 t/03filling.t
 t/04termpara.t
 t/05joining.t
+t/06examplepara.t
+t/07escapes.t
 t/50dom-meta.t
 t/51dom-headings.t
 t/52dom-paras.t

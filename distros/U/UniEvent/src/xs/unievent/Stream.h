@@ -4,6 +4,7 @@
 #include "Handle.h"
 #include "Request.h"
 #include "Ssl.h"
+#include <xs/net/sockaddr.h>
 #include <panda/unievent/Stream.h>
 
 namespace xs {

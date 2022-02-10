@@ -1,61 +1,46 @@
 package Podman::Images;
 
-use strict;
-use warnings;
-use utf8;
+use Mojo::Base 'Podman::Client';
 
-use Moose;
+use Mojo::Collection;
+use Scalar::Util qw(blessed);
 
-use Scalar::Util;
-
-use Podman::Client;
 use Podman::Image;
 
-has 'Client' => (
-    is      => 'ro',
-    isa     => 'Podman::Client',
-    lazy    => 1,
-    default => sub { return Podman::Client->new() },
-);
+has 'names_only' => undef;
 
-sub List {
-    my $Self = shift;
+sub list {
+  my $self = shift;
 
-    $Self = __PACKAGE__->new() if !Scalar::Util::blessed($Self);
+  if (!blessed($self)) {
+    $self = __PACKAGE__->new();
+    my %opts = @_;
+    $self->names_only($opts{names_only});
+  }
 
-    my $List = $Self->Client->Get(
-        'images/json',
-        Parameters => {
-            all => 1
-        },
-    );
+  my $images = $self->get('images/json', parameters => {all => 1},)->json;
 
-    my @List = ();
-    @List =
-      map {
-        my ($Name) = split /:/, $_->{RepoTags}->[0];
-        Podman::Image->new(
-            Client => $Self->Client,
-            Name   => $Name,
-        )
-      } @{$List};
+  my @list = map {
+    my ($name) = split /:/, $_->{Names}->[0] || 'none';
+    $self->names_only ? $name : Podman::Image->new(name => $name);
+  } @{$images};
 
-    return \@List;
+  return Mojo::Collection->new(@list);
 }
 
-sub Prune {
-    my $Self = shift;
+sub prune {
+  my $self = shift;
 
-    $Self = __PACKAGE__->new() if !Scalar::Util::blessed($Self);
+  $self = __PACKAGE__->new() unless blessed($self);
 
-    $Self->Client->Post('images/prune');
+  $self->post('images/prune');
 
-    return 1; 
+  return 1;
 }
-
-__PACKAGE__->meta->make_immutable;
 
 1;
+
+__END__
 
 =encoding utf8
 
@@ -65,41 +50,44 @@ Podman::Images - Manage images.
 
 =head1 SYNOPSIS
 
-    # Create and use containers controller
-    my $Images = Podman::Images->new();
-    $Images->List();
-
-    # List local stored images
-    my $List = Podman::Images->List();
+    # List local stored images sorted by Id
+    my $images = Podman::Images->new->list->sort(sub { $a->inspect->{Id} cmp $b->inspect->{Id} } );
+    say $_->name for $images->each;
 
     # Prune unused images
-    Podman::Images->Prune;
+    Podman::Images->prune;
 
 =head1 DESCRIPTION
+
+=head2 Inheritance
+
+    Podman::Images
+        isa Podman::Client
 
 L<Podman::Images> lists images and prunes unused ones.
 
 =head1 ATTRIBUTES
 
-=head2 Client
+L<Podman::Images> implements following attributes.
 
-    my $Client = Podman::Client->new(
-        Connection => 'http+unix:///var/cache/podman.sock' );
-    my $Images = Podman::Images->new( Client => $Client );
+=head2 names_only
 
-Optional L<Podman::Client> object.
+If C<true>, C<list> returns L<Mojo::Collection> of image names only instead of L<Podman::Image> objects, defaults to
+C<false>.
 
 =head1 METHODS
 
-=head2 List
+L<Podman::System> implements following methods, which can be used as object or class methods.
 
-    my $List = Podman::Images->List();
+=head2 list
 
-Returns a list of L<Podman::Image> of stored images.
+    my $list = Podman::Images->list;
+
+Returns a L<Mojo::Collection> of L<Podman::Image> objects or image names only of stored images.
 
 =head2 Prune
 
-    Podman::Images->Prune();
+    Podman::Images->prune;
 
 Prune all unused stored images.
 

@@ -51,10 +51,12 @@ sub _enablecustom {
     for ( $self->{t_configfiledialog}, $self->{b_configfiledialog} ) {
 	$_->Enable($n);
     }
+
     $n = $self->{cb_customlib}->IsChecked;
     for ( $self->{t_customlibdialog}, $self->{b_customlibdialog} ) {
 	$_->Enable($n);
     }
+
     $n = $self->{cb_tmplfile}->IsChecked;
     for ( $self->{t_tmplfiledialog}, $self->{b_tmplfiledialog} ) {
 	$_->Enable($n);
@@ -158,15 +160,14 @@ sub fetch_prefs {
     $self->_enablecustom;
 
     if ( $is_macos ) {
-	# Cannot use chooser, allow editing.
+	# Cannot use chooser, hide button and change tooltip.
 	for ( qw( configfile customlib tmplfile ) ) {
-	    $self->{"t_${_}dialog"} =
-	      Wx::TextCtrl->new( $self, wxID_ANY, "", wxDefaultPosition,
-				 wxDefaultSize, 0 );
 	    $self->{"sz_$_"}->Hide($self->{"b_${_}dialog"});
 	    $self->{"sz_$_"}->Layout;
+	    my $t = $self->{"t_${_}dialog"}->GetToolTip->GetTip;
+	    $t =~ s/ by pressing .* button//;
+	    $self->{"t_${_}dialog"}->SetToolTipString($t);
 	}
-
     }
 }
 

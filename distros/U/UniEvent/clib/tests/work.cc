@@ -6,8 +6,9 @@ TEST("main") {
     AsyncTest test(10000, {"w", "aw"});
     WorkSP w = new Work(test.loop);
     auto main_id = std::this_thread::get_id();
+    auto work_id = std::this_thread::get_id();
     w->work_cb = [&](Work*) {
-        CHECK(std::this_thread::get_id() != main_id);
+        work_id = std::this_thread::get_id();
         test.happens("w");
     };
     w->after_work_cb = [&](auto, auto& err) {
@@ -20,6 +21,7 @@ TEST("main") {
     CHECK(w->active());
     test.run();
     CHECK_FALSE(w->active());
+    CHECK(work_id != main_id);
 }
 
 TEST("cancel") {

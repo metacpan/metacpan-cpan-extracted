@@ -1,8 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-use strict;
+use v5.14;
+use warnings;
 
-use Test::More tests => 24;
+use Test::More;
 
 use Parse::Man::DOM;
 
@@ -85,3 +86,5 @@ is( $chunks[1]->font, "B",      '.RB font 2' );
 is( $chunks[1]->text, "bold",   '.RB text 2' );
 is( $chunks[2]->font, "R",      '.RB font 3' );
 is( $chunks[2]->text, "roman2", '.RB text 3' );
+
+done_testing;

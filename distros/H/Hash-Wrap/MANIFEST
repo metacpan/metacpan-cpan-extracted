@@ -8,8 +8,6 @@ META.json
 META.yml
 Makefile.PL
 README
-README.md.orig
-bug.pl
 dist.ini
 lib/Hash/Wrap.pm
 perlcritic.rc
@@ -30,6 +28,7 @@ t/lockkeys.t
 t/lvalue.t
 t/lvalue_undef.t
 t/methods.t
+t/predicate.t
 t/recurse.t
 t/subclass.t
 t/undef.t

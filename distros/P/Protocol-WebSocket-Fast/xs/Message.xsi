@@ -20,3 +20,5 @@ uint16_t Message::close_code ()
 string Message::close_message ()
 
 int Message::frame_count ()
+
+bool Message::deflated ()

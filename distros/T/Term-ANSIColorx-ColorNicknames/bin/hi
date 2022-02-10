@@ -1,5 +1,8 @@
 #!/usr/bin/perl -CA
 
+eval 'exec /usr/bin/perl -CA -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
 use strict;
 use Getopt::Long;
 use Pod::Usage;
@@ -12,6 +15,7 @@ my %o; my %ol = (
     "trunc|t=i"          => "truncate the line to this many characters",
     "nixnics|noex|x"     => "don't use the nicknames from Term::ANSIColorx::Colornicknames",
     "command|c=s"        => "fork and exe this command and pipe it through hi; for SHELL = hi in Makefiles",
+    "file|f=s@"          => "read regex/color pairs from file(s)",
     "supress-cmd-say"    => "don't print the command after forking",
     "list|list-colors|l" => "list (many of) the known colors",
 );
@@ -35,7 +39,19 @@ binmode STDIN,  ":utf8";
 binmode STDOUT,  ":utf8";
 binmode STDERR,  ":utf8";
 
-our $VERSION = '2.7191';
+our $VERSION = '2.7193';
+
+if( $o{file} ) {
+    for my $file (@{$o{file}}) {
+        my $array;
+        unless( $array = do $file ) {
+            die "$file: $@" if $@;
+            die "$file: could not load: $!";
+        }
+        die "$file: invalid syntax" unless ref $array eq "ARRAY";
+        unshift @ARGV, @{$array};
+    }
+}
 
 my $app_invocation = $o{list} ? "list_colors" : "fire_filter";
 
@@ -53,6 +69,7 @@ hi - highlight things in a stream of output
       --trunc -t:              truncate lines to this width (argument required)
       --help -h:               this help
       --command -c:            fork and execute this command and pipe it through hi
+      --file -f:               read regex/color pairs from file(s)
 
 =head1 EXAMPLES
 
@@ -61,6 +78,21 @@ Intended as a pipe colorizer
   ps auxfw | hi jettero sky root red ^nobody orange
 
   sudo tail -f /var/log/vsftpd.log | hi CONNECT.* umber OK.UPLOAD.* lime
+
+  getent passwd | hi -f username -f shell '\d+' pink
+
+=head1 FILE
+
+Regex and color pairs may be supplied not only via parameters, but also using
+one or several external files (see L<EXAMPLES>).  Each file should contain a
+valid Perl code returns ARRAYref.  The contents of it will be prepended to
+the ARGV AS-IS, see below.
+
+  [
+      jettero             => 'sky',
+      root                => 'red',
+      '(?<=:)/[^:]+(?=:)' => 'lime',
+  ],
 
 =head1 limited Makefile support
 

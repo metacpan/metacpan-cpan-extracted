@@ -8,9 +8,9 @@ use Log::ger;
 use Time::HiRes qw(time);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-12-09'; # DATE
+our $DATE = '2022-01-23'; # DATE
 our $DIST = 'App-CekBpom'; # DIST
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(cek_bpom_products);
@@ -367,7 +367,7 @@ sub cek_bpom_products {
         };
     }
 
-    $resmeta{title} = "Check BPOM products: query=[".join(",", @{$args{queries}})."], search_types=[".join(",",@$search_types)."]";
+    $resmeta{caption} = "Check BPOM products: query=[".join(",", @{$args{queries}})."], search_types=[".join(",",@$search_types)."]";
 
     $envres;
 }
@@ -387,7 +387,7 @@ App::CekBpom - Check BPOM products/manufacturers ("sarana") via the command-line
 
 =head1 VERSION
 
-This document describes version 0.016 of App::CekBpom (from Perl distribution App-CekBpom), released on 2021-12-09.
+This document describes version 0.017 of App::CekBpom (from Perl distribution App-CekBpom), released on 2022-01-23.
 
 =head1 DESCRIPTION
 
@@ -548,7 +548,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

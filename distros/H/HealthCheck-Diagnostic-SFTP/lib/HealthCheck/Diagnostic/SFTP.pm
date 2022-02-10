@@ -3,7 +3,7 @@ use parent 'HealthCheck::Diagnostic';
 
 # ABSTRACT: Check for SFTP access and operations in a HealthCheck
 use version;
-our $VERSION = 'v1.4.0'; # VERSION
+our $VERSION = 'v1.4.1'; # VERSION
 
 use strict;
 use warnings;
@@ -47,21 +47,30 @@ sub run {
     my ($self, %params) = @_;
     my $host     = $params{host};
     my $callback = $params{callback};
+    my $ssh_args = $params{ssh_args} // {};
 
     # Get our description of the connection.
+    my $port        = $ssh_args->{port};
     my $user        = $params{user};
     my $name        = $params{name};
     my $timeout     = $params{timeout} // 3;
-    my $target      = ( $user ? $user.'@' : '' ).$host;
+    my $target      = sprintf(
+        "%s%s%s",
+        $user ? $user . '@' : '',
+        $host,
+        $port ? ":$port" : '',
+    );
+
     my $description = $name ? "$name ($target) SFTP" : "$target SFTP";
+    my $options = $ssh_args->{options} // [];
 
-    my $ssh_args = $params{ssh_args}    // {};
-    my $options  = $ssh_args->{options} // [];
-
-    unless ( grep { $_ =~ /^ConnectTimeout / } @$options ) {
-        push @$options, "ConnectTimeout $timeout";
-        $ssh_args->{options} = $options;
-    }
+    # Once the SSH ConnectTimeout option is supported, we can re-enable this:
+    # https://rt.cpan.org/Public/Bug/Display.html?id=66433
+    #
+    # unless ( grep { $_ =~ /^ConnectTimeout / } @$options ) {
+    #     push @$options, "ConnectTimeout $timeout";
+    #     $ssh_args->{options} = $options;
+    # }
 
     # Try to connect to the host.
     my $sftp;
@@ -73,7 +82,10 @@ sub run {
     local $@;
     eval {
         local $SIG{__DIE__};
+        local $SIG{ALRM} = sub { die "timeout after $timeout seconds.\n" };
+        alarm $timeout;
         $sftp = Net::SFTP->new( $host, %args );
+        alarm 0;
     };
     return {
         status => 'CRITICAL',
@@ -119,7 +131,7 @@ HealthCheck::Diagnostic::SFTP - Check for SFTP access and operations in a Health
 
 =head1 VERSION
 
-version v1.4.0
+version v1.4.1
 
 =head1 SYNOPSIS
 
@@ -198,9 +210,8 @@ Additional SSH connection arguments.
 
 =head2 timeout
 
-Set for the C<ConnectTimeout> value passed to the C<ssh_args> C<options> setting
-in L<Net::SSH::Perl>.
-Will not be set if an existing C<ConnectTimeout> value has been set.
+Sets up an C<ALRM> signal handler used to timeout the initial connection attempt
+after the number of seconds provided.
 Defaults to 3.
 
 =head1 DEPENDENCIES

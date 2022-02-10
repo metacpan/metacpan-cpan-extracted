@@ -8,7 +8,7 @@ Crypt::EAMessage - Simple-to-use Abstraction of Encrypted Authenticated Messages
 
 =head1 VERSION
 
-version 1.202120
+version 1.220391
 
 =head1 SYNOPSIS
 
@@ -139,21 +139,34 @@ Decrypts the cipher text into the object that was frozen during encryption.
 If the authentication or decryption fails, an exception is thrown. Otherwise
 it returns the plaintext/object.
 
+=head2 generate_key
+
+ say "Hex key: " . Crypt::EAMessage->generate_key()
+
+Added in version 1.220390
+
+This is a class method (I.E. you do not need to instantiate the
+C<Crypt::EAMessage> class to use this).
+
+Returns a randomly generated key suitable to use with AES256 as a hex number.
+
 =head1 GENERATING AES256 KEYS
 
 To generate a key, a simple Perl program can accomplish this - note that you
 should NOT use standard C<rand()> to do this.
 
   use feature 'say';
-  use Bytes::Random::Secure qw(random_bytes_hex);
+  use Crypt::EAMessage;
 
-  my $hexkey = random_bytes_hex(32);
+  my $hexkey = Crypt::EAMessage->generate_key()
   say "Key is: $hexkey";
 
-Alternative, you can do this with a one-liner
-to return a hex key:
+Alternative, you can do this with a one-liner to return a hex key, and the
+L<Crypt::EAMessage::Keygen> module:
 
-  perl -MBytes::Random::Secure=random_bytes_hex -E 'say random_bytes_hex(32)'
+  perl -MCrypt::EAMessage::Keygen -e 1
+
+This will output a random key in hex format suitable for use as an AES256 key.
 
 =head1 SECURITY
 
@@ -193,7 +206,7 @@ Joelle Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2020 by Joelle Maslak.
+This software is copyright (c) 2019-2022 by Joelle Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

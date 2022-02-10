@@ -13,7 +13,7 @@ Readonly::Array our @EXPORT_OK => qw(set_params set_params_pub set_split_params
 	split_params);
 
 # Version.
-our $VERSION = 0.10;
+our $VERSION = 0.11;
 
 # Set parameters to user values.
 sub set_params {
@@ -284,12 +284,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2011-2021
+© Michal Josef Špaček 2011-2022
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.10
+0.11
 
 =cut

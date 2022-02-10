@@ -25,3 +25,7 @@
 ## 20220203.0
 
 * Use in module embedded POD.
+
+## 20220210.0
+
+* Rework. Use Mojo based fluent interface and coding style.

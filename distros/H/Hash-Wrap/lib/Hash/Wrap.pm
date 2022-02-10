@@ -11,7 +11,7 @@ use warnings;
 
 use Scalar::Util;
 use Digest::MD5;
-our $VERSION = '0.19';
+our $VERSION = '0.22';
 
 our @EXPORT = qw[ wrap_hash ];
 
@@ -375,7 +375,7 @@ our $predicate_template = q[
    return exists $self->{\<<KEY>>};
   }
 
-  \$Hash::Wrap::REGISTRY{methods}{'has_\<<KEY>>'} = undef;
+  $Hash::Wrap::REGISTRY{methods}{'has_\<<KEY>>'} = undef;
 
   \&has_\<<KEY>>;
 ];
@@ -678,7 +678,7 @@ Hash::Wrap - create on-the-fly objects from hashes
 
 =head1 VERSION
 
-version 0.19
+version 0.22
 
 =head1 SYNOPSIS
 

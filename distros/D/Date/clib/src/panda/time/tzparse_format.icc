@@ -85,7 +85,7 @@ static inline int PTIME_TZPARSE_HEADERFUNC (const char*& ptr, const char*const e
 static inline bool PTIME_TZPARSE_BODYFUNC (const char*& ptr, const char*const end, ftz_head& head, Timezone* zone) {
     if (ptr + PTIME_TZPARSE_BODY_BASE_SIZE(head) > end) return false;
     
-    PTIME_TZPARSE_TRANSTIME_TYPE* transitions = (PTIME_TZPARSE_TRANSTIME_TYPE*)ptr;
+    auto transitions = ptr;
     ptr += head.tzh_timecnt * sizeof(PTIME_TZPARSE_TRANSTIME_TYPE);
 
     ftz_ilocaltype* ilocaltypes = (ftz_ilocaltype*)ptr;
@@ -157,7 +157,12 @@ static inline bool PTIME_TZPARSE_BODYFUNC (const char*& ptr, const char*const en
     for (uint32_t i = 0; i < head.tzh_timecnt; ++i) {
         ftz_localtype localtype = localtypes[ilocaltypes[i]];
         auto this_trans         = &zone->trans[i+1];
-        this_trans->start       = (ptime_t)PTIME_TZPARSE_NTOH_DYN(transitions[i]);
+        
+        PTIME_TZPARSE_TRANSTIME_TYPE tmp1;
+        memcpy(&tmp1, transitions, sizeof(tmp1));
+        transitions += sizeof(tmp1);
+        this_trans->start       = (ptime_t)PTIME_TZPARSE_NTOH_DYN(tmp1);
+        
         this_trans->gmt_offset  = localtype.offset;
         this_trans->isdst       = localtype.isdst;
         const char* abbrev      = abbrevs + localtype.abbrev_offset;

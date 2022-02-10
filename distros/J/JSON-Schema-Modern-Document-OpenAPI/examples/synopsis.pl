@@ -1,0 +1,78 @@
+use strict;
+use warnings;
+use 5.020;
+
+use OpenAPI::Modern;
+use YAML::PP;
+
+my $openapi = OpenAPI::Modern->new(
+  openapi_uri => 'openapi.yaml',
+  openapi_schema => YAML::PP->new(boolean => 'JSON::PP')->load_string(<<'YAML'));
+openapi: 3.1.0
+info:
+  title: Test API
+  version: 1.2.3
+paths:
+  /foo/{foo_id}:
+    parameters:
+    - name: foo_id
+      in: path
+      required: true
+      schema:
+        pattern: ^[a-z]+$
+    post:
+      operationId: my_foo_request
+      parameters:
+      - name: My-Request-Header
+        in: header
+        required: true
+        schema:
+          pattern: ^[0-9]+$
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                hello:
+                  type: string
+                  pattern: ^[0-9]+$
+      responses:
+        200:
+          description: success
+          headers:
+            My-Response-Header:
+              required: true
+              schema:
+                pattern: ^[0-9]+$
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ status ]
+                properties:
+                  status:
+                    const: ok
+YAML
+
+use HTTP::Request::Common;
+use Mojo::Message::Response;
+say 'request:';
+my $request = POST 'http://example.com/foo/bar',
+  'My-Request-Header' => '123', 'Content-Type' => 'application/json',
+  Content => '{"hello": 123}';
+my $results = $openapi->validate_request($request);
+say $results;
+say ''; # newline
+say JSON::MaybeXS->new(convert_blessed => 1, canonical => 1, pretty => 1, indent_length => 2)->encode($results);
+
+say 'response:';
+my $response = Mojo::Message::Response->new(code => 200, message => 'OK');
+$response->headers->header('Content-Type', 'application/json');
+$response->headers->header('My-Response-Header', '123');
+$response->body('{"status": "ok"}');
+$results = $openapi->validate_response($response, { request => $request });
+say $results;
+say ''; # newline
+say JSON::MaybeXS->new(convert_blessed => 1, canonical => 1, pretty => 1, indent_length => 2)->encode($results);

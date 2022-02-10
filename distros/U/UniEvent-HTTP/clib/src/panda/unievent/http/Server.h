@@ -10,7 +10,7 @@ namespace panda { namespace unievent { namespace http {
 
 using panda::protocol::http::SIZE_UNLIMITED;
 
-struct Server : Refcnt, private IStreamSelfListener {
+struct Server : Refcnt, private IStreamListener {
     static constexpr const int      DEFAULT_BACKLOG          = 4096;
     static constexpr const uint32_t DEFAULT_IDLE_TIMEOUT     = 300000; // [ms]
     static constexpr const size_t   DEFAULT_MAX_HEADERS_SIZE = 16384;
@@ -24,14 +24,31 @@ struct Server : Refcnt, private IStreamSelfListener {
 
     struct Location {
         string           host;
-        uint16_t         port       = 0;
-        string           path       = {};              // path for unix sockets or name for named pipes (windows), if supplied ignores host, port, domain, reuse_port
-        bool             reuse_port = DEFRPORT;        // several listeners(servers) can be bound to the same port if true, useful for threaded apps
-        int              backlog    = DEFAULT_BACKLOG; // max accept queue
-        int              domain     = AF_INET;
-        SslContext       ssl_ctx    = nullptr;         // if set, will use SSL
-        optional<sock_t> sock       = {};              // if supplied, uses this socket and ignores host, port, path, reuse_port, backlog, domain
-                                                       // socket must be bound but NOT LISTENING!
+        uint16_t         port        = 0;
+        string           path        = {};              // path for unix sockets or name for named pipes (windows), if supplied ignores host, port, domain, reuse_port
+        bool             reuse_port  = DEFRPORT;        // several listeners(servers) can be bound to the same port if true, useful for threaded apps
+        int              backlog     = DEFAULT_BACKLOG; // max accept queue
+        int              domain      = AF_INET;
+        bool             tcp_nodelay = false;           // if the location is a tcp location, enables tcp nodelay feature
+        SslContext       ssl_ctx     = nullptr;         // if set, will use SSL
+        optional<sock_t> sock        = {};              // if supplied, uses this socket and ignores host, port, path, reuse_port, backlog, domain
+                                                        // socket must be bound but NOT LISTENING!
+                                                       
+        Location () {}
+        
+        Location (const string& host, uint16_t port, int backlog = DEFAULT_BACKLOG, const SslContext& ssl_ctx = {})
+            : host(host), port(port), backlog(backlog), ssl_ctx(ssl_ctx) {}
+            
+        Location& set_host       (const string& val)     { host = val; return *this; }
+        Location& set_port       (uint16_t val)          { port = val; return *this; }
+        Location& set_path       (const string& val)     { path = val; return *this; }
+        Location& set_reuse_port (bool val)              { reuse_port = val; return *this; }
+        Location& set_backlog    (int val)               { backlog = val; return *this; }
+        Location& set_domain     (int val)               { domain = val; return *this; }
+        Location& set_ssl_ctx    (const SslContext& val) { ssl_ctx = val; return *this; }
+        Location& set_sock       (sock_t val)            { sock = val; return *this; }
+        Location& set_tcp_nodelay(bool val)              { tcp_nodelay = val; return *this; }
+                                                       
         bool operator== (const Location&) const;
         bool operator!= (const Location& oth) const { return !operator==(oth); }
     };
@@ -111,24 +128,17 @@ private:
     Connections _connections;
     uint64_t    _hdate_time = 0;
     string      _hdate_str;
-    uint64_t    _awrs = 0; // active write requests
 
-    void on_connection (const StreamSP&, const ErrorCode&) override;
+    void on_establish(const StreamSP&, const StreamSP&, const ErrorCode&) override;
 
     void remove (const ServerConnectionSP& conn) {
         _connections.erase(conn->id());
         if (_state == State::stopping) _stop_if_done();
     }
 
-    void write_request_queued () { ++_awrs; }
-
-    void write_request_completed () {
-        --_awrs;
-        if (_state == State::stopping) _stop_if_done();
-    }
-
     void _stop_if_done () {
-        if (_state != State::stopping || _connections.size() || _awrs) return;
+        assert(_state == State::stopping);
+        if (_connections.size()) return;
         _state = State::initial;
         stop_event();
     }

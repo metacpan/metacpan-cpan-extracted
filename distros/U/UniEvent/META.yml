@@ -11,9 +11,10 @@ build_requires:
   Test::Exception: '0'
   Test::More: '0'
   Test::Simple: '0.96'
+  XLog: v1.1.2
   XS::Framework: v1.5.2
   XS::libcares: v1.17.1.2
-  XS::libcatch: v3.0.0.3
+  XS::libcatch: v3.0.0.4
   XS::libpanda: v1.5.8
   XS::libuv: v1.41.0.0
   next::XS: v1.0.7
@@ -22,10 +23,11 @@ configure_requires:
   Export::XS: v3.0.5
   Net::SockAddr: v1.1.2
   Test::Catch: v2.0.0
+  XLog: v1.1.2
   XS::Framework: v1.5.2
   XS::Install: v1.3.5
   XS::libcares: v1.17.1.2
-  XS::libcatch: v3.0.0.3
+  XS::libcatch: v3.0.0.4
   XS::libpanda: v1.5.8
   XS::libuv: v1.41.0.0
   next::XS: v1.0.7
@@ -43,11 +45,12 @@ no_index:
 requires:
   Export::XS: v3.0.5
   Net::SockAddr: v1.1.2
+  XLog: v1.1.2
   XS::Framework: v1.5.2
   XS::Install: v1.3.5
   XS::libcares: v1.17.1.2
   XS::libpanda: v1.5.8
   XS::libuv: v1.41.0.0
   next::XS: v1.0.7
-version: v1.2.9
+version: v1.2.10
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

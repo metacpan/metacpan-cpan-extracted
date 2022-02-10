@@ -1,10 +1,34 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Barcode-ZBar
-version:      0.04
-version_from: ZBar.pm
-installdirs:  site
+---
+abstract: 'Perl interface to the ZBar Barcode Reader'
+author:
+  - 'Jeff Brown <spadix@users.sourceforge.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Barcode-ZBar
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Barcode::ZBar:
+    file: ZBar.pm
+    version: '0.10'
+  Barcode::ZBar::Error:
+    file: ZBar.pm
+    version: '0.10'
 requires:
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30
+  perl: '5.006'
+resources:
+  homepage: https://metacpan.org/pod/Barcode::ZBar/
+  repository: https://github.com/mchehab/zbar.git
+version: '0.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

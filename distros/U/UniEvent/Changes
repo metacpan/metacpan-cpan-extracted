@@ -1,4 +1,10 @@
-1.2.9     xx.xx.2021
+1.2.10    xx.xx.2021
+           - add on_establish to event listener API
+           - move sockaddr() peeraddr() from Tcp to Stream
+           - Timer new feature: pause/resume
+           - API for getting connect timer for resuming timeout for logical connections
+           - add XLog dependency
+1.2.9     26.11.2021
            - upgrade tests for catch-v3
 1.2.8     18.11.2021
            - internal misc junk

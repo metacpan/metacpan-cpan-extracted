@@ -126,4 +126,17 @@ Note that this value is relative to L<UniEvent::Loop/"now()"> so it may be inacc
 
 In such case call L<UniEvent::Loop/"update_time()"> before calling C<due_in()> to get accurate value.
 
+
+=head2 pause()
+
+Temporarily pause (stop) the timer. Does nothing if timer has not been started or has been paused/stopped.
+
+
+=head2 resume()
+
+Resumes paused timer. Next callback will be called in number of seconds that were remaining when C<pause()> was called.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS"> if timer was not paused before. C<resume()> can't be called after C<stop()> even if 
+there was preceeding call to C<pause()>.
+
 =cut

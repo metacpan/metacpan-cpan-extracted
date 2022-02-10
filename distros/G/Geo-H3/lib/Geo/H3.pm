@@ -5,7 +5,7 @@ use base qw{Geo::H3::Base}; #provides new and ffi
 use Geo::H3::Index;
 use Geo::H3::Geo;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
@@ -26,7 +26,7 @@ Geo::H3 - H3 Geospatial Hexagon Indexing System
   my $center   = $h3->center;                     #isa Geo::H3::GeoCoord
   my $lat      = $center->lat;                    #isa Double WGS-84 Decimal Degrees
   my $lon      = $center->lon;                    #isa Double WGS-84 Decimal Degrees
-  my $distance = $center->pointDistM($geo);       #isa Double meters
+  my $distance = $center->distance($geo);         #isa Double meters
   
 =head1 DESCRIPTION
 

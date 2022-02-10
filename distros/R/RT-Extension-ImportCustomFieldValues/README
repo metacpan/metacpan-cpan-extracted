@@ -1,0 +1,56 @@
+NAME
+    RT-Extension-ImportCustomFieldValues - Allow to import customfield
+    values from CSV file
+
+RT VERSION
+    Works with RT 4.2 and 4.4.
+
+INSTALLATION
+    "perl Makefile.PL"
+    "make"
+    "make install"
+        May need root permissions
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        If you are using RT 4.2 or greater, add this line:
+
+            Plugin('RT::Extension::ImportCustomFieldValues');
+
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj
+
+    Restart your webserver
+
+DESCRIPTION
+    The ImportCustomFieldValues extension gives you an easy way to import
+    values in a customfield of type "Select" from a CSV file.
+
+DETAILS
+    The tool is available through
+    Administration->CustomFields->[CustomField]->Import from CSV
+
+    CSV file must a consist of a text file with:
+
+    - File encoding: UTF-8 - Fields separated by ";" - No headers - Using
+    the following columns and order: SortOrder, Name, Description, Category
+    - Column "Name" is mandatory, other columns may be empty but must exists
+
+AUTHOR
+    Emmanuel Lacour <elacour@easter-eggs.com>
+
+BUGS
+    All bugs should be reported via email to
+
+        L<bug-RT-Extension-ImportCustomFieldValues@rt.cpan.org|mailto:bug-RT-Extension-ImportCustomFieldValues@rt.cpan.org>
+
+    or via the web at
+
+        L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-ImportCustomFieldValues>.
+
+LICENSE AND COPYRIGHT
+    This software is Copyright (c) 2022 by Emmanuel Lacour.
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

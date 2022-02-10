@@ -19,15 +19,9 @@ no_index:
     - inc
 requires:
   Mojolicious: '9.22'
-  Moose: '2.2014'
-  Path::Tiny: '0.114'
-  Readonly: '2.05'
-  Test::Exception: '0.43'
-  Test::Moose::More: '0.050'
-  Try::Tiny: '0.31'
 resources:
   homepage: https://github.com/tschaefer/podman-perl
   license: http://dev.perl.org/licenses
   repository: https://github.com/tschaefer/podman-perl.git
-version: '20220203.0'
+version: '20220210.0'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

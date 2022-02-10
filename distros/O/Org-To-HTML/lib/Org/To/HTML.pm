@@ -1,17 +1,12 @@
 package Org::To::HTML;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-09-11'; # DATE
-our $DIST = 'Org-To-HTML'; # DIST
-our $VERSION = '0.233'; # VERSION
-
 use 5.010001;
 use strict;
+use vars qw($VERSION);
 use warnings;
 use Log::ger;
 
-use vars qw($VERSION);
-
+use Exporter 'import';
 use File::Slurper qw(read_text write_text);
 use HTML::Entities qw/encode_entities/;
 use Org::Document;
@@ -21,9 +16,11 @@ use experimental 'smartmatch';
 with 'Org::To::Role';
 extends 'Org::To::Base';
 
-require Exporter;
-our @ISA;
-push @ISA,       qw(Exporter);
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-01-21'; # DATE
+our $DIST = 'Org-To-HTML'; # DIST
+our $VERSION = '0.234'; # VERSION
+
 our @EXPORT_OK = qw(org_to_html);
 
 has naked => (is => 'rw');
@@ -118,7 +115,10 @@ sub org_to_html {
             ignore_unknown_settings => $args{ignore_unknown_settings},
         );
     } elsif (defined($args{source_str})) {
-        $doc = Org::Document->new(from_string => $args{source_str});
+        $doc = Org::Document->new(
+            from_string => $args{source_str},
+            ignore_unknown_settings => $args{ignore_unknown_settings},
+        );
     } else {
         return [400, "Please specify source_file/source_str"];
     }
@@ -455,7 +455,7 @@ Org::To::HTML - Export Org document to HTML
 
 =head1 VERSION
 
-This document describes version 0.233 of Org::To::HTML (from Perl distribution Org-To-HTML), released on 2020-09-11.
+This document describes version 0.234 of Org::To::HTML (from Perl distribution Org-To-HTML), released on 2022-01-21.
 
 =head1 SYNOPSIS
 
@@ -500,7 +500,7 @@ Export document to HTML.
 
 Usage:
 
- org_to_html(%args) -> [status, msg, payload, meta]
+ org_to_html(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Export Org document to HTML.
 
@@ -571,12 +571,12 @@ If not specified, HTML string will be returned.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -608,14 +608,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Org-To-HTM
 
 Source repository is at L<https://github.com/perlancar/perl-Org-To-HTML>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Org-To-HTML>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 For more information about Org document format, visit http://orgmode.org/
@@ -628,11 +620,52 @@ L<org-to-html>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTORS
+
+=for stopwords Harald Jörg Steven Haryanto
+
+=over 4
+
+=item *
+
+Harald Jörg <Harald.Joerg@arcor.de>
+
+=item *
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=back
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2020, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Org-To-HTML>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

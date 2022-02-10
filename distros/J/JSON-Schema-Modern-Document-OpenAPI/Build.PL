@@ -87,7 +87,7 @@ EOW
         "Karen Etheridge <ether\@cpan.org>"
       ],
       "dist_name" => "JSON-Schema-Modern-Document-OpenAPI",
-      "dist_version" => "0.019",
+      "dist_version" => "0.020",
       "license" => "perl",
       "module_name" => "JSON::Schema::Modern::Document::OpenAPI",
       "recursive_test_files" => 1,
@@ -122,9 +122,12 @@ EOW
       },
       "test_requires" => {
         "File::Spec" => 0,
-        "HTTP::Request::Common" => 0,
+        "HTTP::Request" => 0,
         "HTTP::Response" => 0,
+        "HTTP::Status" => 0,
         "Module::Metadata" => 0,
+        "Mojo::Message::Request" => 0,
+        "Mojo::Message::Response" => 0,
         "Test::Deep" => 0,
         "Test::Fatal" => 0,
         "Test::File::ShareDir" => 0,
@@ -133,6 +136,7 @@ EOW
         "Test::More" => "0.96",
         "URI" => 0,
         "YAML::PP" => "0.005",
+        "lib" => 0,
         "open" => 0,
         "perl" => "v5.20.0",
         "utf8" => 0
@@ -142,9 +146,12 @@ EOW
 
     my %fallback_build_requires = (
       "File::Spec" => 0,
-      "HTTP::Request::Common" => 0,
+      "HTTP::Request" => 0,
       "HTTP::Response" => 0,
+      "HTTP::Status" => 0,
       "Module::Metadata" => 0,
+      "Mojo::Message::Request" => 0,
+      "Mojo::Message::Response" => 0,
       "Test::Deep" => 0,
       "Test::Fatal" => 0,
       "Test::File::ShareDir" => 0,
@@ -153,6 +160,7 @@ EOW
       "Test::More" => "0.96",
       "URI" => 0,
       "YAML::PP" => "0.005",
+      "lib" => 0,
       "open" => 0,
       "perl" => "v5.20.0",
       "utf8" => 0

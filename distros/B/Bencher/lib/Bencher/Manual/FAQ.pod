@@ -18,7 +18,7 @@ Bencher::Manual::FAQ - FAQ for Bencher
 
 =head1 VERSION
 
-This document describes version 1.056 of Bencher::Manual::FAQ (from Perl distribution Bencher), released on 2021-08-13.
+This document describes version 1.060 of Bencher::Manual::FAQ (from Perl distribution Bencher), released on 2021-08-13.
 
 =head1 GENERAL
 

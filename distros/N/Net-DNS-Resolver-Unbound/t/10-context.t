@@ -51,13 +51,13 @@ ok( $reject_option, "unknown Unbound option\t[$reject_option]" );
 eval { $resolver->set_fwd('127.0.0.53') };
 eval { $resolver->set_tls(0) };
 eval { $resolver->set_stub( 'zone', '10.1.2.3', 0 ) };
-eval { $resolver->resolvconf('filename') };
+eval { $resolver->resolv_conf('filename') };
 eval { $resolver->hosts('filename') };
 eval { $resolver->add_ta('zone DS') };
 eval { $resolver->add_ta_file('filename') };
 eval { $resolver->add_ta_autr('filename') };
-eval { $resolver->trustedkeys('filename') };
-eval { $resolver->debugout('filename') };
+eval { $resolver->trusted_keys('filename') };
+eval { $resolver->debug_out('filename') };
 
 
 exit;

@@ -1,5 +1,14 @@
 Revision history for Perl extension XML::RSSLite.
 
+0.17	2022-02-08
+	Fix parseRSS(..., ..., 1) introduced in 0.16
+
+0.16	2022-02-07
+
+	Corrected typo in SYNOPSIS; data structure key is 'items', not 'item'
+
+	Made character cleaning optional
+
 0.15	Sat Sep  5 23:25:51 EDT 2009
 	Strip bracketing whitespace from links
 

@@ -1,55 +1,91 @@
 NAME
-    `Parse::Man' - parse nroff-formatted manpages
+
+    Parse::Man - parse nroff-formatted manpages
 
 DESCRIPTION
+
     This abstract subclass of Parser::MGC recognises nroff grammar from a
     file or string value. It invokes methods when various nroff directives
-    are encountered. It is intended that this class be used as a base class,
-    with methods provided to handle the various directives and formatting
-    options. Typically a subclass will store intermediate results in a data
-    structure, building it as directed by these method invocations.
+    are encountered. It is intended that this class be used as a base
+    class, with methods provided to handle the various directives and
+    formatting options. Typically a subclass will store intermediate
+    results in a data structure, building it as directed by these method
+    invocations.
 
 TEXT CHUNK FORMATTING METHOD
+
     The following method is used to handle formatted text. Each call is
     passed a plain string value from the input content.
 
-  $parser->chunk( $text, %opts )
-    The `%opts' hash contains the following options:
+ chunk
+
+       $parser->chunk( $text, %opts )
+
+    The %opts hash contains the following options:
 
     font => STRING
-        The name of the current font (`R', `B', etc..)
+
+      The name of the current font (R, B, etc..)
 
     size => INT
-        The current text size, relative to a paragraph base of 0.
 
-    Other font requests that are found in `\fX' or `\f(AB' requests are
-    handled by similarly-named methods.
+      The current text size, relative to a paragraph base of 0.
+
+    Other font requests that are found in \fX or \f(AB requests are handled
+    by similarly-named methods.
 
 PARAGRAPH HANDLING METHODS
+
     The following methods are used to form paragraphs out of formatted text
     chunks. Their return values are ignored.
 
-  $parser->para_TH( $name, $section )
-    Handles the `.TH' paragraph which gives the page title and section
+ para_TH
+
+       $parser->para_TH( $name, $section )
+
+    Handles the .TH paragraph which gives the page title and section
     number.
 
-  $parser->para_SH( $title )
-    Handles the `.SH' paragraph, which gives a section header.
+ para_SH
 
-  $parser->para_SS( $title )
-    Handles the `.SS' paragraph, which gives a sub-section header.
+       $parser->para_SH( $title )
 
-  $parser->para_TP( $opts )
-    Handles a `.TP' paragraph, which gives a term definition.
+    Handles the .SH paragraph, which gives a section header.
 
-  $parser->para_IP( $opts )
-    Handles a `.IP' paragraph, which is indented like the definition part of
-    a `.TP' paragraph.
+ para_SS
 
-  $parser->para_P( $opts )
-    Handles the `.P', `.PP' or `.LP' paragraphs, which are all synonyms for
-    a plain paragraph content.
+       $parser->para_SS( $title )
+
+    Handles the .SS paragraph, which gives a sub-section header.
+
+ para_TP
+
+       $parser->para_TP( $opts )
+
+    Handles a .TP paragraph, which gives a term definition.
+
+ para_IP
+
+       $parser->para_IP( $opts )
+
+    Handles a .IP paragraph, which is indented like the definition part of
+    a .TP paragraph.
+
+ para_P
+
+       $parser->para_P( $opts )
+
+    Handles the .P, .PP or .LP paragraphs, which are all synonyms for a
+    plain paragraph content.
+
+ para_EX
+
+       $parser->para_EX( $opts )
+
+    Handles the .EX paragraph, which is example text; intended to be
+    rendered in a fixed-width font without filling.
 
 AUTHOR
+
     Paul Evans <leonerd@leonerd.org.uk>
 

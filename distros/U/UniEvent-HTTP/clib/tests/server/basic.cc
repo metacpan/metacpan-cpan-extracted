@@ -1,4 +1,5 @@
 #include "../lib/test.h"
+#include "panda/unievent/http/ServerResponse.h"
 
 #define TEST(name) TEST_CASE("server-basic: " name, "[server-basic]" VSSL)
 
@@ -358,4 +359,133 @@ TEST("server request connection properties") {
     );
 
     test.run();
+}
+
+TEST("stop") {
+    AsyncTest test(1000);
+    
+    SECTION("empty") {
+        test.expected = {"stop"};
+        auto srv = make_server(test.loop);
+        auto t = Timer::create(1, [&](auto...){ srv->stop(); }, test.loop);
+        t->weak(true);
+        srv->stop_event.add([&]{
+            test.happens("stop");
+        });
+        test.run();
+    }
+    
+    SECTION("with active request") {
+        test.expected = {"drop", "stop"};
+        ServerPair p(test.loop);
+        p.server->request_event.add([&](auto req) {
+            req->drop_event.add([&](auto...){
+                test.happens("drop");
+            });
+            p.server->stop();
+        });
+        p.server->stop_event.add([&]{
+            test.happens("stop");
+        });
+        
+        p.conn->write(
+            "GET / HTTP/1.1\r\n"
+            "Host: epta.ru\r\n"
+            "\r\n"
+        );
+        
+        test.run();
+    }
+    
+    SECTION("immediately after request") {
+        test.expected = {"stop"};
+        ServerPair p(test.loop);
+        p.server->request_event.add([&](auto req) {
+            req->drop_event.add([&](auto...){
+                FAIL("drop should not be called");
+            });
+            req->respond(new ServerResponse(200));
+            p.server->stop();
+        });
+        p.server->stop_event.add([&]{
+            test.happens("stop");
+        });
+        
+        p.conn->write(
+            "GET / HTTP/1.1\r\n"
+            "Host: epta.ru\r\n"
+            "\r\n"
+        );
+        
+        test.run();
+    }
+}
+
+TEST("graceful stop") {
+    AsyncTest test(1000);
+    
+    SECTION("empty") {
+        test.expected = {"stop"};
+        auto srv = make_server(test.loop);
+        auto t = Timer::create(1, [&](auto...){ srv->graceful_stop(); }, test.loop);
+        t->weak(true);
+        srv->stop_event.add([&]{
+            test.happens("stop");
+        });
+        test.run();
+    }
+    
+    SECTION("with active request") {
+        test.expected = {"stop"};
+        ServerPair p(test.loop);
+        p.server->request_event.add([&](auto req) {
+            req->drop_event.add([&](auto...){
+                test.happens("drop");
+            });
+            p.server->graceful_stop();
+            req->respond(new ServerResponse(200));
+        });
+        p.server->stop_event.add([&]{
+            test.happens("stop");
+        });
+        
+        p.conn->write(
+            "GET / HTTP/1.1\r\n"
+            "Host: epta.ru\r\n"
+            "\r\n"
+        );
+        
+        auto res = p.get_response();
+        CHECK(res);
+        CHECK(res->code == 200);
+        
+        test.run();
+    }
+    
+    SECTION("immediately after request") {
+        test.expected = {"stop"};
+        ServerPair p(test.loop);
+        p.server->request_event.add([&](auto req) {
+            req->drop_event.add([&](auto...){
+                FAIL("drop should not be called");
+            });
+            req->respond(new ServerResponse(200));
+            p.server->graceful_stop();
+        });
+        p.server->stop_event.add([&]{
+            test.happens("stop");
+        });
+        
+        p.conn->write(
+            "GET / HTTP/1.1\r\n"
+            "Host: epta.ru\r\n"
+            "\r\n"
+        );
+
+        auto res = p.get_response();
+        CHECK(res);
+        CHECK(res->code == 200);
+        
+        test.run();
+    }
 }

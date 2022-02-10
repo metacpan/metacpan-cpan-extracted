@@ -54,7 +54,7 @@ ConnectRequestSP  make_request  (const Hash& params, const ConnectRequestSP& = {
 ConnectResponseSP make_response (const Hash& params, const ConnectResponseSP& = {});
 
 void parser_config_in   (Parser::Config&, const Hash&);
-Hash parser_config_out  (Parser::Config& cfg);
+Hash parser_config_out  (const Parser::Config& cfg);
 void deflate_config_in  (DeflateExt::Config&, const Hash&);
 Sv   deflate_config_out (const DeflateExt::Config&);
 

@@ -1,6 +1,9 @@
 Revision history for Geo-Coder-CA
 
-0.11
+0.12	Wed Feb  9 14:43:26 EST 2022
+	Compress the traffic
+
+0.11	Jul 12, 2018
 	Fix http://www.cpantesters.org/cpan/report/548cb7a4-7f04-11e8-9c78-3a8d13bf8fb6
 
 0.10	Thu Jul  5 08:50:21 EDT 2018

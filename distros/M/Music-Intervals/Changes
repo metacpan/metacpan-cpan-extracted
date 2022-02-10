@@ -1,5 +1,12 @@
 Revision history for Music-Intervals
 
+0.0901 2022-02-09 06:37:15
+    - Add the eg/pythagorean program.
+    - Improve documentation.
+
+0.0900 2022-02-07 09:40:41
+    - Add the by_description method.
+
 0.0804 2022-02-07 07:32:27
     - Fix the notes attribute default.
 

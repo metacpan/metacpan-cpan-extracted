@@ -1,8 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-use strict;
+use v5.14;
+use warnings;
 
-use Test::More tests => 4;
+use Test::More;
 
 use Parse::Man::DOM;
 
@@ -35,3 +36,5 @@ Filled text
 EOMAN
 is( $paras[0]->filling, 0, '.nf first para' );
 is( $paras[1]->filling, 1, '.fi second para' );
+
+done_testing;

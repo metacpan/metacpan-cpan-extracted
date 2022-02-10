@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More 0.94;
 
-plan tests => 5;
+plan tests => 6;
 
 my @module_files = (
     'JSON/Schema/Modern/Document/OpenAPI.pm',
@@ -15,7 +15,8 @@ my @module_files = (
 );
 
 my @scripts = (
-    'examples/synopsis'
+    'examples/synopsis',
+    'examples/synopsis.pl'
 );
 
 # no fake home requested

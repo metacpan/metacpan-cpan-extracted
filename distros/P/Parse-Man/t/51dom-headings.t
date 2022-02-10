@@ -1,8 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-use strict;
+use v5.14;
+use warnings;
 
-use Test::More tests => 4;
+use Test::More;
 
 use Parse::Man::DOM;
 
@@ -21,3 +22,5 @@ is( scalar @paras, 2, '$document->paras yields 2 paras' );
 isa_ok( $paras[0], "Parse::Man::DOM::Heading", '$paras[0]' );
 is( $paras[0]->level, 1,      '$paras[0]->level' );
 is( $paras[0]->text,  "NAME", '$paras[0]->name' );
+
+done_testing;

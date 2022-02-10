@@ -1,0 +1,12 @@
+MODULE = UniEvent::WebSocket                PACKAGE = UniEvent::WebSocket::ServerConnection
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash(__PACKAGE__).inherit("UniEvent::WebSocket::Connection");
+}
+
+uint64_t ServerConnection::id ()
+
+void ServerConnection::send_accept_error(protocol::http::ResponseSP res);
+
+void ServerConnection::send_accept_response(ConnectResponseSP res);

@@ -1,5 +1,8 @@
 Revision history for Geo-Coder-Postcodes
 
+0.07	Wed Feb  9 10:15:24 EST 2022
+	Handle compression option in the UserAgent within geocode()
+
 0.06	Wed 17 Apr 19:40:21 EDT 2019
 	Improved handling of failures
 

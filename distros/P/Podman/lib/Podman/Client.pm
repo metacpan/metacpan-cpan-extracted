@@ -1,280 +1,156 @@
 package Podman::Client;
 
-use strict;
-use warnings;
-use utf8;
+use Mojo::Base -base;
 
-use Moose;
+our $VERSION     = '20220210.0';
+our $API_VERSION = '3.0.0';
 
-use Try::Tiny;
-use Readonly;
-
+use English qw( -no_match_vars );
 use Mojo::Asset::File;
 use Mojo::Asset::Memory;
-use Mojo::JSON ();
-use Mojo::UserAgent;
-use Mojo::Util ();
+use Mojo::JSON qw(encode_json);
 use Mojo::URL;
+use Mojo::UserAgent;
+use Mojo::Util qw(url_escape);
 
-Readonly::Scalar my $VERSION => '20220124.0';
-
-use Podman;
 use Podman::Exception;
 
-has 'ConnectionURI' => (
-    is      => 'rw',
-    isa     => 'Str',
-    lazy    => 1,
-    builder => '_BuildConnectionURI',
-);
+has 'connection_url' => sub {
+  return $ENV{PODMAN_CONNECTION_URL}
+    || ($UID != 0 ? "http+unix:///run/user/$UID/podman/podman.sock" : 'http+unix:///run/podman/podman.sock');
+};
 
-has 'Timeout' => (
-    is      => 'ro',
-    isa     => 'Int',
-    lazy    => 1,
-    default => sub { return 3600 },
-);
-
-has 'UserAgent' => (
-    is       => 'ro',
-    isa      => 'Mojo::UserAgent',
-    lazy     => 1,
-    builder  => '_BuildUserAgent',
-    init_arg => undef,
-);
-
-has 'BaseURI' => (
-    is       => 'ro',
-    isa      => 'Mojo::URL',
-    lazy     => 1,
-    builder  => '_BuildBaseURI',
-    init_arg => undef,
-);
-
-sub BUILD {
-    my $Self = shift;
-
-    $Self->ConnectionURI;
-    $Self->UserAgent;
-    $Self->BaseURI;
-
-    return;
+for my $name (qw(delete get post)) {
+  Mojo::Util::monkey_patch(__PACKAGE__, $name, sub { return shift->_request(uc $name, @_); });
 }
 
-sub _BuildConnectionURI {
-    my $Self = shift;
+sub _base_url {
+  my $self = shift;
 
-    return sprintf "http+unix://%s/podman/podman.sock",
-      $ENV{XDG_RUNTIME_DIR} ? $ENV{XDG_RUNTIME_DIR} : '/tmp';
+  my $base_url = Mojo::URL->new($self->_connection_url->scheme eq 'http+unix' ? 'http://d/' : $self->connection_url);
+
+  my $tx;
+  my $url = $base_url->path('_ping');
+  for (0 .. 3) {
+    $tx = $self->_ua->get($url);
+    last if $tx->res->is_success;
+    sleep 1;
+  }
+  Podman::Exception->throw(900) unless $tx->res->is_success;
+
+  $tx = $self->_ua->get($base_url->path('version'));
+  my $version = $tx->res->json->{Components}->[0]->{Details}->{APIVersion};
+
+  say {*STDERR} "Potential insufficient supported Podman service API version." if $version ne $API_VERSION;
+
+  return $base_url->path('v' . $version . '/libpod/');
 }
 
-sub _BuildBaseURI {
-    my $Self = shift;
+sub _connection_url { return Mojo::URL->new(shift->connection_url); }
 
-    my $Scheme = Mojo::URL->new( $Self->ConnectionURI )->scheme();
+sub _request {
+  my ($self, $method, $path, %opts) = @_;
 
-    my $BaseURI =
-      $Scheme eq 'http+unix' ? 'http://d/' : $Self->ConnectionURI;
+  my $url = $self->_base_url->path($path);
+  $url->query($opts{parameters}) if $opts{parameters};
 
-    my $Transaction;
-    my $Tries = 3;
-    while ( $Tries-- ) {
-        $Transaction = $Self->UserAgent->get(
-            Mojo::URL->new($BaseURI)->path('version') );
-        last if $Transaction->res->is_success;
-    }
-    return Podman::Exception->new( Code => 0, )->throw()
-      if !$Transaction->res->is_success;
+  my $tx = $self->_ua->build_tx($method => $url, $opts{headers});
+  if ($opts{data}) {
+    my $asset
+      = ref $opts{data} eq 'Mojo::File'
+      ? Mojo::Asset::File->new(path => $opts{data})
+      : Mojo::Asset::Memory->new->add_chunk(encode_json($opts{data}));
+    $tx->req->content->asset($asset);
+  }
+  $tx = $self->_ua->start($tx);
 
-    my $JSON = $Transaction->res->json;
-    my $Path = sprintf "v%s/libpod/", $JSON->{Version};
+  Podman::Exception->throw($tx->res->code) unless $tx->res->is_success;
 
-    return Mojo::URL->new($BaseURI)->path($Path);
+  return $tx->res;
 }
 
-sub _BuildUserAgent {
-    my $Self = shift;
+sub _ua {
+  my $self = shift;
 
-    my $UserAgent = Mojo::UserAgent->new(
-        connect_timeout    => 10,
-        inactivity_timeout => $Self->Timeout,
-        insecure           => 1,
-    );
-    $UserAgent->transactor->name( sprintf "podman-perl/%s", $Podman::VERSION );
+  my $ua = Mojo::UserAgent->new(insecure => 1);
+  $ua->transactor->name("Podman/$VERSION");
+  if ($self->_connection_url->scheme eq 'http+unix') {
+    $ua->proxy->http($self->_connection_url->scheme . '://' . url_escape($self->_connection_url->path));
+  }
 
-    my $ConnectionURI = Mojo::URL->new( $Self->ConnectionURI );
-    my $Scheme     = $ConnectionURI->scheme();
-
-    if ( $Scheme eq 'http+unix' ) {
-        my $Path = Mojo::Util::url_escape( $ConnectionURI->path() );
-        $UserAgent->proxy->http( sprintf "%s://%s", $Scheme, $Path );
-    }
-
-    return $UserAgent;
+  return $ua;
 }
-
-sub _MakeUrl {
-    my ( $Self, $Path, $Parameters ) = @_;
-
-    my $Url = Mojo::URL->new( $Self->BaseURI )->path($Path);
-
-    if ($Parameters) {
-        $Url->query($Parameters);
-    }
-
-    return $Url;
-}
-
-sub _HandleTransaction {
-    my ( $Self, $Transaction ) = @_;
-
-    if ( !$Transaction->res->is_success ) {
-        return Podman::Exception->new( Code => $Transaction->res->code )
-          ->throw();
-    }
-
-    my $Content =
-      ( lc $Transaction->res->headers->content_type || '' ) eq
-      'application/json'
-      ? $Transaction->res->json
-      : $Transaction->res->body;
-
-    return $Content;
-}
-
-sub Get {
-    my ( $Self, $Path, %Options ) = @_;
-
-    my $Transaction = $Self->UserAgent->build_tx(
-        GET => $Self->_MakeUrl( $Path, $Options{Parameters} ),
-        $Options{Headers},
-    );
-    $Transaction = $Self->UserAgent->start($Transaction);
-
-    return $Self->_HandleTransaction($Transaction);
-}
-
-sub Post {
-    my ( $Self, $Path, %Options ) = @_;
-
-    my $Transaction = $Self->UserAgent->build_tx(
-        POST => $Self->_MakeUrl( $Path, $Options{Parameters} ),
-        $Options{Headers},
-    );
-
-    my $Data = $Options{Data};
-    if ( $Data && ref $Data eq 'File::Temp' ) {
-        $Transaction->req->content->asset(
-            Mojo::Asset::File->new( path => $Data->filename ) );
-    }
-    else {
-        $Transaction->req->content->asset(
-            Mojo::Asset::Memory->new->add_chunk(
-                Mojo::JSON::encode_json($Data)
-            )
-        );
-    }
-
-    $Transaction = $Self->UserAgent->start($Transaction);
-
-    return $Self->_HandleTransaction($Transaction);
-}
-
-sub Delete {
-    my ( $Self, $Path, %Options ) = @_;
-
-    my $Transaction = $Self->UserAgent->build_tx(
-        Delete => $Self->_MakeUrl( $Path, $Options{Parameters} ),
-        $Options{Headers},
-    );
-    $Transaction = $Self->UserAgent->start($Transaction);
-
-    return $Self->_HandleTransaction($Transaction);
-}
-
-__PACKAGE__->meta->make_immutable;
 
 1;
+
+__END__
 
 =encoding utf8
 
 =head1 NAME
 
-Podman::Client - API client.
+Podman::Client - Podman service client.
 
 =head1 SYNOPSIS
 
-    # Connect to service
-    my $Client = Podman::Client->new(
-        ConnectionURI => 'http+unix:///run/user/1000/podman/podman.sock',
-        Timeout       => 1800,
-    );
-
-    # Send GET request
-    my $Response = $Client->Get(
-        'version',
-        Parameters => {},
-        Headers    => {},
-    );
+    # Send service requests
+    my $client = Podman::Client->new;
+    my $res = $client->delete('images/docker.io/library/hello-world');
+    my $res = $client->get('version');
+    my $res = $client->post('containers/prune');
 
 =head1 DESCRIPTION
 
-L<Podman::Client> is a HTTP client (user agent) based on L<Mojo::UserAgent>
-with the needed support to connect to and query the L<http://podman.io> API.
+=head2 Inheritance
+
+    Podman::Client
+        isa Mojo::UserAgent
+
+L<Podman::Client> is a HTTP client (user agent) with the needed support to connect to and query the Podman service.
 
 =head1 ATTRIBUTES
 
-=head2 ConnectionURI
+=head2 connection_url
 
-    my $Client = Podman::Client->new( ConnectionURI => 'https://127.0.0.1:1234' );
+    $client->connection_url('https://127.0.0.1:1234');
 
-URI to L<http://podman.io> API service, defaults to user UNIX domain socket,
-e.g. C<http+unix://run/user/1000/podman/podman.sock>
-
-=head2 Timeout
-
-    my $Client = Podman::Client->new( Timeout => 1800 );
-
-Maximum amount of time in seconds a connection can be inactive before getting
-closed, defaults to C<3600s>. Setting the value to C<0> will allow connections
-to be inactive indefinitely.
+URL to connect to Podman service, defaults to user UNIX domain socket in rootless mode e.g.
+C<http+unix://run/user/1000/podman/podman.sock> otherwise C<http+unix:///run/podman/podman.sock>. Customize via the
+value of C<PODMAN_CONNECTION_URL> environment variable.
 
 =head1 METHODS
 
-L<Podman::Client> provides the valid HTTP requests to query the
-L<Podman::Client> API. All methods take a relative endpoint path and optional
-header parameters and path parameters. if the response has a HTTP code unequal
-C<2xx> a L<Podman::Exception> is raised.
+L<Podman::Client> provides the valid HTTP requests to query the Podman service. All methods take a relative
+endpoint path, optional header parameters and path parameters. if the response has a HTTP code unequal C<2xx> a
+L<Podman::Exception> is raised.
 
-=head2 Get
+=head2 delete
 
-    my $Response = $Client->Get('version');
+    my $res = $client->delete('images/docker.io/library/hello-world');
 
-Perform C<GET> request and return resulting content (hash, array or binary
-data).
+Perform C<DELETE> request and return resulting content.
 
-=head2 Delete
+=head2 get
 
-    my $Response = $Client->Delete('images/docker.io/library/hello-world');
+    my $res = $client->get('version');
 
-Perform C<DELETE> request and return resulting content (hash, array).
+Perform C<GET> request and return resulting content.
 
-=head2 Post
+=head2 post
 
-    my $Response = $Client->Post(
+    my $res = $client->post(
         'build',
-        Data       => $FieHandle,
-        Parameters => {
+        data       => $archive_file, # Mojo::File object
+        parameters => {
             'file' => 'Dockerfile',
             't'    => 'localhost/goodbye',
         },
-        Headers => {
+        headers => {
             'Content-Type' => 'application/x-tar'
         },
     );
 
-Perform C<POST> request and return resulting content (hash, array), takes
-additional optional request data (hash, array or filehandle).
+Perform C<POST> request and return resulting content, takes additional optional request data.
 
 =head1 AUTHORS
 
@@ -288,7 +164,7 @@ Tobias Schäfer, <tschaefer@blackox.org>
 
 Copyright (C) 2022-2022, Tobias Schäfer.
 
-This program is free software, you can redistribute it and/or modify it under
-the terms of the Artistic License version 2.0.
+This program is free software, you can redistribute it and/or modify it under the terms of the Artistic License version
+2.0.
 
 =cut

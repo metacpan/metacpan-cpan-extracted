@@ -15,10 +15,13 @@ my $prefix = path( $prop->{prefix} );
 my $distdir = path( $prop->{distdir} );
 sub _convert {
 	my $p = path($_[0]);
-	my $rel = $p->is_relative
-		? $p
-		: $p->relative($prefix);
-	"" . $distdir->child( $rel );
+	if( Alien::SWIProlog->install_type('share') ) {
+		my $rel = $p->is_relative
+			? $p
+			: $p->relative($prefix);
+		return "" . $distdir->child( $rel );
+	}
+	return $p;
 }
 for my $k ( qw( swipl-bin home rpath ) ) {
 	if( ref $prop->{$k} eq 'ARRAY' ) {
@@ -79,7 +82,7 @@ init(const char *class)
 	int PL_argc = 0;
 	char empty_arg[] = "";
 
-	char** PL_argv[1];
+	char* PL_argv[1];
 	PL_argv[PL_argc++] = empty_arg;
 
 	return PL_initialise(PL_argc, PL_argv);

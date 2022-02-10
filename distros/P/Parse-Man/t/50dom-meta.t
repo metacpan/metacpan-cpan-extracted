@@ -1,8 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-use strict;
+use v5.14;
+use warnings;
 
-use Test::More tests => 4;
+use Test::More;
 
 use Parse::Man::DOM;
 
@@ -18,3 +19,5 @@ isa_ok( $document->meta( "name" ), "Parse::Man::DOM::Metadata", '$document->meta
 
 is( $document->meta( "name" )->value,    "TITLE", '$document->meta( "name" )->value' );
 is( $document->meta( "section" )->value, 3,       '$document->meta( "section" )->value' );
+
+done_testing;

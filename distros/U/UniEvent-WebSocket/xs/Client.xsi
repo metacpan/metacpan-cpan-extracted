@@ -1,0 +1,29 @@
+MODULE = UniEvent::WebSocket                PACKAGE = UniEvent::WebSocket::Client
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash(__PACKAGE__).inherit("UniEvent::WebSocket::Connection");
+}
+
+Client* Client::new (Client::Config config = {}, LoopSP loop = Loop::default_loop()) {
+    RETVAL = new XSClient(loop, config);
+}
+
+void Client::connect (Sv host_or_request, bool secure = false, uint16_t port = 0) {
+    if (SvROK(host_or_request)) {
+        auto req = xs::in<ClientConnectRequestSP>(host_or_request);
+        THIS->connect(req);
+    } else {
+        string host_path = xs::in<string>(host_or_request);
+        THIS->connect(host_path, secure, port);
+    }
+}
+
+XSCallbackDispatcher* Client::connect_event () {
+    RETVAL = XSCallbackDispatcher::create(THIS->connect_event);
+}
+
+void Client::connect_callback (Client::connect_fn cb) {
+    THIS->connect_event.remove_all();
+    if (cb) THIS->connect_event.add(cb);
+}

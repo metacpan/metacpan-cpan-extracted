@@ -14,7 +14,9 @@ namespace panda { namespace unievent {
 
 struct IStreamListener {
     virtual StreamSP create_connection (const StreamSP&)                                             { return {}; }
+    virtual void     on_establish      (const StreamSP&, const StreamSP&, const ErrorCode&)          {}
     virtual void     on_connection     (const StreamSP&, const StreamSP&, const ErrorCode&)          {}
+    virtual void     on_establish      (const StreamSP&, const ErrorCode&, const ConnectRequestSP&)  {}
     virtual void     on_connect        (const StreamSP&, const ErrorCode&, const ConnectRequestSP&)  {}
     virtual void     on_read           (const StreamSP&, string&, const ErrorCode&)                  {}
     virtual void     on_write          (const StreamSP&, const ErrorCode&, const WriteRequestSP&)    {}
@@ -24,7 +26,9 @@ struct IStreamListener {
 
 struct IStreamSelfListener : IStreamListener {
     virtual StreamSP create_connection ()                                           { return {}; }
+    virtual void     on_establish      (const StreamSP&, const ErrorCode&)          {}
     virtual void     on_connection     (const StreamSP&, const ErrorCode&)          {}
+    virtual void     on_establish      (const ErrorCode&, const ConnectRequestSP&)  {}
     virtual void     on_connect        (const ErrorCode&, const ConnectRequestSP&)  {}
     virtual void     on_read           (string&, const ErrorCode&)                  {}
     virtual void     on_write          (const ErrorCode&, const WriteRequestSP&)    {}
@@ -32,7 +36,9 @@ struct IStreamSelfListener : IStreamListener {
     virtual void     on_eof            ()                                           {}
 
     StreamSP create_connection (const StreamSP&)                                                     override { return create_connection(); }
+    void     on_establish      (const StreamSP&, const StreamSP& cli, const ErrorCode& err)          override { on_establish(cli, err); }
     void     on_connection     (const StreamSP&, const StreamSP& cli, const ErrorCode& err)          override { on_connection(cli, err); }
+    void     on_establish      (const StreamSP&, const ErrorCode& err, const ConnectRequestSP& req)  override { on_establish(err, req); }
     void     on_connect        (const StreamSP&, const ErrorCode& err, const ConnectRequestSP& req)  override { on_connect(err, req); }
     void     on_read           (const StreamSP&, string& buf, const ErrorCode& err)                  override { on_read(buf, err); }
     void     on_write          (const StreamSP&, const ErrorCode& err, const WriteRequestSP& req)    override { on_write(err, req); }
@@ -152,6 +158,9 @@ struct Stream : virtual BackendHandle, protected backend::IStreamImplListener {
     excepted<int,  ErrorCode> send_buffer_size () const { return make_excepted(impl()->send_buffer_size()); }
     excepted<void, ErrorCode> recv_buffer_size (int value) { return make_excepted(impl()->recv_buffer_size(value)); }
     excepted<void, ErrorCode> send_buffer_size (int value) { return make_excepted(impl()->send_buffer_size(value)); }
+    
+    virtual excepted<net::SockAddr, ErrorCode> sockaddr () const = 0;
+    virtual excepted<net::SockAddr, ErrorCode> peeraddr () const = 0;
 
 protected:
     Queue queue;
@@ -283,11 +292,12 @@ struct AcceptRequest : StreamRequest, AllocatedObject<AcceptRequest> {
 
 struct ConnectRequest : StreamRequest {
     CallbackDispatcher<Stream::connect_fptr> event;
+    
+    const TimerSP& timeout_timer () const { return _timer; }
 
 protected:
     friend Stream;
     uint64_t timeout;
-    TimerSP  timer;
 
     ConnectRequest (Stream::connect_fn callback = {}, uint64_t timeout = 0) : timeout(timeout) {
         panda_log_ctor();
@@ -302,6 +312,9 @@ protected:
     void exec         () override = 0;
     void handle_event (const ErrorCode&) override;
     void notify       (const ErrorCode&) override;
+    
+private:
+    TimerSP _timer;
 };
 
 

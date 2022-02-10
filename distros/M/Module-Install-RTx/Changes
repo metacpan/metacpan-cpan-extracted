@@ -1,3 +1,6 @@
+0.43 2022-02-09
+ - Fix "require" remove_files for perl 5.26+
+
 0.42 2020-07-15
  - Make rt_too_new warn instead to not block installation
  - Notify user if the extension is already cored

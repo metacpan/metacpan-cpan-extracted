@@ -29,14 +29,14 @@ no_index:
 provides:
   Hash::Wrap:
     file: lib/Hash/Wrap.pm
-    version: '0.19'
+    version: '0.22'
 requires:
   Scalar::Util: '0'
   perl: '5.010'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Hash-Wrap
   repository: https://gitlab.com/djerius/hash-wrap.git
-version: '0.19'
+version: '0.22'
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: GPL-3.0-only

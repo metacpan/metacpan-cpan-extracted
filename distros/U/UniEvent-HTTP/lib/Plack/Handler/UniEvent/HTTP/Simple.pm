@@ -19,6 +19,7 @@ sub new {
 
 sub server { return shift->{server} }
 sub loop   { return shift->{server}->loop }
+sub stop   { shift->{server}->stop }
 
 sub run {
     my ($self, $app) = @_;
@@ -45,8 +46,6 @@ sub run {
         $finish_profile->();
     }
 }
-
-sub stop { shift->{server}->stop }
 
 sub CLONE_SKIP {1}
 

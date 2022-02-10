@@ -16,7 +16,7 @@ See L<Geo::Coder::GooglePlaces::V3> for usage.
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SUBROUTINES/METHODS
 

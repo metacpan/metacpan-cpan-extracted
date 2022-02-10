@@ -804,6 +804,15 @@ Here is the list of constants that are defined in main C<UniEvent> package becau
 
 
 
+=head1 LOGS
+
+Logs are accessible via L<XLog> framework as "UniEvent" module.
+
+    XLog::set_logger(XLog::Console->new);
+    XLog::set_level(XLog::DEBUG, "UniEvent");
+
+
+
 =head1 References
 
 L<UE>

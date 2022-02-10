@@ -10,12 +10,12 @@ build_requires:
 configure_requires:
   Data::Recursive: v1.1.0
   Export::XS: v3.0.5
-  XS::Framework: v1.3.4
-  XS::Install: v1.3.2
-  XS::libpanda: v1.5.0
+  XS::Framework: v1.5.2
+  XS::Install: v1.3.5
+  XS::libpanda: v1.5.8
   next::XS: v1.0.7
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,9 +29,9 @@ requires:
   Data::Recursive: v1.1.0
   Export::XS: v3.0.5
   Path::Class: '0'
-  XS::Framework: v1.3.4
-  XS::Install: v1.3.2
-  XS::libpanda: v1.5.0
+  XS::Framework: v1.5.2
+  XS::Install: v1.3.5
+  XS::libpanda: v1.5.8
   next::XS: v1.0.7
-version: v1.2.2
+version: v1.2.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -26,7 +26,9 @@ WriteMakefile(
         'meta-spec' => { version => 2 },
         resources => {
             bugtracker  => {
-                web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-GooglePlaces',
+                # web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-GooglePlaces',
+		web => 'https://github.com/nigelhorne/Geo-Coder-GooglePlaces/issues',
+		url => 'https://github.com/nigelhorne/Geo-Coder-GooglePlaces/issues',
                 mailto => 'bug-Geo-Coder-GooglePlaces@rt.cpan.org',
             }, repository  => {
                 type => 'git',

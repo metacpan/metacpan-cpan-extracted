@@ -1,7 +1,7 @@
 ##############################################################################
 #
 #  Data::Tools perl module
-#  2013-2019 (c) Vladi Belperchinov-Shabanski "Cade"
+#  2013-2022 (c) Vladi Belperchinov-Shabanski "Cade"
 #  http://cade.datamax.bg
 #  <cade@bis.bg> <cade@cpan.org> <shabanski@gmail.com> 
 #
@@ -21,7 +21,7 @@ use MIME::Base64;
 use File::Glob;
 use Hash::Util qw( lock_hashref unlock_hashref lock_ref_keys );
 
-our $VERSION = '1.23';
+our $VERSION = '1.25';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -33,6 +33,13 @@ our @EXPORT = qw(
               file_save
               file_load
               file_load_ar
+
+              file_bin_save
+              file_bin_load
+
+              file_text_save
+              file_text_load
+              file_text_load_ar
 
               file_mtime
               file_ctime
@@ -90,21 +97,29 @@ our @EXPORT = qw(
               str_pad
               str_pad_center
               str_countable
+              
+              str_password_strength
 
               perl_package_to_file
 
               wp_hex
               md5_hex
               sha1_hex
+
+              wp_hex_file
+              md5_hex_file
+              sha1_hex_file
               
               create_random_id
               
               glob_tree
               read_dir_entries
+              fftwalk
               
               ref_freeze
               ref_thaw
 
+              fork_exec_cmd
             );
 
 our %EXPORT_TAGS = (
@@ -138,6 +153,7 @@ sub data_tools_set_file_io_bin
 }
 
 ##############################################################################
+# the old interface, still works but will be removed!
 
 sub file_load
 {
@@ -217,6 +233,41 @@ sub file_save
   close $o;
   return 1;
 }
+
+##############################################################################
+# binary files load/save
+
+sub file_bin_load
+{
+  my $fn  = shift; # file name
+
+  my $i;
+  open( $i, "<", $fn ) or return undef;
+  binmode( $i );
+  local $/ = undef;
+  my $s = <$i>;
+  close $i;
+  return $s;
+}
+
+sub file_bin_save
+{
+  my $fn = shift; # file name
+  
+  my $o;
+  open( $o, ">", $fn ) or return 0;
+  binmode( $o );
+  print $o @_;
+  close $o;
+  return 1;
+}
+
+##############################################################################
+# text files load/save
+
+*file_text_save    = *file_save;
+*file_text_load    = *file_load;
+*file_text_load_ar = *file_load_ar;
 
 ##############################################################################
 
@@ -330,13 +381,11 @@ sub str_unescape
 
 our $URL_ESCAPES_DONE;
 our %URL_ESCAPES;
-our %URL_ESCAPES_HEX;
 
 sub __url_escapes_init
 {
   return if $URL_ESCAPES_DONE;
   for ( 0 .. 255 ) { $URL_ESCAPES{ chr( $_ )     } = sprintf("%%%02X", $_); }
-  for ( 0 .. 255 ) { $URL_ESCAPES_HEX{ chr( $_ ) } = sprintf("%02X",   $_); }
   $URL_ESCAPES_DONE = 1;
 }
 
@@ -367,7 +416,7 @@ sub str_html_escape
 {
   my $text = shift;
 
-  $text =~ s/([<>])/$HTML_ESCAPES{ $1 }/ge;
+  $text =~ s/([<>`'])/$HTML_ESCAPES{ $1 }/ge;
   
   return $text;
 }
@@ -383,18 +432,12 @@ sub str_html_unescape
 
 sub str_hex
 {
-  my $text = shift;
-  
-  $text =~ s/(.)/$URL_ESCAPES_HEX{$1}/gs;
-  return $text;
+  return unpack( "H*",  shift() );
 }
 
 sub str_unhex
 {
-  my $text = shift;
-  
-  $text =~ s/([0-9A-F][0-9A-F])/chr(hex($1))/ge;
-  return $text;
+  return pack( "H*", shift() );
 }
 
 ##############################################################################
@@ -445,6 +488,36 @@ sub str_countable
   my $many  = shift;
 
   return $count == 0 ? $many : $count == 1 ? $one : $many;
+}
+
+##############################################################################
+# str_password_strength()
+# returns a number representing password strength
+# it is tuned to give password strength in a number close to percents:
+# less than 50 weak, 50-75 good, 76-100 strong, more than 100 very strong
+
+sub str_password_strength
+{
+  my $p  = shift;
+
+  $p =~ s/(.)\1+/$1/g; # reduce repeating chars
+  
+  my $l  = length( $p ); # remaining string length 
+  
+  my $lc = $p =~ tr/[a-z]/[a-z]/; # lower case letters
+  my $uc = $p =~ tr/[A-Z]/[A-Z]/; # upper case letters
+  my $dc = $p =~ tr/[0-9]/[0-9]/; # digits
+  my $sc = $l -  $lc - $uc - $dc; # special chars
+
+  my $cc = ( $lc > 0 )      + ( $uc > 0 )      + ( $dc > 0 )      + ( $sc > 0 )     ; # used classes count
+  my $as = ( $lc > 0 ) * 26 + ( $uc > 0 ) * 26 + ( $dc > 0 ) * 10 + ( $sc > 0 ) * 30; # alphabet size
+
+  my $cp = $cc < 2 ? 2 : 1; # class count penalty
+  my $res = log( $as ** $l ) / $cp;
+
+  # print "<$p> l=$l   lc=$lc   uc=$uc   dc=$dc   sc=$sc   cc=$cc   as=$as   nb=$nb   ($res)\n";
+  
+  return $res;
 }
 
 ##############################################################################
@@ -786,6 +859,32 @@ sub sha1_hex
   return $hex;
 }
 
+sub __digest_hex_file
+{
+  my $digest = shift;
+  my $fn     = shift;
+  
+  open( my $fh, '<', $fn ) or return undef;
+  binmode $fh;
+  $digest->addfile( $fh );
+  return $digest->hexdigest;
+}
+
+sub wp_hex_file
+{
+  return __digest_hex_file( Digest->new( 'Whirlpool' ), shift() );
+}
+
+sub md5_hex_file
+{
+  return __digest_hex_file( Digest::MD5->new, shift() );
+}
+
+sub sha1_hex_file
+{
+  return __digest_hex_file( Digest::SHA1->new, shift() );
+}
+
 ##############################################################################
 
 sub create_random_id
@@ -846,6 +945,59 @@ sub read_dir_entries
 
 ##############################################################################
 
+sub __fftwalk
+{
+  my $e = shift;
+  my $a = shift;
+  my $f = shift; # filter: 0 all, 1 files, 2 dirs
+  
+  opendir( my $dir, $e ) or return undef;
+  my $ee;
+  while( $ee = readdir $dir )
+    {
+    next if $ee eq '.' or $ee eq '..';
+    my $eee = "$e/$ee";
+    
+    next if -l $eee; # FIXME: TODO: OPTION!!!!!!!!!
+    
+    if( -d $eee )
+      {
+      push @$a, $eee if $f != 1;
+      __fftwalk( $eee, $a, $f );
+      }
+    else
+      {
+      push @$a, $eee if $f != 2;
+      }  
+    }
+  closedir( $dir );
+}
+
+# fast file tree walk
+# first argument can be options hash and is optional
+# rest of arguments are directory names to be walked
+# options hash can have:
+# ARRAY => hashref_for_result_list
+# MODE  => ALL   or 0 to scan all files and dirs
+# MODE  => FILES or 1 to scan files only
+# MODE  => DIRS  or 2 to scan directories only
+sub fftwalk
+{
+  my $opt = hash_uc( ref( $_[0] ) eq 'HASH' ? shift : {} );
+  
+  my $f;
+  $f = 0 if $opt->{ 'MODE' } =~ /^(A(LL)?|0|\*|FD|DF)$/i;
+  $f = 1 if $opt->{ 'MODE' } =~ /^(F(ILES)?|1)$/i;
+  $f = 2 if $opt->{ 'MODE' } =~ /^(D(IRS)?|2)$/i;
+
+  my $e = $opt->{ 'ARRAY' } ? $opt->{ 'ARRAY' } : [];
+
+  __fftwalk( $_, $e, $f ) for @_;
+  return $e;
+}
+
+##############################################################################
+
 sub ref_freeze
 {
   my $ref = shift;
@@ -863,6 +1015,19 @@ sub ref_thaw
                                                                                                                                 
   return ref( $ref ) ? $ref : undef;                                                                                            
 };                                                                                                                              
+
+##############################################################################
+
+sub fork_exec_cmd
+{
+  my $cmd = shift;
+  
+  my $pid = fork();
+  return undef if ! defined $pid; # fork failed
+  return $pid if $pid;            # master process here
+  exec $cmd;                      # sub process here  
+  exit;                           # if sub exec fails...
+}
 
 ##############################################################################
 

@@ -1,0 +1,83 @@
+=head1 NAME
+
+UniEvent::WebSocket::ServerConnection - websocket peer connection on server
+
+
+
+=head1 SYNOPSIS
+
+    $ws_server->connection_callback(sub {
+        my ($server, $connection, $connect_request) = @_;
+        $connection->message_callback(sub {...});
+        ...
+    });
+
+
+
+=head1 DESCRIPTION
+
+C<UniEvent::WebSocket::ServerConnection> is a subclass of L<UniEvent::WebSocket::Connection> used in websocket server to represent peer connection.
+
+
+
+=head1 METHODS
+
+=head2 id()
+
+Returns connection id (64bit integer). Every connection in websocket server gets an unique id.
+
+
+=head2 send_accept_response($response)
+
+Sends http response for client's http upgrade request and accept websocket handshake.
+Should only be called from C<handshake_callback> server's callback and only if there were no request errors.
+
+This is optional, if not called, server will send default handshake response.
+
+This method is useful for sending additional data along with handshake response.
+
+C<$response> must be a L<Protocol::WebSocket::Fast::ConnectResponse> object or a hashref that its contrustor supports.
+
+    $server->handshake_callback(sub {
+        my ($server, $conn, $req) = @_;
+        if (!$req->error) {
+            $conn->send_accept_response({
+                headers => {'My-Custom-Data' => $data},
+            });
+        }
+    });
+    
+No need to fill in all the http fields for correct upgrade response, it will be done automatically.
+
+
+=head2 send_accept_error($response)
+
+Sends http response for client's http upgrade request and deny websocket handshake, closing the server connection.
+Should only be called from C<handshake_callback> server's callback.
+
+This is optional, if not called, server will send default handshake error response (if there were handshake errors).
+
+You can send error response even if there were no handshake errors, for example, if you don't like the requested uri or some custom headers are missing.
+
+    $server->handshake_callback(sub {
+        my ($server, $conn, $req) = @_;
+        return if $req->error; # default error response will be sent automatically
+        
+        if ($req->uri->path ne '/my/ws') {
+            $conn->send_accept_error({
+                code => 404,
+                body => 'wrong uri',
+            });
+        }
+        elsif (!check_auth($req->headers->{'My-Auth'})) {
+            $conn->send_accept_error({
+                code => 400,
+                body => 'authorization required',
+            });
+        }
+        ...
+    });
+    
+No need to fill in all the http fields for correct error response, it will be done automatically.
+
+=cut

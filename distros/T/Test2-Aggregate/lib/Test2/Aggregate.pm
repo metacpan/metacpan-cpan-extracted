@@ -26,16 +26,16 @@ Test2::Aggregate - Aggregate tests for increased speed
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =cut
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 =head1 DESCRIPTION
 
 Aggregates all tests specified with C<dirs> (which can even be individual tests)
-to avoid forking, reloading etc that can help with performance (dramatically if
+to avoid forking, reloading etc. that can help with performance (dramatically if
 you have numerous small tests) and also facilitate group profiling. It is quite
 common to have tests that take over a second of startup time for milliseconds of
 actual runtime - L<Test2::Aggregate> removes that overhead.
@@ -49,11 +49,11 @@ tools like L<Test2::Suite>). It does not even try to package each test by defaul
 (there is an option), which may be good or bad, depending on your requirements.
 
 Generally, the way to use this module is to try to aggregate sets of quick tests
-(e.g. unit tests). Try to iterativelly add tests to the aggregator, using the C<lists>
+(e.g. unit tests). Try to iteratively add tests to the aggregator, using the C<lists>
 option, so you can easily edit and remove those that do not work. Trying an entire,
 large, suite in one go is not a good idea, as an incompatible test can break the
 run making the subsequent tests fail (especially when doing things like globally
-redefining built-ins etc) - see the module usage notes for help.
+redefining built-ins etc.) - see the module usage notes for help.
 
 The module can work with L<Test::Builder> / L<Test::More> suites, but you will
 have less issues with L<Test2::Suite> (see notes).
@@ -270,7 +270,7 @@ sub run_tests {
     } else {
         foreach my $file (@{$args{lists}}) {
             push @dirs,
-              map { /^\s*#/ ? () : $_ }
+              map { /^\s*(?:#|$)/ ? () : $_ }
               split( /\r?\n/, _read_file("$root$file", $args{slurp_param}) );
         }
 

@@ -1,5 +1,9 @@
 Revision history for Test::WWW::WebKit2
 
+0.113 Wed Feb 09 14:30:00 CET 2022
+
+Get rid of uninitialized warnings in value_is
+
 0.112 Fri Feb 04 12:00:00 CET 2022
 
 Remove default timeout for click_ok, we want no timeout here unless explicitely requested

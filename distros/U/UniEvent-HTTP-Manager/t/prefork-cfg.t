@@ -39,13 +39,14 @@ is_deeply $cfg, {
       'tcp_nodelay'             => 0,
       'locations'               => [
         {
-          'backlog'     => 4096,
-          'domain'      => 2,
-          'host'        => '127.0.0.1',
-          'port'        => 0,
-          'reuse_port'  => 1,
-          'sock'        => undef,
-          'ssl_ctx'     => undef,
+          backlog     => 4096,
+          domain      => 2,
+          host        => '127.0.0.1',
+          port        => 0,
+          reuse_port  => 1,
+          sock        => undef,
+          ssl_ctx     => undef,
+          tcp_nodelay => 0,
         }
       ],
     },

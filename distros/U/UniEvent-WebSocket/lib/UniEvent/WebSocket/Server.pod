@@ -1,0 +1,324 @@
+=head1 NAME
+
+UniEvent::WebSocket::Server - Asynchronous event-loop based WebSocket server
+
+
+
+=head1 SYNOPSIS
+
+    my $server = UniEvent::WebSocket::Server->new({
+        locations => [
+            {host => "*", port => 80, reuse_port => 1, backlog => 1024},
+            {host => "*", port => 443, reuse_port => 1, backlog => 1024, ssl_ctx => $ssl_ctx},
+        ],
+        max_frame_size   => 10000,
+        max_message_size => 100000,
+        deflate          => {
+            compression_level     => 3,
+            compression_threshold => 1000,
+        },
+    });
+    
+    $server->connection_callback(sub {
+        my ($server, $client) = @_;
+        $client->message_callback(sub {
+            my ($client, $message) = @_;
+            say $message->payload;
+        })
+        $client->peer_close_callback(sub {
+            my ($client, $message) = @_;
+            say $message->close_code;
+            say $message->close_message;
+        });
+        
+        $client->send_text("hello from server");
+        
+        push @client, $client;
+    });
+    $server->run;
+    ...
+    UE::Loop->default->run;
+    
+    
+    # upgrade from different http server
+    
+    my $ws_server = UniEvent::WebSocket::Server->new(...);
+    $ws_server->run;
+    
+    my $http_server = UniEvent::HTTP::Server->new(...);
+    $http_server->run;
+    
+    $http_server->request_callback(sub {
+        my $req = shift;
+        if ($req->path eq "/websocket") {
+            $ws_server->upgrade_connection($req);
+            return;
+        }
+        
+        ...
+    });
+    
+    UE::Loop->default->run;
+
+
+
+=head1 DESCRIPTION
+
+UniEvent::WebSocket::Server can be run as standalone server. Also it can upgrade http requests from http server and manage the rest of lifetime of the
+connection.
+
+If C<locations> config parameter is specified, UE::WebSocket::Server will run its own L<UniEvent::HTTP> server listening for the specified locations.
+It will automatically upgrade all websocket http requests for any URIs (it is possible to control this process). Also it can act as normal http server
+and serve http requets as L<UniEvent::HTTP>.
+
+If C<locations> config parameter is not specified, UE::WebSocket::Server will not listen anything, will not run http server and will be idle
+and wait for C<upgrade_connection()> calls.
+Therefore you can run your own http server and transfer connections for upgrade to websocket server.
+
+There is no differences between standalone and non-standalone versions of websocket server other than that.
+
+Websocket server should be created, then C<run()> should be called and then you should run the corresponding event loop. I.e. C<run()> will not block
+and you can also run a number of other servers and frameworks in the same loop at once.
+
+
+
+=head1 METHODS
+
+=head2 new(\%config, [$loop = default loop])
+
+Create websocket server for a given C<config> and L<UniEvent::Loop>. This server will work when you run specified event loop.
+
+See C<configure()> method for details on what C<config> supports.
+
+
+=head2 configure(\%config)
+
+Configures websocket server with new config. Can be called at any time, even if server is already serving a number of connections. New config will only
+apply for newly established connections.
+
+If some location is absent in new config and there are active connections accepted from that location, they remain and will be served normally.
+Server will not listen for such location anymore.
+
+C<config> should be a hash reference with the following fields:
+
+=over
+
+=item locations
+
+Array of locations to listen and their params. If specified will run http server by itself. See L<UniEvent::HTTP::Server> for description of this
+parameter (because http server implements listening).
+
+=item everything that L<UniEvent::WebSocket::Connection>'s C<configure()> supports
+
+=item config params for http server (if locations are specified)
+
+i.e. everything that L<UniEvent::HTTP::Server>'s C<configure()> supports.
+
+=back
+
+    $server->configure({
+        locations => [{host => '127.0.0.1', port => '80', tcp_nodelay => 1}], # listen
+        max_message_size => 100000, # websocket parameter
+        max_headers_size => 8000,   # http parameter
+    });
+
+
+=head2 loop()
+
+Returns L<UniEvent::Loop> object in which the server runs.
+
+
+=head2 run()
+
+Starts websocket server. This function will not block and returns immediately.
+It just creates and registers a number of event handlers in the event loop.
+
+
+=head2 stop([$close_code = UE::WebSocket::CLOSE_AWAY])
+
+Send close message with C<$close_code> to all peers, close all connections and stop the server immediately. Appropriate callbacks (C<close_event>) will
+be called on each connection as if every connection is normally closed.
+
+If you exit the process immediately after that, some messages in queues and even close messages may not get sent (because shutting down a connection
+is an asynchronous action). To ensure everything is sent okay, you may return to event loop after C<stop()> and it should bail out of it's
+C<run()> execution if or when there are no more active handles (other servers/frameworks/etc) remain in the event loop.
+
+
+=head2 stop_listening()
+
+Temporarily suspend listening for new connections / http requests. Will continue to server active connections. Only meaningful in standalone mode.
+See L<UniEvent::HTTP::Server> C<stop_listening()>.
+
+
+=head2 start_listening()
+
+Resumes listening for new connections after C<stop_listening()>.
+See L<UniEvent::HTTP::Server> C<start_listening()>.
+
+
+=head2 get_connection($id)
+
+Returns L<UniEvent::WebSocket::ServerConnection> object with id C<$id>. Each connection in websocket server gets an unique id (uint64_t).
+It is accessible via $connection->id. See L<UniEvent::WebSocket::ServerConnection>
+
+
+=head2 listeners()
+
+Returns server listeners (event loop handles for listening sockets) as arrayref of L<UniEvent::Stream> objects.
+See L<UniEvent::HTTP::Server> C<listeners()>. They can be used for low-level tuning / overloading. Be careful :-)
+
+
+=head2 connections()
+
+Returns an iterator to all connections that the server has. Iterator is an object with the only method C<next()> which will return next 
+L<UniEvent::WebSocket::ServerConnection> object or C<undef> if there are no more. If server has zero connections, it will anyway return an iterator
+which will return C<undef> on the first C<next()> call.
+
+
+=head2 sockaddr()
+
+Returns socket address of the first listener as L<Net::SockAddr> object. If there are no listeners (or not running / etc), will return error.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 upgrade_connection($request)
+
+Upgrades foreign http connection represented and requested by C<$request> (for now, it must be only L<UniEvent::HTTP::ServerRequest> object).
+Connection is removed from http server and added to websocket server.
+C<connection_callback> will be called on websocket server as if it was normally connected to standalone websocket server.
+
+
+=head2 http()
+
+Returns underlying http server object as L<UniEvent::HTTP::Server>. Only meaningful for standalone websocket servers (which have underlying http server).
+
+This object may be used to add handlers for normal http requests or for restricting condition for connection upgrades (however it is easier to do via
+C<handshake_callback> feature).
+
+    my $ws = UE::WebSocket::Server->new({
+        locations => [...],
+    });
+
+    $ws->http->request_callback(sub {
+        my $req = shift;
+        if ($req->path == "/index.html") {
+            $req->respond({
+                code => 200,
+                body => "hello",
+            });
+        }
+        elsif ($req->path == "/private/websocket") {
+            if ($req->headers->{secret} eq "foobar") {
+                $ws->upgrade_connection($req);
+            } else {
+                $req->respond({code => 400});
+            }
+        }
+        
+        # everything that hasn't been responed will be upgraded automatically (of course, only websocket-upgrade-requests)
+    });
+
+There is not much to document here because it's a standart L<UniEvent::HTTP::Server> API. Read its docs for details.
+
+
+=head2 handshake_callback([\&new_callback])
+
+Gets or sets handshake callback. This callback is called when server receives a websocket http upgrade request and before handshake http response
+is sent. It is possible here to deny websocket upgrade even if handshake request params are okay.
+
+The signature of callback is:
+
+    my ($server, $connection, $request) = @_;
+
+Where C<$server> is the server object itself.
+
+C<$connection> is the L<UniEvent::WebSocket::ServerConnection> object
+
+C<$request> is the received websocket upgrade request, L<Protocol::WebSocket::Fast::ConnectRequest> object.
+All http and websocket properties if the request can be read from this object.
+
+Custom successful or error handshake reponse can be sent from this callback overriding default behaviour.
+
+    $server->handshake_callback(sub {
+        my ($server, $conn, $req) = @_;
+        return if $req->error; # default error response will be sent automatically
+        
+        if ($req->uri->path ne '/my/ws') {
+            $conn->send_accept_error({
+                code => 404,
+                body => 'wrong uri',
+            });
+        }
+        elsif (!check_auth($req->headers->{'My-Auth'})) {
+            $conn->send_accept_error({
+                code => 400,
+                body => 'authorization required',
+            });
+        }
+        else {
+            $conn->send_accept_response({
+                headers => {'My-Custom-Data' => $data},
+            });
+        }
+    });
+
+See L<UniEvent::WebSocket::ServerConnection>'s C<send_accept_response()> and C<send_accept_error()> for details.
+
+To remove C<handshake_callback>, call
+
+    $server->handshake_callback(undef);
+
+
+=head2 connection_callback($sub)
+
+=head2 connection_event()
+
+Callbacks set via these methods will be invoked when new websocket connection is accepted and handshake process is successfully completed (i.e. after
+C<handshake_callback>).
+
+Callback signature:
+
+    my ($server, $connection, $request) = @_;
+    
+Where C<$server> is the server object itself.
+
+C<$connection> is the L<UniEvent::WebSocket::ServerConnection> object
+
+C<$request> is the received websocket upgrade request, L<Protocol::WebSocket::Fast::ConnectRequest> object.
+All http and websocket properties if the request can be read from this object.
+
+At this moment, handshake has been completed and no more http responses could be sent. If at this stage you don't like something, the only option
+is to close the websocket connection.
+
+    $connection->close(CLOSE_BAD_REQUEST);
+
+However it is better to do such checks in C<handshake_callback>.
+
+This is the best place to add listeners for messages to the connection.
+
+Connection object is held by the server till the end, no need to remember it in your code.
+
+See L<UniEvent/"EVENT CALLBACKS"> for differences between C<_callback> and C<_event> versions of methods.
+
+
+=head2 disconnection_callback($sub)
+
+=head2 disconnection_event()
+
+Callbacks set via these methods will be invoked when a connection is closed (if user calls C<close()> method locally or in react to peer's close packet).
+
+Callback signature:
+
+    my ($server, $connection) = @_;
+    
+Where C<$server> is the server object itself.
+
+C<$connection> is the L<UniEvent::WebSocket::ServerConnection> object
+
+At this moment, connection is fully removed from server and inaccessible via C<get_connection()>. No communication should be done via this connection
+anymore.
+
+See L<UniEvent/"EVENT CALLBACKS"> for differences between C<_callback> and C<_event> versions of methods.
+
+=cut

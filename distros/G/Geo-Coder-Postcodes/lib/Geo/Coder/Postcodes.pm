@@ -17,11 +17,11 @@ Geo::Coder::Postcodes - Provides a geocoding functionality using https://postcod
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 SYNOPSIS
 
@@ -48,6 +48,11 @@ a free Geo-Coder database covering the towns in the UK.
 
 sub new {
 	my($class, %param) = @_;
+
+	if(!defined($class)) {
+		# Geo::Coder::Postcodes::new() used rather than Geo::Coder::Postcodes->new()
+		$class = __PACKAGE__;
+	}
 
 	my $ua = delete $param{ua} || LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION");
 	# if(!defined($param{'host'})) {
@@ -121,7 +126,7 @@ sub geocode {
 	my $json = JSON->new()->utf8();
 
 	# TODO: wantarray
-	my $rc = $json->decode($res->content);
+	my $rc = $json->decode($res->decoded_content());
 	my @results = @{$rc->{result}};
 	if($county) {
 		# TODO: search through all results for the right one, e.g. Leeds in
@@ -226,9 +231,9 @@ may work, but you're best to search only for "Margate".
 
 =head1 AUTHOR
 
-Nigel Horne <njh@bandsman.co.uk>
+Nigel Horne C<< <njh@bandsman.co.uk> >>
 
-Based on L<Geo::Coder::Coder::Googleplaces>.
+Based on L<Geo::Coder::GooglePlaces>.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -241,7 +246,7 @@ L<Geo::Coder::GooglePlaces>, L<HTML::GoogleMaps::V3>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2019 Nigel Horne.
+Copyright 2017-2022 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

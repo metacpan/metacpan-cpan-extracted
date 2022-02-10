@@ -1,12 +1,12 @@
 ## no critic
 use Test::More;
 
-use Try::Tiny;
+use English qw( -no_match_vars );
 
 use Podman::Exception;
 
-my %Messages = (
-    0   => 'Connection failed.',
+my %exceptions = (
+    900 => 'Connection failed.',
     304 => 'Action already processing.',
     400 => 'Bad parameter in request.',
     404 => 'No such item.',
@@ -15,19 +15,11 @@ my %Messages = (
     666 => 'Unknown error.',
 );
 
-while ( my ( $Code, $Message ) = each %Messages ) {
-    try {
-        Podman::Exception->new( Code => $Code )->throw();
-    }
-    catch {
-        my $Exception = shift;
+while ( my ( $code, $message ) = each %exceptions ) {
+    eval { Podman::Exception->throw($code); };
 
-        is( $Exception->Message, $Message, 'Exception message ok.' );
-        is( $Exception->Code,    $Code,    'Exception code ok.' );
-
-        my $String = sprintf "%s (%d)", $Message, $Code;
-        is( $Exception->AsString, $String, 'Exception string ok.' );
-    };
+    is( $EVAL_ERROR->message, $message, 'Exception message ok.' );
+    is( $EVAL_ERROR->code,    $code,    'Exception code ok.' );
 }
 
 done_testing();

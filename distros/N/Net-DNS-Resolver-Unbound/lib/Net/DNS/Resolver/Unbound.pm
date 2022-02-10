@@ -4,7 +4,15 @@ use strict;
 use warnings;
 
 our $VERSION;
-$VERSION = '1.05';
+$VERSION = '1.06';
+
+use Carp;
+use Net::DNS;
+
+use base qw(Net::DNS::Resolver DynaLoader);
+eval { __PACKAGE__->bootstrap($VERSION) };
+warn "\n\n$@\n" if $@;
+
 
 =head1 NAME
 
@@ -20,7 +28,7 @@ Net::DNS::Resolver::Unbound - Unbound resolver base for Net::DNS
 =head1 DESCRIPTION
 
 Net::DNS::Resolver::Unbound is designed as an extension to an existing
-Net::DNS installation which provides DNSSEC validated name resolution.
+Net::DNS installation which includes DNSSEC records in responses.
 
 Net::DNS::Resolver::Unbound replaces the resolver send() and bgsend()
 functionality in the Net::DNS::Resolver::Base implementation.
@@ -47,22 +55,13 @@ extracted from the presented packet.
 
 =back
 
-=cut
-
-
-use Carp;
-use Net::DNS;
-use base qw(Net::DNS::Resolver DynaLoader);
-
-eval { Net::DNS::Resolver::Unbound->bootstrap($VERSION) } || croak $@;
-
 
 =head1 METHODS
 
 =head2 new
 
     my $resolver = Net::DNS::Resolver::Unbound->new(
-	debug	    => 1,
+	debug_level => 2,
 	defnames    => 1,
 	dnsrch,	    => 1,
 	domain	    => 'domain',
@@ -72,11 +71,6 @@ eval { Net::DNS::Resolver::Unbound->bootstrap($VERSION) } || croak $@;
 	option => ['logfile', 'mylog.txt'] );
 
 Returns a new Net::DNS::Resolver::Unbound resolver object.
-
-
-=head2 nameservers, force_v6, prefer_v6, force_v4, prefer_v4
-
-See L<Net::DNS::Resolver>.
 
 =cut
 
@@ -93,6 +87,20 @@ sub new {
 	}
 	return $self;
 }
+
+
+=head2 nameservers
+
+    my $stub_resolver = Net::DNS::Resolver::Unbound->new(
+	nameservers => [ '127.0.0.53' ]
+	);
+
+    my $fully_recursive = Net::DNS::Resolver::Unbound->new(
+	nameservers => [],		# override /etc/resolv.conf
+	);
+
+By default, DNS queries are sent to the IP addresses listed in
+/etc/resolv.conf or similar platform-specific sources.
 
 
 =head2 search, query, send, bgsend, bgbusy, bgread
@@ -112,11 +120,7 @@ sub send {
 	my $qclass  = $query->{qclass};
 
 	my $ub_ctx = $self->{ub_ctx};
-	my $result = eval {
-		my $ub_result = Net::DNS::Resolver::libunbound::ub_resolve( $ub_ctx, $qname, $qtype, $qclass );
-		bless( $ub_result, 'Net::DNS::Resolver::Unbound::Result' );
-	};
-	$self->errorstring($@);
+	my $result = Net::DNS::Resolver::libunbound::ub_resolve( $ub_ctx, $qname, $qtype, $qclass );
 	return $self->_decode_result($result);
 }
 
@@ -130,37 +134,30 @@ sub bgsend {
 	my $qtype   = $query->{qtype};
 	my $qclass  = $query->{qclass};
 
-	my $handle = [];
 	my $ub_ctx = $self->{ub_ctx};
-	eval { Net::DNS::Resolver::libunbound::ub_resolve_async( $ub_ctx, $qname, $qtype, $qclass, $handle ) };
-	$self->errorstring($@);
-	return $handle;
+	return Net::DNS::Resolver::libunbound::ub_resolve_async( $ub_ctx, $qname, $qtype, $qclass );
 }
 
 sub bgbusy {
 	my ( $self, $handle ) = @_;
 	return unless $handle;
-	my ( undef, @pre ) = @$handle;
-	return if scalar(@pre);
+	return unless $handle->waiting;
 	my $ub_ctx = $self->{ub_ctx};
-	eval { Net::DNS::Resolver::libunbound::ub_process($ub_ctx) };
-	$self->errorstring($@);
-	eval { select( undef, undef, undef, 0.500 ) };		# avoid tight loop on bgbusy()
-	my ( undef, @post ) = @$handle;
-	return scalar(@post) ? 0 : 1;
+	Net::DNS::Resolver::libunbound::ub_process($ub_ctx);
+	eval { select( undef, undef, undef, 0.200 ) };		# avoid tight loop on bgbusy()
+	return $handle->waiting;
 }
 
 sub bgread {
 	my ( $self, $handle ) = @_;
-
-	my $ub_ctx = $self->{ub_ctx};
-	eval { Net::DNS::Resolver::libunbound::ub_wait($ub_ctx) } if &bgbusy;
-	$self->errorstring($@);
-
 	return unless $handle;
-	my ( $async_id, $err, $result ) = @$handle;
+
+	Net::DNS::Resolver::libunbound::ub_wait( $self->{ub_ctx} ) if &bgbusy;
+
+	my $async_id = $handle->async_id;
+	my $err	     = $handle->err;
 	$self->errorstring( Net::DNS::Resolver::libunbound::ub_strerror($err) ) if $err;
-	return $self->_decode_result($result);
+	return $self->_decode_result( $handle->result );
 }
 
 
@@ -175,9 +172,8 @@ Get or set Unbound resolver (name,value) context options.
 
 sub option {
 	my ( $self, $name, @value ) = @_;
-	my $ctx = $self->{ub_ctx};
-	return Net::DNS::Resolver::libunbound::ub_ctx_set_option( $ctx, "$name:", @value ) if @value;
-	my $value = Net::DNS::Resolver::libunbound::ub_ctx_get_option( $ctx, $name );
+	return $self->{ub_ctx}->set_option( "$name:", @value ) if @value;
+	my $value = $self->{ub_ctx}->get_option($name);
 	return wantarray ? split /\r*\n/, $value : $value;
 }
 
@@ -193,8 +189,7 @@ Unbound configuration options.
 
 sub config {
 	my ( $self, $filename ) = @_;
-	my $ctx = $self->{ub_ctx};
-	return Net::DNS::Resolver::libunbound::ub_ctx_config( $ctx, $filename );
+	return $self->{ub_ctx}->config($filename);
 }
 
 
@@ -212,9 +207,9 @@ as backup servers.
 =cut
 
 sub set_fwd {
-	my ( $self, $address ) = @_;
-	my $ctx = $self->{ub_ctx};
-	return Net::DNS::Resolver::libunbound::ub_ctx_set_fwd( $ctx, $address || return );
+	my $self = shift;
+	my $fwd	 = shift || return;
+	return $self->{ub_ctx}->set_fwd($fwd);
 }
 
 
@@ -228,9 +223,8 @@ Use DNS over TLS to send queries to machines specified using set_fwd().
 =cut
 
 sub set_tls {
-	my ( $self, $boolean ) = @_;
-	my $ctx = $self->{ub_ctx};
-	return Net::DNS::Resolver::libunbound::ub_ctx_set_tls( $ctx, $boolean );
+	my ( $self, $do_tls ) = @_;
+	return $self->{ub_ctx}->set_tls($do_tls);
 }
 
 
@@ -246,14 +240,13 @@ and the 'DHCP DNS' ip address, use ub_ctx_set_fwd.
 
 sub set_stub {
 	my ( $self, $zone, $address, $prime ) = @_;
-	my $ctx = $self->{ub_ctx};
-	return Net::DNS::Resolver::libunbound::ub_ctx_set_stub( $ctx, $zone, $address, $prime );
+	return $self->{ub_ctx}->set_stub( $zone, $address, $prime );
 }
 
 
-=head2 resolvconf
+=head2 resolv_conf
 
-    $resolver->resolvconf( 'filename' );
+    $resolver->resolv_conf( 'filename' );
 
 Extract nameserver list from resolv.conf(5) format configuration file.
 Any domain, searchlist, ndots or other settings are ignored.
@@ -262,10 +255,9 @@ or other platform-specific sources.
 
 =cut
 
-sub resolvconf {
+sub resolv_conf {
 	my ( $self, $filename ) = @_;
-	my $ctx = $self->{ub_ctx};
-	return Net::DNS::Resolver::libunbound::ub_ctx_resolvconf( $ctx, $filename );
+	return $self->{ub_ctx}->resolv_conf($filename);
 }
 
 =head2 hosts
@@ -279,8 +271,7 @@ These addresses are not flagged as DNSSEC secure when queried.
 
 sub hosts {
 	my ( $self, $filename ) = @_;
-	my $ctx = $self->{ub_ctx};
-	return Net::DNS::Resolver::libunbound::ub_ctx_hosts( $ctx, $filename );
+	return $self->{ub_ctx}->hosts($filename);
 }
 
 
@@ -295,9 +286,7 @@ in RFC1035 zonefile format.
 
 sub add_ta {
 	my $self = shift;
-	my $ta	 = Net::DNS::RR->new(@_);
-	my $ctx  = $self->{ub_ctx};
-	return Net::DNS::Resolver::libunbound::ub_ctx_add_ta( $ctx, $ta->plain );
+	return $self->{ub_ctx}->add_ta( Net::DNS::RR->new(@_)->plain );
 }
 
 =head2 add_ta_file
@@ -311,8 +300,7 @@ or drill).
 
 sub add_ta_file {
 	my ( $self, $filename ) = @_;
-	my $ctx = $self->{ub_ctx};
-	return Net::DNS::Resolver::libunbound::ub_ctx_add_ta_file( $ctx, $filename );
+	return $self->{ub_ctx}->add_ta_file($filename);
 }
 
 =head2 add_ta_autr
@@ -327,38 +315,35 @@ trust anchor is changed.
 
 sub add_ta_autr {
 	my ( $self, $filename ) = @_;
-	my $ctx = $self->{ub_ctx};
-	return Net::DNS::Resolver::libunbound::ub_ctx_add_ta_autr( $ctx, $filename );
+	return $self->{ub_ctx}->add_ta_autr($filename);
 }
 
-=head2 trustedkeys
+=head2 trusted_keys
 
-    $resolver->trustedkeys( 'filename' );
+    $resolver->trusted_keys( 'filename' );
 
-Pass the name of a bind-style config file comtaining trusted-keys{}.
+Pass the name of a bind-style config file containing trusted-keys{}.
 
 =cut
 
-sub trustedkeys {
+sub trusted_keys {
 	my ( $self, $filename ) = @_;
-	my $ctx = $self->{ub_ctx};
-	return Net::DNS::Resolver::libunbound::ub_ctx_trustedkeys( $ctx, $filename );
+	return $self->{ub_ctx}->trusted_keys($filename);
 }
 
 
-=head2 debugout
+=head2 debug_out
 
-    $resolver->debugout( out );
+    $resolver->debug_out( out );
 
 Send debug output (and error output) to the specified stream.
 Pass a null argument to disable. Default is stderr.
 
 =cut
 
-sub debugout {
+sub debug_out {
 	my ( $self, $out ) = @_;
-	my $ctx = $self->{ub_ctx};
-	return Net::DNS::Resolver::libunbound::ub_ctx_debugout( $ctx, $out );
+	return $self->{ub_ctx}->debug_out($out);
 }
 
 =head2 debug_level
@@ -373,8 +358,7 @@ Set verbosity of the debug output directed to stderr.  Level 0 is off,
 sub debug_level {
 	my ( $self, $verbosity ) = @_;
 	$self->debug($verbosity);
-	Net::DNS::Resolver::libunbound::ub_ctx_debuglevel( $self->{ub_ctx}, $verbosity );
-	return;
+	return $self->{ub_ctx}->debug_level($verbosity);
 }
 
 
@@ -383,21 +367,18 @@ sub debug_level {
     $resolver->async_thread(1);
 
 Enable a call to resolve_async() to create a thread to handle work in
-the background. If false (by default), a process is forked to handle
-work in the background.
+the background. If false (by default), a process is forked to perform
+the work.
 
 =cut
 
 sub async_thread {
 	my ( $self, $dothread ) = @_;
-	Net::DNS::Resolver::libunbound::ub_ctx_async( $self->{ub_ctx}, $dothread );
-	return;
+	return $self->{ub_ctx}->async($dothread);
 }
 
 
 ########################################
-
-sub replyfrom { return "(local) Unbound resolver" }
 
 sub string {
 	my $self = shift;
@@ -427,12 +408,15 @@ sub _decode_result {
 
 	my $packet;
 	if ($result) {
-		my $buffer = Net::DNS::Resolver::libunbound::ub_result_packet($result);
+		my $buffer = $result->answer_packet;
 		$packet = Net::DNS::Packet->decode( \$buffer, $self->debug );
 		$self->errorstring($@);
+
+		my $secure = $result->secure;
+		my $bogus  = $result->bogus;
+		$self->errorstring( $result->why_bogus );
 	}
 
-	$packet->from( $self->replyfrom ) if $packet;
 	return $packet;
 }
 

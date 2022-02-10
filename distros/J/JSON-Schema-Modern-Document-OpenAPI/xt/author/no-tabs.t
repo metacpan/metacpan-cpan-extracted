@@ -8,6 +8,7 @@ use Test::NoTabs;
 
 my @files = (
     'examples/synopsis',
+    'examples/synopsis.pl',
     'lib/JSON/Schema/Modern/Document/OpenAPI.pm',
     'lib/JSON/Schema/Modern/Vocabulary/OpenAPI.pm',
     'lib/OpenAPI/Modern.pm',
@@ -16,6 +17,7 @@ my @files = (
     't/document-schemas.t',
     't/document-toplevel.t',
     't/find_path.t',
+    't/lib/Helper.pm',
     't/oas-vocabulary.t',
     't/oas-vocabulary/discriminator.json',
     't/oas-vocabulary/formats.json',

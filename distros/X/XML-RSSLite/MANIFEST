@@ -9,3 +9,4 @@ t/02rss.t
 t/journal.rss
 t/sampleRSS.xml
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

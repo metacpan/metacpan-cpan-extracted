@@ -1,5 +1,5 @@
 Name:           perl-Geo-H3
-Version:        0.06
+Version:        0.07
 Release:        1%{?dist}
 Summary:        H3 Geospatial Hexagon Indexing System
 License:        MIT
@@ -44,7 +44,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%doc Changes META.json README
+%doc Changes META.json README.md
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
 %{_mandir}/man1/*

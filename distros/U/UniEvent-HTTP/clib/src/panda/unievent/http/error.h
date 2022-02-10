@@ -13,6 +13,8 @@ enum class errc {
     transfer_aborted,
     server_stopping,
     pipeline_canceled,
+    upgrade_in_pipeline,
+    upgrade_wrong_request,
 };
 
 struct ErrorCategory : std::error_category {

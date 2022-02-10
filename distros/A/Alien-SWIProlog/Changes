@@ -1,3 +1,21 @@
+0.002 2022-02-07 23:01:51-0500
+
+  No change from v0.001_02.
+
+0.001_02 2022-01-31 02:40:42-0500
+
+  Features
+
+   - Dynamically load library and set SWI_HOME_DIR on import.
+     See PR <https://github.com/DesmosomeOrg/p5-Alien-SWIProlog/pull/4>.
+
+0.001_01 2022-01-26 14:36:30-0500
+
+  Features
+
+   - Improvements to system probe for older versions of SWI-Prolog.
+     See PR <https://github.com/DesmosomeOrg/p5-Alien-SWIProlog/pull/3>.
+
 0.001 2021-11-15 01:42:21-0500
 
   Features

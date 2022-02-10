@@ -2,7 +2,7 @@ package Test2::Harness::Finder;
 use strict;
 use warnings;
 
-our $VERSION = '1.000104';
+our $VERSION = '1.000107';
 
 use Test2::Harness::Util qw/clean_path mod2file/;
 use Test2::Harness::Util::JSON qw/decode_json encode_json/;
@@ -366,10 +366,16 @@ sub changes_from_diff {
     my ($file, $sub, $indent, $is_perl);
     while (my $line = $next->()) {
         chomp($line);
-        if ($line =~ m{^(?:---|\+\+\+) [ab]/(.*)$}) {
-            my $maybe_file = $1;
+        if ($line =~ m{^(?:---|\+\+\+) ([ab]/)?(.*)$}) {
+            my $maybe_prefix = $1;
+            my $maybe_file = $2;
             next if $maybe_file =~ m{/dev/null};
-            $file = $maybe_file;
+            if ($maybe_prefix) {
+                $file = -f "$maybe_prefix$maybe_file" ? "$maybe_prefix$maybe_file" : $maybe_file;
+            }
+            else {
+                $file = $maybe_file;
+            }
             $is_perl = 1 if $file =~ m/\.(pl|pm|t2?)$/;
             $sub  = '*'; # Wildcard, changes to the code outside of a sub potentially effects all subs
             next;

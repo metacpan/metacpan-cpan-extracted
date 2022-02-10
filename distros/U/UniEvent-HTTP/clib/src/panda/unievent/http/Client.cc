@@ -172,16 +172,16 @@ void Client::on_read (string& buf, const ErrorCode& err) {
 
         auto result = _parser.parse_shift(buf);
         _response = static_pointer_cast<Response>(result.response);
-        _response->_is_done = result.state >= State::done;
+        _response->_is_done = result.state >= protocol::http::State::done;
 
         if (result.error) return cancel(result.error);
 
-        if (result.state <= State::headers) {
+        if (result.state <= protocol::http::State::headers) {
             panda_log_debug("got part, headers not finished");
             return;
         }
 
-        if (result.state != State::done) {
+        if (result.state != protocol::http::State::done) {
             panda_log_debug("got part, body not finished");
             if (_response->code == 100) continue;
             if (_request->follow_redirect && is_redirect(_response->code)) continue;

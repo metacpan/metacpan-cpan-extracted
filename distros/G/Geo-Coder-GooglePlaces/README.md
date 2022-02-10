@@ -12,7 +12,7 @@ Geo::Coder::GooglePlaces::V3 - Google Places Geocoding API V3
 
 # VERSION
 
-Version 0.04
+Version 0.05
 
 # SYNOPSIS
 

@@ -1,3 +1,10 @@
+1.060   2021-08-13  Released-By: PERLANCAR; Urgency: low
+
+        - No spec changes.
+
+        - Synchronize version & rebuild with Bencher::Backend 1.060.
+
+
 1.056   2021-08-13  Released-By: PERLANCAR; Urgency: low
 
         - No spec changes.

@@ -28,6 +28,8 @@ struct Message : virtual panda::Refcnt {
     size_t max_size () const         { return _max_size; }
     void   max_size (size_t newsize) { _max_size = newsize; }
 
+    bool deflated () const { return _deflated; }
+    void deflated (bool v) { _deflated = v; }
 private:
     enum class State { PENDING, DONE };
 
@@ -39,6 +41,7 @@ private:
     string    _close_message;
     size_t    _payload_length;
     uint32_t  _frame_count;
+    bool      _deflated;
 };
 
 using MessageSP = panda::iptr<Message>;

@@ -1,3 +1,7 @@
+1.1.2    xx.xx.2022
+           - fix 'no_signals' plack behaviour
+           - docs for logging
+           - fix test
 1.1.1    26.11.2021
            - upgrade tests for catch-v3
 1.1.0    18.11.2021

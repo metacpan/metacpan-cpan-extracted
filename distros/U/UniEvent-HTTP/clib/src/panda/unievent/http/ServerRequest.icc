@@ -1,5 +1,6 @@
 #include "ServerRequest.h"
 #include "Server.h"
+#include "panda/protocol/http/Fields.h"
 
 namespace panda { namespace unievent { namespace http {
 
@@ -26,6 +27,12 @@ void ServerRequest::drop () {
 
 net::SockAddr ServerRequest::sockaddr () const { return _connection ? _connection->sockaddr().value() : net::SockAddr{}; }
 net::SockAddr ServerRequest::peeraddr () const { return _connection ? _connection->peeraddr().value() : net::SockAddr{}; }
+
+excepted<StreamSP, ErrorCode> ServerRequest::upgrade() {
+    if (!_connection) return make_unexpected(make_error_code(std::errc::connection_aborted));
+    if (!protocol::http::iequals(headers.connection(), "upgrade")) return make_unexpected(errc::upgrade_wrong_request);
+    return _connection->upgrade(this);
+}
 
 ServerRequest::~ServerRequest () {
     // remove garbage from response in case if user holds response without request after response is finished

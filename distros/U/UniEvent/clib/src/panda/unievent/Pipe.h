@@ -36,6 +36,9 @@ struct Pipe : virtual Stream {
 
     excepted<string, ErrorCode> sockname () const { return handle_fd_excepted(impl()->sockname()); }
     excepted<string, ErrorCode> peername () const { return handle_fd_excepted(impl()->peername()); }
+    
+    excepted<net::SockAddr, ErrorCode> sockaddr () const override;
+    excepted<net::SockAddr, ErrorCode> peeraddr () const override;
 
     virtual excepted<void, ErrorCode> chmod (int mode);
 

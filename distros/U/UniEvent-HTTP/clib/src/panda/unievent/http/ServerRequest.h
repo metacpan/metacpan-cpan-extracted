@@ -2,7 +2,9 @@
 #include "msg.h"
 #include "ServerResponse.h"
 #include <panda/error.h>
+#include <panda/excepted.h>
 #include <panda/net/sockaddr.h>
+#include <panda/unievent/forward.h>
 #include <panda/CallbackDispatcher.h>
 
 namespace panda { namespace unievent { namespace http {
@@ -44,6 +46,11 @@ struct ServerRequest : protocol::http::Request {
 
     net::SockAddr sockaddr () const;
     net::SockAddr peeraddr () const;
+
+    // for "Connection: upgrade" requests. Detaches underlying connection from http server and returns it.
+    excepted<StreamSP, ErrorCode> upgrade ();
+    
+    ServerConnection* connection() const { return _connection; }
 
 protected:
     ServerRequest (ServerConnection*);

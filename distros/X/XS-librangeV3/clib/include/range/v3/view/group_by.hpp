@@ -36,6 +36,7 @@
 #include <range/v3/view/take_while.hpp>
 #include <range/v3/view/view.hpp>
 
+#include <range/v3/detail/config.hpp>
 #include <range/v3/detail/prologue.hpp>
 
 namespace ranges
@@ -175,6 +176,10 @@ namespace ranges
                 /// \pre
                 requires viewable_range<Rng> AND forward_range<Rng> AND
                     indirect_relation<Fun, iterator_t<Rng>>)
+                RANGES_DEPRECATED(
+                    "views::group_by is deprecated. Please use views::chunk_by instead. "
+                    "Note that views::chunk_by evaluates the predicate between adjacent "
+                    "elements.")
             constexpr group_by_view<all_t<Rng>, Fun> operator()(Rng && rng, Fun fun) const
             {
                 return {all(static_cast<Rng &&>(rng)), std::move(fun)};
@@ -186,6 +191,10 @@ namespace ranges
             using group_by_base_fn::operator();
 
             template<typename Fun>
+            RANGES_DEPRECATED(
+                "views::group_by is deprecated. Please use views::chunk_by instead. "
+                "Note that views::chunk_by evaluates the predicate between adjacent "
+                "elements.")
             constexpr auto operator()(Fun fun) const
             {
                 return make_view_closure(bind_back(group_by_base_fn{}, std::move(fun)));

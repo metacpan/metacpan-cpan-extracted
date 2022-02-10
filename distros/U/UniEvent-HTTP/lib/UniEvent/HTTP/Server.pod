@@ -110,12 +110,17 @@ Port to listen. Can be zero, in which case server will bind to a random free por
 
 =item path
 
-Path to unix socket or name for named pipe (on windows) to listen. If defined, ignores C<host>, C<port>, C<reuse_port>, C<domain>, C<sock>.
+Path to unix socket or name for named pipe (on windows) to listen.
+If defined, ignores C<host>, C<port>, C<reuse_port>, C<domain>, C<sock>, C<tcp_nodelay>.
 
 =item reuse_port [true]
 
 If set to true, will use C<REUSE_PORT> feature when binding. This is the simplest (and efficient) way to create several server objects on the same port.
 This option is ignored on systems where it's not supported (for example, windows).
+
+=item tcp_nodelay [false]
+
+Sets the corresponding socket option if location is a tcp location. Option is ignored otherwise.
 
 =item backlog [4096]
 
@@ -142,7 +147,12 @@ C<sock> and C<host>, C<port>, C<path>, C<reuse_port>, C<domain> are mutually exc
 
 =item idle_timeout [300]
 
-Max idle time in seconds for a keep-alive connection before server closes it. Can be fractional.
+Max idle time in seconds for a http connection before server force-closes it. Can be fractional.
+
+Connection is idle:
+1) After physical tcp connection established till first byte of request received (including possible SSL connection time).
+2) After last part of the http response sent till first byte of the next request received (for keep-alive connections).
+3) After last part of the last http response sent till the moment when the connection is properly shut down.
 
 =item max_headers_size [16384]
 
@@ -154,7 +164,7 @@ Max http request body size. If server receives request with bigger body, callbac
 
 =item tcp_nodelay [false]
 
-If set to true, will use C<tcp nodelay> feature.
+If set to true, will set C<tcp_nodelay> feature for all tcp locations.
 
 =item max_keepalive_requests [unlimited]
 
@@ -190,6 +200,8 @@ Returns listeners for all configured locations as arrayref of L<UniEvent::Tcp> o
 Returns sockaddr of the first listener (if any) as L<Net::SockAddr> object. Effect is similar to:
 
     $server->listeners->[0]->sockaddr;
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
 
 
 =head2 stop()

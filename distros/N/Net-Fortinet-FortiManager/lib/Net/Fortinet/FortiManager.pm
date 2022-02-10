@@ -1,5 +1,5 @@
 package Net::Fortinet::FortiManager;
-$Net::Fortinet::FortiManager::VERSION = '0.002000';
+$Net::Fortinet::FortiManager::VERSION = '0.003001';
 # ABSTRACT: Fortinet FortiManager REST API client library
 
 use 5.024;
@@ -8,7 +8,7 @@ use feature 'signatures';
 use Types::Standard qw( ArrayRef HashRef InstanceOf Str );
 use Types::Common::Numeric qw( PositiveInt );
 use Carp qw( croak );
-use List::Util qw( all any );
+use List::Util qw( all any none );
 
 no warnings "experimental::signatures";
 
@@ -186,7 +186,12 @@ sub login ($self) {
 
     $self->_sessionid($res->data->{session});
 
-    $self->_set_adoms($self->list_adoms);
+    $self->_set_adoms($self->list_adoms_by_name);
+
+    # switch to first ADOM if the currently set ADOM isn't available
+    if (none { $_ eq $self->adom } $self->adoms->@*) {
+        $self->adom($self->adoms->[0]);
+    }
 
     return 1;
 }
@@ -206,12 +211,19 @@ sub get_sys_status ($self) {
 }
 
 
-sub list_adoms ($self) {
-    my @adoms = map {
-        $_->{name}
-    } $self->exec_method('get', '/dvmdb/adom', {
-        fields  => [qw( name )],
-    })->@*;
+sub list_adoms ($self, $params = {}) {
+    $self->exec_method('get', '/dvmdb/adom', $params);
+}
+
+
+sub list_adoms_by_name ($self) {
+    my @adoms =
+        sort
+        map {
+            $_->{name}
+        } $self->list_adoms({
+            fields  => [qw( name )],
+        })->@*;
     return \@adoms;
 }
 
@@ -500,7 +512,7 @@ sub delete_policy_package ($self, $name) {
 }
 
 
-sub install_policy_package ($self, $name, $data) {
+sub install_policy_package ($self, $name, $data = {}) {
     my $params = {
         data => {
             $data->%*,
@@ -508,8 +520,10 @@ sub install_policy_package ($self, $name, $data) {
             pkg     => $name,
         },
     };
-    $self->exec_method('exec', '/securityconsole/install/package',
+    my $res = $self->exec_method('exec', '/securityconsole/install/package',
         $params);
+
+    return $res->{task};
 }
 
 
@@ -520,6 +534,23 @@ sub list_tasks ($self, $params = {}) {
 
 sub get_task ($self, $id, $params = {}) {
     $self->exec_method('get', '/task/task/' . $id, $params);
+}
+
+
+sub wait_for_task($self, $taskid, $callback = undef) {
+    croak "task-id missing"
+        unless defined $taskid;
+    croak "callback must be a coderef"
+        if defined $callback && ref $callback ne 'CODE';
+
+    my $task;
+    while (($task = $self->get_task($taskid))
+        && $task->{percent} != 100) {
+        &$callback($task)
+            if defined $callback;
+        sleep 1;
+    }
+    return $task;
 }
 
 
@@ -618,7 +649,7 @@ Net::Fortinet::FortiManager - Fortinet FortiManager REST API client library
 
 =head1 VERSION
 
-version 0.002000
+version 0.003001
 
 =head1 SYNOPSIS
 
@@ -687,7 +718,9 @@ from the JSONRPC response.
 
 =head2 login
 
-Logs into the Fortinet FortiManager.
+Logs into the Fortinet FortiManager and switches to the first available ADOM
+if the currently set L<adom> isn't available, for example because the user
+is limited to one or more ADOMs.
 
 =head2 logout
 
@@ -699,7 +732,13 @@ Returns /sys/status.
 
 =head2 list_adoms
 
-Returns an arrayref of ADOMs by name.
+Takes an optional parameter hashref.
+
+Returns an arrayref of ADOMs.
+
+=head2 list_adoms_by_name
+
+Returns an arrayref of ADOMs sorted by name.
 
 =head2 list_firewall_addresses
 
@@ -909,7 +948,7 @@ Throws an exception on error.
 
 Takes optional parameters.
 
-Returns an arrayref of firewall policies.
+Returns an arrayref of policy packages.
 
 =head2 get_policy_package
 
@@ -949,7 +988,7 @@ Throws an exception on error.
 
 Takes a policy package name and a hashref of parameters.
 
-Returns true on success.
+Returns the task id on success.
 
 Throws an exception on error.
 
@@ -964,6 +1003,13 @@ Returns an arrayref of tasks.
 Takes a task id and an optional parameter hashref.
 
 Returns its data as a hashref.
+
+=head2 wait_for_task
+
+Takes a task id and checks its status every second until its percent
+have reached 100 and return the status.
+Takes an optional callback coderef which is called for every check with the
+task as argument.
 
 =head2 list_firewall_policies
 

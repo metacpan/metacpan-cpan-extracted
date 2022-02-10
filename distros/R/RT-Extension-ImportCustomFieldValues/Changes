@@ -1,0 +1,7 @@
+Revision history for RT-Extension-ImportCustomFieldValues
+
+0.02 2022-02-07
+ - Check permissions before allowing users to use this import tool
+
+0.01 2022-02-07
+ - Initial release

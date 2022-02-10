@@ -1,6 +1,12 @@
 Changelog for HealthCheck-Diagnostic-SFTP
 
-v1.4.0 2022-02-04T21:09:35
+v1.4.1 2022-02-10T17:18:25
+ - Update README (Andrew Hewus Fresh)
+ - Pull request #4: SM-3514 (Mitch McCracken)
+ - Show port in output if one was given (Mitch McCracken)
+ - Switch timeout option to use alarm signal handler (Mitch McCracken)
+
+v1.4.0 2022-02-04T21:08:09
  - Update README (Andrew Hewus Fresh)
  - Pull request #3: SM-3507 (Mitch McCracken)
  - Fix default timeout in POD (Andrew Fresh)
@@ -22,8 +28,8 @@ v1.2.1 2019-11-05T22:35:51
 
 v1.2.0.1 2019-10-18T19:55:55
  - Create distribution files (Andrew Hewus Fresh)
- - Convert to Bitbucket workflow (Andrew Hewus Fresh)
  - Remove gitc metadata (Andrew Hewus Fresh)
+ - Convert to Bitbucket workflow (Andrew Hewus Fresh)
 
 v1.2.0.0 2018-12-04T17:02:02
  - Add a SYNOPSIS (Brandon Messineo)

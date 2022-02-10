@@ -14,8 +14,8 @@ sub tapprox {
     }
     my $d = max( abs($x-$y) );
     if($d >= 0.01) {
+use Carp; confess "SHIT";
        diag "APPROX: $x $y\n";
-       diag "# APPROXFAIL: $x $y\n";
     }
     $d < 0.01;
 }
@@ -106,13 +106,19 @@ is $r->whichND.'', <<EOF, 'whichND works right (was failing on 32-bit)';
 \n[\n [3 4]\n]
 EOF
 
+$x = pdl('[[i 2+3i] [4+5i 6+7i]]');
+ok all(approx $x->norm, pdl(<<'EOF')), 'native complex norm works' or diag $x->norm;
+[
+ [0.267261i 0.534522+0.801783i]
+ [0.356348+0.445435i 0.534522+0.623609i]
+]
+EOF
+
 ##############################
 # Simple test case for interpND
-my $index;
-my $z;
 $x = xvals(10,10)+yvals(10,10)*10;
-$index = cat(3+xvals(5,5)*0.25,7+yvals(5,5)*0.25)->reorder(2,0,1);
-$z = 73+xvals(5,5)*0.25+2.5*yvals(5,5);
+my $index = cat(3+xvals(5,5)*0.25,7+yvals(5,5)*0.25)->reorder(2,0,1);
+my $z = 73+xvals(5,5)*0.25+2.5*yvals(5,5);
 eval { $y = $x->interpND($index) };
 is $@, '';
 is sum($y != $z), 0, "interpND";
@@ -295,6 +301,12 @@ ok($a1->at($x->list,$y->list,$z->list,$w->list) == 203, "whichND" );
 $a1 = pdl(1,2,3,4);
 my $b1 = append($a1,2);
 ok(int(sum($b1))==12, "append");
+$b1 = append(null, null);
+ok !$b1->isnull, 'append(null, null) returns non-null';
+ok $b1->isempty, 'append(null, null) returns an empty';
+append(null, null, $b1);
+ok !$b1->isnull, 'append(null, null, b1) sets non-null';
+ok $b1->isempty, 'append(null, null, b1) sets an empty';
 
 # clip tests
 ok(tapprox($im->hclip(5)->sum,83), "hclip" );

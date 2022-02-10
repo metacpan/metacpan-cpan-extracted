@@ -1,5 +1,14 @@
 Revision history for experimental
 
+0.027     2022-02-08 18:41:07+01:00 Europe/Amsterdam
+          - Update documented list of experiments
+
+0.026     2022-02-08 14:41:02+01:00 Europe/Amsterdam
+          - Added defer experiment
+          - Added for_list experiment
+          - Added builtin experiment
+          - args_array_with_signatures
+
 0.025     2021-07-30 14:41:39+02:00 Europe/Amsterdam
           - Add missing documentation for try
 

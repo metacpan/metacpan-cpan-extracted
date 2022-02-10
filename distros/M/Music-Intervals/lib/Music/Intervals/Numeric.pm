@@ -1,5 +1,5 @@
 package Music::Intervals::Numeric;
-$Music::Intervals::Numeric::VERSION = '0.0804';
+$Music::Intervals::Numeric::VERSION = '0.0901';
 our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Breakdown of numeric musical intervals
@@ -152,14 +152,14 @@ Music::Intervals::Numeric - Breakdown of numeric musical intervals
 
 =head1 VERSION
 
-version 0.0804
+version 0.0901
 
 =head1 SYNOPSIS
 
   use Music::Intervals::Numeric;
 
   my $m = Music::Intervals::Numeric->new(
-    notes => [qw( 1/1 5/4 3/2 15/8 )],
+    notes => [qw( 1/1 6/5 3/2 15/8 )],
   );
 
   print Dumper(
@@ -174,7 +174,7 @@ version 0.0804
 =head1 DESCRIPTION
 
 A C<Music::Intervals> object shows the mathematical break-down of musical
-intervals and chords given as integer ratios.
+intervals given as integer ratios.
 
 =head1 ATTRIBUTES
 

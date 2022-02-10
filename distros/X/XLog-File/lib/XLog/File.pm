@@ -2,7 +2,7 @@ package XLog::File;
 use 5.012;
 use XLog;
 
-our $VERSION = '1.0.6';
+our $VERSION = '1.1.0';
 
 XS::Loader::load();
 

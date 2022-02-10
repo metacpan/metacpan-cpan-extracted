@@ -18,6 +18,7 @@ sub new {
 
 sub manager { return shift->{manager} }
 sub loop    { return shift->{manager}->loop }
+sub stop    { shift->{manager}->stop }
 
 sub make_config {
     my $p = shift;
@@ -71,7 +72,7 @@ sub run {
     $mgr->spawn_event->add(sub {
         my $server = shift;
         
-        unless ($mt) { # release master resources
+        if (!$mt && !$self->{no_signals}) { # release master resources
             $self->{sigint}->reset;
             $self->{sigterm}->reset;
         }
@@ -96,7 +97,5 @@ sub run {
         $finish_profile->();
     }
 }
-
-sub stop { shift->{manager}->stop }
 
 1;

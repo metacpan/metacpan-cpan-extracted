@@ -1,39 +1,8 @@
 #include "test.h"
 #include <time.h>
+#include <catch2/benchmark/catch_benchmark.hpp>
 
 #define TEST(name) TEST_CASE("bench: " name, "[.bench]")
-
-#ifndef BENCHMARK // stub if benchmarking is disabled
-    #define BENCHMARK(name) [&]()
-#endif
-
-double curtime () {
-    struct timespec ts;
-    int status = clock_gettime(CLOCK_REALTIME, &ts);
-    assert(status == 0);
-    return (double)ts.tv_sec + (double)ts.tv_nsec / 1000000000;
-}
-
-template <class T>
-void bench (string name, int cnt, T&& cb) {
-    auto start = curtime();
-    for (int i = 0; i < cnt; ++i) cb();
-    auto took = curtime() - start;
-    int speed = (took == 0) ? 0 : (cnt / took);
-    printf("%s\t\t: took %.3fs, speed %d\n", name.c_str(), took, speed);
-}
-
-template <class T, class INIT>
-void bench (string name, int cnt, T&& cb, INIT&& init) {
-    std::vector<decltype(init())> v;
-    v.reserve(cnt);
-    for (int i = 0; i < cnt; ++i) v.emplace_back(init());
-    auto start = curtime();
-    for (int i = 0; i < cnt; ++i) cb(std::move(v[i]));
-    auto took = curtime() - start;
-    int speed = (took == 0) ? 0 : (cnt / took);
-    printf("%s\t\t: took %.3fs, speed %d\n", name.c_str(), took, speed);
-}
 
 TEST("small parse") {
     ClientParser cp;
@@ -49,13 +18,23 @@ TEST("small parse") {
     auto zbin = sp.start_message(DeflateFlag::YES).send(pl, IsFinal::YES);
     auto zmbin = cp.start_message(DeflateFlag::YES).send(pl, IsFinal::YES);
 
-    bench("unmasked copy", 10 * 1000 * 1000, [&]{ cp.get_frames(bin); });
-    bench("masked copy", 10 * 1000 * 1000, [&]{ sp.get_frames(mbin); });
-    bench("masked move", 10 * 1000 * 1000, [&](string&& s){ sp.get_frames(std::move(s)); }, [&]{ string ret = mbin; ret.buf(); return ret; });
-    bench("masked copy fair", 10 * 1000 * 1000, [&](string&& s){ sp.get_frames(s); }, [&]{ string ret = mbin; ret.buf(); return ret; });
+    BENCHMARK("unmasked copy") { cp.get_frames(bin); };
+    BENCHMARK("masked copy") { sp.get_frames(mbin); };
+    
+    BENCHMARK_ADVANCED("masked move")(Catch::Benchmark::Chronometer meter) {
+        std::vector<string> v;
+        for (int i = 0; i < meter.runs(); ++i) { auto s = mbin; s.buf(); v.push_back(std::move(s)); }
+        meter.measure([&](int i){ sp.get_frames(std::move(v[i])); });
+    };
 
-    bench("unmasked deflate", 10 * 1000 * 1000, [&]{ cp.get_frames(zbin); });
-    bench("masked deflate", 10 * 1000 * 1000, [&]{ sp.get_frames(zmbin); });
+    BENCHMARK_ADVANCED("masked copy fair")(Catch::Benchmark::Chronometer meter) {
+        std::vector<string> v;
+        for (int i = 0; i < meter.runs(); ++i) { auto s = mbin; s.buf(); v.push_back(std::move(s)); }
+        meter.measure([&](int i){ sp.get_frames(v[i]); });
+    };
+
+    BENCHMARK("unmasked deflate") { cp.get_frames(zbin); };
+    BENCHMARK("masked deflate") { sp.get_frames(zmbin); };
 }
 
 TEST("small compile") {
@@ -69,14 +48,38 @@ TEST("small compile") {
     auto pl = repeat("x", 50);
     sp.start_message();
     cp.start_message();
-    bench("unmasked", 10 * 1000 * 1000, [&]{ sp.send_frame(pl); });
-    bench("masked", 10 * 1000 * 1000, [&]{ cp.send_frame(pl); });
+    BENCHMARK("unmasked"){ sp.send_frame(pl); };
+    BENCHMARK("masked"){ cp.send_frame(pl); };
 
     sp.send_frame(IsFinal::YES);
     cp.send_frame(IsFinal::YES);
     sp.start_message(DeflateFlag::YES);
     cp.start_message(DeflateFlag::YES);
+    
+    BENCHMARK_ADVANCED("unmasked deflate")(Catch::Benchmark::Chronometer meter) {
+        std::vector<string> v;
+        for (int i = 0; i < meter.runs(); ++i) { auto s = pl; s.buf(); v.push_back(std::move(s)); }
+        meter.measure([&](int i){ sp.send_frame(v[i]); });
+    };
+    
+    BENCHMARK_ADVANCED("masked deflate")(Catch::Benchmark::Chronometer meter) {
+        std::vector<string> v;
+        for (int i = 0; i < meter.runs(); ++i) { auto s = pl; s.buf(); v.push_back(std::move(s)); }
+        meter.measure([&](int i){ cp.send_frame(v[i]); });
+    };
+}
 
-    bench("unmasked deflate", 1 * 1000 * 1000, [&](string&& s){ sp.send_frame(s); }, [&]{ string ret = pl; ret.buf(); return ret; });
-    bench("masked deflate", 1 * 1000 * 1000, [&](string&& s){ cp.send_frame(s); }, [&]{ string ret = pl; ret.buf(); return ret; });
+TEST("crypt_mask") {
+    string src;
+    string dst(1000000);
+    auto buf = dst.buf();
+    
+    src = string(30, 'x');
+    BENCHMARK("small"){ crypt_mask(src.data(), buf, src.length(), 123456789, 0); };
+
+    src = string(300, 'x');
+    BENCHMARK("medium"){ crypt_mask(src.data(), buf, src.length(), 123456789, 0); };
+    
+    src = string(10000, 'x');
+    BENCHMARK("big"){ crypt_mask(src.data(), buf, src.length(), 123456789, 0); };
 }

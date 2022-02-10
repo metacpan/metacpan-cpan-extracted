@@ -1,0 +1,13 @@
+table.cf-csv-import td {
+    border-left: 1px solid lightgrey;
+    border-right: 1px solid lightgrey;
+}
+table.cf-csv-import th {
+    border: 1px solid lightgrey;
+}
+
+div.button-cancel .buttons {
+    text-align: left;
+    float: left;
+}
+

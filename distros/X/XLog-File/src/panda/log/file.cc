@@ -13,6 +13,12 @@
 
 namespace panda { namespace log {
 
+#ifdef _WIN32
+    static const char* EOL = "\r\n";
+#else
+    static const char* EOL = "\n";
+#endif
+
 using namespace unievent;
 
 static string_view remove_filename (string_view path) {
@@ -25,7 +31,7 @@ static string_view remove_filename (string_view path) {
     return path.substr(0, pos+1);
 }
 
-FileLogger::FileLogger (const Config& cfg) : file(cfg.file), autoflush(cfg.autoflush), check_freq(cfg.check_freq) {
+FileLogger::FileLogger (const Config& cfg) : file(cfg.file), buffered(cfg.buffered), check_freq(cfg.check_freq) {
     if (file.empty()) throw exception("file must be defined");
     reopen();
 }
@@ -100,6 +106,24 @@ void FileLogger::log (const string& msg, const Info& info) {
 
     if (!fh) return; // logging not available
 
+    if (buffered) {
+        buffered_log(msg);
+    } else {
+        unbuffered_log(msg);
+    }
+}
+
+void FileLogger::flush() {
+    if (!buffered || !fh) {
+        return;
+    }
+    auto r = fflush(fh);
+    if (r != 0) {
+        std::cerr << "[FileLogger] flush message to '" << file << "': " << strerror(errno) << std::endl;
+    }
+}
+
+void FileLogger::buffered_log(const string& msg) {
     auto items = fwrite(msg.data(), msg.size(), 1, fh);
     if (!items) {
         std::cerr << "[FileLogger] cannot write message to '" << file << "': " << strerror(errno) << ", message: " << msg << std::endl;
@@ -115,14 +139,20 @@ void FileLogger::log (const string& msg, const Info& info) {
         std::cerr << "[FileLogger] cannot write message to '" << file << "': " << strerror(errno) << std::endl;
         return;
     }
+}
 
-    if (autoflush) {
-        auto r = fflush(fh);
-        if (r != 0) {
-            std::cerr << "[FileLogger] flush message to '" << file << "': " << strerror(errno) << std::endl;
+void FileLogger::unbuffered_log(const string& msg) {
+    string full = msg + EOL;
+    const char* ptr = full.data();
+    const char* end = ptr + full.size();
+    do {
+        auto ret = write(fileno(fh),  ptr, end - ptr);
+        if (ret <= 0) {
+            std::cerr << "[FileLogger] cannot write message to '" << file << "': " << strerror(errno) << ", message: " << msg << std::endl;
             return;
         }
-    };
+        ptr += ret;
+    } while (ptr != end);
 };
 
 }}

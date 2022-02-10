@@ -4,13 +4,13 @@
       "David Mertens, E<lt>dcmertens.perl@gmail.comE<gt>."
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4218",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "PDL-Drawing-Prima",
    "no_index" : {
@@ -33,25 +33,25 @@
          "requires" : {
             "Module::Build" : "0.28",
             "PDL" : "v2.4.10",
-            "Prima" : "1.33"
+            "Prima" : "1.57"
          }
       },
       "runtime" : {
          "requires" : {
             "PDL" : "v2.4.10",
-            "Prima" : "1.35",
-            "perl" : "v5.8.0"
+            "Prima" : "1.57",
+            "perl" : "v5.10.0"
          }
       }
    },
    "provides" : {
       "PDL::Drawing::Prima" : {
          "file" : "lib/PDL/Drawing/Prima.pm.PL",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "PDL::Drawing::Prima::Utils" : {
          "file" : "lib/PDL/Drawing/Prima/Utils.pm.PL",
-         "version" : "0.12"
+         "version" : "0.13"
       }
    },
    "release_status" : "stable",
@@ -66,6 +66,6 @@
          "url" : "http://github.com/run4flat/PDL-Drawing-Prima"
       }
    },
-   "version" : "0.12",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "0.13",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

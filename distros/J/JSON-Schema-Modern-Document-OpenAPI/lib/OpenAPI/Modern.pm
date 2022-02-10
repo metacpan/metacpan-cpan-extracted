@@ -5,7 +5,7 @@ package OpenAPI::Modern;
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.019';
+our $VERSION = '0.020';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -122,8 +122,8 @@ sub validate_request ($self, $request, $options = {}) {
           $param_obj->{name});
         my $valid =
             $param_obj->{in} eq 'path' ? $self->_validate_path_parameter($state, $param_obj, $path_captures)
-          : $param_obj->{in} eq 'query' ? $self->_validate_query_parameter($state, $param_obj, $request->uri)
-          : $param_obj->{in} eq 'header' ? $self->_validate_header_parameter($state, $param_obj->{name}, $param_obj, [ $request->header($param_obj->{name}) ])
+          : $param_obj->{in} eq 'query' ? $self->_validate_query_parameter($state, $param_obj, _request_uri($request))
+          : $param_obj->{in} eq 'header' ? $self->_validate_header_parameter($state, $param_obj->{name}, $param_obj, [ _header($request, $param_obj->{name}) ])
           : $param_obj->{in} eq 'cookie' ? $self->_validate_cookie_parameter($state, $param_obj, $request)
           : abort($state, 'unrecognized "in" value "%s"', $param_obj->{in});
       }
@@ -145,7 +145,7 @@ sub validate_request ($self, $request, $options = {}) {
         $body_obj = $self->_resolve_ref($ref, $state);
       }
 
-      if ($request->content_length // length $request->content_ref->$*) {
+      if (_body_size($request)) {
         ()= $self->_validate_body_content($state, $body_obj->{content}, $request);
       }
       elsif ($body_obj->{required}) {
@@ -179,10 +179,11 @@ sub validate_response ($self, $response, $options = {}) {
   };
 
   try {
-    die pop $options->{errors}->@* if not $self->find_path($response->request, $options);
+    die pop $options->{errors}->@*
+      if not $self->find_path($response->$_call_if_can('request') // $options->{request}, $options);
 
     my ($path_template, $path_captures) = $options->@{qw(path_template path_captures)};
-    my $method = lc $response->request->method;
+    my $method = lc $options->{method};
     my $operation = $self->openapi_document->schema->{paths}{$path_template}{$method};
 
     return $self->_result($state) if not exists $operation->{responses};
@@ -213,12 +214,12 @@ sub validate_response ($self, $response, $options = {}) {
 
       ()= $self->_validate_header_parameter({ %$state,
           data_path => jsonp($state->{data_path}, 'header', $header_name) },
-        $header_name, $header_obj, [ $response->header($header_name) ]);
+        $header_name, $header_obj, [ _header($response, $header_name) ]);
     }
 
     ()= $self->_validate_body_content({ %$state, data_path => jsonp($state->{data_path}, 'body') },
         $response_obj->{content}, $response)
-      if exists $response_obj->{content} and ($response->content_length // length $response->content_ref->$*);
+      if exists $response_obj->{content} and _body_size($response);
   }
   catch ($e) {
     if ($e->$_isa('JSON::Schema::Modern::Result')) {
@@ -237,7 +238,7 @@ sub validate_response ($self, $response, $options = {}) {
 }
 
 sub find_path ($self, $request, $options) {
-  my $path_template;
+  my ($path_template, $method);
 
   my $state = {
     data_path => '/request/uri/path',
@@ -247,40 +248,55 @@ sub find_path ($self, $request, $options) {
     errors => $options->{errors} //= [],
   };
 
-  # path_template from options, method from request
-  if (exists $options->{path_template}) {
-    $path_template = $options->{path_template};
-
-    my $path_item = $self->openapi_document->schema->{paths}{$path_template};
-    return E({ %$state, keyword => 'paths' }, 'missing path-item "%s"', $path_template) if not $path_item;
-
-    my $method = lc $request->method;
-    return E({ %$state, data_path => '/request/method', schema_path => jsonp('/paths', $path_template), keyword => $method },
-        'missing entry for HTTP method "%s"', $method)
-      if not $path_item->{$method};
+  # method from options
+  if (exists $options->{method}) {
+    $method = lc $options->{method};
+    return E({ %$state, data_path => '/request/method' }, 'wrong HTTP method %s', $request->method)
+      if $request and lc $request->method ne $method;
+  }
+  elsif ($request) {
+    $method = lc $request->method;
   }
 
-  # path_template and method from operationId from options
+  # path_template and method from operation_id from options
   if (exists $options->{operation_id}) {
     my $operation_path = $self->openapi_document->get_operationId($options->{operation_id});
     return E({ %$state, keyword => 'paths' }, 'unknown operation_id "%s"', $options->{operation_id})
       if not $operation_path;
     return E({ %$state, schema_path => $operation_path, keyword => 'operationId' },
       'operation id does not have an associated path') if $operation_path !~ m{^/paths/};
-    (undef, undef, $path_template, my $method) = unjsonp($operation_path);
+    (undef, undef, $path_template, $method) = unjsonp($operation_path);
 
     return E({ %$state, schema_path => jsonp('/paths', $path_template) },
         'operation does not match provided path_template')
       if exists $options->{path_template} and $options->{path_template} ne $path_template;
 
     return E({ %$state, data_path => '/request/method', schema_path => $operation_path },
+        'wrong HTTP method %s', $options->{method})
+      if $options->{method} and lc $options->{method} ne $method;
+
+    return E({ %$state, data_path => '/request/method', schema_path => $operation_path },
         'wrong HTTP method %s', $request->method)
-      if lc $request->method ne $method;
+      if $request and lc $request->method ne $method;
   }
 
-  my $uri_path = $request->uri->path;
+  croak 'at least one of request, $options->{method} and $options->{operation_id} must be provided'
+    if not $method;
 
-  if (not $path_template) {
+  # path_template from options
+  if (exists $options->{path_template}) {
+    $path_template = $options->{path_template};
+
+    my $path_item = $self->openapi_document->schema->{paths}{$path_template};
+    return E({ %$state, keyword => 'paths' }, 'missing path-item "%s"', $path_template) if not $path_item;
+
+    return E({ %$state, data_path => '/request/method', schema_path => jsonp('/paths', $path_template), keyword => $method },
+        'missing entry for HTTP method "%s"', $method)
+      if not $path_item->{$method};
+  }
+
+  # path_template from request URI
+  if (not $path_template and $request and my $uri_path = _request_uri($request)->path) {
     my $schema = $self->openapi_document->schema;
     croak 'servers not yet supported when matching request URIs'
       if exists $schema->{servers} and $schema->{servers}->@*;
@@ -294,12 +310,19 @@ sub find_path ($self, $request, $options) {
         Encode::decode('UTF-8', URI::Escape::uri_unescape(substr($uri_path, $-[$_], $+[$_]-$-[$_]))), 1 .. $#-;
       my @capture_names = ($path_template =~ m!\{([^/?#}]+)\}!g);
       my %path_captures; @path_captures{@capture_names} = @capture_values;
-      $options->@{qw(path_template path_captures)} = ($path_template, \%path_captures);
+
+      return E({ %$state, keyword => 'paths' }, 'provided path_captures values do not match request URI')
+        if $options->{path_captures} and not is_equal($options->{path_captures}, \%path_captures);
+
+      $options->@{qw(path_template path_captures method)} = ($path_template, \%path_captures, $method);
       return 1;
     }
 
     return E({ %$state, keyword => 'paths' }, 'no match found for URI path "%s"', $uri_path);
   }
+
+  croak 'at least one of request, $options->{path_template} and $options->{operation_id} must be provided'
+    if not $path_template;
 
   # note: we aren't doing anything special with escaped slashes. this bit of the spec is hazy.
   my @capture_names = ($path_template =~ m!\{([^/}]+)\}!g);
@@ -307,6 +330,15 @@ sub find_path ($self, $request, $options) {
       'provided path_captures names do not match path template "%s"', $path_template)
     if exists $options->{path_captures}
       and not is_equal([ sort keys $options->{path_captures}->%*], [ sort @capture_names ]);
+
+  if (not $request) {
+    $options->@{qw(path_template method)} = ($path_template, $method);
+    return 1;
+  }
+
+  # if we're still here, we were passed path_template in options or we calculated it from
+  # operation_id, and now we verify it against path_captures and the request URI.
+  my $uri_path = _request_uri($request)->path;
 
   # 3.2: "The value for these path parameters MUST NOT contain any unescaped “generic syntax”
   # characters described by [RFC3986]: forward slashes (/), question marks (?), or hashes (#)."
@@ -324,7 +356,7 @@ sub find_path ($self, $request, $options) {
       and not is_equal([ map $_.'', $options->{path_captures}->@{@capture_names} ], \@capture_values);
 
   my %path_captures; @path_captures{@capture_names} = @capture_values;
-  $options->@{qw(path_template path_captures)} = ($path_template, \%path_captures);
+  $options->@{qw(path_template path_captures method)} = ($path_template, \%path_captures, $method);
   return 1;
 }
 
@@ -340,7 +372,7 @@ sub _validate_path_parameter ($self, $state, $param_obj, $path_captures) {
 
 sub _validate_query_parameter ($self, $state, $param_obj, $uri) {
   # parse the query parameters out of uri
-  my $query_params = { $uri->query_form };
+  my $query_params = { _query_pairs($uri) };
 
   # TODO: support different styles.
   # for now, we only support style=form and do not allow for multiple values per
@@ -354,8 +386,8 @@ sub _validate_query_parameter ($self, $state, $param_obj, $uri) {
   }
 
   # TODO: check 'allowReserved': if true, do not use percent-decoding
-    return E({ %$state, keyword => 'allowReserved' }, 'allowReserved: true is not yet supported')
-      if $param_obj->{allowReserved} // 0;
+  return E({ %$state, keyword => 'allowReserved' }, 'allowReserved: true is not yet supported')
+    if $param_obj->{allowReserved} // 0;
 
   $self->_validate_parameter_content($state, $param_obj, \ $query_params->{$param_obj->{name}});
 }
@@ -413,7 +445,7 @@ sub _validate_parameter_content ($self, $state, $param_obj, $content_ref) {
 }
 
 sub _validate_body_content ($self, $state, $content_obj, $message) {
-  my $content_type = fc $message->content_type;
+  my $content_type = _content_type($message);
 
   return E({ %$state, data_path => $state->{data_path} =~ s{body}{header/Content-Type}r, keyword => 'content' },
       'missing header: Content-Type')
@@ -440,14 +472,13 @@ sub _validate_body_content ($self, $state, $content_obj, $message) {
       if $content_type =~ m{^multipart/} or $content_type eq 'application/x-www-form-urlencoded';
   }
 
-  # undoes the Content-Encoding header
-  my $decoded_content_ref = $message->decoded_content(ref => 1);
+  # TODO: handle Content-Encoding header; https://github.com/OAI/OpenAPI-Specification/issues/2868
+  my $content_ref = _content_ref($message);
 
   # decode the charset
-  if (my $charset = $message->content_charset) {
+  if (my $charset = _content_charset($message)) {
     try {
-      $decoded_content_ref =
-        \ Encode::decode($charset, $decoded_content_ref->$*, Encode::FB_CROAK | Encode::LEAVE_SRC);
+      $content_ref = \ Encode::decode($charset, $content_ref->$*, Encode::FB_CROAK | Encode::LEAVE_SRC);
     }
     catch ($e) {
       return E({ %$state, keyword => 'content', _schema_path_suffix => $media_type },
@@ -469,7 +500,7 @@ sub _validate_body_content ($self, $state, $content_obj, $message) {
   }
 
   try {
-    $decoded_content_ref = $media_type_decoder->($decoded_content_ref);
+    $content_ref = $media_type_decoder->($content_ref);
   }
   catch ($e) {
     return E({ %$state, keyword => 'content', _schema_path_suffix => $media_type },
@@ -479,7 +510,7 @@ sub _validate_body_content ($self, $state, $content_obj, $message) {
   return 1 if not defined $schema;
 
   $state = { %$state, schema_path => jsonp($state->{schema_path}, 'content', $media_type, 'schema') };
-  $self->_evaluate_subschema($decoded_content_ref->$*, $schema, $state);
+  $self->_evaluate_subschema($content_ref->$*, $schema, $state);
 }
 
 # wrap a result object around the errors
@@ -539,6 +570,58 @@ sub _evaluate_subschema ($self, $data, $schema, $state) {
   return !!$result;
 }
 
+# returned object supports ->path
+sub _request_uri ($request) {
+    $request->isa('HTTP::Request') ? $request->uri
+  : $request->isa('Mojo::Message::Request') ? $request->url
+  : croak 'unknown type '.ref($request);
+}
+
+# returns a list of key-value pairs (beware of treating as a hash!)
+sub _query_pairs ($uri) {
+    $uri->isa('URI') ? $uri->query_form
+  : $uri->isa('Mojo::URL') ? $uri->query->pairs->@*
+  : croak 'unknown type '.ref($uri);
+}
+
+# note: this assumes that the header values were already normalized on creation,
+# as sanitizing on read is bypassed
+sub _header ($message, $header_name) {
+    $message->isa('HTTP::Message') ? $message->headers->header($header_name)
+  : $message->isa('Mojo::Message') ? $message->content->headers->header($header_name) // ()
+  : croak 'unknown type '.ref($message);
+}
+
+# normalized, with extensions stripped
+sub _content_type ($message) {
+    $message->isa('HTTP::Message') ? fc $message->headers->content_type
+  : $message->isa('Mojo::Message') ? fc((split(/;/, $message->headers->content_type//'', 2))[0] // '')
+  : croak 'unknown type '.ref($message);
+}
+
+sub _content_charset ($message) {
+    $message->isa('HTTP::Message') ? $message->headers->content_type_charset
+  : $message->isa('Mojo::Message') ? $message->content->charset
+  : croak 'unknown type '.ref($message);
+}
+
+sub _body_size ($message) {
+    $message->isa('HTTP::Message') ? $message->headers->content_length // length $message->content_ref->$*
+  : $message->isa('Mojo::Message') ? $message->headers->content_length // $message->body_size
+  : croak 'unknown type '.ref($message);
+}
+
+sub _content_ref ($message) {
+    $message->isa('HTTP::Message') ? $message->content_ref
+  : $message->isa('Mojo::Message') ? \$message->body
+  : croak 'unknown type '.ref($message);
+}
+
+# wrappers that aren't needed (yet), because they are the same across all supported classes:
+# $request->method
+# $response->code
+# $uri->path
+
 1;
 
 __END__
@@ -553,7 +636,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI docume
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 
@@ -608,28 +691,56 @@ version 0.019
                       const: ok
   YAML
 
-  say 'request:';
   use HTTP::Request::Common;
+  use Mojo::Message::Response;
+  say 'request:';
   my $request = POST 'http://example.com/foo/bar',
-    [ 'My-Request-Header' => '123', 'Content-Type' => 'application/json' ],
-    '{"hello": 123}';
-  say $openapi->validate_request($request);
+    'My-Request-Header' => '123', 'Content-Type' => 'application/json',
+    Content => '{"hello": 123}';
+  my $results = $openapi->validate_request($request);
+  say $results;
+  say ''; # newline
+  say JSON::MaybeXS->new(convert_blessed => 1, canonical => 1, pretty => 1, indent_length => 2)->encode($results);
 
   say 'response:';
-  my $response = HTTP::Response->new(
-    200 => 'OK',
-    [ 'My-Response-Header' => '123' ],
-    '{"status": "ok"}',
-  );
-  say $openapi->validate_response($response);
+  my $response = Mojo::Message::Response->new(code => 200, message => 'OK');
+  $response->headers->header('Content-Type', 'application/json');
+  $response->headers->header('My-Response-Header', '123');
+  $response->body('{"status": "ok"}');
+  say $results;
+  say ''; # newline
+  say JSON::MaybeXS->new(convert_blessed => 1, canonical => 1, pretty => 1, indent_length => 2)->encode($results);
 
 prints:
 
   request:
-  '/request/body/hello': wrong type (expected string)
-  '/request/body': not all properties are valid
+  at '/request/body/hello': got integer, not string
+  at '/request/body': not all properties are valid
+
+  {
+    "errors" : [
+      {
+        "absoluteKeywordLocation" : "openapi.yaml#/paths/~1foo~1%7Bfoo_id%7D/post/requestBody/content/application~1json/schema/properties/hello/type",
+        "error" : "got integer, not string",
+        "instanceLocation" : "/request/body/hello",
+        "keywordLocation" : "/paths/~1foo~1{foo_id}/post/requestBody/content/application~1json/schema/properties/hello/type"
+      },
+      {
+        "absoluteKeywordLocation" : "openapi.yaml#/paths/~1foo~1%7Bfoo_id%7D/post/requestBody/content/application~1json/schema/properties",
+        "error" : "not all properties are valid",
+        "instanceLocation" : "/request/body",
+        "keywordLocation" : "/paths/~1foo~1{foo_id}/post/requestBody/content/application~1json/schema/properties"
+      }
+    ],
+    "valid" : false
+  }
+
   response:
   valid
+
+  {
+    "valid" : true
+  }
 
 =head1 DESCRIPTION
 
@@ -694,10 +805,12 @@ The L<JSON::Schema::Modern> object to use for all URI resolution and JSON Schema
       path_template => '/foo/{arg1}/bar/{arg2}',
       operation_id => 'my_operation_id',
       path_captures => { arg1 => 1, arg2 => 2 },
+      method => 'get',
     },
   );
 
-Validates an L<HTTP::Request> object against the corresponding OpenAPI v3.1 document, returning a
+Validates an L<HTTP::Request> or L<Mojo::Message::Request>
+object against the corresponding OpenAPI v3.1 document, returning a
 L<JSON::Schema::Modern::Result> object.
 
 The second argument is a hashref that contains extra information about the request, corresponding to
@@ -710,16 +823,28 @@ pass it to a later L</validate_response> to improve performance.
     $response,
     {
       path_template => '/foo/{arg1}/bar/{arg2}',
+      request => $request,
     },
   );
 
-The second argument is a hashref that contains extra information about the request, as in L</find_path>.
+Validates an L<HTTP::Response> or L<Mojo::Message::Response>
+object against the corresponding OpenAPI v3.1 document, returning a
+L<JSON::Schema::Modern::Result> object.
+
+The second argument is a hashref that contains extra information about the request corresponding to
+the response, as in L</find_path>.
+
+C<request> is also accepted as a key in the hashref, representing the original request object that
+corresponds to this response.
 
 =head2 find_path
 
   $result = $self->find_path($request, $options);
 
-Uses information in the request to determine the relevant parts of the OpenAPI specification
+Uses information in the request to determine the relevant parts of the OpenAPI specification.
+C<$request> should be provided if available, but data in the second argument can be used instead
+(which is populated by earlier L</validate_request> or L</find_path> calls to the same request).
+
 The second argument is a hashref that contains extra information about the request. Possible values include:
 
 =over 4
@@ -736,13 +861,19 @@ C<operation_id>: a string corresponding to the C<operationId> at a particular pa
 
 C<path_captures>: a hashref mapping placeholders in the path to their actual values in the request URI
 
+=item *
+
+C<method>: the HTTP method used by the request (used case-insensitively)
+
 =back
 
-All of these values are optional, and will be derived from the request URI as needed (albeit less
+All of these values are optional (unless C<$request> is omitted), and will be derived from the request URI
+as needed (albeit less
 efficiently than if they were provided). All passed-in values MUST be consistent with each other and
 the request URI.
 
-When successful, the options hash will be populated with keys C<path_template> and C<path_captures>
+When successful, the options hash will be populated with keys C<path_template>, C<path_captures>
+and C<method>,
 and the return value is true.
 When not successful, the options hash will be populated with key C<errors>, an arrayref containing
 a L<JSON::Schema::Modern::Error> object, and the return value is false.

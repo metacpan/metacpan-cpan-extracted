@@ -8,7 +8,7 @@ use overload
     '""'     => sub { shift->{_value} },
     fallback => 1;
 
-our $VERSION = '1.1.0';
+our $VERSION = '1.1.1';
 
 
 require XS::Loader;
@@ -36,7 +36,7 @@ sub new {
 
 sub default_decorator {
     my $args = shift;
-    my $r = join(', ', map { defined($_) ? "$_" : 'undef' } @$args);
+    my $r = join(', ', map { defined($_) ? overload::StrVal($_) : 'undef' } @$args);
     return "($r)";
 }
 

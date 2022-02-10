@@ -6,7 +6,7 @@ use IPC::Run 'run';
 
 plan tests => 2;
 
-my @cmd = ($^X, -CA => qw(bin/hi -t 80 test1 bold-blue));
+my @cmd = ($^X => qw(t/hi -t 80 test1 bold-blue));
 
 my $in = "test: " . ("test1 test2" x 25) . "\n";
 run \@cmd, \$in, \&check_ok, sub { die "@_" };

@@ -3,8 +3,8 @@ NAME
     command-line (CLI interface for cekbpom.pom.go.id)
 
 VERSION
-    This document describes version 0.016 of App::CekBpom (from Perl
-    distribution App-CekBpom), released on 2021-12-09.
+    This document describes version 0.017 of App::CekBpom (from Perl
+    distribution App-CekBpom), released on 2022-01-23.
 
 DESCRIPTION
     See included script cek-bpom-products and cek-bpom-manufacturers.
@@ -156,7 +156,7 @@ CONTRIBUTING
     me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020 by perlancar
+    This software is copyright (c) 2022, 2020 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

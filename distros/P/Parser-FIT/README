@@ -1,0 +1,41 @@
+Parser-FIT
+
+A perl parser for the garmin Flexible and Interoperable Data Transfer (FIT) protocol.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Parser::FIT
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Parser-FIT
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Parser-FIT
+
+    Search CPAN
+        https://metacpan.org/release/Parser-FIT
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2022 by Sven Eppler.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

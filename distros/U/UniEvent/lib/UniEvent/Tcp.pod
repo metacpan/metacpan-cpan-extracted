@@ -197,23 +197,6 @@ in multi-process setups.
 L<May return error|UniEvent/"OPTIONAL ERRORS">
 
 
-=head2 sockaddr()
-
-Returns address (as L<Net::SockAddr> object) of the B<local> endpoint.
-
-If socket is not connected, undef is returned.
-
-L<May return error|UniEvent/"OPTIONAL ERRORS">
-
-
-=head2 peeraddr()
-
-Returns address (as L<Net::SockAddr> object) of the B<remote> (peer) endpoint.
-
-If socket is not connected, undef is returned.
-
-L<May return error|UniEvent/"OPTIONAL ERRORS">
-
 
 =head2 dump()
 

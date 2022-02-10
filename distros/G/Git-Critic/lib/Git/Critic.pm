@@ -14,7 +14,7 @@ use List::Util qw(uniq);
 use Moo;
 use Types::Standard qw( ArrayRef Bool Int Str);
 
-our $VERSION = '0.4';
+our $VERSION = '0.5';
 
 #
 # Moo attributes
@@ -43,6 +43,12 @@ has severity => (
     is      => 'ro',
     isa     => Int | Str,
     default => 5,
+);
+
+has profile => (
+    is      => 'ro',
+    isa     => Str,
+    default => '',
 );
 
 has verbose => (
@@ -133,7 +139,7 @@ sub _get_modified_perl_files {
     my $current_target = $self->current_target;
     my @files          = uniq sort grep { /\S/ && $self->_is_perl($_) }
       split /\n/ => $self->_run( 'git', 'diff', '--name-only',
-        "$primary_target..$current_target" );
+        "$primary_target...$current_target" );
     return @files;
 }
 
@@ -144,7 +150,7 @@ sub _get_diff {
     my $current_target = $self->current_target;
     my @diff =
       split /\n/ =>
-      $self->_run( 'git', 'diff', "$primary_target..$current_target", $file );
+      $self->_run( 'git', 'diff', "$primary_target...$current_target", $file );
     return @diff;
 }
 
@@ -178,9 +184,10 @@ sub run {
     # figure out the start and end of every change you've made. Any perlcritic
     # failures which are *not* on those lines are ignored
     my @files = $self->_get_modified_perl_files;
-    my %reported;
     my @failures;
   FILE: foreach my $file (@files) {
+        my %reported;
+
         my $file_text = $self->_run( 'git', 'show', "${current_target}:$file" )
           or next FILE;
         if ( $self->max_file_size ) {
@@ -194,9 +201,12 @@ sub run {
         print $fh $file_text;
         close $fh;
         my $severity = $self->severity;
+        my $profile = $self->profile;
+        my @arguments = ("--severity=$severity");
+        push @arguments, "--profile=$profile" if $profile;
+        push @arguments, $filename;
         my $critique =
-          $self->_run_without_die( 'perlcritic', "--severity=$severity",
-            $filename );
+          $self->_run_without_die( 'perlcritic', @arguments );
         next FILE unless $critique; # should never happen unless perlcritic dies
         my @critiques = split /\n/, $critique;
 
@@ -272,7 +282,7 @@ Git::Critic - Only run Perl::Critic on lines changed in the current branch
 
 =head1 VERSION
 
-version 0.4
+version 0.5
 
 =head1 SYNOPSIS
 
@@ -331,6 +341,12 @@ default severity level is "gentle" (5).
     -severity => 'harsh'                      -severity => 3
     -severity => 'cruel'                      -severity => 2
     -severity => 'brutal'                     -severity => 1
+
+=head2 C<profile>
+
+Optional.
+
+This is a filepath to a C<Perl::Critic> configuration file.
 
 =head2 C<verbose>
 

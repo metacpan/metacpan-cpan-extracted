@@ -5,7 +5,7 @@ use warnings;
 
 use Template;
 use String::Tagged::HTML;
-use File::Slurp qw( slurp );
+use File::Slurp::Tiny qw( read_file read_lines );
 use Getopt::Long;
 
 my $FILE_EXTENSION = "html";
@@ -25,7 +25,6 @@ GetOptions(
 ) or exit(1);
 
 defined $LINK_EXTENSION or $LINK_EXTENSION = $FILE_EXTENSION;
-defined $PAGE_TEMPLATE  or $PAGE_TEMPLATE = \*DATA;
 
 package ManToHTMLParser;
 use base qw( Parse::Man::DOM );
@@ -105,7 +104,8 @@ sub make_link
 my $parser = ManToHTMLParser->new;
 my $template = Template->new( { DEBUG => 1 } );
 
-my $pagefile = slurp $PAGE_TEMPLATE;
+my $pagefile = defined $PAGE_TEMPLATE ? read_file $PAGE_TEMPLATE
+                                      : do { local $/; <DATA> };
 
 foreach my $manfile ( @ARGV ) {
    my $dom = $parser->from_file( $manfile );
@@ -115,7 +115,7 @@ foreach my $manfile ( @ARGV ) {
 }
 
 if( $ALSO_LIST ) {
-   foreach ( slurp $ALSO_LIST ) {
+   foreach ( read_lines $ALSO_LIST ) {
       chomp;
       m/^(\S+)\s*=\s*(\S+)/ or next;
       exists $doms_by_namesection{$2} or die "Cannot 'also' from $2 - don't have it\n";
@@ -185,9 +185,18 @@ __DATA__
     </dl>
 [% END -%]
 [% BLOCK indent -%]
+[%   IF para.marker == "*" -%]
+   <ul>
+      <li>[% para.body.as_html %]</li>
+   </ul>
+[%   ELSE -%]
     <dl>
       <dd>[% para.body.as_html %]</dd>
     </dl>
+[%   END -%]
+[% END -%]
+[% BLOCK example -%]
+    <pre>[% para.body.as_html %]</pre>
 [% END -%]
 <html>
   <head>
@@ -203,8 +212,10 @@ __DATA__
          INCLUDE plain para=para;
        CASE "term";
          INCLUDE term para=para;
-       CASE "indent"; 
+       CASE "indent";
          INCLUDE indent para=para;
+       CASE "example";
+         INCLUDE example para=para;
      END;
    END -%]
   </body>

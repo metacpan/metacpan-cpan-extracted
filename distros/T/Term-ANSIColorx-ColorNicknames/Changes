@@ -1,3 +1,13 @@
+2.7193: Tue Feb 08 2022
+   - add --file parameter to 'hi' (via zhmylove, thanks)
+   - ↑ it took like 13 months to notice this contribution, so thanks again
+
+2.7191_2: Sun Mar 29 2015
+   - perl v5.10 required for _ prototype
+   - the tests require ExtUtils::MakeMaker 6.64, fixed
+
+2.7191_1: Thu Mar 26 2015
+   - some of my tests are failing and one of them is a total mystery
 
 2.7191: Wed Mar 25 2015
    - resolve these vile -CA bugs

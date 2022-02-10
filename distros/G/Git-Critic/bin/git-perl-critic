@@ -16,6 +16,7 @@ GetOptions(
     "against=s",          # branch you're critiquing against
     "critique=s",         # non-primary branch to critique
     "severity=s",         # Perl::Critic severity (default: 5, gentle)
+    "profile=s",          # Perl::Critic profile filepath
     "max_file_size=i",    # maximum file size of Perl modules to parse
     "help|?",             # show brief help
     "man",                # show full help
@@ -48,12 +49,13 @@ my $primary = shift @ARGV;
 
 # munge options
 $opt_for{severity} ||= 5;
+$opt_for{profile}  ||= '';
 $opt_for{verbose}  ||= 0;
 
 pod2usage( -verbose => 1 ) if ( $opt_for{help} );
 pod2usage( -verbose => 2 ) if ( $opt_for{man} );
 
-our $VERSION = '0.4';
+our $VERSION = '0.5';
 use Git::Critic;
 my $critic = Git::Critic->new(
     primary_target => $primary,
@@ -78,7 +80,7 @@ git-perl-critic - Command-line interface for Perl Git::Critic module
 
 =head1 VERSION
 
-version 0.4
+version 0.5
 
 =head1 SYNOPSIS
 
@@ -185,6 +187,7 @@ Options:
     --critique,-c    Str             Git branch to critique (default is current branch)
     --severity,s     Str|Int         Perl::Critic severity level
     --max_file_size  Bytes           Maximum file size in bytes to check
+    --profile        Filename        Optional Perl::Critic configuration file
 
 Debugging options:
 

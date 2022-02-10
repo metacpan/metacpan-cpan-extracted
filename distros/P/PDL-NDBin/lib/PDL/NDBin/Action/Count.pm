@@ -1,6 +1,6 @@
 package PDL::NDBin::Action::Count;
 # ABSTRACT: Action for PDL::NDBin that counts elements
-$PDL::NDBin::Action::Count::VERSION = '0.024';
+$PDL::NDBin::Action::Count::VERSION = '0.025';
 
 use strict;
 use warnings;
@@ -57,7 +57,7 @@ PDL::NDBin::Action::Count - Action for PDL::NDBin that counts elements
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 DESCRIPTION
 

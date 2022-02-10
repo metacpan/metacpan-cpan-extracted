@@ -202,41 +202,7 @@ sub piddle_of_patterns_for {
 	return $to_return;
 }
 
-=head2 piddle_of_handles_for
-
-THIS FUNCTION IS DEPRECATED AND NOW DIES IF YOU TRY TO USE IT. Performing
-the same PDL drawing operation on different widgets via PDL threading
-makes atomic behavior very difficult, so this functionality has been removed.
-If you think you'd like this behavior back, please let me know.
-
-=cut
-
-sub piddle_of_handles_for {
-	croak("piddle_of_handles_for has been deprecated");
-}
-
 ModuleMaterial
-
-=begin old_code
-
-This used to be useful.
-
-pp_addxs('', q{
-void
-_piddle_of_handles_for(SV * piddle_SV, ...)
-	CODE:
-		int i;
-		/* Get at the piddle's actual data array */
-		long long * piddle = (long long*)SvPVX(piddle_SV);
-		/* Fill the array with the handle values */
-		for (i = 1; i < items; i++) {
-			piddle[i-1] = (long long) gimme_the_mate(ST(i));
-		}
-});
-
-=end old_code
-
-=cut
 
 #=head2 piddle_of_fillPatterns_for
 #
@@ -269,13 +235,13 @@ in PP.pm, but that appears to be the output behavior.
 
 =cut
 
-pp_add_boot pp_line_numbers(__LINE__, q{
+pp_add_boot q{
 	PRIMA_VERSION_BOOTCHECK;
 	/* Initialize the Drawable virtual method table pointer, which is declared
 	 * below and used to detect if the widget supports direct calls using the
 	 * apricot graphics drawing functions. */
 	CDrawable = (PDrawable_vmt)gimme_the_vmt( "Prima::Drawable");
-});
+};
 
 pp_addhdr(pp_line_numbers(__LINE__ + 1, <<'HEADER'));
 
@@ -1344,8 +1310,8 @@ $cleanup_code_for{translates} = pp_line_numbers(__LINE__, q{
 });
 
 # Fill winding works nicely without any alteration:
-$pars_args_for{fillWindings} = 'byte fillWindings()';
-$declare_args_for{fillWindings} = 'char orig_fillWinding, curr_fillWinding';
+$pars_args_for{fillModes} = 'byte fillModes()';
+$declare_args_for{fillModes} = 'char orig_fillMode, curr_fillMode';
 
 # Fill pattern requires that we pack the pattern into an 8-element Perl array.
 $pars_args_for{fillPatterns} = 'byte fillPatterns(oct=8)';
@@ -2262,7 +2228,7 @@ $doc_string = <<'DOC_STRING';
 Draws and fills a polygon with (mostly) arbitrary edge vertices.
 
 Applicable properties include colors, backColors, clipRects,
-fillPatterns, fillWindings, rops, rop2s, and translates.
+fillPatterns, fillModes, rops, rop2s, and translates.
 
 NOTE: there is B<no> underscore between C<fill> and C<poly>, which is
 different from the other C<fill> methods!
@@ -2299,7 +2265,7 @@ For example:
  
  # Draw it in such a way that it fits the canvas nicely
  $canvas->pdl_fillpolys($x * $width / $x->max,
-     ($y + 1) * $height / 2, fillWindings => 1
+     ($y + 1) * $height / 2, fillModes => fm::Winding,
  );
 
 Resizing the window will result in a similar rendering that fits the aspect
@@ -3236,7 +3202,7 @@ $doc_string = <<'DOC_STRING';
 Draws a wide variety of symbols centered at (x, y).
 
 Applicable properties include colors, backColors, clipRects, fillPatterns,
-fillWindings, lineEnds, linePatterns, lineWidths, rops, rop2s, and translates.
+fillModes, lineEnds, linePatterns, lineWidths, rops, rop2s, and translates.
 
 Through various combinations of C<N_points>, C<filled>, and C<skip>, you can
 generate many different regular symbols, including dashes, stars, asterisks,
@@ -3358,9 +3324,9 @@ a filled shape instead of a line drawing.
 
 By default, filled stars and other symbols with odd numbers of points have a
 hole in their middle. However, Prima provides a means for indicating that you
-want such shapes filled; that is the C<fillWinding> property. As with almost all
-graphical properties, you can specify the C<fillWinding> property for each
-symbol by specifying the C<fillWindings> piddle.
+want such shapes filled; that is the C<fillMode> property. As with almost all
+graphical properties, you can specify the C<fillMode> property for each
+symbol by specifying the C<fillMode> piddle to one of C<fm::> constants.
 
 This example creates a table of shapes. It uses an argument from the command
 line to determine the line width.

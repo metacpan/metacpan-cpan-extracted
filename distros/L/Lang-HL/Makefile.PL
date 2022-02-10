@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME              => 'Lang::HL',
     VERSION_FROM      => 'lib/Lang/HL.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
-    PREREQ_PM         => {'Regexp::Grammars' => 0, 'Lang::HL::Export' => 0, 'Data::Printer' => 0}, # e.g., Module::Name => 1.1
+    PREREQ_PM         => {'Perl::Tidy' => 0, 'Regexp::Grammars' => 0, 'Lang::HL::Export' => 0, 'Data::Printer' => 0}, # e.g., Module::Name => 1.1
     ABSTRACT_FROM     => 'lib/Lang/HL.pm', # retrieve abstract from module
     AUTHOR            => 'Rajkumar Reddy',
     EXE_FILES         => ['script/hlc', 'script/hlp'],

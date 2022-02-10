@@ -42,7 +42,7 @@ has 'debug' => (
     default => 0,
 );
 
-our $VERSION = '0.112';
+our $VERSION = '0.113';
 
 sub shout {
     my ($self, $error) = @_;
@@ -325,6 +325,7 @@ sub body_text_like {
 
 sub value_is {
     my ($self, $locator, $value, $description) = @_;
+    $description //= '';
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     is(eval { $self->get_value($locator) }, $value, "value_is($locator, $value, $description)")

@@ -1,0 +1,4 @@
+MODULE = UniEvent::WebSocket                PACKAGE = UniEvent::WebSocket::XSConnectionIterator
+PROTOTYPES: DISABLE
+
+Scalar XSConnectionIterator::next ()

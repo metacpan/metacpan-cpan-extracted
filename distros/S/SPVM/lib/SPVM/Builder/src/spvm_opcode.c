@@ -177,8 +177,12 @@ const char* const* SPVM_OPCODE_C_ID_NAMES(void) {
     "DIVIDE_LONG",
     "DIVIDE_FLOAT",
     "DIVIDE_DOUBLE",
+    "DIVIDE_UNSIGNED_INT",
+    "DIVIDE_UNSIGNED_LONG",
     "REMAINDER_INT",
     "REMAINDER_LONG",
+    "REMAINDER_UNSIGNED_INT",
+    "REMAINDER_UNSIGNED_LONG",
     "LEFT_SHIFT_INT",
     "LEFT_SHIFT_LONG",
     "RIGHT_ARITHMETIC_SHIFT_INT",
@@ -453,6 +457,7 @@ const char* const* SPVM_OPCODE_C_ID_NAMES(void) {
     "REFCNT",
     "REFOP",
     "DUMP",
+    "NEW_STRING_LEN",
   };
   
   return id_names;

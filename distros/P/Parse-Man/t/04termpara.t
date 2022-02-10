@@ -1,8 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-use strict;
+use v5.14;
+use warnings;
 
-use Test::More tests => 2;
+use Test::More;
 
 my @paras;
 
@@ -54,3 +55,5 @@ is_deeply( \@paras,
    [ "Term: Definition here",
      "Another: defined term" ],
    '.TD * 2' );
+
+done_testing;

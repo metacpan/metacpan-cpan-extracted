@@ -1,4 +1,8 @@
-1.0.6  xx.xx.2021
+1.1.0  xx.xx.2022
+           - using write instead of fwrite, logging is atomic now
+           - autoflush removed from config, no bufferization
+           - buffered IO as option
+1.0.6  26.11.2021
            - upgrade tests for catch-v3
 1.0.5  13.07.2021
            - internal stuff

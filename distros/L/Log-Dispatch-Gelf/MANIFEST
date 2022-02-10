@@ -10,5 +10,6 @@ t/00_compile.t
 t/01_log_format.t
 t/02_socket.t
 t/03_chunked.t
+t/05_short_message_sub.t
 META.yml
 MANIFEST

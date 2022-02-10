@@ -1,5 +1,8 @@
 Revision history for Test2-Aggregate
 
+0.17    2022-02-10
+        Ignore empty lines in list files.
+
 0.16    2021-08-26
         Replaced File::Slurp with Path::Tiny (adding 'slurp_param' option).
 

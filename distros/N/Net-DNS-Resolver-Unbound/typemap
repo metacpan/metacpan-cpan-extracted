@@ -3,6 +3,8 @@
 TYPEMAP
 Net::DNS::Resolver::Unbound::Context	T_PTROBJ
 Net::DNS::Resolver::Unbound::Handle	T_PTROBJ
+Net::DNS::Resolver::Unbound::Result	T_PTROBJ
+struct av*		T_PTRREF
 struct ub_ctx*		T_PTRREF
 struct ub_result*	T_PTRREF
 #

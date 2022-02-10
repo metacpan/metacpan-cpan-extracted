@@ -6,7 +6,7 @@
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-08-14'; # DATE
 our $DIST = 'App-GitHubUtils'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -41,7 +41,7 @@ git-clone-from-github - git clone, with some conveniences
 
 =head1 VERSION
 
-This document describes version 0.008 of git-clone-from-github (from Perl distribution App-GitHubUtils), released on 2021-08-14.
+This document describes version 0.009 of git-clone-from-github (from Perl distribution App-GitHubUtils), released on 2021-08-14.
 
 =head1 SYNOPSIS
 

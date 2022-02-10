@@ -1,16 +1,16 @@
 package App::CSVUtils;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-10'; # DATE
-our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.034'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
 
 use Hash::Subset qw(hash_subset);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-02-10'; # DATE
+our $DIST = 'App-CSVUtils'; # DIST
+our $VERSION = '0.036'; # VERSION
 
 our %SPEC;
 
@@ -20,7 +20,7 @@ sub _compile {
     defined($str) && length($str) or die "Please specify code (-e)\n";
     $str = "package main; no strict; no warnings; sub { $str }";
     log_trace "Compiling Perl code: $str";
-    my $code = eval $str;
+    my $code = eval $str; ## no critic: BuiltinFunctions::ProhibitStringyEval
     die "Can't compile code (-e) '$str': $@\n" if $@;
     $code;
 }
@@ -88,7 +88,7 @@ sub _complete_field_or_field_list {
     my $r = $args{r};
 
     # we are not called from cmdline, bail
-    return undef unless $cmdline;
+    return undef unless $cmdline; ## no critic: Subroutines::ProhibitExplicitReturnUndef
 
     # let's parse argv first
     my $args;
@@ -104,10 +104,10 @@ sub _complete_field_or_field_list {
     }
 
     # user hasn't specified -f, bail
-    return undef unless defined $args && $args->{filename};
+    return undef unless defined $args && $args->{filename}; ## no critic: Subroutines::ProhibitExplicitReturnUndef
 
     # user wants to read CSV from stdin, bail
-    return undef if $args->{filename} eq '-';
+    return undef if $args->{filename} eq '-'; ## no critic: Subroutines::ProhibitExplicitReturnUndef
 
     # can the file be opened?
     my $csv_parser = _instantiate_parser(\%args);
@@ -565,6 +565,7 @@ $SPEC{csvutil} = {
                 #'setop', # not implemented in csvutil
                 #'lookup-fields', # not implemented in csvutil
                 'transpose',
+                'freqtable',
             ]],
             req => 1,
             pos => 0,
@@ -611,6 +612,7 @@ sub csvutil {
     my @summary_row;
     my $selected_row;
     my $row_spec_sub;
+    my %freqtable; # key=value, val=frequency
 
     # for action=split
     my ($split_fh, $split_filename, $split_lines);
@@ -681,7 +683,7 @@ sub csvutil {
                         return [400, "Invalid row specification '$spec_item'"];
                     }
                 }
-                $row_spec_sub = eval 'sub { my $i = shift; '.join(" || ", @codestr).' }';
+                $row_spec_sub = eval 'sub { my $i = shift; '.join(" || ", @codestr).' }'; ## no critic: BuiltinFunctions::ProhibitStringyEval
                 return [400, "BUG: Invalid row_spec code: $@"] if $@;
             }
             if ($action eq 'grep') {
@@ -843,6 +845,12 @@ sub csvutil {
                 $res .= _get_csv_row($csv_emitter, $row, $i, $outputs_header)
                     if $args{_with_data_rows};
             }
+        } elsif ($action eq 'freqtable') {
+            if ($i == 1) {
+            } else {
+                $field_idx = _get_field_idx($args{field}, \%field_idxs);
+                $freqtable{ $row->[$field_idx] }++;
+            }
         } elsif ($action eq 'select-row') {
             if ($i == 1 || $row_spec_sub->($i)) {
                 $res .= _get_csv_row($csv_emitter, $row, $i, $outputs_header);
@@ -963,6 +971,14 @@ sub csvutil {
         $res .= _get_csv_row($csv_emitter, \@summary_row,
                              $args{_with_data_rows} ? $i+1 : 2,
                              $outputs_header);
+    }
+
+    if ($action eq 'freqtable') {
+        my @freqtable;
+        for (sort { $freqtable{$b} <=> $freqtable{$a} } keys %freqtable) {
+            push @freqtable, [$_, $freqtable{$_}];
+        }
+        return [200, "OK", \@freqtable, {'table.fields'=>['value','freq']}];
     }
 
     if ($action eq 'dump') {
@@ -1455,6 +1471,21 @@ sub csv_avg {
     my %args = @_;
 
     csvutil(%args, action=>'avg', _with_data_rows=>$args{with_data_rows});
+}
+
+$SPEC{csv_freqtable} = {
+    v => 1.1,
+    summary => 'Output a frequency table of values of a specified field in CSV',
+    args => {
+        %args_common,
+        %arg_filename_0,
+        %arg_field_1,
+    },
+};
+sub csv_freqtable {
+    my %args = @_;
+
+    csvutil(%args, action=>'freqtable');
 }
 
 $SPEC{csv_select_row} = {
@@ -2448,7 +2479,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 0.034 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2021-07-10.
+This document describes version 0.036 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2022-02-10.
 
 =head1 DESCRIPTION
 
@@ -2471,6 +2502,8 @@ This distribution contains the following CLI utilities:
 =item * L<csv-dump>
 
 =item * L<csv-each-row>
+
+=item * L<csv-freqtable>
 
 =item * L<csv-grep>
 
@@ -3449,6 +3482,81 @@ Use C<-> to read from stdin.
 =item * B<hash> => I<bool>
 
 Provide row in $_ as hashref instead of arrayref.
+
+=item * B<header> => I<bool> (default: 1)
+
+Whether input CSV has a header row.
+
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
+
+=item * B<quote_char> => I<str>
+
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
+=item * B<sep_char> => I<str>
+
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
+
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 csv_freqtable
+
+Usage:
+
+ csv_freqtable(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Output a frequency table of values of a specified field in CSV.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
+=item * B<field>* => I<str>
+
+Field name.
+
+=item * B<filename>* => I<filename>
+
+Input CSV file.
+
+Use C<-> to read from stdin.
 
 =item * B<header> => I<bool> (default: 1)
 
@@ -5512,14 +5620,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-CSVUti
 
 Source repository is at L<https://github.com/perlancar/perl-App-CSVUtils>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSVUtils>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<App::TSVUtils>
@@ -5532,11 +5632,36 @@ L<App::SerializeUtils>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSVUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

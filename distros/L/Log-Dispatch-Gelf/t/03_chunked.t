@@ -5,7 +5,7 @@ use Test::More;
 
 use Log::Dispatch;
 use Log::GELF::Util qw(dechunk decode_chunk uncompress);
-use JSON;
+use JSON::MaybeXS;
 use Test::Exception;
 use Mock::Quick;
 use IO::Uncompress::Gunzip qw(gunzip $GunzipError);
@@ -22,7 +22,7 @@ my $class_inet = qclass(
     },
     send => sub {
         my ($self, $encoded_chunk) = @_;
-        
+
         $MESSAGE = dechunk(
             \@ACCUMULATOR,
             decode_chunk($encoded_chunk)

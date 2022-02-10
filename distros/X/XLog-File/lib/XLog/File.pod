@@ -34,9 +34,10 @@ Frequency in milliseconds of checking log file. If file is deleted or moved, cre
 If file can not be created or written, an error message will be written on stderr and logger will be a stub (will do nothing when you log via XLog) until
 file can be written again.
 
-=item autoflush [=false]
+=item buffered [=false]
 
-If true will flush data to file after every log message. This is less efficient, but guarantees that all logs are written in case of application crash (like segfault). 
+If true will use buffered write. This is more efficient, but does not guarantees that all logs are written in case of application crash (like segfault). Unbuffered is less efficient but stable.
+Also buffered IO leads to trunkated lines in case of parrallel writes from different processes or threads.
 
 =back
 

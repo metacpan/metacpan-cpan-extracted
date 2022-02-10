@@ -29,26 +29,32 @@ static inline uint32_t rotate_shift (uint32_t x, unsigned shift) {
                          ((x << shift) | (x >> (sizeof(x)*8 - shift)));
 }
 
-void crypt_mask (const char* str, char* dst, size_t len, uint32_t mask, uint64_t bytes_received) {
+void crypt_mask (const char* _str, char* _dst, size_t len, uint32_t mask, uint64_t bytes_received) {
+    auto str = (const unsigned char*)_str;
+    auto dst = (unsigned char*)_dst;
     mask = rotate_shift(mask, bytes_received & 3);
     const uint64_t mask64 = ((uint64_t)mask << 32) | mask;
-    auto str64 = (const uint64_t*)str;
-    auto dst64 = (uint64_t*)dst;
-    auto end64 = str64 + (len / 8);
+    auto rem = len & 7;
+    auto end64 = str + (len - rem);
 
-    while (str64 != end64) *dst64++ = *str64++ ^ mask64;
-
-    auto cstr  = (const unsigned char*)str64;
-    auto cdst  = (unsigned char*)dst64;
+    while (str != end64) {
+        uint64_t tmp;
+        memcpy(&tmp, str, sizeof(tmp));
+        tmp ^= mask64;
+        memcpy(dst, &tmp, sizeof(tmp));
+        str += sizeof(tmp);
+        dst += sizeof(tmp);
+    }
+    
     auto cmask = (const unsigned char*)&mask64;
-    switch (len & 7) {
-        case 7: *cdst++ = *cstr++ ^ *cmask++; // fall through
-        case 6: *cdst++ = *cstr++ ^ *cmask++; // fall through
-        case 5: *cdst++ = *cstr++ ^ *cmask++; // fall through
-        case 4: *cdst++ = *cstr++ ^ *cmask++; // fall through
-        case 3: *cdst++ = *cstr++ ^ *cmask++; // fall through
-        case 2: *cdst++ = *cstr++ ^ *cmask++; // fall through
-        case 1: *cdst++ = *cstr++ ^ *cmask++;
+    switch (rem) {
+        case 7: *dst++ = *str++ ^ *cmask++; // fall through
+        case 6: *dst++ = *str++ ^ *cmask++; // fall through
+        case 5: *dst++ = *str++ ^ *cmask++; // fall through
+        case 4: *dst++ = *str++ ^ *cmask++; // fall through
+        case 3: *dst++ = *str++ ^ *cmask++; // fall through
+        case 2: *dst++ = *str++ ^ *cmask++; // fall through
+        case 1: *dst++ = *str++ ^ *cmask++;
     }
 }
 

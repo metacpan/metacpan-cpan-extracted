@@ -23,6 +23,9 @@ my @SWIPL_BIN_NAMES = (
 	( $^O !~ /darwin/ ? 'pl' : () ),
 );
 
+# Check for conflicting symbol PL_version.
+# See <https://github.com/salva/p5-Language-Prolog-Yaswi/issues/3>,
+# <https://github.com/SWI-Prolog/swipl-devel/issues/900>.
 my $test_program = <<EOF;
 /* checking for conflicting symbol */
 extern int PL_version;
@@ -37,12 +40,9 @@ EOF
 my $PLVARS;
 my $PL;
 my $PL_path;
-probe sub {
-	my $build = shift;
-	eval 'require Alien::SWIProlog::Util';
 
-	local $Data::Dumper::Terse = 1;
-	local $Data::Dumper::Sortkeys = 1;
+sub find_PL {
+	my $build = shift;
 
 	for $PL (@SWIPL_BIN_NAMES) {
 		$PL_path = File::Which::which($PL) or next;
@@ -50,6 +50,16 @@ probe sub {
 		$PLVARS = Alien::SWIProlog::Util::get_plvars($PL);
 		keys %$PLVARS and last;
 	};
+}
+
+probe sub {
+	my $build = shift;
+	eval 'require Alien::SWIProlog::Util';
+
+	local $Data::Dumper::Terse = 1;
+	local $Data::Dumper::Sortkeys = 1;
+
+	find_PL($build);
 
 	# when not found
 	return 'share' unless keys %$PLVARS;
@@ -105,6 +115,7 @@ sys {
 	gather sub {
 		my ($build) = @_;
 		eval 'require Alien::SWIProlog::Util';
+		find_PL($build);
 		my $prop = Alien::SWIProlog::Util::plvars_to_props($PL_path, $PLVARS);
 		$build->runtime_prop->{$_} = $prop->{$_} for keys %$prop;
 	};

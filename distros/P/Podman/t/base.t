@@ -1,27 +1,21 @@
 ## no critic
 use Test::More;
-use Test::Moose::More;
 
 my %classes = (
-    'Podman::System'     => [ 'DiskUsage', 'Version', 'Client' ],
-    'Podman::Images'     => [ 'List',      'Client' ],
-    'Podman::Containers' => [ 'List',      'Client' ],
+    'Podman::System' => [ 'disk_usage', 'info', 'prune', 'version', ],
+    'Podman::Images'     => [ 'list', 'prune', ],
+    'Podman::Containers' => [ 'list', 'prune', ],
     'Podman::Image'      =>
-      [ 'Build', 'Inspect', 'Pull', 'Remove', 'Client', 'Name' ],
+      [ 'build', 'inspect', 'pull', 'remove', 'name', ],
     'Podman::Container' => [
-        'Create', 'Delete', 'Inspect', 'Kill',
-        'Start',  'Stop',   'Client',  'Name',
+        'create', 'delete', 'inspect', 'kill',   'pause', 'restart',
+        'start',  'stop',   'unpause', 'name',
     ],
 );
 
-for my $class ( sort keys %classes ) {
-    use_ok($class);
-    is_class_ok($class);
-    is_immutable_ok($class);
-    check_sugar_ok($class);
-    for my $method ( @{ $classes{$class} } ) {
-        has_method_ok( $class, $method );
-    }
+for my $module ( sort keys %classes ) {
+    require_ok($module);
+    can_ok( $module, $_ ) for ( @{ $classes{$module} } );
 }
 
 done_testing();

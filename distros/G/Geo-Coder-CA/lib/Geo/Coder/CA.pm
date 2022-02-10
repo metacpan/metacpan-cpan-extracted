@@ -19,11 +19,11 @@ Geo::Coder::CA - Provides a Geo-Coding functionality using http:://geocoder.ca f
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 SYNOPSIS
 
@@ -50,7 +50,16 @@ Geo::Coder::CA provides an interface to geocoder.ca.  Geo::Coder::Canada no long
 sub new {
 	my($class, %param) = @_;
 
-	my $ua = delete $param{ua} || LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION");
+	if(!defined($class)) {
+		# Geo::Coder::CA::new() used rather than Geo::Coder::CA->new()
+		$class = __PACKAGE__;
+	}
+
+	my $ua = delete $param{ua};
+	if(!defined($ua)) {
+		$ua = LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION");
+		$ua->default_header(accept_encoding => 'gzip,deflate');
+	}
 	my $host = delete $param{host} || 'geocoder.ca';
 
 	return bless { ua => $ua, host => $host }, $class;
@@ -74,14 +83,18 @@ sub geocode {
 		%param = %{$_[0]};
 	} elsif(ref($_[0])) {
 		Carp::croak('Usage: geocode(location => $location)');
+		return;
 	} elsif(@_ % 2 == 0) {
 		%param = @_;
 	} else {
 		$param{location} = shift;
 	}
 
-	my $location = $param{location}
-		or Carp::croak('Usage: geocode(location => $location)');
+	my $location = $param{location};
+	if(!defined($location)) {
+		Carp::croak('Usage: geocode(location => $location)');
+		return;
+	}
 
 	if (Encode::is_utf8($location)) {
 		$location = Encode::encode_utf8($location);
@@ -99,9 +112,10 @@ sub geocode {
 		Carp::croak("$url API returned error: " . $res->status_line());
 		return;
 	}
+	# $res->content_type('text/plain');	# May be needed to decode correctly
 
 	my $json = JSON->new->utf8();
-	if(my $rc = $json->decode($res->content())) {
+	if(my $rc = $json->decode($res->decoded_content())) {
 		if($rc->{'error'}) {
 			# Sorry - you lose the error code, but HTML::GoogleMaps::V3 relies on this
 			# TODO - send patch to the H:G:V3 author
@@ -223,7 +237,7 @@ L<Geo::Coder::GooglePlaces>, L<HTML::GoogleMaps::V3>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2018 Nigel Horne.
+Copyright 2017-2022 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

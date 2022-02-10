@@ -1,0 +1,18 @@
+<%INIT>
+my $request_path = $HTML::Mason::Commands::r->path_info;
+if ( $request_path =~ qr{^/Admin/CustomFields/} && $m->request_args->{'id'} &&  $m->request_args->{'id'} =~ /^\d+$/ ) {
+    my $tabs = PageMenu;
+    my $CustomField = RT::CustomField->new( $session{'CurrentUser'} );
+    $CustomField->Load($m->request_args->{'id'});
+    if ( $CustomField->Type && $CustomField->Type eq 'Select' 
+         && ( $session{CurrentUser}->HasRight( Right => 'AdminCustomFieldValues', Object => $CustomField )
+         || $session{CurrentUser}->HasRight( Right => 'AdminCustomField', Object => $CustomField ) )
+        ) {
+        $tabs->child(
+            'cf-import-values' => title => loc('Import from CSV'),
+            path => '/Admin/CustomFields/ImportValues.html?id=' . $m->request_args->{'id'}
+        );
+    }
+}
+
+</%INIT>

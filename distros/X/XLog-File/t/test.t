@@ -17,30 +17,33 @@ sub test ($&) {
 }
 
 test "log" => sub {
-    XLog::set_logger(XLog::File->new({file => $file, autoflush => 1}));
+    XLog::set_logger(XLog::File->new({file => $file, buffered => 0}));
     XLog::set_format("%m");
     XLog::set_level(XLog::DEBUG);
-    
+
     XLog::debug("hello world");
     XLog::set_logger(undef);
 
     is readfile($file), "hello world\n";
 };
 
-test 'autoflush' => sub {
-    XLog::set_logger(XLog::File->new({
+test 'buffered' => sub {
+    my $logger = XLog::File->new({
         file      => $file,
-        autoflush => 1,
-    }));
+        buffered => 1,
+    });
+    XLog::set_logger($logger);
     XLog::set_format("%m");
     XLog::set_level(XLog::DEBUG);
 
     XLog::debug("hello");
-    
+
+    $logger->flush();
     is readfile($file), "hello\n";
-    
+
     XLog::debug("world");
 
+    $logger->flush();
     is readfile($file), "hello\nworld\n";
 };
 

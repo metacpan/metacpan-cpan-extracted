@@ -10,6 +10,7 @@ dist.ini
 lib/App/GitHubUtils.pm
 script/create-this-repo-on-github
 script/git-clone-from-github
+script/this-repo-on-github
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

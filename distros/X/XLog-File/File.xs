@@ -10,13 +10,13 @@ namespace xs {
         static FileLogger::Config in (const Hash& h) {
             FileLogger::Config cfg;
             Sv val;
-            
+
             if ((val = h.fetch("file"))) {
                 cfg.file = xs::in<string>(val);
-                if ((val = h.fetch("autoflush")))  cfg.autoflush = val.is_true();
+                if ((val = h.fetch("buffered")))   cfg.buffered = val.is_true();
                 if ((val = h.fetch("check_freq"))) cfg.check_freq = xs::in<uint32_t>(val);
             }
-            
+
             return cfg;
         }
     };
@@ -36,3 +36,5 @@ BOOT {
 FileLogger* FileLogger::new (FileLogger::Config cfg) {
     RETVAL = new FileLogger(cfg);
 }
+
+void FileLogger::flush()

@@ -34,11 +34,12 @@
          "requires" : {
             "Data::Printer" : "0",
             "Lang::HL::Export" : "0",
+            "Perl::Tidy" : "0",
             "Regexp::Grammars" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "5.001",
+   "version" : "5.002",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

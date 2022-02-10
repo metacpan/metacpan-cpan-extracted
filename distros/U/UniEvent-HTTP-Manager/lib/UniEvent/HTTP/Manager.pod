@@ -478,6 +478,17 @@ not a simple task.
 
 
 
+=head1 LOGS
+
+Logs are accessible via L<XLog> framework as "UniEvent::HTTP::Manager" module.
+
+    XLog::set_logger(XLog::Console->new);
+    XLog::set_level(XLog::DEBUG, "UniEvent::HTTP::Manager");
+
+You might also need logs from "UniEvent::HTTP" layer. See L<UniEvent::HTTP>
+
+
+
 =head1 SEE ALSO
 
 L<Plack::Handler::UniEvent::HTTP>

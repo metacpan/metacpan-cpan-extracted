@@ -613,8 +613,8 @@ data using the C<minmax> function:
  my ($xmin, $xmax) = $x->minmax;
  my ($ymin, $ymax) = $y->minmax;
 
-On the other hand, if you have data but you know that the dimensions of x and
-y match, you could modify the above like so:
+On the other hand, if you have bad data but you know that the dimensions of x
+and y match, you could modify the above like so:
 
  my ($xmin, $xmax) = $x->where($x->isgood & $y->isgood)->minmax;
  my ($ymin, $ymax) = $y->where($x->isgood & $y->isgood)->minmax;

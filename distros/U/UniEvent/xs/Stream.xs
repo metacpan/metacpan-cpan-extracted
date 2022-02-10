@@ -1,3 +1,4 @@
+#include <xs/unievent/Timer.h>
 #include <xs/unievent/Stream.h>
 #include <xs/typemap/expected.h>
 #include <xs/unievent/Listener.h>
@@ -10,6 +11,7 @@ using panda::string;
 
 static PERL_THREAD_LOCAL struct {
     Simple create_connection = Simple::shared("create_connection");
+    Simple on_establish      = Simple::shared("on_establish");
     Simple on_connection     = Simple::shared("on_connection");
     Simple on_connect        = Simple::shared("on_connect");
     Simple on_read           = Simple::shared("on_read");
@@ -24,8 +26,16 @@ struct XSStreamListener : IStreamListener, XSListener {
         return ret ? xs::in<StreamSP>(ret) : StreamSP();
     }
 
+    void on_establish (const StreamSP& h, const StreamSP& client, const ErrorCode& err) override {
+        call(cbn.on_establish, xs::out(h), xs::out(client), xs::out(err));
+    }
+
     void on_connection (const StreamSP& h, const StreamSP& client, const ErrorCode& err) override {
         call(cbn.on_connection, xs::out(h), xs::out(client), xs::out(err));
+    }
+
+    void on_establish (const StreamSP& h, const ErrorCode& err, const ConnectRequestSP& req) override {
+        call(cbn.on_establish, xs::out(h), xs::out(err), xs::out(req));
     }
 
     void on_connect (const StreamSP& h, const ErrorCode& err, const ConnectRequestSP& req) override {
@@ -58,6 +68,7 @@ BOOT {
 
     xs::at_perl_destroy([]() {
         cbn.create_connection = nullptr;
+        cbn.on_establish      = nullptr;
         cbn.on_connection     = nullptr;
         cbn.on_connect        = nullptr;
         cbn.on_read           = nullptr;
@@ -204,6 +215,11 @@ ShutdownRequestSP Stream::shutdown (Sv arg1 = {}, Sv arg2 = {}) {
 
 void Stream::disconnect ()
 
+void Stream::sockaddr () : ALIAS(peeraddr=1) {
+    auto res = ix == 0 ? THIS->sockaddr() : THIS->peeraddr();
+    XSRETURN_EXPECTED(res);
+}
+
 void Stream::use_ssl (SslContext ctx = NULL) {
     if (ctx) THIS->use_ssl(ctx);
     else THIS->use_ssl();
@@ -230,6 +246,10 @@ PROTOTYPES: DISABLE
 BOOT {
     Stash stash(__PACKAGE__, GV_ADD);
     stash.inherit("UniEvent::Request");
+}
+
+TimerSP ConnectRequest::timeout_timer () {
+    RETVAL = THIS->timeout_timer();
 }
 
 

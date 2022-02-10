@@ -38,6 +38,7 @@ void Server::configure (const Config& conf) {
     _conf = conf;
     for (auto& loc : _conf.locations) {
         if (!loc.backlog) loc.backlog = DEFAULT_BACKLOG;
+        if (conf.tcp_nodelay) loc.tcp_nodelay = true;
     }
 
     if (running()) start_listening();
@@ -91,7 +92,7 @@ void Server::start_listening () {
             if (!is_unix_sock) {
                 TcpSP t = new Tcp(_loop);
                 t->open(loc.sock.value());
-                t->set_nodelay(_conf.tcp_nodelay);
+                t->set_nodelay(loc.tcp_nodelay);
                 lst = t;
             }
         }
@@ -106,7 +107,7 @@ void Server::start_listening () {
         }
         else {
             TcpSP t = new Tcp(_loop, loc.domain);
-            t->set_nodelay(_conf.tcp_nodelay);
+            t->set_nodelay(loc.tcp_nodelay);
 
             if (loc.reuse_port) {
                 #ifdef _WIN32
@@ -141,8 +142,8 @@ void Server::start_listening () {
 }
 
 excepted<net::SockAddr, ErrorCode> Server::sockaddr () const {
-    if (!_listeners.size()) return make_unexpected(errc::server_stopping);
-    return get_sockaddr(_listeners.front());
+    if (!_listeners.size()) return make_unexpected(make_error_code(std::errc::not_connected));
+    return _listeners.front()->sockaddr();
 }
 
 void Server::stop_listening () {
@@ -161,12 +162,11 @@ ServerConnectionSP Server::new_connection (uint64_t id, const ServerConnection::
     return new ServerConnection(this, id, conf, stream);
 }
 
-void Server::on_connection (const StreamSP& stream, const ErrorCode& err) {
+void Server::on_establish(const StreamSP&, const StreamSP& stream, const ErrorCode& err) {
     if (err) return;
     ServerConnection::Config cfg {_conf.idle_timeout, _conf.max_keepalive_requests, _conf.max_headers_size, _conf.max_body_size, _factory};
     auto connection = new_connection(++lastid, cfg, stream);
     _connections[connection->id()] = connection;
-    connection->start();
     panda_log_info([&]{
         log << "client connected to ";
         if (stream->type() == Pipe::TYPE) {
@@ -249,9 +249,11 @@ std::ostream& operator<< (std::ostream& os, const Server::Location& location) {
         } else {
             os << "<unknown custom socket>";
         }
+        os << ", tcp_nodelay: " << location.tcp_nodelay;
     } else {
         os << location.host << ":" << location.port;
         os << ", reuse_port: " << location.reuse_port;
+        os << ", tcp_nodelay: " << location.tcp_nodelay;
     }
     os << ", backlog: " << location.backlog;
     os << "}";
@@ -272,8 +274,8 @@ std::ostream& operator<< (std::ostream& os, const Server::Config& conf) {
 }
 
 bool Server::Location::operator== (const Location& oth) const {
-    return host == oth.host && port == oth.port && reuse_port == oth.reuse_port && backlog == oth.backlog &&
-           domain == oth.domain && ssl_ctx == oth.ssl_ctx && sock == oth.sock;
+    return host == oth.host && port == oth.port && path == oth.path && reuse_port == oth.reuse_port && backlog == oth.backlog &&
+           domain == oth.domain && ssl_ctx == oth.ssl_ctx && sock == oth.sock && tcp_nodelay == oth.tcp_nodelay;
 }
 
 bool Server::Config::operator== (const Config& oth) const {

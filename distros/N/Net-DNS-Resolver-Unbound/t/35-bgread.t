@@ -3,32 +3,35 @@
 
 use strict;
 use warnings;
-use Test::More tests => 7;
+use Test::More tests => 6;
 
+use Net::DNS;
 use Net::DNS::Resolver::Unbound;
 
 
 my $resolver = Net::DNS::Resolver::Unbound->new();
-ok( $resolver, 'create new resolver instance' );
 
 
-sub test_case {
-	my ( $handle, @vector ) = @_;
-	Net::DNS::Resolver::libunbound::async_callback( $handle, @vector ) if @vector;
+sub handle_state {
+	my ( $async_id, $err, @result ) = @_;
+	my $handle;
+	$handle = Net::DNS::Resolver::libunbound::emulate_wait($async_id)	   if defined $async_id;
+	$handle = Net::DNS::Resolver::libunbound::emulate_error( $async_id, $err ) if defined $err;
+
+	$resolver->bgbusy($handle);
 	return $resolver->bgread($handle);
 }
 
 
-is( test_case(), undef, 'handle undefined' );
+is( handle_state(), undef, 'handle undefined' );
 
-is( test_case( [1] ), undef, 'awaiting callback' );
+is( handle_state(1), undef, 'awaiting callback' );
 
-is( test_case( [1, 0] ), undef, 'NULL result' );
-is( $resolver->errorstring(), undef, '$resolver->errorstring' );
+is( handle_state( 1, 0 ),     undef, 'NULL result' );
+is( $resolver->errorstring(), undef, 'errorstring undefined' );
 
-is( test_case( [1, -99] ), undef, 'callback error' );
-is( $resolver->errorstring(), 'unknown error', '$resolver->errorstring' );
+is( handle_state( 1, -99 ),   undef,	       'callback error' );
+is( $resolver->errorstring(), 'unknown error', 'unknown error' );
 
 
 exit;
-

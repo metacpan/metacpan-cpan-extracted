@@ -1,0 +1,139 @@
+#include <xs/export.h>
+
+MODULE = UniEvent::WebSocket                PACKAGE = UniEvent::WebSocket::Connection
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash s(__PACKAGE__);
+    xs::exp::create_constants(s, {
+        {"STATE_INITIAL",        (int)Connection::State::INITIAL},
+        {"STATE_TCP_CONNECTING", (int)Connection::State::TCP_CONNECTING},
+        {"STATE_CONNECTING",     (int)Connection::State::CONNECTING},
+        {"STATE_CONNECTED",      (int)Connection::State::CONNECTED},
+        {"STATE_HALT",           (int)Connection::State::HALT},
+    });
+}
+
+LoopSP Connection::loop()
+
+StreamSP Connection::stream()
+
+void Connection::sockaddr () : ALIAS(peeraddr=1) {
+    auto res = ix == 0 ? THIS->sockaddr() : THIS->peeraddr();
+    XSRETURN_EXPECTED(res);
+}
+
+void Connection::send (...) {
+    auto count = items;
+    auto builder = THIS->message();
+    string payload;
+    // need to track if for the cases, if payload was provided, but it was empty.
+    bool has_payload = false;
+
+    Connection::send_fn callback;
+
+    auto process = [&](string_view key, Scalar val) {
+        if (key == "opcode") builder.opcode((Opcode)val.as_number<int>());
+        if (key == "deflate") builder.deflate(val.as_number<int>());
+        if (key == "payload") {
+            payload = val.as_string();
+            has_payload = true;
+        }
+        if (key == "cb") callback = xs::in<Connection::send_fn>(val);
+    };
+
+    if (count % 2) {
+        for (decltype(count) i = 1; i < count; i += 2) {
+            process(xs::in<string_view>(ST(i)), ST(i + 1));
+        }
+    } else if (count == 2 && SvROK(ST(1))) {
+        for (HashEntry e : Hash(ST(1))) {
+            process(e.key(), e.value());
+        }
+    } else {
+        throw "Usage Connection::send(payload => $data,  opcode => ..., deflate => ..., cb => sub { ... }) or Connection::send({payload => $data, same_keys...});";
+    }
+
+    if (!has_payload) throw ("payload is mandatory argument");
+    builder.send(payload, callback);
+}
+
+void Connection::send_ping (string payload = {})
+
+void Connection::send_pong (string payload = {})
+
+void Connection::send_message (string payload)
+
+void Connection::send_text (string payload)
+
+void Connection::close (uint16_t code = uint16_t(CloseCode::DONE), Sv payload = {}) {
+    if (payload) THIS->close(code, xs::in<string>(payload));
+    else         THIS->close(code);
+}
+
+XSCallbackDispatcher* Connection::message_event () {
+    RETVAL = XSCallbackDispatcher::create(THIS->message_event);
+}
+
+void Connection::message_callback (Connection::message_fn cb) {
+    THIS->message_event.remove_all();
+    if (cb) THIS->message_event.add(cb);
+}
+
+XSCallbackDispatcher* Connection::error_event () {
+    RETVAL = XSCallbackDispatcher::create(THIS->error_event);
+}
+
+void Connection::error_callback (Connection::error_fn cb) {
+    THIS->error_event.remove_all();
+    if (cb) THIS->error_event.add(cb);
+}
+
+XSCallbackDispatcher* Connection::close_event () {
+    RETVAL = XSCallbackDispatcher::create(THIS->close_event);
+}
+
+void Connection::close_callback (Connection::close_fn cb) {
+    THIS->close_event.remove_all();
+    if (cb) THIS->close_event.add(cb);
+}
+
+XSCallbackDispatcher* Connection::peer_close_event () {
+    RETVAL = XSCallbackDispatcher::create(THIS->peer_close_event);
+}
+
+void Connection::peer_close_callback (Connection::peer_close_fn cb) {
+    THIS->peer_close_event.remove_all();
+    if (cb) THIS->peer_close_event.add(cb);
+}
+
+XSCallbackDispatcher* Connection::ping_event () {
+    RETVAL = XSCallbackDispatcher::create(THIS->ping_event);
+}
+
+void Connection::ping_callback (Connection::ping_fn cb) {
+    THIS->ping_event.remove_all();
+    if (cb) THIS->ping_event.add(cb);
+}
+
+XSCallbackDispatcher* Connection::pong_event () {
+    RETVAL = XSCallbackDispatcher::create(THIS->pong_event);
+}
+
+void Connection::pong_callback (Connection::pong_fn cb) {
+    THIS->pong_event.remove_all();
+    if (cb) THIS->pong_event.add(cb);
+}
+
+Connection::StatisticsSP Connection::stats_counter(Sv val = {}) {
+    if (val) {
+        THIS->stats_counter(xs::in<Connection::StatisticsSP>(val));
+        XSRETURN_UNDEF;
+    } else {
+        RETVAL = THIS->stats_counter();
+    }
+}
+
+int Connection::state() {
+    RETVAL = (int)THIS->state();
+}

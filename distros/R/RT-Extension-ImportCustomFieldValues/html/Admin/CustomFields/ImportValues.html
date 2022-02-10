@@ -1,0 +1,180 @@
+<& /Admin/Elements/Header,
+    Title => $title,
+    &>
+<& /Elements/Tabs &>
+<& /Elements/ListActions, actions => \@results &>
+
+<form method="post" enctype="multipart/form-data" action="ImportValues.html" name="ImportCFValues" id="ImportCFValues">
+<input type="hidden" class="hidden" name="id" value="<% $id %>" />
+
+% if ( $ARGS{Import} && $values ) {
+% if ( $ARGS{ReplaceValues} ) {
+<input type="hidden" class="hidden" name="ReplaceValues" value="1" />
+<h2><&|/l&>The following values will replace existing ones:</&></h2>
+% } else {
+<h2><&|/l&>The following values will be added to existing ones:</&></h2>
+% }
+<table border="0" cellpadding="1" cellspacing="0" class="collection-as-table cf-csv-import">
+<tr class="collection-as-table">
+    <th class="collection-as-table"><&|/l&>SortOrder</&></th>
+    <th class="collection-as-table"><&|/l&>Name</&></th>
+    <th class="collection-as-table"><&|/l&>Description</&></th>
+    <th class="collection-as-table"><&|/l&>Category</&></th>
+    <th class="collection-as-table"><&|/l&>Import</&></th>
+</tr>
+% my $i = 0;
+% foreach my $value (@$values) {
+<tr class="collection-as-table <% $i++ %2 ? 'oddline' : 'evenline'%>">
+    <td class="collection-as-table"><input name="row-<% $i %>-SortOrder" value="<% $value->{SortOrder} || '' %>" /></td>
+    <td class="collection-as-table"><input name="row-<% $i %>-Name" value="<% $value->{Name} || '' %>" /></td>
+    <td class="collection-as-table"><input name="row-<% $i %>-Description" value="<% $value->{Description} || '' %>" /></td>
+    <td class="collection-as-table"><input name="row-<% $i %>-Category" value="<% $value->{Category} || '' %>" /></td>
+    <td class="collection-as-table"><input type="checkbox" class="checkbox" name="row-<% $i %>-import" value="1" checked="checked" /></td>
+</tr>
+% }
+</table>
+<hr />
+<div class="button-cancel">
+<& /Elements/Submit, Name => 'Cancel', Label => loc('Cancel'), Class => "extra-buttons" &>
+</div>
+<& /Elements/Submit, Name => 'Confirm', Label => loc('Confirm') &>
+% } else {
+<h2><&|/l&>Please select a file with needed values using following format:</&></h2>
+<p>
+<&|/l&>- File encoding: UTF-8</&><br/>
+<&|/l&>- Fields separated by ";"</&><br/>
+<&|/l&>- No headers</&><br/>
+<&|/l&>- Using the following columns and order: SortOrder, Name, Description, Category</&><br/>
+<&|/l&>- Column "Name" is mandatory, other columns may be empty but must exists</&>
+</p>
+<hr />
+<table>
+<tr><td class="label"><&|/l&>CSV file</&></td><td>
+<input type="file" name="<% $name %>" class="CF-<%$CustomField->id%>-Import" />
+</td></tr>
+<tr><td class="label"><&|/l&>Replace?</&>
+<div class="hints"><&|/l&>Default is to add CSV values to existing ones</&></div>
+</td><td>
+<input type="checkbox" class="checkbox" id="cfvalues-replace" name="ReplaceValues" value="1" <% $ReplaceValuesChecked |n %> />
+</td>
+</td>
+</tr>
+
+</table>
+<hr />
+<div class="button-cancel">
+<& /Elements/Submit, Name => 'Cancel', Label => loc('Cancel') &>
+</div>
+<& /Elements/Submit, Name => 'Import', Label => loc('Import') &>
+% }
+
+</form>
+<%INIT>
+my ($title, @results, $values);
+my $CustomField = RT::CustomField->new( $session{'CurrentUser'} );
+unless ( $CustomField->Load( $id ) ) {
+    Abort(loc("CustomField not found"));
+}
+unless ( $session{CurrentUser}->HasRight( Right => 'AdminCustomFieldValues', Object => $CustomField )
+         || $session{CurrentUser}->HasRight( Right => 'AdminCustomField', Object => $CustomField ) ) {
+    Abort(loc("No permissions to edit this customfield values"));
+}
+$title = loc( 'Importing values for CustomField [_1]', $CustomField->Name );
+my $name =  'Import-'. $CustomField->Id . '-Values';
+
+my $ReplaceValuesChecked = ( $ARGS{ReplaceValues} ) ? qq[checked="checked"] : '';
+
+if ( $ARGS{Cancel} ) {
+    $ReplaceValuesChecked = '';
+    delete $ARGS{$name};
+} elsif ( $ARGS{Import} && $ARGS{$name} ) {
+    my $cgi_object = $m->cgi_object;
+    my $filename = $cgi_object->param($name);
+    push @results, "Importing ". $filename;
+    my $fh = $cgi_object->upload($name);
+    if ( $fh ) {
+        binmode($fh);
+
+        require Text::CSV;
+        my $csv = Text::CSV->new ({ strict => 1, sep_char => ";", });
+        $values = $csv->csv (in => $fh, headers => [qw(SortOrder Name Description Category)], encoding => 'UTF-8', );
+        unless ( $values && ref($values) eq 'ARRAY' ) {
+            push @results, loc("[_1]: Wrong file format", $filename);
+        } else {
+            my $i = 0;
+            my $valid_values;
+            foreach my $value (@$values) {
+                $i++;
+                my $valid = 1;
+                foreach my $field (qw(SortOrder Name Description Category)) {
+                    $value->{$field} =~ s/^\s+// if ( $value->{$field} );
+                    $value->{$field} =~ s/\s+$// if ( $value->{$field} );
+                }
+                if ( ! $value->{Name} ) {
+                    push @results, loc("Line [_1]: missing \"[_2]\"", $i, "Name"); 
+                    $valid = undef;
+                }
+                if ( $value->{SortOrder} && $value->{SortOrder} !~ m/^\d+$/ ) {
+                    push @results, loc("Line [_1]: \"[_2]\" must be numerical", $i, loc("SortOrder"));
+                    $valid = undef;
+                }
+                # FIXME: check Category against BasedOn object?
+                if ( $valid ) {
+                    push @$valid_values, $value;
+                }
+            }
+            $values = $valid_values;
+        }
+    } else {
+        push @results, loc("Unable to read file");
+    }
+} elsif ( $ARGS{Confirm} ) {
+    # Prepare a new empty form
+    $ReplaceValuesChecked = '';
+    delete $ARGS{$name};
+    # Reconstructs values to import
+    my $submitted_values = ();
+    foreach my $key (keys %ARGS) {
+        next unless ( $key =~ m/^row-(\d+)-(.+)$/ );
+        $submitted_values->{$1}->{$2} = $ARGS{$key};
+    }
+    # Remove unwanted values
+    foreach my $i (keys %$submitted_values) {
+        if ( ! $submitted_values->{$i}->{import} || $submitted_values->{$i}->{import} eq "0" ) {
+            delete $submitted_values->{$i};
+        } elsif ( $submitted_values->{$i}->{import} ) {
+            delete $submitted_values->{$i}->{import};
+        }
+    }
+    unless ( $submitted_values && ref($submitted_values) eq 'HASH' && scalar(keys %$submitted_values) ) {
+        push @results, loc("No values to import");
+    } else {
+        if ( $ARGS{ReplaceValues} ) {
+            my $Values = $CustomField->Values;
+            while (my $Value = $Values->Next) {
+                my $value_id = $Value->id;
+                my ($val, $msg) = $Value->Delete;
+                if ( $val ) {
+                    push @results, loc("Old value [_1] deleted", $value_id);
+                } else {
+                    push @results, loc("Error deleting old value [_1]: [_2]", $value_id, $msg);
+                }
+            }
+        }
+        foreach my $i (keys %$submitted_values) {
+            my ($val, $msg) = $CustomField->AddValue( %{$submitted_values->{$i}} );
+            if ( $val ) {
+                push @results, loc("Line [_1]: successfully imported", $i);
+            } else  {
+                push @results, loc("Line [_1]: import error: [_2]", $i, $msg);
+            }
+        }
+    }
+    
+}
+
+</%INIT>
+<%ARGS>
+$id => undef
+</%ARGS>
+

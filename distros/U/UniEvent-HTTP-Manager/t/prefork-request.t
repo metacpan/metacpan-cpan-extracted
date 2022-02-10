@@ -60,7 +60,7 @@ $tm->callback(sub {
     is $err, undef, "spawn_callback works in child process";
     $mgr->stop;
 });
-$tm->once(0.01);
+$tm->once(0.2);
 $mgr->run;
 
 done_testing;

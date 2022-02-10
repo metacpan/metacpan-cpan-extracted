@@ -162,6 +162,15 @@ Parsing websocket packet with 200 bytes payload.
 
 
 
+=head1 LOGS
+
+Logs are accessible via L<XLog> framework as "Protocol::WebSocket" module.
+
+    XLog::set_logger(XLog::Console->new);
+    XLog::set_level(XLog::DEBUG, "Protocol::WebSocket");
+
+
+
 =head1 REFERENCE
 
 L<Protocol::WebSocket::Fast::ClientParser>

@@ -64,29 +64,92 @@ static void checkret(const int err, int line)
 
 typedef struct ub_ctx* Net__DNS__Resolver__Unbound__Context;
 typedef struct ub_result* Net__DNS__Resolver__Unbound__Result;
+typedef struct av* Net__DNS__Resolver__Unbound__Handle;
 
-
-=head1	async_callback
-
-The asynchronous resolver result is received as an argument to async_callback (C),
-within which it is convenient to incorporate the constructor for this package (Perl XS):
-
-	MODULE = Net::DNS::Resolver::Unbound	PACKAGE = Net::DNS::Resolver::Unbound::Result
-
-=cut
 
 static void async_callback(void* mydata, int err, struct ub_result* result)
 {
 	dTHX;	/* fetch context */
 	AV* handle = (AV*) mydata;
-	SV* result_sv = newSV(0);
-	sv_setptrobj(result_sv, (void*) result, "Net::DNS::Resolver::Unbound::Result");
 	av_push(handle, newSViv(err) );
-	av_push(handle, result_sv);
+	av_push(handle, newSViv(PTR2IV(result)) );
 	return;
 }
 
+
+
+MODULE = Net::DNS::Resolver::Unbound	PACKAGE = Net::DNS::Resolver::Unbound::Handle
+
+int
+async_id(struct av* handle)
+    INIT:
+	SV** index = av_fetch(handle, 0, 0);
+    CODE:
+	RETVAL = SvIV(*index);
+    OUTPUT:
+	RETVAL
+
+int
+err(struct av* handle)
+    INIT:
+	SV** index = av_fetch(handle, 1, 0);
+    CODE:
+	RETVAL = 0;
+	if ( index ) RETVAL = SvIV(*index);
+    OUTPUT:
+	RETVAL
+
+Net::DNS::Resolver::Unbound::Result
+result(struct av* handle)
+    INIT:
+	SV** index = av_fetch(handle, 2, 0);
+    CODE:
+	RETVAL = NULL;
+	if ( index ) RETVAL = INT2PTR(struct ub_result*, SvIV(*index) );
+    OUTPUT:
+	RETVAL
+
+int
+waiting(struct av* handle)
+    INIT:
+	SV** index = av_fetch(handle, 1, 0);
+    CODE:
+	RETVAL = 1;		/* clumsy, but portable */
+	if ( index ) RETVAL = 0;
+    OUTPUT:
+	RETVAL
+
+
+
 MODULE = Net::DNS::Resolver::Unbound	PACKAGE = Net::DNS::Resolver::Unbound::Result
+
+SV*
+answer_packet(struct ub_result* result)
+    CODE:
+	RETVAL = newSVpvn( result->answer_packet, result->answer_len );
+    OUTPUT:
+	RETVAL
+
+int
+secure(struct ub_result* result)
+    CODE:
+	RETVAL = result->secure;
+    OUTPUT:
+	RETVAL
+
+int
+bogus(struct ub_result* result)
+    CODE:
+	RETVAL = result->bogus;
+    OUTPUT:
+	RETVAL
+
+SV*
+why_bogus(struct ub_result* result)
+    CODE:
+	RETVAL = newSVpv( result->why_bogus, 0 );
+    OUTPUT:
+	RETVAL
 
 void
 DESTROY(struct ub_result* result)
@@ -107,6 +170,87 @@ new(void)
 	RETVAL
 
 void
+set_option(struct ub_ctx* ctx, SV* opt, SV* val)
+    CODE:
+	checkerr( ub_ctx_set_option(ctx, (const char*) SvPVX(opt), (const char*) SvPVX(val)) );
+
+SV*
+get_option(struct ub_ctx* ctx, SV* opt)
+    INIT:
+	char* value;
+    CODE:
+	checkerr( ub_ctx_get_option(ctx, (const char*) SvPVX(opt), &value) );
+	RETVAL = newSVpv( value, 0 );
+	free(value);
+    OUTPUT:
+	RETVAL
+
+void
+config(struct ub_ctx* ctx, const char* fname)
+    CODE:
+	checkerr( ub_ctx_config(ctx, fname) );
+
+void
+set_fwd(struct ub_ctx* ctx, const char* addr)
+    CODE:
+	checkerr( ub_ctx_set_fwd(ctx, addr) );
+
+void
+set_tls(struct ub_ctx* ctx, int tls)
+    CODE:
+	checkerr( ub_ctx_set_tls(ctx, tls) );
+
+void
+set_stub(struct ub_ctx* ctx, const char* zone, const char* addr, int isprime)
+    CODE:
+	checkerr( ub_ctx_set_stub(ctx, zone, addr, isprime) );
+
+void
+resolv_conf(struct ub_ctx* ctx, const char* fname)
+    CODE:
+	checkerr( ub_ctx_resolvconf(ctx, fname) );
+
+void
+hosts(struct ub_ctx* ctx, const char* fname)
+    CODE:
+	checkerr( ub_ctx_hosts(ctx, fname) );
+
+void
+add_ta(struct ub_ctx* ctx, const char* ta)
+    CODE:
+	checkerr( ub_ctx_add_ta(ctx, ta) );
+
+void
+add_ta_file(struct ub_ctx* ctx, const char* fname)
+    CODE:
+	checkerr( ub_ctx_add_ta_file(ctx, fname) );
+
+void
+add_ta_autr(struct ub_ctx* ctx, const char* fname)
+    CODE:
+	checkerr( ub_ctx_add_ta_autr(ctx, fname) );
+
+void
+trusted_keys(struct ub_ctx* ctx, const char* fname)
+    CODE:
+	checkerr( ub_ctx_trustedkeys(ctx, fname) );
+
+void
+debug_out(struct ub_ctx* ctx, const char* out)
+    CODE:
+	checkerr( ub_ctx_debugout(ctx, (void*) out) );
+
+void
+debug_level(struct ub_ctx* ctx, int d)
+    CODE:
+	checkerr( ub_ctx_debuglevel(ctx, d) );
+
+void
+async(struct ub_ctx* ctx, int dothread)
+    CODE:
+	checkerr( ub_ctx_async(ctx, dothread) );
+
+void
 DESTROY(struct ub_ctx* context)
     CODE:
 	ub_ctx_delete(context);
@@ -125,7 +269,7 @@ VERSION(void)
 	RETVAL
 
 
-struct ub_result*
+Net::DNS::Resolver::Unbound::Result
 ub_resolve(struct ub_ctx* ctx, SV* name, int rrtype, int rrclass)
     INIT:
 	struct ub_result* result = NULL;
@@ -135,27 +279,19 @@ ub_resolve(struct ub_ctx* ctx, SV* name, int rrtype, int rrclass)
     OUTPUT:
 	RETVAL
 
-SV*
-ub_result_packet(struct ub_result* result)
-    INIT:
-	const char* packet = (char*) result->answer_packet;
-	int length = result->answer_len;
-    CODE:
-	RETVAL = newSVpvn( packet, length );
-    OUTPUT:
-	RETVAL
 
-
-void
-ub_resolve_async(struct ub_ctx* ctx, SV* name, int rrtype, int rrclass, SV* handle)
+Net::DNS::Resolver::Unbound::Handle
+ub_resolve_async(struct ub_ctx* ctx, SV* name, int rrtype, int rrclass)
     INIT:
+	struct av* array = newAV();
 	int async_id = 0;
-	void* mydata = (void*) SvRV(handle);
-	AV* handle_av = (AV*) mydata;
     CODE:
 	checkerr( ub_resolve_async(ctx, (const char*) SvPVX(name), rrtype, rrclass,
-						mydata, async_callback, &async_id) );
-	av_push(handle_av, newSViv(async_id) );
+					(void*) array, async_callback, &async_id) );
+	av_push(array, newSViv(async_id) );
+	RETVAL = array;
+    OUTPUT:
+	RETVAL
 
 void
 ub_process(struct ub_ctx* ctx)
@@ -168,89 +304,6 @@ ub_wait(struct ub_ctx* ctx)
 	checkerr( ub_wait(ctx) );
 
 
-void
-ub_ctx_set_option(struct ub_ctx* ctx, SV* opt, SV* val)
-    CODE:
-	checkerr( ub_ctx_set_option(ctx, (const char*) SvPVX(opt), (const char*) SvPVX(val)) );
-
-SV*
-ub_ctx_get_option(struct ub_ctx* ctx, SV* opt)
-    INIT:
-	char* result;
-    CODE:
-	checkerr( ub_ctx_get_option(ctx, (const char*) SvPVX(opt), &result) );
-	RETVAL = newSVpv( result, 0 );
-	free(result);
-    OUTPUT:
-	RETVAL
-
-
-void
-ub_ctx_config(struct ub_ctx* ctx, const char* fname)
-    CODE:
-	checkerr( ub_ctx_config(ctx, fname) );
-
-void
-ub_ctx_set_fwd(struct ub_ctx* ctx, const char* addr)
-    CODE:
-	checkerr( ub_ctx_set_fwd(ctx, addr) );
-
-void
-ub_ctx_set_tls(struct ub_ctx* ctx, int tls)
-    CODE:
-	checkerr( ub_ctx_set_tls(ctx, tls) );
-
-void
-ub_ctx_set_stub(struct ub_ctx* ctx, const char* zone, const char* addr, int isprime)
-    CODE:
-	checkerr( ub_ctx_set_stub(ctx, zone, addr, isprime) );
-
-void
-ub_ctx_resolvconf(struct ub_ctx* ctx, const char* fname)
-    CODE:
-	checkerr( ub_ctx_resolvconf(ctx, fname) );
-
-void
-ub_ctx_hosts(struct ub_ctx* ctx, const char* fname)
-    CODE:
-	checkerr( ub_ctx_hosts(ctx, fname) );
-
-void
-ub_ctx_add_ta(struct ub_ctx* ctx, const char* ta)
-    CODE:
-	checkerr( ub_ctx_add_ta(ctx, ta) );
-
-void
-ub_ctx_add_ta_file(struct ub_ctx* ctx, const char* fname)
-    CODE:
-	checkerr( ub_ctx_add_ta_file(ctx, fname) );
-
-void
-ub_ctx_add_ta_autr(struct ub_ctx* ctx, const char* fname)
-    CODE:
-	checkerr( ub_ctx_add_ta_autr(ctx, fname) );
-
-void
-ub_ctx_trustedkeys(struct ub_ctx* ctx, const char* fname)
-    CODE:
-	checkerr( ub_ctx_trustedkeys(ctx, fname) );
-
-void
-ub_ctx_debugout(struct ub_ctx* ctx, const char* out)
-    CODE:
-	checkerr( ub_ctx_debugout(ctx, (void*) out) );
-
-void
-ub_ctx_debuglevel(struct ub_ctx* ctx, int d)
-    CODE:
-	checkerr( ub_ctx_debuglevel(ctx, d) );
-
-void
-ub_ctx_async(struct ub_ctx* ctx, int dothread)
-    CODE:
-	checkerr( ub_ctx_async(ctx, dothread) );
-
-
 const char*
 ub_strerror(int err)
 
@@ -259,8 +312,27 @@ ub_strerror(int err)
 # TEST PURPOSES ONLY
 ####################
 
-void
-async_callback(void* mydata, int err, struct ub_result* result=NULL)
+Net::DNS::Resolver::Unbound::Handle
+emulate_error(int async_id, int err, ...)
+    INIT:
+	struct ub_result* result = NULL;
+    CODE:
+	RETVAL = newAV();
+	av_push(RETVAL, newSViv(async_id) );
+	av_push(RETVAL, newSViv(err) );
+	av_push(RETVAL, newSViv(PTR2IV(result)) );
+    OUTPUT:
+	RETVAL
+
+Net::DNS::Resolver::Unbound::Handle
+emulate_wait(int async_id)
+    INIT:
+	struct av* array = newAV();
+    CODE:
+	av_push(array, newSViv(async_id) );
+	RETVAL = array;
+    OUTPUT:
+	RETVAL
 
 #ifdef croak_memory_wrap
 void

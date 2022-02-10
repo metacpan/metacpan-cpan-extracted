@@ -66,6 +66,10 @@ If this message is a C<close message>, returns message assiciated with the close
 
 Returns number of frames in the message
 
+=head2 deflated()
+
+Returns true if message was sent deflated
+
 
 =head1 SEE ALSO
 

@@ -7,7 +7,7 @@ use Data::Dumper;
 use Exporter;
 use HTML::Template;
 
-our $VERSION = '0.21';
+our $VERSION = '0.24';
 
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(html);
@@ -185,6 +185,11 @@ __END__
 =head1 NAME
 
 Devel::Trace::Subs::HTML
+
+=for html
+<a href="https://github.com/stevieb9/devel-examine-subs/actions"><img src="https://github.com/stevieb9/devel-examine-subs/workflows/CI/badge.svg"/></a>
+<a href='https://coveralls.io/github/stevieb9/devel-examine-subs?branch=master'><img src='https://coveralls.io/repos/stevieb9/devel-examine-subs/badge.svg?branch=master&service=github' alt='Coverage Status' /></a>
+
 
 =head1 FUNCTIONS
 

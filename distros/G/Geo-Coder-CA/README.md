@@ -11,7 +11,7 @@ Geo::Coder::CA - Provides a Geo-Coding functionality using http:://geocoder.ca f
 
 # VERSION
 
-Version 0.11
+Version 0.12
 
 # SYNOPSIS
 
@@ -71,7 +71,7 @@ You can also run this module from the command line:
 
 Nigel Horne <njh@bandsman.co.uk>
 
-Based on [Geo::Coder::Googleplaces](https://metacpan.org/pod/Geo::Coder::Googleplaces).
+Based on [Geo::Coder::Googleplaces](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AGoogleplaces).
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -84,10 +84,10 @@ Should be called Geo::Coder::NA for North America.
 
 # SEE ALSO
 
-[Geo::Coder::GooglePlaces](https://metacpan.org/pod/Geo::Coder::GooglePlaces), [HTML::GoogleMaps::V3](https://metacpan.org/pod/HTML::GoogleMaps::V3)
+[Geo::Coder::GooglePlaces](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AGooglePlaces), [HTML::GoogleMaps::V3](https://metacpan.org/pod/HTML%3A%3AGoogleMaps%3A%3AV3)
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2017-2018 Nigel Horne.
+Copyright 2017-2022 Nigel Horne.
 
 This program is released under the following licence: GPL2

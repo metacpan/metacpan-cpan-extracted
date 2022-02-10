@@ -1,0 +1,72 @@
+{
+   "abstract" : "Perl interface to the ZBar Barcode Reader",
+   "author" : [
+      "Jeff Brown <spadix@users.sourceforge.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "lgpl_2_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Barcode-ZBar",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Image::Magick" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Barcode::ZBar" : {
+         "file" : "ZBar.pm",
+         "version" : "0.10"
+      },
+      "Barcode::ZBar::Error" : {
+         "file" : "ZBar.pm",
+         "version" : "0.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://metacpan.org/pod/Barcode::ZBar/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mchehab/zbar.git",
+         "web" : "https://github.com/mchehab/zbar"
+      }
+   },
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

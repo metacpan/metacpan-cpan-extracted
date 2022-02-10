@@ -19,9 +19,10 @@ name: App-GitHubUtils
 provides:
   App::GitHubUtils:
     file: lib/App/GitHubUtils.pm
-    version: '0.008'
+    version: '0.009'
 requires:
   App::GitUtils: '0'
+  Browser::Open: '0'
   Cwd: '0'
   Data::Sah::Compiler::perl::TH::array: '0.910'
   Data::Sah::Compiler::perl::TH::str: '0.910'
@@ -39,7 +40,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-GitHubUtils
   homepage: https://metacpan.org/release/App-GitHubUtils
   repository: git://github.com/perlancar/perl-App-GitHubUtils.git
-version: '0.008'
+version: '0.009'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -51,6 +52,10 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript git-clone-from-github'
+      version: '0.423'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript this-repo-on-github'
       version: '0.423'
     -
       class: Dist::Zilla::Plugin::InsertExecsList

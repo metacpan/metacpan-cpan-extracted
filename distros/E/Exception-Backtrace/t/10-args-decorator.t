@@ -10,6 +10,11 @@ use MyTest;
 
 Exception::Backtrace::install();
 
+{
+    package Some::Package;
+    use overload '""' => sub { 'this should not have been called' };
+}
+
 subtest "default decorator" => sub {
     my $bt;
     my $fn0 = sub { $bt = Exception::Backtrace::create_backtrace(); };
@@ -39,7 +44,7 @@ subtest "exotic args (io, glob, regex)" => sub {
     my $glob = *STDOUT;
     $fn1->($io, $glob, qr/z+/);
     my $frame = $bt->perl_trace->get_frames->[0];
-    like $frame->to_string, qr/main::__ANON__\(IO::File=IO\(.+?\), \*main::STDOUT, .+\Qz+\E.+\)/;
+    like $frame->to_string, qr/main::__ANON__\(IO::File=IO\(.+?\), \*main::STDOUT, Regexp=REGEXP\(0x\w+\)\)/;
 };
 
 subtest "delete one of arg, undef is reported" => sub {
@@ -62,19 +67,6 @@ SKIP: {
     $fn1->({a => [1,2,3]});
     my $frame = $bt->perl_trace->get_frames->[1];
     like $frame->to_string(), qr/\Q--==([{"a":[1,2,3]}])==--\E/;
-};
-
-subtest "exception in decorator stringizing" => sub {
-    package Bad::Package {
-        use overload '""' => sub { ...; };
-    };
-
-    my $bt;
-    my $fn0 = sub { $bt = Exception::Backtrace::create_backtrace(); };
-    my $fn1 = sub { $fn0->($_[0]); };
-    $fn1->((bless {} => 'Bad::Package'));
-    my $frame = $bt->perl_trace->get_frames->[1];
-    like $frame->to_string, qr/\Q(*exception*)\E/;
 };
 
 SKIP: {

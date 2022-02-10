@@ -3,21 +3,21 @@ use strict;
 use warnings;
 
 use Data::Dumper::Compact 'ddc';
-use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw( MIDI-Praxis-Variation MIDI-Util Music-Duration-Partition );
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw( MIDI-Praxis-Variation MIDI-Util Music-Duration Music-Duration-Partition );
 use MIDI::Praxis::Variation qw(diminution);
-use MIDI::Util;
+use MIDI::Util qw(setup_score);
 use Music::Duration::Partition;
 use Music::Scales;
 
 my $depth   = 5;              # Recusive "by half" depth
 my $t_patch = 4;              # Treble patch
 my $octave  = 4;              # Treble octave
-my $size    = 4;              # Motif duration size in quarter notes
+my $size    = 8;              # Motif duration size in quarter notes
 my $bpm     = 100;            # Beats per minute
 my $note    = 'C';            # C, C#, Db, D, D#, ...
 my $type    = 'pentatonic';   # Alternate: pminor, etc.
 my $out     = "$0.mid";       # MIDI output file
-my $pool    = [qw/ hn qn en /];
+my $pool    = [qw/ hn dhn qn en /];
 
 # Generate a rhythmic motif
 my $mdp = Music::Duration::Partition->new(size => $size, pool => $pool);
@@ -25,15 +25,15 @@ my $motif = $mdp->motif;
 print $depth, '. ', ddc $motif; # Show the generated motif
 
 # Get a MIDI score
-my $score = MIDI::Util::setup_score(bpm => $bpm, patch => $t_patch);
+my $score = setup_score(bpm => $bpm, patch => $t_patch);
 
 # Get a scale of MIDI note numbers
 my @scale = get_scale_MIDI($note, $octave, $type);
 
 # While we are at depth...
 while ($depth) {
-    # Play 2 runs through the motif with random scale notes
-    for my $i (0 .. $size * 2 - 2) {
+    # Play the motif with random scale notes
+    for my $i (0 .. $#$motif) {
         $score->n($motif->[$i % @$motif], $scale[int rand @scale]);
     }
 

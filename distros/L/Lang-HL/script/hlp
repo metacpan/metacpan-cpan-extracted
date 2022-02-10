@@ -5,6 +5,7 @@ use warnings;
 use utf8;
 use Lang::HL;
 use File::Find;
+use Perl::Tidy;
 
 sub readFile {
     my ($fileName) = @_;
@@ -38,4 +39,22 @@ $code =~ s/[\t\r\n\f]+//g;
 my $hlObject = Lang::HL->new();
 my $generatedCode = $hlObject->parse($code);
 
-print $generatedCode;
+my $formattedCode;
+
+my $argv = "-npro";   # Ignore any .perltidyrc at this site
+$argv .= " -pbp";     # Format according to perl best practices
+$argv .= " -nst";     # Must turn off -st in case -pbp is specified
+$argv .= " -se";      # -se appends the errorfile to stderr
+
+my $error = Perl::Tidy::perltidy(
+    argv => $argv,
+    source => \$generatedCode,
+    destination => \$formattedCode,
+);
+
+if($formattedCode) {
+    print $formattedCode;
+}
+else {
+    print $generatedCode;
+}

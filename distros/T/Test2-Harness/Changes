@@ -1,3 +1,15 @@
+1.000107  2022-02-10 08:49:19-08:00 America/Los_Angeles
+
+    - Clean up FIFO in interactive mode with a persistent runner
+
+1.000106  2022-02-08 10:10:38-08:00 America/Los_Angeles
+
+    - Fix uninitialized warning
+
+1.000105  2022-02-08 09:52:32-08:00 America/Los_Angeles
+
+    - Make changes_diff work with or without prefixes in the filenames
+
 1.000104  2022-02-04 11:00:29-08:00 America/Los_Angeles
 
     - Add settings ot paremeter list for coverage managers

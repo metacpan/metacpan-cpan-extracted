@@ -7,7 +7,7 @@ use IPC::Run 'run';
 my $tests = 4;
 plan tests => $tests;
 
-my @cmd = ($^X, -CA => qw(bin/hi test\\d+ _hashed_ test: ocean));
+my @cmd = ($^X => qw(t/hi test\\d+ _hashed_ test: ocean));
 
 my $in;
    $in .= "test: test$_\n" for 1 .. $tests;

@@ -104,12 +104,13 @@ string FrameHeader::compile (size_t plen) const {
         ptr += sizeof(uint16_t);
     } else {
         *((BinarySecond*)ptr++) = BinarySecond{127, has_mask};
-        *((uint64_t*)ptr) = h2be64(plen);
+        auto netlen = h2be64(plen);
+        memcpy(ptr, &netlen, sizeof(uint64_t));
         ptr += sizeof(uint64_t);
     }
 
     if (has_mask) {
-        *((uint32_t*)ptr) = mask;
+        memcpy(ptr, &mask, sizeof(uint32_t));
         ptr += sizeof(uint32_t);
     }
 
