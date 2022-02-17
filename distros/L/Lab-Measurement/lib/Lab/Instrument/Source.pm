@@ -1,6 +1,6 @@
 package Lab::Instrument::Source;
 #ABSTRACT: Generic voltage source base class
-$Lab::Instrument::Source::VERSION = '3.803';
+$Lab::Instrument::Source::VERSION = '3.810';
 use v5.20;
 
 use strict;
@@ -565,7 +565,7 @@ Lab::Instrument::Source - Generic voltage source base class
 
 =head1 VERSION
 
-version 3.803
+version 3.810
 
 =head1 DESCRIPTION
 

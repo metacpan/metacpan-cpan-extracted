@@ -9,11 +9,11 @@ my $build = Module::Build->new(
       'perl' => '5.014',
 
       'Feature::Compat::Try' => '0',
-      'File::Slurp::Tiny' => 0,
       'Scalar::Util' => 0,
    },
    test_requires => {
       'File::Temp' => 0,
+      'Test::Fatal' => 0,
       'Test::More' => '0.88', # done_testing
    },
    configure_requires => {

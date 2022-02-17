@@ -24,6 +24,14 @@ README
 t/00-load.t
 t/advanced-options.t
 t/article-class.t
+t/asian.t
+t/asian/fontspec.json
+t/asian/id.muse
+t/asian/id.tex
+t/asian/ja.muse
+t/asian/ja.tex
+t/asian/zh.muse
+t/asian/zh.tex
 t/bcor-sides.t
 t/beamer.t
 t/bidi-slides.t

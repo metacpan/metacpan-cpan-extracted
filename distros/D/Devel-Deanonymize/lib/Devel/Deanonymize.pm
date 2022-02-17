@@ -12,7 +12,7 @@ by the statistic:
     }
 
 This script aims to solve this problem by wrapping each file in a sub and thus making these subs I<visible>.
-Code is based on https://github.com/pjcj/Devel--Cover/issues/51#issuecomment-17222928
+Code is based on L<https://github.com/pjcj/Devel--Cover/issues/51#issuecomment-17222928>
 
 =head1 SYNOPSIS
 
@@ -20,13 +20,22 @@ Code is based on https://github.com/pjcj/Devel--Cover/issues/51#issuecomment-172
     perl -MDevel::Cover=-ignore,^t/,Deanonymize -MDevel::Deanonymize=<inculde_pattern> your_script.pl
 
     # Perl tests
-    HARNESS_PERL_SWITCHES="-MDevel::Cover=-ignore,^t/,Deanonymize -MDevel::Deanonymize=<include_pattern"  prove t/
+    HARNESS_PERL_SWITCHES="-MDevel::Cover=-ignore,^t/,Deanonymize -MDevel::Deanonymize=<include_pattern>"  prove t/
 
 
 =head1 DEBUGGING
 
 If your tests suddenly fail for some weird reason, you can set C<DEANONYMIZE_DEBUG>. If this environment variable is set,
-we print out the filename for every modified file write its contents to C<filepath/filename_mod.pl>
+we print out the filename for every modified file write its contents to C<filepath/filename_mod.pl>.
+
+It is also important to note that the regex which matches the end-marker is not perfect. In general it can be summarized
+as follows:
+
+We start at the end of a file and search for the first occurrence of either C<__END__>, C<__DATA__> or C<1;>. To improve
+robustness, these markers must occur alone on their respective line.
+A special case is C<1> without semicolon: We only consider this case if its the very last character of a file.
+
+Files with no endmarkers at all are dangerous to use in conjunction with this module...
 
 
 =head1 EXAMPLES
@@ -70,8 +79,11 @@ SOFTWARE.
 package Devel::Deanonymize;
 use strict;
 use warnings FATAL => 'all';
+use base 'Exporter';
 
-our $VERSION = "0.1.2";
+our @EXPORT = qw(alterContent);
+
+our $VERSION = "0.2.0"; # Do not change manually, changed automatically on `make build` target
 
 my $include_pattern;
 
@@ -79,6 +91,34 @@ sub import {
     # capture input parameters
     $include_pattern = $_[1] ? $_[1] : die("Devel::Deanonymize: An include Pattern must be specified \n");
 }
+
+sub alterContent {
+    my $input = shift;
+    my $subName = shift;
+    # define everything in a sub, so Devel::Cover will DTRT
+    # NB this introduces no extra linefeeds so D::C's line numbers
+    # in reports match the file on disk
+    # - In general, we match only if <white_space>*ENDMARKER<white_space>*<end_of_line>
+    # - We only allow `1` without a semicolon if found at the very end
+    $input =~ s/(.*?package\s+\S+)(.*)^[\s]*(__END__|1;|1\Z|__DATA__)[\s]*$(.*)\Z/$1sub $subName {$2} $subName();$3$4/sgm;
+
+    # unhide private methods to avoid "Variable will not stay shared"
+    # warnings that appear due to change of applicable scoping rules
+    # Note: not '\s*' in the start of string, to avoid matching and
+    # removing blank lines before the private sub definitions.
+    $input =~ s/(^[\t| ]*)my\s+(\S+\s*=\s*sub.*)$/$1our $2/gm;
+
+    return $input
+}
+
+sub hasEndmarker {
+    my $input = shift;
+    if ($input =~ /^[\s]*(__END__|1;|1\Z|__DATA__)[\s]*$(.*)\Z/gms) {
+        return 1;
+    }
+    return 0;
+}
+
 
 sub modify_files {
     # Internal notes:
@@ -96,21 +136,12 @@ sub modify_files {
             my $module_text = <$fh>;
             close $fh;
 
-            if (not $module_text =~ /(__END__|1;|__DATA__)/) {
+            if (not hasEndmarker($module_text)) {
                 warn("Devel::Deanonymize: Found no endmarker in file `$filename` - skipping\n");
                 return ();
             }
 
-            # define everything in a sub, so Devel::Cover will DTRT
-            # NB this introduces no extra linefeeds so D::C's line numbers
-            # in reports match the file on disk
-            $module_text =~ s/(.*?package\s+\S+)(.*)(__END__|1;|__DATA__)/$1sub classWrapper {$2} classWrapper();\n$3/s;
-
-            # unhide private methods to avoid "Variable will not stay shared"
-            # warnings that appear due to change of applicable scoping rules
-            # Note: not '\s*' in the start of string, to avoid matching and
-            # removing blank lines before the private sub definitions.
-            $module_text =~ s/^[ \t]*my\s+(\S+\s*=\s*sub.*)$/our $1/gm;
+            $module_text = alterContent($module_text, "_anon");
 
             # filehandle on the scalar
             open $fh, '<', \$module_text;
@@ -142,6 +173,5 @@ INIT {
 UNITCHECK {
     modify_files();
 }
-
 
 1;

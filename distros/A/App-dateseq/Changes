@@ -1,3 +1,11 @@
+0.106   2021-09-24  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Replace an example for '--eval' with a more sophisticated
+	  one.
+
+
 0.105   2021-09-24  Released-By: PERLANCAR; Urgency: medium
 
 	- Add option --eval (-e).

@@ -7,7 +7,7 @@
 #       Author:  Steven Bakker (SBAKKER), <sbakker@cpan.org>
 #      Created:  23/01/18
 #
-#   Copyright (c) 2018 Steven Bakker
+#   Copyright (c) 2022 Steven Bakker
 #
 #   This module is free software; you can redistribute it and/or modify
 #   it under the same terms as Perl itself. See "perldoc perlartistic."
@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI::Argument::Filename 0.054002;
+package Term::CLI::Argument::Filename 0.055002;
 
 use 5.014;
 use warnings;
@@ -33,16 +33,15 @@ use Fcntl ':mode';
 use namespace::clean;
 
 sub complete {
-    my $self    = shift;
-    my $partial = shift;
+    my ( $self, $text ) = @_;
 
     my $func_ref = $self->term->Attribs->{filename_completion_function}
-        or return $self->_glob_complete($partial);
+        or return $self->glob_complete($text);
 
     if ($func_ref) {
         my $state = 0;
         my @list;
-        while ( my $f = $func_ref->( $partial, $state ) ) {
+        while ( my $f = $func_ref->( $text, $state ) ) {
             push @list, $f;
             $state = 1;
         }
@@ -50,9 +49,9 @@ sub complete {
     }
 }
 
-sub _glob_complete {
-    my ( $self, $partial ) = @_;
-    my @list = bsd_glob("$partial*");
+sub glob_complete {
+    my ( $self, $text ) = @_;
+    my @list = bsd_glob("$text*");
 
     return if @list == 0;
 
@@ -60,14 +59,13 @@ sub _glob_complete {
         if (-d $list[0]) {
             # Dumb trick to get readline to expand a directory
             # with a trailing "/", but *not* add a space.
-            # Simulates the Gnu way of doing it.
+            # Simulates the way GNU readline does it.
             return ("$list[0]/", "$list[0]//");
         }
         return @list;
     }
 
-    # If there is more than one possible completion,
-    # add filetype suffixes.
+    # Add filetype suffixes if there is more than one possible completion.
     foreach (@list) {
         lstat;
         if ( -l _ )  { $_ .= q{@}; next }
@@ -93,7 +91,7 @@ Term::CLI::Argument::Filename - class for file name arguments in Term::CLI
 
 =head1 VERSION
 
-version 0.054002
+version 0.055002
 
 =head1 SYNOPSIS
 
@@ -130,33 +128,49 @@ See L<Term::CLI::Argument>(3p). Additionally:
 
 =over
 
-=item B<complete> ( I<PARTIAL> )
+=item B<complete> ( I<TEXT> )
 
-If present, use the C<filename_completion_function> function listed
-in L<Term::ReadLine>'s C<Attribs>, otherwise use L<bsd_glob from
-File::Glob|File::Glob/bsd_glob>.
+=item B<complete> ( I<TEXT>, I<STATE> )
+
+Complete the (partial) filename in I<TEXT>. The I<STATE> HashRef is
+ignored.
+
+If present, this uses the C<filename_completion_function> function listed
+in L<Term::ReadLine>'s C<Attribs>, otherwise it will use the
+L<glob_complete|/glob_complete> method.
 
 Not every C<Term::ReadLine> implementation implements its own
-filename completion function. The ones that do will ave the
+filename completion function. The ones that do will have the
 C<Attrib-E<gt>{filename_completion_function}> attribute set.
 L<Term::ReadLine::Gnu> does this, while L<Term::ReadLine::Perl> doesn't.
+
+=item B<glob_complete> ( I<TEXT> )
+
+=item B<glob_complete> ( I<TEXT>, I<STATE> )
+
+Complete the (partial) filename in I<TEXT>. The I<STATE> HashRef is
+ignored.
+
+Implementation uses L<bsd_glob from File::Glob|File::Glob/bsd_glob> and
+applies some decorations on the filenames based on their type, similar
+to what L<Term::ReadLine::Gnu|Term::ReadLine::Gnu> does.
 
 =back
 
 =head1 SEE ALSO
 
-L<Term::CLI::Argument>(3p),
-L<Term::ReadLine::Gnu>(3p),
-L<File::Glob>(3p),
-L<Term::CLI>(3p).
+L<Term::CLI::Argument|Term::CLI::Argument>(3p),
+L<Term::ReadLine::Gnu|Term::ReadLine::Gnu>(3p),
+L<File::Glob|File::Glob>(3p),
+L<Term::CLI|Term::CLI>(3p).
 
 =head1 AUTHOR
 
-Steven Bakker E<lt>sbakker@cpan.orgE<gt>, 2018.
+Steven Bakker E<lt>sbakker@cpan.orgE<gt>, 2022.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2018 Steven Bakker
+Copyright (c) 2022 Steven Bakker
 
 This module is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. See "perldoc perlartistic."

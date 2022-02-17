@@ -7,6 +7,40 @@ Home page:    <https://metacpan.org/release/Regexp-Pattern-License>
 Bug tracker:  <https://bugs.debian.org/libregexp-pattern-license-perl>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.9.4	2022-02-12
+
+ [ Bug Fixes ]
+ - fix define gen_args 'capture' only for patterns supporting capture, and
+   add tag 'capturing'
+ - fix define gen_args 'subject' and 'req' (not accidentally merge them)
+ - fix detect irregular end-quote (annotation [" ])
+
+ [ Test Suite ]
+ - drop unused code in legacy test library MyTest
+ - rename test library Test2::Regexp::Pattern::License ->
+   Test2::Tools::LicenseRegistry
+ - rewrite test library MyTest.pm as Test2::Tools::LicenseRegistry
+ - skip test if re object is a native Regexp object with perl before v5.12
+   (where RE2 engine is unlikely to be available anyway)
+ - streamline test library Test2::Tools::LicenseObject
+ - use Test2::V0 for author test tidyall.t
+
+ [ Packaging ]
+ - stop test-require Test::Builder::Module
+ - stop test-require Test::More
+
+ [ Other ]
+ - add summary-inspired name pattern for object perl
+ - avoid barely used org software_license: replace pattern
+   caption.alt.org.software_license with summary.alt.misc.software_license
+   for object perl
+ - extend tidyall config to cover tests
+ - optimize slightly: resolve gen option 'subjects' (and possible break)
+   before resolving other options
+ - optimize: mangle capture annotation only for patterns supporting capture
+ - optimize: reuse generic gen_args hashrefs
+ - work around tidyall string-encoding bug
+
 v3.9.3	2021-08-18
 
  [ Packaging ]

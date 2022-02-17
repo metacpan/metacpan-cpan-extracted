@@ -9,6 +9,11 @@ README
 dist.ini
 lib/Text/Table/More.pm
 share/examples/bug220126a.pl
+share/examples/demo-1x1.pl
+share/examples/demo-3x4.pl
+share/examples/demo-colspan-rowspan.pl
+share/examples/demo-colspan-rowspan2.pl
+share/examples/demo-colspan-rowspan2b.pl
 share/examples/emmy.pl
 share/examples/multirow-header.pl
 t/00-compile.t

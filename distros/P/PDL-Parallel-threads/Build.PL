@@ -6,6 +6,7 @@ use PDL::Core::Dev;
 # This is lifted from PDL::Core::Dev, but use a less redundant style:
 my $inc = PDL_INCLUDE;
 $inc =~ s/-I//g;
+$inc =~ s/"//g;
 
 my $class = Module::Build->subclass(
 	class => "Module::Build::Custom",
@@ -61,22 +62,20 @@ my $build = $class->new(
 	module_name => 'PDL::Parallel::threads',
 	license  => 'perl',
 	configure_requires => {
-		PDL						=> '2.4.0',
-		# meta_merge was added in v 0.28:
-		'Module::Build'		=> 0.28,
+		PDL             => '2.4.0',
+		'Module::Build' => 0.28,   # meta_merge
 	},
 	build_requires => {
 		# working here - I need to check the smoke reports to hone in on a
 		# minimum required version:
 		'ExtUtils::ParseXS'	=> '3.0',
-		# Needed for warning testing
 		'Test::Warn' => 0,
 		'Test::Exception' => 0,
 	},
 	requires => {
-		# Due to the use of PerlIO, I need at least 5.8:
-		perl					=> '5.8.0',
-		PDL						=> '2.4.10',
+		'perl'            => '5.8.0',  # PerlIO
+		'PDL'             => '2.4.10', # Windows mmapping
+		'threads::shared' => '1.21',   # shared_clone
 	},
 	needs_compiler => 1,
 	include_dirs => [$inc],

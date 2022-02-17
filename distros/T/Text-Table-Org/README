@@ -2,8 +2,8 @@ NAME
     Text::Table::Org - Generate Org tables
 
 VERSION
-    This document describes version 0.030 of Text::Table::Org (from Perl
-    distribution Text-Table-Org), released on 2022-01-07.
+    This document describes version 0.031 of Text::Table::Org (from Perl
+    distribution Text-Table-Org), released on 2022-01-23.
 
 SYNOPSIS
      use Text::Table::Org;
@@ -50,6 +50,14 @@ FUNCTIONS
     *   separate_rows (bool)
 
         If set to true, will add separator line between data rows.
+
+    *   caption
+
+        Optional. String. If set, will add this line to the beginning of
+        output ("table caption" will be the actual caption string that you
+        provide):
+
+         #+CAPTION: table caption
 
 HOMEPAGE
     Please visit the project's homepage at

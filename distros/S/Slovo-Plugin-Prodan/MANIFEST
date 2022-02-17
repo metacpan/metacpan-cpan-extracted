@@ -1,0 +1,25 @@
+.perlcriticrc
+.perltidyrc
+Changes
+lib/Slovo/Command/prodan.pm
+lib/Slovo/Command/prodan/products.pm
+lib/Slovo/Controller/Poruchki.pm
+lib/Slovo/Model/Poruchki.pm
+lib/Slovo/Model/Products.pm
+lib/Slovo/Plugin/Prodan.pm
+Makefile.PL
+MANIFEST			This list of files
+README.pod
+t/001_load.t
+t/002_products.t
+t/003_cart.t
+t/004_gdpr_consent.t
+t/manifest.t
+t/perl-critic.t
+t/perltidy.t
+t/pod.t
+t/products.yaml
+t/slovo.conf
+t/update_products.yaml
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -4,7 +4,7 @@ use warnings;
 use Test2::Bundle::Extended;
 use Test2::Tools::Explain;
 use Test2::Plugin::NoWarnings;
-use Test::MockFile qw< strict >;
+use Test::MockFile;
 
 my $file1 = Test::MockFile->file('/file1.txt');
 my $file2 = Test::MockFile->file('/file2.txt');

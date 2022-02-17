@@ -38,6 +38,7 @@ my %WriteMakefileArgs = (
     "IO::Select" => 0,
     "IO::Socket" => 0,
     "IO::Socket::INET" => 0,
+    "LWP::Simple" => 0,
     "List::MoreUtils" => 0,
     "List::Util" => 0,
     "Math::Complex" => 0,
@@ -101,7 +102,7 @@ my %WriteMakefileArgs = (
     "aliased" => 0,
     "lib" => 0
   },
-  "VERSION" => "3.803",
+  "VERSION" => "3.810",
   "test" => {
     "TESTS" => "t/*.t t/Analysis/*.t t/Instrument/*.t t/Lab/Test/*.t t/Moose/*.t t/Moose/Connection/*.t t/Moose/DataFile/*.t t/Moose/DataFile/Gnuplot/*.t t/Moose/Instrument/*.t t/Moose/Instrument/OI_Mercury/*.t t/SCPI/*.t t/XPRESS/*.t"
   }
@@ -138,6 +139,7 @@ my %FallbackPrereqs = (
   "IO::Socket" => 0,
   "IO::Socket::INET" => 0,
   "IO::Uncompress::Bunzip2" => 0,
+  "LWP::Simple" => 0,
   "List::MoreUtils" => 0,
   "List::Util" => 0,
   "Math::Complex" => 0,

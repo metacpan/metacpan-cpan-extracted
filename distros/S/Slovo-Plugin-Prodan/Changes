@@ -1,0 +1,9 @@
+Revision history for Slovo plugin Slovo::Plugin::Prodan
+
+0.03 Implemented gdpr_consent feature. Improved documentation. Requires Slovo
+2022.2.16.
+
+0.02 Improved shopping cart. One click less.
+
+0.01 Initial edition. A working shopping cart with products.
+

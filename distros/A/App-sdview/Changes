@@ -1,5 +1,14 @@
 Revision history for App-sdview
 
+0.06    2022-02-10
+        [CHANGES]
+         * Updates for perl 5.35.9:
+            + Avoid use of @_ within signatured methods
+         * Handle item-less =over/=back paragraphs in POD
+         * Initial attempt at parse and output support for manpages
+         * Add extra whitespacing to turn fixedwidth blocks into neat
+           rectangles (RT140536)
+
 0.05    2021-11-15
         [CHANGES]
          * Use Unicode bullets symbol rather than plain ASCII asterisk

@@ -21,6 +21,7 @@
 
 
 void savestate_Low(pTHX_ pMY_CXT) {
+    MY_dMY_CXT_accessor;
     save_item(c_depth);
     sv_inc(c_depth);
 }

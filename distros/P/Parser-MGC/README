@@ -149,6 +149,15 @@ METHODS
 
          $parser->from_file( $file, binmode => ":encoding(UTF-8)" )
 
+ filename
+
+       $filename = $parser->filename
+
+    Since version 0.20.
+
+    Returns the name of the file currently being parsed, if invoked from
+    within "from_file".
+
  from_reader
 
        $result = $parser->from_reader( \&reader )
@@ -220,6 +229,28 @@ METHODS
     This failure will propagate up to the inner-most structure parsing
     method that has not been committed; or will cause the entire parser to
     fail if there are no further options to take.
+
+ die
+
+ die_from
+
+       $parser->die( $message )
+    
+       $parser->die_from( $pos, $message )
+
+    Since version 0.20.
+
+    Throws an exception that propagates as normal for die, entirely out of
+    the entire parser and to the caller of the toplevel from_* method that
+    invoked it, bypassing all of the back-tracking logic.
+
+    This is much like using core's die directly, except that the message
+    string will include the line and column position, and the line of input
+    that the parser was working on, as it does in the "fail" method.
+
+    This method is intended for reporting fatal errors where the parsed
+    input was correctly recognised at a grammar level, but is requesting
+    something that cannot be fulfilled semantically.
 
  at_eos
 
@@ -537,6 +568,45 @@ TOKEN PARSING METHODS
     substring. It is expected that this method would be used as part a
     parser to read quoted strings, or similar cases where whitespace should
     be preserved.
+
+ nonempty_substring_before
+
+       $str = $parser->nonempty_substring_before( $literal )
+    
+       $str = $parser->nonempty_substring_before( qr/pattern/ )
+
+    Since version 0.20.
+
+    A variant of "substring_before" which fails if the matched part is
+    empty.
+
+    The example above could have been written:
+
+       sub token_nonempty_part
+       {
+          my $self = shift;
+    
+          return $parser->nonempty_substring_before( "," );
+       }
+
+    This is often useful for breaking out of repeating loops; e.g.
+
+       sub token_escaped_string
+       {
+          my $self = shift;
+          $self->expect( '"' );
+    
+          my $ret = "";
+          1 while $self->any_of(
+             sub { $ret .= $self->nonempty_substring_before( qr/%|$/m ); 1 }
+             sub { my $escape = ( $self->expect( qr/%(.)/ ) )[1];
+                   $ret .= _handle_escape( $escape );
+                   1 },
+             sub { 0 },
+          )
+    
+          return $ret;
+       }
 
  generic_token
 

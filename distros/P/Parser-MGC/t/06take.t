@@ -5,18 +5,17 @@ use warnings;
 
 use Test::More;
 
-package TestParser;
-use base qw( Parser::MGC );
+package TestParser {
+   use base qw( Parser::MGC );
 
-sub parse
-{
-   my $self = shift;
+   sub parse
+   {
+      my $self = shift;
 
-   # Some gut-wrenching to make the test pass
-   [ $self->take( 5 ), $self->take( 5 ), $self->take( length( $self->{str} ) - pos( $self->{str} ) ) ]
+      # Some gut-wrenching to make the test pass
+      [ $self->take( 5 ), $self->take( 5 ), $self->take( length( $self->{str} ) - pos( $self->{str} ) ) ]
+   }
 }
-
-package main;
 
 my $parser = TestParser->new;
 

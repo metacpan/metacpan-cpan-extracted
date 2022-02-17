@@ -9,7 +9,7 @@ use Scalar::Util qw(blessed);
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-09-24'; # DATE
 our $DIST = 'App-dateseq'; # DIST
-our $VERSION = '0.105'; # VERSION
+our $VERSION = '0.106'; # VERSION
 
 our %SPEC;
 
@@ -307,10 +307,10 @@ _
             'x.doc.max_result_lines' => 10,
         },
         {
-            summary => 'Print first and last timestamp (in ISO format) of each month of 2021',
-            src => q{[[prog]] 2021-01-01 2021-12-01 --increment '1 month' -e 'my $dt2 = $_->clone; $dt2->add(months=>1); $dt2->add(days => -1); $_->ymd . "T00:00:00 " . $dt2->ymd . "T23:59:59"'},
+            summary => 'Retrieve MetaCPAN releases data for 2020, saved in monthly JSON files',
+            src => q{[[prog]] 2020-01-01 2020-12-01 --increment '1 month' -e 'my $dt2 = $_->clone; $dt2->add(months=>1); $dt2->add(days => -1); sprintf "list-metacpan-releases --from-date %sT00:00:00 --to-date %sT23:59:59 --json > %04d%02d.json", $_->ymd, $dt2->ymd, $_->year, $_->month' | bash},
             src_plang => 'bash',
-            'x.doc.max_result_lines' => 10,
+            'x.doc.show_result' => 0,
         },
     ],
     links => [
@@ -491,7 +491,7 @@ App::dateseq - Generate a sequence of dates
 
 =head1 VERSION
 
-This document describes version 0.105 of App::dateseq (from Perl distribution App-dateseq), released on 2021-09-24.
+This document describes version 0.106 of App::dateseq (from Perl distribution App-dateseq), released on 2021-09-24.
 
 =head1 FUNCTIONS
 

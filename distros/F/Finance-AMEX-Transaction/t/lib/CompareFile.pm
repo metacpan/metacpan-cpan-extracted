@@ -5,47 +5,71 @@ use warnings;
 
 use Test::More;
 use JSON ();
-
+use Carp 'croak';
 
 sub compare {
   my ($type, $file, $data, $counts) = @_;
 
   my $obj = Finance::AMEX::Transaction->new(file_type => $type);
 
-  open my $fh, '<', $file or die "cannot open test file: $!";
-
   my $tests = JSON->new->utf8->decode($data);
+
+  open my $fh, '<', $file or croak "cannot open test file: $!";
 
   while (my $line = $obj->getline($fh)) {
 
-    my $type = $line->type;
-    if (exists $counts->{$type}) {
+    my $line_type = $line->type;
+    if (exists $counts->{$line_type}) {
 
-      my $have = $counts->{$type}->{have};
-      my $answers = $tests->{$type}->[$have];
+      my $have    = $counts->{$line_type}->{have};
+      my $answers = $tests->{$line_type}->[$have];
 
-      foreach my $k (keys %{$line->field_map}) {
-        is ($line->$k, $answers->{$k}, $type .' '. $have .': '. $k);
+      my $map = $line->field_map;
+
+      if (ref($map) eq 'HASH') {
+        foreach my $k (keys %{$map}) {
+          is($line->$k, $answers->{$k}, sprintf('%s %s: %s', $line_type, $have, $k));
+        }
+      } elsif (ref($map) eq 'ARRAY') {
+        foreach my $column (@{$map}) {
+          my ($k) = keys %{$column};
+          if ($line->can($k)) {
+            is($line->$k, $answers->{$k}, sprintf('%s %s: %s', $line_type, $have, $k));
+          }
+        }
+      } else {
+        fail "field_map returned an unknown type for file_type => $line_type";
       }
 
       $counts->{$line->type}->{have}++;
 
     } else {
-      fail("unknown line type: $type");
+      fail("unknown line type: $line_type");
     }
   }
 
-  foreach my $type (keys %{$counts}) {
-    is ($counts->{$type}->{have}, $counts->{$type}->{want}, 'We saw the expected amount of '. $type .' records');
+  close $fh or croak "unable to close: $!";
+
+  foreach my $line_type (keys %{$counts}) {
+    is(
+      $counts->{$line_type}->{have},
+      $counts->{$line_type}->{want},
+      sprintf('We saw the expected amount of %s records', $line_type),
+    );
   }
 
-  close $fh;
-
+  return $obj;
 }
 
+sub slurp {
+  my ($file) = @_;
 
+  open my $fh, '<', $file or croak "cannot open test file: $!";
+  local $/ = undef;
+  my $data = <$fh>;
+  close $fh or croak "unable to close: $!";
 
-
-
+  return $data;
+}
 
 1;

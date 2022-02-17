@@ -185,13 +185,27 @@ sub test_tableOfContents : Test(1) {
 
 # -----------------------------------------------------------------------------
 
-sub test_section : Test(1) {
+sub test_section : Test(2) {
     my $self = shift;
 
     my $gen = Quiq::Sdoc::Producer->new;
     
     my $str = $gen->section(2,'Test',"Ein\nTest");
     $self->is($str,"== Test\n\nEin\nTest\n\n");
+
+    # Mit @keyVal
+
+    $str = $gen->section(2,'Test',htmlFolding=>1,"Ein\nTest");
+    $self->is($str,Quiq::Unindent->string(q~
+        %Section:
+            level="2"
+            title="Test"
+            htmlFolding="1"
+
+        Ein
+        Test
+
+    ~));
 }
 
 # -----------------------------------------------------------------------------

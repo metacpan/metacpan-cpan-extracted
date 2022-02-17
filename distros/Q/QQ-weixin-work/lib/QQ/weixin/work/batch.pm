@@ -17,7 +17,7 @@ use LWP::UserAgent;
 use JSON;
 use utf8;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 our @EXPORT = qw/ invite /;
 
 =head1 FUNCTION
@@ -28,9 +28,11 @@ our @EXPORT = qw/ invite /;
 
 =head2 SYNOPSIS
 
-L<https://work.weixin.qq.com/api/doc/90000/90135/90975>
+L<https://developer.work.weixin.qq.com/document/path/90975>
 
 =head3 请求说明：
+
+企业可通过接口批量邀请成员使用企业微信，邀请后将通过短信或邮件下发通知。
 
 =head4 请求包结构体为：
 
@@ -51,15 +53,16 @@ L<https://work.weixin.qq.com/api/doc/90000/90135/90975>
 =head3 权限说明
 
 须拥有指定成员、部门或标签的查看权限。
+第三方仅通讯录应用可调用。
 
 =head3 RETURN 返回结果
 
     {
     	"errcode": 0,
     	"errmsg": "ok",
-      "invaliduser" : ["UserID1", "UserID2"],
-      "invalidparty" : [PartyID1, PartyID2],
-      "invalidtag": [TagID1, TagID2]
+		"invaliduser" : ["UserID1", "UserID2"],
+		"invalidparty" : [PartyID1, PartyID2],
+		"invalidtag": [TagID1, TagID2]
     }
 
 =head4 RETURN 参数说明
@@ -70,6 +73,13 @@ L<https://work.weixin.qq.com/api/doc/90000/90135/90975>
     invaliduser	非法成员列表
     invalidparty	非法部门列表
     invalidtag	非法标签列表
+
+=head3 更多说明
+
+user, party, tag三者不能同时为空；
+如果部分接收人无权限或不存在，邀请仍然执行，但会返回无效的部分（即invaliduser或invalidparty或invalidtag）;
+同一用户只须邀请一次，被邀请的用户如果未安装企业微信，在3天内每天会收到一次通知，最多持续3天。
+因为邀请频率是异步检查的，所以调用接口返回成功，并不代表接收者一定能收到邀请消息（可能受上述频率限制无法接收）。
 
 =cut
 

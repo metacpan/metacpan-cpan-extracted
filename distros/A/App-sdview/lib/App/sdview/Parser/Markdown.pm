@@ -7,7 +7,7 @@ use v5.26;
 
 use Object::Pad 0.43;  # :strict(params)
 
-package App::sdview::Parser::Markdown 0.05;
+package App::sdview::Parser::Markdown 0.06;
 class App::sdview::Parser::Markdown
    does App::sdview::Parser
    :strict(params);

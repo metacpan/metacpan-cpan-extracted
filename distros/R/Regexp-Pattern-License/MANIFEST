@@ -41,5 +41,5 @@ t/coverage-spdx-3.0.t
 t/coverage-tldr.t
 t/coverage-trove.t
 t/coverage-wikidata.t
-t/lib/MyTest.pm
-t/lib/Test2/Regexp/Pattern/License.pm
+t/lib/Test2/Tools/LicenseObject.pm
+t/lib/Test2/Tools/LicenseRegistry.pm

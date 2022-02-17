@@ -1,9 +1,10 @@
-package Finance::AMEX::Transaction::GRRCN;
-$Finance::AMEX::Transaction::GRRCN::VERSION = '0.004';
+package Finance::AMEX::Transaction::GRRCN 0.005;
+
 use strict;
 use warnings;
 
 use Text::CSV;
+use Carp 'croak';
 
 use Finance::AMEX::Transaction::GRRCN::Header;
 use Finance::AMEX::Transaction::GRRCN::Summary;
@@ -35,12 +36,13 @@ sub new {
     TRAILER    => 'Finance::AMEX::Transaction::GRRCN::Trailer',
   };
 
-  my $file_format = $props{format} || 'UNKNOWN';
+  my $file_format  = $props{file_format}  || 'UNKNOWN';
+  my $file_version = $props{file_version} || 'UNKNOWN';
 
   my $self = bless {
-    _type_map    => $type_map,
-    _file_format => $file_format,
-    _version     => $props{version} || 1.01,
+    _type_map     => $type_map,
+    _file_format  => $file_format,
+    _file_version => $file_version,
   }, $class;
 
   return $self;
@@ -51,13 +53,18 @@ sub file_format {
   return $self->{_file_format};
 }
 
+sub file_version {
+  my ($self) = @_;
+  return $self->{_file_version};
+}
+
 sub detect_file_format {
   my ($self, $line) = @_;
 
   if (substr($line, 0, 1) eq '"') {
-    if ($line =~ m{","}) {
+    if ($line =~ m{","}xsm) {
       $self->{_file_format} = 'CSV';
-    } elsif ($line =~ m{\"\t\"}) {
+    } elsif ($line =~ m{\"\t\"}xsm) {
       $self->{_file_format} = 'TSV';
     }
 
@@ -81,13 +88,15 @@ sub parse_line {
   if (exists $self->{_type_map}->{$type}) {
 
     my $parsed = $self->{_type_map}->{$type}->new(
-      line => $line,
-      file_format => $self->file_format,
-      version => $self->{_version},
+      line         => $line,
+      file_format  => $self->file_format,
+      file_version => $self->{_file_version},
     );
 
+    # We want to set the version when we see the header,
+    # it can change how we parse some of the line types
     if ($type eq 'HEADER') {
-      $self->{_version} = $parsed->FILE_VERSION_NUMBER;
+      $self->{_file_version} = $parsed->FILE_VERSION_NUMBER;
     }
 
     return $parsed;
@@ -103,12 +112,14 @@ sub detect_line_type {
     return substr($line, 0, 10);
   }
 
-  my $csv = Text::CSV->new ({
+  my $csv = Text::CSV->new({
     binary      => 1,
     quote_char  => '"',
     escape_char => "\\",
-  }) or die "Cannot use CSV: ".Text::CSV->error_diag ();
-  $line =~ s{\s+\z}{}; # csv parser does not like trailing whitespace
+  })
+    or croak 'Cannot use CSV: ' . Text::CSV->error_diag();
+
+  $line =~ s{\s+\z}{}xsm;    # csv parser does not like trailing whitespace
 
   if ($self->file_format eq 'CSV') {
     $csv->sep_char(',');
@@ -135,7 +146,7 @@ Finance::AMEX::Transaction::GRRCN - Parse AMEX Global Reconciliation (GRRCN)
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -243,6 +254,32 @@ Returns one of the L<Finance::AMEX::Transaction::GRRCN::Header>, L<Finance::AMEX
 
  my $record = $grrcn->parse_line('line from a grrcn file');
 
+=head2 detect_file_format
+
+Returns one of CSV, TSV, or FIXED depending on how the line is formatted.
+You wouldn't normally need to call this.
+
+ my $file_format = $grrcn->detect_file_format('line from a grrcn file');
+
+=head2 detect_line_type
+
+Returns one of the line types for the GRRCN format.
+You wouldn't normally need to call this.
+
+ my $line_type = $grrcn->detect_line_type('line from a grrcn file');
+
+=head2 file_format
+
+Returns the previously detected file format.
+
+ my $file_format = $grrcn->file_format;
+
+=head2 file_version
+
+Returns the detected file version that is parsed from the header.
+
+ my $file_format = $grrcn->file_version;
+
 =head1 NAME
 
 Finance::AMEX::Transaction::GRRCN - Parse AMEX Chargeback Notification Files (GRRCN)
@@ -253,7 +290,7 @@ Tom Heady <cpan@punch.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by ZipRecruiter.
+This software is copyright (c) 2022 by ZipRecruiter/Tom Heady.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

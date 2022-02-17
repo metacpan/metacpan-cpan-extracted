@@ -34,7 +34,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.198';
+our $VERSION = '1.199';
 
 use LWP::UserAgent ();
 use Quiq::Option;
@@ -666,7 +666,7 @@ sub url {
 
 =head1 VERSION
 
-1.198
+1.199
 
 =head1 AUTHOR
 

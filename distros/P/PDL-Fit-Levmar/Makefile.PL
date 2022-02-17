@@ -4,7 +4,6 @@ use warnings;
 use PDL::Core::Dev;
 use ExtUtils::MakeMaker;
 use Carp;
-PDL::Core::Dev->import();
 
 # Choose this to build *without* lapack
 our $HAVE_LAPACK = 0;
@@ -12,18 +11,15 @@ our $HAVE_LAPACK = 0;
 # Choose this to build *with* lapack
 # our $HAVE_LAPACK = 1;
 
-# Developer must edit VERSION in both Levmar.pm and Func.pm
-
 open my $fh, '>','have_lapack' or die "Can't open config file have_lapack for write.";
 print $fh "\$HAVE_LAPACK=$HAVE_LAPACK;\n1\n";
 close($fh);
 
 my $levmarsrc = "./levmar-2.6";
-my $lmpackage = ["levmar.pd", 'Levmar', 'PDL::Fit::Levmar'];
+my $lmpackage = ["levmar.pd", 'Levmar', 'PDL::Fit::Levmar', undef, 1];
 
 my %hash = pdlpp_stdargs($lmpackage);
 
-#$hash{VERSION}  = $VERSION;
 $hash{VERSION_FROM} = 'levmar.pd';
 $hash{INC} .= " -I$levmarsrc";
 
@@ -52,22 +48,20 @@ else {
 $hash{DIR} = [ 'Func' ];
 
 my @lm_base = qw(lm Axb misc lmlec lmblec lmbleic lmbc);
-foreach my $f (@lm_base) {
-    $hash{OBJECT} .= " $levmarsrc/$f\$(OBJ_EXT) ";
-}
+$hash{OBJECT} .= join ' ', '', 'pdlperlfunc$(OBJ_EXT)', map "$levmarsrc/$_\$(OBJ_EXT)", @lm_base;
 
 $hash{clean}{FILES} .= " " . $hash{OBJECT} .
-		" *.o *.so have_lapack Levmar.html have_lapack ";
+		" *.o *.so Levmar.html have_lapack ";
 
 $hash{OPTIMIZE} = "-O3";  # from levmar src Makefile minus clang-incompat unroll-loops
 
 $hash{PREREQ_PM} = { 
-    'PDL' => 0,
+    'PDL' => '2.074',
     'File::Temp' => 0,
 };
 
 $hash{CONFIGURE_REQUIRES} = {
-    'PDL' => '2.057', # allowed empty in $T()
+    'PDL' => '2.074', # definitely got the multi-C changes
     'ExtUtils::MakeMaker' => 0,
 };
 
@@ -78,7 +72,7 @@ $hash{TEST_REQUIRES} = {
 sub MY::postamble {
     my $s =  $levmarsrc;
     join('', map "$s/$_\$(OBJ_EXT): $s/$_.c $s/${_}_core.c $s/levmar.h $s/misc.h\n", @lm_base).
-    "\nLevmar\$(OBJ_EXT) Levmar.pm: pdlperlfunc.c\n".
+    "\n$hash{OBJECT} : pdlperlfunc.h\n".
     pdlpp_postamble($lmpackage)
 }
 

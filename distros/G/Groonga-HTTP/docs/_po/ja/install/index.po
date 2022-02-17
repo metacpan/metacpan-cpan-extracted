@@ -1,0 +1,38 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=; plural=;\n"
+
+msgid ""
+"---\n"
+"title: Install\n"
+"---"
+msgstr ""
+
+msgid "# Install"
+msgstr "# インストール"
+
+msgid "This document how to install Groonga-HTTP on the following platforms:"
+msgstr "このドキュメントは、以下のプラットフォームでGroonga-HTTPをインストールする方法を説明します。"
+
+msgid "  * [AlmaLinux](#almalinux)"
+msgstr ""
+
+msgid "We must install [Groonga][groonga] before installing Groonga-HTTP."
+msgstr "Groonga-HTTPをインストールする前に [Groonga][groonga] をインストールしなければなりません。"
+
+msgid "## AlmaLinux {#almalinux}"
+msgstr ""
+
+msgid ""
+"```console\n"
+"% cpanm --notest git://github.com/groonga/Groonga-HTTP.git@0.05\n"
+"```"
+msgstr ""
+
+msgid "[Groonga]:https://groonga.org/"
+msgstr ""

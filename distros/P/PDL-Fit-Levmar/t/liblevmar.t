@@ -38,17 +38,16 @@ sub tapprox_cruder {
 }
 
 sub check_type {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my ($Type, @d) = @_;
     my $i=0;
     foreach ( @d )  {
-	die "$i: not $Type" unless $Type == $_->type;
+	is $_->type, $Type, "type of var $i ".$_->info;
 	$i++;
     }   
 }
 
-
 sub deb  { print STDERR $_[0],"\n" }
-
 
 #-------------------------------------------------
 # Rosebrock
@@ -62,7 +61,6 @@ sub rosenbrock {
  jacobian jacmros
     d1=(-2 + 2*p0-4*ROSD*(p1-p0*p0)*p0);
     d2=(2*ROSD*(p1-p0*p0));
-
 ';
     my $ROSD = 105.0;
 
@@ -71,17 +69,17 @@ sub rosenbrock {
        my ($p0,$p1) = list $p;
        $d((0)) .= (-2 + 2 * $p0-4 *$ROSD*($p1-$p0*$p0)*$p0);
        $d((1)) .= (2*$ROSD*($p1-$p0*$p0));
-   };
+    };
     my $rf = sub {
        my ($p,$x,$t) = @_;
        my ($p0,$p1) = list $p;
        $x .= ( (1.0-$p0)**2 +  $ROSD*($p1-$p0*$p0)**2 );
-   };
+    };
 
-    my $p =  pdl  $Type, [-1.2, 1];
+    my $p = pdl $Type, [-1.2, 1];
     my $x = pdl $Type, [0,0];
     my $t = pdl $Type, [0,0];
-    
+
     my @opts = ( MAXITS => 5000 );
     my $h1 = levmar($p,$x, FUNC => $st, @opts, @g );
     check_type($Type, $h1->{INFO});
@@ -91,7 +89,7 @@ sub rosenbrock {
     my $h3 = levmar($p,$x, FUNC => $rf, JFUNC => $rderiv, @opts, DERIVATIVE => 'analytic',@g);
     check_type($Type, $h3->{INFO});
     ok ( tapprox_cruder($h2->{P},$h3->{P}), "Rosenbrock  perl sub == def");
-} 
+}
 
 #-------------------------------------------------
 # modified Rosenbrock problem

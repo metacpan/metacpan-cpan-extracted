@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-07'; # DATE
+our $DATE = '2022-01-23'; # DATE
 our $DIST = 'Text-Table-HTML'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 sub _encode {
     state $load = do { require HTML::Entities };
@@ -25,9 +25,9 @@ sub table {
 
     push @table, "<table>\n";
 
-    if (defined $params{title}) {
+    if (defined $params{caption}) {
         require HTML::Entities;
-        push @table, "<caption>".HTML::Entities::encode_entities($params{title})."</caption>\n";
+        push @table, "<caption>".HTML::Entities::encode_entities($params{caption})."</caption>\n";
     }
 
     # then the data
@@ -98,7 +98,7 @@ Text::Table::HTML - Generate HTML table
 
 =head1 VERSION
 
-This document describes version 0.006 of Text::Table::HTML (from Perl distribution Text-Table-HTML), released on 2022-01-07.
+This document describes version 0.007 of Text::Table::HTML (from Perl distribution Text-Table-HTML), released on 2022-01-23.
 
 =head1 SYNOPSIS
 
@@ -151,10 +151,10 @@ each row is an array reference. And each array element is a string (cell
 content) or hashref (with key C<text> to contain the cell text, and optionally
 attributes too like C<rowspan>, C<colspan>).
 
-=item * title
+=item * caption
 
 Optional. Str. If set, will add an HTML C<< <caption> >> element to set the
-table caption.
+provided table caption.
 
 =back
 
@@ -197,7 +197,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2017, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2017, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

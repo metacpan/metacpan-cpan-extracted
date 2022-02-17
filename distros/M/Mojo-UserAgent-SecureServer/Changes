@@ -1,5 +1,8 @@
 Revision history for perl distribution Mojo-UserAgent-SecureServer
 
+0.04 2022-02-13T10:53:53+0900
+ - Increased expiration date for the certs used by t/secure-server.t
+
 0.03 2021-06-17T09:13:31+0900
  - Add missing dependency IO::Socket::SSL
 

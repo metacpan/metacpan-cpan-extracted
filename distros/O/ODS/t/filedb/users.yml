@@ -1,0 +1,15 @@
+---
+- active: !!perl/scalar:JSON::PP::Boolean 1
+  address_line_1: test
+  address_line_2: test
+  address_line_3: test
+  address_line_4: test
+  admin: !!perl/scalar:JSON::PP::Boolean 1
+  email: email@lnation.org
+  first_name: test
+  id: 1
+  landline: ++441234567890
+  last_name: test
+  mobile: '+441234567890'
+  password: $argon2id$v=19$m=32768,t=3,p=1$MjVERkM2QTYtOEJEQy0xMUVDLUFGNTktODM4OTlDN0IyRTk5$0nlJQb4au4SHbRnhvv9Fpw
+  username: lnation

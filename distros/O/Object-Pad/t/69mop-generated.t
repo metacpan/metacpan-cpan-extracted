@@ -9,8 +9,8 @@ use Object::Pad;
 
 # An attempt to programmatically generate everything
 BEGIN {
-   package Point;
-   my $classmeta = Object::Pad::MOP::Class->begin_class( "Point" );
+   # we don't need `package Point` here any more
+   my $classmeta = Object::Pad::MOP::Class->create_class( "Point" );
 
    my $xfieldmeta = $classmeta->add_field( '$x' );
    my $yfieldmeta = $classmeta->add_field( '$y' );
@@ -27,6 +27,8 @@ BEGIN {
       return sprintf "Point(%d, %d)",
          $xfieldmeta->value($self), $yfieldmeta->value($self);
    } );
+
+   $classmeta->seal;
 }
 
 {

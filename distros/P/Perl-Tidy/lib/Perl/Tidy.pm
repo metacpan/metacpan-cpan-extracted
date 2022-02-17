@@ -3,7 +3,7 @@
 #
 #    perltidy - a perl script indenter and formatter
 #
-#    Copyright (c) 2000-2021 by Steve Hancock
+#    Copyright (c) 2000-2022 by Steve Hancock
 #    Distributed under the GPL license agreement; see file COPYING
 #
 #    This program is free software; you can redistribute it and/or modify
@@ -110,7 +110,7 @@ BEGIN {
     # Release version must be bumped, and it is probably past time for a
     # release anyway.
 
-    $VERSION = '20211029';
+    $VERSION = '20220217';
 }
 
 sub DESTROY {
@@ -777,6 +777,7 @@ EOM
 
     Perl::Tidy::Formatter::check_options($rOpts);
     Perl::Tidy::Tokenizer::check_options($rOpts);
+    Perl::Tidy::VerticalAligner::check_options($rOpts);
     if ( $rOpts->{'format'} eq 'html' ) {
         Perl::Tidy::HtmlWriter->check_options($rOpts);
     }
@@ -1019,6 +1020,7 @@ EOM
         my $encoding_in              = "";
         my $rOpts_character_encoding = $rOpts->{'character-encoding'};
         my $encoding_log_message;
+        my $decoded_input_as = "";
 
         # Case 1. See if we already have an encoded string. In that
         # case, we have to ignore any encoding flag.
@@ -1081,9 +1083,13 @@ EOM
                         $encoding_log_message .= <<EOM;
 Guessed encoding '$encoding_in' successfully decoded
 EOM
+                        $decoded_input_as = $encoding_in;
                     }
                 }
             }
+            $encoding_log_message .= <<EOM;
+Unable to guess a character encoding
+EOM
         }
 
         # Case 4. Decode with a specific encoding
@@ -1106,6 +1112,7 @@ EOM
                 $encoding_log_message .= <<EOM;
 Specified encoding '$encoding_in' successfully decoded
 EOM
+                $decoded_input_as = $encoding_in;
             }
         }
 
@@ -1234,6 +1241,7 @@ EOM
             }
         }
         elsif ($destination_stream) {
+
             $output_file = $destination_stream;
         }
         elsif ($source_stream) {    # source but no destination goes to stdout
@@ -1281,6 +1289,20 @@ EOM
           || $remove_terminal_newline
           || $rOpts->{'assert-tidy'}
           || $rOpts->{'assert-untidy'};
+
+        # Postpone final output to a destination SCALAR or ARRAY ref to allow
+        # possible encoding at the end of processing.
+        my $destination_buffer;
+        my $use_destination_buffer;
+        if (
+            ref($destination_stream)
+            && (   ref($destination_stream) eq 'SCALAR'
+                || ref($destination_stream) eq 'ARRAY' )
+          )
+        {
+            $use_destination_buffer = 1;
+            $output_file            = \$destination_buffer;
+        }
 
         $sink_object = Perl::Tidy::LineSink->new(
             output_file    => $use_buffer ? \$postfilter_buffer : $output_file,
@@ -1642,6 +1664,52 @@ EOM
             }
 
             $source_object->close_input_file();
+        }
+
+        #------------------------------------------------------------------
+        # For string output, store the result to the destination, encoding
+        # if requested. This is a fix for issue git #83 (tidyall issue)
+        #------------------------------------------------------------------
+        if ($use_destination_buffer) {
+
+            # At this point, all necessary encoding has been done except for
+            # output to a string or array ref. We use the -eos flag to decide
+            # if we should encode.
+
+            # -neos, DEFAULT: perltidy does not return encoded string output.
+            # This is a result of the code evolution but not very convenient for
+            # most applications.  It would be hard to change without breaking
+            # some programs.
+
+            # -eos flag set: If perltidy decodes a string, regardless of
+            # source, it encodes before returning.
+
+            if ( $rOpts->{'encode-output-strings'} && $decoded_input_as ) {
+                my $encoded_buffer;
+                eval {
+                    $encoded_buffer =
+                      Encode::encode( "UTF-8", $destination_buffer,
+                        Encode::FB_CROAK | Encode::LEAVE_SRC );
+                };
+                if ($@) {
+
+                    Warn(
+"Error attempting to encode output string ref; encoding not done\n"
+                    );
+                }
+                else {
+                    $destination_buffer = $encoded_buffer;
+                }
+            }
+
+            # Final string storage
+            if ( ref($destination_stream) eq 'SCALAR' ) {
+                ${$destination_stream} = $destination_buffer;
+            }
+            else {
+                my @lines = split /^/, $destination_buffer;
+                @{$destination_stream} = @lines;
+            }
         }
 
         # Save names of the input and output files
@@ -2255,7 +2323,10 @@ sub generate_options {
     $add_option->( 'extended-syntax',              'xs',   '!' );
     $add_option->( 'assert-tidy',                  'ast',  '!' );
     $add_option->( 'assert-untidy',                'asu',  '!' );
+    $add_option->( 'encode-output-strings',        'eos',  '!' );
     $add_option->( 'sub-alias-list',               'sal',  '=s' );
+    $add_option->( 'grep-alias-list',              'gal',  '=s' );
+    $add_option->( 'grep-alias-exclusion-list',    'gaxl', '=s' );
 
     ########################################
     $category = 2;    # Code indentation control
@@ -2263,7 +2334,9 @@ sub generate_options {
     $add_option->( 'continuation-indentation',             'ci',    '=i' );
     $add_option->( 'extended-continuation-indentation',    'xci',   '!' );
     $add_option->( 'line-up-parentheses',                  'lp',    '!' );
+    $add_option->( 'extended-line-up-parentheses',         'xlp',   '!' );
     $add_option->( 'line-up-parentheses-exclusion-list',   'lpxl',  '=s' );
+    $add_option->( 'line-up-parentheses-inclusion-list',   'lpil',  '=s' );
     $add_option->( 'outdent-keyword-list',                 'okwl',  '=s' );
     $add_option->( 'outdent-keywords',                     'okw',   '!' );
     $add_option->( 'outdent-labels',                       'ola',   '!' );
@@ -2311,6 +2384,8 @@ sub generate_options {
     $add_option->( 'valign-code',                               'vc',    '!' );
     $add_option->( 'valign-block-comments',                     'vbc',   '!' );
     $add_option->( 'valign-side-comments',                      'vsc',   '!' );
+    $add_option->( 'valign-exclusion-list',                     'vxl',   '=s' );
+    $add_option->( 'valign-inclusion-list',                     'vil',   '=s' );
 
     ########################################
     $category = 4;    # Comment controls
@@ -2393,6 +2468,12 @@ sub generate_options {
     $add_option->( 'break-before-paren-and-indent',           'bbpi',  '=i' );
     $add_option->( 'brace-left-list',                         'bll',   '=s' );
     $add_option->( 'brace-left-exclusion-list',               'blxl',  '=s' );
+    $add_option->( 'break-after-labels',                      'bal',   '=i' );
+
+    ## This was an experiment mentioned in git #78. It works, but it does not
+    ## look very useful.  Instead, I expanded the functionality of the
+    ## --keep-old-breakpoint-xxx flags.
+    ##$add_option->( 'break-open-paren-list',                   'bopl',  '=s' );
 
     ########################################
     $category = 6;    # Controlling list formatting
@@ -2549,6 +2630,7 @@ sub generate_options {
         'keyword-group-blanks-after'  => [ 0, 2 ],
 
         'space-prototype-paren' => [ 0, 2 ],
+        'break-after-labels'    => [ 0, 2 ],
     );
 
     # Note: we could actually allow negative ci if someone really wants it:
@@ -2581,6 +2663,7 @@ sub generate_options {
       brace-tightness=1
       brace-vertical-tightness-closing=0
       brace-vertical-tightness=0
+      break-after-labels=0
       break-at-old-logical-breakpoints
       break-at-old-ternary-breakpoints
       break-at-old-attribute-breakpoints
@@ -3203,6 +3286,66 @@ EOM
         $rexpansion, $roption_category, $roption_range );
 } ## end of _process_command_line
 
+sub make_grep_alias_string {
+    my ($rOpts) = @_;
+
+    # Defaults: list operators in List::Util
+    # Possible future additions:  pairfirst pairgrep pairmap
+    my $default_string = join ' ', qw(
+      all
+      any
+      first
+      none
+      notall
+      reduce
+      reductions
+    );
+
+    # make a hash of any excluded words
+    my %is_excluded_word;
+    my $exclude_string = $rOpts->{'grep-alias-exclusion-list'};
+    if ($exclude_string) {
+        $exclude_string =~ s/,/ /g;    # allow commas
+        $exclude_string =~ s/^\s+//;
+        $exclude_string =~ s/\s+$//;
+        my @q = split /\s+/, $exclude_string;
+        @is_excluded_word{@q} = (1) x scalar(@q);
+    }
+
+    # The special option -gaxl='*' removes all defaults
+    if ( $is_excluded_word{'*'} ) { $default_string = "" }
+
+    # combine the defaults and any input list
+    my $input_string = $rOpts->{'grep-alias-list'};
+    if ($input_string) { $input_string .= " " . $default_string }
+    else               { $input_string = $default_string }
+
+    # Now make the final list of unique grep alias words
+    $input_string =~ s/,/ /g;    # allow commas
+    $input_string =~ s/^\s+//;
+    $input_string =~ s/\s+$//;
+    my @word_list = split /\s+/, $input_string;
+    my @filtered_word_list;
+    my %seen;
+
+    foreach my $word (@word_list) {
+        if ($word) {
+            if ( $word !~ /^\w[\w\d]*$/ ) {
+                Warn(
+                    "unexpected word in --grep-alias-list: '$word' - ignoring\n"
+                );
+            }
+            if ( !$seen{$word} && !$is_excluded_word{$word} ) {
+                $seen{$word}++;
+                push @filtered_word_list, $word;
+            }
+        }
+    }
+    my $joined_words = join ' ', @filtered_word_list;
+    $rOpts->{'grep-alias-list'} = $joined_words;
+    return;
+}
+
 sub check_options {
 
     my ( $rOpts, $is_Windows, $Windows_type, $rpending_complaint ) = @_;
@@ -3210,6 +3353,15 @@ sub check_options {
     #---------------------------------------------------------------
     # check and handle any interactions among the basic options..
     #---------------------------------------------------------------
+
+    # Since perltidy only encodes in utf8, problems can occur if we let it
+    # decode anything else.  See discussions for issue git #83.
+    my $encoding = $rOpts->{'character-encoding'};
+    if ( $encoding !~ /^\s*(guess|none|utf8|utf-8)\s*$/i ) {
+        Die(<<EOM);
+--character-encoding = '$encoding' is not allowed; the options are: 'none', 'guess', 'utf8'
+EOM
+    }
 
     # Since -vt, -vtc, and -cti are abbreviations, but under
     # msdos, an unquoted input parameter like vtc=1 will be
@@ -3374,9 +3526,10 @@ EOM
                 }
             }
         }
-        my $joined_words = join ' ', @filtered_word_list;
         $rOpts->{'sub-alias-list'} = join ' ', @filtered_word_list;
     }
+
+    make_grep_alias_string($rOpts);
 
     # Turn on fuzzy-line-length unless this is an extrude run, as determined
     # by the -i and -ci settings. Otherwise blinkers can form (case b935)
@@ -4195,7 +4348,7 @@ sub show_version {
     print STDOUT <<"EOM";
 This is perltidy, v$VERSION 
 
-Copyright 2000-2021, Steve Hancock
+Copyright 2000-2022, Steve Hancock
 
 Perltidy is free software and may be copied under the terms of the GNU
 General Public License, which is included in the distribution files.

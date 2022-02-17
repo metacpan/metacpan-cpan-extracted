@@ -6,9 +6,9 @@ AnyEvent and Object::Event.
 =head1 SYNOPSIS
 
   use AnyEvent::STOMP::Client;
-  
+
   my $stomp_client = new AnyEvent::STOMP::Client()
-    
+
   $stomp_client->connect();
 
   $stomp_client->on_connected(
@@ -84,7 +84,7 @@ C<< my $client = AnyEvent::STOMP::Client->new(
     {'login' => 'guest', 'passcode' => 'guest', 'virtual-host' => 'foo'}
 ); >>
 
-=head2 $client = connect 
+=head2 $client = connect
 
 Connect to the specified  STOMP message broker. Croaks if you already
 established a connection.
@@ -261,6 +261,11 @@ frame.
 
 =back
 
+=head2 $client->destroy
+
+Disconnects and cleans up all callbacks. To be called when the client object
+is not used any more and should be cleaned up.
+
 =head2 Callbacks
 
 In order for the C<AnyEvent::STOMP::Client> to be useful, callback subroutines
@@ -284,7 +289,7 @@ Parameters passed to the callback: C<$self>, C<$host>, C<$port>.
 Invoked when either the C<on_error> callback specified in the
 C<AnyEvent::Handle> constructor is called, or when no more
 heartbeats arrive from the server.
-Parameters passed to the callback: C<$self>, C<$host>, C<$port>.
+Parameters passed to the callback: C<$self>, C<$host>, C<$port>, C<$error_message>.
 
 =head3 $guard = $client->on_connect_error $callback
 
@@ -332,8 +337,7 @@ C<$self>, C<$header_hashref>.
 
 =head3 $guard = $client->on_error $callback
 
-Invoked when an ERROR frame is received. Parameters passed to the callback:
-C<$self>, C<$header_hashref>, C<$body>.
+Invoked when an ERROR frame is received. Parameters passed to the callback: C<$self>, C<$host>, C<$port>, C<$error_message>.
 
 =head3 $guard = $client->on_subscribed $callback
 

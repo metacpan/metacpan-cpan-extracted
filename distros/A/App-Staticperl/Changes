@@ -16,6 +16,16 @@ TODO: -Ixxx overweritten during startzup for custom perl binaries
 
 TODO: proofread the pod!
 TODO: maybe make extutilc::cbuilder return value dynam,ic and have some kind of app-preferences?
+TODO: bundle "<<<<" error => endless loop
+
+1.46 Tue 15 Feb 2022 19:25:09 CET
+	- when building an app ("mkapp"), staticperl freed the argv too
+          early, which causes memory corruption when perl is later
+          assigning to $0.
+	- default CPAN recommends_policy/suggests_policy to off.
+	- new bundle args: --extra-cflags, --extra-ldflags and --extra-libs.
+        - fix CBuilder workaround to actually use PERL_CFLAGS not PERL_CFLASGS.
+        - minor cosmetic fixes.
 
 1.45 Fri Oct 19 23:26:54 CEST 2018
 	- work around weird, buggy and broken stacksize check in newer Storable.

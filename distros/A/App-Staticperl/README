@@ -742,6 +742,20 @@ THE STATICPERL SCRIPT
                # ldopts might now contain:
                # -lm -Wl,-Bstatic -lcrypt -Wl,-Bdynamic -lpthread
 
+        "--extra-cflags" string
+            Specifies extra compiler flags, used when compiling the bundle
+            file. The flags are appended to all the existing flags, so can
+            be sued to override settings.
+
+        "--extra-ldflags" string
+            Specifies extra linker flags, used when linking the bundle.
+
+        "--extra-libs" string
+            Extra linker flags, appended at the end when linking. The
+            difference to "--extra-ldflags" is that the ldflags are appended
+            to the flags, before the objects and libraries, and the extra
+            libs are added at the end.
+
    EXTENDED GLOB PATTERNS
     Some options of staticperl mkbundle expect an *extended glob pattern*.
     This is neither a normal shell glob nor a regex, but something in
@@ -1051,7 +1065,7 @@ RUNTIME FUNCTIONALITY
     is the path and contents of each file that was bundled.
 
    LAYOUT
-    Any path starting with an ampersand (&) or exclamation mark (!) are
+    Any paths starting with an ampersand (&) or exclamation mark (!) are
     reserved by staticperl. They must only be used as described in this
     section.
 
@@ -1123,8 +1137,8 @@ RECIPES / SPECIFIC MODULES
         such as "unicore/Heavy.pl" and more specific data tables such as
         "unicore/To/Digit.pl" or "unicore/lib/Perl/Word.pl". These tables
         are big (7MB uncompressed, although staticperl contains special
-        handling for those files), so including them on demand by your
-        application only might pay off.
+        handling for those files), so including them only on demand in your
+        application might pay off.
 
         To simply include the whole unicode database, use:
 

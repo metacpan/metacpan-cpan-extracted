@@ -1,5 +1,16 @@
 Revision history for Net-Async-Redis
 
+3.020     2022-02-17 17:47:08+08:00 Asia/Kuala_Lumpur
+    [Bugs fixed]
+
+    - the ->xgroup method was still not available in Net::Async::Redis::Cluster due to
+    an incomplete fix in 3.019, thanks to Nael Alolwani for catching and fixing this
+
+3.019     2022-02-16 15:42:23+08:00 Asia/Kuala_Lumpur
+    [Bugs fixed]
+
+    - the ->xgroup method was not available due to 7.0 changes, added back in
+
 3.018     2022-02-01 11:58:52+08:00 Asia/Kuala_Lumpur
     [New features]
 

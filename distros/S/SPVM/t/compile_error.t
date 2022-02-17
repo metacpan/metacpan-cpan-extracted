@@ -14,6 +14,32 @@ my $file = 't/' . basename $0;
 use FindBin;
 use lib "$FindBin::Bin/default/lib";
 
+sub compile_not_ok {
+  my ($class_name, $error_message_re) = @_;
+  
+  my (undef, $file, $line) = caller;
+  
+    my $builder = SPVM::Builder->new;
+    my $success = $builder->compile_spvm($class_name, $file, $line);
+    ok($success == 0);
+    my $error_messages = $builder->get_error_messages;
+    my $first_error_message = $error_messages->[0];
+    if ($error_message_re) {
+      like($first_error_message, $error_message_re);
+    }
+    print_error_messages($builder);
+}
+
+sub print_error_messages {
+  my ($builder) = @_;
+  
+  my $error_messages = $builder->get_error_messages;
+  
+  for my $error_message (@$error_messages) {
+    print STDERR "[CompileError]$error_message\n";
+  }
+}
+
 # SPVM compile error
 {
   my $command = "$^X -Mblib $FindBin::Bin/compile_error.pl 2>&1";
@@ -28,681 +54,229 @@ use lib "$FindBin::Bin/default/lib";
   like($output, qr/CompileError/);
 }
 
-sub print_error_messages {
-  my ($builder) = @_;
-  
-  my $error_messages = $builder->get_error_messages;
-  
-  for my $error_message (@$error_messages) {
-    print STDERR "[CompileError]$error_message\n";
-  }
-}
 
 # Class
 {
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Class::NotClosed', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Class::ClassNameDifferntFromModuleName', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Class::classPartNameStartWithLowerCase', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('foo', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('4foo', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
+  compile_not_ok('TestCase::CompileError::Class::NotClosed');
+  compile_not_ok('TestCase::CompileError::Class::ClassNameDifferntFromModuleName');
+  compile_not_ok('TestCase::CompileError::Class::classPartNameStartWithLowerCase');
+  compile_not_ok('foo');
+  compile_not_ok('4foo');
 }
 
 # Pakcage name must start SPVM::
 {
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('ClassNameCompileError', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
+  compile_not_ok('ClassNameCompileError');
 }
 
 # use
 {
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Use::ImportMethodNotFound', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Use::AliasStartsLowerCase', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Use::AliasDuplication', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
+  compile_not_ok('TestCase::CompileError::Use::ImportMethodNotFound');
+  compile_not_ok('TestCase::CompileError::Use::AliasStartsLowerCase');
+  compile_not_ok('TestCase::CompileError::Use::AliasDuplication');
 }
 
 # Logical operator
 {
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::LogicalOperator::AndNotExpression', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::LogicalOperator::OrNotExpression', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::LogicalOperator::NotNotExpression', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
+  compile_not_ok('TestCase::CompileError::LogicalOperator::AndNotExpression');
+  compile_not_ok('TestCase::CompileError::LogicalOperator::OrNotExpression');
+  compile_not_ok('TestCase::CompileError::LogicalOperator::NotNotExpression');
 }
 
 # oarray
 {
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::OArray::AssignNumeric', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::OArray::AssignNumericArray', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
+  compile_not_ok('TestCase::CompileError::OArray::AssignNumeric');
+  compile_not_ok('TestCase::CompileError::OArray::AssignNumericArray');
 }
 
 # Literal
 {
   # Caharater
   {
-    {
-      
-      my $builder = SPVM::Builder->new;
-      my $success = $builder->compile_spvm('TestCase::CompileError::Literal::Character::InvalidCharacterLiteralEmpty', __FILE__, __LINE__);
-      ok($success == 0);
-    print_error_messages($builder);
-    }
-    {
-      
-      my $builder = SPVM::Builder->new;
-      my $success = $builder->compile_spvm('TestCase::CompileError::Literal::Character::InvalidCharacterLiteral', __FILE__, __LINE__);
-      ok($success == 0);
-    print_error_messages($builder);
-    }
-    {
-      my $builder = SPVM::Builder->new;
-      my $success = $builder->compile_spvm('TestCase::CompileError::Literal::Character::NotEnd', __FILE__, __LINE__);
-      ok($success == 0);
-    print_error_messages($builder);
-    }
-    {
-      my $builder = SPVM::Builder->new;
-      my $success = $builder->compile_spvm('TestCase::CompileError::Literal::Character::InvalidHexAscii1', __FILE__, __LINE__);
-      ok($success == 0);
-    print_error_messages($builder);
-    }
-    {
-      my $builder = SPVM::Builder->new;
-      my $success = $builder->compile_spvm('TestCase::CompileError::Literal::Character::InvalidHexAscii2', __FILE__, __LINE__);
-      ok($success == 0);
-    print_error_messages($builder);
-    }
+    compile_not_ok('TestCase::CompileError::Literal::Character::InvalidCharacterLiteralEmpty');
+    compile_not_ok('TestCase::CompileError::Literal::Character::InvalidCharacterLiteral');
+    compile_not_ok('TestCase::CompileError::Literal::Character::NotEnd');
+    compile_not_ok('TestCase::CompileError::Literal::Character::InvalidHexAscii1');
+    compile_not_ok('TestCase::CompileError::Literal::Character::InvalidHexAscii2');
   }
   # Integer
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Literal::Integer::IntOutOfRange', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
+  compile_not_ok('TestCase::CompileError::Literal::Integer::IntOutOfRange');
 }
 
 # Lexcarl Variable
 {
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::LexVar::LexVarNameStartDigit', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::LexVar::LexVarNameInvalidColon', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::LexVar::LexVarNameEndColon2', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::LexVar::LexVarNameContainsUnderScoreTwice', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::LexVar::LexVarNameColon2Twice', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
+  compile_not_ok('TestCase::CompileError::LexVar::LexVarNameStartDigit');
+  compile_not_ok('TestCase::CompileError::LexVar::LexVarNameInvalidColon');
+  compile_not_ok('TestCase::CompileError::LexVar::LexVarNameEndColon2');
+  compile_not_ok('TestCase::CompileError::LexVar::LexVarNameContainsUnderScoreTwice');
+  compile_not_ok('TestCase::CompileError::LexVar::LexVarNameColon2Twice');
 }
 
 # Class Variable
 {
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::ClassVar::Private', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::ClassVar::OurClassVarNameStartDigit', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::ClassVar::OurClassVarNameInvalidColon', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::ClassVar::OurClassVarNameEndColon2', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::ClassVar::OurClassVarNameContainsUnderScoreTwice', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::ClassVar::OurClassVarNameColon2Twice', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
+  compile_not_ok('TestCase::CompileError::ClassVar::Private');
+  compile_not_ok('TestCase::CompileError::ClassVar::OurClassVarNameStartDigit');
+  compile_not_ok('TestCase::CompileError::ClassVar::OurClassVarNameInvalidColon');
+  compile_not_ok('TestCase::CompileError::ClassVar::OurClassVarNameEndColon2');
+  compile_not_ok('TestCase::CompileError::ClassVar::OurClassVarNameContainsUnderScoreTwice');
+  compile_not_ok('TestCase::CompileError::ClassVar::OurClassVarNameColon2Twice');
 }
 
 # Method
 {
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Method::Begin', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Method::MethodNameStartDigit', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Method::MethodNameContainsUnderScoreTwice', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
+  compile_not_ok('TestCase::CompileError::Method::Begin');
+  compile_not_ok('TestCase::CompileError::Method::MethodNameStartDigit');
+  compile_not_ok('TestCase::CompileError::Method::MethodNameContainsUnderScoreTwice');
 }
 
 # Field
 {
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Field::Private', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Field::HasFieldNameContainsUnderScoreTwice', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Field::HasFieldNameStartDigit', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
+  compile_not_ok('TestCase::CompileError::Field::Private');
+  compile_not_ok('TestCase::CompileError::Field::HasFieldNameContainsUnderScoreTwice');
+  compile_not_ok('TestCase::CompileError::Field::HasFieldNameStartDigit');
 }
 
 
 # Enum
 {
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Enum::PrivateAccess', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
+  compile_not_ok('TestCase::CompileError::Enum::PrivateAccess');
 }
 
 # Call sub
 {
   {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Switch::NoLastBreak', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
+    
+    compile_not_ok('TestCase::CompileError::Switch::NoLastBreak');
+    
+    
   }
 }
 
 # Value
 {
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Value::FieldsZero', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Value::Fields17', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
+  compile_not_ok('TestCase::CompileError::Value::FieldsZero');
+  compile_not_ok('TestCase::CompileError::Value::Fields17');
 }
 
 # Call method
 {
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::CallMethod::NotFound', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::CallMethod::ClassNotFound', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
+  compile_not_ok('TestCase::CompileError::CallMethod::NotFound');
+  compile_not_ok('TestCase::CompileError::CallMethod::ClassNotFound');
 }
 
 # Assign
 {
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Assign::StringToBytArray', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Assign::DifferentObject', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Assign::ConstToNoConst', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Assign::NotNumericToNumeric', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Assign::NarrwoingConvertionIntToByte', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Assign::NarrwoingConvertionIntToShort', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Assign::NarrwoingConvertionLongToByte', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Assign::NarrwoingConvertionLongToInt', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Assign::NarrwoingConvertionLongToShort', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Assign::UnboxingDifferentType', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Assign::BoxingDifferentType', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
+  compile_not_ok('TestCase::CompileError::Assign::StringToBytArray');
+  compile_not_ok('TestCase::CompileError::Assign::DifferentObject');
+  compile_not_ok('TestCase::CompileError::Assign::ConstToNoConst');
+  compile_not_ok('TestCase::CompileError::Assign::NotNumericToNumeric');
+  compile_not_ok('TestCase::CompileError::Assign::NarrwoingConvertionIntToByte');
+  compile_not_ok('TestCase::CompileError::Assign::NarrwoingConvertionIntToShort');
+  compile_not_ok('TestCase::CompileError::Assign::NarrwoingConvertionLongToByte');
+  compile_not_ok('TestCase::CompileError::Assign::NarrwoingConvertionLongToInt');
+  compile_not_ok('TestCase::CompileError::Assign::NarrwoingConvertionLongToShort');
+  compile_not_ok('TestCase::CompileError::Assign::UnboxingDifferentType');
+  compile_not_ok('TestCase::CompileError::Assign::BoxingDifferentType');
 }
 
 # Remainder
 {
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Remainder::RightIsNotIntegral', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Remainder::LeftIsNotIntegral', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
+  compile_not_ok('TestCase::CompileError::Remainder::RightIsNotIntegral');
+  compile_not_ok('TestCase::CompileError::Remainder::LeftIsNotIntegral');
 }
 
 # String
 {
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::String::CharacterAssign', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::String::AssignNonMutableToMutable', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
+  compile_not_ok('TestCase::CompileError::String::CharacterAssign');
+  compile_not_ok('TestCase::CompileError::String::AssignNonMutableToMutable');
 }
 # Weaken
 {
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Weaken::HashNotObject', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Weaken::ArrayNotObject', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
+  compile_not_ok('TestCase::CompileError::Weaken::HashNotObject');
+  compile_not_ok('TestCase::CompileError::Weaken::ArrayNotObject');
 }
 # Comparison operator
 {
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::ComparisonOperator::GtNotNumeric', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::ComparisonOperator::GeNotNumeric', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::ComparisonOperator::LtNotNumeric', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::ComparisonOperator::LeNotNumeric', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
+  compile_not_ok('TestCase::CompileError::ComparisonOperator::GtNotNumeric');
+  compile_not_ok('TestCase::CompileError::ComparisonOperator::GeNotNumeric');
+  compile_not_ok('TestCase::CompileError::ComparisonOperator::LtNotNumeric');
+  compile_not_ok('TestCase::CompileError::ComparisonOperator::LeNotNumeric');
 }
 
 # Bool
 {
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Bool::NotNumericObject', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
+  compile_not_ok('TestCase::CompileError::Bool::NotNumericObject');
 }
 
 # isa
 {
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Isa::LeftIsNotObject', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
+  compile_not_ok('TestCase::CompileError::Isa::LeftIsNotObject');
 }
 
 {
-  my $builder = SPVM::Builder->new;
-  my $success = $builder->compile_spvm('TestCase::CompileError::InvalidType', __FILE__, __LINE__);
-  ok($success == 0);
-    print_error_messages($builder);
+  compile_not_ok('TestCase::CompileError::InvalidType');
 }
 
 {
-  my $builder = SPVM::Builder->new;
-  my $success = $builder->compile_spvm('TestCase::CompileError::TypeCantBeDetectedUndef', __FILE__, __LINE__);
-  ok($success == 0);
-    print_error_messages($builder);
+  compile_not_ok('TestCase::CompileError::TypeCantBeDetectedUndef');
 }
 
 {
-  my $builder = SPVM::Builder->new;
-  my $success = $builder->compile_spvm('TestCase::CompileError::TypeCantBeDetectedUndefDefault', __FILE__, __LINE__);
-  ok($success == 0);
-    print_error_messages($builder);
+  compile_not_ok('TestCase::CompileError::TypeCantBeDetectedUndefDefault');
 }
 
 {
-  my $builder = SPVM::Builder->new;
-  my $success = $builder->compile_spvm('TestCase::CompileError::New::Private', __FILE__, __LINE__);
-  ok($success == 0);
-    print_error_messages($builder);
+  compile_not_ok('TestCase::CompileError::New::Private');
 }
 
 # Convert
 {
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Convert::ConvertFromByteArrayToString', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Convert::ConvertFromStringToByteArray', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Convert::ConvertToRef', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Convert::ConvertFromRef', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Convert::ConvertFromValueType', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
+  compile_not_ok('TestCase::CompileError::Convert::ConvertFromByteArrayToString');
+  compile_not_ok('TestCase::CompileError::Convert::ConvertFromStringToByteArray');
+  compile_not_ok('TestCase::CompileError::Convert::ConvertToRef');
+  compile_not_ok('TestCase::CompileError::Convert::ConvertFromRef');
+  compile_not_ok('TestCase::CompileError::Convert::ConvertFromValueType');
 }
 
 # Concat
 {
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Concat::RightIsNotString', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Concat::LeftIsNotString', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
+  compile_not_ok('TestCase::CompileError::Concat::RightIsNotString');
+  compile_not_ok('TestCase::CompileError::Concat::LeftIsNotString');
 }
 
 # Type
 {
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Type::MutableNoStringCaseStringArray', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Type::MutableNoStringCaseInt', __FILE__, __LINE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
+  compile_not_ok('TestCase::CompileError::Type::MutableNoStringCaseStringArray');
+  compile_not_ok('TestCase::CompileError::Type::MutableNoStringCaseInt');
 }
 
 # Divide - Compile Error
 {
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Divide::LeftIsNotNumeric', __LINE__, __FILE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Divide::RightIsNotNumeric', __LINE__, __FILE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Divide::DivuiLeftIsNotInt', __LINE__, __FILE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Divide::DivuiRightIsNotInt', __LINE__, __FILE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Divide::DivulLeftIsNotLong', __LINE__, __FILE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Divide::DivulRightIsNotLong', __LINE__, __FILE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
+  compile_not_ok('TestCase::CompileError::Divide::LeftIsNotNumeric');
+  compile_not_ok('TestCase::CompileError::Divide::RightIsNotNumeric');
+  compile_not_ok('TestCase::CompileError::Divide::DivuiLeftIsNotInt');
+  compile_not_ok('TestCase::CompileError::Divide::DivuiRightIsNotInt');
+  compile_not_ok('TestCase::CompileError::Divide::DivulLeftIsNotLong');
+  compile_not_ok('TestCase::CompileError::Divide::DivulRightIsNotLong');
 }
 
 
 # Remainder - Compile Error
 {
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Remainder::LeftIsNotIntegral', __LINE__, __FILE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Remainder::RightIsNotIntegral', __LINE__, __FILE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Remainder::RemuiLeftIsNotInt', __LINE__, __FILE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Remainder::RemuiRightIsNotInt', __LINE__, __FILE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Remainder::RemulLeftIsNotLong', __LINE__, __FILE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
-  {
-    my $builder = SPVM::Builder->new;
-    my $success = $builder->compile_spvm('TestCase::CompileError::Remainder::RemulRightIsNotLong', __LINE__, __FILE__);
-    ok($success == 0);
-    print_error_messages($builder);
-  }
+  compile_not_ok('TestCase::CompileError::Remainder::LeftIsNotIntegral', qr/left.+%.+integral/);
+  compile_not_ok('TestCase::CompileError::Remainder::RightIsNotIntegral', qr/right.+%.+integral/);
+  compile_not_ok('TestCase::CompileError::Remainder::RemuiLeftIsNotInt', qr/left.+remui.+int/);
+  compile_not_ok('TestCase::CompileError::Remainder::RemuiRightIsNotInt', qr/right.+remui.+int/);
+  compile_not_ok('TestCase::CompileError::Remainder::RemulLeftIsNotLong', qr/left.+remul.+long/);
+  compile_not_ok('TestCase::CompileError::Remainder::RemulRightIsNotLong', qr/right.+remul.+long/);
 }
 
+# Interface
+{
+  compile_not_ok('TestCase::CompileError::Interface::HaveBlock', qr/interface.+block/i);
+  compile_not_ok('TestCase::CompileError::Interface::NativeMethod', qr/interface.+native/i);
+  compile_not_ok('TestCase::CompileError::Interface::StaticMethod', qr/interface.+instance/i);
+  compile_not_ok('TestCase::CompileError::Interface::ImplementStatement', qr/implement/i);
+}
 
 done_testing;

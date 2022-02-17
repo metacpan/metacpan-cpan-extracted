@@ -2,6 +2,7 @@ package Text::Amuse::InlineElement;
 use strict;
 use warnings;
 use utf8;
+use Text::Amuse::Utils;
 
 =head1 NAME
 
@@ -179,6 +180,26 @@ TEX
         }
     }
     elsif ($type eq 'open' or $type eq 'close') {
+        if ($self->tag =~ m/\A\[([a-zA-Z-]+)\]\z/) {
+            my $iso = $1;
+            if ($self->is_latex) {
+                if ($type eq 'open') {
+                    my $lang = Text::Amuse::Utils::get_latex_lang($iso);
+                    return "\\foreignlanguage{$lang}{";
+                }
+                else {
+                    return "}";
+                }
+            }
+            elsif ($self->is_html) {
+                if ($type eq 'open') {
+                    return qq{<span lang="$iso">};
+                }
+                else {
+                    return "</span>";
+                }
+            }
+        }
         my $out = $self->_markup_table->{$self->tag}->{$type}->{$self->fmt};
         die "Missing markup for $self->fmt $type $self->tag" unless $out;
         return $out;

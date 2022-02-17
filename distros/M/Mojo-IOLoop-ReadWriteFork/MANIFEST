@@ -1,5 +1,6 @@
 .github/workflows/ci.yaml
 .perltidyrc
+.pls_cache/index
 .ship.conf
 Changes
 cpanfile
@@ -17,6 +18,7 @@ t/event-drain.t
 t/event-finish.t
 t/event-legacy.t
 t/event-prepare.t
+t/event-stderr-stdout.t
 t/minion.t
 t/mojolicious-lite-ev.t
 t/mojolicious-lite-poll.t

@@ -37,6 +37,56 @@
 #include "spvm_array_field_access.h"
 #include "spvm_string_buffer.h"
 #include "spvm_allow.h"
+#include "spvm_implement.h"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -193,6 +243,11 @@ const char* const* SPVM_OP_C_ID_NAMES(void) {
     "REMAINDER_UNSIGNED_INT",
     "REMAINDER_UNSIGNED_LONG",
     "NEW_STRING_LEN",
+    "IS_READ_ONLY",
+    "MAKE_READ_ONLY",
+    "COPY",
+    "IMPLEMENT",
+    "HAS_IMPLEMENT",
   };
   
   return id_names;
@@ -1253,6 +1308,7 @@ int32_t SPVM_OP_get_mem_id(SPVM_COMPILER* compiler, SPVM_OP* op) {
     case SPVM_OP_C_ID_STRING_CMP:
     case SPVM_OP_C_ID_ISA:
     case SPVM_OP_C_ID_ISWEAK_FIELD:
+    case SPVM_OP_C_ID_HAS_IMPLEMENT:
       return 0;
     default: {
       SPVM_OP* op_var = SPVM_OP_get_target_op_var(compiler, op);
@@ -1290,6 +1346,7 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
     case SPVM_OP_C_ID_DIE:
     case SPVM_OP_C_ID_WARN:
     case SPVM_OP_C_ID_PRINT:
+    case SPVM_OP_C_ID_MAKE_READ_ONLY:
     {
       // Dummy int variable
       SPVM_OP* op_type = SPVM_OP_new_op_int_type(compiler, op->file, op->line);
@@ -1319,6 +1376,8 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
     case SPVM_OP_C_ID_ISA:
     case SPVM_OP_C_ID_IF:
     case SPVM_OP_C_ID_ISWEAK_FIELD:
+    case SPVM_OP_C_ID_IS_READ_ONLY:
+    case SPVM_OP_C_ID_HAS_IMPLEMENT:
     {
       SPVM_OP* op_type = SPVM_OP_new_op_int_type(compiler, op->file, op->line);
       type = op_type->uv.type;
@@ -1379,6 +1438,7 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
     case SPVM_OP_C_ID_NEW:
     case SPVM_OP_C_ID_CHECK_CONVERT:
     case SPVM_OP_C_ID_ARRAY_INIT:
+    case SPVM_OP_C_ID_COPY:
     {
       type = SPVM_OP_get_type(compiler, op->first);
       break;
@@ -1560,7 +1620,7 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
           break;
         }
         default:
-          assert(SPVM_TYPE_is_value_ref_type(compiler, term_type->basic_type->id, term_type->dimension, term_type->flag));
+          assert(SPVM_TYPE_is_multi_numeric_ref_type(compiler, term_type->basic_type->id, term_type->dimension, term_type->flag));
           type = SPVM_TYPE_new(compiler);
           type->basic_type = term_type->basic_type;
           type->dimension = term_type->dimension;
@@ -1604,6 +1664,33 @@ SPVM_OP* SPVM_OP_build_weaken_field(SPVM_COMPILER* compiler, SPVM_OP* op_weaken,
   op_field_access->flag |= SPVM_OP_C_FLAG_FIELD_ACCESS_WEAKEN;
   
   return op_weaken_field;
+}
+
+SPVM_OP* SPVM_OP_build_has_implement(SPVM_COMPILER* compiler, SPVM_OP* op_has_implement, SPVM_OP* op_var, SPVM_OP* op_name) {
+  
+  // Build op
+  SPVM_OP_insert_child(compiler, op_has_implement, op_has_implement->last, op_var);
+  SPVM_OP_insert_child(compiler, op_has_implement, op_has_implement->last, op_name);
+
+  SPVM_OP* op_name_var_condition = SPVM_OP_new_op_name(compiler, "@condition_flag", op_var->file, op_var->line);
+  SPVM_OP* op_var_condition = SPVM_OP_new_op_var(compiler, op_name_var_condition);
+  SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_var->file, op_var->line);
+  SPVM_OP_build_assign(compiler, op_assign, op_var_condition, op_has_implement);
+
+  return op_assign;
+}
+
+SPVM_OP* SPVM_OP_build_is_read_only(SPVM_COMPILER* compiler, SPVM_OP* op_is_read_only, SPVM_OP* op_term) {
+  
+  // Build op
+  SPVM_OP_insert_child(compiler, op_is_read_only, op_is_read_only->last, op_term);
+
+  SPVM_OP* op_name_var_condition = SPVM_OP_new_op_name(compiler, "@condition_flag", op_term->file, op_term->line);
+  SPVM_OP* op_var_condition = SPVM_OP_new_op_var(compiler, op_name_var_condition);
+  SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_term->file, op_term->line);
+  SPVM_OP_build_assign(compiler, op_assign, op_var_condition, op_is_read_only);
+
+  return op_assign;
 }
 
 SPVM_OP* SPVM_OP_build_unweaken_field(SPVM_COMPILER* compiler, SPVM_OP* op_unweaken, SPVM_OP* op_field_access) {
@@ -1755,36 +1842,48 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
     while ((op_descriptor = SPVM_OP_sibling(compiler, op_descriptor))) {
       SPVM_DESCRIPTOR* descriptor = op_descriptor->uv.descriptor;
       switch (descriptor->id) {
-        case SPVM_DESCRIPTOR_C_ID_CALLBACK_T:
+        case SPVM_DESCRIPTOR_C_ID_CALLBACK_T: {
           class->category = SPVM_CLASS_C_CATEGORY_CALLBACK;
           category_descriptors_count++;
           break;
-        case SPVM_DESCRIPTOR_C_ID_POINTER_T:
+        }
+        case SPVM_DESCRIPTOR_C_ID_POINTER_T: {
           class->category = SPVM_CLASS_C_CATEGORY_CLASS;
           class->flag |= SPVM_CLASS_C_FLAG_POINTER;
           category_descriptors_count++;
           break;
-        case SPVM_DESCRIPTOR_C_ID_MULNUM_T:
+        }
+        case SPVM_DESCRIPTOR_C_ID_MULNUM_T: {
           class->category = SPVM_CLASS_C_CATEGORY_MULNUM;
           category_descriptors_count++;
           break;
-        case SPVM_DESCRIPTOR_C_ID_PRIVATE:
+        }
+        case SPVM_DESCRIPTOR_C_ID_PRIVATE: {
           // Default is private
           access_control_descriptors_count++;
           break;
-        case SPVM_DESCRIPTOR_C_ID_PUBLIC:
+        }
+        case SPVM_DESCRIPTOR_C_ID_PUBLIC: {
           class->flag |= SPVM_CLASS_C_FLAG_PUBLIC;
           access_control_descriptors_count++;
           break;
-        case SPVM_DESCRIPTOR_C_ID_PRECOMPILE:
+        }
+        case SPVM_DESCRIPTOR_C_ID_PRECOMPILE: {
           class->has_precompile_descriptor = 1;
           break;
-        default:
+        }
+        case SPVM_DESCRIPTOR_C_ID_INTERFACE_T: {
+          class->category = SPVM_CLASS_C_CATEGORY_INTERFACE;
+          category_descriptors_count++;
+          break;
+        }
+        default: {
           SPVM_COMPILER_error(compiler, "Invalid class descriptor %s at %s line %d", (SPVM_DESCRIPTOR_C_ID_NAMES())[descriptor->id], op_class->file, op_class->line);
+        }
       }
     }
     if (category_descriptors_count > 1) {
-      SPVM_COMPILER_error(compiler, "callback, mulnum_t, pointer can be specified only one at %s line %d", op_list_descriptors->file, op_list_descriptors->line);
+      SPVM_COMPILER_error(compiler, "callback_t, mulnum_t, pointer_t interface_t can be specified only one at %s line %d", op_list_descriptors->file, op_list_descriptors->line);
     }
     if (access_control_descriptors_count > 1) {
       SPVM_COMPILER_error(compiler, "private, public can be specified only one at %s line %d", op_list_descriptors->file, op_list_descriptors->line);
@@ -1822,12 +1921,22 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
       else if (op_decl->id == SPVM_OP_C_ID_ALLOW) {
         SPVM_LIST_push(class->op_allows, op_decl);
       }
+      // implement declarations
+      else if (op_decl->id == SPVM_OP_C_ID_IMPLEMENT) {
+        if (class->category != SPVM_CLASS_C_CATEGORY_CLASS) {
+          SPVM_COMPILER_error(compiler, "Non-noramal classes can't have \"implement\" statements at %s line %d", op_decl->file, op_decl->line);
+        }
+        SPVM_LIST_push(class->op_implements, op_decl);
+      }
       // Class var declarations
       else if (op_decl->id == SPVM_OP_C_ID_CLASS_VAR) {
         SPVM_CLASS_VAR* class_var = op_decl->uv.class_var;
 
         if (class->category == SPVM_CLASS_C_CATEGORY_CALLBACK) {
-          SPVM_COMPILER_error(compiler, "Callback class can't have class variable at %s line %d", op_decl->file, op_decl->line);
+          SPVM_COMPILER_error(compiler, "Callback classes can't have class variables at %s line %d", op_decl->file, op_decl->line);
+        }
+        else if (class->category == SPVM_CLASS_C_CATEGORY_INTERFACE) {
+          SPVM_COMPILER_error(compiler, "Interface classes can't have class variables at %s line %d", op_decl->file, op_decl->line);
         }
         SPVM_LIST_push(class->class_vars, op_decl->uv.class_var);
 
@@ -1928,7 +2037,10 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
         SPVM_FIELD* field = op_decl->uv.field;
         
         if (class->category == SPVM_CLASS_C_CATEGORY_CALLBACK) {
-          SPVM_COMPILER_error(compiler, "Callback class can't have field at %s line %d", op_decl->file, op_decl->line);
+          SPVM_COMPILER_error(compiler, "Callback classes can't have fields at %s line %d", op_decl->file, op_decl->line);
+        }
+        else if (class->category == SPVM_CLASS_C_CATEGORY_INTERFACE) {
+          SPVM_COMPILER_error(compiler, "Interface classes can't have fields at %s line %d", op_decl->file, op_decl->line);
         }
         SPVM_LIST_push(class->fields, field);
         
@@ -2140,48 +2252,63 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
             assert(op_arg_first_type->uv.type->basic_type);
           }
         }
-        
-        if (class->category == SPVM_CLASS_C_CATEGORY_CALLBACK) {
-          // Method having callback_t descriptor must be method
-          if (method->is_class_method) {
-            SPVM_COMPILER_error(compiler, "The method belonging to the class with a callback_t descriptor must be a instance method at %s line %d", method->op_method->file, method->op_method->line);
-          }
-          // Method having callback_t descriptor must be anon
-          if (strlen(method_name) != 0) {
-            SPVM_COMPILER_error(compiler, "The method belonging to the class with a callback_t descriptor can't have the name at %s line %d", method->op_method->file, method->op_method->line);
-          }
-        }
-        
+
         // If Method is anon, sub must be method
         if (strlen(method_name) == 0 && method->is_class_method) {
           SPVM_COMPILER_error(compiler, "Anon methods must be instance methods at %s line %d", method->op_method->file, method->op_method->line);
         }
 
-        // If class is callback, sub must not be native
-        if (class->category == SPVM_CLASS_C_CATEGORY_CALLBACK && (method->flag & SPVM_METHOD_C_FLAG_NATIVE)) {
-          SPVM_COMPILER_error(compiler, "Method of callback can't have native descriptor at %s line %d", method->op_method->file, method->op_method->line);
-        }
-
-        // If class is callback, sub must not be precompile
-        if (class->category == SPVM_CLASS_C_CATEGORY_CALLBACK && (method->flag & SPVM_METHOD_C_FLAG_PRECOMPILE)) {
-          SPVM_COMPILER_error(compiler, "Method of callback can't have precompile descriptor at %s line %d", method->op_method->file, method->op_method->line);
-        }
-
-        // If class is callback, sub must not be precompile
-        if (class->category == SPVM_CLASS_C_CATEGORY_CALLBACK && (method->flag & SPVM_METHOD_C_FLAG_PRECOMPILE)) {
-          SPVM_COMPILER_error(compiler, "Method of callback can't have precompile descriptor at %s line %d", method->op_method->file, method->op_method->line);
-        }
-
-        // If class is callback, sub must not be precompile
-        if (!method->op_block) {
-          if (class->category == SPVM_CLASS_C_CATEGORY_CALLBACK) {
-            // OK
+        if (class->category == SPVM_CLASS_C_CATEGORY_CALLBACK) {
+          // Method having callback_t descriptor must be method
+          if (method->is_class_method) {
+            SPVM_COMPILER_error(compiler, "Methods of callback classes must be instance methods at %s line %d", method->op_method->file, method->op_method->line);
           }
-          else if (method->flag & SPVM_METHOD_C_FLAG_NATIVE) {
-            // OK
+          
+          // Method having callback_t descriptor must be anon
+          if (strlen(method_name) != 0) {
+            SPVM_COMPILER_error(compiler, "Methods of callback classes can't have names at %s line %d", method->op_method->file, method->op_method->line);
           }
-          else {
-            SPVM_COMPILER_error(compiler, "Method \"%s\" must have the block at %s line %d", method->name, method->op_method->file, method->op_method->line);
+          
+          // If class is callback, the method must not be native
+          if (method->flag & SPVM_METHOD_C_FLAG_NATIVE) {
+            SPVM_COMPILER_error(compiler, "Methods of callback classes  can't have native descriptors at %s line %d", method->op_method->file, method->op_method->line);
+          }
+
+          // If class is callback, the method must not be precompile
+          if (method->flag & SPVM_METHOD_C_FLAG_PRECOMPILE) {
+            SPVM_COMPILER_error(compiler, "Methods of callback classes can't have precompile descriptors at %s line %d", method->op_method->file, method->op_method->line);
+          }
+          
+          // If class is callback, the method must not be precompile
+          if (method->op_block) {
+            SPVM_COMPILER_error(compiler, "Methods of callback classes can't have the blocks at %s line %d", method->op_method->file, method->op_method->line);
+          }
+        }
+        else if (class->category == SPVM_CLASS_C_CATEGORY_INTERFACE) {
+          // Method having interface_t descriptor must be method
+          if (method->is_class_method) {
+            SPVM_COMPILER_error(compiler, "Methods of interface classes must be instance methods at %s line %d", method->op_method->file, method->op_method->line);
+          }
+          
+          // If class is interface, the method must not be native
+          if (method->flag & SPVM_METHOD_C_FLAG_NATIVE) {
+            SPVM_COMPILER_error(compiler, "Methods of interface classes  can't have native descriptors at %s line %d", method->op_method->file, method->op_method->line);
+          }
+
+          // If class is interface, the method must not be precompile
+          if (method->flag & SPVM_METHOD_C_FLAG_PRECOMPILE) {
+            SPVM_COMPILER_error(compiler, "Methods of interface classes can't have precompile descriptors at %s line %d", method->op_method->file, method->op_method->line);
+          }
+          
+          // If class is interface, the method must not be precompile
+          if (method->op_block) {
+            SPVM_COMPILER_error(compiler, "Methods of interface classes can't have the blocks at %s line %d", method->op_method->file, method->op_method->line);
+          }
+        }
+        
+        if (method->flag & SPVM_METHOD_C_FLAG_NATIVE) {
+          if (method->op_block) {
+            SPVM_COMPILER_error(compiler, "Native methods can't have blocks at %s line %d", method->op_method->file, method->op_method->line);
           }
         }
         
@@ -2268,6 +2395,21 @@ SPVM_OP* SPVM_OP_build_allow(SPVM_COMPILER* compiler, SPVM_OP* op_allow, SPVM_OP
   SPVM_OP_build_use(compiler, op_use, op_type_use, NULL, 0);
   
   return op_allow;
+}
+
+SPVM_OP* SPVM_OP_build_implement(SPVM_COMPILER* compiler, SPVM_OP* op_implement, SPVM_OP* op_type) {
+  
+  SPVM_IMPLEMENT* implement = SPVM_IMPLEMENT_new(compiler);
+  implement->op_type = op_type;
+  op_implement->uv.implement = implement;
+  
+  // add use stack
+  SPVM_TYPE* type_use = SPVM_TYPE_clone_type(compiler, op_type->uv.type);
+  SPVM_OP* op_type_use = SPVM_OP_new_op_type(compiler, type_use, op_type->file, op_type->line);
+  SPVM_OP* op_use = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_USE, op_type->file, op_type->line);
+  SPVM_OP_build_use(compiler, op_use, op_type_use, NULL, 0);
+  
+  return op_implement;
 }
 
 SPVM_OP* SPVM_OP_build_our(SPVM_COMPILER* compiler, SPVM_OP* op_class_var, SPVM_OP* op_name, SPVM_OP* op_descriptors, SPVM_OP* op_type) {
@@ -2748,7 +2890,7 @@ SPVM_OP* SPVM_OP_build_call_method(SPVM_COMPILER* compiler, SPVM_OP* op_invocant
   SPVM_OP* op_call_method = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_CALL_METHOD, op_name_method->file, op_name_method->line);
   SPVM_OP_insert_child(compiler, op_call_method, op_call_method->last, op_list_terms);
   
-  SPVM_CALL_METHOD*call_method = SPVM_CALL_METHOD_new(compiler);
+  SPVM_CALL_METHOD* call_method = SPVM_CALL_METHOD_new(compiler);
   
   const char* method_name = op_name_method->uv.name;
   
@@ -2783,7 +2925,7 @@ SPVM_OP* SPVM_OP_build_call_method(SPVM_COMPILER* compiler, SPVM_OP* op_invocant
     op_term->is_passed_to_method = 1;
   }
   
-  op_call_method->uv.call_method =call_method;
+  op_call_method->uv.call_method = call_method;
   
   return op_call_method;
 }
@@ -3085,6 +3227,13 @@ SPVM_OP* SPVM_OP_build_print(SPVM_COMPILER* compiler, SPVM_OP* op_print, SPVM_OP
   return op_print;
 }
 
+SPVM_OP* SPVM_OP_build_make_read_only(SPVM_COMPILER* compiler, SPVM_OP* op_make_read_only, SPVM_OP* op_term) {
+  
+  SPVM_OP_insert_child(compiler, op_make_read_only, op_make_read_only->last, op_term);
+  
+  return op_make_read_only;
+}
+
 SPVM_OP* SPVM_OP_build_basic_type(SPVM_COMPILER* compiler, SPVM_OP* op_name) {
   
   const char* name = op_name->uv.name;
@@ -3258,4 +3407,10 @@ int32_t SPVM_OP_get_list_elements_count(SPVM_COMPILER* compiler, SPVM_OP* op_lis
   }
   
   return count;
+}
+
+const char* SPVM_OP_get_op_name(int32_t op_id) {
+  const char* op_name = (SPVM_OP_C_ID_NAMES())[op_id];
+  
+  return op_name;
 }

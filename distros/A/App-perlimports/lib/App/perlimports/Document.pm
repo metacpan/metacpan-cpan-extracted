@@ -3,7 +3,7 @@ package App::perlimports::Document;
 use Moo;
 use utf8;
 
-our $VERSION = '0.000032';
+our $VERSION = '0.000034';
 
 use App::perlimports::Annotations     ();
 use App::perlimports::ExportInspector ();
@@ -341,9 +341,14 @@ sub _build_includes {
                 && ( $_[1]->type eq 'use'
                 || $_[1]->type eq 'require' )
                 && !$self->_is_ignored( $_[1] )
-                && !$self->_has_import_switches( $_[1]->module );
+                && !$self->_has_import_switches( $_[1]->module )
+                && !App::perlimports::Sandbox::eval_pkg(
+                $_[1]->module,
+                "$_[1]"
+                );
         }
     ) || [];
+
 }
 
 sub _build_possible_imports {
@@ -440,13 +445,13 @@ sub _build_original_imports {
 
         # If a module has been included multiple times, we want to have a
         # cumulative tally of what has been explicitly imported.
-        my $found = $self->_imports_for_include($include);
-        if ($found) {
+        my $found_for_include = $self->_imports_for_include($include);
+        if ($found_for_include) {
             if ( $imports{$pkg} ) {
-                push @{ $imports{$pkg} }, @{$found};
+                push @{ $imports{$pkg} }, @{$found_for_include};
             }
             else {
-                $imports{$pkg} = $found;
+                $imports{$pkg} = $found_for_include;
             }
         }
     }
@@ -570,7 +575,9 @@ sub _unnest_quotes {
 
     push @words, $self->_extract_symbols_from_snippet( $token->string );
 
-    my $doc    = PPI::Document->new( \$token->string );
+    my $doc = PPI::Document->new( \$token->string );
+    return @words unless $doc;
+
     my $quotes = $doc->find('PPI::Token::Quote');
     return @words unless $quotes;
 
@@ -1021,7 +1028,7 @@ App::perlimports::Document - Make implicit imports explicit
 
 =head1 VERSION
 
-version 0.000032
+version 0.000034
 
 =head2 inspector_for( $module_name )
 

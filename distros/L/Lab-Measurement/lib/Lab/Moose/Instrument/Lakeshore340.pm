@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Lakeshore340;
-$Lab::Moose::Instrument::Lakeshore340::VERSION = '3.803';
+$Lab::Moose::Instrument::Lakeshore340::VERSION = '3.810';
 #ABSTRACT: Lakeshore Model 340 Temperature Controller
 
 use v5.20;
@@ -352,7 +352,7 @@ Lab::Moose::Instrument::Lakeshore340 - Lakeshore Model 340 Temperature Controlle
 
 =head1 VERSION
 
-version 3.803
+version 3.810
 
 =head1 SYNOPSIS
 
@@ -417,13 +417,15 @@ Specifies the control mode. Valid entries: 1 = Manual PID, 2 = Zone,
  my $cmode = $lakeshore->get_control_mode(loop => 1);
 
 =head2 set_mout/get_mout
+
  $lakeshore->set_mout(
     loop => 1,
     value => 22.45, # percent of range
  );
  my $mout = $lakeshore->get_mout(loop => 1);
 
-In open loop mode: Set/get manual output.
+Set/get manual output. Only works if output is configured for open
+loop control.
 
 =head2 set_control_parameters/get_control_parameters
 

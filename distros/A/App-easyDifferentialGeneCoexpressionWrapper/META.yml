@@ -1,0 +1,31 @@
+---
+abstract: 'easyDifferentialGeneCoexpressionWrapper is a wrapper program for the easyDifferentialGeneCoexpression.r R script (developed by Davide Chicco).'
+author:
+  - 'Abbas Alameer'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-easyDifferentialGeneCoexpressionWrapper
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Basename: '0'
+  File::HomeDir: '0'
+  Getopt::Long: '0'
+  Term::ANSIColor: '0'
+  perl: '5.008000'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/AbbasAlameer/easyDifferentialGeneCoexpressionWrapper.git
+version: 1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

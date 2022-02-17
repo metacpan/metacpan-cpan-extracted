@@ -36,7 +36,7 @@ use Binance::API::Request;
 use Binance::Exception::Parameter::BadValue;
 use Binance::Exception::Parameter::Required;
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 =head1 NAME
 
@@ -92,6 +92,10 @@ B<PARAMETERS>
 [OPTIONAL] Number of milliseconds the request is valid for. Applies only in
 signed requests.
 
+=item baseUrl
+
+[OPTIONAL] Base URL of Binance endpoint.
+
 =item logger
 
 [OPTIONAL] See L<Binance::API::Logger/new>
@@ -113,6 +117,7 @@ sub new {
         apiKey     => $params{apiKey},
         secretKey  => $params{secretKey},
         recvWindow => $params{recvWindow},
+        baseUrl    => $params{baseUrl},
         logger     => $logger,
     );
 

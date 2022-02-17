@@ -23,8 +23,8 @@ my $output = '';
 $fork->on(read => sub { $output .= pop });
 $fork->conduit({type => 'pty'})->run_p(ssh => $ENV{READWRITEFORK_SSH}, -t => q(tput cols))->wait;
 
-is_deeply \@pipe_names, [qw(stdin_read stdin_write stdout_read stdout_write)], 'pipe names';
-is_deeply \@pipe_ref, ['', 'IO::Pty', 'IO::Pty', ''], 'pipe types';
+is_deeply \@pipe_names, [qw(stderr_read stderr_write stdin_read stdin_write stdout_read stdout_write)], 'pipe names';
+is_deeply \@pipe_ref,   ['', '', '', 'IO::Pty', 'IO::Pty', ''],                                         'pipe types';
 like $output, qr{$columns\r\n}s, 'changed columns';
 
 done_testing;

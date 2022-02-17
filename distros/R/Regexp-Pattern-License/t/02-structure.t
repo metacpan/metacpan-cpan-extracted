@@ -20,7 +20,7 @@ my $localspec_re = qr/^(?:
 		(?:\.alt(?:\.(?:
 			# TODO: add tests to check each org
 			# TODO: maybe drop less popular orgs (instead using misc)
-			org\.(?:cc|debian|fedora|fsf|gentoo|linfo|osi|perl|scancode|software_license|spdx|steward|tldr|trove|wikipedia|wikidata)
+			org\.(?:cc|debian|fedora|fsf|gentoo|linfo|osi|perl|scancode|spdx|steward|tldr|trove|wikipedia|wikidata)
 		|
 			(?:since|until)\.(?:date_\d{8})
 		|

@@ -1,28 +1,64 @@
 package BorderStyle::UTF8::SingleLineBoldHeader;
 
 use strict;
-use parent 'BorderStyleBase';
+use warnings;
 use utf8;
 
+use Role::Tiny::With;
+with 'BorderStyleRole::Source::ASCIIArt';
+
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-26'; # DATE
+our $DATE = '2022-02-14'; # DATE
 our $DIST = 'BorderStyles-Standard'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.013'; # VERSION
+
+our @PICTURES = (
+    {
+        for_header_data_separator => 1,
+        picture => <<'_',
+┍━━━━━━━┯━━━┯━━━┑'
+╿ ..... ╿ . ╿ . ╿'
+╿ ..... ┡━━━╇━━━┩'
+╿ ..... ╿ . ╿ . ╿'
+╿ ..... ┡━━━┻━━━┩'
+╿ ..... ╿ ..... ╿'
+┡━━━┯━━━┩ ..... ╿'
+╿ . ╿ . ╿ ..... ╿'
+┗━━━┻━━━┻━━━━━━━┛'
+_
+    },
+    {
+        for_header_row => 1,
+        picture => <<'_',
+┏━━━━━━━┳━━━┳━━━┓'
+┃ ..... ┃ . ┃ . ┃'
+┃ ..... ┣━━━╋━━━┫'
+┃ ..... ┃ . ┃ . ┃'
+┃ ..... ┣━━━┻━━━┫'
+┃ ..... ┃ ..... ┃'
+┣━━━┳━━━┫ ..... ┃'
+┃ . ┃ . ┃ ..... ┃'
+┗━━━┻━━━┻━━━━━━━┛'
+_
+    },
+    {
+        picture => <<'_',
+┌───────┬───┬───┐'
+│ ..... │ . │ . │'
+│ ..... ├───┼───┤'
+│ ..... │ . │ . │'
+│ ..... ├───┴───┤'
+│ ..... │ ..... │'
+├───┬───┤ ..... │'
+│ . │ . │ ..... │'
+└───┴───┴───────┘'
+_
+    },
+);
 
 our %BORDER = (
-    v => 2,
+    v => 3,
     summary => 'Single-line border (header box bold) with UTF8 characters',
-    chars => [
-        ['┏','━','┳','┓'], # 0
-        ['┃','┃','┃'],     # 1
-        ['┡','━','╇','┩', '┯','┻','├','┤'], # 2
-        ['│','│','│'],     # 3
-        ['├','─','┼','┤', '┬','┴','├','┤'], # 4
-        ['└','─','┴','┘'], # 5
-
-        ['┌','─','┬','┐'], # 6
-        ['┗','━','┻','┛'], # 7
-    ],
     utf8 => 1,
 );
 
@@ -41,7 +77,7 @@ BorderStyle::UTF8::SingleLineBoldHeader - Single-line border (header box bold) w
 
 =head1 VERSION
 
-This document describes version 0.011 of BorderStyle::UTF8::SingleLineBoldHeader (from Perl distribution BorderStyles-Standard), released on 2022-01-26.
+This document describes version 0.013 of BorderStyle::UTF8::SingleLineBoldHeader (from Perl distribution BorderStyles-Standard), released on 2022-02-14.
 
 =head1 SYNOPSIS
 
@@ -64,9 +100,9 @@ To use with L<Text::ANSITable>:
 
 Sample output:
 
- ┏━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━┓
- ┃ ColumName1 ┃ ColumnNameB ┃ ColumnNameC ┃
- ┡━━━━━━━━━━━━╇━━━━━━━━━━━━━╇━━━━━━━━━━━━━┩
+ ┌────────────┬─────────────┬─────────────┐
+ │ ColumName1 │ ColumnNameB │ ColumnNameC │
+ ├────────────┼─────────────┼─────────────┤
  │ row1A      │ row1B       │ row1C       │
  │ row2A      │ row2B       │ row2C       │
  │ row3A      │ row3B       │ row3C       │

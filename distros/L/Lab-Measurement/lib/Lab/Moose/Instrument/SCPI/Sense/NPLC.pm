@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Sense::NPLC;
-$Lab::Moose::Instrument::SCPI::Sense::NPLC::VERSION = '3.803';
+$Lab::Moose::Instrument::SCPI::Sense::NPLC::VERSION = '3.810';
 #ABSTRACT: Role for the SCPI SENSe:$function:NPLC subsystem
 
 use v5.20;
@@ -51,7 +51,7 @@ Lab::Moose::Instrument::SCPI::Sense::NPLC - Role for the SCPI SENSe:$function:NP
 
 =head1 VERSION
 
-version 3.803
+version 3.810
 
 =head1 METHODS
 

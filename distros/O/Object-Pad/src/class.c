@@ -27,6 +27,24 @@
 #  define DEBUG_SET_CURCOP_LINE(line)
 #endif
 
+#define need_PLparser()  S_need_PLparser(aTHX)
+static void S_need_PLparser(pTHX)
+{
+  if(!PL_parser) {
+    /* We need to generate just enough of a PL_parser to keep newSTATEOP()
+     * happy, otherwise it will SIGSEGV (RT133258)
+     */
+    SAVEVPTR(PL_parser);
+    Newxz(PL_parser, 1, yy_parser);
+    SAVEFREEPV(PL_parser);
+
+    PL_parser->copline = NOLINE;
+#if HAVE_PERL_VERSION(5, 20, 0)
+    PL_parser->preambling = NOLINE;
+#endif
+  }
+}
+
 /* Empty MGVTBL simply for locating instance backing AV */
 static MGVTBL vtbl_backingav = {};
 
@@ -417,6 +435,16 @@ void ObjectPad_mop_class_add_ADJUSTPARAMS(pTHX_ ClassMeta *meta, CV *cv)
   av_push(meta->adjustblocks, (SV *)block);
 }
 
+void ObjectPad_mop_class_add_required_method(pTHX_ ClassMeta *meta, SV *methodname)
+{
+  if(meta->type != METATYPE_ROLE)
+    croak("Can only add a required method to a role");
+  if(meta->sealed)
+    croak("Cannot add a new required method to an already-sealed class");
+
+  av_push(meta->requiremethods, SvREFCNT_inc(methodname));
+}
+
 #define mop_class_implements_role(meta, rolemeta)  S_mop_class_implements_role(aTHX_ meta, rolemeta)
 static bool S_mop_class_implements_role(pTHX_ ClassMeta *meta, ClassMeta *rolemeta)
 {
@@ -739,6 +767,8 @@ static void S_generate_initfields_method(pTHX_ ClassMeta *meta)
   int i;
 
   ENTER;
+
+  need_PLparser();
 
   I32 floor_ix = PL_savestack_ix;
   {
@@ -1525,19 +1555,7 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name)
       break;
   }
 
-  if(!PL_parser) {
-    /* We need to generate just enough of a PL_parser to keep newSTATEOP()
-     * happy, otherwise it will SIGSEGV (RT133258)
-     */
-    SAVEVPTR(PL_parser);
-    Newxz(PL_parser, 1, yy_parser);
-    SAVEFREEPV(PL_parser);
-
-    PL_parser->copline = NOLINE;
-#if HAVE_PERL_VERSION(5, 20, 0)
-    PL_parser->preambling = NOLINE;
-#endif
-  }
+  need_PLparser();
 
   /* Prepare meta->initfields for containing a CV parsing operation */
   {

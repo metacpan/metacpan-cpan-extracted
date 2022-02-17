@@ -25,7 +25,6 @@ my %WriteMakefileArgs = (
   "NAME" => "Text::Table::More",
   "PREREQ_PM" => {
     "BorderStyle::ASCII::SingleLineDoubleAfterHeader" => "0.011",
-    "BorderStyleBase" => "0.011",
     "Exporter" => "5.57",
     "List::AllUtils" => 0,
     "Module::Load::Util" => "0.004",
@@ -41,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "utf8" => 0
   },
-  "VERSION" => "0.022",
+  "VERSION" => "0.023",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,7 +49,6 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "BorderStyle::ASCII::SingleLineDoubleAfterHeader" => "0.011",
-  "BorderStyleBase" => "0.011",
   "Exporter" => "5.57",
   "File::Spec" => 0,
   "IO::Handle" => 0,

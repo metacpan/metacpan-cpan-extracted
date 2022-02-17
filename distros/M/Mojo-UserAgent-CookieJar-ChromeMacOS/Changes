@@ -1,4 +1,8 @@
 Revision history for Mojo-UserAgent-CookieJar-ChromeMacOS
 
+0.02  2022-02-15 16:57:29 CST
+        - copy SQLite file to read
+        - support Linux
+
 0.01  2016-06-06 12:22:11 CST
         - Initial release

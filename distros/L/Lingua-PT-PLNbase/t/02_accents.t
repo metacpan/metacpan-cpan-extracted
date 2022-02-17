@@ -2,28 +2,20 @@
 
 use Test::More tests => 1 + 10 * 6;
 
-use POSIX qw(locale_h);
-setlocale(LC_CTYPE, "pt_PT");
+use utf8;
 
 BEGIN { use_ok( 'Lingua::PT::PLNbase' ); }
 
-use locale;
-
-$a = '«·È';
-
-SKIP: {
-  skip "not a good locale", 10 * 6 unless $a =~ m!^\w{3}$!;
-
-  my %words = qw/m· ma
-		 rÈ re
-		 coraÁ„o coracao
-		 bÈbÈ bebe
-		 h· ha
-		 ‡ a
-		 centrÌfoga centrifoga
-		 cÛcaras cocaras
-		 c˙mulo cumulo
-		 caÁa caca/;
+  my %words = qw/m√° ma
+		 r√© re
+		 cora√ß√£o coracao
+		 b√©b√© bebe
+		 h√° ha
+		 √† a
+		 centr√≠foga centrifoga
+		 c√≥caras cocaras
+		 c√∫mulo cumulo
+		 ca√ßa caca/;
   for (keys %words) {
     ok(has_accents($_));
     ok(!has_accents($words{$_}));
@@ -31,10 +23,11 @@ SKIP: {
 
     is(remove_accents($_), $words{$_});
     is(remove_accents($words{$_}), $words{$_});
-    is(remove_accents(uc($_)), uc($words{$_}));
-  }
+    { use utf8::all;
+      is(remove_accents(uc($_)), uc($words{$_}));
+    }
 
-}
+  }
 
 1;
 

@@ -1,3 +1,8 @@
+Cleanup:
+  * drop undocumented gen option 'anchorleft'
+    when App::Licensecheck no longer use it
+    and require newer R::P::License anyway
+
 Options:
   * Add pattern tolerance option:
     + none

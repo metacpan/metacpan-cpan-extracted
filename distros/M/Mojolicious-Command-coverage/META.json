@@ -41,16 +41,16 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/oposs/mojolicious_coverage/issues"
+         "web" : "https://github.com/oposs/mojolicious-command-coverage/issues"
       },
       "license" : [
          "https://opensource.org/licenses/mit"
       ],
       "repository" : {
-         "url" : "https://github.com/oposs/mojolicious_coverage"
+         "url" : "https://github.com/oposs/mojolicious-command-coverage"
       }
    },
-   "version" : "v0.0.1",
+   "version" : "v0.0.3",
    "x_homepage" : "https://www.oetiker.ch",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

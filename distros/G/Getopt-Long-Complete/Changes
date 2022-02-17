@@ -1,3 +1,10 @@
+0.316   2021-08-24  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention Getopt::Long::Subcommand.
+
+
 0.315   2020-04-16  Released-By: PERLANCAR; Urgency: medium
 
 	- Tweak demo script again: provide all possible completion when

@@ -1,3 +1,8 @@
+0.007   2022-01-23  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+	- [incompatible change] Rename 'title' option to 'caption'.
+
+
 0.006   2022-01-07  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

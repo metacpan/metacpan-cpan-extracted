@@ -1,26 +1,37 @@
 package BorderStyle::BoxChar::SpaceInnerOnly;
 
+use 5.010001;
 use strict;
-use parent 'BorderStyleBase';
+use warnings;
+
+use Role::Tiny::With;
+with 'BorderStyleRole::Spec::Basic';
+with 'BorderStyleRole::Transform::BoxChar';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-26'; # DATE
+our $DATE = '2022-02-14'; # DATE
 our $DIST = 'BorderStyles-Standard'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 our %BORDER = (
-    v => 2,
+    v => 3,
     summary => 'No borders, but columns are still separated using spaces and data row separator is still drawn using horizontal line',
-    chars => [
-        ['','','',''],   # 0
-        ['',' ',''],     # 1
-        ['',' ',' ','', ' ',' ','q','q'], # 2
-        ['',' ',''],     # 3
-        ['','q','q','', 'q','q','q','q'], # 4
-        ['','','',''],   # 5
-    ],
     box_chars => 1,
 );
+
+sub get_border_char {
+    my ($self, %args) = @_;
+    my $char = $args{char};
+    my $repeat = $args{repeat} // 1;
+
+    if ($char eq 'h_i') {
+        return "q" x $repeat;
+    } elsif ($char =~ /_i$/) {
+        return " " x $repeat;
+    } else {
+        return '';
+    }
+}
 
 1;
 # ABSTRACT: No borders, but columns are still separated using spaces and data row separator is still drawn using horizontal line
@@ -37,7 +48,9 @@ BorderStyle::BoxChar::SpaceInnerOnly - No borders, but columns are still separat
 
 =head1 VERSION
 
-This document describes version 0.011 of BorderStyle::BoxChar::SpaceInnerOnly (from Perl distribution BorderStyles-Standard), released on 2022-01-26.
+This document describes version 0.013 of BorderStyle::BoxChar::SpaceInnerOnly (from Perl distribution BorderStyles-Standard), released on 2022-02-14.
+
+=for Pod::Coverage ^(.+)$
 
 =head1 SYNOPSIS
 

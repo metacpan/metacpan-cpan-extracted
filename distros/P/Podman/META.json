@@ -46,6 +46,6 @@
          "url" : "https://github.com/tschaefer/podman-perl.git"
       }
    },
-   "version" : "20220210.0",
+   "version" : "20220211.0",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

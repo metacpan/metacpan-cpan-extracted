@@ -187,7 +187,7 @@ qx.Class.define("callbackery.ui.Card", {
                                     return;
                                 }
                                 lastValue = value;
-                                this.__parentForm.setSelection({ data : this.__dataCache, key : fieldCfg.key, value : value });
+                                this.__parentForm.setSelection({ data : this.__dataCache, selectedField : fieldCfg.key, newValue : value });
                                 if (this.__buttonMap[this._updateAction]) {
                                     this.__buttonMap[this._updateAction].execute();
                                 }

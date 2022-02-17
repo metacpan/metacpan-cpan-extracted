@@ -1,3 +1,13 @@
+0.005     2022-02-13 09:23:00-07:00 America/Los_Angeles
+          - support v3.01 GRRCN files
+          - autodetect GRRCN file version and set it in the base class
+          - correctly set file_format for GRRCN files in the base class
+          - formatting changes for perlcritic and perltidy
+          - fix DISCOUNT_AMOUNT, DISCOUNT_RATE, and FEE_AMOUNT parsing in GRRCN TXNPRICING rows
+          - fix errors with GRRCN SUBMISSION rows
+          - fix issues with filler columns in GRRCN files
+            Thanks webmake https://github.com/ZipRecruiter/Finance-AMEX-Transaction/issues/2
+
 0.004     2021-07-22 21:25:38-07:00 America/Los_Angeles
           - support v2.01 GRRCN files with v1.01 back compat
             Thanks leejo https://github.com/ZipRecruiter/Finance-AMEX-Transaction/pull/1

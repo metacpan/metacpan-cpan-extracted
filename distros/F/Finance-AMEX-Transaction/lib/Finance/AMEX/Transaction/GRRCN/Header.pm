@@ -1,5 +1,5 @@
-package Finance::AMEX::Transaction::GRRCN::Header;
-$Finance::AMEX::Transaction::GRRCN::Header::VERSION = '0.004';
+package Finance::AMEX::Transaction::GRRCN::Header 0.005;
+
 use strict;
 use warnings;
 
@@ -8,15 +8,16 @@ use warnings;
 use base 'Finance::AMEX::Transaction::GRRCN::Base';
 
 sub field_map {
-  return {
-    RECORD_TYPE         => [1, 10],
-    FILE_CREATION_DATE  => [11, 8],
-    FILE_CREATION_TIME  => [19, 6],
-    SEQUENTIAL_NUMBER   => [25, 10],
-    FILE_ID             => [35, 10],
-    FILE_NAME           => [45, 20],
-    FILE_VERSION_NUMBER => [65, 4],
-  };
+  return [
+    {RECORD_TYPE         => [1,  10]},
+    {FILE_CREATION_DATE  => [11, 8]},
+    {FILE_CREATION_TIME  => [19, 6]},
+    {SEQUENTIAL_NUMBER   => [25, 10]},
+    {FILE_ID             => [35, 10]},
+    {FILE_NAME           => [45, 20]},
+    {FILE_VERSION_NUMBER => [65, 4]},
+    {FILLER1             => [69, 732]},
+  ];
 }
 
 sub type {return 'HEADER'}
@@ -43,7 +44,7 @@ Finance::AMEX::Transaction::GRRCN::Header - Parse AMEX Global Reconciliation (GR
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -90,6 +91,14 @@ Returns the full line that is represented by this object.
 
  print $record->line;
 
+=head2 field_map
+
+Returns an arrayref of hashrefs where the name is the record name and 
+the value is an arrayref of the start position and length of that field.
+
+ # print the start position of the FILE_CREATION_DATE field
+ print $record->field_map->[4]->{FILE_CREATION_DATE}->[0]; # 11
+
 =head2 RECORD_TYPE
 
 This field contains the Record identifier, which will always be “HEADER” for the Header Record.
@@ -130,7 +139,7 @@ The format is: HHMMSS
 
 This field contains a Sequential Number, where each time a file is sent it will be incrementally higher than that in the previous file. It is intended to identify whether the file is a duplicate and ensure there has been no missing file.
 
-A sequential number with a prefix of “A” indicates an Adhoc file.
+A sequential number with a prefix of “A” indicates an Ad-hoc file.
 
 =head2 FILE_ID
 
@@ -154,7 +163,7 @@ Tom Heady <cpan@punch.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by ZipRecruiter.
+This software is copyright (c) 2022 by ZipRecruiter/Tom Heady.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

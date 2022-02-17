@@ -1,0 +1,122 @@
+{
+   "abstract" : "Object Data Store",
+   "author" : [
+      "LNATION <thisusedtobeanemail@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "ODS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Blessed::Merge" : "0",
+            "Cwd" : "0",
+            "Data::GUID" : "0",
+            "File::Copy" : "0",
+            "JSON" : "0",
+            "YAML::XS" : "0",
+            "YAOO" : "0.06",
+            "overload" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "ODS" : {
+         "file" : "lib/ODS.pm",
+         "version" : "0.02"
+      },
+      "ODS::Iterator" : {
+         "file" : "lib/ODS/Iterator.pm"
+      },
+      "ODS::Storage::Base" : {
+         "file" : "lib/ODS/Storage/Base.pm"
+      },
+      "ODS::Storage::File" : {
+         "file" : "lib/ODS/Storage/File.pm"
+      },
+      "ODS::Storage::File::JSON" : {
+         "file" : "lib/ODS/Storage/File/JSON.pm"
+      },
+      "ODS::Storage::File::YAML" : {
+         "file" : "lib/ODS/Storage/File/YAML.pm"
+      },
+      "ODS::Table" : {
+         "file" : "lib/ODS/Table.pm"
+      },
+      "ODS::Table::Column::Base" : {
+         "file" : "lib/ODS/Table/Column/Base.pm"
+      },
+      "ODS::Table::Column::Boolean" : {
+         "file" : "lib/ODS/Table/Column/Boolean.pm"
+      },
+      "ODS::Table::Column::Email" : {
+         "file" : "lib/ODS/Table/Column/Email.pm"
+      },
+      "ODS::Table::Column::Epoch" : {
+         "file" : "lib/ODS/Table/Column/Epoch.pm"
+      },
+      "ODS::Table::Column::Float" : {
+         "file" : "lib/ODS/Table/Column/Float.pm"
+      },
+      "ODS::Table::Column::Integer" : {
+         "file" : "lib/ODS/Table/Column/Integer.pm"
+      },
+      "ODS::Table::Column::Phone" : {
+         "file" : "lib/ODS/Table/Column/Phone.pm"
+      },
+      "ODS::Table::Column::String" : {
+         "file" : "lib/ODS/Table/Column/String.pm"
+      },
+      "ODS::Table::ResultSet" : {
+         "file" : "lib/ODS/Table/ResultSet.pm"
+      },
+      "ODS::Table::Row" : {
+         "file" : "lib/ODS/Table/Row.pm"
+      },
+      "ODS::Translator" : {
+         "file" : "lib/ODS/Translator.pm"
+      },
+      "ODS::Utils" : {
+         "file" : "lib/ODS/Utils.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ThisUsedToBeAnEmail/ODS.git",
+         "web" : "https://github.com/ThisUsedToBeAnEmail/ODS"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

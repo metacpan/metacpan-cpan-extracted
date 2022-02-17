@@ -19,7 +19,7 @@ use LWP::UserAgent;
 use JSON;
 use utf8;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 our @EXPORT = qw/ create update delete get addtagusers deltagusers list /;
 
 =head1 FUNCTION
@@ -30,7 +30,7 @@ our @EXPORT = qw/ create update delete get addtagusers deltagusers list /;
 
 =head2 SYNOPSIS
 
-L<https://work.weixin.qq.com/api/doc/90000/90135/90210>
+L<https://developer.work.weixin.qq.com/document/path/90210>
 
 =head3 请求说明：
 
@@ -94,7 +94,7 @@ sub create {
 
 =head2 SYNOPSIS
 
-L<https://work.weixin.qq.com/api/doc/90000/90135/90211>
+L<https://developer.work.weixin.qq.com/document/path/90211>
 
 =head3 请求说明：
 
@@ -154,7 +154,7 @@ sub update {
 
 =head2 SYNOPSIS
 
-L<https://work.weixin.qq.com/api/doc/90000/90135/90212>
+L<https://developer.work.weixin.qq.com/document/path/90212>
 
 =head3 请求说明：
 
@@ -206,7 +206,7 @@ sub delete {
 
 =head2 SYNOPSIS
 
-L<https://work.weixin.qq.com/api/doc/90000/90135/90213>
+L<https://developer.work.weixin.qq.com/document/path/90213>
 
 =head3 请求说明：
 
@@ -228,7 +228,7 @@ L<https://work.weixin.qq.com/api/doc/90000/90135/90213>
        "tagname": "乒乓球协会",
        "userlist": [
             {
-                "userid": "zhangsan@gz.com",
+                "userid": "zhangsan",
                 "name": "李四"
             }
          ],
@@ -271,7 +271,7 @@ sub get {
 
 =head2 SYNOPSIS
 
-L<https://work.weixin.qq.com/api/doc/90000/90135/90214>
+L<https://developer.work.weixin.qq.com/document/path/90214>
 
 =head3 请求说明：
 
@@ -355,7 +355,7 @@ sub addtagusers {
 
 =head2 SYNOPSIS
 
-L<https://work.weixin.qq.com/api/doc/90000/90135/90215>
+L<https://developer.work.weixin.qq.com/document/path/90215>
 
 =head3 请求说明：
 
@@ -374,6 +374,10 @@ L<https://work.weixin.qq.com/api/doc/90000/90135/90215>
     tagid	        是	标签ID
     userlist	否	企业成员ID列表，注意：userlist、partylist不能同时为空，单次请求长度不超过1000
     partylist	否	企业部门ID列表，注意：userlist、partylist不能同时为空，单次请求长度不超过100
+
+=head4 权限说明：
+
+	调用者必须是指定标签的创建者；成员属于应用的可见范围。
 
 =head3 RETURN 返回结果
 
@@ -433,7 +437,7 @@ sub deltagusers {
 
 =head2 SYNOPSIS
 
-L<https://work.weixin.qq.com/api/doc/90000/90135/90216>
+L<https://developer.work.weixin.qq.com/document/path/90216>
 
 =head3 请求说明：
 

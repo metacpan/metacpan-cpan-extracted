@@ -3,9 +3,11 @@ use utf8;
 use 5.10.1;
 use Moose;
 use Scalar::Util qw/looks_like_number/;
+use Carp         qw/croak/;
+
 extends 'Excel::ValueReader::XLSX::Backend';
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 #======================================================================
 # LAZY ATTRIBUTE CONSTRUCTORS
@@ -76,6 +78,7 @@ sub _date_styles {
 
   return \@date_styles; # array of shape (xf_index => numFmt_code)
 }
+
 
 sub _extract_xf {
   my ($self, $xml) = @_;
@@ -179,6 +182,39 @@ sub values {
 
   return \@data;
 }
+
+
+sub _table_targets {
+  my ($self, $rel_xml) = @_;
+
+  my @table_targets = $rel_xml =~ m[<Relationship .*? Target="../tables/table(\d+)\.xml"]g;
+  return @table_targets; # a list of positive integers corresponding to table ids
+}
+
+
+sub _parse_table_xml {
+  my ($self, $xml) = @_;
+
+  state $table_regex = qr{
+     <table .+? displayName="(\w+)"
+            .+? ref="([:A-Z0-9]+)"
+            .+? (headerRowCount="0")?
+            .+?>
+    }x;
+
+  # extract relevant attributes from the <table> node
+  my ($name, $ref, $no_headers) = $xml =~ /$table_regex/g
+    or croak "invalid table XML";
+
+  # column names. Other attributes from <tableColumn> nodes are ignored.
+  my @columns = ($xml =~ m{<tableColumn [^>]+? name="([^"]+)"}gx);
+
+  # decode entites for all string values
+  _decode_xml_entities($_) for $name, @columns;
+
+  return ($name, $ref, \@columns, $no_headers);
+}
+
 
 #======================================================================
 # AUXILIARY FUNCTIONS

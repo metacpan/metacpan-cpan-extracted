@@ -4,40 +4,40 @@ use v5.14;
 use warnings;
 
 use Test::More;
+use Test::Fatal;
 
-package TestParser;
-use base qw( Parser::MGC );
+package TestParser {
+   use base qw( Parser::MGC );
 
-sub parse_hello
-{
-   my $self = shift;
+   sub parse_hello
+   {
+      my $self = shift;
 
-   [ $self->expect( "hello" ), $self->expect( qr/world/ ) ];
+      [ $self->expect( "hello" ), $self->expect( qr/world/ ) ];
+   }
+
+   sub parse_hex
+   {
+      my $self = shift;
+
+      return hex +( $self->expect( qr/0x([0-9A-F]+)/i ) )[1];
+   }
+
+   sub parse_foo_or_bar
+   {
+      my $self = shift;
+
+      return $self->maybe_expect( qr/foo/i ) ||
+             $self->maybe_expect( qr/bar/i );
+   }
+
+   sub parse_numrange
+   {
+      my $self = shift;
+
+      return [ ( $self->maybe_expect( qr/(\d+)(?:-(\d+))?/ ) )[1,2] ];
+   }
 }
-
-sub parse_hex
-{
-   my $self = shift;
-
-   return hex +( $self->expect( qr/0x([0-9A-F]+)/i ) )[1];
-}
-
-sub parse_foo_or_bar
-{
-   my $self = shift;
-
-   return $self->maybe_expect( qr/foo/i ) ||
-          $self->maybe_expect( qr/bar/i );
-}
-
-sub parse_numrange
-{
-   my $self = shift;
-
-   return [ ( $self->maybe_expect( qr/(\d+)(?:-(\d+))?/ ) )[1,2] ];
-}
-
-package main;
 
 my $parser = TestParser->new( toplevel => "parse_hello" );
 
@@ -49,13 +49,8 @@ is_deeply( $parser->from_string( "  hello world  " ),
    [ "hello", "world" ],
    '"  hello world  "' );
 
-# Perl 5.13.6 changed the regexp form
-# Accept both old and new-style stringification
-my $modifiers = (qr/foobar/ =~ /\Q(?^/) ? '^u' : '-xism';
-
-ok( !eval { $parser->from_string( "goodbye world" ) }, '"goodbye world" fails' );
-is( $@,
-   qq[Expected (?$modifiers:hello) on line 1 at:\n] . 
+is( exception { $parser->from_string( "goodbye world" ) },
+   qq[Expected (?^u:hello) on line 1 at:\n] . 
    qq[goodbye world\n] . 
    qq[^\n],
    'Exception from "goodbye world" failure' );

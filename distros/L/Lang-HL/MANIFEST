@@ -7,13 +7,15 @@ Lang-HL-0.33.tar.gz
 Lang-HL-0.93.tar.gz
 Lang-HL-1.007.tar.gz
 Lang-HL-1.071.tar.gz
+Lang-HL-5.005.tar.gz
+Lang-HL-5.010.tar.gz
 lib/Lang/HL.pm
 Makefile.PL
 MANIFEST
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
 README
 script/hlc
 script/hlg
 script/hlp
 t/Lang-HL.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

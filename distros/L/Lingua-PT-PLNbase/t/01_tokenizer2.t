@@ -1,25 +1,19 @@
 # -*- cperl -*-
 
-use Test::More tests => 1 + 22 ;
-use POSIX qw(locale_h);
-setlocale(LC_CTYPE, "pt_PT");
+use Test::More tests => 1 + 24 ;
 
 BEGIN { use_ok( 'Lingua::PT::PLNbase' ); }
 
-use locale;
-
-$a = '«·È';
+use utf8;
 
 $i = 0;
-SKIP: {
-  skip "not a good locale", 22 unless $a =~ m!^\w{3}$!;
 
   $i++;
   $/ = "\n\n";
 
   my $input = "";
   my $output = "";
-  open T, "t/tests2.tok" or die "Cannot open tests file";
+  open T, "<:utf8", "t/tests2.tok" or die "Cannot open tests file";
   while(<T>) {
     chomp($input = <T>);
     chomp($output = <T>);
@@ -29,7 +23,6 @@ SKIP: {
 #    exit if $i == 14;
   }
   close T;
-}
 
 1;
 

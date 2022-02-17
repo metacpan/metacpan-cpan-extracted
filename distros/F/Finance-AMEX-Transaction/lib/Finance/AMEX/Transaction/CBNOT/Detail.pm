@@ -1,5 +1,5 @@
-package Finance::AMEX::Transaction::CBNOT::Detail;
-$Finance::AMEX::Transaction::CBNOT::Detail::VERSION = '0.004';
+package Finance::AMEX::Transaction::CBNOT::Detail 0.005;
+
 use strict;
 use warnings;
 
@@ -9,65 +9,63 @@ use base 'Finance::AMEX::Transaction::CBNOT::Base';
 
 sub field_map {
   return {
-    REC_TYPE                   => [1, 1],
-    SE_NUMB                    => [7, 10],
-    CM_ACCT_NUMB               => [27, 19],
-    CURRENT_CASE_NUMBER        => [47, 11],
-    FINCAP_TRACKING_ID_A       => [47, 11],
-
-    FINCAP_TRACKING_A_DATE     => [47, 3],
-    FINCAP_TRACKING_A_PCID     => [50, 6],
-    FINCAP_TRACKING_A_SEQUENCE => [56, 2],
-
-    CSS_CASE_NUMBER            => [47, 7],
-    SS_CASE_NUMBER             => [47, 9],
-    CURRENT_ACTION_NUMBER      => [58, 2],
-    PREVIOUS_CASE_NUMBER       => [60, 11],
-    CSS_P_CASE_NUMBER          => [60, 11],
-    PREVIOUS_ACTION_NUMBER     => [71, 2],
-    RESOLUTION                 => [73, 1],
-    FROM_SYSTEM                => [74, 1],
-    REJECTS_TO_SYSTEM          => [75, 1],
-    DISPUTES_TO_SYSTEM         => [76, 1],
-    DATE_OF_ADJUSTMENT         => [77, 8],
-    DATE_OF_CHARGE             => [85, 8],
-    AMEX_ID                    => [93, 7],
-    CASE_TYPE                  => [105, 6],
-    LOC_NUMB                   => [111, 15],
-    CB_REAS_CODE               => [126, 3],
-    CB_AMOUNT                  => [129, 17],
-    CB_ADJUSTMENT_NUMBER       => [146, 6],
-    CB_RESOLUTION_ADJ_NUMBER   => [152, 6],
-    CB_REFERENCE_CODE          => [158, 12],
-    BILLED_AMOUNT              => [183, 17],
-    SOC_AMOUNT                 => [200, 17],
-    SOC_INVOICE_NUMBER         => [217, 6],
-    ROC_INVOICE_NUMBER         => [223, 6],
-    FOREIGN_AMT                => [229, 15],
-    CURRENCY                   => [244, 3],
-    SUPP_TO_FOLLOW             => [247, 1],
-    CM_NAME1                   => [248, 30],
-    CM_NAME2                   => [278, 30],
-    CM_ADDR1                   => [308, 30],
-    CM_ADDR2                   => [338, 30],
-    CM_CITY_STATE              => [368, 30],
-    CM_ZIP                     => [398, 9],
-    CM_FIRST_NAME_1            => [407, 12],
-    CM_MIDDLE_NAME_1           => [419, 12],
-    CM_LAST_NAME_1             => [431, 20],
-    CM_ORIG_ACCT_NUM           => [451, 15],
-    CM_ORIG_NAME               => [466, 30],
-    CM_ORIG_FIRST_NAME         => [496, 12],
-    CM_ORIG_MIDDLE_NAME        => [508, 12],
-    CM_ORIG_LAST_NAME          => [520, 20],
-    NOTE1                      => [540, 66],
-    NOTE2                      => [606, 78],
-    NOTE3                      => [684, 60],
-    NOTE4                      => [744, 60],
-    NOTE5                      => [804, 60],
-    NOTE6                      => [864, 60],
-    NOTE7                      => [924, 60],
-    TRIUMPH_SEQ_NO             => [984, 2],
+    REC_TYPE                   => [1,    1],
+    SE_NUMB                    => [7,    10],
+    CM_ACCT_NUMB               => [27,   19],
+    CURRENT_CASE_NUMBER        => [47,   11],
+    FINCAP_TRACKING_ID_A       => [47,   11],
+    FINCAP_TRACKING_A_DATE     => [47,   3],
+    FINCAP_TRACKING_A_PCID     => [50,   6],
+    FINCAP_TRACKING_A_SEQUENCE => [56,   2],
+    CSS_CASE_NUMBER            => [47,   7],
+    SS_CASE_NUMBER             => [47,   9],
+    CURRENT_ACTION_NUMBER      => [58,   2],
+    PREVIOUS_CASE_NUMBER       => [60,   11],
+    CSS_P_CASE_NUMBER          => [60,   11],
+    PREVIOUS_ACTION_NUMBER     => [71,   2],
+    RESOLUTION                 => [73,   1],
+    FROM_SYSTEM                => [74,   1],
+    REJECTS_TO_SYSTEM          => [75,   1],
+    DISPUTES_TO_SYSTEM         => [76,   1],
+    DATE_OF_ADJUSTMENT         => [77,   8],
+    DATE_OF_CHARGE             => [85,   8],
+    AMEX_ID                    => [93,   7],
+    CASE_TYPE                  => [105,  6],
+    LOC_NUMB                   => [111,  15],
+    CB_REAS_CODE               => [126,  3],
+    CB_AMOUNT                  => [129,  17],
+    CB_ADJUSTMENT_NUMBER       => [146,  6],
+    CB_RESOLUTION_ADJ_NUMBER   => [152,  6],
+    CB_REFERENCE_CODE          => [158,  12],
+    BILLED_AMOUNT              => [183,  17],
+    SOC_AMOUNT                 => [200,  17],
+    SOC_INVOICE_NUMBER         => [217,  6],
+    ROC_INVOICE_NUMBER         => [223,  6],
+    FOREIGN_AMT                => [229,  15],
+    CURRENCY                   => [244,  3],
+    SUPP_TO_FOLLOW             => [247,  1],
+    CM_NAME1                   => [248,  30],
+    CM_NAME2                   => [278,  30],
+    CM_ADDR1                   => [308,  30],
+    CM_ADDR2                   => [338,  30],
+    CM_CITY_STATE              => [368,  30],
+    CM_ZIP                     => [398,  9],
+    CM_FIRST_NAME_1            => [407,  12],
+    CM_MIDDLE_NAME_1           => [419,  12],
+    CM_LAST_NAME_1             => [431,  20],
+    CM_ORIG_ACCT_NUM           => [451,  15],
+    CM_ORIG_NAME               => [466,  30],
+    CM_ORIG_FIRST_NAME         => [496,  12],
+    CM_ORIG_MIDDLE_NAME        => [508,  12],
+    CM_ORIG_LAST_NAME          => [520,  20],
+    NOTE1                      => [540,  66],
+    NOTE2                      => [606,  78],
+    NOTE3                      => [684,  60],
+    NOTE4                      => [744,  60],
+    NOTE5                      => [804,  60],
+    NOTE6                      => [864,  60],
+    NOTE7                      => [924,  60],
+    TRIUMPH_SEQ_NO             => [984,  2],
     AIRLINE_TKT_NUM            => [1031, 14],
     AL_SEQUENCE_NUMBER         => [1045, 2],
     FOLIO_REF                  => [1047, 18],
@@ -76,11 +74,9 @@ sub field_map {
     CANC_NUM                   => [1083, 20],
     CANC_DATE                  => [1103, 8],
     FINCAP_TRACKING_ID         => [1111, 11],
-
     FINCAP_TRACKING_DATE       => [1111, 3],
     FINCAP_TRACKING_PCID       => [1114, 6],
     FINCAP_TRACKING_SEQUENCE   => [1120, 2],
-
     FINCAP_FILE_SEQ_NUM        => [1122, 6],
     FINCAP_BATCH_NUMBER        => [1128, 4],
     FINCAP_BATCH_INVOICE_DT    => [1132, 8],
@@ -139,20 +135,16 @@ sub field_map {
   };
 }
 
-
 sub type {return 'DETAIL'}
 
 sub REC_TYPE                   {return $_[0]->_get_column('REC_TYPE')}
 sub SE_NUMB                    {return $_[0]->_get_column('SE_NUMB')}
 sub CM_ACCT_NUMB               {return $_[0]->_get_column('CM_ACCT_NUMB')}
 sub CURRENT_CASE_NUMBER        {return $_[0]->_get_column('CURRENT_CASE_NUMBER')}
-
 sub FINCAP_TRACKING_ID_A       {return $_[0]->_get_column('FINCAP_TRACKING_ID_A')}
-
 sub FINCAP_TRACKING_A_DATE     {return $_[0]->_get_column('FINCAP_TRACKING_A_DATE')}
 sub FINCAP_TRACKING_A_PCID     {return $_[0]->_get_column('FINCAP_TRACKING_A_PCID')}
 sub FINCAP_TRACKING_A_SEQUENCE {return $_[0]->_get_column('FINCAP_TRACKING_A_SEQUENCE')}
-
 sub CSS_CASE_NUMBER            {return $_[0]->_get_column('CSS_CASE_NUMBER')}
 sub SS_CASE_NUMBER             {return $_[0]->_get_column('SS_CASE_NUMBER')}
 sub CURRENT_ACTION_NUMBER      {return $_[0]->_get_column('CURRENT_ACTION_NUMBER')}
@@ -210,11 +202,9 @@ sub MERCH_ORDER_DATE           {return $_[0]->_get_column('MERCH_ORDER_DATE')}
 sub CANC_NUM                   {return $_[0]->_get_column('CANC_NUM')}
 sub CANC_DATE                  {return $_[0]->_get_column('CANC_DATE')}
 sub FINCAP_TRACKING_ID         {return $_[0]->_get_column('FINCAP_TRACKING_ID')}
-
 sub FINCAP_TRACKING_DATE       {return $_[0]->_get_column('FINCAP_TRACKING_DATE')}
 sub FINCAP_TRACKING_PCID       {return $_[0]->_get_column('FINCAP_TRACKING_PCID')}
 sub FINCAP_TRACKING_SEQUENCE   {return $_[0]->_get_column('FINCAP_TRACKING_SEQUENCE')}
-
 sub FINCAP_FILE_SEQ_NUM        {return $_[0]->_get_column('FINCAP_FILE_SEQ_NUM')}
 sub FINCAP_BATCH_NUMBER        {return $_[0]->_get_column('FINCAP_BATCH_NUMBER')}
 sub FINCAP_BATCH_INVOICE_DT    {return $_[0]->_get_column('FINCAP_BATCH_INVOICE_DT')}
@@ -285,7 +275,7 @@ Finance::AMEX::Transaction::CBNOT::Detail - Parse AMEX Chargeback Notification F
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -332,6 +322,14 @@ Returns the full line that is represented by this object.
 
  print $record->line;
 
+=head2 field_map
+
+Returns a hashref where the name is the record name and 
+the value is an arrayref of the start position and length of that field.
+
+ # print the start position of the DATE_OF_ADJUSTMENT field
+ print $record->field_map->{DATE_OF_ADJUSTMENT}->[0]; # 77
+
 =head2 REC_TYPE
 
 This field contains the constant literal "D", a record type code that indicates that this is a Chargeback Notifications (CBNOT) File Detail Record.
@@ -348,15 +346,21 @@ This field contains the Cardmember Account Number that corresponds to this charg
 
 =head2 CURRENT_CASE_NUMBER
 
-This field contains the unique, American Express-assigned, current case (identification) number for this transaction, if this is a chargeback notifica- tion or final resolution.
+This field contains the unique, American Express-assigned, current case (identification) number for this transaction, if this is a chargeback notification or final resolution.
 
 For Customer Service Systems, you can use the CSS_CASE_NUMBER.
 
 For SIREN/SOFA (SE Information Retrieval Entry Network/SE Online Financial Adjustment), you can use the SS_CASE_NUMBER.
 
-=head2 FINCAP_TRACKING_ID
+=head2 FINCAP_TRACKING_ID_A
 
-For FINCAP transactions (indicated when FINCAP_TRACKING_ID is not blank), this field contains the FINCAP Tracking ID.
+For FINCAP transactions (indicated when FINCAP_TRACKING_ID_A is not blank), this field contains the FINCAP Tracking ID.
+
+=head2 FINCAP_TRACKING_A_DATE
+
+=head2 FINCAP_TRACKING_A_PCID
+
+=head2 FINCAP_TRACKING_A_SEQUENCE
 
 =head2 CSS_CASE_NUMBER
 
@@ -872,7 +876,7 @@ This field contains a code that indicates whether additional support is being fo
 
 =head2 CM_NAME1
 
-This field contains the Cardmember’s name, concatenated from the following fields:
+This field contains the Card members name, concatenated from the following fields:
 
 =over 4
 
@@ -886,7 +890,7 @@ This field contains the Cardmember’s name, concatenated from the following fie
 
 =head2 CM_NAME2
 
-This field contains a secondary Card member name. Usually, this is the name of a supplemental cardholder to the primary Card member’s account.
+This field contains a secondary Card member name. Usually, this is the name of a supplemental cardholder to the primary Card members account.
 
 =head2 CM_ADDR1
 
@@ -938,7 +942,7 @@ Developer note: the documentation for this field sometimes refers to it as CM_AC
 
 If the Card member has a different name, this field contains the Card member’s original name at the time the charge was made.
 
-If this field is populated, it contains the Cardmember’s original name, concatenated from the following fields:
+If this field is populated, it contains the Card members original name, concatenated from the following fields:
 
 =over 4
 
@@ -1081,6 +1085,12 @@ The format is: JJJPPPPPPSS
 For all other transactions — This field is unused and is character space filled.
 
 Note: This field is part of the “FINCAP Area.”
+
+=head2 FINCAP_TRACKING_DATE
+
+=head2 FINCAP_TRACKING_PCID
+
+=head2 FINCAP_TRACKING_SEQUENCE
 
 =head2 FINCAP_FILE_SEQ_NUM
 
@@ -1582,7 +1592,7 @@ Tom Heady <cpan@punch.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by ZipRecruiter.
+This software is copyright (c) 2022 by ZipRecruiter/Tom Heady.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

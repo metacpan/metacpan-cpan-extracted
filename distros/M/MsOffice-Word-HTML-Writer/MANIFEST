@@ -6,6 +6,7 @@ META.yml
 README
 t/00-load.t
 t/01_word_document.t
+t/02_latin1.t
 t/pod.t
 Makefile.PL
 META.json

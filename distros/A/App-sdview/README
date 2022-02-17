@@ -20,14 +20,13 @@ DESCRIPTION
 
 TODO
 
-      * Add more formats. man and ReST at least. Perhaps others.
+      * Add more formats. ReST perhaps. Maybe others too.
 
       * Improved Markdown parser. Currently the parser is very simple.
 
       * Other outputs. Consider a Tickit-based frontend.
 
-      Also more structured file writers - ReST, man and maybe also HTML
-      output.
+      Also more structured file writers - ReST and maybe also HTML output.
 
 AUTHOR
 

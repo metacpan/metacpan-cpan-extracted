@@ -32,7 +32,7 @@ my $parser = Parser::FIT->new(on => {
 
 $parser->parse($FindBin::Bin . "/test-files/Activity.fit");
 
-is($result->{session}->[0]->{total_calories}, 1305, "expected total_calories");
+is($result->{session}->[0]->{total_calories}->{value}, 1305, "expected total_calories");
 is(scalar @{$result->{record}}, 9143, "expected number of record messages");
 is($recordMessageCount, 9143, "expected number of recordMessagesHandler callbacks");
 

@@ -1,3 +1,7 @@
+2.020 2022-02-14
+- Set XDG_RUNTIME_DIR environment variable if not set. Required for some
+  terminals (Qt).
+
 2.019 2021-08-16
 - end_multi only calls close if not a display
 - when Qt and multiplot, need to send extra command to make window close

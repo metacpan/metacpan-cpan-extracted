@@ -1,28 +1,36 @@
 package BorderStyle::ASCII::None;
 
+use 5.010001;
 use strict;
-use parent 'BorderStyleBase';
+use warnings;
+
+use Role::Tiny::With;
+with 'BorderStyleRole::Spec::Basic';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-26'; # DATE
+our $DATE = '2022-02-14'; # DATE
 our $DIST = 'BorderStyles-Standard'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 our %BORDER = (
-    v => 2,
-    summary => 'No borders, but data row separator is still drawn using dashes',
-    chars => [
-        ['','','',''],     # 0
-        ['','',''],        # 1
-        ['','','','',   '','','',''], # 2
-        ['','',''],        # 3
-        ['','-','-','', '','','',''], # 4
-        ['','','',''],     # 5
-    ],
+    v => 3,
+    summary => 'No borders, but row separator is still drawn using dashes',
 );
 
+sub get_border_char {
+    my ($self, %args) = @_;
+    my $char = $args{char};
+    my $repeat = $args{repeat} // 1;
+
+    if ($char eq 'h_i') {
+        return "-" x $repeat;
+    } else {
+        return '';
+    }
+}
+
 1;
-# ABSTRACT: No borders, but data row separator is still drawn using dashes
+# ABSTRACT: No borders, but row separator is still drawn using dashes
 
 __END__
 
@@ -32,11 +40,13 @@ __END__
 
 =head1 NAME
 
-BorderStyle::ASCII::None - No borders, but data row separator is still drawn using dashes
+BorderStyle::ASCII::None - No borders, but row separator is still drawn using dashes
 
 =head1 VERSION
 
-This document describes version 0.011 of BorderStyle::ASCII::None (from Perl distribution BorderStyles-Standard), released on 2022-01-26.
+This document describes version 0.013 of BorderStyle::ASCII::None (from Perl distribution BorderStyles-Standard), released on 2022-02-14.
+
+=for Pod::Coverage ^(.+)$
 
 =head1 SYNOPSIS
 
@@ -81,9 +91,7 @@ Sample output:
 
   ColumName1  ColumnNameB  ColumnNameC 
   row1A       row1B        row1C       
- ----------------------------------------
   row2A       row2B        row2C       
- ----------------------------------------
   row3A       row3B        row3C       
  
 
@@ -103,10 +111,11 @@ To use with L<Text::Table::TinyBorderStyle>:
 Sample output:
 
   ColumName1  ColumnNameB  ColumnNameC 
+ --------------------------------------
   row1A       row1B        row1C       
- ----------------------------------------
+ --------------------------------------
   row2A       row2B        row2C       
- ----------------------------------------
+ --------------------------------------
   row3A       row3B        row3C       
 
 =head1 HOMEPAGE

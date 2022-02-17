@@ -23,7 +23,7 @@ sub check_type {
     my ($Type, @d) = @_;
     my $i=0;
     foreach ( @d )  {
-	die "$i: not $Type, ", $_->info unless $Type == $_->type;
+	is $_->type, $Type, "type of var $i ".$_->info;
 	$i++;
     }   
 }
@@ -67,13 +67,12 @@ cpr "# Done compiling fit function.";
 sub keep_work_space {
     my ($Type) = @_;
     my $n = 100;
-    my $t = zeroes($Type, $n)->xlinvals(map pdl($Type, $_), -5,4.9);
+    my $t = zeroes($n)->xlinvals(-5,4.9)->convert($Type);
     my $x = zeroes($Type,$n);
     my $p = pdl($Type, 1,2);
     my $ip = pdl($Type, 3,4);
     $x .= $p((0)) * exp(-$t*$t * $p((1)) );
-    my $work = PDL->null;
-    my $h = levmar($ip,$x,$t,$Gh,@g, WORK =>$work);
+    my $h = levmar($ip,$x,$t,$Gh,@g);
     ok(tapprox($h->{P},$p));
     check_type($Type, $h->{COVAR});
 }

@@ -22,7 +22,7 @@ SKIP: {
     ok( $unlink_dir_errorno, "unlink /dir is non-zero ($unlink_dir_errorno)" );
 }
 
-use Test::MockFile ();
+use Test::MockFile qw< nostrict >;
 
 note "-------------- MOCK MODE --------------";
 my @mock;

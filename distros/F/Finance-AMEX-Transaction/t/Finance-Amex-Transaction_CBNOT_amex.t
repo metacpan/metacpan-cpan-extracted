@@ -1,9 +1,11 @@
+#!/usr/bin/env perl
+
 use strict;
 use warnings;
 
 use Test::More tests => 151;
 
-BEGIN {use_ok('Finance::AMEX::Transaction')};
+BEGIN {use_ok('Finance::AMEX::Transaction')}
 
 use lib '.';
 use t::lib::CompareFile;
@@ -16,7 +18,7 @@ my $counts = {
   DETAIL  => {want => 1, have => 0},
 };
 
-my $data = do { local $/; <DATA> };
+my $data = do {local $/ = undef; <DATA>};
 
 t::lib::CompareFile::compare('CBNOT', $file, $data, $counts);
 

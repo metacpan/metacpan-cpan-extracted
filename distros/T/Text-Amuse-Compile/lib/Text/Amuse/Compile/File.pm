@@ -25,6 +25,7 @@ use PDF::Imposition;
 use Text::Amuse;
 use Text::Amuse::Functions qw/muse_fast_scan_header
                               muse_format_line/;
+use Text::Amuse::Utils;
 
 use Text::Amuse::Compile::Templates;
 use Text::Amuse::Compile::TemplateOptions;
@@ -1313,6 +1314,7 @@ sub _prepare_tex_tokens {
                                             enable_secondary_footnotes => $enable_secondary_footnotes,
                                             bidi => $doc->is_bidi,
                                             is_slide => $is_slide,
+                                            captions => Text::Amuse::Utils::language_code_locale_captions($doc->language_code),
                                            );
 
     my @indexes;

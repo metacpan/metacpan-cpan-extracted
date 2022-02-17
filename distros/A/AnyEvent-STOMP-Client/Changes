@@ -1,5 +1,9 @@
 Revision history for Perl module AnyEvent::STOMP::Client.
 
+0.41  2022-02-14
+      - Avoid memory leak by allowing to fully shutdown the client object (by @kbucheli)
+      - Properly fish error message from the header of the stomp ERROR message (by @kbucheli)
+
 0.40  2021-10-02
       - Properly propagate low-level errors and error messages in the on_error callback (by @kbucheli)
 

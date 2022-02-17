@@ -1,7 +1,7 @@
 use Test2::V0;
 
 use lib 't/lib';
-use Test2::Regexp::Pattern::License;
+use Test2::Tools::LicenseRegistry;
 
 plan 1;
 
@@ -366,7 +366,7 @@ like(
 
 # TODO		field 'Vim License'                                     => 'Vim';
 # TODO		field 'VOSTROM Public License for Open Source'          => 'VOSTROM';
-		field 'Vovida Software License v1.0' => 'VSL-1.0';
+		field 'Vovida Software License v1.0'                 => 'VSL-1.0';
 		field 'W3C Software Notice and License (1998-07-20)' =>
 			'W3C-19980720';
 		field 'W3C Software Notice and License (2002-12-31)' => 'W3C';
@@ -381,13 +381,13 @@ like(
 # TODO		field 'xinetd License'                               => 'xinetd';
 # TODO		field 'XPP License'                                  => 'xpp';
 # TODO		field 'XSkat License'                                => 'XSkat';
-		field 'Yahoo! Public License v1.0' => 'YPL-1.0';
-		field 'Yahoo! Public License v1.1' => 'YPL-1.1';
-		field 'Zed License'                => 'Zed';
-		field 'Zend License v2.0'          => 'Zend-2.0';
-		field 'Zimbra Public License v1.3' => 'Zimbra-1.3';
-		field 'Zimbra Public License v1.4' => 'Zimbra-1.4';
-		field 'zlib License'               => 'Zlib';
+		field 'Yahoo! Public License v1.0'               => 'YPL-1.0';
+		field 'Yahoo! Public License v1.1'               => 'YPL-1.1';
+		field 'Zed License'                              => 'Zed';
+		field 'Zend License v2.0'                        => 'Zend-2.0';
+		field 'Zimbra Public License v1.3'               => 'Zimbra-1.3';
+		field 'Zimbra Public License v1.4'               => 'Zimbra-1.4';
+		field 'zlib License'                             => 'Zlib';
 		field 'zlib/libpng License with Acknowledgement' =>
 			'zlib-acknowledgement';
 		field 'Zope Public License 1.1' => 'ZPL-1.1';

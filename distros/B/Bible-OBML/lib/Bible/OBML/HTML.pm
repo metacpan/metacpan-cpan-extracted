@@ -12,7 +12,7 @@ BEGIN {
     Template->import;
 }
 
-our $VERSION = '1.17'; # VERSION
+our $VERSION = '1.18'; # VERSION
 
 has obml => sub {
     require Bible::OBML;
@@ -232,7 +232,7 @@ Bible::OBML::HTML - Render OBML as HTML
 
 =head1 VERSION
 
-version 1.17
+version 1.18
 
 =for test_synopsis my( $obml, $filename, $data, $skip_smartify );
 

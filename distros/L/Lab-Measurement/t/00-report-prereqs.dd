@@ -38,6 +38,7 @@ do { my $x = {
                                       'IO::Select' => '0',
                                       'IO::Socket' => '0',
                                       'IO::Socket::INET' => '0',
+                                      'LWP::Simple' => '0',
                                       'List::MoreUtils' => '0',
                                       'List::Util' => '0',
                                       'Math::Complex' => '0',

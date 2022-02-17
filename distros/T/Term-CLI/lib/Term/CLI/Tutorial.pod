@@ -22,7 +22,7 @@ Term::CLI::Tutorial - tips, tricks, and examples for Term::CLI
 
 =head1 VERSION
 
-version 0.054002
+version 0.055002
 
 =head1 SYNOPSIS
 
@@ -167,7 +167,7 @@ L<Term::CLI> provides a framework to make this happen:
 
     say "\n[Welcome to BSSH]";
     while (defined (my $line = $term->readline)) {
-        $term->execute($line);
+        $term->execute_line($line);
     }
     say "\n-- exit";
     exit 0;
@@ -200,7 +200,7 @@ add a line to the C<while> loop:
 
     while (my $line = $term->readline) {
         next if /^\s*(?:#.*)?$/; # Skip comments and empty lines.
-        $term->execute($line);
+        $term->execute_line($line);
     }
 
 But it's actually nicer to let L<Term::CLI> handle this for us:
@@ -298,7 +298,7 @@ So, now that we have the basic mechanism out of the way, let's
 add our first command, the highly useful C<exit>.
 
 =head2 The C<exit> command (optional argument)
-X<exit_command>
+X<exit command>
 
 From L<THE BSSH CONCEPT|/THE BSSH CONCEPT> section above:
 
@@ -630,6 +630,7 @@ same prefix (C<e>), so let's see what happens with the abbreviations:
     -- exit: 0
 
 =head2 The C<make> command (enum arguments)
+X<make command>
 
 From L<THE BSSH CONCEPT|/THE BSSH CONCEPT> section above:
 
@@ -1046,7 +1047,7 @@ Code:
                 arguments => [
                     Term::CLI::Argument::Bool->new(name => 'bool',
                         true_values  => [qw( 1 true on yes ok )],
-                        false_values => [qw( 1 false off no never )],
+                        false_values => [qw( 0 false off no never )],
                     )
 
                 ],
@@ -1113,6 +1114,7 @@ sub-commands (the C<interface> command), or to create syntactic sugar
 (the C<do> command).
 
 =head2 Syntactic sugar: the C<do> command
+X<do command>
 
 The specification says:
 
@@ -1157,6 +1159,7 @@ Code:
     );
 
 =head2 Common argument(s): the C<interface> command
+X<interface command>
 
 The specification says:
 
@@ -1539,6 +1542,67 @@ For more details on the dirty secrets of signal handling, see the
 L<SIGNAL HANDLING section|Term::CLI::ReadLine/SIGNAL HANDLING>
 in L<Term::CLI::ReadLine>(3p).
 
+=head1 DYNAMIC COMPLETION LISTS
+
+Let's look at the L<interface command|/interface command> again
+(L<see above|/interface command>).
+
+The I<iface> argument is defined as a simple
+C<Term::CLI::Argument::String>, and so has no possibilities for
+completion.
+
+What if we want to enable completion for this argument, though? Well, the
+obvious choice is L<Term::CLI::Argument::Enum>, which we've seen before
+(See L<make|/make command> and L<do|/do command> above).
+
+We can query the system for a list of the available interfaces at
+object construction time, but what if we run this on a laptop where
+devices can be hot-plugged (USB dongles, etc.)?
+
+Well, this is where C<Term::CLI::Argument::Enum> has a trick up its sleeve.
+Instead of an ArrayRef, we can provide it with a CodeRef which will be called
+when the list of possible values has to be expanded.
+
+So, let's rewrite the C<interface> command definition. Instead of:
+
+	arguments => [
+		Term::CLI::Argument::String->new( name => 'iface' )
+	],
+
+We specify:
+
+	arguments => [
+		Term::CLI::Argument::Enum->new(
+			name => 'iface',
+			value_list => sub {
+				my $if_t = readpipe('ip link show 2>/dev/null') // '';
+				my @if_l = $if_t =~ /^ \d+ : \s (\S+): \s/gxms;
+				return \@if_l;
+			}
+		),
+	],
+
+This results in F<example_18_dynamic_enum.pl>:
+
+    bash$ perl tutorial/example_18_dynamic_enum.pl
+
+    [Welcome to BSSH]
+    bssh> interface <TAB><TAB>
+	lo        virbr0    virbr1    wlp113s0
+
+Now, when I plug in my USB-C dongle with an Ethernet adapter, I get:
+
+    bssh> interface <TAB><TAB>
+	enp0s13f0u3u1  lo   virbr0    virbr1   wlp113s0
+
+Neat, huh?
+
+In combination with the C<cache_values> flag, dynamic value lists can also
+be used to generate the value list once on demand (e.g. by querying a
+remote database) without affecting startup time of the application itself.
+
+See L<Term::CLI::Argument::Enum|Term::CLI::Argument::Enum> for more details.
+
 =head1 DEALING WITH HISTORY
 
 By default, the L<Term::CLI> objects do not try to read or write
@@ -1570,7 +1634,7 @@ on how to change the defaults.
 
 The above code will not save the command history if you call C<exit> from
 a callback function. The previously created C<exit> command
-(L<see above|/exit_command>) calls the C<execute_exit> callback, which calls
+(L<see above|/exit command>) calls the C<execute_exit> callback, which calls
 C<exit()>. As a result, the line with C<$term-E<gt>write_history()> is never
 reached.
 
@@ -1587,7 +1651,7 @@ L<Term::CLI's cleanup|Term::CLI/cleanup> attribute:
     );
 
     while ( defined(my $line = $term->readline) ) {
-        $term->execute($line);
+        $term->execute_line($line);
     }
     exit 0;
 
@@ -1614,7 +1678,7 @@ Add a global flag that is checked within the loop:
     ...
 
     while (defined (my $line = $term->readline)) {
-        $term->execute($line);
+        $term->execute_line($line);
         last if defined $::global_exit;
     }
     $term->write_history()
@@ -1656,7 +1720,7 @@ Return an exit flag through C<execute>:
 
     my %ret;
     while (defined (my $line = $term->readline)) {
-        %ret = $term->execute($line);
+        %ret = $term->execute_line($line);
         last if defined $ret{exit};
     }
     $term->write_history()
@@ -1684,7 +1748,7 @@ Write history in the callback:
     ...
 
     while (defined (my $line = $term->readline)) {
-        $term->execute($line);
+        $term->execute_line($line);
     }
 
     execute_exit($term, 0);
@@ -1747,7 +1811,7 @@ correct scope:
     my $term = initialise_term();
 
     while ( defined(my $line = $term->readline) ) {
-        $term->execute($line);
+        $term->execute_line($line);
     }
     exit 0;
 

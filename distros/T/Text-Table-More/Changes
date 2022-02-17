@@ -1,3 +1,20 @@
+0.023   2022-02-14  Released-By: PERLANCAR; Backward-Incompatible: yes; Urgency: medium
+
+        [INCOMPATIBLE CHANGES]
+
+        - Update to BorderStyle v3. This is marked backward-incompatible because
+          it forces user to use the new border style modules.
+
+        [ENHANCEMENTS]
+
+        - Support padding attributes: lpad, rpad, hpad, tpad, bpad, vpad.
+
+        - Add sample scripts.
+
+        - Observe environment variables PERL_TEXT_TABLE_MORE_BORDER_STYLE &
+          BORDER_STYLE.
+
+
 0.022   2022-01-27  Released-By: PERLANCAR; Urgency: medium
 
         - Bump prereq versions to fix test failures (RT#140878).
@@ -5,7 +22,7 @@
 
 0.021   2022-01-26  Released-By: PERLANCAR; Urgency: medium
 
-        - Add multirow header support (RT#).
+        - Add multirow header support (RT#140765).
 
 
 0.020   2021-08-28  Released-By: PERLANCAR; Urgency: low

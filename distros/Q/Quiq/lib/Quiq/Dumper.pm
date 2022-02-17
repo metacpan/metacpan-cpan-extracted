@@ -19,7 +19,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.198';
+our $VERSION = '1.199';
 
 use Quiq::AnsiColor;
 use Scalar::Util ();
@@ -142,6 +142,14 @@ sub dump {
     elsif ($refType eq 'REGEXP') {
         return "/$arg/";
     }
+    elsif ($refType eq 'CODE') {
+        # FIXME: nicht richtig ausgearbeitet
+        return "CODE: $arg";
+    }
+    elsif ($refType eq 'GLOB') {
+        # FIXME: nicht richtig ausgearbeitet
+        return "GLOB: $arg";
+    }
 
     $this->throw(
         'DUMPER-00002: Unknown reference type',
@@ -153,7 +161,7 @@ sub dump {
 
 =head1 VERSION
 
-1.198
+1.199
 
 =head1 AUTHOR
 

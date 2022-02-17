@@ -1,0 +1,16 @@
+#title Agrikultur
+#lang id
+
+** Agrikultur
+
+Agrikultur adalah kelahiran proses produksi, lengkap dengan fitur-fiturnya yang esensial serta merubah bentuk kehidupan dan kesadaran. Keadaan itu sendiri menjadi satu instrumen produksi dan planet yang dihuni oleh spesies-spesies untuk menjadi objeknya. Liar ataupun jinak/lemah, ganja dan hasil panen berbicara mengenai dualitas yang menimpangkan jiwa dalam keberadaan kita, dengan cepat mengantarkan pada despotisme, perang dan pemiskinan dari peradaban tinggi yang lebih dulu melewati jarak yang begitu besar dari ke-esa-an alam. Kekuatan barisan peradaban yang dimaksudkan oleh Adorno sebagai “asumsi dari kehancuran irasional pada awal sejarah,” yang dirasakan oleh Freud sebagai “sesuatu yang menentukan pada penolakan mayoritas,” yang oleh Stanley Diamond menemukan hanya “kewajiban bukannya kesukarelaan,” yang dipersembahkan oleh agrikultur. 
+
+** Agrikultur
+
+<[ru]>
+жизнь более 500 полотен (в наиболее полных современных каталогах фигур
+</[ru]>
+
+<[hr]>
+Pakao (lat. infernus) jest prema religijskim i mitološkim vjerovanjima mjesto gdje duše ljudi koji umru u smrtnom grijehu trpe vječnu patnju i kaznu. Pojam pakla kao onozemaljskog mjesta prokletstva i muke poznat je u mnogim svjetskim religijama, a osobito u kršćanstvu, islamu i budizmu. U kršćanskoj teologiji pakao se opisuje kao mjesto u kojem obitavaju đavoli i demoni koji muče duše grešnika. Nasuprot tome, prema kršćanskom vjerovanju duše ljudi koji su umrli u miru s Bog odlaze u čistilište, dok duše onih grešnika koji su zavrijedili spasenje odlaze u raj. 
+</[hr]>

@@ -8,7 +8,7 @@ use utf8;
 
 use Object::Pad 0.55;  # :reader on array
 
-package App::sdview::Parser 0.05;
+package App::sdview::Parser 0.06;
 role App::sdview::Parser;
 
 use String::Tagged;
@@ -23,18 +23,21 @@ class App::sdview::Para::Heading :strict(params) {
 }
 
 class App::sdview::Para::Plain :strict(params) {
-   has $text :param :reader;
+   has $text   :param :reader;
+   has $indent :param :reader = 0;
 
    method type { "plain" }
 }
 
 class App::sdview::Para::Verbatim :strict(params) {
    has $text :param :reader;
+   has $indent :param :reader = 0;
 
    method type { "verbatim" }
 }
 
 class App::sdview::Para::List :strict(params) {
+   # "bullet" | "number" | "text"
    has $listtype :param :reader;
    has $indent   :param :reader;
    has $initial  :param :reader = 1;  # for number lists

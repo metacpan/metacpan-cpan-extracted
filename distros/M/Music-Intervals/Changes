@@ -1,5 +1,14 @@
 Revision history for Music-Intervals
 
+0.0904 2022-02-12 13:33:54
+    - Add more (mostly harmonic) ratios!
+
+0.0903 2022-02-12 09:05:56
+    - Rename eg/pythagorean to "eg/analyze", and enhance it some more.
+
+0.0902 2022-02-11 14:29:11
+    - Enhance the eg/pythagorean program.
+
 0.0901 2022-02-09 06:37:15
     - Add the eg/pythagorean program.
     - Improve documentation.

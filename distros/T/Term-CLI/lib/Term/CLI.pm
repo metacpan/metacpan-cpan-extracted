@@ -7,7 +7,7 @@
 #       Author:  Steven Bakker (SBAKKER), <sbakker@cpan.org>
 #      Created:  31/01/18
 #
-#   Copyright (c) 2018 Steven Bakker
+#   Copyright (c) 2018-2022 Steven Bakker
 #
 #   This module is free software; you can redistribute it and/or modify
 #   it under the same terms as Perl itself. See "perldoc perlartistic."
@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI 0.054002;
+package Term::CLI 0.055002;
 
 use 5.014;
 use warnings;
@@ -57,10 +57,12 @@ use namespace::clean 0.25;
 
 extends 'Term::CLI::Base';
 
-with('Term::CLI::Role::CommandSet');
+with qw( 
+    Term::CLI::Role::CommandSet
+    Term::CLI::Role::State
+);
 
 my $DFL_HIST_SIZE = 1000;
-my $ERROR_STATUS  = -1;
 
 # Provide a default for 'name'.
 has '+name' => ( default => sub {$FindBin::Script} );
@@ -106,14 +108,18 @@ has quote_characters => ( is => 'rw', isa => Str, default => sub {q("')} );
 sub BUILD {
     my ( $self, $args ) = @_;
 
-    my $term = Term::CLI::ReadLine->new( $self->name )->term;
+    my @fh_list = ( \*STDIN, \*STDOUT );
+    if (exists $args->{filehandles}) {
+        @fh_list = @{ $args->{filehandles} // [] };
+    }
+
+    my $term = Term::CLI::ReadLine->new( $self->name, @fh_list );
 
     if ( my $sig_list = $args->{ignore_keyboard_signals} ) {
         $term->ignore_keyboard_signals( @{$sig_list} );
     }
 
-    $term->Attribs->{completion_function} = sub { $self->complete_line(@_) };
-    $term->Attribs->{char_is_quoted_p}    = sub { $self->_is_escaped(@_) };
+    $term->Attribs->{char_is_quoted_p} = sub { $self->_is_escaped(@_) };
 
     $self->_set_completion_attribs;
 
@@ -212,106 +218,6 @@ sub _is_escaped {
     return !$self->_is_escaped( $line, $index - 1 );
 }
 
-# CLI->_set_completion_attribs();
-#
-# Set some attributes in the Term::ReadLine object related to
-# custom completion.
-#
-sub _set_completion_attribs {
-    my $self = shift;
-    my $term = $self->term;
-
-    # Default: '"
-    $term->Attribs->{completer_quote_characters} = $self->quote_characters;
-
-    # Default: \n\t\\"'`@$><=;|&{( and <space>
-    $term->Attribs->{completer_word_break_characters} = $self->word_delimiters;
-
-    # Default: <space>
-    $term->Attribs->{completion_append_character} =
-        substr( $self->word_delimiters, 0, 1 );
-
-    return;
-}
-
-# CLI->_split_line( $text );
-#
-# Attempt to split $text into words. Use a custom split function if
-# necessary.
-#
-sub _split_line {
-    my ( $self, $text ) = @_;
-    return $self->split_function->( $self, $text );
-}
-
-# Dumb wrapper around "Attrib" that allows mocking the
-# `completion_quote_character` state.
-sub _rl_completion_quote_character {
-    my ($self) = @_;
-    my $c = $self->term->Attribs->{completion_quote_character} // q{};
-    return $c =~ s/\000//rgx;
-}
-
-# See POD X<complete_line>
-sub complete_line {
-    my ( $self, $text, $line, $start ) = @_;
-
-    $self->_set_completion_attribs;
-
-    my $quote_char = $self->_rl_completion_quote_character;
-
-    my @words;
-
-    if ( $start > 0 ) {
-        if ( length $quote_char ) {
-
-            # ReadLine thinks the $text to be completed is quoted.
-            # The quote character will precede the $start of $text.
-            # Make sure we do not include it in the text to break
-            # into words...
-            ( my $err, @words ) =
-                $self->_split_line( substr( $line, 0, $start - 1 ) );
-        }
-        else {
-            ( my $err, @words ) =
-                $self->_split_line( substr( $line, 0, $start ) );
-        }
-    }
-
-    push @words, $text;
-
-    my @list;
-
-    if ( @words == 1 ) {
-        @list = grep { rindex( $_, $words[0], 0 ) == 0 } $self->command_names;
-    }
-    elsif ( my $cmd = $self->find_command( $words[0] ) ) {
-        @list = $cmd->complete_line( @words[ 1 .. $#words ] );
-    }
-
-    return @list if length $quote_char; # No need to worry about spaces.
-
-    # Escape spaces in reply if necessary.
-    my $delim = $self->word_delimiters;
-    return map {s/([$delim])/\\$1/rgx} @list;
-}
-
-sub readline {    ## no critic (ProhibitBuiltinHomonyms)
-    my ( $self, %args ) = @_;
-
-    my $prompt = $args{prompt} // $self->prompt;
-    my $skip   = exists $args{skip} ? $args{skip} : $self->skip;
-
-    $self->_set_completion_attribs;
-
-    my $input;
-    while ( defined( $input = $self->term->readline($prompt) ) ) {
-        next if defined $skip && $input =~ $skip;
-        last;
-    }
-    return $input;
-}
-
 sub read_history {
     my ( $self, $hist_file ) = @_;
 
@@ -336,40 +242,6 @@ sub write_history {
     return 1;
 }
 
-sub execute {
-    my ( $self, $cmd ) = @_;
-
-    my ( $error, @cmd ) = $self->_split_line($cmd);
-
-    my %args = (
-        status       => 0,
-        error        => q{},
-        command_line => $cmd,
-        command_path => [$self],
-        unparsed     => \@cmd,
-        options      => {},
-        arguments    => [],
-    );
-
-    return $self->try_callback( %args, status => $ERROR_STATUS,
-        error => $error )
-        if length $error;
-
-    if ( @cmd == 0 ) {
-        $args{error}  = loc("missing command");
-        $args{status} = $ERROR_STATUS;
-    }
-    elsif ( my $cmd_ref = $self->find_command( $cmd[0] ) ) {
-        %args = $cmd_ref->execute( %args, unparsed => [ @cmd[ 1 .. $#cmd ] ] );
-    }
-    else {
-        $args{error}  = $self->error;
-        $args{status} = $ERROR_STATUS;
-    }
-
-    return $self->try_callback(%args);
-}
-
 1;
 
 __END__
@@ -382,7 +254,7 @@ Term::CLI - CLI interpreter based on Term::ReadLine
 
 =head1 VERSION
 
-version 0.054002
+version 0.055002
 
 =head1 SYNOPSIS
 
@@ -431,7 +303,7 @@ version 0.054002
  # $cli will now recognise things like: 'copy --verbose a b'
 
  while ( my $input = $cli->readline(skip => qr/^\s*(?:#.*)?$/) ) {
-    $cli->execute($input);
+    $cli->execute_line($input);
  }
 
 =head1 DESCRIPTION
@@ -446,6 +318,26 @@ and L<Term::CLI::Intro>(3p) first, and peruse the example
 scripts in the source distribution's F<examples> and
 F<tutorial> directories.
 
+=head2 I/O handles
+
+By default C<Term::CLI> will create a
+L<Term::CLI::ReadLine|Term::CLI::ReadLine> object
+(which creates a L<Term::ReadLine|Term::ReadLine> object)
+that reads from F<STDIN> and writes to F<STDOUT>.
+
+This is notably different from the default behaviour of e.g.
+GNU Readline which opens the TTY separately. This may cause
+unexpected behaviour in case of UTF-8 I/O.
+
+By explicitly specifying F<STDIN> and F<STDOUT> as the I/O
+handles, we force the underlying readline implementation to
+use the same I/O encoding as the standard I/O handles. This
+means that e.g. C<use open qw(:std :utf8)> will do what you
+expect and enable UTF-8 input/output.
+
+See the C<filehandles> argument to L<new|/new> below for information
+on how to change this.
+
 =head1 CLASS STRUCTURE
 
 =head2 Inherits from:
@@ -454,7 +346,8 @@ L<Term::CLI::Base>(3p).
 
 =head2 Consumes:
 
-L<Term::CLI::Role::CommandSet>(3p).
+L<Term::CLI::Role::CommandSet|Term::CLI::Role::CommandSet>(3p),
+L<Term::CLI::Role::State|Term::CLI::Role::State>(3p).
 
 =head1 CONSTRUCTORS
 
@@ -473,6 +366,18 @@ Valid attributes:
 
 Reference to a subroutine that should be called when the command
 is executed, or C<undef>.
+
+=item B<filehandles> =E<gt> I<ArrayRef>
+
+File handles to use for input and output, resp. The array can be:
+
+    undef
+    [ ]
+    [ IN_FH, OUT_FH ]
+
+If the value is either C<undef> or an empty list, then we rely
+on the underlying readline's implementation to determine the
+I/O handles (but see L<IE<sol>O handles|/I/O handles> above).
 
 =item B<cleanup> =E<gt> I<CodeRef>
 
@@ -710,152 +615,6 @@ and return C<undef>.
 If I<Str> is given, it will try to write to that file instead. If that is
 successful, the L<history_file()|/history_file> attribute will be set
 to I<Str>.
-
-=back
-
-=head2 Others
-
-=over
-
-=item B<complete_line> ( I<TEXT>, I<LINE>, I<START> )
-X<complete_line>
-
-Called when the user hits the I<TAB> key for completion.
-
-I<TEXT> is the text to complete, I<LINE> is the input line so
-far, I<START> is the position in the line where I<TEXT> starts.
-
-The function will split the line in words and delegate the
-completion to the first L<Term::CLI::Command> sub-command,
-see L<Term::CLI::Command|Term::CLI::Command/complete_line>.
-
-=item B<readline> ( [ I<ATTR> =E<gt> I<VAL>, ... ] )
-X<readline>
-
-Read a line from the input connected to L<term|/term>, using
-the L<Term::ReadLine> interface.
-
-By default, it returns the line read from the input, or
-an empty value if end of file has been reached (e.g.
-the user hitting I<Ctrl-D>).
-
-The following I<ATTR> are recognised:
-
-=over
-
-=item B<skip> =E<gt> I<RegEx>
-
-Override the object's L<skip|/skip> attribute.
-
-Skip lines that match the I<RegEx> parameter. A common
-call is:
-
-    $text = CLI->readline( skip => qr{^\s+(?:#.*)$} );
-
-This will skip empty lines, lines containing whitespace, and
-comments.
-
-=item B<prompt> =E<gt> I<Str>
-
-Override the prompt given by the L<prompt|/prompt> method.
-
-=back
-
-Examples:
-
-    # Just read the next input line.
-    $line = $cli->readline;
-    exit if !defined $line;
-
-    # Skip empty lines and comments.
-    $line = $cli->readline( skip => qr{^\s*(?:#.*)?$} );
-    exit if !defined $line;
-
-=item B<execute> ( I<Str> )
-X<execute>
-
-Parse and execute the command line consisting of I<Str>
-(see the return value of L<readline|/readline> above).
-
-The command line is split into words using
-the L<split_function|/split_function>.
-If that succeeds, then the resulting list of words is
-parsed and executed, otherwise a parse error is generated
-(i.e. the object's L<callback|Term::CLI::Role::CommandSet/callback>
-function is called with a C<status> of C<-1> and a suitable C<error>
-field).
-
-For specifying a custom word splitting method, see
-L<split_function|/split_function>.
-
-Example:
-
-    while (my $line = $cli->readline(skip => qr/^\s*(?:#.*)?$/)) {
-        $cli->execute($line);
-    }
-
-The command line is parsed depth-first, and for every
-L<Term::CLI::Command>(3p) encountered, that object's
-L<callback|Term::CLI::Role::CommandSet/callback> function
-is executed (see
-L<callback in Term::CLI::Role::Command|Term::CLI::Role::CommandSet/callback>).
-
-The C<execute> function returns the results of the last called callback
-function.
-
-=over
-
-=item *
-
-Suppose that the C<file> command has a C<show> sub-command that takes
-an optional C<--verbose> option and a single file argument.
-
-=item *
-
-Suppose the input is:
-
-    file show --verbose foo.txt
-
-=item *
-
-Then the parse tree looks like this:
-
-    (cli-root)
-        |
-        +--> Command 'file'
-                |
-                +--> Command 'show'
-                        |
-                        +--> Option '--verbose'
-                        |
-                        +--> Argument 'foo.txt'
-
-=item *
-
-Then the callbacks will be called in the following order:
-
-=over
-
-=item 1.
-
-Callback for 'show'
-
-=item 2.
-
-Callback for 'file'
-
-=item 3.
-
-Callback for C<Term::CLI> object.
-
-=back
-
-The return value from each L<callback|Term::CLI::Role::CommandSet/callback>
-(a hash in list form) is fed into the next callback function in the
-chain. This allows for adding custom data to the return hash that will
-be fed back up the parse tree (and eventually to the caller).
-
-=back
 
 =back
 

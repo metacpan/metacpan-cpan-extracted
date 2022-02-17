@@ -9,6 +9,7 @@ use File::Temp;
 use File::Spec;
 use Text::Amuse::Compile::Utils qw/write_file/;
 use JSON::MaybeXS;
+use Data::Dumper;
 
 my $wd = File::Temp->newdir;
 
@@ -17,7 +18,7 @@ my %files = ('file.ttf' => 'truetype',
              'fileuc.OTF' => 'opentype',
              'file.otf' => 'opentype');
 
-plan tests => scalar(keys %files) * 17 + 38;
+plan tests => 123;
 
 foreach my $file (sort keys %files) {
     my $path = File::Spec->catfile($wd, $file);
@@ -180,6 +181,7 @@ foreach my $file (sort keys %files) {
                                                    italic => $fontfiles{italic},
                                                    bold => $fontfiles{bold},
                                                    bolditalic => $fontfiles{bolditalic},
+                                                   languages => [qw/hr it/]
                                                   },
                                                   {
                                                    name => 'Example Sans',
@@ -208,4 +210,30 @@ foreach my $file (sort keys %files) {
         my $name = ($fonts->$method)[0]->name;
         ok $name, "$method return $name";
     }
+    my ($first) = $fonts->serif_fonts;
+  SKIP: {
+        skip "Fonts cannot be embedded", 5 unless $wd =~ m/\A([A-Za-z0-9\.\/_-]+)\z/;
+        is $first->babel_font_name, 'regular.otf';
+        diag Dumper($first->babel_font_args);
+        my $opts =  $first->babel_font_options(Scale => 'MatchLowercase');
+        like $opts, qr{Scale=MatchLowercase};
+        foreach my $type (qw/Bold Italic BoldItalic/) {
+            like $opts, qr{${type}font=$type\.otf}i;
+        }
+        diag $opts;
+        diag "Testing languages";
+    }
+    ok $first->has_languages;
+    ok $first->for_language_code('hr');
+    ok $first->for_babel_language('croatian');
+    ok !$first->for_language_code('en');
+    ok !$first->for_babel_language('english');
+    ok !$first->for_babel_language('pippo');
+    my ($mono) = $fonts->mono_fonts;
+    ok !$mono->has_languages;
+    ok !$mono->for_language_code('hr');
+    ok !$mono->for_babel_language('croatian');
+    ok scalar($fonts->fonts_for_language(serif => 'croatian'));
+    ok !scalar($fonts->fonts_for_language(mono => 'croatian'));
+    ok !scalar($fonts->fonts_for_language(sans => 'croatian'));
 }

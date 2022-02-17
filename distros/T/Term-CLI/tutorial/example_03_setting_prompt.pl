@@ -18,7 +18,7 @@ my $term = Term::CLI->new(
 
 say "\n[Welcome to BSSH]";
 while ( defined( my $line = $term->readline ) ) {
-    $term->execute($line);
+    $term->execute_line($line);
 }
 say "\n-- exit";
 exit 0;

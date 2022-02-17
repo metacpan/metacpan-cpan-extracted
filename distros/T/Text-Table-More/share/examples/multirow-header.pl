@@ -14,6 +14,8 @@ print generate_table(
         # data
         [{text=>1, rowspan=>2},{text=>'2-3',colspan=>2},{text=>4,rowspan=>2}],
         [5,8],
+
+        [qw/a b c d/],
     ],
     row_attrs => [
         [0, {align=>"middle", _valign=>"middle", bottom_border=>1}],
@@ -21,6 +23,7 @@ print generate_table(
     ],
     header_row => 2,
     #border_style => "UTF8::SingleLineDoubleAfterHeader",
+    border_style => "UTF8::SingleLineBoldHeader",
     #border_style => "Test::Labeled",
     separate_rows => 1,
 );

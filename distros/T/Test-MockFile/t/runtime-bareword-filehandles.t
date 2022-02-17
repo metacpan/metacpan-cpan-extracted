@@ -7,7 +7,7 @@ use Test2::Plugin::NoWarnings;
 use Test2::Tools::Exception qw< lives >;
 
 # This must be loaded after other modules that use open() in BEGIN
-use Test::MockFile ();    # specifically not "strict" to trigger the issue
+use Test::MockFile qw< nostrict >;    # specifically not "strict" to trigger the issue
 
 # This must be loaded after Test::MockFile so we override the core functions
 # that will be used in File::Find when it compiles
@@ -26,5 +26,7 @@ ok(
     ),
     'Successfully handled bareword filehandles during runtime',
 );
+
+is( "$@", '', 'No observed error' );
 
 done_testing();

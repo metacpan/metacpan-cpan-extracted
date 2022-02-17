@@ -8,6 +8,18 @@
 #5 lp2.def
 #6 lp2.lp
 #7 braces.braces8
+#8 rt140025.def
+#9 rt140025.rt140025
+#10 xlp1.def
+#11 xlp1.xlp1
+#12 git74.def
+#13 git74.git74
+#14 git77.def
+#15 git77.git77
+#16 vxl.def
+#17 vxl.vxl1
+#18 vxl.vxl2
+#19 bal.bal1
 
 # To locate test #13 you can search for its name or the string '#13'
 
@@ -25,20 +37,59 @@ BEGIN {
     # BEGIN SECTION 1: Parameter combinations #
     ###########################################
     $rparams = {
+        'bal1'    => "-bal=1",
         'braces8' => <<'----------',
 -bl -bbvt=1 -blxl=' ' -bll='sub do asub'
 ----------
-        'def'       => "",
+        'def'   => "",
+        'git74' => <<'----------',
+-xlp
+--iterations=2
+--maximum-line-length=120
+--line-up-parentheses
+--continuation-indentation=4
+--closing-token-indentation=1
+--want-left-space="= -> ( )"
+--want-right-space="= -> ( )"
+--space-function-paren
+--space-keyword-paren
+--space-terminal-semicolon
+--opening-brace-on-new-line
+--opening-sub-brace-on-new-line
+--opening-anonymous-sub-brace-on-new-line
+--brace-left-and-indent
+--brace-left-and-indent-list="*"
+--break-before-hash-brace=3
+----------
+        'git77' => <<'----------',
+-gal='Grep Map'
+----------
         'lp'        => "-lp",
         'novalign1' => "-novalign",
         'novalign2' => "-nvsc -nvbc -msc=2",
         'novalign3' => "-nvc",
+        'rt140025'  => "-lp -xci -ci=4 -ce",
+        'vxl1'      => <<'----------',
+-vxl='='
+----------
+        'vxl2' => <<'----------',
+-vxl='*' -vil='='
+----------
+        'xlp1' => "-xlp",
     };
 
     ############################
     # BEGIN SECTION 2: Sources #
     ############################
     $rsources = {
+
+        'bal' => <<'----------',
+{
+  L1:
+  L2:
+  L3: return;
+};
+----------
 
         'braces' => <<'----------',
 sub message {
@@ -91,6 +142,84 @@ catch {
 };
 ----------
 
+        'git74' => <<'----------',
+$self->func(
+  {
+    command  => [ 'command', 'argument1', 'argument2' ],
+    callback => sub {
+      my ($res) = @_;
+      print($res);
+    }
+  }
+);
+
+my $test_var = $self->test_call(    #
+    $arg1,
+    $arg2
+);
+
+my $test_var = $self->test_call(
+    $arg1,                          #
+    $arg2
+);
+
+my $test_var = $self->test_call(
+    #
+    $arg1,
+    $arg2,
+);
+
+my $test_var = $self->test_call(
+
+    $arg1,
+    $arg2,
+);
+
+my $test_var = $self->test_call(
+    $arg1,
+    $arg2
+
+);
+
+my $test_var = $self->test_call(
+
+    $arg1,
+    $arg2,
+
+);
+
+my $test_var =
+
+  $self->test_call(
+    $arg1,
+    $arg2
+
+  );
+
+----------
+
+        'git77' => <<'----------',
+# These should format about the same with -gal='Map Grep'.
+# NOTE: The braces only align if the internal code flag ALIGN_GREP_ALIASES is set
+    return +{
+        Map  {
+$_->init_arg => $_->get_value($instance) }
+        Grep { $_->has_value($instance) }
+        Grep {
+defined( $_->init_arg ) }
+$class->get_all_attributes
+    };
+
+    return +{
+        map  {
+$_->init_arg => $_->get_value($instance) }
+        grep { $_->has_value($instance) }
+        grep {
+defined( $_->init_arg ) }
+$class->get_all_attributes
+    };
+----------
+
         'lp2' => <<'----------',
 # test issue git #74, lost -lp when final anon sub brace followed by '}'
 Util::Parser->new(
@@ -116,6 +245,55 @@ my $endkit = 0;    # saw end of kit
 my $fail = 0;    # failed
 }
 
+----------
+
+        'rt140025' => <<'----------',
+eval {
+my $cpid;
+my $cmd;
+
+ FORK: {
+ if( $cpid = fork ) {
+ close( STDOUT );
+ last;
+ } elsif( defined $cpid ) {
+ close( STDIN );
+ open( STDIN, '<', '/dev/null' ) or die( "open3: $!\n" );
+ exec $cmd or die( "exec: $!\n" );
+ } elsif( $! == EAGAIN ) {
+ sleep 3;
+ redo FORK;
+ } else {
+ die( "Can't fork: $!\n" );
+ }
+ }
+};
+----------
+
+        'vxl' => <<'----------',
+# if equals is excluded then ternary is automatically excluded
+# side comment alignments always remain
+$co_description = ($color) ? 'bold cyan' : '';          # description
+$co_prompt      = ($color) ? 'bold green' : '';         # prompt
+$co_unused      = ($color) ? 'on_green' : 'reverse';    # unused
+----------
+
+        'xlp1' => <<'----------',
+# test -xlp with comments, broken sub blocks, blank line, line length limit
+$cb1 = $act_page->Checkbutton(
+  -text     => M "Verwenden",
+  -variable => \$qualitaet_s_optimierung,
+  -command  => sub {
+    change_state_all( $act_page1, $qualitaet_s_optimierung, { $cb1 => 1 } )
+      ;    # sc
+  },
+)->grid(
+
+  # block comment
+  -row    => $gridy++,
+  -column => 2,
+  -sticky => 'e'
+);
 ----------
     };
 
@@ -287,6 +465,322 @@ catch {
     die;
 };
 #7...........
+        },
+
+        'rt140025.def' => {
+            source => "rt140025",
+            params => "def",
+            expect => <<'#8...........',
+eval {
+    my $cpid;
+    my $cmd;
+
+  FORK: {
+        if ( $cpid = fork ) {
+            close(STDOUT);
+            last;
+        }
+        elsif ( defined $cpid ) {
+            close(STDIN);
+            open( STDIN, '<', '/dev/null' ) or die("open3: $!\n");
+            exec $cmd                       or die("exec: $!\n");
+        }
+        elsif ( $! == EAGAIN ) {
+            sleep 3;
+            redo FORK;
+        }
+        else {
+            die("Can't fork: $!\n");
+        }
+    }
+};
+#8...........
+        },
+
+        'rt140025.rt140025' => {
+            source => "rt140025",
+            params => "rt140025",
+            expect => <<'#9...........',
+eval {
+    my $cpid;
+    my $cmd;
+
+FORK: {
+        if ( $cpid = fork ) {
+            close(STDOUT);
+            last;
+        } elsif ( defined $cpid ) {
+            close(STDIN);
+            open( STDIN, '<', '/dev/null' ) or die("open3: $!\n");
+            exec $cmd                       or die("exec: $!\n");
+        } elsif ( $! == EAGAIN ) {
+            sleep 3;
+            redo FORK;
+        } else {
+            die("Can't fork: $!\n");
+        }
+    }
+};
+#9...........
+        },
+
+        'xlp1.def' => {
+            source => "xlp1",
+            params => "def",
+            expect => <<'#10...........',
+# test -xlp with comments, broken sub blocks, blank line, line length limit
+$cb1 = $act_page->Checkbutton(
+    -text     => M "Verwenden",
+    -variable => \$qualitaet_s_optimierung,
+    -command  => sub {
+        change_state_all( $act_page1, $qualitaet_s_optimierung, { $cb1 => 1 } )
+          ;    # sc
+    },
+)->grid(
+
+    # block comment
+    -row    => $gridy++,
+    -column => 2,
+    -sticky => 'e'
+);
+#10...........
+        },
+
+        'xlp1.xlp1' => {
+            source => "xlp1",
+            params => "xlp1",
+            expect => <<'#11...........',
+# test -xlp with comments, broken sub blocks, blank line, line length limit
+$cb1 = $act_page->Checkbutton(
+                              -text     => M "Verwenden",
+                              -variable => \$qualitaet_s_optimierung,
+                              -command  => sub {
+                                  change_state_all( $act_page1,
+                                       $qualitaet_s_optimierung, { $cb1 => 1 } )
+                                    ;    # sc
+                              },
+)->grid(
+
+        # block comment
+        -row    => $gridy++,
+        -column => 2,
+        -sticky => 'e'
+);
+#11...........
+        },
+
+        'git74.def' => {
+            source => "git74",
+            params => "def",
+            expect => <<'#12...........',
+$self->func(
+    {
+        command  => [ 'command', 'argument1', 'argument2' ],
+        callback => sub {
+            my ($res) = @_;
+            print($res);
+        }
+    }
+);
+
+my $test_var = $self->test_call(    #
+    $arg1,
+    $arg2
+);
+
+my $test_var = $self->test_call(
+    $arg1,                          #
+    $arg2
+);
+
+my $test_var = $self->test_call(
+    #
+    $arg1,
+    $arg2,
+);
+
+my $test_var = $self->test_call(
+
+    $arg1,
+    $arg2,
+);
+
+my $test_var = $self->test_call(
+    $arg1,
+    $arg2
+
+);
+
+my $test_var = $self->test_call(
+
+    $arg1,
+    $arg2,
+
+);
+
+my $test_var =
+
+  $self->test_call(
+    $arg1,
+    $arg2
+
+  );
+
+#12...........
+        },
+
+        'git74.git74' => {
+            source => "git74",
+            params => "git74",
+            expect => <<'#13...........',
+$self -> func (
+                {
+                   command  => [ 'command', 'argument1', 'argument2' ],
+                   callback => sub
+                       {
+                       my ($res) = @_ ;
+                       print ($res) ;
+                       }
+                }
+              ) ;
+
+my $test_var = $self -> test_call (    #
+                                    $arg1,
+                                    $arg2
+                                  ) ;
+
+my $test_var = $self -> test_call (
+                                    $arg1,    #
+                                    $arg2
+                                  ) ;
+
+my $test_var = $self -> test_call (
+                                   #
+                                   $arg1,
+                                   $arg2,
+                                  ) ;
+
+my $test_var = $self -> test_call (
+
+                                   $arg1,
+                                   $arg2,
+                                  ) ;
+
+my $test_var = $self -> test_call (
+                                    $arg1,
+                                    $arg2
+
+                                  ) ;
+
+my $test_var = $self -> test_call (
+
+                                   $arg1,
+                                   $arg2,
+
+                                  ) ;
+
+my $test_var =
+
+    $self -> test_call (
+                         $arg1,
+                         $arg2
+
+                       ) ;
+
+#13...........
+        },
+
+        'git77.def' => {
+            source => "git77",
+            params => "def",
+            expect => <<'#14...........',
+# These should format about the same with -gal='Map Grep'.
+# NOTE: The braces only align if the internal code flag ALIGN_GREP_ALIASES is set
+    return +{
+        Map {
+            $_->init_arg => $_->get_value($instance)
+        } Grep { $_->has_value($instance) }
+        Grep {
+            defined( $_->init_arg )
+        }
+        $class->get_all_attributes
+    };
+
+    return +{
+        map  { $_->init_arg => $_->get_value($instance) }
+        grep { $_->has_value($instance) }
+        grep { defined( $_->init_arg ) } $class->get_all_attributes
+    };
+#14...........
+        },
+
+        'git77.git77' => {
+            source => "git77",
+            params => "git77",
+            expect => <<'#15...........',
+# These should format about the same with -gal='Map Grep'.
+# NOTE: The braces only align if the internal code flag ALIGN_GREP_ALIASES is set
+    return +{
+        Map { $_->init_arg => $_->get_value($instance) }
+        Grep { $_->has_value($instance) }
+        Grep { defined( $_->init_arg ) } $class->get_all_attributes
+    };
+
+    return +{
+        map  { $_->init_arg => $_->get_value($instance) }
+        grep { $_->has_value($instance) }
+        grep { defined( $_->init_arg ) } $class->get_all_attributes
+    };
+#15...........
+        },
+
+        'vxl.def' => {
+            source => "vxl",
+            params => "def",
+            expect => <<'#16...........',
+# if equals is excluded then ternary is automatically excluded
+# side comment alignments always remain
+$co_description = ($color) ? 'bold cyan'  : '';           # description
+$co_prompt      = ($color) ? 'bold green' : '';           # prompt
+$co_unused      = ($color) ? 'on_green'   : 'reverse';    # unused
+#16...........
+        },
+
+        'vxl.vxl1' => {
+            source => "vxl",
+            params => "vxl1",
+            expect => <<'#17...........',
+# if equals is excluded then ternary is automatically excluded
+# side comment alignments always remain
+$co_description = ($color) ? 'bold cyan' : '';     # description
+$co_prompt = ($color) ? 'bold green' : '';         # prompt
+$co_unused = ($color) ? 'on_green' : 'reverse';    # unused
+#17...........
+        },
+
+        'vxl.vxl2' => {
+            source => "vxl",
+            params => "vxl2",
+            expect => <<'#18...........',
+# if equals is excluded then ternary is automatically excluded
+# side comment alignments always remain
+$co_description = ($color) ? 'bold cyan' : '';          # description
+$co_prompt      = ($color) ? 'bold green' : '';         # prompt
+$co_unused      = ($color) ? 'on_green' : 'reverse';    # unused
+#18...........
+        },
+
+        'bal.bal1' => {
+            source => "bal",
+            params => "bal1",
+            expect => <<'#19...........',
+{
+  L1:
+  L2:
+  L3:
+    return;
+};
+#19...........
         },
     };
 

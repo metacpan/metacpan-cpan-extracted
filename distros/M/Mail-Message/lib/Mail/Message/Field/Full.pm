@@ -1,14 +1,14 @@
-# Copyrights 2001-2021 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2001-2022 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
+# Pod stripped from pm file by OODoc 2.03.
 # This code is part of distribution Mail-Message.  Meta-POD processed with
 # OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Mail::Message::Field::Full;
 use vars '$VERSION';
-$VERSION = '3.011';
+$VERSION = '3.012';
 
 use base 'Mail::Message::Field';
 
@@ -217,11 +217,12 @@ sub beautify() { shift }
 
 sub _mime_word($$) { "$_[0]$_[1]?=" }
 sub _encode_b($)   { MIME::Base64::encode_base64(shift, '')  }
-sub _encode_q($)
+
+sub _encode_q($)   # RFC2047 sections 4.2 and 5
 {   my $chunk = shift;
-    $chunk =~ s#([\x00-\x1F=\x7F-\xFF])#sprintf "=%02X", ord $1#ge;
+    $chunk =~ s#([^a-zA-Z0-9!*+/=_ -])#sprintf "=%02X", ord $1#ge;
     $chunk =~ s#([_\?,"])#sprintf "=%02X", ord $1#ge;
-    $chunk =~ s/ /_/g;
+    $chunk =~ s/ /_/g;     # special case for =? ?= use
     $chunk;
 }
 
@@ -361,7 +362,7 @@ sub consumePhrase($)
     if($string =~ s/^\s*\" ((?:[^"\r\n\\]*|\\.)*) (?:\"|\s*$)//x )
     {   ($phrase = $1) =~ s/\\\"/"/g;
     }
-    elsif($string =~ s/^\s*([${atext}${atext_ill}\ \t.]+)//o )
+    elsif($string =~ s/^\s*((?:\=\?.*\?\=|[${atext}${atext_ill}\ \t.])+)//o )
     {   ($phrase = $1) =~ s/\s+$//;
         CORE::length($phrase) or undef $phrase;
     }

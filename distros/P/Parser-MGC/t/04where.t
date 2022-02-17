@@ -8,40 +8,39 @@ use Test::More;
 my @positions;
 my @wheres;
 
-package TestParser;
-use base qw( Parser::MGC );
+package TestParser {
+   use base qw( Parser::MGC );
 
-sub parse
-{
-   my $self = shift;
+   sub parse
+   {
+      my $self = shift;
 
-   main::is( $self->pos,
-      $positions[0],
-      '->pos before parsing' );
-   main::is_deeply( [ $self->where ],
-      $wheres[0],
-      '->where before parsing' );
+      main::is( $self->pos,
+         $positions[0],
+         '->pos before parsing' );
+      main::is_deeply( [ $self->where ],
+         $wheres[0],
+         '->where before parsing' );
 
-   $self->expect( "hello" );
-   main::is( $self->pos,
-      $positions[1],
-      '->pos during parsing' );
-   main::is_deeply( [ $self->where ],
-      $wheres[1],
-      '->where during parsing' );
+      $self->expect( "hello" );
+      main::is( $self->pos,
+         $positions[1],
+         '->pos during parsing' );
+      main::is_deeply( [ $self->where ],
+         $wheres[1],
+         '->where during parsing' );
 
-   $self->expect( qr/world/ );
-   main::is( $self->pos,
-      $positions[2],
-      '->pos after parsing' );
-   main::is_deeply( [ $self->where ],
-      $wheres[2],
-      '->where after parsing' );
+      $self->expect( qr/world/ );
+      main::is( $self->pos,
+         $positions[2],
+         '->pos after parsing' );
+      main::is_deeply( [ $self->where ],
+         $wheres[2],
+         '->where after parsing' );
 
-   return 1;
+      return 1;
+   }
 }
-
-package main;
 
 my $parser = TestParser->new;
 

@@ -7,7 +7,7 @@ use Test2::Bundle::Extended;
 use Test2::Tools::Explain;
 use Test2::Plugin::NoWarnings;
 
-use Test::MockFile ();
+use Test::MockFile qw< nostrict >;
 use Overload::FileCheck qw/:check/;
 use Errno qw/ELOOP/;
 
@@ -18,9 +18,26 @@ umask 022;
 
 note "_abs_path_to_file";
 my $cwd = Cwd::getcwd();
-is( Test::MockFile::_abs_path_to_file("0"),    "$cwd/0", "no / prefix makes prepends path on it." );
-is( Test::MockFile::_abs_path_to_file("/lib"), "/lib",   "/lib is /lib" );
-is( Test::MockFile::_abs_path_to_file(),       undef,    "undef is undef" );
+
+is( Test::MockFile::_abs_path_to_file("0"), "$cwd/0", "no / prefix makes prepends path on it." );
+
+is( Test::MockFile::_abs_path_to_file(), undef, "undef is undef" );
+
+my @abs_path = (
+    [ '/lib'                         => '/lib' ],
+    [ '/lib/'                        => '/lib' ],
+    [ '/abc/.'                       => '/abc' ],
+    [ '/abc/./'                      => '/abc' ],
+    [ '/abc/./././.'                 => '/abc' ],
+    [ '/from/here/or-not/..'         => '/from/here' ],
+    [ '/../../..'                    => '/' ],
+    [ '/one/two/three/four/../../..' => '/one' ],
+    [ '/a.b.c.d'                     => '/a.b.c.d' ],
+);
+foreach my $t (@abs_path) {
+    my ( $path, $normalized_path ) = @$t;
+    is( Test::MockFile::_abs_path_to_file($path), $normalized_path, "_abs_path_to_file( '$path' ) = '$normalized_path'" );
+}
 
 note "_fh_to_file";
 my @mocked_files;
@@ -124,8 +141,8 @@ is( Test::MockFile::_mock_stat( 'stat',  '/broken_link' ), [],                  
     # make sure directories with trailing slash are not ignored by stat by accident
     my $dir = Test::MockFile->dir('/quux');
     mkdir $dir->path();
-    ok( -d( $dir->path() ), 'Directory /quux exists' );
-    ok( -d( $dir->path() . '/' ), 'Directory /quux/ also exists' );
+    ok( -d ( $dir->path() ),       'Directory /quux exists' );
+    ok( -d ( $dir->path() . '/' ), 'Directory /quux/ also exists' );
 }
 
 done_testing();

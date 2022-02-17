@@ -85,6 +85,16 @@ sub new {
             $languages{$current_lang}++;
             $language_codes{$current_lang_code}++;
         }
+        foreach my $other (@{ $doc->other_languages || [] }) {
+            if ($main_lang ne $other) {
+                $languages{$other}++;
+            }
+        }
+        foreach my $other (@{ $doc->other_language_codes || [] }) {
+            if ($main_lang_code ne $other) {
+                $language_codes{$other}++;
+            }
+        }
     }
     my (%html_headers, %latex_headers);
     foreach my $k (keys %args) {
@@ -178,7 +188,7 @@ sub other_language_codes {
     my $self = shift;
     my %langs = %{ $self->{other_language_codes} };
     if (%langs) {
-        return [ keys %langs ];
+        return [ sort keys %langs ];
     }
     else {
         return;
@@ -189,7 +199,7 @@ sub other_languages {
     my $self = shift;
     my %langs = %{ $self->{other_languages} };
     if (%langs) {
-        return [ keys %langs ];
+        return [ sort keys %langs ];
     }
     else {
         return;
@@ -354,11 +364,6 @@ sub as_latex {
     my $self = shift;
     my @out;
     my $current_language = $self->language;
-    my %lang_aliases = (
-                        # pre-texlive 2020
-                        # macedonian => 'russian',
-                        serbian    => 'croatian',
-                       );
     my $counter = 0;
     foreach my $doc ($self->docs) {
         $counter++;
@@ -366,13 +371,6 @@ sub as_latex {
         my $output = "\n\n";
 
         my $doc_language = $doc->language;
-        if (my $alias = $lang_aliases{$doc_language}) {
-            $doc_language = $alias;
-        }
-
-        if (my $alias = $lang_aliases{$current_language}) {
-            $current_language = $alias;
-        }
 
         if ($doc_language ne $current_language) {
             $output .= sprintf('\selectlanguage{%s}', $doc_language) . "\n\n";

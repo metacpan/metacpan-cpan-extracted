@@ -12,18 +12,21 @@ use warnings;
 
 =head1 NAME
 
-Test::MockFile::DirHandle - Provides a class object for L<Test::MockFile> to give out for opendir calls.
+Test::MockFile::DirHandle - Provides a class object for
+L<Test::MockFile> to give out for opendir calls.
 
 =head1 VERSION
 
-Version 0.026
+Version 0.029
 
 =cut
 
 =head1 SYNOPSIS
 
-This is a helper class for L<Test::MockFile> its only purpose is to provide a object to recognize that a the passed handle is a mocked handle.
-L<Test::MockFile> has to mock the other calls since there is no tie for B<opendir> handles.
+This is a helper class for L<Test::MockFile> its only purpose is to
+provide a object to recognize that a the passed handle is a mocked
+handle. L<Test::MockFile> has to mock the other calls since there is no
+tie for B<opendir> handles.
 
     # This is what Test::MockFile does. You really shouldn't be doing it directly.
     use Test::MockFile::DirHandle;
@@ -39,11 +42,14 @@ No exports are provided by this module.
 
 Args: ($class, $dir, $files_array_ref)
 
-Returns a blessed object for Test::MockFile::DirHandle. There are no error conditions handled here.
+Returns a blessed object for Test::MockFile::DirHandle. There are no
+error conditions handled here.
 
-B<NOTE:> the permanent directory contents are stored in a hash in Test::MockFile. However when opendir
-is called, a copy is stored here. This is because through experimentation, we've determined that adding
-files in a dir during a opendir/readdir does not affect the return of readdir.
+B<NOTE:> the permanent directory contents are stored in a hash in
+Test::MockFile. However when opendir is called, a copy is stored here.
+This is because through experimentation, we've determined that adding
+files in a dir during a opendir/readdir does not affect the return of
+readdir.
 
 See L<Test::MockFile>.
 
@@ -65,7 +71,8 @@ Todd Rinaldo, C<< <toddr at cpan.org> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to L<https://github.com/CpanelInc/Test-MockFile>. 
+Please report any bugs or feature requests to
+L<https://github.com/CpanelInc/Test-MockFile>.
 
 =head1 SUPPORT
 
@@ -95,8 +102,8 @@ All rights reserved.
 
 L<http://cpanel.net>
 
-This is free software; you can redistribute it and/or modify it under the
-same terms as Perl itself. See L<perlartistic>.
+This is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.
 
 =cut
 

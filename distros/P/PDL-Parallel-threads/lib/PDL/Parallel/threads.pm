@@ -16,7 +16,7 @@ BEGIN {
 		1;
 	};
 	
-	our $VERSION = '0.03';
+	our $VERSION = '0.04';
 	use XSLoader;
 	XSLoader::load 'PDL::Parallel::threads', $VERSION;
 }
@@ -35,8 +35,16 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(share_pdls retrieve_pdls free_pdls);
 
-# PDL data should not be naively copied by Perl
-sub PDL::CLONE_SKIP { 1 }
+# PDL data should not be naively copied by Perl. This is only necessary
+# for older versions of PDL. Newer versions contain the CLONE_SKIP
+# method... which is nice except that it issues warning. So wrap this
+# in a no-warnings block.
+{
+	no warnings;
+	sub PDL::CLONE_SKIP { 1 }
+	# Also suppress the warnings that PDL now apparently issues
+	$PDL::no_clone_skip_warning = 1;
+}
 
 sub auto_package_name {
 	my $name = shift;
@@ -231,7 +239,7 @@ PDL::Parallel::threads - sharing PDL data between Perl threads
 
 =head1 VERSION
 
-This documentation describes version 0.03 of PDL::Parallel::threads.
+This documentation describes version 0.04 of PDL::Parallel::threads.
 
 =head1 SYNOPSIS
 

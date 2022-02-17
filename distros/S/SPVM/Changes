@@ -1,4 +1,57 @@
 Revision history for SPVM
+0.9505  2021-02-16
+        [CHANGE]
+        * Improve the error message of getting and setting fields.
+        * Detect the change of the SPVM core precompile source code in precompile.
+        * Precompile methods is fallbacked to non-precompile methods
+        * Add interface feature
+        * spvmgenlib command generate main method instead of sum and print "Hello World!"
+        * Add Cloneable module.
+        [BUG FIX]
+        * Fix bug that is_read_only doesn't set condition flag.
+        * Fix bug that $self->set_x($self->x) become compile error.
+        
+        [NON BACKWORD COMPATIBLE CHANGES]
+        * spvmgenlib command doesn't generate native module by default
+          --native-language option is needed.
+          [Before]
+          spvmgenlib MyLib
+          [After]
+          spvmgenlib MyLib --native-language c
+        
+0.9504  2021-02-10
+        [CHANGE]
+        * Add the make_read_only native API.
+        * Add the is_read_only native API.
+        * Add make_read_only statement.
+        * Add is_read_only operator.
+        * The string created by string literal become read-only.
+        * Read-only string can't be converted to mutable string.
+        * The key of Hash module become read-only string.
+        * Add native APIs
+          is_array
+          is_string
+          is_numeric_array
+          is_mulnum_array
+        * Add the "get_elem_byte_size" native API.
+        * Add the "new_array_proto" native API.
+        * Fn->new_array_proto throw an exception when the length is lower than 0.
+        * Add the "copy" native API.
+        * Add Fn->is_array, Fn->is_numeric_array, Fn->is_mulnum_array
+        * Add "new_array_proto_raw", "copy_raw" native APIs
+        * Add copy operator
+        * Add the "shorten" native API.
+        * Add Fn->shorten.
+        * Add Fn->chomp.
+        * Add Fn->memcpy.
+        * Add Fn->memmove.
+        [BUG FIX]
+        * Fix the bug that Fn->new_array_proto doesn't create multi numeric array and number array correctly.
+        
+        [NON BACKWORD COMPATIBLE CHANGES]
+        * Remove the syntax of no operand of warn and die statement.
+          This is not documented, but was defined in parsing syntax.
+        
 0.9503  2021-02-08
         [CHANGE]
         * Add divui, divul, remui, remul operators.

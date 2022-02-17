@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Rinci.pm','lib/Rinci.pod','lib/Rinci/FAQ.pod','lib/Rinci/Transaction.pod','lib/Rinci/Undo.pod','lib/Rinci/Upgrading.pod','lib/Rinci/function.pod','lib/Rinci/package.pod','lib/Rinci/resmeta.pod','lib/Rinci/variable.pod'];
+my $filenames = ['lib/Rinci.pm','lib/Rinci.pod','lib/Rinci/FAQ.pod','lib/Rinci/Transaction.pod','lib/Rinci/Upgrading.pod','lib/Rinci/function.pod','lib/Rinci/package.pod','lib/Rinci/resmeta.pod','lib/Rinci/variable.pod'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

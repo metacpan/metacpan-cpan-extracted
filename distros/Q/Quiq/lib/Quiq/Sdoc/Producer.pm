@@ -37,7 +37,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.198';
+our $VERSION = '1.199';
 
 use Quiq::Unindent;
 use Quiq::Hash;
@@ -434,8 +434,8 @@ sub tableOfContents {
 
 =head4 Synopsis
 
-  $str = $gen->section($level,$title);
-  $str = $gen->section($level,$title,$body);
+  $str = $gen->section($level,$title,@keyVal);
+  $str = $gen->section($level,$title,@keyVal,$body);
 
 =head4 Description
 
@@ -461,20 +461,42 @@ erzeugt
 
 sub section {
     my ($self,$level,$title) = splice @_,0,3;
-    # @_: $body
+    # @_: @keyval -or- @keyVal,$body
 
-    my $str;
-    if ($level == -1) {
-        $str = sprintf "=- %s\n\n",$title;
+    my $body;
+    if (@_) {
+        if (@_%2) { # ungerade Anzahl
+            $body = pop;
+        }
     }
-    elsif ($level == 0) {
-        $str = sprintf "==- %s\n\n",$title;
+
+    my ($str,$withKeyVal);
+    if (@_) { # @keyVal
+        $withKeyVal = 1;
+
+        my $ind = ' ' x $self->indentation;
+
+        $str = "%Section:\n";
+        $str .= sprintf qq|%slevel="%s"\n|,$ind,$level;
+        $str .= sprintf qq|%stitle="%s"\n|,$ind,$title;
+        while (@_) {
+            $str .= sprintf qq|%s%s="%s"\n|,$ind,shift,shift;
+        }
+        $str .= "\n";
     }
     else {
-        $str = sprintf "%s %s\n\n",('=' x $level),$title;
+        if ($level == -1) {
+            $str = sprintf "=- %s\n\n",$title;
+        }
+        elsif ($level == 0) {
+            $str = sprintf "==- %s\n\n",$title;
+        }
+        else {
+            $str = sprintf "%s %s\n\n",('=' x $level),$title;
+        }
     }
-    if (@_) {
-        my $body = shift;
+
+    if (defined $body) {
         $body =~ s/\s+$//;
         if ($body ne '') {
             $str .= "$body\n\n";
@@ -596,7 +618,7 @@ sub eof {
 
 =head1 VERSION
 
-1.198
+1.199
 
 =head1 AUTHOR
 

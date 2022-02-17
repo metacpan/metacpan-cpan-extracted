@@ -1,0 +1,82 @@
+{
+   "abstract" : "Lock based on etcd",
+   "author" : [
+      "Emiliano Bruni <info@ebruni.it>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Etcd-Lock",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.012"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Net::Etcd" : "0",
+            "boolean" : "0",
+            "perl" : "5.012"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test::Fork" : "0",
+            "Test::More" : "0",
+            "perl" : "5.012"
+         }
+      }
+   },
+   "provides" : {
+      "Etcd::Lock" : {
+         "file" : "lib/Etcd/Lock.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/EmilianoBruni/etcd-lock",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/EmilianoBruni/etcd-lock.git",
+         "web" : "https://github.com/EmilianoBruni/etcd-lock"
+      }
+   },
+   "version" : "0.03",
+   "x_generated_by_perl" : "v5.32.1",
+   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

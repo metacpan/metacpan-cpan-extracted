@@ -1,5 +1,14 @@
 Revision history for perl module Text::Amuse
 
+1.80 2022-02-12
+
+ - EXPERIMENTAL feature: support language switch with <[ISO]></[ISO]>
+   tags, as block and as inline.
+
+1.79 2022-01-15
+
+ - Add more language mappings
+
 1.78 2021-12-30
 
  - Add support for Chinese

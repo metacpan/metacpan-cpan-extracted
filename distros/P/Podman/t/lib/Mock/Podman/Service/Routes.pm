@@ -87,14 +87,16 @@ __DATA__
 @@ GET/v3.0.0/libpod/images/json.json.ep
 [
   {
-    "RepoTags": [
+    "Names": [
       "docker.io/library/hello-world:latest"
-    ]
+    ],
+    "Id": "feb5d9fea6a5e9606aa995e879d862b825965ba48de054caab5ef356dc6b3412"
   },
   {
-    "RepoTags": [
+    "Names": [
       "localhost/goodbye:latest"
-    ]
+    ],
+    "Id": "9fd9d48d6a14fdaf250ff231578be7ec0c85963d4ef3fd1a82ecf96c60fe9434"
   }
 ]
 @@GET/v3.0.0/libpod/containers/json.json.ep

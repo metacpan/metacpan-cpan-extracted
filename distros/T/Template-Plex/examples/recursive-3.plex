@@ -1,0 +1,14 @@
+@{[ do {
+	BEGIN {
+		use Time::HiRes qw<time>;
+		}
+	}
+]}
+====Template started at @{[time]};
+Options used in level 3 @{[%options]}
+From level 3 $title
+Package in rec 3 @{[__PACKAGE__]}
+Package var is $my_package_var
+john is  $john
+@{[ $john . "ness"]}
+runtime $fields{runtime}

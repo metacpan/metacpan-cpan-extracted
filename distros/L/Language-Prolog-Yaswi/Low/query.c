@@ -18,6 +18,7 @@
 
 
 void savestate_query(pTHX_ pMY_CXT) {
+    MY_dMY_CXT_accessor;
     save_item(c_qid);
     sv_setsv(c_qid, &PL_sv_undef);
     save_item(c_query);
@@ -25,6 +26,7 @@ void savestate_query(pTHX_ pMY_CXT) {
 }
 
 void close_query(pTHX_ pMY_CXT) {
+    MY_dMY_CXT_accessor;
     /* warn ("close_query(qid=%_)", qid); */
     PL_close_query(SvIV(c_qid));
     clear_vars(aTHX_ aMY_CXT);
@@ -34,22 +36,26 @@ void close_query(pTHX_ pMY_CXT) {
 }
 
 void test_no_query(pTHX_ pMY_CXT) {
+    MY_dMY_CXT_accessor;
     if(SvOK(c_qid)) {
 	croak ("there is already an open query on SWI-Prolog (qid=%s)", SvPV_nolen(c_qid));
     }
 }
 
 void test_query(pTHX_ pMY_CXT) {
+    MY_dMY_CXT_accessor;
     if(!SvOK(c_qid)) {
 	croak ("there is not any query open on SWI-Prolog");
     }
 }
 
 int is_query(pTHX_ pMY_CXT) {
+    MY_dMY_CXT_accessor;
     return SvOK(c_qid);
 }
 
 fid_t frame(pTHX_ pMY_CXT) {
+    MY_dMY_CXT_accessor;
     SV **w;
     int len=av_len(c_fids);
     if (len<0) {
@@ -63,12 +69,14 @@ fid_t frame(pTHX_ pMY_CXT) {
 }
 
 void push_frame(pTHX_ pMY_CXT) {
+    MY_dMY_CXT_accessor;
     SV *fid=newSViv(PL_open_foreign_frame());
     /* warn ("push_frame(%_)", fid); */
     av_push(c_fids, fid);
 }
 
 void pop_frame(pTHX_ pMY_CXT) {
+    MY_dMY_CXT_accessor;
     SV *fid=av_pop(c_fids);
     /* warn ("pop_frame(%_)", fid); */
     if (!SvOK(fid)) {
@@ -79,6 +87,7 @@ void pop_frame(pTHX_ pMY_CXT) {
 }
 
 void rewind_frame(pTHX_ pMY_CXT) {
+    MY_dMY_CXT_accessor;
     fid_t fid=frame(aTHX_ aMY_CXT);
     /* warn ("rewind_frame(%i)", fid); */
     PL_rewind_foreign_frame(fid);

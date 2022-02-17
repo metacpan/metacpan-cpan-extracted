@@ -1,5 +1,5 @@
-package Finance::AMEX::Transaction::EPPRC::Detail::ChargeSummaryPricing;
-$Finance::AMEX::Transaction::EPPRC::Detail::ChargeSummaryPricing::VERSION = '0.004';
+package Finance::AMEX::Transaction::EPPRC::Detail::ChargeSummaryPricing 0.005;
+
 use strict;
 use warnings;
 
@@ -9,23 +9,21 @@ use base 'Finance::AMEX::Transaction::EPPRC::Base';
 
 sub field_map {
   return {
-
-    AMEX_PAYEE_NUMBER     => [1, 10],
-    AMEX_SE_NUMBER        => [11, 10],
-    SE_UNIT_NUMBER        => [21, 10],
-    PAYMENT_YEAR          => [31, 4],
-    PAYMENT_NUMBER        => [35, 8],
-    PAYMENT_NUMBER_DATE   => [35, 3],
-    PAYMENT_NUMBER_TYPE   => [38, 1],
-    PAYMENT_NUMBER_NUMBER => [39, 4],
-    RECORD_TYPE           => [43, 1],
-    DETAIL_RECORD_TYPE    => [44, 2],
-
-    FEE_CODE              => [46, 2],
-    FEE_DESCRIPTION       => [45, 25],
-    DISCOUNT_RATE         => [73, 9],
-    DISCOUNT_AMOUNT       => [82, 15],
-    FEE_RATE              => [97, 9],
+    AMEX_PAYEE_NUMBER     => [1,   10],
+    AMEX_SE_NUMBER        => [11,  10],
+    SE_UNIT_NUMBER        => [21,  10],
+    PAYMENT_YEAR          => [31,  4],
+    PAYMENT_NUMBER        => [35,  8],
+    PAYMENT_NUMBER_DATE   => [35,  3],
+    PAYMENT_NUMBER_TYPE   => [38,  1],
+    PAYMENT_NUMBER_NUMBER => [39,  4],
+    RECORD_TYPE           => [43,  1],
+    DETAIL_RECORD_TYPE    => [44,  2],
+    FEE_CODE              => [46,  2],
+    FEE_DESCRIPTION       => [45,  25],
+    DISCOUNT_RATE         => [73,  9],
+    DISCOUNT_AMOUNT       => [82,  15],
+    FEE_RATE              => [97,  9],
     FEE_AMOUNT            => [106, 15],
     MERCHANT_ID           => [121, 15],
   };
@@ -65,7 +63,7 @@ Finance::AMEX::Transaction::EPPRC::Detail::ChargeSummaryPricing - Parse AMEX Tra
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -111,6 +109,14 @@ This will always return the string SOC_PRICING.
 Returns the full line that is represented by this object.
 
  print $record->line;
+
+=head2 field_map
+
+Returns an arrayref of hashrefs where the name is the record name and 
+the value is an arrayref of the start position and length of that field.
+
+ # print the start position of the PAYMENT_YEAR field
+ print $record->field_map->[3]->{PAYMENT_YEAR}->[0]; # 31
 
 =head2 AMEX_PAYEE_NUMBER
 
@@ -250,7 +256,7 @@ Tom Heady <cpan@punch.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by ZipRecruiter.
+This software is copyright (c) 2022 by ZipRecruiter/Tom Heady.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

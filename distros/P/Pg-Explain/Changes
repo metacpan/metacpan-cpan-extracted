@@ -1,5 +1,17 @@
 Revision history for Pg-Explain
 
+2.0     2022/02/11
+        - Add Pg::Explain::Hinter to look through Pg::Explain plans, and
+          suggest optimizations.
+          For now two automatically found optimizations are there:
+          - DISK_SORT - when there is Sort node that is using disk sort
+          - INDEXABLE_SEQSCAN_SIMPLE - when there is Seq Scan (or Parallel Seq
+            Scan) that is using simple expression on one column that can be
+            indexed
+        - Fix dependency on List::Util by requiring v. 1.44+
+        - use JSON::MaybeXS instead of JSON, due to talk on irc/#mojo
+          (suggestion by ether with comments from Grinnz)
+
 1.13    2021/08/03
         - New functionality:
           - Nodes have now ->id() method which returns numeric value, which is

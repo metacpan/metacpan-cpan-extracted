@@ -19,7 +19,7 @@ name: App-TaggedDirUtils
 provides:
   App::TaggedDirUtils:
     file: lib/App/TaggedDirUtils.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Cwd: '0'
   Data::Sah::Compiler::perl::TH::array: '0.910'
@@ -41,7 +41,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-TaggedDirUtils
   homepage: https://metacpan.org/release/App-TaggedDirUtils
   repository: git://github.com/perlancar/perl-App-TaggedDirUtils.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

@@ -1,3 +1,156 @@
+0.055002 -- 2022-02-14
+
+    [Bug fixes]
+
+    - benchmarks/grep_vs_search.pl
+        Fix duplicate '-i' option in `grep_vs_search.pl`.
+
+    - t/*
+        Work around GNU readline interaction with xterm. Tests can fail if GNU
+        readline is told to use STDIN/STDOUT: it may inadvertently output a
+        `ESC-[?1034h` sequence ("interpret Meta key, enable 8-bit input"), which
+        does not play well with our `Test::Output` tests.
+        
+        To avoid this, we specify `filehandles => []` to the `Term::CLI`
+        constructor.
+
+        So far this only manifested itself on OpenBSD 7.0, and only on the
+        i386 build of that. Still, I want my tests to pass...
+
+    [Building / Testing]
+
+    - Leave POD test prereqs out of the distribution.
+    - Improve test coverage (also add tests for `Term::CLI::Util`).
+    - Fix enviroment testing for skipping tests.
+        The `Test::Class` `SKIP_ALL` method does not work as advertised.
+
+    [Enhancements]
+
+    Term::CLI::Util
+        Make find_* routines a little faster. The `last if ...` check
+        when iterating over possible matches is not necessary. A simple
+        unqualified `last` will do.
+
+    Term::CLI::Argument::Filename
+        - Promote `_glob_complete` to `glob_complete`.
+
+0.055001 -- 2022-02-12
+
+    [Enhancements]
+
+    - Context-sensitive Completion / Validation
+        `complete` methods now receive a second argument: a HashRef
+        with "state" information that includes the preceding words on
+        the command line (in the `$state->{processed}` ArrayRef) and a
+        collection of options seen so far (in the `$state->{options}`
+        HashRef).
+
+        Argument validators also receive a "state" parameter HashRef
+        (although it has a different different structure than that of
+        `complete`, see documentation).
+
+        See the demo script in `examples/context_sensitive_completion/`.
+
+    - Dynamic Enum Arguments
+        The `value_list` of Term::CLI::Argument::Enum objects now accepts
+        a CodeRef, which will be called when the list of values needs
+        to be fetched.
+
+        The new `values` method returns the actual list of values.
+
+        The `cache_values` boolean attribute can be used to to execute
+        the list expansion only once.
+
+        The tutorial has been updated to include this.
+
+    - Dynamic Command Lists
+        The `commands` argument of Term::CLI and Term::CLI::Commands
+        objects (through Term::CLI::Role::CommandSet) now accepts a
+        CodeRef, which will only be called the first time the command
+        list is needed.  This allows for delayed command building,
+        which, if used in deeper levels of a command hierarchy, can
+        reduce start-up time.
+
+        A new `delete_command` method allows for dynamic command
+        hierarchies [RFE#16].  See `examples/dynamic_commands.pl` for
+        a demo of this.
+
+    - New `state` attribute for Term::CLI and Term::CLI::Command
+        These classes now use a new role called Term::CLI::Role::State
+        that provides a "state" HashRef that can be used to store
+        application-specific state.
+
+    - Term::CLI
+        Create a ReadLine object that uses `STDIN` and `STDOUT`
+        by default, instead of letting (Gnu) ReadLine find and open
+        the TTY separately.  This ensures that:
+
+            perl readline_app < input_file
+
+        - will actually read input from `input_file`, while also
+        making sure that whatever encoding you have on the standard I/O
+        handles (e.g. `use open qw(:std :utf8)`) will also be applied
+        to ReadLine's I/O.  This means that Estonians can write "tõsi"
+        for "true" and Macedonians can write "лажни" for "false".
+
+    - Term::CLI::Argument::Boolean
+        Completions now match the case of the partial text, so "TR"
+        gets completed to "TRUE" instead of "TRue".
+
+    - Term::CLI::Role::CommandSet
+        Command lists are now always sorted by name internally.  This
+        allows for optimised searching/matching.
+
+    - Term::CLI::Argument::Enum
+        Value lists are always sorted internally.  This allows for
+        optimised searching/matching, see also examples/big_enum.pl
+
+    [New]
+
+    - Term::CLI::Util
+        New module with a few utility functions for other modules.
+
+    - Term::CLI::Role::State
+        A `Moo::Role` that adds a `state` hash to objects.
+        See examples/state_demo.pl.
+
+    - benchmarks/*
+        A few scripts with benchmarks for different approaches to
+        particular algorithms.
+
+    - examples/cli_context.pl
+        Demo script for CLI context (provided by djerius).
+
+    [Tests]
+
+    - Various updates and fixes to test the new functionalities.
+
+    [Bug Fixes]
+
+    - Term::CLI::Argument::Bool
+        - Fix case-sensitive completion (used `lc` where we shouldn't).
+        - Fix test cases for case-insenstive (enum) completion.
+
+    - tutorial/example_17_suspend.pl
+        Don't suspend if there was an error on the command line input.
+
+    - Fix Boolean bug in tutorial (and accompanying code).
+        We specified "1" as a valid value for "false"; that should be "0".
+
+    [Miscellaneous]
+
+    - Eliminate unnecessary `shift` of function argument in favour
+      of assigning from `@_`.
+
+    - Improve Dutch translation of "unknown (sub-)command"
+
+    - Fix dependency on Test::MockModule so it builds on FreeBSD 12.
+
+    - POD fixes and updates.
+
+    - Term::CLI::Command
+        Modify error message for invalid arguments for readability.
+
 0.054002 -- 2022-01-05
 
     [Testing]
@@ -84,13 +237,11 @@
 
     [Bug Fixes]
 
-    - Make sure Term::ReadKey uses a "TTY" filehandle
-        In cases of automatic builds, STDIN and STDOUT may be
-        redirected. Term::ReadLine can handle that, Term::ReadKey
-        cannot, so we need to be explicit.
-
-        Files modified:
-            lib/Term/CLI/ReadLine.pm
+    - Term::CLI::ReadLine
+        - Make sure Term::ReadKey uses a "TTY" filehandle.
+          In cases of e.g. automated runs, STDIN and STDOUT may be
+          redirected. `Term::ReadLine` can handle that, `Term::ReadKey`
+          cannot, so we need to be explicit.
 
     - Minor POD fixes.
 

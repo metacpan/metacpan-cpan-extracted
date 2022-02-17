@@ -3165,7 +3165,7 @@ our $PROFILE = {
                                       'id' => '102',
                                       'name' => 'avg_left_power_phase',
                                       'offset' => undef,
-                                      'scale' => '0,7111111',
+                                      'scale' => '0.7111111',
                                       'type' => 'uint8',
                                       'unit' => 'degrees'
                                     },
@@ -3173,7 +3173,7 @@ our $PROFILE = {
                                       'id' => '103',
                                       'name' => 'avg_left_power_phase_peak',
                                       'offset' => undef,
-                                      'scale' => '0,7111111',
+                                      'scale' => '0.7111111',
                                       'type' => 'uint8',
                                       'unit' => 'degrees'
                                     },
@@ -3181,7 +3181,7 @@ our $PROFILE = {
                                       'id' => '104',
                                       'name' => 'avg_right_power_phase',
                                       'offset' => undef,
-                                      'scale' => '0,7111111',
+                                      'scale' => '0.7111111',
                                       'type' => 'uint8',
                                       'unit' => 'degrees'
                                     },
@@ -3189,7 +3189,7 @@ our $PROFILE = {
                                       'id' => '105',
                                       'name' => 'avg_right_power_phase_peak',
                                       'offset' => undef,
-                                      'scale' => '0,7111111',
+                                      'scale' => '0.7111111',
                                       'type' => 'uint8',
                                       'unit' => 'degrees'
                                     },
@@ -5318,7 +5318,7 @@ our $PROFILE = {
                                         'id' => '69',
                                         'name' => 'left_power_phase',
                                         'offset' => undef,
-                                        'scale' => '0,7111111',
+                                        'scale' => '0.7111111',
                                         'type' => 'uint8',
                                         'unit' => 'degrees'
                                       },
@@ -5334,7 +5334,7 @@ our $PROFILE = {
                                         'id' => '70',
                                         'name' => 'left_power_phase_peak',
                                         'offset' => undef,
-                                        'scale' => '0,7111111',
+                                        'scale' => '0.7111111',
                                         'type' => 'uint8',
                                         'unit' => 'degrees'
                                       },
@@ -5342,7 +5342,7 @@ our $PROFILE = {
                                         'id' => '71',
                                         'name' => 'right_power_phase',
                                         'offset' => undef,
-                                        'scale' => '0,7111111',
+                                        'scale' => '0.7111111',
                                         'type' => 'uint8',
                                         'unit' => 'degrees'
                                       },
@@ -5350,7 +5350,7 @@ our $PROFILE = {
                                         'id' => '72',
                                         'name' => 'right_power_phase_peak',
                                         'offset' => undef,
-                                        'scale' => '0,7111111',
+                                        'scale' => '0.7111111',
                                         'type' => 'uint8',
                                         'unit' => 'degrees'
                                       },
@@ -6385,7 +6385,7 @@ m'
                                              'id' => '75',
                                              'name' => 'avg_left_power_phase',
                                              'offset' => undef,
-                                             'scale' => '0,7111111',
+                                             'scale' => '0.7111111',
                                              'type' => 'uint8',
                                              'unit' => 'degrees'
                                            },
@@ -6393,7 +6393,7 @@ m'
                                              'id' => '76',
                                              'name' => 'avg_left_power_phase_peak',
                                              'offset' => undef,
-                                             'scale' => '0,7111111',
+                                             'scale' => '0.7111111',
                                              'type' => 'uint8',
                                              'unit' => 'degrees'
                                            },
@@ -6401,7 +6401,7 @@ m'
                                              'id' => '77',
                                              'name' => 'avg_right_power_phase',
                                              'offset' => undef,
-                                             'scale' => '0,7111111',
+                                             'scale' => '0.7111111',
                                              'type' => 'uint8',
                                              'unit' => 'degrees'
                                            },
@@ -6409,7 +6409,7 @@ m'
                                              'id' => '78',
                                              'name' => 'avg_right_power_phase_peak',
                                              'offset' => undef,
-                                             'scale' => '0,7111111',
+                                             'scale' => '0.7111111',
                                              'type' => 'uint8',
                                              'unit' => 'degrees'
                                            },
@@ -6760,7 +6760,7 @@ m'
                                           'id' => '116',
                                           'name' => 'avg_left_power_phase',
                                           'offset' => undef,
-                                          'scale' => '0,7111111',
+                                          'scale' => '0.7111111',
                                           'type' => 'uint8',
                                           'unit' => 'degrees'
                                         },
@@ -6768,7 +6768,7 @@ m'
                                           'id' => '117',
                                           'name' => 'avg_left_power_phase_peak',
                                           'offset' => undef,
-                                          'scale' => '0,7111111',
+                                          'scale' => '0.7111111',
                                           'type' => 'uint8',
                                           'unit' => 'degrees'
                                         },
@@ -6776,7 +6776,7 @@ m'
                                           'id' => '118',
                                           'name' => 'avg_right_power_phase',
                                           'offset' => undef,
-                                          'scale' => '0,7111111',
+                                          'scale' => '0.7111111',
                                           'type' => 'uint8',
                                           'unit' => 'degrees'
                                         },
@@ -6784,7 +6784,7 @@ m'
                                           'id' => '119',
                                           'name' => 'avg_right_power_phase_peak',
                                           'offset' => undef,
-                                          'scale' => '0,7111111',
+                                          'scale' => '0.7111111',
                                           'type' => 'uint8',
                                           'unit' => 'degrees'
                                         },

@@ -1,5 +1,5 @@
-package Finance::AMEX::Transaction::GRRCN::FeeRevenue;
-$Finance::AMEX::Transaction::GRRCN::FeeRevenue::VERSION = '0.004';
+package Finance::AMEX::Transaction::GRRCN::FeeRevenue 0.005;
+
 use strict;
 use warnings;
 
@@ -8,25 +8,37 @@ use warnings;
 use base 'Finance::AMEX::Transaction::GRRCN::Base';
 
 sub field_map {
-  return {
-    RECORD_TYPE                     => [1, 10],
-    PAYEE_MERCHANT_ID               => [11, 15],
-    AMERICAN_EXPRESS_PAYMENT_NUMBER => [26, 10],
-    PAYMENT_DATE                    => [36, 8],
-    PAYMENT_CURRENCY                => [44, 3],
+  my ($self) = @_;
 
-    SUBMISSION_MERCHANT_ID          => [47, 15],
-    MERCHANT_LOCATION_ID            => [62, 15],
+  my $map = [
+    {RECORD_TYPE                     => [1,   10]},
+    {PAYEE_MERCHANT_ID               => [11,  15]},
+    {AMERICAN_EXPRESS_PAYMENT_NUMBER => [26,  10]},
+    {PAYMENT_DATE                    => [36,  8]},
+    {PAYMENT_CURRENCY                => [44,  3]},
+    {SUBMISSION_MERCHANT_ID          => [47,  15]},
+    {MERCHANT_LOCATION_ID            => [62,  15]},
+    {FEE_OR_REVENUE_AMOUNT           => [77,  16]},
+    {FEE_OR_REVENUE_DESCRIPTION      => [93,  80]},
+    {ASSET_BILLING_AMOUNT            => [173, 16]},
+    {ASSET_BILLING_DESCRIPTION       => [189, 65]},
+    {ASSET_BILLING_TAX               => [254, 16]},
+    {PAY_IN_GROSS_INDICATOR          => [270, 1]},
+    {BATCH_CODE                      => [271, 3]},
+    {BILL_CODE                       => [274, 3]},
+    {FILLER1                         => [277, 524]},
+  ];
 
-    FEE_OR_REVENUE_AMOUNT           => [77, 16],
-    FEE_OR_REVENUE_DESCRIPTION      => [93, 80],
-    ASSET_BILLING_AMOUNT            => [173, 16],
-    ASSET_BILLING_DESCRIPTION       => [189, 65],
-    ASSET_BILLING_TAX               => [254, 16],
-    PAY_IN_GROSS_INDICATOR          => [270, 1],
-    BATCH_CODE                      => [271, 3],
-    BILL_CODE                       => [274, 3],
-  };
+  if ($self->file_version >= 3.01) {
+    pop @{$map};    # the last filler column changes for v3.01, so we remove it
+
+    push @{$map} => (
+      {SELLER_ID => [277, 20]},     # v3.01
+      {FILLER1   => [267, 504]},    # v3.01
+    );
+  }
+
+  return $map;
 }
 
 sub type {return 'FEEREVENUE'}
@@ -36,10 +48,8 @@ sub PAYEE_MERCHANT_ID               {return $_[0]->_get_column('PAYEE_MERCHANT_I
 sub AMERICAN_EXPRESS_PAYMENT_NUMBER {return $_[0]->_get_column('AMERICAN_EXPRESS_PAYMENT_NUMBER')}
 sub PAYMENT_DATE                    {return $_[0]->_get_column('PAYMENT_DATE')}
 sub PAYMENT_CURRENCY                {return $_[0]->_get_column('PAYMENT_CURRENCY')}
-
 sub SUBMISSION_MERCHANT_ID          {return $_[0]->_get_column('SUBMISSION_MERCHANT_ID')}
 sub MERCHANT_LOCATION_ID            {return $_[0]->_get_column('MERCHANT_LOCATION_ID')}
-
 sub FEE_OR_REVENUE_AMOUNT           {return $_[0]->_get_column('FEE_OR_REVENUE_AMOUNT')}
 sub FEE_OR_REVENUE_DESCRIPTION      {return $_[0]->_get_column('FEE_OR_REVENUE_DESCRIPTION')}
 sub ASSET_BILLING_AMOUNT            {return $_[0]->_get_column('ASSET_BILLING_AMOUNT')}
@@ -48,6 +58,7 @@ sub ASSET_BILLING_TAX               {return $_[0]->_get_column('ASSET_BILLING_TA
 sub PAY_IN_GROSS_INDICATOR          {return $_[0]->_get_column('PAY_IN_GROSS_INDICATOR')}
 sub BATCH_CODE                      {return $_[0]->_get_column('BATCH_CODE')}
 sub BILL_CODE                       {return $_[0]->_get_column('BILL_CODE')}
+sub SELLER_ID                       {return $_[0]->_get_column('SELLER_ID')}
 
 1;
 
@@ -63,7 +74,7 @@ Finance::AMEX::Transaction::GRRCN::FeeRevenue - Parse AMEX Global Reconciliation
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -109,6 +120,14 @@ This will always return the string FEEREVENUE.
 Returns the full line that is represented by this object.
 
  print $record->line;
+
+=head2 field_map
+
+Returns an arrayref of hashrefs where the name is the record name and 
+the value is an arrayref of the start position and length of that field.
+
+ # print the start position of the PAYMENT_DATE field
+ print $record->field_map->[4]->{PAYMENT_DATE}->[0]; # 36
 
 =head2 RECORD_TYPE
 
@@ -204,6 +223,14 @@ This field contains the three-digit, numeric Bill Code that corresponds to the F
 
 If unused, this field is character space filled (fixed format) or blank (delimited).
 
+=head2 SELLER_ID
+
+This field will only be available in v3.01 of the GRRCN format and will be applicable from October 15, 2021.
+
+This field contains the Seller ID, 20-byte code that uniquely identifies a Payment Aggregator or OptBlue Participant's specific seller or vendor.
+
+If unused, this field will be character space filled (fixed format) or blank (delimited formats).
+
 =head1 NAME
 
 Finance::AMEX::Transaction::GRRCN::FeeRevenue - Object methods for AMEX Global Reconciliation (GRRCN) adjustment records.
@@ -214,7 +241,7 @@ Tom Heady <cpan@punch.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by ZipRecruiter.
+This software is copyright (c) 2022 by ZipRecruiter/Tom Heady.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

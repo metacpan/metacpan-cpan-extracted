@@ -38,7 +38,7 @@ my %prerequisite = (
 	);
 
 
-my @debris = qw(*.gcov *.gcda *.gcno *.lock tmp.c);
+my @debris = qw(*.gcov *.gcda *.gcno *.lock);
 
 
 my $inc = '';
@@ -60,15 +60,6 @@ if ( my $dir = $ENV{UNBOUND_PREFIX} ) {
 
 $inc = $ENV{UNBOUND_INCLUDE} if $ENV{UNBOUND_INCLUDE};
 $lib = $ENV{UNBOUND_LIB}     if $ENV{UNBOUND_LIB};
-
-
-if ( $Config{cc} ) {
-	chomp($inc);			## discard \n (from pkg-config)
-	die "$Config{cc} sanity check failed" if system(<<"EOF");
-	$Config{echo} "#include <unbound.h>\nint main() { return 0; }\n" >tmp.c
-	$Config{cc} $inc -c tmp.c
-EOF
-}
 
 
 WriteMakefile(

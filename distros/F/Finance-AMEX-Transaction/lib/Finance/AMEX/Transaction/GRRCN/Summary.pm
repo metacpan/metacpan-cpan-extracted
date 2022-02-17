@@ -1,5 +1,5 @@
-package Finance::AMEX::Transaction::GRRCN::Summary;
-$Finance::AMEX::Transaction::GRRCN::Summary::VERSION = '0.004';
+package Finance::AMEX::Transaction::GRRCN::Summary 0.005;
+
 use strict;
 use warnings;
 
@@ -8,26 +8,27 @@ use warnings;
 use base 'Finance::AMEX::Transaction::GRRCN::Base';
 
 sub field_map {
-  return {
-    RECORD_TYPE                       => [1, 10],
-    PAYEE_MERCHANT_ID                 => [11, 15],
-    SETTLEMENT_ACCOUNT_TYPE_CODE      => [26, 3],
-    AMERICAN_EXPRESS_PAYMENT_NUMBER   => [29, 10],
-    PAYMENT_DATE                      => [39, 8],
-    PAYMENT_CURRENCY                  => [47, 3],
-    UNIQUE_PAYMENT_REFERENCE_NUMBER   => [50, 18],
-    PAYMENT_NET_AMOUNT                => [68, 16],
-    PAYMENT_GROSS_AMOUNT              => [84, 16],
-    PAYMENT_DISCOUNT_AMOUNT           => [100, 16],
-    PAYMENT_SERVICE_FEE_AMOUNT        => [116, 16],
-    PAYMENT_ADJUSTMENT_AMOUNT         => [132, 16],
-    PAYMENT_TAX_AMOUNT                => [148, 16],
-    OPENING_DEBIT_BALANCE_AMOUNT      => [164, 16],
-    PAYEE_DIRECT_DEPOSIT_NUMBER       => [180, 17],
-    BANK_ACCOUNT_NUMBER               => [197, 34],
-    INTERNATIONAL_BANK_ACCOUNT_NUMBER => [231, 34],
-    BANK_IDENTIFIER_CODE              => [265, 15],
-  };
+  return [
+    {RECORD_TYPE                       => [1,   10]},
+    {PAYEE_MERCHANT_ID                 => [11,  15]},
+    {SETTLEMENT_ACCOUNT_TYPE_CODE      => [26,  3]},
+    {AMERICAN_EXPRESS_PAYMENT_NUMBER   => [29,  10]},
+    {PAYMENT_DATE                      => [39,  8]},
+    {PAYMENT_CURRENCY                  => [47,  3]},
+    {UNIQUE_PAYMENT_REFERENCE_NUMBER   => [50,  18]},
+    {PAYMENT_NET_AMOUNT                => [68,  16]},
+    {PAYMENT_GROSS_AMOUNT              => [84,  16]},
+    {PAYMENT_DISCOUNT_AMOUNT           => [100, 16]},
+    {PAYMENT_SERVICE_FEE_AMOUNT        => [116, 16]},
+    {PAYMENT_ADJUSTMENT_AMOUNT         => [132, 16]},
+    {PAYMENT_TAX_AMOUNT                => [148, 16]},
+    {OPENING_DEBIT_BALANCE_AMOUNT      => [164, 16]},
+    {PAYEE_DIRECT_DEPOSIT_NUMBER       => [180, 17]},
+    {BANK_ACCOUNT_NUMBER               => [197, 34]},
+    {INTERNATIONAL_BANK_ACCOUNT_NUMBER => [231, 34]},
+    {BANK_IDENTIFIER_CODE              => [265, 15]},
+    {FILLER1                           => [280, 521]},
+  ];
 }
 
 sub type {return 'SUMMARY'}
@@ -65,7 +66,7 @@ Finance::AMEX::Transaction::GRRCN::Summary - Parse AMEX Global Reconciliation (G
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -111,6 +112,14 @@ This will always return the string SUMMARY.
 Returns the full line that is represented by this object.
 
  print $record->line;
+
+=head2 field_map
+
+Returns an arrayref of hashrefs where the name is the record name and 
+the value is an arrayref of the start position and length of that field.
+
+ # print the start position of the PAYMENT_DATE field
+ print $record->field_map->[4]->{PAYMENT_DATE}->[0]; # 39
 
 =head2 RECORD_TYPE
 
@@ -266,7 +275,7 @@ Tom Heady <cpan@punch.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by ZipRecruiter.
+This software is copyright (c) 2022 by ZipRecruiter/Tom Heady.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

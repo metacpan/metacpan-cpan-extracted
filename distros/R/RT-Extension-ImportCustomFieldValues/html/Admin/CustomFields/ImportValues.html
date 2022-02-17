@@ -93,10 +93,10 @@ if ( $ARGS{Cancel} ) {
     push @results, "Importing ". $filename;
     my $fh = $cgi_object->upload($name);
     if ( $fh ) {
-        binmode($fh);
+        binmode($fh, ":utf8");
 
         require Text::CSV;
-        my $csv = Text::CSV->new ({ strict => 1, sep_char => ";", });
+        my $csv = Text::CSV->new ({ binary => 1, strict => 1, sep_char => ";", });
         $values = $csv->csv (in => $fh, headers => [qw(SortOrder Name Description Category)], encoding => 'UTF-8', );
         unless ( $values && ref($values) eq 'ARRAY' ) {
             push @results, loc("[_1]: Wrong file format", $filename);

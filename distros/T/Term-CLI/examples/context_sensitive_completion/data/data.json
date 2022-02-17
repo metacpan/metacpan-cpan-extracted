@@ -1,0 +1,5406 @@
+{
+   "_description" : {
+      "generated_by" : "munge_country_data.pl",
+      "sources" : {
+         "_repository" : "https://github.com/annexare/Countries",
+         "continents.json" : "master/data/continents.json",
+         "countries.json" : "master/data/countries.json"
+      }
+   },
+   "cities" : {
+      "Abu Dhabi" : {
+         "countries" : [
+            "United Arab Emirates"
+         ],
+         "name" : "Abu Dhabi"
+      },
+      "Abuja" : {
+         "countries" : [
+            "Nigeria"
+         ],
+         "name" : "Abuja"
+      },
+      "Accra" : {
+         "countries" : [
+            "Ghana"
+         ],
+         "name" : "Accra"
+      },
+      "Adamstown" : {
+         "countries" : [
+            "Pitcairn Islands"
+         ],
+         "name" : "Adamstown"
+      },
+      "Addis Ababa" : {
+         "countries" : [
+            "Ethiopia"
+         ],
+         "name" : "Addis Ababa"
+      },
+      "Algiers" : {
+         "countries" : [
+            "Algeria"
+         ],
+         "name" : "Algiers"
+      },
+      "Alofi" : {
+         "countries" : [
+            "Niue"
+         ],
+         "name" : "Alofi"
+      },
+      "Amman" : {
+         "countries" : [
+            "Jordan"
+         ],
+         "name" : "Amman"
+      },
+      "Amsterdam" : {
+         "countries" : [
+            "Netherlands"
+         ],
+         "name" : "Amsterdam"
+      },
+      "Andorra la Vella" : {
+         "countries" : [
+            "Andorra"
+         ],
+         "name" : "Andorra la Vella"
+      },
+      "Ankara" : {
+         "countries" : [
+            "Turkey"
+         ],
+         "name" : "Ankara"
+      },
+      "Antananarivo" : {
+         "countries" : [
+            "Madagascar"
+         ],
+         "name" : "Antananarivo"
+      },
+      "Antarctica" : {
+         "countries" : [
+            "Antarctica"
+         ],
+         "name" : "Antarctica"
+      },
+      "Apia" : {
+         "countries" : [
+            "Samoa"
+         ],
+         "name" : "Apia"
+      },
+      "Ashgabat" : {
+         "countries" : [
+            "Turkmenistan"
+         ],
+         "name" : "Ashgabat"
+      },
+      "Asmara" : {
+         "countries" : [
+            "Eritrea"
+         ],
+         "name" : "Asmara"
+      },
+      "Astana" : {
+         "countries" : [
+            "Kazakhstan"
+         ],
+         "name" : "Astana"
+      },
+      "Asunción" : {
+         "countries" : [
+            "Paraguay"
+         ],
+         "name" : "Asunción"
+      },
+      "Athens" : {
+         "countries" : [
+            "Greece"
+         ],
+         "name" : "Athens"
+      },
+      "Avarua" : {
+         "countries" : [
+            "Cook Islands"
+         ],
+         "name" : "Avarua"
+      },
+      "Baghdad" : {
+         "countries" : [
+            "Iraq"
+         ],
+         "name" : "Baghdad"
+      },
+      "Baku" : {
+         "countries" : [
+            "Azerbaijan"
+         ],
+         "name" : "Baku"
+      },
+      "Bamako" : {
+         "countries" : [
+            "Mali"
+         ],
+         "name" : "Bamako"
+      },
+      "Bandar Seri Begawan" : {
+         "countries" : [
+            "Brunei"
+         ],
+         "name" : "Bandar Seri Begawan"
+      },
+      "Bangkok" : {
+         "countries" : [
+            "Thailand"
+         ],
+         "name" : "Bangkok"
+      },
+      "Bangui" : {
+         "countries" : [
+            "Central African Republic"
+         ],
+         "name" : "Bangui"
+      },
+      "Banjul" : {
+         "countries" : [
+            "Gambia"
+         ],
+         "name" : "Banjul"
+      },
+      "Basse-Terre" : {
+         "countries" : [
+            "Guadeloupe"
+         ],
+         "name" : "Basse-Terre"
+      },
+      "Basseterre" : {
+         "countries" : [
+            "Saint Kitts and Nevis"
+         ],
+         "name" : "Basseterre"
+      },
+      "Beijing" : {
+         "countries" : [
+            "China"
+         ],
+         "name" : "Beijing"
+      },
+      "Beirut" : {
+         "countries" : [
+            "Lebanon"
+         ],
+         "name" : "Beirut"
+      },
+      "Belgrade" : {
+         "countries" : [
+            "Serbia"
+         ],
+         "name" : "Belgrade"
+      },
+      "Belmopan" : {
+         "countries" : [
+            "Belize"
+         ],
+         "name" : "Belmopan"
+      },
+      "Berlin" : {
+         "countries" : [
+            "Germany"
+         ],
+         "name" : "Berlin"
+      },
+      "Bern" : {
+         "countries" : [
+            "Switzerland"
+         ],
+         "name" : "Bern"
+      },
+      "Bishkek" : {
+         "countries" : [
+            "Kyrgyzstan"
+         ],
+         "name" : "Bishkek"
+      },
+      "Bissau" : {
+         "countries" : [
+            "Guinea-Bissau"
+         ],
+         "name" : "Bissau"
+      },
+      "Bogotá" : {
+         "countries" : [
+            "Colombia"
+         ],
+         "name" : "Bogotá"
+      },
+      "Bouvet Island" : {
+         "countries" : [
+            "Bouvet Island"
+         ],
+         "name" : "Bouvet Island"
+      },
+      "Brasília" : {
+         "countries" : [
+            "Brazil"
+         ],
+         "name" : "Brasília"
+      },
+      "Bratislava" : {
+         "countries" : [
+            "Slovakia"
+         ],
+         "name" : "Bratislava"
+      },
+      "Brazzaville" : {
+         "countries" : [
+            "Republic of the Congo"
+         ],
+         "name" : "Brazzaville"
+      },
+      "Bridgetown" : {
+         "countries" : [
+            "Barbados"
+         ],
+         "name" : "Bridgetown"
+      },
+      "Brussels" : {
+         "countries" : [
+            "Belgium"
+         ],
+         "name" : "Brussels"
+      },
+      "Bucharest" : {
+         "countries" : [
+            "Romania"
+         ],
+         "name" : "Bucharest"
+      },
+      "Budapest" : {
+         "countries" : [
+            "Hungary"
+         ],
+         "name" : "Budapest"
+      },
+      "Buenos Aires" : {
+         "countries" : [
+            "Argentina"
+         ],
+         "name" : "Buenos Aires"
+      },
+      "Bujumbura" : {
+         "countries" : [
+            "Burundi"
+         ],
+         "name" : "Bujumbura"
+      },
+      "Cairo" : {
+         "countries" : [
+            "Egypt"
+         ],
+         "name" : "Cairo"
+      },
+      "Canberra" : {
+         "countries" : [
+            "Australia"
+         ],
+         "name" : "Canberra"
+      },
+      "Caracas" : {
+         "countries" : [
+            "Venezuela"
+         ],
+         "name" : "Caracas"
+      },
+      "Castries" : {
+         "countries" : [
+            "Saint Lucia"
+         ],
+         "name" : "Castries"
+      },
+      "Cayenne" : {
+         "countries" : [
+            "French Guiana"
+         ],
+         "name" : "Cayenne"
+      },
+      "Charlotte Amalie" : {
+         "countries" : [
+            "U.S. Virgin Islands"
+         ],
+         "name" : "Charlotte Amalie"
+      },
+      "Chișinău" : {
+         "countries" : [
+            "Moldova"
+         ],
+         "name" : "Chișinău"
+      },
+      "City of San Marino" : {
+         "countries" : [
+            "San Marino"
+         ],
+         "name" : "City of San Marino"
+      },
+      "City of Victoria" : {
+         "countries" : [
+            "Hong Kong"
+         ],
+         "name" : "City of Victoria"
+      },
+      "Cockburn Town" : {
+         "countries" : [
+            "Turks and Caicos Islands"
+         ],
+         "name" : "Cockburn Town"
+      },
+      "Colombo" : {
+         "countries" : [
+            "Sri Lanka"
+         ],
+         "name" : "Colombo"
+      },
+      "Conakry" : {
+         "countries" : [
+            "Guinea"
+         ],
+         "name" : "Conakry"
+      },
+      "Copenhagen" : {
+         "countries" : [
+            "Denmark"
+         ],
+         "name" : "Copenhagen"
+      },
+      "Dakar" : {
+         "countries" : [
+            "Senegal"
+         ],
+         "name" : "Dakar"
+      },
+      "Damascus" : {
+         "countries" : [
+            "Syria"
+         ],
+         "name" : "Damascus"
+      },
+      "Dhaka" : {
+         "countries" : [
+            "Bangladesh"
+         ],
+         "name" : "Dhaka"
+      },
+      "Diego Garcia" : {
+         "countries" : [
+            "British Indian Ocean Territory"
+         ],
+         "name" : "Diego Garcia"
+      },
+      "Dili" : {
+         "countries" : [
+            "East Timor"
+         ],
+         "name" : "Dili"
+      },
+      "Djibouti" : {
+         "countries" : [
+            "Djibouti"
+         ],
+         "name" : "Djibouti"
+      },
+      "Dodoma" : {
+         "countries" : [
+            "Tanzania"
+         ],
+         "name" : "Dodoma"
+      },
+      "Doha" : {
+         "countries" : [
+            "Qatar"
+         ],
+         "name" : "Doha"
+      },
+      "Douglas" : {
+         "countries" : [
+            "Isle of Man"
+         ],
+         "name" : "Douglas"
+      },
+      "Dublin" : {
+         "countries" : [
+            "Ireland"
+         ],
+         "name" : "Dublin"
+      },
+      "Dushanbe" : {
+         "countries" : [
+            "Tajikistan"
+         ],
+         "name" : "Dushanbe"
+      },
+      "El Aaiún" : {
+         "countries" : [
+            "Western Sahara"
+         ],
+         "name" : "El Aaiún"
+      },
+      "Fakaofo" : {
+         "countries" : [
+            "Tokelau"
+         ],
+         "name" : "Fakaofo"
+      },
+      "Flying Fish Cove" : {
+         "countries" : [
+            "Christmas Island"
+         ],
+         "name" : "Flying Fish Cove"
+      },
+      "Fort-de-France" : {
+         "countries" : [
+            "Martinique"
+         ],
+         "name" : "Fort-de-France"
+      },
+      "Freetown" : {
+         "countries" : [
+            "Sierra Leone"
+         ],
+         "name" : "Freetown"
+      },
+      "Funafuti" : {
+         "countries" : [
+            "Tuvalu"
+         ],
+         "name" : "Funafuti"
+      },
+      "Gaborone" : {
+         "countries" : [
+            "Botswana"
+         ],
+         "name" : "Gaborone"
+      },
+      "George Town" : {
+         "countries" : [
+            "Cayman Islands"
+         ],
+         "name" : "George Town"
+      },
+      "Georgetown" : {
+         "countries" : [
+            "Guyana"
+         ],
+         "name" : "Georgetown"
+      },
+      "Gibraltar" : {
+         "countries" : [
+            "Gibraltar"
+         ],
+         "name" : "Gibraltar"
+      },
+      "Guatemala City" : {
+         "countries" : [
+            "Guatemala"
+         ],
+         "name" : "Guatemala City"
+      },
+      "Gustavia" : {
+         "countries" : [
+            "Saint Barthélemy"
+         ],
+         "name" : "Gustavia"
+      },
+      "Hagåtña" : {
+         "countries" : [
+            "Guam"
+         ],
+         "name" : "Hagåtña"
+      },
+      "Hamilton" : {
+         "countries" : [
+            "Bermuda"
+         ],
+         "name" : "Hamilton"
+      },
+      "Hanoi" : {
+         "countries" : [
+            "Vietnam"
+         ],
+         "name" : "Hanoi"
+      },
+      "Harare" : {
+         "countries" : [
+            "Zimbabwe"
+         ],
+         "name" : "Harare"
+      },
+      "Havana" : {
+         "countries" : [
+            "Cuba"
+         ],
+         "name" : "Havana"
+      },
+      "Heard Island and McDonald Islands" : {
+         "countries" : [
+            "Heard Island and McDonald Islands"
+         ],
+         "name" : "Heard Island and McDonald Islands"
+      },
+      "Helsinki" : {
+         "countries" : [
+            "Finland"
+         ],
+         "name" : "Helsinki"
+      },
+      "Honiara" : {
+         "countries" : [
+            "Solomon Islands"
+         ],
+         "name" : "Honiara"
+      },
+      "Islamabad" : {
+         "countries" : [
+            "Pakistan"
+         ],
+         "name" : "Islamabad"
+      },
+      "Jakarta" : {
+         "countries" : [
+            "Indonesia"
+         ],
+         "name" : "Jakarta"
+      },
+      "Jamestown" : {
+         "countries" : [
+            "Saint Helena"
+         ],
+         "name" : "Jamestown"
+      },
+      "Jerusalem" : {
+         "countries" : [
+            "Israel"
+         ],
+         "name" : "Jerusalem"
+      },
+      "Juba" : {
+         "countries" : [
+            "South Sudan"
+         ],
+         "name" : "Juba"
+      },
+      "Kabul" : {
+         "countries" : [
+            "Afghanistan"
+         ],
+         "name" : "Kabul"
+      },
+      "Kampala" : {
+         "countries" : [
+            "Uganda"
+         ],
+         "name" : "Kampala"
+      },
+      "Kathmandu" : {
+         "countries" : [
+            "Nepal"
+         ],
+         "name" : "Kathmandu"
+      },
+      "Khartoum" : {
+         "countries" : [
+            "Sudan"
+         ],
+         "name" : "Khartoum"
+      },
+      "Kigali" : {
+         "countries" : [
+            "Rwanda"
+         ],
+         "name" : "Kigali"
+      },
+      "King Edward Point" : {
+         "countries" : [
+            "South Georgia and the South Sandwich Islands"
+         ],
+         "name" : "King Edward Point"
+      },
+      "Kingston" : {
+         "countries" : [
+            "Norfolk Island",
+            "Jamaica"
+         ],
+         "name" : "Kingston"
+      },
+      "Kingstown" : {
+         "countries" : [
+            "Saint Vincent and the Grenadines"
+         ],
+         "name" : "Kingstown"
+      },
+      "Kinshasa" : {
+         "countries" : [
+            "Democratic Republic of the Congo"
+         ],
+         "name" : "Kinshasa"
+      },
+      "Kralendijk" : {
+         "countries" : [
+            "Bonaire"
+         ],
+         "name" : "Kralendijk"
+      },
+      "Kuala Lumpur" : {
+         "countries" : [
+            "Malaysia"
+         ],
+         "name" : "Kuala Lumpur"
+      },
+      "Kuwait City" : {
+         "countries" : [
+            "Kuwait"
+         ],
+         "name" : "Kuwait City"
+      },
+      "Kyiv" : {
+         "countries" : [
+            "Ukraine"
+         ],
+         "name" : "Kyiv"
+      },
+      "Libreville" : {
+         "countries" : [
+            "Gabon"
+         ],
+         "name" : "Libreville"
+      },
+      "Lilongwe" : {
+         "countries" : [
+            "Malawi"
+         ],
+         "name" : "Lilongwe"
+      },
+      "Lima" : {
+         "countries" : [
+            "Peru"
+         ],
+         "name" : "Lima"
+      },
+      "Lisbon" : {
+         "countries" : [
+            "Portugal"
+         ],
+         "name" : "Lisbon"
+      },
+      "Ljubljana" : {
+         "countries" : [
+            "Slovenia"
+         ],
+         "name" : "Ljubljana"
+      },
+      "Lobamba" : {
+         "countries" : [
+            "Swaziland"
+         ],
+         "name" : "Lobamba"
+      },
+      "Lomé" : {
+         "countries" : [
+            "Togo"
+         ],
+         "name" : "Lomé"
+      },
+      "London" : {
+         "countries" : [
+            "United Kingdom"
+         ],
+         "name" : "London"
+      },
+      "Longyearbyen" : {
+         "countries" : [
+            "Svalbard and Jan Mayen"
+         ],
+         "name" : "Longyearbyen"
+      },
+      "Luanda" : {
+         "countries" : [
+            "Angola"
+         ],
+         "name" : "Luanda"
+      },
+      "Lusaka" : {
+         "countries" : [
+            "Zambia"
+         ],
+         "name" : "Lusaka"
+      },
+      "Luxembourg" : {
+         "countries" : [
+            "Luxembourg"
+         ],
+         "name" : "Luxembourg"
+      },
+      "Macao" : {
+         "countries" : [
+            "Macao"
+         ],
+         "name" : "Macao"
+      },
+      "Madrid" : {
+         "countries" : [
+            "Spain"
+         ],
+         "name" : "Madrid"
+      },
+      "Majuro" : {
+         "countries" : [
+            "Marshall Islands"
+         ],
+         "name" : "Majuro"
+      },
+      "Malabo" : {
+         "countries" : [
+            "Equatorial Guinea"
+         ],
+         "name" : "Malabo"
+      },
+      "Malé" : {
+         "countries" : [
+            "Maldives"
+         ],
+         "name" : "Malé"
+      },
+      "Mamoudzou" : {
+         "countries" : [
+            "Mayotte"
+         ],
+         "name" : "Mamoudzou"
+      },
+      "Managua" : {
+         "countries" : [
+            "Nicaragua"
+         ],
+         "name" : "Managua"
+      },
+      "Manama" : {
+         "countries" : [
+            "Bahrain"
+         ],
+         "name" : "Manama"
+      },
+      "Manila" : {
+         "countries" : [
+            "Philippines"
+         ],
+         "name" : "Manila"
+      },
+      "Maputo" : {
+         "countries" : [
+            "Mozambique"
+         ],
+         "name" : "Maputo"
+      },
+      "Mariehamn" : {
+         "countries" : [
+            "Åland"
+         ],
+         "name" : "Mariehamn"
+      },
+      "Marigot" : {
+         "countries" : [
+            "Saint Martin"
+         ],
+         "name" : "Marigot"
+      },
+      "Maseru" : {
+         "countries" : [
+            "Lesotho"
+         ],
+         "name" : "Maseru"
+      },
+      "Mata-Utu" : {
+         "countries" : [
+            "Wallis and Futuna"
+         ],
+         "name" : "Mata-Utu"
+      },
+      "Mexico City" : {
+         "countries" : [
+            "Mexico"
+         ],
+         "name" : "Mexico City"
+      },
+      "Minsk" : {
+         "countries" : [
+            "Belarus"
+         ],
+         "name" : "Minsk"
+      },
+      "Mogadishu" : {
+         "countries" : [
+            "Somalia"
+         ],
+         "name" : "Mogadishu"
+      },
+      "Monaco" : {
+         "countries" : [
+            "Monaco"
+         ],
+         "name" : "Monaco"
+      },
+      "Monrovia" : {
+         "countries" : [
+            "Liberia"
+         ],
+         "name" : "Monrovia"
+      },
+      "Montevideo" : {
+         "countries" : [
+            "Uruguay"
+         ],
+         "name" : "Montevideo"
+      },
+      "Moroni" : {
+         "countries" : [
+            "Comoros"
+         ],
+         "name" : "Moroni"
+      },
+      "Moscow" : {
+         "countries" : [
+            "Russia"
+         ],
+         "name" : "Moscow"
+      },
+      "Muscat" : {
+         "countries" : [
+            "Oman"
+         ],
+         "name" : "Muscat"
+      },
+      "N'Djamena" : {
+         "countries" : [
+            "Chad"
+         ],
+         "name" : "N'Djamena"
+      },
+      "Nairobi" : {
+         "countries" : [
+            "Kenya"
+         ],
+         "name" : "Nairobi"
+      },
+      "Nassau" : {
+         "countries" : [
+            "Bahamas"
+         ],
+         "name" : "Nassau"
+      },
+      "Naypyidaw" : {
+         "countries" : [
+            "Myanmar [Burma]"
+         ],
+         "name" : "Naypyidaw"
+      },
+      "New Delhi" : {
+         "countries" : [
+            "India"
+         ],
+         "name" : "New Delhi"
+      },
+      "Ngerulmud" : {
+         "countries" : [
+            "Palau"
+         ],
+         "name" : "Ngerulmud"
+      },
+      "Niamey" : {
+         "countries" : [
+            "Niger"
+         ],
+         "name" : "Niamey"
+      },
+      "Nicosia" : {
+         "countries" : [
+            "Cyprus"
+         ],
+         "name" : "Nicosia"
+      },
+      "Nouakchott" : {
+         "countries" : [
+            "Mauritania"
+         ],
+         "name" : "Nouakchott"
+      },
+      "Nouméa" : {
+         "countries" : [
+            "New Caledonia"
+         ],
+         "name" : "Nouméa"
+      },
+      "Nuku'alofa" : {
+         "countries" : [
+            "Tonga"
+         ],
+         "name" : "Nuku'alofa"
+      },
+      "Nuuk" : {
+         "countries" : [
+            "Greenland"
+         ],
+         "name" : "Nuuk"
+      },
+      "Oranjestad" : {
+         "countries" : [
+            "Aruba"
+         ],
+         "name" : "Oranjestad"
+      },
+      "Oslo" : {
+         "countries" : [
+            "Norway"
+         ],
+         "name" : "Oslo"
+      },
+      "Ottawa" : {
+         "countries" : [
+            "Canada"
+         ],
+         "name" : "Ottawa"
+      },
+      "Ouagadougou" : {
+         "countries" : [
+            "Burkina Faso"
+         ],
+         "name" : "Ouagadougou"
+      },
+      "Pago Pago" : {
+         "countries" : [
+            "American Samoa"
+         ],
+         "name" : "Pago Pago"
+      },
+      "Palikir" : {
+         "countries" : [
+            "Micronesia"
+         ],
+         "name" : "Palikir"
+      },
+      "Panama City" : {
+         "countries" : [
+            "Panama"
+         ],
+         "name" : "Panama City"
+      },
+      "Papeetē" : {
+         "countries" : [
+            "French Polynesia"
+         ],
+         "name" : "Papeetē"
+      },
+      "Paramaribo" : {
+         "countries" : [
+            "Suriname"
+         ],
+         "name" : "Paramaribo"
+      },
+      "Paris" : {
+         "countries" : [
+            "France"
+         ],
+         "name" : "Paris"
+      },
+      "Philipsburg" : {
+         "countries" : [
+            "Sint Maarten"
+         ],
+         "name" : "Philipsburg"
+      },
+      "Phnom Penh" : {
+         "countries" : [
+            "Cambodia"
+         ],
+         "name" : "Phnom Penh"
+      },
+      "Plymouth" : {
+         "countries" : [
+            "Montserrat"
+         ],
+         "name" : "Plymouth"
+      },
+      "Podgorica" : {
+         "countries" : [
+            "Montenegro"
+         ],
+         "name" : "Podgorica"
+      },
+      "Port Louis" : {
+         "countries" : [
+            "Mauritius"
+         ],
+         "name" : "Port Louis"
+      },
+      "Port Moresby" : {
+         "countries" : [
+            "Papua New Guinea"
+         ],
+         "name" : "Port Moresby"
+      },
+      "Port Vila" : {
+         "countries" : [
+            "Vanuatu"
+         ],
+         "name" : "Port Vila"
+      },
+      "Port of Spain" : {
+         "countries" : [
+            "Trinidad and Tobago"
+         ],
+         "name" : "Port of Spain"
+      },
+      "Port-au-Prince" : {
+         "countries" : [
+            "Haiti"
+         ],
+         "name" : "Port-au-Prince"
+      },
+      "Port-aux-Français" : {
+         "countries" : [
+            "French Southern Territories"
+         ],
+         "name" : "Port-aux-Français"
+      },
+      "Porto-Novo" : {
+         "countries" : [
+            "Benin"
+         ],
+         "name" : "Porto-Novo"
+      },
+      "Prague" : {
+         "countries" : [
+            "Czech Republic"
+         ],
+         "name" : "Prague"
+      },
+      "Praia" : {
+         "countries" : [
+            "Cape Verde"
+         ],
+         "name" : "Praia"
+      },
+      "Pretoria" : {
+         "countries" : [
+            "South Africa"
+         ],
+         "name" : "Pretoria"
+      },
+      "Pristina" : {
+         "countries" : [
+            "Kosovo"
+         ],
+         "name" : "Pristina"
+      },
+      "Pyongyang" : {
+         "countries" : [
+            "North Korea"
+         ],
+         "name" : "Pyongyang"
+      },
+      "Quito" : {
+         "countries" : [
+            "Ecuador"
+         ],
+         "name" : "Quito"
+      },
+      "Rabat" : {
+         "countries" : [
+            "Morocco"
+         ],
+         "name" : "Rabat"
+      },
+      "Ramallah" : {
+         "countries" : [
+            "Palestine"
+         ],
+         "name" : "Ramallah"
+      },
+      "Reykjavik" : {
+         "countries" : [
+            "Iceland"
+         ],
+         "name" : "Reykjavik"
+      },
+      "Riga" : {
+         "countries" : [
+            "Latvia"
+         ],
+         "name" : "Riga"
+      },
+      "Riyadh" : {
+         "countries" : [
+            "Saudi Arabia"
+         ],
+         "name" : "Riyadh"
+      },
+      "Road Town" : {
+         "countries" : [
+            "British Virgin Islands"
+         ],
+         "name" : "Road Town"
+      },
+      "Rome" : {
+         "countries" : [
+            "Italy"
+         ],
+         "name" : "Rome"
+      },
+      "Roseau" : {
+         "countries" : [
+            "Dominica"
+         ],
+         "name" : "Roseau"
+      },
+      "Saint Helier" : {
+         "countries" : [
+            "Jersey"
+         ],
+         "name" : "Saint Helier"
+      },
+      "Saint John's" : {
+         "countries" : [
+            "Antigua and Barbuda"
+         ],
+         "name" : "Saint John's"
+      },
+      "Saint-Denis" : {
+         "countries" : [
+            "Réunion"
+         ],
+         "name" : "Saint-Denis"
+      },
+      "Saint-Pierre" : {
+         "countries" : [
+            "Saint Pierre and Miquelon"
+         ],
+         "name" : "Saint-Pierre"
+      },
+      "Saipan" : {
+         "countries" : [
+            "Northern Mariana Islands"
+         ],
+         "name" : "Saipan"
+      },
+      "San José" : {
+         "countries" : [
+            "Costa Rica"
+         ],
+         "name" : "San José"
+      },
+      "San Juan" : {
+         "countries" : [
+            "Puerto Rico"
+         ],
+         "name" : "San Juan"
+      },
+      "San Salvador" : {
+         "countries" : [
+            "El Salvador"
+         ],
+         "name" : "San Salvador"
+      },
+      "Sana'a" : {
+         "countries" : [
+            "Yemen"
+         ],
+         "name" : "Sana'a"
+      },
+      "Santiago" : {
+         "countries" : [
+            "Chile"
+         ],
+         "name" : "Santiago"
+      },
+      "Santo Domingo" : {
+         "countries" : [
+            "Dominican Republic"
+         ],
+         "name" : "Santo Domingo"
+      },
+      "Sarajevo" : {
+         "countries" : [
+            "Bosnia and Herzegovina"
+         ],
+         "name" : "Sarajevo"
+      },
+      "Seoul" : {
+         "countries" : [
+            "South Korea"
+         ],
+         "name" : "Seoul"
+      },
+      "Singapore" : {
+         "countries" : [
+            "Singapore"
+         ],
+         "name" : "Singapore"
+      },
+      "Skopje" : {
+         "countries" : [
+            "North Macedonia"
+         ],
+         "name" : "Skopje"
+      },
+      "Sofia" : {
+         "countries" : [
+            "Bulgaria"
+         ],
+         "name" : "Sofia"
+      },
+      "South Tarawa" : {
+         "countries" : [
+            "Kiribati"
+         ],
+         "name" : "South Tarawa"
+      },
+      "St. George's" : {
+         "countries" : [
+            "Grenada"
+         ],
+         "name" : "St. George's"
+      },
+      "St. Peter Port" : {
+         "countries" : [
+            "Guernsey"
+         ],
+         "name" : "St. Peter Port"
+      },
+      "Stanley" : {
+         "countries" : [
+            "Falkland Islands"
+         ],
+         "name" : "Stanley"
+      },
+      "Stockholm" : {
+         "countries" : [
+            "Sweden"
+         ],
+         "name" : "Stockholm"
+      },
+      "Sucre" : {
+         "countries" : [
+            "Bolivia"
+         ],
+         "name" : "Sucre"
+      },
+      "Suva" : {
+         "countries" : [
+            "Fiji"
+         ],
+         "name" : "Suva"
+      },
+      "São Tomé" : {
+         "countries" : [
+            "São Tomé and Príncipe"
+         ],
+         "name" : "São Tomé"
+      },
+      "Taipei" : {
+         "countries" : [
+            "Taiwan"
+         ],
+         "name" : "Taipei"
+      },
+      "Tallinn" : {
+         "countries" : [
+            "Estonia"
+         ],
+         "name" : "Tallinn"
+      },
+      "Tashkent" : {
+         "countries" : [
+            "Uzbekistan"
+         ],
+         "name" : "Tashkent"
+      },
+      "Tbilisi" : {
+         "countries" : [
+            "Georgia"
+         ],
+         "name" : "Tbilisi"
+      },
+      "Tegucigalpa" : {
+         "countries" : [
+            "Honduras"
+         ],
+         "name" : "Tegucigalpa"
+      },
+      "Tehran" : {
+         "countries" : [
+            "Iran"
+         ],
+         "name" : "Tehran"
+      },
+      "The Valley" : {
+         "countries" : [
+            "Anguilla"
+         ],
+         "name" : "The Valley"
+      },
+      "Thimphu" : {
+         "countries" : [
+            "Bhutan"
+         ],
+         "name" : "Thimphu"
+      },
+      "Tirana" : {
+         "countries" : [
+            "Albania"
+         ],
+         "name" : "Tirana"
+      },
+      "Tokyo" : {
+         "countries" : [
+            "Japan"
+         ],
+         "name" : "Tokyo"
+      },
+      "Tripoli" : {
+         "countries" : [
+            "Libya"
+         ],
+         "name" : "Tripoli"
+      },
+      "Tunis" : {
+         "countries" : [
+            "Tunisia"
+         ],
+         "name" : "Tunis"
+      },
+      "Tórshavn" : {
+         "countries" : [
+            "Faroe Islands"
+         ],
+         "name" : "Tórshavn"
+      },
+      "U.S. Minor Outlying Islands" : {
+         "countries" : [
+            "U.S. Minor Outlying Islands"
+         ],
+         "name" : "U.S. Minor Outlying Islands"
+      },
+      "Ulan Bator" : {
+         "countries" : [
+            "Mongolia"
+         ],
+         "name" : "Ulan Bator"
+      },
+      "Vaduz" : {
+         "countries" : [
+            "Liechtenstein"
+         ],
+         "name" : "Vaduz"
+      },
+      "Valletta" : {
+         "countries" : [
+            "Malta"
+         ],
+         "name" : "Valletta"
+      },
+      "Vatican City" : {
+         "countries" : [
+            "Vatican City"
+         ],
+         "name" : "Vatican City"
+      },
+      "Victoria" : {
+         "countries" : [
+            "Seychelles"
+         ],
+         "name" : "Victoria"
+      },
+      "Vienna" : {
+         "countries" : [
+            "Austria"
+         ],
+         "name" : "Vienna"
+      },
+      "Vientiane" : {
+         "countries" : [
+            "Laos"
+         ],
+         "name" : "Vientiane"
+      },
+      "Vilnius" : {
+         "countries" : [
+            "Lithuania"
+         ],
+         "name" : "Vilnius"
+      },
+      "Warsaw" : {
+         "countries" : [
+            "Poland"
+         ],
+         "name" : "Warsaw"
+      },
+      "Washington D.C." : {
+         "countries" : [
+            "United States"
+         ],
+         "name" : "Washington D.C."
+      },
+      "Wellington" : {
+         "countries" : [
+            "New Zealand"
+         ],
+         "name" : "Wellington"
+      },
+      "West Island" : {
+         "countries" : [
+            "Cocos [Keeling] Islands"
+         ],
+         "name" : "West Island"
+      },
+      "Willemstad" : {
+         "countries" : [
+            "Curacao"
+         ],
+         "name" : "Willemstad"
+      },
+      "Windhoek" : {
+         "countries" : [
+            "Namibia"
+         ],
+         "name" : "Windhoek"
+      },
+      "Yamoussoukro" : {
+         "countries" : [
+            "Ivory Coast"
+         ],
+         "name" : "Yamoussoukro"
+      },
+      "Yaoundé" : {
+         "countries" : [
+            "Cameroon"
+         ],
+         "name" : "Yaoundé"
+      },
+      "Yaren" : {
+         "countries" : [
+            "Nauru"
+         ],
+         "name" : "Yaren"
+      },
+      "Yerevan" : {
+         "countries" : [
+            "Armenia"
+         ],
+         "name" : "Yerevan"
+      },
+      "Zagreb" : {
+         "countries" : [
+            "Croatia"
+         ],
+         "name" : "Zagreb"
+      }
+   },
+   "continents" : {
+      "Africa" : {
+         "countries" : [
+            "Eritrea",
+            "Togo",
+            "Rwanda",
+            "Swaziland",
+            "São Tomé and Príncipe",
+            "Zimbabwe",
+            "Madagascar",
+            "Mauritius",
+            "Democratic Republic of the Congo",
+            "Kenya",
+            "Comoros",
+            "Ethiopia",
+            "Lesotho",
+            "Chad",
+            "Réunion",
+            "Zambia",
+            "Uganda",
+            "Senegal",
+            "Republic of the Congo",
+            "Ghana",
+            "South Africa",
+            "Mayotte",
+            "Angola",
+            "Burkina Faso",
+            "Central African Republic",
+            "Libya",
+            "Sierra Leone",
+            "Nigeria",
+            "Algeria",
+            "Equatorial Guinea",
+            "South Sudan",
+            "Seychelles",
+            "Liberia",
+            "Mali",
+            "Gabon",
+            "Djibouti",
+            "Morocco",
+            "Niger",
+            "Somalia",
+            "Namibia",
+            "Western Sahara",
+            "Tunisia",
+            "Cape Verde",
+            "Burundi",
+            "Mauritania",
+            "Guinea-Bissau",
+            "Egypt",
+            "Sudan",
+            "Benin",
+            "Saint Helena",
+            "Mozambique",
+            "Botswana",
+            "Gambia",
+            "Guinea",
+            "Malawi",
+            "Cameroon",
+            "Ivory Coast",
+            "Tanzania"
+         ],
+         "name" : "Africa"
+      },
+      "Antarctica" : {
+         "countries" : [
+            "South Georgia and the South Sandwich Islands",
+            "French Southern Territories",
+            "Heard Island and McDonald Islands",
+            "Antarctica",
+            "Bouvet Island"
+         ],
+         "name" : "Antarctica"
+      },
+      "Asia" : {
+         "countries" : [
+            "Hong Kong",
+            "Kuwait",
+            "Israel",
+            "Thailand",
+            "Bahrain",
+            "Kazakhstan",
+            "Malaysia",
+            "Christmas Island",
+            "Lebanon",
+            "Palestine",
+            "Bangladesh",
+            "Oman",
+            "South Korea",
+            "Iraq",
+            "Qatar",
+            "Saudi Arabia",
+            "Iran",
+            "Nepal",
+            "Afghanistan",
+            "Philippines",
+            "Macao",
+            "India",
+            "Cocos [Keeling] Islands",
+            "Yemen",
+            "Japan",
+            "Vietnam",
+            "Indonesia",
+            "Syria",
+            "Turkmenistan",
+            "Brunei",
+            "Uzbekistan",
+            "Turkey",
+            "British Indian Ocean Territory",
+            "Myanmar [Burma]",
+            "Mongolia",
+            "Armenia",
+            "United Arab Emirates",
+            "Tajikistan",
+            "North Korea",
+            "Sri Lanka",
+            "Maldives",
+            "Kyrgyzstan",
+            "Pakistan",
+            "Azerbaijan",
+            "Georgia",
+            "Taiwan",
+            "Jordan",
+            "Laos",
+            "Cambodia",
+            "Singapore",
+            "China",
+            "Bhutan"
+         ],
+         "name" : "Asia"
+      },
+      "Europe" : {
+         "countries" : [
+            "Bulgaria",
+            "Cyprus",
+            "Åland",
+            "Estonia",
+            "Svalbard and Jan Mayen",
+            "Guernsey",
+            "Faroe Islands",
+            "Switzerland",
+            "Slovenia",
+            "San Marino",
+            "Moldova",
+            "Andorra",
+            "Sweden",
+            "Norway",
+            "Belarus",
+            "Luxembourg",
+            "United Kingdom",
+            "Ireland",
+            "Slovakia",
+            "Isle of Man",
+            "Italy",
+            "Croatia",
+            "Jersey",
+            "Monaco",
+            "Kosovo",
+            "Serbia",
+            "Ukraine",
+            "Liechtenstein",
+            "Albania",
+            "Hungary",
+            "Finland",
+            "Romania",
+            "Spain",
+            "Germany",
+            "Lithuania",
+            "Bosnia and Herzegovina",
+            "Latvia",
+            "North Macedonia",
+            "Portugal",
+            "France",
+            "Belgium",
+            "Poland",
+            "Czech Republic",
+            "Montenegro",
+            "Vatican City",
+            "Denmark",
+            "Austria",
+            "Malta",
+            "Russia",
+            "Gibraltar",
+            "Greece",
+            "Netherlands",
+            "Iceland"
+         ],
+         "name" : "Europe"
+      },
+      "North America" : {
+         "countries" : [
+            "El Salvador",
+            "Grenada",
+            "Saint Vincent and the Grenadines",
+            "Mexico",
+            "Guadeloupe",
+            "Antigua and Barbuda",
+            "Saint Lucia",
+            "Saint Kitts and Nevis",
+            "Cuba",
+            "Dominican Republic",
+            "Saint Martin",
+            "United States",
+            "Haiti",
+            "British Virgin Islands",
+            "Honduras",
+            "Bahamas",
+            "Barbados",
+            "Turks and Caicos Islands",
+            "Montserrat",
+            "Jamaica",
+            "Saint Barthélemy",
+            "Saint Pierre and Miquelon",
+            "Canada",
+            "Puerto Rico",
+            "Greenland",
+            "U.S. Virgin Islands",
+            "Bonaire",
+            "Nicaragua",
+            "Dominica",
+            "Martinique",
+            "Bermuda",
+            "Anguilla",
+            "Curacao",
+            "Guatemala",
+            "Cayman Islands",
+            "Costa Rica",
+            "Sint Maarten",
+            "Aruba",
+            "Panama",
+            "Trinidad and Tobago",
+            "Belize"
+         ],
+         "name" : "North America"
+      },
+      "Oceania" : {
+         "countries" : [
+            "Marshall Islands",
+            "New Caledonia",
+            "Australia",
+            "French Polynesia",
+            "Northern Mariana Islands",
+            "Guam",
+            "Norfolk Island",
+            "Kiribati",
+            "Wallis and Futuna",
+            "Papua New Guinea",
+            "Tonga",
+            "Vanuatu",
+            "American Samoa",
+            "Samoa",
+            "Niue",
+            "East Timor",
+            "New Zealand",
+            "Pitcairn Islands",
+            "Solomon Islands",
+            "Cook Islands",
+            "Micronesia",
+            "Tokelau",
+            "Nauru",
+            "Palau",
+            "Fiji",
+            "U.S. Minor Outlying Islands",
+            "Tuvalu"
+         ],
+         "name" : "Oceania"
+      },
+      "South America" : {
+         "countries" : [
+            "Uruguay",
+            "Guyana",
+            "Suriname",
+            "Bolivia",
+            "Colombia",
+            "French Guiana",
+            "Paraguay",
+            "Peru",
+            "Venezuela",
+            "Chile",
+            "Ecuador",
+            "Falkland Islands",
+            "Argentina",
+            "Brazil"
+         ],
+         "name" : "South America"
+      }
+   },
+   "countries" : {
+      "Afghanistan" : {
+         "cities" : [
+            "Kabul"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "AFN"
+         ],
+         "name" : "Afghanistan"
+      },
+      "Albania" : {
+         "cities" : [
+            "Tirana"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "ALL"
+         ],
+         "name" : "Albania"
+      },
+      "Algeria" : {
+         "cities" : [
+            "Algiers"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "DZD"
+         ],
+         "name" : "Algeria"
+      },
+      "American Samoa" : {
+         "cities" : [
+            "Pago Pago"
+         ],
+         "continent" : "Oceania",
+         "currency" : [
+            "USD"
+         ],
+         "name" : "American Samoa"
+      },
+      "Andorra" : {
+         "cities" : [
+            "Andorra la Vella"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "Andorra"
+      },
+      "Angola" : {
+         "cities" : [
+            "Luanda"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "AOA"
+         ],
+         "name" : "Angola"
+      },
+      "Anguilla" : {
+         "cities" : [
+            "The Valley"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "XCD"
+         ],
+         "name" : "Anguilla"
+      },
+      "Antarctica" : {
+         "cities" : [
+            "Antarctica"
+         ],
+         "continent" : "Antarctica",
+         "currency" : [],
+         "name" : "Antarctica"
+      },
+      "Antigua and Barbuda" : {
+         "cities" : [
+            "Saint John's"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "XCD"
+         ],
+         "name" : "Antigua and Barbuda"
+      },
+      "Argentina" : {
+         "cities" : [
+            "Buenos Aires"
+         ],
+         "continent" : "South America",
+         "currency" : [
+            "ARS"
+         ],
+         "name" : "Argentina"
+      },
+      "Armenia" : {
+         "cities" : [
+            "Yerevan"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "AMD"
+         ],
+         "name" : "Armenia"
+      },
+      "Aruba" : {
+         "cities" : [
+            "Oranjestad"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "AWG"
+         ],
+         "name" : "Aruba"
+      },
+      "Australia" : {
+         "cities" : [
+            "Canberra"
+         ],
+         "continent" : "Oceania",
+         "currency" : [
+            "AUD"
+         ],
+         "name" : "Australia"
+      },
+      "Austria" : {
+         "cities" : [
+            "Vienna"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "Austria"
+      },
+      "Azerbaijan" : {
+         "cities" : [
+            "Baku"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "AZN"
+         ],
+         "name" : "Azerbaijan"
+      },
+      "Bahamas" : {
+         "cities" : [
+            "Nassau"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "BSD"
+         ],
+         "name" : "Bahamas"
+      },
+      "Bahrain" : {
+         "cities" : [
+            "Manama"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "BHD"
+         ],
+         "name" : "Bahrain"
+      },
+      "Bangladesh" : {
+         "cities" : [
+            "Dhaka"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "BDT"
+         ],
+         "name" : "Bangladesh"
+      },
+      "Barbados" : {
+         "cities" : [
+            "Bridgetown"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "BBD"
+         ],
+         "name" : "Barbados"
+      },
+      "Belarus" : {
+         "cities" : [
+            "Minsk"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "BYN"
+         ],
+         "name" : "Belarus"
+      },
+      "Belgium" : {
+         "cities" : [
+            "Brussels"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "Belgium"
+      },
+      "Belize" : {
+         "cities" : [
+            "Belmopan"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "BZD"
+         ],
+         "name" : "Belize"
+      },
+      "Benin" : {
+         "cities" : [
+            "Porto-Novo"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "XOF"
+         ],
+         "name" : "Benin"
+      },
+      "Bermuda" : {
+         "cities" : [
+            "Hamilton"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "BMD"
+         ],
+         "name" : "Bermuda"
+      },
+      "Bhutan" : {
+         "cities" : [
+            "Thimphu"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "BTN",
+            "INR"
+         ],
+         "name" : "Bhutan"
+      },
+      "Bolivia" : {
+         "cities" : [
+            "Sucre"
+         ],
+         "continent" : "South America",
+         "currency" : [
+            "BOB",
+            "BOV"
+         ],
+         "name" : "Bolivia"
+      },
+      "Bonaire" : {
+         "cities" : [
+            "Kralendijk"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "USD"
+         ],
+         "name" : "Bonaire"
+      },
+      "Bosnia and Herzegovina" : {
+         "cities" : [
+            "Sarajevo"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "BAM"
+         ],
+         "name" : "Bosnia and Herzegovina"
+      },
+      "Botswana" : {
+         "cities" : [
+            "Gaborone"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "BWP"
+         ],
+         "name" : "Botswana"
+      },
+      "Bouvet Island" : {
+         "cities" : [
+            "Bouvet Island"
+         ],
+         "continent" : "Antarctica",
+         "currency" : [
+            "NOK"
+         ],
+         "name" : "Bouvet Island"
+      },
+      "Brazil" : {
+         "cities" : [
+            "Brasília"
+         ],
+         "continent" : "South America",
+         "currency" : [
+            "BRL"
+         ],
+         "name" : "Brazil"
+      },
+      "British Indian Ocean Territory" : {
+         "cities" : [
+            "Diego Garcia"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "USD"
+         ],
+         "name" : "British Indian Ocean Territory"
+      },
+      "British Virgin Islands" : {
+         "cities" : [
+            "Road Town"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "USD"
+         ],
+         "name" : "British Virgin Islands"
+      },
+      "Brunei" : {
+         "cities" : [
+            "Bandar Seri Begawan"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "BND"
+         ],
+         "name" : "Brunei"
+      },
+      "Bulgaria" : {
+         "cities" : [
+            "Sofia"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "BGN"
+         ],
+         "name" : "Bulgaria"
+      },
+      "Burkina Faso" : {
+         "cities" : [
+            "Ouagadougou"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "XOF"
+         ],
+         "name" : "Burkina Faso"
+      },
+      "Burundi" : {
+         "cities" : [
+            "Bujumbura"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "BIF"
+         ],
+         "name" : "Burundi"
+      },
+      "Cambodia" : {
+         "cities" : [
+            "Phnom Penh"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "KHR"
+         ],
+         "name" : "Cambodia"
+      },
+      "Cameroon" : {
+         "cities" : [
+            "Yaoundé"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "XAF"
+         ],
+         "name" : "Cameroon"
+      },
+      "Canada" : {
+         "cities" : [
+            "Ottawa"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "CAD"
+         ],
+         "name" : "Canada"
+      },
+      "Cape Verde" : {
+         "cities" : [
+            "Praia"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "CVE"
+         ],
+         "name" : "Cape Verde"
+      },
+      "Cayman Islands" : {
+         "cities" : [
+            "George Town"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "KYD"
+         ],
+         "name" : "Cayman Islands"
+      },
+      "Central African Republic" : {
+         "cities" : [
+            "Bangui"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "XAF"
+         ],
+         "name" : "Central African Republic"
+      },
+      "Chad" : {
+         "cities" : [
+            "N'Djamena"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "XAF"
+         ],
+         "name" : "Chad"
+      },
+      "Chile" : {
+         "cities" : [
+            "Santiago"
+         ],
+         "continent" : "South America",
+         "currency" : [
+            "CLF",
+            "CLP"
+         ],
+         "name" : "Chile"
+      },
+      "China" : {
+         "cities" : [
+            "Beijing"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "CNY"
+         ],
+         "name" : "China"
+      },
+      "Christmas Island" : {
+         "cities" : [
+            "Flying Fish Cove"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "AUD"
+         ],
+         "name" : "Christmas Island"
+      },
+      "Cocos [Keeling] Islands" : {
+         "cities" : [
+            "West Island"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "AUD"
+         ],
+         "name" : "Cocos [Keeling] Islands"
+      },
+      "Colombia" : {
+         "cities" : [
+            "Bogotá"
+         ],
+         "continent" : "South America",
+         "currency" : [
+            "COP"
+         ],
+         "name" : "Colombia"
+      },
+      "Comoros" : {
+         "cities" : [
+            "Moroni"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "KMF"
+         ],
+         "name" : "Comoros"
+      },
+      "Cook Islands" : {
+         "cities" : [
+            "Avarua"
+         ],
+         "continent" : "Oceania",
+         "currency" : [
+            "NZD"
+         ],
+         "name" : "Cook Islands"
+      },
+      "Costa Rica" : {
+         "cities" : [
+            "San José"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "CRC"
+         ],
+         "name" : "Costa Rica"
+      },
+      "Croatia" : {
+         "cities" : [
+            "Zagreb"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "HRK"
+         ],
+         "name" : "Croatia"
+      },
+      "Cuba" : {
+         "cities" : [
+            "Havana"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "CUC",
+            "CUP"
+         ],
+         "name" : "Cuba"
+      },
+      "Curacao" : {
+         "cities" : [
+            "Willemstad"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "ANG"
+         ],
+         "name" : "Curacao"
+      },
+      "Cyprus" : {
+         "cities" : [
+            "Nicosia"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "Cyprus"
+      },
+      "Czech Republic" : {
+         "cities" : [
+            "Prague"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "CZK"
+         ],
+         "name" : "Czech Republic"
+      },
+      "Democratic Republic of the Congo" : {
+         "cities" : [
+            "Kinshasa"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "CDF"
+         ],
+         "name" : "Democratic Republic of the Congo"
+      },
+      "Denmark" : {
+         "cities" : [
+            "Copenhagen"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "DKK"
+         ],
+         "name" : "Denmark"
+      },
+      "Djibouti" : {
+         "cities" : [
+            "Djibouti"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "DJF"
+         ],
+         "name" : "Djibouti"
+      },
+      "Dominica" : {
+         "cities" : [
+            "Roseau"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "XCD"
+         ],
+         "name" : "Dominica"
+      },
+      "Dominican Republic" : {
+         "cities" : [
+            "Santo Domingo"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "DOP"
+         ],
+         "name" : "Dominican Republic"
+      },
+      "East Timor" : {
+         "cities" : [
+            "Dili"
+         ],
+         "continent" : "Oceania",
+         "currency" : [
+            "USD"
+         ],
+         "name" : "East Timor"
+      },
+      "Ecuador" : {
+         "cities" : [
+            "Quito"
+         ],
+         "continent" : "South America",
+         "currency" : [
+            "USD"
+         ],
+         "name" : "Ecuador"
+      },
+      "Egypt" : {
+         "cities" : [
+            "Cairo"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "EGP"
+         ],
+         "name" : "Egypt"
+      },
+      "El Salvador" : {
+         "cities" : [
+            "San Salvador"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "SVC",
+            "USD"
+         ],
+         "name" : "El Salvador"
+      },
+      "Equatorial Guinea" : {
+         "cities" : [
+            "Malabo"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "XAF"
+         ],
+         "name" : "Equatorial Guinea"
+      },
+      "Eritrea" : {
+         "cities" : [
+            "Asmara"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "ERN"
+         ],
+         "name" : "Eritrea"
+      },
+      "Estonia" : {
+         "cities" : [
+            "Tallinn"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "Estonia"
+      },
+      "Ethiopia" : {
+         "cities" : [
+            "Addis Ababa"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "ETB"
+         ],
+         "name" : "Ethiopia"
+      },
+      "Falkland Islands" : {
+         "cities" : [
+            "Stanley"
+         ],
+         "continent" : "South America",
+         "currency" : [
+            "FKP"
+         ],
+         "name" : "Falkland Islands"
+      },
+      "Faroe Islands" : {
+         "cities" : [
+            "Tórshavn"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "DKK"
+         ],
+         "name" : "Faroe Islands"
+      },
+      "Fiji" : {
+         "cities" : [
+            "Suva"
+         ],
+         "continent" : "Oceania",
+         "currency" : [
+            "FJD"
+         ],
+         "name" : "Fiji"
+      },
+      "Finland" : {
+         "cities" : [
+            "Helsinki"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "Finland"
+      },
+      "France" : {
+         "cities" : [
+            "Paris"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "France"
+      },
+      "French Guiana" : {
+         "cities" : [
+            "Cayenne"
+         ],
+         "continent" : "South America",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "French Guiana"
+      },
+      "French Polynesia" : {
+         "cities" : [
+            "Papeetē"
+         ],
+         "continent" : "Oceania",
+         "currency" : [
+            "XPF"
+         ],
+         "name" : "French Polynesia"
+      },
+      "French Southern Territories" : {
+         "cities" : [
+            "Port-aux-Français"
+         ],
+         "continent" : "Antarctica",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "French Southern Territories"
+      },
+      "Gabon" : {
+         "cities" : [
+            "Libreville"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "XAF"
+         ],
+         "name" : "Gabon"
+      },
+      "Gambia" : {
+         "cities" : [
+            "Banjul"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "GMD"
+         ],
+         "name" : "Gambia"
+      },
+      "Georgia" : {
+         "cities" : [
+            "Tbilisi"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "GEL"
+         ],
+         "name" : "Georgia"
+      },
+      "Germany" : {
+         "cities" : [
+            "Berlin"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "Germany"
+      },
+      "Ghana" : {
+         "cities" : [
+            "Accra"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "GHS"
+         ],
+         "name" : "Ghana"
+      },
+      "Gibraltar" : {
+         "cities" : [
+            "Gibraltar"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "GIP"
+         ],
+         "name" : "Gibraltar"
+      },
+      "Greece" : {
+         "cities" : [
+            "Athens"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "Greece"
+      },
+      "Greenland" : {
+         "cities" : [
+            "Nuuk"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "DKK"
+         ],
+         "name" : "Greenland"
+      },
+      "Grenada" : {
+         "cities" : [
+            "St. George's"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "XCD"
+         ],
+         "name" : "Grenada"
+      },
+      "Guadeloupe" : {
+         "cities" : [
+            "Basse-Terre"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "Guadeloupe"
+      },
+      "Guam" : {
+         "cities" : [
+            "Hagåtña"
+         ],
+         "continent" : "Oceania",
+         "currency" : [
+            "USD"
+         ],
+         "name" : "Guam"
+      },
+      "Guatemala" : {
+         "cities" : [
+            "Guatemala City"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "GTQ"
+         ],
+         "name" : "Guatemala"
+      },
+      "Guernsey" : {
+         "cities" : [
+            "St. Peter Port"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "GBP"
+         ],
+         "name" : "Guernsey"
+      },
+      "Guinea" : {
+         "cities" : [
+            "Conakry"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "GNF"
+         ],
+         "name" : "Guinea"
+      },
+      "Guinea-Bissau" : {
+         "cities" : [
+            "Bissau"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "XOF"
+         ],
+         "name" : "Guinea-Bissau"
+      },
+      "Guyana" : {
+         "cities" : [
+            "Georgetown"
+         ],
+         "continent" : "South America",
+         "currency" : [
+            "GYD"
+         ],
+         "name" : "Guyana"
+      },
+      "Haiti" : {
+         "cities" : [
+            "Port-au-Prince"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "HTG",
+            "USD"
+         ],
+         "name" : "Haiti"
+      },
+      "Heard Island and McDonald Islands" : {
+         "cities" : [
+            "Heard Island and McDonald Islands"
+         ],
+         "continent" : "Antarctica",
+         "currency" : [
+            "AUD"
+         ],
+         "name" : "Heard Island and McDonald Islands"
+      },
+      "Honduras" : {
+         "cities" : [
+            "Tegucigalpa"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "HNL"
+         ],
+         "name" : "Honduras"
+      },
+      "Hong Kong" : {
+         "cities" : [
+            "City of Victoria"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "HKD"
+         ],
+         "name" : "Hong Kong"
+      },
+      "Hungary" : {
+         "cities" : [
+            "Budapest"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "HUF"
+         ],
+         "name" : "Hungary"
+      },
+      "Iceland" : {
+         "cities" : [
+            "Reykjavik"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "ISK"
+         ],
+         "name" : "Iceland"
+      },
+      "India" : {
+         "cities" : [
+            "New Delhi"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "INR"
+         ],
+         "name" : "India"
+      },
+      "Indonesia" : {
+         "cities" : [
+            "Jakarta"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "IDR"
+         ],
+         "name" : "Indonesia"
+      },
+      "Iran" : {
+         "cities" : [
+            "Tehran"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "IRR"
+         ],
+         "name" : "Iran"
+      },
+      "Iraq" : {
+         "cities" : [
+            "Baghdad"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "IQD"
+         ],
+         "name" : "Iraq"
+      },
+      "Ireland" : {
+         "cities" : [
+            "Dublin"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "Ireland"
+      },
+      "Isle of Man" : {
+         "cities" : [
+            "Douglas"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "GBP"
+         ],
+         "name" : "Isle of Man"
+      },
+      "Israel" : {
+         "cities" : [
+            "Jerusalem"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "ILS"
+         ],
+         "name" : "Israel"
+      },
+      "Italy" : {
+         "cities" : [
+            "Rome"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "Italy"
+      },
+      "Ivory Coast" : {
+         "cities" : [
+            "Yamoussoukro"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "XOF"
+         ],
+         "name" : "Ivory Coast"
+      },
+      "Jamaica" : {
+         "cities" : [
+            "Kingston"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "JMD"
+         ],
+         "name" : "Jamaica"
+      },
+      "Japan" : {
+         "cities" : [
+            "Tokyo"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "JPY"
+         ],
+         "name" : "Japan"
+      },
+      "Jersey" : {
+         "cities" : [
+            "Saint Helier"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "GBP"
+         ],
+         "name" : "Jersey"
+      },
+      "Jordan" : {
+         "cities" : [
+            "Amman"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "JOD"
+         ],
+         "name" : "Jordan"
+      },
+      "Kazakhstan" : {
+         "cities" : [
+            "Astana"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "KZT"
+         ],
+         "name" : "Kazakhstan"
+      },
+      "Kenya" : {
+         "cities" : [
+            "Nairobi"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "KES"
+         ],
+         "name" : "Kenya"
+      },
+      "Kiribati" : {
+         "cities" : [
+            "South Tarawa"
+         ],
+         "continent" : "Oceania",
+         "currency" : [
+            "AUD"
+         ],
+         "name" : "Kiribati"
+      },
+      "Kosovo" : {
+         "cities" : [
+            "Pristina"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "Kosovo"
+      },
+      "Kuwait" : {
+         "cities" : [
+            "Kuwait City"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "KWD"
+         ],
+         "name" : "Kuwait"
+      },
+      "Kyrgyzstan" : {
+         "cities" : [
+            "Bishkek"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "KGS"
+         ],
+         "name" : "Kyrgyzstan"
+      },
+      "Laos" : {
+         "cities" : [
+            "Vientiane"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "LAK"
+         ],
+         "name" : "Laos"
+      },
+      "Latvia" : {
+         "cities" : [
+            "Riga"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "Latvia"
+      },
+      "Lebanon" : {
+         "cities" : [
+            "Beirut"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "LBP"
+         ],
+         "name" : "Lebanon"
+      },
+      "Lesotho" : {
+         "cities" : [
+            "Maseru"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "LSL",
+            "ZAR"
+         ],
+         "name" : "Lesotho"
+      },
+      "Liberia" : {
+         "cities" : [
+            "Monrovia"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "LRD"
+         ],
+         "name" : "Liberia"
+      },
+      "Libya" : {
+         "cities" : [
+            "Tripoli"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "LYD"
+         ],
+         "name" : "Libya"
+      },
+      "Liechtenstein" : {
+         "cities" : [
+            "Vaduz"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "CHF"
+         ],
+         "name" : "Liechtenstein"
+      },
+      "Lithuania" : {
+         "cities" : [
+            "Vilnius"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "Lithuania"
+      },
+      "Luxembourg" : {
+         "cities" : [
+            "Luxembourg"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "Luxembourg"
+      },
+      "Macao" : {
+         "cities" : [
+            "Macao"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "MOP"
+         ],
+         "name" : "Macao"
+      },
+      "Madagascar" : {
+         "cities" : [
+            "Antananarivo"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "MGA"
+         ],
+         "name" : "Madagascar"
+      },
+      "Malawi" : {
+         "cities" : [
+            "Lilongwe"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "MWK"
+         ],
+         "name" : "Malawi"
+      },
+      "Malaysia" : {
+         "cities" : [
+            "Kuala Lumpur"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "MYR"
+         ],
+         "name" : "Malaysia"
+      },
+      "Maldives" : {
+         "cities" : [
+            "Malé"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "MVR"
+         ],
+         "name" : "Maldives"
+      },
+      "Mali" : {
+         "cities" : [
+            "Bamako"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "XOF"
+         ],
+         "name" : "Mali"
+      },
+      "Malta" : {
+         "cities" : [
+            "Valletta"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "Malta"
+      },
+      "Marshall Islands" : {
+         "cities" : [
+            "Majuro"
+         ],
+         "continent" : "Oceania",
+         "currency" : [
+            "USD"
+         ],
+         "name" : "Marshall Islands"
+      },
+      "Martinique" : {
+         "cities" : [
+            "Fort-de-France"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "Martinique"
+      },
+      "Mauritania" : {
+         "cities" : [
+            "Nouakchott"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "MRU"
+         ],
+         "name" : "Mauritania"
+      },
+      "Mauritius" : {
+         "cities" : [
+            "Port Louis"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "MUR"
+         ],
+         "name" : "Mauritius"
+      },
+      "Mayotte" : {
+         "cities" : [
+            "Mamoudzou"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "Mayotte"
+      },
+      "Mexico" : {
+         "cities" : [
+            "Mexico City"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "MXN"
+         ],
+         "name" : "Mexico"
+      },
+      "Micronesia" : {
+         "cities" : [
+            "Palikir"
+         ],
+         "continent" : "Oceania",
+         "currency" : [
+            "USD"
+         ],
+         "name" : "Micronesia"
+      },
+      "Moldova" : {
+         "cities" : [
+            "Chișinău"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "MDL"
+         ],
+         "name" : "Moldova"
+      },
+      "Monaco" : {
+         "cities" : [
+            "Monaco"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "Monaco"
+      },
+      "Mongolia" : {
+         "cities" : [
+            "Ulan Bator"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "MNT"
+         ],
+         "name" : "Mongolia"
+      },
+      "Montenegro" : {
+         "cities" : [
+            "Podgorica"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "Montenegro"
+      },
+      "Montserrat" : {
+         "cities" : [
+            "Plymouth"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "XCD"
+         ],
+         "name" : "Montserrat"
+      },
+      "Morocco" : {
+         "cities" : [
+            "Rabat"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "MAD"
+         ],
+         "name" : "Morocco"
+      },
+      "Mozambique" : {
+         "cities" : [
+            "Maputo"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "MZN"
+         ],
+         "name" : "Mozambique"
+      },
+      "Myanmar [Burma]" : {
+         "cities" : [
+            "Naypyidaw"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "MMK"
+         ],
+         "name" : "Myanmar [Burma]"
+      },
+      "Namibia" : {
+         "cities" : [
+            "Windhoek"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "NAD",
+            "ZAR"
+         ],
+         "name" : "Namibia"
+      },
+      "Nauru" : {
+         "cities" : [
+            "Yaren"
+         ],
+         "continent" : "Oceania",
+         "currency" : [
+            "AUD"
+         ],
+         "name" : "Nauru"
+      },
+      "Nepal" : {
+         "cities" : [
+            "Kathmandu"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "NPR"
+         ],
+         "name" : "Nepal"
+      },
+      "Netherlands" : {
+         "cities" : [
+            "Amsterdam"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "Netherlands"
+      },
+      "New Caledonia" : {
+         "cities" : [
+            "Nouméa"
+         ],
+         "continent" : "Oceania",
+         "currency" : [
+            "XPF"
+         ],
+         "name" : "New Caledonia"
+      },
+      "New Zealand" : {
+         "cities" : [
+            "Wellington"
+         ],
+         "continent" : "Oceania",
+         "currency" : [
+            "NZD"
+         ],
+         "name" : "New Zealand"
+      },
+      "Nicaragua" : {
+         "cities" : [
+            "Managua"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "NIO"
+         ],
+         "name" : "Nicaragua"
+      },
+      "Niger" : {
+         "cities" : [
+            "Niamey"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "XOF"
+         ],
+         "name" : "Niger"
+      },
+      "Nigeria" : {
+         "cities" : [
+            "Abuja"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "NGN"
+         ],
+         "name" : "Nigeria"
+      },
+      "Niue" : {
+         "cities" : [
+            "Alofi"
+         ],
+         "continent" : "Oceania",
+         "currency" : [
+            "NZD"
+         ],
+         "name" : "Niue"
+      },
+      "Norfolk Island" : {
+         "cities" : [
+            "Kingston"
+         ],
+         "continent" : "Oceania",
+         "currency" : [
+            "AUD"
+         ],
+         "name" : "Norfolk Island"
+      },
+      "North Korea" : {
+         "cities" : [
+            "Pyongyang"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "KPW"
+         ],
+         "name" : "North Korea"
+      },
+      "North Macedonia" : {
+         "cities" : [
+            "Skopje"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "MKD"
+         ],
+         "name" : "North Macedonia"
+      },
+      "Northern Mariana Islands" : {
+         "cities" : [
+            "Saipan"
+         ],
+         "continent" : "Oceania",
+         "currency" : [
+            "USD"
+         ],
+         "name" : "Northern Mariana Islands"
+      },
+      "Norway" : {
+         "cities" : [
+            "Oslo"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "NOK"
+         ],
+         "name" : "Norway"
+      },
+      "Oman" : {
+         "cities" : [
+            "Muscat"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "OMR"
+         ],
+         "name" : "Oman"
+      },
+      "Pakistan" : {
+         "cities" : [
+            "Islamabad"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "PKR"
+         ],
+         "name" : "Pakistan"
+      },
+      "Palau" : {
+         "cities" : [
+            "Ngerulmud"
+         ],
+         "continent" : "Oceania",
+         "currency" : [
+            "USD"
+         ],
+         "name" : "Palau"
+      },
+      "Palestine" : {
+         "cities" : [
+            "Ramallah"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "ILS"
+         ],
+         "name" : "Palestine"
+      },
+      "Panama" : {
+         "cities" : [
+            "Panama City"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "PAB",
+            "USD"
+         ],
+         "name" : "Panama"
+      },
+      "Papua New Guinea" : {
+         "cities" : [
+            "Port Moresby"
+         ],
+         "continent" : "Oceania",
+         "currency" : [
+            "PGK"
+         ],
+         "name" : "Papua New Guinea"
+      },
+      "Paraguay" : {
+         "cities" : [
+            "Asunción"
+         ],
+         "continent" : "South America",
+         "currency" : [
+            "PYG"
+         ],
+         "name" : "Paraguay"
+      },
+      "Peru" : {
+         "cities" : [
+            "Lima"
+         ],
+         "continent" : "South America",
+         "currency" : [
+            "PEN"
+         ],
+         "name" : "Peru"
+      },
+      "Philippines" : {
+         "cities" : [
+            "Manila"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "PHP"
+         ],
+         "name" : "Philippines"
+      },
+      "Pitcairn Islands" : {
+         "cities" : [
+            "Adamstown"
+         ],
+         "continent" : "Oceania",
+         "currency" : [
+            "NZD"
+         ],
+         "name" : "Pitcairn Islands"
+      },
+      "Poland" : {
+         "cities" : [
+            "Warsaw"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "PLN"
+         ],
+         "name" : "Poland"
+      },
+      "Portugal" : {
+         "cities" : [
+            "Lisbon"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "Portugal"
+      },
+      "Puerto Rico" : {
+         "cities" : [
+            "San Juan"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "USD"
+         ],
+         "name" : "Puerto Rico"
+      },
+      "Qatar" : {
+         "cities" : [
+            "Doha"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "QAR"
+         ],
+         "name" : "Qatar"
+      },
+      "Republic of the Congo" : {
+         "cities" : [
+            "Brazzaville"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "XAF"
+         ],
+         "name" : "Republic of the Congo"
+      },
+      "Romania" : {
+         "cities" : [
+            "Bucharest"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "RON"
+         ],
+         "name" : "Romania"
+      },
+      "Russia" : {
+         "cities" : [
+            "Moscow"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "RUB"
+         ],
+         "name" : "Russia"
+      },
+      "Rwanda" : {
+         "cities" : [
+            "Kigali"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "RWF"
+         ],
+         "name" : "Rwanda"
+      },
+      "Réunion" : {
+         "cities" : [
+            "Saint-Denis"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "Réunion"
+      },
+      "Saint Barthélemy" : {
+         "cities" : [
+            "Gustavia"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "Saint Barthélemy"
+      },
+      "Saint Helena" : {
+         "cities" : [
+            "Jamestown"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "SHP"
+         ],
+         "name" : "Saint Helena"
+      },
+      "Saint Kitts and Nevis" : {
+         "cities" : [
+            "Basseterre"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "XCD"
+         ],
+         "name" : "Saint Kitts and Nevis"
+      },
+      "Saint Lucia" : {
+         "cities" : [
+            "Castries"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "XCD"
+         ],
+         "name" : "Saint Lucia"
+      },
+      "Saint Martin" : {
+         "cities" : [
+            "Marigot"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "Saint Martin"
+      },
+      "Saint Pierre and Miquelon" : {
+         "cities" : [
+            "Saint-Pierre"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "Saint Pierre and Miquelon"
+      },
+      "Saint Vincent and the Grenadines" : {
+         "cities" : [
+            "Kingstown"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "XCD"
+         ],
+         "name" : "Saint Vincent and the Grenadines"
+      },
+      "Samoa" : {
+         "cities" : [
+            "Apia"
+         ],
+         "continent" : "Oceania",
+         "currency" : [
+            "WST"
+         ],
+         "name" : "Samoa"
+      },
+      "San Marino" : {
+         "cities" : [
+            "City of San Marino"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "San Marino"
+      },
+      "Saudi Arabia" : {
+         "cities" : [
+            "Riyadh"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "SAR"
+         ],
+         "name" : "Saudi Arabia"
+      },
+      "Senegal" : {
+         "cities" : [
+            "Dakar"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "XOF"
+         ],
+         "name" : "Senegal"
+      },
+      "Serbia" : {
+         "cities" : [
+            "Belgrade"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "RSD"
+         ],
+         "name" : "Serbia"
+      },
+      "Seychelles" : {
+         "cities" : [
+            "Victoria"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "SCR"
+         ],
+         "name" : "Seychelles"
+      },
+      "Sierra Leone" : {
+         "cities" : [
+            "Freetown"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "SLL"
+         ],
+         "name" : "Sierra Leone"
+      },
+      "Singapore" : {
+         "cities" : [
+            "Singapore"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "SGD"
+         ],
+         "name" : "Singapore"
+      },
+      "Sint Maarten" : {
+         "cities" : [
+            "Philipsburg"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "ANG"
+         ],
+         "name" : "Sint Maarten"
+      },
+      "Slovakia" : {
+         "cities" : [
+            "Bratislava"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "Slovakia"
+      },
+      "Slovenia" : {
+         "cities" : [
+            "Ljubljana"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "Slovenia"
+      },
+      "Solomon Islands" : {
+         "cities" : [
+            "Honiara"
+         ],
+         "continent" : "Oceania",
+         "currency" : [
+            "SBD"
+         ],
+         "name" : "Solomon Islands"
+      },
+      "Somalia" : {
+         "cities" : [
+            "Mogadishu"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "SOS"
+         ],
+         "name" : "Somalia"
+      },
+      "South Africa" : {
+         "cities" : [
+            "Pretoria"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "ZAR"
+         ],
+         "name" : "South Africa"
+      },
+      "South Georgia and the South Sandwich Islands" : {
+         "cities" : [
+            "King Edward Point"
+         ],
+         "continent" : "Antarctica",
+         "currency" : [
+            "GBP"
+         ],
+         "name" : "South Georgia and the South Sandwich Islands"
+      },
+      "South Korea" : {
+         "cities" : [
+            "Seoul"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "KRW"
+         ],
+         "name" : "South Korea"
+      },
+      "South Sudan" : {
+         "cities" : [
+            "Juba"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "SSP"
+         ],
+         "name" : "South Sudan"
+      },
+      "Spain" : {
+         "cities" : [
+            "Madrid"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "Spain"
+      },
+      "Sri Lanka" : {
+         "cities" : [
+            "Colombo"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "LKR"
+         ],
+         "name" : "Sri Lanka"
+      },
+      "Sudan" : {
+         "cities" : [
+            "Khartoum"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "SDG"
+         ],
+         "name" : "Sudan"
+      },
+      "Suriname" : {
+         "cities" : [
+            "Paramaribo"
+         ],
+         "continent" : "South America",
+         "currency" : [
+            "SRD"
+         ],
+         "name" : "Suriname"
+      },
+      "Svalbard and Jan Mayen" : {
+         "cities" : [
+            "Longyearbyen"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "NOK"
+         ],
+         "name" : "Svalbard and Jan Mayen"
+      },
+      "Swaziland" : {
+         "cities" : [
+            "Lobamba"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "SZL"
+         ],
+         "name" : "Swaziland"
+      },
+      "Sweden" : {
+         "cities" : [
+            "Stockholm"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "SEK"
+         ],
+         "name" : "Sweden"
+      },
+      "Switzerland" : {
+         "cities" : [
+            "Bern"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "CHE",
+            "CHF",
+            "CHW"
+         ],
+         "name" : "Switzerland"
+      },
+      "Syria" : {
+         "cities" : [
+            "Damascus"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "SYP"
+         ],
+         "name" : "Syria"
+      },
+      "São Tomé and Príncipe" : {
+         "cities" : [
+            "São Tomé"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "STN"
+         ],
+         "name" : "São Tomé and Príncipe"
+      },
+      "Taiwan" : {
+         "cities" : [
+            "Taipei"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "TWD"
+         ],
+         "name" : "Taiwan"
+      },
+      "Tajikistan" : {
+         "cities" : [
+            "Dushanbe"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "TJS"
+         ],
+         "name" : "Tajikistan"
+      },
+      "Tanzania" : {
+         "cities" : [
+            "Dodoma"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "TZS"
+         ],
+         "name" : "Tanzania"
+      },
+      "Thailand" : {
+         "cities" : [
+            "Bangkok"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "THB"
+         ],
+         "name" : "Thailand"
+      },
+      "Togo" : {
+         "cities" : [
+            "Lomé"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "XOF"
+         ],
+         "name" : "Togo"
+      },
+      "Tokelau" : {
+         "cities" : [
+            "Fakaofo"
+         ],
+         "continent" : "Oceania",
+         "currency" : [
+            "NZD"
+         ],
+         "name" : "Tokelau"
+      },
+      "Tonga" : {
+         "cities" : [
+            "Nuku'alofa"
+         ],
+         "continent" : "Oceania",
+         "currency" : [
+            "TOP"
+         ],
+         "name" : "Tonga"
+      },
+      "Trinidad and Tobago" : {
+         "cities" : [
+            "Port of Spain"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "TTD"
+         ],
+         "name" : "Trinidad and Tobago"
+      },
+      "Tunisia" : {
+         "cities" : [
+            "Tunis"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "TND"
+         ],
+         "name" : "Tunisia"
+      },
+      "Turkey" : {
+         "cities" : [
+            "Ankara"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "TRY"
+         ],
+         "name" : "Turkey"
+      },
+      "Turkmenistan" : {
+         "cities" : [
+            "Ashgabat"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "TMT"
+         ],
+         "name" : "Turkmenistan"
+      },
+      "Turks and Caicos Islands" : {
+         "cities" : [
+            "Cockburn Town"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "USD"
+         ],
+         "name" : "Turks and Caicos Islands"
+      },
+      "Tuvalu" : {
+         "cities" : [
+            "Funafuti"
+         ],
+         "continent" : "Oceania",
+         "currency" : [
+            "AUD"
+         ],
+         "name" : "Tuvalu"
+      },
+      "U.S. Minor Outlying Islands" : {
+         "cities" : [
+            "U.S. Minor Outlying Islands"
+         ],
+         "continent" : "Oceania",
+         "currency" : [
+            "USD"
+         ],
+         "name" : "U.S. Minor Outlying Islands"
+      },
+      "U.S. Virgin Islands" : {
+         "cities" : [
+            "Charlotte Amalie"
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "USD"
+         ],
+         "name" : "U.S. Virgin Islands"
+      },
+      "Uganda" : {
+         "cities" : [
+            "Kampala"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "UGX"
+         ],
+         "name" : "Uganda"
+      },
+      "Ukraine" : {
+         "cities" : [
+            "Kyiv"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "UAH"
+         ],
+         "name" : "Ukraine"
+      },
+      "United Arab Emirates" : {
+         "cities" : [
+            "Abu Dhabi"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "AED"
+         ],
+         "name" : "United Arab Emirates"
+      },
+      "United Kingdom" : {
+         "cities" : [
+            "London"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "GBP"
+         ],
+         "name" : "United Kingdom"
+      },
+      "United States" : {
+         "cities" : [
+            "Washington D.C."
+         ],
+         "continent" : "North America",
+         "currency" : [
+            "USD",
+            "USN",
+            "USS"
+         ],
+         "name" : "United States"
+      },
+      "Uruguay" : {
+         "cities" : [
+            "Montevideo"
+         ],
+         "continent" : "South America",
+         "currency" : [
+            "UYI",
+            "UYU"
+         ],
+         "name" : "Uruguay"
+      },
+      "Uzbekistan" : {
+         "cities" : [
+            "Tashkent"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "UZS"
+         ],
+         "name" : "Uzbekistan"
+      },
+      "Vanuatu" : {
+         "cities" : [
+            "Port Vila"
+         ],
+         "continent" : "Oceania",
+         "currency" : [
+            "VUV"
+         ],
+         "name" : "Vanuatu"
+      },
+      "Vatican City" : {
+         "cities" : [
+            "Vatican City"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "Vatican City"
+      },
+      "Venezuela" : {
+         "cities" : [
+            "Caracas"
+         ],
+         "continent" : "South America",
+         "currency" : [
+            "VES"
+         ],
+         "name" : "Venezuela"
+      },
+      "Vietnam" : {
+         "cities" : [
+            "Hanoi"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "VND"
+         ],
+         "name" : "Vietnam"
+      },
+      "Wallis and Futuna" : {
+         "cities" : [
+            "Mata-Utu"
+         ],
+         "continent" : "Oceania",
+         "currency" : [
+            "XPF"
+         ],
+         "name" : "Wallis and Futuna"
+      },
+      "Western Sahara" : {
+         "cities" : [
+            "El Aaiún"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "MAD",
+            "DZD",
+            "MRU"
+         ],
+         "name" : "Western Sahara"
+      },
+      "Yemen" : {
+         "cities" : [
+            "Sana'a"
+         ],
+         "continent" : "Asia",
+         "currency" : [
+            "YER"
+         ],
+         "name" : "Yemen"
+      },
+      "Zambia" : {
+         "cities" : [
+            "Lusaka"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "ZMW"
+         ],
+         "name" : "Zambia"
+      },
+      "Zimbabwe" : {
+         "cities" : [
+            "Harare"
+         ],
+         "continent" : "Africa",
+         "currency" : [
+            "USD",
+            "ZAR",
+            "BWP",
+            "GBP",
+            "AUD",
+            "CNY",
+            "INR",
+            "JPY"
+         ],
+         "name" : "Zimbabwe"
+      },
+      "Åland" : {
+         "cities" : [
+            "Mariehamn"
+         ],
+         "continent" : "Europe",
+         "currency" : [
+            "EUR"
+         ],
+         "name" : "Åland"
+      }
+   },
+   "currencies" : {
+      "AED" : {
+         "country" : [
+            "United Arab Emirates"
+         ],
+         "name" : "AED"
+      },
+      "AFN" : {
+         "country" : [
+            "Afghanistan"
+         ],
+         "name" : "AFN"
+      },
+      "ALL" : {
+         "country" : [
+            "Albania"
+         ],
+         "name" : "ALL"
+      },
+      "AMD" : {
+         "country" : [
+            "Armenia"
+         ],
+         "name" : "AMD"
+      },
+      "ANG" : {
+         "country" : [
+            "Curacao",
+            "Sint Maarten"
+         ],
+         "name" : "ANG"
+      },
+      "AOA" : {
+         "country" : [
+            "Angola"
+         ],
+         "name" : "AOA"
+      },
+      "ARS" : {
+         "country" : [
+            "Argentina"
+         ],
+         "name" : "ARS"
+      },
+      "AUD" : {
+         "country" : [
+            "Zimbabwe",
+            "Australia",
+            "Christmas Island",
+            "Norfolk Island",
+            "Kiribati",
+            "Cocos [Keeling] Islands",
+            "Heard Island and McDonald Islands",
+            "Nauru",
+            "Tuvalu"
+         ],
+         "name" : "AUD"
+      },
+      "AWG" : {
+         "country" : [
+            "Aruba"
+         ],
+         "name" : "AWG"
+      },
+      "AZN" : {
+         "country" : [
+            "Azerbaijan"
+         ],
+         "name" : "AZN"
+      },
+      "BAM" : {
+         "country" : [
+            "Bosnia and Herzegovina"
+         ],
+         "name" : "BAM"
+      },
+      "BBD" : {
+         "country" : [
+            "Barbados"
+         ],
+         "name" : "BBD"
+      },
+      "BDT" : {
+         "country" : [
+            "Bangladesh"
+         ],
+         "name" : "BDT"
+      },
+      "BGN" : {
+         "country" : [
+            "Bulgaria"
+         ],
+         "name" : "BGN"
+      },
+      "BHD" : {
+         "country" : [
+            "Bahrain"
+         ],
+         "name" : "BHD"
+      },
+      "BIF" : {
+         "country" : [
+            "Burundi"
+         ],
+         "name" : "BIF"
+      },
+      "BMD" : {
+         "country" : [
+            "Bermuda"
+         ],
+         "name" : "BMD"
+      },
+      "BND" : {
+         "country" : [
+            "Brunei"
+         ],
+         "name" : "BND"
+      },
+      "BOB" : {
+         "country" : [
+            "Bolivia"
+         ],
+         "name" : "BOB"
+      },
+      "BOV" : {
+         "country" : [
+            "Bolivia"
+         ],
+         "name" : "BOV"
+      },
+      "BRL" : {
+         "country" : [
+            "Brazil"
+         ],
+         "name" : "BRL"
+      },
+      "BSD" : {
+         "country" : [
+            "Bahamas"
+         ],
+         "name" : "BSD"
+      },
+      "BTN" : {
+         "country" : [
+            "Bhutan"
+         ],
+         "name" : "BTN"
+      },
+      "BWP" : {
+         "country" : [
+            "Zimbabwe",
+            "Botswana"
+         ],
+         "name" : "BWP"
+      },
+      "BYN" : {
+         "country" : [
+            "Belarus"
+         ],
+         "name" : "BYN"
+      },
+      "BZD" : {
+         "country" : [
+            "Belize"
+         ],
+         "name" : "BZD"
+      },
+      "CAD" : {
+         "country" : [
+            "Canada"
+         ],
+         "name" : "CAD"
+      },
+      "CDF" : {
+         "country" : [
+            "Democratic Republic of the Congo"
+         ],
+         "name" : "CDF"
+      },
+      "CHE" : {
+         "country" : [
+            "Switzerland"
+         ],
+         "name" : "CHE"
+      },
+      "CHF" : {
+         "country" : [
+            "Switzerland",
+            "Liechtenstein"
+         ],
+         "name" : "CHF"
+      },
+      "CHW" : {
+         "country" : [
+            "Switzerland"
+         ],
+         "name" : "CHW"
+      },
+      "CLF" : {
+         "country" : [
+            "Chile"
+         ],
+         "name" : "CLF"
+      },
+      "CLP" : {
+         "country" : [
+            "Chile"
+         ],
+         "name" : "CLP"
+      },
+      "CNY" : {
+         "country" : [
+            "Zimbabwe",
+            "China"
+         ],
+         "name" : "CNY"
+      },
+      "COP" : {
+         "country" : [
+            "Colombia"
+         ],
+         "name" : "COP"
+      },
+      "CRC" : {
+         "country" : [
+            "Costa Rica"
+         ],
+         "name" : "CRC"
+      },
+      "CUC" : {
+         "country" : [
+            "Cuba"
+         ],
+         "name" : "CUC"
+      },
+      "CUP" : {
+         "country" : [
+            "Cuba"
+         ],
+         "name" : "CUP"
+      },
+      "CVE" : {
+         "country" : [
+            "Cape Verde"
+         ],
+         "name" : "CVE"
+      },
+      "CZK" : {
+         "country" : [
+            "Czech Republic"
+         ],
+         "name" : "CZK"
+      },
+      "DJF" : {
+         "country" : [
+            "Djibouti"
+         ],
+         "name" : "DJF"
+      },
+      "DKK" : {
+         "country" : [
+            "Faroe Islands",
+            "Greenland",
+            "Denmark"
+         ],
+         "name" : "DKK"
+      },
+      "DOP" : {
+         "country" : [
+            "Dominican Republic"
+         ],
+         "name" : "DOP"
+      },
+      "DZD" : {
+         "country" : [
+            "Algeria",
+            "Western Sahara"
+         ],
+         "name" : "DZD"
+      },
+      "EGP" : {
+         "country" : [
+            "Egypt"
+         ],
+         "name" : "EGP"
+      },
+      "ERN" : {
+         "country" : [
+            "Eritrea"
+         ],
+         "name" : "ERN"
+      },
+      "ETB" : {
+         "country" : [
+            "Ethiopia"
+         ],
+         "name" : "ETB"
+      },
+      "EUR" : {
+         "country" : [
+            "Cyprus",
+            "Åland",
+            "Estonia",
+            "Guadeloupe",
+            "Réunion",
+            "Slovenia",
+            "San Marino",
+            "Andorra",
+            "Saint Martin",
+            "Luxembourg",
+            "Ireland",
+            "Mayotte",
+            "Slovakia",
+            "French Southern Territories",
+            "Italy",
+            "Monaco",
+            "French Guiana",
+            "Kosovo",
+            "Saint Barthélemy",
+            "Saint Pierre and Miquelon",
+            "Finland",
+            "Martinique",
+            "Spain",
+            "Germany",
+            "Lithuania",
+            "Latvia",
+            "Portugal",
+            "France",
+            "Belgium",
+            "Montenegro",
+            "Vatican City",
+            "Austria",
+            "Malta",
+            "Greece",
+            "Netherlands"
+         ],
+         "name" : "EUR"
+      },
+      "FJD" : {
+         "country" : [
+            "Fiji"
+         ],
+         "name" : "FJD"
+      },
+      "FKP" : {
+         "country" : [
+            "Falkland Islands"
+         ],
+         "name" : "FKP"
+      },
+      "GBP" : {
+         "country" : [
+            "Zimbabwe",
+            "Guernsey",
+            "United Kingdom",
+            "South Georgia and the South Sandwich Islands",
+            "Isle of Man",
+            "Jersey"
+         ],
+         "name" : "GBP"
+      },
+      "GEL" : {
+         "country" : [
+            "Georgia"
+         ],
+         "name" : "GEL"
+      },
+      "GHS" : {
+         "country" : [
+            "Ghana"
+         ],
+         "name" : "GHS"
+      },
+      "GIP" : {
+         "country" : [
+            "Gibraltar"
+         ],
+         "name" : "GIP"
+      },
+      "GMD" : {
+         "country" : [
+            "Gambia"
+         ],
+         "name" : "GMD"
+      },
+      "GNF" : {
+         "country" : [
+            "Guinea"
+         ],
+         "name" : "GNF"
+      },
+      "GTQ" : {
+         "country" : [
+            "Guatemala"
+         ],
+         "name" : "GTQ"
+      },
+      "GYD" : {
+         "country" : [
+            "Guyana"
+         ],
+         "name" : "GYD"
+      },
+      "HKD" : {
+         "country" : [
+            "Hong Kong"
+         ],
+         "name" : "HKD"
+      },
+      "HNL" : {
+         "country" : [
+            "Honduras"
+         ],
+         "name" : "HNL"
+      },
+      "HRK" : {
+         "country" : [
+            "Croatia"
+         ],
+         "name" : "HRK"
+      },
+      "HTG" : {
+         "country" : [
+            "Haiti"
+         ],
+         "name" : "HTG"
+      },
+      "HUF" : {
+         "country" : [
+            "Hungary"
+         ],
+         "name" : "HUF"
+      },
+      "IDR" : {
+         "country" : [
+            "Indonesia"
+         ],
+         "name" : "IDR"
+      },
+      "ILS" : {
+         "country" : [
+            "Israel",
+            "Palestine"
+         ],
+         "name" : "ILS"
+      },
+      "INR" : {
+         "country" : [
+            "Zimbabwe",
+            "India",
+            "Bhutan"
+         ],
+         "name" : "INR"
+      },
+      "IQD" : {
+         "country" : [
+            "Iraq"
+         ],
+         "name" : "IQD"
+      },
+      "IRR" : {
+         "country" : [
+            "Iran"
+         ],
+         "name" : "IRR"
+      },
+      "ISK" : {
+         "country" : [
+            "Iceland"
+         ],
+         "name" : "ISK"
+      },
+      "JMD" : {
+         "country" : [
+            "Jamaica"
+         ],
+         "name" : "JMD"
+      },
+      "JOD" : {
+         "country" : [
+            "Jordan"
+         ],
+         "name" : "JOD"
+      },
+      "JPY" : {
+         "country" : [
+            "Zimbabwe",
+            "Japan"
+         ],
+         "name" : "JPY"
+      },
+      "KES" : {
+         "country" : [
+            "Kenya"
+         ],
+         "name" : "KES"
+      },
+      "KGS" : {
+         "country" : [
+            "Kyrgyzstan"
+         ],
+         "name" : "KGS"
+      },
+      "KHR" : {
+         "country" : [
+            "Cambodia"
+         ],
+         "name" : "KHR"
+      },
+      "KMF" : {
+         "country" : [
+            "Comoros"
+         ],
+         "name" : "KMF"
+      },
+      "KPW" : {
+         "country" : [
+            "North Korea"
+         ],
+         "name" : "KPW"
+      },
+      "KRW" : {
+         "country" : [
+            "South Korea"
+         ],
+         "name" : "KRW"
+      },
+      "KWD" : {
+         "country" : [
+            "Kuwait"
+         ],
+         "name" : "KWD"
+      },
+      "KYD" : {
+         "country" : [
+            "Cayman Islands"
+         ],
+         "name" : "KYD"
+      },
+      "KZT" : {
+         "country" : [
+            "Kazakhstan"
+         ],
+         "name" : "KZT"
+      },
+      "LAK" : {
+         "country" : [
+            "Laos"
+         ],
+         "name" : "LAK"
+      },
+      "LBP" : {
+         "country" : [
+            "Lebanon"
+         ],
+         "name" : "LBP"
+      },
+      "LKR" : {
+         "country" : [
+            "Sri Lanka"
+         ],
+         "name" : "LKR"
+      },
+      "LRD" : {
+         "country" : [
+            "Liberia"
+         ],
+         "name" : "LRD"
+      },
+      "LSL" : {
+         "country" : [
+            "Lesotho"
+         ],
+         "name" : "LSL"
+      },
+      "LYD" : {
+         "country" : [
+            "Libya"
+         ],
+         "name" : "LYD"
+      },
+      "MAD" : {
+         "country" : [
+            "Morocco",
+            "Western Sahara"
+         ],
+         "name" : "MAD"
+      },
+      "MDL" : {
+         "country" : [
+            "Moldova"
+         ],
+         "name" : "MDL"
+      },
+      "MGA" : {
+         "country" : [
+            "Madagascar"
+         ],
+         "name" : "MGA"
+      },
+      "MKD" : {
+         "country" : [
+            "North Macedonia"
+         ],
+         "name" : "MKD"
+      },
+      "MMK" : {
+         "country" : [
+            "Myanmar [Burma]"
+         ],
+         "name" : "MMK"
+      },
+      "MNT" : {
+         "country" : [
+            "Mongolia"
+         ],
+         "name" : "MNT"
+      },
+      "MOP" : {
+         "country" : [
+            "Macao"
+         ],
+         "name" : "MOP"
+      },
+      "MRU" : {
+         "country" : [
+            "Western Sahara",
+            "Mauritania"
+         ],
+         "name" : "MRU"
+      },
+      "MUR" : {
+         "country" : [
+            "Mauritius"
+         ],
+         "name" : "MUR"
+      },
+      "MVR" : {
+         "country" : [
+            "Maldives"
+         ],
+         "name" : "MVR"
+      },
+      "MWK" : {
+         "country" : [
+            "Malawi"
+         ],
+         "name" : "MWK"
+      },
+      "MXN" : {
+         "country" : [
+            "Mexico"
+         ],
+         "name" : "MXN"
+      },
+      "MYR" : {
+         "country" : [
+            "Malaysia"
+         ],
+         "name" : "MYR"
+      },
+      "MZN" : {
+         "country" : [
+            "Mozambique"
+         ],
+         "name" : "MZN"
+      },
+      "NAD" : {
+         "country" : [
+            "Namibia"
+         ],
+         "name" : "NAD"
+      },
+      "NGN" : {
+         "country" : [
+            "Nigeria"
+         ],
+         "name" : "NGN"
+      },
+      "NIO" : {
+         "country" : [
+            "Nicaragua"
+         ],
+         "name" : "NIO"
+      },
+      "NOK" : {
+         "country" : [
+            "Svalbard and Jan Mayen",
+            "Norway",
+            "Bouvet Island"
+         ],
+         "name" : "NOK"
+      },
+      "NPR" : {
+         "country" : [
+            "Nepal"
+         ],
+         "name" : "NPR"
+      },
+      "NZD" : {
+         "country" : [
+            "Niue",
+            "New Zealand",
+            "Pitcairn Islands",
+            "Cook Islands",
+            "Tokelau"
+         ],
+         "name" : "NZD"
+      },
+      "OMR" : {
+         "country" : [
+            "Oman"
+         ],
+         "name" : "OMR"
+      },
+      "PAB" : {
+         "country" : [
+            "Panama"
+         ],
+         "name" : "PAB"
+      },
+      "PEN" : {
+         "country" : [
+            "Peru"
+         ],
+         "name" : "PEN"
+      },
+      "PGK" : {
+         "country" : [
+            "Papua New Guinea"
+         ],
+         "name" : "PGK"
+      },
+      "PHP" : {
+         "country" : [
+            "Philippines"
+         ],
+         "name" : "PHP"
+      },
+      "PKR" : {
+         "country" : [
+            "Pakistan"
+         ],
+         "name" : "PKR"
+      },
+      "PLN" : {
+         "country" : [
+            "Poland"
+         ],
+         "name" : "PLN"
+      },
+      "PYG" : {
+         "country" : [
+            "Paraguay"
+         ],
+         "name" : "PYG"
+      },
+      "QAR" : {
+         "country" : [
+            "Qatar"
+         ],
+         "name" : "QAR"
+      },
+      "RON" : {
+         "country" : [
+            "Romania"
+         ],
+         "name" : "RON"
+      },
+      "RSD" : {
+         "country" : [
+            "Serbia"
+         ],
+         "name" : "RSD"
+      },
+      "RUB" : {
+         "country" : [
+            "Russia"
+         ],
+         "name" : "RUB"
+      },
+      "RWF" : {
+         "country" : [
+            "Rwanda"
+         ],
+         "name" : "RWF"
+      },
+      "SAR" : {
+         "country" : [
+            "Saudi Arabia"
+         ],
+         "name" : "SAR"
+      },
+      "SBD" : {
+         "country" : [
+            "Solomon Islands"
+         ],
+         "name" : "SBD"
+      },
+      "SCR" : {
+         "country" : [
+            "Seychelles"
+         ],
+         "name" : "SCR"
+      },
+      "SDG" : {
+         "country" : [
+            "Sudan"
+         ],
+         "name" : "SDG"
+      },
+      "SEK" : {
+         "country" : [
+            "Sweden"
+         ],
+         "name" : "SEK"
+      },
+      "SGD" : {
+         "country" : [
+            "Singapore"
+         ],
+         "name" : "SGD"
+      },
+      "SHP" : {
+         "country" : [
+            "Saint Helena"
+         ],
+         "name" : "SHP"
+      },
+      "SLL" : {
+         "country" : [
+            "Sierra Leone"
+         ],
+         "name" : "SLL"
+      },
+      "SOS" : {
+         "country" : [
+            "Somalia"
+         ],
+         "name" : "SOS"
+      },
+      "SRD" : {
+         "country" : [
+            "Suriname"
+         ],
+         "name" : "SRD"
+      },
+      "SSP" : {
+         "country" : [
+            "South Sudan"
+         ],
+         "name" : "SSP"
+      },
+      "STN" : {
+         "country" : [
+            "São Tomé and Príncipe"
+         ],
+         "name" : "STN"
+      },
+      "SVC" : {
+         "country" : [
+            "El Salvador"
+         ],
+         "name" : "SVC"
+      },
+      "SYP" : {
+         "country" : [
+            "Syria"
+         ],
+         "name" : "SYP"
+      },
+      "SZL" : {
+         "country" : [
+            "Swaziland"
+         ],
+         "name" : "SZL"
+      },
+      "THB" : {
+         "country" : [
+            "Thailand"
+         ],
+         "name" : "THB"
+      },
+      "TJS" : {
+         "country" : [
+            "Tajikistan"
+         ],
+         "name" : "TJS"
+      },
+      "TMT" : {
+         "country" : [
+            "Turkmenistan"
+         ],
+         "name" : "TMT"
+      },
+      "TND" : {
+         "country" : [
+            "Tunisia"
+         ],
+         "name" : "TND"
+      },
+      "TOP" : {
+         "country" : [
+            "Tonga"
+         ],
+         "name" : "TOP"
+      },
+      "TRY" : {
+         "country" : [
+            "Turkey"
+         ],
+         "name" : "TRY"
+      },
+      "TTD" : {
+         "country" : [
+            "Trinidad and Tobago"
+         ],
+         "name" : "TTD"
+      },
+      "TWD" : {
+         "country" : [
+            "Taiwan"
+         ],
+         "name" : "TWD"
+      },
+      "TZS" : {
+         "country" : [
+            "Tanzania"
+         ],
+         "name" : "TZS"
+      },
+      "UAH" : {
+         "country" : [
+            "Ukraine"
+         ],
+         "name" : "UAH"
+      },
+      "UGX" : {
+         "country" : [
+            "Uganda"
+         ],
+         "name" : "UGX"
+      },
+      "USD" : {
+         "country" : [
+            "El Salvador",
+            "Marshall Islands",
+            "Zimbabwe",
+            "Northern Mariana Islands",
+            "Guam",
+            "United States",
+            "Haiti",
+            "British Virgin Islands",
+            "Turks and Caicos Islands",
+            "American Samoa",
+            "East Timor",
+            "Puerto Rico",
+            "Micronesia",
+            "Palau",
+            "U.S. Virgin Islands",
+            "Bonaire",
+            "Ecuador",
+            "British Indian Ocean Territory",
+            "U.S. Minor Outlying Islands",
+            "Panama"
+         ],
+         "name" : "USD"
+      },
+      "USN" : {
+         "country" : [
+            "United States"
+         ],
+         "name" : "USN"
+      },
+      "USS" : {
+         "country" : [
+            "United States"
+         ],
+         "name" : "USS"
+      },
+      "UYI" : {
+         "country" : [
+            "Uruguay"
+         ],
+         "name" : "UYI"
+      },
+      "UYU" : {
+         "country" : [
+            "Uruguay"
+         ],
+         "name" : "UYU"
+      },
+      "UZS" : {
+         "country" : [
+            "Uzbekistan"
+         ],
+         "name" : "UZS"
+      },
+      "VES" : {
+         "country" : [
+            "Venezuela"
+         ],
+         "name" : "VES"
+      },
+      "VND" : {
+         "country" : [
+            "Vietnam"
+         ],
+         "name" : "VND"
+      },
+      "VUV" : {
+         "country" : [
+            "Vanuatu"
+         ],
+         "name" : "VUV"
+      },
+      "WST" : {
+         "country" : [
+            "Samoa"
+         ],
+         "name" : "WST"
+      },
+      "XAF" : {
+         "country" : [
+            "Chad",
+            "Republic of the Congo",
+            "Central African Republic",
+            "Equatorial Guinea",
+            "Gabon",
+            "Cameroon"
+         ],
+         "name" : "XAF"
+      },
+      "XCD" : {
+         "country" : [
+            "Grenada",
+            "Saint Vincent and the Grenadines",
+            "Antigua and Barbuda",
+            "Saint Lucia",
+            "Saint Kitts and Nevis",
+            "Montserrat",
+            "Dominica",
+            "Anguilla"
+         ],
+         "name" : "XCD"
+      },
+      "XOF" : {
+         "country" : [
+            "Togo",
+            "Senegal",
+            "Burkina Faso",
+            "Mali",
+            "Niger",
+            "Guinea-Bissau",
+            "Benin",
+            "Ivory Coast"
+         ],
+         "name" : "XOF"
+      },
+      "XPF" : {
+         "country" : [
+            "New Caledonia",
+            "French Polynesia",
+            "Wallis and Futuna"
+         ],
+         "name" : "XPF"
+      },
+      "YER" : {
+         "country" : [
+            "Yemen"
+         ],
+         "name" : "YER"
+      },
+      "ZAR" : {
+         "country" : [
+            "Zimbabwe",
+            "Lesotho",
+            "South Africa",
+            "Namibia"
+         ],
+         "name" : "ZAR"
+      },
+      "ZMW" : {
+         "country" : [
+            "Zambia"
+         ],
+         "name" : "ZMW"
+      }
+   }
+}

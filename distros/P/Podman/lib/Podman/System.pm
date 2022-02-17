@@ -68,12 +68,12 @@ Podman::System - Service information.
 
 =head1 SYNOPSIS
 
-    # Object-oriented interface usage
+    # Object interface usage
     my $system  = Podman::System->new;
     my $version = $system->version;
     my $report  = $system->prune
 
-    # Function-oriented interface usage
+    # Class interface usage
     my $disk    = Podman::System->disk_sage;
     my $version = Podman::System->version;
 

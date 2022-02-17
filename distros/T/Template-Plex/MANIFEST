@@ -1,0 +1,24 @@
+Changes
+examples/begin.pl
+examples/examples.pl
+examples/experiment.pl
+examples/external.plex
+examples/header.plex
+examples/html.pl
+examples/html.plex
+examples/recursive-2.plex
+examples/recursive-3.plex
+examples/recursive-top.plex
+examples/recursive.pl
+lib/Template/Plex.pm
+lib/Template/Plex.pod
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+README.md
+t/sub1.plex
+t/sub2.plex
+t/Template-Plex.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -19,6 +19,10 @@ use DynaLoader;
 
 
 
+
+
+#line 9 "func.pd"
+
 =head1 NAME
 
 PDL::Fit::Levmar::Func - Create model functions for Levenberg-Marquardt fit routines
@@ -164,12 +168,15 @@ $MKOBJ = $Config{cc} . " -c " . $Config{optimize} . " " .
 $MKSO = $Config{ld} . " " . $Config{lddlflags} ." %o -o %s ";
 
 use File::Temp qw(tempdir);
+#line 172 "Func.pm"
 
 
 
 
 
 
+
+#line 181 "func.pd"
 
 
 =head2 new
@@ -960,28 +967,34 @@ sub jac_of_t1 {
     _callj1($p,$t,$jac, $self->{JPOINTER});
     return($jac);
 }
+#line 971 "Func.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *_callf = \&PDL::Fit::Levmar::Func::_callf;
+#line 978 "Func.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *_callj = \&PDL::Fit::Levmar::Func::_callj;
+#line 985 "Func.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *_callj1 = \&PDL::Fit::Levmar::Func::_callj1;
+#line 992 "Func.pm"
 
 
 
-;
+
+
+#line 158 "func.pd"
 
 
 =head1 AUTHORS
@@ -994,7 +1007,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-
+#line 1011 "Func.pm"
 
 
 

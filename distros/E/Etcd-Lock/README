@@ -1,0 +1,52 @@
+NAME
+    Etcd::Lock - Lock based on etcd
+
+VERSION
+    version 0.03
+
+SYNOPSIS
+      use Etcd::Lock
+
+      my $etcdLock = Etcd::Lock->new(host => 'host.name.com', key => 'lock_key');
+      $etcdLock->lock();
+      ... do_something ...
+      $etcdLock->unlock();
+
+DESCRIPTION
+    Etcd::Lock is a lock based on etcd. When a key is locked, try to lock
+    same key return false. Key is unlocked automatically when ttl seconds
+    expired.
+
+METHODS
+  lock()
+    Return true if key is unlocked. Now it's locked.
+
+  unlock()
+    Return true if key is locked. Now it's unlocked
+
+  ttl(new_ttl)
+    Set or return after how many seconds a lock is automatically removed.
+    Defaul: 3600.
+
+BUGS/CONTRIBUTING
+    Please report any bugs through the web interface at
+    <https://github.com/EmilianoBruni/etcd-lock/issues>
+
+    If you want to contribute changes or otherwise involve yourself in
+    development, feel free to fork the Git repository from
+    <https://github.com/EmilianoBruni/etcd-lock/>.
+
+SUPPORT
+    You can find this documentation with the perldoc command too.
+
+        perldoc etcd-lock
+
+AUTHOR
+    Emiliano Bruni <info@ebruni.it>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2022 by Emiliano Bruni.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

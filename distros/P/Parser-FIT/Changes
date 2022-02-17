@@ -1,5 +1,14 @@
 Revision history for Parser-FIT
 
+Upcoming Release
+        - post-process raw values
+        - disable debug output by default
+        - fix warnings
+        - message fields are hash-refs instead of just scalar values
+        - Fix portability warnings
+        - Support parsing of FIT data from scalar
+        - Fix array-access syntax
+
 0.02    2022-02-08
         - Don't skip Makefile.PL
 

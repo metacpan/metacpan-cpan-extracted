@@ -6,9 +6,9 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Alien::SWIProlog: '0.002'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,10 +19,11 @@ no_index:
     - t
     - inc
 requires:
+  Alien::SWIProlog: '0.002'
   Language::Prolog::Sugar: '0.03'
   Language::Prolog::Types: '0.09'
 resources:
   bugtracker: https://github.com/salva/p5-Language-Prolog-Yaswi/issues
   repository: git://github.com/salva/p5-Language-Prolog-Yaswi.git
-version: '0.22'
+version: '0.23'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

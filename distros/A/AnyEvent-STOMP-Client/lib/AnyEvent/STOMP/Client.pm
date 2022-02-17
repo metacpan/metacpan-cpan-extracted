@@ -11,7 +11,7 @@ use AnyEvent::Handle;
 use List::Util 'max';
 
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 
 my $EOL = chr(10);
@@ -138,8 +138,10 @@ sub disconnect {
     unless ($self->is_connected) {
         if (defined $self->{handle}) {
             $self->{handle}->destroy;
+            delete $self->{handle};
         }
         $self->event('DISCONNECTED', $self->{host}, $self->{port}, $ungraceful);
+        delete $self->{heartbeat}{timer};
         return;
     }
 
@@ -149,8 +151,10 @@ sub disconnect {
         if (defined $self->{handle}) {
             $self->{handle}->push_shutdown;
             $self->{handle}->destroy;
+            delete $self->{handle};
         }
         $self->event('DISCONNECTED', $self->{host}, $self->{port}, $ungraceful);
+        delete $self->{heartbeat}{timer};
     }
     else {
         my $receipt_id = $self->get_uuid;
@@ -168,12 +172,20 @@ sub disconnect {
                     if (defined $self->{handle}) {
                         $self->{handle}->push_shutdown;
                         $self->{handle}->destroy;
+                        delete $self->{handle};
                     }
                     $self->event('DISCONNECTED', $self->{host}, $self->{port}, $ungraceful);
+                    delete $self->{heartbeat}{timer};
                 }
             }
         );
     }
+}
+
+sub destroy {
+    my $self = shift;
+    $self->disconnect(1) if $self->is_connected;
+    $self->remove_all_callbacks;
 }
 
 sub DESTROY {
@@ -551,7 +563,7 @@ sub read_frame {
 
             $self->reset_server_heartbeat_timer;
 
-            if ($command =~ /(CONNECTED|MESSAGE|RECEIPT|ERROR)/) {
+            if ($command =~ /^(CONNECTED|MESSAGE|RECEIPT|ERROR)$/) {
                 $command = $1;
             }
             else {
@@ -584,14 +596,25 @@ sub read_frame {
                             cb => sub {
                                 my ($handle, $body) = @_;
                                 $self->event('READ_FRAME', $command, $header_hashref, $body);
-                                $self->event($command, $header_hashref, $body);
-
-                                if (defined $header_hashref->{subscription}) {
+                                if ($command eq 'ERROR') {
+                                    $body =~ s/^\s+|\s+$|\0//g; # trim and remove null char
                                     $self->event(
-                                        $command.'-'.$header_hashref->{subscription},
-                                        $header_hashref,
-                                        $body
+                                        'ERROR',
+                                        $self->{host},
+                                        $self->{port},
+                                        $body || $header_hashref->{message} || 'unknown'
                                     );
+                                }
+                                else {
+                                    $self->event('MESSAGE', $header_hashref, $body);
+
+                                    if (defined $header_hashref->{subscription}) {
+                                        $self->event(
+                                            "MESSAGE-$header_hashref->{subscription}",
+                                            $header_hashref,
+                                            $body
+                                        );
+                                    }
                                 }
                             }
                         );
@@ -966,6 +989,11 @@ Hash, optional, empty by default. Used to pass arbitrary headers to the STOMP
 frame.
 
 =back
+
+=head2 $client->destroy
+
+Disconnects and cleans up all callbacks. To be called when the client object
+is not used any more and should be cleaned up.
 
 =head2 Callbacks
 

@@ -1,5 +1,5 @@
-package Finance::AMEX::Transaction::EPTRN::Unknown;
-$Finance::AMEX::Transaction::EPTRN::Unknown::VERSION = '0.004';
+package Finance::AMEX::Transaction::EPTRN::Unknown 0.005;
+
 use strict;
 use warnings;
 
@@ -7,9 +7,7 @@ use warnings;
 
 sub new {
   my ($class, %props) = @_;
-  my $self = bless {
-    _line => $props{line},
-  }, $class;
+  my $self = bless {_line => $props{line}}, $class;
   return $self;
 }
 
@@ -34,7 +32,7 @@ Finance::AMEX::Transaction::EPTRN::Unknown - Parse AMEX Transaction/Invoice Leve
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 
@@ -70,7 +68,7 @@ Tom Heady <cpan@punch.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by ZipRecruiter.
+This software is copyright (c) 2022 by ZipRecruiter/Tom Heady.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

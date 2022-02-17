@@ -324,11 +324,11 @@ _
 |  ⻅  | B0 | C0 |
 +======+====+====+
 | A1L1 | B1 | C1 |
-| \e[0mL2   |    |    |
+|\e[0m L2   |    |    |
 +------+----+----+
-| A2   | \e[31mBC23L1\e[0m  |
-+------+ \e[31mL2⻅\e[0m    |
-|   A3 | \e[31mL3\e[0m      |
+| A2   | \e[31mBC23L1 \e[0m |
++------+\e[31m L2⻅ \e[0m   |
+|   A3 |\e[31m L3\e[0m      |
 `------+---------'
 _
     },
@@ -374,6 +374,66 @@ _
 _
     },
 
+    {
+        name => 'lpad=0, rpad=0, vpad=>1',
+        rows => [["A","BBB"], ["CC","D"]],
+        args => {lpad=>0, rpad=>0, vpad=>1},
+        result => <<'_',
+.--+---.
+|  |   |
+|A |BBB|
+|  |   |
+|  |   |
+|CC|D  |
+|  |   |
+`--+---'
+_
+    },
+    {
+        name => 'lpad=2, rpad=>3',
+        rows => [["A","BBB"], ["CC","D"]],
+        args => {lpad=>2, rpad=>3},
+        result => <<'_',
+.-------+--------.
+|  A    |  BBB   |
+|  CC   |  D     |
+`-------+--------'
+_
+    },
+    {
+        name => 'tpad=1, bpad=>2, hpad=>0',
+        rows => [["A","BBB"], ["CC","D"]],
+        args => {tpad=>1, bpad=>2, hpad=>0},
+        result => <<'_',
+.--+---.
+|  |   |
+|A |BBB|
+|  |   |
+|  |   |
+|  |   |
+|CC|D  |
+|  |   |
+|  |   |
+`--+---'
+_
+    },
+    {
+        name => 'cell attr: tpad,bpad,lpad,rpad',
+        rows => [[{text=>"A",lpad=>2},{text=>"BBB", rpad=>0}], [{text=>"CC",tpad=>1},{text=>"D",bpad=>3}]],
+        args => {},
+        result => <<'_',
+.----+----.
+|  A | BBB|
+|    | D  |
+| CC |    |
+|    |    |
+|    |    |
+`----+----'
+_
+    },
+    # XXX per-cell attr: {h,v}pad
+    # XXX per-row  attr: {h,v,t,b,l,r}pad
+    # XXX per-col  attr: {h,v,t,b,l,r}pad
 );
 my @include_tests = (); #("wide_char & color"); # e.g. ("1x1")
 my $border_style;# = "UTF8::SingleLineBoldHeader"; # force border style
@@ -395,6 +455,7 @@ for my $test (@tests) {
             ($border_style ? (border_style=>$border_style) : ()),
         );
         is($res, $test->{result}) or diag "expected:\n$test->{result}\nresult:\n$res";
+        #eq_or_diff($res, $test->{result}); # sometimes show output as one line, not very useful
         #use DDC; is($res, $test->{result}) or diag "expected:\n".DDC::dump($test->{result})."\nresult:\n".DDC::dump($res);
     };
 }

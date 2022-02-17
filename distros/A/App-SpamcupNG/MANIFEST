@@ -40,6 +40,7 @@ t/forms.t
 t/redact_auth.t
 t/responses/after_login.html
 t/responses/bounce_error.html
+t/responses/boundary.html
 t/responses/failed_load_header.html
 t/responses/mailhost_problem.html
 t/responses/missing_sendreport_form.html

@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/google-ads-perl.iml" filepath="$PROJECT_DIR$/.idea/google-ads-perl.iml" />
+      <module fileurl="file://$PROJECT_DIR$/google-ads-perl.iml" filepath="$PROJECT_DIR$/google-ads-perl.iml" />
     </modules>
   </component>
 </project>

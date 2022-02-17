@@ -171,10 +171,16 @@ int32_t SPVM_TYPE_get_type_category(SPVM_COMPILER* compiler, int32_t basic_type_
     else if (SPVM_TYPE_is_class_type(compiler, basic_type_id, dimension, flag)) {
       type_category = SPVM_TYPE_C_TYPE_CATEGORY_CLASS;
     }
+    else if (SPVM_TYPE_is_callback_type(compiler, basic_type_id, dimension, flag)) {
+      type_category = SPVM_TYPE_C_TYPE_CATEGORY_CLASS;
+    }
+    else if (SPVM_TYPE_is_interface_type(compiler, basic_type_id, dimension, flag)) {
+      type_category = SPVM_TYPE_C_TYPE_CATEGORY_CLASS;
+    }
     else if (SPVM_TYPE_is_numeric_array_type(compiler, basic_type_id, dimension, flag)) {
       type_category = SPVM_TYPE_C_TYPE_CATEGORY_NUMERIC_ARRAY;
     }
-    else if (SPVM_TYPE_is_value_array_type(compiler, basic_type_id, dimension, flag)) {
+    else if (SPVM_TYPE_is_mulnum_array_type(compiler, basic_type_id, dimension, flag)) {
       type_category = SPVM_TYPE_C_TYPE_CATEGORY_MULNUM_ARRAY;
     }
     else if (SPVM_TYPE_is_array_type(compiler, basic_type_id, dimension, flag)) {
@@ -267,11 +273,22 @@ int32_t SPVM_TYPE_has_callback(
   int32_t callback_basic_type_id, int32_t callback_type_dimension, int32_t callback_type_flag)
 {
   (void)compiler;
+  
+  if (class_type_dimension > 0) {
+    return 0;
+  }
+  
+  if (class_type_flag & SPVM_TYPE_C_FLAG_REF) {
+    return 0;
+  }
 
-  assert(
-    SPVM_TYPE_is_module_type(compiler, class_basic_type_id, class_type_dimension, class_type_flag)
-    || SPVM_TYPE_is_callback_type(compiler, callback_basic_type_id, callback_type_dimension, callback_type_flag)
-  );
+  if (callback_type_dimension > 0) {
+    return 0;
+  }
+
+  if (callback_type_flag & SPVM_TYPE_C_FLAG_REF) {
+    return 0;
+  }
 
   SPVM_BASIC_TYPE* class_basic_type = SPVM_LIST_fetch(compiler->basic_types, class_basic_type_id);
   SPVM_BASIC_TYPE* callback_basic_type = SPVM_LIST_fetch(compiler->basic_types, callback_basic_type_id);
@@ -309,6 +326,47 @@ int32_t SPVM_TYPE_has_callback(
     else {
       return 0;
     }
+  }
+}
+
+int32_t SPVM_TYPE_has_interface(
+  SPVM_COMPILER* compiler,
+  int32_t class_basic_type_id, int32_t class_type_dimension, int32_t class_type_flag,
+  int32_t interface_basic_type_id, int32_t interface_type_dimension, int32_t interface_type_flag)
+{
+  (void)compiler;
+  if (class_type_dimension > 0) {
+    return 0;
+  }
+  
+  if (class_type_flag & SPVM_TYPE_C_FLAG_REF) {
+    return 0;
+  }
+
+  if (interface_type_dimension > 0) {
+    return 0;
+  }
+
+  if (interface_type_flag & SPVM_TYPE_C_FLAG_REF) {
+    return 0;
+  }
+  
+  SPVM_BASIC_TYPE* class_basic_type = SPVM_LIST_fetch(compiler->basic_types, class_basic_type_id);
+  SPVM_BASIC_TYPE* interface_basic_type = SPVM_LIST_fetch(compiler->basic_types, interface_basic_type_id);
+  
+  SPVM_CLASS* class = class_basic_type->class;
+  SPVM_CLASS* interface = interface_basic_type->class;
+
+  if (strcmp(class->name, interface->name) == 0) {
+    return 1;
+  }
+  
+  SPVM_CLASS* found_interface_class = SPVM_HASH_fetch(class->interface_class_symtable, interface->name, strlen(interface->name));
+  if (found_interface_class) {
+    return 1;
+  }
+  else {
+    return 0;
   }
 }
 
@@ -889,10 +947,16 @@ int32_t SPVM_TYPE_is_object_type(SPVM_COMPILER* compiler, int32_t basic_type_id,
   else if (SPVM_TYPE_is_string_type(compiler, basic_type_id, dimension, flag)) {
     return 1;
   }
-  else if (SPVM_TYPE_is_module_type(compiler, basic_type_id, dimension, flag)) {
+  else if (SPVM_TYPE_is_class_type(compiler, basic_type_id, dimension, flag)) {
     return 1;
   }
   else if (SPVM_TYPE_is_callback_type(compiler, basic_type_id, dimension, flag)) {
+    return 1;
+  }
+  else if (SPVM_TYPE_is_interface_type(compiler, basic_type_id, dimension, flag)) {
+    return 1;
+  }
+  else if (SPVM_TYPE_is_interface_type(compiler, basic_type_id, dimension, flag)) {
     return 1;
   }
   else if (SPVM_TYPE_is_any_object_type(compiler, basic_type_id, dimension, flag)) {
@@ -924,10 +988,13 @@ int32_t SPVM_TYPE_is_object_array_type(SPVM_COMPILER* compiler, int32_t basic_ty
       else if (SPVM_TYPE_is_string_type(compiler, basic_type_id, element_dimension, flag)) {
         return 1;
       }
-      else if (SPVM_TYPE_is_module_type(compiler, basic_type_id, element_dimension, flag)) {
+      else if (SPVM_TYPE_is_class_type(compiler, basic_type_id, element_dimension, flag)) {
         return 1;
       }
       else if (SPVM_TYPE_is_callback_type(compiler, basic_type_id, element_dimension, flag)) {
+        return 1;
+      }
+      else if (SPVM_TYPE_is_interface_type(compiler, basic_type_id, element_dimension, flag)) {
         return 1;
       }
       else if (SPVM_TYPE_is_any_object_type(compiler, basic_type_id, element_dimension, flag)) {
@@ -960,7 +1027,12 @@ int32_t SPVM_TYPE_is_class_type(SPVM_COMPILER* compiler, int32_t basic_type_id, 
     SPVM_CLASS* class = SPVM_HASH_fetch(compiler->class_symtable, basic_type_name, strlen(basic_type_name));
     // Class
     if (class) {
-      is_class_type = 1;
+      if (class->category == SPVM_CLASS_C_CATEGORY_CLASS) {
+        is_class_type = 1;
+      }
+      else {
+        is_class_type = 0;
+      }
     }
     // Numeric type
     else {
@@ -975,38 +1047,62 @@ int32_t SPVM_TYPE_is_class_type(SPVM_COMPILER* compiler, int32_t basic_type_id, 
   return is_class_type;
 }
 
-int32_t SPVM_TYPE_is_module_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag) {
-  if (SPVM_TYPE_is_class_type(compiler, basic_type_id, dimension, flag)) {
-    SPVM_BASIC_TYPE* basic_type = SPVM_LIST_fetch(compiler->basic_types, basic_type_id);
+int32_t SPVM_TYPE_is_callback_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag) {
+  SPVM_BASIC_TYPE* basic_type = SPVM_LIST_fetch(compiler->basic_types, basic_type_id);
+  
+  int32_t is_class_type;
+  if (dimension == 0 && !(flag & SPVM_TYPE_C_FLAG_REF)) {
     const char* basic_type_name = basic_type->name;
     SPVM_CLASS* class = SPVM_HASH_fetch(compiler->class_symtable, basic_type_name, strlen(basic_type_name));
-    if (class->category == SPVM_CLASS_C_CATEGORY_CLASS) {
-      return 1;
+    // Class
+    if (class) {
+      if (class->category == SPVM_CLASS_C_CATEGORY_CALLBACK) {
+        is_class_type = 1;
+      }
+      else {
+        is_class_type = 0;
+      }
     }
+    // Numeric type
     else {
-      return 0;
+      is_class_type = 0;
     }
   }
+  // Array
   else {
-    return 0;
+    is_class_type = 0;
   }
+  
+  return is_class_type;
 }
 
-int32_t SPVM_TYPE_is_callback_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag) {
-  if (SPVM_TYPE_is_class_type(compiler, basic_type_id, dimension, flag)) {
-    SPVM_BASIC_TYPE* basic_type = SPVM_LIST_fetch(compiler->basic_types, basic_type_id);
+int32_t SPVM_TYPE_is_interface_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag) {
+  SPVM_BASIC_TYPE* basic_type = SPVM_LIST_fetch(compiler->basic_types, basic_type_id);
+  
+  int32_t is_interface_type;
+  if (dimension == 0 && !(flag & SPVM_TYPE_C_FLAG_REF)) {
     const char* basic_type_name = basic_type->name;
     SPVM_CLASS* class = SPVM_HASH_fetch(compiler->class_symtable, basic_type_name, strlen(basic_type_name));
-    if (class->category == SPVM_CLASS_C_CATEGORY_CALLBACK) {
-      return 1;
+    // Class
+    if (class) {
+      if (class->category == SPVM_CLASS_C_CATEGORY_INTERFACE) {
+        is_interface_type = 1;
+      }
+      else {
+        is_interface_type = 0;
+      }
     }
+    // Numeric type
     else {
-      return 0;
+      is_interface_type = 0;
     }
   }
+  // Array
   else {
-    return 0;
+    is_interface_type = 0;
   }
+  
+  return is_interface_type;
 }
 
 int32_t SPVM_TYPE_is_string_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag) {
@@ -1111,7 +1207,7 @@ int32_t SPVM_TYPE_is_multi_numeric_type(SPVM_COMPILER* compiler, int32_t basic_t
   return is_mulnum_t;
 }
 
-int32_t SPVM_TYPE_is_value_ref_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag) {
+int32_t SPVM_TYPE_is_multi_numeric_ref_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag) {
   (void)compiler;
   
   SPVM_BASIC_TYPE* basic_type = SPVM_LIST_fetch(compiler->basic_types, basic_type_id);
@@ -1142,7 +1238,7 @@ int32_t SPVM_TYPE_is_value_ref_type(SPVM_COMPILER* compiler, int32_t basic_type_
   return is_value_ref_type;
 }
 
-int32_t SPVM_TYPE_is_value_array_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag) {
+int32_t SPVM_TYPE_is_mulnum_array_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag) {
   (void)compiler;
 
   SPVM_BASIC_TYPE* basic_type = SPVM_LIST_fetch(compiler->basic_types, basic_type_id);
@@ -1221,4 +1317,68 @@ int32_t SPVM_TYPE_get_width(SPVM_COMPILER* compiler, int32_t basic_type_id, int3
   }
   
   return width;
+}
+
+int32_t SPVM_TYPE_get_elem_byte_size(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag) {
+  
+  assert(!(flag & SPVM_TYPE_C_FLAG_REF));
+  
+  int32_t elem_byte_size;
+  if (SPVM_TYPE_is_string_type(compiler, basic_type_id, dimension, flag)) {
+    elem_byte_size = 1;
+  }
+  else if (SPVM_TYPE_is_numeric_array_type(compiler, basic_type_id, dimension, flag)) {
+    if (basic_type_id == SPVM_BASIC_TYPE_C_ID_BYTE) {
+      elem_byte_size = 1;
+    }
+    else if (basic_type_id == SPVM_BASIC_TYPE_C_ID_SHORT) {
+      elem_byte_size = 2;
+    }
+    else if (basic_type_id == SPVM_BASIC_TYPE_C_ID_INT || basic_type_id == SPVM_BASIC_TYPE_C_ID_FLOAT) {
+      elem_byte_size = 4;
+    }
+    else if (basic_type_id == SPVM_BASIC_TYPE_C_ID_LONG || basic_type_id == SPVM_BASIC_TYPE_C_ID_DOUBLE) {
+      elem_byte_size = 8;
+    }
+    else {
+      assert(0);
+    }
+  }
+  else if (SPVM_TYPE_is_mulnum_array_type(compiler, basic_type_id, dimension, flag)) {
+    
+    SPVM_BASIC_TYPE* basic_type = SPVM_LIST_fetch(compiler->basic_types, basic_type_id);
+    if (!basic_type) {
+      elem_byte_size = 0;
+    }
+    
+    SPVM_CLASS* class = basic_type->class;
+    
+    int32_t width = class->fields->length;
+    SPVM_FIELD* first_field = (SPVM_FIELD*)SPVM_LIST_fetch(class->fields, 0);
+    int32_t field_basic_type_id = first_field->type->basic_type->id;
+    
+    if (field_basic_type_id == SPVM_BASIC_TYPE_C_ID_BYTE) {
+      elem_byte_size = 1 * width;
+    }
+    else if (field_basic_type_id == SPVM_BASIC_TYPE_C_ID_SHORT) {
+      elem_byte_size = 2 * width;
+    }
+    else if (field_basic_type_id == SPVM_BASIC_TYPE_C_ID_INT || field_basic_type_id == SPVM_BASIC_TYPE_C_ID_FLOAT) {
+      elem_byte_size = 4 * width;
+    }
+    else if (field_basic_type_id == SPVM_BASIC_TYPE_C_ID_LONG || field_basic_type_id == SPVM_BASIC_TYPE_C_ID_DOUBLE) {
+      elem_byte_size = 8 * width;
+    }
+    else {
+      assert(0);
+    }
+  }
+  else if (SPVM_TYPE_is_object_array_type(compiler, basic_type_id, dimension, flag)) {
+    elem_byte_size = sizeof(void*);
+  }
+  else {
+    assert(0);
+  }
+  
+  return elem_byte_size;
 }

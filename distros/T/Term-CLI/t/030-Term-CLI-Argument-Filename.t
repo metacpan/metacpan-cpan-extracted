@@ -1,6 +1,6 @@
 #!/usr/bin/perl -T
 #
-# Copyright (C) 2018, Steven Bakker.
+# Copyright (c) 2018-2022, Steven Bakker.
 #
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl 5.14.0. For more details, see the full text
@@ -10,14 +10,16 @@
 use 5.014_001;
 use warnings;
 
-sub Main {
-    Term_CLI_Argument_Filename_test->SKIP_CLASS(
-        ($::ENV{SKIP_ARGUMENT})
-            ? "disabled in environment"
-            : 0
-    );
+use Test::More;
+
+my $TEST_NAME = 'ARGUMENT';
+
+sub Main() {
+    if ( ($::ENV{SKIP_ALL} || $::ENV{"SKIP_$TEST_NAME"}) && !$::ENV{"TEST_$TEST_NAME"} ) {
+       plan skip_all => 'skipped because of environment'
+    }
     Term_CLI_Argument_Filename_test->runtests();
-    return;
+    exit 0;
 }
 
 package Term_CLI_Argument_Filename_test {
@@ -75,7 +77,7 @@ sub check_attributes: Test(2) {
     return;
 }
 
-sub check_complete: Test(4) {
+sub check_complete: Test(10) {
     my $self = shift;
     my $arg = $self->{arg};
 
@@ -86,25 +88,48 @@ sub check_complete: Test(4) {
     is_deeply( [$arg->complete("$dir/")], ["$dir/testdir"],
         "complete returns ('$dir/testdir') for '$dir/'");
 
+    is_deeply( [$arg->glob_complete("$dir/")], ["$dir/testdir/", "$dir/testdir//"],
+        "glob_complete returns ('$dir/testdir/', '$dir/testdir//') for '$dir/'");
+
     is_deeply( [$arg->complete("$dir/testdir/")], [],
         "complete returns () for '$dir/testdir/'");
 
+    is_deeply( [$arg->glob_complete("$dir/testdir/")], [],
+        "glob_complete returns () for '$dir/testdir/'");
+
     my @fnames = qw( one two three );
+    mkdir("$dir/testdir/dir");
+
     for my $f (@fnames) {
         my $path = "$dir/testdir/$f";
         open my $fh, ">", $path || fail("cannot create $path: $!");
         close $fh;
     }
+    chmod(0755, "$dir/testdir/one");
+    symlink('./one', "$dir/testdir/link");
 
     my @expected;
-    
-    @expected = map { "$dir/testdir/$_" } @fnames;
+
+    @expected = map { "$dir/testdir/$_" } qw( dir one two three link );
     is_deeply( [sort $arg->complete("$dir/testdir/")], [sort @expected],
         "complete returns (@expected) for '$dir/testdir/'");
+
+    @expected = map { "$dir/testdir/$_" } qw( dir/ one* two three link@ );
+    is_deeply( [sort $arg->glob_complete("$dir/testdir/")], [sort @expected],
+        "glob_complete returns (@expected) for '$dir/testdir/'");
 
     @expected = map { "$dir/testdir/$_" } qw( two three );
     is_deeply( [sort $arg->complete("$dir/testdir/t")], [sort @expected],
         "complete returns (@expected) for '$dir/testdir/t'");
+    is_deeply( [sort $arg->glob_complete("$dir/testdir/t")], [sort @expected],
+        "glob_complete returns (@expected) for '$dir/testdir/t'");
+
+    @expected = map { "$dir/testdir/$_" } qw( link );
+    is_deeply( [sort $arg->complete("$dir/testdir/l")], [sort @expected],
+        "complete returns (@expected) for '$dir/testdir/l'");
+    is_deeply( [sort $arg->glob_complete("$dir/testdir/l")], [sort @expected],
+        "glob_complete returns (@expected) for '$dir/testdir/l'");
+
     return;
 }
 

@@ -12,9 +12,9 @@ use Scalar::Util 'looks_like_number';
 require Win32::Console::ANSI if $^O =~ /Win/;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-27'; # DATE
+our $DATE = '2022-02-14'; # DATE
 our $DIST = 'Text-ANSITable'; # DIST
-our $VERSION = '0.607'; # VERSION
+our $VERSION = '0.608'; # VERSION
 
 # see Module::Features for more details on this
 our %FEATURES = (
@@ -323,6 +323,8 @@ sub BUILD {
 
         if (defined $ENV{ANSITABLE_BORDER_STYLE}) {
             $bs = $ENV{ANSITABLE_BORDER_STYLE};
+        } elsif (defined $ENV{BORDER_STYLE}) {
+            $bs = $ENV{BORDER_STYLE};
         } elsif ($use_utf8) {
             $bs //= 'UTF8::BrickOuterOnly';
         } elsif ($self->use_box_chars) {
@@ -1235,8 +1237,8 @@ sub _calc_table_width_height {
     my $frow_heights = $self->{_draw}{frow_heights};
 
     my $w = 0;
-    $w += 1 if length($self->{border_style_obj}->get_border_char(3, 0));
-    my $has_vsep = length($self->{border_style_obj}->get_border_char(3, 1));
+    $w += 1 if length($self->{border_style_obj}->get_border_char(char=>'v_l'));
+    my $has_vsep = length($self->{border_style_obj}->get_border_char(char=>'v_i'));
     for my $i (0..@$cols-1) {
         next unless $cols->[$i] ~~ $fcols;
         $w += $fcol_lpads->[$i] + $fcol_widths->[$i] + $fcol_rpads->[$i];
@@ -1244,24 +1246,24 @@ sub _calc_table_width_height {
             $w += 1 if $has_vsep;
         }
     }
-    $w += 1 if length($self->{border_style_obj}->get_border_char(3, 2));
+    $w += 1 if length($self->{border_style_obj}->get_border_char(char=>'v_r'));
     $self->{_draw}{table_width}  = $w;
 
     my $h = 0;
-    $h += 1 if length($self->{border_style_obj}->get_border_char(0, 0)); # top border line
+    $h += 1 if length($self->{border_style_obj}->get_border_char(char=>'rd_t')); # top border line
     $h += $self->{header_tpad} // $self->{header_vpad} //
         $self->{cell_tpad} // $self->{cell_vpad};
     $h += $self->{_draw}{header_height} // 0;
     $h += $self->{header_bpad} // $self->{header_vpad} //
         $self->{cell_bpad} // $self->{cell_vpad};
-    $h += 1 if length($self->{border_style_obj}->get_border_char(2, 0));
+    $h += 1 if length($self->{border_style_obj}->get_border_char(char=>'rv_l'));
     for my $i (0..@$frows-1) {
         $h += ($frow_tpads->[$i] // 0) +
             ($frow_heights->[$i] // 0) +
                 ($frow_bpads->[$i] // 0);
         $h += 1 if $self->_should_draw_row_separator($i);
     }
-    $h += 1 if length($self->{border_style_obj}->get_border_char(5, 0));
+    $h += 1 if length($self->{border_style_obj}->get_border_char(char=>'ru_b'));
     $self->{_draw}{table_height}  = $h;
 }
 
@@ -1405,18 +1407,18 @@ sub draw_border_char {
     my $self = shift;
     my $args; $args = shift if ref($_[0]) eq 'HASH';
 
-    while (my ($y, $x, $n) = splice @_, 0, 3) {
+    while (my ($name, $n) = splice @_, 0, 2) {
         $n //= 1;
         if (!$self->{use_color}) {
             # save some CPU cycles
         } elsif ($args) {
             $self->draw_theme_color('border',
-                                    {table=>$self, border=>[$y, $x, $n], %$args});
+                                    {table=>$self, border=>[$name, $n], %$args});
         } else {
             $self->draw_theme_color('border',
-                                    {table=>$self, border=>[$y, $x, $n]});
+                                    {table=>$self, border=>[$name, $n]});
         }
-        $self->draw_str($self->{border_style_obj}->get_border_char($y, $x, $n));
+        $self->draw_str($self->{border_style_obj}->get_border_char(char=>$name, repeat=>$n));
         $self->draw_color_reset;
     }
 }
@@ -1633,16 +1635,16 @@ sub draw {
 
     # draw border top line
     {
-        last unless length($self->{border_style_obj}->get_border_char(0, 0));
+        last unless length($self->{border_style_obj}->get_border_char(char=>'rd_t'));
         my @b;
-        push @b, 0, 0, 1;
+        push @b, 'rd_t', 1;
         for my $i (0..@$fcols-1) {
             my $ci = $self->_colnum($fcols->[$i]);
-            push @b, 0, 1,
+            push @b, 'h_t',
                 $fcol_lpads->[$ci] + $fcol_widths->[$ci] + $fcol_rpads->[$ci];
-            push @b, 0, 2, 1 if $i < @$fcols-1;
+            push @b, 'hd_t', 1 if $i < @$fcols-1;
         }
-        push @b, 0, 3, 1;
+        push @b, 'ld_t', 1;
         $self->draw_border_char(@b);
         $self->draw_str("\n");
     }
@@ -1666,28 +1668,28 @@ sub draw {
         }
         #use Data::Dump; print "D:hcell_lines: "; dd $hcell_lines;
         for my $l (0..@{ $hcell_lines->[0] }-1) {
-            $self->draw_border_char(1, 0);
+            $self->draw_border_char('v_l');
             for my $i (0..@$fcols-1) {
                 $self->draw_str($hcell_lines->[$i][$l]);
                 $self->draw_color_reset;
-                $self->draw_border_char(1, 1) unless $i == @$fcols-1;
+                $self->draw_border_char('v_i') unless $i == @$fcols-1;
             }
-            $self->draw_border_char(1, 2);
+            $self->draw_border_char('v_r');
             $self->draw_str("\n");
         }
     }
 
     # draw header-data row separator
-    if ($self->{show_header} && length($self->{border_style_obj}->get_border_char(2, 0))) {
+    if ($self->{show_header} && length($self->{border_style_obj}->get_border_char(char=>'rv_l'))) {
         my @b;
-        push @b, 2, 0, 1;
+        push @b, 'rv_l', 1;
         for my $i (0..@$fcols-1) {
             my $ci = $self->_colnum($fcols->[$i]);
-            push @b, 2, 1,
+            push @b, 'h_i',
                 $fcol_lpads->[$ci] + $fcol_widths->[$ci] + $fcol_rpads->[$ci];
-            push @b, 2, 2, 1 unless $i==@$fcols-1;
+            push @b, 'hv_i', 1 unless $i==@$fcols-1;
         }
-        push @b, 2, 3, 1;
+        push @b, 'lv_r', 1;
         $self->draw_border_char(@b);
         $self->draw_str("\n");
     }
@@ -1713,27 +1715,27 @@ sub draw {
             }
             #use Data::Dump; print "TMP: dcell_lines: "; dd $dcell_lines;
             for my $l (0..@{ $dcell_lines->[0] }-1) {
-                $self->draw_border_char({rownum=>$r}, 3, 0);
+                $self->draw_border_char({rownum=>$r}, 'v_l');
                 for my $i (0..@$fcols-1) {
                     $self->draw_str($dcell_lines->[$i][$l]);
                     $self->draw_color_reset;
-                    $self->draw_border_char({rownum=>$r}, 3, 1)
+                    $self->draw_border_char({rownum=>$r}, 'v_i')
                         unless $i == @$fcols-1;
                 }
-                $self->draw_border_char({rownum=>$r}, 3, 2);
+                $self->draw_border_char({rownum=>$r}, 'v_r');
                 $self->draw_str("\n");
             }
 
             # draw separators between row
             if ($self->_should_draw_row_separator($r)) {
                 my @b;
-                push @b, 4, 0, 1;
+                push @b, 'rv_l', 1;
                 for my $i (0..@$fcols-1) {
                     my $ci = $self->_colnum($fcols->[$i]);
-                    push @b, 4, 1,
+                    push @b, 'h_i',
                         $fcol_lpads->[$ci] + $fcol_widths->[$ci] +
                             $fcol_rpads->[$ci];
-                    push @b, 4, $i==@$fcols-1 ? 3:2, 1;
+                    push @b, ($i==@$fcols-1 ? 'lv_r' : 'hv_i'), 1;
                 }
                 $self->draw_border_char({rownum=>$r}, @b);
                 $self->draw_str("\n");
@@ -1743,16 +1745,16 @@ sub draw {
 
     # draw border bottom line
     {
-        last unless length($self->{border_style_obj}->get_border_char(5, 0));
+        last unless length($self->{border_style_obj}->get_border_char(char=>'ru_b'));
         my @b;
-        push @b, 5, 0, 1;
+        push @b, 'ru_b', 1;
         for my $i (0..@$fcols-1) {
             my $ci = $self->_colnum($fcols->[$i]);
-            push @b, 5, 1,
+            push @b, 'h_b',
                 $fcol_lpads->[$ci] + $fcol_widths->[$ci] + $fcol_rpads->[$ci];
-            push @b, 5, 2, 1 unless $i == @$fcols-1;
+            push @b, 'hu_b', 1 unless $i == @$fcols-1;
         }
-        push @b, 5, 3, 1;
+        push @b, 'lu_b', 1;
         $self->draw_border_char(@b);
         $self->draw_str("\n");
     }
@@ -1775,7 +1777,7 @@ Text::ANSITable - Create nice formatted tables using extended ASCII and ANSI col
 
 =head1 VERSION
 
-This document describes version 0.607 of Text::ANSITable (from Perl distribution Text-ANSITable), released on 2021-08-27.
+This document describes version 0.608 of Text::ANSITable (from Perl distribution Text-ANSITable), released on 2022-02-14.
 
 =head1 SYNOPSIS
 
@@ -2123,8 +2125,8 @@ optional arguments.
  $t->border_style(["Test::CustomChar", {character=>"x"}]);
 
 If no border style is selected explicitly, a nice default will be chosen. You
-can also set the C<ANSITABLE_BORDER_STYLE> environment variable to set the
-default.
+can also set the C<ANSITABLE_BORDER_STYLE> or C<BORDER_STYLE> environment
+variable to set the default.
 
 To create a new border style, see L<BorderStyle>.
 
@@ -3204,7 +3206,13 @@ Can be used to override terminal width detection.
 
 =head2 ANSITABLE_BORDER_STYLE => STR
 
-Can be used to set default value for C<border_style> attribute.
+Can be used to set default value for C<border_style> attribute. Takes precedence
+over L<BORDER_STYLE>.
+
+=head2 BORDER_STYLE => STR
+
+Can be used to set default value for C<border_style> attribute. See also
+C<ANSITABLE_BORDER_STYLE>.
 
 =head2 ANSITABLE_COLOR_THEME => STR
 
@@ -3323,7 +3331,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Mario Zieschang Steven Haryanto (on PC)
+=for stopwords Mario Zieschang Steven Haryanto
 
 =over 4
 
@@ -3333,7 +3341,7 @@ Mario Zieschang <mario@zieschang.info>
 
 =item *
 
-Steven Haryanto (on PC) <stevenharyanto@gmail.com>
+Steven Haryanto <stevenharyanto@gmail.com>
 
 =back
 
@@ -3356,7 +3364,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2018, 2017, 2016, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2018, 2017, 2016, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,24 +1,33 @@
 package BorderStyle::BoxChar::SingleLineInnerOnly;
 
 use strict;
-use parent 'BorderStyleBase';
+use warnings;
+
+use Role::Tiny::With;
+with 'BorderStyleRole::Source::ASCIIArt';
+with 'BorderStyleRole::Transform::InnerOnly';
+with 'BorderStyleRole::Transform::BoxChar';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-26'; # DATE
+our $DATE = '2022-02-14'; # DATE
 our $DIST = 'BorderStyles-Standard'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.013'; # VERSION
+
+our $PICTURE = <<'_';
+                 '
+  ..... x . x .  '
+  ..... tqqqnqqq '
+  ..... x . x .  '
+  ..... tqqqvqqq '
+  ..... x .....  '
+ qqqwqqqu .....  '
+  . x . x .....  '
+                 '
+_
 
 our %BORDER = (
-    v => 2,
+    v => 3,
     summary => 'Single line border with box-drawing characters, between columns only',
-    chars => [
-        ['','','',''],     # 0
-        [' ','x',' '],     # 1
-        [' ','q','n',' ', 'w','v','t','u'], # 2
-        [' ','x',' '],     # 3
-        [' ','q','n',' ', 'w','v','t','u'], # 4
-        ['','','',''],     # 5
-    ],
     box_chars => 1,
 );
 
@@ -37,7 +46,7 @@ BorderStyle::BoxChar::SingleLineInnerOnly - Single line border with box-drawing 
 
 =head1 VERSION
 
-This document describes version 0.011 of BorderStyle::BoxChar::SingleLineInnerOnly (from Perl distribution BorderStyles-Standard), released on 2022-01-26.
+This document describes version 0.013 of BorderStyle::BoxChar::SingleLineInnerOnly (from Perl distribution BorderStyles-Standard), released on 2022-02-14.
 
 =head1 SYNOPSIS
 

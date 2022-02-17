@@ -4,27 +4,42 @@ use v5.14;
 use warnings;
 
 use Test::More;
+use Test::Fatal;
 
-package TestParser;
-use base qw( Parser::MGC );
+package TestParser {
+   use base qw( Parser::MGC );
 
-sub parse
-{
-   my $self = shift;
+   our $Nonempty;
 
-   [ $self->substring_before( "!" ), $self->expect( "!" ) ];
+   sub parse
+   {
+      my $self = shift;
+
+      [ ( $Nonempty ? $self->nonempty_substring_before( "!" ) : $self->substring_before( "!" ) ),
+        $self->expect( "!" ) ];
+   }
 }
-
-package main;
 
 my $parser = TestParser->new;
 
-is_deeply( $parser->from_string( "Hello, world!" ),
-   [ "Hello, world", "!" ],
-   '"Hello, world!"' );
+{
+   is_deeply( $parser->from_string( "Hello, world!" ),
+      [ "Hello, world", "!" ],
+      '"Hello, world!"' );
 
-is_deeply( $parser->from_string( "!" ),
-   [ "", "!" ],
-   '"Hello, world!"' );
+   is_deeply( $parser->from_string( "!" ),
+      [ "", "!" ],
+      '"!"' );
+}
+
+{
+   local $TestParser::Nonempty = 1;
+
+   is( exception { $parser->from_string( "!" ) },
+      qq[Expected to find a non-empty substring before \(\?^u:\\!\) on line 1 at:\n] .
+      qq[!\n] .
+      qq[^\n],
+      'Exception from ->nonempty_substring_before failure' );
+}
 
 done_testing;

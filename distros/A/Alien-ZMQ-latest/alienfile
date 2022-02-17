@@ -30,7 +30,7 @@ EOF
 
 	my $make = '%{make}';
 	if( $build_conf_pref eq BUILD_CONF_PREF_AUTOCONF ) {
-		if( $^O eq 'freebsd' ) {
+		if( $^O eq 'freebsd' || $^O eq 'solaris' ) {
 			requires 'Alien::gmake' => 0.14;
 			$make = '%{gmake}';
 		}
@@ -49,7 +49,8 @@ EOF
 	my $enable_tests = 0;
 	if( $build_conf_pref eq BUILD_CONF_PREF_AUTOCONF ) {
 		plugin 'Build::Autoconf';
-		my $should_stub_tests = $^O eq 'MSWin32';
+		# OpenBSD / FreeBSD fixed in <https://github.com/zeromq/libzmq/pull/4174>.
+		my $should_stub_tests = $^O eq 'MSWin32' || $^O =~ /^(freebsd|openbsd)$/;
 		my @make_stub_tests = $should_stub_tests
 			? ( "noinst_LIBRARIES=" )
 			: ();
@@ -58,6 +59,7 @@ EOF
 				'%{configure}',
 				( $enable_static ? '--enable-static' : '--disable-static' ),
 				'--enable-shared',
+				"MAKE=$make",
 			),
 			[ $make, @make_stub_tests ],
 			[ $make, 'install', @make_stub_tests ],

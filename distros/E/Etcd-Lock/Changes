@@ -1,0 +1,11 @@
+Changelog for Etcd::lock
+
+0.03 2022-02-17T15:00:00
+    - Add TTL to set after how many seconds a lock is automatically removed.
+    - Update documentation.
+
+0.02 2022-02-14T16:22:00
+    - Now test using etcd server only is env TEST_ETCD is set.
+
+0.01 2022-02-14T12:25:00
+    - First Release.

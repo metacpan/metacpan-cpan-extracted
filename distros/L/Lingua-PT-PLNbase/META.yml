@@ -3,15 +3,15 @@ abstract: 'Perl extension for NLP of the Portuguese'
 author:
   - 'Alberto Simoes <ambs@di.uminho.pt>'
 build_requires:
-  File::Slurp: '0'
   File::Temp: '0'
   Lingua::PT::Abbrev: '0.05'
+  Perl6::Slurp: '0'
   Test::Pod: '1.00'
   Test::Pod::Coverage: '0.08'
 configure_requires:
   ExtUtils::MakeMaker: '6.55'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,4 +23,6 @@ no_index:
     - inc
 requires:
   Lingua::PT::Abbrev: '0.05'
-version: '0.27'
+  utf8::all: '0'
+version: '0.28'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

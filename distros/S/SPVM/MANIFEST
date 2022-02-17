@@ -384,6 +384,7 @@ lib/SPVM/Builder/include/spvm_enumeration_value.h
 lib/SPVM/Builder/include/spvm_field.h
 lib/SPVM/Builder/include/spvm_field_access.h
 lib/SPVM/Builder/include/spvm_hash.h
+lib/SPVM/Builder/include/spvm_implement.h
 lib/SPVM/Builder/include/spvm_limit.h
 lib/SPVM/Builder/include/spvm_list.h
 lib/SPVM/Builder/include/spvm_method.h
@@ -429,6 +430,7 @@ lib/SPVM/Builder/src/spvm_enumeration_value.c
 lib/SPVM/Builder/src/spvm_field.c
 lib/SPVM/Builder/src/spvm_field_access.c
 lib/SPVM/Builder/src/spvm_hash.c
+lib/SPVM/Builder/src/spvm_implement.c
 lib/SPVM/Builder/src/spvm_list.c
 lib/SPVM/Builder/src/spvm_method.c
 lib/SPVM/Builder/src/spvm_my.c
@@ -450,6 +452,8 @@ lib/SPVM/Builder/Util/API.pm
 lib/SPVM/Byte.pm
 lib/SPVM/ByteList.pm
 lib/SPVM/ByteList.spvm
+lib/SPVM/Cloneable.pm
+lib/SPVM/Cloneable.spvm
 lib/SPVM/Cloner.pm
 lib/SPVM/Cloner.spvm
 lib/SPVM/Comparator/Byte.pm
@@ -516,6 +520,8 @@ lib/SPVM/Regex/Replacer.spvm
 lib/SPVM/Short.pm
 lib/SPVM/ShortList.pm
 lib/SPVM/ShortList.spvm
+lib/SPVM/Stringable.pm
+lib/SPVM/Stringable.spvm
 lib/SPVM/StringBuffer.pm
 lib/SPVM/StringBuffer.spvm
 lib/SPVM/Stringer.pm
@@ -548,6 +554,7 @@ solo/SPVM/TestCase.spvm
 solo/SPVM/TestCase/Allow.spvm
 solo/SPVM/TestCase/Callback1.spvm
 solo/SPVM/TestCase/Callback2.spvm
+solo/SPVM/TestCase/CommonInterface.spvm
 solo/SPVM/TestCase/Comparator.spvm
 solo/SPVM/TestCase/Comparator/Byte.spvm
 solo/SPVM/TestCase/ComparatorAnon.spvm
@@ -614,6 +621,7 @@ t/default/compile_native_api.pl
 t/default/concat.t
 t/default/constant.t
 t/default/convert.t
+t/default/copy.t
 t/default/default_loaded_modules.t
 t/default/divide.t
 t/default/dump.t
@@ -629,6 +637,7 @@ t/default/if.t
 t/default/if_require.t
 t/default/increment.t
 t/default/inline.t
+t/default/interface.t
 t/default/isa.t
 t/default/lexical_var.t
 t/default/lib/SPVM/4foo.spvm
@@ -712,6 +721,10 @@ t/default/lib/SPVM/TestCase/CompileError/Field/HasFieldNameContainsUnderScoreTwi
 t/default/lib/SPVM/TestCase/CompileError/Field/HasFieldNameStartDigit.spvm
 t/default/lib/SPVM/TestCase/CompileError/Field/Private.spvm
 t/default/lib/SPVM/TestCase/CompileError/ForTest.spvm
+t/default/lib/SPVM/TestCase/CompileError/Interface/HaveBlock.spvm
+t/default/lib/SPVM/TestCase/CompileError/Interface/ImplementStatement.spvm
+t/default/lib/SPVM/TestCase/CompileError/Interface/NativeMethod.spvm
+t/default/lib/SPVM/TestCase/CompileError/Interface/StaticMethod.spvm
 t/default/lib/SPVM/TestCase/CompileError/InvalidType.spvm
 t/default/lib/SPVM/TestCase/CompileError/Isa/LeftIsNotObject.spvm
 t/default/lib/SPVM/TestCase/CompileError/LexVar/LexVarNameColon2Twice.spvm
@@ -766,6 +779,7 @@ t/default/lib/SPVM/TestCase/CompileError/Weaken/HashNotObject.spvm
 t/default/lib/SPVM/TestCase/Concat.spvm
 t/default/lib/SPVM/TestCase/Constant.spvm
 t/default/lib/SPVM/TestCase/Convert.spvm
+t/default/lib/SPVM/TestCase/Copy.spvm
 t/default/lib/SPVM/TestCase/Data/Weaken.spvm
 t/default/lib/SPVM/TestCase/Destructor.spvm
 t/default/lib/SPVM/TestCase/Divide.spvm
@@ -785,6 +799,8 @@ t/default/lib/SPVM/TestCase/If.spvm
 t/default/lib/SPVM/TestCase/IfRequire.spvm
 t/default/lib/SPVM/TestCase/Increment.spvm
 t/default/lib/SPVM/TestCase/Inline.spvm
+t/default/lib/SPVM/TestCase/Interface.spvm
+t/default/lib/SPVM/TestCase/InterfaceType.spvm
 t/default/lib/SPVM/TestCase/Isa.spvm
 t/default/lib/SPVM/TestCase/LexicalVar.spvm
 t/default/lib/SPVM/TestCase/Lib/Bool.spvm

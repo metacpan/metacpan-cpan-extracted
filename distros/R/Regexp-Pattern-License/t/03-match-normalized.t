@@ -1,12 +1,9 @@
-#!perl
-
-use utf8;
-use strict;
-use warnings;
+use Test2::V0;
 
 use lib 't/lib';
+use Test2::Tools::LicenseObject;
 
-use MyTest tests => 468;
+plan 468;
 
 license_covered(
 	'aal',
@@ -452,7 +449,7 @@ EOF
 license_covered(
 	'artistic_1_clarified',
 	name => 'Clarified Artistic License',
-	iri =>
+	iri  =>
 		'http://gianluca.dellavedova.org/2011/01/03/clarified-artistic-license/',
 	text => <<EOF,
 7.
@@ -1475,7 +1472,7 @@ EOF
 license_covered(
 	'cc_cc0',
 	name => 'Creative Commons Zero 1.0 Universal',
-	iri =>
+	iri  =>
 		'https://en.wikipedia.org/wiki/Creative_Commons_license#Zero_/_public_domain',
 	grant =>
 		'To the extent possible under law, the person who associated CC0 with this work has waived all copyright and related or neighboring rights to this work',
@@ -1485,7 +1482,7 @@ license_covered(
 license_covered(
 	'cc_cc0_1',
 	name => 'Creative Commons Zero 1.0 Universal',
-	iri =>
+	iri  =>
 		'https://en.wikipedia.org/wiki/Creative_Commons_license#Zero_/_public_domain',
 	grant =>
 		'To the extent possible under law, the person who associated CC0 with this work has waived all copyright and related or neighboring rights to this work',
@@ -2435,7 +2432,7 @@ EOF
 license_covered(
 	'fsfap',
 	name => 'FSF All Permissive License',
-	iri =>
+	iri  =>
 		'https://www.gnu.org/prep/maintain/html_node/License-Notices-for-Other-Files.html',
 	text => <<EOF,
 Copying and distribution of this file, with or without modification, are permitted in any medium without royalty provided the copyright notice and this notice are preserved.
@@ -3362,7 +3359,7 @@ EOF
 license_covered(
 	'ms_pl',
 	name => 'Microsoft Public License',
-	iri =>
+	iri  =>
 		'https://en.wikipedia.org/wiki/Shared_source#Microsoft_Public_License_(Ms-PL)',
 	TODO => [qw(not_iri_name)]
 );
@@ -3370,7 +3367,7 @@ license_covered(
 license_covered(
 	'ms_rl',
 	name => 'Microsoft Reciprocal License',
-	iri =>
+	iri  =>
 		'https://en.wikipedia.org/wiki/Shared_source#Microsoft_Reciprocal_License_(Ms-RL)',
 	TODO => [qw(not_iri_name)]
 );
@@ -4741,7 +4738,7 @@ EOF
 license_covered(
 	'sissl_1_2',
 	name => 'SUN INDUSTRY STANDARDS SOURCE LICENSE Version 1.2',
-	iri =>
+	iri  =>
 		'http://gridscheduler.sourceforge.net/Gridengine_SISSL_license.html',
 	text => <<EOF,
 SUN INDUSTRY STANDARDS SOURCE LICENSE

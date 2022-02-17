@@ -260,5 +260,18 @@ struct spvm_env {
   int32_t (*get_instance_method_id_static)(SPVM_ENV* env, const char* class_name, const char* method_name, const char* signature);
   int32_t (*get_bool_object_value)(SPVM_ENV* env, void* bool_object);
   void* string_basic_type_id;
+  void (*make_read_only)(SPVM_ENV* env, void* string);
+  int32_t (*is_read_only)(SPVM_ENV* env, void* string);
+  int32_t (*is_array)(SPVM_ENV* env, void* object);
+  int32_t (*is_string)(SPVM_ENV* env, void* object);
+  int32_t (*is_numeric_array)(SPVM_ENV* env, void* object);
+  int32_t (*is_mulnum_array)(SPVM_ENV* env, void* object);
+  int32_t (*get_elem_byte_size)(SPVM_ENV* env, void* array);
+  void* (*new_array_proto_raw)(SPVM_ENV* env, void* array, int32_t length);
+  void* (*new_array_proto)(SPVM_ENV* env, void* array, int32_t length);
+  void* (*copy_raw)(SPVM_ENV* env, void* object);
+  void* (*copy)(SPVM_ENV* env, void* object);
+  void (*shorten)(SPVM_ENV* env, void* string, int32_t new_length);
+  int32_t (*has_interface)(SPVM_ENV* env, void* object, int32_t interface_basic_type_id);
 };
 #endif

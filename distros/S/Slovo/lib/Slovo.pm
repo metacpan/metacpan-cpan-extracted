@@ -11,7 +11,7 @@ use Slovo::Cache;
 use Time::Piece;
 
 our $AUTHORITY = 'cpan:BEROV';
-our $VERSION   = '2022.02.02';
+our $VERSION   = '2022.2.16';
 our $CODENAME  = 'U+2C15 GLAGOLITIC CAPITAL LETTER TVRIDO (Ⱅ)';
 my $CLASS = __PACKAGE__;
 
@@ -22,17 +22,35 @@ has validator => sub { Slovo::Validator->new };
 
 # We prefer $MOJO_HOME to be the folder where the folders bin or script
 # reside.
-has home => sub {
-  if ($ENV{MOJO_HOME}) { return Mojo::Home->new($ENV{MOJO_HOME}); }
-  my $r = Mojo::Home->new($INC{class_to_path $CLASS})->dirname->to_abs;
-  my $m = $_[0]->moniker;
-  while (($r = $r->dirname) && @{$r->to_array} > 2) {
-    if (-x $r->child("bin/$m") || -x $r->child("script/$m")) {
-      return $r;
-    }
+sub home {
+  my $class_or_self = shift;
+  if (ref($class_or_self) && $class_or_self->{home}) { return $class_or_self->{home}; }
+  if ($ENV{MOJO_HOME}) {
+    return
+      ref($class_or_self)
+      ? ($class_or_self->{home} = Mojo::Home->new($ENV{MOJO_HOME}))
+      : Mojo::Home->new($ENV{MOJO_HOME});
   }
-  return $_[0]->SUPER::home;
-};
+  my $r = Mojo::Home->new($INC{class_to_path $CLASS})->dirname->to_abs;
+  my $m = lc $CLASS;    # moniker *should* have the same name
+  while (($r = $r->dirname) && @{$r->to_array} > 2) {
+    if ( -x $r->child("script/$m")
+      || -x $r->child("bin/$m")
+      || -x $r->child("script/$m.pl")
+      || -x $r->child("bin/$m.pl"))
+    {
+      if (ref($class_or_self)) { return $class_or_self->{home} = $r; }
+      else {
+        return $r;
+      }
+    }
+    ;
+  }
+  return
+    ref($class_or_self)
+    ? ($class_or_self->{home} = $class_or_self->SUPER::home)
+    : $class_or_self->SUPER::home;
+}
 
 # Writes to $home/log/slovo.log if $home/log/ exists and is writable.
 has log => sub {

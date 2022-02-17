@@ -15,8 +15,12 @@ t/dir_interface.t
 t/file_access_hooks.t
 t/file_from_disk.t
 t/filename.t
+t/fileno.t
 t/globbing.t
 t/goto_is_available.t
+t/handle-corruption.t
+t/import.t
+t/lib/Test/TMF.pm
 t/manifest.t
 t/mkdir.t
 t/mock_stat.t
@@ -31,6 +35,7 @@ t/readlink.t
 t/rmdir.t
 t/runtime-bareword-filehandles.t
 t/stat-x.t
+t/symlink.t
 t/sysopen.t
 t/Test-MockFile_file.t
 t/touch.t

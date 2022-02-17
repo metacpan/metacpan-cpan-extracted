@@ -37,6 +37,45 @@ has 'on_when' => (
 
 # METHODS
 
+sub data {
+  my ($self, $data) = @_;
+
+  while(my($key, $value) = each(%$data)) {
+    $self->just($key)->then($value);
+  }
+
+  return $self;
+}
+
+sub expr {
+  my ($self, $topic) = @_;
+
+  $self->when(sub{
+    my $value = $self->value;
+
+    if (!defined $value) {
+      return 0;
+    }
+    if (Scalar::Util::blessed($value) && !overload::Overloaded($value)) {
+      return 0;
+    }
+    if (!Scalar::Util::blessed($value) && ref($value)) {
+      return 0;
+    }
+    if (ref($topic) eq 'Regexp' && "$value" =~ qr/$topic/) {
+      return 1;
+    }
+    elsif ("$value" eq "$topic") {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  });
+
+  return $self;
+}
+
 sub just {
   my ($self, $topic) = @_;
 
@@ -232,9 +271,114 @@ This package provides the following methods:
 
 =cut
 
+=head2 data
+
+  data(HashRef $data) (Match)
+
+The data method takes a hashref (i.e. lookup table) and match conditions and
+actions based on the keys and values found.
+
+I<Since C<0.07>>
+
+=over 4
+
+=item data example 1
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new('a');
+
+  $match->data({
+    'a' => 'b',
+    'c' => 'd',
+    'e' => 'f',
+    'g' => 'h',
+  });
+
+  my $result = $match->none('z')->result;
+
+  # "b"
+
+=back
+
+=over 4
+
+=item data example 2
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new('x');
+
+  $match->data({
+    'a' => 'b',
+    'c' => 'd',
+    'e' => 'f',
+    'g' => 'h',
+  });
+
+  my $result = $match->none('z')->result;
+
+  # "z"
+
+=back
+
+=cut
+
+=head2 expr
+
+  expr(Str | RegexpRef $expr) (Match)
+
+The expr method registers a L</when> condition that check if the match value is
+an exact string match of the C<$topic> if the topic is a string, or that it
+matches against the topic if the topic is a regular expression.
+
+I<Since C<0.07>>
+
+=over 4
+
+=item expr example 1
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new('1901-01-01');
+
+  $match->expr('1901-01-01')->then(sub{[split /-/]});
+
+  my $result = $match->result;
+
+  # ["1901", "01", "01"]
+
+=back
+
+=over 4
+
+=item expr example 2
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new('1901-01-01');
+
+  $match->expr(qr/^1901-/)->then(sub{[split /-/]});
+
+  my $result = $match->result;
+
+  # ["1901", "01", "01"]
+
+=back
+
+=cut
+
 =head2 just
 
-  just(Str $topic) (Self)
+  just(Str $topic) (Match)
 
 The just method registers a L</when> condition that check if the match value is
 an exact string match of the C<$topic> provided.
@@ -369,7 +513,7 @@ I<Since C<0.03>>
 
 =head2 none
 
-  none(CodeRef $code) (Self)
+  none(CodeRef $code) (Match)
 
 The none method registers a special condition that returns a result only when
 no other conditions have been matched.
@@ -424,7 +568,7 @@ I<Since C<0.03>>
 
 =head2 only
 
-  only(CodeRef $code) (Self)
+  only(CodeRef $code) (Match)
 
 The only method registers a special condition that only allows matching on the
 match value only if the code provided returns truthy.
@@ -553,7 +697,7 @@ I<Since C<0.03>>
 
 =head2 then
 
-  then(CodeRef $code) (Self)
+  then(CodeRef $code) (Match)
 
 The then method registers an action to be executed if the corresponding match
 condition returns truthy.
@@ -609,7 +753,7 @@ I<Since C<0.03>>
 
 =head2 when
 
-  when(Str | CodeRef $code, Any @args) (Self)
+  when(Str | CodeRef $code, Any @args) (Match)
 
 The when method registers a match condition that will be passed the match value
 during evaluation. If the match condition returns truthy the corresponding

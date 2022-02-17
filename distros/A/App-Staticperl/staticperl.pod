@@ -802,6 +802,22 @@ Example: link libcrypt statically into the final binary.
    # ldopts might now contain:
    # -lm -Wl,-Bstatic -lcrypt -Wl,-Bdynamic -lpthread
 
+=item C<--extra-cflags> string
+
+Specifies extra compiler flags, used when compiling the bundle file. The
+flags are appended to all the existing flags, so can be sued to override
+settings.
+
+=item C<--extra-ldflags> string
+
+Specifies extra linker flags, used when linking the bundle.
+
+=item C<--extra-libs> string
+
+Extra linker flags, appended at the end when linking. The difference to
+C<--extra-ldflags> is that the ldflags are appended to the flags, before
+the objects and libraries, and the extra libs are added at the end.
+
 =back
 
 =back
@@ -1179,7 +1195,7 @@ is the path and contents of each file that was bundled.
 
 =head3 LAYOUT
 
-Any path starting with an ampersand (F<&>) or exclamation mark (F<!>) are
+Any paths starting with an ampersand (F<&>) or exclamation mark (F<!>) are
 reserved by F<staticperl>. They must only be used as described in this
 section.
 
@@ -1275,8 +1291,8 @@ Many Unicode properties in turn are defined in separate modules,
 such as C<"unicore/Heavy.pl"> and more specific data tables such as
 C<"unicore/To/Digit.pl"> or C<"unicore/lib/Perl/Word.pl">. These tables
 are big (7MB uncompressed, although F<staticperl> contains special
-handling for those files), so including them on demand by your application
-only might pay off.
+handling for those files), so including them only on demand in your
+application might pay off.
 
 To simply include the whole unicode database, use:
 

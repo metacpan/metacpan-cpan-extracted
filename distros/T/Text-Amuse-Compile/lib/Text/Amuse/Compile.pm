@@ -31,11 +31,11 @@ Text::Amuse::Compile - Compiler for Text::Amuse
 
 =head1 VERSION
 
-Version 1.67
+Version 1.82
 
 =cut
 
-our $VERSION = '1.67';
+our $VERSION = '1.82';
 
 =head1 SYNOPSIS
 
@@ -245,6 +245,7 @@ sub _build_fonts {
     my $fonts = Text::Amuse::Compile::Fonts->new($specs);
     my %args = (
                 size => $self->selected_font_size || 10,
+                all_fonts => $fonts,
                );
     my @all_fonts = $fonts->all_fonts;
     foreach my $type (qw/sans mono serif/) {

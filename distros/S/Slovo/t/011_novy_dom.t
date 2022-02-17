@@ -1,7 +1,6 @@
 use open qw(:std :utf8);
 use Mojo::Base -strict;
 use FindBin qw($Bin);
-use lib "$Bin/lib";
 use Test::More;
 use Test::Mojo;
 use Mojo::File qw(path);
@@ -24,7 +23,7 @@ isa_ok($command => 'Slovo::Command');
 
 # Default values
 my $buffer  = '';
-my $db_file = $app->resources->child("data/$moniker.$mode.sqlite");
+my $db_file = $app->home->child("data/$moniker.$mode.sqlite");
 subtest 'Default values' => sub {
   {
     open my $handle, '>', \$buffer;

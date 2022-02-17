@@ -318,11 +318,19 @@ Return -1. The same bit expression of 0xFF in the unsigned 8bit integer in 2's c
 
 Return the absolute value.
 
+=head2 chomp
+
+  static method chomp : void ($string : mutable string)
+
+Remove C<\n> of the end of the string. This method changes the given string itself.
+
+If the string is C<undef> or the length is zero, does nothing.
+
 =head2 chompr
 
   static method chompr : string ($string : string)
 
-Copy the string and remove "\n" of the end of line and return it.
+Copy the string and remove "\n" of the end of the string and return it.
 
 =head2 copy_array_byte
 
@@ -378,13 +386,13 @@ If the array is undef, return undef.
   
 Slice elements in the byte array with the start offset and the length.
 
-Array must be defined, otherwise a exception occurs.
+Array must be defined, otherwise an exception occurs.
 
-Offset must be in the array range, otherwise a exception occurs.
+Offset must be in the array range, otherwise an exception occurs.
 
-Length must be more than or equals to 0, othrewise a exception occurs.
+Length must be more than or equals to 0, othrewise an exception occurs.
 
-Offset + length must not be in the array range, othrewise a exception occurs.
+Offset + length must not be in the array range, othrewise an exception occurs.
 
 =head2 copy_array_range_double
 
@@ -392,13 +400,13 @@ Offset + length must not be in the array range, othrewise a exception occurs.
 
 Slice elements in the double array with the start offset and the length.
 
-Array must be defined, otherwise a exception occurs.
+Array must be defined, otherwise an exception occurs.
 
-Offset must be in the array range, otherwise a exception occurs.
+Offset must be in the array range, otherwise an exception occurs.
 
-Length must be more than or equals to 0, othrewise a exception occurs.
+Length must be more than or equals to 0, othrewise an exception occurs.
 
-Offset + length must not be in the array range, othrewise a exception occurs.
+Offset + length must not be in the array range, othrewise an exception occurs.
 
 =head2 copy_array_range_float
 
@@ -406,13 +414,13 @@ Offset + length must not be in the array range, othrewise a exception occurs.
 
 Slice elements in the float array with the start offset and the length.
 
-Array must be defined, otherwise a exception occurs.
+Array must be defined, otherwise an exception occurs.
 
-Offset must be in the array range, otherwise a exception occurs.
+Offset must be in the array range, otherwise an exception occurs.
 
-Length must be more than or equals to 0, othrewise a exception occurs.
+Length must be more than or equals to 0, othrewise an exception occurs.
 
-Offset + length must not be in the array range, othrewise a exception occurs.
+Offset + length must not be in the array range, othrewise an exception occurs.
 
 =head2 copy_array_range_int
 
@@ -420,13 +428,13 @@ Offset + length must not be in the array range, othrewise a exception occurs.
 
 Slice elements in the int array with the start offset and the length.
 
-Array must be defined, otherwise a exception occurs.
+Array must be defined, otherwise an exception occurs.
 
-Offset must be in the array range, otherwise a exception occurs.
+Offset must be in the array range, otherwise an exception occurs.
 
-Length must be more than or equals to 0, othrewise a exception occurs.
+Length must be more than or equals to 0, othrewise an exception occurs.
 
-Offset + length must not be in the array range, othrewise a exception occurs.
+Offset + length must not be in the array range, othrewise an exception occurs.
 
 =head2 copy_array_range_long
 
@@ -434,13 +442,13 @@ Offset + length must not be in the array range, othrewise a exception occurs.
 
 Slice elements in the long array with the start offset and the length.
 
-Array must be defined, otherwise a exception occurs.
+Array must be defined, otherwise an exception occurs.
 
-Offset must be in the array range, otherwise a exception occurs.
+Offset must be in the array range, otherwise an exception occurs.
 
-Length must be more than or equals to 0, othrewise a exception occurs.
+Length must be more than or equals to 0, othrewise an exception occurs.
 
-Offset + length must not be in the array range, othrewise a exception occurs.
+Offset + length must not be in the array range, othrewise an exception occurs.
 
 =head2 copy_array_range_object
 
@@ -448,13 +456,13 @@ Offset + length must not be in the array range, othrewise a exception occurs.
 
 Slice elements in the object array with the start offset and the length.
 
-Array must be defined, otherwise a exception occurs.
+Array must be defined, otherwise an exception occurs.
 
-Offset must be in the array range, otherwise a exception occurs.
+Offset must be in the array range, otherwise an exception occurs.
 
-Length must be more than or equals to 0, othrewise a exception occurs.
+Length must be more than or equals to 0, othrewise an exception occurs.
 
-Offset + length must not be in the array range, othrewise a exception occurs.
+Offset + length must not be in the array range, othrewise an exception occurs.
 
 =head2 copy_array_range_short
 
@@ -462,13 +470,13 @@ Offset + length must not be in the array range, othrewise a exception occurs.
 
 Slice elements in the short array with the start offset and the length.
 
-Array must be defined, otherwise a exception occurs.
+Array must be defined, otherwise an exception occurs.
 
-Offset must be in the array range, otherwise a exception occurs.
+Offset must be in the array range, otherwise an exception occurs.
 
-Length must be more than or equals to 0, othrewise a exception occurs.
+Length must be more than or equals to 0, othrewise an exception occurs.
 
-Offset + length must not be in the array range, othrewise a exception occurs.
+Offset + length must not be in the array range, othrewise an exception occurs.
 
 =head2 copy_array_range_string
   
@@ -476,13 +484,13 @@ Offset + length must not be in the array range, othrewise a exception occurs.
 
 Slice elements in the string array with the start offset and the length.
 
-Array must be defined, otherwise a exception occurs.
+Array must be defined, otherwise an exception occurs.
 
-Offset must be in the array range, otherwise a exception occurs.
+Offset must be in the array range, otherwise an exception occurs.
 
-Length must be more than or equals to 0, othrewise a exception occurs.
+Length must be more than or equals to 0, othrewise an exception occurs.
 
-Offset + length must not be in the array range, othrewise a exception occurs.
+Offset + length must not be in the array range, othrewise an exception occurs.
 
 =head2 copy_array_short
 
@@ -676,7 +684,7 @@ If at least one of the arrays is undef, a excetpion occurs.
 
 Check equality of two objects. You must sepecify a L<EqualityChecker|SPVM::EqualityChecker> object to check the equality of each element.
 
-$objs1 and $objs2 and $equality_checker must be defined, otherwise a exception occur.
+$objs1 and $objs2 and $equality_checker must be defined, otherwise an exception occurs.
 
 Return 1 if the length of $objs1 and $objs2 is same and all element is same, otherwise return 0.
 
@@ -702,9 +710,9 @@ If at least one of the arrays is undef, a excetpion occurs.
 
 Convert hex string to int value.
 
-the hex string must be defined, otherwise a exception occurs.
+the hex string must be defined, otherwise an exception occurs.
 
-the hex string must be a valid expression which is represented by a regex "^([0-9a-fA-F]{1,8})$", otherwise a exception occurs.
+the hex string must be a valid expression which is represented by a regex "^([0-9a-fA-F]{1,8})$", otherwise an exception occurs.
 
 =head2 index
 
@@ -808,9 +816,9 @@ If character is hexadecimal digit('0'-'9', 'A'-'F', 'a'-'f'), return 1. If not, 
   
 Join a string array with separater and return it.
 
-If separater is undef, a exception occurs.
+If separater is undef, an exception occurs.
 
-If string array is undef, a exception occurs.
+If string array is undef, an exception occurs.
 
 =head2 labs
 
@@ -830,6 +838,32 @@ Convert uppercase string to lowercase string.
 
 Convert first chracter of string from uppercase to lowercase.
 
+=head2 memcpy
+
+  static method memcpy : void ($dest : object, $dest_byte_offset : int, $source : object, $source_byte_offset : int, $byte_length : int);
+
+The destination must be a string type, a numeric type, or a multi numeric type, otherwise an exception is thrown.
+
+If the destination is a read-only string, an exception is thrown.
+
+The source must be a string type, a numeric type, or a multi numeric type, otherwise an exception is thrown.
+
+Copy the source to the destination with the given each offset and the given length by byte unit.
+
+If source data range and destination data overlap, the result is not guaranteed.
+
+The destnation must be defined, otherwise an exception occurs.
+
+The source must be defined, otherwise an exception occurs.
+
+The length must be more than or equals to 0, otherwise an exception occurs.
+
+The destnation byte offset + byte length must be within the byte range of the destnation, otherwise an exception occurs.
+
+The source byte offset + byte length must be within the byte range of the source, otherwise an exception occurs.
+
+If source data range and destination data overlap, the result is not guaranteed.
+
 =head2 memcpy_byte
 
   static method memcpy_byte : void ($dest : byte[], $dest_offset : int, $source : byte[], $source_offset : int, $length : int)
@@ -838,15 +872,15 @@ Copy source byte array to destination byte array with the each offset and a leng
 
 If source data range and destination data overlap, the result is not guaranteed.
 
-Destnation must be defined, otherwise a exception occurs.
+Destnation must be defined, otherwise an exception occurs.
 
-Source must be defined, otherwise a exception occurs.
+Source must be defined, otherwise an exception occurs.
 
-Length must be more than or equals to 0, otherwise a exception occurs.
+Length must be more than or equals to 0, otherwise an exception occurs.
 
-Destnation offset + length must be within the range of the destnation array, otherwise a exception occurs.
+Destnation offset + length must be within the range of the destnation array, otherwise an exception occurs.
 
-Source offset + length must be within the range of the source array, otherwise a exception occurs.
+Source offset + length must be within the range of the source array, otherwise an exception occurs.
 
 =head2 memcpy_double
   
@@ -856,15 +890,15 @@ Copy source double array to destination double array with the each offset and a 
 
 If source data range and destination data overlap, the result is not guaranteed.
 
-Destnation must be defined, otherwise a exception occurs.
+Destnation must be defined, otherwise an exception occurs.
 
-Source must be defined, otherwise a exception occurs.
+Source must be defined, otherwise an exception occurs.
 
-Length must be more than or equals to 0, otherwise a exception occurs.
+Length must be more than or equals to 0, otherwise an exception occurs.
 
-Destnation offset + length must be within the range of the destnation array, otherwise a exception occurs.
+Destnation offset + length must be within the range of the destnation array, otherwise an exception occurs.
 
-Source offset + length must be within the range of the source array, otherwise a exception occurs.
+Source offset + length must be within the range of the source array, otherwise an exception occurs.
 
 =head2 memcpy_float
   
@@ -874,15 +908,15 @@ Copy source float array to destination float array with the each offset and a le
 
 If source data range and destination data overlap, the result is not guaranteed.
 
-Destnation must be defined, otherwise a exception occurs.
+Destnation must be defined, otherwise an exception occurs.
 
-Source must be defined, otherwise a exception occurs.
+Source must be defined, otherwise an exception occurs.
 
-Length must be more than or equals to 0, otherwise a exception occurs.
+Length must be more than or equals to 0, otherwise an exception occurs.
 
-Destnation offset + length must be within the range of the destnation array, otherwise a exception occurs.
+Destnation offset + length must be within the range of the destnation array, otherwise an exception occurs.
 
-Source offset + length must be within the range of the source array, otherwise a exception occurs.
+Source offset + length must be within the range of the source array, otherwise an exception occurs.
 
 =head2 memcpy_int
   
@@ -890,15 +924,15 @@ Source offset + length must be within the range of the source array, otherwise a
 
 Copy source int array to destination int array with the each offset and a length.
 
-Destnation must be defined, otherwise a exception occurs.
+Destnation must be defined, otherwise an exception occurs.
 
-Source must be defined, otherwise a exception occurs.
+Source must be defined, otherwise an exception occurs.
 
-Length must be more than or equals to 0, otherwise a exception occurs.
+Length must be more than or equals to 0, otherwise an exception occurs.
 
-Destnation offset + length must be within the range of the destnation array, otherwise a exception occurs.
+Destnation offset + length must be within the range of the destnation array, otherwise an exception occurs.
 
-Source offset + length must be within the range of the source array, otherwise a exception occurs.
+Source offset + length must be within the range of the source array, otherwise an exception occurs.
 
 =head2 memcpy_long
   
@@ -908,15 +942,15 @@ Copy source long array to destination long array with the each offset and a leng
 
 If source data range and destination data overlap, the result is not guaranteed.
 
-Destnation must be defined, otherwise a exception occurs.
+Destnation must be defined, otherwise an exception occurs.
 
-Source must be defined, otherwise a exception occurs.
+Source must be defined, otherwise an exception occurs.
 
-Length must be more than or equals to 0, otherwise a exception occurs.
+Length must be more than or equals to 0, otherwise an exception occurs.
 
-Destnation offset + length must be within the range of the destnation array, otherwise a exception occurs.
+Destnation offset + length must be within the range of the destnation array, otherwise an exception occurs.
 
-Source offset + length must be within the range of the source array, otherwise a exception occurs.
+Source offset + length must be within the range of the source array, otherwise an exception occurs.
 
 =head2 memcpy_short
 
@@ -926,15 +960,39 @@ Copy source short array to destination short array with the each offset and a le
 
 If source data range and destination data overlap, the result is not guaranteed.
 
-Destnation must be defined, otherwise a exception occurs.
+Destnation must be defined, otherwise an exception occurs.
 
-Source must be defined, otherwise a exception occurs.
+Source must be defined, otherwise an exception occurs.
 
-Length must be more than or equals to 0, otherwise a exception occurs.
+Length must be more than or equals to 0, otherwise an exception occurs.
 
-Destnation offset + length must be within the range of the destnation array, otherwise a exception occurs.
+Destnation offset + length must be within the range of the destnation array, otherwise an exception occurs.
 
-Source offset + length must be within the range of the source array, otherwise a exception occurs.
+Source offset + length must be within the range of the source array, otherwise an exception occurs.
+
+=head2 memmove
+
+  static method memmove : void ($dest : object, $dest_byte_offset : int, $source : object, $source_byte_offset : int, $byte_length : int);
+
+The destination must be a string type, a numeric type, or a multi numeric type, otherwise an exception is thrown.
+
+If the destination is a read-only string, an exception is thrown.
+
+The source must be a string type, a numeric type, or a multi numeric type, otherwise an exception is thrown.
+
+Copy the source to the destination with the given each offset and the given length by byte unit.
+
+If source data range and destination data overlap, the result is not guaranteed.
+
+The destnation must be defined, otherwise an exception occurs.
+
+The source must be defined, otherwise an exception occurs.
+
+The length must be more than or equals to 0, otherwise an exception occurs.
+
+The destnation byte offset + byte length must be within the byte range of the destnation, otherwise an exception occurs.
+
+The source byte offset + byte length must be within the byte range of the source, otherwise an exception occurs.
 
 =head2 memmove_byte
 
@@ -944,15 +1002,15 @@ Copy source byte array to destination byte array with the each offset and a leng
 
 Even if source data range and destination data overlap, the result is guaranteed.
 
-Destnation must be defined, otherwise a exception occurs.
+Destnation must be defined, otherwise an exception occurs.
 
-Source must be defined, otherwise a exception occurs.
+Source must be defined, otherwise an exception occurs.
 
-Length must be more than or equals to 0, otherwise a exception occurs.
+Length must be more than or equals to 0, otherwise an exception occurs.
 
-Destnation offset + length must be within the range of the destnation array, otherwise a exception occurs.
+Destnation offset + length must be within the range of the destnation array, otherwise an exception occurs.
 
-Source offset + length must be within the range of the source array, otherwise a exception occurs.
+Source offset + length must be within the range of the source array, otherwise an exception occurs.
 
 =head2 memmove_double
   
@@ -962,15 +1020,15 @@ Copy source double array to destination double array with the each offset and a 
 
 Even if source data range and destination data overlap, the result is guaranteed.
 
-Destnation must be defined, otherwise a exception occurs.
+Destnation must be defined, otherwise an exception occurs.
 
-Source must be defined, otherwise a exception occurs.
+Source must be defined, otherwise an exception occurs.
 
-Length must be more than or equals to 0, otherwise a exception occurs.
+Length must be more than or equals to 0, otherwise an exception occurs.
 
-Destnation offset + length must be within the range of the destnation array, otherwise a exception occurs.
+Destnation offset + length must be within the range of the destnation array, otherwise an exception occurs.
 
-Source offset + length must be within the range of the source array, otherwise a exception occurs.
+Source offset + length must be within the range of the source array, otherwise an exception occurs.
 
 =head2 memmove_float
   
@@ -980,15 +1038,15 @@ Copy source float array to destination float array with the each offset and a le
 
 Even if source data range and destination data overlap, the result is guaranteed.
 
-Destnation must be defined, otherwise a exception occurs.
+Destnation must be defined, otherwise an exception occurs.
 
-Source must be defined, otherwise a exception occurs.
+Source must be defined, otherwise an exception occurs.
 
-Length must be more than or equals to 0, otherwise a exception occurs.
+Length must be more than or equals to 0, otherwise an exception occurs.
 
-Destnation offset + length must be within the range of the destnation array, otherwise a exception occurs.
+Destnation offset + length must be within the range of the destnation array, otherwise an exception occurs.
 
-Source offset + length must be within the range of the source array, otherwise a exception occurs.
+Source offset + length must be within the range of the source array, otherwise an exception occurs.
 
 =head2 memmove_int
   
@@ -998,15 +1056,15 @@ Copy source int array to destination int array with the each offset and a length
 
 Even if source data range and destination data overlap, the result is guaranteed.
 
-Destnation must be defined, otherwise a exception occurs.
+Destnation must be defined, otherwise an exception occurs.
 
-Source must be defined, otherwise a exception occurs.
+Source must be defined, otherwise an exception occurs.
 
-Length must be more than or equals to 0, otherwise a exception occurs.
+Length must be more than or equals to 0, otherwise an exception occurs.
 
-Destnation offset + length must be within the range of the destnation array, otherwise a exception occurs.
+Destnation offset + length must be within the range of the destnation array, otherwise an exception occurs.
 
-Source offset + length must be within the range of the source array, otherwise a exception occurs.
+Source offset + length must be within the range of the source array, otherwise an exception occurs.
 
 =head2 memmove_long
   
@@ -1016,15 +1074,15 @@ Copy source long array to destination long array with the each offset and a leng
 
 Even if source data range and destination data overlap, the result is guaranteed.
 
-Destnation must be defined, otherwise a exception occurs.
+Destnation must be defined, otherwise an exception occurs.
 
-Source must be defined, otherwise a exception occurs.
+Source must be defined, otherwise an exception occurs.
 
-Length must be more than or equals to 0, otherwise a exception occurs.
+Length must be more than or equals to 0, otherwise an exception occurs.
 
-Destnation offset + length must be within the range of the destnation array, otherwise a exception occurs.
+Destnation offset + length must be within the range of the destnation array, otherwise an exception occurs.
 
-Source offset + length must be within the range of the source array, otherwise a exception occurs.
+Source offset + length must be within the range of the source array, otherwise an exception occurs.
 
 =head2 memmove_short
 
@@ -1034,21 +1092,15 @@ Copy source short array to destination short array with the each offset and a le
 
 Even if source data range and destination data overlap, the result is guaranteed.
 
-Destnation must be defined, otherwise a exception occurs.
+Destnation must be defined, otherwise an exception occurs.
 
-Source must be defined, otherwise a exception occurs.
+Source must be defined, otherwise an exception occurs.
 
-Length must be more than or equals to 0, otherwise a exception occurs.
+Length must be more than or equals to 0, otherwise an exception occurs.
 
-Destnation offset + length must be within the range of the destnation array, otherwise a exception occurs.
+Destnation offset + length must be within the range of the destnation array, otherwise an exception occurs.
 
-Source offset + length must be within the range of the source array, otherwise a exception occurs.
-
-=head2 substr
-
-  static method substr : string ($string : string, $offset : int, $length : int)
-
-Get the substring of the string with the start offset and the length.
+Source offset + length must be within the range of the source array, otherwise an exception occurs.
 
 =head2 new_array_proto
 
@@ -1084,19 +1136,33 @@ This method is not thread safe because internaly this method use rand function o
 
 Same as "index" function except that the search is the last of the string.
 
+=head2 shorten
+
+    static method shorten : void ($string : mutable string, $length : int32_t)
+
+Shorten the string to the given length.
+
+If the string is null, does nothing.
+
+If the given length is greater than the length of the string, does nothing.
+
+If the given length is lower than C<0>, the given length become C<0>.
+
+In the level of native APIs, the charaters of the after the given length are filled with C<\0>.
+
 =head2 sort_byte
 
     static method sort_byte : void ($nums : byte[], $offset : int, $length : int, $comparator : Comparator::Byte)
 
 Sort byte array itself with a offset, a length, and a L<Comparator::Byte|SPVM::Comparator::Byte> comparator.
 
-Array must be not undef. Otherwise a exception occurs.
+Array must be not undef. Otherwise an exception occurs.
 
-Offset must be more than or equals to 0. Otherwise a exception occurs.
+Offset must be more than or equals to 0. Otherwise an exception occurs.
 
-Length must be more than or equals to 0. Otherwise a exception occurs.
+Length must be more than or equals to 0. Otherwise an exception occurs.
 
-Offset + Length must be in the array range. Otherwise a exception occurs.
+Offset + Length must be in the array range. Otherwise an exception occurs.
 
 =head2 sort_double
 
@@ -1104,13 +1170,13 @@ Offset + Length must be in the array range. Otherwise a exception occurs.
 
 Sort double array itself with a offset, a length, and a L<Comparator::Double|SPVM::Comparator::Double> comparator.
 
-Array must be not undef. Otherwise a exception occurs.
+Array must be not undef. Otherwise an exception occurs.
 
-Offset must be more than or equals to 0. Otherwise a exception occurs.
+Offset must be more than or equals to 0. Otherwise an exception occurs.
 
-Length must be more than or equals to 0. Otherwise a exception occurs.
+Length must be more than or equals to 0. Otherwise an exception occurs.
 
-Offset + Length must be in the array range. Otherwise a exception occurs.
+Offset + Length must be in the array range. Otherwise an exception occurs.
 
 =head2 sort_float
 
@@ -1118,13 +1184,13 @@ Offset + Length must be in the array range. Otherwise a exception occurs.
 
 Sort float array itself with a offset, a length, and a L<Comparator::Float|SPVM::Comparator::Float> comparator.
 
-Array must be not undef. Otherwise a exception occurs.
+Array must be not undef. Otherwise an exception occurs.
 
-Offset must be more than or equals to 0. Otherwise a exception occurs.
+Offset must be more than or equals to 0. Otherwise an exception occurs.
 
-Length must be more than or equals to 0. Otherwise a exception occurs.
+Length must be more than or equals to 0. Otherwise an exception occurs.
 
-Offset + Length must be in the array range. Otherwise a exception occurs.
+Offset + Length must be in the array range. Otherwise an exception occurs.
 
 =head2 sort_int
 
@@ -1132,13 +1198,13 @@ Offset + Length must be in the array range. Otherwise a exception occurs.
 
 Sort int array itself with a offset, a length, and a L<Comparator::Int|SPVM::Comparator::Int> comparator.
 
-Array must be not undef. Otherwise a exception occurs.
+Array must be not undef. Otherwise an exception occurs.
 
-Offset must be more than or equals to 0. Otherwise a exception occurs.
+Offset must be more than or equals to 0. Otherwise an exception occurs.
 
-Length must be more than or equals to 0. Otherwise a exception occurs.
+Length must be more than or equals to 0. Otherwise an exception occurs.
 
-Offset + Length must be in the array range. Otherwise a exception occurs.
+Offset + Length must be in the array range. Otherwise an exception occurs.
 
 =head2 sort_long
 
@@ -1146,13 +1212,13 @@ Offset + Length must be in the array range. Otherwise a exception occurs.
 
 Sort long array itself with a offset, a length, and a L<Comparator::Long|SPVM::Comparator::Long> comparator.
 
-Array must be not undef. Otherwise a exception occurs.
+Array must be not undef. Otherwise an exception occurs.
 
-Offset must be more than or equals to 0. Otherwise a exception occurs.
+Offset must be more than or equals to 0. Otherwise an exception occurs.
 
-Length must be more than or equals to 0. Otherwise a exception occurs.
+Length must be more than or equals to 0. Otherwise an exception occurs.
 
-Offset + Length must be in the array range. Otherwise a exception occurs.
+Offset + Length must be in the array range. Otherwise an exception occurs.
 
 =head2 sort_object
 
@@ -1160,13 +1226,13 @@ Offset + Length must be in the array range. Otherwise a exception occurs.
 
 Sort object array itself with a offset, a length, and a L<Comparator::Object|SPVM::Comparator::Object> comparator.
 
-Array must be not undef. Otherwise a exception occurs.
+Array must be not undef. Otherwise an exception occurs.
 
-Offset must be more than or equals to 0. Otherwise a exception occurs.
+Offset must be more than or equals to 0. Otherwise an exception occurs.
 
-Length must be more than or equals to 0. Otherwise a exception occurs.
+Length must be more than or equals to 0. Otherwise an exception occurs.
 
-Offset + Length must be in the array range. Otherwise a exception occurs.
+Offset + Length must be in the array range. Otherwise an exception occurs.
 
 =head2 sort_short
 
@@ -1174,13 +1240,13 @@ Offset + Length must be in the array range. Otherwise a exception occurs.
 
 Sort short array itself with a offset, a length, and a L<Comparator::Short|SPVM::Comparator::Short> comparator.
 
-Array must be not undef. Otherwise a exception occurs.
+Array must be not undef. Otherwise an exception occurs.
 
-Offset must be more than or equals to 0. Otherwise a exception occurs.
+Offset must be more than or equals to 0. Otherwise an exception occurs.
 
-Length must be more than or equals to 0. Otherwise a exception occurs.
+Length must be more than or equals to 0. Otherwise an exception occurs.
 
-Offset + Length must be in the array range. Otherwise a exception occurs.
+Offset + Length must be in the array range. Otherwise an exception occurs.
 
 =head2 sort_string
 
@@ -1188,13 +1254,13 @@ Offset + Length must be in the array range. Otherwise a exception occurs.
 
 Sort string array itself with a offset, a length, and a L<Comparator::String|SPVM::Comparator::String> comparator.
 
-Array must be not undef. Otherwise a exception occurs.
+Array must be not undef. Otherwise an exception occurs.
 
-Offset must be more than or equals to 0. Otherwise a exception occurs.
+Offset must be more than or equals to 0. Otherwise an exception occurs.
 
-Length must be more than or equals to 0. Otherwise a exception occurs.
+Length must be more than or equals to 0. Otherwise an exception occurs.
 
-Offset + Length must be in the array range. Otherwise a exception occurs.
+Offset + Length must be in the array range. Otherwise an exception occurs.
 
 =head2 split
 
@@ -1276,6 +1342,12 @@ Create a formatted string with the format and the embdded values.
 
 Sets random number seed for the C<crand> or C<rand> class method.
 
+=head2 substr
+
+  static method substr : string ($string : string, $offset : int, $length : int)
+
+Get the substring of the string with the start offset and the length.
+
 =head2 to_double
 
   static method to_double : double ($string : string);
@@ -1284,7 +1356,7 @@ Convert the string to float value.
 
 Format is [' ' or '\t' or '\n' or '\v' or '\f' or '\r'][+ or -][zero more than 0-9][.][zero more than 0-9][e or E[+ or -]zero more than 0-9]. Internal of [] is optional.
 
-If the convertion fails, a exception occuer.
+If the convertion fails, an exception occuer.
 
   my $string = "1.25";
   my $num = to_double($string);
@@ -1297,7 +1369,7 @@ Convert the string to float value.
 
 Format is [' ' or '\t' or '\n' or '\v' or '\f' or '\r'][+ or -][zero more than 0-9][.][zero more than 0-9][e or E[+ or -]zero more than 0-9]. Internal of [] is optional.
 
-If the convertion fails, a exception occuer.
+If the convertion fails, an exception occuer.
 
   my $string = "1.25";
   my $num = to_float($string);
@@ -1319,7 +1391,7 @@ Convert the string to a int value with a digit(2, 8, 10, 16).
 
 Format is [' ' or '\t' or '\n' or '\v' or '\f' or '\r'][+ or -][0][x][one more than 0-9]. Internal of [] is optional.
 
-If convertion fails, a exception occuer.
+If convertion fails, an exception occuer.
 
   my $string = "-2147483648";
   my $num = to_int_with_base($string, 10);
@@ -1341,7 +1413,7 @@ Convert the string to long value with digit(2, 8, 10, 16).
 
 Format is [' ' or '\t' or '\n' or '\v' or '\f' or '\r'][+ or -][0][x][zero more than 0-9]. Internal of [] is optional.
 
-If the convertion fails, a exception occuer.
+If the convertion fails, an exception occuer.
 
   my $string = "-9223372036854775808";
   my $num = to_long_with_base($string, 10);
@@ -1372,7 +1444,7 @@ If the argument string is undef, return undef.
 
 Convert a lowercase string to a uppercase string.
 
-If the string is undef, a exception occur.
+If the string is undef, an exception occurs.
 
 =head2 ucfirst
 
@@ -1380,6 +1452,6 @@ If the string is undef, a exception occur.
 
 Convert the first character of a string to a uppercase character.
 
-If the string is undef, a exception occur.
+If the string is undef, an exception occurs.
 
 

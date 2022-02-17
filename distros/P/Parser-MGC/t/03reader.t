@@ -5,20 +5,19 @@ use warnings;
 
 use Test::More;
 
-package TestParser;
-use base qw( Parser::MGC );
+package TestParser {
+   use base qw( Parser::MGC );
 
-sub parse
-{
-   my $self = shift;
+   sub parse
+   {
+      my $self = shift;
 
-   my @tokens;
-   push @tokens, $self->expect( qr/[a-z]+/ ) while !$self->at_eos;
+      my @tokens;
+      push @tokens, $self->expect( qr/[a-z]+/ ) while !$self->at_eos;
 
-   return \@tokens;
+      return \@tokens;
+   }
 }
-
-package main;
 
 my $parser = TestParser->new;
 

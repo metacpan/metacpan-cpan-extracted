@@ -1,5 +1,5 @@
-package Finance::AMEX::Transaction::CBNOT::Trailer;
-$Finance::AMEX::Transaction::CBNOT::Trailer::VERSION = '0.004';
+package Finance::AMEX::Transaction::CBNOT::Trailer 0.005;
+
 use strict;
 use warnings;
 
@@ -9,18 +9,16 @@ use base 'Finance::AMEX::Transaction::CBNOT::Base';
 
 sub field_map {
   return {
-    REC_TYPE                => [1, 1],
-    AMEX_APPL_AREA          => [2, 100],
-
-    APPLICATION_SYSTEM_CODE => [2, 2],
-    FILE_TYPE_CODE          => [4, 2],
-    FILE_CREATION_DATE      => [6, 8],
-    FILE_SEQUENCE_NUMBER    => [20, 6],
-    JULIAN_DATE             => [22, 2],
-    AMEX_TOTAL_RECORDS      => [27, 5],
-    CONFIRM_RECORD_COUNT    => [36, 9],
-    AMEX_JOB_NUMBER         => [45, 9],
-
+    REC_TYPE                => [1,   1],
+    AMEX_APPL_AREA          => [2,   100],
+    APPLICATION_SYSTEM_CODE => [2,   2],
+    FILE_TYPE_CODE          => [4,   2],
+    FILE_CREATION_DATE      => [6,   8],
+    FILE_SEQUENCE_NUMBER    => [20,  6],
+    JULIAN_DATE             => [22,  2],
+    AMEX_TOTAL_RECORDS      => [27,  5],
+    CONFIRM_RECORD_COUNT    => [36,  9],
+    AMEX_JOB_NUMBER         => [45,  9],
     SAID                    => [102, 6],
     DATATYPE                => [108, 5],
     CCYYDDD                 => [113, 7],
@@ -45,10 +43,10 @@ sub DATATYPE                {return $_[0]->_get_column('DATATYPE')}
 sub CCYYDDD                 {return $_[0]->_get_column('CCYYDDD')}
 
 # perl does not allow 0 at the beginning of a sub name,
-# so we strip of the filler character in both the subname
+# so we strip off the filler character in both the subname
 # and the return value
-sub HHMMSS                  {return substr($_[0]->_get_column('HHMMSS'), 1, 6)}
-sub STARS_FILESEQ_NB        {return $_[0]->_get_column('STARS_FILESEQ_NB')}
+sub HHMMSS           {return substr($_[0]->_get_column('HHMMSS'), 1, 6)}
+sub STARS_FILESEQ_NB {return $_[0]->_get_column('STARS_FILESEQ_NB')}
 
 1;
 
@@ -64,7 +62,7 @@ Finance::AMEX::Transaction::CBNOT::Trailer - Parse AMEX Chargeback Notification 
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -110,6 +108,14 @@ This will always return the string TRAILER.
 Returns the full line that is represented by this object.
 
  print $record->line;
+
+=head2 field_map
+
+Returns a hashref where the name is the record name and 
+the value is an arrayref of the start position and length of that field.
+
+ # print the start position of the FILE_CREATION_DATE field
+ print $record->field_map->{FILE_CREATION_DATE}->[0]; # 6
 
 =head2 REC_TYPE
 
@@ -197,7 +203,7 @@ Tom Heady <cpan@punch.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by ZipRecruiter.
+This software is copyright (c) 2022 by ZipRecruiter/Tom Heady.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

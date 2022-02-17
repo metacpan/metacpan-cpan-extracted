@@ -20,7 +20,7 @@ my %regexes = (
     message_age => qr/^Message\sis\s(\d+)\s(\w+)\sold/
 );
 
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 =head1 NAME
 
@@ -97,7 +97,18 @@ sub find_header_info {
                     my $encoding = lc( $wanted[0] );
                     my $charset  = lc( $wanted[1] );
                     $charset =~ s/^\s+//;
-                    $info{content_type} = join( ';', $encoding, $charset );
+
+                    my $not_useful = 'boundary';
+
+                    if (substr( $charset, 0, length($not_useful) ) eq
+                        $not_useful )
+                    {
+                        $info{content_type} = $encoding;
+                    }
+                    else {
+                        $info{content_type}
+                            = join( ';', $encoding, $charset );
+                    }
                 }
                 else {
                     chop $wanted if ( substr( $wanted, -1 ) eq ';' );
@@ -446,7 +457,7 @@ sub find_receivers {
             elsif (
                 substr( $inner, 0, length($report_sent) ) eq $report_sent )
             {
-                $result_ref = [$parts[6], $parts[3]];
+                $result_ref = [ $parts[6], $parts[3] ];
             }
             else {
                 warn "Unexpected receiver format: $inner";

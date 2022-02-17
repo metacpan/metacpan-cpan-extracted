@@ -3,9 +3,9 @@
 package BorderStyle::Text::ANSITable::OldCompat::Default::bold;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-27'; # DATE
+our $DATE = '2022-02-14'; # DATE
 our $DIST = 'Text-ANSITable'; # DIST
-our $VERSION = '0.607'; # VERSION
+our $VERSION = '0.608'; # VERSION
 
 use alias::module 'BorderStyle::UTF8::SingleLineBold';
 
@@ -24,7 +24,7 @@ BorderStyle::Text::ANSITable::OldCompat::Default::bold - UTF8::SingleLineBold bo
 
 =head1 VERSION
 
-This document describes version 0.607 of BorderStyle::Text::ANSITable::OldCompat::Default::bold (from Perl distribution Text-ANSITable), released on 2021-08-27.
+This document describes version 0.608 of BorderStyle::Text::ANSITable::OldCompat::Default::bold (from Perl distribution Text-ANSITable), released on 2022-02-14.
 
 =head1 HOMEPAGE
 
@@ -57,7 +57,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2018, 2017, 2016, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2018, 2017, 2016, 2015, 2014, 2013 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

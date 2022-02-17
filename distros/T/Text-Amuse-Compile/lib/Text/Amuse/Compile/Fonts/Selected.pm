@@ -21,6 +21,11 @@ All are read-only instances of L<Text::Amuse::Compile::Fonts::Family>.
 
 =head2 size
 
+=head2 all_fonts
+
+The instance of L<Text::Amuse::Compile::Fonts> carrying all available
+fonts.
+
 =head1 METHODS
 
 =head2 compose_polyglossia_fontspec_stanza(lang => 'english', others => [qw/russian farsi/], bidi => 1)
@@ -48,6 +53,10 @@ Boolean if bidirectional
 
 Boolean if for beamer
 
+=item captions
+
+Custom locale strings. See L<Text::Amuse::Utils::language_code_locale_captions>
+
 =back
 
 =head2 families
@@ -60,6 +69,8 @@ has mono => (is => 'ro', required => 1, isa => InstanceOf['Text::Amuse::Compile:
 has sans => (is => 'ro', required => 1, isa => InstanceOf['Text::Amuse::Compile::Fonts::Family']);
 has main => (is => 'ro', required => 1, isa => InstanceOf['Text::Amuse::Compile::Fonts::Family']);
 has size => (is => 'ro', default => sub { 10 }, isa => Enum[9..14]);
+has all_fonts => (is => 'ro', required => 1, isa => InstanceOf['Text::Amuse::Compile::Fonts']);
+
 
 sub compose_polyglossia_fontspec_stanza {
     my ($self, %args) = @_;
@@ -116,47 +127,76 @@ STANDARD
 \usepackage{bookmark}
 HYPERREF
     }
-    # main language
-    my $orig_lang = $args{lang} || 'english';
-
-    if ($orig_lang eq 'chinese') {
-        push @out, "\\usepackage[chinese, provide=*]{babel}";
-        push @out, "\\usepackage[heading=true]{ctex}";
-        # foreach my $slot (qw/main mono sans/) {
-        #     # original lang
-        #     push @out, "\\setCJK${slot}font{" . $self->$slot->name . "}";
-        # }
-        return join("\n", @out);
+    my $main_lang = $args{lang} || 'english';
+    my @langs = (@{ $args{others} || [] }, $main_lang);
+    my $babel_langs = join(',', @langs) . ",shorthands=off";
+    my $bidi = $args{bidi} ? ", bidi=default" : "";
+    BABELFONTS: {
+        if (Text::Amuse::Utils::has_babel_ldf($main_lang)) {
+            # one or more is missing, load the main from ldf, others from ini
+            if (grep { !Text::Amuse::Utils::has_babel_ldf($_) } @{ $args{others} || []}) {
+                push @out, "\\usepackage[$babel_langs,provide+=*${bidi}]{babel}";
+            }
+            else {
+                # load everything with the standard ldf
+                push @out, "\\usepackage[${babel_langs}${bidi}]{babel}";
+            }
+        }
+        else {
+            push @out, "\\usepackage[$babel_langs,provide*=*${bidi}]{babel}";
+        }
+        my %slots = (qw/main rm
+                        mono tt
+                        sans sf/);
+        foreach my $slot (sort keys %slots) {
+            # check all the available fonts if there are language specific
+            foreach my $lang (reverse @langs) {
+                my $font = $self->_font_for_slot_and_lang($slot, $lang);
+                my @font_opts = $slot eq 'main' ? () : (qw/Scale MatchLowercase/);
+                if ($lang eq $main_lang) {
+                    push @out, sprintf("\\babelfont{%s}[%s]{%s}",
+                                       $slots{$slot},
+                                       $font->babel_font_options(@font_opts),
+                                       $font->babel_font_name);
+                }
+                else {
+                    push @out, sprintf("\\babelfont[%s]{%s}[%s]{%s}",
+                                       $lang,
+                                       $slots{$slot},
+                                       $font->babel_font_options(@font_opts),
+                                       $font->babel_font_name);
+                }
+            }
+        }
     }
+    my %cjk = (
+               japanese => 1,
+               korean => 1,
+               chinese => 1,
+              );
 
-    push @out, "\\usepackage{fontspec}";
-    push @out, "\\usepackage{polyglossia}";
-
-    my %aliases = (
-                   # pre texlive-2020
-                   # macedonian => 'russian',
-                   serbian => 'croatian',
-                  );
-
-    my $lang = $aliases{$orig_lang} || $orig_lang;
-    my %langs = ($lang => 1, map { $aliases{$_} || $_  => 1 } @{ $args{others} || [] } );
-
-    push @out, "\\setmainlanguage{$lang}";
-    if (my @other_langs = sort grep { $_ ne $lang } keys %langs) {
-        push @out, sprintf('\\setotherlanguages{%s}', join(",", @other_langs));
+    if ($cjk{$main_lang}) {
+        # these will die with luatex. Too bad.
+        #  right now we’re using Song for sans and Kai for sf
+        # https://github.com/adobe-fonts/source-han-serif/releases/download/2.000R/SourceHanSerifCN.zip
+        # https://github.com/adobe-fonts/source-han-sans/releases/download/2.004R/SourceHanSansCN.zip
+        # load all languages with ini files
+        push @out, "\\usepackage{xeCJK}";
+        foreach my $slot (qw/main mono sans/) {
+            # original lang
+            my $font = $self->_font_for_slot_and_lang($slot, $main_lang);
+            push @out, sprintf("\\setCJK${slot}font{%s}[%s]",
+                               $font->babel_font_name,
+                               $font->babel_font_options,
+                              );
+        }
     }
-
-    foreach my $slot (qw/main mono sans/) {
-        # original lang
-        push @out, "\\set${slot}font" . $self->_fontspec_args($slot => $lang);
-    }
-
-    foreach my $l (sort keys %langs) {
-        push @out, "\\newfontfamily\\${l}font" . $self->_fontspec_args(main => $l);
-    }
-
-    if ($args{bidi}) {
-        push @out, '\\usepackage{bidi}';
+    if (my $custom = $args{captions}) {
+        if (my $base = delete $custom->{_base_}) {
+            foreach my $k (sort keys %$custom) {
+                push @out, "\\setlocalecaption{$base}{$k}{$custom->{$k}}";
+            }
+        }
     }
     push @out, '';
     return join("\n", @out);
@@ -219,7 +259,7 @@ sub _fontspec_args {
                   );
     my $def = $self->definitions->{$slot} or die "bad usage, can't find $slot";
     my $script = $scripts{$language} || 'Latin';
-    my @list = ("Script=$script", "Ligatures=TeX");
+    my @list = ("Ligatures=TeX");
     my @shapes = sort values %{ $self->_shape_mapping };
     foreach my $att (qw/Scale Path/, @shapes) {
         if (my $v = $def->{attr}->{$att}) {
@@ -233,5 +273,18 @@ sub families {
     my $self = shift;
     return [ $self->main, $self->mono, $self->sans ];
 }
+
+sub _font_for_slot_and_lang {
+    my ($self, $slot, $lang) = @_;
+    my $font = $self->$slot;
+    if (my @language_specific = $self->all_fonts->fonts_for_language($slot, $lang)) {
+        # there are other fonts setting the lang
+        unless ($font->for_babel_language($lang)) {
+            $font = $language_specific[0];
+        }
+    }
+    return $font;
+}
+
 
 1;

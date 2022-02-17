@@ -3,12 +3,14 @@ package Mojo::UserAgent::CookieJar::ChromeMacOS;
 use strict;
 use warnings;
 use v5.10;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Mojo::Base 'Mojo::UserAgent::CookieJar';
 
 use Mojo::Cookie::Request;
 use DBI;
+use File::Temp qw/tempfile/;
+use File::Copy ();
 use PBKDF2::Tiny qw/derive/;
 use Crypt::CBC;
 
@@ -16,6 +18,7 @@ use Crypt::CBC;
 has 'file' => sub {
     return $ENV{HOME} . "/Library/Application Support/Google/Chrome/Default/Cookies";
 };
+has 'pass'; # for Linux
 
 # readonly
 sub add {}
@@ -29,8 +32,9 @@ sub find {
     my $salt = 'saltysalt';
     my $iv = ' ' x 16;
     my $salt_len = 16;
-    my $pass = __get_pass();
+    my $pass = $self->_get_pass();
     my $iterations = 1003;
+    $iterations = 1 if $pass eq 'peanuts'; # Linux
     my $key = derive( 'SHA-1', $pass, $salt, $iterations, $salt_len );
     my $cipher = Crypt::CBC->new(
         -cipher => 'Crypt::OpenSSL::AES',
@@ -85,18 +89,27 @@ sub __get_dbh {
 
     state $dbh;
     return $dbh if $dbh && $dbh->ping;
-    $dbh = DBI->connect( "dbi:SQLite:dbname=" . $self->file, '', '', {
+
+    # copy to read
+    my ($fh, $filename) = tempfile();
+    File::Copy::copy($self->file, $filename);
+    my $sqlite_file = -e $filename ? $filename : $self->file; # make sure copy works
+
+    $dbh = DBI->connect( "dbi:SQLite:dbname=" . $sqlite_file, '', '', {
       sqlite_see_if_its_a_number => 1,
     } );
 
     return $dbh;
 }
 
-sub __get_pass {
-    state $pass;
-    return $pass if $pass;
-    $pass = `security find-generic-password -w -s "Chrome Safe Storage"`;
+sub _get_pass {
+    my ($self) = @_;
+
+    return $self->pass if $self->pass; # for Linux which passed in ->new
+    my $pass = `security find-generic-password -w -s "Chrome Safe Storage"`;
     chomp( $pass );
+    $self->pass($pass);
+
     return $pass;
 }
 
@@ -119,6 +132,12 @@ Mojo::UserAgent::CookieJar::ChromeMacOS - readonly Chrome(MacOSx) cookies for Mo
 
     my $ua = Mojo::UserAgent->new;
     $ua->cookie_jar(Mojo::UserAgent::CookieJar::ChromeMacOS->new);
+
+    # For Linux
+    Mojo::UserAgent::CookieJar::ChromeMacOS->new(
+        file => '~/.config/google-chrome/Default/Cookies',
+        pass => 'peanuts', # hardcode for Linux
+    );
 
 =head1 DESCRIPTION
 

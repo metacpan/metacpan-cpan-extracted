@@ -6,10 +6,18 @@ use warnings;
 
 use Test::More;
 
-plan tests => 1 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'BorderStyle.pm'
+    'BorderStyle.pm',
+    'BorderStyle/Test/CustomChar.pm',
+    'BorderStyle/Test/Labeled.pm',
+    'BorderStyleRole/Source/ASCIIArt.pm',
+    'BorderStyleRole/Source/Hash.pm',
+    'BorderStyleRole/Spec/Basic.pm',
+    'BorderStyleRole/Transform/BoxChar.pm',
+    'BorderStyleRole/Transform/InnerOnly.pm',
+    'BorderStyleRole/Transform/OuterOnly.pm'
 );
 
 

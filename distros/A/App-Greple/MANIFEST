@@ -6,6 +6,7 @@ MANIFEST.SKIP
 META.json
 README.md
 cpanfile
+dist.ini
 lib/App/Greple.pm
 lib/App/Greple/Common.pm
 lib/App/Greple/Filter.pm
@@ -46,9 +47,9 @@ t/line/00_load.t
 t/line/02_search.t
 t/pod-coverage.t
 t/pod.t
-t/select/00_load.t
-t/select/01_select.t
 t/runner/README.md
 t/runner/Runner.pm
+t/select/00_load.t
+t/select/01_select.t
 META.yml
 MANIFEST

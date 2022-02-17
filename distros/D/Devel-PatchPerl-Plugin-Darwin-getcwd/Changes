@@ -1,0 +1,7 @@
+Revision history for Devel-PatchPerl-Plugin-Darwin-getcwd
+
+0.002  2022-02-11 16:32:39 JST
+  - Add Devel::PatchPerl prereq
+
+0.001  2022-02-11 16:26:42 JST
+  - Initial version

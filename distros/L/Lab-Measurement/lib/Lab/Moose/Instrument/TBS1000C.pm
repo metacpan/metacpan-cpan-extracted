@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::TBS1000C;
-$Lab::Moose::Instrument::TBS1000C::VERSION = '3.803';
+$Lab::Moose::Instrument::TBS1000C::VERSION = '3.810';
 #ABSTRACT: Tektronix TBS 1000C series Oscilloscope.
 
 use v5.20;
@@ -182,7 +182,7 @@ Lab::Moose::Instrument::TBS1000C - Tektronix TBS 1000C series Oscilloscope.
 
 =head1 VERSION
 
-version 3.803
+version 3.810
 
 =head1 SYNOPSIS
 

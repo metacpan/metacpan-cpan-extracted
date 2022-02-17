@@ -53,6 +53,10 @@ constructor, otherwise print the JSON on the standard output.
 
 =item as_json
 
+=item full_font_list
+
+Holds a reference to L<Text::Amuse::Compile::Fonts>
+
 =back
 
 
@@ -60,6 +64,8 @@ constructor, otherwise print the JSON on the standard output.
 
 
 has output => (is => 'ro');
+
+has full_font_list => (is => 'ro', default => sub { Text::Amuse::Compile::Fonts->new });
 
 sub use_fclist {
     return system('fc-list', '--version') == 0;
@@ -70,8 +76,9 @@ sub use_imagemagick {
 }
 
 sub try_list {
+    my $self = shift;
     # pick the default list from the Fonts class and add Noto
-    my $fonts = Text::Amuse::Compile::Fonts->new;
+    my $fonts = $self->full_font_list;
     my %all = (
                serif => [ map { $_->name } $fonts->serif_fonts ],
                mono  => [ map { $_->name } $fonts->mono_fonts ],
@@ -195,6 +202,7 @@ sub import_list {
     local $ENV{LC_ALL} = 'C';
     my $specs = $self->import_with_fclist || $self->import_with_imagemagick;
     die "Cannot retrieve specs, nor with fc-list, nor with imagemagick" unless $specs;
+    my %all_default = map { $_->{name} => $_ } @{ $self->full_font_list->default_font_list };
     my @out;
     foreach my $type (qw/serif sans mono/) {
         foreach my $font (@{$list->{$type}}) {
@@ -211,15 +219,16 @@ sub import_list {
                              );
                 if (grep { !$_ } values %styles) {
                     warn "$font is missing styles: " . Dumper(\%styles) . " disabling embedding\n";
-                    push @out, {
+                    %styles = (
                                 name => $font,
                                 desc => $font,
                                 type => $type,
-                               },
+                              );
                 }
-                else {
-                    push @out, \%styles;
+                if (my $langs = $all_default{$font}{languages}) {
+                    $styles{languages} = $langs;
                 }
+                push @out, \%styles;
             }
         }
     }

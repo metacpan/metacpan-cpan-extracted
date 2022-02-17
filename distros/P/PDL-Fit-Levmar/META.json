@@ -28,13 +28,13 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "PDL" : "2.057"
+            "PDL" : "2.074"
          }
       },
       "runtime" : {
          "requires" : {
             "File::Temp" : "0",
-            "PDL" : "0"
+            "PDL" : "2.074"
          }
       },
       "test" : {
@@ -55,6 +55,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "0.0103",
+   "version" : "0.0105",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

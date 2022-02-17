@@ -7,6 +7,7 @@ use Text::Amuse::Compile;
 use File::Spec;
 use Text::Amuse::Compile::Utils qw/write_file read_file/;
 use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
+use Data::Dumper;
 
 my $builder = Test::More->builder;
 binmode $builder->output,         ":utf8";
@@ -15,7 +16,7 @@ binmode $builder->todo_output,    ":utf8";
 binmode STDOUT, ':encoding(utf-8)';
 binmode STDERR, ':encoding(utf-8)';
 
-my $testnum = 143;
+my $testnum = 141;
 
 my $xelatex = $ENV{TEST_WITH_LATEX};
 if ($xelatex) {
@@ -68,10 +69,10 @@ like $outtex, qr/\\title\{My new shiny test}/, "Doc title found";
 
 like $outtex, qr/\\selectlanguage\{russian\}/, "Found language selection";
 like $outtex, qr/\\selectlanguage\{english\}/, "Found language selection";
-like $outtex, qr/\\setmainlanguage\{french\}/, "Found language selection";
-like $outtex, qr/\\setotherlanguages\{.*russian.*\}/, "Found russian lang";
-like $outtex, qr/\\setotherlanguages\{.*english.*\}/, "Found english lang";
-like $outtex, qr/\\russianfont/, "Found russian font";
+like $outtex, qr/\\setmainlanguage\{french\}|\\usepackage\[.*french,shorthands=off,provide.*\]\{babel\}/, "Found language selection" or die;
+like $outtex, qr/\\setotherlanguages\{.*russian.*\}|\\usepackage\[.*russian.*\]\{babel\}/, "Found russian lang";
+like $outtex, qr/\\setotherlanguages\{.*english.*\}|\\usepackage\[.*russian.*\]\{babel\}/, "Found english lang";
+like $outtex, qr/\\russianfont|\\babelfont\[russian\]/, "Found russian font";
 like $outtex, qr/No sections/;
 like $outtex, qr/pippo no section/;
 like $outtex, qr/Here the body goes/;
@@ -88,12 +89,7 @@ if ($xelatex) {
     ok(-f "$base.pdf", "$base.pdf created");
 }
 
-my @chunks = grep { /language/ } split(/\n/, $outtex);
-
-like shift(@chunks), qr/setmainlanguage\{french\}/, "Found french";
-like shift(@chunks), qr/setotherlanguages\{(english,macedonian,russian)\}/,
-  "Found other languages";
-
+my @chunks = grep { /selectlanguage/ } split(/\n/, $outtex);
 
 foreach my $l (qw/russian english macedonian/) {
     like shift(@chunks), qr/\\selectlanguage\{\Q$l\E\}/, "Found $l";

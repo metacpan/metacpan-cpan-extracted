@@ -19,7 +19,7 @@ name: Perinci-CmdLine-POD
 provides:
   Perinci::CmdLine::POD:
     file: lib/Perinci/CmdLine/POD.pm
-    version: '0.024'
+    version: '0.025'
 requires:
   Data::Dmp: '0.241'
   Exporter: '5.57'
@@ -42,7 +42,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-POD
   homepage: https://metacpan.org/release/Perinci-CmdLine-POD
   repository: git://github.com/perlancar/perl-Perinci-CmdLine-POD.git
-version: '0.024'
+version: '0.025'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

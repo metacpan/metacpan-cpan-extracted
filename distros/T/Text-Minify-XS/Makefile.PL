@@ -7,7 +7,7 @@ use 5.009003;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Simple text minification",
+  "ABSTRACT" => "remove indentation and trailing whitespace",
   "AUTHOR" => "Robert Rothenberg <rrwo\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
     "Test::Warnings" => 0,
     "utf8" => 0
   },
-  "VERSION" => "v0.5.1",
+  "VERSION" => "v0.6.0",
   "test" => {
     "TESTS" => "t/*.t"
   }

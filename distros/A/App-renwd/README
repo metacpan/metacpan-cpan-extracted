@@ -2,7 +2,7 @@ NAME
     App::renwd - REName current (Working) Directory
 
 VERSION
-    This document describes version 0.007 of App::renwd (from Perl
+    This document describes version 0.008 of App::renwd (from Perl
     distribution App-renwd), released on 2021-11-16.
 
 SYNOPSIS

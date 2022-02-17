@@ -1,34 +1,34 @@
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
 
-use Test::More tests => 28503;
+use Test::More tests => 28_503;
 
-BEGIN {use_ok('Finance::AMEX::Transaction')};
+BEGIN {use_ok('Finance::AMEX::Transaction')}
 
 use lib '.';
 use t::lib::CompareFile;
 my $file = 't/data/AMEX/EPPRC test sample file masked.txt';
 
 my $counts = {
-  HEADER            => {want =>  45, have => 0},
-  TRAILER           => {want =>  45, have => 0},
-  SUMMARY           => {want =>  60, have => 0},
-  SOC_DETAIL        => {want =>  65, have => 0},
-  SOC_PRICING       => {want =>  18, have => 0},
+  HEADER            => {want => 45,  have => 0},
+  TRAILER           => {want => 45,  have => 0},
+  SUMMARY           => {want => 60,  have => 0},
+  SOC_DETAIL        => {want => 65,  have => 0},
+  SOC_PRICING       => {want => 18,  have => 0},
   ROC_DETAIL        => {want => 541, have => 0},
   ROC_PRICING       => {want => 333, have => 0},
-  CHARGEBACK_DETAIL => {want =>   0, have => 0},
-  ADJUSTMENT_DETAIL => {want =>   9, have => 0},
-  OTHER_DETAIL      => {want =>  15, have => 0},
+  CHARGEBACK_DETAIL => {want => 0,   have => 0},
+  ADJUSTMENT_DETAIL => {want => 9,   have => 0},
+  OTHER_DETAIL      => {want => 15,  have => 0},
 };
 
-my $data = do { local $/; <DATA> };
+my $data = do {local $/ = undef; <DATA>};
 
 t::lib::CompareFile::compare('EPPRC', $file, $data, $counts);
 
 done_testing();
-
 
 __DATA__
 {

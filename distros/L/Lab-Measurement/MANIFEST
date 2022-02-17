@@ -146,6 +146,7 @@ lib/Lab/Moose/DataFile/Read.pm
 lib/Lab/Moose/DataFolder.pm
 lib/Lab/Moose/Instrument.pm
 lib/Lab/Moose/Instrument/ABB_TRMC2.pm
+lib/Lab/Moose/Instrument/AH2700A.pm
 lib/Lab/Moose/Instrument/AdjustRange.pm
 lib/Lab/Moose/Instrument/Agilent34410A.pm
 lib/Lab/Moose/Instrument/Agilent34460A.pm
@@ -170,6 +171,7 @@ lib/Lab/Moose/Instrument/Lakeshore340/Helium3.pm
 lib/Lab/Moose/Instrument/Lakeshore372.pm
 lib/Lab/Moose/Instrument/LinearStepSweep.pm
 lib/Lab/Moose/Instrument/Log.pm
+lib/Lab/Moose/Instrument/MCL1_540.pm
 lib/Lab/Moose/Instrument/OI_Common.pm
 lib/Lab/Moose/Instrument/OI_ILM210.pm
 lib/Lab/Moose/Instrument/OI_IPS.pm

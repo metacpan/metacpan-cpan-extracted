@@ -5,24 +5,23 @@ use warnings;
 
 use Test::More;
 
-package TestParser;
-use base qw( Parser::MGC );
+package TestParser {
+   use base qw( Parser::MGC );
 
-sub parse
-{
-   my $self = shift;
+   sub parse
+   {
+      my $self = shift;
 
-   $self->sequence_of( 
-      sub {
-         $self->any_of(
-            sub { $self->expect( qr/[a-z]+/ ) . "/" . $self->scope_level },
-            sub { $self->scope_of( "(", \&parse, ")" ) },
-         );
-      },
-   );
+      $self->sequence_of( 
+         sub {
+            $self->any_of(
+               sub { $self->expect( qr/[a-z]+/ ) . "/" . $self->scope_level },
+               sub { $self->scope_of( "(", \&parse, ")" ) },
+            );
+         },
+      );
+   }
 }
-
-package main;
 
 my $parser = TestParser->new;
 

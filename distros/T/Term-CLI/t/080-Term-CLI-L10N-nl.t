@@ -1,6 +1,6 @@
 #!perl
 #
-# Copyright (C) 2018, Steven Bakker.
+# Copyright (c) 2018-2022, Steven Bakker.
 #
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl 5.14.0. For more details, see the full text
@@ -12,6 +12,12 @@ use warnings 1.00;
 
 use Test::More 1.001002;
 use Term::CLI::L10N;
+
+my $TEST_NAME = 'L10N';
+
+if ( ($::ENV{SKIP_ALL} || $::ENV{"SKIP_$TEST_NAME"}) && !$::ENV{"TEST_$TEST_NAME"} ) {
+    plan skip_all => 'skipped because of environment'
+}
 
 Term::CLI::L10N->set_language('nl');
 

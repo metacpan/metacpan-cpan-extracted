@@ -1,7 +1,7 @@
 use Test2::V0;
 
 use lib 't/lib';
-use Test2::Regexp::Pattern::License;
+use Test2::Tools::LicenseRegistry;
 
 plan 1;
 

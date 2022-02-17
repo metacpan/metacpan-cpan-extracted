@@ -95,7 +95,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.198';
+our $VERSION = '1.199';
 
 use Quiq::Hash;
 use Quiq::Properties;
@@ -422,6 +422,50 @@ sub rows {
 
 # -----------------------------------------------------------------------------
 
+=head3 row() - Liefere Zeile
+
+=head4 Synopsis
+
+  $row = $tab->row($i);
+
+=head4 Arguments
+
+=over 4
+
+=item $i
+
+Index der Zeile (0 .. $tab->count-1)
+
+=back
+
+=head4 Returns
+
+(Object) Zeile
+
+=head4 Description
+
+Liefere Zeile mit Index $i.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub row {
+    my ($self,$i) = @_;
+
+    if ($i < 0 || $i > $self->count-1) {
+        $self->throw(
+            'TABLE-00099: Row does not exist, index out of range',
+            Index => $i,
+            Range => '0 .. '.($self->count-1),
+        );
+    }
+
+    return $self->rows->[$i];
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 values() - Werte einer Kolumne
 
 =head4 Synopsis
@@ -594,7 +638,7 @@ sub asText {
 
 =head1 VERSION
 
-1.198
+1.199
 
 =head1 AUTHOR
 

@@ -1,5 +1,18 @@
 Revision history for perl module Text::Amuse::Compile
 
+1.82 2022-02-13
+
+ - Disable the babel shorthands
+
+1.81 2022-02-13
+
+ - Fix failing tests for Windows
+
+1.80 2022-02-12
+
+ - Extend support for languages with language-specific fonts
+ - Use babel instead of polyglossia
+
 1.67 2021-12-30
 
  - Preliminary support for Chinese (without font selection)

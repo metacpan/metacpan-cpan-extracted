@@ -12,7 +12,7 @@ use File::Basename;
 
 use Errno qw/ENOENT EBADF ENOTDIR/;
 
-use Test::MockFile;    # Everything below this can have its open overridden.
+use Test::MockFile qw< nostrict >;    # Everything below this can have its open overridden.
 
 my $temp_dir = tempdir( CLEANUP => 1 );
 my ( undef, $filename )    = tempfile( DIR => $temp_dir );
@@ -81,7 +81,7 @@ my @contents = readdir $sdh;
 closedir $sdh or die $!;
 is(
     [ sort @contents ],
-    [ qw< . .. dest infoo source > ],
+    [qw< . .. dest infoo source >],
     'Symlink and directories appears in directory content'
 );
 
@@ -96,7 +96,7 @@ is(
     opendir my $dh, '/foo2' or die $!;
     my @content = readdir $dh;
     closedir $dh or die $!;
-    is( \@content, [ qw< . .. bar > ], 'Did not get confused by internal files' );
+    is( \@content, [qw< . .. bar >], 'Did not get confused by internal files' );
 }
 
 done_testing();

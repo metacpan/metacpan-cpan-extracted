@@ -4,7 +4,7 @@ use warnings;
 use 5.010; # state
 
 # ABSTRACT: Fully UTF-8 aware File::Find
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 #pod =begin :prelude
 #pod
@@ -127,9 +127,6 @@ our $UTF8_CHECK = Encode::FB_CROAK | Encode::LEAVE_SRC; # Die on encoding errors
 my $_UTF8 = Encode::find_encoding('UTF-8');
 
 sub import {
-    # Target package (i.e., the one loading this module)
-    my $target_package = caller;
-
     # If run on the dos/os2/windows platform, ignore overriding functions silently.
     # These platforms do not have (proper) utf-8 file system suppport...
     unless ($^O =~ /MSWin32|cygwin|dos|os2/) {
@@ -155,7 +152,10 @@ sub import {
 
     # Use exporter to export
     require Exporter;
-    Exporter::export_to_level($original_package, 1, $target_package, @_) if (@_);
+    if (@_) {
+        @_ = ($original_package, @_);
+        goto &Exporter::import;
+    }
 
     return;
 }
@@ -250,7 +250,7 @@ File::Find::utf8 - Fully UTF-8 aware File::Find
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =for test_synopsis my @directories_to_search;
 

@@ -20,9 +20,9 @@ has listen => sub {
 $ENV{MOJO_LOG_LEVEL} ||= $ENV{HARNESS_IS_VERBOSE} ? 'trace' : 'fatal';
 
 sub startup {
-  my $Self = shift;
+  my $self = shift;
 
-  $Self->hook(
+  $self->hook(
     after_build_tx => sub {
       my $Transaction = shift;
 
@@ -30,9 +30,9 @@ sub startup {
     }
   );
 
-  $Self->secrets('dedf9c3d-93ca-42ca-9ee7-82bc1d625c61');
-  $Self->routes->any('/*route')->to('Routes#any');
-  $Self->renderer->classes(['Mock::Podman::Service::Routes']);
+  $self->secrets('dedf9c3d-93ca-42ca-9ee7-82bc1d625c61');
+  $self->routes->any('/*route')->to('Routes#any');
+  $self->renderer->classes(['Mock::Podman::Service::Routes']);
 
   return;
 }

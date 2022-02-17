@@ -3,63 +3,76 @@ NAME
     files without touching the file system.
 
 VERSION
-    Version 0.023
+    Version 0.029
 
 SYNOPSIS
     Intercepts file system calls for specific files so unit testing can take
     place without any files being altered on disk.
 
     This is useful for small tests
-    <https://en.wikipedia.org/wiki/Google_Test#Small_Tests_(Unit_Tests)>
-    where file interaction is discouraged.
+    <https://testing.googleblog.com/2010/12/test-sizes.html> where file
+    interaction is discouraged.
 
-    A strict mode is even provided which can throw a die when files are
-    accessed during your tests!
+    A strict mode is even provided (and turned on by default) which can
+    throw a die when files are accessed during your tests!
 
         # Loaded before Test::MockFile so uses the core perl functions without any hooks.
         use Module::I::Dont::Want::To::Alter;
 
-        # strict mode
-        use Test::MockFile qw< strict >;
+        # strict mode by default
+        use Test::MockFile ();
+
+        # non-strict mode
+        use Test::MockFile qw< nostrict >;
 
         # Be sure to assign the output of mocks, they disappear when they go out of scope
-        my $mock_file = Test::MockFile->file("/foo/bar", "contents\ngo\nhere");
-        open my $fh, '<', '/foo/bar' or die; # Does not actually open the file on disk
-        say 'ok' if -e $fh;
+        my $foobar = Test::MockFile->file( "/foo/bar", "contents\ngo\nhere" );
+        open my $fh, '<', '/foo/bar' or die;    # Does not actually open the file on disk
+        say '/foo/bar exists' if -e $fh;
         close $fh;
-        say 'ok' if -f '/foo/bar';
+
+        say '/foo/bar is a file' if -f '/foo/bar';
         say '/foo/bar is THIS BIG: ' . -s '/foo/bar';
 
-        my $missing_mocked_file = Test::MockFile->file('/foo/baz'); # File starts out missing
-        my $opened              = open my $baz_fh, '<', '/foo/baz'; # File reports as missing so fails
-        say 'ok' if !-e '/foo/baz';
+        my $foobaz = Test::MockFile->file('/foo/baz');    # File starts out missing
+        my $opened = open my $baz_fh, '<', '/foo/baz';    # File reports as missing so fails
+        say '/foo/baz does not exist yet' if !-e '/foo/baz';
 
-        open $baz_fh, '>', '/foo/baz' or die; # open for writing
-        print {$baz_fh} "replace contents\n";
+        open $baz_fh, '>', '/foo/baz' or die;             # open for writing
+        print {$baz_fh} "first line\n";
 
-        open $baz_fh, '>>', '/foo/baz' or die; # open for append.
+        open $baz_fh, '>>', '/foo/baz' or die;            # open for append.
         print {$baz_fh} "second line";
         close $baz_fh;
 
-        say $baz->contents;
+        say "Contents of /foo/baz:\n>>" . $foobaz->contents() . '<<';
 
         # Unmock your file.
-        undef $missing_mocked_file;
+        # (same as the variable going out of scope
+        undef $foobaz;
 
         # The file check will now happen on file system now the file is no longer mocked.
-        say 'ok' if !-e '/foo/baz';
+        say '/foo/baz is missing again (no longer mocked)' if !-e '/foo/baz';
 
-        my $quux    = Test::MockFile->file('/foo/bar/quux.txt');
-        my @matches = </foo/bar/*.txt>;       # ( 'quux.txt' )
-        my @matches = glob('/foo/bar/*.txt'); # same as above
+        my $quux    = Test::MockFile->file( '/foo/bar/quux.txt', '' );
+        my @matches = </foo/bar/*.txt>;
+
+        # ( '/foo/bar/quux.txt' )
+        say "Contents of /foo/bar directory: " . join "\n", @matches;
+
+        @matches = glob('/foo/bar/*.txt');
+
+        # same as above
+        say "Contents of /foo/bar directory (using glob()): " . join "\n", @matches;
 
 IMPORT
-    If the module is loaded in strict mode, any file checks, open, sysopen,
-    opendir, stat, or lstat will throw a die.
+    When the module is loaded with no parameters, strict mode is turned on.
+    Any file checks, "open", "sysopen", "opendir", "stat", or "lstat" will
+    throw a die.
 
     For example:
 
-        use Test::MockFile qw< strict >;
+        use Test::MockFile;
 
         # This will not die.
         my $file    = Test::MockFile->file("/bar", "...");
@@ -74,6 +87,10 @@ IMPORT
         -e '/file';
         -l '/file';
 
+    If we want to load the module without strict mode:
+
+        use Test::MockFile qw< nostrict >;
+
     Relative paths are not supported:
 
         use Test::MockFile;
@@ -83,10 +100,15 @@ IMPORT
         $file = Test::MockFile->file( '/bar',        '...' ); # ok     - absolute path
         $file = Test::MockFile->file( 'bar', '...' );         # ok     - current dir
 
-    And if you have multiple forward slashes, it will croak as well:
+  file_arg_position_for_command
+    Args: ($command)
 
-        use Test::MockFile;
-        $file = Test::MockFile->file( '//bar', '...' );
+    Provides a hint with the position of the argument most likely holding
+    the file name for the current $command call.
+
+    This is used internaly to provide better error messages. This can be
+    used when plugging hooks to know what's the filename we currently try to
+    access.
 
 SUBROUTINES/METHODS
   file
@@ -142,7 +164,7 @@ SUBROUTINES/METHODS
     The directory name is normalized so any trailing slash is removed.
 
         $dir = Test::MockFile->dir( 'mydir/', ... ); # ok
-        $dir->filename();                            # mydir
+        $dir->path();                                # mydir
 
     If there were previously mocked files (within the same scope), the
     directory will exist. Otherwise, the directory will be nonexistent.
@@ -233,7 +255,11 @@ SUBROUTINES/METHODS
     Symlinks have no contents.
 
   filename
-    The name of the file this mock object is controlling.
+    Deprecated. Same as "path".
+
+  path
+    The path (filename or dirname) of the file or directory this mock object
+    is controlling.
 
   unlink
     Makes the virtual file go away. NOTE: This also works for directories.
@@ -374,7 +400,32 @@ SUBROUTINES/METHODS
 
     *   closedir
 
-BAREWORD FILEHANDLE FAILURES
+CAEATS AND LIMITATIONS
+  DEBUGGER UNDER STRICT MODE
+    If you want to use the Perl debugger (perldebug) on any code that uses
+    Test::MockFile in strict mode, you will need to load Term::ReadLine
+    beforehand, because it loads a file. Under the debugger, the debugger
+    will load the module after Test::MockFile and get mad.
+
+        # Load it from the command line
+        perl -MTerm::ReadLine -d code.pl
+
+        # Or alternatively, add this to the top of your code:
+        use Term::ReadLine
+
+  FILENO IS UNSUPPORTED
+    Filehandles can provide the file descriptor (in number) using the
+    "fileno" keyword but this is purposefully unsupported in Test::MockFile.
+
+    The reaosn is that by mocking a file, we're creating an alternative file
+    system. Returning a "fileno" (file descriptor number) would require
+    creating file descriptor numbers that would possibly conflict with the
+    file desciptors you receive from the real filesystem.
+
+    In short, this is a recipe for buggy tests or worse - truly destructive
+    behavior. If you have a need for a real file, we suggest File::Temp.
+
+  BAREWORD FILEHANDLE FAILURES
     There is a particular type of bareword filehandle failures that cannot
     be fixed.
 

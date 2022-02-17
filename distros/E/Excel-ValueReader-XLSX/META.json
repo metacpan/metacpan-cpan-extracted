@@ -25,10 +25,12 @@
          },
          "requires" : {
             "Archive::Zip" : "0",
+            "Carp" : "0",
             "Date::Calc" : "0",
             "Module::Load" : "0",
             "Moose" : "0",
             "POSIX" : "0",
+            "Scalar::Util" : "0",
             "perl" : "5.010001",
             "utf8" : "0"
          }
@@ -39,7 +41,6 @@
             "List::MoreUtils" : "0",
             "List::Util" : "0",
             "Module::Load::Conditional" : "0",
-            "Scalar::Util" : "0",
             "Test::More" : "0"
          }
       }
@@ -47,19 +48,19 @@
    "provides" : {
       "Excel::ValueReader::XLSX" : {
          "file" : "lib/Excel/ValueReader/XLSX.pm",
-         "version" : "1.07"
+         "version" : "1.08"
       },
       "Excel::ValueReader::XLSX::Backend" : {
          "file" : "lib/Excel/ValueReader/XLSX/Backend.pm",
-         "version" : "1.07"
+         "version" : "1.08"
       },
       "Excel::ValueReader::XLSX::Backend::LibXML" : {
          "file" : "lib/Excel/ValueReader/XLSX/Backend/LibXML.pm",
-         "version" : "1.07"
+         "version" : "1.08"
       },
       "Excel::ValueReader::XLSX::Backend::Regex" : {
          "file" : "lib/Excel/ValueReader/XLSX/Backend/Regex.pm",
-         "version" : "1.07"
+         "version" : "1.08"
       }
    },
    "release_status" : "stable",
@@ -71,6 +72,6 @@
          "url" : "https://github.com/damil/Excel-ValueReader-XLSX"
       }
    },
-   "version" : "1.07",
+   "version" : "1.08",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

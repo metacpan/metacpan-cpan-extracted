@@ -1,6 +1,16 @@
-# mojolicious_coverage
+# Mojolicious::Command::coverage
 
-Start you Mojo app in coverage mode
+![https://metacpan.org/pod/Mojolicious::Command::coverage](https://img.shields.io/cpan/v/Mojolicious-Command-coverage)
+
+Start you Mojo app in coverage mode. In short this command does the following:
+
+```text
+
+./myapp.pl coverage [application arguments]
+# Is translated to
+perl -I $INC[0] ... - I $INC[N] -MDevel::Cover=$coverageConfig -MDevel::Deanonymize=$deanonConfig myapp.pl [application arguments]
+
+```
 
 # SYNOPSIS
 

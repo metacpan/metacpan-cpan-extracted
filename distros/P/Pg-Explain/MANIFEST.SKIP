@@ -49,3 +49,6 @@
 \bPg-Explain-[\d\.\_]+
 ^MYMETA.yml$
 ^MYMETA\.json$
+
+# direnv config file
+\.envrc$

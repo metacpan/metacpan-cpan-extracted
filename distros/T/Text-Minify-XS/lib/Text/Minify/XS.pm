@@ -1,6 +1,6 @@
 package Text::Minify::XS;
 
-# ABSTRACT: Simple text minification
+# ABSTRACT: remove indentation and trailing whitespace
 
 use v5.9.3;
 use strict;
@@ -10,11 +10,16 @@ require Exporter;
 require XSLoader;
 
 our @ISA = qw(Exporter);
-our @EXPORT_OK = qw(minify);
+our @EXPORT_OK = qw(minify minify_utf8 minify_ascii);
 
-our $VERSION = 'v0.5.1';
+our $VERSION = 'v0.6.0';
 
 XSLoader::load( "Text::Minify::XS", $VERSION );
+
+{
+    no strict 'refs';
+    *minify_utf8 = \&minify;
+}
 
 1;
 
@@ -26,17 +31,22 @@ __END__
 
 =head1 NAME
 
-Text::Minify::XS - Simple text minification
+Text::Minify::XS - remove indentation and trailing whitespace
 
 =head1 VERSION
 
-version v0.5.1
+version v0.6.0
 
 =head1 SYNOPSIS
 
   use Text::Minify::XS qw/ minify /;
 
   my $out = minify( $in );
+
+=head1 DESCRIPTION
+
+This is a simple and fast text minifier that removes quickly extra
+whitespace from multi-line text.
 
 =head1 EXPORTS
 
@@ -46,8 +56,8 @@ None by default.
 
   my $out = minify( $in );
 
-This is a quick-and-dirty text minifier that removes whitespace in a
-single pass.
+This is a quick-and-dirty text minifier that removes indentation and
+trailing whitespace from a multi-line text document in a single pass.
 
 It does the following:
 
@@ -73,6 +83,24 @@ and changes carriage returns to newlines.
 
 It does not recognise any form of markup, comments or text quoting.
 Nor does it remove extra whitespace in the middle of the line.
+
+Because it does not recognise any markup, newlines are not removed
+since they may be significant.
+
+=head2 minify_utf8
+
+This is an alias for L</minify>.  It was added in v0.5.3.
+
+=head2 minify_ascii
+
+This is a version of L</minify> that works on ASCII text. It was added in v0.5.3.
+
+If you are only processing 8-bit text, then it should be faster.
+(Rudimentary benchmarks show it is twice as fast as L</minify>.)
+
+Unlike the L</minify>, if the input string has the UTF-8 flag set, the
+resulting string will not.  You should ensure the string is properly
+encoded.
 
 =head1 KNOWN ISSUES
 
@@ -161,7 +189,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020-2021 by Robert Rothenberg.
+This software is Copyright (c) 2020-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

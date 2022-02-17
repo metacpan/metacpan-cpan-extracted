@@ -1,5 +1,5 @@
 package Music::Intervals::Ratios;
-$Music::Intervals::Ratios::VERSION = '0.0901';
+$Music::Intervals::Ratios::VERSION = '0.0904';
 our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Musical ratios
@@ -31,11 +31,11 @@ our $ratio = {
     },
     E => {
         ratio => '5/4',
-        name => q|major third|,
+        name => q|5-limit major third, 5th harmonic|,
     },
     Eb => {
         ratio => '6/5',
-        name => q|minor third|,
+        name => q|5-limit minor third|,
     },
     m10 => {
         ratio => '7/3',
@@ -75,7 +75,7 @@ our $ratio = {
     },
     D => {
         ratio => '9/8',
-        name => q|major whole tone|,
+        name => q|major whole tone, 9th harmonic|,
     },
     et => {
         ratio => '10/7',
@@ -103,7 +103,7 @@ our $ratio = {
     },
     '11h' => {
         ratio => '11/8',
-        name => q|undecimal semi-augmented fourth, undecimal tritone (11th harmonic)|,
+        name => q|undecimal semi-augmented fourth, undecimal tritone, 11th harmonic|,
     },
     un3 => {
         ratio => '11/9',
@@ -135,7 +135,7 @@ our $ratio = {
     },
     tn10 => {
         ratio => '13/8',
-        name => q|tridecimal neutral sixth, overtone sixth|,
+        name => q|tridecimal neutral sixth, overtone sixth, 13th harmonic|,
     },
     td5 => {
         ratio => '13/9',
@@ -183,7 +183,7 @@ our $ratio = {
     },
     mds => {
         ratio => '16/15',
-        name => q|minor diatonic semitone, major half-step|,
+        name => q|minor diatonic semitone, major 5-limit half-step|,
     },
     sM9 => {
         ratio => '16/7',
@@ -299,7 +299,7 @@ our $ratio = {
     },
     ms => {
         ratio => '21/20',
-        name => q|minor semitone|,
+        name => q|septimal semitone|,
     },
     tM6 => {
         ratio => '22/13',
@@ -367,7 +367,7 @@ our $ratio = {
     },
     'C#' => {
         ratio => '25/24',
-        name => q|classic chromatic semitone, minor chroma, minor half-step|,
+        name => q|classic chromatic semitone, minor chroma, minor 5-limit half-step|,
     },
     ca11 => {
         ratio => '25/9',
@@ -431,7 +431,7 @@ our $ratio = {
     },
     a13t => {
         ratio => '28/27',
-        name => q|septimal 1/3-tone, inferior quarter-tone|,
+        name => q|septimal 1/3-tone, inferior quarter-tone (Archytas)|,
     },
     '29h' => {
         ratio => '29/16',
@@ -571,7 +571,7 @@ our $ratio = {
     },
     g5 => {
         ratio => '40/27',
-        name => q|grave fifth, dissonant "wolf" fifth|,
+        name => q|grave fifth, dissonant "wolf" 5-limit fifth|,
     },
     tmd => {
         ratio => '40/39',
@@ -595,7 +595,7 @@ our $ratio = {
     },
     dt => {
         ratio => '45/32',
-        name => q|diatonic tritone, high tritone|,
+        name => q|diatonic tritone, high 5-limit tritone|,
     },
     '15t' => {
         ratio => '45/44',
@@ -767,7 +767,7 @@ our $ratio = {
     },
     '2tt' => {
         ratio => '64/45',
-        name => q|2nd tritone, low tritone|,
+        name => q|2nd tritone, low 5-limit tritone|,
     },
     stM3 => {
         ratio => '64/49',
@@ -851,7 +851,7 @@ our $ratio = {
     },
     k77h => {
         ratio => '77/64',
-        name => q|keenanismic minor third, octave reduced 77th harmonic|,
+        name => q|keenanismic minor third, 77th harmonic|,
     },
     use => {
         ratio => '77/72',
@@ -1183,7 +1183,7 @@ our $ratio = {
     },
     pM7 => {
         ratio => '243/128',
-        name => q|Pythagorean major seventh|,
+        name => q|Pythagorean major seventh, 243rd harmonic|,
     },
     a5 => {
         ratio => '243/160',
@@ -1805,6 +1805,250 @@ our $ratio = {
         ratio => '19383245667680019896796723/19342813113834066795298816',
         name => q|Mercator's comma|,
     },
+    iqt => {
+        ratio => '32/31',
+        name => q|inferior quarter-tone (Didymus)|,
+    },
+    '129h' => {
+        ratio => '129/128',
+        name => q|129th harmonic|,
+    },
+    '131h' => {
+        ratio => '131/128',
+        name => q|131st harmonic|,
+    },
+    '133h' => {
+        ratio => '133/128',
+        name => q|133rd harmonic|,
+    },
+    '137h' => {
+        ratio => '137/128',
+        name => q|137th harmonic|,
+    },
+    '139h' => {
+        ratio => '139/128',
+        name => q|139th harmonic|,
+    },
+    '141h' => {
+        ratio => '141/128',
+        name => q|141st harmonic|,
+    },
+    '143h' => {
+        ratio => '143/128',
+        name => q|143rd harmonic|,
+    },
+    '145h' => {
+        ratio => '145/128',
+        name => q|145th harmonic|,
+    },
+    '149h' => {
+        ratio => '149/128',
+        name => q|149th harmonic|,
+    },
+    '151h' => {
+        ratio => '151/128',
+        name => q|151st harmonic|,
+    },
+    '153h' => {
+        ratio => '153/128',
+        name => q|153rd harmonic|,
+    },
+    '155h' => {
+        ratio => '155/128',
+        name => q|155th harmonic|,
+    },
+    '157h' => {
+        ratio => '157/128',
+        name => q|157th harmonic|,
+    },
+    '159h' => {
+        ratio => '159/128',
+        name => q|159th harmonic|,
+    },
+    '161h' => {
+        ratio => '161/128',
+        name => q|161st harmonic|,
+    },
+    '163h' => {
+        ratio => '163/128',
+        name => q|163rd harmonic|,
+    },
+    '165h' => {
+        ratio => '165/128',
+        name => q|165th harmonic|,
+    },
+    '167h' => {
+        ratio => '167/128',
+        name => q|167th harmonic|,
+    },
+    '169h' => {
+        ratio => '169/128',
+        name => q|169th harmonic|,
+    },
+    '171h' => {
+        ratio => '171/128',
+        name => q|171st harmonic|,
+    },
+    '173h' => {
+        ratio => '173/128',
+        name => q|173rd harmonic|,
+    },
+    '175h' => {
+        ratio => '175/128',
+        name => q|175th harmonic|,
+    },
+    '177h' => {
+        ratio => '177/128',
+        name => q|177th harmonic|,
+    },
+    '179h' => {
+        ratio => '179/128',
+        name => q|179th harmonic|,
+    },
+    '181h' => {
+        ratio => '181/128',
+        name => q|181st harmonic|,
+    },
+    '183h' => {
+        ratio => '183/128',
+        name => q|183rd harmonic|,
+    },
+    '185h' => {
+        ratio => '185/128',
+        name => q|185th harmonic|,
+    },
+    '187h' => {
+        ratio => '187/128',
+        name => q|187th harmonic|,
+    },
+    '191h' => {
+        ratio => '191/128',
+        name => q|191st harmonic|,
+    },
+    '193h' => {
+        ratio => '193/128',
+        name => q|193rd harmonic|,
+    },
+    '195h' => {
+        ratio => '195/128',
+        name => q|195th harmonic|,
+    },
+    '197h' => {
+        ratio => '197/128',
+        name => q|197th harmonic|,
+    },
+    '199h' => {
+        ratio => '199/128',
+        name => q|199th harmonic|,
+    },
+    '201h' => {
+        ratio => '201/128',
+        name => q|201st harmonic|,
+    },
+    '203h' => {
+        ratio => '203/128',
+        name => q|203rd harmonic|,
+    },
+    '205h' => {
+        ratio => '205/128',
+        name => q|205th harmonic|,
+    },
+    '207h' => {
+        ratio => '207/128',
+        name => q|207th harmonic|,
+    },
+    '209h' => {
+        ratio => '209/128',
+        name => q|209th harmonic|,
+    },
+    '211h' => {
+        ratio => '211/128',
+        name => q|211th harmonic|,
+    },
+    '213h' => {
+        ratio => '213/128',
+        name => q|213th harmonic|,
+    },
+    '215h' => {
+        ratio => '215/128',
+        name => q|215th harmonic|,
+    },
+    '217h' => {
+        ratio => '217/128',
+        name => q|217th harmonic|,
+    },
+    '219h' => {
+        ratio => '219/128',
+        name => q|219th harmonic|,
+    },
+    '221h' => {
+        ratio => '221/128',
+        name => q|221st harmonic|,
+    },
+    '223h' => {
+        ratio => '223/128',
+        name => q|223rd harmonic|,
+    },
+    '225h' => {
+        ratio => '225/128',
+        name => q|225th harmonic|,
+    },
+    '227h' => {
+        ratio => '227/128',
+        name => q|227th harmonic|,
+    },
+    '229h' => {
+        ratio => '229/128',
+        name => q|229th harmonic|,
+    },
+    '231h' => {
+        ratio => '231/128',
+        name => q|231st harmonic|,
+    },
+    '233h' => {
+        ratio => '233/128',
+        name => q|233rd harmonic|,
+    },
+    '235h' => {
+        ratio => '235/128',
+        name => q|235th harmonic|,
+    },
+    '237h' => {
+        ratio => '237/128',
+        name => q|237th harmonic|,
+    },
+    '239h' => {
+        ratio => '239/128',
+        name => q|239th harmonic|,
+    },
+    '241h' => {
+        ratio => '241/128',
+        name => q|241st harmonic|,
+    },
+    '245h' => {
+        ratio => '245/128',
+        name => q|245th harmonic|,
+    },
+    '247h' => {
+        ratio => '247/128',
+        name => q|247th harmonic|,
+    },
+    '249h' => {
+        ratio => '249/128',
+        name => q|249th harmonic|,
+    },
+    '251h' => {
+        ratio => '251/128',
+        name => q|251st harmonic|,
+    },
+    '253h' => {
+        ratio => '253/128',
+        name => q|253rd harmonic|,
+    },
+    '255h' => {
+        ratio => '255/128',
+        name => q|255th harmonic|,
+    },
 };
 
 1;
@@ -1821,7 +2065,7 @@ Music::Intervals::Ratios - Musical ratios
 
 =head1 VERSION
 
-version 0.0901
+version 0.0904
 
 =head1 AUTHOR
 

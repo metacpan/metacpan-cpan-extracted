@@ -1,13 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
 
 use Object::Pad 0.43;  # :strict(params), ADJUST
 
-package App::sdview::Parser::Pod 0.05;
+package App::sdview::Parser::Pod 0.06;
 class App::sdview::Parser::Pod
    isa Pod::Simple
    does App::sdview::Parser
@@ -39,6 +39,7 @@ ADJUST
    $self->nix_X_codes( 1 );
 }
 
+has @_indentstack;
 has @_parastack;
 
 has %_curtags;
@@ -46,6 +47,7 @@ has $_curpara;
 
 method parse_file ( $fh )
 {
+   push @_indentstack, 0;
    push @_parastack, [];
    $self->SUPER::parse_file( $fh );
    return $_parastack[0]->@*;
@@ -53,6 +55,7 @@ method parse_file ( $fh )
 
 method parse_string ( $str )
 {
+   push @_indentstack, 0;
    push @_parastack, [];
    $self->SUPER::parse_string_document ( $str );
    return $_parastack[0]->@*;
@@ -64,7 +67,7 @@ my %PARA_TYPES = (
 );
 my @FORMAT_TYPES = qw( B I F C L );
 
-method _handle_element_start ($type, $attrs)
+method _handle_element_start ( $type, $attrs )
 {
    if( $type eq "Document" ) {
       %_curtags = ();
@@ -82,7 +85,8 @@ method _handle_element_start ($type, $attrs)
    }
    elsif( my $class = $PARA_TYPES{$type} ) {
       push $_parastack[-1]->@*, $_curpara = $class->new(
-         text => String::Tagged->new,
+         text   => String::Tagged->new,
+         indent => $_indentstack[-1],
       );
       %_curtags = ();
    }
@@ -97,10 +101,13 @@ method _handle_element_start ($type, $attrs)
    elsif( any { $type eq $_ } @FORMAT_TYPES ) {
       ++$_curtags{$type};
    }
+   elsif( $type eq "over-block" ) {
+      push @_indentstack, $_indentstack[-1] + $attrs->{indent};
+   }
    elsif( $type =~ m/^over-(.*)/ ) {
       push $_parastack[-1]->@*, App::sdview::Para::List->new(
          listtype => $1,
-         indent   => $attrs->{indent},
+         indent   => $_indentstack[-1] + $attrs->{indent},
       );
       push @_parastack, [];
       undef $_curpara;
@@ -119,11 +126,11 @@ method _handle_element_start ($type, $attrs)
       );
    }
    else {
-      print STDERR "START $_[0]\n";
+      print STDERR "START $type\n";
    }
 }
 
-method _handle_element_end ($type, @)
+method _handle_element_end ( $type, @ )
 {
    if( $type eq "Document" ) {
       # nothing
@@ -138,6 +145,9 @@ method _handle_element_end ($type, @)
    elsif( any { $type eq $_ } @FORMAT_TYPES ) {
       delete $_curtags{$type};
    }
+   elsif( $type eq "over-block" ) {
+      pop @_indentstack;
+   }
    elsif( $type =~ m/^over-(.*)/ ) {
       my @items = ( pop @_parastack )->@*;
       $_parastack[-1][-1]->push_item( $_ ) for @items;
@@ -146,7 +156,7 @@ method _handle_element_end ($type, @)
       # nothing
    }
    else {
-      print STDERR "END $_[0]\n";
+      print STDERR "END $type\n";
    }
 }
 

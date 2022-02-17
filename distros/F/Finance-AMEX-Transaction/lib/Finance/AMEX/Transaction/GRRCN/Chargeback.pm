@@ -1,5 +1,5 @@
-package Finance::AMEX::Transaction::GRRCN::Chargeback;
-$Finance::AMEX::Transaction::GRRCN::Chargeback::VERSION = '0.004';
+package Finance::AMEX::Transaction::GRRCN::Chargeback 0.005;
+
 use strict;
 use warnings;
 
@@ -8,38 +8,37 @@ use warnings;
 use base 'Finance::AMEX::Transaction::GRRCN::Base';
 
 sub field_map {
-  return {
-    RECORD_TYPE                        => [1, 10],
-    PAYEE_MERCHANT_ID                  => [11, 15],
-    SETTLEMENT_ACCOUNT_TYPE_CODE       => [26, 3],
-    AMERICAN_EXPRESS_PAYMENT_NUMBER    => [29, 10],
-    PAYMENT_DATE                       => [39, 8],
-    PAYMENT_CURRENCY                   => [47, 3],
-    SUBMISSION_MERCHANT_ID             => [50, 15],
-
-    BUSINESS_SUBMISSION_DATE           => [65, 8],
-    MERCHANT_LOCATION_ID               => [73, 15],
-    INVOICE_REFERENCE_NUMBER           => [88, 30],
-    SELLER_ID                          => [118, 20],
-    CARDMEMBER_ACCOUNT_NUMBER          => [138, 19],
-    INDUSTRY_SPECIFIC_REFERENCE_NUMBER => [157, 30],
-    AMEX_PROCESSING_DATE               => [187, 8],
-    SUBMISSION_INVOICE_NUMBER          => [195, 15],
-    SUBMISSION_CURRENCY                => [210, 3],
-    CHARGEBACK_NUMBER                  => [213, 30],
-    CHARGEBACK_REASON_CODE             => [243, 10],
-    CHARGEBACK_REASON_DESCRIPTION      => [253, 280],
-    GROSS_AMOUNT                       => [533, 16],
-    DISCOUNT_AMOUNT                    => [549, 16],
-    SERVICE_FEE_AMOUNT                 => [565, 16],
-    TAX_AMOUNT                         => [581, 16],
-    NET_AMOUNT                         => [597, 16],
-    DISCOUNT_RATE                      => [613, 7],
-    SERVICE_FEE_RATE                   => [620, 7],
-    BATCH_CODE                         => [627, 3],
-    BILL_CODE                          => [630, 3],
-
-  };
+  return [
+    {RECORD_TYPE                        => [1,   10]},
+    {PAYEE_MERCHANT_ID                  => [11,  15]},
+    {SETTLEMENT_ACCOUNT_TYPE_CODE       => [26,  3]},
+    {AMERICAN_EXPRESS_PAYMENT_NUMBER    => [29,  10]},
+    {PAYMENT_DATE                       => [39,  8]},
+    {PAYMENT_CURRENCY                   => [47,  3]},
+    {SUBMISSION_MERCHANT_ID             => [50,  15]},
+    {BUSINESS_SUBMISSION_DATE           => [65,  8]},
+    {MERCHANT_LOCATION_ID               => [73,  15]},
+    {INVOICE_REFERENCE_NUMBER           => [88,  30]},
+    {SELLER_ID                          => [118, 20]},
+    {CARDMEMBER_ACCOUNT_NUMBER          => [138, 19]},
+    {INDUSTRY_SPECIFIC_REFERENCE_NUMBER => [157, 30]},
+    {AMEX_PROCESSING_DATE               => [187, 8]},
+    {SUBMISSION_INVOICE_NUMBER          => [195, 15]},
+    {SUBMISSION_CURRENCY                => [210, 3]},
+    {CHARGEBACK_NUMBER                  => [213, 30]},
+    {CHARGEBACK_REASON_CODE             => [243, 10]},
+    {CHARGEBACK_REASON_DESCRIPTION      => [253, 280]},
+    {GROSS_AMOUNT                       => [533, 16]},
+    {DISCOUNT_AMOUNT                    => [549, 16]},
+    {SERVICE_FEE_AMOUNT                 => [565, 16]},
+    {TAX_AMOUNT                         => [581, 16]},
+    {NET_AMOUNT                         => [597, 16]},
+    {DISCOUNT_RATE                      => [613, 7]},
+    {SERVICE_FEE_RATE                   => [620, 7]},
+    {BATCH_CODE                         => [627, 3]},
+    {BILL_CODE                          => [630, 3]},
+    {FILLER1                            => [633, 168]},
+  ];
 }
 
 sub type {return 'CHARGEBACK'}
@@ -51,7 +50,6 @@ sub AMERICAN_EXPRESS_PAYMENT_NUMBER    {return $_[0]->_get_column('AMERICAN_EXPR
 sub PAYMENT_DATE                       {return $_[0]->_get_column('PAYMENT_DATE')}
 sub PAYMENT_CURRENCY                   {return $_[0]->_get_column('PAYMENT_CURRENCY')}
 sub SUBMISSION_MERCHANT_ID             {return $_[0]->_get_column('SUBMISSION_MERCHANT_ID')}
-
 sub BUSINESS_SUBMISSION_DATE           {return $_[0]->_get_column('BUSINESS_SUBMISSION_DATE')}
 sub MERCHANT_LOCATION_ID               {return $_[0]->_get_column('MERCHANT_LOCATION_ID')}
 sub INVOICE_REFERENCE_NUMBER           {return $_[0]->_get_column('INVOICE_REFERENCE_NUMBER')}
@@ -74,7 +72,6 @@ sub SERVICE_FEE_RATE                   {return $_[0]->_get_column('SERVICE_FEE_R
 sub BATCH_CODE                         {return $_[0]->_get_column('BATCH_CODE')}
 sub BILL_CODE                          {return $_[0]->_get_column('BILL_CODE')}
 
-
 1;
 
 __END__
@@ -89,7 +86,7 @@ Finance::AMEX::Transaction::GRRCN::Chargeback - Parse AMEX Global Reconciliation
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -135,6 +132,14 @@ This will always return the string CHARGEBACK.
 Returns the full line that is represented by this object.
 
  print $record->line;
+
+=head2 field_map
+
+Returns an arrayref of hashrefs where the name is the record name and 
+the value is an arrayref of the start position and length of that field.
+
+ # print the start position of the PAYMENT_DATE field
+ print $record->field_map->[4]->{PAYMENT_DATE}->[0]; # 39
 
 =head2 RECORD_TYPE
 
@@ -444,7 +449,7 @@ Tom Heady <cpan@punch.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by ZipRecruiter.
+This software is copyright (c) 2022 by ZipRecruiter/Tom Heady.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

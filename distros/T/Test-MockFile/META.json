@@ -22,8 +22,11 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "File::Basename" : "0",
             "File::Slurper" : "0",
+            "File::Temp" : "0",
             "Test2::Bundle::Extended" : "0.000084",
+            "Test2::Harness::Util::IPC" : "0",
             "Test2::Plugin::NoWarnings" : "0",
             "Test2::Tools::Explain" : "0",
             "Test::More" : "1.302133"
@@ -54,6 +57,6 @@
          "url" : "https://github.com/cpanelinc/Test-MockFile"
       }
    },
-   "version" : "0.026",
+   "version" : "0.029",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

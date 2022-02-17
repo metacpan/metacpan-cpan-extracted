@@ -231,7 +231,7 @@ push @commands, Term::CLI::Command->new(
                 Term::CLI::Argument::Bool->new(
                     name         => 'bool',
                     true_values  => [qw( 1 true on yes ok )],
-                    false_values => [qw( 1 false off no never )],
+                    false_values => [qw( 0 false off no never )],
                 )
 
             ],
@@ -250,7 +250,7 @@ $term->add_command(@commands);
 
 say "\n[Welcome to BSSH]";
 while ( defined( my $line = $term->readline ) ) {
-    $term->execute($line);
+    $term->execute_line($line);
 }
 print "\n";
 execute_exit( $term, 0 );

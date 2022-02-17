@@ -1,9 +1,11 @@
+#!/usr/bin/env perl
+
 use strict;
 use warnings;
 
 use Test::More tests => 717;
 
-BEGIN {use_ok('Finance::AMEX::Transaction')};
+BEGIN {use_ok('Finance::AMEX::Transaction')}
 
 use lib '.';
 use t::lib::CompareFile;
@@ -11,21 +13,20 @@ use t::lib::CompareFile;
 my $file = 't/data/AMEX/EPRAW sample test file.txt';
 
 my $counts = {
-  HEADER            => {want =>  5, have => 0},
-  TRAILER           => {want =>  5, have => 0},
-  SUMMARY           => {want =>  5, have => 0},
+  HEADER            => {want => 5,  have => 0},
+  TRAILER           => {want => 5,  have => 0},
+  SUMMARY           => {want => 5,  have => 0},
   SOC_DETAIL        => {want => 13, have => 0},
-  CHARGEBACK_DETAIL => {want =>  5, have => 0},
-  ADJUSTMENT_DETAIL => {want =>  1, have => 0},
-  OTHER_DETAIL      => {want =>  2, have => 0},
+  CHARGEBACK_DETAIL => {want => 5,  have => 0},
+  ADJUSTMENT_DETAIL => {want => 1,  have => 0},
+  OTHER_DETAIL      => {want => 2,  have => 0},
 };
 
-my $data = do { local $/; <DATA> };
+my $data = do {local $/ = undef; <DATA>};
 
 t::lib::CompareFile::compare('EPRAW', $file, $data, $counts);
 
 done_testing();
-
 
 __DATA__
 {

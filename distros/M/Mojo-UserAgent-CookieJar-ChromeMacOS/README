@@ -10,6 +10,12 @@ SYNOPSIS
     
         my $ua = Mojo::UserAgent->new;
         $ua->cookie_jar(Mojo::UserAgent::CookieJar::ChromeMacOS->new);
+    
+        # For Linux
+        Mojo::UserAgent::CookieJar::ChromeMacOS->new(
+            file => '~/.config/google-chrome/Default/Cookies',
+            pass => 'peanuts', # hardcode for Linux
+        );
 
 DESCRIPTION
 

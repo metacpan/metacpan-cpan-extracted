@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.541-5-g4cde6982
+package JSON::Schema::Modern; # git description: v0.543-3-ga802bc0b
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.542';
+our $VERSION = '0.544';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -163,8 +163,7 @@ sub add_schema {
       errors => [ $document->errors ],
       exception => 1,
     );
-    die $result if (caller())[0]->isa(__PACKAGE__);
-    croak $result.'';
+    die $result;
   }
 
   if (not grep refaddr($_->{document}) == refaddr($document), $self->_canonical_resources) {
@@ -243,11 +242,13 @@ sub traverse ($self, $schema_reference, $config_override = {}) {
     initial_schema_uri => $initial_uri,     # the canonical URI as of the start of this method, or last $id
     traversed_schema_path => $initial_path, # the accumulated traversal path as of the start, or last $id
     schema_path => '',                      # the rest of the path, since the start of this method, or last $id
+    effective_base_uri => Mojo::URL->new(''),
     errors => [],
     identifiers => [],
     configs => {},
     callbacks => $config_override->{callbacks} // {},
     evaluator => $self,
+    traverse => 1,
   };
 
   try {
@@ -290,6 +291,7 @@ sub traverse ($self, $schema_reference, $config_override = {}) {
     }
   }
 
+  delete $state->{traverse};
   return $state;
 }
 
@@ -297,14 +299,15 @@ sub traverse ($self, $schema_reference, $config_override = {}) {
 sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
   croak 'evaluate called in void context' if not defined wantarray;
 
-  my $base_uri = Mojo::URL->new;  # TODO: will be set by a global attribute
   my $initial_path = $config_override->{traversed_schema_path} // '';
+  my $effective_base_uri = Mojo::URL->new($config_override->{effective_base_uri}//'');
 
   my $state = {
     data_path => $config_override->{data_path} // '',
     traversed_schema_path => $initial_path, # the accumulated path as of the start of evaluation, or last $id or $ref
-    initial_schema_uri => $base_uri,    # the canonical URI as of the start of evaluation, or last $id or $ref
+    initial_schema_uri => Mojo::URL->new,   # the canonical URI as of the start of evaluation, or last $id or $ref
     schema_path => '',                  # the rest of the path, since the start of evaluation, or last $id or $ref
+    effective_base_uri => $effective_base_uri, # resolve locations against this for errors and annotations
     errors => [],
   };
 
@@ -313,15 +316,14 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
     my $schema_info;
 
     if (not is_ref($schema_reference) or $schema_reference->$_isa('Mojo::URL')) {
-      # TODO: resolve this URI against 'base_uri'
       $schema_info = $self->_fetch_from_uri($schema_reference);
-      $state->{initial_schema_uri} = Mojo::URL->new($config_override->{initial_schema_uri} // $base_uri);
+      $state->{initial_schema_uri} = Mojo::URL->new($config_override->{initial_schema_uri} // '');
     }
     else {
       # traverse is called via add_schema -> ::Document->new -> ::Document->BUILD
-      my $document = $self->add_schema($base_uri, $schema_reference);
+      my $document = $self->add_schema('', $schema_reference);
       my $base_resource = $document->_get_resource($document->canonical_uri)
-        || croak "couldn't get resource from '$base_uri'";
+        || croak "couldn't get resource: document parse error";
 
       $schema_info = {
         schema => $document->schema,
@@ -351,7 +353,7 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
       (map {
         my $val = $config_override->{$_} // $self->$_;
         defined $val ? ( $_ => $val ) : ()
-      } qw(validate_formats validate_content_schemas short_circuit collect_annotations annotate_unknown_keywords scalarref_booleans)),
+      } qw(validate_formats validate_content_schemas short_circuit collect_annotations annotate_unknown_keywords scalarref_booleans strict)),
     };
 
     $valid = $self->_eval_subschema($data, $schema_info->{schema}, $state);
@@ -459,7 +461,7 @@ sub _traverse_subschema ($self, $schema, $state) {
   delete $state->{keyword};
 
   if ($self->strict and keys %unknown_keywords) {
-    abort($state, 'unknown keyword%s found: %s', keys %unknown_keywords > 1 ? 's' : '',
+    ()= E($state, 'unknown keyword%s found: %s', keys %unknown_keywords > 1 ? 's' : '',
       join(', ', sort keys %unknown_keywords));
   }
 
@@ -555,7 +557,7 @@ sub _eval_subschema ($self, $data, $schema, $state) {
 
   delete $state->{keyword};
 
-  if ($self->strict and keys %unknown_keywords) {
+  if ($state->{strict} and keys %unknown_keywords) {
     abort($state, 'unknown keyword%s found: %s', keys %unknown_keywords > 1 ? 's' : '',
       join(', ', sort keys %unknown_keywords));
   }
@@ -950,7 +952,7 @@ JSON::Schema::Modern - Validate data against a schema
 
 =head1 VERSION
 
-version 0.542
+version 0.544
 
 =head1 SYNOPSIS
 
@@ -1112,6 +1114,29 @@ L</short_circuit>, L</collect_annotations>, L</annotate_unknown_keywords>, L</sc
 L</strict>, L</validate_formats>, and/or L</validate_content_schemas>
 settings for just this evaluation call.
 
+You can also pass use these keys to alter behaviour (these are generally only used by custom validation
+applications that contain embedded JSON Schemas):
+
+=over 4
+
+=item *
+
+C<data_path>: adjusts the effective path of the data instance as of the start of evaluation
+
+=item *
+
+C<traversed_schema_path>: adjusts the accumulated path as of the start of evaluation (or last C<$id> or C<$ref>)
+
+=item *
+
+C<initial_schema_uri>: adjusts the recorded absolute keyword location as of the start of evaluation
+
+=item *
+
+C<effective_base_uri>: locations in errors and annotations are resolved against this URI
+
+=back
+
 The result is a L<JSON::Schema::Modern::Result> object, which can also be used as a boolean.
 
 =head2 evaluate
@@ -1147,6 +1172,29 @@ L</short_circuit>, L</collect_annotations>, L</annotate_unknown_keywords>, L</sc
 L</strict>, L</validate_formats>, and/or L</validate_content_schemas>
 settings for just this evaluation call.
 
+You can also pass use these keys to alter behaviour (these are generally only used by custom validation
+applications that contain embedded JSON Schemas):
+
+=over 4
+
+=item *
+
+C<data_path>: adjusts the effective path of the data instance as of the start of evaluation
+
+=item *
+
+C<traversed_schema_path>: adjusts the accumulated path as of the start of evaluation (or last C<$id> or C<$ref>)
+
+=item *
+
+C<initial_schema_uri>: adjusts the recorded absolute keyword location as of the start of evaluation
+
+=item *
+
+C<effective_base_uri>: locations in errors and annotations are resolved against this URI
+
+=back
+
 You can pass a series of callback subs to this method corresponding to keywords, which is useful for
 identifying various data that are not exposed by annotations.
 This feature is highly experimental and may change in the future.
@@ -1172,6 +1220,26 @@ The result is a L<JSON::Schema::Modern::Result> object, which can also be used a
 Traverses the provided schema without evaluating it against any instance data. Returns the
 internal state object accumulated during the traversal, including any identifiers found therein, and
 any errors found during parsing. For internal purposes only.
+
+Optionally, a hashref can be passed as a second parameter which alters some
+behaviour (these are generally only used by custom validation
+applications that contain embedded JSON Schemas):
+
+=over 4
+
+=item *
+
+C<traversed_schema_path>: adjusts the accumulated path as of the start of evaluation (or last C<$id> or C<$ref>)
+
+=item *
+
+C<initial_schema_uri>: adjusts the recorded absolute keyword location as of the start of evaluation
+
+=item *
+
+C<metaschema_uri>: use the indicated URI as the metaschema
+
+=back
 
 You can pass a series of callback subs to this method corresponding to keywords, which is useful for
 extracting data from within schemas and skipping properties that may look like keywords but actually

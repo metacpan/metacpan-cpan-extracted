@@ -48,9 +48,9 @@
       "repository" : {
          "url" : "https://github.com/melmothx/text-amuse"
       },
-      "x_IRC" : "irc://chat.freenode.net/#amusewiki",
-      "x_WebIRC" : "https://webchat.freenode.net/?channels=#amusewiki"
+      "x_IRC" : "irc://irc.libera.chat/#amusewiki",
+      "x_WebIRC" : "https://web.libera.chat/#amusewiki"
    },
-   "version" : "1.78",
+   "version" : "1.80",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

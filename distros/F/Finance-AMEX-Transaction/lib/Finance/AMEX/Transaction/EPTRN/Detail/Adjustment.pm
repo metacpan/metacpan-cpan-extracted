@@ -1,5 +1,5 @@
-package Finance::AMEX::Transaction::EPTRN::Detail::Adjustment;
-$Finance::AMEX::Transaction::EPTRN::Detail::Adjustment::VERSION = '0.004';
+package Finance::AMEX::Transaction::EPTRN::Detail::Adjustment 0.005;
+
 use strict;
 use warnings;
 
@@ -10,51 +10,51 @@ use base 'Finance::AMEX::Transaction::EPTRN::Base';
 sub field_map {
   return {
 
-    AMEX_PAYEE_NUMBER         => [1, 10],
-    AMEX_SE_NUMBER            => [11, 10],
-    SE_UNIT_NUMBER            => [21, 10],
-    PAYMENT_YEAR              => [31, 4],
-    PAYMENT_NUMBER            => [35, 8],
-    PAYMENT_NUMBER_DATE       => [35, 3],
-    PAYMENT_NUMBER_TYPE       => [38, 1],
-    PAYMENT_NUMBER_NUMBER     => [39, 4],
-    RECORD_TYPE               => [43, 1],
-    DETAIL_RECORD_TYPE        => [44, 2],
-    AMEX_PROCESS_DATE         => [46, 7],
-    ADJUSTMENT_NUMBER         => [53, 6],
-    ADJUSTMENT_AMOUNT         => [59, 9],
-    DISCOUNT_AMOUNT           => [68, 9],
-    SERVICE_FEE_AMOUNT        => [77, 7],
-    NET_ADJUSTMENT_AMOUNT     => [91, 9],
-    DISCOUNT_RATE             => [100, 5],
-    SERVICE_FEE_RATE          => [105, 5],
-    CARDMEMBER_NUMBER         => [126, 17],
-    ADJUSTMENT_REASON         => [143, 280],
+    AMEX_PAYEE_NUMBER     => [1,   10],
+    AMEX_SE_NUMBER        => [11,  10],
+    SE_UNIT_NUMBER        => [21,  10],
+    PAYMENT_YEAR          => [31,  4],
+    PAYMENT_NUMBER        => [35,  8],
+    PAYMENT_NUMBER_DATE   => [35,  3],
+    PAYMENT_NUMBER_TYPE   => [38,  1],
+    PAYMENT_NUMBER_NUMBER => [39,  4],
+    RECORD_TYPE           => [43,  1],
+    DETAIL_RECORD_TYPE    => [44,  2],
+    AMEX_PROCESS_DATE     => [46,  7],
+    ADJUSTMENT_NUMBER     => [53,  6],
+    ADJUSTMENT_AMOUNT     => [59,  9],
+    DISCOUNT_AMOUNT       => [68,  9],
+    SERVICE_FEE_AMOUNT    => [77,  7],
+    NET_ADJUSTMENT_AMOUNT => [91,  9],
+    DISCOUNT_RATE         => [100, 5],
+    SERVICE_FEE_RATE      => [105, 5],
+    CARDMEMBER_NUMBER     => [126, 17],
+    ADJUSTMENT_REASON     => [143, 280],
   };
 }
 
 sub type {return 'ADJUSTMENT_DETAIL'}
 
-sub AMEX_PAYEE_NUMBER         {return $_[0]->_get_column('AMEX_PAYEE_NUMBER')}
-sub AMEX_SE_NUMBER            {return $_[0]->_get_column('AMEX_SE_NUMBER')}
-sub SE_UNIT_NUMBER            {return $_[0]->_get_column('SE_UNIT_NUMBER')}
-sub PAYMENT_YEAR              {return $_[0]->_get_column('PAYMENT_YEAR')}
-sub PAYMENT_NUMBER            {return $_[0]->_get_column('PAYMENT_NUMBER')}
-sub PAYMENT_NUMBER_DATE       {return $_[0]->_get_column('PAYMENT_NUMBER_DATE')}
-sub PAYMENT_NUMBER_TYPE       {return $_[0]->_get_column('PAYMENT_NUMBER_TYPE')}
-sub PAYMENT_NUMBER_NUMBER     {return $_[0]->_get_column('PAYMENT_NUMBER_NUMBER')}
-sub RECORD_TYPE               {return $_[0]->_get_column('RECORD_TYPE')}
-sub DETAIL_RECORD_TYPE        {return $_[0]->_get_column('DETAIL_RECORD_TYPE')}
-sub AMEX_PROCESS_DATE         {return $_[0]->_get_column('AMEX_PROCESS_DATE')}
-sub ADJUSTMENT_NUMBER         {return $_[0]->_get_column('ADJUSTMENT_NUMBER')}
-sub ADJUSTMENT_AMOUNT         {return $_[0]->_get_column('ADJUSTMENT_AMOUNT')}
-sub DISCOUNT_AMOUNT           {return $_[0]->_get_column('DISCOUNT_AMOUNT')}
-sub SERVICE_FEE_AMOUNT        {return $_[0]->_get_column('SERVICE_FEE_AMOUNT')}
-sub NET_ADJUSTMENT_AMOUNT     {return $_[0]->_get_column('NET_ADJUSTMENT_AMOUNT')}
-sub DISCOUNT_RATE             {return $_[0]->_get_column('DISCOUNT_RATE')}
-sub SERVICE_FEE_RATE          {return $_[0]->_get_column('SERVICE_FEE_RATE')}
-sub CARDMEMBER_NUMBER         {return $_[0]->_get_column('CARDMEMBER_NUMBER')}
-sub ADJUSTMENT_REASON         {return $_[0]->_get_column('ADJUSTMENT_REASON')}
+sub AMEX_PAYEE_NUMBER     {return $_[0]->_get_column('AMEX_PAYEE_NUMBER')}
+sub AMEX_SE_NUMBER        {return $_[0]->_get_column('AMEX_SE_NUMBER')}
+sub SE_UNIT_NUMBER        {return $_[0]->_get_column('SE_UNIT_NUMBER')}
+sub PAYMENT_YEAR          {return $_[0]->_get_column('PAYMENT_YEAR')}
+sub PAYMENT_NUMBER        {return $_[0]->_get_column('PAYMENT_NUMBER')}
+sub PAYMENT_NUMBER_DATE   {return $_[0]->_get_column('PAYMENT_NUMBER_DATE')}
+sub PAYMENT_NUMBER_TYPE   {return $_[0]->_get_column('PAYMENT_NUMBER_TYPE')}
+sub PAYMENT_NUMBER_NUMBER {return $_[0]->_get_column('PAYMENT_NUMBER_NUMBER')}
+sub RECORD_TYPE           {return $_[0]->_get_column('RECORD_TYPE')}
+sub DETAIL_RECORD_TYPE    {return $_[0]->_get_column('DETAIL_RECORD_TYPE')}
+sub AMEX_PROCESS_DATE     {return $_[0]->_get_column('AMEX_PROCESS_DATE')}
+sub ADJUSTMENT_NUMBER     {return $_[0]->_get_column('ADJUSTMENT_NUMBER')}
+sub ADJUSTMENT_AMOUNT     {return $_[0]->_get_column('ADJUSTMENT_AMOUNT')}
+sub DISCOUNT_AMOUNT       {return $_[0]->_get_column('DISCOUNT_AMOUNT')}
+sub SERVICE_FEE_AMOUNT    {return $_[0]->_get_column('SERVICE_FEE_AMOUNT')}
+sub NET_ADJUSTMENT_AMOUNT {return $_[0]->_get_column('NET_ADJUSTMENT_AMOUNT')}
+sub DISCOUNT_RATE         {return $_[0]->_get_column('DISCOUNT_RATE')}
+sub SERVICE_FEE_RATE      {return $_[0]->_get_column('SERVICE_FEE_RATE')}
+sub CARDMEMBER_NUMBER     {return $_[0]->_get_column('CARDMEMBER_NUMBER')}
+sub ADJUSTMENT_REASON     {return $_[0]->_get_column('ADJUSTMENT_REASON')}
 
 1;
 
@@ -70,7 +70,7 @@ Finance::AMEX::Transaction::EPTRN::Detail::Adjustment - Parse AMEX Transaction/I
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -116,6 +116,14 @@ This will always return the string ADJUSTMENT_DETAIL.
 Returns the full line that is represented by this object.
 
  print $record->line;
+
+=head2 field_map
+
+Returns an arrayref of hashrefs where the name is the record name and 
+the value is an arrayref of the start position and length of that field.
+
+ # print the start position of the PAYMENT_YEAR field
+ print $record->field_map->[3]->{PAYMENT_YEAR}->[0]; # 31
 
 =head2 AMEX_PAYEE_NUMBER
 
@@ -336,7 +344,7 @@ Tom Heady <cpan@punch.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by ZipRecruiter.
+This software is copyright (c) 2022 by ZipRecruiter/Tom Heady.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,7 +1,7 @@
 use Test2::V0;
 
 use lib 't/lib';
-use Test2::Regexp::Pattern::License;
+use Test2::Tools::LicenseRegistry;
 
 plan 1;
 
@@ -147,10 +147,10 @@ like(
 		field
 			'GNU General Public License v3.0 w/GCC Runtime Library exception'
 			=> 'GPL-3.0-with-GCC-exception';
-		field 'GNU Lesser General Public License v2.1 only' => 'LGPL-2.1';
+		field 'GNU Lesser General Public License v2.1 only'     => 'LGPL-2.1';
 		field 'GNU Lesser General Public License v2.1 or later' =>
 			'LGPL-2.1+';
-		field 'GNU Lesser General Public License v3.0 only' => 'LGPL-3.0';
+		field 'GNU Lesser General Public License v3.0 only'     => 'LGPL-3.0';
 		field 'GNU Lesser General Public License v3.0 or later' =>
 			'LGPL-3.0+';
 		field 'GNU Library General Public License v2 only'     => 'LGPL-2.0';

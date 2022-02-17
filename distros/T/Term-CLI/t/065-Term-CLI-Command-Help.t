@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# Copyright (C) 2018, Steven Bakker.
+# Copyright (c) 2018-2022, Steven Bakker.
 #
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl 5.14.0. For more details, see the full text
@@ -10,14 +10,16 @@
 use 5.014_001;
 use warnings;
 
-sub Main {
-    Term_CLI_Command_Help_test->SKIP_CLASS(
-        ($::ENV{SKIP_COMMAND})
-            ? "disabled in environment"
-            : 0
-    );
+use Test::More;
+
+my $TEST_NAME = 'COMMAND';
+
+sub Main() {
+    if ( ($::ENV{SKIP_ALL} || $::ENV{"SKIP_$TEST_NAME"}) && !$::ENV{"TEST_$TEST_NAME"} ) {
+       plan skip_all => 'skipped because of environment'
+    }
     Term_CLI_Command_Help_test->runtests();
-    return;
+    exit(0);
 }
 
 package Term_CLI_Command_Help_test {
@@ -77,9 +79,10 @@ sub startup : Test(startup => 1) {
     push @commands, $help;
 
     my $cli = Term::CLI->new(
-        prompt => 'test> ',
-        callback => undef,
-        commands => \@commands,
+        prompt      => 'test> ',
+        callback    => undef,
+        commands    => \@commands,
+        filehandles => [],
     );
     isa_ok( $cli, 'Term::CLI', 'Term::CLI->new' );
 

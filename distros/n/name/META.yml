@@ -1,5 +1,5 @@
 ---
-abstract: unknown
+abstract: 'Take The Name'
 author:
   - 'Bernhard Graf <graf@cpan.org>'
 build_requires:
@@ -8,8 +8,8 @@ build_requires:
   Test::More: '0.90'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,5 +23,9 @@ requires:
   Carp: '0'
   Sub::Util: '1.40'
   perl: '5.008'
-version: v0.0.0
+resources:
+  bugtracker: https://github.com/augensalat/perl-name/issues
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: https://github.com/augensalat/perl-name.git
+version: v0.0.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,7 +1,7 @@
 use Test2::V0;
 
 use lib 't/lib';
-use Test2::Regexp::Pattern::License;
+use Test2::Tools::LicenseRegistry;
 
 plan 1;
 
@@ -18,7 +18,7 @@ like(
 		field 'Developing Nations License' => 'CC-DevNations-2.0';    # deed
 
 		# ShareAlike
-		field 'Creative Commons ShareAlike' => 'CC-SA';
+		field 'Creative Commons ShareAlike'                     => 'CC-SA';
 		field 'Creative Commons ShareAlike 1.0 Generic License' =>
 			'CC-SA-1.0';                                              # grant
 		field 'ShareAlike 1.0'                     => 'CC-SA-1.0'; # legal
@@ -26,7 +26,7 @@ like(
 		field 'ShareAlike 1.0 Generic (CC SA 1.0)' => 'CC-SA-1.0'; # deed
 
 		# NonCommercial
-		field 'Creative Commons NonCommercial' => 'CC-NC';
+		field 'Creative Commons NonCommercial'                     => 'CC-NC';
 		field 'Creative Commons NonCommercial 1.0 Generic License' =>
 			'CC-NC-1.0';                                           # grant
 		field 'NonCommercial 1.0' => 'CC-NC-1.0';                  # legal
@@ -50,7 +50,7 @@ like(
 			'CC-NC-SA-1.0';                                      # deed
 
 		# NoDerivs-NonCommercial
-		field 'Creative Commons NoDerivs-NonCommercial' => 'CC-ND-NC';
+		field 'Creative Commons NoDerivs-NonCommercial'      => 'CC-ND-NC';
 		field 'Creative Commons NoDerivatives-NonCommercial' =>
 			'CC-ND-NC';                                          # long
 		field 'Creative Commons NonCommercial-NoDerivs' =>

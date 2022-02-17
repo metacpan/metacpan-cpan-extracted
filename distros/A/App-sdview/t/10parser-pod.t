@@ -89,6 +89,22 @@ EOPOD
    is( $p[1]->text, qq(use v5.14;\nuse warnings;\nsay "Hello, world";), 'p[1] text' );
 };
 
+subtest "Indented" => sub {
+   my @p = App::sdview::Parser::Pod->new->parse_string( <<"EOPOD" );
+=over 4
+
+This plain paragraph is indented
+
+=back
+EOPOD
+
+   is( scalar @p, 1, 'Received 1 paragraphs' );
+
+   is( $p[0]->type, "plain", 'p[0] type' );
+   is( $p[0]->indent, 4, 'p[0] indent' );
+   is( $p[0]->text, "This plain paragraph is indented", 'p[0] text' );
+};
+
 subtest "Bullet lists" => sub {
    my @p = App::sdview::Parser::Pod->new->parse_string( <<"EOPOD" );
 =over 4
@@ -181,6 +197,8 @@ The second item
 
 The third item
 
+Has two paragraphs
+
 =back
 EOPOD
 
@@ -191,19 +209,22 @@ EOPOD
 
    my @items = $p[0]->items;
 
-   is( scalar @items, 3, '3 items' );
+   is( scalar @items, 4, '4 items' );
 
    is( $items[0]->type, "item",  'items[0] type' );
    is( $items[0]->term, "First", 'items[0] term' );
-   is( $items[0]->text, "The first item", 'items[1] text' );
+   is( $items[0]->text, "The first item", 'items[0] text' );
 
-   is( $items[1]->type, "item",  'items[2] type' );
-   is( $items[1]->term, "Second", 'items[2] term' );
-   is( $items[1]->text, "The second item", 'items[3] text' );
+   is( $items[1]->type, "item",  'items[1] type' );
+   is( $items[1]->term, "Second", 'items[1] term' );
+   is( $items[1]->text, "The second item", 'items[1] text' );
 
-   is( $items[2]->type, "item",  'items[4] type' );
-   is( $items[2]->term, "Third", 'items[4] term' );
-   is( $items[2]->text, "The third item", 'items[5] text' );
+   is( $items[2]->type, "item",  'items[2] type' );
+   is( $items[2]->term, "Third", 'items[2] term' );
+   is( $items[2]->text, "The third item", 'items[2] text' );
+
+   is( $items[3]->type, "plain", 'items[3] type' );
+   is( $items[3]->text, "Has two paragraphs", 'items[3] text' );
 };
 
 done_testing;

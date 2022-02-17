@@ -4,11 +4,13 @@ Changes
 lib/App/sdview.pm
 lib/App/sdview/Output.pm
 lib/App/sdview/Output/Formatted.pm
+lib/App/sdview/Output/Man.pm
 lib/App/sdview/Output/Markdown.pm
 lib/App/sdview/Output/Plain.pm
 lib/App/sdview/Output/Pod.pm
 lib/App/sdview/Output/Terminal.pm
 lib/App/sdview/Parser.pm
+lib/App/sdview/Parser/Man.pm
 lib/App/sdview/Parser/Markdown.pm
 lib/App/sdview/Parser/Pod.pm
 LICENSE
@@ -19,6 +21,8 @@ README
 t/00use.t
 t/10parser-pod.t
 t/11parser-markdown.t
+t/12parser-man.t
 t/20output-pod.t
 t/21output-markdown.t
+t/22output-man.t
 t/30output-plain.t

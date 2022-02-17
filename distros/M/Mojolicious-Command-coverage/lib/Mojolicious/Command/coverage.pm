@@ -4,7 +4,9 @@ use warnings FATAL => 'all';
 use Mojo::Base 'Mojolicious::Command', -signatures;
 use Mojo::Util qw(getopt);
 
-our $VERSION = "0.0.1"; # Do not update manually
+use Data::Dumper;
+
+our $VERSION = "0.0.3"; # Do not update manually
 
 # Short description
 has description => 'Start you Mojo app in coverage mode';
@@ -39,6 +41,9 @@ sub run($self, @args) {
         $coverageConfig = $self->app->coverageConfig;
         print "Command::coverage: Taking config from `$appName->coverageConfig` for Devel::Cover \n";
     }
+    # We also have to forward @INC which may have been set-up with Findbin
+    my @Is = ('-I') x scalar @INC;
+    my @includes = map {($Is[$_], $INC[$_])} (0 .. $#INC); # this is basically zip(arr1,arr2) in other languages
 
     # if there is no custom config, we fallback to default
     $deanonConfig = $appName if $deanonConfig eq "";
@@ -46,10 +51,10 @@ sub run($self, @args) {
 
     my @commandline_inject = ();
     if ($deanonConfig ne "0") {
-        @commandline_inject = ('perl', "-MDevel::Cover=$coverageConfig", "-MDevel::Deanonymize=$deanonConfig", $0);
+        @commandline_inject = ('perl', @includes, "-MDevel::Cover=$coverageConfig", "-MDevel::Deanonymize=$deanonConfig", $0);
     }
     else {
-        @commandline_inject = ('perl', "-MDevel::Cover=$coverageConfig", $0);
+        @commandline_inject = ('perl', @includes, "-MDevel::Cover=$coverageConfig", $0);
     }
     # Merge with application arguments
     my @full_commandline = (@commandline_inject, @orig_args[$n_args .. $#orig_args]);
@@ -84,7 +89,12 @@ Mojolicious::Command::coverage - Run your application with coverage statistics
 
 =head1 DESCRIPTION
 
-Starts your mojo application with L<Devel::Cover> and optionally L<Devel::Deanonymize>.
+Starts your mojo application with L<Devel::Cover> and optionally L<Devel::Deanonymize>. In short this command does the following:
+
+    ./myapp.pl coverage [application arguments]
+    # Is translated to
+    perl -I $INC[0] ... - I $INC[N] -MDevel::Cover=$coverageConfig -MDevel::Deanonymize=$deanonConfig myapp.pl [application arguments]
+
 
 =cut
 

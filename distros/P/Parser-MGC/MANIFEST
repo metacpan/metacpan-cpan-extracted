@@ -5,7 +5,6 @@ examples/LICENSE
 examples/parse-bencode.pl
 examples/parse-dict.pl
 examples/parse-jsonlike.pl
-examples/parse-perlstr.pl
 examples/parse-pod.pl
 examples/parse-xml.pl
 examples/synopsis.pl
@@ -40,7 +39,7 @@ t/24any_of.t
 t/30commit.t
 t/31scope_level.t
 t/32committed_scope_of.t
-t/32exception.t
+t/33exception.t
 t/90ex_bencode.t
 t/90ex_dict.t
 t/90ex_expr.t

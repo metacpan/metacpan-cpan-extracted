@@ -19,7 +19,7 @@ my ( $fh, $existing_file_name ) = tempfile();
 print $fh "This is the real file\n";
 close $fh;
 
-use Test::MockFile ();
+use Test::MockFile qw< nostrict >;
 
 subtest 'unlink on a missing file' => sub {
     $! = 0;
@@ -45,9 +45,10 @@ subtest 'unlink on an existing directory' => sub {
 
     $! = 0;
     is( unlink($temp_dir_name), 0, "MOCKED unlink returns 0 files deleted." );
+    my $err_code = $! + 0;
   SKIP: {
         skip q{This docker container doesn't emit $! failures reliably.}, 1 if on_broken_docker();
-        is( $! + 0, $real_dir_unlink_error, '$! is set to EISDIR' );
+        is( $err_code, $real_dir_unlink_error, '$! is set to EISDIR' );
     }
 };
 

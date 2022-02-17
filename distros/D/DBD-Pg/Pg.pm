@@ -1,6 +1,6 @@
 #  -*-cperl-*-
 #
-#  Copyright (c) 2002-2021 Greg Sabino Mullane and others: see the Changes file
+#  Copyright (c) 2002-2022 Greg Sabino Mullane and others: see the Changes file
 #  Portions Copyright (c) 2002 Jeffrey W. Baker
 #  Portions Copyright (c) 1997-2001 Edmund Mergl
 #  Portions Copyright (c) 1994-1997 Tim Bunce
@@ -16,13 +16,13 @@ use 5.008001;
 {
     package DBD::Pg;
 
-    use version; our $VERSION = qv('3.15.0');
+    use version; our $VERSION = qv('3.15.1');
 
-    use DBI ();
-    use DynaLoader ();
+    use DBI 1.614 ();
     use Exporter ();
-    use vars qw(@ISA %EXPORT_TAGS $err $errstr $sqlstate $drh $dbh $DBDPG_DEFAULT @EXPORT);
-    @ISA = qw(DynaLoader Exporter);
+    use XSLoader;
+    our $dbh;
+    our @ISA = qw(Exporter);
 
     use constant {
         PG_MIN_SMALLINT => -32768,
@@ -39,7 +39,7 @@ use 5.008001;
         PG_MAX_BIGSERIAL => '9223372036854775807',
     };
 
-    %EXPORT_TAGS =
+    our %EXPORT_TAGS =
         (
          async => [qw($DBDPG_DEFAULT PG_ASYNC PG_OLDQUERY_CANCEL PG_OLDQUERY_WAIT)],
          pg_limits => [qw($DBDPG_DEFAULT
@@ -92,18 +92,15 @@ use 5.008001;
         package DBD::Pg::DefaultValue;
         sub new { my $self = {}; return bless $self, shift; }
     }
-    $DBDPG_DEFAULT = DBD::Pg::DefaultValue->new();
+    our $DBDPG_DEFAULT = DBD::Pg::DefaultValue->new();
     Exporter::export_ok_tags('pg_types', 'async', 'pg_limits');
-    @EXPORT = qw($DBDPG_DEFAULT PG_ASYNC PG_OLDQUERY_CANCEL PG_OLDQUERY_WAIT PG_BYTEA);
+    our @EXPORT = qw($DBDPG_DEFAULT PG_ASYNC PG_OLDQUERY_CANCEL PG_OLDQUERY_WAIT PG_BYTEA);
+    XSLoader::load(__PACKAGE__, $VERSION);
 
-    require_version DBI 1.614;
-
-    bootstrap DBD::Pg $VERSION;
-
-    $err = 0;       # holds error code for DBI::err
-    $errstr = '';   # holds error string for DBI::errstr
-    $sqlstate = ''; # holds five character SQLSTATE code
-    $drh = undef;   # holds driver handle once initialized
+    our $err = 0;       # holds error code for DBI::err
+    our $errstr = '';   # holds error string for DBI::errstr
+    our $sqlstate = ''; # holds five character SQLSTATE code
+    our $drh = undef;   # holds driver handle once initialized
 
     ## These two methods are here to allow calling before connect()
     sub parse_trace_flag {
@@ -140,7 +137,7 @@ use 5.008001;
         $class .= '::dr';
 
         ## Work around for issue found in https://rt.cpan.org/Ticket/Display.html?id=83057
-        my $realversion = qv('3.15.0');
+        my $realversion = qv('3.15.1');
 
         $drh = DBI::_new_drh($class, {
             'Name'        => 'Pg',
@@ -1701,7 +1698,7 @@ DBD::Pg - PostgreSQL database driver for the DBI module
 
 =head1 VERSION
 
-This documents version 3.15.0 of the DBD::Pg module
+This documents version 3.15.1 of the DBD::Pg module
 
 =head1 DESCRIPTION
 
@@ -2072,14 +2069,14 @@ object descriptor! This function cannot be used if AutoCommit is enabled.
 
   $nbytes = $dbh->pg_lo_write($lobj_fd, $buffer, $len);
 
-Writes C<$len> bytes of c<$buffer> into the large object C<$lobj_fd>. Returns the number
+Writes C<$len> bytes of C<$buffer> into the large object C<$lobj_fd>. Returns the number
 of bytes written and C<undef> upon failure. This function cannot be used if AutoCommit is enabled.
 
 =item pg_lo_read
 
   $nbytes = $dbh->pg_lo_read($lobj_fd, $buffer, $len);
 
-Reads C<$len> bytes into c<$buffer> from large object C<$lobj_fd>. Returns the number of
+Reads C<$len> bytes into C<$buffer> from large object C<$lobj_fd>. Returns the number of
 bytes read and C<undef> upon failure. This function cannot be used if AutoCommit is enabled.
 
 =item pg_lo_lseek
@@ -2559,7 +2556,7 @@ the L</pg_placeholder_nocolons> attribute in the same way. Examples:
   $sth = $dbh->prepare(q{SELECT array[1:2] FROM mytable WHERE id = ?});
   $sth->execute(1);
 
-Again, you may set it param time as well:
+Again, you may set it at prepare time as well:
 
   $sth = $dbh->prepare(q{SELECT array[1:2] FROM mytable WHERE id = ?},
     {pg_placeholder_nocolons => 1});
@@ -2763,7 +2760,7 @@ Looks for any asynchronous notifications received and returns either C<undef>
 or a reference to a three-element array consisting of an event name, the PID 
 of the backend that sent the NOTIFY command, and the optional payload string. 
 Note that this does not check if the connection to the database is still valid first - 
-for that, use the c<ping> method. You may need to commit if not in autocommit mode - 
+for that, use the C<ping> method. You may need to commit if not in autocommit mode -
 new notices will not be picked up while in the middle of a transaction. An example:
 
   $dbh->do("LISTEN abc");
@@ -2791,7 +2788,7 @@ server version 9.0 or higher.
 
 The C<ping> method determines if there is a working connection to an active 
 database server. It does this by sending a small query to the server, currently 
-B<'DBD::Pg ping test v3.15.0'>. It returns 0 (false) if the connection is not valid, 
+B<'DBD::Pg ping test v3.15.1'>. It returns 0 (false) if the connection is not valid, 
 otherwise it returns a positive number (true). The value returned indicates the 
 current state:
 
@@ -4475,7 +4472,7 @@ Visit the archives at http://grokbase.com/g/perl/dbd-pg
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 1994-2021, Greg Sabino Mullane
+Copyright (C) 1994-2022, Greg Sabino Mullane
 
 This module (DBD::Pg) is free software; you can redistribute it and/or modify it 
 under the same terms as Perl 5.10.0. For more details, see the full text of the 

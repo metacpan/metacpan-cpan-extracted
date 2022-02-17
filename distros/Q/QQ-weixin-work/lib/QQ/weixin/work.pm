@@ -38,8 +38,8 @@ use LWP::UserAgent;
 use JSON;
 use utf8;
 
-our $VERSION = '0.04';
-our @EXPORT = qw/ gettoken getcallbackip /;
+our $VERSION = '0.06';
+our @EXPORT = qw/ gettoken getcallbackip get_api_domain_ip /;
 
 =head1 FUNCTION
 
@@ -49,7 +49,7 @@ our @EXPORT = qw/ gettoken getcallbackip /;
 
 =head3 SYNOPSIS
 
-L<https://work.weixin.qq.com/api/doc/90000/90135/91039>
+L<https://developer.work.weixin.qq.com/document/path/91039>
 
 =head3 参数说明
 
@@ -105,13 +105,14 @@ sub gettoken {
     return 0;
 }
 
-=head2 getcallbackip(corpid,corpsecrect);
+=head2 getcallbackip(access_token);
 
 获取企业微信服务器的ip段
 
 =head3 SYNOPSIS
 
-L<https://work.weixin.qq.com/api/doc/90000/90135/90930>
+L<https://developer.work.weixin.qq.com/document/path/90930#33-获取企业微信服务器的ip段>
+企业微信在回调企业指定的URL时，是通过特定的IP发送出去的。如果企业需要做防火墙配置，那么可以通过这个接口获取到所有相关的IP段。IP段有变更可能，当IP段变更时，新旧IP段会同时保留一段时间。建议企业每天定时拉取IP段，更新防火墙设置，避免因IP段变更导致网络不通。
 
 =head3 参数说明
 
@@ -166,6 +167,67 @@ sub getcallbackip {
     return 0;
 }
 
+=head2 get_api_domain_ip(access_token);
+
+获取企业微信API域名IP段
+
+=head3 SYNOPSIS
+
+L<https://developer.work.weixin.qq.com/document/path/92520>
+API域名IP即qyapi.weixin.qq.com的解析地址，由开发者调用企业微信端的接入IP。如果企业需要做防火墙配置，那么可以通过这个接口获取到所有相关的IP段。IP段有变更可能，当IP段变更时，新旧IP段会同时保留一段时间。建议企业每天定时拉取IP段，更新防火墙设置，避免因IP段变更导致网络不通。
+
+=head3 参数说明
+
+    参数          必须  说明
+    access_token	是	调用接口凭证
+
+=head3 RETURN 返回结果
+
+  {
+    "ip_list":[
+      "182.254.11.176",
+      "182.254.78.66"
+      ],
+      "errcode":0,
+      "errmsg":"ok"
+  }
+
+=head4 RETURN 参数说明
+
+    参数       类型       说明
+    ip_list	StringArray	企业微信回调的IP段
+    errcode	int	错误码，0表示成功，非0表示调用失败
+    errmsg	string	错误信息，调用失败会有相关的错误信息返回
+
+=head3 注意事项
+
+  若调用失败，会返回errcode及errmsg（判断是否调用失败，根据errcode存在并且值非0）
+
+  根据errcode值非0，判断调用失败。以下是access_token过期的返回示例：
+
+  {
+    "ip_list":[],
+    "errcode":42001,
+    "errmsg":"access_token expired, hint: [1576065934_28_e0fae07666aa64636023c1fa7e8f49a4], from ip: 9.30.0.138, more info at https://open.work.weixin.qq.com/devtool/query?e=42001"
+  }
+
+=cut
+
+sub get_api_domain_ip {
+    if ( @_ && $_[0] ) {
+        my $access_token = $_[0];
+        my $ua = LWP::UserAgent->new;
+        $ua->timeout(30);
+        $ua->env_proxy;
+
+        my $response = $ua->get("https://qyapi.weixin.qq.com/cgi-bin/get_api_domain_ip?access_token=$access_token");
+        if ($response->is_success) {
+            return from_json($response->decoded_content,{utf8 => 1, allow_nonref => 1});
+        }
+
+    }
+    return 0;
+}
 
 1;
 __END__

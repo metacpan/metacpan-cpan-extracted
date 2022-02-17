@@ -1,5 +1,5 @@
-package Finance::AMEX::Transaction::CBNOT;
-$Finance::AMEX::Transaction::CBNOT::VERSION = '0.004';
+package Finance::AMEX::Transaction::CBNOT 0.005;
+
 use strict;
 use warnings;
 
@@ -19,12 +19,13 @@ sub new {
     T => 'Finance::AMEX::Transaction::CBNOT::Trailer',
   };
 
-  my $self = bless {
-    _type_map => $type_map,
-  }, $class;
+  my $self = bless {_type_map => $type_map}, $class;
 
   return $self;
 }
+
+sub file_format  {return 'N/A'}
+sub file_version {return 'N/A'}
 
 sub parse_line {
   my ($self, $line) = @_;
@@ -52,7 +53,7 @@ Finance::AMEX::Transaction::CBNOT - Parse AMEX Chargeback Notification Files (CB
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -118,6 +119,14 @@ Returns one of the L<Finance::AMEX::Transaction::CBNOT::Header>, L<Finance::AMEX
 
  my $record = $cbnot->parse_line('line from a cbnot file');
 
+=head2 file_format
+
+This is included for compatibility, it will always return the string 'N/A'.
+
+=head2 file_version
+
+This is included for compatibility, it will always return the string 'N/A'.
+
 =head1 NAME
 
 Finance::AMEX::Transaction::CBNOT - Parse AMEX Chargeback Notification Files (CBNOT)
@@ -128,7 +137,7 @@ Tom Heady <cpan@punch.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by ZipRecruiter.
+This software is copyright (c) 2022 by ZipRecruiter/Tom Heady.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

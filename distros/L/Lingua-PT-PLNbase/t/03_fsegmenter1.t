@@ -1,22 +1,16 @@
 # -*- cperl -*-
 
 use Test::More tests => 1 + 4;
-use POSIX qw(locale_h);
-setlocale(LC_CTYPE, "pt_PT");
-use locale;
+
 use File::Temp qw/:POSIX/;
-use File::Slurp qw.slurp.;
+#use Perl6::Slurp;
+use Path::Tiny 'path';
 BEGIN { use_ok( 'Lingua::PT::PLNbase' ); }
-
-
-$a = 'Çáé';
-
-SKIP: {
-  skip "not a good locale", 4 unless $a =~ m!^\w{3}$!;
+use utf8;
 
   my $outfile = tmpnam();
   fsentences({output=> $outfile},"t/ftext1");
-  is(slurp($outfile), slurp('t/ftext1.out1'));
+  is(path($outfile)->slurp_utf8 ,path('t/ftext1.out1')->slurp_utf8 );
   unlink $outfile;
 
   $outfile = tmpnam();
@@ -25,21 +19,20 @@ SKIP: {
 	      p_tag => 'paragraph',
 	      output=> $outfile,
              },"t/ftext1");
-  is(slurp($outfile), slurp('t/ftext1.out2'));
+  is(path($outfile)->slurp_utf8 , path('t/ftext1.out2')->slurp_utf8 );
   unlink $outfile;
 
   $outfile = tmpnam();
   fsentences({o_format => 'NATools',
 	      output   => $outfile},
              "t/ftext1");
-  is(slurp($outfile), slurp('t/ftext1.out3'));
+  is(path($outfile)->slurp_utf8 , path('t/ftext1.out3')->slurp_utf8 );
   unlink $outfile;
 
   $outfile = tmpnam();
   fsentences({o_format => 'NATools',
 	      tokenize => 1,
 	      output=>$outfile},"t/ftext1");
-  is(slurp($outfile), slurp('t/ftext1.out4'));
+  is(path($outfile)->slurp_utf8 , path('t/ftext1.out4')->slurp_utf8 );
   unlink $outfile;
 
-}

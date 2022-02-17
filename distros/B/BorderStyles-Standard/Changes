@@ -1,3 +1,18 @@
+0.013   2022-02-14  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Re-enable Pod::Weaver plugin 'BorderStyle'.
+
+
+0.012   2022-02-14  Released-By: PERLANCAR; Backward-Incompatible: yes; Urgency: medium
+
+        - Adjust with BorderStyle 3.0.0.
+
+        - [build] Temporarily disable Pod::Weaver plugin BorderStyle because
+          Text::Table::More has not been adjusted.
+
+
 0.011   2022-01-26  Released-By: PERLANCAR; Urgency: medium
 
         - Fixes.

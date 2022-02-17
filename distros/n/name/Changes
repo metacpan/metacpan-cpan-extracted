@@ -1,5 +1,13 @@
 Revision history for name
 
-0.01    2022-01-31
+v0.0.1  2022-02-11
+        - No code changes.
+        - Add release tests.
+        - Implement Github workflow for running unit tests and CPAN publishing.
+        - Add a META_MERGE section to Makefile.PL.
+        - Add a .gitattributes file.
+        - Add an .editorconfig file.
+
+v0.0.0  2022-01-31
         First version, released on an unsuspecting world.
 

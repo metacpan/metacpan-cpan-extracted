@@ -28,7 +28,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.198';
+our $VERSION = '1.199';
 
 use overload '""' => sub {${$_[0]}}, 'cmp' => sub{${$_[0]} cmp $_[1]};
 use Quiq::Path;
@@ -145,7 +145,7 @@ sub new {
 
 =head1 VERSION
 
-1.198
+1.199
 
 =head1 AUTHOR
 

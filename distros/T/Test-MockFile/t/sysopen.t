@@ -14,7 +14,7 @@ use Fcntl;
 
 #use Errno qw/ENOENT EBADF/;
 
-use Test::MockFile;    # Everything below this can have its open overridden.
+use Test::MockFile qw< nostrict >;    # Everything below this can have its open overridden.
 my ( undef, $filename ) = tempfile();
 unlink $filename;
 

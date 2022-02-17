@@ -18,16 +18,26 @@ my $inopt_re =  qr{[^]]*?};
 
 my $pathre = qr{$inopt_re Path= \Q$wd\E $inopt_re}xs;
 
-unless ($wd =~ m/\A([A-Za-z0-9\.\/_-]+)\z/) {
-    $pathre = $inopt_re;
-}
-
-my $font_re = qr{\{(serif|sans|mono)-regular\.otf\}\[
+my $font_re = qr{(?:\{(serif|sans|mono)-regular\.otf\}\[
                  $pathre
                  BoldFont=(serif|sans|mono)-bold\.otf $inopt_re
                  BoldItalicFont=(serif|sans|mono)-bolditalic\.otf $inopt_re
                  ItalicFont=(serif|sans|mono)-italic\.otf $inopt_re
-                 \]}sx;
+                 \]
+                 |
+                 \[
+                 $pathre
+                 BoldFont=(serif|sans|mono)-bold\.otf $inopt_re
+                 BoldItalicFont=(serif|sans|mono)-bolditalic\.otf $inopt_re
+                 ItalicFont=(serif|sans|mono)-italic\.otf $inopt_re
+                 \]
+                 \{(serif|sans|mono)-regular\.otf\}
+                 )
+            }sx;
+
+unless ($wd =~ m/\A([A-Za-z0-9\.\/_-]+)\z/) {
+    $font_re = qr{\[$inopt_re\]\{DejaVu(?:Serif|Sans|SansMono)\}};
+}
 
 my $font_size_in_pt = qr{font-size:.*pt};
 
@@ -92,9 +102,9 @@ foreach my $fs ($file, \@fonts) {
     {
         ok (-f $tex, "$tex produced");
         my $texbody = read_file($tex);
-        like $texbody, qr/mainfont$font_re/;
-        like $texbody, qr/monofont$font_re/;
-        like $texbody, qr/sansfont$font_re/;
+        like $texbody, qr/(mainfont|babelfont\{rm\})$font_re/;
+        like $texbody, qr/(monofont|babelfont\{tt\})$font_re/;
+        like $texbody, qr/(sansfont|babelfont\{sf\})$font_re/ or die Dumper($c);
     }
   SKIP: {
         skip "No pdf required", 1 unless $xelatex;
@@ -144,9 +154,9 @@ foreach my $fs ($file, \@fonts) {
     {
         ok (-f $tex, "$tex produced");
         my $texbody = read_file($tex);
-        like $texbody, qr/mainfont$font_re/;
-        like $texbody, qr/monofont$font_re/;
-        like $texbody, qr/sansfont$font_re/ or die Dumper($c);
+        like $texbody, qr/(mainfont|babelfont\{rm\})$font_re/;
+        like $texbody, qr/(monofont|babelfont\{tt\})$font_re/;
+        like $texbody, qr/(sansfont|babelfont\{sf\})$font_re/ or die Dumper($c);
     }
   SKIP: {
         skip "No pdf required", 1 unless $xelatex;
@@ -255,9 +265,9 @@ ok ($@, "bad specification: $@");
     {
         ok (-f $tex, "$tex produced");
         my $texbody = read_file($tex);
-        like $texbody, qr/mainfont.*\{DejaVuSerif\}/;
-        like $texbody, qr/monofont.*\{DejaVuSansMono\}/;
-        like $texbody, qr/sansfont.*\{DejaVuSans\}/ or die Dumper($c);
+        like $texbody, qr/(mainfont|babelfont\{rm\}).*\{DejaVuSerif\}/;
+        like $texbody, qr/(monofont|babelfont\{tt\}).*\{DejaVuSansMono\}/;
+        like $texbody, qr/(sansfont|babelfont\{sf\}).*\{DejaVuSans\}/ or die Dumper($c);
     }
   SKIP: {
         skip "No pdf required", 1 unless $xelatex;
@@ -310,9 +320,9 @@ ok ($@, "bad specification: $@");
     {
         ok (-f $tex, "$tex produced");
         my $texbody = read_file($tex);
-        like $texbody, qr/mainfont$font_re/;
-        like $texbody, qr/monofont$font_re/;
-        like $texbody, qr/sansfont$font_re/;
+        like $texbody, qr/(mainfont|babelfont\{rm\})$font_re/;
+        like $texbody, qr/(monofont|babelfont\{tt\})$font_re/;
+        like $texbody, qr/(sansfont|babelfont\{sf\})$font_re/ or die Dumper($c);
     }
   SKIP: {
         skip "No pdf required", 1 unless $xelatex;

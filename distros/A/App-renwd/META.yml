@@ -20,7 +20,7 @@ name: App-renwd
 provides:
   App::renwd:
     file: lib/App/renwd.pm
-    version: '0.007'
+    version: '0.008'
 requires:
   Complete::Util: '0.608'
   Cwd: '0'
@@ -31,7 +31,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-renwd
   homepage: https://metacpan.org/release/App-renwd
   repository: git://github.com/perlancar/perl-App-renwd.git
-version: '0.007'
+version: '0.008'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

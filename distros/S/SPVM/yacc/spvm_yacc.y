@@ -19,7 +19,7 @@
 %}
 
 %token <opval> CLASS HAS METHOD OUR ENUM MY USE AS REQUIRE ALLOW CURRENT_CLASS MUTABLE
-%token <opval> DESCRIPTOR
+%token <opval> DESCRIPTOR MAKE_READ_ONLY IMPLEMENT
 %token <opval> IF UNLESS ELSIF ELSE FOR WHILE LAST NEXT SWITCH CASE DEFAULT BREAK EVAL
 %token <opval> NAME VAR_NAME CONSTANT EXCEPTION_VAR
 %token <opval> UNDEF VOID BYTE SHORT INT LONG FLOAT DOUBLE STRING OBJECT TRUE FALSE END_OF_FILE
@@ -38,11 +38,11 @@
 %type <opval> unary_op binary_op comparison_op isa logical_op expression_or_logical_op
 %type <opval> call_spvm_method opt_vaarg
 %type <opval> array_access field_access weaken_field unweaken_field isweak_field convert array_length
-%type <opval> assign inc dec allow
+%type <opval> assign inc dec allow has_implement
 %type <opval> new array_init
-%type <opval> my_var var
+%type <opval> my_var var implement
 %type <opval> expression opt_expressions expressions opt_expression case_statements
-%type <opval> field_name method_name
+%type <opval> field_name method_name is_read_only
 %type <opval> type qualified_type basic_type array_type array_type_with_length ref_type  qualified_type_or_void
 
 %right <opval> ASSIGN SPECIAL_ASSIGN
@@ -55,7 +55,7 @@
 %left <opval> SHIFT
 %left <opval> '+' '-' '.'
 %left <opval> '*' DIVIDE DIVIDE_UNSIGNED_INT DIVIDE_UNSIGNED_LONG REMAINDER  REMAINDER_UNSIGNED_INT REMAINDER_UNSIGNED_LONG
-%right <opval> LOGICAL_NOT BIT_NOT '@' CREATE_REF DEREF PLUS MINUS CONVERT SCALAR STRING_LENGTH ISWEAK REFCNT REFOP DUMP NEW_STRING_LEN
+%right <opval> LOGICAL_NOT BIT_NOT '@' CREATE_REF DEREF PLUS MINUS CONVERT SCALAR STRING_LENGTH ISWEAK REFCNT REFOP DUMP NEW_STRING_LEN IS_READ_ONLY COPY HAS_IMPLEMENT
 %nonassoc <opval> INC DEC
 %left <opval> ARROW
 
@@ -168,6 +168,7 @@ declaration
   | our ';'
   | use
   | allow
+  | implement
   | init_block
 
 init_block
@@ -213,6 +214,11 @@ allow
       $$ = SPVM_OP_build_allow(compiler, $1, $2);
     }
 
+implement
+  : IMPLEMENT basic_type ';'
+    {
+      $$ = SPVM_OP_build_implement(compiler, $1, $2);
+    }
 
 enumeration
   : opt_descriptors ENUM enumeration_block
@@ -474,17 +480,9 @@ statement
     {
       $$ = SPVM_OP_build_return(compiler, $1, $2);
     }
-  | DIE ';'
-    {
-      $$ = SPVM_OP_build_die(compiler, $1, NULL);
-    }
   | DIE expression ';'
     {
       $$ = SPVM_OP_build_die(compiler, $1, $2);
-    }
-  | WARN ';'
-    {
-      $$ = SPVM_OP_build_warn(compiler, $1, NULL);
     }
   | WARN expression ';'
     {
@@ -499,6 +497,10 @@ statement
   | ';'
     {
       $$ = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NULL, compiler->cur_file, compiler->cur_line);
+    }
+  | MAKE_READ_ONLY expression ';'
+    {
+      $$ = SPVM_OP_build_make_read_only(compiler, $1, $2);
     }
 
 for_statement
@@ -712,6 +714,8 @@ expression
     {
       $$ = SPVM_OP_new_op_false(compiler, $1);
     }
+  | is_read_only
+  | has_implement
 
 expressions
   : expressions ',' expression
@@ -779,6 +783,16 @@ unary_op
   | NEW_STRING_LEN expression
     {
       $$ = SPVM_OP_build_unary_op(compiler, $1, $2);
+    }
+  | COPY expression
+    {
+      $$ = SPVM_OP_build_unary_op(compiler, $1, $2);
+    }
+
+is_read_only
+  : IS_READ_ONLY expression
+    {
+      $$ = SPVM_OP_build_is_read_only(compiler, $1, $2);
     }
 
 inc
@@ -1100,6 +1114,12 @@ isweak_field
     {
       SPVM_OP* op_field_access = SPVM_OP_build_field_access(compiler, $2, $5);
       $$ = SPVM_OP_build_isweak_field(compiler, $1, op_field_access);
+    }
+
+has_implement
+  : HAS_IMPLEMENT var ARROW method_name
+    {
+      $$ = SPVM_OP_build_has_implement(compiler, $1, $2, $4);
     }
 
 array_length

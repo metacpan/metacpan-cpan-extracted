@@ -1,0 +1,42 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Data::Dumper::Compact qw(ddc);
+use Music::Intervals;
+
+use constant OPT => { max_width => 256 };
+
+my $string = shift || 'pythagorean'; # comma, minor, harmonic, etc.
+
+my $intervals = Music::Intervals->by_description($string);
+
+if ($string eq 'comma') {
+    delete $intervals->{'19tc'};
+    delete $intervals->{'41tc'};
+    delete $intervals->{enlc};
+    delete $intervals->{mercc};
+    delete $intervals->{p19c};
+    delete $intervals->{vc};
+}
+print ddc $intervals, OPT;
+
+my $m = Music::Intervals->new(notes => [ keys $intervals->%* ]);
+
+my $naturals = $m->natural_intervals;
+#print ddc $naturals, OPT;
+
+my %named;
+for my $natural (keys $naturals->%*) {
+    my $name = (values $naturals->{$natural}->%*)[0];
+    next unless defined $name;
+    $named{$natural} = $naturals->{$natural};
+    my $ratio = (keys $named{$natural}->%*)[0];
+    $named{$natural}->{float} = eval $ratio;
+}
+#print ddc \%named, OPT;
+
+for my $key (sort { $named{$a}->{float} <=> $named{$b}->{float} } keys %named) {
+    delete $named{$key}->{float};
+    printf "%-9s: %s", $key, ddc($named{$key}, OPT);
+}

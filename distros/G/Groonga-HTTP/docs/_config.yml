@@ -1,0 +1,36 @@
+title: Groonga-HTTP
+markdown: kramdown
+highlighter: rouge
+version: 0.05
+release_date: 2022-02-03
+copyright_year: 2022
+exclude:
+  - "Rakefile"
+  - "Gemfile"
+  - "Gemfile.lock"
+description:
+  en: Groonga HTTP client module for Perl
+  ja: Perl用の Groonga HTTPクライント モジュール
+
+kramdown:
+  input: GFM
+  smart_quotes: ["apos", "apos", "quot", "quot"]
+
+sass:
+  sass_dir: assets/stylesheets
+
+defaults:
+  - scope:
+      path: "ja"
+    values:
+      path_prefix: /ja/
+      layout: "base"
+      language: ja
+      country: JP
+  - scope:
+      path: ""
+    values:
+      path_prefix: /
+      layout: "base"
+      language: en
+      country: US

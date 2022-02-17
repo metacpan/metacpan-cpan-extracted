@@ -2,7 +2,7 @@ NAME
     Regexp::Pattern::License - Regular expressions for legal licenses
 
 VERSION
-    Version v3.9.3
+    Version v3.9.4
 
 SYNOPSIS
         use Regexp::Pattern::License;

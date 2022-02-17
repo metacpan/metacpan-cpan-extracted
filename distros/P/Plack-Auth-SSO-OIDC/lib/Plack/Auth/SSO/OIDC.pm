@@ -16,7 +16,7 @@ use MIME::Base64;
 use Digest::SHA;
 use Try::Tiny;
 
-our $VERSION = "0.01";
+our $VERSION = "0.012";
 
 with "Plack::Auth::SSO";
 
@@ -283,7 +283,7 @@ sub exchange_code_for_tokens {
     if ( grep { $_ eq "client_secret_basic" } @$token_endpoint_auth_methods_supported ) {
 
         $self->log->info("using client_secret_basic");
-        $headers->{"Authorization"} = "Basic " . MIME::Base64::encode_base64url("$client_id:$client_secret");
+        $headers->{"Authorization"} = "Basic " . MIME::Base64::encode_base64("$client_id:$client_secret");
 
     }
     elsif ( grep { $_ eq "client_secret_post" } @$token_endpoint_auth_methods_supported ) {
@@ -369,7 +369,7 @@ sub to_app {
         # check csrf
         if ( $stored_state ne $state ) {
 
-            $self->cleanup();
+            $self->cleanup($session);
             $self->set_auth_sso_error( $session,{
                 package    => __PACKAGE__,
                 package_id => $self->id,
@@ -386,7 +386,7 @@ sub to_app {
 
         if ( is_string($error) ) {
 
-            $self->cleanup();
+            $self->cleanup($session);
             $self->set_auth_sso_error($session, {
                 package    => __PACKAGE__,
                 package_id => $self->id,
@@ -401,7 +401,7 @@ sub to_app {
 
         unless ( is_string($code) ) {
 
-            $self->cleanup();
+            $self->cleanup($session);
             $self->set_auth_sso_error($session, {
                 package    => __PACKAGE__,
                 package_id => $self->id,
@@ -420,6 +420,19 @@ sub to_app {
 
         $self->log->debugf("tokens: %s", $tokens)
             if $self->log->is_debug();
+
+        if ( is_string($tokens->{error}) ) {
+
+            $self->cleanup($session);
+            $self->set_auth_sso_error($session, {
+                package    => __PACKAGE__,
+                package_id => $self->id,
+                type => $tokens->{error},
+                content => $tokens->{error_description}
+            });
+            return $self->redirect_to_error();
+
+        }
 
         my $claims = $self->extract_claims_from_id_token($tokens->{id_token});
 

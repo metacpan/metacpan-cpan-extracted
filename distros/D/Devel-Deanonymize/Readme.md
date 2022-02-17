@@ -22,7 +22,7 @@ cover -report html
 ## Debugging
 
 If your tests suddenly fail for some weird reason, you can set `DEANONYMIZE_DEBUG`. If this environment variable is set,
-we print out the filename for every modified file write its contents to `<filpath/filename>_mod.pl`
+we print out the filename for every modified file and write its contents to `<filpath/filename>_mod.pl`
 
 ## Coverage Reports
 
@@ -42,6 +42,6 @@ See separate subdirectory [examples/runit.sh](examples/runit.sh)
 
 ## Important notes
 
-- Make sure your script (the one under test) always ends with `__END__`, otherwise the regex to modify it fails silently
+- Make sure your script (the one under test) always ends with `__END__`, `__DATA__` or `1;`, otherwise the regex to modify it fails silently
 - To debug if your script is "deanonymized" use `warn()` instead of `print()` print is somewhat unreliable in this early stage
 - [Devel::Cover](https://metacpan.org/pod/Devel::Cover) on cpan

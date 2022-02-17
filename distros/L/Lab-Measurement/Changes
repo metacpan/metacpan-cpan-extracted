@@ -4,6 +4,11 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.810 2022-02-14
+  * New driver: Synctek MCL1-540 Lock-in Amplifier
+  * New driver: Andeen-Hagerling AH2700A ultra-precision capacitance bridge
+  * Lakeshore 372: many more functions (display, excitation power, scanner, ...)
+
 3.803 2022-02-01
   * Lakeshore 340: Add example subclass (Helium3), manual output function
   * Lakeshore 372: Additional functions

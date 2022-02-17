@@ -1,0 +1,40 @@
+Changes
+lib/ODS.pm
+lib/ODS/Iterator.pm
+lib/ODS/Storage/Base.pm
+lib/ODS/Storage/File.pm
+lib/ODS/Storage/File/JSON.pm
+lib/ODS/Storage/File/YAML.pm
+lib/ODS/Table.pm
+lib/ODS/Table/Column/Base.pm
+lib/ODS/Table/Column/Boolean.pm
+lib/ODS/Table/Column/Email.pm
+lib/ODS/Table/Column/Epoch.pm
+lib/ODS/Table/Column/Float.pm
+lib/ODS/Table/Column/Integer.pm
+lib/ODS/Table/Column/Phone.pm
+lib/ODS/Table/Column/String.pm
+lib/ODS/Table/ResultSet.pm
+lib/ODS/Table/Row.pm
+lib/ODS/Translator.pm
+lib/ODS/Utils.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+scripts/convert.pl
+t/00-load.t
+t/01-basic.t
+t/02-yaml.t
+t/filedb/test.json
+t/filedb/test.json.2
+t/filedb/test.yml
+t/filedb/users.json
+t/filedb/users.yml
+t/manifest.t
+t/ODS/ResultSet/User.pm
+t/ODS/Table/Test.pm
+t/ODS/Table/User.pm
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

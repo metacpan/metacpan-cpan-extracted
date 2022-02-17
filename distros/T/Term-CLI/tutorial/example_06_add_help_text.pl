@@ -53,7 +53,7 @@ $term->add_command(@commands);
 
 say "\n[Welcome to BSSH]";
 while ( defined( my $line = $term->readline ) ) {
-    $term->execute($line);
+    $term->execute_line($line);
 }
 print "\n";
 execute_exit( $term, 0 );

@@ -67,8 +67,8 @@ dotest "Verbatim", pod => <<"EOPOD",
 EOPOD
 <<"EOF";
 EXAMPLE
-        use v5.14;
-        use warnings;
+        use v5.14;         
+        use warnings;      
         say "Hello, world";
 EOF
 
@@ -137,6 +137,8 @@ The second item
 
 The third item
 
+Has two paragraphs
+
 =back
 EOPOD
 <<"EOF";
@@ -148,6 +150,8 @@ EOPOD
 
       Third
           The third item
+
+          Has two paragraphs
 EOF
 
 dotest "Nested lists", pod => <<"EOPOD",

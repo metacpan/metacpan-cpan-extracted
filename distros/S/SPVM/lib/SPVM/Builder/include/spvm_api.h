@@ -59,7 +59,13 @@ void SPVM_API_free_runtime(SPVM_RUNTIME* runtime);
 void SPVM_API_call_init_blocks(SPVM_ENV* env);
 
 int32_t SPVM_API_is_type(SPVM_ENV* env, SPVM_OBJECT* object, int32_t basic_type_id, int32_t type_dimension);
+int32_t SPVM_API_is_array(SPVM_ENV* env, SPVM_OBJECT* object);
+int32_t SPVM_API_is_string(SPVM_ENV* env, SPVM_OBJECT* object);
+int32_t SPVM_API_is_numeric_array(SPVM_ENV* env, SPVM_OBJECT* object);
+int32_t SPVM_API_is_mulnum_array(SPVM_ENV* env, SPVM_OBJECT* object);
+int32_t SPVM_API_get_elem_byte_size(SPVM_ENV* env, SPVM_OBJECT* array);
 int32_t SPVM_API_has_callback(SPVM_ENV* env, SPVM_OBJECT* object, int32_t callback_basic_type_id);
+int32_t SPVM_API_has_interface(SPVM_ENV* env, SPVM_OBJECT* object, int32_t callback_basic_type_id);
 
 SPVM_METHOD* SPVM_API_method(SPVM_ENV* env, SPVM_CLASS* class, const char* method_name);
 
@@ -223,6 +229,9 @@ int32_t SPVM_API_object_basic_type_id(SPVM_ENV* env, SPVM_OBJECT* object);
 
 const char* SPVM_API_get_chars(SPVM_ENV* env, SPVM_OBJECT* string);
 
+void SPVM_API_make_read_only(SPVM_ENV* env, SPVM_OBJECT* string);
+int32_t SPVM_API_is_read_only(SPVM_ENV* env, SPVM_OBJECT* string);
+
 SPVM_OBJECT* SPVM_API_new_pointer_by_name(SPVM_ENV* env, const char* class_name, void* pointer, int32_t* exception_flag, const char* file, int32_t line);
 void SPVM_API_set_field_byte_by_name(SPVM_ENV* env, SPVM_OBJECT* object, const char* class_name, const char* field_name, int8_t value, int32_t* exception_flag, const char* file, int32_t line);
 void SPVM_API_set_field_short_by_name(SPVM_ENV* env, SPVM_OBJECT* object, const char* class_name, const char* field_name, int16_t value, int32_t* exception_flag, const char* file, int32_t line);
@@ -267,5 +276,11 @@ SPVM_CLASS_VAR* SPVM_API_get_class_var(SPVM_ENV* env, SPVM_CLASS* class, const c
 SPVM_METHOD* SPVM_API_get_method(SPVM_ENV* env, SPVM_CLASS* class, const char* method_name);
 
 int32_t SPVM_API_get_instance_method_id_static(SPVM_ENV* env, const char* class_name, const char* method_name, const char* signature);
+
+SPVM_OBJECT* SPVM_API_new_array_proto_raw(SPVM_ENV* env, SPVM_OBJECT* array, int32_t length);
+SPVM_OBJECT* SPVM_API_new_array_proto(SPVM_ENV* env, SPVM_OBJECT* array, int32_t length);
+SPVM_OBJECT* SPVM_API_copy_raw(SPVM_ENV* env, SPVM_OBJECT* object);
+SPVM_OBJECT* SPVM_API_copy(SPVM_ENV* env, SPVM_OBJECT* object);
+void SPVM_API_shorten(SPVM_ENV* env, SPVM_OBJECT* string, int32_t new_length);
 
 #endif

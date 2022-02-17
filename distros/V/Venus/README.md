@@ -8,7 +8,7 @@ OO Standard Library for Perl 5
 
 # VERSION
 
-0.04
+0.07
 
 # SYNOPSIS
 
@@ -346,7 +346,9 @@ This package provides the following features:
 
         my $string = Venus::String->new('hello, world');
 
-        $string->box->split(', ')->join(' ')->titlecase->unbox->get; # Hello World
+        $string->box->split(', ')->join(' ')->titlecase->unbox->get;
+
+        # Hello World
 
 - utility-classes
 

@@ -3,9 +3,9 @@ package BorderStyles::Standard;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-26'; # DATE
+our $DATE = '2022-02-14'; # DATE
 our $DIST = 'BorderStyles-Standard'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 1;
 # ABSTRACT: A standard collection of border styles
@@ -22,7 +22,7 @@ BorderStyles::Standard - A standard collection of border styles
 
 =head1 VERSION
 
-This document describes version 0.011 of BorderStyles::Standard (from Perl distribution BorderStyles-Standard), released on 2022-01-26.
+This document describes version 0.013 of BorderStyles::Standard (from Perl distribution BorderStyles-Standard), released on 2022-02-14.
 
 =head1 BORDER STYLES
 
@@ -30,7 +30,7 @@ This document describes version 0.011 of BorderStyles::Standard (from Perl distr
 
 =item * L<BorderStyle::ASCII::None>
 
-No borders, but data row separator is still drawn using dashes.
+No borders, but row separator is still drawn using dashes.
 
 =item * L<BorderStyle::ASCII::SingleLine>
 

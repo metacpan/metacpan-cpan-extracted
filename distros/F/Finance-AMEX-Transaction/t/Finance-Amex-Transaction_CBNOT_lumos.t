@@ -1,15 +1,17 @@
+#!/usr/bin/env perl
+
 use strict;
 use warnings;
 
 use Test::More tests => 151;
 
-BEGIN {use_ok('Finance::AMEX::Transaction')};
+BEGIN {use_ok('Finance::AMEX::Transaction')}
 
 use lib '.';
 use t::lib::CompareFile;
 
 # source: https://github.com/lumoslabs/paxmex/blob/master/spec/parser_spec.rb
-my $file = 't/data/dummy_cbnot_raw';
+my $file = 't/data/paxmex/dummy_cbnot_raw';
 
 my $counts = {
   HEADER  => {want => 1, have => 0},
@@ -17,12 +19,11 @@ my $counts = {
   DETAIL  => {want => 1, have => 0},
 };
 
-my $data = do { local $/; <DATA> };
+my $data = do {local $/ = undef; <DATA>};
 
 t::lib::CompareFile::compare('CBNOT', $file, $data, $counts);
 
 done_testing();
-
 
 __DATA__
 {

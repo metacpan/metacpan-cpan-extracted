@@ -1,5 +1,58 @@
 Revision history for Text-Minify-XS:
 
+v0.6.0    2022-02-15 14:23:40+00:00 Europe/London
+  [Documentation]
+  - Updated documentation of minify_ascii to mention encoding issues.
+
+v0.5.6    2022-02-14 09:55:26+00:00 Europe/London (TRIAL RELEASE)
+  [Bug Fixes]
+  - Fix parameter in _minify_ascii function, GH#9.
+
+v0.5.5    2022-02-13 10:58:31+00:00 Europe/London (TRIAL RELEASE)
+  [Bug Fixes]
+  - Remove incorrect const from parameter to _minify_ascii function, GH#9.
+
+  [Documentation]
+  - Mention benchmarks.
+
+  [Tests]
+  - Enable Perl::Critic author test.
+
+  [Other]
+  - Included a sample benchmark script.
+
+v0.5.4    2022-02-12 15:01:25+00:00 Europe/London (TRIAL RELEASE)
+  [Documentation]
+  - Removed reference to UTF-8 from DESCRIPTION since there is now a
+    separate minify_ascii function.
+
+  - Fix incorrect text about newlines not being removed.
+
+v0.5.3    2022-02-12 14:54:54+00:00 Europe/London (TRIAL RELEASE)
+  [Enhancements]
+  - Add minify_ascii for minifying ASCII test, GH#6.
+
+  - Add minify_utf8 as an alias for minify.
+
+  [Bug Fixes]
+  - Use correct name of function in error message.
+
+  [Documentation]
+  - Add an actual DESCRIPTION section.
+
+  - Fix error in Changes.
+
+  - Add note about handling of newlines.
+
+v0.5.2    2022-02-12 11:38:41+00:00 Europe/London
+  [Enhancements]
+  - Upgrade Devel::PPPort to 3.64.
+
+  [Documentation]
+  - Update ABSTRACT and EXPORTS to make it clear what this does.
+
+  - Bump copyright year.
+
 v0.5.1    2021-09-28 22:48:54+01:00 Europe/London
   [Bug Fixes]
   - Improve malformed UTF-8 handling for trailing whitespace.

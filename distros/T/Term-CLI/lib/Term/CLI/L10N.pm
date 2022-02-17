@@ -5,7 +5,7 @@
 #       Author:  Steven Bakker (SBAKKER), <sbakker@cpan.org>
 #      Created:  27/02/18
 #
-#   Copyright (c) 2018 Steven Bakker; All rights reserved.
+#   Copyright (c) 2018-2022 Steven Bakker; All rights reserved.
 #
 #   This module is free software; you can redistribute it and/or modify
 #   it under the same terms as Perl itself. See "perldoc perlartistic."
@@ -16,7 +16,7 @@
 #
 #=============================================================================
 
-package Term::CLI::L10N 0.054002;
+package Term::CLI::L10N 0.055002;
 
 use 5.014;
 use warnings;
@@ -71,7 +71,7 @@ Term::CLI::L10N - localizations for Term::CLI
 
 =head1 VERSION
 
-version 0.054002
+version 0.055002
 
 =head1 SYNOPSIS
 

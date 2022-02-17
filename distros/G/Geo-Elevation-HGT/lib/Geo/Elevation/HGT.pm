@@ -6,9 +6,9 @@ use warnings;
 use POSIX ();
 use Carp;
 # set the version for version checking
-our $VERSION     = '0.05';
+our $VERSION     = '0.08';
 # file-private lexicals
-my $grid_size; # .hgt grid size = 3601x3601 for 1-minute DEMs or 1201x1201 for 3-minute DEMs
+my $grid_size; # .hgt grid size = 3601x3601 for 1-minute DEMs or 7201x7201 for 0.5-minute DEMs or 1201x1201 for 3-minute DEMs
 my @DEMnames;
 my @default_DEMs;
 my @want_DEMnames;
@@ -17,6 +17,9 @@ my $url;
 my $folder;
 my $cache_folder;
 my $debug;
+my $bicubic;
+my $bicubic_current;
+my $bicubic_mixed;
 my $switch;
 my $cache;
 my $fail;
@@ -28,6 +31,9 @@ sub new {
     folder => "https://elevation-tiles-prod.s3.amazonaws.com/skadi",
     cache_folder => "",
     debug => 0,
+    bicubic => 0,
+    bicubic_current => 0,
+    bicubic_mixed => 0,
     %params
   );
   my $self = {};
@@ -54,9 +60,12 @@ sub get_elevation_hgt {
   $url = $self->{url};
   $cache_folder = $self->{cache_folder};
   $debug = $self->{debug};
+  $bicubic = $self->{bicubic};
+  $bicubic_current = $self->{bicubic_current};
+  $bicubic_mixed = $self->{bicubic_mixed};
   $status_descr = "Memory";
   say STDERR "get_elevation_hgt" if $debug;
-  say STDERR "  Parameters: folder=>'$folder', url=>'$url', cache_folder=>'$cache_folder', debug=>$debug" if $debug;
+  say STDERR "  Parameters: folder=>'$folder', url=>'$url', cache_folder=>'$cache_folder', debug=>$debug, bicubic=>$bicubic" if $debug;
   say STDERR "  Input lat lon: $lat  $lon" if $debug;
   my $flat = POSIX::floor $lat;
   my $flon = POSIX::floor $lon;
@@ -85,19 +94,82 @@ sub get_elevation_hgt {
     return $self->{elevation};
   }
   $grid_size = sqrt (length ($$dem)/2);    # grid size of DEM
-  unless ($grid_size == 3601 or $grid_size == 1201) {
-    croak "Unknown tile format for '$self->{DEMs}{$DEMname}{DEMpath}': grid size is '$grid_size', should be 3601 or 1201";
+  unless ($grid_size == 3601 or $grid_size == 7201 or $grid_size == 1201) {
+    croak "Unknown tile format for '$self->{DEMs}{$DEMname}{DEMpath}': grid size is '$grid_size', should be 3601 or 7201 or 1201";
   }
   # the DEMs start in the NW corner with $grid_size - 1 intervals
   my $ilat = (1 - ($lat - $flat)) * ($grid_size - 1);
   my $ilon =      ($lon - $flon)  * ($grid_size - 1);
   say STDERR "  Grid size lat lon: $grid_size  $ilat  $ilon" if $debug;
   $self->{grid_size} = $grid_size;
-  $self->{elevation} = _interpolate ($dem, $ilat, $ilon);
+  $self->{elevation} = $bicubic ? _interpolate_bicubic ($dem, $ilat, $ilon) : _interpolate_bilinear ($dem, $ilat, $ilon);
   return $self->{elevation};
 }
 
-sub _interpolate {
+sub _interpolate_bicubic {
+  use List::Util qw( min max );
+  my ($f, $x, $y) = @_;
+  my $x1 = POSIX::floor $x;
+  my $x2 = POSIX::ceil  $x;
+  my $x0 = max ($x1-1, 0);
+  my $x3 = min ($x2+1, $grid_size-1);
+  my $y1 = POSIX::floor $y;
+  my $y2 = POSIX::ceil  $y;
+  my $y0 = max ($y1-1, 0);
+  my $y3 = min ($y2+1, $grid_size-1);
+
+  my $f00 = unpack ("s>*", substr ($$f, 2*($x0*$grid_size+$y0), 2));    # unpack signed big-endian 16-bit integer to elevation value
+  my $f01 = unpack ("s>*", substr ($$f, 2*($x0*$grid_size+$y1), 2));    # unpack signed big-endian 16-bit integer to elevation value
+  my $f02 = unpack ("s>*", substr ($$f, 2*($x0*$grid_size+$y2), 2));    # unpack signed big-endian 16-bit integer to elevation value
+  my $f03 = unpack ("s>*", substr ($$f, 2*($x0*$grid_size+$y3), 2));    # unpack signed big-endian 16-bit integer to elevation value
+
+  my $f10 = unpack ("s>*", substr ($$f, 2*($x1*$grid_size+$y0), 2));    # unpack signed big-endian 16-bit integer to elevation value
+  my $f11 = unpack ("s>*", substr ($$f, 2*($x1*$grid_size+$y1), 2));    # unpack signed big-endian 16-bit integer to elevation value
+  my $f12 = unpack ("s>*", substr ($$f, 2*($x1*$grid_size+$y2), 2));    # unpack signed big-endian 16-bit integer to elevation value
+  my $f13 = unpack ("s>*", substr ($$f, 2*($x1*$grid_size+$y3), 2));    # unpack signed big-endian 16-bit integer to elevation value
+
+  my $f20 = unpack ("s>*", substr ($$f, 2*($x2*$grid_size+$y0), 2));    # unpack signed big-endian 16-bit integer to elevation value
+  my $f21 = unpack ("s>*", substr ($$f, 2*($x2*$grid_size+$y1), 2));    # unpack signed big-endian 16-bit integer to elevation value
+  my $f22 = unpack ("s>*", substr ($$f, 2*($x2*$grid_size+$y2), 2));    # unpack signed big-endian 16-bit integer to elevation value
+  my $f23 = unpack ("s>*", substr ($$f, 2*($x2*$grid_size+$y3), 2));    # unpack signed big-endian 16-bit integer to elevation value
+
+  my $f30 = unpack ("s>*", substr ($$f, 2*($x3*$grid_size+$y0), 2));    # unpack signed big-endian 16-bit integer to elevation value
+  my $f31 = unpack ("s>*", substr ($$f, 2*($x3*$grid_size+$y1), 2));    # unpack signed big-endian 16-bit integer to elevation value
+  my $f32 = unpack ("s>*", substr ($$f, 2*($x3*$grid_size+$y2), 2));    # unpack signed big-endian 16-bit integer to elevation value
+  my $f33 = unpack ("s>*", substr ($$f, 2*($x3*$grid_size+$y3), 2));    # unpack signed big-endian 16-bit integer to elevation value
+
+  say STDERR "  Grid corners: ($x0,$y0)  ($x1,$y1)  ($x2,$y2)  ($x3,$y3)" if $debug;
+  # say STDERR "  Elevation at corners: $f11  $f21  $f12  $f22" if $debug;
+  say STDERR "  Elevation at corners: $f00  $f01  $f02  $f03" if $debug;
+  say STDERR "  Elevation at corners: $f10  $f11  $f12  $f13" if $debug;
+  say STDERR "  Elevation at corners: $f20  $f21  $f22  $f23" if $debug;
+  say STDERR "  Elevation at corners: $f30  $f31  $f32  $f33" if $debug;
+  # Bicubic interpolation as per https://www.paulinternet.nl/?page=bicubic
+  # using the simplifying fact that ($x2-$x1)==1 and ($y2-$y1)==1
+  my $xx = $x - $x1;
+  my $yy = $y - $y1;
+  my $f0 = _bicubic ($f00, $f01, $f02, $f03, $yy);
+  my $f1 = _bicubic ($f10, $f11, $f12, $f13, $yy);
+  my $f2 = _bicubic ($f20, $f21, $f22, $f23, $yy);
+  my $f3 = _bicubic ($f30, $f31, $f32, $f33, $yy);
+  say STDERR "  bicubic interpolated elevation: "._bicubic ($f0, $f1, $f2, $f3, $xx) if $debug;
+  return _bicubic ($f0, $f1, $f2, $f3, $xx);
+}
+
+sub _bicubic {
+  my ($f0, $f1, $f2, $f3, $x) = @_;
+  if ($bicubic_current) {
+    return $f1 + $x*($f1 - $f0 + $x*(2.0*$f0 - 5.0*$f1 + 4.0*$f2 - $f3 + $x*(3.0*($f1 - $f2) + $f3 - $f0)));    # use slope of a line between the previous and the «current» point as the derivative at a point, that is (p1-p0) and (p3-p2)
+  }
+  elsif ($bicubic_mixed) {
+    return $f1 + 0.75 * $x*($f2 - $f0 + $x*(2.0*$f0 - 5.0*$f1 + 4.0*$f2 - $f3 + $x*(3.0*($f1 - $f2) + $f3 - $f0)));    # use «current» and «next» point «mixed» slope
+  }
+  else {
+    return $f1 + 0.5 * $x*($f2 - $f0 + $x*(2.0*$f0 - 5.0*$f1 + 4.0*$f2 - $f3 + $x*(3.0*($f1 - $f2) + $f3 - $f0)));    # use slope of a line between the previous and the «next» point as the derivative at a point, that is (p2-p0)/2 and (p3-p1)/2
+  }
+}
+
+sub _interpolate_bilinear {
   my ($f, $x, $y) = @_;
   my $x1 = POSIX::floor $x;
   my $x2 = POSIX::ceil  $x;
@@ -115,7 +187,7 @@ sub _interpolate {
   my $yy = $y - $y1;
   my $f1 = _avg ($f11, $f21, $xx);
   my $f2 = _avg ($f12, $f22, $xx);
-  say STDERR "  Interpolated elevation: "._avg ($f1, $f2, $yy) if $debug;
+  say STDERR "  bilinear interpolated elevation: "._avg ($f1, $f2, $yy) if $debug;
   return _avg ($f1, $f2, $yy);
 }
 
@@ -216,7 +288,7 @@ Geo::Elevation::HGT - Elevation service with terrain data provided by L<Mapzen a
 
 =head1 Version
 
-Version 0.05
+Version 0.08
 
 =head1 Synopsis
 
@@ -234,6 +306,7 @@ You provide the latitude and longitude in decimal degrees, with south latitude a
 
 The return is the elevation for this latitude and longitude in meters.
 Bilinear interpolation is applied to the elevations at the four grid points adjacent to the latitude plus longitude pair.
+To use bicubic interpolation using the sixteen grid points adjacent to the latitude plus longitude pair set the C<bicubic> parameter to 1.
 
 You can also use your own terrain tiles by providing the corresponding path, see below.
 A good source for Europe that I am using was compiled by Sonny -- many thanks to him; found at L<https://data.opendataportal.at/dataset/dtm-europe>
@@ -259,7 +332,7 @@ In a typical application of getting elevations for a gpx track of an outdoor act
 
 To get the elevations of a few thousand gpx track points is therefore normally quite fast.
 
-Here is a benchmark I did on my 2015 NUC5i3RYK with Intel 5010U dual-core processor
+Here is a benchmark I did with bilinear interpolation on my 2015 NUC5i3RYK with Intel 5010U dual-core processor
 
 =for :list
 
@@ -329,6 +402,13 @@ Note that cache will not expire and will have to be cleared from outside of C<Ge
 
 * C<debug> - set to 1 to get some debug output to STDERR; default 0
 
+* C<bicubic> - set to 1 to perform bicubic interpolation; default 0 = I<bilinear> interpolation
+
+Note that bicubic interpolation involves more multiplications (40 per elevation value instead of 3), reducing performance on my NUC to about 50%.
+Bicubic interpolation has an advantage when determining the elevation of a sharp peak in that it also takes into account the elevation gradient around the peak.
+This will allow the calculated elevation to be above that of the adjacent grid points.
+The effect is not very prominent however and will also depend on how much the gradient is reflected in the underlying data.
+
 =head2 get_elevation_hgt
 
 C<$ele_geh = $geh-E<gt>get_elevation_hgt ($lat, $lon)>
@@ -395,7 +475,7 @@ Elevations are in meters referenced to the WGS84/EGM96 geoid.
 
 Byte order is Motorola ("big-endian") standard with the most significant byte first.
 
-Grid size is 3601x3601 for 1-minute DEMs or 1201x1201 for 3-minute DEMs.
+Grid size is 3601x3601 for 1-minute DEMs or 7201x7201 for 0.5-minute DEMs or 1201x1201 for 3-minute DEMs.
 
 The rows at the north and south edges as well as the columns at the east and west edges of each cell overlap and are identical to the edge rows and columns in the adjacent cell.
 
@@ -422,7 +502,7 @@ C<https://elevation-tiles-prod.s3.amazonaws.com/skadi> stores HGT files in subdi
 
 C<$geh-E<gt>{folder}> will work without following the above storage pattern, as long as a file with the correct name is found somewhere under that path.
 
-Similarly, C<$geh-E<gt>{cache}> will be built to the above storage pattern, but will also work if files are stored in any other way under that path.
+Similarly, C<$geh-E<gt>{cache_folder}> will be built to the above storage pattern, but will also work if files are stored in any other way under that path.
 
 HGT files need to be compressed to GNU zip (gzip) or ZIP (zip) compression format with .hgt.gz or .zip file extension, respectively.
 
@@ -472,6 +552,8 @@ L<racemap Elevation service|https://github.com/racemap/elevation-service>
 
 L<Using DEMs to get GPX elevation profiles|http://notes.secretsauce.net/notes/2014/03/18_using-dems-to-get-gpx-elevation-profiles.html>
 
+L<Bicubic interpolation|https://www.paulinternet.nl/?page=bicubic>
+
 plus others
 
 =head1 License and Copyright
@@ -483,4 +565,3 @@ This is free software, licensed under:
   The Artistic License 2.0 (GPL Compatible)
 
 =cut
-

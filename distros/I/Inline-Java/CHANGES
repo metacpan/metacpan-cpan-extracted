@@ -1,5 +1,6 @@
-Revision history for Perl extension Inline::Java
-------------------------------------------------
+0.67 2022-02-12
+- remove support for Win95/98/ME
+- append to CLASSPATH in test not set (#10, #11) - thanks @jlberner
 
 0.66 Fri Apr  6 01:26:50 BST 2018
  - Fix build on Cygwin [RT#119307] - thanks @mperry2!

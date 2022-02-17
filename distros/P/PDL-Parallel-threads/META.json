@@ -4,13 +4,13 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.3901, CPAN::Meta::Converter version 2.120630",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "PDL-Parallel-threads",
    "no_index" : {
@@ -40,14 +40,15 @@
       "runtime" : {
          "requires" : {
             "PDL" : "v2.4.10",
-            "perl" : "v5.8.0"
+            "perl" : "v5.8.0",
+            "threads::shared" : "1.21"
          }
       }
    },
    "provides" : {
       "PDL::Parallel::threads" : {
          "file" : "lib/PDL/Parallel/threads.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "PDL::Parallel::threads::SIMD" : {
          "file" : "lib/PDL/Parallel/threads/SIMD.pm",
@@ -66,5 +67,6 @@
          "url" : "http://github.com/run4flat/PDL-Parallel-threads"
       }
    },
-   "version" : "0.03"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

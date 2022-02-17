@@ -85,7 +85,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.198';
+our $VERSION = '1.199';
 
 use Quiq::Html::Widget::CheckBox;
 
@@ -219,7 +219,7 @@ sub html {
 
 =head1 VERSION
 
-1.198
+1.199
 
 =head1 AUTHOR
 

@@ -19,16 +19,55 @@ name: BorderStyle
 provides:
   BorderStyle:
     file: lib/BorderStyle.pm
-    version: v2.0.9
+    version: v3.0.2
+  BorderStyle::Test::CustomChar:
+    file: lib/BorderStyle/Test/CustomChar.pm
+    version: v3.0.2
+  BorderStyle::Test::Labeled:
+    file: lib/BorderStyle/Test/Labeled.pm
+    version: v3.0.2
+  BorderStyleRole::Source::ASCIIArt:
+    file: lib/BorderStyleRole/Source/ASCIIArt.pm
+    version: v3.0.2
+  BorderStyleRole::Source::Hash:
+    file: lib/BorderStyleRole/Source/Hash.pm
+    version: v3.0.2
+  BorderStyleRole::Spec::Basic:
+    file: lib/BorderStyleRole/Spec/Basic.pm
+    version: v3.0.2
+  BorderStyleRole::Transform::BoxChar:
+    file: lib/BorderStyleRole/Transform/BoxChar.pm
+    version: v3.0.2
+  BorderStyleRole::Transform::InnerOnly:
+    file: lib/BorderStyleRole/Transform/InnerOnly.pm
+    version: v3.0.2
+  BorderStyleRole::Transform::OuterOnly:
+    file: lib/BorderStyleRole/Transform/OuterOnly.pm
+    version: v3.0.2
+requires:
+  Role::Tiny: '0'
+  Role::Tiny::With: '0'
+  perl: '5.010001'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=BorderStyle
   homepage: https://metacpan.org/release/BorderStyle
   repository: git://github.com/perlancar/perl-BorderStyle.git
-version: 2.0.9
+version: 3.0.2
 x_Dist_Zilla:
   perl:
     version: '5.034000'
   plugins:
+    -
+      class: Dist::Zilla::Plugin::BorderStyle
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
+      name: BorderStyle
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
       name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'
@@ -115,8 +154,12 @@ x_Dist_Zilla:
       version: '0.02'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
-      version: '0.062'
+      version: '0.063'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
@@ -323,6 +366,10 @@ x_Dist_Zilla:
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
               version: '0.082'
+            -
+              class: Pod::Weaver::Plugin::BorderStyle
+              name: -BorderStyle
+              version: '0.003'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -

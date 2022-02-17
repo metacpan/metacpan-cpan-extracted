@@ -1,18 +1,19 @@
 package BorderStyle::Test::Random;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-12'; # DATE
-our $DIST = 'BorderStyles-Test'; # DIST
-our $VERSION = '0.003'; # VERSION
-
 use strict;
 use warnings;
-use parent 'BorderStyleBase';
+
+use Role::Tiny::With;
+with 'BorderStyleRole::Spec::Basic';
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-02-14'; # DATE
+our $DIST = 'BorderStyles-Test'; # DIST
+our $VERSION = '0.005'; # VERSION
 
 our %BORDER = (
-    v => 2,
+    v => 3,
     summary => 'A border style that uses random characters',
-    dynamic => 1,
     args => {
         cache => {
             schema => 'bool*',
@@ -24,8 +25,9 @@ our %BORDER = (
 my @chars = map {chr($_)} 32 .. 127;
 
 sub get_border_char {
-    my ($self, $y, $x, $n, $args) = @_;
-    $n = 1 unless defined $n;
+    my ($self, %args) = @_;
+    my $char = $args{char};
+    my $repeat = $args{repeat} // 1;
 
     my $c;
     if ($self->{args}{cache}) {
@@ -38,7 +40,7 @@ sub get_border_char {
         $c = $chars[@chars * rand()];
     }
 
-    $c x $n;
+    $c x $repeat;
 }
 
 1;
@@ -56,7 +58,9 @@ BorderStyle::Test::Random - A border style that uses random characters
 
 =head1 VERSION
 
-This document describes version 0.003 of BorderStyle::Test::Random (from Perl distribution BorderStyles-Test), released on 2021-05-12.
+This document describes version 0.005 of BorderStyle::Test::Random (from Perl distribution BorderStyles-Test), released on 2022-02-14.
+
+=for Pod::Coverage ^(.+)$
 
 =head1 SYNOPSIS
 
@@ -79,13 +83,13 @@ To use with L<Text::ANSITable>:
 
 Sample output:
 
- cccccccccccccccccccccccccccccccccccccccccc
- c ColumName1 c ColumnNameB c ColumnNameC c
- cccccccccccccccccccccccccccccccccccccccccc
- c row1A      c row1B       c row1C       c
- c row2A      c row2B       c row2C       c
- c row3A      c row3B       c row3C       c
- cccccccccccccccccccccccccccccccccccccccccc
+ ..........................................
+ . ColumName1 . ColumnNameB . ColumnNameC .
+ ..........................................
+ . row1A      . row1B       . row1C       .
+ . row2A      . row2B       . row2C       .
+ . row3A      . row3B       . row3C       .
+ ..........................................
 
 To use with L<Text::Table::More>:
 
@@ -102,15 +106,15 @@ To use with L<Text::Table::More>:
 
 Sample output:
 
- wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
- w ColumName1 w ColumnNameB w ColumnNameC w
- wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
- w row1A      w row1B       w row1C       w
- wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
- w row2A      w row2B       w row2C       w
- wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
- w row3A      w row3B       w row3C       w
- wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
+ llllllllllllllllllllllllllllllllllllllllll
+ l ColumName1 l ColumnNameB l ColumnNameC l
+ llllllllllllllllllllllllllllllllllllllllll
+ l row1A      l row1B       l row1C       l
+ llllllllllllllllllllllllllllllllllllllllll
+ l row2A      l row2B       l row2C       l
+ llllllllllllllllllllllllllllllllllllllllll
+ l row3A      l row3B       l row3C       l
+ llllllllllllllllllllllllllllllllllllllllll
  
 
 To use with L<Text::Table::TinyBorderStyle>:
@@ -128,15 +132,15 @@ To use with L<Text::Table::TinyBorderStyle>:
 
 Sample output:
 
- ))))))))))))))))))))))))))))))))))))))))))
- ) ColumName1 ) ColumnNameB ) ColumnNameC )
- ))))))))))))))))))))))))))))))))))))))))))
- ) row1A      ) row1B       ) row1C       )
- ))))))))))))))))))))))))))))))))))))))))))
- ) row2A      ) row2B       ) row2C       )
- ))))))))))))))))))))))))))))))))))))))))))
- ) row3A      ) row3B       ) row3C       )
- ))))))))))))))))))))))))))))))))))))))))))
+ PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+ P ColumName1 P ColumnNameB P ColumnNameC P
+ PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+ P row1A      P row1B       P row1C       P
+ PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+ P row2A      P row2B       P row2C       P
+ PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+ P row3A      P row3B       P row3C       P
+ PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
 =head1 HOMEPAGE
 
@@ -146,6 +150,34 @@ Please visit the project's homepage at L<https://metacpan.org/release/BorderStyl
 
 Source repository is at L<https://github.com/perlancar/perl-BorderStyles-Test>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=BorderStyles-Test>
@@ -153,16 +185,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

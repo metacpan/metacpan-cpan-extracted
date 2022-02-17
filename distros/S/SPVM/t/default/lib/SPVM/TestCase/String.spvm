@@ -1,5 +1,39 @@
 class TestCase::String {
+  use Fn;
   static method string_access : int () {
+    # Read-only strings can't be converted to mutable strings
+    {
+      eval { (mutable string)"abc"; };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
+    # String literal is read-only
+    {
+      my $string = "abc";
+      unless (is_read_only $string) {
+        return 0;
+      }
+    }
+
+    # make_read_only
+    {
+      my $string = Fn->copy_string("abc");
+      if (is_read_only $string) {
+        return 0;
+      }
+      make_read_only $string;
+      unless (is_read_only $string) {
+        return 0;
+      }
+      
+      eval { (mutable string)$string; };
+      unless ($@) {
+        return 0;
+      }
+    }
+    
     # Get the charactor
     {
       my $string = "abc";
@@ -19,7 +53,7 @@ class TestCase::String {
     
     # Set the character
     {
-      my $string : mutable string = (mutable string)"abc";
+      my $string : mutable string = (mutable string)Fn->copy_string("abc");
       $string->[0] = 'd';
       $string->[1] = 'e';
       $string->[2] = 'f';
@@ -39,7 +73,7 @@ class TestCase::String {
 
     # Set the character - type inference
     {
-      my $string = (mutable string)"abc";
+      my $string = (mutable string)Fn->copy_string("abc");
       $string->[0] = 'd';
       $string->[1] = 'e';
       $string->[2] = 'f';
@@ -112,24 +146,97 @@ class TestCase::String {
   }
 
   static method new_string_len : int () {
-    my $message = new_string_len 3;
     
-    unless ($message isa string) {
-      return 0;
+    # Basic
+    {
+      my $message = new_string_len 3;
+      
+      unless ($message isa string) {
+        return 0;
+      }
+      
+      unless ($message eq "\0\0\0") {
+        return 0;
+      }
+      
+      my $message_mut = (mutable string)$message;
+      
+      $message_mut->[0] = 'a';
+      $message_mut->[1] = 'b';
+      $message_mut->[2] = 'c';
+      
+      unless ($message eq "abc") {
+        return 0;
+      }
     }
     
-    unless ($message eq "\0\0\0") {
-      return 0;
+    # The length is 0
+    {
+      my $message = new_string_len(0);
+      
+      unless ($message eq "") {
+        return 0;
+      }
+    }
+
+    # The length is -1
+    {
+      eval { new_string_len -1; };
+      unless ($@) {
+        return 0;
+      }
     }
     
-    my $message_mut = (mutable string)$message;
+    $@ = undef;
     
-    $message_mut->[0] = 'a';
-    $message_mut->[1] = 'b';
-    $message_mut->[2] = 'c';
+    return 1;
+  }
+
+  static method shorten : int () {
     
-    unless ($message eq "abc") {
-      return 0;
+    # Basic
+    {
+      my $string = copy "abc";
+      
+      Fn->shorten((mutable string)$string, 2);
+      
+      unless ($string eq "ab") {
+        return 0;
+      }
+      
+      Fn->shorten((mutable string)$string, 0);
+      
+      unless ($string eq "") {
+        return 0;
+      }
+    }
+    
+    # Bad cases
+    {
+      my $string = copy "abc";
+      
+      Fn->shorten((mutable string)$string, 4);
+      
+      unless ($string eq "abc") {
+        return 0;
+      }
+      
+      Fn->shorten((mutable string)$string, -1);
+      
+      unless ($string eq "") {
+        return 0;
+      }
+    }
+    
+    # undef
+    {
+      my $string = (string)undef;
+      
+      Fn->shorten((mutable string)$string, 2);
+      
+      unless ($string == undef) {
+        return 0;
+      }
     }
     
     return 1;

@@ -13,7 +13,7 @@ use Excel::ValueReader::XLSX;
 (my $xl_1904    = $0) =~ s/\.t$/1904.xlsx/;     # 'valuereader1904.xlsx'
 (my $xl_ulibuck = $0) =~ s/\w+.t$/ulibuck.xlsx/; # 'ulibuck.xlsx'
 
-my @expected_sheet_names = qw/Test Empty Entities Tab_entities Dates/;
+my @expected_sheet_names = qw/Test Empty Entities Tab_entities Dates Tables/;
 my @expected_values      = (  ["Hello", undef, undef, 22, 33, 55],
                               [123, undef, '<>'],
                               ["This is bold text", undef, '&'],
@@ -119,6 +119,29 @@ my @expected_dates_1904 = (
 );
 
 
+my @expected_tab_names = qw(Entities tab_foobar tab_in_middle_of_sheet tab_without_headers Cols_with_entities);
+
+
+my @expected_tab_foobar = (
+  {foo => 11, bar => 22},
+  {foo => 33, bar => 44},
+ );
+
+my @expected_tab_badambum = (
+  {badam => 99, bum => 88},
+  {badam => 77, bum => 66},
+ );
+
+my @expected_tab_no_headers = (
+  {col1 => 'aa', col2 => 'bb',  col3 => 'cc'},
+  {col1 => 'dd', col2 => undef, col3 => undef},
+  {col1 => 'ee', col2 => 'ff',  col3 => 'gg'},
+ );
+
+my @expected_tab_cols_with_entities = (
+  {'col<' => 'foo', 'col&' => 'bar', 'col>' => 'bim'},
+);
+
 
 my @backends = ('Regex');
 push @backends, 'LibXML' if check_install(module => 'XML::LibXML::Reader');
@@ -145,6 +168,28 @@ foreach my $backend (@backends) {
   # check an empty sheet
   my $empty  = $reader->values('Empty');
   is_deeply($empty, [], "empty values using $backend");
+
+  # tables
+  my ($entity_columns, $entities) = $reader->table('Entities');
+  is_deeply($entity_columns, [qw(Num Name Char Cap/small Letter Variant)],
+                                           "column names, using $backend");
+  is $entities->[0]{Name},   'amp'       , "1st table row, name, using $backend";
+  is $entities->[0]{Letter}, 'ampersand' , "1st table row, letter, using $backend";
+  is $entities->[-1]{Name},  'yuml' ,      "last table row, name, using $backend";
+
+  is_deeply([$reader->table_names], \@expected_tab_names, "table names, using $backend");
+
+  my $tab_foobar = $reader->table('tab_foobar');
+  is_deeply($tab_foobar, \@expected_tab_foobar, "tab_foobar, using $backend");
+
+  my $tab_badambum = $reader->table('tab_in_middle_of_sheet');
+  is_deeply($tab_badambum, \@expected_tab_badambum, "tab_badambum, using $backend");
+
+  my ($col_headers, $tab_no_headers) = $reader->table('tab_without_headers');
+  is_deeply($tab_no_headers, \@expected_tab_no_headers, "tab_no_headers, using $backend");
+
+  my $tab_cols_with_entities = $reader->table('Cols_with_entities');
+  is_deeply($tab_cols_with_entities, \@expected_tab_cols_with_entities, "tab_cols_with_entities, using $backend");
 
   # check a pivot table
   my $tab_entities = $reader->values('Tab_entities');
@@ -178,6 +223,8 @@ foreach my $backend (@backends) {
   my @all_vals_flat   = grep {$_} map {@$_} @$dates_raw_nums;
   my $are_all_numbers = all {looks_like_number($_)} @all_vals_flat;
   ok($are_all_numbers, "dates with no format, using $backend");
+
+
 
   # Excel file in 1904 date format
   my $reader_1904 = Excel::ValueReader::XLSX->new(xlsx => $xl_1904, using => $backend);

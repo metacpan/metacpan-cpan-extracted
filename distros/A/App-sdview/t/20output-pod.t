@@ -97,6 +97,8 @@ The second item
 
 The third item
 
+Has two paragraphs
+
 =back
 EOPOD
 

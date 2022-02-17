@@ -1,6 +1,6 @@
+.pls_cache/index
 Changes
 cpanfile
-Fullmakt.odt
 lib/Mojo/UserAgent/SecureServer.pm
 Makefile.PL
 MANIFEST			This list of files
@@ -9,6 +9,7 @@ t/from-ua.t
 t/pki/certs/ca-chain.cert.pem
 t/pki/certs/ca.cert.pem
 t/pki/certs/ca.csr.pem
+t/pki/crl.pem
 t/pki/crlnumber
 t/pki/index.txt
 t/pki/index.txt.attr
@@ -16,6 +17,7 @@ t/pki/mojo.example.com.cert.pem
 t/pki/mojo.example.com.csr.pem
 t/pki/mojo.example.com.key.pem
 t/pki/newcerts/1000.pem
+t/pki/newcerts/1001.pem
 t/pki/private/ca.key.pem
 t/pki/private/passphrase
 t/pki/root/ca.cert.pem

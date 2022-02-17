@@ -7,7 +7,7 @@ use v5.26;
 
 use Object::Pad;
 
-package App::sdview::Output::Pod 0.05;
+package App::sdview::Output::Pod 0.06;
 class App::sdview::Output::Pod
    does App::sdview::Output
    :strict(params);
@@ -59,16 +59,21 @@ method _output_list ( $para )
    foreach my $idx ( 0 .. $#items ) {
       my $item = $items[$idx];
 
-      if( $para->listtype eq "bullet" ) {
+      if( $item->type ne "item" ) {
+         # Non-item has no leader
+      }
+      elsif( $para->listtype eq "bullet" ) {
          $self->say( "=item *" );
+         $self->say;
       }
       elsif( $para->listtype eq "number" ) {
          $self->say( sprintf "=item %d.", $idx + 1 );
+         $self->say;
       }
       elsif( $para->listtype eq "text" ) {
          $self->say( sprintf "=item %s", $self->_convert_str( $item->term ) );
+         $self->say;
       }
-      $self->say;
 
       $self->say( $self->_convert_str( $item->text ) );
       $self->say;

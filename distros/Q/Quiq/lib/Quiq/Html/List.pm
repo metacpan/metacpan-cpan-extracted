@@ -112,7 +112,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.198';
+our $VERSION = '1.199';
 
 # -----------------------------------------------------------------------------
 
@@ -197,7 +197,7 @@ sub html {
             if ($type eq 'dl') {
                 for (my $i = 0; $i < @$itemA; $i += 2) {
                     my $val = $itemA->[$i+1];
-                    if (!defined($val) || $val eq '') {
+                    if (!defined($val)) { # || $val eq '') {
                         next;
                     }
                     $html .= $h->tag('dt',
@@ -230,7 +230,7 @@ sub html {
 
 =head1 VERSION
 
-1.198
+1.199
 
 =head1 AUTHOR
 

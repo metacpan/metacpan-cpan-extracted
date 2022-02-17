@@ -1,3 +1,46 @@
+3.0.2   2022-02-14  Released-By: PERLANCAR; Urgency: medium
+
+        - No spec changes.
+
+        - [border style Test::Labeled] Give different label for header row and
+          header-data separator line.
+
+        - Edit Changes.
+
+        - [build] Rebuild with POD::Weaver & Dist::Zilla plugin 'BorderStyle'.
+
+
+3.0.1   2022-02-14  Released-By: PERLANCAR; Urgency: medium
+
+        - No spec changes.
+
+        - Add BorderStyle::Test::{CustomChar,Labeled} from BorderStyleBase
+          distribution, as that distribution will be purged from CPAN.
+
+        - [bugfix] Avoid error from stricture.
+
+
+3.0.0   2022-02-14  Released-By: PERLANCAR; Backward-Incompatible: yes; Urgency: medium
+
+        [INCOMPATIBLE CHANGES]
+
+        - Bump specification version from 2 to 3 due to incompatible changes.
+
+        - Remove `chars` in border style structure and abstract it through
+          `get_border_char()` to be more flexible, e.g. to allow for footer
+          area, vertical header (header columns), and so on.
+
+        - Replace the positional arguments in `get_border_char()` with named
+          arguments to be more flexible. Replace the `x` and `y` arguments
+          that refer to character with character `name`, to be more readable.
+
+        [ENHANCEMENTS]
+
+        - Add roles in BorderStyleRole::* to replace BorderStyleBase. There are
+          now BorderStyleRole::Source::ASCIIArt to make it easier to add a new
+          border style by just "drawing" it.
+
+
 2.0.9   2022-01-27  Released-By: PERLANCAR; Urgency: medium
 
         - Fix some border characters in demo table.

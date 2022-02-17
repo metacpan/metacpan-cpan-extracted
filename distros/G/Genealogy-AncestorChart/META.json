@@ -1,0 +1,54 @@
+{
+   "abstract" : "create a table of genealogical ancestors.",
+   "author" : [
+      "Dave Cross <dave@perlhacks.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Genealogy-AncestorChart",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moo" : "0",
+            "Types::Standard" : "0",
+            "perl" : "5.006000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/davorg/genealogy-ancestorchart/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/davorg/genealogy-ancestorchart.git",
+         "web" : "https://github.com/davorg/genealogy-ancestorchart"
+      }
+   },
+   "version" : "v0.0.2",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

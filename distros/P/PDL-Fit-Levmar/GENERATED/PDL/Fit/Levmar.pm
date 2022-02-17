@@ -3,7 +3,7 @@
 #
 package PDL::Fit::Levmar;
 
-our @EXPORT_OK = qw(levmar levmar_report levmar_chkjac levmar_der_ levmar_der_lb levmar_der_ub levmar_der_lb_ub levmar_diff_ levmar_diff_lb levmar_diff_ub levmar_diff_lb_ub _levmar_chkjac _levmar_chkjac_no_t );
+our @EXPORT_OK = qw(levmar levmar_report levmar_chkjac levmar_der_lb_ub levmar_der_lb levmar_der_ub levmar_der_ levmar_diff_lb_ub levmar_diff_lb levmar_diff_ub levmar_diff_ _levmar_chkjac _levmar_chkjac_no_t );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -11,13 +11,17 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '0.0103';
+   our $VERSION = '0.0105';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Fit::Levmar $VERSION;
 
 
 
+
+
+
+#line 14 "levmar.pd"
 
 #use Data::Dumper;
 
@@ -469,7 +473,7 @@ threaded. That is, if the array FIX has more than one
 dimension you will not get correct results. Also, PDL will
 not add dimension correctly if you pass additional
 dimensions in other quantities.  Threading will work if you
-use linear contstraints directly via C<A> and C<b>.
+use linear constraints directly via C<A> and C<b>.
 
 =item FIXB
 
@@ -557,60 +561,13 @@ should be in separate section, or otherwise noted.
 If defined, return a ref to a hash containing the default
 values of the parameters.
 
-=item WORK
-
-levmar() needs some storage for scratch space. Normally, you
-are not concerned with this-- the storage is allocated and
-deallocated automatically without you being aware. However
-if you have very large data sets, and are doing several
-fits, this allocation and deallocation may be time consuming
-(the time required to allocate storage grows faster than
-linearly with the amount of storage). If you are using
-implicit threading, the storage is only allocated once
-outside the threadloop even if you don't use this
-option. However, you may want to do several fits on the perl
-level and want to allocate the work space only once.
-
-If you set WORK to a null piddle (say $work) and keep the
-reference and call levmar(), storage will be created before
-the fit. If you continue to call levmar() with WORK =>
-$work, no new storage will be created. In this example,
-
- sub somefitting {
-  my $work = PDL->null;
-  ...
-  while (1) {
-    my $h = levmar($p, ... ,WORK => $work);
-    ... change inputs based on results in $h  
-    last if somecondition is true;
-  }
-  ...
- }
-
-storage is created in the first call to C<levmar> and is
-destroyed upon leaving the subroutine C<somefitting>
-(provided a reference to $work was not stored in some data
-structure delclared in an block enclosing the subroutine.)
-
-The numeric-derivative algorithms require more storage than
-the analytic-derivative algorithms. So if you create the
-storage for $work on a call with DERIVATIVE=>'numeric' and
-subsequently make a call with DERIVATIVE=>'analytic' you are
-ok. But if you try it in the other order, you will get a
-runtime error. You can also pass a pdl created elsewhere
-with the correct type and enough or more than enough storage.
-
-There are several pdls used by levmar() that have a similar option.
-
-(see also in PDL::Indexing )
-
 =item COVAR
 
 Send a pdl reference for the output hash element COVAR. You may
 want to test if this option is more efficient for
 some problem. But unless the covariance matrix is very large,
 it probably won't help much. On the other hand it almost certainly
-won't make levmar() less efficient.  See the section on WORK above.
+won't make levmar() less efficient.
 
 Note that levmar returns a piddle representing the covariance in
 the output hash. This will be the the same piddle that you give
@@ -621,9 +578,7 @@ as input via this option. So, if you do the following,
 
 then $covar and $h->{COVAR} are references to the same
 pdl. The storage for the pdl will not be destroyed until
-both $covar and $h->{COVAR} become undefined. The option
-C<WORK> differs in this regard. That is, the piddle containing
-the workspace is not returned in the hash.
+both $covar and $h->{COVAR} become undefined.
 
 =item NOCOVAR
 
@@ -633,18 +588,17 @@ If defined, no covariance matrix is computed.
 
 Send a pdl reference for the output hash element P. Don't
 confuse this with the option P which can be used to send the
-initial guess for the parameters
-(see C<COVAR> and C<WORK>).
+initial guess for the parameters (see C<COVAR>).
 
 =item INFO
 
 Send a pdl reference for the output hash element C<INFO>.
-(see C<COVAR> and C<WORK>)
+(see C<COVAR>)
 
 =item RET
 
 Send a pdl reference for the output hash element C<RET>.
-(see C<COVAR> and C<WORK>)
+(see C<COVAR>)
 
 
 =item MAXITS
@@ -1182,15 +1136,22 @@ $LPPEXT = ".lpp";
 
 
 sub deb { print STDERR $_[0],"\n"}
+#line 1140 "Levmar.pm"
 
 
+
+#line 1131 "levmar.pd"
 
 $PDL::Fit::Levmar::HAVE_LAPACK=0;
+#line 1147 "Levmar.pm"
 
 
 
 
 
+
+
+#line 1166 "levmar.pd"
 
 
 
@@ -1281,7 +1242,6 @@ $Levmar_defaults = {
     T => undef,
     WGHTS => undef,
     COVAR => undef, # The next 5 params can be set to PDL->null
-    WORK => undef,  # work space
     POUT => undef,  # ref for preallocated output parameters
     INFO => undef,
     RET => undef,
@@ -1346,8 +1306,11 @@ sub levmar {
     $inh->{FUNC} = $infunc if defined $infunc;
     die "levmar: neither FUNC nor CSRC defined"
         unless defined $inh->{FUNC} or defined $inh->{CSRC};
+#line 1310 "Levmar.pm"
 
 
+
+#line 1323 "levmar.pd"
 
  
     foreach (qw( A B C D FIX WGHT )) {
@@ -1355,6 +1318,11 @@ sub levmar {
             if exists $inh->{$_};
     }
    
+#line 1322 "Levmar.pm"
+
+
+
+#line 1332 "levmar.pd"
 
 
         
@@ -1379,8 +1347,6 @@ sub levmar {
     $x = $h->{X} unless not defined $h->{X} and defined $p;
     $t = $h->{T} unless not defined $h->{T} and defined $p;
 
-    $t = PDL->null unless defined $t; # sometimes $t not needed
-
     if ( not defined $p ) { # This looks like some kind of error thing that was
                             # not implemented consistently
 	my $st = "No parameter (P) pdl";
@@ -1397,13 +1363,13 @@ sub levmar {
 # Treat input and output piddles for pp_defs
     $x = topdl($x); # in case they are refs to arrays
     $p = topdl($p);
+    $t = PDL->zeroes($p->type, 1) unless defined $t; # sometimes $t not needed
     $t = topdl($t);
 ###  output variables
     my $pout;
     my $info;
     my $covar;
     my $ret;
-    my $work;
     my $wghts;
 
 # should put this stuff in a loop
@@ -1411,7 +1377,6 @@ sub levmar {
     $pout = $h->{POUT} if defined $h->{POUT};
     $info = $h->{INFO} if defined $h->{INFO};
     $ret = $h->{RET} if defined $h->{RET};
-    $work = $h->{WORK} if defined $h->{WORK};
     $wghts = $h->{WGHTS} if defined $h->{WGHTS};
 
 # If they are set here, then there will be no external ref.
@@ -1419,13 +1384,8 @@ sub levmar {
     $pout = PDL->null unless defined $pout;
     $info = PDL->null unless defined $info;
     $ret = PDL->null unless defined $ret;
-    $work = PDL->null unless defined $work;
     $wghts = PDL->null unless defined $wghts;
 
-# Input pdl contstructed in levmar
-# Currently, the elements are set from a hash; no convenient way to thread.
-# As an alternative, we could send them as a pdl, then we could thread them
-    my $opts;
 # Careful about $m, it is used in construcing $A below (with fix). But this is
 # not correct when using implicit threading. Except threading may still be working.
 # Need to look into that.
@@ -1503,16 +1463,12 @@ sub levmar {
     }
 
 # liblevmar uses 5 option for analytic and 6 for numeric. 
+    my $opts = pdl($p->type, @$h{qw(MU EPS1 EPS2 EPS3)},
+      $h->{DERIVATIVE} eq 'analytic' ? () : $h->{DELTA}
+    );
 # We make an integer option array as well, for passing stuff , like maxits.
-    if ($h->{DERIVATIVE} eq 'analytic') {
-	$opts = pdl ($p->type, $h->{MU},$h->{EPS1},$h->{EPS2},$h->{EPS3});
-    }
-    else {
-	$opts = pdl ($p->type,$h->{MU},$h->{EPS1},$h->{EPS2},$h->{EPS3},$h->{DELTA});
-    }
     my $iopts = pdl(long, $h->{MAXITS});
 
-  
 ########### FIX holds some parameters constant using linear constraints.
 # It is a special case of more general constraints using A and b.
 # Notice that this fails if FIX has more than one dimension (ie, you are
@@ -1575,12 +1531,10 @@ sub levmar {
 #    print "func $pdl_levmar_func\n";
 #    my $nargs = @$arg_list;
 #    print "Got $nargs args\n";
-    my @jacobians = ();
-    if ( $h->{DERIVATIVE} eq 'analytic' ) {
-      @jacobians = ( $jacn, $sjacn );
-    }
-    &$pdl_levmar_func($p,$x,$t,@$arg_list,$iopts,$opts,$work,
-       $covar, $ret, $pout, $info, $funcn, $sfuncn, @jacobians, $DFP, $want_covar);
+    &$pdl_levmar_func($p,$x,$t,@$arg_list,$iopts,$opts,
+       $covar, $ret, $pout, $info, $funcn, $sfuncn,
+       ($h->{DERIVATIVE} eq 'analytic' ? ( $jacn, $sjacn ) : ()),
+       $DFP, $want_covar);
 
     DFP_free($DFP) if $DFP;
 
@@ -1753,70 +1707,83 @@ sub levmar_chkjac {
     DFP_free($DFP);
     return $err;
 }
+#line 1711 "Levmar.pm"
 
 
 
-
-
-*levmar_der_ = \&PDL::levmar_der_;
-
-
-
-
-
-*levmar_der_lb = \&PDL::levmar_der_lb;
-
-
-
-
-
-*levmar_der_ub = \&PDL::levmar_der_ub;
-
-
-
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *levmar_der_lb_ub = \&PDL::levmar_der_lb_ub;
+#line 1718 "Levmar.pm"
 
 
 
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
-
-*levmar_diff_ = \&PDL::levmar_diff_;
-
-
-
-
-
-*levmar_diff_lb = \&PDL::levmar_diff_lb;
+*levmar_der_lb = \&PDL::levmar_der_lb;
+#line 1725 "Levmar.pm"
 
 
 
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+
+*levmar_der_ub = \&PDL::levmar_der_ub;
+#line 1732 "Levmar.pm"
 
 
-*levmar_diff_ub = \&PDL::levmar_diff_ub;
+
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+
+*levmar_der_ = \&PDL::levmar_der_;
+#line 1739 "Levmar.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *levmar_diff_lb_ub = \&PDL::levmar_diff_lb_ub;
+#line 1746 "Levmar.pm"
 
 
 
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
+*levmar_diff_lb = \&PDL::levmar_diff_lb;
+#line 1753 "Levmar.pm"
+
+
+
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+
+*levmar_diff_ub = \&PDL::levmar_diff_ub;
+#line 1760 "Levmar.pm"
+
+
+
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
+
+*levmar_diff_ = \&PDL::levmar_diff_;
+#line 1767 "Levmar.pm"
+
+
+
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *_levmar_chkjac = \&PDL::_levmar_chkjac;
+#line 1774 "Levmar.pm"
 
 
 
-
+#line 1060 "/home/osboxes/.perlbrew/libs/perl-5.32.0@normal/lib/perl5/x86_64-linux/PDL/PP.pm"
 
 *_levmar_chkjac_no_t = \&PDL::_levmar_chkjac_no_t;
+#line 1781 "Levmar.pm"
 
 
 
-;
+
+
+#line 1133 "levmar.pd"
 
 
 
@@ -1834,7 +1801,7 @@ distribution, the copyright notice should be included in the
 file.
 
 =cut
-
+#line 1805 "Levmar.pm"
 
 
 

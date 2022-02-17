@@ -7,7 +7,7 @@ use Test2::Bundle::Extended;
 use Test2::Tools::Explain;
 use Test2::Plugin::NoWarnings;
 
-use Test::MockFile ();
+use Test::MockFile qw< nostrict >;
 
 my $path = '/some/nonexistant/path';
 my $mock = Test::MockFile->file($path);

@@ -1,1 +1,2 @@
-V	220112025135Z		1000	unknown	/CN=mojo.example.com
+R	220112025135Z	220213014942Z	1000	unknown	/CN=mojo.example.com
+V	230213015035Z		1001	unknown	/CN=mojo.example.com

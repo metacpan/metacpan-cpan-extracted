@@ -1,5 +1,5 @@
-package Finance::AMEX::Transaction::EPRAW::Detail::ChargeSummary;
-$Finance::AMEX::Transaction::EPRAW::Detail::ChargeSummary::VERSION = '0.004';
+package Finance::AMEX::Transaction::EPRAW::Detail::ChargeSummary 0.005;
+
 use strict;
 use warnings;
 
@@ -9,27 +9,25 @@ use base 'Finance::AMEX::Transaction::EPRAW::Base';
 
 sub field_map {
   return {
-
-    AMEX_PAYEE_NUMBER         => [1, 10],
-    AMEX_SE_NUMBER            => [11, 10],
-    SE_UNIT_NUMBER            => [21, 10],
-    PAYMENT_YEAR              => [31, 4],
-    PAYMENT_NUMBER            => [35, 8],
-    PAYMENT_NUMBER_DATE       => [35, 3],
-    PAYMENT_NUMBER_TYPE       => [38, 1],
-    PAYMENT_NUMBER_NUMBER     => [39, 4],
-    RECORD_TYPE               => [43, 1],
-    DETAIL_RECORD_TYPE        => [44, 2],
-    SE_BUSINESS_DATE          => [46, 7],
-    AMEX_PROCESS_DATE         => [53, 7],
-    SOC_INVOICE_NUMBER        => [60, 6],
-    SOC_AMOUNT                => [66, 11],
-    DISCOUNT_AMOUNT           => [77, 9],
-    SERVICE_FEE_AMOUNT        => [86, 7],
+    AMEX_PAYEE_NUMBER         => [1,   10],
+    AMEX_SE_NUMBER            => [11,  10],
+    SE_UNIT_NUMBER            => [21,  10],
+    PAYMENT_YEAR              => [31,  4],
+    PAYMENT_NUMBER            => [35,  8],
+    PAYMENT_NUMBER_DATE       => [35,  3],
+    PAYMENT_NUMBER_TYPE       => [38,  1],
+    PAYMENT_NUMBER_NUMBER     => [39,  4],
+    RECORD_TYPE               => [43,  1],
+    DETAIL_RECORD_TYPE        => [44,  2],
+    SE_BUSINESS_DATE          => [46,  7],
+    AMEX_PROCESS_DATE         => [53,  7],
+    SOC_INVOICE_NUMBER        => [60,  6],
+    SOC_AMOUNT                => [66,  11],
+    DISCOUNT_AMOUNT           => [77,  9],
+    SERVICE_FEE_AMOUNT        => [86,  7],
     NET_SOC_AMOUNT            => [100, 11],
     DISCOUNT_RATE             => [111, 5],
     SERVICE_FEE_RATE          => [116, 5],
-
     AMEX_GROSS_AMOUNT         => [142, 11],
     AMEX_ROC_COUNT            => [153, 5],
     TRACKING_ID               => [158, 9],
@@ -40,10 +38,10 @@ sub field_map {
     SERVICE_AGENT_MERCHANT_ID => [281, 15],
 
     # DEPRECATED
-    OPTIMA_DIVIDEND_AMOUNT    => [93, 7],
-    OPTIMA_DIVIDEND_RATE      => [121, 5],
-    OPTIMA_GROSS_AMOUNT       => [126, 11],
-    OPTIMA_ROC_COUNT          => [137, 5],
+    OPTIMA_DIVIDEND_AMOUNT => [93,  7],
+    OPTIMA_DIVIDEND_RATE   => [121, 5],
+    OPTIMA_GROSS_AMOUNT    => [126, 11],
+    OPTIMA_ROC_COUNT       => [137, 5],
   };
 }
 
@@ -78,11 +76,10 @@ sub AMEX_ROC_COUNT_POA        {return $_[0]->_get_column('AMEX_ROC_COUNT_POA')}
 sub SERVICE_AGENT_MERCHANT_ID {return $_[0]->_get_column('SERVICE_AGENT_MERCHANT_ID')}
 
 # DEPRECATED
-sub OPTIMA_DIVIDEND_AMOUNT    {return $_[0]->_get_column('OPTIMA_DIVIDEND_AMOUNT')}
-sub OPTIMA_DIVIDEND_RATE      {return $_[0]->_get_column('OPTIMA_DIVIDEND_RATE')}
-sub OPTIMA_GROSS_AMOUNT       {return $_[0]->_get_column('OPTIMA_GROSS_AMOUNT')}
-sub OPTIMA_ROC_COUNT          {return $_[0]->_get_column('OPTIMA_ROC_COUNT')}
-
+sub OPTIMA_DIVIDEND_AMOUNT {return $_[0]->_get_column('OPTIMA_DIVIDEND_AMOUNT')}
+sub OPTIMA_DIVIDEND_RATE   {return $_[0]->_get_column('OPTIMA_DIVIDEND_RATE')}
+sub OPTIMA_GROSS_AMOUNT    {return $_[0]->_get_column('OPTIMA_GROSS_AMOUNT')}
+sub OPTIMA_ROC_COUNT       {return $_[0]->_get_column('OPTIMA_ROC_COUNT')}
 
 1;
 
@@ -98,7 +95,7 @@ Finance::AMEX::Transaction::EPRAW::Detail::ChargeSummary - Parse AMEX Reconcilia
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -144,6 +141,14 @@ This will always return the string SOC_DETAIL.
 Returns the full line that is represented by this object.
 
  print $record->line;
+
+=head2 field_map
+
+Returns an arrayref of hashrefs where the name is the record name and 
+the value is an arrayref of the start position and length of that field.
+
+ # print the start position of the PAYMENT_DATE field
+ print $record->field_map->[3]->{PAYMENT_DATE}->[0]; # 31
 
 =head2 AMEX_PAYEE_NUMBER
 
@@ -446,7 +451,7 @@ Tom Heady <cpan@punch.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by ZipRecruiter.
+This software is copyright (c) 2022 by ZipRecruiter/Tom Heady.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

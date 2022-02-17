@@ -1,2 +1,9 @@
+0.012  2022-02-16 11:17:28 CET
+  - basic authentication requires encode_base64 with trailing =
+
+0.011  2022-02-16 10:35:22 CET
+  - cleanup called without session
+  - error condition can also happen during code exchange
+
 0.01  2022-01-31 10:01:02 CET
   - first release

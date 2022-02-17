@@ -1,3 +1,10 @@
+0.0.3 2022-02-16 15:08:23 +0100 Tobias Bossert <tobib at cpan.org>
+ - Also forward includes to target mojo command
+
+0.0.2 2022-02-11 12:52:26 +0100 Tobias Bossert <tobib at cpan.org>
+ - Repo updates
+ - Constrained dependency versions
+
 0.0.1 2022-01-25 13:30:48 +0100 Tobias Bossert <tobib at cpan.org>
  - initial release
 

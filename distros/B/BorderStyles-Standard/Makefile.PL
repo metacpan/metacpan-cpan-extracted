@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010001;
 
 use ExtUtils::MakeMaker;
 
@@ -14,10 +14,14 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "BorderStyles-Standard",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "BorderStyles::Standard",
   "PREREQ_PM" => {
-    "BorderStyleBase" => "0.009",
-    "parent" => 0,
+    "BorderStyleRole::Source::ASCIIArt" => 0,
+    "BorderStyleRole::Spec::Basic" => 0,
+    "BorderStyleRole::Transform::BoxChar" => 0,
+    "BorderStyleRole::Transform::InnerOnly" => 0,
+    "Role::Tiny::With" => 0,
     "strict" => 0,
     "utf8" => 0,
     "warnings" => 0
@@ -28,7 +32,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.011",
+  "VERSION" => "0.013",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,12 +40,15 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "BorderStyleBase" => "0.009",
+  "BorderStyleRole::Source::ASCIIArt" => 0,
+  "BorderStyleRole::Spec::Basic" => 0,
+  "BorderStyleRole::Transform::BoxChar" => 0,
+  "BorderStyleRole::Transform::InnerOnly" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Role::Tiny::With" => 0,
   "Test::More" => 0,
-  "parent" => 0,
   "strict" => 0,
   "utf8" => 0,
   "warnings" => 0

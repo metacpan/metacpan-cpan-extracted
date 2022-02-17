@@ -1,0 +1,48 @@
+---
+abstract: 'Perl module for sending HTTP requests to Groonga.'
+author:
+  - 'Horimoto Yasuhiro <horimoto@clear-code.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+  perl: 5.008_001
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.14, CPAN::Meta::Converter version 2.150010'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Groonga-HTTP
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Groonga::Commands::Select:
+    file: lib/Groonga/Commands/Select.pm
+  Groonga::Commands::Status:
+    file: lib/Groonga/Commands/Status.pm
+  Groonga::HTTP:
+    file: lib/Groonga/HTTP.pm
+    version: '0.07'
+  Groonga::HTTP::Client:
+    file: lib/Groonga/HTTP/Client.pm
+  Groonga::ResultSet:
+    file: lib/Groonga/ResultSet.pm
+requires:
+  JSON::PP: '0'
+  LWP::UserAgent: '0'
+resources:
+  bugtracker: https://github.com/groonga/Groonga-HTTP/issues
+  homepage: https://github.com/groonga/Groonga-HTTP
+  repository: git://github.com/groonga/Groonga-HTTP.git
+version: '0.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

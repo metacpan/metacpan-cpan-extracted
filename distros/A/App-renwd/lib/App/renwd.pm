@@ -5,7 +5,7 @@ use strict;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-11-16'; # DATE
 our $DIST = 'App-renwd'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 1;
 # ABSTRACT: REName current (Working) Directory
@@ -22,7 +22,7 @@ App::renwd - REName current (Working) Directory
 
 =head1 VERSION
 
-This document describes version 0.007 of App::renwd (from Perl distribution App-renwd), released on 2021-11-16.
+This document describes version 0.008 of App::renwd (from Perl distribution App-renwd), released on 2021-11-16.
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,14 @@
+0.005   2022-02-14  Released-By: PERLANCAR; Backward-Incompatible: yes; Urgency: medium
+
+        [INCOMPATIBLE CHANGES]
+
+        - Update to BorderStyle v3.
+
+        [Enhancements]
+
+        - Add sample script in share/examples/.
+
+
 0.004   2020-06-12  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

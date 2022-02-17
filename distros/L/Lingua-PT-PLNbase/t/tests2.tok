@@ -1,4 +1,4 @@
-#1 = tokenização simples
+#1 = tokenizaÃ§Ã£o simples
 
 era uma vez
 
@@ -35,30 +35,30 @@ certeza
 
 #5 = horas
 
-o comboio parte às 2:30 da tarde
+o comboio parte Ã s 2:30 da tarde
 
 o
 comboio
 parte
-às
+Ã s
 2:30
 da
 tarde
 
-#6 = pontuação
+#6 = pontuaÃ§Ã£o
 
-uma; duas; três: três casas no Gerês
+uma; duas; trÃªs: trÃªs casas no GerÃªs
 
 uma
 ;
 duas
 ;
-três
+trÃªs
 :
-três
+trÃªs
 casas
 no
-Gerês
+GerÃªs
 
 #7 = reticencias
 
@@ -87,45 +87,45 @@ quente
 
 #9 = email
 
-Envie a correspondência para me@there.com
+Envie a correspondÃªncia para me@there.com
 
 Envie
 a
-correspondência
+correspondÃªncia
 para
 me@there.com
 
 #10 = email.email
 
-Envie a correspondência para not.me@there.com.
+Envie a correspondÃªncia para not.me@there.com.
 
 Envie
 a
-correspondência
+correspondÃªncia
 para
 not.me@there.com
 .
 
 #11 = URL - http
 
-Visite http://www.linguateca.pt para mais informações.
+Visite http://www.linguateca.pt para mais informaÃ§Ãµes.
 
 Visite
 http://www.linguateca.pt
 para
 mais
-informações
+informaÃ§Ãµes
 .
 
 #12 = duas frases simples
 
-O João comeu a maçã da Maria. A Maria ficou zangada.
+O JoÃ£o comeu a maÃ§Ã£ da Maria. A Maria ficou zangada.
 
 O
-João
+JoÃ£o
 comeu
 a
-maçã
+maÃ§Ã£
 da
 Maria
 .
@@ -166,9 +166,9 @@ de
 Abril
 .
 
-#15 = Extracto do Público
+#15 = Extracto do PÃºblico
 
-Um comando de 17 pessoas equipadas com cintos de explosivos tomou hoje de assalto uma escola em Beslan (Ossétia do norte) onde se encontram cerca de 200 crianças e 40 adultos, no dia em que recomeçam as aulas naquela região russa.
+Um comando de 17 pessoas equipadas com cintos de explosivos tomou hoje de assalto uma escola em Beslan (OssÃ©tia do norte) onde se encontram cerca de 200 crianÃ§as e 40 adultos, no dia em que recomeÃ§am as aulas naquela regiÃ£o russa.
 
 Um
 comando
@@ -189,7 +189,7 @@ escola
 em
 Beslan
 (
-Ossétia
+OssÃ©tia
 do
 norte
 )
@@ -199,7 +199,7 @@ encontram
 cerca
 de
 200
-crianças
+crianÃ§as
 e
 40
 adultos
@@ -208,25 +208,25 @@ no
 dia
 em
 que
-recomeçam
+recomeÃ§am
 as
 aulas
 naquela
-região
+regiÃ£o
 russa
 .
 
-# 16 - Noticia Público Desporto
+# 16 - Noticia PÃºblico Desporto
 
-Jacques Rogge, presidente do Comité Olímpico Internacional (COI), encerrou Atenas 2004 com um discurso virado para o combate ao "doping".
+Jacques Rogge, presidente do ComitÃ© OlÃ­mpico Internacional (COI), encerrou Atenas 2004 com um discurso virado para o combate ao "doping".
 
 Jacques
 Rogge
 ,
 presidente
 do
-Comité
-Olímpico
+ComitÃ©
+OlÃ­mpico
 Internacional
 (
 COI
@@ -243,9 +243,9 @@ para
 o
 combate
 ao
-«
+Â«
 doping
-»
+Â»
 .
 
 # 17 - SIGLA
@@ -258,7 +258,7 @@ falar
 dos
 U.S.A.
 
-# 18 - SIGLA -- com espaços
+# 18 - SIGLA -- com espaÃ§os
 
 Texto a falar dos U. S. A.
 
@@ -292,7 +292,7 @@ I
 I
 'll
 
-# 21 - Francês...
+# 21 - FrancÃªs...
 
 d'Almeida l'ennemie
 
@@ -305,20 +305,57 @@ ennemie
 
 'era uma vez' "um gato" ou mesmo `dois gatos'.
 
-«
+Â«
 era
 uma
 vez
-»
-«
+Â»
+Â«
 um
 gato
-»
+Â»
 ou
 mesmo
-«
+Â«
 dois
 gatos
-»
+Â»
+.
+
+# 23 - pontos e abreviaturas misturados diversos
+
+n.o 7 and e.g. n.o 8 are cases of entries in the file. Rigth?
+
+n.o
+7
+and
+e.g.
+n.o
+8
+are
+cases
+of
+entries
+in
+the
+file
+.
+Rigth
+?
+
+# 24 - elementos de XML
+
+um texto contento <page>55</page> ou <page id="55"/> ou semelhantes.
+
+um
+texto
+contento
+<page>
+55
+</page>
+ou
+<page id="55"/>
+ou
+semelhantes
 .
 

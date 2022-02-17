@@ -1,3 +1,15 @@
+0.608   2022-02-14  Released-By: PERLANCAR; Backward-Incompatible: yes; Urgency: medium
+
+        [INCOMPATIBLE CHANGES]
+
+        - Update to BorderStyle v3. Marked as incompatible changes because user
+          will have to install a backward incompatible border style modules.
+
+        [ENHANCEMENTS]
+
+        - Add example script in share/examples/.
+
+
 0.607   2021-08-27  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

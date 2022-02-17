@@ -1,0 +1,20 @@
+use strict;
+use warnings;
+
+our @Templates = (
+    {
+        Queue           => 0,
+        Name            => 'NonWatcherRecipients Admin Correspondence in HTML',
+        Description     => 'HTML note about non-ticket-watchers receiving email on correspondence',
+        Content         => <<'    TEMPLATE',
+RT-Attach-Message: yes
+Content-Type: text/html
+
+<p>Ticket URL: <a href="{RT->Config->Get("WebURL")}Ticket/Display.html?id={$Ticket->id}">{RT->Config->Get("WebURL")}Ticket/Display.html?id={$Ticket->id}</a>
+<br />
+<br />
+{ RT::Extension::NonWatcherRecipients->FindRecipients(Transaction => $Transaction, Ticket => $Ticket, Format => 'text/html') }</p>
+{$Transaction->Content(Type => "text/html");}
+    TEMPLATE
+    }
+);

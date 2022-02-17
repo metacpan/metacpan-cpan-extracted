@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Continuous::Time;
-$Lab::Moose::Sweep::Continuous::Time::VERSION = '3.803';
+$Lab::Moose::Sweep::Continuous::Time::VERSION = '3.810';
 #ABSTRACT: Time sweep
 
 use v5.20;
@@ -135,7 +135,7 @@ Lab::Moose::Sweep::Continuous::Time - Time sweep
 
 =head1 VERSION
 
-version 3.803
+version 3.810
 
 =head1 SYNOPSIS
 

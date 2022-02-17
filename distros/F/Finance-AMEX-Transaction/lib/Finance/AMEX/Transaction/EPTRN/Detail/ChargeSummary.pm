@@ -1,5 +1,5 @@
-package Finance::AMEX::Transaction::EPTRN::Detail::ChargeSummary;
-$Finance::AMEX::Transaction::EPTRN::Detail::ChargeSummary::VERSION = '0.004';
+package Finance::AMEX::Transaction::EPTRN::Detail::ChargeSummary 0.005;
+
 use strict;
 use warnings;
 
@@ -9,66 +9,65 @@ use base 'Finance::AMEX::Transaction::EPTRN::Base';
 
 sub field_map {
   return {
-
-    AMEX_PAYEE_NUMBER           => [1, 10],
-    AMEX_SE_NUMBER              => [11, 10],
-    SE_UNIT_NUMBER              => [21, 10],
-    PAYMENT_YEAR                => [31, 4],
-    PAYMENT_NUMBER              => [35, 8],
-    PAYMENT_NUMBER_DATE         => [35, 3],
-    PAYMENT_NUMBER_TYPE         => [38, 1],
-    PAYMENT_NUMBER_NUMBER       => [39, 4],
-    RECORD_TYPE                 => [43, 1],
-    DETAIL_RECORD_TYPE          => [44, 2],
-    SE_BUSINESS_DATE            => [46, 7],
-    AMEX_PROCESS_DATE           => [53, 7],
-    SOC_INVOICE_NUMBER          => [60, 6],
-    SOC_AMOUNT                  => [66, 11],
-    DISCOUNT_AMOUNT             => [77, 9],
-    SERVICE_FEE_AMOUNT          => [86, 7],
-    NET_SOC_AMOUNT              => [100, 11],
-    DISCOUNT_RATE               => [111, 5],
-    SERVICE_FEE_RATE            => [116, 5],
-    AMEX_GROSS_AMOUNT           => [142, 11],
-    AMEX_ROC_COUNT              => [153, 5],
-    TRACKING_ID                 => [158, 9],
-    TRACKING_ID_DATE            => [158, 3],
-    TRACKING_ID_PCID            => [161, 6],
-    CPC_INDICATOR               => [167, 1],
-    AMEX_ROC_COUNT_POA          => [183, 7],
-    BASE_DISCOUNT_AMOUNT        => [190, 16],
+    AMEX_PAYEE_NUMBER     => [1,   10],
+    AMEX_SE_NUMBER        => [11,  10],
+    SE_UNIT_NUMBER        => [21,  10],
+    PAYMENT_YEAR          => [31,  4],
+    PAYMENT_NUMBER        => [35,  8],
+    PAYMENT_NUMBER_DATE   => [35,  3],
+    PAYMENT_NUMBER_TYPE   => [38,  1],
+    PAYMENT_NUMBER_NUMBER => [39,  4],
+    RECORD_TYPE           => [43,  1],
+    DETAIL_RECORD_TYPE    => [44,  2],
+    SE_BUSINESS_DATE      => [46,  7],
+    AMEX_PROCESS_DATE     => [53,  7],
+    SOC_INVOICE_NUMBER    => [60,  6],
+    SOC_AMOUNT            => [66,  11],
+    DISCOUNT_AMOUNT       => [77,  9],
+    SERVICE_FEE_AMOUNT    => [86,  7],
+    NET_SOC_AMOUNT        => [100, 11],
+    DISCOUNT_RATE         => [111, 5],
+    SERVICE_FEE_RATE      => [116, 5],
+    AMEX_GROSS_AMOUNT     => [142, 11],
+    AMEX_ROC_COUNT        => [153, 5],
+    TRACKING_ID           => [158, 9],
+    TRACKING_ID_DATE      => [158, 3],
+    TRACKING_ID_PCID      => [161, 6],
+    CPC_INDICATOR         => [167, 1],
+    AMEX_ROC_COUNT_POA    => [183, 7],
+    BASE_DISCOUNT_AMOUNT  => [190, 16],
   };
 }
 
 sub type {return 'SOC_DETAIL'}
 
-sub AMEX_PAYEE_NUMBER           {return $_[0]->_get_column('AMEX_PAYEE_NUMBER')}
-sub AMEX_SE_NUMBER              {return $_[0]->_get_column('AMEX_SE_NUMBER')}
-sub SE_UNIT_NUMBER              {return $_[0]->_get_column('SE_UNIT_NUMBER')}
-sub PAYMENT_YEAR                {return $_[0]->_get_column('PAYMENT_YEAR')}
-sub PAYMENT_NUMBER              {return $_[0]->_get_column('PAYMENT_NUMBER')}
-sub PAYMENT_NUMBER_DATE         {return $_[0]->_get_column('PAYMENT_NUMBER_DATE')}
-sub PAYMENT_NUMBER_TYPE         {return $_[0]->_get_column('PAYMENT_NUMBER_TYPE')}
-sub PAYMENT_NUMBER_NUMBER       {return $_[0]->_get_column('PAYMENT_NUMBER_NUMBER')}
-sub RECORD_TYPE                 {return $_[0]->_get_column('RECORD_TYPE')}
-sub DETAIL_RECORD_TYPE          {return $_[0]->_get_column('DETAIL_RECORD_TYPE')}
-sub SE_BUSINESS_DATE            {return $_[0]->_get_column('SE_BUSINESS_DATE')}
-sub AMEX_PROCESS_DATE           {return $_[0]->_get_column('AMEX_PROCESS_DATE')}
-sub SOC_INVOICE_NUMBER          {return $_[0]->_get_column('SOC_INVOICE_NUMBER')}
-sub SOC_AMOUNT                  {return $_[0]->_get_column('SOC_AMOUNT')}
-sub DISCOUNT_AMOUNT             {return $_[0]->_get_column('DISCOUNT_AMOUNT')}
-sub SERVICE_FEE_AMOUNT          {return $_[0]->_get_column('SERVICE_FEE_AMOUNT')}
-sub NET_SOC_AMOUNT              {return $_[0]->_get_column('NET_SOC_AMOUNT')}
-sub DISCOUNT_RATE               {return $_[0]->_get_column('DISCOUNT_RATE')}
-sub SERVICE_FEE_RATE            {return $_[0]->_get_column('SERVICE_FEE_RATE')}
-sub AMEX_GROSS_AMOUNT           {return $_[0]->_get_column('AMEX_GROSS_AMOUNT')}
-sub AMEX_ROC_COUNT              {return $_[0]->_get_column('AMEX_ROC_COUNT')}
-sub TRACKING_ID                 {return $_[0]->_get_column('TRACKING_ID')}
-sub TRACKING_ID_DATE            {return $_[0]->_get_column('TRACKING_ID_DATE')}
-sub TRACKING_ID_PCID            {return $_[0]->_get_column('TRACKING_ID_PCID')}
-sub CPC_INDICATOR               {return $_[0]->_get_column('CPC_INDICATOR')}
-sub AMEX_ROC_COUNT_POA          {return $_[0]->_get_column('AMEX_ROC_COUNT_POA')}
-sub BASE_DISCOUNT_AMOUNT        {return $_[0]->_get_column('BASE_DISCOUNT_AMOUNT')}
+sub AMEX_PAYEE_NUMBER     {return $_[0]->_get_column('AMEX_PAYEE_NUMBER')}
+sub AMEX_SE_NUMBER        {return $_[0]->_get_column('AMEX_SE_NUMBER')}
+sub SE_UNIT_NUMBER        {return $_[0]->_get_column('SE_UNIT_NUMBER')}
+sub PAYMENT_YEAR          {return $_[0]->_get_column('PAYMENT_YEAR')}
+sub PAYMENT_NUMBER        {return $_[0]->_get_column('PAYMENT_NUMBER')}
+sub PAYMENT_NUMBER_DATE   {return $_[0]->_get_column('PAYMENT_NUMBER_DATE')}
+sub PAYMENT_NUMBER_TYPE   {return $_[0]->_get_column('PAYMENT_NUMBER_TYPE')}
+sub PAYMENT_NUMBER_NUMBER {return $_[0]->_get_column('PAYMENT_NUMBER_NUMBER')}
+sub RECORD_TYPE           {return $_[0]->_get_column('RECORD_TYPE')}
+sub DETAIL_RECORD_TYPE    {return $_[0]->_get_column('DETAIL_RECORD_TYPE')}
+sub SE_BUSINESS_DATE      {return $_[0]->_get_column('SE_BUSINESS_DATE')}
+sub AMEX_PROCESS_DATE     {return $_[0]->_get_column('AMEX_PROCESS_DATE')}
+sub SOC_INVOICE_NUMBER    {return $_[0]->_get_column('SOC_INVOICE_NUMBER')}
+sub SOC_AMOUNT            {return $_[0]->_get_column('SOC_AMOUNT')}
+sub DISCOUNT_AMOUNT       {return $_[0]->_get_column('DISCOUNT_AMOUNT')}
+sub SERVICE_FEE_AMOUNT    {return $_[0]->_get_column('SERVICE_FEE_AMOUNT')}
+sub NET_SOC_AMOUNT        {return $_[0]->_get_column('NET_SOC_AMOUNT')}
+sub DISCOUNT_RATE         {return $_[0]->_get_column('DISCOUNT_RATE')}
+sub SERVICE_FEE_RATE      {return $_[0]->_get_column('SERVICE_FEE_RATE')}
+sub AMEX_GROSS_AMOUNT     {return $_[0]->_get_column('AMEX_GROSS_AMOUNT')}
+sub AMEX_ROC_COUNT        {return $_[0]->_get_column('AMEX_ROC_COUNT')}
+sub TRACKING_ID           {return $_[0]->_get_column('TRACKING_ID')}
+sub TRACKING_ID_DATE      {return $_[0]->_get_column('TRACKING_ID_DATE')}
+sub TRACKING_ID_PCID      {return $_[0]->_get_column('TRACKING_ID_PCID')}
+sub CPC_INDICATOR         {return $_[0]->_get_column('CPC_INDICATOR')}
+sub AMEX_ROC_COUNT_POA    {return $_[0]->_get_column('AMEX_ROC_COUNT_POA')}
+sub BASE_DISCOUNT_AMOUNT  {return $_[0]->_get_column('BASE_DISCOUNT_AMOUNT')}
 
 1;
 
@@ -84,7 +83,7 @@ Finance::AMEX::Transaction::EPTRN::Detail::ChargeSummary - Parse AMEX Transactio
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -130,6 +129,14 @@ This will always return the string SOC_DETAIL.
 Returns the full line that is represented by this object.
 
  print $record->line;
+
+=head2 field_map
+
+Returns an arrayref of hashrefs where the name is the record name and 
+the value is an arrayref of the start position and length of that field.
+
+ # print the start position of the PAYMENT_YEAR field
+ print $record->field_map->[3]->{PAYMENT_YEAR}->[0]; # 31
 
 =head2 AMEX_PAYEE_NUMBER
 
@@ -434,7 +441,7 @@ Tom Heady <cpan@punch.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by ZipRecruiter.
+This software is copyright (c) 2022 by ZipRecruiter/Tom Heady.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

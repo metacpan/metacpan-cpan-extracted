@@ -7,7 +7,7 @@ use warnings;
 
 # VERSION
 
-our $VERSION = '0.04';
+our $VERSION = '0.07';
 
 # AUTHORITY
 
@@ -103,7 +103,7 @@ OO Standard Library for Perl 5
 
 =head1 VERSION
 
-0.04
+0.07
 
 =cut
 
@@ -519,7 +519,9 @@ B<example 1>
 
   my $string = Venus::String->new('hello, world');
 
-  $string->box->split(', ')->join(' ')->titlecase->unbox->get; # Hello World
+  $string->box->split(', ')->join(' ')->titlecase->unbox->get;
+
+  # Hello World
 
 =back
 

@@ -1,4 +1,5 @@
 use Test2::V0;
+use Test2::Require::Perl 'v5.12';
 
 use Regexp::Pattern;
 

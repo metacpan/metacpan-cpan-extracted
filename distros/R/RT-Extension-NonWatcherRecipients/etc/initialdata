@@ -1,8 +1,9 @@
-@Templates = {
-    Queue           => 0,
-    Name            => 'NonWatcherRecipients Admin Correspondence',
-    Description     => 'Note non-ticket-watchers receiving email on correspondence',
-    Content         => <<'    TEMPLATE',
+@Templates = (
+    {
+        Queue           => 0,
+        Name            => 'NonWatcherRecipients Admin Correspondence',
+        Description     => 'Plain text note about non-ticket-watchers receiving email on correspondence',
+        Content         => <<'    TEMPLATE',
 RT-Attach-Message: yes
 
 <URL: {RT->Config->Get('WebURL')}Ticket/Display.html?id={$Ticket->id} >
@@ -10,4 +11,20 @@ RT-Attach-Message: yes
 { RT::Extension::NonWatcherRecipients->FindRecipients(Transaction => $Transaction, Ticket => $Ticket) }
 {$Transaction->Content()}
     TEMPLATE
-};
+    },
+    {
+        Queue           => 0,
+        Name            => 'NonWatcherRecipients Admin Correspondence in HTML',
+        Description     => 'HTML note about non-ticket-watchers receiving email on correspondence',
+        Content         => <<'    TEMPLATE',
+RT-Attach-Message: yes
+Content-Type: text/html
+
+<p>Ticket URL: <a href="{RT->Config->Get("WebURL")}Ticket/Display.html?id={$Ticket->id}">{RT->Config->Get("WebURL")}Ticket/Display.html?id={$Ticket->id}</a>
+<br />
+<br />
+{ RT::Extension::NonWatcherRecipients->FindRecipients(Transaction => $Transaction, Ticket => $Ticket, Format => 'text/html') }</p>
+{$Transaction->Content(Type => "text/html");}
+    TEMPLATE
+    }
+);

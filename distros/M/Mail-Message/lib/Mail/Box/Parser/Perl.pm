@@ -1,14 +1,14 @@
-# Copyrights 2001-2021 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2001-2022 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.02.
+# Pod stripped from pm file by OODoc 2.03.
 # This code is part of distribution Mail-Message.  Meta-POD processed with
 # OODoc into POD and HTML manual-pages.  See README.md
 # Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Mail::Box::Parser::Perl;
 use vars '$VERSION';
-$VERSION = '3.011';
+$VERSION = '3.012';
 
 use base 'Mail::Box::Parser';
 
@@ -114,7 +114,7 @@ sub _is_good_end($)
     return 1 unless defined $line;
 
         substr($line, 0, length $sep) eq $sep
-    && ($sep ne 'From ' || $line =~ m/ (?:19[6-9]|20[0-2])[0-9]\b/ );
+    && ($sep ne 'From ' || $line =~ m/ (?:19[6-9]|20[0-3])[0-9]\b/ );
 }
 
 sub readSeparator()
@@ -173,7 +173,7 @@ sub _read_stripped_lines(;$$)
         }
 
         if(@$lines && $lines->[-1] =~ s/(\r?\n)\z//)
-        {   pop @$lines if length($lines->[-1])==0;
+        {   pop @$lines if @seps==1 && length($lines->[-1])==0;
         }
     }
     else # File without separators.
@@ -245,7 +245,7 @@ sub bodyAsFile($;$$)
 
     my ($end, $lines) = $self->_read_stripped_lines($exp_chars, $exp_lines);
 
-    $out->print($_) foreach @$lines;
+    $out->print($_) for @$lines;
     ($begin, $end, scalar @$lines);
 }
 
@@ -264,7 +264,7 @@ sub bodyDelayed(;$$)
     }
 
     my ($end, $lines) = $self->_read_stripped_lines($exp_chars, $exp_lines);
-    my $chars = sum(map {length} @$lines);
+    my $chars = sum(map length, @$lines);
     ($begin, $end, $chars, scalar @$lines);
 }
 

@@ -1,5 +1,14 @@
 Revision history for Geo-Elevation-HGT
 
+0.08    12 February 2022
+        Version 0.08 - allow grid size of 7201x7201 for 0.5-minute DEMs
+
+0.07    27 December 2020
+        Version 0.07 - add bicubic_current and bicubic_mixed parameters (not documented)
+
+0.06    11 September 2020
+        Version 0.06 - add bicubic interpolation
+
 0.05    02 July 2020
         Version 0.05 - get rid of bareword filehandle
 
@@ -14,4 +23,3 @@ Revision history for Geo-Elevation-HGT
 
 0.01    21 April 2020
         Version 0.01 - initial release
-

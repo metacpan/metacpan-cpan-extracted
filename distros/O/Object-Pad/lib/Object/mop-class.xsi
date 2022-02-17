@@ -1,27 +1,35 @@
 
 SV *
-begin_class(pkg, name, ...)
+_create_class(pkg, name, ...)
     SV *pkg
     SV *name
   ALIAS:
-    begin_class = METATYPE_CLASS
-    begin_role  = METATYPE_ROLE
+    _create_class = METATYPE_CLASS
+    _create_role  = METATYPE_ROLE
   CODE:
   {
     PERL_UNUSED_ARG(pkg);
     dKWARG(2);
     SV *superclassname = NULL;
+    bool set_compclassmeta = false;
 
     static const char *args[] = {
       "extends",
+      "isa",
+      "_set_compclassmeta",
       NULL
     };
     while(KWARG_NEXT(args)) {
       switch(kwarg) {
         case 0: /* extends */
+        case 1: /* isa */
           if(ix != METATYPE_CLASS)
             croak("Only a class may extend another");
           superclassname = sv_mortalcopy(kwval);
+          break;
+
+        case 2: /* _set_compclassmeta */
+          set_compclassmeta = SvTRUE(kwval);
           break;
       }
     }
@@ -33,17 +41,19 @@ begin_class(pkg, name, ...)
 
     mop_class_begin(meta);
 
-    compclassmeta_set(meta);
-
     RETVAL = newSV(0);
     sv_setref_uv(RETVAL, "Object::Pad::MOP::Class", PTR2UV(meta));
 
-    CV *cv = newXS(NULL, &xsub_mop_class_seal, __FILE__);
-    CvXSUBANY(cv).any_ptr = meta;
+    if(set_compclassmeta) {
+      compclassmeta_set(meta);
 
-    if(!PL_unitcheckav)
-      PL_unitcheckav = newAV();
-    av_push(PL_unitcheckav, (SV *)cv);
+      CV *cv = newXS(NULL, &xsub_mop_class_seal, __FILE__);
+      CvXSUBANY(cv).any_ptr = meta;
+
+      if(!PL_unitcheckav)
+        PL_unitcheckav = newAV();
+      av_push(PL_unitcheckav, (SV *)cv);
+    }
   }
   OUTPUT:
     RETVAL
@@ -291,6 +301,17 @@ direct_methods(self)
 
     XSRETURN(retcount);
 
+void
+add_required_method(self, mname)
+    SV *self
+    SV *mname
+  CODE:
+  {
+    ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
+
+    mop_class_add_required_method(meta, mname);
+  }
+
 SV *
 add_field(self, fieldname, ...)
     SV *self
@@ -401,3 +422,31 @@ fields(self)
       sv_setref_iv(ST(i), "Object::Pad::MOP::Field", PTR2UV(fieldmeta));
     }
     XSRETURN(nfields);
+
+void
+required_method_names(self)
+    SV *self
+  PPCODE:
+    ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
+
+    if(meta->type != METATYPE_ROLE)
+      croak("Can only call ->required_method_names on a metaclass for a role");
+
+    AV *required_methods = meta->requiremethods;
+    U32 nmethods = av_count(required_methods);
+
+    EXTEND(SP, nmethods);
+
+    int i;
+    for(i = 0; i < nmethods; i++) {
+      ST(i) = sv_2mortal(newSVsv(AvARRAY(required_methods)[i]));
+    }
+    XSRETURN(nmethods);
+
+void
+seal(self)
+    SV *self
+  CODE:
+    ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
+
+    mop_class_seal(meta);

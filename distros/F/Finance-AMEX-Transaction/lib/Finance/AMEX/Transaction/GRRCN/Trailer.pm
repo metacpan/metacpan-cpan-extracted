@@ -1,5 +1,5 @@
-package Finance::AMEX::Transaction::GRRCN::Trailer;
-$Finance::AMEX::Transaction::GRRCN::Trailer::VERSION = '0.004';
+package Finance::AMEX::Transaction::GRRCN::Trailer 0.005;
+
 use strict;
 use warnings;
 
@@ -8,11 +8,12 @@ use warnings;
 use base 'Finance::AMEX::Transaction::GRRCN::Base';
 
 sub field_map {
-  return {
-    RECORD_TYPE        => [1, 10],
-    SEQUENTIAL_NUMBER  => [11, 10],
-    TOTAL_RECORD_COUNT => [21, 7],
-  };
+  return [
+    {RECORD_TYPE        => [1,  10]},
+    {SEQUENTIAL_NUMBER  => [11, 10]},
+    {TOTAL_RECORD_COUNT => [21, 10]},
+    {FILLER1            => [31, 770]},
+  ];
 }
 
 sub type {return 'TRAILER'}
@@ -35,7 +36,7 @@ Finance::AMEX::Transaction::GRRCN::Trailer - Parse AMEX Transaction/Invoice Leve
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -82,6 +83,14 @@ Returns the full line that is represented by this object.
 
  print $record->line;
 
+=head2 field_map
+
+Returns an arrayref of hashrefs where the name is the record name and 
+the value is an arrayref of the start position and length of that field.
+
+ # print the start position of the SEQUENTIAL_NUMBER field
+ print $record->field_map->[1]->{SEQUENTIAL_NUMBER}->[0]; # 11
+
 =head2 RECORD_TYPE
 
 This field contains the Record identifier, which will always be “TRAILER” for the Trailer Record.
@@ -90,7 +99,7 @@ This field contains the Record identifier, which will always be “TRAILER” fo
 
 This field contains the Sequential Number which is the same as the sequential number in the Header Record.
 
-A sequential number with a prefix of “A” indicates an Adhoc file.
+A sequential number with a prefix of “A” indicates an Ad-hoc file.
 
 =head2 TOTAL_RECORD_COUNT
 
@@ -98,7 +107,7 @@ This field contains the Record Count for all items in this data file, including 
 
 =head1 NAME
 
-Finance::AMEX::Transaction::GRRCN::Footer - Object methods for AMEX Reconciliation file footer records.
+Finance::AMEX::Transaction::GRRCN::Trailer - Object methods for AMEX Reconciliation file footer records.
 
 =head1 AUTHOR
 
@@ -106,7 +115,7 @@ Tom Heady <cpan@punch.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by ZipRecruiter.
+This software is copyright (c) 2022 by ZipRecruiter/Tom Heady.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

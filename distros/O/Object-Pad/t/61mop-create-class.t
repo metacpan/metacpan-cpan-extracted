@@ -31,7 +31,7 @@ class Parent { has $thing = "parent"; }
       BEGIN {
          Object::Pad->import_into( "Child" );
 
-         my $classmeta = Object::Pad::MOP::Class->begin_class( "Child", extends => "Parent" );
+         my $classmeta = Object::Pad::MOP::Class->begin_class( "Child", isa => "Parent" );
 
          ::is( $classmeta->name, "Child", '$classmeta->name for Child' );
       }

@@ -4,7 +4,7 @@ Mojo::IOLoop::ReadWriteFork - Fork a process and read/write from it
 
 # VERSION
 
-1.02
+2.00
 
 # SYNOPSIS
 
@@ -49,6 +49,20 @@ more than welcome.
 
 # EVENTS
 
+## stderr
+
+    $fork->on(stderr => sub { my ($fork, $buf) = @_; });
+
+Emitted when the child has written a chunk of data to STDERR and ["conduit"](#conduit)
+has the "stderr" key set to a true value.
+
+## stdout
+
+    $fork->on(stdout => sub { my ($fork, $buf) = @_; });
+
+Emitted when the child has written a chunk of data to STDOUT and ["conduit"](#conduit)
+has the "stdout" key set to a true value.
+
 ## asset
 
     $fork->on(asset => sub { my ($fork, $asset) = @_; });
@@ -85,7 +99,8 @@ Emitted when the child process exit.
 
     $fork->on(read => sub { my ($fork, $buf) = @_; });
 
-Emitted when the child has written a chunk of data to STDOUT or STDERR.
+Emitted when the child has written a chunk of data to STDOUT or STDERR, and
+neither "stderr" nor "stdout" is set in the ["conduit"](#conduit).
 
 ## spawn
 
@@ -119,13 +134,17 @@ See also ["pid"](#pid) for example usage of this event.
 Emitted right before the child process is forked. Example `$pipes`
 
     $pipes = {
+      # if "stderr" is set in conduit()
+      stdin_write => $stderr_fh_w,
+      stdout_read => $stderr_fh_r,
+
       # for both conduit "pipe" and "pty"
-      stdin_write => $pipe_fh_1_or_pty_object,
-      stdout_read => $pipe_fh_2_or_pty_object,
+      stdin_write => $pipe_fh_r_or_pty_object,
+      stdout_read => $pipe_fh_w_or_pty_object,
 
       # only for conduit "pipe"
-      stdin_read => $pipe_fh_3,
-      stdout_write => $pipe_fh_4,
+      stdin_read   => $pipe_fh_r,
+      stdout_write => $pipe_fh_w,
     }
 
 # ATTRIBUTES
@@ -133,11 +152,27 @@ Emitted right before the child process is forked. Example `$pipes`
 ## conduit
 
     $hash = $fork->conduit;
-    $fork = $fork->conduit({type => "pipe"});
+    $fork = $fork->conduit(\%options);
 
-Used to set the conduit and conduit options. Example:
+Used to set the conduit options. Possible values are:
 
-    $fork->conduit({raw => 1, type => "pty"});
+- stderr
+
+    This will make [Mojo::IOLoop::ReadWriteFork](https://metacpan.org/pod/Mojo%3A%3AIOLoop%3A%3AReadWriteFork) emit "stderr" events, instead of
+    "read" events. Setting this to "0" will close STDERR in the child.
+
+- stdout
+
+    This will make [Mojo::IOLoop::ReadWriteFork](https://metacpan.org/pod/Mojo%3A%3AIOLoop%3A%3AReadWriteFork) emit "stdout" events, instead of
+    "read" events. Setting this to "0" will close STDOUT in the child.
+
+- raw
+
+    Calls ["set\_raw" in IO::Pty](https://metacpan.org/pod/IO%3A%3APty#set_raw) if "typ" is "pty".
+
+- type
+
+    "type" can be either "pipe" or "pty". Default value is "pipe".
 
 ## ioloop
 

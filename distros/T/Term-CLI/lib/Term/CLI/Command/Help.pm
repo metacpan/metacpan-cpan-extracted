@@ -7,7 +7,7 @@
 #       Author:  Steven Bakker (SBAKKER), <sbakker@cpan.org>
 #      Created:  18/Feb/2018
 #
-#   Copyright (c) 2018 Steven Bakker
+#   Copyright (c) 2018-2022 Steven Bakker
 #
 #   This module is free software; you can redistribute it and/or modify
 #   it under the same terms as Perl itself. See "perldoc perlartistic."
@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI::Command::Help 0.054002;
+package Term::CLI::Command::Help 0.055002;
 
 use 5.014;
 use warnings;
@@ -27,7 +27,7 @@ use version;
 use List::Util 1.23 qw( first min );
 use File::Which 1.09;
 use Types::Standard 1.000005 qw( ArrayRef Str );
-use Getopt::Long 2.38 qw( GetOptionsFromArray );
+use Term::CLI::Util qw( is_prefix_str get_options_from_array );
 use Term::CLI::L10N qw( loc );
 
 use Pod::Text::Termcap    2.06;
@@ -42,6 +42,7 @@ my @PAGERS = (
             less --no-lessopen --no-init
             --dumb --quit-at-eof
             --quit-if-one-screen
+            --RAW-CONTROL-CHARS
         )
     ],
     ['more'],
@@ -103,8 +104,7 @@ has '+_arguments' => (
 );
 
 sub _format_pod {
-    my $self = shift;
-    my $text = shift;
+    my ($self, $text) = @_;
 
     my $output;
 
@@ -167,7 +167,7 @@ sub _get_help {
         my ( $pod, $text ) = $self->_make_command_summary(
             cmd_path   => [],
             pod_prefix => "=head2 " . loc("Commands") . ":\n\n",
-            commands   => [ $self->root_node->commands ]
+            commands   => [ $self->parent->commands ]
         );
         return ( %args, pod => $pod, text => $text );
     }
@@ -175,7 +175,7 @@ sub _get_help {
     # We've been given arguments to "help". Find the
     # appropriate command object, and work from there.
 
-    my $cur_cmd_ref = $self->root_node;
+    my $cur_cmd_ref = $self->parent;
     my @cmd_ref_path;
 
     for my $cmd_name ( @{ $args{arguments} } ) {
@@ -268,7 +268,7 @@ sub _get_help_all_commands {
     my ( $self, %args ) = @_;
 
     my @cmd_path = @{ $args{cmd_path} // [] };
-    my $cmd      = $cmd_path[-1] // $self->root_node;
+    my $cmd      = $cmd_path[-1] // $self->parent;
 
     my $pod = '';
 
@@ -289,7 +289,7 @@ sub _get_all_help {
     my ( $pod1, $txt1 ) = $self->_make_command_summary(
         cmd_path   => [],
         pod_prefix => "=head1 " . loc("COMMAND SUMMARY") . "\n\n",
-        commands   => [ $self->root_node->commands ]
+        commands   => [ $self->parent->commands ]
     );
 
     my $pod2 =
@@ -310,51 +310,47 @@ sub _get_all_help {
     return ( %args, pod => $pod1 . $pod2, text => "$txt1\n$txt2" );
 }
 
-sub complete_line {
-    my ( $self, @words ) = @_;
+sub complete {
+    my ( $self, $text, $state ) = @_;
 
-    my $partial = $words[-1] // '';
+    my $processed       = $state->{processed}   //= [];
+    my $unprocessed     = $state->{unprocessed} //= [];
+    my $parsed_options  = $state->{options}     //= {};
 
     # uncoverable branch false
     if ( $self->has_options ) {
 
         Getopt::Long::Configure(qw(bundling require_order pass_through));
 
-        my $opt_specs = $self->options;
+        my %opt_result = get_options_from_array(
+            args         => $unprocessed,
+            spec         => $self->options,
+            result       => $parsed_options,
+            pass_through => 1,
+        );
 
-        my %parsed_opts;
+        my $double_dash = $opt_result{double_dash};
 
-        my $has_terminator = first { $_ eq '--' } @words[ 0 .. $#words - 1 ];
-
-        ## no critic (RequireCheckingReturnValueOfEval)
-        eval { GetOptionsFromArray( \@words, \%parsed_opts, @$opt_specs ) };
-
-        if ( !$has_terminator && @words <= 1 && $partial =~ /^-/x ) {
+        if ( !$double_dash && @{$unprocessed} == 0 && $text =~ /^-/x ) {
 
             # We have to complete a command-line option.
-            return
-                grep { rindex( $_, $partial, 0 ) == 0 } $self->option_names;
+            return grep { is_prefix_str( $text, $_ ) } $self->option_names;
         }
     }
 
-    my $cur_cmd_ref = $self->root_node;
-    while (@words) {
-        my $new_cmd_ref = $cur_cmd_ref->find_command( $words[0] );
-        if ( !$new_cmd_ref ) {
-            last;
-        }
-        shift @words;
+    my $cur_cmd_ref = $self->parent;
+    while (@$unprocessed) {
+        my $new_cmd_ref = $cur_cmd_ref->find_command( $unprocessed->[0] );
+
+        return () if !$new_cmd_ref;
+
+        push @{$processed}, shift @{$unprocessed};
         $cur_cmd_ref = $new_cmd_ref;
     }
 
-    if ( @words == 0 ) {
-        return $cur_cmd_ref->name;
-    }
-    if ( $cur_cmd_ref->has_commands && @words == 1 ) {
-        return
-            grep { rindex( $_, $partial, 0 ) == 0 }
-            $cur_cmd_ref->command_names;
-    }
+    return grep { is_prefix_str( $text, $_ ) } $cur_cmd_ref->command_names
+        if $cur_cmd_ref->has_commands;
+
     return ();
 }
 
@@ -424,7 +420,7 @@ Term::CLI::Command::Help - A generic 'help' command for Term::CLI
 
 =head1 VERSION
 
-version 0.054002
+version 0.055002
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -T
 #
-# Copyright (C) 2018, Steven Bakker.
+# Copyright (c) 2018-2022, Steven Bakker.
 #
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl 5.14.0. For more details, see the full text
@@ -10,14 +10,16 @@
 use 5.014_001;
 use warnings;
 
+use Test::More;
+
+my $TEST_NAME = 'READLINE';
+
 sub Main() {
-    Term_CLI_ReadLine_test->SKIP_CLASS(
-        ($::ENV{SKIP_READLINE})
-            ? "disabled in environment"
-            : 0
-    );
+    if ( ($::ENV{SKIP_ALL} || $::ENV{"SKIP_$TEST_NAME"}) && !$::ENV{"TEST_$TEST_NAME"} ) {
+       plan skip_all => 'skipped because of environment'
+    }
     Term_CLI_ReadLine_test->runtests();
-    return;
+    exit(0);
 }
 
 package Term_CLI_ReadLine_test {
@@ -57,6 +59,15 @@ sub check_size: Test(2) {
 
     ok( $width > 0, "terminal width $width > 0");
     ok( $height > 0, "terminal height $height > 0");
+    return;
+}
+
+sub test_ignore_keyboard_signals: Test(0) {
+    my $self = shift;
+    my $term = $self->{term};
+
+    $term->ignore_keyboard_signals('HUP', 'INT');
+    $term->no_ignore_keyboard_signals('HUP', 'INT');
     return;
 }
 

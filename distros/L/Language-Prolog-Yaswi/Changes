@@ -1,5 +1,17 @@
 Revision history for Perl extension Language::Prolog::Yaswi.
 
+0.23 2022-02-12 13:04:35-0500
+        - No change from v0.22_01.
+
+0.22_01 2022-02-10 12:44:15-0500
+        - Fix typos (thanks to @mohawk2 for the report).
+        - Update ppport.h using Devel::PPPort v3.63 (Zakariyya Mughal
+          @zmughal).
+        - Use Alien::SWIProlog to configure build (Zakariyya Mughal @zmughal).
+        - Change how the `my_cxt` is handled in Perls without threads. Was
+          previously using `extern`, now uses `static` (Zakariyya Mughal
+          @zmughal).
+
 0.22 2021-11-13 02:35:40-0500
         - Fix typos in SYNOPSIS (thanks to Dmitri Tikhonov @dtikhonov).
         - Update build configuration to try to use two hyphens (Zakariyya

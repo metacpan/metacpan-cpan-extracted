@@ -1,6 +1,6 @@
 package Language::Prolog::Yaswi::Low;
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 use strict;
 use warnings;
@@ -53,6 +53,7 @@ $dl_load_flags = 0x1 unless defined $dl_load_flags;
 sub dl_load_flags { $dl_load_flags }
 
 require DynaLoader;
+use Alien::SWIProlog;
 __PACKAGE__->bootstrap;
 
 our @args;

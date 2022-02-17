@@ -2,7 +2,7 @@ package Perl::Tidy::VerticalAligner;
 use strict;
 use warnings;
 use Carp;
-our $VERSION = '20211029';
+our $VERSION = '20220217';
 use Perl::Tidy::VerticalAligner::Alignment;
 use Perl::Tidy::VerticalAligner::Line;
 
@@ -122,6 +122,7 @@ BEGIN {
     # Define the fixed indexes for variables in $self, which is an array
     # reference.  Note the convention of leading and trailing underscores to
     # keep them unique.
+    # Do not combine with other BEGIN blocks (c101).
     my $i = 0;
     use constant {
         _file_writer_object_ => $i++,
@@ -171,7 +172,68 @@ BEGIN {
     };
 
     DEBUG_TABS && $debug_warning->('TABS');
+}
 
+# GLOBAL variables
+my (
+
+    %valign_control_hash,
+    $valign_control_default,
+
+);
+
+sub check_options {
+
+    # This routine is called to check the user-supplied run parameters
+    # and to configure the control hashes to them.
+    my ($rOpts) = @_;
+
+    # All alignments are done by default
+    %valign_control_hash    = ();
+    $valign_control_default = 1;
+
+    # If -vil=s is entered without -vxl, assume -vxl='*'
+    if (  !$rOpts->{'valign-exclusion-list'}
+        && $rOpts->{'valign-inclusion-list'} )
+    {
+        $rOpts->{'valign-exclusion-list'} = '*';
+    }
+
+    # See if the user wants to exclude any alignment types ...
+    if ( $rOpts->{'valign-exclusion-list'} ) {
+
+        # The inclusion list is only relevant if there is an exclusion list
+        if ( $rOpts->{'valign-inclusion-list'} ) {
+            my @vil = split /\s+/, $rOpts->{'valign-inclusion-list'};
+            @valign_control_hash{@vil} = (1) x scalar(@vil);
+        }
+
+        # Note that the -vxl list is done after -vil, so -vxl has priority
+        # in the event of duplicate entries.
+        my @vxl = split /\s+/, $rOpts->{'valign-exclusion-list'};
+        @valign_control_hash{@vxl} = (0) x scalar(@vxl);
+
+        # Optimization: revert to defaults if no exclusions.
+        # This could happen with -vxl='  ' and any -vil list
+        if ( !@vxl ) {
+            %valign_control_hash = ();
+        }
+
+        # '$valign_control_default' applies to types not in the hash:
+        # - If a '*' was entered then set it to be that default type
+        # - Otherwise, leave it set it to 1
+        if ( defined( $valign_control_hash{'*'} ) ) {
+            $valign_control_default = $valign_control_hash{'*'};
+        }
+
+        # Side comments are controlled separately and must be removed
+        # if given in a list.
+        if (%valign_control_hash) {
+            $valign_control_hash{'#'} = 1;
+        }
+    }
+
+    return;
 }
 
 sub new {
@@ -888,6 +950,12 @@ sub fix_terminal_ternary {
     return unless ($old_line);
     use constant EXPLAIN_TERNARY => 0;
 
+    if (%valign_control_hash) {
+        my $align_ok = $valign_control_hash{'?'};
+        $align_ok = $valign_control_default unless defined($align_ok);
+        return unless ($align_ok);
+    }
+
     my $jmax        = @{$rfields} - 1;
     my $rfields_old = $old_line->get_rfields();
 
@@ -1057,6 +1125,12 @@ sub fix_terminal_else {
     my $jmax = @{$rfields} - 1;
     return unless ( $jmax > 0 );
 
+    if (%valign_control_hash) {
+        my $align_ok = $valign_control_hash{'{'};
+        $align_ok = $valign_control_default unless defined($align_ok);
+        return unless ($align_ok);
+    }
+
     # check for balanced else block following if/elsif/unless
     my $rfields_old = $old_line->get_rfields();
 
@@ -1224,6 +1298,7 @@ sub check_fit {
     my $rfield_lengths      = $new_line->get_rfield_lengths();
     my $padding_available   = $old_line->get_available_space_on_right();
     my $jmax_old            = $old_line->get_jmax();
+    my $rtokens_old         = $old_line->get_rtokens();
 
     # Safety check ... only lines with equal array sizes should arrive here
     # from sub check_match.  So if this error occurs, look at recent changes in
@@ -1257,9 +1332,9 @@ EOM
         }
 
         # Keep going if this field does not need any space.
-        next if $pad < 0;
+        next if ( $pad < 0 );
 
-        # See if it needs too much space.
+        # Revert to the starting state if does not fit
         if ( $pad > $padding_available ) {
 
             ################################################
@@ -1369,12 +1444,13 @@ sub _flush_comment_lines {
         my $file_writer_object = $self->[_file_writer_object_];
         my $last_outdented_line_at =
           $file_writer_object->get_output_line_number();
-        $self->[_last_outdented_line_at_] = $last_outdented_line_at;
+        my $nlines = @{$rgroup_lines};
+        $self->[_last_outdented_line_at_] =
+          $last_outdented_line_at + $nlines - 1;
         my $outdented_line_count = $self->[_outdented_line_count_];
         unless ($outdented_line_count) {
             $self->[_first_outdented_line_at_] = $last_outdented_line_at;
         }
-        my $nlines = @{$rgroup_lines};
         $outdented_line_count += $nlines;
         $self->[_outdented_line_count_] = $outdented_line_count;
     }
@@ -1511,6 +1587,12 @@ sub _flush_group_lines {
             }
         );
     }
+
+    # Let the formatter know that this object has been processed and any
+    # recoverable spaces have been handled.  This is needed for setting the
+    # closing paren location in -lp mode.
+    my $object = $rgroup_lines->[0]->get_indentation();
+    if ( ref($object) ) { $object->set_recoverable_spaces(0) }
 
     $self->initialize_for_new_group();
     return;
@@ -2731,6 +2813,16 @@ EOM
                     #######################################################
                     my $delete_me = !defined($il) && !defined($ir);
 
+                    # Apply any user controls. Note that not all lines pass
+                    # this way so they have to be applied elsewhere too.
+                    my $align_ok = 1;
+                    if (%valign_control_hash) {
+                        $align_ok = $valign_control_hash{$raw_tok};
+                        $align_ok = $valign_control_default
+                          unless defined($align_ok);
+                        $delete_me ||= !$align_ok;
+                    }
+
                     # But now we modify this with exceptions...
 
                     # EXCEPTION 1: If we are in a complete ternary or
@@ -2826,6 +2918,9 @@ EOM
                             }
                         }
                     }
+
+                    # Do not let a user exclusion be reactivated by above rules
+                    $delete_me ||= !$align_ok;
 
                     #####################################
                     # Add this token to the deletion list

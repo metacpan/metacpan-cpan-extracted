@@ -2,7 +2,7 @@ package Test2::Harness::Runner;
 use strict;
 use warnings;
 
-our $VERSION = '1.000107';
+our $VERSION = '1.000108';
 
 use File::Spec();
 
@@ -350,7 +350,7 @@ sub run_job {
 
     my $task = $self->next() or return 0;
 
-    if ($task->{spawn}) {
+    if ($task->{spawn} && !$task->{resource_skip}) {
         my $job = Test2::Harness::Runner::Spawn->new(
             runner        => $self,
             task          => $task,

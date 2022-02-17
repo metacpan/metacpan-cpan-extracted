@@ -7,7 +7,7 @@ build_requires:
   ExtUtils::ParseXS: '3.0'
 configure_requires:
   Module::Build: '0.28'
-  PDL: v2.4.10
+  PDL: '2.037'
   Prima: '1.57'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
@@ -25,17 +25,17 @@ no_index:
 provides:
   PDL::Drawing::Prima:
     file: lib/PDL/Drawing/Prima.pm.PL
-    version: '0.13'
+    version: '0.14'
   PDL::Drawing::Prima::Utils:
     file: lib/PDL/Drawing/Prima/Utils.pm.PL
-    version: '0.13'
+    version: '0.14'
 requires:
-  PDL: v2.4.10
+  PDL: '2.037'
   Prima: '1.57'
   perl: v5.10.0
 resources:
   bugtracker: http://github.com/run4flat/PDL-Drawing-Prima/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/run4flat/PDL-Drawing-Prima
-version: '0.13'
+version: '0.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

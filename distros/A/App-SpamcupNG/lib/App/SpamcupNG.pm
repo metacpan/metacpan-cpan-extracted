@@ -41,7 +41,7 @@ my %regexes = (
 
 lock_hash(%OPTIONS_MAP);
 
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 =head1 NAME
 
@@ -471,7 +471,7 @@ sub main_loop {
 
         foreach my $error ( @{$errors_ref} ) {
             if ( $error->is_fatal() ) {
-                $logger->fatal($error);
+                $logger->fatal($error->message);
 
               # must stop processing the HTML for this report and move to next
                 return 0;

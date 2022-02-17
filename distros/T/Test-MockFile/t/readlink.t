@@ -22,7 +22,7 @@ my $bad_symlink = "$temp_dir_name/c";
 CORE::symlink( "a",        $symlink );
 CORE::symlink( "notafile", $bad_symlink );
 
-use Test::MockFile ();
+use Test::MockFile qw< nostrict >;
 
 note "-------------- REAL MODE --------------";
 $! = 0;
@@ -48,14 +48,24 @@ is( $! + 0,                         EINVAL, '$! is EINVAL for a readlink on a di
 $! = 0;
 my $got = 'abc';
 like( warning { $got = CORE::readlink(undef) }, qr/^Use of uninitialized value in readlink at /, "Got expected warning for passing no value to readlink" );
-is( $got,   undef,  "readlink without args is undef." );
-is( $! + 0, ENOENT, '$! is ENOENT for a readlink(undef)' );
+is( $got, undef, "readlink without args is undef." );
+if ( $^O eq 'freebsd' ) {
+    is( $! + 0, EINVAL, '$! is EINVAL for a readlink(undef)' );
+}
+else {
+    is( $! + 0, ENOENT, '$! is ENOENT for a readlink(undef)' );
+}
 
 $!   = 0;
 $got = 'abc';
 like( warning { $got = CORE::readlink() }, qr/^Use of uninitialized value \$_ in readlink at /, "Got expected warning for passing no value to readlink" );
-is( $got,   undef,  "readlink without args is undef." );
-is( $! + 0, ENOENT, '$! is ENOENT for a readlink(undef)' );
+is( $got, undef, "readlink without args is undef." );
+if ( $^O eq 'freebsd' ) {
+    is( $! + 0, EINVAL, '$! is EINVAL for a readlink(undef)' );
+}
+else {
+    is( $! + 0, ENOENT, '$! is ENOENT for a readlink(undef)' );
+}
 
 note "Cleaning up...";
 CORE::unlink( $symlink, $bad_symlink, $file );
@@ -95,15 +105,25 @@ is( $! + 0,                   EINVAL, '$! is EINVAL for a readlink on a dir.' );
 $!   = 0;
 $got = 'abc';
 like( warning { $got = readlink(undef) }, qr/^Use of uninitialized value in readlink at /, "Got expected warning for passing no value to readlink" );
-is( $got,   undef,  "readlink without args is undef." );
-is( $! + 0, ENOENT, '$! is ENOENT for a readlink(undef)' );
+is( $got, undef, "readlink without args is undef." );
+if ( $^O eq 'freebsd' ) {
+    is( $! + 0, EINVAL, '$! is EINVAL for a readlink(undef)' );
+}
+else {
+    is( $! + 0, ENOENT, '$! is ENOENT for a readlink(undef)' );
+}
 
 $!   = 0;
 $got = 'abc';
 todo "Something's wrong with readlink's prototype and the warning is incorrect no matter what we do in the code." => sub {
     like( warning { $got = readlink() }, qr/^Use of uninitialized value \$_ in readlink at /, "Got expected warning for passing no value to readlink" );
 };
-is( $got,   undef,  "readlink without args is undef." );
-is( $! + 0, ENOENT, '$! is ENOENT for a readlink(undef)' );
+is( $got, undef, "readlink without args is undef." );
+if ( $^O eq 'freebsd' ) {
+    is( $! + 0, EINVAL, '$! is EINVAL for a readlink(undef)' );
+}
+else {
+    is( $! + 0, ENOENT, '$! is ENOENT for a readlink(undef)' );
+}
 
 done_testing();

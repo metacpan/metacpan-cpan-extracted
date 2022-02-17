@@ -21,7 +21,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.198';
+our $VERSION = '1.199';
 
 use Encode ();
 use Quiq::Array;
@@ -31,14 +31,40 @@ use Quiq::Option;
 
 =head1 METHODS
 
+=head2 Konstruktor
+
+=head3 new() - Instantiiere Objekt
+
+=head4 Synopsis
+
+  $u = $class->new;
+
+=head4 Description
+
+Instantiiere ein Objekt der Klasse und liefere eine Referenz auf
+dieses Objekt zurück. Da die Klasse ausschließlich Klassenmethoden
+enthält, hat das Objekt ausschließlich die Funktion, eine abkürzende
+Aufrufschreibweise zu ermöglichen.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub new {
+    my $class = shift;
+    return bless \(my $dummy),$class;
+}
+
+# -----------------------------------------------------------------------------
+
 =head2 Klassenmethoden
 
 =head3 encode() - Kodiere Zeichenkette
 
 =head4 Synopsis
 
-  $encStr = $class->encode($str);
-  $encStr = $class->encode($str,$encoding);
+  $encStr = $this->encode($str);
+  $encStr = $this->encode($str,$encoding);
 
 =head4 Arguments
 
@@ -80,7 +106,7 @@ Bytes im Encoding des Zeichens entspricht.
 # -----------------------------------------------------------------------------
 
 sub encode {
-    my ($class,$str) = splice @_,0,2;
+    my ($this,$str) = splice @_,0,2;
     my $encoding = shift // 'utf-8';
 
     if (!defined $str) {
@@ -99,8 +125,8 @@ sub encode {
 
 =head4 Synopsis
 
-  $str = $class->decode($encStr);
-  $str = $class->decode($encStr,$encoding);
+  $str = $this->decode($encStr);
+  $str = $this->decode($encStr,$encoding);
 
 =head4 Arguments
 
@@ -131,7 +157,7 @@ zurück.
 # -----------------------------------------------------------------------------
 
 sub decode {
-    my ($class,$str) = splice @_,0,2;
+    my ($this,$str) = splice @_,0,2;
     my $encoding = shift // 'utf-8';
 
     if (!defined $str) {
@@ -150,8 +176,12 @@ sub decode {
 
 =head4 Synopsis
 
-  $queryStr = $class->queryEncode(@opt,@keyVal);
-  $queryStr = $class->queryEncode($initialChar,@opt,@keyVal);
+  $queryStr = $this->queryEncode(@opt,@keyVal);
+  $queryStr = $this->queryEncode($initialChar,@opt,@keyVal);
+
+=head4 Alias
+
+qE()
 
 =head4 Arguments
 
@@ -247,7 +277,7 @@ wird zu
 # -----------------------------------------------------------------------------
 
 sub queryEncode {
-    my $class = shift;
+    my $this = shift;
     # @_: '?' oder '&' oder ';'
 
     my $str = '';
@@ -294,13 +324,18 @@ sub queryEncode {
             if ($i++) {
                 $str .= $separator;
             }
-            $str .= $class->encode($key,$encoding);
+            $str .= $this->encode($key,$encoding);
             $str .= '=';
-            $str .= $class->encode($val,$encoding);
+            $str .= $this->encode($val,$encoding);
         }
     }
 
     return $str;
+}
+
+{
+    no warnings 'once';
+    *qE = \&queryEncode;
 }
 
 # -----------------------------------------------------------------------------
@@ -309,8 +344,8 @@ sub queryEncode {
 
 =head4 Synopsis
 
-  @arr | $arr = $class->queryDecode($queryStr);
-  @arr | $arr = $class->queryDecode($queryStr,$encoding);
+  @arr | $arr = $this->queryDecode($queryStr);
+  @arr | $arr = $this->queryDecode($queryStr,$encoding);
 
 =head4 Arguments
 
@@ -344,7 +379,7 @@ Die Schlüssel/Wert-Paare können per & oder ; getrennt sein.
 # -----------------------------------------------------------------------------
 
 sub queryDecode {
-    my ($class,$str) = splice @_,0,2;
+    my ($this,$str) = splice @_,0,2;
     my $encoding = shift // 'utf-8';
 
     my $arr = Quiq::Array->new;
@@ -352,8 +387,8 @@ sub queryDecode {
         next if !$_;
         my ($key,$val) = split /=/;
 
-        $key = $class->decode($key,$encoding);
-        $val = $class->decode($val,$encoding);
+        $key = $this->decode($key,$encoding);
+        $val = $this->decode($val,$encoding);
 
         push @$arr,$key,$val;
     }
@@ -368,7 +403,7 @@ sub queryDecode {
 =head4 Synopsis
 
   ($schema,$user,$passw,$host,$port,$path,$query,$fragment,@opt) =
-      $class->split($url);
+      $this->split($url);
 
 =head4 Options
 
@@ -431,7 +466,7 @@ keine Rolle.
 # -----------------------------------------------------------------------------
 
 sub split {
-    my $class = shift;
+    my $this = shift;
     my $url = shift;
     # @_: @opt
 
@@ -493,7 +528,7 @@ sub split {
 
 =head1 VERSION
 
-1.198
+1.199
 
 =head1 AUTHOR
 

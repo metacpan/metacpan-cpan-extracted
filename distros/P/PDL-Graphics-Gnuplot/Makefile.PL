@@ -66,6 +66,7 @@ WriteMakefile(
 	    'Storable'            => 0,
 	    'IPC::Open3'          => 0,
 	    'IO::Select'          => 0,
+	    'File::Temp'          => '0.19',
 	    'Time::HiRes'         => 0,
 	    'Safe::Isa'           => 0
     },

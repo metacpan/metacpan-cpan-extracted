@@ -20,7 +20,7 @@ if ( grep /\P{ASCII}/ => @ARGV ) {
 use Carp;
 use Clone qw( clone );
 use autodie;
-use List::Util qw( sum uniq );
+use List::Util qw( sum );
 use Pg::Explain::StringAnonymizer;
 use Pg::Explain::FromText;
 use Pg::Explain::FromYAML;
@@ -33,11 +33,11 @@ Pg::Explain - Object approach at reading explain analyze output
 
 =head1 VERSION
 
-Version 1.13
+Version 2.0
 
 =cut
 
-our $VERSION = '1.13';
+our $VERSION = '2.0';
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@ Geo::Elevation::HGT - Elevation service with terrain data provided by [Mapzen an
 
 # Version
 
-Version 0.05
+Version 0.08
 
 # Synopsis
 
@@ -22,6 +22,7 @@ You provide the latitude and longitude in decimal degrees, with south latitude a
 
 The return is the elevation for this latitude and longitude in meters.
 Bilinear interpolation is applied to the elevations at the four grid points adjacent to the latitude plus longitude pair.
+To use bicubic interpolation using the sixteen grid points adjacent to the latitude plus longitude pair set the `bicubic` parameter to 1.
 
 You can also use your own terrain tiles by providing the corresponding path, see below.
 A good source for Europe that I am using was compiled by Sonny -- many thanks to him; found at [https://data.opendataportal.at/dataset/dtm-europe](https://data.opendataportal.at/dataset/dtm-europe)
@@ -47,7 +48,7 @@ In a typical application of getting elevations for a gpx track of an outdoor act
 
 To get the elevations of a few thousand gpx track points is therefore normally quite fast.
 
-Here is a benchmark I did on my 2015 NUC5i3RYK with Intel 5010U dual-core processor
+Here is a benchmark I did with bilinear interpolation on my 2015 NUC5i3RYK with Intel 5010U dual-core processor
 
 \- 4.5 s for the first elevation with download of the terrain tile from Amazon AWS S3
 
@@ -113,6 +114,13 @@ Note that cache will not expire and will have to be cleared from outside of `Geo
 
 \* `debug` - set to 1 to get some debug output to STDERR; default 0
 
+\* `bicubic` - set to 1 to perform bicubic interpolation; default 0 = _bilinear_ interpolation
+
+Note that bicubic interpolation involves more multiplications (40 per elevation value instead of 3), reducing performance on my NUC to about 50%.
+Bicubic interpolation has an advantage when determining the elevation of a sharp peak in that it also takes into account the elevation gradient around the peak.
+This will allow the calculated elevation to be above that of the adjacent grid points.
+The effect is not very prominent however and will also depend on how much the gradient is reflected in the underlying data.
+
 ## get\_elevation\_hgt
 
 `$ele_geh = $geh->get_elevation_hgt ($lat, $lon)`
@@ -175,7 +183,7 @@ Elevations are in meters referenced to the WGS84/EGM96 geoid.
 
 Byte order is Motorola ("big-endian") standard with the most significant byte first.
 
-Grid size is 3601x3601 for 1-minute DEMs or 1201x1201 for 3-minute DEMs.
+Grid size is 3601x3601 for 1-minute DEMs or 7201x7201 for 0.5-minute DEMs or 1201x1201 for 3-minute DEMs.
 
 The rows at the north and south edges as well as the columns at the east and west edges of each cell overlap and are identical to the edge rows and columns in the adjacent cell.
 
@@ -202,7 +210,7 @@ The rows at the north and south edges as well as the columns at the east and wes
 
 `$geh->{folder}` will work without following the above storage pattern, as long as a file with the correct name is found somewhere under that path.
 
-Similarly, `$geh->{cache}` will be built to the above storage pattern, but will also work if files are stored in any other way under that path.
+Similarly, `$geh->{cache_folder}` will be built to the above storage pattern, but will also work if files are stored in any other way under that path.
 
 HGT files need to be compressed to GNU zip (gzip) or ZIP (zip) compression format with .hgt.gz or .zip file extension, respectively.
 
@@ -247,6 +255,8 @@ Inspired by
 [racemap Elevation service](https://github.com/racemap/elevation-service)
 
 [Using DEMs to get GPX elevation profiles](http://notes.secretsauce.net/notes/2014/03/18_using-dems-to-get-gpx-elevation-profiles.html)
+
+[Bicubic interpolation](https://www.paulinternet.nl/?page=bicubic)
 
 plus others
 

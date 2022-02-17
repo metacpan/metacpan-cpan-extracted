@@ -6,7 +6,7 @@
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-08-23'; # DATE
 our $DIST = 'App-TaggedDirUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,7 @@ list-tagged-dirs - Search tagged directories recursively in a list of places
 
 =head1 VERSION
 
-This document describes version 0.001 of list-tagged-dirs (from Perl distribution App-TaggedDirUtils), released on 2021-08-23.
+This document describes version 0.002 of list-tagged-dirs (from Perl distribution App-TaggedDirUtils), released on 2021-08-23.
 
 =head1 SYNOPSIS
 
@@ -97,7 +97,7 @@ See C<--lacks-tag>.
 
 =item B<--prefixes-json>=I<s>
 
-Changes file (JSON-encoded).
+Locations to search for tagged directories (JSON-encoded).
 
 See C<--prefixes>.
 
@@ -105,7 +105,7 @@ Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--prefixes>=I<s@>*
 
-Changes file.
+Locations to search for tagged directories.
 
 Location(s) to search for tagged subdirectories, i.e. directories which have
 some file with specific names in its root.

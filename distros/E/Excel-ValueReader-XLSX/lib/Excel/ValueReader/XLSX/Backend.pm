@@ -3,27 +3,30 @@ use utf8;
 use 5.10.1;
 use Moose;
 use Archive::Zip          qw(AZ_OK);
+use Carp                  qw/croak/;
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 #======================================================================
 # ATTRIBUTES
 #======================================================================
-has 'frontend'      => (is => 'ro',   isa => 'Excel::ValueReader::XLSX',
+has 'frontend'      => (is => 'ro', isa => 'Excel::ValueReader::XLSX',
                         required => 1, weak_ref => 1,
                         handles => [qw/A1_to_num formatted_date/]);
 
-has 'zip'           => (is => 'ro',   isa => 'Archive::Zip', init_arg => undef,
-                        builder => '_zip', lazy => 1);
 
-has 'date_styles'   => (is => 'ro',   isa => 'ArrayRef', init_arg => undef,
-                        builder => '_date_styles', lazy => 1);
 
-has 'strings'       => (is => 'ro',   isa => 'ArrayRef', init_arg => undef,
-                        builder => '_strings',   lazy => 1);
+my %lazy_attrs = ( zip             => 'Archive::Zip',
+                   date_styles     => 'ArrayRef',
+                   strings         => 'ArrayRef',
+                   workbook_data   => 'HashRef',
+                   table_info      => 'HashRef',
+                   sheet_for_table => 'ArrayRef',  );
 
-has 'workbook_data' => (is => 'ro',   isa => 'HashRef', init_arg => undef,
-                        builder => '_workbook_data',   lazy => 1);
+while (my ($name, $type) = each %lazy_attrs) {
+  has $name => (is => 'ro', isa => $type, builder => "_$name", init_arg => undef, lazy => 1);
+}
+
 
 
 
@@ -41,6 +44,42 @@ sub _zip {
 
   return $zip;
 }
+
+
+sub _table_info {
+  my ($self) = @_;
+
+  my %table_info;
+  my @table_members = $self->zip->membersMatching(qr[^xl/tables/table\d+\.xml$]);
+  foreach my $table_member (map {$_->fileName} @table_members) {
+    my ($table_id)     = $table_member =~ /table(\d+)\.xml/;
+    my $table_xml      = $self->_zip_member_contents($table_member);
+    my ($name, $ref, $table_columns, $no_headers)
+                       = $self->_parse_table_xml($table_xml); # defined in subclass
+    my $sheet_id       = $self->sheet_for_table->[$table_id]
+      or croak "could not find sheet id for table $table_id";
+    $table_info{$name} = [$sheet_id, $table_id, $ref, $table_columns, $no_headers];
+  }
+
+  return \%table_info;
+}
+
+
+sub _sheet_for_table {
+  my ($self) = @_;
+
+  my @sheet_for_table;
+  my @rel_members = $self->zip->membersMatching(qr[^xl/worksheets/_rels/sheet\d+\.xml\.rels$]);
+  foreach my $rel_member (map {$_->fileName} @rel_members) {
+    my ($sheet_id) = $rel_member =~ /sheet(\d+)\.xml/;
+    my $rel_xml    = $self->_zip_member_contents($rel_member);
+    my @table_ids  = $self->_table_targets($rel_xml); # defined in subclass
+    $sheet_for_table[$_] = $sheet_id foreach @table_ids;
+  }
+
+  return \@sheet_for_table;
+}
+
 
 # attribute constructors for _date_styles, _strings and _workbook_data are supplied in subclasses
 
@@ -82,7 +121,6 @@ sub Excel_builtin_date_formats {
   return @numFmt;
 }
 
-
 sub _zip_member_contents {
   my ($self, $member) = @_;
 
@@ -92,8 +130,6 @@ sub _zip_member_contents {
 
   return $contents;
 }
-
-
 
 sub _zip_member_name_for_sheet {
   my ($self, $sheet) = @_;
@@ -109,10 +145,6 @@ sub _zip_member_name_for_sheet {
   # construct member name for that sheet
   return "xl/worksheets/sheet$id.xml";
 }
-
-
-# method "values" is defined in subclasses
-
 
 
 1;
@@ -166,12 +198,14 @@ some metadata information about the workbook
 
 =head1 ABSTRACT METHODS
 
+Not defined in this abstract class, but implemented in subclasses.
+
 =over
 
 =item values
 
 Inspects all cells within the XSLX files and returns a bi-dimensional array of values.
-Not defined in this abstract class, but implemented in subclasses.
+
 
 =back
 

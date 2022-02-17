@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Core;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Core vocabulary
 
-our $VERSION = '0.542';
+our $VERSION = '0.544';
 
 use 5.020;
 use Moo;
@@ -116,7 +116,7 @@ sub _traverse_keyword_schema ($self, $schema, $state) {
   }
   else {
     my $schema_info = $state->{evaluator}->_fetch_from_uri($schema->{'$schema'});
-    abort($state, 'EXCEPTION: unable to find resource %s', $schema->{'$schema'}) if not $schema_info;
+    return E($state, 'EXCEPTION: unable to find resource %s', $schema->{'$schema'}) if not $schema_info;
 
     ($spec_version, $vocabularies) = $self->__fetch_vocabulary_data({ %$state,
         keyword => '$vocabulary', initial_schema_uri => Mojo::URL->new($schema->{'$schema'}),
@@ -347,7 +347,7 @@ JSON::Schema::Modern::Vocabulary::Core - Implementation of the JSON Schema Core 
 
 =head1 VERSION
 
-version 0.542
+version 0.544
 
 =head1 DESCRIPTION
 

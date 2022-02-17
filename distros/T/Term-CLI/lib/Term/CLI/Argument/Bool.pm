@@ -7,7 +7,7 @@
 #       Author:  Steven Bakker (SBAKKER), <sbakker@cpan.org>
 #      Created:  22/01/18
 #
-#   Copyright (c) 2018 Steven Bakker
+#   Copyright (c) 2018-2022 Steven Bakker
 #
 #   This module is free software; you can redistribute it and/or modify
 #   it under the same terms as Perl itself. See "perldoc perlartistic."
@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI::Argument::Bool 0.054002;
+package Term::CLI::Argument::Bool 0.055002;
 
 use 5.014;
 use warnings;
@@ -30,6 +30,7 @@ use Types::Standard 1.000005 qw(
 );
 
 use Term::CLI::L10N qw( loc );
+use Term::CLI::Util qw( is_prefix_str );
 
 use Moo 1.000001;
 use namespace::clean 0.25;
@@ -55,8 +56,7 @@ has 'ignore_case' => (
 );
 
 sub validate {
-    my $self  = shift;
-    my $value = shift;
+    my ($self, $value) = @_;
 
     defined $self->SUPER::validate($value) or return;
 
@@ -73,8 +73,8 @@ sub validate {
         $false = $self->false_values;
     }
 
-    my @true_match  = grep { rindex( $_, $value, 0 ) == 0 } @{$true};
-    my @false_match = grep { rindex( $_, $value, 0 ) == 0 } @{$false};
+    my @true_match  = grep { is_prefix_str( $value, $_ ) } @{$true};
+    my @false_match = grep { is_prefix_str( $value, $_ ) } @{$false};
 
     if (@true_match) {
         if (@false_match) {
@@ -102,12 +102,18 @@ sub complete {
     return ( sort @values ) if $value eq q{};
 
     if ( $self->ignore_case ) {
-        my @matches =
-            grep { substr( lc $_, 0, length $value ) eq lc $value } @values;
+        my @matches = grep { is_prefix_str( lc $value, lc $_ ) } @values;
 
+        # Cannot just return @matches because of potential case differences.
+        if ( $value =~ m{ \p{Lu}\z }xsm ) {
+            return ( sort map { $value . uc substr $_, length $value } @matches );
+        }
+        if ( $value =~ m{ \p{Ll}\z }xsm ) {
+            return ( sort map { $value . lc substr $_, length $value } @matches );
+        }
         return ( sort map { $value . substr $_, length $value } @matches );
     }
-    return ( sort grep { substr( $_, 0, length $value ) eq $value } @values );
+    return ( sort grep { is_prefix_str( $value, $_ ) } @values );
 }
 
 1;
@@ -122,7 +128,7 @@ Term::CLI::Argument::Bool - class for "boolean" arguments in Term::CLI
 
 =head1 VERSION
 
-version 0.054002
+version 0.055002
 
 =head1 SYNOPSIS
 

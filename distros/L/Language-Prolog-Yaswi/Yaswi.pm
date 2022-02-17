@@ -1,6 +1,6 @@
 package Language::Prolog::Yaswi;
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 use strict;
 use warnings;
@@ -279,8 +279,8 @@ again and so on:
 
   Perl -> Prolog -> Perl -> Prolog -> ...
 
-(unfortunately, by now, the cicle has to be started from Perl,
-although it is very easy to circunvent this limitation with the help
+(unfortunately, by now, the cycle has to be started from Perl,
+although it is very easy to circumvent this limitation with the help
 of a dummy Perl script that just calls Prolog the first time).
 
 The interface is based on the set of classes defined in

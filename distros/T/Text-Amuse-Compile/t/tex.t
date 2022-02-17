@@ -9,6 +9,7 @@ use File::Spec;
 use Text::Amuse;
 use Text::Amuse::Compile;
 use Text::Amuse::Compile::Utils qw/read_file/;
+use Text::Amuse::Utils;
 
 my $builder = Test::More->builder;
 binmode $builder->output,         ":utf8";
@@ -18,12 +19,15 @@ binmode STDOUT, ':encoding(utf-8)';
 binmode STDERR, ':encoding(utf-8)';
 
 if ($ENV{TEST_WITH_LATEX}) {
-    plan tests => 171;
+    plan tests => 174;
 }
 else {
-    plan tests => 152;
+    plan tests => 155;
 }
 
+ok !Text::Amuse::Utils::has_babel_ldf('greek') or die;
+ok Text::Amuse::Utils::has_babel_ldf('serbian') or die;
+ok !Text::Amuse::Utils::has_babel_ldf('macedonian') or die;
 
 # this is the test file for the LaTeX output, which is the most
 # complicated.
@@ -43,8 +47,10 @@ test_file($file_no_toc, {
           qr/scrbook/,
           qr/DIV=9/,
           qr/fontsize=11pt/,
-          qr/mainlanguage\{croatian\}/,
-          qr/\\setmainfont\{CMU Serif\}\[Script=Latin/,
+          qr/(mainlanguage\{croatian\}|
+              \\usepackage\[serbian,shorthands=off\]\{babel\})/x,
+          qr/\\setmainfont\{CMU\sSerif\}\[Script=Latin|
+             \\babelfont\{rm\}\[\]\{CMU\sSerif\}/x,
           qr/paper=5.5in:8.5in/,
           qr/\\end\{titlepage\}\s*\\cleardoublepage/s,
           qr/document\}\s*\\hyphenation\{\s*a-no-ther\ste-st\s*}/s,
@@ -73,7 +79,7 @@ test_file($file_no_toc, {
                          twoside => 1,
                         }, [
           qr/\\end\{center\}\s*\\vskip 3em\s*\\par\s*\w/s,
-          qr/\\setmainfont\{Iwona\}\[Script=Latin/,
+          qr/\\setmainfont\{Iwona\}\[Script=Latin|\\babelfont\{rm\}\[\]\{Iwona\}/,
           qr/\n\s+twoside\,\%\n/s,
           qr/BCOR=0mm/,
           qr/ifthispageodd/,
@@ -104,8 +110,8 @@ test_file($file_with_toc, {
                           }, [
           qr/scrbook/,
           qr/\n\s+oneside\,\%\n/s,
-          qr/^\\setmainlanguage\{macedonian\}/m,
-          qr/\\macedonianfont\{CMU\sSerif\}\[Script=Cyrillic/,
+          qr/^\\setmainlanguage\{macedonian\}|\\usepackage\[macedonian,shorthands=off,provide\*=\*\]\{babel\}/m,
+          qr/\\macedonianfont\{CMU\sSerif\}\[Script=Cyrillic|\\babelfont\{rm\}\[\]\{CMU Serif\}/,
           qr/paper=210mm:11in/,
           qr/\\end\{titlepage\}\s*\\cleardoublepage/s,
                              ]
@@ -163,10 +169,12 @@ test_file({
           },
           {
           }, [
-          qr/croatian/,
+          qr/croatian|serbian/,
           qr/macedonian/,
           qr/Pallino.*Pinco.*Second.*author/s,
-          qr/mainlanguage\{macedonian}.*selectlanguage\{croatian}.*selectlanguage\{macedonian}/s,
+          qr/mainlanguage\{macedonian}.*selectlanguage\{croatian}.*selectlanguage\{macedonian}|
+             \\usepackage\[serbian,macedonian,shorthands=off,provide\*=\*\]\{babel\}.*selectlanguage\{serbian}.*selectlanguage\{macedonian}
+            /sx,
           qr/\\end\{titlepage\}\s*\\cleardoublepage/s,
           qr/\\setmainlanguage\{macedonian\}\s*
              \\setotherlanguages\{croatian\}\s*
@@ -174,7 +182,10 @@ test_file({
              .*?
              \\newfontfamily\s*
              \\macedonianfont\{CMU\sSerif\}\[Script=Cyrillic.*?
+             |
+             \\usepackage\[serbian,macedonian,shorthands=off,provide\*=\*\]\{babel\}
              .*
+             \\babelfont\{rm\}\[\]\{CMU\sSerif\}
              /sx,
              ],
          );
@@ -189,15 +200,20 @@ test_file({
           },
           [
           qr/\\end\{titlepage\}\s*\\cleardoublepage/s,
-          qr/mainlanguage\{croatian}.*selectlanguage\{macedonian}.*selectlanguage\{croatian}/s,
+          qr/(mainlanguage\{croatian}|usepackage\[macedonian,serbian,shorthands=off,provide)
+             .*selectlanguage\{macedonian}
+             .*selectlanguage\{(croatian|serbian)\}/sx,
           qr/Second.*author.*Pallino.*Pinco/s,
-          qr/croatian/,
+          qr/croatian|serbian/,
           qr/macedonian/,
-          qr/\\setmainlanguage\{croatian\}\s*
+          qr/(\\setmainlanguage\{croatian\}\s*
              \\setotherlanguages\{macedonian\}\s*
              .*
              \\newfontfamily\s*
              \\macedonianfont\{CMU\sSerif\}\[Script=Cyrillic
+             |
+                 \\usepackage\[macedonian,serbian,shorthands=off,provide\+=\*\]\{babel\}
+             )
              .*
             /sx
           ],
@@ -212,21 +228,21 @@ test_file({
           {
           },
           [
-          qr/mainlanguage\{macedonian}.*
-             selectlanguage\{croatian}.*
+          qr/(mainlanguage\{macedonian}|italian,serbian,macedonian,shorthands=off,provide\+=\*).*
+             selectlanguage\{croatian|serbian}.*
              selectlanguage\{macedonian}.*
              selectlanguage\{italian}/sx,
           qr/\\begin\{document\}\s*
              \\hyphenation\{\s*pal-li-no\s*pin-co\s*\}.*
              \\hyphenation\{\s*pal-li-no\s*pin-co\s*\}.*
-             \\selectlanguage\{croatian\}\s*
+             \\selectlanguage\{(croatian|serbian)\}\s*
              \\hyphenation\{\s*a-no-ther\s*te-st\s*\}.*
              \\selectlanguage\{macedonian\}\s*
              \\hyphenation\{\s*pal-li-no\s*pin-co\s*\}.*
              \\selectlanguage\{italian\}\s*
              \\hyphenation\{\s*ju-st\s*th-is\s*\}
             /sx,
-          qr/\\setotherlanguages\{croatian,italian\}/,
+          qr/\\setotherlanguages\{croatian,italian\}|\[italian,serbian,macedonian,shorthands=off,provide/,
           qr/usekomafont\{title\}\{\\huge\ TitleT.*
              usekomafont\{subtitle\}\{SubtitleT.*
              usekomafont\{author\}\{AuthorT.*
@@ -286,7 +302,7 @@ $outbody = test_file($file_no_toc, {
 
 test_file(File::Spec->catfile(qw/t tex greek.muse/),
           {},
-          [ qr/Script=Greek/ ]);
+          [ qr/Script=Greek|\\usepackage\[greek,shorthands=off,provide\*=\*\]\{babel\}/ ]);
 
 test_file({
            path => File::Spec->catfile(qw/t tex/),
@@ -295,7 +311,7 @@ test_file({
            title => 'Merged Greek',
           },
           {},
-          [ qr/Script=Greek.*Script=Cyrillic/sx ]);
+          [ qr/Script=Greek.*Script=Cyrillic|\\usepackage\[macedonian,greek,shorthands=off,provide\*=\*\]\{babel\}/sx ]);
 
 sub test_file {
     my ($file, $extra, $like, $unlike) = @_;

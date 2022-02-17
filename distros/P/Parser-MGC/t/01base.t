@@ -5,20 +5,19 @@ use warnings;
 
 use Test::More;
 
-package TestParser;
-use base qw( Parser::MGC );
+package TestParser {
+   use base qw( Parser::MGC );
 
-sub parse
-{
-   my $self = shift;
+   sub parse
+   {
+      my $self = shift;
 
-   # Some slight cheating here
-   pos( $self->{str} ) = length( $self->{str} );
+      # Some slight cheating here
+      pos( $self->{str} ) = length( $self->{str} );
 
-   return [ split ' ', $self->{str} ];
+      return [ split ' ', $self->{str} ];
+   }
 }
-
-package main;
 
 my $parser = TestParser->new;
 

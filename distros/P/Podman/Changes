@@ -29,3 +29,7 @@
 ## 20220210.0
 
 * Rework. Use Mojo based fluent interface and coding style.
+
+## 20220211.0
+
+* Minor fixes and improvments (code and POD).

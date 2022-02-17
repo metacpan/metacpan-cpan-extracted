@@ -665,7 +665,7 @@ pp_def ('collate_min_max_wrt_many',
 		barf("Internal error: good code should never be called in collate_min_max_for_many");
 	},
 	HandleBad => 1,
-	BadCode => '# line ' . (__LINE__ + 1) . q["lib/PDL/Drawing/Prima/Utils.pm.PL"
+	BadCode => pp_line_numbers(__LINE__, q[
 		int N_extras, index, N_pixels;
 		$GENERIC(min_check) min_value, max_value;
 		N_extras = $COMP(N_extras);
@@ -718,7 +718,7 @@ pp_def ('collate_min_max_wrt_many',
 					$max(N => index) = max_value;
 			%}
 		%}
-	],
+	]),
 
 	PMCode => <<'ModuleMaterial',
 

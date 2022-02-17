@@ -31,8 +31,8 @@ WriteMakefile(
         requires  => { perl => '5.020000' },
         resources => {
             license    => 'https://opensource.org/licenses/mit',
-            repository => 'https://github.com/oposs/mojolicious_coverage',
-            bugtracker => 'https://github.com/oposs/mojolicious_coverage/issues'
+            repository => 'https://github.com/oposs/mojolicious-command-coverage',
+            bugtracker => 'https://github.com/oposs/mojolicious-command-coverage/issues'
         },
         no_index  => { directory => [ 't' ] },
         homepage   => 'https://www.oetiker.ch',

@@ -71,7 +71,7 @@ fi
 
 # work around ExtUtils::CBuilder and others
 export CC="$PERL_CC"
-export CFLAGS="$PERL_CFLASGS"
+export CFLAGS="$PERL_CFLAGS"
 export LD="$PERL_CC"
 export LDFLAGS="$PERL_LDFLAGS"
 unset LIBS
@@ -88,7 +88,7 @@ PATH="$PERL_PREFIX/perl/bin:$PATH"
 
 # set version in a way that Makefile.PL can extract
 VERSION=VERSION; eval \
-$VERSION="1.45"
+$VERSION="1.46"
 
 fatal() {
    printf -- "\nFATAL: %s\n\n" "$*" >&2
@@ -219,7 +219,7 @@ EOF
          *.gz   ) UNCOMPRESS="gzip -d"  ;;
          *.tar  ) UNCOMPRESS="cat"      ;;
          * )
-            fatal "don't know hot to uncompress $PERL_TAR,\nonly tar, tar.gz, tar.bz2, tar.lzma and tar.xz are supported."
+            fatal "don't know hot to uncompress $PERLTAR,\nonly tar, tar.gz, tar.bz2, tar.lzma and tar.xz are supported."
             exit 1
             ;;
       esac
@@ -562,7 +562,9 @@ end_of_patch_postinstall
          CPAN::Shell->o (conf => q<make_install_make_command>, "'"$PERL_PREFIX"'/bin/SP-make-install-make");
          CPAN::Shell->o (conf => q<prerequisites_policy>, q<follow>);
          CPAN::Shell->o (conf => q<build_requires_install_policy>, q<yes>);
-         CPAN::Shell->o (conf => q<prefer_installer>, "EUMM");
+         CPAN::Shell->o (conf => q<recommends_policy>, q<0>);
+         CPAN::Shell->o (conf => q<suggests_policy>, q<0>);
+         CPAN::Shell->o (conf => q<prefer_installer>, q<EUMM>);
          CPAN::Shell->o (conf => q<commit>);
       ' || fatal "error while initialising CPAN"
 
@@ -606,7 +608,7 @@ instcpan() {
 
    verblock <<EOF
 installing modules from CPAN
-$@
+$*
 EOF
 
    MYCONFIG=
@@ -615,7 +617,7 @@ EOF
    "$PERL_PREFIX"/bin/perl $MYCONFIG -MCPAN -e 'notest (install => $_) for @ARGV' -- "$@" | tee "$STATICPERL/instcpan.log"
 
    if grep -q " -- NOT OK\$" "$STATICPERL/instcpan.log"; then
-      fatal "failure while installing modules from CPAN ($@)"
+      fatal "failure while installing modules from CPAN ($*)"
    fi
    rm -f "$STATICPERL/instcpan.log"
 }
@@ -628,7 +630,7 @@ instsrc() {
 
    verblock <<EOF
 installing modules from source
-$@
+$*
 EOF
 
    for mod in "$@"; do
@@ -693,6 +695,9 @@ our $PACKLIST      = 0;
 our $IGNORE_ENV    = 0;
 our $ALLOW_DYNAMIC = 0;
 our $HAVE_DYNAMIC; # maybe useful?
+our $EXTRA_CFLAGS  = "";
+our $EXTRA_LDFLAGS = "";
+our $EXTRA_LIBS    = "";
 
 our $OPTIMISE_SIZE = 0; # optimise for raw file size instead of for compression?
 
@@ -1034,30 +1039,34 @@ use Getopt::Long;
 
 sub parse_argv {
    GetOptions
-      "perl"          => \$PERL,
-      "app=s"         => \$APP,
+      "perl"            => \$PERL,
+      "app=s"           => \$APP,
 
-      "verbose|v"     => sub { ++$VERBOSE },
-      "quiet|q"       => sub { --$VERBOSE },
+      "verbose|v"       => sub { ++$VERBOSE },
+      "quiet|q"         => sub { --$VERBOSE },
 
-      "strip=s"       => \$STRIP,
-      "cache=s"       => \$CACHE, # internal option
-      "eval|e=s"      => sub { trace_eval    $_[1] },
-      "use|M=s"       => sub { trace_module  $_[1] },
-      "boot=s"        => sub { cmd_boot      $_[1] },
-      "add=s"         => sub { cmd_add       $_[1], 0 },
-      "addbin=s"      => sub { cmd_add       $_[1], 1 },
-      "incglob=s"     => sub { cmd_incglob   $_[1] },
-      "include|i=s"   => sub { cmd_include   $_[1], 1 },
-      "exclude|x=s"   => sub { cmd_include   $_[1], 0 },
-      "usepacklists!" => \$PACKLIST,
+      "strip=s"         => \$STRIP,
+      "cache=s"         => \$CACHE, # internal option
+      "eval|e=s"        => sub { trace_eval    $_[1] },
+      "use|M=s"         => sub { trace_module  $_[1] },
+      "boot=s"          => sub { cmd_boot      $_[1] },
+      "add=s"           => sub { cmd_add       $_[1], 0 },
+      "addbin=s"        => sub { cmd_add       $_[1], 1 },
+      "incglob=s"       => sub { cmd_incglob   $_[1] },
+      "include|i=s"     => sub { cmd_include   $_[1], 1 },
+      "exclude|x=s"     => sub { cmd_include   $_[1], 0 },
+      "usepacklists!"   => \$PACKLIST,
 
-      "static!"       => \$STATIC,
-      "staticlib=s"   => sub { cmd_staticlib $_[1] },
-      "allow-dynamic!"=> \$ALLOW_DYNAMIC,
-      "ignore-env"    => \$IGNORE_ENV,
+      "static!"         => \$STATIC,
+      "staticlib=s"     => sub { cmd_staticlib $_[1] },
+      "allow-dynamic!"  => \$ALLOW_DYNAMIC,
+      "ignore-env"      => \$IGNORE_ENV,
 
-      "<>"            => sub { cmd_file      $_[0] },
+      "extra-cflags=s"  => \$EXTRA_CFLAGS,
+      "extra-ldflags=s" => \$EXTRA_LDFLAGS,
+      "extra-libs=s"    => \$EXTRA_LIBS,
+
+      "<>"              => sub { cmd_file      $_[0] },
       or exit 1;
 }
 
@@ -1773,13 +1782,13 @@ $IGNORE_ENV
   PL_exit_flags |= PERL_EXIT_DESTRUCT_END;
 
   exitstatus = perl_parse (staticperl, staticperl_xs_init, argc + 3, args, environ);
-  free (args);
   if (!exitstatus)
     perl_run (staticperl);
 
   exitstatus = perl_destruct (staticperl);
   perl_free (staticperl);
   PERL_SYS_TERM ();
+  /*free (args); no point doing it this late */
 
   return exitstatus;
 }
@@ -1864,7 +1873,7 @@ my $ccopts;
    print "generating $PREFIX.ccopts... "
       if $VERBOSE >= 1;
 
-   $ccopts = "$Config{ccflags} $Config{optimize} $Config{cppflags} -I$Config{archlibexp}/CORE";
+   $ccopts = "$Config{ccflags} $Config{optimize} $Config{cppflags} -I$Config{archlibexp}/CORE $EXTRA_CFLAGS";
    $ccopts =~ s/([\(\)])/\\$1/g;
 
    open my $fh, ">$PREFIX.ccopts"
@@ -1882,7 +1891,7 @@ my $ldopts;
 
    $ldopts = $STATIC ? "-static " : "";
 
-   $ldopts .= "$Config{ccdlflags} $Config{ldflags} @libs $Config{archlibexp}/CORE/$Config{libperl} $Config{perllibs}";
+   $ldopts .= "$Config{ccdlflags} $Config{ldflags} $EXTRA_LDFLAGS @libs $Config{archlibexp}/CORE/$Config{libperl} $Config{perllibs} $EXTRA_LIBS";
 
    my %seen;
    $ldopts .= " $_" for reverse grep !$seen{$_}++, reverse +($extralibs =~ /(\S+)/g);
@@ -2806,6 +2815,22 @@ Example: link libcrypt statically into the final binary.
    # ldopts might now contain:
    # -lm -Wl,-Bstatic -lcrypt -Wl,-Bdynamic -lpthread
 
+=item C<--extra-cflags> string
+
+Specifies extra compiler flags, used when compiling the bundle file. The
+flags are appended to all the existing flags, so can be sued to override
+settings.
+
+=item C<--extra-ldflags> string
+
+Specifies extra linker flags, used when linking the bundle.
+
+=item C<--extra-libs> string
+
+Extra linker flags, appended at the end when linking. The difference to
+C<--extra-ldflags> is that the ldflags are appended to the flags, before
+the objects and libraries, and the extra libs are added at the end.
+
 =back
 
 =back
@@ -3183,7 +3208,7 @@ is the path and contents of each file that was bundled.
 
 =head3 LAYOUT
 
-Any path starting with an ampersand (F<&>) or exclamation mark (F<!>) are
+Any paths starting with an ampersand (F<&>) or exclamation mark (F<!>) are
 reserved by F<staticperl>. They must only be used as described in this
 section.
 
@@ -3279,8 +3304,8 @@ Many Unicode properties in turn are defined in separate modules,
 such as C<"unicore/Heavy.pl"> and more specific data tables such as
 C<"unicore/To/Digit.pl"> or C<"unicore/lib/Perl/Word.pl">. These tables
 are big (7MB uncompressed, although F<staticperl> contains special
-handling for those files), so including them on demand by your application
-only might pay off.
+handling for those files), so including them only on demand in your
+application might pay off.
 
 To simply include the whole unicode database, use:
 

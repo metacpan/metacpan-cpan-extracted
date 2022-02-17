@@ -449,7 +449,7 @@ END {	print "End ping.test\n"; } BEGIN {	print "Begin ping.test\n"; }
 
 use strict; use warnings; use Data::Dumper; $Data::Dumper::Deepcopy=1; use DBD::Pg; use DBI qw(:sql_types);
 $|=1; select((select(STDERR),$|=1)[0]);
-use vars qw($dbh $SQL $sql $sth $count $version $info $result $id $val);
+our ($dbh, $SQL, $sql, $sth, $count, $version, $info, $result, $id, $val);
 my $trace = shift || 0;
 my $dv = $DBI::VERSION; print "DBI version: $dv\n";
 my $pv = $DBD::Pg::VERSION; print "DBD::Pg version: $pv\n";
@@ -640,12 +640,14 @@ extension for any miscellaneous files you have that use often (e.g. libpq-fe.h.t
 release tarball. Make sure there is nothing important here.
 
 * Update the SIGNATURE file with Module::Signature (e.g. make signature)
+You may need to add this your login script: export GPG_TTY=$(tt)
 
 * Run "make disttest". This unpacks the tarball, then runs "make" and "make test" on it.
 You may also want to remove the directory it creates later by using "make realclean"
 
 * Make a new git tag: git tag -u 01234abc 1.2.3 -m "Version 1.2.3, released April 1, 2015"
 In the example above, 01234abc is your pgp shortid and 1.2.3 is the new version number.
+You might need: export GPG_TTY=$(tty)
 
 * Make checksums
 
@@ -880,4 +882,3 @@ that need to be done regularly:
 * Check the bug reports from github, mailing lists, etc. (monthly)
 
 * Test against latest version of DBI (upon new release, but also as often as possible)
-

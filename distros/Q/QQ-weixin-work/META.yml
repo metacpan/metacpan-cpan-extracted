@@ -1,6 +1,6 @@
 ---
 name: QQ-weixin-work
-version: '0.04'
+version: '0.06'
 author:
   - 'yourself <admz@mail.scuec.edu.cn>'
 abstract: 'QQ::weixin::work - api for 腾讯企业微信'
@@ -18,49 +18,100 @@ dynamic_config: 1
 provides:
   QQ::weixin::work:
     file: lib/QQ/weixin/work.pm
-    version: 0.04
-  QQ::weixin::work::user:
-    file: lib/QQ/weixin/work/user.pm
-    version: 0.04
-  QQ::weixin::work::department:
-    file: lib/QQ/weixin/work/department.pm
-    version: 0.04
-  QQ::weixin::work::tag:
-    file: lib/QQ/weixin/work/tag.pm
-    version: 0.04
-  QQ::weixin::work::message:
-    file: lib/QQ/weixin/work/message.pm
-    version: 0.04
+    version: 0.06
   QQ::weixin::work::agent:
     file: lib/QQ/weixin/work/agent.pm
-    version: 0.04
-  QQ::weixin::work::menu:
-    file: lib/QQ/weixin/work/menu.pm
-    version: 0.04
-  QQ::weixin::work::checkin:
-    file: lib/QQ/weixin/work/checkin.pm
-    version: 0.04
-  QQ::weixin::work::oa:
-    file: lib/QQ/weixin/work/oa.pm
-    version: 0.04
-  QQ::weixin::work::batch:
-    file: lib/QQ/weixin/work/batch.pm
-    version: 0.04
-  QQ::weixin::work::corp:
-    file: lib/QQ/weixin/work/corp.pm
-    version: 0.04
+    version: 0.06
   QQ::weixin::work::appchat:
     file: lib/QQ/weixin/work/appchat.pm
-    version: 0.04
+    version: 0.06
+  QQ::weixin::work::batch:
+    file: lib/QQ/weixin/work/batch.pm
+    version: 0.06
+  QQ::weixin::work::checkin:
+    file: lib/QQ/weixin/work/checkin.pm
+    version: 0.06
+  QQ::weixin::work::corp:
+    file: lib/QQ/weixin/work/corp.pm
+    version: 0.06
+  QQ::weixin::work::department:
+    file: lib/QQ/weixin/work/department.pm
+    version: 0.06
   QQ::weixin::work::dial:
     file: lib/QQ/weixin/work/dial.pm
-    version: 0.04
+    version: 0.06
+  QQ::weixin::work::externalcontact:
+    file: lib/QQ/weixin/work/externalcontact.pm
+    version: 0.06
+  QQ::weixin::work::externalcontact::batch:
+    file: lib/QQ/weixin/work/externalcontact/batch.pm
+    version: 0.06
+  QQ::weixin::work::externalcontact::customer_strategy:
+    file: lib/QQ/weixin/work/externalcontact/customer_strategy.pm
+    version: 0.06
+  QQ::weixin::work::externalcontact::group_welcome_template:
+    file: lib/QQ/weixin/work/externalcontact/group_welcome_template.pm
+    version: 0.06
+  QQ::weixin::work::externalcontact::groupchat:
+    file: lib/QQ/weixin/work/externalcontact/groupchat.pm
+    version: 0.06
+  QQ::weixin::work::externalcontact::moment_strategy:
+    file: lib/QQ/weixin/work/externalcontact/moment_strategy.pm
+    version: 0.06
+  QQ::weixin::work::externalcontact::resigned:
+    file: lib/QQ/weixin/work/externalcontact/resigned.pm
+    version: 0.06
+  QQ::weixin::work::kf:
+    file: lib/QQ/weixin/work/kf.pm
+    version: 0.06
+  QQ::weixin::work::kf::account:
+    file: lib/QQ/weixin/work/kf/account.pm
+    version: 0.06
+  QQ::weixin::work::kf::customer:
+    file: lib/QQ/weixin/work/kf/customer.pm
+    version: 0.06
+  QQ::weixin::work::kf::service_state:
+    file: lib/QQ/weixin/work/kf/service_state.pm
+    version: 0.06
+  QQ::weixin::work::kf::servicer:
+    file: lib/QQ/weixin/work/kf/servicer.pm
+    version: 0.06
+  QQ::weixin::work::living:
+    file: lib/QQ/weixin/work/living.pm
+    version: 0.06
+  QQ::weixin::work::media:
+    file: lib/QQ/weixin/work/media.pm
+    version: 0.06
+  QQ::weixin::work::menu:
+    file: lib/QQ/weixin/work/menu.pm
+    version: 0.06
+  QQ::weixin::work::message:
+    file: lib/QQ/weixin/work/message.pm
+    version: 0.06
+  QQ::weixin::work::oa:
+    file: lib/QQ/weixin/work/oa.pm
+    version: 0.06
   QQ::weixin::work::oa::calendar:
     file: lib/QQ/weixin/work/oa/calendar.pm
-    version: 0.04
+    version: 0.06
+  QQ::weixin::work::oa::journal:
+    file: lib/QQ/weixin/work/oa/journal.pm
+    version: 0.06
+  QQ::weixin::work::oa::meetingroom:
+    file: lib/QQ/weixin/work/oa/meetingroom.pm
+    version: 0.06
   QQ::weixin::work::oa::schedule:
     file: lib/QQ/weixin/work/oa/schedule.pm
-    version: 0.04
+    version: 0.06
+  QQ::weixin::work::tag:
+    file: lib/QQ/weixin/work/tag.pm
+    version: 0.06
+  QQ::weixin::work::user:
+    file: lib/QQ/weixin/work/user.pm
+    version: 0.06
+  QQ::weixin::work::wedrive:
+    file: lib/QQ/weixin/work/wedrive.pm
+    version: 0.06
 generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html

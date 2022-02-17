@@ -1,5 +1,10 @@
 Revision history for Perl module Test::File
 
+1.992 2022-02-15T19:40:16Z
+	* GitHub #29 - race condition in tests for mtime, from Slaven Rezić.
+	Most people never experienced this timing issue, so if you have this
+	already you don't need to update.
+
 1.991 2022-01-21T01:37:36Z
 	* Enforce text files in some functions, as warned in #18.
 	* Change up some diag messages: 1) lowercase first letter 2) not ! at

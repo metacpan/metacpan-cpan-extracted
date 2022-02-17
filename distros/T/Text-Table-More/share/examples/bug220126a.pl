@@ -6,11 +6,13 @@ use warnings;
 
 use Text::Table::More qw/generate_table/;
 
-print generate_table(
+my %table = (
     rows => [
         # header
-        [{text=>'header1', rowspan=>2}, {text=>'header2',colspan=>2}, {text=>'header3', rowspan=>2}],
+        [{text=>'header1', rowspan=>4}, {text=>'header2',colspan=>2}, {text=>'header3', rowspan=>4}],
         ['header2a', 'header2b'],
+        ['header2c', 'header2d'],
+        [{text=>'header2e', colspan=>2}],
         # data
         [{text=>1, rowspan=>2},{text=>'2-3',colspan=>2},{text=>4,rowspan=>2}],
         [5,8],
@@ -20,7 +22,11 @@ print generate_table(
         [1, {align=>"middle", valign=>"middle", bottom_border=>1}],
     ],
     header_row => 1,
-    #border_style => "UTF8::SingleLineDoubleAfterHeader",
-    #border_style => "Test::Labeled",
     separate_rows => 1,
 );
+
+binmode(STDOUT, ":utf8");
+say "with header_row => 4 (OK):";
+print generate_table(%table, header_row=>4);
+say "with header_row => 1 (buggy):";
+print generate_table(%table);

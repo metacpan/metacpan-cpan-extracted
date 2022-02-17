@@ -1,5 +1,8 @@
 package Rinci::Transaction; # just to make PodWeaver happy
 
+# AUTHORITY
+# DATE
+our $DIST = 'Rinci'; # DIST
 # VERSION
 
 1;
@@ -21,7 +24,7 @@ Rinci::Transaction - A transactional system based on functions
 
 =head1 VERSION
 
-This document describes version 1.1.99 of Rinci::Transaction (from Perl distribution Rinci), released on 2021-12-09.
+This document describes version 1.1.100 of Rinci::Transaction (from Perl distribution Rinci), released on 2022-01-23.
 
 =head1 SPECIFICATION
 
@@ -824,7 +827,7 @@ beyond that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -2,7 +2,7 @@ package Podman::Client;
 
 use Mojo::Base -base;
 
-our $VERSION     = '20220210.0';
+our $VERSION     = '20220211.0';
 our $API_VERSION = '3.0.0';
 
 use English qw( -no_match_vars );
@@ -104,7 +104,7 @@ Podman::Client - Podman service client.
 =head2 Inheritance
 
     Podman::Client
-        isa Mojo::UserAgent
+        wrap Mojo::UserAgent
 
 L<Podman::Client> is a HTTP client (user agent) with the needed support to connect to and query the Podman service.
 

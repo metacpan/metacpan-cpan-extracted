@@ -8,7 +8,7 @@ use Test::More;
 use File::Temp qw/tempfile/;
 use File::Slurper ();
 
-use Test::MockFile;    # Everything below this can have its open overridden.
+use Test::MockFile qw< nostrict >;    # Everything below this can have its open overridden.
 
 my $fake_file_contents = "abc\n" . ( "x" x 20 ) . "\n";
 

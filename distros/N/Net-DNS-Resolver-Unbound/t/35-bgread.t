@@ -3,35 +3,37 @@
 
 use strict;
 use warnings;
-use Test::More tests => 6;
+use Test::More tests => 13;
 
 use Net::DNS;
 use Net::DNS::Resolver::Unbound;
 
-
 my $resolver = Net::DNS::Resolver::Unbound->new();
 
 
-sub handle_state {
-	my ( $async_id, $err, @result ) = @_;
-	my $handle;
-	$handle = Net::DNS::Resolver::libunbound::emulate_wait($async_id)	   if defined $async_id;
-	$handle = Net::DNS::Resolver::libunbound::emulate_error( $async_id, $err ) if defined $err;
-
-	$resolver->bgbusy($handle);
-	return $resolver->bgread($handle);
+for ( my $handle = undef ) {
+	ok( !$resolver->bgbusy($handle), 'not bgbusy' );
+	is( $resolver->bgread($handle), undef, 'undefined bgread' );
 }
 
 
-is( handle_state(), undef, 'handle undefined' );
+for ( my $handle = Net::DNS::Resolver::libunbound::emulate_wait(123) ) {
+	is( $handle->async_id(), 123,	'handle->async_id' );
+	is( $handle->err(),	 0,	'no handle->err' );
+	is( $handle->result(),	 undef, 'no handle->result' );
+	ok( $resolver->bgbusy($handle), 'bgbusy' );
+	is( $resolver->bgread($handle), undef, 'undefined bgread' );
+}
 
-is( handle_state(1), undef, 'awaiting callback' );
 
-is( handle_state( 1, 0 ),     undef, 'NULL result' );
-is( $resolver->errorstring(), undef, 'errorstring undefined' );
-
-is( handle_state( 1, -99 ),   undef,	       'callback error' );
-is( $resolver->errorstring(), 'unknown error', 'unknown error' );
+for ( my $handle = Net::DNS::Resolver::libunbound::emulate_error( 123, -99 ) ) {
+	is( $handle->async_id(), 123,	'handle->async_id' );
+	is( $handle->err(),	 -99,	'handle->err' );
+	is( $handle->result(),	 undef, 'no handle->result' );
+	ok( !$resolver->bgbusy($handle), 'not bgbusy' );
+	is( $resolver->bgread($handle), undef,		 'undefined bgread' );
+	is( $resolver->errorstring(),	'unknown error', 'unknown error' );
+}
 
 
 exit;

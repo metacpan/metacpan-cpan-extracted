@@ -3,17 +3,20 @@
 
 use strict;
 use warnings;
-use Test::More tests => 3;
+use Test::More;
 
 use Net::DNS;
 use Net::DNS::Resolver::Unbound;
-
 
 my $resolver = Net::DNS::Resolver::Unbound->new(
 	defnames    => 1,
 	dnsrch	    => 1,
 	debug_level => 0
 	);
+
+
+plan skip_all => 'no local nameserver' unless $resolver->nameservers;
+plan tests    => 3;
 
 
 ok( $resolver->send('ns.net-dns.org.'), '$resolver->send(ns.net-dns.org.)' );

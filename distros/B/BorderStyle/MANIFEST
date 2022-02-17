@@ -8,6 +8,14 @@ Makefile.PL
 README
 dist.ini
 lib/BorderStyle.pm
+lib/BorderStyle/Test/CustomChar.pm
+lib/BorderStyle/Test/Labeled.pm
+lib/BorderStyleRole/Source/ASCIIArt.pm
+lib/BorderStyleRole/Source/Hash.pm
+lib/BorderStyleRole/Spec/Basic.pm
+lib/BorderStyleRole/Transform/BoxChar.pm
+lib/BorderStyleRole/Transform/InnerOnly.pm
+lib/BorderStyleRole/Transform/OuterOnly.pm
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

@@ -8,7 +8,10 @@ our @EXPORT = qw(is_it_the_number is_the_sum_the_number);
 
 my $anon = sub($number) {
     if ($number != 42) {
-        return "No, it's not";
+        my $sub_sub = sub($num) {
+            return "No, it's not";
+        };
+        &{$sub_sub}($number);
     }
 };
 

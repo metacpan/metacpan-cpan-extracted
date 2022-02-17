@@ -1,5 +1,5 @@
-package Finance::AMEX::Transaction::EPTRN::Header;
-$Finance::AMEX::Transaction::EPTRN::Header::VERSION = '0.004';
+package Finance::AMEX::Transaction::EPTRN::Header 0.005;
+
 use strict;
 use warnings;
 
@@ -9,8 +9,8 @@ use base 'Finance::AMEX::Transaction::EPTRN::Base';
 
 sub field_map {
   return {
-    DF_HDR_RECORD_TYPE => [1, 5],
-    DF_HDR_DATE        => [6, 8],
+    DF_HDR_RECORD_TYPE => [1,  5],
+    DF_HDR_DATE        => [6,  8],
     DF_HDR_TIME        => [14, 4],
     DF_HDR_FILE_ID     => [18, 6],
     DF_HDR_FILE_NAME   => [24, 20],
@@ -39,7 +39,7 @@ Finance::AMEX::Transaction::EPTRN::Header - Parse AMEX Transaction/Invoice Level
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -85,6 +85,14 @@ This will always return the string HEADER.
 Returns the full line that is represented by this object.
 
  print $record->line;
+
+=head2 field_map
+
+Returns a hashref where the name is the record name and 
+the value is an arrayref of the start position and length of that field.
+
+ # print the start position of the DF_HDR_DATE field
+ print $record->field_map->{DF_HDR_DATE}->[0]; # 6
 
 =head2 DF_HDR_RECORD_TYPE
 
@@ -138,7 +146,7 @@ Tom Heady <cpan@punch.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by ZipRecruiter.
+This software is copyright (c) 2022 by ZipRecruiter/Tom Heady.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,8 @@
 Revision history for MsOffice-Word-HTML-Writer
 
+1.07 15.02.2022
+  - fix bug introduced in v1.04 : wide chars should be encoded as HTML numeric entities
+
 1.06 30.01.2022
   - fix bug introduced in v1.04 : images should not be utf8-encoded (thanks Rob. Wohlfarth!)
 

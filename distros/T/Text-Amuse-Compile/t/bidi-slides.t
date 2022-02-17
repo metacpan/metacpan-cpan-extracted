@@ -43,7 +43,7 @@ my $muse_en = <<EOF;
 ** Test
 
  - <<<دانشنامه‌ای آزاد که همه می‌توانند آن را ویرایش کنند؛>>>
- - <<<دانشنامه‌ای آزاد که همه می‌توانند آن را ویرایش کنند؛>>
+ - <[fa]>دانشنامه‌ای آزاد که همه می‌توانند آن را ویرایش کنند؛</[fa]>
 EOF
 
 my $muse_fa_en = <<EOF;
@@ -64,7 +64,7 @@ my @tests = (
              {
               muse => $muse_fa,
               name => 'fa',
-              bidi => 0,
+              bidi => 1,
               rtl => 1,
              },
              {
@@ -93,10 +93,10 @@ foreach my $test (@tests) {
     }
     ok $tex->exists;
     if ($test->{bidi}) {
-        like $tex->slurp_utf8, qr/\\usepackage\{bidi\}/;
+        like $tex->slurp_utf8, qr/\\usepackage\{bidi\}|bidi=default/;
     }
     else {
-        unlike $tex->slurp_utf8, qr/\\usepackage\{bidi\}/;
+        unlike $tex->slurp_utf8, qr/\\usepackage\{bidi\}|bidi=default/;
     }
     if ($test->{rtl}) {
         like $tex->slurp_utf8, qr/\{frametitle\}\[default\]\[right\]/;

@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2022 -- leonerd@leonerd.org.uk
 
-package Parser::MGC 0.19;
+package Parser::MGC 0.20;
 
 use v5.14;
 use warnings;
@@ -11,7 +11,6 @@ use warnings;
 use Carp;
 use Feature::Compat::Try;
 
-use File::Slurp::Tiny qw( read_file );
 use Scalar::Util qw( blessed );
 
 =head1 NAME
@@ -261,9 +260,34 @@ sub from_file
 
    $self->{filename} = $file;
 
-   $self->from_string( ref $file ?
-      do { local $/; binmode $file, $opts{binmode} if $opts{binmode}; <$file> } :
-      ( read_file $file, binmode => $opts{binmode} ) );
+   my $fh;
+   if( ref $file ) {
+      $fh = $file;
+   }
+   else {
+      open $fh, "<", $file or die "Cannot open $file for reading - $!";
+   }
+
+   binmode $fh, $opts{binmode} if $opts{binmode};
+
+   $self->from_string( do { local $/; <$fh>; } );
+}
+
+=head2 filename
+
+   $filename = $parser->filename
+
+I<Since version 0.20.>
+
+Returns the name of the file currently being parsed, if invoked from within
+L</from_file>.
+
+=cut
+
+sub filename
+{
+   my $self = shift;
+   return $self->{filename};
 }
 
 =head2 from_reader
@@ -420,7 +444,53 @@ sub fail_from
    die Parser::MGC::Failure->new( $message, $self, $pos );
 }
 
-sub _isa_failure { blessed $_[0] and $_[0]->isa( "Parser::MGC::Failure" ) }
+# On perl 5.32 onwards we can use the nicer `isa` infix operator
+# Problem is it won't even parse correctly on older perls so we'll have to go
+# the long way around
+*_isa_failure = ( $^V ge v5.32 )
+   ? do { eval 'use experimental "isa"; sub { $_[0] isa Parser::MGC::Failure }' // die $@ }
+   : do { require Scalar::Util; 
+          sub { Scalar::Util::blessed($_[0]) and $_[0]->isa( "Parser::MGC::Failure" ) } };
+
+=head2 die
+
+=head2 die_from
+
+   $parser->die( $message )
+
+   $parser->die_from( $pos, $message )
+
+I<Since version 0.20.>
+
+Throws an exception that propagates as normal for C<die>, entirely out of the
+entire parser and to the caller of the toplevel C<from_*> method that invoked
+it, bypassing all of the back-tracking logic.
+
+This is much like using core's C<die> directly, except that the message string
+will include the line and column position, and the line of input that the
+parser was working on, as it does in the L</fail> method.
+
+This method is intended for reporting fatal errors where the parsed input was
+correctly recognised at a grammar level, but is requesting something that
+cannot be fulfilled semantically.
+
+=cut
+
+sub die :method
+{
+   my $self = shift;
+   my ( $message ) = @_;
+   $self->die_from( $self->pos, $message );
+}
+
+sub die_from
+{
+   my $self = shift;
+   my ( $pos, $message ) = @_;
+   # Convenient just to use the ->STRING method of a Failure object but don't
+   # throw it directly
+   die Parser::MGC::Failure->new( $message, $self, $pos )->STRING;
+}
 
 =head2 at_eos
 
@@ -984,12 +1054,50 @@ consume either leading or trailing whitespace around the substring. It is
 expected that this method would be used as part a parser to read quoted
 strings, or similar cases where whitespace should be preserved.
 
+=head2 nonempty_substring_before
+
+   $str = $parser->nonempty_substring_before( $literal )
+
+   $str = $parser->nonempty_substring_before( qr/pattern/ )
+
+I<Since version 0.20.>
+
+A variant of L</substring_before> which fails if the matched part is empty.
+
+The example above could have been written:
+
+   sub token_nonempty_part
+   {
+      my $self = shift;
+
+      return $parser->nonempty_substring_before( "," );
+   }
+
+This is often useful for breaking out of repeating loops; e.g.
+
+   sub token_escaped_string
+   {
+      my $self = shift;
+      $self->expect( '"' );
+
+      my $ret = "";
+      1 while $self->any_of(
+         sub { $ret .= $self->nonempty_substring_before( qr/%|$/m ); 1 }
+         sub { my $escape = ( $self->expect( qr/%(.)/ ) )[1];
+               $ret .= _handle_escape( $escape );
+               1 },
+         sub { 0 },
+      )
+
+      return $ret;
+   }
+
 =cut
 
-sub substring_before
+sub _substring_before
 {
    my $self = shift;
-   my ( $expect ) = @_;
+   my ( $expect, $fail_if_empty ) = @_;
 
    ref $expect or $expect = qr/\Q$expect/;
 
@@ -1008,7 +1116,22 @@ sub substring_before
       $end = length $self->{str};
    }
 
+   $self->fail( "Expected to find a non-empty substring before $expect" )
+      if $fail_if_empty and $end == $start;
+
    return $self->take( $end - $start );
+}
+
+sub substring_before
+{
+   my $self = shift;
+   return $self->_substring_before( $_[0], 0 );
+}
+
+sub nonempty_substring_before
+{
+   my $self = shift;
+   return $self->_substring_before( $_[0], 1 );
 }
 
 =head2 generic_token
@@ -1280,7 +1403,7 @@ sub STRING
    my $indent = substr( $text, 0, $col );
    $indent =~ s/[^ \t]/ /g; # blank out all the non-whitespace
 
-   my $filename = $parser->{filename};
+   my $filename = $parser->filename;
    my $in_file = ( defined $filename and !ref $filename )
                     ? "in $filename " : "";
 

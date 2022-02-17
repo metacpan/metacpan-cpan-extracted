@@ -1,0 +1,21 @@
+This is the main template: Title in external is $title
+@{[ do {
+	#Can even comment
+	BEGIN {
+		use Time::HiRes qw<time>;
+		use JSON;
+	}
+	encode_json  [map time."\n", (1..10)];
+}
+]}
+
+Unknown value, but no error: $a->[1]{wer};
+Items: @$items;
+@{['other perl code']}
+
+Doing a recursive template load, and execute
+@{[ plex("header.plex", \%fields, %options)->render() ]}
+
+Doing an inline include subtitution
+@{[include("header.plex")]}
+@{[include("header.plex")]}

@@ -35,4 +35,4 @@ SKIP:
 }
 
 ok $tex->exists;
-like $tex->slurp_utf8, qr/\\usepackage\{bidi\}/;
+like $tex->slurp_utf8, qr/\\usepackage\{bidi\}|bidi=default/;

@@ -1,6 +1,6 @@
 package Lab::Data::Analysis;
 #ABSTRACT: Analyze data from 'Trace' files
-$Lab::Data::Analysis::VERSION = '3.803';
+$Lab::Data::Analysis::VERSION = '3.810';
 use v5.20;
 
 use strict;
@@ -1113,7 +1113,7 @@ Lab::Data::Analysis - Analyze data from 'Trace' files
 
 =head1 VERSION
 
-version 3.803
+version 3.810
 
 =head1 SYNOPSIS
 

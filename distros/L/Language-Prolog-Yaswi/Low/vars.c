@@ -16,23 +16,27 @@
 
 
 AV *get_cells(pTHX_ pMY_CXT) {
+    MY_dMY_CXT_accessor;
     AV *av;
     if (av=GvAV(c_cells)) return av;
     return GvAV(c_cells)=newAV();
 }
 
 AV *get_vars(pTHX_ pMY_CXT) {
+    MY_dMY_CXT_accessor;
     AV *av;
     if (av=GvAV(c_vars)) return av;
     return GvAV(c_vars)=newAV();
 }
 
 HV *get_cache(pTHX_ pMY_CXT) {
+    MY_dMY_CXT_accessor;
     HV *hv;
     if (hv=GvHV(c_cache)) return hv;
     return GvHV(c_cache)=newHV();
 }
 void savestate_vars(pTHX_ pMY_CXT) {
+    MY_dMY_CXT_accessor;
     save_ary(c_vars);
     save_ary(c_cells);
     save_hash(c_cache);

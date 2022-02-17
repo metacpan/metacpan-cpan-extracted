@@ -1,0 +1,26 @@
+#title 選り抜き記事
+#lang ja
+
+** 概要
+
+この事件は、太平洋戦争（大東亜戦争）敗戦直後に各地で発生した無条件降伏に反対する騒擾事件の一つである。地方都市である松江市で発生した事件であるが、大日本帝国憲法下における全国的規模の騒乱を目的とした最後のクーデターであり、大審院で裁判が行われた最後の事件でもある。
+
+1945年（昭和20年）8月15日、ポツダム宣言の受諾による日本の降伏が昭和天皇による玉音放送によって国民に発表されると、その2日後の8月17日、東京都では降伏に反対する尊攘同志会の会員らが愛宕山に篭城、全国に決起を呼びかけた（愛宕山事件）。
+
+** 概要
+
+松江騒擾事件は、この愛宕山事件に呼応する形で発生した。8月24日未明、尊攘同志会会員であった岡崎功（当時25歳）を中心とした20歳前後の男女数十人が「皇国義勇軍」を名乗って武装蜂起し、各隊員が分担して県内の主要施設を襲撃した。島根県庁は焼き討ちされ、新聞社・発電所もその機能を一部破壊された。事前の計画では、知事・検事正の暗殺も企図されていたが、足並みが揃わず失敗した。一味は各地を襲撃後、全国に決起呼びかけを行うため放送局に集結したが、放送局長はこれを固く拒否した。押し問答が続く間に警官・軍隊が放送局を包囲し、その結果全員が検挙され鎮定された。
+
+島根県庁舎・県会議事堂のべ3000m2は全焼し、被害額は約192万円を計上（1946年（昭和21年）当時の県職員給与総額は103万円）、焼き討ちの際に住民1人が殺害され、書類等も多数焼失した。発電所襲撃の影響で、松江市内は3時間半にわたり停電となった。新聞社も襲撃の影響で8月31日までタブロイド判での発行を余儀なくされた。
+
+行政・治安当局をはじめ、敗戦直後の島根県民には異常な衝撃を与えたが、報道管制などが功を奏し、この蜂起が全国に波及することはなかった。皇国義勇軍の主要メンバーは服役したのち、教育者や印刷会社職員、産業廃棄物処理業などに就いていたことが判明しているが、その他のメンバーの行方についてはほとんど分かっていない。 
+
+** Agrikultur
+
+<[ru]>
+жизнь более 500 полотен (в наиболее полных современных каталогах фигур
+</[ru]>
+
+<[hr]>
+Pakao (lat. infernus) jest prema religijskim i mitološkim vjerovanjima mjesto gdje duše ljudi koji umru u smrtnom grijehu trpe vječnu patnju i kaznu. Pojam pakla kao onozemaljskog mjesta prokletstva i muke poznat je u mnogim svjetskim religijama, a osobito u kršćanstvu, islamu i budizmu. U kršćanskoj teologiji pakao se opisuje kao mjesto u kojem obitavaju đavoli i demoni koji muče duše grešnika. Nasuprot tome, prema kršćanskom vjerovanju duše ljudi koji su umrli u miru s Bog odlaze u čistilište, dok duše onih grešnika koji su zavrijedili spasenje odlaze u raj. 
+</[hr]>

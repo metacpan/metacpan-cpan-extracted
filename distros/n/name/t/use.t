@@ -3,7 +3,6 @@ use strict;
 use lib 't/lib';
 
 use Scalar::Util 'blessed';
-use Test::Fatal;
 use Test::More;
 
 BEGIN {

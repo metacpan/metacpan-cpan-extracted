@@ -21,7 +21,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.198';
+our $VERSION = '1.199';
 
 use Quiq::Template;
 use Quiq::Path;
@@ -222,7 +222,7 @@ sub line {
     my $line = '';
     open my $fh,'<',\$code or $this->throw;
     while (<$fh>) {
-        s|\s*//.*||; # Kommentar entfernen
+        s~(^|\s+)//.*~~; # Kommentar entfernen
         s/^\s+//;
         s/\s+$//;
         next if $_ eq '';
@@ -384,7 +384,7 @@ sub script {
 
 =head1 VERSION
 
-1.198
+1.199
 
 =head1 AUTHOR
 

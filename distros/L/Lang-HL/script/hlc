@@ -33,7 +33,10 @@ sub process_file {
     }
 }
 
-$code =~ s/[\t\r\n\f]+//g;
+$code =~ s/[\r\n\f]+//g;
+
+my @code = split(" ", $code);
+$code = join(" ", @code);
 
 my $hlObject = Lang::HL->new();
 my $generatedCode = $hlObject->parse($code);

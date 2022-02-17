@@ -27,7 +27,11 @@ lib/Object/Pad/MOP/Class.pm
 lib/Object/Pad/MOP/Field.pm
 lib/Object/Pad/MOP/FieldAttr.pm
 lib/Object/Pad/MOP/Method.pm
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 src/class.c
 src/field.c
 src/suspended_compcv.c
@@ -82,7 +86,3 @@ t/90leak.t
 t/92legacy-class-keywords.t
 t/95utf8.t
 t/99pod.t
-README
-LICENSE
-META.yml
-META.json

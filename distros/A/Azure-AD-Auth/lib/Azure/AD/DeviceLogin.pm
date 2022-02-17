@@ -188,7 +188,7 @@ Azure::AD::DeviceLogin - Azure AD Device Login authentication flow
 =head1 SYNOPSIS
 
   use Azure::AD::DeviceLogin;
-  my $creds = Azure::AD::ClientCredentials->new(
+  my $creds = Azure::AD::DeviceLogin->new(
     resource_id => 'https://management.core.windows.net/',
     message_handler => sub { say $_[0] },
     client_id => '',
@@ -252,7 +252,7 @@ awaiting the user to complete the flow. Once the user completes the instructions
 will be returned.
 
 The access_token is cached in the object as long as it's valid, so subsequent calls
-to access_token will return the appropiate token without reauthenticating to Azure AD. 
+to access_token will return the appropriate token without reauthenticating to Azure AD. 
 If the token has expired, access_token will call Azure AD to obtain a new token.
 
 Example usage:
@@ -274,7 +274,8 @@ L<Azure::AD::Auth>
 
 =head1 COPYRIGHT and LICENSE
 
-Copyright (c) 2018 by CAPSiDE
+Copyright (c) 2020 by Jose Luis Martinez
+
 This code is distributed under the Apache 2 License. The full text of the 
 license can be found in the LICENSE file included with this module.
 

@@ -2,7 +2,7 @@ NAME
     App::TaggedDirUtils - CLI utilities related to tagged directories
 
 VERSION
-    This document describes version 0.001 of App::TaggedDirUtils (from Perl
+    This document describes version 0.002 of App::TaggedDirUtils (from Perl
     distribution App-TaggedDirUtils), released on 2021-08-23.
 
 SYNOPSIS
@@ -48,7 +48,7 @@ FUNCTIONS
 
     *   prefixes* => *array[dirname]*
 
-        Changes file.
+        Locations to search for tagged directories.
 
         Location(s) to search for tagged subdirectories, i.e. directories
         which have some file with specific names in its root.

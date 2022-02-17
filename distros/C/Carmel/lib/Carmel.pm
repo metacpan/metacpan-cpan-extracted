@@ -1,7 +1,7 @@
 package Carmel;
 use strict;
 use 5.012000;
-use version; our $VERSION = version->declare('v0.1.38');
+use version; our $VERSION = version->declare('v0.1.39');
 
 1;
 __END__
@@ -57,8 +57,6 @@ Carmel - CPAN Artifact Repository Manager
   carmel find Plack ">= 1.0000, < 1.1000"
 
 =head1 DESCRIPTION
-
-B<THIS IS EXPERIMENTAL!>
 
 Carmel is yet another CPAN module manager.
 

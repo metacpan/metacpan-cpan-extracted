@@ -7,7 +7,7 @@
 #       Author:  Steven Bakker (SBAKKER), <sbakker@cpan.org>
 #      Created:  22/01/18
 #
-#   Copyright (c) 2018 Steven Bakker
+#   Copyright (c) 2018-2022 Steven Bakker
 #
 #   This module is free software; you can redistribute it and/or modify
 #   it under the same terms as Perl itself. See "perldoc perlartistic."
@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI::Argument::Number 0.054002;
+package Term::CLI::Argument::Number 0.055002;
 
 use 5.014;
 use warnings;
@@ -83,7 +83,7 @@ Term::CLI::Argument::Number - base class for numerical arguments in Term::CLI
 
 =head1 VERSION
 
-version 0.054002
+version 0.055002
 
 =head1 SYNOPSIS
 

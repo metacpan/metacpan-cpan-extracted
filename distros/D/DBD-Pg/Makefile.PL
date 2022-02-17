@@ -5,13 +5,13 @@ use warnings;
 use 5.008001;
 
 ## No version.pm for this one, as the prereqs are not loaded yet.
-my $VERSION = '3.15.0';
+my $VERSION = '3.15.1';
 
 ## App::Info is stored inside t/lib
 ## Create a proper path so we can use it below
 my $lib;
+my $sep;
 BEGIN {
-    use vars qw/$sep/;
     my %seplist = (
                MacOS   => ':',
                MSWin32 => '\\',
@@ -220,6 +220,7 @@ my %opts =
      PREREQ_PM      => {
                         'ExtUtils::MakeMaker' => '6.11',
                         'DBI'                 => '1.614',
+                        'File::Temp'          => '0',
                         'Test::More'          => '0.88',
                         'Time::HiRes'         => '0',
                         'version'             => '0',

@@ -164,6 +164,9 @@ void ObjectPad_mop_class_add_ADJUST(pTHX_ ClassMeta *meta, CV *cv);
 #define mop_class_add_ADJUSTPARAMS(class, cv)  ObjectPad_mop_class_add_ADJUSTPARAMS(aTHX_ class, cv)
 void ObjectPad_mop_class_add_ADJUSTPARAMS(pTHX_ ClassMeta *meta, CV *cv);
 
+#define mop_class_add_required_method(class, methodname)  ObjectPad_mop_class_add_required_method(aTHX_ class, methodname)
+void ObjectPad_mop_class_add_required_method(pTHX_ ClassMeta *meta, SV *methodname);
+
 #define mop_class_apply_attribute(classmeta, name, value)  ObjectPad_mop_class_apply_attribute(aTHX_ classmeta, name, value)
 void ObjectPad_mop_class_apply_attribute(pTHX_ ClassMeta *classmeta, const char *name, SV *value);
 

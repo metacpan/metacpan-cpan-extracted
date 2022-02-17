@@ -1,2 +1,6 @@
+0.02 2022-02-15T00:13:22+01:00
+ - Add missing newline in help.
+ - Fix check of ISBN length.
+
 0.01 2022-02-01T16:49:52+01:00
  - First version.

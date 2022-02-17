@@ -15,12 +15,12 @@ use Podman::System;
 our @EXPORT_OK   = qw(build containers create images pull version);
 our %EXPORT_TAGS = (all => [@EXPORT_OK],);
 
-sub build      { return Podman::Image::build(@_); }
-sub containers { return Podman::Containers->list }
-sub create     { return Podman::Container::create(@_); }
-sub images     { return Podman::Images->list }
-sub pull       { return Podman::Image::pull(@_); }
-sub version    { return Podman::System->version }
+sub build      { Podman::Image::build(@_); }
+sub containers { Podman::Containers->list }
+sub create     { Podman::Container::create(@_); }
+sub images     { Podman::Images->list }
+sub pull       { Podman::Image::pull(@_); }
+sub version    { Podman::System->version }
 
 1;
 
@@ -39,11 +39,11 @@ Podman - Library of bindings to use the RESTful API of L<https://podman.io> serv
     my $image = build('localhost/goodbye', '/tmp/goodbye/Dockerfile');
 
     # List stored images name
-    say $_->name for $Podman->images;
+    say $_->name for $Podman::images;
 
     # Show version information
-    my $podman = Podman->new;
-    say $podman->version->{Version};
+    use Podman qw(:all);
+    say version->{Version};
 
 =head1 DESCRIPTION
 
@@ -88,7 +88,8 @@ Pull and store named image from registry.
 
 =head2 version
 
-    say Podman::version->{APIVersion};
+    use Podman qw(version);
+    say version->{APIVersion};
 
 Obtain a dictionary of versions for the Podman service components.
 

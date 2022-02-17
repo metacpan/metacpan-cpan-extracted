@@ -1,0 +1,113 @@
+Revision history for OpenAPI-Modern
+
+0.022     2022-02-16 06:00:37Z
+          - construction with an invalid document is handled more nicely
+          - added new dialect schema share/strict-schema.json to the list of
+            available schemas, which prohibits unrecognized keywords
+          - added custom LICENSE to schema files copied from
+            github.com/OAI/OpenAPI-Specification
+          - distribution is renamed from JSON-Schema-Modern-Document-OpenAPI
+            to OpenAPI-Modern
+
+0.021     2022-02-11 04:44:05Z
+          - absolute locations in errors are now resolved against the
+            request's Host header
+
+0.020     2022-02-10 02:56:46Z
+          - validation methods and find_path now also accept the HTTP request
+            method as an option
+          - the request object is no longer required as an argument to
+            find_path
+          - validate_request, validate_response now also support Mojolicious
+            request and response objects
+
+0.019     2022-01-23 08:17:30Z
+          - some instanceLocations in errors from validate_request and
+            validate_response have changed to be more specific regarding the
+            source of the error
+          - find_path is now a public method of OpenAPI::Modern, factored out
+            of validate_request and validate_response to enable third-party
+            callers to reuse information between these two method calls
+
+0.018     2022-01-17 23:37:05Z
+          - fix parsing of escaped characters in URI paths and capture values
+
+0.017     2022-01-17 18:33:07Z
+          - remove erroneous logic when checking the "discriminator" keyword
+          - user-provided path_template, path_captures and operation_id are
+            all verified against the request URI
+          - path_template, operation_id and path_captures are no longer
+            required arguments for validate_request, validate_response
+
+0.016     2022-01-06 04:22:20Z
+          - fix the prereq specification for YAML::PP
+
+0.015     2021-12-31 21:17:11Z
+          - load Math::BigInt before attempting to use it
+
+0.014     2021-12-30 05:38:03Z
+          - use bignums in JSON::Schema::Modern to properly support int32,
+            int64 numeric formats
+
+0.013     2021-12-22 19:23:30Z
+          - support */* as a media-type in a content specification, to
+            indicate valiation checks that can be performed on any content
+            type (e.g. length)
+          - add support for OAS-specific formats: int32, int64, float, double,
+            password
+
+0.012     2021-12-17 06:39:38Z
+          - properly handle a missing Content-Length header alongside a
+            non-zero-length body payload
+
+0.011     2021-12-16 06:17:57Z
+          - spurious validation errors fixed when request body is empty,
+            yet not required
+
+0.010     2021-12-11 23:11:43Z
+          - OpenAPI metaschemas are now also available via URIs ending in
+            .../latest
+          - improved error messaging when a media-type or charset decoder fails
+          - improved handling of HTTP headers
+
+0.009     2021-12-06 05:55:01Z
+          - validation no longer errors on a missing media type if the
+            corresponding schema is empty (true)
+          - validate_request and validate_response now accept an operation_id
+            instead of a path_template for looking up the endpoint
+            specification in the openapi document
+          - treat Content-Type headers and media-type entries in openapi
+            documents case-insensitively, and also match wildcards
+            (image/jpg falls back to image/* or */*)
+
+0.008     2021-12-03 05:33:29Z
+          - process response headers in canonical order
+
+0.007     2021-12-02 05:43:34Z
+          - properly handle missing message bodies, with possibly a mising
+            Content-Type header as well
+          - better type handling for numeric strings and stringy numbers
+          - detect and handle infinite recursion while evaluating
+
+0.006     2021-12-01 05:22:01Z
+          - support media type encodings in parameters
+
+0.005     2021-11-30 06:22:10Z
+          - performance improvements when loading and parsing documents
+          - extract and cache all operationIds in the document
+
+0.004     2021-11-28 22:09:01Z
+          - implemented validate_response()
+          - when validating requests and responses, values that look like
+            numbers, and are evaluated as numbers in schemas, are now coerced
+            to numbers automatically
+
+0.003     2021-11-26 01:01:47Z
+          - OpenAPI::Modern is born
+
+0.002     2021-11-17 05:49:29Z
+          - minimum Perl version raised to 5.20
+          - embedded schemas are now traversed for resource URIs
+
+0.001     2021-11-10 04:50:17Z
+          - Initial release.

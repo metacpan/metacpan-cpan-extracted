@@ -23,10 +23,10 @@ requires:
   File::Temp: '0'
   perl: '5.010001'
 resources:
-  IRC: irc://chat.freenode.net/#amusewiki
-  WebIRC: https://webchat.freenode.net/?channels=#amusewiki
+  IRC: irc://irc.libera.chat/#amusewiki
+  WebIRC: https://web.libera.chat/#amusewiki
   bugtracker: https://github.com/melmothx/text-amuse/issues
   homepage: http://amusewiki.org
   repository: https://github.com/melmothx/text-amuse
-version: '1.78'
+version: '1.80'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

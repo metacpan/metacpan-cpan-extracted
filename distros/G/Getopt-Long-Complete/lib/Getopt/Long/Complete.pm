@@ -2,11 +2,6 @@
 
 package Getopt::Long::Complete;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-16'; # DATE
-our $DIST = 'Getopt-Long-Complete'; # DIST
-our $VERSION = '0.315'; # VERSION
-
 use strict;
 use warnings;
 
@@ -26,6 +21,11 @@ our @EXPORT_OK = qw(
                     HelpMessage
                     VersionMessage
                );
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-08-24'; # DATE
+our $DIST = 'Getopt-Long-Complete'; # DIST
+our $VERSION = '0.316'; # VERSION
 
 # we don't want to always load Getopt::Long to avoid startup overhead.
 our ($REQUIRE_ORDER, $PERMUTE, $RETURN_IN_ORDER) = (0..2); # copied from Getopt::Long
@@ -149,7 +149,7 @@ Getopt::Long::Complete - A drop-in replacement for Getopt::Long, with shell tab 
 
 =head1 VERSION
 
-This document describes version 0.315 of Getopt::Long::Complete (from Perl distribution Getopt-Long-Complete), released on 2020-04-16.
+This document describes version 0.316 of Getopt::Long::Complete (from Perl distribution Getopt-Long-Complete), released on 2021-08-24.
 
 =head1 SYNOPSIS
 
@@ -355,14 +355,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Getopt-Lon
 
 Source repository is at L<https://github.com/perlancar/perl-Getopt-Long-Complete>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Getopt-Long-Complete>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Getopt::Long::More>, another drop-in replacement for Getopt::Long with tab
@@ -371,6 +363,9 @@ auto_help.
 
 L<Complete::Getopt::Long> (the backend for this module), L<Complete::Bash>,
 L<Complete::Tcsh>.
+
+L<Getopt::Long::Subcommand> also supports tab completion, in addition to
+subcommands.
 
 Other option-processing modules featuring shell tab completion:
 L<Getopt::Complete>.
@@ -386,11 +381,42 @@ L<Pod::Weaver::Section::Completion::GetoptLongComplete>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto (on Asus Zenbook)
+
+Steven Haryanto (on Asus Zenbook) <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Getopt-Long-Complete>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

@@ -1,10 +1,10 @@
 # NAME
 
-Text::Minify::XS - Simple text minification
+Text::Minify::XS - remove indentation and trailing whitespace
 
 # VERSION
 
-version v0.5.1
+version v0.6.0
 
 # SYNOPSIS
 
@@ -13,6 +13,11 @@ use Text::Minify::XS qw/ minify /;
 
 my $out = minify( $in );
 ```
+
+# DESCRIPTION
+
+This is a simple and fast text minifier that removes quickly extra
+whitespace from multi-line text.
 
 # EXPORTS
 
@@ -24,8 +29,8 @@ None by default.
 my $out = minify( $in );
 ```
 
-This is a quick-and-dirty text minifier that removes whitespace in a
-single pass.
+This is a quick-and-dirty text minifier that removes indentation and
+trailing whitespace from a multi-line text document in a single pass.
 
 It does the following:
 
@@ -36,6 +41,24 @@ It does the following:
 
 It does not recognise any form of markup, comments or text quoting.
 Nor does it remove extra whitespace in the middle of the line.
+
+Because it does not recognise any markup, newlines are not removed
+since they may be significant.
+
+## minify\_utf8
+
+This is an alias for ["minify"](#minify).  It was added in v0.5.3.
+
+## minify\_ascii
+
+This is a version of ["minify"](#minify) that works on ASCII text. It was added in v0.5.3.
+
+If you are only processing 8-bit text, then it should be faster.
+(Rudimentary benchmarks show it is twice as fast as ["minify"](#minify).)
+
+Unlike the ["minify"](#minify), if the input string has the UTF-8 flag set, the
+resulting string will not.  You should ensure the string is properly
+encoded.
 
 # KNOWN ISSUES
 
@@ -99,7 +122,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020-2021 by Robert Rothenberg.
+This software is Copyright (c) 2020-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

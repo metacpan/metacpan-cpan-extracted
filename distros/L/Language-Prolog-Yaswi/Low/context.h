@@ -16,10 +16,6 @@ typedef struct {
     int prolog_init;
 } my_cxt_t;
 
-#ifndef MULTIPLICITY
-extern my_cxt_t my_cxt;
-#endif
-
 #define c_depth     MY_CXT.depth
 #define c_converter MY_CXT.converter
 #define c_qid       MY_CXT.qid
@@ -40,3 +36,20 @@ my_cxt_t *get_MY_CXT(pTHX);
 
 #define MY_dMY_CXT my_cxt_t *my_cxtp = get_MY_CXT(aTHX)
 
+/* MY_dMY_CXT_accessor
+ * ===================
+ * Use this macro to call accessor in functions that take `pMY_CXT` parameter.
+ * This is a no-op when `MULTIPLICITY` is defined.
+ */
+#ifndef INSIDE_CONTEXT_C
+#ifndef MULTIPLICITY
+#define MY_dMY_CXT_accessor MY_dMY_CXT
+/* MY_CXT is used in combination with MY_dMY_CXT_accessor.
+ *
+ * Redefine to using the pointer because the static variable is not visible.
+ */
+#define MY_CXT (*my_cxtp)
+#else
+#define MY_dMY_CXT_accessor dNOOP
+#endif /* MULTIPLICITY */
+#endif /*INSIDE_CONTEXT_C */

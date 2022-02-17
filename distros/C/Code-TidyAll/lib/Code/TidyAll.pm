@@ -29,7 +29,7 @@ use Try::Tiny;
 
 use Moo 2.000000;
 
-our $VERSION = '0.80';
+our $VERSION = '0.81';
 
 sub default_conf_names { ( 'tidyall.ini', '.tidyallrc' ) }
 
@@ -850,7 +850,7 @@ Code::TidyAll - Engine for tidyall, your all-in-one code tidier and validator
 
 =head1 VERSION
 
-version 0.80
+version 0.81
 
 =head1 SYNOPSIS
 
@@ -1154,7 +1154,7 @@ timgimyee <tim.gim.yee@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 - 2021 by Jonathan Swartz.
+This software is copyright (c) 2011 - 2022 by Jonathan Swartz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

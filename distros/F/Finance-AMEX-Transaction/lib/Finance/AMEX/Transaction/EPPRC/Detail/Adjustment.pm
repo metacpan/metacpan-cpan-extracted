@@ -1,5 +1,5 @@
-package Finance::AMEX::Transaction::EPPRC::Detail::Adjustment;
-$Finance::AMEX::Transaction::EPPRC::Detail::Adjustment::VERSION = '0.004';
+package Finance::AMEX::Transaction::EPPRC::Detail::Adjustment 0.005;
+
 use strict;
 use warnings;
 
@@ -9,33 +9,30 @@ use base 'Finance::AMEX::Transaction::EPPRC::Base';
 
 sub field_map {
   return {
-
-    AMEX_PAYEE_NUMBER         => [1, 10],
-    AMEX_SE_NUMBER            => [11, 10],
-    SE_UNIT_NUMBER            => [21, 10],
-    PAYMENT_YEAR              => [31, 4],
-    PAYMENT_NUMBER            => [35, 8],
-    PAYMENT_NUMBER_DATE       => [35, 3],
-    PAYMENT_NUMBER_TYPE       => [38, 1],
-    PAYMENT_NUMBER_NUMBER     => [39, 4],
-    RECORD_TYPE               => [43, 1],
-    DETAIL_RECORD_TYPE        => [44, 2],
-    AMEX_PROCESS_DATE         => [46, 7],
-    ADJUSTMENT_NUMBER         => [53, 6],
-    ADJUSTMENT_AMOUNT         => [59, 9],
-    DISCOUNT_AMOUNT           => [68, 9],
-    SERVICE_FEE_AMOUNT        => [77, 7],
-    NET_ADJUSTMENT_AMOUNT     => [91, 9],
+    AMEX_PAYEE_NUMBER         => [1,   10],
+    AMEX_SE_NUMBER            => [11,  10],
+    SE_UNIT_NUMBER            => [21,  10],
+    PAYMENT_YEAR              => [31,  4],
+    PAYMENT_NUMBER            => [35,  8],
+    PAYMENT_NUMBER_DATE       => [35,  3],
+    PAYMENT_NUMBER_TYPE       => [38,  1],
+    PAYMENT_NUMBER_NUMBER     => [39,  4],
+    RECORD_TYPE               => [43,  1],
+    DETAIL_RECORD_TYPE        => [44,  2],
+    AMEX_PROCESS_DATE         => [46,  7],
+    ADJUSTMENT_NUMBER         => [53,  6],
+    ADJUSTMENT_AMOUNT         => [59,  9],
+    DISCOUNT_AMOUNT           => [68,  9],
+    SERVICE_FEE_AMOUNT        => [77,  7],
+    NET_ADJUSTMENT_AMOUNT     => [91,  9],
     DISCOUNT_RATE             => [100, 5],
     SERVICE_FEE_RATE          => [105, 5],
     CARDMEMBER_NUMBER         => [126, 17],
     ADJUSTMENT_REASON         => [143, 280],
-
     BATCH_CODE                => [423, 3],
     BILL_CODE                 => [426, 3],
     SERVICE_AGENT_MERCHANT_ID => [429, 15],
     MEMBERSHIP_REWARDS        => [444, 1],
-
   };
 }
 
@@ -61,7 +58,6 @@ sub DISCOUNT_RATE             {return $_[0]->_get_column('DISCOUNT_RATE')}
 sub SERVICE_FEE_RATE          {return $_[0]->_get_column('SERVICE_FEE_RATE')}
 sub CARDMEMBER_NUMBER         {return $_[0]->_get_column('CARDMEMBER_NUMBER')}
 sub ADJUSTMENT_REASON         {return $_[0]->_get_column('ADJUSTMENT_REASON')}
-
 sub BATCH_CODE                {return $_[0]->_get_column('BATCH_CODE')}
 sub BILL_CODE                 {return $_[0]->_get_column('BILL_CODE')}
 sub SERVICE_AGENT_MERCHANT_ID {return $_[0]->_get_column('SERVICE_AGENT_MERCHANT_ID')}
@@ -81,7 +77,7 @@ Finance::AMEX::Transaction::EPPRC::Detail::Adjustment - Parse AMEX Transaction/I
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -127,6 +123,14 @@ This will always return the string ADJUSTMENT_DETAIL.
 Returns the full line that is represented by this object.
 
  print $record->line;
+
+=head2 field_map
+
+Returns an arrayref of hashrefs where the name is the record name and 
+the value is an arrayref of the start position and length of that field.
+
+ # print the start position of the PAYMENT_YEAR field
+ print $record->field_map->[3]->{PAYMENT_YEAR}->[0]; # 31
 
 =head2 AMEX_PAYEE_NUMBER
 
@@ -379,7 +383,7 @@ Tom Heady <cpan@punch.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by ZipRecruiter.
+This software is copyright (c) 2022 by ZipRecruiter/Tom Heady.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

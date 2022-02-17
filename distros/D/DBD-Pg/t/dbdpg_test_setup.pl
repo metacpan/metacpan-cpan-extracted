@@ -6,6 +6,7 @@ use warnings;
 use lib 'blib/lib', 'blib/arch'; ## no critic
 use Data::Dumper;
 use DBI;
+use File::Temp;
 use Cwd;
 use Test::More qw//;
 use 5.008001;
@@ -69,7 +70,7 @@ my $S = 'dbd_pg_testschema';
 ## File written so we don't have to retry connections:
 my $helpfile = 'README.testdatabase';
 
-use vars qw/$fh/;
+our $fh;
 
 sub connect_database {
 
@@ -372,8 +373,9 @@ version: $version
             my $founduser = 0;
             $su = $testuser = '';
 
-            ## Figure out a valid directory - returns empty if nothing available
-            $testdir = File::Temp::tempdir('dbdpg_testdatabase_XXXXXX', TMPDIR => 1, CLEANUP => 0);
+            $testdir = exists $ENV{DBDPG_TEMPDIR} ?
+                File::Temp::tempdir("$ENV{DBDPG_TEMPDIR}/dbdpg_testdatabase_XXXXXX", TMPDIR => 1, CLEANUP => 0) :
+                File::Temp::tempdir('dbdpg_testdatabase_XXXXXX', TMPDIR => 1, CLEANUP => 0);
 
             my $readme = "$testdir/README";
             if (open $fh, '>', $readme) {
@@ -446,12 +448,22 @@ version: $version
             $resetxlog =~ s/pg_resetxlog/pg_resetwal/;
         }
         eval {
-            $info = qx{$resetxlog --help};
+            if ($su) {
+                $info = qx{su -m "$testuser" -c "$resetxlog --help"};
+            }
+            else {
+                $info = qx{$resetxlog --help};
+            }
         };
         if (! $@ and $info =~ /XID/) {
             if (! -e "$testdir/data/postmaster.pid") {
                 eval {
-                    $info = qx{ $resetxlog -o 2222333344 $testdir/data };
+                    if ($su) {
+                        $info = qx{ su -m "$testuser" -c "$resetxlog -o 2222333344 $testdir/data" };
+                    }
+                    else {
+                        $info = qx{ $resetxlog -o 2222333344 $testdir/data };
+                    }
                 };
                 ## We don't really care if it worked or not!
             }
@@ -813,7 +825,9 @@ sub get_test_settings {
 
     if (!$testdir) {
         my $dir = getcwd();
-        $testdir = "$dir/dbdpg_test_database";
+        $testdir = exists $ENV{DBDPG_TEMPDIR} ?
+            File::Temp::tempdir("$ENV{DBDPG_TEMPDIR}/dbdpg_testdatabase_XXXXXX", TMPDIR => 1, CLEANUP => 0) :
+            "$dir/dbdpg_test_database";
     }
 
     ## Allow forcing of ENV variables

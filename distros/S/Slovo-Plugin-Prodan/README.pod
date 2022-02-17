@@ -1,0 +1,196 @@
+=encoding utf8
+
+=head1 NAME
+
+Slovo::Plugin::Prodan - Make and manage sales in your Slovo-based site
+
+=head1 SYNOPSIS
+
+  # In slovo.conf
+  load_plugins => [
+    #...
+    'Themes::Malka',
+    {
+      Prodan => {
+        migrate          => 1,
+        gdpr_consent_url => '/ѿносно/условия.bg.html',
+        econt            => {
+          shop_id                 => $ENV{SLOVO_PRODAN_SHOP_ID},
+          private_key             => $ENV{SLOVO_PRODAN_PRIVATE_KEY},
+          shippment_calc_url      => 'https://delivery.econt.com/customer_info.php',
+          crupdate_order_endpoint =>
+            'https://delivery.econt.com/services/OrdersService.updateOrder.json',
+          create_awb_endpoint =>
+            'https://delivery.econt.com/services/OrdersService.createAWB.json'
+        }}
+    },
+    #...
+  ],
+
+=head1 DESCRIPTION
+
+The word про̀дан (прода̀жба) in Bulgarian means sale. Roots are found in Old
+Common Slavic (Old Bulgarian) I<проданьѥ>. Here is an exerpt from Codex
+Suprasliensis(331.27) where this word was witnessed: I<сꙑнъ божии. вол҄еѭ
+на сьпасьнѫѭ страсть съ вами придетъ. и на B<продании> станетъ.
+искѹпѹѭштааго животворьноѭ кръвьѭ. своеѭ миръ.>
+
+L<Slovo::Plugin::Prodan> is a L<Mojolicious::Plugin> that extends a
+Slovo-based site and turns it into an online shop. 
+
+=head1 FEATURES
+
+In this edition of L<Slovo::Plugin::Prodan> we implement the following features:
+
+=head2 A Shopping cart
+
+A jQuery and localStorage based shopping cart. Two static files contain
+the implementation and they can be inflated. The files are
+C</css/cart.css> and C</js/cart.js>. You should inflate these files into
+your public forlder C<domove/example.com/public> for the domain on which you
+will use it. Even not inflated these will be referred from any page of the
+site. The site layout C<layouts/site.html.ep> includes automatically these
+two static files if this plugin is loaded.
+
+  # Inflate new static files from Slovo::Plugin::Prodan
+  bin/slovo inflate --class Slovo::Plugin::Prodan -p --path domove/xn--b1arjbl.xn--90ae/public
+
+To add a product to your cart and make an order, you need a button, containing
+the product data. For example:
+
+    <button class="primary sharer button add-to-cart"
+        title="книжно издание" data-sku="9786199169001" 
+        data-title="Житие на света Петка Българска от свети патриарх Евтимий"
+        data-weight="0.5" data-price="7.00"><img
+        src="/css/malka/book-open-page-variant-outline.svg">
+        <img src="/img/cart-plus-white.svg"></button>
+
+See "A template..." below.
+
+=head2 Delivery of sold goods
+
+A "Pay on delivery" integration with Bulgarian currier L<Econt (in
+Bulgarian)|https://www.econt.com/developers/43-kakvo-e-dostavi-s-ekont.html>.
+
+=head2 Products
+
+Products - a products SQL table to populate your pages with products. You
+create a page with several articles (celini) in it. These celini will be the
+pages for the products. You prepare a YAML file with products. Each product
+C<alias> property must match exactly the celina C<alias> and C<data_type>
+on wich this product  will be placed. See C<t/products.yaml>
+and C<t/update_products.yaml> for examples. See
+L<Slovo::Command::prodan::products> on how to add and update products.
+
+=head2 Products template
+
+A template for displaying products within a C<celina>. You can modify this
+template as you wish to display other types of products - not just books as it
+is now. See C<partials/_kniga.html.ep> inlined in this file's C<__DATA__>
+section. It of course can be inflated using
+L<Slovo::Command::Author::inflate>. The template produces the HTML from the
+products table, including the button mentioned above already.
+
+  # Add the template form Prodan
+  bin/slovo inflate --class Slovo::Plugin::Prodan \
+    -t --path domove/xn--b1arjbl.xn--90ae/templates/themes/malka
+
+
+=head2 GDPR and Cookies consent
+
+A GDPR and cookies consent alert in the footer which upon click leads to the
+page (celina) where all conditions on using the site can be described. When the
+user clicks on the link to the I<Consent> page a flag in C<localStorage> is put
+so the alert is not shown any more. This flag disappears if the user clears any
+site data and the alert will appear again if the user vists the  site again.
+The Consent celina is created automatically in the localhost domain as an
+example. Search for C<gdpr_consent> in the source of this module to see how it
+is implemented.
+
+=head2 TODO some day
+
+=over 1
+
+=item Invoices - generate an invoice in PDF via headless LibreOffice instance
+on your server.
+
+=item Merchants - a merchants SQL table with Open API to manage and
+automatically populate invoices.
+
+=item Other "Pay on Delivery" providers. Feel free to contibute yours. 
+
+=item Other types of Payments and/or Online Payment Providers like online POS
+Terminals etc.
+
+=back
+
+=head1 METHODS
+
+The usual method is implemented.
+
+=head2 register
+
+Prepends the class to renderer and static classes. Adds some REST API routes,
+configures the deliverer.
+
+=head1 EMBEDDED FILES
+
+    @@ css/cart.css
+    @@ js/cart.js
+    @@ img/arrow-collapse-all.svg
+    @@ img/cart-arrow-right.svg
+    @@ img/cart.svg
+    @@ img/cart-check.svg
+    @@ img/cart-off.svg
+    @@ img/cart-minus.svg
+    @@ img/cart-plus-white.svg
+    @@ img/cart-plus.svg
+    @@ img/cart-remove.svg
+    @@ img/econt.svg
+    @@ partials/_kniga.html.ep
+    @@ partials/_gdpr_consent.html.ep
+    @@ resources/data/prodan_migrations.sql
+
+=head1 SEE ALSO
+
+L<Slovo::Command::prodan::products>,
+L<Slovo>,
+L<Mojolicious::Guides::Tutorial/Stash and templates>,
+L<Mojolicious/renderer>,
+L<Mojolicious::Renderer>,
+L<Mojolicious::Guides::Rendering/Bundling assets with plugins>,
+L<Slovo::Command::Author::inflate>
+
+=head1 AUTHOR
+
+    Красимир Беров
+    CPAN ID: BEROV
+    berov на cpan точка org
+    http://слово.бг
+
+=head1 CONTRIBUTORS
+
+Ordered by time of first commit.
+
+=over
+
+=item * Your Name
+
+=item * Someone Else
+
+=item * Another Contributor
+
+=back
+
+=head1 COPYRIGHT
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+
+This distribution contains icons from L<https://materialdesignicons.com/> and
+may contain other free software which belongs to their respective authors.
+

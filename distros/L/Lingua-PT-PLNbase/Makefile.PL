@@ -14,9 +14,10 @@ WriteMakefile(
 				    'Test::Pod::Coverage' => '0.08',
 				    'Lingua::PT::Abbrev' => '0.05',
                                     'File::Temp' => 0,
-                                    'File::Slurp' => 0,
+                                    'Perl6::Slurp' => 0,
                                    },
 	      PREREQ_PM         => {
+				    'utf8::all' => 0,
 				    'Lingua::PT::Abbrev' => '0.05',
 				   },
 	      ($] >= 5.005 ?     ## Add these new keywords supported since 5.005

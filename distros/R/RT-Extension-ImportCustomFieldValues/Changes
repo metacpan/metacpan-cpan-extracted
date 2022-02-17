@@ -1,5 +1,8 @@
 Revision history for RT-Extension-ImportCustomFieldValues
 
+0.03 2022-02-11
+ - Fix handling of utf-8 chars
+
 0.02 2022-02-07
  - Check permissions before allowing users to use this import tool
 

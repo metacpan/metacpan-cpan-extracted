@@ -36,6 +36,7 @@
 #include "spvm_check_ast_info.h"
 #include "spvm_string_buffer.h"
 #include "spvm_use.h"
+#include "spvm_implement.h"
 
 void SPVM_OP_CHECKER_free_mem_id(SPVM_COMPILER* compiler, SPVM_LIST* mem_stack, SPVM_MY* my) {
   (void)compiler;
@@ -1180,15 +1181,19 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                   SPVM_CLASS* class = SPVM_HASH_fetch(compiler->class_symtable, type->basic_type->name, strlen(type->basic_type->name));
                   
                   if (class->category == SPVM_CLASS_C_CATEGORY_CALLBACK) {
-                    SPVM_COMPILER_error(compiler, "Can't create object of callback class at %s line %d", op_cur->file, op_cur->line);
+                    SPVM_COMPILER_error(compiler, "Can't create the object of a callback type at %s line %d", op_cur->file, op_cur->line);
+                    return;
+                  }
+                  else if (class->category == SPVM_CLASS_C_CATEGORY_INTERFACE) {
+                    SPVM_COMPILER_error(compiler, "Can't create the object of a interface type at %s line %d", op_cur->file, op_cur->line);
                     return;
                   }
                   else if (class->category == SPVM_CLASS_C_CATEGORY_MULNUM) {
-                    SPVM_COMPILER_error(compiler, "Can't create object of mulnum_t class at %s line %d", op_cur->file, op_cur->line);
+                    SPVM_COMPILER_error(compiler, "Can't create the object of a multi numeric type at %s line %d", op_cur->file, op_cur->line);
                     return;
                   }
                   else if (class->flag & SPVM_CLASS_C_FLAG_POINTER) {
-                    SPVM_COMPILER_error(compiler, "Can't create object of struct class at %s line %d", op_cur->file, op_cur->line);
+                    SPVM_COMPILER_error(compiler, "Can't create the object of a pointer type at %s line %d", op_cur->file, op_cur->line);
                     return;
                   }
                   
@@ -1822,6 +1827,17 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               
               break;
             }
+            case SPVM_OP_C_ID_COPY: {
+              SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
+              
+              // Operand must be numeric type
+              if (!SPVM_TYPE_is_object_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
+                SPVM_COMPILER_error(compiler, "Operand of unary + operator must be a numeric type at %s line %d", op_cur->file, op_cur->line);
+                return;
+              }
+              
+              break;
+            }
             case SPVM_OP_C_ID_MINUS: {
               SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
               
@@ -2212,7 +2228,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               first_type = SPVM_OP_get_type(compiler, op_cur->first);
 
               if (!SPVM_TYPE_is_string_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
-                SPVM_COMPILER_error(compiler, "die argument must be string type at %s line %d", op_cur->file, op_cur->line);
+                SPVM_COMPILER_error(compiler, "The operand of the die statement must be string type at %s line %d", op_cur->file, op_cur->line);
                 return;
               }
               break;
@@ -2230,7 +2246,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               first_type = SPVM_OP_get_type(compiler, op_cur->first);
               
               if (!SPVM_TYPE_is_string_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
-                SPVM_COMPILER_error(compiler, "warn argument must be string type at %s line %d", op_cur->file, op_cur->line);
+                SPVM_COMPILER_error(compiler, "The operand of the warn statement must be a string type at %s line %d", op_cur->file, op_cur->line);
                 return;
               }
               break;
@@ -2248,7 +2264,29 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               first_type = SPVM_OP_get_type(compiler, op_cur->first);
               
               if (!SPVM_TYPE_is_string_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
-                SPVM_COMPILER_error(compiler, "print argument must be string type at %s line %d", op_cur->file, op_cur->line);
+                SPVM_COMPILER_error(compiler, "The operand of the print statement must be a string type at %s line %d", op_cur->file, op_cur->line);
+                return;
+              }
+              break;
+            }
+            case SPVM_OP_C_ID_MAKE_READ_ONLY: {
+              SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
+              
+              first_type = SPVM_OP_get_type(compiler, op_cur->first);
+              
+              if (!SPVM_TYPE_is_string_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
+                SPVM_COMPILER_error(compiler, "The operand of the make_read_only statement must be a string type at %s line %d", op_cur->file, op_cur->line);
+                return;
+              }
+              break;
+            }
+            case SPVM_OP_C_ID_IS_READ_ONLY: {
+              SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
+              
+              first_type = SPVM_OP_get_type(compiler, op_cur->first);
+              
+              if (!SPVM_TYPE_is_string_type(compiler, first_type->basic_type->id, first_type->dimension, first_type->flag)) {
+                SPVM_COMPILER_error(compiler, "The operand of the is_read_only operator must be a string type at %s line %d", op_cur->file, op_cur->line);
                 return;
               }
               break;
@@ -2294,7 +2332,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               SPVM_OP* op_var = op_cur->first;
               SPVM_TYPE* var_type = SPVM_OP_get_type(compiler, op_var);
               
-              if (!(SPVM_TYPE_is_numeric_ref_type(compiler, var_type->basic_type->id, var_type->dimension, var_type->flag) || SPVM_TYPE_is_value_ref_type(compiler, var_type->basic_type->id, var_type->dimension, var_type->flag))) {
+              if (!(SPVM_TYPE_is_numeric_ref_type(compiler, var_type->basic_type->id, var_type->dimension, var_type->flag) || SPVM_TYPE_is_multi_numeric_ref_type(compiler, var_type->basic_type->id, var_type->dimension, var_type->flag))) {
                 SPVM_COMPILER_error(compiler, "Dereference target must be numeric reference type or value reference type at %s line %d", op_cur->file, op_cur->line);
                 return;
               }
@@ -2442,7 +2480,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               SPVM_OP* op_list_args = op_cur->last;
               
               SPVM_CALL_METHOD* call_method = op_call_method->uv.call_method;
-              const char* method_name = call_method->method->op_name->uv.name;
+              const char* method_name = call_method->method->name;
               
               if (call_method->method->is_class_method) {
                 if (!call_method->is_class_method_call) {
@@ -2704,35 +2742,41 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                   // $object->foo
                   // [After]
                   // $object->{foo}
-                  const char* field_name = call_method->method->accessor_original_name;
-
-                  SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_cur);
-
-                  SPVM_OP_cut_op(compiler, call_method->op_invocant);
-
-                  SPVM_OP* op_name_field_access = SPVM_OP_new_op_name(compiler, field_name, op_cur->file, op_cur->line);
-                  SPVM_OP* op_field_access = SPVM_OP_build_field_access(compiler, call_method->op_invocant, op_name_field_access);
-                  op_field_access->uv.field_access->inline_expansion = 1;
-
-                  // Replace parent call sub op's op_invocant
-                  SPVM_OP* op_parent_list =  SPVM_OP_get_parent(compiler, op_stab);
+                  
+                  // If the parent is a method call, no inline expansion
+                  // This maybe ok, but I don't resolve this problem now
+                  int32_t do_inline_expansion = 1;
+                  // Replace parent call method op's op_invocant
+                  SPVM_OP* op_parent_list =  SPVM_OP_get_parent(compiler, op_cur);
                   if (op_parent_list->id == SPVM_OP_C_ID_LIST) {
                     SPVM_OP* op_parent_call_method =  SPVM_OP_get_parent(compiler, op_parent_list);
                     if (op_parent_call_method->id == SPVM_OP_C_ID_CALL_METHOD) {
                       if (!op_parent_call_method->uv.call_method->is_class_method_call) {
-                        op_parent_call_method->uv.call_method->op_invocant = op_field_access;
+                        do_inline_expansion = 0;
                       }
                     }
                   }
                   
-                  SPVM_OP_replace_op(compiler, op_stab, op_field_access);
+                  if (do_inline_expansion) {
+                    const char* field_name = call_method->method->accessor_original_name;
+
+                    SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_cur);
                   
-                  SPVM_OP_CHECKER_check_tree(compiler, op_field_access, check_ast_info);
-                  
-                  op_cur = op_field_access;
+                    SPVM_OP_cut_op(compiler, call_method->op_invocant);
+
+                    SPVM_OP* op_name_field_access = SPVM_OP_new_op_name(compiler, field_name, op_cur->file, op_cur->line);
+                    SPVM_OP* op_field_access = SPVM_OP_build_field_access(compiler, call_method->op_invocant, op_name_field_access);
+                    op_field_access->uv.field_access->inline_expansion = 1;
+
+                    SPVM_OP_replace_op(compiler, op_stab, op_field_access);
+                    
+                    SPVM_OP_CHECKER_check_tree(compiler, op_field_access, check_ast_info);
+                    op_cur = op_field_access;
+                  }
                 }
                 // Field setter is replaced to field access
                 else if (call_method->method->is_field_setter) {
+                  
                   // [Before]
                   // $object->set_foo($value)
                   // [After]
@@ -2981,13 +3025,13 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               SPVM_TYPE* invoker_type = SPVM_OP_get_type(compiler, op_term_invocker);
               int32_t is_valid_invoker_type;
               if (invoker_type) {
-                if (SPVM_TYPE_is_module_type(compiler, invoker_type->basic_type->id, invoker_type->dimension, invoker_type->flag)) {
+                if (SPVM_TYPE_is_class_type(compiler, invoker_type->basic_type->id, invoker_type->dimension, invoker_type->flag)) {
                   is_valid_invoker_type = 1;
                 }
                 else if (SPVM_TYPE_is_multi_numeric_type(compiler, invoker_type->basic_type->id, invoker_type->dimension, invoker_type->flag)) {
                   is_valid_invoker_type = 1;
                 }
-                else if (SPVM_TYPE_is_value_ref_type(compiler, invoker_type->basic_type->id, invoker_type->dimension, invoker_type->flag)) {
+                else if (SPVM_TYPE_is_multi_numeric_ref_type(compiler, invoker_type->basic_type->id, invoker_type->dimension, invoker_type->flag)) {
                   is_valid_invoker_type = 1;
                 }
                 else {
@@ -2998,7 +3042,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 is_valid_invoker_type = 0;
               }
               if (!is_valid_invoker_type) {
-                SPVM_COMPILER_error(compiler, "Invocker of field access must be class type, or multi numeric type, or numeric reference type at %s line %d", op_cur->file, op_cur->line);
+                SPVM_COMPILER_error(compiler, "The invocant of the field access must be a class type, or a multi numeric type, or a multi numeric reference type at %s line %d", op_cur->file, op_cur->line);
                 return;
               }
               
@@ -3216,6 +3260,19 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               
               if (!SPVM_TYPE_is_object_type(compiler, type->basic_type->id, type->dimension, type->flag)) {
                 SPVM_COMPILER_error(compiler, "isweak is only used for object field \"%s\" \"%s\" at %s line %d", field->class->op_name->uv.name, field->op_name->uv.name, op_cur->file, op_cur->line);
+                return;
+              }
+              
+              break;
+            }
+            case SPVM_OP_C_ID_HAS_IMPLEMENT: {
+              SPVM_OP* op_var = op_cur->first;
+              SPVM_OP* op_name = op_cur->last;
+              
+              SPVM_TYPE* type = SPVM_OP_get_type(compiler, op_var);
+              
+              if (!(SPVM_TYPE_is_class_type(compiler, type->basic_type->id, type->dimension, type->flag) || SPVM_TYPE_is_interface_type(compiler, type->basic_type->id, type->dimension, type->flag))) {
+                SPVM_COMPILER_error(compiler, "The invocant of the has_implement operator must be a class type or an interface type at %s line %d", op_cur->file, op_cur->line);
                 return;
               }
               
@@ -3560,11 +3617,6 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
             }
           }
           
-          if (class->category == SPVM_CLASS_C_CATEGORY_CALLBACK && (method->op_block || method->flag & SPVM_METHOD_C_FLAG_NATIVE)) {
-            SPVM_COMPILER_error(compiler, "Callback sub can't have implementation at %s line %d", method->op_method->file, method->op_method->line);
-            return;
-          }
-          
           // Check method
           if (!(method->flag & SPVM_METHOD_C_FLAG_NATIVE)) {
             SPVM_CHECK_AST_INFO check_ast_info_struct = {0};
@@ -3713,6 +3765,8 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                         case SPVM_OP_C_ID_DIE:
                         case SPVM_OP_C_ID_WARN:
                         case SPVM_OP_C_ID_PRINT:
+                        case SPVM_OP_C_ID_MAKE_READ_ONLY:
+                        case SPVM_OP_C_ID_IS_READ_ONLY:
                         case SPVM_OP_C_ID_LAST:
                         case SPVM_OP_C_ID_NEXT:
                         case SPVM_OP_C_ID_BREAK:
@@ -3734,6 +3788,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                         case SPVM_OP_C_ID_RIGHT_LOGICAL_SHIFT:
                         case SPVM_OP_C_ID_MINUS:
                         case SPVM_OP_C_ID_PLUS:
+                        case SPVM_OP_C_ID_COPY:
                         case SPVM_OP_C_ID_ARRAY_LENGTH:
                         case SPVM_OP_C_ID_STRING_LENGTH:
                         case SPVM_OP_C_ID_NEW:
@@ -3846,7 +3901,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
             assert(method->class->module_file);
             
             // Add op my if need
-            if (method->class->category == SPVM_CLASS_C_CATEGORY_CALLBACK) {
+            if (method->class->category == SPVM_CLASS_C_CATEGORY_CALLBACK || method->class->category == SPVM_CLASS_C_CATEGORY_INTERFACE) {
               int32_t arg_index;
               for (arg_index = 0; arg_index < method->args->length; arg_index++) {
                 SPVM_MY* arg_my = SPVM_LIST_fetch(method->args, arg_index);
@@ -4613,8 +4668,8 @@ SPVM_OP* SPVM_OP_CHECKER_check_assign(SPVM_COMPILER* compiler, SPVM_TYPE* dist_t
         // Dist type is class or callback
         else if (dist_type->dimension == 0){
           // Dist type is class
-          if (SPVM_TYPE_is_module_type(compiler, dist_type->basic_type->id, dist_type->dimension, dist_type->flag)) {
-            if (SPVM_TYPE_is_module_type(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag)) {
+          if (SPVM_TYPE_is_class_type(compiler, dist_type->basic_type->id, dist_type->dimension, dist_type->flag)) {
+            if (SPVM_TYPE_is_class_type(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag)) {
               if (dist_type->basic_type->id == src_type->basic_type->id) {
                 can_assign = 1;
               }
@@ -4629,13 +4684,33 @@ SPVM_OP* SPVM_OP_CHECKER_check_assign(SPVM_COMPILER* compiler, SPVM_TYPE* dist_t
           // Dist type is callback
           else if (SPVM_TYPE_is_callback_type(compiler, dist_type->basic_type->id, dist_type->dimension, dist_type->flag)) {
             
-            // Source type is class or callback
+            // Source type is class, callback or interface
             if (
-              SPVM_TYPE_is_module_type(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag)
+              SPVM_TYPE_is_class_type(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag)
               || SPVM_TYPE_is_callback_type(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag)
+              || SPVM_TYPE_is_interface_type(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag)
             )
             {
               can_assign = SPVM_TYPE_has_callback(
+                compiler,
+                src_type->basic_type->id, src_type->dimension, src_type->flag,
+                dist_type->basic_type->id, dist_type->dimension, dist_type->flag
+              );
+            }
+            else {
+              can_assign = 0;
+            }
+          }
+          // Dist type is interface
+          else if (SPVM_TYPE_is_interface_type(compiler, dist_type->basic_type->id, dist_type->dimension, dist_type->flag)) {
+            // Source type is class, callback, or interface
+            if (
+              SPVM_TYPE_is_class_type(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag)
+              || SPVM_TYPE_is_callback_type(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag)
+              || SPVM_TYPE_is_interface_type(compiler, src_type->basic_type->id, src_type->dimension, src_type->flag)
+            )
+            {
+              can_assign = SPVM_TYPE_has_interface(
                 compiler,
                 src_type->basic_type->id, src_type->dimension, src_type->flag,
                 dist_type->basic_type->id, dist_type->dimension, dist_type->flag
@@ -4736,7 +4811,7 @@ void SPVM_OP_CHECKER_resolve_types(SPVM_COMPILER* compiler) {
     
     // Reference type must be numeric refernce type or value reference type
     if (SPVM_TYPE_is_ref_type(compiler, type->basic_type->id, type->dimension, type->flag)) {
-      if (!(SPVM_TYPE_is_numeric_ref_type(compiler, type->basic_type->id, type->dimension, type->flag) || SPVM_TYPE_is_value_ref_type(compiler, type->basic_type->id, type->dimension, type->flag))) {
+      if (!(SPVM_TYPE_is_numeric_ref_type(compiler, type->basic_type->id, type->dimension, type->flag) || SPVM_TYPE_is_multi_numeric_ref_type(compiler, type->basic_type->id, type->dimension, type->flag))) {
         SPVM_COMPILER_error(compiler, "Reference type must be numeric refernce type or mulnum_t reference type \"%s\"\\ at %s line %d", basic_type_name, op_type->file, op_type->line);
         return;
       }
@@ -5148,7 +5223,7 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
         SPVM_TYPE* arg_type = SPVM_OP_get_type(compiler, arg_my->op_my);
         
         int32_t is_arg_type_is_multi_numeric_type = SPVM_TYPE_is_multi_numeric_type(compiler, arg_type->basic_type->id, arg_type->dimension, arg_type->flag);
-        int32_t is_arg_type_is_value_ref_type = SPVM_TYPE_is_value_ref_type(compiler, arg_type->basic_type->id, arg_type->dimension, arg_type->flag);
+        int32_t is_arg_type_is_value_ref_type = SPVM_TYPE_is_multi_numeric_ref_type(compiler, arg_type->basic_type->id, arg_type->dimension, arg_type->flag);
         
         if (is_arg_type_is_multi_numeric_type || is_arg_type_is_value_ref_type) {
           arg_allow_count += arg_type->basic_type->class->fields->length;
@@ -5237,6 +5312,35 @@ void SPVM_OP_CHECKER_resolve_classes(SPVM_COMPILER* compiler) {
     }
   }
   
+  // classes must be implement the interface classes 
+  for (int32_t class_index = compiler->cur_class_base; class_index < compiler->classes->length; class_index++) {
+    SPVM_CLASS* class = SPVM_LIST_fetch(compiler->classes, class_index);
+    
+    // Add the interfaces to the class
+    for (int32_t i = 0; i < class->op_implements->length; i++) {
+      SPVM_OP* op_implement = SPVM_LIST_fetch(class->op_implements, i);
+      
+      SPVM_IMPLEMENT* implement = op_implement->uv.implement;
+      
+      SPVM_OP* op_type_implement = implement->op_type;
+      SPVM_TYPE* implement_type = op_type_implement->uv.type;
+      
+      SPVM_BASIC_TYPE* implement_basic_type = implement_type->basic_type;
+      
+      SPVM_CLASS* implement_class = implement_basic_type->class;
+      
+      if (implement_class->category != SPVM_CLASS_C_CATEGORY_INTERFACE) {
+        SPVM_COMPILER_error(compiler, "The operand of the implement statment must be the interface class at %s line %d", implement_class->name, op_implement->file, op_implement->line);
+        return;
+      }
+      
+      SPVM_CLASS* found_implement_class = SPVM_HASH_fetch(class->interface_class_symtable, implement_class->name, strlen(implement_class->name));
+      if (!found_implement_class) {
+        SPVM_HASH_insert(class->interface_class_symtable, implement_class->name, strlen(implement_class->name), implement_class);
+      }
+    }
+  }
+
   for (int32_t class_index = compiler->cur_class_base; class_index < compiler->classes->length; class_index++) {
     SPVM_CLASS* class = SPVM_LIST_fetch(compiler->classes, class_index);
     // Check methods

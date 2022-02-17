@@ -55,6 +55,16 @@ extern "C" {
 #endif
 
 
+#define UNBOUND_VERSION	( (UNBOUND_VERSION_MAJOR*1000) + UNBOUND_VERSION_MINOR )
+#define unimplemented	croak( "not implemented  %s line %d", __FILE__, __LINE__ )
+
+#if (UNBOUND_VERSION < 1009)
+int ub_ctx_set_stub(struct ub_ctx* ctx, const char* zone, const char* addr, int isprime) { unimplemented; }
+int ub_ctx_add_ta_autr(struct ub_ctx* ctx, const char* fname) { unimplemented; }
+int ub_ctx_set_tls(struct ub_ctx* ctx, int tls) { unimplemented; }
+#endif
+
+
 #define checkerr(arg)	checkret( (arg), __LINE__ )
 static void checkret(const int err, int line)
 {
@@ -70,9 +80,9 @@ typedef struct av* Net__DNS__Resolver__Unbound__Handle;
 static void async_callback(void* mydata, int err, struct ub_result* result)
 {
 	dTHX;	/* fetch context */
-	AV* handle = (AV*) mydata;
-	av_push(handle, newSViv(err) );
-	av_push(handle, newSViv(PTR2IV(result)) );
+	AV* av_ptr = (AV*) mydata;
+	av_push(av_ptr, newSViv(err) );
+	av_push(av_ptr, newSViv(PTR2IV(result)) );
 	return;
 }
 
@@ -85,7 +95,7 @@ async_id(struct av* handle)
     INIT:
 	SV** index = av_fetch(handle, 0, 0);
     CODE:
-	RETVAL = SvIV(*index);
+	RETVAL = SvIVX(*index);
     OUTPUT:
 	RETVAL
 
@@ -94,8 +104,7 @@ err(struct av* handle)
     INIT:
 	SV** index = av_fetch(handle, 1, 0);
     CODE:
-	RETVAL = 0;
-	if ( index ) RETVAL = SvIV(*index);
+	RETVAL = index ? SvIVX(*index) : 0;
     OUTPUT:
 	RETVAL
 
@@ -105,7 +114,10 @@ result(struct av* handle)
 	SV** index = av_fetch(handle, 2, 0);
     CODE:
 	RETVAL = NULL;
-	if ( index ) RETVAL = INT2PTR(struct ub_result*, SvIV(*index) );
+	if ( index ) {
+		RETVAL = INT2PTR(struct ub_result*, SvIVX(*index) );
+		av_pop(handle);		/* avoid ub_result double-free vulnerability */
+	}
     OUTPUT:
 	RETVAL
 
@@ -114,8 +126,7 @@ waiting(struct av* handle)
     INIT:
 	SV** index = av_fetch(handle, 1, 0);
     CODE:
-	RETVAL = 1;		/* clumsy, but portable */
-	if ( index ) RETVAL = 0;
+	RETVAL = index ? 0 : 1;
     OUTPUT:
 	RETVAL
 
@@ -162,10 +173,8 @@ MODULE = Net::DNS::Resolver::Unbound	PACKAGE = Net::DNS::Resolver::Unbound::Cont
 
 Net::DNS::Resolver::Unbound::Context
 new(void)
-    INIT:
-	struct ub_ctx* context = ub_ctx_create();
     CODE:
-	RETVAL = context;
+	RETVAL = ub_ctx_create();
     OUTPUT:
 	RETVAL
 
@@ -283,13 +292,12 @@ ub_resolve(struct ub_ctx* ctx, SV* name, int rrtype, int rrclass)
 Net::DNS::Resolver::Unbound::Handle
 ub_resolve_async(struct ub_ctx* ctx, SV* name, int rrtype, int rrclass)
     INIT:
-	struct av* array = newAV();
 	int async_id = 0;
     CODE:
+	RETVAL = newAV();
 	checkerr( ub_resolve_async(ctx, (const char*) SvPVX(name), rrtype, rrclass,
-					(void*) array, async_callback, &async_id) );
-	av_push(array, newSViv(async_id) );
-	RETVAL = array;
+					(void*) RETVAL, async_callback, &async_id) );
+	av_push(RETVAL, newSViv(async_id) );
     OUTPUT:
 	RETVAL
 
@@ -314,25 +322,22 @@ ub_strerror(int err)
 
 Net::DNS::Resolver::Unbound::Handle
 emulate_error(int async_id, int err, ...)
-    INIT:
-	struct ub_result* result = NULL;
     CODE:
 	RETVAL = newAV();
 	av_push(RETVAL, newSViv(async_id) );
 	av_push(RETVAL, newSViv(err) );
-	av_push(RETVAL, newSViv(PTR2IV(result)) );
+	av_push(RETVAL, newSViv(PTR2IV(NULL)) );
     OUTPUT:
 	RETVAL
 
 Net::DNS::Resolver::Unbound::Handle
 emulate_wait(int async_id)
-    INIT:
-	struct av* array = newAV();
     CODE:
-	av_push(array, newSViv(async_id) );
-	RETVAL = array;
+	RETVAL = newAV();
+	av_push(RETVAL, newSViv(async_id) );
     OUTPUT:
 	RETVAL
+
 
 #ifdef croak_memory_wrap
 void

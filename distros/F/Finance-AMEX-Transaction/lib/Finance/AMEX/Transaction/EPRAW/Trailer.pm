@@ -1,5 +1,5 @@
-package Finance::AMEX::Transaction::EPRAW::Trailer;
-$Finance::AMEX::Transaction::EPRAW::Trailer::VERSION = '0.004';
+package Finance::AMEX::Transaction::EPRAW::Trailer 0.005;
+
 use strict;
 use warnings;
 
@@ -9,8 +9,8 @@ use base 'Finance::AMEX::Transaction::EPRAW::Base';
 
 sub field_map {
   return {
-    DF_TRL_RECORD_TYPE   => [1, 5],
-    DF_TRL_DATE          => [6, 8],
+    DF_TRL_RECORD_TYPE   => [1,  5],
+    DF_TRL_DATE          => [6,  8],
     DF_TRL_TIME          => [14, 4],
     DF_TRL_FILE_ID       => [18, 6],
     DF_TRL_FILE_NAME     => [24, 20],
@@ -43,7 +43,7 @@ Finance::AMEX::Transaction::EPRAW::Trailer - Parse AMEX Reconciliation Files (EP
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -89,6 +89,14 @@ This will always return the string TRAILER.
 Returns the full line that is represented by this object.
 
  print $record->line;
+
+=head2 field_map
+
+Returns a hashref where the name is the record name and 
+the value is an arrayref of the start position and length of that field.
+
+ # print the start position of the DF_TRL_DATE field
+ print $record->field_map->{DF_TRL_DATE}->[0]; # 6
 
 =head2 DF_TRL_RECORD_TYPE
 
@@ -144,7 +152,7 @@ This field contains the Record Count for all items in this data file, including 
 
 =head1 NAME
 
-Finance::AMEX::Transaction::EPRAW::Footer - Object methods for AMEX Reconciliation file footer records.
+Finance::AMEX::Transaction::EPRAW::Trailer - Object methods for AMEX Reconciliation file footer records.
 
 =head1 AUTHOR
 
@@ -152,7 +160,7 @@ Tom Heady <cpan@punch.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by ZipRecruiter.
+This software is copyright (c) 2022 by ZipRecruiter/Tom Heady.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

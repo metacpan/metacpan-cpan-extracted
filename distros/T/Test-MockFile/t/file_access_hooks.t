@@ -13,7 +13,7 @@ use Fcntl;
 
 #use Errno qw/ENOENT EBADF/;
 
-use Test::MockFile qw/strict/;    # Everything below this can have its open overridden.
+use Test::MockFile;    # Everything below this can have its open overridden.
 my ( undef, $temp_file ) = tempfile();
 my $temp_dir = tempdir( CLEANUP => 1 );
 

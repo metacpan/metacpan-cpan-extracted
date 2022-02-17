@@ -7,7 +7,7 @@ use Test2::Bundle::Extended;
 use Test2::Tools::Explain;
 use Test2::Plugin::NoWarnings;
 use Test2::Tools::Exception qw< lives dies >;
-use Test::MockFile qw< strict >;
+use Test::MockFile;
 
 sub test_content_with_keywords {
     my ( $dirname, $dir_content ) = @_;

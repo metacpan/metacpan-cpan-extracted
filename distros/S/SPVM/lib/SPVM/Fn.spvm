@@ -47,6 +47,20 @@ class Fn : precompile {
     return $ret;
   }
 
+  static method chomp : void ($string : mutable string) {
+    
+    unless ($string) {
+      return;
+    }
+
+    my $length = length $string;
+    if ($length > 0) {
+      if ($string->[$length - 1] == '\n') {
+        &shorten($string, $length - 1);
+      }
+    }
+  }
+
   static method chompr : string ($string : string) {
     unless ($string) {
       return undef;
@@ -55,14 +69,14 @@ class Fn : precompile {
     my $new_string : string;
     my $length = length $string;
     if ($length == 0) {
-      $new_string = &copy_string($string);
+      $new_string = copy $string;
     }
     else {
       if ($string->[$length - 1] == '\n') {
-        $new_string = (string)&copy_array_range_byte((byte[])$string, 0, $length - 1);
+        $new_string = &substr($string, 0, $length - 1);
       }
       else {
-        $new_string = &copy_string($string);
+        $new_string = copy $string;
       }
     }
 
@@ -70,83 +84,23 @@ class Fn : precompile {
   }
 
   static method copy_array_byte : byte[] ($nums : byte[]) {
-    if ($nums == undef) {
-      return undef;
-    }
-    
-    my $length = @$nums;
-
-    my $new_nums = new byte[$length];
-
-    for (my $i = 0; $i < $length; $i++) {
-      $new_nums->[$i] = $nums->[$i];
-    }
-
-    return $new_nums;
+    return copy $nums;
   }
 
   static method copy_array_double : double[] ($nums : double[]) {
-    if ($nums == undef) {
-      return undef;
-    }
-    
-    my $length = @$nums;
-
-    my $new_nums = new double[$length];
-
-    for (my $i = 0; $i < $length; $i++) {
-      $new_nums->[$i] = $nums->[$i];
-    }
-
-    return $new_nums;
+    return copy $nums;
   }
 
   static method copy_array_float : float[] ($nums : float[]) {
-    if ($nums == undef) {
-      return undef;
-    }
-    
-    my $length = @$nums;
-
-    my $new_nums = new float[$length];
-
-    for (my $i = 0; $i < $length; $i++) {
-      $new_nums->[$i] = $nums->[$i];
-    }
-
-    return $new_nums;
+    return copy $nums;
   }
 
   static method copy_array_int : int[] ($nums : int[]) {
-    if ($nums == undef) {
-      return undef;
-    }
-    
-    my $length = @$nums;
-
-    my $new_nums = new int[$length];
-
-    for (my $i = 0; $i < $length; $i++) {
-      $new_nums->[$i] = $nums->[$i];
-    }
-
-    return $new_nums;
+    return copy $nums;
   }
 
   static method copy_array_long : long[] ($nums : long[]) {
-    if ($nums == undef) {
-      return undef;
-    }
-    
-    my $length = @$nums;
-
-    my $new_nums = new long[$length];
-
-    for (my $i = 0; $i < $length; $i++) {
-      $new_nums->[$i] = $nums->[$i];
-    }
-
-    return $new_nums;
+    return copy $nums;
   }
 
   static method copy_array_object : object[] ($objects : object[], $cloner : Cloner) {
@@ -415,19 +369,7 @@ class Fn : precompile {
   }
 
   static method copy_array_short : short[] ($nums : short[]) {
-    if ($nums == undef) {
-      return undef;
-    }
-    
-    my $length = @$nums;
-
-    my $new_nums = new short[$length];
-
-    for (my $i = 0; $i < $length; $i++) {
-      $new_nums->[$i] = $nums->[$i];
-    }
-
-    return $new_nums;
+    return copy $nums;
   }
 
   static method copy_array_string : string[] ($strings : string[]) {
@@ -440,22 +382,14 @@ class Fn : precompile {
     my $new_strings = new string[$length];
 
     for (my $i = 0; $i < $length; $i++) {
-      $new_strings->[$i] = Fn->copy_string($strings->[$i]);
+      $new_strings->[$i] = copy $strings->[$i];
     }
 
     return $new_strings;
   }
   
   static method copy_string : string ($string : string) {
-    unless ($string) {
-      return undef;
-    }
-    
-    my $string_length = length $string;
-    
-    my $bytes = (byte[])$string;
-
-    return (string)$bytes;
+    return copy $string;
   }
 
   native static method crand : int ();
@@ -1069,6 +1003,8 @@ class Fn : precompile {
     }
   }
 
+  native static method is_array : int ($object : object);
+
   static method is_blank : int ($code_point : int) {
 
     if ($code_point >= ' ' ||  $code_point <= '\t') {
@@ -1118,6 +1054,10 @@ class Fn : precompile {
       return 0;
     }
   }
+
+  native static method is_mulnum_array : int ($object : object);
+
+  native static method is_numeric_array : int ($object : object);
 
   # This is same as Perl \s
   static method is_perl_space : int ($code_point : int) {
@@ -1269,6 +1209,7 @@ class Fn : precompile {
     return (string)$new_string;
   }
 
+  native static method memcpy : void ($dest : object, $dest_byte_offset : int, $source : object, $source_byte_offset : int, $byte_length : int);
   native static method memcpy_byte : void ($dest : byte[], $dest_offset : int, $source : byte[], $source_offset : int, $length : int);
   native static method memcpy_double : void ($dest : double[], $dest_offset : int, $source : double[], $source_offset : int, $length : int);
   native static method memcpy_float : void ($dest : float[], $dest_offset : int, $source : float[], $source_offset : int, $length : int);
@@ -1276,6 +1217,7 @@ class Fn : precompile {
   native static method memcpy_long : void ($dest : long[], $dest_offset : int, $source : long[], $source_offset : int, $length : int);
   native static method memcpy_short : void ($dest : short[], $dest_offset : int, $source : short[], $source_offset : int, $length : int);
 
+  native static method memmove : void ($dest : object, $dest_byte_offset : int, $source : object, $source_byte_offset : int, $byte_length : int);
   native static method memmove_byte : void ($dest : byte[], $dest_offset : int, $source : byte[], $source_offset : int, $length : int);
   native static method memmove_double : void ($dest : double[], $dest_offset : int, $source : double[], $source_offset : int, $length : int);
   native static method memmove_float : void ($dest : float[], $dest_offset : int, $source : float[], $source_offset : int, $length : int);
@@ -1360,6 +1302,8 @@ class Fn : precompile {
     my $b = new byte[$length];
     Fn->_sort_byte_merge_sort($nums, $b, $offset, $offset + $length - 1, $length - 1, $comparator);
   }
+
+  native static method shorten : void ($string : mutable string, $length : int);
 
   static method sort_double : void ($nums : double[], $offset : int, $length : int, $comparator : Comparator::Double) {
     if ($nums == undef) {

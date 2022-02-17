@@ -1,7 +1,7 @@
 ---
 abstract: 'Writing documents for MsWord in HTML format'
 author:
-  - 'Laurent Dami <dami AT cpan.org>'
+  - 'Laurent Dami <dami@cpan.org>'
 build_requires: {}
 configure_requires:
   Module::Build: '0.42'
@@ -15,12 +15,10 @@ name: MsOffice-Word-HTML-Writer
 provides:
   MsOffice::Word::HTML::Writer:
     file: lib/MsOffice/Word/HTML/Writer.pm
-    version: '1.06'
+    version: '1.07'
 requires:
   Carp: '0'
-  Encode: '0'
   MIME::Base64: '0'
-  MIME::QuotedPrint: '0'
   MIME::Types: '0'
   Module::Build: '0'
   Params::Validate: '0'
@@ -29,5 +27,6 @@ requires:
   utf8: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.06'
+  repository: https://github.com/damil/MsOffice-Word-HTML-Writer
+version: '1.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

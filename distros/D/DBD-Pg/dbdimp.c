@@ -1,6 +1,6 @@
 /*
 
-  Copyright (c) 2002-2021 Greg Sabino Mullane and others: see the Changes file
+  Copyright (c) 2002-2022 Greg Sabino Mullane and others: see the Changes file
   Portions Copyright (c) 2002 Jeffrey W. Baker
   Portions Copyright (c) 1997-2000 Edmund Mergl
   Portions Copyright (c) 1994-1997 Tim Bunce
@@ -18,10 +18,6 @@
 #endif
 
 #define DEBUG_LAST_RESULT 0
-
-#define sword signed int
-#define sb2 signed short
-#define ub2 unsigned short
 
 #if PGLIBVERSION < 80300
 Oid lo_truncate (PGconn *conn, int fd, size_t len);
@@ -514,7 +510,7 @@ int dbd_db_ping (SV * dbh)
     }
 
     /* No matter what state we are in, send an empty query to the backend */
-    result = PQexec(imp_dbh->conn, "/* DBD::Pg ping test v3.15.0 */");
+    result = PQexec(imp_dbh->conn, "/* DBD::Pg ping test v3.15.1 */");
     status = PQresultStatus(result);
     PQclear(result);
     if (PGRES_FATAL_ERROR == status) {

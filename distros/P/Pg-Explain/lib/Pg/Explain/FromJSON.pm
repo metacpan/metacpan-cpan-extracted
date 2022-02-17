@@ -18,7 +18,7 @@ if ( grep /\P{ASCII}/ => @ARGV ) {
 # UTF8 boilerplace, per http://stackoverflow.com/questions/6162484/why-does-modern-perl-avoid-utf-8-by-default/
 
 use base qw( Pg::Explain::From );
-use JSON;
+use JSON::MaybeXS;
 use Carp;
 use Pg::Explain::JIT;
 use Pg::Explain::Buffers;
@@ -29,11 +29,11 @@ Pg::Explain::FromJSON - Parser for explains in JSON format
 
 =head1 VERSION
 
-Version 1.13
+Version 2.0
 
 =cut
 
-our $VERSION = '1.13';
+our $VERSION = '2.0';
 
 =head1 SYNOPSIS
 
@@ -78,7 +78,7 @@ sub parse_source {
     }
 
     # And now parse the json...
-    my $struct = from_json( $source );
+    my $struct = decode_json( $source );
     if (   ( 'ARRAY' eq ref $struct )
         && ( defined $struct->[ 0 ]->{ 'Plan' } ) )
     {

@@ -5,17 +5,16 @@ use warnings;
 
 use Test::More;
 
-package TestParser;
-use base qw( Parser::MGC );
+package TestParser {
+   use base qw( Parser::MGC );
 
-sub parse
-{
-   my $self = shift;
+   sub parse
+   {
+      my $self = shift;
 
-   return $self->token_float;
+      return $self->token_float;
+   }
 }
-
-package main;
 
 my $parser = TestParser->new;
 

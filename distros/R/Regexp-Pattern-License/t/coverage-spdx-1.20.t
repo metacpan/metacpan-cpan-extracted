@@ -1,7 +1,7 @@
 use Test2::V0;
 
 use lib 't/lib';
-use Test2::Regexp::Pattern::License;
+use Test2::Tools::LicenseRegistry;
 
 plan 1;
 
@@ -201,10 +201,10 @@ like(
 		field
 			'GNU General Public License v3.0 w/GCC Runtime Library exception'
 			=> 'GPL-3.0-with-GCC-exception';
-		field 'GNU Lesser General Public License v2.1 only' => 'LGPL-2.1';
+		field 'GNU Lesser General Public License v2.1 only'     => 'LGPL-2.1';
 		field 'GNU Lesser General Public License v2.1 or later' =>
 			'LGPL-2.1+';
-		field 'GNU Lesser General Public License v3.0 only' => 'LGPL-3.0';
+		field 'GNU Lesser General Public License v3.0 only'     => 'LGPL-3.0';
 		field 'GNU Lesser General Public License v3.0 or later' =>
 			'LGPL-3.0+';
 		field 'GNU Library General Public License v2 only'     => 'LGPL-2.0';
@@ -381,12 +381,12 @@ like(
 # TODO		field 'xinetd License'             => 'xinetd';
 # TODO		field 'XPP License'                => 'xpp';
 # TODO		field 'XSkat License'              => 'XSkat';
-		field 'Yahoo! Public License v1.0' => 'YPL-1.0';
-		field 'Yahoo! Public License v1.1' => 'YPL-1.1';
-		field 'Zed License'                => 'Zed';
-		field 'Zend License v2.0'          => 'Zend-2.0';
-		field 'Zimbra Public License v1.3' => 'Zimbra-1.3';
-		field 'zlib License'               => 'Zlib';
+		field 'Yahoo! Public License v1.0'               => 'YPL-1.0';
+		field 'Yahoo! Public License v1.1'               => 'YPL-1.1';
+		field 'Zed License'                              => 'Zed';
+		field 'Zend License v2.0'                        => 'Zend-2.0';
+		field 'Zimbra Public License v1.3'               => 'Zimbra-1.3';
+		field 'zlib License'                             => 'Zlib';
 		field 'zlib/libpng License with Acknowledgement' =>
 			'zlib-acknowledgement';
 		field 'Zope Public License 1.1' => 'ZPL-1.1';

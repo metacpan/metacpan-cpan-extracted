@@ -3,10 +3,10 @@
 use strict;
 use warnings;
 
-use POSIX qw(locale_h);
-setlocale(&POSIX::LC_ALL, "pt_PT");
-use locale;
-
+#use POSIX qw(locale_h);
+#setlocale(&POSIX::LC_ALL, "pt_PT");
+#use locale;
+use utf8::all;
 
 use Lingua::PT::PLNbase;
 

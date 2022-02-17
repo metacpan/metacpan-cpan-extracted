@@ -1,0 +1,14 @@
+This is recursive template 2 with $title
+Looking for $aaa
+Package in rec 2 @{[__PACKAGE__]}
+@{[
+do{
+	say "OPTIONS in template 2: ", %options;
+	our $john="cool";
+	my $t=plex "recursive-3.plex";#, {john=>"cool"}, %options;
+	$t->render();
+	$t->render({runtime=>"worked"})
+	
+}
+]}
+

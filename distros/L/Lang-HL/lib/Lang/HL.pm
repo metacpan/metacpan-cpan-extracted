@@ -5,7 +5,7 @@ use warnings;
 use utf8;
 use Regexp::Grammars;
 
-our $VERSION = '5.002';
+our $VERSION = '5.016';
 
 sub new {
     my ($class) = @_;
@@ -16,8 +16,8 @@ sub PT::Lang::X {
     my ($class) = @_;
 
     my $code = 'use strict;
-                use warnings;
-                use utf8;';
+        use warnings;
+        use utf8;';
 
     for my $element ( @{ $class->{Class}} ) {
         $code .= $element->X();
@@ -85,10 +85,24 @@ sub PT::Group::X {
     my ($class, $className) = @_;
 
     return (       $class->{Comment}
-                || $class->{Function}
                 || $class->{Parent}
                 || $class->{Packages}
-                || $class->{EmbedBlock} )->X($className);
+                || $class->{EmbedBlock}
+                || $class->{Function}
+                || $class->{NonSyntaxClass} )->X($className);
+}
+
+sub PT::NonSyntaxClass::X {
+    my ($class, $className) = @_;
+    my $nonSyntax = $class->{''};
+
+    my @nonSyntax = split(" ", $nonSyntax);
+    $nonSyntax = $nonSyntax[0];
+
+    print "SyntaxError", "\n";
+    print "===========", "\n";
+    print "ClassName: ", $className, "\n";
+    die "Error: $nonSyntax \n";
 }
 
 sub PT::Packages::X {
@@ -113,8 +127,8 @@ sub PT::PackageList::X {
 sub PT::Package::X {
     my ($class, $className) = @_;
 
-    return (        $class->{PackageWithConstructor}
-                 || $class->{PackageWithoutConstructor} )->X($className);
+    return (       $class->{PackageWithConstructor}
+                || $class->{PackageWithoutConstructor} )->X($className);
 }
 
 sub PT::PackageWithConstructor::X {
@@ -127,6 +141,7 @@ sub PT::PackageWithConstructor::X {
     if(exists $class->{ObjectParameters}) {
         my $objectParameters = $class->{ObjectParameters}->X($className);
         my $parameters;
+
         if(ref($objectParameters)) {
             $parameters = join(",", @{$objectParameters});
         } else {
@@ -180,14 +195,15 @@ sub PT::PackageName::X {
 
 sub PT::PackageWithoutConstructor::X {
     my ($class, $className) = @_;
-
     my $packageName = $class->{PackageName}->X($className);
+
     if(exists $class->{QW}) {
         my $qw = $class->{QW}->X($className);
 
         my $packageWithoutConstructor = "use " . $packageName . $qw . ";\n";
         return $packageWithoutConstructor;
     }
+
     my $packageWithoutConstructor = "use " . $packageName . ";\n";
     return $packageWithoutConstructor;
 }
@@ -213,24 +229,24 @@ sub PT::FunctionList::X {
 }
 
 sub PT::Constructor::X {
-        my ($class, $className) = @_;
+    my ($class, $className) = @_;
 
-        my $constructor = $class->{''};
-        return $constructor;
+    my $constructor = $class->{''};
+    return $constructor;
 }
 
 sub PT::Object::X {
-        my ($class, $className) = @_;
+    my ($class, $className) = @_;
 
-        my $object = $class->{''};
-        return $object;
+    my $object = $class->{''};
+    return $object;
 }
 
 sub PT::PackageDir::X {
-        my ($class, $className) = @_;
+    my ($class, $className) = @_;
 
-        my $packageDir = $class->{''};
-        return $packageDir;
+    my $packageDir = $class->{''};
+    return $packageDir;
 }
 
 sub PT::Parent::X {
@@ -267,9 +283,10 @@ sub PT::LineComment::X {
 
 sub PT::Function::X {
     my ($class, $className) = @_;
+
     my $functionName = $class->{FunctionName}->X($className);
     my $functionParamList = $class->{FunctionParamList}->X($className);
-    my $codeBlock = $class->{CodeBlock}->X($className);
+    my $codeBlock = $class->{CodeBlock}->X($className, $functionName);
 
     my $function = "\n sub " . $functionName . $functionParamList . $codeBlock;
     return $function;
@@ -277,14 +294,17 @@ sub PT::Function::X {
 
 sub PT::FunctionName::X {
     my ($class, $className) = @_;
+
     my $functionName = $class->{''};
     return $functionName;
 }
 
 sub PT::FunctionParamList::X {
     my ($class, $className) = @_;
+
     my @params = (       $class->{EmptyParamList}
                       || $class->{FunctionParams} )->X($className);
+
     my $functionParamList;
     $functionParamList = '( $class, ';
 
@@ -307,8 +327,8 @@ sub PT::FunctionParamList::X {
 }
 
 sub PT::CodeBlock::X {
-    my ($class, $className) = @_;
-    my $blocks = $class->{Blocks}->X($className);
+    my ($class, $className, $functionName) = @_;
+    my $blocks = $class->{Blocks}->X($className, $functionName);
     my $codeBlock = "{\n" . $blocks . "\n}";
     return $codeBlock;
 }
@@ -335,11 +355,11 @@ sub PT::Arg::X {
 }
 
 sub PT::Blocks::X {
-    my ($class, $className) = @_;
+    my ($class, $className, $functionName) = @_;
     my @blocks;
 
     for my $element ( @{$class->{Block}} ) {
-        push @blocks, $element->X($className);
+        push @blocks, $element->X($className, $functionName);
     }
 
     my $blocks = join("\n", @blocks);
@@ -347,15 +367,34 @@ sub PT::Blocks::X {
 }
 
 sub PT::Block::X {
-    my ($class, $className) = @_;
+    my ($class, $className, $functionName) = @_;
     my $block = (      $class->{IfElse}
                     || $class->{While}
                     || $class->{ForEach}
                     || $class->{For}
                     || $class->{EmbedBlock}
                     || $class->{Comment}
-                    || $class->{Statement} )->X($className);
+                    || $class->{Statement}
+                    || $class->{NonSyntaxFunction} )->X($className, $functionName);
     return $block;
+}
+
+sub PT::NonSyntaxFunction::X {
+    my ($class, $className, $functionName) = @_;
+    my $nonSyntax = $class->{''};
+
+    my @nonSyntax = split(" ", $nonSyntax);
+    $nonSyntax = $nonSyntax[0];
+
+    print "SyntaxError", "\n";
+    print "===========", "\n";
+    print "ClassName: ", $className, "\n";
+
+    if(defined $functionName) {
+    	print "FunctionName: ", $functionName, "\n";
+    }
+
+    die "Error: $nonSyntax \n";
 }
 
 sub PT::EmbedBlock::X {
@@ -381,6 +420,7 @@ sub PT::EmbeddedCode::X {
 
 sub PT::While::X {
     my ($class, $className) = @_;
+
     my $boolExpression = $class->{BoolExpression}->X($className);
     my $codeBlock = $class->{CodeBlock}->X($className);
 
@@ -390,6 +430,7 @@ sub PT::While::X {
 
 sub PT::ForEach::X {
     my ($class, $className) = @_;
+
     my $forEachVariableName = $class->{ForEachVariableName}->X($className);
     my $variableName = $class->{VariableName}->X($className);
     my $codeBlock = $class->{CodeBlock}->X($className);
@@ -402,12 +443,14 @@ sub PT::ForEach::X {
 
 sub PT::ForEachVariableName::X {
     my ($class, $className) = @_;
+
     my $variableName = $class->{VariableName}->X($className);
     return $variableName;
 }
 
 sub PT::For::X {
     my ($class, $className) = @_;
+
     my $variableName = $class->{VariableName}->X($className);
     my @forRange = $class->{ForRange}->X($className);
     my $codeBlock = $class->{CodeBlock}->X($className);
@@ -420,6 +463,7 @@ sub PT::For::X {
 
 sub PT::ForRange::X {
     my ($class, $className) = @_;
+
     my $lowerRange = $class->{LowerRange}->X($className);
     my $upperRange = $class->{UpperRange}->X($className);
 
@@ -429,6 +473,7 @@ sub PT::ForRange::X {
 
 sub PT::LowerRange::X {
     my ($class, $className) = @_;
+
     my $number = (     $class->{Number}
                     || $class->{VariableName}
                     || $class->{ArrayElement}
@@ -442,6 +487,7 @@ sub PT::LowerRange::X {
 
 sub PT::UpperRange::X {
     my ($class, $className) = @_;
+
     my $number = (     $class->{Number}
                     || $class->{VariableName}
                     || $class->{ArrayElement}
@@ -511,6 +557,7 @@ sub PT::IfElseIf::X {
 
 sub PT::If::X {
     my ($class, $className) = @_;
+
     my $boolExpression = $class->{BoolExpression}->X($className);
     my $codeBlock = $class->{CodeBlock}->X($className);
 
@@ -558,6 +605,7 @@ sub PT::BooleanExpression::X {
 
 sub PT::BoolOperatorExpression::X {
     my ($class, $className) = @_;
+
     my $boolOperator = $class->{BoolOperator}->X($className);
     my $boolOperand = $class->{BoolOperands}->X($className);
 
@@ -1009,8 +1057,18 @@ sub PT::ArrayElement::X {
 
 sub PT::ArrayAccess::X {
     my ($class, $className) = @_;
-    my $number = $class->{Number}->X($className);
+    my $number = $class->{ArrayKey}->X($className);
     return $number;
+}
+
+sub PT::ArrayKey::X {
+    my ($class, $className) = @_;
+    return (       $class->{Number}
+                || $class->{ScalarVariable}
+                || $class->{ArrayElement}
+                || $class->{HashElement}
+                || $class->{FunctionReturn}
+                || $class->{ClassFunctionReturn} )->X($className);
 }
 
 sub PT::ArrayName::X {
@@ -1050,8 +1108,13 @@ sub PT::HashName::X {
 
 sub PT::HashKey::X {
     my ($class, $className) = @_;
-    return (       $class->{HashKeyString}
-                || $class->{HashKeyNumber} )->X($className);
+    return (       $class->{String}
+                || $class->{Number}
+                || $class->{ScalarVariable}
+                || $class->{ArrayElement}
+                || $class->{HashElement}
+                || $class->{FunctionReturn}
+                || $class->{ClassFunctionReturn} )->X($className);
 }
 
 sub PT::HashKeyString::X {
@@ -1262,7 +1325,7 @@ sub PT::LogicalOr::X {
 
 my $parser = qr {
     <nocontext:>
-    <debug: off>
+    # <debug: on>
 
     <Lang>
     <objrule:  PT::Lang>                       <[Class]>+
@@ -1272,7 +1335,9 @@ my $parser = qr {
     <objrule:  PT::ClassBlock>                 <LBrace> <ClassGroups> <RBrace>
     <objrule:  PT::ClassGroups>                <[Group]>+
 
-    <objrule:  PT::Group>                      <ws: (\s++)*> <Comment> | <Function> | <Parent> | <Packages> | <EmbedBlock>
+    <objrule:  PT::Group>                      <ws: (\s++)*> <Comment> | <Parent> | <Packages> | <EmbedBlock> | <Function> | <NonSyntaxClass>
+
+    <objtoken: PT::NonSyntaxClass>             \b.*\b
 
     <objrule:  PT::Comment>                    [#] <LineComment> @
     <objtoken: PT::LineComment>                .*?
@@ -1305,7 +1370,9 @@ my $parser = qr {
     <objrule:  PT::CodeBlock>                  <LBrace> <Blocks> <RBrace>
     <objrule:  PT::Blocks>                     <[Block]>+
 
-    <objrule:  PT::Block>                      <IfElse> | <While> | <ForEach> | <For> | <EmbedBlock> | <Comment> | <Statement>
+    <objrule:  PT::Block>                      <IfElse> | <While> | <ForEach> | <For> | <EmbedBlock> | <Comment> | <Statement> | <NonSyntaxFunction>
+
+    <objtoken: PT::NonSyntaxFunction>          \b.*\b
 
     <objrule:  PT::EmbedBlock>                 <TokenEmbedBlock> <EmbedCodeBlock>
     <objrule:  PT::EmbedCodeBlock>             <EmbedBegin> <EmbeddedCode> <EmbedEnd>
@@ -1319,8 +1386,10 @@ my $parser = qr {
 
     <objrule:  PT::For>                        <TokenFor> <Var> <VariableName> <LParen> <ForRange> <RParen> <CodeBlock>
     <objrule:  PT::ForRange>                   <LowerRange> <Dot><Dot><Dot> <UpperRange>
+
     <objrule:  PT::LowerRange>                 <Number> | <VariableName> | <ArrayElement> | <HashElement>
                                                 | <ClassAccessor> | <ClassFunctionReturn> | <FunctionReturn>
+
     <objrule:  PT::UpperRange>                 <Number> | <VariableName> | <ArrayElement> | <HashElement>
                                                 | <ClassAccessor> | <ClassFunctionReturn> | <FunctionReturn>
 
@@ -1330,8 +1399,10 @@ my $parser = qr {
     <objrule:  PT::BoolExpression>             <[BooleanExpression]>+ % <[BoolOperator]>
     <objrule:  PT::BooleanExpression>          <BoolOperands> <BoolOperatorExpression>?
     <objrule:  PT::BoolOperatorExpression>     <BoolOperator> <BoolOperands>
+
     <objrule:  PT::BoolOperands>               <RealNumber> | <String> | <ScalarVariable> | <ArrayElement> | <HashElement>
                                                | <ClassAccessor> | <ClassFunctionReturn> | <FunctionReturn> | <EmbedBlock>
+
     <objrule:  PT::BoolOperator>               <GreaterThan> | <LessThan> | <Equals> | <GreaterThanEquals> | <LessThanEquals>
                                                | <StringEquals> | <StringNotEquals> | <NotEqulas> | <LogicalAnd> | <LogicalOr>
                                                | <EmbedBlock>
@@ -1345,9 +1416,7 @@ my $parser = qr {
     <objrule:  PT::ClassFunctionCall>          <TokenClass> <Dot> <FunctionName> <LParen> <Parameters>? <RParen> <SemiColon>
 
     <objrule:  PT::ObjectCall>                 <ObjectFunctionCall> <SemiColon>
-
     <objrule:  PT::VariableDeclaration>        <ArrayDeclaration> | <HashDeclaration> | <ScalarDeclaration>
-
     <objrule:  PT::ScalarDeclaration>          <Var> <VariableName> <Equal> <Value> <SemiColon>
 
     <objtoken: PT::Var>                        var
@@ -1363,6 +1432,7 @@ my $parser = qr {
     <objrule:  PT::ArrayDeclaration>           <Var> <VariableName> <Equal> <ArrayList> <SemiColon>
     <objrule:  PT::ArrayList>                  <LBracket> <ListElements> <RBracket>
     <objrule:  PT::ListElements>               .{0} | <[ListElement]>+ % <Comma>
+
     <objrule:  PT::ListElement>                <RealNumber> | <String> | <ClassFunctionReturn> | <FunctionReturn>
                                                 | <ArrayElement> | <HashElement> | <ArrayList> | <HashRef>
                                                 | <VariableName> | <EmbedBlock>
@@ -1371,8 +1441,10 @@ my $parser = qr {
     <objrule:  PT::HashRef>                    <LBrace> <KeyValuePairs> <RBrace>
     <objrule:  PT::KeyValuePairs>              .{0} | <[KeyValue]>+ % <Comma>
     <objrule:  PT::KeyValue>                   <PairKey> <Colon> <PairValue>
+
     <objrule:  PT::PairKey>                    <Number> | <String> | <ClassFunctionReturn> | <FunctionReturn>
                                                 | <VariableName> | <EmbedBlock>
+
     <objrule:  PT::PairValue>                  <RealNumber> | <String> | <ClassFunctionReturn> | <FunctionReturn>
                                                 | <ArrayElement> | <HashElement> | <ArrayList> | <HashRef>
                                                 | <VariableName> | <EmbedBlock>
@@ -1395,19 +1467,20 @@ my $parser = qr {
     <objrule:  PT::FunctionReturn>             <FunctionName> <LParen> <Parameters>? <RParen>
 
     <objrule:  PT::ArrayElement>               <ArrayName> <[ArrayAccess]>+
-    <objrule:  PT::ArrayAccess>                <LBracket> <Number> <RBracket>
+    <objrule:  PT::ArrayAccess>                <LBracket> <ArrayKey> <RBracket>
+    <objrule:  PT::ArrayKey>                   <Number> | <ScalarVariable> | <ArrayElement>
+                                               | <HashElement> | <FunctionReturn> | <ClassFunctionReturn>
     <objrule:  PT::ArrayName>                  [a-zA-Z]+?
 
     <objrule:  PT::HashElement>                <HashName> <[HashAccess]>+
     <objrule:  PT::HashAccess>                 <LBrace> <HashKey> <RBrace>
     <objtoken: PT::HashName>                   [a-zA-Z]+?
-    <objrule:  PT::HashKey>                    <HashKeyString> | <HashKeyNumber>
-    <objrule:  PT::HashKeyString>              <LQuote> <HashKeyStringValue> <RQuote>
-    <objtoken: PT::HashKeyStringValue>         [a-zA-Z]+?
-    <objtoken: PT::HashKeyNumber>              [0-9]+?
+    <objrule:  PT::HashKey>                    <String> | <Number> | <ScalarVariable> | <ArrayElement>
+                                               | <HashElement> | <FunctionReturn> | <ClassFunctionReturn>
 
     <objrule:  PT::STDIN>                      <LessThan>  <TokenSTDIN> <GreaterThan>
 
+    <objtoken: PT::HashKeyStringValue>         [a-zA-Z]+?
     <objrule:  PT::AccessorAssignment>         <TokenClass> <Dot> <HashKeyStringValue> <Equal> <RHS> <SemiColon>
     <objrule:  PT::ClassAccessor>              <TokenClass> <Dot> <HashKeyStringValue>
     <objrule:  PT::ClassFunctionReturn>        <TokenClass> <Dot> <FunctionName> <LParen> <Parameters>? <RParen>
@@ -1419,6 +1492,7 @@ my $parser = qr {
     <objrule:  PT::CalcExpression>             <[CalcOperands]>+ % <[CalcOperator]>
     <objrule:  PT::CalcOperands>               <RealNumber> | <ScalarVariable> | <ArrayElement> | <HashElement> | <ClassAccessor>
                                                | <ClassFunctionReturn> | <FunctionReturn> | <EmbedBlock> | <ObjectFunctionCall>
+
     <objtoken: PT::CalcOperator>               <Plus> | <Minus> | <Multiply> | <Divide> | <Modulus> | <Exponent> | <EmbedBlock>
 
     <objrule:  PT::Return>                     <TokenReturn> <RHS>? <SemiColon>

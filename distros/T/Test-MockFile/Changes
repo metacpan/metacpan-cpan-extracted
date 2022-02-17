@@ -1,5 +1,36 @@
 Revision history for Test-MockFile
 
+0.029   2/16/2022
+- Fix broken link to small test documentation
+- Ensure strict mode is enabled by default and prevent import conflicts.
+- Fix warnings during global destruction
+- Additional rules for _abs_path_to_file
+- GH #103 - Update eg/example.pl:
+- Add rmdir, mkdir and unlink default position
+- Postpone file arg check during strict mode analysis
+- Fixup hook args and teach for mkdir filename pos
+- Perltidy policy changes.
+- Use carp in filename and readlink
+- Fix broken link to small test documentation
+
+0.028   2/12/2022
+- Update test for our FreeBSD results
+- GH #122 - Support two-arg open, read/write, and understand pipes
+- Add strict guards for additional keywords: readdir, telldir, rewinddir,
+  seekdir, closedir, readlink, mkdir, rmdir
+- Revert to old symbol resolution technique.
+
+0.027   2/10/2022
+- GH #75 - Strict mode is now on by default
+- GH #45 - Provide a helpful error message and document fileno unsupported.
+- GH #90 - Normalize forward slashes.
+- GH #126 - Document using debugger under strict mode.
+- Do not hard-code values of $!
+- Try to get more data when t/runtime-bareword-filehandles.t fails on cpan testers.
+- GH #64 -  Do not overwrite the error code when checking for Docker
+- GH #63 -  FreeBSD's readlink() returns EINVAL for readlink(undef):
+- Add more data for debugging test failures on OpenBSD
+
 0.026   2/3/2022
 - Fix support for mocking the top-level directory.
 - Symlinks should appear in readdir

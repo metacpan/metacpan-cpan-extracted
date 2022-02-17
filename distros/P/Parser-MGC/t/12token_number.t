@@ -4,18 +4,18 @@ use v5.14;
 use warnings;
 
 use Test::More;
+use Test::Fatal;
 
-package TestParser;
-use base qw( Parser::MGC );
+package TestParser {
+   use base qw( Parser::MGC );
 
-sub parse
-{
-   my $self = shift;
+   sub parse
+   {
+      my $self = shift;
 
-   return $self->token_number;
+      return $self->token_number;
+   }
 }
-
-package main;
 
 my $parser = TestParser->new;
 
@@ -35,6 +35,6 @@ approx( $parser->from_string( "12." ),    12,    'Trailing DP' );
 approx( $parser->from_string( ".34" ),     0.34, 'Leading DP' );
 approx( $parser->from_string( "8.9" ),     8.9,  'Infix DP' );
 
-ok( !eval { $parser->from_string( "hello" ) }, '"hello" fails' );
+ok( exception { $parser->from_string( "hello" ) }, '"hello" fails' );
 
 done_testing;

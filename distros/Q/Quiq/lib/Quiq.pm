@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.198';
+our $VERSION = '1.199';
 
 =encoding utf8
 
@@ -600,6 +600,10 @@ L<Quiq::LockedCounter> - Persistenter Zähler mit Lock
 
 =item *
 
+L<Quiq::MailTo> - Erzeuge mailto-URL
+
+=item *
+
 L<Quiq::Math> - Mathematische Funktionen
 
 =item *
@@ -908,6 +912,10 @@ L<Quiq::Url> - URL Klasse
 
 =item *
 
+L<Quiq::Web::Navigation> - Webseiten-Navigation
+
+=item *
+
 L<Quiq::XTerm> - XTerminal Fenster
 
 =item *
@@ -922,7 +930,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.198
+1.199
 
 =head1 AUTHOR
 

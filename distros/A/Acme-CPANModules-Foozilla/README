@@ -1,0 +1,126 @@
+NAME
+    Acme::CPANModules::Foozilla - Ideas for module/script/project name using
+    'zilla'
+
+VERSION
+    This document describes version 0.001 of Acme::CPANModules::Foozilla
+    (from Perl distribution Acme-CPANModules-Foozilla), released on
+    2021-08-04.
+
+DESCRIPTION
+    Do you want to name your project "<something>zilla", but searching
+    MetaCPAN is difficult because everything is about Dist::Zilla? Here's a
+    little help. I've searched using "lcpan" (from App::lcpan):
+
+     lcpan mods --query-type name zilla | grep -iv Dist::
+
+    and the following is the summary.
+
+    Mozilla
+
+    Of course, Mozilla is the biggest name of things foozilla. There's a
+    rather decent "Mozilla::" namespace on CPAN with notable modules like
+    Mozilla::DOM and Mozilla::Mechanize. There are also
+    Software::License::Mozilla_2_0 (and its siblings),
+    Graphics::ColorNames::Mozilla, or Wx::Mozilla.
+
+    Bugzilla
+
+    Also from the Mozilla project, hence the name. We have <WWW::Bugzilla>
+    on CPAN, but as you know Bugzilla itself is also written in Perl.
+
+    Filezilla
+
+    I can only find the following modules related to this popular file
+    transfer software: Software::Catalog::SW::filezilla.
+
+    That's it
+
+    Vast world awaits for your new "*"zilla project.
+
+ACME::CPANMODULES ENTRIES
+    Dist::Zilla
+        Author: RJBS <https://metacpan.org/author/RJBS>
+
+    App::lcpan
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    Mozilla::DOM
+        Author: SLANNING <https://metacpan.org/author/SLANNING>
+
+    Mozilla::Mechanize
+        Author: SLANNING <https://metacpan.org/author/SLANNING>
+
+    Software::License::Mozilla_2_0
+        Author: LEONT <https://metacpan.org/author/LEONT>
+
+    Graphics::ColorNames::Mozilla
+        Author: XAVIER <https://metacpan.org/author/XAVIER>
+
+    Wx::Mozilla
+        Author: DSUGAL <https://metacpan.org/author/DSUGAL>
+
+    Software::Catalog::SW::filezilla
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+FAQ
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n Foozilla
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
+
+        % cpanmodules ls-entries Foozilla | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=Foozilla -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    or directly:
+
+        % perl -MAcme::CPANModules::Foozilla -E'say $_->{module} for @{ $Acme::CPANModules::Foozilla::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-Foozilla>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-Foozilla>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Fooz
+    illa>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

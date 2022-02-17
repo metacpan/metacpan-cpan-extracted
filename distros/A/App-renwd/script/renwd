@@ -10,7 +10,7 @@ use Getopt::Long::Complete qw(GetOptionsWithCompletion);
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-11-16'; # DATE
 our $DIST = 'App-renwd'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 my $cwd = getcwd();
 my ($curname) = $cwd =~ m!/([^/]*)$!;
@@ -81,7 +81,7 @@ renwd - REName current (Working) Directory
 
 =head1 VERSION
 
-This document describes version 0.007 of renwd (from Perl distribution App-renwd), released on 2021-11-16.
+This document describes version 0.008 of renwd (from Perl distribution App-renwd), released on 2021-11-16.
 
 =head1 SYNOPSIS
 
@@ -125,6 +125,8 @@ Afterwards, you can:
  % renwd-cd foo<Tab>
 
 =for END_BLOCK: protip_renwd_cd
+
+Note: C<renself> is an alias for C<renwd>.
 
 =head1 COMPLETION
 

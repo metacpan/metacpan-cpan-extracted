@@ -8,6 +8,7 @@ Makefile.PL
 README
 dist.ini
 lib/App/renwd.pm
+script/renself
 script/renwd
 share/renwd-cd.bash
 t/00-compile.t

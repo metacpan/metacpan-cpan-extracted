@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.542';
+our $VERSION = '0.544';
 
 use 5.020;
 use strictures 2;
@@ -204,7 +204,8 @@ sub E ($state, $error_string, @args) {
   croak 'E called in void context' if not defined wantarray;
 
   # sometimes the keyword shouldn't be at the very end of the schema path
-  my $uri = canonical_uri($state, $state->{keyword}, $state->{_schema_path_suffix});
+  my $uri = canonical_uri($state, $state->{keyword}, $state->{_schema_path_suffix})
+    ->to_abs($state->{effective_base_uri});
 
   my $keyword_location = $state->{traversed_schema_path}
     .jsonp($state->{schema_path}, $state->{keyword}, delete $state->{_schema_path_suffix});
@@ -237,7 +238,8 @@ sub E ($state, $error_string, @args) {
 sub A ($state, $annotation) {
   return 1 if not $state->{collect_annotations};
 
-  my $uri = canonical_uri($state, $state->{keyword}, $state->{_schema_path_suffix});
+  my $uri = canonical_uri($state, $state->{keyword}, $state->{_schema_path_suffix})
+    ->to_abs($state->{effective_base_uri});
 
   my $keyword_location = $state->{traversed_schema_path}
     .jsonp($state->{schema_path}, $state->{keyword}, delete $state->{_schema_path_suffix});
@@ -263,6 +265,7 @@ sub A ($state, $annotation) {
 # Therefore this is only appropriate during the evaluation phase, not the traverse phase.
 sub abort ($state, $error_string, @args) {
   ()= E($state, $error_string, @args);
+  croak 'abort() called during traverse' if $state->{traverse};
   my $error = pop $state->{errors}->@*;
   $error->exception(1);
   die $error;
@@ -358,7 +361,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.542
+version 0.544
 
 =head1 SYNOPSIS
 

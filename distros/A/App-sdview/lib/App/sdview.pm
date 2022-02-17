@@ -8,7 +8,7 @@ use utf8;
 
 use Object::Pad;
 
-package App::sdview 0.05;
+package App::sdview 0.06;
 class App::sdview :strict(params);
 
 use List::Keywords qw( first );
@@ -37,6 +37,7 @@ To actually use it, you likely wanted wanted to see the F<bin/sdview> script.
 my @PARSER_CLASSES = qw(
    App::sdview::Parser::Pod
    App::sdview::Parser::Markdown
+   App::sdview::Parser::Man
 );
 
 require ( "$_.pm" =~ s{::}{/}gr ) for @PARSER_CLASSES;
@@ -46,6 +47,7 @@ my @OUTPUT_CLASSES = qw(
    App::sdview::Output::Plain
    App::sdview::Output::Pod
    App::sdview::Output::Markdown
+   App::sdview::Output::Man
 );
 
 require ( "$_.pm" =~ s{::}{/}gr ) for @OUTPUT_CLASSES;
@@ -92,7 +94,7 @@ method run ( $file, %opts )
 
 =item *
 
-Add more formats. man and ReST at least. Perhaps others.
+Add more formats. ReST perhaps. Maybe others too.
 
 =item *
 
@@ -102,7 +104,7 @@ Improved Markdown parser. Currently the parser is very simple.
 
 Other outputs. Consider a L<Tickit>-based frontend.
 
-Also more structured file writers - ReST, man and maybe also HTML output.
+Also more structured file writers - ReST and maybe also HTML output.
 
 =back
 

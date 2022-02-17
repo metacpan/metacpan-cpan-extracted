@@ -145,6 +145,7 @@ lib/Quiq/LineProcessor/Line.pm
 lib/Quiq/List.pm
 lib/Quiq/LockedContent.pm
 lib/Quiq/LockedCounter.pm
+lib/Quiq/MailTo.pm
 lib/Quiq/Math.pm
 lib/Quiq/Mechanize.pm
 lib/Quiq/MediaWiki/Client.pm
@@ -222,6 +223,7 @@ lib/Quiq/TreeFormatter.pm
 lib/Quiq/Udl.pm
 lib/Quiq/Unindent.pm
 lib/Quiq/Url.pm
+lib/Quiq/Web/Navigation.pm
 lib/Quiq/Xml/LibXml.pm
 lib/Quiq/XTerm.pm
 LICENSE
@@ -372,6 +374,7 @@ t/bin/Quiq/LineProcessor/Line.t
 t/bin/Quiq/List.t
 t/bin/Quiq/LockedContent.t
 t/bin/Quiq/LockedCounter.t
+t/bin/Quiq/MailTo.t
 t/bin/Quiq/Math.t
 t/bin/Quiq/Mechanize.t
 t/bin/Quiq/MediaWiki/Client.t
@@ -449,6 +452,7 @@ t/bin/Quiq/TreeFormatter.t
 t/bin/Quiq/Udl.t
 t/bin/Quiq/Unindent.t
 t/bin/Quiq/Url.t
+t/bin/Quiq/Web/Navigation.t
 t/bin/Quiq/Xml/LibXml.t
 t/bin/Quiq/XTerm.t
 t/data/class/MyClass1.pm

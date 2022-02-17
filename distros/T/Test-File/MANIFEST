@@ -1,4 +1,5 @@
 Changes
+CITATION.cff
 examples/README
 INSTALL.SKIP
 lib/Test/File.pm
@@ -29,5 +30,6 @@ t/test_files.t
 t/test_manifest
 t/win32.t
 xt/changes.t
+xt/citations.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -7,7 +7,7 @@
 #       Author:  Steven Bakker (SBAKKER), <sbakker@cpan.org>
 #      Created:  30/01/18
 #
-#   Copyright (c) 2018 Steven Bakker
+#   Copyright (c) 2018-2022 Steven Bakker
 #
 #   This module is free software; you can redistribute it and/or modify
 #   it under the same terms as Perl itself. See "perldoc perlartistic."
@@ -18,13 +18,12 @@
 #
 #=============================================================================
 
-package Term::CLI::Command 0.054002;
+package Term::CLI::Command 0.055002;
 
 use 5.014;
 use warnings;
 
 use List::Util 1.23 qw( first min );
-use Getopt::Long 2.38 qw( GetOptionsFromArray );
 use Types::Standard 1.000005 qw(
     ArrayRef
     CodeRef
@@ -34,6 +33,7 @@ use Types::Standard 1.000005 qw(
 );
 
 use Term::CLI::L10N qw( loc );
+use Term::CLI::Util qw( is_prefix_str get_options_from_array );
 
 use Moo 1.000001;
 use namespace::clean 0.25;
@@ -46,12 +46,15 @@ has options => (
     predicate => 1
 );
 
-with('Term::CLI::Role::CommandSet');
-with('Term::CLI::Role::ArgumentSet');
-with('Term::CLI::Role::HelpText');
+with qw(
+    Term::CLI::Role::CommandSet
+    Term::CLI::Role::ArgumentSet
+    Term::CLI::Role::HelpText
+    Term::CLI::Role::State
+);
 
 sub option_names {
-    my $self      = shift;
+    my ($self) = @_;
     my $opt_specs = $self->options or return ();
     my @names;
     for my $spec ( @{$opt_specs} ) {
@@ -62,79 +65,65 @@ sub option_names {
     return @names;
 }
 
-sub complete_line {
-    my ( $self, @words ) = @_;
+sub complete {
+    my ( $self, $text, $state ) = @_;
 
-    my $partial = $words[-1] // q{};
+    $text  //= q{};
+    $state //= {};
+
+    my $processed       = $state->{processed}     //= [];
+    my $unprocessed     = $state->{unprocessed}   //= [];
+    my $parsed_options  = $state->{options}       //= {};
 
     if ( $self->has_options ) {
 
-        Getopt::Long::Configure(qw(bundling require_order pass_through));
+        my %opt_result = get_options_from_array(
+            args         => $unprocessed,
+            spec         => $self->options,
+            result       => $parsed_options,
+            pass_through => 1,
+        );
 
-        my $opt_specs = $self->options;
+        my $double_dash = $opt_result{double_dash};
 
-        my %parsed_opts;
-
-        my $has_terminator;
-        if ( $Getopt::Long::VERSION < 2.51 ) {
-
-            # Getopt::Long before 2.51 removes '--' from word list;
-            # Try to work around the bug. Can still be fooled by
-            # "--foo --" if "--foo" takes an argument. :-/
-            $has_terminator = first { $_ eq '--' } @words[ 0 .. $#words - 1 ];
-            ## no critic (RequireCheckingReturnValueOfEval)
-            eval {
-                GetOptionsFromArray( \@words, \%parsed_opts, @{$opt_specs} );
-            };
-        }
-        else {
-            ## no critic (RequireCheckingReturnValueOfEval)
-            eval {
-                GetOptionsFromArray( \@words, \%parsed_opts, @{$opt_specs} );
-            };
-            if ( @words > 1 && $words[0] eq '--' ) {
-                $has_terminator = shift @words;
-            }
-        }
-        if ( !$has_terminator && @words <= 1 && $partial =~ /^-/x ) {
-
-            # We have to complete a command-line option.
-            return grep { rindex( $_, $partial, 0 ) == 0 } $self->option_names;
+        # Check if we have to complete a command-line option.
+        if ( !$double_dash && @{$unprocessed} == 0 && $text =~ /^-/x ) {
+            return grep { is_prefix_str( $text, $_ ) } $self->option_names;
         }
     }
 
     # If the command has arguments, try to skip over them.
     if ( $self->has_arguments ) {
         my @args = $self->arguments;
-        my $n    = 0;
-        while ( @words > 1 ) {
-            last if @args == 0;
-            shift @words;
-            $n++;
-            if ( $args[0]->max_occur > 0 and $n >= $args[0]->max_occur ) {
+        my $arg_repeat = 0;
+        while ( @{$unprocessed} && @args ) {
+            push @{$processed}, shift @{$unprocessed};
+            $arg_repeat++;
+            if ( $args[0]->max_occur > 0 and $arg_repeat >= $args[0]->max_occur ) {
                 shift @args;
-                $n = 0;
+                $arg_repeat = 0;
             }
         }
 
         if (@args) {
-            return $args[0]->complete( $words[0] );
+            return $args[0]->complete( $text, $state );
         }
     }
 
     if ( $self->has_commands ) {
-        if ( @words <= 1 ) {
-            return grep { rindex( $_, $partial, 0 ) == 0 } $self->command_names;
+        if ( @{$unprocessed} == 0 ) {
+            return grep { is_prefix_str( $text, $_ ) } $self->command_names;
         }
-        if ( my $cmd = $self->find_command( $words[0] ) ) {
-            return $cmd->complete_line( @words[ 1 .. $#words ] );
+        if ( my $cmd = $self->find_command( $unprocessed->[0] ) ) {
+            push @{$processed}, shift @{$unprocessed};
+            return $cmd->complete( $text, $state );
         }
     }
 
     return ();
 }
 
-sub execute {
+sub execute_command {
     my ( $self, %args ) = @_;
 
     $args{status} = 0;
@@ -150,30 +139,29 @@ sub execute {
     push @{ $args{command_path} }, $self;
 
     if ( $self->has_options ) {
-        my $opt_specs = $self->options;
+        my %opt_result = get_options_from_array(
+            args         => $args{unparsed},
+            spec         => $self->options,
+            result       => $args{options},
+            pass_through => 0,
+        );
 
-        Getopt::Long::Configure(qw(bundling require_order no_pass_through));
-
-        my $error = q{};
-        my $ok    = do {
-            local ( $SIG{__WARN__} ) =
-                sub { chomp( $error = join( q{}, @_ ) ) };
-            GetOptionsFromArray( $args{unparsed}, $args{options}, @$opt_specs );
-        };
-
-        if ( !$ok ) {
+        if ( !$opt_result{success} ) {
             $args{status} = -1;
-            $args{error}  = $error;
+            $args{error}  = $opt_result{error_msg};
+            return $self->try_callback(%args);
         }
     }
 
-    if ( $args{status} >= 0 ) {
-        if ( $self->has_arguments || !$self->has_commands ) {
-            %args = $self->_check_arguments(%args);
-        }
+    if ( $self->has_arguments || !$self->has_commands ) {
+        %args = $self->_check_arguments(%args);
+        return $self->try_callback(%args) if $args{status} < 0;
     }
-    if ( $args{status} >= 0 and $self->has_commands ) {
-        %args = $self->_execute_command(%args);
+
+    return $self->try_callback(%args) if !$self->has_commands;
+
+    if ( $self->require_sub_command || @{ $args{unparsed} } > 0 ) {
+        %args = $self->_execute_sub_command(%args);
     }
     return $self->try_callback(%args);
 }
@@ -233,15 +221,13 @@ sub _check_arguments {
         for my $i ( 1 .. $args_to_check ) {
             my $arg = $unparsed->[0];
             $argno++;
-            my $arg_value = $arg_spec->validate($arg);
+            my $arg_value = $arg_spec->validate($arg, \%args);
             if ( !defined $arg_value ) {
                 return (
                     %args,
                     status => -1,
-                    error  => "arg#$argno, '$arg': "
+                    error  => "arg#$argno (" . $arg_spec->name . "), '$arg': "
                         . $arg_spec->error . q{ }
-                        . loc("for") . q{ '}
-                        . $arg_spec->name . q{'}
                 );
             }
             push @{ $args{arguments} }, $arg_value;
@@ -268,7 +254,7 @@ sub _check_arguments {
     return %args;
 }
 
-sub _execute_command {
+sub _execute_sub_command {
     my ( $self, %args ) = @_;
 
     my $unparsed = $args{unparsed};
@@ -309,7 +295,7 @@ sub _execute_command {
     }
 
     shift @{$unparsed};
-    return $cmd->execute(%args);
+    return $cmd->execute_command(%args);
 }
 
 1;
@@ -324,7 +310,7 @@ Term::CLI::Command - Class for (sub-)commands in Term::CLI
 
 =head1 VERSION
 
-version 0.054002
+version 0.055002
 
 =head1 SYNOPSIS
 
@@ -348,19 +334,20 @@ version 0.054002
 
 =head1 DESCRIPTION
 
-Class for command elements in L<Term::CLI>(3p).
+Class for command elements in L<Term::CLI|Term::CLI>(3p).
 
 =head1 CLASS STRUCTURE
 
 =head2 Inherits from:
 
-L<Term::CLI::Element>(3p).
+L<Term::CLI::Element|Term::CLI::Element>(3p).
 
 =head2 Consumes:
 
-L<Term::CLI::Role::ArgumentSet>(3p),
-L<Term::CLI::Role::CommandSet>(3p),
-L<Term::CLI::Role::HelpText>(3p).
+L<Term::CLI::Role::ArgumentSet|Term::CLI::Role::ArgumentSet>(3p),
+L<Term::CLI::Role::CommandSet|Term::CLI::Role::CommandSet>(3p),
+L<Term::CLI::Role::HelpText|Term::CLI::Role::HelpText>(3p),
+L<Term::CLI::Role::State|Term::CLI::Role::State>(3p).
 
 =head1 CONSTRUCTORS
 
@@ -380,11 +367,13 @@ Other attributes are:
 
 =item B<arguments> =E<gt> I<ArrayRef>
 
-Reference to an array containing L<Term::CLI::Argument>(3p) object
+Reference to an array containing
+L<Term::CLI::Argument|Term::CLI::Argument>(3p) object
 instances that describe the parameters that the command takes,
 or C<undef>.
 
-See also L<Term::CLI::Role::ArgumentSet|Term::CLI::Role::ArgumentSet/ATTRIBUTES>.
+See also
+L<Term::CLI::Role::ArgumentSet|Term::CLI::Role::ArgumentSet/ATTRIBUTES>.
 
 =item B<callback> =E<gt> I<CodeRef>
 
@@ -397,12 +386,23 @@ Reference to an array containing C<Term::CLI::Command> object
 instances that describe the sub-commands that the command takes,
 or C<undef>.
 
-See also L<Term::CLI::Role::ArgumentSet|Term::CLI::Role::ArgumentSet/ATTRIBUTES>.
+See also
+L<Term::CLI::Role::CommandSet|Term::CLI::Role::CommandSet/ATTRIBUTES>.
+
+=item B<require_sub_command> =E<gt> I<Bool>
+
+If the command has sub-commands, it is normally required that the input
+contains one of the sub-commands after this command. However, it may be
+desirable to allow the command to appear "naked", i.e. without a sub-command.
+For such cases, set the C<require_sub_command> to a false value.
+
+See also
+L<Term::CLI::Role::CommandSet|Term::CLI::Role::CommandSet/ATTRIBUTES>.
 
 =item B<options> =E<gt> I<ArrayRef>
 
 Reference to an array containing command options in
-L<Getopt::Long>(3p) style, or C<undef>.
+L<Getopt::Long|Getopt::Long>(3p) style, or C<undef>.
 
 =item B<description> =E<gt> I<Str>
 
@@ -432,11 +432,11 @@ automatically.)
 =head1 INHERITED METHODS
 
 This class inherits all the attributes and accessors of
-L<Term::CLI::Element>(3p),
-L<Term::CLI::Role::CommandSet>(3p),
-L<Term::CLI::Role::HelpText>(3p),
+L<Term::CLI::Element|Term::CLI::Element>(3p),
+L<Term::CLI::Role::CommandSet|Term::CLI::Role::CommandSet>(3p),
+L<Term::CLI::Role::HelpText|Term::CLI::Role::HelpText>(3p),
 and
-L<Term::CLI::Role::ArgumentSet>(3p),
+L<Term::CLI::Role::ArgumentSet|Term::CLI::Role::ArgumentSet>(3p),
 most notably:
 
 =head2 Accessors
@@ -541,7 +541,8 @@ attribute has been set.
 =item B<options> ( [ I<ArrayRef> ] )
 X<options>
 
-I<ArrayRef> with command-line options in L<Getopt::Long>(3p) format.
+I<ArrayRef> with command-line options in L<Getopt::Long|Getopt::Long>(3p)
+format.
 
 =back
 
@@ -549,18 +550,17 @@ I<ArrayRef> with command-line options in L<Getopt::Long>(3p) format.
 
 =over
 
-=item B<complete_line> ( I<CLI>, I<WORD>, ... )
-X<complete_line>
+=item B<complete> ( I<TEXT>, I<STATE> )
+X<complete>
 
-I<CLI> is a reference to the top-level L<Term::CLI> instance.
-
-The I<WORD> arguments make up the parameters to this command.
-Given those, this method attempts to generate possible completions
-for the last I<WORD> in the list.
+Called by L<Term::CLI::Role::CommandSet|Term::CLI::Role::CommandSet>'s
+L<complete_line|Term::CLI::Role::CommandSet/complete_line> method,
+or another C<Term::CLI::Command>'s C<complete> function.
 
 The method can complete options, sub-commands, and arguments.
 Completions of commands and arguments is delegated to the appropriate
-L<Term::CLI::Command> and L<Term::CLI::Argument> instances, resp.
+C<Term::CLI::Command> and L<Term::CLI::Argument|Term::CLI::Argument>
+instances, resp.
 
 =item B<option_names>
 X<option_names>
@@ -575,18 +575,20 @@ Example:
     say join(' ', $cmd->option_names);
     # output: --debug --help --verbose -? -d -h -v
 
-=item B<execute> ( I<ARGS> )
+=item B<execute_command> ( I<KEY> =E<gt> I<VAL>, ... )
 
-This method is called by L<Term::CLI::execute|Term::CLI/execute>. It
-should not be called directly.
+This method is called by C<Term::CLI::Role::CommandSet>'s
+L<execute|Term::CLI::Role::CommandSet/execute> method.
+It should not be called directly.
 
 It accepts the same list of parameters as the
 L<command callback|Term::CLI::Role::CommandSet/callback>
-function (see
-L<Term::CLI::Role::CommandSet>), and returns the same structure.
+function
+(see L<Term::CLI::Role::CommandSet|Term::CLI::Role::CommandSet>),
+and returns the same structure.
 
-The C<arguments> I<ArrayRef> should contain the words on the command line
-that have not been parsed yet.
+The C<arguments> parameter (an I<ArrayRef>) should contain the words
+on the command line that have not been parsed yet.
 
 Depending on whether the object has sub-commands or arguments, the rest of
 the line is parsed (possibly handing off to another sub-command), and the
@@ -598,13 +600,14 @@ function.
 
 =head1 SEE ALSO
 
-L<Term::CLI::Argument>(3p),
-L<Term::CLI::Element>(3p),
-L<Term::CLI::Role::ArgumentSet>(3p),
-L<Term::CLI::Role::CommandSet>(3p),
-L<Term::CLI::Role::HelpText>(3p),
-L<Term::CLI>(3p),
-L<Getopt::Long>(3p).
+L<Term::CLI::Argument|Term::CLI::Argument>(3p),
+L<Term::CLI::Element|Term::CLI::Element>(3p),
+L<Term::CLI::Role::ArgumentSet|Term::CLI::Role::ArgumentSet>(3p),
+L<Term::CLI::Role::CommandSet|Term::CLI::Role::CommandSet>(3p),
+L<Term::CLI::Role::HelpText|Term::CLI::Role::HelpText>(3p),
+L<Term::CLI|Term::CLI>(3p),
+L<Term::CLI::Util|Term::CLI::Util>(3p),
+L<Getopt::Long|Getopt::Long>(3p).
 
 =head1 AUTHOR
 

@@ -1,3 +1,7 @@
+0.41.4 2022-02-15 18:19:07 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - card now returns the currently selected field in selectedField and newValue
+
 0.41.3 2022-01-10 12:03:21 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - remove custom reconfig behavior for cama app ... this is covered by regular funktionality

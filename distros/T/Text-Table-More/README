@@ -3,8 +3,8 @@ NAME
     options
 
 VERSION
-    This document describes version 0.022 of Text::Table::More (from Perl
-    distribution Text-Table-More), released on 2022-01-27.
+    This document describes version 0.023 of Text::Table::More (from Perl
+    distribution Text-Table-More), released on 2022-02-14.
 
 SYNOPSIS
      #!perl
@@ -104,9 +104,9 @@ SYNOPSIS
      | 1962 | The Bob Newhart Show (NBC)   |                      | The Garry Moore Show (CBS)   | E. G. Marshall, The Defenders (CBS)                                   | Shirley Booth, Hazel (NBC)                                                              |
      +------+------------------------------+                      +------------------------------+                                                                       |                                                                                         |
      | 1963 | The Dick Van Dyke Show (CBS) | The Defenders (CBS)  | The Andy Williams Show (NBC) |                                                                       |                                                                                         |
-     +------+                              |                      +------------------------------+-----------------------------------------------------------------------+-----------------------------------------------------------------------------------------+
+     +------+                              |                      +------------------------------+---------------------------------------------|-------------------------+------------------------------------------------|----------------------------------------+
      | 1964 |                              |                      | The Danny Kaye Show (CBS)    | Dick Van Dyke, The Dick Van Dyke Show (CBS)                           | Mary Tyler Moore, The Dick Van Dyke Show (CBS)                                          |
-     +------+------------------------------+----------------------+------------------------------+-----------------------------------------------------------------------+-----------------------------------------------------------------------------------------+
+     +------+------------------------------+----------------------+------------------------------+---------------------------------------------|-------------------------+------------------------------------------------|----------------------------------------+
      | 1965 | four winners (Outstanding Program Achievements in Entertainment)                   | five winners (Outstanding Program Achievements in Entertainment)                                                                                                |
      +------+------------------------------+----------------------+------------------------------+---------------------------------------------+-------------------------+------------------------------------------------+----------------------------------------+
      | 1966 | The Dick Van Dyke Show (CBS) | The Fugitive (ABC)   | The Andy Williams Show (NBC) | Dick Van Dyke, The Dick Van Dyke Show (CBS) | Bill Cosby, I Spy (CBS) | Mary Tyler Moore, The Dick Van Dyke Show (CBS) | Barbara Stanwyck, The Big Valley (CBS) |
@@ -128,9 +128,9 @@ SYNOPSIS
      │ 1962 │ The Bob Newhart Show (NBC)   │                      │ The Garry Moore Show (CBS)   │ E. G. Marshall, The Defenders (CBS)                                   │ Shirley Booth, Hazel (NBC)                                                              │
      ├──────┼──────────────────────────────┤                      ├──────────────────────────────┤                                                                       │                                                                                         │
      │ 1963 │ The Dick Van Dyke Show (CBS) │ The Defenders (CBS)  │ The Andy Williams Show (NBC) │                                                                       │                                                                                         │
-     ├──────┤                              │                      ├──────────────────────────────┼───────────────────────────────────────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────┤
+     ├──────┤                              │                      ├──────────────────────────────┼─────────────────────────────────────────────│─────────────────────────┼────────────────────────────────────────────────│────────────────────────────────────────┤
      │ 1964 │                              │                      │ The Danny Kaye Show (CBS)    │ Dick Van Dyke, The Dick Van Dyke Show (CBS)                           │ Mary Tyler Moore, The Dick Van Dyke Show (CBS)                                          │
-     ├──────┼──────────────────────────────┴──────────────────────┴──────────────────────────────┼───────────────────────────────────────────────────────────────────────┴─────────────────────────────────────────────────────────────────────────────────────────┤
+     ├──────┼──────────────────────────────┴──────────────────────┴──────────────────────────────┼─────────────────────────────────────────────│─────────────────────────┴────────────────────────────────────────────────│────────────────────────────────────────┤
      │ 1965 │ four winners (Outstanding Program Achievements in Entertainment)                   │ five winners (Outstanding Program Achievements in Entertainment)                                                                                                │
      ├──────┼──────────────────────────────┬──────────────────────┬──────────────────────────────┼─────────────────────────────────────────────┬─────────────────────────┬────────────────────────────────────────────────┬────────────────────────────────────────┤
      │ 1966 │ The Dick Van Dyke Show (CBS) │ The Fugitive (ABC)   │ The Andy Williams Show (NBC) │ Dick Van Dyke, The Dick Van Dyke Show (CBS) │ Bill Cosby, I Spy (CBS) │ Mary Tyler Moore, The Dick Van Dyke Show (CBS) │ Barbara Stanwyck, The Big Valley (CBS) │
@@ -244,28 +244,28 @@ DECLARED FEATURES
 
         Provide a way for user to specify horizontal padding of cells.
 
-        Value: no.
+        Value: yes.
 
     *   can_hpad_individual_cell
 
         Provide a way for user to specify different horizontal padding of
         individual cells.
 
-        Value: no.
+        Value: yes.
 
     *   can_hpad_individual_column
 
         Provide a way for user to specify different horizontal padding of
         individual columns.
 
-        Value: no.
+        Value: yes.
 
     *   can_hpad_individual_row
 
         Provide a way for user to specify different horizontal padding of
         individual rows.
 
-        Value: no.
+        Value: yes.
 
     *   can_rowspan
 
@@ -333,28 +333,28 @@ DECLARED FEATURES
 
         Provide a way for user to specify vertical padding of cells.
 
-        Value: no.
+        Value: yes.
 
     *   can_vpad_individual_cell
 
         Provide a way for user to specify different vertical padding of
         individual cells.
 
-        Value: no.
+        Value: yes.
 
     *   can_vpad_individual_column
 
         Provide a way for user to specify different vertical padding of
         individual columns.
 
-        Value: no.
+        Value: yes.
 
     *   can_vpad_individual_row
 
         Provide a way for user to specify different vertical padding of
         individual rows.
 
-        Value: no.
+        Value: yes.
 
     *   speed
 
@@ -365,54 +365,145 @@ DECLARED FEATURES
     For more details on module features, see Module::Features.
 
 PER-ROW ATTRIBUTES
-  align
-    String. Value is either "left", "middle", "right". Specify text
-    alignment of cells. Override table argument, but is overridden by
-    per-column or per-cell attribute of the same name.
+    *   align
 
-  valign
-    String. Value is either "top", "middle", "bottom". Specify vertical text
-    alignment of cells. Override table argument, but is overridden by
-    per-column or per-cell attribute of the same name.
+        String. Value is either "left", "middle", "right". Specify text
+        alignment of cells. Override table argument, but is overridden by
+        per-column or per-cell attribute of the same name.
 
-  bottom_border
-    Boolean.
+    *   valign
 
-  top_border
-    Boolean.
+        String. Value is either "top", "middle", "bottom". Specify vertical
+        text alignment of cells. Override table argument, but is overridden
+        by per-column or per-cell attribute of the same name.
+
+    *   bottom_border
+
+        Boolean.
+
+    *   top_border
+
+        Boolean.
+
+    *   lpad
+
+        Integer.
+
+    *   rpad
+
+        Integer.
+
+    *   hpad
+
+        Integer.
+
+    *   tpad
+
+        Integer.
+
+    *   bpad
+
+        Integer.
+
+    *   vpad
+
+        Integer.
 
 PER-COLUMN ATTRIBUTES
-  align
-    String. Value is either "left", "middle", "right". Specify text
-    alignment of cells. Override table argument and per-row attribute of the
-    same name, but is overridden by per-cell attribute of the same name.
+    *   align
 
-  valign
-    String. Value is either "top", "middle", "bottom". Specify vertical text
-    alignment of cells. Override table argument and per-row attribute of the
-    same name, but is overridden by per-cell attribute of the same name.
+        String. Value is either "left", "middle", "right". Specify text
+        alignment of cells. Override table argument and per-row attribute of
+        the same name, but is overridden by per-cell attribute of the same
+        name.
+
+    *   valign
+
+        String. Value is either "top", "middle", "bottom". Specify vertical
+        text alignment of cells. Override table argument and per-row
+        attribute of the same name, but is overridden by per-cell attribute
+        of the same name.
+
+    *   lpad
+
+        Integer.
+
+    *   rpad
+
+        Integer.
+
+    *   hpad
+
+        Integer.
+
+    *   tpad
+
+        Integer.
+
+    *   bpad
+
+        Integer.
+
+    *   vpad
+
+        Integer.
 
 PER-CELL ATTRIBUTES
-  align
-    String. Value is either "left", "middle", "right". Override table
-    argument, per-row attribute, and per-column attribute of the same name.
+    *   align
 
-  valign
-    String. Value is either "top", "middle", "bottom". Specify vertical text
-    alignment of cells. Override table argument, per-row attribute, and
-    per-column attribute of the same name.
+        String. Value is either "left", "middle", "right". Override table
+        argument, per-row attribute, and per-column attribute of the same
+        name.
 
-  colspan
-    Positive integer. Default 1.
+    *   valign
 
-  rowspan
-    Positive integer. Default 1.
+        String. Value is either "top", "middle", "bottom". Specify vertical
+        text alignment of cells. Override table argument, per-row attribute,
+        and per-column attribute of the same name.
 
-  bottom_border.
-    Boolean. Currently the attribute of he leftmost cell is used.
+    *   colspan
 
-  top_border.
-    Boolean. Currently the attribute of he leftmost cell is used.
+        Positive integer. Default 1.
+
+    *   rowspan
+
+        Positive integer. Default 1.
+
+    *   bottom_border.
+
+        Boolean. Currently the attribute of he leftmost cell is used.
+
+    *   top_border.
+
+        Boolean. Currently the attribute of he leftmost cell is used.
+
+    *   lpad
+
+        Integer.
+
+    *   rpad
+
+        Integer.
+
+    *   hpad
+
+        Integer.
+
+    *   tpad
+
+        Integer.
+
+    *   bpad
+
+        Integer.
+
+    *   vpad
+
+        Integer.
+
+    *   pad_char
+
+        String.
 
 FUNCTIONS
   generate_table
@@ -447,10 +538,12 @@ FUNCTIONS
 
     *   border_style
 
-        Str. Optional. Default to "ASCII::SingleLineDoubleAfterHeader". This
-        is Perl module under the BorderStyle namespace, without the
-        namespace prefix. To see how a border style looks like, you can use
-        the CLI show-border-style from App::BorderStyleUtils.
+        Str. Optional. Uses default from the environment variable
+        "PERL_TEXT_TABLE_MORE_BORDER_STYLE", or environment variable
+        "BORDER_STYLE", or "ASCII::SingleLineDoubleAfterHeader". This is
+        Perl module under the BorderStyle namespace, without the namespace
+        prefix. To see how a border style looks like, you can use the CLI
+        show-border-style from App::BorderStyleUtils.
 
     *   align
 
@@ -488,6 +581,53 @@ FUNCTIONS
         Alternatively, you can specify a cell's attribute in the "rows"
         argument directly, by specifying a cell as hashref.
 
+    *   lpad
+
+        Integer. Optional. Set number of padding characters to add at the
+        left side of table cells. Overrides "hpad". Overridden by
+        per-row/per-column/per-cell padding attributes. See also "rpad".
+
+    *   rpad
+
+        Integer. Optional. Set number of padding characters to add at the
+        right side of table cells. Overrides "hpad". Overridden by
+        per-row/per-column/per-cell padding attributes. See also "rpad".
+
+    *   hpad
+
+        Integer. Optional. Set number of padding characters to add at the
+        left and right sides of table cells. Overridden by "lpad" for left
+        side, and "rpad" for right side. Overridden by
+        per-row/per-column/per-cell padding attributes. See also "vpad".
+
+        Default is 1.
+
+    *   tpad
+
+        Integer. Optional. Set number of padding lines to add at the top
+        side of table cells. Overrides "vpad". Overridden by
+        per-row/per-column/per-cell padding attributes. See also "bpad".
+
+    *   bpad
+
+        Integer. Optional. Set number of padding lines to add at the bottom
+        side of table cells. Overrides "vpad". Overridden by
+        per-row/per-column/per-cell padding attributes. See also "tpad".
+
+    *   vpad
+
+        Integer. Optional. Set number of padding lines to add at the top and
+        bottom sides of table cells. Overridden by "tpad" for top side, and
+        "bpad" for bottom side. Overridden by per-row/per-column/per-cell
+        padding attributes. See also "hpad".
+
+        Default is 0.
+
+    *   pad_char
+
+        String. Optional. Must be one character long. Default is " " (space
+        character).
+
     *   separate_rows
 
         Boolean. Optional. Default 0. If set to true, will add a separator
@@ -513,6 +653,15 @@ FAQ
     Yes, by setting "header_row" option to 2 or whatever number of header
     rows you have. See example script multirow-header.pl in this
     distribution.
+
+ENVIRONMENT
+  PERL_TEXT_TABLE_MORE_BORDER_STYLE
+    String. Used to set the default for the "border_style" option. Has
+    higher precedence than "BORDER_STYLE".
+
+  BORDER_STYLE
+    String. Used to set the default for the "border_style" option. Has lower
+    precedence than "PERL_TEXT_TABLE_MORE_BORDER_STYLE".
 
 HOMEPAGE
     Please visit the project's homepage at

@@ -7,7 +7,7 @@
 #       Author:  Steven Bakker (SBAKKER), <sbakker@cpan.org>
 #      Created:  05/02/18
 #
-#   Copyright (c) 2018 Steven Bakker
+#   Copyright (c) 2018-2022 Steven Bakker
 #
 #   This module is free software; you can redistribute it and/or modify
 #   it under the same terms as Perl itself. See "perldoc perlartistic."
@@ -18,15 +18,19 @@
 #
 #=============================================================================
 
-package Term::CLI::Role::CommandSet 0.054002;
+package Term::CLI::Role::CommandSet 0.055002;
 
 use 5.014;
 use warnings;
 
+use Carp qw( croak );
+use Scalar::Util qw( reftype );
 use Term::CLI::L10N qw( loc );
+use Term::CLI::Util qw( find_obj_name_matches );
 
 use Types::Standard 1.000005 qw(
     ArrayRef
+    Bool
     CodeRef
     InstanceOf
     ConsumerOf
@@ -36,25 +40,28 @@ use Types::Standard 1.000005 qw(
 use Moo::Role;
 use namespace::clean 0.25;
 
+my $ERROR_STATUS  = -1;
+
 has parent => (
     is       => 'rwp',
     weak_ref => 1,
-    isa      => ConsumerOf ['Term::CLI::Role::CommandSet'],
+    isa      => Maybe[ ConsumerOf ['Term::CLI::Role::CommandSet'] ],
 );
 
-has _commands => (
+has _command_list => (
     is       => 'rw',
-    writer   => '_set_commands',
+    isa      => Maybe [ArrayRef|CodeRef],
     init_arg => 'commands',
-    isa      => Maybe [ ArrayRef [ InstanceOf ['Term::CLI::Command'] ] ],
+    writer   => '_set_command_list',
     trigger  => 1,
     coerce   => sub {
-
-        # Copy the array, so the reference we store becomes
-        # "internal", preventing accidental modification
-        # from the outside.
-        return [ @{ $_[0] } ];
-    },
+        my ($arg) = @_;
+        if (ref $arg && reftype $arg eq 'ARRAY') {
+            # clone and sort array.
+            return [ sort { $a->name cmp $b->name } @{$arg} ];
+        }
+        return $arg;
+    }
 );
 
 has callback => (
@@ -63,81 +70,146 @@ has callback => (
     predicate => 1
 );
 
-# $self->_set_commands($ref) => $self->_trigger__commands($ref);
+has require_sub_command => (
+    is      => 'ro',
+    isa     => Bool,
+    default => sub { 1 },
+);
+
+# $self->_set_command_list($ref) => $self->_trigger__command_list($ref);
 #
 # Trigger to run whenever the object's _commands array ref is set.
 #
-sub _trigger__commands {    ## no critic (ProhibitUnusedPrivateSubroutines)
-    my ( $self, $arg ) = @_;
+sub _trigger__command_list { ## no critic (ProhibitUnusedPrivateSubroutines)
+    my ( $self, $cmd_list ) = @_;
 
-    # No need to check for defined-ness of $arg.
-    # The writer method already checks & croaks.
-    for my $cmd (@$arg) {
-        $cmd->_set_parent($self);
+    return if !$cmd_list;
+
+    # Set the parent for each command object.
+    if (ref $cmd_list && reftype $cmd_list eq 'ARRAY') {
+        for my $cmd_obj ( @{$cmd_list} ) {
+            $cmd_obj->_set_parent($self);
+        }
     }
     return;
 }
 
+# Get the command list reference, expand a CODE ref if necessary.
+sub _get_command_list {
+    my ($self) = @_;
+
+    my $command_list = $self->_command_list;
+
+    return undef if !ref $command_list;
+
+    return $command_list if reftype $command_list eq 'ARRAY';
+
+    if (reftype $command_list ne 'CODE') {
+        croak "internal error: 'command' ($command_list) is ",
+            "neither a CodeRef nor an ArrayRef!";
+    }
+
+    $command_list = $command_list->($self);
+
+    if (!ref $command_list || reftype $command_list ne 'ARRAY') {
+        croak "'command' CodeRef should return an ARRAY ref, not ",
+            ref $command_list     ? reftype( $command_list ) :
+            defined $command_list ?  "'$command_list'"       :
+            '(undef)';
+    }
+
+    return $self->_set_command_list($command_list);
+}
+
 sub commands {
-    my $self = shift;
-    my @l    = sort { $a->name cmp $b->name } @{ $self->_commands // [] };
+    my ($self) = @_;
+    my $command_list = $self->_get_command_list // [];
+    return @{ $command_list };
+}
+
+sub command_names {
+    my ($self) = @_;
+    my $command_list = $self->_get_command_list or return;
+    my @l = map { $_->name } @{$command_list};
     return @l;
 }
 
 sub has_commands {
-    my $self = shift;
-    return ( $self->_commands and scalar @{ $self->_commands } > 0 );
+    my ($self) = @_;
+    my $command_list = $self->_get_command_list or return !1;
+    return scalar( @{$command_list} ) > 0;
 }
 
 sub add_command {
     my ( $self, @commands ) = @_;
 
-    if ( !$self->_commands ) {
-        $self->_set_commands( [] );
+    my $cmd_list = $self->_get_command_list;
+
+    if (!$cmd_list) {
+        $cmd_list = \@commands;
+        $self->_set_command_list($cmd_list);
+        return $self;
     }
 
-    for my $cmd (@commands) {
-        push @{ $self->_commands }, $cmd;
-        $cmd->_set_parent($self);
+    for my $cmd_obj ( @commands ) {
+        $cmd_obj->_set_parent( $self );
     }
+
+    push @{$cmd_list}, @commands;
+    @{$cmd_list} = sort { $a->name cmp $b->name } @{$cmd_list};
+
     return $self;
 }
 
-sub command_names {
-    my $self = shift;
-    return map { $_->name } $self->commands;
+sub delete_command {
+    my ( $self, @commands ) = @_;
+
+    my $cmd_list = $self->_get_command_list or return;
+
+    my %to_delete = map { (ref $_ ? $_->name : $_ ) => 1 } @commands;
+
+    my @deleted;
+
+    for my $index (reverse 0..$#{$cmd_list}) {
+        my $cmd_obj = $cmd_list->[$index];
+        if ( $to_delete{$cmd_obj->name} ) {
+            my $cmd_obj = splice @{$cmd_list}, $index, 1;
+            $cmd_obj->_set_parent(undef);
+            push @deleted, $cmd_obj;
+        }
+    }
+    return @deleted;
 }
 
 sub find_matches {
-    my ( $self, $partial ) = @_;
-    return () if !$self->has_commands;
-    my @found = grep { rindex( $_->name, $partial, 0 ) == 0 } $self->commands;
-    return @found;
+    my ( $self, $text ) = @_;
+    return find_obj_name_matches($text, $self->_get_command_list);
 }
 
 sub root_node {
-    my $curr_node = shift;
+    my ($self) = my ($curr_node) = @_;
 
     while ( my $parent = $curr_node->parent ) {
         $curr_node = $parent;
     }
-    return $curr_node;
+    return $curr_node // $self;
 }
 
 sub find_command {
-    my ( $self, $partial ) = @_;
-    my @matches = $self->find_matches($partial);
+    my ( $self, $text ) = @_;
 
-    if ( @matches == 1 ) {
-        return $matches[0];
-    }
-    if ( @matches == 0 ) {
-        return $self->set_error( loc( "unknown command '[_1]'", $partial ) );
-    }
+    my @matches = find_obj_name_matches(
+        $text, $self->_get_command_list, exact => 1 );
+
+    return $self->set_error( loc( "unknown command '[_1]'", $text ) )
+        if @matches == 0;
+
+    return $matches[0] if @matches == 1 || $matches[0]->name eq $text;
+
     return $self->set_error(
         loc("ambiguous command '[_1]' (matches: [_2])",
-            $partial,
-            join( ', ', sort map { $_->name } @matches )
+            $text,
+            join( ', ', map { $_->name } @matches )
         )
     );
 }
@@ -151,6 +223,147 @@ sub try_callback {
     return %args;
 }
 
+# CLI->_set_completion_attribs();
+#
+# Set some attributes in the Term::ReadLine object related to
+# custom completion.
+#
+sub _set_completion_attribs {
+    my ($self) = @_;
+    my $root = $self->root_node;
+    my $term = $root->term;
+
+
+    # set Completion for current object
+    $term->Attribs->{completion_function} = sub { $self->complete_line( @_ ) };
+
+    # Default: '"
+    $term->Attribs->{completer_quote_characters} = $root->quote_characters;
+
+    # Default: \n\t\\"'`@$><=;|&{( and <space>
+    $term->Attribs->{completer_word_break_characters} = $root->word_delimiters;
+
+    # Default: <space>
+    $term->Attribs->{completion_append_character} =
+        substr( $root->word_delimiters, 0, 1 );
+
+    return;
+}
+
+# See POD X<complete_line>
+sub complete_line {
+    my ( $self, $text, $line, $start ) = @_;
+
+    my $root = $self->root_node;
+
+    $self->_set_completion_attribs;
+
+    my $quote_char = $self->term->completion_quote_character;
+
+    my @words;
+
+    if ( $start > 0 ) {
+        if ( length $quote_char ) {
+
+            # ReadLine thinks the $text to be completed is quoted.
+            # The quote character will precede the $start of $text.
+            # Make sure we do not include it in the text to break
+            # into words...
+            $start--;
+        }
+        ( my $err, @words ) =
+            $root->_split_line( substr( $line, 0, $start ) );
+    }
+
+    my @list;
+
+    if ( @words == 0 ) {
+        @list = map { $_->name } $self->find_matches( $text );
+    }
+    elsif ( my $cmd = $self->find_command( $words[0] ) ) {
+        @list = $cmd->complete(
+            $text => {
+                processed   => [shift @words],
+                unprocessed => \@words,
+                options => {},
+            }
+        );
+    }
+
+    return @list if length $quote_char; # No need to worry about spaces.
+
+    # Escape spaces in reply if necessary.
+    my $delim = $root->word_delimiters;
+    return map {s/([$delim])/\\$1/rgx} @list;
+}
+
+sub readline {    ## no critic (ProhibitBuiltinHomonyms)
+    my ( $self, %args ) = @_;
+
+    my $root = $self->root_node;
+
+    my $prompt = $args{prompt} // $self->prompt;
+    my $skip   = exists $args{skip} ? $args{skip} : $root->skip;
+
+    $self->_set_completion_attribs;
+
+    my $input;
+    while ( defined( $input = $root->term->readline($prompt) ) ) {
+        next if defined $skip && $input =~ $skip;
+        last;
+    }
+    return $input;
+}
+
+# OBJ->_split_line( $text );
+#
+# Attempt to split $text into words. Use a custom split function if
+# necessary.
+#
+sub _split_line {
+    my ( $self, $text ) = @_;
+    my $root_node = $self->root_node;
+    return $root_node->split_function->( $root_node, $text );
+}
+
+sub execute { return shift->execute_line(@_) }  ## DEPRECATED
+
+sub execute_line {
+    my ( $self, $cmd ) = @_;
+
+    my ( $error, @cmd ) = $self->_split_line($cmd);
+
+    my %args = (
+        status       => 0,
+        error        => q{},
+        command_line => $cmd,
+        command_path => [$self],
+        unparsed     => \@cmd,
+        options      => {},
+        arguments    => [],
+    );
+
+    return $self->try_callback( %args, status => $ERROR_STATUS,
+        error => $error )
+        if length $error;
+
+    if ( @cmd == 0 ) {
+        $args{error}  = loc("missing command");
+        $args{status} = $ERROR_STATUS;
+    }
+    elsif ( my $cmd_ref = $self->find_command( $cmd[0] ) ) {
+        %args = $cmd_ref->execute_command(
+            %args, unparsed => [ @cmd[ 1 .. $#cmd ] ] );
+    }
+    else {
+        $args{error}  = $self->error;
+        $args{status} = $ERROR_STATUS;
+    }
+
+    return $self->try_callback(%args);
+}
+
+
 1;
 
 __END__
@@ -163,7 +376,7 @@ Term::CLI::Role::CommandSet - Role for (sub-)commands in Term::CLI
 
 =head1 VERSION
 
-version 0.054002
+version 0.055002
 
 =head1 SYNOPSIS
 
@@ -204,25 +417,56 @@ This role defines two additional attributes:
 
 =over
 
-=item B<commands> =E<gt> I<ArrayRef>
+=item B<commands> =E<gt> { I<ArrayRef> | I<CodeRef> }
 
-Reference to an array containing C<Term::CLI::Command> object
-instances that describe the sub-commands that the command takes,
-or C<undef>.
+Either an C<ArrayRef> containing C<Term::CLI::Command>
+object instances that describe the sub-commands that the command takes,
+a C<CodeRef> that returns such an C<ArrayRef>, or C<undef>.
 
 Note that the elements of the array are copied over to an internal
-array, so modifications to the I<ArrayRef> will not be seen.
+array, so modifications to the C<ArrayRef> will not be seen.
+
+In case a C<CodeRef> is specified, the C<CodeRef> will be called only
+once, i.e. when the list of commands needs to be expanded. This allows
+for delayed object creation, which can be useful in deeper levels of the
+command hierarchy to reduce startup time.
+
+See also the L<commands|/commands> accessor below.
 
 =item B<callback> =E<gt> I<CodeRef>
 
 Reference to a subroutine that should be called when the command
 is executed, or C<undef>.
 
+=item B<require_sub_command> =E<gt> I<Bool>
+
+Default is 1 (true).
+
+If the list of C<commands> is not empty, it is normally required that the input
+contains one of these sub-commands after the "parent" command word. However, it
+may be desirable to allow the parent command to appear "naked", i.e. without a
+sub-command.
+
+For such cases, set the C<require_sub_command> to a false value.
+
+See also L<Term::CLI::Role::CommandSet|Term::CLI::Role::CommandSet/ATTRIBUTES>.
+
 =back
 
 =head1 ACCESSORS AND PREDICATES
 
 =over
+
+=item B<commands>
+X<commands>
+
+Returns an C<ArrayRef> containing C<Term::CLI::Command>
+object instances that describe the sub-commands that the command takes,
+or C<undef>.
+
+Note that, although a C<CodeRef> can be specified in the constructor, the
+actual I<accessor> will never return the C<CodeRef>. Rather, it
+will call the C<CodeRef> once and store the result in an C<ArrayRef>.
 
 =item B<has_callback>
 X<has_callback>
@@ -323,8 +567,10 @@ of object references:
     ]
 
 The first item in the C<command_path> list is always the top-level
-L<Term::CLI> object, while the last is always the same as the
-I<OBJ_REF> parameter.
+L<Term::CLI> object.
+
+The I<OBJ_REF> will be somewhere in that list; it will be the last
+one if it is the "leaf" command.
 
 =back
 
@@ -366,6 +612,120 @@ X<command_names>
 
 Return the list of (sub-)command names, sorted alphabetically.
 
+=item B<complete_line> ( I<TEXT>, I<LINE>, I<START> )
+X<complete_line>
+
+Called when the user hits the I<TAB> key for completion.
+
+I<TEXT> is the text to complete, I<LINE> is the input line so
+far, I<START> is the position in the line where I<TEXT> starts.
+
+The function will split the line in words and delegate the
+completion to the first L<Term::CLI::Command> sub-command,
+see L<Term::CLI::Command|Term::CLI::Command/complete>.
+
+=item B<delete_command> ( I<CMD>, ... )
+X<delete_command>
+
+Remove the given I<CMD> command(s) from the list of (sub-)commands,
+setting each object's L<parent|/parent> attribute to C<undef>.
+
+I<CMD> can be a string denoting a command name, or a
+L<Term::CLI::Command|Term::CLI::Command> object reference; if it
+is a reference, its C<name> will be used to locate the appropriate
+(sub-)command.
+
+Return the list of objects that were removed.
+
+=item B<execute> ( I<Str> ) B<### DEPRECATED>
+X<execute>
+
+=item B<execute_line> ( I<Str> )
+X<execute_line>
+
+Parse and execute the command line consisting of I<Str>
+(see the return value of L<readline|/readline> above).
+
+The command line is split into words using
+the L<split_function|/split_function>.
+If that succeeds, then the resulting list of words is
+parsed and executed, otherwise a parse error is generated
+(i.e. the object's L<callback|Term::CLI::Role::CommandSet/callback>
+function is called with a C<status> of C<-1> and a suitable C<error>
+field).
+
+For specifying a custom word splitting method, see
+L<split_function|/split_function>.
+
+Example:
+
+    while (my $line = $cli->readline(skip => qr/^\s*(?:#.*)?$/)) {
+        $cli->execute_line($line);
+    }
+
+The command line is parsed depth-first, and for every
+L<Term::CLI::Command>(3p) encountered, that object's
+L<callback|Term::CLI::Role::CommandSet/callback> function
+is executed (see
+L<callback in Term::CLI::Role::Command|Term::CLI::Role::CommandSet/callback>).
+
+The C<execute_line> function returns the results of the last called callback
+function.
+
+=over
+
+=item *
+
+Suppose that the C<file> command has a C<show> sub-command that takes
+an optional C<--verbose> option and a single file argument.
+
+=item *
+
+Suppose the input is:
+
+    file show --verbose foo.txt
+
+=item *
+
+Then the parse tree looks like this:
+
+    (cli-root)
+        |
+        +--> Command 'file'
+                |
+                +--> Command 'show'
+                        |
+                        +--> Option '--verbose'
+                        |
+                        +--> Argument 'foo.txt'
+
+=item *
+
+Then the callbacks will be called in the following order:
+
+=over
+
+=item 1.
+
+Callback for 'show'
+
+=item 2.
+
+Callback for 'file'
+
+=item 3.
+
+Callback for C<Term::CLI> object.
+
+=back
+
+=back
+
+The return value from each L<callback|Term::CLI::Role::CommandSet/callback>
+(a hash in list form) is fed into the next callback function in the
+chain. This allows for adding custom data to the return hash that will
+be fed back up the parse tree (and eventually to the caller).
+
 =item B<find_matches> ( I<Str> )
 X<find_matches>
 
@@ -377,13 +737,55 @@ X<find_command>
 
 Check whether I<Str> uniquely matches a command in this C<Term::CLI>
 object. Returns a reference to the appropriate
-L<Term::CLI::Command> object if successful; otherwise, it
-sets the objects C<error> field and returns C<undef>.
+L<Term::CLI::Command|Term::CLI::Command> object if successful; otherwise,
+it sets the object's C<error> field and returns C<undef>.
 
 Example:
 
     my $sub_cmd = $cmd->find_command($prefix);
     die $cmd->error unless $sub_cmd;
+
+=item B<readline> ( [ I<ATTR> =E<gt> I<VAL>, ... ] )
+X<readline>
+
+Read a line from the input connected to L<term|/term>, using
+the L<Term::ReadLine> interface.
+
+By default, it returns the line read from the input, or
+an empty value if end of file has been reached (e.g.
+the user hitting I<Ctrl-D>).
+
+The following I<ATTR> are recognised:
+
+=over
+
+=item B<skip> =E<gt> I<RegEx>
+
+Override the object's L<skip|/skip> attribute.
+
+Skip lines that match the I<RegEx> parameter. A common
+call is:
+
+    $text = CLI->readline( skip => qr{^\s+(?:#.*)$} );
+
+This will skip empty lines, lines containing whitespace, and
+comments.
+
+=item B<prompt> =E<gt> I<Str>
+
+Override the prompt given by the L<prompt|/prompt> method.
+
+=back
+
+Examples:
+
+    # Just read the next input line.
+    $line = $cli->readline;
+    exit if !defined $line;
+
+    # Skip empty lines and comments.
+    $line = $cli->readline( skip => qr{^\s*(?:#.*)?$} );
+    exit if !defined $line;
 
 =item B<root_node>
 X<root_node>

@@ -2,6 +2,7 @@ AUTHORS
 CHANGES
 COPYRIGHT
 examples/lib/Fancy/Module.pm
+examples/lib/Other/Module.pm
 examples/my_program.pl
 examples/runit.sh
 examples/t/number_test.t
@@ -11,6 +12,19 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 Readme.md
+t/00_endmarkers.t
+t/test_data/Dummy0.pm
+t/test_data/Dummy0.pm_exp
+t/test_data/Dummy1.pm
+t/test_data/Dummy1.pm_exp
+t/test_data/Dummy2.pm
+t/test_data/Dummy2.pm_exp
+t/test_data/Dummy3.pm
+t/test_data/Dummy3.pm_exp
+t/test_data/Dummy4.pm
+t/test_data/Dummy4.pm_exp
+t/test_data/Dummy5.pm
+t/test_data/Dummy5.pm_exp
 VERSION
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

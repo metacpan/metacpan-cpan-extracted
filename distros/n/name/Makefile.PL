@@ -1,4 +1,4 @@
-use 5.006;
+use 5.008;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -10,19 +10,39 @@ my %WriteMakefileArgs = (
     ABSTRACT_FROM    => 'lib/name.pm',
     LICENSE          => 'artistic_2',
     MIN_PERL_VERSION => '5.008',
+    META_MERGE       => {
+        'meta-spec'    => {version => 2},
+        dynamic_config => 0,
+        prereqs   => {
+            runtime => {requires => {perl => '5.008'}}
+        },
+        resources => {
+            bugtracker => {
+                web => 'https://github.com/augensalat/perl-name/issues'
+            },
+            license    => [
+                'http://www.opensource.org/licenses/artistic-license-2.0',
+            ],
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/augensalat/perl-name.git',
+                web  => 'https://github.com/augensalat/perl-name',
+            },
+        },
+    },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },
     TEST_REQUIRES => {
         'Test::Fatal' => '0',
-        'Test::More' => '0.90',
+        'Test::More'  => '0.90',
     },
     PREREQ_PM => {
         'Carp'      => '0',
         'Sub::Util' => '1.40',
     },
-    dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => 'name-*' },
+    dist  => {COMPRESS => 'gzip -9f', SUFFIX => 'gz'},
+    clean => {FILES => 'name-*'},
 );
 
 # Compatibility with old versions of ExtUtils::MakeMaker

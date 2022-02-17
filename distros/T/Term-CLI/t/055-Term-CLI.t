@@ -1,6 +1,6 @@
 #!/usr/bin/perl -T
 #
-# Copyright (C) 2018, Steven Bakker.
+# Copyright (c) 2018-2022, Steven Bakker.
 #
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl 5.14.0. For more details, see the full text
@@ -10,14 +10,16 @@
 use 5.014_001;
 use warnings;
 
-sub Main {
-    Term_CLI_test->SKIP_CLASS(
-        ($::ENV{SKIP_COMMAND})
-            ? "disabled in environment"
-            : 0
-    );
+use Test::More;
+
+my $TEST_NAME = 'CLI';
+
+sub Main() {
+    if ( ($::ENV{SKIP_ALL} || $::ENV{"SKIP_$TEST_NAME"}) && !$::ENV{"TEST_$TEST_NAME"} ) {
+       plan skip_all => 'skipped because of environment'
+    }
     Term_CLI_test->runtests();
-    return;
+    exit(0);
 }
 
 package Term_CLI_test {
@@ -27,7 +29,7 @@ use parent 0.225 qw( Test::Class );
 use Test::More 1.001002;
 use Test::Exception 0.35;
 use Test::Output 1.02;
-use Test::MockModule 0.171 qw( strict );
+use Test::MockModule 0.16 qw( strict );
 
 use FindBin 1.50;
 use Term::CLI;
@@ -213,9 +215,10 @@ sub startup : Test(startup => 5) {
             'Term::CLI::Command->new' );
 
     my $cli = Term::CLI->new(
-        prompt => 'test> ',
-        commands => [],
-        skip => qr/^\s*(?:#.*)?$/,
+        prompt      => 'test> ',
+        commands    => [],
+        skip        => qr/^\s*(?:#.*)?$/,
+        filehandles => []
     );
     isa_ok( $cli, 'Term::CLI', 'Term::CLI->new' );
     ok(!$cli->has_commands, 'empty commands array -> has_commands == false');
@@ -252,6 +255,7 @@ sub check_root_node: Test(6) {
 
     my $test_2_test_1 = $cli->find_command('test_2_test_1');
     ok($test_2_test_1, 'found the test_2_test_1 command');
+
     my $test_1 = $test_2_test_1->find_command('test_1');
     ok($test_2_test_1, 'found the test_2_test_1 test_1 sub-command');
 
@@ -275,6 +279,46 @@ sub check_command_names: Test(1) {
     return;
 }
 
+
+sub check_delete_command: Test(3) {
+    my ($self) = @_;
+    my $cli = $self->{cli};
+
+    my @commands = sort { $a cmp $b } map { $_->name } @{$self->{commands}};
+
+    my $target_index = int( (@commands - 1) /2 );
+    my @expected = @commands;
+    my $target_name = splice @expected, $target_index, 1;
+
+    my @deleted = $cli->delete_command($target_name);
+
+    if ( ! is( int(@deleted), 1, 'delete_command returns one element' ) ) {
+        diag("cannot test further");
+        return;
+    }
+
+    is( $deleted[0]->name, $target_name,
+        'delete_command deleted the correct command' )
+    or return;
+
+    my @leftover = $cli->command_names;
+    is_deeply( \@leftover, \@expected,
+            'delete_command leaves correct set of commands' );
+
+}
+
+sub check_state: Test(2) {
+    my $self = shift;
+    my $cli = $self->{cli};
+
+    my $got = $cli->state;
+    is_deeply( $got, {}, 'state returns an empty HashRef' );
+
+    $cli->state->{'flag'} = 123;
+
+    is( $cli->state->{'flag'}, 123,
+        'state is stored and retrieved correctly' );
+}
 
 sub check_attributes: Test(1) {
     my $self = shift;
@@ -403,7 +447,8 @@ sub check_complete_line: Test(12) {
     @expected = qw( );
     is_deeply(\@got, \@expected,
             "'$line$text' completions are (@expected)")
-    or diag("complete_line('$text','$line$text',$start) returned: (", join(", ", map {"'$_'"} @got), ")");
+    or diag("complete_line('$text','$line$text',$start) returned: (",
+            join(", ", map {"'$_'"} @got), ")");
 
     $line = 'show ';
     $text = '';
@@ -416,11 +461,11 @@ sub check_complete_line: Test(12) {
 
     {
         # Try quoted strings for completion... We need to make sure that
-        # Term::CLI's `_rl_completion_quote_character` returns a quote char,
+        # Term::CLI::ReadLine's `completion_quote_character` returns a quote char,
         # so temporarily mock it.
         my $quote_char = '"';
-        my $rl_mock = Test::MockModule->new('Term::CLI');
-        $rl_mock->redefine('_rl_completion_quote_character' => $quote_char);
+        my $rl_mock = Test::MockModule->new('Term::CLI::ReadLine');
+        $rl_mock->redefine('completion_quote_character' => $quote_char);
 
         $line = "show $quote_char";
         $text = 'd';

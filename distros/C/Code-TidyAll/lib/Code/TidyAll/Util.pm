@@ -8,7 +8,7 @@ use Path::Tiny 0.098 qw(tempdir);
 
 use Exporter qw(import);
 
-our $VERSION = '0.80';
+our $VERSION = '0.81';
 
 our @EXPORT_OK = qw(tempdir_simple);
 
@@ -55,7 +55,7 @@ Code::TidyAll::Util - Utility functions for internal use by Code::TidyAll
 
 =head1 VERSION
 
-version 0.80
+version 0.81
 
 =head1 SUPPORT
 
@@ -81,7 +81,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 - 2021 by Jonathan Swartz.
+This software is copyright (c) 2011 - 2022 by Jonathan Swartz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -3,7 +3,7 @@ package Perinci::CmdLine::POD;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-08-22'; # DATE
 our $DIST = 'Perinci-CmdLine-POD'; # DIST
-our $VERSION = '0.024'; # VERSION
+our $VERSION = '0.025'; # VERSION
 
 use 5.010001;
 use strict;
@@ -889,7 +889,6 @@ _
             }
         }
         if (@examples) {
-            push @sectpod, "Examples:\n\n";
             for my $eg (@examples) {
                 my $url = $urls{ $eg->{_sc_name} };
                 my $meta = $metas{ $eg->{_sc_name} };
@@ -1023,7 +1022,7 @@ Perinci::CmdLine::POD - Generate POD for Perinci::CmdLine-based CLI script
 
 =head1 VERSION
 
-This document describes version 0.024 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2021-08-22.
+This document describes version 0.025 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2021-08-22.
 
 =head1 SYNOPSIS
 
@@ -1159,14 +1158,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Cm
 
 Source repository is at L<https://github.com/perlancar/perl-Perinci-CmdLine-POD>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-POD>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Perinci::CmdLine>
@@ -1181,5 +1172,13 @@ This software is copyright (c) 2021, 2020, 2019, 2017 by perlancar <perlancar@cp
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-POD>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

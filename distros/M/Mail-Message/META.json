@@ -45,7 +45,7 @@
             "Test::More" : "0.47",
             "Time::Zone" : "0",
             "URI" : "1.23",
-            "User::Identity" : "1"
+            "User::Identity" : "1.01"
          }
       }
    },
@@ -61,6 +61,6 @@
          "web" : "https://github.com/markov2/perl5-Mail-Message"
       }
    },
-   "version" : "3.011",
+   "version" : "3.012",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

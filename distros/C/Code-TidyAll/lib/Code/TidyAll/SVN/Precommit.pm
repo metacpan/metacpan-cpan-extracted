@@ -13,7 +13,7 @@ use Try::Tiny;
 
 use Moo;
 
-our $VERSION = '0.80';
+our $VERSION = '0.81';
 
 # Public
 has conf_name                => ( is => 'ro' );
@@ -182,7 +182,7 @@ Code::TidyAll::SVN::Precommit - Subversion pre-commit hook that requires files t
 
 =head1 VERSION
 
-version 0.80
+version 0.81
 
 =head1 SYNOPSIS
 
@@ -337,7 +337,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 - 2021 by Jonathan Swartz.
+This software is copyright (c) 2011 - 2022 by Jonathan Swartz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

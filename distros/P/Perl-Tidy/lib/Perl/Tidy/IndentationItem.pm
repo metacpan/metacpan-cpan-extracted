@@ -8,11 +8,12 @@
 package Perl::Tidy::IndentationItem;
 use strict;
 use warnings;
-our $VERSION = '20211029';
+our $VERSION = '20220217';
 
 BEGIN {
 
     # Array index names
+    # Do not combine with other BEGIN blocks (c101).
     my $i = 0;
     use constant {
         _spaces_             => $i++,
@@ -21,14 +22,13 @@ BEGIN {
         _available_spaces_   => $i++,
         _closed_             => $i++,
         _comma_count_        => $i++,
-        _sequence_number_    => $i++,
-        _index_              => $i++,
+        _lp_item_index_      => $i++,
         _have_child_         => $i++,
         _recoverable_spaces_ => $i++,
-        _align_paren_        => $i++,
+        _align_seqno_        => $i++,
         _marked_             => $i++,
         _stack_depth_        => $i++,
-        _starting_index_K_   => $i++,
+        _K_begin_line_       => $i++,
         _arrow_count_        => $i++,
     };
 }
@@ -73,17 +73,16 @@ sub new {
     #                        # for this level
     # closed             =>  # index where we saw closing '}'
     # comma_count        =>  # how many commas at this level?
-    # sequence_number    =>  # output batch number
-    # index              =>  # index in output batch list
+    # lp_item_index     =>  # index in output batch list
     # have_child         =>  # any dependents?
     # recoverable_spaces =>  # how many spaces to the right
     #                        # we would like to move to get
     #                        # alignment (negative if left)
-    # align_paren        =>  # do we want to try to align
-    #                        # with an opening structure?
+    # align_seqno        =>  # if we are aligning with an opening structure,
+    #                        # this is its seqno
     # marked             =>  # if visited by corrector logic
     # stack_depth        =>  # indentation nesting depth
-    # starting_index_K   =>  # first token index K of this level
+    # K_begin_line   =>  # first token index K of this level
     # arrow_count        =>  # how many =>'s
 
     my $self = [];
@@ -93,14 +92,13 @@ sub new {
     $self->[_available_spaces_]   = $input_hash{available_spaces};
     $self->[_closed_]             = -1;
     $self->[_comma_count_]        = 0;
-    $self->[_sequence_number_]    = $input_hash{gnu_sequence_number};
-    $self->[_index_]              = $input_hash{index};
+    $self->[_lp_item_index_]      = $input_hash{lp_item_index};
     $self->[_have_child_]         = 0;
     $self->[_recoverable_spaces_] = 0;
-    $self->[_align_paren_]        = $input_hash{align_paren};
+    $self->[_align_seqno_]        = $input_hash{align_seqno};
     $self->[_marked_]             = 0;
     $self->[_stack_depth_]        = $input_hash{stack_depth};
-    $self->[_starting_index_K_]   = $input_hash{starting_index_K};
+    $self->[_K_begin_line_]       = $input_hash{K_begin_line};
     $self->[_arrow_count_]        = 0;
 
     bless $self, $class;
@@ -189,8 +187,8 @@ sub decrease_available_spaces {
     return $self->[_available_spaces_];
 }
 
-sub get_align_paren {
-    return $_[0]->[_align_paren_];
+sub get_align_seqno {
+    return $_[0]->[_align_seqno_];
 }
 
 sub get_recoverable_spaces {
@@ -221,16 +219,17 @@ sub get_level {
     return $_[0]->[_level_];
 }
 
-sub get_sequence_number {
-    return $_[0]->[_sequence_number_];
+sub get_spaces_level_ci {
+    my $self = shift;
+    return [ $self->[_spaces_], $self->[_level_], $self->[_ci_level_] ];
 }
 
-sub get_index {
-    return $_[0]->[_index_];
+sub get_lp_item_index {
+    return $_[0]->[_lp_item_index_];
 }
 
-sub get_starting_index_K {
-    return $_[0]->[_starting_index_K_];
+sub get_K_begin_line {
+    return $_[0]->[_K_begin_line_];
 }
 
 sub set_have_child {

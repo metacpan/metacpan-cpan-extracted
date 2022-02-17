@@ -5,12 +5,12 @@ Crypt::OpenSSL::Guess - Guess OpenSSL include path
 
 # SYNOPSIS
 
-    use ExtUtils::MakerMaker;
+    use ExtUtils::MakeMaker;
     use Crypt::OpenSSL::Guess;
 
     WriteMakefile(
         # ...
-        LIBS => ['-lssl -lcrypto ' . openssl_lib_paths()],
+        LIBS => [openssl_lib_paths() . ' -lssl -lcrypto'],
         INC  => openssl_inc_paths(), # guess include path or get from $ENV{OPENSSL_PREFIX}
     );
 

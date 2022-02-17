@@ -52,5 +52,7 @@ sub create_font_object {
     return Text::Amuse::Compile::Fonts::Selected->new(size => 12,
                                                       sans => ($fonts->sans_fonts)[0],
                                                       main => ($fonts->serif_fonts)[0],
-                                                      mono => ($fonts->mono_fonts)[0]);
+                                                      mono => ($fonts->mono_fonts)[0],
+                                                      all_fonts => $fonts,
+                                                     );
 }

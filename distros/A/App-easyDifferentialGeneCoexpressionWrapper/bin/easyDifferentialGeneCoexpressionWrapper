@@ -1,0 +1,448 @@
+#!/usr/bin/env perl
+
+##########################################################################################################################################################################################
+#                                                                                                                                                                                        #
+#                                                                                                                                                                                        #
+# easyDifferentialGeneCoexpressionWrapper, version 1.00                                                                                                                                  #
+# -----------------------------------------------------                                                                                                                                  #
+#                                                                                                                                                                                        #        
+# Last Update: 12/2/22                                                                                                                                                                   #
+#                                                                                                                                                                                        #
+# Author:   Abbas Alameer <abbas.alameer@ku.edu.kw>,                                                                                                                                     #
+#                      Kuwait University                                                                                                                                                 #
+#                                                                                                                                                                                        #
+# Please email queries, suggestions, and possible bug information to the above author.                                                                                                   #
+#                                                                                                                                                                                        #
+# Brief Description:                                                                                                                                                                     #
+# ------------------                                                                                                                                                                     #
+#                                                                                                                                                                                        #
+# This is a wrapper program for the easyDifferentialGeneCoexpression.r (developed by Davide Chicco) whose function is to detect pairings of genes/probesets with the highest,            #
+# significant differential coexpression. For more information, see https://cran.r-project.org/web/packages/easyDifferentialGeneCoexpression/index.html                                   #
+#                                                                                                                                                                                        #
+# The prerequisite for running this program in a UNIX or Linux environment is:                                                                                                           #
+# ----------------------------------------------------------------------------                                                                                                           #
+#                                                                                                                                                                                        #
+# 1. cURL: If using an Ubuntu-based system, the program will assist the user in installing cURL, otherwise                                                                               #
+#                   manual installation is required.                                                                                                                                     #
+#                                                                                                                                                                                        #
+# 2. R programming language: >= v4 is required to be installed.                                                                                                                          #
+#                                                                                                                                                                                        #
+#                                                                                                                                                                                        #
+# Program Usage:                                                                                                                                                                         #
+# --------------                                                                                                                                                                         #
+#                                                                                                                                                                                        #
+# easyDifferentialGeneCoexpressionWrapper -h [-a PROBESETS_OR_GENE_SYMBOLS] [-f INPUT_FILE] [-d GEO_DATASET_CODE] [-v FEATURE_NAME] [-v1 CONDITION_1] [-v2 CONDITION_2] [-o OUTPUT_FILE] #
+#                                                                                                                                                                                        #
+##########################################################################################################################################################################################
+
+
+
+#import standard Perl modules
+use strict;
+use warnings;
+use Term::ANSIColor;
+use Getopt::Long qw(GetOptions);
+use File::Basename;
+use File::HomeDir;
+
+
+#variables
+my %options 	          = (); #hash for storing command line switches and arguments
+my $prog_path;
+my $current_date_time     = date_time();
+my $input_command_line;
+my $run_subdir;
+my $rscript_subdir;
+my $csv_file_subdir;
+my $results_subdir;
+my $RscriptFile;
+my $rscript_path;
+my $data_path;
+my $results_path;
+my $home_dir              = File::HomeDir -> my_home;
+my $absolute_path;
+my $argv_line;
+my $probesets_or_geneSymbols;
+my $geoDatasetCode;
+my $csv_file;
+my $featureName;
+my $firstCondition;
+my $secondCondition; 
+my $outputResultsFile;
+my $outputLogFile;
+my $help;
+my $main_csv_file;
+
+
+#run start-up
+start_up();
+
+#perform initial checks
+initial_checks();
+
+#check CLI flags
+input_parameters_check();
+
+#run easyDifferentialGeneCoexpression.r (R script)
+main();
+
+
+
+###################################################
+#                                                 #
+#             SUBROUTINES BELOW                   #
+#             -----------------                   #
+#                                                 #
+###################################################
+
+############################ SUBROUTINE 1 #######################################################
+#This subroutine prints the program details at start-up.
+sub start_up {
+	
+	print color ("yellow"),"  
+#######################################################################
+#                                                                     #
+#                easyDifferentialGeneCoexpressionWrapper v1.00        #
+#                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~        #
+#                                                                     #
+#                Author:  Abbas Alameer, Kuwait University            #
+#                         abbas.alameer\@ku.edu.kw                     #
+#                                                                     #
+#                                                                     #
+#                       Developed in February 2022                    #
+#                     and released under GPLv2 license                #
+#                                                                     #
+#######################################################################\n\n\n" , color("reset");
+}
+############################ SUBROUTINE 2 #######################################################
+#various checks done before program's run execution.
+sub initial_checks {
+	
+	#check 1 - check that the script is installed on the system.
+	#Prompt user to install it, if not found in the $PATH.
+	my $which_path	  	= qx{which easyDifferentialGeneCoexpressionWrapper};
+	$run_subdir			= "/easyDifferentialGeneCoexpressionWrapper_files";
+	$rscript_subdir 	= "$run_subdir/Rscript/";
+	$csv_file_subdir 	= "$run_subdir/data/";
+	$results_subdir		= "$run_subdir/results/";
+
+	unless ($which_path) {
+		
+		print color ("red"), "easyDifferentialGeneCoexpressionWrapper is not installed on this system...\n", color("reset");
+		print color ("red"), "See \"README\" for installation instructions.\n", color("reset");
+		exit;
+	} 
+
+	else {
+		
+		my $home_dir  = File::HomeDir -> my_home;
+		$rscript_path = $home_dir . $rscript_subdir;
+		$data_path	  = $home_dir . $csv_file_subdir;
+		$results_path = $home_dir . $results_subdir;
+		
+		#create main directories - ignore if already present
+		system("mkdir -p $rscript_path $data_path $results_path");
+	}
+	
+	#check 2 - check for the presence of curl binary in the $PATH. 
+	#if not found, install on Ubuntu-based systems. 
+	#if system is not Ubuntu-based systems, prompt user to install it manually.
+	my $check_curl = qx{which curl};
+	#check if current system is Ubuntu-based
+	my $ubuntu = qx{uname -a};
+	
+	if (!$check_curl) {
+			
+		if ($ubuntu=~ /.+ubuntu.+/ig) {
+			
+			print color ("red"), "curl binary was not found: follow onscreen instructions/input your password for its installation...\n\n", color("reset");
+			system("sudo apt -y install curl"); #install curl
+			print "done\n";	
+		} 
+			
+		else { 
+				
+			print color ("red"), "curl binary was not found: install it on your system.\n", color("reset");
+			exit; 
+		}
+	}	
+	
+	#check 3 - check for presence of easyDifferentialGeneCoexpressionInputParameters.r and its auxiliary file && .csv file(s)
+	$RscriptFile 	 = "$rscript_path" . "easyDifferentialGeneCoexpressionInputParameters.r";
+	
+	unless (-e $RscriptFile) {
+
+			#The script downloads the two R scripts if they do not exist in the current folder
+			print color ("red"), "\"$RscriptFile\" & \"installPackages.r\" files are missing and will be downloaded...\n\n", color("reset");
+			system ("cd $rscript_path && { curl -O -C - https://raw.githubusercontent.com/davidechicco/easyDifferentialGeneCoexpression/main/bin/easyDifferentialGeneCoexpressionInputParameters.r ; }");
+			#make sure to download installPackages.r an auxiliary script used for installing/loading CRAN packages by the main R script.
+			system ("cd $rscript_path && { curl -O -C - https://raw.githubusercontent.com/davidechicco/easyDifferentialGeneCoexpression/main/bin/installPackages.r ; }");
+
+	}
+	
+}
+############################ SUBROUTINE 3 #######################################################
+#get the current date and time.
+sub date_time {
+	
+    my ($sec, $min, $hour, $mday, $mon, $yr, $wday, $yday, $isdst) = localtime();
+    my $ctime = localtime();
+    my $time_hour;
+    my $time_minutes; 
+                                       #hour  #minutes
+    if ($ctime =~ m/^\w+\s+\w+\s+\d+\s+(\d+)\:(\d+)\:\d+\s+\d+/) {
+		
+		$time_hour = $1;
+		$time_minutes = $2;
+	}
+	
+    my $month    = $mon + 1;
+    my $year     = $yr + 1900;
+    return "$year-0$month-$mday\_h$time_hour$time_minutes";
+}
+############################ SUBROUTINE 4 #######################################################
+#This subroutine checks all command line input switches and arguments (including optional ones).
+#It warns user if mandatory command line input switches and arguments are missing.
+sub input_parameters_check {
+
+
+	my $help_message1  = "Usage: easyDifferentialGeneCoexpressionWrapper -h [-a PROBESETS_OR_GENE_SYMBOLS] [-f INPUT_FILE] [-d GEO_DATASET_CODE] [-v FEATURE_NAME] [-v1 CONDITION_1] [-v2 CONDITION_2] [-o OUTPUT_DIRECTORY]";
+	my $help_message2  = "Mandatory arguments:
+	-a                    PROBESETS_OR_GENE_SYMBOLS
+	-f                    user-specified CSV file
+	-d                    GEO dataset code
+	-v                    feature name
+	-v1                   condition 1
+	-v2                   condition 2
+	-o                    output results file
+	-h                    show help message and exit\n";
+ 
+ 
+ 	#get command line parameters from @ARGV and append them all in string. Used for later output at the end of a run.	
+	foreach my $element (@ARGV) {
+	
+		if ($element !~ m/-a|-f|-d|-v|-v1|-v2|-o/) {
+		
+			$argv_line .= "\"$element\" ";
+			
+		} else {
+		
+			$argv_line .= "$element ";
+		}
+	}
+
+	if ($argv_line) {
+		
+		$input_command_line = "User input command: easyDifferentialGeneCoexpressionWrapper $argv_line";
+	}
+     
+    GetOptions(
+        'a=s'  => \$probesets_or_geneSymbols,
+        'f=s'  => \$csv_file,
+        'd=s'  => \$geoDatasetCode,
+        'v=s'  => \$featureName,
+        'v1=s' => \$firstCondition,
+        'v2=s' => \$secondCondition,
+        'o=s'  => \$outputResultsFile,
+        'h'    => \$help
+    );
+     
+    if ($help) {
+		
+		print color ("green"), "$help_message1\n\n$help_message2", color("reset");
+		exit;
+	}
+	
+    elsif (!$probesets_or_geneSymbols or !$csv_file or !$geoDatasetCode or !$featureName or !$firstCondition or !$secondCondition or !$outputResultsFile) {
+			
+        print color ("red"), "Error: arguments are missing...\n", color("reset");
+        print color ("green"),"$help_message1\n", color("reset");
+        exit;
+    }
+    
+	if (-e "$csv_file") {
+		
+		#copy file to the data directory. From there the Rscript command of main() will point to it.
+		system ("cp $csv_file $data_path");
+		
+		if ($csv_file =~ /.*\/(.*\..*)$/) { 
+			
+			$main_csv_file = $1;
+		} else { 
+		
+			$main_csv_file = $csv_file;	
+		}
+			
+	} else {
+		
+		print color ("red"), "Error: CSV file not found: \"$csv_file\". Make sure the name or path of the file is correct.\n", color("reset");
+		exit; 
+	}
+	
+	$outputResultsFile  = $outputResultsFile . "_$current_date_time";
+	$outputLogFile		= "Log" . "_$current_date_time";
+}
+############################ SUBROUTINE 5 #######################################################
+#This subroutine runs the easyDifferentialGeneCoexpression.r script.
+sub main {
+	
+	print color ("green"), "Running easyDifferentialGeneCoexpression.r script...\n", color("reset");	
+	#run easyDifferentialGeneCoexpression.r script using the CLI arguments inputted by the user.
+	system ("cd $rscript_path && { (Rscript $RscriptFile $probesets_or_geneSymbols $data_path$main_csv_file $geoDatasetCode $featureName $firstCondition $secondCondition | tee $results_path$outputResultsFile) 3>&1 1>&2 2>&3 | tee $results_path$outputLogFile; }");
+	print color ("green"), "Run complete.\n", color("reset");
+	print color ("green"), "$input_command_line\n\n", color("reset");
+	print color ("green"), "=========================================================================================\n", color("reset");
+	print color ("green"), "Check results file: ~$results_subdir$outputResultsFile\n", color("reset");
+}
+
+exit 0;
+
+=pod 
+
+=encoding utf8
+
+=head1 NAME
+
+easyDifferentialGeneCoexpressionWrapper is a wrapper program for the easyDifferentialGeneCoexpression.r R script (developed by Davide Chicco).
+
+=head1 SYNOPSIS
+
+    Usage: easyDifferentialGeneCoexpressionWrapper -a "PROBESETS_OR_GENE_SYMBOLS" -f "INPUT_FILE" -d "GEO_DATASET_CODE" -v "FEATURE_NAME" -v1 "CONDITION_1" -v2 "CONDITION_2" -o "OUTPUT_FILE" 
+
+An example usage command for computing the differential coexpression of probesets in the GSE30201 gene expression dataset is: 
+
+    $ easyDifferentialGeneCoexpressionWrapper -a "PROBESETS" -f "dc_probeset_list03.csv" -d "GSE30201" -v "source_name_ch1" -v1 "Patient" -v2 "Normal" -o result.out
+
+When using this command, the output files of easyDifferentialGeneCoexpressionWrapper will be found in the `~/easyDifferentialGeneCoexpressionWrapper_files/results/` directory, created in the user's home directory.
+
+=head1 DESCRIPTION
+
+This is a wrapper program for easyDifferentialGeneCoexpression.r whose function is to detect pairings of genes/probesets with the highest, significant differential coexpression. For more information, see its man page on CRAN (L<user manual|https://cran.r-project.org/web/packages/easyDifferentialGeneCoexpression/index.html/>).
+
+=head1 DEPENDENCIES
+
+=over
+
+=item strict
+
+=item warnings
+
+=item Term::ANSIColor
+
+=item Getopt::Long
+
+=item File::Basename
+
+=item File::HomeDir
+
+=back
+
+=head1 INSTALLATION
+
+easyDifferentialGeneCoexpressionWrapper can be used on any Linux, macOS, or Windows machines. On the Windows operating system you will need to install the Windows Subsystem for Linux (WSL) compatibility layer (L<The WSL Installation Page|https://docs.microsoft.com/en-us/windows/wsl/install/>). Once WSL is launched, the user can follow the easyDifferentialGeneCoexpressionWrapper installation instructions described below.
+
+By default, Perl is installed on all Linux or macOS operating systems. Likewise, cURL is installed on all macOS versions. cURL/R may not be installed on Linux/macOS. They would need to be manually installed through your operating system's software centres. cURL will be installed automatically on Linux Ubuntu by easyDifferentialGeneCoexpressionWrapper.
+
+Manual install:
+
+    $  perl Makefile.PL
+    $  make
+    $  make install
+
+On Linux Ubuntu, you might need to run the last command as a superuser
+(`sudo make install`) and you will need to manually install (if not
+already installed in your Perl 5 configuration) the following packages:
+
+libfile-homedir-perl
+
+    $  sudo apt-get install -y libfile-homedir-perl
+
+cpanminus
+
+    $  sudo apt -y install cpanminus
+
+CPAN install:
+
+    $  cpanm App::easyDifferentialGeneCoexpressionWrapper
+
+To uninstall:
+
+    $  cpanm --uninstall App::easyDifferentialGeneCoexpressionWrapper
+
+=head1 EXECUTION INSTRUCTIONS
+
+The command for running easyDifferentialGeneCoexpressionWrapper is:
+
+    $  easyDifferentialGeneCoexpressionWrapper -a "PROBESETS_OR_GENE_SYMBOLS" -f "INPUT_FILE" -d "GEO_DATASET_CODE" -v "FEATURE_NAME" -v1 "CONDITION_1" -v2 "CONDITION_2" -o "OUTPUT_FILE"
+
+An example usage command for computing the differential coexpression of probesets in the GSE30201 gene expression dataset is:
+
+    $  easyDifferentialGeneCoexpressionWrapper -a "PROBESETS" -f "dc_probeset_list03.csv" -d "GSE30201" -v "source_name_ch1" -v1 "Patient" -v2 "Normal" -o result.out
+
+When using this command, the output files of easyDifferentialGeneCoexpressionWrapper will be found in the `~/easyDifferentialGeneCoexpressionWrapper_files/results/` directory, created in the user's home directory.
+
+The mandatory command line options are described below:
+
+-a <PROBESETS_OR_GENE_SYMBOLS>
+
+A flag to indicate type of data (probesets or gene symbols) being read during execution
+
+-f <INPUT_FILE>
+
+The name of the CSV file listing the probesets or the gene symbols
+
+-d <GEO_DATASET_CODE>
+
+GEO dataset code of the microarray platform for which the probeset-gene symbol mapping should be done
+
+-v <FEATURE_NAME>
+
+name of the feature of the dataset that contains the two conditions to investigate
+
+-v1 <CONDITION_1>
+
+name of the first condition in the feature to discriminate (for example, "healthy")
+
+-v2 <CONDITION_2>
+
+name of the second condition in the feature to discriminate (for example, "can-
+cer")
+
+-o <OUTPUT_FILE>
+
+name of the output file where the output data for the differential coexpression of probesets are written
+
+=head1 HELP
+
+Help information can be read by typing the following command: 
+
+    $ easyDifferentialGeneCoexpressionWrapper -h
+
+This command will print the following instructions:
+
+Usage: easyDifferentialGeneCoexpressionWrapper -h
+
+Mandatory arguments:
+	-a                    PROBESETS_OR_GENE_SYMBOLS
+	-f                    user-specified CSV file
+	-d                    GEO dataset code
+	-v                    feature name
+	-v1                   condition 1
+	-v2                   condition 2
+	-o                    output results file
+	-h                    show help message and exit
+
+=head1 AUTHOR
+
+Abbas Alameer (Kuwait University)
+
+For information, please contact Abbas Alameer at abbas.alameer(AT)ku.edu.kw
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2022 by Abbas Alameer (Kuwait University)
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License, version 2 (GPLv2).
+
+=cut

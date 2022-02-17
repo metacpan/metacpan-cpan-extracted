@@ -1,0 +1,17 @@
+package Dummy4;sub wrapper_4 {
+use strict;
+use warnings FATAL => 'all';
+
+
+sub test4 {
+    my $val = "hello";
+    my $val2 = "__END__";
+}
+
+=head3 TEstero
+
+Bla Bla Bla
+
+=cut
+
+} wrapper_4();1

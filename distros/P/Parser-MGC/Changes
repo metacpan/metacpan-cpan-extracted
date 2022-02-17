@@ -1,5 +1,14 @@
 Revision history for Parser-MGC
 
+0.20    2022-02-14
+        [CHANGES]
+         * Avoid File::Slurp::Tiny (RT137215)
+         * Added methods
+            + ->filename
+            + ->nonempty_substring_before
+            + ->die and ->die_from
+         * Make use of perl 5.32's `isa` operator when available
+
 0.19    2021-04-23
         [CHANGES]
          * Document how to generate more helpful error messages from ->any_of

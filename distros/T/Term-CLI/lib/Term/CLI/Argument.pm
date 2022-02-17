@@ -7,7 +7,7 @@
 #       Author:  Steven Bakker (SBAKKER), <sbakker@cpan.org>
 #      Created:  22/01/18
 #
-#   Copyright (c) 2018 Steven Bakker
+#   Copyright (c) 2018-2022 Steven Bakker
 #
 #   This module is free software; you can redistribute it and/or modify
 #   it under the same terms as Perl itself. See "perldoc perlartistic."
@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI::Argument 0.054002;
+package Term::CLI::Argument 0.055002;
 
 use 5.014;
 use warnings;
@@ -73,7 +73,7 @@ before validate => sub {
 };
 
 sub validate {
-    my ( $self, $value ) = @_;
+    my ( $self, $value, $state ) = @_;
 
     if ( not defined $value or $value eq q{} ) {
         return $self->set_error( loc('value cannot be empty') );
@@ -93,7 +93,7 @@ Term::CLI::Argument - generic parent class for arguments in Term::CLI
 
 =head1 VERSION
 
-version 0.054002
+version 0.055002
 
 =head1 SYNOPSIS
 
@@ -193,17 +193,54 @@ Return the argument "type". By default, this is the object's class name
 with the C<M6::CLI::Argument::> prefix removed. Can be overloaded to
 provide a different value.
 
-=item B<validate> ( I<value> )
+=item B<validate> ( I<TEXT>, I<STATE> )
 
-Check whether I<value> is a valid value for this object. Return the
-(possibly normalised) value if it is, nothing (i.e. C<undef> or the
-empty list, depending on call context) if it is not (and set the
+Check whether I<TEXT> is a valid value for this object. Return the
+(possibly normalised) value if it is valid. Otherwise, return nothing
+(i.e. C<undef> or the empty list, depending on call context) and set the
 L<error|/error>() attribute).
 
 By default, this method only checks whether I<value> is defined and not
 an empty string.
 
 Sub-classes should probably override this.
+
+The C<validate> function can be made context-aware by inspecting the
+I<STATE> parameter, a HashRef containing the same key/value pairs
+as in the arguments to the
+L<command callback|Term::CLI::Role::CommandSet|/callback>
+function (see also
+L<Term::CLI::Role::CommandSet|Term::CLI::Role::CommandSet>):
+
+    STATE = {
+        status       => Int,
+        error        => Str,
+        options      => HashRef,
+        arguments    => ArrayRef[Value],
+        command_line => Str,
+        command_path => ArrayRef[InstanceOf['Term::CLI::Command']],
+    }
+
+The C<arguments> array holds the argument values (scalars) that were parsed up
+until now (not including the current argument value).
+
+The C<command_path> array holds the L<Term::CLI::Command|Term::CLI::Command>
+objects that were parsed up until now. This means that the command to which
+this argument applies can be accessed with:
+
+    CURRENT_COMMAND = STATE->{command_path}->[-1];
+
+The C<command_line> is the full string as it was passed from
+L<readline|Term::CLI/readline>.
+
+=over 6
+
+=item B<NOTE:>
+
+Care should be taken to not modify the values in the I<STATE> HashRef.
+Modifications may result in unexpected behaviour.
+
+=back
 
 =back
 

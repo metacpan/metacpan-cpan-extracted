@@ -11,11 +11,13 @@ my $builder = Module::Build->new(
     requires => {
       'perl'                      => "5.010001",
       'utf8'                      => 0,
+      'Carp'                      => 0,
       'Archive::Zip'              => 0,
       'Module::Load'              => 0,
       'Moose'                     => 0,
       'Date::Calc'                => 0,
       'POSIX'                     => 0,
+      'Scalar::Util'              => 0,
      },
     recommends => {
       'XML::LibXML::Reader'       => 0,
@@ -24,7 +26,6 @@ my $builder = Module::Build->new(
       'Test::More'                => 0,
       'List::Util'                => 0,
       'List::MoreUtils'           => 0,
-      'Scalar::Util'              => 0,
       'Module::Load::Conditional' => 0,
       'Clone'                     => 0,
     },

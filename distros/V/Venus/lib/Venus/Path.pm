@@ -251,7 +251,10 @@ sub mkdirs {
 
   my @paths;
 
-  for my $path (reverse($self->parents), ($self->is_file ? () : $self)) {
+  for my $path (
+    grep !!$_, reverse($self->parents), ($self->is_file ? () : $self)
+  )
+  {
     if ($path->exists) {
       next;
     }
@@ -902,7 +905,7 @@ I<Since C<0.01>>
 
   # given: synopsis;
 
-  my $find = $path->find('[:\/\\\.]+m.*');
+  my $find = $path->find('[:\/\\\.]+m.*$');
 
   # [
   #   bless({ value => "t/data/planets/makemake" }, "Venus::Path"),

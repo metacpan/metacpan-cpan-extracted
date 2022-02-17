@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.60;
+package Object::Pad 0.61;
 
 use v5.14;
 use warnings;
@@ -609,11 +609,18 @@ are invoked.
       ...
    }
 
+   method NAME;
+
 Declares a new named method. This behaves similarly to the C<sub> keyword,
 except that within the body of the method all of the member fields are also
 accessible. In addition, the method body will have a lexical called C<$self>
 which contains the invocant object directly; it will already have been shifted
 from the C<@_> array.
+
+If the method has no body and is given simply as a name, this declares a
+I<required> method for a role. Such a method must be provided by any class
+that implements the role. It will be a compiletime error to combine the role
+with a class that does not provide this.
 
 The C<signatures> feature is automatically enabled for method declarations. In
 this case the signature does not have to account for the invocant instance; 
@@ -766,6 +773,9 @@ check.
 Declares that this role requires a method of the given name from any class
 that implements it. It is an error at compiletime if the implementing class
 does not provide such a method.
+
+This form of declaring a required method is now vaguely discouraged, in favour
+of the bodyless C<method> form described above.
 
 =head1 CREPT FEATURES
 

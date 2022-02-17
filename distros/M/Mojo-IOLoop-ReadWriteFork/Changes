@@ -1,5 +1,8 @@
 Revision history for perl distribution Mojo-IOLoop-ReadWriteFork
 
+2.00 2022-02-12T11:53:55+0900
+ - Add support for "stderr" and "stdout" events
+
 1.02 2021-04-21T13:01:11+0900
  - Fix Mojo::Promise->timer require Mojolicious 8.41 #18
 

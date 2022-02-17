@@ -7,7 +7,7 @@ use Test2::Bundle::Extended;
 use Test2::Tools::Explain;
 use Test2::Plugin::NoWarnings;
 use Test2::Tools::Exception qw< lives dies >;
-use Test::MockFile qw< strict >;
+use Test::MockFile ();
 
 my $euid     = $>;
 my $egid     = int $);
@@ -71,8 +71,7 @@ subtest(
             }
             else {
                 ok( !chown( @{$args} ), $message );
-                is( $! + 0, 1,                         "chown failed (EPERM): \$>:$>, \$):$)" );
-                is( "$!",   'Operation not permitted', 'Correct error string' );
+                is( $! + 0, 1, "chown failed (EPERM): \$>:$>, \$):$)" );
             }
         };
 

@@ -1,3 +1,8 @@
+0.025   2021-08-22  Released-By: PERLANCAR; Urgency: medium
+
+	- Remove superfluous paragraph 'Examples:' in the EXAMPLES section.
+
+
 0.024   2021-08-22  Released-By: PERLANCAR; Urgency: medium
 
 	- Move generated examples from SYNOPSIS section to EXAMPLES

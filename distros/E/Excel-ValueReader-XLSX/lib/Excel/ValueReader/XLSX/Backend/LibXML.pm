@@ -7,7 +7,7 @@ use XML::LibXML::Reader qw/XML_READER_TYPE_END_ELEMENT/;
 
 extends 'Excel::ValueReader::XLSX::Backend';
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 #======================================================================
 # LAZY ATTRIBUTE CONSTRUCTORS
@@ -65,6 +65,7 @@ sub _workbook_data {
 
   return {sheets => \%sheets, base_year => $base_year};
 }
+
 
 sub _date_styles {
   my $self = shift;
@@ -129,16 +130,24 @@ sub _date_styles {
 # METHODS
 #======================================================================
 
-sub _xml_reader_for_zip_member {
-  my ($self, $member_name) = @_;
+sub _xml_reader {
+  my ($self, $xml) = @_;
 
-  my $contents = $self->_zip_member_contents($member_name);
-  my $reader   = XML::LibXML::Reader->new(string     => $contents,
+  my $reader   = XML::LibXML::Reader->new(string     => $xml,
                                           no_blanks  => 1,
                                           no_network => 1,
                                           huge       => 1);
   return $reader;
 }
+
+
+sub _xml_reader_for_zip_member {
+  my ($self, $member_name) = @_;
+
+  my $contents = $self->_zip_member_contents($member_name);
+  return $self->_xml_reader($contents);
+}
+
 
 sub values {
   my ($self, $sheet) = @_;
@@ -238,6 +247,63 @@ sub values {
 
 
 
+sub _table_targets {
+  my ($self, $rel_xml) = @_;
+
+  my $xml_reader = $self->_xml_reader($rel_xml);
+
+  my @table_targets;
+
+  # iterate through XML nodes
+ NODE:
+  while ($xml_reader->read) {
+    my $node_name = $xml_reader->name;
+    my $node_type = $xml_reader->nodeType;
+    next NODE if $node_type == XML_READER_TYPE_END_ELEMENT;
+
+    if ($node_name eq 'Relationship') {
+      my $target     = $xml_reader->getAttribute('Target');
+      if ($target =~ m[tables/table(\d+)\.xml]) {
+        # just store the table id (positive integer)
+        push @table_targets, $1;
+      }
+    }
+  }
+
+  return @table_targets;
+}
+
+
+sub _parse_table_xml {
+  my ($self, $xml) = @_;
+
+  my ($name, $ref, $no_headers, @columns);
+
+  my $xml_reader = $self->_xml_reader($xml);
+
+  # iterate through XML nodes
+ NODE:
+  while ($xml_reader->read) {
+    my $node_name = $xml_reader->name;
+    my $node_type = $xml_reader->nodeType;
+    next NODE if $node_type == XML_READER_TYPE_END_ELEMENT;
+
+    if ($node_name eq 'table') {
+      $name       = $xml_reader->getAttribute('displayName');
+      $ref        = $xml_reader->getAttribute('ref');
+      $no_headers = ($xml_reader->getAttribute('headerRowCount') // "") eq "0";
+    }
+    elsif ($node_name eq 'tableColumn') {
+      push @columns, $xml_reader->getAttribute('name');
+    }
+  }
+
+  return ($name, $ref, \@columns, $no_headers);
+}
+
+
+
+
 1;
 
 
@@ -261,7 +327,7 @@ Laurent Dami, E<lt>dami at cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2020,2021 by Laurent Dami.
+Copyright 2020-2022 by Laurent Dami.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

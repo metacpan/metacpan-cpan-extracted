@@ -3,19 +3,19 @@ abstract: 'sharing PDL data between Perl threads'
 author:
   - unknown
 build_requires:
-  ExtUtils::CBuilder: 0
-  ExtUtils::ParseXS: 3.0
-  Test::Exception: 0
-  Test::Warn: 0
+  ExtUtils::CBuilder: '0'
+  ExtUtils::ParseXS: '3.0'
+  Test::Exception: '0'
+  Test::Warn: '0'
 configure_requires:
-  Module::Build: 0.28
+  Module::Build: '0.28'
   PDL: v2.4.0
 dynamic_config: 1
-generated_by: 'Module::Build version 0.3901, CPAN::Meta::Converter version 2.120630'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: PDL-Parallel-threads
 no_index:
   directory:
@@ -26,15 +26,17 @@ no_index:
 provides:
   PDL::Parallel::threads:
     file: lib/PDL/Parallel/threads.pm
-    version: 0.03
+    version: '0.04'
   PDL::Parallel::threads::SIMD:
     file: lib/PDL/Parallel/threads/SIMD.pm
-    version: 0.02
+    version: '0.02'
 requires:
   PDL: v2.4.10
   perl: v5.8.0
+  threads::shared: '1.21'
 resources:
   bugtracker: http://github.com/run4flat/PDL-Parallel-threads/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/run4flat/PDL-Parallel-threads
-version: 0.03
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

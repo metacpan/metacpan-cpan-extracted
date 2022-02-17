@@ -1,0 +1,87 @@
+[
+   {
+      "desc" : "CMU Serif",
+      "name" : "CMU Serif",
+       "type" : "serif",
+       "languages": [ "hr" ]
+   },
+   {
+      "desc" : "Linux Libertine O",
+      "name" : "Linux Libertine O",
+      "type" : "serif"
+   },
+   {
+      "desc" : "FandolHei",
+      "languages" : [
+         "zh"
+      ],
+      "name" : "FandolHei",
+      "type" : "serif"
+   },
+   {
+      "desc" : "Source Han Serif SC",
+      "languages" : [
+         "zh"
+      ],
+      "name" : "Source Han Serif SC",
+      "type" : "serif"
+   },
+   {
+      "desc" : "Source Han Serif",
+      "languages" : [
+         "ja"
+      ],
+      "name" : "Source Han Serif",
+      "type" : "serif"
+   },
+   {
+      "desc" : "Source Han Serif K",
+      "languages" : [
+         "ko"
+      ],
+      "name" : "Source Han Serif K",
+      "type" : "serif"
+   },
+   {
+      "desc" : "CMU Sans Serif",
+      "name" : "CMU Sans Serif",
+      "type" : "sans"
+   },
+   {
+      "desc" : "FandolSong",
+      "languages" : [
+         "zh"
+      ],
+      "name" : "FandolSong",
+      "type" : "sans"
+   },
+   {
+      "desc" : "Source Han Sans SC",
+      "languages" : [
+         "zh"
+      ],
+      "name" : "Source Han Sans SC",
+      "type" : "sans"
+   },
+   {
+      "desc" : "Source Han Sans",
+      "languages" : [
+         "ja"
+      ],
+      "name" : "Source Han Sans",
+      "type" : "sans"
+   },
+   {
+      "desc" : "Source Han Sans K",
+      "languages" : [
+         "ko"
+      ],
+      "name" : "Source Han Sans K",
+      "type" : "sans"
+   },
+   {
+      "desc" : "CMU Typewriter Text",
+      "name" : "CMU Typewriter Text",
+      "type" : "mono"
+   }
+]

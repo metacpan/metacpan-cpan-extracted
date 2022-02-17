@@ -1,0 +1,19 @@
+# This CITATION.cff file was generated with /Users/brian/bin/bmt
+# Tue Feb 15 12:46:17 2022
+
+abstract: Test::File -- test file attributes
+authors:
+- family-names: foy
+  given-names: brian d
+  orcid: 0000-0002-0283-8283
+cff-version: 1.2.0
+date-released: refs/tags/v1.36
+doi: 10.5281/zenodo.6093297
+license: artistic_2
+license-url: https://github.com/briandfoy/test-file/LICENSE
+message: The GitHub page for this module provides formatted citations
+repository-code: https://github.com/briandfoy/test-file
+title: The Test::File Perl module
+type: software
+version: ''
+

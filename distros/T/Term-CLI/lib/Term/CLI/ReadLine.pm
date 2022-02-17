@@ -7,7 +7,7 @@
 #       Author:  Steven Bakker (SBAKKER), <sbakker@cpan.org>
 #      Created:  23/Jan/2018
 #
-#   Copyright (c) 2018 Steven Bakker
+#   Copyright (c) 2018-2022 Steven Bakker
 #
 #   This module is free software; you can redistribute it and/or modify
 #   it under the same terms as Perl itself. See "perldoc perlartistic."
@@ -18,7 +18,7 @@
 #
 #=============================================================================
 
-package Term::CLI::ReadLine 0.054002;
+package Term::CLI::ReadLine 0.055002;
 
 use 5.014;
 use warnings;
@@ -78,6 +78,14 @@ sub new {
 
 sub term { return $Term }
 
+# Dumb wrapper around "Attrib" that allows mocking the
+# `completion_quote_character` state.
+sub completion_quote_character {
+    my ($self) = @_;
+    my $c = $self->term->Attribs->{completion_quote_character} // q{};
+    return $c =~ s/\000//rgx;
+}
+
 sub ignore_keyboard_signals {
     my ( $self, @args ) = @_;
     foreach my $signame (@args) {
@@ -120,13 +128,13 @@ sub reset_ignore_keyboard_signals {
 }
 
 sub term_width {
-    my $self = shift;
+    my ($self) = @_;
     my ( $rows, $cols ) = $self->get_screen_size();
     return $cols;
 }
 
 sub term_height {
-    my $self = shift;
+    my ($self) = @_;
     my ( $rows, $cols ) = $self->get_screen_size();
     return $rows;
 }
@@ -241,7 +249,7 @@ sub readline {    ## no critic (ProhibitBuiltinHomonyms)
 #
 sub _set_signal_handlers {
     ## no critic (RequireLocalizedPunctuationVars)
-    my $self = shift;
+    my ($self) = @_;
 
     my %old_SIG = %SIG;
 
@@ -484,7 +492,7 @@ Term::CLI::ReadLine - Term::ReadLine compatibility layer for Term::CLI
 
 =head1 VERSION
 
-version 0.054002
+version 0.055002
 
 =head1 SYNOPSIS
 
@@ -544,6 +552,20 @@ See L<Term::ReadLine>(3p), L<Term::ReadLine::Gnu>(3p) and/or
 L<Term::ReadLine::Perl> for the inherited methods.
 
 =over
+
+=item B<completion_quote_character>
+X<completion_quote_character>
+
+In a L<Term::ReadLine::Gnu|Term::ReadLine::Gnu> environment this returns
+the C<rl_completion_quote_character>. This value is set during completion
+if the text to be completed has an open quote. Consider the case:
+
+    foo 'bar <TAB>
+
+When the completion function is called, the C<rl_completion_quote_character>
+will contain a single quote, C<'>.
+
+For non-GNU ReadLine backends, this function returns an empty string.
 
 =item B<echo_signal_char> ( I<signal> )
 X<echo_signal_char>

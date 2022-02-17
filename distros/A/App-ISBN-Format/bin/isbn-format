@@ -5,7 +5,7 @@ use warnings;
 
 use App::ISBN::Format;
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 # Run.
 exit App::ISBN::Format->new->run;
@@ -95,6 +95,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

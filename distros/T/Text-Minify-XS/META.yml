@@ -1,5 +1,5 @@
 ---
-abstract: 'Simple text minification'
+abstract: 'remove indentation and trailing whitespace'
 author:
   - 'Robert Rothenberg <rrwo@cpan.org>'
 build_requires:
@@ -30,7 +30,7 @@ name: Text-Minify-XS
 provides:
   Text::Minify::XS:
     file: lib/Text/Minify/XS.pm
-    version: v0.5.1
+    version: v0.6.0
 requires:
   Exporter: '0'
   XSLoader: '0'
@@ -41,7 +41,7 @@ resources:
   bugtracker: https://github.com/robrwo/Text-Minify-XS/issues
   homepage: https://metacpan.org/release/Text-Minify-XS
   repository: git://github.com/robrwo/Text-Minify-XS.git
-version: v0.5.1
+version: v0.6.0
 x_authority: cpan:RRWO
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -4,42 +4,45 @@ use v5.14;
 use warnings;
 
 use Test::More;
+use Test::Fatal;
 
-my $die;
+my $diemsg;
 
-package TestParser;
-use base qw( Parser::MGC );
+package TestParser {
+   use base qw( Parser::MGC );
 
-sub parse
-{
-   my $self = shift;
+   sub parse
+   {
+      my $self = shift;
 
-   $self->maybe( sub {
-      die $die if $die;
-      $self->token_ident;
-   } ) ||
-      $self->token_int;
+      $self->maybe( sub {
+         $self->die( $diemsg ) if $diemsg;
+         $self->token_ident;
+      } ) || $self->token_int;
+   }
 }
 
-package TestParser2;
-use base qw( Parser::MGC );
+package TestParser2 {
+   use base qw( Parser::MGC );
 
-sub parse
-{
-   my $self = shift;
-   $self->maybe( 'token_ident' ) || $self->token_int;
+   sub parse
+   {
+      my $self = shift;
+      $self->maybe( 'token_ident' ) || $self->token_int;
+   }
 }
-
-package main;
 
 my $parser = TestParser->new;
 
 is( $parser->from_string( "hello" ), "hello", '"hello"' );
 is( $parser->from_string( "123" ), 123, '"123"' );
 
-$die = "Now have to fail\n";
-ok( !eval { $parser->from_string( "456" ) }, '"456" with $die fails' );
-is( $@, "Now have to fail\n", 'Exception from failure' );
+$diemsg = "Now have to fail";
+is( exception { $parser->from_string( "456" ) },
+   qq[Now have to fail on line 1 at:\n] .
+   qq[456\n] .
+   qq[^\n],
+   'Exception from ->die failure' );
 
 is( TestParser2->new->from_string( "hello" ), "hello", '"hello" as method name' );
 

@@ -42,7 +42,7 @@ class BClass :does(ARole) :does(BRole) {
 }
 
 role CRole {
-   requires three;
+   method three;
 }
 
 class CClass :does(CRole) {

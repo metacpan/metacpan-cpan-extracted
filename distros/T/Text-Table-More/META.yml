@@ -21,14 +21,13 @@ name: Text-Table-More
 provides:
   Text::Table::More:
     file: lib/Text/Table/More.pm
-    version: '0.022'
+    version: '0.023'
 recommends:
   Text::ANSI::Util: '0.22'
   Text::ANSI::WideUtil: '0'
   Text::WideChar::Util: '0'
 requires:
   BorderStyle::ASCII::SingleLineDoubleAfterHeader: '0.011'
-  BorderStyleBase: '0.011'
   Exporter: '5.57'
   List::AllUtils: '0'
   Module::Load::Util: '0.004'
@@ -41,7 +40,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Table-More
   homepage: https://metacpan.org/release/Text-Table-More
   repository: git://github.com/perlancar/perl-Text-Table-More.git
-version: '0.022'
+version: '0.023'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -144,8 +143,12 @@ x_Dist_Zilla:
       version: '0.02'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
-      version: '0.062'
+      version: '0.063'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'

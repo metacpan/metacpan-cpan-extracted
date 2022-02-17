@@ -17,7 +17,7 @@ use Types::Standard -types;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.2.4';
+our $VERSION = 'v0.2.6';
 
 
 has resolver => (
@@ -96,6 +96,12 @@ sub _build_robots {
             name   => 'Google',
             agent  => qr/\bGoogle(?:bot?)\b/i,
             domain => qr/\.google(?:bot)?\.com$/,
+        },
+
+        {
+            name   => 'InfoTiger',
+            agent  => qr/\bInfoTigerBot\b/,
+            domain => qr/\.infotiger\.com$/,
         },
 
         {
@@ -254,7 +260,7 @@ Robots::Validate - Validate that IP addresses are associated with known robots
 
 =head1 VERSION
 
-version v0.2.4
+version v0.2.6
 
 =head1 SYNOPSIS
 
@@ -380,7 +386,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2021 by Robert Rothenberg.
+This software is Copyright (c) 2018-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

@@ -1,0 +1,43 @@
+---
+abstract: 'Lock based on etcd'
+author:
+  - 'Emiliano Bruni <info@ebruni.it>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::Fork: '0'
+  Test::More: '0'
+  perl: '5.012'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.012'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Etcd-Lock
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Etcd::Lock:
+    file: lib/Etcd/Lock.pm
+    version: '0.03'
+requires:
+  Net::Etcd: '0'
+  boolean: '0'
+  perl: '5.012'
+resources:
+  homepage: https://github.com/EmilianoBruni/etcd-lock
+  repository: https://github.com/EmilianoBruni/etcd-lock.git
+version: '0.03'
+x_generated_by_perl: v5.32.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

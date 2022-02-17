@@ -1,0 +1,19 @@
+package Dummy2;sub wrapper_2 {
+use strict;
+use warnings FATAL => 'all';
+
+
+sub test3 {
+    my $val = "hello";
+    my $val2 = "__END__";
+}
+
+our $t = sub {
+  my $hello = 1;
+};
+
+
+
+1;
+
+} wrapper_2();__END__

@@ -32,8 +32,8 @@
             "Clone" : "0",
             "Digest::SHA" : "0",
             "HOP::Lexer" : "0",
-            "JSON" : "0",
-            "List::Util" : "0",
+            "JSON::MaybeXS" : "0",
+            "List::Util" : "1.44",
             "XML::Simple" : "0",
             "YAML" : "1.15",
             "perl" : "5.018"
@@ -43,47 +43,55 @@
    "provides" : {
       "Pg::Explain" : {
          "file" : "lib/Pg/Explain.pm",
-         "version" : "1.13"
+         "version" : "2.0"
       },
       "Pg::Explain::Analyzer" : {
          "file" : "lib/Pg/Explain/Analyzer.pm",
-         "version" : "1.13"
+         "version" : "2.0"
       },
       "Pg::Explain::Buffers" : {
          "file" : "lib/Pg/Explain/Buffers.pm",
-         "version" : "1.13"
+         "version" : "2.0"
       },
       "Pg::Explain::From" : {
          "file" : "lib/Pg/Explain/From.pm",
-         "version" : "1.13"
+         "version" : "2.0"
       },
       "Pg::Explain::FromJSON" : {
          "file" : "lib/Pg/Explain/FromJSON.pm",
-         "version" : "1.13"
+         "version" : "2.0"
       },
       "Pg::Explain::FromText" : {
          "file" : "lib/Pg/Explain/FromText.pm",
-         "version" : "1.13"
+         "version" : "2.0"
       },
       "Pg::Explain::FromXML" : {
          "file" : "lib/Pg/Explain/FromXML.pm",
-         "version" : "1.13"
+         "version" : "2.0"
       },
       "Pg::Explain::FromYAML" : {
          "file" : "lib/Pg/Explain/FromYAML.pm",
-         "version" : "1.13"
+         "version" : "2.0"
+      },
+      "Pg::Explain::Hinter" : {
+         "file" : "lib/Pg/Explain/Hinter.pm",
+         "version" : "2.0"
+      },
+      "Pg::Explain::Hinter::Hint" : {
+         "file" : "lib/Pg/Explain/Hinter/Hint.pm",
+         "version" : "2.0"
       },
       "Pg::Explain::JIT" : {
          "file" : "lib/Pg/Explain/JIT.pm",
-         "version" : "1.13"
+         "version" : "2.0"
       },
       "Pg::Explain::Node" : {
          "file" : "lib/Pg/Explain/Node.pm",
-         "version" : "1.13"
+         "version" : "2.0"
       },
       "Pg::Explain::StringAnonymizer" : {
          "file" : "lib/Pg/Explain/StringAnonymizer.pm",
-         "version" : "1.13"
+         "version" : "2.0"
       }
    },
    "release_status" : "stable",
@@ -101,6 +109,6 @@
          "web" : "https://gitlab.com/depesz/Pg--Explain"
       }
    },
-   "version" : "1.13",
+   "version" : "2.0",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

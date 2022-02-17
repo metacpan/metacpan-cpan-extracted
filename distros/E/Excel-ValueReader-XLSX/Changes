@@ -1,5 +1,8 @@
 Revision history for Excel-ValueReader-XLSX
 
+1.08 11.02.2022
+  - added support to parse Excel tables
+
 1.07 31.12.2021
   - oops, forgot a file in MANIFEST
 

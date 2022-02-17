@@ -21,7 +21,7 @@
 package Perl::Tidy::Tokenizer;
 use strict;
 use warnings;
-our $VERSION = '20211029';
+our $VERSION = '20220217';
 
 # this can be turned on for extra checking during development
 use constant DEVEL_MODE => 0;
@@ -92,6 +92,8 @@ use vars qw{
   %is_valid_token_type
   %is_keyword
   %is_code_block_token
+  %is_sort_map_grep_eval_do
+  %is_grep_alias
   %really_want_term
   @opening_brace_names
   @closing_brace_names
@@ -132,7 +134,8 @@ use constant MAX_NAG_MESSAGES => 6;
 
 BEGIN {
 
-    # Array index names for $self
+    # Array index names for $self.
+    # Do not combine with other BEGIN blocks (c101).
     my $i = 0;
     use constant {
         _rhere_target_list_                  => $i++,
@@ -307,6 +310,15 @@ sub check_options {
         foreach my $word (@sub_alias_list) {
             $is_sub{$word} = 1;
         }
+    }
+
+    %is_grep_alias = ();
+    if ( $rOpts->{'grep-alias-list'} ) {
+
+        # Note that 'grep-alias-list' has been preprocessed to be a trimmed,
+        # space-separated list
+        my @q = split /\s+/, $rOpts->{'grep-alias-list'};
+        @{is_grep_alias}{@q} = (1) x scalar(@q);
     }
 
     $rOpts_code_skipping = $rOpts->{'code-skipping'};
@@ -733,6 +745,11 @@ sub report_v_string {
         );
     }
     return;
+}
+
+sub is_valid_token_type {
+    my ($type) = @_;
+    return $is_valid_token_type{$type};
 }
 
 sub get_input_line_number {
@@ -2603,7 +2620,8 @@ EOM
                     && $last_nonblank_i >= 0 )
                 {
                     if ( $routput_token_type->[$last_nonblank_i] eq 'w' ) {
-                        $routput_token_type->[$last_nonblank_i] = 'G';
+                        $routput_token_type->[$last_nonblank_i] =
+                          $is_grep_alias{$block_type} ? 'k' : 'G';
                     }
                 }
 
@@ -3104,6 +3122,7 @@ EOM
                 }
             }
             else {
+                error_if_expecting_OPERATOR();
             }
         },
         '->' => sub {
@@ -3199,10 +3218,6 @@ EOM
     @_ = qw( } { BEGIN END CHECK INIT AUTOLOAD DESTROY UNITCHECK continue ;
       if elsif else unless while until for foreach switch case given when);
     @is_zero_continuation_block_type{@_} = (1) x scalar(@_);
-
-    my %is_not_zero_continuation_block_type;
-    @_ = qw(sort grep map do eval);
-    @is_not_zero_continuation_block_type{@_} = (1) x scalar(@_);
 
     my %is_logical_container;
     @_ = qw(if elsif unless while and or err not && !  || for foreach);
@@ -3499,7 +3514,11 @@ EOM
                     $routput_token_type->[$i] = $type;
 
                 }
-                $tok = $quote_character if ($quote_character);
+
+                # Removed to fix b1280.  This is not needed and was causing the
+                # starting type 'qw' to be lost, leading to mis-tokenization of
+                # a trailing block brace in a parenless for stmt 'for .. qw.. {'
+                ##$tok = $quote_character if ($quote_character);
 
                 # scan for the end of the quote or pattern
                 (
@@ -3637,8 +3656,12 @@ EOM
                       $last_nonblank_container_type;
                     $last_last_nonblank_type_sequence =
                       $last_nonblank_type_sequence;
-                    $last_nonblank_token          = $tok;
-                    $last_nonblank_type           = $type;
+
+                    # Fix part #3 for git82: propagate type 'Z' though L-R pair
+                    unless ( $type eq 'R' && $last_nonblank_type eq 'Z' ) {
+                        $last_nonblank_token = $tok;
+                        $last_nonblank_type  = $type;
+                    }
                     $last_nonblank_prototype      = $prototype;
                     $last_nonblank_block_type     = $block_type;
                     $last_nonblank_container_type = $container_type;
@@ -4954,16 +4977,16 @@ EOM
 
                     # zero continuation flag at terminal BLOCK '}' which
                     # ends a statement.
-                    if ( $routput_block_type->[$i] ) {
+                    my $block_type_i = $routput_block_type->[$i];
+                    if ($block_type_i) {
 
                         # ...These include non-anonymous subs
                         # note: could be sub ::abc { or sub 'abc
-                        if ( $routput_block_type->[$i] =~ m/^sub\s*/gc ) {
+                        if ( $block_type_i =~ m/^sub\s*/gc ) {
 
                          # note: older versions of perl require the /gc modifier
                          # here or else the \G does not work.
-                            if ( $routput_block_type->[$i] =~ /\G('|::|\w)/gc )
-                            {
+                            if ( $block_type_i =~ /\G('|::|\w)/gc ) {
                                 $in_statement_continuation = 0;
                             }
                         }
@@ -4972,27 +4995,21 @@ EOM
 # block prototypes and these: (sort|grep|map|do|eval)
 # /^(\}|\{|BEGIN|END|CHECK|INIT|AUTOLOAD|DESTROY|UNITCHECK|continue|;|if|elsif|else|unless|while|until|for|foreach)$/
                         elsif (
-                            $is_zero_continuation_block_type{
-                                $routput_block_type->[$i]
-                            }
-                          )
+                            $is_zero_continuation_block_type{$block_type_i} )
                         {
                             $in_statement_continuation = 0;
                         }
 
                         # ..but these are not terminal types:
                         #     /^(sort|grep|map|do|eval)$/ )
-                        elsif (
-                            $is_not_zero_continuation_block_type{
-                                $routput_block_type->[$i]
-                            }
-                          )
+                        elsif ($is_sort_map_grep_eval_do{$block_type_i}
+                            || $is_grep_alias{$block_type_i} )
                         {
                         }
 
                         # ..and a block introduced by a label
                         # /^\w+\s*:$/gc ) {
-                        elsif ( $routput_block_type->[$i] =~ /:$/ ) {
+                        elsif ( $block_type_i =~ /:$/ ) {
                             $in_statement_continuation = 0;
                         }
 
@@ -5659,7 +5676,9 @@ sub code_block_type {
 # otherwise, look at previous token.  This must be a code block if
 # it follows any of these:
 # /^(BEGIN|END|CHECK|INIT|AUTOLOAD|DESTROY|UNITCHECK|continue|if|elsif|else|unless|do|while|until|eval|for|foreach|map|grep|sort)$/
-    elsif ( $is_code_block_token{$last_nonblank_token} ) {
+    elsif ($is_code_block_token{$last_nonblank_token}
+        || $is_grep_alias{$last_nonblank_token} )
+    {
 
         # Bug Patch: Note that the opening brace after the 'if' in the following
         # snippet is an anonymous hash ref and not a code block!
@@ -6061,7 +6080,10 @@ sub increase_nesting_depth {
             }
         }
     }
-    $nested_statement_type[$aa][ $current_depth[$aa] ] = $statement_type;
+
+    # Fix part #1 for git82: save last token type for propagation of type 'Z'
+    $nested_statement_type[$aa][ $current_depth[$aa] ] =
+      [ $statement_type, $last_nonblank_type, $last_nonblank_token ];
     $statement_type = "";
     return ( $seqno, $indent );
 }
@@ -6107,7 +6129,19 @@ sub decrease_nesting_depth {
         if ( $aa == QUESTION_COLON ) {
             $outdent = $nested_ternary_flag[ $current_depth[$aa] ];
         }
-        $statement_type = $nested_statement_type[$aa][ $current_depth[$aa] ];
+
+        # Fix part #2 for git82: use saved type for propagation of type 'Z'
+        # through type L-R braces.  Perl seems to allow ${bareword}
+        # as an indirect object, but nothing much more complex than that.
+        ( $statement_type, my $saved_type, my $saved_token ) =
+          @{ $nested_statement_type[$aa][ $current_depth[$aa] ] };
+        if (   $aa == BRACE
+            && $saved_type eq 'Z'
+            && $last_nonblank_type eq 'w'
+            && $brace_structural_type[$brace_depth] eq 'L' )
+        {
+            $last_nonblank_type = $saved_type;
+        }
 
         # check that any brace types $bb contained within are balanced
         for my $bb ( 0 .. @closing_brace_names - 1 ) {
@@ -7112,9 +7146,15 @@ sub scan_identifier_do {
         else {
 
             # shouldn't happen: bad call parameter
-            Fault(<<EOM);
-Program Bug: scan_identifier received bad starting token = '$tok'
-EOM
+            my $msg =
+"Program bug detected: scan_identifier received bad starting token = '$tok'\n";
+            if (DEVEL_MODE) { Fault($msg) }
+            if ( !$tokenizer_self->[_in_error_] ) {
+                warning($msg);
+                $tokenizer_self->[_in_error_] = 1;
+            }
+            $id_scan_state = '';
+            goto RETURN;
         }
         $saw_type = !$saw_alpha;
     }
@@ -7319,9 +7359,11 @@ EOM
                 }
                 else {
                     $id_scan_state = '';
+                    $i             = $i_save;
+                    last;    # c106
                 }
             }
-            else {    # something else
+            else {           # something else
 
                 if ( $in_prototype_or_signature && $tok =~ /^[\),=#]/ ) {
 
@@ -7649,7 +7691,14 @@ EOM
         if ($saw_type) {
 
             if ($saw_alpha) {
-                if ( $identifier =~ /^->/ && $last_nonblank_type eq 'w' ) {
+
+                # The type without the -> should be the same as with the -> so
+                # that if they get separated we get the same bond strengths,
+                # etc.  See b1234
+                if (   $identifier =~ /^->/
+                    && $last_nonblank_type eq 'w'
+                    && substr( $identifier, 2, 1 ) =~ /^\w/ )
+                {
                     $type = 'w';
                 }
                 else { $type = 'i' }
@@ -7693,6 +7742,8 @@ EOM
         $tok = $tok_begin;
         $i   = $i_begin;
     }
+
+  RETURN:
 
     DEBUG_SCAN_ID && do {
         my ( $a, $b, $c ) = caller;
@@ -8234,7 +8285,14 @@ sub find_angle_operator_termination {
     elsif ( $expecting == UNKNOWN ) { $filter = '[\>\;\=\#\|\<]' }
 
     # shouldn't happen - we shouldn't be here if operator is expected
-    else { warning("Program Bug in find_angle_operator_termination\n") }
+    else {
+        if (DEVEL_MODE) {
+            Fault(<<EOM);
+Bad call to find_angle_operator_termination
+EOM
+        }
+        return ( $i, $type );
+    }
 
     # To illustrate what we might be looking at, in case we are
     # guessing, here are some examples of valid angle operators
@@ -8273,6 +8331,22 @@ sub find_angle_operator_termination {
 
             my $pos_beg = $rtoken_map->[$i];
             my $str     = substr( $input_line, $pos_beg, ( $pos - $pos_beg ) );
+
+            # Test for '<' after possible filehandle, issue c103
+            # print $fh <>;          # syntax error
+            # print $fh <DATA>;      # ok
+            # print $fh < DATA>;     # syntax error at '>'
+            # print STDERR < DATA>;  # ok, prints word 'DATA'
+            # print BLABLA <DATA>;   # ok; does nothing unless BLABLA is defined
+            if ( $last_nonblank_type eq 'Z' ) {
+
+                # $str includes brackets; something like '<DATA>'
+                if (   substr( $last_nonblank_token, 0, 1 ) !~ /[A-Za-z_]/
+                    && substr( $str, 1, 1 ) !~ /[A-Za-z_]/ )
+                {
+                    return ( $i, $type );
+                }
+            }
 
             # Reject if the closing '>' follows a '-' as in:
             # if ( VERSION < 5.009 && $op-> name eq 'assign' ) { }
@@ -8788,7 +8862,8 @@ sub follow_quoted_string {
                 "Note: alphanumeric quote delimiter ($beginning_tok) \n");
         }
 
-        while ( $i < $max_token_index ) {
+        # Note: changed < to <= here to fix c109. Relying on extra end blanks.
+        while ( $i <= $max_token_index ) {
 
             if ( $quote_pos == 0 || ( $i < 0 ) ) {
                 $tok = $rtokens->[ ++$i ];
@@ -8815,6 +8890,11 @@ sub follow_quoted_string {
 
                 $quoted_string .=
                   substr( $tok, $old_pos, $quote_pos - $old_pos - 1 );
+
+                # NOTE: any quote modifiers will be at the end of '$tok'. If we
+                # wanted to check them, this is the place to get them.  But
+                # this quote form is rarely used in practice, so it isn't
+                # worthwhile.
 
                 $quote_depth--;
 
@@ -9196,6 +9276,13 @@ BEGIN {
       unless do while until eval for foreach map grep sort
       switch case given when default catch try finally);
     @is_code_block_token{@q} = (1) x scalar(@q);
+
+    # Note: this hash was formerly named '%is_not_zero_continuation_block_type'
+    # to contrast it with the block types in '%is_zero_continuation_block_type'
+    @q = qw( sort map grep eval do );
+    @is_sort_map_grep_eval_do{@q} = (1) x scalar(@q);
+
+    %is_grep_alias = ();
 
     # I'll build the list of keywords incrementally
     my @Keywords = ();

@@ -8,7 +8,7 @@ use utf8;
 
 use Object::Pad;
 
-package App::sdview::Output::Formatted 0.05;
+package App::sdview::Output::Formatted 0.06;
 class App::sdview::Output::Formatted :strict(params);
 
 # This isn't itself an output module; but a base class to build them on
@@ -104,6 +104,14 @@ method _output_para ( $para, %opts )
 
    my @lines = $text->split( qr/\n/ );
    @lines or @lines = ( String::Tagged->new ) if defined $leader;
+
+   # If there's a background set, then space-pad every line to the same width
+   # so it looks neater on the terminal
+   #   https://rt.cpan.org/Ticket/Display.html?id=140536
+   if( defined $typestyle{bg} ) {
+      my $width = max map { length $_ } @lines;
+      $_ .= " " x ( $width - length $_ ) for @lines;
+   }
 
    $indent //= $typestyle{indent};
    $indent //= 0;

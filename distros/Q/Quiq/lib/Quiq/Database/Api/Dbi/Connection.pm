@@ -40,7 +40,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.198';
+our $VERSION = '1.199';
 
 use Quiq::Option;
 use DBI ();
@@ -191,7 +191,7 @@ sub new {
         if ($stdErr) {
             my $stdMsg;
             if ($stdErr == 4) {
-                $stdMsg = "DB-00004: Unique Constraint verletzt";
+                $stdMsg = "DB-00004: Constraint verletzt";
             }
             $class->throw($stdMsg,Internal=>$msg,Command=>$stmt);
         }
@@ -557,7 +557,7 @@ sub sql {
 
 =head1 VERSION
 
-1.198
+1.199
 
 =head1 AUTHOR
 

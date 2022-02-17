@@ -4,27 +4,27 @@ use v5.14;
 use warnings;
 
 use Test::More;
-
-package TestParser;
-use base qw( Parser::MGC );
+use Test::Fatal;
 
 my $re;
 my $convert;
 
-sub parse
-{
-   my $self = shift;
+package TestParser {
+   use base qw( Parser::MGC );
 
-   return $self->generic_token( token => $re, $convert );
+   sub parse
+   {
+      my $self = shift;
+
+      return $self->generic_token( token => $re, $convert );
+   }
 }
-
-package main;
 
 my $parser = TestParser->new;
 
 $re = qr/[A-Z]+/;
 is( $parser->from_string( "HELLO" ), "HELLO", 'Simple RE' );
-ok( !eval { $parser->from_string( "hello" ) }, 'Simple RE fails' );
+ok( exception { $parser->from_string( "hello" ) }, 'Simple RE fails' );
 
 $re = qr/[A-Z]+/i;
 is( $parser->from_string( "Hello" ), "Hello", 'RE with flags' );

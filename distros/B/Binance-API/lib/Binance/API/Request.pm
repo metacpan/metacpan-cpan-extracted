@@ -52,12 +52,13 @@ sub new {
     my $class = shift;
     my %params = @_;
 
-    my $self = {
-        apiKey     => $params{'apiKey'},
-        secretKey  => $params{'secretKey'},
-        recvWindow => $params{'recvWindow'},
-        logger     => $params{'logger'},
-    };
+    my $self = $class->SUPER::new;
+
+    $self->{apiKey}     = $params{'apiKey'};
+    $self->{secretKey}  = $params{'secretKey'};
+    $self->{recvWindow} = $params{'recvWindow'};
+    $self->{baseUrl}    = $params{'baseUrl'};
+    $self->{logger}     = $params{'logger'};
 
     bless $self, $class;
 }
@@ -143,7 +144,8 @@ sub _init {
 
     $timestamp //= int Time::HiRes::time * 1000 if $params->{'signed'};
 
-    my $uri = URI->new( BASE_URL . $path );
+    my $base_url = defined $self->{'baseUrl'} ? $self->{'baseUrl'} : BASE_URL;
+    my $uri = URI->new( $base_url . $path );
     my $full_path = $uri->as_string;
 
     my %data;

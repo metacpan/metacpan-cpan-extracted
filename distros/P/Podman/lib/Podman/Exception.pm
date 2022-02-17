@@ -14,12 +14,7 @@ use constant MESSAGE => {
 
 has 'code' => -1;
 
-sub new {
-  my ($self, $code) = @_;
-
-  return $self->SUPER::new unless $code;
-  return $self->SUPER::new(MESSAGE->{$code} // 'Unknown error.')->code($code);
-}
+sub new { $_[1] ? shift->SUPER::new(MESSAGE->{$_[0]} // 'Unknown error.')->code($_[0]) : shift->SUPER::new }
 
 1;
 

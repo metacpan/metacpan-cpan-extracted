@@ -1,4 +1,8 @@
 class TestCase::Minimal : public {
+
+  implement Stringable;
+  implement Cloneable;
+
   has x : rw public int;
   has y : rw public int;
 
@@ -23,5 +27,14 @@ class TestCase::Minimal : public {
     my $str = "(" . $self->{x} . "," . $self->{y} . ")";
     
     return $str;
+  }
+
+  method cloneable_clone : object () {
+    my $new_minimal = TestCase::Minimal->new;
+    
+    $new_minimal->set_x($self->x);
+    $new_minimal->set_y($self->y);
+    
+    return $new_minimal;
   }
 }

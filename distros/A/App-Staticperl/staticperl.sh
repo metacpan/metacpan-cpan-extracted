@@ -71,7 +71,7 @@ fi
 
 # work around ExtUtils::CBuilder and others
 export CC="$PERL_CC"
-export CFLAGS="$PERL_CFLASGS"
+export CFLAGS="$PERL_CFLAGS"
 export LD="$PERL_CC"
 export LDFLAGS="$PERL_LDFLAGS"
 unset LIBS
@@ -88,7 +88,7 @@ PATH="$PERL_PREFIX/perl/bin:$PATH"
 
 # set version in a way that Makefile.PL can extract
 VERSION=VERSION; eval \
-$VERSION="1.45"
+$VERSION="1.46"
 
 fatal() {
    printf -- "\nFATAL: %s\n\n" "$*" >&2
@@ -219,7 +219,7 @@ EOF
          *.gz   ) UNCOMPRESS="gzip -d"  ;;
          *.tar  ) UNCOMPRESS="cat"      ;;
          * )
-            fatal "don't know hot to uncompress $PERL_TAR,\nonly tar, tar.gz, tar.bz2, tar.lzma and tar.xz are supported."
+            fatal "don't know hot to uncompress $PERLTAR,\nonly tar, tar.gz, tar.bz2, tar.lzma and tar.xz are supported."
             exit 1
             ;;
       esac
@@ -455,7 +455,9 @@ end_of_patch_postinstall
          CPAN::Shell->o (conf => q<make_install_make_command>, "'"$PERL_PREFIX"'/bin/SP-make-install-make");
          CPAN::Shell->o (conf => q<prerequisites_policy>, q<follow>);
          CPAN::Shell->o (conf => q<build_requires_install_policy>, q<yes>);
-         CPAN::Shell->o (conf => q<prefer_installer>, "EUMM");
+         CPAN::Shell->o (conf => q<recommends_policy>, q<0>);
+         CPAN::Shell->o (conf => q<suggests_policy>, q<0>);
+         CPAN::Shell->o (conf => q<prefer_installer>, q<EUMM>);
          CPAN::Shell->o (conf => q<commit>);
       ' || fatal "error while initialising CPAN"
 
@@ -499,7 +501,7 @@ instcpan() {
 
    verblock <<EOF
 installing modules from CPAN
-$@
+$*
 EOF
 
    MYCONFIG=
@@ -508,7 +510,7 @@ EOF
    "$PERL_PREFIX"/bin/perl $MYCONFIG -MCPAN -e 'notest (install => $_) for @ARGV' -- "$@" | tee "$STATICPERL/instcpan.log"
 
    if grep -q " -- NOT OK\$" "$STATICPERL/instcpan.log"; then
-      fatal "failure while installing modules from CPAN ($@)"
+      fatal "failure while installing modules from CPAN ($*)"
    fi
    rm -f "$STATICPERL/instcpan.log"
 }
@@ -521,7 +523,7 @@ instsrc() {
 
    verblock <<EOF
 installing modules from source
-$@
+$*
 EOF
 
    for mod in "$@"; do

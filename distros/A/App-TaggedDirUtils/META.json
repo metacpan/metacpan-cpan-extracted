@@ -63,7 +63,7 @@
    "provides" : {
       "App::TaggedDirUtils" : {
          "file" : "lib/App/TaggedDirUtils.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -78,7 +78,7 @@
          "web" : "https://github.com/perlancar/perl-App-TaggedDirUtils"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

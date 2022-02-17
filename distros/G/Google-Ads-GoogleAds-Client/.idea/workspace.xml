@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="27f179f7-d1ed-432c-a16f-97cc9a9aa8b2" name="Changes" comment="" />
+    <list default="true" id="0db9d6cc-89a7-4404-b5dc-04c1f83a761d" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -10,13 +10,31 @@
   <component name="ComposerSettings">
     <execution />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Perl5 script" />
+      </list>
+    </option>
+  </component>
+  <component name="G3PluginsProjectSettings">
+    <appliedSettings>
+      <entry key="LinkifyInternalShortlinks" value="true" />
+      <entry key="RecognizedNullableAnnotations" value="true" />
+    </appliedSettings>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GoLibraries">
-    <option name="indexEntireGoPath" value="false" />
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
   </component>
-  <component name="ProjectId" id="22DwY8G2deJajNAlcNPaYBYg0tS" />
+  <component name="ProjectId" id="23dtlQX1MPKmBgFJN8kbvLfb41I" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -27,10 +45,17 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="go.formatter.settings.were.checked" value="true" />
     <property name="go.import.settings.migrated" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/t/testdata" />
+    <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
     <property name="settings.editor.selected.configurable" value="PERL5_MAIN_SETTINGS" />
   </component>
-  <component name="RunManager">
-    <configuration name="Tests from '101_CodeExamples.t'" type="PerlTestRunConfiguration" factoryName="Perl5 Test" temporary="true" nameIsGenerated="true" show_console_on_std_err="false" show_console_on_std_out="false">
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/t/testdata" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Perl.get_keywords.pl">
+    <configuration name="add_display_upload_ad.pl" type="#PerlConfigurationType" factoryName="Perl" temporary="true" nameIsGenerated="true" show_console_on_std_err="false" show_console_on_std_out="false">
       <option name="allowRunningInParallel" value="false" />
       <option name="alternativeSdkName" />
       <option name="compileTimeBreakpointsEnabled" value="false" />
@@ -45,40 +70,163 @@
       <option name="programParameters" />
       <option name="projectPathOnTarget" />
       <option name="scriptCharset" value="utf8" />
-      <option name="scriptPath" value="$PROJECT_DIR$/t/101_CodeExamples.t" />
+      <option name="scriptPath" value="$PROJECT_DIR$/examples/advanced_operations/add_display_upload_ad.pl" />
       <option name="selectedOptions">
         <list />
       </option>
       <option name="startMode" value="RUN" />
       <option name="useAlternativeSdk" value="false" />
       <option name="workingDirectory" />
-      <JOBS_NUMBER>1</JOBS_NUMBER>
-      <TEST_SCRIPT_PARAMETERS />
+      <method v="2" />
+    </configuration>
+    <configuration name="add_performance_max_retail_campaign.pl" type="#PerlConfigurationType" factoryName="Perl" temporary="true" nameIsGenerated="true" show_console_on_std_err="false" show_console_on_std_out="false">
+      <option name="allowRunningInParallel" value="false" />
+      <option name="alternativeSdkName" />
+      <option name="compileTimeBreakpointsEnabled" value="false" />
+      <option name="consoleCharset" value="UTF-8" />
+      <option name="envs">
+        <map />
+      </option>
+      <option name="initCode" value="" />
+      <option name="nonInteractiveModeEnabled" value="false" />
+      <option name="passParentEnvs" value="true" />
+      <option name="perlParameters" value="" />
+      <option name="programParameters" />
+      <option name="projectPathOnTarget" />
+      <option name="scriptCharset" value="utf8" />
+      <option name="scriptPath" value="$PROJECT_DIR$/examples/shopping_ads/add_performance_max_retail_campaign.pl" />
+      <option name="selectedOptions">
+        <list />
+      </option>
+      <option name="startMode" value="RUN" />
+      <option name="useAlternativeSdk" value="false" />
+      <option name="workingDirectory" />
+      <method v="2" />
+    </configuration>
+    <configuration name="get_all_image_assets.pl" type="#PerlConfigurationType" factoryName="Perl" temporary="true" nameIsGenerated="true" show_console_on_std_err="false" show_console_on_std_out="false">
+      <option name="allowRunningInParallel" value="false" />
+      <option name="alternativeSdkName" />
+      <option name="compileTimeBreakpointsEnabled" value="false" />
+      <option name="consoleCharset" value="UTF-8" />
+      <option name="envs">
+        <map />
+      </option>
+      <option name="initCode" value="" />
+      <option name="nonInteractiveModeEnabled" value="false" />
+      <option name="passParentEnvs" value="true" />
+      <option name="perlParameters" value="" />
+      <option name="programParameters" />
+      <option name="projectPathOnTarget" />
+      <option name="scriptCharset" value="utf8" />
+      <option name="scriptPath" value="$PROJECT_DIR$/examples/misc/get_all_image_assets.pl" />
+      <option name="selectedOptions">
+        <list />
+      </option>
+      <option name="startMode" value="RUN" />
+      <option name="useAlternativeSdk" value="false" />
+      <option name="workingDirectory" />
+      <method v="2" />
+    </configuration>
+    <configuration name="get_keywords.pl" type="#PerlConfigurationType" factoryName="Perl" temporary="true" nameIsGenerated="true" show_console_on_std_err="false" show_console_on_std_out="false">
+      <option name="allowRunningInParallel" value="false" />
+      <option name="alternativeSdkName" />
+      <option name="compileTimeBreakpointsEnabled" value="false" />
+      <option name="consoleCharset" value="UTF-8" />
+      <option name="envs">
+        <map />
+      </option>
+      <option name="initCode" value="" />
+      <option name="nonInteractiveModeEnabled" value="false" />
+      <option name="passParentEnvs" value="true" />
+      <option name="perlParameters" value="" />
+      <option name="programParameters" />
+      <option name="projectPathOnTarget" />
+      <option name="scriptCharset" value="utf8" />
+      <option name="scriptPath" value="$PROJECT_DIR$/examples/basic_operations/get_keywords.pl" />
+      <option name="selectedOptions">
+        <list />
+      </option>
+      <option name="startMode" value="RUN" />
+      <option name="useAlternativeSdk" value="false" />
+      <option name="workingDirectory" />
+      <method v="2" />
+    </configuration>
+    <configuration name="upload_image_asset.pl" type="#PerlConfigurationType" factoryName="Perl" temporary="true" nameIsGenerated="true" show_console_on_std_err="false" show_console_on_std_out="false">
+      <option name="allowRunningInParallel" value="false" />
+      <option name="alternativeSdkName" />
+      <option name="compileTimeBreakpointsEnabled" value="false" />
+      <option name="consoleCharset" value="UTF-8" />
+      <option name="envs">
+        <map />
+      </option>
+      <option name="initCode" value="" />
+      <option name="nonInteractiveModeEnabled" value="false" />
+      <option name="passParentEnvs" value="true" />
+      <option name="perlParameters" value="" />
+      <option name="programParameters" />
+      <option name="projectPathOnTarget" />
+      <option name="scriptCharset" value="utf8" />
+      <option name="scriptPath" value="$PROJECT_DIR$/examples/misc/upload_image_asset.pl" />
+      <option name="selectedOptions">
+        <list />
+      </option>
+      <option name="startMode" value="RUN" />
+      <option name="useAlternativeSdk" value="false" />
+      <option name="workingDirectory" />
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Perl5 Test.Tests from '101_CodeExamples.t'" />
+        <item itemvalue="Perl.get_keywords.pl" />
+        <item itemvalue="Perl.add_performance_max_retail_campaign.pl" />
+        <item itemvalue="Perl.get_all_image_assets.pl" />
+        <item itemvalue="Perl.upload_image_asset.pl" />
+        <item itemvalue="Perl.add_display_upload_ad.pl" />
       </list>
     </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="27f179f7-d1ed-432c-a16f-97cc9a9aa8b2" name="Changes" comment="" />
-      <created>1639385513193</created>
+      <changelist id="0db9d6cc-89a7-4404-b5dc-04c1f83a761d" name="Changes" comment="" />
+      <created>1642075943549</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1639385513193</updated>
-      <workItem from="1639385517296" duration="1446000" />
+      <updated>1642075943549</updated>
+      <workItem from="1642075946396" duration="1254000" />
+      <workItem from="1642387107557" duration="714000" />
+      <workItem from="1643029228506" duration="631000" />
+      <workItem from="1643029879406" duration="21615000" />
+      <workItem from="1643253388149" duration="16467000" />
+      <workItem from="1643337804012" duration="6385000" />
+      <workItem from="1643516260337" duration="829000" />
+      <workItem from="1644547603318" duration="2499000" />
+      <workItem from="1644806058841" duration="16054000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
-  <component name="VgoProject">
-    <integration-enabled>true</integration-enabled>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="perl_line_breakpoint">
+          <url>file://$PROJECT_DIR$/examples/remarketing/add_customer_match_user_list.pl</url>
+          <line>29</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="perl_line_breakpoint">
+          <url>file://$PROJECT_DIR$/lib/Google/Ads/GoogleAds/V10/Resources/CustomerAsset.pm</url>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="perl_line_breakpoint">
+          <url>file://$PROJECT_DIR$/lib/Google/Ads/GoogleAds/Client.pm</url>
+          <line>25</line>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

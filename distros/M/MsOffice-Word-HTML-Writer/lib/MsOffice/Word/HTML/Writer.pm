@@ -2,15 +2,13 @@ package MsOffice::Word::HTML::Writer;
 
 use warnings;
 use strict;
-use MIME::QuotedPrint qw/encode_qp/;
 use MIME::Base64      qw/encode_base64/;
 use MIME::Types;
-use Encode            qw/encode_utf8/;
 use Carp;
 use Params::Validate  qw/validate SCALAR HASHREF/;
 use Scalar::Util      qw/looks_like_number/;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 sub new {
   my $class = shift;
@@ -183,9 +181,16 @@ sub content {
     my $mime_type = MIME::Types->new->mimeTypeOf($filename) || '';
     my ($encoding, $encoded);
     if ($mime_type =~ /^text|xml$/) {
-      $encoding = 'quoted-printable';
+      # no need for Windows-style end-of-lines of shape CRLF
       $content  =~ s/\r\n/\n/g;
-      $encoded  = encode_qp(encode_utf8($content), ''); # '': no "soft line breaks"
+
+      # multibyte chars are encoded as numerical HTML entities
+      $content  =~ s/([^\x{0}-\x{FF}])/'&#'.ord($1).';'/eg;
+
+      # simple-minded MIME quoted-printable encoding, using latin-1 encoding
+      $encoding = 'quoted-printable';
+      ($encoded = $content)  =~ s/=/=3D/g;
+      $mime_type .= "; charset=iso-8859-1";
     }
     else {
       $encoding = 'base64';
@@ -282,11 +287,11 @@ sub _w_xml {
   my $node = shift;
   my $xml = "";
   while (my ($k, $v) = each %$node) {
-    $xml .= $v ? (               # élément avec contenu
+    $xml .= $v ? (               # node with content
                    "<w:$k>"
                   . (ref $v ? _w_xml($v) : $v)
                   . "</w:$k>\n" )
-               : "<w:$k />\n";     # élément sans contenu
+               : "<w:$k />\n";   # node without content
   }
   return $xml;
 }
@@ -452,7 +457,7 @@ MsOffice::Word::HTML::Writer - Writing documents for MsWord in HTML format
 The present module is one way to programatically generate documents
 targeted for Microsoft Word (MsWord). It doesn't need
 MsWord to be installed, and doesn't even require a Win32 machine
-(which is why it is not in the C<Win32> namespace).
+(which is why the module is not in the C<Win32> namespace).
 
 =head2 MsWord and HTML
 
@@ -491,8 +496,8 @@ MsWord documents in MHT format. The advantage of this technique is
 that one can rely on standard HTML mechanisms for layout control, such
 as styles, tables, divs, etc. Of course this markup can be produced
 using your favorite HTML templating module; the added value
-of C<MsOffice::Word::HTML::Writer> is to help building the 
-MIME multipart file, and provide some abstractions for 
+of C<MsOffice::Word::HTML::Writer> is to help building the
+MIME multipart file, and provide some abstractions for
 representing MsWord-specific features (headers, footers, fields, etc.).
 
 =head2 Advantages of MHT format
@@ -539,7 +544,7 @@ this format.
 
 =back
 
-By contrast, C<MsOffice::Word::HTML::Writer> allows you to 
+By contrast, C<MsOffice::Word::HTML::Writer> allows you to
 produce documents even with little knowledge of MsWord.
 Besides, since the content is in HTML, it can be assembled
 with any HTML tool, and therefore also requires little knowledge
@@ -816,18 +821,18 @@ MsWord does not support the full HTML and CSS standard,
 so authoring MHT documents requires some trial and error.
 Basic divs, spans, paragraphs and tables,
 are reasonably supported, together with their common CSS
-properties; but fancier features  like floats, absolute 
+properties; but fancier features  like floats, absolute
 positioning, etc. may yield some surprises.
 
 To specify widths and heights, you will get better results
-by using CSS properties rather than attributes of the 
+by using CSS properties rather than attributes of the
 HTML table model.
 
-In case of difficulties for implementing specific features, 
+In case of difficulties for implementing specific features,
 try to see what MsWord does with that feature when saving
 a document in HTML format (plain HTM, not MHT!). 
 The generated HTML is quite verbose, but after eliminating
-unnecessary tags one can sometimes figure out which are 
+unnecessary tags one can sometimes figure out which are
 the key tags (they start with C<o:>  or C<w:>) or the
 key attributes (they start with C<mso->) which correspond
 to the desired functionality.
@@ -864,7 +869,7 @@ them into C<MsOffice::Word::HTML::Writer>.
   $doc->write($body);
   $doc->save_as("/path/to/some/file");
 
-This architecture is straightforward, but various document parts 
+This architecture is straightforward, but various document parts
 are split into several templates, which might be inconvenient
 when maintaining a large body of document templates.
 
@@ -956,7 +961,7 @@ by using L<TT views|Template::Manual::Views> to
 encapsulate documents. Views have an inheritance mechanism,
 so it becomes possible to define families of document
 templates, that inherit properties or methods from common
-ancestors. Let us start with F<generic_letter.tt2>, 
+ancestors. Let us start with F<generic_letter.tt2>,
 a generic letter template :
 
   [% VIEW generic_letter
@@ -1042,15 +1047,13 @@ Contributions welcome!
 
 =head1 AUTHOR
 
-Laurent Dami, C<< <laurent DOT dami AT etat DOT geneve DOT ch> >>
+Laurent Dami, C<< <dami AT cpan DOT org> >>
 
 =head1 BUGS
 
 Please report any bugs or feature requests to
-C<bug-win32-word-html-writer at rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=MsOffice-Word-HTML-Writer>.
-I will be notified, and then you'll automatically be notified of progress on
-your bug as I make changes.
+L<https://github.com/damil/MsOffice-Word-HTML-Writer/issues>.
+
 
 =head1 SUPPORT
 
@@ -1058,27 +1061,9 @@ You can find documentation for this module with the perldoc command.
 
     perldoc MsOffice::Word::HTML::Writer
 
-You can also look for information at:
+or at the CPAN web site L<https://metacpan.org/pod/MsOffice::Word::HTML::Writer>.
 
-=over 4
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/MsOffice-Word-HTML-Writer>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/MsOffice-Word-HTML-Writer>
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=MsOffice-Word-HTML-Writer>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/MsOffice-Word-HTML-Writer>
-
-=back
 
 =head1 SEE ALSO
 
@@ -1088,7 +1073,7 @@ L<OpenOffice::OODoc>.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2009 Laurent Dami, all rights reserved.
+Copyright 2009-2022 Laurent Dami, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

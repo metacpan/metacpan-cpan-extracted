@@ -3,7 +3,7 @@ package App::perlimports::Sandbox;
 use strict;
 use warnings;
 
-our $VERSION = '0.000032';
+our $VERSION = '0.000034';
 
 use Data::UUID ();
 
@@ -35,8 +35,9 @@ $content;
 1;
 EOF
 
+    ## no critic (Variables::RequireInitializationForLocalVars)
     local $@;
-    ## no critic (BuiltinFunctions::ProhibitStringyEval)
+    ## no critic (BuiltinFunctions::ProhibitStringyEval,ErrorHandling::RequireCheckingReturnValueOfEval)
     eval $to_eval;
 
     my $e = $@;
@@ -59,7 +60,7 @@ App::perlimports::Sandbox - Internal Tools for perlimports
 
 =head1 VERSION
 
-version 0.000032
+version 0.000034
 
 =head2 pkg_for( $string )
 

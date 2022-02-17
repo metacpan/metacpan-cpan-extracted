@@ -39,6 +39,7 @@ sub new {
                 footnote_symbol => '',
                 footnote_index => '',
                 anchors => [],
+                language => '',
                };
     my %provided;
     foreach my $accessor (keys %$self) {
@@ -59,6 +60,16 @@ sub new {
     }
 
     bless $self, $class;
+}
+
+=item language
+
+Accessor to the language attribute
+
+=cut
+
+sub language {
+    shift->{language};
 }
 
 =item rawline

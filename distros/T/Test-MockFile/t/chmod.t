@@ -8,7 +8,7 @@ use Test2::Tools::Explain;
 use Test2::Plugin::NoWarnings;
 use Test2::Tools::Exception qw< lives dies >;
 use Test2::Tools::Warnings qw< warning >;
-use Test::MockFile;
+use Test::MockFile qw< nostrict >;
 
 my $filename = __FILE__;
 my $file     = Test::MockFile->file( $filename, 'whatevs' );
@@ -28,11 +28,17 @@ subtest(
             "Directory /foo is set to $dir_def_perm",
         );
 
+        # These variables are for debugging test failures
+        my $umask         = sprintf '%04o', umask;
+        my $perms_before  = sprintf '%04o', Test::MockFile::S_IFPERMS() & 0666;
+        my $perms_after_1 = sprintf '%04o', ( Test::MockFile::S_IFPERMS() & 0666 ) ^ umask;
+        my $perms_after_2 = sprintf '%04o', ( ( Test::MockFile::S_IFPERMS() & 0666 ) ^ umask ) | Test::MockFile::S_IFREG();
+
         my $file_def_perm = sprintf '%04o', 0666 - umask;
         is(
             sprintf( '%04o', ( stat '/foo/bar' )[2] & 07777 ),
             $file_def_perm,
-            "File /foo/bar is set to $file_def_perm",
+            "File /foo/bar is set to $file_def_perm (umask: $umask, perms before: $perms_before, perms after 1: $perms_after_1, perms after 2: $perms_after_2)",
         );
     }
 );

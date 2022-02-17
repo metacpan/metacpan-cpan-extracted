@@ -47,6 +47,6 @@
          "url" : "https://github.com/oposs/devel-deanonymize"
       }
    },
-   "version" : "v0.1.2",
+   "version" : "v0.2.0",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

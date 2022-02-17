@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::Class 0.60;
+package Object::Pad::MOP::Class 0.61;
 
 use v5.14;
 use warnings;
@@ -74,6 +74,44 @@ sub for_caller
    return shift->for_class( caller );
 }
 
+=head2 create_class
+
+   my $metaclass = Object::Pad::MOP::Class->create_class( $name, %args )
+
+I<Since version 0.61.>
+
+Creates a new class of the given name and yields the metaclass for it.
+
+Takes the following additional named arguments:
+
+=over 4
+
+=item extends => STRING
+
+=item isa => STRING
+
+An optional name of a superclass that this class will extend. These options
+are synonyms; new code should use C<isa>, as C<extends> will eventually be
+removed.
+
+=back
+
+Once created, this metaclass must be sealed using the L</seal> method before
+it can be used to actually construct object instances.
+
+=head2 create_role
+
+   my $metaclass = Object::Pad::MOP::Class->create_role( $name, %args )
+
+I<Since version 0.61.>
+
+As L</create_class> but creates a role instead of a class.
+
+=cut
+
+sub create_class { shift->_create_class( shift, @_ ); }
+sub create_role  { shift->_create_role ( shift, @_ ); }
+
 =head2 begin_class
 
    BEGIN {
@@ -83,20 +121,15 @@ sub for_caller
 
 I<Since version 0.46.>
 
-Creates a new class of the given name and yields the metaclass for it. This
-must be done during C<BEGIN> time, as it creates a deferred code block at
-C<UNITCHECK> time of its surrounding scope, which is used to finalise the
-constructed class.
+A variant of L</create_class> which sets the newly-created class as the
+current complication scope of the surrounding code, allowing it to accept
+C<Object::Pad> syntax forms such as C<has> and C<method>.
 
-Takes the following additional named arguments:
-
-=over 4
-
-=item extends => STRING
-
-An optional name of a superclass that this class will extend.
-
-=back
+This must be done during C<BEGIN> time because of this compiletime effect.
+It additionally creates a deferred code block at C<UNITCHECK> time of its
+surrounding scope, which is used to finalise the constructed class. In this
+case you do not need to remember to call L</seal> on it; this happens
+automatically.
 
 =head2 begin_role
 
@@ -105,6 +138,9 @@ I<Since version 0.46.>
 As L</begin_class> but creates a role instead of a class.
 
 =cut
+
+sub begin_class { shift->_create_class( shift, _set_compclassmeta => 1, @_ ); }
+sub begin_role  { shift->_create_role ( shift, _set_compclassmeta => 1, @_ ); }
 
 =head1 METHODS
 
@@ -357,6 +393,44 @@ sub slots
 *roles = \&direct_roles;
 
 *get_own_method = \&get_direct_method;
+
+=head2 add_required_method
+
+   $metaclass->add_required_method( $name )
+
+I<Since version 0.61.>
+
+Adds a new required method to the role, whose name is given as a plain string.
+
+Currently returns nothing. This should be considered temporary, as eventually
+a metatype for required methods will be added, at which point this method can
+return instances of it. It may also take additional parameters to define the
+required method with. Currently extra parameters are not permitted.
+
+=head2 required_method_names
+
+   @names = $metaclass->required_method_names
+
+I<Since version 0.61.>
+
+Returns a list names of required methods for the role, as plain strings.
+
+This should be considered a temporary method. Currently there is no metatype
+for required methods, so they are represented as plain strings. Eventually a
+type may be defined and a C<required_methods> method will be added.
+
+=cut
+
+=head2 seal
+
+   $metaclass->seal
+
+I<Since version 0.61.>
+
+If the metaclass was created by L</create_class> or L</create_role>, this
+method must be called once everything has been added into it, as the class
+will not yet be ready to construct actual object instances before this is
+done.
 
 =head1 AUTHOR
 

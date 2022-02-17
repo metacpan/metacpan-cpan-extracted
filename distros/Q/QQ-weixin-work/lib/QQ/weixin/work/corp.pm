@@ -17,7 +17,7 @@ use LWP::UserAgent;
 use JSON;
 use utf8;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 our @EXPORT = qw/ get_join_qrcode /;
 
 =head1 FUNCTION
@@ -28,7 +28,7 @@ our @EXPORT = qw/ get_join_qrcode /;
 
 =head2 SYNOPSIS
 
-L<https://work.weixin.qq.com/api/doc/90000/90135/91714>
+L<https://developer.work.weixin.qq.com/document/path/91714>
 
 =head3 请求说明：
 
@@ -62,7 +62,7 @@ L<https://work.weixin.qq.com/api/doc/90000/90135/91714>
 sub get_join_qrcode {
     if ( @_ && $_[0] && $_[1] ) {
         my $access_token = $_[0];
-        my $size_type = $_[1];
+        my $size_type = $_[1] || 1;
         my $ua = LWP::UserAgent->new;
         $ua->timeout(30);
         $ua->env_proxy;

@@ -1,0 +1,22 @@
+Revision history for YAOO
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.03    2022-02-13
+	Third times a charm
+
+0.04    2022-02-14
+	- Fix booleans
+	- Add an extends keyword for inheritance
+	- Add require_has and require_sub keywords
+
+0.05    2022-02-14
+	Various Fixes including:
+	- inheritance
+	- any isa type
+	- passing $self into coerce and trigger
+	- ordered hash cloning in the correct order
+
+0.06    2022-02-15
+	- Add support for defining multiple attributes/accessors via [qw/one two three/] and {one => {}, two => {}}

@@ -1,5 +1,8 @@
 Revision history for Perl extension Lingua::PT::PLNbase.
 
+0.28  Mon 15 Feb 15:52:24 WET 2022
+      - utf8 input
+
 0.27  Sat Oct  4 16:31:05 WEST 2014
       - localize $_
 

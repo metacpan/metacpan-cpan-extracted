@@ -8,7 +8,7 @@ use Mail::Message;
 use Mail::Message::Test;
 use Mail::Message::Field::Addresses;
 
-use Test::More tests => 108;
+use Test::More;
 use Encode qw(is_utf8);
 
 # avoid "print of Wide characters" warning
@@ -268,3 +268,19 @@ is $a1->address, $email;
 is $a1->username, 'owner-farmsclub+"simple."=ail.com';
 is $a1->domain, 'simplelists.com';
 
+# Bug reported by Andrew, 2022-02-10
+# https://github.com/markov2/perl5-Mail-Message/issues/2
+
+my $john ='John Smith with a long long long long phrase (via test list)';
+my $f = Mail::Message::Field::Address->new(
+    address => 'andy@example.com',
+    phrase  => $john,
+);
+ok defined $f, "Constructed address with quoted-print";
+
+is "$f", '=?us-ascii?q?John_Smith_with_a_long_long_long_long_phrase_=28via_test_lis?= =?us-ascii?q?t=29?= <andy@example.com>';
+
+my $new = Mail::Message::Field::Address->parse("$f");
+is $new->phrase, $john;
+
+done_testing;

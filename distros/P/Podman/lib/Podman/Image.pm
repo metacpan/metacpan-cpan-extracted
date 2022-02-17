@@ -28,7 +28,7 @@ sub build {
   $self->post(
     'build',
     data       => $archive_file,
-    parameters => {'file'         => path($file)->basename, 't' => $name, %options,},
+    parameters => {'file'         => path($file)->basename, 't' => $name, %options},
     headers    => {'Content-Type' => 'application/x-tar'},
   );
   $self->get(sprintf "images/%s/exists", $name);
@@ -43,7 +43,7 @@ sub pull {
 
   my $reference = sprintf "%s:%s", $name, $tag // 'latest';
 
-  $self->post('images/pull', parameters => {reference => $reference, tlsVerify => 1, %options,});
+  $self->post('images/pull', parameters => {reference => $reference, tlsVerify => 1, %options});
   $self->get(sprintf "images/%s/exists", $name);
 
   return $self->name($name);
@@ -53,18 +53,15 @@ sub inspect {
   my $self = shift;
 
   my $data = $self->get(sprintf "images/%s/json", $self->name)->json;
+  my $tag  = (split /:/, $data->{RepoTags}->[0])[1];
 
-  my $tag = (split /:/, $data->{RepoTags}->[0])[1];
-
-  my %inspect = (Tag => $tag, Id => $data->{Id}, Created => $data->{Created}, Size => $data->{Size},);
-
-  return \%inspect;
+  return {Tag => $tag, Id => $data->{Id}, Created => $data->{Created}, Size => $data->{Size}};
 }
 
 sub remove {
   my ($self, $force) = @_;
 
-  $self->delete('images', parameters => {images => $self->name, force => $force // 0,});
+  $self->delete('images', parameters => {images => $self->name, force => $force // 0});
 
   return 1;
 }
@@ -82,7 +79,8 @@ Podman::Image - Create and control image.
 =head1 SYNOPSIS
 
     # Pull image from registry
-    my $image = Podman::Image::pull('docker.io/library/hello-world');
+    use Podman::Image qw(pull);
+    my $image = pull('docker.io/library/hello-world');
 
     # Build new image from File
     my $image = Podman::Image::build('localhost/goodbye', '/tmp/Dockerfile');
@@ -91,13 +89,13 @@ Podman::Image - Create and control image.
     my $info = $image->inspect;
 
     # Remove local stored image
-    $image->remove();
+    $image->remove;
 
 =head1 DESCRIPTION
 
 =head2 Inheritance
 
-    Podman::Containers
+    Podman::Image
         isa Podman::Client
 
 L<Podman::Image> provides functionality to create and control an image.
@@ -128,9 +126,9 @@ the directory level of the build file are included.
 =head2 pull
 
     use Podman::Image qw(pull);
-    my $image = pull('docker.io/library/hello-world' 'latest', %options);
+    my $image = pull('docker.io/library/hello-world' 'linux', %options);
 
-Pull named image with optional tag, defaults to C<latest> and additional options from registry into store.
+Pull named image with optional tag, defaults to C<latest>, and additional options from registry into store.
 
 =head1 METHODS
 

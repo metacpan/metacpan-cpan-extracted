@@ -3,6 +3,7 @@
 use Test::More;
 
 use_ok('Azure::AD::ClientCredentials');
+use_ok('Azure::AD::ClientCredentialsV2');
 use_ok('Azure::AD::DeviceLogin');
 use_ok('Azure::AD::Password');
 
@@ -19,6 +20,27 @@ use_ok('Azure::AD::Password');
 {
   my $auth = Azure::AD::ClientCredentials->new(
     resource_id => 'random',
+    client_id => 'cid1',
+    tenant_id => 'ten1',
+    secret_id => 'sec1',
+    ad_url => 'https://login.microsoftonline.us',
+  );
+  like($auth->token_endpoint, qr|^https://login.microsoftonline.us|, 'Got custom US endpoint');
+}
+
+{
+  my $auth = Azure::AD::ClientCredentialsV2->new(
+    scope     => 'scope',
+    client_id => 'cid1',
+    tenant_id => 'ten1',
+    secret_id => 'sec1',
+  );
+  like($auth->token_endpoint, qr|^https://login.microsoftonline.com|, 'Got default endpoint');
+}
+
+{
+  my $auth = Azure::AD::ClientCredentialsV2->new(
+    scope     => 'scope',
     client_id => 'cid1',
     tenant_id => 'ten1',
     secret_id => 'sec1',

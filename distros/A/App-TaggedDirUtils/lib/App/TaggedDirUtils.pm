@@ -10,7 +10,7 @@ use Log::ger;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-08-23'; # DATE
 our $DIST = 'App-TaggedDirUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our %SPEC;
 
@@ -21,7 +21,7 @@ $SPEC{':package'} = {
 
 our %argspecs_common = (
     prefixes => {
-        summary => 'Changes file',
+        summary => 'Locations to search for tagged directories',
         schema => ['array*', of=>'dirname*'],
         req => 1,
         pos => 0,
@@ -192,7 +192,7 @@ App::TaggedDirUtils - CLI utilities related to tagged directories
 
 =head1 VERSION
 
-This document describes version 0.001 of App::TaggedDirUtils (from Perl distribution App-TaggedDirUtils), released on 2021-08-23.
+This document describes version 0.002 of App::TaggedDirUtils (from Perl distribution App-TaggedDirUtils), released on 2021-08-23.
 
 =head1 SYNOPSIS
 
@@ -247,7 +247,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<prefixes>* => I<array[dirname]>
 
-Changes file.
+Locations to search for tagged directories.
 
 Location(s) to search for tagged subdirectories, i.e. directories which have
 some file with specific names in its root.

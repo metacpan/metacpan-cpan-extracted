@@ -9,11 +9,11 @@ README
 README.md
 dist.ini
 eg/Dancer-App.pm
+eg/analyze
 eg/benchmark
 eg/intervals
 eg/intervals-numeric
 eg/mojo-intervals.pl
-eg/pythagorean
 eg/scala
 eg/werck1.scl
 lib/Music/Intervals.pm

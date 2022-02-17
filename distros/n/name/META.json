@@ -1,10 +1,10 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "Take The Name",
    "author" : [
       "Bernhard Graf <graf@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -45,6 +45,19 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.0.0",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/augensalat/perl-name/issues"
+      },
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/augensalat/perl-name.git",
+         "web" : "https://github.com/augensalat/perl-name"
+      }
+   },
+   "version" : "v0.0.1",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

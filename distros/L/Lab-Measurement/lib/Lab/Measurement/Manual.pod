@@ -14,7 +14,7 @@ Lab::Measurement::Manual - API documentation manual for Lab::Measurement
 
 =head1 VERSION
 
-version 3.803
+version 3.810
 
 =head1 OVERVIEW
 
@@ -188,13 +188,11 @@ alias: L<Lab::Moose::Instrument::Agilent34410A>
 
 =item * L<Lab::Moose::Instrument::SignalRecovery7265>
 
-=back
-
-=head3 Impedance analyzers
-
-=over
+=item * L<Lab::Moose::Instrument::MCL1_540>
 
 =item * L<Lab::Moose::Instrument::ZI_MFIA>
+
+=item * L<Lab::Moose::Instrument::AH2700A>
 
 =back
 

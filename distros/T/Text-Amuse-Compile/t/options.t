@@ -148,6 +148,7 @@ my $file = Text::Amuse::Compile::File->new(name => 'test',
                                                        desc => $returned->{selected_font_main},
                                                        type => 'serif',
                                                       ),
+                                                 all_fonts => Text::Amuse::Compile::Fonts->new,
                                                  size => 14,
                                                 ),
                                            templates => $tt);

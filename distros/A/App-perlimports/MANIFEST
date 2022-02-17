@@ -22,7 +22,6 @@ lib/App/perlimports/ExportInspector.pm
 lib/App/perlimports/Include.pm
 lib/App/perlimports/Role/Logger.pm
 lib/App/perlimports/Sandbox.pm
-perlcriticrc
 perltidyrc
 precious.toml
 script/dump-perl-exports
@@ -68,6 +67,7 @@ t/lib/TestHelper.pm
 t/lookalike-words.t
 t/meta.t
 t/method.t
+t/missing-semicolon-in-import.t
 t/module-with-inner-packages.t
 t/moo.t
 t/moose-types.t
@@ -100,6 +100,7 @@ t/symbol-in-export.t
 t/test-builder.t
 t/test-most.t
 t/typeglob.t
+t/unnest-quotes.t
 t/use-and-require.t
 t/var-in-hash-key.pl
 t/var-in-regex.t
@@ -162,6 +163,7 @@ test-data/lookalike-words.pl
 test-data/messy-imports.pl
 test-data/meta.t
 test-data/method.pl
+test-data/missing-semicolon-in-import.pl
 test-data/moosex-types-moose.pl
 test-data/more-find-bin.pl
 test-data/nested-quotes.pl
@@ -189,6 +191,7 @@ test-data/test-html-lint.t
 test-data/test-more.t
 test-data/test-most.t
 test-data/typeglob.pl
+test-data/unnest-quotes.pl
 test-data/use-and-require.pl
 test-data/var-in-hash-key.pl
 test-data/var-in-regex.pl

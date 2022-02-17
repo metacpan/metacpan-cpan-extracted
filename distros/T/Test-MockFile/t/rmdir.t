@@ -13,7 +13,7 @@ use File::Temp qw/tempfile tempdir/;
 my $temp_dir_name = tempdir( CLEANUP => 1 );
 CORE::rmdir $temp_dir_name;
 
-use Test::MockFile ();
+use Test::MockFile qw< nostrict >;
 
 # Proves umask works in this test.
 umask 022;

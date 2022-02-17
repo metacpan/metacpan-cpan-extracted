@@ -4,7 +4,7 @@ Robots::Validate - Validate that IP addresses are associated with known robots
 
 # VERSION
 
-version v0.2.4
+version v0.2.6
 
 # SYNOPSIS
 
@@ -122,7 +122,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2021 by Robert Rothenberg.
+This software is Copyright (c) 2018-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

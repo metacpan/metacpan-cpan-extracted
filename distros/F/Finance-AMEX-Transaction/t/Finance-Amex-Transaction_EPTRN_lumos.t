@@ -1,16 +1,17 @@
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
 
 use Test::More tests => 91;
 
-BEGIN {use_ok('Finance::AMEX::Transaction')};
+BEGIN {use_ok('Finance::AMEX::Transaction')}
 
 use lib '.';
 use t::lib::CompareFile;
 
 # source: https://github.com/lumoslabs/paxmex/blob/master/spec/parser_spec.rb
-my $file = 't/data/dummy_eptrn_raw';
+my $file = 't/data/paxmex/dummy_eptrn_raw';
 
 my $counts = {
   HEADER            => {want => 1, have => 0},
@@ -23,12 +24,11 @@ my $counts = {
   OTHER_DETAIL      => {want => 0, have => 0},
 };
 
-my $data = do { local $/; <DATA> };
+my $data = do {local $/ = undef; <DATA>};
 
 t::lib::CompareFile::compare('EPTRN', $file, $data, $counts);
 
 done_testing();
-
 
 __DATA__
 {

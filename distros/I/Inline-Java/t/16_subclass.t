@@ -6,9 +6,11 @@ use warnings;
 package Hi3;
 use strict;
 use warnings;
+use Config;
+use File::Spec;
 
 BEGIN {
-  $ENV{CLASSPATH} .= "t/t16subclass.jar";
+  $ENV{CLASSPATH} = join $Config{path_sep}, grep defined, $ENV{CLASSPATH}, File::Spec->catfile(qw(t t16subclass.jar));
 }
 
 use Inline Java => 'STUDY', STUDY => ['t16subclass'];

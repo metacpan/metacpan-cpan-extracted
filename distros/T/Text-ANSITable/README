@@ -3,8 +3,8 @@ NAME
     ANSI colors
 
 VERSION
-    This document describes version 0.607 of Text::ANSITable (from Perl
-    distribution Text-ANSITable), released on 2021-08-27.
+    This document describes version 0.608 of Text::ANSITable (from Perl
+    distribution Text-ANSITable), released on 2022-02-14.
 
 SYNOPSIS
      use 5.010;
@@ -334,8 +334,8 @@ BORDER STYLES
      $t->border_style(["Test::CustomChar", {character=>"x"}]);
 
     If no border style is selected explicitly, a nice default will be
-    chosen. You can also set the "ANSITABLE_BORDER_STYLE" environment
-    variable to set the default.
+    chosen. You can also set the "ANSITABLE_BORDER_STYLE" or "BORDER_STYLE"
+    environment variable to set the default.
 
     To create a new border style, see BorderStyle.
 
@@ -1297,7 +1297,12 @@ ENVIRONMENT
     Can be used to override terminal width detection.
 
   ANSITABLE_BORDER_STYLE => STR
-    Can be used to set default value for "border_style" attribute.
+    Can be used to set default value for "border_style" attribute. Takes
+    precedence over BORDER_STYLE.
+
+  BORDER_STYLE => STR
+    Can be used to set default value for "border_style" attribute. See also
+    "ANSITABLE_BORDER_STYLE".
 
   ANSITABLE_COLOR_THEME => STR
     Can be used to set default value for "border_style" attribute.
@@ -1402,7 +1407,7 @@ AUTHOR
 CONTRIBUTORS
     *   Mario Zieschang <mario@zieschang.info>
 
-    *   Steven Haryanto (on PC) <stevenharyanto@gmail.com>
+    *   Steven Haryanto <stevenharyanto@gmail.com>
 
 CONTRIBUTING
     To contribute, you can send patches by email/via RT, or send pull
@@ -1421,8 +1426,8 @@ CONTRIBUTING
     me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020, 2018, 2017, 2016, 2015, 2014,
-    2013 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2022, 2021, 2020, 2018, 2017, 2016, 2015,
+    2014, 2013 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

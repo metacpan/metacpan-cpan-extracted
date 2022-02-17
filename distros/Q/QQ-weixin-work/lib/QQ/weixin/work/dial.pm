@@ -19,7 +19,7 @@ use LWP::UserAgent;
 use JSON;
 use utf8;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 our @EXPORT = qw/ get_dial_record /;
 
 =head1 FUNCTION
@@ -30,9 +30,11 @@ our @EXPORT = qw/ get_dial_record /;
 
 =head2 SYNOPSIS
 
-L<https://work.weixin.qq.com/api/doc/90000/90135/90267>
+L<https://developer.work.weixin.qq.com/document/path/93662>
 
 =head3 请求说明：
+
+企业可通过此接口，按时间范围拉取成功接通的公费电话拨打记录。
 
 =head4 请求包结构体为：
 
@@ -52,6 +54,10 @@ L<https://work.weixin.qq.com/api/doc/90000/90135/90267>
     offset	否	分页查询的偏移量
     limit	否	分页查询的每页大小,默认为100条，如该参数大于100则按100处理
 
+请注意，查询的时间范围为[start_time,end_time]，即前后均为闭区间。在两个参数都指定了的情况下，结束时间不得小于开始时间，开始时间也不得早于当前时间，否则会返回600018错误码(无效的起止时间)。
+受限于网络传输，起止时间的最大跨度为30天，如超过30天，则以结束时间为基准向前取30天进行查询。
+如果未指定起止时间，则默认查询最近30天范围内数据。
+
 =head4 权限说明：
 
 企业需要使用公费电话secret所获取的accesstoken来调用（accesstoken如何获取？）；
@@ -60,60 +66,63 @@ L<https://work.weixin.qq.com/api/doc/90000/90135/90267>
 =head3 RETURN 返回结果：
 
     {
-    	"errcode": 0,
-    	"errmsg": "ok",
-      "record":[
-           {
-            "call_time":1536508800,
-            "total_duration":10,
-            "call_type":1,
-            "caller":
-            {
-                "userid":"tony",
-                "duration":10
-            },
-            "callee":[
-            {
-                "phone":138000800,
-                "duration":10
-            }
-            ]
-          },
-          {
-            "call_time":1536940800,
-            "total_duration":20,
-            "call_type":2,
-            "caller":
-            {
-                "userid":"tony",
-                "duration":10
-            },
-            "callee":[
-                {
-                    "phone":138000800,
-                    "duration":5
-                },
-                {
-                    "userid":"tom",
-                    "duration":5
-                }
-            ]
-          }
-      ]
-    }
+	   "errcode": 0,
+	   "errmsg": "ok",
+	   "record":[
+			{
+				"call_time":1536508800,
+				"total_duration":10,
+				"call_type":1,
+				"caller":
+				{
+					"userid":"tony",
+					"duration":10
+				},
+				"callee":[
+				{
+					"phone":138000800,
+					"duration":10
+				}
+				]
+			},
+			{
+				"call_time":1536940800,
+				"total_duration":20,
+				"call_type":2,
+				"caller":
+				{
+					"userid":"tony",
+					"duration":10
+				},
+				"callee":[
+					{
+						"phone":138000800,
+						"duration":5
+					},
+					{
+						"userid":"tom",
+						"duration":5
+					}
+				]
+			}
+	   ]
+	}
 
 =head4 RETURN 参数说明：
 
     参数	        说明
-    errcode	    出错返回码，为0表示成功，非0表示调用失败
-    errmsg	对返回码的文本描述内容
-    record.call_time	拨出时间
-    record.total_duration	总通话时长，单位为分钟
-    record.call_type	通话类型，1-单人通话 2-多人通话
-    record.caller.userid	主叫用户的userid
-    record.caller.duration	主叫用户的通话时长
-    record.callee.userid	被叫用户的userid，当被叫用户为企业内用户时返回
-    record.callee.phone	被叫用户的号码，当被叫用户为外部用户时返回
+    errcode	返回码
+	errmsg	对返回码的文本描述内容
+	record.call_time	拨出时间
+	record.total_duration	总通话时长，单位为分钟
+	record.call_type	通话类型，1-单人通话 2-多人通话
+	record.caller.userid	主叫用户的userid
+	record.caller.duration	主叫用户的通话时长
+	record.callee.userid	被叫用户的userid，当被叫用户为企业内用户时返回
+	record.callee.phone	被叫用户的号码，当被叫用户为外部用户时返回
+	record.callee.duration	被叫用户的通话时长
+
+通话类型为单人通话时，总通话时长等于单人通话时长，通话类型为多人通话时，总通话时长等于包括主叫用户在内的每个接入用户的通话时长之和。
 
 =cut
 

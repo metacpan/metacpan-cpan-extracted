@@ -28,7 +28,7 @@
             "Test::Rinci" : "0.151"
          },
          "x_spec" : {
-            "Rinci" : "v1.1.99"
+            "Rinci" : "v1.1.100"
          }
       },
       "runtime" : {
@@ -68,7 +68,7 @@
    "provides" : {
       "App::ImageMagickUtils" : {
          "file" : "lib/App/ImageMagickUtils.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       }
    },
    "release_status" : "stable",
@@ -83,7 +83,7 @@
          "web" : "https://github.com/perlancar/perl-App-ImageMagickUtils"
       }
    },
-   "version" : "0.010",
+   "version" : "0.011",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

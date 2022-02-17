@@ -787,6 +787,17 @@ Native APIs of L<SPVM> have the IDs that is corresponding to the names. These ID
   160 get_instance_method_id_static
   161 get_bool_object_value
   162 string_basic_type_id
+  163 make_read_only
+  164 is_read_only
+  165 is_array
+  166 is_string
+  167 is_numeric_array
+  168 is_mulnum_array
+  169 get_elem_byte_size
+  170 new_array_proto_raw
+  171 new_array_proto
+  172 copy_raw
+  173 copy
 
 =head1 List of Native APIs
 
@@ -2440,6 +2451,68 @@ B<Examples:>
   void* string_basic_type_id;
 
 Basic type ID of the C<string> type. This is used internally.
+
+=head2 make_read_only
+
+  void (*make_read_only)(SPVM_ENV* env, void* string)
+
+Make the string read-only.
+
+=head2 is_read_only
+
+  void (*make_read_only)(SPVM_ENV* env, void* string)
+
+If the string is read-only, returns C<1>, otherwise returns C<0>.
+
+=head2 is_array
+
+  int32_t (*is_array)(SPVM_ENV* env, void* object);
+
+If the object is an array, returns C<1>, otherwise returns C<0>.
+
+=head2 is_string
+
+  int32_t (*is_string)(SPVM_ENV* env, void* object);
+
+If the object is a string, returns C<1>, otherwise returns C<0>.
+
+=head2 is_numeric_array
+
+  int32_t (*is_numeric_array)(SPVM_ENV* env, void* object);
+
+If the object is a numeric array, returns C<1>, otherwise returns C<0>.
+
+=head2 is_mulnum_array
+
+  int32_t (*is_mulnum_array)(SPVM_ENV* env, void* object);
+
+If the object is a multi numeric array, returns C<1>, otherwise returns C<0>.
+
+=head2 get_elem_byte_size
+
+  int32_t (*get_elem_byte_size)(SPVM_ENV* env, void* array);
+
+Get the byte size of the element of the array.
+
+=head2 new_array_proto
+
+  void* (*new_array_proto)(SPVM_ENV* env, void* array, int32_t length);
+
+Create a new array that have the type of the given array and the given length.
+
+The given array must be the object that is an array type.
+
+If the given array is L<NULL>, returns C<NULL>.
+
+If the given length is lower than C<0>, returns C<NULL>.
+
+=head2 copy
+
+  void* (*copy)(SPVM_ENV* env, void* object);
+
+Copy the object. The type of the object must be a string type, a numeric array, or a multi numeric array.
+
+If the given object is L<NULL>, returns L<NULL>.
 
 =head1 Utilities
 

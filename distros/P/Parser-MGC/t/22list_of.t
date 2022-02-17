@@ -5,46 +5,47 @@ use warnings;
 
 use Test::More;
 
-package TestParser;
-use base qw( Parser::MGC );
+package TestParser {
+   use base qw( Parser::MGC );
 
-sub parse
-{
-   my $self = shift;
+   sub parse
+   {
+      my $self = shift;
 
-   $self->list_of( ",", sub {
-      return $self->token_int;
-   } );
+      $self->list_of( ",", sub {
+         return $self->token_int;
+      } );
+   }
 }
 
-package TestParser2;
-use base qw( Parser::MGC );
+package TestParser2 {
+   use base qw( Parser::MGC );
 
-sub parse
-{
-   my $self = shift;
+   sub parse
+   {
+      my $self = shift;
 
-   $self->list_of( ",", 'token_int' );
+      $self->list_of( ",", 'token_int' );
+   }
 }
 
-package TestParser3;
-use base qw( Parser::MGC );
+package TestParser3 {
+   use base qw( Parser::MGC );
 
-sub parse
-{
-   my $self = shift;
+   sub parse
+   {
+      my $self = shift;
 
-   $self->list_of( ":", 'parse_inner' );
+      $self->list_of( ":", 'parse_inner' );
+   }
+
+   sub parse_inner
+   {
+      my $self = shift;
+
+      return ( "(", $self->token_int, ")" );
+   }
 }
-
-sub parse_inner
-{
-   my $self = shift;
-
-   return ( "(", $self->token_int, ")" );
-}
-
-package main;
 
 my $parser = TestParser->new;
 

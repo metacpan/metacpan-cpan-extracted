@@ -5,36 +5,36 @@ use warnings;
 
 use Test::More;
 
-package TestParser;
-use base qw( Parser::MGC );
+package TestParser {
+   use base qw( Parser::MGC );
 
-sub parse
-{
-   my $self = shift;
-
-   $self->sequence_of( sub {
-      return $self->token_int;
-   } );
-}
-
-package IntThenStringParser;
-use base qw( Parser::MGC );
-
-sub parse
-{
-   my $self = shift;
-
-   [ $self->sequence_of( sub {
-         return $self->token_int;
-      } ),
+   sub parse
+   {
+      my $self = shift;
 
       $self->sequence_of( sub {
-         return $self->token_string;
-      } ),
-   ];
+         return $self->token_int;
+      } );
+   }
 }
 
-package main;
+package IntThenStringParser {
+   use base qw( Parser::MGC );
+
+   sub parse
+   {
+      my $self = shift;
+
+      [ $self->sequence_of( sub {
+            return $self->token_int;
+         } ),
+
+         $self->sequence_of( sub {
+            return $self->token_string;
+         } ),
+      ];
+   }
+}
 
 my $parser = TestParser->new;
 

@@ -28,12 +28,12 @@ requires:
   PDF::Imposition: '0.23'
   Path::Tiny: '0'
   Template::Tiny: '1.12'
-  Text::Amuse: '1.78'
+  Text::Amuse: '1.8'
   Type::Tiny: '1'
 resources:
-  IRC: irc://chat.freenode.net/#amusewiki
-  WebIRC: https://webchat.freenode.net/?channels=#amusewiki
+  IRC: irc://irc.libera.chat/#amusewiki
+  WebIRC: https://web.libera.chat/#amusewiki
   homepage: http://amusewiki.org
   repository: https://github.com/melmothx/text-amuse-compile
-version: '1.67'
+version: '1.82'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

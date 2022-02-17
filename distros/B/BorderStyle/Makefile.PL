@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010001;
 
 use ExtUtils::MakeMaker;
 
@@ -14,15 +14,22 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "BorderStyle",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "BorderStyle",
-  "PREREQ_PM" => {},
+  "PREREQ_PM" => {
+    "Role::Tiny" => 0,
+    "Role::Tiny::With" => 0,
+    "strict" => 0,
+    "utf8" => 0,
+    "warnings" => 0
+  },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "2.0.9",
+  "VERSION" => "3.0.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -33,7 +40,12 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Test::More" => 0
+  "Role::Tiny" => 0,
+  "Role::Tiny::With" => 0,
+  "Test::More" => 0,
+  "strict" => 0,
+  "utf8" => 0,
+  "warnings" => 0
 );
 
 

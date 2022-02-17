@@ -1,4 +1,3 @@
-.envrc
 Build.PL
 Changes
 cpanfile
@@ -11,6 +10,8 @@ lib/Pg/Explain/FromJSON.pm
 lib/Pg/Explain/FromText.pm
 lib/Pg/Explain/FromXML.pm
 lib/Pg/Explain/FromYAML.pm
+lib/Pg/Explain/Hinter.pm
+lib/Pg/Explain/Hinter/Hint.pm
 lib/Pg/Explain/JIT.pm
 lib/Pg/Explain/Node.pm
 lib/Pg/Explain/StringAnonymizer.pm
@@ -423,6 +424,9 @@ t/72-more-info-for-initscans.d/plan.xml
 t/72-more-info-for-initscans.d/plan.yaml
 t/72-more-info-for-initscans.t
 t/73-node-id.t
+t/74-hinter-no-hints.t
+t/75-hinter-disk-sort.t
+t/76-hinter-indexable-seqscan-simple.t
 t/99-manifest.t
 t/perlcriticrc
 t/perltidyrc

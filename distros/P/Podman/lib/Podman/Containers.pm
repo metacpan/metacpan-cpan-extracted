@@ -2,7 +2,7 @@ package Podman::Containers;
 
 use Mojo::Base 'Podman::Client';
 
-use Mojo::Collection;
+use Mojo::Collection qw(c);
 use Scalar::Util qw(blessed);
 
 use Podman::Container;
@@ -18,14 +18,13 @@ sub list {
     $self->names_only($opts{names_only});
   }
 
-  my $images = $self->get('containers/json', parameters => {all => 1},)->json;
-
+  my $containers = $self->get('containers/json', parameters => {all => 1})->json;
   my @list = map {
-    my $name = $_->{Names}->[0] || 'none';
+    my $name = $_->{Names}->[0] || $_->{Id};
     $self->names_only ? $name : Podman::Container->new(name => $name);
-  } @{$images};
+  } @{$containers};
 
-  return Mojo::Collection->new(@list);
+  return c(@list);
 }
 
 sub prune {
@@ -51,7 +50,7 @@ Podman::Containers - Manage containers.
 =head1 SYNOPSIS
 
     # List available containers sorted by Id
-    my $containers = Podman::Images->new->list->sort(sub { $a->inspect->{Id} cmp $b->inspect->{Id} } );
+    my $containers = Podman::Containers->new->list->sort(sub { $a->inspect->{Id} cmp $b->inspect->{Id} } );
     say $_->name for $containers->each;
 
     # Prune unused containers
@@ -72,8 +71,7 @@ L<Podman::Containers> implements following attributes.
 
 =head2 names_only
 
-If C<true>, C<list> returns L<Mojo::Collection> of image names only instead of L<Podman::Image> objects, defaults to
-C<false>.
+If C<true>, C<list> returns L<Mojo::Collection> of image names only, defaults to C<false>.
 
 =head1 METHODS
 
@@ -81,9 +79,10 @@ L<Podman::Containers> implements following methods, which can be used as object 
 
 =head2 list
 
-    my $list = Podman::Containers->list;
+    my $list = Podman::Containers->list(names_only => 1);
 
-Returns a L<Mojo::Collection> of L<Podman::Container> objects or container names only of stored images.
+Returns a L<Mojo::Collection> of L<Podman::Container> objects or container names only of stored images. See attribute
+C<names_only>.
 
 =head2 prune
 

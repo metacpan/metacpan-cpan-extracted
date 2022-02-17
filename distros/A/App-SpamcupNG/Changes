@@ -1,10 +1,42 @@
 ==================================================
-Changes from 2021-01-28 00:00:00 +0000 to present.
+Changes from 2021-02-17 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.010 at 2022-01-28 23:56:52 +0000
+version 0.011 at 2022-02-17 00:25:54 +0000
 ------------------------------------------
+
+  Change: e56053602a88ea09eb46c5d3f2a86a13208e807b
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-02-16 21:24:34 +0000
+
+    Merge branch 'bugfix/logging_errors' 
+
+  Change: 8452875f0e2f82757bfabfa218481d80ae7459d4
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-02-16 21:24:19 +0000
+
+    chore: perltidy 
+
+  Change: 21f1c512a2f7cd318bcb466d8bcf97cc45dff771
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-02-16 21:23:11 +0000
+
+    Merge pull request #5 from glasswalk3r/bugfix/logging_errors
+
+    Bugfix/logging errors 
+
+  Change: 6dd292ec0a04024a7f60e060190828dc03952a09
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-02-16 21:19:01 +0000
+
+    fix: useless boundary filter 
+
+  Change: 71a1a4c714b7334849423570e2c4cb506fa66f72
+  Author: alceu.freitas <alceu.freitas@semantix.com.br>
+  Date : 2022-02-16 20:57:56 +0000
+
+    fix: added missing method invocation 
 
   Change: e067435f8868ad3b04a658b196e59eac3e30eaf8
   Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>

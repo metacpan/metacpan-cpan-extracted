@@ -10,7 +10,7 @@ use Text::Wrap 'wrap';
 use Bible::Reference 1.05;
 use Clone 'clone';
 
-our $VERSION = '1.17'; # VERSION
+our $VERSION = '1.18'; # VERSION
 
 has bible    => 'Protestant';
 has acronyms => 1;
@@ -284,6 +284,13 @@ sub render {
         else {
             my $rendered_block = join( ' ', map { $render_block->($_) } @$node );
             $rendered_block =~ s/[ \t]*(\n+)[ \t]?/$1/g;
+
+            $rendered_block =~ s/[ \t]([^\w ]+)[ \t]*(\[[^\]]*\]|\{[^\}]*\})[ \t]*/ $1$2/g;
+            $rendered_block =~ s/[ \t]*(\[[^\]]*\]|\{[^\}]*\})[ \t]*([^\w ]+)[ \t]/$1$2 /g;
+
+            $rendered_block =~ s/^([^\w ]+)[ \t]*(\[[^\]]*\]|\{[^\}]*\})[ \t]*/$1$2/g;
+            $rendered_block =~ s/[ \t]*(\[[^\]]*\]|\{[^\}]*\})[ \t]*([^\w ]+)$/$1$2/g;
+
             return $rendered_block;
         }
     };
@@ -316,7 +323,6 @@ sub render {
     $content =~ s/\(\s+/\(/g;
     $content =~ s/\s+\)/\)/g;
 
-    $content =~ s/(\s*(?:\[[^\]]*\]|\{[^\}]*\}))\s*([\,\;\.\!\?]+)/$2$1/g;
     $content =~ s/\s+(?=[\,\;\.\!\?]+)//g;
     $content =~ s/\s+(?=[\-]+\s)//g;
 
@@ -481,7 +487,7 @@ Bible::OBML - Open Bible Markup Language parser and renderer
 
 =head1 VERSION
 
-version 1.17
+version 1.18
 
 =for markdown [![test](https://github.com/gryphonshafer/Bible-OBML/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bible-OBML/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bible-OBML/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bible-OBML)

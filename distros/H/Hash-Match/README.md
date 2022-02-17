@@ -4,7 +4,7 @@ Hash::Match - match contents of a hash against rules
 
 # VERSION
 
-version v0.7.1
+version v0.7.2
 
 # SYNOPSIS
 
@@ -211,7 +211,7 @@ Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Robert Rothenberg.
+This software is Copyright (c) 2018-2022 by Robert Rothenberg.
 
 This is free software, licensed under:
 

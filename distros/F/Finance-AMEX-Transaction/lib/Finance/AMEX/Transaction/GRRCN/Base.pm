@@ -1,27 +1,30 @@
-package Finance::AMEX::Transaction::GRRCN::Base;
-$Finance::AMEX::Transaction::GRRCN::Base::VERSION = '0.004';
+package Finance::AMEX::Transaction::GRRCN::Base 0.005;
+
 use strict;
 use warnings;
 
 use Text::CSV;
+use Carp 'croak';
 
 # ABSTRACT: Parse AMEX Global Reconciliation (GRRCN) Base methods
 
 sub new {
   my ($class, %props) = @_;
   my $self = bless {
-    _line        => $props{line},
-    _file_format => $props{file_format},
-    _fields      => undef,
-    _version     => $props{version} || 1.01,
+    _line         => $props{line},
+    _file_format  => $props{file_format},
+    _fields       => undef,
+    _file_version => $props{file_version} || 1.01,
   }, $class;
 
   my $map = $self->field_map;
 
-  my @sorted = sort {$map->{$a}->[0] <=> $map->{$b}->[0]} keys %{$map};
-  my $numbered = {};
-  for (my $i = 0; $i < @sorted; $i++) {
-    $numbered->{$sorted[$i]} = $i;
+  my $column_number = 0;
+  my $numbered      = {};
+
+  foreach my $column (@{$map}) {
+    my ($field) = keys %{$column};
+    $numbered->{$field} = $column_number++;
   }
 
   $self->{_fields} = $numbered;
@@ -44,37 +47,44 @@ sub fields {
   return $self->{_fields};
 }
 
-sub version {
+sub file_version {
   my ($self) = @_;
-  return $self->{_version};
+  return $self->{_file_version};
 }
 
 sub _get_column {
   my ($self, $field) = @_;
 
+  # this will happen if we're trying to get a field that does not
+  # exist in the version of the file we are parsing
+  return if not exists $self->fields->{$field};
+
   if ($self->file_format eq 'CSV' or $self->file_format eq 'TSV') {
 
-   # Text::CSV does not like blank space at the end of the line
-   $self->{_line} =~ s{\s+\z}{};
-   my $index = $self->fields->{$field};
+    # Text::CSV does not like blank space at the end of the line
+    $self->{_line} =~ s{\s+\z}{}xsm;
+    my $index = $self->fields->{$field};
 
-   my $csv = Text::CSV->new ({
-     binary      => 1,
-     quote_char  => '"',
-     escape_char => "\\",
-   }) or die "Cannot use CSV: ".Text::CSV->error_diag ();
+    my $csv = Text::CSV->new({
+      binary      => 1,
+      quote_char  => '"',
+      escape_char => "\\",
+    })
+      or croak 'Cannot use CSV: ' . Text::CSV->error_diag();
 
-   if ($self->file_format eq 'TSV') {
-     $csv->sep_char("\t");
-   }
+    if ($self->file_format eq 'TSV') {
+      $csv->sep_char("\t");
+    }
 
-   if (my $status = $csv->parse($self->{_line})) {
-     return ($csv->fields)[$index];
-   }
+    if (my $status = $csv->parse($self->{_line})) {
+      return ($csv->fields)[$index];
+    }
 
   } elsif ($self->file_format eq 'FIXED') {
 
-    my $map = $self->field_map;
+    my $column_number = $self->fields->{$field};
+
+    my $map = $self->field_map->{$column_number}->{$field};
 
     # if the line is not long enough to handle the start of the field,
     # it is an optional field that we don't have
@@ -83,10 +93,9 @@ sub _get_column {
     }
 
     my $ret = substr($self->{_line}, $map->[0] - 1, $map->[1]);
-    $ret =~ s{\s+\z}{};
+    $ret =~ s{\s+\z}{}xsm;
     return $ret;
   }
-
 }
 
 1;
@@ -103,7 +112,7 @@ Finance::AMEX::Transaction::GRRCN::Base - Parse AMEX Global Reconciliation (GRRC
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 
@@ -119,6 +128,18 @@ The shared new method.
 
 The shared line method.
 
+=head2 fields
+
+Returns the parsed fields from the child module.
+
+=head2 file_format
+
+Returns the file_format.  Normally this will be auto-detected.
+
+=head2 file_version
+
+Returns the file_version.  Normally this will be auto-detected.
+
 =head1 NAME
 
 Finance::AMEX::Transaction::GRRCN::Base - Shared methods for AMEX reconciliation file records.
@@ -129,7 +150,7 @@ Tom Heady <cpan@punch.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by ZipRecruiter.
+This software is copyright (c) 2022 by ZipRecruiter/Tom Heady.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

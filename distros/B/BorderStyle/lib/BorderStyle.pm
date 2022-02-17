@@ -3,9 +3,9 @@
 package BorderStyle;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-27'; # DATE
+our $DATE = '2022-02-14'; # DATE
 our $DIST = 'BorderStyle'; # DIST
-our $VERSION = '2.0.9'; # VERSION
+our $VERSION = '3.0.2'; # VERSION
 
 1;
 # ABSTRACT: Border styles
@@ -22,11 +22,11 @@ BorderStyle - Border styles
 
 =head1 SPECIFICATION VERSION
 
-2
+3
 
 =head1 VERSION
 
-This document describes version 2.0.9 of BorderStyle (from Perl distribution BorderStyle), released on 2022-01-27.
+This document describes version 3.0.2 of BorderStyle (from Perl distribution BorderStyle), released on 2022-02-14.
 
 =head1 DESCRIPTION
 
@@ -45,8 +45,6 @@ This document specifies a way to create and use border styles
 Border style class must be put under C<BorderStyle::*>. Application-specific
 border styles should be put under C<BorderStyle::MODULE::NAME::*> or
 C<BorderStyle::APP::NAME::*>.
-
-Border style structure must be put in the C<%BORDER> package variable.
 
 Border style class must also provide these methods:
 
@@ -86,12 +84,125 @@ should be via this method.
 
 Usage:
 
- my $str = $bs->get_border_char($y, $x, $n, \%char_args);
+ my $str = $bs->get_border_char(%args);
 
-Get border character at a particular C<$y> and C<$x> position, duplicated C<$n>
-times (defaults to 1). Per-character arguments can also be passed. Known
-per-character arguments: C<rownum> (uint, row number, starts from 0), C<colnum>
-(uint, column number, starts from 0).
+Get border character. Arguments include:
+
+=over
+
+=item * char
+
+String. Required. Character name (see below).
+
+=item * repeat
+
+Uint. Optional, defaults to 1.
+
+=item * rownum
+
+Uint, row number of the table cell, starts from 0.
+
+=item * colnum
+
+Uint, column number of the table cell, starts from 0.
+
+=item * for_header_row
+
+Bool. True if drawing a header row, or a separator line between header rows, or
+a separator between header row and data row.
+
+=item * for_header_header_separator
+
+Bool. True if drawing a separator line between header rows/columns.
+
+=item * for_header_column
+
+Bool. True if drawing a header column.
+
+=item * for_header_data_separator
+
+Bool. True if drawing a separator line between the last header row/column and
+the first data row/column.
+
+=item * for_data_row
+
+Bool. True if drawing a data row, or a separator line between data rows, or a
+separator between header row and data row.
+
+=item * for_data_data_separator
+
+Bool. True if drawing a separator line between data rows/columns.
+
+=item * for_data_column
+
+Bool. True if drawing a data column.
+
+=item * for_data_footer_separator
+
+Bool. True if drawing a separator line between the last data row/column and the
+first footer row/column.
+
+=item * for_footer_row
+
+Bool. True if drawing a footer row, or separator between footer rows, or
+separator between data row and footer row.
+
+=item * for_footer_column
+
+Bool. True if drawing a footer column.
+
+=item * for_footer_footer_separator
+
+Bool. True if drawing a separator line between footer rows/columns.
+
+=back
+
+B<Character names>. Names of known border characters are given below:
+
+         rd_t  h_t   hd_t        ld_t
+         | ____|     |           |
+         vv          v           v
+         ┏━━━━━━━━━━━┳━━━━━┳━━━━━┓
+  v_l -->┃    v_i -->┃ hv_i┃     ┃<-- v_r
+         ┃           ┃    \┃     ┃
+         ┃   rv_i -->┣━━━━━╋━━━━━┫<-- lv_r
+         ┃           ┃     ┃     ┃
+         ┃           ┣━━━━━┻━━━━━┫
+         ┃h_i  hd_i  ┃     ^     ┃
+         ┃|    |     ┃     |     ┃
+         ┃v    v     ┃     hu_i  ┃
+ rv_l -->┣━━━━━┳━━━━━┫<-- lv_i   ┃
+         ┃     ┃     ┃           ┃
+ ru_l -->┗━━━━━┻━━━━━┻━━━━━━━━━━━┛
+          ^    ^                 ^
+          |    |                 |
+          h_b  hu_b              lu_b
+
+ no  border character name   description
+ --  ---------------------   -----------
+  1  h_b                     horizontal for top border
+  2  h_i                     horizontal for top border
+  3  h_t                     horizontal line, for top border
+  4  hd_t                    horizontal down line, for top border
+  5  hd_i                    horizontal down line, for inside border
+  6  hu_b                    horizontal up line, for bottom border
+  7  hu_i                    horizontal up line, for inside border
+  8  hv_i                    horizontal vertical line, for inside border
+  9  ld_t                    left down line, for top border
+ 10  lu_b                    left up line, for bottom border
+ 11  lv_i                    left vertical, for inside border
+ 12  lv_r                    left vertical, for right border
+ 13  rd_t                    right down line, for top border
+ 14  ru_b                    right up line, for bottom border
+ 15  rv_i                    right vertical line, for inside border
+ 16  rv_l                    right vertical line, for left border
+ 17  v_i                     vertical line, for inside border
+ 18  v_l                     vertical line, for left border
+ 19  v_r                     vertical line, for right border
+
+The arguments to C<get_border_char()> will also be passed to border character
+that is coderef, or to be interpreted by the class' C<get_border_char()> to vary
+the character.
 
 =back
 
@@ -138,98 +249,9 @@ L<Rinci::function> specifies function arguments. An argument specification can
 contain these properties: C<summary>, C<description>, C<schema>, C<req>,
 C<default>.
 
-=item * chars
-
-An array. Required. Format for the characters in C<chars>:
-
- [                           # y
- #x 0  1  2  3  4  5  6  7
-   [A, B, C, D],             # 0 Top border characters (if drawing header rows)
-   [E, F, G],                # 1 Vertical separators for header row
-   [H, I, J, K, a, b, c, d], # 2 Separator between header row and first data row
-   [L, M, N],                # 3 Vertical separators for data row
-   [O, P, Q, R, e, f, g, h], # 4 Separator between data rows
-   [S, T, U, V],             # 5 Bottom border characters
-
-   [Ȧ, Ḃ, Ċ, Ḋ],             # 6 Top border characters (if not drawing header rows)
-   [Ṣ, Ṭ, Ụ, Ṿ],             # 7 Bottom border characters (if drawing header rows but there are no data rows)
-
-   [Ȯ, Ṗ, Ꝙ, Ṙ, ė, ḟ, ġ, ḣ], # 8 Separator between header rows
- ]
-
-When drawing border, below is how the border characters will be used:
-
- ABBBCBBBD        #0 Top border characters
- E   F   G        #1 Vertical separators for header row
- ȮṖṖṖꝘṖṖṖṘ        #8 Separator between header rows (if there are multiple header rows)
- E   F   G        #1 (another header row, if there are multiple header rows)
- HIIIJIIIK        #2 Separator between last header row and first data row
- L   M   N        #3 Vertical separators for data row
- OPPPQPPPR        #4 Separator between data rows
- L   M   N        #3 (another data row)
- STTTUTTTV        #5 Bottom border characters
-
-When not drawing header rows, these characters will be used instead:
-
- ȦḂḂḂĊḂḂḂḊ        #6 Top border characters (when not drawing header rows)
- L   M   N        #3 Vertical separators for data row
- OPPPQPPPR        #4 Separator between data rows
- L   M   N        #3 (another data row)
- OPPPQPPPR        #4 (another separator between data rows)
- L   M   N        #3 (another data row)
- STTTUTTTV        #5 Bottom border characters
-
-When drawing header rows and there are no data rows, these characters will be
-used:
-
- ABBBCBBBD        #0 Top border characters
- E   F   G        #1 Vertical separators for header row
- ȮṖṖṖꝘṖṖṖṘ        #8 Separator between header rows (if there are multiple header rows)
- E   F   G        #1 (another header row, if there are multiple header rows)
- ṢṬṬṬỤṬṬṬṾ        #7 Bottom border characters (when there are header rows but no data row)
-
-In table with column and row spans (demonstrates characters C<a>, C<b>, C<e>,
-C<f>, C<g>, C<h>):
-
- ABBBBBBBCBBBCBBBD  ^
- E       F   F   G  |
- ȮṖṖṖṖṖṖṖꝘṖṖṖėṖṖṖṘ  |      # ė=no top line, ḟ=no bottom line
- E       F   F   G  |
- ȮṖṖṖṖṖṖṖꝘṖṖṖḟṖṖṖṘ  +------> header area
- E       F       G  |
- E       ġṖṖṖṖṖṖṖṘ  |      # ġ=no left line
- E       F       G  |
- ȮṖṖṖṖṖṖṖḣ       G  |      # h=on right line
- E       F       G  |
- HIIIaIIIJIIIbIIIK  v ^    # a=no top line, b=no bottom line
- L   M   M       N    |
- OPPPfPPPQPPPePPPR    |    # e=no top line, f=no bottom line
- L       M   M   N    |
- OPPPPPPPQPPPePPPR    +----> data area
- L       M       N    |
- L       gPPPPPPPR    |    # g=no left line
- L       M       N    |
- OPPPPPPPh       N    |    # h=on right line
- L       M       N    |
- STTTTTTTUTTTTTTTV    v
-
-In the case of a header-data separator line also having been cut by a multirow
-cell (note the C<c> and C<d> border character):
-
- ABBBBBBBBBCBBBBBBBBBBBBBBBBBBBBBCBBBBBBBBBD  ^
- F         F                     F         G  |
- F         cIIIIIIIIIIaIIIIIIIIIId         G  +-------> header area
- L         M          M          F         N  |
- OPPPPPPPPPQPPPPPPPPPPQPPPPPPPPPPQPPPPPPPPPR  v  ^
- M         M          M          M         N     |
- M         M          M          M         N     +----> data area
- M         M          M          M         N     |
- STTTTTTTTTUTTTTTTTTTTUTTTTTTTTTTUTTTTTTTTTV     v
-
-A character can also be a coderef that will be called with C<< ($self, $y, $x,
-$n, \%args) >>. See L</Border style character>.
-
 =back
+
+Border style structure must be put in the C<%BORDER> package variable.
 
 =head2 Border style character
 
@@ -250,7 +272,28 @@ Source repository is at L<https://github.com/perlancar/perl-BorderStyle>.
 
 =head1 HISTORY
 
-L<Border::Style> is an older specification, superseded by this document.
+=head2 v3
+
+Incompatible change.
+
+Remove C<chars> in border style structure and abstract it through
+C<get_border_char()> to be more flexible, e.g. to allow for footer area,
+vertical header (header columns), and so on.
+
+Replace the positional arguments in C<get_border_char()> with named arguments to
+be more flexible. Replace the C<x> and C<y> arguments that refer to character
+with character C<name>, to be more readable.
+
+=head2 v2
+
+The first version of BorderStyle.
+
+=head2 Border::Style
+
+L<Border::Style> is an older specification, superseded by this document. The
+older specification defines border style as just the border style structure, not
+the class and thus lacks methods like C<get_struct()>, C<get_args()>, and
+C<get_border_char()>.
 
 =head1 AUTHOR
 

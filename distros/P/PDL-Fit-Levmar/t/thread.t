@@ -34,7 +34,7 @@ sub check_type {
     my ($Type, @d) = @_;
     my $i=0;
     foreach ( @d )  {
-	die "$i: not $Type" unless $Type == $_->type;
+	is $_->type, $Type, "type of var $i ".$_->info;
 	$i++;
     }   
 }
@@ -84,29 +84,23 @@ cpr "# Done compiling fit function.";
 sub thread1 {
     my ($Type) = @_;
     my $n = 10000;
-    my $t = zeroes($Type, $n)->xlinvals(map pdl($Type, $_), -5,4.999);
+    my $t = zeroes($n)->xlinvals(-5,4.999)->convert($Type);
     my $params =  [ [3,.2], [ 9, .1] , [2,.01], [3,.3] ];
     my $x = zeroes($Type,$n,scalar @$params);
     my $i = 0;
     map {  $x(:,$i++)  .= $_->[0] * exp(-$t*$t * $_->[1]  ) }  @$params;
     my $p = pdl $Type, [ 5, 1]; # starting guess 
     check_type($Type, $p,$x,$t);
-    my $w = PDL->null;
-    my $h = levmar(  $p, $x, $t, $Gh, @g, WORK => $w, DERIVATIVE => 'numeric');
+    my $h = levmar(  $p, $x, $t, $Gh, @g, DERIVATIVE => 'numeric');
     check_type($Type, $h->{INFO});
     ok(tapprox($h->{P}, pdl($Type, $params)), "Thread x, 1 thread dim ($Type)")
         or diag "got=", $h->{P}, "expected=", pdl($Type, $params),
             "report=", levmar_report($h);
     my $m = 2;
     my $s = 4*$n+4*$m + $n*$m + $m*$m;
-    ok($s == $w->nelem, " Workspace, numeric,  allocated correctly in pp_def");
-    $h = levmar(  $p, $x, $t, $Gh, @g, WORK => $w);
-    ok($s == $w->nelem, " Workspace from numeric accepted when analytic");
-    $w = PDL->null;
-    $h = levmar(  $p, $x, $t, $Gh, @g, WORK => $w);
+    $h = levmar(  $p, $x, $t, $Gh, @g);
+    $h = levmar(  $p, $x, $t, $Gh, @g);
     $s = 2*$n+4*$m + $n*$m + $m*$m;
-    ok($s == $w->nelem, " Workspace, analytic, allocated correctly in pp_def");
-    check_type($Type, $w);
 }
 
 # Change the following routines to use map the same way
@@ -116,7 +110,7 @@ sub thread1 {
 sub thread2 {
     my ($Type) = @_;
     my $n = 10000;
-    my $t = zeroes($Type, $n)->xlinvals(map pdl($Type, $_), -5,4.999);
+    my $t = zeroes($n)->xlinvals(-5,4.999)->convert($Type);
     my $x = zeroes($Type, $n);
     my $params =   [[0,3,.2]]; # only 1 dimension
     map {  $x(:,$_->[0])  .= $_->[1] * exp(-$t*$t * $_->[2]  ) }  @$params;
@@ -135,7 +129,7 @@ sub thread2 {
 sub thread3 {
     my ($Type) = @_;
     my $n = 10000;
-    my $t = zeroes($Type, $n)->xlinvals(map pdl($Type, $_), -5,4.999);
+    my $t = zeroes($n)->xlinvals(-5,4.999)->convert($Type);
     my $params =  [ [0,3,.2], [1, 2, .1] ];
     my $x = zeroes($Type, $n,scalar(@$params));
     my $res =  pdl $Type, $params;
@@ -151,7 +145,7 @@ sub thread3 {
 sub thread4 {
     my ($Type) = @_;
     my $n = 1000;
-    my $t = zeroes($Type, $n)->xlinvals(map pdl($Type, $_), -5,4.999);
+    my $t = zeroes($n)->xlinvals(-5,4.999)->convert($Type);
 # Put any number of triples of actual parameters here.
     my $params =  [ [0,3,.2], [1, 28, .1] , [2,2,.01], [3,3,.3] ];
     my $nx = scalar(@$params);
@@ -192,7 +186,7 @@ sub thread4 {
 sub thread5 {
     my ($Type) = @_;
     my $n = 10000;
-    my $t = zeroes($Type, $n)->xlinvals(map pdl($Type, $_), -5,4.999);
+    my $t = zeroes($n)->xlinvals(-5,4.999)->convert($Type);
     my $x = zeroes($Type, $n,4);
     my $params =  [ [3,.2], [ 28, .1] , [2,.01], [3,.3] ];
     my $i = 0;
@@ -217,7 +211,7 @@ sub thread5 {
 sub thread6 {
     my ($Type) = @_;
     my $n = 1000;
-    my $t = zeroes($Type, $n)->xlinvals(map pdl($Type, $_), -5,4.999);
+    my $t = zeroes($n)->xlinvals(-5,4.999)->convert($Type);
 # Put any number of pairs of actual parameters here.
     my $params =  [ [500,.01], [3, .1] , [2,.01], [50,.3] ];
     my $nx = scalar(@$params);

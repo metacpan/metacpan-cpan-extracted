@@ -8,6 +8,7 @@
 #include <SWI-Prolog.h>
 
 #include "Low.h"
+#define INSIDE_CONTEXT_C
 #include "context.h"
 
 
@@ -66,6 +67,10 @@ void release_cxt(pTHX_ pMY_CXT) {
 }
 
 my_cxt_t *get_MY_CXT(pTHX) {
+#ifndef MULTIPLICITY
+    return &my_cxt;
+#else
     dMY_CXT;
-    return my_cxtp;
+    return aMY_CXT;
+#endif
 }

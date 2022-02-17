@@ -25,6 +25,51 @@ sub coerce {
   return ();
 }
 
+sub coerce_args {
+  my ($self, $data, $spec) = @_;
+
+  for my $name (grep exists($data->{$_}), sort keys %$spec) {
+    $data->{$name} = $self->coerce_onto(
+      $data, $name, $spec->{$name}, $data->{$name},
+    );
+  }
+
+  return $data;
+}
+
+sub coerce_into {
+  my ($self, $class, $value) = @_;
+
+  require Scalar::Util;
+  require Venus::Space;
+
+  $class = Venus::Space->new($class)->load;
+
+  if (Scalar::Util::blessed($value) && $value->isa($class)) {
+    return $value;
+  }
+  else {
+    return $class->new($value);
+  }
+}
+
+sub coerce_onto {
+  my ($self, $data, $name, $class, $value) = @_;
+
+  require Venus::Space;
+
+  $class = Venus::Space->new($class)->load;
+
+  $value = $data->{$name} if $#_ < 4;
+
+  if (my $method = $self->can("coerce_${name}")) {
+    return $data->{$name} = $self->$method(\&coerce_into, $class, $value);
+  }
+  else {
+    return $data->{$name} = $self->coerce_into($class, $value);
+  }
+}
+
 sub coercion {
   my ($self, $data) = @_;
 
@@ -32,40 +77,11 @@ sub coercion {
 
   return $data if !@args;
 
-  my $rules = (@args > 1) ? {@args} : (ref($args[0]) eq 'HASH') ? $args[0] : {};
+  my $spec = (@args > 1) ? {@args} : (ref($args[0]) eq 'HASH') ? $args[0] : {};
 
-  return $data if !%$rules;
+  return $data if !%$spec;
 
-  require Scalar::Util;
-  require Venus::Space;
-
-  my $routine = sub {
-    my ($self, $class, $value) = @_;
-
-    if (Scalar::Util::blessed($value) && $value->isa($class)) {
-      return $value;
-    }
-    else {
-      return $class->new($value);
-    }
-  };
-
-  my $space = "Venus::Space";
-
-  for my $name (grep exists($data->{$_}), sort keys %$rules) {
-    if (my $method = $self->can("coerce_${name}")) {
-      $data->{$name} = $self->$method(
-        $routine, $space->new($rules->{$name})->load, $data->{$name}
-      );
-    }
-    else {
-      $data->{$name} = $self->$routine(
-        $space->new($rules->{$name})->load, $data->{$name}
-      );
-    }
-  }
-
-  return $data;
+  return $self->coerce_args($data, $spec);
 }
 
 1;
@@ -167,7 +183,7 @@ L</coercion> method, and returns key/value pairs where the keys map to class
 attributes (or input parameters) and the values are L<Venus::Space> compatible
 package names.
 
-I<Since C<0.01>>
+I<Since C<0.02>>
 
 =over 4
 
@@ -192,6 +208,105 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 coerce_args
+
+  coerce_args(HashRef $data, HashRef $spec) (HashRef)
+
+The coerce_args method replaces values in the data provided with objects
+corresponding to the specification provided. The specification should contains
+key/value pairs where the keys map to class attributes (or input parameters)
+and the values are L<Venus::Space> compatible package names.
+
+I<Since C<0.07>>
+
+=over 4
+
+=item coerce_args example 1
+
+  package main;
+
+  my $person = Person->new;
+
+  my $data = $person->coerce_args(
+    {
+      father => { name => 'father' }
+    },
+    {
+      father => 'Person',
+    },
+  );
+
+  # {
+  #   father   => bless({...}, 'Person'),
+  # }
+
+=back
+
+=cut
+
+=head2 coerce_into
+
+  coerce_into(Str $class, Any $value) (Object)
+
+The coerce_into method attempts to build and return an object based on the
+class name and value provided, unless the value provided is already an object
+derived from the specified class.
+
+I<Since C<0.07>>
+
+=over 4
+
+=item coerce_into example 1
+
+  package main;
+
+  my $person = Person->new;
+
+  my $friend = $person->coerce_into('Person', {
+    name => 'friend',
+  });
+
+  # bless({...}, 'Person')
+
+=back
+
+=cut
+
+=head2 coerce_onto
+
+  coerce_onto(HashRef $data, Str $name, Str $class, Any $value) (Object)
+
+The coerce_onto method attempts to build and assign an object based on the
+class name and value provided, as the value corresponding to the name
+specified, in the data provided. If the C<$value> is omitted, the value
+corresponding to the name in the C<$data> will be used.
+
+I<Since C<0.07>>
+
+=over 4
+
+=item coerce_onto example 1
+
+  package main;
+
+  my $person = Person->new;
+
+  my $data = { friend => { name => 'friend' } };
+
+  my $friend = $person->coerce_onto($data, 'friend', 'Person');
+
+  # bless({...}, 'Person'),
+
+  # $data was updated
+  #
+  # {
+  #   friend => bless({...}, 'Person'),
+  # }
+
+=back
+
+=cut
+
 =head2 coercion
 
   coercion(HashRef $data) (HashRef)
@@ -199,7 +314,7 @@ I<Since C<0.01>>
 The coercion method is called automatically during object construction but can
 be called manually as well, and is passed a hashref to coerce and return.
 
-I<Since C<0.01>>
+I<Since C<0.02>>
 
 =over 4
 

@@ -6,9 +6,9 @@ use warnings;
 #use utf8;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-27'; # DATE
+our $DATE = '2022-02-14'; # DATE
 our $DIST = 'Text-Table-More'; # DIST
-our $VERSION = '0.022'; # VERSION
+our $VERSION = '0.023'; # VERSION
 
 # see Module::Features for more details on this
 our %FEATURES = (
@@ -53,14 +53,14 @@ our %FEATURES = (
             can_set_cell_width                       => 0,
             can_set_cell_width_of_individual_column  => 0,
             speed                                    => 'slow',
-            can_hpad                                 => 0,
-            can_hpad_individual_row                  => 0,
-            can_hpad_individual_column               => 0,
-            can_hpad_individual_cell                 => 0,
-            can_vpad                                 => 0,
-            can_vpad_individual_row                  => 0,
-            can_vpad_individual_column               => 0,
-            can_vpad_individual_cell                 => 0,
+            can_hpad                                 => 1,
+            can_hpad_individual_row                  => 1,
+            can_hpad_individual_column               => 1,
+            can_hpad_individual_cell                 => 1,
+            can_vpad                                 => 1,
+            can_vpad_individual_row                  => 1,
+            can_vpad_individual_column               => 1,
+            can_vpad_individual_cell                 => 1,
         },
     },
 );
@@ -84,6 +84,7 @@ sub IDX_EXPTABLE_CELL_IS_ROWSPAN_TAIL() {5} # whether this cell is tail of a row
 sub IDX_EXPTABLE_CELL_IS_COLSPAN_TAIL() {6} # whether this cell is tail of a colspan
 sub IDX_EXPTABLE_CELL_ORIG_ROWNUM()     {7} #
 sub IDX_EXPTABLE_CELL_ORIG_COLNUM()     {8} #
+sub IDX_EXPTABLE_CELL_TEXT()            {9} # cell text (modified: padded)
 
 # whether an exptable cell is the head (1st cell) or tail (the rest) of a
 # rowspan/colspan. these should be macros if possible, for speed.
@@ -110,10 +111,10 @@ sub _divide_int_to_n_ints {
 }
 
 sub _vpad {
-    my ($lines, $num_lines, $width, $which) = @_;
+    my ($lines, $num_lines, $width, $which, $pad_char) = @_;
     return $lines if @$lines >= $num_lines; # we don't do truncate
     my @vpadded_lines;
-    my $pad_line = " " x $width;
+    my $pad_line = $pad_char x $width;
     if ($which =~ /^b/) { # bottom padding
         push @vpadded_lines, @$lines;
         push @vpadded_lines, $pad_line for @$lines+1 .. $num_lines;
@@ -190,12 +191,13 @@ sub _get_exptable_cell_lines {
         $bottom_borders, $intercol_width, $y, $x) = @_;
 
     my $exptable_cell = $exptable->[$y][$x];
-    my $cell   = $exptable_cell->[IDX_EXPTABLE_CELL_ORIG];
-    my $text   = ref $cell eq 'HASH' ? $cell->{text} : $cell;
-    my $align  = _get_attr('align', $y, $x, $cell, $table_args) // 'left';
-    my $valign = _get_attr('valign', $y, $x, $cell, $table_args) // 'top';
-    my $pad    = $align eq 'left' ? 'r' : $align eq 'right' ? 'l' : 'c';
-    my $vpad   = $valign eq 'top' ? 'b' : $valign eq 'bottom' ? 't' : 'c';
+    my $cell     = $exptable_cell->[IDX_EXPTABLE_CELL_ORIG];
+    my $text     = $exptable_cell->[IDX_EXPTABLE_CELL_TEXT];
+    my $align    = _get_attr('align', $y, $x, $cell, $table_args) // 'left';
+    my $valign   = _get_attr('valign', $y, $x, $cell, $table_args) // 'top';
+    my $pad      = $align eq 'left' ? 'r' : $align eq 'right' ? 'l' : 'c';
+    my $vpad     = $valign eq 'top' ? 'b' : $valign eq 'bottom' ? 't' : 'c';
+    my $pad_char = $table_args->{pad_char};
     my $height = 0;
     my $width  = 0;
     for my $ic (1..$exptable_cell->[IDX_EXPTABLE_CELL_COLSPAN]) {
@@ -207,9 +209,9 @@ sub _get_exptable_cell_lines {
         $height++ if $bottom_borders->[$y+$ir-2] && $ir > 1;
     }
 
-    my @datalines = map { $_pad_func->($_, $width, $pad, ' ', 'truncate') }
+    my @datalines = map { $_pad_func->($_, $width, $pad, $pad_char, 'truncate') }
         ($_split_lines_func->($text));
-    _vpad(\@datalines, $height, $width, $vpad);
+    _vpad(\@datalines, $height, $width, $vpad, $pad_char);
 }
 
 sub generate_table {
@@ -217,8 +219,16 @@ sub generate_table {
     require Text::NonWideChar::Util;
 
     my %args = @_;
+    $args{header_row} //= 0; my $header_row = $args{header_row};
+    $args{pad_char} //= ' ';
+    $args{hpad} //= 1;
+    $args{vpad} //= 0;
+
     my $rows = $args{rows} or die "Please specify rows";
-    my $bs_name = $args{border_style} // 'ASCII::SingleLineDoubleAfterHeader';
+    my $bs_name = $args{border_style} //
+        $ENV{PERL_TEXT_TABLE_MORE_BORDER_STYLE} //
+        $ENV{BORDER_STYLE} //
+        'ASCII::SingleLineDoubleAfterHeader';
     my $cell_attrs = $args{cell_attrs} // [];
 
     my $bs_obj = Module::Load::Util::instantiate_class_with_optional_args({ns_prefix=>"BorderStyle"}, $bs_name);
@@ -262,7 +272,7 @@ sub generate_table {
 
     # XXX when we allow cell attrs right_border and left_border, this will
     # become array too like $exptable_bottom_borders.
-    my $intercol_width = length(" " . $bs_obj->get_border_char(3, 1) . " ");
+    my $intercol_width = length($bs_obj->get_border_char(char=>'v_i'));
 
     my $exptable = []; # [ [[$orig_rowidx,$orig_colidx,$rowspan,$colspan,...], ...], [[...], ...], ... ]
     my $exptable_bottom_borders = []; # idx=exptable rownum, val=bool
@@ -287,7 +297,7 @@ sub generate_table {
             $rownum++;
             my $colnum = -1;
             my $separator_type = do {
-                my $cmp = ($args{header_row}//0)-1 <=> $rownum;
+                my $cmp = $header_row-1 <=> $rownum;
                 # 0=none, 2=separator between header/data, 4=separator between
                 # data rows, 8=separator between header rows. this is from
                 # BorderStyle standard.
@@ -345,7 +355,7 @@ sub generate_table {
                     }
 
                     # determine whether we should draw bottom border of each row
-                    if ($rownum+$ir-1 == 0 && ($args{header_row}//0) > 0) {
+                    if ($rownum+$ir-1 == 0 && $header_row > 0) {
                         $exptable_bottom_borders->[0] = $separator_type;
                     } else {
                         my $val;
@@ -377,13 +387,31 @@ sub generate_table {
                 my $colspan = $exptable_cell->[IDX_EXPTABLE_CELL_COLSPAN];
                 my $cell = $exptable_cell->[IDX_EXPTABLE_CELL_ORIG];
                 my $text = ref $cell eq 'HASH' ? $cell->{text} : $cell;
+
+                # pad the text, put in exptable text
+                my $hpad = _get_attr('hpad', $exptable_rownum, $exptable_colnum, $cell, \%args);
+                my $lpad = _get_attr('lpad', $exptable_rownum, $exptable_colnum, $cell, \%args) // $hpad;
+                my $rpad = _get_attr('rpad', $exptable_rownum, $exptable_colnum, $cell, \%args) // $hpad;
+                my $vpad = _get_attr('vpad', $exptable_rownum, $exptable_colnum, $cell, \%args);
+                my $tpad = _get_attr('tpad', $exptable_rownum, $exptable_colnum, $cell, \%args) // $vpad;
+                my $bpad = _get_attr('bpad', $exptable_rownum, $exptable_colnum, $cell, \%args) // $vpad;
+                my $pad_char = $args{pad_char};
+                if ($lpad > 0) { my $p = $pad_char x $lpad; $text =~ s/^/$p/gm }
+                if ($rpad > 0) { my $p = $pad_char x $rpad; $text =~ s/$/$p/gm }
+                if ($tpad > 0) { $text = ("\n" x $tpad) . $text }
+                if ($bpad > 0) { $text = $text . ("\n$pad_char" x $bpad) }
+                $exptable_cell->[IDX_EXPTABLE_CELL_TEXT] = $text;
+
                 my $lh = $_length_height_func->($text);
+                #use DDC; dd $text;
                 #use DDC; say "D:length_height[$exptable_rownum,$exptable_colnum] = (".DDC::dump($text)."): ".DDC::dump($lh);
                 my $tot_intercol_widths = ($colspan-1) * $intercol_width;
                 my $tot_interrow_heights = 0; for (1..$rowspan-1) { $tot_interrow_heights++ if $exptable_bottom_borders->[$exptable_rownum+$_-1] }
-                #say "D:interrow_heights=$tot_interrow_heights";
+                #say "D:tot_intercol_widths=$tot_intercol_widths";
+                #say "D:to_interrow_heights=$tot_interrow_heights";
                 my @heights = _divide_int_to_n_ints(max(0, $lh->[1] - $tot_interrow_heights), $rowspan);
                 my @widths  = _divide_int_to_n_ints(max(0, $lh->[0] - $tot_intercol_widths ), $colspan);
+                #use DDC; say "D:split widths:", DDC::dump(\@widths), ", split heights:", DDC::dump(\@heights);
                 for my $ir (1..$rowspan) {
                     for my $ic (1..$colspan) {
                         $exptable->[$exptable_rownum+$ir-1][$exptable_colnum+$ic-1][IDX_EXPTABLE_CELL_HEIGHT]  = $heights[$ir-1];
@@ -449,37 +477,40 @@ sub generate_table {
         my $y = 0;
 
         for my $ir (0..$M-1) {
+
+            my %gbcargs = (
+                $header_row  >= $ir+1 ? (for_header_row=>1) :
+                (for_data_row=>1),
+            );
+
           DRAW_TOP_BORDER:
             {
                 last unless $ir == 0;
-                my $b_y = ($args{header_row}//0) > 0 ? 0 : 6;
-                my $b_topleft    = $bs_obj->get_border_char($b_y, 0);
-                my $b_topline    = $bs_obj->get_border_char($b_y, 1);
-                my $b_topbetwcol = $bs_obj->get_border_char($b_y, 2);
-                my $b_topright   = $bs_obj->get_border_char($b_y, 3);
+                my $b_topleft    = $bs_obj->get_border_char(char=>'rd_t', %gbcargs);
+                my $b_topline    = $bs_obj->get_border_char(char=>'h_t', %gbcargs);
+                my $b_topbetwcol = $bs_obj->get_border_char(char=>'hd_t', %gbcargs);
+                my $b_topright   = $bs_obj->get_border_char(char=>'ld_t', %gbcargs);
                 last unless length $b_topleft || length $b_topline || length $b_topbetwcol || length $b_topright;
                 $buf[$y][0] = $b_topleft;
                 for my $ic (0..$N-1) {
                     my $cell_right = $ic < $N-1 ? $exptable->[$ir][$ic+1] : undef;
                     my $cell_right_has_content = defined $cell_right && _exptable_cell_is_head($cell_right);
-                    $buf[$y][$ic*4+2] = $bs_obj->get_border_char($b_y, 1, $exptable_column_widths->[$ic]+2); # +1, +2, +3
+                    $buf[$y][$ic*4+2] = $bs_obj->get_border_char(char=>'h_t', repeat=>$exptable_column_widths->[$ic], %gbcargs); # +1, +2, +3
                     $buf[$y][$ic*4+4] = $ic == $N-1 ? $b_topright : ($cell_right_has_content ? $b_topbetwcol : $b_topline);
                 }
                 $y++;
             } # DRAW_TOP_BORDER
 
-            # DRAW_DATA_OR_HEADER_ROW
+          DRAW_DATA_OR_HEADER_ROW:
             {
                 # draw leftmost border, which we always do.
-                my $b_y = $ir == 0 && $args{header_row} ? 1 : 3;
                 for my $i (1 .. $exptable_row_heights->[$ir]) {
-                    $buf[$y+$i-1][0] = $bs_obj->get_border_char($b_y, 0);
+                    $buf[$y+$i-1][0] = $bs_obj->get_border_char(char=>'v_l', %gbcargs);
                 }
 
                 my $lines;
                 for my $ic (0..$N-1) {
                     my $cell = $exptable->[$ir][$ic];
-
                     # draw cell content. also possibly draw border between
                     # cells. we don't draw border inside a row/colspan.
                     if (_exptable_cell_is_head($cell)) {
@@ -487,19 +518,18 @@ sub generate_table {
                             \%args, $exptable, $exptable_row_heights, $exptable_column_widths,
                             $exptable_bottom_borders, $intercol_width, $ir, $ic);
                         for my $i (0..$#{$lines}) {
-                            $buf[$y+$i][$ic*4+0] = $bs_obj->get_border_char($b_y, 1);
-                            $buf[$y+$i][$ic*4+1] = " ";
+                            $buf[$y+$i][$ic*4+0] = $bs_obj->get_border_char(char=>'v_i', %gbcargs);
+                            $buf[$y+$i][$ic*4+1] = "";
                             $buf[$y+$i][$ic*4+2] = $lines->[$i];
-                            $buf[$y+$i][$ic*4+3] = " ";
+                            $buf[$y+$i][$ic*4+3] = "";
                         }
                         #use DDC; say "D: Drawing exptable_cell($ir,$ic): ", DDC::dump($lines);
                     }
 
                     # draw rightmost border, which we always do.
                     if ($ic == $N-1) {
-                        my $b_y = $ir == 0 && $args{header_row} ? 1 : 3;
                         for my $i (1 .. $exptable_row_heights->[$ir]) {
-                            $buf[$y+$i-1][$ic*4+4] = $bs_obj->get_border_char($b_y, 2);
+                            $buf[$y+$i-1][$ic*4+4] = $bs_obj->get_border_char(char=>'v_r', %gbcargs);
                         }
                     }
 
@@ -507,24 +537,24 @@ sub generate_table {
             } # DRAW_DATA_OR_HEADER_ROW
             $y += $exptable_row_heights->[$ir];
 
+            $gbcargs{for_header_data_separator} = 1 if $header_row == $ir+1;
           DRAW_ROW_SEPARATOR:
             {
                 last unless $ir < $M-1;
                 last unless $exptable_bottom_borders->[$ir];
-                my $b_y = $exptable_bottom_borders->[$ir];
-                my $b_betwrowleft    = $bs_obj->get_border_char($b_y, 0);
-                my $b_betwrowline    = $bs_obj->get_border_char($b_y, 1);
-                my $b_betwrowbetwcol = $bs_obj->get_border_char($b_y, 2);
-                my $b_betwrowright   = $bs_obj->get_border_char($b_y, 3);
+
+                my $b_betwrowleft    = $bs_obj->get_border_char(char=>'rv_l', %gbcargs);
+                my $b_betwrowline    = $bs_obj->get_border_char(char=>'v_i', %gbcargs);
+                my $b_betwrowbetwcol = $bs_obj->get_border_char(char=>'hv_i', %gbcargs);
+                my $b_betwrowright   = $bs_obj->get_border_char(char=>'lv_r', %gbcargs);
                 last unless length $b_betwrowleft || length $b_betwrowline || length $b_betwrowbetwcol || length $b_betwrowright;
-                my $b_betwrowbetwcol_notop = $bs_obj->get_border_char($b_y, 4);
-                my $b_betwrowbetwcol_nobot = $bs_obj->get_border_char($b_y, 5);
-                my $b_betwrowbetwcol_noleft  = $bs_obj->get_border_char($b_y, 6);
-                my $b_betwrowbetwcol_noright = $bs_obj->get_border_char($b_y, 7);
-                my $b_ydataorheader = $args{header_row} == $ir+1 ? 2 : $args{header_row} < $ir+1 ? 3 : 1;
-                my $b_dataorheaderrowleft    = $bs_obj->get_border_char($b_ydataorheader, 0, 1);
-                my $b_dataorheaderrowbetwcol = $bs_obj->get_border_char($b_ydataorheader, 1, 1);
-                my $b_dataorheaderrowright   = $bs_obj->get_border_char($b_ydataorheader, 2, 1);
+                my $b_betwrowbetwcol_notop = $bs_obj->get_border_char(char=>'hd_i', %gbcargs);
+                my $b_betwrowbetwcol_nobot = $bs_obj->get_border_char(char=>'hu_i', %gbcargs);
+                my $b_betwrowbetwcol_noleft  = $bs_obj->get_border_char(char=>'rv_i', %gbcargs);
+                my $b_betwrowbetwcol_noright = $bs_obj->get_border_char(char=>'lv_i', %gbcargs);
+                my $b_dataorheaderrowleft    = $bs_obj->get_border_char(char=>'v_l', %gbcargs);
+                my $b_dataorheaderrowbetwcol = $bs_obj->get_border_char(char=>'v_i', %gbcargs);
+                my $b_dataorheaderrowright   = $bs_obj->get_border_char(char=>'v_r', %gbcargs);
                 for my $ic (0..$N-1) {
                     my $cell_right       = $ic < $N-1 ? $exptable->[$ir][$ic+1] : undef;
                     my $cell_bottom      = $ir < $M-1 ? $exptable->[$ir+1][$ic] : undef;
@@ -537,7 +567,7 @@ sub generate_table {
 
                     # along the width of cell content
                     if (_exptable_cell_is_rowspan_head($cell_bottom)) {
-                        $buf[$y][$ic*4+2] = $bs_obj->get_border_char($b_y, 1, $exptable_column_widths->[$ic]+2);
+                        $buf[$y][$ic*4+2] = $bs_obj->get_border_char(char=>'h_i', repeat=>$exptable_column_widths->[$ic], %gbcargs);
                     }
 
                     my $char;
@@ -583,20 +613,20 @@ sub generate_table {
                 }
                 $y++;
             } # DRAW_ROW_SEPARATOR
+            delete $gbcargs{for_header_data_separator};
 
           DRAW_BOTTOM_BORDER:
             {
                 last unless $ir == $M-1;
-                my $b_y = $ir == 0 && $args{header_row} ? 7 : 5;
-                my $b_botleft    = $bs_obj->get_border_char($b_y, 0);
-                my $b_botline    = $bs_obj->get_border_char($b_y, 1);
-                my $b_botbetwcol = $bs_obj->get_border_char($b_y, 2);
-                my $b_botright   = $bs_obj->get_border_char($b_y, 3);
+                my $b_botleft    = $bs_obj->get_border_char(char=>'ru_b', %gbcargs);
+                my $b_botline    = $bs_obj->get_border_char(char=>'h_b', %gbcargs);
+                my $b_botbetwcol = $bs_obj->get_border_char(char=>'hu_b', %gbcargs);
+                my $b_botright   = $bs_obj->get_border_char(char=>'lu_b', %gbcargs);
                 last unless length $b_botleft || length $b_botline || length $b_botbetwcol || length $b_botright;
                 $buf[$y][0] = $b_botleft;
                 for my $ic (0..$N-1) {
                     my $cell_right = $ic < $N-1 ? $exptable->[$ir][$ic+1] : undef;
-                    $buf[$y][$ic*4+2] = $bs_obj->get_border_char($b_y, 1, $exptable_column_widths->[$ic]+2);
+                    $buf[$y][$ic*4+2] = $bs_obj->get_border_char(char=>'h_b', repeat=>$exptable_column_widths->[$ic], %gbcargs);
                     $buf[$y][$ic*4+4] = $ic == $N-1 ? $b_botright : (_exptable_cell_is_colspan_tail($cell_right) ? $b_botline : $b_botbetwcol);
                 }
                 $y++;
@@ -631,7 +661,7 @@ Text::Table::More - Generate text table with simple interface and many options
 
 =head1 VERSION
 
-This document describes version 0.022 of Text::Table::More (from Perl distribution Text-Table-More), released on 2022-01-27.
+This document describes version 0.023 of Text::Table::More (from Perl distribution Text-Table-More), released on 2022-02-14.
 
 =head1 SYNOPSIS
 
@@ -732,9 +762,9 @@ will output something like:
  | 1962 | The Bob Newhart Show (NBC)   |                      | The Garry Moore Show (CBS)   | E. G. Marshall, The Defenders (CBS)                                   | Shirley Booth, Hazel (NBC)                                                              |
  +------+------------------------------+                      +------------------------------+                                                                       |                                                                                         |
  | 1963 | The Dick Van Dyke Show (CBS) | The Defenders (CBS)  | The Andy Williams Show (NBC) |                                                                       |                                                                                         |
- +------+                              |                      +------------------------------+-----------------------------------------------------------------------+-----------------------------------------------------------------------------------------+
+ +------+                              |                      +------------------------------+---------------------------------------------|-------------------------+------------------------------------------------|----------------------------------------+
  | 1964 |                              |                      | The Danny Kaye Show (CBS)    | Dick Van Dyke, The Dick Van Dyke Show (CBS)                           | Mary Tyler Moore, The Dick Van Dyke Show (CBS)                                          |
- +------+------------------------------+----------------------+------------------------------+-----------------------------------------------------------------------+-----------------------------------------------------------------------------------------+
+ +------+------------------------------+----------------------+------------------------------+---------------------------------------------|-------------------------+------------------------------------------------|----------------------------------------+
  | 1965 | four winners (Outstanding Program Achievements in Entertainment)                   | five winners (Outstanding Program Achievements in Entertainment)                                                                                                |
  +------+------------------------------+----------------------+------------------------------+---------------------------------------------+-------------------------+------------------------------------------------+----------------------------------------+
  | 1966 | The Dick Van Dyke Show (CBS) | The Fugitive (ABC)   | The Andy Williams Show (NBC) | Dick Van Dyke, The Dick Van Dyke Show (CBS) | Bill Cosby, I Spy (CBS) | Mary Tyler Moore, The Dick Van Dyke Show (CBS) | Barbara Stanwyck, The Big Valley (CBS) |
@@ -756,9 +786,9 @@ then the output will be something like:
  │ 1962 │ The Bob Newhart Show (NBC)   │                      │ The Garry Moore Show (CBS)   │ E. G. Marshall, The Defenders (CBS)                                   │ Shirley Booth, Hazel (NBC)                                                              │
  ├──────┼──────────────────────────────┤                      ├──────────────────────────────┤                                                                       │                                                                                         │
  │ 1963 │ The Dick Van Dyke Show (CBS) │ The Defenders (CBS)  │ The Andy Williams Show (NBC) │                                                                       │                                                                                         │
- ├──────┤                              │                      ├──────────────────────────────┼───────────────────────────────────────────────────────────────────────┼─────────────────────────────────────────────────────────────────────────────────────────┤
+ ├──────┤                              │                      ├──────────────────────────────┼─────────────────────────────────────────────│─────────────────────────┼────────────────────────────────────────────────│────────────────────────────────────────┤
  │ 1964 │                              │                      │ The Danny Kaye Show (CBS)    │ Dick Van Dyke, The Dick Van Dyke Show (CBS)                           │ Mary Tyler Moore, The Dick Van Dyke Show (CBS)                                          │
- ├──────┼──────────────────────────────┴──────────────────────┴──────────────────────────────┼───────────────────────────────────────────────────────────────────────┴─────────────────────────────────────────────────────────────────────────────────────────┤
+ ├──────┼──────────────────────────────┴──────────────────────┴──────────────────────────────┼─────────────────────────────────────────────│─────────────────────────┴────────────────────────────────────────────────│────────────────────────────────────────┤
  │ 1965 │ four winners (Outstanding Program Achievements in Entertainment)                   │ five winners (Outstanding Program Achievements in Entertainment)                                                                                                │
  ├──────┼──────────────────────────────┬──────────────────────┬──────────────────────────────┼─────────────────────────────────────────────┬─────────────────────────┬────────────────────────────────────────────────┬────────────────────────────────────────┤
  │ 1966 │ The Dick Van Dyke Show (CBS) │ The Fugitive (ABC)   │ The Andy Williams Show (NBC) │ Dick Van Dyke, The Dick Van Dyke Show (CBS) │ Bill Cosby, I Spy (CBS) │ Mary Tyler Moore, The Dick Van Dyke Show (CBS) │ Barbara Stanwyck, The Big Valley (CBS) │
@@ -878,25 +908,25 @@ Value: yes.
 
 Provide a way for user to specify horizontal padding of cells.
 
-Value: no.
+Value: yes.
 
 =item * can_hpad_individual_cell
 
 Provide a way for user to specify different horizontal padding of individual cells.
 
-Value: no.
+Value: yes.
 
 =item * can_hpad_individual_column
 
 Provide a way for user to specify different horizontal padding of individual columns.
 
-Value: no.
+Value: yes.
 
 =item * can_hpad_individual_row
 
 Provide a way for user to specify different horizontal padding of individual rows.
 
-Value: no.
+Value: yes.
 
 =item * can_rowspan
 
@@ -960,25 +990,25 @@ Value: yes.
 
 Provide a way for user to specify vertical padding of cells.
 
-Value: no.
+Value: yes.
 
 =item * can_vpad_individual_cell
 
 Provide a way for user to specify different vertical padding of individual cells.
 
-Value: no.
+Value: yes.
 
 =item * can_vpad_individual_column
 
 Provide a way for user to specify different vertical padding of individual columns.
 
-Value: no.
+Value: yes.
 
 =item * can_vpad_individual_row
 
 Provide a way for user to specify different vertical padding of individual rows.
 
-Value: no.
+Value: yes.
 
 =item * speed
 
@@ -992,68 +1022,156 @@ For more details on module features, see L<Module::Features>.
 
 =head1 PER-ROW ATTRIBUTES
 
-=head2 align
+=over
+
+=item * align
 
 String. Value is either C<"left">, C<"middle">, C<"right">. Specify text
 alignment of cells. Override table argument, but is overridden by per-column or
 per-cell attribute of the same name.
 
-=head2 valign
+=item * valign
 
 String. Value is either C<"top">, C<"middle">, C<"bottom">. Specify vertical
 text alignment of cells. Override table argument, but is overridden by
 per-column or per-cell attribute of the same name.
 
-=head2 bottom_border
+=item * bottom_border
 
 Boolean.
 
-=head2 top_border
+=item * top_border
 
 Boolean.
+
+=item * lpad
+
+Integer.
+
+=item * rpad
+
+Integer.
+
+=item * hpad
+
+Integer.
+
+=item * tpad
+
+Integer.
+
+=item * bpad
+
+Integer.
+
+=item * vpad
+
+Integer.
+
+=back
 
 =head1 PER-COLUMN ATTRIBUTES
 
-=head2 align
+=over
+
+=item * align
 
 String. Value is either C<"left">, C<"middle">, C<"right">. Specify text
 alignment of cells. Override table argument and per-row attribute of the same
 name, but is overridden by per-cell attribute of the same name.
 
-=head2 valign
+=item * valign
 
 String. Value is either C<"top">, C<"middle">, C<"bottom">. Specify vertical
 text alignment of cells. Override table argument and per-row attribute of the
 same name, but is overridden by per-cell attribute of the same name.
 
+=item * lpad
+
+Integer.
+
+=item * rpad
+
+Integer.
+
+=item * hpad
+
+Integer.
+
+=item * tpad
+
+Integer.
+
+=item * bpad
+
+Integer.
+
+=item * vpad
+
+Integer.
+
+=back
+
 =head1 PER-CELL ATTRIBUTES
 
-=head2 align
+=over
+
+=item * align
 
 String. Value is either C<"left">, C<"middle">, C<"right">. Override table
 argument, per-row attribute, and per-column attribute of the same name.
 
-=head2 valign
+=item * valign
 
 String. Value is either C<"top">, C<"middle">, C<"bottom">. Specify vertical
 text alignment of cells. Override table argument, per-row attribute, and
 per-column attribute of the same name.
 
-=head2 colspan
+=item * colspan
 
 Positive integer. Default 1.
 
-=head2 rowspan
+=item * rowspan
 
 Positive integer. Default 1.
 
-=head2 bottom_border.
+=item * bottom_border.
 
 Boolean. Currently the attribute of he leftmost cell is used.
 
-=head2 top_border.
+=item * top_border.
 
 Boolean. Currently the attribute of he leftmost cell is used.
+
+=item * lpad
+
+Integer.
+
+=item * rpad
+
+Integer.
+
+=item * hpad
+
+Integer.
+
+=item * tpad
+
+Integer.
+
+=item * bpad
+
+Integer.
+
+=item * vpad
+
+Integer.
+
+=item * pad_char
+
+String.
+
+=back
 
 =head1 FUNCTIONS
 
@@ -1090,9 +1208,11 @@ header.
 
 =item * border_style
 
-Str. Optional. Default to C<ASCII::SingleLineDoubleAfterHeader>. This is Perl
-module under the L<BorderStyle> namespace, without the namespace prefix. To see
-how a border style looks like, you can use the CLI L<show-border-style> from
+Str. Optional. Uses default from the environment variable
+L</PERL_TEXT_TABLE_MORE_BORDER_STYLE>, or environment variable L</BORDER_STYLE>,
+or C<ASCII::SingleLineDoubleAfterHeader>. This is Perl module under the
+L<BorderStyle> namespace, without the namespace prefix. To see how a border
+style looks like, you can use the CLI L<show-border-style> from
 L<App::BorderStyleUtils>.
 
 =item * align
@@ -1129,6 +1249,52 @@ attributes.
 Alternatively, you can specify a cell's attribute in the L</rows> argument
 directly, by specifying a cell as hashref.
 
+=item * lpad
+
+Integer. Optional. Set number of padding characters to add at the left side of
+table cells. Overrides C<hpad>. Overridden by per-row/per-column/per-cell
+padding attributes. See also C<rpad>.
+
+=item * rpad
+
+Integer. Optional. Set number of padding characters to add at the right side of
+table cells. Overrides C<hpad>. Overridden by per-row/per-column/per-cell
+padding attributes. See also C<rpad>.
+
+=item * hpad
+
+Integer. Optional. Set number of padding characters to add at the left and right
+sides of table cells. Overridden by C<lpad> for left side, and C<rpad> for right
+side. Overridden by per-row/per-column/per-cell padding attributes. See also
+C<vpad>.
+
+Default is 1.
+
+=item * tpad
+
+Integer. Optional. Set number of padding lines to add at the top side of table
+cells. Overrides C<vpad>. Overridden by per-row/per-column/per-cell padding
+attributes. See also C<bpad>.
+
+=item * bpad
+
+Integer. Optional. Set number of padding lines to add at the bottom side of
+table cells. Overrides C<vpad>. Overridden by per-row/per-column/per-cell
+padding attributes. See also C<tpad>.
+
+=item * vpad
+
+Integer. Optional. Set number of padding lines to add at the top and bottom
+sides of table cells. Overridden by C<tpad> for top side, and C<bpad> for bottom
+side. Overridden by per-row/per-column/per-cell padding attributes. See also
+C<hpad>.
+
+Default is 0.
+
+=item * pad_char
+
+String. Optional. Must be one character long. Default is C< > (space character).
+
 =item * separate_rows
 
 Boolean. Optional. Default 0. If set to true, will add a separator between data
@@ -1155,6 +1321,18 @@ prereq L<Text::ANSI::Util> or L<Text::ANSI::WideUtil>.
 
 Yes, by setting L</header_row> option to 2 or whatever number of header rows you
 have. See example script F<multirow-header.pl> in this distribution.
+
+=head1 ENVIRONMENT
+
+=head2 PERL_TEXT_TABLE_MORE_BORDER_STYLE
+
+String. Used to set the default for the L</border_style> option. Has higher
+precedence than L</BORDER_STYLE>.
+
+=head2 BORDER_STYLE
+
+String. Used to set the default for the L</border_style> option. Has lower
+precedence than L</PERL_TEXT_TABLE_MORE_BORDER_STYLE>.
 
 =head1 HOMEPAGE
 

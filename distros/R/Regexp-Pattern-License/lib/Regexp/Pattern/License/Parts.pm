@@ -10,11 +10,11 @@ Regexp::Pattern::License::Parts - Regular expressions for licensing sub-parts
 
 =head1 VERSION
 
-Version v3.9.3
+Version v3.9.4
 
 =cut
 
-our $VERSION = version->declare("v3.9.3");
+our $VERSION = version->declare("v3.9.4");
 
 =head STATUS
 
@@ -60,7 +60,7 @@ our %RE = (
 		pat =>
 			'this software and(?:[/]or)? associated documentation files [(]?the ["]Materials?["][)]?, '
 	},
-	cp_sw => { pat => 'all copies of the Software' },
+	cp_sw      => { pat => 'all copies of the Software' },
 	cp_sw_copr =>
 		{ pat => 'all copies of the Software and its Copyright notices' },
 	cp_sw_doc =>
@@ -98,7 +98,7 @@ our %RE = (
 	},
 	and_to_perm_pers => {
 		caption => 'to permit person',
-		pat =>
+		pat     =>
 			'and to permit persons to whom the Software is furnished to do so, '
 	},
 
@@ -138,8 +138,8 @@ our %RE = (
 		pat =>
 			'If you change this software and redistribute parts or all of it in any form, you must make the source code of the altered version of this software available'
 	},
-	incl => { pat => 'shall be included in ' },
-	name => { pat => '[Tt]he names?[ word]{1,15}' },
+	incl    => { pat => 'shall be included in ' },
+	name    => { pat => '[Tt]he names?[ word]{1,15}' },
 	namenot =>
 		{ pat => '(?:[Tt]he n|N)ames?[ word]{1,15} (?:may|must|shall) not ' },
 	neithername => {
@@ -181,7 +181,7 @@ our %RE = (
 	},
 	without_prior_written =>
 		{ pat => 'without(?: specific)? prior written permission' },
-	without_written => { pat => 'without specific written permission' },
+	without_written       => { pat => 'without specific written permission' },
 	without_written_prior =>
 		{ pat => 'without specific, written prior permission' },
 	origin_sw_no_misrepresent => {
@@ -225,14 +225,14 @@ our %RE = (
 		{ pat => 'THE SOFTWARE IS PROVIDED [as is],? WITHOUT WARRANTY' },
 
 	# Creative Commons
-	cc     => { pat => '(?:Creative Commons|CC)' },
-	cc_by  => { pat => '(?:Attribution)' },
-	cc_cc0 => { pat => '(?:CC0|Zero|0)' },
-	cc_nc  => { pat => '(?:Non[- ]?Commercial)' },
-	cc_nd  => { pat => '(?:No[- ]?Deriv(?:ative)?s)' },
-	cc_sa  => { pat => '(?:Share[- ]?Alike)' },
-	cc_sp  => { pat => '(?:Sampling[- ]?Plus)' },
-	cc_url => { pat => '(?:[http://]creativecommons.org[/]licenses[/])' },
+	cc        => { pat => '(?:Creative Commons|CC)' },
+	cc_by     => { pat => '(?:Attribution)' },
+	cc_cc0    => { pat => '(?:CC0|Zero|0)' },
+	cc_nc     => { pat => '(?:Non[- ]?Commercial)' },
+	cc_nd     => { pat => '(?:No[- ]?Deriv(?:ative)?s)' },
+	cc_sa     => { pat => '(?:Share[- ]?Alike)' },
+	cc_sp     => { pat => '(?:Sampling[- ]?Plus)' },
+	cc_url    => { pat => '(?:[http://]creativecommons.org[/]licenses[/])' },
 	cc_url_pd =>
 		{ pat => '(?:[http://]creativecommons.org[/]publicdomain[/])' },
 

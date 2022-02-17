@@ -78,13 +78,10 @@ $perl_jdk_dir =~ s/'/\'/g ;
 # Check directory
 my $jdk_bin = Inline::Java::Portable::portable("J2SDK_BIN") ;
 my $ext = Inline::Java::Portable::portable('EXE_EXTENSION') ;
-foreach my $f ('javac', 'jar', 'java'){
-	if (! -f File::Spec->catfile($jdk_dir, $jdk_bin, $f . $ext)){
-		my $bf = File::Spec->catfile($jdk_bin, $f . $ext) ;
-		print "Can't locate file '$bf' anywhere under '$jdk_dir'\n" ;
-	}
-}
-
+$ENV{PATH} .= $Config{path_sep} . File::Spec->catdir($jdk_dir, $jdk_bin);
+require File::Which;
+print "Can't locate file '$_' in PATH\n"
+  for grep !File::Which::which($_), 'javac', 'jar', 'java';
 
 # Now we have the J2SDK directory and it exists.
 # We will create the default_j2sdk.pl file that
@@ -103,8 +100,6 @@ sub Inline::Java::get_default_j2sdk {
 	return '$perl_jdk_dir' ;
 }
 1 ;
-
-
 J2SDK_PL
 close(J2SDK) ;
 
@@ -115,10 +110,9 @@ or change this default value.
 
 SAVE_J2SDK
 
-
 # We will now add the building of our Java files to the Makefile.
-my $javac = File::Spec->catfile($jdk_dir, $jdk_bin, 'javac' . $ext) ;
-my $jar = File::Spec->catfile($jdk_dir, $jdk_bin, 'jar' . $ext) ;                      
+my $javac = File::Which::which('javac');
+my $jar = File::Which::which('jar');
 my $src_dir = File::Spec->catdir('Java', 'sources', 'org', 'perl', 'inline', 'java') ;
 my @src = glob File::Spec->catfile($src_dir, '*.java') ;
 my $obj_dir = File::Spec->catdir('Java', 'classes') ;
@@ -136,7 +130,6 @@ my $INSTALLSITEARCH = '' ;
 my $INST_ARCHLIB = '' ;
 sub MY::postamble {
 	my $this = shift ;
-
 	my $java_src = join(' ', @src, File::Spec->catfile($obj_dir, 'InlineJava.properties')) ;
 
 	my $make = <<MAKE ;
@@ -191,6 +184,7 @@ WriteMakefile(
   XSMULTI => 1,
   CONFIGURE_REQUIRES => {
     'ExtUtils::MakeMaker' => '7.30',
+    'File::Which'         => 0,
   },
   PREREQ_PM => {
     Inline => 0.68,
@@ -239,12 +233,9 @@ print J2SDK <<J2SDK_PL;
 	) ;
 }
 
-
 1 ;
 J2SDK_PL
 close(J2SDK) ;
-
-
 
 # Create the properties that will be included in the jar.
 my @perlnatives_so_parts = ("auto", "Inline", "Java", "PerlNatives", 
@@ -284,18 +275,3 @@ inline_java_perlinterpreter_so_test    = $test_perlinterpreter_so
 inline_java_libperl_so	= $libperl_so
 PROP
 close(PROP) ;
-
-# Clean up the Makefile for Win95/98/Me
-if (Inline::Java::Portable::portable('COMMAND_COM')){
-	print "\nFixing Makefile for Win95/98/Me...\n" ;
-	open(MAKEFILE, "<Makefile") or die "Can't open Makefile for reading" ;
-	my @lines = <MAKEFILE> ;
-	close(MAKEFILE) ;
-	open(MAKEFILE, ">Makefile") or die "Can't open Makefile for writing" ;
-	foreach my $line (@lines){
-		if ($line !~ /^\s*((\@\[)|(\]))\s*$/){
-			print MAKEFILE $line ;
-		}
-	}
-	close(MAKEFILE) ;
-}

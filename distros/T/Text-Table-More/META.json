@@ -29,6 +29,7 @@
             "Test::Pod::Coverage" : "1.08"
          },
          "x_spec" : {
+            "BorderStyle" : "v3.0.0",
             "Module::Features" : "v0.1.7"
          }
       },
@@ -40,7 +41,6 @@
          },
          "requires" : {
             "BorderStyle::ASCII::SingleLineDoubleAfterHeader" : "0.011",
-            "BorderStyleBase" : "0.011",
             "Exporter" : "5.57",
             "List::AllUtils" : "0",
             "Module::Load::Util" : "0.004",
@@ -64,7 +64,7 @@
    "provides" : {
       "Text::Table::More" : {
          "file" : "lib/Text/Table/More.pm",
-         "version" : "0.022"
+         "version" : "0.023"
       }
    },
    "release_status" : "stable",
@@ -79,7 +79,7 @@
          "web" : "https://github.com/perlancar/perl-Text-Table-More"
       }
    },
-   "version" : "0.022",
+   "version" : "0.023",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -208,8 +208,14 @@
          },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec",
+            "config" : {
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000037",
+                  "version" : "0.006"
+               }
+            },
             "name" : "@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec",
-            "version" : "0.062"
+            "version" : "0.063"
          },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::MetaResources",

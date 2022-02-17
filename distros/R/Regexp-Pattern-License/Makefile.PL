@@ -30,8 +30,6 @@ my $meta = {
                           requires => {
                             "Regexp::Pattern" => 0,
                             "Test2::V0" => 0,
-                            "Test::Builder::Module" => 0,
-                            "Test::More" => 0.98,
                             "Test::Regexp::Pattern" => 0.003,
                             "Test::Without::Module" => 0,
                             "Try::Tiny" => 0,
@@ -39,8 +37,8 @@ my $meta = {
                         },
                       },
   "provides"       => {
-                        "Regexp::Pattern::License"        => { file => "lib/Regexp/Pattern/License.pm", version => "v3.9.3" },
-                        "Regexp::Pattern::License::Parts" => { file => "lib/Regexp/Pattern/License/Parts.pm", version => "v3.9.3" },
+                        "Regexp::Pattern::License"        => { file => "lib/Regexp/Pattern/License.pm", version => "v3.9.4" },
+                        "Regexp::Pattern::License::Parts" => { file => "lib/Regexp/Pattern/License/Parts.pm", version => "v3.9.4" },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -53,9 +51,9 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/project",
                       },
-  "version"        => "v3.9.3",
+  "version"        => "v3.9.4",
   "x_breaks"       => { "App::Licensecheck" => "<= v3.2.6" },
-  "x_help_wanted"  => ["tester", "documenter"],
+  "x_help_wanted"  => ["documenter", "tester"],
 };
 
 my %dynamic_config;

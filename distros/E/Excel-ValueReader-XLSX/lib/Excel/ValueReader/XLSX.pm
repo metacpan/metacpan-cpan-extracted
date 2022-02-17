@@ -4,9 +4,10 @@ use Moose;
 use Module::Load          qw/load/;
 use Date::Calc            qw/Add_Delta_Days/;
 use POSIX                 qw/strftime modf/;
+use Carp                  qw/croak/;
 use feature 'state';
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 #======================================================================
 # ATTRIBUTES
@@ -97,7 +98,7 @@ sub _date_formatter {
 
 
 #======================================================================
-# METHODS
+# GENERAL METHODS
 #======================================================================
 
 
@@ -175,6 +176,99 @@ sub formatted_date {
   return $formatted_date;
 }
 
+#======================================================================
+# METHODS FOR PARSING EXCEL TABLES
+#======================================================================
+
+
+sub table_names {
+  my ($self) = @_;
+
+  my $table_info = $self->backend->table_info;
+
+  # sort on table id (field [1] in table_info arrayrefs)
+  my @table_names = sort {$table_info->{$a}[1] <=> $table_info->{$b}->[1]} keys %$table_info;
+
+  return @table_names;
+}
+
+
+# info fields returned from the backend parsing methods
+my @table_info_fields = qw/sheet table_id ref columns no_headers/;
+
+
+# the same fields are also the valid args for the method call
+my $is_valid_arg      = "^(" . join("|", @table_info_fields) . ")\$";
+
+sub table {
+  my $self = shift;
+
+  # syntactic sugar : ->table('foo') is treated as ->table(name => 'foo')
+  my %args = @_ == 1 ? (name => $_[0]) : @_;
+
+  # if called with a table name, derive all other args from internal workbook info
+  if (my $table_name = delete $args{name}) {
+    !$args{$_} or croak "table() : arg '$_' is incompatible with 'name'"  for @table_info_fields;
+    @args{@table_info_fields} = @{$self->backend->table_info->{$table_name}}
+      or croak "no table info for table: $table_name";
+  }
+
+  # check args
+  my @invalid_args = grep {!/$is_valid_arg/} keys %args;
+  croak "invalid args to table(): " . join ", ", @invalid_args if @invalid_args;
+
+  # get raw values from the sheet
+  my $values = $self->values($args{sheet});
+
+  # restrict values to the table subrange (if applicable)
+  $values = $self->_subrange($values, $args{ref}) if $args{ref};
+
+  # take headers from first row if not already given in $args{columns}
+  $args{columns} //= $values->[0];
+
+  # if this table has headers (which is almost always the case), drop the header row
+  shift @$values unless $args{no_headers};
+
+  # build a table of hashes. This could be done with a simple map(), but using a loop
+  # avoids to store 2 copies of cell values in memory : @$values is shifted when @table is pushed.
+  my @cols = @{$args{columns}};
+  croak "table contains undefined columns" if grep {!defined $_} @cols;
+  my @rows;
+  while (my $vals = shift @$values) {
+    my %row;
+    @row{@cols} = @$vals;
+    push @rows, \%row;
+  }
+
+  # in scalar context, just return the rows. In list context, also return the column names
+  return wantarray ? (\@cols, \@rows) : \@rows;
+}
+
+
+
+sub _subrange {
+  my ($self, $values, $ref) = @_;
+
+  # parse rows and columns from the $ref string (of shape like for example "A1:D34")
+  my ($col1, $row1, $col2, $row2) = $ref =~ /^([A-Z]+)(\d+):([A-Z]+)(\d+)$/
+    or croak "_subrange : invalid ref: $ref";
+
+  # restrict to the row range
+  if ($row1 > 1 || $row2 < @$values){
+    $values = [ @$values[$row1-1 .. $row2-1] ];
+  }
+
+  # restrict to the column range
+  my @col_nums = map {$self->A1_to_num($_) - 1} ($col1, $col2);
+  if ($col_nums[0] > 1){ # THINK : should check if $colnum2 is smaller that the max row size ??
+    my @col_range = ($col_nums[0] .. $col_nums[1]);
+    $values = [map { [ @$_[@col_range] ]} @$values];
+  }
+
+  return $values;
+}
+
+
 1;
 
 
@@ -200,17 +294,22 @@ Excel::ValueReader::XLSX - extracting values from Excel workbooks in XLSX format
      print "sheet $sheet_name has $n_rows rows; ",
            "first cell contains : ", $grid->[0][0];
   }
+  
+  foreach my $table_name ($reader->table_names) {
+     my ($columns, $rows) = $reader->table($table_name);
+     my $n_data_rows      = @$rows;
+     my $n_columns        = @$columns;
+     print "table $table_name has $n_data_rows rows and $n_columns columns; ",
+           "column 'foo' in first row contains : ", $rows->[0]{foo};
+  }
 
 =head1 DESCRIPTION
 
-This module reads the contents of an Excel file in XLSX format;
-given a worksheet name it returns a bidimensional array of values
-in that worksheet.
-
-Unlike L<Spreadsheet::ParseXLSX> or L<Spreadsheet::XLSX>, there is no
-support for reading formulas, formats or other Excel internal
+This module reads the contents of an Excel file in XLSX format.
+Unlike other modules like L<Spreadsheet::ParseXLSX> or L<Spreadsheet::XLSX>, 
+there is no support for reading formulas, formats or other Excel internal
 information; all you get are plain values -- but you get them much
-faster !
+faster ! Besides, this module also has support for parsing Excel tables.
 
 This front module has two different backends for extracting values :
 
@@ -274,6 +373,61 @@ like this :
 
   my $nb_rows = @$grid;
   my $nb_cols = max map {scalar @$_} @$grid; # must import List::Util::max
+
+=head2 table_names
+
+  my @table_names = $reader->table_names;
+
+Returns the list of names of table registered in this workbook.
+
+
+=head2 table
+
+  my $rows             = $reader->table(name => $table_name);  # or just : $reader->table($table_name)
+  # or
+  my ($columns, $rows) = $reader->table(name => $table_name);
+  # or
+  my ($columns, $rows) = $reader->table(sheet => $sheet [, ref        => $range] 
+                                                        [, columns    => \@columns]
+                                                        [, no_headers => 1]
+                                       );
+
+In its simplest form, this method returns the content of an Excel table referenced by its table name
+(in Excel, the table name appears and can be modified through the Table tools / Design tab).
+The table name is passed either through the named argument C<name>, or positionally as unique argument
+to the method.
+
+Rows are returned as hashrefs, where keys of the hashes correspond to column names
+in the table. In scalar context, the method just returns an arrayref to the list of rows. In list
+context, the method returns a pair, where the first element is an arrayref of column names, and the
+second element is an arrayref to the list of rows.
+
+Instead of specifying a table name, it is also possible to give a sheet name or sheet number.
+By default, this considers the whole sheet content as a single table, where column names
+are on the first row. However, additional arguments can be supplied to change the default
+behaviour :
+
+=over
+
+=item ref
+
+a specific range of cells within the sheet that contain the table rows and columns.
+The range must be expressed using traditional Excel notation,
+like for example C<"C9:E23"> (colums 3 to 5, rows 9 to 23).
+
+=item columns
+
+an arrayref containing the list of column names.
+If absent, column names will be taken from the first row in the table.
+
+=item no_headers
+
+if true, the first row in the table will be treated as a regular data row, instead
+of being treated as a list of column names. In that case, since column names cannot
+be inferred from cell values in the first row, the C<columns> argument to the method
+must be present.
+
+=back
 
 
 =head1 AUXILIARY METHODS
@@ -470,7 +624,7 @@ Laurent Dami, E<lt>dami at cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2020, 2021 by Laurent Dami.
+Copyright 2020-2022 by Laurent Dami.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

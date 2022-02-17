@@ -6,7 +6,7 @@ our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
 
-our $VERSION = '0.0901';
+our $VERSION = '0.0904';
 
 use Algorithm::Combinatorics qw( combinations );
 use Math::Factor::XS qw( prime_factors );
@@ -288,7 +288,7 @@ Music::Intervals - Breakdown of musical intervals
 
 =head1 VERSION
 
-version 0.0901
+version 0.0904
 
 =head1 SYNOPSIS
 

@@ -7,7 +7,7 @@
 package Perl::Tidy::FileWriter;
 use strict;
 use warnings;
-our $VERSION = '20211029';
+our $VERSION = '20220217';
 
 use constant DEVEL_MODE => 0;
 
@@ -44,7 +44,8 @@ my $MAX_NAG_MESSAGES = 6;
 
 BEGIN {
 
-    # Array index names for variables
+    # Array index names for variables.
+    # Do not combine with other BEGIN blocks (c101).
     my $i = 0;
     use constant {
         _line_sink_object_            => $i++,

@@ -1,5 +1,5 @@
-package Finance::AMEX::Transaction::CBNOT::Header;
-$Finance::AMEX::Transaction::CBNOT::Header::VERSION = '0.004';
+package Finance::AMEX::Transaction::CBNOT::Header 0.005;
+
 use strict;
 use warnings;
 
@@ -9,13 +9,11 @@ use base 'Finance::AMEX::Transaction::CBNOT::Base';
 
 sub field_map {
   return {
-    REC_TYPE                => [1, 1],
-    AMEX_APPL_AREA          => [2, 100],
-
-    APPLICATION_SYSTEM_CODE => [2, 2],
-    FILE_TYPE_CODE          => [4, 3],
-    FILE_CREATION_DATE      => [6, 8],
-
+    REC_TYPE                => [1,   1],
+    AMEX_APPL_AREA          => [2,   100],
+    APPLICATION_SYSTEM_CODE => [2,   2],
+    FILE_TYPE_CODE          => [4,   3],
+    FILE_CREATION_DATE      => [6,   8],
     SAID                    => [102, 6],
     DATATYPE                => [108, 5],
     CCYYDDD                 => [113, 7],
@@ -36,7 +34,7 @@ sub CCYYDDD                 {return $_[0]->_get_column('CCYYDDD')}
 # perl does not allow 0 at the beginning of a sub name,
 # so we strip of the filler character in both the subname
 # and the return value
-sub HHMMSS                  {return substr($_[0]->_get_column('HHMMSS'), 1, 6)}
+sub HHMMSS {return substr($_[0]->_get_column('HHMMSS'), 1, 6)}
 
 1;
 
@@ -52,7 +50,7 @@ Finance::AMEX::Transaction::CBNOT::Header - Parse AMEX Chargeback Notification F
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -99,6 +97,14 @@ Returns the full line that is represented by this object.
 
  print $record->line;
 
+=head2 field_map
+
+Returns a hashref where the name is the record name and 
+the value is an arrayref of the start position and length of that field.
+
+ # print the start position of the FILE_CREATION_DATE field
+ print $record->field_map->{FILE_CREATION_DATE}->[0]; # 6
+
 =head2 REC_TYPE
 
 This field contains the constant literal "H", a Record Type code that indicates that this is a Chargeback Notifications (CBNOT) File Header Record.
@@ -133,6 +139,10 @@ This field contains the constant literal "CBNOT", a Data Type code that indicate
 
 This field contains the STARS creation date, which is the date that American Express transmitted the file to the merchant.
 
+=head2 HHMMSS
+
+The hour, minute, and seconds of the STARS creation date.
+
 =head1 NAME
 
 Finance::AMEX::Transaction::CBNOT::Header - Object methods for AMEX chargeback notification file header records.
@@ -143,7 +153,7 @@ Tom Heady <cpan@punch.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by ZipRecruiter.
+This software is copyright (c) 2022 by ZipRecruiter/Tom Heady.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

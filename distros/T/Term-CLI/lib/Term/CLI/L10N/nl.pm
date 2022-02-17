@@ -4,7 +4,7 @@
 #       Author:  Steven Bakker (SBAKKER), <sbakker@cpan.org>
 #      Created:  27/02/18
 #
-#   Copyright (c) 2018 Steven Bakker; All rights reserved.
+#   Copyright (c) 2018-2022 Steven Bakker; All rights reserved.
 #
 #   This module is free software; you can redistribute it and/or modify
 #   it under the same terms as Perl itself. See "perldoc perlartistic."
@@ -15,7 +15,7 @@
 #
 #=============================================================================
 
-package Term::CLI::L10N::nl 0.054002;
+package Term::CLI::L10N::nl 0.055002;
 
 use 5.014;
 use warnings;
@@ -217,7 +217,7 @@ msgstr "kan programma '%1' niet starten: %2"
 
 #: lib/Term/CLI/Role/CommandSet.pm:138
 msgid "unknown command '%1'"
-msgstr "onbekend commando '%1'"
+msgstr "onbekende instructie '%1'"
 
 #: lib/Term/CLI/Role/CommandSet.pm:142
 msgid "ambiguous command '%1' (matches: %2)"
@@ -272,7 +272,7 @@ msgstr "'%1' verwacht in plaats van '%2'"
 
 #: lib/Term/CLI/Command.pm
 msgid "unknown sub-command '%1'"
-msgstr "onbekend sub-commando '%1'"
+msgstr "onbekende sub-instructie '%1'"
 
 #############################################################################
 ### lib/Term/CLI.pm #########################################################
@@ -299,7 +299,7 @@ Term::CLI::L10N::nl - Dutch localizations for Term::CLI
 
 =head1 VERSION
 
-version 0.054002
+version 0.055002
 
 =head1 SYNOPSIS
 

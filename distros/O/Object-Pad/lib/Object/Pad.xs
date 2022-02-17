@@ -600,6 +600,10 @@ static void check_has(pTHX_ void *hookdata)
 
   if(compclassmeta->role_is_invokable)
     croak("Cannot add field data to an invokable role");
+
+  if(!sv_eq(PL_curstname, compclassmeta->name))
+    croak("Current package name no longer matches current class (%" SVf " vs %" SVf ")",
+      PL_curstname, compclassmeta->name);
 }
 
 static int build_has(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata)
@@ -767,6 +771,10 @@ static bool parse_permit(pTHX_ void *hookdata)
   if(!have_compclassmeta)
     croak("Cannot 'method' outside of 'class'");
 
+  if(!sv_eq(PL_curstname, compclassmeta->name))
+    croak("Current package name no longer matches current class (%" SVf " vs %" SVf ")",
+      PL_curstname, compclassmeta->name);
+
   return true;
 }
 
@@ -909,91 +917,96 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *ho
   PADNAME **padnames = PadnamelistARRAY(PadlistNAMES(CvPADLIST(PL_compcv)));
   OP *fieldops = NULL;
 
+  /* If we have no ctx->body that means this was a bodyless method
+   * declaration; a required method for a role
+   */
+  if(ctx->body) {
 #if HAVE_PERL_VERSION(5, 22, 0)
-  U32 cop_seq_low = COP_SEQ_RANGE_LOW(padnames[PADIX_SELF]);
+    U32 cop_seq_low = COP_SEQ_RANGE_LOW(padnames[PADIX_SELF]);
 #endif
 
-  {
-    ENTER;
-    SAVEVPTR(PL_curcop);
+    {
+      ENTER;
+      SAVEVPTR(PL_curcop);
 
-    /* See https://rt.cpan.org/Ticket/Display.html?id=132428
-     *   https://github.com/Perl/perl5/issues/17754
-     */
-    PADOFFSET padix;
-    for(padix = PADIX_SELF + 1; padix <= PadnamelistMAX(PadlistNAMES(CvPADLIST(PL_compcv))); padix++) {
-      PADNAME *pn = padnames[padix];
-
-      if(PadnameIsNULL(pn) || !PadnameLEN(pn))
-        continue;
-
-      const char *pv = PadnamePV(pn);
-      if(!pv || !strEQ(pv, "$self"))
-        continue;
-
-      COP *padcop = NULL;
-      if(find_cop_for_lvintro(padix, ctx->body, &padcop))
-        PL_curcop = padcop;
-      warn("\"my\" variable $self masks earlier declaration in same scope");
-    }
-
-    LEAVE;
-  }
-
-  fieldops = op_append_list(OP_LINESEQ, fieldops,
-    newSTATEOP(0, NULL, NULL));
-  fieldops = op_append_list(OP_LINESEQ, fieldops,
-    newMETHSTARTOP(0 |
-      (compclassmeta->type == METATYPE_ROLE ? OPf_SPECIAL : 0) |
-      (compclassmeta->repr << 8)));
-
-  int i;
-  for(i = 0; i < nfields; i++) {
-    FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(compclassmeta->direct_fields)[i];
-    PADNAME *fieldname = snames[i + 1];
-
-    if(!fieldname
-#if HAVE_PERL_VERSION(5, 22, 0)
-      /* On perl 5.22 and above we can use PadnameREFCNT to detect which pad
-       * slots are actually being used
+      /* See https://rt.cpan.org/Ticket/Display.html?id=132428
+       *   https://github.com/Perl/perl5/issues/17754
        */
-       || PadnameREFCNT(fieldname) < 2
-#endif
-      )
-        continue;
+      PADOFFSET padix;
+      for(padix = PADIX_SELF + 1; padix <= PadnamelistMAX(PadlistNAMES(CvPADLIST(PL_compcv))); padix++) {
+        PADNAME *pn = padnames[padix];
 
-    FIELDOFFSET fieldix = fieldmeta->fieldix;
-    PADOFFSET padix = find_padix_for_field(fieldmeta);
+        if(PadnameIsNULL(pn) || !PadnameLEN(pn))
+          continue;
 
-    if(padix == NOT_IN_PAD)
-      continue;
+        const char *pv = PadnamePV(pn);
+        if(!pv || !strEQ(pv, "$self"))
+          continue;
 
-    U8 private = 0;
-    switch(SvPV_nolen(fieldmeta->name)[0]) {
-      case '$': private = OPpFIELDPAD_SV; break;
-      case '@': private = OPpFIELDPAD_AV; break;
-      case '%': private = OPpFIELDPAD_HV; break;
+        COP *padcop = NULL;
+        if(find_cop_for_lvintro(padix, ctx->body, &padcop))
+          PL_curcop = padcop;
+        warn("\"my\" variable $self masks earlier declaration in same scope");
+      }
+
+      LEAVE;
     }
 
     fieldops = op_append_list(OP_LINESEQ, fieldops,
-      /* alias the padix from the field */
-      newFIELDPADOP(private << 8, padix, fieldix));
+      newSTATEOP(0, NULL, NULL));
+    fieldops = op_append_list(OP_LINESEQ, fieldops,
+      newMETHSTARTOP(0 |
+        (compclassmeta->type == METATYPE_ROLE ? OPf_SPECIAL : 0) |
+        (compclassmeta->repr << 8)));
+
+    int i;
+    for(i = 0; i < nfields; i++) {
+      FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(compclassmeta->direct_fields)[i];
+      PADNAME *fieldname = snames[i + 1];
+
+      if(!fieldname
+#if HAVE_PERL_VERSION(5, 22, 0)
+        /* On perl 5.22 and above we can use PadnameREFCNT to detect which pad
+         * slots are actually being used
+         */
+         || PadnameREFCNT(fieldname) < 2
+#endif
+        )
+          continue;
+
+      FIELDOFFSET fieldix = fieldmeta->fieldix;
+      PADOFFSET padix = find_padix_for_field(fieldmeta);
+
+      if(padix == NOT_IN_PAD)
+        continue;
+
+      U8 private = 0;
+      switch(SvPV_nolen(fieldmeta->name)[0]) {
+        case '$': private = OPpFIELDPAD_SV; break;
+        case '@': private = OPpFIELDPAD_AV; break;
+        case '%': private = OPpFIELDPAD_HV; break;
+      }
+
+      fieldops = op_append_list(OP_LINESEQ, fieldops,
+        /* alias the padix from the field */
+        newFIELDPADOP(private << 8, padix, fieldix));
 
 #if HAVE_PERL_VERSION(5, 22, 0)
-    /* Unshare the padname so the one in the methodscope pad returns to refcount 1 */
-    PADNAME *newpadname = newPADNAMEpvn(PadnamePV(fieldname), PadnameLEN(fieldname));
-    PadnameREFCNT_dec(padnames[padix]);
-    padnames[padix] = newpadname;
+      /* Unshare the padname so the one in the methodscope pad returns to refcount 1 */
+      PADNAME *newpadname = newPADNAMEpvn(PadnamePV(fieldname), PadnameLEN(fieldname));
+      PadnameREFCNT_dec(padnames[padix]);
+      padnames[padix] = newpadname;
 
-    /* Turn off OUTER and set a valid COP sequence range, so the lexical is
-     * visible to eval(), PadWalker, perldb, etc.. */
-    PadnameOUTER_off(newpadname);
-    COP_SEQ_RANGE_LOW(newpadname) = cop_seq_low;
-    COP_SEQ_RANGE_HIGH(newpadname) = PL_cop_seqmax;
+      /* Turn off OUTER and set a valid COP sequence range, so the lexical is
+       * visible to eval(), PadWalker, perldb, etc.. */
+      PadnameOUTER_off(newpadname);
+      COP_SEQ_RANGE_LOW(newpadname) = cop_seq_low;
+      COP_SEQ_RANGE_HIGH(newpadname) = PL_cop_seqmax;
 #endif
-  }
+    }
 
-  ctx->body = op_append_list(OP_LINESEQ, fieldops, ctx->body);
+    ctx->body = op_append_list(OP_LINESEQ, fieldops, ctx->body);
+  }
 
   compclassmeta->methodscope = NULL;
 
@@ -1041,6 +1054,16 @@ static void parse_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, void *hook
   if(ctx->cv)
     CvMETHOD_on(ctx->cv);
 
+  if(!ctx->cv) {
+    /* This is a required method declaration for a role */
+    /* TODO: This was a pretty rubbish way to detect that. We should remember it
+     *   more reliably */
+
+    /* This already checks and complains if meta->type != METATYPE_ROLE */
+    mop_class_add_required_method(compclassmeta, ctx->name);
+    return;
+  }
+
   switch(type) {
     case PHASER_NONE:
       if(ctx->cv && ctx->name && (ctx->actions & XS_PARSE_SUBLIKE_ACTION_INSTALL_SYMBOL))
@@ -1080,7 +1103,9 @@ static void parse_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, void *hook
 }
 
 static struct XSParseSublikeHooks parse_method_hooks = {
-  .flags           = XS_PARSE_SUBLIKE_FLAG_FILTERATTRS|XS_PARSE_SUBLIKE_COMPAT_FLAG_DYNAMIC_ACTIONS,
+  .flags           = XS_PARSE_SUBLIKE_FLAG_FILTERATTRS |
+                     XS_PARSE_SUBLIKE_COMPAT_FLAG_DYNAMIC_ACTIONS |
+                     XS_PARSE_SUBLIKE_FLAG_BODY_OPTIONAL,
   .permit_hintkey  = "Object::Pad/method",
   .permit          = parse_permit,
   .pre_subparse    = parse_pre_subparse,
@@ -1128,7 +1153,7 @@ static int build_requires(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t na
 {
   SV *mname = args[0]->sv;
 
-  av_push(compclassmeta->requiremethods, mname);
+  mop_class_add_required_method(compclassmeta, mname);
 
   *out = newOP(OP_NULL, 0);
 

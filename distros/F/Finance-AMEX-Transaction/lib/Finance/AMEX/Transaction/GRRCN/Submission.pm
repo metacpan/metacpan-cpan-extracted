@@ -1,5 +1,5 @@
-package Finance::AMEX::Transaction::GRRCN::Submission;
-$Finance::AMEX::Transaction::GRRCN::Submission::VERSION = '0.004';
+package Finance::AMEX::Transaction::GRRCN::Submission 0.005;
+
 use strict;
 use warnings;
 
@@ -10,84 +10,79 @@ use base 'Finance::AMEX::Transaction::GRRCN::Base';
 sub field_map {
   my ($self) = @_;
 
-  return {
-    RECORD_TYPE                                    => [1, 10],
-    PAYEE_MERCHANT_ID                              => [11, 15],
-    SETTLEMENT_ACCOUNT_TYPE_CODE                   => [26, 3],
-    AMERICAN_EXPRESS_PAYMENT_NUMBER                => [29, 10],
-    PAYMENT_DATE                                   => [39, 8],
-    PAYMENT_CURRENCY                               => [47, 3],
-
-    SUBMISSION_MERCHANT_ID                         => [50, 15],
-    BUSINESS_SUBMISSION_DATE                       => [65, 8],
-    AMERICAN_EXPRESS_PROCESSING_DATE               => [73, 18],
-    SUBMISSION_INVOICE_NUMBER                      => [81, 15],
-    SUBMISSION_CURRENCY                            => [96, 3],
-
-    (
-      $self->version >= 2.01
-      ? ( FILLER => [99, 15] )
-      : ()
-    ),
-
-    SUBMISSION_EXCHANGE_RATE                       => [114, 15],
-    SUBMISSION_GROSS_AMOUNT_IN_SUBMISSION_CURRENCY => [129, 15],
-    SUBMISSION_GROSS_AMOUNT_IN_PAYMENT_CURRENCY    => [145, 16],
-    SUBMISSION_DISCOUNT_AMOUNT                     => [161, 16],
-    SUBMISSION_SERVICE_FEE_AMOUNT                  => [177, 16],
-    SUBMISSION_TAX_AMOUNT                          => [193, 16],
-    SUBMISSION_NET_AMOUNT                          => [209, 16],
-    SUBMISSION_DISCOUNT_RATE                       => [225, 7],
-    SUBMISSION_TAX_RATE                            => [232, 7],
-    TRANSACTION_COUNT                              => [239, 7],
-    TRACKING_ID                                    => [246, 11],
-    INSTALLMENT_NUMBER                             => [257, 5],
-    ACCELERATION_NUMBER                            => [262, 9],
-    ORIGINAL_SETTLEMENT_DATE                       => [271, 8],
-    ACCELERATION_DATE                              => [279, 8],
-    NUMBER_OF_DAYS_IN_ADVANCE                      => [287, 5],
-    SUBMISSION_ACCELERATION_FEE_AMOUNT             => [292, 16],
-    SUBMISSION_ACCELERATION_FEE_NET_AMOUNT         => [308, 16],
-    SUBMISSION_DEBIT_GROSS_AMOUNT                  => [324, 16],
-    SUBMISSION_CREDIT_GROSS_AMOUNT                 => [340, 16],
-  };
+  return [
+    {RECORD_TYPE                                    => [1,   10]},
+    {PAYEE_MERCHANT_ID                              => [11,  15]},
+    {SETTLEMENT_ACCOUNT_TYPE_CODE                   => [26,  3]},
+    {AMERICAN_EXPRESS_PAYMENT_NUMBER                => [29,  10]},
+    {PAYMENT_DATE                                   => [39,  8]},
+    {PAYMENT_CURRENCY                               => [47,  3]},
+    {SUBMISSION_MERCHANT_ID                         => [50,  15]},
+    {BUSINESS_SUBMISSION_DATE                       => [65,  8]},
+    {AMERICAN_EXPRESS_PROCESSING_DATE               => [73,  8]},
+    {SUBMISSION_INVOICE_NUMBER                      => [81,  15]},
+    {SUBMISSION_CURRENCY                            => [96,  3]},
+    {FILLER1                                        => [99,  15]},
+    {SUBMISSION_EXCHANGE_RATE                       => [114, 15]},
+    {SUBMISSION_GROSS_AMOUNT_IN_SUBMISSION_CURRENCY => [129, 16]},
+    {SUBMISSION_GROSS_AMOUNT_IN_PAYMENT_CURRENCY    => [145, 16]},
+    {SUBMISSION_DISCOUNT_AMOUNT                     => [161, 16]},
+    {SUBMISSION_SERVICE_FEE_AMOUNT                  => [177, 16]},
+    {SUBMISSION_TAX_AMOUNT                          => [193, 16]},
+    {SUBMISSION_NET_AMOUNT                          => [209, 16]},
+    {SUBMISSION_DISCOUNT_RATE                       => [225, 7]},
+    {SUBMISSION_TAX_RATE                            => [232, 7]},
+    {TRANSACTION_COUNT                              => [239, 7]},
+    {TRACKING_ID                                    => [246, 11]},
+    {INSTALLMENT_NUMBER                             => [257, 5]},
+    {ACCELERATION_NUMBER                            => [262, 9]},
+    {ORIGINAL_SETTLEMENT_DATE                       => [271, 8]},
+    {ACCELERATION_DATE                              => [279, 8]},
+    {NUMBER_OF_DAYS_IN_ADVANCE                      => [287, 5]},
+    {SUBMISSION_ACCELERATION_FEE_AMOUNT             => [292, 16]},
+    {SUBMISSION_ACCELERATION_FEE_NET_AMOUNT         => [308, 16]},
+    {SUBMISSION_DEBIT_GROSS_AMOUNT                  => [324, 16]},
+    {SUBMISSION_CREDIT_GROSS_AMOUNT                 => [340, 16]},
+    {FILLER2                                        => [356, 445]},
+  ];
 }
 
 sub type {return 'SUBMISSION'}
 
-sub RECORD_TYPE                                    {return $_[0]->_get_column('RECORD_TYPE')}
-sub PAYEE_MERCHANT_ID                              {return $_[0]->_get_column('PAYEE_MERCHANT_ID')}
-sub SETTLEMENT_ACCOUNT_TYPE_CODE                   {return $_[0]->_get_column('SETTLEMENT_ACCOUNT_TYPE_CODE')}
-sub AMERICAN_EXPRESS_PAYMENT_NUMBER                {return $_[0]->_get_column('AMERICAN_EXPRESS_PAYMENT_NUMBER')}
-sub PAYMENT_DATE                                   {return $_[0]->_get_column('PAYMENT_DATE')}
-sub FILLER                                         {return $_[0]->_get_column('FILLER')}
+sub RECORD_TYPE                      {return $_[0]->_get_column('RECORD_TYPE')}
+sub PAYEE_MERCHANT_ID                {return $_[0]->_get_column('PAYEE_MERCHANT_ID')}
+sub SETTLEMENT_ACCOUNT_TYPE_CODE     {return $_[0]->_get_column('SETTLEMENT_ACCOUNT_TYPE_CODE')}
+sub AMERICAN_EXPRESS_PAYMENT_NUMBER  {return $_[0]->_get_column('AMERICAN_EXPRESS_PAYMENT_NUMBER')}
+sub PAYMENT_DATE                     {return $_[0]->_get_column('PAYMENT_DATE')}
+sub PAYMENT_CURRENCY                 {return $_[0]->_get_column('PAYMENT_CURRENCY')}
+sub SUBMISSION_MERCHANT_ID           {return $_[0]->_get_column('SUBMISSION_MERCHANT_ID')}
+sub BUSINESS_SUBMISSION_DATE         {return $_[0]->_get_column('BUSINESS_SUBMISSION_DATE')}
+sub AMERICAN_EXPRESS_PROCESSING_DATE {return $_[0]->_get_column('AMERICAN_EXPRESS_PROCESSING_DATE')}
+sub SUBMISSION_INVOICE_NUMBER        {return $_[0]->_get_column('SUBMISSION_INVOICE_NUMBER')}
+sub SUBMISSION_CURRENCY              {return $_[0]->_get_column('SUBMISSION_CURRENCY')}
+sub SUBMISSION_EXCHANGE_RATE         {return $_[0]->_get_column('SUBMISSION_EXCHANGE_RATE')}
 
-sub PAYMENT_CURRENCY                               {return $_[0]->_get_column('PAYMENT_CURRENCY')}
-sub SUBMISSION_MERCHANT_ID                         {return $_[0]->_get_column('SUBMISSION_MERCHANT_ID')}
-sub BUSINESS_SUBMISSION_DATE                       {return $_[0]->_get_column('BUSINESS_SUBMISSION_DATE')}
-sub AMERICAN_EXPRESS_PROCESSING_DATE               {return $_[0]->_get_column('AMERICAN_EXPRESS_PROCESSING_DATE')}
-sub SUBMISSION_INVOICE_NUMBER                      {return $_[0]->_get_column('SUBMISSION_INVOICE_NUMBER')}
-sub SUBMISSION_CURRENCY                            {return $_[0]->_get_column('SUBMISSION_CURRENCY')}
-sub SUBMISSION_EXCHANGE_RATE                       {return $_[0]->_get_column('SUBMISSION_EXCHANGE_RATE')}
-sub SUBMISSION_GROSS_AMOUNT_IN_SUBMISSION_CURRENCY {return $_[0]->_get_column('SUBMISSION_GROSS_AMOUNT_IN_SUBMISSION_CURRENCY')}
-sub SUBMISSION_GROSS_AMOUNT_IN_PAYMENT_CURRENCY    {return $_[0]->_get_column('SUBMISSION_GROSS_AMOUNT_IN_PAYMENT_CURRENCY')}
-sub SUBMISSION_DISCOUNT_AMOUNT                     {return $_[0]->_get_column('SUBMISSION_DISCOUNT_AMOUNT')}
-sub SUBMISSION_SERVICE_FEE_AMOUNT                  {return $_[0]->_get_column('SUBMISSION_SERVICE_FEE_AMOUNT')}
-sub SUBMISSION_TAX_AMOUNT                          {return $_[0]->_get_column('SUBMISSION_TAX_AMOUNT')}
-sub SUBMISSION_NET_AMOUNT                          {return $_[0]->_get_column('SUBMISSION_NET_AMOUNT')}
-sub SUBMISSION_DISCOUNT_RATE                       {return $_[0]->_get_column('SUBMISSION_DISCOUNT_RATE')}
-sub SUBMISSION_TAX_RATE                            {return $_[0]->_get_column('SUBMISSION_TAX_RATE')}
-sub TRANSACTION_COUNT                              {return $_[0]->_get_column('TRANSACTION_COUNT')}
-sub TRACKING_ID                                    {return $_[0]->_get_column('TRACKING_ID')}
-sub INSTALLMENT_NUMBER                             {return $_[0]->_get_column('INSTALLMENT_NUMBER')}
-sub ACCELERATION_NUMBER                            {return $_[0]->_get_column('ACCELERATION_NUMBER')}
-sub ORIGINAL_SETTLEMENT_DATE                       {return $_[0]->_get_column('ORIGINAL_SETTLEMENT_DATE')}
-sub ACCELERATION_DATE                              {return $_[0]->_get_column('ACCELERATION_DATE')}
-sub NUMBER_OF_DAYS_IN_ADVANCE                      {return $_[0]->_get_column('NUMBER_OF_DAYS_IN_ADVANCE')}
-sub SUBMISSION_ACCELERATION_FEE_AMOUNT             {return $_[0]->_get_column('SUBMISSION_ACCELERATION_FEE_AMOUNT')}
-sub SUBMISSION_ACCELERATION_FEE_NET_AMOUNT         {return $_[0]->_get_column('SUBMISSION_ACCELERATION_FEE_NET_AMOUNT')}
-sub SUBMISSION_DEBIT_GROSS_AMOUNT                  {return $_[0]->_get_column('SUBMISSION_DEBIT_GROSS_AMOUNT')}
-sub SUBMISSION_CREDIT_GROSS_AMOUNT                 {return $_[0]->_get_column('SUBMISSION_CREDIT_GROSS_AMOUNT')}
+sub SUBMISSION_GROSS_AMOUNT_IN_SUBMISSION_CURRENCY {
+  return $_[0]->_get_column('SUBMISSION_GROSS_AMOUNT_IN_SUBMISSION_CURRENCY');
+}
+sub SUBMISSION_GROSS_AMOUNT_IN_PAYMENT_CURRENCY {return $_[0]->_get_column('SUBMISSION_GROSS_AMOUNT_IN_PAYMENT_CURRENCY')}
+sub SUBMISSION_DISCOUNT_AMOUNT                  {return $_[0]->_get_column('SUBMISSION_DISCOUNT_AMOUNT')}
+sub SUBMISSION_SERVICE_FEE_AMOUNT               {return $_[0]->_get_column('SUBMISSION_SERVICE_FEE_AMOUNT')}
+sub SUBMISSION_TAX_AMOUNT                       {return $_[0]->_get_column('SUBMISSION_TAX_AMOUNT')}
+sub SUBMISSION_NET_AMOUNT                       {return $_[0]->_get_column('SUBMISSION_NET_AMOUNT')}
+sub SUBMISSION_DISCOUNT_RATE                    {return $_[0]->_get_column('SUBMISSION_DISCOUNT_RATE')}
+sub SUBMISSION_TAX_RATE                         {return $_[0]->_get_column('SUBMISSION_TAX_RATE')}
+sub TRANSACTION_COUNT                           {return $_[0]->_get_column('TRANSACTION_COUNT')}
+sub TRACKING_ID                                 {return $_[0]->_get_column('TRACKING_ID')}
+sub INSTALLMENT_NUMBER                          {return $_[0]->_get_column('INSTALLMENT_NUMBER')}
+sub ACCELERATION_NUMBER                         {return $_[0]->_get_column('ACCELERATION_NUMBER')}
+sub ORIGINAL_SETTLEMENT_DATE                    {return $_[0]->_get_column('ORIGINAL_SETTLEMENT_DATE')}
+sub ACCELERATION_DATE                           {return $_[0]->_get_column('ACCELERATION_DATE')}
+sub NUMBER_OF_DAYS_IN_ADVANCE                   {return $_[0]->_get_column('NUMBER_OF_DAYS_IN_ADVANCE')}
+sub SUBMISSION_ACCELERATION_FEE_AMOUNT          {return $_[0]->_get_column('SUBMISSION_ACCELERATION_FEE_AMOUNT')}
+sub SUBMISSION_ACCELERATION_FEE_NET_AMOUNT      {return $_[0]->_get_column('SUBMISSION_ACCELERATION_FEE_NET_AMOUNT')}
+sub SUBMISSION_DEBIT_GROSS_AMOUNT               {return $_[0]->_get_column('SUBMISSION_DEBIT_GROSS_AMOUNT')}
+sub SUBMISSION_CREDIT_GROSS_AMOUNT              {return $_[0]->_get_column('SUBMISSION_CREDIT_GROSS_AMOUNT')}
 
 1;
 
@@ -103,7 +98,7 @@ Finance::AMEX::Transaction::GRRCN::Submission - Parse AMEX Global Reconciliation
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -149,6 +144,14 @@ This will always return the string SUBMISSION.
 Returns the full line that is represented by this object.
 
  print $record->line;
+
+=head2 field_map
+
+Returns an arrayref of hashrefs where the name is the record name and 
+the value is an arrayref of the start position and length of that field.
+
+ # print the start position of the PAYMENT_DATE field
+ print $record->field_map->[4]->{PAYMENT_DATE}->[0]; # 39
 
 =head2 RECORD_TYPE
 
@@ -449,7 +452,7 @@ Tom Heady <cpan@punch.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by ZipRecruiter.
+This software is copyright (c) 2022 by ZipRecruiter/Tom Heady.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

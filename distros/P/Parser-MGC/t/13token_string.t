@@ -4,28 +4,29 @@ use v5.14;
 use warnings;
 
 use Test::More;
+use Test::Fatal;
 
-package TestParser;
-use base qw( Parser::MGC );
+package TestParser {
+   use base qw( Parser::MGC );
 
-sub parse
-{
-   my $self = shift;
+   sub parse
+   {
+      my $self = shift;
 
-   return $self->token_string;
+      return $self->token_string;
+   }
 }
 
-package StringPairParser;
-use base qw( Parser::MGC );
+package StringPairParser {
+   use base qw( Parser::MGC );
 
-sub parse
-{
-   my $self = shift;
+   sub parse
+   {
+      my $self = shift;
 
-   return [ $self->token_string, $self->token_string ];
+      return [ $self->token_string, $self->token_string ];
+   }
 }
-
-package main;
 
 my $parser = TestParser->new;
 
@@ -55,7 +56,7 @@ $parser = TestParser->new(
 );
 
 is( $parser->from_string( q["double"] ), "double", 'Double quoted string still passes' );
-ok( !eval { $parser->from_string( q['single'] ) }, 'Single quoted string now fails' );
+ok( exception { $parser->from_string( q['single'] ) }, 'Single quoted string now fails' );
 
 $parser = StringPairParser->new;
 

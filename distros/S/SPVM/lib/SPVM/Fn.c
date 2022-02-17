@@ -86,6 +86,71 @@ int32_t SPVM__Fn__RAND_MAX(SPVM_ENV* env, SPVM_VALUE* stack) {
 #define SPRINTF_MAX_RESULT_LEN 256
 #define UINT64_MAX_LEN 20
 
+int32_t SPVM__Fn__is_array(SPVM_ENV* env, SPVM_VALUE* stack) {
+  (void)env;
+
+  void* object = stack[0].oval;
+  
+  int32_t is_array;
+  if (env->is_array(env, object)) {
+    is_array = 1;
+  }
+  else {
+    is_array = 0;
+  }
+
+  stack[0].ival = is_array;
+
+  return 0;
+}
+
+int32_t SPVM__Fn__is_numeric_array(SPVM_ENV* env, SPVM_VALUE* stack) {
+  (void)env;
+
+  void* object = stack[0].oval;
+  
+  int32_t is_numeric_array;
+  if (env->is_numeric_array(env, object)) {
+    is_numeric_array = 1;
+  }
+  else {
+    is_numeric_array = 0;
+  }
+
+  stack[0].ival = is_numeric_array;
+
+  return 0;
+}
+
+int32_t SPVM__Fn__is_mulnum_array(SPVM_ENV* env, SPVM_VALUE* stack) {
+  (void)env;
+
+  void* object = stack[0].oval;
+  
+  int32_t is_mulnum_array;
+  if (env->is_mulnum_array(env, object)) {
+    is_mulnum_array = 1;
+  }
+  else {
+    is_mulnum_array = 0;
+  }
+
+  stack[0].ival = is_mulnum_array;
+
+  return 0;
+}
+
+int32_t SPVM__Fn__shorten(SPVM_ENV* env, SPVM_VALUE* stack) {
+  (void)env;
+
+  void* string = stack[0].oval;
+  int32_t new_length = stack[1].ival;
+  
+  env->shorten(env, string, new_length);
+
+  return 0;
+}
+
 int32_t SPVM__Fn___snsprintf_double(SPVM_ENV* env, SPVM_VALUE* stack) {
   (void)env;
 
@@ -225,11 +290,127 @@ int32_t SPVM__Fn__to_double(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
+int32_t SPVM__Fn__memcpy(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  void* dest = stack[0].oval;
+  int32_t dest_byte_offset = stack[1].ival;
+  void* source = stack[2].oval;
+  int32_t source_byte_offset = stack[3].ival;
+  int32_t byte_length = stack[4].ival;
+
+  if (!dest) {
+    return env->die(env, "Destnation must be defined", MFILE, __LINE__);
+  }
+  
+  if (!(env->is_string(env, dest) || env->is_numeric_array(env, dest) || env->is_mulnum_array(env, dest))) {
+    return env->die(env, "Destnation must be a string type, a numeric arrya type, or a multi numeric array", MFILE, __LINE__);
+  }
+  
+  if (!source) {
+    return env->die(env, "Source must be defined", MFILE, __LINE__);
+  }
+
+  if (!(env->is_string(env, source) || env->is_numeric_array(env, source) || env->is_mulnum_array(env, source))) {
+    return env->die(env, "Source must be a string type, a numeric arrya type, or a multi numeric array", MFILE, __LINE__);
+  }
+
+  if (env->is_read_only(env, dest)) {
+    return env->die(env, "Destnation must not be a read-only string", MFILE, __LINE__);
+  }
+  
+  if (byte_length == 0) {
+    return 0;
+  }
+  else if (byte_length < 0) {
+    return env->die(env, "The length must be more than or equals to 0", MFILE, __LINE__);
+  }
+  
+  char* dest_bytes = (char*)env->get_chars(env, dest);
+  int32_t dest_len = env->length(env, dest);
+  int32_t dest_elem_byte_size = env->get_elem_byte_size(env, dest);
+  int32_t dest_byte_length = dest_elem_byte_size * dest_len;
+  
+  const char* source_bytes = env->get_chars(env, source);
+  int32_t source_len = env->length(env, source);
+  int32_t source_elem_byte_size = env->get_elem_byte_size(env, source);
+  int32_t source_byte_length = source_elem_byte_size * source_len;
+  
+  if (dest_byte_offset + byte_length > dest_byte_length) {
+    return env->die(env, "Destnation byte_offset + byte_length must be within the range of the destnation array", MFILE, __LINE__);
+  }
+
+  if (source_byte_offset + byte_length > source_byte_length) {
+    return env->die(env, "Source byte_offset + byte_length must be within the range of the source array", MFILE, __LINE__);
+  }
+  
+  memcpy((char*)(dest_bytes + dest_byte_offset), (char*)(source_bytes + source_byte_offset), byte_length);
+  
+  return 0;
+}
+
+int32_t SPVM__Fn__memmove(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  void* dest = stack[0].oval;
+  int32_t dest_byte_offset = stack[1].ival;
+  void* source = stack[2].oval;
+  int32_t source_byte_offset = stack[3].ival;
+  int32_t byte_length = stack[4].ival;
+
+  if (!dest) {
+    return env->die(env, "Destnation must be defined", MFILE, __LINE__);
+  }
+  
+  if (!(env->is_string(env, dest) || env->is_numeric_array(env, dest) || env->is_mulnum_array(env, dest))) {
+    return env->die(env, "Destnation must be a string type, a numeric arrya type, or a multi numeric array", MFILE, __LINE__);
+  }
+  
+  if (!source) {
+    return env->die(env, "Source must be defined", MFILE, __LINE__);
+  }
+
+  if (!(env->is_string(env, source) || env->is_numeric_array(env, source) || env->is_mulnum_array(env, source))) {
+    return env->die(env, "Source must be a string type, a numeric arrya type, or a multi numeric array", MFILE, __LINE__);
+  }
+
+  if (env->is_read_only(env, dest)) {
+    return env->die(env, "Destnation must not be a read-only string", MFILE, __LINE__);
+  }
+  
+  if (byte_length == 0) {
+    return 0;
+  }
+  else if (byte_length < 0) {
+    return env->die(env, "The length must be more than or equals to 0", MFILE, __LINE__);
+  }
+  
+  char* dest_bytes = (char*)env->get_chars(env, dest);
+  int32_t dest_len = env->length(env, dest);
+  int32_t dest_elem_byte_size = env->get_elem_byte_size(env, dest);
+  int32_t dest_byte_length = dest_elem_byte_size * dest_len;
+  
+  const char* source_bytes = env->get_chars(env, source);
+  int32_t source_len = env->length(env, source);
+  int32_t source_elem_byte_size = env->get_elem_byte_size(env, source);
+  int32_t source_byte_length = source_elem_byte_size * source_len;
+  
+  if (dest_byte_offset + byte_length > dest_byte_length) {
+    return env->die(env, "Destnation byte_offset + byte_length must be within the range of the destnation array", MFILE, __LINE__);
+  }
+
+  if (source_byte_offset + byte_length > source_byte_length) {
+    return env->die(env, "Source byte_offset + byte_length must be within the range of the source array", MFILE, __LINE__);
+  }
+  
+  memmove((char*)(dest_bytes + dest_byte_offset), (char*)(source_bytes + source_byte_offset), byte_length);
+  
+  return 0;
+}
+
 int32_t SPVM__Fn__memcpy_byte(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* sv_dest = stack[0].oval;
   int32_t dest_offset = stack[1].ival;
-  void* sv_source_data = stack[2].oval;
+  void* sv_source = stack[2].oval;
   int32_t source_offset = stack[3].ival;
   int32_t length = stack[4].ival;
 
@@ -237,7 +418,7 @@ int32_t SPVM__Fn__memcpy_byte(SPVM_ENV* env, SPVM_VALUE* stack) {
     return env->die(env, "Destnation must be defined", MFILE, __LINE__);
   }
   
-  if (!sv_source_data) {
+  if (!sv_source) {
     return env->die(env, "Source must be defined", MFILE, __LINE__);
   }
   
@@ -251,8 +432,8 @@ int32_t SPVM__Fn__memcpy_byte(SPVM_ENV* env, SPVM_VALUE* stack) {
   int8_t* dest = env->get_elems_byte(env, sv_dest);
   int32_t dest_len = env->length(env, sv_dest);
   
-  int8_t* source = env->get_elems_byte(env, sv_source_data);
-  int32_t source_len = env->length(env, sv_source_data);
+  int8_t* source = env->get_elems_byte(env, sv_source);
+  int32_t source_len = env->length(env, sv_source);
   
   if (dest_offset + length > dest_len) {
     return env->die(env, "Destnation offset + length must be within the range of the destnation array", MFILE, __LINE__);
@@ -271,13 +452,13 @@ int32_t SPVM__Fn__memmove_byte(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* sv_dest = stack[0].oval;
   int32_t dest_offset = stack[1].ival;
-  void* sv_source_data = stack[2].oval;
+  void* sv_source = stack[2].oval;
   int32_t source_offset = stack[3].ival;
   int32_t length = stack[4].ival;
 
   if (!sv_dest) { return env->die(env, "Destnation must be defined", MFILE, __LINE__); }
   
-  if (!sv_source_data) { return env->die(env, "Source must be defined", MFILE, __LINE__); }
+  if (!sv_source) { return env->die(env, "Source must be defined", MFILE, __LINE__); }
   
   if (length == 0) {
     return 0;
@@ -289,8 +470,8 @@ int32_t SPVM__Fn__memmove_byte(SPVM_ENV* env, SPVM_VALUE* stack) {
   int8_t* dest = env->get_elems_byte(env, sv_dest);
   int32_t dest_len = env->length(env, sv_dest);
   
-  int8_t* source = env->get_elems_byte(env, sv_source_data);
-  int32_t source_len = env->length(env, sv_source_data);
+  int8_t* source = env->get_elems_byte(env, sv_source);
+  int32_t source_len = env->length(env, sv_source);
   
   if (dest_offset + length > dest_len) {
     return env->die(env, "Destnation offset + length must be within the range of the destnation array", MFILE, __LINE__);
@@ -309,13 +490,13 @@ int32_t SPVM__Fn__memcpy_short(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* sv_dest = stack[0].oval;
   int32_t dest_offset = stack[1].ival;
-  void* sv_source_data = stack[2].oval;
+  void* sv_source = stack[2].oval;
   int32_t source_offset = stack[3].ival;
   int32_t length = stack[4].ival;
 
   if (!sv_dest) { return env->die(env, "Destnation must be defined", MFILE, __LINE__); }
 
-  if (!sv_source_data) { return env->die(env, "Source must be defined", MFILE, __LINE__); }
+  if (!sv_source) { return env->die(env, "Source must be defined", MFILE, __LINE__); }
   
   if (length == 0) {
     return 0;
@@ -327,8 +508,8 @@ int32_t SPVM__Fn__memcpy_short(SPVM_ENV* env, SPVM_VALUE* stack) {
   int16_t* dest = env->get_elems_short(env, sv_dest);
   int32_t dest_len = env->length(env, sv_dest);
   
-  int16_t* source = env->get_elems_short(env, sv_source_data);
-  int32_t source_len = env->length(env, sv_source_data);
+  int16_t* source = env->get_elems_short(env, sv_source);
+  int32_t source_len = env->length(env, sv_source);
   
   if (dest_offset + length > dest_len) {
     return env->die(env, "Destnation offset + length must be within the range of the destnation array", MFILE, __LINE__);
@@ -347,13 +528,13 @@ int32_t SPVM__Fn__memmove_short(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* sv_dest = stack[0].oval;
   int32_t dest_offset = stack[1].ival;
-  void* sv_source_data = stack[2].oval;
+  void* sv_source = stack[2].oval;
   int32_t source_offset = stack[3].ival;
   int32_t length = stack[4].ival;
 
   if (!sv_dest) { return env->die(env, "Destnation must be defined", MFILE, __LINE__); }
   
-  if (!sv_source_data) { return env->die(env, "Source must be defined", MFILE, __LINE__); }
+  if (!sv_source) { return env->die(env, "Source must be defined", MFILE, __LINE__); }
   
   if (length == 0) {
     return 0;
@@ -365,8 +546,8 @@ int32_t SPVM__Fn__memmove_short(SPVM_ENV* env, SPVM_VALUE* stack) {
   int16_t* dest = env->get_elems_short(env, sv_dest);
   int32_t dest_len = env->length(env, sv_dest);
   
-  int16_t* source = env->get_elems_short(env, sv_source_data);
-  int32_t source_len = env->length(env, sv_source_data);
+  int16_t* source = env->get_elems_short(env, sv_source);
+  int32_t source_len = env->length(env, sv_source);
   
   if (dest_offset + length > dest_len) {
     return env->die(env, "Destnation offset + length must be within the range of the destnation array", MFILE, __LINE__);
@@ -385,13 +566,13 @@ int32_t SPVM__Fn__memcpy_int(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* sv_dest = stack[0].oval;
   int32_t dest_offset = stack[1].ival;
-  void* sv_source_data = stack[2].oval;
+  void* sv_source = stack[2].oval;
   int32_t source_offset = stack[3].ival;
   int32_t length = stack[4].ival;
 
   if (!sv_dest) { return env->die(env, "Destnation must be defined", MFILE, __LINE__); }
   
-  if (!sv_source_data) { return env->die(env, "Source must be defined", MFILE, __LINE__); }
+  if (!sv_source) { return env->die(env, "Source must be defined", MFILE, __LINE__); }
   
   if (length == 0) {
     return 0;
@@ -403,8 +584,8 @@ int32_t SPVM__Fn__memcpy_int(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t* dest = env->get_elems_int(env, sv_dest);
   int32_t dest_len = env->length(env, sv_dest);
   
-  int32_t* source = env->get_elems_int(env, sv_source_data);
-  int32_t source_len = env->length(env, sv_source_data);
+  int32_t* source = env->get_elems_int(env, sv_source);
+  int32_t source_len = env->length(env, sv_source);
   
   if (dest_offset + length > dest_len) {
     return env->die(env, "Destnation offset + length must be within the range of the destnation array", MFILE, __LINE__);
@@ -423,13 +604,13 @@ int32_t SPVM__Fn__memmove_int(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* sv_dest = stack[0].oval;
   int32_t dest_offset = stack[1].ival;
-  void* sv_source_data = stack[2].oval;
+  void* sv_source = stack[2].oval;
   int32_t source_offset = stack[3].ival;
   int32_t length = stack[4].ival;
 
   if (!sv_dest) { return env->die(env, "Destnation must be defined", MFILE, __LINE__); }
   
-  if (!sv_source_data) { return env->die(env, "Source must be defined", MFILE, __LINE__); }
+  if (!sv_source) { return env->die(env, "Source must be defined", MFILE, __LINE__); }
   
   if (length == 0) {
     return 0;
@@ -441,8 +622,8 @@ int32_t SPVM__Fn__memmove_int(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t* dest = env->get_elems_int(env, sv_dest);
   int32_t dest_len = env->length(env, sv_dest);
   
-  int32_t* source = env->get_elems_int(env, sv_source_data);
-  int32_t source_len = env->length(env, sv_source_data);
+  int32_t* source = env->get_elems_int(env, sv_source);
+  int32_t source_len = env->length(env, sv_source);
   
   if (dest_offset + length > dest_len) {
     return env->die(env, "Destnation offset + length must be within the range of the destnation array", MFILE, __LINE__);
@@ -461,13 +642,13 @@ int32_t SPVM__Fn__memcpy_long(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* sv_dest = stack[0].oval;
   int32_t dest_offset = stack[1].ival;
-  void* sv_source_data = stack[2].oval;
+  void* sv_source = stack[2].oval;
   int32_t source_offset = stack[3].ival;
   int32_t length = stack[4].ival;
 
   if (!sv_dest) { return env->die(env, "Destnation must be defined", MFILE, __LINE__); }
   
-  if (!sv_source_data) { return env->die(env, "Source must be defined", MFILE, __LINE__); }
+  if (!sv_source) { return env->die(env, "Source must be defined", MFILE, __LINE__); }
   
   if (length == 0) {
     return 0;
@@ -479,8 +660,8 @@ int32_t SPVM__Fn__memcpy_long(SPVM_ENV* env, SPVM_VALUE* stack) {
   int64_t* dest = env->get_elems_long(env, sv_dest);
   int32_t dest_len = env->length(env, sv_dest);
   
-  int64_t* source = env->get_elems_long(env, sv_source_data);
-  int32_t source_len = env->length(env, sv_source_data);
+  int64_t* source = env->get_elems_long(env, sv_source);
+  int32_t source_len = env->length(env, sv_source);
   
   if (dest_offset + length > dest_len) {
     return env->die(env, "Destnation offset + length must be within the range of the destnation array", MFILE, __LINE__);
@@ -499,13 +680,13 @@ int32_t SPVM__Fn__memmove_long(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* sv_dest = stack[0].oval;
   int32_t dest_offset = stack[1].ival;
-  void* sv_source_data = stack[2].oval;
+  void* sv_source = stack[2].oval;
   int32_t source_offset = stack[3].ival;
   int32_t length = stack[4].ival;
 
   if (!sv_dest) { return env->die(env, "Destnation must be defined", MFILE, __LINE__); }
   
-  if (!sv_source_data) { return env->die(env, "Source must be defined", MFILE, __LINE__); }
+  if (!sv_source) { return env->die(env, "Source must be defined", MFILE, __LINE__); }
   
   if (length == 0) {
     return 0;
@@ -517,8 +698,8 @@ int32_t SPVM__Fn__memmove_long(SPVM_ENV* env, SPVM_VALUE* stack) {
   int64_t* dest = env->get_elems_long(env, sv_dest);
   int32_t dest_len = env->length(env, sv_dest);
   
-  int64_t* source = env->get_elems_long(env, sv_source_data);
-  int32_t source_len = env->length(env, sv_source_data);
+  int64_t* source = env->get_elems_long(env, sv_source);
+  int32_t source_len = env->length(env, sv_source);
   
   if (dest_offset + length > dest_len) {
     return env->die(env, "Destnation offset + length must be within the range of the destnation array", MFILE, __LINE__);
@@ -537,13 +718,13 @@ int32_t SPVM__Fn__memcpy_float(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* sv_dest = stack[0].oval;
   int32_t dest_offset = stack[1].ival;
-  void* sv_source_data = stack[2].oval;
+  void* sv_source = stack[2].oval;
   int32_t source_offset = stack[3].ival;
   int32_t length = stack[4].ival;
 
   if (!sv_dest) { return env->die(env, "Destnation must be defined", MFILE, __LINE__); }
   
-  if (!sv_source_data) { return env->die(env, "Source must be defined", MFILE, __LINE__); }
+  if (!sv_source) { return env->die(env, "Source must be defined", MFILE, __LINE__); }
   
   if (length == 0) {
     return 0;
@@ -555,8 +736,8 @@ int32_t SPVM__Fn__memcpy_float(SPVM_ENV* env, SPVM_VALUE* stack) {
   float* dest = env->get_elems_float(env, sv_dest);
   int32_t dest_len = env->length(env, sv_dest);
   
-  float* source = env->get_elems_float(env, sv_source_data);
-  int32_t source_len = env->length(env, sv_source_data);
+  float* source = env->get_elems_float(env, sv_source);
+  int32_t source_len = env->length(env, sv_source);
   
   if (dest_offset + length > dest_len) {
     return env->die(env, "Destnation offset + length must be within the range of the destnation array", MFILE, __LINE__);
@@ -575,13 +756,13 @@ int32_t SPVM__Fn__memmove_float(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* sv_dest = stack[0].oval;
   int32_t dest_offset = stack[1].ival;
-  void* sv_source_data = stack[2].oval;
+  void* sv_source = stack[2].oval;
   int32_t source_offset = stack[3].ival;
   int32_t length = stack[4].ival;
 
   if (!sv_dest) { return env->die(env, "Destnation must be defined", MFILE, __LINE__); }
   
-  if (!sv_source_data) { return env->die(env, "Source must be defined", MFILE, __LINE__); }
+  if (!sv_source) { return env->die(env, "Source must be defined", MFILE, __LINE__); }
   
 
   if (length == 0) {
@@ -594,8 +775,8 @@ int32_t SPVM__Fn__memmove_float(SPVM_ENV* env, SPVM_VALUE* stack) {
   float* dest = env->get_elems_float(env, sv_dest);
   int32_t dest_len = env->length(env, sv_dest);
   
-  float* source = env->get_elems_float(env, sv_source_data);
-  int32_t source_len = env->length(env, sv_source_data);
+  float* source = env->get_elems_float(env, sv_source);
+  int32_t source_len = env->length(env, sv_source);
   
   if (dest_offset + length > dest_len) {
     return env->die(env, "Destnation offset + length must be within the range of the destnation array", MFILE, __LINE__);
@@ -614,13 +795,13 @@ int32_t SPVM__Fn__memcpy_double(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* sv_dest = stack[0].oval;
   int32_t dest_offset = stack[1].ival;
-  void* sv_source_data = stack[2].oval;
+  void* sv_source = stack[2].oval;
   int32_t source_offset = stack[3].ival;
   int32_t length = stack[4].ival;
 
   if (!sv_dest) { return env->die(env, "Destnation must be defined", MFILE, __LINE__); }
   
-  if (!sv_source_data) { return env->die(env, "Source must be defined", MFILE, __LINE__); }
+  if (!sv_source) { return env->die(env, "Source must be defined", MFILE, __LINE__); }
   
 
   if (length == 0) {
@@ -633,8 +814,8 @@ int32_t SPVM__Fn__memcpy_double(SPVM_ENV* env, SPVM_VALUE* stack) {
   double* dest = env->get_elems_double(env, sv_dest);
   int32_t dest_len = env->length(env, sv_dest);
   
-  double* source = env->get_elems_double(env, sv_source_data);
-  int32_t source_len = env->length(env, sv_source_data);
+  double* source = env->get_elems_double(env, sv_source);
+  int32_t source_len = env->length(env, sv_source);
   
   if (dest_offset + length > dest_len) {
     return env->die(env, "Destnation offset + length must be within the range of the destnation array", MFILE, __LINE__);
@@ -653,13 +834,13 @@ int32_t SPVM__Fn__memmove_double(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* sv_dest = stack[0].oval;
   int32_t dest_offset = stack[1].ival;
-  void* sv_source_data = stack[2].oval;
+  void* sv_source = stack[2].oval;
   int32_t source_offset = stack[3].ival;
   int32_t length = stack[4].ival;
 
   if (!sv_dest) { return env->die(env, "Destnation must be defined", MFILE, __LINE__); }
   
-  if (!sv_source_data) { return env->die(env, "Source must be defined", MFILE, __LINE__); }
+  if (!sv_source) { return env->die(env, "Source must be defined", MFILE, __LINE__); }
 
   if (length == 0) {
     return 0;
@@ -671,8 +852,8 @@ int32_t SPVM__Fn__memmove_double(SPVM_ENV* env, SPVM_VALUE* stack) {
   double* dest = env->get_elems_double(env, sv_dest);
   int32_t dest_len = env->length(env, sv_dest);
   
-  double* source = env->get_elems_double(env, sv_source_data);
-  int32_t source_len = env->length(env, sv_source_data);
+  double* source = env->get_elems_double(env, sv_source);
+  int32_t source_len = env->length(env, sv_source);
   
   if (dest_offset + length > dest_len) {
     return env->die(env, "Destnation offset + length must be within the range of the destnation array", MFILE, __LINE__);
@@ -689,17 +870,18 @@ int32_t SPVM__Fn__memmove_double(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Fn__new_array_proto(SPVM_ENV* env, SPVM_VALUE* stack) {
   
-  void* oarray = stack[0].oval;
+  void* array = stack[0].oval;
   int32_t length = stack[1].ival;
   
-  if (oarray == NULL) {
+  if (array == NULL) {
     return env->die(env, "Prototype array must be defined", MFILE, __LINE__);
   }
+
+  if (length < 0) {
+    return env->die(env, "The length must be greater than or equals to 0", MFILE, __LINE__);
+  }
   
-  int32_t basic_type_id = env->get_object_basic_type_id(env, oarray);
-  int32_t element_dimension = env->get_object_type_dimension(env, oarray) - 1;
-  
-  void* new_object_array = env->new_muldim_array(env, basic_type_id, element_dimension, length);
+  void* new_object_array = env->new_array_proto(env, array, length);
   
   stack[0].oval = new_object_array;
   

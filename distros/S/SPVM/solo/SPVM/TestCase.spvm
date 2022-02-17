@@ -24,7 +24,8 @@ class TestCase {
   use TestCase::DumpTest1;
   use TestCase::Complex_2f;
   use TestCase::Complex_2d;
-
+  use TestCase::CommonInterface;
+  
 =pod
 
 ABCDE
@@ -88,6 +89,74 @@ SPVM::Test - SPVM test module
 
   static method main : int ($start_file : string, $args : string[]) {
     {
+      my $minimal = TestCase::Minimal->new;
+      my $interface : TestCase::CommonInterface = $minimal;
+      my $has_implement_share2 = has_implement $interface->shared2;
+        warn $has_implement_share2;
+      if (has_implement $interface->shared2) {
+        warn $has_implement_share2;
+      }
+      my $has_implement_share3 = has_implement $interface->shared3;
+      warn $has_implement_share3;
+    }
+
+    {
+      my $minimal = (TestCase::Minimal)undef;
+      
+      eval { $minimal->clear; };
+    }
+    {
+      {
+        my $minimal = TestCase::Minimal->new;
+        my $interface : TestCase::CommonInterface = $minimal;
+        eval { $interface->shared3; };
+        eval { $interface->shared4($minimal); };
+      }
+      
+      {
+        my $minimal = TestCase::Minimal->new;
+        my $interface : TestCase::CommonInterface = $minimal;
+        warn $interface->shared1;
+        warn $interface->shared2;
+      }
+
+      {
+        my $simple = TestCase::Simple->new;
+        my $interface : TestCase::CommonInterface = $simple;
+        warn $interface->shared1;
+        warn $interface->shared2;
+      }
+      
+      {
+        my $minimal = TestCase::Minimal->new;
+        my $interface : TestCase::CommonInterface = $minimal;
+        my $object = (object)$interface;
+        my $interface_again = (TestCase::CommonInterface)$object;
+        warn $interface_again->shared1;
+        warn $interface_again->shared2;
+      }
+    }
+    
+    {
+      my $string = copy "abc";
+      
+      warn $string;
+    }
+    
+    {
+      my $const_string = "abc";
+      warn is_read_only $const_string;
+      
+      eval { my $string = (mutable string)$const_string; };
+    }
+    
+    {
+      my $string = new_string_len 3;
+      make_read_only $string;
+      my $is_read_only = is_read_only $string;
+    }
+    
+    {
       my $message = new_string_len 3;
     }
     {
@@ -137,7 +206,7 @@ SPVM::Test - SPVM test module
     }
     
     {
-      my $string : mutable string = (mutable string)"abc";
+      my $string : mutable string = (mutable string)new_string_len 3;
       $string->[0] = 'd';
       
       warn $string;
@@ -357,7 +426,6 @@ SPVM::Test - SPVM test module
     
     {
       warn "PPP";
-      warn;
       warn "QQQ\n";
     }
     

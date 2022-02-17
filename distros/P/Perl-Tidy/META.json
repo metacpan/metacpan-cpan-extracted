@@ -39,6 +39,6 @@
          "web" : "https://github.com/perltidy/perltidy"
       }
    },
-   "version" : "20211029",
+   "version" : "20220217",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

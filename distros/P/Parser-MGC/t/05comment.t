@@ -4,27 +4,27 @@ use v5.14;
 use warnings;
 
 use Test::More;
+use Test::Fatal;
 
-package TestParser;
-use base qw( Parser::MGC );
+package TestParser {
+   use base qw( Parser::MGC );
 
-sub parse
-{
-   my $self = shift;
+   sub parse
+   {
+      my $self = shift;
 
-   $self->expect( "hello" );
-   $self->expect( qr/world/ );
+      $self->expect( "hello" );
+      $self->expect( qr/world/ );
 
-   return 1;
+      return 1;
+   }
 }
-
-package main;
 
 my $parser = TestParser->new;
 
 ok( $parser->from_string( "hello world" ), '"hello world"' );
 ok( $parser->from_string( "hello\nworld" ), '"hello\nworld"' );
-ok( !eval { $parser->from_string( "hello\n# Comment\nworld" ) }, '"hello world" with comment fails' );
+ok( exception { $parser->from_string( "hello\n# Comment\nworld" ) }, '"hello world" with comment fails' );
 
 $parser = TestParser->new(
    patterns => { comment => qr/#.*\n/ },

@@ -1,5 +1,5 @@
-package Finance::AMEX::Transaction::GRRCN::TxnPricing;
-$Finance::AMEX::Transaction::GRRCN::TxnPricing::VERSION = '0.004';
+package Finance::AMEX::Transaction::GRRCN::TxnPricing 0.005;
+
 use strict;
 use warnings;
 
@@ -10,33 +10,44 @@ use base 'Finance::AMEX::Transaction::GRRCN::Base';
 sub field_map {
   my ($self) = @_;
 
-  return {
-    RECORD_TYPE                     => [1, 10],
-    PAYEE_MERCHANT_ID               => [11, 15],
-    SETTLEMENT_ACCOUNT_TYPE_CODE    => [26, 3],
-    AMERICAN_EXPRESS_PAYMENT_NUMBER => [29, 10],
-    PAYMENT_DATE                    => [39, 8],
-    PAYMENT_CURRENCY                => [47, 3],
-    SUBMISSION_MERCHANT_ID          => [50, 15],
+  # order is important here for the CSV and TSV file formats
+  my $map = [
+    {RECORD_TYPE                     => [1,   10]},
+    {PAYEE_MERCHANT_ID               => [11,  15]},
+    {SETTLEMENT_ACCOUNT_TYPE_CODE    => [26,  3]},
+    {AMERICAN_EXPRESS_PAYMENT_NUMBER => [29,  10]},
+    {PAYMENT_DATE                    => [39,  8]},
+    {PAYMENT_CURRENCY                => [47,  3]},
+    {SUBMISSION_MERCHANT_ID          => [50,  15]},
+    {MERCHANT_LOCATION_ID            => [65,  15]},
+    {FILLER1                         => [80,  15]},
+    {INVOICE_REFERENCE_NUMBER        => [95,  30]},
+    {SELLER_ID                       => [125, 20]},
+    {CARDMEMBER_ACCOUNT_NUMBER       => [145, 19]},
+    {TRANSACTION_AMOUNT              => [164, 16]},
+    {TRANSACTION_DATE                => [180, 8]},
+    {FEE_CODE                        => [188, 2]},
+    {FILLER2                         => [190, 7]},
+    {FEE_AMOUNT                      => [197, 22]},
+    {DISCOUNT_RATE                   => [219, 7]},
+    {DISCOUNT_AMOUNT                 => [226, 22]},
+    {FILLER3                         => [248, 553]},
+  ];
 
-    MERCHANT_LOCATION_ID            => [65, 15],
+  if ($self->file_version >= 3.01) {
+    pop @{$map};    # the last filler column changes for v3.01, so we remove it
 
-    (
-      $self->version >= 2.01
-      ? ( FILLER => [80, 15] )
-      : ()
-    ),
+    push @{$map} => (
+      {ROUNDED_FEE_AMOUNT                     => [248, 16]},     # v3.01
+      {ROUNDED_DISCOUNT_AMOUNT                => [264, 16]},     # v3.01
+      {FEE_AMOUNT_SETTLEMENT_CURRENCY         => [280, 22]},     # v3.01
+      {DISCOUNT_AMOUNT_SETTLEMENT_CURRENCY    => [302, 22]},     # v3.01
+      {TRANSACTION_AMOUNT_SETTLEMENT_CURRENCY => [324, 16]},     # v3.01
+      {FILLER3                                => [340, 461]},    # v3.01
+    );
+  }
 
-    INVOICE_REFERENCE_NUMBER        => [95, 30],
-    SELLER_ID                       => [125, 20],
-    CARDMEMBER_ACCOUNT_NUMBER       => [145, 19],
-    TRANSACTION_AMOUNT              => [164, 16],
-    TRANSACTION_DATE                => [180, 8],
-    FEE_CODE                        => [188, 2],
-    FEE_AMOUNT                      => [197, 22],
-    DISCOUNT_RATE                   => [216, 7],
-    DISCOUNT_AMOUNT                 => [226, 22],
-  };
+  return $map;
 }
 
 sub type {return 'TXNPRICING'}
@@ -48,9 +59,7 @@ sub AMERICAN_EXPRESS_PAYMENT_NUMBER {return $_[0]->_get_column('AMERICAN_EXPRESS
 sub PAYMENT_DATE                    {return $_[0]->_get_column('PAYMENT_DATE')}
 sub PAYMENT_CURRENCY                {return $_[0]->_get_column('PAYMENT_CURRENCY')}
 sub SUBMISSION_MERCHANT_ID          {return $_[0]->_get_column('SUBMISSION_MERCHANT_ID')}
-
 sub MERCHANT_LOCATION_ID            {return $_[0]->_get_column('MERCHANT_LOCATION_ID')}
-sub FILLER                          {return $_[0]->_get_column('FILLER')}
 sub INVOICE_REFERENCE_NUMBER        {return $_[0]->_get_column('INVOICE_REFERENCE_NUMBER')}
 sub SELLER_ID                       {return $_[0]->_get_column('SELLER_ID')}
 sub CARDMEMBER_ACCOUNT_NUMBER       {return $_[0]->_get_column('CARDMEMBER_ACCOUNT_NUMBER')}
@@ -60,6 +69,12 @@ sub FEE_CODE                        {return $_[0]->_get_column('FEE_CODE')}
 sub FEE_AMOUNT                      {return $_[0]->_get_column('FEE_AMOUNT')}
 sub DISCOUNT_RATE                   {return $_[0]->_get_column('DISCOUNT_RATE')}
 sub DISCOUNT_AMOUNT                 {return $_[0]->_get_column('DISCOUNT_AMOUNT')}
+
+sub ROUNDED_FEE_AMOUNT                     {return $_[0]->_get_column('ROUNDED_FEE_AMOUNT')}
+sub ROUNDED_DISCOUNT_AMOUNT                {return $_[0]->_get_column('ROUNDED_DISCOUNT_AMOUNT')}
+sub FEE_AMOUNT_SETTLEMENT_CURRENCY         {return $_[0]->_get_column('FEE_AMOUNT_SETTLEMENT_CURRENCY')}
+sub DISCOUNT_AMOUNT_SETTLEMENT_CURRENCY    {return $_[0]->_get_column('DISCOUNT_AMOUNT_SETTLEMENT_CURRENCY')}
+sub TRANSACTION_AMOUNT_SETTLEMENT_CURRENCY {return $_[0]->_get_column('TRANSACTION_AMOUNT_SETTLEMENT_CURRENCY')}
 
 1;
 
@@ -75,7 +90,7 @@ Finance::AMEX::Transaction::GRRCN::TxnPricing - Parse AMEX Global Reconciliation
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -121,6 +136,14 @@ This will always return the string TXNPRICING.
 Returns the full line that is represented by this object.
 
  print $record->line;
+
+=head2 field_map
+
+Returns an arrayref of hashrefs where the name is the record name and 
+the value is an arrayref of the start position and length of that field.
+
+ # print the start position of the PAYMENT_DATE field
+ print $record->field_map->[4]->{PAYMENT_DATE}->[0]; # 39
 
 =head2 RECORD_TYPE
 
@@ -282,6 +305,69 @@ Positions 17-22 (6) are decimal places.
 
 For example: ‘000000000000056789000’ represents a positive amount of 56.789, while ‘-000000000000056789000’ represents a negative amount of 56.789.
 
+=head2 ROUNDED_FEE_AMOUNT
+
+This field will only be available in v3.01 of the GRRCN format.  If you call this method on previous versions it will return undef.
+
+This field contains the Fee Amount charged by American Express for this transaction to two (2) decimal places. If the applied fee is a Fixed Fee, then the Fixed Fee Amount will be displayed in this field. This value is expressed in the Submission currency. For a typical debit ROC/transaction, the fee amount is signed positive.
+
+This field is only applicable in the U.S. and Canada. Where not relevant this field will be zero (0) filled.
+
+=head2 ROUNDED_DISCOUNT_AMOUNT
+
+This field will only be available in v3.01 of the GRRCN format.  If you call this method on previous versions it will return undef.
+
+This field contains the Discount Amount charged by American Express for this transaction to two (2) decimal places.
+
+If the applied fee is calculated as a percentage (%) of the transaction amount then the calculated fee amount will be displayed in this field (e.g., Rate = 2%, Transaction Amount = $100.00, Calculated Fee Amount = $2.00) - $2.00 will be populated in this field.
+
+Note: It is also possible that in certain markets which have local goods and services taxes (e.g., India, Australia, Mexico) that this field will contain a Tax Amount applicable to the transaction. This value is expressed in the Submission currency. For a typical debit transaction/ROC, the discount amount is signed positive.
+
+This field is only applicable in the U.S. and Canada. Where not relevant this field will be zero (0) filled.
+
+=head2 FEE_AMOUNT_SETTLEMENT_CURRENCY
+
+This field will only be available in v3.01 of the GRRCN format.  If you call this method on previous versions it will return undef.
+
+This field contains the Fee Amount charged by American Express for this transaction to six (6) decimal places.
+
+If the applied fee is a Fixed Fee, then the Fixed Fee Amount will be displayed in this field.
+
+If this field is populated then Field 18, Discount Rate, Field 19 Discount Amount and Field 23, Discount Amount (Settlement Currency) will not be populated.
+
+This value is expressed in the Settlement currency.
+
+For a typical debit ROC/transaction, the fee amount is signed positive.
+
+The format of this field is: Position 1 (1) is a signed field and will be either a space for a credit amount or a ‘-’ sign for a debit amount.
+
+Positions 2-16 (15) are whole numbers.
+
+Positions 17-22 (6) are decimal places.
+
+For example:
+' 000000000000056789000' represents a positive amount of 56.789, while '-000000000000056789000' represents a negative amount of 56.789.
+
+=head2 DISCOUNT_AMOUNT_SETTLEMENT_CURRENCY
+
+This field will only be available in v3.01 of the GRRCN format.  If you call this method on previous versions it will return undef.
+
+This field contains the Discount Amount charged by American Express for this transaction to six (6) decimal places.
+
+Note: It is also possible that in certain markets which have local goods and services taxes (e.g., India, Australia, Mexico) that this field will contain a Tax Amount applicable to the transaction. This value is expressed in the Settlement currency. If the applied fee is calculated as a percentage (%) of the transaction amount then the calculated fee amount will be displayed in this field (e.g., Rate = 2%, Transaction Amount = $100.00, Calculated Fee Amount = $2.00) - $2.00 will be populated in this field. If this field is populated then Field 17, Fee Amount and Field 22, Fee Amount (Settlement Currency) will not be populated.
+
+For a typical debit transaction/ROC, the discount amount is signed positive. The format of this field is: Position 1 (1) is a signed field and will be either a space for a credit amount or a ‘-’ sign for a debit amount. Positions 2-16 (15) are whole numbers. Positions 17-22 (6) are decimal places.
+
+For example:’ 000000000000056789000’ represents a positive amount of 56.789, while ‘-0000000000000567 represents a negative amount of 56.789.
+
+=head2 TRANSACTION_AMOUNT_SETTLEMENT_CURRENCY
+
+This field will only be available in v3.01 of the GRRCN format.  If you call this method on previous versions it will return undef.
+
+This field contains the Transaction or Record of Charge (ROC) Amount for a single transaction.
+
+This value is expressed in the Settlement currency.
+
 =head1 NAME
 
 Finance::AMEX::Transaction::GRRCN::TxnPricing - Object methods for AMEX Global Reconciliation (GRRCN) transaction or ROC pricing records.
@@ -292,7 +378,7 @@ Tom Heady <cpan@punch.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by ZipRecruiter.
+This software is copyright (c) 2022 by ZipRecruiter/Tom Heady.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

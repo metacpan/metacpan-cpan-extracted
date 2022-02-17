@@ -1,7 +1,7 @@
 use Test2::V0;
 
 use lib 't/lib';
-use Test2::Regexp::Pattern::License;
+use Test2::Tools::LicenseRegistry;
 
 plan 1;
 
@@ -15,15 +15,15 @@ like(
 		field 'Abstyles License'              => 'Abstyles';
 		field 'Adobe Systems Incorporated Source Code License Agreement' =>
 			'Adobe-2006';
-		field 'Adobe Glyph List License'           => 'Adobe-Glyph';
-		field 'Amazon Digital Services License'    => 'ADSL';
-		field 'Academic Free License v1.1'         => 'AFL-1.1';
-		field 'Academic Free License v1.2'         => 'AFL-1.2';
-		field 'Academic Free License v2.0'         => 'AFL-2.0';
-		field 'Academic Free License v2.1'         => 'AFL-2.1';
-		field 'Academic Free License v3.0'         => 'AFL-3.0';
-		field 'Afmparse License'                   => 'Afmparse';
-		field 'Affero General Public License v1.0' => 'AGPL-1.0';
+		field 'Adobe Glyph List License'                    => 'Adobe-Glyph';
+		field 'Amazon Digital Services License'             => 'ADSL';
+		field 'Academic Free License v1.1'                  => 'AFL-1.1';
+		field 'Academic Free License v1.2'                  => 'AFL-1.2';
+		field 'Academic Free License v2.0'                  => 'AFL-2.0';
+		field 'Academic Free License v2.1'                  => 'AFL-2.1';
+		field 'Academic Free License v3.0'                  => 'AFL-3.0';
+		field 'Afmparse License'                            => 'Afmparse';
+		field 'Affero General Public License v1.0'          => 'AGPL-1.0';
 		field 'GNU Affero General Public License v3.0 only' =>
 			'AGPL-3.0-only';
 		field 'GNU Affero General Public License v3.0 or later' =>
@@ -211,13 +211,13 @@ like(
 #		field 'GL2PS License'                        => 'GL2PS';
 #		field 'Glulxe License'                       => 'Glulxe';
 #		field 'gnuplot License'                      => 'gnuplot';
-		field 'GNU General Public License v1.0 only' => 'GPL-1.0-only';
+		field 'GNU General Public License v1.0 only'     => 'GPL-1.0-only';
 		field 'GNU General Public License v1.0 or later' =>
 			'GPL-1.0-or-later';
-		field 'GNU General Public License v2.0 only' => 'GPL-2.0-only';
+		field 'GNU General Public License v2.0 only'     => 'GPL-2.0-only';
 		field 'GNU General Public License v2.0 or later' =>
 			'GPL-2.0-or-later';
-		field 'GNU General Public License v3.0 only' => 'GPL-3.0-only';
+		field 'GNU General Public License v3.0 only'     => 'GPL-3.0-only';
 		field 'GNU General Public License v3.0 or later' =>
 			'GPL-3.0-or-later';
 		field 'gSOAP Public License v1.3b' => 'gSOAP-1.3b';
@@ -440,13 +440,13 @@ like(
 
 #		field 'XPP License'                                 => 'xpp';
 #		field 'XSkat License'                               => 'XSkat';
-		field 'Yahoo! Public License v1.0' => 'YPL-1.0';
-		field 'Yahoo! Public License v1.1' => 'YPL-1.1';
-		field 'Zed License'                => 'Zed';
-		field 'Zend License v2.0'          => 'Zend-2.0';
-		field 'Zimbra Public License v1.3' => 'Zimbra-1.3';
-		field 'Zimbra Public License v1.4' => 'Zimbra-1.4';
-		field 'zlib License'               => 'Zlib';
+		field 'Yahoo! Public License v1.0'               => 'YPL-1.0';
+		field 'Yahoo! Public License v1.1'               => 'YPL-1.1';
+		field 'Zed License'                              => 'Zed';
+		field 'Zend License v2.0'                        => 'Zend-2.0';
+		field 'Zimbra Public License v1.3'               => 'Zimbra-1.3';
+		field 'Zimbra Public License v1.4'               => 'Zimbra-1.4';
+		field 'zlib License'                             => 'Zlib';
 		field 'zlib/libpng License with Acknowledgement' =>
 			'zlib-acknowledgement';
 		field 'Zope Public License 1.1' => 'ZPL-1.1';

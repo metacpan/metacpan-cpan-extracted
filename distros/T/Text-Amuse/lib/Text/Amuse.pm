@@ -6,6 +6,7 @@ use warnings;
 use Text::Amuse::Document;
 use Text::Amuse::Output;
 use Text::Amuse::Beamer;
+use Text::Amuse::Utils;
 
 =head1 NAME
 
@@ -13,11 +14,11 @@ Text::Amuse - Generate HTML and LaTeX documents from Emacs Muse markup.
 
 =head1 VERSION
 
-Version 1.78
+Version 1.80
 
 =cut
 
-our $VERSION = '1.78';
+our $VERSION = '1.80';
 
 
 =head1 SYNOPSIS
@@ -482,7 +483,7 @@ Babel, Polyglossia, etc.
 =cut
 
 sub _language_mapping {
-    shift->document->_language_mapping;
+    return Text::Amuse::Utils::language_mapping();
 }
 
 =item header_defined
@@ -521,26 +522,29 @@ sub language {
 
 =item other_language_codes
 
-Always return undef, because in the current implementation you can't
-switch language in the middle of a text. But could be implemented in
-the future. It should return an arrayref or undef.
+It returns an arrayref or undef.
 
 =cut
 
 sub other_language_codes {
-    return;
+    my $self = shift;
+    # ensure the body is parsed
+    $self->as_latex;
+    return $self->document->other_language_codes;
 }
 
 =item other_languages
 
-Always return undef. When and if implemented, it should return an
-arrayref or undef.
+It return an arrayref or undef.
 
 =cut
 
 
 sub other_languages {
-    return;
+    my $self = shift;
+    # ensure the body is parsed
+    $self->as_latex;
+    return $self->document->other_languages;
 }
 
 =item hyphenation
@@ -589,21 +593,16 @@ return Latin.
 =cut
 
 sub is_rtl {
-    my $self = shift;
-    my $lang = $self->language_code;
-    my %rtl = (
-               ar => 1,
-               he => 1,
-               fa => 1,
-              );
-    return $rtl{$lang};
+    Text::Amuse::Utils::lang_code_is_rtl(shift->language_code);
 }
 
 sub is_bidi {
     my $self = shift;
     # trigger the parsing
     $self->as_latex;
-    return $self->document->bidi_document;
+    return $self->document->bidi_document || scalar(grep { Text::Amuse::Utils::lang_code_is_rtl($_) }
+                                                    ($self->language_code,
+                                                     @{ $self->other_language_codes || [] }));
 }
 
 sub html_direction {

@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-07'; # DATE
+our $DATE = '2022-01-23'; # DATE
 our $DIST = 'Text-Table-Org'; # DIST
-our $VERSION = '0.030'; # VERSION
+our $VERSION = '0.031'; # VERSION
 
 sub table {
     my %params = @_;
@@ -22,6 +22,8 @@ sub table {
 
     # here we go...
     my @table;
+
+    push @table, "#+CAPTION: $params{caption}\n" if defined $params{caption};
 
     # if the first row's a header:
     my $data_begins = 0;
@@ -109,7 +111,7 @@ Text::Table::Org - Generate Org tables
 
 =head1 VERSION
 
-This document describes version 0.030 of Text::Table::Org (from Perl distribution Text-Table-Org), released on 2022-01-07.
+This document describes version 0.031 of Text::Table::Org (from Perl distribution Text-Table-Org), released on 2022-01-23.
 
 =head1 SYNOPSIS
 
@@ -163,6 +165,13 @@ row, and separated from the rest of the table with a ruled line.
 =item * separate_rows (bool)
 
 If set to true, will add separator line between data rows.
+
+=item * caption
+
+Optional. String. If set, will add this line to the beginning of output (C<table
+caption> will be the actual caption string that you provide):
+
+ #+CAPTION: table caption
 
 =back
 

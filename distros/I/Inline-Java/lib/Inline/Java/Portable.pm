@@ -1,6 +1,4 @@
 package Inline::Java::Portable ;
-@Inline::Java::Portable::ISA = qw(Exporter) ;
-
 
 use strict ;
 use Exporter ;
@@ -9,7 +7,8 @@ use Config ;
 use File::Find ;
 use File::Spec ;
 
-$Inline::Java::Portable::VERSION = '0.53_90' ;
+our @ISA = qw(Exporter) ;
+our $VERSION = '0.53_90' ;
 
 # Here is some code to figure out if we are running on command.com
 # shell under Windows.
@@ -168,7 +167,14 @@ my $map = {
 		PERL_PARSE_DUP_ENV	=>  '-DPERL_PARSE_DUP_ENV',
 		BUILD_JNI_BY_DFLT	=>  1,
 		J2SDK_BIN			=>  'bin',
-		DEFAULT_J2SDK_DIR	=>  undef,
+		DEFAULT_J2SDK_DIR   =>  sub {
+			# for Ubuntu
+			require File::Which;
+			my $javapath = File::Which::which('java');
+			$javapath = readlink $javapath while defined eval { readlink $javapath };
+			require File::Basename;
+			File::Basename::dirname(File::Basename::dirname($javapath));
+		},
 		OTHERLDFLAGS		=>  '',
 		dynamic_lib			=>  {}
 	},
@@ -266,11 +272,11 @@ sub portable {
 	my $val = undef ;
 	if ((defined($map->{$^O}))&&(defined($map->{$^O}->{$key}))){
 		$val = $map->{$^O}->{$key} ;
-		$val = $val->() if ref($val) eq 'CODE' and $key !~ /^SUB_/;
 	}
 	else {
 		$val = $map->{_DEFAULT_}->{$key} ;
 	}
+	$val = $val->() if ref($val) eq 'CODE' and $key !~ /^SUB_/;
 
 	if ($key =~ /^SUB_/){
 		my $sub = $val ;

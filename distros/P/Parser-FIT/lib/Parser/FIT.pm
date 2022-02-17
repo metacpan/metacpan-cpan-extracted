@@ -4,18 +4,19 @@ use strict;
 use warnings;
 use Carp qw/croak carp/;
 use feature 'state';
+use Math::BigInt;
 use Parser::FIT::Profile;
 
 #require "Profile.pm";
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 sub new {
 	my $class = shift;
 	my %options = @_;
 
 	my $ref = {
-		_DEBUG => 1,
+		_DEBUG => 0,
 		header => {},
 		body => {},
 		globalMessages => [],
@@ -30,6 +31,10 @@ sub new {
 
 	if(exists $options{on}) {
 		$ref->{messageHandlers} = $options{on};
+	}
+
+	if(exists $options{debug} && $options{debug}) {
+		$ref->{_DEBUG} = 1;
 	}
 
 	bless($ref, $class);
@@ -51,16 +56,36 @@ sub parse {
 	open(my $input, "<", $file) or croak "Error opening '$file': $!";
 	binmode($input);
 
+	$self->parse_fh($input);
+}
+
+sub parse_fh {
+	my $self = shift;
+	my $input = shift;
+
+	unless(ref $input eq "GLOB") {
+		die "parse_fh requires an opened filehandle as param!";
+	}
+
+
 	$self->{fh} = $input;
 	my $header = $self->_read_header();
 	$self->{header} = $self->_parse_header($header);
 	#my $dataBody = $self->_readBytes($self->{header}->{dataLength});
-	my $result = $self->_parse_data_records();
+	$self->_parse_data_records();
 	#$self->_parse_crc();
 
 	close($input);
+}
 
-	return $result;
+sub parse_data {
+	my $self = shift;
+	my $data = shift;
+
+	open(my $fh, "<", \$data) or die "Error opening scalar as file: $!";
+	binmode($fh);
+
+	return $self->parse_fh($fh);
 }
 
 sub _read_header {
@@ -142,7 +167,6 @@ sub _parse_data_records {
 	while($self->{totalBytesRead} < $self->{header}->{eof}) {
 		
 		my ($recordHeaderByte) = unpack("c", $self->_readBytes(1));
-		# my $recordHeaderByte = $self->_readBytes(1);
 		$self->_debug("HeaderBytes in Binary: " . sprintf("%08b", $recordHeaderByte));
 		my $header = $self->_parse_record_header($recordHeaderByte);
 
@@ -153,22 +177,19 @@ sub _parse_data_records {
 
 			if($header->{isDefinitionMessage}) {
 				$self->_debug("Record definition header for LocalMessageType=" . $header->{localMessageType});
-				$self->_parse_definition_message($header->{localMessageType});
+				$self->_parse_definition_message($header);
 			}
 			else {
-				$self->_debug("Record Header for LocalMessageType=" . $header->{localMessageType});
-				my $localMessage = $self->_parse_local_message_record($header);
+				my $parseResult = $self->_parse_local_message_record($header);
 
-				if(!defined $localMessage->{globalMessageType}) {
-					$self->_debug("Undefined record. Skipping");
+				if(!defined $parseResult) {
+					$self->_debug("Skipping record for unknown LocalMessageType=" . $header->{localMessageType});
 					next;
 				}
+				
+				$self->_debug("Processed record for LocalMessageType=" . $header->{localMessageType});
 
-				my $globalMessageName = $localMessage->{globalMessageType}->{name};
-
-				my $msgType = $globalMessageName;
-				my $msgData = $localMessage->{data};
-				$self->emitRecord($msgType, $msgData);
+				$self->emitRecord($parseResult->{messageType}, $parseResult->{fields});
 
 				$self->{records}++;
 			}
@@ -209,6 +230,10 @@ sub getHandler {
 	my $self = shift;
 	my $msgType = shift;
 
+	if(!$msgType) {
+		die "cannot get a handler for an unknown msgType!";
+	}
+
 	if(exists $self->{messageHandlers}->{$msgType}) {
 		return $self->{messageHandlers}->{$msgType};
 	}
@@ -218,42 +243,69 @@ sub getHandler {
 
 sub _parse_definition_message {
 	my $self = shift;
-	my $localMessageType = shift;
-	my $recordLength;
-	my $rawEntry;
+	my $header = shift;
+	my $localMessageType = $header->{localMessageType};
 
 	my $data = $self->_readBytes(5);
 	my ($reserved, $arch, $globalMessageId, $fields) = unpack("ccsc", $data);
 
 	my $globalMessageType = $self->_get_global_message_type($globalMessageId);
 
-	my $globalMessageTypeName = $globalMessageType->{name};
-	my $globalMessageTypeDefinition = $globalMessageType;
-
 	$self->_debug("DefinitionMessageHeader:");
-	$self->_debug("Arch: $arch - GlobalMessage: " . ($self->_global_message_id_to_name($globalMessageId) || "<UNKNOWN_GLOBAL_MESSAGE>") . " ($globalMessageId) - Fields: $fields");
+	$self->_debug("Arch: $arch - GlobalMessage: " . (defined $globalMessageType ? $globalMessageType->{name} : "<UNKNOWN_GLOBAL_MESSAGE>") . " ($globalMessageId) - #Fields: $fields");
 	carp "BigEndian isn't supported so far!" if($arch == 1);
 
-	$rawEntry .= $data;
+	my ($messageFields, $recordLength) = ([], 0);
+
+	if(defined $globalMessageType) {
+		($messageFields, $recordLength) = $self->_parse_defintion_message_fields($globalMessageType, $fields);
+	}
+
+	my $localMessage = {
+		size => $recordLength,
+		dataFields => $messageFields,
+		globalMessage => $globalMessageType,,
+		unpackTemplate => join("", map { $_->{baseType}->{packTemplate} } @$messageFields),
+		isDeveloperMessage => $header->{isDeveloperData},
+		isUnknownMessage => !defined $globalMessageType,
+	};
+
+	$self->{localMessages}->[$localMessageType] = $localMessage;
+
+	$self->_debug("Following Record length: " . $localMessage->{size} . " bytes");
+}
+
+sub _parse_defintion_message_fields {
+	my $self = shift;
+	my $globalMessageType = shift;
+	my $numberOfFields = shift;
+
+	my $recordLength = 0;
+
 	my @dataFields;
 
-	foreach(1..$fields) {
+	foreach(1..$numberOfFields) {
 		my $fieldDefinitionData = $self->_readBytes(3); # Every Field has 3 Bytes
-		$rawEntry .= $fieldDefinitionData;
 		my ($fieldDefinition, $size, $baseTypeData)  = unpack("Ccc", $fieldDefinitionData);
 		my ($baseTypeEndian, $baseTypeNumber) = ($baseTypeData & 128, $baseTypeData & 15);
 		my $baseType = $self->_get_base_type($baseTypeNumber);
-		my $fieldDefinitionInfo = $globalMessageTypeDefinition->{fields}->{$fieldDefinition};
-		my $fieldName = $fieldDefinitionInfo->{name} || "<UNKNOWN_FIELD_NAME>";
+		my $fieldDescriptor = $globalMessageType->{fields}->{$fieldDefinition};
+
+		if(!defined $fieldDescriptor) {
+			$fieldDescriptor = {
+				isUnkownField => 1,
+				name => "<UNKNOWN_FIELD_NAME>"
+			};
+		}
+
+		my $fieldName = $fieldDescriptor->{name};
 		$self->_debug("FieldDefinition: Nr: $fieldDefinition (" . $fieldName . "), Size: $size, BaseType: " . $baseType->{name} . " ($baseTypeNumber), BaseTypeEndian: $baseTypeEndian");
 		$recordLength += $size;
-		push(@dataFields, { baseType => $baseType, fieldId => $fieldDefinition, fieldName => $fieldName });
+
+		push(@dataFields, { baseType => $baseType, fieldDescriptor => $fieldDescriptor });
 	}
 
-	$self->{localMessages}->[$localMessageType] = { size => $recordLength, dataFields => \@dataFields, globalMessageId => $globalMessageId };
-	$self->_debug("Following Record length: $recordLength bytes");
-
-	$self->_debug("RawEntry: length=" . length($rawEntry) . " - " . join(" ", map { "0x" . $_ } unpack("(H2)*", $rawEntry)));
+	return (\@dataFields, $recordLength);
 }
 
 sub _global_message_id_to_name {
@@ -364,6 +416,19 @@ sub _global_message_id_to_name {
 	}
 }
 
+sub getLocalMessageById {
+	my $self = shift;
+	my $localMessageId = shift;
+
+	my $localMessage = $self->{localMessages}->[$localMessageId];
+
+	if(!defined $localMessage) {
+		die "Encountered a record  localMessageId=$localMessageId which was not introduced by a definition message!";
+	}
+
+	return $localMessage;
+}
+
 sub _get_global_message_type {
 	my $self = shift;
 
@@ -385,36 +450,75 @@ sub _parse_local_message_record {
 	my $self = shift;
 	my $header = shift;
 
-	my $localMessage = $self->{localMessages}->[$header->{localMessageType}];
-
-	if(!defined $localMessage) {
-		die "Encountered record for LocalMessageNumber=" . $header->{localMessageType} . " which was not preceded by a matching definition message!";
-	}
+	my $localMessageId = $header->{localMessageType};
+	my $localMessage = $self->getLocalMessageById($localMessageId);
 
 	my $recordLength = $localMessage->{size};
 	my $record = $self->_readBytes($recordLength);
 
-	my $unpackTemplate = join("", map { $_->{baseType}->{packTemplate} } @{$localMessage->{dataFields}});
-	my @rawFields;
-	foreach($localMessage->{dataFields}) {
-		push(@rawFields, unpack($unpackTemplate, $record));
+	# skip unknown messages (the _readBytes above is correct, since we need to "remove" the bytes from the stream)
+	if($localMessage->{isUnknownMessage}) {
+		return undef;
 	}
 
-	my $globalMessageType = $self->_get_global_message_type($localMessage->{globalMessageId});
+	my $unpackTemplate = $localMessage->{unpackTemplate};
+	my @rawFields = unpack($unpackTemplate, $record);
+
+	my $globalMessageType = $localMessage->{globalMessage};
 
 	my %result;
 
 	my $fieldCount = scalar @{$localMessage->{dataFields}};
 	for(my $i = 0; $i < $fieldCount; $i++) {
 		my $localMessageField = $localMessage->{dataFields}->[$i];
-		my $rawValue = @rawFields[$i];
+		my $rawValue = $rawFields[$i];
 
-		my $fieldName = $localMessageField->{fieldName};
+		my $fieldDescriptor = $localMessageField->{fieldDescriptor};
+		my $fieldName = $fieldDescriptor->{name};
 
-		$result{$fieldName} = $rawValue; 
+		if($fieldDescriptor->{isUnkownField}) {
+			next;
+		}
+
+		my $postProcessedValue = $self->postProcessRawValue($rawValue, $fieldDescriptor);
+
+		$result{$fieldName} = {
+			value => $postProcessedValue,
+			rawValue => $rawValue,
+			fieldDescriptor => $fieldDescriptor,
+		};
 	}
 
-	return { globalMessageType => $globalMessageType, globalMessageId => $localMessage->{globalMessageId}, data => \%result };
+	return {
+		messageType => $localMessage->{globalMessage}->{name},
+		fields => \%result
+	};
+}
+
+sub postProcessRawValue {
+	my $self = shift;
+	my $rawValue = shift;
+	my $fieldDescriptor = shift;
+
+	if(defined $fieldDescriptor->{scale}) {
+		$rawValue /= $fieldDescriptor->{scale};
+	}
+
+	if(defined $fieldDescriptor->{offset}) {
+		$rawValue -= $fieldDescriptor->{offset};
+	}
+
+	if(defined $fieldDescriptor->{unit} && $fieldDescriptor->{unit} eq "semicircles") {
+		state $semicirclesToDegreesConversionRate = 180 / 2**31;
+		$rawValue *= $semicirclesToDegreesConversionRate;
+	}
+
+	if(defined $fieldDescriptor->{type} && $fieldDescriptor->{type} eq "date_time") {
+		state $fitEpocheOffset = 631065600;
+		$rawValue += $fitEpocheOffset;
+	}
+
+	return $rawValue;
 }
 
 sub _get_base_type {
@@ -481,7 +585,7 @@ sub _get_base_type {
 		{
 			name => "float64",
 			size => 8,
-			invalid => 0xffffffffffffffff,
+			invalid => Math::BigInt->new("0xffffffffffffffff"),
 			packTemplate => "d",
 		},
 		{
@@ -511,13 +615,13 @@ sub _get_base_type {
 		{
 			name => "sint64",
 			size => 8,
-			invalid => 0x7fffffffffffffff,
+			invalid => Math::BigInt->new("0x7fffffffffffffff"),
 			packTemplate => "q",
 		},
 		{
 			name => "uint64",
 			size => 8,
-			invalid => 0xffffffffffffffff,
+			invalid => Math::BigInt->new("0xffffffffffffffff"),
 			packTemplate => "Q",
 		},
 		{
@@ -599,15 +703,23 @@ But this module is free and open source: Feel free to contribute code, example d
 
 Create a new L<Parser::FIT> object.
 
-Parameters:
+  Parser::FIT->new(
+	  debug => 1|0 # enable/disable debug output. Disabled by default
+	  on => { # Provide a hashref of message handlers
+	  	sessiont => sub { },
+		lap => sub { },
+	  }
+  )
 
 =head2 on
 
 Register and deregister handlers for a parser.
 
-  $parser->on(record => sub { });
+  $parser->on(record => sub { my $message = shift; });
 
-Registering and already existing handler overwrites the old one.
+Concrete message handlers receive on paramter which represents the parsed message. See L</MESSAGES> for more details.
+
+Registering an already existing handler overwrites the old one.
 
   $parser->on(session => sub { say "foo" });
   $parser->on(session => sub { say "bar" }); # Overwrites the previous handler
@@ -618,14 +730,16 @@ Registering a falsy value for a message type will deregister the handler:
 
 There is currently no check, if the provided message name actually represents an existing one from the FIT specs.
 
-Additionally there is one special message name: C<_any>. Which can be used to receive just every message encountered by the parser:
+Additionally there is a special message name: C<_any>. Which can be used to receive just every message encountered by the parser.
+The C<_any> handler receives two parameters. The first one is the C<messageType> which is just a string with the name of the message. The second one is a L<message|/MESSAGES> hash-ref.
 
   $parser->on(_any => sub {
-	  my $msgType = shift;
-	  my $msgData = shift;
+	  my $messageType = shift;
+	  my $message = shift;
 
-	  print "Saw a messafe of type $msgType";
+	  print "Saw a message of type $msgType";
   });
+
 
 The C<on> method can also be called from inside a handler callback in order to de-/register handlers based on the stream of events
 
@@ -639,6 +753,168 @@ The C<on> method can also be called from inside a handler callback in order to d
 		  $lapResults[$lapCount]++;
 	  });
   });
+
+=head2 parse
+
+Parse a file and call registered message handlers.
+
+  $parser->parse('/some/file.fit');
+
+=head2 parse_data
+
+Parse FIT data contained in a scalar and call registered message handlers.
+
+  $parser->parse_data($inMemoryFitData);
+
+=head1 DATA STRUCTURES
+
+This section explains the used data structures you may or may not encounter when using this module.
+
+=head2 MESSAGES
+
+A message is a hash-ref where the keys map to fieldnames defined by the FIT Profile (aka C<Profile.xls>) for the given message.
+
+The FIT protocol defines so called C<local messages> which allow to only store a subset of the so called C<global message>.
+For example the C<session> global message defines 134 fields, but an actually recorded session message in a FIT file may only contain 20 of these.
+
+This way it is possible to create FIT files which only contain the data the device is currently "seeing". But this also means, that this data may change "in-flight".
+For example if a session is started without an heartrate sensor, the include FIT data will not have heartrate related data. When later in the session the user straps on a heartrate sensor
+and pairs it with his device, all upcoming data inside the FIT file will have heartrate data. The same is true for sensors/data that goes away while recording.
+
+Therefore you always have to check if the desired data is actually in the message.
+
+For a list of field names you may expect to see, you can check the Garmin FIT SDK. It includes a C<Profile.xls> file which defines all the valid fields for every global message.
+
+The fields of a message are represented as L<message fields|/MESSAGE-FIELDS>.
+
+An example C<record> message:
+
+  {
+    'speed' => {
+      'fieldDescriptor' => {
+                              'name' => 'speed',
+                              'id' => '6',
+                              'scale' => 1000,
+                              'unit' => 'm/s',
+                              'type' => 'uint16',
+                              'offset' => undef
+                          },
+      'rawValue' => 2100
+      'value' => '2.1',
+    },
+    'position_lat' => {
+        'fieldDescriptor' => { }, # skipped for readability
+        'rawValue' => 574866379,
+        'value' => '48.184743'
+    },
+    'distance' => {
+        'fieldDescriptor' => { }, # skipped for readability
+        'rawValue' => 238,
+        'value' => '2.38',
+    },
+    'heart_rate' => {
+      'fieldDescriptor' => { }, # skipped for readability
+      'value' => 70,
+      'rawValue' => 70
+      },
+    'timestamp' => {
+      'rawValue' => 983200317,
+      'fieldDescriptor' => { }, # skipped for readability
+      'value' => 1614265917
+      },
+    'altitude' => {
+        'value' => '790.8',
+        'fieldDescriptor' => { }, # skipped for readability
+        'rawValue' => 6454
+    },
+    'position_long' => {
+        'fieldDescriptor' => { }, # skipped for readability
+        'value' => '9.102652',
+        'rawValue' => 108598869
+      }
+  }
+=head2 MESSAGE FIELDS
+
+A message field represents actuall data inside a message. It consists of a hash-ref containg:
+
+=over
+
+=item value
+
+The value after L<post processing|/POST-PROCESSING>.
+
+=item rawValue
+
+The original value as it is stored in the FIT file.
+
+=item fieldDescriptor
+
+A hash-ref containing a L<field descriptor|/FIELD-DESCRIPTOR> which describes this field.
+
+=back
+
+=head2 FIELD DESCRIPTOR
+
+A C<field descriptor> is just a hash-ref with some key-value pairs describing the underlying field.
+
+The keys are:
+
+=over
+
+=item id
+
+The id of the field in relation to the message type.
+
+=item name
+
+The name of the field this descriptor represents.
+
+=item unit
+
+The unit of measurement (e.G. C<kcal>, C<m>, C<bpm>).
+
+=item scale
+
+The scale by which the rawValue needs to be scaled.
+
+=item type
+
+The original FIT data type (e.G. C<uint8>, C<date_time>).
+
+=back
+
+The values for these keys are directly taken from the FIT C<Profile.xls>.
+
+
+=head1 POST PROCESSING
+
+=head2 SCALE
+
+The FIT protocol defines for various data fields a scale (e.G. distances define a scale of 100) in order to optimize the low-level storage type.
+
+L<Parser::FIT> divides the C<rawValue> by the scale and stores the result in C<value>. The C<rawValue> stays untouched.
+
+=head2 OFFSET
+
+The FIT protocol defines for various data fields an offset (e.G. altitude values are offset by 500m) in order to optimize the low-level storage type.
+
+L<Parser::FIT> subtracts the offsets from the C<rawValue> and stores the result in C<value>. The C<rawValue> stays untouched.
+
+=head2 CONVERSIONS
+
+The FIT protocol defines various special data types. L<Parser::FIT> converts the following types to "more usefull" ones:
+
+=head3 SEMICRICLES
+
+Fields with the data type C<semicricles> get converted to degrees via this formula: C<degrees = semicircles * (180/2^31)>.
+
+So the C<value> of a field with data type C<semicricles> is in degrees. The C<rawValue> stays in semicircles.
+
+=head3 DATE_TIME
+
+Fields with the data type C<date_time> get converted to unix epoche timestamps via this formula: C<unixTimestamp = fitTimestamp + 631065600>.
+
+Internally FIT is using it's own epoche starting at December 31, 1989 UTC.
 
 =head1 AUTHOR
 

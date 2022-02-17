@@ -1,24 +1,33 @@
 package BorderStyle::BoxChar::SingleLine;
 
+
 use strict;
-use parent 'BorderStyleBase';
+use warnings;
+
+use Role::Tiny::With;
+with 'BorderStyleRole::Source::ASCIIArt';
+with 'BorderStyleRole::Transform::BoxChar';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-26'; # DATE
+our $DATE = '2022-02-14'; # DATE
 our $DIST = 'BorderStyles-Standard'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.013'; # VERSION
+
+our $PICTURE = <<'_';
+lqqqqqqqwqqqwqqqk'
+x ..... x . x . x'
+x ..... tqqqnqqqu'
+x ..... x . x . x'
+x ..... tqqqvqqqu'
+x ..... x ..... x'
+tqqqwqqqu ..... x'
+x . x . x ..... x'
+mqqqvqqqvqqqqqqqj'
+_
 
 our %BORDER = (
-    v => 2,
+    v => 3,
     summary => 'Single line border with box-drawing characters',
-    chars => [
-        ['l','q','w','k'], # 0
-        ['x','x','x'],     # 1
-        ['t','q','n','u', 'w','v','t','u'], # 2
-        ['x','x','x'],     # 3
-        ['t','q','n','u', 'w','v','t','u'], # 4
-        ['m','q','v','j'], # 5
-    ],
     box_chars => 1,
 );
 
@@ -37,7 +46,7 @@ BorderStyle::BoxChar::SingleLine - Single line border with box-drawing character
 
 =head1 VERSION
 
-This document describes version 0.011 of BorderStyle::BoxChar::SingleLine (from Perl distribution BorderStyles-Standard), released on 2022-01-26.
+This document describes version 0.013 of BorderStyle::BoxChar::SingleLine (from Perl distribution BorderStyles-Standard), released on 2022-02-14.
 
 =head1 SYNOPSIS
 

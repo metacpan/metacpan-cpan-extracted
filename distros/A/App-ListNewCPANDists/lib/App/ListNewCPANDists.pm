@@ -1,9 +1,9 @@
 package App::ListNewCPANDists;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-01'; # DATE
+our $DATE = '2021-08-20'; # DATE
 our $DIST = 'App-ListNewCPANDists'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 use 5.010001;
 use strict;
@@ -272,7 +272,6 @@ _
         %args_filter,
         from_time => {
             schema => $sch_date,
-            req => 1,
             pos => 0,
             cmdline_aliases => {from=>{}},
         },
@@ -281,6 +280,25 @@ _
             pos => 1,
             cmdline_aliases => {to=>{}},
         },
+
+        today => {
+            schema => 'true*',
+        },
+        this_week => {
+            schema => 'true*',
+            description => <<'_',
+
+Monday is the start of the week.
+
+_
+        },
+        this_month => {
+            schema => 'true*',
+        },
+        # this_year
+    },
+    args_rels => {
+        req_one => [qw/today this_week this_month from_time/],
     },
     examples => [
         {
@@ -299,7 +317,22 @@ sub list_new_cpan_dists {
     my $state = _init(\%args);
     my $dbh = $state->{dbh};
 
-    my $from_time = $args{from_time};
+    my $from_time;
+    if ($args{from_time}) {
+        $from_time = $args{from_time};
+    } elsif ($args{today}) {
+        $from_time = DateTime->today;
+    } elsif ($args{this_week}) {
+        my $today = DateTime->today;
+        my $dow   = $today->day_of_week;
+        my $days  = $dow > 1 ? $dow-1 : 7;
+        $from_time = $today->add(days => -$days);
+    } elsif ($args{this_month}) {
+        $from_time = DateTime->today->set(day => 1);
+    } else {
+        return [400, "Please specify today/this_week/this_month/from_time"];
+    }
+
     my $to_time   = $args{to_time} // DateTime->now;
     #if (!$to_time) {
     #    $to_time = $from_time->clone;
@@ -570,7 +603,7 @@ App::ListNewCPANDists - List new CPAN distributions in a given time period
 
 =head1 VERSION
 
-This document describes version 0.015 of App::ListNewCPANDists (from Perl distribution App-ListNewCPANDists), released on 2021-08-01.
+This document describes version 0.016 of App::ListNewCPANDists (from Perl distribution App-ListNewCPANDists), released on 2021-08-20.
 
 =head1 FUNCTIONS
 
@@ -747,9 +780,17 @@ Filename of database.
 
 =item * B<exclude_dists> => I<array[perl::distname]>
 
-=item * B<from_time>* => I<date>
+=item * B<from_time> => I<date>
+
+=item * B<this_month> => I<true>
+
+=item * B<this_week> => I<true>
+
+Monday is the start of the week.
 
 =item * B<to_time> => I<date>
+
+=item * B<today> => I<true>
 
 
 =back
@@ -785,9 +826,26 @@ feature.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
+beyond that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

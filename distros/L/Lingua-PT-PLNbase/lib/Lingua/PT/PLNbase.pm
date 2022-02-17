@@ -9,10 +9,10 @@ use Lingua::PT::Abbrev;
 require Exporter;
 our @ISA = qw(Exporter);
 
-use POSIX qw(locale_h);
-my $llang = setlocale(LC_CTYPE, "pt_PT");
-$llang    = setlocale(LC_CTYPE, "pt_BR") unless $llang;
-use locale;
+#use POSIX qw(locale_h);
+#my $llang = setlocale(LC_CTYPE, "pt_PT");
+#$llang    = setlocale(LC_CTYPE, "pt_BR") unless $llang;
+#use locale;
 
 use utf8;
 
@@ -51,40 +51,59 @@ our @EXPORT = qw(
    cqptokens tokenize
 );
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 our $abrev;
 
-our $terminador = qr{([.?!;]+[\»"'”’]?|<[pP]\b.*?>|<br>|\n\n+|:\s+(?=[-\«"“‘][A-Z]))};
+our $terminador = qr{([.?!;]+[\»"'”’\«]?|<[pP]\b.*?>|<br>|\n\h*\n+|:\s+(?=[-\«"“‘„][A-Z]))};
+
+our $itemmarkers1 =qr{
+  (?:^|\n)\h*(
+      \d\d?[)]\h                        # 4) 
+    | [a-z][.)]\h                       # a)  b.
+    | \([a-z1-9]\)\h                    # (a)
+    | [.*►•●]                           # •
+    | \d{1,3}[.]\h                      # 1.
+    | \d{1,2}\.\d{1,2}[.)]\h            # 2.3.
+    | \d{1,2}\.\d{1,2}\.\d{1,2}[.)]\h   # 2.3.3.
+    )
+}x;
+
+our $itemmarkers2 =qr{         # not used yet
+  \n\h*(
+    | \<(li|LI)\>              # <li>
+    | [‐‑–—\-]+                # --
+    )
+}x;
 
 our $protect = qr!
        \#n\d+
     |  \w+['’]\w+
-    |  \bn\.o                                    # number
+    |  \bn\.os?(?\![.\w])                        # number
     |  [\w_.-]+ \@ [\w_.-]+\w                    # emails
     |  \w+\.?[ºª°]\.?                            # ordinals
     |  _sec[:+].*?_                              # section marks from bookclean
-    |  <[A-Za-z](?:\w|:)*                        # <tag
+    |  <[A-Za-z_](?:\w|:)*                       # <tag
          (?:\s+
-            [A-Za-z:0-9]+=                       #   at='v'
+            [A-Za-z_:0-9]+=                      #   at='v'
                (?: '[^']+'
                |   "[^"]+")
          )*
          \s*/?\s*
        >                                         # markup open XML SGML
-    |  </\s*[A-Za-z0-9:]+\s*>                    # markup close XML SGML
+    |  </\s*[A-Za-z_0-9:]+\s*>                   # markup close XML SGML
     |  \d+(?:\/\d+)+                             # dates or similar 12/21/1
     |  \d+(?:[.,]\d+)+%?                         # numbers
-    |  \d+(?:\.[oa])+                            # ordinals numbers  12.o
+    |  \d+(?:\.[oa])+                            # ordinals numbers  12.
     |  (?:\d+\.)+(?=[ ]*[a-z0-9])                # numbers  12. (continuation)
     |  \d+\:\d+(\:\d+)?                          # the time         12:12:2
     |  (?:\&\w+\;)                               # entidades XML HTML
-    |  ((https?|ftp|gopher)://|www)[\w_./~:-]+\w # urls
-    |  \w+\.(?:com|org|net|pt)                   # simplified urls
-    |  \w+(-\w+)+                                # dá-lo-à
+    |  (?:(?:https?|ftp|gopher|oai):|www)[\w_./~:-]+\w  # urls
+     |  (?: \w+ \. )+ (?: com | org | net | pt )  # simplified urls
+    |  \w+(-\w+)+                                # dá-lo-à  
     |  \\\\unicode\{\d+\}                        # unicode...
-    |  \w+\.(?:exe|html?|zip|jpg|gif|wav|mp3|png|t?gz|pl|xml) # filenames
-!x;
+     |  \w+\.(?:exe|html?|zip|jpg|gif|wav|mp3|png|t?gz|pl|xml) # filenames
+!xu;
 
 
 our ($savit_n, %savit_p);
@@ -122,6 +141,7 @@ sub _loadit{
 
 
 sub _tokenizecommon {
+  use utf8::all;
   my $conf = { keep_quotes => 0 };
   if (ref($_[0]) eq "HASH") {
     my $c = shift;
@@ -340,20 +360,22 @@ sub xmlsentences {
 
 sub frases { sentences(@_) }
 sub sentences{
+  use utf8::all;
   my @r;
   my $MARCA = "\0x01";
   my $par = shift;
   for ($par) {
+    s!($itemmarkers1)!_savit("$MARCA$1$MARCA")!ge;
     s!($protect)!          _savit($1)!xge;
     s!\b(($abrev)\.)!      _savit($1)!ige;
     s!\b(([A-Z])\.)!       _savit($1)!gie;  # este à parte para não apanhar minúlculas (s///i)
     s!($terminador)!$1$MARCA!g;
     $_ = _loadit($_);
-    @r = split(/$MARCA/,$_);
+    @r = split(/\s*(?:$MARCA\s*)/,$_);
   }
-  if (@r && $r[-1] =~ /^\s*$/s) {
-    pop(@r)
-  }
+  #if (@r && $r[-1] =~ /^\s*$/s) {
+  #  pop(@r)
+  #}
   return map { _trim($_) } @r;
 }
 
@@ -361,7 +383,8 @@ sub _trim {
   my $x = shift;
   $x =~ s/^[\n\r\s]+//;
   $x =~ s/[\n\r\s]+$//;
-  return $x;
+  if($x =~ /\S/){return ($x)}
+  else          {return (  )}
 }
 
 
@@ -445,6 +468,7 @@ Só pode ser usado com o C<s_tag> e obriga à numeração a três níveis (N.N.N
 =cut
 
 sub fsentences {
+  use utf8::all; 
   my %opts = (
 	      o_format => 'XML',
 	      s_tag    => 's',
@@ -482,7 +506,11 @@ sub fsentences {
     if (ref($file)) {
       $fh = $file;
     } else {
-      open $fh, $file or die("Cannot open file $file:$!\n");
+	if ($opts{enc}) {
+	    open $fh, "<$opts{enc}", $file or die("Cannot open file $file:$!\n");
+	} else {
+	    open $fh, $file or die("Cannot open file $file:$!\n");
+	}
       print _open_t_tag(\%opts, $file);
     }
 
@@ -676,6 +704,7 @@ sub remove_accents {
 ### ---------- OSLO --------
 
 sub tokeniza {
+  use utf8::all;
   my $par = shift;
 
   for ($par) {
@@ -799,6 +828,7 @@ sub tokeniza {
 
 
 sub tratar_pontuacao_interna {
+  use utf8::all;
   my $par = shift;
 
   #    print "Estou no pontuação interna... $par\n";
@@ -1068,6 +1098,7 @@ sub tratar_pontuacao_interna {
 
 
 sub separa_frases {
+  use utf8::all;
   my $par = shift;
 
   # $num++;
@@ -1211,6 +1242,7 @@ sub separa_frases {
 
 
 sub recupera_ortografia_certa {
+  use utf8::all;
   # os sinais literais de + são codificados como "++" para evitar
   # transformação no ponto, que é o significado do "+"
 

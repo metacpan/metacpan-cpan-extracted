@@ -1,3 +1,33 @@
+1.199 2022-02-13
+================
+
+[Quiq::Database:Connection]
+* Meldung bei Constraint-Verletzung verallgemeinert
+
+[Quiq::Html::List]
+* Bei description-List Eintrag nur bei undef unterdrücken
+
+[Quiq::Sdoc::Producer]
+* section() - Abschittsattribute eingeführt
+
+[Quiq::Web::Navigation]
+* Klasse hinzugefügt
+
+[Quiq::Dumper]
+* dump() - CODE- und GLOB-Referenz hinzugefügt
+
+[Quiq::JavaScript]
+* line() - Kommentar-Behandlung verbessert
+
+[Quiq::MailTo]
+* Klasse hinzugefügt
+
+[Quiq::Table]
+* row() - Methode hinzugefügt
+
+[Quiq::Url]
+* new() - Methode hinzugefügt
+
 1.198 2022-01-22
 ================
 

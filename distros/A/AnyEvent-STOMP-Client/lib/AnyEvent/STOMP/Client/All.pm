@@ -10,7 +10,7 @@ use Log::Any qw($log);
 use AnyEvent::STOMP::Client;
 
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 
 my $SEPARATOR_ID_ACK = '#';
@@ -68,8 +68,8 @@ sub setup_stomp_clients {
 
         $self->{stomp_clients}{$id}->on_error(
             sub {
-                my (undef, $header, undef) = @_;
-                $log->warn("$id STOMP ERROR $header->{message}.");
+                my (undef, undef, undef, $error) = @_;
+                $log->warn("$id STOMP ERROR $error");
             }
         );
 
